@@ -69,7 +69,7 @@
     <ClCompile Include="texture_baker\texture_baker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\binpacking.cpp">
+    <ClCompile Include="SDK\atlaspacking.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

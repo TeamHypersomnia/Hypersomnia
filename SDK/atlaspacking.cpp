@@ -1,22 +1,23 @@
-#include "db.h"
-DB_USE_ALL_NAMESPACES;
+#include "../augmentations.h"
 
-#include <gl\GL.h>
+#include "../texture_baker/font.h"
 
+#include "../config/config.h"
+#include "../window_framework/window.h"
+
+#include <gl\glew.h>
 
 int main() {
-	using namespace db;
-	using namespace math;
-	using namespace window;
-	using namespace graphics;
-	
-	config cfg("window_config.txt");
+	augmentations::init();
+	using namespace augmentations;
 
-	glwindow::init();
-	glwindow gl;
-	gl.create(cfg, rect_wh(100, 100), glwindow::RESIZABLE);
-	graphics::init();
-	graphics::fps.set_max_fps(9999999);
+	config::input_file cfg("window_config.txt");
+
+	window::glwindow gl;
+	gl.create(cfg, rects::wh(100, 100), window::glwindow::RESIZABLE);
+	
+	util::fpstimer fps;
+	fps.set_max_fps(9999999);
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
@@ -28,18 +29,18 @@ int main() {
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);  
 	glEnableClientState(GL_COLOR_ARRAY);  
 
-	gl.set_minimum_size(rect_wh(10, 10));
-	gl.set_maximum_size(rect_wh(1680, 1050));
+	gl.set_minimum_size(rects::wh(10, 10));
+	gl.set_maximum_size(rects::wh(1680, 1050));
 
-	event::message msg;
+	window::event::message msg;
 
 	bool quit = false;
 	gl.set_show(gl.SHOW);
 	unsigned id = 0, in = 0;
 	
 	const int IMAGES = 40;
-	image images[IMAGES];
-	texture textures[IMAGES];
+	texture_baker::image images[IMAGES];
+	texture_baker::texture textures[IMAGES];
 
 	images[0].from_file(L"C:/VVV/fruit.png");
 	images[1].from_file(L"C:/VVV/head.png");
@@ -77,26 +78,20 @@ int main() {
 	images[39].create(4, 4, 1);
 	images[39].fill(255);
 
-	gui::null_texture = textures + 0;
-
 	const int FONTS = 4;
-	font_file fontf[FONTS];
-	font      fonts[FONTS];
-	font_in fin; 
+	texture_baker::font_file fontf[FONTS];
+	texture_baker::font      fonts[FONTS];
 
-	fin.init();
 	wchar_t* str = L" qvxQVXaπbcÊdeÍfghijkl≥mnÒoÛprsútuwyzüøA•BC∆DE FGHIJKL£MN—O”PRSåTUWYZèØ0123456789.!@#$%^&*()_+-=[];'\\,./{}:\"|<>?";
 	
-	fontf[0].open(fin, "resources/texteditor/arial.ttf",   25, str);
-	fontf[1].open(fin, "resources/texteditor/arialbd.ttf", 25, str);
-	fontf[2].open(fin, "resources/texteditor/ariali.ttf",  25, str);
-	fontf[3].open(fin, "resources/texteditor/arialbi.ttf", 25, str);
-	
-	fin.deinit();
+	fontf[0].open("SDK/resources/arial.ttf",   25, str);
+	fontf[1].open("SDK/resources/arialbd.ttf", 25, str);
+	fontf[2].open("SDK/resources/ariali.ttf",  25, str);
+	fontf[3].open("SDK/resources/arialbi.ttf", 25, str);
 	
 	fonts->set_styles(fonts + 1, fonts + 2, fonts + 3);
 	
-	io::input::atlas atl;
+    texture_baker::atlas atl;
 
 	atl.quick_add(images, textures, IMAGES, fontf, fonts, FONTS);
 	atl.pack();
@@ -105,18 +100,11 @@ int main() {
 	atl.img.destroy();
 	atl.nearest();
 
-	gui::null_texture->translate_uv(pointf(2, 2));
-	gui::null_texture->scale_uv(0.000000001f, 0.000000001f);
+	textures[IMAGES].translate_uv(rects::pointf(2, 2));
+	textures[IMAGES].scale_uv(0.000000001f, 0.000000001f);
 
-	gui::system sys(gl.events);
-	gui::group main_window(sys);
-	stylesheeted::ltblue_theme();
-	
-	//stylesheeted::crect atlrect(rect_xywh(0, 0, atl.img.get_size().w, atl.img.get_size().h), stylesheet(stylesheet::style(pixel_32(), &atl.atlas_texture, solid_stroke(0))));
-	stylesheeted::crect atlrect(rect_xywh(0, 0, gl.get_window_rect().w, gl.get_window_rect().h), stylesheet(stylesheet::style(pixel_32(), &atl.atlas_texture, solid_stroke(0))));
-	main_window.root.children.push_back(&atlrect);
 
-	gl.resize = [](glwindow& gl) {
+	gl.resize = [](window::glwindow& gl) {
 		gl.current();
 		glViewport(0, 0, gl.get_window_rect().w, gl.get_window_rect().h);
 
@@ -128,16 +116,13 @@ int main() {
 
 	gl.resize(gl);
 
+	atl.bind();
+	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
+
 	while(true) {
 		if(gl.poll_events(msg)) {
-			using namespace event;
-
-			if(msg == close) {
+			if(msg == window::event::close) 
 				break;
-			}
-
-			main_window.update_rectangles();
-			main_window.poll_events();
 		}
 
 		if(fps.render()) { 
@@ -145,8 +130,16 @@ int main() {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glLoadIdentity();
 
-			main_window.default_update();
-			main_window.draw_gl_fixed();
+			glBegin (GL_QUADS);
+			glTexCoord2f (0.0, 0.0);
+			glVertex2i (0, 0);
+			glTexCoord2f (1.0, 0.0);
+			glVertex2i (gl.get_window_rect().w, 0);
+			glTexCoord2f (1.0, 1.0);
+			glVertex2i (gl.get_window_rect().w, gl.get_window_rect().h);
+			glTexCoord2f (0.0, 1.0);
+			glVertex2i (0, gl.get_window_rect().h);
+			glEnd();
 
 			if(!gl.swap_buffers()) break;
 
