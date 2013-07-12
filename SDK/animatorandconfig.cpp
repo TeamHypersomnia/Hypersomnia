@@ -1,44 +1,46 @@
 //#define include_DWM
-#include "db.h"
+#include "../augmentations.h"
+
+#include "../config/config.h"
+#include "../window_framework/window.h"
+#include "../utility/value_animator.h"
+
+#include <gl/glew.h>
 
 int main() {
-	using namespace db;
-	using namespace math;
-	using namespace window;
-
-	config cfg("window_config.txt");
-
-	glwindow::init();
-	glwindow gl;
-	gl.create(cfg, rect_wh(100, 100), 0);
+	augmentations::init();
+	using namespace augmentations;
 	
-	gl.set_minimum_size(rect_wh(cfg[L"min_resw"], cfg[L"min_resh"]));
-	gl.set_maximum_size(rect_wh(cfg[L"max_resw"], cfg[L"max_resh"]));
+	config::input_file cfg("window_config.txt");
 
-	event::message msg;
+	window::glwindow gl;
+	gl.create(cfg, rects::wh(100, 100));
+	
+	//gl.set_minimum_size(rects::wh(cfg[L"min_resw"], cfg[L"min_resh"]));
+	//gl.set_maximum_size(rects::wh(cfg[L"max_resw"], cfg[L"max_resh"]));
+
+	window::event::message msg;
 
 	bool quit = false;
 	gl.set_show(gl.SHOW);
-	
 
-	misc::animator fadein ([](float val){
+	util::animator fadein ([](float val){
 		glClearColor(val, val, val, val);
 	},
-		0.f, 1.f, 500, misc::animator::EXPONENTIAL);
+		0.f, 1.f, 500, util::animator::EXPONENTIAL);
 
-	misc::animator mover ([&](float val){ 
-		rect_xywh rc = gl.get_window_rect();
+	util::animator mover ([&](float val){ 
+		rects::xywh rc = gl.get_window_rect();
 		rc.x = val;
-		gl.set_window_rect(rc); }, 400.0f, 0.0f, 500, misc::animator::EXPONENTIAL);
+		gl.set_window_rect(rc); }, 400.0f, 30.0f, 500, util::animator::EXPONENTIAL);
 
-	misc::animation anim(1), anim2(1);
+	util::animation anim(1), anim2(1);
 	anim.animators.push_back(&fadein);
 	anim2.animators.push_back(&mover);
 	
 	anim.start();
 	anim2.start();
 
-	db::graphics::init();
 	glEnable(GL_BLEND);
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
 	
@@ -47,7 +49,7 @@ int main() {
 
 	while(!quit) {
 		while(gl.poll_events(msg)) {
-			if(msg == event::close) {
+			if(msg == window::event::close) {
 				quit = true;
 			}
 		}
@@ -58,5 +60,6 @@ int main() {
 		gl.swap_buffers();
 	}
 	
+	augmentations::deinit();
 	return 0;
 }

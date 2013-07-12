@@ -78,7 +78,7 @@
     <ClCompile Include="entity_system\world.cpp" />
     <ClCompile Include="error\error.cpp" />
     <ClCompile Include="rects\rects.cpp" />
-    <ClCompile Include="SDK\atlaspacking.cpp" />
+    <ClCompile Include="SDK\animatorandconfig.cpp" />
     <ClCompile Include="texture_baker\font.cpp" />
     <ClCompile Include="texture_baker\image.cpp" />
     <ClCompile Include="texture_baker\rectpack.cpp" />

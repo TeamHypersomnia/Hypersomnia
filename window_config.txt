@@ -3,7 +3,8 @@ int fullscreen 0
 int window_border 1
 int window_x 30
 int window_y 30
-int resolution_w 500
+int bpp 24
+int resolution_w 400
 int resolution_h 500
 int doublebuffer 1
-int bpp 24
+  

@@ -147,7 +147,7 @@ int main() {
 		}
 		fps.loop();
 	}
-
+	augmentations::deinit();
 	return 0;
 }
 
