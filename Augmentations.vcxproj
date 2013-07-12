@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6CC06ECD-D908-4A12-A57B-CEEEEF078609}</ProjectGuid>
+    <RootNamespace>Augmentations</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120_CTP_Nov2012</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>C:\boost;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glew32sd.lib;OpenGL32.lib;Ws2_32.lib;dwmapi.lib;freetype2412MT_D.lib;Gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>glew32s.lib;OpenGL32.lib;Ws2_32.lib;dwmapi.lib;freetype2412MT.lib;Gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="augmentations.cpp" />
+    <ClCompile Include="config\config.cpp" />
+    <ClCompile Include="entity_system\entity.cpp" />
+    <ClCompile Include="entity_system\signature_matcher.cpp" />
+    <ClCompile Include="entity_system\system.cpp" />
+    <ClCompile Include="entity_system\templated_list.cpp" />
+    <ClCompile Include="entity_system\type_registry.cpp" />
+    <ClCompile Include="entity_system\world.cpp" />
+    <ClCompile Include="error\error.cpp" />
+    <ClCompile Include="rects\rects.cpp" />
+    <ClCompile Include="SDK\binpacking.cpp" />
+    <ClCompile Include="texture_baker\font.cpp" />
+    <ClCompile Include="texture_baker\image.cpp" />
+    <ClCompile Include="texture_baker\rectpack.cpp" />
+    <ClCompile Include="texture_baker\texture_baker.cpp" />
+    <ClCompile Include="utility\timer.cpp" />
+    <ClCompile Include="utility\value_animator.cpp" />
+    <ClCompile Include="window_framework\event.cpp" />
+    <ClCompile Include="window_framework\window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="augmentations.h" />
+    <ClInclude Include="config\config.h" />
+    <ClInclude Include="entity_system\component.h" />
+    <ClInclude Include="entity_system\entity.h" />
+    <ClInclude Include="entity_system\signature_matcher.h" />
+    <ClInclude Include="entity_system\system.h" />
+    <ClInclude Include="entity_system\templated_list.h" />
+    <ClInclude Include="entity_system\type_registry.h" />
+    <ClInclude Include="entity_system\world.h" />
+    <ClInclude Include="error\error.h" />
+    <ClInclude Include="options.h" />
+    <ClInclude Include="rects\rects.h" />
+    <ClInclude Include="texture_baker\font.h" />
+    <ClInclude Include="texture_baker\image.h" />
+    <ClInclude Include="texture_baker\rectpack.h" />
+    <ClInclude Include="texture_baker\texture_baker.h" />
+    <ClInclude Include="utility\stream.h" />
+    <ClInclude Include="utility\timer.h" />
+    <ClInclude Include="utility\type_mapper.h" />
+    <ClInclude Include="utility\value_animator.h" />
+    <ClInclude Include="window_framework\event.h" />
+    <ClInclude Include="window_framework\window.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
