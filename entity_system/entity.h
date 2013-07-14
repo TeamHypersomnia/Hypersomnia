@@ -23,13 +23,13 @@ namespace augmentations {
 			/* maps type hashes into components */
 			std::map<type_hash, component*> type_to_component;
 		public:
-			/* get information about component types from the entity */
+			/* get information about component types */
 			std::vector<registered_type> get_components() const;
 			
 			/* removes all components */
 			void clear();
 
-			/* get value of a component of component_class from the entity */
+			/* get specified component */
 			template<class component_class>
 			component_class& get() {
 				return *static_cast<component_class*>(type_to_component.at(typeid(component_class).hash_code()));
