@@ -10,17 +10,17 @@ namespace augmentations {
 		public:
 			template <typename type_in>
 			void add(const type_in& in = type_in()) {
-				raw.insert(typeid(type_in).hash_code, in);
+				raw.insert(typeid(type_in).hash_code(), in);
 			}
 
 			template <typename type_in>
 			void erase() {
-				raw.erase(typeid(type_in).hash_code);
+				raw.erase(typeid(type_in).hash_code());
 			}
 
 			template <typename type_in>
 			type_in& get() {
-				return *static_cast<type_in*>(raw.at(typeid(type_in).hash_code));
+				return *static_cast<type_in*>(raw.at(typeid(type_in).hash_code()));
 			}
 			
 			//template <typename type_in>

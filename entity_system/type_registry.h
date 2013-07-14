@@ -4,6 +4,7 @@
 
 namespace augmentations {
 	namespace entity_system {
+		class entity;
 		typedef size_t type_hash;
 
 		struct registered_type : base_type {
@@ -22,6 +23,7 @@ namespace augmentations {
 			std::vector<registered_type> register_types(const type_pack& raw_types);
 			/* only returns existing types */
 			std::vector<registered_type> get_registered_types(const std::vector<type_hash>& raw_types) const;
+			std::vector<registered_type> get_registered_types(const entity&) const;
 
 			/* get single type information from its hash */
 			registered_type get_registered_type(type_hash) const;

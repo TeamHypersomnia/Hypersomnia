@@ -174,7 +174,6 @@ namespace augmentations {
 		}
 
 		glwindow* glwindow::context = nullptr;
-		glwindow* glwindow::parent = nullptr;
 		
 		glwindow::glwindow()
 			: hwnd(0), hdc(0), hglrc(0), name(nullptr), bpp(0), resize(nullptr), menu(false), transparent(false), active(false), doubled(false) {

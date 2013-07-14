@@ -5,10 +5,8 @@
 #define BOOST_DISABLE_THREADS
 #include <boost\pool\object_pool.hpp>
 
-#include "../utility/type_mapper.h"
-
 #include "entity.h"
-#include "system.h"
+#include "processing_system.h"
 #include "type_registry.h"
 
 namespace augmentations {
@@ -29,9 +27,11 @@ namespace augmentations {
 				return get_container_for_size(sizeof(type));
 			}
 
+			std::vector<processing_system*> systems;
+
 		public:
-			std::vector<system*> systems;
-			 
+			void add_system(processing_system*); 
+
 			world();
 
 			entity& create_entity();

@@ -1,17 +1,25 @@
 #include "world.h"
-		#include <queue>
 
 namespace augmentations {
 	namespace entity_system {
 		world::world() {
 		}
+			
+		void world::add_system(processing_system* new_system) {
+			/* 
+			here we register systems' signatures so we can ensure that whenever we add 
+			of course entities must be created AFTER the systems are specified and added
+			*/
+			new_system->components_signature = signature_matcher_bitset(component_library.register_types(new_system->get_needed_components()));
+			systems.push_back(new_system);
+		}
 
 		entity& world::create_entity() {
-			return *entities.construct();
+			return *entities.construct<world&>(*this);
 		}
 
 		void world::delete_entity(entity& e) {
-			e.clear(*this);
+			e.clear();
 			entities.destroy(&e);
 		}
 
@@ -30,7 +38,7 @@ namespace augmentations {
 
 		void world::run() {
 			for(auto it = systems.begin(); it != systems.end(); ++it) {
-				(*it)->process();
+				(*it)->process_entities();
 			}
 		}
 	}

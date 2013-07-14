@@ -1,5 +1,6 @@
 #pragma once
 #include "type_registry.h"
+#include "entity.h"
 
 namespace augmentations {
 	namespace entity_system {
@@ -24,10 +25,19 @@ namespace augmentations {
 		std::vector<registered_type> type_registry::get_registered_types(const std::vector<type_hash>& raw_types) const {
 			std::vector<registered_type> registered;
 			for(auto raw = raw_types.begin(); raw != raw_types.end(); ++raw) {
-				/* try to register this type with fresh id */
 				auto it = library.at(*raw);
 
 				/* take registered_type from existing map value */
+				registered.push_back(it);
+			}
+			return registered;
+		}
+			
+		std::vector<registered_type> type_registry::get_registered_types(const entity& e) const {
+			std::vector<registered_type> registered;
+			for(auto raw = e.type_to_component.begin(); raw != e.type_to_component.end(); ++raw) {
+				auto it = library.at((*raw).first);
+				
 				registered.push_back(it);
 			}
 			return registered;

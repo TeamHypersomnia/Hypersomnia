@@ -29,8 +29,25 @@ namespace augmentations {
 		//}
 
 		signature_matcher_bitset::signature_matcher_bitset(const std::vector<registered_type>& types_with_ids) {
+			add(types_with_ids);
+		}
+			
+		void signature_matcher_bitset::add(const registered_type& r) {
+			signature.set(r.id, true);
+		}
+
+		void signature_matcher_bitset::remove(const registered_type& r) {
+			signature.set(r.id, false);
+		}
+
+		void signature_matcher_bitset::add(const std::vector<registered_type>& types_with_ids) {
 			for(auto i = types_with_ids.begin(); i != types_with_ids.end(); ++i)
-				signature.set((*i).id, true);
+				add(*i);
+		}
+			
+		void signature_matcher_bitset::remove(const std::vector<registered_type>& types_with_ids) {
+			for(auto i = types_with_ids.begin(); i != types_with_ids.end(); ++i)
+				remove(*i);
 		}
 			
 		bool signature_matcher_bitset::matches(const signature_matcher_bitset& bigger) const {

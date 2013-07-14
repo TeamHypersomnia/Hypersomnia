@@ -1,3 +1,4 @@
+#include <gl\glew.h>
 #include "../augmentations.h"
 
 #include "../texture_baker/font.h"
@@ -5,7 +6,6 @@
 #include "../config/config.h"
 #include "../window_framework/window.h"
 
-#include <gl\glew.h>
 
 int main() {
 	augmentations::init();

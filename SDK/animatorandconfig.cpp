@@ -1,11 +1,12 @@
 //#define include_DWM
+#include <gl/glew.h>
+
 #include "../augmentations.h"
 
 #include "../config/config.h"
 #include "../window_framework/window.h"
 #include "../utility/value_animator.h"
 
-#include <gl/glew.h>
 
 int main() {
 	augmentations::init();

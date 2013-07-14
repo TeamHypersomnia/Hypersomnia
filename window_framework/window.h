@@ -22,7 +22,7 @@ namespace augmentations {
 			friend int WINAPI ::WinMain (HINSTANCE, HINSTANCE, LPSTR, int);
 			friend LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
 
-			static glwindow* context, *parent;
+			static glwindow* context;
 			static glwindow* getcurrent();
 
 			HWND hwnd;

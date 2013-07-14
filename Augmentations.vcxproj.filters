@@ -24,9 +24,6 @@
     <ClCompile Include="entity_system\signature_matcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="entity_system\system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="entity_system\templated_list.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -69,7 +66,16 @@
     <ClCompile Include="texture_baker\texture_baker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\animatorandconfig.cpp">
+    <ClCompile Include="SDK\entity_system\entity_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\entity_system\systems.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="entity_system\processing_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="entity_system\component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -84,9 +90,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="entity_system\signature_matcher.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="entity_system\system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="entity_system\templated_list.h">
@@ -138,6 +141,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="entity_system\entity_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\entity_system\components.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\entity_system\systems.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="entity_system\processing_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
