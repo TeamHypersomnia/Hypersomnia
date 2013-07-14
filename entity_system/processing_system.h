@@ -5,9 +5,6 @@
 
 namespace augmentations {
 	namespace entity_system {
-		class entity;
-		class assemblage_bucket;
-
 		class processing_system {
 			friend class world;
 			friend class entity;
