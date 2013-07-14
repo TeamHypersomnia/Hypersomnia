@@ -6,11 +6,11 @@
 #include <boost\pool\object_pool.hpp>
 
 #include "entity.h"
-#include "processing_system.h"
 #include "type_registry.h"
 
 namespace augmentations {
 	namespace entity_system {
+		class processing_system;
 		class world {
 			friend class entity;
 			boost::object_pool<entity> entities;

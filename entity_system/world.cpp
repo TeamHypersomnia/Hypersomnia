@@ -1,4 +1,5 @@
 #include "world.h"
+#include "processing_system.h"
 
 namespace augmentations {
 	namespace entity_system {
@@ -7,7 +8,7 @@ namespace augmentations {
 			
 		void world::add_system(processing_system* new_system) {
 			/* 
-			here we register systems' signatures so we can ensure that whenever we add 
+			here we register systems' signatures so we can ensure that whenever we add a component it is already registered
 			of course entities must be created AFTER the systems are specified and added
 			*/
 			new_system->components_signature = signature_matcher_bitset(component_library.register_types(new_system->get_needed_components()));
@@ -19,7 +20,6 @@ namespace augmentations {
 		}
 
 		void world::delete_entity(entity& e) {
-			e.clear();
 			entities.destroy(&e);
 		}
 

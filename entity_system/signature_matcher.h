@@ -21,6 +21,5 @@ namespace augmentations {
 
 			bool matches(const signature_matcher_bitset& bigger) const;
 		};
-		
 	}
 }

@@ -27,9 +27,6 @@ namespace augmentations {
 
 			/* get single type information from its hash */
 			registered_type get_registered_type(type_hash) const;
-			
-			/* only returns existing types */
-			//std::vector<registered_type> get_types(const type_pack& raw_types) const;
 		}; 
 	}
 }

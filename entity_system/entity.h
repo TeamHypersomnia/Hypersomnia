@@ -1,38 +1,40 @@
 #pragma once
 #include <map>
-#include <forward_list>
 
 #define BOOST_DISABLE_THREADS
 #include <boost\pool\object_pool.hpp>
 
+#include "processing_system.h"
+#include "world.h"
 #include "component.h"
 #include "signature_matcher.h"
 
 namespace augmentations {
 	namespace entity_system {
-		class world;
-		class processing_system;
-
 		class entity {
-			/* only world class is allowed to instantiate an entity */
-			friend class world;
+			/* only world class is allowed to instantiate an entity and it has to do it inside object pool */
 			friend class boost::object_pool<entity>;
 			friend class type_registry;
 			
 			entity(world& owner_world);
 			~entity();
-
 			world& owner_world;
 
 			/* maps type hashes into components */
 			std::map<type_hash, component*> type_to_component;
 		public:
-			/* returns type_to_component */
-			const std::map<type_hash, component*>& raw_mapper() const;
-
 			/* get information about component types from the entity */
 			std::vector<registered_type> get_components() const;
 			
+			/* removes all components */
+			void clear();
+
+			/* get value of a component of component_class from the entity */
+			template<class component_class>
+			component_class& get() {
+				return *static_cast<component_class*>(type_to_component.at(typeid(component_class).hash_code()));
+			}
+
 			template <typename component_type>
 			void add(const component_type& object = component_type(), bool overwrite_if_exists = true) {
 				signature_matcher_bitset old_signature(get_components());
@@ -88,15 +90,6 @@ namespace augmentations {
 						if(!(*sys)->components_signature.matches(new_signature) && (*sys)->components_signature.matches(old_signature)) 
 							/* we should remove this entity from there */
 								(*sys)->remove(this);
-			}
-
-			/* removes all components */
-			void clear();
-
-			/* get value of a component of component_class from the entity */
-			template<class component_class>
-			component_class& get() {
-				return *static_cast<component_class*>(type_to_component.at(typeid(component_class).hash_code()));
 			}
 		};
 	}
