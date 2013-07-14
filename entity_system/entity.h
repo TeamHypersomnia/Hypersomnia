@@ -75,7 +75,7 @@ namespace augmentations {
 				/* not found, return */
 				if ( it == type_to_component.end()) return;
 
-				/* delete component from corresponding pool */
+				/* delete component from corresponding pool, first cast to component_type to avoid polymorphic indirection */
 				(static_cast<component_type*>((*it).second))->~component_type();
 				owner_world.get_container_for_type(*type).free((*it).second);
 
