@@ -27,8 +27,10 @@ int main() {
 
 	entity& player = my_world.create_entity();
 
-	player.add<render_component>(render_component(0, 255, 0, 0, 255));
-	player.add<transform_component>(transform_component(rects::pointf(30, 30), rects::wh(50, 50)));
+	player.add(input_component());
+	player.add(velocity_component());
+	player.add(render_component(0, 255, 0, 0, 255));
+	player.add(transform_component(rects::pointf(30, 30), rects::wh(50, 50)));
 
 	while(!quit_flag) my_world.run();
 	

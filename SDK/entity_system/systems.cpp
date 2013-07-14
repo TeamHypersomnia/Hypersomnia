@@ -24,8 +24,8 @@ void render_system::process_entities() {
 	/* we traverse layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
 	for(auto it = layers.rbegin(); it != layers.rend(); ++it) {
 		for(auto e = (*it).targets.begin(); e != (*it).targets.end(); ++e) {
-			auto render_info = (*e)->get<render_component>();
-			auto transform = (*e)->get<transform_component>();
+			auto& render_info = (*e)->get<render_component>();
+			auto& transform = (*e)->get<transform_component>();
 
 			glLoadIdentity();
 
@@ -46,16 +46,16 @@ void render_system::process_entities() {
 
 void render_system::add(entity* e) {
 	auto layer = e->get<render_component>().layer;
-	
+
 	if(layers.size() <= layer)
 		layers.resize(layer + 1);
-	
+
 	layers[layer].targets.push_back(e);
 }
 
 void render_system::remove(entity* e) {
 	auto layer = e->get<render_component>().layer;
-	
+
 	if(layers.size() > layer) {
 		auto entities = layers[layer].targets; 
 		entities.erase(std::remove(entities.begin(), entities.end(), e), entities.end());
@@ -64,35 +64,56 @@ void render_system::remove(entity* e) {
 
 void movement_system::process_entities() {
 	for_each([](entity* e) {
-		auto pos = e->get<transform_component>();
-		auto vel = e->get<velocity_component>();
+		auto& pos = e->get<transform_component>();
+		auto& vel = e->get<velocity_component>();
 		pos.pos += vel.vel;
 	});
 }
 
 input_system::input_system(window::glwindow& input_window, bool& quit_flag) : input_window(input_window), quit_flag(quit_flag) {
-
 }
 
 void input_system::process_entities() {
 	window::event::message msg;
 
+	enum action {
+		GO_DOWN, GO_LEFT, GO_RIGHT, GO_UP, BRAKE
+	} controller_action;
+
 	while(input_window.poll_events(msg)) {
 		if(msg == window::event::close) {
 			quit_flag = true;
 		}
+		if(msg == window::event::key::down) {
+			if(input_window.events.key == window::event::keys::ESC)
+				quit_flag = true;
+
+		//	if(input_window.events.key == window::event::keys::DOWN)	controller_action = GO_DOWN;	    
+		//	if(input_window.events.key == window::event::keys::UP)		controller_action = GO_UP;	    
+		//	if(input_window.events.key == window::event::keys::RIGHT)	controller_action = GO_RIGHT;	    
+		//	if(input_window.events.key == window::event::keys::LEFT)	controller_action = GO_LEFT;	    
+		}
+		//if(msg == window::event::key::up) {
+		//	if( input_window.events.key == window::event::keys::DOWN ||
+		//		input_window.events.key == window::event::keys::UP ||
+		//		input_window.events.key == window::event::keys::RIGHT ||
+		//		input_window.events.key == window::event::keys::LEFT
+		//		) {
+		//			controller_action = BRAKE;
+		//	}
+		//}
 	}
 
 	for_each([this](entity* e){
-		auto vel = e->get<velocity_component>().vel;
-		
-		if(input_window.events.keys[window::event::keys::DOWN])
-			vel.y = 100.0;
-		if(input_window.events.keys[window::event::keys::UP])
-			vel.y = -100;
-		if(input_window.events.keys[window::event::keys::RIGHT])
-			vel.x = 100;
-		if(input_window.events.keys[window::event::keys::LEFT])
-			vel.x = -100;
+		auto& vel = e->get<velocity_component>().vel;
+		if(input_window.events.key == window::event::keys::DOWN)
+			vel.y = 1.0/10.0;		    
+		if(input_window.events.key == window::event::keys::UP)
+			vel.y = -1.0/10.0;		    
+		if(input_window.events.key == window::event::keys::RIGHT)
+			vel.x = 1.0/10.0;		    
+		if(input_window.events.key == window::event::keys::LEFT)
+			vel.x = -1.0/10.0;
+
 	});
 }

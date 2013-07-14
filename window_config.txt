@@ -4,7 +4,7 @@ int window_border 1
 int window_x 30
 int window_y 30
 int bpp 24
-int resolution_w 400
-int resolution_h 500
+int resolution_w 800
+int resolution_h 600
 int doublebuffer 1
   
