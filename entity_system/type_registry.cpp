@@ -8,7 +8,7 @@ namespace augmentations {
 
 		std::vector<registered_type> type_registry::register_types(const type_pack& raw_types) {
 			std::vector<registered_type> registered;
-			for(auto raw = raw_types.raw_types.begin(); raw != raw_types.raw_types.end(); ++raw) {
+			for(auto raw = raw_types.begin(); raw != raw_types.end(); ++raw) {
 				/* try to register this type with fresh id */
 				auto it = library.emplace((*raw).hash, registered_type(*raw, next_id));
 
