@@ -90,12 +90,6 @@ namespace augmentations {
 								(*sys)->remove(this);
 			}
 
-
-			/* sums components specified in component_types with current components of the entity */
-			//void add_n(const type_pack& component_types) override;
-			///* removes components specified in component_types from current components of the entity */
-			//void remove_n(const type_pack& component_types) override;
-
 			/* removes all components */
 			void clear();
 
