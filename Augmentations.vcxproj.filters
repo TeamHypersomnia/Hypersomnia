@@ -125,9 +125,6 @@
     <ClInclude Include="utility\timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utility\type_mapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="utility\value_animator.h">
       <Filter>Header Files</Filter>
     </ClInclude>

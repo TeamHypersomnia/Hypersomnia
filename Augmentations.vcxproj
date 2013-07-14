@@ -112,7 +112,6 @@
     <ClInclude Include="texture_baker\texture_baker.h" />
     <ClInclude Include="utility\stream.h" />
     <ClInclude Include="utility\timer.h" />
-    <ClInclude Include="utility\type_mapper.h" />
     <ClInclude Include="utility\value_animator.h" />
     <ClInclude Include="window_framework\event.h" />
     <ClInclude Include="window_framework\window.h" />

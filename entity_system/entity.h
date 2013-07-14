@@ -35,6 +35,8 @@ namespace augmentations {
 			
 			template <typename component_type>
 			void add(const component_type& object = component_type(), bool overwrite_if_exists = true) {
+				signature_matcher_bitset old_signature(get_components());
+
 				/* first try to insert with a null value and obtain iterator */
 				auto p = type_to_component.emplace(typeid(component_type).hash_code(), nullptr);
 
@@ -44,8 +46,6 @@ namespace augmentations {
 						(*static_cast<component_type*>((*p.first).second)) = object;
 					return;
 				}
-
-				signature_matcher_bitset old_signature(get_components());
 
 				/* allocate new component in corresponding pool */
 				p.first->second = static_cast<component*>(owner_world.get_container_for_type(typeid(component_type).hash_code()).malloc());

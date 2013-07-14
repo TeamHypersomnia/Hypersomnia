@@ -4,9 +4,18 @@
 #include "systems.h"
 
 render_system::render_system(window::glwindow& output_window) : output_window(output_window) {
+	output_window.current();
+
 	glEnable(GL_BLEND);
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
+
+	glViewport(0, 0, output_window.get_window_rect().w, output_window.get_window_rect().h);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, output_window.get_window_rect().w, output_window.get_window_rect().h, 0, 0, 1);
+	glMatrixMode(GL_MODELVIEW);
 }
 
 void render_system::process_entities() {
