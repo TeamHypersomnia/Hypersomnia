@@ -37,9 +37,8 @@ namespace augmentations {
 		}
 
 		void world::run() {
-			for(auto it = systems.begin(); it != systems.end(); ++it) {
+			for(auto it = systems.begin(); it != systems.end(); ++it)
 				(*it)->process_entities();
-			}
 		}
 	}
 }

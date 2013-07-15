@@ -5,14 +5,22 @@
 namespace augmentations {
 	namespace util {
 		class timer {
-			LARGE_INTEGER freq, ticks, cmp, delta;
+			LARGE_INTEGER freq, ticks, delta;
 		public:
+			/* returns time that has lasted since last call to "microseconds" (zeroes the ticks) */
 			double microseconds();
+			/* returns time in miliseconds that has lasted since last call to "microseconds" (zeroes the ticks) */
 			double miliseconds();
+			/* returns time in seconds that has lasted since last call to "microseconds" (zeroes the ticks) */
 			double seconds();
-			double get_microseconds();
-			double get_miliseconds();
-			double get_seconds();
+			
+			/* returns time that has lasted since last call to "microseconds" */
+			double get_microseconds() const;
+			/* returns time in miliseconds that has lasted since last call to "microseconds" */
+			double get_miliseconds() const;
+			/* returns time in seconds that has lasted since last call to "microseconds" */
+			double get_seconds() const;
+			
 			timer();
 		};
 

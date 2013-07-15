@@ -78,6 +78,9 @@
     <ClCompile Include="entity_system\component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="utility\delta_accumulator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config\config.h">
@@ -150,6 +153,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="entity_system\processing_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utility\delta_accumulator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

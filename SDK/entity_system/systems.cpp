@@ -62,58 +62,45 @@ void render_system::remove(entity* e) {
 	}
 }
 
+movement_system::movement_system() : accumulator(60.0, 5) {
+}
 void movement_system::process_entities() {
-	for_each([](entity* e) {
-		auto& pos = e->get<transform_component>();
-		auto& vel = e->get<velocity_component>();
-		pos.pos += vel.vel;
+	unsigned steps = accumulator.update_and_extract_steps();
+
+	for(unsigned i = 0; i < steps; ++i)
+		for_each([this](entity* e) {
+			auto& pos = e->get<transform_component>();
+			auto& vel = e->get<velocity_component>();
+			pos.pos += vel.vel*accumulator.per_second();
 	});
 }
 
 input_system::input_system(window::glwindow& input_window, bool& quit_flag) : input_window(input_window), quit_flag(quit_flag) {
+	states[0] = states[1] = states[2] = states[3] = 0;
 }
 
 void input_system::process_entities() {
 	window::event::message msg;
 
-	enum action {
-		GO_DOWN, GO_LEFT, GO_RIGHT, GO_UP, BRAKE
-	} controller_action;
-
 	while(input_window.poll_events(msg)) {
 		if(msg == window::event::close) {
 			quit_flag = true;
 		}
-		if(msg == window::event::key::down) {
+		if(msg == window::event::key::down || msg == window::event::key::up) {
 			if(input_window.events.key == window::event::keys::ESC)
 				quit_flag = true;
 
-		//	if(input_window.events.key == window::event::keys::DOWN)	controller_action = GO_DOWN;	    
-		//	if(input_window.events.key == window::event::keys::UP)		controller_action = GO_UP;	    
-		//	if(input_window.events.key == window::event::keys::RIGHT)	controller_action = GO_RIGHT;	    
-		//	if(input_window.events.key == window::event::keys::LEFT)	controller_action = GO_LEFT;	    
+			bool state = (msg == window::event::key::down);
+			if(input_window.events.key == window::event::keys::DOWN)	states[GO_DOWN] = state;	    
+			if(input_window.events.key == window::event::keys::UP)		states[GO_UP] = state;
+			if(input_window.events.key == window::event::keys::RIGHT)	states[GO_RIGHT] = state;	    
+			if(input_window.events.key == window::event::keys::LEFT)	states[GO_LEFT] = state;	    
 		}
-		//if(msg == window::event::key::up) {
-		//	if( input_window.events.key == window::event::keys::DOWN ||
-		//		input_window.events.key == window::event::keys::UP ||
-		//		input_window.events.key == window::event::keys::RIGHT ||
-		//		input_window.events.key == window::event::keys::LEFT
-		//		) {
-		//			controller_action = BRAKE;
-		//	}
-		//}
 	}
 
 	for_each([this](entity* e){
 		auto& vel = e->get<velocity_component>().vel;
-		if(input_window.events.key == window::event::keys::DOWN)
-			vel.y = 1.0/10.0;		    
-		if(input_window.events.key == window::event::keys::UP)
-			vel.y = -1.0/10.0;		    
-		if(input_window.events.key == window::event::keys::RIGHT)
-			vel.x = 1.0/10.0;		    
-		if(input_window.events.key == window::event::keys::LEFT)
-			vel.x = -1.0/10.0;
-
+			vel.x = ((states[GO_RIGHT]==true)*800.0f) + ((states[GO_LEFT]==true)*(-800.0f));    
+			vel.y = ((states[GO_DOWN] ==true)*800.0f) + ((states[GO_UP]  ==true)*(-800.0f));		    
 	});
 }
