@@ -86,6 +86,7 @@
     <ClCompile Include="texture_baker\rectpack.cpp" />
     <ClCompile Include="texture_baker\texture_baker.cpp" />
     <ClCompile Include="utility\delta_accumulator.cpp" />
+    <ClCompile Include="input\input_context.cpp" />
     <ClCompile Include="utility\timer.cpp" />
     <ClCompile Include="utility\value_animator.cpp" />
     <ClCompile Include="window_framework\event.cpp" />
@@ -112,6 +113,7 @@
     <ClInclude Include="texture_baker\rectpack.h" />
     <ClInclude Include="texture_baker\texture_baker.h" />
     <ClInclude Include="utility\delta_accumulator.h" />
+    <ClInclude Include="input\input_context.h" />
     <ClInclude Include="utility\stream.h" />
     <ClInclude Include="utility\timer.h" />
     <ClInclude Include="utility\value_animator.h" />

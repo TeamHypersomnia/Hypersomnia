@@ -35,7 +35,7 @@ namespace augmentations {
 		}
 
 		void input_file::open(const char* filename) {
-			std::locale::global(std::locale(""));
+			locale::global(locale(""));
 			wifstream in(filename);
 			const int CNT = 1000;
 			wchar_t buf[CNT]; 

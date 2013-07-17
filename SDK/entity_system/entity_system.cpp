@@ -13,7 +13,7 @@ int main() {
 	augmentations::init();
 	
 	config::input_file cfg("window_config.txt");
-
+	 
 	window::glwindow gl;
 	gl.create(cfg, rects::wh(100, 100));
 	gl.set_show(gl.SHOW);
@@ -30,7 +30,7 @@ int main() {
 	player.add(input_component());
 	player.add(velocity_component());
 	player.add(render_component(0, 255, 0, 0, 255));
-	player.add(transform_component(rects::pointf(30, 30), rects::wh(50, 50)));
+	player.add(transform_component(rects::pointf(30, 30), rects::wh(20, 30)));
 
 	while(!quit_flag) my_world.run();
 	

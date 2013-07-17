@@ -62,7 +62,7 @@ void render_system::remove(entity* e) {
 	}
 }
 
-movement_system::movement_system() : accumulator(60.0, 5) {
+movement_system::movement_system() : accumulator(120.0, 5) {
 }
 void movement_system::process_entities() {
 	unsigned steps = accumulator.update_and_extract_steps();
@@ -91,16 +91,16 @@ void input_system::process_entities() {
 				quit_flag = true;
 
 			bool state = (msg == window::event::key::down);
-			if(input_window.events.key == window::event::keys::DOWN)	states[GO_DOWN] = state;	    
-			if(input_window.events.key == window::event::keys::UP)		states[GO_UP] = state;
-			if(input_window.events.key == window::event::keys::RIGHT)	states[GO_RIGHT] = state;	    
-			if(input_window.events.key == window::event::keys::LEFT)	states[GO_LEFT] = state;	    
+			if(input_window.events.key == window::event::keys::S)	{ states[GO_DOWN] = state;	}    
+			if(input_window.events.key == window::event::keys::W)	{ states[GO_UP] = state;	}
+			if(input_window.events.key == window::event::keys::D)	{ states[GO_RIGHT] = state;	}
+			if(input_window.events.key == window::event::keys::A)	{ states[GO_LEFT] = state;	}
 		}
 	}
 
 	for_each([this](entity* e){
 		auto& vel = e->get<velocity_component>().vel;
-			vel.x = ((states[GO_RIGHT]==true)*800.0f) + ((states[GO_LEFT]==true)*(-800.0f));    
-			vel.y = ((states[GO_DOWN] ==true)*800.0f) + ((states[GO_UP]  ==true)*(-800.0f));		    
+			vel.x = ((states[GO_RIGHT]==true)*1000.0f) + ((states[GO_LEFT]==true)*(-1000.0f));    
+			vel.y = ((states[GO_DOWN] ==true)*1000.0f) + ((states[GO_UP]  ==true)*(-1000.0f));		    
 	});
 }
