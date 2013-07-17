@@ -22,12 +22,6 @@ struct render_component : public component {
 
 	render_component(unsigned layer, unsigned r, unsigned g, unsigned b, unsigned a) 
 		: layer(layer), r(r), g(g), b(b), a(a) {}
-
-	~render_component() override {
-		int abc;
-		abc = 2;
-		r = abc;
-	}
 };
 
 struct input_component : public component {
