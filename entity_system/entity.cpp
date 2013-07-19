@@ -22,7 +22,7 @@ namespace augmentations {
 			signature_matcher_bitset my_signature(get_components());
 			for(auto sys = owner_world.systems.begin(); sys != owner_world.systems.end(); ++sys) {
 				/* if the system potentially owns this entity */
-				if((*sys)->components_signature.matches(my_signature));
+				if((*sys)->components_signature.matches(my_signature))
 					(*sys)->remove(this);
 			}
 
