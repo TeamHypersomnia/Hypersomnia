@@ -45,6 +45,36 @@ namespace augmentations {
 			}
 		}
 
+		float texture::get_u(int vertex_num_from_cw_rect) const {
+			vertex_num_from_cw_rect %= 4;
+			float u = 0.f;
+
+			switch(vertex_num_from_cw_rect) {
+			case 0: u = 0.f; break; 
+			case 1: u = rect.flipped ? 0.f : 1.f; break; 
+			case 2: u = 1.f; break; 
+			case 3: u = rect.flipped ? 1.f : 0.f; break; 
+			default: break;
+			}
+
+			return x + w * u;
+		}
+
+		float texture::get_v(int vertex_num_from_cw_rect) const {
+			vertex_num_from_cw_rect %= 4;
+			float v = 0.f;
+
+			switch(vertex_num_from_cw_rect) {
+			case 0: v = 0.f; break; 
+			case 1: v = rect.flipped ? 1.f : 0.f; break; 
+			case 2: v = 1.f; break; 
+			case 3: v = rect.flipped ? 0.f : 1.f; break; 
+			default: break;
+			}
+
+			return y + h * v;
+		}
+
 		void texture::translate_uv(rects::pointf uv) {
 			uv *= rects::pointf(w/rect.w, h/rect.h);
 			x += uv.x;
