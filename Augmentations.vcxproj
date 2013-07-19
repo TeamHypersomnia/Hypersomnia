@@ -16,7 +16,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>Utility</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120_CTP_Nov2012</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -79,14 +79,13 @@
     <ClCompile Include="entity_system\world.cpp" />
     <ClCompile Include="error\error.cpp" />
     <ClCompile Include="rects\rects.cpp" />
-    <ClCompile Include="SDK\entity_system\entity_system.cpp" />
     <ClCompile Include="SDK\entity_system\systems.cpp" />
     <ClCompile Include="texture_baker\font.cpp" />
     <ClCompile Include="texture_baker\image.cpp" />
     <ClCompile Include="texture_baker\rectpack.cpp" />
     <ClCompile Include="texture_baker\texture_baker.cpp" />
     <ClCompile Include="utility\delta_accumulator.cpp" />
-    <ClCompile Include="input\input_context.cpp" />
+    <ClCompile Include="utility\input_context.cpp" />
     <ClCompile Include="utility\timer.cpp" />
     <ClCompile Include="utility\value_animator.cpp" />
     <ClCompile Include="window_framework\event.cpp" />
@@ -113,7 +112,7 @@
     <ClInclude Include="texture_baker\rectpack.h" />
     <ClInclude Include="texture_baker\texture_baker.h" />
     <ClInclude Include="utility\delta_accumulator.h" />
-    <ClInclude Include="input\input_context.h" />
+    <ClInclude Include="utility\input_context.h" />
     <ClInclude Include="utility\stream.h" />
     <ClInclude Include="utility\timer.h" />
     <ClInclude Include="utility\value_animator.h" />
