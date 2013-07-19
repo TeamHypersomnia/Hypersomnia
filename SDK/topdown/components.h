@@ -1,6 +1,19 @@
 #pragma once
 #include "../../entity_system/entity_system.h"
+#include "../../texture_baker/texture_baker.h"
 
-struct render_component : public augmentations::entity_system::component {
-	unsigned layer;
-};
+
+namespace components {
+	using namespace augmentations;
+	using namespace entity_system;
+
+	struct render : public component {
+		unsigned layer;
+		texture_baker::texture texture;
+	};
+
+	struct transform : public component {
+
+
+	};
+}

@@ -66,9 +66,6 @@
     <ClCompile Include="texture_baker\texture_baker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\entity_system\systems.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="entity_system\processing_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -79,6 +76,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utility\input_context.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\rendering.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -146,12 +149,6 @@
     <ClInclude Include="entity_system\entity_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\entity_system\components.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SDK\entity_system\systems.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="entity_system\processing_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -159,6 +156,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="utility\input_context.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\components.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\systems\rendering.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
