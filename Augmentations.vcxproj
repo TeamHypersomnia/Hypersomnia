@@ -16,7 +16,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Utility</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120_CTP_Nov2012</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -79,7 +79,8 @@
     <ClCompile Include="entity_system\world.cpp" />
     <ClCompile Include="error\error.cpp" />
     <ClCompile Include="rects\rects.cpp" />
-    <ClCompile Include="SDK\entity_system\systems.cpp" />
+    <ClCompile Include="SDK\topdown\main.cpp" />
+    <ClCompile Include="SDK\topdown\systems\rendering.cpp" />
     <ClCompile Include="texture_baker\font.cpp" />
     <ClCompile Include="texture_baker\image.cpp" />
     <ClCompile Include="texture_baker\rectpack.cpp" />
@@ -105,8 +106,8 @@
     <ClInclude Include="error\error.h" />
     <ClInclude Include="options.h" />
     <ClInclude Include="rects\rects.h" />
-    <ClInclude Include="SDK\entity_system\components.h" />
-    <ClInclude Include="SDK\entity_system\systems.h" />
+    <ClInclude Include="SDK\topdown\components.h" />
+    <ClInclude Include="SDK\topdown\systems\rendering.h" />
     <ClInclude Include="texture_baker\font.h" />
     <ClInclude Include="texture_baker\image.h" />
     <ClInclude Include="texture_baker\rectpack.h" />
