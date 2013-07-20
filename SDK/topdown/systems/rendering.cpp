@@ -26,7 +26,7 @@ void render_system::process_entities() {
 			auto& render_info = (*e)->get<components::render>();
 			auto& transform = (*e)->get<components::transform>();
 
-		
+
 		}
 	}
 

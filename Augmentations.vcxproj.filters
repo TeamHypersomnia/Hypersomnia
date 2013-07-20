@@ -158,10 +158,16 @@
     <ClInclude Include="utility\input_context.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\topdown\components.h">
+    <ClInclude Include="SDK\topdown\systems\rendering.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\topdown\systems\rendering.h">
+    <ClInclude Include="SDK\topdown\components\transform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\components\input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\components\render.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,6 +1,8 @@
 #pragma once
-#include "../components.h"
+#include "../components/render.h"
+#include "../components/transform.h"
 #include "../../../window_framework/window.h"
+#include <glm/glm.hpp>
 
 using namespace augmentations;
 using namespace entity_system;
@@ -8,9 +10,8 @@ using namespace entity_system;
 class render_system : public processing_system_templated<components::transform, components::render> {
 	struct quad {
 		struct vertex {
-			int x, y;
-			unsigned char r, g, b, a;
-			float u, v;
+			glm::vec2 position, texcoord;
+			glm::vec4 color;
 		};
 		
 		vertex vertices[4];
