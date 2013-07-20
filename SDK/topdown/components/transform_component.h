@@ -7,5 +7,6 @@ namespace components {
 		augmentations::rects::pointf pos;
 		augmentations::rects::wh size;
 		double rotation;
+		transform() : rotation(0.0) { }
 	};
 }

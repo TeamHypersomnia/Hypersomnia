@@ -9,5 +9,7 @@ namespace components {
 	struct render : public augmentations::entity_system::component {
 		unsigned layer;
 		texture_baker::texture* texture;
+
+		render(unsigned layer) : layer(layer) {}
 	};
 }

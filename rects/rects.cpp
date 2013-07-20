@@ -133,6 +133,7 @@ namespace augmentations {
 		
 		
 		pointf::pointf(const point& p) : x(float(p.x)), y(float(p.y)) {}
+		pointf::pointf(const wh& p) : x(float(p.w)), y(float(p.h)) {}
 		pointf::pointf(const xywh& p) : x(float(p.x)), y(float(p.y)) {}
 		pointf::pointf(const ltrb& p) : x(float(p.l)), y(float(p.t)) {}
 		
@@ -150,16 +151,32 @@ namespace augmentations {
 			return get_radians()*180.0/3.141592653589793238462;
 		}
 
-		void pointf::set_from_angle(float rotation) {
+		pointf& pointf::set_from_angle(float rotation) {
 			x = sin(rotation);
 			y = cos(rotation);
 			normalize();
+			return *this;
+		}
+			
+		pointf& pointf::rotate(float degrees, pointf origin) {
+			float s = sin(degrees);
+		    float c = cos(degrees);
+			pointf rotated;
+
+			*this -= origin;
+
+			rotated.x = x * c - y * s;
+			rotated.y = x * s + y * c;
+
+			*this = (rotated + origin);
+			return *this;
 		}
 
-		void pointf::normalize() {
+		pointf& pointf::normalize() {
 			float len = 1.f/length();
 			x *= len;
 			y *= len;
+			return *this;
 		}
 		
 		pointf pointf::operator-(const point& p) const {
@@ -226,6 +243,7 @@ namespace augmentations {
 			return *this;
 		}
 
+		wh::wh(const pointf& rr) : w(rr.x), h(rr.y) {} 
 		wh::wh(const ltrb& rr) : w(rr.w()), h(rr.h()) {} 
 		wh::wh(const xywh& rr) : w(rr.w), h(rr.h) {} 
 		wh::wh(int w, int h) : w(w), h(h) {}
@@ -241,7 +259,7 @@ namespace augmentations {
 		wh wh::operator*(float s) const {
 			return wh(int(w*s), int(h*s));
 		}
-			
+
 		bool wh::operator==(const wh& r) const {
 			return w == r.w && h == r.h;
 		}

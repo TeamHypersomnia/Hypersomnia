@@ -9,6 +9,7 @@ namespace augmentations {
 	}
 	/* faciliates operations on rectangles and points */
 	namespace rects {
+		struct wh;
 		struct ltrb;
 		struct xywh;
 		struct point;
@@ -45,12 +46,14 @@ namespace augmentations {
 			pointf(const point&);
 			pointf(const ltrb&);
 			pointf(const xywh&);
+			pointf(const wh&);
 			pointf(float x = 0.f, float y = 0.f);
-			void normalize();
+			pointf& normalize();
 			float length() const;
 			float get_degrees() const;
 			float get_radians() const;
-			void set_from_angle(float);
+			pointf& set_from_angle(float);
+			pointf& rotate(float degrees, pointf origin = pointf(0.0, 0.0));
 			
 			pointf operator-(const point&) const;
 			pointf operator-(const pointf&) const;
@@ -68,6 +71,7 @@ namespace augmentations {
 		};
 
 		struct wh {
+			wh(const pointf&);
 			wh(const ltrb&);
 			wh(const xywh&);
 			wh(int w = 0, int h = 0);

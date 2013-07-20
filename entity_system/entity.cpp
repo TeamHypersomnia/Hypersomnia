@@ -6,7 +6,6 @@
 namespace augmentations {
 	namespace entity_system {
 		entity::entity(world& owner_world) : owner_world(owner_world) {}
-		entity::~entity() { clear(); }
 
 		std::vector<registered_type> entity::get_components() const {
 			return owner_world.component_library.get_registered_types(*this);

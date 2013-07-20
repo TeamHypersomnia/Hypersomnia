@@ -20,6 +20,7 @@ namespace augmentations {
 		}
 
 		void world::delete_entity(entity& e) {
+			e.clear(); 
 			entities.destroy(&e);
 		}
 
