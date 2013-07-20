@@ -141,9 +141,23 @@ namespace augmentations {
 		float pointf::length() const {
 			return sqrt(x*x + y*y);
 		}
+		
+		float pointf::get_radians() const {
+			return atan2(y, x);
+		}
+
+		float pointf::get_degrees() const {
+			return get_radians()*180.0/3.141592653589793238462;
+		}
+
+		void pointf::set_from_angle(float rotation) {
+			x = sin(rotation);
+			y = cos(rotation);
+			normalize();
+		}
 
 		void pointf::normalize() {
-			float len = 1.0f/length();
+			float len = 1.f/length();
 			x *= len;
 			y *= len;
 		}

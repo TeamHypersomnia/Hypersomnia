@@ -48,6 +48,9 @@ namespace augmentations {
 			pointf(float x = 0.f, float y = 0.f);
 			void normalize();
 			float length() const;
+			float get_degrees() const;
+			float get_radians() const;
+			void set_from_angle(float);
 			
 			pointf operator-(const point&) const;
 			pointf operator-(const pointf&) const;
