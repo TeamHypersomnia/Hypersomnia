@@ -8,7 +8,7 @@ namespace augmentations {
 
 			double accumulator;
 			double ratio;
-			double fixed_dt_miliseconds;
+			double fixed_dt_milliseconds;
 
 			/* maximum steps taken to avoid spiral of death */
 			unsigned max_steps;
@@ -25,6 +25,9 @@ namespace augmentations {
 
 			/* a scalar that you should multiply your numbers by to get speed per second */
 			double per_second() const;
+			
+			/* get fixed_dt_milliseconds */
+			double get_timestep() const;
 		};
 	}
 }

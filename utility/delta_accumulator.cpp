@@ -7,32 +7,36 @@
 
 namespace augmentations {
 	namespace util {
-		delta_accumulator::delta_accumulator(double fps, unsigned max_steps) : max_steps(max_steps), accumulator(0.0), fixed_dt_miliseconds(1000.0/fps), ratio(0.0) {
+		delta_accumulator::delta_accumulator(double fps, unsigned max_steps) : max_steps(max_steps), accumulator(0.0), fixed_dt_milliseconds(1000.0/fps), ratio(0.0) {
 			reset_timer();
 		}
 
 		unsigned delta_accumulator::update_and_extract_steps() {
-			accumulator += ticks.miliseconds();
+			auto add = ticks.extract<std::chrono::milliseconds>();
+			//if(add > fixed_dt_milliseconds*max_steps) {
+			//	add = fixed_dt_milliseconds*max_steps;
+			//}
+			accumulator += add;
 
-			const unsigned steps = static_cast<unsigned>(std::floor(accumulator / fixed_dt_miliseconds));
+			const unsigned steps = static_cast<unsigned>(std::floor(accumulator / fixed_dt_milliseconds));
 
 			/* to avoid rounding errors we touch accumulator only once */
-			if(steps > 0) accumulator -= steps * fixed_dt_miliseconds;
-
+			if(steps > 0) accumulator -= steps * fixed_dt_milliseconds;
+	
 			assert (
 				"Accumulator must have a value lesser than the fixed time step" &&
-				accumulator < fixed_dt_miliseconds + FLT_EPSILON
+				accumulator < fixed_dt_milliseconds + FLT_EPSILON
 				);
 
 			return std::min(steps, max_steps);
 		}
 
 		double delta_accumulator::get_ratio() const {
-			return accumulator / fixed_dt_miliseconds;
+			return accumulator / fixed_dt_milliseconds;
 		}
 			
 		void delta_accumulator::reset_timer() {
-			ticks.microseconds();
+			ticks.reset();
 		}
 
 		void delta_accumulator::reset() {
@@ -42,7 +46,11 @@ namespace augmentations {
 		
 		double delta_accumulator::per_second() const {
 			/* it's 1.0/fps */
-			return fixed_dt_miliseconds/1000.0; 
+			return fixed_dt_milliseconds/1000.0; 
+		}
+
+		double delta_accumulator::get_timestep() const {
+			return fixed_dt_milliseconds; 
 		}
 	}
 }
