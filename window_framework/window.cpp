@@ -98,7 +98,7 @@ namespace augmentations {
 					break;
 				case ldown:
 						events.mouse.state[0] = events.keys[LMOUSE] = true;  
-						if(doubled && triple_timer.miliseconds() < triple_click_delay) {
+						if(doubled && triple_timer.extract<std::chrono::milliseconds>() < triple_click_delay) {
 							m = events.msg = ltripleclick;
 							doubled = false;
 						}
@@ -111,7 +111,7 @@ namespace augmentations {
 				case ldoubleclick:
 					SetCapture(hwnd);
 					events.mouse.state[0] = events.keys[LMOUSE] = true; 
-					triple_timer.microseconds();
+					triple_timer.extract<std::chrono::microseconds>();
 					doubled = true;
 					break;
 				case rdoubleclick:			    

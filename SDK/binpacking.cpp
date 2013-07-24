@@ -107,7 +107,7 @@ int main() {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glLoadIdentity();
 
-			rects::point pos;
+			vec2<int> pos;
 			for(int i = 0; i < bins.size(); ++i) {
 				if(pos.x + bins[i].size.w >= gl.get_window_rect().w) {
 					pos.y += MAX_SIDE+10;

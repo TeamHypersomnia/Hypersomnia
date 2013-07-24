@@ -8,7 +8,7 @@ namespace augmentations {
 		class animator {
 			timer tm;
 			std::function<void (float)> callback;
-			float init_val, diff, miliseconds;
+			float init_val, diff, milliseconds;
 		public:
 			struct method {
 				std::function<float (float)> increasing_func;
@@ -24,7 +24,7 @@ namespace augmentations {
 				static float exponential(float);
 			} how;
 			static method LINEAR, QUADRATIC, SINUSOIDAL, HYPERBOLIC, LOGARITHMIC, EXPONENTIAL;
-			animator(const std::function<void (float)>& callback, float init_val, float desired_val, float miliseconds, method how);
+			animator(const std::function<void (float)>& callback, float init_val, float desired_val, float milliseconds, method how);
 			
 			void start();
 			bool animate();

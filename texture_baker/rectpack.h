@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "../rects/rects.h"
+#include "../math/rects.h"
 
 namespace augmentations {
 	namespace packing {

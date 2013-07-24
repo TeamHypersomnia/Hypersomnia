@@ -32,7 +32,7 @@ namespace augmentations {
 
 			const rects::xywhf& get_rect() const;
 
-			void translate_uv(rects::pointf pixels);
+			void translate_uv(vec2<float> pixels);
 			void scale_uv(float u_scalar, float v_scalar);
 			void get_uv(const rects::texture& uv, rects::texture& out) const;
 			void get_uv(float u, float v, float& u_out, float& v_out) const;

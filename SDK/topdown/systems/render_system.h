@@ -10,8 +10,8 @@ using namespace entity_system;
 class render_system : public processing_system_templated<components::transform, components::render> {
 	struct quad {
 		struct vertex {
-			rects::point position;
-			rects::pointf texcoord;
+			vec2<int> position;
+			vec2<float> texcoord;
 			graphics::pixel_32 color;
 		};
 		

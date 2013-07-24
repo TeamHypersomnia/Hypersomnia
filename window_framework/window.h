@@ -5,7 +5,7 @@
 #include <Windows.h>
 #undef min
 #undef max
-#include "../rects/rects.h"
+#include "../math/rects.h"
 #include "event.h"
 #include "../utility/timer.h"
 #include <functional>
@@ -62,7 +62,7 @@ namespace augmentations {
 				
 			/* user settings */
 			std::function<void (glwindow&)> resize; /* resize function */
-			unsigned triple_click_delay; /* maximum delay time for the next click (after doubleclick) to be considered tripleclick (in miliseconds) */
+			unsigned triple_click_delay; /* maximum delay time for the next click (after doubleclick) to be considered tripleclick (in milliseconds) */
 			
 			glwindow();
 			

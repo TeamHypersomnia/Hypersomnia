@@ -14,18 +14,18 @@ namespace augmentations {
 			animator::LOGARITHMIC(0.05f, 5.f,						[](float x){return log(x);}),
 			animator::EXPONENTIAL(-3.f, 1.f,						[](float x){return -exp(-x);}); 
 
-		animator::animator(const std::function<void (float)>& callback, float init_val, float desired_val, float miliseconds, method how) 
-			: callback(callback), init_val(init_val), diff(desired_val - init_val), miliseconds(miliseconds), how(how) {
+		animator::animator(const std::function<void (float)>& callback, float init_val, float desired_val, float milliseconds, method how) 
+			: callback(callback), init_val(init_val), diff(desired_val - init_val), milliseconds(milliseconds), how(how) {
 		}
 
 		void animator::start() {
-			tm.microseconds();
+			tm.extract<std::chrono::microseconds>();
 		}
 
 		bool animator::animate() {
-			float ms = float(tm.get_miliseconds());
-			bool finished = ms >= miliseconds;
-			callback(finished ? init_val + diff : init_val + diff * (how.increasing_func(how.left_x + ms / miliseconds * how.diff_x) - how.left_y) / how.diff_y);
+			float ms = float(tm.get<std::chrono::milliseconds>());
+			bool finished = ms >= milliseconds;
+			callback(finished ? init_val + diff : init_val + diff * (how.increasing_func(how.left_x + ms / milliseconds * how.diff_x) - how.left_y) / how.diff_y);
 			return finished;
 		}
 

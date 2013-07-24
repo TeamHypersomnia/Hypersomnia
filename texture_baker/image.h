@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "../rects/rects.h"
+#include "../math/rects.h"
 /*
 todo:
 * ostateczne rozwiazanie kwestii rejestru, podzielic po prostu na link/object ale na razie to nie moj concern

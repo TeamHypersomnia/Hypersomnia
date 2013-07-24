@@ -3,7 +3,8 @@
 #include <Windows.h>
 #undef min
 #undef max
-#include "../rects/rects.h"
+#include "../math/rects.h"
+#include "../math/vec2d.h"
 
 namespace augmentations {
 	namespace window {
@@ -12,7 +13,7 @@ namespace augmentations {
 
 			struct state {
 				struct mouse_info {
-					rects::point pos, rel, ldrag, rdrag;
+					vec2<int> pos, rel, ldrag, rdrag;
 					bool state[3];
 					int scroll;
 				} mouse;

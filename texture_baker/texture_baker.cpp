@@ -8,6 +8,7 @@
 #include "../options.h"
 #include "texture_baker.h"
 #include "font.h"
+#include "../math/vec2d.h"
 
 namespace augmentations {
 	namespace texture_baker {
@@ -75,8 +76,8 @@ namespace augmentations {
 			return y + h * v;
 		}
 
-		void texture::translate_uv(rects::pointf uv) {
-			uv *= rects::pointf(w/rect.w, h/rect.h);
+		void texture::translate_uv(vec2<float> uv) {
+			uv *= vec2<float>(w/rect.w, h/rect.h);
 			x += uv.x;
 			y += uv.y;
 		}

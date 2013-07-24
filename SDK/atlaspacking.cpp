@@ -100,7 +100,7 @@ int main() {
 	atl.img.destroy();
 	atl.nearest();
 
-	textures[IMAGES].translate_uv(rects::pointf(2, 2));
+	textures[IMAGES].translate_uv(vec2<float>(2, 2));
 	textures[IMAGES].scale_uv(0.000000001f, 0.000000001f);
 
 
