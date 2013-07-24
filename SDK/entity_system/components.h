@@ -1,19 +1,19 @@
 #pragma once
 #include "../../entity_system/entity_system.h"
-#include "../../rects/rects.h"
+#include "../../math/rects.h"
 
 using namespace augmentations;
 using namespace entity_system;
 
 struct transform_component : public component {
-	rects::pointf pos;
+	vec2<float> pos;
 	rects::wh size;
-	transform_component(rects::pointf pos, rects::wh size) : pos(pos), size(size) {}
+	transform_component(vec2<float> pos, rects::wh size) : pos(pos), size(size) {}
 };
 
 struct velocity_component : public component {
-	rects::pointf vel;
-	velocity_component(rects::pointf vel = rects::pointf(0, 0)) : vel(vel) {}
+	vec2<float> vel;
+	velocity_component(vec2<float> vel = vec2<float>(0, 0)) : vel(vel) {}
 };
 
 struct render_component : public component {

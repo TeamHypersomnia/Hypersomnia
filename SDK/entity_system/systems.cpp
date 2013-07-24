@@ -21,48 +21,36 @@ render_system::render_system(window::glwindow& output_window) : output_window(ou
 void render_system::process_entities() {
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	std::vector<entity*> visible_targets(get_targets());
+
+	std::sort(visible_targets.begin(), visible_targets.end(), [](entity* a, entity* b){ 
+		return a->get<render_component>().layer < b->get<render_component>().layer;
+	});
+
+
 	/* we traverse layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
-	for(auto it = layers.rbegin(); it != layers.rend(); ++it) {
-		for(auto e = (*it).targets.begin(); e != (*it).targets.end(); ++e) {
-			auto& render_info = (*e)->get<render_component>();
-			auto& transform = (*e)->get<transform_component>();
+	for (auto e = visible_targets.begin(); e != visible_targets.end(); ++e) {
+		auto& render_info = (*e)->get<render_component>();
+		auto& transform = (*e)->get<transform_component>();
 
-			glLoadIdentity();
+		glLoadIdentity();
 
-			glTranslatef(transform.pos.x, transform.pos.y, 0.0);
-			glColor4f(render_info.r, render_info.g, render_info.b, render_info.a);
+		glTranslatef(transform.pos.x, transform.pos.y, 0.0);
+		glColor4f(render_info.r, render_info.g, render_info.b, render_info.a);
 
-			glBegin (GL_QUADS);
-			glVertex2i (0, 0);
-			glVertex2i (transform.size.w, 0);
-			glVertex2i (transform.size.w, transform.size.h);
-			glVertex2i (0, transform.size.h);
-			glEnd();
-		}
+		glBegin(GL_QUADS);
+		glVertex2i(0, 0);
+		glVertex2i(transform.size.w, 0);
+		glVertex2i(transform.size.w, transform.size.h);
+		glVertex2i(0, transform.size.h);
+		glEnd();
 	}
 
 	output_window.swap_buffers();
 }
 
-void render_system::add(entity* e) {
-	auto layer = e->get<render_component>().layer;
-
-	if(layers.size() <= layer)
-		layers.resize(layer + 1);
-
-	layers[layer].targets.push_back(e);
-}
-
-void render_system::remove(entity* e) {
-	auto layer = e->get<render_component>().layer;
-
-	if(layers.size() > layer) {
-		auto entities = layers[layer].targets; 
-		entities.erase(std::remove(entities.begin(), entities.end(), e), entities.end());
-	}
-}
-
-movement_system::movement_system() : accumulator(120.0, 5) {
+/* because we're consuming velocity only ONCE 1000/fps milliseconds, input seems to be discrete in low framerates */
+movement_system::movement_system() : accumulator(100.0, 5) {
 }
 void movement_system::process_entities() {
 	unsigned steps = accumulator.update_and_extract_steps();
@@ -100,7 +88,7 @@ void input_system::process_entities() {
 
 	for_each([this](entity* e){
 		auto& vel = e->get<velocity_component>().vel;
-			vel.x = ((states[GO_RIGHT]==true)*1000.0f) + ((states[GO_LEFT]==true)*(-1000.0f));    
-			vel.y = ((states[GO_DOWN] ==true)*1000.0f) + ((states[GO_UP]  ==true)*(-1000.0f));		    
+			vel.x = ((states[GO_RIGHT]==true)*800.0f) + ((states[GO_LEFT]==true)*(-800.0f));    
+			vel.y = ((states[GO_DOWN] ==true)*800.0f) + ((states[GO_UP]  ==true)*(-800.0f));		    
 	});
 }

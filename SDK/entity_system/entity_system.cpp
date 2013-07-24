@@ -30,12 +30,10 @@ int main() {
 	player.add(input_component());
 	player.add(velocity_component());
 	player.add(render_component(0, 255, 0, 0, 255));
-	player.add(transform_component(rects::pointf(30, 30), rects::wh(20, 30)));
+	player.add(transform_component(vec2<float>(30, 30), rects::wh(20, 30)));
 
 	while(!quit_flag) my_world.run();
 	
-	my_world.delete_entity(player);
-
 	augmentations::deinit();
 	return 0;
 }

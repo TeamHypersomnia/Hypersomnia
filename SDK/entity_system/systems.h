@@ -14,15 +14,6 @@ struct render_system : public processing_system_templated<transform_component, r
 	window::glwindow& output_window;
 
 	render_system(window::glwindow&);
-
-	struct bucket {
-		std::vector<entity*> targets;
-	};
-
-	void add(entity*) override;
-	void remove(entity*) override;
-
-	std::vector<bucket> layers;
 };
 
 struct movement_system : public processing_system_templated<transform_component, velocity_component> {
