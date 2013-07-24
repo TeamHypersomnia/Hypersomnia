@@ -1,29 +1,44 @@
 #pragma once
-#define UNICODE
-#include <Windows.h>
+#include <ratio>
+#include <chrono>
 
 namespace augmentations {
 	namespace util {
 		class timer {
-			LARGE_INTEGER freq, ticks, delta;
+			std::chrono::high_resolution_clock::time_point ticks;
 		public:
-			/* returns time that has lasted since last call to "microseconds" (zeroes the ticks) */
-			double microseconds();
-			/* returns time in miliseconds that has lasted since last call to "microseconds" (zeroes the ticks) */
-			double miliseconds();
-			/* returns time in seconds that has lasted since last call to "microseconds" (zeroes the ticks) */
-			double seconds();
+
+			/* returns time that has lasted since last call to "extract" (zeroes the ticks) */
+			template<class resolution>
+			double extract() {
+				using namespace std::chrono;
+
+				high_resolution_clock::now();
+				high_resolution_clock::now();
+				high_resolution_clock::now();
+				high_resolution_clock::now();
+				high_resolution_clock::now();
+				high_resolution_clock::now();
+				high_resolution_clock::now();
+				high_resolution_clock::now();
+				auto now = high_resolution_clock::now();
+				double count = duration_cast<duration<double, resolution::period>>(now - ticks).count();
+				ticks = now;
+				return count;
+			}
 			
-			/* returns time that has lasted since last call to "microseconds" */
-			double get_microseconds() const;
-			/* returns time in miliseconds that has lasted since last call to "microseconds" */
-			double get_miliseconds() const;
-			/* returns time in seconds that has lasted since last call to "microseconds" */
-			double get_seconds() const;
-			
+			/* returns time that has lasted since last call to "extract" */
+			template<class resolution>
+			double get() const {
+				using namespace std::chrono;
+				return duration_cast<duration<double, resolution::period>>(high_resolution_clock::now() - ticks).count();
+			}
+
+			void reset();
 			timer();
 		};
 
+		/* WARNING! This variable timestep timer should be replaced with delta accumulation functionality! */
 		class fpstimer : private timer {
 			double maxfps;
 			double sumframes, secs;

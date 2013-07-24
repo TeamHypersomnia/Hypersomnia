@@ -1,44 +1,21 @@
 #include "timer.h"
+#include <algorithm>
+
 
 namespace augmentations {
 	namespace util {
 		timer::timer() {
-			QueryPerformanceFrequency(&freq);
-			ticks.QuadPart = 0;
-		}
-		double timer::microseconds() {
-			LARGE_INTEGER cmp;
-			QueryPerformanceCounter(&cmp);
-			delta.QuadPart = cmp.QuadPart - ticks.QuadPart;
-			ticks.QuadPart = cmp.QuadPart;
-			return delta.QuadPart * (1000000.0/freq.QuadPart);
+			reset();
 		}
 
-		double timer::miliseconds() {
-			return microseconds() * 0.001;
-		}
-		double timer::seconds() { 
-			return microseconds() * 0.000001;
-		}
-
-		double timer::get_microseconds() const {
-			LARGE_INTEGER cmp;
-			QueryPerformanceCounter(&cmp);
-			return (cmp.QuadPart - ticks.QuadPart) * (1000000.0/freq.QuadPart);
-		}
-
-		double timer::get_miliseconds() const {
-			return get_microseconds() * 0.001;
-		}
-
-		double timer::get_seconds() const { 
-			return get_microseconds() * 0.000001;
+		void timer::reset() {
+			ticks = std::chrono::high_resolution_clock::now();
 		}
 
 		fpstimer::fpstimer() : secs(0.0), sumframes(0.0), maxfps(1.0/1000.0){}
 
 		void fpstimer::set_max_fps(double fps) {
-			maxfps = 1.0/(fps = max(fps, 1.0));
+			maxfps = 1.0/(fps = std::max(fps, 1.0));
 		}
 
 		double fpstimer::get_max_fps() {
@@ -58,11 +35,11 @@ namespace augmentations {
 		}
 
 		void fpstimer::start() {
-			seconds();
+			reset();
 		}
 
 		void fpstimer::loop() {
-			secs = seconds();
+			secs = extract<std::chrono::seconds>();
 			sumframes += secs;
 		}
 
