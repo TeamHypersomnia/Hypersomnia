@@ -1,12 +1,20 @@
 #pragma once
 #include "../../../entity_system/entity_system.h"
-#include "../../../rects/rects.h"
+#include "../../../math/rects.h"
+#include "../../../math/vec2d.h"
 
 namespace components {
 	struct transform : public augmentations::entity_system::component {
-		augmentations::rects::pointf pos;
-		augmentations::rects::wh size;
-		double rotation;
-		transform() : rotation(0.0) { }
+		struct state {
+			augmentations::vec2<float> pos;
+			double rotation;
+			state() : rotation(0.0) { }
+		};
+		state previous, current;
+
+		transform(augmentations::vec2<float> pos = augmentations::vec2<float>(), double rotation = 0.0) {
+			current.pos = pos;
+			current.rotation = rotation;
+		}
 	};
 }
