@@ -12,11 +12,10 @@ class physics_system : public processing_system_templated<components::physics, c
 	void reset_states();
 	void smooth_states();
 public:
-	b2World world;
+	b2World b2world;
 	physics_system();
 
-	void process_entities() override;
-
+	void process_entities(world&) override;
 	void add(entity*) override;
 	void remove(entity*) override;
 };
