@@ -2,8 +2,8 @@
 #include <Box2D\Box2D.h>
 
 #include "../../../entity_system/entity_system.h"
-#define PIXELS_TO_METERS 1.0/100
-#define METERS_TO_PIXELS 100.0
+#define METERS_TO_PIXELS 50.0
+#define PIXELS_TO_METERS 1.0/METERS_TO_PIXELS
 
 namespace components {
 	struct physics : public augmentations::entity_system::component {
