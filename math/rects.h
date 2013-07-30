@@ -38,6 +38,8 @@ namespace augmentations {
 			bool inside(const wh& bigger) const;
 
 			bool good() const;
+			
+			wh& operator/=(int d) { w /= d; h /= d; return *this; }
 			wh operator*(float) const;
 			bool operator==(const wh&) const;
 		};
@@ -55,6 +57,7 @@ namespace augmentations {
 			bool clip(const ltrb& bigger);
 			bool hover(const vec2<int>& mouse) const;
 			bool hover(const ltrb&) const;
+			bool hover(const xywh&) const;
 			bool inside(const ltrb& bigger) const;
 			
 			bool stick_x(const ltrb& bigger);
@@ -99,6 +102,8 @@ namespace augmentations {
 			
 			bool clip(const xywh& bigger); // false - null rectangle
 			bool hover(const vec2<int>& mouse);
+			bool hover(const xywh&);
+			bool hover(const ltrb&);
 
 			int x, y, r() const, b() const;
 			void r(int), b(int);

@@ -83,6 +83,10 @@ namespace augmentations {
 		bool ltrb::hover(const ltrb& rc) const {
 			return !(l >= rc.r || t >= rc.b || r <= rc.l || b <= rc.t);
 		}
+
+		bool ltrb::hover(const xywh& rc) const {
+			return hover(ltrb(rc));
+		}
 		
 		bool ltrb::inside(const ltrb& rc) const {
 			return l >= rc.l && r <= rc.r && t >= rc.t && b <= rc.b;
@@ -187,6 +191,14 @@ namespace augmentations {
 
 		bool xywh::hover(const vec2<int>& m) {
 			return m.x >= x && m.y >= y && m.x <= r() && m.y <= b();
+		}
+
+		bool xywh::hover(const ltrb& rc) {
+			return rc.hover(*this);
+		}
+
+		bool xywh::hover(const xywh& rc) {
+			return ltrb(rc).hover(*this);
 		}
 		
 		int xywh::r() const {
