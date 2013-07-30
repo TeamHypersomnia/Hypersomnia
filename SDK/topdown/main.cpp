@@ -31,7 +31,6 @@ int main() {
 	render_system render(gl);
 	camera_system camera(render);
 
-	//physics.world.SetGravity(vec2<>(0,0));
 	texture_baker::image img;
 	texture_baker::texture tex;
 	texture_baker::atlas atl;
@@ -82,44 +81,8 @@ int main() {
 	gui_camera.add(components::camera(screen_rect, screen_rect, 0, components::render::GUI));
 	gui_camera.add(components::transform());
 
-	/*b2BodyDef def;
-	b2Body* body[2]; 
-	def.type = b2_dynamicBody;
-	def.angle = 0;
-	def.userData = (void*)&rect;
-	body[0] = physics.b2world.CreateBody(&def);
-	def.type = b2_staticBody;
-	def.userData = (void*)&ground;
-	body[1] = physics.b2world.CreateBody(&def);
-	
-	body[0]->SetTransform(vec2<float>(2, 1), 1.f);
-	body[1]->SetTransform(vec2<float>(2, 5), 0.f);
-	
-	b2PolygonShape shape[2];
-	shape[0].SetAsBox(139 / 100.0, 172 / 100.0);
-	shape[1].SetAsBox(139 / 100.0, 172 / 100.0);
-
-	b2FixtureDef fixdef;
-	fixdef.density = 10.0;
-	fixdef.shape = &shape[0];
-
-	body[0]->CreateFixture(&fixdef);
-	fixdef.shape = &shape[1];
-	body[1]->CreateFixture(&fixdef);*/
-	
-	//rect.get<components::physics>().body = body[0];
-	//ground.get<components::transform>().current.pos = body[1]->GetTransform().p;
-	//ground.get<components::physics>().body = body[1];
-	
-	//body[0]->ResetMassData();
-		//body[0]->ApplyLinearImpulse(vec2<>(0, -10000), body[0]->GetLocalCenter());
-		//body[0]->SetLinearDamping(0.1);
-	//	body[0]->SetAngularDamping(0.1);
-//	body[0]->ApplyAngularImpulse(10000);
-
-	while (!quit_flag) {
+	while (!quit_flag)
 		my_world.run();
-	}
 	
 	augmentations::deinit();
 	return 0;
