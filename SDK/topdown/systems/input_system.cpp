@@ -5,7 +5,7 @@ input_system::input_system(window::glwindow& input_window, bool& quit_flag) : in
 
 }
 
-void input_system::process_entities() {
+void input_system::process_entities(world&) {
 	window::event::message msg;
 
 	while(input_window.poll_events(msg)) {

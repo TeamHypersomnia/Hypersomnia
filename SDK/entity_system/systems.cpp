@@ -18,7 +18,7 @@ render_system::render_system(window::glwindow& output_window) : output_window(ou
 	glMatrixMode(GL_MODELVIEW);
 }
 
-void render_system::process_entities() {
+void render_system::process_entities(world&) {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	std::vector<entity*> visible_targets(get_targets());
@@ -52,7 +52,7 @@ void render_system::process_entities() {
 /* because we're consuming velocity only ONCE 1000/fps milliseconds, input seems to be discrete in low framerates */
 movement_system::movement_system() : accumulator(100.0, 5) {
 }
-void movement_system::process_entities() {
+void movement_system::process_entities(world&) {
 	unsigned steps = accumulator.update_and_extract_steps();
 
 	for(unsigned i = 0; i < steps; ++i)
@@ -67,7 +67,7 @@ input_system::input_system(window::glwindow& input_window, bool& quit_flag) : in
 	states[0] = states[1] = states[2] = states[3] = 0;
 }
 
-void input_system::process_entities() {
+void input_system::process_entities(world&) {
 	window::event::message msg;
 
 	while(input_window.poll_events(msg)) {

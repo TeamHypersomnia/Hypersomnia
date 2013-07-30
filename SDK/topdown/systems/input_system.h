@@ -7,14 +7,14 @@ using namespace entity_system;
 
 namespace augmentations {
 	namespace window {
-		struct glwindow;
+		class glwindow;
 	}
 }
 
 struct input_system : public processing_system_templated<components::input> {
 	bool& quit_flag;
 	
-	void process_entities() override;
+	void process_entities(world&) override;
 	
 	window::glwindow& input_window;
 	input_system(window::glwindow&, bool& quit_flag);

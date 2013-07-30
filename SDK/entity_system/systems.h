@@ -9,7 +9,7 @@ using namespace augmentations;
 using namespace entity_system;
 
 struct render_system : public processing_system_templated<transform_component, render_component> {
-	void process_entities() override;
+	void process_entities(world&) override;
 	
 	window::glwindow& output_window;
 
@@ -20,7 +20,7 @@ struct movement_system : public processing_system_templated<transform_component,
 	util::delta_accumulator accumulator;
 	movement_system();
 
-	void process_entities() override;
+	void process_entities(world&) override;
 };
 
 struct input_system : public processing_system_templated<velocity_component, input_component> {
@@ -32,7 +32,7 @@ struct input_system : public processing_system_templated<velocity_component, inp
 
 	std::array<bool, 4> states;
 	
-	void process_entities() override;
+	void process_entities(world&) override;
 	
 	window::glwindow& input_window;
 	input_system(window::glwindow&, bool& quit_flag);
