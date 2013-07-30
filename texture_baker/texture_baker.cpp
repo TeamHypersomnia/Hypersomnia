@@ -31,8 +31,12 @@ namespace augmentations {
 			ltoa = flag;
 		}
 
-		const rects::xywhf& texture::get_rect() const {
+		rects::xywhf texture::get_rect() const {
 			return rect;
+		}
+
+		rects::wh texture::get_size() const {
+			return !rect.flipped ? rects::wh(rect.w, rect.h) : rects::wh(rect.h, rect.w);
 		}
 
 		void texture::get_uv(float u, float v, float& u_out, float& v_out) const {

@@ -30,7 +30,8 @@ namespace augmentations {
 			void set(image* img);
 			void luminosity_to_alpha(bool);
 
-			const rects::xywhf& get_rect() const;
+			rects::xywhf get_rect() const;
+			rects::wh get_size() const;
 
 			void translate_uv(vec2<float> pixels);
 			void scale_uv(float u_scalar, float v_scalar);
@@ -69,7 +70,6 @@ namespace augmentations {
 				pack(int max_size);
 
 			void create_image(int atlas_channels, bool destroy_images);
-			void create_raw_texture(const image&);
 			void build(bool mipmaps = false, bool linear = false, image* raw_texture = 0), bind(), _bind(), nearest(), linear(), clamp(), repeat();
 
 			bool is_mipmapped() const;
