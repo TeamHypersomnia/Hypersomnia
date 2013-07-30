@@ -2,9 +2,9 @@
 #include "rects.h"
 namespace augmentations {
 	template <class vec, class d>
-	vec& rotate(vec& v, const vec& origin, d degrees) {
-		float s = sin(degrees);
-		float c = cos(degrees);
+	vec& rotate(vec& v, const vec& origin, d angle) {
+		float s = sin(angle);
+		float c = cos(angle);
 		vec rotated;
 
 		v -= origin;
@@ -87,8 +87,8 @@ namespace augmentations {
 		}
 
 		template <typename v>
-		vec2& rotate(float degrees, v origin) {
-			augmentations::rotate(*this, origin, degrees);
+		vec2& rotate(float angle, v origin) {
+			augmentations::rotate(*this, origin, angle);
 			return *this;
 		}
 
