@@ -7,7 +7,7 @@
 
 namespace augmentations {
 	namespace util {
-		delta_accumulator::delta_accumulator(double fps, unsigned max_steps) : max_steps(max_steps), accumulator(0.0), fixed_dt_milliseconds(1000.0/fps), ratio(0.0) {
+		delta_accumulator::delta_accumulator(double fps, unsigned max_steps) : max_steps(max_steps), accumulator(0.0), fixed_dt_milliseconds((1.0/fps) * 1000.0), ratio(0.0) {
 			reset_timer();
 		}
 
@@ -45,7 +45,7 @@ namespace augmentations {
 		}
 		
 		double delta_accumulator::per_second() const {
-			/* it's 1.0/fps */
+			/* it's 1/fps */
 			return fixed_dt_milliseconds/1000.0; 
 		}
 
