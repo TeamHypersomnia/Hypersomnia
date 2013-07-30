@@ -52,6 +52,8 @@ int main() {
 	entity& gui_camera = my_world.create_entity();
 
 	entity& rect = my_world.create_entity();
+	entity& rect1 = my_world.create_entity();
+	entity& rect2 = my_world.create_entity();
 	entity& ground = my_world.create_entity();
 	entity& crosshair = my_world.create_entity();
 
@@ -59,15 +61,23 @@ int main() {
 	sprite my_sprite(&tex);
 	sprite bigger_sprite(&tex);
 	bigger_sprite.size.w = 400;
-	small_sprite.size /= 2;
+	small_sprite.size.w = 100;
+	small_sprite.size.h = 100;
 
 	rect.add(components::render(0, &my_sprite));
-	rect.add(components::transform(vec2<float>(30, 10)));
+	rect.add(components::transform(vec2<float>(500, -50)));
 	topdown::create_physics_component(rect, physics.b2world);
+	rect1.add(components::render(0, &my_sprite));
+	rect1.add(components::transform(vec2<float>(470, 50)));
+	topdown::create_physics_component(rect1, physics.b2world);
+	rect2.add(components::render(0, &small_sprite));
+	rect2.add(components::transform(vec2<float>(400, 0), 45 * 0.01745329251994329576923690768489));
+	topdown::create_physics_component(rect2, physics.b2world);
 
 	ground.add(components::render(0, &bigger_sprite));
-	ground.add(components::transform(vec2<float>(50, 100)));
+	ground.add(components::transform(vec2<float>(400, 400)));
 	topdown::create_physics_component(ground, physics.b2world, b2_staticBody);
+    ground.get<components::physics>().body->GetFixtureList()->SetRestitution(1.0f);
 
 	crosshair.add(components::render(0, &small_sprite, components::render::GUI));
 	crosshair.add(components::transform(vec2<float>(200, 10)));

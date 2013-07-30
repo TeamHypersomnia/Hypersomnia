@@ -6,17 +6,22 @@ sprite::sprite(texture_baker::texture* tex, graphics::pixel_32 color) : tex(tex)
 	size = tex->get_size();
 }
 
-void renderable::make_rect(vec2<float> pos, vec2<float> size, float rotation_degrees, vec2<float> v[4]) {
+void renderable::make_rect(vec2<float> pos, vec2<float> size, float angle, vec2<float> v[4]) {
 	vec2<float> origin = pos + size / 2.0;
 	v[0] = pos;
 	v[1] = pos + vec2<float>(size.x, 0.f);
 	v[2] = pos + size;
 	v[3] = pos + vec2<float>(0.f, size.y);
 
-	v[0].rotate(rotation_degrees, origin);
-	v[1].rotate(rotation_degrees, origin);
-	v[2].rotate(rotation_degrees, origin);
-	v[3].rotate(rotation_degrees, origin);
+	v[0].rotate(angle, origin);
+	v[1].rotate(angle, origin);
+	v[2].rotate(angle, origin);
+	v[3].rotate(angle, origin);
+
+	v[0] -= size / 2.0;
+	v[1] -= size / 2.0;
+	v[2] -= size / 2.0;
+	v[3] -= size / 2.0;
 }
 
 void sprite::draw(buffer& triangles, const components::transform& transform) {
@@ -49,18 +54,21 @@ b2Body* sprite::create_body(entity_system::entity& subject, b2World& b2world, b2
 	def.userData = (void*) &subject;
 
 	b2PolygonShape shape;
+	shape.SetAsBox(size.w / 2.0 * PIXELS_TO_METERS, size.h / 2.0 * PIXELS_TO_METERS);
 	
-	b2Vec2 v[4] = {
-		vec2<float>(0.f, 0.f),
-		vec2<float>(size.w*PIXELS_TO_METERS, 0.f),
-		vec2<float>(size.w*PIXELS_TO_METERS, size.h*PIXELS_TO_METERS),
-		vec2<float>(0.f, size.h*PIXELS_TO_METERS)
-	};
+	//b2Vec2 v[4] = {
+	//	vec2<float>(0.f, 0.f),
+	//	vec2<float>(size.w*PIXELS_TO_METERS, 0.f),
+	//	vec2<float>(size.w*PIXELS_TO_METERS, size.h*PIXELS_TO_METERS),
+	//	vec2<float>(0.f, size.h*PIXELS_TO_METERS)
+	//};
 
-	shape.Set(v, 4);
+	//shape.Set(v, 4);
 	
 	b2FixtureDef fixdef;
 	fixdef.shape = &shape;
+	fixdef.density = 1.0;
+	fixdef.friction = 1.0;
 
 	b2Body* body = b2world.CreateBody(&def);
 	body->CreateFixture(&fixdef);
