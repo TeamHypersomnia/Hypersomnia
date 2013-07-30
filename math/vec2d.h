@@ -41,7 +41,10 @@ namespace augmentations {
 		}
 
 		vec2(type x = 0, type y = 0) : x(x), y(y) {}
-		vec2(const rects::wh& r) : x(r.w), y(r.h) {}
+		vec2(const rects::wh& r) : x(r.w), y(r.h) {
+			x = r.w;
+			y = r.h;
+		}
 		vec2(const rects::ltrb& r) : x(r.l), y(r.t) {}
 		vec2(const rects::xywh& r) : x(r.x), y(r.y) {}
 
@@ -96,109 +99,45 @@ namespace augmentations {
 			return *this;
 		}
 
-		template <class v> 
-		vec2 operator-(const v& p) const {
-			return vec2(x - p.x, y - p.y);
-		}
+		template <class v> vec2 operator-(const v& p) const { return vec2(x - p.x, y - p.y); }
+		template <class v> vec2 operator+(const v& p) const { return vec2(x + p.x, y + p.y); }
+		template <class v> vec2 operator*(const v& p) const { return vec2(x * p.x, y * p.y); }
+		template <class v> vec2 operator/(const v& p) const { return vec2(x / p.x, y / p.y); }
+
+		vec2 operator-(double d) const { return vec2(x - d, y - d); }
+		vec2 operator+(double d) const { return vec2(x + d, y + d); }
+		vec2 operator*(double d) const { return vec2(x * d, y * d); }
+		vec2 operator/(double d) const { return vec2(x / d, y / d); }
 		
-		template <class v> 
-		vec2 operator+(const v& p) const {
-			return vec2(x + p.x, y + p.y);
-		}
+		vec2 operator-(float d) const { return vec2(x - d, y - d); }
+		vec2 operator+(float d) const { return vec2(x + d, y + d); }
+		vec2 operator*(float d) const { return vec2(x * d, y * d); }
+		vec2 operator/(float d) const { return vec2(x / d, y / d); }
 		
-		template <class v> 
-		vec2 operator*(const v& p) const {
-			return vec2(x * p.x, y * p.y);
-		}
+		vec2 operator-(int d) const { return vec2(x - d, y - d); }
+		vec2 operator+(int d) const { return vec2(x + d, y + d); }
+		vec2 operator*(int d) const { return vec2(x * d, y * d); }
+		vec2 operator/(int d) const { return vec2(x / d, y / d); }
 
-		template <class v> 
-		vec2 operator/(const v& p) const {
-			return vec2(x / p.x, y / p.y);
-		}
+		template <class v> vec2& operator-=(const v& p) { x -= p.x; y -= p.y; return *this; }
+		template <class v> vec2& operator+=(const v& p) { x += p.x; y += p.y; return *this; }
+		template <class v> vec2& operator*=(const v& p) { x *= p.x; y *= p.y; return *this; }
+		template <class v> vec2& operator/=(const v& p) { x /= p.x; y /= p.y; return *this; }
 
-		template <class v> 
-		vec2& operator-=(const v& p) {
-			x -= p.x;
-			y -= p.y;
-			return *this;
-		}
+		vec2& operator-=(double d) { x -= d; y -= d; return *this; }
+		vec2& operator+=(double d) { x += d; y += d; return *this; }
+		vec2& operator*=(double d) { x *= d; y *= d; return *this; }
+		vec2& operator/=(double d) { x /= d; y /= d; return *this; }
 		
-		template <class v> 
-		vec2& operator+=(const v& p) {
-			x += p.x;
-			y += p.y;
-			return *this;
-		}
+		vec2& operator-=(float d) { x -= d; y -= d; return *this; }
+		vec2& operator+=(float d) { x += d; y += d; return *this; }
+		vec2& operator*=(float d) { x *= d; y *= d; return *this; }
+		vec2& operator/=(float d) { x /= d; y /= d; return *this; }
 		
-		template <class v> 
-		vec2& operator*=(const v& p) {
-			x *= p.x;
-			y *= p.y;
-			return *this;
-		}
-
-		template <class v> 
-		vec2& operator/=(const v& p) {
-			x /= p.x;
-			y /= p.y;
-			return *this;
-		}
-		
-		vec2 operator-(double d) const {
-			return vec2(x - d, y - d);
-		}
-
-		vec2 operator+(double d) const {
-			return vec2(x + d, y + d);
-		}
-
-		vec2 operator*(double d) const {
-			return vec2(x * d, y * d);
-		}
-
-		vec2 operator/(double d) const {
-			return vec2(x / d, y / d);
-		}
-		
-		vec2 operator-(float d) const {
-			return vec2(x - d, y - d);
-		}
-
-		vec2 operator+(float d) const {
-			return vec2(x + d, y + d);
-		}
-
-		vec2 operator*(float d) const {
-			return vec2(x * d, y * d);
-		}
-
-		vec2 operator/(float d) const {
-			return vec2(x / d, y / d);
-		}
-
-		vec2& operator-=(double d) {
-			x -= d;
-			y -= d;
-			return *this;
-		}
-
-		vec2& operator+=(double d) {
-			x += d;
-			y += d;
-			return *this;
-		}
-		
-		vec2& operator*=(double d) {
-			x *= d;
-			y *= d;
-			return *this;
-		}
-
-		vec2& operator/=(double d) {
-			x /= d;
-			y /= d;
-			return *this;
-		}
+		vec2& operator-=(int d) { x -= d; y -= d; return *this; }
+		vec2& operator+=(int d) { x += d; y += d; return *this; }
+		vec2& operator*=(int d) { x *= d; y *= d; return *this; }
+		vec2& operator/=(int d) { x /= d; y /= d; return *this; }
 	};
 }
 
