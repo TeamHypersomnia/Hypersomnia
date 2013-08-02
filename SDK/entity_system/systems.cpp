@@ -21,7 +21,7 @@ render_system::render_system(window::glwindow& output_window) : output_window(ou
 void render_system::process_entities(world&) {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	std::vector<entity*> visible_targets(get_targets());
+	std::vector<entity*> visible_targets = targets;
 
 	std::sort(visible_targets.begin(), visible_targets.end(), [](entity* a, entity* b){ 
 		return a->get<render_component>().layer < b->get<render_component>().layer;
@@ -56,11 +56,11 @@ void movement_system::process_entities(world&) {
 	unsigned steps = accumulator.update_and_extract_steps();
 
 	for(unsigned i = 0; i < steps; ++i)
-		for_each([this](entity* e) {
-			auto& pos = e->get<transform_component>();
-			auto& vel = e->get<velocity_component>();
+		for (auto it = targets.begin(); it != targets.end(); ++it) {
+			auto& pos = (*it)->get<transform_component>();
+			auto& vel = (*it)->get<velocity_component>();
 			pos.pos += vel.vel*accumulator.per_second();
-	});
+	}
 }
 
 input_system::input_system(window::glwindow& input_window, bool& quit_flag) : input_window(input_window), quit_flag(quit_flag) {
@@ -86,9 +86,9 @@ void input_system::process_entities(world&) {
 		}
 	}
 
-	for_each([this](entity* e){
-		auto& vel = e->get<velocity_component>().vel;
+	for(auto it = targets.begin(); it != targets.end(); ++it) {
+		auto& vel = (*it)->get<velocity_component>().vel;
 			vel.x = ((states[GO_RIGHT]==true)*800.0f) + ((states[GO_LEFT]==true)*(-800.0f));    
 			vel.y = ((states[GO_DOWN] ==true)*800.0f) + ((states[GO_UP]  ==true)*(-800.0f));		    
-	});
+	}
 }

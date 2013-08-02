@@ -30,19 +30,6 @@ namespace augmentations {
 
 			/* you are required to override this function to specify components that this system needs to processing */
 			virtual type_pack get_needed_components() const = 0;
-
-			/* helper function that iterates through every target entity */
-			void for_each(std::function<void (entity*)>);
-
-			template<typename message>
-			void post(world& owner, const message& msg) const {
-				owner.post_message(msg);
-			}
-
-			template<typename message>
-			std::vector<message>& get_queue(world& owner, const message& msg) const {
-				owner.get_message_queue<message>();
-			}
 		};
 
 		/* helper class removing necessity to override get_needed_components by specifying the types in the parameter pack */
