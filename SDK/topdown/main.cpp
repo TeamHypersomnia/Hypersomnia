@@ -63,6 +63,8 @@ int main() {
 	bigger_sprite.size.w = 400;
 	small_sprite.size.w = 100;
 	small_sprite.size.h = 100;
+	my_sprite.size.w = 200;
+	my_sprite.size.h = 120;
 
 	rect.add(components::render(0, &my_sprite));
 	rect.add(components::transform(vec2<float>(500, -50)));
