@@ -37,6 +37,7 @@ namespace augmentations {
 			void scale_uv(float u_scalar, float v_scalar);
 			void get_uv(const rects::texture& uv, rects::texture& out) const;
 			void get_uv(float u, float v, float& u_out, float& v_out) const;
+			void get_uv(vec2<float>& texture_space) const;
 
 			/* gets u coordinate from a standard rectangular quad with origin coordinates 0.0, 0.0, 1.0, 1.0 */
 			float get_u(int vertex_num_from_cw_rect) const;

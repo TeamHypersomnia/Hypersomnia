@@ -49,6 +49,11 @@ namespace augmentations {
 				v_out = y + h * u;
 			}
 		}
+		
+		void texture::get_uv(vec2<float>& texture_space) const {
+			auto temp = texture_space;
+			get_uv(temp.x, temp.y, texture_space.x, texture_space.y);
+		}
 
 		float texture::get_u(int vertex_num_from_cw_rect) const {
 			vertex_num_from_cw_rect %= 4;
