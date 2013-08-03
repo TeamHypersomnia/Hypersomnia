@@ -1,6 +1,6 @@
 #pragma once
-#include "../../../entity_system/entity_system.h"
-#include "../../../math/rects.h"
+#include "entity_system/component.h"
+#include "math/rects.h"
 #include "render_component.h"
 
 namespace components {

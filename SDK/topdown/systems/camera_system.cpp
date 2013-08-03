@@ -1,4 +1,6 @@
+#include "entity_system/entity.h"
 #include "camera_system.h"
+
 #include <gl\GL.h>
 
 camera_system::camera_system(render_system& raw_renderer) : raw_renderer(raw_renderer) {}

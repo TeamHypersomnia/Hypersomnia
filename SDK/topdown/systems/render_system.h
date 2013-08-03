@@ -1,10 +1,13 @@
 #pragma once
+#include <Box2D\Collision\b2DynamicTree.h>
+#include "window_framework/window.h"
+
+#include "entity_system/processing_system.h"
+
 #include "../components/transform_component.h"
 #include "../components/render_component.h"
 
-#include "../../../window_framework/window.h"
 #include "../renderable.h"
-#include <Box2D\Collision\b2DynamicTree.h>
 
 using namespace augmentations;
 using namespace entity_system;

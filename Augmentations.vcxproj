@@ -39,7 +39,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(IncludePath)</IncludePath>
+    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(IncludePath)</IncludePath>
@@ -131,8 +131,14 @@
     <ClCompile Include="graphics\pixel.cpp" />
     <ClCompile Include="math\rects.cpp" />
     <ClCompile Include="math\vec2d.cpp" />
-    <ClCompile Include="SDK\entity_system\entity_system.cpp" />
-    <ClCompile Include="SDK\entity_system\systems.cpp" />
+    <ClCompile Include="SDK\topdown\game\body_helper.cpp" />
+    <ClCompile Include="SDK\topdown\main.cpp" />
+    <ClCompile Include="SDK\topdown\renderable.cpp" />
+    <ClCompile Include="SDK\topdown\systems\camera_system.cpp" />
+    <ClCompile Include="SDK\topdown\systems\crosshair_system.cpp" />
+    <ClCompile Include="SDK\topdown\systems\input_system.cpp" />
+    <ClCompile Include="SDK\topdown\systems\physics_system.cpp" />
+    <ClCompile Include="SDK\topdown\systems\render_system.cpp" />
     <ClCompile Include="texture_baker\font.cpp" />
     <ClCompile Include="texture_baker\image.cpp" />
     <ClCompile Include="texture_baker\rectpack.cpp" />
@@ -206,14 +212,29 @@
     <ClInclude Include="options.h" />
     <ClInclude Include="math\rects.h" />
     <ClInclude Include="math\vec2d.h" />
-    <ClInclude Include="SDK\entity_system\components.h" />
-    <ClInclude Include="SDK\entity_system\systems.h" />
+    <ClInclude Include="SDK\topdown\components\camera_component.h" />
+    <ClInclude Include="SDK\topdown\components\crosshair_component.h" />
+    <ClInclude Include="SDK\topdown\components\input_component.h" />
+    <ClInclude Include="SDK\topdown\components\physics_component.h" />
+    <ClInclude Include="SDK\topdown\components\render_component.h" />
+    <ClInclude Include="SDK\topdown\components\transform_component.h" />
+    <ClInclude Include="SDK\topdown\game\body_helper.h" />
+    <ClInclude Include="SDK\topdown\messages\collision_message.h" />
+    <ClInclude Include="SDK\topdown\messages\intent_message.h" />
+    <ClInclude Include="SDK\topdown\messages\message.h" />
+    <ClInclude Include="SDK\topdown\renderable.h" />
+    <ClInclude Include="SDK\topdown\systems\camera_system.h" />
+    <ClInclude Include="SDK\topdown\systems\crosshair_system.h" />
+    <ClInclude Include="SDK\topdown\systems\input_system.h" />
+    <ClInclude Include="SDK\topdown\systems\physics_system.h" />
+    <ClInclude Include="SDK\topdown\systems\render_system.h" />
     <ClInclude Include="texture_baker\font.h" />
     <ClInclude Include="texture_baker\image.h" />
     <ClInclude Include="texture_baker\rectpack.h" />
     <ClInclude Include="texture_baker\texture_baker.h" />
     <ClInclude Include="utility\delta_accumulator.h" />
     <ClInclude Include="utility\input_context.h" />
+    <ClInclude Include="utility\sorted_vector.h" />
     <ClInclude Include="utility\stream.h" />
     <ClInclude Include="utility\timer.h" />
     <ClInclude Include="utility\value_animator.h" />

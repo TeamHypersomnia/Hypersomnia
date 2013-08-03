@@ -1,5 +1,6 @@
 #include "render_system.h"
 #include <gl\glew.h>
+#include "entity_system/entity.h"
 
 void render_system::add(entity* e) {
 	entities_by_mask[e->get<components::render>().mask].push_back(e);

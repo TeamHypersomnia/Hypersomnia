@@ -1,5 +1,5 @@
 #pragma once
-#include "../../../entity_system/entity_system.h"
+#include "entity_system/entity_system.h"
 #include <Box2D\Box2D.h>
 
 struct sprite;

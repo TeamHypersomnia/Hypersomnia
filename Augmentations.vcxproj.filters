@@ -219,10 +219,28 @@
     <ClCompile Include="3rdparty\Box2D\Rope\b2Rope.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\entity_system\entity_system.cpp">
+    <ClCompile Include="SDK\topdown\game\body_helper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\entity_system\systems.cpp">
+    <ClCompile Include="SDK\topdown\systems\camera_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\input_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\physics_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\render_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\renderable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\crosshair_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -443,10 +461,55 @@
     <ClInclude Include="3rdparty\Box2D\Box2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\entity_system\components.h">
+    <ClInclude Include="SDK\topdown\components\camera_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\entity_system\systems.h">
+    <ClInclude Include="SDK\topdown\components\input_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\components\physics_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\components\render_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\components\transform_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\game\body_helper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\messages\collision_message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\messages\message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\systems\camera_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\systems\input_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\systems\physics_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\systems\render_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\renderable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\messages\intent_message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utility\sorted_vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\components\crosshair_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\systems\crosshair_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

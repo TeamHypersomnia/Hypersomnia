@@ -1,10 +1,12 @@
 #pragma once
 #include <vector>
-#include "../../texture_baker/texture_baker.h"
-#include "../../graphics/pixel.h"
-#include "../../math/vec2d.h"
-#include "components\transform_component.h"
 #include <Box2D/Box2D.h>
+
+#include "texture_baker/texture_baker.h"
+#include "graphics/pixel.h"
+#include "math/vec2d.h"
+
+#include "components\transform_component.h"
 
 using namespace augmentations;
 

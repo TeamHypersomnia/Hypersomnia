@@ -1,7 +1,7 @@
 #pragma once
-#include "../../../entity_system/entity_system.h"
-#include "../../../math/rects.h"
-#include "../../../math/vec2d.h"
+#include "entity_system/component.h"
+#include "math/rects.h"
+#include "math/vec2d.h"
 
 namespace components {
 	struct transform : public augmentations::entity_system::component {

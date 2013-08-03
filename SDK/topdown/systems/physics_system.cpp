@@ -1,4 +1,5 @@
 #include "physics_system.h"
+#include "entity_system/entity.h"
 
 physics_system::physics_system() : accumulator(30.0, 1), 
 	//world(b2Vec2(0.f, 0.f)) 

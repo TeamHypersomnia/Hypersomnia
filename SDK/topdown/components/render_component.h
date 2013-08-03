@@ -1,5 +1,5 @@
 #pragma once
-#include "../../../entity_system/entity_system.h"
+#include "entity_system/component.h"
 
 struct renderable;
 namespace components {
