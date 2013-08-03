@@ -51,5 +51,7 @@ namespace augmentations {
 			
 			void run();
 		};
+
+		template <typename message> std::vector<message> world::message_queue<message>::messages;
 	}
 }
