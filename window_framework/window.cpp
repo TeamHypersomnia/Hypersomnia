@@ -361,6 +361,10 @@ namespace augmentations {
 		rects::wh glwindow::get_maximum_size() const {
 			return rects::wh(cmaxw, cmaxh);
 		}
+
+		rects::wh glwindow::get_screen_rect() const {
+			return rects::wh(get_window_rect().w, get_window_rect().h);
+		}
 		
 		rects::xywh glwindow::get_window_rect() const {
 			static RECT r;

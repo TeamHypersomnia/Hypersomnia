@@ -105,7 +105,8 @@ namespace augmentations {
 
 			rects::wh 
 				get_minimum_size() const, 
-				get_maximum_size() const;
+				get_maximum_size() const,
+				get_screen_rect() const;
 			rects::xywh
 				get_window_rect() const,
 				get_adjusted_rect() const;
