@@ -1,6 +1,8 @@
-#include "renderable.h"
-#include "../topdown/components/physics_component.h"
 #include <algorithm>
+#include "entity_system/entity.h"
+
+#include "../topdown/components/physics_component.h"
+#include "renderable.h"
 
 sprite::sprite(texture_baker::texture* tex, graphics::pixel_32 color) : tex(tex), color(color) {
 	size = tex->get_size();
@@ -37,6 +39,11 @@ void sprite::draw(buffer& triangles, const components::transform& transform) {
 	t2.vertices[1].texcoord = vec2<float>(1.f, 0.f);
 	t1.vertices[1].texcoord = t2.vertices[2].texcoord = vec2<float>(1.f, 1.f);
 	t1.vertices[2].texcoord = vec2<float>(0.f, 1.f);
+
+	for (int i = 0; i < 3; ++i) {
+		tex->get_uv(t1.vertices[i].texcoord);
+		tex->get_uv(t2.vertices[i].texcoord);
+	}
 
 	t1.vertices[0].position = t2.vertices[0].position = v[0];
 	t2.vertices[1].position = v[1];
