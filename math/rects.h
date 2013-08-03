@@ -68,6 +68,8 @@ namespace augmentations {
 			void center_y(int y);
 			void center(const vec2<int>&);
 
+			void snap_point(vec2<float>&) const;
+
 			int l, t, r, b, w() const, h() const, area() const, perimeter() const, max_side() const; // false - null rectangle
 			void x(int), y(int), w(int), h(int);
 			bool good() const;
