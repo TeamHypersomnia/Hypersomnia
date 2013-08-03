@@ -25,8 +25,8 @@ namespace augmentations {
 			*/
 			virtual void remove(entity*);
 
-			/* process all entity targets */
-			virtual void process_entities(world&) = 0;
+			/* process all entity targets, base function does nothing */
+			virtual void process_entities(world&);
 
 			/* you are required to override this function to specify components that this system needs to processing */
 			virtual type_pack get_needed_components() const = 0;
@@ -37,6 +37,17 @@ namespace augmentations {
 		class processing_system_templated : public processing_system {
 			virtual type_pack get_needed_components() const override {
 				return templated_list<needed_components...>::get();
+			}
+		};
+		
+		template<typename... needed_components>
+		class event_only_system_templated : public processing_system_templated<needed_components...> {
+			virtual void add(entity*) {
+
+			}
+
+			virtual void remove(entity*) {
+
 			}
 		};
 	}
