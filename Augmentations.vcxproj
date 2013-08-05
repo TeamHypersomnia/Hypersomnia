@@ -222,6 +222,7 @@
     <ClInclude Include="SDK\topdown\messages\collision_message.h" />
     <ClInclude Include="SDK\topdown\messages\intent_message.h" />
     <ClInclude Include="SDK\topdown\messages\message.h" />
+    <ClInclude Include="SDK\topdown\messages\moved_message.h" />
     <ClInclude Include="SDK\topdown\renderable.h" />
     <ClInclude Include="SDK\topdown\systems\camera_system.h" />
     <ClInclude Include="SDK\topdown\systems\crosshair_system.h" />
