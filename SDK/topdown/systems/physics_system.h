@@ -7,6 +7,8 @@
 #include "../components/physics_component.h"
 #include "../components/transform_component.h"
 
+#include "../messages/moved_message.h"
+
 using namespace augmentations;
 using namespace entity_system;
 

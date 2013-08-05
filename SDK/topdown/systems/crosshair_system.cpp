@@ -2,6 +2,7 @@
 #include "entity_system/world.h"
 
 #include "../messages/intent_message.h"
+#include "../messages/moved_message.h"
 
 void crosshair_system::process_entities(world& owner) {
 	auto events = owner.get_message_queue<messages::intent_message>();
@@ -16,8 +17,12 @@ void crosshair_system::process_entities(world& owner) {
 			/* move crosshair according to its sensitivity and relative mouse movement (easier to support multiple resolutions) */
 			transform->current.pos += (*it).mouse_rel * crosshair->sensitivity;
 
-			/* align the crosshair to bounds rect */
-			crosshair->bounds.snap_point(transform->current.pos);
+			if ((*it).mouse_rel.x != 0 || (*it).mouse_rel.y != 0) {
+				/* align the crosshair to bounds rect */
+
+				crosshair->bounds.snap_point(transform->current.pos);
+				owner.post_message(messages::moved_message(it->subject));
+			}
 		}
 	}
 }

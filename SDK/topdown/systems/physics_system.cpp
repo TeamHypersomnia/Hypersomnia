@@ -1,6 +1,5 @@
 #include "physics_system.h"
 #include "entity_system/entity.h"
-#include "../messages/moved_messsage.h"
 
 physics_system::physics_system() : accumulator(30.0, 1), 
 	//world(b2Vec2(0.f, 0.f)) 
@@ -25,9 +24,8 @@ void physics_system::process_entities(world& owner) {
 
 		if (!physics || !transform) continue;
 		
-		physics->body->SetTransform(transform->current.pos, transform->current.rotation);
+		physics->body->SetTransform(transform->current.pos * PIXELS_TO_METERS, transform->current.rotation);
 	}
-
 
 	for (unsigned i = 0; i < steps; ++i) {
 		int32 velocityIterations = 8;
