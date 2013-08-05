@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include <pair>
 
 #define BOOST_DISABLE_THREADS
 #include <boost\pool\object_pool.hpp>
@@ -32,6 +33,14 @@ namespace augmentations {
 			template<class component_class>
 			component_class& get() {
 				return *static_cast<component_class*>(type_to_component.at(typeid(component_class).hash_code()));
+			}
+
+			template <typename component_class>
+			component_class* find() {
+				auto it = type_to_component.find();
+				if (it != type_to_component.end()) 
+					return *it;
+				return nullptr;
 			}
 
 			template <typename component_type>
