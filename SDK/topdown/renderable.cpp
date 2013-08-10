@@ -8,7 +8,7 @@ sprite::sprite(texture_baker::texture* tex, graphics::pixel_32 color) : tex(tex)
 	size = tex->get_size();
 }
 
-void renderable::make_rect(vec2<float> pos, vec2<float> size, float angle, vec2<float> v[4]) {
+void renderable::make_rect(vec2<double> pos, vec2<float> size, float angle, vec2<float> v[4]) {
 	vec2<float> origin = pos + size / 2.0;
 	v[0] = pos;
 	v[1] = pos + vec2<float>(size.x, 0.f);

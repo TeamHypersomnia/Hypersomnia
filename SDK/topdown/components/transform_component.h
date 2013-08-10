@@ -6,9 +6,9 @@
 namespace components {
 	struct transform : public augmentations::entity_system::component {
 		struct state {
-			augmentations::vec2<float> pos;
+			augmentations::vec2<double> pos;
 			double rotation;
-			state() : rotation(0.0) { }
+			state() : rotation(0.0), pos(0.0) { }
 		};
 		state previous, current;
 
