@@ -146,7 +146,7 @@ namespace augmentations {
 			center_y(c.y);
 		}
 		
-		void ltrb::snap_point(vec2<float>& v) const {
+		void ltrb::snap_point(vec2<double>& v) const {
 			if (v.x < l) v.x = l;
 			if (v.y < t) v.y = t;
 			if (v.x > r) v.x = r;
