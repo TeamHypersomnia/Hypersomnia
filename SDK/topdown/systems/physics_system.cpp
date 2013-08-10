@@ -24,6 +24,7 @@ void physics_system::process_entities(world& owner) {
 
 		if (!physics || !transform) continue;
 		
+		transform->previous = transform->current;
 		physics->body->SetTransform(transform->current.pos * PIXELS_TO_METERS, transform->current.rotation);
 	}
 
@@ -70,7 +71,7 @@ void physics_system::smooth_states() {
 		if (b->GetType() == b2_staticBody) continue;
  
 		auto& transform = static_cast<entity*>(b->GetUserData())->get<components::transform>();
-		transform.current.pos = vec2<float>(accumulator.get_ratio() * b->GetPosition()) + transform.previous.pos * PIXELS_TO_METERS * one_minus_ratio;
+		transform.current.pos = vec2<double>(accumulator.get_ratio() * b->GetPosition()) + transform.previous.pos * PIXELS_TO_METERS * one_minus_ratio;
 		transform.current.pos *= METERS_TO_PIXELS;
 		transform.current.rotation = accumulator.get_ratio() * b->GetAngle() + one_minus_ratio * transform.previous.rotation;
 	}
