@@ -137,6 +137,7 @@
     <ClCompile Include="SDK\topdown\systems\camera_system.cpp" />
     <ClCompile Include="SDK\topdown\systems\crosshair_system.cpp" />
     <ClCompile Include="SDK\topdown\systems\input_system.cpp" />
+    <ClCompile Include="SDK\topdown\systems\lookat_system.cpp" />
     <ClCompile Include="SDK\topdown\systems\physics_system.cpp" />
     <ClCompile Include="SDK\topdown\systems\render_system.cpp" />
     <ClCompile Include="texture_baker\font.cpp" />
@@ -215,6 +216,7 @@
     <ClInclude Include="SDK\topdown\components\camera_component.h" />
     <ClInclude Include="SDK\topdown\components\crosshair_component.h" />
     <ClInclude Include="SDK\topdown\components\input_component.h" />
+    <ClInclude Include="SDK\topdown\components\lookat_component.h" />
     <ClInclude Include="SDK\topdown\components\physics_component.h" />
     <ClInclude Include="SDK\topdown\components\render_component.h" />
     <ClInclude Include="SDK\topdown\components\transform_component.h" />
@@ -227,6 +229,7 @@
     <ClInclude Include="SDK\topdown\systems\camera_system.h" />
     <ClInclude Include="SDK\topdown\systems\crosshair_system.h" />
     <ClInclude Include="SDK\topdown\systems\input_system.h" />
+    <ClInclude Include="SDK\topdown\systems\lookat_system.h" />
     <ClInclude Include="SDK\topdown\systems\physics_system.h" />
     <ClInclude Include="SDK\topdown\systems\render_system.h" />
     <ClInclude Include="texture_baker\font.h" />

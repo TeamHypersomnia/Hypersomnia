@@ -9,6 +9,7 @@
 #include "systems/render_system.h"
 #include "systems/input_system.h"
 #include "systems/crosshair_system.h"
+#include "systems/lookat_system.h"
 
 #include "game\body_helper.h"
 
@@ -24,8 +25,9 @@ int main() {
 	window::glwindow gl;
 	gl.create(cfg, rects::wh(100, 100));
 	gl.set_show(gl.SHOW);
+	window::cursor(false);
 
-#define IMAGES 3
+#define IMAGES 4
 
 	texture_baker::image img[IMAGES];
 	texture_baker::texture tex[IMAGES];
@@ -34,6 +36,7 @@ int main() {
 	img[0].from_file(L"C:\\VVV\\head.png");
 	img[1].from_file(L"C:\\VVV\\enemy.png");
 	img[2].from_file(L"C:\\VVV\\segment.png");
+	img[3].from_file(L"C:\\VVV\\rifle.png");
 
 	for (int i = 0; i < IMAGES; ++i) {
 		tex[i].set(img + i);
@@ -47,15 +50,16 @@ int main() {
 
 	/* destroy the raw image as it is already uploaded to GPU */
 	atl.img.destroy();
-	atl.nearest();
+	atl.linear();
 
 	sprite small_sprite(tex + 0);
 	sprite my_sprite(tex + 0);
 	sprite bigger_sprite(tex + 0);
 	sprite player_sprite(tex + 1);
 	sprite crosshair_sprite(tex + 2);
+	sprite rifle_sprite(tex + 3);
 
-	player_sprite.size = vec2<float>(60.f, 60.f);
+	player_sprite.size /= 4.f;
 
 	bigger_sprite.size.w = 400;
 	small_sprite.size.w = 100;
@@ -69,6 +73,7 @@ int main() {
 
 	input_system input(gl, quit_flag);
 	crosshair_system crosshairs;
+	lookat_system lookat;
 	physics_system physics;
 	render_system render(gl);
 	camera_system camera(render);
@@ -86,6 +91,7 @@ int main() {
 
 	my_world.add_system(&input);
 	my_world.add_system(&crosshairs);
+	my_world.add_system(&lookat);
 	my_world.add_system(&physics);
 	my_world.add_system(&render);
 	my_world.add_system(&camera);
@@ -107,7 +113,8 @@ int main() {
 	player_input.intents.add(intent_message::intent::MOVE_RIGHT);
 
 	player.add(components::render(0, &player_sprite));
-	player.add(components::transform(vec2<float>(100, 100)));
+	player.add(components::transform(vec2<float>(gl.get_screen_rect())/2));
+	player.add(components::lookat(&crosshair));
 	player.add(player_input);
 	topdown::create_physics_component(player, physics.b2world, b2_kinematicBody);
 
@@ -137,12 +144,13 @@ int main() {
 
 	gui_camera.add(components::camera(gl.get_screen_rect(), gl.get_screen_rect(), 0, components::render::GUI));
 	gui_camera.add(components::transform());
-
+	
 	while (!quit_flag) {
 		my_world.run();
 
 		/* flushing message queues */
 		my_world.get_message_queue<intent_message>().clear();
+		my_world.get_message_queue<moved_message>().clear();
 		my_world.get_message_queue<collision_message>().clear();
 	}
 	
