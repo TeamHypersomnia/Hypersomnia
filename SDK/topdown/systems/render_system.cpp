@@ -7,7 +7,7 @@ void render_system::add(entity* e) {
 }
 
 void render_system::remove(entity* e) {
-	auto v = entities_by_mask[e->get<components::render>().mask];
+	auto& v = entities_by_mask[e->get<components::render>().mask];
 	v.erase(std::remove(v.begin(), v.end(), e), v.end());
 }
 
