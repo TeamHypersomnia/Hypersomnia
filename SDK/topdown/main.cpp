@@ -5,13 +5,19 @@
 #include "../../config/config.h"
 
 #include "systems/physics_system.h"
+#include "systems/movement_system.h"
 #include "systems/camera_system.h"
 #include "systems/render_system.h"
 #include "systems/input_system.h"
 #include "systems/crosshair_system.h"
 #include "systems/lookat_system.h"
+#include "systems/chase_system.h"
 
-#include "game\body_helper.h"
+#include "messages/collision_message.h"
+#include "messages/moved_message.h"
+#include "messages/intent_message.h"
+
+#include "game/body_helper.h"
 
 using namespace augmentations;
 using namespace entity_system;
@@ -33,10 +39,10 @@ int main() {
 	texture_baker::texture tex[IMAGES];
 	texture_baker::atlas atl;
 
-	img[0].from_file(L"C:\\VVV\\head.png");
-	img[1].from_file(L"C:\\VVV\\enemy.png");
-	img[2].from_file(L"C:\\VVV\\segment.png");
-	img[3].from_file(L"C:\\VVV\\rifle.png");
+	img[0].from_file(L"C:\\VVV\\rect.png");
+	img[1].from_file(L"C:\\VVV\\rect.png");
+	img[2].from_file(L"C:\\VVV\\rect.png");
+	img[3].from_file(L"C:\\VVV\\rect.png");
 
 	for (int i = 0; i < IMAGES; ++i) {
 		tex[i].set(img + i);
@@ -59,7 +65,7 @@ int main() {
 	sprite crosshair_sprite(tex + 2);
 	sprite rifle_sprite(tex + 3);
 
-	player_sprite.size /= 4.f;
+	player_sprite.size = vec2<float>(100,100);
 
 	bigger_sprite.size.w = 400;
 	small_sprite.size.w = 100;
@@ -72,11 +78,13 @@ int main() {
 	world my_world;
 
 	input_system input(gl, quit_flag);
+	movement_system movement;
 	crosshair_system crosshairs;
 	lookat_system lookat;
 	physics_system physics;
 	render_system render(gl);
 	camera_system camera(render);
+	chase_system chase;
 
 	input_system::context main_context;
 	main_context.raw_id_to_intent[window::event::mouse::motion] = intent_message::intent::AIM;
@@ -90,8 +98,10 @@ int main() {
 	physics.b2world.SetGravity(vec2<>(0.f, 0.f));
 
 	my_world.add_system(&input);
+	my_world.add_system(&movement);
 	my_world.add_system(&crosshairs);
 	my_world.add_system(&lookat);
+	my_world.add_system(&chase);
 	my_world.add_system(&physics);
 	my_world.add_system(&render);
 	my_world.add_system(&camera);
@@ -99,7 +109,8 @@ int main() {
 	entity& world_camera = my_world.create_entity();
 	entity& gui_camera = my_world.create_entity();
 
-	entity& player = my_world.create_entity();
+	entity& player_visual = my_world.create_entity();
+	entity& player_physical = my_world.create_entity();
 	entity& rect = my_world.create_entity();
 	entity& rect1 = my_world.create_entity();
 	entity& rect2 = my_world.create_entity();
@@ -112,11 +123,19 @@ int main() {
 	player_input.intents.add(intent_message::intent::MOVE_LEFT);
 	player_input.intents.add(intent_message::intent::MOVE_RIGHT);
 
-	player.add(components::render(0, &player_sprite));
-	player.add(components::transform(vec2<float>(gl.get_screen_rect())/2));
-	player.add(components::lookat(&crosshair));
-	player.add(player_input);
-	topdown::create_physics_component(player, physics.b2world, b2_kinematicBody);
+	player_visual.add(components::render(0, &player_sprite));
+	player_visual.add(components::transform(vec2<float>(gl.get_screen_rect()) / 2));
+	player_visual.add(components::lookat(&crosshair));
+	player_visual.add(components::chase(&player_physical));
+
+	player_physical.add(components::render(0, &player_sprite));
+	player_physical.add(components::transform(vec2<float>(gl.get_screen_rect()) / 2));
+	player_physical.add(components::movement(vec2<float>(50000.f, 50000.f), 500.f));
+	player_physical.add(player_input);
+	topdown::create_physics_component(player_physical, physics.b2world, b2_dynamicBody);
+	player_physical.get<components::physics>().body->SetLinearDamping(20.0f);
+	player_physical.get<components::physics>().body->SetAngularDamping(20.0f);
+	player_physical.get<components::physics>().body->SetFixedRotation(true);
 
 	rect.add(components::render(0, &my_sprite));
 	rect.add(components::transform(vec2<float>(500, -50)));
@@ -127,11 +146,14 @@ int main() {
 	rect2.add(components::render(0, &small_sprite));
 	rect2.add(components::transform(vec2<float>(400, 0), 45 * 0.01745329251994329576923690768489));
 	topdown::create_physics_component(rect2, physics.b2world);
+	rect .get<components::physics>().body->ApplyLinearImpulse(vec2<float>(0.f, 2000.f*PIXELS_TO_METERS),  rect.get<components::physics>().body->GetWorldCenter());
+	rect1.get<components::physics>().body->ApplyLinearImpulse(vec2<float>(0.f, 2000.f*PIXELS_TO_METERS), rect1.get<components::physics>().body->GetWorldCenter());
+	rect2.get<components::physics>().body->ApplyLinearImpulse(vec2<float>(0.f, 2000.f*PIXELS_TO_METERS), rect2.get<components::physics>().body->GetWorldCenter());
 
 	ground.add(components::render(0, &bigger_sprite));
-	ground.add(components::transform(vec2<float>(400, 400)));
+	ground.add(components::transform(vec2<float>(400, 400), 75 * 0.01745329251994329576923690768489));
 	topdown::create_physics_component(ground, physics.b2world, b2_staticBody);
-    ground.get<components::physics>().body->GetFixtureList()->SetRestitution(1.0f);
+    ground.get<components::physics>().body->GetFixtureList()->SetFriction(0.0f);
 
 	crosshair.add(components::render(0, &crosshair_sprite, components::render::GUI));
 	crosshair.add(components::transform(vec2<float>(gl.get_window_rect().w, gl.get_window_rect().h) / 2));
@@ -144,11 +166,13 @@ int main() {
 
 	gui_camera.add(components::camera(gl.get_screen_rect(), gl.get_screen_rect(), 0, components::render::GUI));
 	gui_camera.add(components::transform());
-	
+
+	player_physical.remove<components::render>();
 	while (!quit_flag) {
 		my_world.run();
 
 		/* flushing message queues */
+		my_world.get_message_queue<message>().clear();
 		my_world.get_message_queue<intent_message>().clear();
 		my_world.get_message_queue<moved_message>().clear();
 		my_world.get_message_queue<collision_message>().clear();

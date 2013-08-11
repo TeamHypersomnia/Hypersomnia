@@ -1,5 +1,5 @@
-#include "entity_system/entity.h"
 #include "camera_system.h"
+#include "entity_system/entity.h"
 
 #include <gl\GL.h>
 

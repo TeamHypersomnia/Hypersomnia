@@ -1,10 +1,10 @@
 string window_name example
-int fullscreen 1
+int fullscreen 0
 int window_border 0
 int window_x 0
 int window_y 0
 int bpp 24
-int resolution_w 1650
-int resolution_h 1080
+int resolution_w 1550
+int resolution_h 980
 int doublebuffer 1
   
