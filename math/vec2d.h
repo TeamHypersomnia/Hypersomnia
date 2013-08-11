@@ -99,6 +99,12 @@ namespace augmentations {
 			return *this;
 		}
 
+		bool non_zero() const {
+			return x != type(0) || y != type(0);
+		}
+		
+		template <class v> bool operator==(const v& p) const { return x == p.x && y == p.y; }
+
 		template <class v> vec2 operator-(const v& p) const { return vec2(x - p.x, y - p.y); }
 		template <class v> vec2 operator+(const v& p) const { return vec2(x + p.x, y + p.y); }
 		template <class v> vec2 operator*(const v& p) const { return vec2(x * p.x, y * p.y); }

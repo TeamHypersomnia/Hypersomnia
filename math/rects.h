@@ -40,6 +40,7 @@ namespace augmentations {
 			bool good() const;
 			
 			wh& operator/=(int d) { w /= d; h /= d; return *this; }
+			wh& operator/=(float d) { w /= d; h /= d; return *this; }
 			wh operator*(float) const;
 			bool operator==(const wh&) const;
 		};

@@ -78,25 +78,25 @@ namespace augmentations {
 				signature_matcher_bitset old_signature(get_components());
 
 				/* try to find and obtain iterator */
-				auto it =  type_to_component.find(typeid(component_type).hash_code());
+				auto it = type_to_component.find(typeid(component_type).hash_code());
 				/* not found, return */
-				if ( it == type_to_component.end()) return;
-
-				/* delete component from corresponding pool, first cast to component_type to avoid polymorphic indirection */
-				(static_cast<component_type*>((*it).second))->~component_type();
-				owner_world.get_container_for_type(*type).free((*it).second);
-
-				/* delete component from entity's map */
-				type_to_component.erase(it);
+				if (it == type_to_component.end()) return;
 
 				signature_matcher_bitset new_signature(old_signature);
 				new_signature.remove(owner_world.component_library.get_registered_type(typeid(component_type).hash_code()));
 
-				for(auto sys = owner_world.systems.begin(); sys != owner_world.systems.end(); ++sys)
-					/* if a processing_system matches does not match with the new signature and does with the old one */
-						if(!(*sys)->components_signature.matches(new_signature) && (*sys)->components_signature.matches(old_signature)) 
-							/* we should remove this entity from there */
-								(*sys)->remove(this);
+				for (auto sys = owner_world.systems.begin(); sys != owner_world.systems.end(); ++sys)
+					/* if a processing_system does not match with the new signature and does with the old one */
+					if (!(*sys)->components_signature.matches(new_signature) && (*sys)->components_signature.matches(old_signature))
+						/* we should remove this entity from there */
+						(*sys)->remove(this);
+
+				/* delete component from corresponding pool, first cast to component_type to avoid polymorphic indirection */
+				(static_cast<component_type*>((*it).second))->~component_type();
+				owner_world.get_container_for_type(typeid(component_type).hash_code()).free((*it).second);
+
+				/* delete component from entity's map */
+				type_to_component.erase(it);
 			}
 		};
 	}
