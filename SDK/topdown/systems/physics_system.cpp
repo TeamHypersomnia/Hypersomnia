@@ -1,21 +1,21 @@
 #include "physics_system.h"
 #include "entity_system/entity.h"
 
-physics_system::physics_system() : accumulator(30.0, 1), 
-	//world(b2Vec2(0.f, 0.f)) 
+#include "../messages/moved_message.h"
+#include "../messages/collision_message.h"
+
+physics_system::physics_system() : accumulator(60.0, 1), 
 	b2world(b2Vec2(0.f, 9.8f)) {
 	b2world.SetAllowSleeping(true);
 	b2world.SetAutoClearForces(false);
 }
 
 void physics_system::process_entities(world& owner) {
-	const unsigned steps = accumulator.update_and_extract_steps();
 
 	/* we will update body's transforms HERE according to the ENTITY_MOVED message
 	bitsquid's events are particularly well when message can be processed "within the same domain"
 	whereas when it comes to registrations to entity-specific notations, there is probably some overhead imposed with searching the matching subscriber
 	*/
-
 	auto events = owner.get_message_queue<messages::moved_message>();
 
 	for (auto it = events.begin(); it != events.end(); ++it) {
@@ -27,6 +27,8 @@ void physics_system::process_entities(world& owner) {
 		transform->previous = transform->current;
 		physics->body->SetTransform(transform->current.pos * PIXELS_TO_METERS, transform->current.rotation);
 	}
+
+	const unsigned steps = accumulator.update_and_extract_steps();
 
 	for (unsigned i = 0; i < steps; ++i) {
 		int32 velocityIterations = 8;
@@ -65,14 +67,17 @@ void physics_system::reset_states() {
 }
 
 void physics_system::smooth_states() {
-	const float one_minus_ratio = 1.f - accumulator.get_ratio();
+	const double one_minus_ratio = 1.f - accumulator.get_ratio();
  
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
  
 		auto& transform = static_cast<entity*>(b->GetUserData())->get<components::transform>();
-		transform.current.pos = vec2<double>(accumulator.get_ratio() * b->GetPosition()) + transform.previous.pos * PIXELS_TO_METERS * one_minus_ratio;
-		transform.current.pos *= METERS_TO_PIXELS;
+
+		if (transform.current.pos == transform.previous.pos && transform.current.rotation == transform.previous.rotation)
+			continue;
+
+		transform.current.pos = vec2<double>(accumulator.get_ratio() * b->GetPosition()) * METERS_TO_PIXELS + transform.previous.pos * one_minus_ratio;
 		transform.current.rotation = accumulator.get_ratio() * b->GetAngle() + one_minus_ratio * transform.previous.rotation;
 	}
 }
