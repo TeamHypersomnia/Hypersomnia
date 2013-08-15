@@ -16,15 +16,14 @@ void chase_system::process_entities(world&) {
 		auto& chase = it->get<components::chase>();
 		auto& target_transform = chase.target->get<components::transform>();
 
-		if (chase.relative) {
-			transform.current.pos += target_transform.current.pos - chase.previous;
-			chase.previous = target_transform.current.pos;
-		}
-		else {
-			transform.current.pos = target_transform.current.pos;
-			transform.current.pos += chase.offset;
-			transform.previous.pos = transform.current.pos;
-		}
+		if (chase.relative) 
+			chase.offset = transform.current.pos - chase.previous;
+
+		transform.current.pos = target_transform.current.pos;
+		transform.current.pos += chase.offset;
+
+		//transform.previous.pos = transform.current.pos;
+		chase.previous = target_transform.current.pos;
 	}
 }
 
