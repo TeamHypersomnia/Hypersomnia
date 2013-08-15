@@ -12,15 +12,6 @@ namespace augmentations {
 			template<class resolution>
 			double extract() {
 				using namespace std::chrono;
-
-				high_resolution_clock::now();
-				high_resolution_clock::now();
-				high_resolution_clock::now();
-				high_resolution_clock::now();
-				high_resolution_clock::now();
-				high_resolution_clock::now();
-				high_resolution_clock::now();
-				high_resolution_clock::now();
 				auto now = high_resolution_clock::now();
 				double count = duration_cast<duration<double, resolution::period>>(now - ticks).count();
 				ticks = now;
