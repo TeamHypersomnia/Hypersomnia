@@ -8,9 +8,9 @@ using namespace entity_system;
 
 class camera_system : public processing_system_templated<components::transform, components::camera> {
 	render_system& raw_renderer;
-
 public:
 	camera_system(render_system& raw_renderer);
 
 	void process_entities(world&) override;
+	void add(entity*) override;
 };
