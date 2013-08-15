@@ -6,11 +6,6 @@
 
 camera_system::camera_system(render_system& raw_renderer) : raw_renderer(raw_renderer) {}
 
-void camera_system::add(entity* e) {
-	//e->get<components::camera>().interpolated_previous = e->get<components::transform>().current.pos;
-	processing_system::add(e);
-}
-
 void camera_system::process_entities(world&) {
 	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
 	std::sort(targets.begin(), targets.end(), [](entity* a, entity* b) {
@@ -20,65 +15,56 @@ void camera_system::process_entities(world&) {
 	for (auto e : targets) {
 		auto& camera = e->get<components::camera>();
 
-		if(camera.enabled) {
+		if (camera.enabled) {
 			glLoadIdentity();
 			glOrtho(camera.ortho.l, camera.ortho.r, camera.ortho.b, camera.ortho.t, 0, 1);
 			glViewport(camera.screen_rect.x, camera.screen_rect.y, camera.screen_rect.w, camera.screen_rect.h);
 
-			auto& transform = e->get<components::transform>();
-			components::transform result_transform = transform;
-
+			/* we obtain transform as a copy because we'll be now offsetting it by crosshair position */
+			components::transform transform = e->get<components::transform>();
 			vec2<> camera_screen = vec2<>(vec2<int>(camera.ortho.w(), camera.ortho.h()));
 
+			/* if we set player and crosshair entity targets */
 			if (camera.player && camera.crosshair) {
-				auto physics = camera.player->get<components::physics>();
-				
-
+				/* skip calculations if no orbit_mode is specified */
 				if (camera.orbit_mode != camera.NONE) {
+					/* shortcuts */
 					vec2<>& crosshair_pos = camera.crosshair->get<components::transform>().current.pos;
-					vec2<>  player_pos = camera.player->get<components::transform>().current.pos;
+					vec2<> player_pos = camera.player->get<components::transform>().current.pos;
 					vec2<> dir = (crosshair_pos - player_pos);
 
 					if (camera.orbit_mode == camera.ANGLED) {
 						vec2<> bound = camera_screen / 2.f + camera.angled_look_length;
+						/* save copy */
 						vec2<> normalized = dir.clamp(bound);
-						normalized.normalize();
-						result_transform.current.pos += normalized * camera.angled_look_length;
+						transform.current.pos += normalized.normalize() * camera.angled_look_length;
 					}
 
 					if (camera.orbit_mode == camera.LOOK) {
 						vec2<> bound = camera.max_look_expand + camera_screen / 2.f;
-
-						result_transform.current.pos += (dir.clamp(bound) / bound) * camera.max_look_expand;
+						/* simple proportion */
+						transform.current.pos += (dir.clamp(bound) / bound) * camera.max_look_expand;
 					}
 
+					/* update crosshair so it is snapped to visible area */
 					crosshair_pos = player_pos + dir;
 				}
 			}
 
 			if (camera.enable_smoothing) {
-				//if (transform.previous.pos != result_transform.current.pos) {
-				//	camera.interpolated_previous = camera.last_interpolant;
-				//	camera.animator.reset(0.f, 1.f
-				//		//	, (result_transform.current.pos - transform.previous.pos).length() / camera_screen.length() * camera.miliseconds_transition
-				//		);
-				//}
+				/* variable time step camera smoothing by averaging last position with the current */
+				float averaging_constant = static_cast<float>(
+					pow(camera.smoothing_average_factor, camera.averages_per_sec * camera.smooth_timer.extract<std::chrono::seconds>())
+					);
 
-				//float ratio = 0.f;
-				//camera.animator.animate(ratio);
-				//camera.last_interpolant = camera.interpolated_previous.lerp(result_transform.current.pos, ratio);
-
-
-				float constant = static_cast<float>(pow(camera.smoothing_average_factor, camera.averages_per_sec*camera.smooth_timer.extract<std::chrono::seconds>()));
-				camera.last_interpolant = camera.last_interpolant * constant + result_transform.current.pos*(1.f - constant);
-
-				raw_renderer.draw(camera.ortho, components::transform(camera.last_interpolant), camera.mask);
-				//transform.previous.pos = result_transform.current.pos;
-			}
-			else {
-				raw_renderer.draw(camera.ortho, components::transform(result_transform.current.pos), camera.mask);
+				//if ((transform.current.pos - camera.last_interpolant).length() < 2.0) camera.last_interpolant = transform.current.pos;
+				//else
+					camera.last_interpolant = camera.last_interpolant * averaging_constant + transform.current.pos * (1.f - averaging_constant);
+				/* save smoothing result */
+				transform.current.pos = camera.last_interpolant;
 			}
 
+			raw_renderer.draw(camera.ortho, components::transform(transform.current.pos), camera.mask);
 		}
 	}
 

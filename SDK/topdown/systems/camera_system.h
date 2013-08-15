@@ -12,5 +12,4 @@ public:
 	camera_system(render_system& raw_renderer);
 
 	void process_entities(world&) override;
-	void add(entity*) override;
 };

@@ -131,7 +131,7 @@ int main() {
 
 	player_physical.add(components::render(0, &player_sprite));
 	player_physical.add(components::transform(vec2<>(0.f, 0.f)));
-	player_physical.add(components::movement(vec2<>(10000.f, 10000.f), 10000.f));
+	player_physical.add(components::movement(vec2<>(15000.f, 15000.f), 15000.f));
 	player_physical.add(player_input);
 	topdown::create_physics_component(player_physical, physics.b2world, b2_dynamicBody);
 	player_physical.get<components::physics>().body->SetLinearDamping(13.0f);
@@ -169,9 +169,10 @@ int main() {
 	crosshair.add(components::input());
 	crosshair.get<components::input>().intents.add(intent_message::intent::AIM);
 	
+	gl.vsync(0);
 	world_camera.add(components::transform());
 	world_camera.add(components::chase(&player_physical, false, vec2<>(vec2<int>(gl.get_screen_rect()))*-0.5f));
-	world_camera.add(components::camera(gl.get_screen_rect(), gl.get_screen_rect(), 0, components::render::WORLD, 0.5, 1));
+	world_camera.add(components::camera(gl.get_screen_rect(), gl.get_screen_rect(), 0, components::render::WORLD, 0.5, 20.0));
 	world_camera.get<components::camera>().crosshair = &crosshair;
 	world_camera.get<components::camera>().player = &player_physical;
 	world_camera.get<components::camera>().orbit_mode = components::camera::LOOK;
