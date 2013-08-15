@@ -13,7 +13,7 @@ namespace augmentations {
 
 			struct state {
 				struct mouse_info {
-					vec2<int> pos, rel, ldrag, rdrag;
+					vec2<int> pos, rel, raw_rel, ldrag, rdrag;
 					bool state[3];
 					int scroll;
 				} mouse;
@@ -173,7 +173,8 @@ namespace augmentations {
 			namespace mouse {
 				enum {
 					ltripleclick,
-					motion =		WM_MOUSEMOVE,
+					raw_motion,
+					motion = WM_MOUSEMOVE,
 					wheel =		    WM_MOUSEWHEEL,
 					ldoubleclick =	WM_LBUTTONDBLCLK,
 					mdoubleclick =	WM_MBUTTONDBLCLK,

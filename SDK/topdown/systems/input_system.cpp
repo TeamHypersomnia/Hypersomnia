@@ -10,7 +10,7 @@ input_system::input_system(window::glwindow& input_window, bool& quit_flag) : in
 void input_system::post(messages::intent_message incoming_event, world& owner) {
 	auto& m = input_window.events.mouse;
 	incoming_event.mouse_pos = m.pos;
-	incoming_event.mouse_rel = m.rel;
+	incoming_event.mouse_rel = m.raw_rel;
 
 	for (auto it = targets.begin(); it != targets.end(); ++it) {
 		if ((*it)->get<components::input>().intents.find(incoming_event.type)) {
@@ -42,7 +42,7 @@ void input_system::process_entities(world& owner) {
 
 	while (input_window.poll_events(msg)) {
 
-		if (msg == window::event::close) {
+		if (msg == close) {
 			quit_flag = true;
 		}
 
@@ -72,6 +72,5 @@ void input_system::process_entities(world& owner) {
 
 			if (succesfully_mapped) break;
 		}
-
 	}
 }

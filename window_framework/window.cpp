@@ -27,7 +27,7 @@ namespace augmentations {
 				if(umsg == WM_DESTROY) {
 					RemoveClipboardFormatListener(hwnd); 
 				}
-				else if(umsg == WM_SYSCOMMAND || umsg == WM_ACTIVATE) {
+				else if(umsg == WM_SYSCOMMAND || umsg == WM_ACTIVATE || umsg == WM_INPUT) {
 					err(PostMessage(hwnd, umsg, wParam, lParam));
 					return 0;
 				}
@@ -47,10 +47,15 @@ namespace augmentations {
 		void glwindow::_poll(event::message& m, WPARAM wParam, LPARAM lParam) {
 				using namespace event::key;
 				using namespace event::keys;
+
 				static POINTS p;
 				static RECT* r;
 				static long rw, rh;
 				static MINMAXINFO* mi;
+				static BYTE lpb[40];
+				static UINT dwSize = 40;
+				static RAWINPUT* raw;
+
 				events.mouse.rel.x = 0;
 				events.mouse.rel.y = 0;
 				switch (m) {
@@ -141,6 +146,21 @@ namespace augmentations {
 						events.mouse.rdrag.x = events.mouse.pos.x;
 						events.mouse.rdrag.y = events.mouse.pos.y;
 					}
+					break;
+
+				case WM_INPUT:
+					GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT,
+						lpb, &dwSize, sizeof(RAWINPUTHEADER));
+
+					raw = reinterpret_cast<RAWINPUT*>(lpb);
+
+					if (raw->header.dwType == RIM_TYPEMOUSE) {
+						events.mouse.raw_rel.x = raw->data.mouse.lLastX;
+						events.mouse.raw_rel.y = raw->data.mouse.lLastY;
+
+						m = events.msg = raw_motion;
+					}
+
 					break;
 
 				case event::activate:	
@@ -244,6 +264,20 @@ namespace augmentations {
 			
 			set_maximum_size(crect);
 			set_minimum_size(crect);
+
+#ifndef HID_USAGE_PAGE_GENERIC
+#define HID_USAGE_PAGE_GENERIC         ((USHORT) 0x01)
+#endif
+#ifndef HID_USAGE_GENERIC_MOUSE
+#define HID_USAGE_GENERIC_MOUSE        ((USHORT) 0x02)
+#endif
+
+			RAWINPUTDEVICE Rid[1];
+			Rid[0].usUsagePage = HID_USAGE_PAGE_GENERIC;
+			Rid[0].usUsage = HID_USAGE_GENERIC_MOUSE;
+			Rid[0].dwFlags = RIDEV_INPUTSINK;
+			Rid[0].hwndTarget = hwnd;
+			RegisterRawInputDevices(Rid, 1, sizeof(Rid[0]));
 
 			return f != 0;
 		}
