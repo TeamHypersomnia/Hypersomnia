@@ -27,11 +27,16 @@ void movement_system::process_entities(world& owner) {
 		auto& physics = it->get<components::physics>();
 		auto& movement = it->get<components::movement>();
 
-		vec2<float> resultant;
+		vec2<> resultant;
 		resultant.x = movement.current_directions[movement.RIGHT] * movement.acceleration.x - movement.current_directions[movement.LEFT] * movement.acceleration.x;
 		resultant.y = movement.current_directions[movement.BACKWARD] * movement.acceleration.y - movement.current_directions[movement.FORWARD] * movement.acceleration.y;
 
 		if (resultant.non_zero())
-			physics.body->ApplyForce(resultant * PIXELS_TO_METERS * physics.body->GetMass(), physics.body->GetWorldCenter());
+			physics.body->ApplyForce(resultant * PIXELS_TO_METERSf * physics.body->GetMass(), physics.body->GetWorldCenter());
+
+		b2Vec2 vel = physics.body->GetLinearVelocity();
+
+		if (vel.Normalize() > movement.max_speed * PIXELS_TO_METERSf)
+			physics.body->SetLinearVelocity(movement.max_speed * PIXELS_TO_METERSf * vel);
 	}
 }
