@@ -19,7 +19,8 @@ namespace augmentations {
 		struct xywh;
 
 		struct wh {
-			wh(const vec2<float>&);
+			template<typename type>
+			wh(const vec2<type>& rr) : w(static_cast<int>(rr.x)), h(static_cast<int>(rr.y)) {}
 			wh(const ltrb&);
 			wh(const xywh&);
 			wh(int w = 0, int h = 0);
@@ -39,8 +40,8 @@ namespace augmentations {
 
 			bool good() const;
 			
-			wh& operator/=(int d) { w /= d; h /= d; return *this; }
-			wh& operator/=(float d) { w /= d; h /= d; return *this; }
+			//wh& operator/=(int d) { w /= d; h /= d; return *this; }
+			//wh& operator/=(float d) { w /= d; h /= d; return *this; }
 			wh operator*(float) const;
 			bool operator==(const wh&) const;
 		};
@@ -69,7 +70,13 @@ namespace augmentations {
 			void center_y(int y);
 			void center(const vec2<int>&);
 
-			void snap_point(vec2<double>&) const;
+			template <typename type>
+			void snap_point(vec2<type>& v) const {
+				if (v.x < l) v.x = static_cast<type>(l);
+				if (v.y < t) v.y = static_cast<type>(t);
+				if (v.x > r) v.x = static_cast<type>(r);
+				if (v.y > b) v.y = static_cast<type>(b);
+			}
 
 			int l, t, r, b, w() const, h() const, area() const, perimeter() const, max_side() const; // false - null rectangle
 			void x(int), y(int), w(int), h(int);

@@ -3,8 +3,8 @@
 namespace augmentations {
 	template <class vec, class d>
 	vec& rotate(vec& v, const vec& origin, d angle) {
-		float s = sin(angle);
-		float c = cos(angle);
+		auto s = sin(angle);
+		auto c = cos(angle);
 		vec rotated;
 
 		v -= origin;
@@ -31,19 +31,19 @@ namespace augmentations {
 		type x, y;
 		
 		template <class t>
-		vec2(const t& v) : x(v.x), y(v.y) {}
+		vec2(const t& v) : x(static_cast<type>(v.x)), y(static_cast<type>(v.y)) {}
 
 		template <class t>
 		vec2& operator=(const t& v) {
-			x = v.x;
-			y = v.y;
+			x = static_cast<type>(v.x);
+			y = static_cast<type>(v.y);
 			return *this;
 		}
 
 		vec2(type x = 0, type y = 0) : x(x), y(y) {}
 		vec2(const rects::wh& r) : x(r.w), y(r.h) {
-			x = r.w;
-			y = r.h;
+			x = static_cast<type>(r.w);
+			y = static_cast<type>(r.h);
 		}
 		vec2(const rects::ltrb& r) : x(r.l), y(r.t) {}
 		vec2(const rects::xywh& r) : x(r.x), y(r.y) {}
@@ -57,7 +57,11 @@ namespace augmentations {
 		}
 
 		float length() const {
-			return sqrt(x*x + y*y);
+			return sqrt(length_sq());
+		}
+
+		float length_sq() const {
+			return x*x + y*y;
 		}
 
 		float get_radians() const {
@@ -92,6 +96,10 @@ namespace augmentations {
 			return *this;
 		}
 
+		vec2 lerp(const vec2& bigger, float ratio) const {
+			return (*this) + (bigger - (*this)) * ratio;
+		}
+
 		vec2& normalize() {
 			float len = 1.f/length();
 			x *= len;
@@ -99,11 +107,30 @@ namespace augmentations {
 			return *this;
 		}
 
+		vec2& clamp(vec2<float> rect) {
+			if (x > rect.x) x = rect.x;
+			if (y > rect.y) y = rect.y;
+			if (x < -rect.x) x = -rect.x;
+			if (y < -rect.y) y = -rect.y;
+			return *this;
+		}
+
+		vec2& clamp(float max_length) {
+			if (length_sq() > max_length*max_length) {
+				normalize();
+				(*this) *= max_length;
+			}
+			return *this;
+		}
+
 		bool non_zero() const {
 			return x != type(0) || y != type(0);
 		}
 		
+		vec2 operator-() { return vec2(x * -1, y * -1); }
+
 		template <class v> bool operator==(const v& p) const { return x == p.x && y == p.y; }
+		template <class v> bool operator!=(const v& p) const { return x != p.x || y != p.y; }
 
 		template <class v> vec2 operator-(const v& p) const { return vec2(x - p.x, y - p.y); }
 		template <class v> vec2 operator+(const v& p) const { return vec2(x + p.x, y + p.y); }

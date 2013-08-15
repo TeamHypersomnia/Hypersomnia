@@ -6,7 +6,6 @@
 namespace augmentations {
 	namespace rects {
 		
-		wh::wh(const vec2<float>& rr) : w(rr.x), h(rr.y) {} 
 		wh::wh(const ltrb& rr) : w(rr.w()), h(rr.h()) {} 
 		wh::wh(const xywh& rr) : w(rr.w), h(rr.h) {} 
 		wh::wh(int w, int h) : w(w), h(h) {}
@@ -144,13 +143,6 @@ namespace augmentations {
 		void ltrb::center(const vec2<int>& c) {
 			center_x(c.x);
 			center_y(c.y);
-		}
-		
-		void ltrb::snap_point(vec2<double>& v) const {
-			if (v.x < l) v.x = l;
-			if (v.y < t) v.y = t;
-			if (v.x > r) v.x = r;
-			if (v.y > b) v.y = b;
 		}
 
 		void ltrb::x(int xx) {
