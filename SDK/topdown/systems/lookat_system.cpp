@@ -11,7 +11,7 @@ void lookat_system::process_entities(world& owner) {
 			auto& transform = it->get<components::transform>();
 
 			transform.current.rotation = (target_transform->current.pos - transform.current.pos).get_radians();
-			owner.post_message(messages::moved_message(it));
+			//owner.post_message(messages::moved_message(it));
 		}
 	}
 }
