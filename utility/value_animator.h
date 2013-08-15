@@ -24,21 +24,25 @@ namespace augmentations {
 				static float exponential(float);
 			} how;
 			static method LINEAR, QUADRATIC, SINUSOIDAL, HYPERBOLIC, LOGARITHMIC, EXPONENTIAL;
-			animator(const std::function<void (float)>& callback, float init_val, float desired_val, float milliseconds, method how);
+			animator(float init_val, float desired_val, float milliseconds, method how, const std::function<void (float) >& callback = nullptr);
 			
 			void start();
 			bool animate();
+			bool animate(float& out_val);
+
+			void reset(float init_val, float desired_val);
+			void reset(float init_val, float desired_val, float milliseconds);
 		};
 
 		struct animation {
-			std::vector<animator*> animators;
+			std::vector<animator> animators;
 
 			int loops, current_loop;
 			unsigned current;
 			animation(int loops = -1);
 
 			void start();
-			bool animate();
+			bool animate(float& out_val); 
 		};
 	}
 }
