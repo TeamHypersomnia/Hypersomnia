@@ -23,7 +23,7 @@ struct triangle {
 typedef std::vector<triangle> buffer;
 
 struct renderable {
-	static void make_rect(vec2<double> pos, vec2<float> size, float rotation_degrees, vec2<float> out[4]);
+	static void make_rect(vec2<> pos, vec2<float> size, float rotation_degrees, vec2<float> out[4]);
 
 	virtual void draw(buffer&, const components::transform&) = 0;
 	virtual rects::xywh get_aabb(const components::transform&) = 0;
@@ -34,7 +34,7 @@ struct renderable {
 struct sprite : renderable {
 	texture_baker::texture* tex;
 	graphics::pixel_32 color;
-	rects::wh size;
+	vec2<int> size;
 
 	sprite(texture_baker::texture*, graphics::pixel_32 = graphics::pixel_32());
 

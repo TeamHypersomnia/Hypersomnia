@@ -35,8 +35,8 @@ namespace augmentations {
 			return rect;
 		}
 
-		rects::wh texture::get_size() const {
-			return !rect.flipped ? rects::wh(rect.w, rect.h) : rects::wh(rect.h, rect.w);
+		vec2<int> texture::get_size() const {
+			return !rect.flipped ? vec2<int>(rect.w, rect.h) : vec2<int>(rect.h, rect.w);
 		}
 
 		void texture::get_uv(float u, float v, float& u_out, float& v_out) const {

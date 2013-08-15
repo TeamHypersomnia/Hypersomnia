@@ -31,7 +31,7 @@ namespace augmentations {
 			void luminosity_to_alpha(bool);
 
 			rects::xywhf get_rect() const;
-			rects::wh get_size() const;
+			vec2<int> get_size() const;
 
 			void translate_uv(vec2<float> pixels);
 			void scale_uv(float u_scalar, float v_scalar);

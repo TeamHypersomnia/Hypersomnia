@@ -6,13 +6,13 @@
 namespace components {
 	struct transform : public augmentations::entity_system::component {
 		struct state {
-			augmentations::vec2<double> pos;
-			double rotation;
-			state() : rotation(0.0), pos(0.0) { }
+			augmentations::vec2<> pos;
+			float rotation;
+			state() : rotation(0.f) { }
 		};
 		state previous, current;
 
-		transform(augmentations::vec2<float> pos = augmentations::vec2<float>(), double rotation = 0.0) {
+		transform(augmentations::vec2<> pos = augmentations::vec2<>(), float rotation = 0.f) {
 			current.pos = pos;
 			current.rotation = rotation;
 		}

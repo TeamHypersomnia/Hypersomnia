@@ -4,7 +4,7 @@
 #include "../messages/moved_message.h"
 #include "../messages/collision_message.h"
 
-physics_system::physics_system() : accumulator(60.0, 1), 
+physics_system::physics_system() : accumulator(60.0, 5), 
 	b2world(b2Vec2(0.f, 9.8f)) {
 	b2world.SetAllowSleeping(true);
 	b2world.SetAutoClearForces(false);
@@ -16,6 +16,7 @@ void physics_system::process_entities(world& owner) {
 	bitsquid's events are particularly well when message can be processed "within the same domain"
 	whereas when it comes to registrations to entity-specific notations, there is probably some overhead imposed with searching the matching subscriber
 	*/
+	/*
 	auto events = owner.get_message_queue<messages::moved_message>();
 
 	for (auto it = events.begin(); it != events.end(); ++it) {
@@ -27,6 +28,7 @@ void physics_system::process_entities(world& owner) {
 		transform->previous = transform->current;
 		physics->body->SetTransform(transform->current.pos * PIXELS_TO_METERS, transform->current.rotation);
 	}
+	*/
 
 	const unsigned steps = accumulator.update_and_extract_steps();
 
@@ -35,7 +37,7 @@ void physics_system::process_entities(world& owner) {
 		int32 positionIterations = 3;
 
 		reset_states();
-		b2world.Step(accumulator.per_second(), velocityIterations, positionIterations);
+		b2world.Step(static_cast<float32>(accumulator.per_second()), velocityIterations, positionIterations);
 	}
 
 	/* note we DON'T send moved_message for every processed physics entity, because if something wants to keep track of an entity's position it can
@@ -59,7 +61,7 @@ void physics_system::reset_states() {
 		auto& transform = static_cast<entity*>(b->GetUserData())->get<components::transform>();
 		
 		transform.current.pos = b->GetPosition();
-		transform.current.pos *= METERS_TO_PIXELS;
+		transform.current.pos *= METERS_TO_PIXELSf;
 		transform.current.rotation = b->GetAngle();
 
 		transform.previous = transform.current;
@@ -67,17 +69,14 @@ void physics_system::reset_states() {
 }
 
 void physics_system::smooth_states() {
-	const double one_minus_ratio = 1.f - accumulator.get_ratio();
+	const float ratio = static_cast<float>(accumulator.get_ratio());
  
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
  
 		auto& transform = static_cast<entity*>(b->GetUserData())->get<components::transform>();
 
-		if (transform.current.pos == transform.previous.pos && transform.current.rotation == transform.previous.rotation)
-			continue;
-
-		transform.current.pos = vec2<double>(accumulator.get_ratio() * b->GetPosition()) * METERS_TO_PIXELS + transform.previous.pos * one_minus_ratio;
-		transform.current.rotation = accumulator.get_ratio() * b->GetAngle() + one_minus_ratio * transform.previous.rotation;
+		transform.current.pos = transform.previous.pos + ratio * (METERS_TO_PIXELSf*b->GetPosition() - transform.previous.pos);
+		transform.current.rotation = transform.previous.rotation + ratio * (b->GetAngle() - transform.previous.rotation);
 	}
 }

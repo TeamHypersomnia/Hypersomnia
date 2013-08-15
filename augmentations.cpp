@@ -41,7 +41,7 @@ namespace augmentations {
 			wcl.lpszClassName = L"AugmentedWindow";
 			wcl.hIconSm = 0;
 
-			errs(RegisterClassEx(&wcl) != 0, "class registering") != 0;
+			(errs((RegisterClassEx(&wcl) != 0), "class registering") != 0);
 		}
 		
 		if(to_initialize & GLEW) {
