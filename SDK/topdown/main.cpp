@@ -172,6 +172,9 @@ int main() {
 	input_system::context main_context;
 	main_context.raw_id_to_intent[window::event::mouse::raw_motion] = intent_message::intent::AIM;
 	main_context.raw_id_to_intent[window::event::mouse::ldown] = intent_message::intent::SHOOT;
+	main_context.raw_id_to_intent[window::event::mouse::ldoubleclick] = intent_message::intent::SHOOT;
+	main_context.raw_id_to_intent[window::event::mouse::rdown] = intent_message::intent::SWITCH_LOOK;
+	main_context.raw_id_to_intent[window::event::mouse::rdoubleclick] = intent_message::intent::SWITCH_LOOK;
 	main_context.raw_id_to_intent[window::event::keys::W] = intent_message::intent::MOVE_FORWARD;
 	main_context.raw_id_to_intent[window::event::keys::S] = intent_message::intent::MOVE_BACKWARD;
 	main_context.raw_id_to_intent[window::event::keys::A] = intent_message::intent::MOVE_LEFT;
@@ -249,13 +252,12 @@ int main() {
 
 	player.first.get<components::physics>().body->SetTransform(vec2<>(-500.f*PIXELS_TO_METERSf, 0.f), 0.f);
 	
-	for (int i = 0; i < 100; ++i) {
+	for (int i = 0; i < 10; ++i) {
 		auto npc = spawn_npc();
 		npc.first.get<components::physics>().body->SetLinearDamping(4.0f);
 		npc.first.get<components::physics>().body->SetFixedRotation(false);
-		//npc.first.get<components::physics>().body->GetFixtureList()->SetDensity(0.1f);
+		npc.first.get<components::physics>().body->GetFixtureList()->SetDensity(0.1f);
 		npc.first.get<components::physics>().body->ResetMassData();
-	    //if(i&2)npc.first.add(player_input);
 	}
 
 	rect.add(components::render(0, &my_sprite));
@@ -294,9 +296,11 @@ int main() {
 	world_camera.add(components::camera(gl.get_screen_rect(), gl.get_screen_rect(), 0, components::render::WORLD, 0.5, 20.0));
 	world_camera.get<components::camera>().crosshair = &crosshair;
 	world_camera.get<components::camera>().player = &player.first;
-	world_camera.get<components::camera>().orbit_mode = components::camera::LOOK;
+	world_camera.get<components::camera>().orbit_mode = components::camera::ANGLED;
 	world_camera.get<components::camera>().max_look_expand = vec2<>(vec2<int>(gl.get_screen_rect())) * 0.5f;
 	world_camera.get<components::camera>().enable_smoothing = true;
+	world_camera.add(components::input());
+	world_camera.get<components::input>().intents.add(intent_message::intent::SWITCH_LOOK);
 
 	while (!quit_flag) {
 		my_world.run();

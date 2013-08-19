@@ -3,15 +3,28 @@
 #include <gl\GL.h>
 #include "entity_system/entity.h"
 #include "../components/physics_component.h"
+#include "../messages/intent_message.h"
 
 
 camera_system::camera_system(render_system& raw_renderer) : raw_renderer(raw_renderer) {}
 
-void camera_system::process_entities(world&) {
+void camera_system::process_entities(world& owner) {
 	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
 	std::sort(targets.begin(), targets.end(), [](entity* a, entity* b) {
 		return a->get<components::camera>().layer > b->get<components::camera>().layer;
 	});
+
+	auto events = owner.get_message_queue<messages::intent_message>();
+
+	for (auto it : events) {
+		if (it.type == messages::intent_message::intent::SWITCH_LOOK && it.state_flag) {
+			auto& mode = it.subject->get<components::camera>().orbit_mode;
+			if (mode == components::camera::LOOK)
+				mode = components::camera::ANGLED;
+			else mode = components::camera::LOOK;
+
+		}
+	}
 
 	for (auto e : targets) {
 		auto& camera = e->get<components::camera>();
@@ -35,7 +48,7 @@ void camera_system::process_entities(world&) {
 					vec2<> dir = (crosshair_pos - player_pos);
 
 					if (camera.orbit_mode == camera.ANGLED) {
-						vec2<> bound = camera_screen / 2.f + camera.angled_look_length;
+						vec2<> bound = camera_screen / 2.f;
 						/* save copy */
 						vec2<> normalized = dir.clamp(bound);
 						transform.current.pos += normalized.normalize() * camera.angled_look_length;
