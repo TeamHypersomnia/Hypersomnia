@@ -19,8 +19,15 @@ namespace augmentations {
 					raw.erase(it);
 			}
 
-			bool find(const value& val) const {
-				return std::binary_search(raw.begin(), raw.end(), val);
+			bool find(const value& key) const {
+				return std::binary_search(raw.begin(), raw.end(), key);
+			}
+
+			value* get(const value& key) {
+				auto it = std::lower_bound(raw.begin(), raw.end(), key);
+				if (it == raw.end() || !(*it < key))
+					return &*it;
+				return nullptr;
 			}
 
 			const std::vector<value>& get_vector() const {
