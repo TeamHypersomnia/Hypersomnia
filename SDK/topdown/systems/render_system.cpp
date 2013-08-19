@@ -1,6 +1,7 @@
 #include "render_system.h"
 #include <gl\glew.h>
 #include "entity_system/entity.h"
+#include "../renderable.h"
 
 void render_system::add(entity* e) {
 	entities_by_mask[e->get<components::render>().mask].push_back(e);
@@ -39,6 +40,7 @@ void render_system::draw(rects::xywh visible_area, components::transform camera_
 
 	for (auto e = entities.begin(); e != entities.end(); ++e) {
 		auto& render_info = (*e)->get<components::render>();
+		if (render_info.instance == nullptr) continue;
 		auto& transform = (*e)->get<components::transform>();
 		
 		/* if an entity's AABB hovers specified visible region */
@@ -52,6 +54,8 @@ void render_system::draw(rects::xywh visible_area, components::transform camera_
 	});
 
 	for (auto e = visible_targets.begin(); e != visible_targets.end(); ++e) {
+		if ((*e).first->instance == nullptr) continue;
+
 		components::transform drawing_transform = *(*e).second;
 		
 		/* translate to camera position */
