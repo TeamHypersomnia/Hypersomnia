@@ -107,7 +107,8 @@ namespace augmentations {
 			return *this;
 		}
 
-		vec2& clamp(vec2<float> rect) {
+		template<class type>
+		vec2& clamp(vec2<type> rect) {
 			if (x > rect.x) x = rect.x;
 			if (y > rect.y) y = rect.y;
 			if (x < -rect.x) x = -rect.x;
