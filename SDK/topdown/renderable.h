@@ -3,27 +3,19 @@
 #include <Box2D/Box2D.h>
 
 #include "texture_baker/texture_baker.h"
-#include "graphics/pixel.h"
-#include "math/vec2d.h"
-
 #include "components\transform_component.h"
 
+#include "vertex.h"
 using namespace augmentations;
 
-struct vertex {
-	vec2<int> position;
-	vec2<float> texcoord;
-	graphics::pixel_32 color;
-};
-
-struct triangle {
-	vertex vertices[3];
-};
-
-typedef std::vector<triangle> buffer;
+namespace augmentations {
+	namespace entity_system {
+		class entity;
+	}
+}
 
 struct renderable {
-	static void make_rect(vec2<> pos, vec2<float> size, float rotation_degrees, vec2<float> out[4]);
+	static void make_rect(vec2<> pos, vec2<> size, float rotation_degrees, vec2<> out[4]);
 
 	virtual void draw(buffer&, const components::transform&) = 0;
 	virtual rects::xywh get_aabb(const components::transform&) = 0;

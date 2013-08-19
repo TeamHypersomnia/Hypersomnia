@@ -1,15 +1,16 @@
+#include "renderable.h"
+
 #include <algorithm>
 #include "entity_system/entity.h"
 
 #include "../topdown/components/physics_component.h"
-#include "renderable.h"
 
 sprite::sprite(texture_baker::texture* tex, graphics::pixel_32 color) : tex(tex), color(color) {
 	size = tex->get_size();
 }
 
-void renderable::make_rect(vec2<> pos, vec2<float> size, float angle, vec2<float> v[4]) {
-	vec2<float> origin(pos + (size/2.f));
+void renderable::make_rect(vec2<> pos, vec2<> size, float angle, vec2<> v[4]) {
+	vec2<> origin(pos + (size/2.f));
 
 	v[0] = pos;
 	v[1] = pos + vec2<>(size.x, 0.f);
@@ -29,7 +30,7 @@ void renderable::make_rect(vec2<> pos, vec2<float> size, float angle, vec2<float
 
 void sprite::draw(buffer& triangles, const components::transform& transform) {
 	vec2<> v[4];
-	make_rect(transform.current.pos, vec2<float>(size), transform.current.rotation, v);
+	make_rect(transform.current.pos, vec2<>(size), transform.current.rotation, v);
 
 	triangle t1, t2;
 	t1.vertices[0].color = t2.vertices[0].color = color;
@@ -89,7 +90,7 @@ b2Body* sprite::create_body(entity_system::entity& subject, b2World& b2world, b2
 
 rects::xywh sprite::get_aabb(const components::transform& transform) {
 	vec2<> v[4];
-	make_rect(transform.current.pos, vec2<float>(size), transform.current.rotation, v);
+	make_rect(transform.current.pos, vec2<>(size), transform.current.rotation, v);
 
 	typedef const vec2<>& vc;
 	

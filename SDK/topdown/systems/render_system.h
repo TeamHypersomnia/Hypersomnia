@@ -7,7 +7,7 @@
 #include "../components/transform_component.h"
 #include "../components/render_component.h"
 
-#include "../renderable.h"
+#include "../vertex.h"
 
 using namespace augmentations;
 using namespace entity_system;
