@@ -17,6 +17,8 @@ namespace augmentations {
 			friend class type_registry;
 			
 			entity(world& owner_world);
+			~entity();
+
 			world& owner_world;
 
 			/* maps type hashes into components */

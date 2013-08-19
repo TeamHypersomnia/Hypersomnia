@@ -94,54 +94,54 @@ int main() {
 	sprite rifle_sprite(tex + 3);
 	sprite bg_sprite(tex + 0);
 
-	sprite legs [] =   { tex + 4, tex + 5, tex + 6, tex + 7, tex + 8, tex + 9, tex + 10, tex + 11, tex + 12, tex + 13 };
-	sprite player [] = { tex + 14, tex + 15, tex + 16, tex + 17, tex + 18, tex + 19, tex + 20, tex + 21, tex + 22, tex + 23 };
-	for (auto& it : legs)
+	sprite legs_sprites [] =   { tex + 4, tex + 5, tex + 6, tex + 7, tex + 8, tex + 9, tex + 10, tex + 11, tex + 12, tex + 13 };
+	sprite player_sprites [] = { tex + 14, tex + 15, tex + 16, tex + 17, tex + 18, tex + 19, tex + 20, tex + 21, tex + 22, tex + 23 };
+	for (auto& it : legs_sprites)
 		it.size *= 2.f;
 
 	animation legs_animation;
 	animation player_animation;
 
 	legs_animation.frames.push_back(animation::frame(nullptr, 2.f));
-	legs_animation.frames.push_back(animation::frame(legs + 4, 2.f));
-	legs_animation.frames.push_back(animation::frame(legs + 3, 2.f));
-	legs_animation.frames.push_back(animation::frame(legs + 2, 2.f));
-	legs_animation.frames.push_back(animation::frame(legs + 1, 2.f));
-	legs_animation.frames.push_back(animation::frame(legs + 0, 2.f));
-	legs_animation.frames.push_back(animation::frame(legs + 1, 2.f));
-	legs_animation.frames.push_back(animation::frame(legs + 2, 2.f));
-	legs_animation.frames.push_back(animation::frame(legs + 3, 2.f));
-	legs_animation.frames.push_back(animation::frame(legs + 4, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs_sprites + 4, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs_sprites + 3, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs_sprites + 2, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs_sprites + 1, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs_sprites + 0, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs_sprites + 1, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs_sprites + 2, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs_sprites + 3, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs_sprites + 4, 2.f));
 	legs_animation.frames.push_back(animation::frame(nullptr, 2.f));
-	legs_animation.frames.push_back(animation::frame(legs + 5, 2.f));
-	legs_animation.frames.push_back(animation::frame(legs + 6, 2.f));
-	legs_animation.frames.push_back(animation::frame(legs + 7, 2.f));
-	legs_animation.frames.push_back(animation::frame(legs + 8, 2.f));
-	legs_animation.frames.push_back(animation::frame(legs + 9, 2.f));
-	legs_animation.frames.push_back(animation::frame(legs + 8, 2.f));
-	legs_animation.frames.push_back(animation::frame(legs + 7, 2.f));
-	legs_animation.frames.push_back(animation::frame(legs + 6, 2.f));
-	legs_animation.frames.push_back(animation::frame(legs + 5, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs_sprites + 5, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs_sprites + 6, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs_sprites + 7, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs_sprites + 8, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs_sprites + 9, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs_sprites + 8, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs_sprites + 7, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs_sprites + 6, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs_sprites + 5, 2.f));
 	legs_animation.loop_mode = animation::loop_type::REPEAT;
 
-	player_animation.frames.push_back(animation::frame(player + 0, 2.f));
-	player_animation.frames.push_back(animation::frame(player + 1, 2.f));
-	player_animation.frames.push_back(animation::frame(player + 2, 2.f));
-	player_animation.frames.push_back(animation::frame(player + 3, 2.f));
-	player_animation.frames.push_back(animation::frame(player + 4, 2.f));
-	player_animation.frames.push_back(animation::frame(player + 3, 2.f));
-	player_animation.frames.push_back(animation::frame(player + 2, 2.f));
-	player_animation.frames.push_back(animation::frame(player + 1, 2.f));
-	player_animation.frames.push_back(animation::frame(player + 0, 2.f));
-	player_animation.frames.push_back(animation::frame(player + 5, 2.f));
-	player_animation.frames.push_back(animation::frame(player + 6, 2.f));
-	player_animation.frames.push_back(animation::frame(player + 7, 2.f));
-	player_animation.frames.push_back(animation::frame(player + 8, 2.f));
-	player_animation.frames.push_back(animation::frame(player + 9, 2.f));
-	player_animation.frames.push_back(animation::frame(player + 8, 2.f));
-	player_animation.frames.push_back(animation::frame(player + 7, 2.f));
-	player_animation.frames.push_back(animation::frame(player + 6, 2.f));
-	player_animation.frames.push_back(animation::frame(player + 5, 2.f));
+	player_animation.frames.push_back(animation::frame(player_sprites + 0, 2.f));
+	player_animation.frames.push_back(animation::frame(player_sprites + 1, 2.f));
+	player_animation.frames.push_back(animation::frame(player_sprites + 2, 2.f));
+	player_animation.frames.push_back(animation::frame(player_sprites + 3, 2.f));
+	player_animation.frames.push_back(animation::frame(player_sprites + 4, 2.f));
+	player_animation.frames.push_back(animation::frame(player_sprites + 3, 2.f));
+	player_animation.frames.push_back(animation::frame(player_sprites + 2, 2.f));
+	player_animation.frames.push_back(animation::frame(player_sprites + 1, 2.f));
+	player_animation.frames.push_back(animation::frame(player_sprites + 0, 2.f));
+	player_animation.frames.push_back(animation::frame(player_sprites + 5, 2.f));
+	player_animation.frames.push_back(animation::frame(player_sprites + 6, 2.f));
+	player_animation.frames.push_back(animation::frame(player_sprites + 7, 2.f));
+	player_animation.frames.push_back(animation::frame(player_sprites + 8, 2.f));
+	player_animation.frames.push_back(animation::frame(player_sprites + 9, 2.f));
+	player_animation.frames.push_back(animation::frame(player_sprites + 8, 2.f));
+	player_animation.frames.push_back(animation::frame(player_sprites + 7, 2.f));
+	player_animation.frames.push_back(animation::frame(player_sprites + 6, 2.f));
+	player_animation.frames.push_back(animation::frame(player_sprites + 5, 2.f));
 	player_animation.loop_mode = animation::loop_type::REPEAT;
 
 	bg_sprite.size *= 2;
@@ -191,59 +191,72 @@ int main() {
 	my_world.add_system(&camera);
 
 	entity& world_camera = my_world.create_entity();
-	entity& gui_camera = my_world.create_entity();
-
 	entity& bg = my_world.create_entity();
-	entity& player_visual = my_world.create_entity();
-	entity& player_physical = my_world.create_entity();
 	entity& rect = my_world.create_entity();
 	entity& rect1 = my_world.create_entity();
 	entity& rect2 = my_world.create_entity();
 	entity& ground = my_world.create_entity();
 	entity& crosshair = my_world.create_entity();
-	entity& player_legs = my_world.create_entity();
 
 	bg.add(components::render(3, &bg_sprite));
 	bg.add(components::transform());
+
+	components::animate player_animate;
+	player_animate.available_animations.add(components::animate::response(animate_message::animation::MOVE, &player_animation));
+	player_animate.current_animation = &player_animation;
+
+	components::animate legs_animate;
+	legs_animate.available_animations.add(components::animate::response(animate_message::animation::MOVE, &legs_animation));
+	legs_animate.current_animation = &legs_animation;
+
+	auto spawn_npc = [&](){
+		entity& physical = my_world.create_entity();
+		entity& legs = my_world.create_entity();
+
+		components::movement player_movement(vec2<>(15000.f, 15000.f), 15000.f);
+		player_movement.animation_receivers.push_back(components::movement::subscribtion(&physical, false));
+		player_movement.animation_receivers.push_back(components::movement::subscribtion(&legs, true));
+
+		physical.add(components::render(0, &player_sprite));
+		physical.add(components::transform(vec2<>(0.f, 0.f)));
+		physical.add(player_animate);
+		physical.add(player_movement);
+
+		topdown::create_physics_component(physical, physics.b2world, b2_dynamicBody);
+		physical.get<components::physics>().body->SetLinearDamping(13.0f);
+		physical.get<components::physics>().body->SetAngularDamping(5.0f);
+		physical.get<components::physics>().body->SetFixedRotation(true);
+
+		legs.add(legs_animate);
+		legs.add(components::render(1, nullptr));
+		legs.add(components::chase(&physical));
+		legs.add(components::transform());
+		legs.add(components::lookat(&physical, components::lookat::chase_type::VELOCITY));
+		
+		return std::pair<entity&, entity&>(physical, legs);
+	};
+	
+	auto player = spawn_npc();
 
 	components::input player_input;
 	player_input.intents.add(intent_message::intent::MOVE_FORWARD);
 	player_input.intents.add(intent_message::intent::MOVE_BACKWARD);
 	player_input.intents.add(intent_message::intent::MOVE_LEFT);
 	player_input.intents.add(intent_message::intent::MOVE_RIGHT);
-
-	components::movement player_movement(vec2<>(15000.f, 15000.f), 15000.f);
-	player_movement.animation_receivers.push_back(components::movement::subscribtion(&player_physical, false));
-	player_movement.animation_receivers.push_back(components::movement::subscribtion(&player_legs, true));
-
-	components::animate player_animate;
-	player_animate.available_animations.add(components::animate::response(animate_message::animation::MOVE, &player_animation));
-	player_animate.current_animation = &player_animation;
-
-	player_physical.add(components::render(0, &player_sprite));
-	player_physical.add(components::transform(vec2<>(0.f, 0.f)));
-	player_physical.add(player_movement);
-	player_physical.add(player_input);
-	player_physical.add(player_animate);
-	player_physical.add(components::lookat(&crosshair));
-
-	topdown::create_physics_component(player_physical, physics.b2world, b2_dynamicBody);
-	player_physical.get<components::physics>().body->SetLinearDamping(13.0f);
-	player_physical.get<components::physics>().body->SetFixedRotation(true);
-
-	//player_visual.add(components::render(1, &rifle_sprite));
-	//player_visual.add(components::transform(vec2<>(0.f, 0.f)));
-	//player_visual.add(components::lookat(&crosshair));
-	//player_visual.add(components::chase(&player_physical));
 	
-	components::animate legs_animate;
-	legs_animate.available_animations.add(components::animate::response(animate_message::animation::MOVE, &legs_animation));
-	legs_animate.current_animation = &legs_animation;
-	player_legs.add(legs_animate);
-	player_legs.add(components::render(1, nullptr));
-	player_legs.add(components::chase(&player_physical));
-	player_legs.add(components::transform());
-	player_legs.add(components::lookat(&player_physical, components::lookat::chase_type::VELOCITY));
+	player.first.add(player_input);
+	player.first.add(components::lookat(&crosshair));
+
+	player.first.get<components::physics>().body->SetTransform(vec2<>(-500.f*PIXELS_TO_METERSf, 0.f), 0.f);
+	
+	for (int i = 0; i < 100; ++i) {
+		auto npc = spawn_npc();
+		npc.first.get<components::physics>().body->SetLinearDamping(4.0f);
+		npc.first.get<components::physics>().body->SetFixedRotation(false);
+		//npc.first.get<components::physics>().body->GetFixtureList()->SetDensity(0.1f);
+		npc.first.get<components::physics>().body->ResetMassData();
+	    //if(i&2)npc.first.add(player_input);
+	}
 
 	rect.add(components::render(0, &my_sprite));
 	rect.add(components::transform(vec2<>(500.f, -50.f)));
@@ -272,21 +285,18 @@ int main() {
 	crosshair.add(components::render(0, &crosshair_sprite));
 	crosshair.add(components::transform(vec2<>(vec2<int>(gl.get_window_rect().w, gl.get_window_rect().h)) / 2.f));
 	crosshair.add(components::crosshair(2.5f));
-	crosshair.add(components::chase(&player_physical, true));
+	crosshair.add(components::chase(&player.first, true));
 	crosshair.add(components::input());
 	crosshair.get<components::input>().intents.add(intent_message::intent::AIM);
 	
 	world_camera.add(components::transform());
-	world_camera.add(components::chase(&player_physical, false, vec2<>(vec2<int>(gl.get_screen_rect()))*-0.5f));
+	world_camera.add(components::chase(&player.first, false, vec2<>(vec2<int>(gl.get_screen_rect()))*-0.5f));
 	world_camera.add(components::camera(gl.get_screen_rect(), gl.get_screen_rect(), 0, components::render::WORLD, 0.5, 20.0));
 	world_camera.get<components::camera>().crosshair = &crosshair;
-	world_camera.get<components::camera>().player = &player_physical;
+	world_camera.get<components::camera>().player = &player.first;
 	world_camera.get<components::camera>().orbit_mode = components::camera::LOOK;
 	world_camera.get<components::camera>().max_look_expand = vec2<>(vec2<int>(gl.get_screen_rect())) * 0.5f;
 	world_camera.get<components::camera>().enable_smoothing = true;
-
-	//gui_camera.add(components::camera(gl.get_screen_rect(), gl.get_screen_rect(), 0, components::render::GUI));
-	//gui_camera.add(components::transform());
 
 	while (!quit_flag) {
 		my_world.run();
