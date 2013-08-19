@@ -6,6 +6,7 @@
 
 #include "systems/physics_system.h"
 #include "systems/movement_system.h"
+#include "systems/animation_system.h"
 #include "systems/camera_system.h"
 #include "systems/render_system.h"
 #include "systems/input_system.h"
@@ -16,8 +17,12 @@
 #include "messages/collision_message.h"
 #include "messages/moved_message.h"
 #include "messages/intent_message.h"
+#include "messages/animate_message.h"
 
 #include "game/body_helper.h"
+
+#include "renderable.h"
+#include "animation.h"
 
 using namespace augmentations;
 using namespace entity_system;
@@ -33,15 +38,39 @@ int main() {
 	gl.set_show(gl.SHOW);
 	window::cursor(false);
 
-#define IMAGES 4
+#define IMAGES 25
 	texture_baker::image img[IMAGES];
 	texture_baker::texture tex[IMAGES];
 	texture_baker::atlas atl;
 
-	img[0].from_file(L"C:\\VVV\\pollock.jpg");
-	img[1].from_file(L"C:\\VVV\\enemy.png");
-	img[2].from_file(L"C:\\VVV\\crosshair.png");
-	img[3].from_file(L"C:\\VVV\\rifle.png");
+	img[0].from_file(L"C:\\vvv2\\pollock.jpg");
+	img[1].from_file(L"C:\\vvv2\\enemy.png");
+	img[2].from_file(L"C:\\vvv2\\crosshair.png");
+	img[3].from_file(L"C:\\vvv2\\rifle.png");
+
+	img[4].from_file(L"C:\\vvv2\\legs_1.png");
+	img[5].from_file(L"C:\\vvv2\\legs_2.png");
+	img[6].from_file(L"C:\\vvv2\\legs_3.png");
+	img[7].from_file(L"C:\\vvv2\\legs_4.png");
+	img[8].from_file(L"C:\\vvv2\\legs_5.png");
+	img[9].from_file(L"C:\\vvv2\\legs_6.png");
+	img[10].from_file(L"C:\\vvv2\\legs_7.png");
+	img[11].from_file(L"C:\\vvv2\\legs_8.png");
+	img[12].from_file(L"C:\\vvv2\\legs_9.png");
+	img[13].from_file(L"C:\\vvv2\\legs_10.png");
+
+	img[14].from_file(L"C:\\vvv2\\player_1.png");
+	img[15].from_file(L"C:\\vvv2\\player_2.png");
+	img[16].from_file(L"C:\\vvv2\\player_3.png");
+	img[17].from_file(L"C:\\vvv2\\player_4.png");
+	img[18].from_file(L"C:\\vvv2\\player_5.png");
+	img[19].from_file(L"C:\\vvv2\\player_6.png");
+	img[20].from_file(L"C:\\vvv2\\player_7.png");
+	img[21].from_file(L"C:\\vvv2\\player_8.png");
+	img[22].from_file(L"C:\\vvv2\\player_9.png");
+	img[23].from_file(L"C:\\vvv2\\player_10.png");
+	
+	img[24].from_file(L"C:\\vvv2\\crate.jpg");
 
 	for (int i = 0; i < IMAGES; ++i) {
 		tex[i].set(img + i);
@@ -55,22 +84,73 @@ int main() {
 
 	/* destroy the raw image as it is already uploaded to GPU */
 	atl.img.destroy();
-	atl.linear();
+	atl.nearest();
 
-	sprite small_sprite(tex + 0);
-	sprite my_sprite(tex + 0);
-	sprite bigger_sprite(tex + 0);
+	sprite small_sprite(tex + 24);
+	sprite my_sprite(tex + 24);
+	sprite bigger_sprite(tex + 24);
 	sprite player_sprite(tex + 1);
 	sprite crosshair_sprite(tex + 2);
 	sprite rifle_sprite(tex + 3);
 	sprite bg_sprite(tex + 0);
+
+	sprite legs [] =   { tex + 4, tex + 5, tex + 6, tex + 7, tex + 8, tex + 9, tex + 10, tex + 11, tex + 12, tex + 13 };
+	sprite player [] = { tex + 14, tex + 15, tex + 16, tex + 17, tex + 18, tex + 19, tex + 20, tex + 21, tex + 22, tex + 23 };
+	for (auto& it : legs)
+		it.size *= 2.f;
+
+	animation legs_animation;
+	animation player_animation;
+
+	legs_animation.frames.push_back(animation::frame(nullptr, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs + 4, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs + 3, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs + 2, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs + 1, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs + 0, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs + 1, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs + 2, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs + 3, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs + 4, 2.f));
+	legs_animation.frames.push_back(animation::frame(nullptr, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs + 5, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs + 6, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs + 7, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs + 8, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs + 9, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs + 8, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs + 7, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs + 6, 2.f));
+	legs_animation.frames.push_back(animation::frame(legs + 5, 2.f));
+	legs_animation.loop_mode = animation::loop_type::REPEAT;
+
+	player_animation.frames.push_back(animation::frame(player + 0, 2.f));
+	player_animation.frames.push_back(animation::frame(player + 1, 2.f));
+	player_animation.frames.push_back(animation::frame(player + 2, 2.f));
+	player_animation.frames.push_back(animation::frame(player + 3, 2.f));
+	player_animation.frames.push_back(animation::frame(player + 4, 2.f));
+	player_animation.frames.push_back(animation::frame(player + 3, 2.f));
+	player_animation.frames.push_back(animation::frame(player + 2, 2.f));
+	player_animation.frames.push_back(animation::frame(player + 1, 2.f));
+	player_animation.frames.push_back(animation::frame(player + 0, 2.f));
+	player_animation.frames.push_back(animation::frame(player + 5, 2.f));
+	player_animation.frames.push_back(animation::frame(player + 6, 2.f));
+	player_animation.frames.push_back(animation::frame(player + 7, 2.f));
+	player_animation.frames.push_back(animation::frame(player + 8, 2.f));
+	player_animation.frames.push_back(animation::frame(player + 9, 2.f));
+	player_animation.frames.push_back(animation::frame(player + 8, 2.f));
+	player_animation.frames.push_back(animation::frame(player + 7, 2.f));
+	player_animation.frames.push_back(animation::frame(player + 6, 2.f));
+	player_animation.frames.push_back(animation::frame(player + 5, 2.f));
+	player_animation.loop_mode = animation::loop_type::REPEAT;
+
 	bg_sprite.size *= 2;
 	
 	rifle_sprite.size /= 4;
 
 	player_sprite.size = vec2<>(60.f, 70.f);
 
-	bigger_sprite.size.x = 400;
+	bigger_sprite.size.y = 800;
 	small_sprite.size = vec2<int>(100, 100);
 	my_sprite.size = vec2<int>(200, 120);
 	crosshair_sprite.size = vec2<int>(70, 70);
@@ -81,6 +161,7 @@ int main() {
 
 	input_system input(gl, quit_flag);
 	movement_system movement;
+	animation_system animations;
 	crosshair_system crosshairs;
 	lookat_system lookat;
 	physics_system physics;
@@ -101,6 +182,7 @@ int main() {
 
 	my_world.add_system(&input);
 	my_world.add_system(&movement);
+	my_world.add_system(&animations);
 	my_world.add_system(&physics);
 	my_world.add_system(&crosshairs);
 	my_world.add_system(&lookat);
@@ -119,8 +201,9 @@ int main() {
 	entity& rect2 = my_world.create_entity();
 	entity& ground = my_world.create_entity();
 	entity& crosshair = my_world.create_entity();
+	entity& player_legs = my_world.create_entity();
 
-	bg.add(components::render(2, &bg_sprite));
+	bg.add(components::render(3, &bg_sprite));
 	bg.add(components::transform());
 
 	components::input player_input;
@@ -129,20 +212,38 @@ int main() {
 	player_input.intents.add(intent_message::intent::MOVE_LEFT);
 	player_input.intents.add(intent_message::intent::MOVE_RIGHT);
 
+	components::movement player_movement(vec2<>(15000.f, 15000.f), 15000.f);
+	player_movement.animation_receivers.push_back(components::movement::subscribtion(&player_physical, false));
+	player_movement.animation_receivers.push_back(components::movement::subscribtion(&player_legs, true));
+
+	components::animate player_animate;
+	player_animate.available_animations.add(components::animate::response(animate_message::animation::MOVE, &player_animation));
+	player_animate.current_animation = &player_animation;
+
 	player_physical.add(components::render(0, &player_sprite));
 	player_physical.add(components::transform(vec2<>(0.f, 0.f)));
-	player_physical.add(components::movement(vec2<>(15000.f, 15000.f), 15000.f));
+	player_physical.add(player_movement);
 	player_physical.add(player_input);
+	player_physical.add(player_animate);
+	player_physical.add(components::lookat(&crosshair));
+
 	topdown::create_physics_component(player_physical, physics.b2world, b2_dynamicBody);
 	player_physical.get<components::physics>().body->SetLinearDamping(13.0f);
-	//player_physical.get<components::physics>().body->SetAngularDamping(30.0f);
 	player_physical.get<components::physics>().body->SetFixedRotation(true);
-	//player_physical.remove<components::render>();
 
-	player_visual.add(components::render(1, &rifle_sprite));
-	player_visual.add(components::transform(vec2<>(0.f, 0.f)));
-	player_visual.add(components::lookat(&crosshair));
-	player_visual.add(components::chase(&player_physical));
+	//player_visual.add(components::render(1, &rifle_sprite));
+	//player_visual.add(components::transform(vec2<>(0.f, 0.f)));
+	//player_visual.add(components::lookat(&crosshair));
+	//player_visual.add(components::chase(&player_physical));
+	
+	components::animate legs_animate;
+	legs_animate.available_animations.add(components::animate::response(animate_message::animation::MOVE, &legs_animation));
+	legs_animate.current_animation = &legs_animation;
+	player_legs.add(legs_animate);
+	player_legs.add(components::render(1, nullptr));
+	player_legs.add(components::chase(&player_physical));
+	player_legs.add(components::transform());
+	player_legs.add(components::lookat(&player_physical, components::lookat::chase_type::VELOCITY));
 
 	rect.add(components::render(0, &my_sprite));
 	rect.add(components::transform(vec2<>(500.f, -50.f)));
@@ -153,14 +254,20 @@ int main() {
 	rect2.add(components::render(0, &small_sprite));
 	rect2.add(components::transform(vec2<>(400.f, 0.f), 45.f * 0.01745329251994329576923690768489f));
 	topdown::create_physics_component(rect2, physics.b2world);
-	rect .get<components::physics>().body->ApplyLinearImpulse(vec2<>(0.f, 2000.f*PIXELS_TO_METERSf),  rect.get<components::physics>().body->GetWorldCenter());
-	rect1.get<components::physics>().body->ApplyLinearImpulse(vec2<>(0.f, 2000.f*PIXELS_TO_METERSf), rect1.get<components::physics>().body->GetWorldCenter());
-	rect2.get<components::physics>().body->ApplyLinearImpulse(vec2<>(0.f, 2000.f*PIXELS_TO_METERSf), rect2.get<components::physics>().body->GetWorldCenter());
 
 	ground.add(components::render(0, &bigger_sprite));
 	ground.add(components::transform(vec2<>(400.f, 400.f), 75.f * 0.01745329251994329576923690768489f));
-	topdown::create_physics_component(ground, physics.b2world, b2_staticBody);
+	topdown::create_physics_component(ground, physics.b2world, b2_dynamicBody);
     ground.get<components::physics>().body->GetFixtureList()->SetFriction(0.0f);
+
+	rect.get<components::physics>().body->SetLinearDamping(5.f);
+	rect1.get<components::physics>().body->SetLinearDamping(5.f);
+	rect2.get<components::physics>().body->SetLinearDamping(5.f);
+	ground.get<components::physics>().body->SetLinearDamping(5.f);
+	rect.get<components::physics>().body->SetAngularDamping(5.f);
+	rect1.get<components::physics>().body->SetAngularDamping(5.f);
+	rect2.get<components::physics>().body->SetAngularDamping(5.f);
+	ground.get<components::physics>().body->SetAngularDamping(5.f);
 
 	crosshair.add(components::render(0, &crosshair_sprite));
 	crosshair.add(components::transform(vec2<>(vec2<int>(gl.get_window_rect().w, gl.get_window_rect().h)) / 2.f));
@@ -169,7 +276,6 @@ int main() {
 	crosshair.add(components::input());
 	crosshair.get<components::input>().intents.add(intent_message::intent::AIM);
 	
-	gl.vsync(0);
 	world_camera.add(components::transform());
 	world_camera.add(components::chase(&player_physical, false, vec2<>(vec2<int>(gl.get_screen_rect()))*-0.5f));
 	world_camera.add(components::camera(gl.get_screen_rect(), gl.get_screen_rect(), 0, components::render::WORLD, 0.5, 20.0));
@@ -187,6 +293,7 @@ int main() {
 
 		/* flushing message queues */
 		my_world.get_message_queue<message>().clear();
+		my_world.get_message_queue<animate_message>().clear();
 		my_world.get_message_queue<intent_message>().clear();
 		my_world.get_message_queue<moved_message>().clear();
 		my_world.get_message_queue<collision_message>().clear();

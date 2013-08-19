@@ -131,9 +131,11 @@
     <ClCompile Include="graphics\pixel.cpp" />
     <ClCompile Include="math\rects.cpp" />
     <ClCompile Include="math\vec2d.cpp" />
+    <ClCompile Include="SDK\topdown\animation.cpp" />
     <ClCompile Include="SDK\topdown\game\body_helper.cpp" />
     <ClCompile Include="SDK\topdown\main.cpp" />
     <ClCompile Include="SDK\topdown\renderable.cpp" />
+    <ClCompile Include="SDK\topdown\systems\animation_system.cpp" />
     <ClCompile Include="SDK\topdown\systems\camera_system.cpp" />
     <ClCompile Include="SDK\topdown\systems\chase_system.cpp" />
     <ClCompile Include="SDK\topdown\systems\crosshair_system.cpp" />
@@ -215,6 +217,8 @@
     <ClInclude Include="options.h" />
     <ClInclude Include="math\rects.h" />
     <ClInclude Include="math\vec2d.h" />
+    <ClInclude Include="SDK\topdown\animation.h" />
+    <ClInclude Include="SDK\topdown\components\animate_component.h" />
     <ClInclude Include="SDK\topdown\components\camera_component.h" />
     <ClInclude Include="SDK\topdown\components\chase_component.h" />
     <ClInclude Include="SDK\topdown\components\crosshair_component.h" />
@@ -225,11 +229,13 @@
     <ClInclude Include="SDK\topdown\components\render_component.h" />
     <ClInclude Include="SDK\topdown\components\transform_component.h" />
     <ClInclude Include="SDK\topdown\game\body_helper.h" />
+    <ClInclude Include="SDK\topdown\messages\animate_message.h" />
     <ClInclude Include="SDK\topdown\messages\collision_message.h" />
     <ClInclude Include="SDK\topdown\messages\intent_message.h" />
     <ClInclude Include="SDK\topdown\messages\message.h" />
     <ClInclude Include="SDK\topdown\messages\moved_message.h" />
     <ClInclude Include="SDK\topdown\renderable.h" />
+    <ClInclude Include="SDK\topdown\systems\animation_system.h" />
     <ClInclude Include="SDK\topdown\systems\camera_system.h" />
     <ClInclude Include="SDK\topdown\systems\chase_system.h" />
     <ClInclude Include="SDK\topdown\systems\crosshair_system.h" />
@@ -238,6 +244,7 @@
     <ClInclude Include="SDK\topdown\systems\movement_system.h" />
     <ClInclude Include="SDK\topdown\systems\physics_system.h" />
     <ClInclude Include="SDK\topdown\systems\render_system.h" />
+    <ClInclude Include="SDK\topdown\vertex.h" />
     <ClInclude Include="texture_baker\font.h" />
     <ClInclude Include="texture_baker\image.h" />
     <ClInclude Include="texture_baker\rectpack.h" />

@@ -1,8 +1,9 @@
 #include "camera_system.h"
+
+#include <gl\GL.h>
 #include "entity_system/entity.h"
 #include "../components/physics_component.h"
 
-#include <gl\GL.h>
 
 camera_system::camera_system(render_system& raw_renderer) : raw_renderer(raw_renderer) {}
 
@@ -59,7 +60,7 @@ void camera_system::process_entities(world&) {
 
 				//if ((transform.current.pos - camera.last_interpolant).length() < 2.0) camera.last_interpolant = transform.current.pos;
 				//else
-					camera.last_interpolant = camera.last_interpolant * averaging_constant + transform.current.pos * (1.f - averaging_constant);
+					camera.last_interpolant = camera.last_interpolant * averaging_constant + transform.current.pos * (1.0f - averaging_constant);
 				/* save smoothing result */
 				transform.current.pos = camera.last_interpolant;
 			}
