@@ -85,7 +85,7 @@ namespace augmentations {
 		}
 
 		vec2& set_from_angle(float rotation) {
-			set(sin(rotation), cos(rotation));
+			set(cos(rotation), sin(rotation));
 			normalize();
 			return *this;
 		}
