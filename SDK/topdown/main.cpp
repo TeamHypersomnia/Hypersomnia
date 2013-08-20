@@ -10,6 +10,7 @@
 #include "systems/camera_system.h"
 #include "systems/render_system.h"
 #include "systems/input_system.h"
+#include "systems/gun_system.h"
 #include "systems/crosshair_system.h"
 #include "systems/lookat_system.h"
 #include "systems/chase_system.h"
@@ -38,39 +39,53 @@ int main() {
 	gl.set_show(gl.SHOW);
 	window::cursor(false);
 
-#define IMAGES 25
+#define IMAGES 36
 	texture_baker::image img[IMAGES];
 	texture_baker::texture tex[IMAGES];
 	texture_baker::atlas atl;
 
-	img[0].from_file(L"C:\\vvv2\\pollock.jpg");
-	img[1].from_file(L"C:\\vvv2\\enemy.png");
-	img[2].from_file(L"C:\\vvv2\\crosshair.png");
-	img[3].from_file(L"C:\\vvv2\\rifle.png");
+	img[0].from_file(L"Release\\resources\\pollock.jpg");
+	img[1].from_file(L"Release\\resources\\enemy.png");
+	img[2].from_file(L"Release\\resources\\crosshair.png");
+	img[3].from_file(L"Release\\resources\\rifle.png");
 
-	img[4].from_file(L"C:\\vvv2\\legs_1.png");
-	img[5].from_file(L"C:\\vvv2\\legs_2.png");
-	img[6].from_file(L"C:\\vvv2\\legs_3.png");
-	img[7].from_file(L"C:\\vvv2\\legs_4.png");
-	img[8].from_file(L"C:\\vvv2\\legs_5.png");
-	img[9].from_file(L"C:\\vvv2\\legs_6.png");
-	img[10].from_file(L"C:\\vvv2\\legs_7.png");
-	img[11].from_file(L"C:\\vvv2\\legs_8.png");
-	img[12].from_file(L"C:\\vvv2\\legs_9.png");
-	img[13].from_file(L"C:\\vvv2\\legs_10.png");
+	img[4].from_file(L"Release\\resources\\legs_1.png");
+	img[5].from_file(L"Release\\resources\\legs_2.png");
+	img[6].from_file(L"Release\\resources\\legs_3.png");
+	img[7].from_file(L"Release\\resources\\legs_4.png");
+	img[8].from_file(L"Release\\resources\\legs_5.png");
+	img[9].from_file(L"Release\\resources\\legs_6.png");
+	img[10].from_file(L"Release\\resources\\legs_7.png");
+	img[11].from_file(L"Release\\resources\\legs_8.png");
+	img[12].from_file(L"Release\\resources\\legs_9.png");
+	img[13].from_file(L"Release\\resources\\legs_10.png");
 
-	img[14].from_file(L"C:\\vvv2\\player_1.png");
-	img[15].from_file(L"C:\\vvv2\\player_2.png");
-	img[16].from_file(L"C:\\vvv2\\player_3.png");
-	img[17].from_file(L"C:\\vvv2\\player_4.png");
-	img[18].from_file(L"C:\\vvv2\\player_5.png");
-	img[19].from_file(L"C:\\vvv2\\player_6.png");
-	img[20].from_file(L"C:\\vvv2\\player_7.png");
-	img[21].from_file(L"C:\\vvv2\\player_8.png");
-	img[22].from_file(L"C:\\vvv2\\player_9.png");
-	img[23].from_file(L"C:\\vvv2\\player_10.png");
+	img[14].from_file(L"Release\\resources\\player_1.png");
+	img[15].from_file(L"Release\\resources\\player_2.png");
+	img[16].from_file(L"Release\\resources\\player_3.png");
+	img[17].from_file(L"Release\\resources\\player_4.png");
+	img[18].from_file(L"Release\\resources\\player_5.png");
+	img[19].from_file(L"Release\\resources\\player_6.png");
+	img[20].from_file(L"Release\\resources\\player_7.png");
+	img[21].from_file(L"Release\\resources\\player_8.png");
+	img[22].from_file(L"Release\\resources\\player_9.png");
+	img[23].from_file(L"Release\\resources\\player_10.png");
 	
-	img[24].from_file(L"C:\\vvv2\\crate.jpg");
+	img[24].from_file(L"Release\\resources\\crate.jpg");
+
+	img[25].from_file(L"Release\\resources\\player_shotgun_1.png");
+	img[26].from_file(L"Release\\resources\\player_shotgun_2.png");
+	img[27].from_file(L"Release\\resources\\player_shotgun_3.png");
+	img[28].from_file(L"Release\\resources\\player_shotgun_4.png");
+	img[29].from_file(L"Release\\resources\\player_shotgun_5.png");
+
+	img[30].from_file(L"Release\\resources\\bullet.png");
+
+	img[31].from_file(L"Release\\resources\\player_shotgun_shot_1.png");
+	img[32].from_file(L"Release\\resources\\player_shotgun_shot_2.png");
+	img[33].from_file(L"Release\\resources\\player_shotgun_shot_3.png");
+	img[34].from_file(L"Release\\resources\\player_shotgun_shot_4.png");
+	img[35].from_file(L"Release\\resources\\player_shotgun_shot_5.png");
 
 	for (int i = 0; i < IMAGES; ++i) {
 		tex[i].set(img + i);
@@ -93,14 +108,19 @@ int main() {
 	sprite crosshair_sprite(tex + 2);
 	sprite rifle_sprite(tex + 3);
 	sprite bg_sprite(tex + 0);
+	sprite bullet_sprite(tex + 30);
 
 	sprite legs_sprites [] =   { tex + 4, tex + 5, tex + 6, tex + 7, tex + 8, tex + 9, tex + 10, tex + 11, tex + 12, tex + 13 };
 	sprite player_sprites [] = { tex + 14, tex + 15, tex + 16, tex + 17, tex + 18, tex + 19, tex + 20, tex + 21, tex + 22, tex + 23 };
+	sprite player_shotgun_sprites [] = { tex + 25, tex + 26, tex + 27, tex + 28, tex + 29 };
+	sprite player_shotgun_shot_sprites [] = { tex + 31, tex + 32, tex + 33, tex + 34, tex + 35 };
 	for (auto& it : legs_sprites)
 		it.size *= 2.f;
 
 	animation legs_animation;
 	animation player_animation;
+	animation player_shotgun_animation;
+	animation player_shotgun_shot_animation;
 
 	legs_animation.frames.push_back(animation::frame(nullptr, 2.f));
 	legs_animation.frames.push_back(animation::frame(legs_sprites + 4, 2.f));
@@ -144,6 +164,25 @@ int main() {
 	player_animation.frames.push_back(animation::frame(player_sprites + 5, 2.f));
 	player_animation.loop_mode = animation::loop_type::REPEAT;
 
+	player_shotgun_animation.frames.push_back(animation::frame(player_shotgun_sprites + 0, 5.f));
+	player_shotgun_animation.frames.push_back(animation::frame(player_shotgun_sprites + 1, 5.f));
+	player_shotgun_animation.frames.push_back(animation::frame(player_shotgun_sprites + 2, 5.f));
+	player_shotgun_animation.frames.push_back(animation::frame(player_shotgun_sprites + 3, 5.f));
+	player_shotgun_animation.frames.push_back(animation::frame(player_shotgun_sprites + 4, 5.f));
+	player_shotgun_animation.loop_mode = animation::loop_type::INVERSE;
+
+	player_shotgun_shot_animation.frames.push_back(animation::frame(player_shotgun_shot_sprites + 0, 15.f));
+	player_shotgun_shot_animation.frames.push_back(animation::frame(player_shotgun_shot_sprites + 1, 15.f));
+	player_shotgun_shot_animation.frames.push_back(animation::frame(player_shotgun_shot_sprites + 2, 15.f));
+	player_shotgun_shot_animation.frames.push_back(animation::frame(player_shotgun_shot_sprites + 3, 15.f));
+	player_shotgun_shot_animation.frames.push_back(animation::frame(player_shotgun_shot_sprites + 4, 15.f));
+	player_shotgun_shot_animation.frames.push_back(animation::frame(player_shotgun_shot_sprites + 3, 15.f));
+	player_shotgun_shot_animation.frames.push_back(animation::frame(player_shotgun_shot_sprites + 2, 15.f));
+	player_shotgun_shot_animation.frames.push_back(animation::frame(player_shotgun_shot_sprites + 1, 15.f));
+	player_shotgun_shot_animation.frames.push_back(animation::frame(player_shotgun_shot_sprites + 0, 15.f));
+	player_shotgun_shot_animation.loop_mode = animation::loop_type::NONE;
+
+	bullet_sprite.size /= 1.25;
 	bg_sprite.size *= 2;
 	
 	rifle_sprite.size /= 4;
@@ -165,6 +204,7 @@ int main() {
 	crosshair_system crosshairs;
 	lookat_system lookat;
 	physics_system physics;
+	gun_system guns(physics);
 	render_system render(gl);
 	camera_system camera(render);
 	chase_system chase;
@@ -173,6 +213,7 @@ int main() {
 	main_context.raw_id_to_intent[window::event::mouse::raw_motion] = intent_message::intent::AIM;
 	main_context.raw_id_to_intent[window::event::mouse::ldown] = intent_message::intent::SHOOT;
 	main_context.raw_id_to_intent[window::event::mouse::ldoubleclick] = intent_message::intent::SHOOT;
+	main_context.raw_id_to_intent[window::event::mouse::ltripleclick] = intent_message::intent::SHOOT;
 	main_context.raw_id_to_intent[window::event::mouse::rdown] = intent_message::intent::SWITCH_LOOK;
 	main_context.raw_id_to_intent[window::event::mouse::rdoubleclick] = intent_message::intent::SWITCH_LOOK;
 	main_context.raw_id_to_intent[window::event::keys::W] = intent_message::intent::MOVE_FORWARD;
@@ -185,11 +226,12 @@ int main() {
 
 	my_world.add_system(&input);
 	my_world.add_system(&movement);
-	my_world.add_system(&animations);
 	my_world.add_system(&physics);
 	my_world.add_system(&crosshairs);
 	my_world.add_system(&lookat);
 	my_world.add_system(&chase);
+	my_world.add_system(&guns);
+	my_world.add_system(&animations);
 	my_world.add_system(&render);
 	my_world.add_system(&camera);
 
@@ -204,6 +246,11 @@ int main() {
 	bg.add(components::render(3, &bg_sprite));
 	bg.add(components::transform());
 
+	components::animate player_shotgun_animate;
+	player_shotgun_animate.available_animations.add(components::animate::response(animate_message::animation::MOVE, &player_shotgun_animation));
+	player_shotgun_animate.available_animations.add(components::animate::response(animate_message::animation::SHOT, &player_shotgun_shot_animation));
+	player_shotgun_animate.current_animation = &player_shotgun_animation;
+
 	components::animate player_animate;
 	player_animate.available_animations.add(components::animate::response(animate_message::animation::MOVE, &player_animation));
 	player_animate.current_animation = &player_animation;
@@ -212,7 +259,22 @@ int main() {
 	legs_animate.available_animations.add(components::animate::response(animate_message::animation::MOVE, &legs_animation));
 	legs_animate.current_animation = &legs_animation;
 
-	auto spawn_npc = [&](){
+	components::gun_info double_barrel;
+	double_barrel.bullets_once = 2;
+	double_barrel.bullet_max_damage = 100.f;
+	double_barrel.bullet_distance_offset = 129.f;
+	double_barrel.bullet_min_damage = 80.f;
+	double_barrel.bullet_speed = 5000.f;
+	double_barrel.bullet_sprite = &bullet_sprite;
+	double_barrel.is_automatic = true;
+	double_barrel.max_rounds = 2;
+	double_barrel.shooting_interval_ms = 60.f;
+	double_barrel.spread_radians = 2.f * 0.01745329251994329576923690768489f;
+	double_barrel.velocity_variation = 1000.f;
+	double_barrel.shake_radius = 20.f;
+	double_barrel.shake_spread_radians = 45.f * 0.01745329251994329576923690768489f;
+
+	auto spawn_npc = [&](components::animate& animate_component){
 		entity& physical = my_world.create_entity();
 		entity& legs = my_world.create_entity();
 
@@ -222,8 +284,13 @@ int main() {
 
 		physical.add(components::render(0, &player_sprite));
 		physical.add(components::transform(vec2<>(0.f, 0.f)));
-		physical.add(player_animate);
+		physical.add(animate_component);
 		physical.add(player_movement);
+
+		components::gun my_gun(&double_barrel);
+		my_gun.current_rounds = 1000;
+
+		physical.add(my_gun);
 
 		topdown::create_physics_component(physical, physics.b2world, b2_dynamicBody);
 		physical.get<components::physics>().body->SetLinearDamping(13.0f);
@@ -239,21 +306,23 @@ int main() {
 		return std::pair<entity&, entity&>(physical, legs);
 	};
 	
-	auto player = spawn_npc();
+	auto player = spawn_npc(player_shotgun_animate);
 
 	components::input player_input;
 	player_input.intents.add(intent_message::intent::MOVE_FORWARD);
 	player_input.intents.add(intent_message::intent::MOVE_BACKWARD);
 	player_input.intents.add(intent_message::intent::MOVE_LEFT);
 	player_input.intents.add(intent_message::intent::MOVE_RIGHT);
+	player_input.intents.add(intent_message::intent::SHOOT);
 	
 	player.first.add(player_input);
 	player.first.add(components::lookat(&crosshair));
 
 	player.first.get<components::physics>().body->SetTransform(vec2<>(-500.f*PIXELS_TO_METERSf, 0.f), 0.f);
+	player.first.get<components::gun>().target_camera_shake = &world_camera;
 	
-	for (int i = 0; i < 10; ++i) {
-		auto npc = spawn_npc();
+	for (int i = 0; i < 30; ++i) {
+		auto npc = spawn_npc(player_animate);
 		npc.first.get<components::physics>().body->SetLinearDamping(4.0f);
 		npc.first.get<components::physics>().body->SetFixedRotation(false);
 		npc.first.get<components::physics>().body->GetFixtureList()->SetDensity(0.1f);

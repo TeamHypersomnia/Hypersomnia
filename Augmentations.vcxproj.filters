@@ -258,6 +258,9 @@
     <ClCompile Include="SDK\topdown\systems\animation_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\gun_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config\config.h">
@@ -561,6 +564,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SDK\topdown\vertex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\components\gun_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\systems\gun_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\components\damage_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
