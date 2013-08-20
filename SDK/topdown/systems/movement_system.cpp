@@ -53,6 +53,7 @@ void movement_system::process_entities(world& owner) {
 		msg.change_animation = true;
 		msg.preserve_state = false;
 		msg.message_type = ((speed <= 1.f) ? animate_message::type::STOP : animate_message::type::CONTINUE);
+		msg.animation_priority = 0;
 
 		for (auto receiver : movement.animation_receivers) {
 			animate_message copy(msg);

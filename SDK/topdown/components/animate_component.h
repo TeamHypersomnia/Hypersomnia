@@ -18,13 +18,22 @@ namespace components {
 		augmentations::util::sorted_vector<response> available_animations;
 		
 		animation* current_animation;
-		bool enabled;
 
+		int current_priority;
 		unsigned current_frame;
 		float current_ms;
 		float speed_factor;
-		bool increasing;
+		
+		enum class state {
+			INCREASING,
+			DECREASING,
+			PAUSED
+		};
 
-		animate() : current_frame(0), current_ms(0.f), speed_factor(1.f), current_animation(nullptr), increasing(true), enabled(true) {}
+		state current_state;
+		state paused_state;
+
+		animate() : current_frame(0), current_ms(0.f), speed_factor(1.f), current_animation(nullptr), 
+			current_state(state::INCREASING), paused_state(state::INCREASING), current_priority(0) {}
 	};
 }
