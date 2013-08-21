@@ -8,9 +8,53 @@ physics_system::physics_system() : accumulator(60.0, 5),
 	b2world(b2Vec2(0.f, 9.8f)) {
 	b2world.SetAllowSleeping(true);
 	b2world.SetAutoClearForces(false);
+	b2world.SetContactListener(&listener);
+}
+
+struct game_filter : public b2ContactFilter {
+	bool ShouldCollide(b2Fixture* a, b2Fixture* b) override {
+		if (b2ContactFilter::ShouldCollide(a, b)) {
+
+
+		}
+	}
+};
+
+void physics_system::contact_listener::BeginContact(b2Contact* contact) {
+	messages::collision_message msg;
+
+	auto body_a = contact->GetFixtureA()->GetBody();
+	auto body_b = contact->GetFixtureB()->GetBody();
+
+	msg.subject  = static_cast<entity*>(body_a->GetUserData());
+	msg.collider = static_cast<entity*>(body_b->GetUserData());
+
+	b2WorldManifold manifold;
+	contact->GetWorldManifold(&manifold);
+
+	msg.point = manifold.points[0];
+
+	msg.impact_velocity = 
+		body_a->GetLinearVelocityFromWorldPoint(manifold.points[0]) -
+		body_b->GetLinearVelocityFromWorldPoint(manifold.points[0]);
+
+	world_ptr->post_message(msg);
+}
+
+void physics_system::contact_listener::EndContact(b2Contact* contact) {
+
+}
+
+void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold) {
+
+}
+
+void physics_system::contact_listener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) {
+
 }
 
 void physics_system::process_entities(world& owner) {
+	listener.world_ptr = &owner;
 
 	/* we will update body's transforms HERE according to the ENTITY_MOVED message
 	bitsquid's events are particularly well when message can be processed "within the same domain"

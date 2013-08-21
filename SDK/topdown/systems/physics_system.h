@@ -13,6 +13,17 @@ class physics_system : public processing_system_templated<components::physics, c
 
 	void reset_states();
 	void smooth_states();
+
+	struct contact_listener : public b2ContactListener {
+		void BeginContact(b2Contact* contact) override;
+		void EndContact(b2Contact* contact) override;
+		void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override;
+		void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) override;
+		
+		world* world_ptr;
+	};
+
+	contact_listener listener;
 public:
 	b2World b2world;
 	physics_system();
