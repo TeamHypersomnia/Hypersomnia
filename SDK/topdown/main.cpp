@@ -14,7 +14,10 @@
 #include "systems/crosshair_system.h"
 #include "systems/lookat_system.h"
 #include "systems/chase_system.h"
+#include "systems/damage_system.h"
+#include "systems/destroy_system.h"
 
+#include "messages/destroy_message.h"
 #include "messages/collision_message.h"
 #include "messages/moved_message.h"
 #include "messages/intent_message.h"
@@ -208,6 +211,8 @@ int main() {
 	render_system render(gl);
 	camera_system camera(render);
 	chase_system chase;
+	damage_system damage;
+	destroy_system destroy;
 
 	input_system::context main_context;
 	main_context.raw_id_to_intent[window::event::mouse::raw_motion] = intent_message::intent::AIM;
@@ -231,8 +236,10 @@ int main() {
 	my_world.add_system(&lookat);
 	my_world.add_system(&chase);
 	my_world.add_system(&guns);
+	my_world.add_system(&damage);
 	my_world.add_system(&animations);
 	my_world.add_system(&render);
+	my_world.add_system(&destroy);
 	my_world.add_system(&camera);
 
 	entity& world_camera = my_world.create_entity();
@@ -260,7 +267,7 @@ int main() {
 	legs_animate.current_animation = &legs_animation;
 
 	components::gun_info double_barrel;
-	double_barrel.bullets_once = 2;
+	double_barrel.bullets_once = 100;
 	double_barrel.bullet_max_damage = 100.f;
 	double_barrel.bullet_distance_offset = 129.f;
 	double_barrel.bullet_min_damage = 80.f;
@@ -268,11 +275,14 @@ int main() {
 	double_barrel.bullet_sprite = &bullet_sprite;
 	double_barrel.is_automatic = true;
 	double_barrel.max_rounds = 2;
-	double_barrel.shooting_interval_ms = 60.f;
-	double_barrel.spread_radians = 2.f * 0.01745329251994329576923690768489f;
-	double_barrel.velocity_variation = 1000.f;
-	double_barrel.shake_radius = 20.f;
+	double_barrel.shooting_interval_ms = 500.f;
+	double_barrel.spread_radians = 10.f * 0.01745329251994329576923690768489f;
+	double_barrel.velocity_variation = 1500.f;
+	double_barrel.shake_radius = 50.f;
 	double_barrel.shake_spread_radians = 45.f * 0.01745329251994329576923690768489f;
+	double_barrel.box2d_bullet_group_index = -1;
+	double_barrel.bullet_layer = 0;
+	double_barrel.max_bullet_distance = 5000.f;
 
 	auto spawn_npc = [&](components::animate& animate_component){
 		entity& physical = my_world.create_entity();
@@ -376,6 +386,7 @@ int main() {
 
 		/* flushing message queues */
 		my_world.get_message_queue<message>().clear();
+		my_world.get_message_queue<destroy_message>().clear();
 		my_world.get_message_queue<animate_message>().clear();
 		my_world.get_message_queue<intent_message>().clear();
 		my_world.get_message_queue<moved_message>().clear();

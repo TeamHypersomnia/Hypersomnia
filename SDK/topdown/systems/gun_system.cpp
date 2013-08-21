@@ -6,6 +6,7 @@
 #include "../components/render_component.h"
 #include "../components/physics_component.h"
 #include "../components/camera_component.h"
+#include "../components/damage_component.h"
 
 #include "../game/body_helper.h"
 
@@ -25,7 +26,7 @@ void gun_system::process_entities(world& owner) {
 	}
 
 	for (auto it : targets) {
-		auto& transform = it->get<components::transform>();
+		auto& gun_transform = it->get<components::transform>();
 		auto& gun = it->get<components::gun>();
 
 		if (!gun.reloading &&
@@ -48,8 +49,8 @@ void gun_system::process_entities(world& owner) {
 				if (gun.target_camera_shake) {
 					vec2<> shake_dir;
 					shake_dir.set_from_angle(std::uniform_real_distribution<float>(
-					transform.current.rotation - gun.info->shake_spread_radians, 
-					transform.current.rotation + gun.info->shake_spread_radians)(generator));
+						gun_transform.current.rotation - gun.info->shake_spread_radians,
+						gun_transform.current.rotation + gun.info->shake_spread_radians)(generator));
 				
 					gun.target_camera_shake->get<components::camera>().last_interpolant += shake_dir * gun.info->shake_radius;
 				}
@@ -61,29 +62,43 @@ void gun_system::process_entities(world& owner) {
 
 				for (int i = 0; i < gun.info->bullets_once; ++i) {
 					entity& new_bullet = owner.create_entity();
-					new_bullet.add(components::render(0, gun.info->bullet_sprite));
 
 					vec2<> vel;
 
+					/* randomize bullet direction taking spread into account */
 					vel.set_from_angle(std::uniform_real_distribution<float> (
-						transform.current.rotation - gun.info->spread_radians,
-						transform.current.rotation + gun.info->spread_radians)(generator));
+						gun_transform.current.rotation - gun.info->spread_radians,
+						gun_transform.current.rotation + gun.info->spread_radians)(generator));
 
-					auto new_transform = transform;
+					/* place bullet near the very barrel */
+					auto new_transform = gun_transform;
 					new_transform.current.pos += vel * gun.info->bullet_distance_offset;
+					
+					/* add randomized speed to bullet taking velocity variation into account */
+					vel *= std::uniform_real_distribution<float> (
+						gun.info->bullet_speed - gun.info->velocity_variation,
+						gun.info->bullet_speed + gun.info->velocity_variation)(generator) * PIXELS_TO_METERSf;
 
+					components::damage damage;
+					/* randomize damage */
+					damage.amount = std::uniform_real_distribution<float> (gun.info->bullet_min_damage, gun.info->bullet_max_damage)(generator);
+					damage.sender = it;
+					damage.max_distance = gun.info->max_bullet_distance;
+					damage.starting_point = new_transform.current.pos;
+
+					/* add components that make up a bullet */
 					new_bullet.add(new_transform);
-
+					new_bullet.add(damage);
+					new_bullet.add(components::render(gun.info->bullet_layer, gun.info->bullet_sprite));
 					topdown::create_physics_component(new_bullet, physics.b2world, b2_dynamicBody);
 
-					float random_speed = std::uniform_real_distribution<float> (
-						gun.info->bullet_speed - gun.info->velocity_variation,
-						gun.info->bullet_speed + gun.info->velocity_variation)(generator);
-
-					vel *= random_speed * PIXELS_TO_METERSf;
+					/* bullet's physics settings */
 					auto body = new_bullet.get<components::physics>().body;
 					body->SetLinearVelocity(vel);
 					body->SetBullet(true);
+					auto filter = body->GetFixtureList()->GetFilterData();
+					filter.groupIndex = gun.info->box2d_bullet_group_index;
+					body->GetFixtureList()->SetFilterData(filter);
 				}
 
 				gun.shooting_timer.reset();
@@ -92,4 +107,3 @@ void gun_system::process_entities(world& owner) {
 		if (gun.current_rounds == 0) gun.reloading = true;
 	}
 }
-

@@ -42,6 +42,7 @@ namespace augmentations {
 		
 		template<typename... needed_components>
 		class event_only_system_templated : public processing_system_templated<needed_components...> {
+		public:
 			virtual void add(entity*) {
 
 			}
