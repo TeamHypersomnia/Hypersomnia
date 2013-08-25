@@ -1,21 +1,13 @@
 #pragma once
+#include <unordered_map>
 #include "entity_system/component.h"
 #include "../messages/animate_message.h"
 
 struct animation;
 namespace components {
 	struct animate : public augmentations::entity_system::component {
-		struct response {
-			messages::animate_message::animation type;
-			animation* instance;
-
-			response(messages::animate_message::animation type, animation* instance = nullptr) : type(type), instance(instance) {}
-
-			bool operator<(const response& b) const {
-				return type < b.type;
-			}
-		};
-		augmentations::util::sorted_vector<response> available_animations;
+		typedef std::unordered_map<messages::animate_message::animation, animation*> subscribtion;
+		subscribtion* available_animations;
 		
 		animation* current_animation;
 
@@ -33,7 +25,7 @@ namespace components {
 		state current_state;
 		state paused_state;
 
-		animate() : current_frame(0), current_ms(0.f), speed_factor(1.f), current_animation(nullptr), 
+		animate(subscribtion* available_animations) : available_animations(available_animations), current_frame(0), current_ms(0.f), speed_factor(1.f), current_animation(nullptr),
 			current_state(state::INCREASING), paused_state(state::INCREASING), current_priority(0) {}
 	};
 }

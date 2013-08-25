@@ -2,6 +2,7 @@
 #include "entity_system/world.h"
 #include "../messages/intent_message.h"
 #include "../messages/animate_message.h"
+#include "../messages/particle_burst_message.h"
 
 #include "../components/render_component.h"
 #include "../components/physics_component.h"
@@ -60,19 +61,28 @@ void gun_system::process_entities(world& owner) {
 
 				--gun.current_rounds;
 
+				/* place bullets near the very barrel */
+				auto new_transform = gun_transform;
+				new_transform.current.pos += vec2<>::from_angle(gun_transform.current.rotation) * gun.info->bullet_distance_offset;
+
+				messages::particle_burst_message burst;
+				burst.pos = new_transform.current.pos;
+				burst.rotation = gun_transform.current.rotation;
+				burst.subject = it;
+				burst.type = messages::particle_burst_message::burst_type::WEAPON_SHOT;
+
+				owner.post_message(burst);
+ 
 				for (int i = 0; i < gun.info->bullets_once; ++i) {
 					entity& new_bullet = owner.create_entity();
 
-					vec2<> vel;
-
 					/* randomize bullet direction taking spread into account */
-					vel.set_from_angle(std::uniform_real_distribution<float> (
+					vec2<> vel(vec2<>::from_angle(
+						std::uniform_real_distribution<float> (
 						gun_transform.current.rotation - gun.info->spread_radians,
-						gun_transform.current.rotation + gun.info->spread_radians)(generator));
+						gun_transform.current.rotation + gun.info->spread_radians)(generator)));
 
-					/* place bullet near the very barrel */
-					auto new_transform = gun_transform;
-					new_transform.current.pos += vel * gun.info->bullet_distance_offset;
+					new_transform.current.rotation = vel.get_radians();
 					
 					/* add randomized speed to bullet taking velocity variation into account */
 					vel *= std::uniform_real_distribution<float> (

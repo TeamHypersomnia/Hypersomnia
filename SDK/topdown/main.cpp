@@ -16,17 +16,22 @@
 #include "systems/chase_system.h"
 #include "systems/damage_system.h"
 #include "systems/destroy_system.h"
+#include "systems/particle_group_system.h"
+#include "systems/particle_emitter_system.h"
 
 #include "messages/destroy_message.h"
 #include "messages/collision_message.h"
 #include "messages/moved_message.h"
 #include "messages/intent_message.h"
 #include "messages/animate_message.h"
+#include "messages/particle_burst_message.h"
 
 #include "game/body_helper.h"
 
 #include "renderable.h"
 #include "animation.h"
+
+#include <random>
 
 using namespace augmentations;
 using namespace entity_system;
@@ -42,7 +47,7 @@ int main() {
 	gl.set_show(gl.SHOW);
 	window::cursor(false);
 
-#define IMAGES 36
+#define IMAGES 45
 	texture_baker::image img[IMAGES];
 	texture_baker::texture tex[IMAGES];
 	texture_baker::atlas atl;
@@ -90,6 +95,17 @@ int main() {
 	img[34].from_file(L"Release\\resources\\player_shotgun_shot_4.png");
 	img[35].from_file(L"Release\\resources\\player_shotgun_shot_5.png");
 
+	img[36].from_file(L"Release\\resources\\piece_1.png");
+	img[37].from_file(L"Release\\resources\\piece_2.png");
+	img[38].from_file(L"Release\\resources\\piece_3.png");
+	img[39].from_file(L"Release\\resources\\piece_4.png");
+	img[40].from_file(L"Release\\resources\\piece_5.png");
+	img[41].from_file(L"Release\\resources\\piece_6.png");
+	img[42].from_file(L"Release\\resources\\piece_7.png");
+	img[43].from_file(L"Release\\resources\\piece_8.png");
+	
+	img[44].from_file(L"Release\\resources\\smoke_particle.png");
+
 	for (int i = 0; i < IMAGES; ++i) {
 		tex[i].set(img + i);
 		atl.textures.push_back(tex + i);
@@ -119,6 +135,9 @@ int main() {
 	sprite player_shotgun_shot_sprites [] = { tex + 31, tex + 32, tex + 33, tex + 34, tex + 35 };
 	for (auto& it : legs_sprites)
 		it.size *= 2.f;
+
+	sprite wood_pieces [] = { tex + 36, tex + 37, tex + 38, tex + 39, tex + 40, tex + 41, tex + 42, tex + 43 };
+	sprite smoke_sprite(tex + 44);
 
 	animation legs_animation;
 	animation player_animation;
@@ -208,6 +227,8 @@ int main() {
 	lookat_system lookat;
 	physics_system physics;
 	gun_system guns(physics);
+	particle_group_system particles;
+	particle_emitter_system emitters;
 	render_system render(gl);
 	camera_system camera(render);
 	chase_system chase;
@@ -237,10 +258,23 @@ int main() {
 	my_world.add_system(&chase);
 	my_world.add_system(&guns);
 	my_world.add_system(&damage);
+	my_world.add_system(&emitters);
+	my_world.add_system(&particles);
 	my_world.add_system(&animations);
 	my_world.add_system(&render);
 	my_world.add_system(&destroy);
 	my_world.add_system(&camera);
+
+	enum LAYERS {
+		GUI_OBJECTS,
+		OBJECTS,
+		EFFECTS,
+		PLAYERS,
+		BULLETS,
+		LEGS,
+		PARTICLES,
+		GROUND
+	};
 
 	entity& world_camera = my_world.create_entity();
 	entity& bg = my_world.create_entity();
@@ -250,38 +284,184 @@ int main() {
 	entity& ground = my_world.create_entity();
 	entity& crosshair = my_world.create_entity();
 
-	bg.add(components::render(3, &bg_sprite));
+	entity& particle_group_top = my_world.create_entity();
+	entity& particle_group_ground = my_world.create_entity();
+	particle_group_top.add(components::transform());
+	particle_group_top.add(components::particle_group());
+	particle_group_top.add(components::render(EFFECTS, new particles_renderable(&particle_group_top)));
+	particle_group_top.add(components::transform(vec2<>(0.f, 0.f)));
+	particle_group_ground.add(components::transform());
+	particle_group_ground.add(components::particle_group());
+	particle_group_ground.add(components::render(PARTICLES, new particles_renderable(&particle_group_ground)));
+	particle_group_ground.add(components::transform(vec2<>(0.f, 0.f)));
+
+	components::particle_group::particle templates[8], barrel_explosion_template, barrel_smoke_template;
+
+	barrel_explosion_template.angular_damping = 0.f;
+	barrel_explosion_template.linear_damping = 55000.f;
+	barrel_explosion_template.should_disappear = true;
+	barrel_explosion_template.face = bullet_sprite;
+	barrel_explosion_template.face.size *= 4.f;
+	barrel_explosion_template.max_lifetime_ms = 40.f;
+	barrel_explosion_template.lifetime_ms = 0.f;
+
+	barrel_smoke_template.angular_damping = 0.f;
+	barrel_smoke_template.linear_damping = 100.f;
+	barrel_smoke_template.should_disappear = true;
+	barrel_smoke_template.face = smoke_sprite;
+	barrel_smoke_template.face.size /= 5.f;
+	barrel_smoke_template.face.color.a = 3;
+	barrel_smoke_template.max_lifetime_ms = 2000.f;
+	barrel_smoke_template.lifetime_ms = 0.f;
+
+	/* big pieces */
+	for (int i = 0; i < 4; ++i) {
+		templates[i].angular_damping = 1200.f * 0.01745329251994329576923690768489f;
+		templates[i].linear_damping = 10000.f;
+		templates[i].should_disappear = false;
+		templates[i].face = wood_pieces[i];
+	}
+	/* small pieces */
+	for (int i = 4; i < 8; ++i) {
+		templates[i].angular_damping = 1200.f * 0.01745329251994329576923690768489f;
+		templates[i].linear_damping = 7000.f;
+		templates[i].should_disappear = false;
+		templates[i].face = wood_pieces[i];
+	}
+
+	components::particle_emitter::subscribtion wood_hit, weapon_shot;
+	auto& wood_emissions = wood_hit[messages::particle_burst_message::burst_type::BULLET_IMPACT];
+	auto& shot_emissions = weapon_shot[messages::particle_burst_message::burst_type::WEAPON_SHOT];
+	
+	components::particle_emitter::emission wood_parts_big, wood_parts_small, barrel_explosion, barrel_smoke;
+	wood_parts_big.spread_radians = 45.f * 0.01745329251994329576923690768489f;
+	wood_parts_big.particles_per_burst_min = 1;
+	wood_parts_big.particles_per_burst_max = 1;
+	wood_parts_big.type = components::particle_emitter::emission::type::BURST;
+	wood_parts_big.velocity_min = 2000.f;
+	wood_parts_big.velocity_max = 3000.f;
+	wood_parts_big.angular_velocity_min = 100.f * 0.01745329251994329576923690768489f;
+	wood_parts_big.angular_velocity_max = 720.f * 0.01745329251994329576923690768489f;
+	wood_parts_big.particle_templates = std::vector<components::particle_group::particle>(templates + 0, templates + 4);
+	wood_parts_big.size_multiplier_min = 0.1f;
+	wood_parts_big.size_multiplier_max = 1.0f;
+	wood_parts_big.initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
+	wood_parts_big.angular_offset = 0.f;
+	wood_parts_big.target_particle_group = &particle_group_ground;
+
+	wood_parts_small.spread_radians = 45.f * 0.01745329251994329576923690768489f;
+	wood_parts_small.particles_per_burst_min = 2;
+	wood_parts_small.particles_per_burst_max = 4;
+	wood_parts_small.type = components::particle_emitter::emission::type::BURST;
+	wood_parts_small.velocity_min = 200.f;
+	wood_parts_small.velocity_max = 3000.f;
+	wood_parts_small.particle_templates = std::vector<components::particle_group::particle>(templates + 4, templates + 8);
+	wood_parts_small.size_multiplier_min = 0.1f;
+	wood_parts_small.size_multiplier_max = 1.0f;
+	wood_parts_small.angular_velocity_min = 100.f * 0.01745329251994329576923690768489f;
+	wood_parts_small.angular_velocity_max = 720.f * 0.01745329251994329576923690768489f;
+	wood_parts_small.initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
+	wood_parts_small.angular_offset = 0.f;
+	wood_parts_small.target_particle_group = &particle_group_ground;
+
+	barrel_explosion.spread_radians = 15.5f * 0.01745329251994329576923690768489f;
+	barrel_explosion.particles_per_burst_min = 10;
+	barrel_explosion.particles_per_burst_max = 50;
+	barrel_explosion.type = components::particle_emitter::emission::type::BURST;
+	barrel_explosion.velocity_min = 1000.f;
+	barrel_explosion.velocity_max = 10000.f;
+	barrel_explosion.angular_velocity_min = 0.f;
+	barrel_explosion.angular_velocity_max = 0.f;
+	barrel_explosion.particle_templates.push_back(barrel_explosion_template);
+	barrel_explosion.size_multiplier_min = 0.8f;
+	barrel_explosion.size_multiplier_max = 1.2f;
+	barrel_explosion.initial_rotation_variation = 0.f;
+	barrel_explosion.target_particle_group = &particle_group_top;
+	barrel_explosion.angular_offset = 0.f;
+
+	barrel_smoke.spread_radians = 25.5f * 0.01745329251994329576923690768489f;
+	barrel_smoke.particles_per_sec_min = 50.f;
+	barrel_smoke.particles_per_sec_max = 90.f;
+	barrel_smoke.stream_duration_ms_min = 100.f;
+	barrel_smoke.stream_duration_ms_max = 600.f;
+	barrel_smoke.type = components::particle_emitter::emission::type::STREAM;
+	barrel_smoke.velocity_min = 50.f;
+	barrel_smoke.velocity_max = 100.f;
+	barrel_smoke.angular_velocity_min = 0.f;
+	barrel_smoke.angular_velocity_max = 360.f * 0.01745329251994329576923690768489f;
+	barrel_smoke.particle_templates.push_back(barrel_smoke_template);
+	barrel_smoke.size_multiplier_min = 0.7f;
+	barrel_smoke.size_multiplier_max = 5.5f;
+	barrel_smoke.initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
+	barrel_smoke.target_particle_group = &particle_group_top;
+	barrel_smoke.angular_offset = 0.f;
+
+	wood_emissions.push_back(wood_parts_big);
+	wood_emissions.push_back(wood_parts_small);
+	wood_emissions.push_back(barrel_smoke);
+	shot_emissions.push_back(barrel_explosion);
+	shot_emissions.push_back(barrel_smoke);
+
+	bg.add(components::render(GROUND, &bg_sprite));
 	bg.add(components::transform());
 
-	components::animate player_shotgun_animate;
-	player_shotgun_animate.available_animations.add(components::animate::response(animate_message::animation::MOVE, &player_shotgun_animation));
-	player_shotgun_animate.available_animations.add(components::animate::response(animate_message::animation::SHOT, &player_shotgun_shot_animation));
+	/* creating flyweights */
+	components::animate::subscribtion 
+		player_shotgun_animate_subscribtion, 
+		player_animate_subscribtion, 
+		legs_animate_subscribtion;
+
+	player_shotgun_animate_subscribtion[animate_message::animation::MOVE] = &player_shotgun_animation;
+	player_shotgun_animate_subscribtion[animate_message::animation::SHOT] = &player_shotgun_shot_animation;
+	player_animate_subscribtion[animate_message::animation::MOVE] = &player_animation;
+	legs_animate_subscribtion[animate_message::animation::MOVE] = &legs_animation;
+
+	/* creating instances of animation */
+	components::animate 
+		player_shotgun_animate(&player_shotgun_animate_subscribtion),
+		player_animate(&player_animate_subscribtion), 
+		legs_animate(&legs_animate_subscribtion);
+
 	player_shotgun_animate.current_animation = &player_shotgun_animation;
-
-	components::animate player_animate;
-	player_animate.available_animations.add(components::animate::response(animate_message::animation::MOVE, &player_animation));
 	player_animate.current_animation = &player_animation;
-
-	components::animate legs_animate;
-	legs_animate.available_animations.add(components::animate::response(animate_message::animation::MOVE, &legs_animation));
 	legs_animate.current_animation = &legs_animation;
 
-	components::gun_info double_barrel;
-	double_barrel.bullets_once = 100;
-	double_barrel.bullet_max_damage = 100.f;
-	double_barrel.bullet_distance_offset = 129.f;
-	double_barrel.bullet_min_damage = 80.f;
+	components::gun::gun_info double_barrel, assault_rifle;
+	bullet_sprite.size.y /= 5.f;
+	bullet_sprite.size.x *= 2.f;
+
+	assault_rifle.bullets_once = 1;
+	assault_rifle.bullet_max_damage = 100.f;
+	assault_rifle.bullet_distance_offset = 120.f;
+	assault_rifle.bullet_min_damage = 80.f;
+	assault_rifle.bullet_speed = 5000.f;
+	assault_rifle.bullet_sprite = &bullet_sprite;
+	assault_rifle.is_automatic = true;
+	assault_rifle.max_rounds = 30;
+	assault_rifle.shooting_interval_ms = 70.f;
+	assault_rifle.spread_radians = 1.f * 0.01745329251994329576923690768489f;
+	assault_rifle.velocity_variation = 1500.f;
+	assault_rifle.shake_radius = 10.f;
+	assault_rifle.shake_spread_radians = 45.f * 0.01745329251994329576923690768489f;
+	assault_rifle.box2d_bullet_group_index = -1;
+	assault_rifle.bullet_layer = BULLETS;
+	assault_rifle.max_bullet_distance = 5000.f;
+
+	double_barrel.bullets_once = 12;
+	double_barrel.bullet_min_damage = 10.f;
+	double_barrel.bullet_max_damage = 12.f;
+	double_barrel.bullet_distance_offset = 120.f;
 	double_barrel.bullet_speed = 5000.f;
 	double_barrel.bullet_sprite = &bullet_sprite;
-	double_barrel.is_automatic = true;
+	double_barrel.is_automatic = false;
 	double_barrel.max_rounds = 2;
 	double_barrel.shooting_interval_ms = 500.f;
-	double_barrel.spread_radians = 10.f * 0.01745329251994329576923690768489f;
+	double_barrel.spread_radians = 5.f * 0.01745329251994329576923690768489f;
 	double_barrel.velocity_variation = 1500.f;
-	double_barrel.shake_radius = 50.f;
+	double_barrel.shake_radius = 15.f;
 	double_barrel.shake_spread_radians = 45.f * 0.01745329251994329576923690768489f;
 	double_barrel.box2d_bullet_group_index = -1;
-	double_barrel.bullet_layer = 0;
+	double_barrel.bullet_layer = BULLETS;
 	double_barrel.max_bullet_distance = 5000.f;
 
 	auto spawn_npc = [&](components::animate& animate_component){
@@ -292,8 +472,9 @@ int main() {
 		player_movement.animation_receivers.push_back(components::movement::subscribtion(&physical, false));
 		player_movement.animation_receivers.push_back(components::movement::subscribtion(&legs, true));
 
-		physical.add(components::render(0, &player_sprite));
+		physical.add(components::render(PLAYERS, &player_sprite));
 		physical.add(components::transform(vec2<>(0.f, 0.f)));
+		physical.add(components::particle_emitter(&weapon_shot));
 		physical.add(animate_component);
 		physical.add(player_movement);
 
@@ -308,7 +489,7 @@ int main() {
 		physical.get<components::physics>().body->SetFixedRotation(true);
 
 		legs.add(legs_animate);
-		legs.add(components::render(1, nullptr));
+		legs.add(components::render(LEGS, nullptr));
 		legs.add(components::chase(&physical));
 		legs.add(components::transform());
 		legs.add(components::lookat(&physical, components::lookat::chase_type::VELOCITY));
@@ -339,18 +520,22 @@ int main() {
 		npc.first.get<components::physics>().body->ResetMassData();
 	}
 
-	rect.add(components::render(0, &my_sprite));
+	rect.add(components::render(OBJECTS, &my_sprite));
 	rect.add(components::transform(vec2<>(500.f, -50.f)));
+	rect.add(components::particle_emitter(&wood_hit));
 	topdown::create_physics_component(rect, physics.b2world);
-	rect1.add(components::render(0, &my_sprite));
+	rect1.add(components::render(OBJECTS, &my_sprite));
 	rect1.add(components::transform(vec2<>(470.f, 50.f)));
+	rect1.add(components::particle_emitter(&wood_hit));
 	topdown::create_physics_component(rect1, physics.b2world);
-	rect2.add(components::render(0, &small_sprite));
+	rect2.add(components::render(OBJECTS, &small_sprite));
+	rect2.add(components::particle_emitter(&wood_hit));
 	rect2.add(components::transform(vec2<>(400.f, 0.f), 45.f * 0.01745329251994329576923690768489f));
 	topdown::create_physics_component(rect2, physics.b2world);
 
-	ground.add(components::render(0, &bigger_sprite));
+	ground.add(components::render(OBJECTS, &bigger_sprite));
 	ground.add(components::transform(vec2<>(400.f, 400.f), 75.f * 0.01745329251994329576923690768489f));
+	ground.add(components::particle_emitter(&wood_hit));
 	topdown::create_physics_component(ground, physics.b2world, b2_dynamicBody);
     ground.get<components::physics>().body->GetFixtureList()->SetFriction(0.0f);
 
@@ -363,7 +548,7 @@ int main() {
 	rect2.get<components::physics>().body->SetAngularDamping(5.f);
 	ground.get<components::physics>().body->SetAngularDamping(5.f);
 
-	crosshair.add(components::render(0, &crosshair_sprite));
+	crosshair.add(components::render(GUI_OBJECTS, &crosshair_sprite));
 	crosshair.add(components::transform(vec2<>(vec2<int>(gl.get_window_rect().w, gl.get_window_rect().h)) / 2.f));
 	crosshair.add(components::crosshair(2.5f));
 	crosshair.add(components::chase(&player.first, true));
@@ -380,17 +565,18 @@ int main() {
 	world_camera.get<components::camera>().enable_smoothing = true;
 	world_camera.add(components::input());
 	world_camera.get<components::input>().intents.add(intent_message::intent::SWITCH_LOOK);
-
+	
 	while (!quit_flag) {
 		my_world.run();
 
 		/* flushing message queues */
 		my_world.get_message_queue<message>().clear();
+		my_world.get_message_queue<moved_message>().clear();
+		my_world.get_message_queue<intent_message>().clear();
 		my_world.get_message_queue<destroy_message>().clear();
 		my_world.get_message_queue<animate_message>().clear();
-		my_world.get_message_queue<intent_message>().clear();
-		my_world.get_message_queue<moved_message>().clear();
 		my_world.get_message_queue<collision_message>().clear();
+		my_world.get_message_queue<particle_burst_message>().clear();
 	}
 	
 	augmentations::deinit();

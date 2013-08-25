@@ -2,6 +2,7 @@
 #include "entity_system/world.h"
 #include "entity_system/entity.h"
 
+#include "../messages/particle_burst_message.h"
 #include "../messages/collision_message.h"
 #include "../messages/destroy_message.h"
 
@@ -13,6 +14,13 @@ void damage_system::process_entities(world& owner) {
 		auto* object_b = it.collider->find<components::damage>();
 
 		auto handle_impact = [&](entity* damager, entity* receiver, components::damage& damage) {
+			messages::particle_burst_message msg;
+			msg.subject = receiver;
+			msg.pos = it.point;
+			msg.rotation = it.impact_velocity.get_radians();
+			msg.type = messages::particle_burst_message::burst_type::BULLET_IMPACT;
+
+			owner.post_message(msg);
 			owner.post_message(messages::destroy_message(damager));
 		};
 

@@ -5,10 +5,13 @@
 #include "../components/physics_component.h"
 #include "../messages/intent_message.h"
 
-
-camera_system::camera_system(render_system& raw_renderer) : raw_renderer(raw_renderer) {}
+camera_system::camera_system(render_system& raw_renderer) : raw_renderer(raw_renderer) {
+	smooth_timer.reset();
+}
 
 void camera_system::process_entities(world& owner) {
+	double delta = smooth_timer.extract<std::chrono::seconds>();
+
 	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
 	std::sort(targets.begin(), targets.end(), [](entity* a, entity* b) {
 		return a->get<components::camera>().layer > b->get<components::camera>().layer;
@@ -68,7 +71,7 @@ void camera_system::process_entities(world& owner) {
 			if (camera.enable_smoothing) {
 				/* variable time step camera smoothing by averaging last position with the current */
 				float averaging_constant = static_cast<float>(
-					pow(camera.smoothing_average_factor, camera.averages_per_sec * camera.smooth_timer.extract<std::chrono::seconds>())
+					pow(camera.smoothing_average_factor, camera.averages_per_sec * delta)
 					);
 
 				//if ((transform.current.pos - camera.last_interpolant).length() < 2.0) camera.last_interpolant = transform.current.pos;
@@ -81,6 +84,6 @@ void camera_system::process_entities(world& owner) {
 			raw_renderer.draw(camera.ortho, components::transform(transform.current.pos), camera.mask);
 		}
 	}
-
+	
 	raw_renderer.render();
 }

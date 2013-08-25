@@ -1,6 +1,8 @@
 #include "physics_system.h"
 #include "entity_system/entity.h"
 
+#include "../components/damage_component.h"
+
 #include "../messages/moved_message.h"
 #include "../messages/collision_message.h"
 
@@ -33,12 +35,17 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 	contact->GetWorldManifold(&manifold);
 
 	msg.point = manifold.points[0];
+	msg.point *= METERS_TO_PIXELSf;
 
 	msg.impact_velocity = 
 		body_a->GetLinearVelocityFromWorldPoint(manifold.points[0]) -
 		body_b->GetLinearVelocityFromWorldPoint(manifold.points[0]);
 
 	world_ptr->post_message(msg);
+
+	if (msg.subject->find<components::damage>() || msg.collider->find<components::damage>()) {
+		contact->SetEnabled(false);
+	}
 }
 
 void physics_system::contact_listener::EndContact(b2Contact* contact) {

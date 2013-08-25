@@ -1,6 +1,21 @@
 #pragma once
 #include "rects.h"
 namespace augmentations {
+	template <class type_val, class type_len>
+	void damp(type_val& val, type_len len) {
+		type_len zero = static_cast<type_len>(0);
+		if (val > zero) {
+			val -= len;
+			if (val < zero) 
+				val = zero;
+		}
+		else if (val < zero) {
+			val += len;
+			if (val > zero)
+				val = zero;
+		}
+	}
+
 	template <class vec, class d>
 	vec& rotate(vec& v, const vec& origin, d angle) {
 		auto s = sin(angle);
@@ -30,6 +45,13 @@ namespace augmentations {
 	struct vec2 {
 		type x, y;
 		
+		template <class t>
+		static vec2 from_angle(t radians) {
+			vec2 out;
+			out.set_from_angle(radians);
+			return out;
+		}
+
 		template <class t>
 		vec2(const t& v) : x(static_cast<type>(v.x)), y(static_cast<type>(v.y)) {}
 
@@ -106,9 +128,23 @@ namespace augmentations {
 			y *= len;
 			return *this;
 		}
+		
+		template<class t>
+		vec2& damp(t len) {
+			if (len == static_cast<t>(0)) return *this;
 
-		template<class type>
-		vec2& clamp(vec2<type> rect) {
+			t current_length = length();
+			
+			if (current_length <= len) {
+				return *this = vec2(static_cast<type>(0), static_cast<type>(0));
+			}
+
+			normalize();
+			return (*this) *= (current_length - len);
+		}
+
+		template<class t>
+		vec2& clamp(vec2<t> rect) {
 			if (x > rect.x) x = rect.x;
 			if (y > rect.y) y = rect.y;
 			if (x < -rect.x) x = -rect.x;

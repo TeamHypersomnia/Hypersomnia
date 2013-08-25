@@ -44,7 +44,7 @@ void render_system::draw(rects::xywh visible_area, components::transform camera_
 		auto& transform = (*e)->get<components::transform>();
 		
 		/* if an entity's AABB hovers specified visible region */
-		if (render_info.instance->get_aabb(transform).hover(visible_area + camera_transform.current.pos))
+		if (render_info.instance->is_visible(visible_area + camera_transform.current.pos, transform))
 			visible_targets.push_back(std::make_pair(&render_info, &transform));
 	}
 

@@ -44,14 +44,14 @@ void animation_system::process_entities(world& owner) {
 				animate.speed_factor = it.speed_factor;
 
 			if (it.change_animation) {
-				auto new_instance = animate.available_animations.get(components::animate::response(it.animation_type));
+				auto new_instance = animate.available_animations->at(it.animation_type);
 
-				if (new_instance->instance != animate.current_animation) {
+				if (new_instance != animate.current_animation) {
 					if (!it.preserve_state) {
 						animate.current_frame = 0;
 						animate.current_ms = 0.f;
 					}
-					animate.current_animation = new_instance->instance;
+					animate.current_animation = new_instance;
 				}
 			}
 		}

@@ -4,9 +4,11 @@
 #include "entity_system/entity.h"
 
 #include "../topdown/components/physics_component.h"
+#include "../topdown/components/particle_group_component.h"
 
 sprite::sprite(texture_baker::texture* tex, graphics::pixel_32 color) : tex(tex), color(color) {
-	size = tex->get_size();
+	if(tex) 
+		size = tex->get_size();
 }
 
 void renderable::make_rect(vec2<> pos, vec2<> size, float angle, vec2<> v[4]) {
@@ -88,7 +90,7 @@ b2Body* sprite::create_body(entity_system::entity& subject, b2World& b2world, b2
 	return body;
 }
 
-rects::xywh sprite::get_aabb(const components::transform& transform) {
+bool sprite::is_visible(rects::xywh visibility_aabb, const components::transform& transform) {
 	vec2<> v[4];
 	make_rect(transform.current.pos, vec2<>(size), transform.current.rotation, v);
 
@@ -108,9 +110,35 @@ rects::xywh sprite::get_aabb(const components::transform& transform) {
 		static_cast<int>(std::max_element(v, v + 4, y_pred)->y)
 		);
 
-	return rects::ltrb(lower.x, lower.y, upper.x, upper.y);
+	return rects::ltrb(lower.x, lower.y, upper.x, upper.y).hover(visibility_aabb);
 }
 
 void polygon::draw(buffer& triangles, const components::transform& transform) {
 	/* perform triangulation */
+}
+
+particles_renderable::particles_renderable(augmentations::entity_system::entity* particles) : particles(particles) {}
+
+void particles_renderable::draw(buffer& triangles, const components::transform& transform) {
+	auto& p = particles->get<components::particle_group>();
+
+	for (auto& it : p.particles) {
+		auto temp_alpha = it.face.color.a;
+		
+		if(it.should_disappear) 
+			it.face.color.a = ((it.max_lifetime_ms - it.lifetime_ms) / it.max_lifetime_ms) * temp_alpha;
+		
+		it.face.draw(triangles, components::transform(	transform.current.pos + it.pos, 
+														transform.current.rotation + it.rotation));
+		it.face.color.a = temp_alpha;
+	}
+}
+
+bool particles_renderable::is_visible(rects::xywh visibility_aabb, const components::transform& transform) {
+	/* will be visible most of the time */
+	return true;
+}
+
+b2Body* particles_renderable::create_body(entity_system::entity& subject, b2World& b2world, b2BodyType type) {
+	return nullptr;
 }

@@ -8,6 +8,7 @@ using namespace entity_system;
 
 class camera_system : public processing_system_templated<components::transform, components::camera> {
 	render_system& raw_renderer;
+	augmentations::util::timer smooth_timer;
 public:
 	camera_system(render_system& raw_renderer);
 
