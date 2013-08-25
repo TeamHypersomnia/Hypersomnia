@@ -1,7 +1,24 @@
 #include "particle_emitter_system.h"
 #include "entity_system/entity.h"
+#include "../components/particle_stream_component.h"
 
-particle_emitter_system::particle_emitter_system() : generator(device()) {}
+float randval(int min, int max) {
+	static std::mt19937 generator = std::mt19937(std::random_device()());
+	if (min == max) return min;
+	return std::uniform_int_distribution<int>(min, max)(generator);
+}
+
+float randval(unsigned min, unsigned max) {
+	static std::mt19937 generator = std::mt19937(std::random_device()());
+	if (min == max) return min;
+	return std::uniform_int_distribution<unsigned>(min, max)(generator);
+}
+
+float randval(float min, float max) {
+	static std::mt19937 generator = std::mt19937(std::random_device()());
+	if (min == max) return min;
+	return std::uniform_real_distribution<float>(min, max)(generator);
+}
 
 void particle_emitter_system::spawn_particle(
 	components::particle_group& group, const vec2<>& position, float rotation, const components::particle_emitter::emission& emission) {
@@ -22,8 +39,6 @@ void particle_emitter_system::spawn_particle(
 void particle_emitter_system::process_entities(world& owner) {
 	using namespace components;
 	using namespace messages;
-
-	double delta = timer.extract<std::chrono::milliseconds>();
 
 	auto events = owner.get_message_queue<particle_burst_message>();
 
@@ -47,37 +62,23 @@ void particle_emitter_system::process_entities(world& owner) {
 			}
 
 			else if (emission.type == particle_emitter::emission::type::STREAM) {
-				particle_emitter::stream new_stream(&emission);
+				components::particle_stream new_stream(&emission);
 				new_stream.lifetime_ms = 0.f;
 				new_stream.max_lifetime_ms = randval(emission.stream_duration_ms_min, emission.stream_duration_ms_max);
 				new_stream.particles_to_spawn = 0.f;
-				new_stream.pos = it.pos;
-				new_stream.rotation = target_rotation;
 
-				emitter->current_streams.push_back(new_stream);
+				entity& new_stream_entity = owner.create_entity();
+				new_stream_entity.add(new_stream);
+				new_stream_entity.add(components::transform(it.pos, target_rotation));
+				
+				components::chase chase(it.subject);
+				auto& subject_transform = it.subject->get<components::transform>().current;
+				chase.type = components::chase::chase_type::ORBIT;
+				chase.rotation_offset = it.rotation - subject_transform.rotation;
+				chase.rotation_orbit_offset = (it.pos - subject_transform.pos);
+
+				new_stream_entity.add(chase);
 			}
 		}
-	}
-
-	for (auto it : targets) {
-		auto& emitter = it->get<particle_emitter>();
-
-		for (auto stream = emitter.current_streams.begin(); stream != emitter.current_streams.end(); ++stream) {
-			delta = std::min(delta, static_cast<double>((*stream).max_lifetime_ms - (*stream).lifetime_ms));
-
-			(*stream).lifetime_ms += delta;
-			(*stream).lifetime_ms = std::min((*stream).lifetime_ms, (*stream).max_lifetime_ms);
-
-			(*stream).particles_to_spawn += randval((*stream).info->particles_per_sec_min, (*stream).info->particles_per_sec_max) * (delta / 1000.0);
-
-			while ((*stream).particles_to_spawn >= 1.f) {
-				spawn_particle((*stream).info->target_particle_group->get<components::particle_group>(), (*stream).pos, (*stream).rotation, *(*stream).info);
-				(*stream).particles_to_spawn -= 1.f;
-			}
-		}
-
-		emitter.current_streams.erase(std::remove_if(emitter.current_streams.begin(), emitter.current_streams.end(),
-			[](const particle_emitter::stream& a) { return a.lifetime_ms >= a.max_lifetime_ms;  }
-		), emitter.current_streams.end());
 	}
 }

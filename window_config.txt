@@ -1,5 +1,5 @@
 string window_name example
-int fullscreen 1 
+int fullscreen 1
 int window_border 0
 int window_x 0
 int window_y 0

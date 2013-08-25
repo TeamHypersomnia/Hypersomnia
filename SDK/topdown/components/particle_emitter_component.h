@@ -4,6 +4,7 @@
 
 #include "../messages/particle_burst_message.h"
 #include "particle_group_component.h"
+#include "chase_component.h"
 
 namespace augmentations {
 	namespace entity_system {
@@ -41,22 +42,8 @@ namespace components {
 			augmentations::entity_system::entity* target_particle_group;
 		};
 
-		struct stream {
-			emission* info;
-			augmentations::vec2<> pos;
-			float rotation;
-
-			float lifetime_ms;
-			float max_lifetime_ms;
-			float particles_to_spawn;
-
-			stream(emission* info) : info(info), lifetime_ms(0.f), particles_to_spawn(0.f) {}
-		};
-
 		typedef std::unordered_map<messages::particle_burst_message::burst_type, std::vector<emission>> subscribtion;
 		subscribtion* available_emissions;
-
-		std::vector<stream> current_streams;
 
 		particle_emitter(subscribtion* available_emissions) 
 			: available_emissions(available_emissions) {}

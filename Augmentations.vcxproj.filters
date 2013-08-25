@@ -273,6 +273,9 @@
     <ClCompile Include="SDK\topdown\systems\particle_emitter_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\particle_stream_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config\config.h">
@@ -609,6 +612,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SDK\topdown\systems\particle_emitter_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\components\particle_stream_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\systems\particle_stream_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
