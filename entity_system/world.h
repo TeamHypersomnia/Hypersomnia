@@ -8,20 +8,25 @@
 #include "entity.h"
 #include "type_registry.h"
 
+#include "utility/sorted_vector.h"
+
 namespace augmentations {
 	namespace entity_system {
 		class processing_system;
 		class world {
-			
+			friend class entity;
+			friend class entity_ptr;
+
 			template <typename message>
 			class message_queue {
 			public:
 				static std::vector<message> messages;
 			};
 
-			friend class entity;
 			boost::object_pool<entity> entities;
+			
 			std::unordered_map<size_t, boost::pool<>> size_to_container;
+			std::unordered_map<entity*, util::sorted_vector<entity_ptr*>> registered_entity_watchers;
 
 			type_registry component_library;
 
@@ -30,6 +35,9 @@ namespace augmentations {
 			boost::pool<>& get_container_for_type(const base_type& type);
 			
 			std::vector<processing_system*> systems;
+
+			void register_entity_watcher(entity_ptr&);
+			void unregister_entity_watcher(entity_ptr&);
 		public:
 
 			template <typename message>

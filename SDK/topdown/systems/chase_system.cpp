@@ -1,4 +1,5 @@
 #include "chase_system.h"
+#include "entity_system/entity.h"
 
 void chase_system::add(entity* e) {
 	auto& chase = e->get<components::chase>();

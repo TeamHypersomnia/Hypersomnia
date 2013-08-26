@@ -1,12 +1,7 @@
 #pragma once
 #include "entity_system/component.h"
+#include "entity_system/entity_ptr.h"
 #include "math/vec2d.h"
-
-namespace augmentations {
-	namespace entity_system {
-		class entity;
-	}
-}
 
 namespace components {
 	struct movement : public augmentations::entity_system::component {
@@ -15,7 +10,7 @@ namespace components {
 		};
 
 		struct subscribtion {
-			augmentations::entity_system::entity* target;
+			augmentations::entity_system::entity_ptr target;
 			bool stop_at_zero_movement;
 			subscribtion(augmentations::entity_system::entity* target, bool stop_at_zero_movement = true) :
 				target(target), stop_at_zero_movement(stop_at_zero_movement) {}

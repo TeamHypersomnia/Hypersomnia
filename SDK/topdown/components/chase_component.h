@@ -1,10 +1,11 @@
 #pragma once
-#include "entity_system/entity.h"
+#include "entity_system/component.h"
+#include "entity_system/entity_ptr.h"
 #include "math/vec2d.h"
 
 namespace components {
 	struct chase : public augmentations::entity_system::component {
-		augmentations::entity_system::entity* target;
+		augmentations::entity_system::entity_ptr target;
 		
 		enum class chase_type {
 			OFFSET,

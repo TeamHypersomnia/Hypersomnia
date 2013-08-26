@@ -122,6 +122,7 @@
     <ClCompile Include="config\config.cpp" />
     <ClCompile Include="entity_system\component.cpp" />
     <ClCompile Include="entity_system\entity.cpp" />
+    <ClCompile Include="entity_system\entity_ptr.cpp" />
     <ClCompile Include="entity_system\signature_matcher.cpp" />
     <ClCompile Include="entity_system\processing_system.cpp" />
     <ClCompile Include="entity_system\templated_list.cpp" />
@@ -142,6 +143,7 @@
     <ClCompile Include="SDK\topdown\systems\damage_system.cpp" />
     <ClCompile Include="SDK\topdown\systems\destroy_system.cpp" />
     <ClCompile Include="SDK\topdown\systems\gun_system.cpp" />
+    <ClCompile Include="SDK\topdown\systems\health_system.cpp" />
     <ClCompile Include="SDK\topdown\systems\input_system.cpp" />
     <ClCompile Include="SDK\topdown\systems\lookat_system.cpp" />
     <ClCompile Include="SDK\topdown\systems\movement_system.cpp" />
@@ -212,6 +214,7 @@
     <ClInclude Include="config\config.h" />
     <ClInclude Include="entity_system\component.h" />
     <ClInclude Include="entity_system\entity.h" />
+    <ClInclude Include="entity_system\entity_ptr.h" />
     <ClInclude Include="entity_system\entity_system.h" />
     <ClInclude Include="entity_system\signature_matcher.h" />
     <ClInclude Include="entity_system\processing_system.h" />
@@ -227,8 +230,10 @@
     <ClInclude Include="SDK\topdown\components\animate_component.h" />
     <ClInclude Include="SDK\topdown\components\camera_component.h" />
     <ClInclude Include="SDK\topdown\components\chase_component.h" />
+    <ClInclude Include="SDK\topdown\components\children_component.h" />
     <ClInclude Include="SDK\topdown\components\crosshair_component.h" />
     <ClInclude Include="SDK\topdown\components\damage_component.h" />
+    <ClInclude Include="SDK\topdown\components\health_component.h" />
     <ClInclude Include="SDK\topdown\components\input_component.h" />
     <ClInclude Include="SDK\topdown\components\lookat_component.h" />
     <ClInclude Include="SDK\topdown\components\particle_emitter_component.h" />
@@ -242,6 +247,7 @@
     <ClInclude Include="SDK\topdown\game\body_helper.h" />
     <ClInclude Include="SDK\topdown\messages\animate_message.h" />
     <ClInclude Include="SDK\topdown\messages\collision_message.h" />
+    <ClInclude Include="SDK\topdown\messages\damage_message.h" />
     <ClInclude Include="SDK\topdown\messages\destroy_message.h" />
     <ClInclude Include="SDK\topdown\messages\intent_message.h" />
     <ClInclude Include="SDK\topdown\messages\message.h" />
@@ -255,6 +261,7 @@
     <ClInclude Include="SDK\topdown\systems\damage_system.h" />
     <ClInclude Include="SDK\topdown\systems\destroy_system.h" />
     <ClInclude Include="SDK\topdown\systems\gun_system.h" />
+    <ClInclude Include="SDK\topdown\systems\health_system.h" />
     <ClInclude Include="SDK\topdown\systems\input_system.h" />
     <ClInclude Include="SDK\topdown\systems\lookat_system.h" />
     <ClInclude Include="SDK\topdown\systems\movement_system.h" />

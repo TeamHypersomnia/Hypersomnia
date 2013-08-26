@@ -15,6 +15,7 @@
 #include "systems/lookat_system.h"
 #include "systems/chase_system.h"
 #include "systems/damage_system.h"
+#include "systems/health_system.h"
 #include "systems/destroy_system.h"
 #include "systems/particle_group_system.h"
 #include "systems/particle_emitter_system.h"
@@ -26,6 +27,7 @@
 #include "messages/intent_message.h"
 #include "messages/animate_message.h"
 #include "messages/particle_burst_message.h"
+#include "messages/damage_message.h"
 
 #include "game/body_helper.h"
 
@@ -48,7 +50,7 @@ int main() {
 	gl.set_show(gl.SHOW);
 	window::cursor(false);
 
-#define IMAGES 50
+#define IMAGES 52
 	texture_baker::image img[IMAGES];
 	texture_baker::texture tex[IMAGES];
 	texture_baker::atlas atl;
@@ -113,6 +115,9 @@ int main() {
 	img[48].from_file(L"Release\\resources\\blood_4.png");
 	img[49].from_file(L"Release\\resources\\blood_5.png");
 
+	img[50].from_file(L"Release\\resources\\dead_front.png");
+	img[51].from_file(L"Release\\resources\\dead_back.png");
+
 	for (int i = 0; i < IMAGES; ++i) {
 		tex[i].set(img + i);
 		atl.textures.push_back(tex + i);
@@ -147,6 +152,9 @@ int main() {
 	sprite smoke_sprite(tex + 44);
 
 	sprite blood_sprites [] = { tex + 45, tex + 46, tex + 47, tex + 48, tex + 49 };
+
+	sprite dead_front_sprite(tex + 50);
+	sprite dead_back_sprite(tex + 51);
 
 	animation legs_animation;
 	animation player_animation;
@@ -243,6 +251,7 @@ int main() {
 	camera_system camera(render);
 	chase_system chase;
 	damage_system damage;
+	health_system health;
 	destroy_system destroy;
 
 	input_system::context main_context;
@@ -267,6 +276,7 @@ int main() {
 	my_world.add_system(&lookat);
 	my_world.add_system(&guns);
 	my_world.add_system(&damage);
+	my_world.add_system(&health);
 	my_world.add_system(&emitters);
 	my_world.add_system(&streams);
 	my_world.add_system(&particles);
@@ -441,6 +451,9 @@ int main() {
 	barrel_smoke[0].initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
 	barrel_smoke[0].target_particle_group = &particle_group_top;
 	barrel_smoke[0].angular_offset = 0.f;
+	barrel_smoke[0].randomize_acceleration = true;
+	barrel_smoke[0].acc_min = 100.f;
+	barrel_smoke[0].acc_max = 200.f;
 
 	barrel_smoke[1].spread_radians = 14.5f * 0.01745329251994329576923690768489f;
 	barrel_smoke[1].particles_per_sec_min = 40.f;
@@ -458,6 +471,9 @@ int main() {
 	barrel_smoke[1].initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
 	barrel_smoke[1].target_particle_group = &particle_group_top;
 	barrel_smoke[1].angular_offset = 0.f;
+	barrel_smoke[1].randomize_acceleration = true;
+	barrel_smoke[1].acc_min = 40.f;
+	barrel_smoke[1].acc_max = 400.f;
 
 	blood_shower.spread_radians = 45.5f * 0.01745329251994329576923690768489f;
 	blood_shower.particles_per_sec_min = 10.f;
@@ -525,7 +541,7 @@ int main() {
 	assault_rifle.shooting_interval_ms = 70.f;
 	assault_rifle.spread_radians = 1.f * 0.01745329251994329576923690768489f;
 	assault_rifle.velocity_variation = 1500.f;
-	assault_rifle.shake_radius = 20.f;
+	assault_rifle.shake_radius = 0.5f;
 	assault_rifle.shake_spread_radians = 45.f * 0.01745329251994329576923690768489f;
 	assault_rifle.box2d_bullet_group_index = -1;
 	assault_rifle.bullet_layer = BULLETS;
@@ -542,11 +558,17 @@ int main() {
 	double_barrel.shooting_interval_ms = 500.f;
 	double_barrel.spread_radians = 5.f * 0.01745329251994329576923690768489f;
 	double_barrel.velocity_variation = 1500.f;
-	double_barrel.shake_radius = 25.f;
+	double_barrel.shake_radius = 0.5f;
 	double_barrel.shake_spread_radians = 45.f * 0.01745329251994329576923690768489f;
 	double_barrel.box2d_bullet_group_index = -1;
 	double_barrel.bullet_layer = BULLETS;
 	double_barrel.max_bullet_distance = 5000.f;
+
+	components::health::health_info npc_health_info;
+	npc_health_info.dead_lifetime_ms = 1000.f;
+	npc_health_info.should_disappear = true;
+	npc_health_info.death_sprite = dead_front_sprite;
+	npc_health_info.max_hp = 100.f;
 
 	auto spawn_npc = [&](components::animate& animate_component){
 		entity& physical = my_world.create_entity();
@@ -561,8 +583,13 @@ int main() {
 		physical.add(components::particle_emitter(&player_effects));
 		physical.add(animate_component);
 		physical.add(player_movement);
+		physical.add(components::health(&npc_health_info, 100.f));
+		
+		components::children player_children;
+		player_children.children_entities.push_back(&legs);
+		physical.add(player_children);
 
-		components::gun my_gun(&assault_rifle);
+		components::gun my_gun(&double_barrel);
 		my_gun.current_rounds = 1000;
 
 		physical.add(my_gun);
@@ -657,6 +684,7 @@ int main() {
 		my_world.get_message_queue<message>().clear();
 		my_world.get_message_queue<moved_message>().clear();
 		my_world.get_message_queue<intent_message>().clear();
+		my_world.get_message_queue<damage_message>().clear();
 		my_world.get_message_queue<destroy_message>().clear();
 		my_world.get_message_queue<animate_message>().clear();
 		my_world.get_message_queue<collision_message>().clear();

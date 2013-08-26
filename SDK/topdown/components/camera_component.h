@@ -4,11 +4,7 @@
 #include "render_component.h"
 #include "utility/delta_accumulator.h"
 
-namespace augmentations {
-	namespace entity_system {
-		class entity;
-	}
-}
+#include "entity_system/entity_ptr.h"
 
 namespace components {
 	struct camera : public augmentations::entity_system::component {
@@ -29,8 +25,8 @@ namespace components {
 
 		augmentations::vec2<> max_look_expand, last_interpolant;
 
-		augmentations::entity_system::entity* player;
-		augmentations::entity_system::entity* crosshair;
+		augmentations::entity_system::entity_ptr player;
+		augmentations::entity_system::entity_ptr crosshair;
 
 		augmentations::util::timer smooth_timer;
 

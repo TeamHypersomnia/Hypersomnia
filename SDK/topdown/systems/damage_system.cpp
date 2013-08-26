@@ -5,6 +5,7 @@
 #include "../messages/particle_burst_message.h"
 #include "../messages/collision_message.h"
 #include "../messages/destroy_message.h"
+#include "../messages/damage_message.h"
 
 void damage_system::process_entities(world& owner) {
 	auto events = owner.get_message_queue<messages::collision_message>();
@@ -14,13 +15,18 @@ void damage_system::process_entities(world& owner) {
 		auto* object_b = it.collider->find<components::damage>();
 
 		auto handle_impact = [&](entity* damager, entity* receiver, components::damage& damage) {
-			messages::particle_burst_message msg;
-			msg.subject = receiver;
-			msg.pos = it.point;
-			msg.rotation = it.impact_velocity.get_radians();
-			msg.type = messages::particle_burst_message::burst_type::BULLET_IMPACT;
+			messages::damage_message damage_msg;
+			damage_msg.subject = receiver;
+			damage_msg.amount = damage.amount;
 
-			owner.post_message(msg);
+			messages::particle_burst_message burst_msg;
+			burst_msg.subject = receiver;
+			burst_msg.pos = it.point;
+			burst_msg.rotation = it.impact_velocity.get_radians();
+			burst_msg.type = messages::particle_burst_message::burst_type::BULLET_IMPACT;
+
+			owner.post_message(damage_msg);
+			owner.post_message(burst_msg);
 			owner.post_message(messages::destroy_message(damager));
 		};
 

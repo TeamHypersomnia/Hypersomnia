@@ -3,17 +3,11 @@
 #include <Box2D/Box2D.h>
 
 #include "texture_baker/texture_baker.h"
+#include "entity_system/entity_ptr.h"
 #include "components\transform_component.h"
 
 #include "vertex.h"
 using namespace augmentations;
-
-namespace augmentations {
-	namespace entity_system {
-		class entity;
-	}
-}
-
 struct renderable {
 	static void make_rect(vec2<> pos, vec2<> size, float rotation_degrees, vec2<> out[4]);
 
@@ -46,7 +40,7 @@ namespace components {
 }
 
 struct particles_renderable : public renderable {
-	augmentations::entity_system::entity* particles;
+	augmentations::entity_system::entity_ptr particles;
 
 	particles_renderable(augmentations::entity_system::entity*);
 	virtual void draw(buffer&, const components::transform&) override;

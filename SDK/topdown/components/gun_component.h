@@ -1,15 +1,9 @@
 #pragma once
-#include "entity_system/component.h"
 #include "utility/timer.h"
+#include "entity_system/component.h"
+#include "entity_system/entity_ptr.h"
 
 struct renderable;
-
-namespace augmentations {
-	namespace entity_system {
-		class entity;
-	}
-}
-
 namespace components {
 	struct gun : public augmentations::entity_system::component {
 		struct gun_info {
@@ -46,7 +40,7 @@ namespace components {
 		bool reloading, trigger;
 
 		augmentations::util::timer shooting_timer;
-		augmentations::entity_system::entity* target_camera_shake;
+		augmentations::entity_system::entity_ptr target_camera_shake;
 
 		gun(gun_info* info)
 			: info(info), current_rounds(0), 

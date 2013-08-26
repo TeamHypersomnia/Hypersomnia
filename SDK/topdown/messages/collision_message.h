@@ -4,7 +4,7 @@
 
 namespace messages {
 	struct collision_message : public message {
-		augmentations::entity_system::entity* collider;
+		augmentations::entity_system::entity_ptr collider;
 		augmentations::vec2<> impact_velocity, point;
 	};
 }

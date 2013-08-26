@@ -1,9 +1,9 @@
 #pragma once
+#include <random>
 #include "entity_system/processing_system.h"
 
 #include "../components/transform_component.h"
 #include "../components/gun_component.h"
-#include <random>
 
 using namespace augmentations;
 using namespace entity_system;

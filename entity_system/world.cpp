@@ -1,11 +1,26 @@
 #include "world.h"
 #include "processing_system.h"
+#include "entity_ptr.h"
 
 namespace augmentations {
 	namespace entity_system {
 		world::world() {
 		}
-			
+
+		void world::register_entity_watcher(entity_ptr& ptr) {
+			registered_entity_watchers[ptr].add(&ptr);
+		}
+
+		void world::unregister_entity_watcher(entity_ptr& ptr) {
+			auto it = registered_entity_watchers.find(ptr);
+			if (it != registered_entity_watchers.end()) {
+				(*it).second.remove(&ptr);
+				if ((*it).second.get_vector().empty()) {
+					registered_entity_watchers.erase(it);
+				}
+			}
+		}
+
 		void world::add_system(processing_system* new_system) {
 			/* 
 			here we register systems' signatures so we can ensure that whenever we add a component it is already registered
@@ -20,6 +35,17 @@ namespace augmentations {
 		}
 
 		void world::delete_entity(entity& e) {
+			auto it = registered_entity_watchers.find(&e);
+
+			if (it != registered_entity_watchers.end()) {
+				for (auto watcher : (*it).second.get_vector()) {
+					/* watch out, may unregister itself if used improperly */
+					watcher->ptr = nullptr;
+				}
+
+				registered_entity_watchers.erase(it);
+			}
+
 			e.clear(); 
 			entities.destroy(&e);
 		}

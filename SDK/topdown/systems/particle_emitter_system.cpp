@@ -32,6 +32,12 @@ void particle_emitter_system::spawn_particle(
 		new_particle.face.size *= randval(emission.size_multiplier_min, emission.size_multiplier_max);
 		new_particle.rotation = randval(rotation - emission.initial_rotation_variation, rotation + emission.initial_rotation_variation);
 		new_particle.rotation_speed = randval(emission.angular_velocity_min, emission.angular_velocity_max);
+		
+		if (emission.randomize_acceleration) {
+			new_particle.acc += vec2<>::from_angle(
+				randval(rotation - emission.spread_radians, rotation + emission.spread_radians)) *
+				randval(emission.acc_min, emission.acc_max);
+		}
 
 		group.particles.push_back(new_particle);
 }

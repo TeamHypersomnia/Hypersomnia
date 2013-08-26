@@ -2,6 +2,7 @@
 /* for utilities */
 #include "particle_emitter_system.h"
 
+#include "entity_system/entity.h"
 #include "../components/particle_emitter_component.h"
 #include "../messages/destroy_message.h"
 

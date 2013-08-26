@@ -15,6 +15,7 @@ namespace augmentations {
 			/* only world class is allowed to instantiate an entity and it has to do it inside object pool */
 			friend class boost::object_pool<entity>;
 			friend class type_registry;
+			friend class entity_ptr;
 			
 			entity(world& owner_world);
 			~entity();
