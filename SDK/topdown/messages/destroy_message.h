@@ -3,6 +3,9 @@
 
 namespace messages {
 	struct destroy_message : public message {
-		destroy_message(augmentations::entity_system:: entity* subject = nullptr) : message(subject) {}
+		augmentations::entity_system::entity * redirection;
+		bool only_children;
+		destroy_message(augmentations::entity_system::entity* subject = nullptr, augmentations::entity_system::entity* redirection = nullptr) 
+			: message(subject), only_children(false), redirection(redirection) {}
 	};
 }
