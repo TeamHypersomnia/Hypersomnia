@@ -441,6 +441,9 @@
     <ClCompile Include="SDK\topdown\script.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SDK\topdown\game\sprite_helper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config\config.h">
@@ -1122,6 +1125,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="entity_system\entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\game\sprite_helper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

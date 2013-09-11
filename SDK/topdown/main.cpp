@@ -37,6 +37,7 @@
 #include "messages/damage_message.h"
 
 #include "game/body_helper.h"
+#include "game/sprite_helper.h"
 
 #include "renderable.h"
 #include "animation.h"
@@ -50,6 +51,93 @@ using namespace entity_system;
 using namespace messages;
 
 int main() {
+	augmentations::init();
+
+	config::input_file cfg("window_config.txt");
+
+	window::glwindow gl;
+	gl.create(cfg, rects::wh(100, 100));
+	gl.set_show(gl.SHOW);
+	window::cursor(false);
+
+	bool quit_flag = false;
+
+	world my_world;
+
+	input_system input(gl, quit_flag);
+	movement_system movement;
+	animation_system animations;
+	crosshair_system crosshairs;
+	lookat_system lookat;
+	physics_system physics;
+	gun_system guns(physics);
+	particle_group_system particles;
+	particle_emitter_system emitters;
+	render_system render(gl);
+	camera_system camera(render);
+	chase_system chase;
+	damage_system damage;
+	health_system health(physics);
+	destroy_system destroy;
+	script_system scripts;
+
+	luabind::globals(scripts.lua_state)["world"] = &my_world;
+
+	my_world.add_system(&input);
+	my_world.add_system(&movement);
+	my_world.add_system(&physics);
+	my_world.add_system(&crosshairs);
+	my_world.add_system(&lookat);
+	my_world.add_system(&guns);
+	my_world.add_system(&damage);
+	my_world.add_system(&health);
+	my_world.add_system(&emitters);
+	my_world.add_system(&particles);
+	my_world.add_system(&chase);
+	my_world.add_system(&animations);
+	my_world.add_system(&render);
+	my_world.add_system(&destroy);
+	my_world.add_system(&camera);
+
+	script my_script;
+	my_script.associate_filename("script.txt");
+	auto luaerrors = my_script.compile(scripts.lua_state);
+	auto luaerrors_call = my_script.call(scripts.lua_state);
+
+	entity& world_camera = my_world.create_entity();
+
+	world_camera.add(components::transform());
+	//world_camera.add(components::chase(&player.first, false, vec2<>(vec2<int>(gl.get_screen_rect()))*-0.5f));
+	world_camera.add(components::camera(gl.get_screen_rect(), gl.get_screen_rect(), 0, components::render::WORLD, 0.5, 20.0));
+	world_camera.get<components::camera>().crosshair = nullptr;
+	world_camera.get<components::camera>().player = nullptr;
+	world_camera.get<components::camera>().orbit_mode = components::camera::ANGLED;
+	world_camera.get<components::camera>().max_look_expand = vec2<>(vec2<int>(gl.get_screen_rect())) * 0.5f;
+	world_camera.get<components::camera>().enable_smoothing = true;
+	//world_camera.add(components::input());
+	//world_camera.get<components::input>().intents.add(intent_message::intent::SWITCH_LOOK);
+
+	while (!quit_flag) {
+		my_world.run();
+
+		/* flushing message queues */
+		my_world.get_message_queue<message>().clear();
+		my_world.get_message_queue<moved_message>().clear();
+		my_world.get_message_queue<intent_message>().clear();
+		my_world.get_message_queue<damage_message>().clear();
+		my_world.get_message_queue<destroy_message>().clear();
+		my_world.get_message_queue<animate_message>().clear();
+		my_world.get_message_queue<collision_message>().clear();
+		my_world.get_message_queue<particle_burst_message>().clear();
+	}
+
+	augmentations::deinit();
+	return 0;
+}
+
+//#define kajdljsdklasjdd
+#ifdef kajdljsdklasjdd
+int dmain() {
 	augmentations::init();
 
 	config::input_file cfg("window_config.txt");
@@ -132,14 +220,7 @@ int main() {
 		atl.textures.push_back(tex + i);
 	}
 
-	atl.pack();
-	atl.create_image(4, true);
-	atl.build();
-	atl.bind();
-
-	/* destroy the raw image as it is already uploaded to GPU */
-	atl.img.destroy();
-	atl.nearest();
+	atl.default_build();
 
 	sprite small_sprite(tex + 24);
 	sprite my_sprite(tex + 24);
@@ -627,7 +708,7 @@ int main() {
 	assault_rifle.shooting_interval_ms = 70.f;
 	assault_rifle.spread_radians = 1.f * 0.01745329251994329576923690768489f;
 	assault_rifle.velocity_variation = 1500.f;
-	assault_rifle.shake_radius = 4.5f;
+	assault_rifle.shake_radius = 9.5f;
 	assault_rifle.shake_spread_radians = 45.f * 0.01745329251994329576923690768489f;
 	assault_rifle.bullet_collision_filter = filter_bullets;
 	assault_rifle.bullet_layer = BULLETS;
@@ -781,3 +862,5 @@ int main() {
 	augmentations::deinit();
 	return 0;
 }
+
+#endif

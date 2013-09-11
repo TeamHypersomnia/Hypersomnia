@@ -188,6 +188,7 @@
     <ClCompile Include="math\vec2d.cpp" />
     <ClCompile Include="SDK\topdown\animation.cpp" />
     <ClCompile Include="SDK\topdown\game\body_helper.cpp" />
+    <ClCompile Include="SDK\topdown\game\sprite_helper.cpp" />
     <ClCompile Include="SDK\topdown\main.cpp" />
     <ClCompile Include="SDK\topdown\renderable.cpp" />
     <ClCompile Include="SDK\topdown\script.cpp" />
@@ -407,6 +408,7 @@
     <ClInclude Include="SDK\topdown\components\transform_component.h" />
     <ClInclude Include="SDK\topdown\components\gun_component.h" />
     <ClInclude Include="SDK\topdown\game\body_helper.h" />
+    <ClInclude Include="SDK\topdown\game\sprite_helper.h" />
     <ClInclude Include="SDK\topdown\messages\animate_message.h" />
     <ClInclude Include="SDK\topdown\messages\collision_message.h" />
     <ClInclude Include="SDK\topdown\messages\damage_message.h" />
