@@ -11,27 +11,24 @@ void damage_system::process_entities(world& owner) {
 	auto events = owner.get_message_queue<messages::collision_message>();
 
 	for (auto it : events) {
-		auto* object_a = it.subject->find<components::damage>();
-		auto* object_b = it.collider->find<components::damage>();
-
-		auto handle_impact = [&](entity* damager, entity* receiver, components::damage& damage) {
+		auto* damage = it.collider->find<components::damage>();
+		
+		if (damage) {
 			messages::damage_message damage_msg;
-			damage_msg.subject = receiver;
-			damage_msg.amount = damage.amount;
+			damage_msg.subject = it.subject;
+			damage_msg.amount = damage->amount;
+			damage_msg.impact_velocity = it.impact_velocity;
 
 			messages::particle_burst_message burst_msg;
-			burst_msg.subject = receiver;
+			burst_msg.subject = it.subject;
 			burst_msg.pos = it.point;
-			burst_msg.rotation = it.impact_velocity.get_radians();
+			burst_msg.rotation = (-it.impact_velocity).get_radians();
 			burst_msg.type = messages::particle_burst_message::burst_type::BULLET_IMPACT;
 
 			owner.post_message(damage_msg);
 			owner.post_message(burst_msg);
-			owner.post_message(messages::destroy_message(damager));
-		};
-
-		if (object_a) handle_impact(it.subject, it.collider, *object_a);
-		if (object_b) handle_impact(it.collider, it.subject, *object_b);
+			owner.post_message(messages::destroy_message(it.collider));
+		}
 	}
 
 	for (auto it : targets) {
