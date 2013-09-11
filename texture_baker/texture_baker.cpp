@@ -224,7 +224,15 @@ namespace augmentations {
 			atlas_texture.set(&im);
 			atlas_texture.set_uv_unit(1.0/im.get_size().w, 1.0/im.get_size().h);
 		}
-
+		
+		void atlas::default_build() {
+			pack();
+			create_image(4, true);
+			build(false, false);
+			bind();
+			/* destroy the raw image as it is already uploaded to GPU */
+			img.destroy();
+		}
 
 		void atlas::bind() {
 			if(current != id) _bind();

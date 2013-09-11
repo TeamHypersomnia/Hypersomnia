@@ -73,6 +73,8 @@ namespace augmentations {
 			void create_image(int atlas_channels, bool destroy_images);
 			void build(bool mipmaps = false, bool linear = false, image* raw_texture = 0), bind(), _bind(), nearest(), linear(), clamp(), repeat();
 
+			void default_build();
+
 			bool is_mipmapped() const;
 			void destroy();
 		};
