@@ -1,4 +1,5 @@
 #pragma once
+#include <Box2D/Common/b2Math.h>
 #include "rects.h"
 namespace augmentations {
 	template <class type_val, class type_len>
@@ -70,9 +71,8 @@ namespace augmentations {
 		vec2(const rects::ltrb& r) : x(r.l), y(r.t) {}
 		vec2(const rects::xywh& r) : x(r.x), y(r.y) {}
 
-		template <typename v>
-		operator v() const {
-			v t;
+		operator b2Vec2() const {
+			b2Vec2 t;
 			t.x = x;
 			t.y = y;
 			return t;
