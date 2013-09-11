@@ -10,12 +10,12 @@
 using namespace augmentations;
 using namespace entity_system;
 
-extern float randval(int min, int max);
-extern float randval(unsigned min, unsigned max);
+extern int randval(int min, int max);
+extern unsigned randval(unsigned min, unsigned max);
 extern float randval(float min, float max);
 
 class particle_emitter_system : public processing_system_templated<components::particle_emitter> {
 public:
-	static void spawn_particle(components::particle_group&, const vec2<>&, float, const components::particle_emitter::emission&);
+	static void spawn_particle(components::particle_group&, const vec2<>&, float, const components::particle_group::emission&);
 	void process_entities(world&);
 };
