@@ -34,13 +34,13 @@ namespace augmentations {
 			return *entities.construct<world&>(*this);
 		}
 
-		void world::delete_entity(entity& e) {
+		void world::delete_entity(entity& e, entity* redirect_pointers) {
 			auto it = registered_entity_watchers.find(&e);
 
 			if (it != registered_entity_watchers.end()) {
 				for (auto watcher : (*it).second.get_vector()) {
 					/* watch out, may unregister itself if used improperly */
-					watcher->ptr = nullptr;
+					watcher->ptr = redirect_pointers;
 				}
 
 				registered_entity_watchers.erase(it);
