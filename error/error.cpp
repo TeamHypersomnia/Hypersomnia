@@ -1,5 +1,4 @@
 ﻿#pragma once
-#define _CRT_SECURE_NO_WARNINGS
 #include "error.h"
 #define UNICODE
 #include <Windows.h>
@@ -24,7 +23,7 @@ namespace augmentations {
 
 
 	namespace error_logging {
-		unsigned glew_last_errorcode;
+		unsigned glew_last_errorcode = 0;
 
 		void module::last_error(wchar_t* msgbuf) {
 			DWORD dw = GetLastError(); 

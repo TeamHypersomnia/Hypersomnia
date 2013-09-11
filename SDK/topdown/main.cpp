@@ -1,8 +1,12 @@
 #pragma once
+#include <random>
+
 #include "../../augmentations.h"
 
 #include "../../window_framework/window.h"
 #include "../../config/config.h"
+
+#include "entity_system/world.h"
 
 #include "systems/physics_system.h"
 #include "systems/movement_system.h"
@@ -19,7 +23,10 @@
 #include "systems/destroy_system.h"
 #include "systems/particle_group_system.h"
 #include "systems/particle_emitter_system.h"
-#include "systems/particle_stream_system.h"
+#include "systems/script_system.h"
+
+//#undef BOOST_DISABLE_THREADS
+//#define BOOST_DISABLE_THREADS
 
 #include "messages/destroy_message.h"
 #include "messages/collision_message.h"
@@ -33,8 +40,10 @@
 
 #include "renderable.h"
 #include "animation.h"
+#include "script.h"
 
-#include <random>
+#include <lua/lua.hpp>
+#include <luabind/luabind.hpp>
 
 using namespace augmentations;
 using namespace entity_system;
@@ -42,6 +51,17 @@ using namespace messages;
 
 int main() {
 	augmentations::init();
+	
+	lua_State* L = luaL_newstate();
+	luabind::open(L);
+	luabind::module(L)[
+		luabind::class_<world>("world")
+			.def(luabind::constructor<>())
+			.def("create_entity", &world::create_entity)
+			.def("delete_entity", &world::delete_entity),
+
+			luabind::class_<entity>("entity")
+	];
 
 	config::input_file cfg("window_config.txt");
 	 
@@ -237,6 +257,13 @@ int main() {
 
 	world my_world;
 
+	luabind::globals(L)["world"] = &my_world;
+
+	script my_script;
+	my_script.associate_filename("script.txt");
+	auto luaerrors = my_script.compile(L);
+	auto luaerrors_call = my_script.call(L);
+
 	input_system input(gl, quit_flag);
 	movement_system movement;
 	animation_system animations;
@@ -246,13 +273,13 @@ int main() {
 	gun_system guns(physics);
 	particle_group_system particles;
 	particle_emitter_system emitters;
-	particle_stream_system streams;
 	render_system render(gl);
 	camera_system camera(render);
 	chase_system chase;
 	damage_system damage;
-	health_system health;
+	health_system health(physics);
 	destroy_system destroy;
+	script_system scripts;
 
 	input_system::context main_context;
 	main_context.raw_id_to_intent[window::event::mouse::raw_motion] = intent_message::intent::AIM;
@@ -278,7 +305,6 @@ int main() {
 	my_world.add_system(&damage);
 	my_world.add_system(&health);
 	my_world.add_system(&emitters);
-	my_world.add_system(&streams);
 	my_world.add_system(&particles);
 	my_world.add_system(&chase);
 	my_world.add_system(&animations);
@@ -293,10 +319,41 @@ int main() {
 		PLAYERS,
 		BULLETS,
 		LEGS,
-		BLOOD,
-		PARTICLES,
+		ON_GROUND,
 		GROUND
 	};
+	
+	b2Filter filter_objects, filter_characters, filter_bullets, filter_corpses;
+	
+	{
+		enum {
+			CHARACTERS = 1 << 0,
+			OBJECTS = 1 << 1,
+			BULLETS = 1 << 2,
+			CORPSES = 1 << 3
+		};
+
+		filter_characters.categoryBits = CHARACTERS;
+		filter_characters.maskBits = OBJECTS | BULLETS | CHARACTERS;
+
+		filter_objects.categoryBits = OBJECTS;
+		filter_objects.maskBits = OBJECTS | BULLETS | CHARACTERS | CORPSES;
+
+		filter_bullets.categoryBits = BULLETS;
+		filter_bullets.maskBits = OBJECTS | CHARACTERS;
+
+		filter_corpses.categoryBits = CORPSES;
+		filter_corpses.maskBits = OBJECTS;
+	}
+
+	//if (luaL_dostring(L,
+	//	" local my_entity = world:create_entity() \n"
+	//	" local my_entity2 = world:create_entity() \n"
+	//	"world:delete_entity(world:create_entity(), my_entity2)\n"
+	//	)) {
+	//		std::ofstream logfilelua("luakurwa.txt");
+	//		logfilelua << lua_tostring(L, -1);
+	//}
 
 	entity& world_camera = my_world.create_entity();
 	entity& bg = my_world.create_entity();
@@ -306,17 +363,6 @@ int main() {
 	entity& ground = my_world.create_entity();
 	entity& crosshair = my_world.create_entity();
 
-	entity& particle_group_top = my_world.create_entity();
-	entity& particle_group_ground = my_world.create_entity();
-	particle_group_top.add(components::transform());
-	particle_group_top.add(components::particle_group());
-	particle_group_top.add(components::render(EFFECTS, new particles_renderable(&particle_group_top)));
-	particle_group_top.add(components::transform(vec2<>(0.f, 0.f)));
-	particle_group_ground.add(components::transform());
-	particle_group_ground.add(components::particle_group());
-	particle_group_ground.add(components::render(PARTICLES, new particles_renderable(&particle_group_ground)));
-	particle_group_ground.add(components::transform(vec2<>(0.f, 0.f)));
-
 	components::particle_group::particle templates[9], barrel_explosion_template, barrel_smoke_template, blood_shower_templates[5];
 
 	barrel_explosion_template.angular_damping = 0.f;
@@ -324,7 +370,6 @@ int main() {
 	barrel_explosion_template.should_disappear = true;
 	barrel_explosion_template.face = bullet_sprite;
 	barrel_explosion_template.face.size *= 4.f;
-	barrel_explosion_template.max_lifetime_ms = 40.f;
 	barrel_explosion_template.lifetime_ms = 0.f;
 
 	barrel_smoke_template.angular_damping = 0.f;
@@ -333,17 +378,16 @@ int main() {
 	barrel_smoke_template.face = smoke_sprite;
 	barrel_smoke_template.face.size /= 5.f;
 	barrel_smoke_template.face.color.a = 3;
-	barrel_smoke_template.max_lifetime_ms = 2000.f;
 	barrel_smoke_template.lifetime_ms = 0.f;
-	barrel_smoke_template.acc = vec2<>(0.f, -300.f);
+	barrel_smoke_template.acc.y = -300.f;
 
 	for (int i = 0; i < 5; ++i) {
-		blood_shower_templates[i].angular_damping = 2000.f;
-		blood_shower_templates[i].linear_damping = 7500.f;
+		blood_shower_templates[i].angular_damping = 1000.f;
+		blood_shower_templates[i].linear_damping = 80500.f;
 		blood_shower_templates[i].should_disappear = false;
 		blood_shower_templates[i].face = blood_sprites[i];
-		blood_shower_templates[i].face.color.a = 30;
-		blood_shower_templates[i].face.size *= vec2<>(1.2f, 0.9f);
+		blood_shower_templates[i].face.color.a = 255;
+		//blood_shower_templates[i].face.size *= vec2<>(1.2f, 0.9f);
 	}
 
 	/* big pieces */
@@ -373,42 +417,42 @@ int main() {
 	auto& shot_emissions = player_effects[messages::particle_burst_message::burst_type::WEAPON_SHOT];
 	auto& blood_emissions = player_effects[messages::particle_burst_message::burst_type::BULLET_IMPACT];
 	
-	components::particle_emitter::emission wood_parts_big, wood_parts_small, barrel_explosion, barrel_smoke[2], blood_shower, wood_dust;
+	components::particle_group::emission wood_parts_big, wood_parts_small, barrel_explosion, barrel_smoke[2], blood_shower, blood_pool, blood_droplets, wood_dust;
 
 	wood_parts_big.spread_radians = 45.f * 0.01745329251994329576923690768489f;
 	wood_parts_big.particles_per_burst_min = 1;
 	wood_parts_big.particles_per_burst_max = 1;
-	wood_parts_big.type = components::particle_emitter::emission::type::BURST;
+	wood_parts_big.type = components::particle_group::emission::type::BURST;
 	wood_parts_big.velocity_min = 2000.f;
 	wood_parts_big.velocity_max = 3000.f;
 	wood_parts_big.angular_velocity_min = 100.f * 0.01745329251994329576923690768489f;
-	wood_parts_big.angular_velocity_max = 720.f * 0.01745329251994329576923690768489f;
+	wood_parts_big.angular_velocity_max = 220.f * 0.01745329251994329576923690768489f;
 	wood_parts_big.particle_templates = std::vector<components::particle_group::particle>(templates + 0, templates + 4);
 	wood_parts_big.size_multiplier_min = 0.1f;
 	wood_parts_big.size_multiplier_max = 1.0f;
 	wood_parts_big.initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
 	wood_parts_big.angular_offset = 0.f;
-	wood_parts_big.target_particle_group = &particle_group_ground;
+	wood_parts_big.particle_group_layer = ON_GROUND;
 
 	wood_parts_small.spread_radians = 45.f * 0.01745329251994329576923690768489f;
 	wood_parts_small.particles_per_burst_min = 2;
 	wood_parts_small.particles_per_burst_max = 4;
-	wood_parts_small.type = components::particle_emitter::emission::type::BURST;
+	wood_parts_small.type = components::particle_group::emission::type::BURST;
 	wood_parts_small.velocity_min = 200.f;
 	wood_parts_small.velocity_max = 3000.f;
 	wood_parts_small.particle_templates = std::vector<components::particle_group::particle>(templates + 4, templates + 8);
 	wood_parts_small.size_multiplier_min = 0.1f;
 	wood_parts_small.size_multiplier_max = 1.0f;
 	wood_parts_small.angular_velocity_min = 100.f * 0.01745329251994329576923690768489f;
-	wood_parts_small.angular_velocity_max = 720.f * 0.01745329251994329576923690768489f;
+	wood_parts_small.angular_velocity_max = 220.f * 0.01745329251994329576923690768489f;
 	wood_parts_small.initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
 	wood_parts_small.angular_offset = 0.f;
-	wood_parts_small.target_particle_group = &particle_group_ground;
+	wood_parts_small.particle_group_layer = ON_GROUND;
 
 	wood_dust.spread_radians = 45.f * 0.01745329251994329576923690768489f;
 	wood_dust.particles_per_burst_min = 5;
 	wood_dust.particles_per_burst_max = 55;
-	wood_dust.type = components::particle_emitter::emission::type::BURST;
+	wood_dust.type = components::particle_group::emission::type::BURST;
 	wood_dust.velocity_min = 200.f;
 	wood_dust.velocity_max = 4000.f;
 	wood_dust.particle_templates.push_back(templates[8]);
@@ -416,23 +460,27 @@ int main() {
 	wood_dust.size_multiplier_max = 0.5f;
 	wood_dust.angular_velocity_min = 540.f * 0.01745329251994329576923690768489f;
 	wood_dust.angular_velocity_max = 1220.f * 0.01745329251994329576923690768489f;
+	wood_dust.particle_lifetime_ms_min = 0.f;
+	wood_dust.particle_lifetime_ms_max = 350.f;
 	wood_dust.initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
 	wood_dust.angular_offset = 0.f;
-	wood_dust.target_particle_group = &particle_group_ground;
+	wood_dust.particle_group_layer = ON_GROUND;
 
 	barrel_explosion.spread_radians = 15.5f * 0.01745329251994329576923690768489f;
 	barrel_explosion.particles_per_burst_min = 10;
 	barrel_explosion.particles_per_burst_max = 50;
-	barrel_explosion.type = components::particle_emitter::emission::type::BURST;
+	barrel_explosion.type = components::particle_group::emission::type::BURST;
 	barrel_explosion.velocity_min = 1000.f;
 	barrel_explosion.velocity_max = 10000.f;
 	barrel_explosion.angular_velocity_min = 0.f;
 	barrel_explosion.angular_velocity_max = 0.f;
+	barrel_explosion.particle_lifetime_ms_min = 20.f;
+	barrel_explosion.particle_lifetime_ms_max = 40.f;
 	barrel_explosion.particle_templates.push_back(barrel_explosion_template);
 	barrel_explosion.size_multiplier_min = 0.8f;
 	barrel_explosion.size_multiplier_max = 1.2f;
 	barrel_explosion.initial_rotation_variation = 0.f;
-	barrel_explosion.target_particle_group = &particle_group_top;
+	barrel_explosion.particle_group_layer = EFFECTS;
 	barrel_explosion.angular_offset = 0.f;
 
 	barrel_smoke[0].spread_radians = 25.5f * 0.01745329251994329576923690768489f;
@@ -440,57 +488,103 @@ int main() {
 	barrel_smoke[0].particles_per_sec_max = 90.f;
 	barrel_smoke[0].stream_duration_ms_min = 100.f;
 	barrel_smoke[0].stream_duration_ms_max = 600.f;
-	barrel_smoke[0].type = components::particle_emitter::emission::type::STREAM;
+	barrel_smoke[0].type = components::particle_group::emission::type::STREAM;
 	barrel_smoke[0].velocity_min = 50.f;
 	barrel_smoke[0].velocity_max = 100.f;
 	barrel_smoke[0].angular_velocity_min = 0.f;
-	barrel_smoke[0].angular_velocity_max = 360.f * 0.01745329251994329576923690768489f;
+	barrel_smoke[0].angular_velocity_max = 0.f * 0.01745329251994329576923690768489f;
+	barrel_smoke[0].particle_lifetime_ms_min = 10.f;
+	barrel_smoke[0].particle_lifetime_ms_max = 3000.f;
 	barrel_smoke[0].particle_templates.push_back(barrel_smoke_template);
 	barrel_smoke[0].size_multiplier_min = 0.7f;
 	barrel_smoke[0].size_multiplier_max = 5.5f;
 	barrel_smoke[0].initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
-	barrel_smoke[0].target_particle_group = &particle_group_top;
+	barrel_smoke[0].particle_group_layer = EFFECTS;
 	barrel_smoke[0].angular_offset = 0.f;
-	barrel_smoke[0].randomize_acceleration = true;
-	barrel_smoke[0].acc_min = 100.f;
-	barrel_smoke[0].acc_max = 200.f;
+	barrel_smoke[0].randomize_acceleration = false;
 
 	barrel_smoke[1].spread_radians = 14.5f * 0.01745329251994329576923690768489f;
-	barrel_smoke[1].particles_per_sec_min = 40.f;
+	barrel_smoke[1].particles_per_sec_min = 50.f;
 	barrel_smoke[1].particles_per_sec_max = 90.f;
 	barrel_smoke[1].stream_duration_ms_min = 100.f;
 	barrel_smoke[1].stream_duration_ms_max = 6000.f;
-	barrel_smoke[1].type = components::particle_emitter::emission::type::STREAM;
+	barrel_smoke[1].type = components::particle_group::emission::type::STREAM;
 	barrel_smoke[1].velocity_min = 100.f;
 	barrel_smoke[1].velocity_max = 200.f;
+	barrel_smoke[1].particle_lifetime_ms_min = 10.f;
+	barrel_smoke[1].particle_lifetime_ms_max = 3000.f;
 	barrel_smoke[1].angular_velocity_min = 0.f;
-	barrel_smoke[1].angular_velocity_max = 360.f * 0.01745329251994329576923690768489f;
+	barrel_smoke[1].angular_velocity_max = 0.f * 0.01745329251994329576923690768489f;
 	barrel_smoke[1].particle_templates.push_back(barrel_smoke_template);
-	barrel_smoke[1].size_multiplier_min = 0.7f;
+	barrel_smoke[1].size_multiplier_min = 1.0f;
 	barrel_smoke[1].size_multiplier_max = 1.3f;
 	barrel_smoke[1].initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
-	barrel_smoke[1].target_particle_group = &particle_group_top;
+	barrel_smoke[1].particle_group_layer = EFFECTS;
 	barrel_smoke[1].angular_offset = 0.f;
-	barrel_smoke[1].randomize_acceleration = true;
-	barrel_smoke[1].acc_min = 40.f;
-	barrel_smoke[1].acc_max = 400.f;
+	barrel_smoke[1].randomize_acceleration = false;
 
-	blood_shower.spread_radians = 45.5f * 0.01745329251994329576923690768489f;
-	blood_shower.particles_per_sec_min = 10.f;
-	blood_shower.particles_per_sec_max = 20.f;
-	blood_shower.stream_duration_ms_min = 100.f;
-	blood_shower.stream_duration_ms_max = 1000.f;
-	blood_shower.type = components::particle_emitter::emission::type::STREAM;
-	blood_shower.velocity_min = 50.f;
-	blood_shower.velocity_max = 1500.f;
+	blood_shower.spread_radians = 120.5f * 0.01745329251994329576923690768489f;
+	//blood_shower.particles_per_sec_min = 10.f;
+	//blood_shower.particles_per_sec_max = 200.f;
+	blood_shower.particles_per_burst_min = 10;
+	blood_shower.particles_per_burst_max = 20;
+	//blood_shower.stream_duration_ms_min = 100.f;
+	//blood_shower.stream_duration_ms_max = 1000.f;
+	blood_shower.type = components::particle_group::emission::type::BURST;
+	blood_shower.velocity_min = 1.f;
+	blood_shower.velocity_max = 4000.f;
 	blood_shower.angular_velocity_min = 0.f;
-	blood_shower.angular_velocity_max = 0.f;
+	blood_shower.angular_velocity_max = 1500.f * 0.01745329251994329576923690768489f;
 	blood_shower.particle_templates = std::vector<components::particle_group::particle>(blood_shower_templates, blood_shower_templates + 5);
-	blood_shower.size_multiplier_min = 2.0f;
-	blood_shower.size_multiplier_max = 4.0f;
-	blood_shower.initial_rotation_variation = 1.f * 0.01745329251994329576923690768489f;
-	blood_shower.target_particle_group = &particle_group_ground;
+	blood_shower.size_multiplier_min = 0.2f;
+	blood_shower.size_multiplier_max = 0.35f;
+	blood_shower.initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
+	blood_shower.particle_group_layer = ON_GROUND;
 	blood_shower.angular_offset = 0.f;
+
+	blood_droplets.spread_radians = 90.5f * 0.01745329251994329576923690768489f;
+	blood_droplets.particles_per_burst_min = 10;
+	blood_droplets.particles_per_burst_max = 500;
+	blood_droplets.type = components::particle_group::emission::type::BURST;
+	blood_droplets.velocity_min = 1.f;
+	blood_droplets.velocity_max = 5000.f;
+	blood_droplets.angular_velocity_min = 0.f;
+	blood_droplets.angular_velocity_max = 1500.f * 0.01745329251994329576923690768489f;
+	blood_droplets.particle_templates = std::vector<components::particle_group::particle>(blood_shower_templates, blood_shower_templates + 5);
+
+	for (auto& it : blood_droplets.particle_templates) {
+		it.should_disappear = true;
+	}
+
+	blood_droplets.size_multiplier_min = 0.2f;
+	blood_droplets.size_multiplier_max = 0.35f;
+	blood_droplets.initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
+	blood_droplets.particle_group_layer = ON_GROUND;
+	blood_droplets.angular_offset = 0.f;
+	blood_droplets.particle_lifetime_ms_min = 200.f;
+	blood_droplets.particle_lifetime_ms_max = 500.f;
+
+	blood_pool.spread_radians = 180.5f * 0.01745329251994329576923690768489f;
+	blood_pool.particles_per_sec_min = 20.f;
+	blood_pool.particles_per_sec_max = 100.f;
+	blood_pool.stream_duration_ms_min = 300.f;
+	blood_pool.stream_duration_ms_max = 1000.f;
+	blood_pool.type = components::particle_group::emission::type::STREAM;
+	blood_pool.velocity_min = 1.f;
+	blood_pool.velocity_max = 6.f;
+	blood_pool.angular_velocity_min = 0.f;
+	blood_pool.angular_velocity_max = 10.f * 0.01745329251994329576923690768489f;
+	blood_pool.particle_templates = std::vector<components::particle_group::particle>(blood_shower_templates, blood_shower_templates + 5);
+	
+	for (auto& it : blood_pool.particle_templates) {
+		it.linear_damping = 2.f;
+	}
+	
+	blood_pool.size_multiplier_min = 0.3f;
+	blood_pool.size_multiplier_max = 1.0f;
+	blood_pool.initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
+	blood_pool.particle_group_layer = ON_GROUND;
+	blood_pool.angular_offset = 0.f;
 
 	wood_emissions.push_back(wood_parts_big);
 	wood_emissions.push_back(wood_parts_small);
@@ -501,6 +595,8 @@ int main() {
 	shot_emissions.push_back(barrel_smoke[0]);
 	shot_emissions.push_back(barrel_smoke[1]);
 	blood_emissions.push_back(blood_shower);
+	blood_emissions.push_back(blood_pool);
+	blood_emissions.push_back(blood_droplets);
 
 	bg.add(components::render(GROUND, &bg_sprite));
 	bg.add(components::transform());
@@ -534,16 +630,16 @@ int main() {
 	assault_rifle.bullet_max_damage = 100.f;
 	assault_rifle.bullet_distance_offset = 120.f;
 	assault_rifle.bullet_min_damage = 80.f;
-	assault_rifle.bullet_speed = 6000.f;
+	assault_rifle.bullet_speed = 10000.f;
 	assault_rifle.bullet_sprite = &bullet_sprite;
 	assault_rifle.is_automatic = true;
 	assault_rifle.max_rounds = 30;
 	assault_rifle.shooting_interval_ms = 70.f;
 	assault_rifle.spread_radians = 1.f * 0.01745329251994329576923690768489f;
 	assault_rifle.velocity_variation = 1500.f;
-	assault_rifle.shake_radius = 0.5f;
+	assault_rifle.shake_radius = 4.5f;
 	assault_rifle.shake_spread_radians = 45.f * 0.01745329251994329576923690768489f;
-	assault_rifle.box2d_bullet_group_index = -1;
+	assault_rifle.bullet_collision_filter = filter_bullets;
 	assault_rifle.bullet_layer = BULLETS;
 	assault_rifle.max_bullet_distance = 5000.f;
 
@@ -560,15 +656,16 @@ int main() {
 	double_barrel.velocity_variation = 1500.f;
 	double_barrel.shake_radius = 0.5f;
 	double_barrel.shake_spread_radians = 45.f * 0.01745329251994329576923690768489f;
-	double_barrel.box2d_bullet_group_index = -1;
+	double_barrel.bullet_collision_filter = filter_bullets;
 	double_barrel.bullet_layer = BULLETS;
 	double_barrel.max_bullet_distance = 5000.f;
 
 	components::health::health_info npc_health_info;
 	npc_health_info.dead_lifetime_ms = 1000.f;
 	npc_health_info.should_disappear = true;
-	npc_health_info.death_sprite = dead_front_sprite;
+	npc_health_info.death_render = components::render(ON_GROUND, &dead_front_sprite);
 	npc_health_info.max_hp = 100.f;
+	npc_health_info.corpse_collision_filter = filter_corpses;
 
 	auto spawn_npc = [&](components::animate& animate_component){
 		entity& physical = my_world.create_entity();
@@ -583,18 +680,18 @@ int main() {
 		physical.add(components::particle_emitter(&player_effects));
 		physical.add(animate_component);
 		physical.add(player_movement);
-		physical.add(components::health(&npc_health_info, 100.f));
+		physical.add(components::health(&npc_health_info, 500.f));
 		
 		components::children player_children;
 		player_children.children_entities.push_back(&legs);
 		physical.add(player_children);
 
-		components::gun my_gun(&double_barrel);
+		components::gun my_gun(&assault_rifle);
 		my_gun.current_rounds = 1000;
 
 		physical.add(my_gun);
 
-		topdown::create_physics_component(physical, physics.b2world, b2_dynamicBody);
+		topdown::create_physics_component(physical, physics.b2world, filter_characters, b2_dynamicBody);
 		physical.get<components::physics>().body->SetLinearDamping(13.0f);
 		physical.get<components::physics>().body->SetAngularDamping(5.0f);
 		physical.get<components::physics>().body->SetFixedRotation(true);
@@ -634,20 +731,20 @@ int main() {
 	rect.add(components::render(OBJECTS, &my_sprite));
 	rect.add(components::transform(vec2<>(500.f, -50.f)));
 	rect.add(components::particle_emitter(&wood_effects));
-	topdown::create_physics_component(rect, physics.b2world);
+	topdown::create_physics_component(rect, physics.b2world, filter_objects);
 	rect1.add(components::render(OBJECTS, &my_sprite));
 	rect1.add(components::transform(vec2<>(470.f, 50.f)));
 	rect1.add(components::particle_emitter(&wood_effects));
-	topdown::create_physics_component(rect1, physics.b2world);
+	topdown::create_physics_component(rect1, physics.b2world, filter_objects);
 	rect2.add(components::render(OBJECTS, &small_sprite));
 	rect2.add(components::particle_emitter(&wood_effects));
 	rect2.add(components::transform(vec2<>(400.f, 0.f), 45.f * 0.01745329251994329576923690768489f));
-	topdown::create_physics_component(rect2, physics.b2world);
+	topdown::create_physics_component(rect2, physics.b2world, filter_objects);
 
 	ground.add(components::render(OBJECTS, &bigger_sprite));
 	ground.add(components::transform(vec2<>(400.f, 400.f), 75.f * 0.01745329251994329576923690768489f));
 	ground.add(components::particle_emitter(&wood_effects));
-	topdown::create_physics_component(ground, physics.b2world, b2_dynamicBody);
+	topdown::create_physics_component(ground, physics.b2world, filter_objects, b2_dynamicBody);
     ground.get<components::physics>().body->GetFixtureList()->SetFriction(0.0f);
 
 	rect.get<components::physics>().body->SetLinearDamping(5.f);

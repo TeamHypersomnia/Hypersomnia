@@ -50,7 +50,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PreprocessorDefinitions>_MBCS;_CRT_SECURE_NO_WARNINGS%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_MBCS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -64,6 +64,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -73,6 +75,58 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="3rdparty\lua\lapi.c" />
+    <ClCompile Include="3rdparty\lua\lauxlib.c" />
+    <ClCompile Include="3rdparty\lua\lbaselib.c" />
+    <ClCompile Include="3rdparty\lua\lbitlib.c" />
+    <ClCompile Include="3rdparty\lua\lcode.c" />
+    <ClCompile Include="3rdparty\lua\lcorolib.c" />
+    <ClCompile Include="3rdparty\lua\lctype.c" />
+    <ClCompile Include="3rdparty\lua\ldblib.c" />
+    <ClCompile Include="3rdparty\lua\ldebug.c" />
+    <ClCompile Include="3rdparty\lua\ldo.c" />
+    <ClCompile Include="3rdparty\lua\ldump.c" />
+    <ClCompile Include="3rdparty\lua\lfunc.c" />
+    <ClCompile Include="3rdparty\lua\lgc.c" />
+    <ClCompile Include="3rdparty\lua\linit.c" />
+    <ClCompile Include="3rdparty\lua\liolib.c" />
+    <ClCompile Include="3rdparty\lua\llex.c" />
+    <ClCompile Include="3rdparty\lua\lmathlib.c" />
+    <ClCompile Include="3rdparty\lua\lmem.c" />
+    <ClCompile Include="3rdparty\lua\loadlib.c" />
+    <ClCompile Include="3rdparty\lua\lobject.c" />
+    <ClCompile Include="3rdparty\lua\lopcodes.c" />
+    <ClCompile Include="3rdparty\lua\loslib.c" />
+    <ClCompile Include="3rdparty\lua\lparser.c" />
+    <ClCompile Include="3rdparty\lua\lstate.c" />
+    <ClCompile Include="3rdparty\lua\lstring.c" />
+    <ClCompile Include="3rdparty\lua\lstrlib.c" />
+    <ClCompile Include="3rdparty\lua\ltable.c" />
+    <ClCompile Include="3rdparty\lua\ltablib.c" />
+    <ClCompile Include="3rdparty\lua\ltm.c" />
+    <ClCompile Include="3rdparty\lua\lundump.c" />
+    <ClCompile Include="3rdparty\lua\lvm.c" />
+    <ClCompile Include="3rdparty\lua\lzio.c" />
+    <ClCompile Include="3rdparty\src\class.cpp" />
+    <ClCompile Include="3rdparty\src\class_info.cpp" />
+    <ClCompile Include="3rdparty\src\class_registry.cpp" />
+    <ClCompile Include="3rdparty\src\class_rep.cpp" />
+    <ClCompile Include="3rdparty\src\create_class.cpp" />
+    <ClCompile Include="3rdparty\src\error_luabind.cpp" />
+    <ClCompile Include="3rdparty\src\exception_handler.cpp" />
+    <ClCompile Include="3rdparty\src\function.cpp" />
+    <ClCompile Include="3rdparty\src\function_introspection.cpp" />
+    <ClCompile Include="3rdparty\src\inheritance.cpp" />
+    <ClCompile Include="3rdparty\src\link_compatibility.cpp" />
+    <ClCompile Include="3rdparty\src\object_rep.cpp" />
+    <ClCompile Include="3rdparty\src\open.cpp" />
+    <ClCompile Include="3rdparty\src\operator.cpp" />
+    <ClCompile Include="3rdparty\src\pcall.cpp" />
+    <ClCompile Include="3rdparty\src\scope.cpp" />
+    <ClCompile Include="3rdparty\src\set_package_preload.cpp" />
+    <ClCompile Include="3rdparty\src\stack_content_by_name.cpp" />
+    <ClCompile Include="3rdparty\src\weak_ref.cpp" />
+    <ClCompile Include="3rdparty\src\wrapper_base.cpp" />
     <ClCompile Include="augmentations.cpp" />
     <ClCompile Include="3rdparty\Box2D\Collision\b2BroadPhase.cpp" />
     <ClCompile Include="3rdparty\Box2D\Collision\b2CollideCircle.cpp" />
@@ -136,6 +190,7 @@
     <ClCompile Include="SDK\topdown\game\body_helper.cpp" />
     <ClCompile Include="SDK\topdown\main.cpp" />
     <ClCompile Include="SDK\topdown\renderable.cpp" />
+    <ClCompile Include="SDK\topdown\script.cpp" />
     <ClCompile Include="SDK\topdown\systems\animation_system.cpp" />
     <ClCompile Include="SDK\topdown\systems\camera_system.cpp" />
     <ClCompile Include="SDK\topdown\systems\chase_system.cpp" />
@@ -149,9 +204,9 @@
     <ClCompile Include="SDK\topdown\systems\movement_system.cpp" />
     <ClCompile Include="SDK\topdown\systems\particle_emitter_system.cpp" />
     <ClCompile Include="SDK\topdown\systems\particle_group_system.cpp" />
-    <ClCompile Include="SDK\topdown\systems\particle_stream_system.cpp" />
     <ClCompile Include="SDK\topdown\systems\physics_system.cpp" />
     <ClCompile Include="SDK\topdown\systems\render_system.cpp" />
+    <ClCompile Include="SDK\topdown\systems\script_system.cpp" />
     <ClCompile Include="texture_baker\font.cpp" />
     <ClCompile Include="texture_baker\image.cpp" />
     <ClCompile Include="texture_baker\rectpack.cpp" />
@@ -164,6 +219,113 @@
     <ClCompile Include="window_framework\window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="3rdparty\luabind\adopt_policy.hpp" />
+    <ClInclude Include="3rdparty\luabind\back_reference.hpp" />
+    <ClInclude Include="3rdparty\luabind\back_reference_fwd.hpp" />
+    <ClInclude Include="3rdparty\luabind\class.hpp" />
+    <ClInclude Include="3rdparty\luabind\class_info.hpp" />
+    <ClInclude Include="3rdparty\luabind\config.hpp" />
+    <ClInclude Include="3rdparty\luabind\container_policy.hpp" />
+    <ClInclude Include="3rdparty\luabind\copy_policy.hpp" />
+    <ClInclude Include="3rdparty\luabind\dependency_policy.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\call.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\call_function.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\call_member.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\call_operator_iterate.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\class_registry.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\class_rep.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\constructor.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\conversion_storage.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\convert_to_lua.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\debug.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\decorate_type.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\deduce_signature.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\enum_maker.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\format_signature.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\garbage_collector.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\has_get_pointer.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\inheritance.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\instance_holder.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\link_compatibility.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\make_instance.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\most_derived.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\object.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\object_call.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\object_rep.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\open.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\operator_id.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\other.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\pcall.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\pointee_sizeof.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\pointee_typeid.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\policy.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\primitives.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\property.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\ref.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\signature_match.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\stack_utils.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\typetraits.hpp" />
+    <ClInclude Include="3rdparty\luabind\detail\yes_no.hpp" />
+    <ClInclude Include="3rdparty\luabind\discard_result_policy.hpp" />
+    <ClInclude Include="3rdparty\luabind\error.hpp" />
+    <ClInclude Include="3rdparty\luabind\error_callback_fun.hpp" />
+    <ClInclude Include="3rdparty\luabind\exception_handler.hpp" />
+    <ClInclude Include="3rdparty\luabind\from_stack.hpp" />
+    <ClInclude Include="3rdparty\luabind\function.hpp" />
+    <ClInclude Include="3rdparty\luabind\function_introspection.hpp" />
+    <ClInclude Include="3rdparty\luabind\get_main_thread.hpp" />
+    <ClInclude Include="3rdparty\luabind\get_pointer.hpp" />
+    <ClInclude Include="3rdparty\luabind\handle.hpp" />
+    <ClInclude Include="3rdparty\luabind\iterator_policy.hpp" />
+    <ClInclude Include="3rdparty\luabind\luabind.hpp" />
+    <ClInclude Include="3rdparty\luabind\lua_include.hpp" />
+    <ClInclude Include="3rdparty\luabind\lua_state_fwd.hpp" />
+    <ClInclude Include="3rdparty\luabind\make_function.hpp" />
+    <ClInclude Include="3rdparty\luabind\nil.hpp" />
+    <ClInclude Include="3rdparty\luabind\no_dependency.hpp" />
+    <ClInclude Include="3rdparty\luabind\object.hpp" />
+    <ClInclude Include="3rdparty\luabind\open.hpp" />
+    <ClInclude Include="3rdparty\luabind\operator.hpp" />
+    <ClInclude Include="3rdparty\luabind\out_value_policy.hpp" />
+    <ClInclude Include="3rdparty\luabind\prefix.hpp" />
+    <ClInclude Include="3rdparty\luabind\raw_policy.hpp" />
+    <ClInclude Include="3rdparty\luabind\return_reference_to_policy.hpp" />
+    <ClInclude Include="3rdparty\luabind\scope.hpp" />
+    <ClInclude Include="3rdparty\luabind\set_package_preload.hpp" />
+    <ClInclude Include="3rdparty\luabind\shared_ptr_converter.hpp" />
+    <ClInclude Include="3rdparty\luabind\std_shared_ptr_converter.hpp" />
+    <ClInclude Include="3rdparty\luabind\tag_function.hpp" />
+    <ClInclude Include="3rdparty\luabind\typeid.hpp" />
+    <ClInclude Include="3rdparty\luabind\value_wrapper.hpp" />
+    <ClInclude Include="3rdparty\luabind\version.hpp" />
+    <ClInclude Include="3rdparty\luabind\weak_ref.hpp" />
+    <ClInclude Include="3rdparty\luabind\wrapper_base.hpp" />
+    <ClInclude Include="3rdparty\luabind\yield_policy.hpp" />
+    <ClInclude Include="3rdparty\lua\lapi.h" />
+    <ClInclude Include="3rdparty\lua\lauxlib.h" />
+    <ClInclude Include="3rdparty\lua\lcode.h" />
+    <ClInclude Include="3rdparty\lua\lctype.h" />
+    <ClInclude Include="3rdparty\lua\ldebug.h" />
+    <ClInclude Include="3rdparty\lua\ldo.h" />
+    <ClInclude Include="3rdparty\lua\lfunc.h" />
+    <ClInclude Include="3rdparty\lua\lgc.h" />
+    <ClInclude Include="3rdparty\lua\llex.h" />
+    <ClInclude Include="3rdparty\lua\llimits.h" />
+    <ClInclude Include="3rdparty\lua\lmem.h" />
+    <ClInclude Include="3rdparty\lua\lobject.h" />
+    <ClInclude Include="3rdparty\lua\lopcodes.h" />
+    <ClInclude Include="3rdparty\lua\lparser.h" />
+    <ClInclude Include="3rdparty\lua\lstate.h" />
+    <ClInclude Include="3rdparty\lua\lstring.h" />
+    <ClInclude Include="3rdparty\lua\ltable.h" />
+    <ClInclude Include="3rdparty\lua\ltm.h" />
+    <ClInclude Include="3rdparty\lua\lua.h" />
+    <ClInclude Include="3rdparty\lua\lua.hpp" />
+    <ClInclude Include="3rdparty\lua\luaconf.h" />
+    <ClInclude Include="3rdparty\lua\lualib.h" />
+    <ClInclude Include="3rdparty\lua\lundump.h" />
+    <ClInclude Include="3rdparty\lua\lvm.h" />
+    <ClInclude Include="3rdparty\lua\lzio.h" />
     <ClInclude Include="augmentations.h" />
     <ClInclude Include="3rdparty\Box2D\Box2D.h" />
     <ClInclude Include="3rdparty\Box2D\Collision\b2BroadPhase.h" />
@@ -239,9 +401,9 @@
     <ClInclude Include="SDK\topdown\components\particle_emitter_component.h" />
     <ClInclude Include="SDK\topdown\components\movement_component.h" />
     <ClInclude Include="SDK\topdown\components\particle_group_component.h" />
-    <ClInclude Include="SDK\topdown\components\particle_stream_component.h" />
     <ClInclude Include="SDK\topdown\components\physics_component.h" />
     <ClInclude Include="SDK\topdown\components\render_component.h" />
+    <ClInclude Include="SDK\topdown\components\scriptable_component.h" />
     <ClInclude Include="SDK\topdown\components\transform_component.h" />
     <ClInclude Include="SDK\topdown\components\gun_component.h" />
     <ClInclude Include="SDK\topdown\game\body_helper.h" />
@@ -254,6 +416,7 @@
     <ClInclude Include="SDK\topdown\messages\moved_message.h" />
     <ClInclude Include="SDK\topdown\messages\particle_burst_message.h" />
     <ClInclude Include="SDK\topdown\renderable.h" />
+    <ClInclude Include="SDK\topdown\script.h" />
     <ClInclude Include="SDK\topdown\systems\animation_system.h" />
     <ClInclude Include="SDK\topdown\systems\camera_system.h" />
     <ClInclude Include="SDK\topdown\systems\chase_system.h" />
@@ -267,9 +430,9 @@
     <ClInclude Include="SDK\topdown\systems\movement_system.h" />
     <ClInclude Include="SDK\topdown\systems\particle_emitter_system.h" />
     <ClInclude Include="SDK\topdown\systems\particle_group_system.h" />
-    <ClInclude Include="SDK\topdown\systems\particle_stream_system.h" />
     <ClInclude Include="SDK\topdown\systems\physics_system.h" />
     <ClInclude Include="SDK\topdown\systems\render_system.h" />
+    <ClInclude Include="SDK\topdown\systems\script_system.h" />
     <ClInclude Include="SDK\topdown\vertex.h" />
     <ClInclude Include="texture_baker\font.h" />
     <ClInclude Include="texture_baker\image.h" />

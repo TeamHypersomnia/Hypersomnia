@@ -7,4 +7,3 @@ int bpp 24
 int resolution_w 800
 int resolution_h 800
 int doublebuffer 1
-  
