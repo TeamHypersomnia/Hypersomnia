@@ -20,18 +20,20 @@ namespace augmentations {
 			
 			/* iterate through systems and remove references to this entity */
 			signature_matcher_bitset my_signature(get_components());
-			for(auto sys = owner_world.systems.begin(); sys != owner_world.systems.end(); ++sys) {
+			for(auto sys : owner_world.systems) {
 				/* if the system potentially owns this entity */
-				if((*sys)->components_signature.matches(my_signature))
-					(*sys)->remove(this);
+				if(sys->components_signature.matches(my_signature))
+					sys->remove(this);
 			}
 
-			for(auto type = type_to_component.begin(); type != type_to_component.end(); ++type) {
+			for(auto type : type_to_component) {
 				/* call polymorphic destructor */
-				((*type).second)->~component();
+				type.second->~component();
 				/* delete component from corresponding pool, we must get component's size from the library */
-				owner_world.get_container_for_type((*type).first).free((*type).second);
+				owner_world.get_container_for_type(type.first).free(type.second);
 			}
+
+			type_to_component.clear();
 		}
 	}
 }

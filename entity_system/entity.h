@@ -16,7 +16,7 @@ namespace augmentations {
 			friend class boost::object_pool<entity>;
 			friend class type_registry;
 			friend class entity_ptr;
-			
+
 			entity(world& owner_world);
 			~entity();
 
@@ -27,7 +27,7 @@ namespace augmentations {
 		public:
 			/* get information about component types */
 			std::vector<registered_type> get_components() const;
-			
+
 			/* removes all components */
 			void clear();
 
@@ -40,7 +40,7 @@ namespace augmentations {
 			template <typename component_class>
 			component_class* find() {
 				auto it = type_to_component.find(typeid(component_class).hash_code());
-				if (it != type_to_component.end()) 
+				if (it != type_to_component.end())
 					return static_cast<component_class*>((*it).second);
 				return nullptr;
 			}
@@ -53,8 +53,9 @@ namespace augmentations {
 				auto p = type_to_component.emplace(typeid(component_type).hash_code(), nullptr);
 
 				/* component already exists, overwrite and return */
-				if(!p.second) {
-					if(overwrite_if_exists) 
+				if (!p.second) {
+					assert(0 && "component already exists!");
+					if (overwrite_if_exists)
 						(*static_cast<component_type*>((*p.first).second)) = object;
 					return;
 				}
@@ -69,11 +70,11 @@ namespace augmentations {
 				/* will trigger an exception on debug if the component type was not registered within any existing system */
 				new_signature.add(owner_world.component_library.get_registered_type(typeid(component_type).hash_code()));
 
-				for(auto sys = owner_world.systems.begin(); sys != owner_world.systems.end(); ++sys)
+				for (auto sys : owner_world.systems)
 					/* if a processing_system matches with the new signature and not with the old one */
-						if((*sys)->components_signature.matches(new_signature) && !(*sys)->components_signature.matches(old_signature)) 
-							/* we should add this entity there */
-								(*sys)->add(this);
+					if (sys->components_signature.matches(new_signature) && !sys->components_signature.matches(old_signature))
+						/* we should add this entity there */
+						sys->add(this);
 			}
 
 			template <typename component_type>
@@ -88,14 +89,14 @@ namespace augmentations {
 				signature_matcher_bitset new_signature(old_signature);
 				new_signature.remove(owner_world.component_library.get_registered_type(typeid(component_type).hash_code()));
 
-				for (auto sys = owner_world.systems.begin(); sys != owner_world.systems.end(); ++sys)
+				for (auto sys : owner_world.systems)
 					/* if a processing_system does not match with the new signature and does with the old one */
-					if (!(*sys)->components_signature.matches(new_signature) && (*sys)->components_signature.matches(old_signature))
+					if (!sys->components_signature.matches(new_signature) && sys->components_signature.matches(old_signature))
 						/* we should remove this entity from there */
-						(*sys)->remove(this);
+						sys->remove(this);
 
 				/* delete component from corresponding pool, first cast to component_type to avoid polymorphic indirection */
-				(static_cast<component_type*>((*it).second))->~component_type();
+				static_cast<component_type*>((*it).second)->~component_type();
 				owner_world.get_container_for_type(typeid(component_type).hash_code()).free((*it).second);
 
 				/* delete component from entity's map */
