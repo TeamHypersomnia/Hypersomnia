@@ -13,10 +13,15 @@ void lookat_system::process_entities(world& owner) {
 
 		auto& transform = it->get<components::transform>();
 		if (lookat.type == components::lookat::chase_type::POSITION) {
-			transform.current.rotation = (lookat.target->get<components::transform>().current.pos - transform.current.pos).get_radians();
+			auto target_transform = lookat.target->find<components::transform>();
+			if (target_transform != nullptr)
+				transform.current.rotation = (target_transform->current.pos - transform.current.pos).get_radians();
 		}
 		else if (lookat.type == components::lookat::chase_type::VELOCITY) {
-			transform.current.rotation = vec2<>(lookat.target->get<components::physics>().body->GetLinearVelocity()).get_radians();
+			auto target_physics = lookat.target->find<components::physics>();
+			
+			if (target_physics != nullptr)
+				transform.current.rotation = vec2<>(target_physics->body->GetLinearVelocity()).get_radians();
 		}
 	}
 }

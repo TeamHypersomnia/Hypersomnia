@@ -9,8 +9,9 @@ void animation_system::process_entities(world& owner) {
 	auto events = owner.get_message_queue<animate_message>();
 
 	for (auto it : events) {
-		auto& animate = it.subject->get<components::animate>();
-		
+		auto ptr = it.subject->find<components::animate>();
+		if (!ptr) continue; auto& animate = *ptr;
+
 		if (it.animation_priority >= animate.current_priority || animate.current_state == components::animate::state::PAUSED) {
 			animate.current_priority = it.animation_priority;
 
