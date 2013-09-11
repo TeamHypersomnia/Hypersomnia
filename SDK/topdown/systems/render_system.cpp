@@ -49,19 +49,13 @@ void render_system::draw(rects::xywh visible_area, components::transform camera_
 	}
 
 	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
-	std::sort(visible_targets.begin(), visible_targets.end(), [](const cached_pair& a, const cached_pair& b) {
+	std::stable_sort(visible_targets.begin(), visible_targets.end(), [](const cached_pair& a, const cached_pair& b) {
 		return a.first->layer > b.first->layer;
 	});
 
 	for (auto e = visible_targets.begin(); e != visible_targets.end(); ++e) {
 		if ((*e).first->instance == nullptr) continue;
-
-		components::transform drawing_transform = *(*e).second;
-		
-		/* translate to camera position */
-		drawing_transform.current.pos -= camera_transform.current.pos;
-
-		(*e).first->instance->draw(triangles, drawing_transform);
+		(*e).first->instance->draw(triangles, *(*e).second, camera_transform.current.pos);
 	}
 }
 

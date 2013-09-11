@@ -30,9 +30,9 @@ void renderable::make_rect(vec2<> pos, vec2<> size, float angle, vec2<> v[4]) {
 	v[3] -= size / 2.f;
 }
 
-void sprite::draw(buffer& triangles, const components::transform& transform) {
+void sprite::draw(buffer& triangles, const components::transform& transform, vec2<> camera_pos) {
 	vec2<> v[4];
-	make_rect(transform.current.pos, vec2<>(size), transform.current.rotation, v);
+	make_rect(transform.current.pos - camera_pos, vec2<>(size), transform.current.rotation, v);
 
 	triangle t1, t2;
 	t1.vertices[0].color = t2.vertices[0].color = color;
@@ -113,32 +113,29 @@ bool sprite::is_visible(rects::xywh visibility_aabb, const components::transform
 	return rects::ltrb(lower.x, lower.y, upper.x, upper.y).hover(visibility_aabb);
 }
 
-void polygon::draw(buffer& triangles, const components::transform& transform) {
+void polygon::draw(buffer& triangles, const components::transform& transform, vec2<> camera_pos) {
 	/* perform triangulation */
 }
 
-particles_renderable::particles_renderable(augmentations::entity_system::entity* particles) : particles(particles) {}
+namespace components {
+	void particle_group::draw(buffer& triangles, const components::transform& transform, vec2<> camera_pos) {
+		for (auto& it : particles) {
+			auto temp_alpha = it.face.color.a;
 
-void particles_renderable::draw(buffer& triangles, const components::transform& transform) {
-	auto& p = particles->get<components::particle_group>();
+			 if (it.should_disappear)
+				it.face.color.a = ((it.max_lifetime_ms - it.lifetime_ms) / it.max_lifetime_ms) * temp_alpha;
 
-	for (auto& it : p.particles) {
-		auto temp_alpha = it.face.color.a;
-		
-		if(it.should_disappear) 
-			it.face.color.a = ((it.max_lifetime_ms - it.lifetime_ms) / it.max_lifetime_ms) * temp_alpha;
-		
-		it.face.draw(triangles, components::transform(	transform.current.pos + it.pos, 
-														transform.current.rotation + it.rotation));
-		it.face.color.a = temp_alpha;
+			it.face.draw(triangles, components::transform(it.pos, it.rotation), camera_pos);
+			it.face.color.a = temp_alpha;
+		}
 	}
-}
 
-bool particles_renderable::is_visible(rects::xywh visibility_aabb, const components::transform& transform) {
-	/* will be visible most of the time */
-	return true;
-}
+	bool particle_group::is_visible(rects::xywh visibility_aabb, const components::transform& transform) {
+		/* will be visible most of the time */
+		return true;
+	}
 
-b2Body* particles_renderable::create_body(entity_system::entity& subject, b2World& b2world, b2BodyType type) {
-	return nullptr;
+	b2Body* particle_group::create_body(entity_system::entity& subject, b2World& b2world, b2BodyType type) {
+		return nullptr;
+	}
 }
