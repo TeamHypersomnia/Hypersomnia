@@ -100,15 +100,13 @@ void gun_system::process_entities(world& owner) {
 					new_bullet.add(new_transform);
 					new_bullet.add(damage);
 					new_bullet.add(components::render(gun.info->bullet_layer, gun.info->bullet_sprite));
-					topdown::create_physics_component(new_bullet, physics.b2world, b2_dynamicBody);
+					topdown::create_physics_component(new_bullet, physics.b2world, gun.info->bullet_collision_filter, b2_dynamicBody);
 
 					/* bullet's physics settings */
 					auto body = new_bullet.get<components::physics>().body;
 					body->SetLinearVelocity(vel);
 					body->SetBullet(true);
-					auto filter = body->GetFixtureList()->GetFilterData();
-					filter.groupIndex = gun.info->box2d_bullet_group_index;
-					body->GetFixtureList()->SetFilterData(filter);
+					body->GetFixtureList()->SetFilterData(gun.info->bullet_collision_filter);
 				}
 
 				gun.shooting_timer.reset();

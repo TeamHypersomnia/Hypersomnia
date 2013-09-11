@@ -2,6 +2,7 @@
 #include "utility/timer.h"
 #include "entity_system/component.h"
 #include "entity_system/entity_ptr.h"
+#include <Box2D\Dynamics\b2Fixture.h>
 
 struct renderable;
 namespace components {
@@ -29,11 +30,13 @@ namespace components {
 			unsigned bullet_layer;
 
 			/* detail - usually you don't want to change it */
-			int box2d_bullet_group_index;
+			b2Filter bullet_collision_filter;
 
 			gun_info() : max_rounds(0), bullets_once(0), spread_radians(0.f), bullet_min_damage(0.f), bullet_max_damage(0.f), is_automatic(false), bullet_sprite(nullptr),
 				bullet_distance_offset(0.f), velocity_variation(0.f), shake_radius(0.f), shake_spread_radians(0.f),
-				bullet_layer(0), box2d_bullet_group_index(-1), max_bullet_distance(1000.f) {}
+				bullet_layer(0), max_bullet_distance(1000.f) {
+					bullet_collision_filter.groupIndex = -1;
+			}
 		} *info;
 		unsigned current_rounds;
 
