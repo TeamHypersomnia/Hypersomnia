@@ -51,17 +51,6 @@ using namespace messages;
 
 int main() {
 	augmentations::init();
-	
-	lua_State* L = luaL_newstate();
-	luabind::open(L);
-	luabind::module(L)[
-		luabind::class_<world>("world")
-			.def(luabind::constructor<>())
-			.def("create_entity", &world::create_entity)
-			.def("delete_entity", &world::delete_entity),
-
-			luabind::class_<entity>("entity")
-	];
 
 	config::input_file cfg("window_config.txt");
 	 
@@ -257,12 +246,6 @@ int main() {
 
 	world my_world;
 
-	luabind::globals(L)["world"] = &my_world;
-
-	script my_script;
-	my_script.associate_filename("script.txt");
-	auto luaerrors = my_script.compile(L);
-	auto luaerrors_call = my_script.call(L);
 
 	input_system input(gl, quit_flag);
 	movement_system movement;
@@ -280,6 +263,13 @@ int main() {
 	health_system health(physics);
 	destroy_system destroy;
 	script_system scripts;
+
+	luabind::globals(scripts.lua_state)["world"] = &my_world;
+
+	script my_script;
+	my_script.associate_filename("script.txt");
+	auto luaerrors = my_script.compile(scripts.lua_state);
+	auto luaerrors_call = my_script.call(scripts.lua_state);
 
 	input_system::context main_context;
 	main_context.raw_id_to_intent[window::event::mouse::raw_motion] = intent_message::intent::AIM;

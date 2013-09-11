@@ -6,8 +6,9 @@ class script;
 namespace components {
 	struct scriptable {
 		enum script_type {
-
-
+			COLLISION_MESSAGE,
+			DAMAGE_MESSAGE,
+			LOOP
 		};
 
 		typedef std::unordered_map<script_type, script*> subscribtion;

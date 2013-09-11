@@ -728,9 +728,6 @@
     <ClInclude Include="SDK\topdown\systems\chase_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="entity_system\entity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SDK\topdown\messages\animate_message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1122,6 +1119,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SDK\topdown\script.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="entity_system\entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
