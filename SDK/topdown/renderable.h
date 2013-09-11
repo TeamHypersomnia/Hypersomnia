@@ -20,9 +20,10 @@ struct renderable {
 struct sprite : public renderable {
 	texture_baker::texture* tex;
 	graphics::pixel_32 color;
-	vec2<int> size;
+	vec2<> size;
 
-	sprite(texture_baker::texture*, graphics::pixel_32 = graphics::pixel_32());
+	sprite(texture_baker::texture* = nullptr, graphics::pixel_32 = graphics::pixel_32());
+	void set(texture_baker::texture*, graphics::pixel_32);
 
 	virtual void draw(buffer&, const components::transform&, vec2<> camera_pos) override;
 	virtual bool is_visible(rects::xywh visibility_aabb, const components::transform&) override;

@@ -7,7 +7,14 @@
 #include "../topdown/components/particle_group_component.h"
 
 sprite::sprite(texture_baker::texture* tex, graphics::pixel_32 color) : tex(tex), color(color) {
-	if(tex) 
+	set(tex, color);
+}
+
+void sprite::set(texture_baker::texture* _tex, graphics::pixel_32 _color) {
+	tex = _tex;
+	color = _color;
+
+	if (tex)
 		size = tex->get_size();
 }
 
