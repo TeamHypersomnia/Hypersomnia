@@ -8,10 +8,26 @@
 #include <lua/lua.hpp>
 #include <luabind/luabind.hpp>
 
+#include "../components/animate_component.h"
+#include "../components/camera_component.h"
+#include "../components/chase_component.h"
+#include "../components/children_component.h"
+#include "../components/damage_component.h"
+#include "../components/gun_component.h"
+#include "../components/health_component.h"
+#include "../components/input_component.h"
+#include "../components/lookat_component.h"
+#include "../components/movement_component.h"
+#include "../components/particle_emitter_component.h"
+#include "../components/particle_group_component.h"
+#include "../components/physics_component.h"
+#include "../components/scriptable_component.h"
 #include "../components/transform_component.h"
 #include "../components/render_component.h"
 
 #include "../game/sprite_helper.h"
+
+#include "../animation.h"
 
 namespace luabind
 {
@@ -61,6 +77,11 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 		luabind::class_<sprite_helper>("sprite")
 			.def(luabind::constructor<std::wstring, texture_baker::atlas&>())
 			.def_readwrite("size", &sprite_helper::size),
+
+		luabind::class_<animation>("animation")
+			.def(luabind::constructor<>())
+			.def("add_frame", &animation::add_frame)
+			.def_readwrite("loop_mode", &animation::loop_mode),
 
 		luabind::class_<world>("world")
 			.def(luabind::constructor<>())

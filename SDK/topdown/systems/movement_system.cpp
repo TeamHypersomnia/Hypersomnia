@@ -51,7 +51,7 @@ void movement_system::process_entities(world& owner) {
 		msg.change_speed = true;
 		msg.speed_factor = speed / movement.max_speed;
 		msg.change_animation = true;
-		msg.preserve_state = false;
+		msg.preserve_state_if_animation_changes = false;
 		msg.message_type = ((speed <= 1.f) ? animate_message::type::STOP : animate_message::type::CONTINUE);
 		msg.animation_priority = 0;
 

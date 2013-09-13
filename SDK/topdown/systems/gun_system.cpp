@@ -37,7 +37,7 @@ void gun_system::process_entities(world& owner) {
 
 				messages::animate_message msg;
 				msg.animation_type = messages::animate_message::animation::SHOT;
-				msg.preserve_state = false;
+				msg.preserve_state_if_animation_changes = false;
 				msg.change_animation = true;
 				msg.change_speed = true;
 				msg.speed_factor = 1.f;
@@ -47,13 +47,13 @@ void gun_system::process_entities(world& owner) {
 
 				owner.post_message(msg);
 
-				if (gun.target_camera_shake) {
+				if (gun.target_camera_to_shake) {
 					vec2<> shake_dir;
 					shake_dir.set_from_angle(std::uniform_real_distribution<float>(
 						gun_transform.current.rotation - gun.info->shake_spread_radians,
 						gun_transform.current.rotation + gun.info->shake_spread_radians)(generator));
 				
-					gun.target_camera_shake->get<components::camera>().last_interpolant += shake_dir * gun.info->shake_radius;
+					gun.target_camera_to_shake->get<components::camera>().last_interpolant += shake_dir * gun.info->shake_radius;
 				}
 
 				if (!gun.info->is_automatic)

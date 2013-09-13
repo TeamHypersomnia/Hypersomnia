@@ -6,6 +6,9 @@
 
 #include "entity_system/entity_ptr.h"
 
+class camera_system;
+class gun_system;
+
 namespace components {
 	struct camera : public augmentations::entity_system::component {
 		augmentations::rects::xywh screen_rect;
@@ -19,16 +22,14 @@ namespace components {
 			ANGLED,
 			LOOK
 		} orbit_mode;
+
 		float angled_look_length;
 		bool enable_smoothing;
 		double smoothing_average_factor, averages_per_sec;
 
-		augmentations::vec2<> max_look_expand, last_interpolant;
+		augmentations::vec2<> max_look_expand;
 
-		augmentations::entity_system::entity_ptr player;
-		augmentations::entity_system::entity_ptr crosshair;
-
-		augmentations::util::timer smooth_timer;
+		augmentations::entity_system::entity_ptr player, crosshair;
 
 		camera(augmentations::rects::xywh screen_rect, augmentations::rects::ltrb ortho, unsigned layer, unsigned mask, 
 			double smoothing_average_factor = 0.004, double averages_per_sec = 60.0) :
@@ -37,5 +38,12 @@ namespace components {
 			smoothing_average_factor(smoothing_average_factor), averages_per_sec(averages_per_sec), enable_smoothing(true) {
 				smooth_timer.reset();
 		}
+
+	private:
+		friend class camera_system;
+		friend class gun_system;
+
+		augmentations::vec2<> last_interpolant;
+		augmentations::util::timer smooth_timer;
 	};
 }

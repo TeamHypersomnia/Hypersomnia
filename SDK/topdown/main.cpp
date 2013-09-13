@@ -43,13 +43,14 @@
 #include "animation.h"
 #include "script.h"
 
-#include <lua/lua.hpp>
 #include <luabind/luabind.hpp>
 
 using namespace augmentations;
 using namespace entity_system;
 using namespace messages;
 
+//#define kajdljsdklasjdd
+#ifdef kajdljsdklasjdd
 int main() {
 	augmentations::init();
 
@@ -134,10 +135,8 @@ int main() {
 	augmentations::deinit();
 	return 0;
 }
-
-//#define kajdljsdklasjdd
-#ifdef kajdljsdklasjdd
-int dmain() {
+#else
+int main() {
 	augmentations::init();
 
 	config::input_file cfg("window_config.txt");
@@ -345,12 +344,12 @@ int dmain() {
 	destroy_system destroy;
 	script_system scripts;
 
-	luabind::globals(scripts.lua_state)["world"] = &my_world;
+	//luabind::globals(scripts.lua_state)["world"] = &my_world;
 
-	script my_script;
-	my_script.associate_filename("script.txt");
-	auto luaerrors = my_script.compile(scripts.lua_state);
-	auto luaerrors_call = my_script.call(scripts.lua_state);
+	//script my_script;
+	//my_script.associate_filename("script.txt");
+	//auto luaerrors = my_script.compile(scripts.lua_state);
+	//auto luaerrors_call = my_script.call(scripts.lua_state);
 
 	input_system::context main_context;
 	main_context.raw_id_to_intent[window::event::mouse::raw_motion] = intent_message::intent::AIM;
@@ -689,10 +688,6 @@ int dmain() {
 		player_animate(&player_animate_subscribtion), 
 		legs_animate(&legs_animate_subscribtion);
 
-	player_shotgun_animate.current_animation = &player_shotgun_animation;
-	player_animate.current_animation = &player_animation;
-	legs_animate.current_animation = &legs_animation;
-
 	components::gun::gun_info double_barrel, assault_rifle;
 	bullet_sprite.size.y /= 3.f;
 	bullet_sprite.size.x *= 2.f;
@@ -789,7 +784,7 @@ int dmain() {
 	player.first.add(components::lookat(&crosshair));
 
 	player.first.get<components::physics>().body->SetTransform(vec2<>(-500.f*PIXELS_TO_METERSf, 0.f), 0.f);
-	player.first.get<components::gun>().target_camera_shake = &world_camera;
+	player.first.get<components::gun>().target_camera_to_shake = &world_camera;
 	
 	for (int i = 0; i < 30; ++i) {
 		auto npc = spawn_npc(player_animate);

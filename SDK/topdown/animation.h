@@ -11,12 +11,16 @@ struct animation {
 	};
 
 	std::vector<frame> frames;
-	enum class loop_type {
+
+	enum loop_type {
 		REPEAT,
 		INVERSE,
 		NONE
 	};
+
 	loop_type loop_mode;
 
 	animation();
+
+	void add_frame(renderable* instance, float duration_milliseconds);
 };

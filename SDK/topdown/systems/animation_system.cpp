@@ -48,7 +48,7 @@ void animation_system::process_entities(world& owner) {
 				auto new_instance = animate.available_animations->at(it.animation_type);
 
 				if (new_instance != animate.current_animation) {
-					if (!it.preserve_state) {
+					if (!it.preserve_state_if_animation_changes) {
 						animate.current_frame = 0;
 						animate.current_ms = 0.f;
 					}

@@ -5,6 +5,8 @@
 #include <Box2D\Dynamics\b2Fixture.h>
 
 struct renderable;
+class gun_system;
+
 namespace components {
 	struct gun : public augmentations::entity_system::component {
 		struct gun_info {
@@ -42,11 +44,15 @@ namespace components {
 
 		bool reloading, trigger;
 
-		augmentations::util::timer shooting_timer;
-		augmentations::entity_system::entity_ptr target_camera_shake;
+		augmentations::entity_system::entity_ptr target_camera_to_shake;
 
 		gun(gun_info* info)
 			: info(info), current_rounds(0), 
-			reloading(false), trigger(false), target_camera_shake(nullptr) {}
+			reloading(false), trigger(false), target_camera_to_shake(nullptr) {}
+
+	private:
+		friend class gun_system;
+
+		augmentations::util::timer shooting_timer;
 	};
 }
