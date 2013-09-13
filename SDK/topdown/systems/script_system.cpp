@@ -94,6 +94,13 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 		luabind::class_<components::transform>("transform")
 			.def(luabind::constructor<augmentations::vec2<>, float>()),
 
+		luabind::class_<components::animate::subscribtion>("animation_subscribtion")
+			.def(luabind::constructor<>())
+			.def("add", &components::animate::subscribtion::insert),
+
+		luabind::class_<components::animate>("animate")
+			.def(luabind::constructor<components::animate::subscribtion*>()),
+
 		luabind::class_<entity>("entity")
 			.def("clear", &entity::clear)
 			.def("add", &entity::add<components::render>)

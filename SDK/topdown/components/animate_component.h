@@ -2,13 +2,14 @@
 #include <unordered_map>
 #include "entity_system/component.h"
 #include "../messages/animate_message.h"
+#include "utility/map_wrapper.h"
 
 struct animation;
 class animation_system;
 
 namespace components {
 	struct animate : public augmentations::entity_system::component {
-		typedef std::unordered_map<messages::animate_message::animation, animation*> subscribtion;
+		typedef augmentations::util::map_wrapper<messages::animate_message::animation, animation*> subscribtion;
 		subscribtion* available_animations;
 
 		animate(subscribtion* available_animations) 

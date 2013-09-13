@@ -1130,5 +1130,8 @@
     <ClInclude Include="SDK\topdown\game\sprite_helper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="utility\map_wrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
