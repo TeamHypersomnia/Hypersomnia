@@ -12,6 +12,11 @@ void render_system::remove(entity* e) {
 	v.erase(std::remove(v.begin(), v.end(), e), v.end());
 }
 
+void render_system::clear() {
+	entities_by_mask.clear();
+	processing_system::clear();
+}
+
 render_system::render_system(window::glwindow& output_window) : output_window(output_window) {
 	output_window.current();
 

@@ -30,6 +30,8 @@ namespace augmentations {
 
 			/* you are required to override this function to specify components that this system needs to processing */
 			virtual type_pack get_needed_components() const = 0;
+
+			virtual void clear();
 		};
 
 		/* helper class removing necessity to override get_needed_components by specifying the types in the parameter pack */

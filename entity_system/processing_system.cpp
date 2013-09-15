@@ -12,7 +12,11 @@ namespace augmentations {
 		void processing_system::remove(entity* e) {
 			targets.erase(std::remove(targets.begin(), targets.end(), e), targets.end());
 		}
-		
+
+		void processing_system::clear() {
+			targets.clear();
+		}
+
 		void processing_system::process_entities(world&) {
 
 		}

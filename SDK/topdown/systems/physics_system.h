@@ -31,4 +31,5 @@ public:
 	void process_entities(world&) override;
 	void add(entity*) override;
 	void remove(entity*) override;
+	void clear() override;
 };

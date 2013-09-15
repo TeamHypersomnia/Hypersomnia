@@ -102,6 +102,16 @@ void physics_system::add(entity*) {
 
 }
 
+void physics_system::clear() {
+	auto it = b2world.GetBodyList();
+	while (it) {
+		auto next = it->GetNext();
+		b2world.DestroyBody(it);
+		it = next;
+	}
+	processing_system::clear();
+}
+
 void physics_system::remove(entity* e) {
 	b2world.DestroyBody(e->get<components::physics>().body);
 }
