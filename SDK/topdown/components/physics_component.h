@@ -10,6 +10,6 @@
 namespace components {
 	struct physics : public augmentations::entity_system::component {
 		b2Body* body;
-		physics(b2Body* body) : body(body) {}
+		physics(b2Body* body = nullptr) : body(body) {}
 	};
 }

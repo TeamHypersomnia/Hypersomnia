@@ -4,13 +4,13 @@
 
 namespace components {
 	struct lookat : public augmentations::entity_system::component {
-		enum class chase_type {
+		enum chase_type {
 			POSITION,
 			VELOCITY
 		} type;
 
 		augmentations::entity_system::entity_ptr target;
 
-		lookat(augmentations::entity_system::entity* target, chase_type type = chase_type::POSITION) : target(target), type(type) {}
+		lookat(augmentations::entity_system::entity* target = nullptr, chase_type type = chase_type::POSITION) : target(target), type(type) {}
 	};
 }

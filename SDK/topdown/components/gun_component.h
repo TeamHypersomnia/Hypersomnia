@@ -46,7 +46,7 @@ namespace components {
 
 		augmentations::entity_system::entity_ptr target_camera_to_shake;
 
-		gun(gun_info* info)
+		gun(gun_info* info = nullptr)
 			: info(info), current_rounds(0), 
 			reloading(false), trigger(false), target_camera_to_shake(nullptr) {}
 

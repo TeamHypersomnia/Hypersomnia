@@ -18,6 +18,6 @@ namespace components {
 		float hp;
 		bool dead;
 
-		health(health_info* info, float hp) : info(info), hp(hp), dead(false) {}
+		health(health_info* info = nullptr, float hp = 0.f) : info(info), hp(hp), dead(false) {}
 	};
 }

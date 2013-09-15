@@ -5,10 +5,6 @@
 
 namespace components {
 	struct movement : public augmentations::entity_system::component {
-		enum {
-			FORWARD, BACKWARD, LEFT, RIGHT
-		};
-
 		struct subscribtion {
 			augmentations::entity_system::entity_ptr target;
 			bool stop_at_zero_movement;
@@ -16,15 +12,19 @@ namespace components {
 				target(target), stop_at_zero_movement(stop_at_zero_movement) {}
 		};
 
+		void add_animation_receiver(augmentations::entity_system::entity_ptr e, bool stop_at_zero_movement) {
+			animation_receivers.push_back(subscribtion(e, stop_at_zero_movement));
+		}
+
 		std::vector<subscribtion> animation_receivers;
 
-		bool current_directions[4];
+		bool moving_left, moving_right, moving_forward, moving_backward;
 
 		augmentations::vec2<> acceleration;
 		float max_speed;
 
-		movement(augmentations::vec2<> acceleration, float max_speed) : acceleration(acceleration), max_speed(max_speed) {
-			current_directions[0] = current_directions[1] = current_directions[2] = current_directions[3] = false;
+		movement(augmentations::vec2<> acceleration = augmentations::vec2<>(), float max_speed = 0.f) : acceleration(acceleration), max_speed(max_speed) {
+			moving_left = moving_right = moving_forward = moving_backward = false;
 		}
 	};
 }

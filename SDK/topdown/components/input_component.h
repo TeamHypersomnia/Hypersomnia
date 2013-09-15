@@ -7,6 +7,10 @@
 namespace components {
 	struct input : public augmentations::entity_system::component {
 		augmentations::util::sorted_vector<messages::intent_message::intent> intents;
+
+		void add(messages::intent_message::intent _intent) {
+			intents.add(_intent);
+		}
 	};
 }
 

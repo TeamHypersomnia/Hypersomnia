@@ -31,7 +31,8 @@ namespace components {
 
 		augmentations::entity_system::entity_ptr player, crosshair;
 
-		camera(augmentations::rects::xywh screen_rect, augmentations::rects::ltrb ortho, unsigned layer, unsigned mask, 
+		camera(augmentations::rects::xywh screen_rect = augmentations::rects::xywh(), augmentations::rects::ltrb ortho = augmentations::rects::ltrb(), 
+			unsigned layer = 0, unsigned mask = 0,
 			double smoothing_average_factor = 0.004, double averages_per_sec = 60.0) :
 			screen_rect(screen_rect), ortho(ortho), layer(layer), mask(mask), enabled(true), orbit_mode(NONE), player(nullptr), crosshair(nullptr),
 			angled_look_length(100.f), max_look_expand(augmentations::vec2<double>(600.f, 300.f)), 

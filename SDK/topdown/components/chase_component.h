@@ -9,7 +9,7 @@ namespace components {
 	struct chase : public augmentations::entity_system::component {
 		augmentations::entity_system::entity_ptr target;
 		
-		enum class chase_type {
+		enum chase_type {
 			OFFSET,
 			ORBIT
 		} type;
@@ -21,7 +21,7 @@ namespace components {
 		bool chase_rotation;
 		bool track_origin;
 
-		chase(augmentations::entity_system::entity* target, bool relative = false, augmentations::vec2<> offset = augmentations::vec2<>())
+		chase(augmentations::entity_system::entity* target = nullptr, bool relative = false, augmentations::vec2<> offset = augmentations::vec2<>())
 			: type(chase_type::OFFSET), target(target), offset(offset), relative(relative), chase_rotation(false), track_origin(false), rotation_offset(0.f), rotation_orbit_offset(0.f), rotation_previous(0.f) {}
 		
 	private:
