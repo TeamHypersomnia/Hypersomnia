@@ -43,13 +43,11 @@
 #include "animation.h"
 #include "script.h"
 
-#include <luabind/luabind.hpp>
-
 using namespace augmentations;
 using namespace entity_system;
 using namespace messages;
 
-//#define kajdljsdklasjdd
+#define kajdljsdklasjdd
 #ifdef kajdljsdklasjdd
 int main() {
 	augmentations::init();
@@ -62,6 +60,8 @@ int main() {
 	window::cursor(false);
 
 	bool quit_flag = false;
+
+	std::cout << "compilation error";
 
 	world my_world;
 
@@ -82,8 +82,6 @@ int main() {
 	destroy_system destroy;
 	script_system scripts;
 
-	luabind::globals(scripts.lua_state)["world"] = &my_world;
-
 	my_world.add_system(&input);
 	my_world.add_system(&movement);
 	my_world.add_system(&physics);
@@ -100,11 +98,14 @@ int main() {
 	my_world.add_system(&destroy);
 	my_world.add_system(&camera);
 
+	scripts.global("world", my_world);
+	scripts.global("window", gl);
+
 	script my_script;
-	my_script.associate_filename("script.txt");
+	my_script.associate_filename("scripts/init_scene.lua");
 	auto luaerrors = my_script.compile(scripts.lua_state);
 	auto luaerrors_call = my_script.call(scripts.lua_state);
-
+	
 	entity& world_camera = my_world.create_entity();
 
 	world_camera.add(components::transform());
@@ -130,6 +131,12 @@ int main() {
 		my_world.get_message_queue<animate_message>().clear();
 		my_world.get_message_queue<collision_message>().clear();
 		my_world.get_message_queue<particle_burst_message>().clear();
+		
+		auto scripts = script::script_reloader.get_modified_script_files();
+
+		for (auto& script_to_reload : scripts) {
+			
+		}
 	}
 
 	augmentations::deinit();
@@ -433,7 +440,7 @@ int main() {
 	entity& ground = my_world.create_entity();
 	entity& crosshair = my_world.create_entity();
 
-	components::particle_group::particle templates[9], barrel_explosion_template, barrel_smoke_template, blood_shower_templates[5];
+	components::particle_emitter::particle templates[9], barrel_explosion_template, barrel_smoke_template, blood_shower_templates[5];
 
 	barrel_explosion_template.angular_damping = 0.f;
 	barrel_explosion_template.linear_damping = 55000.f;
@@ -487,171 +494,171 @@ int main() {
 	auto& shot_emissions = player_effects[messages::particle_burst_message::burst_type::WEAPON_SHOT];
 	auto& blood_emissions = player_effects[messages::particle_burst_message::burst_type::BULLET_IMPACT];
 	
-	components::particle_group::emission wood_parts_big, wood_parts_small, barrel_explosion, barrel_smoke[2], blood_shower, blood_pool, blood_droplets, wood_dust;
+	components::particle_emitter::emission wood_parts_big, wood_parts_small, barrel_explosion, barrel_smoke[2], blood_shower, blood_pool, blood_droplets, wood_dust;
 
 	wood_parts_big.spread_radians = 45.f * 0.01745329251994329576923690768489f;
-	wood_parts_big.particles_per_burst_min = 1;
-	wood_parts_big.particles_per_burst_max = 1;
-	wood_parts_big.type = components::particle_group::emission::type::BURST;
-	wood_parts_big.velocity_min = 2000.f;
-	wood_parts_big.velocity_max = 3000.f;
-	wood_parts_big.angular_velocity_min = 100.f * 0.01745329251994329576923690768489f;
-	wood_parts_big.angular_velocity_max = 220.f * 0.01745329251994329576923690768489f;
-	wood_parts_big.particle_templates = std::vector<components::particle_group::particle>(templates + 0, templates + 4);
-	wood_parts_big.size_multiplier_min = 0.1f;
-	wood_parts_big.size_multiplier_max = 1.0f;
+	wood_parts_big.particles_per_burst.first = 1;
+	wood_parts_big.particles_per_burst.second = 1;
+	wood_parts_big.type = components::particle_emitter::emission::type::BURST;
+	wood_parts_big.velocity.first = 2000.f;
+	wood_parts_big.velocity.second = 3000.f;
+	wood_parts_big.angular_velocity.first = 100.f * 0.01745329251994329576923690768489f;
+	wood_parts_big.angular_velocity.second = 220.f * 0.01745329251994329576923690768489f;
+	wood_parts_big.particle_templates = std::vector<components::particle_emitter::particle>(templates + 0, templates + 4);
+	wood_parts_big.size_multiplier.first = 0.1f;
+	wood_parts_big.size_multiplier.second = 1.0f;
 	wood_parts_big.initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
 	wood_parts_big.angular_offset = 0.f;
 	wood_parts_big.particle_group_layer = ON_GROUND;
 
 	wood_parts_small.spread_radians = 45.f * 0.01745329251994329576923690768489f;
-	wood_parts_small.particles_per_burst_min = 2;
-	wood_parts_small.particles_per_burst_max = 4;
-	wood_parts_small.type = components::particle_group::emission::type::BURST;
-	wood_parts_small.velocity_min = 200.f;
-	wood_parts_small.velocity_max = 3000.f;
-	wood_parts_small.particle_templates = std::vector<components::particle_group::particle>(templates + 4, templates + 8);
-	wood_parts_small.size_multiplier_min = 0.1f;
-	wood_parts_small.size_multiplier_max = 1.0f;
-	wood_parts_small.angular_velocity_min = 100.f * 0.01745329251994329576923690768489f;
-	wood_parts_small.angular_velocity_max = 220.f * 0.01745329251994329576923690768489f;
+	wood_parts_small.particles_per_burst.first = 2;
+	wood_parts_small.particles_per_burst.second = 4;
+	wood_parts_small.type = components::particle_emitter::emission::type::BURST;
+	wood_parts_small.velocity.first = 200.f;
+	wood_parts_small.velocity.second = 3000.f;
+	wood_parts_small.particle_templates = std::vector<components::particle_emitter::particle>(templates + 4, templates + 8);
+	wood_parts_small.size_multiplier.first = 0.1f;
+	wood_parts_small.size_multiplier.second = 1.0f;
+	wood_parts_small.angular_velocity.first = 100.f * 0.01745329251994329576923690768489f;
+	wood_parts_small.angular_velocity.second = 220.f * 0.01745329251994329576923690768489f;
 	wood_parts_small.initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
 	wood_parts_small.angular_offset = 0.f;
 	wood_parts_small.particle_group_layer = ON_GROUND;
 
 	wood_dust.spread_radians = 45.f * 0.01745329251994329576923690768489f;
-	wood_dust.particles_per_burst_min = 5;
-	wood_dust.particles_per_burst_max = 55;
-	wood_dust.type = components::particle_group::emission::type::BURST;
-	wood_dust.velocity_min = 200.f;
-	wood_dust.velocity_max = 4000.f;
+	wood_dust.particles_per_burst.first = 5;
+	wood_dust.particles_per_burst.second = 55;
+	wood_dust.type = components::particle_emitter::emission::type::BURST;
+	wood_dust.velocity.first = 200.f;
+	wood_dust.velocity.second = 4000.f;
 	wood_dust.particle_templates.push_back(templates[8]);
-	wood_dust.size_multiplier_min = 0.1f;
-	wood_dust.size_multiplier_max = 0.5f;
-	wood_dust.angular_velocity_min = 540.f * 0.01745329251994329576923690768489f;
-	wood_dust.angular_velocity_max = 1220.f * 0.01745329251994329576923690768489f;
-	wood_dust.particle_lifetime_ms_min = 0.f;
-	wood_dust.particle_lifetime_ms_max = 350.f;
+	wood_dust.size_multiplier.first = 0.1f;
+	wood_dust.size_multiplier.second = 0.5f;
+	wood_dust.angular_velocity.first = 540.f * 0.01745329251994329576923690768489f;
+	wood_dust.angular_velocity.second = 1220.f * 0.01745329251994329576923690768489f;
+	wood_dust.particle_lifetime_ms.first = 0.f;
+	wood_dust.particle_lifetime_ms.second = 350.f;
 	wood_dust.initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
 	wood_dust.angular_offset = 0.f;
 	wood_dust.particle_group_layer = ON_GROUND;
 
 	barrel_explosion.spread_radians = 15.5f * 0.01745329251994329576923690768489f;
-	barrel_explosion.particles_per_burst_min = 10;
-	barrel_explosion.particles_per_burst_max = 50;
-	barrel_explosion.type = components::particle_group::emission::type::BURST;
-	barrel_explosion.velocity_min = 1000.f;
-	barrel_explosion.velocity_max = 10000.f;
-	barrel_explosion.angular_velocity_min = 0.f;
-	barrel_explosion.angular_velocity_max = 0.f;
-	barrel_explosion.particle_lifetime_ms_min = 20.f;
-	barrel_explosion.particle_lifetime_ms_max = 40.f;
+	barrel_explosion.particles_per_burst.first = 10;
+	barrel_explosion.particles_per_burst.second = 50;
+	barrel_explosion.type = components::particle_emitter::emission::type::BURST;
+	barrel_explosion.velocity.first = 1000.f;
+	barrel_explosion.velocity.second = 10000.f;
+	barrel_explosion.angular_velocity.first = 0.f;
+	barrel_explosion.angular_velocity.second = 0.f;
+	barrel_explosion.particle_lifetime_ms.first = 20.f;
+	barrel_explosion.particle_lifetime_ms.second = 40.f;
 	barrel_explosion.particle_templates.push_back(barrel_explosion_template);
-	barrel_explosion.size_multiplier_min = 0.8f;
-	barrel_explosion.size_multiplier_max = 1.2f;
+	barrel_explosion.size_multiplier.first = 0.8f;
+	barrel_explosion.size_multiplier.second = 1.2f;
 	barrel_explosion.initial_rotation_variation = 0.f;
 	barrel_explosion.particle_group_layer = EFFECTS;
 	barrel_explosion.angular_offset = 0.f;
 
 	barrel_smoke[0].spread_radians = 25.5f * 0.01745329251994329576923690768489f;
-	barrel_smoke[0].particles_per_sec_min = 50.f;
-	barrel_smoke[0].particles_per_sec_max = 90.f;
-	barrel_smoke[0].stream_duration_ms_min = 100.f;
-	barrel_smoke[0].stream_duration_ms_max = 600.f;
-	barrel_smoke[0].type = components::particle_group::emission::type::STREAM;
-	barrel_smoke[0].velocity_min = 50.f;
-	barrel_smoke[0].velocity_max = 100.f;
-	barrel_smoke[0].angular_velocity_min = 0.f;
-	barrel_smoke[0].angular_velocity_max = 0.f * 0.01745329251994329576923690768489f;
-	barrel_smoke[0].particle_lifetime_ms_min = 10.f;
-	barrel_smoke[0].particle_lifetime_ms_max = 3000.f;
+	barrel_smoke[0].particles_per_sec.first = 50.f;
+	barrel_smoke[0].particles_per_sec.second = 90.f;
+	barrel_smoke[0].stream_duration_ms.first = 100.f;
+	barrel_smoke[0].stream_duration_ms.second = 600.f;
+	barrel_smoke[0].type = components::particle_emitter::emission::type::STREAM;
+	barrel_smoke[0].velocity.first = 50.f;
+	barrel_smoke[0].velocity.second = 100.f;
+	barrel_smoke[0].angular_velocity.first = 0.f;
+	barrel_smoke[0].angular_velocity.second = 0.f * 0.01745329251994329576923690768489f;
+	barrel_smoke[0].particle_lifetime_ms.first = 10.f;
+	barrel_smoke[0].particle_lifetime_ms.second = 3000.f;
 	barrel_smoke[0].particle_templates.push_back(barrel_smoke_template);
-	barrel_smoke[0].size_multiplier_min = 0.7f;
-	barrel_smoke[0].size_multiplier_max = 5.5f;
+	barrel_smoke[0].size_multiplier.first = 0.7f;
+	barrel_smoke[0].size_multiplier.second = 5.5f;
 	barrel_smoke[0].initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
 	barrel_smoke[0].particle_group_layer = EFFECTS;
 	barrel_smoke[0].angular_offset = 0.f;
 	barrel_smoke[0].randomize_acceleration = false;
 
 	barrel_smoke[1].spread_radians = 14.5f * 0.01745329251994329576923690768489f;
-	barrel_smoke[1].particles_per_sec_min = 50.f;
-	barrel_smoke[1].particles_per_sec_max = 90.f;
-	barrel_smoke[1].stream_duration_ms_min = 100.f;
-	barrel_smoke[1].stream_duration_ms_max = 6000.f;
-	barrel_smoke[1].type = components::particle_group::emission::type::STREAM;
-	barrel_smoke[1].velocity_min = 100.f;
-	barrel_smoke[1].velocity_max = 200.f;
-	barrel_smoke[1].particle_lifetime_ms_min = 10.f;
-	barrel_smoke[1].particle_lifetime_ms_max = 3000.f;
-	barrel_smoke[1].angular_velocity_min = 0.f;
-	barrel_smoke[1].angular_velocity_max = 0.f * 0.01745329251994329576923690768489f;
+	barrel_smoke[1].particles_per_sec.first = 50.f;
+	barrel_smoke[1].particles_per_sec.second = 90.f;
+	barrel_smoke[1].stream_duration_ms.first = 100.f;
+	barrel_smoke[1].stream_duration_ms.second = 6000.f;
+	barrel_smoke[1].type = components::particle_emitter::emission::type::STREAM;
+	barrel_smoke[1].velocity.first = 100.f;
+	barrel_smoke[1].velocity.second = 200.f;
+	barrel_smoke[1].particle_lifetime_ms.first = 10.f;
+	barrel_smoke[1].particle_lifetime_ms.second = 3000.f;
+	barrel_smoke[1].angular_velocity.first = 0.f;
+	barrel_smoke[1].angular_velocity.second = 0.f * 0.01745329251994329576923690768489f;
 	barrel_smoke[1].particle_templates.push_back(barrel_smoke_template);
-	barrel_smoke[1].size_multiplier_min = 1.0f;
-	barrel_smoke[1].size_multiplier_max = 1.3f;
+	barrel_smoke[1].size_multiplier.first = 1.0f;
+	barrel_smoke[1].size_multiplier.second = 1.3f;
 	barrel_smoke[1].initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
 	barrel_smoke[1].particle_group_layer = EFFECTS;
 	barrel_smoke[1].angular_offset = 0.f;
 	barrel_smoke[1].randomize_acceleration = false;
 
 	blood_shower.spread_radians = 120.5f * 0.01745329251994329576923690768489f;
-	//blood_shower.particles_per_sec_min = 10.f;
-	//blood_shower.particles_per_sec_max = 200.f;
-	blood_shower.particles_per_burst_min = 10;
-	blood_shower.particles_per_burst_max = 20;
-	//blood_shower.stream_duration_ms_min = 100.f;
-	//blood_shower.stream_duration_ms_max = 1000.f;
-	blood_shower.type = components::particle_group::emission::type::BURST;
-	blood_shower.velocity_min = 1.f;
-	blood_shower.velocity_max = 4000.f;
-	blood_shower.angular_velocity_min = 0.f;
-	blood_shower.angular_velocity_max = 1500.f * 0.01745329251994329576923690768489f;
-	blood_shower.particle_templates = std::vector<components::particle_group::particle>(blood_shower_templates, blood_shower_templates + 5);
-	blood_shower.size_multiplier_min = 0.2f;
-	blood_shower.size_multiplier_max = 0.35f;
+	//blood_shower.particles_per_sec.first = 10.f;
+	//blood_shower.particles_per_sec.second = 200.f;
+	blood_shower.particles_per_burst.first = 10;
+	blood_shower.particles_per_burst.second = 20;
+	//blood_shower.stream_duration_ms.first = 100.f;
+	//blood_shower.stream_duration_ms.second = 1000.f;
+	blood_shower.type = components::particle_emitter::emission::type::BURST;
+	blood_shower.velocity.first = 1.f;
+	blood_shower.velocity.second = 4000.f;
+	blood_shower.angular_velocity.first = 0.f;
+	blood_shower.angular_velocity.second = 1500.f * 0.01745329251994329576923690768489f;
+	blood_shower.particle_templates = std::vector<components::particle_emitter::particle>(blood_shower_templates, blood_shower_templates + 5);
+	blood_shower.size_multiplier.first = 0.2f;
+	blood_shower.size_multiplier.second = 0.35f;
 	blood_shower.initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
 	blood_shower.particle_group_layer = ON_GROUND;
 	blood_shower.angular_offset = 0.f;
 
 	blood_droplets.spread_radians = 90.5f * 0.01745329251994329576923690768489f;
-	blood_droplets.particles_per_burst_min = 10;
-	blood_droplets.particles_per_burst_max = 500;
-	blood_droplets.type = components::particle_group::emission::type::BURST;
-	blood_droplets.velocity_min = 1.f;
-	blood_droplets.velocity_max = 5000.f;
-	blood_droplets.angular_velocity_min = 0.f;
-	blood_droplets.angular_velocity_max = 1500.f * 0.01745329251994329576923690768489f;
-	blood_droplets.particle_templates = std::vector<components::particle_group::particle>(blood_shower_templates, blood_shower_templates + 5);
+	blood_droplets.particles_per_burst.first = 10;
+	blood_droplets.particles_per_burst.second = 500;
+	blood_droplets.type = components::particle_emitter::emission::type::BURST;
+	blood_droplets.velocity.first = 1.f;
+	blood_droplets.velocity.second = 5000.f;
+	blood_droplets.angular_velocity.first = 0.f;
+	blood_droplets.angular_velocity.second = 1500.f * 0.01745329251994329576923690768489f;
+	blood_droplets.particle_templates = std::vector<components::particle_emitter::particle>(blood_shower_templates, blood_shower_templates + 5);
 
 	for (auto& it : blood_droplets.particle_templates) {
 		it.should_disappear = true;
 	}
 
-	blood_droplets.size_multiplier_min = 0.2f;
-	blood_droplets.size_multiplier_max = 0.35f;
+	blood_droplets.size_multiplier.first = 0.2f;
+	blood_droplets.size_multiplier.second = 0.35f;
 	blood_droplets.initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
 	blood_droplets.particle_group_layer = ON_GROUND;
 	blood_droplets.angular_offset = 0.f;
-	blood_droplets.particle_lifetime_ms_min = 200.f;
-	blood_droplets.particle_lifetime_ms_max = 500.f;
+	blood_droplets.particle_lifetime_ms.first = 200.f;
+	blood_droplets.particle_lifetime_ms.second = 500.f;
 
 	blood_pool.spread_radians = 180.5f * 0.01745329251994329576923690768489f;
-	blood_pool.particles_per_sec_min = 20.f;
-	blood_pool.particles_per_sec_max = 100.f;
-	blood_pool.stream_duration_ms_min = 300.f;
-	blood_pool.stream_duration_ms_max = 1000.f;
-	blood_pool.type = components::particle_group::emission::type::STREAM;
-	blood_pool.velocity_min = 1.f;
-	blood_pool.velocity_max = 6.f;
-	blood_pool.angular_velocity_min = 0.f;
-	blood_pool.angular_velocity_max = 10.f * 0.01745329251994329576923690768489f;
-	blood_pool.particle_templates = std::vector<components::particle_group::particle>(blood_shower_templates, blood_shower_templates + 5);
+	blood_pool.particles_per_sec.first = 20.f;
+	blood_pool.particles_per_sec.second = 100.f;
+	blood_pool.stream_duration_ms.first = 300.f;
+	blood_pool.stream_duration_ms.second = 1000.f;
+	blood_pool.type = components::particle_emitter::emission::type::STREAM;
+	blood_pool.velocity.first = 1.f;
+	blood_pool.velocity.second = 6.f;
+	blood_pool.angular_velocity.first = 0.f;
+	blood_pool.angular_velocity.second = 10.f * 0.01745329251994329576923690768489f;
+	blood_pool.particle_templates = std::vector<components::particle_emitter::particle>(blood_shower_templates, blood_shower_templates + 5);
 	
 	for (auto& it : blood_pool.particle_templates) {
 		it.linear_damping = 2.f;
 	}
 	
-	blood_pool.size_multiplier_min = 0.3f;
-	blood_pool.size_multiplier_max = 1.0f;
+	blood_pool.size_multiplier.first = 0.3f;
+	blood_pool.size_multiplier.second = 1.0f;
 	blood_pool.initial_rotation_variation = 180.f * 0.01745329251994329576923690768489f;
 	blood_pool.particle_group_layer = ON_GROUND;
 	blood_pool.angular_offset = 0.f;

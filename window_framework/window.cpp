@@ -422,6 +422,10 @@ namespace augmentations {
 
 			rc = rects::ltrb(wr.left, wr.top, wr.right, wr.bottom);
 		}
+		
+		HWND glwindow::get_hwnd() const {
+			return hwnd;
+		}
 
 		int glwindow::get_vsync() const { 
 			return vsyn; 

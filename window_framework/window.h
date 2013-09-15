@@ -116,6 +116,8 @@ namespace augmentations {
 			
 			void adjust(rects::xywh&);
 
+			HWND get_hwnd() const;
+
 			void destroy();
 			~glwindow();
 		};

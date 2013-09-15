@@ -1,3 +1,4 @@
+#pragma once
 #include <unordered_map>
 
 namespace augmentations {
@@ -23,6 +24,10 @@ namespace augmentations {
 
 			size_t size() const {
 				return raw_map.size();
+			}
+
+			std::unordered_map<key, value>& get_raw() {
+				return raw_map;
 			}
 		};
 	}

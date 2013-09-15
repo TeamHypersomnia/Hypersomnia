@@ -42,7 +42,8 @@
     <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -107,6 +108,9 @@
     <ClCompile Include="3rdparty\lua\lundump.c" />
     <ClCompile Include="3rdparty\lua\lvm.c" />
     <ClCompile Include="3rdparty\lua\lzio.c" />
+    <ClCompile Include="3rdparty\readdir\ReadDirectoryChanges.cpp" />
+    <ClCompile Include="3rdparty\readdir\ReadDirectoryChangesPrivate.cpp" />
+    <ClCompile Include="3rdparty\readdir\stdafx.cpp" />
     <ClCompile Include="3rdparty\src\class.cpp" />
     <ClCompile Include="3rdparty\src\class_info.cpp" />
     <ClCompile Include="3rdparty\src\class_registry.cpp" />
@@ -327,6 +331,11 @@
     <ClInclude Include="3rdparty\lua\lundump.h" />
     <ClInclude Include="3rdparty\lua\lvm.h" />
     <ClInclude Include="3rdparty\lua\lzio.h" />
+    <ClInclude Include="3rdparty\readdir\ReadDirectoryChanges.h" />
+    <ClInclude Include="3rdparty\readdir\ReadDirectoryChangesPrivate.h" />
+    <ClInclude Include="3rdparty\readdir\stdafx.h" />
+    <ClInclude Include="3rdparty\readdir\targetver.h" />
+    <ClInclude Include="3rdparty\readdir\ThreadSafeQueue.h" />
     <ClInclude Include="augmentations.h" />
     <ClInclude Include="3rdparty\Box2D\Box2D.h" />
     <ClInclude Include="3rdparty\Box2D\Collision\b2BroadPhase.h" />
