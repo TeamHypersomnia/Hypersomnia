@@ -11,16 +11,16 @@ void movement_system::process_entities(world& owner) {
 	for (auto it : events) {
 		switch (it.type) {
 		case intent_message::intent::MOVE_FORWARD:
-			it.subject->get<components::movement>().current_directions[components::movement::FORWARD] = it.state_flag;
+			it.subject->get<components::movement>().moving_forward = it.state_flag;
 			break;
 		case intent_message::intent::MOVE_BACKWARD:
-			it.subject->get<components::movement>().current_directions[components::movement::BACKWARD] = it.state_flag;
+			it.subject->get<components::movement>().moving_backward = it.state_flag;
 			break;
 		case intent_message::intent::MOVE_LEFT:
-			it.subject->get<components::movement>().current_directions[components::movement::LEFT] = it.state_flag;
+			it.subject->get<components::movement>().moving_left = it.state_flag;
 			break;
 		case intent_message::intent::MOVE_RIGHT:
-			it.subject->get<components::movement>().current_directions[components::movement::RIGHT] = it.state_flag;
+			it.subject->get<components::movement>().moving_right = it.state_flag;
 			break;
 		default: break;
 		}
@@ -30,11 +30,9 @@ void movement_system::process_entities(world& owner) {
 		auto& physics = it->get<components::physics>();
 		auto& movement = it->get<components::movement>();
 
-		auto dirs = movement.current_directions;
-
 		vec2<> resultant;
-		resultant.x = dirs[movement.RIGHT] * movement.acceleration.x - dirs[movement.LEFT] * movement.acceleration.x;
-		resultant.y = dirs[movement.BACKWARD] * movement.acceleration.y - dirs[movement.FORWARD] * movement.acceleration.y;
+		resultant.x = movement.moving_right * movement.acceleration.x - movement.moving_left * movement.acceleration.x;
+		resultant.y = movement.moving_backward * movement.acceleration.y - movement.moving_forward * movement.acceleration.y;
 
 		if (resultant.non_zero())
 			physics.body->ApplyForce(resultant * PIXELS_TO_METERSf * physics.body->GetMass(), physics.body->GetWorldCenter());

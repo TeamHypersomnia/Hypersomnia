@@ -7,7 +7,7 @@ using namespace augmentations;
 
 namespace messages {
 	struct intent_message : public message {
-		enum class intent {
+		enum intent {
 			MOVE_FORWARD,
 			MOVE_BACKWARD,
 			MOVE_LEFT,
