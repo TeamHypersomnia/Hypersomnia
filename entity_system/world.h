@@ -57,6 +57,8 @@ namespace augmentations {
 			entity& create_entity();
 			void delete_entity(entity&, entity* redirect_pointers = nullptr);
 			
+			void delete_all_entities();
+
 			void run();
 		};
 

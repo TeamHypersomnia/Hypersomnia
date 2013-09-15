@@ -33,6 +33,15 @@ namespace augmentations {
 		entity& world::create_entity() {
 			return *entities.construct<world&>(*this);
 		}
+		
+		void world::delete_all_entities() {
+			entities.~object_pool<entity>();
+			new (&entities) boost::object_pool<entity>();
+
+			for (auto* system_to_clean : systems) {
+				system_to_clean->clear();
+			}
+		}
 
 		void world::delete_entity(entity& e, entity* redirect_pointers) {
 			auto it = registered_entity_watchers.find(&e);
