@@ -20,25 +20,33 @@ float randval(float min, float max) {
 	return std::uniform_real_distribution<float>(min, max)(generator);
 }
 
+unsigned randval(std::pair<unsigned, unsigned> p) {
+	return randval(p.first, p.second);
+}
+
+float randval(std::pair<float, float> p) {
+	return randval(p.first, p.second);
+}
+
 void particle_emitter_system::spawn_particle(
-	components::particle_group& group, const vec2<>& position, float rotation, const components::particle_group::emission& emission) {
+	components::particle_group& group, const vec2<>& position, float rotation, const components::particle_emitter::emission& emission) {
 		auto new_particle = emission.particle_templates[randval(0u, emission.particle_templates.size()-1)];
 		new_particle.vel = vec2<>::from_angle(
 			randval(rotation - emission.spread_radians, rotation + emission.spread_radians)) *
-			randval(emission.velocity_min, emission.velocity_max);
+			randval(emission.velocity);
 		
 		new_particle.pos = position + emission.offset;
 		new_particle.lifetime_ms = 0.f;
-		new_particle.face.size *= randval(emission.size_multiplier_min, emission.size_multiplier_max);
+		new_particle.face.size *= randval(emission.size_multiplier);
 		new_particle.rotation = randval(rotation - emission.initial_rotation_variation, rotation + emission.initial_rotation_variation);
-		new_particle.rotation_speed = randval(emission.angular_velocity_min, emission.angular_velocity_max);
-		new_particle.max_lifetime_ms = randval(emission.particle_lifetime_ms_min, emission.particle_lifetime_ms_max);
+		new_particle.rotation_speed = randval(emission.angular_velocity);
+		new_particle.max_lifetime_ms = randval(emission.particle_lifetime_ms);
 		
 
 		if (emission.randomize_acceleration) {
 			new_particle.acc += vec2<>::from_angle(
 				randval(rotation - emission.spread_radians, rotation + emission.spread_radians)) *
-				randval(emission.acc_min, emission.acc_max);
+				randval(emission.acceleration);
 		}
 
 		group.particles.push_back(new_particle);
@@ -54,15 +62,15 @@ void particle_emitter_system::process_entities(world& owner) {
 		auto* emitter = it.subject->find<particle_emitter>();
 		if (emitter == nullptr) continue;
 
-		auto emissions = emitter->available_emissions->find(it.type);
+		auto emissions = emitter->available_particle_effects->get_raw().find(it.type);
 
-		if (emissions == emitter->available_emissions->end()) continue;
+		if (emissions == emitter->available_particle_effects->get_raw().end()) continue;
 
 		for (auto& emission : (*emissions).second) {
 			float target_rotation = it.rotation + emission.angular_offset;
 
-			if (emission.type == particle_group::emission::type::BURST) {
-				int burst_amount = randval(emission.particles_per_burst_min, emission.particles_per_burst_max);
+			if (emission.type == particle_emitter::emission::type::BURST) {
+				int burst_amount = randval(emission.particles_per_burst);
 				
 				entity& new_burst_entity = owner.create_entity();
 				new_burst_entity.add(components::particle_group());
@@ -73,11 +81,11 @@ void particle_emitter_system::process_entities(world& owner) {
 					spawn_particle(new_burst_entity.get<components::particle_group>(), it.pos, target_rotation, emission);
 			}
 
-			else if (emission.type == particle_group::emission::type::STREAM) {
+			else if (emission.type == particle_emitter::emission::type::STREAM) {
 				components::particle_group new_stream;
 				new_stream.stream_info = &emission;
 				new_stream.stream_lifetime_ms = 0.f;
-				new_stream.stream_max_lifetime_ms = randval(emission.stream_duration_ms_min, emission.stream_duration_ms_max);
+				new_stream.stream_max_lifetime_ms = randval(emission.stream_duration_ms);
 				new_stream.stream_particles_to_spawn = 0.f;
 
 				entity& new_stream_entity = owner.create_entity();
