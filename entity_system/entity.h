@@ -46,7 +46,15 @@ namespace augmentations {
 			}
 
 			template <typename component_type>
-			void add(const component_type& object = component_type(), bool overwrite_if_exists = true) {
+			void set(const component_type& object) {
+				auto* obj = find<component_type>();
+				if (obj) {
+					(*obj) = object;
+				}
+			}
+
+			template <typename component_type>
+			void add(const component_type& object = component_type()) {
 				signature_matcher_bitset old_signature(get_components());
 
 				/* first try to insert with a null value and obtain iterator */
@@ -55,8 +63,8 @@ namespace augmentations {
 				/* component already exists, overwrite and return */
 				if (!p.second) {
 					assert(0 && "component already exists!");
-					if (overwrite_if_exists)
-						(*static_cast<component_type*>((*p.first).second)) = object;
+					//if (overwrite_if_exists)
+						//(*static_cast<component_type*>((*p.first).second)) = object;
 					return;
 				}
 
