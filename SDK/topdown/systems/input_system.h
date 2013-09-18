@@ -30,7 +30,7 @@ struct input_system : public processing_system_templated<components::input> {
 	void process_entities(world&) override;
 	
 	struct context {
-		std::unordered_map<unsigned, messages::intent_message::intent> raw_id_to_intent;
+		std::unordered_map<unsigned, messages::intent_message::intent_type> raw_id_to_intent;
 	};
 
 	std::vector<context*> active_contexts;

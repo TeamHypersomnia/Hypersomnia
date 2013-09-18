@@ -8,11 +8,8 @@
 #include "../messages/destroy_message.h"
 
 #include "../components/transform_component.h"
+#include "../components/physics_component.h"
 #include "../game/body_helper.h"
-
-#include "physics_system.h"
-
-health_system::health_system(physics_system& physics) : physics(physics) {}
 
 void health_system::process_entities(world& owner) {
 	auto events = owner.get_message_queue<messages::damage_message>();
@@ -35,7 +32,7 @@ void health_system::process_entities(world& owner) {
 				transform.current.rotation = it.impact_velocity.get_radians();
 				corpse.add(transform);
 
-				topdown::create_physics_component(corpse, physics.b2world, health->info->corpse_collision_filter);
+				topdown::create_physics_component(corpse, health->info->corpse_collision_filter);
 				auto body = corpse.get<components::physics>().body;
 				body->SetLinearDamping(5.f);
 				body->SetFixedRotation(true);

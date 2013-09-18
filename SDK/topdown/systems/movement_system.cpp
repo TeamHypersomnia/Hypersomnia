@@ -9,17 +9,17 @@ void movement_system::process_entities(world& owner) {
 	auto events = owner.get_message_queue<messages::intent_message>();
 
 	for (auto it : events) {
-		switch (it.type) {
-		case intent_message::intent::MOVE_FORWARD:
+		switch (it.intent) {
+		case intent_message::intent_type::MOVE_FORWARD:
 			it.subject->get<components::movement>().moving_forward = it.state_flag;
 			break;
-		case intent_message::intent::MOVE_BACKWARD:
+		case intent_message::intent_type::MOVE_BACKWARD:
 			it.subject->get<components::movement>().moving_backward = it.state_flag;
 			break;
-		case intent_message::intent::MOVE_LEFT:
+		case intent_message::intent_type::MOVE_LEFT:
 			it.subject->get<components::movement>().moving_left = it.state_flag;
 			break;
-		case intent_message::intent::MOVE_RIGHT:
+		case intent_message::intent_type::MOVE_RIGHT:
 			it.subject->get<components::movement>().moving_right = it.state_flag;
 			break;
 		default: break;

@@ -13,7 +13,7 @@ void input_system::post(messages::intent_message incoming_event, world& owner) {
 	incoming_event.mouse_rel = m.raw_rel;
 
 	for (auto it = targets.begin(); it != targets.end(); ++it) {
-		if ((*it)->get<components::input>().intents.find(incoming_event.type)) {
+		if ((*it)->get<components::input>().intents.find(incoming_event.intent)) {
 			incoming_event.subject = *it;
 			owner.post_message(incoming_event);
 		}
@@ -45,6 +45,10 @@ void input_system::process_entities(world& owner) {
 		if (msg == close) {
 			quit_flag = true;
 		}
+
+		if (msg == key::down) 
+			if (input_window.events.key == ESC)
+				quit_flag = true;
 
 		for (auto it = active_contexts.begin(); it != active_contexts.end(); ++it) {
 			bool succesfully_mapped = false;

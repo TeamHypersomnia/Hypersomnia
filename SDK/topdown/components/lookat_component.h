@@ -4,13 +4,15 @@
 
 namespace components {
 	struct lookat : public augmentations::entity_system::component {
-		enum chase_type {
+		enum look_type {
 			POSITION,
 			VELOCITY
-		} type;
+		};
+
+		unsigned look_mode;
 
 		augmentations::entity_system::entity_ptr target;
 
-		lookat(augmentations::entity_system::entity* target = nullptr, chase_type type = chase_type::POSITION) : target(target), type(type) {}
+		lookat(augmentations::entity_system::entity* target = nullptr, unsigned look_mode = look_type::POSITION) : target(target), look_mode(look_mode) {}
 	};
 }

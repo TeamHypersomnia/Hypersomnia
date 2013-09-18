@@ -17,7 +17,7 @@ namespace components {
 		unsigned mask;
 		bool enabled;
 
-		enum {
+		enum orbit_type {
 			NONE,
 			ANGLED,
 			LOOK

@@ -11,17 +11,13 @@
 
 #include "../game/body_helper.h"
 
-#include "physics_system.h"
-
-gun_system::gun_system(physics_system& physics) : physics(physics), generator(device()) {
-
-}
+gun_system::gun_system() : generator(device()) {}
 
 void gun_system::process_entities(world& owner) {
 	auto events = owner.get_message_queue<messages::intent_message>();
 
 	for (auto it : events) {
-		if (it.type == messages::intent_message::intent::SHOOT) {
+		if (it.intent == messages::intent_message::intent_type::SHOOT) {
 			it.subject->get<components::gun>().trigger = it.state_flag;
 		}
 	}
@@ -100,7 +96,7 @@ void gun_system::process_entities(world& owner) {
 					new_bullet.add(new_transform);
 					new_bullet.add(damage);
 					new_bullet.add(components::render(gun.info->bullet_layer, gun.info->bullet_sprite));
-					topdown::create_physics_component(new_bullet, physics.b2world, gun.info->bullet_collision_filter, b2_dynamicBody);
+					topdown::create_physics_component(new_bullet, gun.info->bullet_collision_filter, b2_dynamicBody);
 
 					/* bullet's physics settings */
 					auto body = new_bullet.get<components::physics>().body;

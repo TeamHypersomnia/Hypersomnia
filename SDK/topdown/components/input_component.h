@@ -6,9 +6,9 @@
 
 namespace components {
 	struct input : public augmentations::entity_system::component {
-		augmentations::util::sorted_vector<messages::intent_message::intent> intents;
+		augmentations::util::sorted_vector<unsigned> intents;
 
-		void add(messages::intent_message::intent _intent) {
+		void add(messages::intent_message::intent_type _intent) {
 			intents.add(_intent);
 		}
 	};

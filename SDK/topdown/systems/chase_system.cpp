@@ -4,10 +4,10 @@
 void chase_system::add(entity* e) {
 	auto& chase = e->get<components::chase>();
 
-	//if (chase.relative) {
+	if (chase.target != nullptr) {
 		chase.previous = chase.target->get<components::transform>().current.pos;
 		chase.rotation_previous = chase.target->get<components::transform>().current.rotation;
-	//}
+	}
 
 	processing_system::add(e);
 }

@@ -19,7 +19,7 @@ namespace components {
 			instance = new_instance;
 		}
 
-		enum {
+		enum mask_type {
 			WORLD,
 			GUI
 		};

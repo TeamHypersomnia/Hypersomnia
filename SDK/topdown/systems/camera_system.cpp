@@ -20,7 +20,7 @@ void camera_system::process_entities(world& owner) {
 	auto events = owner.get_message_queue<messages::intent_message>();
 
 	for (auto it : events) {
-		if (it.type == messages::intent_message::intent::SWITCH_LOOK && it.state_flag) {
+		if (it.intent == messages::intent_message::intent_type::SWITCH_LOOK && it.state_flag) {
 			auto& mode = it.subject->get<components::camera>().orbit_mode;
 			if (mode == components::camera::LOOK)
 				mode = components::camera::ANGLED;

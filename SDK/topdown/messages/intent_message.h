@@ -7,7 +7,7 @@ using namespace augmentations;
 
 namespace messages {
 	struct intent_message : public message {
-		enum intent {
+		enum intent_type {
 			MOVE_FORWARD,
 			MOVE_BACKWARD,
 			MOVE_LEFT,
@@ -18,12 +18,12 @@ namespace messages {
 			SWITCH_WEAPON
 		};
 
-		intent type;
+		unsigned intent;
 
 		bool state_flag;
 		vec2<int> mouse_pos, mouse_rel;
 
-		intent_message(intent type, bool state_flag = true) : type(type), state_flag(state_flag) {}
-		intent_message(intent type, vec2<int> mouse_pos, vec2<int> mouse_rel) : type(type), mouse_pos(mouse_pos), mouse_rel(mouse_rel), state_flag(true) {}
+		intent_message(unsigned intent = 0, bool state_flag = true) : intent(intent), state_flag(state_flag) {}
+		intent_message(unsigned intent, vec2<int> mouse_pos, vec2<int> mouse_rel) : intent(intent), mouse_pos(mouse_pos), mouse_rel(mouse_rel), state_flag(true) {}
 	};
 }

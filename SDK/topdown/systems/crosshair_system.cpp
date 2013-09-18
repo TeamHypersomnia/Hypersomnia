@@ -11,7 +11,7 @@ void crosshair_system::process_entities(world& owner) {
 	auto events = owner.get_message_queue<messages::intent_message>();
 
 	for (auto it : events) {
-		if (it.type == messages::intent_message::intent::AIM) {
+		if (it.intent == messages::intent_message::intent_type::AIM) {
 			auto transform = it.subject->find<components::transform>();
 			auto crosshair = it.subject->find<components::crosshair>();
 			
@@ -20,14 +20,14 @@ void crosshair_system::process_entities(world& owner) {
 			/* move crosshair according to its sensitivity and relative mouse movement (easier to support multiple resolutions) */
 			transform->current.pos += vec2<float>(it.mouse_rel) * crosshair->sensitivity;
 
-			if (it.mouse_rel.non_zero()) {
-				/* align the crosshair to bounds rect */
-
-				if(crosshair->bounds.good()) 
-					crosshair->bounds.snap_point(transform->current.pos);
-
-				//owner.post_message(messages::moved_message(it.subject));
-			}
+			//if (it.mouse_rel.non_zero()) {
+			//	/* align the crosshair to bounds rect */
+			//
+			//	if(crosshair->bounds.good()) 
+			//		crosshair->bounds.snap_point(transform->current.pos);
+			//
+			//	//owner.post_message(messages::moved_message(it.subject));
+			//}
 		}
 	}
 
