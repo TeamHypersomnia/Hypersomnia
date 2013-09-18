@@ -26,10 +26,11 @@
 #include "../components/transform_component.h"
 #include "../components/render_component.h"
 
+#include "../game/body_helper.h"
 #include "../game/sprite_helper.h"
 
 #include "../animation.h"
-
+#include "../script.h"
 
 namespace luabind
 {
@@ -65,6 +66,9 @@ namespace luabind
 
 script_system::script_system() : lua_state(luaL_newstate()) {
 	luabind::open(lua_state);
+
+	luaopen_base(lua_state);
+	luaopen_io(lua_state);
 	luabind::module(lua_state)[
 		luabind::class_<std::pair<float, float>>("minmax_f")
 			.def(luabind::constructor<float, float>())
@@ -91,6 +95,15 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			.property("w", (int (rects::ltrb::*)() const)&rects::ltrb::w, (void (rects::ltrb::*)(int) ) &rects::ltrb::w)
 			.property("h", (int (rects::ltrb::*)() const)&rects::ltrb::h, (void (rects::ltrb::*)(int) ) &rects::ltrb::h),
 
+		luabind::class_<rects::xywh>("rect_xywh")
+			.def(luabind::constructor<int, int, int, int>())
+			.def_readwrite("x", &rects::xywh::x)
+			.def_readwrite("y", &rects::xywh::y)
+			.def_readwrite("w", &rects::xywh::w)
+			.def_readwrite("h", &rects::xywh::h)
+			.property("r", (int (rects::xywh::*)() const)&rects::xywh::r, (void (rects::xywh::*)(int) ) &rects::xywh::r)
+			.property("b", (int (rects::xywh::*)() const)&rects::xywh::b, (void (rects::xywh::*)(int) ) &rects::xywh::b),
+
 		luabind::class_<window::glwindow>("glwindow")
 			.def(luabind::constructor<>())
 		,
@@ -98,6 +111,11 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 		luabind::class_<texture_baker::atlas>("atlas")
 			.def(luabind::constructor<>())
 			.def("build", &texture_baker::atlas::default_build),
+
+		luabind::class_<script>("script")
+			.def(luabind::constructor<>())
+			.def("associate_filename", (void (script::*)(const std::string&))&script::associate_filename)
+			.def("call", &script::call),
 
 		luabind::class_<sprite_helper>("sprite")
 			.def(luabind::constructor<std::wstring, texture_baker::atlas&>())
@@ -124,6 +142,10 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 		.def_readwrite("mask", &components::render::mask)
 		.def_readwrite("layer", &components::render::layer)
 		.property("image", &components::render::get_renderable<sprite_helper>, &components::render::set_renderable<sprite_helper>)
+		.enum_("mask_type")[
+			luabind::value("WORLD", components::render::mask_type::WORLD),
+			luabind::value("GUI", components::render::mask_type::GUI)
+		]
 		,
 		
 		luabind::class_<components::transform::state>("transform_state")
@@ -134,7 +156,6 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 		
 		luabind::class_<components::transform>("transform_component")
 		.def(luabind::constructor<>())
-		.def(luabind::constructor<vec2<>, float>())
 		.def_readwrite("current", &components::transform::current)
 		.def_readwrite("previous", &components::transform::previous)
 		,
@@ -145,19 +166,45 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 
 		luabind::class_<components::animate>("animate_component")
 		.def(luabind::constructor<>())
-		.def(luabind::constructor<components::animate::subscribtion*>())
 			.def_readwrite("available_animations", &components::animate::available_animations),
 			
+		luabind::class_<components::camera>("camera_component")
+			.def(luabind::constructor<>())
+			.def_readwrite("screen_rect", &components::camera::screen_rect)
+			.def_readwrite("ortho", &components::camera::ortho)
+			.def_readwrite("layer", &components::camera::layer)
+			.def_readwrite("mask", &components::camera::mask)
+			.def_readwrite("enabled", &components::camera::enabled)
+			.def_readwrite("orbit_mode", &components::camera::orbit_mode)
+			.def_readwrite("angled_look_length", &components::camera::angled_look_length)
+			.def_readwrite("enable_smoothing", &components::camera::enable_smoothing)
+			.def_readwrite("smoothing_average_factor", &components::camera::smoothing_average_factor)
+			.def_readwrite("averages_per_sec", &components::camera::averages_per_sec)
+			.def_readwrite("max_look_expand", &components::camera::max_look_expand)
+			.def_readwrite("player", &components::camera::player)
+			.def_readwrite("crosshair", &components::camera::crosshair)
+			.enum_("orbit_type")[
+				luabind::value("NONE", components::camera::orbit_type::NONE),
+				luabind::value("ANGLED", components::camera::orbit_type::ANGLED),
+				luabind::value("LOOK", components::camera::orbit_type::LOOK)
+			]
+			,
+
 			luabind::class_<components::chase>("chase_component")
 		.def(luabind::constructor<>())
-		.def(luabind::constructor < entity_system::entity*, bool, vec2 < >> ())
+			.def_readwrite("target", &components::chase::target)
 			.def_readwrite("type", &components::chase::type)
 			.def_readwrite("offset", &components::chase::offset)
 			.def_readwrite("rotation_orbit_offset", &components::chase::rotation_orbit_offset)
 			.def_readwrite("rotation_offset", &components::chase::rotation_offset)
 			.def_readwrite("relative", &components::chase::relative)
 			.def_readwrite("chase_rotation", &components::chase::chase_rotation)
-			.def_readwrite("track_origin", &components::chase::track_origin),
+			.def_readwrite("track_origin", &components::chase::track_origin)
+			.enum_("chase_type")[
+				luabind::value("OFFSET", components::chase::chase_type::OFFSET),
+				luabind::value("ORBIT", components::chase::chase_type::ORBIT)
+			]
+			,
 
 			luabind::class_<components::children>("children_component")
 			.def(luabind::constructor<>())
@@ -165,9 +212,8 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 
 			luabind::class_<components::crosshair>("crosshair_component")
 		.def(luabind::constructor<>())
-		.def(luabind::constructor<float, rects::ltrb>())
-			.def_readwrite("bounds", &components::crosshair::bounds)
-			.def_readwrite("blink", &components::crosshair::blink)
+			//.def_readwrite("bounds", &components::crosshair::bounds)
+			//.def_readwrite("blink", &components::crosshair::blink)
 			.def_readwrite("should_blink", &components::crosshair::should_blink)
 			.def_readwrite("sensitivity", &components::crosshair::sensitivity),
 
@@ -203,7 +249,6 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			
 		luabind::class_<components::gun>("gun_component")
 		.def(luabind::constructor<>())
-		.def(luabind::constructor<components::gun::gun_info*>())
 			.def_readwrite("info", &components::gun::info)
 			.def_readwrite("current_rounds", &components::gun::current_rounds)
 			.def_readwrite("reloading", &components::gun::reloading)
@@ -220,24 +265,38 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 
 		luabind::class_<components::health>("health_component")
 		.def(luabind::constructor<>())
-		.def(luabind::constructor<components::health::health_info*, float>())
 			.def_readwrite("info", &components::health::info)
 			.def_readwrite("hp", &components::health::hp)
 			.def_readwrite("dead", &components::health::dead),
 
+
+		luabind::class_<messages::intent_message>("intent_message")
+		.def(luabind::constructor<>())
+		.enum_("intent_type")[
+		luabind::value("MOVE_FORWARD", messages::intent_message::intent_type::MOVE_FORWARD),
+			luabind::value("MOVE_BACKWARD", messages::intent_message::intent_type::MOVE_BACKWARD),
+			luabind::value("MOVE_LEFT", messages::intent_message::intent_type::MOVE_LEFT),
+			luabind::value("MOVE_RIGHT", messages::intent_message::intent_type::MOVE_RIGHT),
+			luabind::value("SHOOT", messages::intent_message::intent_type::SHOOT),
+			luabind::value("AIM", messages::intent_message::intent_type::AIM),
+			luabind::value("SWITCH_LOOK", messages::intent_message::intent_type::SWITCH_LOOK),
+			luabind::value("SWITCH_WEAPON", messages::intent_message::intent_type::SWITCH_WEAPON)
+		],
+
 		luabind::class_<components::input>("input_component")
 			.def(luabind::constructor<>())
 			.def("add", &components::input::add),
-
 			luabind::class_<components::lookat>("lookat_component")
 			.def(luabind::constructor<>())
-			.def(luabind::constructor<entity_system::entity*, components::lookat::chase_type>())
-			.def_readwrite("type", &components::lookat::type)
-			.def_readwrite("target", &components::lookat::target),
+			.def_readwrite("look_mode", &components::lookat::look_mode)
+			.def_readwrite("target", &components::lookat::target)
+			.enum_("chase_type")[
+				luabind::value("OFFSET", components::lookat::look_type::POSITION),
+					luabind::value("ORBIT", components::lookat::look_type::VELOCITY)
+			],
 
 		luabind::class_<components::movement>("movement_component")
 		.def(luabind::constructor<>())
-		.def(luabind::constructor<vec2<>, float>())
 			.def("add_animation_receiver", &components::movement::add_animation_receiver)
 			.def_readwrite("moving_left", &components::movement::moving_left)
 			.def_readwrite("moving_right", &components::movement::moving_right)
@@ -333,33 +392,35 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			.def("add", &entity::add<components::transform>)
 			.property("transform", &entity::find<components::transform>, &entity::set<components::transform>)
 			.def("add", &entity::add<components::animate>)
-			.property("transform", &entity::find<components::animate>, &entity::set<components::animate>)
+			.property("animate", &entity::find<components::animate>, &entity::set<components::animate>)
 			.def("add", &entity::add<components::camera>)
-			.property("transform", &entity::find<components::camera>, &entity::set<components::camera>)
+			.property("camera", &entity::find<components::camera>, &entity::set<components::camera>)
 			.def("add", &entity::add<components::chase>)
-			.property("transform", &entity::find<components::chase>, &entity::set<components::chase>)
+			.property("chase", &entity::find<components::chase>, &entity::set<components::chase>)
 			.def("add", &entity::add<components::children>)
-			.property("transform", &entity::find<components::children>, &entity::set<components::children>)
+			.property("children", &entity::find<components::children>, &entity::set<components::children>)
 			.def("add", &entity::add<components::crosshair>)
-			.property("transform", &entity::find<components::crosshair>, &entity::set<components::crosshair>)
+			.property("crosshair", &entity::find<components::crosshair>, &entity::set<components::crosshair>)
 			.def("add", &entity::add<components::damage>)
-			.property("transform", &entity::find<components::damage>, &entity::set<components::damage>)
+			.property("damage", &entity::find<components::damage>, &entity::set<components::damage>)
 			.def("add", &entity::add<components::gun>)
-			.property("transform", &entity::find<components::gun>, &entity::set<components::gun>)
+			.property("gun", &entity::find<components::gun>, &entity::set<components::gun>)
 			.def("add", &entity::add<components::health>)
-			.property("transform", &entity::find<components::health>, &entity::set<components::health>)
+			.property("health", &entity::find<components::health>, &entity::set<components::health>)
 			.def("add", &entity::add<components::input>)
-			.property("transform", &entity::find<components::input>, &entity::set<components::input>)
+			.property("input", &entity::find<components::input>, &entity::set<components::input>)
 			.def("add", &entity::add<components::lookat>)
-			.property("transform", &entity::find<components::lookat>, &entity::set<components::lookat>)
+			.property("lookat", &entity::find<components::lookat>, &entity::set<components::lookat>)
 			.def("add", &entity::add<components::movement>)
-			.property("transform", &entity::find<components::movement>, &entity::set<components::movement>)
+			.property("movement", &entity::find<components::movement>, &entity::set<components::movement>)
 			.def("add", &entity::add<components::particle_emitter>)
-			.property("transform", &entity::find<components::particle_emitter>, &entity::set<components::particle_emitter>)
+			.property("particle_emitter", &entity::find<components::particle_emitter>, &entity::set<components::particle_emitter>)
 			.def("add", &entity::add<components::physics>)
-			.property("transform", &entity::find<components::physics>, &entity::set<components::physics>)
+			.property("physics", &entity::find<components::physics>, &entity::set<components::physics>)
 			.def("add", &entity::add<components::scriptable>)
-			.property("transform", &entity::find<components::scriptable>, &entity::set<components::scriptable>)
+			.property("scriptable", &entity::find<components::scriptable>, &entity::set<components::scriptable>),
+
+			luabind::def("create_physics_component", topdown::create_physics_component_str)
 	];
 }
 

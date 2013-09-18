@@ -61,8 +61,6 @@ int main() {
 
 	bool quit_flag = false;
 
-	std::cout << "compilation error";
-
 	world my_world;
 
 	input_system input(gl, quit_flag);
@@ -71,16 +69,18 @@ int main() {
 	crosshair_system crosshairs;
 	lookat_system lookat;
 	physics_system physics;
-	gun_system guns(physics);
+	gun_system guns;
 	particle_group_system particles;
 	particle_emitter_system emitters;
 	render_system render(gl);
 	camera_system camera(render);
 	chase_system chase;
 	damage_system damage;
-	health_system health(physics);
+	health_system health;
 	destroy_system destroy;
 	script_system scripts;
+
+	topdown::current_b2world = &physics.b2world;
 
 	my_world.add_system(&input);
 	my_world.add_system(&movement);
@@ -101,23 +101,12 @@ int main() {
 	scripts.global("world", my_world);
 	scripts.global("window", gl);
 
-	script my_script;
-	my_script.associate_filename("scripts/init_scene.lua");
-	auto luaerrors = my_script.compile(scripts.lua_state);
-	auto luaerrors_call = my_script.call(scripts.lua_state);
-	
-	entity& world_camera = my_world.create_entity();
-
-	world_camera.add(components::transform());
-	//world_camera.add(components::chase(&player.first, false, vec2<>(vec2<int>(gl.get_screen_rect()))*-0.5f));
-	world_camera.add(components::camera(gl.get_screen_rect(), gl.get_screen_rect(), 0, components::render::WORLD, 0.5, 20.0));
-	world_camera.get<components::camera>().crosshair = nullptr;
-	world_camera.get<components::camera>().player = nullptr;
-	world_camera.get<components::camera>().orbit_mode = components::camera::ANGLED;
-	world_camera.get<components::camera>().max_look_expand = vec2<>(vec2<int>(gl.get_screen_rect())) * 0.5f;
-	world_camera.get<components::camera>().enable_smoothing = true;
-	//world_camera.add(components::input());
-	//world_camera.get<components::input>().intents.add(intent_message::intent::SWITCH_LOOK);
+	script::lua_state = scripts.lua_state;
+	script::script_reloader.report_errors = &std::cout;
+	script::script_reloader.add_directory(L"scripts", true);
+	script init_script;
+	init_script.associate_filename("scripts\\init.lua");
+	init_script.call();
 
 	while (!quit_flag) {
 		my_world.run();
@@ -132,10 +121,14 @@ int main() {
 		my_world.get_message_queue<collision_message>().clear();
 		my_world.get_message_queue<particle_burst_message>().clear();
 		
-		auto scripts = script::script_reloader.get_modified_script_files();
+		auto scripts_reloaded = script::script_reloader.get_modified_script_files();
 
-		for (auto& script_to_reload : scripts) {
-			
+		for (auto& script_to_reload : scripts_reloaded) {
+			if (script_to_reload->reload_scene_when_modified) {
+				my_world.delete_all_entities();
+				init_script.call();
+				break;
+			}
 		}
 	}
 

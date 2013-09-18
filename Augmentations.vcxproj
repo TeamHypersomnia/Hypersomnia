@@ -39,7 +39,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;$(IncludePath)</IncludePath>
@@ -191,6 +192,7 @@
     <ClCompile Include="math\rects.cpp" />
     <ClCompile Include="math\vec2d.cpp" />
     <ClCompile Include="SDK\topdown\animation.cpp" />
+    <ClCompile Include="SDK\topdown\bindings\common.cpp" />
     <ClCompile Include="SDK\topdown\game\body_helper.cpp" />
     <ClCompile Include="SDK\topdown\game\sprite_helper.cpp" />
     <ClCompile Include="SDK\topdown\main.cpp" />

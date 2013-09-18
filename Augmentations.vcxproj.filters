@@ -453,6 +453,9 @@
     <ClCompile Include="3rdparty\readdir\ReadDirectoryChangesPrivate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\common.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config\config.h">
