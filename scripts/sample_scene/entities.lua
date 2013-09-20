@@ -31,7 +31,7 @@ local group_archetype = {
 		chase = {
 			target = 'body',
 			relative = false,
-			offset = vec2(200, 0),
+			offset = vec2(100, 0),
 			type = chase_component.OFFSET,
 			rotation_orbit_offset = vec2(0, 0),
 			rotation_offset = 45,
@@ -49,20 +49,6 @@ create_entity_group {
 			pos = vec2(214, 520),
 			rotation = 0
 		}	
-	}
-}
-
-create_entity_from_entry {
-	archetype = crate_archetype,
-	transform = {
-		rotation = 92
-	}
-}
-
-create_entity_from_entry {
-	archetype = crate_archetype,	
-	transform = {
-		rotation = 45
 	}
 }
 

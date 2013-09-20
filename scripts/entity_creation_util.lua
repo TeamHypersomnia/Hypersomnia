@@ -1,21 +1,25 @@
-function rewrite(component, entry, properties) 
-	for i, property in pairs(properties) do
-		if entry[property] ~= nil then
-			component[property] = entry[property]
+function rewrite(component, entry, omit_properties)
+	if omit_properties == nil then
+		for key, val in pairs(entry) do
+			component[key] = val
+		end
+	else
+		for key, val in pairs(entry) do
+			if omit_properties[key] == nil then
+				component[key] = val
+			end
 		end
 	end
 end
 
-function rewrite_ptr(component, entry, properties, entities_lookup) 
-	for i, property in pairs(properties) do
-		if entry[property] ~= nil then
-			if type(entry[property]) == "string" then
-				if(entities_lookup[entry[property]] ~= nil) then
-					component[property]:set(entities_lookup[entry[property]])
-				end  
-			else
-				component[property]:set(entry[property])
-			end
+function rewrite_ptr(component, entry, properties, entities_lookup)
+	if properties == nil then return end
+	
+	for key, val in pairs(properties) do
+		if type(entry[key]) == "string" then
+			component[key]:set(entities_lookup[entry[key]])
+		else
+			component[key]:set(entry[key])
 		end
 	end
 end
@@ -74,38 +78,34 @@ function set_components_from_entry(_entity, _entry, entities_lookup)
 			end
 		end
 		
-		rewrite(movement, entry.movement, {'acceleration', 'max_speed'})
+		rewrite(movement, entry.movement)
 	end
 	
-	if entry.physics ~= nil then
-		local filter = b2Filter()
-		rewrite(filter, entry.physics.filter, {'categoryBits', 'maskBits', 'groupIndex'})
-			
-		create_physics_component(_entity, filter, entry.physics.body_type)
-	end
-	
-	function def(module_name, property_name, variables, ptr_variables) 
+	function def(module_name, property_name, ptr_variables) 
 		if(entry[property_name] ~= nil) then
 			local component = _entity:add(module_name())
-			rewrite(component, entry[property_name], variables)
+			rewrite(component, entry[property_name], ptr_variables)
 			rewrite_ptr(component, entry[property_name], ptr_variables, entities_lookup)
 		end
 	end
 	
-	def(render_component, 'render', {'layer', 'image', 'mask'}, {})
-	def(animate_component, 'animate', {'available_animations'}, {})
-	def(camera_component, 'camera', {'enabled', 'layer', 'mask', 'screen_rect', 'ortho',
-		 'enable_smoothing', 'smoothing_average_factor', 'averages_per_sec', 'crosshair', 'player', 
-		 'orbit_mode', 'max_look_expand',
-		'angled_look_length' }, {})
+	def(render_component, 'render')
+	def(animate_component, 'animate')
+	def(camera_component, 'camera', { crosshair = true, player = true})
+	def(chase_component, 'chase', { target = true })
+	def(crosshair_component, 'crosshair')
+	def(damage_component, 'damage', { sender = true })
+	def(gun_component, 'damage', { target_camera_to_shake = true })
+	def(health_component, 'health')
+	def(lookat_component, 'lookat', { target = true })
+	def(particle_emitter_component, 'particle_emitter')
 	
-	def(chase_component, 'chase', {'type', 'offset', 'rotation_orbit_offset', 'rotation_offset', 'relative', 'chase_rotation', 'track_origin'}, {'target'})
-	def(crosshair_component, 'crosshair', {'should_blink', 'sensitivity'}, {})
-	def(damage_component, 'damage', {'amount', 'starting_point', 'max_distance'}, {'sender'})
-	def(gun_component, 'damage', {'info', 'current_rounds', 'reloading'}, {'target_camera_to_shake'})
-	def(health_component, 'health', {'info', 'hp', 'dead'}, {})
-	def(lookat_component, 'lookat', {'look_mode'}, {'target'})
-	def(particle_emitter_component, 'particle_emitter', {'available_particle_effects'})
+	if entry.physics ~= nil then
+		local filter = b2Filter()
+		rewrite(filter, entry.physics.filter)
+			
+		create_physics_component(_entity, filter, entry.physics.body_type)
+	end
 end
 
 function create_entity_from_entry(entry)
