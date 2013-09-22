@@ -5,13 +5,13 @@
 
 #include "../messages/particle_burst_message.h"
 #include "chase_component.h"
-#include "../renderable.h"
+#include "../resources/render_info.h"
 
 namespace components {
 	struct particle_emitter : public augmentations::entity_system::component {
 		struct particle {
 			augmentations::vec2<> pos, vel, acc;
-			sprite face;
+			resources::sprite face;
 			float rotation;
 			float rotation_speed;
 			float linear_damping;

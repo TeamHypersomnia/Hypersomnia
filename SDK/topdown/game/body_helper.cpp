@@ -1,7 +1,7 @@
 #include "body_helper.h"
 #include "../components/physics_component.h"
 #include "../components/render_component.h"
-#include "../renderable.h"
+#include "../render_info.h"
 
 #include "entity_system/entity_system.h"
 

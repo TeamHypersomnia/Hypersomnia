@@ -2,8 +2,6 @@
 #include <Box2D\Box2D.h>
 #include <string>
 
-struct sprite;
-
 namespace augmentations {
 	namespace entity_system {
 		class entity;

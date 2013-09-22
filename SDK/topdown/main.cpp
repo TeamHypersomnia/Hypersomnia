@@ -39,9 +39,9 @@
 #include "game/body_helper.h"
 #include "game/sprite_helper.h"
 
-#include "renderable.h"
-#include "animation.h"
-#include "script.h"
+#include "render_info.h"
+#include "resources/animate_info.h"
+#include "resources/scriptable_info.h"
 
 using namespace augmentations;
 using namespace entity_system;

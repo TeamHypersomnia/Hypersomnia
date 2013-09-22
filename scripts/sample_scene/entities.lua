@@ -1,17 +1,30 @@
-local default_transform = {
-	transform = {
-		pos = vec2(300, 200),
-		rotation = 0
-	}
+local crate_archetype = {
+	image = crate_texture,
+	layer = 1,
+	mask = 0,
+	color = { r = 255, g = 255, b = 255, a = 255 }
+}
+
+local crate_sprite = create_render_info {
+	archetype = crate_archetype,
+}
+
+local red_crate_sprite = create_render_info {
+	archetype = crate_archetype,
+	
+	layer = 0,
+	color = { r = 255, g = 0, b = 0, a = 255 },
+	size = vec2(40, 40)
 }
 
 local crate_archetype = {
-	archetype = default_transform, 
+	transform = {
+		pos = vec2(0, 0),
+		rotation = 0
+	},
 	
 	render = {
-		image = crate_sprite,
-		layer = 0,
-		mask = 0
+		info = red_crate_sprite
 	}
 }
 

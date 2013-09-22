@@ -27,10 +27,10 @@
 #include "../components/render_component.h"
 
 #include "../game/body_helper.h"
-#include "../game/sprite_helper.h"
+#include "../game/texture_helper.h"
 
-#include "../animation.h"
-#include "../script.h"
+#include "../resources/animate_info.h"
+#include "../resources/scriptable_info.h"
 
 namespace luabind
 {
@@ -65,6 +65,9 @@ namespace luabind
 }
 
 script_system::script_system() : lua_state(luaL_newstate()) {
+	using namespace resources;
+	using namespace topdown;
+
 	luabind::open(lua_state);
 
 	luaopen_base(lua_state);
@@ -85,6 +88,12 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			.def(luabind::constructor<>())
 			.def_readwrite("x", &vec2<>::x)
 			.def_readwrite("y", &vec2<>::y),
+
+		luabind::class_<graphics::pixel_32>("rgba")
+			.def_readwrite("r", &graphics::pixel_32::r)
+			.def_readwrite("g", &graphics::pixel_32::g)
+			.def_readwrite("b", &graphics::pixel_32::b)
+			.def_readwrite("a", &graphics::pixel_32::a),
 
 		luabind::class_<rects::ltrb>("rect_ltrb")
 			.def(luabind::constructor<int, int, int, int>())
@@ -117,9 +126,8 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			.def("associate_filename", (void (script::*)(const std::string&))&script::associate_filename)
 			.def("call", &script::call),
 
-		luabind::class_<sprite_helper>("sprite")
-			.def(luabind::constructor<std::wstring, texture_baker::atlas&>())
-			.def_readwrite("size", &sprite_helper::size),
+		luabind::class_<texture_helper>("texture")
+			.def(luabind::constructor<std::wstring, texture_baker::atlas&>()),
 
 		luabind::class_<animation>("animation")
 			.def(luabind::constructor<>())
@@ -136,28 +144,33 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			.def("get", &entity_ptr::get)
 			.def("set", &entity_ptr::set),
 
+		luabind::class_<sprite>("sprite")
+			.def_readwrite("mask", &sprite::mask)
+			.def_readwrite("layer", &sprite::layer)
+			.def_readwrite("size", &sprite::size)
+			.def_readwrite("image", &sprite::tex)
+			.def_readwrite("color", &sprite::color)
+			.def("update_size", &sprite::update_size)
+			.enum_("mask_type")[
+				luabind::value("WORLD", sprite::mask_type::WORLD),
+					luabind::value("GUI", sprite::mask_type::GUI)
+			],
+
 		luabind::class_<components::render>("render_component")
-		.def(luabind::constructor<>())
-		//.def(luabind::constructor<unsigned, sprite_helper*, unsigned>())
-		.def_readwrite("mask", &components::render::mask)
-		.def_readwrite("layer", &components::render::layer)
-		.property("image", &components::render::get_renderable<sprite_helper>, &components::render::set_renderable<sprite_helper>)
-		.enum_("mask_type")[
-			luabind::value("WORLD", components::render::mask_type::WORLD),
-			luabind::value("GUI", components::render::mask_type::GUI)
-		]
+			.def(luabind::constructor<>())
+			.property("info", &components::render::get_render_info<sprite>, &components::render::set_render_info<sprite>)
 		,
 		
 		luabind::class_<components::transform::state>("transform_state")
-		.def(luabind::constructor<>())
-		.def_readwrite("pos", &components::transform::state::pos)
-		.property("rotation", &components::transform::state::get_rotation, &components::transform::state::set_rotation)
+			.def(luabind::constructor<>())
+			.def_readwrite("pos", &components::transform::state::pos)
+			.property("rotation", &components::transform::state::get_rotation, &components::transform::state::set_rotation)
 		,
 		
 		luabind::class_<components::transform>("transform_component")
-		.def(luabind::constructor<>())
-		.def_readwrite("current", &components::transform::current)
-		.def_readwrite("previous", &components::transform::previous)
+			.def(luabind::constructor<>())
+			.def_readwrite("current", &components::transform::current)
+			.def_readwrite("previous", &components::transform::previous)
 		,
 
 		luabind::class_<components::animate::subscribtion>("animation_subscribtion")

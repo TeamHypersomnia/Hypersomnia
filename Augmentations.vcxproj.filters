@@ -237,9 +237,6 @@
     <ClCompile Include="SDK\topdown\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\topdown\renderable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SDK\topdown\systems\crosshair_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -250,9 +247,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SDK\topdown\systems\chase_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SDK\topdown\animation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SDK\topdown\systems\animation_system.cpp">
@@ -438,12 +432,6 @@
     <ClCompile Include="SDK\topdown\systems\script_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\topdown\script.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SDK\topdown\game\sprite_helper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\readdir\ReadDirectoryChanges.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -454,6 +442,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SDK\topdown\bindings\common.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\game\texture_helper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\resources\render_info.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\resources\scriptable_info.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\resources\animate_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -707,9 +707,6 @@
     <ClInclude Include="SDK\topdown\systems\render_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\topdown\renderable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SDK\topdown\messages\intent_message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -749,13 +746,7 @@
     <ClInclude Include="SDK\topdown\components\animate_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\topdown\animation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SDK\topdown\systems\animation_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SDK\topdown\vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SDK\topdown\components\gun_component.h">
@@ -1133,13 +1124,7 @@
     <ClInclude Include="SDK\topdown\components\scriptable_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\topdown\script.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="entity_system\entity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SDK\topdown\game\sprite_helper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="utility\map_wrapper.h">
@@ -1158,6 +1143,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\readdir\ReadDirectoryChangesPrivate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\resources\vertex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\game\texture_helper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\resources\render_info.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\resources\scriptable_info.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\resources\animate_info.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\resources\gun_info.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

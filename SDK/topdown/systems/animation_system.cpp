@@ -2,7 +2,7 @@
 #include "entity_system/world.h"
 #include "../messages/animate_message.h"
 
-#include "../animation.h"
+#include "../resources/animate_info.h"
 using namespace messages;
 
 void animation_system::process_entities(world& owner) {

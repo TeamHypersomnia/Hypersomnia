@@ -1,32 +1,25 @@
 #pragma once
 #include "entity_system/component.h"
 
-struct renderable;
-struct sprite;
+namespace resources {
+	struct render_info;
+}
+
 namespace components {
 	struct render : public augmentations::entity_system::component {
-		unsigned layer;
-		renderable* instance;
+		resources::render_info* info;
 
 		/* for script bindings */
 		template<class derived>
 		derived* get_renderable() {
-			return reinterpret_cast<derived*>(instance);
+			return reinterpret_cast<derived*>(model);
 		}
 
 		template<class derived>
-		void set_renderable(derived* new_instance) {
-			instance = new_instance;
+		void set_renderable(derived* new_model) {
+			model = new_model;
 		}
 
-		enum mask_type {
-			WORLD,
-			GUI
-		};
-
-		unsigned mask;
-
-		render(unsigned layer = 0, renderable* instance = nullptr, unsigned mask = WORLD)
-			: layer(layer), instance(instance), mask(mask) {}
+		render(resources::render_info* info) : info(info) {}
 	};
 }

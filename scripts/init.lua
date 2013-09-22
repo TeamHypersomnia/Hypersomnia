@@ -1,15 +1,16 @@
 local my_atlas = atlas()
-crate_sprite = sprite("Release\\resources\\crate.jpg", my_atlas)
+crate_texture = texture("Release\\resources\\crate.jpg", my_atlas)
 
 my_atlas:build()
 
-crate_sprite.size = vec2(100, 100)
-
 local util = script()
+local resource_util = script()
 local scene = script()
 
 util:associate_filename("scripts\\entity_creation_util.lua")
+resource_util:associate_filename("scripts\\resource_creation_util.lua")
 scene:associate_filename("scripts\\sample_scene\\entities.lua")
 
 util:call()
+resource_util:call()
 scene:call()

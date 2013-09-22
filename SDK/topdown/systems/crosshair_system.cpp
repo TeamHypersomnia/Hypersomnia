@@ -5,7 +5,7 @@
 #include "../messages/moved_message.h"
 
 #include "../components/render_component.h"
-#include "../renderable.h"
+#include "../render_info.h"
 
 void crosshair_system::process_entities(world& owner) {
 	auto events = owner.get_message_queue<messages::intent_message>();
