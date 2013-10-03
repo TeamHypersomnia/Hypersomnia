@@ -19,6 +19,7 @@ namespace augmentations {
 
 	template <class vec, class d>
 	vec& rotate(vec& v, const vec& origin, d angle) {
+		angle *= 0.01745329251994329576923690768489;
 		auto s = sin(angle);
 		auto c = cos(angle);
 		vec rotated;
@@ -47,9 +48,9 @@ namespace augmentations {
 		type x, y;
 		
 		template <class t>
-		static vec2 from_angle(t radians) {
+		static vec2 from_angle(t degrees) {
 			vec2 out;
-			out.set_from_angle(radians);
+			out.set_from_angle(degrees);
 			return out;
 		}
 
@@ -107,6 +108,7 @@ namespace augmentations {
 		}
 
 		vec2& set_from_angle(float rotation) {
+			rotation *= 0.01745329251994329576923690768489;
 			set(cos(rotation), sin(rotation));
 			normalize();
 			return *this;
