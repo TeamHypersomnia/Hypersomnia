@@ -1,14 +1,13 @@
 #pragma once
 #include <vector>
+#include "render_info.h"
 
 namespace resources {
-	struct render_info;
-
 	struct animation {
 		struct frame {
-			render_info* instance;
+			sprite model;
 			float duration_milliseconds;
-			frame(render_info* instance, float duration_milliseconds);
+			frame(sprite model, float duration_milliseconds);
 		};
 
 		std::vector<frame> frames;
@@ -22,7 +21,14 @@ namespace resources {
 		loop_type loop_mode;
 
 		animation();
+		~animation() {
+			int wtflol = 0;
+			wtflol = 2;
+		}
 
-		void add_frame(render_info* instance, float duration_milliseconds);
+		template <typename T>
+		void add_frame(T* model, float duration_milliseconds) {
+			frames.push_back(frame(*model, duration_milliseconds));
+		}
 	};
 }
