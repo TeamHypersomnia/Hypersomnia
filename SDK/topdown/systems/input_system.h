@@ -30,10 +30,15 @@ struct input_system : public processing_system_templated<components::input> {
 	void process_entities(world&) override;
 	
 	struct context {
-		std::unordered_map<unsigned, messages::intent_message::intent_type> raw_id_to_intent;
+		std::unordered_map<unsigned, unsigned> raw_id_to_intent;
+		bool enabled;
+		context();
+
+		void set_intent(unsigned, messages::intent_message::intent_type);
 	};
 
 	std::vector<context*> active_contexts;
+	void add_context(context*);
 
 	window::glwindow& input_window;
 	input_system(window::glwindow&, bool& quit_flag);
@@ -42,4 +47,6 @@ struct input_system : public processing_system_templated<components::input> {
 	bool post_intent_from_raw_id(world& owner, const context&, unsigned id, bool state = true);
 
 	void post(messages::intent_message incoming_event, world& owner);
+
+	void clear() override;
 };
