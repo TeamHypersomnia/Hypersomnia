@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include <Box2D/Box2D.h>
 
 #include "texture_baker/texture_baker.h"
 #include "entity_system/entity_ptr.h"
@@ -29,6 +28,12 @@ namespace resources {
 		vec2<> size;
 
 		sprite(texture_baker::texture* = nullptr, graphics::pixel_32 = graphics::pixel_32());
+		~sprite() {
+			int wtflol = 0;
+			wtflol = 23;
+
+			wtflol *= 2;
+		}
 
 		void set(texture_baker::texture*, graphics::pixel_32);
 		void update_size();
@@ -47,20 +52,5 @@ namespace resources {
 	struct particles : public renderable {
 		components::particle_group* target_group;
 
-		virtual void draw(buffer&, const components::transform&, vec2<> camera_pos) override;
-		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform&) override;
-		virtual b2Body* create_body(entity_system::entity& subject, b2World& b2world, b2BodyType type) override;
-	};
-
-	struct render_info {
-		renderable* model;
-
-		enum mask_type {
-			WORLD,
-			GUI
-		};
-
-		unsigned layer;
-		unsigned mask;
 	};
 }

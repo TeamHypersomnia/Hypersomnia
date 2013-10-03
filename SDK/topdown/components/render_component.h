@@ -2,12 +2,20 @@
 #include "entity_system/component.h"
 
 namespace resources {
-	struct render_info;
+	struct renderable;
 }
 
 namespace components {
 	struct render : public augmentations::entity_system::component {
-		resources::render_info* info;
+		resources::renderable* model;
+
+		enum mask_type {
+			WORLD,
+			GUI
+		};
+
+		unsigned layer;
+		unsigned mask;
 
 		/* for script bindings */
 		template<class derived>
@@ -20,6 +28,6 @@ namespace components {
 			model = new_model;
 		}
 
-		render(resources::render_info* info) : info(info) {}
+		render(resources::renderable* model = nullptr) : model(model) {}
 	};
 }

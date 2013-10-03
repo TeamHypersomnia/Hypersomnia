@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "render_info.h"
 
 #include <algorithm>
@@ -129,9 +131,11 @@ namespace resources {
 	void polygon::draw(buffer& triangles, const components::transform& transform, vec2<> camera_pos) {
 		/* perform triangulation */
 	}
+}
 
-	void particles::draw(buffer& triangles, const components::transform& transform, vec2<> camera_pos) {
-		for (auto& it : target_group->particles) {
+namespace components {
+	void particle_group::draw(resources::buffer& triangles, const components::transform& transform, vec2<> camera_pos) {
+		for (auto& it : particles) {
 			auto temp_alpha = it.face.color.a;
 
 			if (it.should_disappear)
@@ -142,12 +146,12 @@ namespace resources {
 		}
 	}
 
-	bool particles::is_visible(rects::xywh visibility_aabb, const components::transform& transform) {
+	bool particle_group::is_visible(rects::xywh visibility_aabb, const components::transform& transform) {
 		/* will be visible most of the time */
 		return true;
 	}
 
-	b2Body* particles::create_body(entity_system::entity& subject, b2World& b2world, b2BodyType type) {
+	b2Body* particle_group::create_body(entity_system::entity& subject, b2World& b2world, b2BodyType type) {
 		return nullptr;
 	}
 }
