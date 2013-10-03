@@ -4,11 +4,12 @@
 #include "../messages/animate_message.h"
 #include "utility/map_wrapper.h"
 
-namespace resources {
-	struct animation;
-	typedef augmentations::util::map_wrapper<messages::animate_message::animation, animation*> animate_info;
-}
+#include "../resources/animate_info.h"
+
 class animation_system;
+namespace resources {
+	typedef augmentations::util::map_wrapper<unsigned, animation*> animate_info;
+}
 
 namespace components {
 	struct animate : public augmentations::entity_system::component {
