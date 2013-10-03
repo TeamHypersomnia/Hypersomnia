@@ -1,9 +1,10 @@
+#include "stdafx.h"
 #include "animation_system.h"
 #include "entity_system/world.h"
 #include "../messages/animate_message.h"
 
-#include "../resources/animate_info.h"
 using namespace messages;
+using namespace resources;
 
 void animation_system::process_entities(world& owner) {
 	auto events = owner.get_message_queue<animate_message>();
@@ -45,7 +46,7 @@ void animation_system::process_entities(world& owner) {
 				animate.speed_factor = it.speed_factor;
 
 			if (it.change_animation) {
-				auto new_instance = animate.available_animations->at(it.animation_type);
+				auto new_instance = it.set_animation != nullptr ? it.set_animation : animate.available_animations->at(it.animation_type);
 
 				if (new_instance != animate.current_animation) {
 					if (!it.preserve_state_if_animation_changes) {
@@ -63,8 +64,11 @@ void animation_system::process_entities(world& owner) {
 	for (auto it : targets) {
 		auto& animate = it->get<components::animate>();
 		auto& render = it->get<components::render>();
+		if (animate.current_animation == nullptr) continue;
+
 		auto& animation = *animate.current_animation;
-		
+		if (animation.frames.empty()) continue;
+
 		if (animate.current_state != components::animate::state::PAUSED) {
 			animate.current_ms += delta * animate.speed_factor;
 
@@ -121,6 +125,6 @@ void animation_system::process_entities(world& owner) {
 			}
 		}
 
-		render.instance = animation.frames[animate.current_frame].instance;
+		render.model = &animation.frames[animate.current_frame].model;
 	}
 }
