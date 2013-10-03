@@ -1,28 +1,26 @@
+#include "stdafx.h"
 #include "scriptable_info.h"
-
-extern "C" {
-#include <lua\lua.h>
-#include <lua\lauxlib.h>
-}
 
 #include <fstream>
 
 namespace resources {
-	script::script() : needs_reloading(false), is_associated_string_filename(false), reload_scene_when_modified(true), call_upon_reload(true) {
+	script::script() : needs_recompilation(false), is_associated_string_filename(false), reload_scene_when_modified(true) {
 
 	}
 
 	void script::associate_string(const std::string& str) {
 		associated_string = str;
 		is_associated_string_filename = false;
-		needs_reloading = true;
+		needs_recompilation = true;
 	}
 
 	lua_State* script::lua_state = nullptr;
 
 	script::reloader script::script_reloader;
+	
+	script::reloader::script_entry::script_entry(script* script_ptr) : script_ptr(script_ptr) {}
 
-	std::vector<script*> script::reloader::get_modified_script_files() {
+	std::vector<script*> script::reloader::get_script_files_to_reload() {
 		std::vector<script*> output;
 
 		if (WaitForSingleObjectEx(changes.GetWaitHandle(), 0, false) == WAIT_OBJECT_0) {
@@ -33,14 +31,23 @@ namespace resources {
 				DWORD dwAction;
 				CStringW wstrFilename;
 
-				while (changes.Pop(dwAction, wstrFilename)) {
-					if (dwAction == FILE_ACTION_MODIFIED) {
-						auto it = filename_to_script.find(std::wstring(wstrFilename));
+				std::vector<CStringW> filenames;
 
-						if (it != filename_to_script.end()) {
-							output.push_back((*it).second);
-							(*it).second->needs_reloading = true;
-						}
+				while (changes.Pop(dwAction, wstrFilename))
+					if (dwAction == FILE_ACTION_MODIFIED)
+						filenames.push_back(wstrFilename);
+
+				std::sort(filenames.begin(), filenames.end());
+				filenames.erase(std::unique(filenames.begin(), filenames.end()), filenames.end());
+
+				for (auto& filename : filenames) {
+					auto it = filename_to_script.find(std::wstring(filename));
+
+					if (it != filename_to_script.end()) {
+						for (auto script_to_reload : (*it).second.reload_dependants)
+							output.push_back(script_to_reload);
+
+						(*it).second.script_ptr->needs_recompilation = true;
 					}
 				}
 			}
@@ -65,11 +72,16 @@ namespace resources {
 			script_reloader.filename_to_script.erase(std::wstring(associated_string.begin(), associated_string.end()));
 
 		if (register_for_file_reloading)
-			script_reloader.filename_to_script[std::wstring(str.begin(), str.end())] = this;
+			script_reloader.filename_to_script[std::wstring(str.begin(), str.end())] = reloader::script_entry(this);
 
 		associated_string = str;
 		is_associated_string_filename = true;
-		needs_reloading = true;
+		needs_recompilation = true;
+	}
+
+	void script::add_reload_dependant(script* dependant) {
+		assert(is_associated_string_filename);
+		script_reloader.filename_to_script[std::wstring(associated_string.begin(), associated_string.end())].reload_dependants.push_back(dependant);
 	}
 
 	const std::string& script::get_associated_string() const {
@@ -109,11 +121,11 @@ namespace resources {
 	}
 
 	void script::set_out_of_date() {
-		needs_reloading = true;
+		needs_recompilation = true;
 	}
 
 	std::string script::compile() {
-		if (needs_reloading) {
+		if (needs_recompilation) {
 			int result = LUA_OK;
 			bytecode.clear();
 
@@ -141,7 +153,7 @@ namespace resources {
 			}
 		}
 
-		needs_reloading = false;
+		needs_recompilation = false;
 		return std::string();
 	}
 
