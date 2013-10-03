@@ -1,5 +1,5 @@
 #pragma once
-#include <luabind/object.hpp>
+#include "stdafx.h"
 
 #include "entity_system/processing_system.h"
 #include "../components/scriptable_component.h"
