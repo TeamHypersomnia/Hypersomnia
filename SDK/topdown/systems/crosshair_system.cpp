@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "crosshair_system.h"
 #include "entity_system/world.h"
 
@@ -5,7 +6,7 @@
 #include "../messages/moved_message.h"
 
 #include "../components/render_component.h"
-#include "../render_info.h"
+#include "../resources/render_info.h"
 
 void crosshair_system::process_entities(world& owner) {
 	auto events = owner.get_message_queue<messages::intent_message>();
@@ -38,7 +39,7 @@ void crosshair_system::process_entities(world& owner) {
 		if (render && crosshair.should_blink) {
 			float ratio = 0.f;
 			crosshair.blink.animate(ratio);
-			sprite* crosshair_sprite = static_cast<sprite*>(render->instance);
+			resources::sprite* crosshair_sprite = render->get_renderable<resources::sprite>();
 			crosshair_sprite->size = vec2<int>(vec2<>(crosshair_sprite->tex->get_size())*ratio);
 		}
 	}

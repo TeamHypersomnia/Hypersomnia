@@ -1,7 +1,9 @@
+#include "stdafx.h"
 #include "particle_group_system.h"
 #include "particle_emitter_system.h"
 #include "entity_system/entity.h"
 
+#include "../resources/particle_emitter_info.h"
 #include "../messages/destroy_message.h"
 
 void particle_group_system::process_entities(world& owner) {
@@ -36,7 +38,7 @@ void particle_group_system::process_entities(world& owner) {
 		}
 
 		group.particles.erase(std::remove_if(group.particles.begin(), group.particles.end(),
-			[](const components::particle_emitter::particle& a) { return a.should_disappear && a.lifetime_ms >= a.max_lifetime_ms;  }
+			[](const resources::particle& a) { return a.should_disappear && a.lifetime_ms >= a.max_lifetime_ms;  }
 		), group.particles.end());
 		
 		if (group.particles.empty() && group.destroy_when_empty && (!group.stream_info || group.stream_lifetime_ms >= group.stream_max_lifetime_ms))

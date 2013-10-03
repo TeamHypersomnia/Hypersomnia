@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "camera_system.h"
 
 #include <gl\GL.h>

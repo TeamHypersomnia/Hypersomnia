@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "lookat_system.h"
 #include "entity_system/entity.h"
 

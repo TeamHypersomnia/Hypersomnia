@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "physics_system.h"
 #include "entity_system/entity.h"
 
