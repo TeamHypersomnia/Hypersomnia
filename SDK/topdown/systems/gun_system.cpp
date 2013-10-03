@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "gun_system.h"
 #include "entity_system/world.h"
 #include "../messages/intent_message.h"
@@ -29,7 +30,7 @@ void gun_system::process_entities(world& owner) {
 		if (!gun.reloading &&
 			gun.current_rounds > 0 &&
 			gun.trigger &&
-			gun.shooting_timer.get<std::chrono::milliseconds>() >= gun.info->shooting_interval_ms) {
+			gun.shooting_timer.get<std::chrono::milliseconds>() >= gun.shooting_interval_ms) {
 
 				messages::animate_message msg;
 				msg.animation_type = messages::animate_message::animation::SHOT;
@@ -46,20 +47,20 @@ void gun_system::process_entities(world& owner) {
 				if (gun.target_camera_to_shake) {
 					vec2<> shake_dir;
 					shake_dir.set_from_angle(std::uniform_real_distribution<float>(
-						gun_transform.current.rotation - gun.info->shake_spread_radians,
-						gun_transform.current.rotation + gun.info->shake_spread_radians)(generator));
+						gun_transform.current.rotation - gun.shake_spread_degrees,
+						gun_transform.current.rotation + gun.shake_spread_degrees)(generator));
 				
-					gun.target_camera_to_shake->get<components::camera>().last_interpolant += shake_dir * gun.info->shake_radius;
+					gun.target_camera_to_shake->get<components::camera>().last_interpolant += shake_dir * gun.shake_radius;
 				}
 
-				if (!gun.info->is_automatic)
+				if (!gun.is_automatic)
 					gun.trigger = false;
 
 				--gun.current_rounds;
 
 				/* place bullets near the very barrel */
 				auto new_transform = gun_transform;
-				new_transform.current.pos += vec2<>::from_angle(gun_transform.current.rotation) * gun.info->bullet_distance_offset;
+				new_transform.current.pos += vec2<>::from_angle(gun_transform.current.rotation) * gun.bullet_distance_offset;
 
 				messages::particle_burst_message burst;
 				burst.pos = new_transform.current.pos;
@@ -69,40 +70,40 @@ void gun_system::process_entities(world& owner) {
 
 				owner.post_message(burst);
  
-				for (int i = 0; i < gun.info->bullets_once; ++i) {
+				for (int i = 0; i < gun.bullets_once; ++i) {
 					entity& new_bullet = owner.create_entity();
 
 					/* randomize bullet direction taking spread into account */
 					vec2<> vel(vec2<>::from_angle(
 						std::uniform_real_distribution<float> (
-						gun_transform.current.rotation - gun.info->spread_radians,
-						gun_transform.current.rotation + gun.info->spread_radians)(generator)));
+						gun_transform.current.rotation - gun.spread_degrees,
+						gun_transform.current.rotation + gun.spread_degrees)(generator)));
 
 					new_transform.current.rotation = vel.get_radians();
 					
 					/* add randomized speed to bullet taking velocity variation into account */
 					vel *= std::uniform_real_distribution<float> (
-						gun.info->bullet_speed - gun.info->velocity_variation,
-						gun.info->bullet_speed + gun.info->velocity_variation)(generator) * PIXELS_TO_METERSf;
+						gun.bullet_speed - gun.velocity_variation,
+						gun.bullet_speed + gun.velocity_variation)(generator) * PIXELS_TO_METERSf;
 
 					components::damage damage;
 					/* randomize damage */
-					damage.amount = std::uniform_real_distribution<float> (gun.info->bullet_min_damage, gun.info->bullet_max_damage)(generator);
+					damage.amount = std::uniform_real_distribution<float> (gun.bullet_min_damage, gun.bullet_max_damage)(generator);
 					damage.sender = it;
-					damage.max_distance = gun.info->max_bullet_distance;
+					damage.max_distance = gun.max_bullet_distance;
 					damage.starting_point = new_transform.current.pos;
 
 					/* add components that make up a bullet */
 					new_bullet.add(new_transform);
 					new_bullet.add(damage);
-					new_bullet.add(components::render(gun.info->bullet_layer, gun.info->bullet_sprite));
-					topdown::create_physics_component(new_bullet, gun.info->bullet_collision_filter, b2_dynamicBody);
+					new_bullet.add(gun.bullet_render);
+					topdown::create_physics_component(new_bullet, gun.bullet_collision_filter, b2_dynamicBody);
 
 					/* bullet's physics settings */
 					auto body = new_bullet.get<components::physics>().body;
 					body->SetLinearVelocity(vel);
 					body->SetBullet(true);
-					body->GetFixtureList()->SetFilterData(gun.info->bullet_collision_filter);
+					body->GetFixtureList()->SetFilterData(gun.bullet_collision_filter);
 				}
 
 				gun.shooting_timer.reset();
