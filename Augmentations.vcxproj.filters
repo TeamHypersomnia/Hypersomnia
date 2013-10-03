@@ -1268,9 +1268,6 @@
     <ClInclude Include="SDK\topdown\resources\animate_info.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\topdown\resources\gun_info.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SDK\topdown\resources\particle_emitter_info.h">
       <Filter>Header Files</Filter>
     </ClInclude>

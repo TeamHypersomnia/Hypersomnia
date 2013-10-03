@@ -674,7 +674,6 @@
     <ClInclude Include="SDK\topdown\messages\message.h" />
     <ClInclude Include="SDK\topdown\messages\moved_message.h" />
     <ClInclude Include="SDK\topdown\messages\particle_burst_message.h" />
-    <ClInclude Include="SDK\topdown\resources\gun_info.h" />
     <ClInclude Include="SDK\topdown\resources\particle_emitter_info.h" />
     <ClInclude Include="SDK\topdown\resources\render_info.h" />
     <ClInclude Include="SDK\topdown\resources\scriptable_info.h" />
