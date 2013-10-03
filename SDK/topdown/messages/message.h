@@ -1,9 +1,13 @@
 #pragma once
-#include "entity_system/entity_ptr.h"
+namespace augmentations {
+	namespace entity_system {
+		class entity;
+	}
+}
 
 namespace messages {
 	struct message {
-		augmentations::entity_system::entity_ptr subject;
+		augmentations::entity_system::entity* subject;
 		message(augmentations::entity_system::entity* subject = nullptr) : subject(subject) {}
 	};
 }
