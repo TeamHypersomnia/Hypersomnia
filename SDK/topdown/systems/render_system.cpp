@@ -1,21 +1,7 @@
+#include "stdafx.h"
 #include "render_system.h"
-#include <gl\glew.h>
 #include "entity_system/entity.h"
-#include "../render_info.h"
-
-void render_system::add(entity* e) {
-	entities_by_mask[e->get<components::render>().mask].push_back(e);
-}
-
-void render_system::remove(entity* e) {
-	auto& v = entities_by_mask[e->get<components::render>().mask];
-	v.erase(std::remove(v.begin(), v.end(), e), v.end());
-}
-
-void render_system::clear() {
-	entities_by_mask.clear();
-	processing_system::clear();
-}
+#include "../resources/render_info.h"
 
 render_system::render_system(window::glwindow& output_window) : output_window(output_window) {
 	output_window.current();
@@ -40,17 +26,20 @@ void render_system::draw(rects::xywh visible_area, components::transform camera_
 
 	std::vector<cached_pair> visible_targets;
 
-	/* shortcut */
-	auto& entities = entities_by_mask[mask];
+	std::vector<entity*> entities_by_mask;
+	for (auto it : targets) {
+		if (it->get<components::render>().mask == mask)
+			entities_by_mask.push_back(it);
+	}
 
-	for (auto e = entities.begin(); e != entities.end(); ++e) {
-		auto& render_info = (*e)->get<components::render>();
-		if (render_info.instance == nullptr) continue;
-		auto& transform = (*e)->get<components::transform>();
+	for (auto e : entities_by_mask) {
+		auto& render = e->get<components::render>();
+		if (render.model == nullptr) continue;
+		auto& transform = e->get<components::transform>();
 		
 		/* if an entity's AABB hovers specified visible region */
-		if (render_info.instance->is_visible(visible_area + camera_transform.current.pos, transform))
-			visible_targets.push_back(std::make_pair(&render_info, &transform));
+		if (render.model->is_visible(visible_area + camera_transform.current.pos, transform))
+			visible_targets.push_back(std::make_pair(&render, &transform));
 	}
 
 	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
@@ -58,9 +47,9 @@ void render_system::draw(rects::xywh visible_area, components::transform camera_
 		return a.first->layer > b.first->layer;
 	});
 
-	for (auto e = visible_targets.begin(); e != visible_targets.end(); ++e) {
-		if ((*e).first->instance == nullptr) continue;
-		(*e).first->instance->draw(triangles, *(*e).second, camera_transform.current.pos);
+	for (auto e : visible_targets) {
+		if (e.first->model == nullptr) continue;
+		e.first->model->draw(triangles, *e.second, camera_transform.current.pos);
 	}
 }
 
@@ -70,9 +59,9 @@ void render_system::process_entities(world&) {
 void render_system::render() {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glVertexPointer(2, GL_INT, sizeof(vertex), triangles.data());
-	glTexCoordPointer(2, GL_FLOAT, sizeof(vertex), (char*) (triangles.data()) + sizeof(int) * 2);
-	glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(vertex), (char*) (triangles.data()) + sizeof(int) * 2 + sizeof(float) * 2);
+	glVertexPointer(2, GL_INT, sizeof(resources::vertex), triangles.data());
+	glTexCoordPointer(2, GL_FLOAT, sizeof(resources::vertex), (char*) (triangles.data()) + sizeof(int) * 2);
+	glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(resources::vertex), (char*) (triangles.data()) + sizeof(int) * 2 + sizeof(float) * 2);
 	glDrawArrays(GL_TRIANGLES, 0, triangles.size() * 3);
 
 	output_window.swap_buffers();
