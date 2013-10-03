@@ -9,6 +9,9 @@ namespace augmentations {
 		class map_wrapper {
 			std::unordered_map<key, value> raw_map;
 		public:
+			void add(key k, value v) {
+				raw_map.insert(std::make_pair(k, v));
+			}
 
 			void insert(const key& k, const value& v) {
 				raw_map.insert(std::make_pair(k, v));

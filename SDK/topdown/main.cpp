@@ -1,4 +1,9 @@
 #pragma once
+#include "stdafx.h"
+#define CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 #include <random>
 
 #include "../../augmentations.h"
@@ -37,9 +42,9 @@
 #include "messages/damage_message.h"
 
 #include "game/body_helper.h"
-#include "game/sprite_helper.h"
+#include "game/texture_helper.h"
 
-#include "render_info.h"
+#include "resources/render_info.h"
 #include "resources/animate_info.h"
 #include "resources/scriptable_info.h"
 
@@ -49,6 +54,7 @@ using namespace messages;
 
 #define kajdljsdklasjdd
 #ifdef kajdljsdklasjdd
+
 int main() {
 	augmentations::init();
 
@@ -100,13 +106,18 @@ int main() {
 
 	scripts.global("world", my_world);
 	scripts.global("window", gl);
+	scripts.global("input_system", input);
 
-	script::lua_state = scripts.lua_state;
-	script::script_reloader.report_errors = &std::cout;
-	script::script_reloader.add_directory(L"scripts", true);
-	script init_script;
+	resources::script::lua_state = scripts.lua_state;
+	resources::script::script_reloader.report_errors = &std::cout;
+	resources::script::script_reloader.add_directory(L"scripts", true);
+	resources::script init_script;
+
 	init_script.associate_filename("scripts\\init.lua");
+	init_script.add_reload_dependant(&init_script);
 	init_script.call();
+	std::cout << std::endl;
+	lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
 
 	while (!quit_flag) {
 		my_world.run();
@@ -121,18 +132,31 @@ int main() {
 		my_world.get_message_queue<collision_message>().clear();
 		my_world.get_message_queue<particle_burst_message>().clear();
 		
-		auto scripts_reloaded = script::script_reloader.get_modified_script_files();
+		auto& scripts_reloaded = resources::script::script_reloader.get_script_files_to_reload();
 
+		bool deleted = false;
 		for (auto& script_to_reload : scripts_reloaded) {
 			if (script_to_reload->reload_scene_when_modified) {
 				my_world.delete_all_entities();
-				init_script.call();
+				deleted = true;
 				break;
 			}
+		}
+
+		//assert(scripts_reloaded.empty() || (scripts_reloaded.size() && deleted));
+
+		for (auto& script_to_reload : scripts_reloaded) {
+			script_to_reload->call();
+		}
+
+		if (!scripts_reloaded.empty()) {
+			std::cout << std::endl;
+			lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
 		}
 	}
 
 	augmentations::deinit();
+	//_CrtDumpMemoryLeaks();
 	return 0;
 }
 #else
@@ -489,7 +513,7 @@ int main() {
 	
 	components::particle_emitter::emission wood_parts_big, wood_parts_small, barrel_explosion, barrel_smoke[2], blood_shower, blood_pool, blood_droplets, wood_dust;
 
-	wood_parts_big.spread_radians = 45.f * 0.01745329251994329576923690768489f;
+	wood_parts_big.spread_degrees = 45.f * 0.01745329251994329576923690768489f;
 	wood_parts_big.particles_per_burst.first = 1;
 	wood_parts_big.particles_per_burst.second = 1;
 	wood_parts_big.type = components::particle_emitter::emission::type::BURST;
@@ -504,7 +528,7 @@ int main() {
 	wood_parts_big.angular_offset = 0.f;
 	wood_parts_big.particle_group_layer = ON_GROUND;
 
-	wood_parts_small.spread_radians = 45.f * 0.01745329251994329576923690768489f;
+	wood_parts_small.spread_degrees = 45.f * 0.01745329251994329576923690768489f;
 	wood_parts_small.particles_per_burst.first = 2;
 	wood_parts_small.particles_per_burst.second = 4;
 	wood_parts_small.type = components::particle_emitter::emission::type::BURST;
@@ -519,7 +543,7 @@ int main() {
 	wood_parts_small.angular_offset = 0.f;
 	wood_parts_small.particle_group_layer = ON_GROUND;
 
-	wood_dust.spread_radians = 45.f * 0.01745329251994329576923690768489f;
+	wood_dust.spread_degrees = 45.f * 0.01745329251994329576923690768489f;
 	wood_dust.particles_per_burst.first = 5;
 	wood_dust.particles_per_burst.second = 55;
 	wood_dust.type = components::particle_emitter::emission::type::BURST;
@@ -536,7 +560,7 @@ int main() {
 	wood_dust.angular_offset = 0.f;
 	wood_dust.particle_group_layer = ON_GROUND;
 
-	barrel_explosion.spread_radians = 15.5f * 0.01745329251994329576923690768489f;
+	barrel_explosion.spread_degrees = 15.5f * 0.01745329251994329576923690768489f;
 	barrel_explosion.particles_per_burst.first = 10;
 	barrel_explosion.particles_per_burst.second = 50;
 	barrel_explosion.type = components::particle_emitter::emission::type::BURST;
@@ -553,7 +577,7 @@ int main() {
 	barrel_explosion.particle_group_layer = EFFECTS;
 	barrel_explosion.angular_offset = 0.f;
 
-	barrel_smoke[0].spread_radians = 25.5f * 0.01745329251994329576923690768489f;
+	barrel_smoke[0].spread_degrees = 25.5f * 0.01745329251994329576923690768489f;
 	barrel_smoke[0].particles_per_sec.first = 50.f;
 	barrel_smoke[0].particles_per_sec.second = 90.f;
 	barrel_smoke[0].stream_duration_ms.first = 100.f;
@@ -573,7 +597,7 @@ int main() {
 	barrel_smoke[0].angular_offset = 0.f;
 	barrel_smoke[0].randomize_acceleration = false;
 
-	barrel_smoke[1].spread_radians = 14.5f * 0.01745329251994329576923690768489f;
+	barrel_smoke[1].spread_degrees = 14.5f * 0.01745329251994329576923690768489f;
 	barrel_smoke[1].particles_per_sec.first = 50.f;
 	barrel_smoke[1].particles_per_sec.second = 90.f;
 	barrel_smoke[1].stream_duration_ms.first = 100.f;
@@ -593,7 +617,7 @@ int main() {
 	barrel_smoke[1].angular_offset = 0.f;
 	barrel_smoke[1].randomize_acceleration = false;
 
-	blood_shower.spread_radians = 120.5f * 0.01745329251994329576923690768489f;
+	blood_shower.spread_degrees = 120.5f * 0.01745329251994329576923690768489f;
 	//blood_shower.particles_per_sec.first = 10.f;
 	//blood_shower.particles_per_sec.second = 200.f;
 	blood_shower.particles_per_burst.first = 10;
@@ -612,7 +636,7 @@ int main() {
 	blood_shower.particle_group_layer = ON_GROUND;
 	blood_shower.angular_offset = 0.f;
 
-	blood_droplets.spread_radians = 90.5f * 0.01745329251994329576923690768489f;
+	blood_droplets.spread_degrees = 90.5f * 0.01745329251994329576923690768489f;
 	blood_droplets.particles_per_burst.first = 10;
 	blood_droplets.particles_per_burst.second = 500;
 	blood_droplets.type = components::particle_emitter::emission::type::BURST;
@@ -634,7 +658,7 @@ int main() {
 	blood_droplets.particle_lifetime_ms.first = 200.f;
 	blood_droplets.particle_lifetime_ms.second = 500.f;
 
-	blood_pool.spread_radians = 180.5f * 0.01745329251994329576923690768489f;
+	blood_pool.spread_degrees = 180.5f * 0.01745329251994329576923690768489f;
 	blood_pool.particles_per_sec.first = 20.f;
 	blood_pool.particles_per_sec.second = 100.f;
 	blood_pool.stream_duration_ms.first = 300.f;
@@ -701,10 +725,10 @@ int main() {
 	assault_rifle.is_automatic = true;
 	assault_rifle.max_rounds = 30;
 	assault_rifle.shooting_interval_ms = 70.f;
-	assault_rifle.spread_radians = 1.f * 0.01745329251994329576923690768489f;
+	assault_rifle.spread_degrees = 1.f * 0.01745329251994329576923690768489f;
 	assault_rifle.velocity_variation = 1500.f;
 	assault_rifle.shake_radius = 9.5f;
-	assault_rifle.shake_spread_radians = 45.f * 0.01745329251994329576923690768489f;
+	assault_rifle.shake_spread_degrees = 45.f * 0.01745329251994329576923690768489f;
 	assault_rifle.bullet_collision_filter = filter_bullets;
 	assault_rifle.bullet_layer = BULLETS;
 	assault_rifle.max_bullet_distance = 5000.f;
@@ -718,10 +742,10 @@ int main() {
 	double_barrel.is_automatic = true;
 	double_barrel.max_rounds = 2;
 	double_barrel.shooting_interval_ms = 500.f;
-	double_barrel.spread_radians = 5.f * 0.01745329251994329576923690768489f;
+	double_barrel.spread_degrees = 5.f * 0.01745329251994329576923690768489f;
 	double_barrel.velocity_variation = 1500.f;
 	double_barrel.shake_radius = 0.5f;
-	double_barrel.shake_spread_radians = 45.f * 0.01745329251994329576923690768489f;
+	double_barrel.shake_spread_degrees = 45.f * 0.01745329251994329576923690768489f;
 	double_barrel.bullet_collision_filter = filter_bullets;
 	double_barrel.bullet_layer = BULLETS;
 	double_barrel.max_bullet_distance = 5000.f;

@@ -1,71 +1,57 @@
-local crate_archetype = {
-	image = crate_texture,
-	layer = 1,
-	mask = 0,
-	color = { r = 255, g = 255, b = 255, a = 255 }
+pollock_sprite = create_sprite {
+	image = images.pollock,
+	size = vec2(2000, 1000)
 }
 
-local crate_sprite = create_render_info {
-	archetype = crate_archetype,
-}
-
-local red_crate_sprite = create_render_info {
-	archetype = crate_archetype,
-	
-	layer = 0,
-	color = { r = 255, g = 0, b = 0, a = 255 },
-	size = vec2(40, 40)
-}
-
-local crate_archetype = {
-	transform = {
-		pos = vec2(0, 0),
-		rotation = 0
-	},
-	
+bg = create_entity {
 	render = {
-		info = red_crate_sprite
-	}
-}
-
-local group_archetype = {
-	body = {
-		archetype = crate_archetype,
-		
-		transform = {
-			pos = vec2(100, 100),
-			rotation = 20
-		}
+		model = pollock_sprite,
+		mask = render_component.WORLD,
+		layer = render_layers.GROUND
 	},
 	
-	chaser = {
-		archetype = crate_archetype,
-		
-		chase = {
-			target = 'body',
-			relative = false,
-			offset = vec2(100, 0),
-			type = chase_component.OFFSET,
-			rotation_orbit_offset = vec2(0, 0),
-			rotation_offset = 45,
-			chase_rotation = true,
-			track_origin = false
-		}
+	transform = {
+		pos	= vec2(0, 300),
+		rotation = 0
 	}
 }
 
-create_entity_group {
-	archetype = group_archetype,
-	
-	body = {
-		transform = {
-			pos = vec2(214, 520),
-			rotation = 0
-		}	
+filter_objects = b2Filter()
+filter_characters = b2Filter()
+filter_bullets = b2Filter()
+filter_corpses = b2Filter()
+
+filter_characters.categoryBits = CHARACTERS;
+filter_characters.maskBits = bitor(OBJECTS, BULLETS, CHARACTERS)
+
+filter_objects.categoryBits = OBJECTS;
+filter_objects.maskBits = bitor(OBJECTS, BULLETS, CHARACTERS, CORPSES);
+
+filter_bullets.categoryBits = BULLETS;
+filter_bullets.maskBits = bitor(OBJECTS, CHARACTERS);
+
+filter_corpses.categoryBits = CORPSES;
+filter_corpses.maskBits = OBJECTS;
+
+
+main_context = create_input_context {
+	intents = { 
+		[mouse.raw_motion] 		= intent_message.MOVE_FORWARD,
+		[keys.W] 				= intent_message.MOVE_FORWARD,
+		[keys.S] 				= intent_message.MOVE_BACKWARD,
+		[keys.A] 				= intent_message.MOVE_LEFT,
+		[keys.D] 				= intent_message.MOVE_RIGHT,
+		[mouse.ldoubleclick] 	= intent_message.SHOOT,
+		[mouse.ltripleclick] 	= intent_message.SHOOT,
+		[mouse.ldown] 			= intent_message.SHOOT,
+		[mouse.rdown] 			= intent_message.SWITCH_LOOK,
+		[mouse.rdoubleclick] 	= intent_message.SWITCH_LOOK
 	}
 }
 
-local world_camera = create_entity_from_entry {
+input_system:add_context(main_context)
+
+world_camera = create_entity {
 	transform = {
 		pos = vec2(),
 		rotation = 0
@@ -90,3 +76,5 @@ local world_camera = create_entity_from_entry {
 		angled_look_length = 0
 	}
 }
+
+
