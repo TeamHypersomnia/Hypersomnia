@@ -1,7 +1,7 @@
 #pragma once
+#include "stdafx.h"
+
 #include <set>
-#include <ft2build.h>
-#include <freetype/freetype.h>
 
 #include "../options.h"
 #include "font.h"

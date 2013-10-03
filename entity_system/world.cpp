@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "world.h"
 #include "processing_system.h"
 #include "entity_ptr.h"

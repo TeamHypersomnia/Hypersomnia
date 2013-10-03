@@ -1,7 +1,5 @@
 #pragma once
-#define UNICODE
-#include <Windows.h>
-#include <gdiplus.h>
+#include "stdafx.h"
 #include <memory>
 
 #include "image.h"

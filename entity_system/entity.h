@@ -1,9 +1,6 @@
 #pragma once
 #include <map>
 
-#define BOOST_DISABLE_THREADS
-#include <boost\pool\object_pool.hpp>
-
 #include "processing_system.h"
 #include "world.h"
 #include "component.h"

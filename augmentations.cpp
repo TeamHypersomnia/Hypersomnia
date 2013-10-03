@@ -1,9 +1,4 @@
-#include <gl\glew.h>
-#include <ft2build.h>
-#include <freetype/freetype.h>
-#define UNICODE
-#include <Windows.h>
-#include <gdiplus.h>
+#include "stdafx.h"
 
 #include "augmentations.h"
 #include "options.h"

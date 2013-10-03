@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "entity_ptr.h"
 #include "entity.h"
 

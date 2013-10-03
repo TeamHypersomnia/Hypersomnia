@@ -1,4 +1,5 @@
 #pragma once
+#include "stdafx.h"
 #include "entity.h"
 #include "signature_matcher.h"
 #include <cassert>

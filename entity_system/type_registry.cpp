@@ -1,4 +1,5 @@
 #pragma once
+#include "stdafx.h"
 #include "type_registry.h"
 #include "entity.h"
 

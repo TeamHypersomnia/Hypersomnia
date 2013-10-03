@@ -1,12 +1,4 @@
-#define UNICODE
-#define GLEW_STATIC
-#include <gl/glew.h>
-#include <gl/wglew.h>
-#include <GL/GL.h>
-
-#ifdef INCLUDE_DWM
-#include <dwmapi.h>
-#endif
+#include "stdafx.h"
 
 #include "window.h"
 #include "../config/config.h"

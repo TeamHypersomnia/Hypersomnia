@@ -1,14 +1,9 @@
 #pragma once
-#define UNICODE
-#include <Windows.h>
-#define GLEW_STATIC
-#include <gl/glew.h>
-#include <GL/GL.h>
+#include "stdafx.h"
 
 #include "../options.h"
 #include "texture_baker.h"
 #include "font.h"
-#include "../math/vec2d.h"
 
 namespace augmentations {
 	namespace texture_baker {
@@ -229,7 +224,6 @@ namespace augmentations {
 			pack();
 			create_image(4, true);
 			build(false, false);
-			bind();
 			/* destroy the raw image as it is already uploaded to GPU */
 			img.destroy();
 		}
@@ -239,7 +233,7 @@ namespace augmentations {
 		}
 
 		void atlas::_bind() {
-			glBindTexture(GL_TEXTURE_2D, id);
+			glBindTexture(GL_TEXTURE_2D, current = id);
 		}
 
 		void atlas::repeat() {

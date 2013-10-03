@@ -1,11 +1,4 @@
 #pragma once
-#define UNICODE
-#include <Windows.h>
-#undef min
-#undef max
-#include "../math/rects.h"
-#include "../math/vec2d.h"
-
 namespace augmentations {
 	namespace window {
 		namespace event {

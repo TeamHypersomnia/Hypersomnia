@@ -1,10 +1,6 @@
 #pragma once
 #include "../options.h"
 
-#define UNICODE
-#include <Windows.h>
-#undef min
-#undef max
 #include "../math/rects.h"
 #include "event.h"
 #include "../utility/timer.h"

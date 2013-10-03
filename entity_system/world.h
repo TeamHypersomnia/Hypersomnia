@@ -2,9 +2,6 @@
 #include <unordered_map>
 #include <vector>
 
-#define BOOST_DISABLE_THREADS
-#include <boost\pool\object_pool.hpp>
-
 #include "entity.h"
 #include "type_registry.h"
 

@@ -28,7 +28,7 @@
 
 #define UNICODE
 
-#include "stdafx.h"
+#include "_stdafx.h"
 #include "ReadDirectoryChanges.h"
 #include "ReadDirectoryChangesPrivate.h"
 

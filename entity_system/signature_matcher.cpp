@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include <algorithm>
 
 #include "signature_matcher.h"
