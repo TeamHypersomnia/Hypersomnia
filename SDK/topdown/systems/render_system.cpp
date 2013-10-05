@@ -57,14 +57,11 @@ void render_system::process_entities(world&) {
 }
 
 void render_system::render() {
-	glClear(GL_COLOR_BUFFER_BIT);
-
 	glVertexPointer(2, GL_INT, sizeof(resources::vertex), triangles.data());
 	glTexCoordPointer(2, GL_FLOAT, sizeof(resources::vertex), (char*) (triangles.data()) + sizeof(int) * 2);
 	glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(resources::vertex), (char*) (triangles.data()) + sizeof(int) * 2 + sizeof(float) * 2);
 	glDrawArrays(GL_TRIANGLES, 0, triangles.size() * 3);
 
-	output_window.swap_buffers();
 	triangles.clear();
 }
 

@@ -11,6 +11,8 @@ camera_system::camera_system(render_system& raw_renderer) : raw_renderer(raw_ren
 }
 
 void camera_system::process_entities(world& owner) {
+	glClear(GL_COLOR_BUFFER_BIT);
+
 	double delta = smooth_timer.extract<std::chrono::seconds>();
 
 	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
@@ -83,8 +85,8 @@ void camera_system::process_entities(world& owner) {
 			}
 
 			raw_renderer.draw(camera.ortho, components::transform(transform.current.pos), camera.mask);
+			raw_renderer.render();
 		}
 	}
-	
-	raw_renderer.render();
+	raw_renderer.output_window.swap_buffers();
 }
