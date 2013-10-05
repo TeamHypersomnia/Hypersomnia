@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "window.h"
-#include "../config/config.h"
 #include "../utility/stream.h"
 #include <algorithm>
 
@@ -195,25 +194,32 @@ namespace augmentations {
 			triple_click_delay = GetDoubleClickTime();
 		}
 		
-		bool glwindow::create(const config::input_file& cfg, rects::wh force_minimum_resolution, int _menu) {
-			if(cfg.values.at(L"fullscreen").int_val > 0) {
+		std::wstring to_wstr(const std::string& ss) {
+			return std::wstring(ss.begin(), ss.end());
+		}
+
+		bool glwindow::create(lua_State* L, rects::wh force_minimum_resolution, int _menu) {
+			luabind::object cfg = luabind::globals(L)["config_table"];
+			luabind::object my_object = cfg["fullscreen"];
+
+			if (luabind::object_cast<int>(my_object)) {
 				auto r = get_display();
 				return create(rects::xywh(0,0, r.w,r.h), 
-					cfg.values.at(L"window_border").int_val > 0 ? _menu : 0,
-					cfg.values.at(L"window_name").string_val.c_str(),
-					cfg.values.at(L"doublebuffer").int_val > 0,
-					cfg.values.at(L"bpp").int_val
+					luabind::object_cast<int>(cfg["window_border"]) > 0 ? _menu : 0,
+					to_wstr(luabind::object_cast<std::string>(cfg["window_name"])).c_str(),
+					luabind::object_cast<int>(cfg["doublebuffer"]) > 0,
+					luabind::object_cast<int>(cfg["bpp"])
 					);
 			}
 			else {
-				return create(rects::xywh(	cfg.values.at(L"window_x").int_val,
-					cfg.values.at(L"window_y").int_val, 
-					std::max(force_minimum_resolution.w, cfg.values.at(L"resolution_w").int_val),
-					std::max(force_minimum_resolution.h, cfg.values.at(L"resolution_h").int_val)), 
-					cfg.values.at(L"window_border").int_val > 0 ? _menu : 0,
-					cfg.values.at(L"window_name").string_val.c_str(),
-					cfg.values.at(L"doublebuffer").int_val > 0,
-					cfg.values.at(L"bpp").int_val
+				return create(rects::xywh(luabind::object_cast<int>(cfg["window_x"]),
+					luabind::object_cast<int>(cfg["window_y"]),
+					std::max(force_minimum_resolution.w, luabind::object_cast<int>(cfg["resolution_w"])),
+					std::max(force_minimum_resolution.h, luabind::object_cast<int>(cfg["resolution_h"]))),
+					luabind::object_cast<int>(cfg["window_border"]) > 0 ? _menu : 0,
+					to_wstr(luabind::object_cast<std::string>(cfg["window_name"])).c_str(),
+					luabind::object_cast<int>(cfg["doublebuffer"]) > 0,
+					luabind::object_cast<int>(cfg["bpp"])
 					);
 			}
 		}

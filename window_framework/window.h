@@ -6,6 +6,8 @@
 #include "../utility/timer.h"
 #include <functional>
 
+class lua_State;
+
 namespace augmentations {
 	namespace config {
 		struct input_file;
@@ -79,7 +81,7 @@ namespace augmentations {
 				int doublebuffer 1
 				int bpp 24
 				*/
-				create(const config::input_file&, rects::wh force_minimum_resolution, int _menu = ALL),
+				create(lua_State*, rects::wh force_minimum_resolution, int _menu = ALL),
 			     swap_buffers(), 
 				 focus_keyboard(), 
 				 current(),
