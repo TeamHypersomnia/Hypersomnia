@@ -8,7 +8,7 @@
 #include "../messages/collision_message.h"
 
 physics_system::physics_system() : accumulator(60.0, 5), 
-	b2world(b2Vec2(0.f, 9.8f)) {
+	b2world(b2Vec2(0.f, 0.f)) {
 	b2world.SetAllowSleeping(false);
 	b2world.SetAutoClearForces(false);
 	b2world.SetContactListener(&listener);
@@ -125,6 +125,7 @@ void physics_system::reset_states() {
 		transform.current.pos = b->GetPosition();
 		transform.current.pos *= METERS_TO_PIXELSf;
 		transform.current.rotation = b->GetAngle();
+		transform.current.rotation *= 180.0 / 3.141592653589793238462;
 
 		transform.previous = transform.current;
 	}
@@ -139,6 +140,6 @@ void physics_system::smooth_states() {
 		auto& transform = static_cast<entity*>(b->GetUserData())->get<components::transform>();
 
 		transform.current.pos = transform.previous.pos + ratio * (METERS_TO_PIXELSf*b->GetPosition() - transform.previous.pos);
-		transform.current.rotation = transform.previous.rotation + ratio * (b->GetAngle() - transform.previous.rotation);
+		transform.current.rotation = transform.previous.rotation + ratio * (b->GetAngle()*180.0/3.141592653589793238462 - transform.previous.rotation);
 	}
 }

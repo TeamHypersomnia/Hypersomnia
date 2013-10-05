@@ -29,11 +29,11 @@ void health_system::process_entities(world& owner) {
 				entity& corpse = owner.create_entity();
 
 				corpse.clear();
-				corpse.add(health->death_render);
-				transform.current.rotation = it.impact_velocity.get_radians();
+				corpse.add(health->corpse_render);
+				transform.current.rotation = it.impact_velocity.get_degrees();
 				corpse.add(transform);
 
-				topdown::create_physics_component(corpse, health->corpse_collision_filter);
+				topdown::create_physics_component(health->corpse_body, corpse);
 				auto body = corpse.get<components::physics>().body;
 				body->SetLinearDamping(5.f);
 				body->SetFixedRotation(true);

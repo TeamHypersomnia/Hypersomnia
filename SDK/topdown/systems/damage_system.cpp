@@ -23,7 +23,7 @@ void damage_system::process_entities(world& owner) {
 			messages::particle_burst_message burst_msg;
 			burst_msg.subject = it.subject;
 			burst_msg.pos = it.point;
-			burst_msg.rotation = (-it.impact_velocity).get_radians();
+			burst_msg.rotation = (-it.impact_velocity).get_degrees();
 			burst_msg.type = messages::particle_burst_message::burst_type::BULLET_IMPACT;
 
 			owner.post_message(damage_msg);
