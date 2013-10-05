@@ -29,7 +29,6 @@ namespace components {
 
 		virtual void draw(resources::buffer&, const components::transform&, vec2<> camera_pos) override;
 		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform&) override;
-		virtual b2Body* create_body(entity_system::entity& subject, b2World& b2world, b2BodyType type) override;
 
 		/* only used by subject stream to indicate that it will no longer emit particles */
 		bool destroy_when_empty;

@@ -19,7 +19,6 @@ namespace resources {
 
 		virtual void draw(buffer&, const components::transform&, vec2<> camera_pos) = 0;
 		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform&) = 0;
-		virtual b2Body* create_body(entity_system::entity& subject, b2World& b2world, b2BodyType type) = 0;
 	};
 
 	struct sprite : public renderable {
@@ -28,19 +27,12 @@ namespace resources {
 		vec2<> size;
 
 		sprite(texture_baker::texture* = nullptr, graphics::pixel_32 = graphics::pixel_32());
-		~sprite() {
-			int wtflol = 0;
-			wtflol = 23;
-
-			wtflol *= 2;
-		}
 
 		void set(texture_baker::texture*, graphics::pixel_32);
 		void update_size();
 
 		virtual void draw(buffer&, const components::transform&, vec2<> camera_pos) override;
 		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform&) override;
-		virtual b2Body* create_body(entity_system::entity& subject, b2World& b2world, b2BodyType type) override;
 	};
 
 	struct polygon : public renderable {

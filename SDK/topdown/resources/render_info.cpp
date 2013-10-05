@@ -46,6 +46,7 @@ namespace resources {
 	}
 
 	void sprite::draw(buffer& triangles, const components::transform& transform, vec2<> camera_pos) {
+		if (tex == nullptr) return;
 		vec2<> v[4];
 		make_rect(transform.current.pos - camera_pos, vec2<>(size), transform.current.rotation, v);
 
@@ -71,38 +72,6 @@ namespace resources {
 
 		triangles.emplace_back(t1);
 		triangles.emplace_back(t2);
-	}
-
-	b2Body* sprite::create_body(entity_system::entity& subject, b2World& b2world, b2BodyType type) {
-		b2BodyDef def;
-		def.type = type;
-		def.angle = 0;
-		def.userData = (void*) &subject;
-
-		b2PolygonShape shape;
-		shape.SetAsBox(static_cast<float>(size.x) / 2.f * PIXELS_TO_METERSf, static_cast<float>(size.y) / 2.f * PIXELS_TO_METERSf);
-
-		//b2Vec2 v[4] = {
-		//	vec2<>(0.f, 0.f),
-		//	vec2<>(size.w*PIXELS_TO_METERS, 0.f),
-		//	vec2<>(size.w*PIXELS_TO_METERS, size.h*PIXELS_TO_METERS),
-		//	vec2<>(0.f, size.h*PIXELS_TO_METERS)
-		//};
-
-		//shape.Set(v, 4);
-
-		b2FixtureDef fixdef;
-		fixdef.shape = &shape;
-		fixdef.density = 1.0;
-		fixdef.friction = 1.0;
-
-		b2Body* body = b2world.CreateBody(&def);
-		body->CreateFixture(&fixdef);
-		auto& transform = subject.get<components::transform>();
-
-		body->SetTransform(transform.current.pos*PIXELS_TO_METERSf, transform.current.rotation);
-
-		return body;
 	}
 
 	bool sprite::is_visible(rects::xywh visibility_aabb, const components::transform& transform) {
@@ -149,9 +118,5 @@ namespace components {
 	bool particle_group::is_visible(rects::xywh visibility_aabb, const components::transform& transform) {
 		/* will be visible most of the time */
 		return true;
-	}
-
-	b2Body* particle_group::create_body(entity_system::entity& subject, b2World& b2world, b2BodyType type) {
-		return nullptr;
 	}
 }

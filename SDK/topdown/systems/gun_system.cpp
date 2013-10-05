@@ -79,8 +79,7 @@ void gun_system::process_entities(world& owner) {
 						gun_transform.current.rotation - gun.spread_degrees,
 						gun_transform.current.rotation + gun.spread_degrees)(generator)));
 
-					new_transform.current.rotation = vel.get_radians();
-					
+					new_transform.current.rotation = vel.get_degrees();
 					/* add randomized speed to bullet taking velocity variation into account */
 					vel *= std::uniform_real_distribution<float> (
 						gun.bullet_speed - gun.velocity_variation,
@@ -88,7 +87,7 @@ void gun_system::process_entities(world& owner) {
 
 					components::damage damage;
 					/* randomize damage */
-					damage.amount = std::uniform_real_distribution<float> (gun.bullet_min_damage, gun.bullet_max_damage)(generator);
+					damage.amount = std::uniform_real_distribution<float> (gun.bullet_damage.first, gun.bullet_damage.second)(generator);
 					damage.sender = it;
 					damage.max_distance = gun.max_bullet_distance;
 					damage.starting_point = new_transform.current.pos;
@@ -97,13 +96,14 @@ void gun_system::process_entities(world& owner) {
 					new_bullet.add(new_transform);
 					new_bullet.add(damage);
 					new_bullet.add(gun.bullet_render);
-					topdown::create_physics_component(new_bullet, gun.bullet_collision_filter, b2_dynamicBody);
+					topdown::create_physics_component(gun.bullet_body, new_bullet, b2_dynamicBody);
 
 					/* bullet's physics settings */
 					auto body = new_bullet.get<components::physics>().body;
 					body->SetLinearVelocity(vel);
+					body->SetAngularVelocity(0);
 					body->SetBullet(true);
-					body->GetFixtureList()->SetFilterData(gun.bullet_collision_filter);
+					body->GetFixtureList()->SetFilterData(gun.bullet_body.filter);
 				}
 
 				gun.shooting_timer.reset();
