@@ -7,7 +7,11 @@
 namespace bindings {
 	luabind::scope _glwindow() {
 		return
+			(
+			luabind::def("get_display", window::get_display),
+
 			luabind::class_<window::glwindow>("glwindow")
-			.def(luabind::constructor<>());
+			.def(luabind::constructor<>())
+			);
 	}
 }
