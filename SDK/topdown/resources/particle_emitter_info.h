@@ -51,7 +51,15 @@ namespace resources {
 			particle_templates.push_back(p);
 		}
 
-		emission() : acceleration(std::make_pair(0.f, 0.f)), randomize_acceleration(false) {}
+		emission() : velocity(std::make_pair(0, 0)),
+			angular_velocity(std::make_pair(0, 0)),
+			particles_per_sec(std::make_pair(0, 0)),
+			stream_duration_ms(std::make_pair(0, 0)),
+			particle_lifetime_ms(std::make_pair(0, 0)),
+			size_multiplier(std::make_pair(0, 0)),
+			acceleration(std::make_pair(0, 0)), randomize_acceleration(false), spread_degrees(0), initial_rotation_variation(0),
+			offset(0, 0), angular_offset(0)
+		{}
 	};
 
 	typedef std::vector<emission> particle_effect;

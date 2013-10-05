@@ -30,12 +30,16 @@ function create_sprite(entries)
 		my_sprite:update_size()
 	end
 	
+	if entries.size_multiplier ~= nil then
+		my_sprite.size = vec2(my_sprite.size.x * entries.size_multiplier.x, my_sprite.size.y * entries.size_multiplier.y)
+	end	
+	
 	return my_sprite
 end
 
 function create_animation(entries) 
 	local my_animation = animation()
-	rewrite(my_animation, entries, {loop_mode = true})
+	rewrite(my_animation, entries)
 	
 	for i = 1, #(entries.frames) do
 		-- shortcut
@@ -95,7 +99,7 @@ end
 function create_particle_effect(entries)
 	local my_effect = particle_effect()
 	
-	for k, v in pairs(entries.emissions) do
+	for k, v in pairs(entries) do
 		my_effect:add(create_emission(v))
 	end
 	
@@ -112,3 +116,14 @@ function create_particle_emitter_info(entries)
 	return my_info
 end
 
+function set_physics_info(my_body_data, entries)
+	if entries ~= nil then
+		recursive_write(my_body_data, entries, { "vertices" } )
+		
+		if my_body_data.type == physics_info.POLYGON and entries.vertices ~= nil then
+			for k, v in pairs(entries.vertices) do 
+				my_body_data:add_vertex(v)
+			end
+		end
+	end
+end

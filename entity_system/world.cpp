@@ -9,6 +9,12 @@ namespace augmentations {
 		world::world() {
 		}
 
+		world::~world() {
+
+
+		}
+
+
 		void world::register_entity_watcher(entity_ptr& ptr) {
 			registered_entity_watchers[ptr].add(&ptr);
 		}

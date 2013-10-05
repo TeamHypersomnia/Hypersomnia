@@ -1,18 +1,13 @@
-print("Executing commands.lua...")
+print("Calling commands.lua...")
 
-my_effect = create_particle_effect(wood_effect)
+for i = 1, 100 do
+	msg = create(particle_burst_message, {
+		pos = vec2(i*40-300, i*40-300), 
+		rotation = 180,
+		set_effect = cached_wood_effect,
+		subject = nil
+	})
 
-msg = create(particle_burst_message, {
-	pos = vec2(400, 300), 
-	rotation = 180,
-	set_effect = my_effect,
-	subject = nil
-})
-
-world:post_message(msg)
-
-
-
-
-
+	world:post_message(msg)
+end
 

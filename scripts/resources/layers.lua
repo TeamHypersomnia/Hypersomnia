@@ -16,3 +16,23 @@ create_options {
 	"BULLETS", 
 	"CORPSES" 
 }
+
+filter_objects = {
+	categoryBits = OBJECTS,
+	maskBits = bitor(OBJECTS, BULLETS, CHARACTERS, CORPSES)
+}
+
+filter_characters = {
+	categoryBits = CHARACTERS,
+	maskBits = bitor(OBJECTS, BULLETS, CHARACTERS)
+}
+
+filter_bullets = {
+	categoryBits = BULLETS,
+	maskBits = bitor(OBJECTS, CHARACTERS)
+}
+
+filter_corpses = {
+	categoryBits = CORPSES,
+	maskBits = OBJECTS
+}

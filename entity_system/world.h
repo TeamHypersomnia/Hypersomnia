@@ -50,6 +50,7 @@ namespace augmentations {
 			void add_system(processing_system*); 
 
 			world();
+			~world();
 
 			entity& create_entity();
 			void delete_entity(entity&, entity* redirect_pointers = nullptr);

@@ -8,8 +8,8 @@ my_atlas = atlas()
 collectgarbage("collect")
 
 images = {
-	crate_texture = "Release\\resources\\crate.jpg",
-	pollock = "Release\\resources\\pollock.jpg",
+	crate = "Release\\resources\\crate.jpg",
+	background = "Release\\resources\\background.jpg",
 	enemy = "Release\\resources\\enemy.png",
 	crosshair = "Release\\resources\\crosshair.png",
 	rifle = "Release\\resources\\rifle.png",

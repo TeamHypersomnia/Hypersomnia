@@ -10,7 +10,7 @@ namespace augmentations {
 		class glwindow;
 	}
 		
-	template<typename t> struct vec2;
+	template<typename t = float> struct vec2;
 
 	/* faciliates operations on rectangles and points */
 	namespace rects {
