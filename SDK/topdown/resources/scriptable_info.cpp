@@ -14,6 +14,12 @@ namespace resources {
 		needs_recompilation = true;
 	}
 
+	void script::dofile(const std::string& filename) {
+		static script my_script;
+		my_script.associate_filename(filename, false);
+		my_script.call();
+	}
+
 	lua_State* script::lua_state = nullptr;
 
 	script::reloader script::script_reloader;

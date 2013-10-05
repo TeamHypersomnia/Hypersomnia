@@ -36,6 +36,8 @@ namespace resources {
 		static reloader script_reloader;
 		static lua_State* lua_state;
 
+		static void dofile(const std::string& filename);
+
 		script();
 
 		void associate_string(const std::string&);
