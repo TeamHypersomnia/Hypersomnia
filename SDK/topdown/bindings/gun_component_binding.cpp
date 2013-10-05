@@ -17,8 +17,7 @@ namespace bindings {
 			.def_readwrite("bullets_once", &gun::bullets_once)
 			.def_readwrite("max_rounds", &gun::max_rounds)
 			.def_readwrite("spread_degrees", &gun::spread_degrees)
-			.def_readwrite("bullet_min_damage", &gun::bullet_min_damage)
-			.def_readwrite("bullet_max_damage", &gun::bullet_max_damage)
+			.def_readwrite("bullet_damage", &gun::bullet_damage)
 			.def_readwrite("bullet_speed", &gun::bullet_speed)
 			.def_readwrite("shooting_interval_ms", &gun::shooting_interval_ms)
 			.def_readwrite("velocity_variation", &gun::velocity_variation)
@@ -28,6 +27,6 @@ namespace bindings {
 			.def_readwrite("shake_spread_degrees", &gun::shake_spread_degrees)
 			.def_readwrite("is_automatic", &gun::is_automatic)
 			.def_readwrite("bullet_render", &gun::bullet_render)
-			.def_readwrite("bullet_collision_filter", &gun::bullet_collision_filter);
+			.def_readwrite("bullet_body", &gun::bullet_body);
 	}
 }

@@ -10,6 +10,7 @@ namespace bindings {
 		return
 			luabind::class_<entity_ptr>("entity_ptr")
 			.def(luabind::constructor<>())
+			.def(luabind::constructor<entity_system::entity*>())
 			.def("get", &entity_ptr::get)
 			.def("set", &entity_ptr::set);
 	}

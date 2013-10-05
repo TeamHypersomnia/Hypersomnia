@@ -1,14 +1,16 @@
 #pragma once
 #include "../components/render_component.h"
+#include "../game/body_helper.h"
 
 namespace components {
 	struct health : public augmentations::entity_system::component {
-		components::render death_render;
+		components::render corpse_render;
+		topdown::physics_info corpse_body;
+
 		float max_hp;
 
 		bool should_disappear;
 		float dead_lifetime_ms;
-		b2Filter corpse_collision_filter;
 		
 		float hp;
 		bool dead;

@@ -28,6 +28,6 @@ namespace components {
 			model = new_model;
 		}
 
-		render(resources::renderable* model = nullptr) : model(model) {}
+		render(resources::renderable* model = nullptr) : model(model), layer(0), mask(mask_type::WORLD) {}
 	};
 }

@@ -13,8 +13,8 @@ namespace bindings {
 			.def_readwrite("look_mode", &lookat::look_mode)
 			.def_readwrite("target", &lookat::target)
 			.enum_("chase_type")[
-				luabind::value("OFFSET", lookat::look_type::POSITION),
-				luabind::value("ORBIT", lookat::look_type::VELOCITY)
+				luabind::value("POSITION", lookat::look_type::POSITION),
+				luabind::value("VELOCITY", lookat::look_type::VELOCITY)
 			];
 	}
 }

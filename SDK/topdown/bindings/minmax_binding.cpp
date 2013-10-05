@@ -2,7 +2,6 @@
 #include "stdafx.h"
 #include "bindings.h"
 
-
 namespace bindings {
 	luabind::scope _minmax() {
 		return (

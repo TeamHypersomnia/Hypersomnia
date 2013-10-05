@@ -12,7 +12,8 @@ namespace bindings {
 
 			luabind::class_<texture_helper>("texture")
 			.def(luabind::constructor<std::wstring, texture_baker::atlas&>())
-			.def_readwrite("tex", &texture_helper::tex),
+			.def_readwrite("tex", &texture_helper::tex)
+			.property("size", &texture_helper::get_size),
 
 			luabind::class_<texture_baker::atlas>("atlas")
 			.def(luabind::constructor<>())

@@ -117,13 +117,15 @@ void particle_emitter_system::process_entities(world& owner) {
 				new_render.set_renderable(&new_stream_entity.get<components::particle_group>());
 				new_stream_entity.add(new_render);
 
-				components::chase chase(it.subject);
-				auto& subject_transform = it.subject->get<components::transform>().current;
-				chase.type = components::chase::chase_type::ORBIT;
-				chase.rotation_offset = it.rotation - subject_transform.rotation;
-				chase.rotation_orbit_offset = (it.pos - subject_transform.pos);
+				if (it.subject) {
+					components::chase chase(it.subject);
+					auto& subject_transform = it.subject->get<components::transform>().current;
+					chase.type = components::chase::chase_type::ORBIT;
+					chase.rotation_offset = it.rotation - subject_transform.rotation;
+					chase.rotation_orbit_offset = (it.pos - subject_transform.pos);
 
-				new_stream_entity.add(chase);
+					new_stream_entity.add(chase);
+				}
 			}
 		}
 	}
