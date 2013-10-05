@@ -80,8 +80,7 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 
 	luabind::open(lua_state);
 
-	luaopen_base(lua_state);
-	luaopen_io(lua_state);
+	luaL_openlibs(lua_state);
 
 	lua_register(lua_state, "bitor", bitor);
 	lua_register(lua_state, "bitflag", bitflag);
