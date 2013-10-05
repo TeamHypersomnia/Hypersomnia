@@ -46,7 +46,15 @@ void animation_system::process_entities(world& owner) {
 				animate.speed_factor = it.speed_factor;
 
 			if (it.change_animation) {
-				auto new_instance = it.set_animation != nullptr ? it.set_animation : animate.available_animations->at(it.animation_type);
+				resources::animation* new_instance = nullptr;
+				if (it.set_animation)
+					new_instance = it.set_animation;
+				else {
+					auto found_animation = animate.available_animations->get_raw().find(it.animation_type);
+					if (found_animation != animate.available_animations->get_raw().end()) {
+						new_instance = (*found_animation).second;
+					}
+				}
 
 				if (new_instance != animate.current_animation) {
 					if (!it.preserve_state_if_animation_changes) {
