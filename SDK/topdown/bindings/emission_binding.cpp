@@ -20,6 +20,8 @@ namespace bindings {
 			.def_readwrite("size_multiplier", &emission::size_multiplier)
 			.def_readwrite("acceleration", &emission::acceleration)
 			.def_readwrite("particles_per_burst", &emission::particles_per_burst)
+			.def_readwrite("swing_spread", &emission::swing_spread)
+			.def_readwrite("swings_per_sec", &emission::swings_per_sec)
 			.def_readwrite("initial_rotation_variation", &emission::initial_rotation_variation)
 			.def_readwrite("randomize_acceleration", &emission::randomize_acceleration)
 			.def_readwrite("offset", &emission::offset)

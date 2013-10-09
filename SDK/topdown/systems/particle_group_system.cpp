@@ -14,14 +14,17 @@ void particle_group_system::process_entities(world& owner) {
 		auto& transform = it->get<components::transform>();
 
 		if (group.stream_info) {
+			auto& stream = *group.stream_info;
 			double stream_delta = std::min(delta, static_cast<double>(group.stream_max_lifetime_ms - group.stream_lifetime_ms));
 			group.stream_lifetime_ms += stream_delta;
 			group.stream_lifetime_ms = std::min(group.stream_lifetime_ms, group.stream_max_lifetime_ms);
 
-			group.stream_particles_to_spawn += randval(group.stream_info->particles_per_sec.first, group.stream_info->particles_per_sec.second) * (stream_delta / 1000.0);
+			group.stream_particles_to_spawn += randval(stream.particles_per_sec.first, stream.particles_per_sec.second) * (stream_delta / 1000.0);
 
 			while (group.stream_particles_to_spawn >= 1.f) {
-				particle_emitter_system::spawn_particle(group, transform.current.pos, transform.current.rotation, *group.stream_info);
+				particle_emitter_system::spawn_particle(group, transform.current.pos, transform.current.rotation + 
+					group.swing_spread * sin(group.stream_lifetime_ms * group.swings_per_sec)
+				, stream);
 				group.stream_particles_to_spawn -= 1.f;
 			}
 		}

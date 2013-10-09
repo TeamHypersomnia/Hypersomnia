@@ -36,6 +36,7 @@ namespace components {
 		float stream_lifetime_ms;
 		float stream_max_lifetime_ms;
 		float stream_particles_to_spawn;
+		float swing_spread, swings_per_sec;
 
 		resources::emission* stream_info;
 	};

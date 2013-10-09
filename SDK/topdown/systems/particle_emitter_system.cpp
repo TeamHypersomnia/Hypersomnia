@@ -85,7 +85,7 @@ void particle_emitter_system::process_entities(world& owner) {
 
 
 		for (auto& emission : *emissions) {
-			float target_rotation = it.rotation + emission.angular_offset;
+			float target_rotation = it.rotation + randval(emission.angular_offset);
 
 			if (emission.type == resources::emission::type::BURST) {
 				int burst_amount = randval(emission.particles_per_burst);
@@ -106,6 +106,8 @@ void particle_emitter_system::process_entities(world& owner) {
 				components::particle_group new_stream;
 				new_stream.stream_info = &emission;
 				new_stream.stream_lifetime_ms = 0.f;
+				new_stream.swing_spread = randval(emission.swing_spread);
+				new_stream.swings_per_sec = randval(emission.swings_per_sec);
 				new_stream.stream_max_lifetime_ms = randval(emission.stream_duration_ms);
 				new_stream.stream_particles_to_spawn = 0.f;
 
@@ -121,7 +123,7 @@ void particle_emitter_system::process_entities(world& owner) {
 					components::chase chase(it.subject);
 					auto& subject_transform = it.subject->get<components::transform>().current;
 					chase.type = components::chase::chase_type::ORBIT;
-					chase.rotation_offset = it.rotation - subject_transform.rotation;
+					chase.rotation_offset = target_rotation - subject_transform.rotation;
 					chase.rotation_orbit_offset = (it.pos - subject_transform.pos);
 
 					new_stream_entity.add(chase);
