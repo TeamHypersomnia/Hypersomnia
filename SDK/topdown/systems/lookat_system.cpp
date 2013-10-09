@@ -2,7 +2,6 @@
 #include "lookat_system.h"
 #include "entity_system/entity.h"
 
-#include "../messages/moved_message.h"
 #include "../components/physics_component.h"
 
 void lookat_system::process_entities(world& owner) {

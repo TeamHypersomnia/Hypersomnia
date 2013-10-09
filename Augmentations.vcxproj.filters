@@ -824,9 +824,6 @@
     <ClInclude Include="SDK\topdown\systems\crosshair_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\topdown\messages\moved_message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SDK\topdown\components\lookat_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>

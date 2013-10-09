@@ -12,6 +12,11 @@ crate_sprite = create_sprite {
 	size = vec2(100, 100)
 }
 
+metal_sprite = create_sprite {
+	image = images.metal,
+	size = vec2(170, 170)
+}
+
 corpse_sprite = create_sprite {
 	image = images.dead_front
 }
@@ -46,17 +51,6 @@ crate_archetype = {
 	}
 }
 
-
-for i = 1, 5 do
-	create_entity (archetyped(crate_archetype, {
-		transform = {
-			pos = vec2(i*150 - 100, 200),
-			rotation = 0
-		}
-	}))
-end
-
-
 bg = create_entity {
 	render = {
 		model = background_sprite,
@@ -75,7 +69,7 @@ bullet_sprite = create_sprite {
 }
 
 assault_rifle = {
-	bullets_once = 3,
+	bullets_once = 1,
 	bullet_distance_offset = 120,
 	bullet_damage = minmax(80, 100),
 	bullet_speed = 7000,
@@ -247,7 +241,7 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 		},
 		
 		crosshair = {
-			sensitivity = 2.5
+			sensitivity = 5.5
 		},
 		
 		chase = {
@@ -261,22 +255,42 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 	}
 }))
 
-npc_1 = create_entity_group (archetyped(my_npc_archetype, {
-	body = {
+
+for i = 1, 5 do
+	create_entity (archetyped(crate_archetype, {
 		transform = {
-			pos = vec2(0, 0),
-			rotation = 180
+			pos = vec2(400, i*200-600),
+			rotation = 0
 		}
-	}
-}))
-
-
-for i = 1, 35 do
+	}))
+	
 	create_entity_group (archetyped(my_npc_archetype, {
 		body = {
 			transform = {
-				pos = vec2(i*20, 0),
-				rotation = 180
+				pos = vec2(-550, i*200-600),
+				rotation = 0
+			}
+		}
+	}))
+	
+	create_entity (archetyped(crate_archetype, {
+		transform = {
+			pos = vec2(-400, i*200-600),
+			rotation = 0
+		},
+		
+		render = {
+			model = metal_sprite
+		},
+		
+		particle_emitter = {
+			available_particle_effects = metal_effects
+		},
+		
+		physics = {
+			body_info = {
+				rect_size = metal_sprite.size,
+				density = 0.5
 			}
 		}
 	}))

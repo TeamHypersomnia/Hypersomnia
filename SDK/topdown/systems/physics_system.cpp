@@ -4,7 +4,6 @@
 
 #include "../components/damage_component.h"
 
-#include "../messages/moved_message.h"
 #include "../messages/collision_message.h"
 
 physics_system::physics_system() : accumulator(60.0, 5), 
@@ -64,24 +63,6 @@ void physics_system::contact_listener::PostSolve(b2Contact* contact, const b2Con
 void physics_system::process_entities(world& owner) {
 	listener.world_ptr = &owner;
 
-	/* we will update body's transforms HERE according to the ENTITY_MOVED message
-	bitsquid's events are particularly well when message can be processed "within the same domain"
-	whereas when it comes to registrations to entity-specific notations, there is probably some overhead imposed with searching the matching subscriber
-	*/
-	/*
-	auto events = owner.get_message_queue<messages::moved_message>();
-
-	for (auto it = events.begin(); it != events.end(); ++it) {
-		auto physics = (*it).subject->find<components::physics>();
-		auto transform = (*it).subject->find<components::transform>();
-
-		if (!physics || !transform) continue;
-		
-		transform->previous = transform->current;
-		physics->body->SetTransform(transform->current.pos * PIXELS_TO_METERS, transform->current.rotation);
-	}
-	*/
-
 	const unsigned steps = accumulator.update_and_extract_steps();
 
 	for (unsigned i = 0; i < steps; ++i) {
@@ -91,9 +72,6 @@ void physics_system::process_entities(world& owner) {
 		reset_states();
 		b2world.Step(static_cast<float32>(accumulator.per_second()), velocityIterations, positionIterations);
 	}
-
-	/* note we DON'T send moved_message for every processed physics entity, because if something wants to keep track of an entity's position it can
-	hold its reference and poll the position every frame */
 
 	b2world.ClearForces();
 	smooth_states();

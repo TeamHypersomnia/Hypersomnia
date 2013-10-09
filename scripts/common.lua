@@ -1,4 +1,3 @@
-
 function rewrite(component, entry, omit_properties)
 	--print(inspect(entry))
 	if omit_properties == nil then

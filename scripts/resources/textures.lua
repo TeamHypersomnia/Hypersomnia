@@ -9,6 +9,8 @@ collectgarbage("collect")
 
 images = {
 	crate = "Release\\resources\\crate.jpg",
+	metal = "Release\\resources\\metal.jpg",
+	
 	background = "Release\\resources\\background.jpg",
 	enemy = "Release\\resources\\enemy.png",
 	crosshair = "Release\\resources\\crosshair.png",

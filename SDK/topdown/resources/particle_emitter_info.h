@@ -33,7 +33,10 @@ namespace resources {
 			stream_duration_ms,
 			particle_lifetime_ms,
 			size_multiplier,
-			acceleration;
+			acceleration,
+			angular_offset,
+			swing_spread,
+			swings_per_sec;
 
 		std::pair<unsigned, unsigned>
 			particles_per_burst;
@@ -42,7 +45,6 @@ namespace resources {
 		bool randomize_acceleration;
 
 		augmentations::vec2<> offset;
-		float angular_offset;
 
 		std::vector<particle> particle_templates;
 		components::render particle_render_template;
@@ -57,8 +59,10 @@ namespace resources {
 			stream_duration_ms(std::make_pair(0, 0)),
 			particle_lifetime_ms(std::make_pair(0, 0)),
 			size_multiplier(std::make_pair(0, 0)),
+			swing_spread(std::make_pair(0, 0)),
+			swings_per_sec(std::make_pair(0, 0)),
 			acceleration(std::make_pair(0, 0)), randomize_acceleration(false), spread_degrees(0), initial_rotation_variation(0),
-			offset(0, 0), angular_offset(0)
+			offset(0, 0), angular_offset(std::make_pair(0, 0))
 		{}
 	};
 

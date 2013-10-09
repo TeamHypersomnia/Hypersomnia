@@ -3,7 +3,6 @@
 #include "entity_system/world.h"
 
 #include "../messages/intent_message.h"
-#include "../messages/moved_message.h"
 
 #include "../components/render_component.h"
 #include "../resources/render_info.h"
@@ -27,7 +26,7 @@ void crosshair_system::process_entities(world& owner) {
 			//	if(crosshair->bounds.good()) 
 			//		crosshair->bounds.snap_point(transform->current.pos);
 			//
-			//	//owner.post_message(messages::moved_message(it.subject));
+			//	
 			//}
 		}
 	}

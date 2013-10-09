@@ -24,7 +24,6 @@
 
 #include "messages/destroy_message.h"
 #include "messages/collision_message.h"
-#include "messages/moved_message.h"
 #include "messages/intent_message.h"
 #include "messages/animate_message.h"
 #include "messages/particle_burst_message.h"
@@ -110,7 +109,6 @@ int main() {
 
 		/* flushing message queues */
 		my_world.get_message_queue<message>().clear();
-		my_world.get_message_queue<moved_message>().clear();
 		my_world.get_message_queue<intent_message>().clear();
 		my_world.get_message_queue<damage_message>().clear();
 		my_world.get_message_queue<destroy_message>().clear();
