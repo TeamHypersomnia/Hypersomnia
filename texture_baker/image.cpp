@@ -3,7 +3,6 @@
 #include <memory>
 
 #include "image.h"
-#include "../options.h"
 
 namespace augmentations {
 	namespace texture_baker {
@@ -28,18 +27,14 @@ namespace augmentations {
 		}
 
 		bool image::from_file(const std::wstring& filename, unsigned force_channels) {
+			std::string errstr("Coudn't load ");
+			errstr += std::string(filename.begin(), filename.end());
+
 			channels = force_channels;
 			std::shared_ptr<Gdiplus::Bitmap> pBitmap(Gdiplus::Bitmap::FromFile(filename.c_str(), FALSE));
 
-			if (pBitmap.get() == 0 || pBitmap.get()->GetLastStatus() != Gdiplus::Ok) {
-				std::wstring errstr(L"Coudn't load ");
-				errstr += std::wstring(filename);
-				errs(false, errstr.c_str());
-#ifdef ENABLE_EXCEPTIONS
-				throw errstr;
-#endif
-				return false;
-			}
+			if (pBitmap.get() == 0 || pBitmap.get()->GetLastStatus() != Gdiplus::Ok) 
+				throw std::runtime_error(errstr.c_str());
 
 			// GDI+ orients bitmap images top-bottom.
 			// OpenGL expects bitmap images to be oriented bottom-top by default.
@@ -65,7 +60,7 @@ namespace augmentations {
 					channels = 3; break;
 				case PixelFormat32bppARGB: 
 					channels = 4; break;
-				default: throw channels; break;
+				default: throw std::runtime_error(errstr.c_str()); break;
 				}
 				break;
 			case 1: format = PixelFormat8bppIndexed; break;

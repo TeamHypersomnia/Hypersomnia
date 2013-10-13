@@ -32,6 +32,7 @@ namespace augmentations {
 			boost::pool<>& get_container_for_type(const base_type& type);
 			
 			std::vector<processing_system*> systems;
+			std::unordered_map<size_t, processing_system*> hash_to_system;
 
 			void register_entity_watcher(entity_ptr&);
 			void unregister_entity_watcher(entity_ptr&);
@@ -47,7 +48,30 @@ namespace augmentations {
 				return message_queue<message>::messages;
 			}
 
-			void add_system(processing_system*); 
+			template<class T>
+			void add_system(T* new_system) {
+				/*
+				here we register systems' signatures so we can ensure that whenever we add a component it is already registered
+				of course entities must be created AFTER the systems are specified and added
+				*/
+				new_system->components_signature 
+					= signature_matcher_bitset(component_library.register_types(new_system->get_needed_components()));
+				
+				systems.push_back(new_system);
+				/* register to enable by-type system retrieval */
+				hash_to_system[typeid(T).hash_code()] = new_system;
+
+			}
+			
+			template<class T>
+			T& get_system() {
+				const auto& info = typeid(T);
+				auto it = hash_to_system.find(info.hash_code());
+				if (it == hash_to_system.end()) 
+					throw std::runtime_error((std::string(info.name()) + std::string(" not found in entity_system::world.")).c_str());
+				
+				return *static_cast<T*>(hash_to_system.at(info.hash_code()));
+			}
 
 			world();
 			~world();

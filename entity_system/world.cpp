@@ -29,15 +29,6 @@ namespace augmentations {
 			}
 		}
 
-		void world::add_system(processing_system* new_system) {
-			/* 
-			here we register systems' signatures so we can ensure that whenever we add a component it is already registered
-			of course entities must be created AFTER the systems are specified and added
-			*/
-			new_system->components_signature = signature_matcher_bitset(component_library.register_types(new_system->get_needed_components()));
-			systems.push_back(new_system);
-		}
-
 		entity& world::create_entity() {
 			return *entities.construct<world&>(*this);
 		}

@@ -1,7 +1,6 @@
 #pragma once
 #include "stdafx.h"
 
-#include "../options.h"
 #include "texture_baker.h"
 #include "font.h"
 
@@ -150,10 +149,8 @@ namespace augmentations {
 
 			int res = rect2D(p, cnt, max_size, b);
 
-			bool notenough = res != 1;
-			bool texlarger = res != 2;
-			errs(notenough, "not enough space");
-			errs(texlarger, "texture larger than max_size");
+			if (res == 1) throw std::runtime_error("not enough space in texture atlas!");
+			if (res == 2) throw std::runtime_error("there's a texture larger than maximum atlas size");
 
 			return !res;
 		}

@@ -82,14 +82,11 @@ namespace augmentations {
 			errsf(!FT_Set_Char_Size(face, 0, pt << 6, 96, 96), L"couldn't set char size", f);
 			errsf(!FT_Select_Charmap(face, FT_ENCODING_UNICODE), L"couldn't set encoding", f);
 
-#ifdef ENABLE_EXCEPTIONS
 			if(!f) {
-				std::string errstring("Error loading ");
+				std::string errstring("Couldn't load ");
 				errstring += filename;
-				throw std::exception(errstring.c_str());
+				throw std::runtime_error(errstring.c_str());
 			}
-#endif
-			if(!f) return false;
 
 			ascender = face->size->metrics.ascender >> 6;
 			descender = face->size->metrics.descender >> 6;
