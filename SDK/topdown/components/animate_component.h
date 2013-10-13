@@ -8,7 +8,7 @@
 
 class animation_system;
 namespace resources {
-	typedef augmentations::util::map_wrapper<unsigned, animation*> animate_info;
+	typedef augmentations::util::map_wrapper<int, animation*> animate_info;
 }
 
 namespace components {

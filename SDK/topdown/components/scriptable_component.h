@@ -4,6 +4,7 @@
 
 namespace resources {
 	class script;
+	typedef augmentations::util::map_wrapper<int, luabind::object> scriptable_info;
 }
 
 namespace components {
@@ -13,10 +14,9 @@ namespace components {
 			DAMAGE_MESSAGE,
 			LOOP
 		};
+		
+		resources::scriptable_info* available_scripts;
 
-		typedef augmentations::util::map_wrapper<unsigned, resources::script*> subscribtion;
-		subscribtion* available_scripts;
-
-		scriptable(subscribtion* available_scripts = nullptr) : available_scripts(available_scripts) {}
+		scriptable(resources::scriptable_info* available_scripts = nullptr) : available_scripts(available_scripts) {}
 	};
 }

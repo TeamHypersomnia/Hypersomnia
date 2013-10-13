@@ -52,6 +52,8 @@ namespace bindings {
 		_intent_message(),
 		_animate_message(),
 		_particle_burst_message(),
+		_collision_message(),
+		_damage_message(),
 
 		_render_component(),
 		_transform_component(),
@@ -106,6 +108,8 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			bindings::_intent_message(),
 			bindings::_animate_message(),
 			bindings::_particle_burst_message(),
+			bindings::_collision_message(),
+			bindings::_damage_message(),
 
 			bindings::_render_component(),
 			bindings::_transform_component(),
@@ -134,4 +138,9 @@ script_system::~script_system() {
 }
 
 void script_system::process_entities(world& owner) {
+	for (auto it : targets) {
+		auto& scriptable = it->get<components::scriptable>();
+
+		//auto loop_event = scriptable
+	}
 }

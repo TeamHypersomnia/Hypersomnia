@@ -46,7 +46,8 @@ crate_archetype = {
 			linear_damping = 5,
 			angular_damping = 5,
 			fixed_rotation = false,
-			density = 0.1
+			density = 0.1,
+			sensor = true
 		}
 	}
 }
@@ -86,12 +87,14 @@ assault_rifle = {
 		filter = filter_bullets,
 		type = physics_info.RECT,
 		rect_size = bullet_sprite.size,
-		fixed_rotation = true
+		fixed_rotation = true,
+		density = 0.1
 	},
 	
 	max_bullet_distance = 5000,
 	current_rounds = 1000000
 }
+
 
 shotgun = archetyped(assault_rifle, {
 	bullets_once = 12,
@@ -401,3 +404,16 @@ world_camera = create_entity (archetyped(camera_archetype, {
 --}))
 
 player.body.gun.target_camera_to_shake:set(world_camera)
+
+my_scriptable_info = create_scriptable_info {
+	scripted_events = {
+		[scriptable_component.COLLISION_MESSAGE] 	= 	function(arg) print ("calling COLLISION_MESSAGE with number " .. arg)  end,
+		[scriptable_component.DAMAGE_MESSAGE] 		= 	function(arg) print ("calling DAMAGE_MESSAGE with number " .. arg) end,
+		[scriptable_component.LOOP] 				= 	function(arg) print ("calling LOOP with number " .. arg) end
+	}
+}
+
+my_scriptable_info:at(scriptable_component.COLLISION_MESSAGE)(1)
+my_scriptable_info:at(scriptable_component.DAMAGE_MESSAGE)(2)
+my_scriptable_info:at(scriptable_component.LOOP)(3)
+

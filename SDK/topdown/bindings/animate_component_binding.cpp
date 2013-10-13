@@ -2,7 +2,6 @@
 #include "stdafx.h"
 #include "bindings.h"
 
-
 #include "../resources/animate_info.h"
 #include "../components/animate_component.h"
 

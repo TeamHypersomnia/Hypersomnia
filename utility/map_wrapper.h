@@ -10,14 +10,18 @@ namespace augmentations {
 			std::unordered_map<key, value> raw_map;
 		public:
 			void add(key k, value v) {
-				raw_map.insert(std::make_pair(k, v));
+				raw_map[k] = v;
 			}
 
 			void insert(const key& k, const value& v) {
-				raw_map.insert(std::make_pair(k, v));
+				raw_map[k] = v;
 			}
 
 			const value& at(const key& k) const {
+				return raw_map.at(k);
+			}
+
+			const value& get(key k) const {
 				return raw_map.at(k);
 			}
 

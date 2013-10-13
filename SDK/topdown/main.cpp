@@ -35,7 +35,8 @@
 #include "resources/render_info.h"
 #include "resources/animate_info.h"
 #include "resources/scriptable_info.h"
-
+//separate events and processing passes in systems to enable script callbacks
+// or we can do with polluted data/instruction caches
 using namespace augmentations;
 using namespace entity_system;
 using namespace messages;
@@ -72,8 +73,6 @@ int main() {
 	damage_system damage;
 	health_system health;
 	destroy_system destroy;
-
-	topdown::current_b2world = &physics.b2world;
 
 	my_world.add_system(&input);
 	my_world.add_system(&movement);

@@ -37,6 +37,7 @@ namespace augmentations {
 		/* helper class removing necessity to override get_needed_components by specifying the types in the parameter pack */
 		template<typename... needed_components>
 		class processing_system_templated : public processing_system {
+		public:
 			virtual type_pack get_needed_components() const override {
 				return templated_list<needed_components...>::get();
 			}

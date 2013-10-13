@@ -2,7 +2,6 @@
 #include "stdafx.h"
 #include "entity.h"
 #include "signature_matcher.h"
-#include <cassert>
 
 namespace augmentations {
 	namespace entity_system {

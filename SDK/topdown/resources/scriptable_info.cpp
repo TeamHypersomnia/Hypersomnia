@@ -31,7 +31,7 @@ namespace resources {
 
 		if (WaitForSingleObjectEx(changes.GetWaitHandle(), 0, false) == WAIT_OBJECT_0) {
 			if (changes.CheckOverflow()) {
-				throw std::exception("file change command buffer overflow");
+				throw std::runtime_error("file change command buffer overflow");
 			}
 			else {
 				DWORD dwAction;
@@ -86,7 +86,7 @@ namespace resources {
 	}
 
 	void script::add_reload_dependant(script* dependant) {
-		assert(is_associated_string_filename);
+		if (!is_associated_string_filename) throw std::runtime_error("add_reload_dependant call on script that is not a file");
 		script_reloader.filename_to_script[std::wstring(associated_string.begin(), associated_string.end())].reload_dependants.push_back(dependant);
 	}
 

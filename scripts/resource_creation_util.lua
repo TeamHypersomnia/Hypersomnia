@@ -16,6 +16,14 @@ function create_options(entries, output)
 	return entries
 end
 
+function create_inverse_enum(entries)
+	local new_table = {}
+	
+	for k, v in pairs(entries) do
+		new_table[v] = 1000000000-k
+	end
+end
+
 function create_sprite(entries)
 	local my_sprite = sprite()
 	rewrite(my_sprite, entries, {image = true})
@@ -111,6 +119,16 @@ function create_particle_emitter_info(entries)
 	
 	for k, v in pairs(entries.effects_subscribtion) do
 		my_info:add(k, create_particle_effect(v))
+	end
+	
+	return my_info
+end
+
+function create_scriptable_info(entries)
+	local my_info = scriptable_info()
+	
+	for k, v in pairs(entries.scripted_events) do
+		my_info:set(k, v)
 	end
 	
 	return my_info

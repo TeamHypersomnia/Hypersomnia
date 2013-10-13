@@ -17,11 +17,11 @@ namespace augmentations {
 			entity(world& owner_world);
 			~entity();
 
-			world& owner_world;
-
 			/* maps type hashes into components */
 			std::map<type_hash, component*> type_to_component;
 		public:
+			world& owner_world;
+
 			/* get information about component types */
 			std::vector<registered_type> get_components() const;
 
@@ -59,7 +59,7 @@ namespace augmentations {
 
 				/* component already exists, overwrite and return */
 				if (!p.second) {
-					assert(0 && "component already exists!");
+					throw std::exception("component already exists!");
 					//if (overwrite_if_exists)
 						//(*static_cast<component_type*>((*p.first).second)) = object;
 				}
