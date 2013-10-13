@@ -13,37 +13,80 @@ physics_system::physics_system() : accumulator(60.0, 5),
 	b2world.SetContactListener(&listener);
 }
 
-struct game_filter : public b2ContactFilter {
-	bool ShouldCollide(b2Fixture* a, b2Fixture* b) override {
-		if (b2ContactFilter::ShouldCollide(a, b)) {
-
-
-		}
-	}
-};
+//struct game_filter : public b2ContactFilter {
+//	bool ShouldCollide(b2Fixture* a, b2Fixture* b) override {
+//		if (b2ContactFilter::ShouldCollide(a, b)) {
+//
+//
+//		}
+//	}
+//};
 
 void physics_system::contact_listener::BeginContact(b2Contact* contact) {
+	auto fix_a = contact->GetFixtureA();
+	auto fix_b = contact->GetFixtureB();
 
+	if (fix_a->IsSensor() || fix_b->IsSensor()) {
+		auto body_a = fix_a->GetBody();
+		auto body_b = fix_b->GetBody();
+
+		messages::collision_message msg;
+
+		msg.subject = static_cast<entity*>(body_a->GetUserData());
+		msg.collider = static_cast<entity*>(body_b->GetUserData());
+
+		if (fix_a->IsSensor()) {
+			msg.impact_velocity = (body_b->GetLinearVelocity());
+			world_ptr->post_message(msg);
+		}
+
+		if (fix_b->IsSensor()) {
+			std::swap(msg.collider, msg.subject);
+			msg.impact_velocity = (body_a->GetLinearVelocity());
+			world_ptr->post_message(msg);
+		}
+	}
 }
 
 void physics_system::contact_listener::EndContact(b2Contact* contact) {
+	auto fix_a = contact->GetFixtureA();
+	auto fix_b = contact->GetFixtureB();
 
+	if (fix_a->IsSensor() || fix_b->IsSensor()) {
+		auto body_a = fix_a->GetBody();
+		auto body_b = fix_b->GetBody();
+
+		messages::collision_message msg;
+
+		msg.subject = static_cast<entity*>(body_a->GetUserData());
+		msg.collider = static_cast<entity*>(body_b->GetUserData());
+
+		msg.sensor_end_contact = true;
+		
+		if (fix_a->IsSensor()) {
+			msg.impact_velocity = -body_b->GetLinearVelocity();
+			world_ptr->post_message(msg);
+		}
+
+		if (fix_b->IsSensor()) {
+			std::swap(msg.collider, msg.subject);
+			msg.impact_velocity = -body_a->GetLinearVelocity();
+			world_ptr->post_message(msg);
+		}
+	}
 }
 
 void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold) {
-	messages::collision_message msg;
+	b2WorldManifold manifold;
+	contact->GetWorldManifold(&manifold);
 
 	auto body_a = contact->GetFixtureA()->GetBody();
 	auto body_b = contact->GetFixtureB()->GetBody();
 
+	messages::collision_message msg;
+
 	msg.subject = static_cast<entity*>(body_a->GetUserData());
 	msg.collider = static_cast<entity*>(body_b->GetUserData());
-	
-	if (msg.subject->find<components::damage>() || msg.collider->find<components::damage>()) 
-		contact->SetEnabled(false);
-	
-	b2WorldManifold manifold;
-	contact->GetWorldManifold(&manifold);
 
 	msg.point = manifold.points[0];
 	msg.point *= METERS_TO_PIXELSf;

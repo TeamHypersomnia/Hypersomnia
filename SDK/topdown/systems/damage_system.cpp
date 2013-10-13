@@ -12,6 +12,8 @@ void damage_system::process_entities(world& owner) {
 	auto events = owner.get_message_queue<messages::collision_message>();
 
 	for (auto it : events) {
+		if (it.sensor_end_contact) continue;
+
 		auto* damage = it.collider->find<components::damage>();
 		
 		if (damage) {

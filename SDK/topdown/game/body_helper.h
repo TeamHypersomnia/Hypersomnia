@@ -8,8 +8,6 @@ namespace augmentations {
 }
 
 namespace topdown {
-	extern b2World* current_b2world;
-
 	struct physics_info {
 		enum {
 			RECT,
@@ -21,7 +19,7 @@ namespace topdown {
 		b2Filter filter;
 
 		float density, angular_damping, linear_damping;
-		bool fixed_rotation;
+		bool fixed_rotation, sensor;
 
 		void add_vertex(augmentations::vec2<> v) {
 			vertices.push_back(v);

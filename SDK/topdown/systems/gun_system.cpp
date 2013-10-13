@@ -103,7 +103,6 @@ void gun_system::process_entities(world& owner) {
 					body->SetLinearVelocity(vel);
 					body->SetAngularVelocity(0);
 					body->SetBullet(true);
-					body->GetFixtureList()->SetFilterData(gun.bullet_body.filter);
 				}
 
 				gun.shooting_timer.reset();

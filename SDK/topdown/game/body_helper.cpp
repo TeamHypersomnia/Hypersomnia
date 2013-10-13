@@ -4,16 +4,20 @@
 #include "../components/render_component.h"
 #include "../resources/render_info.h"
 
+#include "../systems/physics_system.h"
+
 #include "entity_system/entity_system.h"
 
 namespace topdown {
 	physics_info::physics_info() 
-		: rect_size(augmentations::vec2<>()), type(RECT), density(1.f), angular_damping(0.f), linear_damping(0.f), fixed_rotation(false) {
+		: rect_size(augmentations::vec2<>()), type(RECT), density(1.f), angular_damping(0.f), linear_damping(0.f), fixed_rotation(false), sensor(false) {
 	}
 
 	b2World* current_b2world = nullptr;
 	
 	void create_physics_component(const physics_info& body_data, augmentations::entity_system::entity& subject, int body_type) {
+		physics_system& physics = subject.owner_world.get_system<physics_system>();
+		
 		b2BodyDef def;
 		def.type = b2BodyType(body_type);
 		def.angle = 0;
@@ -40,8 +44,9 @@ namespace topdown {
 		fixdef.shape = &shape;
 		fixdef.density = body_data.density;
 		fixdef.friction = 1.0;
+		fixdef.isSensor = body_data.sensor;
 
-		b2Body* body = current_b2world->CreateBody(&def);
+		b2Body* body = physics.b2world.CreateBody(&def);
 		body->CreateFixture(&fixdef);
 		auto& transform = subject.get<components::transform>();
 
@@ -52,7 +57,7 @@ namespace topdown {
 		body->SetLinearDamping(body_data.linear_damping);
 		body->SetFixedRotation(body_data.fixed_rotation);
 
-		auto physics = components::physics(body);
-		subject.add(physics);
+		auto physics_component = components::physics(body);
+		subject.add(physics_component);
 	}
 }
