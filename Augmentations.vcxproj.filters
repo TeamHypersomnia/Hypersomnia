@@ -564,6 +564,15 @@
     <ClCompile Include="SDK\topdown\bindings\particle_burst_message_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\ai_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\collision_message_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\damage_message_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="entity_system\component.h">
@@ -636,144 +645,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="math\vec2d.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2CircleShape.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2EdgeShape.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2PolygonShape.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2Shape.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Collision\b2BroadPhase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Collision\b2Collision.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Collision\b2Distance.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Collision\b2DynamicTree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Collision\b2TimeOfImpact.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Common\b2BlockAllocator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Common\b2Draw.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Common\b2GrowableStack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Common\b2Math.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Common\b2Settings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Common\b2StackAllocator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Common\b2Timer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2ChainAndCircleContact.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2ChainAndPolygonContact.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2CircleContact.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2Contact.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2ContactSolver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2EdgeAndCircleContact.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2EdgeAndPolygonContact.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2PolygonAndCircleContact.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2PolygonContact.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2DistanceJoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2FrictionJoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2GearJoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2Joint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2MouseJoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2PrismaticJoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2PulleyJoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2RevoluteJoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2RopeJoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2WeldJoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2WheelJoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\b2Body.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\b2ContactManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\b2Fixture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\b2Island.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\b2TimeStep.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\b2World.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Dynamics\b2WorldCallbacks.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Rope\b2Rope.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\Box2D\Box2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SDK\topdown\components\camera_component.h">
@@ -899,81 +770,6 @@
     <ClInclude Include="entity_system\entity_ptr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="3rdparty\lua\lapi.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\lauxlib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\lcode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\lctype.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\ldebug.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\ldo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\lfunc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\lgc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\llex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\llimits.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\lmem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\lobject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\lopcodes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\lparser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\lstate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\lstring.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\ltable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\ltm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\lua.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\lua.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\luaconf.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\lualib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\lundump.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\lvm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\lua\lzio.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SDK\topdown\systems\script_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -986,16 +782,7 @@
     <ClInclude Include="utility\map_wrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="3rdparty\readdir\ReadDirectoryChanges.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="3rdparty\readdir\targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\readdir\ThreadSafeQueue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\readdir\ReadDirectoryChangesPrivate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SDK\topdown\resources\vertex.h">
@@ -1023,6 +810,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\readdir\_stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\components\ai_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\systems\ai_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
