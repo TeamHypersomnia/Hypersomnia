@@ -15,25 +15,25 @@ namespace augmentations {
 		void entity::clear() {
 			/* user may have already removed all components using templated remove
 			but anyway world calls this function during deletion */
-			if(type_to_component.empty()) 
+			if (type_to_component.raw.empty())
 				return;
 			
 			/* iterate through systems and remove references to this entity */
 			signature_matcher_bitset my_signature(get_components());
-			for(auto sys : owner_world.systems) {
+			for (auto sys : owner_world.systems) {
 				/* if the system potentially owns this entity */
 				if(sys->components_signature.matches(my_signature))
 					sys->remove(this);
 			}
 
-			for(auto type : type_to_component) {
+			for (auto type : type_to_component.raw) {
 				/* call polymorphic destructor */
 				type.second->~component();
 				/* delete component from corresponding pool, we must get component's size from the library */
 				owner_world.get_container_for_type(type.first).free(type.second);
 			}
 
-			type_to_component.clear();
+			type_to_component.raw.clear();
 		}
 	}
 }
