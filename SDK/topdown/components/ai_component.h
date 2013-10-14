@@ -9,7 +9,7 @@ namespace components {
 			augmentations::vec2<> points[3];
 		};
 
-		augmentations::vec2<> vision_rectangle;
+		float visibility_radius;
 		std::vector<vision_triangle> visible_area;
 	};
 }

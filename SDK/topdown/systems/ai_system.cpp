@@ -10,6 +10,6 @@ void ai_system::process_entities(world& owner) {
 	physics_system& physics = owner.get_system<physics_system>();
 
 	for (auto it : targets) {
-
+		auto& ai = it->get<components::ai>();
 	}
 }
