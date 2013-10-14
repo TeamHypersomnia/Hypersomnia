@@ -10,16 +10,7 @@ camera_system::camera_system(render_system& raw_renderer) : raw_renderer(raw_ren
 	smooth_timer.reset();
 }
 
-void camera_system::process_entities(world& owner) {
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	double delta = smooth_timer.extract<std::chrono::seconds>();
-
-	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
-	std::sort(targets.begin(), targets.end(), [](entity* a, entity* b) {
-		return a->get<components::camera>().layer > b->get<components::camera>().layer;
-	});
-
+void camera_system::process_events(world& owner) {
 	auto events = owner.get_message_queue<messages::intent_message>();
 
 	for (auto it : events) {
@@ -31,6 +22,17 @@ void camera_system::process_entities(world& owner) {
 
 		}
 	}
+}
+
+void camera_system::process_entities(world& owner) {
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	double delta = smooth_timer.extract<std::chrono::seconds>();
+
+	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
+	std::sort(targets.begin(), targets.end(), [](entity* a, entity* b) {
+		return a->get<components::camera>().layer > b->get<components::camera>().layer;
+	});
 
 	for (auto e : targets) {
 		auto& camera = e->get<components::camera>();

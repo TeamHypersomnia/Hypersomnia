@@ -74,6 +74,7 @@ int main() {
 	health_system health;
 	destroy_system destroy;
 
+	my_world.add_system(&scripts);
 	my_world.add_system(&input);
 	my_world.add_system(&movement);
 	my_world.add_system(&physics);
@@ -90,6 +91,14 @@ int main() {
 	my_world.add_system(&destroy);
 	my_world.add_system(&camera);
 
+	//my_world.register_message_queue<message>();
+	my_world.register_message_queue<intent_message>();
+	my_world.register_message_queue<damage_message>();
+	my_world.register_message_queue<destroy_message>();
+	my_world.register_message_queue<animate_message>();
+	my_world.register_message_queue<collision_message>();
+	my_world.register_message_queue<particle_burst_message>();
+
 	scripts.global("world", my_world);
 	scripts.global("window", gl);
 	scripts.global("input_system", input);
@@ -105,15 +114,6 @@ int main() {
 
 	while (!quit_flag) {
 		my_world.run();
-
-		/* flushing message queues */
-		my_world.get_message_queue<message>().clear();
-		my_world.get_message_queue<intent_message>().clear();
-		my_world.get_message_queue<damage_message>().clear();
-		my_world.get_message_queue<destroy_message>().clear();
-		my_world.get_message_queue<animate_message>().clear();
-		my_world.get_message_queue<collision_message>().clear();
-		my_world.get_message_queue<particle_burst_message>().clear();
 		
 		auto& scripts_reloaded = resources::script::script_reloader.get_script_files_to_reload();
 

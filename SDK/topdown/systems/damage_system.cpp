@@ -8,14 +8,14 @@
 #include "../messages/destroy_message.h"
 #include "../messages/damage_message.h"
 
-void damage_system::process_entities(world& owner) {
+void damage_system::process_events(world& owner) {
 	auto events = owner.get_message_queue<messages::collision_message>();
 
 	for (auto it : events) {
 		if (it.sensor_end_contact) continue;
 
 		auto* damage = it.collider->find<components::damage>();
-		
+
 		if (damage) {
 			messages::damage_message damage_msg;
 			damage_msg.subject = it.subject;
@@ -33,7 +33,9 @@ void damage_system::process_entities(world& owner) {
 			owner.post_message(messages::destroy_message(it.collider));
 		}
 	}
+}
 
+void damage_system::process_entities(world& owner) {
 	for (auto it : targets) {
 		auto& transform = it->get<components::transform>();
 		auto& damage = it->get<components::damage>();

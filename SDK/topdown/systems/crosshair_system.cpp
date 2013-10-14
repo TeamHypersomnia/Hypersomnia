@@ -7,14 +7,14 @@
 #include "../components/render_component.h"
 #include "../resources/render_info.h"
 
-void crosshair_system::process_entities(world& owner) {
+void crosshair_system::process_events(world& owner) {
 	auto events = owner.get_message_queue<messages::intent_message>();
 
 	for (auto it : events) {
 		if (it.intent == messages::intent_message::intent_type::AIM) {
 			auto transform = it.subject->find<components::transform>();
 			auto crosshair = it.subject->find<components::crosshair>();
-			
+
 			if (!transform || !crosshair) continue;
 
 			/* move crosshair according to its sensitivity and relative mouse movement (easier to support multiple resolutions) */
@@ -30,7 +30,9 @@ void crosshair_system::process_entities(world& owner) {
 			//}
 		}
 	}
+}
 
+void crosshair_system::process_entities(world& owner) {
 	for (auto it : targets) {
 		auto render = it->find<components::render>();
 		auto& crosshair = it->get<components::crosshair>();

@@ -60,7 +60,7 @@ void particle_emitter_system::spawn_particle(
 		group.particles.push_back(new_particle);
 }
 
-void particle_emitter_system::process_entities(world& owner) {
+void particle_emitter_system::process_events(world& owner) {
 	using namespace components;
 	using namespace messages;
 

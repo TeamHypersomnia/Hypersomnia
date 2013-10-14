@@ -6,7 +6,7 @@
 
 using namespace messages;
 
-void movement_system::process_entities(world& owner) {
+void movement_system::process_events(world& owner) {
 	auto events = owner.get_message_queue<messages::intent_message>();
 
 	for (auto it : events) {
@@ -26,7 +26,9 @@ void movement_system::process_entities(world& owner) {
 		default: break;
 		}
 	}
+}
 
+void movement_system::process_entities(world& owner) {
 	for (auto it : targets) {
 		auto& physics = it->get<components::physics>();
 		auto& movement = it->get<components::movement>();

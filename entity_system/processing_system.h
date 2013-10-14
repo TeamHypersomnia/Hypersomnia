@@ -28,6 +28,11 @@ namespace augmentations {
 			/* process all entity targets, base function does nothing */
 			virtual void process_entities(world&);
 
+			/* process all events involved with this system, base function does nothing
+				called repeatedly until all of the existing message queues are empty
+			*/
+			virtual void process_events(world&);
+
 			/* you are required to override this function to specify components that this system needs to processing */
 			virtual type_pack get_needed_components() const = 0;
 

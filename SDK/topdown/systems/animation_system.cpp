@@ -6,7 +6,7 @@
 using namespace messages;
 using namespace resources;
 
-void animation_system::process_entities(world& owner) {
+void animation_system::process_events(world& owner) {
 	auto events = owner.get_message_queue<animate_message>();
 
 	for (auto it : events) {
@@ -66,7 +66,9 @@ void animation_system::process_entities(world& owner) {
 			}
 		}
 	}
+}
 
+void animation_system::process_entities(world& owner) {
 	float delta = static_cast<float>(animation_timer.extract<std::chrono::milliseconds>());
 
 	for (auto it : targets) {

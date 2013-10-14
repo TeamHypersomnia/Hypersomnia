@@ -7,6 +7,9 @@
 #include "../components/scriptable_component.h"
 #include "../bindings/bindings.h"
 
+#include "../messages/collision_message.h"
+#include "../messages/damage_message.h"
+
 int bitor(lua_State* L) {
 	int arg_count = lua_gettop(L);
 	int result = 0;
@@ -76,6 +79,11 @@ namespace bindings {
 		_body_helper();
 }
 
+int the_callback(lua_State *L) {
+	std::cout << lua_tostring(L, -1) << std::endl;
+	return 0;
+}
+
 script_system::script_system() : lua_state(luaL_newstate()) {
 	using namespace resources;
 	using namespace topdown;
@@ -131,6 +139,8 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			bindings::_entity(),
 			bindings::_body_helper()
 	];
+
+	luabind::set_pcall_callback(the_callback);
 }
 
 script_system::~script_system() {
@@ -141,6 +151,35 @@ void script_system::process_entities(world& owner) {
 	for (auto it : targets) {
 		auto& scriptable = it->get<components::scriptable>();
 
+		auto loop_event = scriptable.available_scripts->get_raw().find(components::scriptable::LOOP);
+		
+		if (loop_event != scriptable.available_scripts->get_raw().end()) {
+			luabind::call_function<void>((*loop_event).second, it);
+		}
 		//auto loop_event = scriptable
 	}
+}
+
+template<typename message_type>
+void pass_events_to_script(world& owner, int msg_enum) {
+	auto& events = owner.get_message_queue<message_type>();
+
+	events.erase(
+		std::remove_if(events.begin(), events.end(), [msg_enum](message_type& msg){
+			auto* scriptable = msg.subject->find<components::scriptable>();
+			if (scriptable == nullptr) return false;
+
+			auto it = scriptable->available_scripts->get_raw().find(msg_enum);
+
+			if (it != scriptable->available_scripts->get_raw().end()) {
+				return !luabind::call_function<bool>((*it).second, boost::ref(msg));
+			}
+			
+			return false;
+	}), events.end());
+}
+using namespace messages;
+void script_system::process_events(world& owner) {
+	pass_events_to_script<collision_message>(owner, components::scriptable::COLLISION_MESSAGE);
+	pass_events_to_script<damage_message>(owner, components::scriptable::DAMAGE_MESSAGE);
 }

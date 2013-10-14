@@ -10,5 +10,6 @@ using namespace entity_system;
 
 class damage_system : public processing_system_templated<components::damage, components::transform, components::physics> {
 public:
+	void process_events(world&) override;
 	void process_entities(world&) override;
 };

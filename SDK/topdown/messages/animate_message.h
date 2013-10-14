@@ -1,6 +1,5 @@
 #pragma once
 #include "message.h"
-#include "utility/sorted_vector.h"
 
 namespace resources {
 	struct animation;

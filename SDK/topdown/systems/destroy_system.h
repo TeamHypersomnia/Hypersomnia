@@ -9,5 +9,6 @@ class destroy_system : public processing_system_templated<components::children> 
 public:
 	void add(entity*) override {}
 	void remove(entity*) override {}
-	void process_entities(world&);
+
+	void process_events(world&) override;
 };

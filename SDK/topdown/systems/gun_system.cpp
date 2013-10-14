@@ -14,7 +14,7 @@
 
 gun_system::gun_system() : generator(device()) {}
 
-void gun_system::process_entities(world& owner) {
+void gun_system::process_events(world& owner) {
 	auto events = owner.get_message_queue<messages::intent_message>();
 
 	for (auto it : events) {
@@ -22,7 +22,9 @@ void gun_system::process_entities(world& owner) {
 			it.subject->get<components::gun>().trigger = it.state_flag;
 		}
 	}
+}
 
+void gun_system::process_entities(world& owner) {
 	for (auto it : targets) {
 		auto& gun_transform = it->get<components::transform>();
 		auto& gun = it->get<components::gun>();

@@ -9,5 +9,6 @@ using namespace entity_system;
 
 class crosshair_system : public processing_system_templated<components::transform, components::crosshair> {
 public:
+	void process_events(world&) override;
 	void process_entities(world&) override;
 };

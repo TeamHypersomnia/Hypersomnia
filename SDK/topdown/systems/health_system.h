@@ -8,5 +8,5 @@ using namespace entity_system;
 
 class health_system : public processing_system_templated<components::health> {
 public:
-	void process_entities(world&) override;
+	void process_events(world&) override;
 };

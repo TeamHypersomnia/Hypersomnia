@@ -12,7 +12,7 @@
 #include "../components/physics_component.h"
 #include "../game/body_helper.h"
 
-void health_system::process_entities(world& owner) {
+void health_system::process_events(world& owner) {
 	auto events = owner.get_message_queue<messages::damage_message>();
 
 	for (auto it : events) {

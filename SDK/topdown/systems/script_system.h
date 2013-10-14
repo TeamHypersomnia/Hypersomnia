@@ -22,4 +22,5 @@ public:
 	}
 
 	void process_entities(world&) override;
+	void process_events(world&) override;
 };

@@ -23,5 +23,5 @@ namespace components {
 class particle_emitter_system : public processing_system_templated<components::particle_emitter> {
 public:
 	static void spawn_particle(components::particle_group&, const vec2<>&, float, const resources::emission&);
-	void process_entities(world&);
+	void process_events(world&) override;
 };
