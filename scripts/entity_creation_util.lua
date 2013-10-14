@@ -64,6 +64,7 @@ function set_components_from_entry(_entity, entry, entities_lookup)
 	def		(health_component, 'health', { corpse_body = true, corpse_render = true } )
 	def_ptr (lookat_component, 'lookat', { target = true })
 	def		(particle_emitter_component, 'particle_emitter')
+	def		(scriptable_component, 'scriptable')
 	
 	if entry.physics ~= nil then
 		local my_body_data = physics_info()

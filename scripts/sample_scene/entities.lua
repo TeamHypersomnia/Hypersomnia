@@ -258,20 +258,50 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 	}
 }))
 
+my_scriptable_info = create_scriptable_info {
+	scripted_events = {
+		[scriptable_component.COLLISION_MESSAGE] 	= 	
+		function(message) 
+			print ("calling COLLISION_MESSAGE at point X:" .. message.point.x .. " Y: " .. message.point.y) 
+			message.collider.physics.body:ApplyForce(b2Vec2(-message.impact_velocity.x*100, -message.impact_velocity.y*100), message.collider.physics.body:GetWorldCenter())
+			return true 
+			
+		end,
+		
+		[scriptable_component.DAMAGE_MESSAGE] 		= 	
+		function(message) 
+			message.amount = 10
+			print ("calling DAMAGE_MESSAGE with damage of amount " .. message.amount)
+			--player.body.physics.body:ApplyForce(b2Vec2(message.impact_velocity.x, message.impact_velocity.y), player.body.physics.body:GetWorldCenter())
+			return true
+		end,
+		
+		[scriptable_component.LOOP] 				= 	
+		function(subject) 
+			subject.physics.body:ApplyForce(b2Vec2(2.1, 2.1), subject.physics.body:GetWorldCenter()) 
+		end
+	}
+}
 
+npcs = {}
+crates = {}
 for i = 1, 5 do
-	create_entity (archetyped(crate_archetype, {
+	crates[i] = create_entity (archetyped(crate_archetype, {
 		transform = {
 			pos = vec2(400, i*200-600),
 			rotation = 0
 		}
 	}))
 	
-	create_entity_group (archetyped(my_npc_archetype, {
+	npcs[i] = create_entity_group (archetyped(my_npc_archetype, {
 		body = {
 			transform = {
 				pos = vec2(-550, i*200-600),
 				rotation = 0
+			},
+			
+			scriptable = {
+				available_scripts = my_scriptable_info
 			}
 		}
 	}))
@@ -405,15 +435,13 @@ world_camera = create_entity (archetyped(camera_archetype, {
 
 player.body.gun.target_camera_to_shake:set(world_camera)
 
-my_scriptable_info = create_scriptable_info {
-	scripted_events = {
-		[scriptable_component.COLLISION_MESSAGE] 	= 	function(arg) print ("calling COLLISION_MESSAGE with number " .. arg)  end,
-		[scriptable_component.DAMAGE_MESSAGE] 		= 	function(arg) print ("calling DAMAGE_MESSAGE with number " .. arg) end,
-		[scriptable_component.LOOP] 				= 	function(arg) print ("calling LOOP with number " .. arg) end
-	}
-}
 
 my_scriptable_info:at(scriptable_component.COLLISION_MESSAGE)(1)
 my_scriptable_info:at(scriptable_component.DAMAGE_MESSAGE)(2)
-my_scriptable_info:at(scriptable_component.LOOP)(3)
+
+--script_only = create_entity {
+--	scriptable = {
+--		available_scripts = my_scriptable_info
+--	}
+--}
 
