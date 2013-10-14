@@ -6,7 +6,7 @@
 
 namespace augmentations {
 	namespace entity_system {
-		world::world() {
+		world::world() : input_queue(queues), output_queue(queues+1) {
 		}
 
 		world::~world() {
@@ -23,7 +23,7 @@ namespace augmentations {
 			auto it = registered_entity_watchers.find(ptr);
 			if (it != registered_entity_watchers.end()) {
 				(*it).second.remove(&ptr);
-				if ((*it).second.get_vector().empty()) {
+				if ((*it).second.raw.empty()) {
 					registered_entity_watchers.erase(it);
 				}
 			}
@@ -46,7 +46,7 @@ namespace augmentations {
 			auto it = registered_entity_watchers.find(&e);
 
 			if (it != registered_entity_watchers.end()) {
-				for (auto watcher : (*it).second.get_vector()) {
+				for (auto watcher : (*it).second.raw) {
 					/* watch out, may unregister itself if used improperly */
 					watcher->ptr = redirect_pointers;
 				}
@@ -72,8 +72,36 @@ namespace augmentations {
 		}
 
 		void world::run() {
-			for(auto it = systems.begin(); it != systems.end(); ++it)
-				(*it)->process_entities(*this);
+			for (auto& it : queues[0])
+				it.second.get()->clear();
+
+			for (auto& it : queues[1])
+				it.second.get()->clear();
+
+			for(auto it : systems)
+				it->process_entities(*this);
+
+			bool all_clear = false;
+
+			while(!all_clear) {
+				all_clear = true;
+				for (auto& it : *output_queue) {
+					if (!it.second.get()->empty()) {
+						all_clear = false;
+						break;
+					}
+				}
+
+				if (!all_clear) {
+					std::swap(input_queue, output_queue);
+					
+					for (auto& it : *output_queue) 
+						it.second.get()->clear();
+
+					for (auto it : systems)
+						it->process_events(*this);
+				}
+			}
 		}
 	}
 }

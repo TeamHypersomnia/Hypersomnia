@@ -14,14 +14,21 @@ namespace augmentations {
 			friend class entity;
 			friend class entity_ptr;
 
+			struct message_queue {
+				virtual void clear() = 0;
+				virtual bool empty() = 0;
+			};
+
 			template <typename message>
-			class message_queue {
-			public:
-				static std::vector<message> messages;
+			struct templated_message_queue : public message_queue {
+				std::vector<message> messages;
+				void clear() override { messages.clear(); }
+				bool empty() override { return messages.empty();  }
 			};
 
 			boost::object_pool<entity> entities;
 			
+			std::unordered_map<size_t, std::unique_ptr<message_queue>> *input_queue, *output_queue, queues[2];
 			std::unordered_map<size_t, boost::pool<>> size_to_container;
 			std::unordered_map<entity*, util::sorted_vector<entity_ptr*>> registered_entity_watchers;
 
@@ -38,16 +45,23 @@ namespace augmentations {
 			void unregister_entity_watcher(entity_ptr&);
 		public:
 
-			template <typename message>
-			void post_message(const message& message_object) {
-				message_queue<message>::messages.push_back(message_object);
+			template <typename T>
+			void register_message_queue() {
+				for (int i = 0; i < 2; ++i)
+					queues[i].emplace(std::make_pair(typeid(T).hash_code(),
+						std::unique_ptr<message_queue>(static_cast <message_queue*>(new templated_message_queue<T>()))));
 			}
 
-			template <typename message>
-			std::vector<message>& get_message_queue() {
-				return message_queue<message>::messages;
+			template <typename T>
+			std::vector<T>& get_message_queue() {
+				return (static_cast<templated_message_queue<T>*>(input_queue->at(typeid(T).hash_code()).get()))->messages;
 			}
 
+			template <typename T>
+			void post_message(const T& message_object) {
+				return (static_cast<templated_message_queue<T>*>(output_queue->at(typeid(T).hash_code()).get()))->messages.push_back(message_object);
+			}
+			
 			template<class T>
 			void add_system(T* new_system) {
 				/*
@@ -83,7 +97,5 @@ namespace augmentations {
 
 			void run();
 		};
-
-		template <typename message> std::vector<message> world::message_queue<message>::messages;
 	}
 }
