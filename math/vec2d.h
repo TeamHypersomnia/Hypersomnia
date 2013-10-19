@@ -116,7 +116,7 @@ namespace augmentations {
 
 		template <typename v>
 		vec2& rotate(float angle, v origin) {
-			augmentations::rotate(*this, origin, angle);
+			augmentations::rotate<vec2, float>(*this, origin, angle);
 			return *this;
 		}
 
@@ -168,6 +168,7 @@ namespace augmentations {
 		
 		vec2 operator-() { return vec2(x * -1, y * -1); }
 
+		template <class v> bool operator< (const v& p) const { return x < p.x && y < p.y; }
 		template <class v> bool operator==(const v& p) const { return x == p.x && y == p.y; }
 		template <class v> bool operator!=(const v& p) const { return x != p.x || y != p.y; }
 

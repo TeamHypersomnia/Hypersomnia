@@ -47,7 +47,7 @@ crate_archetype = {
 			angular_damping = 5,
 			fixed_rotation = false,
 			density = 0.1,
-			sensor = true
+			sensor = false
 		}
 	}
 }
@@ -229,6 +229,10 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 		lookat = {
 			target = "crosshair",
 			look_mode = lookat_component.POSITION
+		},
+		
+		ai = {
+			visibility_square_side = 2000
 		}
 	},
 	
@@ -274,11 +278,6 @@ my_scriptable_info = create_scriptable_info {
 			print ("calling DAMAGE_MESSAGE with damage of amount " .. message.amount)
 			--player.body.physics.body:ApplyForce(b2Vec2(message.impact_velocity.x, message.impact_velocity.y), player.body.physics.body:GetWorldCenter())
 			return true
-		end,
-		
-		[scriptable_component.LOOP] 				= 	
-		function(subject) 
-			subject.physics.body:ApplyForce(b2Vec2(2.1, 2.1), subject.physics.body:GetWorldCenter()) 
 		end
 	}
 }

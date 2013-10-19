@@ -20,6 +20,12 @@ render_system::render_system(window::glwindow& output_window) : output_window(ou
 	glEnableClientState(GL_COLOR_ARRAY);
 }
 
+#define AI_DEBUG_DRAW
+#ifdef AI_DEBUG_DRAW
+static components::transform last_camera;
+#include "../components/ai_component.h"
+#include "../components/physics_component.h"
+#endif
 void render_system::draw(rects::xywh visible_area, components::transform camera_transform, unsigned mask) {
 	/* shortcut */
 	typedef std::pair<components::render*, components::transform*> cached_pair;
@@ -51,6 +57,28 @@ void render_system::draw(rects::xywh visible_area, components::transform camera_
 		if (e.first->model == nullptr) continue;
 		e.first->model->draw(triangles, *e.second, camera_transform.current.pos);
 	}
+
+#ifdef AI_DEBUG_DRAW
+	last_camera = camera_transform;
+	for (auto it : targets) {
+		auto* ai = it->find<components::ai>();
+		if (ai) {
+			auto origin = it->get<components::transform>().current.pos;
+
+			for (int i = 0; i < ai->get_num_triangles(); ++i) {
+				auto& tri = ai->get_triangle(i, origin);
+				resources::vertex_triangle verts;
+				
+				for (int i = 0; i < 3; ++i) {
+					verts.vertices[i].position = tri.points[i] - camera_transform.current.pos;
+					verts.vertices[i].color = graphics::pixel_32(0, 0, 0, 125);
+				}
+
+				triangles.push_back(verts);
+			}
+		}
+	}
+#endif
 }
 
 void render_system::process_entities(world&) {
@@ -62,6 +90,25 @@ void render_system::render() {
 	glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(resources::vertex), (char*) (triangles.data()) + sizeof(int) * 2 + sizeof(float) * 2);
 	glDrawArrays(GL_TRIANGLES, 0, triangles.size() * 3);
 
+#ifdef AI_DEBUG_DRAW
+	for (auto it : targets) {
+		auto* ai = it->find<components::ai>();
+		if (ai) {
+			glColor4f(1.0, 0.0, 0.0, 1.0);
+			glDisable(GL_TEXTURE_2D);
+			glBegin(GL_LINES);
+			
+			for (auto line : ai->lines) {
+				glVertex2f(line.a.x*METERS_TO_PIXELSf - last_camera.current.pos.x, line.a.y*METERS_TO_PIXELSf - last_camera.current.pos.y);
+				glVertex2f(line.b.x*METERS_TO_PIXELSf - last_camera.current.pos.x, line.b.y*METERS_TO_PIXELSf - last_camera.current.pos.y);
+			}
+
+			glEnd();
+			glEnable(GL_TEXTURE_2D);
+			ai->lines.clear();
+		}
+	}
+#endif
 	triangles.clear();
 }
 

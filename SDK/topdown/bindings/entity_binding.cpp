@@ -4,6 +4,7 @@
 
 #include "bindings.h"
 
+#include "../components/ai_component.h"
 #include "../components/animate_component.h"
 #include "../components/camera_component.h"
 #include "../components/chase_component.h"
@@ -29,6 +30,8 @@ namespace bindings {
 
 			.def("add", &entity::add<animate>)
 			.property("animate", &entity::find<animate>, &entity::set<animate>)
+			.def("add", &entity::add<ai>)
+			.property("ai", &entity::find<ai>, &entity::set<ai>)
 			.def("add", &entity::add<camera>)
 			.property("camera", &entity::find<camera>, &entity::set<camera>)
 			.def("add", &entity::add<chase>)

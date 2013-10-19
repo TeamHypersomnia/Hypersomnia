@@ -11,9 +11,9 @@ namespace resources {
 		graphics::pixel_32 color;
 	};
 
-	struct triangle {
+	struct vertex_triangle {
 		vertex vertices[3];
 	};
 
-	typedef std::vector<triangle> buffer;
+	typedef std::vector<vertex_triangle> buffer;
 }

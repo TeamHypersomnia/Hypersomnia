@@ -2,7 +2,6 @@
 #include "stdafx.h"
 #include "bindings.h"
 
-
 #include "../components/chase_component.h"
 
 namespace bindings {

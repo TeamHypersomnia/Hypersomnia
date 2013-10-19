@@ -50,7 +50,7 @@ namespace resources {
 		vec2<> v[4];
 		make_rect(transform.current.pos - camera_pos, vec2<>(size), transform.current.rotation, v);
 
-		triangle t1, t2;
+		vertex_triangle t1, t2;
 		t1.vertices[0].color = t2.vertices[0].color = color;
 		t1.vertices[1].color = t2.vertices[1].color = color;
 		t1.vertices[2].color = t2.vertices[2].color = color;
@@ -96,6 +96,20 @@ namespace resources {
 
 		return rects::ltrb(lower.x, lower.y, upper.x, upper.y).hover(visibility_aabb);
 	}
+
+	//triangle::triangle(const vertex& a, const vertex& b, const vertex& c) {
+	//	vertices[0] = a;
+	//	vertices[1] = b;
+	//	vertices[2] = c;
+	//}
+	//
+	//void triangle::draw(buffer& triangles, const components::transform& transform, vec2<> camera_pos) {
+	//
+	//}
+	//
+	//bool triangle::is_visible(rects::xywh visibility_aabb, const components::transform& transform) {
+	//	return true;
+	//}
 
 	void polygon::draw(buffer& triangles, const components::transform& transform, vec2<> camera_pos) {
 		/* perform triangulation */
