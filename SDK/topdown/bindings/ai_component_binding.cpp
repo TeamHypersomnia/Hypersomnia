@@ -9,7 +9,6 @@ namespace bindings {
 		return
 			luabind::class_<ai>("ai_component")
 			.def(luabind::constructor<>())
-			.def_readwrite("visibility_radius", &ai::visibility_radius)
-			.def_readwrite("visibility_angle", &ai::visibility_angle);
+			.def_readwrite("visibility_square_side", &ai::visibility_square_side);
 	}
 }
