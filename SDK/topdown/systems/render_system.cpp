@@ -57,27 +57,8 @@ void render_system::draw(rects::xywh visible_area, components::transform camera_
 		if (e.first->model == nullptr) continue;
 		e.first->model->draw(triangles, *e.second, camera_transform.current.pos);
 	}
-
 #ifdef AI_DEBUG_DRAW
-	last_camera = camera_transform;
-	for (auto it : targets) {
-		auto* ai = it->find<components::ai>();
-		if (ai) {
-			auto origin = it->get<components::transform>().current.pos;
-
-			for (int i = 0; i < ai->get_num_triangles(); ++i) {
-				auto& tri = ai->get_triangle(i, origin);
-				resources::vertex_triangle verts;
-				
-				for (int i = 0; i < 3; ++i) {
-					verts.vertices[i].position = tri.points[i] - camera_transform.current.pos;
-					verts.vertices[i].color = graphics::pixel_32(0, 0, 0, 125);
-				}
-
-				triangles.push_back(verts);
-			}
-		}
-	}
+	last_camera = camera_transform.current.pos;
 #endif
 }
 

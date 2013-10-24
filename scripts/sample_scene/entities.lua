@@ -232,7 +232,7 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 		},
 		
 		ai = {
-			visibility_square_side = 2000
+			visibility_radius = 500
 		}
 	},
 	

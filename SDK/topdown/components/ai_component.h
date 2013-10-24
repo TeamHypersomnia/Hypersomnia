@@ -12,15 +12,8 @@ namespace components {
 		};
 		std::vector<debug_line> lines;
 
-		float visibility_square_side;
-		std::vector<augmentations::vec2<>> vision_points;
-
-		int get_num_triangles();
-		
-		struct triangle {
-			augmentations::vec2<> points[3];
-		} get_triangle(int index, augmentations::vec2<> origin);
-
-		ai() : visibility_square_side(0.f) {}
+		float visibility_radius;
+		float visibility_angle;
+		ai() : visibility_radius(0.f) {}
 	};
 }
