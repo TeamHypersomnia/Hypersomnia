@@ -5,6 +5,7 @@
 #include "entity_system/entity.h"
 
 #include "physics_system.h"
+#include <limits>
 
 struct my_callback : public b2QueryCallback {
 	std::vector<b2Fixture*> fixtures;
@@ -18,7 +19,7 @@ struct my_callback : public b2QueryCallback {
 };
 
 struct my_ray_callback : public b2RayCastCallback {
-	vec2<> intersection;
+	vec2<> intersection, target;
 	bool hit;
 
 	my_ray_callback() : hit(false) {}
@@ -72,10 +73,6 @@ void ai_system::process_entities(world& owner) {
 		callback.subject = it;
 		physics.b2world.QueryAABB(&callback, aabb);
 
-		if (callback.fixtures.empty()) {
-
-		}
-
 		for (auto fixture : callback.fixtures) {
 			auto shape = fixture->GetShape();
 			
@@ -86,10 +83,10 @@ void ai_system::process_entities(world& owner) {
 				
 				for (int i = 0; i < verts; ++i) {
 					auto position = fixture->GetBody()->GetPosition();
-					auto rotation = fixture->GetBody()->GetAngle();
+					auto rotation = fixture->GetBody()->GetAngle() / 0.01745329251994329576923690768489;
 					
 					std::pair<float, vec2<>> new_vertex;
-					new_vertex.second = vec2<>(polygon_shape->GetVertex(i)).rotate(rotation, fixture->GetBody()->GetWorldCenter()) + position;
+					new_vertex.second = vec2<>(polygon_shape->GetVertex(i)).rotate(rotation, fixture->GetBody()->GetLocalCenter()) + position;
 
 					vec2<> diff = new_vertex.second - position_meters;
 
@@ -118,54 +115,117 @@ void ai_system::process_entities(world& owner) {
 		ai.lines.push_back(components::ai::debug_line(vec2<>(whole_vision[2]) + vec2<>(1.f, 0.f), vec2<>(whole_vision[3]) + vec2<>(-1.f, 0.f)));
 		ai.lines.push_back(components::ai::debug_line(vec2<>(whole_vision[3]) + vec2<>(0.f, 1.f), vec2<>(whole_vision[0]) + vec2<>(0.f, -1.f)));
 
-		//for (auto& v : whole_vision)
-		//	all_vertices_transformed.push_back(std::make_pair(comparable_angle(v), v));
+		for (auto& v : whole_vision)
+			all_vertices_transformed.push_back(std::make_pair(comparable_angle(v - position_meters), v));
 
 		std::sort(all_vertices_transformed.begin(), all_vertices_transformed.end());
 
-		/* now to propagate the visible area */
-		ai.vision_points.clear();
-
-		vec2<> last_vertex_that_ray_reached;
 		/* by now we have ensured that all_vertices_transformed is non-empty */
+		const auto epsilon = 0.0001f;
+			//std::numeric_limits<float>().epsilon();
+		/*
+		debugging:
+			red ray - ignored rays that intersected with obstacle
+			yellow ray - hit the same vertex
+			violet ray - ray that passed through vertex and hit another obstacle
+			blue ray - ray that hit boundary and/or passed through vertex
+		*/
+
+		typedef std::pair<vec2<>, vec2<>> double_ray;
+		std::vector<double_ray> double_rays;
+		
+		auto draw_line = [&position_meters, &ai](vec2<> point, graphics::pixel_32 col){
+			ai.lines.push_back(components::ai::debug_line(position_meters, point, col));
+		};
+
 		for (auto& vertex : all_vertices_transformed) {
-			my_ray_callback ray_callback;
+			b2Vec2* from_aabb = nullptr;
 
-			auto normalized_direction = (vertex.second - position_meters).normalize();
+			for (auto& aabb_vert : whole_vision)
+				if (vertex.second == aabb_vert) 
+					from_aabb = &aabb_vert;
+			
+			my_ray_callback ray_callbacks[2];
 
-			physics.b2world.RayCast(&ray_callback, position_meters, position_meters + (normalized_direction*vision_side_meters / 2 * 1.414213562373095));
-			ai.lines.push_back(components::ai::debug_line(position_meters, position_meters + (normalized_direction*vision_side_meters / 2 * 1.414213562373095)));
+			ray_callbacks[0].target = position_meters + vec2<>::from_angle((vertex.second - position_meters).get_degrees() - epsilon) * vision_side_meters / 2 * 1.414213562373095;
+			ray_callbacks[1].target = position_meters + vec2<>::from_angle((vertex.second - position_meters).get_degrees() + epsilon) * vision_side_meters / 2 * 1.414213562373095;
 
-			if (!ray_callback.hit) {
-				for (auto& bound : bounds) {
-					b2RayCastOutput output;
-					b2RayCastInput input;
-					input.maxFraction = 1.0;
-					input.p1 = position_meters;
-					input.p2 = position_meters + (normalized_direction * (vision_side_meters + 0.1) / 2 * 1.414213562373095);
+			physics.b2world.RayCast(&ray_callbacks[0], position_meters, ray_callbacks[0].target);
+			physics.b2world.RayCast(&ray_callbacks[1], position_meters, ray_callbacks[1].target);
+			
+			/*if it was cast against the aabb, there's a high probability we did not intersect with anything */
+			if (!(ray_callbacks[0].hit || ray_callbacks[1].hit)) {
+				if (from_aabb) 
+					double_rays.push_back(double_ray(*from_aabb, *from_aabb));
+				else {
+					/* only ever happens if an object is partially inside visibility rectangle
+					ignore, handling not implemented
+					*/
+					bool breakpoint = true;
+					//draw_line(ray_callbacks[0].target, graphics::pixel_32(0, 255, 255, 255));
+					//draw_line(ray_callbacks[1].target, graphics::pixel_32(0, 255, 0, 255));
+				}
+			}
+			else if (ray_callbacks[0].hit && ray_callbacks[1].hit) {
+				/* ray intersected with an obstacle, ignoring intersection */
+				if ((ray_callbacks[0].intersection - vertex.second).length_sq() > 0.001f &&
+					(ray_callbacks[1].intersection - vertex.second).length_sq() > 0.001f) {
+						//draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 0, 255));
+				}
+				/* intersected with the same vertex */
+				else if ((ray_callbacks[0].intersection - ray_callbacks[1].intersection).length_sq() < 0.0001f) {
+					double_rays.push_back(double_ray(vertex.second, vertex.second));
+					//draw_line(vertex.second, graphics::pixel_32(255, 255, 0, 255));
+				}
+				/* this is the case where the ray is cast at the peripheral vertex, here we also detect the discontinuity */
+				else {
+					double_rays.push_back(double_ray(ray_callbacks[0].intersection, ray_callbacks[1].intersection));
 
-					b2Transform edge_transform(b2Vec2(0, 0), b2Rot(0));
-					ai.lines.push_back(components::ai::debug_line(input.p1, input.p2));
+					if ((ray_callbacks[0].intersection - position_meters).length_sq() > (ray_callbacks[1].intersection - position_meters).length_sq()) {
+					//	draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 255, 255));
+					}
+					else {
+					//	draw_line(ray_callbacks[1].intersection, graphics::pixel_32(255, 0, 255, 255));
+					}
+				}
+			}
+			/* one of the rays did not hit anything so we cast it against boundaries, we also detect discontinuity here
+			*/
+			else {
+				for (int i = 0; i < 2; ++i) {
+					if (!ray_callbacks[i].hit) {
+						for (auto& bound : bounds) {
+							b2RayCastOutput output;
+							b2RayCastInput input;
+							input.maxFraction = 1.0;
+							input.p1 = position_meters;
+							input.p2 = ray_callbacks[i].target;
 
-					if (bound.RayCast(&output, input, edge_transform, 0)) {
-						//ray_callback.intersection = input.p2 + output.fraction * (input.p2 - input.p1);
+							b2Transform edge_transform(b2Vec2(0, 0), b2Rot(0));
+
+							if (bound.RayCast(&output, input, edge_transform, 0)) {
+								auto actual_intersection = input.p1 + output.fraction * (input.p2 - input.p1);
+								if (i == 0) double_rays.push_back(double_ray(actual_intersection, ray_callbacks[1].intersection));
+								else if (i == 1) double_rays.push_back(double_ray(ray_callbacks[0].intersection, actual_intersection));
+								//draw_line(actual_intersection, graphics::pixel_32(0, 0, 255, 255));
+							}
+						}
 						break;
 					}
 				}
 			}
-
-			//if ((ray_callback.intersection - position_meters).length_sq() >= (vertex.second - position_meters).length_sq()) {
-				//ai.vision_points.push_back(last_vertex_that_ray_reached);
-				ai.vision_points.push_back(ray_callback.intersection);
-
-				//last_vertex_that_ray_reached = vertex.second;
-			//}
-
-			/* otherwise ray has not reached its destination, discard result to not create redundant triangles */
 		}
 
-		for (auto& vision_point : ai.vision_points) {
-			vision_point *= METERS_TO_PIXELSf;
+		/* now to propagate the visible area */
+		ai.vision_points.clear();
+
+		for (int i = 0; i < double_rays.size(); ++i) {
+			ai.vision_points.push_back(double_rays[i].second * METERS_TO_PIXELSf);
+			//draw_line(PIXELS_TO_METERSf**ai.vision_points.rbegin(), graphics::pixel_32(255, 255, 255, 255));
+			ai.vision_points.push_back(double_rays[(i + 1)%double_rays.size()].first * METERS_TO_PIXELSf);
+			//draw_line(PIXELS_TO_METERSf**ai.vision_points.rbegin(), graphics::pixel_32(255, 255, 255, 255));
+
+			//ai.lines.push_back(components::ai::debug_line(PIXELS_TO_METERSf**ai.vision_points.rbegin(), PIXELS_TO_METERSf**(ai.vision_points.rbegin() + 1), graphics::pixel_32(255, 255, 255, 255)));
 		}
 	}
 }

@@ -2,12 +2,14 @@
 #include <vector>
 #include "math/vec2d.h"
 #include "entity_system/component.h"
+#include "graphics/pixel.h"
 
 namespace components {
 	struct ai : public augmentations::entity_system::component {
 		struct debug_line {
-			debug_line(augmentations::vec2<> a, augmentations::vec2<> b) : a(a), b(b) {}
+			debug_line(augmentations::vec2<> a, augmentations::vec2<> b, augmentations::graphics::pixel_32 col = augmentations::graphics::pixel_32(255, 255, 255, 255)) : col(col), a(a), b(b) {}
 
+			augmentations::graphics::pixel_32 col;
 			augmentations::vec2<> a, b;
 		};
 		std::vector<debug_line> lines;
