@@ -37,7 +37,7 @@ namespace augmentations {
 		std::vector<registered_type> type_registry::get_registered_types(const entity& e) const {
 			std::vector<registered_type> registered;
 			for(auto& raw : e.type_to_component.raw) {
-				auto it = library.at(raw.first);
+				auto it = library.at(raw.key);
 				
 				registered.push_back(it);
 			}

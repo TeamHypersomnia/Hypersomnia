@@ -28,9 +28,9 @@ namespace augmentations {
 
 			for (auto type : type_to_component.raw) {
 				/* call polymorphic destructor */
-				type.second->~component();
+				type.val->~component();
 				/* delete component from corresponding pool, we must get component's size from the library */
-				owner_world.get_container_for_type(type.first).free(type.second);
+				owner_world.get_container_for_type(type.key).free(type.val);
 			}
 
 			type_to_component.raw.clear();

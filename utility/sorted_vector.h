@@ -37,15 +37,26 @@ namespace augmentations {
 
 		template<typename key_type, typename value_type>
 		struct sorted_vector_map {
-			std::vector<std::pair<key_type, value_type>> raw;
+			struct node {
+				key_type key;
+				value_type val;
+
+				bool operator < (const node& b) const {
+					return key < b.key;
+				}
+
+				node(const key_type& k, const value_type& v) : key(k), val(v) {}
+			};
+
+			std::vector<node> raw;
 
 			void add(const key_type& key, const value_type& val) {
-				raw.push_back(std::make_pair(key, val));
+				raw.push_back(node(key, val));
 				std::sort(raw.begin(), raw.end());
 			}
 
 			bool remove(const key_type& key) {
-				auto it = std::lower_bound(raw.begin(), raw.end(), std::make_pair(key, value_type()));
+				auto it = std::lower_bound(raw.begin(), raw.end(), node(key, value_type()));
 
 				if (it != raw.end() && *it == val) {
 					raw.erase(it);
@@ -56,14 +67,14 @@ namespace augmentations {
 			}
 
 			bool find(const key_type& key) const {
-				return std::binary_search(raw.begin(), raw.end(), std::make_pair(key, value_type()));
+				return std::binary_search(raw.begin(), raw.end(), node(key, value_type()));
 			}
 
 			value_type* get(const key_type& key) {
-				auto it = std::lower_bound(raw.begin(), raw.end(), std::make_pair(key, value_type()));
-				if (it == raw.end() || (*it).first != key)
+				auto it = std::lower_bound(raw.begin(), raw.end(), node(key, value_type()));
+				if (it == raw.end() || (*it).key != key)
 					return nullptr;
-				return &(*it).second;
+				return &(*it).val;
 			}
 		};
 	}
