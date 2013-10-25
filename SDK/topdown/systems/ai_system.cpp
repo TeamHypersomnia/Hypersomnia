@@ -86,7 +86,7 @@ void ai_system::process_entities(world& owner) {
 					auto rotation = fixture->GetBody()->GetAngle() / 0.01745329251994329576923690768489;
 					
 					std::pair<float, vec2<>> new_vertex;
-					new_vertex.second = vec2<>(polygon_shape->GetVertex(i)).rotate(rotation, fixture->GetBody()->GetLocalCenter()) + position;
+					new_vertex.second = vec2<>(polygon_shape->GetVertex(i)).rotate(rotation, b2Vec2(0, 0)) + position;
 
 					vec2<> diff = new_vertex.second - position_meters;
 
@@ -170,22 +170,22 @@ void ai_system::process_entities(world& owner) {
 				/* ray intersected with an obstacle, ignoring intersection */
 				if ((ray_callbacks[0].intersection - vertex.second).length_sq() > 0.001f &&
 					(ray_callbacks[1].intersection - vertex.second).length_sq() > 0.001f) {
-						//draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 0, 255));
+						draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 0, 255));
 				}
 				/* intersected with the same vertex */
 				else if ((ray_callbacks[0].intersection - ray_callbacks[1].intersection).length_sq() < 0.0001f) {
 					double_rays.push_back(double_ray(vertex.second, vertex.second));
-					//draw_line(vertex.second, graphics::pixel_32(255, 255, 0, 255));
+					draw_line(vertex.second, graphics::pixel_32(255, 255, 0, 255));
 				}
 				/* this is the case where the ray is cast at the peripheral vertex, here we also detect the discontinuity */
 				else {
 					double_rays.push_back(double_ray(ray_callbacks[0].intersection, ray_callbacks[1].intersection));
 
 					if ((ray_callbacks[0].intersection - position_meters).length_sq() > (ray_callbacks[1].intersection - position_meters).length_sq()) {
-					//	draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 255, 255));
+						draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 255, 255));
 					}
 					else {
-					//	draw_line(ray_callbacks[1].intersection, graphics::pixel_32(255, 0, 255, 255));
+						draw_line(ray_callbacks[1].intersection, graphics::pixel_32(255, 0, 255, 255));
 					}
 				}
 			}
@@ -207,7 +207,7 @@ void ai_system::process_entities(world& owner) {
 								auto actual_intersection = input.p1 + output.fraction * (input.p2 - input.p1);
 								if (i == 0) double_rays.push_back(double_ray(actual_intersection, ray_callbacks[1].intersection));
 								else if (i == 1) double_rays.push_back(double_ray(ray_callbacks[0].intersection, actual_intersection));
-								//draw_line(actual_intersection, graphics::pixel_32(0, 0, 255, 255));
+								draw_line(actual_intersection, graphics::pixel_32(0, 0, 255, 255));
 							}
 						}
 						break;
