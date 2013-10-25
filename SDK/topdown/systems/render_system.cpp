@@ -24,6 +24,7 @@ render_system::render_system(window::glwindow& output_window) : output_window(ou
 #ifdef AI_DEBUG_DRAW
 static components::transform last_camera;
 #include "../components/ai_component.h"
+#include <algorithm>
 #include "../components/physics_component.h"
 #endif
 void render_system::draw(rects::xywh visible_area, components::transform camera_transform, unsigned mask) {
@@ -58,27 +59,7 @@ void render_system::draw(rects::xywh visible_area, components::transform camera_
 		e.first->model->draw(triangles, *e.second, camera_transform.current.pos);
 	}
 
-#ifdef AI_DEBUG_DRAW
 	last_camera = camera_transform;
-	for (auto it : targets) {
-		auto* ai = it->find<components::ai>();
-		if (ai) {
-			auto origin = it->get<components::transform>().current.pos;
-
-			for (int i = 0; i < ai->get_num_triangles(); ++i) {
-				auto& tri = ai->get_triangle(i, origin);
-				resources::vertex_triangle verts;
-				
-				for (int i = 0; i < 3; ++i) {
-					verts.vertices[i].position = tri.points[i] - camera_transform.current.pos;
-					verts.vertices[i].color = graphics::pixel_32(0, 0, 0, 125);
-				}
-
-				triangles.push_back(verts);
-			}
-		}
-	}
-#endif
 }
 
 void render_system::process_entities(world&) {
@@ -91,23 +72,55 @@ void render_system::render() {
 	glDrawArrays(GL_TRIANGLES, 0, triangles.size() * 3);
 
 #ifdef AI_DEBUG_DRAW
+	glDisable(GL_TEXTURE_2D);
+
+	glBegin(GL_TRIANGLES);
 	for (auto it : targets) {
 		auto* ai = it->find<components::ai>();
 		if (ai) {
-			glColor4f(1.0, 0.0, 0.0, 1.0);
-			glDisable(GL_TEXTURE_2D);
-			glBegin(GL_LINES);
+			auto origin = it->get<components::transform>().current.pos;
+
+			for (int i = 0; i < ai->get_num_triangles(); ++i) {
+				auto& tri = ai->get_triangle(i, origin);
+				resources::vertex_triangle verts;
+
+				for (int i = 0; i < 3; ++i) {
+					auto pos = tri.points[i] - last_camera.current.pos;
+
+					//if (i == 0)
+						glColor4ub(255, 255, 255, 122);
+					//else
+					//	glColor4ub(255, 255, 255, std::max(int(0), int(
+					//	255 * (1 - ((tri.points[i] - tri.points[0]).length() / 1000))
+					//	
+					//	)));
+
+					
+					glVertex2f(pos.x, pos.y);
+				}
+
+			}
+		}
+	}
+	glEnd();
+
+	glBegin(GL_LINES);
+	for (auto it : targets) {
+		auto* ai = it->find<components::ai>();
+		if (ai) {
 			
 			for (auto line : ai->lines) {
+				glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
 				glVertex2f(line.a.x*METERS_TO_PIXELSf - last_camera.current.pos.x, line.a.y*METERS_TO_PIXELSf - last_camera.current.pos.y);
 				glVertex2f(line.b.x*METERS_TO_PIXELSf - last_camera.current.pos.x, line.b.y*METERS_TO_PIXELSf - last_camera.current.pos.y);
 			}
 
-			glEnd();
-			glEnable(GL_TEXTURE_2D);
 			ai->lines.clear();
 		}
 	}
+	glEnd();
+
+	glEnable(GL_TEXTURE_2D);
 #endif
 	triangles.clear();
 }
