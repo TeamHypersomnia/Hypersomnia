@@ -47,6 +47,7 @@ namespace bindings {
 		_world(),
 		_entity_ptr(),
 		_sprite(),
+		_polygon(),
 
 		_particle(),
 		_emission(),
@@ -109,6 +110,7 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			bindings::_world(),
 			bindings::_entity_ptr(),
 			bindings::_sprite(),
+			bindings::_polygon(),
 
 			bindings::_particle(),
 			bindings::_emission(),

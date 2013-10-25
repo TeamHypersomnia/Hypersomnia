@@ -168,7 +168,7 @@ namespace augmentations {
 		
 		vec2 operator-() { return vec2(x * -1, y * -1); }
 
-		template <class v> bool operator< (const v& p) const { return x < p.x && y < p.y; }
+		template <class v> bool operator < (const v& p) const { return std::make_pair(x, y) < std::make_pair(p.x, p.y); }
 		template <class v> bool operator==(const v& p) const { return x == p.x && y == p.y; }
 		template <class v> bool operator!=(const v& p) const { return x != p.x || y != p.y; }
 

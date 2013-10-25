@@ -2,7 +2,6 @@
 #include "stdafx.h"
 #include "bindings.h"
 
-
 #include "../components/physics_component.h"
 
 void set_density(b2Body* body, float density) {

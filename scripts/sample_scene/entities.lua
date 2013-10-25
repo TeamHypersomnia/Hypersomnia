@@ -21,6 +21,14 @@ corpse_sprite = create_sprite {
 	image = images.dead_front
 }
 
+crate_piece_poly = create_polygon {
+	{ pos = vec2(0, 0), image = images.crate, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+	{ pos = vec2(180, 0), image = images.crate, texcoord = vec2(1, 0), color = rgba(255, 255, 255, 255) },
+	{ pos = vec2(80, 40), image = images.crate, texcoord = vec2(1, 1), color = rgba(255, 255, 255, 255) },
+	{ pos = vec2(0, 80), image = images.crate, texcoord = vec2(0, 1), color = rgba(255, 255, 255, 255) }
+}
+
+
 crate_archetype = {
 	transform = {
 		pos = vec2(0, 0), rotation = 0
@@ -40,7 +48,7 @@ crate_archetype = {
 		
 		body_info = {
 			filter = filter_objects,
-			type = physics_info.RECT,
+			shape_type = physics_info.RECT,
 			rect_size = crate_sprite.size,
 			
 			linear_damping = 5,
@@ -51,6 +59,25 @@ crate_archetype = {
 		}
 	}
 }
+
+crate_piece_archetype = archetyped(crate_archetype, {
+	render = {
+		model = crate_piece_poly
+	},
+	
+	physics = {
+		body_info = {
+			shape_type = physics_info.POLYGON,
+			vertices = crate_piece_poly
+		}
+	}
+})
+
+my_crate_piece = create_entity (archetyped(crate_piece_archetype, {
+	transform = {
+		pos = vec2(0, 300)
+	}
+}))
 
 bg = create_entity {
 	render = {
@@ -85,7 +112,7 @@ assault_rifle = {
 	
 	bullet_body = {
 		filter = filter_bullets,
-		type = physics_info.RECT,
+		shape_type = physics_info.RECT,
 		rect_size = bullet_sprite.size,
 		fixed_rotation = true,
 		density = 0.1
@@ -132,7 +159,7 @@ my_npc_archetype = {
 			
 			corpse_body = {
 				filter = filter_corpses,
-				type = physics_info.RECT,
+				shape_type = physics_info.RECT,
 				rect_size = corpse_sprite.size,
 				fixed_rotation = false,
 				linear_damping = 20,
@@ -145,7 +172,7 @@ my_npc_archetype = {
 			
 			body_info = {
 				filter = filter_characters,
-				type = physics_info.RECT,
+				shape_type = physics_info.RECT,
 				rect_size = images.player_1.size,
 				
 				linear_damping = 5,
@@ -284,7 +311,7 @@ my_scriptable_info = create_scriptable_info {
 
 npcs = {}
 crates = {}
-for i = 1, 5 do
+for i = 1, 0 do
 	crates[i] = create_entity (archetyped(crate_archetype, {
 		transform = {
 			pos = vec2(400, i*200-600),

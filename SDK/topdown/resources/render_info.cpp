@@ -8,6 +8,9 @@
 #include "../../topdown/components/physics_component.h"
 #include "../../topdown/components/particle_group_component.h"
 
+#include "polydecomp/decomp.h"
+#include "utility/sorted_vector.h"
+
 namespace resources {
 	void renderable::make_rect(vec2<> pos, vec2<> size, float angle, vec2<> v[4]) {
 		vec2<> origin(pos + (size / 2.f));
@@ -96,6 +99,11 @@ namespace resources {
 
 		return rects::ltrb(lower.x, lower.y, upper.x, upper.y).hover(visibility_aabb);
 	}
+	
+	bool polygon::is_visible(rects::xywh visibility_aabb, const components::transform&) {
+		/* perform visibility check! */
+		return true;
+	}
 
 	//triangle::triangle(const vertex& a, const vertex& b, const vertex& c) {
 	//	vertices[0] = a;
@@ -111,8 +119,55 @@ namespace resources {
 	//	return true;
 	//}
 
+	void polygon::concave::add_vertex(const vertex& v) {
+		vertices.push_back(v);
+	}
+
+	void polygon::add_concave(const concave& polygon) {
+		/* enabling retrieval of drawable vertex values */
+		util::sorted_vector_map<vec2<>, vertex> vertex_lib;
+
+		/* perform decomposition */		
+		poly_decomposition::Polygon poly;
+
+		for (auto& v : polygon.vertices) {
+			vertex_lib.add(v.position, v);
+			poly.push_back(poly_decomposition::Point(v.position.x, v.position.y));
+		}
+
+		auto output = poly_decomposition::decompose_polygon(poly);
+
+		for (auto& convex : output) {
+			std::vector<vertex> convex_poly;
+
+			for (auto& v : convex)
+				convex_poly.push_back(*vertex_lib.get(vec2<>(v.x, v.y)));
+
+			add_convex(convex_poly);
+		}
+	}
+
+	void polygon::add_convex(const std::vector<vertex>& model) {
+		convex_models.push_back(model);
+	}
+
 	void polygon::draw(buffer& triangles, const components::transform& transform, vec2<> camera_pos) {
-		/* perform triangulation */
+		vertex_triangle new_tri;
+		
+		auto models_copy = convex_models;
+		for (auto model : models_copy) {
+			for (int i = 0; i < model.size(); ++i) {
+				model[i].position.rotate(transform.current.rotation, vec2<>(0, 0));
+				model[i].position += transform.current.pos - camera_pos;
+
+				if (i > 1) {
+					new_tri.vertices[0] = model[0];
+					new_tri.vertices[1] = model[i - 1];
+					new_tri.vertices[2] = model[i];
+					triangles.push_back(new_tri);
+				}
+			}
+		}
 	}
 }
 

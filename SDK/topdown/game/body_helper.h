@@ -7,6 +7,10 @@ namespace augmentations {
 	}
 }
 
+namespace resources {
+	class polygon;
+}
+
 namespace topdown {
 	struct physics_info {
 		enum {
@@ -14,16 +18,17 @@ namespace topdown {
 			POLYGON
 		} type;
 		
-		std::vector<augmentations::vec2<>> vertices;
+		std::vector<std::vector<augmentations::vec2<>>> convex_polys;
 		augmentations::vec2<> rect_size;
 		b2Filter filter;
 
 		float density, angular_damping, linear_damping;
 		bool fixed_rotation, sensor;
 
-		void add_vertex(augmentations::vec2<> v) {
-			vertices.push_back(v);
-		}
+		void add_convex(const std::vector < augmentations::vec2 < >> &);
+		void add_concave(const std::vector < augmentations::vec2 < >> &);
+
+		void from_renderable(const resources::polygon&);
 
 		physics_info();
 	};

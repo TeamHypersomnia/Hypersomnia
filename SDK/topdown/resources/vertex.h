@@ -4,11 +4,20 @@
 
 using namespace augmentations;
 
+namespace augmentations {
+	namespace texture_baker {
+		class texture;
+	}
+}
+
 namespace resources {
 	struct vertex {
-		vec2<int> position;
-		vec2<float> texcoord;
+		vec2<> position;
+		vec2<> texcoord;
 		graphics::pixel_32 color;
+
+		vertex() {}
+		vertex(vec2<> position, vec2<> texcoord, graphics::pixel_32 color, texture_baker::texture* tex);
 	};
 
 	struct vertex_triangle {

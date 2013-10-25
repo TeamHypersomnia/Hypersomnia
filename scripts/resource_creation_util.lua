@@ -45,6 +45,19 @@ function create_sprite(entries)
 	return my_sprite
 end
 
+function create_polygon(entries) 
+	local my_polygon = polygon()
+	local my_concave = drawable_concave()
+	
+	for k, vert in pairs(entries) do
+		my_concave:add_vertex(vertex(vert.pos, vert.texcoord, vert.color, vert.image.tex))
+	end
+	
+	my_polygon:add_concave(my_concave)
+	
+	return my_polygon
+end
+
 function create_animation(entries) 
 	local my_animation = animation()
 	rewrite(my_animation, entries)
@@ -138,9 +151,14 @@ function set_physics_info(my_body_data, entries)
 	if entries ~= nil then
 		recursive_write(my_body_data, entries, { "vertices" } )
 		
-		if my_body_data.type == physics_info.POLYGON and entries.vertices ~= nil then
-			for k, v in pairs(entries.vertices) do 
-				my_body_data:add_vertex(v)
+		if my_body_data.shape_type == physics_info.POLYGON then
+			if type(entries.vertices) == "userdata" then
+				my_body_data:from_renderable(entries.vertices)
+			elseif type(entries.vertices) == "table" then
+				print("VERTICES FROM TABLE NOT IMPLEMENTED YET")
+				--for k, v in pairs(entries.vertices) do 
+				--	my_body_data:add_vertex(v)
+				--end
 			end
 		end
 	end

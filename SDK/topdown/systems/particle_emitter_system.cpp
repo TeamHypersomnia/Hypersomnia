@@ -95,7 +95,7 @@ void particle_emitter_system::process_events(world& owner) {
 				new_burst_entity.add(components::transform());
 				
 				components::render new_render = emission.particle_render_template;
-				new_render.set_renderable(&new_burst_entity.get<components::particle_group>());
+				new_render.model = &new_burst_entity.get<components::particle_group>();
 				new_burst_entity.add(new_render);
 
 				for (int i = 0; i < burst_amount; ++i)
@@ -116,7 +116,7 @@ void particle_emitter_system::process_events(world& owner) {
 				new_stream_entity.add(components::transform(it.pos, target_rotation));
 
 				components::render new_render = emission.particle_render_template;
-				new_render.set_renderable(&new_stream_entity.get<components::particle_group>());
+				new_render.model = &new_stream_entity.get<components::particle_group>();
 				new_stream_entity.add(new_render);
 
 				if (it.subject) {

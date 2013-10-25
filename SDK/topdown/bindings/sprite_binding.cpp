@@ -8,7 +8,9 @@
 namespace bindings {
 	luabind::scope _sprite() {
 		return
-			luabind::class_<sprite>("sprite")
+			luabind::class_<renderable>("renderable"),
+
+			luabind::class_<sprite, renderable>("sprite")
 			.def(luabind::constructor<>())
 			.def_readwrite("size", &sprite::size)
 			.def_readwrite("image", &sprite::tex)

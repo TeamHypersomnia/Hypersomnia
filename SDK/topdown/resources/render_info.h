@@ -44,9 +44,18 @@ namespace resources {
 	//};
 
 	struct polygon : public renderable {
-		std::vector<vertex> vertices;
+		/* binding facility */
+		struct concave {
+			std::vector<vertex> vertices;
+			void add_vertex(const vertex& v);
+		};
 
+		std::vector<std::vector<vertex>> convex_models;
+
+		void add_convex(const std::vector<vertex>&);
+		void add_concave(const concave&);
 		virtual void draw(buffer&, const components::transform&, vec2<> camera_pos) override;
+		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform&) override;
 	};
 
 	struct particles : public renderable {
