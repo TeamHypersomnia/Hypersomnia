@@ -22,12 +22,11 @@ corpse_sprite = create_sprite {
 }
 
 crate_piece_poly = create_polygon {
-	{ pos = vec2(0, 0), image = images.crate, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-	{ pos = vec2(180, 0), image = images.crate, texcoord = vec2(1, 0), color = rgba(255, 255, 255, 255) },
-	{ pos = vec2(80, 40), image = images.crate, texcoord = vec2(1, 1), color = rgba(255, 255, 255, 255) },
-	{ pos = vec2(0, 80), image = images.crate, texcoord = vec2(0, 1), color = rgba(255, 255, 255, 255) }
+	{ pos = vec2(0, 0), image = images.crate, texcoord = vec2(0, 0), color = rgba(255, 0, 0, 255) },
+	{ pos = vec2(40, 80), image = images.crate, texcoord = vec2(1, 0), color = rgba(255, 255, 255, 255) },
+	{ pos = vec2(0, 40), image = images.crate, texcoord = vec2(1, 1), color = rgba(255, 255, 255, 122) },
+	{ pos = vec2(-40, 80), image = images.crate, texcoord = vec2(0, 1), color = rgba(255, 255, 255, 255) }
 }
-
 
 crate_archetype = {
 	transform = {
