@@ -35,7 +35,13 @@ namespace topdown {
 		std::vector<std::vector<b2Vec2>> output;
 		auto& input = reinterpret_cast<const std::vector<b2Vec2>&>(verts);
 		int res = separator.Validate(input);
-		separator.calcShapes(input, output);
+		
+		if (res != 0) {
+			auto reversed_input = input;
+			std::reverse(reversed_input.begin(), reversed_input.end());
+			separator.calcShapes(reversed_input, output);
+		}
+		else separator.calcShapes(input, output);
 		
 		for (auto& convex : output)
 			add_convex(std::vector<augmentations::vec2<>>(convex.begin(), convex.end()));
