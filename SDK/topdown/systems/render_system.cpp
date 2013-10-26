@@ -88,7 +88,7 @@ void render_system::render() {
 					auto pos = tri.points[i] - last_camera.current.pos;
 
 					//if (i == 0)
-						glColor4ub(255, 255, 255, 122);
+					glColor4ub(ai->visibility_color.r, ai->visibility_color.g, ai->visibility_color.b, 62);
 					//else
 					//	glColor4ub(255, 255, 255, std::max(int(0), int(
 					//	255 * (1 - ((tri.points[i] - tri.points[0]).length() / 1000))

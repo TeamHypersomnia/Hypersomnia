@@ -13,6 +13,7 @@ namespace components {
 			augmentations::vec2<> a, b;
 		};
 		std::vector<debug_line> lines;
+		augmentations::graphics::pixel_32 visibility_color;
 
 		float visibility_square_side;
 		std::vector<augmentations::vec2<>> vision_points;

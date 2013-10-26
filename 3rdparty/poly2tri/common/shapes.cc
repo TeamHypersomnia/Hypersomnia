@@ -223,6 +223,7 @@ Point* Triangle::PointCW(Point& point)
     return points_[1];
   }
   assert(0);
+  return nullptr;
 }
 
 // The point counter-clockwise to given point
@@ -236,6 +237,7 @@ Point* Triangle::PointCCW(Point& point)
     return points_[0];
   }
   assert(0);
+  return nullptr;
 }
 
 // The neighbor clockwise to given point

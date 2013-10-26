@@ -1,6 +1,22 @@
+ai_system.draw_cast_rays = 0
+ai_system.draw_triangle_edges = 0
+
 background_sprite = create_sprite {
 	image = images.background,
-	size = vec2(2000, 1000)
+	size = vec2(1060, 800),
+	color = rgba(255, 255, 255, 255)
+}
+
+bg = create_entity {
+	render = {
+		model = background_sprite,
+		layer = render_layers.GROUND
+	},
+	
+	transform = {
+		pos	= vec2(120, 180),
+		rotation = 0
+	}
 }
 
 crosshair_sprite = create_sprite {
@@ -9,7 +25,7 @@ crosshair_sprite = create_sprite {
 
 crate_sprite = create_sprite {
 	image = images.crate,
-	size = vec2(100, 100)
+	size = vec2(60, 60)
 }
 
 metal_sprite = create_sprite {
@@ -21,11 +37,84 @@ corpse_sprite = create_sprite {
 	image = images.dead_front
 }
 
+function map_uv_square(texcoords_to_map, lefttop, bottomright)
+	--print("lefttop: " .. lefttop.x .. "|" .. lefttop.y .. "\n")
+	--print("bottomright: " .. bottomright.x .. "|" .. bottomright.y.. "\n")
+	for k, v in pairs(texcoords_to_map) do
+		--print("vertex: " .. v.pos.x .. "|" .. v.pos.y .. "\n")
+		v.texcoord = vec2(
+		(v.pos.x - lefttop.x) / (bottomright.x-lefttop.x),
+		(v.pos.y - lefttop.y) / (bottomright.y-lefttop.y)
+		)
+		--print("texcoord: " .. v.texcoord.x .. "|" .. v.texcoord.y .. "\n")
+	end
+end
+
+size_mult = vec2(80, -80)
+
+map_points = {
+	square = {
+		U = { pos = vec2(-5.1, 6.29) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+		V = { pos = vec2(-5.16, -4.68) * size_mult, image = images.metal, texcoord = vec2(0, 1), color = rgba(255, 255, 255, 255) },
+		W = { pos = vec2(8.19, -4.39) * size_mult, image = images.metal, texcoord = vec2(1, 1), color = rgba(255, 255, 255, 255) },
+		Z = { pos = vec2(8.19, 6.87) * size_mult, image = images.metal, texcoord = vec2(1, 0), color = rgba(255, 255, 255, 255) },
+	},
+	
+	interior = {
+		A = { pos = vec2(-3, -2) 		 * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+		B = { pos = vec2(-3.13, -3.49)  * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+		C = { pos = vec2(7.06, -3.33)  	* size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+		D = { pos = vec2(7.1, 5.74)  	* size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+		E = { pos = vec2(-4.32, 5.71)  * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+		F = { pos = vec2(-4.22, 3.52)  * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+		G = { pos = vec2(-3.2, 3.52) 	 * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+		H = { pos = vec2(-3.23, 4.81)  * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+		I = { pos = vec2(-2.55, 4.78)  * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+		J = { pos = vec2(-2.96, -1.4)  * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+		K = { pos = vec2(3.5, -1.62)  * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+		L = { pos = vec2(3.44, 1.76)  * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+		M = { pos = vec2(3.78, 1.72)  * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+		N = { pos = vec2(3.85, 0)  		* size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+		O = { pos = vec2(5.01, 0)  		* size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+		P = { pos = vec2(4.97, 3.84)  * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+		Q = { pos = vec2(3.36, 3.54)  * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+		R = { pos = vec2(3.43, 4.29)  * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+		S = { pos = vec2(5.46, 4.52)  * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
+		T = { pos = vec2(5.49, -1.94)  * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) }
+	}
+}
+
+print(map_points.interior.B.texcoord.x, map_points.interior.B.texcoord.y)
+
+map_uv_square(map_points.interior, map_points.square.U.pos, map_points.square.W.pos)
+
 crate_piece_poly = create_polygon {
-	{ pos = vec2(0, 0), image = images.crate, texcoord = vec2(0, 0), color = rgba(255, 0, 0, 255) },
-	{ pos = vec2(40, 80), image = images.crate, texcoord = vec2(1, 0), color = rgba(255, 255, 255, 255) },
-	{ pos = vec2(0, 40), image = images.crate, texcoord = vec2(1, 1), color = rgba(255, 255, 255, 122) },
-	{ pos = vec2(-40, 80), image = images.crate, texcoord = vec2(0, 1), color = rgba(255, 255, 255, 255) }
+	map_points.square.V,
+	map_points.interior.B,
+	map_points.interior.A,
+	map_points.interior.T,
+	map_points.interior.S,
+	map_points.interior.R,
+	map_points.interior.Q,
+	map_points.interior.P,
+	map_points.interior.O,
+	map_points.interior.N,
+	map_points.interior.M,
+	map_points.interior.L,
+	map_points.interior.K,
+	map_points.interior.J,
+	map_points.interior.I,
+	map_points.interior.H,
+	map_points.interior.G,
+	map_points.interior.F,
+	map_points.interior.E,
+	map_points.interior.D,
+	map_points.interior.C,
+	map_points.interior.B,
+	map_points.square.V,
+	map_points.square.W,
+	map_points.square.Z,
+	map_points.square.U
 }
 
 crate_archetype = {
@@ -65,6 +154,8 @@ crate_piece_archetype = archetyped(crate_archetype, {
 	},
 	
 	physics = {
+		body_type = Box2D.b2_staticBody,
+		
 		body_info = {
 			shape_type = physics_info.POLYGON,
 			vertices = crate_piece_poly
@@ -78,17 +169,6 @@ my_crate_piece = create_entity (archetyped(crate_piece_archetype, {
 	}
 }))
 
-bg = create_entity {
-	render = {
-		model = background_sprite,
-		layer = render_layers.GROUND
-	},
-	
-	transform = {
-		pos	= vec2(0, 300),
-		rotation = 0
-	}
-}
 
 bullet_sprite = create_sprite {
 	image = images.bullet,
@@ -97,7 +177,7 @@ bullet_sprite = create_sprite {
 
 assault_rifle = {
 	bullets_once = 1,
-	bullet_distance_offset = 120,
+	bullet_distance_offset = 120*0.5,
 	bullet_damage = minmax(80, 100),
 	bullet_speed = 7000,
 	bullet_render = { model = bullet_sprite, layer = render_layers.BULLETS },
@@ -172,7 +252,7 @@ my_npc_archetype = {
 			body_info = {
 				filter = filter_characters,
 				shape_type = physics_info.RECT,
-				rect_size = images.player_1.size,
+				rect_size = images.player_1.size*npc_size_multiplier,
 				
 				linear_damping = 5,
 				angular_damping = 5,
@@ -198,6 +278,11 @@ my_npc_archetype = {
 		
 		children = {
 			"legs"
+		},
+		
+		ai = {
+			visibility_square_side = 4000,
+			visibility_color = rgba(255, 0, 255, 255)
 		}
 	},
 	
@@ -226,7 +311,44 @@ my_npc_archetype = {
 		}
 	}
 }
+create_entity_group (archetyped(my_npc_archetype, {
+		body = {
+			transform = {
+				pos = vec2(-140, 520),
+				rotation = 0
+			}
+		}
+	}))
+	
+create_entity_group (archetyped(my_npc_archetype, {
+	body = {
+		transform = {
+			pos = vec2(360, 250),
+			rotation = 0
+		},
+		
+		ai = {
+			visibility_color = rgba(0, 255, 0, 255)
+		}
+	}
+}))
+	
+create_entity (archetyped(crate_archetype, {
+		transform = {
+			pos = vec2(-100, 340),
+			rotation = 30
+		}
+}))
 
+
+create_entity (archetyped(crate_archetype, {
+		transform = {
+			pos = vec2(100, 300),
+			rotation = 10
+		}
+}))
+	
+	
 player = create_entity_group (archetyped(my_npc_archetype, {
 	body = {
 		animate = {
@@ -258,8 +380,9 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 		},
 		
 		ai = {
-			visibility_square_side = 2000
+			visibility_color = rgba(255, 255, 255, 255)
 		}
+		
 	},
 	
 	crosshair = { 
@@ -308,6 +431,8 @@ my_scriptable_info = create_scriptable_info {
 	}
 }
 
+
+	
 npcs = {}
 crates = {}
 for i = 1, 0 do

@@ -600,9 +600,6 @@
     <ClCompile Include="3rdparty\poly2tri\common\shapes.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\polypartition\polypartition.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="entity_system\component.h">
@@ -870,9 +867,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\poly2tri\common\utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\polypartition\polypartition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

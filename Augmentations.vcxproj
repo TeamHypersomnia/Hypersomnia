@@ -216,7 +216,6 @@
     <ClCompile Include="3rdparty\poly2tri\sweep\cdt.cc" />
     <ClCompile Include="3rdparty\poly2tri\sweep\sweep.cc" />
     <ClCompile Include="3rdparty\poly2tri\sweep\sweep_context.cc" />
-    <ClCompile Include="3rdparty\polypartition\polypartition.cpp" />
     <ClCompile Include="3rdparty\readdir\ReadDirectoryChanges.cpp" />
     <ClCompile Include="3rdparty\readdir\ReadDirectoryChangesPrivate.cpp" />
     <ClCompile Include="3rdparty\readdir\_stdafx.cpp" />
@@ -612,7 +611,6 @@
     <ClInclude Include="3rdparty\poly2tri\sweep\cdt.h" />
     <ClInclude Include="3rdparty\poly2tri\sweep\sweep.h" />
     <ClInclude Include="3rdparty\poly2tri\sweep\sweep_context.h" />
-    <ClInclude Include="3rdparty\polypartition\polypartition.h" />
     <ClInclude Include="3rdparty\readdir\_stdafx.h" />
     <ClInclude Include="3rdparty\readdir\targetver.h" />
     <ClInclude Include="augmentations.h" />

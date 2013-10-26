@@ -43,6 +43,8 @@ float comparable_angle(vec2<> diff) {
 		);
 }
 
+ai_system::ai_system() : draw_cast_rays(false), draw_triangle_edges(true) {}
+
 int components::ai::get_num_triangles() {
 	return vision_points.size() - 1;
 }
@@ -55,10 +57,10 @@ components::ai::triangle components::ai::get_triangle(int i, augmentations::vec2
 void ai_system::process_entities(world& owner) {
 	physics_system& physics = owner.get_system<physics_system>();
 
-	static std::vector<std::pair<float, vec2<>>> all_vertices_transformed;
-	all_vertices_transformed.clear();
-
 	for (auto it : targets) {
+		static std::vector < std::pair < float, vec2< >> > all_vertices_transformed;
+		all_vertices_transformed.clear();
+
 		auto& ai = it->get<components::ai>();
 		auto& transform = it->get<components::transform>();
 
@@ -110,11 +112,13 @@ void ai_system::process_entities(world& owner) {
 		bounds[2].Set(vec2<>(whole_vision[2]) + vec2<>(1.f, 0.f), vec2<>(whole_vision[3]) + vec2<>(-1.f, 0.f));
 		bounds[3].Set(vec2<>(whole_vision[3]) + vec2<>(0.f, 1.f), vec2<>(whole_vision[0]) + vec2<>(0.f, -1.f));
 
-		//ai.lines.push_back(components::ai::debug_line(vec2<>(whole_vision[0]) + vec2<>(-1.f, 0.f), vec2<>(whole_vision[1]) + vec2<>(1.f, 0.f)));
-		//ai.lines.push_back(components::ai::debug_line(vec2<>(whole_vision[1]) + vec2<>(0.f, -1.f), vec2<>(whole_vision[2]) + vec2<>(0.f, 1.f)));
-		//ai.lines.push_back(components::ai::debug_line(vec2<>(whole_vision[2]) + vec2<>(1.f, 0.f), vec2<>(whole_vision[3]) + vec2<>(-1.f, 0.f)));
-		//ai.lines.push_back(components::ai::debug_line(vec2<>(whole_vision[3]) + vec2<>(0.f, 1.f), vec2<>(whole_vision[0]) + vec2<>(0.f, -1.f)));
-
+		if (draw_cast_rays || draw_triangle_edges) {
+			ai.lines.push_back(components::ai::debug_line(vec2<>(whole_vision[0]) + vec2<>(-1.f, 0.f), vec2<>(whole_vision[1]) + vec2<>(1.f, 0.f)));
+			ai.lines.push_back(components::ai::debug_line(vec2<>(whole_vision[1]) + vec2<>(0.f, -1.f), vec2<>(whole_vision[2]) + vec2<>(0.f, 1.f)));
+			ai.lines.push_back(components::ai::debug_line(vec2<>(whole_vision[2]) + vec2<>(1.f, 0.f), vec2<>(whole_vision[3]) + vec2<>(-1.f, 0.f)));
+			ai.lines.push_back(components::ai::debug_line(vec2<>(whole_vision[3]) + vec2<>(0.f, 1.f), vec2<>(whole_vision[0]) + vec2<>(0.f, -1.f)));
+		}
+	
 		for (auto& v : whole_vision)
 			all_vertices_transformed.push_back(std::make_pair(comparable_angle(v - position_meters), v));
 
@@ -162,30 +166,28 @@ void ai_system::process_entities(world& owner) {
 					ignore, handling not implemented
 					*/
 					bool breakpoint = true;
-					//draw_line(ray_callbacks[0].target, graphics::pixel_32(0, 255, 255, 255));
-					//draw_line(ray_callbacks[1].target, graphics::pixel_32(0, 255, 0, 255));
 				}
 			}
 			else if (ray_callbacks[0].hit && ray_callbacks[1].hit) {
 				/* ray intersected with an obstacle, ignoring intersection */
 				if ((ray_callbacks[0].intersection - vertex.second).length_sq() > 0.001f &&
 					(ray_callbacks[1].intersection - vertex.second).length_sq() > 0.001f) {
-						//draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 0, 255));
+						if(draw_cast_rays) draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 0, 255));
 				}
 				/* intersected with the same vertex */
 				else if ((ray_callbacks[0].intersection - ray_callbacks[1].intersection).length_sq() < 0.0001f) {
 					double_rays.push_back(double_ray(vertex.second, vertex.second));
-					//draw_line(vertex.second, graphics::pixel_32(255, 255, 0, 255));
+					if (draw_cast_rays) draw_line(vertex.second, graphics::pixel_32(255, 255, 0, 255));
 				}
 				/* this is the case where the ray is cast at the peripheral vertex, here we also detect the discontinuity */
 				else {
 					double_rays.push_back(double_ray(ray_callbacks[0].intersection, ray_callbacks[1].intersection));
 
 					if ((ray_callbacks[0].intersection - position_meters).length_sq() > (ray_callbacks[1].intersection - position_meters).length_sq()) {
-						//draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 255, 255));
+						if (draw_cast_rays) draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 255, 255));
 					}
 					else {
-						//draw_line(ray_callbacks[1].intersection, graphics::pixel_32(255, 0, 255, 255));
+						if (draw_cast_rays) draw_line(ray_callbacks[1].intersection, graphics::pixel_32(255, 0, 255, 255));
 					}
 				}
 			}
@@ -207,7 +209,7 @@ void ai_system::process_entities(world& owner) {
 								auto actual_intersection = input.p1 + output.fraction * (input.p2 - input.p1);
 								if (i == 0) double_rays.push_back(double_ray(actual_intersection, ray_callbacks[1].intersection));
 								else if (i == 1) double_rays.push_back(double_ray(ray_callbacks[0].intersection, actual_intersection));
-								//draw_line(actual_intersection, graphics::pixel_32(0, 0, 255, 255));
+								if (draw_cast_rays) draw_line(actual_intersection, graphics::pixel_32(0, 0, 255, 255));
 							}
 						}
 						break;
@@ -221,11 +223,11 @@ void ai_system::process_entities(world& owner) {
 
 		for (int i = 0; i < double_rays.size(); ++i) {
 			ai.vision_points.push_back(double_rays[i].second * METERS_TO_PIXELSf);
-			//draw_line(PIXELS_TO_METERSf**ai.vision_points.rbegin(), graphics::pixel_32(255, 255, 255, 255));
+			if (draw_triangle_edges) draw_line(PIXELS_TO_METERSf**ai.vision_points.rbegin(), ai.visibility_color);
 			ai.vision_points.push_back(double_rays[(i + 1)%double_rays.size()].first * METERS_TO_PIXELSf);
-			//draw_line(PIXELS_TO_METERSf**ai.vision_points.rbegin(), graphics::pixel_32(255, 255, 255, 255));
+			if (draw_triangle_edges) draw_line(PIXELS_TO_METERSf**ai.vision_points.rbegin(), ai.visibility_color);
 
-			//ai.lines.push_back(components::ai::debug_line(PIXELS_TO_METERSf**ai.vision_points.rbegin(), PIXELS_TO_METERSf**(ai.vision_points.rbegin() + 1), graphics::pixel_32(255, 255, 255, 255)));
+			if (draw_triangle_edges) ai.lines.push_back(components::ai::debug_line(PIXELS_TO_METERSf**ai.vision_points.rbegin(), PIXELS_TO_METERSf**(ai.vision_points.rbegin() + 1), ai.visibility_color));
 		}
 	}
 }

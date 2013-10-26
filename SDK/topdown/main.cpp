@@ -105,6 +105,7 @@ int main() {
 	scripts.global("world", my_world);
 	scripts.global("window", gl);
 	scripts.global("input_system", input);
+	scripts.global("ai_system", ai);
 
 	resources::script::script_reloader.add_directory(L"scripts", true);
 	resources::script init_script;
