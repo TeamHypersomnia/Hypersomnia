@@ -82,6 +82,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="3rdparty\b2Separator\b2Separator.cpp" />
     <ClCompile Include="3rdparty\lua\lapi.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -210,9 +211,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="3rdparty\polydecomp\common.cpp" />
-    <ClCompile Include="3rdparty\polydecomp\decomp.cpp" />
-    <ClCompile Include="3rdparty\polydecomp\Point.cpp" />
+    <ClCompile Include="3rdparty\poly2tri\common\shapes.cc" />
+    <ClCompile Include="3rdparty\poly2tri\sweep\advancing_front.cc" />
+    <ClCompile Include="3rdparty\poly2tri\sweep\cdt.cc" />
+    <ClCompile Include="3rdparty\poly2tri\sweep\sweep.cc" />
+    <ClCompile Include="3rdparty\poly2tri\sweep\sweep_context.cc" />
+    <ClCompile Include="3rdparty\polypartition\polypartition.cpp" />
     <ClCompile Include="3rdparty\readdir\ReadDirectoryChanges.cpp" />
     <ClCompile Include="3rdparty\readdir\ReadDirectoryChangesPrivate.cpp" />
     <ClCompile Include="3rdparty\readdir\_stdafx.cpp" />
@@ -317,6 +321,7 @@
     <ClCompile Include="math\vec2d.cpp" />
     <ClCompile Include="SDK\topdown\bindings\ai_component_binding.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SDK\topdown\bindings\animate_component_binding.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
@@ -432,6 +437,7 @@
     </ClCompile>
     <ClCompile Include="SDK\topdown\bindings\polygon_binding.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SDK\topdown\bindings\rect_ltrb_binding.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
@@ -598,9 +604,15 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="3rdparty\polydecomp\common.h" />
-    <ClInclude Include="3rdparty\polydecomp\decomp.h" />
-    <ClInclude Include="3rdparty\polydecomp\Point.h" />
+    <ClInclude Include="3rdparty\b2Separator\b2Separator.h" />
+    <ClInclude Include="3rdparty\poly2tri\common\shapes.h" />
+    <ClInclude Include="3rdparty\poly2tri\common\utils.h" />
+    <ClInclude Include="3rdparty\poly2tri\poly2tri.h" />
+    <ClInclude Include="3rdparty\poly2tri\sweep\advancing_front.h" />
+    <ClInclude Include="3rdparty\poly2tri\sweep\cdt.h" />
+    <ClInclude Include="3rdparty\poly2tri\sweep\sweep.h" />
+    <ClInclude Include="3rdparty\poly2tri\sweep\sweep_context.h" />
+    <ClInclude Include="3rdparty\polypartition\polypartition.h" />
     <ClInclude Include="3rdparty\readdir\_stdafx.h" />
     <ClInclude Include="3rdparty\readdir\targetver.h" />
     <ClInclude Include="augmentations.h" />

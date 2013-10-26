@@ -8,8 +8,8 @@
 #include "../../topdown/components/physics_component.h"
 #include "../../topdown/components/particle_group_component.h"
 
-#include "polydecomp/decomp.h"
 #include "utility/sorted_vector.h"
+#include "poly2tri/poly2tri.h"
 
 namespace resources {
 	void renderable::make_rect(vec2<> pos, vec2<> size, float angle, vec2<> v[4]) {
@@ -124,49 +124,53 @@ namespace resources {
 	}
 
 	void polygon::add_concave(const concave& polygon) {
-		/* enabling retrieval of drawable vertex values */
-		util::sorted_vector_map<vec2<>, vertex> vertex_lib;
+		using namespace p2t;
+		std::vector<Point> points;
+		std::vector<Point*> input;
+		
+		points.reserve(polygon.vertices.size());
+		input.reserve(polygon.vertices.size());
+		model.reserve(model.size() + polygon.vertices.size());
+
+		int offset = model.size();
+		for (int i = 0; i < polygon.vertices.size(); ++i) {
+			points.push_back(Point(polygon.vertices[i].position.x, polygon.vertices[i].position.y, i + offset));
+			model.push_back(polygon.vertices[i]);
+		}
+
+		for (auto& v : points) 
+			input.push_back(&v);
 
 		/* perform decomposition */		
-		poly_decomposition::Polygon poly;
+		CDT cdt(std::move(input));
+		cdt.Triangulate();
+		auto output = cdt.GetTriangles();
 
-		for (auto& v : polygon.vertices) {
-			vertex_lib.add(v.position, v);
-			poly.push_back(poly_decomposition::Point(v.position.x, v.position.y));
-		}
-
-		auto output = poly_decomposition::decompose_polygon(poly);
-
-		for (auto& convex : output) {
-			std::vector<vertex> convex_poly;
-
-			for (auto& v : convex)
-				convex_poly.push_back(*vertex_lib.get(vec2<>(v.x, v.y)));
-
-			add_convex(convex_poly);
+		for (auto& tri : output) {
+			indices.push_back(tri->GetPoint(0)->index);
+			indices.push_back(tri->GetPoint(1)->index);
+			indices.push_back(tri->GetPoint(2)->index);
 		}
 	}
 
-	void polygon::add_convex(const std::vector<vertex>& model) {
-		convex_models.push_back(model);
-	}
+	//void polygon::add_convex(const std::vector<vertex>& model) {
+	//	convex_models.push_back(model);
+	//}
 
 	void polygon::draw(buffer& triangles, const components::transform& transform, vec2<> camera_pos) {
 		vertex_triangle new_tri;
 		
-		auto models_copy = convex_models;
-		for (auto model : models_copy) {
-			for (int i = 0; i < model.size(); ++i) {
-				model[i].position.rotate(transform.current.rotation, vec2<>(0, 0));
-				model[i].position += transform.current.pos - camera_pos;
+		auto model_transformed = model;
+		for (auto& v : model_transformed) {
+				v.position.rotate(transform.current.rotation, vec2<>(0, 0));
+				v.position += transform.current.pos - camera_pos;
+		}
 
-				if (i > 1) {
-					new_tri.vertices[0] = model[0];
-					new_tri.vertices[1] = model[i - 1];
-					new_tri.vertices[2] = model[i];
-					triangles.push_back(new_tri);
-				}
-			}
+		for (int i = 0; i < indices.size(); i += 3) {
+			new_tri.vertices[0] = model_transformed[indices[i]];
+			new_tri.vertices[1] = model_transformed[indices[i + 1]];
+			new_tri.vertices[2] = model_transformed[indices[i + 2]];
+			triangles.push_back(new_tri);
 		}
 	}
 }

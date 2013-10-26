@@ -8,7 +8,7 @@
 
 #include "entity_system/entity_system.h"
 
-#include "polydecomp/decomp.h"
+#include "b2Separator/b2Separator.h"
 
 namespace topdown {
 	physics_info::physics_info() 
@@ -22,33 +22,23 @@ namespace topdown {
 	}
 
 	void physics_info::from_renderable(const resources::polygon& p) {
-		for (auto convex : p.convex_models) {
-			
-			std::vector<augmentations::vec2<>> convex_poly;
-			for (auto& v : convex) {
-				convex_poly.push_back(augmentations::vec2<>(v.position.x, v.position.y));
-			}
+		std::vector<augmentations::vec2<>> concave_poly;
 
-			convex_polys.push_back(convex_poly);
-		}
+		for (auto& v : p.model)
+			concave_poly.push_back(augmentations::vec2<>(v.position.x, v.position.y));
+
+		add_concave(concave_poly);
 	}
 
 	void physics_info::add_concave(const std::vector < augmentations::vec2 < >> &verts) {
-		poly_decomposition::Polygon poly;
+		b2Separator separator;
+		std::vector<std::vector<b2Vec2>> output;
+		auto& input = reinterpret_cast<const std::vector<b2Vec2>&>(verts);
+		int res = separator.Validate(input);
+		separator.calcShapes(input, output);
 		
-		for (auto v : verts) 
-			poly.push_back(poly_decomposition::Point(v.x, v.y));
-
-		auto output = poly_decomposition::decompose_polygon(poly);
-		
-		for (auto& convex : output) {
-			std::vector<augmentations::vec2<>> convex_poly;
-			for (auto& v : convex) {
-				convex_poly.push_back(augmentations::vec2<>(v.x, v.y));
-			}
-
-			add_convex(convex_poly);
-		}
+		for (auto& convex : output)
+			add_convex(std::vector<augmentations::vec2<>>(convex.begin(), convex.end()));
 	}
 
 	void create_physics_component(const physics_info& body_data, augmentations::entity_system::entity& subject, int body_type) {

@@ -50,9 +50,10 @@ namespace resources {
 			void add_vertex(const vertex& v);
 		};
 
-		std::vector<std::vector<vertex>> convex_models;
+		std::vector<vertex> model;
+		std::vector<int> indices;
 
-		void add_convex(const std::vector<vertex>&);
+		//void add_convex(const std::vector<vertex>&);
 		void add_concave(const concave&);
 		virtual void draw(buffer&, const components::transform&, vec2<> camera_pos) override;
 		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform&) override;
