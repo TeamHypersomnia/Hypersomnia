@@ -22,7 +22,7 @@ namespace topdown {
 		augmentations::vec2<> rect_size;
 		b2Filter filter;
 
-		float density, angular_damping, linear_damping;
+		float density, friction, angular_damping, linear_damping;
 		bool fixed_rotation, sensor;
 
 		void add_convex(const std::vector < augmentations::vec2 < >> &);

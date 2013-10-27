@@ -59,7 +59,7 @@ namespace topdown {
 
 		b2FixtureDef fixdef;
 		fixdef.density = body_data.density;
-		fixdef.friction = 1.0;
+		fixdef.friction = body_data.friction;
 		fixdef.isSensor = body_data.sensor;
 		fixdef.filter = body_data.filter;
 		fixdef.shape = &shape;
