@@ -38,10 +38,6 @@ void camera_system::process_entities(world& owner) {
 		auto& camera = e->get<components::camera>();
 
 		if (camera.enabled) {
-			glLoadIdentity();
-			glOrtho(camera.ortho.l, camera.ortho.r, camera.ortho.b, camera.ortho.t, 0, 1);
-			glViewport(camera.screen_rect.x, camera.screen_rect.y, camera.screen_rect.w, camera.screen_rect.h);
-
 			/* we obtain transform as a copy because we'll be now offsetting it by crosshair position */
 			components::transform transform = e->get<components::transform>();
 			vec2<> camera_screen = vec2<>(vec2<int>(camera.ortho.w(), camera.ortho.h()));
@@ -82,11 +78,25 @@ void camera_system::process_entities(world& owner) {
 				//if ((transform.current.pos - camera.last_interpolant).length() < 2.0) camera.last_interpolant = transform.current.pos;
 				//else
 					camera.last_interpolant = camera.last_interpolant * averaging_constant + transform.current.pos * (1.0f - averaging_constant);
+					
+					auto interp = [](int& a, int& b, float averaging_constant){
+						a = a * averaging_constant + b * (1.0f - averaging_constant);
+					};
+
+					interp(camera.last_ortho_interpolant.l, camera.ortho.l, averaging_constant);
+					interp(camera.last_ortho_interpolant.t, camera.ortho.t, averaging_constant);
+					interp(camera.last_ortho_interpolant.r, camera.ortho.r, averaging_constant);
+					interp(camera.last_ortho_interpolant.b, camera.ortho.b, averaging_constant);
+
 				/* save smoothing result */
 				transform.current.pos = camera.last_interpolant;
 			}
 
-			raw_renderer.draw(camera.ortho, components::transform(transform.current.pos), camera.mask);
+			glLoadIdentity();
+			glOrtho(camera.last_ortho_interpolant.l, camera.last_ortho_interpolant.r, camera.last_ortho_interpolant.b, camera.last_ortho_interpolant.t, 0, 1);
+			glViewport(camera.screen_rect.x, camera.screen_rect.y, camera.screen_rect.w, camera.screen_rect.h);
+
+			raw_renderer.draw(camera.last_ortho_interpolant, components::transform(transform.current.pos), camera.mask);
 			raw_renderer.render();
 		}
 	}

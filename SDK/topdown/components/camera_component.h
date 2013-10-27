@@ -46,5 +46,6 @@ namespace components {
 
 		augmentations::vec2<> last_interpolant;
 		augmentations::util::timer smooth_timer;
+		augmentations::rects::ltrb last_ortho_interpolant;
 	};
 }
