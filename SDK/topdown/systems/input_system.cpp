@@ -28,6 +28,7 @@ void input_system::post(messages::intent_message incoming_event, world& owner) {
 	auto& m = input_window.events.mouse;
 	incoming_event.mouse_pos = m.pos;
 	incoming_event.mouse_rel = m.raw_rel;
+	incoming_event.wheel_amount = m.scroll;
 
 	for (auto it = targets.begin(); it != targets.end(); ++it) {
 		if ((*it)->get<components::input>().intents.find(incoming_event.intent)) {
