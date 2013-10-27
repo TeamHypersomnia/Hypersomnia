@@ -378,7 +378,7 @@ public:
 	/// Dump this body to a log file
 	void Dump();
 
-private:
+//private:
 
 	friend class b2World;
 	friend class b2Island;

@@ -43,8 +43,11 @@ void movement_system::process_entities(world& owner) {
 		b2Vec2 vel = physics.body->GetLinearVelocity();
 		float32 speed = vel.Normalize() * METERS_TO_PIXELSf;
 
-		if (speed > movement.max_speed)
+		if (speed > movement.max_speed) {
 			physics.body->SetLinearVelocity(movement.max_speed * PIXELS_TO_METERSf * vel);
+//			physics.body->ClearForces();
+			physics.body->m_force = b2Vec2(0, 0);
+		}
 
 		animate_message msg;
 		msg.animation_type = animate_message::animation::MOVE;
