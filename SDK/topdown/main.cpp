@@ -80,8 +80,8 @@ int main() {
 	my_world.add_system(&input);
 	my_world.add_system(&movement);
 	my_world.add_system(&physics);
-	my_world.add_system(&chase);
 	my_world.add_system(&lookat);
+	my_world.add_system(&chase);
 	my_world.add_system(&crosshairs);
 	my_world.add_system(&guns);
 	my_world.add_system(&damage);

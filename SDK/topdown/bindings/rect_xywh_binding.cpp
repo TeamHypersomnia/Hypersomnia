@@ -2,7 +2,6 @@
 #include "stdafx.h"
 #include "bindings.h"
 
-
 #include "math/rects.h"
 
 namespace bindings {
@@ -10,6 +9,7 @@ namespace bindings {
 		return
 			luabind::class_<rects::xywh>("rect_xywh")
 			.def(luabind::constructor<int, int, int, int>())
+			.def(luabind::constructor<const rects::ltrb&>())
 			.def_readwrite("x", &rects::xywh::x)
 			.def_readwrite("y", &rects::xywh::y)
 			.def_readwrite("w", &rects::xywh::w)

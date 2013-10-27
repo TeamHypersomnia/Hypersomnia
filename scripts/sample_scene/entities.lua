@@ -3,7 +3,7 @@ ai_system.draw_triangle_edges = 1
 
 background_sprite = create_sprite {
 	image = images.background,
-	size = vec2(1060, 800),
+	size = vec2(1060, 800)*3.33,
 	color = rgba(255, 255, 255, 255)
 }
 
@@ -14,10 +14,11 @@ bg = create_entity {
 	},
 	
 	transform = {
-		pos	= vec2(120, 180),
+		pos	= vec2(390, 70),
 		rotation = 0
 	}
 }
+
 
 crosshair_sprite = create_sprite {
 	image = images.crosshair
@@ -25,7 +26,7 @@ crosshair_sprite = create_sprite {
 
 crate_sprite = create_sprite {
 	image = images.crate,
-	size = vec2(60, 60)
+	size = vec2(100, 100)
 }
 
 metal_sprite = create_sprite {
@@ -50,7 +51,7 @@ function map_uv_square(texcoords_to_map, lefttop, bottomright)
 	end
 end
 
-size_mult = vec2(80, -80)
+size_mult = vec2(80, -80)*3.33
 
 map_points = {
 	square = {
@@ -149,7 +150,24 @@ crate_archetype = {
 	}
 }
 
-crate_piece_archetype = archetyped(crate_archetype, {
+metal_archetype = (archetyped(crate_archetype, {
+	render = {
+		model = metal_sprite
+	},
+	
+	particle_emitter = {
+		available_particle_effects = metal_effects
+	},
+	
+	physics = {
+		body_info = {
+			rect_size = metal_sprite.size,
+			density = 0.5
+		}
+	}
+}))
+
+crate_piece_archetype = archetyped(metal_archetype, {
 	render = {
 		model = crate_piece_poly
 	},
@@ -178,7 +196,7 @@ bullet_sprite = create_sprite {
 
 assault_rifle = {
 	bullets_once = 1,
-	bullet_distance_offset = 120*0.5,
+	bullet_distance_offset = 120,
 	bullet_damage = minmax(80, 100),
 	bullet_speed = 7000,
 	bullet_render = { model = bullet_sprite, layer = render_layers.BULLETS },
@@ -282,7 +300,7 @@ my_npc_archetype = {
 		},
 		
 		ai = {
-			visibility_square_side = 4000,
+			visibility_square_side = 12000,
 			visibility_color = rgba(255, 0, 255, 255)
 		}
 	},
@@ -315,7 +333,7 @@ my_npc_archetype = {
 create_entity_group (archetyped(my_npc_archetype, {
 		body = {
 			transform = {
-				pos = vec2(-140, 520),
+				pos = vec2(-540, 1020),
 				rotation = 0
 			}
 		}
@@ -324,7 +342,7 @@ create_entity_group (archetyped(my_npc_archetype, {
 create_entity_group (archetyped(my_npc_archetype, {
 	body = {
 		transform = {
-			pos = vec2(360, 250),
+			pos = vec2(1160, 150),
 			rotation = 0
 		},
 		
@@ -336,7 +354,7 @@ create_entity_group (archetyped(my_npc_archetype, {
 	
 create_entity (archetyped(crate_archetype, {
 		transform = {
-			pos = vec2(-100, 340),
+			pos = vec2(-330, 340),
 			rotation = 30
 		}
 }))
@@ -344,7 +362,7 @@ create_entity (archetyped(crate_archetype, {
 
 create_entity (archetyped(crate_archetype, {
 		transform = {
-			pos = vec2(100, 300),
+			pos = vec2(330, 300),
 			rotation = 10
 		}
 }))
@@ -432,53 +450,12 @@ my_scriptable_info = create_scriptable_info {
 	}
 }
 
-
-	
-npcs = {}
-crates = {}
-for i = 1, 0 do
-	crates[i] = create_entity (archetyped(crate_archetype, {
-		transform = {
-			pos = vec2(400, i*200-600),
-			rotation = 0
-		}
-	}))
-	
-	npcs[i] = create_entity_group (archetyped(my_npc_archetype, {
-		body = {
-			transform = {
-				pos = vec2(-550, i*200-600),
-				rotation = 0
-			},
-			
-			scriptable = {
-				available_scripts = my_scriptable_info
-			}
-		}
-	}))
-	
-	create_entity (archetyped(crate_archetype, {
-		transform = {
-			pos = vec2(-400, i*200-600),
-			rotation = 0
-		},
-		
-		render = {
-			model = metal_sprite
-		},
-		
-		particle_emitter = {
-			available_particle_effects = metal_effects
-		},
-		
-		physics = {
-			body_info = {
-				rect_size = metal_sprite.size,
-				density = 0.5
-			}
-		}
-	}))
-end
+create_entity (archetyped(metal_archetype, {
+	transform = {
+		pos = vec2(100, 300),
+		rotation = 0
+	}
+}))
 
 -- msg = create(animate_message, {
 -- 	set_animation = nil,
@@ -508,7 +485,8 @@ main_context = create_input_context {
 		[mouse.ltripleclick] 	= intent_message.SHOOT,
 		[mouse.ldown] 			= intent_message.SHOOT,
 		[mouse.rdown] 			= intent_message.SWITCH_LOOK,
-		[mouse.rdoubleclick] 	= intent_message.SWITCH_LOOK
+		[mouse.rdoubleclick] 	= intent_message.SWITCH_LOOK,
+		[mouse.wheel]			= custom_intents.ZOOM_CAMERA
 	}
 }
 
@@ -544,6 +522,29 @@ camera_archetype = {
 	}
 }
 
+current_zoom_level = 3000
+
+function set_zoom_level(camera)
+	local mult = 1 + (current_zoom_level / 1000)
+	local new_w = config_table.resolution_w*mult
+	local new_h = config_table.resolution_h*mult
+	camera.camera.ortho = rect_ltrb(rect_xywh((config_table.resolution_w-new_w)/2, (config_table.resolution_h-new_h)/2, new_w, new_h))
+	
+	player.crosshair.crosshair.size_multiplier = vec2(mult, mult)
+end
+
+scriptable_zoom = create_scriptable_info {
+	scripted_events = {
+		[scriptable_component.INTENT_MESSAGE] = function(message)
+				if message.intent == custom_intents.ZOOM_CAMERA then
+					current_zoom_level = current_zoom_level-message.wheel_amount
+					set_zoom_level(message.subject)
+				end
+			return true
+		end
+	}
+}
+
 world_camera = create_entity (archetyped(camera_archetype, {
 	transform = {
 		pos = vec2(),
@@ -559,14 +560,20 @@ world_camera = create_entity (archetyped(camera_archetype, {
 	},
 	
 	input = {
-		intent_message.SWITCH_LOOK
+		intent_message.SWITCH_LOOK,
+		custom_intents.ZOOM_CAMERA
 	},
 	
 	chase = {
 		target = player.body
+	},
+	
+	scriptable = {
+		available_scripts = scriptable_zoom
 	}
 }))
 
+set_zoom_level(world_camera)
 --npc_camera = create_entity (archetyped(camera_archetype, {
 --	transform = {
 --		pos = vec2(),
@@ -587,8 +594,8 @@ world_camera = create_entity (archetyped(camera_archetype, {
 player.body.gun.target_camera_to_shake:set(world_camera)
 
 
-my_scriptable_info:at(scriptable_component.COLLISION_MESSAGE)(1)
-my_scriptable_info:at(scriptable_component.DAMAGE_MESSAGE)(2)
+--my_scriptable_info:at(scriptable_component.COLLISION_MESSAGE)(1)
+--my_scriptable_info:at(scriptable_component.DAMAGE_MESSAGE)(2)
 
 --script_only = create_entity {
 --	scriptable = {

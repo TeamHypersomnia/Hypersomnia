@@ -9,6 +9,10 @@ render_layers = {
 	GROUND = 7
 }
 
+custom_intents = create_inverse_enum {
+	"ZOOM_CAMERA",
+}
+
 -- PHYSICS COLLISION LAYERS --
 create_options { 
 	"CHARACTERS", 

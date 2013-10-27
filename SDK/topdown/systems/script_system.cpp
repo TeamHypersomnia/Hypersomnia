@@ -9,6 +9,7 @@
 
 #include "../messages/collision_message.h"
 #include "../messages/damage_message.h"
+#include "../messages/intent_message.h"
 
 int bitor(lua_State* L) {
 	int arg_count = lua_gettop(L);
@@ -186,4 +187,5 @@ using namespace messages;
 void script_system::process_events(world& owner) {
 	pass_events_to_script<collision_message>(owner, components::scriptable::COLLISION_MESSAGE);
 	pass_events_to_script<damage_message>(owner, components::scriptable::DAMAGE_MESSAGE);
+	pass_events_to_script<intent_message>(owner, components::scriptable::INTENT_MESSAGE);
 }

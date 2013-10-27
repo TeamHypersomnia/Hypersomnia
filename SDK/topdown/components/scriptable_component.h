@@ -12,6 +12,7 @@ namespace components {
 		enum script_type {
 			COLLISION_MESSAGE,
 			DAMAGE_MESSAGE,
+			INTENT_MESSAGE,
 			LOOP
 		};
 		

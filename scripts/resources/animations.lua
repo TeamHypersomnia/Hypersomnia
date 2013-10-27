@@ -1,4 +1,4 @@
-npc_size_multiplier = vec2(0.3, 0.3)
+npc_size_multiplier = vec2(1, 1)
 
 legs_animation = create_animation {
 	frames = {

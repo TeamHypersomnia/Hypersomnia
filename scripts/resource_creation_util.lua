@@ -22,6 +22,8 @@ function create_inverse_enum(entries)
 	for k, v in pairs(entries) do
 		new_table[v] = 1000000000-k
 	end
+	
+	return new_table
 end
 
 function create_sprite(entries)

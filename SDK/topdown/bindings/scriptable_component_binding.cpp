@@ -18,6 +18,7 @@ namespace bindings {
 			.enum_("script_type")[
 				luabind::value("COLLISION_MESSAGE", scriptable::script_type::COLLISION_MESSAGE),
 				luabind::value("DAMAGE_MESSAGE", scriptable::script_type::DAMAGE_MESSAGE),
+				luabind::value("INTENT_MESSAGE", scriptable::script_type::INTENT_MESSAGE),
 				luabind::value("LOOP", scriptable::script_type::LOOP)
 			]
 		);
