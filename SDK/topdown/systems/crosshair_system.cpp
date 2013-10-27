@@ -41,7 +41,7 @@ void crosshair_system::process_entities(world& owner) {
 			float ratio = 0.f;
 			crosshair.blink.animate(ratio);
 			auto crosshair_sprite = static_cast < resources::sprite*>(render->model);
-			crosshair_sprite->size = vec2<int>(vec2<>(crosshair_sprite->tex->get_size())*ratio);
+			crosshair_sprite->size = vec2<>(crosshair_sprite->tex->get_size())*crosshair.size_multiplier*ratio;
 		}
 	}
 }

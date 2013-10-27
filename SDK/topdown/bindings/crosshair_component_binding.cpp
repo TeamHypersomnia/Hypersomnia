@@ -2,7 +2,6 @@
 #include "stdafx.h"
 #include "bindings.h"
 
-
 #include "../components/crosshair_component.h"
 
 namespace bindings {
@@ -13,6 +12,7 @@ namespace bindings {
 			//.def_readwrite("bounds", &components::crosshair::bounds)
 			//.def_readwrite("blink", &components::crosshair::blink)
 			.def_readwrite("should_blink", &crosshair::should_blink)
+			.def_readwrite("size_multiplier", &crosshair::size_multiplier)
 			.def_readwrite("sensitivity", &crosshair::sensitivity);
 	}
 }
