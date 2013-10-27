@@ -1,5 +1,5 @@
 ai_system.draw_cast_rays = 0
-ai_system.draw_triangle_edges = 0
+ai_system.draw_triangle_edges = 1
 
 background_sprite = create_sprite {
 	image = images.background,
@@ -143,6 +143,7 @@ crate_archetype = {
 			angular_damping = 5,
 			fixed_rotation = false,
 			density = 0.1,
+			friction = 0.0,
 			sensor = false
 		}
 	}

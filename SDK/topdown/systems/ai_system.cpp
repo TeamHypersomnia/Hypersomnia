@@ -19,6 +19,7 @@ struct my_callback : public b2QueryCallback {
 };
 
 struct my_ray_callback : public b2RayCastCallback {
+	entity* subject;
 	vec2<> intersection, target;
 	bool hit;
 
@@ -26,6 +27,11 @@ struct my_ray_callback : public b2RayCastCallback {
 
 	float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point,
 		const b2Vec2& normal, float32 fraction) override {
+			if ((entity*) fixture->GetBody()->GetUserData() == subject)
+			{
+				return -1;
+			}
+
 			intersection = point;
 			
 			hit = true;
@@ -151,6 +157,8 @@ void ai_system::process_entities(world& owner) {
 			
 			my_ray_callback ray_callbacks[2];
 
+			ray_callbacks[0].subject = it;
+			ray_callbacks[1].subject = it;
 			ray_callbacks[0].target = position_meters + vec2<>::from_angle((vertex.second - position_meters).get_degrees() - epsilon) * vision_side_meters / 2 * 1.414213562373095;
 			ray_callbacks[1].target = position_meters + vec2<>::from_angle((vertex.second - position_meters).get_degrees() + epsilon) * vision_side_meters / 2 * 1.414213562373095;
 
