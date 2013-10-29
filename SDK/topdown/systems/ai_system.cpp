@@ -76,7 +76,7 @@ void ai_system::process_entities(world& owner) {
 		auto& ai = it->get<components::ai>();
 		auto& transform = it->get<components::transform>();
 
-		/* transform entity position and it's visibility radius to Box2D coordinates */
+		/* transform entity position and its visibility radius to Box2D coordinates */
 		vec2<> position_meters = transform.current.pos * PIXELS_TO_METERSf;
 		float vision_side_meters = ai.visibility_square_side * PIXELS_TO_METERSf;
 
@@ -264,30 +264,41 @@ void ai_system::process_entities(world& owner) {
 					if (draw_cast_rays) draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 255, 255));
 				}
 			}
-			/* one of the rays did not hit anything so we cast it against boundaries, we also detect discontinuity here
-			*/
+			/* the case where exactly one of the rays did not hit anything so we cast it against boundaries, 
+				we also detect discontinuity here */
 			else {
+				/* for every callback that didn't detect hit (it will be only one) */
 				for (int i = 0; i < 2; ++i) {
 					if (!ray_callbacks[i].hit) {
+						/* for every edge from 4 edges forming visibility square */
 						for (auto& bound : bounds) {
+							/* prepare b2RayCastOutput/b2RayCastInput data for raw b2EdgeShape::RayCast call */
 							b2RayCastOutput output;
 							b2RayCastInput input;
 							input.maxFraction = 1.0;
 							input.p1 = position_meters;
 							input.p2 = ray_callbacks[i].target;
-
+							
+							/* we don't need to transform edge or ray since they are in the same space
+							but we have to prepare dummy b2Transform as argument for b2EdgeShape::RayCast
+							*/
 							b2Transform edge_transform(b2Vec2(0, 0), b2Rot(0));
 
+							/* if we hit against boundaries (must happen for at least 1 of them) */
 							if (bound.RayCast(&output, input, edge_transform, 0)) {
+								/* prepare new discontinuity data */
 								components::ai::discontinuity new_discontinuity;
 
+								/* compute the actual intersection point from b2RayCastOutput data */
 								auto actual_intersection = input.p1 + output.fraction * (input.p2 - input.p1);
+								/* if the left-handed ray intersected with boundary */
 								if (i == 0) {
 									new_discontinuity.p1 = ray_callbacks[1].intersection;
 									new_discontinuity.p2 = ray_callbacks[0].intersection;
 									new_discontinuity.winding = components::ai::discontinuity::LEFT;
 									double_rays.push_back(double_ray(actual_intersection, ray_callbacks[1].intersection));
 								}
+								/* if the right-handed ray intersected with boundary */
 								else if (i == 1) {
 									new_discontinuity.p1 = ray_callbacks[0].intersection;
 									new_discontinuity.p2 = ray_callbacks[1].intersection;
@@ -312,9 +323,10 @@ void ai_system::process_entities(world& owner) {
 
 		for (int i = 0; i < double_rays.size(); ++i) {
 			ai.vision_points.push_back(double_rays[i].second * METERS_TO_PIXELSf);
-			if (draw_triangle_edges) draw_line(PIXELS_TO_METERSf**ai.vision_points.rbegin(), ai.visibility_color);
+			if (draw_triangle_edges) draw_line(PIXELS_TO_METERSf*(*ai.vision_points.rbegin()), ai.visibility_color);
+			/* (i + 1)%double_rays.size() ensures the cycle */
 			ai.vision_points.push_back(double_rays[(i + 1)%double_rays.size()].first * METERS_TO_PIXELSf);
-			if (draw_triangle_edges) draw_line(PIXELS_TO_METERSf**ai.vision_points.rbegin(), ai.visibility_color);
+			if (draw_triangle_edges) draw_line(PIXELS_TO_METERSf*(*ai.vision_points.rbegin()), ai.visibility_color);
 
 			if (draw_triangle_edges) ai.lines.push_back(components::ai::debug_line(PIXELS_TO_METERSf**ai.vision_points.rbegin(), PIXELS_TO_METERSf**(ai.vision_points.rbegin() + 1), ai.visibility_color));
 		}
