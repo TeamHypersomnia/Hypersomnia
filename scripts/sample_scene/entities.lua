@@ -1,5 +1,31 @@
+-- KONFIGURACJA NA PREZENTACJE
+-- KONFIGURACJA NA PREZENTACJE
+-- KONFIGURACJA NA PREZENTACJE
+
+scenes = {
+	ALL = 1,
+	CRATES = 2
+}
+
+scene = scenes.ALL
+
 ai_system.draw_cast_rays = 0
 ai_system.draw_triangle_edges = 1
+ai_system.draw_discontinuities = 1
+render_system.visibility_expansion = 1.0
+render_system.max_visibility_expansion_distance = 1
+render_system.draw_visibility = 0
+
+if scene == scenes.CRATES then
+	ai_system.draw_cast_rays = 1
+	ai_system.draw_triangle_edges = 0
+	ai_system.draw_discontinuities = 0
+end
+
+-- KONFIGURACJA NA PREZENTACJE
+-- KONFIGURACJA NA PREZENTACJE
+-- KONFIGURACJA NA PREZENTACJE
+
 
 background_sprite = create_sprite {
 	image = images.background,
@@ -182,11 +208,13 @@ crate_piece_archetype = archetyped(metal_archetype, {
 	}
 })
 
-my_crate_piece = create_entity (archetyped(crate_piece_archetype, {
-	transform = {
-		pos = vec2(0, 300)
-	}
-}))
+if scene == scenes.ALL then
+	my_crate_piece = create_entity (archetyped(crate_piece_archetype, {
+		transform = {
+			pos = vec2(0, 300)
+		}
+	}))
+end
 
 
 bullet_sprite = create_sprite {
@@ -273,17 +301,17 @@ my_npc_archetype = {
 				shape_type = physics_info.RECT,
 				rect_size = images.player_1.size*npc_size_multiplier,
 				
-				linear_damping = 5,
 				angular_damping = 5,
+				linear_damping = 3,
 				fixed_rotation = false,
 				density = 0.1
 			},
 		},
 		
 		movement = {
-			acceleration = vec2(15000, 15000),
+			input_acceleration = vec2(15000, 15000),
 			
-			max_speed = 15000,
+			max_speed = 20000,
 			
 			receivers = {
 				{ target = "body", stop_at_zero_movement = false }, 
@@ -300,8 +328,13 @@ my_npc_archetype = {
 		},
 		
 		ai = {
-			visibility_square_side = 12000,
-			visibility_color = rgba(255, 0, 255, 255)
+			visibility_square_side = 6000,
+			visibility_color = rgba(255, 0, 255, 255),
+			visibility_subject = false
+		},
+		
+		steering = {
+		
 		}
 	},
 	
@@ -330,6 +363,8 @@ my_npc_archetype = {
 		}
 	}
 }
+
+if scene == scenes.ALL then
 create_entity_group (archetyped(my_npc_archetype, {
 		body = {
 			transform = {
@@ -359,6 +394,7 @@ create_entity (archetyped(crate_archetype, {
 		}
 }))
 
+end
 
 create_entity (archetyped(crate_archetype, {
 		transform = {
@@ -399,7 +435,8 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 		},
 		
 		ai = {
-			visibility_color = rgba(255, 255, 255, 255)
+			visibility_color = rgba(255, 255, 255, 255),
+			visibility_subject = true
 		}
 		
 	},
@@ -447,6 +484,22 @@ my_scriptable_info = create_scriptable_info {
 			--player.body.physics.body:ApplyForce(b2Vec2(message.impact_velocity.x, message.impact_velocity.y), player.body.physics.body:GetWorldCenter())
 			return true
 		end
+	}
+}
+
+loop_only_info = create_scriptable_info {
+	scripted_events = {
+		[scriptable_component.LOOP] 	=
+			function(message)
+				my_atlas:_bind()
+				return true
+			end
+	}
+}
+
+create_entity {
+	scriptable = {
+		available_scripts = loop_only_info
 	}
 }
 

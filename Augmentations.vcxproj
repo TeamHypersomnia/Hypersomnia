@@ -466,9 +466,16 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\steering_component_binding.cpp" />
+    <ClCompile Include="SDK\topdown\resources\fbo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="SDK\topdown\resources\vertex.cpp" />
     <ClCompile Include="SDK\topdown\systems\ai_system.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\steering_system.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
@@ -630,7 +637,11 @@
     <ClInclude Include="math\vec2d.h" />
     <ClInclude Include="SDK\topdown\bindings\bindings.h" />
     <ClInclude Include="SDK\topdown\components\ai_component.h" />
+    <ClInclude Include="SDK\topdown\components\steering_component.h" />
+    <ClInclude Include="SDK\topdown\messages\steering_message.h" />
+    <ClInclude Include="SDK\topdown\resources\fbo.h" />
     <ClInclude Include="SDK\topdown\systems\ai_system.h" />
+    <ClInclude Include="SDK\topdown\systems\steering_system.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SDK\topdown\resources\animate_info.h" />
     <ClInclude Include="SDK\topdown\components\animate_component.h" />

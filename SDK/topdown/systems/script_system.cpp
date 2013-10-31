@@ -76,6 +76,7 @@ namespace bindings {
 		_movement_component(),
 		_particle_emitter_component(),
 		_physics_component(),
+		_steering_component(),
 		_scriptable_component(),
 
 		_entity(),
@@ -139,6 +140,7 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			bindings::_movement_component(),
 			bindings::_particle_emitter_component(),
 			bindings::_physics_component(),
+			bindings::_steering_component(),
 			bindings::_scriptable_component(),
 
 			bindings::_entity(),

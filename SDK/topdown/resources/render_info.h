@@ -17,8 +17,8 @@ namespace resources {
 	struct renderable {
 		static void make_rect(vec2<> pos, vec2<> size, float rotation_degrees, vec2<> out[4]);
 
-		virtual void draw(buffer&, const components::transform&, vec2<> camera_pos) = 0;
-		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform&) = 0;
+		virtual void draw(buffer&, const components::transform::state&, vec2<> camera_pos) = 0;
+		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) = 0;
 	};
 
 	struct sprite : public renderable {
@@ -31,16 +31,16 @@ namespace resources {
 		void set(texture_baker::texture*, graphics::pixel_32);
 		void update_size();
 
-		virtual void draw(buffer&, const components::transform&, vec2<> camera_pos) override;
-		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform&) override;
+		virtual void draw(buffer&, const components::transform::state&, vec2<> camera_pos) override;
+		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) override;
 	};
 
 	//struct triangle : public renderable {
 	//	vertex vertices[3];
 	//	triangle(const vertex&, const vertex&, const vertex&);
 	//
-	//	virtual void draw(buffer&, const components::transform&, vec2<> camera_pos) override;
-	//	virtual bool is_visible(rects::xywh visibility_aabb, const components::transform&) override;
+	//	virtual void draw(buffer&, const components::transform::state&, vec2<> camera_pos) override;
+	//	virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) override;
 	//};
 
 	struct polygon : public renderable {
@@ -55,8 +55,8 @@ namespace resources {
 
 		//void add_convex(const std::vector<vertex>&);
 		void add_concave(const concave&);
-		virtual void draw(buffer&, const components::transform&, vec2<> camera_pos) override;
-		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform&) override;
+		virtual void draw(buffer&, const components::transform::state&, vec2<> camera_pos) override;
+		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) override;
 	};
 
 	struct particles : public renderable {

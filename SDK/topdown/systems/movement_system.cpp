@@ -34,8 +34,8 @@ void movement_system::process_entities(world& owner) {
 		auto& movement = it->get<components::movement>();
 
 		vec2<> resultant;
-		resultant.x = movement.moving_right * movement.acceleration.x - movement.moving_left * movement.acceleration.x;
-		resultant.y = movement.moving_backward * movement.acceleration.y - movement.moving_forward * movement.acceleration.y;
+		resultant.x = movement.moving_right * movement.input_acceleration.x - movement.moving_left * movement.input_acceleration.x;
+		resultant.y = movement.moving_backward * movement.input_acceleration.y - movement.moving_forward * movement.input_acceleration.y;
 
 		if (resultant.non_zero())
 			physics.body->ApplyForce(resultant * PIXELS_TO_METERSf * physics.body->GetMass(), physics.body->GetWorldCenter());
@@ -45,7 +45,6 @@ void movement_system::process_entities(world& owner) {
 
 		if (speed > movement.max_speed) {
 			physics.body->SetLinearVelocity(movement.max_speed * PIXELS_TO_METERSf * vel);
-//			physics.body->ClearForces();
 			physics.body->m_force = b2Vec2(0, 0);
 		}
 

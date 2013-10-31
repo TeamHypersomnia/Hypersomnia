@@ -6,6 +6,7 @@
 #include "entity_system/world.h"
 
 #include "systems/physics_system.h"
+#include "systems/steering_system.h"
 #include "systems/movement_system.h"
 #include "systems/ai_system.h"
 #include "systems/animation_system.h"
@@ -29,6 +30,7 @@
 #include "messages/animate_message.h"
 #include "messages/particle_burst_message.h"
 #include "messages/damage_message.h"
+#include "messages/steering_message.h"
 
 #include "game/body_helper.h"
 #include "game/texture_helper.h"
@@ -60,6 +62,7 @@ int main() {
 	world my_world;
 
 	input_system input(gl, quit_flag);
+	steering_system steering;
 	movement_system movement;
 	animation_system animations;
 	crosshair_system crosshairs;
@@ -78,6 +81,7 @@ int main() {
 
 	my_world.add_system(&scripts);
 	my_world.add_system(&input);
+	my_world.add_system(&steering);
 	my_world.add_system(&movement);
 	my_world.add_system(&physics);
 	my_world.add_system(&lookat);
@@ -106,6 +110,7 @@ int main() {
 	scripts.global("window", gl);
 	scripts.global("input_system", input);
 	scripts.global("ai_system", ai);
+	scripts.global("render_system", render);
 
 	resources::script::script_reloader.add_directory(L"scripts", true);
 	resources::script init_script;

@@ -12,9 +12,7 @@ images = {
 	metal = "Release\\resources\\metal.jpg",
 	
 	background = "Release\\resources\\background.jpg",
-	enemy = "Release\\resources\\enemy.png",
 	crosshair = "Release\\resources\\crosshair.png",
-	rifle = "Release\\resources\\rifle.png",
 	
 	legs_1 = "Release\\resources\\legs_1.png",
 	legs_2 = "Release\\resources\\legs_2.png",
@@ -77,3 +75,4 @@ images = {
 
 create_textures(my_atlas, images)
 my_atlas:build()
+my_atlas:nearest()

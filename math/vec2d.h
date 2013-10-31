@@ -48,9 +48,9 @@ namespace augmentations {
 		type x, y;
 		
 		template <class t>
-		static vec2 from_angle(t degrees) {
+		static vec2 from_degrees(t degrees) {
 			vec2 out;
-			out.set_from_angle(degrees);
+			out.set_from_degrees(degrees);
 			return out;
 		}
 
@@ -107,9 +107,9 @@ namespace augmentations {
 			return *this;
 		}
 
-		vec2& set_from_angle(float rotation) {
-			rotation *= 0.01745329251994329576923690768489;
-			set(cos(rotation), sin(rotation));
+		vec2& set_from_degrees(float degrees) {
+			float radians = degrees * 0.01745329251994329576923690768489;
+			set(cos(radians), sin(radians));
 			normalize();
 			return *this;
 		}

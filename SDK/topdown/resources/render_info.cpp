@@ -48,10 +48,10 @@ namespace resources {
 			size = tex->get_size();
 	}
 
-	void sprite::draw(buffer& triangles, const components::transform& transform, vec2<> camera_pos) {
+	void sprite::draw(buffer& triangles, const components::transform::state& transform, vec2<> camera_pos) {
 		if (tex == nullptr) return;
 		vec2<> v[4];
-		make_rect(transform.current.pos - camera_pos, vec2<>(size), transform.current.rotation, v);
+		make_rect(transform.pos - camera_pos, vec2<>(size), transform.rotation, v);
 
 		vertex_triangle t1, t2;
 		t1.vertices[0].color = t2.vertices[0].color = color;
@@ -77,9 +77,9 @@ namespace resources {
 		triangles.emplace_back(t2);
 	}
 
-	bool sprite::is_visible(rects::xywh visibility_aabb, const components::transform& transform) {
+	bool sprite::is_visible(rects::xywh visibility_aabb, const components::transform::state& transform) {
 		vec2<> v[4];
-		make_rect(transform.current.pos, vec2<>(size), transform.current.rotation, v);
+		make_rect(transform.pos, vec2<>(size), transform.rotation, v);
 
 		typedef const vec2<>& vc;
 
@@ -100,7 +100,7 @@ namespace resources {
 		return rects::ltrb(lower.x, lower.y, upper.x, upper.y).hover(visibility_aabb);
 	}
 	
-	bool polygon::is_visible(rects::xywh visibility_aabb, const components::transform&) {
+	bool polygon::is_visible(rects::xywh visibility_aabb, const components::transform::state&) {
 		/* perform visibility check! */
 		return true;
 	}
@@ -111,11 +111,11 @@ namespace resources {
 	//	vertices[2] = c;
 	//}
 	//
-	//void triangle::draw(buffer& triangles, const components::transform& transform, vec2<> camera_pos) {
+	//void triangle::draw(buffer& triangles, const components::transform::state& transform, vec2<> camera_pos) {
 	//
 	//}
 	//
-	//bool triangle::is_visible(rects::xywh visibility_aabb, const components::transform& transform) {
+	//bool triangle::is_visible(rects::xywh visibility_aabb, const components::transform::state& transform) {
 	//	return true;
 	//}
 
@@ -157,13 +157,13 @@ namespace resources {
 	//	convex_models.push_back(model);
 	//}
 
-	void polygon::draw(buffer& triangles, const components::transform& transform, vec2<> camera_pos) {
+	void polygon::draw(buffer& triangles, const components::transform::state& transform, vec2<> camera_pos) {
 		vertex_triangle new_tri;
 		
 		auto model_transformed = model;
 		for (auto& v : model_transformed) {
-				v.position.rotate(transform.current.rotation, vec2<>(0, 0));
-				v.position += transform.current.pos - camera_pos;
+				v.position.rotate(transform.rotation, vec2<>(0, 0));
+				v.position += transform.pos - camera_pos;
 		}
 
 		for (int i = 0; i < indices.size(); i += 3) {
@@ -176,19 +176,19 @@ namespace resources {
 }
 
 namespace components {
-	void particle_group::draw(resources::buffer& triangles, const components::transform& transform, vec2<> camera_pos) {
+	void particle_group::draw(resources::buffer& triangles, const components::transform::state& transform, vec2<> camera_pos) {
 		for (auto& it : particles) {
 			auto temp_alpha = it.face.color.a;
 
 			if (it.should_disappear)
 				it.face.color.a = ((it.max_lifetime_ms - it.lifetime_ms) / it.max_lifetime_ms) * temp_alpha;
 
-			it.face.draw(triangles, components::transform(it.pos, it.rotation), camera_pos);
+			it.face.draw(triangles, components::transform::state(it.pos, it.rotation), camera_pos);
 			it.face.color.a = temp_alpha;
 		}
 	}
 
-	bool particle_group::is_visible(rects::xywh visibility_aabb, const components::transform& transform) {
+	bool particle_group::is_visible(rects::xywh visibility_aabb, const components::transform::state& transform) {
 		/* will be visible most of the time */
 		return true;
 	}
