@@ -39,7 +39,7 @@ void camera_system::process_entities(world& owner) {
 
 		if (camera.enabled) {
 			/* we obtain transform as a copy because we'll be now offsetting it by crosshair position */
-			components::transform transform = e->get<components::transform>();
+			auto transform = e->get<components::transform>().current;
 			vec2<> camera_screen = vec2<>(vec2<int>(camera.ortho.w(), camera.ortho.h()));
 
 			/* if we set player and crosshair entity targets */
@@ -55,13 +55,13 @@ void camera_system::process_entities(world& owner) {
 						vec2<> bound = camera_screen / 2.f;
 						/* save copy */
 						vec2<> normalized = dir.clamp(bound);
-						transform.current.pos += normalized.normalize() * camera.angled_look_length;
+						transform.pos += normalized.normalize() * camera.angled_look_length;
 					}
 
 					if (camera.orbit_mode == camera.LOOK) {
 						vec2<> bound = camera.max_look_expand + camera_screen / 2.f;
 						/* simple proportion */
-						transform.current.pos += (dir.clamp(bound) / bound) * camera.max_look_expand;
+						transform.pos += (dir.clamp(bound) / bound) * camera.max_look_expand;
 					}
 
 					/* update crosshair so it is snapped to visible area */
@@ -75,9 +75,9 @@ void camera_system::process_entities(world& owner) {
 					pow(camera.smoothing_average_factor, camera.averages_per_sec * delta)
 					);
 
-				//if ((transform.current.pos - camera.last_interpolant).length() < 2.0) camera.last_interpolant = transform.current.pos;
+				//if ((transform.pos - camera.last_interpolant).length() < 2.0) camera.last_interpolant = transform.current.pos;
 				//else
-					camera.last_interpolant = camera.last_interpolant * averaging_constant + transform.current.pos * (1.0f - averaging_constant);
+					camera.last_interpolant = camera.last_interpolant * averaging_constant + transform.pos * (1.0f - averaging_constant);
 					
 					auto interp = [](int& a, int& b, float averaging_constant){
 						a = a * averaging_constant + b * (1.0f - averaging_constant);
@@ -89,15 +89,15 @@ void camera_system::process_entities(world& owner) {
 					interp(camera.last_ortho_interpolant.b, camera.ortho.b, averaging_constant);
 
 				/* save smoothing result */
-				transform.current.pos = camera.last_interpolant;
+				transform.pos = camera.last_interpolant;
 			}
 
 			glLoadIdentity();
 			glOrtho(camera.last_ortho_interpolant.l, camera.last_ortho_interpolant.r, camera.last_ortho_interpolant.b, camera.last_ortho_interpolant.t, 0, 1);
 			glViewport(camera.screen_rect.x, camera.screen_rect.y, camera.screen_rect.w, camera.screen_rect.h);
 
-			raw_renderer.draw(camera.last_ortho_interpolant, components::transform(transform.current.pos), camera.mask);
-			raw_renderer.render();
+			raw_renderer.draw(camera.last_ortho_interpolant, transform, camera.mask);
+			raw_renderer.render(camera.last_ortho_interpolant);
 		}
 	}
 	raw_renderer.output_window.swap_buffers();

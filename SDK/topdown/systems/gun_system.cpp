@@ -26,7 +26,7 @@ void gun_system::process_events(world& owner) {
 
 void gun_system::process_entities(world& owner) {
 	for (auto it : targets) {
-		auto& gun_transform = it->get<components::transform>();
+		auto& gun_transform = it->get<components::transform>().current;
 		auto& gun = it->get<components::gun>();
 
 		if (!gun.reloading &&
@@ -48,9 +48,9 @@ void gun_system::process_entities(world& owner) {
 
 				if (gun.target_camera_to_shake) {
 					vec2<> shake_dir;
-					shake_dir.set_from_angle(std::uniform_real_distribution<float>(
-						gun_transform.current.rotation - gun.shake_spread_degrees,
-						gun_transform.current.rotation + gun.shake_spread_degrees)(generator));
+					shake_dir.set_from_degrees(std::uniform_real_distribution<float>(
+						gun_transform.rotation - gun.shake_spread_degrees,
+						gun_transform.rotation + gun.shake_spread_degrees)(generator));
 				
 					gun.target_camera_to_shake->get<components::camera>().last_interpolant += shake_dir * gun.shake_radius;
 				}
@@ -62,11 +62,11 @@ void gun_system::process_entities(world& owner) {
 
 				/* place bullets near the very barrel */
 				auto new_transform = gun_transform;
-				new_transform.current.pos += vec2<>::from_angle(gun_transform.current.rotation) * gun.bullet_distance_offset;
+				new_transform.pos += vec2<>::from_degrees(gun_transform.rotation) * gun.bullet_distance_offset;
 
 				messages::particle_burst_message burst;
-				burst.pos = new_transform.current.pos;
-				burst.rotation = gun_transform.current.rotation;
+				burst.pos = new_transform.pos;
+				burst.rotation = gun_transform.rotation;
 				burst.subject = it;
 				burst.type = messages::particle_burst_message::burst_type::WEAPON_SHOT;
 
@@ -76,12 +76,12 @@ void gun_system::process_entities(world& owner) {
 					entity& new_bullet = owner.create_entity();
 
 					/* randomize bullet direction taking spread into account */
-					vec2<> vel(vec2<>::from_angle(
+					vec2<> vel(vec2<>::from_degrees(
 						std::uniform_real_distribution<float> (
-						gun_transform.current.rotation - gun.spread_degrees,
-						gun_transform.current.rotation + gun.spread_degrees)(generator)));
+						gun_transform.rotation - gun.spread_degrees,
+						gun_transform.rotation + gun.spread_degrees)(generator)));
 
-					new_transform.current.rotation = vel.get_degrees();
+					new_transform.rotation = vel.get_degrees();
 					/* add randomized speed to bullet taking velocity variation into account */
 					vel *= std::uniform_real_distribution<float> (
 						gun.bullet_speed - gun.velocity_variation,
@@ -92,10 +92,10 @@ void gun_system::process_entities(world& owner) {
 					damage.amount = std::uniform_real_distribution<float> (gun.bullet_damage.first, gun.bullet_damage.second)(generator);
 					damage.sender = it;
 					damage.max_distance = gun.max_bullet_distance;
-					damage.starting_point = new_transform.current.pos;
+					damage.starting_point = new_transform.pos;
 
 					/* add components that make up a bullet */
-					new_bullet.add(new_transform);
+					new_bullet.add(components::transform(new_transform));
 					new_bullet.add(damage);
 					new_bullet.add(gun.bullet_render);
 					topdown::create_physics_component(gun.bullet_body, new_bullet, b2_dynamicBody);

@@ -11,7 +11,7 @@ void particle_group_system::process_entities(world& owner) {
 
 	for (auto it : targets) {
 		auto& group = it->get<components::particle_group>();
-		auto& transform = it->get<components::transform>();
+		auto& transform = it->get<components::transform>().current;
 
 		if (group.stream_info) {
 			auto& stream = *group.stream_info;
@@ -22,7 +22,7 @@ void particle_group_system::process_entities(world& owner) {
 			group.stream_particles_to_spawn += randval(stream.particles_per_sec.first, stream.particles_per_sec.second) * (stream_delta / 1000.0);
 
 			while (group.stream_particles_to_spawn >= 1.f) {
-				particle_emitter_system::spawn_particle(group, transform.current.pos, transform.current.rotation + 
+				particle_emitter_system::spawn_particle(group, transform.pos, transform.rotation + 
 					group.swing_spread * sin(group.stream_lifetime_ms * group.swings_per_sec)
 				, stream);
 				group.stream_particles_to_spawn -= 1.f;

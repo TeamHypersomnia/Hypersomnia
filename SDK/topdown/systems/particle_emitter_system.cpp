@@ -39,7 +39,7 @@ float randval(std::pair<float, float> p) {
 void particle_emitter_system::spawn_particle(
 	components::particle_group& group, const vec2<>& position, float rotation, const resources::emission& emission) {
 		auto new_particle = emission.particle_templates[randval(0u, emission.particle_templates.size()-1)];
-		new_particle.vel = vec2<>::from_angle(
+		new_particle.vel = vec2<>::from_degrees(
 			randval(rotation - emission.spread_degrees, rotation + emission.spread_degrees)) *
 			randval(emission.velocity);
 		
@@ -52,7 +52,7 @@ void particle_emitter_system::spawn_particle(
 		
 
 		if (emission.randomize_acceleration) {
-			new_particle.acc += vec2<>::from_angle(
+			new_particle.acc += vec2<>::from_degrees(
 				randval(rotation - emission.spread_degrees, rotation + emission.spread_degrees)) *
 				randval(emission.acceleration);
 		}

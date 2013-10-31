@@ -6,8 +6,9 @@ void chase_system::add(entity* e) {
 	auto& chase = e->get<components::chase>();
 
 	if (chase.target != nullptr) {
-		chase.previous = chase.target->get<components::transform>().current.pos;
-		chase.rotation_previous = chase.target->get<components::transform>().current.rotation;
+		auto& target_chase = chase.target->get<components::transform>().current;
+		chase.previous = target_chase.pos;
+		chase.rotation_previous = target_chase.rotation;
 	}
 
 	processing_system::add(e);
@@ -15,35 +16,35 @@ void chase_system::add(entity* e) {
 
 void chase_system::process_entities(world&) {
 	for (auto it : targets) {
-		auto& transform = it->get<components::transform>();
+		auto& transform = it->get<components::transform>().current;
 		auto& chase = it->get<components::chase>();
 
 		if (chase.target == nullptr) continue;
 
-		auto& target_transform = chase.target->get<components::transform>();
+		auto& target_transform = chase.target->get<components::transform>().current;
 
 		if (chase.type == components::chase::chase_type::OFFSET) {
 			if (chase.relative) {
-				chase.offset = transform.current.pos - chase.previous;
-				chase.rotation_offset = transform.current.rotation - chase.rotation_previous;
+				chase.offset = transform.pos - chase.previous;
+				chase.rotation_offset = transform.rotation - chase.rotation_previous;
 			}
 
-			transform.current.pos = target_transform.current.pos;
-			transform.current.pos += chase.offset;
+			transform.pos = target_transform.pos;
+			transform.pos += chase.offset;
 
 			if (chase.chase_rotation) {
-				transform.current.rotation = target_transform.current.rotation;
-				transform.current.rotation += chase.rotation_offset;
+				transform.rotation = target_transform.rotation;
+				transform.rotation += chase.rotation_offset;
 			}
 
-			//transform.previous.pos = transform.current.pos;
-			chase.previous = target_transform.current.pos;
-			chase.rotation_previous = target_transform.current.rotation;
+			//transform.previous.pos = transform.pos;
+			chase.previous = target_transform.pos;
+			chase.rotation_previous = target_transform.rotation;
 		}
 		else if (chase.type == components::chase::chase_type::ORBIT) {
-			transform.current.pos = target_transform.current.pos + chase.rotation_orbit_offset;
-			transform.current.pos.rotate(target_transform.current.rotation - chase.rotation_previous, target_transform.current.pos);
-			transform.current.rotation = target_transform.current.rotation + chase.rotation_offset;
+			transform.pos = target_transform.pos + chase.rotation_orbit_offset;
+			transform.pos.rotate(target_transform.rotation - chase.rotation_previous, target_transform.pos);
+			transform.rotation = target_transform.rotation + chase.rotation_offset;
 		}
 	}
 }

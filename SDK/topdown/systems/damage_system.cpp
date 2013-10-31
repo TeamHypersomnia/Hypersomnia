@@ -37,10 +37,10 @@ void damage_system::process_events(world& owner) {
 
 void damage_system::process_entities(world& owner) {
 	for (auto it : targets) {
-		auto& transform = it->get<components::transform>();
+		auto& transform = it->get<components::transform>().current;
 		auto& damage = it->get<components::damage>();
 	
-		if (damage.max_distance >= 0.f && (damage.starting_point - transform.current.pos).length() >= damage.max_distance) 
+		if (damage.max_distance >= 0.f && (damage.starting_point - transform.pos).length() >= damage.max_distance) 
 			owner.post_message(messages::destroy_message(it));
 	}
 }

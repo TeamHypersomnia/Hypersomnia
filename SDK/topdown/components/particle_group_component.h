@@ -27,8 +27,8 @@ namespace components {
 		friend class particle_group_system;
 		friend class particle_emitter_system;
 
-		virtual void draw(resources::buffer&, const components::transform&, vec2<> camera_pos) override;
-		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform&) override;
+		virtual void draw(resources::buffer&, const components::transform::state&, vec2<> camera_pos) override;
+		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) override;
 
 		/* only used by subject stream to indicate that it will no longer emit particles */
 		bool destroy_when_empty;
