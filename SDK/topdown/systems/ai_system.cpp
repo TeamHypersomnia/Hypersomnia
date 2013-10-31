@@ -53,7 +53,7 @@ float comparable_angle(vec2<> diff) {
 		);
 }
 
-ai_system::ai_system() : draw_cast_rays(false), draw_triangle_edges(true) {}
+ai_system::ai_system() : draw_cast_rays(false), draw_triangle_edges(true), draw_discontinuities(false) {}
 
 int components::ai::get_num_triangles() {
 	return vision_points.size() - 1;
@@ -74,10 +74,10 @@ void ai_system::process_entities(world& owner) {
 
 		/* get AI data and position of the entity */
 		auto& ai = it->get<components::ai>();
-		auto& transform = it->get<components::transform>();
+		auto& transform = it->get<components::transform>().current;
 
 		/* transform entity position and its visibility radius to Box2D coordinates */
-		vec2<> position_meters = transform.current.pos * PIXELS_TO_METERSf;
+		vec2<> position_meters = transform.pos * PIXELS_TO_METERSf;
 		float vision_side_meters = ai.visibility_square_side * PIXELS_TO_METERSf;
 
 		/* prepare maximum visibility square */
@@ -134,7 +134,7 @@ void ai_system::process_entities(world& owner) {
 		};
 
 		/* prepare edge shapes given above vertices to cast rays against when no obstacle was hit 
-			note we lengthen them a bit and add substract 1.f to avoid undeterministic vertex cases
+			note we lengthen them a bit and add/substract 1.f to avoid undeterministic vertex cases
 		*/
 		b2EdgeShape bounds[4];
 		bounds[0].Set(vec2<>(whole_vision[0]) + vec2<>(-1.f, 0.f), vec2<>(whole_vision[1]) + vec2<>(1.f, 0.f));
@@ -202,8 +202,8 @@ void ai_system::process_entities(world& owner) {
 			
 			ray_callbacks[0] and ray_callbacks[1] differ ONLY by an epsilon added/substracted to the angle
 			*/
-			ray_callbacks[0].target = position_meters + vec2<>::from_angle((vertex.second - position_meters).get_degrees() - epsilon) * vision_side_meters / 2 * 1.414213562373095;
-			ray_callbacks[1].target = position_meters + vec2<>::from_angle((vertex.second - position_meters).get_degrees() + epsilon) * vision_side_meters / 2 * 1.414213562373095;
+			ray_callbacks[0].target = position_meters + vec2<>::from_degrees((vertex.second - position_meters).get_degrees() - epsilon) * vision_side_meters / 2 * 1.414213562373095;
+			ray_callbacks[1].target = position_meters + vec2<>::from_degrees((vertex.second - position_meters).get_degrees() + epsilon) * vision_side_meters / 2 * 1.414213562373095;
 
 			/* cast both rays starting from the player position and ending in ray_callbacks[x].target */
 			physics.b2world.RayCast(&ray_callbacks[0], position_meters, ray_callbacks[0].target);
@@ -251,17 +251,17 @@ void ai_system::process_entities(world& owner) {
 						new_discontinuity.p1 = ray_callbacks[0].intersection;
 						new_discontinuity.p2 = ray_callbacks[1].intersection;
 						new_discontinuity.winding = components::ai::discontinuity::RIGHT;
+						if (draw_cast_rays) draw_line(ray_callbacks[1].intersection, graphics::pixel_32(255, 0, 255, 255));
 					}
 					/* otherwise it is to the left */
 					else {
 						new_discontinuity.p1 = ray_callbacks[1].intersection;
 						new_discontinuity.p2 = ray_callbacks[0].intersection;
 						new_discontinuity.winding = components::ai::discontinuity::LEFT;
+						if (draw_cast_rays) draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 255, 255));
 					}
 					/* save new discontinuity */
 					local_discontinuities.push_back(new_discontinuity);
-
-					if (draw_cast_rays) draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 255, 255));
 				}
 			}
 			/* the case where exactly one of the rays did not hit anything so we cast it against boundaries, 
@@ -319,7 +319,9 @@ void ai_system::process_entities(world& owner) {
 
 		/* now to propagate the visible area */
 		ai.vision_points.clear();
-		ai.memorised_discontinuities = local_discontinuities;
+		
+		if (draw_discontinuities)
+			ai.memorised_discontinuities = local_discontinuities;
 
 		for (int i = 0; i < double_rays.size(); ++i) {
 			ai.vision_points.push_back(double_rays[i].second * METERS_TO_PIXELSf);
