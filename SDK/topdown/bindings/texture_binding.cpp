@@ -18,6 +18,10 @@ namespace bindings {
 			luabind::class_<texture_baker::atlas>("atlas")
 			.def(luabind::constructor<>())
 			.def("build", &texture_baker::atlas::default_build)
+			.def("linear", &texture_baker::atlas::linear)
+			.def("nearest", &texture_baker::atlas::nearest)
+			.def("bind", &texture_baker::atlas::bind)
+			.def("_bind", &texture_baker::atlas::_bind)
 			);
 	}
 }

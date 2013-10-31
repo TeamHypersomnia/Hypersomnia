@@ -19,6 +19,7 @@
 #include "../components/particle_emitter_component.h"
 #include "../components/physics_component.h"
 #include "../components/scriptable_component.h"
+#include "../components/steering_component.h"
 #include "../components/transform_component.h"
 #include "../components/render_component.h"
 
@@ -58,6 +59,8 @@ namespace bindings {
 			.property("physics", &entity::find<physics>, &entity::set<physics>)
 			.def("add", &entity::add<scriptable>)
 			.property("scriptable", &entity::find<scriptable>, &entity::set<scriptable>)
+			.def("add", &entity::add<steering>)
+			.property("steering", &entity::find<steering>, &entity::set<steering>)
 			.def("add", &entity::add<render>)
 			.property("render", &entity::find<render>, &entity::set<render>)
 			.def("add", &entity::add<transform>)
