@@ -182,6 +182,8 @@ public:
 	/// @param v the new linear velocity of the center of mass.
 	void SetLinearVelocity(const b2Vec2& v);
 
+	void SetMaximumLinearVelocity(float32 length);
+
 	/// Get the linear velocity of the center of mass.
 	/// @return the linear velocity of the center of mass.
 	b2Vec2 GetLinearVelocity() const;
@@ -433,8 +435,8 @@ public:
 	b2Vec2 m_linearVelocity;
 	float32 m_angularVelocity;
 
-	b2Vec2 m_force;
-	float32 m_torque;
+	b2Vec2 m_force, m_last_force;
+	float32 m_torque, m_max_speed;
 
 	b2World* m_world;
 	b2Body* m_prev;
@@ -503,6 +505,10 @@ inline void b2Body::SetLinearVelocity(const b2Vec2& v)
 	}
 
 	m_linearVelocity = v;
+}
+
+inline void b2Body::SetMaximumLinearVelocity(float32 length) {
+	m_max_speed = length;
 }
 
 inline b2Vec2 b2Body::GetLinearVelocity() const

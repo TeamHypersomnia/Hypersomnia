@@ -6,7 +6,8 @@ namespace components {
 	struct lookat : public augmentations::entity_system::component {
 		enum look_type {
 			POSITION,
-			VELOCITY
+			VELOCITY,
+			ACCELEARATION
 		};
 
 		unsigned look_mode;

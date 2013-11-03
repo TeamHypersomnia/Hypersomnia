@@ -17,11 +17,21 @@ void lookat_system::process_entities(world& owner) {
 			if (target_transform != nullptr)
 				transform.rotation = (target_transform->current.pos - transform.pos).get_degrees();
 		}
-		else if (lookat.look_mode == components::lookat::look_type::VELOCITY) {
+		else {
 			auto target_physics = lookat.target->find<components::physics>();
 			
-			if (target_physics != nullptr)
-				transform.rotation = vec2<>(target_physics->body->GetLinearVelocity()).get_degrees();
+			if (target_physics != nullptr) {
+				vec2<> direction;
+
+				if (lookat.look_mode == components::lookat::look_type::VELOCITY)
+					direction = vec2<>(target_physics->body->GetLinearVelocity());
+
+				if (lookat.look_mode == components::lookat::look_type::ACCELEARATION)
+					direction = vec2<>(target_physics->body->m_last_force);
+
+				if (direction.non_zero())
+					transform.rotation = direction.get_degrees();
+			}
 		}
 	}
 }
