@@ -10,16 +10,16 @@ namespace augmentations {
 		}
 
 		world::~world() {
-
-
+			delete_all_entities(false);
 		}
-
 
 		void world::register_entity_watcher(entity_ptr& ptr) {
 			registered_entity_watchers[ptr].add(&ptr);
 		}
 
 		void world::unregister_entity_watcher(entity_ptr& ptr) {
+			if (registered_entity_watchers.empty()) return;
+
 			auto it = registered_entity_watchers.find(ptr);
 			if (it != registered_entity_watchers.end()) {
 				(*it).second.remove(&ptr);
@@ -33,13 +33,19 @@ namespace augmentations {
 			return *entities.construct<world&>(*this);
 		}
 		
-		void world::delete_all_entities() {
+		void world::delete_all_entities(bool clear_systems_manually) {
+			if (clear_systems_manually)
+				for (auto* system_to_clean : systems)
+					system_to_clean->clear();
+
+			for (auto& watcher_vector : registered_entity_watchers) 
+				for (auto& watcher : watcher_vector.second.raw) 
+					watcher->ptr = nullptr;
+
+			registered_entity_watchers.clear();
+
 			entities.~object_pool<entity>();
 			new (&entities) boost::object_pool<entity>();
-
-			for (auto* system_to_clean : systems) {
-				system_to_clean->clear();
-			}
 		}
 
 		void world::delete_entity(entity& e, entity* redirect_pointers) {

@@ -39,6 +39,11 @@ namespace augmentations {
 			set(p.ptr);
 			return *this;
 		}
+		
+		entity_ptr& entity_ptr::operator=(entity* p) {
+			set(p);
+			return *this;
+		}
 
 		entity* entity_ptr::operator->() {
 			return get();

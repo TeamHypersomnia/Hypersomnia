@@ -21,9 +21,13 @@ namespace components {
 		bool moving_left, moving_right, moving_forward, moving_backward;
 		augmentations::vec2<> input_acceleration;
 		
-		float max_speed;
+		float air_resistance;
 
-		movement(augmentations::vec2<> acceleration = augmentations::vec2<>(), float max_speed = 0.f) : input_acceleration(input_acceleration), max_speed(max_speed) {
+		float max_speed;
+		float braking_damping;
+
+		movement(augmentations::vec2<> acceleration = augmentations::vec2<>(), float air_resistance = 0.f) 
+			: input_acceleration(input_acceleration), air_resistance(air_resistance), braking_damping(-1.f), max_speed(-1.f) {
 			moving_left = moving_right = moving_forward = moving_backward = false;
 		}
 	};

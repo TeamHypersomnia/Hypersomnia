@@ -16,7 +16,8 @@ namespace augmentations {
 			entity* get() const;
 
 			operator entity*() const;
-			entity_ptr& operator=(const entity_ptr&);
+			entity_ptr& operator=(const entity_ptr&) ;
+			entity_ptr& operator=(entity*) ;
 			entity* operator->();
 			entity& operator*();
 		};

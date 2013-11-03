@@ -12,6 +12,9 @@ namespace bindings {
 			luabind::class_<render_system>("_render_system")
 			.def_readwrite("visibility_expansion", &render_system::visibility_expansion)
 			.def_readwrite("max_visibility_expansion_distance", &render_system::max_visibility_expansion_distance)
+			.def_readwrite("draw_steering_forces", &render_system::draw_steering_forces)
+			.def_readwrite("draw_substeering_forces", &render_system::draw_substeering_forces)
+			.def_readwrite("draw_velocities", &render_system::draw_velocities)
 			.def_readwrite("draw_visibility", &render_system::draw_visibility),
 
 			luabind::class_<render>("render_component")

@@ -4,7 +4,9 @@
 
 #include "entity_system/entity_ptr.h"
 #include "entity_system/entity.h"
+#include <luabind/operator.hpp>
 
+entity* dummy_pointer_instance;
 namespace bindings {
 	luabind::scope _entity_ptr() {
 		return

@@ -53,16 +53,18 @@ namespace resources {
 			particle_templates.push_back(p);
 		}
 
-		emission() : velocity(std::make_pair(0, 0)),
-			angular_velocity(std::make_pair(0, 0)),
-			particles_per_sec(std::make_pair(0, 0)),
-			stream_duration_ms(std::make_pair(0, 0)),
-			particle_lifetime_ms(std::make_pair(0, 0)),
-			size_multiplier(std::make_pair(0, 0)),
-			swing_spread(std::make_pair(0, 0)),
-			swings_per_sec(std::make_pair(0, 0)),
-			acceleration(std::make_pair(0, 0)), randomize_acceleration(false), spread_degrees(0), initial_rotation_variation(0),
-			offset(0, 0), angular_offset(std::make_pair(0, 0))
+		emission() : 
+			particles_per_burst(std::make_pair(0, 0)),
+			velocity(std::make_pair(0.f, 0.f)),
+			angular_velocity(std::make_pair(0.f, 0.f)),
+			particles_per_sec(std::make_pair(0.f, 0.f)),
+			stream_duration_ms(std::make_pair(0.f, 0.f)),
+			particle_lifetime_ms(std::make_pair(0.f, 0.f)),
+			size_multiplier(std::make_pair(0.f, 0.f)),
+			swing_spread(std::make_pair(0.f, 0.f)),
+			swings_per_sec(std::make_pair(0.f, 0.f)),
+			acceleration(std::make_pair(0.f, 0.f)), randomize_acceleration(false), spread_degrees(0.f), initial_rotation_variation(0.f),
+			offset(0.f, 0.f), angular_offset(std::make_pair(0.f, 0.f))
 		{}
 	};
 
