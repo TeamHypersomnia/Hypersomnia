@@ -1,9 +1,20 @@
 #include "stdafx.h"
+#include <algorithm>
+
 #include "render_system.h"
 #include "entity_system/entity.h"
 #include "../resources/render_info.h"
 
-render_system::render_system(window::glwindow& output_window) : output_window(output_window), visibility_expansion(1.f), max_visibility_expansion_distance(1000.f), draw_visibility(0) {
+#include "../components/ai_component.h"
+#include "../components/physics_component.h"
+
+render_system::render_system(window::glwindow& output_window) 
+	: output_window(output_window), visibility_expansion(1.f), max_visibility_expansion_distance(1000.f), 
+	draw_visibility(0),
+	draw_substeering_forces(0),
+	draw_steering_forces(0),
+	draw_velocities(0)
+{
 	output_window.current();
 
 	scene_fbo		.create(output_window.get_screen_rect().w, output_window.get_screen_rect().h);
@@ -23,13 +34,7 @@ render_system::render_system(window::glwindow& output_window) : output_window(ou
 	glEnableClientState(GL_COLOR_ARRAY);
 }
 
-#define AI_DEBUG_DRAW
-#ifdef AI_DEBUG_DRAW
 static components::transform::state last_camera;
-#include "../components/ai_component.h"
-#include <algorithm>
-#include "../components/physics_component.h"
-#endif
 void render_system::draw(rects::xywh visible_area, components::transform::state camera_transform, unsigned mask) {
 	/* shortcut */
 	typedef std::pair<components::render*, components::transform::state*> cached_pair;
@@ -81,10 +86,9 @@ void render_system::render(rects::xywh visible_area) {
 	
 	//postprocess_fbo.use();
 	//glClear(GL_COLOR_BUFFER_BIT);
-#ifdef AI_DEBUG_DRAW
+	glDisable(GL_TEXTURE_2D);
+	
 	if (draw_visibility) {
-		glDisable(GL_TEXTURE_2D);
-
 		//glColor4f(1.f, 1.f, 1.f, 1.f);
 		glBegin(GL_TRIANGLES);
 		for (auto it : targets) {
@@ -126,32 +130,19 @@ void render_system::render(rects::xywh visible_area) {
 			}
 		}
 		glEnd();
-
-		glBegin(GL_LINES);
-		for (auto it : targets) {
-			auto* ai = it->find<components::ai>();
-			if (ai) {
-
-				for (auto& line : ai->lines) {
-					glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
-					glVertex2f(line.a.x*METERS_TO_PIXELSf - last_camera.pos.x, line.a.y*METERS_TO_PIXELSf - last_camera.pos.y);
-					glVertex2f(line.b.x*METERS_TO_PIXELSf - last_camera.pos.x, line.b.y*METERS_TO_PIXELSf - last_camera.pos.y);
-				}
-
-				for (auto& line : ai->memorised_discontinuities) {
-					glColor4ub(0, 127, 255, 255);
-					glVertex2f(line.p1.x*METERS_TO_PIXELSf - last_camera.pos.x, line.p1.y*METERS_TO_PIXELSf - last_camera.pos.y);
-					glVertex2f(line.p2.x*METERS_TO_PIXELSf - last_camera.pos.x, line.p2.y*METERS_TO_PIXELSf - last_camera.pos.y);
-				}
-				ai->lines.clear();
-			}
-		}
-		glEnd();
-
-		glEnable(GL_TEXTURE_2D);
 	}
 
-#endif
+	glBegin(GL_LINES);
+	for (auto& line : lines) {
+		glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
+		glVertex2f(line.a.x*METERS_TO_PIXELSf - last_camera.pos.x, line.a.y*METERS_TO_PIXELSf - last_camera.pos.y);
+		glVertex2f(line.b.x*METERS_TO_PIXELSf - last_camera.pos.x, line.b.y*METERS_TO_PIXELSf - last_camera.pos.y);
+	}
+	lines.clear();
+	glEnd();
+
+	glEnable(GL_TEXTURE_2D);
+
 	fbo::use_default();
 	
 	glColor4f(1.f, 1.f, 1.f, 1.f);
@@ -159,10 +150,10 @@ void render_system::render(rects::xywh visible_area) {
 	glGenerateMipmap(GL_TEXTURE_2D);
 	
 	glBegin(GL_QUADS);
-		glTexCoord2f(0.f, 1.f); glVertex2f(visible_area.x, visible_area.y);
-		glTexCoord2f(1.f, 1.f); glVertex2f(visible_area.r(), visible_area.y);
-		glTexCoord2f(1.f, 0.f); glVertex2f(visible_area.r(), visible_area.b());
-		glTexCoord2f(0.f, 0.f); glVertex2f(visible_area.x, visible_area.b());
+		glTexCoord2f(0.f, 1.f); glVertex2i(visible_area.x, visible_area.y);
+		glTexCoord2f(1.f, 1.f); glVertex2i(visible_area.r(), visible_area.y);
+		glTexCoord2f(1.f, 0.f); glVertex2i(visible_area.r(), visible_area.b());
+		glTexCoord2f(0.f, 0.f); glVertex2i(visible_area.x, visible_area.b());
 	glEnd();
 
 	triangles.clear();

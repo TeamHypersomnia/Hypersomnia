@@ -5,6 +5,7 @@
 #include "entity_system/entity.h"
 
 #include "physics_system.h"
+#include "render_system.h"
 #include <limits>
 
 struct my_callback : public b2QueryCallback {
@@ -66,6 +67,7 @@ components::ai::triangle components::ai::get_triangle(int i, augmentations::vec2
 
 void ai_system::process_entities(world& owner) {
 	physics_system& physics = owner.get_system<physics_system>();
+	render_system& render = owner.get_system<render_system>();
 
 	for (auto it : targets) {
 		/* prepare container for all the vertices that we will cast the ray to */
@@ -104,7 +106,7 @@ void ai_system::process_entities(world& owner) {
 				for (int i = 0; i < verts; ++i) {
 					auto position = fixture->GetBody()->GetPosition();
 					/* transform angle to degrees */
-					auto rotation = fixture->GetBody()->GetAngle() / 0.01745329251994329576923690768489;
+					auto rotation = fixture->GetBody()->GetAngle() / 0.01745329251994329576923690768489f;
 					
 					std::pair<float, vec2<>> new_vertex;
 					/* transform vertex to current entity's position and rotation */
@@ -144,10 +146,10 @@ void ai_system::process_entities(world& owner) {
 
 		/* debug drawing of the visibility square */
 		if (draw_cast_rays || draw_triangle_edges) {
-			ai.lines.push_back(components::ai::debug_line(vec2<>(whole_vision[0]) + vec2<>(-1.f, 0.f), vec2<>(whole_vision[1]) + vec2<>(1.f, 0.f)));
-			ai.lines.push_back(components::ai::debug_line(vec2<>(whole_vision[1]) + vec2<>(0.f, -1.f), vec2<>(whole_vision[2]) + vec2<>(0.f, 1.f)));
-			ai.lines.push_back(components::ai::debug_line(vec2<>(whole_vision[2]) + vec2<>(1.f, 0.f), vec2<>(whole_vision[3]) + vec2<>(-1.f, 0.f)));
-			ai.lines.push_back(components::ai::debug_line(vec2<>(whole_vision[3]) + vec2<>(0.f, 1.f), vec2<>(whole_vision[0]) + vec2<>(0.f, -1.f)));
+			render.lines.push_back(render_system::debug_line(vec2<>(whole_vision[0]) + vec2<>(-1.f, 0.f), vec2<>(whole_vision[1]) + vec2<>(1.f, 0.f)));
+			render.lines.push_back(render_system::debug_line(vec2<>(whole_vision[1]) + vec2<>(0.f, -1.f), vec2<>(whole_vision[2]) + vec2<>(0.f, 1.f)));
+			render.lines.push_back(render_system::debug_line(vec2<>(whole_vision[2]) + vec2<>(1.f, 0.f), vec2<>(whole_vision[3]) + vec2<>(-1.f, 0.f)));
+			render.lines.push_back(render_system::debug_line(vec2<>(whole_vision[3]) + vec2<>(0.f, 1.f), vec2<>(whole_vision[0]) + vec2<>(0.f, -1.f)));
 		}
 	
 		/* add the visibility square to the vertices that we cast rays to, computing comparable angle in place */
@@ -176,8 +178,8 @@ void ai_system::process_entities(world& owner) {
 		std::vector<double_ray> double_rays;
 		
 		/* debugging lambda */
-		auto draw_line = [&position_meters, &ai](vec2<> point, graphics::pixel_32 col){
-			ai.lines.push_back(components::ai::debug_line(position_meters, point, col));
+		auto draw_line = [&position_meters, &render](vec2<> point, graphics::pixel_32 col){
+			render.lines.push_back(render_system::debug_line(position_meters, point, col));
 		};
 
 		/* container for holding info about local discontinuities, will be used for dynamic AI navigation */
@@ -321,16 +323,17 @@ void ai_system::process_entities(world& owner) {
 		ai.vision_points.clear();
 		
 		if (draw_discontinuities)
-			ai.memorised_discontinuities = local_discontinuities;
+		for (auto& disc : local_discontinuities) 
+			render.lines.push_back(render_system::debug_line(disc.p1, disc.p2, graphics::pixel_32(0, 127, 255, 255)));
 
-		for (int i = 0; i < double_rays.size(); ++i) {
+		for (size_t i = 0; i < double_rays.size(); ++i) {
 			ai.vision_points.push_back(double_rays[i].second * METERS_TO_PIXELSf);
 			if (draw_triangle_edges) draw_line(PIXELS_TO_METERSf*(*ai.vision_points.rbegin()), ai.visibility_color);
 			/* (i + 1)%double_rays.size() ensures the cycle */
 			ai.vision_points.push_back(double_rays[(i + 1)%double_rays.size()].first * METERS_TO_PIXELSf);
 			if (draw_triangle_edges) draw_line(PIXELS_TO_METERSf*(*ai.vision_points.rbegin()), ai.visibility_color);
 
-			if (draw_triangle_edges) ai.lines.push_back(components::ai::debug_line(PIXELS_TO_METERSf**ai.vision_points.rbegin(), PIXELS_TO_METERSf**(ai.vision_points.rbegin() + 1), ai.visibility_color));
+			if (draw_triangle_edges) render.lines.push_back(render_system::debug_line(PIXELS_TO_METERSf**ai.vision_points.rbegin(), PIXELS_TO_METERSf**(ai.vision_points.rbegin() + 1), ai.visibility_color));
 		}
 	}
 }
