@@ -27,6 +27,9 @@ namespace augmentations {
 
 			/* process all entity targets, base function does nothing */
 			virtual void process_entities(world&);
+			
+			/* used in physics systems to apply proper forces every substep */
+			virtual void substep(world&);
 
 			/* process all events involved with this system, base function does nothing
 				called repeatedly until all of the existing message queues are empty

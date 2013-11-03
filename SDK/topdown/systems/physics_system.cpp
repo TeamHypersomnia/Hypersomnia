@@ -12,7 +12,6 @@ physics_system::physics_system() : accumulator(60.0, 5),
 	b2world.SetAutoClearForces(false);
 	b2world.SetContactListener(&listener);
 }
-
 //struct game_filter : public b2ContactFilter {
 //	bool ShouldCollide(b2Fixture* a, b2Fixture* b) override {
 //		if (b2ContactFilter::ShouldCollide(a, b)) {
@@ -113,10 +112,15 @@ void physics_system::process_entities(world& owner) {
 		int32 positionIterations = 3;
 
 		reset_states();
-		b2world.Step(static_cast<float32>(accumulator.per_second()), velocityIterations, positionIterations);
-	}
+		
+		for (auto& sys : substepping_systems)
+			sys->substep(owner);
 
-	b2world.ClearForces();
+		b2world.Step(static_cast<float32>(accumulator.per_second()), velocityIterations, positionIterations);
+		b2world.ClearForces();
+	}
+	
+	if(steps == 0) b2world.ClearForces();
 	smooth_states();
 }
 
@@ -125,12 +129,14 @@ void physics_system::add(entity*) {
 }
 
 void physics_system::clear() {
-	auto it = b2world.GetBodyList();
-	while (it) {
-		auto next = it->GetNext();
-		b2world.DestroyBody(it);
-		it = next;
-	}
+	std::vector<b2Body*> to_destroy;
+
+	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) 
+		to_destroy.push_back(b);
+
+	for (auto& just_die : to_destroy)
+		b2world.DestroyBody(just_die);
+
 	processing_system::clear();
 }
 
@@ -146,7 +152,7 @@ void physics_system::reset_states() {
 		transform.current.pos = b->GetPosition();
 		transform.current.pos *= METERS_TO_PIXELSf;
 		transform.current.rotation = b->GetAngle();
-		transform.current.rotation *= 180.0 / 3.141592653589793238462;
+		transform.current.rotation *= 180.0f / 3.141592653589793238462f;
 
 		transform.previous = transform.current;
 	}
@@ -161,6 +167,6 @@ void physics_system::smooth_states() {
 		auto& transform = static_cast<entity*>(b->GetUserData())->get<components::transform>();
 
 		transform.current.pos = transform.previous.pos + ratio * (METERS_TO_PIXELSf*b->GetPosition() - transform.previous.pos);
-		transform.current.rotation = transform.previous.rotation + ratio * (b->GetAngle()*180.0/3.141592653589793238462 - transform.previous.rotation);
+		transform.current.rotation = static_cast<float>(transform.previous.rotation + ratio * (b->GetAngle()*180.0/3.141592653589793238462 - transform.previous.rotation));
 	}
 }

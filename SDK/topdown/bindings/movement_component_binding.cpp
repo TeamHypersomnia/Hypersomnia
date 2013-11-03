@@ -16,6 +16,8 @@ namespace bindings {
 			.def_readwrite("moving_forward", &movement::moving_forward)
 			.def_readwrite("moving_backward", &movement::moving_backward)
 			.def_readwrite("input_acceleration", &movement::input_acceleration)
-			.def_readwrite("max_speed", &movement::max_speed);
+			.def_readwrite("braking_damping", &movement::braking_damping)
+			.def_readwrite("max_speed", &movement::max_speed)
+			.def_readwrite("air_resistance", &movement::air_resistance);
 	}
 }

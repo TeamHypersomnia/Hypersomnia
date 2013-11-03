@@ -22,6 +22,10 @@ namespace augmentations {
 		void processing_system::process_entities(world&) {
 
 		}
+
+		void processing_system::substep(world&) {
+
+		}
 		
 		void processing_system::process_events(world&) {
 
