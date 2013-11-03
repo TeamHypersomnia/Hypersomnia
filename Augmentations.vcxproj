@@ -54,7 +54,8 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PreprocessorDefinitions>_MBCS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <MinimalRebuild>true</MinimalRebuild>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -71,7 +72,7 @@
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <MinimalRebuild>true</MinimalRebuild>
     </ClCompile>
     <Link>
@@ -83,6 +84,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="3rdparty\b2Separator\b2Separator.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\b2BroadPhase.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\b2CollideCircle.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\b2CollideEdge.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\b2CollidePolygon.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\b2Collision.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\b2Distance.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\b2DynamicTree.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\b2TimeOfImpact.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2CircleShape.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2EdgeShape.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2PolygonShape.cpp" />
     <ClCompile Include="3rdparty\lua\lapi.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -243,18 +256,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="3rdparty\Box2D\Collision\b2BroadPhase.cpp" />
-    <ClCompile Include="3rdparty\Box2D\Collision\b2CollideCircle.cpp" />
-    <ClCompile Include="3rdparty\Box2D\Collision\b2CollideEdge.cpp" />
-    <ClCompile Include="3rdparty\Box2D\Collision\b2CollidePolygon.cpp" />
-    <ClCompile Include="3rdparty\Box2D\Collision\b2Collision.cpp" />
-    <ClCompile Include="3rdparty\Box2D\Collision\b2Distance.cpp" />
-    <ClCompile Include="3rdparty\Box2D\Collision\b2DynamicTree.cpp" />
-    <ClCompile Include="3rdparty\Box2D\Collision\b2TimeOfImpact.cpp" />
-    <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.cpp" />
-    <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2CircleShape.cpp" />
-    <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2EdgeShape.cpp" />
-    <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2PolygonShape.cpp" />
     <ClCompile Include="3rdparty\Box2D\Common\b2BlockAllocator.cpp" />
     <ClCompile Include="3rdparty\Box2D\Common\b2Draw.cpp" />
     <ClCompile Include="3rdparty\Box2D\Common\b2Math.cpp" />
@@ -466,9 +467,13 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="SDK\topdown\bindings\steering_component_binding.cpp" />
+    <ClCompile Include="SDK\topdown\bindings\steering_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="SDK\topdown\resources\fbo.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SDK\topdown\resources\vertex.cpp" />
     <ClCompile Include="SDK\topdown\systems\ai_system.cpp">
@@ -477,6 +482,7 @@
     </ClCompile>
     <ClCompile Include="SDK\topdown\systems\steering_system.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -611,6 +617,52 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\b2Separator\b2Separator.h" />
+    <ClInclude Include="3rdparty\Box2D\Box2D.h" />
+    <ClInclude Include="3rdparty\Box2D\Collision\b2BroadPhase.h" />
+    <ClInclude Include="3rdparty\Box2D\Collision\b2Collision.h" />
+    <ClInclude Include="3rdparty\Box2D\Collision\b2Distance.h" />
+    <ClInclude Include="3rdparty\Box2D\Collision\b2DynamicTree.h" />
+    <ClInclude Include="3rdparty\Box2D\Collision\b2TimeOfImpact.h" />
+    <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h" />
+    <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2CircleShape.h" />
+    <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2EdgeShape.h" />
+    <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2PolygonShape.h" />
+    <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2Shape.h" />
+    <ClInclude Include="3rdparty\Box2D\Common\b2BlockAllocator.h" />
+    <ClInclude Include="3rdparty\Box2D\Common\b2Draw.h" />
+    <ClInclude Include="3rdparty\Box2D\Common\b2GrowableStack.h" />
+    <ClInclude Include="3rdparty\Box2D\Common\b2Math.h" />
+    <ClInclude Include="3rdparty\Box2D\Common\b2Settings.h" />
+    <ClInclude Include="3rdparty\Box2D\Common\b2StackAllocator.h" />
+    <ClInclude Include="3rdparty\Box2D\Common\b2Timer.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\b2Body.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\b2ContactManager.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\b2Fixture.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\b2Island.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\b2TimeStep.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\b2World.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\b2WorldCallbacks.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2ChainAndCircleContact.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2ChainAndPolygonContact.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2CircleContact.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2Contact.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2ContactSolver.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2EdgeAndCircleContact.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2EdgeAndPolygonContact.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2PolygonAndCircleContact.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2PolygonContact.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2DistanceJoint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2FrictionJoint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2GearJoint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2Joint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2MouseJoint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2PrismaticJoint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2PulleyJoint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2RevoluteJoint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2RopeJoint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2WeldJoint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2WheelJoint.h" />
+    <ClInclude Include="3rdparty\Box2D\Rope\b2Rope.h" />
     <ClInclude Include="3rdparty\poly2tri\common\shapes.h" />
     <ClInclude Include="3rdparty\poly2tri\common\utils.h" />
     <ClInclude Include="3rdparty\poly2tri\poly2tri.h" />

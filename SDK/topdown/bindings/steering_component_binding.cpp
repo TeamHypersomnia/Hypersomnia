@@ -14,17 +14,24 @@ namespace bindings {
 			.def_readwrite("max_force_applied", &steering::behaviour::max_force_applied)
 			.def_readwrite("weight", &steering::behaviour::weight)
 			.def_readwrite("erase_when_target_reached", &steering::behaviour::erase_when_target_reached)
+			.def_readwrite("enabled", &steering::behaviour::enabled)
+			.def_readwrite("force_color", &steering::behaviour::force_color)
+			.def_readwrite("last_estimated_pursuit_position", &steering::behaviour::last_estimated_pursuit_position)
+			.def_readwrite("arrival_slowdown_radius", &steering::behaviour::arrival_slowdown_radius)
+			.def_readwrite("max_target_future_prediction_ms", &steering::behaviour::max_target_future_prediction_ms)
+			.def_readwrite("effective_fleeing_radius", &steering::behaviour::effective_fleeing_radius)
 			.enum_("script_type")[
 				luabind::value("SEEK", steering::behaviour::SEEK),
-					luabind::value("FLEE", steering::behaviour::FLEE),
-					luabind::value("ARRIVAL", steering::behaviour::ARRIVAL),
-					luabind::value("PURSUIT", steering::behaviour::PURSUIT)
+				luabind::value("FLEE", steering::behaviour::FLEE),
+				luabind::value("PURSUIT", steering::behaviour::PURSUIT),
+				luabind::value("EVASION", steering::behaviour::EVASION)
 			],
 
 			luabind::class_<steering>("steering_component")
 			.def(luabind::constructor<>())
 			.def("add_behaviour", &steering::add_behaviour)
 			.def("clear_behaviours", &steering::clear_behaviours)
+			.def_readwrite("max_resultant_force", &steering::max_resultant_force)
 			);
 	}
 }

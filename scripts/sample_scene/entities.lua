@@ -9,9 +9,15 @@ scenes = {
 
 scene = scenes.ALL
 
+
 ai_system.draw_cast_rays = 0
-ai_system.draw_triangle_edges = 1
-ai_system.draw_discontinuities = 1
+ai_system.draw_triangle_edges = 0
+ai_system.draw_discontinuities = 0
+
+render_system.draw_steering_forces = 1
+render_system.draw_substeering_forces = 1
+render_system.draw_velocities = 1
+
 render_system.visibility_expansion = 1.0
 render_system.max_visibility_expansion_distance = 1
 render_system.draw_visibility = 0
@@ -303,15 +309,17 @@ my_npc_archetype = {
 				
 				angular_damping = 5,
 				linear_damping = 3,
+				
 				fixed_rotation = false,
 				density = 0.1
 			},
 		},
 		
 		movement = {
-			input_acceleration = vec2(15000, 15000),
+			input_acceleration = vec2(30000, 30000),
 			
-			max_speed = 20000,
+			air_resistance = 0.0,
+			max_speed = 1100,
 			
 			receivers = {
 				{ target = "body", stop_at_zero_movement = false }, 
@@ -331,10 +339,6 @@ my_npc_archetype = {
 			visibility_square_side = 6000,
 			visibility_color = rgba(255, 0, 255, 255),
 			visibility_subject = false
-		},
-		
-		steering = {
-		
 		}
 	},
 	
@@ -364,16 +368,7 @@ my_npc_archetype = {
 	}
 }
 
-if scene == scenes.ALL then
-create_entity_group (archetyped(my_npc_archetype, {
-		body = {
-			transform = {
-				pos = vec2(-540, 1020),
-				rotation = 0
-			}
-		}
-	}))
-	
+if scene == scenes.ALL then	
 create_entity_group (archetyped(my_npc_archetype, {
 	body = {
 		transform = {
@@ -487,22 +482,6 @@ my_scriptable_info = create_scriptable_info {
 	}
 }
 
-loop_only_info = create_scriptable_info {
-	scripted_events = {
-		[scriptable_component.LOOP] 	=
-			function(message)
-				my_atlas:_bind()
-				return true
-			end
-	}
-}
-
-create_entity {
-	scriptable = {
-		available_scripts = loop_only_info
-	}
-}
-
 create_entity (archetyped(metal_archetype, {
 	transform = {
 		pos = vec2(100, 300),
@@ -534,6 +513,7 @@ main_context = create_input_context {
 		[keys.S] 				= intent_message.MOVE_BACKWARD,
 		[keys.A] 				= intent_message.MOVE_LEFT,
 		[keys.D] 				= intent_message.MOVE_RIGHT,
+		[keys.R] 				= custom_intents.STEERING_REQUEST,
 		[mouse.ldoubleclick] 	= intent_message.SHOOT,
 		[mouse.ltripleclick] 	= intent_message.SHOOT,
 		[mouse.ldown] 			= intent_message.SHOOT,
@@ -625,6 +605,133 @@ world_camera = create_entity (archetyped(camera_archetype, {
 		available_scripts = scriptable_zoom
 	}
 }))
+
+if scene == scenes.ALL then
+
+target_entity = create_entity {
+	render = {
+		model = crosshair_sprite,
+		layer = render_layers.GUI_OBJECTS
+	},
+	
+	transform = {} 
+}
+
+flee_behaviour = create_steering_behaviour {
+	current_target = target_entity,
+	weight = 1,
+	behaviour_type = steering_behaviour.FLEE,
+	enabled = true,
+	erase_when_target_reached = false,
+	effective_fleeing_radius = 500,
+	force_color = rgba(255, 0, 0, 255)
+}
+		
+seek_behaviour = create_steering_behaviour {
+	current_target = player.body,
+	weight = 1,
+	behaviour_type = steering_behaviour.SEEK,
+	enabled = true,
+	erase_when_target_reached = false,
+	arrival_slowdown_radius = 500,
+	force_color = rgba(0, 255, 255, 255)
+}			
+
+pursuit_behaviour = create_steering_behaviour {
+	current_target = player.body,
+	weight = 1.0,
+	behaviour_type = steering_behaviour.PURSUIT,
+	enabled = true,
+	max_target_future_prediction_ms = 0.5,
+	force_color = rgba(0, 255, 255, 255)
+}
+
+evasion_behaviour = create_steering_behaviour {
+	current_target = player.body,
+	weight = 1.2,
+	behaviour_type = steering_behaviour.EVASION,
+	enabled = true,
+	max_target_future_prediction_ms = 0.2,
+	effective_fleeing_radius = 700,
+	force_color = rgba(255, 0, 0, 255)
+}
+					
+scripted_steering = create_scriptable_info {
+	scripted_events = {
+		[scriptable_component.INTENT_MESSAGE] = function(message)
+				if message.intent == custom_intents.STEERING_REQUEST then
+					target_entity.transform.current.pos = player.crosshair.transform.current.pos
+					message.subject.steering:clear_behaviours()
+					message.subject.steering:add_behaviour(evasion_behaviour)
+					message.subject.steering:add_behaviour(pursuit_behaviour)
+					--message.subject.steering:add_behaviour(flee_behaviour)
+					--message.subject.steering:add_behaviour(seek_behaviour)
+				end
+			return true
+		end
+	}
+}
+
+create_entity_group (archetyped(my_npc_archetype, {
+	body = {
+		transform = {
+			pos = vec2(-540, 1020),
+			rotation = 0
+		},
+		
+		scriptable = {
+			available_scripts = scripted_steering
+		},
+	
+		input = {
+			custom_intents.STEERING_REQUEST
+		},
+		
+		steering = {
+			max_resultant_force = 2500 -- -1 = no force clamping
+		},
+		
+		movement = {
+			max_speed = 3000
+		},
+		
+		lookat = {
+			target = player.body,
+			look_mode = lookat_component.POSITION
+		}
+	}
+}))	
+end
+
+blue_crosshair_sprite = create_sprite {
+	image = images.crosshair,
+	color = rgba(255, 255, 255, 255)
+}
+
+blue_crosshair = create_entity {
+	transform = {},
+	
+	render = {
+		model = blue_crosshair_sprite
+	}
+}
+
+loop_only_info = create_scriptable_info {
+	scripted_events = {
+		[scriptable_component.LOOP] 	=
+			function(message)
+				my_atlas:_bind()
+				blue_crosshair.transform.current.pos = evasion_behaviour.last_estimated_pursuit_position
+				return true
+			end
+	}
+}
+
+create_entity {
+	scriptable = {
+		available_scripts = loop_only_info
+	}
+}
 
 set_zoom_level(world_camera)
 --npc_camera = create_entity (archetyped(camera_archetype, {

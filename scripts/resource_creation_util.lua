@@ -165,3 +165,13 @@ function set_physics_info(my_body_data, entries)
 		end
 	end
 end
+
+function create_steering_behaviour(entries)
+	local my_behaviour = steering_behaviour()
+	
+	rewrite(my_behaviour, entries, { current_target = true })
+	if entries.current_target ~= nil then 
+		my_behaviour.current_target:set(entries.current_target) 
+	end
+	return my_behaviour
+end

@@ -83,6 +83,8 @@ int main() {
 	my_world.add_system(&input);
 	my_world.add_system(&steering);
 	my_world.add_system(&movement);
+	physics.substepping_systems.push_back(&steering);
+	physics.substepping_systems.push_back(&movement);
 	my_world.add_system(&physics);
 	my_world.add_system(&lookat);
 	my_world.add_system(&chase);
@@ -128,7 +130,7 @@ int main() {
 
 		for (auto& script_to_reload : scripts_reloaded) {
 			if (script_to_reload->reload_scene_when_modified) {
-				my_world.delete_all_entities();
+				my_world.delete_all_entities(true);
 				break;
 			}
 		}
