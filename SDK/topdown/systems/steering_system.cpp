@@ -63,7 +63,8 @@ vec2<> steering_system::flee(vec2<> position, vec2<> velocity, vec2<> target, fl
 	return direction * max_speed - velocity;
 }
 
-vec2<> steering_system::predict_interception(vec2<> position, vec2<> velocity, vec2<> target, vec2<> target_velocity, float max_prediction_ms) {
+vec2<> steering_system::predict_interception(vec2<> position, vec2<> velocity, vec2<> target, vec2<> target_velocity, float max_prediction_ms,
+	bool flee_prediction) {
 	auto offset = target - position;
 	auto distance = offset.length();
 	
@@ -74,8 +75,13 @@ vec2<> steering_system::predict_interception(vec2<> position, vec2<> velocity, v
 	auto parallelness = unit_vel.dot(target_velocity / target_velocity.length());
 
 	float time_factor = 1.f;
-	if (forwardness > 0.707f && parallelness < -0.707f)
+	
+	if (flee_prediction && forwardness < -0.707f && parallelness > 0.707f) {
 		time_factor = 0.2f;
+	}
+	else if (forwardness > 0.707f && parallelness < -0.707f) {
+		time_factor = 0.2f;
+	}
 
 	return target + target_velocity * std::min(max_prediction_ms, time_factor * (distance / speed));
 }
@@ -120,7 +126,7 @@ void steering_system::substep(world& owner) {
 				behaviour.last_estimated_pursuit_position = 
 					predict_interception(transform.pos, velocity, target_transform.pos, 
 					vec2<>(behaviour.current_target->get<components::physics>().body->GetLinearVelocity())*METERS_TO_PIXELSf,
-					behaviour.max_target_future_prediction_ms);
+					behaviour.max_target_future_prediction_ms, behaviour.behaviour_type == steering::behaviour::EVASION);
 
 				if (behaviour.behaviour_type == steering::behaviour::PURSUIT)
 					added_force = seek(transform.pos, velocity, behaviour.last_estimated_pursuit_position, max_speed, behaviour.arrival_slowdown_radius);

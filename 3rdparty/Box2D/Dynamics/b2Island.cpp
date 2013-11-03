@@ -195,7 +195,6 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 		float32 a = b->m_sweep.a;
 		b2Vec2 v = b->m_linearVelocity;
 		float32 w = b->m_angularVelocity;
-		float32 max_speed = b->m_max_speed;
 
 		// Store positions for continuous collision.
 		b->m_sweep.c0 = b->m_sweep.c;
@@ -221,10 +220,10 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 		m_positions[i].c = c;
 		m_positions[i].a = a;
 
-		if (max_speed >= 0.f) {
+		if (b->m_max_speed >= 0.f) {
 			float32 speed = v.Normalize();
-			if (speed > max_speed)
-				v *= max_speed;
+			if (speed > b->m_max_speed)
+				v *= b->m_max_speed;
 			else v *= speed;
 		}
 

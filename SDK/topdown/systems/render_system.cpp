@@ -94,7 +94,7 @@ void render_system::render(rects::xywh visible_area) {
 		for (auto it : targets) {
 			auto* ai = it->find<components::ai>();
 			if (ai) {
-				glColor4ub(ai->visibility_color.r, ai->visibility_color.g, ai->visibility_color.b, 62);
+				glColor4ub(ai->visibility_color.r, ai->visibility_color.g, ai->visibility_color.b, ai->visibility_color.a/2);
 				auto origin = it->get<components::transform>().current.pos;
 
 				for (int i = 0; i < ai->get_num_triangles(); ++i) {

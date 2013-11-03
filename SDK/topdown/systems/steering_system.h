@@ -16,5 +16,5 @@ public:
 
 	vec2<> steering_system::seek(vec2<> position, vec2<> velocity, vec2<> target, float max_speed, float arrival_radius);
 	vec2<> steering_system::flee(vec2<> position, vec2<> velocity, vec2<> target, float max_speed, float flee_radius);
-	vec2<> predict_interception(vec2<> position, vec2<> velocity, vec2<> target, vec2<> target_velocity, float max_prediction_ms);
+	vec2<> predict_interception(vec2<> position, vec2<> velocity, vec2<> target, vec2<> target_velocity, float max_prediction_ms, bool);
 };

@@ -11,7 +11,7 @@ scene = scenes.ALL
 
 
 ai_system.draw_cast_rays = 0
-ai_system.draw_triangle_edges = 0
+ai_system.draw_triangle_edges = 1
 ai_system.draw_discontinuities = 0
 
 render_system.draw_steering_forces = 1
@@ -377,7 +377,7 @@ create_entity_group (archetyped(my_npc_archetype, {
 		},
 		
 		ai = {
-			visibility_color = rgba(0, 255, 0, 255)
+			visibility_color = rgba(0, 255, 0, 0)
 		}
 	}
 }))
@@ -430,7 +430,7 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 		},
 		
 		ai = {
-			visibility_color = rgba(255, 255, 255, 255),
+			visibility_color = rgba(255, 255, 255, 0),
 			visibility_subject = true
 		}
 		
@@ -648,10 +648,10 @@ pursuit_behaviour = create_steering_behaviour {
 
 evasion_behaviour = create_steering_behaviour {
 	current_target = player.body,
-	weight = 1.2,
+	weight = 3.0,
 	behaviour_type = steering_behaviour.EVASION,
 	enabled = true,
-	max_target_future_prediction_ms = 0.2,
+	max_target_future_prediction_ms = 0.3,
 	effective_fleeing_radius = 700,
 	force_color = rgba(255, 0, 0, 255)
 }
@@ -675,7 +675,7 @@ scripted_steering = create_scriptable_info {
 create_entity_group (archetyped(my_npc_archetype, {
 	body = {
 		transform = {
-			pos = vec2(-540, 1020),
+			pos = vec2(-540, 120),
 			rotation = 0
 		},
 		
@@ -688,7 +688,7 @@ create_entity_group (archetyped(my_npc_archetype, {
 		},
 		
 		steering = {
-			max_resultant_force = 2500 -- -1 = no force clamping
+			max_resultant_force = 3000 -- -1 = no force clamping
 		},
 		
 		movement = {
