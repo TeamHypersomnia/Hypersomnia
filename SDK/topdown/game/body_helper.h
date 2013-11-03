@@ -8,7 +8,7 @@ namespace augmentations {
 }
 
 namespace resources {
-	class polygon;
+	struct polygon;
 }
 
 namespace topdown {

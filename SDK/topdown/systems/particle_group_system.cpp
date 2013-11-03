@@ -7,7 +7,7 @@
 #include "../messages/destroy_message.h"
 
 void particle_group_system::process_entities(world& owner) {
-	double delta = timer.extract<std::chrono::milliseconds>();
+	float delta = static_cast<float>(timer.extract<std::chrono::milliseconds>());
 
 	for (auto it : targets) {
 		auto& group = it->get<components::particle_group>();
@@ -15,11 +15,11 @@ void particle_group_system::process_entities(world& owner) {
 
 		if (group.stream_info) {
 			auto& stream = *group.stream_info;
-			double stream_delta = std::min(delta, static_cast<double>(group.stream_max_lifetime_ms - group.stream_lifetime_ms));
+			float stream_delta = std::min(delta, group.stream_max_lifetime_ms - group.stream_lifetime_ms);
 			group.stream_lifetime_ms += stream_delta;
 			group.stream_lifetime_ms = std::min(group.stream_lifetime_ms, group.stream_max_lifetime_ms);
 
-			group.stream_particles_to_spawn += randval(stream.particles_per_sec.first, stream.particles_per_sec.second) * (stream_delta / 1000.0);
+			group.stream_particles_to_spawn += randval(stream.particles_per_sec.first, stream.particles_per_sec.second) * (stream_delta / 1000.f);
 
 			while (group.stream_particles_to_spawn >= 1.f) {
 				particle_emitter_system::spawn_particle(group, transform.pos, transform.rotation + 
@@ -34,8 +34,8 @@ void particle_group_system::process_entities(world& owner) {
 			particle.pos += particle.vel * delta / 1000.0;
 			particle.rotation += particle.rotation_speed * delta;
 			
-			particle.vel.damp(particle.linear_damping * delta / 1000.0);
-			damp(particle.rotation_speed, particle.angular_damping * delta / 1000.0);
+			particle.vel.damp(particle.linear_damping * delta / 1000.f);
+			damp(particle.rotation_speed, particle.angular_damping * delta / 1000.f);
 
 			particle.lifetime_ms += delta;
 		}

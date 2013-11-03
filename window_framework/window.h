@@ -6,7 +6,7 @@
 #include "../utility/timer.h"
 #include <functional>
 
-class lua_State;
+struct lua_State;
 
 namespace augmentations {
 	namespace config {

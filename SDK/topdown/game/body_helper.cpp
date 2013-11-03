@@ -93,7 +93,7 @@ namespace topdown {
 
 		auto& transform = subject.get<components::transform>().current;
 
-		body->SetTransform(transform.pos*PIXELS_TO_METERSf, transform.rotation*0.01745329251994329576923690768489);
+		body->SetTransform(transform.pos*PIXELS_TO_METERSf, transform.rotation*0.01745329251994329576923690768489f);
 
 		body->SetAngularDamping(body_data.angular_damping);
 		body->SetLinearDamping(body_data.linear_damping);

@@ -2,9 +2,9 @@
 #include <Box2D/Common/b2Math.h>
 #include "rects.h"
 namespace augmentations {
-	template <class type_val, class type_len>
-	void damp(type_val& val, type_len len) {
-		type_len zero = static_cast<type_len>(0);
+	template <class type_val>
+	void damp(type_val& val, type_val len) {
+		type_val zero = static_cast<type_val>(0);
 		if (val > zero) {
 			val -= len;
 			if (val < zero) 
@@ -19,7 +19,7 @@ namespace augmentations {
 
 	template <class vec, class d>
 	vec& rotate(vec& v, const vec& origin, d angle) {
-		angle *= 0.01745329251994329576923690768489;
+		angle *= static_cast<d>(0.01745329251994329576923690768489);
 		auto s = sin(angle);
 		auto c = cos(angle);
 		vec rotated;
@@ -43,7 +43,9 @@ namespace augmentations {
 		target.y = source.y;
 	}
 
-	template <class type = float>
+	template <class type = float> struct vec2;
+
+	template <class type>
 	struct vec2 {
 		type x, y;
 		
@@ -79,6 +81,10 @@ namespace augmentations {
 			return t;
 		}
 
+		float dot(vec2 v) const {
+			return x * v.x + y * v.y;
+		}
+
 		float length() const {
 			return sqrt(length_sq());
 		}
@@ -92,7 +98,7 @@ namespace augmentations {
 		}
 
 		float get_degrees() const {
-			return get_radians()*180.0/3.141592653589793238462;
+			return get_radians()*180.0f/3.141592653589793238462f;
 		}
 
 		template<class A, class B>
@@ -108,7 +114,7 @@ namespace augmentations {
 		}
 
 		vec2& set_from_degrees(float degrees) {
-			float radians = degrees * 0.01745329251994329576923690768489;
+			float radians = degrees * 0.01745329251994329576923690768489f;
 			set(cos(radians), sin(radians));
 			normalize();
 			return *this;
@@ -177,20 +183,20 @@ namespace augmentations {
 		template <class v> vec2 operator*(const v& p) const { return vec2(x * p.x, y * p.y); }
 		template <class v> vec2 operator/(const v& p) const { return vec2(x / p.x, y / p.y); }
 
-		vec2 operator-(double d) const { return vec2(x - d, y - d); }
-		vec2 operator+(double d) const { return vec2(x + d, y + d); }
-		vec2 operator*(double d) const { return vec2(x * d, y * d); }
-		vec2 operator/(double d) const { return vec2(x / d, y / d); }
+		vec2 operator-(double d) const { return vec2(x - static_cast<type>(d), y - static_cast<type>(d)); }
+		vec2 operator+(double d) const { return vec2(x + static_cast<type>(d), y + static_cast<type>(d)); }
+		vec2 operator*(double d) const { return vec2(x * static_cast<type>(d), y * static_cast<type>(d)); }
+		vec2 operator/(double d) const { return vec2(x / static_cast<type>(d), y / static_cast<type>(d)); }
 		
 		vec2 operator-(float d) const { return vec2(x - d, y - d); }
 		vec2 operator+(float d) const { return vec2(x + d, y + d); }
 		vec2 operator*(float d) const { return vec2(x * d, y * d); }
 		vec2 operator/(float d) const { return vec2(x / d, y / d); }
 		
-		vec2 operator-(int d) const { return vec2(x - d, y - d); }
-		vec2 operator+(int d) const { return vec2(x + d, y + d); }
-		vec2 operator*(int d) const { return vec2(x * d, y * d); }
-		vec2 operator/(int d) const { return vec2(x / d, y / d); }
+		vec2 operator-(int d) const { return vec2(x - static_cast<type>(d), y - static_cast<type>(d)); }
+		vec2 operator+(int d) const { return vec2(x + static_cast<type>(d), y + static_cast<type>(d)); }
+		vec2 operator*(int d) const { return vec2(x * static_cast<type>(d), y * static_cast<type>(d)); }
+		vec2 operator/(int d) const { return vec2(x / static_cast<type>(d), y / static_cast<type>(d)); }
 
 		template <class v> vec2& operator-=(const v& p) { x -= p.x; y -= p.y; return *this; }
 		template <class v> vec2& operator+=(const v& p) { x += p.x; y += p.y; return *this; }

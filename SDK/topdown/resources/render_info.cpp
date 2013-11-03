@@ -133,7 +133,7 @@ namespace resources {
 		model.reserve(model.size() + polygon.vertices.size());
 
 		int offset = model.size();
-		for (int i = 0; i < polygon.vertices.size(); ++i) {
+		for (size_t i = 0; i < polygon.vertices.size(); ++i) {
 			points.push_back(Point(polygon.vertices[i].position.x, polygon.vertices[i].position.y, i + offset));
 			model.push_back(polygon.vertices[i]);
 		}
@@ -166,7 +166,7 @@ namespace resources {
 				v.position += transform.pos - camera_pos;
 		}
 
-		for (int i = 0; i < indices.size(); i += 3) {
+		for (size_t i = 0; i < indices.size(); i += 3) {
 			new_tri.vertices[0] = model_transformed[indices[i]];
 			new_tri.vertices[1] = model_transformed[indices[i + 1]];
 			new_tri.vertices[2] = model_transformed[indices[i + 2]];
@@ -181,7 +181,7 @@ namespace components {
 			auto temp_alpha = it.face.color.a;
 
 			if (it.should_disappear)
-				it.face.color.a = ((it.max_lifetime_ms - it.lifetime_ms) / it.max_lifetime_ms) * temp_alpha;
+				it.face.color.a = static_cast<graphics::color>(((it.max_lifetime_ms - it.lifetime_ms) / it.max_lifetime_ms) * static_cast<float>(temp_alpha));
 
 			it.face.draw(triangles, components::transform::state(it.pos, it.rotation), camera_pos);
 			it.face.color.a = temp_alpha;

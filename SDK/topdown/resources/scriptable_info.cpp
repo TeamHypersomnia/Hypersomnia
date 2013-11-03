@@ -140,7 +140,7 @@ namespace resources {
 				std::string script_file;
 
 				t.seekg(0, std::ios::end);
-				script_file.reserve(t.tellg());
+				script_file.reserve(static_cast<unsigned>(t.tellg()));
 				t.seekg(0, std::ios::beg);
 
 				script_file.assign((std::istreambuf_iterator<char>(t)),

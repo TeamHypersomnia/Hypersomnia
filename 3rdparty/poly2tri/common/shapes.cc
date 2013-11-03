@@ -164,6 +164,7 @@ int Triangle::Index(const Point* p)
     return 2;
   }
   assert(0);
+  return -1;
 }
 
 int Triangle::EdgeIndex(const Point* p1, const Point* p2)

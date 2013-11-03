@@ -72,7 +72,7 @@ void gun_system::process_entities(world& owner) {
 
 				owner.post_message(burst);
  
-				for (int i = 0; i < gun.bullets_once; ++i) {
+				for (unsigned i = 0; i < gun.bullets_once; ++i) {
 					entity& new_bullet = owner.create_entity();
 
 					/* randomize bullet direction taking spread into account */
