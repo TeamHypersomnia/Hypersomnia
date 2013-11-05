@@ -7,17 +7,8 @@
 #include "../messages/steering_message.h"
 #include "render_system.h"
 
-void steering_system::process_events(world& owner) {
-	//auto events = owner.get_message_queue<messages::steering_input_message>();
-	//
-	//for (auto it : events) {
-	//
-	//}
-}
-
-void steering_system::process_entities(world& owner) {
-
-}
+void steering_system::process_events(world& owner) {}
+void steering_system::process_entities(world& owner) {}
 
 vec2<> steering_system::seek(vec2<> position, vec2<> velocity, vec2<> target, float max_speed, float arrival_radius) {
 	auto direction = target - position;
@@ -31,12 +22,13 @@ vec2<> steering_system::seek(vec2<> position, vec2<> velocity, vec2<> target, fl
 	if (arrival_radius > 0.f) {
 		/* get the proportion and clip it to max_speed */
 		auto clipped_speed = std::min(max_speed, max_speed * (distance / arrival_radius));
+		/* obtain desired velocity, direction is normalized */
 		auto desired_velocity = direction * clipped_speed;
 		return desired_velocity - velocity;
 	}
 
 	/* steer in the direction of difference between maximum desired speed and the actual velocity
-		note that the first operand is MAXIMUM velocity so we effectively increase velocity up to max_speed
+		note that the vector we substract from is MAXIMUM velocity so we effectively increase velocity up to max_speed
 	*/
 	return (direction * max_speed - velocity);
 }
@@ -48,10 +40,12 @@ vec2<> steering_system::flee(vec2<> position, vec2<> velocity, vec2<> target, fl
 	/* handle pathological case, if we're directly at target just choose random unit vector */
 	if (position == target)
 		direction = vec2<>(1, 0);
+	/* else just normalize offset */
 	else direction /= distance;
 
 	/* if we want to constrain effective fleeing range */
 	if (flee_radius > 0.f) {
+		/* get the proportion and clip it to max_speed */
 		auto clipped_speed = std::max(0.f, (max_speed * (1 - (distance / flee_radius))));
 		auto desired_velocity = direction * clipped_speed;
 		
@@ -65,25 +59,32 @@ vec2<> steering_system::flee(vec2<> position, vec2<> velocity, vec2<> target, fl
 
 vec2<> steering_system::predict_interception(vec2<> position, vec2<> velocity, vec2<> target, vec2<> target_velocity, float max_prediction_ms,
 	bool flee_prediction) {
+
 	auto offset = target - position;
 	auto distance = offset.length();
 	
 	auto speed = velocity.length();
 	auto unit_vel = velocity / speed;
 
+	/* how parallel is our current velocity and the direction we our target is to */
 	auto forwardness = unit_vel.dot(offset / distance);
+	/* how parallel is our current velocity and the target's current velocity */
 	auto parallelness = unit_vel.dot(target_velocity / target_velocity.length());
 
 	float time_factor = 1.f;
 	
-	if (flee_prediction && forwardness < -0.707f && parallelness > 0.707f) {
+	/* if we are fleeing and our chaser is right behind our back, there's no point in predicting far positions 
+		as it would turn as towards the chaser */
+	if (flee_prediction && forwardness < -0.707f && parallelness > 0.707f)
 		time_factor = 0.2f;
-	}
-	else if (forwardness > 0.707f && parallelness < -0.707f) {
+	/* if we are chasing the target and it is dead ahead running towards us, there's no point in predicting far positions
+		as it would turn as away from the target
+	*/
+	else if (forwardness > 0.707f && parallelness < -0.707f)
 		time_factor = 0.2f;
-	}
 
-	return target + target_velocity * std::min(max_prediction_ms, time_factor * (distance / speed));
+	/* return the point of interception, clamping maximum prediction time to max_prediction_ms milliseconds (velocities are in seconds) */
+	return target + target_velocity * std::min(max_prediction_ms/1000.f, time_factor * (distance / speed));
 }
 
 

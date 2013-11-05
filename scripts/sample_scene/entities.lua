@@ -642,7 +642,7 @@ pursuit_behaviour = create_steering_behaviour {
 	weight = 1.0,
 	behaviour_type = steering_behaviour.PURSUIT,
 	enabled = true,
-	max_target_future_prediction_ms = 0.5,
+	max_target_future_prediction_ms = 500,
 	force_color = rgba(0, 255, 255, 255)
 }
 
@@ -651,7 +651,7 @@ evasion_behaviour = create_steering_behaviour {
 	weight = 3.0,
 	behaviour_type = steering_behaviour.EVASION,
 	enabled = true,
-	max_target_future_prediction_ms = 0.3,
+	max_target_future_prediction_ms = 300,
 	effective_fleeing_radius = 700,
 	force_color = rgba(255, 0, 0, 255)
 }
