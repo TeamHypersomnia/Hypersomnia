@@ -24,6 +24,7 @@ public:
 		augmentations::vec2<> a, b;
 	};
 	std::vector<debug_line> lines;
+	std::vector<debug_line> manually_cleared_lines;
 
 	fbo scene_fbo, postprocess_fbo;
 
@@ -34,6 +35,8 @@ public:
 	int draw_steering_forces;
 	int draw_substeering_forces;
 	int draw_velocities;
+
+	int draw_avoidance_info;
 
 	window::glwindow& output_window;
 	render_system(window::glwindow& output_window);

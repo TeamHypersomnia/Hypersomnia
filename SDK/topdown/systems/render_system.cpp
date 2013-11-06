@@ -13,7 +13,8 @@ render_system::render_system(window::glwindow& output_window)
 	draw_visibility(0),
 	draw_substeering_forces(0),
 	draw_steering_forces(0),
-	draw_velocities(0)
+	draw_velocities(0),
+	draw_avoidance_info(0)
 {
 	output_window.current();
 
@@ -135,9 +136,15 @@ void render_system::render(rects::xywh visible_area) {
 	glBegin(GL_LINES);
 	for (auto& line : lines) {
 		glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
-		glVertex2f(line.a.x*METERS_TO_PIXELSf - last_camera.pos.x, line.a.y*METERS_TO_PIXELSf - last_camera.pos.y);
-		glVertex2f(line.b.x*METERS_TO_PIXELSf - last_camera.pos.x, line.b.y*METERS_TO_PIXELSf - last_camera.pos.y);
+		glVertex2f(line.a.x - last_camera.pos.x, line.a.y - last_camera.pos.y);
+		glVertex2f(line.b.x - last_camera.pos.x, line.b.y - last_camera.pos.y);
 	}
+	for (auto& line : manually_cleared_lines) {
+		glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
+		glVertex2f(line.a.x - last_camera.pos.x, line.a.y - last_camera.pos.y);
+		glVertex2f(line.b.x - last_camera.pos.x, line.b.y - last_camera.pos.y);
+	}
+
 	lines.clear();
 	glEnd();
 
