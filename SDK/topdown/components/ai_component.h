@@ -13,7 +13,7 @@ namespace components {
 		augmentations::graphics::pixel_32 visibility_color;
 
 		float visibility_square_side;
-		std::vector<augmentations::vec2<>> vision_points;
+		std::vector<std::pair<augmentations::vec2<>, augmentations::vec2<>>> vision_edges;
 
 		int get_num_triangles();
 		

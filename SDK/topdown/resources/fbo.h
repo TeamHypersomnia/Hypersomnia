@@ -4,7 +4,6 @@ class fbo {
 	GLuint fboId, textureId, width, height;
 	bool created;
 	fbo& operator=(const fbo&) {}
-	fbo(const fbo&) {}
 
 	static GLuint currently_bound_fbo;
 public:
