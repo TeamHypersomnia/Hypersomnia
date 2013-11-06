@@ -20,11 +20,14 @@ namespace bindings {
 			.def_readwrite("arrival_slowdown_radius", &steering::behaviour::arrival_slowdown_radius)
 			.def_readwrite("max_target_future_prediction_ms", &steering::behaviour::max_target_future_prediction_ms)
 			.def_readwrite("effective_fleeing_radius", &steering::behaviour::effective_fleeing_radius)
+			.def_readwrite("intervention_time_ms", &steering::behaviour::intervention_time_ms)
+			.def_readwrite("avoidance_rectangle_width", &steering::behaviour::avoidance_rectangle_width)
 			.enum_("script_type")[
 				luabind::value("SEEK", steering::behaviour::SEEK),
 				luabind::value("FLEE", steering::behaviour::FLEE),
 				luabind::value("PURSUIT", steering::behaviour::PURSUIT),
-				luabind::value("EVASION", steering::behaviour::EVASION)
+				luabind::value("EVASION", steering::behaviour::EVASION),
+				luabind::value("OBSTACLE_AVOIDANCE", steering::behaviour::OBSTACLE_AVOIDANCE)
 			],
 
 			luabind::class_<steering>("steering_component")

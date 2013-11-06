@@ -5,6 +5,8 @@
 #include "entity_system/world.h"
 
 #include "../messages/steering_message.h"
+#include "../components/ai_component.h"
+
 #include "render_system.h"
 
 void steering_system::process_events(world& owner) {}
@@ -87,9 +89,213 @@ vec2<> steering_system::predict_interception(vec2<> position, vec2<> velocity, v
 	return target + target_velocity * std::min(max_prediction_ms/1000.f, time_factor * (distance / speed));
 }
 
+#include <queue>
+
+render_system* _render = nullptr;
+
+bool steering_system::avoid_collisions(vec2<> position, vec2<> velocity, float avoidance_rectangle_width, vec2<> target,
+	std::vector < std::pair < vec2<>, vec2< >> > &visibility_edges, float intervention_time_ms, vec2<>& best_candidate, int attempt) {
+		//float speed = velocity.length();
+		//if (speed < 0.00001f) return false;
+		//vec2<> direction = velocity / speed;
+
+
+		//velocity.normalize();
+		//if (!velocity.non_zero()) velocity = vec2<>(0, -1);
+		//float speed = 500.f;
+		//vec2<> direction = velocity;
+
+		float speed = velocity.length();
+		if (std::abs(velocity.x) < 0.01f && std::abs(velocity.y) < 0.01f) return false;
+		vec2<> direction = velocity / speed;
+		
+		/* clockwise wound perpendicular direction */
+		vec2<> perpendicular_direction = vec2<>(direction.y, -direction.x);
+
+		float avoidance_rectangle_length = speed * intervention_time_ms / 1000.f;
+		if (avoidance_rectangle_length <= 0.0001f) return false;
+
+		std::vector<b2Vec2> avoidance_rectangle;
+		avoidance_rectangle.resize(4);		
+		/* these vertices near position */
+		avoidance_rectangle[0] = position - perpendicular_direction *  avoidance_rectangle_width/2;
+		avoidance_rectangle[3] = position + perpendicular_direction *  avoidance_rectangle_width/2;
+
+		/* these vertices far away */
+		avoidance_rectangle[1] = avoidance_rectangle[0] + direction * avoidance_rectangle_length;
+		avoidance_rectangle[2] = avoidance_rectangle[3] + direction * avoidance_rectangle_length;
+
+		auto draw_avoidance = [&avoidance_rectangle](graphics::pixel_32 col) {
+			if (_render->draw_avoidance_info) {
+				_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance_rectangle[0], avoidance_rectangle[1], col));
+				_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance_rectangle[1], avoidance_rectangle[2], col));
+				_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance_rectangle[2], avoidance_rectangle[3], col));
+				_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance_rectangle[3], avoidance_rectangle[0], col));
+			}
+		};
+
+		//draw_avoidance(graphics::pixel_32());
+		
+		/*
+		first - distance from target
+		second - vertex pointer
+		*/
+
+		struct navigation_candidate {
+			vec2<> vertex_ptr;
+			float distance;
+			bool clockwise;
+
+			bool operator < (const navigation_candidate& b) const {
+				return distance > b.distance;
+			}
+
+			navigation_candidate(vec2<> v = vec2<>(), float d = 0.f, bool c = false) :
+				vertex_ptr(v), distance(d), clockwise(c) {};
+		};
+
+		//navigation_candidate best_navigation_candidate;
+		std::priority_queue < navigation_candidate > candidates;
+
+		auto check_navigation_candidate = [&target, &candidates, &position](vec2<>& v, bool cw) {
+			float distance = (target - v).length() ;
+			candidates.push(navigation_candidate(v, distance, cw));
+			//if (!best_navigation_candidate.vertex_ptr ||
+			//	best_navigation_candidate.distance > distance) best_navigation_candidate = navigation_candidate(&v, distance, cw);
+		};
+
+		int edges_num = static_cast<int>(visibility_edges.size());
+
+		auto wrap = [edges_num](int ix){
+			if (ix < 0) return edges_num + ix;
+			return ix % edges_num;
+		};
+
+		/* create b2PolygonShape to check for intersections with edges */
+		b2PolygonShape avoidance_rectangle_shape;
+		auto rect_copy = avoidance_rectangle;
+		std::reverse(rect_copy.begin(), rect_copy.begin() + 4);
+		avoidance_rectangle_shape.Set(rect_copy.data(), 4);
+
+		/* visibility points are in clockwise order */
+		for (int i = 0; i < edges_num; ++i) {
+			/* create b2EdgeShape representing the outer visibility triangle's edge */
+			b2EdgeShape edge_shape;
+			edge_shape.Set(visibility_edges[i].first, visibility_edges[i].second);
+
+			/* we don't need to transform edge or ray since they are in the same space
+			but we have to prepare dummy b2Transform as an argument for b2TestOverlap
+			*/
+			b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
+			_render->manually_cleared_lines.push_back(render_system::debug_line(visibility_edges[i].first, visibility_edges[i].second, graphics::pixel_32(255, 255, 255, 255)));
+
+			/* if an edge intersects the avoidance rectangle */
+			if (b2TestOverlap(&avoidance_rectangle_shape, 0, &edge_shape, 0, null_transform, null_transform)) {
+
+				/* navigate to the left end of the edge*/
+				for (int j = i; j >= 0; --j) 
+					/* if left-handed vertex of candidate edge and right-handed vertex of previous edge do not match, we have a lateral obstacle vertex */
+					if (!visibility_edges[j].first.compare(visibility_edges[wrap(j - 1)].second, avoidance_rectangle_width)) {
+					check_navigation_candidate(visibility_edges[j].first, false);
+						break;
+					}
+					else {
+						if (_render->draw_avoidance_info) {
+							_render->manually_cleared_lines.push_back(render_system::debug_line(visibility_edges[j].first, visibility_edges[j].second, graphics::pixel_32(255, 0, 0, 255)));
+							_render->manually_cleared_lines.push_back(render_system::debug_line(visibility_edges[wrap(j - 1)].first, visibility_edges[wrap(j - 1)].second, graphics::pixel_32(255, 0, 0, 255)));
+						}
+					}
+
+				/* navigate to the right end of the edge */
+				for (int j = i; j < edges_num; ++j) 
+					/* if right-handed vertex of candidate edge and left-handed vertex of next edge do not match, we have a lateral obstacle vertex */
+					if (!visibility_edges[j].second.compare(visibility_edges[wrap(j + 1)].first, avoidance_rectangle_width)) {
+					
+						check_navigation_candidate(visibility_edges[j].second, true);
+						break;
+					}
+					else {
+						if (_render->draw_avoidance_info) {
+							_render->manually_cleared_lines.push_back(render_system::debug_line(visibility_edges[j].first, visibility_edges[j].second, graphics::pixel_32(255, 0, 0, 255)));
+							_render->manually_cleared_lines.push_back(render_system::debug_line(visibility_edges[wrap(j + 1)].first, visibility_edges[wrap(j + 1)].second, graphics::pixel_32(255, 0, 0, 255)));
+						}
+					}
+			}
+		}
+
+		/* if we have specified a single candidate for navigation,
+		which means there is an obstacle on the way */
+		while (!candidates.empty()) {
+			/* save output */
+			best_candidate = candidates.top().vertex_ptr;
+
+			if (_render->draw_avoidance_info)
+			_render->manually_cleared_lines.push_back(render_system::debug_line(position, best_candidate, graphics::pixel_32(0, 255, 0, 255)));
+
+			float angle = (best_candidate - position).angle_between(direction);
+
+			/* add offset to the angle so the edge of the avoidance rectangle only touches the vertex */
+			float a = avoidance_rectangle_width / (2 * (best_candidate - position).length());
+			
+			if (a > 1) 
+				a = 1;
+			float offset = asin(a) / 0.01745329251994329576923690768489f;
+			
+			if (!candidates.top().clockwise)
+				offset = -offset;
+			angle += offset;
+
+			best_candidate.rotate(offset, position);
+
+			//auto _avoidance_rect_copy = avoidance_rectangle;
+
+			for (auto& p : avoidance_rectangle)
+				p = vec2<>(p).rotate(angle, position);
+			
+			if (_render->draw_avoidance_info)
+				_render->manually_cleared_lines.push_back(render_system::debug_line(position, best_candidate, graphics::pixel_32(0, 255, 255, 255)));
+
+			//bool good_found = true;
+			//
+			//b2PolygonShape _avoidance_rectangle_shape;
+			//std::reverse(_avoidance_rect_copy.begin(), _avoidance_rect_copy.begin() + 4);
+			//_avoidance_rectangle_shape.Set(_avoidance_rect_copy.data(), 4);
+			//
+			//for (int i = 0; i < edges_num; ++i) {
+			//	b2EdgeShape edge_shape;
+			//	edge_shape.Set(visibility_edges[i].first, visibility_edges[i].second);
+			//	b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
+			//
+			//	if (b2TestOverlap(&_avoidance_rectangle_shape, 0, &edge_shape, 0, null_transform, null_transform)) {
+			//		good_found = false;
+			//		break;
+			//	}
+			//}
+			//
+			//if (good_found) {
+			//	avoidance_rectangle  = _avoidance_rect_copy;
+			//	draw_avoidance(candidates.top().clockwise ? graphics::pixel_32(255, 0, 0, 255) : graphics::pixel_32(0
+			//		, 0, 255, 255));
+			//	return true;
+			//}
+			//
+			//candidates.pop();
+
+			//draw_avoidance(candidates.top().clockwise ? graphics::pixel_32(255, 0, 0, 255) : graphics::pixel_32(0
+			//	, 0, 255, 255));
+			draw_avoidance(graphics::pixel_32());
+			return true;
+		}
+
+		/* no obstacle on the way, no force applied */
+		return false;
+}
 
 void steering_system::substep(world& owner) {
 	auto& render = owner.get_system<render_system>();
+	_render = &render;
+
+	render.manually_cleared_lines.clear();
 
 	for (auto it : targets) {
 		auto& steering = it->get<components::steering>();
@@ -103,7 +309,7 @@ void steering_system::substep(world& owner) {
 
 		auto draw_vector = [&transform, &render](vec2<> v, graphics::pixel_32 col){
 			if (v.non_zero())
-				render.lines.push_back(render_system::debug_line(transform.pos*PIXELS_TO_METERSf, (transform.pos + v)*PIXELS_TO_METERSf, col));
+				render.manually_cleared_lines.push_back(render_system::debug_line(transform.pos, transform.pos + v, col));
 		};
 		
 		for (auto& ptr_behaviour : steering.active_behaviours) {
@@ -134,6 +340,27 @@ void steering_system::substep(world& owner) {
 				if (behaviour.behaviour_type == steering::behaviour::EVASION)
 					added_force = flee(transform.pos, velocity, behaviour.last_estimated_pursuit_position, max_speed, behaviour.effective_fleeing_radius);
 			}
+			if (behaviour.behaviour_type == steering::behaviour::OBSTACLE_AVOIDANCE) {
+				vec2<> navigate_to;
+				auto ai = it->find<components::ai>();
+
+				if (avoid_collisions(transform.pos, velocity,
+					behaviour.avoidance_rectangle_width,
+					target_transform.pos,
+					ai->vision_edges,
+					behaviour.intervention_time_ms, navigate_to)) {
+						/* there's an obstacle, seek it */
+						added_force = seek(transform.pos, velocity, navigate_to, max_speed, behaviour.arrival_slowdown_radius);
+						//added_force *= 0.f;
+							//if ((added_force * 0.f).non_zero()) {
+							//	//int no_elo = 2;
+							//	//added_force = 0.f;
+							//
+							//	added_force = vec2<>(0.f, 0.f);
+							//}
+							//added_force = vec2<>(0.f, 0.f);
+				}
+			}
 
 			added_force *= behaviour.weight;
 
@@ -154,7 +381,7 @@ void steering_system::substep(world& owner) {
 		body->ApplyForce(resultant_force*PIXELS_TO_METERSf, body->GetWorldCenter());
 
 		if (render.draw_steering_forces)
-			draw_vector(resultant_force, graphics::pixel_32(0, 0, 255, 122));
+			draw_vector(resultant_force, graphics::pixel_32(255, 255, 255, 122));
 
 		if (render.draw_velocities)
 			draw_vector(velocity, graphics::pixel_32(0, 255, 0, 255));

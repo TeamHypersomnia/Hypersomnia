@@ -12,7 +12,7 @@ namespace components {
 		
 		struct behaviour {
 			enum {
-				SEEK, FLEE, ARRIVAL, PURSUIT, EVASION
+				SEEK, FLEE, ARRIVAL, PURSUIT, EVASION, OBSTACLE_AVOIDANCE
 			} behaviour_type;
 
 			target current_target;
@@ -23,6 +23,9 @@ namespace components {
 			float max_force_applied;
 			float weight;
 		
+			float intervention_time_ms;
+			float avoidance_rectangle_width;
+
 			bool erase_when_target_reached;
 			bool enabled;
 
@@ -36,7 +39,9 @@ namespace components {
 				max_force_applied(-1.f), 
 				max_target_future_prediction_ms(0.f),
 				arrival_slowdown_radius(0.f),
-				effective_fleeing_radius(-1.f)
+				effective_fleeing_radius(-1.f),
+				intervention_time_ms(0.f),
+				avoidance_rectangle_width(0.f)
 			{}
 
 			augmentations::vec2<> last_estimated_pursuit_position;
