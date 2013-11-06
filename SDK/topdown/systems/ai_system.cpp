@@ -28,7 +28,8 @@ struct my_ray_callback : public b2RayCastCallback {
 
 	float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point,
 		const b2Vec2& normal, float32 fraction) override {
-			if ((entity*) fixture->GetBody()->GetUserData() == subject)
+			auto* fixture_entity = reinterpret_cast<entity*>(fixture->GetBody()->GetUserData());
+			if (fixture_entity->find<components::ai>() != nullptr)
 			{
 				return -1;
 			}
@@ -57,11 +58,11 @@ float comparable_angle(vec2<> diff) {
 ai_system::ai_system() : draw_cast_rays(false), draw_triangle_edges(true), draw_discontinuities(false) {}
 
 int components::ai::get_num_triangles() {
-	return vision_points.size() - 1;
+	return vision_edges.size();
 }
 
 components::ai::triangle components::ai::get_triangle(int i, augmentations::vec2<> origin) {
-	components::ai::triangle tri = { origin, vision_points[i], vision_points[i+1] };
+	components::ai::triangle tri = { origin, vision_edges[i].first, vision_edges[i].second };
 	return tri;
 }
 
@@ -146,10 +147,10 @@ void ai_system::process_entities(world& owner) {
 
 		/* debug drawing of the visibility square */
 		if (draw_cast_rays || draw_triangle_edges) {
-			render.lines.push_back(render_system::debug_line(vec2<>(whole_vision[0]) + vec2<>(-1.f, 0.f), vec2<>(whole_vision[1]) + vec2<>(1.f, 0.f)));
-			render.lines.push_back(render_system::debug_line(vec2<>(whole_vision[1]) + vec2<>(0.f, -1.f), vec2<>(whole_vision[2]) + vec2<>(0.f, 1.f)));
-			render.lines.push_back(render_system::debug_line(vec2<>(whole_vision[2]) + vec2<>(1.f, 0.f), vec2<>(whole_vision[3]) + vec2<>(-1.f, 0.f)));
-			render.lines.push_back(render_system::debug_line(vec2<>(whole_vision[3]) + vec2<>(0.f, 1.f), vec2<>(whole_vision[0]) + vec2<>(0.f, -1.f)));
+			render.lines.push_back(render_system::debug_line((vec2<>(whole_vision[0]) + vec2<>(-1.f, 0.f))*METERS_TO_PIXELSf, (vec2<>(whole_vision[1]) + vec2<>(1.f, 0.f))*METERS_TO_PIXELSf));
+			render.lines.push_back(render_system::debug_line((vec2<>(whole_vision[1]) + vec2<>(0.f, -1.f))*METERS_TO_PIXELSf, (vec2<>(whole_vision[2]) + vec2<>(0.f, 1.f))*METERS_TO_PIXELSf));
+			render.lines.push_back(render_system::debug_line((vec2<>(whole_vision[2]) + vec2<>(1.f, 0.f))*METERS_TO_PIXELSf, (vec2<>(whole_vision[3]) + vec2<>(-1.f, 0.f))*METERS_TO_PIXELSf));
+			render.lines.push_back(render_system::debug_line((vec2<>(whole_vision[3]) + vec2<>(0.f, 1.f))*METERS_TO_PIXELSf, (vec2<>(whole_vision[0]) + vec2<>(0.f, -1.f))*METERS_TO_PIXELSf));
 		}
 	
 		/* add the visibility square to the vertices that we cast rays to, computing comparable angle in place */
@@ -179,7 +180,7 @@ void ai_system::process_entities(world& owner) {
 		
 		/* debugging lambda */
 		auto draw_line = [&position_meters, &render](vec2<> point, graphics::pixel_32 col){
-			render.lines.push_back(render_system::debug_line(position_meters, point, col));
+			render.lines.push_back(render_system::debug_line(position_meters * METERS_TO_PIXELSf, point * METERS_TO_PIXELSf, col));
 		};
 
 		/* container for holding info about local discontinuities, will be used for dynamic AI navigation */
@@ -227,7 +228,7 @@ void ai_system::process_entities(world& owner) {
 			/* both rays intersect with something */
 			else if (ray_callbacks[0].hit && ray_callbacks[1].hit) {
 				/* if distance of intersection is bigger than epsilon
-				then ray must have intersected with an obstacle, ignoring intersection completely */
+				then ray must have intersected with an obstacle BEFORE reaching the vertex, ignoring intersection completely */
 				if ((ray_callbacks[0].intersection - vertex.second).length_sq() > 0.001f &&
 					(ray_callbacks[1].intersection - vertex.second).length_sq() > 0.001f) {
 						if(draw_cast_rays) draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 0, 255));
@@ -235,7 +236,7 @@ void ai_system::process_entities(world& owner) {
 				/* distance between both intersections fit in epsilon which means ray intersected with the same vertex */
 				else if ((ray_callbacks[0].intersection - ray_callbacks[1].intersection).length_sq() < 0.0001f) {
 					/* interpret it as both rays hit the same vertex 
-					for accuracy reasons, push the vertex coordinates instead of the actual intersections */
+					for maximum accuracy, push the vertex coordinates instead of the actual intersections */
 					double_rays.push_back(double_ray(vertex.second, vertex.second));
 					if (draw_cast_rays) draw_line(vertex.second, graphics::pixel_32(255, 255, 0, 255));
 				}
@@ -284,10 +285,10 @@ void ai_system::process_entities(world& owner) {
 							/* we don't need to transform edge or ray since they are in the same space
 							but we have to prepare dummy b2Transform as argument for b2EdgeShape::RayCast
 							*/
-							b2Transform edge_transform(b2Vec2(0, 0), b2Rot(0));
+							b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
 
 							/* if we hit against boundaries (must happen for at least 1 of them) */
-							if (bound.RayCast(&output, input, edge_transform, 0)) {
+							if (bound.RayCast(&output, input, null_transform, 0)) {
 								/* prepare new discontinuity data */
 								components::ai::discontinuity new_discontinuity;
 
@@ -320,20 +321,24 @@ void ai_system::process_entities(world& owner) {
 		}
 
 		/* now to propagate the visible area */
-		ai.vision_points.clear();
+		ai.vision_edges.clear();
 		
 		if (draw_discontinuities)
 		for (auto& disc : local_discontinuities) 
 			render.lines.push_back(render_system::debug_line(disc.p1, disc.p2, graphics::pixel_32(0, 127, 255, 255)));
 
 		for (size_t i = 0; i < double_rays.size(); ++i) {
-			ai.vision_points.push_back(double_rays[i].second * METERS_TO_PIXELSf);
-			if (draw_triangle_edges) draw_line(PIXELS_TO_METERSf*(*ai.vision_points.rbegin()), ai.visibility_color);
 			/* (i + 1)%double_rays.size() ensures the cycle */
-			ai.vision_points.push_back(double_rays[(i + 1)%double_rays.size()].first * METERS_TO_PIXELSf);
-			if (draw_triangle_edges) draw_line(PIXELS_TO_METERSf*(*ai.vision_points.rbegin()), ai.visibility_color);
+			vec2<> p1 = double_rays[i].second;
+			vec2<> p2 = double_rays[(i + 1)%double_rays.size()].first;
 
-			if (draw_triangle_edges) render.lines.push_back(render_system::debug_line(PIXELS_TO_METERSf**ai.vision_points.rbegin(), PIXELS_TO_METERSf**(ai.vision_points.rbegin() + 1), ai.visibility_color));
+			if (draw_triangle_edges) {
+				draw_line(p1, ai.visibility_color);
+				draw_line(p2, ai.visibility_color);
+				render.lines.push_back(render_system::debug_line(p1 * METERS_TO_PIXELSf, p2 * METERS_TO_PIXELSf, ai.visibility_color));
+			}
+
+			ai.vision_edges.push_back(std::make_pair(p1 * METERS_TO_PIXELSf, p2 * METERS_TO_PIXELSf));
 		}
 	}
 }
