@@ -74,10 +74,6 @@ namespace augmentations {
 				std::min(b, rc.b));
 			return true;
 		}
-		
-		bool ltrb::hover(const vec2<int>& m) const {
-			return m.x >= l && m.y >= t && m.x <= r && m.y <= b;
-		}
 
 		bool ltrb::hover(const ltrb& rc) const {
 			return !(l >= rc.r || t >= rc.b || r <= rc.l || b <= rc.t);

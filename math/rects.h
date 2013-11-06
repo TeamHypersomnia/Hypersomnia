@@ -57,7 +57,12 @@ namespace augmentations {
 			void contain_positive(const ltrb& smaller);
 
 			bool clip(const ltrb& bigger);
-			bool hover(const vec2<int>& mouse) const;
+			
+			template <typename T>
+			bool hover(const vec2<T>& m) const {
+				return m.x >= l && m.y >= t && m.x <= r && m.y <= b;
+			}
+
 			bool hover(const ltrb&) const;
 			bool hover(const xywh&) const;
 			bool inside(const ltrb& bigger) const;

@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <Box2D/Common/b2Math.h>
 #include "rects.h"
 namespace augmentations {
@@ -101,6 +102,10 @@ namespace augmentations {
 			return get_radians()*180.0f/3.141592653589793238462f;
 		}
 
+		float angle_between(const vec2<>& v) {
+			return get_degrees() - v.get_degrees();
+		}
+
 		template<class A, class B>
 		vec2& set(const A& vx, const B& vy) {
 			x = vx; y = vy;
@@ -131,9 +136,14 @@ namespace augmentations {
 		}
 
 		vec2& normalize() {
-			float len = 1.f/length();
-			x *= len;
-			y *= len;
+			float len = length();
+			if (len < std::numeric_limits<float>::epsilon()) 
+				return *this;
+			
+			float inv_len = 1.f / len;
+
+			x *= inv_len;
+			y *= inv_len;
 			return *this;
 		}
 		
@@ -173,6 +183,13 @@ namespace augmentations {
 		}
 		
 		vec2 operator-() { return vec2(x * -1, y * -1); }
+
+		bool compare(const vec2& b, const float epsilon = 0.00001f) {
+			if (std::abs(x - b.x) < epsilon && std::abs(y - b.y) < epsilon)
+				return true;
+
+			return false;
+		}
 
 		template <class v> bool operator < (const v& p) const { return std::make_pair(x, y) < std::make_pair(p.x, p.y); }
 		template <class v> bool operator==(const v& p) const { return x == p.x && y == p.y; }
