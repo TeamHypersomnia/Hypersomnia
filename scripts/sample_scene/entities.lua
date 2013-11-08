@@ -1,7 +1,3 @@
--- KONFIGURACJA NA PREZENTACJE
--- KONFIGURACJA NA PREZENTACJE
--- KONFIGURACJA NA PREZENTACJE
-
 scenes = {
 	ALL = 1,
 	CRATES = 2
@@ -9,12 +5,11 @@ scenes = {
 
 scene = scenes.CRATES
 
-
 ai_system.draw_cast_rays = 0
 ai_system.draw_triangle_edges = 0
 ai_system.draw_discontinuities = 0
 
-render_system.draw_steering_forces = 0
+render_system.draw_steering_forces = 1
 render_system.draw_substeering_forces = 0
 render_system.draw_velocities = 0
 
@@ -29,11 +24,6 @@ if scene == scenes.CRATES then
 	ai_system.draw_triangle_edges = 0
 	ai_system.draw_discontinuities = 0
 end
-
--- KONFIGURACJA NA PREZENTACJE
--- KONFIGURACJA NA PREZENTACJE
--- KONFIGURACJA NA PREZENTACJE
-
 
 background_sprite = create_sprite {
 	image = images.background,
@@ -119,8 +109,6 @@ map_points = {
 		T = { pos = vec2(5.49, -1.94)  * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) }
 	}
 }
-
-print(map_points.interior.B.texcoord.x, map_points.interior.B.texcoord.y)
 
 map_uv_square(map_points.interior, map_points.square.U.pos, map_points.square.W.pos)
 
@@ -322,7 +310,7 @@ my_npc_archetype = {
 			input_acceleration = vec2(30000, 30000),
 			
 			air_resistance = 0.0,
-			max_speed = 1100,
+			max_speed = 1300,
 			
 			receivers = {
 				{ target = "body", stop_at_zero_movement = false }, 
@@ -389,6 +377,7 @@ if scene == scenes.ALL then
 
 end
 
+if scene == scenes.CRATES then
 for i=1, 14 do
 
 for j=1, 14 do
@@ -399,6 +388,8 @@ create_entity (archetyped(crate_archetype, {
 		}
 }))
 end
+end
+
 end
 
 create_entity (archetyped(crate_archetype, {
@@ -509,25 +500,6 @@ my_scriptable_info = create_scriptable_info {
 	}
 }
 
-
-
--- msg = create(animate_message, {
--- 	set_animation = nil,
--- 	animation_type = animation_events.SHOT,
--- 	preserve_state_if_animation_changes = false,
--- 	message_type = animate_message.START,
--- 	change_animation = true,
--- 	change_speed = true,
--- 	speed_factor = 0.05,
--- 	animation_priority = 0
--- })
--- 
--- msg.subject = player
--- world:post_message(msg)
--- 
--- msg.subject = npc_1
--- world:post_message(msg)
-
 main_context = create_input_context {
 	intents = { 
 		[mouse.raw_motion] 		= intent_message.AIM,
@@ -628,8 +600,6 @@ world_camera = create_entity (archetyped(camera_archetype, {
 	}
 }))
 
---if scene == scenes.ALL then
-
 target_entity = create_entity {
 	render = {
 		model = crosshair_sprite,
@@ -655,7 +625,7 @@ seek_behaviour = create_steering_behaviour {
 	behaviour_type = steering_behaviour.SEEK,
 	enabled = true,
 	erase_when_target_reached = false,
-	arrival_slowdown_radius = 500,
+	arrival_slowdown_radius = 0,
 	force_color = rgba(0, 255, 255, 0)
 }			
 
@@ -686,7 +656,7 @@ obstacle_avoidance_behaviour = create_steering_behaviour {
 	enabled = true,
 	force_color = rgba(255, 0, 0, 255),
 	intervention_time_ms = 1600,
-	avoidance_rectangle_width = 100
+	avoidance_rectangle_width = 200
 }
 					
 scripted_steering = create_scriptable_info {
@@ -740,20 +710,15 @@ my_steered_npc_archetype = (archetyped(my_npc_archetype, {
 my_steered_npc = create_entity_group (archetyped(my_steered_npc_archetype, {
 	body = {
 		transform = {
-				pos = vec2(640, 420),
+				pos = vec2(1040, 20),
 				rotation = 0
 			}
 		}
 }))
 
-
 my_steered_npc.body.steering:add_behaviour(obstacle_avoidance_behaviour)
 my_steered_npc.body.steering:add_behaviour(pursuit_behaviour)
---player.body.steering:add_behaviour(obstacle_avoidance_behaviour)
---player.body.steering:add_behaviour(pursuit_behaviour)
 obstacle_avoidance_behaviour.current_target:set(player.body)
-
---end
 
 blue_crosshair_sprite = create_sprite {
 	image = images.crosshair,
@@ -773,7 +738,7 @@ loop_only_info = create_scriptable_info {
 		[scriptable_component.LOOP] 	=
 			function(message)
 				my_atlas:_bind()
-				blue_crosshair.transform.current.pos = evasion_behaviour.last_estimated_pursuit_position
+				blue_crosshair.transform.current.pos = pursuit_behaviour.last_estimated_pursuit_position
 				return true
 			end
 	}
@@ -786,32 +751,5 @@ create_entity {
 }
 
 set_zoom_level(world_camera)
---npc_camera = create_entity (archetyped(camera_archetype, {
---	transform = {
---		pos = vec2(),
---		rotation = 0
---	},
---
---	camera = {
---		screen_rect = rect_xywh(400, 0, 400, 800),
---		ortho = rect_ltrb(400, 0, 800, 800)
---	},
---	
---	chase = {
---		target = npc_1.body,
---		offset = vec2(config_table.resolution_w/(-1.5), config_table.resolution_h/(-2))
---	}
---}))
-
 player.body.gun.target_camera_to_shake:set(world_camera)
-
-
---my_scriptable_info:at(scriptable_component.COLLISION_MESSAGE)(1)
---my_scriptable_info:at(scriptable_component.DAMAGE_MESSAGE)(2)
-
---script_only = create_entity {
---	scriptable = {
---		available_scripts = my_scriptable_info
---	}
---}
 
