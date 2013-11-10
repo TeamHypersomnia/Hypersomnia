@@ -1001,7 +1001,11 @@ struct b2WorldRayCastWrapper
 		b2Fixture* fixture = proxy->fixture;
 		int32 index = proxy->childIndex;
 		b2RayCastOutput output;
-		bool hit = fixture->RayCast(&output, input, index);
+		bool hit = false;
+		
+		if (callback->ShouldRaycast(fixture))
+			hit = fixture->RayCast(&output, input, index);
+		else hit = false;
 
 		if (hit)
 		{

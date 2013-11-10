@@ -29,6 +29,7 @@ class b2Joint;
 class b2Contact;
 struct b2ContactResult;
 struct b2Manifold;
+struct b2Filter;
 
 /// Joints and fixtures are destroyed when their associated
 /// body is destroyed. Implement this listener so that you
@@ -57,6 +58,7 @@ public:
 	/// Return true if contact calculations should be performed between these two shapes.
 	/// @warning for performance reasons this is only called when the AABBs begin to overlap.
 	virtual bool ShouldCollide(b2Fixture* fixtureA, b2Fixture* fixtureB);
+	static bool ShouldCollide(const b2Filter* filterA, const b2Filter* filterB);
 };
 
 /// Contact impulses for reporting. Impulses are used instead of forces because
@@ -136,6 +138,10 @@ class b2RayCastCallback
 {
 public:
 	virtual ~b2RayCastCallback() {}
+
+	virtual bool ShouldRaycast(b2Fixture* fixture) {
+		return true;
+	}
 
 	/// Called for each fixture found in the query. You control how the ray cast
 	/// proceeds by returning a float:
