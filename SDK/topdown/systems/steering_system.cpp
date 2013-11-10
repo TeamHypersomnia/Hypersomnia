@@ -8,6 +8,7 @@
 #include "../components/ai_component.h"
 
 #include "render_system.h"
+#include <iostream>
 
 void steering_system::process_events(world& owner) {}
 void steering_system::process_entities(world& owner) {}
@@ -94,7 +95,8 @@ vec2<> steering_system::predict_interception(vec2<> position, vec2<> velocity, v
 render_system* _render = nullptr;
 
 bool steering_system::avoid_collisions(vec2<> position, vec2<> velocity, float avoidance_rectangle_width, vec2<> target,
-	std::vector < std::pair < vec2<>, vec2< >> > &visibility_edges, float intervention_time_ms, vec2<>& best_candidate, int attempt) {
+	std::vector < std::pair < vec2<>, vec2< >> > &visibility_edges, float intervention_time_ms, 
+	vec2<>& best_candidate, components::steering::behaviour& info) {
 		//float speed = velocity.length();
 		//if (speed < 0.00001f) return false;
 		//vec2<> direction = velocity / speed;
@@ -158,7 +160,8 @@ bool steering_system::avoid_collisions(vec2<> position, vec2<> velocity, float a
 		std::priority_queue < navigation_candidate > candidates;
 
 		auto check_navigation_candidate = [&target, &candidates, &position](vec2<>& v, bool cw) {
-			float distance = (target - v).length() ;
+			float distance = (target - v).length();
+				//+ (position - v).length();
 			candidates.push(navigation_candidate(v, distance, cw));
 			//if (!best_navigation_candidate.vertex_ptr ||
 			//	best_navigation_candidate.distance > distance) best_navigation_candidate = navigation_candidate(&v, distance, cw);
@@ -193,7 +196,7 @@ bool steering_system::avoid_collisions(vec2<> position, vec2<> velocity, float a
 			if (b2TestOverlap(&avoidance_rectangle_shape, 0, &edge_shape, 0, null_transform, null_transform)) {
 
 				/* navigate to the left end of the edge*/
-				for (int j = i; j >= 0; --j) 
+				for (int j = i, k = 0; k < edges_num; j = wrap(j - 1), ++k) 
 					/* if left-handed vertex of candidate edge and right-handed vertex of previous edge do not match, we have a lateral obstacle vertex */
 					if (!visibility_edges[j].first.compare(visibility_edges[wrap(j - 1)].second, avoidance_rectangle_width)) {
 					check_navigation_candidate(visibility_edges[j].first, false);
@@ -207,7 +210,7 @@ bool steering_system::avoid_collisions(vec2<> position, vec2<> velocity, float a
 					}
 
 				/* navigate to the right end of the edge */
-				for (int j = i; j < edges_num; ++j) 
+				for (int j = i, k = 0; k < edges_num; j = wrap(j + 1), ++k)
 					/* if right-handed vertex of candidate edge and left-handed vertex of next edge do not match, we have a lateral obstacle vertex */
 					if (!visibility_edges[j].second.compare(visibility_edges[wrap(j + 1)].first, avoidance_rectangle_width)) {
 					
@@ -229,6 +232,16 @@ bool steering_system::avoid_collisions(vec2<> position, vec2<> velocity, float a
 			/* save output */
 			best_candidate = candidates.top().vertex_ptr;
 
+			if (info.last_decision_timer.get<std::chrono::milliseconds>() < info.decision_duration_ms) {
+				if ((info.last_decision - best_candidate).length() > 10.f)
+					best_candidate = info.last_decision;
+				else info.last_decision = best_candidate;
+			}
+			else {
+				info.last_decision_timer.reset();
+				info.last_decision = best_candidate;
+			}
+
 			if (_render->draw_avoidance_info)
 			_render->manually_cleared_lines.push_back(render_system::debug_line(position, best_candidate, graphics::pixel_32(0, 255, 0, 255)));
 
@@ -239,6 +252,7 @@ bool steering_system::avoid_collisions(vec2<> position, vec2<> velocity, float a
 			
 			if (a > 1) 
 				a = 1;
+			
 			float offset = asin(a) / 0.01745329251994329576923690768489f;
 			
 			if (!candidates.top().clockwise)
@@ -342,15 +356,17 @@ void steering_system::substep(world& owner) {
 			}
 			if (behaviour.behaviour_type == steering::behaviour::OBSTACLE_AVOIDANCE) {
 				vec2<> navigate_to;
-				auto ai = it->find<components::ai>();
-
+				auto& edges = it->get<components::ai>().
+					get_visibility(components::ai::visibility::OBSTACLE_AVOIDANCE).edges;
+				
 				if (avoid_collisions(transform.pos, velocity,
 					behaviour.avoidance_rectangle_width,
 					target_transform.pos,
-					ai->vision_edges,
-					behaviour.intervention_time_ms, navigate_to)) {
+					edges,
+					behaviour.intervention_time_ms, navigate_to, behaviour)) {
 						/* there's an obstacle, seek it */
-						added_force = seek(transform.pos, velocity, navigate_to, max_speed, behaviour.arrival_slowdown_radius);
+						added_force = seek(transform.pos, velocity, navigate_to,
+							max_speed, behaviour.arrival_slowdown_radius);
 						//added_force *= 0.f;
 							//if ((added_force * 0.f).non_zero()) {
 							//	//int no_elo = 2;

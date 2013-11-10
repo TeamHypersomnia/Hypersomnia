@@ -22,6 +22,7 @@ namespace bindings {
 			.def_readwrite("effective_fleeing_radius", &steering::behaviour::effective_fleeing_radius)
 			.def_readwrite("intervention_time_ms", &steering::behaviour::intervention_time_ms)
 			.def_readwrite("avoidance_rectangle_width", &steering::behaviour::avoidance_rectangle_width)
+			.def_readwrite("decision_duration_ms", &steering::behaviour::decision_duration_ms)
 			.enum_("script_type")[
 				luabind::value("SEEK", steering::behaviour::SEEK),
 				luabind::value("FLEE", steering::behaviour::FLEE),
