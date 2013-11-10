@@ -57,6 +57,17 @@ namespace augmentations {
 			return out;
 		}
 
+		static bool segment_in_segment(vec2 smaller_p1, vec2 smaller_p2, vec2 bigger_p1, vec2 bigger_p2,
+			type maximum_offset
+			) {
+				return
+					((bigger_p2 - bigger_p1).length_sq() > (smaller_p2 - smaller_p1).length_sq())
+					&&
+					smaller_p1.distance_from_segment_sq(bigger_p1, bigger_p2) < maximum_offset*maximum_offset
+					&&
+					smaller_p2.distance_from_segment_sq(bigger_p1, bigger_p2) < maximum_offset*maximum_offset;
+		}
+
 		template <class t>
 		vec2(const t& v) : x(static_cast<type>(v.x)), y(static_cast<type>(v.y)) {}
 
@@ -80,6 +91,26 @@ namespace augmentations {
 			t.x = x;
 			t.y = y;
 			return t;
+		}
+
+		/* from http://stackoverflow.com/a/1501725 */
+		type distance_from_segment_sq(vec2 v, vec2 w) {
+			auto& p = *this;
+			// Return minimum distance between line segment vw and point p
+			const float l2 = (v - w).length_sq();  // i.e. |w-v|^2 -  avoid a sqrt
+			if (l2 == 0.0) return (p - v).length_sq();   // v == w case
+			// Consider the line extending the segment, parameterized as v + t (w - v).
+			// We find projection of point p onto the line. 
+			// It falls where t = [(p-v) . (w-v)] / |w-v|^2
+			const float t = (p - v).dot(w - v) / l2;
+			if (t < 0.0) return (p - v).length_sq();       // Beyond the 'v' end of the segment
+			else if (t > 1.0) return (p - w).length_sq();  // Beyond the 'w' end of the segment
+			const vec2 projection = v + t * (w - v);  // Projection falls on the segment
+			return (p - projection).length_sq();
+		}
+
+		type distance_from_segment(vec2 v, vec2 w) {
+			return sqrt(distance_from_segment_sq(v, w));
 		}
 
 		float dot(vec2 v) const {
