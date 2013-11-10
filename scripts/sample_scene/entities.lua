@@ -11,7 +11,7 @@ ai_system.draw_cast_rays = 0
 ai_system.draw_triangle_edges = 0
 ai_system.draw_discontinuities = 0
 
-ai_system.draw_memorised_walls = 0
+ai_system.draw_memorised_walls = 1
 
 
 render_system.draw_steering_forces = 1

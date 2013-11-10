@@ -9,9 +9,10 @@
 
 #include "../resources/render_info.h"
 #include <limits>
+#include <set>
 
 struct my_callback : public b2QueryCallback {
-	std::vector<b2Fixture*> fixtures;
+	std::set<b2Body*> bodies;
 	entity* subject;
 	b2Filter* filter;
 
@@ -21,7 +22,7 @@ struct my_callback : public b2QueryCallback {
 		if ((b2ContactFilter::ShouldCollide(filter, &fixture->GetFilterData()))
 			&&
 			(entity*) fixture->GetBody()->GetUserData() != subject)
-			fixtures.push_back(fixture);
+			bodies.insert(fixture->GetBody());
 		return true;
 	}
 };
@@ -108,16 +109,15 @@ void ai_system::process_entities(world& owner) {
 			physics.b2world.QueryAABB(&callback, aabb);
 
 			/* for every fixture that intersected with the visibility square */
-			for (auto fixture : callback.fixtures) {
-				auto& body = *fixture->GetBody();
-				auto verts = reinterpret_cast<entity*>(body.GetUserData())->get<components::render>().model->get_vertices();
+			for (auto body : callback.bodies) {
+				auto verts = reinterpret_cast<entity*>(body->GetUserData())->get<components::render>().model->get_vertices();
 					/* for every vertex in given fixture's shape */
 					for (auto& v : verts) {
 						v *= PIXELS_TO_METERSf;
 
-						auto position = body.GetPosition();
+						auto position = body->GetPosition();
 						/* transform angle to degrees */
-						auto rotation = body.GetAngle() / 0.01745329251994329576923690768489f;
+						auto rotation = body->GetAngle() / 0.01745329251994329576923690768489f;
 
 						std::pair<float, vec2<>> new_vertex;
 						/* transform vertex to current entity's position and rotation */
