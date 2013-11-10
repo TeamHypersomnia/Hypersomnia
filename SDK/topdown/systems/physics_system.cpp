@@ -6,7 +6,7 @@
 
 #include "../messages/collision_message.h"
 
-physics_system::physics_system() : accumulator(60.0, 5), 
+physics_system::physics_system() : accumulator(60.0, 5), timestep_multiplier(1.f),
 	b2world(b2Vec2(0.f, 0.f)) {
 	b2world.SetAllowSleeping(false);
 	b2world.SetAutoClearForces(false);
@@ -116,7 +116,7 @@ void physics_system::process_entities(world& owner) {
 		for (auto& sys : substepping_systems)
 			sys->substep(owner);
 
-		b2world.Step(static_cast<float32>(accumulator.per_second()), velocityIterations, positionIterations);
+		b2world.Step(static_cast<float32>(accumulator.per_second()*timestep_multiplier), velocityIterations, positionIterations);
 		b2world.ClearForces();
 	}
 	

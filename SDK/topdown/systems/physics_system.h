@@ -26,6 +26,7 @@ class physics_system : public processing_system_templated<components::physics, c
 	contact_listener listener;
 public:
 	std::vector<processing_system*> substepping_systems;
+	float timestep_multiplier;
 
 	b2World b2world;
 	physics_system();
