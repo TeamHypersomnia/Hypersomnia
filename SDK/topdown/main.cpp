@@ -113,6 +113,7 @@ int main() {
 	scripts.global("input_system", input);
 	scripts.global("ai_system", ai);
 	scripts.global("render_system", render);
+	scripts.global("physics_system", physics);
 
 	resources::script::script_reloader.add_directory(L"scripts", true);
 	resources::script init_script;

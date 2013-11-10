@@ -3,32 +3,37 @@
 #include "math/vec2d.h"
 #include "entity_system/component.h"
 #include "graphics/pixel.h"
+#include "utility/sorted_vector.h"
 
 class ai_system;
 class render_system; // for debugging
 
 namespace components {
 	struct ai : public augmentations::entity_system::component {
-		bool postprocessing_subject;
-		augmentations::graphics::pixel_32 visibility_color;
+		typedef std::pair<augmentations::vec2<>, augmentations::vec2<>> edge;
 
-		float visibility_square_side;
-		std::vector<std::pair<augmentations::vec2<>, augmentations::vec2<>>> vision_edges;
+		struct visibility {
+			enum type {
+				OBSTACLE_AVOIDANCE,
+				DYNAMIC_PATHFINDING
+			};
 
-		int get_num_triangles();
-		
-		struct triangle {
-			augmentations::vec2<> points[3];
-		} get_triangle(int index, augmentations::vec2<> origin);
+			bool postprocessing_subject;
+			augmentations::graphics::pixel_32 color;
+			
+			b2Filter filter;
 
-		ai() : visibility_square_side(0.f), postprocessing_subject(false) {}
+			float square_side;
+			std::vector<edge> edges;
 
-		private:
-			friend class ai_system;
-			friend class render_system;
+			int get_num_triangles();
+
+			struct triangle {
+				augmentations::vec2<> points[3];
+			} get_triangle(int index, augmentations::vec2<> origin);
 
 			struct discontinuity {
-				augmentations::vec2<> p1, p2;
+				edge points;
 				bool visited;
 
 				enum {
@@ -36,10 +41,26 @@ namespace components {
 					LEFT
 				} winding;
 
-				discontinuity(augmentations::vec2<> p1 = augmentations::vec2<>(), augmentations::vec2<> p2 = augmentations::vec2<>()) : p1(p1), p2(p2), winding(RIGHT) {}
+				discontinuity(edge points = edge()) : points(points), winding(RIGHT) {}
 			};
 
 			discontinuity local_minimal_discontinuity;
 			std::vector<discontinuity> memorised_discontinuities;
+			
+			std::vector<edge> memorised_walls;
+			std::vector<edge> memorised_undiscovered_walls;
+
+			visibility() : square_side(0.f), postprocessing_subject(false) {}
+		};
+
+		augmentations::util::sorted_vector_map<int, visibility> visibility_requests;
+		
+		void add_request(int key, const visibility& val) {
+			visibility_requests.add(key, val);
+		}
+
+		visibility& get_visibility(int key) {
+			return *visibility_requests.get(key);
+		}
 	};
 }

@@ -3,6 +3,7 @@
 #include "entity_system/entity_ptr.h"
 #include "math/vec2d.h"
 #include "graphics/pixel.h"
+#include "utility/timer.h"
 
 class steering_system;
 
@@ -26,10 +27,15 @@ namespace components {
 			float intervention_time_ms;
 			float avoidance_rectangle_width;
 
+			float decision_duration_ms;
+
 			bool erase_when_target_reached;
 			bool enabled;
 
 			augmentations::graphics::pixel_32 force_color;
+
+			augmentations::util::timer last_decision_timer;
+			augmentations::vec2<> last_decision;
 
 			behaviour() : 
 				weight(1.f), 
@@ -41,8 +47,11 @@ namespace components {
 				arrival_slowdown_radius(0.f),
 				effective_fleeing_radius(-1.f),
 				intervention_time_ms(0.f),
-				avoidance_rectangle_width(0.f)
-			{}
+				avoidance_rectangle_width(0.f),
+				decision_duration_ms(0.f)
+			{
+				last_decision_timer.reset();
+			}
 
 			augmentations::vec2<> last_estimated_pursuit_position;
 		private:

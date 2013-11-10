@@ -68,6 +68,16 @@ function set_components_from_entry(_entity, entry, entities_lookup)
 	def		(ai_component, 'ai')
 	def		(steering_component, 'steering')
 	
+	if entry.ai ~= nil then
+		local ai = _entity.ai
+		
+		for key, values in pairs (entry.ai.visibility_requests) do
+			local my_visibility = visibility()
+			recursive_write(my_visibility, values)
+			ai:add_request(key, my_visibility)
+		end
+	end
+	
 	if entry.physics ~= nil then
 		local my_body_data = physics_info()
 		set_physics_info(my_body_data, entry.physics.body_info)

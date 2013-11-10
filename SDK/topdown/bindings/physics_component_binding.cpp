@@ -3,6 +3,7 @@
 #include "bindings.h"
 
 #include "../components/physics_component.h"
+#include "../systems/physics_system.h"
 
 void set_density(b2Body* body, float density) {
 	for (b2Fixture* it = body->GetFixtureList(); it; it = it->GetNext()) {
@@ -27,6 +28,9 @@ namespace bindings {
 				luabind::value("b2_staticBody", b2_staticBody),
 				luabind::value("b2_kinematicBody", b2_kinematicBody)
 			],
+
+			luabind::class_<physics_system>("_physics_system")
+			.def_readwrite("timestep_multiplier", &physics_system::timestep_multiplier),
 
 			luabind::class_<physics>("physics_component")
 			.def(luabind::constructor<>())

@@ -25,6 +25,7 @@ public:
 	};
 	std::vector<debug_line> lines;
 	std::vector<debug_line> manually_cleared_lines;
+	std::vector<debug_line> non_cleared_lines;
 
 	fbo scene_fbo, postprocess_fbo;
 

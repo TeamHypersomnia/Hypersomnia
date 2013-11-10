@@ -16,4 +16,5 @@ public:
 	int draw_triangle_edges;
 	int draw_cast_rays;
 	int draw_discontinuities;
+	int draw_memorised_walls;
 };

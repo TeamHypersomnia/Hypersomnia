@@ -1,19 +1,23 @@
+physics_system.timestep_multiplier = 1
+
 scenes = {
 	ALL = 1,
 	CRATES = 2
 }
 
-scene = scenes.CRATES
+scene = scenes.ALL
 
 ai_system.draw_cast_rays = 0
 ai_system.draw_triangle_edges = 0
 ai_system.draw_discontinuities = 0
 
+ai_system.draw_memorised_walls = 1
+
 render_system.draw_steering_forces = 1
 render_system.draw_substeering_forces = 0
 render_system.draw_velocities = 0
 
-render_system.draw_avoidance_info = 0
+render_system.draw_avoidance_info = 1
 
 render_system.visibility_expansion = 1.0
 render_system.max_visibility_expansion_distance = 1
@@ -207,6 +211,12 @@ crate_piece_archetype = archetyped(metal_archetype, {
 
 if scene == scenes.ALL then
 	my_crate_piece = create_entity (archetyped(crate_piece_archetype, {
+		physics = {
+			body_info = {
+				filter = filter_static_objects
+			}
+		},
+		
 		transform = {
 			pos = vec2(0, 300)
 		}
@@ -327,9 +337,13 @@ my_npc_archetype = {
 		},
 		
 		ai = {
-			visibility_square_side = 6000,
-			visibility_color = rgba(255, 0, 255, 120),
-			visibility_subject = false
+			visibility_requests = {
+				--[visibility.OBSTACLE_AVOIDANCE] = {
+				--	square_side = 2000,
+				--	color = rgba(255, 0, 255, 120),
+				--	filter = filter_obstacle_visibility
+				--}
+			}
 		}
 	},
 	
@@ -378,9 +392,9 @@ if scene == scenes.ALL then
 end
 
 if scene == scenes.CRATES then
-for i=1, 14 do
+for i=1, 3 do
 
-for j=1, 14 do
+for j=1, 3 do
 create_entity (archetyped(crate_archetype, {
 		transform = {
 			pos = vec2(j*420+200+(-170), i*420+340),
@@ -444,8 +458,17 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 		},
 		
 		ai = {
-			visibility_color = rgba(255, 255, 255, 0),
-			visibility_subject = true
+			visibility_requests = {
+				--[visibility.OBSTACLE_AVOIDANCE] = {
+				--	color = rgba(255, 255, 255, 122)
+				--},	
+				
+				[visibility.DYNAMIC_PATHFINDING] = {
+					square_side = 7000,
+					color = rgba(255, 0, 255, 120),
+					filter = filter_pathfinding_visibility
+				}
+			}
 		},
 		
 		steering = {
@@ -655,8 +678,9 @@ obstacle_avoidance_behaviour = create_steering_behaviour {
 	
 	enabled = true,
 	force_color = rgba(255, 0, 0, 255),
-	intervention_time_ms = 1600,
-	avoidance_rectangle_width = 200
+	intervention_time_ms = 200,
+	avoidance_rectangle_width = 110,
+	decision_duration_ms = 0
 }
 					
 scripted_steering = create_scriptable_info {
@@ -678,7 +702,6 @@ scripted_steering = create_scriptable_info {
 
 my_steered_npc_archetype = (archetyped(my_npc_archetype, {
 	body = {
-	
 		transform = {
 			pos = vec2(640, 420),
 			rotation = 0
@@ -700,6 +723,16 @@ my_steered_npc_archetype = (archetyped(my_npc_archetype, {
 			max_speed = 1000
 		},
 		
+		ai = {
+			visibility_requests = {
+				[visibility.DYNAMIC_PATHFINDING] = {
+					square_side = 6000,
+					color = rgba(0, 255, 255, 122),
+					filter = filter_pathfinding_visibility
+				}
+			}
+		},
+		
 		lookat = {
 			target = player.body,
 			look_mode = lookat_component.POSITION
@@ -707,17 +740,17 @@ my_steered_npc_archetype = (archetyped(my_npc_archetype, {
 	}
 }))	
 
-my_steered_npc = create_entity_group (archetyped(my_steered_npc_archetype, {
-	body = {
-		transform = {
-				pos = vec2(1040, 20),
-				rotation = 0
-			}
-		}
-}))
+--my_steered_npc = create_entity_group (archetyped(my_steered_npc_archetype, {
+--	body = {
+--		transform = {
+--				pos = vec2(840+780, 820),
+--				rotation = 0
+--			}
+--		}
+--}))
 
-my_steered_npc.body.steering:add_behaviour(obstacle_avoidance_behaviour)
-my_steered_npc.body.steering:add_behaviour(pursuit_behaviour)
+--my_steered_npc.body.steering:add_behaviour(obstacle_avoidance_behaviour)
+--my_steered_npc.body.steering:add_behaviour(pursuit_behaviour)
 obstacle_avoidance_behaviour.current_target:set(player.body)
 
 blue_crosshair_sprite = create_sprite {

@@ -18,26 +18,43 @@ custom_intents = create_inverse_enum {
 create_options { 
 	"CHARACTERS", 
 	"OBJECTS", 
+	"STATIC_OBJECTS",
 	"BULLETS", 
 	"CORPSES" 
 }
 
+
+filter_static_objects = {
+	categoryBits = STATIC_OBJECTS,
+	maskBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS, CORPSES)
+}
+
 filter_objects = {
 	categoryBits = OBJECTS,
-	maskBits = bitor(OBJECTS, BULLETS, CHARACTERS, CORPSES)
+	maskBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS, CORPSES)
 }
 
 filter_characters = {
 	categoryBits = CHARACTERS,
-	maskBits = bitor(OBJECTS, BULLETS, CHARACTERS)
+	maskBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS)
 }
 
 filter_bullets = {
 	categoryBits = BULLETS,
-	maskBits = bitor(OBJECTS, CHARACTERS)
+	maskBits = bitor(OBJECTS, STATIC_OBJECTS, CHARACTERS)
 }
 
 filter_corpses = {
 	categoryBits = CORPSES,
-	maskBits = OBJECTS
+	maskBits = bitor(OBJECTS, STATIC_OBJECTS)
+}
+
+filter_pathfinding_visibility = {
+	categoryBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS, CORPSES),
+	maskBits = bitor(STATIC_OBJECTS)
+}
+
+filter_obstacle_visibility = {
+	categoryBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS, CORPSES),
+	maskBits = bitor(OBJECTS)
 }
