@@ -6,6 +6,8 @@
 
 #include "physics_system.h"
 #include "render_system.h"
+
+#include "../resources/render_info.h"
 #include <limits>
 
 struct my_callback : public b2QueryCallback {
@@ -107,23 +109,19 @@ void ai_system::process_entities(world& owner) {
 
 			/* for every fixture that intersected with the visibility square */
 			for (auto fixture : callback.fixtures) {
-				auto shape = fixture->GetShape();
-
-				/* if it is polygonal shape (we don't support other shapes for the moment) */
-				if (shape->GetType() == b2Shape::e_polygon) {
-					auto polygon_shape = static_cast<b2PolygonShape*>(shape);
-
-					int verts = polygon_shape->GetVertexCount();
-
+				auto& body = *fixture->GetBody();
+				auto verts = reinterpret_cast<entity*>(body.GetUserData())->get<components::render>().model->get_vertices();
 					/* for every vertex in given fixture's shape */
-					for (int i = 0; i < verts; ++i) {
-						auto position = fixture->GetBody()->GetPosition();
+					for (auto& v : verts) {
+						v *= PIXELS_TO_METERSf;
+
+						auto position = body.GetPosition();
 						/* transform angle to degrees */
-						auto rotation = fixture->GetBody()->GetAngle() / 0.01745329251994329576923690768489f;
+						auto rotation = body.GetAngle() / 0.01745329251994329576923690768489f;
 
 						std::pair<float, vec2<>> new_vertex;
 						/* transform vertex to current entity's position and rotation */
-						new_vertex.second = vec2<>(polygon_shape->GetVertex(i)).rotate(rotation, b2Vec2(0, 0)) + position;
+						new_vertex.second = v.rotate(rotation, b2Vec2(0, 0)) + position;
 
 						vec2<> diff = new_vertex.second - position_meters;
 						/*
@@ -138,7 +136,6 @@ void ai_system::process_entities(world& owner) {
 						all_vertices_transformed.push_back(new_vertex);
 					}
 				}
-			}
 
 			/* extract the actual vertices from visibility AABB to cast rays to */
 			b2Vec2 whole_vision [] = {

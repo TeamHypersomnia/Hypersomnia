@@ -19,6 +19,7 @@ namespace resources {
 
 		virtual void draw(buffer&, const components::transform::state&, vec2<> camera_pos) = 0;
 		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) = 0;
+		virtual std::vector<vec2<>> get_vertices();
 	};
 
 	struct sprite : public renderable {
@@ -33,6 +34,7 @@ namespace resources {
 
 		virtual void draw(buffer&, const components::transform::state&, vec2<> camera_pos) override;
 		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) override;
+		virtual std::vector<vec2<>> get_vertices() override;
 	};
 
 	//struct triangle : public renderable {
@@ -57,6 +59,7 @@ namespace resources {
 		void add_concave(const concave&);
 		virtual void draw(buffer&, const components::transform::state&, vec2<> camera_pos) override;
 		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) override;
+		virtual std::vector<vec2<>> get_vertices() override;
 	};
 
 	struct particles : public renderable {

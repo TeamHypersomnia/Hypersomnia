@@ -11,7 +11,8 @@ ai_system.draw_cast_rays = 0
 ai_system.draw_triangle_edges = 0
 ai_system.draw_discontinuities = 0
 
-ai_system.draw_memorised_walls = 1
+ai_system.draw_memorised_walls = 0
+
 
 render_system.draw_steering_forces = 1
 render_system.draw_substeering_forces = 0
@@ -562,7 +563,7 @@ camera_archetype = {
 		player = nil,
 	
 		orbit_mode = camera_component.LOOK,
-		max_look_expand = vec2(config_table.resolution_w/2, config_table.resolution_h/2),
+		max_look_expand = vec2(config_table.resolution_w/2, config_table.resolution_h/2)*10,
 		angled_look_length = 100
 	},
 	

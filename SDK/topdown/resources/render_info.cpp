@@ -31,6 +31,10 @@ namespace resources {
 		v[3] -= size / 2.f;
 	}
 
+	std::vector<vec2<>> renderable::get_vertices() {
+		return std::vector<vec2<>>();
+	}
+
 	sprite::sprite(texture_baker::texture* tex, graphics::pixel_32 color) : tex(tex), color(color) {
 		set(tex, color);
 	}
@@ -100,6 +104,15 @@ namespace resources {
 		return rects::ltrb(lower.x, lower.y, upper.x, upper.y).hover(visibility_aabb);
 	}
 	
+	std::vector<vec2<>> sprite::get_vertices() {
+		std::vector<vec2<>> out;
+		out.push_back(size / -2.f);
+		out.push_back(size / -2.f + vec2<>(size.x, 0.f));
+		out.push_back(size / -2.f + size);
+		out.push_back(size / -2.f + vec2<>(0.f, size.y));
+		return std::move(out);
+	}
+
 	bool polygon::is_visible(rects::xywh visibility_aabb, const components::transform::state&) {
 		/* perform visibility check! */
 		return true;
@@ -151,6 +164,15 @@ namespace resources {
 			indices.push_back(tri->GetPoint(1)->index);
 			indices.push_back(tri->GetPoint(2)->index);
 		}
+	}
+
+	std::vector<vec2<>> polygon::get_vertices() {
+		std::vector<vec2<>> out;
+
+		for (auto& v : model) 
+			out.push_back(v.position);
+		
+		return std::move(out);
 	}
 
 	//void polygon::add_convex(const std::vector<vertex>& model) {
