@@ -65,7 +65,7 @@ function set_components_from_entry(_entity, entry, entities_lookup)
 	def_ptr (lookat_component, 'lookat', { target = true })
 	def		(particle_emitter_component, 'particle_emitter')
 	def		(scriptable_component, 'scriptable')
-	def		(ai_component, 'ai')
+	def		(ai_component, 'ai', {}, { visibility_requests = true })
 	def		(steering_component, 'steering')
 	
 	if entry.ai ~= nil then

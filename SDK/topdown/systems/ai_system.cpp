@@ -360,11 +360,22 @@ void ai_system::process_entities(world& owner) {
 				vec2<> p1 = ray_a.second * METERS_TO_PIXELSf;
 				vec2<> p2 = ray_b.first * METERS_TO_PIXELSf;
 
+				if (draw_triangle_edges) {
+					draw_line(p1 * PIXELS_TO_METERSf, request.color);
+					draw_line(p2 * PIXELS_TO_METERSf, request.color);
+					render.lines.push_back(render_system::debug_line(p1, p2, request.color));
+				}
+
+				request.edges.push_back(std::make_pair(p1, p2));
+
+				/* if we don't want to generate navigation info */
+				if (!request.generate_navigation_info) continue;
+
 				/* we have a fully visible wall here */
 				if (ray_a.second_reached_destination && ray_b.first_reached_destination) {
 					/* compare with already memorised walls */
 					bool such_a_wall_exists = false;
-					for (auto& wall : request.memorised_walls) {
+					for (auto& wall : request.visible_walls) {
 						/* if any memorised wall is almost equal to the candidate */
 						if (((wall.first - p1).length_sq() < epsilon_max_segment_difference && (wall.second - p2).length_sq() < epsilon_max_segment_difference)
 							||
@@ -377,83 +388,146 @@ void ai_system::process_entities(world& owner) {
 					}
 
 					if (!such_a_wall_exists)  {
-						request.memorised_walls.push_back(components::ai::edge(p1, p2));
+						request.visible_walls.push_back(components::ai::edge(p1, p2));
 
 						/* if such exists, delete the undiscovered wall that falls into this discovered wall */
-						auto& walls = request.memorised_undiscovered_walls;
-						//walls.erase(std::remove_if(walls.begin(), walls.end(), [&](const components::ai::edge& e){
-						//	return vec2<>::segment_in_segment(e.first, e.second, p1, p2, epsilon_max_segment_difference);
-						//}), walls.end());
-						
-						for (auto& it = walls.begin(); it != walls.end(); ++it) {
-							if (vec2<>::segment_in_segment((*it).first, (*it).second, p1, p2, epsilon_max_segment_difference)) {
-								walls.erase(it);
-								break;
-							}
-						}
+						//auto& undiscovered = request.undiscovered_walls;
+						////walls.erase(std::remove_if(walls.begin(), walls.end(), [&](const components::ai::edge& e){
+						////	return vec2<>::segment_in_segment(e.first, e.second, p1, p2, epsilon_max_segment_difference);
+						////}), walls.end());
+						//
+						//for (auto& it = undiscovered.begin(); it != undiscovered.end(); ++it) {
+						//	if (vec2<>::segment_in_segment((*it).first, (*it).second, p1, p2, epsilon_max_segment_difference)) {
+						//		undiscovered.erase(it);
+						//		break;
+						//	}
+						//}
 					}
 				}
 				/* we have a potentially undiscovered wall */
-				else {
-					bool this_wall_is_discovered = false;
-					/* if any memorised, discovered wall covers the the candidate */
-					for (auto& wall : request.memorised_walls) {
-						if (vec2<>::segment_in_segment(p1, p2, wall.first, wall.second, epsilon_max_segment_difference)) {
-							/* we don't push it as "undiscovered" as it is already discovered */
-							this_wall_is_discovered = true;
+				//else {
+				//	bool this_wall_is_discovered = false;
+				//	/* if any memorised, discovered wall covers the the candidate */
+				//	for (auto& wall : request.visible_walls) {
+				//		if (vec2<>::segment_in_segment(p1, p2, wall.first, wall.second, epsilon_max_segment_difference)) {
+				//			/* we don't push it as "undiscovered" as it is already discovered */
+				//			this_wall_is_discovered = true;
+				//			break;
+				//		}
+				//	}
+				//
+				//	/* if this wall is undiscovered */
+				//	if (!this_wall_is_discovered) {
+				//		bool this_wall_covers_any_undiscovered_wall = false;
+				//
+				//		for (auto& wall : request.undiscovered_walls) {
+				//			/* check if our undiscovered candidate fits into
+				//			any existing undiscovered walls */
+				//			if (vec2<>::segment_in_segment(p1, p2, wall.first, wall.second, epsilon_max_segment_difference)) {
+				//				/* if it is so, don't do anything and break */
+				//				this_wall_covers_any_undiscovered_wall = true;
+				//				break;
+				//			}
+				//			/* reverse roles: we check if any existing undiscovered wall fits inside
+				//			our undiscovered candidate */
+				//			if (vec2<>::segment_in_segment(wall.first, wall.second, p1, p2, epsilon_max_segment_difference)) {
+				//				/* we don't push (p1, p2) as another undiscovered wall,
+				//				we just widen this existing one */
+				//				this_wall_covers_any_undiscovered_wall = true;
+				//
+				//				wall.first = p1;
+				//				wall.second = p2;
+				//				break;
+				//			}
+				//		}
+				//
+				//		/* if there's no such wall that can replace the new one */
+				//		if (!this_wall_covers_any_undiscovered_wall) {
+				//			request.undiscovered_walls.push_back(components::ai::edge(p1, p2));
+				//		}
+				//	}
+				//}
+			}
+
+			if (request.generate_navigation_info) {
+				/* save new discontinuities */
+				for (auto& disc : local_discontinuities) {
+					/* transform all discontinuities from Box2D coordinates to pixels */
+					disc.points.first *= METERS_TO_PIXELSf;
+					disc.points.second *= METERS_TO_PIXELSf;
+
+					bool this_discontinuity_is_already_memorised = false;
+
+					for (auto& memorised : request.undiscovered_discontinuities) {
+						/* if a discontinuity with the same closer vertex already exists */
+						if ((memorised.points.first - disc.points.first).length() < 3.f) {
+							this_discontinuity_is_already_memorised = true;
 							break;
 						}
 					}
 
-					/* if this wall is undiscovered */
-					if (!this_wall_is_discovered) {
-						bool this_wall_covers_any_undiscovered_wall = false;
-
-						for (auto& wall : request.memorised_undiscovered_walls) {
-							/* check if our undiscovered candidate fits into
-							any existing undiscovered walls */
-							if (vec2<>::segment_in_segment(p1, p2, wall.first, wall.second, epsilon_max_segment_difference)) {
-								/* if it is so, don't do anything and break */
-								this_wall_covers_any_undiscovered_wall = true;
-								break;
-							}
-							/* reverse roles: we check if any existing undiscovered wall fits inside
-							our undiscovered candidate */
-							if (vec2<>::segment_in_segment(wall.first, wall.second, p1, p2, epsilon_max_segment_difference)) {
-								/* we don't push (p1, p2) as another undiscovered wall,
-								we just widen this existing one */
-								this_wall_covers_any_undiscovered_wall = true;
-
-								wall.first = p1;
-								wall.second = p2;
-								break;
-							}
-						}
-
-						/* if there's no such wall that can replace the new one */
-						if (!this_wall_covers_any_undiscovered_wall) {
-							request.memorised_undiscovered_walls.push_back(components::ai::edge(p1, p2));
-						}
+					/* if it is unique, push it */
+					if (!this_discontinuity_is_already_memorised) {
+						request.undiscovered_discontinuities.push_back(
+							components::ai::visibility::discontinuity(disc.points, disc.points.second));
 					}
 				}
 
-				if (draw_triangle_edges) {
-					draw_line(p1 * PIXELS_TO_METERSf, request.color);
-					draw_line(p2 * PIXELS_TO_METERSf, request.color);
-					render.lines.push_back(render_system::debug_line(p1, p2, request.color));
-				}
-
-				request.edges.push_back(std::make_pair(p1, p2));
+				/* delete all discontinuities that fall into any of fully visible walls */
+				auto& discs = request.undiscovered_discontinuities;
+				discs.erase(std::remove_if(discs.begin(), discs.end(), [&request, this](const components::ai::visibility::discontinuity& d){
+					bool this_discontinuity_is_discovered = false;
+					
+					for (auto& wall : request.visible_walls) {
+						if (d.points.second.distance_from_segment_sq(wall.first, wall.second) < epsilon_max_segment_difference) {
+							this_discontinuity_is_discovered = true;
+							break;
+						}
+					}
+					
+					return this_discontinuity_is_discovered;
+				}), discs.end());
 			}
 
 			if (draw_memorised_walls) {
-				for (auto& wall : request.memorised_walls) {
+				for (auto& wall : request.visible_walls) {
 					render.lines.push_back(render_system::debug_line(wall.first, wall.second, graphics::pixel_32(0, 255, 0, 255)));
 				}
 
-				for (auto& wall : request.memorised_undiscovered_walls) {
-					//render.lines.push_back(render_system::debug_line(wall.first, wall.second, graphics::pixel_32(255, 0, 0, 255)));
-				}
+				//for (auto& wall : request.undiscovered_walls) {
+				//	//render.lines.push_back(render_system::debug_line(wall.first, wall.second, graphics::pixel_32(255, 0, 0, 255)));
+				//}
+			}
+		}
+
+		/* if we are requested to constantly update navigation info */
+		if (ai.is_finding_a_path) {
+			/* get navigation info from dynamic_pathfinding visibility request */
+			auto& vertices = ai.get_visibility(components::ai::visibility::DYNAMIC_PATHFINDING)
+				.undiscovered_discontinuities;
+
+			if (!vertices.empty()) {
+				/* find discontinuity that is closest to the target */
+				auto& local_minimum_discontinuity = (*std::min_element(vertices.begin(), vertices.end(),
+					[&ai](const components::ai::visibility::discontinuity& a,
+					const components::ai::visibility::discontinuity& b) {
+						return (a.points.first - ai.target).length_sq() < (b.points.first - ai.target).length_sq();
+				}));
+
+				/* extract the closer vertex */
+				ai.navigate_to = local_minimum_discontinuity.points.first;
+
+				/* rotate it a bit so we don't collide with walls */
+				float a = ai.avoidance_width / (2 * (ai.navigate_to - transform.pos).length());
+				if (a > 1) a = 1;
+
+				float angular_offset = asin(a) / 0.01745329251994329576923690768489f;
+
+				/* if the free area is counter-clockwise wound */
+				if (!local_minimum_discontinuity.winding == components::ai::visibility::discontinuity::LEFT)
+					angular_offset *= -1;
+
+				//ai.navigate_to.rotate(angular_offset, transform.pos);
 			}
 		}
 	}

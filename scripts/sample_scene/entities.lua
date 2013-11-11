@@ -9,16 +9,21 @@ scene = scenes.ALL
 
 ai_system.draw_cast_rays = 0
 ai_system.draw_triangle_edges = 0
-ai_system.draw_discontinuities = 0
+ai_system.draw_discontinuities = 1
 
 ai_system.draw_memorised_walls = 1
 
+ai_system.epsilon_ray_angle_variation = 0.0001
+ai_system.epsilon_threshold_obstacle_hit = 20
+ai_system.epsilon_distance_vertex_hit = 0.01/2
+ai_system.epsilon_max_segment_difference = 4
 
 render_system.draw_steering_forces = 1
 render_system.draw_substeering_forces = 0
 render_system.draw_velocities = 0
 
 render_system.draw_avoidance_info = 1
+
 
 render_system.visibility_expansion = 1.0
 render_system.max_visibility_expansion_distance = 1
@@ -427,9 +432,15 @@ create_entity (archetyped(metal_archetype, {
 		rotation = 0
 	}
 }))
-	
+
+
 player = create_entity_group (archetyped(my_npc_archetype, {
 	body = {
+		transform = {
+			--pos = vec2(1861.36646, -951.093262),
+			--rotation = 0
+		},
+		
 		animate = {
 			available_animations = npc_animation_body_shotgun_set
 		},
@@ -459,6 +470,8 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 		},
 		
 		ai = {
+			avoidance_width = 100,
+		
 			visibility_requests = {
 				--[visibility.OBSTACLE_AVOIDANCE] = {
 				--	color = rgba(255, 255, 255, 122)
@@ -467,13 +480,14 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 				[visibility.DYNAMIC_PATHFINDING] = {
 					square_side = 7000,
 					color = rgba(255, 0, 255, 120),
-					filter = filter_pathfinding_visibility
+					filter = filter_pathfinding_visibility,
+					generate_navigation_info = true
 				}
 			}
 		},
 		
 		steering = {
-			max_resultant_force = 10000 -- -1 = no force clamping
+			max_resultant_force = 1300 -- -1 = no force clamping
 		}
 		
 	},
@@ -624,7 +638,7 @@ world_camera = create_entity (archetyped(camera_archetype, {
 	}
 }))
 
-target_entity = create_entity {
+target_entity_archetype = {
 	render = {
 		model = crosshair_sprite,
 		layer = render_layers.GUI_OBJECTS
@@ -632,6 +646,9 @@ target_entity = create_entity {
 	
 	transform = {} 
 }
+
+target_entity = create_entity(archetyped(target_entity_archetype, {}))
+navigation_target_entity = create_entity(archetyped(target_entity_archetype, {}))
 
 flee_behaviour = create_steering_behaviour {
 	current_target = target_entity,
@@ -683,37 +700,12 @@ obstacle_avoidance_behaviour = create_steering_behaviour {
 	avoidance_rectangle_width = 110,
 	decision_duration_ms = 0
 }
-					
-scripted_steering = create_scriptable_info {
-	scripted_events = {
-		[scriptable_component.INTENT_MESSAGE] = function(message)
-				if message.intent == custom_intents.STEERING_REQUEST then
-					target_entity.transform.current.pos = player.crosshair.transform.current.pos
-					message.subject.steering:clear_behaviours()
-					--message.subject.steering:add_behaviour(evasion_behaviour)
-					--message.subject.steering:add_behaviour(pursuit_behaviour)
-					--message.subject.steering:add_behaviour(obstacle_avoidance_behaviour)
-					--message.subject.steering:add_behaviour(seek_behaviour)
-				end
-			return true
-		end
-	}
-}
-
 
 my_steered_npc_archetype = (archetyped(my_npc_archetype, {
 	body = {
 		transform = {
 			pos = vec2(640, 420),
 			rotation = 0
-		},
-		
-		scriptable = {
-			available_scripts = scripted_steering
-		},
-	
-		input = {
-			custom_intents.STEERING_REQUEST
 		},
 		
 		steering = {
@@ -773,12 +765,32 @@ loop_only_info = create_scriptable_info {
 			function(message)
 				my_atlas:_bind()
 				blue_crosshair.transform.current.pos = pursuit_behaviour.last_estimated_pursuit_position
+				navigation_target_entity.transform.current.pos = player.body.ai.navigate_to
+				return true
+			end,
+			
+		[scriptable_component.INTENT_MESSAGE] = 
+			function(message)
+				if message.intent == custom_intents.STEERING_REQUEST then
+					target_entity.transform.current.pos = player.crosshair.transform.current.pos
+					player.body.ai.target = target_entity.transform.current.pos
+					player.body.ai.is_finding_a_path = true
+					--message.subject.steering:clear_behaviours()
+					--message.subject.steering:add_behaviour(evasion_behaviour)
+					--message.subject.steering:add_behaviour(pursuit_behaviour)
+					--message.subject.steering:add_behaviour(obstacle_avoidance_behaviour)
+					--message.subject.steering:add_behaviour(seek_behaviour)
+				end
 				return true
 			end
 	}
 }
 
 create_entity {
+	input = {
+			custom_intents.STEERING_REQUEST
+	},
+		
 	scriptable = {
 		available_scripts = loop_only_info
 	}

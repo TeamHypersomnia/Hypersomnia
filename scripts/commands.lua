@@ -1,9 +1,14 @@
 print("Calling commands.lua...")
-physics_system.timestep_multiplier = 0.005
+physics_system.timestep_multiplier = 1
 
-ai_system.draw_triangle_edges = 0
-ai_system.draw_cast_rays = 1
-ai_system.draw_memorised_walls = 0
+--print(player.body.transform.current.pos.x)
+ai_system.draw_triangle_edges = 1
+ai_system.draw_cast_rays = 0
+--ai_system.draw_visibility = 0
+--
+render_system.visibility_expansion = 1
+--ai_system.draw_memorised_walls = 0
+
 
 
 
