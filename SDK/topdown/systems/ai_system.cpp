@@ -33,11 +33,17 @@ struct my_ray_callback : public b2RayCastCallback {
 
 	vec2<> intersection, target;
 	bool hit;
+	b2Fixture* what_fixture;
 
-	my_ray_callback() : hit(false), subject_filter(nullptr), subject(nullptr) {}
+	my_ray_callback() : hit(false), subject_filter(nullptr), subject(nullptr), what_fixture(nullptr) {}
 
 	bool ShouldRaycast(b2Fixture* fixture) override {
-		return (b2ContactFilter::ShouldCollide(subject_filter, &fixture->GetFilterData()));
+		//if (subject_filter)
+			return 
+				(subject && reinterpret_cast<entity*>(fixture->GetBody()->GetUserData()) == subject) ||
+				(b2ContactFilter::ShouldCollide(subject_filter, &fixture->GetFilterData()));
+
+		//return true;
 	}
 
 	float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point,
@@ -45,6 +51,7 @@ struct my_ray_callback : public b2RayCastCallback {
 			intersection = point;
 
 			hit = true;
+			what_fixture = fixture;
 			return fraction;
 	}
 };
@@ -79,10 +86,6 @@ void ai_system::process_entities(world& owner) {
 	render_system& render = owner.get_system<render_system>();
 
 	for (auto it : targets) {
-		/* prepare container for all the vertices that we will cast the ray to */
-		static std::vector < std::pair < float, vec2< >> > all_vertices_transformed;
-		all_vertices_transformed.clear();
-
 		/* get AI data and position of the entity */
 		auto& ai = it->get<components::ai>();
 		auto& transform = it->get<components::transform>().current;
@@ -92,6 +95,10 @@ void ai_system::process_entities(world& owner) {
 
 		/* for every visibility type requested for given entity */
 		for (auto& entry : ai.visibility_requests.raw) {
+			/* prepare container for all the vertices that we will cast the ray to */
+			static std::vector < std::pair < float, vec2< >> > all_vertices_transformed;
+			all_vertices_transformed.clear();
+
 			/* shortcut */
 			auto& request = entry.val;
 			/* to Box2D coordinates */
@@ -111,31 +118,31 @@ void ai_system::process_entities(world& owner) {
 			/* for every fixture that intersected with the visibility square */
 			for (auto body : callback.bodies) {
 				auto verts = reinterpret_cast<entity*>(body->GetUserData())->get<components::render>().model->get_vertices();
-					/* for every vertex in given fixture's shape */
-					for (auto& v : verts) {
-						v *= PIXELS_TO_METERSf;
+				/* for every vertex in given fixture's shape */
+				for (auto& v : verts) {
+					v *= PIXELS_TO_METERSf;
 
-						auto position = body->GetPosition();
-						/* transform angle to degrees */
-						auto rotation = body->GetAngle() / 0.01745329251994329576923690768489f;
+					auto position = body->GetPosition();
+					/* transform angle to degrees */
+					auto rotation = body->GetAngle() / 0.01745329251994329576923690768489f;
 
-						std::pair<float, vec2<>> new_vertex;
-						/* transform vertex to current entity's position and rotation */
-						new_vertex.second = v.rotate(rotation, b2Vec2(0, 0)) + position;
+					std::pair<float, vec2<>> new_vertex;
+					/* transform vertex to current entity's position and rotation */
+					new_vertex.second = v.rotate(rotation, b2Vec2(0, 0)) + position;
 
-						vec2<> diff = new_vertex.second - position_meters;
-						/*
-						compute angle to be compared while sorting
-						source:
-						http://stackoverflow.com/questions/16542042/fastest-way-to-sort-vectors-by-angle-without-actually-computing-that-angle
+					vec2<> diff = new_vertex.second - position_meters;
+					/*
+					compute angle to be compared while sorting
+					source:
+					http://stackoverflow.com/questions/16542042/fastest-way-to-sort-vectors-by-angle-without-actually-computing-that-angle
 
-						save the angle in pair next to the vertex position, we will then sort the "angle-vertex" pairs by angle */
-						new_vertex.first = comparable_angle(diff);
+					save the angle in pair next to the vertex position, we will then sort the "angle-vertex" pairs by angle */
+					new_vertex.first = comparable_angle(diff);
 
-						/* save transformed vertex */
-						all_vertices_transformed.push_back(new_vertex);
-					}
+					/* save transformed vertex */
+					all_vertices_transformed.push_back(new_vertex);
 				}
+			}
 
 			/* extract the actual vertices from visibility AABB to cast rays to */
 			b2Vec2 whole_vision [] = {
@@ -170,7 +177,7 @@ void ai_system::process_entities(world& owner) {
 			std::sort(all_vertices_transformed.begin(), all_vertices_transformed.end());
 
 			/* by now we have ensured that all_vertices_transformed is non-empty
-			
+
 			debugging:
 			red ray - ray that intersected with obstacle, these are ignored
 			yellow ray - ray that hit the same vertex
@@ -244,7 +251,7 @@ void ai_system::process_entities(world& owner) {
 					BOTH intersections occured FAR from the vertex
 					then ray must have intersected with an obstacle BEFORE reaching the vertex, ignoring intersection completely */
 					float distance_from_origin = (vertex.second - position_meters).length_sq();
-					
+
 					if ((ray_callbacks[0].intersection - position_meters).length_sq() + PIXELS_TO_METERSf * epsilon_threshold_obstacle_hit < distance_from_origin &&
 						(ray_callbacks[1].intersection - position_meters).length_sq() + PIXELS_TO_METERSf * epsilon_threshold_obstacle_hit < distance_from_origin) {
 							if (draw_cast_rays) draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 0, 255));
@@ -280,8 +287,8 @@ void ai_system::process_entities(world& owner) {
 							/* it was "second" one that directly reached its destination */
 							new_double_ray.second_reached_destination = true;
 
-							new_discontinuity.points.first = ray_callbacks[1].intersection;
-							new_discontinuity.points.second = vertex.second;
+							new_discontinuity.points.first = vertex.second;
+							new_discontinuity.points.second = ray_callbacks[0].intersection;
 							new_discontinuity.winding = components::ai::visibility::discontinuity::LEFT;
 							if (draw_cast_rays) draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 255, 255));
 						}
@@ -348,9 +355,11 @@ void ai_system::process_entities(world& owner) {
 			/* now to propagate the visible area */
 			request.edges.clear();
 
-			if (draw_discontinuities)
-				for (auto& disc : local_discontinuities)
-					render.lines.push_back(render_system::debug_line(disc.points.first, disc.points.second, graphics::pixel_32(0, 127, 255, 255)));
+			/* transform all discontinuities from Box2D coordinates to pixels */
+			for (auto& disc : local_discontinuities) {
+				disc.points.first *= METERS_TO_PIXELSf;
+				disc.points.second *= METERS_TO_PIXELSf;
+			}
 
 			for (size_t i = 0; i < double_rays.size(); ++i) {
 				/* (i + 1)%double_rays.size() ensures the cycle */
@@ -452,25 +461,20 @@ void ai_system::process_entities(world& owner) {
 			if (request.generate_navigation_info) {
 				/* save new discontinuities */
 				for (auto& disc : local_discontinuities) {
-					/* transform all discontinuities from Box2D coordinates to pixels */
-					disc.points.first *= METERS_TO_PIXELSf;
-					disc.points.second *= METERS_TO_PIXELSf;
-
 					bool this_discontinuity_is_already_memorised = false;
 
 					for (auto& memorised : request.undiscovered_discontinuities) {
 						/* if a discontinuity with the same closer vertex already exists */
 						if ((memorised.points.first - disc.points.first).length() < 3.f) {
 							this_discontinuity_is_already_memorised = true;
+							memorised.points.second = disc.points.second;
 							break;
 						}
 					}
 
 					/* if it is unique, push it */
-					if (!this_discontinuity_is_already_memorised) {
-						request.undiscovered_discontinuities.push_back(
-							components::ai::visibility::discontinuity(disc.points, disc.points.second));
-					}
+					if (!this_discontinuity_is_already_memorised)
+						request.undiscovered_discontinuities.push_back(disc);
 				}
 
 				/* delete all discontinuities that fall into any of fully visible walls */
@@ -502,32 +506,55 @@ void ai_system::process_entities(world& owner) {
 
 		/* if we are requested to constantly update navigation info */
 		if (ai.is_finding_a_path) {
-			/* get navigation info from dynamic_pathfinding visibility request */
-			auto& vertices = ai.get_visibility(components::ai::visibility::DYNAMIC_PATHFINDING)
-				.undiscovered_discontinuities;
+			auto& visibility_info = ai.get_visibility(components::ai::visibility::DYNAMIC_PATHFINDING);
 
-			if (!vertices.empty()) {
-				/* find discontinuity that is closest to the target */
-				auto& local_minimum_discontinuity = (*std::min_element(vertices.begin(), vertices.end(),
-					[&ai](const components::ai::visibility::discontinuity& a,
-					const components::ai::visibility::discontinuity& b) {
-						return (a.points.first - ai.target).length_sq() < (b.points.first - ai.target).length_sq();
-				}));
+			if ((ai.navigate_to - ai.target).length_sq() < ai.avoidance_width*ai.avoidance_width) {
+				ai.navigate_to = ai.target;
+			}
+			else {
+				/* first check if there's a line of sight */
+				my_ray_callback line_of_sight;
+				line_of_sight.subject = it;
+				line_of_sight.subject_filter = &visibility_info.filter;
+				physics.b2world.RayCast(&line_of_sight, ai.target * PIXELS_TO_METERSf, transform.pos * PIXELS_TO_METERSf);
 
-				/* extract the closer vertex */
-				ai.navigate_to = local_minimum_discontinuity.points.first;
+				if (line_of_sight.hit && reinterpret_cast<entity*>(line_of_sight.what_fixture->GetBody()->GetUserData()) == it) {
+					ai.navigate_to = ai.target;
+				}
+				else {
+					/* get navigation info from dynamic_pathfinding visibility request */
+					auto& vertices = visibility_info.undiscovered_discontinuities;
 
-				/* rotate it a bit so we don't collide with walls */
-				float a = ai.avoidance_width / (2 * (ai.navigate_to - transform.pos).length());
-				if (a > 1) a = 1;
+					if (draw_discontinuities) {
+						for (auto& disc : vertices)
+							render.lines.push_back(render_system::debug_line(disc.points.first, disc.points.second, graphics::pixel_32(0, 127, 255, 255)));
+					}
 
-				float angular_offset = asin(a) / 0.01745329251994329576923690768489f;
+					if (!vertices.empty()) {
+						/* find discontinuity that is closest to the target */
+						auto& local_minimum_discontinuity = (*std::min_element(vertices.begin(), vertices.end(),
+							[&ai, &transform](const components::ai::visibility::discontinuity& a,
+							const components::ai::visibility::discontinuity& b) {
+								return (a.points.first - ai.target).length_sq() + (a.points.first - transform.pos).length_sq()
+									< (b.points.first - ai.target).length_sq() + (b.points.first - transform.pos).length_sq();
+						}));
 
-				/* if the free area is counter-clockwise wound */
-				if (!local_minimum_discontinuity.winding == components::ai::visibility::discontinuity::LEFT)
-					angular_offset *= -1;
+						/* extract the closer vertex */
+						ai.navigate_to = local_minimum_discontinuity.points.first;
 
-				//ai.navigate_to.rotate(angular_offset, transform.pos);
+						/* rotate it a bit so we don't collide with walls */
+						float a = ai.avoidance_width / (2 * (ai.navigate_to - transform.pos).length());
+						if (a > 1) a = 1;
+
+						float angular_offset = asin(a) / 0.01745329251994329576923690768489f;
+
+						/* if the free area is counter-clockwise wound */
+						if (local_minimum_discontinuity.winding == components::ai::visibility::discontinuity::LEFT)
+							angular_offset = -angular_offset;
+
+						ai.navigate_to.rotate(angular_offset, transform.pos);
+					}
+				}
 			}
 		}
 	}

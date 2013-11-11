@@ -27,7 +27,7 @@ render_system.draw_avoidance_info = 1
 
 render_system.visibility_expansion = 1.0
 render_system.max_visibility_expansion_distance = 1
-render_system.draw_visibility = 1
+render_system.draw_visibility = 0
 
 if scene == scenes.CRATES then
 	ai_system.draw_cast_rays = 0
@@ -326,7 +326,7 @@ my_npc_archetype = {
 			input_acceleration = vec2(30000, 30000),
 			
 			air_resistance = 0.0,
-			max_speed = 1300,
+			max_speed = 3000,
 			
 			receivers = {
 				{ target = "body", stop_at_zero_movement = false }, 
@@ -344,11 +344,11 @@ my_npc_archetype = {
 		
 		ai = {
 			visibility_requests = {
-				--[visibility.OBSTACLE_AVOIDANCE] = {
-				--	square_side = 2000,
-				--	color = rgba(255, 0, 255, 120),
-				--	filter = filter_obstacle_visibility
-				--}
+				[visibility.OBSTACLE_AVOIDANCE] = {
+					square_side = 5000,
+					color = rgba(255, 0, 0, 120),
+					filter = filter_obstacle_visibility
+				}
 			}
 		}
 	},
@@ -398,18 +398,38 @@ if scene == scenes.ALL then
 end
 
 if scene == scenes.CRATES then
-for i=1, 3 do
-
-for j=1, 3 do
-create_entity (archetyped(crate_archetype, {
-		transform = {
-			pos = vec2(j*420+200+(-170), i*420+340),
-			rotation = 0
-		}
-}))
-end
-end
-
+	for i=1, 10 do
+	
+	for j=1, 10 do
+	create_entity (archetyped(crate_archetype, {
+			transform = {
+				pos = vec2(j*420+200+(-170), i*420+340),
+				rotation = 0
+			}
+	}))
+	end
+	end
+else
+	create_entity (archetyped(crate_archetype, {
+			transform = {
+				pos = vec2(100, -600),
+				rotation = 0
+			}
+	}))
+	
+	create_entity (archetyped(crate_archetype, {
+			transform = {
+				pos = vec2(400, -432),
+				rotation = 20
+			}
+	}))
+	
+	create_entity (archetyped(crate_archetype, {
+			transform = {
+				pos = vec2(800, -432),
+				rotation = -30
+			}
+	}))
 end
 
 create_entity (archetyped(crate_archetype, {
@@ -470,24 +490,30 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 		},
 		
 		ai = {
-			avoidance_width = 100,
+			avoidance_width = 250,
 		
 			visibility_requests = {
-				--[visibility.OBSTACLE_AVOIDANCE] = {
-				--	color = rgba(255, 255, 255, 122)
-				--},	
+				[visibility.OBSTACLE_AVOIDANCE] = {
+					square_side = 7000,
+					color = rgba(255, 0, 255, 120),
+					filter = filter_obstacle_visibility
+				},	
 				
 				[visibility.DYNAMIC_PATHFINDING] = {
 					square_side = 7000,
-					color = rgba(255, 0, 255, 120),
+					color = rgba(0, 255, 255, 120),
 					filter = filter_pathfinding_visibility,
 					generate_navigation_info = true
 				}
 			}
 		},
 		
+		movement = {
+			max_speed = 4300
+		},
+		
 		steering = {
-			max_resultant_force = 1300 -- -1 = no force clamping
+			max_resultant_force = 4300 -- -1 = no force clamping
 		}
 		
 	},
@@ -577,7 +603,7 @@ camera_archetype = {
 		player = nil,
 	
 		orbit_mode = camera_component.LOOK,
-		max_look_expand = vec2(config_table.resolution_w/2, config_table.resolution_h/2)*10,
+		max_look_expand = vec2(config_table.resolution_w/2, config_table.resolution_h/2),
 		angled_look_length = 100
 	},
 	
@@ -661,12 +687,12 @@ flee_behaviour = create_steering_behaviour {
 }
 		
 seek_behaviour = create_steering_behaviour {
-	current_target = player.body,
-	weight = 1,
+	current_target = navigation_target_entity,
+	weight = 10,
 	behaviour_type = steering_behaviour.SEEK,
 	enabled = true,
 	erase_when_target_reached = false,
-	arrival_slowdown_radius = 0,
+	arrival_slowdown_radius = 50,
 	force_color = rgba(0, 255, 255, 0)
 }			
 
@@ -690,7 +716,7 @@ evasion_behaviour = create_steering_behaviour {
 }
 
 obstacle_avoidance_behaviour = create_steering_behaviour {
-	current_target = player.body,
+	current_target = navigation_target_entity,
 	weight = 10000, 
 	behaviour_type = steering_behaviour.OBSTACLE_AVOIDANCE,
 	
@@ -733,18 +759,18 @@ my_steered_npc_archetype = (archetyped(my_npc_archetype, {
 	}
 }))	
 
---my_steered_npc = create_entity_group (archetyped(my_steered_npc_archetype, {
---	body = {
---		transform = {
---				pos = vec2(840+780, 820),
---				rotation = 0
---			}
---		}
---}))
+my_steered_npc = create_entity_group (archetyped(my_steered_npc_archetype, {
+	body = {
+		transform = {
+				pos = vec2(840+780, 820),
+				rotation = 0
+			}
+		}
+}))
 
 --my_steered_npc.body.steering:add_behaviour(obstacle_avoidance_behaviour)
---my_steered_npc.body.steering:add_behaviour(pursuit_behaviour)
-obstacle_avoidance_behaviour.current_target:set(player.body)
+--my_steered_npc.body.steering:add_behaviour(seek_behaviour)
+obstacle_avoidance_behaviour.current_target:set(navigation_target_entity)
 
 blue_crosshair_sprite = create_sprite {
 	image = images.crosshair,
@@ -775,11 +801,13 @@ loop_only_info = create_scriptable_info {
 					target_entity.transform.current.pos = player.crosshair.transform.current.pos
 					player.body.ai.target = target_entity.transform.current.pos
 					player.body.ai.is_finding_a_path = true
-					--message.subject.steering:clear_behaviours()
+					player.body.ai:clear_pathfinding_info()
+					player.body.steering:clear_behaviours()
 					--message.subject.steering:add_behaviour(evasion_behaviour)
 					--message.subject.steering:add_behaviour(pursuit_behaviour)
 					--message.subject.steering:add_behaviour(obstacle_avoidance_behaviour)
-					--message.subject.steering:add_behaviour(seek_behaviour)
+					player.body.steering:add_behaviour(seek_behaviour)
+					player.body.steering:add_behaviour(obstacle_avoidance_behaviour)
 				end
 				return true
 			end

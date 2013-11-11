@@ -19,7 +19,7 @@ vec2<> steering_system::seek(vec2<> position, vec2<> velocity, vec2<> target, fl
 	direction /= distance;
 
 	/* pathological case, we don't need to push further */
-	if (distance < 2.f) return vec2<>(0, 0);
+	if (distance < 5.f) return vec2<>(0, 0);
 
 	/* if we want to slowdown on arrival */
 	if (arrival_radius > 0.f) {
