@@ -94,7 +94,7 @@ namespace augmentations {
 		}
 
 		/* from http://stackoverflow.com/a/1501725 */
-		type distance_from_segment_sq(vec2 v, vec2 w) {
+		type distance_from_segment_sq(vec2 v, vec2 w) const {
 			auto& p = *this;
 			// Return minimum distance between line segment vw and point p
 			const float l2 = (v - w).length_sq();  // i.e. |w-v|^2 -  avoid a sqrt
@@ -109,7 +109,7 @@ namespace augmentations {
 			return (p - projection).length_sq();
 		}
 
-		type distance_from_segment(vec2 v, vec2 w) {
+		type distance_from_segment(vec2 v, vec2 w) const {
 			return sqrt(distance_from_segment_sq(v, w));
 		}
 
