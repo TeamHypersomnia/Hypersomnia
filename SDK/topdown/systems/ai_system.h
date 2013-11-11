@@ -17,4 +17,9 @@ public:
 	int draw_cast_rays;
 	int draw_discontinuities;
 	int draw_memorised_walls;
+
+	float epsilon_ray_angle_variation;
+	float epsilon_distance_vertex_hit;
+	float epsilon_threshold_obstacle_hit;
+	float epsilon_max_segment_difference;
 };

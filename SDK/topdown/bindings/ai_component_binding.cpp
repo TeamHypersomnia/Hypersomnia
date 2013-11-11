@@ -12,7 +12,12 @@ namespace bindings {
 			.def_readwrite("draw_cast_rays", &ai_system::draw_cast_rays)
 			.def_readwrite("draw_triangle_edges", &ai_system::draw_triangle_edges)
 			.def_readwrite("draw_discontinuities", &ai_system::draw_discontinuities)
-			.def_readwrite("draw_memorised_walls", &ai_system::draw_memorised_walls),
+			.def_readwrite("draw_memorised_walls", &ai_system::draw_memorised_walls)
+			.def_readwrite("epsilon_ray_angle_variation", &ai_system::epsilon_ray_angle_variation)
+			.def_readwrite("epsilon_distance_vertex_hit", &ai_system::epsilon_distance_vertex_hit)
+			.def_readwrite("epsilon_threshold_obstacle_hit", &ai_system::epsilon_threshold_obstacle_hit)
+			.def_readwrite("epsilon_max_segment_difference", &ai_system::epsilon_max_segment_difference)
+			,
 
 			luabind::class_<ai::visibility>("visibility")
 			.def(luabind::constructor<>())
@@ -28,6 +33,10 @@ namespace bindings {
 			
 			luabind::class_<ai>("ai_component")
 			.def(luabind::constructor<>())
+			.def_readwrite("is_finding_a_path", &ai::is_finding_a_path)
+			.def_readwrite("target", &ai::target)
+			.def_readwrite("navigate_to", &ai::navigate_to)
+			.def_readwrite("avoidance_width", &ai::avoidance_width)
 			.def("add_request", &ai::add_request)
 			.def("get_visibility", &ai::get_visibility)
 			;

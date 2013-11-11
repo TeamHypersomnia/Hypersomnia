@@ -170,12 +170,7 @@ void ai_system::process_entities(world& owner) {
 			std::sort(all_vertices_transformed.begin(), all_vertices_transformed.end());
 
 			/* by now we have ensured that all_vertices_transformed is non-empty
-			this value is to be tuned
-			*/
-			const auto epsilon = 0.0001f;
-			//std::numeric_limits<float>().epsilon();
-
-			/*
+			
 			debugging:
 			red ray - ray that intersected with obstacle, these are ignored
 			yellow ray - ray that hit the same vertex
@@ -223,8 +218,8 @@ void ai_system::process_entities(world& owner) {
 
 				ray_callbacks[0] and ray_callbacks[1] differ ONLY by an epsilon added/substracted to the angle
 				*/
-				ray_callbacks[0].target = position_meters + vec2<>::from_degrees((vertex.second - position_meters).get_degrees() - epsilon) * vision_side_meters / 2 * 1.414213562373095;
-				ray_callbacks[1].target = position_meters + vec2<>::from_degrees((vertex.second - position_meters).get_degrees() + epsilon) * vision_side_meters / 2 * 1.414213562373095;
+				ray_callbacks[0].target = position_meters + vec2<>::from_degrees((vertex.second - position_meters).get_degrees() - epsilon_ray_angle_variation) * vision_side_meters / 2 * 1.414213562373095;
+				ray_callbacks[1].target = position_meters + vec2<>::from_degrees((vertex.second - position_meters).get_degrees() + epsilon_ray_angle_variation) * vision_side_meters / 2 * 1.414213562373095;
 
 				/* cast both rays starting from the player position and ending in ray_callbacks[x].target */
 				physics.b2world.RayCast(&ray_callbacks[0], position_meters, ray_callbacks[0].target);
@@ -248,12 +243,14 @@ void ai_system::process_entities(world& owner) {
 					/* if distance between intersection and target vertex is bigger than epsilon, which means that
 					BOTH intersections occured FAR from the vertex
 					then ray must have intersected with an obstacle BEFORE reaching the vertex, ignoring intersection completely */
-					if ((ray_callbacks[0].intersection - vertex.second).length_sq() > 0.01f/2.f &&
-						(ray_callbacks[1].intersection - vertex.second).length_sq() > 0.01f/2.f) {
+					float distance_from_origin = (vertex.second - position_meters).length_sq();
+					
+					if ((ray_callbacks[0].intersection - position_meters).length_sq() + PIXELS_TO_METERSf * epsilon_threshold_obstacle_hit < distance_from_origin &&
+						(ray_callbacks[1].intersection - position_meters).length_sq() + PIXELS_TO_METERSf * epsilon_threshold_obstacle_hit < distance_from_origin) {
 							if (draw_cast_rays) draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 0, 255));
 					}
 					/* distance between both intersections fit in epsilon which means ray intersected with the same vertex */
-					else if ((ray_callbacks[0].intersection - ray_callbacks[1].intersection).length_sq() < 0.01f/2.f) {
+					else if ((ray_callbacks[0].intersection - ray_callbacks[1].intersection).length_sq() < PIXELS_TO_METERSf * epsilon_distance_vertex_hit) {
 						/* interpret it as both rays hit the same vertex
 						for maximum accuracy, push the vertex coordinates instead of the actual intersections */
 						double_rays.push_back(double_ray(vertex.second, vertex.second, true, true));
@@ -369,9 +366,9 @@ void ai_system::process_entities(world& owner) {
 					bool such_a_wall_exists = false;
 					for (auto& wall : request.memorised_walls) {
 						/* if any memorised wall is almost equal to the candidate */
-						if (((wall.first - p1).length_sq() < 4.f && (wall.second - p2).length_sq() < 4.f)
+						if (((wall.first - p1).length_sq() < epsilon_max_segment_difference && (wall.second - p2).length_sq() < epsilon_max_segment_difference)
 							||
-							((wall.first - p2).length_sq() < 4.f && (wall.second - p1).length_sq() < 4.f)
+							((wall.first - p2).length_sq() < epsilon_max_segment_difference && (wall.second - p1).length_sq() < epsilon_max_segment_difference)
 							) {
 								/* there's no need to push back the new one*/
 								such_a_wall_exists = true;
@@ -382,10 +379,14 @@ void ai_system::process_entities(world& owner) {
 					if (!such_a_wall_exists)  {
 						request.memorised_walls.push_back(components::ai::edge(p1, p2));
 
-						/* if such exists, delete the undisovered wall that falls into this discovered wall */
+						/* if such exists, delete the undiscovered wall that falls into this discovered wall */
 						auto& walls = request.memorised_undiscovered_walls;
+						//walls.erase(std::remove_if(walls.begin(), walls.end(), [&](const components::ai::edge& e){
+						//	return vec2<>::segment_in_segment(e.first, e.second, p1, p2, epsilon_max_segment_difference);
+						//}), walls.end());
+						
 						for (auto& it = walls.begin(); it != walls.end(); ++it) {
-							if (vec2<>::segment_in_segment((*it).first, (*it).second, p1, p2, 4.f)) {
+							if (vec2<>::segment_in_segment((*it).first, (*it).second, p1, p2, epsilon_max_segment_difference)) {
 								walls.erase(it);
 								break;
 							}
@@ -397,7 +398,7 @@ void ai_system::process_entities(world& owner) {
 					bool this_wall_is_discovered = false;
 					/* if any memorised, discovered wall covers the the candidate */
 					for (auto& wall : request.memorised_walls) {
-						if (vec2<>::segment_in_segment(p1, p2, wall.first, wall.second, 4.f)) {
+						if (vec2<>::segment_in_segment(p1, p2, wall.first, wall.second, epsilon_max_segment_difference)) {
 							/* we don't push it as "undiscovered" as it is already discovered */
 							this_wall_is_discovered = true;
 							break;
@@ -411,14 +412,14 @@ void ai_system::process_entities(world& owner) {
 						for (auto& wall : request.memorised_undiscovered_walls) {
 							/* check if our undiscovered candidate fits into
 							any existing undiscovered walls */
-							if (vec2<>::segment_in_segment(p1, p2, wall.first, wall.second, 4.f)) {
+							if (vec2<>::segment_in_segment(p1, p2, wall.first, wall.second, epsilon_max_segment_difference)) {
 								/* if it is so, don't do anything and break */
 								this_wall_covers_any_undiscovered_wall = true;
 								break;
 							}
 							/* reverse roles: we check if any existing undiscovered wall fits inside
 							our undiscovered candidate */
-							if (vec2<>::segment_in_segment(wall.first, wall.second, p1, p2, 4.f)) {
+							if (vec2<>::segment_in_segment(wall.first, wall.second, p1, p2, epsilon_max_segment_difference)) {
 								/* we don't push (p1, p2) as another undiscovered wall,
 								we just widen this existing one */
 								this_wall_covers_any_undiscovered_wall = true;
@@ -429,7 +430,7 @@ void ai_system::process_entities(world& owner) {
 							}
 						}
 
-						/* if there's no such wall that fits */
+						/* if there's no such wall that can replace the new one */
 						if (!this_wall_covers_any_undiscovered_wall) {
 							request.memorised_undiscovered_walls.push_back(components::ai::edge(p1, p2));
 						}
@@ -451,7 +452,7 @@ void ai_system::process_entities(world& owner) {
 				}
 
 				for (auto& wall : request.memorised_undiscovered_walls) {
-					render.lines.push_back(render_system::debug_line(wall.first, wall.second, graphics::pixel_32(255, 0, 0, 255)));
+					//render.lines.push_back(render_system::debug_line(wall.first, wall.second, graphics::pixel_32(255, 0, 0, 255)));
 				}
 			}
 		}
