@@ -61,7 +61,7 @@ namespace augmentations {
 			type maximum_offset
 			) {
 				return
-					((bigger_p2 - bigger_p1).length_sq() > (smaller_p2 - smaller_p1).length_sq())
+					((bigger_p2 - bigger_p1).length_sq() >= (smaller_p2 - smaller_p1).length_sq())
 					&&
 					smaller_p1.distance_from_segment_sq(bigger_p1, bigger_p2) < maximum_offset*maximum_offset
 					&&
