@@ -25,7 +25,6 @@ namespace bindings {
 			.def_readwrite("square_side", &ai::visibility::square_side)
 			.def_readwrite("color", &ai::visibility::color)
 			.def_readwrite("postprocessing_subject", &ai::visibility::postprocessing_subject)
-			.def_readwrite("generate_navigation_info", &ai::visibility::generate_navigation_info)
 			.enum_("constants")
 			[
 				luabind::value("OBSTACLE_AVOIDANCE", ai::visibility::OBSTACLE_AVOIDANCE),
@@ -34,13 +33,14 @@ namespace bindings {
 			
 			luabind::class_<ai>("ai_component")
 			.def(luabind::constructor<>())
-			.def_readwrite("is_finding_a_path", &ai::is_finding_a_path)
-			.def_readwrite("target", &ai::target)
-			.def_readwrite("navigate_to", &ai::navigate_to)
-			.def_readwrite("avoidance_width", &ai::avoidance_width)
+			.def("start_pathfinding", &ai::start_pathfinding)
+			.def("get_current_navigation_target", &ai::get_current_navigation_target)
 			.def("clear_pathfinding_info", &ai::clear_pathfinding_info)
+			.def("is_still_pathfinding", &ai::is_still_pathfinding)
 			.def("add_request", &ai::add_request)
 			.def("get_visibility", &ai::get_visibility)
+			.def_readwrite("avoidance_width", &ai::avoidance_width)
+			.def_readwrite("enable_backtracking", &ai::enable_backtracking)
 			;
 	}
 }

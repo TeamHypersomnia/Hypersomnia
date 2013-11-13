@@ -90,6 +90,8 @@ void ai_system::process_entities(world& owner) {
 		auto& ai = it->get<components::ai>();
 		auto& transform = it->get<components::transform>().current;
 
+		auto body = it->get<components::physics>().body;
+
 		/* transform entity position to Box2D coordinates */
 		vec2<> position_meters = transform.pos * PIXELS_TO_METERSf;
 
@@ -116,15 +118,15 @@ void ai_system::process_entities(world& owner) {
 			physics.b2world.QueryAABB(&callback, aabb);
 
 			/* for every fixture that intersected with the visibility square */
-			for (auto body : callback.bodies) {
-				auto verts = reinterpret_cast<entity*>(body->GetUserData())->get<components::render>().model->get_vertices();
+			for (auto b : callback.bodies) {
+				auto verts = reinterpret_cast<entity*>(b->GetUserData())->get<components::render>().model->get_vertices();
 				/* for every vertex in given fixture's shape */
 				for (auto& v : verts) {
 					v *= PIXELS_TO_METERSf;
 
-					auto position = body->GetPosition();
+					auto position = b->GetPosition();
 					/* transform angle to degrees */
-					auto rotation = body->GetAngle() / 0.01745329251994329576923690768489f;
+					auto rotation = b->GetAngle() / 0.01745329251994329576923690768489f;
 
 					std::pair<float, vec2<>> new_vertex;
 					/* transform vertex to current entity's position and rotation */
@@ -203,7 +205,7 @@ void ai_system::process_entities(world& owner) {
 			};
 
 			/* container for holding info about local discontinuities, will be used for dynamic AI navigation */
-			std::vector<components::ai::visibility::discontinuity> local_discontinuities;
+			std::vector<components::ai::discontinuity> local_discontinuities;
 
 			for (auto& vertex : all_vertices_transformed) {
 				b2Vec2* from_aabb = nullptr;
@@ -270,7 +272,7 @@ void ai_system::process_entities(world& owner) {
 						double_ray new_double_ray(ray_callbacks[0].intersection, ray_callbacks[1].intersection, false, false);
 
 						/* handle new discontinuity */
-						components::ai::visibility::discontinuity new_discontinuity;
+						components::ai::discontinuity new_discontinuity;
 
 						/* if the ray that we substracted the epsilon from intersected closer (and thus with the vertex), then the free space is to the right */
 						if ((ray_callbacks[0].intersection - position_meters).length_sq() < (ray_callbacks[1].intersection - position_meters).length_sq()) {
@@ -279,7 +281,7 @@ void ai_system::process_entities(world& owner) {
 
 							new_discontinuity.points.first = vertex.second;
 							new_discontinuity.points.second = ray_callbacks[1].intersection;
-							new_discontinuity.winding = components::ai::visibility::discontinuity::RIGHT;
+							new_discontinuity.winding = components::ai::discontinuity::RIGHT;
 							if (draw_cast_rays) draw_line(ray_callbacks[1].intersection, graphics::pixel_32(255, 0, 255, 255));
 						}
 						/* otherwise it is to the left */
@@ -289,7 +291,7 @@ void ai_system::process_entities(world& owner) {
 
 							new_discontinuity.points.first = vertex.second;
 							new_discontinuity.points.second = ray_callbacks[0].intersection;
-							new_discontinuity.winding = components::ai::visibility::discontinuity::LEFT;
+							new_discontinuity.winding = components::ai::discontinuity::LEFT;
 							if (draw_cast_rays) draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 255, 255));
 						}
 						/* save new double ray */
@@ -321,7 +323,7 @@ void ai_system::process_entities(world& owner) {
 								/* if we hit against boundaries (must happen for at least 1 of them) */
 								if (bound.RayCast(&output, input, null_transform, 0)) {
 									/* prepare new discontinuity data */
-									components::ai::visibility::discontinuity new_discontinuity;
+									components::ai::discontinuity new_discontinuity;
 
 									/* compute the actual intersection point from b2RayCastOutput data */
 									auto actual_intersection = input.p1 + output.fraction * (input.p2 - input.p1);
@@ -330,14 +332,14 @@ void ai_system::process_entities(world& owner) {
 									if (i == 0) {
 										new_discontinuity.points.first = ray_callbacks[1].intersection;
 										new_discontinuity.points.second = ray_callbacks[0].intersection;
-										new_discontinuity.winding = components::ai::visibility::discontinuity::LEFT;
+										new_discontinuity.winding = components::ai::discontinuity::LEFT;
 										double_rays.push_back(double_ray(actual_intersection, ray_callbacks[1].intersection, false, true));
 									}
 									/* if the right-handed ray intersected with boundary */
 									else if (i == 1) {
 										new_discontinuity.points.first = ray_callbacks[0].intersection;
 										new_discontinuity.points.second = ray_callbacks[1].intersection;
-										new_discontinuity.winding = components::ai::visibility::discontinuity::RIGHT;
+										new_discontinuity.winding = components::ai::discontinuity::RIGHT;
 										double_rays.push_back(double_ray(ray_callbacks[0].intersection, actual_intersection, true, false));
 									}
 
@@ -361,6 +363,11 @@ void ai_system::process_entities(world& owner) {
 				disc.points.second *= METERS_TO_PIXELSf;
 			}
 
+			if (!ai.is_finding_a_path && draw_discontinuities && entry.key == components::ai::visibility::DYNAMIC_PATHFINDING) {
+				for (auto& disc : local_discontinuities)
+					render.lines.push_back(render_system::debug_line(disc.points.first, disc.points.second, graphics::pixel_32(0, 127, 255, 255)));
+			}
+
 			for (size_t i = 0; i < double_rays.size(); ++i) {
 				/* (i + 1)%double_rays.size() ensures the cycle */
 				auto& ray_a = double_rays[i];
@@ -377,14 +384,14 @@ void ai_system::process_entities(world& owner) {
 
 				request.edges.push_back(std::make_pair(p1, p2));
 
-				/* if we don't want to generate navigation info */
-				if (!request.generate_navigation_info) continue;
+				/* if we're not here to generate pathfinding info, return */
+				if (entry.key != components::ai::visibility::DYNAMIC_PATHFINDING) continue;
 
 				/* we have a fully visible wall here */
 				if (ray_a.second_reached_destination && ray_b.first_reached_destination) {
 					/* compare with already memorised walls */
 					bool such_a_wall_exists = false;
-					for (auto& wall : request.visible_walls) {
+					for (auto& wall : ai.session.visible_walls) {
 						/* if any memorised wall is almost equal to the candidate */
 						if (((wall.first - p1).length_sq() < epsilon_max_segment_difference && (wall.second - p2).length_sq() < epsilon_max_segment_difference)
 							||
@@ -397,7 +404,7 @@ void ai_system::process_entities(world& owner) {
 					}
 
 					if (!such_a_wall_exists)  {
-						request.visible_walls.push_back(components::ai::edge(p1, p2));
+						ai.session.visible_walls.push_back(components::ai::edge(p1, p2));
 
 						/* if such exists, delete the undiscovered wall that falls into this discovered wall */
 						//auto& undiscovered = request.undiscovered_walls;
@@ -458,31 +465,31 @@ void ai_system::process_entities(world& owner) {
 				//}
 			}
 
-			if (request.generate_navigation_info) {
+			if (entry.key == components::ai::visibility::DYNAMIC_PATHFINDING) {
 				/* save new discontinuities */
 				for (auto& disc : local_discontinuities) {
 					bool this_discontinuity_is_already_memorised = false;
 
-					for (auto& memorised : request.undiscovered_discontinuities) {
+					for (auto& memorised : ai.session.undiscovered_discontinuities) {
 						/* if a discontinuity with the same closer vertex already exists */
 						if ((memorised.points.first - disc.points.first).length() < 3.f) {
 							this_discontinuity_is_already_memorised = true;
-							memorised.points.second = disc.points.second;
+							//memorised.points.second = disc.points.second;
 							break;
 						}
 					}
 
 					/* if it is unique, push it */
 					if (!this_discontinuity_is_already_memorised)
-						request.undiscovered_discontinuities.push_back(disc);
+						ai.session.undiscovered_discontinuities.push_back(disc);
 				}
 
 				/* delete all discontinuities that fall into any of fully visible walls */
-				auto& discs = request.undiscovered_discontinuities;
-				discs.erase(std::remove_if(discs.begin(), discs.end(), [&request, this](const components::ai::visibility::discontinuity& d){
+				auto& discs = ai.session.undiscovered_discontinuities;
+				discs.erase(std::remove_if(discs.begin(), discs.end(), [&ai, this](const components::ai::discontinuity& d){
 					bool this_discontinuity_is_discovered = false;
 					
-					for (auto& wall : request.visible_walls) {
+					for (auto& wall : ai.session.visible_walls) {
 						if (d.points.second.distance_from_segment_sq(wall.first, wall.second) < epsilon_max_segment_difference) {
 							this_discontinuity_is_discovered = true;
 							break;
@@ -494,7 +501,7 @@ void ai_system::process_entities(world& owner) {
 			}
 
 			if (draw_memorised_walls) {
-				for (auto& wall : request.visible_walls) {
+				for (auto& wall : ai.session.visible_walls) {
 					render.lines.push_back(render_system::debug_line(wall.first, wall.second, graphics::pixel_32(0, 255, 0, 255)));
 				}
 
@@ -506,24 +513,33 @@ void ai_system::process_entities(world& owner) {
 
 		/* if we are requested to constantly update navigation info */
 		if (ai.is_finding_a_path) {
+			/* get navigation info from dynamic_pathfinding visibility request */
 			auto& visibility_info = ai.get_visibility(components::ai::visibility::DYNAMIC_PATHFINDING);
 
-			if ((ai.navigate_to - ai.target).length_sq() < ai.avoidance_width*ai.avoidance_width) {
-				ai.navigate_to = ai.target;
+			my_ray_callback line_of_sight;
+			line_of_sight.subject = it;
+			line_of_sight.subject_filter = &visibility_info.filter;
+
+			bool target_inside_body = body->TestPoint(ai.session.target * PIXELS_TO_METERSf);
+			
+			if (ai.session_stack.empty() && target_inside_body) {
+				ai.is_finding_a_path = false;
 			}
 			else {
 				/* first check if there's a line of sight */
-				my_ray_callback line_of_sight;
-				line_of_sight.subject = it;
-				line_of_sight.subject_filter = &visibility_info.filter;
-				physics.b2world.RayCast(&line_of_sight, ai.target * PIXELS_TO_METERSf, transform.pos * PIXELS_TO_METERSf);
+				physics.b2world.RayCast(&line_of_sight, ai.session.target * PIXELS_TO_METERSf, transform.pos * PIXELS_TO_METERSf);
 
-				if (line_of_sight.hit && reinterpret_cast<entity*>(line_of_sight.what_fixture->GetBody()->GetUserData()) == it) {
-					ai.navigate_to = ai.target;
+				if (target_inside_body || (line_of_sight.hit && reinterpret_cast<entity*>(line_of_sight.what_fixture->GetBody()->GetUserData()) == it)) {
+					/* if we're actually navigating to a secondary target */
+					if (!ai.session_stack.empty()) {
+						/* roll back to the previous session */
+						const auto top = ai.session_stack.end() - 1;
+						ai.session = *top;
+						ai.session_stack.erase(top);
+					} else ai.session.navigate_to = ai.session.target;
 				}
 				else {
-					/* get navigation info from dynamic_pathfinding visibility request */
-					auto& vertices = visibility_info.undiscovered_discontinuities;
+					auto& vertices = ai.session.undiscovered_discontinuities;
 
 					if (draw_discontinuities) {
 						for (auto& disc : vertices)
@@ -533,26 +549,45 @@ void ai_system::process_entities(world& owner) {
 					if (!vertices.empty()) {
 						/* find discontinuity that is closest to the target */
 						auto& local_minimum_discontinuity = (*std::min_element(vertices.begin(), vertices.end(),
-							[&ai, &transform](const components::ai::visibility::discontinuity& a,
-							const components::ai::visibility::discontinuity& b) {
-								return (a.points.first - ai.target).length_sq() + (a.points.first - transform.pos).length_sq()
-									< (b.points.first - ai.target).length_sq() + (b.points.first - transform.pos).length_sq();
+							[&ai, &transform](const components::ai::discontinuity& a,
+							const components::ai::discontinuity& b) {
+								return (a.points.first - ai.session.target).length_sq() + (a.points.first - transform.pos).length_sq()
+									< (b.points.first - ai.session.target).length_sq() + (b.points.first - transform.pos).length_sq();
 						}));
 
 						/* extract the closer vertex */
-						ai.navigate_to = local_minimum_discontinuity.points.first;
+						ai.session.navigate_to = local_minimum_discontinuity.points.second;
 
 						/* rotate it a bit so we don't collide with walls */
-						float a = ai.avoidance_width / (2 * (ai.navigate_to - transform.pos).length());
+						float a = ai.avoidance_width / (2 * (ai.session.navigate_to - transform.pos).length());
 						if (a > 1) a = 1;
 
 						float angular_offset = asin(a) / 0.01745329251994329576923690768489f;
 
 						/* if the free area is counter-clockwise wound */
-						if (local_minimum_discontinuity.winding == components::ai::visibility::discontinuity::LEFT)
+						if (local_minimum_discontinuity.winding == components::ai::discontinuity::LEFT)
 							angular_offset = -angular_offset;
 
-						ai.navigate_to.rotate(angular_offset, transform.pos);
+						ai.session.navigate_to.rotate(angular_offset, transform.pos);
+
+						/* test if we can see it */
+						physics.b2world.RayCast(&line_of_sight, local_minimum_discontinuity.points.first * PIXELS_TO_METERSf, transform.pos * PIXELS_TO_METERSf);
+						
+						/* and if we can, navigate there */
+						if (body->TestPoint(ai.session.navigate_to * PIXELS_TO_METERSf) || 
+							(line_of_sight.hit && reinterpret_cast<entity*>(line_of_sight.what_fixture->GetBody()->GetUserData()) == it)) {
+						}
+						/* else start new navigation session */
+						else {
+							if (ai.enable_backtracking) {
+								vec2<> new_target = ai.session.navigate_to;
+
+								ai.session_stack.push_back(ai.session);
+								ai.session = components::ai::pathfinding_session();
+								ai.session.target = new_target;
+							}
+						}
+
 					}
 				}
 			}
