@@ -485,6 +485,15 @@ void b2Body::SetActive(bool flag)
 	}
 }
 
+bool b2Body::TestPoint(b2Vec2 v) const
+{
+	for (const b2Fixture* f = GetFixtureList(); f != nullptr; f = f->GetNext()) {
+		if (f->TestPoint(v)) return true;
+	}
+
+	return false;
+}
+
 void b2Body::Dump()
 {
 	int32 bodyIndex = m_islandIndex;

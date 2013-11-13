@@ -324,6 +324,8 @@ public:
 	/// @return true if the body is sleeping.
 	bool IsAwake() const;
 
+	bool TestPoint(b2Vec2) const;
+
 	/// Set the active state of the body. An inactive body is not
 	/// simulated and cannot be collided with or woken up.
 	/// If you pass a flag of true, all fixtures will be added to the
