@@ -405,64 +405,8 @@ void ai_system::process_entities(world& owner) {
 
 					if (!such_a_wall_exists)  {
 						ai.session.visible_walls.push_back(components::ai::edge(p1, p2));
-
-						/* if such exists, delete the undiscovered wall that falls into this discovered wall */
-						//auto& undiscovered = request.undiscovered_walls;
-						////walls.erase(std::remove_if(walls.begin(), walls.end(), [&](const components::ai::edge& e){
-						////	return vec2<>::segment_in_segment(e.first, e.second, p1, p2, epsilon_max_segment_difference);
-						////}), walls.end());
-						//
-						//for (auto& it = undiscovered.begin(); it != undiscovered.end(); ++it) {
-						//	if (vec2<>::segment_in_segment((*it).first, (*it).second, p1, p2, epsilon_max_segment_difference)) {
-						//		undiscovered.erase(it);
-						//		break;
-						//	}
-						//}
 					}
 				}
-				/* we have a potentially undiscovered wall */
-				//else {
-				//	bool this_wall_is_discovered = false;
-				//	/* if any memorised, discovered wall covers the the candidate */
-				//	for (auto& wall : request.visible_walls) {
-				//		if (vec2<>::segment_in_segment(p1, p2, wall.first, wall.second, epsilon_max_segment_difference)) {
-				//			/* we don't push it as "undiscovered" as it is already discovered */
-				//			this_wall_is_discovered = true;
-				//			break;
-				//		}
-				//	}
-				//
-				//	/* if this wall is undiscovered */
-				//	if (!this_wall_is_discovered) {
-				//		bool this_wall_covers_any_undiscovered_wall = false;
-				//
-				//		for (auto& wall : request.undiscovered_walls) {
-				//			/* check if our undiscovered candidate fits into
-				//			any existing undiscovered walls */
-				//			if (vec2<>::segment_in_segment(p1, p2, wall.first, wall.second, epsilon_max_segment_difference)) {
-				//				/* if it is so, don't do anything and break */
-				//				this_wall_covers_any_undiscovered_wall = true;
-				//				break;
-				//			}
-				//			/* reverse roles: we check if any existing undiscovered wall fits inside
-				//			our undiscovered candidate */
-				//			if (vec2<>::segment_in_segment(wall.first, wall.second, p1, p2, epsilon_max_segment_difference)) {
-				//				/* we don't push (p1, p2) as another undiscovered wall,
-				//				we just widen this existing one */
-				//				this_wall_covers_any_undiscovered_wall = true;
-				//
-				//				wall.first = p1;
-				//				wall.second = p2;
-				//				break;
-				//			}
-				//		}
-				//
-				//		/* if there's no such wall that can replace the new one */
-				//		if (!this_wall_covers_any_undiscovered_wall) {
-				//			request.undiscovered_walls.push_back(components::ai::edge(p1, p2));
-				//		}
-				//	}
-				//}
 			}
 
 			if (entry.key == components::ai::visibility::DYNAMIC_PATHFINDING) {
@@ -504,10 +448,6 @@ void ai_system::process_entities(world& owner) {
 				for (auto& wall : ai.session.visible_walls) {
 					render.lines.push_back(render_system::debug_line(wall.first, wall.second, graphics::pixel_32(0, 255, 0, 255)));
 				}
-
-				//for (auto& wall : request.undiscovered_walls) {
-				//	//render.lines.push_back(render_system::debug_line(wall.first, wall.second, graphics::pixel_32(255, 0, 0, 255)));
-				//}
 			}
 		}
 
