@@ -10,6 +10,8 @@
 
 #include "../messages/particle_burst_message.h"
 
+#include "utility/randval.h"
+
 void particle_emitter_system::spawn_particle(
 	components::particle_group& group, const vec2<>& position, float rotation, const resources::emission& emission) {
 		auto new_particle = emission.particle_templates[randval(0u, emission.particle_templates.size()-1)];

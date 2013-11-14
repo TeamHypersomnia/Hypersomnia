@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "utility/randval.h"
 #include "particle_group_system.h"
 #include "particle_emitter_system.h"
 #include "entity_system/entity.h"

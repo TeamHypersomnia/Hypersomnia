@@ -604,6 +604,7 @@
     </ClCompile>
     <ClCompile Include="utility\delta_accumulator.cpp" />
     <ClCompile Include="utility\input_context.cpp" />
+    <ClCompile Include="utility\randval.cpp" />
     <ClCompile Include="utility\timer.cpp" />
     <ClCompile Include="utility\value_animator.cpp" />
     <ClCompile Include="window_framework\event.cpp">
@@ -749,6 +750,7 @@
     <ClInclude Include="utility\delta_accumulator.h" />
     <ClInclude Include="utility\input_context.h" />
     <ClInclude Include="utility\map_wrapper.h" />
+    <ClInclude Include="utility\randval.h" />
     <ClInclude Include="utility\sorted_vector.h" />
     <ClInclude Include="utility\stream.h" />
     <ClInclude Include="utility\timer.h" />

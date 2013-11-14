@@ -20,7 +20,7 @@ ai_system.epsilon_max_segment_difference = 4
 
 
 render_system.draw_steering_forces = 1
-render_system.draw_substeering_forces = 0
+render_system.draw_substeering_forces = 1
 render_system.draw_velocities = 0
 
 render_system.draw_avoidance_info = 1
@@ -448,6 +448,11 @@ shotgun = archetyped(assault_rifle, {
 	velocity_variation = 3500
 })
 
+blank = create_sprite {
+	image = images.blank,
+	size_multiplier = vec2(10, 7)
+}
+
 my_npc_archetype = {
 	body = {
 		transform = { 
@@ -457,12 +462,12 @@ my_npc_archetype = {
 		
 		render = {
 			layer = render_layers.PLAYERS,
-			model = nil
+			model = blank
 		},
 		
-		animate = {
-			available_animations = npc_animation_body_set
-		},
+		--animate = {
+		--	--available_animations = npc_animation_body_set
+		--},
 		
 		health = {
 			hp = 1000,
@@ -488,7 +493,7 @@ my_npc_archetype = {
 			body_info = {
 				filter = filter_characters,
 				shape_type = physics_info.RECT,
-				rect_size = images.player_1.size*npc_size_multiplier,
+				rect_size = blank.size*npc_size_multiplier,
 				
 				angular_damping = 5,
 				linear_damping = 3,
@@ -522,11 +527,16 @@ my_npc_archetype = {
 			enable_backtracking = true,
 		
 			visibility_requests = {
-				[visibility.OBSTACLE_AVOIDANCE] = {
-					square_side = 5000,
-					color = rgba(255, 0, 0, 0),
-					filter = filter_obstacle_visibility
-				}
+				--[visibility.OBSTACLE_AVOIDANCE] = {
+				--	square_side = 5000,
+				--	color = rgba(255, 0, 0, 0),
+				--	filter = filter_obstacle_visibility
+				--}
+				--[visibility.CONTAINMENT] = {
+				--	square_side = 5000,
+				--	color = rgba(255, 0, 0, 0),
+				--	filter = filter_obstacle_visibility
+				--}
 			}
 		}
 	},
@@ -632,6 +642,7 @@ create_entity (archetyped(metal_archetype, {
 }))
 
 
+
 player = create_entity_group (archetyped(my_npc_archetype, {
 	body = {
 		transform = {
@@ -639,16 +650,16 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 			--rotation = 0
 		},
 		
-		animate = {
-			available_animations = npc_animation_body_set
-		},
+		--animate = {
+		--	available_animations = npc_animation_body_set
+		--},
 		
 		gun = assault_rifle,
 		
 		physics = {
 		
 			body_info = {
-				fixed_rotation = true,
+				fixed_rotation = false,
 				angular_damping = 5,
 				linear_damping = 13
 			}
@@ -662,16 +673,16 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 			intent_message.SHOOT
 		},
 		
-		lookat = {
-			target = "crosshair",
-			look_mode = lookat_component.POSITION
-		},
+		--lookat = {
+		--	target = "crosshair",
+		--	look_mode = lookat_component.POSITION
+		--},
 		
 		ai = {
 			avoidance_width = 300,
 		
 			visibility_requests = {
-				[visibility.OBSTACLE_AVOIDANCE] = {
+				[visibility.CONTAINMENT] = {
 					square_side = 7000,
 					color = rgba(255, 0, 255, 0),
 					filter = filter_obstacle_visibility
@@ -867,7 +878,7 @@ flee_behaviour = create_steering_behaviour {
 		
 seek_behaviour = create_steering_behaviour {
 	current_target = navigation_target_entity,
-	weight = 10,
+	weight = 0.1,
 	behaviour_type = steering_behaviour.SEEK,
 	enabled = true,
 	erase_when_target_reached = false,
@@ -897,10 +908,14 @@ evasion_behaviour = create_steering_behaviour {
 obstacle_avoidance_behaviour = create_steering_behaviour {
 	current_target = navigation_target_entity,
 	weight = 10000, 
-	behaviour_type = steering_behaviour.OBSTACLE_AVOIDANCE,
+	behaviour_type = steering_behaviour.CONTAINMENT,
+	
+	visibility_type = visibility.CONTAINMENT,
+	ray_count = 20,
+	randomize_rays = false,
 	
 	enabled = true,
-	force_color = rgba(255, 0, 0, 255),
+	force_color = rgba(0, 255, 255, 255),
 	intervention_time_ms = 200,
 	avoidance_rectangle_width = 150,
 	decision_duration_ms = 0
@@ -949,7 +964,7 @@ my_steered_npc_archetype = (archetyped(my_npc_archetype, {
 
 --my_steered_npc.body.steering:add_behaviour(obstacle_avoidance_behaviour)
 --my_steered_npc.body.steering:add_behaviour(seek_behaviour)
-obstacle_avoidance_behaviour.current_target:set(navigation_target_entity)
+--obstacle_avoidance_behaviour.current_target:set(navigation_target_entity)
 
 blue_crosshair_sprite = create_sprite {
 	image = images.crosshair,

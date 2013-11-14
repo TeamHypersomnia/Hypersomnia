@@ -14,6 +14,8 @@ images = {
 	background = "Release\\resources\\background.jpg",
 	crosshair = "Release\\resources\\crosshair.png",
 	
+	blank = "Release\\resources\\blank.png",
+	
 	legs_1 = "Release\\resources\\legs_1.png",
 	legs_2 = "Release\\resources\\legs_2.png",
 	legs_3 = "Release\\resources\\legs_3.png",
