@@ -113,6 +113,11 @@ namespace augmentations {
 			return sqrt(distance_from_segment_sq(v, w));
 		}
 
+		vec2 project_onto(vec2 v, vec2 w) const {
+			const float t = ((*this) - v).dot(w - v) / (v - w).length_sq();
+			return v + t * (w - v);
+		}
+
 		float dot(vec2 v) const {
 			return x * v.x + y * v.y;
 		}
