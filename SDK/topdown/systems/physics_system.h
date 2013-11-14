@@ -37,14 +37,16 @@ public:
 	void clear() override;
 
 	struct raycast_output {
-		vec2<> intersection;
+		vec2<> intersection, normal;
 		bool hit;
 		b2Fixture* what_fixture;
+		entity* what_entity;
 
 		raycast_output() : hit(false), what_fixture(nullptr) {}
 	};
 
-	raycast_output ray_cast(vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter = 0, entity* ignore_entity = nullptr);
+	raycast_output ray_cast   (vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter = 0, entity* ignore_entity = nullptr);
+	raycast_output ray_cast_px(vec2<> p1, vec2<> p2, b2Filter* filter = 0, entity* ignore_entity = nullptr);
 private:
 	struct raycast_input : public b2RayCastCallback {
 		entity* subject;

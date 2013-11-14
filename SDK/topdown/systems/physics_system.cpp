@@ -7,8 +7,9 @@
 #include "../messages/collision_message.h"
 
 bool physics_system::raycast_input::ShouldRaycast(b2Fixture* fixture) {
+	entity* fixture_entity = reinterpret_cast<entity*>(fixture->GetBody()->GetUserData());
 	return
-		(subject && reinterpret_cast<entity*>(fixture->GetBody()->GetUserData()) == subject) ||
+		(!subject || fixture_entity != subject) &&
 		(b2ContactFilter::ShouldCollide(subject_filter, &fixture->GetFilterData()));
 }
 
@@ -18,6 +19,8 @@ float32 physics_system::raycast_input::ReportFixture(b2Fixture* fixture, const b
 
 		output.hit = true;
 		output.what_fixture = fixture;
+		output.what_entity = reinterpret_cast<entity*>(fixture->GetBody()->GetUserData());
+		output.normal = normal;
 		return fraction;
 }
 
@@ -37,6 +40,13 @@ physics_system::raycast_output physics_system::ray_cast(vec2<> p1_meters, vec2<>
 
 	b2world.RayCast(&callback, p1_meters, p2_meters);
 	return callback.output;
+}
+
+physics_system::raycast_output physics_system::ray_cast_px (vec2<> p1, vec2<> p2, b2Filter* filter, entity* ignore_entity) {
+	auto out = ray_cast(p1 * PIXELS_TO_METERSf, p2 * PIXELS_TO_METERSf, filter, ignore_entity);
+	out.intersection *= METERS_TO_PIXELSf;
+	
+	return out;
 }
 
 void physics_system::contact_listener::BeginContact(b2Contact* contact) {

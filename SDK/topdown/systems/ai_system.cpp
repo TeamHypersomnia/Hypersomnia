@@ -200,7 +200,7 @@ void ai_system::process_entities(world& owner) {
 					position_meters + vec2<>::from_degrees((vertex.second - position_meters).get_degrees() + epsilon_ray_angle_variation) * vision_side_meters / 2 * 1.414213562373095
 				};
 				
-				/* cast both rays starting from the player position and ending in ray_callbacks[x].target */
+				/* cast both rays starting from the player position and ending in ray_callbacks[x].target, ignoring subject entity completely */
 				ray_callbacks[0] = physics.ray_cast(position_meters, targets[0], &request.filter, it);
 				ray_callbacks[1] = physics.ray_cast(position_meters, targets[1], &request.filter, it);
 
@@ -427,8 +427,8 @@ void ai_system::process_entities(world& owner) {
 			auto& visibility_info = ai.get_visibility(components::ai::visibility::DYNAMIC_PATHFINDING);
 
 			auto& is_point_visible = [&physics, this](vec2<> from, vec2<> point, b2Filter& filter){
-				auto line_of_sight = physics.ray_cast(from * PIXELS_TO_METERSf, point * PIXELS_TO_METERSf, &filter);
-				return (!line_of_sight.hit || (line_of_sight.intersection * METERS_TO_PIXELSf - point).length_sq() < epsilon_distance_vertex_hit);
+				auto line_of_sight = physics.ray_cast_px(from, point, &filter);
+				return (!line_of_sight.hit || (line_of_sight.intersection - point).length_sq() < epsilon_distance_vertex_hit);
 			};
 
 			bool target_inside_body = body->TestPoint(ai.session.target * PIXELS_TO_METERSf);
