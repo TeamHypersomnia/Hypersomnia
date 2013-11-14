@@ -23,12 +23,16 @@ namespace bindings {
 			.def_readwrite("intervention_time_ms", &steering::behaviour::intervention_time_ms)
 			.def_readwrite("avoidance_rectangle_width", &steering::behaviour::avoidance_rectangle_width)
 			.def_readwrite("decision_duration_ms", &steering::behaviour::decision_duration_ms)
+			.def_readwrite("randomize_rays", &steering::behaviour::randomize_rays)
+			.def_readwrite("ray_count", &steering::behaviour::ray_count)
+			.def_readwrite("visibility_type", &steering::behaviour::visibility_type)
 			.enum_("script_type")[
 				luabind::value("SEEK", steering::behaviour::SEEK),
 				luabind::value("FLEE", steering::behaviour::FLEE),
 				luabind::value("PURSUIT", steering::behaviour::PURSUIT),
 				luabind::value("EVASION", steering::behaviour::EVASION),
-				luabind::value("OBSTACLE_AVOIDANCE", steering::behaviour::OBSTACLE_AVOIDANCE)
+				luabind::value("OBSTACLE_AVOIDANCE", steering::behaviour::OBSTACLE_AVOIDANCE),
+				luabind::value("CONTAINMENT", steering::behaviour::CONTAINMENT)
 			],
 
 			luabind::class_<steering>("steering_component")

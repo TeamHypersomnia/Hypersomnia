@@ -15,7 +15,8 @@ namespace components {
 		struct visibility {
 			enum type {
 				OBSTACLE_AVOIDANCE,
-				DYNAMIC_PATHFINDING
+				DYNAMIC_PATHFINDING,
+				CONTAINMENT
 			};
 
 			bool postprocessing_subject;

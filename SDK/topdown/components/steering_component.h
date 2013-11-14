@@ -5,6 +5,8 @@
 #include "graphics/pixel.h"
 #include "utility/timer.h"
 
+#include "ai_component.h"
+
 class steering_system;
 
 namespace components {
@@ -13,7 +15,7 @@ namespace components {
 		
 		struct behaviour {
 			enum {
-				SEEK, FLEE, ARRIVAL, PURSUIT, EVASION, OBSTACLE_AVOIDANCE
+				SEEK, FLEE, ARRIVAL, PURSUIT, EVASION, OBSTACLE_AVOIDANCE, CONTAINMENT
 			} behaviour_type;
 
 			target current_target;
@@ -30,6 +32,11 @@ namespace components {
 			float decision_duration_ms;
 
 			bool erase_when_target_reached;
+
+			bool randomize_rays;
+			int ray_count;
+			int visibility_type;
+
 			bool enabled;
 
 			augmentations::graphics::pixel_32 force_color;
@@ -48,7 +55,10 @@ namespace components {
 				effective_fleeing_radius(-1.f),
 				intervention_time_ms(0.f),
 				avoidance_rectangle_width(0.f),
-				decision_duration_ms(0.f)
+				decision_duration_ms(0.f),
+				ray_count(0),
+				randomize_rays(false),
+				visibility_type(ai::visibility::OBSTACLE_AVOIDANCE)
 			{
 				last_decision_timer.reset();
 			}

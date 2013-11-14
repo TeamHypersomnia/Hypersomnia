@@ -28,6 +28,7 @@ namespace bindings {
 			.enum_("constants")
 			[
 				luabind::value("OBSTACLE_AVOIDANCE", ai::visibility::OBSTACLE_AVOIDANCE),
+				luabind::value("CONTAINMENT", ai::visibility::CONTAINMENT),
 				luabind::value("DYNAMIC_PATHFINDING", ai::visibility::DYNAMIC_PATHFINDING)
 			],
 			
