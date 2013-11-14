@@ -35,4 +35,24 @@ public:
 	void add(entity*) override;
 	void remove(entity*) override;
 	void clear() override;
+
+	struct raycast_output {
+		vec2<> intersection;
+		bool hit;
+		b2Fixture* what_fixture;
+
+		raycast_output() : hit(false), what_fixture(nullptr) {}
+	};
+
+	raycast_output ray_cast(vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter = 0, entity* ignore_entity = nullptr);
+private:
+	struct raycast_input : public b2RayCastCallback {
+		entity* subject;
+		b2Filter* subject_filter;
+		raycast_output output;
+
+		bool ShouldRaycast(b2Fixture* fixture);
+		float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction);
+		raycast_input();
+	};
 };

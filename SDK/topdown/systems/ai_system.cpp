@@ -27,35 +27,6 @@ struct my_callback : public b2QueryCallback {
 	}
 };
 
-struct my_ray_callback : public b2RayCastCallback {
-	entity* subject;
-	b2Filter* subject_filter;
-
-	vec2<> intersection, target;
-	bool hit;
-	b2Fixture* what_fixture;
-
-	my_ray_callback() : hit(false), subject_filter(nullptr), subject(nullptr), what_fixture(nullptr) {}
-
-	bool ShouldRaycast(b2Fixture* fixture) override {
-		//if (subject_filter)
-			return 
-				(subject && reinterpret_cast<entity*>(fixture->GetBody()->GetUserData()) == subject) ||
-				(b2ContactFilter::ShouldCollide(subject_filter, &fixture->GetFilterData()));
-
-		//return true;
-	}
-
-	float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point,
-		const b2Vec2& normal, float32 fraction) override {
-			intersection = point;
-
-			hit = true;
-			what_fixture = fixture;
-			return fraction;
-	}
-};
-
 template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
@@ -214,25 +185,24 @@ void ai_system::process_entities(world& owner) {
 					if (vertex.second == aabb_vert)
 						from_aabb = &aabb_vert;
 
-				my_ray_callback ray_callbacks[2];
-
 				/* save the entity pointer in ray_callback structure to not intersect with the player fixture
 				it is then compared in my_ray_callback::ReportFixture
 				*/
-				ray_callbacks[0].subject = it;
-				ray_callbacks[0].subject_filter = &request.filter;
-				ray_callbacks[1] = ray_callbacks[0];
+				
 				/* create a vector in direction of vertex with length equal to the half of diagonal of the visibility square
 				(majority of rays will slightly SLIGHTLY go beyond visibility square, but that's not important for now)
-
-				ray_callbacks[0] and ray_callbacks[1] differ ONLY by an epsilon added/substracted to the angle
+				ray_callbacks[0] and ray_callbacks[1] differ ONLY by an epsilon added / substracted to the angle
 				*/
-				ray_callbacks[0].target = position_meters + vec2<>::from_degrees((vertex.second - position_meters).get_degrees() - epsilon_ray_angle_variation) * vision_side_meters / 2 * 1.414213562373095;
-				ray_callbacks[1].target = position_meters + vec2<>::from_degrees((vertex.second - position_meters).get_degrees() + epsilon_ray_angle_variation) * vision_side_meters / 2 * 1.414213562373095;
 
+				physics_system::raycast_output ray_callbacks[2];
+				vec2<> targets[2] = {
+					position_meters + vec2<>::from_degrees((vertex.second - position_meters).get_degrees() - epsilon_ray_angle_variation) * vision_side_meters / 2 * 1.414213562373095,
+					position_meters + vec2<>::from_degrees((vertex.second - position_meters).get_degrees() + epsilon_ray_angle_variation) * vision_side_meters / 2 * 1.414213562373095
+				};
+				
 				/* cast both rays starting from the player position and ending in ray_callbacks[x].target */
-				physics.b2world.RayCast(&ray_callbacks[0], position_meters, ray_callbacks[0].target);
-				physics.b2world.RayCast(&ray_callbacks[1], position_meters, ray_callbacks[1].target);
+				ray_callbacks[0] = physics.ray_cast(position_meters, targets[0], &request.filter, it);
+				ray_callbacks[1] = physics.ray_cast(position_meters, targets[1], &request.filter, it);
 
 				/* if we did not intersect with anything */
 				if (!(ray_callbacks[0].hit || ray_callbacks[1].hit)) {
@@ -313,7 +283,7 @@ void ai_system::process_entities(world& owner) {
 								b2RayCastInput input;
 								input.maxFraction = 1.0;
 								input.p1 = position_meters;
-								input.p2 = ray_callbacks[i].target;
+								input.p2 = targets[i];
 
 								/* we don't need to transform edge or ray since they are in the same space
 								but we have to prepare dummy b2Transform as argument for b2EdgeShape::RayCast
@@ -456,9 +426,10 @@ void ai_system::process_entities(world& owner) {
 			/* get navigation info from dynamic_pathfinding visibility request */
 			auto& visibility_info = ai.get_visibility(components::ai::visibility::DYNAMIC_PATHFINDING);
 
-			my_ray_callback line_of_sight;
-			line_of_sight.subject = it;
-			line_of_sight.subject_filter = &visibility_info.filter;
+			auto& is_point_visible = [&physics, this](vec2<> from, vec2<> point, b2Filter& filter){
+				auto line_of_sight = physics.ray_cast(from * PIXELS_TO_METERSf, point * PIXELS_TO_METERSf, &filter);
+				return (!line_of_sight.hit || (line_of_sight.intersection * METERS_TO_PIXELSf - point).length_sq() < epsilon_distance_vertex_hit);
+			};
 
 			bool target_inside_body = body->TestPoint(ai.session.target * PIXELS_TO_METERSf);
 			
@@ -467,9 +438,9 @@ void ai_system::process_entities(world& owner) {
 			}
 			else {
 				/* first check if there's a line of sight */
-				physics.b2world.RayCast(&line_of_sight, ai.session.target * PIXELS_TO_METERSf, transform.pos * PIXELS_TO_METERSf);
+				;
 
-				if (target_inside_body || (line_of_sight.hit && reinterpret_cast<entity*>(line_of_sight.what_fixture->GetBody()->GetUserData()) == it)) {
+				if (target_inside_body || is_point_visible(transform.pos, ai.session.target, visibility_info.filter)) {
 					/* if we're actually navigating to a secondary target */
 					if (!ai.session_stack.empty()) {
 						/* roll back to the previous session */
@@ -508,14 +479,11 @@ void ai_system::process_entities(world& owner) {
 						if (local_minimum_discontinuity.winding == components::ai::discontinuity::LEFT)
 							angular_offset = -angular_offset;
 
-						ai.session.navigate_to.rotate(angular_offset, transform.pos);
+						//ai.session.navigate_to.rotate(angular_offset, transform.pos);
 
-						/* test if we can see it */
-						physics.b2world.RayCast(&line_of_sight, local_minimum_discontinuity.points.first * PIXELS_TO_METERSf, transform.pos * PIXELS_TO_METERSf);
-						
-						/* and if we can, navigate there */
+						/* if we can see it, navigate there */
 						if (body->TestPoint(ai.session.navigate_to * PIXELS_TO_METERSf) || 
-							(line_of_sight.hit && reinterpret_cast<entity*>(line_of_sight.what_fixture->GetBody()->GetUserData()) == it)) {
+							is_point_visible(transform.pos, local_minimum_discontinuity.points.first, visibility_info.filter)) {
 						}
 						/* else start new navigation session */
 						else {

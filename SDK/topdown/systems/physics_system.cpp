@@ -6,20 +6,38 @@
 
 #include "../messages/collision_message.h"
 
+bool physics_system::raycast_input::ShouldRaycast(b2Fixture* fixture) {
+	return
+		(subject && reinterpret_cast<entity*>(fixture->GetBody()->GetUserData()) == subject) ||
+		(b2ContactFilter::ShouldCollide(subject_filter, &fixture->GetFilterData()));
+}
+
+float32 physics_system::raycast_input::ReportFixture(b2Fixture* fixture, const b2Vec2& point,
+	const b2Vec2& normal, float32 fraction) {
+		output.intersection = point;
+
+		output.hit = true;
+		output.what_fixture = fixture;
+		return fraction;
+}
+
+physics_system::raycast_input::raycast_input() : subject_filter(nullptr), subject(nullptr) {}
+
 physics_system::physics_system() : accumulator(60.0, 5), timestep_multiplier(1.f),
 	b2world(b2Vec2(0.f, 0.f)) {
-	b2world.SetAllowSleeping(false);
-	b2world.SetAutoClearForces(false);
-	b2world.SetContactListener(&listener);
+		b2world.SetAllowSleeping(false);
+		b2world.SetAutoClearForces(false);
+		b2world.SetContactListener(&listener);
 }
-//struct game_filter : public b2ContactFilter {
-//	bool ShouldCollide(b2Fixture* a, b2Fixture* b) override {
-//		if (b2ContactFilter::ShouldCollide(a, b)) {
-//
-//
-//		}
-//	}
-//};
+
+physics_system::raycast_output physics_system::ray_cast(vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter, entity* ignore_entity) {
+	raycast_input callback;
+	callback.subject_filter = filter;
+	callback.subject = ignore_entity;
+
+	b2world.RayCast(&callback, p1_meters, p2_meters);
+	return callback.output;
+}
 
 void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 	auto fix_a = contact->GetFixtureA();
