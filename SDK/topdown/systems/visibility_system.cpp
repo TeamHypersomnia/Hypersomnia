@@ -53,7 +53,15 @@ components::visibility::triangle components::visibility::layer::get_triangle(int
 }
 
 void visibility_system::process_entities(world& owner) {
+	/* prepare epsilons to be used later, just to make the notation more clear */
+	float epsilon_distance_vertex_hit_sq = epsilon_distance_vertex_hit * PIXELS_TO_METERSf;
+	float epsilon_threshold_obstacle_hit_sq = epsilon_threshold_obstacle_hit * PIXELS_TO_METERSf;
+	epsilon_distance_vertex_hit_sq *= epsilon_distance_vertex_hit_sq;
+	epsilon_threshold_obstacle_hit_sq *= epsilon_threshold_obstacle_hit_sq;
+
+	/* we'll need a reference to physics system for raycasting */
 	physics_system& physics = owner.get_system<physics_system>();
+	/* we'll need a reference to render system for debug drawing */
 	render_system& render = owner.get_system<render_system>();
 
 	for (auto it : targets) {
@@ -178,6 +186,8 @@ void visibility_system::process_entities(world& owner) {
 			/* container for holding info about local discontinuities, will be used for dynamic AI navigation */
 			request.discontinuities.clear();
 
+			request.vertex_hits.clear();
+
 			for (auto& vertex : all_vertices_transformed) {
 				b2Vec2* from_aabb = nullptr;
 
@@ -224,14 +234,15 @@ void visibility_system::process_entities(world& owner) {
 					then ray must have intersected with an obstacle BEFORE reaching the vertex, ignoring intersection completely */
 					float distance_from_origin = (vertex.second - position_meters).length_sq();
 
-					if ((ray_callbacks[0].intersection - position_meters).length_sq() + PIXELS_TO_METERSf * epsilon_threshold_obstacle_hit < distance_from_origin &&
-						(ray_callbacks[1].intersection - position_meters).length_sq() + PIXELS_TO_METERSf * epsilon_threshold_obstacle_hit < distance_from_origin) {
+					if ((ray_callbacks[0].intersection - position_meters).length_sq() + epsilon_threshold_obstacle_hit_sq < distance_from_origin &&
+						(ray_callbacks[1].intersection - position_meters).length_sq() + epsilon_threshold_obstacle_hit_sq < distance_from_origin) {
 							if (draw_cast_rays) draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 0, 255));
 					}
 					/* distance between both intersections fit in epsilon which means ray intersected with the same vertex */
-					else if ((ray_callbacks[0].intersection - ray_callbacks[1].intersection).length_sq() < PIXELS_TO_METERSf * epsilon_distance_vertex_hit) {
+					else if ((ray_callbacks[0].intersection - ray_callbacks[1].intersection).length_sq() < epsilon_distance_vertex_hit_sq) {
 						/* interpret it as both rays hit the same vertex
 						for maximum accuracy, push the vertex coordinates instead of the actual intersections */
+						request.vertex_hits.push_back(vertex.second * METERS_TO_PIXELSf);
 						double_rays.push_back(double_ray(vertex.second, vertex.second, true, true));
 						if (draw_cast_rays) draw_line(vertex.second, graphics::pixel_32(255, 255, 0, 255));
 					}
@@ -245,7 +256,7 @@ void visibility_system::process_entities(world& owner) {
 						components::visibility::discontinuity new_discontinuity;
 
 						/* if the ray that we substracted the epsilon from intersected closer (and thus with the vertex), then the free space is to the right */
-						if ((ray_callbacks[0].intersection - position_meters).length_sq() < (ray_callbacks[1].intersection - position_meters).length_sq()) {
+						if ((ray_callbacks[0].intersection - vertex.second).length_sq() < (ray_callbacks[1].intersection - vertex.second).length_sq()) {
 							/* it was "first" one that directly reached its destination */
 							new_double_ray.first_reached_destination = true;
 
@@ -312,7 +323,6 @@ void visibility_system::process_entities(world& owner) {
 										new_discontinuity.winding = components::visibility::discontinuity::RIGHT;
 										double_rays.push_back(double_ray(ray_callbacks[0].intersection, actual_intersection, true, false));
 									}
-
 									request.discontinuities.push_back(new_discontinuity);
 
 									if (draw_cast_rays) draw_line(actual_intersection, graphics::pixel_32(0, 0, 255, 255));
