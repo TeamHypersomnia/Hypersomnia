@@ -27,8 +27,8 @@ void pathfinding_system::process_entities(world& owner) {
 			auto& vision = visibility.get_layer(components::visibility::DYNAMIC_PATHFINDING);
 
 			/* save all undiscovered walls from visibility */
-			bool such_a_wall_exists = false;
 			for (auto& new_wall : vision.visible_walls) {
+				bool such_a_wall_exists = false;
 				/* compare this wall with already memorised walls */
 				for (auto& memorised_wall : pathfinding.session.visible_walls) {
 					/* if any memorised wall is almost equal to the candidate */
@@ -44,7 +44,8 @@ void pathfinding_system::process_entities(world& owner) {
 					}
 				}
 
-				if (!such_a_wall_exists) pathfinding.session.visible_walls.push_back(new_wall);
+				if (!such_a_wall_exists) 
+					pathfinding.session.visible_walls.push_back(new_wall);
 			}
 
 			/* save all new discontinuities from visibility */
@@ -132,11 +133,11 @@ void pathfinding_system::process_entities(world& owner) {
 						}));
 
 						/* extract the closer vertex */
-						pathfinding.session.navigate_to = local_minimum_discontinuity.points.second;
+						pathfinding.session.navigate_to = local_minimum_discontinuity.points.first;
 
 						/* if we can see it, navigate there */
 						if (body->TestPoint(pathfinding.session.navigate_to * PIXELS_TO_METERSf) ||
-							is_point_visible(transform.pos, local_minimum_discontinuity.points.first, vision.filter)) {
+							is_point_visible(transform.pos, pathfinding.session.navigate_to, vision.filter)) {
 						}
 						/* else start new navigation session */
 						else {

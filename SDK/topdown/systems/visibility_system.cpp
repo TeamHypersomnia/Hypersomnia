@@ -41,7 +41,7 @@ float comparable_angle(vec2<> diff) {
 		);
 }
 
-visibility_system::visibility_system() : draw_cast_rays(false), draw_triangle_edges(true), draw_discontinuities(false) {}
+visibility_system::visibility_system() : draw_cast_rays(false), draw_triangle_edges(true), draw_discontinuities(false), draw_visible_walls(false) {}
 
 int components::visibility::layer::get_num_triangles() {
 	return edges.size();
@@ -354,8 +354,12 @@ void visibility_system::process_entities(world& owner) {
 				request.edges.push_back(std::make_pair(p1, p2));
 
 				/* we have a fully visible wall here */
-				if (ray_a.second_reached_destination && ray_b.first_reached_destination) 
+				if (ray_a.second_reached_destination && ray_b.first_reached_destination) {
 					request.visible_walls.push_back(components::visibility::edge(p1, p2));
+
+					if (draw_visible_walls)
+						render.lines.push_back(render_system::debug_line(p1, p2, request.color));
+				}
 			}
 		}
 	}

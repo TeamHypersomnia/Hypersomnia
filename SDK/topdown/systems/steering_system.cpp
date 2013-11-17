@@ -149,7 +149,6 @@ struct avoidance_info {
 			but we have to prepare dummy b2Transform as an argument for b2TestOverlap
 			*/
 			b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
-			_render->manually_cleared_lines.push_back(render_system::debug_line(visibility_edges[i].first, visibility_edges[i].second, graphics::pixel_32(255, 255, 255, 255)));
 
 			/* if an edge intersects the avoidance rectangle */
 			if (b2TestOverlap(&avoidance_rectangle_shape, 0, &edge_shape, 0, null_transform, null_transform)) {
