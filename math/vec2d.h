@@ -1,3 +1,4 @@
+
 #pragma once
 #include <algorithm>
 #include <Box2D/Common/b2Math.h>
@@ -220,8 +221,22 @@ namespace augmentations {
 		
 		vec2 operator-() { return vec2(x * -1, y * -1); }
 
-		bool compare(const vec2& b, const float epsilon = 0.00001f) {
+		bool compare_abs(const vec2& b, const float epsilon = 0.00001f) {
 			if (std::abs(x - b.x) < epsilon && std::abs(y - b.y) < epsilon)
+				return true;
+
+			return false;
+		}
+
+		bool compare_sq(const vec2& b, const float epsilon = 0.00001f) {
+			if ((*this - b).length_sq() < epsilon)
+				return true;
+
+			return false;
+		}
+
+		bool compare(const vec2& b, const float epsilon = 0.00001f) {
+			if ((*this - b).length() < epsilon)
 				return true;
 
 			return false;
