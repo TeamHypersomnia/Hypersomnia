@@ -9,7 +9,8 @@ scene = scenes.ALL
 
 visibility_system.draw_cast_rays = 0
 visibility_system.draw_triangle_edges = 0
-visibility_system.draw_discontinuities = 1
+visibility_system.draw_discontinuities = 0
+visibility_system.draw_visible_walls = 1
 
 visibility_system.epsilon_ray_angle_variation = 0.0001
 visibility_system.epsilon_threshold_obstacle_hit = 20
@@ -116,189 +117,9 @@ map_points = {
 	}
 }
 
-map_points_1 = {
-{ pos = vec2(82,43) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(81,31) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(79,27) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(72,24) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(65,23) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(63,19) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(69,17) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(78,18) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(80,10) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(80,7) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(74,2) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(67,2) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(63,1) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(64,-2) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(72,-3) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(80,-3) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(81,-11) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(70,-18) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(56,-13) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(53,-5) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(48,-11) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(49,-18) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(57,-22) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(72,-24) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(78,-19) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(79,-27) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(70,-33) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(57,-34) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(56,-42) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(74,-41) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(71,-45) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(68,-48) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(54,-47) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(44,-45) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(46,-37) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(42,-34) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(34,-38) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(36,-44) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(36,-46) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(22,-48) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(24,-39) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(25,-32) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(21,-28) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(16,-36) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(17,-43) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(13,-45) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(2,-46) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(4,-32) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(12,-30) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(10,-26) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(2,-22) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-4,-27) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-3,-33) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-5,-41) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-9,-45) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-18,-45) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-19,-34) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-10,-20) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-11,-9) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-20,-12) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-24,-22) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-24,-30) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-23,-39) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-27,-46) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-34,-44) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-38,-43) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-33,-19) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-40,-16) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-46,-8) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-20,0) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-19,-7) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-6,7) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(0,1) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-3,-11) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(4,-16) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(7,-3) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(2,7) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-3,13) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(0,19) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(8,21) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(12,9) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(13,-6) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(10,-15) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(15,-20) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(23,-7) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(27,-9) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(28,-21) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(29,-26) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(37,-26) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(36,-13) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(44,2) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(32,2) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(22,-3) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(19,5) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(36,9) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(50,7) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(50,15) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(41,20) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(33,18) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(26,16) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(22,20) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(29,27) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(40,33) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(39,37) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(29,40) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(19,31) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(17,14) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(4,31) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-2,34) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-12,25) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-12,10) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-19,6) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-29,14) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-25,27) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-15,38) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-13,43) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-24,43) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-44,33) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-43,20) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-39,13) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-32,5) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-31,0) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-43,-2) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-62,-4) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-59,-13) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-51,-19) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-42,-22) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-48,-33) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-50,-42) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-58,-46) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-78,-44) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-79,-33) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-69,-26) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-69,-35) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-59,-34) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-64,-17) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-76,-16) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-68,-23) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-78,-27) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-88,-15) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-87,-2) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-74,0) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-77,-7) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-69,-8) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-70,1) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-73,9) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-85,11) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-84,20) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-72,25) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-70,18) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-63,6) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-53,4) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-48,12) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-54,21) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-63,26) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-64,32) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-73,33) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-81,26) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-86,35) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-86,42) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-73,46) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-61,41) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-52,35) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-50,41) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-35,46) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(-12,48) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(5,46) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(2,39) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(10,44) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(26,46) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(44,45) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(47,36) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(46,25) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(53,22) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(56,35) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) },
-{ pos = vec2(66,42) * size_mult, image = images.metal, texcoord = vec2(0, 0), color = rgba(255, 255, 255, 255) }
-}
-
 map_uv_square(map_points.interior, map_points.square.U.pos, map_points.square.W.pos)
-map_uv_square(map_points_1, vec2(-78,-44) * size_mult, vec2(82,43) * size_mult)
 
-crate_piece_poly = create_polygon--(map_points_1)
+crate_piece_poly = create_polygon
 {
 	map_points.square.V,
 	map_points.interior.B,
@@ -624,7 +445,7 @@ create_entity (archetyped(metal_archetype, {
 		rotation = 0
 	}
 }))
-print("elo1")
+
 player = create_entity_group (archetyped(my_npc_archetype, {
 	body = {
 		transform = {
@@ -998,8 +819,8 @@ loop_only_info = create_scriptable_info {
 					--message.subject.steering:add_behaviour(pursuit_behaviour)
 					--message.subject.steering:add_behaviour(obstacle_avoidance_behaviour)
 					player.body.steering:add_behaviour(seek_behaviour)
-					player.body.steering:add_behaviour(obstacle_avoidance_behaviour)
-					player.body.steering:add_behaviour(containment_behaviour)
+					--player.body.steering:add_behaviour(obstacle_avoidance_behaviour)
+					--player.body.steering:add_behaviour(containment_behaviour)
 					
 				elseif message.intent == custom_intents.SPEED_INCREASE then
 					physics_system.timestep_multiplier = physics_system.timestep_multiplier + 0.05

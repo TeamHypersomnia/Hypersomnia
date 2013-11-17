@@ -14,6 +14,8 @@ function open_script(filename)
 	return my_script
 end
 
+local CURRENT_SCENE = "scripts\\sample_scenes\\pathfinding.lua"
+
 common = 						open_script "scripts\\common.lua" 
 textures = 						open_script "scripts\\resources\\textures.lua"
 resource_creation_util = 		open_script "scripts\\resource_creation_util.lua"
@@ -22,7 +24,7 @@ entity_creation_util = 			open_script "scripts\\entity_creation_util.lua"
 layers = 						open_script "scripts\\resources\\layers.lua"
 animations = 					open_script "scripts\\resources\\animations.lua"
 particle_effects = 				open_script "scripts\\resources\\particle_effects.lua"
-entities = 						open_script "scripts\\sample_scene\\entities.lua"
+entities = 						open_script (CURRENT_SCENE)
 
 call_on_modification(common, 				{ common, layers, entity_creation_util, resource_creation_util, textures, animations, particle_effects, entities }) 
 call_on_modification(textures, 				{ textures, animations, particle_effects, entities })
@@ -41,7 +43,7 @@ dofile "scripts\\resources\\layers.lua"
 dofile "scripts\\resources\\textures.lua"
 dofile "scripts\\resources\\animations.lua"
 dofile "scripts\\resources\\particle_effects.lua"
-dofile "scripts\\sample_scene\\entities.lua"
+dofile (CURRENT_SCENE)
 
 commands = script()
 commands:associate_filename("scripts\\commands.lua")
