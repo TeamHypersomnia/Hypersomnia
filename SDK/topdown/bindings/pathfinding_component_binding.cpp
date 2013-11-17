@@ -13,8 +13,9 @@ namespace bindings {
 			.def_readwrite("epsilon_distance_visible_point", &pathfinding_system::epsilon_distance_visible_point)
 			.def_readwrite("draw_memorised_walls", &pathfinding_system::draw_memorised_walls)
 			.def_readwrite("draw_undiscovered", &pathfinding_system::draw_undiscovered)
+			.def_readwrite("ignore_discontinuities_shorter_than", &pathfinding_system::ignore_discontinuities_shorter_than)
 			,
-
+			
 			luabind::class_<pathfinding>("pathfinding_component")
 			.def(luabind::constructor<>())
 			.def("start_pathfinding", &pathfinding::start_pathfinding)
@@ -22,6 +23,7 @@ namespace bindings {
 			.def("clear_pathfinding_info", &pathfinding::clear_pathfinding_info)
 			.def("is_still_pathfinding", &pathfinding::is_still_pathfinding)
 			.def_readwrite("enable_backtracking", &pathfinding::enable_backtracking)
+			.def_readwrite("target_offset", &pathfinding::target_offset)
 			;
 	}
 }

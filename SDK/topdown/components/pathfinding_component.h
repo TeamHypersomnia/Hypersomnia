@@ -8,16 +8,24 @@ namespace components {
 	struct pathfinding : public augmentations::entity_system::component {
 		typedef std::pair<augmentations::vec2<>, augmentations::vec2<>> edge;
 
-		pathfinding() : is_finding_a_path(false), enable_backtracking(true) {}
+		pathfinding() : is_finding_a_path(false), enable_backtracking(true), target_offset(0.f) {}
 
 		bool is_finding_a_path;
 		bool enable_backtracking;
 
+		float target_offset;
+
 		struct pathfinding_session {
 			augmentations::vec2<> target, navigate_to;
 
-			std::vector<edge> visible_walls, undiscovered_walls;
-			std::vector<visibility::discontinuity> undiscovered_discontinuities;
+			struct navigation_vertex {
+				augmentations::vec2<> location, sensor;
+			};
+
+			std::vector<navigation_vertex> discovered_vertices, undiscovered_vertices;
+
+			//std::vector<edge> visible_walls, undiscovered_walls;
+			//std::vector<visibility::discontinuity> undiscovered_discontinuities;
 		} session;
 
 		std::vector <pathfinding_session> session_stack;
@@ -37,9 +45,11 @@ namespace components {
 		}
 
 		void clear_pathfinding_info() {
-			session.undiscovered_discontinuities.clear();
-			session.visible_walls.clear();
-			session.undiscovered_walls.clear();
+			//session.undiscovered_discontinuities.clear();
+			//session.visible_walls.clear();
+			//session.undiscovered_walls.clear();
+			session.discovered_vertices.clear();
+			session.undiscovered_vertices.clear();
 			session_stack.clear();
 		}
 	};

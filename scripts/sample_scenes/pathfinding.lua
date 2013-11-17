@@ -3,16 +3,17 @@ physics_system.timestep_multiplier = 1
 visibility_system.draw_cast_rays = 0
 visibility_system.draw_triangle_edges = 0
 visibility_system.draw_discontinuities = 0
-visibility_system.draw_visible_walls = 1
+visibility_system.draw_visible_walls = 0
 
 visibility_system.epsilon_ray_angle_variation = 0.0001
-visibility_system.epsilon_threshold_obstacle_hit = 20
-visibility_system.epsilon_distance_vertex_hit = 0.01/2
+visibility_system.epsilon_threshold_obstacle_hit = 2
+visibility_system.epsilon_distance_vertex_hit = 2
 
 pathfinding_system.draw_memorised_walls = 1
 pathfinding_system.draw_undiscovered = 1
 pathfinding_system.epsilon_max_segment_difference = 4
-pathfinding_system.epsilon_distance_visible_point = 0.01/2
+pathfinding_system.epsilon_distance_visible_point = 2
+pathfinding_system.ignore_discontinuities_shorter_than = 40
 
 render_system.draw_steering_forces = 1
 render_system.draw_substeering_forces = 1
@@ -101,7 +102,6 @@ map_points = {
 }
 
 map_uv_square(map_points.interior, map_points.square.U.pos, map_points.square.W.pos)
-map_uv_square(map_points_1, vec2(-78,-44) * size_mult, vec2(82,43) * size_mult)
 
 environment_poly = create_polygon
 {
@@ -155,7 +155,7 @@ small_box_archetype = {
 			angular_damping = 5,
 			fixed_rotation = false,
 			density = 0.1,
-			friction = 0.0,
+			friction = 0,
 			sensor = false
 		}
 	}
@@ -185,7 +185,8 @@ environment = create_entity {
 		body_info = {
 			shape_type = physics_info.POLYGON,
 			vertices = environment_poly,
-			filter = filter_static_objects
+			filter = filter_static_objects,
+			friction = 0
 		}
 	},
 	
@@ -231,47 +232,47 @@ my_npc_archetype = {
 	}
 }
 
-create_entity (archetyped(small_box_archetype, {
-		transform = {
-			pos = vec2(100, -600),
-			rotation = 0
-		}
-}))
-
-create_entity (archetyped(small_box_archetype, {
-		transform = {
-			pos = vec2(400, -432),
-			rotation = 20
-		}
-}))
-
-create_entity (archetyped(small_box_archetype, {
-		transform = {
-			pos = vec2(800, -432),
-			rotation = -30
-		}
-}))
-
-create_entity (archetyped(big_box_archetype, {
-		transform = {
-			pos = vec2(200+(-170), 340),
-			rotation = 0
-		}
-}))
-
-create_entity (archetyped(big_box_archetype, {
-		transform = {
-			pos = vec2(200+(-500), 300),
-			rotation = 0
-		}
-}))
-	
-create_entity (archetyped(big_box_archetype, {
-	transform = {
-		pos = vec2((-280), 500),
-		rotation = 0
-	}
-}))
+--create_entity (archetyped(small_box_archetype, {
+--		transform = {
+--			pos = vec2(100, -600),
+--			rotation = 0
+--		}
+--}))
+--
+--create_entity (archetyped(small_box_archetype, {
+--		transform = {
+--			pos = vec2(400, -432),
+--			rotation = 20
+--		}
+--}))
+--
+--create_entity (archetyped(small_box_archetype, {
+--		transform = {
+--			pos = vec2(800, -432),
+--			rotation = -30
+--		}
+--}))
+--
+--create_entity (archetyped(big_box_archetype, {
+--		transform = {
+--			pos = vec2(200+(-170), 340),
+--			rotation = 0
+--		}
+--}))
+--
+--create_entity (archetyped(big_box_archetype, {
+--		transform = {
+--			pos = vec2(200+(-500), 300),
+--			rotation = 0
+--		}
+--}))
+--	
+--create_entity (archetyped(big_box_archetype, {
+--	transform = {
+--		pos = vec2((-280), 500),
+--		rotation = 0
+--	}
+--}))
 
 player = create_entity_group (archetyped(my_npc_archetype, {
 	body = {
@@ -295,11 +296,11 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 	
 		visibility = {
 			visibility_layers = {
-				[visibility_component.CONTAINMENT] = {
-					square_side = 7000,
-					color = rgba(255, 0, 255, 0),
-					filter = filter_obstacle_visibility
-				},	
+				--[visibility_component.CONTAINMENT] = {
+				--	square_side = 7000,
+				--	color = rgba(255, 0, 255, 0),
+				--	filter = filter_obstacle_visibility
+				--},	
 				
 				[visibility_component.DYNAMIC_PATHFINDING] = {
 					square_side = 7000,
@@ -310,7 +311,8 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 		},
 		
 		pathfinding = {
-			enable_backtracking = true
+			enable_backtracking = true,
+			target_offset = 100
 		},
 		
 		movement = {
@@ -386,7 +388,7 @@ camera_archetype = {
 		player = nil,
 	
 		orbit_mode = camera_component.LOOK,
-		max_look_expand = vec2(config_table.resolution_w/2, config_table.resolution_h/2),
+		max_look_expand = vec2(config_table.resolution_w/2, config_table.resolution_h/2)*10,
 		angled_look_length = 100
 	},
 	
@@ -571,8 +573,8 @@ loop_only_info = create_scriptable_info {
 				elseif message.intent == custom_intents.SPEED_DECREASE then
 					physics_system.timestep_multiplier = physics_system.timestep_multiplier - 0.05
 					
-					if physics_system.timestep_multiplier < 0.01 then
-						physics_system.timestep_multiplier = 0.01
+					if physics_system.timestep_multiplier < 0.001 then
+						physics_system.timestep_multiplier = 0.001
 					end
 				end
 				return true

@@ -39,6 +39,7 @@ namespace components {
 			/* output */
 			std::vector<edge> edges;
 			std::vector<edge> visible_walls;
+			std::vector<augmentations::vec2<>> vertex_hits;
 			std::vector<discontinuity> discontinuities;
 
 			int get_num_triangles();
