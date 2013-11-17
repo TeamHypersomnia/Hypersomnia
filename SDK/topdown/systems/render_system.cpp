@@ -5,7 +5,7 @@
 #include "entity_system/entity.h"
 #include "../resources/render_info.h"
 
-#include "../components/ai_component.h"
+#include "../components/visibility_component.h"
 #include "../components/physics_component.h"
 
 render_system::render_system(window::glwindow& output_window)
@@ -93,9 +93,9 @@ void render_system::render(rects::xywh visible_area) {
 		//glColor4f(1.f, 1.f, 1.f, 1.f);
 		glBegin(GL_TRIANGLES);
 		for (auto it : targets) {
-			auto* ai = it->find<components::ai>();
-			if (ai) {
-				for (auto& entry : ai->visibility_requests.raw) {
+			auto* visibility = it->find<components::visibility>();
+			if (visibility) {
+				for (auto& entry : visibility->visibility_layers.raw) {
 					/* shortcut */
 					auto& request = entry.val;
 

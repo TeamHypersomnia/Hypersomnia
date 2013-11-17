@@ -62,7 +62,8 @@ namespace bindings {
 
 		_render_component(),
 		_transform_component(),
-		_ai_component(),
+		_visibility_component(),
+		_pathfinding_component(),
 		_animate_component(),
 		_camera_component(),
 		_chase_component(),
@@ -126,7 +127,8 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 
 			bindings::_render_component(),
 			bindings::_transform_component(),
-			bindings::_ai_component(),
+			bindings::_visibility_component(),
+			bindings::_pathfinding_component(),
 			bindings::_animate_component(),
 			bindings::_camera_component(),
 			bindings::_chase_component(),

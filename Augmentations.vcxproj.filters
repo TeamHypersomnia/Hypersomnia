@@ -528,16 +528,10 @@
     <ClCompile Include="SDK\topdown\bindings\particle_burst_message_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\topdown\systems\ai_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SDK\topdown\bindings\collision_message_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SDK\topdown\bindings\damage_message_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SDK\topdown\bindings\ai_component_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SDK\topdown\bindings\polygon_binding.cpp">
@@ -610,6 +604,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utility\randval.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\visibility_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\pathfinding_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\visibility_component_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\pathfinding_component_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -851,12 +857,6 @@
     <ClInclude Include="3rdparty\readdir\_stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SDK\topdown\components\ai_component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SDK\topdown\systems\ai_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="3rdparty\b2Separator\b2Separator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1032,6 +1032,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="utility\randval.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\components\pathfinding_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\systems\visibility_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\systems\pathfinding_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\topdown\components\visibility_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

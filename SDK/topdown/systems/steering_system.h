@@ -23,7 +23,7 @@ public:
 
 	vec2<> containment(vec2<> position, vec2<> velocity, float avoidance_rectangle_width, float intervention_time_ms,
 		int rays_count, bool random_distribution, physics_system&, const std::vector<augmentations::vec2<>>& shape_verts, 
-		b2Filter& ray_filter, entity* ignore_entity);
+		b2Filter& ray_filter, entity* ignore_entity, bool only_threats_in_OBB);
 
 	vec2<> seek(vec2<> position, vec2<> velocity, vec2<> target, float max_speed, float arrival_radius);
 	vec2<> flee(vec2<> position, vec2<> velocity, vec2<> target, float max_speed, float flee_radius);

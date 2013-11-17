@@ -8,7 +8,8 @@
 #include "systems/physics_system.h"
 #include "systems/steering_system.h"
 #include "systems/movement_system.h"
-#include "systems/ai_system.h"
+#include "systems/visibility_system.h"
+#include "systems/pathfinding_system.h"
 #include "systems/animation_system.h"
 #include "systems/camera_system.h"
 #include "systems/render_system.h"
@@ -68,7 +69,8 @@ int main() {
 	crosshair_system crosshairs;
 	lookat_system lookat;
 	physics_system physics;
-	ai_system ai;
+	visibility_system visibility;
+	pathfinding_system pathfinding;
 	gun_system guns;
 	particle_group_system particles;
 	particle_emitter_system emitters;
@@ -95,7 +97,8 @@ int main() {
 	my_world.add_system(&emitters);
 	my_world.add_system(&particles);
 	my_world.add_system(&animations);
-	my_world.add_system(&ai);
+	my_world.add_system(&visibility);
+	my_world.add_system(&pathfinding);
 	my_world.add_system(&render);
 	my_world.add_system(&destroy);
 	my_world.add_system(&camera);
@@ -111,7 +114,8 @@ int main() {
 	scripts.global("world", my_world);
 	scripts.global("window", gl);
 	scripts.global("input_system", input);
-	scripts.global("ai_system", ai);
+	scripts.global("visibility_system", visibility);
+	scripts.global("pathfinding_system", pathfinding);
 	scripts.global("render_system", render);
 	scripts.global("physics_system", physics);
 

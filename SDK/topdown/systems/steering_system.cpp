@@ -5,7 +5,7 @@
 #include "entity_system/world.h"
 
 #include "../messages/steering_message.h"
-#include "../components/ai_component.h"
+#include "../components/visibility_component.h"
 
 #include "render_system.h"
 #include "physics_system.h"
@@ -136,9 +136,8 @@ struct avoidance_info {
 		b2PolygonShape avoidance_rectangle_shape;
 		b2Vec2 rect_copy[4];
 		std::copy(out.avoidance, out.avoidance + 4, rect_copy);
-		std::reverse(rect_copy, rect_copy + 4);
-		return out;
-		//avoidance_rectangle_shape.Set(rect_copy, 4);
+		//std::reverse(rect_copy, rect_copy + 4);
+		avoidance_rectangle_shape.Set(rect_copy, 4);
 
 		/* visibility points are in clockwise order */
 		for (size_t i = 0; i < visibility_edges.size(); ++i) {
@@ -162,7 +161,8 @@ struct avoidance_info {
 }
 
 vec2<> steering_system::containment(vec2<> position, vec2<> velocity, float avoidance_rectangle_width, float intervention_time_ms,
-	int rays_count, bool random_distribution, physics_system& physics, const std::vector<augmentations::vec2<>>& shape_verts, b2Filter& ray_filter, entity* ignore_entity) {
+	int rays_count, bool random_distribution, physics_system& physics, const std::vector<augmentations::vec2<>>& shape_verts, b2Filter& ray_filter, 
+	entity* ignore_entity, bool only_threats_in_OBB) {
 		float speed = velocity.length();
 		if (std::abs(velocity.x) < 0.01f && std::abs(velocity.y) < 0.01f) return vec2<>(0, 0);
 		vec2<> direction = velocity / speed;
@@ -194,7 +194,14 @@ vec2<> steering_system::containment(vec2<> position, vec2<> velocity, float avoi
 			else
 				ray_location += rayline * (avoidance_width / (rays_count-1)) * i;
 
-			vec2<> p1 = ray_location, p2 = ray_location.project_onto(avoidance.avoidance[1], avoidance.avoidance[2]);
+			
+			vec2<> p1 = ray_location, p2;
+
+			if (only_threats_in_OBB)
+				p2 = ray_location.project_onto(avoidance.rightmost_line[0], avoidance.rightmost_line[1]);
+			else
+				p2 = ray_location.project_onto(avoidance.avoidance[1], avoidance.avoidance[2]);
+			
 			_render->manually_cleared_lines.push_back(render_system::debug_line(p1, p2, graphics::pixel_32(255, 0, 0, 255)));
 			auto output = physics.ray_cast_px(p1, p2, &ray_filter, ignore_entity);
 
@@ -425,8 +432,8 @@ void steering_system::substep(world& owner) {
 			}
 			if (behaviour.behaviour_type == steering::behaviour::OBSTACLE_AVOIDANCE) {
 				vec2<> navigate_to;
-				auto& edges = it->get<components::ai>().
-					get_visibility(behaviour.visibility_type).edges;
+				auto& edges = it->get<components::visibility>().
+					get_layer(behaviour.visibility_type).edges;
 				
 				if (avoid_collisions(transform.pos, velocity,
 					behaviour.avoidance_rectangle_width,
@@ -439,10 +446,10 @@ void steering_system::substep(world& owner) {
 			}
 			if (behaviour.behaviour_type == steering::behaviour::CONTAINMENT) {
 				added_force = containment(transform.pos, velocity,
-					behaviour.avoidance_rectangle_width, behaviour.intervention_time_ms, behaviour.ray_count, 
-					behaviour.randomize_rays, physics, shape_verts, 
-					it->get<components::ai>().get_visibility(behaviour.visibility_type).filter,
-					it
+					behaviour.avoidance_rectangle_width, behaviour.intervention_time_ms, behaviour.ray_count,
+					behaviour.randomize_rays, physics, shape_verts,
+					it->get<components::visibility>().get_layer (behaviour.visibility_type).filter,
+					it, behaviour.only_threads_inside_OBB
 					).normalize() * max_speed;
 			}
 

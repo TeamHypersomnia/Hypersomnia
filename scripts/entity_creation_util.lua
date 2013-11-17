@@ -65,16 +65,17 @@ function set_components_from_entry(_entity, entry, entities_lookup)
 	def_ptr (lookat_component, 'lookat', { target = true })
 	def		(particle_emitter_component, 'particle_emitter')
 	def		(scriptable_component, 'scriptable')
-	def		(ai_component, 'ai', {}, { visibility_requests = true })
+	def		(visibility_component, 'visibility', {}, { visibility_layers = true })
+	def		(pathfinding_component, 'pathfinding')
 	def		(steering_component, 'steering')
 	
-	if entry.ai ~= nil then
-		local ai = _entity.ai
+	if entry.visibility ~= nil then
+		local visibility = _entity.visibility
 		
-		for key, values in pairs (entry.ai.visibility_requests) do
-			local my_visibility = visibility()
+		for key, values in pairs (entry.visibility.visibility_layers) do
+			local my_visibility = visibility_layer()
 			recursive_write(my_visibility, values)
-			ai:add_request(key, my_visibility)
+			visibility:add_layer(key, my_visibility)
 		end
 	end
 	

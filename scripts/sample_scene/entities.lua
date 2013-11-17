@@ -7,17 +7,18 @@ scenes = {
 
 scene = scenes.ALL
 
-ai_system.draw_cast_rays = 0
-ai_system.draw_triangle_edges = 0
-ai_system.draw_discontinuities = 1
+visibility_system.draw_cast_rays = 0
+visibility_system.draw_triangle_edges = 0
+visibility_system.draw_discontinuities = 1
 
-ai_system.draw_memorised_walls = 1
+visibility_system.epsilon_ray_angle_variation = 0.0001
+visibility_system.epsilon_threshold_obstacle_hit = 20
+visibility_system.epsilon_distance_vertex_hit = 0.01/2
 
-ai_system.epsilon_ray_angle_variation = 0.0001
-ai_system.epsilon_threshold_obstacle_hit = 20
-ai_system.epsilon_distance_vertex_hit = 0.01/2
-ai_system.epsilon_max_segment_difference = 4
-
+pathfinding_system.draw_memorised_walls = 1
+pathfinding_system.draw_undiscovered = 1
+pathfinding_system.epsilon_max_segment_difference = 4
+pathfinding_system.epsilon_distance_visible_point = 0.01/2
 
 render_system.draw_steering_forces = 1
 render_system.draw_substeering_forces = 1
@@ -521,23 +522,6 @@ my_npc_archetype = {
 		
 		children = {
 			"legs"
-		},
-		
-		ai = {
-			enable_backtracking = true,
-		
-			visibility_requests = {
-				--[visibility.OBSTACLE_AVOIDANCE] = {
-				--	square_side = 5000,
-				--	color = rgba(255, 0, 0, 0),
-				--	filter = filter_obstacle_visibility
-				--}
-				--[visibility.CONTAINMENT] = {
-				--	square_side = 5000,
-				--	color = rgba(255, 0, 0, 0),
-				--	filter = filter_obstacle_visibility
-				--}
-			}
 		}
 	},
 	
@@ -575,7 +559,7 @@ if scene == scenes.ALL then
 --			rotation = 0
 --		},
 --		
---		ai = {
+--		visibility = {
 --			visibility_color = rgba(0, 255, 0, 0)
 --		}
 --	}
@@ -640,9 +624,7 @@ create_entity (archetyped(metal_archetype, {
 		rotation = 0
 	}
 }))
-
-
-
+print("elo1")
 player = create_entity_group (archetyped(my_npc_archetype, {
 	body = {
 		transform = {
@@ -678,22 +660,24 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 		--	look_mode = lookat_component.POSITION
 		--},
 		
-		ai = {
-			avoidance_width = 300,
-		
-			visibility_requests = {
-				[visibility.CONTAINMENT] = {
+		visibility = {
+			visibility_layers = {
+				[visibility_component.CONTAINMENT] = {
 					square_side = 7000,
 					color = rgba(255, 0, 255, 0),
 					filter = filter_obstacle_visibility
 				},	
 				
-				[visibility.DYNAMIC_PATHFINDING] = {
+				[visibility_component.DYNAMIC_PATHFINDING] = {
 					square_side = 7000,
 					color = rgba(0, 255, 255, 120),
 					filter = filter_pathfinding_visibility
 				}
 			}
+		},
+		
+		pathfinding = {
+			enable_backtracking = true
 		},
 		
 		movement = {
@@ -731,6 +715,7 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 		}
 	}
 }))
+
 
 my_scriptable_info = create_scriptable_info {
 	scripted_events = {
@@ -878,7 +863,7 @@ flee_behaviour = create_steering_behaviour {
 		
 seek_behaviour = create_steering_behaviour {
 	current_target = navigation_target_entity,
-	weight = 0.1,
+	weight = 1,
 	behaviour_type = steering_behaviour.SEEK,
 	enabled = true,
 	erase_when_target_reached = false,
@@ -907,12 +892,25 @@ evasion_behaviour = create_steering_behaviour {
 
 obstacle_avoidance_behaviour = create_steering_behaviour {
 	current_target = navigation_target_entity,
+	weight = 100, 
+	behaviour_type = steering_behaviour.OBSTACLE_AVOIDANCE,
+	visibility_type = visibility_component.CONTAINMENT,
+	
+	enabled = true,
+	force_color = rgba(0, 255, 255, 255),
+	intervention_time_ms = 200,
+	avoidance_rectangle_width = 150,
+	decision_duration_ms = 0
+}
+
+containment_behaviour = create_steering_behaviour {
 	weight = 10000, 
 	behaviour_type = steering_behaviour.CONTAINMENT,
 	
-	visibility_type = visibility.CONTAINMENT,
+	visibility_type = visibility_component.CONTAINMENT,
 	ray_count = 20,
 	randomize_rays = false,
+	only_threads_inside_OBB = true,
 	
 	enabled = true,
 	force_color = rgba(0, 255, 255, 255),
@@ -936,9 +934,9 @@ my_steered_npc_archetype = (archetyped(my_npc_archetype, {
 			max_speed = 1000
 		},
 		
-		ai = {
-			--visibility_requests = {
-			--	[visibility.DYNAMIC_PATHFINDING] = {
+		visibility = {
+			--visibility_layers = {
+			--	[visibility_component.DYNAMIC_PATHFINDING] = {
 			--		square_side = 6000,
 			--		color = rgba(0, 255, 255, 122),
 			--		filter = filter_pathfinding_visibility
@@ -964,7 +962,7 @@ my_steered_npc_archetype = (archetyped(my_npc_archetype, {
 
 --my_steered_npc.body.steering:add_behaviour(obstacle_avoidance_behaviour)
 --my_steered_npc.body.steering:add_behaviour(seek_behaviour)
---obstacle_avoidance_behaviour.current_target:set(navigation_target_entity)
+obstacle_avoidance_behaviour.current_target:set(player.body)
 
 blue_crosshair_sprite = create_sprite {
 	image = images.crosshair,
@@ -985,8 +983,8 @@ loop_only_info = create_scriptable_info {
 			function(message)
 				my_atlas:_bind()
 				blue_crosshair.transform.current.pos = pursuit_behaviour.last_estimated_pursuit_position
-				navigation_target_entity.transform.current.pos = player.body.ai:get_current_navigation_target()
-				seek_behaviour.enabled = player.body.ai:is_still_pathfinding()
+				navigation_target_entity.transform.current.pos = player.body.pathfinding:get_current_navigation_target()
+				seek_behaviour.enabled = player.body.pathfinding:is_still_pathfinding()
 				return true
 			end,
 			
@@ -994,13 +992,14 @@ loop_only_info = create_scriptable_info {
 			function(message)
 				if message.intent == custom_intents.STEERING_REQUEST then
 					target_entity.transform.current.pos = player.crosshair.transform.current.pos
-					player.body.ai:start_pathfinding(target_entity.transform.current.pos)
+					player.body.pathfinding:start_pathfinding(target_entity.transform.current.pos)
 					player.body.steering:clear_behaviours()
 					--message.subject.steering:add_behaviour(evasion_behaviour)
 					--message.subject.steering:add_behaviour(pursuit_behaviour)
 					--message.subject.steering:add_behaviour(obstacle_avoidance_behaviour)
 					player.body.steering:add_behaviour(seek_behaviour)
 					player.body.steering:add_behaviour(obstacle_avoidance_behaviour)
+					player.body.steering:add_behaviour(containment_behaviour)
 					
 				elseif message.intent == custom_intents.SPEED_INCREASE then
 					physics_system.timestep_multiplier = physics_system.timestep_multiplier + 0.05

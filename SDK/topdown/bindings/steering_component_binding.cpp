@@ -25,6 +25,7 @@ namespace bindings {
 			.def_readwrite("decision_duration_ms", &steering::behaviour::decision_duration_ms)
 			.def_readwrite("randomize_rays", &steering::behaviour::randomize_rays)
 			.def_readwrite("ray_count", &steering::behaviour::ray_count)
+			.def_readwrite("only_threads_inside_OBB", &steering::behaviour::only_threads_inside_OBB)
 			.def_readwrite("visibility_type", &steering::behaviour::visibility_type)
 			.enum_("script_type")[
 				luabind::value("SEEK", steering::behaviour::SEEK),

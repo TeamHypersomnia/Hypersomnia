@@ -319,7 +319,10 @@
     <ClCompile Include="graphics\pixel.cpp" />
     <ClCompile Include="math\rects.cpp" />
     <ClCompile Include="math\vec2d.cpp" />
-    <ClCompile Include="SDK\topdown\bindings\ai_component_binding.cpp">
+    <ClCompile Include="SDK\topdown\bindings\pathfinding_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\visibility_component_binding.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
@@ -476,7 +479,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SDK\topdown\resources\vertex.cpp" />
-    <ClCompile Include="SDK\topdown\systems\ai_system.cpp">
+    <ClCompile Include="SDK\topdown\systems\pathfinding_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\visibility_system.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
@@ -689,11 +695,13 @@
     <ClInclude Include="math\rects.h" />
     <ClInclude Include="math\vec2d.h" />
     <ClInclude Include="SDK\topdown\bindings\bindings.h" />
-    <ClInclude Include="SDK\topdown\components\ai_component.h" />
+    <ClInclude Include="SDK\topdown\components\visibility_component.h" />
+    <ClInclude Include="SDK\topdown\components\pathfinding_component.h" />
     <ClInclude Include="SDK\topdown\components\steering_component.h" />
     <ClInclude Include="SDK\topdown\messages\steering_message.h" />
     <ClInclude Include="SDK\topdown\resources\fbo.h" />
-    <ClInclude Include="SDK\topdown\systems\ai_system.h" />
+    <ClInclude Include="SDK\topdown\systems\pathfinding_system.h" />
+    <ClInclude Include="SDK\topdown\systems\visibility_system.h" />
     <ClInclude Include="SDK\topdown\systems\steering_system.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SDK\topdown\resources\animate_info.h" />
