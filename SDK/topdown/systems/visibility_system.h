@@ -17,6 +17,7 @@ public:
 	int draw_triangle_edges;
 	int draw_cast_rays;
 	int draw_discontinuities;
+	int draw_visible_walls;
 
 	float epsilon_ray_angle_variation;
 	float epsilon_distance_vertex_hit;
