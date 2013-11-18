@@ -223,25 +223,22 @@ vec2<> steering_system::containment(vec2<> position, vec2<> velocity, float avoi
 			}
 		}
 
-		steering.normalize();
-		float paralellness = steering.dot(direction);
-		vec2<> perpendiculars [] = { vec2<>(direction.y, -direction.x), vec2<>(-direction.y, direction.x) };
-		
-		if (perpendiculars[0].dot(steering) > perpendiculars[1].dot(steering)) {
-			return perpendiculars[0];
+		if (steering.non_zero()) {
+			steering.normalize();
+			vec2<> perpendiculars [] = { vec2<>(direction.y, -direction.x), vec2<>(-direction.y, direction.x) };
+
+			if (perpendiculars[0].dot(steering) > perpendiculars[1].dot(steering)) {
+				return perpendiculars[0];
+			}
+			else return perpendiculars[1];
 		}
-		else perpendiculars[1];
 
-		//if (paralellness < -0.7f) {
-		//	steering = perpendicular_direction;
-		//}
-
-		return steering;
+		return vec2<>(0, 0);
 }
 
 bool steering_system::avoid_collisions(vec2<> position, vec2<> velocity, float avoidance_rectangle_width, vec2<> target,
 	edges &visibility_edges, float intervention_time_ms, 
-	vec2<>& best_candidate, components::steering::behaviour& info, const std::vector<vec2<>>& shape_verts) {
+	vec2<>& best_candidate, const std::vector<vec2<>>& shape_verts) {
 		float speed = velocity.length();
 		if (std::abs(velocity.x) < 0.01f && std::abs(velocity.y) < 0.01f) return false;
 		vec2<> direction = velocity / speed;
@@ -336,16 +333,6 @@ bool steering_system::avoid_collisions(vec2<> position, vec2<> velocity, float a
 		while (!candidates.empty()) {
 			/* save output */
 			best_candidate = candidates.top().vertex_ptr;
-
-			if (info.last_decision_timer.get<std::chrono::milliseconds>() < info.decision_duration_ms) {
-				if ((info.last_decision - best_candidate).length() > 10.f)
-					best_candidate = info.last_decision;
-				else info.last_decision = best_candidate;
-			}
-			else {
-				info.last_decision_timer.reset();
-				info.last_decision = best_candidate;
-			}
 
 			if (_render->draw_avoidance_info)
 			_render->manually_cleared_lines.push_back(render_system::debug_line(position, best_candidate, graphics::pixel_32(0, 255, 0, 255)));
