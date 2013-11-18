@@ -34,7 +34,7 @@ namespace components {
 			bool erase_when_target_reached;
 
 			bool randomize_rays;
-			bool only_threads_inside_OBB;
+			bool only_threats_inside_OBB;
 			int ray_count;
 			int visibility_type;
 
@@ -59,7 +59,7 @@ namespace components {
 				decision_duration_ms(0.f),
 				ray_count(0),
 				randomize_rays(false),
-				only_threads_inside_OBB(false),
+				only_threats_inside_OBB(false),
 				visibility_type(visibility::OBSTACLE_AVOIDANCE)
 			{
 				last_decision_timer.reset();

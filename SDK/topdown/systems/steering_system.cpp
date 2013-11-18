@@ -119,10 +119,13 @@ struct avoidance_info {
 		int topmost =	 (&*std::min_element(rotated_verts.begin(), rotated_verts.end(), [](vec2<> a, vec2<> b){ return a.y < b.y; })) - rotated_verts.data();
 		int bottommost = (&*std::max_element(rotated_verts.begin(), rotated_verts.end(), [](vec2<> a, vec2<> b){ return a.y < b.y; })) - rotated_verts.data();
 		int rightmost =  (&*std::max_element(rotated_verts.begin(), rotated_verts.end(), [](vec2<> a, vec2<> b){ return a.x < b.x; })) - rotated_verts.data();
+		
+		rotated_verts[topmost].y -= avoidance_rectangle_width;
+		rotated_verts[bottommost].y += avoidance_rectangle_width;
 
 		/* these vertices near position */
-		out.avoidance[0] = position + shape_verts[topmost];
-		out.avoidance[3] = position + shape_verts[bottommost];
+		out.avoidance[0] = position + vec2<>(rotated_verts[topmost]).rotate(velocity_angle, vec2<>());
+		out.avoidance[3] = position + vec2<>(rotated_verts[bottommost]).rotate(velocity_angle, vec2<>());
 
 		/* these vertices far away */
 		out.avoidance[1] = vec2<>(rotated_verts[rightmost].x + avoidance_rectangle_length, rotated_verts[topmost].y).rotate(velocity_angle, vec2<>()) + position;
@@ -159,15 +162,12 @@ struct avoidance_info {
 		return out;
 }
 
-vec2<> steering_system::containment(vec2<> position, vec2<> velocity, float avoidance_rectangle_width, float intervention_time_ms,
+vec2<> steering_system::containment(vec2<> position, vec2<> velocity, float avoidance_rectangle_width, float avoidance_rectangle_length,
 	int rays_count, bool random_distribution, physics_system& physics, const std::vector<augmentations::vec2<>>& shape_verts, b2Filter& ray_filter, 
 	entity* ignore_entity, bool only_threats_in_OBB) {
 		float speed = velocity.length();
 		if (std::abs(velocity.x) < 0.01f && std::abs(velocity.y) < 0.01f) return vec2<>(0, 0);
 		vec2<> direction = velocity / speed;
-
-		float avoidance_rectangle_length = speed * intervention_time_ms / 1000.f;
-		if (avoidance_rectangle_length <= 0.0001f) return vec2<>(0, 0);
 
 		auto avoidance = get_avoidance_info(position, avoidance_rectangle_width, direction, avoidance_rectangle_length, edges(), shape_verts);
 
@@ -206,22 +206,35 @@ vec2<> steering_system::containment(vec2<> position, vec2<> velocity, float avoi
 
 			/* if our ray hits anything */
 			if (output.hit) {
+				_render->manually_cleared_lines.push_back(render_system::debug_line(p1, output.intersection, graphics::pixel_32(0, 255, 255, 255)));
 				vec2<> rightmost_projection = ray_location.project_onto(avoidance.rightmost_line[0], avoidance.rightmost_line[1]);
 				/* if an obstacle is even closer than a rightmost line, which means it overlaps the object's OBB - steer away immediately */
-				if ((output.intersection - ray_location).length_sq() <
-					(ray_location - rightmost_projection).length_sq()
-					) {
-						steering += (output.intersection - position).normalize();
-				}
-				/* otherwise the obstacle is beyond the rightmost line, weigh the normals depending on the distance of the intersection */
-				else {
-					_render->manually_cleared_lines.push_back(render_system::debug_line(rightmost_projection, output.intersection, graphics::pixel_32(0, 255, 255, 255)));
+				//if ((output.intersection - ray_location).length_sq() <
+				//	(ray_location - rightmost_projection).length_sq()
+				//	) {
+				//		steering += (velocity * -1).normalize();
+				//}
+				///* otherwise the obstacle is beyond the rightmost line, weigh the normals depending on the distance of the intersection */
+				//else {
 					
 					float proportion = (output.intersection - rightmost_projection).length_sq() / (avoidance_length*avoidance_length);
 					steering += output.normal * (1 - proportion);
-				}
+				//}
 			}
 		}
+
+		steering.normalize();
+		float paralellness = steering.dot(direction);
+		vec2<> perpendiculars [] = { vec2<>(direction.y, -direction.x), vec2<>(-direction.y, direction.x) };
+		
+		if (perpendiculars[0].dot(steering) > perpendiculars[1].dot(steering)) {
+			return perpendiculars[0];
+		}
+		else perpendiculars[1];
+
+		//if (paralellness < -0.7f) {
+		//	steering = perpendicular_direction;
+		//}
 
 		return steering;
 }
@@ -254,9 +267,13 @@ bool steering_system::avoid_collisions(vec2<> position, vec2<> velocity, float a
 		//navigation_candidate best_navigation_candidate;
 		std::priority_queue < navigation_candidate > candidates;
 
-		auto check_navigation_candidate = [&target, &candidates, &position](vec2<>& v, bool cw) {
-			float distance = (target - v).length();
-			candidates.push(navigation_candidate(v, distance, cw));
+		auto check_navigation_candidate = [&candidates, &position, velocity](vec2<> v, bool cw) {
+			auto v1 = v - position;
+			auto v2 = velocity;
+			v1.normalize();
+			v2.normalize();
+			float distance = v1.dot(v2);
+			candidates.push(navigation_candidate(v, -distance, cw));
 		};
 
 		int edges_num = static_cast<int>(visibility_edges.size());
@@ -345,9 +362,9 @@ bool steering_system::avoid_collisions(vec2<> position, vec2<> velocity, float a
 			
 			if (!candidates.top().clockwise)
 				offset = -offset;
-			angle += offset;
+			//angle += offset;
 
-			best_candidate.rotate(offset, position);
+			//best_candidate.rotate(offset, position);
 
 			for (auto& p : avoidance.avoidance)
 				p = vec2<>(p).rotate(angle, position);
@@ -406,50 +423,62 @@ void steering_system::substep(world& owner) {
 			vec2<> added_force;
 
 			auto& behaviour = *ptr_behaviour;
-			if (!behaviour.enabled || behaviour.current_target == nullptr) continue;
+			if (!behaviour.enabled) continue;
 
-			auto& target_transform = behaviour.current_target->get<components::transform>().current;
 
-			if (behaviour.behaviour_type == steering::behaviour::FLEE) 
-				added_force = flee(transform.pos, velocity, target_transform.pos, max_speed, behaviour.effective_fleeing_radius);
-			if (behaviour.behaviour_type == steering::behaviour::SEEK) 
-				added_force = seek(transform.pos, velocity, target_transform.pos, max_speed, behaviour.arrival_slowdown_radius);
-			if (
-				behaviour.behaviour_type == steering::behaviour::PURSUIT ||
-				behaviour.behaviour_type == steering::behaviour::EVASION
-				) {
-
-				behaviour.last_estimated_pursuit_position = 
-					predict_interception(transform.pos, velocity, target_transform.pos, 
-					vec2<>(behaviour.current_target->get<components::physics>().body->GetLinearVelocity())*METERS_TO_PIXELSf,
-					behaviour.max_target_future_prediction_ms, behaviour.behaviour_type == steering::behaviour::EVASION);
-
-				if (behaviour.behaviour_type == steering::behaviour::PURSUIT)
-					added_force = seek(transform.pos, velocity, behaviour.last_estimated_pursuit_position, max_speed, behaviour.arrival_slowdown_radius);
-				if (behaviour.behaviour_type == steering::behaviour::EVASION)
-					added_force = flee(transform.pos, velocity, behaviour.last_estimated_pursuit_position, max_speed, behaviour.effective_fleeing_radius);
-			}
-			if (behaviour.behaviour_type == steering::behaviour::OBSTACLE_AVOIDANCE) {
-				vec2<> navigate_to;
-				auto& edges = it->get<components::visibility>().
-					get_layer(behaviour.visibility_type).edges;
-				
-				if (avoid_collisions(transform.pos, velocity,
-					behaviour.avoidance_rectangle_width,
-					target_transform.pos,
-					edges,
-					behaviour.intervention_time_ms, navigate_to, behaviour, shape_verts)) {
-						/* there's an obstacle, seek it */
-						added_force = seek(transform.pos, velocity, navigate_to, max_speed, behaviour.arrival_slowdown_radius);
-				}
-			}
+			/* undirected behaviours */
 			if (behaviour.behaviour_type == steering::behaviour::CONTAINMENT) {
 				added_force = containment(transform.pos, velocity,
-					behaviour.avoidance_rectangle_width, behaviour.intervention_time_ms, behaviour.ray_count,
+					behaviour.avoidance_rectangle_width, velocity.length() * behaviour.intervention_time_ms / 1000.f, behaviour.ray_count,
 					behaviour.randomize_rays, physics, shape_verts,
-					it->get<components::visibility>().get_layer (behaviour.visibility_type).filter,
-					it, behaviour.only_threads_inside_OBB
+					it->get<components::visibility>().get_layer(behaviour.visibility_type).filter,
+					it, behaviour.only_threats_inside_OBB
 					).normalize() * max_speed;
+			}
+			/* directed behaviours */
+			else {
+				auto& target_transform = behaviour.current_target->get<components::transform>().current;
+
+				if (behaviour.behaviour_type == steering::behaviour::FLEE)
+					added_force = flee(transform.pos, velocity, target_transform.pos, max_speed, behaviour.effective_fleeing_radius);
+				if (behaviour.behaviour_type == steering::behaviour::SEEK)
+					added_force = seek(transform.pos, velocity, target_transform.pos, max_speed, behaviour.arrival_slowdown_radius);
+				if (
+					behaviour.behaviour_type == steering::behaviour::PURSUIT ||
+					behaviour.behaviour_type == steering::behaviour::EVASION
+					) {
+
+						behaviour.last_estimated_pursuit_position =
+							predict_interception(transform.pos, velocity, target_transform.pos,
+							vec2<>(behaviour.current_target->get<components::physics>().body->GetLinearVelocity())*METERS_TO_PIXELSf,
+							behaviour.max_target_future_prediction_ms, behaviour.behaviour_type == steering::behaviour::EVASION);
+
+						if (behaviour.behaviour_type == steering::behaviour::PURSUIT)
+							added_force = seek(transform.pos, velocity, behaviour.last_estimated_pursuit_position, max_speed, behaviour.arrival_slowdown_radius);
+						if (behaviour.behaviour_type == steering::behaviour::EVASION)
+							added_force = flee(transform.pos, velocity, behaviour.last_estimated_pursuit_position, max_speed, behaviour.effective_fleeing_radius);
+				}
+				if (behaviour.behaviour_type == steering::behaviour::OBSTACLE_AVOIDANCE) {
+					vec2<> navigate_to;
+					auto& edges = it->get<components::visibility>().
+						get_layer(behaviour.visibility_type).edges;
+
+					if (avoid_collisions(transform.pos, velocity,
+						behaviour.avoidance_rectangle_width,
+						target_transform.pos,
+						edges,
+						behaviour.intervention_time_ms, navigate_to, behaviour, shape_verts)) {
+							/* there's an obstacle, seek it */
+							added_force = seek(transform.pos, velocity, navigate_to, max_speed, behaviour.arrival_slowdown_radius);
+
+							added_force += containment(transform.pos, (navigate_to - transform.pos),
+								behaviour.avoidance_rectangle_width, behaviour.intervention_time_ms, behaviour.ray_count,
+								behaviour.randomize_rays, physics, shape_verts,
+								it->get<components::visibility>().get_layer(behaviour.visibility_type).filter,
+								it, behaviour.only_threats_inside_OBB
+								).normalize() * max_speed;
+					}
+				}
 			}
 
 			added_force *= behaviour.weight;

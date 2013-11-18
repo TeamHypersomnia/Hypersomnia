@@ -232,47 +232,47 @@ my_npc_archetype = {
 	}
 }
 
---create_entity (archetyped(small_box_archetype, {
---		transform = {
---			pos = vec2(100, -600),
---			rotation = 0
---		}
---}))
---
---create_entity (archetyped(small_box_archetype, {
---		transform = {
---			pos = vec2(400, -432),
---			rotation = 20
---		}
---}))
---
---create_entity (archetyped(small_box_archetype, {
---		transform = {
---			pos = vec2(800, -432),
---			rotation = -30
---		}
---}))
---
---create_entity (archetyped(big_box_archetype, {
---		transform = {
---			pos = vec2(200+(-170), 340),
---			rotation = 0
---		}
---}))
---
---create_entity (archetyped(big_box_archetype, {
---		transform = {
---			pos = vec2(200+(-500), 300),
---			rotation = 0
---		}
---}))
---	
---create_entity (archetyped(big_box_archetype, {
---	transform = {
---		pos = vec2((-280), 500),
---		rotation = 0
---	}
---}))
+create_entity (archetyped(small_box_archetype, {
+		transform = {
+			pos = vec2(100, -600),
+			rotation = 0
+		}
+}))
+
+create_entity (archetyped(small_box_archetype, {
+		transform = {
+			pos = vec2(400, -432),
+			rotation = 20
+		}
+}))
+
+create_entity (archetyped(small_box_archetype, {
+		transform = {
+			pos = vec2(800, -432),
+			rotation = -30
+		}
+}))
+
+create_entity (archetyped(big_box_archetype, {
+		transform = {
+			pos = vec2(200+(-170), 340),
+			rotation = 0
+		}
+}))
+
+create_entity (archetyped(big_box_archetype, {
+		transform = {
+			pos = vec2(200+(-500), 300),
+			rotation = 0
+		}
+}))
+	
+create_entity (archetyped(big_box_archetype, {
+	transform = {
+		pos = vec2((-280), 500),
+		rotation = 0
+	}
+}))
 
 player = create_entity_group (archetyped(my_npc_archetype, {
 	body = {
@@ -296,11 +296,11 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 	
 		visibility = {
 			visibility_layers = {
-				--[visibility_component.CONTAINMENT] = {
-				--	square_side = 7000,
-				--	color = rgba(255, 0, 255, 0),
-				--	filter = filter_obstacle_visibility
-				--},	
+				[visibility_component.CONTAINMENT] = {
+					square_side = 7000,
+					color = rgba(255, 0, 255, 0),
+					filter = filter_obstacle_visibility
+				},	
 				
 				[visibility_component.DYNAMIC_PATHFINDING] = {
 					square_side = 7000,
@@ -506,26 +506,30 @@ obstacle_avoidance_behaviour = create_steering_behaviour {
 	behaviour_type = steering_behaviour.OBSTACLE_AVOIDANCE,
 	visibility_type = visibility_component.CONTAINMENT,
 	
+	ray_count = 20,
+	randomize_rays = false,
+	only_threats_inside_OBB = false,
+	
 	enabled = true,
 	force_color = rgba(0, 255, 255, 255),
 	intervention_time_ms = 200,
-	avoidance_rectangle_width = 150,
+	avoidance_rectangle_width = 20,
 	decision_duration_ms = 0
 }
 
 containment_behaviour = create_steering_behaviour {
-	weight = 10000, 
+	weight = 0.2, 
 	behaviour_type = steering_behaviour.CONTAINMENT,
 	
 	visibility_type = visibility_component.CONTAINMENT,
-	ray_count = 20,
+	ray_count = 100,
 	randomize_rays = false,
-	only_threads_inside_OBB = true,
+	only_threats_inside_OBB = false,
 	
 	enabled = true,
 	force_color = rgba(0, 255, 255, 255),
-	intervention_time_ms = 200,
-	avoidance_rectangle_width = 150,
+	intervention_time_ms = 400,
+	avoidance_rectangle_width = 10,
 	decision_duration_ms = 0
 }
 
@@ -551,6 +555,10 @@ loop_only_info = create_scriptable_info {
 				my_atlas:_bind()
 				blue_crosshair.transform.current.pos = pursuit_behaviour.last_estimated_pursuit_position
 				navigation_target_entity.transform.current.pos = player.body.pathfinding:get_current_navigation_target()
+				
+				local myvel = player.body.physics.body:GetLinearVelocity()
+				navigation_target_entity.transform.current.pos = player.body.transform.current.pos + vec2(myvel.x, myvel.y) * 50
+				
 				seek_behaviour.enabled = player.body.pathfinding:is_still_pathfinding()
 				return true
 			end,
@@ -565,7 +573,7 @@ loop_only_info = create_scriptable_info {
 					--message.subject.steering:add_behaviour(pursuit_behaviour)
 					--message.subject.steering:add_behaviour(obstacle_avoidance_behaviour)
 					player.body.steering:add_behaviour(seek_behaviour)
-					--player.body.steering:add_behaviour(obstacle_avoidance_behaviour)
+					player.body.steering:add_behaviour(obstacle_avoidance_behaviour)
 					--player.body.steering:add_behaviour(containment_behaviour)
 					
 				elseif message.intent == custom_intents.SPEED_INCREASE then
@@ -573,8 +581,8 @@ loop_only_info = create_scriptable_info {
 				elseif message.intent == custom_intents.SPEED_DECREASE then
 					physics_system.timestep_multiplier = physics_system.timestep_multiplier - 0.05
 					
-					if physics_system.timestep_multiplier < 0.001 then
-						physics_system.timestep_multiplier = 0.001
+					if physics_system.timestep_multiplier < 0.01 then
+						physics_system.timestep_multiplier = 0.01
 					end
 				end
 				return true
