@@ -8,13 +8,15 @@
 #include "physics_system.h"
 #include "../resources/render_info.h"
 
-pathfinding_system::pathfinding_system() : draw_memorised_walls(false), draw_undiscovered(false), ignore_discontinuities_shorter_than(1.f) {}
+pathfinding_system::pathfinding_system() : draw_memorised_walls(false), draw_undiscovered(false), ignore_discontinuities_shorter_than(1.f),
+	epsilon_distance_the_same_vertex(3.f) {}
 
 void pathfinding_system::process_entities(world& owner) {
 	/* prepare epsilons to be used later, just to make the notation more clear */
 	const float ignore_discontinuities_shorter_than_sq = ignore_discontinuities_shorter_than * ignore_discontinuities_shorter_than;
 	const float epsilon_distance_visible_point_sq = epsilon_distance_visible_point * epsilon_distance_visible_point;
-
+	const float epsilon_distance_the_same_vertex_sq = epsilon_distance_the_same_vertex * epsilon_distance_the_same_vertex;
+	
 	/* we'll need a reference to physics system for raycasting */
 	physics_system& physics = owner.get_system<physics_system>();
 	/* we'll need a reference to render system for debug drawing */
@@ -58,8 +60,9 @@ void pathfinding_system::process_entities(world& owner) {
 
 				for (auto& memorised_discovered : pathfinding.session.discovered_vertices) {
 					/* if a discontinuity with the same closer vertex already exists */
-					if ((memorised_discovered.location - visible_vertex).length() < 3.f) {
+					if ((memorised_discovered.location - visible_vertex).length_sq() < epsilon_distance_the_same_vertex_sq) {
 						this_visible_vertex_is_already_memorised = true;
+						memorised_discovered.location = visible_vertex;
 						break;
 					}
 				}
@@ -80,16 +83,18 @@ void pathfinding_system::process_entities(world& owner) {
 
 				for (auto& memorised_undiscovered : pathfinding.session.undiscovered_vertices) {
 					/* if a discontinuity with the same closer vertex already exists */
-					if ((memorised_undiscovered.location - disc.points.first).length() < 3.f) {
+					if ((memorised_undiscovered.location - disc.points.first).length_sq() < epsilon_distance_the_same_vertex_sq) {
 						this_discontinuity_is_already_memorised = true;
+						memorised_undiscovered.location = disc.points.first;
 						break;
 					}
 				}
 
 				for (auto& memorised_discovered : pathfinding.session.discovered_vertices) {
 					/* if a discontinuity with the same closer vertex already exists */
-					if ((memorised_discovered.location - disc.points.first).length() < 3.f) {
+					if ((memorised_discovered.location - disc.points.first).length_sq() < epsilon_distance_the_same_vertex_sq) {
 						this_discontinuity_is_already_memorised = true;
+						memorised_discovered.location = disc.points.first;
 						break;
 					}
 				}
@@ -98,8 +103,20 @@ void pathfinding_system::process_entities(world& owner) {
 				if (!this_discontinuity_is_already_memorised) {
 					components::pathfinding::pathfinding_session::navigation_vertex vert;
 					vert.location = disc.points.first;
+					auto associated_edge = vision.edges[disc.edge_index];
+
+					vec2<> offset_direction;
+
+					if (associated_edge.first.compare(vert.location))
+						offset_direction = associated_edge.first - associated_edge.second;
+					else if (associated_edge.second.compare(vert.location))
+						offset_direction = associated_edge.second - associated_edge.first;
+					else assert(0);
+
+					offset_direction.normalize();
+
 					/* push the sensor a bit further so the body doesn't stop not seeing another targets */
-					vert.sensor = vert.location + (disc.points.second - vert.location).normalize() * pathfinding.target_offset;
+					vert.sensor = vert.location + offset_direction * pathfinding.target_offset;
 					pathfinding.session.undiscovered_vertices.push_back(vert);
 				}
 			}

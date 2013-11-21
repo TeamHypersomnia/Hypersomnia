@@ -16,6 +16,7 @@ public:
 	void process_entities(world&) override;
 	float epsilon_max_segment_difference;
 	float epsilon_distance_visible_point;
+	float epsilon_distance_the_same_vertex;
 	float ignore_discontinuities_shorter_than;
 
 	int draw_memorised_walls;
