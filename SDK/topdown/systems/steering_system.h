@@ -24,6 +24,7 @@ public:
 		vec2<> unit_vel;
 		vec2<> direction;
 		vec2<> target;
+		bool directed;
 
 		void set_target(vec2<>);
 		void set_velocity(vec2<>);
@@ -36,9 +37,9 @@ public:
 	};
 
 	struct avoidance_input : steering_input {
-		float intervention_time_ms;
 		float avoidance_rectangle_length;
 		float avoidance_rectangle_width;
+		float ignore_discontinuities_narrower_than;
 		std::vector<augmentations::vec2<>>* shape_verts;
 		avoidance_input();
 	};
@@ -46,6 +47,7 @@ public:
 	struct obstacle_avoidance_input : avoidance_input {
 		edges* visibility_edges;
 		vec2<>* output;
+
 		obstacle_avoidance_input();
 	};
 

@@ -19,7 +19,6 @@ namespace components {
 			} behaviour_type;
 
 			target current_target;
-			target shifted_temporary_target;
 
 			float max_target_future_prediction_ms;
 			float radius_of_effect;
@@ -27,6 +26,7 @@ namespace components {
 			float weight;
 		
 			float intervention_time_ms;
+			float max_intervention_length;
 			float avoidance_rectangle_width;
 
 			float decision_duration_ms;
@@ -37,6 +37,10 @@ namespace components {
 			bool only_threats_in_OBB;
 			int ray_count;
 			int visibility_type;
+
+			float ignore_discontinuities_narrower_than;
+
+			augmentations::vec2<> last_output_force;
 
 			bool enabled;
 
@@ -56,7 +60,8 @@ namespace components {
 				ray_count(0),
 				randomize_rays(false),
 				only_threats_in_OBB(false),
-				visibility_type(visibility::OBSTACLE_AVOIDANCE)
+				visibility_type(visibility::OBSTACLE_AVOIDANCE),
+				ignore_discontinuities_narrower_than(1.f), max_intervention_length(-1.f)
 			{
 			}
 

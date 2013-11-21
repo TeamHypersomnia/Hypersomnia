@@ -26,6 +26,9 @@ namespace bindings {
 			.def_readwrite("ray_count", &steering::behaviour::ray_count)
 			.def_readwrite("only_threats_in_OBB", &steering::behaviour::only_threats_in_OBB)
 			.def_readwrite("visibility_type", &steering::behaviour::visibility_type)
+			.def_readwrite("last_output_force", &steering::behaviour::last_output_force)
+			.def_readwrite("ignore_discontinuities_narrower_than", &steering::behaviour::ignore_discontinuities_narrower_than)
+			.def_readwrite("max_intervention_length", &steering::behaviour::max_intervention_length)
 			.enum_("script_type")[
 				luabind::value("SEEK", steering::behaviour::SEEK),
 				luabind::value("FLEE", steering::behaviour::FLEE),

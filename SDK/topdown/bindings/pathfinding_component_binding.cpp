@@ -14,7 +14,8 @@ namespace bindings {
 			.def_readwrite("draw_memorised_walls", &pathfinding_system::draw_memorised_walls)
 			.def_readwrite("draw_undiscovered", &pathfinding_system::draw_undiscovered)
 			.def_readwrite("ignore_discontinuities_shorter_than", &pathfinding_system::ignore_discontinuities_shorter_than)
-			,
+			.def_readwrite("epsilon_distance_the_same_vertex", &pathfinding_system::epsilon_distance_the_same_vertex)
+			, 
 			
 			luabind::class_<pathfinding>("pathfinding_component")
 			.def(luabind::constructor<>())

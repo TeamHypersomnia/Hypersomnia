@@ -17,13 +17,13 @@ steering_system::obstacle_avoidance_input::obstacle_avoidance_input()
 	: visibility_edges(nullptr), output(nullptr) {
 }
 steering_system::avoidance_input::avoidance_input() 
-	: intervention_time_ms(0.f), avoidance_rectangle_length(0.f), avoidance_rectangle_width(0.f) {
+	: avoidance_rectangle_length(0.f), avoidance_rectangle_width(0.f), ignore_discontinuities_narrower_than(0.f) {
 }
 steering_system::containment_input::containment_input() 
 	: ray_count(0), randomize_rays(false), only_threats_in_OBB(false), physics(nullptr), ray_filter(nullptr), ignore_entity(nullptr) {
 }
 steering_system::steering_input::steering_input() 
-	: speed(0.f), distance(0.f), max_speed(0.f), radius_of_effect(0.f) {
+	: speed(0.f), distance(0.f), max_speed(0.f), radius_of_effect(0.f), directed(false) {
 }
 
 void steering_system::process_events(world& owner) {}
@@ -94,7 +94,9 @@ steering_system::avoidance_info_output steering_system::get_avoidance_info(obsta
 		avoidance_info_output out;
 		float velocity_angle = in.unit_vel.get_degrees();
 		
-		auto& rotated_verts = *in.shape_verts;
+		/* copied vector to hold rotated vertices */
+		auto rotated_verts = *in.shape_verts;
+		
 		/* rotate to velocity's frame of reference */
 		for (auto& v : rotated_verts) {
 			v.rotate(-velocity_angle, vec2<>());
@@ -150,6 +152,10 @@ steering_system::avoidance_info_output steering_system::get_avoidance_info(obsta
 
 vec2<> steering_system::containment(containment_input in) {
 	if (in.speed < 0.1f) return vec2<>();
+	
+	if (in.directed) 
+		in.unit_vel = in.direction;
+
 	obstacle_avoidance_input obstacle_in;
 	obstacle_in.avoidance_input::operator=(in);
 	auto avoidance = get_avoidance_info(obstacle_in);
@@ -203,23 +209,26 @@ vec2<> steering_system::containment(containment_input in) {
 }
 
 bool steering_system::avoid_collisions(obstacle_avoidance_input in) {
-	if (in.speed < 0.1f) return false;
+	if (in.speed < 0.001f) return false;
 		/*
 		first - distance from target
 		second - vertex pointer
 		*/
+	if (in.directed)
+		in.unit_vel = in.direction;
 
 		struct navigation_candidate {
 			vec2<> vertex_ptr;
-			float distance;
+			float linear_distance;
+			float angular_distance;
 			bool clockwise;
 
 			bool operator < (const navigation_candidate& b) const {
-				return distance > b.distance;
+				return angular_distance > b.angular_distance;
 			}
 
-			navigation_candidate(vec2<> v = vec2<>(), float d = 0.f, bool c = false) :
-				vertex_ptr(v), distance(d), clockwise(c) {};
+			navigation_candidate(vec2<> v = vec2<>(), float a = 0.f, float d = 0.f, bool c = false) :
+				vertex_ptr(v), angular_distance(a), linear_distance(d), clockwise(c) {};
 		};
 
 		//navigation_candidate best_navigation_candidate;
@@ -230,10 +239,13 @@ bool steering_system::avoid_collisions(obstacle_avoidance_input in) {
 
 		auto check_navigation_candidate = [&candidates, &in](vec2<> v, bool cw) {
 			auto v1 = v - in.position;
+			float dist = v1.length();
 			auto v2 = in.unit_vel;
-			v1.normalize();
-			float distance = v1.dot(v2);
-			candidates.push(navigation_candidate(v, -distance, cw));
+			if(dist != 0.f) v1 /= dist;
+			
+			float angular_distance = v1.dot(v2);
+			/* minus here because if its 1.0 it is totally parallel and we want the less the better */
+			candidates.push(navigation_candidate(v, -angular_distance, dist, cw));
 		};
 
 		int edges_num = static_cast<int>(visibility_edges.size());
@@ -252,7 +264,7 @@ bool steering_system::avoid_collisions(obstacle_avoidance_input in) {
 			/* navigate to the left end of the edge*/
 			for (int j = i, k = 0; k < edges_num; j = wrap(j - 1), ++k)
 				/* if left-handed vertex of candidate edge and right-handed vertex of previous edge do not match, we have a lateral obstacle vertex */
-				if (!visibility_edges[j].first.compare(visibility_edges[wrap(j - 1)].second, in.avoidance_rectangle_width)) {
+				if (!visibility_edges[j].first.compare(visibility_edges[wrap(j - 1)].second, in.ignore_discontinuities_narrower_than)) {
 					check_navigation_candidate(visibility_edges[j].first, false);
 					break;
 				}
@@ -266,7 +278,7 @@ bool steering_system::avoid_collisions(obstacle_avoidance_input in) {
 				/* navigate to the right end of the edge */
 				for (int j = i, k = 0; k < edges_num; j = wrap(j + 1), ++k)
 					/* if right-handed vertex of candidate edge and left-handed vertex of next edge do not match, we have a lateral obstacle vertex */
-					if (!visibility_edges[j].second.compare(visibility_edges[wrap(j + 1)].first, in.avoidance_rectangle_width)) {
+					if (!visibility_edges[j].second.compare(visibility_edges[wrap(j + 1)].first, in.ignore_discontinuities_narrower_than)) {
 
 						check_navigation_candidate(visibility_edges[j].second, true);
 						break;
@@ -298,26 +310,19 @@ bool steering_system::avoid_collisions(obstacle_avoidance_input in) {
 
 		while (!candidates.empty()) {
 			/* save output */
-			best_candidate = candidates.top().vertex_ptr;
+			navigation_candidate best[2];
+			best[0] = candidates.top(); candidates.pop();
+			best[1] = candidates.top();
+
+			if (std::abs(best[0].angular_distance - best[1].angular_distance) > 0.1)
+				best_candidate = best[best[0].angular_distance > best[1].angular_distance].vertex_ptr;
+			else
+				best_candidate = best[best[0].linear_distance > best[1].linear_distance].vertex_ptr;
 
 			if (_render->draw_avoidance_info)
 			_render->manually_cleared_lines.push_back(render_system::debug_line(in.position, best_candidate, graphics::pixel_32(0, 255, 0, 255)));
 
 			float angle = (best_candidate - in.position).angle_between(in.unit_vel);
-
-			/* add offset to the angle so the edge of the avoidance rectangle only touches the vertex */
-			float a = in.avoidance_rectangle_width / (2 * (best_candidate - in.position).length());
-			
-			if (a > 1) 
-				a = 1;
-			
-			float offset = asin(a) / 0.01745329251994329576923690768489f;
-			
-			if (!candidates.top().clockwise)
-				offset = -offset;
-			//angle += offset;
-
-			//best_candidate.rotate(offset, position);
 
 			for (auto& p : avoidance.avoidance)
 				p = vec2<>(p).rotate(angle, in.position);
@@ -403,7 +408,6 @@ void steering_system::substep(world& owner) {
 			auto& behaviour = *ptr_behaviour;
 			if (!behaviour.enabled) continue;
 
-
 			/* prepare data that will be used by all steering behaviours */
 			steering_input common_input;
 			avoidance_input avoid_input;
@@ -413,23 +417,29 @@ void steering_system::substep(world& owner) {
 			common_input.position = transform.pos;
 
 			/* only for directed behaviours */
-			if (behaviour.current_target)
+			if (behaviour.current_target) {
 				common_input.set_target(behaviour.current_target->get<components::transform>().current.pos);
+				common_input.directed = true;
+			}
 
 			common_input.set_velocity(velocity);
 			common_input.max_speed = max_speed;
 			common_input.radius_of_effect = behaviour.radius_of_effect;
 
 			avoid_input.steering_input::operator=(common_input);
-			avoid_input.intervention_time_ms = behaviour.intervention_time_ms;
 			avoid_input.avoidance_rectangle_width = behaviour.avoidance_rectangle_width;
 			avoid_input.avoidance_rectangle_length = common_input.speed * behaviour.intervention_time_ms / 1000.f;
+
+			/* clamp maximum intervention length*/
+			if (behaviour.max_intervention_length > 1.f && avoid_input.avoidance_rectangle_length > behaviour.max_intervention_length)
+				avoid_input.avoidance_rectangle_length = behaviour.max_intervention_length;
+
 			avoid_input.shape_verts = &shape_verts;
+			avoid_input.ignore_discontinuities_narrower_than = behaviour.ignore_discontinuities_narrower_than;
 
 			containment_input.avoidance_input::operator=(avoid_input);
 			containment_input.only_threats_in_OBB = behaviour.only_threats_in_OBB;
 			containment_input.randomize_rays = behaviour.randomize_rays;
-			containment_input.intervention_time_ms = behaviour.intervention_time_ms;
 			containment_input.ray_count = behaviour.ray_count;
 			containment_input.physics = &physics;
 			containment_input.ray_filter = &it->get<components::visibility>().get_layer(behaviour.visibility_type).filter;
@@ -441,8 +451,6 @@ void steering_system::substep(world& owner) {
 			}
 			/* directed behaviours */
 			else {
-				auto& target_transform = behaviour.current_target->get<components::transform>().current;
-
 				if (behaviour.behaviour_type == steering::behaviour::FLEE) added_force = flee(common_input);
 				if (behaviour.behaviour_type == steering::behaviour::SEEK) added_force = seek(common_input);
 				if (
@@ -473,6 +481,7 @@ void steering_system::substep(world& owner) {
 				}
 			}
 
+			behaviour.last_output_force = added_force;
 			added_force *= behaviour.weight;
 
 			/* values less then 0.f indicate we don't want force clamping */

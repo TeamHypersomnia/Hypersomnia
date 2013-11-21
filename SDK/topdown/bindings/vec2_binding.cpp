@@ -26,6 +26,7 @@ namespace bindings {
 			.def("get_degrees", &vec2<>::get_degrees)
 			.def("get_radians", &vec2<>::get_radians)
 			.def("set_from_degrees", &vec2<>::set_from_degrees)
+			.def("non_zero", &vec2<>::non_zero)
 			.def_readwrite("x", &vec2<>::x)
 			.def_readwrite("y", &vec2<>::y);
 	}
