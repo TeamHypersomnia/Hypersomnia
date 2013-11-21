@@ -259,20 +259,24 @@ void visibility_system::process_entities(world& owner) {
 						if ((ray_callbacks[0].intersection - vertex.second).length_sq() < (ray_callbacks[1].intersection - vertex.second).length_sq()) {
 							/* it was "first" one that directly reached its destination */
 							new_double_ray.first_reached_destination = true;
-
+							new_double_ray.first = vertex.second;
+							
 							new_discontinuity.points.first = vertex.second;
 							new_discontinuity.points.second = ray_callbacks[1].intersection;
 							new_discontinuity.winding = components::visibility::discontinuity::RIGHT;
+							new_discontinuity.edge_index = double_rays.size() - 1;
 							if (draw_cast_rays) draw_line(ray_callbacks[1].intersection, graphics::pixel_32(255, 0, 255, 255));
 						}
 						/* otherwise it is to the left */
 						else {
 							/* it was "second" one that directly reached its destination */
 							new_double_ray.second_reached_destination = true;
+							new_double_ray.second = vertex.second;
 
 							new_discontinuity.points.first = vertex.second;
 							new_discontinuity.points.second = ray_callbacks[0].intersection;
 							new_discontinuity.winding = components::visibility::discontinuity::LEFT;
+							new_discontinuity.edge_index = double_rays.size();
 							if (draw_cast_rays) draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 255, 255));
 						}
 						/* save new double ray */
@@ -314,6 +318,7 @@ void visibility_system::process_entities(world& owner) {
 										new_discontinuity.points.first = ray_callbacks[1].intersection;
 										new_discontinuity.points.second = ray_callbacks[0].intersection;
 										new_discontinuity.winding = components::visibility::discontinuity::LEFT;
+										new_discontinuity.edge_index = double_rays.size();
 										double_rays.push_back(double_ray(actual_intersection, ray_callbacks[1].intersection, false, true));
 									}
 									/* if the right-handed ray intersected with boundary */
@@ -321,6 +326,7 @@ void visibility_system::process_entities(world& owner) {
 										new_discontinuity.points.first = ray_callbacks[0].intersection;
 										new_discontinuity.points.second = ray_callbacks[1].intersection;
 										new_discontinuity.winding = components::visibility::discontinuity::RIGHT;
+										new_discontinuity.edge_index = double_rays.size() - 1;
 										double_rays.push_back(double_ray(ray_callbacks[0].intersection, actual_intersection, true, false));
 									}
 									request.discontinuities.push_back(new_discontinuity);
@@ -338,6 +344,11 @@ void visibility_system::process_entities(world& owner) {
 			for (auto& disc : request.discontinuities) {
 				disc.points.first *= METERS_TO_PIXELSf;
 				disc.points.second *= METERS_TO_PIXELSf;
+
+				/* wrap it */
+				if (disc.edge_index < 0) 
+					disc.edge_index = double_rays.size() - 1;
+				;
 
 				if (draw_discontinuities) 
 					render.lines.push_back(render_system::debug_line(disc.points.first, disc.points.second, graphics::pixel_32(0, 127, 255, 255)));
