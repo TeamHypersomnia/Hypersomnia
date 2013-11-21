@@ -236,7 +236,7 @@ namespace augmentations {
 		}
 
 		bool compare(const vec2& b, const float epsilon = 0.00001f) {
-			if ((*this - b).length() < epsilon)
+			if ((*this - b).length() <= epsilon)
 				return true;
 
 			return false;

@@ -6,14 +6,15 @@ visibility_system.draw_discontinuities = 0
 visibility_system.draw_visible_walls = 0
 
 visibility_system.epsilon_ray_angle_variation = 0.0001
-visibility_system.epsilon_threshold_obstacle_hit = 2
+visibility_system.epsilon_threshold_obstacle_hit = 10
 visibility_system.epsilon_distance_vertex_hit = 2
 
 pathfinding_system.draw_memorised_walls = 1
 pathfinding_system.draw_undiscovered = 1
 pathfinding_system.epsilon_max_segment_difference = 4
 pathfinding_system.epsilon_distance_visible_point = 2
-pathfinding_system.ignore_discontinuities_shorter_than = 40
+pathfinding_system.ignore_discontinuities_shorter_than = 100
+pathfinding_system.epsilon_distance_the_same_vertex = 10
 
 render_system.draw_steering_forces = 1
 render_system.draw_substeering_forces = 1
@@ -36,13 +37,13 @@ blank_white = create_sprite {
 
 blank_red = create_sprite {
 	image = images.blank,
-	size_multiplier = vec2(10, 10),
+	size_multiplier = vec2(14, 14),
 	color = rgba(255, 0, 0, 255)
 }
 
 blank_green = create_sprite {
 	image = images.blank,
-	size_multiplier = vec2(10, 7),
+	size_multiplier = vec2(7, 7),
 	color = rgba(0, 255, 0, 255)
 }
 
@@ -213,7 +214,7 @@ my_npc_archetype = {
 			body_info = {
 				filter = filter_characters,
 				shape_type = physics_info.RECT,
-				rect_size = vec2(100, 70),
+				rect_size = blank_green.size,
 				
 				angular_damping = 5,
 				linear_damping = 3,
@@ -281,7 +282,7 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 		physics = {
 		
 			body_info = {
-				fixed_rotation = false,
+				fixed_rotation = true,
 				angular_damping = 5,
 				linear_damping = 13
 			}
@@ -460,6 +461,7 @@ target_entity_archetype = {
 
 target_entity = create_entity(archetyped(target_entity_archetype, {}))
 navigation_target_entity = create_entity(archetyped(target_entity_archetype, {}))
+forward_navigation_entity = create_entity(archetyped(target_entity_archetype, {}))
 
 flee_behaviour = create_steering_behaviour {
 	current_target = target_entity,
@@ -471,15 +473,22 @@ flee_behaviour = create_steering_behaviour {
 	force_color = rgba(255, 0, 0, 0)
 }
 		
-seek_behaviour = create_steering_behaviour {
+seek_archetype = {
 	current_target = navigation_target_entity,
 	weight = 1,
 	behaviour_type = steering_behaviour.SEEK,
 	enabled = true,
 	erase_when_target_reached = false,
-	radius_of_effect = 0,
+	radius_of_effect = 200,
 	force_color = rgba(0, 255, 255, 0)
 }			
+
+target_seek_behaviour = create_steering_behaviour (seek_archetype)
+forward_seek_behaviour = create_steering_behaviour (archetyped(seek_archetype, {
+	current_target = forward_navigation_entity,
+	radius_of_effect = 0
+}
+))
 
 pursuit_behaviour = create_steering_behaviour {
 	current_target = player.body,
@@ -500,23 +509,6 @@ evasion_behaviour = create_steering_behaviour {
 	force_color = rgba(255, 0, 0, 0)
 }
 
-obstacle_avoidance_behaviour = create_steering_behaviour {
-	current_target = navigation_target_entity,
-	weight = 100, 
-	behaviour_type = steering_behaviour.OBSTACLE_AVOIDANCE,
-	visibility_type = visibility_component.CONTAINMENT,
-	
-	ray_count = 20,
-	randomize_rays = false,
-	only_threats_in_OBB = false,
-	
-	enabled = true,
-	force_color = rgba(0, 255, 255, 255),
-	intervention_time_ms = 200,
-	avoidance_rectangle_width = 0,
-	decision_duration_ms = 0
-}
-
 containment_behaviour = create_steering_behaviour {
 	weight = 1, 
 	behaviour_type = steering_behaviour.CONTAINMENT,
@@ -533,12 +525,35 @@ containment_behaviour = create_steering_behaviour {
 	decision_duration_ms = 0
 }
 
-obstacle_avoidance_behaviour.current_target:set(player.body)
+obstacle_avoidance_archetype = {
+	weight = 100, 
+	behaviour_type = steering_behaviour.OBSTACLE_AVOIDANCE,
+	visibility_type = visibility_component.CONTAINMENT,
+	
+	ray_count = 20,
+	randomize_rays = false,
+	only_threats_in_OBB = false,
+	
+	enabled = true,
+	force_color = rgba(0, 255, 255, 255),
+	intervention_time_ms = 200,
+	avoidance_rectangle_width = 0,
+	decision_duration_ms = 0,
+	ignore_discontinuities_narrower_than = 50
+}
+
+obstacle_avoidance_behaviour = create_steering_behaviour (obstacle_avoidance_archetype)
+sensor_avoidance_behaviour = create_steering_behaviour (archetyped(obstacle_avoidance_archetype, {
+	weight = 0,
+	current_target = navigation_target_entity,
+	intervention_time_ms = 200
+}))
 
 blue_crosshair_sprite = create_sprite {
 	image = images.crosshair,
 	color = rgba(255, 255, 255, 255)
 }
+
 
 blue_crosshair = create_entity {
 	transform = {},
@@ -557,9 +572,25 @@ loop_only_info = create_scriptable_info {
 				navigation_target_entity.transform.current.pos = player.body.pathfinding:get_current_navigation_target()
 				
 				local myvel = player.body.physics.body:GetLinearVelocity()
-				navigation_target_entity.transform.current.pos = player.body.transform.current.pos + vec2(myvel.x, myvel.y) * 50
+				forward_navigation_entity.transform.current.pos = player.body.transform.current.pos + vec2(myvel.x, myvel.y) * 50
 				
-				seek_behaviour.enabled = player.body.pathfinding:is_still_pathfinding()
+				if player.body.pathfinding:is_still_pathfinding() == true then
+					obstacle_avoidance_behaviour.enabled = true
+					if sensor_avoidance_behaviour.last_output_force:non_zero() then
+						target_seek_behaviour.enabled = false
+						forward_seek_behaviour.enabled = true
+					else
+						target_seek_behaviour.enabled = true
+						forward_seek_behaviour.enabled = false
+					end
+				else
+					target_seek_behaviour.enabled = false
+					forward_seek_behaviour.enabled = false
+					obstacle_avoidance_behaviour.enabled = false
+				end
+				
+				sensor_avoidance_behaviour.max_intervention_length = (player.body.transform.current.pos - navigation_target_entity.transform.current.pos):length() - 70
+				
 				return true
 			end,
 			
@@ -572,9 +603,10 @@ loop_only_info = create_scriptable_info {
 					--message.subject.steering:add_behaviour(evasion_behaviour)
 					--message.subject.steering:add_behaviour(pursuit_behaviour)
 					--message.subject.steering:add_behaviour(obstacle_avoidance_behaviour)
-					player.body.steering:add_behaviour(seek_behaviour)
+					player.body.steering:add_behaviour(target_seek_behaviour)
+					player.body.steering:add_behaviour(forward_seek_behaviour)
 					player.body.steering:add_behaviour(obstacle_avoidance_behaviour)
-					--player.body.steering:add_behaviour(containment_behaviour)
+					player.body.steering:add_behaviour(sensor_avoidance_behaviour)
 					
 				elseif message.intent == custom_intents.SPEED_INCREASE then
 					physics_system.timestep_multiplier = physics_system.timestep_multiplier + 0.05
