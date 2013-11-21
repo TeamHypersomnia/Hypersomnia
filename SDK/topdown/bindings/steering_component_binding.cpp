@@ -17,15 +17,14 @@ namespace bindings {
 			.def_readwrite("enabled", &steering::behaviour::enabled)
 			.def_readwrite("force_color", &steering::behaviour::force_color)
 			.def_readwrite("last_estimated_pursuit_position", &steering::behaviour::last_estimated_pursuit_position)
-			.def_readwrite("arrival_slowdown_radius", &steering::behaviour::arrival_slowdown_radius)
 			.def_readwrite("max_target_future_prediction_ms", &steering::behaviour::max_target_future_prediction_ms)
-			.def_readwrite("effective_fleeing_radius", &steering::behaviour::effective_fleeing_radius)
+			.def_readwrite("radius_of_effect", &steering::behaviour::radius_of_effect)
 			.def_readwrite("intervention_time_ms", &steering::behaviour::intervention_time_ms)
 			.def_readwrite("avoidance_rectangle_width", &steering::behaviour::avoidance_rectangle_width)
 			.def_readwrite("decision_duration_ms", &steering::behaviour::decision_duration_ms)
 			.def_readwrite("randomize_rays", &steering::behaviour::randomize_rays)
 			.def_readwrite("ray_count", &steering::behaviour::ray_count)
-			.def_readwrite("only_threats_inside_OBB", &steering::behaviour::only_threats_inside_OBB)
+			.def_readwrite("only_threats_in_OBB", &steering::behaviour::only_threats_in_OBB)
 			.def_readwrite("visibility_type", &steering::behaviour::visibility_type)
 			.enum_("script_type")[
 				luabind::value("SEEK", steering::behaviour::SEEK),

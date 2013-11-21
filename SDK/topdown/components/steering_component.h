@@ -19,10 +19,10 @@ namespace components {
 			} behaviour_type;
 
 			target current_target;
+			target shifted_temporary_target;
 
 			float max_target_future_prediction_ms;
-			float arrival_slowdown_radius;
-			float effective_fleeing_radius;
+			float radius_of_effect;
 			float max_force_applied;
 			float weight;
 		
@@ -34,16 +34,13 @@ namespace components {
 			bool erase_when_target_reached;
 
 			bool randomize_rays;
-			bool only_threats_inside_OBB;
+			bool only_threats_in_OBB;
 			int ray_count;
 			int visibility_type;
 
 			bool enabled;
 
 			augmentations::graphics::pixel_32 force_color;
-
-			augmentations::util::timer last_decision_timer;
-			augmentations::vec2<> last_decision;
 
 			behaviour() : 
 				weight(1.f), 
@@ -52,23 +49,20 @@ namespace components {
 				behaviour_type(SEEK), 
 				max_force_applied(-1.f), 
 				max_target_future_prediction_ms(0.f),
-				arrival_slowdown_radius(0.f),
-				effective_fleeing_radius(-1.f),
+				radius_of_effect(-1.f),
 				intervention_time_ms(0.f),
 				avoidance_rectangle_width(0.f),
 				decision_duration_ms(0.f),
 				ray_count(0),
 				randomize_rays(false),
-				only_threats_inside_OBB(false),
+				only_threats_in_OBB(false),
 				visibility_type(visibility::OBSTACLE_AVOIDANCE)
 			{
-				last_decision_timer.reset();
 			}
 
 			augmentations::vec2<> last_estimated_pursuit_position;
 		private:
 			friend class steering_system;
-			bool completed;
 		};
 
 		std::vector<behaviour*> active_behaviours;

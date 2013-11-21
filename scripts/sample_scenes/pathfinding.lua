@@ -467,7 +467,7 @@ flee_behaviour = create_steering_behaviour {
 	behaviour_type = steering_behaviour.FLEE,
 	enabled = true,
 	erase_when_target_reached = false,
-	effective_fleeing_radius = 500,
+	radius_of_effect = 500,
 	force_color = rgba(255, 0, 0, 0)
 }
 		
@@ -477,7 +477,7 @@ seek_behaviour = create_steering_behaviour {
 	behaviour_type = steering_behaviour.SEEK,
 	enabled = true,
 	erase_when_target_reached = false,
-	arrival_slowdown_radius = 0,
+	radius_of_effect = 0,
 	force_color = rgba(0, 255, 255, 0)
 }			
 
@@ -496,7 +496,7 @@ evasion_behaviour = create_steering_behaviour {
 	behaviour_type = steering_behaviour.EVASION,
 	enabled = true,
 	max_target_future_prediction_ms = 300,
-	effective_fleeing_radius = 700,
+	radius_of_effect = 700,
 	force_color = rgba(255, 0, 0, 0)
 }
 
@@ -508,28 +508,28 @@ obstacle_avoidance_behaviour = create_steering_behaviour {
 	
 	ray_count = 20,
 	randomize_rays = false,
-	only_threats_inside_OBB = false,
+	only_threats_in_OBB = false,
 	
 	enabled = true,
 	force_color = rgba(0, 255, 255, 255),
 	intervention_time_ms = 200,
-	avoidance_rectangle_width = 20,
+	avoidance_rectangle_width = 0,
 	decision_duration_ms = 0
 }
 
 containment_behaviour = create_steering_behaviour {
-	weight = 0.2, 
+	weight = 1, 
 	behaviour_type = steering_behaviour.CONTAINMENT,
 	
 	visibility_type = visibility_component.CONTAINMENT,
 	ray_count = 100,
 	randomize_rays = false,
-	only_threats_inside_OBB = false,
+	only_threats_in_OBB = false,
 	
 	enabled = true,
 	force_color = rgba(0, 255, 255, 255),
 	intervention_time_ms = 400,
-	avoidance_rectangle_width = 10,
+	avoidance_rectangle_width = 0,
 	decision_duration_ms = 0
 }
 
