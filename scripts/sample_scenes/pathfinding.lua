@@ -2,7 +2,7 @@ physics_system.timestep_multiplier = 1
 
 visibility_system.draw_cast_rays = 0
 visibility_system.draw_triangle_edges = 0
-visibility_system.draw_discontinuities = 0
+visibility_system.draw_discontinuities = 1
 visibility_system.draw_visible_walls = 0
 
 visibility_system.epsilon_ray_angle_variation = 0.0001
@@ -13,8 +13,7 @@ pathfinding_system.draw_memorised_walls = 1
 pathfinding_system.draw_undiscovered = 1
 pathfinding_system.epsilon_max_segment_difference = 4
 pathfinding_system.epsilon_distance_visible_point = 2
-pathfinding_system.ignore_discontinuities_shorter_than = 200
-pathfinding_system.epsilon_distance_the_same_vertex = 10
+pathfinding_system.epsilon_distance_the_same_vertex = 50
 
 render_system.draw_steering_forces = 1
 render_system.draw_substeering_forces = 1
@@ -30,6 +29,7 @@ crosshair_sprite = create_sprite {
 	image = images.crosshair
 }
 
+
 blank_white = create_sprite {
 	image = images.blank,
 	color = rgba(255, 0, 0, 255)
@@ -37,7 +37,7 @@ blank_white = create_sprite {
 
 blank_red = create_sprite {
 	image = images.blank,
-	size_multiplier = vec2(50, 10),
+	size_multiplier = vec2(70, 10),
 	color = rgba(255, 0, 0, 255)
 }
 
@@ -145,7 +145,7 @@ small_box_archetype = {
 	},
 	
 	physics = {
-		body_type = Box2D.b2_staticBody,
+		body_type = Box2D.b2_dynamicBody,
 		
 		body_info = {
 			filter = filter_objects,
@@ -299,6 +299,7 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 			visibility_layers = {
 				[visibility_component.CONTAINMENT] = {
 					square_side = 7000,
+					ignore_discontinuities_shorter_than = 170*1.41,
 					color = rgba(255, 0, 255, 0),
 					filter = filter_obstacle_visibility
 				},	
@@ -306,6 +307,7 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 				[visibility_component.DYNAMIC_PATHFINDING] = {
 					square_side = 7000,
 					color = rgba(0, 255, 255, 120),
+					ignore_discontinuities_shorter_than = 170*1.41,
 					filter = filter_pathfinding_visibility
 				}
 			}
@@ -313,7 +315,8 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 		
 		pathfinding = {
 			enable_backtracking = true,
-			target_offset = 100
+			target_offset = 100,
+			distance_navpoint_hit = 20
 		},
 		
 		movement = {
@@ -539,7 +542,7 @@ obstacle_avoidance_archetype = {
 	intervention_time_ms = 200,
 	avoidance_rectangle_width = 0,
 	decision_duration_ms = 0,
-	ignore_discontinuities_narrower_than = 50
+	ignore_discontinuities_narrower_than = 1
 }
 
 obstacle_avoidance_behaviour = create_steering_behaviour (obstacle_avoidance_archetype)

@@ -8,12 +8,12 @@ namespace components {
 	struct pathfinding : public augmentations::entity_system::component {
 		typedef std::pair<augmentations::vec2<>, augmentations::vec2<>> edge;
 
-		pathfinding() : enable_backtracking(true), target_offset(0.f), ignore_discontinuities_shorter_than(1.f) {}
+		pathfinding() : enable_backtracking(true), target_offset(0.f), distance_navpoint_hit(0.f) {}
 
 		bool enable_backtracking;
 
 		float target_offset;
-		float ignore_discontinuities_shorter_than;
+		float distance_navpoint_hit;
 
 		struct pathfinding_session {
 			augmentations::vec2<> target, navigate_to;

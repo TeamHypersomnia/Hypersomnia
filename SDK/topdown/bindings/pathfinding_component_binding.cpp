@@ -24,7 +24,7 @@ namespace bindings {
 			.def("is_still_pathfinding", &pathfinding::is_still_pathfinding)
 			.def_readwrite("enable_backtracking", &pathfinding::enable_backtracking)
 			.def_readwrite("target_offset", &pathfinding::target_offset)
-			.def_readwrite("ignore_discontinuities_shorter_than", &pathfinding::ignore_discontinuities_shorter_than)
-			;
+			.def_readwrite("distance_navpoint_hit", &pathfinding::distance_navpoint_hit)
+			; 
 	}
 }

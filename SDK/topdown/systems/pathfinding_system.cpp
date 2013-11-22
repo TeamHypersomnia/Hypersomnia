@@ -6,7 +6,9 @@
 
 #include "render_system.h"
 #include "physics_system.h"
+
 #include "../resources/render_info.h"
+#include "../game/body_helper.h"
 
 pathfinding_system::pathfinding_system() : draw_memorised_walls(false), draw_undiscovered(false),
 	epsilon_distance_the_same_vertex(3.f) {}
@@ -27,8 +29,6 @@ void pathfinding_system::process_entities(world& owner) {
 		auto& pathfinding = it->get<components::pathfinding>();
 		auto& transform = it->get<components::transform>().current;
 		auto body = it->get<components::physics>().body;
-
-		const float ignore_discontinuities_shorter_than_sq = pathfinding.ignore_discontinuities_shorter_than * pathfinding.ignore_discontinuities_shorter_than;
 
 		/* check if we request pathfinding */
 		if (!pathfinding.session_stack.empty()) {
@@ -56,9 +56,6 @@ void pathfinding_system::process_entities(world& owner) {
 
 			/* save all new discontinuities from visibility */
 			for (auto& disc : vision.discontinuities) {
-				if ((disc.points.second - disc.points.first).length_sq() < ignore_discontinuities_shorter_than_sq)
-					continue;
-
 				bool this_discontinuity_is_already_memorised = false;
 
 				for (auto& memorised_undiscovered : pathfinding.session().undiscovered_vertices) {
@@ -101,13 +98,26 @@ void pathfinding_system::process_entities(world& owner) {
 				}
 			}
 
-			/* mark vertices whose sensors touch the body as visited */
+			/* mark vertices whose sensors distance from the the body is less than distance_navpoint_hit as visited */
 
+			/* prepare body polygon to test for overlaps */
+			b2PolygonShape body_poly;
+			auto verts = topdown::get_transformed_shape_verts(*reinterpret_cast<entity*>(body->GetUserData()));
+			body_poly.Set(verts.data(), verts.size());
+
+			/* for every undiscovered navigation point */
 			auto& undiscs = pathfinding.session().undiscovered_vertices;
-			undiscs.erase(std::remove_if(undiscs.begin(), undiscs.end(), [&body, &pathfinding](const components::pathfinding::pathfinding_session::navigation_vertex& nav){
-				//b2CircleShape b2circle;
-				
-				if (body->TestPoint(nav.sensor * PIXELS_TO_METERSf)) {
+			undiscs.erase(std::remove_if(undiscs.begin(), undiscs.end(), [&body, &pathfinding, &body_poly](const components::pathfinding::pathfinding_session::navigation_vertex& nav){
+				/* prepare edge shape for sensor to test for overlaps */
+				b2EdgeShape sensor_edge;
+				sensor_edge.Set(nav.location * PIXELS_TO_METERSf, nav.sensor * PIXELS_TO_METERSf);
+
+				/* prepare null transform, both bodies are already in the same frame of reference */
+				b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
+
+				/* if shortest distance between body and sensor fits in distance_navpoint_hit */
+				if (b2TestOverlap(&sensor_edge, 0, &body_poly, 0, null_transform, null_transform, pathfinding.distance_navpoint_hit * PIXELS_TO_METERSf)) {
+					/* save this sensor in discovered ones and return true to remove it from the undiscovered */
 					pathfinding.session().discovered_vertices.push_back(nav);
 					return true;
 				}
@@ -173,6 +183,10 @@ void pathfinding_system::process_entities(world& owner) {
 			if (draw_undiscovered) {
 				for (auto& disc : vertices)
 					render.lines.push_back(render_system::debug_line(disc.location, disc.sensor, graphics::pixel_32(0, 127, 255, 255)));
+
+				for (auto& disc : pathfinding.session().discovered_vertices)
+					if(disc.sensor.non_zero())
+					render.lines.push_back(render_system::debug_line(disc.location, disc.sensor, graphics::pixel_32(0, 255, 0, 255)));
 			}
 
 			if (!vertices.empty()) {
@@ -180,8 +194,8 @@ void pathfinding_system::process_entities(world& owner) {
 				auto& local_minimum_discontinuity = (*std::min_element(vertices.begin(), vertices.end(),
 					[&pathfinding, &transform](const components::pathfinding::pathfinding_session::navigation_vertex& a,
 					const components::pathfinding::pathfinding_session::navigation_vertex& b) {
-						auto dist_a = (a.location - pathfinding.session().target).length_sq(); //+ (a.location - transform.pos).length_sq();
-						auto dist_b = (b.location - pathfinding.session().target).length_sq(); //+ (b.location - transform.pos).length_sq();
+						auto dist_a = (a.location - pathfinding.session().target).length_sq() + (a.location - transform.pos).length_sq();
+						auto dist_b = (b.location - pathfinding.session().target).length_sq() + (b.location - transform.pos).length_sq();
 						return dist_a < dist_b;
 				}));
 
@@ -190,8 +204,8 @@ void pathfinding_system::process_entities(world& owner) {
 					pathfinding.session().navigate_to = local_minimum_discontinuity.sensor;
 
 				/* if we can see it, navigate there */
-				if (body->TestPoint(local_minimum_discontinuity.location * PIXELS_TO_METERSf) ||
-					is_point_visible(transform.pos, local_minimum_discontinuity.location, vision.filter)) {
+				if (body->TestPoint(local_minimum_discontinuity.sensor * PIXELS_TO_METERSf) ||
+					is_point_visible(transform.pos, local_minimum_discontinuity.sensor, vision.filter)) {
 				}
 				/* else start new navigation session */
 				else {
