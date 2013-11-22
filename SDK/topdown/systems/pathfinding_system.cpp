@@ -8,12 +8,11 @@
 #include "physics_system.h"
 #include "../resources/render_info.h"
 
-pathfinding_system::pathfinding_system() : draw_memorised_walls(false), draw_undiscovered(false), ignore_discontinuities_shorter_than(1.f),
+pathfinding_system::pathfinding_system() : draw_memorised_walls(false), draw_undiscovered(false),
 	epsilon_distance_the_same_vertex(3.f) {}
 
 void pathfinding_system::process_entities(world& owner) {
 	/* prepare epsilons to be used later, just to make the notation more clear */
-	const float ignore_discontinuities_shorter_than_sq = ignore_discontinuities_shorter_than * ignore_discontinuities_shorter_than;
 	const float epsilon_distance_visible_point_sq = epsilon_distance_visible_point * epsilon_distance_visible_point;
 	const float epsilon_distance_the_same_vertex_sq = epsilon_distance_the_same_vertex * epsilon_distance_the_same_vertex;
 	
@@ -29,8 +28,10 @@ void pathfinding_system::process_entities(world& owner) {
 		auto& transform = it->get<components::transform>().current;
 		auto body = it->get<components::physics>().body;
 
+		const float ignore_discontinuities_shorter_than_sq = pathfinding.ignore_discontinuities_shorter_than * pathfinding.ignore_discontinuities_shorter_than;
+
 		/* check if we request pathfinding */
-		if (pathfinding.is_finding_a_path) {
+		if (!pathfinding.session_stack.empty()) {
 			/* get visibility information */
 			auto& vision = visibility.get_layer(components::visibility::DYNAMIC_PATHFINDING);
 
@@ -58,7 +59,7 @@ void pathfinding_system::process_entities(world& owner) {
 			for (auto& visible_vertex : vision.vertex_hits) {
 				bool this_visible_vertex_is_already_memorised = false;
 
-				for (auto& memorised_discovered : pathfinding.session.discovered_vertices) {
+				for (auto& memorised_discovered : pathfinding.session().discovered_vertices) {
 					/* if a discontinuity with the same closer vertex already exists */
 					if ((memorised_discovered.location - visible_vertex).length_sq() < epsilon_distance_the_same_vertex_sq) {
 						this_visible_vertex_is_already_memorised = true;
@@ -70,7 +71,7 @@ void pathfinding_system::process_entities(world& owner) {
 				if (!this_visible_vertex_is_already_memorised) {
 					components::pathfinding::pathfinding_session::navigation_vertex vert;
 					vert.location = visible_vertex;
-					pathfinding.session.discovered_vertices.push_back(vert);
+					pathfinding.session().discovered_vertices.push_back(vert);
 				}
 			}
 
@@ -81,7 +82,7 @@ void pathfinding_system::process_entities(world& owner) {
 
 				bool this_discontinuity_is_already_memorised = false;
 
-				for (auto& memorised_undiscovered : pathfinding.session.undiscovered_vertices) {
+				for (auto& memorised_undiscovered : pathfinding.session().undiscovered_vertices) {
 					/* if a discontinuity with the same closer vertex already exists */
 					if ((memorised_undiscovered.location - disc.points.first).length_sq() < epsilon_distance_the_same_vertex_sq) {
 						this_discontinuity_is_already_memorised = true;
@@ -90,7 +91,7 @@ void pathfinding_system::process_entities(world& owner) {
 					}
 				}
 
-				for (auto& memorised_discovered : pathfinding.session.discovered_vertices) {
+				for (auto& memorised_discovered : pathfinding.session().discovered_vertices) {
 					/* if a discontinuity with the same closer vertex already exists */
 					if ((memorised_discovered.location - disc.points.first).length_sq() < epsilon_distance_the_same_vertex_sq) {
 						this_discontinuity_is_already_memorised = true;
@@ -117,18 +118,18 @@ void pathfinding_system::process_entities(world& owner) {
 
 					/* push the sensor a bit further so the body doesn't stop not seeing another targets */
 					vert.sensor = vert.location + offset_direction * pathfinding.target_offset;
-					pathfinding.session.undiscovered_vertices.push_back(vert);
+					pathfinding.session().undiscovered_vertices.push_back(vert);
 				}
 			}
 
 			/* mark vertices whose sensors touch the body as visited */
 
-			auto& undiscs = pathfinding.session.undiscovered_vertices;
+			auto& undiscs = pathfinding.session().undiscovered_vertices;
 			undiscs.erase(std::remove_if(undiscs.begin(), undiscs.end(), [&body, &pathfinding](const components::pathfinding::pathfinding_session::navigation_vertex& nav){
 				//b2CircleShape b2circle;
 				
 				if (body->TestPoint(nav.sensor * PIXELS_TO_METERSf)) {
-					pathfinding.session.discovered_vertices.push_back(nav);
+					pathfinding.session().discovered_vertices.push_back(nav);
 					return true;
 				}
 				return false;
@@ -166,62 +167,86 @@ void pathfinding_system::process_entities(world& owner) {
 				return (!line_of_sight.hit || (line_of_sight.intersection - point).length_sq() < epsilon_distance_visible_point_sq);
 			};
 
-			bool target_inside_body = body->TestPoint(pathfinding.session.target * PIXELS_TO_METERSf);
+			/* we are sure here that session stack has at least 1 session
+				we drop secondary sessions whose targets are visible
+			*/
+			if (pathfinding.session_stack.size() >= 2) {
+				for (auto old_session = pathfinding.session_stack.begin(); old_session != pathfinding.session_stack.end(); ++old_session) {
+					/*  check if there's a line of sight to any of the old targets
+					if there's a line of sight to "navigate_to" it will be visible as target to the newer session
+					and we either way also handle the current session's target so nothing is missing here
+					*/
+					if (body->TestPoint((*old_session).target * PIXELS_TO_METERSf) ||
+						is_point_visible(transform.pos, (*old_session).target, vision.filter)) {
+							/* if there is, roll back to this session */
+							pathfinding.session() = (*old_session);
+							
+							/* if it is the first session, we don't want to erase it since we still need to reach the target */
+							if (old_session == pathfinding.session_stack.begin())
+								++old_session;
 
-			if (pathfinding.session_stack.empty() && target_inside_body) {
-				pathfinding.is_finding_a_path = false;
+							/* drop unnecessary sessions */
+							pathfinding.session_stack.erase(old_session, pathfinding.session_stack.end());
+							break;
+					}
+				}
 			}
-			else {
-				/* first check if there's a line of sight */
-				if (target_inside_body || is_point_visible(transform.pos, pathfinding.session.target, vision.filter)) {
-					/* if we're actually navigating to a secondary target */
-					if (!pathfinding.session_stack.empty()) {
-						/* roll back to the previous session */
-						const auto top = pathfinding.session_stack.end() - 1;
-						pathfinding.session = *top;
-						pathfinding.session_stack.erase(top);
-					}
-					else pathfinding.session.navigate_to = pathfinding.session.target;
+
+			if (pathfinding.session_stack.size() == 1) {
+				/* if the target is inside body, it's already found */
+				if (body->TestPoint(pathfinding.session().target * PIXELS_TO_METERSf)) {
+					/* done, target found */
+					pathfinding.clear_pathfinding_info();
+					continue;
 				}
+
+				/* check if there's a line of sight */
+				if (is_point_visible(transform.pos, pathfinding.session().target, vision.filter)) {
+					/* if there is, navigate directly to target */
+					pathfinding.session().navigate_to = pathfinding.session().target;
+					continue;
+				}
+			}
+
+			/* if it is the last session but there's not line of sight,
+				or it is not the last session but it was not dropped from the loop which means there's no line of sight to target,
+				pick the best navigation candidate
+			*/
+
+			auto& vertices = pathfinding.session().undiscovered_vertices;
+
+			if (draw_undiscovered) {
+				for (auto& disc : vertices)
+					render.lines.push_back(render_system::debug_line(disc.location, disc.sensor, graphics::pixel_32(0, 127, 255, 255)));
+			}
+
+			if (!vertices.empty()) {
+				/* find discontinuity that is closest to the target */
+				auto& local_minimum_discontinuity = (*std::min_element(vertices.begin(), vertices.end(),
+					[&pathfinding, &transform](const components::pathfinding::pathfinding_session::navigation_vertex& a,
+					const components::pathfinding::pathfinding_session::navigation_vertex& b) {
+						auto dist_a = (a.location - pathfinding.session().target).length_sq(); //+ (a.location - transform.pos).length_sq();
+						auto dist_b = (b.location - pathfinding.session().target).length_sq(); //+ (b.location - transform.pos).length_sq();
+						return dist_a < dist_b;
+				}));
+
+				/* extract the closer vertex, condition to faciliate debug */
+				if (local_minimum_discontinuity.sensor != pathfinding.session().navigate_to)
+					pathfinding.session().navigate_to = local_minimum_discontinuity.sensor;
+
+				/* if we can see it, navigate there */
+				if (body->TestPoint(local_minimum_discontinuity.location * PIXELS_TO_METERSf) ||
+					is_point_visible(transform.pos, local_minimum_discontinuity.location, vision.filter)) {
+				}
+				/* else start new navigation session */
 				else {
-					auto& vertices = pathfinding.session.undiscovered_vertices;
-
-					if (draw_undiscovered) {
-						for (auto& disc : vertices)
-							render.lines.push_back(render_system::debug_line(disc.location, disc.sensor, graphics::pixel_32(0, 127, 255, 255)));
-					}
-
-					if (!vertices.empty()) {
-						/* find discontinuity that is closest to the target */
-						auto& local_minimum_discontinuity = (*std::min_element(vertices.begin(), vertices.end(),
-							[&pathfinding, &transform](const components::pathfinding::pathfinding_session::navigation_vertex& a,
-							const components::pathfinding::pathfinding_session::navigation_vertex& b) {
-								auto dist_a = (a.location - pathfinding.session.target).length_sq() + (a.location - transform.pos).length_sq();
-								auto dist_b = (b.location - pathfinding.session.target).length_sq() + (b.location - transform.pos).length_sq();
-								return dist_a < dist_b;
-						}));
-
-						/* extract the closer vertex, condition to faciliate debug */
-						if (local_minimum_discontinuity.sensor != pathfinding.session.navigate_to)
-							pathfinding.session.navigate_to = local_minimum_discontinuity.sensor;
-
-						/* if we can see it, navigate there */
-						if (body->TestPoint(local_minimum_discontinuity.location * PIXELS_TO_METERSf) ||
-							is_point_visible(transform.pos, local_minimum_discontinuity.location, vision.filter)) {
-						}
-						/* else start new navigation session */
-						else {
-							if (pathfinding.enable_backtracking) {
-								vec2<> new_target = pathfinding.session.navigate_to;
-
-								pathfinding.session_stack.push_back(pathfinding.session);
-								pathfinding.session = components::pathfinding::pathfinding_session();
-								pathfinding.session.target = new_target;
-							}
-						}
-
+					if (pathfinding.enable_backtracking) {
+						vec2<> new_target = pathfinding.session().navigate_to;
+						pathfinding.session_stack.push_back(components::pathfinding::pathfinding_session());
+						pathfinding.session().target = new_target;
 					}
 				}
+
 			}
 		}
 	}

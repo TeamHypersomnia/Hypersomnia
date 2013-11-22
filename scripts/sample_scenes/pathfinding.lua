@@ -13,7 +13,7 @@ pathfinding_system.draw_memorised_walls = 1
 pathfinding_system.draw_undiscovered = 1
 pathfinding_system.epsilon_max_segment_difference = 4
 pathfinding_system.epsilon_distance_visible_point = 2
-pathfinding_system.ignore_discontinuities_shorter_than = 100
+pathfinding_system.ignore_discontinuities_shorter_than = 200
 pathfinding_system.epsilon_distance_the_same_vertex = 10
 
 render_system.draw_steering_forces = 1
@@ -37,7 +37,7 @@ blank_white = create_sprite {
 
 blank_red = create_sprite {
 	image = images.blank,
-	size_multiplier = vec2(14, 14),
+	size_multiplier = vec2(50, 10),
 	color = rgba(255, 0, 0, 255)
 }
 
@@ -145,7 +145,7 @@ small_box_archetype = {
 	},
 	
 	physics = {
-		body_type = Box2D.b2_dynamicBody,
+		body_type = Box2D.b2_staticBody,
 		
 		body_info = {
 			filter = filter_objects,
@@ -546,7 +546,7 @@ obstacle_avoidance_behaviour = create_steering_behaviour (obstacle_avoidance_arc
 sensor_avoidance_behaviour = create_steering_behaviour (archetyped(obstacle_avoidance_archetype, {
 	weight = 0,
 	current_target = navigation_target_entity,
-	intervention_time_ms = 200
+	intervention_time_ms = 400
 }))
 
 blue_crosshair_sprite = create_sprite {
@@ -569,19 +569,22 @@ loop_only_info = create_scriptable_info {
 			function(message)
 				my_atlas:_bind()
 				blue_crosshair.transform.current.pos = pursuit_behaviour.last_estimated_pursuit_position
-				navigation_target_entity.transform.current.pos = player.body.pathfinding:get_current_navigation_target()
 				
 				local myvel = player.body.physics.body:GetLinearVelocity()
 				forward_navigation_entity.transform.current.pos = player.body.transform.current.pos + vec2(myvel.x, myvel.y) * 50
 				
 				if player.body.pathfinding:is_still_pathfinding() == true then
+					navigation_target_entity.transform.current.pos = player.body.pathfinding:get_current_navigation_target()
+				
 					obstacle_avoidance_behaviour.enabled = true
 					if sensor_avoidance_behaviour.last_output_force:non_zero() then
 						target_seek_behaviour.enabled = false
 						forward_seek_behaviour.enabled = true
+						obstacle_avoidance_behaviour.enabled = true
 					else
 						target_seek_behaviour.enabled = true
 						forward_seek_behaviour.enabled = false
+						obstacle_avoidance_behaviour.enabled = false
 					end
 				else
 					target_seek_behaviour.enabled = false

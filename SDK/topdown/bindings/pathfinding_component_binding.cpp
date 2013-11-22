@@ -13,7 +13,6 @@ namespace bindings {
 			.def_readwrite("epsilon_distance_visible_point", &pathfinding_system::epsilon_distance_visible_point)
 			.def_readwrite("draw_memorised_walls", &pathfinding_system::draw_memorised_walls)
 			.def_readwrite("draw_undiscovered", &pathfinding_system::draw_undiscovered)
-			.def_readwrite("ignore_discontinuities_shorter_than", &pathfinding_system::ignore_discontinuities_shorter_than)
 			.def_readwrite("epsilon_distance_the_same_vertex", &pathfinding_system::epsilon_distance_the_same_vertex)
 			, 
 			
@@ -25,6 +24,7 @@ namespace bindings {
 			.def("is_still_pathfinding", &pathfinding::is_still_pathfinding)
 			.def_readwrite("enable_backtracking", &pathfinding::enable_backtracking)
 			.def_readwrite("target_offset", &pathfinding::target_offset)
+			.def_readwrite("ignore_discontinuities_shorter_than", &pathfinding::ignore_discontinuities_shorter_than)
 			;
 	}
 }
