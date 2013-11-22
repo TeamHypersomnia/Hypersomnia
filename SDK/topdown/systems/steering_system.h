@@ -54,6 +54,13 @@ public:
 		obstacle_avoidance_input();
 	};
 
+	struct wander_input : steering_input {
+		float circle_radius, circle_distance;
+		float* current_angle;
+		float displacement_degrees;
+		wander_input();
+	};
+
 	struct containment_input : avoidance_input {
 		int ray_count;
 		bool randomize_rays;
@@ -70,10 +77,12 @@ public:
 		b2Vec2 avoidance[4];
 	} get_avoidance_info(obstacle_avoidance_input);
 
+
 	bool avoid_collisions(obstacle_avoidance_input);
 	vec2<> containment(containment_input);
 	vec2<> seek(steering_input);
 	vec2<> flee(steering_input);
+	vec2<> wander(wander_input);
 
 	vec2<> predict_interception(steering_input, vec2<> target_velocity, float max_prediction_ms, bool flee_prediction);
 };

@@ -38,6 +38,7 @@ public:
 	int draw_velocities;
 
 	int draw_avoidance_info;
+	int draw_wandering_info;
 
 	window::glwindow& output_window;
 	render_system(window::glwindow& output_window);

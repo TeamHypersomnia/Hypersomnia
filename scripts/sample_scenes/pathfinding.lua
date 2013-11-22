@@ -20,6 +20,7 @@ render_system.draw_substeering_forces = 1
 render_system.draw_velocities = 0
 
 render_system.draw_avoidance_info = 1
+render_system.draw_wandering_info = 1
 
 render_system.visibility_expansion = 1.0
 render_system.max_visibility_expansion_distance = 1
@@ -545,6 +546,18 @@ obstacle_avoidance_archetype = {
 	ignore_discontinuities_narrower_than = 1
 }
 
+wander_behaviour = create_steering_behaviour {
+	weight = 0.5, 
+	behaviour_type = steering_behaviour.WANDER,
+	
+	wander_circle_radius = 500,
+	wander_circle_distance = 2540,
+	wander_displacement_degrees = 5,
+	
+	enabled = true,
+	force_color = rgba(0, 255, 255, 255)
+}
+
 obstacle_avoidance_behaviour = create_steering_behaviour (obstacle_avoidance_archetype)
 sensor_avoidance_behaviour = create_steering_behaviour (archetyped(obstacle_avoidance_archetype, {
 	weight = 0,
@@ -597,6 +610,14 @@ loop_only_info = create_scriptable_info {
 				
 				sensor_avoidance_behaviour.max_intervention_length = (player.body.transform.current.pos - navigation_target_entity.transform.current.pos):length() - 70
 				
+					sensor_avoidance_behaviour.enabled = true
+					obstacle_avoidance_behaviour.enabled = true
+				forward_seek_behaviour.enabled = true
+				
+				if obstacle_avoidance_behaviour.last_output_force:non_zero() then
+					wander_behaviour.wander_current_angle = obstacle_avoidance_behaviour.last_output_force:get_degrees()
+				end
+				
 				return true
 			end,
 			
@@ -609,10 +630,13 @@ loop_only_info = create_scriptable_info {
 					--message.subject.steering:add_behaviour(evasion_behaviour)
 					--message.subject.steering:add_behaviour(pursuit_behaviour)
 					--message.subject.steering:add_behaviour(obstacle_avoidance_behaviour)
-					player.body.steering:add_behaviour(target_seek_behaviour)
-					player.body.steering:add_behaviour(forward_seek_behaviour)
+					
+					--player.body.steering:add_behaviour(target_seek_behaviour)
+					--player.body.steering:add_behaviour(forward_seek_behaviour)
 					player.body.steering:add_behaviour(obstacle_avoidance_behaviour)
-					player.body.steering:add_behaviour(sensor_avoidance_behaviour)
+					--player.body.steering:add_behaviour(sensor_avoidance_behaviour)
+					
+					player.body.steering:add_behaviour(wander_behaviour)
 					
 				elseif message.intent == custom_intents.SPEED_INCREASE then
 					physics_system.timestep_multiplier = physics_system.timestep_multiplier + 0.05

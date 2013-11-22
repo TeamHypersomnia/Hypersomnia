@@ -2,10 +2,6 @@ print("Calling commands.lua...")
 --visibility_system.draw_discontinuities = 1
 
 
-visibility_system.draw_triangle_edges = 1
-render_system.draw_visibility = 1
-
-
 
 --print(player.body.transform.current.pos.x)
 --ai_system.draw_triangle_edges = 1

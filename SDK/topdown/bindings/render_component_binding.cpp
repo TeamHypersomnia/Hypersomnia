@@ -16,7 +16,8 @@ namespace bindings {
 			.def_readwrite("draw_substeering_forces", &render_system::draw_substeering_forces)
 			.def_readwrite("draw_velocities", &render_system::draw_velocities)
 			.def_readwrite("draw_avoidance_info", &render_system::draw_avoidance_info)
-			.def_readwrite("draw_visibility", &render_system::draw_visibility),
+			.def_readwrite("draw_wandering_info", &render_system::draw_wandering_info)
+			.def_readwrite("draw_visibility", &render_system::draw_visibility), 
 
 			luabind::class_<render>("render_component")
 			.def(luabind::constructor<>())

@@ -15,7 +15,7 @@ namespace components {
 		
 		struct behaviour {
 			enum {
-				SEEK, FLEE, ARRIVAL, PURSUIT, EVASION, OBSTACLE_AVOIDANCE, CONTAINMENT
+				SEEK, FLEE, ARRIVAL, PURSUIT, EVASION, OBSTACLE_AVOIDANCE, CONTAINMENT, WANDER
 			} behaviour_type;
 
 			target current_target;
@@ -40,6 +40,12 @@ namespace components {
 
 			float ignore_discontinuities_narrower_than;
 
+			float wander_circle_radius;
+			float wander_circle_distance;
+			float wander_current_angle;
+
+			float wander_displacement_degrees;
+
 			augmentations::vec2<> last_output_force;
 
 			bool enabled;
@@ -61,7 +67,10 @@ namespace components {
 				randomize_rays(false),
 				only_threats_in_OBB(false),
 				visibility_type(visibility::OBSTACLE_AVOIDANCE),
-				ignore_discontinuities_narrower_than(1.f), max_intervention_length(-1.f)
+				ignore_discontinuities_narrower_than(1.f), max_intervention_length(-1.f),
+				wander_circle_radius(0.f), wander_circle_distance(0.f),
+				wander_displacement_degrees(0.f),
+				wander_current_angle(0.f)
 			{
 			}
 

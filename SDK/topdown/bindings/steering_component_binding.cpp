@@ -29,13 +29,18 @@ namespace bindings {
 			.def_readwrite("last_output_force", &steering::behaviour::last_output_force)
 			.def_readwrite("ignore_discontinuities_narrower_than", &steering::behaviour::ignore_discontinuities_narrower_than)
 			.def_readwrite("max_intervention_length", &steering::behaviour::max_intervention_length)
+			.def_readwrite("wander_circle_radius", &steering::behaviour::wander_circle_radius)
+			.def_readwrite("wander_circle_distance", &steering::behaviour::wander_circle_distance)
+			.def_readwrite("wander_current_angle", &steering::behaviour::wander_current_angle)
+			.def_readwrite("wander_displacement_degrees", &steering::behaviour::wander_displacement_degrees)
 			.enum_("script_type")[
 				luabind::value("SEEK", steering::behaviour::SEEK),
 				luabind::value("FLEE", steering::behaviour::FLEE),
 				luabind::value("PURSUIT", steering::behaviour::PURSUIT),
 				luabind::value("EVASION", steering::behaviour::EVASION),
 				luabind::value("OBSTACLE_AVOIDANCE", steering::behaviour::OBSTACLE_AVOIDANCE),
-				luabind::value("CONTAINMENT", steering::behaviour::CONTAINMENT)
+				luabind::value("CONTAINMENT", steering::behaviour::CONTAINMENT),
+				luabind::value("WANDER", steering::behaviour::WANDER)
 			],
 
 			luabind::class_<steering>("steering_component")

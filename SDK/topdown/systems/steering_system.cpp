@@ -25,6 +25,10 @@ steering_system::containment_input::containment_input()
 steering_system::steering_input::steering_input() 
 	: speed(0.f), distance(0.f), max_speed(0.f), radius_of_effect(0.f), directed(false) {
 }
+steering_system::wander_input::wander_input() :
+	 circle_radius(0.f), circle_distance(0.f), current_angle(nullptr), displacement_degrees(0.f) {
+}
+
 
 void steering_system::process_events(world& owner) {}
 void steering_system::process_entities(world& owner) {}
@@ -354,6 +358,25 @@ bool steering_system::avoid_collisions(obstacle_avoidance_input in) {
 		return false;
 }
 
+vec2<> steering_system::wander(wander_input in) {
+	(*in.current_angle) += randval(-in.displacement_degrees, in.displacement_degrees);
+
+	vec2<> circle_center = in.position + in.circle_distance * in.unit_vel;
+	vec2<> displacement_position = circle_center + vec2<>(1, 0) * in.circle_radius;
+	displacement_position.rotate(*in.current_angle, circle_center);
+
+	vec2<> displacement_force = displacement_position - in.position;
+
+	if (_render->draw_wandering_info) {
+		_render->manually_cleared_lines.push_back(render_system::debug_line(circle_center - vec2<>(in.circle_radius, 0), circle_center + vec2<>(in.circle_radius, 0), graphics::pixel_32(0, 255, 255, 255)));
+		_render->manually_cleared_lines.push_back(render_system::debug_line(circle_center - vec2<>(0, in.circle_radius), circle_center + vec2<>(0, in.circle_radius), graphics::pixel_32(0, 255, 255, 255)));
+		_render->manually_cleared_lines.push_back(render_system::debug_line(circle_center, displacement_position, graphics::pixel_32(255, 0, 0, 255)));
+		_render->manually_cleared_lines.push_back(render_system::debug_line(in.position, displacement_position, graphics::pixel_32(0, 255, 0, 255)));
+	}
+
+	return displacement_force.normalize() * in.max_speed;
+}
+
 void steering_system::steering_input::set_target(vec2<> t) {
 	target = t;
 
@@ -428,6 +451,7 @@ void steering_system::substep(world& owner) {
 			steering_input common_input;
 			avoidance_input avoid_input;
 			containment_input containment_input;
+			wander_input wander_input;
 			obstacle_avoidance_input obstacle_avoidance_input;
 
 			common_input.position = transform.pos;
@@ -441,6 +465,12 @@ void steering_system::substep(world& owner) {
 			common_input.set_velocity(velocity);
 			common_input.max_speed = max_speed;
 			common_input.radius_of_effect = behaviour.radius_of_effect;
+
+			wander_input.steering_input::operator=(common_input);
+			wander_input.circle_distance = behaviour.wander_circle_distance;
+			wander_input.circle_radius = behaviour.wander_circle_radius;
+			wander_input.displacement_degrees = behaviour.wander_displacement_degrees;
+			wander_input.current_angle = &behaviour.wander_current_angle;
 
 			avoid_input.steering_input::operator=(common_input);
 			avoid_input.avoidance_rectangle_width = behaviour.avoidance_rectangle_width;
@@ -461,43 +491,41 @@ void steering_system::substep(world& owner) {
 			containment_input.ray_filter = &it->get<components::visibility>().get_layer(behaviour.visibility_type).filter;
 			containment_input.ignore_entity = it;
 
-			/* undirected behaviours */
-			if (behaviour.behaviour_type == steering::behaviour::CONTAINMENT) {
-				added_force = containment(containment_input).normalize() * max_speed;
+
+			if (behaviour.behaviour_type == steering::behaviour::WANDER) added_force = wander(wander_input);
+			if (behaviour.behaviour_type == steering::behaviour::CONTAINMENT) added_force = containment(containment_input).normalize() * max_speed;
+			if (behaviour.behaviour_type == steering::behaviour::FLEE) added_force = flee(common_input);
+			if (behaviour.behaviour_type == steering::behaviour::SEEK) added_force = seek(common_input);
+			
+			if (
+				behaviour.behaviour_type == steering::behaviour::PURSUIT ||
+				behaviour.behaviour_type == steering::behaviour::EVASION
+				) {
+					common_input.set_target(behaviour.last_estimated_pursuit_position =
+						predict_interception(common_input,
+						vec2<>(behaviour.current_target->get<components::physics>().body->GetLinearVelocity())*METERS_TO_PIXELSf,
+						behaviour.max_target_future_prediction_ms, behaviour.behaviour_type == steering::behaviour::EVASION));
+
+					if (behaviour.behaviour_type == steering::behaviour::PURSUIT) added_force = seek(common_input);
+					if (behaviour.behaviour_type == steering::behaviour::EVASION) added_force = flee(common_input);
 			}
-			/* directed behaviours */
-			else {
-				if (behaviour.behaviour_type == steering::behaviour::FLEE) added_force = flee(common_input);
-				if (behaviour.behaviour_type == steering::behaviour::SEEK) added_force = seek(common_input);
-				if (
-					behaviour.behaviour_type == steering::behaviour::PURSUIT ||
-					behaviour.behaviour_type == steering::behaviour::EVASION
-					) {
-						common_input.set_target(behaviour.last_estimated_pursuit_position =
-							predict_interception(common_input,
-							vec2<>(behaviour.current_target->get<components::physics>().body->GetLinearVelocity())*METERS_TO_PIXELSf,
-							behaviour.max_target_future_prediction_ms, behaviour.behaviour_type == steering::behaviour::EVASION));
 
-						if (behaviour.behaviour_type == steering::behaviour::PURSUIT) added_force = seek(common_input);
-						if (behaviour.behaviour_type == steering::behaviour::EVASION) added_force = flee(common_input);
-				}
-				if (behaviour.behaviour_type == steering::behaviour::OBSTACLE_AVOIDANCE) {
-					obstacle_avoidance_input.avoidance_input::operator=(avoid_input);
-					vec2<> navigate_to;
-					auto& vision = it->get<components::visibility>().get_layer(behaviour.visibility_type);
+			if (behaviour.behaviour_type == steering::behaviour::OBSTACLE_AVOIDANCE) {
+				obstacle_avoidance_input.avoidance_input::operator=(avoid_input);
+				vec2<> navigate_to;
+				auto& vision = it->get<components::visibility>().get_layer(behaviour.visibility_type);
 
-					obstacle_avoidance_input.visibility_edges = &vision.edges;
-					obstacle_avoidance_input.discontinuities = &vision.discontinuities;
+				obstacle_avoidance_input.visibility_edges = &vision.edges;
+				obstacle_avoidance_input.discontinuities = &vision.discontinuities;
 
-					obstacle_avoidance_input.output = &navigate_to;
+				obstacle_avoidance_input.output = &navigate_to;
 
-					if (avoid_collisions(obstacle_avoidance_input)) {
-						common_input.set_target(navigate_to);
-						containment_input.set_velocity(navigate_to - transform.pos);
+				if (avoid_collisions(obstacle_avoidance_input)) {
+					common_input.set_target(navigate_to);
+					containment_input.set_velocity(navigate_to - transform.pos);
 
-						added_force = seek(common_input);
-						added_force += containment(containment_input).normalize() * max_speed;
-					}
+					added_force = seek(common_input);
+					added_force += containment(containment_input).normalize() * max_speed;
 				}
 			}
 
@@ -507,7 +535,7 @@ void steering_system::substep(world& owner) {
 			/* values less then 0.f indicate we don't want force clamping */
 			if (behaviour.max_force_applied >= 0.f)
 				added_force.clamp(behaviour.max_force_applied);
-			
+
 			if (render.draw_substeering_forces)
 				draw_vector(added_force, behaviour.force_color);
 

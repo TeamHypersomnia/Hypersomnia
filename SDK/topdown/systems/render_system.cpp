@@ -14,7 +14,8 @@ render_system::render_system(window::glwindow& output_window)
 	draw_substeering_forces(0),
 	draw_steering_forces(0),
 	draw_velocities(0),
-	draw_avoidance_info(0)
+	draw_avoidance_info(0),
+	draw_wandering_info(0)
 {
 	output_window.current();
 
