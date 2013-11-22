@@ -229,7 +229,7 @@ int32 b2ClipSegmentToLine(b2ClipVertex vOut[2], const b2ClipVertex vIn[2],
 
 bool b2TestOverlap(	const b2Shape* shapeA, int32 indexA,
 					const b2Shape* shapeB, int32 indexB,
-					const b2Transform& xfA, const b2Transform& xfB)
+					const b2Transform& xfA, const b2Transform& xfB, float32 maximum_distance)
 {
 	b2DistanceInput input;
 	input.proxyA.Set(shapeA, indexA);
@@ -245,5 +245,6 @@ bool b2TestOverlap(	const b2Shape* shapeA, int32 indexA,
 
 	b2Distance(&output, &cache, &input);
 
-	return output.distance < 10.0f * b2_epsilon;
+	if (maximum_distance < 0.f) maximum_distance = 10.f * b2_epsilon;
+	return output.distance < maximum_distance;
 }
