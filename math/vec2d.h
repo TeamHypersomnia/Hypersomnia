@@ -123,6 +123,10 @@ namespace augmentations {
 			return x * v.x + y * v.y;
 		}
 
+		float cross(vec2 v) const {
+			return x * v.y - y * v.x;
+		}
+
 		float length() const {
 			return sqrt(length_sq());
 		}
@@ -228,15 +232,8 @@ namespace augmentations {
 			return false;
 		}
 
-		bool compare_sq(const vec2& b, const float epsilon = 0.00001f) {
-			if ((*this - b).length_sq() < epsilon)
-				return true;
-
-			return false;
-		}
-
 		bool compare(const vec2& b, const float epsilon = 0.00001f) {
-			if ((*this - b).length() <= epsilon)
+			if ((*this - b).length_sq() <= epsilon*epsilon)
 				return true;
 
 			return false;
