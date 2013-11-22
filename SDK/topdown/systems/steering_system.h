@@ -4,6 +4,7 @@
 #include "../components/steering_component.h"
 #include "../components/physics_component.h"
 #include "../components/transform_component.h"
+#include "../components/visibility_component.h"
 
 using namespace augmentations;
 using namespace entity_system;
@@ -46,6 +47,8 @@ public:
 
 	struct obstacle_avoidance_input : avoidance_input {
 		edges* visibility_edges;
+		std::vector<components::visibility::discontinuity>* discontinuities;
+
 		vec2<>* output;
 
 		obstacle_avoidance_input();

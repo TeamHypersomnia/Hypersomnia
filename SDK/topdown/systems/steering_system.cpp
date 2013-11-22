@@ -14,7 +14,7 @@
 #include "utility/randval.h"
 
 steering_system::obstacle_avoidance_input::obstacle_avoidance_input() 
-	: visibility_edges(nullptr), output(nullptr) {
+	: visibility_edges(nullptr), discontinuities(nullptr), output(nullptr) {
 }
 steering_system::avoidance_input::avoidance_input() 
 	: avoidance_rectangle_length(0.f), avoidance_rectangle_width(0.f), ignore_discontinuities_narrower_than(0.f) {
@@ -265,8 +265,20 @@ bool steering_system::avoid_collisions(obstacle_avoidance_input in) {
 			for (int j = i, k = 0; k < edges_num; j = wrap(j - 1), ++k)
 				/* if left-handed vertex of candidate edge and right-handed vertex of previous edge do not match, we have a lateral obstacle vertex */
 				if (!visibility_edges[j].first.compare(visibility_edges[wrap(j - 1)].second, in.ignore_discontinuities_narrower_than)) {
-					check_navigation_candidate(visibility_edges[j].first, false);
-					break;
+
+					bool such_discontinuity_exists = false;
+					/* check if there exists any discontinuity with such an edge index and winding */
+					for (auto& disc : *in.discontinuities) {
+						if (disc.edge_index == j && disc.winding == disc.LEFT) {
+							such_discontinuity_exists = true;
+							break;
+						}
+					}
+
+					if (such_discontinuity_exists) {
+						check_navigation_candidate(visibility_edges[j].first, false);
+						break;
+					}
 				}
 				else {
 					if (_render->draw_avoidance_info) {
@@ -280,8 +292,19 @@ bool steering_system::avoid_collisions(obstacle_avoidance_input in) {
 					/* if right-handed vertex of candidate edge and left-handed vertex of next edge do not match, we have a lateral obstacle vertex */
 					if (!visibility_edges[j].second.compare(visibility_edges[wrap(j + 1)].first, in.ignore_discontinuities_narrower_than)) {
 
-						check_navigation_candidate(visibility_edges[j].second, true);
-						break;
+						bool such_discontinuity_exists = false;
+						/* check if there exists any discontinuity with such an edge index and winding */
+						for (auto& disc : *in.discontinuities) {
+							if (disc.edge_index == j && disc.winding == disc.RIGHT) {
+								such_discontinuity_exists = true;
+								break;
+							}
+						}
+
+						if (such_discontinuity_exists) {
+							check_navigation_candidate(visibility_edges[j].second, true);
+							break;
+						}
 					}
 					else {
 						if (_render->draw_avoidance_info) {
@@ -310,14 +333,7 @@ bool steering_system::avoid_collisions(obstacle_avoidance_input in) {
 
 		while (!candidates.empty()) {
 			/* save output */
-			navigation_candidate best[2];
-			best[0] = candidates.top(); candidates.pop();
-			best[1] = candidates.top();
-
-			if (std::abs(best[0].angular_distance - best[1].angular_distance) > 0.1)
-				best_candidate = best[best[0].angular_distance > best[1].angular_distance].vertex_ptr;
-			else
-				best_candidate = best[best[0].linear_distance > best[1].linear_distance].vertex_ptr;
+			best_candidate = candidates.top().vertex_ptr;
 
 			if (_render->draw_avoidance_info)
 			_render->manually_cleared_lines.push_back(render_system::debug_line(in.position, best_candidate, graphics::pixel_32(0, 255, 0, 255)));
@@ -468,7 +484,11 @@ void steering_system::substep(world& owner) {
 				if (behaviour.behaviour_type == steering::behaviour::OBSTACLE_AVOIDANCE) {
 					obstacle_avoidance_input.avoidance_input::operator=(avoid_input);
 					vec2<> navigate_to;
-					obstacle_avoidance_input.visibility_edges = &it->get<components::visibility>().get_layer(behaviour.visibility_type).edges;
+					auto& vision = it->get<components::visibility>().get_layer(behaviour.visibility_type);
+
+					obstacle_avoidance_input.visibility_edges = &vision.edges;
+					obstacle_avoidance_input.discontinuities = &vision.discontinuities;
+
 					obstacle_avoidance_input.output = &navigate_to;
 
 					if (avoid_collisions(obstacle_avoidance_input)) {
