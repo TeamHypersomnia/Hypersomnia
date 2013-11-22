@@ -35,27 +35,6 @@ void pathfinding_system::process_entities(world& owner) {
 			/* get visibility information */
 			auto& vision = visibility.get_layer(components::visibility::DYNAMIC_PATHFINDING);
 
-			/* save all undiscovered walls from visibility */
-			//for (auto& new_wall : vision.visible_walls) {
-			//	bool such_a_wall_exists = false;
-			//	/* compare this wall with already memorised walls */
-			//	for (auto& memorised_wall : pathfinding.session.visible_walls) {
-			//		/* if any memorised wall is almost equal to the candidate */
-			//		if (( memorised_wall.first.compare_sq(new_wall.first,  epsilon_max_segment_difference) && 
-			//			  memorised_wall.second.compare_sq(new_wall.second, epsilon_max_segment_difference))
-			//			||
-			//			(memorised_wall.first.compare_sq(new_wall.second, epsilon_max_segment_difference) &&
-			//			memorised_wall.second.compare_sq(new_wall.first, epsilon_max_segment_difference))
-			//			) {
-			//				/* there's no need to push back the new one */
-			//				such_a_wall_exists = true;
-			//				break;
-			//		}
-			//	}
-			//
-			//	if (!such_a_wall_exists) 
-			//		pathfinding.session.visible_walls.push_back(new_wall);
-			//}
 			for (auto& visible_vertex : vision.vertex_hits) {
 				bool this_visible_vertex_is_already_memorised = false;
 
@@ -134,30 +113,6 @@ void pathfinding_system::process_entities(world& owner) {
 				}
 				return false;
 			}), undiscs.end());
-
-			/* delete all discontinuities that fall into any of fully visible walls */
-			//auto& discs = pathfinding.session.undiscovered_discontinuities;
-			//discs.erase(std::remove_if(discs.begin(), discs.end(), [&pathfinding, this](const components::visibility::discontinuity& d){
-			//	bool this_discontinuity_is_discovered = false;
-			//
-			//	/* for all visible walls */
-			//	for (auto& wall : pathfinding.session.visible_walls) {
-			//		/* check if the further vertex is near enough the segment representing the wall */
-			//		if (d.points.second.distance_from_segment_sq(wall.first, wall.second) < epsilon_max_segment_difference) {
-			//			this_discontinuity_is_discovered = true;
-			//			break;
-			//		}
-			//	}
-			//
-			//	return this_discontinuity_is_discovered;
-			//}), discs.end());
-
-			/* debug drawing */
-			//if (draw_memorised_walls) {
-			//	for (auto& wall : pathfinding.session.visible_walls) {
-			//		render.lines.push_back(render_system::debug_line(wall.first, wall.second, graphics::pixel_32(0, 255, 0, 255)));
-			//	}
-			//}
 
 			/* now for the actual pathfinding routine */
 
