@@ -102,4 +102,24 @@ namespace topdown {
 		auto physics_component = components::physics(body);
 		subject.add(physics_component);
 	}
+
+	std::vector<b2Vec2> get_transformed_shape_verts(augmentations::entity_system::entity& subject) {
+		std::vector<b2Vec2> output;
+
+		auto b = subject.get<components::physics>().body;
+		auto verts = reinterpret_cast<entity*>(b->GetUserData())->get<components::render>().model->get_vertices();
+		/* for every vertex in given fixture's shape */
+		for (auto& v : verts) {
+			v *= PIXELS_TO_METERSf;
+
+			auto position = b->GetPosition();
+			/* transform angle to degrees */
+			auto rotation = b->GetAngle() / 0.01745329251994329576923690768489f;
+
+			/* transform vertex to current entity's position and rotation */
+			output.push_back(v.rotate(rotation, b2Vec2(0, 0)) + position);
+		}
+
+		return output;
+	}
 }
