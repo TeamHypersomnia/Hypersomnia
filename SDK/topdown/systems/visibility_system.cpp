@@ -8,6 +8,8 @@
 #include "render_system.h"
 
 #include "../resources/render_info.h"
+#include "../game/body_helper.h"
+
 #include <limits>
 #include <set>
 
@@ -98,18 +100,12 @@ void visibility_system::process_entities(world& owner) {
 
 			/* for every fixture that intersected with the visibility square */
 			for (auto b : callback.bodies) {
-				auto verts = reinterpret_cast<entity*>(b->GetUserData())->get<components::render>().model->get_vertices();
+				auto verts = topdown::get_transformed_shape_verts(*reinterpret_cast<entity*>(b->GetUserData()));
 				/* for every vertex in given fixture's shape */
 				for (auto& v : verts) {
-					v *= PIXELS_TO_METERSf;
-
-					auto position = b->GetPosition();
-					/* transform angle to degrees */
-					auto rotation = b->GetAngle() / 0.01745329251994329576923690768489f;
-
 					std::pair<float, vec2<>> new_vertex;
 					/* transform vertex to current entity's position and rotation */
-					new_vertex.second = v.rotate(rotation, b2Vec2(0, 0)) + position;
+					new_vertex.second = v;
 
 					vec2<> diff = new_vertex.second - position_meters;
 					/*
@@ -348,10 +344,6 @@ void visibility_system::process_entities(world& owner) {
 				/* wrap it */
 				if (disc.edge_index < 0) 
 					disc.edge_index = double_rays.size() - 1;
-				;
-
-				if (draw_discontinuities) 
-					render.lines.push_back(render_system::debug_line(disc.points.first, disc.points.second, graphics::pixel_32(0, 127, 255, 255)));
 			}
 
 			/* now to propagate the output */
@@ -373,6 +365,99 @@ void visibility_system::process_entities(world& owner) {
 
 				request.edges.push_back(std::make_pair(p1, p2));
 			}
+
+			/* values less than zero indicate we don't want to ignore discontinuities */
+			if (request.ignore_discontinuities_shorter_than > 0.f) {
+				int edges_num = request.edges.size();
+
+				/* prepare helpful lambda */
+				auto& wrap = [edges_num](int ix){
+					if (ix < 0) return edges_num + ix;
+					return ix % edges_num;
+				};
+
+				/* shortcut */
+				auto& discs = request.discontinuities;
+
+				std::vector<components::visibility::edge> marked_holes;
+
+				/* for every discontinuity, remove if there exists an edge whose vertex is too close to the discontinuity's vertex */
+				discs.erase(std::remove_if(discs.begin(), discs.end(),
+					[&request, edges_num, &transform, &wrap, &render, &marked_holes, this](const components::visibility::discontinuity& d){
+						std::vector<vec2<>> points_too_close;
+
+						if (d.winding == d.RIGHT) {
+							/* we check all left handed vertices of edges */
+							for (int j = wrap(d.edge_index + 1), k = 0; k < edges_num-1; j = wrap(j + 1), ++k) {
+								vec2<> close_point = request.edges[j].first;
+
+								/* we've already reached edges that are to CCW side of discontinuity, we're not interested in checking these*/
+								if ((d.points.first - transform.pos).cross(close_point - transform.pos) <= 0)
+									break;
+
+								if (close_point.compare(d.points.first, request.ignore_discontinuities_shorter_than)) {
+									points_too_close.push_back(close_point);
+								}
+							}
+						}
+						else {
+							/* we check all right handed vertices of edges */
+							for (int j = wrap(d.edge_index - 1), k = 0; k < edges_num-1; j = wrap(j - 1), ++k) {
+								vec2<> close_point = request.edges[j].second;
+
+								/* we've already reached edges that are to CW side of discontinuity, we're not interested in checking these */
+								if ((d.points.first - transform.pos).cross(close_point - transform.pos) >= 0)
+									break;
+
+								if (close_point.compare(d.points.first, request.ignore_discontinuities_shorter_than)) {
+									points_too_close.push_back(close_point);
+								}
+							}
+						}
+
+						if (!points_too_close.empty()) {
+							vec2<> closest_point = *std::min_element(points_too_close.begin(), points_too_close.end(), [&transform](vec2<> a, vec2<> b){
+								return (a - transform.pos).length_sq() < (b - transform.pos).length_sq();
+							});
+
+							marked_holes.push_back(components::visibility::edge(closest_point, d.points.first));
+							
+							if (draw_discontinuities)
+								render.lines.push_back(render_system::debug_line(closest_point, d.points.first, graphics::pixel_32(255, 255, 255, 255)));
+							
+							return true;
+						}
+
+						return false;
+				}
+				), discs.end());
+
+				/* now check if any remaining discontinuities can not be seen through marked non-walkable areas (pathological case) */
+				b2RayCastOutput output;
+				b2RayCastInput input;
+				input.maxFraction = 1.0;
+
+				for (auto& marked : marked_holes) {
+					b2EdgeShape marked_hole;
+					marked_hole.Set(marked.first, marked.second);
+
+					discs.erase(std::remove_if(discs.begin(), discs.end(), [&marked_hole, &output, &input, &transform](const components::visibility::discontinuity& d){
+						input.p1 = transform.pos;
+						input.p2 = d.points.first;
+
+						/* we don't need to transform edge or ray since they are in the same space
+						but we have to prepare dummy b2Transform as argument for b2EdgeShape::RayCast
+						*/
+						b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
+
+						return (marked_hole.RayCast(&output, input, null_transform, 0));
+					}), discs.end());
+				}
+			}
+
+			if (draw_discontinuities)
+				for (auto& disc : request.discontinuities)
+					render.lines.push_back(render_system::debug_line(disc.points.first, disc.points.second, graphics::pixel_32(0, 127, 255, 255)));
 		}
 	}
 }

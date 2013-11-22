@@ -36,6 +36,7 @@ namespace components {
 			
 			b2Filter filter;
 			float square_side;
+			float ignore_discontinuities_shorter_than;
 
 			/* output */
 			std::vector<edge> edges;
@@ -45,7 +46,7 @@ namespace components {
 			int get_num_triangles();
 			triangle get_triangle(int index, augmentations::vec2<> origin);
 
-			layer() : square_side(0.f), postprocessing_subject(false) {}
+			layer() : square_side(0.f), postprocessing_subject(false), ignore_discontinuities_shorter_than(-1.f) {}
 		};
 
 		enum layer_type {
