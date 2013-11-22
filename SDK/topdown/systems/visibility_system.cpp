@@ -356,7 +356,6 @@ void visibility_system::process_entities(world& owner) {
 
 			/* now to propagate the output */
 			request.edges.clear();
-			request.visible_walls.clear();
 
 			for (size_t i = 0; i < double_rays.size(); ++i) {
 				/* (i + 1)%double_rays.size() ensures the cycle */
@@ -373,14 +372,6 @@ void visibility_system::process_entities(world& owner) {
 				}
 
 				request.edges.push_back(std::make_pair(p1, p2));
-
-				/* we have a fully visible wall here */
-				if (ray_a.second_reached_destination && ray_b.first_reached_destination) {
-					request.visible_walls.push_back(components::visibility::edge(p1, p2));
-
-					if (draw_visible_walls)
-						render.lines.push_back(render_system::debug_line(p1, p2, request.color));
-				}
 			}
 		}
 	}
