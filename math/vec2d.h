@@ -104,8 +104,8 @@ namespace augmentations {
 			// We find projection of point p onto the line. 
 			// It falls where t = [(p-v) . (w-v)] / |w-v|^2
 			const float t = (p - v).dot(w - v) / l2;
-			if (t < 0.0) return (p - v).length_sq();       // Beyond the 'v' end of the segment
-			else if (t > 1.0) return (p - w).length_sq();  // Beyond the 'w' end of the segment
+			if (t < 0.f) return (p - v).length_sq();       // Beyond the 'v' end of the segment
+			else if (t > 1.f) return (p - w).length_sq();  // Beyond the 'w' end of the segment
 			const vec2 projection = v + t * (w - v);  // Projection falls on the segment
 			return (p - projection).length_sq();
 		}
@@ -116,6 +116,15 @@ namespace augmentations {
 
 		vec2 project_onto(vec2 v, vec2 w) const {
 			const float t = ((*this) - v).dot(w - v) / (v - w).length_sq();
+			return v + t * (w - v);
+		}
+
+		vec2 closest_point_on_segment(vec2 v, vec2 w) const {
+			const float t = ((*this) - v).dot(w - v) / (v - w).length_sq();
+			
+			if (t < 0.f) return v;
+			else if (t > 1.f) return w;
+
 			return v + t * (w - v);
 		}
 

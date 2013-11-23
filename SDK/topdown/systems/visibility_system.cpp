@@ -49,6 +49,14 @@ int components::visibility::layer::get_num_triangles() {
 	return edges.size();
 }
 
+components::visibility::discontinuity* components::visibility::layer::get_discontinuity(int n) {
+	for (auto& disc : discontinuities)
+		if (disc.edge_index == n)
+			return &disc;
+
+	return nullptr;
+}
+
 components::visibility::triangle components::visibility::layer::get_triangle(int i, augmentations::vec2<> origin) {
 	components::visibility::triangle tri = { origin, edges[i].first, edges[i].second };
 	return tri;
@@ -376,41 +384,42 @@ void visibility_system::process_entities(world& owner) {
 					return ix % edges_num;
 				};
 
-				/* shortcut */
-				auto& discs = request.discontinuities;
+				/* shortcut, note we get it by copy */
+				auto discs_copy = request.discontinuities;
 
 				std::vector<components::visibility::edge> marked_holes;
 
-				/* for every discontinuity, remove if there exists an edge whose vertex is too close to the discontinuity's vertex */
-				discs.erase(std::remove_if(discs.begin(), discs.end(),
-					[&request, edges_num, &transform, &wrap, &render, &marked_holes, this](const components::visibility::discontinuity& d){
+				/* for every discontinuity, remove if there exists an edge that is too close to the discontinuity's vertex */
+				discs_copy.erase(std::remove_if(discs_copy.begin(), discs_copy.end(),
+					[&request, edges_num, &transform, &wrap, &render, &marked_holes, this]
+				(const components::visibility::discontinuity& d){
 						std::vector<vec2<>> points_too_close;
 
-						if (d.winding == d.RIGHT) {
-							/* we check all left handed vertices of edges */
-							for (int j = wrap(d.edge_index + 1), k = 0; k < edges_num-1; j = wrap(j + 1), ++k) {
-								vec2<> close_point = request.edges[j].first;
+						int cw = d.winding == d.RIGHT ? 1 : -1;
+						
+						/* we check all vertices of edges */
+						for (int j = wrap(d.edge_index + cw), k = 0; k < edges_num-1; j = wrap(j + cw), ++k) {
+							/* we've already reached edges that are to CW/CCW side of discontinuity, we're not interested in checking further */
+							if (cw * (d.points.first - transform.pos).cross(request.edges[j].first - transform.pos) <= 0)
+								break;
 
-								/* we've already reached edges that are to CCW side of discontinuity, we're not interested in checking these*/
-								if ((d.points.first - transform.pos).cross(close_point - transform.pos) <= 0)
-									break;
+							/* project this point onto candidate edge */
+							vec2<> close_point = d.points.first.closest_point_on_segment(request.edges[j].first, request.edges[j].second);
 
-								if (close_point.compare(d.points.first, request.ignore_discontinuities_shorter_than)) {
-									points_too_close.push_back(close_point);
-								}
-							}
+							if (close_point.compare(d.points.first, request.ignore_discontinuities_shorter_than)) 
+								points_too_close.push_back(close_point);
 						}
-						else {
-							/* we check all right handed vertices of edges */
-							for (int j = wrap(d.edge_index - 1), k = 0; k < edges_num-1; j = wrap(j - 1), ++k) {
-								vec2<> close_point = request.edges[j].second;
+						
+						/* let's also check the discontinuities - we don't know what's behind */
+						for (auto& old_disc : request.discontinuities) {
+							if (old_disc.edge_index != d.edge_index) {
+								/* if a discontinuity is to CW/CCW respectively */
+								if (!(cw * (d.points.first - transform.pos).cross(old_disc.points.first - transform.pos) <= 0)) {
+									/* project this point onto candidate discontinuity */
+									vec2<> close_point = d.points.first.closest_point_on_segment(old_disc.points.first, old_disc.points.second);
 
-								/* we've already reached edges that are to CW side of discontinuity, we're not interested in checking these */
-								if ((d.points.first - transform.pos).cross(close_point - transform.pos) >= 0)
-									break;
-
-								if (close_point.compare(d.points.first, request.ignore_discontinuities_shorter_than)) {
-									points_too_close.push_back(close_point);
+									if (close_point.compare(d.points.first, request.ignore_discontinuities_shorter_than))
+										points_too_close.push_back(close_point);
 								}
 							}
 						}
@@ -430,7 +439,7 @@ void visibility_system::process_entities(world& owner) {
 
 						return false;
 				}
-				), discs.end());
+				), discs_copy.end());
 
 				/* now check if any remaining discontinuities can not be seen through marked non-walkable areas (pathological case) */
 				b2RayCastOutput output;
@@ -441,7 +450,7 @@ void visibility_system::process_entities(world& owner) {
 					b2EdgeShape marked_hole;
 					marked_hole.Set(marked.first, marked.second);
 
-					discs.erase(std::remove_if(discs.begin(), discs.end(), [&marked_hole, &output, &input, &transform](const components::visibility::discontinuity& d){
+					discs_copy.erase(std::remove_if(discs_copy.begin(), discs_copy.end(), [&marked_hole, &output, &input, &transform](const components::visibility::discontinuity& d){
 						input.p1 = transform.pos;
 						input.p2 = d.points.first;
 
@@ -451,8 +460,11 @@ void visibility_system::process_entities(world& owner) {
 						b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
 
 						return (marked_hole.RayCast(&output, input, null_transform, 0));
-					}), discs.end());
+					}), discs_copy.end());
 				}
+
+				/* save cleaned copy in actual discontinuities */
+				request.discontinuities = discs_copy;
 			}
 
 			if (draw_discontinuities)

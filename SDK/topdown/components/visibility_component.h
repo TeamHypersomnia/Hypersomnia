@@ -43,6 +43,8 @@ namespace components {
 			std::vector<augmentations::vec2<>> vertex_hits;
 			std::vector<discontinuity> discontinuities;
 
+			discontinuity* get_discontinuity(int edge_num);
+
 			int get_num_triangles();
 			triangle get_triangle(int index, augmentations::vec2<> origin);
 
