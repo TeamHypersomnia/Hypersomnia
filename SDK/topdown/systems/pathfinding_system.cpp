@@ -24,30 +24,33 @@ void pathfinding_system::process_entities(world& owner) {
 	render_system& render = owner.get_system<render_system>();
 
 	for (auto it : targets) {
-		/* get AI data and position of the entity */
+		/* get necessary components */
 		auto& visibility = it->get<components::visibility>();
 		auto& pathfinding = it->get<components::pathfinding>();
 		auto& transform = it->get<components::transform>().current;
 		auto body = it->get<components::physics>().body;
 
-		/* check if we request pathfinding */
+		/* check if we request pathfinding at the moment */
 		if (!pathfinding.session_stack.empty()) {
 			/* get visibility information */
 			auto& vision = visibility.get_layer(components::visibility::DYNAMIC_PATHFINDING);
-			vision.ignore_discontinuities_shorter_than = pathfinding.session().temporary_ignore_discontinuities_shorter_than;
+			//vision.ignore_discontinuities_shorter_than = pathfinding.session().temporary_ignore_discontinuities_shorter_than;
 
+			/* save all fully visible vertices as discovered */
 			for (auto& visible_vertex : vision.vertex_hits) {
 				bool this_visible_vertex_is_already_memorised = false;
 
 				for (auto& memorised_discovered : pathfinding.session().discovered_vertices) {
-					/* if a discontinuity with the same closer vertex already exists */
+					/* if a similiar discovered vertex exists */
 					if ((memorised_discovered.location - visible_vertex).length_sq() < epsilon_distance_the_same_vertex_sq) {
 						this_visible_vertex_is_already_memorised = true;
+						/* overwrite the location just in case */
 						memorised_discovered.location = visible_vertex;
 						break;
 					}
 				}
 
+				/* save if unique */
 				if (!this_visible_vertex_is_already_memorised) {
 					components::pathfinding::pathfinding_session::navigation_vertex vert;
 					vert.location = visible_vertex;
@@ -81,20 +84,25 @@ void pathfinding_system::process_entities(world& owner) {
 				if (!this_discontinuity_is_already_memorised) {
 					components::pathfinding::pathfinding_session::navigation_vertex vert;
 					vert.location = disc.points.first;
+
+					/* get the associated edge to prepare a relevant sensor */
 					auto associated_edge = vision.edges[disc.edge_index];
 
-					vec2<> offset_direction;
+					/* get the direction the sensor will be going to */
+					vec2<> sensor_direction;
 
+					/* if the first vertex of the edge matches the location */
 					if (associated_edge.first.compare(vert.location))
-						offset_direction = associated_edge.first - associated_edge.second;
+						sensor_direction = associated_edge.first - associated_edge.second;
+					/* if it is the second one */
 					else if (associated_edge.second.compare(vert.location))
-						offset_direction = associated_edge.second - associated_edge.first;
+						sensor_direction = associated_edge.second - associated_edge.first;
+					/* should never happen */
 					else assert(0);
 
-					offset_direction.normalize();
+					sensor_direction.normalize();
 
-					/* push the sensor a bit further so the body doesn't stop not seeing another targets */
-					vert.sensor = vert.location + offset_direction * pathfinding.target_offset;
+					vert.sensor = vert.location + sensor_direction * pathfinding.target_offset;
 					pathfinding.session().undiscovered_vertices.push_back(vert);
 				}
 			}
@@ -174,7 +182,7 @@ void pathfinding_system::process_entities(world& owner) {
 				}
 			}
 
-			/* if it is the last session but there's not line of sight,
+			/* if it is the last session but there's no line of sight,
 				or it is not the last session but it was not dropped from the loop which means there's no line of sight to target,
 				pick the best navigation candidate
 			*/
@@ -205,13 +213,14 @@ void pathfinding_system::process_entities(world& owner) {
 					pathfinding.session().navigate_to = local_minimum_discontinuity.sensor;
 
 				bool rays_hit = false;
-				auto& subject_verts = topdown::get_transformed_shape_verts(*it);
+				/* extract all transformed vertices of the subject's original model, false means we want pixels */
+				auto& subject_verts = topdown::get_transformed_shape_verts(*it, false);
 				subject_verts.push_back(transform.pos);
 
 				for (auto& subject_vert : subject_verts) {
 					if (
-						is_point_visible(METERS_TO_PIXELSf*subject_vert, local_minimum_discontinuity.location, vision.filter) ||
-						is_point_visible(METERS_TO_PIXELSf*subject_vert, local_minimum_discontinuity.sensor, vision.filter)
+						is_point_visible(subject_vert, local_minimum_discontinuity.location, vision.filter) ||
+						is_point_visible(subject_vert, local_minimum_discontinuity.sensor, vision.filter)
 						) {
 						rays_hit = true;
 					}
