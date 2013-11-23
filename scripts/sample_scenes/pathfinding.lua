@@ -1,7 +1,8 @@
 physics_system.timestep_multiplier = 1
+physics_system.enable_interpolation = 0
 
 visibility_system.draw_cast_rays = 0
-visibility_system.draw_triangle_edges = 0
+visibility_system.draw_triangle_edges = 1
 visibility_system.draw_discontinuities = 1
 visibility_system.draw_visible_walls = 0
 
@@ -25,7 +26,7 @@ render_system.draw_wandering_info = 1
 
 render_system.visibility_expansion = 1.0
 render_system.max_visibility_expansion_distance = 1
-render_system.draw_visibility = 0
+render_system.draw_visibility = 1
 
 crosshair_sprite = create_sprite {
 	image = images.crosshair,

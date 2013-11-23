@@ -13,6 +13,7 @@
 #include <limits>
 #include <set>
 
+/* callback structure used in QueryAABB function to get all shapes near-by */
 struct my_callback : public b2QueryCallback {
 	std::set<b2Body*> bodies;
 	entity* subject;
@@ -65,9 +66,8 @@ components::visibility::triangle components::visibility::layer::get_triangle(int
 void visibility_system::process_entities(world& owner) {
 	/* prepare epsilons to be used later, just to make the notation more clear */
 	float epsilon_distance_vertex_hit_sq = epsilon_distance_vertex_hit * PIXELS_TO_METERSf;
-	float epsilon_threshold_obstacle_hit_sq = epsilon_threshold_obstacle_hit * PIXELS_TO_METERSf;
+	float epsilon_threshold_obstacle_hit_meters = epsilon_threshold_obstacle_hit * PIXELS_TO_METERSf;
 	epsilon_distance_vertex_hit_sq *= epsilon_distance_vertex_hit_sq;
-	epsilon_threshold_obstacle_hit_sq *= epsilon_threshold_obstacle_hit_sq;
 
 	/* we'll need a reference to physics system for raycasting */
 	physics_system& physics = owner.get_system<physics_system>();
@@ -108,13 +108,13 @@ void visibility_system::process_entities(world& owner) {
 
 			/* for every fixture that intersected with the visibility square */
 			for (auto b : callback.bodies) {
+				/* get shape vertices from utility that transforms them to current entity's position and rotation in Box2D space */
 				auto verts = topdown::get_transformed_shape_verts(*reinterpret_cast<entity*>(b->GetUserData()));
 				/* for every vertex in given fixture's shape */
 				for (auto& v : verts) {
 					std::pair<float, vec2<>> new_vertex;
-					/* transform vertex to current entity's position and rotation */
 					new_vertex.second = v;
-
+					/* calculate difference vector */
 					vec2<> diff = new_vertex.second - position_meters;
 					/*
 					compute angle to be compared while sorting
@@ -180,52 +180,54 @@ void visibility_system::process_entities(world& owner) {
 					: first(first), second(second), first_reached_destination(a), second_reached_destination(b) {
 				}
 			};
+
+			/* container for these */
 			std::vector<double_ray> double_rays;
 
-			/* debugging lambda */
-			auto draw_line = [&position_meters, &render](vec2<> point, graphics::pixel_32 col){
+			/* helper debugging lambda */
+			auto draw_line = [&position_meters, &render](vec2<> point, graphics::pixel_32 col) {
 				render.lines.push_back(render_system::debug_line(position_meters * METERS_TO_PIXELSf, point * METERS_TO_PIXELSf, col));
 			};
 
-			/* container for holding info about local discontinuities, will be used for dynamic AI navigation */
+			/* clear per-frame visibility information */
 			request.discontinuities.clear();
-
 			request.vertex_hits.clear();
+			request.edges.clear();
 
+			/* for every vertex to cast the ray to */
 			for (auto& vertex : all_vertices_transformed) {
 				b2Vec2* from_aabb = nullptr;
 
+				/* if the vertex comes from bounding square, save it and remember about it */
 				for (auto& aabb_vert : whole_vision)
 					if (vertex.second == aabb_vert)
 						from_aabb = &aabb_vert;
 
-				/* save the entity pointer in ray_callback structure to not intersect with the player fixture
-				it is then compared in my_ray_callback::ReportFixture
-				*/
-				
-				/* create a vector in direction of vertex with length equal to the half of diagonal of the visibility square
-				(majority of rays will slightly SLIGHTLY go beyond visibility square, but that's not important for now)
+				/* create two vectors in direction of vertex with length equal to the half of diagonal of the visibility square
+				(majority of rays will SLIGHTLY go beyond visibility square, but that's not important now)
 				ray_callbacks[0] and ray_callbacks[1] differ ONLY by an epsilon added / substracted to the angle
 				*/
 
-				physics_system::raycast_output ray_callbacks[2];
 				vec2<> targets[2] = {
 					position_meters + vec2<>::from_degrees((vertex.second - position_meters).get_degrees() - epsilon_ray_angle_variation) * vision_side_meters / 2 * 1.414213562373095,
 					position_meters + vec2<>::from_degrees((vertex.second - position_meters).get_degrees() + epsilon_ray_angle_variation) * vision_side_meters / 2 * 1.414213562373095
 				};
 				
-				/* cast both rays starting from the player position and ending in ray_callbacks[x].target, ignoring subject entity completely */
+				/* cast both rays starting from the player position and ending in targets[x].target, 
+				ignoring subject entity ("it") completely, save results in ray_callbacks[2] */
+				physics_system::raycast_output ray_callbacks[2];
 				ray_callbacks[0] = physics.ray_cast(position_meters, targets[0], &request.filter, it);
 				ray_callbacks[1] = physics.ray_cast(position_meters, targets[1], &request.filter, it);
 
 				/* if we did not intersect with anything */
 				if (!(ray_callbacks[0].hit || ray_callbacks[1].hit)) {
-					/* we must have cast the ray against AABB */
-					if (from_aabb) {
+					/* we could have cast the ray against bounding square, so if it in fact comes from there */
+					if (from_aabb) 
+						/* interpret as both rays hit the square */
 						double_rays.push_back(double_ray(*from_aabb, *from_aabb, true, true));
-					}
+					
 					/* only ever happens if an object is only partially inside visibility rectangle
-					may happen but ignore, handling not implemented
+					may happen but ignore, handling not implemented yet
 					*/
 					else {
 						bool breakpoint = true;
@@ -233,13 +235,12 @@ void visibility_system::process_entities(world& owner) {
 				}
 				/* both rays intersect with something */
 				else if (ray_callbacks[0].hit && ray_callbacks[1].hit) {
-					/* if distance between intersection and target vertex is bigger than epsilon, which means that
-					BOTH intersections occured FAR from the vertex
-					then ray must have intersected with an obstacle BEFORE reaching the vertex, ignoring intersection completely */
-					float distance_from_origin = (vertex.second - position_meters).length_sq();
+					/* if distance between both intersections and position is less than distance from target to position
+					then rays must have intersected with an obstacle BEFORE reaching the vertex, ignoring intersection completely */
+					float distance_from_origin = (vertex.second - position_meters).length();
 
-					if ((ray_callbacks[0].intersection - position_meters).length_sq() + epsilon_threshold_obstacle_hit_sq < distance_from_origin &&
-						(ray_callbacks[1].intersection - position_meters).length_sq() + epsilon_threshold_obstacle_hit_sq < distance_from_origin) {
+					if ((ray_callbacks[0].intersection - position_meters).length() + epsilon_threshold_obstacle_hit_meters < distance_from_origin &&
+						(ray_callbacks[1].intersection - position_meters).length() + epsilon_threshold_obstacle_hit_meters < distance_from_origin) {
 							if (draw_cast_rays) draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 0, 255));
 					}
 					/* distance between both intersections fit in epsilon which means ray intersected with the same vertex */
@@ -250,28 +251,37 @@ void visibility_system::process_entities(world& owner) {
 						double_rays.push_back(double_ray(vertex.second, vertex.second, true, true));
 						if (draw_cast_rays) draw_line(vertex.second, graphics::pixel_32(255, 255, 0, 255));
 					}
-					/* this is the case where the ray is cast at the lateral vertex,
+					/* we're here so: 
+					they reached the target or even further (guaranteed by first condition),
+					and they are not close to each other (guaranteed by condition 2),
+					so either one of them hit the vertex and the second one went further or we have a pathological case
+					that both wen't further and still intersected somewhere close - this is something we either way cannot handle and occurs 
+					when a body is pathologically thin
+
+					so this is the case where the ray is cast at the lateral vertex,
 					here we also detect the discontinuity */
 					else {
 						/* save both intersection points, this is what we introduced "double_ray" pair for */
 						double_ray new_double_ray(ray_callbacks[0].intersection, ray_callbacks[1].intersection, false, false);
 
-						/* handle new discontinuity */
+						/* save new discontinuity */
 						components::visibility::discontinuity new_discontinuity;
 
 						/* if the ray that we substracted the epsilon from intersected closer (and thus with the vertex), then the free space is to the right */
-						if ((ray_callbacks[0].intersection - vertex.second).length_sq() < (ray_callbacks[1].intersection - vertex.second).length_sq()) {
+						if ((ray_callbacks[0].intersection - vertex.second).length_sq() < 
+							(ray_callbacks[1].intersection - vertex.second).length_sq()) {
 							/* it was "first" one that directly reached its destination */
 							new_double_ray.first_reached_destination = true;
 							new_double_ray.first = vertex.second;
 							
+							/* save discontinuity info and edge_index to associate discontinuity with current edge */
 							new_discontinuity.points.first = vertex.second;
 							new_discontinuity.points.second = ray_callbacks[1].intersection;
 							new_discontinuity.winding = components::visibility::discontinuity::RIGHT;
 							new_discontinuity.edge_index = double_rays.size() - 1;
 							if (draw_cast_rays) draw_line(ray_callbacks[1].intersection, graphics::pixel_32(255, 0, 255, 255));
 						}
-						/* otherwise it is to the left */
+						/* otherwise the free area is to the left */
 						else {
 							/* it was "second" one that directly reached its destination */
 							new_double_ray.second_reached_destination = true;
@@ -344,24 +354,13 @@ void visibility_system::process_entities(world& owner) {
 				}
 			}
 
-			/* transform all discontinuities from Box2D coordinates to pixels */
-			for (auto& disc : request.discontinuities) {
-				disc.points.first *= METERS_TO_PIXELSf;
-				disc.points.second *= METERS_TO_PIXELSf;
-
-				/* wrap it */
-				if (disc.edge_index < 0) 
-					disc.edge_index = double_rays.size() - 1;
-			}
-
-			/* now to propagate the output */
-			request.edges.clear();
-
+			/* now propagate the output */
 			for (size_t i = 0; i < double_rays.size(); ++i) {
 				/* (i + 1)%double_rays.size() ensures the cycle */
 				auto& ray_a = double_rays[i];
 				auto& ray_b = double_rays[(i + 1)%double_rays.size()];
 
+				/* transform intersection locations to pixels */
 				vec2<> p1 = ray_a.second * METERS_TO_PIXELSf;
 				vec2<> p2 = ray_b.first * METERS_TO_PIXELSf;
 
@@ -371,10 +370,24 @@ void visibility_system::process_entities(world& owner) {
 					render.lines.push_back(render_system::debug_line(p1, p2, request.color));
 				}
 
+				/* save new edge */
 				request.edges.push_back(std::make_pair(p1, p2));
 			}
 
-			/* values less than zero indicate we don't want to ignore discontinuities */
+			/* a little processing on discontinuities, we'll need them in a moment */
+			for (auto& disc : request.discontinuities) {
+				/* transform all discontinuities from Box2D coordinates to pixels */
+				disc.points.first *= METERS_TO_PIXELSf;
+				disc.points.second *= METERS_TO_PIXELSf;
+
+				/* wrap the indices, some may be negative */
+				if (disc.edge_index < 0)
+					disc.edge_index = double_rays.size() - 1;
+			}
+
+			/* 
+			additional processing: delete discontinuities navigation to which will result in collision
+			values less than zero indicate we don't want to perform this calculation */
 			if (request.ignore_discontinuities_shorter_than > 0.f) {
 				int edges_num = request.edges.size();
 
@@ -387,14 +400,16 @@ void visibility_system::process_entities(world& owner) {
 				/* shortcut, note we get it by copy */
 				auto discs_copy = request.discontinuities;
 
+				/* container for edges denoting unreachable areas */
 				std::vector<components::visibility::edge> marked_holes;
 
-				/* for every discontinuity, remove if there exists an edge that is too close to the discontinuity's vertex */
+				/* for every discontinuity, remove if there exists any edge that is too close to the discontinuity's vertex */
 				discs_copy.erase(std::remove_if(discs_copy.begin(), discs_copy.end(),
 					[&request, edges_num, &transform, &wrap, &render, &marked_holes, this]
 				(const components::visibility::discontinuity& d){
 						std::vector<vec2<>> points_too_close;
 
+						/* let's handle both CW and CCW cases in one go, only the sign differs somewhere */
 						int cw = d.winding == d.RIGHT ? 1 : -1;
 						
 						/* we check all vertices of edges */
@@ -406,6 +421,7 @@ void visibility_system::process_entities(world& owner) {
 							/* project this point onto candidate edge */
 							vec2<> close_point = d.points.first.closest_point_on_segment(request.edges[j].first, request.edges[j].second);
 
+							/* if the distance is less than allowed */
 							if (close_point.compare(d.points.first, request.ignore_discontinuities_shorter_than)) 
 								points_too_close.push_back(close_point);
 						}
@@ -424,33 +440,47 @@ void visibility_system::process_entities(world& owner) {
 							}
 						}
 
+						/* if there is any threatening close point */
 						if (!points_too_close.empty()) {
-							vec2<> closest_point = *std::min_element(points_too_close.begin(), points_too_close.end(), [&transform](vec2<> a, vec2<> b){
+							/* pick the one closest to the entity */
+							vec2<> closest_point = *std::min_element(points_too_close.begin(), points_too_close.end(), 
+								[&transform](vec2<> a, vec2<> b) {
 								return (a - transform.pos).length_sq() < (b - transform.pos).length_sq();
 							});
 
+							/* denote the unreachable area by saving an edge from the closest point to the discontinuity */
 							marked_holes.push_back(components::visibility::edge(closest_point, d.points.first));
 							
 							if (draw_discontinuities)
 								render.lines.push_back(render_system::debug_line(closest_point, d.points.first, graphics::pixel_32(255, 255, 255, 255)));
 							
+							/* remove this discontinuity */
 							return true;
 						}
 
+						/* there are no threatening close points, discontinuity is ok */
 						return false;
 				}
 				), discs_copy.end());
 
-				/* now check if any remaining discontinuities can not be seen through marked non-walkable areas (pathological case) */
+				/* now delete any of remaining discontinuities that can't be seen 
+				through marked non-walkable areas (sort of a pathological case) 
+				from position of the player
+				
+				prepare raycast data
+				*/
 				b2RayCastOutput output;
 				b2RayCastInput input;
 				input.maxFraction = 1.0;
 
 				for (auto& marked : marked_holes) {
+					/* prepare raycast subject */
 					b2EdgeShape marked_hole;
 					marked_hole.Set(marked.first, marked.second);
 
-					discs_copy.erase(std::remove_if(discs_copy.begin(), discs_copy.end(), [&marked_hole, &output, &input, &transform](const components::visibility::discontinuity& d){
+					/* remove every discontinuity raycast with which gives positive result */
+					discs_copy.erase(std::remove_if(discs_copy.begin(), discs_copy.end(), 
+						[&marked_hole, &output, &input, &transform](const components::visibility::discontinuity& d){
 						input.p1 = transform.pos;
 						input.p2 = d.points.first;
 
