@@ -41,7 +41,7 @@ public:
 		float avoidance_rectangle_length;
 		float avoidance_rectangle_width;
 		float ignore_discontinuities_narrower_than;
-		std::vector<augmentations::vec2<>>* shape_verts;
+		std::vector<b2Vec2>* shape_verts;
 		avoidance_input();
 	};
 

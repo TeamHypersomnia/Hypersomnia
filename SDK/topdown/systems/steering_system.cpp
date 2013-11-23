@@ -1,5 +1,7 @@
 #include "stdafx.h"
-#include "steering_system.h"
+#include <iostream>
+
+#include "utility/randval.h"
 
 #include "entity_system/entity.h"
 #include "entity_system/world.h"
@@ -7,11 +9,11 @@
 #include "../messages/steering_message.h"
 #include "../components/visibility_component.h"
 
+#include "../game/body_helper.h"
+
+#include "steering_system.h"
 #include "render_system.h"
 #include "physics_system.h"
-#include <iostream>
-
-#include "utility/randval.h"
 
 steering_system::obstacle_avoidance_input::obstacle_avoidance_input() 
 	: visibility_edges(nullptr), discontinuities(nullptr), output(nullptr) {
@@ -99,11 +101,11 @@ steering_system::avoidance_info_output steering_system::get_avoidance_info(obsta
 		float velocity_angle = in.unit_vel.get_degrees();
 		
 		/* copied vector to hold rotated vertices */
-		auto rotated_verts = *in.shape_verts;
+		std::vector<vec2<>> rotated_verts;
 		
 		/* rotate to velocity's frame of reference */
-		for (auto& v : rotated_verts) {
-			v.rotate(-velocity_angle, vec2<>());
+		for (auto& v : *in.shape_verts) {
+			rotated_verts.push_back(vec2<>(v - in.position).rotate(-velocity_angle, vec2<>()));
 		}
 
 		int topmost =	 (&*std::min_element(rotated_verts.begin(), rotated_verts.end(), [](vec2<> a, vec2<> b){ return a.y < b.y; })) - rotated_verts.data();
@@ -129,7 +131,6 @@ steering_system::avoidance_info_output steering_system::get_avoidance_info(obsta
 		b2PolygonShape avoidance_rectangle_shape;
 		b2Vec2 rect_copy[4];
 		std::copy(out.avoidance, out.avoidance + 4, rect_copy);
-		//std::reverse(rect_copy, rect_copy + 4);
 		avoidance_rectangle_shape.Set(rect_copy, 4);
 
 		/* visibility points are in clockwise order */
@@ -155,61 +156,78 @@ steering_system::avoidance_info_output steering_system::get_avoidance_info(obsta
 }
 
 vec2<> steering_system::containment(containment_input in) {
-	if (in.speed < 0.1f) return vec2<>();
+	/* speed is too small to make any significant changes, return */
+	if (in.speed < 0.001f) return vec2<>();
 	
+	/* if we have specified a target for containment, we want the avoidance rectangle to face the target */
 	if (in.directed) 
 		in.unit_vel = in.direction;
 
+	/* prepare obstacle avoidance input to get avoidance info */
 	obstacle_avoidance_input obstacle_in;
 	obstacle_in.avoidance_input::operator=(in);
 	auto avoidance = get_avoidance_info(obstacle_in);
 
-		if (_render->draw_avoidance_info) {
-			_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance.avoidance[0], avoidance.avoidance[1], graphics::pixel_32(255, 255, 255, 255)));
-			_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance.avoidance[1], avoidance.avoidance[2], graphics::pixel_32(255, 255, 255, 255)));
-			_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance.avoidance[2], avoidance.avoidance[3], graphics::pixel_32(255, 255, 255, 255)));
-			_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance.avoidance[3], avoidance.avoidance[0], graphics::pixel_32(255, 255, 255, 255)));
+	/* debug drawing */
+	if (_render->draw_avoidance_info) {
+		_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance.avoidance[0], avoidance.avoidance[1], graphics::pixel_32(255, 255, 255, 255)));
+		_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance.avoidance[1], avoidance.avoidance[2], graphics::pixel_32(255, 255, 255, 255)));
+		_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance.avoidance[2], avoidance.avoidance[3], graphics::pixel_32(255, 255, 255, 255)));
+		_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance.avoidance[3], avoidance.avoidance[0], graphics::pixel_32(255, 255, 255, 255)));
+
+		_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance.rightmost_line[0], avoidance.rightmost_line[1], graphics::pixel_32(255, 255, 255, 255)));
+	}
+
+	/* prepare the line we will cast rays along */
+	vec2<> rayline = (avoidance.avoidance[3] - avoidance.avoidance[0]);
+	/* how long is this line */
+	float avoidance_width = rayline.length();
+	/* how long will the cast rays be */
+	float avoidance_length = (avoidance.avoidance[0] - avoidance.avoidance[1]).Length();
+	/* normalize the ray line */
+	rayline /= avoidance_width;
+
+	/* resultant vector */
+	vec2<> steering;
+
+	for (int i = 0; i < in.ray_count; ++i) {
+		/* this is where the ray line emerges from */
+		vec2<> ray_location = avoidance.avoidance[0];
+
+		if (in.randomize_rays)
+			ray_location += rayline * avoidance_width * randval(0.f, 1.f);
+		else
+			ray_location += rayline * (avoidance_width / (in.ray_count - 1)) * i;
+
+
+		/* prepare the ray to be cast */
+		vec2<> p1 = ray_location, p2;
+
+		/* if we are only interested in threats between leftmost and rightmost line */
+		if (in.only_threats_in_OBB)
+			p2 = ray_location.project_onto(avoidance.rightmost_line[0], avoidance.rightmost_line[1]);
+		else
+			p2 = ray_location.project_onto(avoidance.avoidance[1], avoidance.avoidance[2]);
+
+		_render->manually_cleared_lines.push_back(render_system::debug_line(p1, p2, graphics::pixel_32(255, 0, 0, 255)));
+		
+		/* cast the ray and save output */
+		auto output = in.physics->ray_cast_px(p1, p2, in.ray_filter, in.ignore_entity);
+
+		/* if our ray hits anything */
+		if (output.hit) {
+			_render->manually_cleared_lines.push_back(render_system::debug_line(p1, output.intersection, graphics::pixel_32(0, 255, 255, 255)));
+			vec2<> rightmost_projection = ray_location.project_onto(avoidance.rightmost_line[0], avoidance.rightmost_line[1]);
+
+			/* if it's closer than rightmost_projection the weight should be even bigger than 1.0 */
+			float proportion = (output.intersection - rightmost_projection).length_sq() / (avoidance_length*avoidance_length);
 			
-			_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance.rightmost_line[0], avoidance.rightmost_line[1], graphics::pixel_32(255, 255, 255, 255)));
+			/* add steering force with reference to normal at the intersection point */
+			steering += output.normal * (1 - proportion);
 		}
+	}
 
-		vec2<> rayline = (avoidance.avoidance[3] - avoidance.avoidance[0]);
-		float avoidance_width = rayline.length();
-		float avoidance_length = (avoidance.avoidance[0] - avoidance.avoidance[1]).Length();
-		rayline /= avoidance_width;
-
-		vec2<> steering;
-		for (int i = 0; i < in.ray_count; ++i) {
-			vec2<> ray_location = avoidance.avoidance[0];
-			if (in.randomize_rays)
-				ray_location += rayline * avoidance_width * randval(0.f, 1.f);
-			else
-				ray_location += rayline * (avoidance_width / (in.ray_count-1)) * i;
-
-			
-			vec2<> p1 = ray_location, p2;
-
-			if (in.only_threats_in_OBB)
-				p2 = ray_location.project_onto(avoidance.rightmost_line[0], avoidance.rightmost_line[1]);
-			else
-				p2 = ray_location.project_onto(avoidance.avoidance[1], avoidance.avoidance[2]);
-			
-			_render->manually_cleared_lines.push_back(render_system::debug_line(p1, p2, graphics::pixel_32(255, 0, 0, 255)));
-			auto output = in.physics->ray_cast_px(p1, p2, in.ray_filter, in.ignore_entity);
-
-			/* if our ray hits anything */
-			if (output.hit) {
-				_render->manually_cleared_lines.push_back(render_system::debug_line(p1, output.intersection, graphics::pixel_32(0, 255, 255, 255)));
-				/* if it's closer than rightmost_projection the weight should be even bigger than 1.0 */
-
-				vec2<> rightmost_projection = ray_location.project_onto(avoidance.rightmost_line[0], avoidance.rightmost_line[1]);
-				
-				float proportion = (output.intersection - rightmost_projection).length_sq() / (avoidance_length*avoidance_length);
-				steering += output.normal * (1 - proportion);
-			}
-		}
-
-		return steering;
+	return steering;
 }
 
 bool steering_system::avoid_collisions(obstacle_avoidance_input in) {
@@ -228,32 +246,33 @@ bool steering_system::avoid_collisions(obstacle_avoidance_input in) {
 			bool clockwise;
 
 			bool operator < (const navigation_candidate& b) const {
-				return angular_distance > b.angular_distance;
+				return angular_distance < b.angular_distance;
 			}
 
 			navigation_candidate(vec2<> v = vec2<>(), float a = 0.f, float d = 0.f, bool c = false) :
 				vertex_ptr(v), angular_distance(a), linear_distance(d), clockwise(c) {};
 		};
 
-		//navigation_candidate best_navigation_candidate;
-		std::priority_queue < navigation_candidate > candidates;
+		std::vector<navigation_candidate> candidates;
 
 		/* shortcut */
 		auto& visibility_edges = (*in.visibility_edges);
 
 		auto check_navigation_candidate = [&candidates, &in](vec2<> v, bool cw) {
-			auto v1 = v - in.position;
-			float dist = v1.length();
-			auto v2 = in.unit_vel;
-			if(dist != 0.f) v1 /= dist;
+			/* vector pointing from entity to navigation candidate */
+			auto to_navpoint = v - in.position;
+			float distance_to_navpoint = to_navpoint.length();
+			if (distance_to_navpoint != 0.f) to_navpoint /= distance_to_navpoint;
 			
-			float angular_distance = v1.dot(v2);
+			/* angle it takes to turn the velocity so it faces the navpoint */
+			float angular_distance = to_navpoint.dot(in.unit_vel);
 			/* minus here because if its 1.0 it is totally parallel and we want the less the better */
-			candidates.push(navigation_candidate(v, -angular_distance, dist, cw));
+			candidates.push_back(navigation_candidate(v, -angular_distance, distance_to_navpoint, cw));
 		};
 
 		int edges_num = static_cast<int>(visibility_edges.size());
 
+		/* helper wrapping lambda for iteration */
 		auto wrap = [edges_num](int ix){
 			if (ix < 0) return edges_num + ix;
 			return ix % edges_num;
@@ -270,8 +289,10 @@ bool steering_system::avoid_collisions(obstacle_avoidance_input in) {
 				/* if left-handed vertex of candidate edge and right-handed vertex of previous edge do not match, we have a lateral obstacle vertex */
 				if (!visibility_edges[j].first.compare(visibility_edges[wrap(j - 1)].second, in.ignore_discontinuities_narrower_than)) {
 
+					/* check if there exists any discontinuity with such an edge index and winding,
+						if there does not, it means our discontinuity is too narrow and we don't want to go there
+					*/
 					bool such_discontinuity_exists = false;
-					/* check if there exists any discontinuity with such an edge index and winding */
 					for (auto& disc : *in.discontinuities) {
 						if (disc.edge_index == j && disc.winding == disc.LEFT) {
 							such_discontinuity_exists = true;
@@ -296,8 +317,8 @@ bool steering_system::avoid_collisions(obstacle_avoidance_input in) {
 					/* if right-handed vertex of candidate edge and left-handed vertex of next edge do not match, we have a lateral obstacle vertex */
 					if (!visibility_edges[j].second.compare(visibility_edges[wrap(j + 1)].first, in.ignore_discontinuities_narrower_than)) {
 
+						/* rest is analogous */
 						bool such_discontinuity_exists = false;
-						/* check if there exists any discontinuity with such an edge index and winding */
 						for (auto& disc : *in.discontinuities) {
 							if (disc.edge_index == j && disc.winding == disc.RIGHT) {
 								such_discontinuity_exists = true;
@@ -332,25 +353,28 @@ bool steering_system::avoid_collisions(obstacle_avoidance_input in) {
 		/* if we have specified a single candidate for navigation,
 		which means there is an obstacle on the way */
 		
-		/* shortcut */
-		auto& best_candidate = *in.output;
-
 		while (!candidates.empty()) {
-			/* save output */
-			best_candidate = candidates.top().vertex_ptr;
+			/* shortcut */
+			auto& best_candidate = *in.output;
 
-			if (_render->draw_avoidance_info)
-			_render->manually_cleared_lines.push_back(render_system::debug_line(in.position, best_candidate, graphics::pixel_32(0, 255, 0, 255)));
+			/* get the best candidate for navigation */
+			best_candidate = (*std::min_element(candidates.begin(), candidates.end())).vertex_ptr;
 
-			float angle = (best_candidate - in.position).angle_between(in.unit_vel);
+			/* debug drawing */
+			if (_render->draw_avoidance_info) {
+				_render->manually_cleared_lines.push_back(render_system::debug_line(in.position, best_candidate, graphics::pixel_32(0, 255, 0, 255)));
+				
+				/* angle the entity has to turn by to face the navigation candidate */
+				float angle = (best_candidate - in.position).angle_between(in.unit_vel);
 
-			for (auto& p : avoidance.avoidance)
+				for (auto& p : avoidance.avoidance)
 				p = vec2<>(p).rotate(angle, in.position);
 			
-			if (_render->draw_avoidance_info)
 				_render->manually_cleared_lines.push_back(render_system::debug_line(in.position, best_candidate, graphics::pixel_32(0, 255, 255, 255)));
 
-			draw_avoidance(graphics::pixel_32());
+				draw_avoidance(graphics::pixel_32());
+			}
+
 			return true;
 		}
 
@@ -359,8 +383,10 @@ bool steering_system::avoid_collisions(obstacle_avoidance_input in) {
 }
 
 vec2<> steering_system::wander(wander_input in) {
+	/* rotate the current displacement angle by a random offset */
 	(*in.current_angle) += randval(-in.displacement_degrees, in.displacement_degrees);
 
+	/* these are self-explanatory */
 	vec2<> circle_center = in.position + in.circle_distance * in.unit_vel;
 	vec2<> displacement_position = circle_center + vec2<>(1, 0) * in.circle_radius;
 	displacement_position.rotate(*in.current_angle, circle_center);
@@ -380,6 +406,7 @@ vec2<> steering_system::wander(wander_input in) {
 void steering_system::steering_input::set_target(vec2<> t) {
 	target = t;
 
+	/* update direction and distance data accordingly */
 	direction = target - position;
 	distance = direction.length();
 
@@ -392,15 +419,17 @@ void steering_system::steering_input::set_target(vec2<> t) {
 
 void steering_system::steering_input::set_velocity(vec2<> v) {
 	velocity = v;
+
+	/* update unit_vel and speed data accordingly */
 	unit_vel = v;
 	speed = v.length();
 
+	/* pathological case, we don't want to divide by zero */
 	if (speed == 0.f)
 		unit_vel = vec2<>(0.f, 0.f);
 	else
 		unit_vel /= speed;
 }
-
 
 void steering_system::substep(world& owner) {
 	auto& render = owner.get_system<render_system>();
@@ -414,31 +443,18 @@ void steering_system::substep(world& owner) {
 		auto& transform = it->get<components::transform>().current;
 		auto body = it->get<components::physics>().body;
 
-		/* extract ALL the vertices from the physics body, it will be then used by obstacle avoidance routines to calculate avoidance quad */
-		std::vector<vec2<>> shape_verts;
-		/* iterate through all the fixtures of a body */
-		for (const b2Fixture* f = body->GetFixtureList(); f != nullptr; f = f->GetNext()) {
-			/* we only support polygonal units */
-			if (f->GetShape()->m_type != b2Shape::e_polygon) 
-				throw std::runtime_error("only polygonal AI units are supported!");
-
-			auto shape = reinterpret_cast<const b2PolygonShape*>(f->GetShape());
-
-			for (int i = 0; i < shape->GetVertexCount(); ++i) 
-				/* transform from Box2D coordinates */
-				shape_verts.push_back(vec2<>(shape->GetVertex(i)).rotate(transform.rotation, vec2<>(0, 0)) * METERS_TO_PIXELSf);
-		}
-
-		vec2<> velocity = body->GetLinearVelocity(), resultant_force;
-		velocity *= METERS_TO_PIXELSf;
-
-		float max_speed = body->m_max_speed * METERS_TO_PIXELSf;
-
+		/* extract ALL the vertices from the physics body, it will be then used by obstacle avoidance routines to calculate avoidance quad,
+			false means we want pixels
+		*/
+		auto shape_verts = topdown::get_transformed_shape_verts(*it, false);
 		auto draw_vector = [&transform, &render](vec2<> v, graphics::pixel_32 col){
 			if (v.non_zero())
 				render.manually_cleared_lines.push_back(render_system::debug_line(transform.pos, transform.pos + v, col));
 		};
 		
+		/* resultant force that sums all behaviours and that is to be finally applied */
+		vec2<> resultant_force;
+
 		/* iterate through all the requested behaviours */
 		for (auto& ptr_behaviour : steering.active_behaviours) {
 			using components::steering;
@@ -462,8 +478,8 @@ void steering_system::substep(world& owner) {
 				common_input.directed = true;
 			}
 
-			common_input.set_velocity(velocity);
-			common_input.max_speed = max_speed;
+			common_input.set_velocity(METERS_TO_PIXELSf * body->GetLinearVelocity());
+			common_input.max_speed = body->m_max_speed * METERS_TO_PIXELSf;
 			common_input.radius_of_effect = behaviour.radius_of_effect;
 
 			wander_input.steering_input::operator=(common_input);
@@ -493,7 +509,7 @@ void steering_system::substep(world& owner) {
 
 
 			if (behaviour.behaviour_type == steering::behaviour::WANDER) added_force = wander(wander_input);
-			if (behaviour.behaviour_type == steering::behaviour::CONTAINMENT) added_force = containment(containment_input).normalize() * max_speed;
+			if (behaviour.behaviour_type == steering::behaviour::CONTAINMENT) added_force = containment(containment_input).normalize() * common_input.max_speed;
 			if (behaviour.behaviour_type == steering::behaviour::FLEE) added_force = flee(common_input);
 			if (behaviour.behaviour_type == steering::behaviour::SEEK) added_force = seek(common_input);
 			
@@ -525,7 +541,7 @@ void steering_system::substep(world& owner) {
 					containment_input.set_velocity(navigate_to - transform.pos);
 
 					added_force = seek(common_input);
-					added_force += containment(containment_input).normalize() * max_speed;
+					added_force += containment(containment_input).normalize() * common_input.max_speed;
 				}
 			}
 
@@ -552,7 +568,7 @@ void steering_system::substep(world& owner) {
 			draw_vector(resultant_force, graphics::pixel_32(255, 255, 255, 122));
 
 		if (render.draw_velocities)
-			draw_vector(velocity, graphics::pixel_32(0, 255, 0, 255));
+			draw_vector(METERS_TO_PIXELSf * body->GetLinearVelocity(), graphics::pixel_32(0, 255, 0, 255));
 	}
 }
 
