@@ -132,7 +132,7 @@ void physics_system::contact_listener::PostSolve(b2Contact* contact, const b2Con
 
 void physics_system::process_entities(world& owner) {
 	listener.world_ptr = &owner;
-
+	accumulator.set_time_multiplier(timestep_multiplier);
 	const unsigned steps = accumulator.update_and_extract_steps();
 
 	for (unsigned i = 0; i < steps; ++i) {
@@ -144,7 +144,7 @@ void physics_system::process_entities(world& owner) {
 		for (auto& sys : substepping_systems)
 			sys->substep(owner);
 
-		b2world.Step(static_cast<float32>(accumulator.per_second()*timestep_multiplier), velocityIterations, positionIterations);
+		b2world.Step(static_cast<float32>(accumulator.per_second()), velocityIterations, positionIterations);
 		b2world.ClearForces();
 	}
 	

@@ -12,7 +12,7 @@ namespace augmentations {
 		}
 
 		unsigned delta_accumulator::update_and_extract_steps() {
-			auto add = ticks.extract<std::chrono::milliseconds>();
+			auto add = ticks.extract<std::chrono::milliseconds>() * time_multiplier;
 			//if(add > fixed_dt_milliseconds*max_steps) {
 			//	add = fixed_dt_milliseconds*max_steps;
 			//}
@@ -50,7 +50,11 @@ namespace augmentations {
 		}
 
 		double delta_accumulator::get_timestep() const {
-			return fixed_dt_milliseconds; 
+			return fixed_dt_milliseconds;
+		}
+
+		void delta_accumulator::set_time_multiplier(double tm) {
+			time_multiplier = tm;
 		}
 	}
 }

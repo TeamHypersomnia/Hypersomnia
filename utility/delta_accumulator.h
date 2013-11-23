@@ -10,6 +10,8 @@ namespace augmentations {
 			double ratio;
 			double fixed_dt_milliseconds;
 
+			double time_multiplier;
+
 			/* maximum steps taken to avoid spiral of death */
 			unsigned max_steps;
 		public:
@@ -28,6 +30,8 @@ namespace augmentations {
 			
 			/* get fixed_dt_milliseconds */
 			double get_timestep() const;
+
+			void set_time_multiplier(double);
 		};
 	}
 }
