@@ -30,7 +30,9 @@ namespace bindings {
 			],
 
 			luabind::class_<physics_system>("_physics_system")
-			.def_readwrite("timestep_multiplier", &physics_system::timestep_multiplier),
+			.def_readwrite("timestep_multiplier", &physics_system::timestep_multiplier)
+			.def_readwrite("enable_interpolation", &physics_system::enable_interpolation)
+			,
 
 			luabind::class_<physics>("physics_component")
 			.def(luabind::constructor<>())

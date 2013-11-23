@@ -27,7 +27,7 @@ float32 physics_system::raycast_input::ReportFixture(b2Fixture* fixture, const b
 physics_system::raycast_input::raycast_input() : subject_filter(nullptr), subject(nullptr) {}
 
 physics_system::physics_system() : accumulator(60.0, 5), timestep_multiplier(1.f),
-	b2world(b2Vec2(0.f, 0.f)) {
+	b2world(b2Vec2(0.f, 0.f)), enable_interpolation(true) {
 		b2world.SetAllowSleeping(false);
 		b2world.SetAutoClearForces(false);
 		b2world.SetContactListener(&listener);
@@ -149,7 +149,9 @@ void physics_system::process_entities(world& owner) {
 	}
 	
 	if(steps == 0) b2world.ClearForces();
-	smooth_states();
+	
+	if (enable_interpolation)
+		smooth_states();
 }
 
 void physics_system::add(entity*) {
