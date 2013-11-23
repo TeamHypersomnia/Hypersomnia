@@ -34,6 +34,7 @@ void pathfinding_system::process_entities(world& owner) {
 		if (!pathfinding.session_stack.empty()) {
 			/* get visibility information */
 			auto& vision = visibility.get_layer(components::visibility::DYNAMIC_PATHFINDING);
+			vision.ignore_discontinuities_shorter_than = pathfinding.session().temporary_ignore_discontinuities_shorter_than;
 
 			for (auto& visible_vertex : vision.vertex_hits) {
 				bool this_visible_vertex_is_already_memorised = false;
@@ -203,9 +204,24 @@ void pathfinding_system::process_entities(world& owner) {
 				if (local_minimum_discontinuity.sensor != pathfinding.session().navigate_to)
 					pathfinding.session().navigate_to = local_minimum_discontinuity.sensor;
 
+				bool rays_hit = false;
+				auto& subject_verts = topdown::get_transformed_shape_verts(*it);
+				subject_verts.push_back(transform.pos);
+
+				for (auto& subject_vert : subject_verts) {
+					if (
+						is_point_visible(METERS_TO_PIXELSf*subject_vert, local_minimum_discontinuity.location, vision.filter) ||
+						is_point_visible(METERS_TO_PIXELSf*subject_vert, local_minimum_discontinuity.sensor, vision.filter)
+						) {
+						rays_hit = true;
+					}
+				}
+
 				/* if we can see it, navigate there */
-				if (body->TestPoint(local_minimum_discontinuity.sensor * PIXELS_TO_METERSf) ||
-					is_point_visible(transform.pos, local_minimum_discontinuity.sensor, vision.filter)) {
+				if (body->TestPoint(local_minimum_discontinuity.location * PIXELS_TO_METERSf) ||
+					body->TestPoint(local_minimum_discontinuity.sensor * PIXELS_TO_METERSf) ||
+					rays_hit
+					) {
 				}
 				/* else start new navigation session */
 				else {
@@ -213,9 +229,19 @@ void pathfinding_system::process_entities(world& owner) {
 						vec2<> new_target = pathfinding.session().navigate_to;
 						pathfinding.session_stack.push_back(components::pathfinding::pathfinding_session());
 						pathfinding.session().target = new_target;
+						pathfinding.session().temporary_ignore_discontinuities_shorter_than = pathfinding.starting_ignore_discontinuities_shorter_than;
 					}
 				}
 
+			}
+			else {
+				/* something went wrong, let's begin again */
+				//if (pathfinding.session_stack.size() == 1) {
+					pathfinding.session().discovered_vertices.clear();
+					pathfinding.session().undiscovered_vertices.clear();
+					//pathfinding.session().temporary_ignore_discontinuities_shorter_than /= 1.5f;
+				//}
+				//pathfinding.session_stack.resize(1);
 			}
 		}
 	}

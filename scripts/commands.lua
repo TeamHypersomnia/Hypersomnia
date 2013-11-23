@@ -2,6 +2,8 @@ print("Calling commands.lua...")
 --visibility_system.draw_discontinuities = 1
 
 
+wander_behaviour.weight = 0.05
+
 
 --print(player.body.transform.current.pos.x)
 --ai_system.draw_triangle_edges = 1

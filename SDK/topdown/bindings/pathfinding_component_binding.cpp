@@ -20,11 +20,13 @@ namespace bindings {
 			.def(luabind::constructor<>())
 			.def("start_pathfinding", &pathfinding::start_pathfinding)
 			.def("get_current_navigation_target", &pathfinding::get_current_navigation_target)
+			.def("get_current_target", &pathfinding::get_current_target)
 			.def("clear_pathfinding_info", &pathfinding::clear_pathfinding_info)
 			.def("is_still_pathfinding", &pathfinding::is_still_pathfinding)
 			.def_readwrite("enable_backtracking", &pathfinding::enable_backtracking)
 			.def_readwrite("target_offset", &pathfinding::target_offset)
 			.def_readwrite("distance_navpoint_hit", &pathfinding::distance_navpoint_hit)
+			.def_readwrite("starting_ignore_discontinuities_shorter_than", &pathfinding::starting_ignore_discontinuities_shorter_than)
 			; 
 	}
 }

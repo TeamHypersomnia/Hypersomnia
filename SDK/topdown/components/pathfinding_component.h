@@ -14,6 +14,7 @@ namespace components {
 
 		float target_offset;
 		float distance_navpoint_hit;
+		float starting_ignore_discontinuities_shorter_than;
 
 		struct pathfinding_session {
 			augmentations::vec2<> target, navigate_to;
@@ -23,6 +24,7 @@ namespace components {
 			};
 
 			std::vector<navigation_vertex> discovered_vertices, undiscovered_vertices;
+			float temporary_ignore_discontinuities_shorter_than;
 
 			//std::vector<edge> visible_walls, undiscovered_walls;
 			//std::vector<visibility::discontinuity> undiscovered_discontinuities;
@@ -38,10 +40,15 @@ namespace components {
 			clear_pathfinding_info();
 			session_stack.push_back(pathfinding_session());
 			session().target = target;
+			session().temporary_ignore_discontinuities_shorter_than = starting_ignore_discontinuities_shorter_than;
 		}
 
 		augmentations::vec2<> get_current_navigation_target() {
 			return session().navigate_to;
+		}
+
+		augmentations::vec2<> get_current_target() {
+			return session().target;
 		}
 
 		bool is_still_pathfinding() const {

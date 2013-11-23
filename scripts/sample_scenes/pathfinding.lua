@@ -5,6 +5,7 @@ visibility_system.draw_triangle_edges = 0
 visibility_system.draw_discontinuities = 1
 visibility_system.draw_visible_walls = 0
 
+
 visibility_system.epsilon_ray_angle_variation = 0.0001
 visibility_system.epsilon_threshold_obstacle_hit = 10
 visibility_system.epsilon_distance_vertex_hit = 2
@@ -27,7 +28,13 @@ render_system.max_visibility_expansion_distance = 1
 render_system.draw_visibility = 0
 
 crosshair_sprite = create_sprite {
-	image = images.crosshair
+	image = images.crosshair,
+	color = rgba(255, 0, 0, 255)
+}
+
+crosshair_blue = create_sprite {
+	image = images.crosshair,
+	color = rgba(255, 255, 255, 255)
 }
 
 
@@ -38,7 +45,7 @@ blank_white = create_sprite {
 
 blank_red = create_sprite {
 	image = images.blank,
-	size_multiplier = vec2(70, 10),
+	size_multiplier = vec2(10, 10),
 	color = rgba(255, 0, 0, 255)
 }
 
@@ -276,6 +283,7 @@ create_entity (archetyped(big_box_archetype, {
 	}
 }))
 
+
 player = create_entity_group (archetyped(my_npc_archetype, {
 	body = {
 		transform = {},
@@ -300,7 +308,7 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 			visibility_layers = {
 				[visibility_component.CONTAINMENT] = {
 					square_side = 7000,
-					ignore_discontinuities_shorter_than = 170*1.41,
+					ignore_discontinuities_shorter_than = 80,
 					color = rgba(255, 0, 255, 0),
 					filter = filter_obstacle_visibility
 				},	
@@ -308,7 +316,7 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 				[visibility_component.DYNAMIC_PATHFINDING] = {
 					square_side = 7000,
 					color = rgba(0, 255, 255, 120),
-					ignore_discontinuities_shorter_than = 170*1.41,
+					ignore_discontinuities_shorter_than = 80,
 					filter = filter_pathfinding_visibility
 				}
 			}
@@ -317,7 +325,8 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 		pathfinding = {
 			enable_backtracking = true,
 			target_offset = 100,
-			distance_navpoint_hit = 20
+			distance_navpoint_hit = 2,
+			starting_ignore_discontinuities_shorter_than = 150
 		},
 		
 		movement = {
@@ -328,7 +337,7 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 			max_resultant_force = 4300 -- -1 = no force clamping
 		}
 	},
-	
+
 	crosshair = { 
 		transform = {
 			pos = vec2(0, 0),
@@ -403,6 +412,25 @@ camera_archetype = {
 	}
 }
 
+target_entity_archetype = {
+	render = {
+		model = crosshair_sprite,
+		layer = render_layers.GUI_OBJECTS
+	},
+	
+	transform = {} 
+}
+
+target_entity = create_entity(archetyped(target_entity_archetype, {
+	render = { model = crosshair_blue } ,
+	crosshair = {
+			sensitivity = 0
+	}
+}))
+navigation_target_entity = create_entity(archetyped(target_entity_archetype, {}))
+forward_navigation_entity = create_entity(archetyped(target_entity_archetype, {}))
+
+
 current_zoom_level = 3000
 
 function set_zoom_level(camera)
@@ -412,6 +440,7 @@ function set_zoom_level(camera)
 	camera.camera.ortho = rect_ltrb(rect_xywh((config_table.resolution_w-new_w)/2, (config_table.resolution_h-new_h)/2, new_w, new_h))
 	
 	player.crosshair.crosshair.size_multiplier = vec2(mult, mult)
+	target_entity.crosshair.size_multiplier = vec2(mult, mult)
 end
 
 scriptable_zoom = create_scriptable_info {
@@ -454,18 +483,6 @@ world_camera = create_entity (archetyped(camera_archetype, {
 	}
 }))
 
-target_entity_archetype = {
-	render = {
-		model = crosshair_sprite,
-		layer = render_layers.GUI_OBJECTS
-	},
-	
-	transform = {} 
-}
-
-target_entity = create_entity(archetyped(target_entity_archetype, {}))
-navigation_target_entity = create_entity(archetyped(target_entity_archetype, {}))
-forward_navigation_entity = create_entity(archetyped(target_entity_archetype, {}))
 
 flee_behaviour = create_steering_behaviour {
 	current_target = target_entity,
@@ -483,7 +500,7 @@ seek_archetype = {
 	behaviour_type = steering_behaviour.SEEK,
 	enabled = true,
 	erase_when_target_reached = false,
-	radius_of_effect = 200,
+	radius_of_effect = 300,
 	force_color = rgba(0, 255, 255, 0)
 }			
 
@@ -493,25 +510,6 @@ forward_seek_behaviour = create_steering_behaviour (archetyped(seek_archetype, {
 	radius_of_effect = 0
 }
 ))
-
-pursuit_behaviour = create_steering_behaviour {
-	current_target = player.body,
-	weight = 10,
-	behaviour_type = steering_behaviour.PURSUIT,
-	enabled = true,
-	max_target_future_prediction_ms = 500,
-	force_color = rgba(0, 255, 255, 0)
-}
-
-evasion_behaviour = create_steering_behaviour {
-	current_target = player.body,
-	weight = 1.0,
-	behaviour_type = steering_behaviour.EVASION,
-	enabled = true,
-	max_target_future_prediction_ms = 300,
-	radius_of_effect = 700,
-	force_color = rgba(255, 0, 0, 0)
-}
 
 containment_behaviour = create_steering_behaviour {
 	weight = 1, 
@@ -547,7 +545,7 @@ obstacle_avoidance_archetype = {
 }
 
 wander_behaviour = create_steering_behaviour {
-	weight = 0.5, 
+	weight = 0.05, 
 	behaviour_type = steering_behaviour.WANDER,
 	
 	wander_circle_radius = 500,
@@ -558,40 +556,42 @@ wander_behaviour = create_steering_behaviour {
 	force_color = rgba(0, 255, 255, 255)
 }
 
+
 obstacle_avoidance_behaviour = create_steering_behaviour (obstacle_avoidance_archetype)
 sensor_avoidance_behaviour = create_steering_behaviour (archetyped(obstacle_avoidance_archetype, {
 	weight = 0,
 	current_target = navigation_target_entity,
-	intervention_time_ms = 400
+	intervention_time_ms = 200
 }))
 
-blue_crosshair_sprite = create_sprite {
-	image = images.crosshair,
-	color = rgba(255, 255, 255, 255)
-}
-
-
-blue_crosshair = create_entity {
-	transform = {},
-	
-	render = {
-		model = blue_crosshair_sprite
-	}
-}
-
+steer_request_fnc = 
+			function()
+				target_entity.transform.current.pos = player.crosshair.transform.current.pos
+					player.body.pathfinding:start_pathfinding(target_entity.transform.current.pos)
+					player.body.steering:clear_behaviours()
+					
+					player.body.steering:add_behaviour(target_seek_behaviour)
+					player.body.steering:add_behaviour(forward_seek_behaviour)
+					player.body.steering:add_behaviour(sensor_avoidance_behaviour)
+					
+					player.body.steering:add_behaviour(wander_behaviour)
+					player.body.steering:add_behaviour(obstacle_avoidance_behaviour)
+			
+			end
+			
 loop_only_info = create_scriptable_info {
 	scripted_events = {
 		[scriptable_component.LOOP] 	=
 			function(message)
 				my_atlas:_bind()
-				blue_crosshair.transform.current.pos = pursuit_behaviour.last_estimated_pursuit_position
 				
 				local myvel = player.body.physics.body:GetLinearVelocity()
 				forward_navigation_entity.transform.current.pos = player.body.transform.current.pos + vec2(myvel.x, myvel.y) * 50
 				
 				if player.body.pathfinding:is_still_pathfinding() == true then
 					navigation_target_entity.transform.current.pos = player.body.pathfinding:get_current_navigation_target()
-				
+					target_entity.transform.current.pos = player.body.pathfinding:get_current_target()
+					
 					obstacle_avoidance_behaviour.enabled = true
 					if sensor_avoidance_behaviour.last_output_force:non_zero() then
 						target_seek_behaviour.enabled = false
@@ -610,9 +610,9 @@ loop_only_info = create_scriptable_info {
 				
 				sensor_avoidance_behaviour.max_intervention_length = (player.body.transform.current.pos - navigation_target_entity.transform.current.pos):length() - 70
 				
-					sensor_avoidance_behaviour.enabled = true
-					obstacle_avoidance_behaviour.enabled = true
-				forward_seek_behaviour.enabled = true
+				--	sensor_avoidance_behaviour.enabled = true
+				--	obstacle_avoidance_behaviour.enabled = true
+				--forward_seek_behaviour.enabled = true
 				
 				if obstacle_avoidance_behaviour.last_output_force:non_zero() then
 					wander_behaviour.wander_current_angle = obstacle_avoidance_behaviour.last_output_force:get_degrees()
@@ -624,20 +624,7 @@ loop_only_info = create_scriptable_info {
 		[scriptable_component.INTENT_MESSAGE] = 
 			function(message)
 				if message.intent == custom_intents.STEERING_REQUEST then
-					target_entity.transform.current.pos = player.crosshair.transform.current.pos
-					player.body.pathfinding:start_pathfinding(target_entity.transform.current.pos)
-					player.body.steering:clear_behaviours()
-					--message.subject.steering:add_behaviour(evasion_behaviour)
-					--message.subject.steering:add_behaviour(pursuit_behaviour)
-					--message.subject.steering:add_behaviour(obstacle_avoidance_behaviour)
-					
-					--player.body.steering:add_behaviour(target_seek_behaviour)
-					--player.body.steering:add_behaviour(forward_seek_behaviour)
-					player.body.steering:add_behaviour(obstacle_avoidance_behaviour)
-					--player.body.steering:add_behaviour(sensor_avoidance_behaviour)
-					
-					player.body.steering:add_behaviour(wander_behaviour)
-					
+					steer_request_fnc()
 				elseif message.intent == custom_intents.SPEED_INCREASE then
 					physics_system.timestep_multiplier = physics_system.timestep_multiplier + 0.05
 				elseif message.intent == custom_intents.SPEED_DECREASE then
@@ -664,5 +651,9 @@ create_entity {
 	}
 }
 
+
 set_zoom_level(world_camera)
 
+steer_request_fnc()
+target_entity.transform.current.pos = vec2(-300, 1000)
+player.body.pathfinding:start_pathfinding(target_entity.transform.current.pos)
