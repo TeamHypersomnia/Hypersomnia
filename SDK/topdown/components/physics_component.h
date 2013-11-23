@@ -8,6 +8,8 @@
 namespace components {
 	struct physics : public augmentations::entity_system::component {
 		b2Body* body;
+		std::vector <augmentations::vec2<>> original_model;
+
 		physics(b2Body* body = nullptr) : body(body) {}
 	};
 }
