@@ -5,6 +5,8 @@
 #include "../components/physics_component.h"
 #include "../systems/physics_system.h"
 
+#include "entity_system/entity.h"
+
 void set_density(b2Body* body, float density) {
 	for (b2Fixture* it = body->GetFixtureList(); it; it = it->GetNext()) {
 		it->SetDensity(density);
@@ -29,10 +31,19 @@ namespace bindings {
 				luabind::value("b2_kinematicBody", b2_kinematicBody)
 			],
 
+			luabind::class_<physics_system::raycast_output>("raycast_output")
+			.def(luabind::constructor<>())
+			.def_readwrite("intersection", &physics_system::raycast_output::intersection)
+			.def_readwrite("hit", &physics_system::raycast_output::hit)
+			.def_readwrite("normal", &physics_system::raycast_output::normal)
+			.def_readwrite("what_entity", &physics_system::raycast_output::what_entity)
+			,
+
 			luabind::class_<physics_system>("_physics_system")
 			.def_readwrite("timestep_multiplier", &physics_system::timestep_multiplier)
 			.def_readwrite("enable_interpolation", &physics_system::enable_interpolation)
-			,
+			.def("ray_cast", &physics_system::ray_cast_px)
+			, 
 
 			luabind::class_<physics>("physics_component")
 			.def(luabind::constructor<>())
