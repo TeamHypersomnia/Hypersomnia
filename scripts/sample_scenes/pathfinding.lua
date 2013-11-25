@@ -62,29 +62,45 @@ blank_blue = create_sprite {
 	color = rgba(0, 0, 255, 255)
 }
 
-function map_uv_square(texcoords_to_map, lefttop, bottomright)
-	for k, v in pairs(texcoords_to_map) do
-		v.texcoord = vec2(
+function map_uv_square(texcoords_to_map, texture_to_map)
+	local lefttop = vec2()
+	local bottomright = vec2()
+	
+	for i = 0, texcoords_to_map:get_vertex_count()-1 do
+		local v = texcoords_to_map:get_vertex(i).pos
+		if v.x < lefttop.x then lefttop.x = v.x end
+		if v.y < lefttop.y then lefttop.y = v.y end
+		if v.x > bottomright.x then bottomright.x = v.x end
+		if v.y > bottomright.y then bottomright.y = v.y end
+	end
+	print(lefttop.x, lefttop.y)
+	print(bottomright.x, bottomright.y)
+	
+	for i = 0, texcoords_to_map:get_vertex_count()-1 do
+		local v = texcoords_to_map:get_vertex(i)
+		v:set_texcoord (vec2(
 		(v.pos.x - lefttop.x) / (bottomright.x-lefttop.x),
 		(v.pos.y - lefttop.y) / (bottomright.y-lefttop.y)
-		)
+		), texture_to_map)
+		
+		--print(v.texcoord.x, v.texcoord.y)
 	end
 end
 
 point_archetype = {
-	image = images.blank,
-	color = rgba(0, 30, 30, 255),
+	image = images.metal,
+	color = rgba(255, 255, 255, 255),
 	texcoord = vec2(0, 0)
 }
 
-size_mult = vec2(80, -80)*3.33
-
+--size_mult = vec2(80, -80)*3.33
+size_mult = 10
 map_points = {
 	square = {
-		U = archetyped(point_archetype, { pos = vec2(-5.1, 6.29) * size_mult }),
-		V = archetyped(point_archetype, { pos = vec2(-5.16, -4.68) * size_mult, image = images.blank, texcoord = vec2(0, 1), color = rgba(0, 150, 150, 255) }),
-		W = archetyped(point_archetype, { pos = vec2(8.19, -4.39) * size_mult, image = images.blank, texcoord = vec2(1, 1), color = rgba(0, 150, 150, 255) }),
-		Z = archetyped(point_archetype, { pos = vec2(8.19, 6.87) * size_mult, image = images.blank, texcoord = vec2(1, 0), color = rgba(0, 150, 150, 255) })
+		U = archetyped(point_archetype, { pos = vec2(-5.1, 6.29) * size_mult, color = rgba(0, 150, 150, 255) }),
+		V = archetyped(point_archetype, { pos = vec2(-5.16, -4.68) * size_mult, color = rgba(0, 150, 150, 255) }),
+		W = archetyped(point_archetype, { pos = vec2(8.19, -4.39) * size_mult,  color = rgba(0, 150, 150, 255) }),
+		Z = archetyped(point_archetype, { pos = vec2(8.19, 6.87) * size_mult, color = rgba(0, 150, 150, 255) })
 	},
 	
 	interior = {
@@ -111,37 +127,56 @@ map_points = {
 	}
 }
 
-map_uv_square(map_points.interior, map_points.square.U.pos, map_points.square.W.pos)
+--environment_poly = create_polygon
+--{
+--	map_points.square.V,
+--	map_points.interior.B,
+--	map_points.interior.A,
+--	map_points.interior.T,
+--	map_points.interior.S,
+--	map_points.interior.R,
+--	map_points.interior.Q,
+--	map_points.interior.P,
+--	map_points.interior.O,
+--	map_points.interior.N,
+--	map_points.interior.M,
+--	map_points.interior.L,
+--	map_points.interior.K,
+--	map_points.interior.J,
+--	map_points.interior.I,
+--	map_points.interior.H,
+--	map_points.interior.G,
+--	map_points.interior.F,
+--	map_points.interior.E,
+--	map_points.interior.D,
+--	map_points.interior.C,
+--	map_points.interior.B,
+--	map_points.square.V,
+--	map_points.square.W,
+--	map_points.square.Z,
+--	map_points.square.U
+--}
 
-environment_poly = create_polygon
-{
-	map_points.square.V,
-	map_points.interior.B,
-	map_points.interior.A,
-	map_points.interior.T,
-	map_points.interior.S,
-	map_points.interior.R,
-	map_points.interior.Q,
-	map_points.interior.P,
-	map_points.interior.O,
-	map_points.interior.N,
-	map_points.interior.M,
-	map_points.interior.L,
-	map_points.interior.K,
-	map_points.interior.J,
-	map_points.interior.I,
-	map_points.interior.H,
-	map_points.interior.G,
-	map_points.interior.F,
-	map_points.interior.E,
-	map_points.interior.D,
-	map_points.interior.C,
-	map_points.interior.B,
-	map_points.square.V,
-	map_points.square.W,
-	map_points.square.Z,
-	map_points.square.U
+environment_poly = create_polygon_with_holes {
+	subject = {
+		vec2(-200, -200) * size_mult, 
+		vec2(200, -200) * size_mult, 
+		vec2(200, 200) * size_mult, 
+		vec2(-200, 200) * size_mult 
+	},
+	
+	holes = {
+		{
+			vec2(-100, -100) * size_mult, 
+			vec2(100, -100) * size_mult, 
+			vec2(100, 100) * size_mult, 
+			vec2(-100, 100) * size_mult 
+		}
+	}
 }
+
+map_uv_square(environment_poly, images.metal)
+
 
 small_box_archetype = {
 	transform = {

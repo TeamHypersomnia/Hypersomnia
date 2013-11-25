@@ -11,6 +11,9 @@
 #include "utility/sorted_vector.h"
 #include "poly2tri/poly2tri.h"
 
+#include "3rdparty/polyclipper/clipper.hpp"
+#include "3rdparty/polypartition/polypartition.h"
+
 namespace resources {
 	void renderable::make_rect(vec2<> pos, vec2<> size, float angle, vec2<> v[4]) {
 		vec2<> origin(pos + (size / 2.f));
@@ -72,10 +75,10 @@ namespace resources {
 			tex->get_uv(t2.vertices[i].texcoord);
 		}
 
-		t1.vertices[0].position = t2.vertices[0].position = vec2<int>(v[0]);
-		t2.vertices[1].position = vec2<int>(v[1]);
-		t1.vertices[1].position = t2.vertices[2].position = vec2<int>(v[2]);
-		t1.vertices[2].position = vec2<int>(v[3]);
+		t1.vertices[0].pos = t2.vertices[0].pos = vec2<int>(v[0]);
+		t2.vertices[1].pos = vec2<int>(v[1]);
+		t1.vertices[1].pos = t2.vertices[2].pos = vec2<int>(v[2]);
+		t1.vertices[2].pos = vec2<int>(v[3]);
 
 		triangles.emplace_back(t1);
 		triangles.emplace_back(t2);
@@ -147,8 +150,10 @@ namespace resources {
 
 		int offset = model.size();
 		for (size_t i = 0; i < polygon.vertices.size(); ++i) {
-			points.push_back(Point(polygon.vertices[i].position.x, polygon.vertices[i].position.y, i + offset));
+			points.push_back(Point(polygon.vertices[i].pos.x, polygon.vertices[i].pos.y, i + offset));
 			model.push_back(polygon.vertices[i]);
+			
+			original_model.push_back(polygon.vertices[i].pos);
 		}
 
 		for (auto& v : points) 
@@ -166,11 +171,81 @@ namespace resources {
 		}
 	}
 
+	void polygon::add_concave_set(const concave_set& concaves) {
+		ClipperLib::Polygons subject(1), difference(concaves.holes.size()), solution;
+		
+		for (auto& v : concaves.vertices) {
+			subject[0].push_back(ClipperLib::IntPoint(v.x, v.y));
+		}
+		
+		std::reverse(subject[0].begin(), subject[0].end());
+
+		for (size_t i = 0; i < concaves.holes.size(); ++i) {
+			for (size_t j = 0; j < concaves.holes[i].size(); ++j)
+				difference[i].push_back(ClipperLib::IntPoint(concaves.holes[i][j].x, concaves.holes[i][j].y));
+		}
+
+		ClipperLib::Clipper Clipper;
+		Clipper.AddPolygons(subject, ClipperLib::ptSubject);
+		Clipper.AddPolygons(difference, ClipperLib::ptClip);
+		Clipper.StrictlySimple(true);
+		Clipper.Execute(ClipperLib::ctDifference, solution, ClipperLib::pftNonZero, ClipperLib::pftNonZero);
+
+		std::reverse(solution[0].begin(), solution[0].end());
+
+		list<TPPLPoly> inpolys, outpolys;
+		TPPLPoly subject_poly;
+		subject_poly.Init(solution[0].size());
+		subject_poly.SetHole(false);
+		
+		for (size_t i = 0; i < solution[0].size(); ++i) {
+			vec2<> p(solution[0][i].X, solution[0][i].Y);
+			subject_poly[i].x = p.x;
+			subject_poly[i].y = -p.y;
+
+			original_model.push_back(p);
+		}
+
+		for (size_t i = 1; i < solution.size(); ++i) {
+			TPPLPoly hole_poly;
+			hole_poly.Init(solution[i].size());
+			hole_poly.SetHole(true);
+			std::reverse(solution[i].begin(), solution[i].end());
+
+			basic_polygon new_hole;
+
+			for (size_t j = 0; j < solution[i].size(); ++j) {
+				vec2<> p(solution[i][j].X, solution[i][j].Y);
+				hole_poly[j].x = p.x;
+				hole_poly[j].y = -p.y;
+
+				new_hole.push_back(p);
+			}
+
+			holes.push_back(new_hole);
+			inpolys.push_back(hole_poly);
+		}
+		
+		inpolys.push_back(subject_poly);
+
+		TPPLPartition partition;
+		partition.Triangulate_EC(&inpolys, &outpolys);
+		
+		int index = 0;
+
+		for (auto& out : outpolys) {
+			for (size_t j = 0; j < out.GetNumPoints(); ++j) {
+				model.push_back(vertex(vec2<>(out[j].x, -out[j].y)));
+				indices.push_back(index++);
+			}
+		}
+	}
+
 	std::vector<vec2<>> polygon::get_vertices() {
 		std::vector<vec2<>> out;
 
 		for (auto& v : model) 
-			out.push_back(v.position);
+			out.push_back(v.pos);
 		
 		return std::move(out);
 	}
@@ -184,8 +259,8 @@ namespace resources {
 		
 		auto model_transformed = model;
 		for (auto& v : model_transformed) {
-				v.position.rotate(transform.rotation, vec2<>(0, 0));
-				v.position += transform.pos - camera_pos;
+			v.pos.rotate(transform.rotation, vec2<>(0, 0));
+			v.pos += transform.pos - camera_pos;
 		}
 
 		for (size_t i = 0; i < indices.size(); i += 3) {

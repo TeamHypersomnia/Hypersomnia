@@ -618,6 +618,12 @@
     <ClCompile Include="SDK\topdown\bindings\pathfinding_component_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="3rdparty\polyclipper\clipper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="3rdparty\polypartition\polypartition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="entity_system\component.h">
@@ -1044,6 +1050,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SDK\topdown\components\visibility_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\polyclipper\clipper.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\polypartition\polypartition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -8,7 +8,7 @@
 
 #include "entity_system/entity_system.h"
 
-#include "b2Separator/b2Separator.h"
+#include "3rdparty/polypartition/polypartition.h"
 
 namespace topdown {
 	physics_info::physics_info() 
@@ -23,31 +23,69 @@ namespace topdown {
 	}
 
 	void physics_info::from_renderable(const resources::polygon& p) {
-		std::vector<augmentations::vec2<>> concave_poly;
+		list<TPPLPoly> inpolys, outpolys;
+		TPPLPoly subject_poly;
+		subject_poly.Init(p.original_model.size());
+		subject_poly.SetHole(false);
 
-		for (auto& v : p.model)
-			concave_poly.push_back(augmentations::vec2<>(v.position.x, v.position.y));
+		original_model.insert(original_model.end(), p.original_model.begin(), p.original_model.end());
+		
+		for (auto& hole : p.holes)
+			original_model.insert(original_model.end(), hole.begin(), hole.end());
 
-		add_concave(concave_poly);
+		for (size_t i = 0; i < p.original_model.size(); ++i) {
+			vec2<> p(p.original_model[i]);
+			subject_poly[i].x = p.x;
+			subject_poly[i].y = -p.y;
+		}
+
+		for (size_t i = 0; i < p.holes.size(); ++i) {
+			TPPLPoly hole_poly;
+			hole_poly.Init(p.holes[i].size());
+			hole_poly.SetHole(true);
+
+			for (size_t j = 0; j < p.holes[i].size(); ++j) {
+				vec2<> p(p.holes[i][j]);
+				hole_poly[j].x = p.x;
+				hole_poly[j].y = -p.y;
+			}
+			inpolys.push_back(hole_poly);
+		}
+		inpolys.push_back(subject_poly);
+
+		TPPLPartition partition;
+		partition.ConvexPartition_HM(&inpolys, &outpolys);
+
+		for (auto& out : outpolys) {
+			std::vector < augmentations::vec2 < >> new_convex;
+
+			for (size_t j = 0; j < out.GetNumPoints(); ++j) {
+				new_convex.push_back(vec2<>(out[j].x, -out[j].y));
+			}
+
+			std::reverse(new_convex.begin(), new_convex.end());
+
+			convex_polys.push_back(new_convex);
+		}
 	}
 
 	void physics_info::add_concave(const std::vector < augmentations::vec2 < >> &verts) {
-		original_model.insert(original_model.end(), verts.begin(), verts.end());
-		
-		b2Separator separator;
-		std::vector<std::vector<b2Vec2>> output;
-		auto& input = reinterpret_cast<const std::vector<b2Vec2>&>(verts);
-		int res = separator.Validate(input);
-		
-		if (res != 0) {
-			auto reversed_input = input;
-			std::reverse(reversed_input.begin(), reversed_input.end());
-			separator.calcShapes(reversed_input, output);
-		}
-		else separator.calcShapes(input, output);
-		
-		for (auto& convex : output)
-			convex_polys.push_back(std::vector < augmentations::vec2 < >> (convex.begin(), convex.end()));
+		//original_model.insert(original_model.end(), verts.begin(), verts.end());
+		//
+		//b2Separator separator;
+		//std::vector<std::vector<b2Vec2>> output;
+		//auto& input = reinterpret_cast<const std::vector<b2Vec2>&>(verts);
+		//int res = separator.Validate(input);
+		//
+		//if (res != 0) {
+		//	auto reversed_input = input;
+		//	std::reverse(reversed_input.begin(), reversed_input.end());
+		//	separator.calcShapes(reversed_input, output);
+		//}
+		//else separator.calcShapes(input, output);
+		//
+		//for (auto& convex : output)
+		//	convex_polys.push_back(std::vector < augmentations::vec2 < >> (convex.begin(), convex.end()));
 	}
 
 	void create_physics_component(const physics_info& body_data, augmentations::entity_system::entity& subject, int body_type) {

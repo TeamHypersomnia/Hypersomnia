@@ -60,6 +60,29 @@ function create_polygon(entries)
 	return my_polygon
 end
 
+function create_polygon_with_holes(entries) 
+	local my_polygon = polygon()
+	local my_concave_set = concave_set()
+	
+	for k, vert in pairs(entries.subject) do
+		my_concave_set.vertices:add_vertex(vert)
+	end
+	
+	for k, hole in pairs(entries.holes) do
+		local new_hole = basic_polygon()
+		
+		for j, vert in pairs(hole) do
+			new_hole:add_vertex(vert)
+		end
+		
+		my_concave_set:add_hole(new_hole)
+	end
+	
+	my_polygon:add_concave_set(my_concave_set)
+	
+	return my_polygon
+end
+
 function create_animation(entries) 
 	local my_animation = animation()
 	rewrite(my_animation, entries)

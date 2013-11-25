@@ -45,6 +45,8 @@ namespace resources {
 	//	virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) override;
 	//};
 
+	typedef std::vector<vec2<>> basic_polygon;
+
 	struct polygon : public renderable {
 		/* binding facility */
 		struct concave {
@@ -52,10 +54,32 @@ namespace resources {
 			void add_vertex(const vertex& v);
 		};
 
+		struct concave_set {
+			basic_polygon vertices;
+			std::vector<basic_polygon> holes;
+
+			void add_hole(const basic_polygon& hole) {
+				holes.push_back(hole);
+			}
+		};
+
 		std::vector<vertex> model;
+
+		basic_polygon original_model;
+		std::vector<basic_polygon> holes;
+
 		std::vector<int> indices;
 
+		int get_vertex_count() const {
+			return model.size();
+		}
+
+		vertex& get_vertex(int i) {
+			return model[i];
+		}
+
 		//void add_convex(const std::vector<vertex>&);
+		void add_concave_set(const concave_set&);
 		void add_concave(const concave&);
 		virtual void draw(buffer&, const components::transform::state&, vec2<> camera_pos) override;
 		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) override;
