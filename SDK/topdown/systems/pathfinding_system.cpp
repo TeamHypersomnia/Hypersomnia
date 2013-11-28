@@ -102,6 +102,11 @@ void pathfinding_system::process_entities(world& owner) {
 
 					sensor_direction.normalize();
 
+					/* rotate a bit to avoid non-reachable sensors */
+					float rotation = pathfinding.rotate_navpoints;
+					if (disc.winding == disc.LEFT) rotation = -rotation;
+					sensor_direction.rotate(rotation, vec2<>(0, 0));
+
 					vert.sensor = vert.location + sensor_direction * pathfinding.target_offset;
 					pathfinding.session().undiscovered_vertices.push_back(vert);
 				}
@@ -116,7 +121,13 @@ void pathfinding_system::process_entities(world& owner) {
 
 			/* for every undiscovered navigation point */
 			auto& undiscs = pathfinding.session().undiscovered_vertices;
-			undiscs.erase(std::remove_if(undiscs.begin(), undiscs.end(), [&body, &pathfinding, &body_poly](const components::pathfinding::pathfinding_session::navigation_vertex& nav){
+			undiscs.erase(std::remove_if(undiscs.begin(), undiscs.end(), [&body, &pathfinding, &body_poly, epsilon_distance_the_same_vertex_sq](const components::pathfinding::pathfinding_session::navigation_vertex& nav){
+				/* check again for duplicates, shouldn't happen very often */
+				//for (auto& memorised_discovered : pathfinding.session().discovered_vertices)
+				//	/* if a similiar discovered vertex exists */
+				//	if ((memorised_discovered.location - nav.location).length_sq() < epsilon_distance_the_same_vertex_sq) 
+				//		return true;
+				
 				/* prepare edge shape for sensor to test for overlaps */
 				b2EdgeShape sensor_edge;
 				sensor_edge.Set(nav.location * PIXELS_TO_METERSf, nav.sensor * PIXELS_TO_METERSf);
@@ -150,6 +161,11 @@ void pathfinding_system::process_entities(world& owner) {
 					if there's a line of sight to "navigate_to" it will be visible as target to the newer session
 					and we either way also handle the current session's target so nothing is missing here
 					*/
+
+					/* if we're exploring, we have no target in the first session */
+					if (pathfinding.is_exploring && old_session == pathfinding.session_stack.begin())
+						continue;
+
 					if (body->TestPoint((*old_session).target * PIXELS_TO_METERSf) ||
 						is_point_visible(transform.pos, (*old_session).target, vision.filter)) {
 							/* if there is, roll back to this session */
@@ -166,7 +182,8 @@ void pathfinding_system::process_entities(world& owner) {
 				}
 			}
 
-			if (pathfinding.session_stack.size() == 1) {
+			/* if we're exploring, we have no target in the first session */
+			if (!pathfinding.is_exploring && pathfinding.session_stack.size() == 1) {
 				/* if the target is inside body, it's already found */
 				if (body->TestPoint(pathfinding.session().target * PIXELS_TO_METERSf)) {
 					/* done, target found */
@@ -203,6 +220,11 @@ void pathfinding_system::process_entities(world& owner) {
 				auto& local_minimum_discontinuity = (*std::min_element(vertices.begin(), vertices.end(),
 					[&pathfinding, &transform](const components::pathfinding::pathfinding_session::navigation_vertex& a,
 					const components::pathfinding::pathfinding_session::navigation_vertex& b) {
+						
+						/* if we're exploring, we have no target in the first session */
+						if (pathfinding.is_exploring && pathfinding.session_stack.size() == 1) 
+							return (a.location - transform.pos).length_sq() < (b.location - transform.pos).length_sq();
+
 						auto dist_a = (a.location - pathfinding.session().target).length_sq() + (a.location - transform.pos).length_sq();
 						auto dist_b = (b.location - pathfinding.session().target).length_sq() + (b.location - transform.pos).length_sq();
 						return dist_a < dist_b;

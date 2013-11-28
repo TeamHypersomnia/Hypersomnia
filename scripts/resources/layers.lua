@@ -12,8 +12,9 @@ render_layers = {
 custom_intents = create_inverse_enum {
 	"ZOOM_CAMERA",
 	"STEERING_REQUEST",
+	"EXPLORING_REQUEST",
 	"SPEED_INCREASE",
-	"SPEED_DECREASE",	
+	"SPEED_DECREASE"
 }
 
 -- PHYSICS COLLISION LAYERS --
