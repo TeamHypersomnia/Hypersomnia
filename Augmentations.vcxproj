@@ -323,6 +323,7 @@
     <ClCompile Include="math\vec2d.cpp" />
     <ClCompile Include="SDK\topdown\bindings\pathfinding_component_binding.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SDK\topdown\bindings\visibility_component_binding.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
@@ -483,6 +484,7 @@
     <ClCompile Include="SDK\topdown\resources\vertex.cpp" />
     <ClCompile Include="SDK\topdown\systems\pathfinding_system.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SDK\topdown\systems\visibility_system.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>

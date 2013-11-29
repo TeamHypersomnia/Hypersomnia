@@ -123,10 +123,10 @@ void pathfinding_system::process_entities(world& owner) {
 			auto& undiscs = pathfinding.session().undiscovered_vertices;
 			undiscs.erase(std::remove_if(undiscs.begin(), undiscs.end(), [&body, &pathfinding, &body_poly, epsilon_distance_the_same_vertex_sq](const components::pathfinding::pathfinding_session::navigation_vertex& nav){
 				/* check again for duplicates, shouldn't happen very often */
-				//for (auto& memorised_discovered : pathfinding.session().discovered_vertices)
-				//	/* if a similiar discovered vertex exists */
-				//	if ((memorised_discovered.location - nav.location).length_sq() < epsilon_distance_the_same_vertex_sq) 
-				//		return true;
+				for (auto& memorised_discovered : pathfinding.session().discovered_vertices)
+					/* if a similiar discovered vertex exists */
+					if ((memorised_discovered.location - nav.location).length_sq() < epsilon_distance_the_same_vertex_sq) 
+						return true;
 				
 				/* prepare edge shape for sensor to test for overlaps */
 				b2EdgeShape sensor_edge;
@@ -211,8 +211,8 @@ void pathfinding_system::process_entities(world& owner) {
 					render.lines.push_back(render_system::debug_line(disc.location, disc.sensor, graphics::pixel_32(0, 127, 255, 255)));
 
 				for (auto& disc : pathfinding.session().discovered_vertices)
-					if(disc.sensor.non_zero())
-					render.lines.push_back(render_system::debug_line(disc.location, disc.sensor, graphics::pixel_32(0, 255, 0, 255)));
+					//if(disc.sensor.non_zero())
+					render.lines.push_back(render_system::debug_line(disc.location, disc.location + vec2<>(0, pathfinding.target_offset), graphics::pixel_32(0, 255, 0, 255)));
 			}
 
 			if (!vertices.empty()) {

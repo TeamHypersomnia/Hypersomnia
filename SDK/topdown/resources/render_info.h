@@ -65,7 +65,11 @@ namespace resources {
 
 		std::vector<vertex> model;
 
+		/* the "model" is already triangulated so we need to preserve original model vertex data if for example 
+			we want to form a physics body from this object 
+		*/
 		basic_polygon original_model;
+		/* we keep the original holes data as well */
 		std::vector<basic_polygon> holes;
 
 		std::vector<int> indices;
@@ -78,9 +82,11 @@ namespace resources {
 			return model[i];
 		}
 
-		//void add_convex(const std::vector<vertex>&);
+		/* construct a set of concave polygons from a subject polygon and interior holes */
 		void add_concave_set(const concave_set&);
+		/* construct a set of convex polygons from a potentially concave polygon */
 		void add_concave(const concave&);
+
 		virtual void draw(buffer&, const components::transform::state&, vec2<> camera_pos) override;
 		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) override;
 		virtual std::vector<vec2<>> get_vertices() override;

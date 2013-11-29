@@ -1,3 +1,10 @@
+modes = {
+	DUNGEON = 1, SMALL_DYNAMIC = 2
+}
+
+current_mode = modes.SMALL_DYNAMIC
+
+
 physics_system.timestep_multiplier = 1
 physics_system.enable_interpolation = 0
 
@@ -46,7 +53,7 @@ blank_white = create_sprite {
 
 blank_red = create_sprite {
 	image = images.blank,
-	size_multiplier = vec2(10, 10),
+	size_multiplier = vec2(70, 10),
 	color = rgba(255, 0, 0, 255)
 }
 
@@ -99,8 +106,12 @@ ground_point_archetype = {
 	texcoord = vec2(0, 0)
 }
 
---size_mult = vec2(80, -80)*3.33
-size_mult = vec2(13, -13)
+if current_mode == modes.SMALL_DYNAMIC then
+	size_mult = vec2(80, -80)*3.33
+elseif current_mode == modes.DUNGEON then
+	size_mult = vec2(13, -13)
+end
+
 map_points = {
 	square = {
 		U = archetyped(point_archetype, { pos = vec2(-5.1, 6.29) * size_mult, color = rgba(0, 150, 150, 255) }),
@@ -133,35 +144,37 @@ map_points = {
 	}
 }
 
---environment_poly = create_polygon
---{
---	map_points.square.V,
---	map_points.interior.B,
---	map_points.interior.A,
---	map_points.interior.T,
---	map_points.interior.S,
---	map_points.interior.R,
---	map_points.interior.Q,
---	map_points.interior.P,
---	map_points.interior.O,
---	map_points.interior.N,
---	map_points.interior.M,
---	map_points.interior.L,
---	map_points.interior.K,
---	map_points.interior.J,
---	map_points.interior.I,
---	map_points.interior.H,
---	map_points.interior.G,
---	map_points.interior.F,
---	map_points.interior.E,
---	map_points.interior.D,
---	map_points.interior.C,
---	map_points.interior.B,
---	map_points.square.V,
---	map_points.square.W,
---	map_points.square.Z,
---	map_points.square.U
---}
+if current_mode == modes.SMALL_DYNAMIC then
+environment_poly = create_polygon
+{
+	map_points.square.V,
+	map_points.interior.B,
+	map_points.interior.A,
+	map_points.interior.T,
+	map_points.interior.S,
+	map_points.interior.R,
+	map_points.interior.Q,
+	map_points.interior.P,
+	map_points.interior.O,
+	map_points.interior.N,
+	map_points.interior.M,
+	map_points.interior.L,
+	map_points.interior.K,
+	map_points.interior.J,
+	map_points.interior.I,
+	map_points.interior.H,
+	map_points.interior.G,
+	map_points.interior.F,
+	map_points.interior.E,
+	map_points.interior.D,
+	map_points.interior.C,
+	map_points.interior.B,
+	map_points.square.V,
+	map_points.square.W,
+	map_points.square.Z,
+	map_points.square.U
+}
+end
 
 my_dungeon = {
 
@@ -282,6 +295,7 @@ vec2(417.8184, 91.0816 ) * size_mult,
 vec2(440.3286, 74.7106 ) * size_mult
 }
 
+if current_mode == modes.DUNGEON then
 environment_poly = create_polygon_with_holes {
 	subject = {
 vec2(45.0325, 535.6137) * size_mult,
@@ -323,7 +337,7 @@ vec2(45.0325, 535.6137) * size_mult
 		my_dungeon
 	}
 }
-
+end
 
 ground_poly = create_polygon_with_holes {
 	subject = my_dungeon,
@@ -448,48 +462,49 @@ my_npc_archetype = {
 	}
 }
 
---create_entity (archetyped(small_box_archetype, {
---		transform = {
---			pos = vec2(100, -600),
---			rotation = 0
---		}
---}))
---
---create_entity (archetyped(small_box_archetype, {
---		transform = {
---			pos = vec2(400, -432),
---			rotation = 20
---		}
---}))
---
---create_entity (archetyped(small_box_archetype, {
---		transform = {
---			pos = vec2(800, -432),
---			rotation = -30
---		}
---}))
---
---create_entity (archetyped(big_box_archetype, {
---		transform = {
---			pos = vec2(200+(-170), 340),
---			rotation = 0
---		}
---}))
---
---create_entity (archetyped(big_box_archetype, {
---		transform = {
---			pos = vec2(200+(-500), 300),
---			rotation = 0
---		}
---}))
---	
---create_entity (archetyped(big_box_archetype, {
---	transform = {
---		pos = vec2((-280), 500),
---		rotation = 0
---	}
---}))
+if current_mode == modes.SMALL_DYNAMIC then
+create_entity (archetyped(small_box_archetype, {
+		transform = {
+			pos = vec2(100, -600) + vec2(-1000, 1000),
+			rotation = 0
+		}
+}))
 
+create_entity (archetyped(small_box_archetype, {
+		transform = {
+			pos = vec2(400, -432) + vec2(-1000, 1000),
+			rotation = 20
+		}
+}))
+
+create_entity (archetyped(small_box_archetype, {
+		transform = {
+			pos = vec2(800, -432) + vec2(-1000, 1000),
+			rotation = -30
+		}
+}))
+
+create_entity (archetyped(big_box_archetype, {
+		transform = {
+			pos = vec2(200+(-170), 340) + vec2(-1000, 700),
+			rotation = 0
+		}
+}))
+
+create_entity (archetyped(big_box_archetype, {
+		transform = {
+			pos = vec2(200+(-500), 300) + vec2(-1000, 700),
+			rotation = 0
+		}
+}))
+	
+create_entity (archetyped(big_box_archetype, {
+	transform = {
+		pos = vec2((-280), 500) + vec2(-1000, 700),
+		rotation = 0
+	}
+}))
+end
 
 player = create_entity_group (archetyped(my_npc_archetype, {
 	body = {
@@ -709,14 +724,14 @@ seek_archetype = {
 	behaviour_type = steering_behaviour.SEEK,
 	enabled = true,
 	erase_when_target_reached = false,
-	radius_of_effect = 10,
+	radius_of_effect = 20,
 	force_color = rgba(0, 255, 255, 0)
 }			
 
 target_seek_behaviour = create_steering_behaviour (seek_archetype)
 forward_seek_behaviour = create_steering_behaviour (archetyped(seek_archetype, {
 	current_target = forward_navigation_entity,
-	radius_of_effect = 0
+	radius_of_effect = 20
 }
 ))
 
