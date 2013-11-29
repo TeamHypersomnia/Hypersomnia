@@ -530,7 +530,7 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 			visibility_layers = {
 				[visibility_component.CONTAINMENT] = {
 					square_side = 7000,
-					ignore_discontinuities_shorter_than = 80,
+					ignore_discontinuities_shorter_than = 150,
 					color = rgba(255, 0, 255, 0),
 					filter = filter_obstacle_visibility
 				},	
@@ -538,7 +538,7 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 				[visibility_component.DYNAMIC_PATHFINDING] = {
 					square_side = 7000,
 					color = rgba(0, 255, 255, 120),
-					ignore_discontinuities_shorter_than = 80,
+					ignore_discontinuities_shorter_than = 150,
 					filter = filter_pathfinding_visibility
 				}
 			}
@@ -731,7 +731,7 @@ seek_archetype = {
 target_seek_behaviour = create_steering_behaviour (seek_archetype)
 forward_seek_behaviour = create_steering_behaviour (archetyped(seek_archetype, {
 	current_target = forward_navigation_entity,
-	radius_of_effect = 20
+	radius_of_effect = 0
 }
 ))
 
