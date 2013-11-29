@@ -58,11 +58,9 @@ int main() {
 	gl.set_show(gl.SHOW);
 	window::cursor(false);
 
-	bool quit_flag = false;
-
 	world my_world;
 
-	input_system input(gl, quit_flag);
+	input_system input(gl);
 	steering_system steering;
 	movement_system movement;
 	animation_system animations;
@@ -128,7 +126,7 @@ int main() {
 	std::cout << std::endl;
 	lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
 
-	while (!quit_flag) {
+	while (!input.quit_flag) {
 		my_world.run();
 		
 		auto& scripts_reloaded = resources::script::script_reloader.get_script_files_to_reload();

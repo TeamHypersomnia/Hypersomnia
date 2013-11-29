@@ -25,8 +25,8 @@ a tak to bys musial zapierdalac po wszystkich ktore maja message component a to 
 
 */
 struct input_system : public processing_system_templated<components::input> {
-	bool& quit_flag;
-	
+	int quit_flag;
+
 	void process_entities(world&) override;
 	
 	struct context {
@@ -41,7 +41,7 @@ struct input_system : public processing_system_templated<components::input> {
 	void add_context(context*);
 
 	window::glwindow& input_window;
-	input_system(window::glwindow&, bool& quit_flag);
+	input_system(window::glwindow&);
 
 	/* returns true if successfully mapped raw input to a high level intent */
 	bool post_intent_from_raw_id(world& owner, const context&, unsigned id, bool state = true);

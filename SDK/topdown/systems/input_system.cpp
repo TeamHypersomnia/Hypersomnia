@@ -4,7 +4,7 @@
 
 #include "input_system.h"
 
-input_system::input_system(window::glwindow& input_window, bool& quit_flag) : input_window(input_window), quit_flag(quit_flag) {
+input_system::input_system(window::glwindow& input_window) : input_window(input_window), quit_flag(0) {
 
 }
 
@@ -59,24 +59,12 @@ void input_system::process_entities(world& owner) {
 	unsigned incoming_event = 0;
 
 	while (input_window.poll_events(msg)) {
-
-		if (msg == close) {
-			quit_flag = true;
-		}
-
-		if (msg == key::down) 
-			if (input_window.events.key == ESC)
-				quit_flag = true;
-
 		for (auto it : active_contexts) {
 			if (!it->enabled) continue;
 
 			bool succesfully_mapped = false;
 
 			if (msg == key::down) {
-				if (input_window.events.key == ESC)
-					succesfully_mapped = quit_flag = true;
-				else
 					succesfully_mapped = post_intent_from_raw_id(owner, *it, input_window.events.key, true);
 			}
 

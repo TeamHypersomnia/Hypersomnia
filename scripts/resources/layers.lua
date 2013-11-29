@@ -14,7 +14,8 @@ custom_intents = create_inverse_enum {
 	"STEERING_REQUEST",
 	"EXPLORING_REQUEST",
 	"SPEED_INCREASE",
-	"SPEED_DECREASE"
+	"SPEED_DECREASE",
+	"QUIT"
 }
 
 -- PHYSICS COLLISION LAYERS --

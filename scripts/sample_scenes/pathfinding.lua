@@ -2,7 +2,7 @@ modes = {
 	DUNGEON = 1, SMALL_DYNAMIC = 2
 }
 
-current_mode = modes.SMALL_DYNAMIC
+current_mode = modes.DUNGEON
 
 
 physics_system.timestep_multiplier = 1
@@ -591,6 +591,7 @@ main_context = create_input_context {
 	intents = { 
 		[mouse.raw_motion] 		= intent_message.AIM,
 		[keys.W] 				= intent_message.MOVE_FORWARD,
+		[keys.ESC] 				= custom_intents.QUIT,
 		[keys.S] 				= intent_message.MOVE_BACKWARD,
 		[keys.A] 				= intent_message.MOVE_LEFT,
 		[keys.D] 				= intent_message.MOVE_RIGHT,
@@ -772,7 +773,7 @@ wander_behaviour = create_steering_behaviour {
 	weight = 1, 
 	behaviour_type = steering_behaviour.WANDER,
 	
-	wander_circle_radius = 500,
+	wander_circle_radius = 2000,
 	wander_circle_distance = 2540,
 	wander_displacement_degrees = 5,
 	
@@ -846,7 +847,9 @@ loop_only_info = create_scriptable_info {
 			
 		[scriptable_component.INTENT_MESSAGE] = 
 			function(message)
-				if message.intent == custom_intents.STEERING_REQUEST then
+				if message.intent == custom_intents.QUIT then
+					input_system.quit_flag = 1
+				elseif message.intent == custom_intents.STEERING_REQUEST then
 					steer_request_fnc()
 					player.body.pathfinding:start_pathfinding(target_entity.transform.current.pos)
 				elseif message.intent == custom_intents.EXPLORING_REQUEST then
@@ -871,7 +874,8 @@ create_entity {
 			custom_intents.STEERING_REQUEST,
 			custom_intents.EXPLORING_REQUEST,
 			custom_intents.SPEED_INCREASE,
-			custom_intents.SPEED_DECREASE
+			custom_intents.SPEED_DECREASE,
+			custom_intents.QUIT
 	},
 		
 	scriptable = {
