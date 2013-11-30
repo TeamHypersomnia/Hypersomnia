@@ -13,7 +13,7 @@ namespace bindings {
 			.def_readwrite("draw_triangle_edges", &visibility_system::draw_triangle_edges)
 			.def_readwrite("draw_discontinuities", &visibility_system::draw_discontinuities)
 			.def_readwrite("draw_visible_walls", &visibility_system::draw_visible_walls)
-			.def_readwrite("epsilon_ray_angle_variation", &visibility_system::epsilon_ray_angle_variation)
+			.def_readwrite("epsilon_ray_distance_variation", &visibility_system::epsilon_ray_distance_variation)
 			.def_readwrite("epsilon_distance_vertex_hit", &visibility_system::epsilon_distance_vertex_hit)
 			.def_readwrite("epsilon_threshold_obstacle_hit", &visibility_system::epsilon_threshold_obstacle_hit)
 			,

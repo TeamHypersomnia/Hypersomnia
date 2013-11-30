@@ -13,6 +13,7 @@ custom_intents = create_inverse_enum {
 	"ZOOM_CAMERA",
 	"STEERING_REQUEST",
 	"EXPLORING_REQUEST",
+	"INSTANT_SLOWDOWN",
 	"SPEED_INCREASE",
 	"SPEED_DECREASE",
 	"QUIT"

@@ -13,7 +13,7 @@ visibility_system.draw_discontinuities = 1
 visibility_system.draw_visible_walls = 0
 
 
-visibility_system.epsilon_ray_angle_variation = 0.0001
+visibility_system.epsilon_ray_distance_variation = 0.005
 visibility_system.epsilon_threshold_obstacle_hit = 10
 visibility_system.epsilon_distance_vertex_hit = 2
 
@@ -23,11 +23,11 @@ pathfinding_system.epsilon_max_segment_difference = 4
 pathfinding_system.epsilon_distance_visible_point = 2
 pathfinding_system.epsilon_distance_the_same_vertex = 50
 
-render_system.draw_steering_forces = 0
-render_system.draw_substeering_forces = 0
+render_system.draw_steering_forces = 1
+render_system.draw_substeering_forces = 1
 render_system.draw_velocities = 0
 
-render_system.draw_avoidance_info = 0
+render_system.draw_avoidance_info = 1
 render_system.draw_wandering_info = 0
 
 render_system.visibility_expansion = 1.0
@@ -43,7 +43,6 @@ crosshair_blue = create_sprite {
 	image = images.crosshair,
 	color = rgba(255, 255, 255, 255)
 }
-
 
 blank_white = create_sprite {
 	image = images.blank,
@@ -445,19 +444,47 @@ my_npc_archetype = {
 				rect_size = blank_green.size,
 				
 				angular_damping = 5,
-				linear_damping = 3,
+				linear_damping = 13,
 				
-				fixed_rotation = false,
+				fixed_rotation = true,
 				density = 0.1
 			},
 		},
 		
+		visibility = {
+			visibility_layers = {
+				[visibility_component.CONTAINMENT] = {
+					square_side = 7000,
+					ignore_discontinuities_shorter_than = 150,
+					color = rgba(255, 0, 255, 0),
+					filter = filter_obstacle_visibility
+				},	
+				
+				[visibility_component.DYNAMIC_PATHFINDING] = {
+					square_side = 7000,
+					color = rgba(0, 255, 255, 120),
+					ignore_discontinuities_shorter_than = 150,
+					filter = filter_pathfinding_visibility
+				}
+			}
+		},
+		
+		pathfinding = {
+			enable_backtracking = true,
+			target_offset = 100,
+			rotate_navpoints = 10,
+			distance_navpoint_hit = 2,
+			starting_ignore_discontinuities_shorter_than = 150
+		},
+		
 		movement = {
 			input_acceleration = vec2(30000, 30000),
-			
-			air_resistance = 0.0,
-			max_speed = 3000
+			max_speed = 4300
 		},
+		
+		steering = {
+			max_resultant_force = 4300 -- -1 = no force clamping
+		}
 	}
 }
 
@@ -509,54 +536,11 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 	body = {
 		transform = {},
 		
-		physics = {
-		
-			body_info = {
-				fixed_rotation = true,
-				angular_damping = 5,
-				linear_damping = 13
-			}
-		},
-		
 		input = {
 			intent_message.MOVE_FORWARD,
 			intent_message.MOVE_BACKWARD,
 			intent_message.MOVE_LEFT,
 			intent_message.MOVE_RIGHT
-		},
-	
-		visibility = {
-			visibility_layers = {
-				[visibility_component.CONTAINMENT] = {
-					square_side = 7000,
-					ignore_discontinuities_shorter_than = 150,
-					color = rgba(255, 0, 255, 0),
-					filter = filter_obstacle_visibility
-				},	
-				
-				[visibility_component.DYNAMIC_PATHFINDING] = {
-					square_side = 7000,
-					color = rgba(0, 255, 255, 120),
-					ignore_discontinuities_shorter_than = 150,
-					filter = filter_pathfinding_visibility
-				}
-			}
-		},
-		
-		pathfinding = {
-			enable_backtracking = true,
-			target_offset = 100,
-			rotate_navpoints = 10,
-			distance_navpoint_hit = 2,
-			starting_ignore_discontinuities_shorter_than = 150
-		},
-		
-		movement = {
-			max_speed = 4300
-		},
-		
-		steering = {
-			max_resultant_force = 4300 -- -1 = no force clamping
 		}
 	},
 
@@ -596,6 +580,7 @@ main_context = create_input_context {
 		[keys.D] 				= intent_message.MOVE_RIGHT,
 		[keys.R] 				= custom_intents.STEERING_REQUEST,
 		[keys.E] 				= custom_intents.EXPLORING_REQUEST,
+		[keys.V] 				= custom_intents.INSTANT_SLOWDOWN,
 		[mouse.rdown] 			= intent_message.SWITCH_LOOK,
 		[mouse.rdoubleclick] 	= intent_message.SWITCH_LOOK,
 		[mouse.wheel]			= custom_intents.ZOOM_CAMERA,
@@ -698,9 +683,9 @@ world_camera = create_entity (archetyped(camera_archetype, {
 		custom_intents.ZOOM_CAMERA
 	},
 	
-	--chase = {
-	--	target = player.body
-	--},
+	chase = {
+		target = player.body
+	},
 	
 	scriptable = {
 		available_scripts = scriptable_zoom
@@ -758,7 +743,7 @@ obstacle_avoidance_archetype = {
 }
 
 wander_steering = create_steering {
-	weight = 1, 
+	weight = 0.4, 
 	behaviour_type = wander_behaviour,
 	
 	circle_radius = 2000,
@@ -775,8 +760,9 @@ obstacle_avoidance_steering = create_steering (archetyped(obstacle_avoidance_arc
 
 sensor_avoidance_steering = create_steering (archetyped(obstacle_avoidance_archetype, {
 	weight = 0,
-	intervention_time_ms = 200,
-	force_color = rgba(0, 0, 255, 255)
+	intervention_time_ms = 300,
+	force_color = rgba(0, 0, 255, 255),
+	avoidance_rectangle_width = 0
 }))
 
 behaviour_state(target_seek_steering)
@@ -830,7 +816,7 @@ loop_only_info = create_scriptable_info {
 					end
 				else
 					player_behaviours.target_seeking.enabled = false
-					--player_behaviours.forward_seeking.enabled = false
+					player_behaviours.forward_seeking.enabled = true
 					--player_behaviours.obstacle_avoidance.enabled = false
 				end
 				
@@ -838,7 +824,7 @@ loop_only_info = create_scriptable_info {
 				
 				--	player_behaviours.sensor_avoidance.enabled = true
 				--	player_behaviours.obstacle_avoidance.enabled = true
-				player_behaviours.forward_seeking.enabled = true
+				--player_behaviours.forward_seeking.enabled = true
 				
 				if player_behaviours.obstacle_avoidance.last_output_force:non_zero() then
 					player_behaviours.wandering.current_wander_angle = player_behaviours.obstacle_avoidance.last_output_force:get_degrees()
@@ -857,6 +843,8 @@ loop_only_info = create_scriptable_info {
 				elseif message.intent == custom_intents.EXPLORING_REQUEST then
 					steer_request_fnc()
 					player.body.pathfinding:start_exploring()
+				elseif message.intent == custom_intents.INSTANT_SLOWDOWN then
+					physics_system.timestep_multiplier = 0.005
 				elseif message.intent == custom_intents.SPEED_INCREASE then
 					physics_system.timestep_multiplier = physics_system.timestep_multiplier + 0.05
 				elseif message.intent == custom_intents.SPEED_DECREASE then
@@ -877,6 +865,7 @@ create_entity {
 			custom_intents.EXPLORING_REQUEST,
 			custom_intents.SPEED_INCREASE,
 			custom_intents.SPEED_DECREASE,
+			custom_intents.INSTANT_SLOWDOWN,
 			custom_intents.QUIT
 	},
 		
@@ -889,5 +878,12 @@ create_entity {
 set_zoom_level(world_camera)
 
 --steer_request_fnc()
-target_entity.transform.current.pos = vec2(-300, 1000)
-player.body.pathfinding:start_pathfinding(target_entity.transform.current.pos)
+--target_entity.transform.current.pos = vec2(-300, 1000)
+--player.body.pathfinding:start_pathfinding(target_entity.transform.current.pos)
+--print("no elo kurwa tutaj: " .. player.body.twujstary)
+
+lolinput = input_component()
+lolinput.twujstary = "elo"
+
+referencja = lolinput
+print("no elo kurwa xD " .. type(referencja.twujstary) .. ": " .. referencja.twujstary)
