@@ -16,6 +16,7 @@ namespace components {
 			LOOP
 		};
 		
+		luabind::object script_data;
 		resources::scriptable_info* available_scripts;
 
 		scriptable(resources::scriptable_info* available_scripts = nullptr) : available_scripts(available_scripts) {}

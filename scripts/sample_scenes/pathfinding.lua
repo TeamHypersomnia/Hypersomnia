@@ -12,7 +12,6 @@ visibility_system.draw_triangle_edges = 0
 visibility_system.draw_discontinuities = 1
 visibility_system.draw_visible_walls = 0
 
-
 visibility_system.epsilon_ray_distance_variation = 0.005
 visibility_system.epsilon_threshold_obstacle_hit = 10
 visibility_system.epsilon_distance_vertex_hit = 2
@@ -836,7 +835,7 @@ loop_only_info = create_scriptable_info {
 		[scriptable_component.INTENT_MESSAGE] = 
 			function(message)
 				if message.intent == custom_intents.QUIT then
-					input_system.quit_flag = 1
+					input_system.quit_flag = 1	
 				elseif message.intent == custom_intents.STEERING_REQUEST then
 					steer_request_fnc()
 					player.body.pathfinding:start_pathfinding(target_entity.transform.current.pos)
@@ -844,6 +843,7 @@ loop_only_info = create_scriptable_info {
 					steer_request_fnc()
 					player.body.pathfinding:start_exploring()
 				elseif message.intent == custom_intents.INSTANT_SLOWDOWN then
+					print(message.subject.scriptable.script_data.jemcoupe.twujstary)
 					physics_system.timestep_multiplier = 0.005
 				elseif message.intent == custom_intents.SPEED_INCREASE then
 					physics_system.timestep_multiplier = physics_system.timestep_multiplier + 0.05
@@ -859,7 +859,7 @@ loop_only_info = create_scriptable_info {
 	}
 }
 
-create_entity {
+myloopscript = create_entity {
 	input = {
 			custom_intents.STEERING_REQUEST,
 			custom_intents.EXPLORING_REQUEST,
@@ -870,7 +870,13 @@ create_entity {
 	},
 		
 	scriptable = {
-		available_scripts = loop_only_info
+		available_scripts = loop_only_info,
+		
+		script_data = { 
+		 jemcoupe = {
+			twujstary = "eloguwno2"
+		}
+		}
 	}
 }
 
@@ -882,8 +888,7 @@ set_zoom_level(world_camera)
 --player.body.pathfinding:start_pathfinding(target_entity.transform.current.pos)
 --print("no elo kurwa tutaj: " .. player.body.twujstary)
 
-lolinput = input_component()
-lolinput.twujstary = "elo"
+--myloopscript.twujstary = "elo"
 
-referencja = lolinput
+referencja = myloopscript.scriptable.script_data.jemcoupe
 print("no elo kurwa xD " .. type(referencja.twujstary) .. ": " .. referencja.twujstary)
