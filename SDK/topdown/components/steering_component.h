@@ -8,84 +8,164 @@
 #include "visibility_component.h"
 
 class steering_system;
+class physics_system;
 
 namespace components {
+	struct visibility;
+
 	struct steering : public augmentations::entity_system::component {
-		typedef augmentations::entity_system::entity_ptr target;
-		
+		struct behaviour_state;
+
+		struct object_info {
+			augmentations::vec2<> position, velocity, unit_vel;
+			float speed, max_speed;
+
+			void set_velocity(augmentations::vec2<>);
+			object_info();
+		};
+
+		struct scene {
+			object_info subject; 
+			behaviour_state* state;
+			physics_system* physics;
+			visibility* vision;
+			std::vector<b2Vec2>* shape_verts;
+
+			augmentations::entity_system::entity* subject_entity;
+			
+			scene();
+		};
+
+		struct target_info {
+			object_info info;
+
+			augmentations::vec2<> direction;
+			float distance;
+
+			bool is_set;
+
+			target_info();
+
+			void set(const augmentations::entity_system::entity_ptr&);
+			void set(augmentations::vec2<> position, augmentations::vec2<> velocity = augmentations::vec2<>(0.f, 0.f));
+
+			void calc_direction_distance(const object_info& subject);
+		};
+
 		struct behaviour {
-			enum {
-				SEEK, FLEE, ARRIVAL, PURSUIT, EVASION, OBSTACLE_AVOIDANCE, CONTAINMENT, WANDER
-			} behaviour_type;
-
-			target current_target;
-
-			float max_target_future_prediction_ms;
-			float radius_of_effect;
+			augmentations::graphics::pixel_32 force_color;
 			float max_force_applied;
 			float weight;
-		
+
+			behaviour();
+			virtual augmentations::vec2<> steer(scene) { return augmentations::vec2<>(); }
+		};
+
+		struct directed : behaviour {
+			float radius_of_effect;
+			float max_target_future_prediction_ms;
+
+			directed();
+
+			augmentations::vec2<> predict_interception(const object_info& subject, const target_info& target, bool flee_prediction);
+			virtual augmentations::vec2<> steer(scene) { return augmentations::vec2<>(); }
+		};
+
+		struct avoidance : behaviour {
 			float intervention_time_ms;
 			float max_intervention_length;
 			float avoidance_rectangle_width;
 
-			float decision_duration_ms;
+			int visibility_type;
+			avoidance();
+			
+			struct avoidance_info_output {
+				std::vector<int> intersections;
+				augmentations::vec2<> rightmost_line[2];
+				b2Vec2 avoidance[4];
+			} get_avoidance_info(const scene&);
 
-			bool erase_when_target_reached;
+			void optional_align(scene& in);
+			float get_avoidance_length(const object_info& subject) const;
+			virtual augmentations::vec2<> steer(scene) { return augmentations::vec2<>(); }
+		};
 
+		/* now the actual implementations */
+
+		struct seek : directed {
+			augmentations::vec2<> seek_to(const object_info& subject, const target_info& target) const;
+
+			virtual augmentations::vec2<> steer(scene) override;
+		};
+
+		struct flee : directed {
+			augmentations::vec2<> flee_from(const object_info& subject, const target_info& target) const;
+
+			virtual augmentations::vec2<> steer(scene) override;
+		};
+
+		struct wander : behaviour {
+			float circle_radius;
+			float circle_distance;
+
+			float displacement_degrees;
+
+			wander();
+			virtual augmentations::vec2<> steer(scene) override;
+		};
+
+		struct containment : avoidance {
 			bool randomize_rays;
 			bool only_threats_in_OBB;
 			int ray_count;
-			int visibility_type;
+
+			containment();
+			virtual augmentations::vec2<> steer(scene) override;
+		};
+
+		struct obstacle_avoidance : avoidance {
+			containment* navigation_correction;
+			seek* navigation_seek;
 
 			float ignore_discontinuities_narrower_than;
 
-			float wander_circle_radius;
-			float wander_circle_distance;
-			float wander_current_angle;
-
-			float wander_displacement_degrees;
-
-			augmentations::vec2<> last_output_force;
-
-			bool enabled;
-
-			augmentations::graphics::pixel_32 force_color;
-
-			behaviour() : 
-				weight(1.f), 
-				erase_when_target_reached(true), 
-				enabled(true), 
-				behaviour_type(SEEK), 
-				max_force_applied(-1.f), 
-				max_target_future_prediction_ms(0.f),
-				radius_of_effect(-1.f),
-				intervention_time_ms(0.f),
-				avoidance_rectangle_width(0.f),
-				decision_duration_ms(0.f),
-				ray_count(0),
-				randomize_rays(false),
-				only_threats_in_OBB(false),
-				visibility_type(visibility::OBSTACLE_AVOIDANCE),
-				ignore_discontinuities_narrower_than(1.f), max_intervention_length(-1.f),
-				wander_circle_radius(0.f), wander_circle_distance(0.f),
-				wander_displacement_degrees(0.f),
-				wander_current_angle(0.f)
-			{
-			}
-
-			augmentations::vec2<> last_estimated_pursuit_position;
-		private:
-			friend class steering_system;
+			obstacle_avoidance();
+			virtual augmentations::vec2<> steer(scene) override;
 		};
 
-		std::vector<behaviour*> active_behaviours;
+		struct behaviour_state {
+			/* subject behaviour info */
+			behaviour* subject_behaviour;
+
+			/*
+			if this is not null for avoidance behaviours,
+			these won't align the avoidance rectangle with unit velocity 
+			but with direction to this entity, still using speed and and intervention time to calculate avoidance length
+			*/
+
+			target_info target;
+			augmentations::entity_system::entity_ptr target_from;
+
+			augmentations::vec2<> last_output_force;
+			augmentations::vec2<> last_estimated_target_position;
+			bool enabled;
+
+			float current_wander_angle;
+
+			void update_target_info(const object_info& subject);
+			behaviour_state(behaviour* subject_behaviour = nullptr)
+				: subject_behaviour(subject_behaviour), current_wander_angle(0.f), enabled(true) {}
+		};
+
+		/* the only reason we are storing pointers instead of values are scripts */
+		std::vector<behaviour_state*> active_behaviours;
 		float max_resultant_force;
 
 		steering() : max_resultant_force(-1.f) {}
 
 		/* binding facility */
-		void add_behaviour(behaviour* b) { active_behaviours.push_back(b); }
+		void add_behaviour(behaviour_state* b) { active_behaviours.push_back(b); }
 		void clear_behaviours() { active_behaviours.clear(); }
+
 	};
 }

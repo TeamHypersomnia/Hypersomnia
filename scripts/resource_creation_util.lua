@@ -189,12 +189,15 @@ function set_physics_info(my_body_data, entries)
 	end
 end
 
-function create_steering_behaviour(entries)
-	local my_behaviour = steering_behaviour()
+function create_steering(entries)
+	local my_behaviour = (entries.behaviour_type)()
 	
-	rewrite(my_behaviour, entries, { current_target = true })
+	rewrite(my_behaviour, entries, { behaviour_type = true, current_target = true, optional_alignment = true })
 	if entries.current_target ~= nil then 
 		my_behaviour.current_target:set(entries.current_target) 
+	end
+	if entries.optional_alignment ~= nil then 
+		my_behaviour.optional_alignment:set(entries.optional_alignment) 
 	end
 	return my_behaviour
 end

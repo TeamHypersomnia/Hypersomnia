@@ -7,41 +7,68 @@
 namespace bindings {
 	luabind::scope _steering_component() {
 		return(
+			luabind::class_<steering::target_info>("target_info")
+			.def(luabind::constructor<>())
+			.def("set", (void (steering::target_info::*)(const entity_ptr&))&steering::target_info::set)
+			.def("set", (void (steering::target_info::*)(vec2<>, vec2<>))&steering::target_info::set)
+			.def_readwrite("is_set", &steering::target_info::is_set)
+			,
+			
+			luabind::class_<steering::behaviour_state>("behaviour_state")
+			.def(luabind::constructor<steering::behaviour*>())
+			.def_readwrite("subject_behaviour", &steering::behaviour_state::subject_behaviour)
+			.def_readwrite("target", &steering::behaviour_state::target)
+			.def_readwrite("target_from", &steering::behaviour_state::target_from)
+			.def_readwrite("last_output_force", &steering::behaviour_state::last_output_force)
+			.def_readwrite("last_estimated_target_position", &steering::behaviour_state::last_estimated_target_position)
+			.def_readwrite("enabled", &steering::behaviour_state::enabled)
+			.def_readwrite("current_wander_angle", &steering::behaviour_state::current_wander_angle),
+
 			luabind::class_<steering::behaviour>("steering_behaviour")
 			.def(luabind::constructor<>())
-			.def_readwrite("behaviour_type", &steering::behaviour::behaviour_type)
-			.def_readwrite("current_target", &steering::behaviour::current_target)
-			.def_readwrite("max_force_applied", &steering::behaviour::max_force_applied)
-			.def_readwrite("weight", &steering::behaviour::weight)
-			.def_readwrite("erase_when_target_reached", &steering::behaviour::erase_when_target_reached)
-			.def_readwrite("enabled", &steering::behaviour::enabled)
 			.def_readwrite("force_color", &steering::behaviour::force_color)
-			.def_readwrite("last_estimated_pursuit_position", &steering::behaviour::last_estimated_pursuit_position)
-			.def_readwrite("max_target_future_prediction_ms", &steering::behaviour::max_target_future_prediction_ms)
-			.def_readwrite("radius_of_effect", &steering::behaviour::radius_of_effect)
-			.def_readwrite("intervention_time_ms", &steering::behaviour::intervention_time_ms)
-			.def_readwrite("avoidance_rectangle_width", &steering::behaviour::avoidance_rectangle_width)
-			.def_readwrite("decision_duration_ms", &steering::behaviour::decision_duration_ms)
-			.def_readwrite("randomize_rays", &steering::behaviour::randomize_rays)
-			.def_readwrite("ray_count", &steering::behaviour::ray_count)
-			.def_readwrite("only_threats_in_OBB", &steering::behaviour::only_threats_in_OBB)
-			.def_readwrite("visibility_type", &steering::behaviour::visibility_type)
-			.def_readwrite("last_output_force", &steering::behaviour::last_output_force)
-			.def_readwrite("ignore_discontinuities_narrower_than", &steering::behaviour::ignore_discontinuities_narrower_than)
-			.def_readwrite("max_intervention_length", &steering::behaviour::max_intervention_length)
-			.def_readwrite("wander_circle_radius", &steering::behaviour::wander_circle_radius)
-			.def_readwrite("wander_circle_distance", &steering::behaviour::wander_circle_distance)
-			.def_readwrite("wander_current_angle", &steering::behaviour::wander_current_angle)
-			.def_readwrite("wander_displacement_degrees", &steering::behaviour::wander_displacement_degrees)
-			.enum_("script_type")[
-				luabind::value("SEEK", steering::behaviour::SEEK),
-				luabind::value("FLEE", steering::behaviour::FLEE),
-				luabind::value("PURSUIT", steering::behaviour::PURSUIT),
-				luabind::value("EVASION", steering::behaviour::EVASION),
-				luabind::value("OBSTACLE_AVOIDANCE", steering::behaviour::OBSTACLE_AVOIDANCE),
-				luabind::value("CONTAINMENT", steering::behaviour::CONTAINMENT),
-				luabind::value("WANDER", steering::behaviour::WANDER)
-			],
+			.def_readwrite("max_force_applied", &steering::behaviour::max_force_applied)
+			.def_readwrite("weight", &steering::behaviour::weight),
+
+
+			luabind::class_<steering::directed, steering::behaviour>("directed_behaviour")
+			.def(luabind::constructor<>())
+			.def_readwrite("radius_of_effect", &steering::directed::radius_of_effect)
+			.def_readwrite("max_target_future_prediction_ms", &steering::directed::max_target_future_prediction_ms),
+
+			luabind::class_<steering::avoidance, steering::behaviour>("avoidance_behaviour")
+			.def(luabind::constructor<>())
+			.def_readwrite("intervention_time_ms", &steering::avoidance::intervention_time_ms)
+			.def_readwrite("max_intervention_length", &steering::avoidance::max_intervention_length)
+			.def_readwrite("avoidance_rectangle_width", &steering::avoidance::avoidance_rectangle_width)
+			.def_readwrite("visibility_type", &steering::avoidance::visibility_type)
+			,
+
+			luabind::class_<steering::seek, steering::directed>("seek_behaviour")
+			.def(luabind::constructor<>()),
+
+			luabind::class_<steering::flee, steering::directed>("flee_behaviour")
+			.def(luabind::constructor<>()),
+
+			luabind::class_<steering::wander, steering::behaviour>("wander_behaviour")
+			.def(luabind::constructor<>())
+			.def_readwrite("circle_radius", &steering::wander::circle_radius)
+			.def_readwrite("circle_distance", &steering::wander::circle_distance)
+			.def_readwrite("displacement_degrees", &steering::wander::displacement_degrees)
+			,
+
+			luabind::class_<steering::containment, steering::avoidance>("containment_behaviour")
+			.def(luabind::constructor<>())
+			.def_readwrite("randomize_rays", &steering::containment::randomize_rays)
+			.def_readwrite("only_threats_in_OBB", &steering::containment::only_threats_in_OBB)
+			.def_readwrite("ray_count", &steering::containment::ray_count),
+
+			luabind::class_<steering::obstacle_avoidance, steering::avoidance>("obstacle_avoidance_behaviour")
+			.def(luabind::constructor<>())
+			.def_readwrite("navigation_correction", &steering::obstacle_avoidance::navigation_correction)
+			.def_readwrite("navigation_seek", &steering::obstacle_avoidance::navigation_seek)
+			.def_readwrite("ignore_discontinuities_narrower_than", &steering::obstacle_avoidance::ignore_discontinuities_narrower_than)
+			,
 
 			luabind::class_<steering>("steering_component")
 			.def(luabind::constructor<>())

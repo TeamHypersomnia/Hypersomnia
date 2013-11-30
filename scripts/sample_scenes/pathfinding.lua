@@ -4,7 +4,6 @@ modes = {
 
 current_mode = modes.DUNGEON
 
-
 physics_system.timestep_multiplier = 1
 physics_system.enable_interpolation = 0
 
@@ -24,12 +23,12 @@ pathfinding_system.epsilon_max_segment_difference = 4
 pathfinding_system.epsilon_distance_visible_point = 2
 pathfinding_system.epsilon_distance_the_same_vertex = 50
 
-render_system.draw_steering_forces = 1
-render_system.draw_substeering_forces = 1
+render_system.draw_steering_forces = 0
+render_system.draw_substeering_forces = 0
 render_system.draw_velocities = 0
 
-render_system.draw_avoidance_info = 1
-render_system.draw_wandering_info = 1
+render_system.draw_avoidance_info = 0
+render_system.draw_wandering_info = 0
 
 render_system.visibility_expansion = 1.0
 render_system.max_visibility_expansion_distance = 1
@@ -691,7 +690,7 @@ world_camera = create_entity (archetyped(camera_archetype, {
 		ortho = rect_ltrb(0, 0, config_table.resolution_w, config_table.resolution_h),
 	
 		crosshair = player.crosshair,
-		player = player.body,
+		player = player.body
 	},
 	
 	input = {
@@ -699,9 +698,9 @@ world_camera = create_entity (archetyped(camera_archetype, {
 		custom_intents.ZOOM_CAMERA
 	},
 	
-	chase = {
-		target = player.body
-	},
+	--chase = {
+	--	target = player.body
+	--},
 	
 	scriptable = {
 		available_scripts = scriptable_zoom
@@ -709,97 +708,100 @@ world_camera = create_entity (archetyped(camera_archetype, {
 }))
 
 
-flee_behaviour = create_steering_behaviour {
-	current_target = target_entity,
+flee_steering = create_steering {
+	behaviour_type = flee_behaviour,
 	weight = 1,
-	behaviour_type = steering_behaviour.FLEE,
-	enabled = true,
-	erase_when_target_reached = false,
 	radius_of_effect = 500,
 	force_color = rgba(255, 0, 0, 0)
 }
 		
 seek_archetype = {
-	current_target = navigation_target_entity,
+	behaviour_type = seek_behaviour,
 	weight = 1,
-	behaviour_type = steering_behaviour.SEEK,
-	enabled = true,
-	erase_when_target_reached = false,
 	radius_of_effect = 20,
 	force_color = rgba(0, 255, 255, 0)
 }			
 
-target_seek_behaviour = create_steering_behaviour (seek_archetype)
-forward_seek_behaviour = create_steering_behaviour (archetyped(seek_archetype, {
-	current_target = forward_navigation_entity,
+target_seek_steering = create_steering (seek_archetype)
+forward_seek_steering = create_steering (archetyped(seek_archetype, {
 	radius_of_effect = 0
 }
 ))
 
-containment_behaviour = create_steering_behaviour {
+containment_steering = create_steering {
+	behaviour_type = containment_behaviour,
 	weight = 1, 
-	behaviour_type = steering_behaviour.CONTAINMENT,
 	
 	visibility_type = visibility_component.CONTAINMENT,
 	ray_count = 100,
 	randomize_rays = false,
 	only_threats_in_OBB = false,
 	
-	enabled = true,
-	force_color = rgba(0, 255, 255, 255),
+	force_color = rgba(0, 255, 255, 0),
 	intervention_time_ms = 400,
-	avoidance_rectangle_width = 0,
-	decision_duration_ms = 0
+	avoidance_rectangle_width = 0
 }
 
 obstacle_avoidance_archetype = {
 	weight = 100, 
-	behaviour_type = steering_behaviour.OBSTACLE_AVOIDANCE,
+	behaviour_type = obstacle_avoidance_behaviour,
 	visibility_type = visibility_component.CONTAINMENT,
 	
 	ray_count = 20,
 	randomize_rays = false,
 	only_threats_in_OBB = false,
 	
-	enabled = true,
-	force_color = rgba(0, 255, 255, 255),
+	force_color = rgba(0, 255, 0, 255),
 	intervention_time_ms = 200,
 	avoidance_rectangle_width = 0,
-	decision_duration_ms = 0,
 	ignore_discontinuities_narrower_than = 1
 }
 
-wander_behaviour = create_steering_behaviour {
+wander_steering = create_steering {
 	weight = 1, 
-	behaviour_type = steering_behaviour.WANDER,
+	behaviour_type = wander_behaviour,
 	
-	wander_circle_radius = 2000,
-	wander_circle_distance = 2540,
-	wander_displacement_degrees = 5,
+	circle_radius = 2000,
+	circle_distance = 2540,
+	displacement_degrees = 15,
 	
-	enabled = true,
-	force_color = rgba(0, 255, 255, 255)
+	force_color = rgba(0, 255, 255, 0)
 }
 
-
-obstacle_avoidance_behaviour = create_steering_behaviour (obstacle_avoidance_archetype)
-sensor_avoidance_behaviour = create_steering_behaviour (archetyped(obstacle_avoidance_archetype, {
-	weight = 0,
-	current_target = navigation_target_entity,
-	intervention_time_ms = 200
+obstacle_avoidance_steering = create_steering (archetyped(obstacle_avoidance_archetype, {
+	navigation_seek = target_seek_steering,
+	navigation_correction = containment_steering
 }))
+
+sensor_avoidance_steering = create_steering (archetyped(obstacle_avoidance_archetype, {
+	weight = 0,
+	intervention_time_ms = 200,
+	force_color = rgba(0, 0, 255, 255)
+}))
+
+behaviour_state(target_seek_steering)
+player_behaviours = {
+	target_seeking = behaviour_state(target_seek_steering),
+	forward_seeking = behaviour_state(forward_seek_steering),
+	
+	sensor_avoidance = behaviour_state(sensor_avoidance_steering),
+	wandering = behaviour_state(wander_steering),
+	obstacle_avoidance = behaviour_state(obstacle_avoidance_steering)
+}
+
+player_behaviours.forward_seeking.target_from:set(forward_navigation_entity)
+player_behaviours.target_seeking.target_from:set(navigation_target_entity)
+player_behaviours.sensor_avoidance.target_from:set(navigation_target_entity)
+player_behaviours.wandering.enabled = true
 
 steer_request_fnc = 
 			function()
 				target_entity.transform.current.pos = player.crosshair.transform.current.pos
 					player.body.steering:clear_behaviours()
 					
-					player.body.steering:add_behaviour(target_seek_behaviour)
-					player.body.steering:add_behaviour(forward_seek_behaviour)
-					player.body.steering:add_behaviour(sensor_avoidance_behaviour)
-					
-					player.body.steering:add_behaviour(wander_behaviour)
-					player.body.steering:add_behaviour(obstacle_avoidance_behaviour)
+					for k, v in pairs(player_behaviours) do
+						player.body.steering:add_behaviour(v)
+					end
 			
 			end
 			
@@ -816,30 +818,30 @@ loop_only_info = create_scriptable_info {
 					navigation_target_entity.transform.current.pos = player.body.pathfinding:get_current_navigation_target()
 					target_entity.transform.current.pos = player.body.pathfinding:get_current_target()
 					
-					obstacle_avoidance_behaviour.enabled = true
-					if sensor_avoidance_behaviour.last_output_force:non_zero() then
-						target_seek_behaviour.enabled = false
-						forward_seek_behaviour.enabled = true
-						obstacle_avoidance_behaviour.enabled = true
+					player_behaviours.obstacle_avoidance.enabled = true
+					if player_behaviours.sensor_avoidance.last_output_force:non_zero() then
+						player_behaviours.target_seeking.enabled = false
+						player_behaviours.forward_seeking.enabled = true
+						player_behaviours.obstacle_avoidance.enabled = true
 					else
-						target_seek_behaviour.enabled = true
-						forward_seek_behaviour.enabled = false
-						--obstacle_avoidance_behaviour.enabled = false
+						player_behaviours.target_seeking.enabled = true
+						player_behaviours.forward_seeking.enabled = false
+						--player_behaviours.obstacle_avoidance.enabled = false
 					end
 				else
-					target_seek_behaviour.enabled = false
-					forward_seek_behaviour.enabled = false
-					--obstacle_avoidance_behaviour.enabled = false
+					player_behaviours.target_seeking.enabled = false
+					--player_behaviours.forward_seeking.enabled = false
+					--player_behaviours.obstacle_avoidance.enabled = false
 				end
 				
-				sensor_avoidance_behaviour.max_intervention_length = (player.body.transform.current.pos - navigation_target_entity.transform.current.pos):length() - 70
+				player_behaviours.sensor_avoidance.max_intervention_length = (player.body.transform.current.pos - navigation_target_entity.transform.current.pos):length() - 70
 				
-				--	sensor_avoidance_behaviour.enabled = true
-				--	obstacle_avoidance_behaviour.enabled = true
-				--forward_seek_behaviour.enabled = true
+				--	player_behaviours.sensor_avoidance.enabled = true
+				--	player_behaviours.obstacle_avoidance.enabled = true
+				player_behaviours.forward_seeking.enabled = true
 				
-				if obstacle_avoidance_behaviour.last_output_force:non_zero() then
-					wander_behaviour.wander_current_angle = obstacle_avoidance_behaviour.last_output_force:get_degrees()
+				if player_behaviours.obstacle_avoidance.last_output_force:non_zero() then
+					player_behaviours.wandering.current_wander_angle = player_behaviours.obstacle_avoidance.last_output_force:get_degrees()
 				end
 				
 				return true
