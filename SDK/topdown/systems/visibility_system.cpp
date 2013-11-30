@@ -208,10 +208,8 @@ void visibility_system::process_entities(world& owner) {
 				ray_callbacks[0] and ray_callbacks[1] differ ONLY by an epsilon added / substracted to the angle
 				*/
 
-				vec2<> direction = vertex.second - position_meters;
-				direction.normalize();
 				/* calculate the perpendicular direction to properly apply epsilon_ray_distance_variation */
-				vec2<> perpendicular_cw(-direction.y, direction.x);
+				vec2<> perpendicular_cw = (vertex.second - position_meters).normalize().perpendicular_cw();
 
 				vec2<> targets[2] = {
 					position_meters + ((vertex.second - perpendicular_cw * epsilon_ray_distance_variation * PIXELS_TO_METERSf) - position_meters).normalize() * vision_side_meters / 2 * 1.414213562373095,

@@ -439,8 +439,9 @@ vec2<> steering::obstacle_avoidance::steer(scene in) {
 		/* prepare best candidate for navigation */
 		vec2<> best_candidate;
 
+		auto& discontinuity_info = (*std::min_element(candidates.begin(), candidates.end()));
 		/* get the best candidate for navigation */
-		best_candidate = (*std::min_element(candidates.begin(), candidates.end())).vertex_ptr;
+		best_candidate = discontinuity_info.vertex_ptr;
 
 		/* debug drawing */
 		if (_render->draw_avoidance_info) {
@@ -471,8 +472,17 @@ vec2<> steering::obstacle_avoidance::steer(scene in) {
 
 		if (navigation_seek)
 			steering += navigation_seek->seek_to(in.subject, navigation_target) * navigation_seek->weight;
-		if (navigation_correction)
-			steering += navigation_correction->steer(in) * navigation_correction->weight;
+		if (navigation_correction) {
+			vec2<> correction = navigation_correction->steer(in);
+			
+			if (correction.non_zero()) {
+				vec2<> perpendicular_cw = in.subject.unit_vel.perpendicular_cw() * in.subject.max_speed;
+
+				correction = discontinuity_info.clockwise ? perpendicular_cw : -perpendicular_cw;
+			}
+
+			steering += correction * navigation_correction->weight;
+		}
 
 		return steering.normalize() * in.subject.max_speed;
 	}

@@ -196,6 +196,10 @@ namespace augmentations {
 			y *= inv_len;
 			return *this;
 		}
+
+		vec2 perpendicular_cw() {
+			return vec2(-y, x);
+		}
 		
 		template<class t>
 		vec2& damp(t len) {
@@ -229,7 +233,7 @@ namespace augmentations {
 		}
 
 		bool non_zero() const {
-			return x != type(0) || y != type(0);
+			return std::abs(x) > std::numeric_limits<type>::epsilon() || std::abs(y) > std::numeric_limits<type>::epsilon();
 		}
 		
 		vec2 operator-() { return vec2(x * -1, y * -1); }
