@@ -180,6 +180,10 @@ void pathfinding_system::process_entities(world& owner) {
 				/* check if there's a line of sight */
 				if (is_point_visible(transform.pos, pathfinding.session().target, vision.filter)) {
 					/* if there is, navigate directly to target */
+
+					pathfinding.session().discovered_vertices.clear();
+					pathfinding.session().undiscovered_vertices.clear();
+
 					pathfinding.session().navigate_to = pathfinding.session().target;
 					continue;
 				}
