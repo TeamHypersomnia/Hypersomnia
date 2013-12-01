@@ -330,21 +330,20 @@ void visibility_system::process_entities(world& owner) {
 									/* compute the actual intersection point from b2RayCastOutput data */
 									auto actual_intersection = input.p1 + output.fraction * (input.p2 - input.p1);
 
-									/* if the left-handed ray intersected with boundary */
+									new_discontinuity.points.first = vertex.second;
+									new_discontinuity.points.second = actual_intersection;
+
+									/* if the left-handed ray intersected with boundary and thus the right-handed intersected with an obstacle */
 									if (i == 0) {
-										new_discontinuity.points.first = ray_callbacks[1].intersection;
-										new_discontinuity.points.second = ray_callbacks[0].intersection;
 										new_discontinuity.winding = components::visibility::discontinuity::LEFT;
 										new_discontinuity.edge_index = double_rays.size();
-										double_rays.push_back(double_ray(actual_intersection, ray_callbacks[1].intersection, false, true));
+										double_rays.push_back(double_ray(actual_intersection, vertex.second, false, true));
 									}
-									/* if the right-handed ray intersected with boundary */
+									/* if the right-handed ray intersected with boundary and thus the left-handed intersected with an obstacle */
 									else if (i == 1) {
-										new_discontinuity.points.first = ray_callbacks[0].intersection;
-										new_discontinuity.points.second = ray_callbacks[1].intersection;
 										new_discontinuity.winding = components::visibility::discontinuity::RIGHT;
 										new_discontinuity.edge_index = double_rays.size() - 1;
-										double_rays.push_back(double_ray(ray_callbacks[0].intersection, actual_intersection, true, false));
+										double_rays.push_back(double_ray(vertex.second, actual_intersection, true, false));
 									}
 									request.discontinuities.push_back(new_discontinuity);
 

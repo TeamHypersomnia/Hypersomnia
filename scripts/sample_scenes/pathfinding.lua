@@ -2,7 +2,7 @@ modes = {
 	DUNGEON = 1, SMALL_DYNAMIC = 2
 }
 
-current_mode = modes.SMALL_DYNAMIC
+current_mode = modes.DUNGEON
 
 physics_system.timestep_multiplier = 1
 physics_system.enable_interpolation = 0

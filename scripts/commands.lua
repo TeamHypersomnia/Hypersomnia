@@ -1,11 +1,10 @@
 print("Calling commands.lua...")
 --visibility_system.draw_discontinuities = 1
-target_seek_steering.force_color = rgba(255, 255, 255, 255)
-forward_seek_steering.force_color = rgba(0, 255, 255, 255)
-containment_steering.force_color = rgba(255, 0, 0, 255)
-visibility_system.draw_cast_rays = 0
 
-visibility_system.epsilon_ray_distance_variation = 0.01
+physics_system.timestep_multiplier = 0
+
+visibility_system.draw_triangle_edges = 1
+visibility_system.draw_discontinuities = 1
 --print(player.body.transform.current.pos.x)
 --ai_system.draw_triangle_edges = 1
 --ai_system.draw_cast_rays = 0
