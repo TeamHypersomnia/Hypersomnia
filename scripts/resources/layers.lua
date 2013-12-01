@@ -56,10 +56,10 @@ filter_corpses = {
 
 filter_pathfinding_visibility = {
 	categoryBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS, CORPSES),
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS)
+	maskBits = bitor(STATIC_OBJECTS)
 }
 
 filter_obstacle_visibility = {
 	categoryBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS, CORPSES),
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS)
+	maskBits = bitor(OBJECTS, STATIC_OBJECTS, CHARACTERS)
 }

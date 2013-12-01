@@ -1,37 +1,31 @@
-modes = {
-	DUNGEON = 1, SMALL_DYNAMIC = 2
-}
-
-current_mode = modes.SMALL_DYNAMIC
-
 physics_system.timestep_multiplier = 1
-physics_system.enable_interpolation = 0
+physics_system.enable_interpolation = 1
 
 visibility_system.draw_cast_rays = 0
 visibility_system.draw_triangle_edges = 0
-visibility_system.draw_discontinuities = 1
+visibility_system.draw_discontinuities = 0
 visibility_system.draw_visible_walls = 0
 
 visibility_system.epsilon_ray_distance_variation = 0.005
 visibility_system.epsilon_threshold_obstacle_hit = 10
 visibility_system.epsilon_distance_vertex_hit = 2
 
-pathfinding_system.draw_memorised_walls = 1
-pathfinding_system.draw_undiscovered = 1
+pathfinding_system.draw_memorised_walls = 0
+pathfinding_system.draw_undiscovered = 0
 pathfinding_system.epsilon_max_segment_difference = 4
 pathfinding_system.epsilon_distance_visible_point = 2
 pathfinding_system.epsilon_distance_the_same_vertex = 50
 
-render_system.draw_steering_forces = 1
-render_system.draw_substeering_forces = 1
+render_system.draw_steering_forces = 0
+render_system.draw_substeering_forces = 0
 render_system.draw_velocities = 0
 
-render_system.draw_avoidance_info = 1
+render_system.draw_avoidance_info = 0
 render_system.draw_wandering_info = 0
 
 render_system.visibility_expansion = 1.0
 render_system.max_visibility_expansion_distance = 1
-render_system.draw_visibility = 1
+render_system.draw_visibility = 0
 
 crosshair_sprite = create_sprite {
 	image = images.crosshair,
@@ -77,8 +71,6 @@ function map_uv_square(texcoords_to_map, texture_to_map)
 		if v.x > bottomright.x then bottomright.x = v.x end
 		if v.y > bottomright.y then bottomright.y = v.y end
 	end
-	print(lefttop.x, lefttop.y)
-	print(bottomright.x, bottomright.y)
 	
 	for i = 0, texcoords_to_map:get_vertex_count()-1 do
 		local v = texcoords_to_map:get_vertex(i)
@@ -101,76 +93,7 @@ ground_point_archetype = {
 	texcoord = vec2(0, 0)
 }
 
-if current_mode == modes.SMALL_DYNAMIC then
-	size_mult = vec2(80, -80)*3.33
-elseif current_mode == modes.DUNGEON then
-	size_mult = vec2(13, -13)
-end
-
-map_points = {
-	square = {
-		U = archetyped(point_archetype, { pos = vec2(-5.1, 6.29) * size_mult, color = rgba(0, 150, 150, 255) }),
-		V = archetyped(point_archetype, { pos = vec2(-5.16, -4.68) * size_mult, color = rgba(0, 150, 150, 255) }),
-		W = archetyped(point_archetype, { pos = vec2(8.19, -4.39) * size_mult,  color = rgba(0, 150, 150, 255) }),
-		Z = archetyped(point_archetype, { pos = vec2(8.19, 6.87) * size_mult, color = rgba(0, 150, 150, 255) })
-	},
-	
-	interior = {
-		A = archetyped(point_archetype, { pos = vec2(-3, -2) 		 * size_mult }),
-		B = archetyped(point_archetype, { pos = vec2(-3.13, -3.49)  * size_mult }),
-		C = archetyped(point_archetype, { pos = vec2(7.06, -3.33)  	* size_mult }),
-		D = archetyped(point_archetype, { pos = vec2(7.1, 5.74)  	* size_mult }),
-		E = archetyped(point_archetype, { pos = vec2(-4.32, 5.71)  * size_mult }),
-		F = archetyped(point_archetype, { pos = vec2(-4.22, 3.52)  * size_mult }),
-		G = archetyped(point_archetype, { pos = vec2(-3.2, 3.52) 	 * size_mult }),
-		H = archetyped(point_archetype, { pos = vec2(-3.23, 4.81)  * size_mult }),
-		I = archetyped(point_archetype, { pos = vec2(-2.55, 4.78)  * size_mult }),
-		J = archetyped(point_archetype, { pos = vec2(-2.96, -1.4)  * size_mult }),
-		K = archetyped(point_archetype, { pos = vec2(3.5, -1.62)  * size_mult }),
-		L = archetyped(point_archetype, { pos = vec2(3.44, 1.76)  * size_mult }),
-		M = archetyped(point_archetype, { pos = vec2(3.78, 1.72)  * size_mult }),
-		N = archetyped(point_archetype, { pos = vec2(3.85, 0)  		* size_mult }),
-		O = archetyped(point_archetype, { pos = vec2(5.01, 0)  		* size_mult }),
-		P = archetyped(point_archetype, { pos = vec2(4.97, 3.84)  * size_mult }),
-		Q = archetyped(point_archetype, { pos = vec2(3.36, 3.54)  * size_mult }),
-		R = archetyped(point_archetype, { pos = vec2(3.43, 4.29)  * size_mult }),
-		S = archetyped(point_archetype, { pos = vec2(5.46, 4.52)  * size_mult }),
-		T = archetyped(point_archetype, { pos = vec2(5.49, -1.94)  * size_mult })
-	}
-}
-
-if current_mode == modes.SMALL_DYNAMIC then
-environment_poly = create_polygon
-{
-	map_points.square.V,
-	map_points.interior.B,
-	map_points.interior.A,
-	map_points.interior.T,
-	map_points.interior.S,
-	map_points.interior.R,
-	map_points.interior.Q,
-	map_points.interior.P,
-	map_points.interior.O,
-	map_points.interior.N,
-	map_points.interior.M,
-	map_points.interior.L,
-	map_points.interior.K,
-	map_points.interior.J,
-	map_points.interior.I,
-	map_points.interior.H,
-	map_points.interior.G,
-	map_points.interior.F,
-	map_points.interior.E,
-	map_points.interior.D,
-	map_points.interior.C,
-	map_points.interior.B,
-	map_points.square.V,
-	map_points.square.W,
-	map_points.square.Z,
-	map_points.square.U
-}
-end
-
+size_mult = vec2(13, -13)
 my_dungeon = {
 
 vec2(440.3286, 74.7106 ) * size_mult,
@@ -290,7 +213,6 @@ vec2(417.8184, 91.0816 ) * size_mult,
 vec2(440.3286, 74.7106 ) * size_mult
 }
 
-if current_mode == modes.DUNGEON then
 environment_poly = create_polygon_with_holes {
 	subject = {
 vec2(45.0325, 535.6137) * size_mult,
@@ -332,7 +254,6 @@ vec2(45.0325, 535.6137) * size_mult
 		my_dungeon
 	}
 }
-end
 
 ground_poly = create_polygon_with_holes {
 	subject = my_dungeon,
@@ -419,6 +340,142 @@ ground = create_entity {
 	}
 }
 
+
+target_entity_archetype = {
+	--render = {
+	--	model = crosshair_sprite,
+	--	layer = render_layers.GUI_OBJECTS
+	--},
+	
+	transform = {} 
+}
+
+target_entity = create_entity(archetyped(target_entity_archetype, {
+	render = { model = crosshair_blue } ,
+	crosshair = {
+			sensitivity = 0
+	}
+}))
+
+flee_steering = create_steering {
+	behaviour_type = flee_behaviour,
+	weight = 1,
+	radius_of_effect = 500,
+	force_color = rgba(255, 0, 0, 0)
+}
+		
+seek_archetype = {
+	behaviour_type = seek_behaviour,
+	weight = 1,
+	radius_of_effect = 20,
+	force_color = rgba(0, 255, 255, 0)
+}			
+
+target_seek_steering = create_steering (seek_archetype)
+forward_seek_steering = create_steering (archetyped(seek_archetype, {
+	radius_of_effect = 0
+}
+))
+
+containment_archetype = {
+	behaviour_type = containment_behaviour,
+	weight = 1, 
+	
+	ray_filter = filter_obstacle_visibility,
+	
+	ray_count = 10,
+	randomize_rays = true,
+	only_threats_in_OBB = false,
+	
+	force_color = rgba(0, 255, 255, 0),
+	intervention_time_ms = 200,
+	avoidance_rectangle_width = 0
+}
+
+containment_steering = create_steering (containment_archetype) 
+
+obstacle_avoidance_archetype = {
+	weight = 100, 
+	behaviour_type = obstacle_avoidance_behaviour,
+	visibility_type = visibility_component.DYNAMIC_PATHFINDING,
+	
+	force_color = rgba(0, 255, 0, 255),
+	intervention_time_ms = 200,
+	avoidance_rectangle_width = 0,
+	ignore_discontinuities_narrower_than = 1
+}
+
+wander_steering = create_steering {
+	weight = 0.4, 
+	behaviour_type = wander_behaviour,
+	
+	circle_radius = 2000,
+	circle_distance = 2540,
+	displacement_degrees = 15,
+	
+	force_color = rgba(0, 255, 255, 0)
+}
+
+obstacle_avoidance_steering = create_steering (archetyped(obstacle_avoidance_archetype, {
+	navigation_seek = target_seek_steering,
+	navigation_correction = containment_steering
+}))
+
+sensor_avoidance_steering = create_steering (archetyped(containment_archetype, {
+	weight = 0,
+	intervention_time_ms = 200,
+	force_color = rgba(0, 0, 255, 255),
+	avoidance_rectangle_width = 0
+}))
+
+
+npc_script_info = create_scriptable_info {
+	scripted_events = {
+		[scriptable_component.LOOP] 	=
+			function(message)
+				local this_entity = message
+				local this_behaviours = this_entity.scriptable.script_data.steering_behaviours
+				local target_entities = this_entity.scriptable.script_data.target_entities
+				
+				my_atlas:_bind()
+				
+				local myvel = this_entity.physics.body:GetLinearVelocity()
+				target_entities.forward.transform.current.pos = this_entity.transform.current.pos + vec2(myvel.x, myvel.y) * 50
+				
+				if this_entity.pathfinding:is_still_pathfinding() or this_entity.pathfinding:is_still_exploring() then
+					target_entities.navigation.transform.current.pos = this_entity.pathfinding:get_current_navigation_target()
+					
+					this_behaviours.obstacle_avoidance.enabled = true
+					if this_behaviours.sensor_avoidance.last_output_force:non_zero() then
+						this_behaviours.target_seeking.enabled = false
+						this_behaviours.forward_seeking.enabled = true
+						this_behaviours.obstacle_avoidance.enabled = true
+					else
+						this_behaviours.target_seeking.enabled = true
+						this_behaviours.forward_seeking.enabled = false
+						--this_behaviours.obstacle_avoidance.enabled = false
+					end
+				else
+					this_behaviours.target_seeking.enabled = false
+					this_behaviours.forward_seeking.enabled = true
+					--this_behaviours.obstacle_avoidance.enabled = false
+				end
+				
+				this_behaviours.sensor_avoidance.max_intervention_length = (this_entity.transform.current.pos - target_entities.navigation.transform.current.pos):length() - 70
+				
+				--	this_behaviours.sensor_avoidance.enabled = true
+				--	player_behaviours.obstacle_avoidance.enabled = true
+				--player_behaviours.forward_seeking.enabled = true
+				
+				if this_behaviours.obstacle_avoidance.last_output_force:non_zero() then
+					this_behaviours.wandering.current_wander_angle = this_behaviours.obstacle_avoidance.last_output_force:get_degrees()
+				end
+				
+				return true
+			end
+	}
+}
+
 my_npc_archetype = {
 	body = {
 		transform = { 
@@ -451,17 +508,19 @@ my_npc_archetype = {
 			visibility_layers = {
 				[visibility_component.DYNAMIC_PATHFINDING] = {
 					square_side = 7000,
-					color = rgba(0, 255, 255, 120),
+					color = rgba(0, 255, 255, 0),
 					ignore_discontinuities_shorter_than = 150,
 					filter = filter_pathfinding_visibility
-				},
-				
-				[visibility_component.CONTAINMENT] = {
-					square_side = 7000,
-					color = rgba(0, 255, 255, 120),
-					ignore_discontinuities_shorter_than = 150,
-					filter = filter_obstacle_visibility
 				}
+				--,
+				--
+				--
+				--[visibility_component.CONTAINMENT] = {
+				--	square_side = 7000,
+				--	color = rgba(0, 255, 255, 120),
+				--	ignore_discontinuities_shorter_than = 100,
+				--	filter = filter_obstacle_visibility
+				--}
 			}
 		},
 		
@@ -479,53 +538,46 @@ my_npc_archetype = {
 		
 		steering = {
 			max_resultant_force = 4300 -- -1 = no force clamping
+		},
+		
+		scriptable = {
+			available_scripts = npc_script_info,
+			
+			script_data = {
+				init_func = function(new_entity) 
+					new_entity.scriptable.script_data.steering_behaviours = {
+						target_seeking = behaviour_state(target_seek_steering),
+						forward_seeking = behaviour_state(forward_seek_steering),
+						
+						sensor_avoidance = behaviour_state(sensor_avoidance_steering),
+						wandering = behaviour_state(wander_steering),
+						obstacle_avoidance = behaviour_state(containment_steering),
+					}
+					
+					new_entity.scriptable.script_data.target_entities = {
+						navigation = create_entity(target_entity_archetype),
+						forward = create_entity(target_entity_archetype)
+					}
+					
+					local targets = new_entity.scriptable.script_data.target_entities
+					
+					local this_behaviours = new_entity.scriptable.script_data.steering_behaviours
+					this_behaviours.forward_seeking.target_from:set(targets.forward)
+					this_behaviours.target_seeking.target_from:set(targets.navigation)
+					this_behaviours.sensor_avoidance.target_from:set(targets.navigation)
+				end,
+				
+				refresh_behaviours = function(this_entity)
+					this_entity.steering:clear_behaviours()
+					
+					for k, v in pairs(this_entity.scriptable.script_data.steering_behaviours) do
+						this_entity.steering:add_behaviour(v)
+					end
+				end
+			}
 		}
 	}
 }
-
-if current_mode == modes.SMALL_DYNAMIC then
-create_entity (archetyped(small_box_archetype, {
-		transform = {
-			pos = vec2(100, -600) + vec2(-1000, 1000),
-			rotation = 0
-		}
-}))
-
-create_entity (archetyped(small_box_archetype, {
-		transform = {
-			pos = vec2(400, -432) + vec2(-1000, 1000),
-			rotation = 20
-		}
-}))
-
-create_entity (archetyped(small_box_archetype, {
-		transform = {
-			pos = vec2(800, -432) + vec2(-1000, 1000),
-			rotation = -30
-		}
-}))
-
-create_entity (archetyped(big_box_archetype, {
-		transform = {
-			pos = vec2(200+(-170), 340) + vec2(-1000, 700),
-			rotation = 0
-		}
-}))
-
-create_entity (archetyped(big_box_archetype, {
-		transform = {
-			pos = vec2(200+(-500), 300) + vec2(-1000, 700),
-			rotation = 0
-		}
-}))
-	
-create_entity (archetyped(big_box_archetype, {
-	transform = {
-		pos = vec2((-280), 500) + vec2(-1000, 700),
-		rotation = 0
-	}
-}))
-end
 
 player = create_entity_group (archetyped(my_npc_archetype, {
 	body = {
@@ -564,6 +616,25 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 		}
 	}
 }))
+
+player.body.scriptable.script_data.init_func(player.body)
+
+npc_count = 10
+my_npcs = {}
+
+for i=1, npc_count do
+	my_npcs[i] = create_entity_group (archetyped(my_npc_archetype, {
+		body = {
+			transform = { pos = vec2(1000, (-2800)) }
+		}
+	}))
+	
+	my_npcs[i].body.scriptable.script_data.init_func(my_npcs[i].body)
+	
+	my_npcs[i].body.scriptable.script_data.refresh_behaviours(my_npcs[i].body)
+	my_npcs[i].body.pathfinding:start_exploring()
+end
+
 
 main_context = create_input_context {
 	intents = { 
@@ -616,24 +687,6 @@ camera_archetype = {
 	}
 }
 
-target_entity_archetype = {
-	render = {
-		model = crosshair_sprite,
-		layer = render_layers.GUI_OBJECTS
-	},
-	
-	transform = {} 
-}
-
-target_entity = create_entity(archetyped(target_entity_archetype, {
-	render = { model = crosshair_blue } ,
-	crosshair = {
-			sensitivity = 0
-	}
-}))
-
-navigation_target_entity = create_entity(archetyped(target_entity_archetype, {}))
-forward_navigation_entity = create_entity(archetyped(target_entity_archetype, {}))
 
 current_zoom_level = 3000
 
@@ -688,149 +741,15 @@ world_camera = create_entity (archetyped(camera_archetype, {
 }))
 
 
-flee_steering = create_steering {
-	behaviour_type = flee_behaviour,
-	weight = 1,
-	radius_of_effect = 500,
-	force_color = rgba(255, 0, 0, 0)
-}
-		
-seek_archetype = {
-	behaviour_type = seek_behaviour,
-	weight = 1,
-	radius_of_effect = 20,
-	force_color = rgba(0, 255, 255, 0)
-}			
-
-target_seek_steering = create_steering (seek_archetype)
-forward_seek_steering = create_steering (archetyped(seek_archetype, {
-	radius_of_effect = 0
-}
-))
-
-containment_archetype = {
-	behaviour_type = containment_behaviour,
-	weight = 1, 
-	
-	ray_filter = filter_obstacle_visibility,
-	
-	ray_count = 10,
-	randomize_rays = true,
-	only_threats_in_OBB = false,
-	
-	force_color = rgba(0, 255, 255, 255),
-	intervention_time_ms = 200,
-	avoidance_rectangle_width = 0
-}
-
-containment_steering = create_steering (containment_archetype) 
-
-obstacle_avoidance_archetype = {
-	weight = 100, 
-	behaviour_type = obstacle_avoidance_behaviour,
-	visibility_type = visibility_component.CONTAINMENT,
-	
-	ray_count = 20,
-	randomize_rays = false,
-	only_threats_in_OBB = false,
-	
-	force_color = rgba(0, 255, 0, 255),
-	intervention_time_ms = 200,
-	avoidance_rectangle_width = 0,
-	ignore_discontinuities_narrower_than = 1
-}
-
-wander_steering = create_steering {
-	weight = 0.4, 
-	behaviour_type = wander_behaviour,
-	
-	circle_radius = 2000,
-	circle_distance = 2540,
-	displacement_degrees = 15,
-	
-	force_color = rgba(0, 255, 255, 0)
-}
-
-obstacle_avoidance_steering = create_steering (archetyped(obstacle_avoidance_archetype, {
-	navigation_seek = target_seek_steering,
-	navigation_correction = containment_steering
-}))
-
-sensor_avoidance_steering = create_steering (archetyped(containment_archetype, {
-	weight = 0,
-	intervention_time_ms = 200,
-	force_color = rgba(0, 0, 255, 0),
-	avoidance_rectangle_width = 0
-}))
-
-behaviour_state(target_seek_steering)
-player_behaviours = {
-	target_seeking = behaviour_state(target_seek_steering),
-	forward_seeking = behaviour_state(forward_seek_steering),
-	
-	sensor_avoidance = behaviour_state(sensor_avoidance_steering),
-	wandering = behaviour_state(wander_steering),
-	obstacle_avoidance = behaviour_state(containment_steering)
-}
-
-player_behaviours.forward_seeking.target_from:set(forward_navigation_entity)
-player_behaviours.target_seeking.target_from:set(navigation_target_entity)
-player_behaviours.sensor_avoidance.target_from:set(navigation_target_entity)
-player_behaviours.wandering.enabled = true
-
 steer_request_fnc = 
 			function()
 				target_entity.transform.current.pos = player.crosshair.transform.current.pos
-					player.body.steering:clear_behaviours()
-					
-					for k, v in pairs(player_behaviours) do
-						player.body.steering:add_behaviour(v)
-					end
-			
+				
+				player.body.scriptable.script_data.refresh_behaviours(player.body)
 			end
 			
 loop_only_info = create_scriptable_info {
-	scripted_events = {
-		[scriptable_component.LOOP] 	=
-			function(message)
-				my_atlas:_bind()
-				
-				local myvel = player.body.physics.body:GetLinearVelocity()
-				forward_navigation_entity.transform.current.pos = player.body.transform.current.pos + vec2(myvel.x, myvel.y) * 50
-				
-				if player.body.pathfinding:is_still_pathfinding() or player.body.pathfinding:is_still_exploring() then
-					navigation_target_entity.transform.current.pos = player.body.pathfinding:get_current_navigation_target()
-					target_entity.transform.current.pos = player.body.pathfinding:get_current_target()
-					
-					player_behaviours.obstacle_avoidance.enabled = true
-					if player_behaviours.sensor_avoidance.last_output_force:non_zero() then
-						player_behaviours.target_seeking.enabled = false
-						player_behaviours.forward_seeking.enabled = true
-						player_behaviours.obstacle_avoidance.enabled = true
-					else
-						player_behaviours.target_seeking.enabled = true
-						player_behaviours.forward_seeking.enabled = false
-						--player_behaviours.obstacle_avoidance.enabled = false
-					end
-				else
-					player_behaviours.target_seeking.enabled = false
-					player_behaviours.forward_seeking.enabled = true
-					--player_behaviours.obstacle_avoidance.enabled = false
-				end
-				
-				player_behaviours.sensor_avoidance.max_intervention_length = (player.body.transform.current.pos - navigation_target_entity.transform.current.pos):length() - 70
-				
-				--	player_behaviours.sensor_avoidance.enabled = true
-				--	player_behaviours.obstacle_avoidance.enabled = true
-				--player_behaviours.forward_seeking.enabled = true
-				
-				if player_behaviours.obstacle_avoidance.last_output_force:non_zero() then
-					player_behaviours.wandering.current_wander_angle = player_behaviours.obstacle_avoidance.last_output_force:get_degrees()
-				end
-				
-				return true
-			end,
-			
+	scripted_events = {	
 		[scriptable_component.INTENT_MESSAGE] = 
 			function(message)
 				if message.intent == custom_intents.QUIT then
@@ -842,7 +761,6 @@ loop_only_info = create_scriptable_info {
 					steer_request_fnc()
 					player.body.pathfinding:start_exploring()
 				elseif message.intent == custom_intents.INSTANT_SLOWDOWN then
-					print(message.subject.scriptable.script_data.jemcoupe.twujstary)
 					physics_system.timestep_multiplier = 0.005
 				elseif message.intent == custom_intents.SPEED_INCREASE then
 					physics_system.timestep_multiplier = physics_system.timestep_multiplier + 0.05

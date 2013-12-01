@@ -192,7 +192,7 @@ end
 function create_steering(entries)
 	local my_behaviour = (entries.behaviour_type)()
 	
-	rewrite(my_behaviour, entries, { behaviour_type = true, current_target = true, optional_alignment = true })
+	recursive_write(my_behaviour, entries, { behaviour_type = true, current_target = true, optional_alignment = true })
 	if entries.current_target ~= nil then 
 		my_behaviour.current_target:set(entries.current_target) 
 	end
