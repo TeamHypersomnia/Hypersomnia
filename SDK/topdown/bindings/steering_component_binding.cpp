@@ -41,7 +41,6 @@ namespace bindings {
 			.def_readwrite("intervention_time_ms", &steering::avoidance::intervention_time_ms)
 			.def_readwrite("max_intervention_length", &steering::avoidance::max_intervention_length)
 			.def_readwrite("avoidance_rectangle_width", &steering::avoidance::avoidance_rectangle_width)
-			.def_readwrite("visibility_type", &steering::avoidance::visibility_type)
 			,
 
 			luabind::class_<steering::seek, steering::directed>("seek_behaviour")
@@ -61,13 +60,16 @@ namespace bindings {
 			.def(luabind::constructor<>())
 			.def_readwrite("randomize_rays", &steering::containment::randomize_rays)
 			.def_readwrite("only_threats_in_OBB", &steering::containment::only_threats_in_OBB)
-			.def_readwrite("ray_count", &steering::containment::ray_count),
+			.def_readwrite("ray_count", &steering::containment::ray_count)
+			.def_readwrite("ray_filter", &steering::containment::ray_filter)
+			,
 
 			luabind::class_<steering::obstacle_avoidance, steering::avoidance>("obstacle_avoidance_behaviour")
 			.def(luabind::constructor<>())
 			.def_readwrite("navigation_correction", &steering::obstacle_avoidance::navigation_correction)
 			.def_readwrite("navigation_seek", &steering::obstacle_avoidance::navigation_seek)
 			.def_readwrite("ignore_discontinuities_narrower_than", &steering::obstacle_avoidance::ignore_discontinuities_narrower_than)
+			.def_readwrite("visibility_type", &steering::obstacle_avoidance::visibility_type)
 			,
 
 			luabind::class_<steering>("steering_component")

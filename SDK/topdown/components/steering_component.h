@@ -76,14 +76,14 @@ namespace components {
 			float max_intervention_length;
 			float avoidance_rectangle_width;
 
-			int visibility_type;
 			avoidance();
 			
 			struct avoidance_info_output {
-				std::vector<int> intersections;
 				augmentations::vec2<> rightmost_line[2];
 				b2Vec2 avoidance[4];
 			} get_avoidance_info(const scene&);
+
+			std::vector<int> check_for_intersections(avoidance_info_output input, const std::vector<visibility::edge>& visibility_edges);
 
 			void optional_align(scene& in);
 			float get_avoidance_length(const object_info& subject) const;
@@ -119,6 +119,8 @@ namespace components {
 			bool only_threats_in_OBB;
 			int ray_count;
 
+			b2Filter ray_filter;
+
 			containment();
 			virtual augmentations::vec2<> steer(scene) override;
 		};
@@ -127,6 +129,7 @@ namespace components {
 			containment* navigation_correction;
 			seek* navigation_seek;
 
+			int visibility_type;
 			float ignore_discontinuities_narrower_than;
 
 			obstacle_avoidance();

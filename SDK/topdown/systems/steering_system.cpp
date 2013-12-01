@@ -25,10 +25,10 @@ steering::scene::scene()
 steering::behaviour::behaviour() : max_force_applied(-1.f), weight(1.f) {}
 steering::directed::directed() : radius_of_effect(-1.f), max_target_future_prediction_ms(-1.f)  {}
 steering::avoidance::avoidance() 
-	: avoidance_rectangle_width(0.f), intervention_time_ms(0.f), max_intervention_length(-1.f), visibility_type(0) {}
+	: avoidance_rectangle_width(0.f), intervention_time_ms(0.f), max_intervention_length(-1.f) {}
 steering::wander::wander() : circle_radius(0.f), circle_distance(0.f), displacement_degrees(0.f) {}
 steering::containment::containment() : ray_count(0), randomize_rays(false), only_threats_in_OBB(false) {}
-steering::obstacle_avoidance::obstacle_avoidance() : ignore_discontinuities_narrower_than(1.f), navigation_correction(nullptr), navigation_seek(nullptr) {}
+steering::obstacle_avoidance::obstacle_avoidance() : ignore_discontinuities_narrower_than(1.f), navigation_correction(nullptr), navigation_seek(nullptr), visibility_type(0) {}
 
 steering::object_info::object_info() : speed(0.f), max_speed(0.f) {}
 
@@ -119,34 +119,37 @@ steering::avoidance::avoidance_info_output steering::avoidance::get_avoidance_in
 	out.rightmost_line[0] = vec2<>(rotated_verts[rightmost].x, rotated_verts[topmost].y).rotate(velocity_angle, vec2<>()) + in.subject.position;
 	out.rightmost_line[1] = vec2<>(rotated_verts[rightmost].x, rotated_verts[bottommost].y).rotate(velocity_angle, vec2<>()) + in.subject.position;
 
+	return out;
+}
+
+std::vector<int> steering::avoidance::check_for_intersections(avoidance_info_output input, const std::vector<visibility::edge>& visibility_edges) {
+	std::vector<int> intersections;
+	
 	/* create b2PolygonShape to check for intersections with edges */
 	b2PolygonShape avoidance_rectangle_shape;
 	b2Vec2 rect_copy[4];
-	std::copy(out.avoidance, out.avoidance + 4, rect_copy);
+	std::copy(input.avoidance, input.avoidance + 4, rect_copy);
 	avoidance_rectangle_shape.Set(rect_copy, 4);
+	
+	/* visibility points are in clockwise order */
 
-	if (in.vision) {
-		/* visibility points are in clockwise order */
-		auto& visibility_edges = in.vision->get_layer(visibility_type).edges;
+	for (size_t i = 0; i < visibility_edges.size(); ++i) {
+		/* create b2EdgeShape representing the outer visibility triangle's edge */
+		b2EdgeShape edge_shape;
+		edge_shape.Set(visibility_edges[i].first, visibility_edges[i].second);
 
-		for (size_t i = 0; i < visibility_edges.size(); ++i) {
-			/* create b2EdgeShape representing the outer visibility triangle's edge */
-			b2EdgeShape edge_shape;
-			edge_shape.Set(visibility_edges[i].first, visibility_edges[i].second);
+		/* we don't need to transform edge or ray since they are in the same frame of reference
+		but we have to prepare dummy b2Transform as an argument for b2TestOverlap
+		*/
+		b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
 
-			/* we don't need to transform edge or ray since they are in the same frame of reference
-			but we have to prepare dummy b2Transform as an argument for b2TestOverlap
-			*/
-			b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
-
-			/* if an edge intersects the avoidance rectangle */
-			if (b2TestOverlap(&avoidance_rectangle_shape, 0, &edge_shape, 0, null_transform, null_transform)) {
-				out.intersections.push_back(i);
-			}
+		/* if an edge intersects the avoidance rectangle */
+		if (b2TestOverlap(&avoidance_rectangle_shape, 0, &edge_shape, 0, null_transform, null_transform)) {
+			intersections.push_back(i);
 		}
 	}
 
-	return out;
+	return intersections;
 }
 
 vec2<> steering::seek::seek_to(const object_info& subject, const target_info& target) const {
@@ -288,7 +291,7 @@ vec2<> steering::containment::steer(scene in) {
 			_render->manually_cleared_lines.push_back(render_system::debug_line(p1, p2, graphics::pixel_32(255, 0, 0, 255)));
 		
 		/* cast the ray and save output */
-		auto output = in.physics->ray_cast_px(p1, p2, &in.vision->get_layer(visibility_type).filter, in.subject_entity);
+		auto output = in.physics->ray_cast_px(p1, p2, &ray_filter, in.subject_entity);
 
 		/* if our ray hits anything */
 		if (output.hit) {
@@ -306,9 +309,23 @@ vec2<> steering::containment::steer(scene in) {
 		}
 	}
 
-	steering.normalize();
-	steering *= in.subject.max_speed;
+	if (steering.non_zero()) {
+		steering.normalize();
+
+		vec2<> perpendicular_cw = in.subject.unit_vel.perpendicular_cw();
+		vec2<> perpendicular_ccw = -perpendicular_cw;
+
+		if (perpendicular_cw.dot(steering) > perpendicular_ccw.dot(steering)) {
+			/* CW is more parallel */
+			steering = perpendicular_cw * in.subject.max_speed;
+		}
+		else steering = perpendicular_ccw * in.subject.max_speed;
+	}
+
 	return steering;
+
+	//steering *= in.subject.max_speed;
+	//return steering;
 }
 
 vec2<> steering::obstacle_avoidance::steer(scene in) {
@@ -365,7 +382,12 @@ vec2<> steering::obstacle_avoidance::steer(scene in) {
 
 	auto avoidance = get_avoidance_info(in);
 
-	for (auto& i : avoidance.intersections) {
+	std::vector<int> intersections;
+
+	if (in.vision) 
+		intersections = check_for_intersections(avoidance, in.vision->get_layer(visibility_type).edges);
+
+	for (auto& i : intersections) {
 		/* navigate to the left end of the edge*/
 		for (int j = i, k = 0; k < edges_num; j = wrap(j - 1), ++k)
 			/* if left-handed vertex of candidate edge and right-handed vertex of previous edge do not match, we have a lateral obstacle vertex */
