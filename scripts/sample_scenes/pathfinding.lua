@@ -86,8 +86,6 @@ function map_uv_square(texcoords_to_map, texture_to_map)
 		(v.pos.x - lefttop.x) / (bottomright.x-lefttop.x),
 		(v.pos.y - lefttop.y) / (bottomright.y-lefttop.y)
 		), texture_to_map)
-		
-		--print(v.texcoord.x, v.texcoord.y)
 	end
 end
 
@@ -347,7 +345,6 @@ ground_poly = create_polygon_with_holes {
 map_uv_square(environment_poly, images.metal)
 map_uv_square(ground_poly, images.background)
 
-
 small_box_archetype = {
 	transform = {
 		pos = vec2(0, 0), rotation = 0
@@ -452,13 +449,6 @@ my_npc_archetype = {
 		
 		visibility = {
 			visibility_layers = {
-				[visibility_component.CONTAINMENT] = {
-					square_side = 7000,
-					ignore_discontinuities_shorter_than = 150,
-					color = rgba(255, 0, 255, 0),
-					filter = filter_obstacle_visibility
-				},	
-				
 				[visibility_component.DYNAMIC_PATHFINDING] = {
 					square_side = 7000,
 					color = rgba(0, 255, 255, 120),
@@ -472,8 +462,7 @@ my_npc_archetype = {
 			enable_backtracking = true,
 			target_offset = 100,
 			rotate_navpoints = 10,
-			distance_navpoint_hit = 2,
-			starting_ignore_discontinuities_shorter_than = 150
+			distance_navpoint_hit = 2
 		},
 		
 		movement = {
@@ -635,9 +624,9 @@ target_entity = create_entity(archetyped(target_entity_archetype, {
 			sensitivity = 0
 	}
 }))
+
 navigation_target_entity = create_entity(archetyped(target_entity_archetype, {}))
 forward_navigation_entity = create_entity(archetyped(target_entity_archetype, {}))
-
 
 current_zoom_level = 3000
 
@@ -716,7 +705,7 @@ containment_steering = create_steering {
 	behaviour_type = containment_behaviour,
 	weight = 1, 
 	
-	visibility_type = visibility_component.CONTAINMENT,
+	visibility_type = visibility_component.DYNAMIC_PATHFINDING,
 	ray_count = 100,
 	randomize_rays = false,
 	only_threats_in_OBB = false,
@@ -729,7 +718,7 @@ containment_steering = create_steering {
 obstacle_avoidance_archetype = {
 	weight = 100, 
 	behaviour_type = obstacle_avoidance_behaviour,
-	visibility_type = visibility_component.CONTAINMENT,
+	visibility_type = visibility_component.DYNAMIC_PATHFINDING,
 	
 	ray_count = 20,
 	randomize_rays = false,
@@ -880,15 +869,4 @@ myloopscript = create_entity {
 	}
 }
 
-
 set_zoom_level(world_camera)
-
---steer_request_fnc()
---target_entity.transform.current.pos = vec2(-300, 1000)
---player.body.pathfinding:start_pathfinding(target_entity.transform.current.pos)
---print("no elo kurwa tutaj: " .. player.body.twujstary)
-
---myloopscript.twujstary = "elo"
-
-referencja = myloopscript.scriptable.script_data.jemcoupe
-print("no elo kurwa xD " .. type(referencja.twujstary) .. ": " .. referencja.twujstary)
