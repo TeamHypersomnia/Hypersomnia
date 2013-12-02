@@ -46,9 +46,24 @@ public:
 		raycast_output() : hit(false), what_fixture(nullptr) {}
 	};
 
-	raycast_output ray_cast   (vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter = 0, entity* ignore_entity = nullptr);
-	raycast_output ray_cast_px(vec2<> p1, vec2<> p2, b2Filter* filter = 0, entity* ignore_entity = nullptr);
+	raycast_output ray_cast(vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter = nullptr, entity* ignore_entity = nullptr);
+	raycast_output ray_cast_px(vec2<> p1, vec2<> p2, b2Filter* filter = nullptr, entity* ignore_entity = nullptr);
+
+	std::set<b2Body*> query_square(vec2<> p1_meters, float side_meters, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
+	std::set<b2Body*> query_square_px(vec2<> p1, float side, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
+	std::set<b2Body*> query_aabb(vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
+	std::set<b2Body*> query_aabb_px(vec2<> p1, vec2<> p2, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
 private:
+	/* callback structure used in QueryAABB function to get all shapes near-by */
+	struct query_aabb_input : b2QueryCallback {
+		void* ignore_userdata;
+		b2Filter* filter;
+		std::set<b2Body*> output;
+
+		query_aabb_input();
+		bool ReportFixture(b2Fixture* fixture) override;
+	};
+
 	struct raycast_input : public b2RayCastCallback {
 		entity* subject;
 		b2Filter* subject_filter;

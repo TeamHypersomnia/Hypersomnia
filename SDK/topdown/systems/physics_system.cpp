@@ -49,6 +49,42 @@ physics_system::raycast_output physics_system::ray_cast_px (vec2<> p1, vec2<> p2
 	return out;
 }
 
+physics_system::query_aabb_input::query_aabb_input() : ignore_userdata(nullptr), filter(nullptr) {}
+
+bool physics_system::query_aabb_input::ReportFixture(b2Fixture* fixture) {
+	if ((b2ContactFilter::ShouldCollide(filter, &fixture->GetFilterData()))
+		&& fixture->GetBody()->GetUserData() != ignore_userdata)
+		output.insert(fixture->GetBody());
+	return true;
+}
+
+std::set<b2Body*> physics_system::query_square(vec2<> p1_meters, float side_meters, b2Filter* filter, void* ignore_userdata) {
+	b2AABB aabb;
+	aabb.lowerBound = p1_meters - side_meters / 2;
+	aabb.upperBound = p1_meters + side_meters / 2;
+	return query_aabb(aabb.lowerBound, aabb.upperBound, filter, ignore_userdata);
+}
+
+std::set<b2Body*> physics_system::query_square_px(vec2<> p1, float side, b2Filter* filter, void* ignore_userdata) {
+	return query_square(p1 * PIXELS_TO_METERSf, side * PIXELS_TO_METERSf, filter, ignore_userdata);
+}
+
+std::set<b2Body*> physics_system::query_aabb(vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter, void* ignore_userdata) {
+	query_aabb_input callback;
+	callback.filter = filter;
+	callback.ignore_userdata = ignore_userdata;
+	b2AABB aabb;
+	aabb.lowerBound = p1_meters;
+	aabb.upperBound = p2_meters;
+
+	b2world.QueryAABB(&callback, aabb);
+	return std::move(callback.output);
+}
+
+std::set<b2Body*> physics_system::query_aabb_px(vec2<> p1, vec2<> p2, b2Filter* filter, void* ignore_userdata) {
+	return query_aabb(p1 * PIXELS_TO_METERSf, p2 * PIXELS_TO_METERSf, filter, ignore_userdata);
+}
+
 void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 	auto fix_a = contact->GetFixtureA();
 	auto fix_b = contact->GetFixtureB();

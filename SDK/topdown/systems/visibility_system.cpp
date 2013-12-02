@@ -13,23 +13,6 @@
 #include <limits>
 #include <set>
 
-/* callback structure used in QueryAABB function to get all shapes near-by */
-struct my_callback : public b2QueryCallback {
-	std::set<b2Body*> bodies;
-	entity* subject;
-	b2Filter* filter;
-
-	my_callback() : subject(nullptr), filter(nullptr) {}
-
-	bool ReportFixture(b2Fixture* fixture) override {
-		if ((b2ContactFilter::ShouldCollide(filter, &fixture->GetFilterData()))
-			&&
-			(entity*) fixture->GetBody()->GetUserData() != subject)
-			bodies.insert(fixture->GetBody());
-		return true;
-	}
-};
-
 template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
@@ -101,13 +84,10 @@ void visibility_system::process_entities(world& owner) {
 			aabb.upperBound = position_meters + vision_side_meters / 2;
 
 			/* get list of all fixtures that intersect with the visibility square */
-			my_callback callback;
-			callback.subject = it;
-			callback.filter = &request.filter;
-			physics.b2world.QueryAABB(&callback, aabb);
+			auto bodies = physics.query_aabb_px(aabb.lowerBound, aabb.upperBound, &request.filter, it);
 
 			/* for every fixture that intersected with the visibility square */
-			for (auto b : callback.bodies) {
+			for (auto b : bodies) {
 				/* get shape vertices from utility that transforms them to current entity's position and rotation in Box2D space */
 				auto verts = topdown::get_transformed_shape_verts(*reinterpret_cast<entity*>(b->GetUserData()));
 				/* for every vertex in given fixture's shape */
