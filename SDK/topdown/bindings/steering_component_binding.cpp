@@ -43,6 +43,17 @@ namespace bindings {
 			.def_readwrite("avoidance_rectangle_width", &steering::avoidance::avoidance_rectangle_width)
 			,
 
+			luabind::class_<steering::flocking, steering::behaviour>("flocking_behaviour")
+			.def(luabind::constructor<>())
+			.def_readwrite("group", &steering::flocking::group)
+			.def_readwrite("square_side", &steering::flocking::square_side)
+			.def_readwrite("field_of_vision_degrees", &steering::flocking::field_of_vision_degrees)
+			,
+
+			luabind::class_<steering::separation, steering::flocking>("separation_behaviour")
+			.def(luabind::constructor<>())
+			,
+
 			luabind::class_<steering::seek, steering::directed>("seek_behaviour")
 			.def(luabind::constructor<>()),
 

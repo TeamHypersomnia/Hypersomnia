@@ -124,6 +124,20 @@ namespace components {
 			containment();
 			virtual augmentations::vec2<> steer(scene) override;
 		};
+		
+		struct flocking : behaviour {
+			b2Filter group;
+			/* works as "radius" */
+			float square_side;
+			float field_of_vision_degrees;
+
+			flocking();
+			virtual augmentations::vec2<> steer(scene) { return augmentations::vec2<>(); }
+		};
+
+		struct separation : flocking {
+			virtual augmentations::vec2<> steer(scene) override;
+		};
 
 		struct obstacle_avoidance : avoidance {
 			containment* navigation_correction;

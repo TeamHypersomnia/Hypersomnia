@@ -1,5 +1,5 @@
 physics_system.timestep_multiplier = 1
-physics_system.enable_interpolation = 1
+physics_system.enable_interpolation = 0
 
 visibility_system.draw_cast_rays = 0
 visibility_system.draw_triangle_edges = 0
@@ -17,7 +17,7 @@ pathfinding_system.epsilon_distance_visible_point = 2
 pathfinding_system.epsilon_distance_the_same_vertex = 50
 
 render_system.draw_steering_forces = 0
-render_system.draw_substeering_forces = 0
+render_system.draw_substeering_forces = 1
 render_system.draw_velocities = 0
 
 render_system.draw_avoidance_info = 0
@@ -379,7 +379,7 @@ forward_seek_steering = create_steering (archetyped(seek_archetype, {
 
 containment_archetype = {
 	behaviour_type = containment_behaviour,
-	weight = 1, 
+	weight = 100, 
 	
 	ray_filter = filter_obstacle_visibility,
 	
@@ -388,7 +388,7 @@ containment_archetype = {
 	only_threats_in_OBB = false,
 	
 	force_color = rgba(0, 255, 255, 0),
-	intervention_time_ms = 200,
+	intervention_time_ms = 240,
 	avoidance_rectangle_width = 0
 }
 
@@ -427,6 +427,16 @@ sensor_avoidance_steering = create_steering (archetyped(containment_archetype, {
 	force_color = rgba(0, 0, 255, 255),
 	avoidance_rectangle_width = 0
 }))
+
+separation_steering = create_steering { 
+	behaviour_type = separation_behaviour,
+	weight = 1,
+	force_color = rgba(255, 0, 0, 255),
+	
+	group = filter_characters_separation,
+	square_side = 250,
+	field_of_vision_degrees = 50
+}
 
 
 npc_script_info = create_scriptable_info {
@@ -552,6 +562,7 @@ my_npc_archetype = {
 						sensor_avoidance = behaviour_state(sensor_avoidance_steering),
 						wandering = behaviour_state(wander_steering),
 						obstacle_avoidance = behaviour_state(containment_steering),
+						separating = behaviour_state(separation_steering)
 					}
 					
 					new_entity.scriptable.script_data.target_entities = {
@@ -619,7 +630,7 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 
 player.body.scriptable.script_data.init_func(player.body)
 
-npc_count = 10
+npc_count = 20
 my_npcs = {}
 
 for i=1, npc_count do

@@ -29,6 +29,7 @@ steering::avoidance::avoidance()
 steering::wander::wander() : circle_radius(0.f), circle_distance(0.f), displacement_degrees(0.f) {}
 steering::containment::containment() : ray_count(0), randomize_rays(false), only_threats_in_OBB(false) {}
 steering::obstacle_avoidance::obstacle_avoidance() : ignore_discontinuities_narrower_than(1.f), navigation_correction(nullptr), navigation_seek(nullptr), visibility_type(0) {}
+steering::flocking::flocking() : field_of_vision_degrees(360.f), square_side(0.f) {}
 
 steering::object_info::object_info() : speed(0.f), max_speed(0.f) {}
 
@@ -194,7 +195,7 @@ vec2<> steering::flee::flee_from(const object_info& in, const target_info& targe
 		else return vec2<>(0.f, 0.f);
 	}
 
-	return target.direction * in.max_speed - in.velocity;
+	return (target.direction * (-1)) * in.max_speed - in.velocity;
 }
 
 vec2<> steering::flee::steer(scene in) {
@@ -533,6 +534,62 @@ vec2<> steering::wander::steer(scene in) {
 	}
 
 	return displacement_force.normalize() * in.subject.max_speed;
+}
+
+vec2<> steering::separation::steer(scene in) {
+	auto bodies = in.physics->query_square_px(in.subject.position, square_side, &group, in.subject_entity);
+
+	/* debug drawing */
+	if (_render->draw_avoidance_info) {
+		b2AABB aabb;
+		aabb.lowerBound = in.subject.position - square_side / 2;
+		aabb.upperBound = in.subject.position + square_side / 2;
+		
+		b2Vec2 whole_vision[] = {
+			aabb.lowerBound,
+			aabb.lowerBound + vec2<>(square_side, 0),
+			aabb.upperBound,
+			aabb.upperBound - vec2<>(square_side, 0)
+		};
+
+		_render->manually_cleared_lines.push_back(render_system::debug_line((vec2<>(whole_vision[0]) + vec2<>(-1.f, 0.f)), (vec2<>(whole_vision[1]) + vec2<>(1.f, 0.f))));
+		_render->manually_cleared_lines.push_back(render_system::debug_line((vec2<>(whole_vision[1]) + vec2<>(0.f, -1.f)), (vec2<>(whole_vision[2]) + vec2<>(0.f, 1.f))));
+		_render->manually_cleared_lines.push_back(render_system::debug_line((vec2<>(whole_vision[2]) + vec2<>(1.f, 0.f)), (vec2<>(whole_vision[3]) + vec2<>(-1.f, 0.f))));
+		_render->manually_cleared_lines.push_back(render_system::debug_line((vec2<>(whole_vision[3]) + vec2<>(0.f, 1.f)), (vec2<>(whole_vision[0]) + vec2<>(0.f, -1.f))));
+	}
+
+	vec2<> center;
+	int body_count = 0;
+	for (auto& body : bodies) {
+		vec2<> direction = ((vec2<>(body->GetPosition()) * METERS_TO_PIXELSf) - in.subject.position);
+		float distance = direction.length();
+
+		/* transform the parallellness to 0.f - 1.f space (0.f - parallel, 1.f - anti-parallel) */
+		float parallellness = 1.f - (((direction / distance).dot(in.subject.unit_vel) + 1.f) / 2.f);
+
+		/* calculate fov parallellness threshold */
+		float threshold = (field_of_vision_degrees / 2.f) / 180.f;
+
+		/* if the body's position is within the field of view, add to the resultant */
+		if (parallellness <= threshold) {
+			center += vec2<>(body->GetPosition()) * METERS_TO_PIXELSf;
+			++body_count;
+		}
+	}
+
+	if (body_count > 0) {
+		center /= body_count;
+
+		flee my_flee;
+		target_info center_average;
+		center_average.set(center);
+		center_average.calc_direction_distance(in.subject);
+
+		return my_flee.flee_from(in.subject, center_average).normalize() * in.subject.max_speed;
+	}
+	else {
+		return vec2<>();
+	}
 }
 
 void steering::behaviour_state::update_target_info(const object_info& subject) {

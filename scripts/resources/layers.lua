@@ -44,6 +44,11 @@ filter_characters = {
 	maskBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS)
 }
 
+filter_characters_separation = {
+	categoryBits = CHARACTERS,
+	maskBits = bitor(CHARACTERS)
+}
+
 filter_bullets = {
 	categoryBits = BULLETS,
 	maskBits = bitor(OBJECTS, STATIC_OBJECTS, CHARACTERS)
