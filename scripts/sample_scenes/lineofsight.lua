@@ -388,22 +388,31 @@ separation_steering = create_steering {
 	field_of_vision_degrees = 50
 }
 
+pursuit_steering = create_steering {
+	behaviour_type = seek_behaviour,
+	weight = 1,
+	radius_of_effect = 20,
+	force_color = rgba(0, 255, 255, 0),
+	
+	max_target_future_prediction_ms = 200
+}
+
 
 npc_script_info = create_scriptable_info {
 	scripted_events = {
 		[scriptable_component.LOOP] 	=
 			function(message)
-				local this_entity = message
-				local this_behaviours = this_entity.scriptable.script_data.steering_behaviours
-				local target_entities = this_entity.scriptable.script_data.target_entities
+				local this = message
+				local this_behaviours = this.scriptable.script_data.steering_behaviours
+				local target_entities = this.scriptable.script_data.target_entities
 				
 				my_atlas:_bind()
 				
-				local myvel = this_entity.physics.body:GetLinearVelocity()
-				target_entities.forward.transform.current.pos = this_entity.transform.current.pos + vec2(myvel.x, myvel.y) * 50
+				local myvel = this.physics.body:GetLinearVelocity()
+				target_entities.forward.transform.current.pos = this.transform.current.pos + vec2(myvel.x, myvel.y) * 50
 				
-				if this_entity.pathfinding:is_still_pathfinding() or this_entity.pathfinding:is_still_exploring() then
-					target_entities.navigation.transform.current.pos = this_entity.pathfinding:get_current_navigation_target()
+				if this.pathfinding:is_still_pathfinding() or this.pathfinding:is_still_exploring() then
+					target_entities.navigation.transform.current.pos = this.pathfinding:get_current_navigation_target()
 					
 					this_behaviours.obstacle_avoidance.enabled = true
 					if this_behaviours.sensor_avoidance.last_output_force:non_zero() then
@@ -421,7 +430,7 @@ npc_script_info = create_scriptable_info {
 					--this_behaviours.obstacle_avoidance.enabled = false
 				end
 				
-				this_behaviours.sensor_avoidance.max_intervention_length = (this_entity.transform.current.pos - target_entities.navigation.transform.current.pos):length() - 70
+				this_behaviours.sensor_avoidance.max_intervention_length = (this.transform.current.pos - target_entities.navigation.transform.current.pos):length() - 70
 				
 				--	this_behaviours.sensor_avoidance.enabled = true
 				--	player_behaviours.obstacle_avoidance.enabled = true
@@ -512,7 +521,8 @@ my_npc_archetype = {
 						sensor_avoidance = behaviour_state(sensor_avoidance_steering),
 						wandering = behaviour_state(wander_steering),
 						obstacle_avoidance = behaviour_state(containment_steering),
-						separating = behaviour_state(separation_steering)
+						separating = behaviour_state(separation_steering),
+						pursuit = behaviour_state(pursuit_steering)
 					}
 					
 					new_entity.scriptable.script_data.target_entities = {
@@ -526,6 +536,9 @@ my_npc_archetype = {
 					this_behaviours.forward_seeking.target_from:set(targets.forward)
 					this_behaviours.target_seeking.target_from:set(targets.navigation)
 					this_behaviours.sensor_avoidance.target_from:set(targets.navigation)
+					
+					this_behaviours.pursuit.enabled = false
+					
 				end,
 				
 				refresh_behaviours = function(this_entity)
