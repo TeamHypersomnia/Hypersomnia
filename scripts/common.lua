@@ -54,3 +54,24 @@ function archetyped(archetype, entries)
 	entries_from_archetypes(archetype, entries, final_entries)
 	return final_entries
 end
+
+function map_uv_square(texcoords_to_map, texture_to_map)
+	local lefttop = vec2()
+	local bottomright = vec2()
+	
+	for i = 0, texcoords_to_map:get_vertex_count()-1 do
+		local v = texcoords_to_map:get_vertex(i).pos
+		if v.x < lefttop.x then lefttop.x = v.x end
+		if v.y < lefttop.y then lefttop.y = v.y end
+		if v.x > bottomright.x then bottomright.x = v.x end
+		if v.y > bottomright.y then bottomright.y = v.y end
+	end
+	
+	for i = 0, texcoords_to_map:get_vertex_count()-1 do
+		local v = texcoords_to_map:get_vertex(i)
+		v:set_texcoord (vec2(
+		(v.pos.x - lefttop.x) / (bottomright.x-lefttop.x),
+		(v.pos.y - lefttop.y) / (bottomright.y-lefttop.y)
+		), texture_to_map)
+	end
+end
