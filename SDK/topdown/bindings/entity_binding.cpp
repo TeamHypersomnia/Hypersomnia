@@ -27,7 +27,7 @@
 namespace bindings {
 	luabind::scope _entity() {
 		return
-			luabind::class_<entity>("entity")
+			luabind::class_<entity>("_entity")
 			.def("clear", &entity::clear)
 
 			.def("add", &entity::add<animate>)

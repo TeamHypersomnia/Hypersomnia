@@ -397,50 +397,101 @@ pursuit_steering = create_steering {
 	max_target_future_prediction_ms = 200
 }
 
+npc_class = { entity = 0 }
+
+function get_scripted(entity)
+	return entity.scriptable.script_data
+end
+
+function init_scripted(this_entity) 
+	this_entity.scriptable.script_data = this_entity.scriptable.script_data:new { entity = this_entity }
+end
+
+function npc_class:new(o)
+	o = o or {}
+	o.steering_behaviours = {
+		target_seeking = behaviour_state(target_seek_steering),
+		forward_seeking = behaviour_state(forward_seek_steering),
+		
+		sensor_avoidance = behaviour_state(sensor_avoidance_steering),
+		wandering = behaviour_state(wander_steering),
+		obstacle_avoidance = behaviour_state(containment_steering),
+		separating = behaviour_state(separation_steering),
+		pursuit = behaviour_state(pursuit_steering)
+	}
+	
+	o.target_entities = {
+		navigation = create_entity(target_entity_archetype),
+		forward = create_entity(target_entity_archetype)
+	}
+		
+	o.steering_behaviours.forward_seeking.target_from:set(o.target_entities.forward)
+	o.steering_behaviours.target_seeking.target_from:set(o.target_entities.navigation)
+	o.steering_behaviours.sensor_avoidance.target_from:set(o.target_entities.navigation)
+	
+	o.steering_behaviours.pursuit.enabled = false
+		
+    setmetatable(o, self)
+    self.__index = self
+    return o
+end
+
+function npc_class:refresh_behaviours() 
+	self.entity.steering:clear_behaviours()
+	
+	for k, v in pairs(self.steering_behaviours) do
+		self.entity.steering:add_behaviour(v)
+	end
+end
+
+function npc_class:loop()
+	local entity = self.entity
+	local behaviours = self.steering_behaviours
+	local target_entities = self.target_entities
+	
+	my_atlas:_bind()
+	
+	local myvel = entity.physics.body:GetLinearVelocity()
+	target_entities.forward.transform.current.pos = entity.transform.current.pos + vec2(myvel.x, myvel.y) * 50
+	
+	if entity.pathfinding:is_still_pathfinding() or entity.pathfinding:is_still_exploring() then
+		target_entities.navigation.transform.current.pos = entity.pathfinding:get_current_navigation_target()
+		
+		behaviours.obstacle_avoidance.enabled = true
+		if behaviours.sensor_avoidance.last_output_force:non_zero() then
+			behaviours.target_seeking.enabled = false
+			behaviours.forward_seeking.enabled = true
+			behaviours.obstacle_avoidance.enabled = true
+		else
+			behaviours.target_seeking.enabled = true
+			behaviours.forward_seeking.enabled = false
+			--behaviours.obstacle_avoidance.enabled = false
+		end
+	else
+		behaviours.target_seeking.enabled = false
+		behaviours.forward_seeking.enabled = true
+		--behaviours.obstacle_avoidance.enabled = false
+	end
+	
+	behaviours.sensor_avoidance.max_intervention_length = (entity.transform.current.pos - target_entities.navigation.transform.current.pos):length() - 70
+	
+	--	behaviours.sensor_avoidance.enabled = true
+	--	player_behaviours.obstacle_avoidance.enabled = true
+	--player_behaviours.forward_seeking.enabled = true
+	
+	if behaviours.obstacle_avoidance.last_output_force:non_zero() then
+		behaviours.wandering.current_wander_angle = behaviours.obstacle_avoidance.last_output_force:get_degrees()
+	end
+	
+	return true
+end
+
 
 npc_script_info = create_scriptable_info {
 	scripted_events = {
 		[scriptable_component.LOOP] 	=
 			function(message)
-				local this = message
-				local this_behaviours = this.scriptable.script_data.steering_behaviours
-				local target_entities = this.scriptable.script_data.target_entities
-				
-				my_atlas:_bind()
-				
-				local myvel = this.physics.body:GetLinearVelocity()
-				target_entities.forward.transform.current.pos = this.transform.current.pos + vec2(myvel.x, myvel.y) * 50
-				
-				if this.pathfinding:is_still_pathfinding() or this.pathfinding:is_still_exploring() then
-					target_entities.navigation.transform.current.pos = this.pathfinding:get_current_navigation_target()
-					
-					this_behaviours.obstacle_avoidance.enabled = true
-					if this_behaviours.sensor_avoidance.last_output_force:non_zero() then
-						this_behaviours.target_seeking.enabled = false
-						this_behaviours.forward_seeking.enabled = true
-						this_behaviours.obstacle_avoidance.enabled = true
-					else
-						this_behaviours.target_seeking.enabled = true
-						this_behaviours.forward_seeking.enabled = false
-						--this_behaviours.obstacle_avoidance.enabled = false
-					end
-				else
-					this_behaviours.target_seeking.enabled = false
-					this_behaviours.forward_seeking.enabled = true
-					--this_behaviours.obstacle_avoidance.enabled = false
-				end
-				
-				this_behaviours.sensor_avoidance.max_intervention_length = (this.transform.current.pos - target_entities.navigation.transform.current.pos):length() - 70
-				
-				--	this_behaviours.sensor_avoidance.enabled = true
-				--	player_behaviours.obstacle_avoidance.enabled = true
-				--player_behaviours.forward_seeking.enabled = true
-				
-				if this_behaviours.obstacle_avoidance.last_output_force:non_zero() then
-					this_behaviours.wandering.current_wander_angle = this_behaviours.obstacle_avoidance.last_output_force:get_degrees()
-				end
-				
-				return true
+				get_scripted(message):loop()
 			end
 	}
 }
@@ -511,44 +562,7 @@ my_npc_archetype = {
 		
 		scriptable = {
 			available_scripts = npc_script_info,
-			
-			script_data = {
-				init_func = function(new_entity) 
-					new_entity.scriptable.script_data.steering_behaviours = {
-						target_seeking = behaviour_state(target_seek_steering),
-						forward_seeking = behaviour_state(forward_seek_steering),
-						
-						sensor_avoidance = behaviour_state(sensor_avoidance_steering),
-						wandering = behaviour_state(wander_steering),
-						obstacle_avoidance = behaviour_state(containment_steering),
-						separating = behaviour_state(separation_steering),
-						pursuit = behaviour_state(pursuit_steering)
-					}
-					
-					new_entity.scriptable.script_data.target_entities = {
-						navigation = create_entity(target_entity_archetype),
-						forward = create_entity(target_entity_archetype)
-					}
-					
-					local targets = new_entity.scriptable.script_data.target_entities
-					
-					local this_behaviours = new_entity.scriptable.script_data.steering_behaviours
-					this_behaviours.forward_seeking.target_from:set(targets.forward)
-					this_behaviours.target_seeking.target_from:set(targets.navigation)
-					this_behaviours.sensor_avoidance.target_from:set(targets.navigation)
-					
-					this_behaviours.pursuit.enabled = false
-					
-				end,
-				
-				refresh_behaviours = function(this_entity)
-					this_entity.steering:clear_behaviours()
-					
-					for k, v in pairs(this_entity.scriptable.script_data.steering_behaviours) do
-						this_entity.steering:add_behaviour(v)
-					end
-				end
-			}
+			script_data = npc_class
 		}
 	}
 }
@@ -591,7 +605,8 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 	}
 }))
 
-player.body.scriptable.script_data.init_func(player.body)
+	print("elo")
+init_scripted(player.body)
 
 npc_count = 2
 my_npcs = {}
@@ -603,9 +618,9 @@ for i=1, npc_count do
 		}
 	}))
 	
-	my_npcs[i].body.scriptable.script_data.init_func(my_npcs[i].body)
+	init_scripted(my_npcs[i].body)
 	
-	my_npcs[i].body.scriptable.script_data.refresh_behaviours(my_npcs[i].body)
+	get_scripted(my_npcs[i].body):refresh_behaviours()
 	my_npcs[i].body.pathfinding:start_exploring()
 end
 
@@ -719,7 +734,7 @@ steer_request_fnc =
 			function()
 				target_entity.transform.current.pos = player.crosshair.transform.current.pos
 				
-				player.body.scriptable.script_data.refresh_behaviours(player.body)
+				get_scripted(player.body):refresh_behaviours(player.body)
 			end
 			
 loop_only_info = create_scriptable_info {

@@ -1,12 +1,12 @@
-function set_components_from_entry(_entity, entry, entities_lookup)
+function set_components_from_entry(entity, entry, entities_lookup)
 	if entry.transform ~= nil then
-		local transform = _entity:add(transform_component())
+		local transform = entity:add(transform_component())
 		if entry.transform.pos ~= nil then transform.current.pos = entry.transform.pos end
 		if entry.transform.rotation ~= nil then transform.current.rotation = entry.transform.rotation end
 	end	
 	
 	if entry.children ~= nil then
-		local children = _entity:add(children_component())
+		local children = entity:add(children_component())
 		
 		for i, child in pairs(entry.children) do
 			children:add(entity_ptr(ptr_lookup(child, entities_lookup)))
@@ -14,7 +14,7 @@ function set_components_from_entry(_entity, entry, entities_lookup)
 	end
 	
 	if entry.input ~= nil then
-		local input = _entity:add(input_component())
+		local input = entity:add(input_component())
 		
 		for i, intent in pairs(entry.input) do
 			input:add(intent)
@@ -22,7 +22,7 @@ function set_components_from_entry(_entity, entry, entities_lookup)
 	end
 	
 	if entry.movement ~= nil then
-		local movement = _entity:add(movement_component())
+		local movement = entity:add(movement_component())
 		
 		if entry.movement.receivers ~= nil then
 			for i, receiver in pairs(entry.movement.receivers) do
@@ -35,14 +35,14 @@ function set_components_from_entry(_entity, entry, entities_lookup)
 	
 	function def(module_name, property_name, omit_properties) 
 		if(entry[property_name] ~= nil) then
-			local component = _entity:add(module_name())
+			local component = entity:add(module_name())
 			rewrite(component, entry[property_name], omit_properties)
 		end
 	end
 	
 	function def_ptr(module_name, property_name, ptr_variables, omit_properties) 
 		if(entry[property_name] ~= nil) then
-			local component = _entity:add(module_name())
+			local component = entity:add(module_name())
 			
 			omit_properties = omit_properties or {}
 			for k, v in pairs(ptr_variables) do
@@ -70,7 +70,7 @@ function set_components_from_entry(_entity, entry, entities_lookup)
 	def		(steering_component, 'steering')
 	
 	if entry.visibility ~= nil then
-		local visibility = _entity.visibility
+		local visibility = entity.visibility
 		
 		for key, values in pairs (entry.visibility.visibility_layers) do
 			local my_visibility = visibility_layer()
@@ -83,18 +83,18 @@ function set_components_from_entry(_entity, entry, entities_lookup)
 		local my_body_data = physics_info()
 		set_physics_info(my_body_data, entry.physics.body_info)
 		
-		create_physics_component(my_body_data, _entity, entry.physics.body_type)
+		create_physics_component(my_body_data, entity, entry.physics.body_type)
 	end
 
 	if entry.gun ~= nil then
-		local gun = _entity.gun
+		local gun = entity.gun
 		set_physics_info(gun.bullet_body, entry.gun.bullet_body)
 		--print(inspect(entry.gun))
 		rewrite(gun.bullet_render, entry.gun.bullet_render)
 	end
 	
 	if entry.health ~= nil then
-		local health = _entity.health
+		local health = entity.health
 		set_physics_info(health.corpse_body, entry.health.corpse_body)
 		rewrite(health.corpse_render, entry.health.corpse_render)
 	end
