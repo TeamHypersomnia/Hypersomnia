@@ -385,19 +385,21 @@ separation_steering = create_steering {
 	
 	group = filter_characters_separation,
 	square_side = 250,
-	field_of_vision_degrees = 50
+	field_of_vision_degrees = 240
 }
 
 pursuit_steering = create_steering {
 	behaviour_type = seek_behaviour,
-	weight = 1,
+	weight = 3,
 	radius_of_effect = 20,
 	force_color = rgba(0, 255, 255, 0),
 	
-	max_target_future_prediction_ms = 200
+	max_target_future_prediction_ms = 400
 }
 
-npc_class = { entity = 0 }
+npc_class = { 
+	entity = 0 
+}
 
 function get_scripted(entity)
 	return entity.scriptable.script_data
@@ -481,6 +483,37 @@ function npc_class:loop()
 	
 	if behaviours.obstacle_avoidance.last_output_force:non_zero() then
 		behaviours.wandering.current_wander_angle = behaviours.obstacle_avoidance.last_output_force:get_degrees()
+	end
+	
+	if entity == player.body then return true end
+	
+	local p1 = entity.transform.current.pos
+	local p2 = player.body.transform.current.pos
+	
+	render_system:push_line(debug_line(p1, p2, rgba(255, 0, 0, 255)))
+	
+	--print(p1.x, p1.y)
+	--print(p2.x, p2.y)
+	--if p1.x == p2.x and p1.y == p2.y then return true end
+	
+	ray_output = physics_system:ray_cast(p1, p2, create(b2Filter, filter_obstacle_visibility), entity)
+	
+	if ray_output.hit then
+	
+	
+	render_system:push_line(debug_line(p1, ray_output.intersection, rgba(0, 255, 0, 255)))
+		if ray_output.what_entity == player.body then
+			behaviours.pursuit.enabled = true
+			behaviours.pursuit.target_from:set(player.body)
+			
+			self.last_seen = ray_output.intersection
+			entity.pathfinding:clear_pathfinding_info()
+		else
+			if self.last_seen ~= nil and not entity.pathfinding:is_still_pathfinding() then
+				behaviours.pursuit.enabled = false
+				entity.pathfinding:start_pathfinding(self.last_seen)
+			end
+		end
 	end
 	
 	return true
@@ -605,10 +638,9 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 	}
 }))
 
-	print("elo")
 init_scripted(player.body)
 
-npc_count = 2
+npc_count = 10
 my_npcs = {}
 
 for i=1, npc_count do
