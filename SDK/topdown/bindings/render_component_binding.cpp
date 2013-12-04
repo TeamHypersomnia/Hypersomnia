@@ -9,6 +9,10 @@
 namespace bindings {
 	luabind::scope _render_component() {
 		return
+			luabind::class_<render_system::debug_line>("debug_line")
+			.def(luabind::constructor<vec2<>, vec2<>, graphics::pixel_32>())
+			,
+
 			luabind::class_<render_system>("_render_system")
 			.def_readwrite("visibility_expansion", &render_system::visibility_expansion)
 			.def_readwrite("max_visibility_expansion_distance", &render_system::max_visibility_expansion_distance)
@@ -17,7 +21,9 @@ namespace bindings {
 			.def_readwrite("draw_velocities", &render_system::draw_velocities)
 			.def_readwrite("draw_avoidance_info", &render_system::draw_avoidance_info)
 			.def_readwrite("draw_wandering_info", &render_system::draw_wandering_info)
-			.def_readwrite("draw_visibility", &render_system::draw_visibility), 
+			.def_readwrite("draw_visibility", &render_system::draw_visibility)
+			.def("push_line", &render_system::push_line)
+			, 
 
 			luabind::class_<render>("render_component")
 			.def(luabind::constructor<>())

@@ -134,7 +134,7 @@ void pathfinding_system::process_entities(world& owner) {
 
 			/* helpful lambda */
 			auto& is_point_visible = [&physics, epsilon_distance_visible_point_sq](vec2<> from, vec2<> point, b2Filter& filter){
-				auto line_of_sight = physics.ray_cast_px(from, point, &filter);
+				auto line_of_sight = physics.ray_cast_px(from, point, filter);
 				return (!line_of_sight.hit || (line_of_sight.intersection - point).length_sq() < epsilon_distance_visible_point_sq);
 			};
 

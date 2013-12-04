@@ -292,7 +292,7 @@ vec2<> steering::containment::steer(scene in) {
 			_render->manually_cleared_lines.push_back(render_system::debug_line(p1, p2, graphics::pixel_32(255, 0, 0, 255)));
 		
 		/* cast the ray and save output */
-		auto output = in.physics->ray_cast_px(p1, p2, &ray_filter, in.subject_entity);
+		auto output = in.physics->ray_cast_px(p1, p2, ray_filter, in.subject_entity);
 
 		/* if our ray hits anything */
 		if (output.hit) {

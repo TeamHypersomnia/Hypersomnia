@@ -27,6 +27,10 @@ public:
 	std::vector<debug_line> manually_cleared_lines;
 	std::vector<debug_line> non_cleared_lines;
 
+	void push_line(debug_line l) {
+		lines.push_back(l);
+	}
+
 	fbo scene_fbo, postprocess_fbo;
 
 	float visibility_expansion;

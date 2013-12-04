@@ -46,8 +46,8 @@ public:
 		raycast_output() : hit(false), what_fixture(nullptr) {}
 	};
 
-	raycast_output ray_cast(vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter = nullptr, entity* ignore_entity = nullptr);
-	raycast_output ray_cast_px(vec2<> p1, vec2<> p2, b2Filter* filter = nullptr, entity* ignore_entity = nullptr);
+	raycast_output ray_cast(vec2<> p1_meters, vec2<> p2_meters, b2Filter filter, entity* ignore_entity = nullptr);
+	raycast_output ray_cast_px(vec2<> p1, vec2<> p2, b2Filter filter, entity* ignore_entity = nullptr);
 
 	std::set<b2Body*> query_square(vec2<> p1_meters, float side_meters, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
 	std::set<b2Body*> query_square_px(vec2<> p1, float side, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);

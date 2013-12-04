@@ -22,6 +22,11 @@ namespace augmentations {
 		public:
 			world& owner_world;
 
+			/* only for script binding */
+			bool operator==(const entity& b) const {
+				return this == &b;
+			}
+
 			/* get information about component types */
 			std::vector<registered_type> get_components() const;
 

@@ -199,8 +199,8 @@ void visibility_system::process_entities(world& owner) {
 				/* cast both rays starting from the player position and ending in targets[x].target, 
 				ignoring subject entity ("it") completely, save results in ray_callbacks[2] */
 				physics_system::raycast_output ray_callbacks[2];
-				ray_callbacks[0] = physics.ray_cast(position_meters, targets[0], &request.filter, it);
-				ray_callbacks[1] = physics.ray_cast(position_meters, targets[1], &request.filter, it);
+				ray_callbacks[0] = physics.ray_cast(position_meters, targets[0], request.filter, it);
+				ray_callbacks[1] = physics.ray_cast(position_meters, targets[1], request.filter, it);
 
 				/* if we did not intersect with anything */
 				if (!(ray_callbacks[0].hit || ray_callbacks[1].hit)) {

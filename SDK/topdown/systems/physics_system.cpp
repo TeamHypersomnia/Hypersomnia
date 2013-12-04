@@ -33,16 +33,16 @@ physics_system::physics_system() : accumulator(60.0, 5), timestep_multiplier(1.f
 		b2world.SetContactListener(&listener);
 }
 
-physics_system::raycast_output physics_system::ray_cast(vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter, entity* ignore_entity) {
+physics_system::raycast_output physics_system::ray_cast(vec2<> p1_meters, vec2<> p2_meters, b2Filter filter, entity* ignore_entity) {
 	raycast_input callback;
-	callback.subject_filter = filter;
+	callback.subject_filter = &filter;
 	callback.subject = ignore_entity;
 
 	b2world.RayCast(&callback, p1_meters, p2_meters);
 	return callback.output;
 }
 
-physics_system::raycast_output physics_system::ray_cast_px (vec2<> p1, vec2<> p2, b2Filter* filter, entity* ignore_entity) {
+physics_system::raycast_output physics_system::ray_cast_px (vec2<> p1, vec2<> p2, b2Filter filter, entity* ignore_entity) {
 	auto out = ray_cast(p1 * PIXELS_TO_METERSf, p2 * PIXELS_TO_METERSf, filter, ignore_entity);
 	out.intersection *= METERS_TO_PIXELSf;
 	

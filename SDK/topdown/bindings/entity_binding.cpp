@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+#include <luabind/operator.hpp>
 #include "entity_system/entity.h"
 
 #include "bindings.h"
@@ -29,6 +30,7 @@ namespace bindings {
 		return
 			luabind::class_<entity>("_entity")
 			.def("clear", &entity::clear)
+			.def(luabind::const_self == luabind::const_self)
 
 			.def("add", &entity::add<animate>)
 			.property("animate", &entity::find<animate>, &entity::set<animate>)
