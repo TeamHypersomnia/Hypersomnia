@@ -35,6 +35,8 @@ public:
 
 	float visibility_expansion;
 	float max_visibility_expansion_distance;
+	int debug_drawing;
+
 	int draw_visibility;
 
 	int draw_steering_forces;
