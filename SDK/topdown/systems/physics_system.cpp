@@ -21,19 +21,63 @@ float32 physics_system::raycast_input::ReportFixture(b2Fixture* fixture, const b
 		output.what_fixture = fixture;
 		output.what_entity = reinterpret_cast<entity*>(fixture->GetBody()->GetUserData());
 		output.normal = normal;
+
+		if (save_all) {
+			outputs.push_back(output);
+			return 1.f;
+		}
+		
 		return fraction;
 }
 
-physics_system::raycast_input::raycast_input() : subject_filter(nullptr), subject(nullptr) {}
+physics_system::raycast_input::raycast_input() : subject_filter(nullptr), subject(nullptr), save_all(false) {}
 
 physics_system::physics_system() : accumulator(60.0, 5), timestep_multiplier(1.f),
-	b2world(b2Vec2(0.f, 0.f)), enable_interpolation(true) {
+b2world(b2Vec2(0.f, 0.f)), enable_interpolation(true), ray_casts_per_frame(0) {
 		b2world.SetAllowSleeping(false);
 		b2world.SetAutoClearForces(false);
 		b2world.SetContactListener(&listener);
 }
 
+std::vector<physics_system::raycast_output> physics_system::ray_cast_all_intersections
+	(vec2<> p1_meters, vec2<> p2_meters, b2Filter filter, entity* ignore_entity) {
+	++ray_casts_per_frame;
+
+	raycast_input callback;
+	callback.subject_filter = &filter;
+	callback.subject = ignore_entity;
+	callback.save_all = true;
+
+	b2world.RayCast(&callback, p1_meters, p2_meters);
+	return callback.outputs;
+}
+
+physics_system::edge_edge_output physics_system::edge_edge_intersection(vec2<> p1_meters, vec2<> p2_meters, vec2<> edge_p1, vec2<> edge_p2) {
+	/* prepare b2RayCastOutput/b2RayCastInput data for raw b2EdgeShape::RayCast call */
+	b2RayCastOutput output;
+	b2RayCastInput input;
+	input.maxFraction = 1.0;
+	input.p1 = p1_meters;
+	input.p2 = p2_meters;
+
+	/* we don't need to transform edge or ray since they are in the same space
+	but we have to prepare dummy b2Transform as argument for b2EdgeShape::RayCast
+	*/
+	b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
+
+	b2EdgeShape b2edge;
+	b2edge.Set(b2Vec2(edge_p1), b2Vec2(edge_p2));
+
+	edge_edge_output out;
+	out.hit = b2edge.RayCast(&output, input, null_transform, 0);
+	out.intersection = input.p1 + output.fraction * (input.p2 - input.p1);
+
+	return out;
+}
+
 physics_system::raycast_output physics_system::ray_cast(vec2<> p1_meters, vec2<> p2_meters, b2Filter filter, entity* ignore_entity) {
+	++ray_casts_per_frame;
+
 	raycast_input callback;
 	callback.subject_filter = &filter;
 	callback.subject = ignore_entity;
@@ -188,6 +232,8 @@ void physics_system::process_entities(world& owner) {
 	
 	if (enable_interpolation)
 		smooth_states();
+
+	ray_casts_per_frame = 0;
 }
 
 void physics_system::add(entity*) {

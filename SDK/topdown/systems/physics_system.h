@@ -28,6 +28,7 @@ public:
 	std::vector<processing_system*> substepping_systems;
 	float timestep_multiplier;
 	int enable_interpolation;
+	int ray_casts_per_frame;
 
 	b2World b2world;
 	physics_system();
@@ -45,6 +46,15 @@ public:
 
 		raycast_output() : hit(false), what_fixture(nullptr) {}
 	};
+
+	std::vector<raycast_output> ray_cast_all_intersections(vec2<> p1_meters, vec2<> p2_meters, b2Filter filter, entity* ignore_entity = nullptr);
+	
+	struct edge_edge_output {
+		vec2<> intersection;
+		bool hit;
+	};
+
+	edge_edge_output edge_edge_intersection(vec2<> p1_meters, vec2<> p2_meters, vec2<> edge_p1, vec2<> edge_p2);
 
 	raycast_output ray_cast(vec2<> p1_meters, vec2<> p2_meters, b2Filter filter, entity* ignore_entity = nullptr);
 	raycast_output ray_cast_px(vec2<> p1, vec2<> p2, b2Filter filter, entity* ignore_entity = nullptr);
@@ -67,7 +77,10 @@ private:
 	struct raycast_input : public b2RayCastCallback {
 		entity* subject;
 		b2Filter* subject_filter;
+		
+		bool save_all;
 		raycast_output output;
+		std::vector<raycast_output> outputs;
 
 		bool ShouldRaycast(b2Fixture* fixture);
 		float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction);
