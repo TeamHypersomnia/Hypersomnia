@@ -185,16 +185,31 @@ namespace augmentations {
 			return (*this) + (bigger - (*this)) * ratio;
 		}
 
-		vec2& normalize() {
-			float len = length();
-			if (len < std::numeric_limits<float>::epsilon()) 
+		vec2& set_length(float len) {
+			normalize();
+			return (*this) *= len;
+		}
+
+		vec2& add_length(float len) {
+			float actual_length = length();
+			normalize_hint(actual_length);
+			return (*this) *= (actual_length + len);
+		}
+
+		vec2& normalize_hint(float suggested_length) {
+			float len = suggested_length;
+			if (len < std::numeric_limits<float>::epsilon())
 				return *this;
-			
+
 			float inv_len = 1.f / len;
 
 			x *= inv_len;
 			y *= inv_len;
 			return *this;
+		}
+
+		vec2& normalize() {
+			return normalize_hint(length());
 		}
 
 		vec2 perpendicular_cw() {

@@ -20,10 +20,10 @@ namespace augmentations {
 
 		struct wh {
 			template<typename type>
-			wh(const vec2<type>& rr) : w(static_cast<int>(rr.x)), h(static_cast<int>(rr.y)) {}
+			wh(const vec2<type>& rr) : w(static_cast<float>(rr.x)), h(static_cast<float>(rr.y)) {}
 			wh(const ltrb&);
 			wh(const xywh&);
-			wh(int w = 0, int h = 0);
+			wh(float w = 0, float h = 0);
 
 			enum class fit_status {
 				DOESNT_FIT,
@@ -33,14 +33,14 @@ namespace augmentations {
 				FITS_PERFECTLY_FLIPPED
 			} fits(const wh& bigger) const;
 
-			int w,h, area() const, perimeter() const, max_side() const;
+			float w,h, area() const, perimeter() const, max_side() const;
 			void stick_relative(const wh& content, vec2<float>& scroll) const;
 			bool is_sticked(const wh& content, vec2<float>& scroll) const;
 			bool inside(const wh& bigger) const;
 
 			bool good() const;
 			
-			//wh& operator/=(int d) { w /= d; h /= d; return *this; }
+			//wh& operator/=(float d) { w /= d; h /= d; return *this; }
 			//wh& operator/=(float d) { w /= d; h /= d; return *this; }
 			wh operator*(float) const;
 			bool operator==(const wh&) const;
@@ -50,8 +50,8 @@ namespace augmentations {
 			ltrb();
 			ltrb(const wh&);
 			ltrb(const xywh&);
-			ltrb(int left, int top, int right, int bottom);
-			ltrb(const vec2<int>&, const wh& = wh());
+			ltrb(float left, float top, float right, float bottom);
+			ltrb(const vec2<float>&, const wh& = wh());
 
 			void contain(const ltrb& smaller);
 			void contain_positive(const ltrb& smaller);
@@ -71,9 +71,9 @@ namespace augmentations {
 			bool stick_y(const ltrb& bigger);
 			
 			vec2<float> center() const;
-			void center_x(int x);
-			void center_y(int y);
-			void center(const vec2<int>&);
+			void center_x(float x);
+			void center_y(float y);
+			void center(const vec2<float>&);
 
 			template <typename type>
 			void snap_point(vec2<type>& v) const {
@@ -83,27 +83,27 @@ namespace augmentations {
 				if (v.y > b) v.y = static_cast<type>(b);
 			}
 
-			int l, t, r, b, w() const, h() const, area() const, perimeter() const, max_side() const; // false - null rectangle
-			void x(int), y(int), w(int), h(int);
+			float l, t, r, b, w() const, h() const, area() const, perimeter() const, max_side() const; // false - null rectangle
+			void x(float), y(float), w(float), h(float);
 			bool good() const;
 
 			template <class P>
 			ltrb& operator+=(const P& p) {
-				l += int(p.x);
-				t += int(p.y);
-				r += int(p.x);
-				b += int(p.y);
+				l += float(p.x);
+				t += float(p.y);
+				r += float(p.x);
+				b += float(p.y);
 				return *this;
 			}
 			
 			template <class P>
 			ltrb operator-(const P& p) const {
-				return ltrb(l - int(p.x), t - int(p.y), r - int(p.x), b - int(p.y));
+				return ltrb(l - float(p.x), t - float(p.y), r - float(p.x), b - float(p.y));
 			}
 
 			template <class P>
 			ltrb operator+(const P& p) const {
-				return ltrb(l + int(p.x), t + int(p.y), r + int(p.x), b + int(p.y));
+				return ltrb(l + float(p.x), t + float(p.y), r + float(p.x), b + float(p.y));
 			}
 		};
 
@@ -111,35 +111,35 @@ namespace augmentations {
 			xywh();
 			xywh(const wh&);
 			xywh(const ltrb&);
-			xywh(int x, int y, int width, int height);
-			xywh(int x, int y, const wh&);
-			xywh(const vec2<int>&, const wh&);
+			xywh(float x, float y, float width, float height);
+			xywh(float x, float y, const wh&);
+			xywh(const vec2<float>&, const wh&);
 			
 			bool clip(const xywh& bigger); // false - null rectangle
-			bool hover(const vec2<int>& mouse);
+			bool hover(const vec2<float>& mouse);
 			bool hover(const xywh&);
 			bool hover(const ltrb&);
 
-			int x, y, r() const, b() const;
-			void r(int), b(int);
+			float x, y, r() const, b() const;
+			void r(float), b(float);
 			
 			bool operator==(const xywh&) const;
 
 			template <class P>
 			xywh& operator+=(const P& p) {
-				x += int(p.x);
-				y += int(p.y);
+				x += float(p.x);
+				y += float(p.y);
 				return *this;
 			}
 			
 			template <class P>
 			xywh operator-(const P& p) const {
-				return xywh(x - int(p.x), y - int(p.y), w, h);
+				return xywh(x - float(p.x), y - float(p.y), w, h);
 			}
 
 			template <class P>
 			xywh operator+(const P& p) const {
-				return xywh(x + int(p.x), y + int(p.y), w, h);
+				return xywh(x + float(p.x), y + float(p.y), w, h);
 			}
 		};
 		
@@ -147,7 +147,7 @@ namespace augmentations {
 			xywhf(const wh  &);
 			xywhf(const ltrb&);
 			xywhf(const xywh&);
-			xywhf(int x, int y, int width, int height, bool flipped = false);
+			xywhf(float x, float y, float width, float height, bool flipped = false);
 			xywhf();
 			void flip();
 			xywh rc() const;

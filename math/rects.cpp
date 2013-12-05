@@ -8,7 +8,7 @@ namespace augmentations {
 		
 		wh::wh(const ltrb& rr) : w(rr.w()), h(rr.h()) {} 
 		wh::wh(const xywh& rr) : w(rr.w), h(rr.h) {} 
-		wh::wh(int w, int h) : w(w), h(h) {}
+		wh::wh(float w, float h) : w(w), h(h) {}
 		
 		wh::fit_status wh::fits(const wh& r) const {
 			if(w == r.w && h == r.h) return fit_status::FITS_PERFECTLY;
@@ -19,7 +19,7 @@ namespace augmentations {
 		}
 			
 		wh wh::operator*(float s) const {
-			return wh(int(w*s), int(h*s));
+			return wh(float(w*s), float(h*s));
 		}
 
 		bool wh::operator==(const wh& r) const {
@@ -29,26 +29,26 @@ namespace augmentations {
 		ltrb::ltrb() : l(0), t(0), r(0), b(0) {}
 		ltrb::ltrb(const wh& rr) : l(0), t(0), r(rr.w), b(rr.h) {}
 		ltrb::ltrb(const xywh& rr) : l(rr.x), t(rr.y), r(rr.x+rr.w), b(rr.y+rr.h) {}
-		ltrb::ltrb(int l, int t, int r, int b) : l(l), t(t), r(r), b(b) {}
-		ltrb::ltrb(const vec2<int>& p, const wh& s) : l(p.x), t(p.y), r(p.x + s.w), b(p.y + s.h) {}
+		ltrb::ltrb(float l, float t, float r, float b) : l(l), t(t), r(r), b(b) {}
+		ltrb::ltrb(const vec2<float>& p, const wh& s) : l(p.x), t(p.y), r(p.x + s.w), b(p.y + s.h) {}
 
-		int ltrb::w() const {
+		float ltrb::w() const {
 			return r-l;
 		}
 		
-		int ltrb::h() const {
+		float ltrb::h() const {
 			return b-t;
 		}
 
-		int ltrb::area() const {
+		float ltrb::area() const {
 			return w()*h();
 		}
 
-		int ltrb::perimeter() const {
+		float ltrb::perimeter() const {
 			return 2*w() + 2*h();
 		}
 
-		int ltrb::max_side() const {
+		float ltrb::max_side() const {
 			return std::max(w(), h());
 		}
 		
@@ -88,7 +88,7 @@ namespace augmentations {
 		}
 		
 		bool ltrb::stick_x(const ltrb& rc) {
-			vec2<int> offset(0, 0);
+			vec2<float> offset(0, 0);
 			if(l < rc.l) offset.x += rc.l - l; 
 			if(r > rc.r) offset.x += rc.r - r; 
 			operator+=(offset);
@@ -97,7 +97,7 @@ namespace augmentations {
 		}
 
 		bool ltrb::stick_y(const ltrb& rc) {
-			vec2<int> offset(0, 0);
+			vec2<float> offset(0, 0);
 			if(t < rc.t) offset.y += rc.t - t; 
 			if(b > rc.b) offset.y += rc.b - b; 
 			operator+=(offset);
@@ -124,36 +124,36 @@ namespace augmentations {
 			return scroll.x >= 0.f && scroll.x <= content.w - w && scroll.y >= 0 && scroll.y <= content.h - h; 
 		}
 		
-		void ltrb::center_x(int c) {
-			int _w = w();
+		void ltrb::center_x(float c) {
+			float _w = w();
 			l = c - _w/2;
 			r = l + _w;
 		}
 
-		void ltrb::center_y(int c) {
-			int _h = h();
+		void ltrb::center_y(float c) {
+			float _h = h();
 			t = c - _h/2;
 			b = t + _h;
 		}
 
-		void ltrb::center(const vec2<int>& c) {
+		void ltrb::center(const vec2<float>& c) {
 			center_x(c.x);
 			center_y(c.y);
 		}
 
-		void ltrb::x(int xx) {
-			*this+=(vec2<int>(xx-l, 0));
+		void ltrb::x(float xx) {
+			*this+=(vec2<float>(xx-l, 0));
 		}
 
-		void ltrb::y(int yy) {
-			*this+=(vec2<int>(0, yy-t));
+		void ltrb::y(float yy) {
+			*this+=(vec2<float>(0, yy-t));
 		}
 
-		void ltrb::w(int ww) {
+		void ltrb::w(float ww) {
 			r = l+ww;
 		}
 		
-		void ltrb::h(int hh) {
+		void ltrb::h(float hh) {
 			b = t+hh;
 		}
 
@@ -168,9 +168,9 @@ namespace augmentations {
 		xywh::xywh() : x(0), y(0) {}
 		xywh::xywh(const wh& rr) : x(0), y(0), wh(rr) {}
 		xywh::xywh(const ltrb& rc) : x(rc.l), y(rc.t) { b(rc.b); r(rc.r); }
-		xywh::xywh(int x, int y, int w, int h) : x(x), y(y), wh(w, h) {}
-		xywh::xywh(int x, int y, const wh& r) : x(x), y(y), wh(r) {}
-		xywh::xywh(const vec2<int>& p, const wh& r) : x(p.x), y(p.y), wh(r) {} 
+		xywh::xywh(float x, float y, float w, float h) : x(x), y(y), wh(w, h) {}
+		xywh::xywh(float x, float y, const wh& r) : x(x), y(y), wh(r) {}
+		xywh::xywh(const vec2<float>& p, const wh& r) : x(p.x), y(p.y), wh(r) {} 
 
 		bool xywh::clip(const xywh& rc) {
 			if(x >= rc.r() || y >= rc.b() || r() <= rc.x || b() <= rc.y) {
@@ -184,7 +184,7 @@ namespace augmentations {
 			return true;
 		}
 
-		bool xywh::hover(const vec2<int>& m) {
+		bool xywh::hover(const vec2<float>& m) {
 			return m.x >= x && m.y >= y && m.x <= r() && m.y <= b();
 		}
 
@@ -196,31 +196,31 @@ namespace augmentations {
 			return ltrb(rc).hover(*this);
 		}
 		
-		int xywh::r() const {
+		float xywh::r() const {
 			return x+w;
 		};
 		
-		int xywh::b() const {
+		float xywh::b() const {
 			return y+h;
 		}
 
-		void xywh::r(int right) {
+		void xywh::r(float right) {
 			w = right-x;
 		}
 		
-		void xywh::b(int bottom) {
+		void xywh::b(float bottom) {
 			h = bottom-y;
 		}
 
-		int wh::area() const {
+		float wh::area() const {
 			return w*h;
 		}
 		
-		int wh::perimeter() const {
+		float wh::perimeter() const {
 			return 2*w + 2*h; 
 		}
 		
-		int wh::max_side() const {
+		float wh::max_side() const {
 			return std::max(w, h);
 		}
 
@@ -228,7 +228,7 @@ namespace augmentations {
 		xywhf::xywhf(const ltrb& rr) : xywh(rr), flipped(false) {}
 		xywhf::xywhf(const xywh& rr) : xywh(rr), flipped(false) {}
 		xywhf::xywhf(const wh  & rr) : xywh(rr), flipped(false) {}
-		xywhf::xywhf(int x, int y, int width, int height, bool flipped) : xywh(x, y, width, height), flipped(flipped) {}
+		xywhf::xywhf(float x, float y, float width, float height, bool flipped) : xywh(x, y, width, height), flipped(flipped) {}
 		xywhf::xywhf() : flipped(false) {}
 
 		void xywhf::flip() { 

@@ -175,7 +175,7 @@ namespace augmentations {
 
 			v = order[min_func == -1 ? best_func : min_func].data();
 
-			int clip_x = 0, clip_y = 0;
+			float clip_x = 0.f, clip_y = 0.f;
 			node* ret;
 
 			root.reset(min_bin);

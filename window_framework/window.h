@@ -29,8 +29,9 @@ namespace augmentations {
 			MSG wmsg;
 			RECT srect;
 
-			int minw, minh, maxw, maxh, bpp, style, exstyle,
-			    cminw, cminh, cmaxw, cmaxh, menu, vsyn;
+			float minw, minh, maxw, maxh, cminw, cminh, cmaxw, cmaxh;
+			int bpp, style, exstyle, menu, vsyn;
+			
 			const wchar_t* name;
 			bool active, transparent, doublebuf;
 			

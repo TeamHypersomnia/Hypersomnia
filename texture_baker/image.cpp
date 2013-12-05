@@ -240,16 +240,16 @@ namespace augmentations {
 		}
 
 		unsigned char* image::ptr(int x, int y, int channel) {
-			return v.data() + (size.w * y + x) * channels + channel;
+			return v.data() + (static_cast<int>(size.w) * y + x) * channels + channel;
 		}
 
 		unsigned char image::pix(int x, int y, int channel) const {
-			return v[(size.w * y + x) * channels + channel];
+			return v[(static_cast<int>(size.w) * y + x) * channels + channel];
 		}
 
 
 		int image::get_bytes() const {
-			return sizeof(unsigned char) * size.w * size.h * channels;
+			return sizeof(unsigned char) * static_cast<int>(size.w) * static_cast<int>(size.h) * channels;
 		}
 
 		int image::get_channels() const {

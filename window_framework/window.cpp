@@ -214,8 +214,8 @@ namespace augmentations {
 			else {
 				return create(rects::xywh(luabind::object_cast<int>(cfg["window_x"]),
 					luabind::object_cast<int>(cfg["window_y"]),
-					std::max(force_minimum_resolution.w, luabind::object_cast<int>(cfg["resolution_w"])),
-					std::max(force_minimum_resolution.h, luabind::object_cast<int>(cfg["resolution_h"]))),
+					std::max(force_minimum_resolution.w, luabind::object_cast<float>(cfg["resolution_w"])),
+					std::max(force_minimum_resolution.h, luabind::object_cast<float>(cfg["resolution_h"]))),
 					luabind::object_cast<int>(cfg["window_border"]) > 0 ? _menu : 0,
 					to_wstr(luabind::object_cast<std::string>(cfg["window_name"])).c_str(),
 					luabind::object_cast<int>(cfg["doublebuffer"]) > 0,
