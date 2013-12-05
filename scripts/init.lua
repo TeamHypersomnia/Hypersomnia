@@ -51,6 +51,7 @@ dofile (CURRENT_SCENE)
 commands = script()
 commands:associate_filename("scripts\\commands.lua")
 commands.reload_scene_when_modified = false
+settings.reload_scene_when_modified = false
 
 call_on_modification(commands, {commands})
 

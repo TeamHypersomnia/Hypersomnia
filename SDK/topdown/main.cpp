@@ -127,21 +127,23 @@ int main() {
 	lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
 
 	while (!input.quit_flag) {
-		my_world.run();
 		
-		auto& scripts_reloaded = resources::script::script_reloader.get_script_files_to_reload();
+		my_world.run();
+		std::cout << physics.ray_casts_per_frame << std::endl;
 
+		auto& scripts_reloaded = resources::script::script_reloader.get_script_files_to_reload();
+		
 		for (auto& script_to_reload : scripts_reloaded) {
 			if (script_to_reload->reload_scene_when_modified) {
 				my_world.delete_all_entities(true);
 				break;
 			}
 		}
-
+		
 		for (auto& script_to_reload : scripts_reloaded) {
 			script_to_reload->call();
 		}
-
+		
 		if (!scripts_reloaded.empty()) {
 			std::cout << std::endl;
 			lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);

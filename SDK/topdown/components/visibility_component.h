@@ -15,6 +15,9 @@ namespace components {
 
 		struct discontinuity {
 			int edge_index;
+			bool is_boundary;
+			augmentations::vec2<> normal;
+
 			edge points;
 			augmentations::vec2<> last_undiscovered_wall;
 
@@ -26,7 +29,7 @@ namespace components {
 			discontinuity(const edge& points = edge(),
 				augmentations::vec2<> last_undiscovered_wall = augmentations::vec2<>()) :
 				points(points), winding(RIGHT),
-				last_undiscovered_wall(last_undiscovered_wall), edge_index(0) {}
+				last_undiscovered_wall(last_undiscovered_wall), edge_index(0), is_boundary(false) {}
 		};
 
 		struct layer {

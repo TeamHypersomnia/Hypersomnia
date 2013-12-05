@@ -60,13 +60,15 @@ void pathfinding_system::process_entities(world& owner) {
 
 			/* save all new discontinuities from visibility */
 			for (auto& disc : vision.discontinuities) {
+				if (disc.is_boundary) continue;
+
 				bool this_discontinuity_is_already_memorised = false;
 
 				for (auto& memorised_undiscovered : pathfinding.session().undiscovered_vertices) {
 					/* if a discontinuity with the same closer vertex already exists */
 					if ((memorised_undiscovered.location - disc.points.first).length_sq() < epsilon_distance_the_same_vertex_sq) {
 						this_discontinuity_is_already_memorised = true;
-						memorised_undiscovered.location = disc.points.first;
+							memorised_undiscovered.location = disc.points.first;
 						break;
 					}
 				}
@@ -91,21 +93,20 @@ void pathfinding_system::process_entities(world& owner) {
 					/* get the direction the sensor will be going to */
 					vec2<> sensor_direction;
 
-					/* if the first vertex of the edge matches the location */
-					if (associated_edge.first.compare(vert.location))
-						sensor_direction = associated_edge.first - associated_edge.second;
-					/* if it is the second one */
-					else if (associated_edge.second.compare(vert.location))
-						sensor_direction = associated_edge.second - associated_edge.first;
-					/* should never happen */
-					else assert(0);
+						/* if the first vertex of the edge matches the location */
+						if (associated_edge.first.compare(vert.location))
+							sensor_direction = associated_edge.first - associated_edge.second;
+						/* if it is the second one */
+						else if (associated_edge.second.compare(vert.location))
+							sensor_direction = associated_edge.second - associated_edge.first;
+						/* should never happen */
+						else assert(0);
 
-					sensor_direction.normalize();
-
-					/* rotate a bit to avoid non-reachable sensors */
-					float rotation = pathfinding.rotate_navpoints;
-					if (disc.winding == disc.LEFT) rotation = -rotation;
-					sensor_direction.rotate(rotation, vec2<>(0, 0));
+						/* rotate a bit to prevent non-reachable sensors */
+						float rotation = pathfinding.rotate_navpoints;
+						if (disc.winding == disc.LEFT) rotation = -rotation;
+						sensor_direction.rotate(rotation, vec2<>(0, 0));
+						sensor_direction.normalize();
 
 					vert.sensor = vert.location + sensor_direction * pathfinding.target_offset;
 					pathfinding.session().undiscovered_vertices.push_back(vert);

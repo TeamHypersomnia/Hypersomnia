@@ -398,18 +398,19 @@ my_npc_archetype = {
 		visibility = {
 			visibility_layers = {
 				[visibility_component.DYNAMIC_PATHFINDING] = {
-					square_side = 7000,
-					color = rgba(0, 255, 255, 120),
-					ignore_discontinuities_shorter_than = 150,
-					filter = filter_pathfinding_visibility
-				},
-				
-				[visibility_component.CONTAINMENT] = {
-					square_side = 7000,
+					square_side = 600,
 					color = rgba(0, 255, 255, 120),
 					ignore_discontinuities_shorter_than = 150,
 					filter = filter_obstacle_visibility
 				}
+				--,
+				--
+				--[visibility_component.CONTAINMENT] = {
+				--	square_side = 7000,
+				--	color = rgba(0, 255, 255, 120),
+				--	ignore_discontinuities_shorter_than = 150,
+				--	filter = filter_obstacle_visibility
+				--}
 			}
 		},
 		

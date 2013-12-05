@@ -79,7 +79,7 @@ void camera_system::process_entities(world& owner) {
 				//else
 					camera.last_interpolant = camera.last_interpolant * averaging_constant + transform.pos * (1.0f - averaging_constant);
 					
-					auto interp = [](int& a, int& b, float averaging_constant){
+					auto interp = [](float& a, float& b, float averaging_constant){
 						a = static_cast<int>(a * averaging_constant + b * (1.0f - averaging_constant));
 					};
 

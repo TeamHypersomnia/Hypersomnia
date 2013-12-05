@@ -333,7 +333,7 @@ containment_archetype = {
 	
 	ray_filter = filter_obstacle_visibility,
 	
-	ray_count = 10,
+	ray_count = 5,
 	randomize_rays = true,
 	only_threats_in_OBB = false,
 	
@@ -560,9 +560,9 @@ my_npc_archetype = {
 		visibility = {
 			visibility_layers = {
 				[visibility_component.DYNAMIC_PATHFINDING] = {
-					square_side = 7000,
-					color = rgba(0, 255, 255, 0),
-					ignore_discontinuities_shorter_than = 150,
+					square_side = 5000,
+					color = rgba(0, 255, 255, 122),
+					ignore_discontinuities_shorter_than = -1,
 					filter = filter_pathfinding_visibility
 				}
 				--,
@@ -653,7 +653,7 @@ for i=1, npc_count do
 	init_scripted(my_npcs[i].body)
 	
 	get_scripted(my_npcs[i].body):refresh_behaviours()
-	my_npcs[i].body.pathfinding:start_exploring()
+	my_npcs[i].body.pathfinding:start_pathfinding(vec2(-1000, 0))
 end
 
 
@@ -782,7 +782,7 @@ loop_only_info = create_scriptable_info {
 					steer_request_fnc()
 					player.body.pathfinding:start_exploring()
 				elseif message.intent == custom_intents.INSTANT_SLOWDOWN then
-					physics_system.timestep_multiplier = 0.005
+					physics_system.timestep_multiplier = 0.000
 				elseif message.intent == custom_intents.SPEED_INCREASE then
 					physics_system.timestep_multiplier = physics_system.timestep_multiplier + 0.05
 				elseif message.intent == custom_intents.SPEED_DECREASE then

@@ -22,6 +22,7 @@ namespace bindings {
 			.def_readwrite("draw_avoidance_info", &render_system::draw_avoidance_info)
 			.def_readwrite("draw_wandering_info", &render_system::draw_wandering_info)
 			.def_readwrite("draw_visibility", &render_system::draw_visibility)
+			.def_readwrite("debug_drawing", &render_system::debug_drawing)
 			.def("push_line", &render_system::push_line)
 			, 
 

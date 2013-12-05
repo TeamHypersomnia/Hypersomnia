@@ -29,6 +29,11 @@ create_options {
 }
 
 
+filter_nothing = {
+	categoryBits = 0,
+	maskBits = 0
+}
+
 filter_static_objects = {
 	categoryBits = STATIC_OBJECTS,
 	maskBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS, CORPSES)
