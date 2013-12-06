@@ -417,7 +417,7 @@ function npc_class:new(o)
 		
 		sensor_avoidance = behaviour_state(sensor_avoidance_steering),
 		wandering = behaviour_state(wander_steering),
-		obstacle_avoidance = behaviour_state(containment_steering),
+		obstacle_avoidance = behaviour_state(obstacle_avoidance_steering),
 		separating = behaviour_state(separation_steering),
 		pursuit = behaviour_state(pursuit_steering)
 	}
@@ -503,15 +503,15 @@ function npc_class:loop()
 	
 	render_system:push_line(debug_line(p1, ray_output.intersection, rgba(0, 255, 0, 255)))
 		if ray_output.what_entity == player.body then
-			behaviours.pursuit.enabled = true
+			--behaviours.pursuit.enabled = true
 			behaviours.pursuit.target_from:set(player.body)
 			
 			self.last_seen = ray_output.intersection
-			entity.pathfinding:clear_pathfinding_info()
+			--entity.pathfinding:clear_pathfinding_info()
 		else
 			if self.last_seen ~= nil and not entity.pathfinding:is_still_pathfinding() then
 				behaviours.pursuit.enabled = false
-				entity.pathfinding:start_pathfinding(self.last_seen)
+				--entity.pathfinding:start_pathfinding(self.last_seen)
 			end
 		end
 	end
@@ -561,17 +561,16 @@ my_npc_archetype = {
 			visibility_layers = {
 				[visibility_component.DYNAMIC_PATHFINDING] = {
 					square_side = 5000,
-					color = rgba(0, 255, 255, 122),
+					color = rgba(0, 255, 255, 10),
 					ignore_discontinuities_shorter_than = -1,
 					filter = filter_pathfinding_visibility
 				}
 				--,
 				--
-				--
 				--[visibility_component.CONTAINMENT] = {
-				--	square_side = 7000,
+				--	square_side = 250,
 				--	color = rgba(0, 255, 255, 120),
-				--	ignore_discontinuities_shorter_than = 100,
+				--	ignore_discontinuities_shorter_than = -1,
 				--	filter = filter_obstacle_visibility
 				--}
 			}
@@ -640,7 +639,7 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 
 init_scripted(player.body)
 
-npc_count = 10
+npc_count = 20
 my_npcs = {}
 
 for i=1, npc_count do
@@ -653,7 +652,7 @@ for i=1, npc_count do
 	init_scripted(my_npcs[i].body)
 	
 	get_scripted(my_npcs[i].body):refresh_behaviours()
-	my_npcs[i].body.pathfinding:start_pathfinding(vec2(-1000, 0))
+	my_npcs[i].body.pathfinding:start_exploring()
 end
 
 

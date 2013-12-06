@@ -68,7 +68,7 @@ void pathfinding_system::process_entities(world& owner) {
 					/* if a discontinuity with the same closer vertex already exists */
 					if ((memorised_undiscovered.location - disc.points.first).length_sq() < epsilon_distance_the_same_vertex_sq) {
 						this_discontinuity_is_already_memorised = true;
-							memorised_undiscovered.location = disc.points.first;
+							//memorised_undiscovered.location = disc.points.first;
 						break;
 					}
 				}
