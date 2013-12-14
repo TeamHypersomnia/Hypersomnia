@@ -24,6 +24,7 @@
 #include "systems/particle_group_system.h"
 #include "systems/particle_emitter_system.h"
 #include "systems/script_system.h"
+#include "systems/behaviour_tree_system.h"
 
 #include "messages/destroy_message.h"
 #include "messages/collision_message.h"
@@ -78,8 +79,10 @@ int main() {
 	damage_system damage;
 	health_system health;
 	destroy_system destroy;
+	behaviour_tree_system behaviours;
 
 	my_world.add_system(&scripts);
+	my_world.add_system(&behaviours);
 	my_world.add_system(&input);
 	my_world.add_system(&steering);
 	my_world.add_system(&movement);

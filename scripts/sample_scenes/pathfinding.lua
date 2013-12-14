@@ -388,7 +388,7 @@ my_npc_archetype = {
 				rect_size = blank_green.size,
 				
 				angular_damping = 5,
-				linear_damping = 13,
+				linear_damping = 18,
 				
 				fixed_rotation = true,
 				density = 0.1
@@ -398,7 +398,7 @@ my_npc_archetype = {
 		visibility = {
 			visibility_layers = {
 				[visibility_component.DYNAMIC_PATHFINDING] = {
-					square_side = 1600,
+					square_side = 7600,
 					color = rgba(0, 255, 255, 120),
 					ignore_discontinuities_shorter_than = 150,
 					filter = filter_obstacle_visibility
@@ -422,7 +422,7 @@ my_npc_archetype = {
 		},
 		
 		movement = {
-			input_acceleration = vec2(30000, 30000),
+			input_acceleration = vec2(50000, 50000),
 			max_speed = 4300
 		},
 		
@@ -677,7 +677,7 @@ containment_steering = create_steering (containment_archetype)
 obstacle_avoidance_archetype = {
 	weight = 100, 
 	behaviour_type = obstacle_avoidance_behaviour,
-	visibility_type = visibility_component.CONTAINMENT,
+	visibility_type = visibility_component.DYNAMIC_PATHFINDING,
 	
 	ray_count = 20,
 	randomize_rays = false,
@@ -719,7 +719,7 @@ player_behaviours = {
 	
 	sensor_avoidance = behaviour_state(sensor_avoidance_steering),
 	wandering = behaviour_state(wander_steering),
-	obstacle_avoidance = behaviour_state(containment_steering)
+	obstacle_avoidance = behaviour_state(obstacle_avoidance_steering)
 }
 
 player_behaviours.forward_seeking.target_from:set(forward_navigation_entity)

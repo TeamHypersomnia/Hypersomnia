@@ -1,3 +1,14 @@
+-- improved pathfinding, vertex nodes instead of visible wall tracking
+-- introduced exploration
+-- improved steering: improved avoidance rectangle
+-- obstacle avoidance favors parallellness to velocity instead of distance
+-- sensor avoidance
+-- discarding narrow discontinuities for navigation in dynamic environments
+-- wander steering to avoid equillibriums
+-- improved visibility to match the square shape
+-- separation, many npcs
+-- ai behavior trees: FSMs are bad, reusability of states inside behavior trees (get other weapon)
+
 crosshair_sprite = create_sprite {
 	image = images.crosshair,
 	color = rgba(255, 0, 0, 255)
@@ -345,7 +356,7 @@ containment_archetype = {
 containment_steering = create_steering (containment_archetype) 
 
 obstacle_avoidance_archetype = {
-	weight = 100, 
+	weight = 1, 
 	behaviour_type = obstacle_avoidance_behaviour,
 	visibility_type = visibility_component.DYNAMIC_PATHFINDING,
 	
@@ -380,11 +391,11 @@ sensor_avoidance_steering = create_steering (archetyped(containment_archetype, {
 
 separation_steering = create_steering { 
 	behaviour_type = separation_behaviour,
-	weight = 1,
+	weight = 1.5,
 	force_color = rgba(255, 0, 0, 255),
 	
 	group = filter_characters_separation,
-	square_side = 250,
+	square_side = 150,
 	field_of_vision_degrees = 240
 }
 
@@ -396,6 +407,7 @@ pursuit_steering = create_steering {
 	
 	max_target_future_prediction_ms = 400
 }
+
 
 npc_class = { 
 	entity = 0 
@@ -498,27 +510,67 @@ function npc_class:loop()
 	
 	ray_output = physics_system:ray_cast(p1, p2, create(b2Filter, filter_obstacle_visibility), entity)
 	
-	if ray_output.hit then
-	
-	
-	render_system:push_line(debug_line(p1, ray_output.intersection, rgba(0, 255, 0, 255)))
-		if ray_output.what_entity == player.body then
-			--behaviours.pursuit.enabled = true
-			behaviours.pursuit.target_from:set(player.body)
+	if ray_output.hit and ray_output.what_entity == player.body then
+		render_system:push_line(debug_line(p1, ray_output.intersection, rgba(0, 255, 0, 255)))
+		
+		behaviours.pursuit.enabled = true
+		behaviours.pursuit.target_from:set(player.body)
+		
+		self.last_seen = ray_output.intersection
+		entity.pathfinding:clear_pathfinding_info()
+	else
+		behaviours.pursuit.enabled = false
+		
+		if self.last_seen ~= nil and not entity.pathfinding:is_still_pathfinding() then
+			entity.pathfinding:start_pathfinding(self.last_seen)
 			
-			self.last_seen = ray_output.intersection
-			--entity.pathfinding:clear_pathfinding_info()
-		else
-			if self.last_seen ~= nil and not entity.pathfinding:is_still_pathfinding() then
-				behaviours.pursuit.enabled = false
-				--entity.pathfinding:start_pathfinding(self.last_seen)
-			end
+			entity.pathfinding:start_exploring()
 		end
 	end
 	
 	return true
 end
 
+behaviour_tree = create_behaviour_tree {
+	nodes = {
+		behave = {
+			node_type = selector
+			on_update = function(entity) return behaviour_tree_component.SUCCESS end
+		},
+		
+		player_visible = {
+			on_update = function(entity) 
+				local p1 = entity.transform.current.pos
+				local p2 = player.body.transform.current.pos
+				
+				render_system:push_line(debug_line(p1, p2, rgba(255, 0, 0, 255)))
+				
+				ray_output = physics_system:ray_cast(p1, p2, create(b2Filter, filter_obstacle_visibility), entity)
+				
+				if ray_output.hit and ray_output.what_entity == player.body then
+					return behaviour_tree_component.SUCCESS 
+				end
+				
+				return behaviour_tree_component.FAILURE
+			end
+		},
+		
+		chase_player = {
+			on_enter = function(entity) 
+				npc_data = get_scripted(entity)
+				npc_data.steering_behaviours.pursuit.enabled = true
+			end
+		
+		}
+	},
+	
+	connections = {
+		behave = {
+			
+		}
+	
+	}
+}
 
 npc_script_info = create_scriptable_info {
 	scripted_events = {
@@ -550,7 +602,7 @@ my_npc_archetype = {
 				rect_size = blank_green.size,
 				
 				angular_damping = 5,
-				linear_damping = 13,
+				linear_damping = 18,
 				
 				fixed_rotation = true,
 				density = 0.1
@@ -561,7 +613,7 @@ my_npc_archetype = {
 			visibility_layers = {
 				[visibility_component.DYNAMIC_PATHFINDING] = {
 					square_side = 5000,
-					color = rgba(0, 255, 255, 10),
+					color = rgba(0, 255, 255, 20),
 					ignore_discontinuities_shorter_than = -1,
 					filter = filter_pathfinding_visibility
 				}
@@ -584,12 +636,12 @@ my_npc_archetype = {
 		},
 		
 		movement = {
-			input_acceleration = vec2(30000, 30000),
+			input_acceleration = vec2(50000, 50000),
 			max_speed = 4300
 		},
 		
 		steering = {
-			max_resultant_force = 4300 -- -1 = no force clamping
+			max_resultant_force = 10000 -- -1 = no force clamping
 		},
 		
 		scriptable = {
@@ -639,7 +691,7 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 
 init_scripted(player.body)
 
-npc_count = 20
+npc_count = 0
 my_npcs = {}
 
 for i=1, npc_count do
