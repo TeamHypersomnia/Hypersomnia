@@ -531,46 +531,46 @@ function npc_class:loop()
 	return true
 end
 
-behaviour_tree = create_behaviour_tree {
-	nodes = {
-		behave = {
-			node_type = selector
-			on_update = function(entity) return behaviour_tree_component.SUCCESS end
-		},
-		
-		player_visible = {
-			on_update = function(entity) 
-				local p1 = entity.transform.current.pos
-				local p2 = player.body.transform.current.pos
-				
-				render_system:push_line(debug_line(p1, p2, rgba(255, 0, 0, 255)))
-				
-				ray_output = physics_system:ray_cast(p1, p2, create(b2Filter, filter_obstacle_visibility), entity)
-				
-				if ray_output.hit and ray_output.what_entity == player.body then
-					return behaviour_tree_component.SUCCESS 
-				end
-				
-				return behaviour_tree_component.FAILURE
-			end
-		},
-		
-		chase_player = {
-			on_enter = function(entity) 
-				npc_data = get_scripted(entity)
-				npc_data.steering_behaviours.pursuit.enabled = true
-			end
-		
-		}
-	},
-	
-	connections = {
-		behave = {
-			
-		}
-	
-	}
-}
+--behaviour_tree = create_behaviour_tree {
+--	nodes = {
+--		behave = {
+--			node_type = selector
+--			on_update = function(entity) return behaviour_tree_component.SUCCESS end
+--		},
+--		
+--		player_visible = {
+--			on_update = function(entity) 
+--				local p1 = entity.transform.current.pos
+--				local p2 = player.body.transform.current.pos
+--				
+--				render_system:push_line(debug_line(p1, p2, rgba(255, 0, 0, 255)))
+--				
+--				ray_output = physics_system:ray_cast(p1, p2, create(b2Filter, filter_obstacle_visibility), entity)
+--				
+--				if ray_output.hit and ray_output.what_entity == player.body then
+--					return behaviour_tree_component.SUCCESS 
+--				end
+--				
+--				return behaviour_tree_component.FAILURE
+--			end
+--		},
+--		
+--		chase_player = {
+--			on_enter = function(entity) 
+--				npc_data = get_scripted(entity)
+--				npc_data.steering_behaviours.pursuit.enabled = true
+--			end
+--		
+--		}
+--	},
+--	
+--	connections = {
+--		behave = {
+--			
+--		}
+--	
+--	}
+--}
 
 npc_script_info = create_scriptable_info {
 	scripted_events = {

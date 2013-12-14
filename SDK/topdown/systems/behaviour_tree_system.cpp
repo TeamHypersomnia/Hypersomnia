@@ -6,16 +6,20 @@
 
 using namespace components;
 
-behaviour_tree::behaviour::behaviour() : current_status(status::INVALID) {}
+behaviour_tree::behaviour::behaviour() : current_status(status::INVALID), node_type(type::SEQUENCER) {}
 
 void behaviour_tree::tree::flatten_routine(behaviour* node) {
 	/* depth first order */
+	auto found_entry = address_map.find(node);
 	
-	address_map[node] = flattened_tree.size();
-	flattened_tree.push_back(*node);
-	
-	for (auto child : node->children)
-		flatten_routine(node);
+	/* count only if it is unique as it is DAG */
+	if (found_entry == address_map.end()) {
+		address_map[node] = flattened_tree.size();
+		flattened_tree.push_back(*node);
+
+		for (auto child : node->children)
+			flatten_routine(child);
+	}
 }
 
 void behaviour_tree::tree::create_flattened_tree(behaviour* root) {
@@ -112,4 +116,83 @@ void behaviour_tree_system::process_entities(world& owner) {
 		tree.task_instance.subject = it;
 		tree.starting_node->tick(tree.task_instance);
 	}
+}
+
+#include <gtest\gtest.h>
+
+TEST(BehaviourTree, InvalidOnInit) {
+	behaviour_tree::behaviour my_behaviour;
+	EXPECT_EQ(my_behaviour.current_status, my_behaviour.INVALID);
+	EXPECT_EQ(my_behaviour.node_type, my_behaviour.SEQUENCER);
+}
+
+TEST(BehaviourTree, DepthFirstOrderAndMultipleParents) {
+	/*
+	numbers are connected so they form depth-first traversal order
+	0 ->1
+	1 ->2
+	2 ->3
+	2 ->4
+	1 ->5
+	5 ->6
+	5 ->7
+	5 ->8
+	0 ->9
+	0 ->10
+	0 ->11
+	11->12
+	11->13
+	13->5
+	11->14
+	14->5
+	*/
+
+#define NODE_COUNT 15
+	behaviour_tree::behaviour my_behaviours[NODE_COUNT];
+	my_behaviours[0].children.push_back(my_behaviours +	 1);
+	my_behaviours[1].children.push_back(my_behaviours +	 2);
+	my_behaviours[2].children.push_back(my_behaviours +	 3);
+	my_behaviours[2].children.push_back(my_behaviours +	 4);
+	my_behaviours[1].children.push_back(my_behaviours +	 5);
+	my_behaviours[5].children.push_back(my_behaviours +	 6);
+	my_behaviours[5].children.push_back(my_behaviours +	 7);
+	my_behaviours[5].children.push_back(my_behaviours +	 8);
+	my_behaviours[0].children.push_back(my_behaviours +	 9);
+	my_behaviours[0].children.push_back(my_behaviours +	 10);
+	my_behaviours[0].children.push_back(my_behaviours +	 11);
+	my_behaviours[11].children.push_back(my_behaviours + 12);
+	my_behaviours[11].children.push_back(my_behaviours + 13);
+	my_behaviours[11].children.push_back(my_behaviours + 13);
+
+	/* a connection to already parented node */
+	my_behaviours[13].children.push_back(my_behaviours + 5);
+	my_behaviours[11].children.push_back(my_behaviours + 14);
+	/* a connection to already parented node */
+	my_behaviours[14].children.push_back(my_behaviours + 5);
+	
+	/* create some means of identification */
+	for (int i = 0; i < NODE_COUNT; ++i) {
+		my_behaviours[i].node_type = i;
+	}
+
+	behaviour_tree::tree my_tree;
+	my_tree.create_flattened_tree(my_behaviours);
+
+	ASSERT_EQ(my_tree.flattened_tree.size(), NODE_COUNT);
+	EXPECT_EQ(my_tree.address_map.size(), NODE_COUNT);
+
+	for (size_t i = 0; i < NODE_COUNT; ++i)
+		EXPECT_EQ(my_tree.flattened_tree[i].node_type, i);
+
+	for (size_t i = 0; i < NODE_COUNT; ++i) {
+		EXPECT_EQ(my_tree.address_map[my_behaviours + i], i);
+		EXPECT_EQ(my_tree.retrieve_behaviour(my_behaviours + i), &my_tree.flattened_tree[i]);
+	}
+}
+
+
+TEST(BehaviourTree, DepthFirstOrderAndMultipleParents) {
+
+
+
 }

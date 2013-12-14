@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+#include <gtest\gtest.h>
 #include "../../augmentations.h"
 #include "../../window_framework/window.h"
 
@@ -129,10 +130,18 @@ int main() {
 	std::cout << std::endl;
 	lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
 
+
+	int argc = 0;
+	::testing::InitGoogleTest(&argc, (wchar_t**)nullptr);
+
+	::testing::FLAGS_gtest_catch_exceptions = false;
+	::testing::FLAGS_gtest_break_on_failure = true;
+	auto result = RUN_ALL_TESTS();
+
 	while (!input.quit_flag) {
 		
 		my_world.run();
-		std::cout << physics.ray_casts_per_frame << std::endl;
+		//std::cout << physics.ray_casts_per_frame << std::endl;
 
 		auto& scripts_reloaded = resources::script::script_reloader.get_script_files_to_reload();
 		

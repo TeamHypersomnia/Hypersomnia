@@ -50,11 +50,11 @@ namespace components {
 		};
 
 		class tree {
-			std::vector<behaviour> flattened_tree;
-			std::unordered_map<behaviour*, size_t> address_map;
-			
 			void flatten_routine(behaviour* root);
 		public:
+			std::unordered_map<behaviour*, size_t> address_map;
+			std::vector<behaviour> flattened_tree;
+
 			void create_flattened_tree(behaviour* root);
 			behaviour* retrieve_behaviour(behaviour*);
 		};
