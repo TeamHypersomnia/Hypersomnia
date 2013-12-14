@@ -43,7 +43,7 @@
     <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;$(IncludePath)</IncludePath>
+    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;C:\Users\Anonymous\Documents\GitHub\Augmentations\3rdparty\gtest;$(IncludePath)</IncludePath>
     <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -98,6 +98,13 @@
     <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2CircleShape.cpp" />
     <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2EdgeShape.cpp" />
     <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2PolygonShape.cpp" />
+    <ClCompile Include="3rdparty\gtest\src\gtest-death-test.cc" />
+    <ClCompile Include="3rdparty\gtest\src\gtest-filepath.cc" />
+    <ClCompile Include="3rdparty\gtest\src\gtest-port.cc" />
+    <ClCompile Include="3rdparty\gtest\src\gtest-printers.cc" />
+    <ClCompile Include="3rdparty\gtest\src\gtest-test-part.cc" />
+    <ClCompile Include="3rdparty\gtest\src\gtest-typed-test.cc" />
+    <ClCompile Include="3rdparty\gtest\src\gtest.cc" />
     <ClCompile Include="3rdparty\lua\lapi.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -323,6 +330,9 @@
     <ClCompile Include="graphics\pixel.cpp" />
     <ClCompile Include="math\rects.cpp" />
     <ClCompile Include="math\vec2d.cpp" />
+    <ClCompile Include="SDK\topdown\bindings\behaviour_tree_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="SDK\topdown\bindings\pathfinding_component_binding.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
@@ -484,6 +494,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SDK\topdown\resources\vertex.cpp" />
+    <ClCompile Include="SDK\topdown\systems\behaviour_tree_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="SDK\topdown\systems\pathfinding_system.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
@@ -676,6 +689,27 @@
     <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2WeldJoint.h" />
     <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2WheelJoint.h" />
     <ClInclude Include="3rdparty\Box2D\Rope\b2Rope.h" />
+    <ClInclude Include="3rdparty\gtest\gtest-death-test.h" />
+    <ClInclude Include="3rdparty\gtest\gtest-message.h" />
+    <ClInclude Include="3rdparty\gtest\gtest-param-test.h" />
+    <ClInclude Include="3rdparty\gtest\gtest-printers.h" />
+    <ClInclude Include="3rdparty\gtest\gtest-spi.h" />
+    <ClInclude Include="3rdparty\gtest\gtest-test-part.h" />
+    <ClInclude Include="3rdparty\gtest\gtest-typed-test.h" />
+    <ClInclude Include="3rdparty\gtest\gtest.h" />
+    <ClInclude Include="3rdparty\gtest\gtest_pred_impl.h" />
+    <ClInclude Include="3rdparty\gtest\gtest_prod.h" />
+    <ClInclude Include="3rdparty\gtest\internal\gtest-death-test-internal.h" />
+    <ClInclude Include="3rdparty\gtest\internal\gtest-filepath.h" />
+    <ClInclude Include="3rdparty\gtest\internal\gtest-internal.h" />
+    <ClInclude Include="3rdparty\gtest\internal\gtest-linked_ptr.h" />
+    <ClInclude Include="3rdparty\gtest\internal\gtest-param-util-generated.h" />
+    <ClInclude Include="3rdparty\gtest\internal\gtest-param-util.h" />
+    <ClInclude Include="3rdparty\gtest\internal\gtest-port.h" />
+    <ClInclude Include="3rdparty\gtest\internal\gtest-string.h" />
+    <ClInclude Include="3rdparty\gtest\internal\gtest-tuple.h" />
+    <ClInclude Include="3rdparty\gtest\internal\gtest-type-util.h" />
+    <ClInclude Include="3rdparty\gtest\src\gtest-internal-inl.h" />
     <ClInclude Include="3rdparty\poly2tri\common\shapes.h" />
     <ClInclude Include="3rdparty\poly2tri\common\utils.h" />
     <ClInclude Include="3rdparty\poly2tri\poly2tri.h" />
@@ -703,15 +737,16 @@
     <ClInclude Include="math\rects.h" />
     <ClInclude Include="math\vec2d.h" />
     <ClInclude Include="SDK\topdown\bindings\bindings.h" />
+    <ClInclude Include="SDK\topdown\components\behaviour_tree_component.h" />
     <ClInclude Include="SDK\topdown\components\visibility_component.h" />
     <ClInclude Include="SDK\topdown\components\pathfinding_component.h" />
     <ClInclude Include="SDK\topdown\components\steering_component.h" />
     <ClInclude Include="SDK\topdown\messages\steering_message.h" />
     <ClInclude Include="SDK\topdown\resources\fbo.h" />
+    <ClInclude Include="SDK\topdown\systems\behaviour_tree_system.h" />
     <ClInclude Include="SDK\topdown\systems\pathfinding_system.h" />
     <ClInclude Include="SDK\topdown\systems\visibility_system.h" />
     <ClInclude Include="SDK\topdown\systems\steering_system.h" />
-    <ClInclude Include="stdafx.h" />
     <ClInclude Include="SDK\topdown\resources\animate_info.h" />
     <ClInclude Include="SDK\topdown\components\animate_component.h" />
     <ClInclude Include="SDK\topdown\components\camera_component.h" />
