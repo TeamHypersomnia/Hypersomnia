@@ -203,7 +203,7 @@ function create_steering(entries)
 end
 
 function create_behaviour_tree(entries)
-	
+	local my_allocator = behaviour_tree_allocator()
 
 end
 

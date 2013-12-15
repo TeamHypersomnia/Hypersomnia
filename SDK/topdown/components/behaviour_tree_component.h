@@ -15,26 +15,30 @@ namespace components {
 			enum status {
 				RUNNING,
 				FAILURE,
-				SUCCESS,
-				INVALID
+				SUCCESS
 			};
-
-			int current_status;
 
 			enum type {
 				SEQUENCER,
 				SELECTOR
 			};
-			
-			int node_type;
 
-			int tick(task&);
+			int default_return;
+			int node_type;
+			behaviors children;
+
+			int begin_traversal(task&);
+
+			int tick(task&, behaviour*, size_t);
 			int traverse(task&);
 			
 			/* these functions only call the script delegates */
 			void on_enter(task&);
 			void on_exit(task&, int exit_code);
 			int on_update(task&);
+
+			bool is_currently_running(const task&) const;
+			static void interrupt_running(behaviour* new_running, size_t new_index, task&);
 
 			/* actual implemented behaviours */
 			luabind::object enter_callback;
@@ -44,8 +48,6 @@ namespace components {
 			behaviour();
 
 			void reset_subtree(const task&);
-			behaviors children;
-
 			void add_child(behaviour*);
 		};
 
@@ -64,6 +66,8 @@ namespace components {
 
 			behaviour* running_parent_node;
 			size_t running_index;
+
+			bool operator==(const task&) const;
 
 			task();
 		};

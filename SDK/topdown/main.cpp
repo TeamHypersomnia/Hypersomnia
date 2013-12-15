@@ -135,7 +135,7 @@ int main() {
 	::testing::InitGoogleTest(&argc, (wchar_t**)nullptr);
 
 	::testing::FLAGS_gtest_catch_exceptions = false;
-	::testing::FLAGS_gtest_break_on_failure = true;
+	::testing::FLAGS_gtest_break_on_failure = false;
 	auto result = RUN_ALL_TESTS();
 
 	while (!input.quit_flag) {

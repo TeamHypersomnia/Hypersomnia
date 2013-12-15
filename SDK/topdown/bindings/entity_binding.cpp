@@ -5,6 +5,7 @@
 
 #include "bindings.h"
 
+#include "../components/behaviour_tree_component.h"
 #include "../components/visibility_component.h"
 #include "../components/pathfinding_component.h"
 #include "../components/animate_component.h"
@@ -31,9 +32,11 @@ namespace bindings {
 			luabind::class_<entity>("_entity")
 			.def("clear", &entity::clear)
 			.def(luabind::const_self == luabind::const_self)
-
+			
 			.def("add", &entity::add<animate>)
 			.property("animate", &entity::find<animate>, &entity::set<animate>)
+			.def("add", &entity::add<behaviour_tree>)
+			.property("behaviour_tree", &entity::find<behaviour_tree>, &entity::set<behaviour_tree>)
 			.def("add", &entity::add<visibility>)
 			.property("visibility", &entity::find<visibility>, &entity::set<visibility>)
 			.def("add", &entity::add<pathfinding>)
