@@ -68,6 +68,7 @@ function set_components_from_entry(entity, entry, entities_lookup)
 	def		(visibility_component, 'visibility', {}, { visibility_layers = true })
 	def		(pathfinding_component, 'pathfinding')
 	def		(steering_component, 'steering')
+	def		(behaviour_tree_component, 'behaviour_tree')
 	
 	if entry.visibility ~= nil then
 		local visibility = entity.visibility

@@ -69,38 +69,44 @@ int behaviour_tree::behaviour::tick(task& current_task, behaviour* parent, size_
 		current_status = traverse(current_task);
 	}
 	
-	/* end this node if it was running but has just finalized
-		or if it is just a regular finalized node 
-	*/
-	if (is_currently_running(current_task) && current_status != status::RUNNING
-		|| 
-		!is_currently_running(current_task)
-		)
+	/* end this node if it was running but has just finalized */
+	if (is_currently_running(current_task) && current_status != status::RUNNING) {
+		interrupt_running(nullptr, 0, current_task, current_status);
+	}
+	/* else call on_exit for a regular finalized node */
+	else if (!is_currently_running(current_task)) {
 		on_exit(current_task, current_status);
+	}
 	
 	return current_status;
 }
 
 void behaviour_tree::behaviour::on_enter(task& current_task) {
-	if (enter_callback)
+	if (enter_callback) {
+		std::cout << "entering " << name << std::endl;
 		luabind::call_function<void>(enter_callback, current_task.subject);
+	}
 }
 
 void behaviour_tree::behaviour::on_exit(task& current_task, int exit_code) {
-	if (exit_callback)
+	if (exit_callback) {
+		std::cout << "quitting " << name << std::endl;
 		luabind::call_function<void>(exit_callback, current_task.subject, exit_code);
+	}
 }
 
 int behaviour_tree::behaviour::on_update(task& current_task) {
-	if (update_callback)
+	if (update_callback) {
+		//std::cout << "updating " << name << std::endl;
 		return luabind::call_function<int>(update_callback, current_task.subject);
+	}
 
 	return default_return;
 }
 
-void behaviour_tree::behaviour::interrupt_running(behaviour* new_task, size_t i, task& current_task) {
+void behaviour_tree::behaviour::interrupt_running(behaviour* new_task, size_t i, task& current_task, int exit_code) {
 	if (current_task.running_parent_node) 
-		current_task.running_parent_node->children[current_task.running_index]->on_exit(current_task, status::FAILURE);
+		current_task.running_parent_node->children[current_task.running_index]->on_exit(current_task, exit_code);
 	
 	current_task.running_index = i;
 	current_task.running_parent_node = new_task;
@@ -245,8 +251,75 @@ TEST(BehaviourTree, SelectorFailureSuccess) {
 	EXPECT_EQ(behaviour_tree::behaviour::SUCCESS, my_behaviours[0].begin_traversal(my_task));
 }
 
+struct mock_behaviour : behaviour_tree::behaviour {
+	int enter_called;
+	int exit_called;
+	int update_called;
+
+	mock_behaviour() : enter_called(0), exit_called(0), update_called(0) {}
+
+	void on_enter(behaviour_tree::task& t) override {
+		++enter_called;
+		return behaviour_tree::behaviour::on_enter(t);
+	}
+
+	void on_exit(behaviour_tree::task& t, int exit_code) override {
+		++exit_called;
+		return behaviour_tree::behaviour::on_exit(t, exit_code);
+	}
+
+	int on_update(behaviour_tree::task& t) override {
+		++update_called;
+		return behaviour_tree::behaviour::on_update(t);
+	}
+};
+
+TEST(BehaviourTree, TwoSequentialRunningExitCount) {
+	mock_behaviour my_behaviours[5];
+	my_behaviours[0].children.push_back(my_behaviours + 1);
+	my_behaviours[0].children.push_back(my_behaviours + 2);
+	my_behaviours[0].children.push_back(my_behaviours + 3);
+	my_behaviours[0].children.push_back(my_behaviours + 4);
+	
+	for (int i = 0; i < 5; ++i) {
+		my_behaviours[i].node_type = behaviour_tree::behaviour::SEQUENCER;
+		my_behaviours[i].default_return = behaviour_tree::behaviour::SUCCESS;
+	}
+
+	my_behaviours[2].default_return = behaviour_tree::behaviour::RUNNING;
+
+	behaviour_tree::task my_task;
+	my_behaviours[0].begin_traversal(my_task);
+
+	my_behaviours[2].default_return = behaviour_tree::behaviour::SUCCESS;
+	my_behaviours[3].default_return = behaviour_tree::behaviour::RUNNING;
+	my_behaviours[0].begin_traversal(my_task);
+
+	EXPECT_EQ(2, my_behaviours[0].enter_called);
+	EXPECT_EQ(2, my_behaviours[0].update_called);
+	EXPECT_EQ(2, my_behaviours[0].exit_called);
+	
+	EXPECT_EQ(1, my_behaviours[1].enter_called);
+	EXPECT_EQ(1, my_behaviours[1].update_called);
+	EXPECT_EQ(1, my_behaviours[1].exit_called);
+	
+	EXPECT_EQ(1, my_behaviours[2].enter_called);
+	EXPECT_EQ(2, my_behaviours[2].update_called);
+	EXPECT_EQ(1, my_behaviours[2].exit_called);
+
+	EXPECT_EQ(1, my_behaviours[3].enter_called);
+	EXPECT_EQ(1, my_behaviours[3].update_called);
+	EXPECT_EQ(0, my_behaviours[3].exit_called);
+
+	EXPECT_EQ(0, my_behaviours[4].enter_called);
+	EXPECT_EQ(0, my_behaviours[4].update_called);
+	EXPECT_EQ(0, my_behaviours[4].exit_called);
+}
+
 TEST(BehaviourTree, RunningInterruptions) {
-	behaviour_tree::behaviour my_behaviours[NODE_COUNT];
+
+
+	mock_behaviour my_behaviours[NODE_COUNT];
 	my_behaviours[0].children.push_back(my_behaviours + 1);
 	my_behaviours[1].children.push_back(my_behaviours + 2);
 	my_behaviours[2].children.push_back(my_behaviours + 3);
@@ -271,31 +344,50 @@ TEST(BehaviourTree, RunningInterruptions) {
 	}
 	my_behaviours[12].default_return = behaviour_tree::behaviour::RUNNING;
 
-	behaviour_tree::tree my_tree;
-	my_tree.create_flattened_tree(my_behaviours);
-
 	behaviour_tree::task my_task;
-	my_behaviours[0].reset_subtree(my_task);
 	my_behaviours[0].begin_traversal(my_task);
-	
-	//for (int i = 0; i < NODE_COUNT; ++i) {
-	//	if (i == 12 || i == 11 || i == 0) EXPECT_EQ(my_behaviours[i].current_status, behaviour_tree::behaviour::RUNNING);
-	//	else EXPECT_EQ(my_behaviours[i].current_status, behaviour_tree::behaviour::SUCCESS);
-	//}
-	
-	my_behaviours[0].reset_subtree(my_task);
+
+	/* check if all nodes before the running node were correctly traversed once */
+	for (int i = 0; i < 12; ++i) {
+		EXPECT_EQ(1, my_behaviours[i].enter_called);
+		EXPECT_EQ(1, my_behaviours[i].update_called);
+		EXPECT_EQ(1, my_behaviours[i].exit_called);
+	}
+
+	/* check if the running node did not exit */
+	EXPECT_EQ(1, my_behaviours[12].enter_called);
+	EXPECT_EQ(1, my_behaviours[12].update_called);
+	EXPECT_EQ(0, my_behaviours[12].exit_called);
+
+	/* check if the past-running nodes were not traversed */
+	for (int i = 13; i < 15; ++i) {
+		EXPECT_EQ(0, my_behaviours[i].enter_called);
+		EXPECT_EQ(0, my_behaviours[i].update_called);
+		EXPECT_EQ(0, my_behaviours[i].exit_called);
+	}
+
+	/* check if the running node was correctly picked */
 	EXPECT_EQ(my_behaviours + 11, my_task.running_parent_node);
 	EXPECT_EQ(0, my_task.running_index);
-
-	//for (int i = 0; i < NODE_COUNT; ++i) {
-	//	if (i == 12 || i == 11) EXPECT_EQ(my_behaviours[i].current_status, behaviour_tree::behaviour::RUNNING);
-	//	else EXPECT_EQ(my_behaviours[i].current_status, behaviour_tree::behaviour::INVALID);
-	//}
 
 	my_behaviours[4].default_return = behaviour_tree::behaviour::RUNNING;
 	
 	my_behaviours[0].begin_traversal(my_task);
-	my_behaviours[0].reset_subtree(my_task);
+
+	for (int i = 0; i < 4; ++i) {
+		EXPECT_EQ(2, my_behaviours[i].enter_called);
+		EXPECT_EQ(2, my_behaviours[i].update_called);
+		EXPECT_EQ(2, my_behaviours[i].exit_called);
+	}
+
+	EXPECT_EQ(2, my_behaviours[4].enter_called);
+	EXPECT_EQ(2, my_behaviours[4].update_called);
+	EXPECT_EQ(1, my_behaviours[4].exit_called);
+
+	/* check if the previous running correctly quit */
+	EXPECT_EQ(1, my_behaviours[12].enter_called);
+	EXPECT_EQ(1, my_behaviours[12].update_called);
+	EXPECT_EQ(1, my_behaviours[12].exit_called);
 
 	EXPECT_EQ(my_behaviours + 2, my_task.running_parent_node);
 	EXPECT_EQ(1, my_task.running_index);
@@ -304,7 +396,6 @@ TEST(BehaviourTree, RunningInterruptions) {
 	my_behaviours[12].default_return = behaviour_tree::behaviour::FAILURE;
 	
 	my_behaviours[0].begin_traversal(my_task);
-	my_behaviours[0].reset_subtree(my_task);
 	EXPECT_EQ(nullptr, my_task.running_parent_node);
 
 	//for (int i = 0; i < NODE_COUNT; ++i) 

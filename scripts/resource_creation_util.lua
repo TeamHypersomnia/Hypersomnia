@@ -204,6 +204,29 @@ end
 
 function create_behaviour_tree(entries)
 	local my_allocator = behaviour_tree_allocator()
-
+	local out_my_nodes = {}
+	
+	for k, v in pairs(entries.nodes) do
+		out_my_nodes[k] = behaviour_node()
+		rewrite(out_my_nodes[k], v)
+		out_my_nodes[k].name = k
+	end
+	
+	for root, v in pairs(entries.connections) do
+		print("parent is: " .. root)
+		for i=1, #v do
+			
+			print(i, v[i])
+			out_my_nodes[root]:add_child(out_my_nodes[v[i]])
+		end
+	end
+	
+	my_allocator:create_flattened_tree(out_my_nodes[entries.root])
+	
+	for k, v in pairs(out_my_nodes) do
+		v = my_allocator:retrieve_behaviour(v)
+	end
+	
+	return out_my_nodes
 end
 

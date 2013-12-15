@@ -10,7 +10,10 @@ namespace bindings {
 			.def(luabind::constructor<>())
 			.def_readwrite("default_return", &behaviour_tree::behaviour::default_return)
 			.def_readwrite("node_type", &behaviour_tree::behaviour::node_type)
-			.def_readwrite("default_return", &behaviour_tree::behaviour::default_return)
+			.def_readwrite("on_enter", &behaviour_tree::behaviour::enter_callback)
+			.def_readwrite("on_exit", &behaviour_tree::behaviour::exit_callback)
+			.def_readwrite("on_update", &behaviour_tree::behaviour::update_callback)
+			.def_readwrite("name", &behaviour_tree::behaviour::name)
 			.def("add_child", &behaviour_tree::behaviour::add_child)
 			.enum_("constants")[
 				luabind::value("SUCCESS", behaviour_tree::behaviour::SUCCESS),

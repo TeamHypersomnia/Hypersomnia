@@ -27,18 +27,22 @@ namespace components {
 			int node_type;
 			behaviors children;
 
+			std::string name;
+
 			int begin_traversal(task&);
 
 			int tick(task&, behaviour*, size_t);
 			int traverse(task&);
 			
-			/* these functions only call the script delegates */
-			void on_enter(task&);
-			void on_exit(task&, int exit_code);
-			int on_update(task&);
+			/* these functions only call the script delegates
+				virtuals are only for mocking
+			*/
+			virtual void on_enter(task&);
+			virtual void on_exit(task&, int exit_code);
+			virtual int on_update(task&);
 
 			bool is_currently_running(const task&) const;
-			static void interrupt_running(behaviour* new_running, size_t new_index, task&);
+			static void interrupt_running(behaviour* new_running, size_t new_index, task&, int status = status::FAILURE);
 
 			/* actual implemented behaviours */
 			luabind::object enter_callback;

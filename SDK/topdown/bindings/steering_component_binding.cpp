@@ -22,6 +22,7 @@ namespace bindings {
 			.def_readwrite("last_output_force", &steering::behaviour_state::last_output_force)
 			.def_readwrite("last_estimated_target_position", &steering::behaviour_state::last_estimated_target_position)
 			.def_readwrite("enabled", &steering::behaviour_state::enabled)
+			.def_readwrite("weight_multiplier", &steering::behaviour_state::weight_multiplier)
 			.def_readwrite("current_wander_angle", &steering::behaviour_state::current_wander_angle),
 
 			luabind::class_<steering::behaviour>("steering_behaviour")

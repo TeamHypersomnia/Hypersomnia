@@ -328,7 +328,7 @@ flee_steering = create_steering {
 seek_archetype = {
 	behaviour_type = seek_behaviour,
 	weight = 1,
-	radius_of_effect = 20,
+	radius_of_effect = 100,
 	force_color = rgba(0, 255, 255, 0)
 }			
 
@@ -340,7 +340,7 @@ forward_seek_steering = create_steering (archetyped(seek_archetype, {
 
 containment_archetype = {
 	behaviour_type = containment_behaviour,
-	weight = 100, 
+	weight = 1, 
 	
 	ray_filter = filter_obstacle_visibility,
 	
@@ -356,7 +356,7 @@ containment_archetype = {
 containment_steering = create_steering (containment_archetype) 
 
 obstacle_avoidance_archetype = {
-	weight = 1, 
+	weight = 1000, 
 	behaviour_type = obstacle_avoidance_behaviour,
 	visibility_type = visibility_component.DYNAMIC_PATHFINDING,
 	
@@ -401,9 +401,9 @@ separation_steering = create_steering {
 
 pursuit_steering = create_steering {
 	behaviour_type = seek_behaviour,
-	weight = 3,
+	weight = 1,
 	radius_of_effect = 20,
-	force_color = rgba(0, 255, 255, 0),
+	force_color = rgba(255, 255, 255, 255),
 	
 	max_target_future_prediction_ms = 400
 }
@@ -412,6 +412,12 @@ pursuit_steering = create_steering {
 npc_class = { 
 	entity = 0 
 }
+
+function set_max_speed(entity, max_speed_val)
+	entity.movement.max_speed = max_speed_val
+	entity.steering.max_resultant_force = max_speed_val
+
+end
 
 function get_scripted(entity)
 	return entity.scriptable.script_data
@@ -487,7 +493,7 @@ function npc_class:loop()
 		end
 	else
 		behaviours.target_seeking.enabled = false
-		behaviours.forward_seeking.enabled = true
+		behaviours.forward_seeking.enabled = false
 		--behaviours.obstacle_avoidance.enabled = false
 	end
 	
@@ -501,37 +507,39 @@ function npc_class:loop()
 		behaviours.wandering.current_wander_angle = behaviours.obstacle_avoidance.last_output_force:get_degrees()
 	end
 	
-	if entity == player.body then return true end
-	
-	local p1 = entity.transform.current.pos
-	local p2 = player.body.transform.current.pos
-	
-	render_system:push_line(debug_line(p1, p2, rgba(255, 0, 0, 255)))
-	
-	--print(p1.x, p1.y)
-	--print(p2.x, p2.y)
-	--if p1.x == p2.x and p1.y == p2.y then return true end
-	
-	ray_output = physics_system:ray_cast(p1, p2, create(b2Filter, filter_obstacle_visibility), entity)
-	
-	if ray_output.hit and ray_output.what_entity == player.body then
-		render_system:push_line(debug_line(p1, ray_output.intersection, rgba(0, 255, 0, 255)))
-		
-		behaviours.pursuit.enabled = true
-		
-		self.was_seen = true
-		self.target_entities.last_seen.transform.current.pos = player.body.transform.current.pos
-		
-		entity.pathfinding:clear_pathfinding_info()
-	else
-		behaviours.pursuit.enabled = false
-		
-		if self.was_seen and not entity.pathfinding:is_still_pathfinding() then
-			entity.pathfinding:start_pathfinding(self.target_entities.last_seen.transform.current.pos)
-			
-			entity.pathfinding:start_exploring()
-		end
-	end
+--	if entity == player.body then return true end
+--	
+--	local p1 = entity.transform.current.pos
+--	local p2 = player.body.transform.current.pos
+--	
+--	render_system:push_line(debug_line(p1, p2, rgba(255, 0, 0, 255)))
+--	
+--	--print(p1.x, p1.y)
+--	--print(p2.x, p2.y)
+--	--if p1.x == p2.x and p1.y == p2.y then return true end
+--	
+--	ray_output = physics_system:ray_cast(p1, p2, create(b2Filter, filter_obstacle_visibility), entity)
+--	
+--	if ray_output.hit and ray_output.what_entity == player.body then
+--	
+--		render_system:push_line(debug_line(p1, ray_output.intersection, rgba(0, 255, 0, 255)))
+--		
+--		behaviours.pursuit.enabled = true
+--		
+--		self.was_seen = true
+--		self.target_entities.last_seen.transform.current.pos = player.body.transform.current.pos
+--		self.target_entities.navigation.transform.current.pos = player.body.transform.current.pos
+--		
+--		entity.pathfinding:clear_pathfinding_info()
+--	else
+--		behaviours.pursuit.enabled = false
+--		
+--		if self.was_seen and not entity.pathfinding:is_still_pathfinding() then
+--			entity.pathfinding:start_pathfinding(self.target_entities.last_seen.transform.current.pos)
+--			
+--			entity.pathfinding:start_exploring()
+--		end
+--	end
 	
 	return true
 end
@@ -539,7 +547,7 @@ end
 npc_behaviour_tree = create_behaviour_tree {
 	nodes = {
 		behave = {
-			node_type = behaviour_node.SELECTOR
+			node_type = behaviour_node.SELECTOR,
 			on_update = function(entity) return behaviour_node.SUCCESS end
 		},
 		
@@ -548,13 +556,12 @@ npc_behaviour_tree = create_behaviour_tree {
 				local p1 = entity.transform.current.pos
 				local p2 = player.body.transform.current.pos
 				
-				render_system:push_line(debug_line(p1, p2, rgba(255, 0, 0, 255)))
 				
 				ray_output = physics_system:ray_cast(p1, p2, create(b2Filter, filter_obstacle_visibility), entity)
 				
 				if ray_output.hit and ray_output.what_entity == player.body then
 					local npc_info = get_scripted(entity)
-					npc_info.was_seen = ray_output.intersection
+					npc_info.was_seen = true
 					npc_info.target_entities.last_seen.transform.current.pos = player.body.transform.current.pos
 					
 					return behaviour_node.SUCCESS 
@@ -569,7 +576,8 @@ npc_behaviour_tree = create_behaviour_tree {
 				local npc_info = get_scripted(entity)
 				npc_info.steering_behaviours.pursuit.target_from:set(player.body)
 				npc_info.steering_behaviours.pursuit.enabled = true
-			end
+				npc_info.target_entities.navigation.transform.current.pos = player.body.transform.current.pos
+			end,
 			
 			on_exit = function(entity, status)
 				get_scripted(entity).steering_behaviours.pursuit.enabled = false
@@ -586,6 +594,8 @@ npc_behaviour_tree = create_behaviour_tree {
 				else
 					return behaviour_node.FAILURE
 				end
+				
+				return behaviour_node.FAILURE
 			end
 		},
 		
@@ -594,21 +604,29 @@ npc_behaviour_tree = create_behaviour_tree {
 			default_return = behaviour_node.SUCCESS,
 			
 			on_enter = function(entity)
-				entity.pathfinding:start_pathfinding(npc_info.last_seen.transform.current.pos)
+				local npc_info = get_scripted(entity)
+				entity.pathfinding:start_pathfinding(npc_info.target_entities.last_seen.transform.current.pos)
+			end,
+			
+			on_exit = function(entity, status)
+				--entity.pathfinding:clear_pathfinding_info()
 			end
 		},
 		
 		go_to_last_seen = {
-			--on_enter = function(entity)
+			on_enter = function(entity)
 			--	local npc_info = get_scripted(entity)
 			--	npc_info.steering_behaviours.pursuit.target_from:set(npc_info.last_seen)
 			--	npc_info.steering_behaviours.pursuit.enabled = true
-			--end
+			end,
 			
 			on_update = function(entity)
-				if entity.pathfinding.is_still_pathfinding() return behaviour_node.RUNNING
+				render_system:push_line(debug_line(entity.transform.current.pos, get_scripted(entity).target_entities.last_seen.transform.current.pos, rgba(255, 0, 0, 255)))
+				
+				if entity.pathfinding:is_still_pathfinding() then return behaviour_node.RUNNING end
 				return behaviour_node.SUCCESS 
-			end,
+			end
+			,
 			
 			on_exit = function(entity, status)
 				entity.pathfinding:clear_pathfinding_info()
@@ -618,18 +636,46 @@ npc_behaviour_tree = create_behaviour_tree {
 		explore = {
 			on_enter = function(entity)
 				entity.pathfinding:start_exploring()
+			end
+			,
+			
+			on_exit = function(entity, status)
+				entity.pathfinding:clear_pathfinding_info()
+			end
+			--,
+			--
+			--on_update = function(entity)
+			--	if entity.pathfinding:is_still_pathfinding() then return behaviour_node.RUNNING end
+			--	return behaviour_node.SUCCESS 
+			--end
+		},
+		
+		idle = {
+			default_return = behaviour_node.SUCCESS
+		},
+		
+		walk_around = {
+			default_return = behaviour_node.RUNNING,
+			
+			on_enter = function(entity)
+				set_max_speed(entity, 2000)
+				get_scripted(entity).steering_behaviours.wandering.weight_multiplier = 1.0 
 			end,
 			
-			on_update = function(entity)
-				if entity.pathfinding.is_still_pathfinding() return behaviour_node.RUNNING
-				return behaviour_node.SUCCESS 
+			on_exit = function(entity, status)
+				set_max_speed(entity, 5000)
+				get_scripted(entity).steering_behaviours.wandering.weight_multiplier = 0.2
 			end
 		}
 	},
 	
 	connections = {
 		behave = {
-			"player_visible", "player_seen_before", "walk_around"
+			"player_visible", "player_seen_before", "idle"
+		},
+		
+		idle = {
+			"walk_around"
 		},
 		
 		player_visible = {
@@ -637,9 +683,11 @@ npc_behaviour_tree = create_behaviour_tree {
 		},
 		
 		player_seen_before = {
-			"go_to_last_seen", "explore"
+			"begin_pathfinding_to_last_seen", "go_to_last_seen", "explore"
 		}
-	}
+	},
+	
+	root = "behave"
 }
 
 npc_script_info = create_scriptable_info {
@@ -702,7 +750,8 @@ my_npc_archetype = {
 			enable_backtracking = true,
 			target_offset = 100,
 			rotate_navpoints = 10,
-			distance_navpoint_hit = 2
+			distance_navpoint_hit = 2,
+			favor_velocity_parallellness = true
 		},
 		
 		movement = {
@@ -711,7 +760,7 @@ my_npc_archetype = {
 		},
 		
 		steering = {
-			max_resultant_force = 10000 -- -1 = no force clamping
+			max_resultant_force = -1 -- -1 = no force clamping
 		},
 		
 		scriptable = {
@@ -759,6 +808,8 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 	}
 }))
 
+set_max_speed(player.body, 4000)
+
 init_scripted(player.body)
 
 npc_count = 1
@@ -767,7 +818,8 @@ my_npcs = {}
 for i=1, npc_count do
 	my_npcs[i] = create_entity_group (archetyped(my_npc_archetype, {
 		body = {
-			transform = { pos = vec2(1000, (-2800)) },
+			transform = { pos = vec2(1000, (-2800)) }
+			,
 			
 			behaviour_tree = {
 				starting_node = npc_behaviour_tree.behave

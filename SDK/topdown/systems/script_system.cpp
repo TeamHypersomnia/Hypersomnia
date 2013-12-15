@@ -79,6 +79,7 @@ namespace bindings {
 		_physics_component(),
 		_steering_component(),
 		_scriptable_component(),
+		_behaviour_tree_component(),
 
 		_entity(),
 		_body_helper();
@@ -144,6 +145,7 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			bindings::_physics_component(),
 			bindings::_steering_component(),
 			bindings::_scriptable_component(),
+			bindings::_behaviour_tree_component(), 
 
 			bindings::_entity(),
 			bindings::_body_helper()
