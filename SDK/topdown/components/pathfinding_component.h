@@ -8,10 +8,15 @@ namespace components {
 	struct pathfinding : public augmentations::entity_system::component {
 		typedef std::pair<augmentations::vec2<>, augmentations::vec2<>> edge;
 
-		pathfinding() : enable_backtracking(true), target_offset(0.f), distance_navpoint_hit(0.f), is_exploring(false), rotate_navpoints(0.f) {}
+		pathfinding() : favor_velocity_parallellness(false), enable_backtracking(true), target_offset(0.f), distance_navpoint_hit(0.f), is_exploring(false), rotate_navpoints(0.f) {}
 
 		bool enable_backtracking;
 		bool is_exploring;
+
+		/* only in the context of exploration 
+		will pick vertices that are the most parallell with the velocity
+		*/
+		bool favor_velocity_parallellness;
 
 		float target_offset;
 		float rotate_navpoints;
@@ -39,17 +44,17 @@ namespace components {
 		}
 
 		void start_pathfinding(augmentations::vec2<> target) {
-			is_exploring = false;
 			clear_pathfinding_info();
 			session_stack.push_back(pathfinding_session());
 			session().target = target;
 			session().temporary_ignore_discontinuities_shorter_than = starting_ignore_discontinuities_shorter_than;
+			is_exploring = false;
 		}
 
 		void start_exploring() {
-			is_exploring = true;
 			clear_pathfinding_info();
 			session_stack.push_back(pathfinding_session());
+			is_exploring = true;
 		}
 
 		augmentations::vec2<> get_current_navigation_target() {

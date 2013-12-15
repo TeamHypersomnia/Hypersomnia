@@ -25,6 +25,7 @@ namespace bindings {
 			.def("get_current_target", &pathfinding::get_current_target)
 			.def("clear_pathfinding_info", &pathfinding::clear_pathfinding_info)
 			.def("is_still_pathfinding", &pathfinding::is_still_pathfinding)
+			.def_readwrite("favor_velocity_parallellness", &pathfinding::favor_velocity_parallellness)
 			.def_readwrite("enable_backtracking", &pathfinding::enable_backtracking)
 			.def_readwrite("rotate_navpoints", &pathfinding::rotate_navpoints)
 			.def_readwrite("target_offset", &pathfinding::target_offset)

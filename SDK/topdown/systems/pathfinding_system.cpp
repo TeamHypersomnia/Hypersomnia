@@ -207,14 +207,25 @@ void pathfinding_system::process_entities(world& owner) {
 			}
 
 			if (!vertices.empty()) {
+				vec2<> unit_vel = body->GetLinearVelocity();
+				unit_vel.normalize();
+
 				/* find discontinuity that is closest to the target */
 				auto& local_minimum_discontinuity = (*std::min_element(vertices.begin(), vertices.end(),
-					[&pathfinding, &transform](const components::pathfinding::pathfinding_session::navigation_vertex& a,
+					[&pathfinding, &transform, body, unit_vel](const components::pathfinding::pathfinding_session::navigation_vertex& a,
 					const components::pathfinding::pathfinding_session::navigation_vertex& b) {
 						
 						/* if we're exploring, we have no target in the first session */
-						if (pathfinding.is_exploring && pathfinding.session_stack.size() == 1) 
-							return (a.location - transform.pos).length_sq() < (b.location - transform.pos).length_sq();
+					if (pathfinding.is_exploring && pathfinding.session_stack.size() == 1) {
+						if (pathfinding.favor_velocity_parallellness) {
+
+							auto parallellness_a = (a.location - transform.pos).normalize().dot(unit_vel);
+							auto parallellness_b = (b.location - transform.pos).normalize().dot(unit_vel);
+
+							return parallellness_a > parallellness_b;
+						}
+						else return (a.location - transform.pos).length_sq() < (b.location - transform.pos).length_sq();
+					}
 
 						auto dist_a = (a.location - pathfinding.session().target).length_sq() + (a.location - transform.pos).length_sq();
 						auto dist_b = (b.location - pathfinding.session().target).length_sq() + (b.location - transform.pos).length_sq();
