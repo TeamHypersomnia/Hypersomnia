@@ -508,7 +508,7 @@ vec2<> steering::obstacle_avoidance::steer(scene in) {
 			steering += correction * navigation_correction->weight;
 		}
 
-		return steering.normalize() * in.subject.max_speed;
+		return steering.set_length(in.subject.velocity.length());
 	}
 
 	/* no obstacle on the way, no force applied */
@@ -653,7 +653,7 @@ void steering_system::substep(world& owner) {
 			added_force = subject_behaviour.steer(frame_of_reference);
 
 			behaviour.last_output_force = added_force;
-			added_force *= subject_behaviour.weight;
+			added_force *= subject_behaviour.weight * behaviour.weight_multiplier;
 
 			/* values less then 0.f indicate we don't want force clamping */
 			if (subject_behaviour.max_force_applied >= 0.f)

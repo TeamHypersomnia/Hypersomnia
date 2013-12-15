@@ -165,13 +165,15 @@ namespace components {
 
 			augmentations::vec2<> last_output_force;
 			augmentations::vec2<> last_estimated_target_position;
+			float weight_multiplier;
+
 			bool enabled;
 
 			float current_wander_angle;
 
 			void update_target_info(const object_info& subject);
 			behaviour_state(behaviour* subject_behaviour = nullptr)
-				: subject_behaviour(subject_behaviour), current_wander_angle(0.f), enabled(true) {}
+				: subject_behaviour(subject_behaviour), current_wander_angle(0.f), enabled(true), weight_multiplier(1.f) {}
 		};
 
 		/* the only reason we are storing pointers instead of values are scripts */
