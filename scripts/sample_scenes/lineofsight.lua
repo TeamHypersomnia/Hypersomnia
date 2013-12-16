@@ -731,7 +731,7 @@ my_npc_archetype = {
 			visibility_layers = {
 				[visibility_component.DYNAMIC_PATHFINDING] = {
 					square_side = 5000,
-					color = rgba(0, 255, 255, 20),
+					color = rgba(0, 255, 255, 120),
 					ignore_discontinuities_shorter_than = -1,
 					filter = filter_pathfinding_visibility
 				}

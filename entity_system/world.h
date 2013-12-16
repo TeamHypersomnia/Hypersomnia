@@ -9,9 +9,10 @@
 
 namespace augmentations {
 	namespace entity_system {
+		class entity;
+
 		class processing_system;
 		class world {
-			friend class entity;
 			friend class entity_ptr;
 
 			struct message_queue {
@@ -32,18 +33,19 @@ namespace augmentations {
 			std::unordered_map<size_t, boost::pool<>> size_to_container;
 			std::unordered_map<entity*, util::sorted_vector<entity_ptr*>> registered_entity_watchers;
 
-			type_registry component_library;
 
-			boost::pool<>& get_container_for_size(size_t size);
-			boost::pool<>& get_container_for_type(type_hash hash);
-			boost::pool<>& get_container_for_type(const base_type& type);
-			
 			std::vector<processing_system*> systems;
+			std::vector<processing_system*> all_systems;
 			std::unordered_map<size_t, processing_system*> hash_to_system;
 
 			void register_entity_watcher(entity_ptr&);
 			void unregister_entity_watcher(entity_ptr&);
 		public:
+			boost::pool<>& get_container_for_size(size_t size);
+			boost::pool<>& get_container_for_type(type_hash hash);
+			boost::pool<>& get_container_for_type(const base_type& type);
+			
+			type_registry component_library;
 
 			template <typename T>
 			void register_message_queue() {
@@ -62,19 +64,43 @@ namespace augmentations {
 				return (static_cast<templated_message_queue<T>*>(output_queue->at(typeid(T).hash_code()).get()))->messages.push_back(message_object);
 			}
 			
-			template<class T>
-			void add_system(T* new_system) {
+			std::vector<processing_system*>& get_all_systems() {
+				return all_systems;
+			}
+
+			template <class T>
+			void register_system(T* new_system) {
+				bool such_a_system_found = false;
+				for (auto it : all_systems) {
+					if (it == new_system) {
+						such_a_system_found = true;
+						break;
+					}
+				}
+
+				if (!such_a_system_found)
+					all_systems.push_back(new_system);
 				/*
 				here we register systems' signatures so we can ensure that whenever we add a component it is already registered
 				of course entities must be created AFTER the systems are specified and added
 				*/
-				new_system->components_signature 
+				new_system->components_signature
 					= signature_matcher_bitset(component_library.register_types(new_system->get_needed_components()));
-				
-				systems.push_back(new_system);
+
 				/* register to enable by-type system retrieval */
 				hash_to_system[typeid(T).hash_code()] = new_system;
+			}
 
+			template<class T>
+			void add_system(T* new_system) {
+				systems.push_back(new_system);
+				register_system(new_system);
+			}
+
+			template<class T>
+			void add_subsystem(processing_system* parent_system, T* new_subsystem) {
+				parent_system->subsystems.push_back(new_subsystem);
+				register_system(new_subsystem);
 			}
 			
 			template<class T>

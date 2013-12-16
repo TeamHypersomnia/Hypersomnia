@@ -83,12 +83,12 @@ int main() {
 	behaviour_tree_system behaviours;
 
 	my_world.add_system(&scripts);
-	my_world.add_system(&behaviours);
 	my_world.add_system(&input);
-	my_world.add_system(&steering);
+	//my_world.add_system(&steering);
 	my_world.add_system(&movement);
-	physics.substepping_systems.push_back(&steering);
-	physics.substepping_systems.push_back(&movement);
+	my_world.add_subsystem(&physics, &steering);
+	my_world.add_subsystem(&physics, &movement);
+	my_world.add_subsystem(&physics, &behaviours);
 	my_world.add_system(&physics);
 	my_world.add_system(&lookat);
 	my_world.add_system(&chase);
@@ -126,6 +126,7 @@ int main() {
 
 	init_script.associate_filename("scripts\\init.lua");
 	init_script.add_reload_dependant(&init_script);
+	// http://google.pl
 	init_script.call();
 	std::cout << std::endl;
 	lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);

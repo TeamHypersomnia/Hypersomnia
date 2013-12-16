@@ -171,7 +171,7 @@ int behaviour_tree::behaviour::begin_traversal(task& current_task) {
 }
 
 
-void behaviour_tree_system::process_entities(world& owner) {
+void behaviour_tree_system::substep(world& owner) {
 	for (auto it : targets) {
 		auto& tree = it->get<components::behaviour_tree>();
 		tree.starting_node->reset_subtree(tree.task_instance);

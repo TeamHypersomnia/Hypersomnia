@@ -221,7 +221,7 @@ void physics_system::process_entities(world& owner) {
 
 		reset_states();
 		
-		for (auto& sys : substepping_systems)
+		for (auto& sys : subsystems)
 			sys->substep(owner);
 
 		b2world.Step(static_cast<float32>(accumulator.per_second()), velocityIterations, positionIterations);

@@ -78,7 +78,7 @@ namespace augmentations {
 				/* will trigger an exception on debug if the component type was not registered within any existing system */
 				new_signature.add(owner_world.component_library.get_registered_type(typeid(component_type).hash_code()));
 
-				for (auto sys : owner_world.systems)
+				for (auto sys : owner_world.get_all_systems())
 					/* if a processing_system matches with the new signature and not with the old one */
 					if (sys->components_signature.matches(new_signature) && !sys->components_signature.matches(old_signature))
 						/* we should add this entity there */
@@ -99,7 +99,7 @@ namespace augmentations {
 				signature_matcher_bitset new_signature(old_signature);
 				new_signature.remove(owner_world.component_library.get_registered_type(typeid(component_type).hash_code()));
 
-				for (auto sys : owner_world.systems)
+				for (auto sys : owner_world.get_all_systems())
 					/* if a processing_system does not match with the new signature and does with the old one */
 					if (!sys->components_signature.matches(new_signature) && sys->components_signature.matches(old_signature))
 						/* we should remove this entity from there */

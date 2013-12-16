@@ -1,5 +1,5 @@
 physics_system.timestep_multiplier = 1
-physics_system.enable_interpolation = 0
+physics_system.enable_interpolation = 1
 
 visibility_system.draw_cast_rays = 0
 visibility_system.draw_triangle_edges = 0

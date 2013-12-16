@@ -13,7 +13,8 @@ namespace augmentations {
 			signature_matcher_bitset components_signature;
 		public:
 			std::vector<entity*> targets;
-		
+			std::vector<processing_system*> subsystems;
+
 			/* add an entity to processing_system 
 			base function just push_backs entity to targets
 			*/

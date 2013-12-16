@@ -184,11 +184,19 @@ namespace resources {
 		if (lua_load(lua_state, lua_reader, &info, "scriptname", "b") != LUA_OK)
 			return lua_tostring(lua_state, -1);
 
-		if (lua_pcall(lua_state, 0, LUA_MULTRET, 0) != LUA_OK) {
-			std::string compilation_error(lua_tostring(lua_state, -1));
-			report_errors(compilation_error);
+		try {
+			luabind::call_function<void>(luabind::object(luabind::from_stack(lua_state, -1)));
+			lua_pop(lua_state, 1);
+		}
+		catch (std::exception error_exception) {
+			//std::string compilation_error;//(lua_tostring(lua_state, -1));
+			report_errors(std::string(error_exception.what()));
 			return compilation_error;
 		}
+
+		//if (lua_pcall(lua_state, 0, LUA_MULTRET, 0) != LUA_OK) {
+		//	
+		//}
 
 		report_errors(std::string("Compilation succesfull."));
 		return std::string();

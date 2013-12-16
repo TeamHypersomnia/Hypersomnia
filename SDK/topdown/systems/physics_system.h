@@ -25,7 +25,6 @@ class physics_system : public processing_system_templated<components::physics, c
 
 	contact_listener listener;
 public:
-	std::vector<processing_system*> substepping_systems;
 	float timestep_multiplier;
 	int enable_interpolation;
 	int ray_casts_per_frame;
