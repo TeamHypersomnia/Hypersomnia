@@ -165,7 +165,12 @@ void script_system::process_entities(world& owner) {
 		auto loop_event = scriptable.available_scripts->get_raw().find(components::scriptable::LOOP);
 		
 		if (loop_event != scriptable.available_scripts->get_raw().end()) {
-			luabind::call_function<void>((*loop_event).second, it);
+			try {
+				luabind::call_function<void>((*loop_event).second, it);
+			}
+			catch (std::exception compilation_error) {
+				std::cout << compilation_error.what() << std::endl;
+			}
 		}
 		//auto loop_event = scriptable
 	}
@@ -191,7 +196,12 @@ void pass_events_to_script(world& owner, int msg_enum) {
 }
 using namespace messages;
 void script_system::process_events(world& owner) {
-	pass_events_to_script<collision_message>(owner, components::scriptable::COLLISION_MESSAGE);
-	pass_events_to_script<damage_message>(owner, components::scriptable::DAMAGE_MESSAGE);
-	pass_events_to_script<intent_message>(owner, components::scriptable::INTENT_MESSAGE);
+	try {
+		pass_events_to_script<collision_message>(owner, components::scriptable::COLLISION_MESSAGE);
+		pass_events_to_script<damage_message>(owner, components::scriptable::DAMAGE_MESSAGE);
+		pass_events_to_script<intent_message>(owner, components::scriptable::INTENT_MESSAGE);
+	}
+	catch (std::exception compilation_error) {
+		std::cout << compilation_error.what() << std::endl;
+	}
 }
