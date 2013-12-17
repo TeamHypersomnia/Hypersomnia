@@ -360,7 +360,7 @@ obstacle_avoidance_archetype = {
 	behaviour_type = obstacle_avoidance_behaviour,
 	visibility_type = visibility_component.DYNAMIC_PATHFINDING,
 	
-	force_color = rgba(0, 255, 0, 255),
+	force_color = rgba(0, 255, 0, 0),
 	intervention_time_ms = 200,
 	avoidance_rectangle_width = 0,
 	ignore_discontinuities_narrower_than = 1
@@ -385,14 +385,14 @@ obstacle_avoidance_steering = create_steering (archetyped(obstacle_avoidance_arc
 sensor_avoidance_steering = create_steering (archetyped(containment_archetype, {
 	weight = 0,
 	intervention_time_ms = 200,
-	force_color = rgba(0, 0, 255, 255),
+	force_color = rgba(0, 0, 255, 0),
 	avoidance_rectangle_width = 0
 }))
 
 separation_steering = create_steering { 
 	behaviour_type = separation_behaviour,
 	weight = 1.5,
-	force_color = rgba(255, 0, 0, 255),
+	force_color = rgba(255, 0, 0, 0),
 	
 	group = filter_characters_separation,
 	square_side = 150,
@@ -549,7 +549,7 @@ npc_behaviour_tree = create_behaviour_tree {
 	decorators = {
 		timed_exploration = {
 			decorator_type = behaviour_timer_decorator,
-			maximum_running_time_ms = 2000
+			maximum_running_time_ms = 3000
 		}
 	},
 	
@@ -571,6 +571,10 @@ npc_behaviour_tree = create_behaviour_tree {
 					local npc_info = get_scripted(entity)
 					npc_info.was_seen = true
 					npc_info.target_entities.last_seen.transform.current.pos = player.body.transform.current.pos
+					
+					local player_vel = player.body.physics.body:GetLinearVelocity()
+					entity.pathfinding.custom_exploration_hint.origin = player.body.transform.current.pos
+					entity.pathfinding.custom_exploration_hint.target = player.body.transform.current.pos + (vec2(player_vel.x, player_vel.y) * 50)
 					
 					return behaviour_node.SUCCESS 
 				end
@@ -632,6 +636,7 @@ npc_behaviour_tree = create_behaviour_tree {
 			
 			on_update = function(entity)
 				render_system:push_line(debug_line(entity.transform.current.pos, get_scripted(entity).target_entities.last_seen.transform.current.pos, rgba(255, 0, 0, 255)))
+				render_system:push_line(debug_line(entity.pathfinding.custom_exploration_hint.origin, entity.pathfinding.custom_exploration_hint.target, rgba(255, 0, 0, 255)))
 				
 				if entity.pathfinding:is_still_pathfinding() then return behaviour_node.RUNNING end
 				return behaviour_node.SUCCESS 
@@ -647,11 +652,13 @@ npc_behaviour_tree = create_behaviour_tree {
 			decorator_chain = "timed_exploration",
 			
 			on_enter = function(entity)
+				entity.pathfinding.custom_exploration_hint.enabled = true
 				entity.pathfinding:start_exploring()
 			end
 			,
 			
 			on_exit = function(entity, status)
+				entity.pathfinding.custom_exploration_hint.enabled = false
 				entity.pathfinding:clear_pathfinding_info()
 				get_scripted(entity).was_seen = false
 			end

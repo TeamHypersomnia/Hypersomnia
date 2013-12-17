@@ -218,9 +218,13 @@ void pathfinding_system::process_entities(world& owner) {
 						/* if we're exploring, we have no target in the first session */
 					if (pathfinding.is_exploring && pathfinding.session_stack.size() == 1) {
 						if (pathfinding.favor_velocity_parallellness) {
+							vec2<> compared_direction = unit_vel;
 
-							auto parallellness_a = (a.location - transform.pos).normalize().dot(unit_vel);
-							auto parallellness_b = (b.location - transform.pos).normalize().dot(unit_vel);
+							if (pathfinding.custom_exploration_hint.enabled) 
+								compared_direction = (pathfinding.custom_exploration_hint.target - pathfinding.custom_exploration_hint.origin).normalize();
+
+							auto parallellness_a = (a.location - transform.pos).normalize().dot(compared_direction);
+							auto parallellness_b = (b.location - transform.pos).normalize().dot(compared_direction);
 
 							return parallellness_a > parallellness_b;
 						}
