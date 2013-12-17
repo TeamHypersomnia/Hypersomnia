@@ -58,16 +58,23 @@ void pathfinding_system::process_entities(world& owner) {
 				}
 			}
 
+
+			std::vector<components::pathfinding::pathfinding_session::navigation_vertex> undiscovered_visible;
+
 			/* save all new discontinuities from visibility */
 			for (auto& disc : vision.discontinuities) {
 				if (disc.is_boundary) continue;
 
 				bool this_discontinuity_is_already_memorised = false;
+				bool this_discontinuity_is_already_discovered = false;
+
+				components::pathfinding::pathfinding_session::navigation_vertex vert;
 
 				for (auto& memorised_undiscovered : pathfinding.session().undiscovered_vertices) {
 					/* if a discontinuity with the same closer vertex already exists */
 					if ((memorised_undiscovered.location - disc.points.first).length_sq() < epsilon_distance_the_same_vertex_sq) {
 						this_discontinuity_is_already_memorised = true;
+						vert = memorised_undiscovered;
 							//memorised_undiscovered.location = disc.points.first;
 						break;
 					}
@@ -76,16 +83,16 @@ void pathfinding_system::process_entities(world& owner) {
 				for (auto& memorised_discovered : pathfinding.session().discovered_vertices) {
 					/* if a discontinuity with the same closer vertex already exists */
 					if ((memorised_discovered.location - disc.points.first).length_sq() < epsilon_distance_the_same_vertex_sq) {
-						this_discontinuity_is_already_memorised = true;
+						this_discontinuity_is_already_discovered = true;
 						memorised_discovered.location = disc.points.first;
 						break;
 					}
 				}
 
+				vert.location = disc.points.first;
+				
 				/* if it is unique, push it */
-				if (!this_discontinuity_is_already_memorised) {
-					components::pathfinding::pathfinding_session::navigation_vertex vert;
-					vert.location = disc.points.first;
+				if (!this_discontinuity_is_already_memorised && !this_discontinuity_is_already_discovered) {
 
 					/* get the associated edge to prepare a relevant sensor */
 					auto associated_edge = vision.edges[disc.edge_index];
@@ -111,6 +118,9 @@ void pathfinding_system::process_entities(world& owner) {
 					vert.sensor = vert.location + sensor_direction * pathfinding.target_offset;
 					pathfinding.session().undiscovered_vertices.push_back(vert);
 				}
+
+				if (!this_discontinuity_is_already_discovered) 
+					undiscovered_visible.push_back(vert);
 			}
 
 			/* mark vertices whose sensors distance from the the body is less than distance_navpoint_hit as visited */
@@ -193,9 +203,12 @@ void pathfinding_system::process_entities(world& owner) {
 			/* if it is the last session but there's no line of sight,
 				or it is not the last session but it was not dropped from the loop which means there's no line of sight to target,
 				pick the best navigation candidate
+
+				if we're exploring, pick only visible undiscovered vertices not to get stuck between two nodes
 			*/
 
-			auto& vertices = pathfinding.session().undiscovered_vertices;
+			auto& vertices = (pathfinding.is_exploring && pathfinding.session_stack.size() == 1 && !undiscovered_visible.empty()) ?
+				undiscovered_visible : pathfinding.session().undiscovered_vertices;
 
 			if (draw_undiscovered) {
 				for (auto& disc : vertices)
@@ -218,13 +231,18 @@ void pathfinding_system::process_entities(world& owner) {
 						/* if we're exploring, we have no target in the first session */
 					if (pathfinding.is_exploring && pathfinding.session_stack.size() == 1) {
 						if (pathfinding.favor_velocity_parallellness) {
-							vec2<> compared_direction = unit_vel;
+							float parallellness_a = 0.f;
+							float parallellness_b = 0.f;
 
-							if (pathfinding.custom_exploration_hint.enabled) 
-								compared_direction = (pathfinding.custom_exploration_hint.target - pathfinding.custom_exploration_hint.origin).normalize();
-
-							auto parallellness_a = (a.location - transform.pos).normalize().dot(compared_direction);
-							auto parallellness_b = (b.location - transform.pos).normalize().dot(compared_direction);
+							if (pathfinding.custom_exploration_hint.enabled) {
+								vec2<> compared_dir = (pathfinding.custom_exploration_hint.target - pathfinding.custom_exploration_hint.origin).normalize();
+								parallellness_a = (a.location - pathfinding.custom_exploration_hint.origin).normalize().dot(compared_dir);
+								parallellness_b = (b.location - pathfinding.custom_exploration_hint.origin).normalize().dot(compared_dir);
+							}
+							else {
+								parallellness_a = (a.location - transform.pos).normalize().dot(unit_vel);
+								parallellness_b = (b.location - transform.pos).normalize().dot(unit_vel);
+							}
 
 							return parallellness_a > parallellness_b;
 						}

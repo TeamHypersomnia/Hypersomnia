@@ -507,7 +507,9 @@ function npc_class:loop()
 		behaviours.wandering.current_wander_angle = behaviours.obstacle_avoidance.last_output_force:get_degrees()
 	end
 	
---	if entity == player.body then return true end
+	if entity ~= player.body then 
+	
+	end
 --	
 --	local p1 = entity.transform.current.pos
 --	local p2 = player.body.transform.current.pos
@@ -547,9 +549,14 @@ end
 npc_behaviour_tree = create_behaviour_tree {
 
 	decorators = {
+		temporarily_follow_hint = {
+			decorator_type = behaviour_timer_decorator,
+			maximum_running_time_ms = 50000000
+		},
+	
 		timed_exploration = {
 			decorator_type = behaviour_timer_decorator,
-			maximum_running_time_ms = 3000
+			maximum_running_time_ms = 1000
 		}
 	},
 	
@@ -572,10 +579,6 @@ npc_behaviour_tree = create_behaviour_tree {
 					npc_info.was_seen = true
 					npc_info.target_entities.last_seen.transform.current.pos = player.body.transform.current.pos
 					
-					local player_vel = player.body.physics.body:GetLinearVelocity()
-					entity.pathfinding.custom_exploration_hint.origin = player.body.transform.current.pos
-					entity.pathfinding.custom_exploration_hint.target = player.body.transform.current.pos + (vec2(player_vel.x, player_vel.y) * 50)
-					
 					return behaviour_node.SUCCESS 
 				end
 				
@@ -585,16 +588,23 @@ npc_behaviour_tree = create_behaviour_tree {
 		
 		chase_him = {
 			on_enter = function(entity)
+				entity.pathfinding:clear_pathfinding_info()
 				local npc_info = get_scripted(entity)
 				npc_info.steering_behaviours.pursuit.target_from:set(player.body)
 				npc_info.steering_behaviours.pursuit.enabled = true
+				npc_info.steering_behaviours.obstacle_avoidance.enabled = false
 				npc_info.steering_behaviours.sensor_avoidance.target_from:set(player.body)
 			end,
 			
 			on_exit = function(entity, status)
 				local npc_info = get_scripted(entity)
 				npc_info.steering_behaviours.pursuit.enabled = false
+				npc_info.steering_behaviours.obstacle_avoidance.enabled = true
 				npc_info.steering_behaviours.sensor_avoidance.target_from:set(npc_info.target_entities.navigation)
+				
+				local player_vel = player.body.physics.body:GetLinearVelocity()
+				entity.pathfinding.custom_exploration_hint.origin = player.body.transform.current.pos
+				entity.pathfinding.custom_exploration_hint.target = player.body.transform.current.pos + (vec2(player_vel.x, player_vel.y) * 50)
 			end
 		},
 		
@@ -635,6 +645,7 @@ npc_behaviour_tree = create_behaviour_tree {
 			end,
 			
 			on_update = function(entity)
+				
 				render_system:push_line(debug_line(entity.transform.current.pos, get_scripted(entity).target_entities.last_seen.transform.current.pos, rgba(255, 0, 0, 255)))
 				render_system:push_line(debug_line(entity.pathfinding.custom_exploration_hint.origin, entity.pathfinding.custom_exploration_hint.target, rgba(255, 0, 0, 255)))
 				
@@ -648,18 +659,35 @@ npc_behaviour_tree = create_behaviour_tree {
 			end
 		},
 		
+		follow_hint = {
+			decorator_chain = "temporarily_follow_hint",
+			
+			on_enter = function(entity)
+				entity.pathfinding.favor_velocity_parallellness = true
+				entity.pathfinding.custom_exploration_hint.enabled = true
+				entity.pathfinding:start_exploring()
+			end,
+			
+			on_update = function(entity)
+				render_system:push_line(debug_line(entity.pathfinding.custom_exploration_hint.origin, entity.pathfinding.custom_exploration_hint.target, rgba(255, 0, 255, 255)))
+				return behaviour_node.RUNNING
+			end,
+			
+			on_exit = function(entity, status)
+				entity.pathfinding.custom_exploration_hint.enabled = false
+			end
+		},
+		
 		explore = {
 			decorator_chain = "timed_exploration",
 			
 			on_enter = function(entity)
-				entity.pathfinding.custom_exploration_hint.enabled = true
-				entity.pathfinding:start_exploring()
-			end
-			,
+				entity.pathfinding.favor_velocity_parallellness = false
+				entity.pathfinding.custom_exploration_hint.enabled = false
+			end,
 			
 			on_exit = function(entity, status)
-				entity.pathfinding.custom_exploration_hint.enabled = false
-				entity.pathfinding:clear_pathfinding_info()
+				--entity.pathfinding:clear_pathfinding_info()
 				get_scripted(entity).was_seen = false
 			end
 			--,
@@ -680,6 +708,7 @@ npc_behaviour_tree = create_behaviour_tree {
 			on_enter = function(entity)
 				set_max_speed(entity, 2000)
 				entity.pathfinding:start_exploring()
+				entity.pathfinding.favor_velocity_parallellness = true
 				get_scripted(entity).steering_behaviours.wandering.weight_multiplier = 1.0 
 			end,
 			
@@ -704,7 +733,7 @@ npc_behaviour_tree = create_behaviour_tree {
 		},
 		
 		player_seen_before = {
-			"begin_pathfinding_to_last_seen", "go_to_last_seen", "explore"
+			"begin_pathfinding_to_last_seen", "go_to_last_seen", "follow_hint", "explore"
 		}
 	},
 	
@@ -776,7 +805,7 @@ my_npc_archetype = {
 		},
 		
 		movement = {
-			input_acceleration = vec2(50000, 50000),
+			input_acceleration = vec2(70000, 70000),
 			max_speed = 4300
 		},
 		
@@ -829,7 +858,7 @@ player = create_entity_group (archetyped(my_npc_archetype, {
 	}
 }))
 
-set_max_speed(player.body, 4000)
+set_max_speed(player.body, 5000)
 
 init_scripted(player.body)
 

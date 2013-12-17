@@ -7,7 +7,17 @@ print("Calling commands.lua...")
 --visibility_system.draw_discontinuities = 1
 
 
-	obstacle_avoidance_steering.force_color = rgba(0, 255, 255, 255)
+--render_system:push_non_cleared_line(debug_line(vec2(), vec2(), rgba(255, 0, 0, 255)))
+render_system:clear_non_cleared_lines()
+--render_system:push_non_cleared_line(debug_line(
+--my_npcs[1]
+--.body
+--.transform
+--.current
+--.pos, 
+--my_npcs[1].body.pathfinding:get_current_target(), rgba(255, 0, 0, 255)))
+
+	--obstacle_avoidance_steering.force_color = rgba(0, 255, 255, 255)
 	
 --print(player.body.transform.current.pos.x)
 --ai_system.draw_triangle_edges = 1
