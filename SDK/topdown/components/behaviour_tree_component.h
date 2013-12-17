@@ -17,17 +17,6 @@ namespace components {
 				FAILURE,
 				SUCCESS
 			};
-			/*
-			virtuals are for mocking and decorators
-			assertions placed instead of just being abstract because of whining luabind
-			*/
-			//virtual int tick(task&, composite*, size_t) { assert(0);  return status::SUCCESS; }
-			//virtual int traverse(task&) { assert(0); return status::SUCCESS; }
-			//
-			///* these functions only call the script delegates */
-			//virtual void on_enter(task&) { assert(0); }
-			//virtual void on_exit(task&, int exit_code) { assert(0); }
-			//virtual int on_update(task&) { assert(0); return status::SUCCESS; }
 		};
 
 		/* base behaviour composite */
@@ -55,9 +44,12 @@ namespace components {
 			};
 
 			int update(update_input);
+
+			/* virtuals are for mocking and decorators */
 			virtual int tick(update_input);
 			virtual int traverse(task&);
 			
+			/* these functions only call the script delegates */
 			virtual void on_enter(task&);
 			virtual void on_exit(task&, int exit_code);
 			virtual int on_update(task&);
@@ -84,13 +76,6 @@ namespace components {
 			decorator() : next_decorator(nullptr) {}
 
 			virtual int update(composite* current, composite::update_input);
-
-			//virtual int tick(task& t, composite* c, size_t s) override { return base_node->tick(t, c, s); }
-			//virtual int traverse(task& t) override { return base_node->traverse(t); }
-			//
-			//virtual void on_enter(task& t) override { base_node->on_enter(t); }
-			//virtual void on_exit(task& t, int exit_code) override { base_node->on_exit(t, exit_code); }
-			//virtual int on_update(task& t) override { return base_node->on_update(t); }
 		};
 
 		struct timer_decorator : decorator {
@@ -99,18 +84,6 @@ namespace components {
 			timer_decorator();
 			int update(composite* current, composite::update_input) override;
 		};
-
-
-		/* not to be used now, have to go with data blobs */
-		//class tree {
-		//	void flatten_routine(behaviour_interface* root);
-		//public:
-		//	std::unordered_map<behaviour*, size_t> address_map;
-		//	std::vector<behaviour> flattened_tree;
-		//
-		//	void create_flattened_tree(behaviour* root);
-		//	behaviour* retrieve_behaviour(behaviour*);
-		//};
 
 		struct task {
 			augmentations::entity_system::entity* subject;

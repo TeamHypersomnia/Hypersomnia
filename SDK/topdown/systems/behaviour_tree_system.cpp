@@ -14,35 +14,6 @@ bool behaviour_tree::task::operator==(const task& b) const {
 
 behaviour_tree::composite::composite() : node_type(type::SEQUENCER), default_return(status::RUNNING), decorator_chain(nullptr) {}
 
-//void behaviour_tree::tree::flatten_routine(behaviour* node) {
-//	/* depth first order */
-//	auto found_entry = address_map.find(node);
-//	
-//	/* count only if it is unique as it is DAG */
-//	if (found_entry == address_map.end()) {
-//		address_map[node] = flattened_tree.size();
-//		flattened_tree.push_back(*node);
-//
-//		for (auto child : node->children)
-//			flatten_routine(child);
-//	}
-//}
-//
-//void behaviour_tree::tree::create_flattened_tree(behaviour* root) {
-//	flattened_tree.clear();
-//	address_map.clear();
-//
-//	flatten_routine(root);
-//
-//	for (auto& node : flattened_tree) 
-//		for (auto& child : node.children) 
-//			child = &flattened_tree[address_map[child]];
-//}
-
-//behaviour_tree::behaviour* behaviour_tree::tree::retrieve_behaviour(behaviour* real_address) {
-//	return &flattened_tree[address_map[real_address]];
-//}
-
 bool behaviour_tree::composite::is_currently_running(const task& current_task) const {
 	if (current_task.running_parent_node) 
 		return this == (current_task.running_parent_node->children[current_task.running_index]);
@@ -210,41 +181,9 @@ void behaviour_tree_system::substep(world& owner) {
 	}
 }
 
-//behaviour_tree::decorator::decorator() : base_node(nullptr) {}
 behaviour_tree::timer_decorator::timer_decorator() : maximum_running_time_ms(0.f) {
 	int breakp = 22;
 }
-
-//int behaviour_tree::decorator::tick(task& t, composite* c, size_t s) {
-//	return base_node->tick(t, c, s);
-//}
-
-//int behaviour_tree::decorator::traverse(task& t) {
-//	return base_node->traverse(t);
-//}
-//
-//void behaviour_tree::decorator::on_enter(task& current_task) {
-//	base_node->on_enter(current_task);
-//}
-//
-//void behaviour_tree::decorator::on_exit(task& current_task, int exit_code) {
-//	base_node->on_exit(current_task, exit_code);
-//}
-//
-//int behaviour_tree::decorator::on_update(task& current_task) {
-//	return base_node->on_update(current_task);
-//}
-//
-//void behaviour_tree::timer_decorator::on_enter(task& current_task) {
-//	timer.reset();
-//	decorator::on_enter(current_task);
-//}
-
-//int behaviour_tree::timer_decorator::on_update(task& current_task) {
-//	if (timer.get<std::chrono::milliseconds>() < maximum_running_time_ms)
-//		return decorator::on_update(current_task);
-//	else return status::SUCCESS;
-//}
 
 int behaviour_tree::decorator::update(composite* current, composite::update_input in) {
 	if (next_decorator) 
@@ -262,9 +201,6 @@ int behaviour_tree::timer_decorator::update(composite* current, composite::updat
 		return composite::SUCCESS;
 	else return composite::RUNNING;
 }
-
-
-
 
 #include <gtest\gtest.h>
 
@@ -289,9 +225,6 @@ TEST(BehaviourTree, SequencerFailureSuccess) {
 	my_behaviours[0].children.push_back(my_behaviours + 3);
 	my_behaviours[0].children.push_back(my_behaviours + 4);
 
-	//behaviour_tree::tree my_tree;
-	//my_tree.create_flattened_tree(my_behaviours);
-
 	EXPECT_EQ(behaviour_tree::behaviour::SUCCESS, my_behaviours[0].begin_traversal(my_task));
 	my_behaviours[3].default_return = behaviour_tree::behaviour::FAILURE;
 	EXPECT_EQ(behaviour_tree::behaviour::FAILURE, my_behaviours[0].begin_traversal(my_task));
@@ -315,9 +248,6 @@ TEST(BehaviourTree, SelectorFailureSuccess) {
 	my_behaviours[0].children.push_back(my_behaviours + 2);
 	my_behaviours[0].children.push_back(my_behaviours + 3);
 	my_behaviours[0].children.push_back(my_behaviours + 4);
-
-	//behaviour_tree::tree my_tree;
-	//my_tree.create_flattened_tree(my_behaviours);
 
 	EXPECT_EQ(behaviour_tree::behaviour::FAILURE, my_behaviours[0].begin_traversal(my_task));
 	my_behaviours[3].default_return = behaviour_tree::behaviour::SUCCESS;
@@ -480,67 +410,4 @@ TEST(BehaviourTree, InitValues) {
 	//EXPECT_EQ(my_behaviour.current_status, my_behaviour.INVALID);
 	EXPECT_EQ(my_behaviour.SEQUENCER, my_behaviour.node_type);
 	EXPECT_EQ(my_behaviour.RUNNING, my_behaviour.default_return);
-}
-
-TEST(BehaviourTree, DepthFirstOrderAndMultipleParents) {
-	/*
-	numbers are connected so they form depth-first traversal order
-	0 ->1
-	1 ->2
-	2 ->3
-	2 ->4
-	1 ->5
-	5 ->6
-	5 ->7
-	5 ->8
-	0 ->9
-	0 ->10
-	0 ->11
-	11->12
-	11->13
-	13->5
-	11->14
-	14->5
-	*/
-
-	behaviour_tree::composite my_behaviours[NODE_COUNT];
-	my_behaviours[0].children.push_back(my_behaviours +	 1);
-	my_behaviours[1].children.push_back(my_behaviours +	 2);
-	my_behaviours[2].children.push_back(my_behaviours +	 3);
-	my_behaviours[2].children.push_back(my_behaviours +	 4);
-	my_behaviours[1].children.push_back(my_behaviours +	 5);
-	my_behaviours[5].children.push_back(my_behaviours +	 6);
-	my_behaviours[5].children.push_back(my_behaviours +	 7);
-	my_behaviours[5].children.push_back(my_behaviours +	 8);
-	my_behaviours[0].children.push_back(my_behaviours +	 9);
-	my_behaviours[0].children.push_back(my_behaviours +	 10);
-	my_behaviours[0].children.push_back(my_behaviours +	 11);
-	my_behaviours[11].children.push_back(my_behaviours + 12);
-	my_behaviours[11].children.push_back(my_behaviours + 13);
-	my_behaviours[11].children.push_back(my_behaviours + 13);
-
-	/* a connection to already parented node */
-	my_behaviours[13].children.push_back(my_behaviours + 5);
-	my_behaviours[11].children.push_back(my_behaviours + 14);
-	/* a connection to already parented node */
-	my_behaviours[14].children.push_back(my_behaviours + 5);
-	
-	/* create some means of identification */
-	for (int i = 0; i < NODE_COUNT; ++i) {
-		my_behaviours[i].node_type = i;
-	}
-
-	//behaviour_tree::tree my_tree;
-	//my_tree.create_flattened_tree(my_behaviours);
-
-	//ASSERT_EQ(NODE_COUNT, my_tree.flattened_tree.size());
-	//ASSERT_EQ(NODE_COUNT, my_tree.address_map.size());
-	//
-	//for (size_t i = 0; i < NODE_COUNT; ++i)
-	//	EXPECT_EQ(i, my_tree.flattened_tree[i].node_type);
-	//
-	//for (size_t i = 0; i < NODE_COUNT; ++i) {
-	//	EXPECT_EQ(i, my_tree.address_map[my_behaviours + i]);
-	//	EXPECT_EQ(&my_tree.flattened_tree[i], my_tree.retrieve_behaviour(my_behaviours + i));
-	//}
 }
