@@ -545,10 +545,18 @@ function npc_class:loop()
 end
 
 npc_behaviour_tree = create_behaviour_tree {
+
+	decorators = {
+		timed_exploration = {
+			decorator_type = behaviour_timer_decorator,
+			maximum_running_time_ms = 2000
+		}
+	},
+	
 	nodes = {
 		behave = {
 			node_type = behaviour_node.SELECTOR,
-			on_update = function(entity) return behaviour_node.SUCCESS end
+			default_return = behaviour_node.SUCCESS
 		},
 		
 		player_visible = {
@@ -576,11 +584,13 @@ npc_behaviour_tree = create_behaviour_tree {
 				local npc_info = get_scripted(entity)
 				npc_info.steering_behaviours.pursuit.target_from:set(player.body)
 				npc_info.steering_behaviours.pursuit.enabled = true
-				npc_info.target_entities.navigation.transform.current.pos = player.body.transform.current.pos
+				npc_info.steering_behaviours.sensor_avoidance.target_from:set(player.body)
 			end,
 			
 			on_exit = function(entity, status)
-				get_scripted(entity).steering_behaviours.pursuit.enabled = false
+				local npc_info = get_scripted(entity)
+				npc_info.steering_behaviours.pursuit.enabled = false
+				npc_info.steering_behaviours.sensor_avoidance.target_from:set(npc_info.target_entities.navigation)
 			end
 		},
 		
@@ -634,6 +644,8 @@ npc_behaviour_tree = create_behaviour_tree {
 		},
 		
 		explore = {
+			decorator_chain = "timed_exploration",
+			
 			on_enter = function(entity)
 				entity.pathfinding:start_exploring()
 			end
@@ -641,6 +653,7 @@ npc_behaviour_tree = create_behaviour_tree {
 			
 			on_exit = function(entity, status)
 				entity.pathfinding:clear_pathfinding_info()
+				get_scripted(entity).was_seen = false
 			end
 			--,
 			--
@@ -659,6 +672,7 @@ npc_behaviour_tree = create_behaviour_tree {
 			
 			on_enter = function(entity)
 				set_max_speed(entity, 2000)
+				entity.pathfinding:start_exploring()
 				get_scripted(entity).steering_behaviours.wandering.weight_multiplier = 1.0 
 			end,
 			
@@ -830,7 +844,7 @@ for i=1, npc_count do
 	init_scripted(my_npcs[i].body)
 	
 	get_scripted(my_npcs[i].body):refresh_behaviours()
-	my_npcs[i].body.pathfinding:start_exploring()
+	--my_npcs[i].body.pathfinding:start_exploring()
 end
 
 

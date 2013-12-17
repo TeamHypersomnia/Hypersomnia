@@ -12,112 +12,143 @@ bool behaviour_tree::task::operator==(const task& b) const {
 	return running_parent_node == b.running_parent_node && running_index == b.running_index;
 }
 
-behaviour_tree::behaviour::behaviour() : node_type(type::SEQUENCER), default_return(status::RUNNING) {}
+behaviour_tree::composite::composite() : node_type(type::SEQUENCER), default_return(status::RUNNING), decorator_chain(nullptr) {}
 
-void behaviour_tree::tree::flatten_routine(behaviour* node) {
-	/* depth first order */
-	auto found_entry = address_map.find(node);
-	
-	/* count only if it is unique as it is DAG */
-	if (found_entry == address_map.end()) {
-		address_map[node] = flattened_tree.size();
-		flattened_tree.push_back(*node);
+//void behaviour_tree::tree::flatten_routine(behaviour* node) {
+//	/* depth first order */
+//	auto found_entry = address_map.find(node);
+//	
+//	/* count only if it is unique as it is DAG */
+//	if (found_entry == address_map.end()) {
+//		address_map[node] = flattened_tree.size();
+//		flattened_tree.push_back(*node);
+//
+//		for (auto child : node->children)
+//			flatten_routine(child);
+//	}
+//}
+//
+//void behaviour_tree::tree::create_flattened_tree(behaviour* root) {
+//	flattened_tree.clear();
+//	address_map.clear();
+//
+//	flatten_routine(root);
+//
+//	for (auto& node : flattened_tree) 
+//		for (auto& child : node.children) 
+//			child = &flattened_tree[address_map[child]];
+//}
 
-		for (auto child : node->children)
-			flatten_routine(child);
-	}
-}
+//behaviour_tree::behaviour* behaviour_tree::tree::retrieve_behaviour(behaviour* real_address) {
+//	return &flattened_tree[address_map[real_address]];
+//}
 
-void behaviour_tree::tree::create_flattened_tree(behaviour* root) {
-	flattened_tree.clear();
-	address_map.clear();
-
-	flatten_routine(root);
-
-	for (auto& node : flattened_tree) 
-		for (auto& child : node.children) 
-			child = &flattened_tree[address_map[child]];
-}
-
-behaviour_tree::behaviour* behaviour_tree::tree::retrieve_behaviour(behaviour* real_address) {
-	return &flattened_tree[address_map[real_address]];
-}
-
-bool behaviour_tree::behaviour::is_currently_running(const task& current_task) const {
+bool behaviour_tree::composite::is_currently_running(const task& current_task) const {
 	if (current_task.running_parent_node) 
 		return this == (current_task.running_parent_node->children[current_task.running_index]);
 
 	return false;
 }
 
-int behaviour_tree::behaviour::tick(task& current_task, behaviour* parent, size_t i) {
-	if (!is_currently_running(current_task))
-		on_enter(current_task);
+bool behaviour_tree::composite::is_running_parent(const task& current_task) const {
+	return current_task.running_parent_node == this;
+}
+
+int behaviour_tree::composite::update(update_input in) {
+	if (decorator_chain)
+		return decorator_chain->update(this, in);
+
+	return tick(in);
+}
+
+int behaviour_tree::composite::tick(update_input in) {
+	if (!is_currently_running(*in.current_task))
+		on_enter(*in.current_task);
 	
 	/* handle script callback */
-	auto current_status = on_update(current_task);
+	auto current_status = on_update(*in.current_task);
 	
 	/* detected leaf that returned RUNNING status, interrupt the other running action */
-	if (!is_currently_running(current_task) && current_status == status::RUNNING) {
-		interrupt_running(parent, i, current_task);
+	if (!is_currently_running(*in.current_task) && current_status == status::RUNNING) {
+		interrupt_running(in);
 	}
 	/* the case where the running node finally succeds 
 	is in the case where something different from RUNNING was returned to the node */
 
 	/* traverse further only if script succeeds at this node */
 	if (current_status == status::SUCCESS) {
-		current_status = traverse(current_task);
+		current_status = traverse(*in.current_task);
 	}
 	
 	/* end this node if it was running but has just finalized */
-	if (is_currently_running(current_task) && current_status != status::RUNNING) {
-		interrupt_running(nullptr, 0, current_task, current_status);
+	if (is_currently_running(*in.current_task) && current_status != status::RUNNING) {
+		interrupt_running(update_input(in.current_task), current_status);
 	}
 	/* else call on_exit for a regular finalized node */
-	else if (!is_currently_running(current_task)) {
-		on_exit(current_task, current_status);
+	else if (!is_currently_running(*in.current_task)) {
+		on_exit(*in.current_task, current_status);
 	}
 	
 	return current_status;
 }
 
-void behaviour_tree::behaviour::on_enter(task& current_task) {
+void behaviour_tree::composite::on_enter(task& current_task) {
 	if (enter_callback) {
 		std::cout << "entering " << name << std::endl;
-		luabind::call_function<void>(enter_callback, current_task.subject);
+		try {
+			luabind::call_function<void>(enter_callback, current_task.subject);
+		}
+		catch (std::exception compilation_error) {
+			std::cout << compilation_error.what() << std::endl;
+		}
 	}
 }
 
-void behaviour_tree::behaviour::on_exit(task& current_task, int exit_code) {
+void behaviour_tree::composite::on_exit(task& current_task, int exit_code) {
 	if (exit_callback) {
 		std::cout << "quitting " << name << std::endl;
-		luabind::call_function<void>(exit_callback, current_task.subject, exit_code);
+		try {
+			luabind::call_function<void>(exit_callback, current_task.subject, exit_code);
+		}
+		catch (std::exception compilation_error) {
+			std::cout << compilation_error.what() << std::endl;
+		}
 	}
 }
 
-int behaviour_tree::behaviour::on_update(task& current_task) {
+int behaviour_tree::composite::on_update(task& current_task) {
 	if (update_callback) {
 		//std::cout << "updating " << name << std::endl;
-		return luabind::call_function<int>(update_callback, current_task.subject);
+		try {
+			auto result = luabind::call_function<int>(update_callback, current_task.subject);
+			return result;  
+		}
+		catch (std::exception compilation_error) {
+			std::cout << compilation_error.what() << std::endl;
+		}
 	}
 
 	return default_return;
 }
 
-void behaviour_tree::behaviour::interrupt_running(behaviour* new_task, size_t i, task& current_task, int exit_code) {
-	if (current_task.running_parent_node) 
-		current_task.running_parent_node->children[current_task.running_index]->on_exit(current_task, exit_code);
+void behaviour_tree::composite::interrupt_running(update_input in, int exit_code) {
+	if (in.current_task->running_parent_node) 
+		in.current_task->running_parent_node->children[in.current_task->running_index]->on_exit(*in.current_task, exit_code);
 	
-	current_task.running_index = i;
-	current_task.running_parent_node = new_task;
+	in.current_task->running_index = in.child_index;
+	in.current_task->running_parent_node = in.parent;
+	in.current_task->since_entered.reset();
 }
 
-int behaviour_tree::behaviour::traverse(task& current_task) {
+int behaviour_tree::composite::traverse(task& current_task) {
 	size_t beginning_node = (this == current_task.running_parent_node) ? current_task.running_index : 0u;
+	update_input in(&current_task);
 
 	if (node_type == type::SEQUENCER) {
 		for (size_t i = beginning_node; i < children.size(); ++i) {
-			auto exit_code = children[i]->tick(current_task, this, i);
+			in.child_index = i;
+			in.parent = this;
+			auto exit_code = children[i]->update(in);
 
 			if (exit_code != status::SUCCESS)
 				return exit_code;
@@ -131,7 +162,9 @@ int behaviour_tree::behaviour::traverse(task& current_task) {
 		if (children.empty()) return status::SUCCESS;
 
 		for (size_t i = beginning_node; i < children.size(); ++i) {
-			auto exit_code = children[i]->tick(current_task, this, i);
+			in.child_index = i;
+			in.parent = this;
+			auto exit_code = children[i]->update(in);
 
 			if (exit_code != status::FAILURE) 
 				return exit_code;
@@ -145,36 +178,28 @@ int behaviour_tree::behaviour::traverse(task& current_task) {
 	return status::FAILURE;
 }
 
-void behaviour_tree::behaviour::reset_subtree(const task& current_task) {
-	//current_status = status::INVALID;
-	//
-	//if (current_task.running_parent_node == this) {
-	//	current_status = status::RUNNING;
-	//	children.at(current_task.running_index)->current_status = status::RUNNING;
-	//}
-	
-	//for (auto& child : children) 
-	//	child->reset_subtree(current_task);
-}
-
-void behaviour_tree::behaviour::add_child(behaviour* b) {
+void behaviour_tree::composite::add_child(composite* b) {
 	children.push_back(b);
 }
 
-int behaviour_tree::behaviour::begin_traversal(task& current_task) {
-	auto status = tick(current_task, nullptr, 0);
+int behaviour_tree::composite::begin_traversal(task& current_task) {
+	update_input in;
+	in.current_task = &current_task;
+	auto status = update(in);
 	
 	if (status != behaviour_tree::behaviour::RUNNING)
-		interrupt_running(0, 0, current_task);
+		interrupt_running(in);
 
 	return status;
 }
 
+void behaviour_tree_system::process_entities(world& owner) {
+	substep(owner);
+}
 
 void behaviour_tree_system::substep(world& owner) {
 	for (auto it : targets) {
 		auto& tree = it->get<components::behaviour_tree>();
-		tree.starting_node->reset_subtree(tree.task_instance);
 		
 		tree.task_instance.subject = it;
 
@@ -185,10 +210,58 @@ void behaviour_tree_system::substep(world& owner) {
 	}
 }
 
+//behaviour_tree::decorator::decorator() : base_node(nullptr) {}
+behaviour_tree::timer_decorator::timer_decorator() : maximum_running_time_ms(0.f) {
+	int breakp = 22;
+}
 
+//int behaviour_tree::decorator::tick(task& t, composite* c, size_t s) {
+//	return base_node->tick(t, c, s);
+//}
 
+//int behaviour_tree::decorator::traverse(task& t) {
+//	return base_node->traverse(t);
+//}
+//
+//void behaviour_tree::decorator::on_enter(task& current_task) {
+//	base_node->on_enter(current_task);
+//}
+//
+//void behaviour_tree::decorator::on_exit(task& current_task, int exit_code) {
+//	base_node->on_exit(current_task, exit_code);
+//}
+//
+//int behaviour_tree::decorator::on_update(task& current_task) {
+//	return base_node->on_update(current_task);
+//}
+//
+//void behaviour_tree::timer_decorator::on_enter(task& current_task) {
+//	timer.reset();
+//	decorator::on_enter(current_task);
+//}
 
+//int behaviour_tree::timer_decorator::on_update(task& current_task) {
+//	if (timer.get<std::chrono::milliseconds>() < maximum_running_time_ms)
+//		return decorator::on_update(current_task);
+//	else return status::SUCCESS;
+//}
 
+int behaviour_tree::decorator::update(composite* current, composite::update_input in) {
+	if (next_decorator) 
+		return next_decorator->update(current, in);
+	return current->tick(in);
+}
+
+int behaviour_tree::timer_decorator::update(composite* current, composite::update_input in) {
+	int result = decorator::update(current, in);
+
+	if (result != composite::RUNNING) 
+		return result;
+	
+	if (in.current_task->since_entered.get<std::chrono::milliseconds>() > maximum_running_time_ms)
+		return composite::SUCCESS;
+	else return composite::RUNNING;
+}
 
 
 
@@ -198,9 +271,9 @@ void behaviour_tree_system::substep(world& owner) {
 #define NODE_COUNT 15
 
 TEST(BehaviourTree, SequencerFailureSuccess) {
-	behaviour_tree::behaviour my_behaviours[5];
+	behaviour_tree::composite my_behaviours[5];
 	for (int i = 0; i < 5; ++i) {
-		my_behaviours[i].node_type = behaviour_tree::behaviour::SEQUENCER;
+		my_behaviours[i].node_type = behaviour_tree::composite::SEQUENCER;
 		my_behaviours[i].default_return = behaviour_tree::behaviour::SUCCESS;
 	}
 
@@ -216,8 +289,8 @@ TEST(BehaviourTree, SequencerFailureSuccess) {
 	my_behaviours[0].children.push_back(my_behaviours + 3);
 	my_behaviours[0].children.push_back(my_behaviours + 4);
 
-	behaviour_tree::tree my_tree;
-	my_tree.create_flattened_tree(my_behaviours);
+	//behaviour_tree::tree my_tree;
+	//my_tree.create_flattened_tree(my_behaviours);
 
 	EXPECT_EQ(behaviour_tree::behaviour::SUCCESS, my_behaviours[0].begin_traversal(my_task));
 	my_behaviours[3].default_return = behaviour_tree::behaviour::FAILURE;
@@ -225,9 +298,9 @@ TEST(BehaviourTree, SequencerFailureSuccess) {
 }
 
 TEST(BehaviourTree, SelectorFailureSuccess) {
-	behaviour_tree::behaviour my_behaviours[5];
+	behaviour_tree::composite my_behaviours[5];
 	for (int i = 0; i < 5; ++i) {
-		my_behaviours[i].node_type = behaviour_tree::behaviour::SELECTOR;
+		my_behaviours[i].node_type = behaviour_tree::composite::SELECTOR;
 		my_behaviours[i].default_return = behaviour_tree::behaviour::FAILURE;
 	}
 
@@ -243,15 +316,15 @@ TEST(BehaviourTree, SelectorFailureSuccess) {
 	my_behaviours[0].children.push_back(my_behaviours + 3);
 	my_behaviours[0].children.push_back(my_behaviours + 4);
 
-	behaviour_tree::tree my_tree;
-	my_tree.create_flattened_tree(my_behaviours);
+	//behaviour_tree::tree my_tree;
+	//my_tree.create_flattened_tree(my_behaviours);
 
 	EXPECT_EQ(behaviour_tree::behaviour::FAILURE, my_behaviours[0].begin_traversal(my_task));
 	my_behaviours[3].default_return = behaviour_tree::behaviour::SUCCESS;
 	EXPECT_EQ(behaviour_tree::behaviour::SUCCESS, my_behaviours[0].begin_traversal(my_task));
 }
 
-struct mock_behaviour : behaviour_tree::behaviour {
+struct mock_behaviour : behaviour_tree::composite {
 	int enter_called;
 	int exit_called;
 	int update_called;
@@ -260,17 +333,17 @@ struct mock_behaviour : behaviour_tree::behaviour {
 
 	void on_enter(behaviour_tree::task& t) override {
 		++enter_called;
-		return behaviour_tree::behaviour::on_enter(t);
+		return behaviour_tree::composite::on_enter(t);
 	}
 
 	void on_exit(behaviour_tree::task& t, int exit_code) override {
 		++exit_called;
-		return behaviour_tree::behaviour::on_exit(t, exit_code);
+		return behaviour_tree::composite::on_exit(t, exit_code);
 	}
 
 	int on_update(behaviour_tree::task& t) override {
 		++update_called;
-		return behaviour_tree::behaviour::on_update(t);
+		return behaviour_tree::composite::on_update(t);
 	}
 };
 
@@ -282,7 +355,7 @@ TEST(BehaviourTree, TwoSequentialRunningExitCount) {
 	my_behaviours[0].children.push_back(my_behaviours + 4);
 	
 	for (int i = 0; i < 5; ++i) {
-		my_behaviours[i].node_type = behaviour_tree::behaviour::SEQUENCER;
+		my_behaviours[i].node_type = behaviour_tree::composite::SEQUENCER;
 		my_behaviours[i].default_return = behaviour_tree::behaviour::SUCCESS;
 	}
 
@@ -339,7 +412,7 @@ TEST(BehaviourTree, RunningInterruptions) {
 	my_behaviours[14].children.push_back(my_behaviours + 5);
 
 	for (int i = 0; i < NODE_COUNT; ++i) {
-		my_behaviours[i].node_type = behaviour_tree::behaviour::SEQUENCER;
+		my_behaviours[i].node_type = behaviour_tree::composite::SEQUENCER;
 		my_behaviours[i].default_return = behaviour_tree::behaviour::SUCCESS;
 	}
 	my_behaviours[12].default_return = behaviour_tree::behaviour::RUNNING;
@@ -403,7 +476,7 @@ TEST(BehaviourTree, RunningInterruptions) {
 }
 
 TEST(BehaviourTree, InitValues) {
-	behaviour_tree::behaviour my_behaviour;
+	behaviour_tree::composite my_behaviour;
 	//EXPECT_EQ(my_behaviour.current_status, my_behaviour.INVALID);
 	EXPECT_EQ(my_behaviour.SEQUENCER, my_behaviour.node_type);
 	EXPECT_EQ(my_behaviour.RUNNING, my_behaviour.default_return);
@@ -430,7 +503,7 @@ TEST(BehaviourTree, DepthFirstOrderAndMultipleParents) {
 	14->5
 	*/
 
-	behaviour_tree::behaviour my_behaviours[NODE_COUNT];
+	behaviour_tree::composite my_behaviours[NODE_COUNT];
 	my_behaviours[0].children.push_back(my_behaviours +	 1);
 	my_behaviours[1].children.push_back(my_behaviours +	 2);
 	my_behaviours[2].children.push_back(my_behaviours +	 3);
@@ -457,17 +530,17 @@ TEST(BehaviourTree, DepthFirstOrderAndMultipleParents) {
 		my_behaviours[i].node_type = i;
 	}
 
-	behaviour_tree::tree my_tree;
-	my_tree.create_flattened_tree(my_behaviours);
+	//behaviour_tree::tree my_tree;
+	//my_tree.create_flattened_tree(my_behaviours);
 
-	ASSERT_EQ(NODE_COUNT, my_tree.flattened_tree.size());
-	ASSERT_EQ(NODE_COUNT, my_tree.address_map.size());
-
-	for (size_t i = 0; i < NODE_COUNT; ++i)
-		EXPECT_EQ(i, my_tree.flattened_tree[i].node_type);
-
-	for (size_t i = 0; i < NODE_COUNT; ++i) {
-		EXPECT_EQ(i, my_tree.address_map[my_behaviours + i]);
-		EXPECT_EQ(&my_tree.flattened_tree[i], my_tree.retrieve_behaviour(my_behaviours + i));
-	}
+	//ASSERT_EQ(NODE_COUNT, my_tree.flattened_tree.size());
+	//ASSERT_EQ(NODE_COUNT, my_tree.address_map.size());
+	//
+	//for (size_t i = 0; i < NODE_COUNT; ++i)
+	//	EXPECT_EQ(i, my_tree.flattened_tree[i].node_type);
+	//
+	//for (size_t i = 0; i < NODE_COUNT; ++i) {
+	//	EXPECT_EQ(i, my_tree.address_map[my_behaviours + i]);
+	//	EXPECT_EQ(&my_tree.flattened_tree[i], my_tree.retrieve_behaviour(my_behaviours + i));
+	//}
 }

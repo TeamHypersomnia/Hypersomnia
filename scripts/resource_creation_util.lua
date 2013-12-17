@@ -203,12 +203,36 @@ function create_steering(entries)
 end
 
 function create_behaviour_tree(entries)
-	local my_allocator = behaviour_tree_allocator()
+	--local my_allocator = behaviour_tree_allocator()
 	local out_my_nodes = {}
+	
+	for k, v in pairs(entries.decorators) do 
+		out_my_nodes[k] = (v.decorator_type)()
+		rewrite(out_my_nodes[k], v, { decorator_type = true })
+		
+		--if v.base_node ~= nil then
+		--	out_my_nodes[k].base_node = out_my_nodes[v.base_node]
+		--end
+		
+		out_my_nodes[k].name = k
+	end
+	
+	for k, v in pairs(entries.decorators) do
+		if v.next_decorator then
+			out_my_nodes[k].next_decorator = out_my_nodes[v.next_decorator]
+		end
+	end
 	
 	for k, v in pairs(entries.nodes) do
 		out_my_nodes[k] = behaviour_node()
-		rewrite(out_my_nodes[k], v)
+		rewrite(out_my_nodes[k], v, { decorator_chain = true } )
+		
+		if v.decorator_chain ~= nil then
+			
+			out_my_nodes[k].decorator_chain = out_my_nodes[v.decorator_chain]
+			print(out_my_nodes[k].decorator_chain.maximum_running_time_ms)
+		end
+		
 		out_my_nodes[k].name = k
 	end
 	
@@ -221,11 +245,11 @@ function create_behaviour_tree(entries)
 		end
 	end
 	
-	my_allocator:create_flattened_tree(out_my_nodes[entries.root])
-	
-	for k, v in pairs(out_my_nodes) do
-		v = my_allocator:retrieve_behaviour(v)
-	end
+	--my_allocator:create_flattened_tree(out_my_nodes[entries.root])
+	--
+	--for k, v in pairs(out_my_nodes) do
+	--	v = my_allocator:retrieve_behaviour(v)
+	--end
 	
 	return out_my_nodes
 end

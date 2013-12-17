@@ -11,5 +11,5 @@ class physics_system;
 class behaviour_tree_system : public processing_system_templated<components::behaviour_tree> {
 public:
 	void substep(world&) override;
-	//void process_entities(world&) override;
+	void process_entities(world&) override;
 };

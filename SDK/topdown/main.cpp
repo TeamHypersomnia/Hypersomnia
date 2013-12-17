@@ -84,11 +84,10 @@ int main() {
 
 	my_world.add_system(&scripts);
 	my_world.add_system(&input);
-	//my_world.add_system(&steering);
+	my_world.add_system(&steering);
 	my_world.add_system(&movement);
 	my_world.add_subsystem(&physics, &steering);
 	my_world.add_subsystem(&physics, &movement);
-	my_world.add_subsystem(&physics, &behaviours);
 	my_world.add_system(&physics);
 	my_world.add_system(&lookat);
 	my_world.add_system(&chase);
@@ -101,6 +100,7 @@ int main() {
 	my_world.add_system(&animations);
 	my_world.add_system(&visibility);
 	my_world.add_system(&pathfinding);
+	my_world.add_system(&behaviours);
 	my_world.add_system(&render);
 	my_world.add_system(&destroy);
 	my_world.add_system(&camera);
