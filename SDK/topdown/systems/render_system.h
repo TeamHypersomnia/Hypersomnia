@@ -30,6 +30,14 @@ public:
 	void push_line(debug_line l) {
 		lines.push_back(l);
 	}
+	
+	void push_non_cleared_line(debug_line l) {
+		non_cleared_lines.push_back(l);
+	}
+
+	void clear_non_cleared_lines() {
+		non_cleared_lines.clear();
+	}
 
 	fbo scene_fbo, postprocess_fbo;
 

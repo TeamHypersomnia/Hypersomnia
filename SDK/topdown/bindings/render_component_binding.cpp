@@ -24,6 +24,8 @@ namespace bindings {
 			.def_readwrite("draw_visibility", &render_system::draw_visibility)
 			.def_readwrite("debug_drawing", &render_system::debug_drawing)
 			.def("push_line", &render_system::push_line)
+			.def("push_non_cleared_line", &render_system::push_non_cleared_line)
+			.def("clear_non_cleared_lines", &render_system::clear_non_cleared_lines)
 			, 
 
 			luabind::class_<render>("render_component")
