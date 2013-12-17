@@ -14,7 +14,7 @@ function open_script(filename)
 	return my_script
 end
 
-local CURRENT_SCENE = "scripts\\sample_scenes\\lineofsight.lua"
+local CURRENT_SCENE = "scripts\\sample_scenes\\soldier_ai.lua"
 
 common = 						open_script "scripts\\common.lua" 
 textures = 						open_script "scripts\\resources\\textures.lua"

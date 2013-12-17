@@ -159,14 +159,14 @@ npc_behaviour_tree = create_behaviour_tree {
 			default_return = behaviour_node.RUNNING,
 			
 			on_enter = function(entity)
-				set_max_speed(entity, 2000)
+				set_max_speed(entity, 700)
 				entity.pathfinding:start_exploring()
 				entity.pathfinding.favor_velocity_parallellness = true
 				get_scripted(entity).steering_behaviours.wandering.weight_multiplier = 1.0 
 			end,
 			
 			on_exit = function(entity, status)
-				set_max_speed(entity, 5000)
+				set_max_speed(entity, 3000)
 				get_scripted(entity).steering_behaviours.wandering.weight_multiplier = 0.2
 			end
 		}

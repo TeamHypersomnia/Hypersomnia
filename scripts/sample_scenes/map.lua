@@ -1,4 +1,4 @@
-size_mult = vec2(13, -13)
+size_mult = vec2(9, -9)
 my_dungeon = {
 
 vec2(440.3286, 74.7106 ) * size_mult,
