@@ -10,6 +10,8 @@
 #include "../components/camera_component.h"
 #include "../components/damage_component.h"
 
+#include "../systems/physics_system.h"
+
 #include "../game/body_helper.h"
 
 gun_system::gun_system() : generator(device()) {}
@@ -25,6 +27,8 @@ void gun_system::process_events(world& owner) {
 }
 
 void gun_system::process_entities(world& owner) {
+	auto& physics_sys = owner.get_system<physics_system>();
+
 	for (auto it : targets) {
 		auto& gun_transform = it->get<components::transform>().current;
 		auto& gun = it->get<components::gun>();
@@ -68,7 +72,12 @@ void gun_system::process_entities(world& owner) {
 
 				/* place bullets near the very barrel */
 				auto new_transform = gun_transform;
-				new_transform.pos += vec2<>::from_degrees(gun_transform.rotation) * gun.bullet_distance_offset;
+				new_transform.pos += vec2<>(gun.bullet_distance_offset).rotate(gun_transform.rotation, vec2<>());
+
+				auto result = physics_sys.ray_cast_px(gun_transform.pos, new_transform.pos, gun.bullet_body.filter, it);
+				
+				if (result.hit)
+					new_transform.pos = result.intersection;
 
 				messages::particle_burst_message burst;
 				burst.pos = new_transform.pos;

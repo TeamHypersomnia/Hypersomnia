@@ -193,6 +193,7 @@ namespace resources {
 		Clipper.AddPolygons(subject, ClipperLib::ptSubject);
 		Clipper.AddPolygons(difference, ClipperLib::ptClip);
 		Clipper.StrictlySimple(true);
+		Clipper.Execute(ClipperLib::ctDifference, solution, ClipperLib::pftNonZero, ClipperLib::pftNonZero);
 
 		
 		std::reverse(solution[0].begin(), solution[0].end());
