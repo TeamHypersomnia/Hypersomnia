@@ -24,9 +24,9 @@ npc_behaviour_tree = create_behaviour_tree {
 				local p2 = player.body.transform.current.pos
 				
 				
-				ray_output = physics_system:ray_cast(p1, p2, create(b2Filter, filter_obstacle_visibility), entity)
+				ray_output = physics_system:ray_cast(p1, p2, create(b2Filter, filter_pathfinding_visibility), entity)
 				
-				if ray_output.hit and ray_output.what_entity == player.body then
+				if not ray_output.hit then
 					local npc_info = get_scripted(entity)
 					npc_info.was_seen = true
 					npc_info.target_entities.last_seen.transform.current.pos = player.body.transform.current.pos

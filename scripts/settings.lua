@@ -19,12 +19,12 @@ pathfinding_system.epsilon_distance_the_same_vertex = 50
 render_system.debug_drawing = 1
 
 render_system.draw_steering_forces = 0
-render_system.draw_substeering_forces = 1
-render_system.draw_velocities = 1
+render_system.draw_substeering_forces = 0
+render_system.draw_velocities = 0
 
 render_system.draw_avoidance_info = 1
 render_system.draw_wandering_info = 0
 
 render_system.visibility_expansion = 1.0
 render_system.max_visibility_expansion_distance = 1
-render_system.draw_visibility = 1
+render_system.draw_visibility = 0

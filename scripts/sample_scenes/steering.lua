@@ -87,7 +87,7 @@ sensor_avoidance_steering = create_steering (archetyped(containment_archetype, {
 
 separation_steering = create_steering { 
 	behaviour_type = separation_behaviour,
-	weight = 1.5,
+	weight = 0.5,
 	force_color = rgba(255, 0, 0, 0),
 	
 	group = filter_characters_separation,

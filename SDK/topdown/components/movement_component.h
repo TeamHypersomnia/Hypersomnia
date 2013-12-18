@@ -26,8 +26,10 @@ namespace components {
 		float max_speed;
 		float braking_damping;
 
+		float max_speed_animation;
+
 		movement(augmentations::vec2<> acceleration = augmentations::vec2<>(), float air_resistance = 0.f) 
-			: input_acceleration(input_acceleration), air_resistance(air_resistance), braking_damping(-1.f), max_speed(-1.f) {
+			: input_acceleration(input_acceleration), air_resistance(air_resistance), braking_damping(-1.f), max_speed(-1.f), max_speed_animation(0.f){
 			moving_left = moving_right = moving_forward = moving_backward = false;
 		}
 	};

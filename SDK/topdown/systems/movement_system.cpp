@@ -70,8 +70,8 @@ void movement_system::process_entities(world& owner) {
 
 		msg.change_speed = true;
 		
-		if (movement.max_speed == 0.f) msg.speed_factor = 0.f;
-		else msg.speed_factor = speed / movement.max_speed;
+		if (movement.max_speed_animation == 0.f) msg.speed_factor = 0.f;
+		else msg.speed_factor = speed / movement.max_speed_animation;
 		
 		msg.change_animation = true;
 		msg.preserve_state_if_animation_changes = false;
