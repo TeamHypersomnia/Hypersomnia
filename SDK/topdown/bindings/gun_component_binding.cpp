@@ -2,7 +2,6 @@
 #include "stdafx.h"
 #include "bindings.h"
 
-
 #include "../components/gun_component.h"
 
 namespace bindings {
@@ -27,6 +26,11 @@ namespace bindings {
 			.def_readwrite("shake_spread_degrees", &gun::shake_spread_degrees)
 			.def_readwrite("is_automatic", &gun::is_automatic)
 			.def_readwrite("bullet_render", &gun::bullet_render)
+			.def_readwrite("is_melee", &gun::is_melee)
+			.def_readwrite("swing_radius", &gun::swing_radius)
+			.def_readwrite("swing_angle", &gun::swing_angle)
+			.def_readwrite("swing_angular_offset", &gun::swing_angular_offset)
+			//.def_readwrite("query_vertices", &gun::query_vertices)
 			.def_readwrite("bullet_body", &gun::bullet_body);
 	}
 }

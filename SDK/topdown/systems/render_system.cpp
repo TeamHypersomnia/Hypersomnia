@@ -16,7 +16,8 @@ render_system::render_system(window::glwindow& output_window)
 	draw_velocities(0),
 	draw_avoidance_info(0),
 	draw_wandering_info(0),
-	debug_drawing(0)
+	debug_drawing(0),
+	draw_weapon_info(0)
 {
 	output_window.current();
 

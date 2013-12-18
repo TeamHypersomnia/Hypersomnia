@@ -119,8 +119,11 @@ physics_system::query_aabb_input::query_aabb_input() : ignore_userdata(nullptr),
 
 bool physics_system::query_aabb_input::ReportFixture(b2Fixture* fixture) {
 	if ((b2ContactFilter::ShouldCollide(filter, &fixture->GetFilterData()))
-		&& fixture->GetBody()->GetUserData() != ignore_userdata)
+		&& fixture->GetBody()->GetUserData() != ignore_userdata) {
 		output.insert(fixture->GetBody());
+		out_fixtures.push_back(fixture);
+	}
+
 	return true;
 }
 
@@ -145,6 +148,26 @@ std::set<b2Body*> physics_system::query_aabb(vec2<> p1_meters, vec2<> p2_meters,
 
 	b2world.QueryAABB(&callback, aabb);
 	return std::move(callback.output);
+}
+
+std::set<b2Body*> physics_system::query_shape(b2Shape* shape, b2Filter* filter, void* ignore_userdata) {
+	b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
+	
+	query_aabb_input callback;
+	callback.filter = filter;
+	callback.ignore_userdata = ignore_userdata;
+	
+	b2AABB shape_aabb;
+	shape->ComputeAABB(&shape_aabb, null_transform, 0);
+	b2world.QueryAABB(&callback, shape_aabb);
+	
+	std::set<b2Body*> bodies;
+
+	for (auto fixture : callback.out_fixtures) 
+		if (b2TestOverlap(shape, 0, fixture->GetShape(), 0, null_transform, fixture->GetBody()->GetTransform())) 
+			bodies.insert(fixture->GetBody());
+
+	return std::move(bodies);
 }
 
 std::set<b2Body*> physics_system::query_aabb_px(vec2<> p1, vec2<> p2, b2Filter* filter, void* ignore_userdata) {

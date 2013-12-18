@@ -54,6 +54,8 @@ public:
 	int draw_avoidance_info;
 	int draw_wandering_info;
 
+	int draw_weapon_info;
+
 	window::glwindow& output_window;
 	render_system(window::glwindow& output_window);
 

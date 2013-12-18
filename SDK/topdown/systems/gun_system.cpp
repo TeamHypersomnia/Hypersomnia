@@ -4,6 +4,7 @@
 #include "../messages/intent_message.h"
 #include "../messages/animate_message.h"
 #include "../messages/particle_burst_message.h"
+#include "../messages/damage_message.h"
 
 #include "../components/render_component.h"
 #include "../components/physics_component.h"
@@ -11,6 +12,7 @@
 #include "../components/damage_component.h"
 
 #include "../systems/physics_system.h"
+#include "../systems/render_system.h"
 
 #include "../game/body_helper.h"
 
@@ -28,16 +30,93 @@ void gun_system::process_events(world& owner) {
 
 void gun_system::process_entities(world& owner) {
 	auto& physics_sys = owner.get_system<physics_system>();
+	auto& render = owner.get_system<render_system>();
 
 	for (auto it : targets) {
 		auto& gun_transform = it->get<components::transform>().current;
 		auto& gun = it->get<components::gun>();
 
+		auto get_damage = [&gun, this](){
+			return std::uniform_real_distribution<float>(gun.bullet_damage.first, gun.bullet_damage.second)(generator);
+		};
+
 		bool interval_passed = gun.shooting_timer.get<std::chrono::milliseconds>() >= gun.shooting_interval_ms;
 
-		if (gun.is_melee && 
-			gun.trigger && interval_passed
-			) {
+		if (gun.is_melee) {
+			if (interval_passed) {
+				gun.is_swinging = false;
+			}
+
+			if (!gun.is_swinging && gun.trigger) {
+				gun.is_swinging = true;
+
+				messages::animate_message msg;
+				msg.animation_type = messages::animate_message::animation::SHOT;
+				msg.preserve_state_if_animation_changes = false;
+				msg.change_animation = true;
+				msg.change_speed = true;
+				msg.speed_factor = 1.f;
+				msg.subject = it;
+				msg.message_type = messages::animate_message::type::START;
+				msg.animation_priority = 1;
+
+				owner.post_message(msg);
+				
+				gun.shooting_timer.reset();
+			}
+
+			if (gun.is_swinging) {
+				std::vector<b2Vec2> query_vertices;
+				query_vertices.resize(gun.query_vertices + 1);
+				query_vertices[gun.query_vertices] = gun_transform.pos;
+
+				for (int i = 0; i < gun.query_vertices; ++i) {
+					query_vertices[i] = gun_transform.pos + vec2<>::from_degrees(
+						gun_transform.rotation + gun.swing_angular_offset - (gun.swing_angle / 2)
+						+ i * (gun.swing_angle / (gun.query_vertices - 1))
+						) * gun.swing_radius;
+				}
+
+				query_vertices[gun.query_vertices] = gun_transform.pos;
+
+				if (render.draw_weapon_info)
+					for (int i = 0; i < query_vertices.size(); ++i) {
+						render.lines.push_back(render_system::debug_line(query_vertices[i], query_vertices[(i + 1) % query_vertices.size()]));
+					}
+
+				for (auto& v : query_vertices)
+					v *= PIXELS_TO_METERSf;
+
+				b2PolygonShape swing_query;
+				swing_query.Set(query_vertices.data(), query_vertices.size());
+
+				auto hit_bodies = physics_sys.query_shape(&swing_query, &gun.bullet_body.filter, it);
+
+				for (auto hit_body : hit_bodies) {
+					auto target_entity = reinterpret_cast<entity*>(hit_body->GetUserData());
+					auto target_transform = target_entity->get<components::transform>().current;
+					auto ray_output = physics_sys.ray_cast_px(gun_transform.pos, target_transform.pos, gun.bullet_body.filter, it);
+
+					if (!ray_output.hit || (ray_output.hit && ray_output.what_entity == target_entity)) {
+						/* apply damage to the entity */
+						vec2<> impact_pos = ray_output.hit ? ray_output.intersection : target_transform.pos;
+
+						messages::damage_message damage_msg;
+						damage_msg.subject = target_entity;
+						damage_msg.amount = get_damage();
+						damage_msg.impact_velocity = impact_pos - gun_transform.pos;
+
+						messages::particle_burst_message burst_msg;
+						burst_msg.subject = target_entity;
+						burst_msg.pos = impact_pos;
+						burst_msg.rotation = (-damage_msg.impact_velocity).get_degrees();
+						burst_msg.type = messages::particle_burst_message::burst_type::BULLET_IMPACT;
+
+						owner.post_message(damage_msg);
+						owner.post_message(burst_msg);
+					}
+				}
+			}
 		}
 		else if (!gun.reloading &&
 			gun.current_rounds > 0 &&
@@ -104,7 +183,7 @@ void gun_system::process_entities(world& owner) {
 
 					components::damage damage;
 					/* randomize damage */
-					damage.amount = std::uniform_real_distribution<float> (gun.bullet_damage.first, gun.bullet_damage.second)(generator);
+					damage.amount = get_damage();
 					damage.sender = it;
 					damage.max_distance = gun.max_bullet_distance;
 					damage.starting_point = new_transform.pos;

@@ -64,12 +64,15 @@ public:
 	std::set<b2Body*> query_square_px(vec2<> p1, float side, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
 	std::set<b2Body*> query_aabb(vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
 	std::set<b2Body*> query_aabb_px(vec2<> p1, vec2<> p2, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
+
+	std::set<b2Body*> query_shape(b2Shape*, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
 private:
 	/* callback structure used in QueryAABB function to get all shapes near-by */
 	struct query_aabb_input : b2QueryCallback {
 		void* ignore_userdata;
 		b2Filter* filter;
 		std::set<b2Body*> output;
+		std::vector<b2Fixture*> out_fixtures;
 
 		query_aabb_input();
 		bool ReportFixture(b2Fixture* fixture) override;
