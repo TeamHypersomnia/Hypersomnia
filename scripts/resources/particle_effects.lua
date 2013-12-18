@@ -185,7 +185,7 @@ barrel_smoke_2 = archetyped(barrel_smoke_1, {
 
 blood_shower = {
 	spread_degrees = 120.5,
-	particles_per_burst = minmax_u(10, 20),
+	particles_per_burst = minmax_u(5, 10),
 	type = emission.BURST;
 	velocity = minmax(1, 4000),
 	angular_velocity = minmax(0, 1500),
@@ -228,7 +228,7 @@ blood_droplets = {
 blood_pool = {
 	spread_degrees = 180.5,
 	particles_per_sec = minmax(20, 100),
-	stream_duration_ms = minmax(300, 1000),
+	stream_duration_ms = minmax(100, 300),
 	type = emission.STREAM,
 	velocity = minmax(1, 6),
 	angular_velocity = minmax(0, 10),

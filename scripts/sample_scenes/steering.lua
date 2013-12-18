@@ -24,15 +24,16 @@ flee_steering = create_steering {
 seek_archetype = {
 	behaviour_type = seek_behaviour,
 	weight = 1,
-	radius_of_effect = 100,
 	force_color = rgba(0, 255, 255, 0)
 }			
 
-target_seek_steering = create_steering (seek_archetype)
+target_seek_steering = create_steering (archetyped(seek_archetype, {
+	radius_of_effect = 150
+}))
+
 forward_seek_steering = create_steering (archetyped(seek_archetype, {
 	radius_of_effect = 0
-}
-))
+}))
 
 containment_archetype = {
 	behaviour_type = containment_behaviour,

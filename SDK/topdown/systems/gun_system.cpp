@@ -29,10 +29,16 @@ void gun_system::process_entities(world& owner) {
 		auto& gun_transform = it->get<components::transform>().current;
 		auto& gun = it->get<components::gun>();
 
-		if (!gun.reloading &&
+		bool interval_passed = gun.shooting_timer.get<std::chrono::milliseconds>() >= gun.shooting_interval_ms;
+
+		if (gun.is_melee && 
+			gun.trigger && interval_passed
+			) {
+		}
+		else if (!gun.reloading &&
 			gun.current_rounds > 0 &&
 			gun.trigger &&
-			gun.shooting_timer.get<std::chrono::milliseconds>() >= gun.shooting_interval_ms) {
+			interval_passed) {
 
 				messages::animate_message msg;
 				msg.animation_type = messages::animate_message::animation::SHOT;
