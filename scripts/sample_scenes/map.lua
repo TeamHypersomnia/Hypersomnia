@@ -156,7 +156,18 @@ vec2(45.0325, 535.6137) * size_mult
 	},
 	
 	holes = {
+	
+		another_hole = {
+			vec2(95.8429, 307.0366)*size_mult, 
+			vec2(48.3455, 225.1885)*size_mult, 
+			vec2(48.7696, 178.9634)*size_mult, 
+			vec2(118.7435, 249.7853)*size_mult, 
+			vec2(112.8063, 300.6754)*size_mult, 
+			vec2(95.8429, 307.0366)*size_mult 
+		}	
+		,
 		my_dungeon
+		
 	}
 }
 

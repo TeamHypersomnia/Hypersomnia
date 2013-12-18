@@ -156,6 +156,11 @@ void render_system::render(rects::xywh visible_area) {
 			glVertex2f(line.a.x - last_camera.pos.x, line.a.y - last_camera.pos.y);
 			glVertex2f(line.b.x - last_camera.pos.x, line.b.y - last_camera.pos.y);
 		}
+		for (auto& line : global_debug) {
+			glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
+			glVertex2f(line.a.x - last_camera.pos.x, line.a.y - last_camera.pos.y);
+			glVertex2f(line.b.x - last_camera.pos.x, line.b.y - last_camera.pos.y);
+		}
 
 		glEnd();
 		glEnable(GL_TEXTURE_2D);

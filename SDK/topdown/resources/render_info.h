@@ -9,6 +9,9 @@
 
 using namespace augmentations;
 
+#include "../../topdown/systems/render_system.h"
+extern std::vector<render_system::debug_line> global_debug;
+
 namespace components {
 	struct particle_group;
 }

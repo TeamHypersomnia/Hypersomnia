@@ -14,6 +14,8 @@
 #include "3rdparty/polyclipper/clipper.hpp"
 #include "3rdparty/polypartition/polypartition.h"
 
+std::vector<render_system::debug_line> global_debug;
+
 namespace resources {
 	void renderable::make_rect(vec2<> pos, vec2<> size, float angle, vec2<> v[4]) {
 		vec2<> origin(pos + (size / 2.f));
@@ -173,6 +175,8 @@ namespace resources {
 
 	void polygon::add_concave_set(const concave_set& concaves) {
 		ClipperLib::Polygons subject(1), difference(concaves.holes.size()), solution;
+		/* should use solutiontree instead */
+		ClipperLib::PolyTree solutiontree;
 		
 		for (auto& v : concaves.vertices) {
 			subject[0].push_back(ClipperLib::IntPoint(v.x, v.y));
@@ -189,8 +193,8 @@ namespace resources {
 		Clipper.AddPolygons(subject, ClipperLib::ptSubject);
 		Clipper.AddPolygons(difference, ClipperLib::ptClip);
 		Clipper.StrictlySimple(true);
-		Clipper.Execute(ClipperLib::ctDifference, solution, ClipperLib::pftNonZero, ClipperLib::pftNonZero);
 
+		
 		std::reverse(solution[0].begin(), solution[0].end());
 
 		list<TPPLPoly> inpolys, outpolys;
