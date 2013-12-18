@@ -75,6 +75,28 @@ physics_system::edge_edge_output physics_system::edge_edge_intersection(vec2<> p
 	return out;
 }
 
+vec2<> physics_system::push_away_from_walls(vec2<> position, float radius, int ray_amount, b2Filter filter, entity* ignore_entity) {
+	vec2<> resultant;
+	
+	float worst_distance = radius;
+
+	for (int i = 0; i < ray_amount; ++i) {
+		auto out = ray_cast_px(position, position + vec2<>::from_degrees((360.f / ray_amount) * i) * radius, filter, ignore_entity);
+
+		if (out.hit) {
+			auto diff = (out.intersection - position);
+			auto distance = diff.length();
+			
+			if (distance < worst_distance) worst_distance = distance;
+			resultant += diff;
+		}
+	}
+
+	if (resultant.non_zero())
+		return position + (-resultant).set_length(radius - worst_distance);
+	else return position;
+}
+
 physics_system::raycast_output physics_system::ray_cast(vec2<> p1_meters, vec2<> p2_meters, b2Filter filter, entity* ignore_entity) {
 	++ray_casts_per_frame;
 

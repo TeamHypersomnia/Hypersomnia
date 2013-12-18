@@ -57,6 +57,8 @@ public:
 
 	raycast_output ray_cast(vec2<> p1_meters, vec2<> p2_meters, b2Filter filter, entity* ignore_entity = nullptr);
 	raycast_output ray_cast_px(vec2<> p1, vec2<> p2, b2Filter filter, entity* ignore_entity = nullptr);
+	
+	vec2<> push_away_from_walls(vec2<> position, float radius, int ray_amount, b2Filter filter, entity* ignore_entity = nullptr);
 
 	std::set<b2Body*> query_square(vec2<> p1_meters, float side_meters, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
 	std::set<b2Body*> query_square_px(vec2<> p1, float side, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);

@@ -289,8 +289,8 @@ gunshot_effect = {
 }
 
 blood_effect = {
-	blood_shower,
-	blood_pool,
+	--blood_shower,
+	--blood_pool,
 	blood_droplets
 }
 
