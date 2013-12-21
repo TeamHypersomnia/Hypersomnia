@@ -117,21 +117,6 @@ namespace augmentations {
 				return true;
 		}
 
-		void atlas::quick_add(image* in_images, texture* out_textures, int n_tex, font_file* in_files, font* out_fonts, int n_fonts) {
-			if(in_images && out_textures) {
-				for(int i = 0; i < n_tex; ++i) {
-					out_textures[i].set(in_images + i);
-					textures.push_back(out_textures + i);
-				}
-			}
-			if(in_files && out_fonts) {
-				for(int i = 0; i < n_fonts; ++i) {
-					out_fonts[i].build(in_files + i);
-					out_fonts[i].add_to_atlas(*this);
-				}
-			}
-		}
-
 		bool atlas::pack() {
 			GLint tsize;
 			glGetIntegerv(GL_MAX_TEXTURE_SIZE, &tsize);

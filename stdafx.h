@@ -10,10 +10,6 @@
 #undef min
 #undef max
 
-#include <ft2build.h>
-#include <freetype/freetype.h>
-
-
 #ifdef INCLUDE_DWM
 #include <dwmapi.h>
 #endif

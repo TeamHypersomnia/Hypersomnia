@@ -33,9 +33,6 @@
     <ClCompile Include="error\error.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="texture_baker\font.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="texture_baker\image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -651,6 +648,9 @@
     <ClCompile Include="3rdparty\gtest\src\gtest-typed-test.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="3rdparty\GL\glew.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="entity_system\component.h">
@@ -1149,6 +1149,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\gtest\gtest-typed-test.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\GL\wglew.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\GL\glxew.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\GL\glew.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

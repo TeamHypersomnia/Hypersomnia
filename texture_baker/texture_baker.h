@@ -66,7 +66,6 @@ namespace augmentations {
 			texture atlas_texture;
 			image img;
 
-			void quick_add(image* in_images, texture* out_textures, int n_tex, font_file* in_files, font* out_fonts, int n_fonts);
 			bool pack(), // max texture size 
 				pack(int max_size);
 

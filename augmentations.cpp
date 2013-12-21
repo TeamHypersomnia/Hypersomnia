@@ -10,7 +10,7 @@ namespace augmentations {
 	WNDCLASSEX wcl = {0};
 	HINSTANCE hinst;
 	unsigned initialized = 0;
-	std::unique_ptr<FT_Library> freetype_library(new FT_Library);
+	//std::unique_ptr<FT_Library> freetype_library(new FT_Library);
 
 	namespace window {
 		extern LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
@@ -19,8 +19,8 @@ namespace augmentations {
 	void init(unsigned to_initialize) {
 		if(to_initialize & GDIPLUS) 
 			errs(Gdiplus::GdiplusStartup(&gdit, &gdi, nullptr) == Gdiplus::Status::Ok, L"Failed to initialize GDI+!");
-		if(to_initialize & FREETYPE)
-			errs(!FT_Init_FreeType(freetype_library.get()), "freetype initialization");
+//		if(to_initialize & FREETYPE)
+//			errs(!FT_Init_FreeType(freetype_library.get()), "freetype initialization");
 		if(to_initialize & WINDOWS_API) {
 			hinst = GetModuleHandle(NULL);
 			wcl.cbSize = sizeof(wcl);
@@ -56,7 +56,7 @@ namespace augmentations {
 		if(initialized & GLEW) {
 		
 		}
-		if(initialized & FREETYPE) 
-			errs(!FT_Done_FreeType(*freetype_library.get()), "freetype deinitialization");
+		//if(initialized & FREETYPE) 
+		//	errs(!FT_Done_FreeType(*freetype_library.get()), "freetype deinitialization");
 	}
 };

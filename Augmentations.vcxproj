@@ -39,11 +39,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;C:\Users\Anonymous\Documents\GitHub\Augmentations\3rdparty\gtest;$(IncludePath)</IncludePath>
+    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(IncludePath)</IncludePath>
     <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;C:\Users\Anonymous\Documents\GitHub\Augmentations\3rdparty\gtest;$(IncludePath)</IncludePath>
+    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(IncludePath)</IncludePath>
     <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -59,7 +59,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OpenGL32.lib;Ws2_32.lib;dwmapi.lib;Gdiplus.lib;freetype250_D.lib;glew32sd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OpenGL32.lib;Ws2_32.lib;dwmapi.lib;Gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -81,7 +81,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>glew32s.lib;OpenGL32.lib;Ws2_32.lib;dwmapi.lib;freetype250.lib;Gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OpenGL32.lib;Ws2_32.lib;dwmapi.lib;Gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -98,6 +98,7 @@
     <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2CircleShape.cpp" />
     <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2EdgeShape.cpp" />
     <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2PolygonShape.cpp" />
+    <ClCompile Include="3rdparty\GL\glew.c" />
     <ClCompile Include="3rdparty\gtest\src\gtest-death-test.cc" />
     <ClCompile Include="3rdparty\gtest\src\gtest-filepath.cc" />
     <ClCompile Include="3rdparty\gtest\src\gtest-port.cc" />
@@ -616,10 +617,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="texture_baker\font.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="texture_baker\image.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
@@ -691,6 +688,9 @@
     <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2WeldJoint.h" />
     <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2WheelJoint.h" />
     <ClInclude Include="3rdparty\Box2D\Rope\b2Rope.h" />
+    <ClInclude Include="3rdparty\GL\glew.h" />
+    <ClInclude Include="3rdparty\GL\glxew.h" />
+    <ClInclude Include="3rdparty\GL\wglew.h" />
     <ClInclude Include="3rdparty\gtest\gtest-death-test.h" />
     <ClInclude Include="3rdparty\gtest\gtest-message.h" />
     <ClInclude Include="3rdparty\gtest\gtest-param-test.h" />
