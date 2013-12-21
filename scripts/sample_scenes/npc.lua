@@ -1,5 +1,8 @@
 npc_class = { 
-	entity = 0 
+	entity = 0,
+	weapon_animation_sets = {
+		
+	}
 }
 
 function set_max_speed(entity, max_speed_val)
@@ -55,6 +58,23 @@ function npc_class:refresh_behaviours()
 	for k, v in pairs(self.steering_behaviours) do
 		self.entity.steering:add_behaviour(v)
 	end
+end
+
+function npc_class:take_weapon_item(item_data)
+	recursive_write(self.entity.gun, item_data.weapon_info)
+	self.entity.animate = weapon_animation_sets[item_data.animation_index]
+end
+
+function npc_class:take_weapon(weapon_entity)
+	take_weapon_item(get_scripted(weapon_entity).item_data)
+	world:delete_entity(weapon_item)
+end
+
+function npc_class:drop_weapon()
+	create_entity {
+		
+		
+	}
 end
 
 function npc_class:loop()

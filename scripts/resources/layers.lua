@@ -25,7 +25,8 @@ create_options {
 	"OBJECTS", 
 	"STATIC_OBJECTS",
 	"BULLETS", 
-	"CORPSES" 
+	"CORPSES",
+	"ITEMS"
 }
 
 
@@ -34,9 +35,11 @@ filter_nothing = {
 	maskBits = 0
 }
 
+local mask_all = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS, CORPSES, ITEMS)
+
 filter_static_objects = {
 	categoryBits = STATIC_OBJECTS,
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS, CORPSES)
+	maskBits = mask_all
 }
 
 filter_objects = {
@@ -61,6 +64,11 @@ filter_bullets = {
 
 filter_corpses = {
 	categoryBits = CORPSES,
+	maskBits = bitor(OBJECTS, STATIC_OBJECTS)
+}
+
+filter_items = {
+	categoryBits = ITEMS,
 	maskBits = bitor(OBJECTS, STATIC_OBJECTS)
 }
 

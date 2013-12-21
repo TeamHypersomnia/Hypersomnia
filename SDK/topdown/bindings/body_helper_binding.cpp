@@ -16,6 +16,7 @@ namespace bindings {
 			.def_readwrite("filter", &physics_info::filter)
 			.def_readwrite("density", &physics_info::density)
 			.def_readwrite("friction", &physics_info::friction)
+			.def_readwrite("restitution", &physics_info::restitution)
 			.def_readwrite("angular_damping", &physics_info::angular_damping)
 			.def_readwrite("linear_damping", &physics_info::linear_damping)
 			.def_readwrite("fixed_rotation", &physics_info::fixed_rotation)

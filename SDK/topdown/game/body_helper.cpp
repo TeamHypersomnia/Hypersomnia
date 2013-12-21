@@ -12,7 +12,7 @@
 
 namespace topdown {
 	physics_info::physics_info() 
-		: rect_size(augmentations::vec2<>()), type(RECT), density(1.f), angular_damping(0.f), linear_damping(0.f), fixed_rotation(false), sensor(false) {
+		: rect_size(augmentations::vec2<>()), type(RECT), density(1.f), angular_damping(0.f), linear_damping(0.f), fixed_rotation(false), sensor(false), restitution(0.f) {
 	}
 
 	b2World* current_b2world = nullptr;
@@ -103,6 +103,7 @@ namespace topdown {
 		fixdef.friction = body_data.friction;
 		fixdef.isSensor = body_data.sensor;
 		fixdef.filter = body_data.filter;
+		fixdef.restitution = body_data.restitution;
 		fixdef.shape = &shape;
 
 		b2Body* body = physics.b2world.CreateBody(&def);

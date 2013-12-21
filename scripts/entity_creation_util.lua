@@ -82,6 +82,13 @@ function set_components_from_entry(entity, entry, entities_lookup)
 	
 	if entry.physics ~= nil then
 		local my_body_data = physics_info()
+		
+		if entry.physics.body_info.shape_type == physics_info.RECT then
+			if entry.physics.body_info.rect_size == nil then
+				entry.physics.body_info.rect_size = entry.render.model.size
+			end
+		end
+		
 		set_physics_info(my_body_data, entry.physics.body_info)
 		
 		create_physics_component(my_body_data, entity, entry.physics.body_type)
