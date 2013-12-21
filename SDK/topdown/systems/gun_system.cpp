@@ -28,6 +28,10 @@ void gun_system::process_events(world& owner) {
 	}
 }
 
+bool components::gun::can_drop() const {
+	return !is_melee || (is_melee && !is_swinging && shooting_timer.get<std::chrono::milliseconds>() >= shooting_interval_ms);
+}
+
 void gun_system::process_entities(world& owner) {
 	auto& physics_sys = owner.get_system<physics_system>();
 	auto& render = owner.get_system<render_system>();
@@ -40,14 +44,15 @@ void gun_system::process_entities(world& owner) {
 			return std::uniform_real_distribution<float>(gun.bullet_damage.first, gun.bullet_damage.second)(generator);
 		};
 
-		bool interval_passed = gun.shooting_timer.get<std::chrono::milliseconds>() >= gun.shooting_interval_ms;
+		auto since_shot = gun.shooting_timer.get<std::chrono::milliseconds>();
+		bool interval_passed = since_shot >= gun.shooting_interval_ms;
 
 		if (gun.is_melee) {
-			if (interval_passed) {
+			if (since_shot > gun.swing_duration) {
 				gun.is_swinging = false;
 			}
 
-			if (!gun.is_swinging && gun.trigger) {
+			if (!gun.is_swinging && gun.trigger && interval_passed) {
 				gun.is_swinging = true;
 
 				messages::animate_message msg;

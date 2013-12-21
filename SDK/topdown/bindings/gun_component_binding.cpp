@@ -27,6 +27,7 @@ namespace bindings {
 			.def_readwrite("is_automatic", &gun::is_automatic)
 			.def_readwrite("bullet_render", &gun::bullet_render)
 			.def_readwrite("is_melee", &gun::is_melee)
+			.def_readwrite("swing_duration", &gun::swing_duration)
 			.def_readwrite("swing_radius", &gun::swing_radius)
 			.def_readwrite("swing_angle", &gun::swing_angle)
 			.def_readwrite("swing_angular_offset", &gun::swing_angular_offset)
