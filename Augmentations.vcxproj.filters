@@ -1161,4 +1161,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="scripts\entity_creation_util.lua" />
+  </ItemGroup>
 </Project>

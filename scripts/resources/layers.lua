@@ -16,7 +16,8 @@ custom_intents = create_inverse_enum {
 	"INSTANT_SLOWDOWN",
 	"SPEED_INCREASE",
 	"SPEED_DECREASE",
-	"QUIT"
+	"QUIT",
+	"DROP_WEAPON"
 }
 
 -- PHYSICS COLLISION LAYERS --

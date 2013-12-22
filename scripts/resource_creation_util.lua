@@ -115,7 +115,7 @@ end
 function create_input_context(entries) 
 	local my_input_context = input_context()
 	
-	for k,v in pairs(entries.intents) do
+	for k, v in pairs(entries.intents) do
 		my_input_context:set_intent(k, v)
 	end
 	

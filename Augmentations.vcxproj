@@ -811,6 +811,9 @@
     <ClInclude Include="window_framework\event.h" />
     <ClInclude Include="window_framework\window.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="scripts\entity_creation_util.lua" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

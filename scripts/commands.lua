@@ -40,3 +40,11 @@ render_system:clear_non_cleared_lines()
 --	world:post_message(msg)
 --end
 
+
+get_scripted(player.body):take_weapon_item(shotgun)
+
+
+--create_entity { 
+--}
+
+

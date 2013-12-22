@@ -19,7 +19,7 @@ images = {
 	blank = "blank.png",
 	
 	shotgun = "shotgun.png",
-	m4a1 = "m4a1.png",
+	assault = "m4a1.png",
 	fireaxe = "fireaxe.png",
 	
 	legs_1 = "legs_1.png",

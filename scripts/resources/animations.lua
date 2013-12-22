@@ -90,7 +90,8 @@ npc_animation_body_shotgun_set = create_animation_set {
 
 npc_animation_body_set = create_animation_set {
 	animations = { 
-		{ event = animation_events.MOVE, animation_response = player_animation }
+		{ event = animation_events.MOVE, animation_response = player_animation },
+		{ event = animation_events.SHOT, animation_response = player_shotgun_shot_animation }
 	}
 }
 

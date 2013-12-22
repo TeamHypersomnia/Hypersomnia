@@ -15,6 +15,12 @@ function open_script(filename)
 end
 
 local CURRENT_SCENE = "scripts\\sample_scenes\\soldier_ai.lua"
+npc_script_file = open_script "scripts\\sample_scenes\\npc.lua"
+soldier_tree_file = open_script "scripts\\sample_scenes\\soldier_tree.lua"
+steering_file = open_script "scripts\\sample_scenes\\steering.lua"
+map_file = open_script "scripts\\sample_scenes\\map.lua"
+weapons_file = open_script "scripts\\sample_scenes\\weapons.lua"
+player_file = open_script "scripts\\sample_scenes\\player.lua"
 
 common = 						open_script "scripts\\common.lua" 
 textures = 						open_script "scripts\\resources\\textures.lua"
@@ -37,6 +43,14 @@ call_on_modification(animations, 			{ animations, particle_effects, entities })
 call_on_modification(particle_effects, 		{ particle_effects, entities })
 call_on_modification(entities, 				{ entities })
 call_on_modification(settings, 				{ settings })
+
+call_on_modification(npc_script_file, 				{ entities })
+call_on_modification(soldier_tree_file, 				{ entities })
+call_on_modification(steering_file, 				{ entities })
+call_on_modification(map_file, 				{ entities })
+call_on_modification(weapons_file, 				{ entities })
+call_on_modification(player_file, 				{ entities })
+
 
 dofile "scripts\\common.lua"
 dofile "scripts\\resource_creation_util.lua"

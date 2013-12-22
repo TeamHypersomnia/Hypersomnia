@@ -82,8 +82,9 @@ function set_components_from_entry(entity, entry, entities_lookup)
 	
 	if entry.physics ~= nil then
 		local my_body_data = physics_info()
+		entry.physics.body_info = entry.physics.body_info or {}
 		
-		if entry.physics.body_info.shape_type == physics_info.RECT then
+		if entry.physics.body_info.shape_type ~= nil and entry.physics.body_info.shape_type == physics_info.RECT then
 			if entry.physics.body_info.rect_size == nil then
 				entry.physics.body_info.rect_size = entry.render.model.size
 			end
@@ -96,8 +97,11 @@ function set_components_from_entry(entity, entry, entities_lookup)
 
 	if entry.gun ~= nil then
 		local gun = entity.gun
-		set_physics_info(gun.bullet_body, entry.gun.bullet_body)
 		--print(inspect(entry.gun))
+		entry.gun.bullet_body = entry.gun.bullet_body or {}
+		entry.gun.bullet_render = entry.gun.bullet_render or {} 
+		
+		set_physics_info(gun.bullet_body, entry.gun.bullet_body)
 		rewrite(gun.bullet_render, entry.gun.bullet_render)
 	end
 	
