@@ -183,8 +183,8 @@ void gun_system::process_entities(world& owner) {
 					new_transform.rotation = vel.get_degrees();
 					/* add randomized speed to bullet taking velocity variation into account */
 					vel *= std::uniform_real_distribution<float> (
-						gun.bullet_speed - gun.velocity_variation,
-						gun.bullet_speed + gun.velocity_variation)(generator) * PIXELS_TO_METERSf;
+						gun.bullet_speed.first,
+						gun.bullet_speed.second)(generator) * PIXELS_TO_METERSf;
 
 					components::damage damage;
 					/* randomize damage */

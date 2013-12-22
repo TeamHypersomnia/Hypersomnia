@@ -1,4 +1,6 @@
 #include "stdafx.h"
+#include <luabind/class_info.hpp>
+
 #include "entity_system/world.h"
 #include "entity_system/entity.h"
 
@@ -10,6 +12,7 @@
 #include "../messages/collision_message.h"
 #include "../messages/damage_message.h"
 #include "../messages/intent_message.h"
+
 
 int bitor(lua_State* L) {
 	int arg_count = lua_gettop(L);
@@ -95,6 +98,7 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 	using namespace topdown;
 
 	luabind::open(lua_state);
+	luabind::bind_class_info(lua_state);
 
 	luaL_openlibs(lua_state);
 
@@ -161,6 +165,7 @@ script_system::~script_system() {
 void script_system::process_entities(world& owner) {
 	for (auto it : targets) {
 		auto& scriptable = it->get<components::scriptable>();
+		if (!scriptable.available_scripts) continue;
 
 		auto loop_event = scriptable.available_scripts->get_raw().find(components::scriptable::LOOP);
 		
@@ -183,7 +188,7 @@ void pass_events_to_script(world& owner, int msg_enum) {
 	events.erase(
 		std::remove_if(events.begin(), events.end(), [msg_enum](message_type& msg){
 			auto* scriptable = msg.subject->find<components::scriptable>();
-			if (scriptable == nullptr) return false;
+			if (scriptable == nullptr || !scriptable->available_scripts) return false;
 
 			auto it = scriptable->available_scripts->get_raw().find(msg_enum);
 

@@ -58,6 +58,7 @@ namespace bindings {
 
 			luabind::class_<b2Body>("b2Body")
 			.def("ApplyForce", &b2Body::ApplyForce)
+			.def("ApplyLinearImpulse", &b2Body::ApplyLinearImpulse)
 			.def("GetWorldCenter", &b2Body::GetWorldCenter)
 			.def("SetFixedRotation", &b2Body::SetFixedRotation)
 			.def("SetLinearDamping", &b2Body::SetLinearDamping)
