@@ -6,6 +6,8 @@
 
 #include "../messages/collision_message.h"
 
+#include "../game/body_helper.h"
+
 bool physics_system::raycast_input::ShouldRaycast(b2Fixture* fixture) {
 	entity* fixture_entity = reinterpret_cast<entity*>(fixture->GetBody()->GetUserData());
 	return
@@ -148,6 +150,22 @@ physics_system::query_output physics_system::query_aabb(vec2<> p1_meters, vec2<>
 
 	b2world.QueryAABB(&callback, aabb);
 	return std::move(std::vector<b2Body*>(callback.output.begin(), callback.output.end()));
+}
+
+physics_system::query_output physics_system::query_body(augmentations::entity_system::entity& subject, b2Filter* filter, void* ignore_userdata) {
+	query_output total_output;
+	
+	for (b2Fixture* f = subject.get<components::physics>().body->GetFixtureList(); f != nullptr; f = f->GetNext()) {
+		auto transformed = topdown::get_transformed_shape_verts(subject, true);
+		
+		b2PolygonShape shape;
+		shape.Set(transformed.data(), transformed.size());
+
+		auto this_result = query_shape(&shape, filter, ignore_userdata);
+		total_output.bodies.insert(total_output.bodies.end(), this_result.bodies.begin(), this_result.bodies.end());
+	}
+
+	return total_output;
 }
 
 physics_system::query_output physics_system::query_shape(b2Shape* shape, b2Filter* filter, void* ignore_userdata) {

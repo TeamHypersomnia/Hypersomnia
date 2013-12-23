@@ -5,6 +5,8 @@
 #include "../resources/render_info.h"
 #include "../game/body_helper.h"
 
+#include "entity_system/entity.h"
+
 namespace bindings {
 	luabind::scope _body_helper() {
 		return (
@@ -27,7 +29,8 @@ namespace bindings {
 				luabind::value("RECT", physics_info::RECT)
 			],
 
-			luabind::def("create_physics_component", create_physics_component)
+			luabind::def("create_physics_component", create_physics_component),
+			luabind::def("body_to_entity", body_to_entity)
 		);
 	}
 }

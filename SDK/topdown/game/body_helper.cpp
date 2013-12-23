@@ -173,4 +173,9 @@ namespace topdown {
 
 		return output;
 	}
+
+	augmentations::entity_system::entity* body_to_entity(b2Body* b) {
+		return static_cast<augmentations::entity_system::entity*>(b->GetUserData());
+	}
+
 }

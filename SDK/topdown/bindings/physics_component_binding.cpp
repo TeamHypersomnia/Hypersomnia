@@ -49,7 +49,8 @@ namespace bindings {
 			.def_readwrite("timestep_multiplier", &physics_system::timestep_multiplier)
 			.def_readwrite("enable_interpolation", &physics_system::enable_interpolation)
 			.def("ray_cast", &physics_system::ray_cast_px)
-			.def("query_aabb", &physics_system::query_aabb)
+			.def("query_aabb", &physics_system::query_aabb_px)
+			.def("query_body", &physics_system::query_body)
 			.def("push_away_from_walls", &physics_system::push_away_from_walls)
 			, 
 
