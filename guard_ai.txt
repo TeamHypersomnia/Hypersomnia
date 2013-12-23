@@ -1,0 +1,25 @@
+graph g {
+Combat[shape=box]
+"Player seen before"[shape=box]
+
+ordering=out;
+Behave--Combat
+Behave--"Player seen before"
+"Player seen before"--"Begin pathfinding to last seen"
+"Player seen before"--"Last seen reached"
+"Player seen before"--"Explore"
+
+Combat--"Player visible"
+Combat--"Anything in hand"
+Combat--Fight
+Fight--"Is melee range"
+"Is melee range"--"Swing"
+Fight--"Has gun and ammo"
+"Has gun and ammo"--Shoot
+Fight--"Other gun visible"
+"Other gun visible"--"Get it"
+Explore--"Other gun visible"
+
+Behave--"Walk around"
+
+}

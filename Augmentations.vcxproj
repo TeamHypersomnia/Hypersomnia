@@ -41,10 +41,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(IncludePath)</IncludePath>
     <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)\output\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(IncludePath)</IncludePath>
     <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)\output\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

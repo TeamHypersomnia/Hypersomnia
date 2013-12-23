@@ -20,16 +20,6 @@ namespace components {
 
 		std::vector<resources::particle> particles;
 
-		particle_group() 
-			: optional_physics(nullptr), destroy_when_empty(true), stream_info(nullptr), stream_lifetime_ms(0.f), stream_particles_to_spawn(0.f) {}
-
-	private:
-		friend class particle_group_system;
-		friend class particle_emitter_system;
-
-		virtual void draw(resources::buffer&, const components::transform::state&, vec2<> camera_pos) override;
-		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) override;
-
 		/* only used by subject stream to indicate that it will no longer emit particles */
 		bool destroy_when_empty;
 
@@ -39,5 +29,15 @@ namespace components {
 		float swing_spread, swings_per_sec;
 
 		resources::emission* stream_info;
+
+		particle_group() 
+			: optional_physics(nullptr), destroy_when_empty(true), stream_info(nullptr), stream_lifetime_ms(0.f), stream_particles_to_spawn(0.f) {}
+
+	private:
+		friend class particle_group_system;
+		friend class particle_emitter_system;
+
+		virtual void draw(resources::buffer&, const components::transform::state&, vec2<> camera_pos) override;
+		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) override;
 	};
 }
