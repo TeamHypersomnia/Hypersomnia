@@ -1,7 +1,6 @@
 player_class = inherits_from(npc_class)
 
 function player_class:init()
-	print("player initialised")
 end
 
 function player_class:loop()

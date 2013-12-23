@@ -73,6 +73,11 @@ filter_items = {
 	maskBits = bitor(OBJECTS, STATIC_OBJECTS)
 }
 
+filter_pick_up_items = {
+	categoryBits = mask_all,
+	maskBits = ITEMS
+}
+
 filter_pathfinding_visibility = {
 	categoryBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS, CORPSES),
 	maskBits = bitor(STATIC_OBJECTS)

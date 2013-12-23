@@ -253,7 +253,8 @@ loop_only_info = create_scriptable_info {
 					input_system.quit_flag = 1	
 				elseif message.intent == custom_intents.DROP_WEAPON then
 					if message.state_flag then
-						get_scripted(player.body):drop_weapon()
+						--get_scripted(player.body):drop_weapon()
+						get_scripted(player.body):pick_up_weapon()
 					end
 				elseif message.intent == custom_intents.INSTANT_SLOWDOWN then
 					physics_system.timestep_multiplier = 0.000

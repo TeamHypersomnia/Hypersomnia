@@ -15,8 +15,6 @@ function get_scripted(entity)
 end
 
 function init_npc(this_entity)
-	for k, v in pairs(this_entity.scriptable.script_data) do print(k, v) end
-	
 	this_entity.scriptable.script_data = this_entity.scriptable.script_data:create()
 	this_entity.scriptable.script_data.entity = this_entity
 	this_entity.scriptable.script_data:init()
@@ -70,7 +68,7 @@ end
 function npc_class:take_weapon_item(item_data)
 		print("taking weapon...\n" .. item_data.animation_index)
 		--print(item_data.weapon_info.is_melee)
-		print(debug.traceback())
+		--print(debug.traceback())
 	recursive_write(self.entity.gun, item_data.weapon_info)
 	
 	for k, v in pairs(self.weapon_animation_sets) do print(k) end
@@ -85,8 +83,8 @@ function npc_class:take_weapon_item(item_data)
 end
 
 function npc_class:take_weapon(weapon_entity)
-	take_weapon_item(get_scripted(weapon_entity).item_data)
-	world:delete_entity(weapon_item)
+	self:take_weapon_item(get_scripted(weapon_entity).item_data)
+	world:delete_entity(weapon_entity, nil)
 end
 
 
@@ -96,57 +94,82 @@ function npc_class:drop_weapon()
 		local my_thrown_weapon = create_entity (archetyped(self.current_weapon.item_entity, {
 			transform = {
 				pos = self.entity.transform.current.pos
+			},
+			
+			scriptable = {
+				script_data = {
+					item_data = self.current_weapon
+				}
 			}
 		}))
 		
-		local throw_force = vec2.from_degrees(self.entity.transform.current.rotation) * 2
+		local throw_force = vec2.from_degrees(self.entity.transform.current.rotation) * 14
 		
 		local body = my_thrown_weapon.physics.body
 		
 		body:ApplyLinearImpulse(b2Vec2(throw_force.x, throw_force.y), body:GetWorldCenter())
-		body:ApplyAngularImpulse(2)
+		body:ApplyAngularImpulse(8)
 		
 		self:take_weapon_item(bare_hands)
 	end
 end
 
+function npc_class:pick_up_weapon()
+	local items_in_range = physics_system:query_body(self.entity, create(b2Filter, filter_pick_up_items), nil)
+	
+	local was_something_on_ground = false
+	
+	for candidate in items_in_range.bodies do
+		print("picking up.. ")
+		
+		self:drop_weapon()
+		self:take_weapon(body_to_entity(candidate))
+		was_something_on_ground = true
+		break
+	end
+	
+	if not was_something_on_ground then
+		self:drop_weapon()
+	end
+end
+
 function npc_class:loop()
---	local entity = self.entity
---	local behaviours = self.steering_behaviours
---	local target_entities = self.target_entities
---	
---	
---	local myvel = entity.physics.body:GetLinearVelocity()
---	target_entities.forward.transform.current.pos = entity.transform.current.pos + vec2(myvel.x, myvel.y) * 50
---	
---	if entity.pathfinding:is_still_pathfinding() or entity.pathfinding:is_still_exploring() then
---		target_entities.navigation.transform.current.pos = entity.pathfinding:get_current_navigation_target()
---		
---		behaviours.obstacle_avoidance.enabled = true
---		if behaviours.sensor_avoidance.last_output_force:non_zero() then
---			behaviours.target_seeking.enabled = false
---			behaviours.forward_seeking.enabled = true
---			behaviours.obstacle_avoidance.enabled = true
---		else
---			behaviours.target_seeking.enabled = true
---			behaviours.forward_seeking.enabled = false
---			--behaviours.obstacle_avoidance.enabled = false
---		end
---	else
---		behaviours.target_seeking.enabled = false
---		behaviours.forward_seeking.enabled = false
---		--behaviours.obstacle_avoidance.enabled = false
---	end
---	
---	behaviours.sensor_avoidance.max_intervention_length = (entity.transform.current.pos - target_entities.navigation.transform.current.pos):length() - 70
---	
---	--	behaviours.sensor_avoidance.enabled = true
---	--	player_behaviours.obstacle_avoidance.enabled = true
---	--player_behaviours.forward_seeking.enabled = true
---	
---	if behaviours.obstacle_avoidance.last_output_force:non_zero() then
---		behaviours.wandering.current_wander_angle = behaviours.obstacle_avoidance.last_output_force:get_degrees()
---	end
+	local entity = self.entity
+	local behaviours = self.steering_behaviours
+	local target_entities = self.target_entities
+	
+	
+	local myvel = entity.physics.body:GetLinearVelocity()
+	target_entities.forward.transform.current.pos = entity.transform.current.pos + vec2(myvel.x, myvel.y) * 50
+	
+	if entity.pathfinding:is_still_pathfinding() or entity.pathfinding:is_still_exploring() then
+		target_entities.navigation.transform.current.pos = entity.pathfinding:get_current_navigation_target()
+		
+		behaviours.obstacle_avoidance.enabled = true
+		if behaviours.sensor_avoidance.last_output_force:non_zero() then
+			behaviours.target_seeking.enabled = false
+			behaviours.forward_seeking.enabled = true
+			behaviours.obstacle_avoidance.enabled = true
+		else
+			behaviours.target_seeking.enabled = true
+			behaviours.forward_seeking.enabled = false
+			--behaviours.obstacle_avoidance.enabled = false
+		end
+	else
+		behaviours.target_seeking.enabled = false
+		behaviours.forward_seeking.enabled = false
+		--behaviours.obstacle_avoidance.enabled = false
+	end
+	
+	behaviours.sensor_avoidance.max_intervention_length = (entity.transform.current.pos - target_entities.navigation.transform.current.pos):length() - 70
+	
+	--	behaviours.sensor_avoidance.enabled = true
+	--	player_behaviours.obstacle_avoidance.enabled = true
+	--player_behaviours.forward_seeking.enabled = true
+	
+	if behaviours.obstacle_avoidance.last_output_force:non_zero() then
+		behaviours.wandering.current_wander_angle = behaviours.obstacle_avoidance.last_output_force:get_degrees()
+	end
 	
 	
 	
@@ -194,9 +217,9 @@ final_npc_archetype = (archetyped(character_archetype, {
 		body = {
 			transform = { pos = vec2(1000, (-2800)) },
 			
-			--behaviour_tree = {
-			--	starting_node = npc_behaviour_tree.behave
-			--},
+			behaviour_tree = {
+				starting_node = npc_behaviour_tree.behave
+			},
 		
 			lookat = {
 				target = "body",

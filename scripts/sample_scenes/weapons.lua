@@ -33,6 +33,7 @@ world_item = {
 			fixed_rotation = false,
 			density = 0.1,
 			friction = 0,
+			restitution = 0.4,
 			sensor = false
 		}
 	}
