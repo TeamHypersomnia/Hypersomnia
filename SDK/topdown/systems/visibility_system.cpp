@@ -126,7 +126,7 @@ void visibility_system::process_entities(world& owner) {
 			};
 
 			/* get list of all fixtures that intersect with the visibility square */
-			auto bodies = physics.query_aabb(aabb.lowerBound, aabb.upperBound, &request.filter, it);
+			auto bodies = physics.query_aabb(aabb.lowerBound, aabb.upperBound, &request.filter, it).bodies;
 
 			/* for every fixture that intersected with the visibility square */
 			for (auto b : bodies) {

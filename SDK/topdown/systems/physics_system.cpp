@@ -127,18 +127,18 @@ bool physics_system::query_aabb_input::ReportFixture(b2Fixture* fixture) {
 	return true;
 }
 
-std::set<b2Body*> physics_system::query_square(vec2<> p1_meters, float side_meters, b2Filter* filter, void* ignore_userdata) {
+physics_system::query_output physics_system::query_square(vec2<> p1_meters, float side_meters, b2Filter* filter, void* ignore_userdata) {
 	b2AABB aabb;
 	aabb.lowerBound = p1_meters - side_meters / 2;
 	aabb.upperBound = p1_meters + side_meters / 2;
 	return query_aabb(aabb.lowerBound, aabb.upperBound, filter, ignore_userdata);
 }
 
-std::set<b2Body*> physics_system::query_square_px(vec2<> p1, float side, b2Filter* filter, void* ignore_userdata) {
+physics_system::query_output physics_system::query_square_px(vec2<> p1, float side, b2Filter* filter, void* ignore_userdata) {
 	return query_square(p1 * PIXELS_TO_METERSf, side * PIXELS_TO_METERSf, filter, ignore_userdata);
 }
 
-std::set<b2Body*> physics_system::query_aabb(vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter, void* ignore_userdata) {
+physics_system::query_output physics_system::query_aabb(vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter, void* ignore_userdata) {
 	query_aabb_input callback;
 	callback.filter = filter;
 	callback.ignore_userdata = ignore_userdata;
@@ -147,10 +147,10 @@ std::set<b2Body*> physics_system::query_aabb(vec2<> p1_meters, vec2<> p2_meters,
 	aabb.upperBound = p2_meters;
 
 	b2world.QueryAABB(&callback, aabb);
-	return std::move(callback.output);
+	return std::move(std::vector<b2Body*>(callback.output.begin(), callback.output.end()));
 }
 
-std::set<b2Body*> physics_system::query_shape(b2Shape* shape, b2Filter* filter, void* ignore_userdata) {
+physics_system::query_output physics_system::query_shape(b2Shape* shape, b2Filter* filter, void* ignore_userdata) {
 	b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
 	
 	query_aabb_input callback;
@@ -167,10 +167,10 @@ std::set<b2Body*> physics_system::query_shape(b2Shape* shape, b2Filter* filter, 
 		if (b2TestOverlap(shape, 0, fixture->GetShape(), 0, null_transform, fixture->GetBody()->GetTransform())) 
 			bodies.insert(fixture->GetBody());
 
-	return std::move(bodies);
+	return std::move(std::vector<b2Body*>(bodies.begin(), bodies.end()));
 }
 
-std::set<b2Body*> physics_system::query_aabb_px(vec2<> p1, vec2<> p2, b2Filter* filter, void* ignore_userdata) {
+physics_system::query_output physics_system::query_aabb_px(vec2<> p1, vec2<> p2, b2Filter* filter, void* ignore_userdata) {
 	return query_aabb(p1 * PIXELS_TO_METERSf, p2 * PIXELS_TO_METERSf, filter, ignore_userdata);
 }
 

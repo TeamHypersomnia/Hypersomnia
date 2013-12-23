@@ -95,7 +95,7 @@ void gun_system::process_entities(world& owner) {
 				b2PolygonShape swing_query;
 				swing_query.Set(query_vertices.data(), query_vertices.size());
 
-				auto hit_bodies = physics_sys.query_shape(&swing_query, &gun.bullet_body.filter, it);
+				auto hit_bodies = physics_sys.query_shape(&swing_query, &gun.bullet_body.filter, it).bodies;
 
 				for (auto hit_body : hit_bodies) {
 					auto target_entity = reinterpret_cast<entity*>(hit_body->GetUserData());

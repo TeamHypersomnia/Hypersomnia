@@ -60,12 +60,18 @@ public:
 	
 	vec2<> push_away_from_walls(vec2<> position, float radius, int ray_amount, b2Filter filter, entity* ignore_entity = nullptr);
 
-	std::set<b2Body*> query_square(vec2<> p1_meters, float side_meters, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
-	std::set<b2Body*> query_square_px(vec2<> p1, float side, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
-	std::set<b2Body*> query_aabb(vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
-	std::set<b2Body*> query_aabb_px(vec2<> p1, vec2<> p2, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
+	struct query_output {
+		std::vector<b2Body*> bodies;
+		query_output() {}
+		query_output(const std::vector<b2Body*>& b) : bodies(b) {}
+	};
 
-	std::set<b2Body*> query_shape(b2Shape*, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
+	query_output query_square(vec2<> p1_meters, float side_meters, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
+	query_output query_square_px(vec2<> p1, float side, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
+	query_output query_aabb(vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
+	query_output query_aabb_px(vec2<> p1, vec2<> p2, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
+
+	query_output query_shape(b2Shape*, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
 private:
 	/* callback structure used in QueryAABB function to get all shapes near-by */
 	struct query_aabb_input : b2QueryCallback {

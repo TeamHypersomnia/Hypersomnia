@@ -537,7 +537,7 @@ vec2<> steering::wander::steer(scene in) {
 }
 
 vec2<> steering::separation::steer(scene in) {
-	auto bodies = in.physics->query_square_px(in.subject.position, square_side, &group, in.subject_entity);
+	auto bodies = in.physics->query_square_px(in.subject.position, square_side, &group, in.subject_entity).bodies;
 
 	/* debug drawing */
 	if (_render->draw_avoidance_info) {

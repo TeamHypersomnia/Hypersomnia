@@ -41,7 +41,8 @@ render_system:clear_non_cleared_lines()
 --end
 
 
-get_scripted(player.body):take_weapon_item(shotgun)
+--get_scripted(player.body):take_weapon_item(shotgun)
+
 
 
 --create_entity { 

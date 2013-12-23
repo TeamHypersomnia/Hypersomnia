@@ -6,6 +6,7 @@
 #include "../systems/physics_system.h"
 
 #include "entity_system/entity.h"
+#include <luabind/iterator_policy.hpp>
 
 void set_density(b2Body* body, float density) {
 	for (b2Fixture* it = body->GetFixtureList(); it; it = it->GetNext()) {
@@ -39,10 +40,16 @@ namespace bindings {
 			.def_readwrite("what_entity", &physics_system::raycast_output::what_entity)
 			,
 
+			luabind::class_<physics_system::query_output>("query_output")
+			.def(luabind::constructor<>())
+			.def_readwrite("bodies", &physics_system::query_output::bodies, luabind::return_stl_iterator)
+			,
+
 			luabind::class_<physics_system>("_physics_system")
 			.def_readwrite("timestep_multiplier", &physics_system::timestep_multiplier)
 			.def_readwrite("enable_interpolation", &physics_system::enable_interpolation)
 			.def("ray_cast", &physics_system::ray_cast_px)
+			.def("query_aabb", &physics_system::query_aabb)
 			.def("push_away_from_walls", &physics_system::push_away_from_walls)
 			, 
 
