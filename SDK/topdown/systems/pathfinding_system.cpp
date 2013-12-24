@@ -246,6 +246,8 @@ void pathfinding_system::process_entities(world& owner) {
 
 							return parallellness_a > parallellness_b;
 						}
+						else if (pathfinding.custom_exploration_hint.enabled) 
+							return (a.location - pathfinding.custom_exploration_hint.origin).length_sq() < (b.location - pathfinding.custom_exploration_hint.origin).length_sq();
 						else return (a.location - transform.pos).length_sq() < (b.location - transform.pos).length_sq();
 					}
 
