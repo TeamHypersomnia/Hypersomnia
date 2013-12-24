@@ -55,7 +55,7 @@ fireaxe_sprite = create_sprite {
 }
 
 bare_hands = {
-	weapon_info = {
+	weapon_info = create_gun({
 		bullet_damage = minmax(110, 140),
 		shooting_interval_ms = 600,
 		swing_duration = 300,
@@ -75,37 +75,39 @@ bare_hands = {
 		
 		swing_angular_offset = 0
 		--query_vertices = 7
-	},
+	}),
 	
 	animation_index = "BARE_HANDS"
 }
 
-assault_rifle = {
-	weapon_info = {
-		bullets_once = 1,
-		bullet_distance_offset = vec2(120, 0),
-		bullet_damage = minmax(80, 100),
-		bullet_speed = minmax(6000, 7000),
-		bullet_render = { model = bullet_sprite, layer = render_layers.BULLETS },
-		is_automatic = true,
-		max_rounds = 30,
-		shooting_interval_ms = 100,
-		spread_degrees = 2,
-		shake_radius = 9.5,
-		shake_spread_degrees = 45,
-		is_melee = false,
-		
-		bullet_body = {
-			filter = filter_bullets,
-			shape_type = physics_info.RECT,
-			rect_size = bullet_sprite.size,
-			fixed_rotation = true,
-			density = 0.1
-		},
-		
-		max_bullet_distance = 5000,
-		current_rounds = 1000000
+assault_rifle_info = {
+	bullets_once = 1,
+	bullet_distance_offset = vec2(120, 0),
+	bullet_damage = minmax(80, 100),
+	bullet_speed = minmax(6000, 7000),
+	bullet_render = { model = bullet_sprite, layer = render_layers.BULLETS },
+	is_automatic = true,
+	max_rounds = 30,
+	shooting_interval_ms = 100,
+	spread_degrees = 2,
+	shake_radius = 9.5,
+	shake_spread_degrees = 45,
+	is_melee = false,
+	
+	bullet_body = {
+		filter = filter_bullets,
+		shape_type = physics_info.RECT,
+		rect_size = bullet_sprite.size,
+		fixed_rotation = true,
+		density = 0.1
 	},
+	
+	max_bullet_distance = 5000,
+	current_rounds = 30
+}
+
+assault_rifle = {
+	weapon_info = create_gun (assault_rifle_info),
 	
 	animation_index = "ASSAULT_RIFLE",
 	
@@ -116,15 +118,18 @@ assault_rifle = {
 	}) 
 }
 
-shotgun = archetyped(assault_rifle, {
-	weapon_info = {
+shotgun = {
+	weapon_info = create_gun(archetyped(assault_rifle_info, {
 		bullets_once = 12,
 		bullet_damage = minmax(80, 100),
 		bullet_speed = minmax(4000, 8000),
 		is_automatic = false,
 		shooting_interval_ms = 500,
-		spread_degrees = 8
-	},
+		spread_degrees = 8,
+		
+		current_rounds = 2,
+		max_rounds = 2
+	})),
 	
 	animation_index = "SHOTGUN",
 	
@@ -133,10 +138,10 @@ shotgun = archetyped(assault_rifle, {
 			model = shotgun_sprite
 		}
 	}) 
-})
+}
 
 fireaxe = {
-	weapon_info = {
+	weapon_info = create_gun({
 	bullet_damage = minmax(110, 140),
 	shooting_interval_ms = 500,
 	swing_duration = 300,
@@ -156,7 +161,7 @@ fireaxe = {
 	 
 	swing_angular_offset = 0
 	--query_vertices = 7
-	},
+	}),
 	
 	animation_index = "FIREAXE",
 	

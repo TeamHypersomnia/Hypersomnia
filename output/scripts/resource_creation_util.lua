@@ -254,3 +254,15 @@ function create_behaviour_tree(entries)
 	return out_my_nodes
 end
 
+function create_gun(entries)
+	local new_gun = gun_component()
+
+	entries.bullet_body = entries.bullet_body or {}
+	entries.bullet_render = entries.bullet_render or {} 
+	
+	set_physics_info(new_gun.bullet_body, entries.bullet_body)
+	rewrite(new_gun.bullet_render, entries.bullet_render)
+	
+	return new_gun
+end
+
