@@ -146,8 +146,11 @@ character_archetype = {
 			model = blank_green
 		},
 		
-		animate = {},
-		gun = {},
+		animate = { 
+			--available_animations = npc_animation_body_shotgun_set
+		},
+		gun = {}, 
+		--assault_rifle_info,
 		
 		physics = {
 			body_type = Box2D.b2_dynamicBody,

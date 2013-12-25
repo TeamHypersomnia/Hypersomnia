@@ -8,7 +8,7 @@ print("Calling commands.lua...")
 
 
 --render_system:push_non_cleared_line(debug_line(vec2(), vec2(), rgba(255, 0, 0, 255)))
-render_system:clear_non_cleared_lines()
+--render_system:clear_non_cleared_lines()
 --render_system:push_non_cleared_line(debug_line(
 --my_npcs[1]
 --.body
@@ -41,7 +41,9 @@ render_system:clear_non_cleared_lines()
 --end
 
 
---get_scripted(player.body):take_weapon_item(shotgun)
+
+
+get_scripted(player.body):take_weapon_item(shotgun)
 
 
 

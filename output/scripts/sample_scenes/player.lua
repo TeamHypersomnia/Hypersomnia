@@ -1,6 +1,8 @@
 player_class = inherits_from(npc_class)
 
 function player_class:init()
+	self:take_weapon_item(bare_hands)
+	print("player initialised")
 end
 
 function player_class:loop()
@@ -55,14 +57,14 @@ player = create_entity_group (archetyped(character_archetype, {
 	}
 }))
 
-init_npc(player.body)
-
-get_scripted(player.body).weapon_animation_sets = {
-	BARE_HANDS = npc_animation_body_set,
-	FIREAXE = npc_animation_body_set,
-	ASSAULT_RIFLE = npc_animation_body_shotgun_set,
-	SHOTGUN = npc_animation_body_shotgun_set
-}
+init_npc(player.body, { 
+	weapon_animation_sets = {
+		BARE_HANDS = npc_animation_body_set,
+		FIREAXE = npc_animation_body_set,
+		ASSAULT_RIFLE = npc_animation_body_shotgun_set,
+		SHOTGUN = npc_animation_body_shotgun_set
+	}}
+)
 
 get_scripted(player.body):take_weapon_item(assault_rifle)
 

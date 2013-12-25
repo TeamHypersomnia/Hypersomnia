@@ -14,9 +14,12 @@ function get_scripted(entity)
 	return entity.scriptable.script_data
 end
 
-function init_npc(this_entity)
+function init_npc(this_entity, optional_write)
 	this_entity.scriptable.script_data = this_entity.scriptable.script_data:create()
 	this_entity.scriptable.script_data.entity = this_entity
+	
+	if optional_write ~= nil then recursive_write(this_entity.scriptable.script_data, optional_write) end
+	
 	this_entity.scriptable.script_data:init()
 end
 
@@ -54,7 +57,7 @@ function npc_class:init()
 	
 	o.steering_behaviours.pursuit.enabled = false
 	
-	o:take_weapon_item(shotgun)
+	o:take_weapon_item(bare_hands)
 end
 
 function npc_class:refresh_behaviours() 
@@ -66,10 +69,9 @@ function npc_class:refresh_behaviours()
 end
 
 function npc_class:take_weapon_item(item_data)
-		print("taking weapon...\n" .. item_data.animation_index)
 		--print(item_data.weapon_info.is_melee)
 		--print(debug.traceback())
-	recursive_write(self.entity.gun, item_data.weapon_info)
+	self.entity.gun = gun_component(item_data.weapon_info)
 	
 	for k, v in pairs(self.weapon_animation_sets) do print(k) end
 	
@@ -80,13 +82,23 @@ function npc_class:take_weapon_item(item_data)
 	
 	self.entity.animate.available_animations = self.weapon_animation_sets[item_data.animation_index]
 	self.current_weapon = item_data
+	print("taking weapon...\n" .. item_data.animation_index)
 end
+
+global_item_table = {}
 
 function npc_class:take_weapon(weapon_entity)
 	self:take_weapon_item(get_scripted(weapon_entity).item_data)
+	
+	for k, v in ipairs(global_item_table) do
+		if v == weapon_entity then
+			table.remove(global_item_table, k)
+			break
+		end
+	end
+	
 	world:delete_entity(weapon_entity, nil)
 end
-
 
 function npc_class:drop_weapon()
 	if self.current_weapon ~= bare_hands then
@@ -98,17 +110,24 @@ function npc_class:drop_weapon()
 			
 			scriptable = {
 				script_data = {
-					item_data = self.current_weapon
+					item_data = {}
 				}
 			}
 		}))
+		
+		local item_data_table = my_thrown_weapon.scriptable.script_data.item_data
+		
+		recursive_write(item_data_table, self.current_weapon, { weapon_info = true })
+		item_data_table.weapon_info = gun_component(self.entity.gun)
+		
+		table.insert(global_item_table, my_thrown_weapon)
 		
 		local throw_force = vec2.from_degrees(self.entity.transform.current.rotation) * 14
 		
 		local body = my_thrown_weapon.physics.body
 		
 		body:ApplyLinearImpulse(b2Vec2(throw_force.x, throw_force.y), body:GetWorldCenter())
-		body:ApplyAngularImpulse(8)
+		body:ApplyAngularImpulse(10)
 		
 		self:take_weapon_item(bare_hands)
 	end
@@ -210,7 +229,7 @@ function npc_class:loop()
 end
 
 
-npc_count = 1
+npc_count = 0
 my_npcs = {}
 
 final_npc_archetype = (archetyped(character_archetype, {
@@ -257,14 +276,13 @@ for i=1, npc_count do
 	end
 	
 	
-	init_npc(my_npcs[i].body)
-	get_scripted(my_npcs[i].body).
+	init_npc(my_npcs[i].body, { 
 	weapon_animation_sets = {
 		BARE_HANDS = npc_animation_body_set,
 		FIREAXE = npc_animation_body_set,
 		ASSAULT_RIFLE = npc_animation_body_shotgun_set,
 		SHOTGUN = npc_animation_body_shotgun_set
-	}	
+	}})
 	
 	local script_data = get_scripted(my_npcs[i].body)
 	script_data:refresh_behaviours()

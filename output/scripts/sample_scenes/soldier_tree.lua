@@ -1,3 +1,18 @@
+player_seen_before_archetype = {
+	node_type = behaviour_node.SEQUENCER,
+	on_update = function(entity)
+		local self = get_scripted(entity)
+		
+		if self.was_seen then
+			return behaviour_node.SUCCESS 
+		else
+			return behaviour_node.FAILURE
+		end
+		
+		return behaviour_node.FAILURE
+	end
+}
+
 npc_behaviour_tree = create_behaviour_tree {
 
 	decorators = {
@@ -22,6 +37,33 @@ npc_behaviour_tree = create_behaviour_tree {
 			node_type = behaviour_node.SELECTOR,
 			default_return = behaviour_node.SUCCESS
 		},
+			
+		player_seen_before_first = player_seen_before_archetype,
+		
+		can_get_better_weapon = {
+			on_update = function(entity) 
+				-- take only guns with ammo
+				local condition = function(weapon) return not weapon.is_melee and weapon.current_rounds > 0 end
+				
+				-- if we're armed, we can't get better weapon
+				if condition(entity.gun) then return behaviour_node.FAILURE end
+				
+				-- if we only have bare hands
+				local npc_info = get_scripted(entity)
+				if entity.gun.is_melee and npc_info.current_weapon == bare_hands then 
+					-- take anything
+					condition = function(weapon) return true end
+				end
+				
+				for k, v in ipairs(global_item_table) do
+					
+				end
+			end
+		},
+		
+			
+		player_seen_before = player_seen_before_archetype,
+		
 		
 		player_visible = {
 			node_type = behaviour_node.SEQUENCER,
@@ -98,21 +140,7 @@ npc_behaviour_tree = create_behaviour_tree {
 			end
 		},
 		
-		player_seen_before = {
-			node_type = behaviour_node.SEQUENCER,
-			on_update = function(entity)
-				local self = get_scripted(entity)
-				
-				if self.was_seen then
-					return behaviour_node.SUCCESS 
-				else
-					return behaviour_node.FAILURE
-				end
-				
-				return behaviour_node.FAILURE
-			end
-		},
-		
+	
 		
 		begin_pathfinding_to_last_seen = {
 			default_return = behaviour_node.SUCCESS,

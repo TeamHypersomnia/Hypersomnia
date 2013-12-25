@@ -53,8 +53,8 @@ call_on_modification(player_file, 				{ entities })
 
 
 dofile "scripts\\common.lua"
-dofile "scripts\\resource_creation_util.lua"
 dofile "scripts\\entity_creation_util.lua" 
+dofile "scripts\\resource_creation_util.lua"
 dofile "scripts\\resources\\layers.lua"
 dofile "scripts\\resources\\textures.lua"
 dofile "scripts\\resources\\animations.lua"

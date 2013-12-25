@@ -9,6 +9,7 @@ namespace bindings {
 		return
 			luabind::class_<gun>("gun_component")
 			.def(luabind::constructor<>())
+			.def(luabind::constructor<const gun&>())
 			.def_readwrite("current_rounds", &gun::current_rounds)
 			.def_readwrite("reloading", &gun::reloading)
 			.def_readwrite("trigger", &gun::trigger)

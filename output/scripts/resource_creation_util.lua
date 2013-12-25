@@ -255,14 +255,10 @@ function create_behaviour_tree(entries)
 end
 
 function create_gun(entries)
-	local new_gun = gun_component()
-
-	entries.bullet_body = entries.bullet_body or {}
-	entries.bullet_render = entries.bullet_render or {} 
-	
-	set_physics_info(new_gun.bullet_body, entries.bullet_body)
-	rewrite(new_gun.bullet_render, entries.bullet_render)
-	
+	print("creating gun..")
+	local temp = create_entity { gun = entries }
+	local new_gun = gun_component(temp.gun)
+	world:delete_entity(temp, nil)
 	return new_gun
 end
 
