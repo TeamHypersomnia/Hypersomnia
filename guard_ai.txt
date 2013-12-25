@@ -1,24 +1,55 @@
 graph g {
-Combat[shape=box]
-"Player seen before"[shape=box]
-
 ordering=out;
-Behave--Combat
+"Player seen before"[shape=box]
+Playerseen2[label="Player seen before", shape = box]
+Behave--Playerseen2
+Playerseen2--"Can get better weapon"
+Playerseen2--"Get it"
+
+Behave--"Player visible"
 Behave--"Player seen before"
 "Player seen before"--"Begin pathfinding to last seen"
 "Player seen before"--"Last seen reached"
 "Player seen before"--"Explore"
 
-Combat--"Player visible"
-Combat--"Anything in hand"
-Combat--Fight
+"Player visible"--"Anything in hand"
+"Player visible"--"Escape and evade"
+"Anything in hand"--Fight
 Fight--"Is melee range"
 "Is melee range"--"Swing"
 Fight--"Has gun and ammo"
 "Has gun and ammo"--Shoot
-Fight--"Other gun visible"
-"Other gun visible"--"Get it"
-Explore--"Other gun visible"
+Fight--"Chase player"
+
+Behave--"Walk around"
+
+}
+
+
+
+graph g {
+ordering=out;
+"Player seen before"[shape=box]
+Playerseen2[label="Player seen before", shape = box]
+Behave--Playerseen2
+Playerseen2--"Bare hands, melee or empty gun"
+Playerseen2--"Better item visible"
+Playerseen2--"Get it"
+
+Behave--"Player visible"
+Behave--"Player seen before"
+"Player seen before"--"Begin pathfinding to last seen"
+"Player seen before"--"Last seen reached"
+"Player seen before"--"Explore"
+
+"Player visible"--"Anything in hand"
+"Player visible"--"Escape and evade"
+"Anything in hand"--Fight
+Fight--"Is melee range"
+"Is melee range"--"Swing"
+Fight--"Has gun and ammo"
+"Has gun and ammo"--Shoot
+Fight--"Chase player"
 
 Behave--"Walk around"
 
