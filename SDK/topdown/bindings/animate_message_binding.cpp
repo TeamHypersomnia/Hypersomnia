@@ -35,6 +35,7 @@ namespace bindings {
 			.enum_("constants")
 			[
 				luabind::value("MOVE", animate_message::MOVE),
+				luabind::value("SWING", animate_message::SWING),
 				luabind::value("SHOT", animate_message::SHOT)
 			]
 				);

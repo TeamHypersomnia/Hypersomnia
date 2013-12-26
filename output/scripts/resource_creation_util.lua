@@ -258,7 +258,11 @@ function create_gun(entries)
 	print("creating gun..")
 	local temp = create_entity { gun = entries }
 	local new_gun = gun_component(temp.gun)
-	world:delete_entity(temp, nil)
+	
+	local msg = destroy_message()
+	msg.subject = temp
+	world:post_message(msg)
+	
 	return new_gun
 end
 

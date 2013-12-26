@@ -62,6 +62,7 @@ namespace bindings {
 		_particle_burst_message(),
 		_collision_message(),
 		_damage_message(),
+		_destroy_message(),
 
 		_render_component(),
 		_transform_component(),
@@ -129,6 +130,7 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			bindings::_particle_burst_message(),
 			bindings::_collision_message(),
 			bindings::_damage_message(),
+			bindings::_destroy_message(),
 
 			bindings::_render_component(),
 			bindings::_transform_component(),
