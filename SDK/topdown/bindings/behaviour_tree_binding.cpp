@@ -29,13 +29,15 @@ namespace bindings {
 			.def_readwrite("on_update", &behaviour_tree::composite::update_callback)
 			.def_readwrite("name", &behaviour_tree::composite::name)
 			.def_readwrite("decorator_chain", &behaviour_tree::composite::decorator_chain)
+			.def_readwrite("concurrent_return", &behaviour_tree::composite::concurrent_return)
 			.def("add_child", &behaviour_tree::composite::add_child)
 			.enum_("constants")[
 				luabind::value("SUCCESS", behaviour_tree::composite::SUCCESS),
 				luabind::value("RUNNING", behaviour_tree::composite::RUNNING),
 				luabind::value("FAILURE", behaviour_tree::composite::FAILURE),
 				luabind::value("SEQUENCER", behaviour_tree::composite::SEQUENCER),
-				luabind::value("SELECTOR", behaviour_tree::composite::SELECTOR)
+				luabind::value("SELECTOR", behaviour_tree::composite::SELECTOR),
+				luabind::value("CONCURRENT", behaviour_tree::composite::CONCURRENT)
 			]
 			,
 			

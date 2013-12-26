@@ -12,7 +12,7 @@ bool behaviour_tree::task::operator==(const task& b) const {
 	return running_parent_node == b.running_parent_node && running_index == b.running_index;
 }
 
-behaviour_tree::composite::composite() : node_type(type::SEQUENCER), default_return(status::RUNNING), decorator_chain(nullptr) {}
+behaviour_tree::composite::composite() : node_type(type::SEQUENCER), default_return(status::RUNNING), decorator_chain(nullptr), concurrent_return(status::RUNNING) {}
 
 bool behaviour_tree::composite::is_currently_running(const task& current_task) const {
 	if (current_task.running_parent_node) 
@@ -144,6 +144,18 @@ int behaviour_tree::composite::traverse(task& current_task) {
 		/* none succedeed */
 		return status::FAILURE;
 	}
+	else if (node_type == type::CONCURRENT) {
+		for (size_t i = beginning_node; i < children.size(); ++i) {
+			in.child_index = i;
+			in.parent = this;
+			auto exit_code = children[i]->update(in);
+
+			if (exit_code == status::RUNNING)
+				return exit_code;
+		}
+
+		return concurrent_return;
+	}
 
 	assert(0);
 	return status::FAILURE;
@@ -181,7 +193,7 @@ void behaviour_tree_system::substep(world& owner) {
 	}
 }
 
-behaviour_tree::timer_decorator::timer_decorator() : maximum_running_time_ms(0.f) {
+behaviour_tree::timer_decorator::timer_decorator() : maximum_running_time_ms(-1.f), return_failure_for_the_first_ms(-1.f) {
 	int breakp = 22;
 }
 

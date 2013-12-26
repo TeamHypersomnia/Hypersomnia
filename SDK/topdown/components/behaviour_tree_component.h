@@ -25,10 +25,13 @@ namespace components {
 
 			enum type {
 				SEQUENCER,
-				SELECTOR
+				SELECTOR,
+				CONCURRENT
 			};
 
 			std::string name;
+
+			int concurrent_return;
 
 			int default_return;
 			int node_type;
@@ -80,6 +83,7 @@ namespace components {
 
 		struct timer_decorator : decorator {
 			float maximum_running_time_ms;
+			float return_failure_for_the_first_ms;
 			
 			timer_decorator();
 			int update(composite* current, composite::update_input) override;
