@@ -9,7 +9,8 @@ namespace messages {
 	struct animate_message : public message {
 		enum animation {
 			MOVE,
-			SHOT
+			SHOT,
+			SWING
 		} animation_type;
 
 		enum type {

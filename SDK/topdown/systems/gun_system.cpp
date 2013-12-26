@@ -56,7 +56,7 @@ void gun_system::process_entities(world& owner) {
 				gun.is_swinging = true;
 
 				messages::animate_message msg;
-				msg.animation_type = messages::animate_message::animation::SHOT;
+				msg.animation_type = messages::animate_message::animation::SWING;
 				msg.preserve_state_if_animation_changes = false;
 				msg.change_animation = true;
 				msg.change_speed = true;
