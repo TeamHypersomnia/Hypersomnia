@@ -125,7 +125,7 @@ int behaviour_tree::composite::on_update(task& current_task) {
 		}
 	}
 
-	//std::cout << "updating " << name << " which is " << get_type_str() << " returns by default " << get_result_str(default_return) << std::endl;
+	std::cout << "updating " << name << " which is " << get_type_str() << " returns by default " << get_result_str(default_return) << std::endl;
 	return default_return;
 }
 
@@ -209,14 +209,18 @@ void behaviour_tree_system::process_entities(world& owner) {
 
 void behaviour_tree_system::substep(world& owner) {
 	for (auto it : targets) {
-		auto& tree = it->get<components::behaviour_tree>();
+		auto& trees = it->get<components::behaviour_tree>();
 		
-		tree.task_instance.subject = it;
+		for (auto& tree : trees.trees) {
+			tree.task_instance.subject = it;
 
-		/* if the root returns value different from RUNNING, it means that the traversal did not reach the running node
-		and thus the running node has to be interrupted
-		*/
-		tree.starting_node->begin_traversal(tree.task_instance);
+			/* if the root returns value different from RUNNING, it means that the traversal did not reach the running node
+			and thus the running node has to be interrupted
+			*/
+			tree.starting_node->begin_traversal(tree.task_instance);
+
+			std::cout << "\n\n::::::::::::::ANOTHER TREE::::::::::::::\n\n";
+		}
 	}
 }
 
@@ -236,8 +240,13 @@ int behaviour_tree::timer_decorator::update(composite* current, composite::updat
 	if (result != composite::RUNNING) 
 		return result;
 	
-	if (in.current_task->since_entered.get<std::chrono::milliseconds>() > maximum_running_time_ms)
+	if (in.current_task->since_entered.get<std::chrono::milliseconds>() > maximum_running_time_ms) {
+		/* previous call to tick had no chance to know that the node has to be interrupted since it returned RUNNING
+			so we have to interrupt now
+		*/
+		behaviour_tree::composite::interrupt_running(composite::update_input(in.current_task), composite::SUCCESS);
 		return composite::SUCCESS;
+	}
 	else return composite::RUNNING;
 }
 

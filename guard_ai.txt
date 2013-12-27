@@ -1,6 +1,50 @@
+
+
+graph g {
+
+ordering=out;
+
+Alertness
+"Common state"--"Player visibility"
+Playerseen2[label="Player seen before", shape = box]
+Legs--Playerseen2
+Playerseen2--"Get better weapon if closer than player"
+Anythinginhand2[shape = box, label = "Anything in hands"]
+Anythinginhandsvisible[label="Anything in hands"]
+Playervisiblelegs[label="Player visible"]
+
+Hands[shape = box]
+Hands--"Player visible"
+Hands--"Anything in hands"
+"Anything in hands"--"Check melee range"
+"Anything in hands"--"Try to shoot"
+
+
+Legs--Playervisiblelegs
+Legs--"Is alert"
+Playervisiblelegs--"Stand still"
+Playervisiblelegs--"Chase him"
+Playervisiblelegs--"Escape"
+"Chase him"--Anythinginhandsvisible
+Escape--"Just bare hands"
+"Stand still"--"Has ammo"
+
+"Is alert"--Anythinginhand2
+Anythinginhand2--"Go to last seen"
+Anythinginhand2--"Follow hint"
+"Is alert"--"Try to evade"
+Legs--"Walk around"
+
+}
+
+
+
+
 graph g {
 ordering=out;
 Behave--"Common state"
+Behave--"Try melee range"
+"Try melee range"--"Is melee range"
 "Common state"--"Player visibility"
 Playerseen2[label="Player seen before", shape = box]
 Behave--Playerseen2
@@ -10,8 +54,7 @@ Anythinginhand2[shape = box, label = "Anything in hand"]
 Behave--"Player visible"
 Behave--"Is alert"
 "Is alert"--Anythinginhand2
-Anythinginhand2--"Begin pathfinding to last seen"
-Anythinginhand2--"Last seen reached"
+Anythinginhand2--"Go to last seen"
 Anythinginhand2--"Explore"
 "Is alert"--"Escape and evade"
 
@@ -19,41 +62,10 @@ Melee[shape=box]
 "Player visible"--"Anything in hand"
 "Anything in hand"--"Has gun and ammo"
 "Anything in hand"--Melee
-Melee--"Is melee range"
 Melee--"Chase player"
 "Is melee range"--"Swing"
 "Has gun and ammo"--Shoot
 
-
-Behave--"Walk around"
-
-}
-
-
-
-graph g {
-ordering=out;
-"Player seen before"[shape=box]
-Playerseen2[label="Player seen before", shape = box]
-Behave--Playerseen2
-Playerseen2--"Bare hands, melee or empty gun"
-Playerseen2--"Better item visible"
-Playerseen2--"Get it"
-
-Behave--"Player visible"
-Behave--"Player seen before"
-"Player seen before"--"Begin pathfinding to last seen"
-"Player seen before"--"Last seen reached"
-"Player seen before"--"Explore"
-
-"Player visible"--"Anything in hand"
-"Player visible"--"Escape and evade"
-"Anything in hand"--Fight
-Fight--"Is melee range"
-"Is melee range"--"Swing"
-Fight--"Has gun and ammo"
-"Has gun and ammo"--Shoot
-Fight--"Chase player"
 
 Behave--"Walk around"
 
