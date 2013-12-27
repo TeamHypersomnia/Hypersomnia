@@ -4,6 +4,19 @@
 #include "entity_system/world.h"
 #include "entity_system/entity.h"
 
+class NullStream {
+public:
+	NullStream() { }
+	template<typename T> NullStream& operator<<(const T const&) { return *this; }
+};
+
+//#define NDEBUG
+#ifdef NDEBUG
+	#define COUT std::cout
+#else
+	#define COUT NullStream()
+#endif
+
 using namespace components;
 
 behaviour_tree::task::task() : subject(nullptr), running_parent_node(nullptr), running_index(0u) {}
@@ -90,13 +103,13 @@ std::string behaviour_tree::composite::get_result_str(int result) const {
 }
 
 void behaviour_tree::composite::on_enter(task& current_task) {
-	std::cout << "entering " << name << " which is " << get_type_str() << std::endl;
+	COUT << "entering " << name << " which is " << get_type_str() << '\n';
 	if (enter_callback) {
 		try {
 			luabind::call_function<void>(enter_callback, current_task.subject, &current_task);
 		}
 		catch (std::exception compilation_error) {
-			std::cout << compilation_error.what() << std::endl;
+			COUT << compilation_error.what() << '\n';
 		}
 	}
 }
@@ -107,32 +120,32 @@ void behaviour_tree::composite::on_exit(task& current_task, int exit_code) {
 			luabind::call_function<void>(exit_callback, current_task.subject, exit_code);
 		}
 		catch (std::exception compilation_error) {
-			std::cout << compilation_error.what() << std::endl;
+			COUT << compilation_error.what() << '\n';
 		}
 	}
-	std::cout << "quitting " << name << " which was " << get_type_str() << " and resulted in " << get_result_str(exit_code) << std::endl;
+	COUT << "quitting " << name << " which was " << get_type_str() << " and resulted in " << get_result_str(exit_code) << '\n';
 }
 
 int behaviour_tree::composite::on_update(task& current_task) {
 	if (update_callback) {
 		try {
 			int result = luabind::call_function<int>(update_callback, current_task.subject);
-			std::cout << "updating " << name << " which is " << get_type_str() << " results in " << get_result_str(result) << std::endl;
+			COUT << "updating " << name << " which is " << get_type_str() << " results in " << get_result_str(result) << '\n';
 			return result;
 		}
 		catch (std::exception compilation_error) {
-			std::cout << compilation_error.what() << std::endl;
+			COUT << compilation_error.what() << '\n';
 		}
 	}
 
-	std::cout << "updating " << name << " which is " << get_type_str() << " returns by default " << get_result_str(default_return) << std::endl;
+	COUT << "updating " << name << " which is " << get_type_str() << " returns by default " << get_result_str(default_return) << '\n';
 	return default_return;
 }
 
 void behaviour_tree::composite::set_running(update_input in, int exit_code) {
 	in.current_task->interrupt_runner(exit_code);
 
-	std::cout << "setting " << in.parent->children[in.child_index]->name << "as currently RUNNING" << std::endl;
+	COUT << "setting " << in.parent->children[in.child_index]->name << "as currently RUNNING" << '\n';
 	in.current_task->running_index = in.child_index;
 	in.current_task->running_parent_node = in.parent;
 	in.current_task->since_entered.reset();
@@ -140,7 +153,7 @@ void behaviour_tree::composite::set_running(update_input in, int exit_code) {
 
 void behaviour_tree::task::interrupt_runner(int exit_code) {
 	if (running_parent_node) {
-		std::cout << "interrupting " << running_parent_node->children[running_index]->name << std::endl;
+		COUT << "interrupting " << running_parent_node->children[running_index]->name << '\n';
 		running_parent_node->children[running_index]->on_exit(*this, exit_code);
 	}
 	
@@ -231,7 +244,7 @@ void behaviour_tree_system::substep(world& owner) {
 			*/
 			tree.starting_node->begin_traversal(tree.task_instance);
 
-			std::cout << "\n\n::::::::::::::ANOTHER TREE::::::::::::::\n\n";
+			COUT << "\n\n::::::::::::::ANOTHER TREE::::::::::::::\n\n";
 		}
 	}
 }
