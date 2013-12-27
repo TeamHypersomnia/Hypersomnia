@@ -339,4 +339,4 @@ for i=1, npc_count do
 	my_npcs[i].body.gun.target_camera_to_shake:set(world_camera)
 end
 
-get_scripted(my_npcs[1].body):take_weapon_item(assault_rifle)
+--get_scripted(my_npcs[1].body):take_weapon_item(assault_rifle)

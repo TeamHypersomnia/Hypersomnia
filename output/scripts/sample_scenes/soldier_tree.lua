@@ -20,14 +20,16 @@ anything_in_hands_archetype = {
 }
 
 escape_archetype = {
-	on_enter = function(entity)
-		set_max_speed(entity, 3000)
+	on_enter = function(entity, current_task)
+		current_task:interrupt_runner(behaviour_node.FAILURE)
+		
 		entity.pathfinding.favor_velocity_parallellness = true
 		entity.pathfinding.custom_exploration_hint.enabled = true
 		entity.pathfinding:start_exploring()
 	end,
 	
 	on_update = function(entity)
+		set_max_speed(entity, 3000)
 		entity.pathfinding.custom_exploration_hint.origin = entity.transform.current.pos
 		entity.pathfinding.custom_exploration_hint.target = entity.transform.current.pos - (get_scripted(entity).target_entities.last_seen.transform.current.pos - entity.transform.current.pos)
 		render_system:push_line(debug_line(entity.pathfinding.custom_exploration_hint.origin, entity.pathfinding.custom_exploration_hint.target, rgba(255, 255, 255, 255)))
@@ -193,7 +195,8 @@ return
 		anything_in_hands_second = archetyped(anything_in_hands_archetype, { node_type = behaviour_node.SEQUENCER }),
 		
 		go_to_last_seen = {
-			on_enter = function(entity)		
+			on_enter = function(entity, current_task)		
+				current_task:interrupt_runner(behaviour_node.FAILURE)
 				local npc_info = get_scripted(entity)
 				
 				local temporary_copy = vec2(npc_info.target_entities.last_seen.transform.current.pos.x, npc_info.target_entities.last_seen.transform.current.pos.y)
@@ -225,7 +228,8 @@ return
 		},
 		
 		follow_hint = {
-			on_enter = function(entity)
+			on_enter = function(entity, current_task)
+				current_task:interrupt_runner(behaviour_node.FAILURE)
 				local npc_info = get_scripted(entity)
 			
 				--entity.pathfinding.custom_exploration_hint.origin = npc_info.target_entities.last_seen.transform.current.pos
@@ -243,6 +247,7 @@ return
 			
 			on_exit = function(entity, status)
 				entity.pathfinding.custom_exploration_hint.enabled = false
+				entity.pathfinding:clear_pathfinding_info()
 			end
 		},
 		
@@ -251,7 +256,8 @@ return
 		walk_around = {
 			default_return = behaviour_node.RUNNING,
 			
-			on_enter = function(entity)
+			on_enter = function(entity, current_task)
+				current_task:interrupt_runner(behaviour_node.FAILURE)
 				--npc_behaviour_tree.delay_chase.maximum_running_time_ms = 400
 				set_max_speed(entity, 700)
 				entity.pathfinding:start_exploring()
@@ -260,6 +266,7 @@ return
 			end,
 			
 			on_exit = function(entity, status)
+				entity.pathfinding:clear_pathfinding_info()
 			end
 		},
 		
@@ -393,7 +400,7 @@ npc_alertness = create_behaviour_tree {
 			end,
 			
 			on_exit = function(entity, code)
-				if code == behaviour_node.SUCCESS then get_scripted(entity).is_alert = false end
+				--if code == behaviour_node.SUCCESS then get_scripted(entity).is_alert = false end
 			end
 		}
 	},
