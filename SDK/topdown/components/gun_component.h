@@ -40,6 +40,7 @@ namespace components {
 		float swing_radius;
 		float swing_angle;
 		float swing_angular_offset;
+		float swing_interval_ms;
 		int query_vertices;
 
 		bool can_drop() const;

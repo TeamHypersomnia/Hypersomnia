@@ -45,14 +45,13 @@ void gun_system::process_entities(world& owner) {
 		};
 
 		auto since_shot = gun.shooting_timer.get<std::chrono::milliseconds>();
-		bool interval_passed = since_shot >= gun.shooting_interval_ms;
 
 		if (gun.is_melee) {
 			if (since_shot > gun.swing_duration) {
 				gun.is_swinging = false;
 			}
 
-			if (!gun.is_swinging && gun.trigger && interval_passed) {
+			if (!gun.is_swinging && gun.trigger && since_shot >= gun.swing_interval_ms) {
 				gun.is_swinging = true;
 
 				messages::animate_message msg;
@@ -85,7 +84,7 @@ void gun_system::process_entities(world& owner) {
 				query_vertices[gun.query_vertices] = gun_transform.pos;
 
 				if (render.draw_weapon_info)
-					for (int i = 0; i < query_vertices.size(); ++i) {
+					for (size_t i = 0; i < query_vertices.size(); ++i) {
 						render.lines.push_back(render_system::debug_line(query_vertices[i], query_vertices[(i + 1) % query_vertices.size()]));
 					}
 
@@ -126,7 +125,7 @@ void gun_system::process_entities(world& owner) {
 		else if (!gun.reloading &&
 			gun.current_rounds > 0 &&
 			gun.trigger &&
-			interval_passed) {
+			since_shot >= gun.shooting_interval_ms) {
 
 				messages::animate_message msg;
 				msg.animation_type = messages::animate_message::animation::SHOT;

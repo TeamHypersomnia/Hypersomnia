@@ -31,6 +31,7 @@ namespace bindings {
 			.def_readwrite("swing_radius", &gun::swing_radius)
 			.def_readwrite("swing_angle", &gun::swing_angle)
 			.def_readwrite("swing_angular_offset", &gun::swing_angular_offset)
+			.def_readwrite("swing_interval_ms", &gun::swing_interval_ms)
 			//.def_readwrite("query_vertices", &gun::query_vertices)
 			.def_readwrite("bullet_body", &gun::bullet_body);
 	}
