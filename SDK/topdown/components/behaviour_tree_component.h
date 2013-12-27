@@ -35,7 +35,12 @@ namespace components {
 
 			int default_return;
 			int node_type;
+
+			int skip_to_running_child;
 			behaviors children;
+			
+			std::string get_type_str() const;
+			std::string get_result_str(int result) const;
 
 			int begin_traversal(task&);
 

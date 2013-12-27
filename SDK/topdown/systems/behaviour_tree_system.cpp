@@ -12,7 +12,7 @@ bool behaviour_tree::task::operator==(const task& b) const {
 	return running_parent_node == b.running_parent_node && running_index == b.running_index;
 }
 
-behaviour_tree::composite::composite() : node_type(type::SEQUENCER), default_return(status::RUNNING), decorator_chain(nullptr), concurrent_return(status::RUNNING) {}
+behaviour_tree::composite::composite() : node_type(type::SEQUENCER), default_return(status::RUNNING), decorator_chain(nullptr), concurrent_return(status::RUNNING), skip_to_running_child(true) {}
 
 bool behaviour_tree::composite::is_currently_running(const task& current_task) const {
 	if (current_task.running_parent_node) 
@@ -63,9 +63,34 @@ int behaviour_tree::composite::tick(update_input in) {
 	return current_status;
 }
 
+std::string behaviour_tree::composite::get_type_str() const {
+	std::string node_type_name;
+
+	if (children.empty()) node_type_name = "LEAF";
+	else switch (node_type) {
+	case SELECTOR: node_type_name = "SELECTOR"; break;
+	case SEQUENCER: node_type_name = "SEQUENCER"; break;
+	case CONCURRENT: node_type_name = "CONCURRENT"; break;
+	default: node_type_name = "UNKNOWN"; break;
+	}
+
+	return node_type_name;
+}
+
+std::string behaviour_tree::composite::get_result_str(int result) const {
+	std::string result_str;
+	switch (result) {
+		case status::SUCCESS: result_str = "SUCCESS"; break;
+		case status::FAILURE: result_str = "FAILURE"; break;
+		case status::RUNNING: result_str = "RUNNING"; break;
+		default: result_str = "UNKNOWN"; break;
+	}
+
+	return result_str;
+}
+
 void behaviour_tree::composite::on_enter(task& current_task) {
 	if (enter_callback) {
-		std::cout << "entering " << name << std::endl;
 		try {
 			luabind::call_function<void>(enter_callback, current_task.subject);
 		}
@@ -73,11 +98,11 @@ void behaviour_tree::composite::on_enter(task& current_task) {
 			std::cout << compilation_error.what() << std::endl;
 		}
 	}
+	std::cout << "entering " << name << " which is " << get_type_str() << std::endl;
 }
 
 void behaviour_tree::composite::on_exit(task& current_task, int exit_code) {
 	if (exit_callback) {
-		std::cout << "quitting " << name << std::endl;
 		try {
 			luabind::call_function<void>(exit_callback, current_task.subject, exit_code);
 		}
@@ -85,20 +110,22 @@ void behaviour_tree::composite::on_exit(task& current_task, int exit_code) {
 			std::cout << compilation_error.what() << std::endl;
 		}
 	}
+	std::cout << "quitting " << name << " which was " << get_type_str() << " and resulted in " << get_result_str(exit_code) << std::endl;
 }
 
 int behaviour_tree::composite::on_update(task& current_task) {
 	if (update_callback) {
-		//std::cout << "updating " << name << std::endl;
 		try {
-			auto result = luabind::call_function<int>(update_callback, current_task.subject);
-			return result;  
+			int result = luabind::call_function<int>(update_callback, current_task.subject);
+			std::cout << "updating " << name << " which is " << get_type_str() << " results in " << get_result_str(result) << std::endl;
+			return result;
 		}
 		catch (std::exception compilation_error) {
 			std::cout << compilation_error.what() << std::endl;
 		}
 	}
 
+	//std::cout << "updating " << name << " which is " << get_type_str() << " returns by default " << get_result_str(default_return) << std::endl;
 	return default_return;
 }
 
@@ -112,7 +139,7 @@ void behaviour_tree::composite::interrupt_running(update_input in, int exit_code
 }
 
 int behaviour_tree::composite::traverse(task& current_task) {
-	size_t beginning_node = (this == current_task.running_parent_node) ? current_task.running_index : 0u;
+	size_t beginning_node = (this == current_task.running_parent_node && skip_to_running_child) ? current_task.running_index : 0u;
 	update_input in(&current_task);
 
 	if (node_type == type::SEQUENCER) {

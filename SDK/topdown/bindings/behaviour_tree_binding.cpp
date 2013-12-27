@@ -30,6 +30,7 @@ namespace bindings {
 			.def_readwrite("name", &behaviour_tree::composite::name)
 			.def_readwrite("decorator_chain", &behaviour_tree::composite::decorator_chain)
 			.def_readwrite("concurrent_return", &behaviour_tree::composite::concurrent_return)
+			.def_readwrite("skip_to_running_child", &behaviour_tree::composite::skip_to_running_child)
 			.def("add_child", &behaviour_tree::composite::add_child)
 			.enum_("constants")[
 				luabind::value("SUCCESS", behaviour_tree::composite::SUCCESS),
