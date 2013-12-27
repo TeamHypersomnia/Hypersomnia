@@ -50,7 +50,7 @@ namespace bindings {
 
 			luabind::class_<behaviour_tree>("behaviour_tree_component")
 			.def(luabind::constructor<>())
-			.def_readwrite("starting_node", &behaviour_tree::starting_node);
+			.def("add_tree", &behaviour_tree::add_tree);
 			;
 	}
 }

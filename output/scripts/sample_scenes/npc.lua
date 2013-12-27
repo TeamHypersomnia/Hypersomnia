@@ -276,7 +276,11 @@ final_npc_archetype = (archetyped(character_archetype, {
 			transform = { pos = vec2(1000, (-2800)) },
 			
 			behaviour_tree = {
-				starting_node = npc_behaviour_tree.behave
+				trees = {
+					npc_alertness.behave,
+					npc_legs_behaviour_tree.legs,
+					npc_hands_behaviour_tree.hands
+				}
 			},
 		
 			lookat = {

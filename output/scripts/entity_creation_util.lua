@@ -68,7 +68,7 @@ function set_components_from_entry(entity, entry, entities_lookup)
 	def		(visibility_component, 'visibility', {}, { visibility_layers = true })
 	def		(pathfinding_component, 'pathfinding')
 	def		(steering_component, 'steering')
-	def		(behaviour_tree_component, 'behaviour_tree')
+	def		(behaviour_tree_component, 'behaviour_tree',  {}, { trees = true })
 	
 	if entry.visibility ~= nil then
 		local visibility = entity.visibility
@@ -109,6 +109,14 @@ function set_components_from_entry(entity, entry, entities_lookup)
 		local health = entity.health
 		set_physics_info(health.corpse_body, entry.health.corpse_body)
 		rewrite(health.corpse_render, entry.health.corpse_render)
+	end
+	
+	if entry.behaviour_tree ~= nil then
+		local behaviour_tree = entity.behaviour_tree
+		
+		for k, v in ipairs(entry.behaviour_tree.trees) do
+			behaviour_tree:add_tree(v)
+		end
 	end
 end
 

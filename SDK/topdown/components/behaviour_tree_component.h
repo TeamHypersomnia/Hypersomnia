@@ -107,8 +107,18 @@ namespace components {
 			augmentations::util::timer since_entered;
 		};
 
-		composite* starting_node;
-		task task_instance;
+		struct tree_instance {
+			composite* starting_node;
+			task task_instance;
+		};
+
+		std::vector<tree_instance> trees;
+	
+		void add_tree(composite* starting_node) {
+			tree_instance t;
+			t.starting_node = starting_node;
+			trees.push_back(t);
+		}
 	};
 }
 
