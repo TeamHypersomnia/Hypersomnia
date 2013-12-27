@@ -2,16 +2,9 @@
 #include "chase_system.h"
 #include "entity_system/entity.h"
 
-void chase_system::add(entity* e) {
-	auto& chase = e->get<components::chase>();
-
-	if (chase.target != nullptr) {
-		auto& target_chase = chase.target->get<components::transform>().current;
-		chase.previous = target_chase.pos;
-		chase.rotation_previous = target_chase.rotation;
-	}
-
-	processing_system::add(e);
+void components::chase::set_target(augmentations::entity_system::entity* new_target) {
+	target_newly_set = true;
+	target.set(new_target);
 }
 
 void chase_system::process_entities(world&) {
@@ -20,6 +13,13 @@ void chase_system::process_entities(world&) {
 		auto& chase = it->get<components::chase>();
 
 		if (chase.target == nullptr) continue;
+		
+		if (chase.target_newly_set) {
+			auto& target_chase = chase.target->get<components::transform>().current;
+			chase.previous = target_chase.pos;
+			chase.rotation_previous = target_chase.rotation;
+			chase.target_newly_set = false;
+		}
 
 		auto& target_transform = chase.target->get<components::transform>().current;
 

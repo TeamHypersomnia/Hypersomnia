@@ -400,7 +400,7 @@ npc_alertness = create_behaviour_tree {
 			end,
 			
 			on_exit = function(entity, code)
-				--if code == behaviour_node.SUCCESS then get_scripted(entity).is_alert = false end
+				if code == behaviour_node.SUCCESS then get_scripted(entity).is_alert = false end
 			end
 		}
 	},

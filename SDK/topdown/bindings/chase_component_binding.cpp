@@ -9,7 +9,8 @@ namespace bindings {
 		return
 			luabind::class_<chase>("chase_component")
 			.def(luabind::constructor<>())
-			.def_readwrite("target", &chase::target)
+			.def("set_target", &chase::set_target)
+			//.def_readwrite("target", &chase::target)
 			.def_readwrite("type", &chase::type)
 			.def_readwrite("offset", &chase::offset)
 			.def_readwrite("rotation_orbit_offset", &chase::rotation_orbit_offset)

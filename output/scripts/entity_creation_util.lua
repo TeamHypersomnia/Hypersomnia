@@ -57,7 +57,7 @@ function set_components_from_entry(entity, entry, entities_lookup)
 	def		(render_component, 'render')
 	def		(animate_component, 'animate')
 	def_ptr	(camera_component, 'camera', { crosshair = true, player = true})
-	def_ptr	(chase_component, 'chase', { target = true })
+	def_ptr	(chase_component, 'chase', { }, { target = true } )
 	def		(crosshair_component, 'crosshair')
 	def_ptr (damage_component, 'damage', { sender = true })
 	def_ptr (gun_component, 'gun', { target_camera_to_shake = true }, { bullet_body = true, bullet_render = true })
@@ -69,6 +69,10 @@ function set_components_from_entry(entity, entry, entities_lookup)
 	def		(pathfinding_component, 'pathfinding')
 	def		(steering_component, 'steering')
 	def		(behaviour_tree_component, 'behaviour_tree',  {}, { trees = true })
+	
+	if entry.chase ~= nil then
+		entity.chase:set_target(ptr_lookup(entry.chase.target, entities_lookup))
+	end
 	
 	if entry.visibility ~= nil then
 		local visibility = entity.visibility
