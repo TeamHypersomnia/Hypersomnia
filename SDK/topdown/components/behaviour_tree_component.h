@@ -64,7 +64,7 @@ namespace components {
 
 			bool is_currently_running(const task&) const;
 			bool is_running_parent(const task&) const;
-			static void interrupt_running(update_input, int status = status::FAILURE);
+			static void set_running(update_input, int status = status::FAILURE);
 
 			/* actual implemented behaviours */
 			luabind::object enter_callback;
@@ -95,6 +95,8 @@ namespace components {
 		};
 
 		struct task {
+			void interrupt_runner(int status = composite::status::FAILURE);
+
 			augmentations::entity_system::entity* subject;
 
 			composite* running_parent_node;

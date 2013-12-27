@@ -41,7 +41,7 @@ int behaviour_tree::composite::tick(update_input in) {
 	
 	/* detected leaf that returned RUNNING status, interrupt the other running action */
 	if (!is_currently_running(*in.current_task) && current_status == status::RUNNING) {
-		interrupt_running(in);
+		set_running(in);
 	}
 	/* the case where the running node finally succeds 
 	is in the case where something different from RUNNING was returned to the node */
@@ -53,7 +53,7 @@ int behaviour_tree::composite::tick(update_input in) {
 	
 	/* end this node if it was running but has just finalized */
 	if (is_currently_running(*in.current_task) && current_status != status::RUNNING) {
-		interrupt_running(update_input(in.current_task), current_status);
+		in.current_task->interrupt_runner(current_status);
 	}
 	/* else call on_exit for a regular finalized node */
 	else if (!is_currently_running(*in.current_task)) {
@@ -90,15 +90,15 @@ std::string behaviour_tree::composite::get_result_str(int result) const {
 }
 
 void behaviour_tree::composite::on_enter(task& current_task) {
+	std::cout << "entering " << name << " which is " << get_type_str() << std::endl;
 	if (enter_callback) {
 		try {
-			luabind::call_function<void>(enter_callback, current_task.subject);
+			luabind::call_function<void>(enter_callback, current_task.subject, &current_task);
 		}
 		catch (std::exception compilation_error) {
 			std::cout << compilation_error.what() << std::endl;
 		}
 	}
-	std::cout << "entering " << name << " which is " << get_type_str() << std::endl;
 }
 
 void behaviour_tree::composite::on_exit(task& current_task, int exit_code) {
@@ -129,13 +129,24 @@ int behaviour_tree::composite::on_update(task& current_task) {
 	return default_return;
 }
 
-void behaviour_tree::composite::interrupt_running(update_input in, int exit_code) {
-	if (in.current_task->running_parent_node) 
-		in.current_task->running_parent_node->children[in.current_task->running_index]->on_exit(*in.current_task, exit_code);
-	
+void behaviour_tree::composite::set_running(update_input in, int exit_code) {
+	in.current_task->interrupt_runner(exit_code);
+
+	std::cout << "setting " << in.parent->children[in.child_index]->name << "as currently RUNNING" << std::endl;
 	in.current_task->running_index = in.child_index;
 	in.current_task->running_parent_node = in.parent;
 	in.current_task->since_entered.reset();
+}
+
+void behaviour_tree::task::interrupt_runner(int exit_code) {
+	if (running_parent_node) {
+		std::cout << "interrupting " << running_parent_node->children[running_index]->name << std::endl;
+		running_parent_node->children[running_index]->on_exit(*this, exit_code);
+	}
+	
+	running_index = 0;
+	running_parent_node = nullptr;
+	since_entered.reset();
 }
 
 int behaviour_tree::composite::traverse(task& current_task) {
@@ -197,8 +208,9 @@ int behaviour_tree::composite::begin_traversal(task& current_task) {
 	in.current_task = &current_task;
 	auto status = update(in);
 	
+	/* interrupt the current runner if it the traversal has never reached it */
 	if (status != behaviour_tree::behaviour::RUNNING)
-		interrupt_running(in);
+		in.current_task->interrupt_runner();
 
 	return status;
 }
@@ -244,7 +256,7 @@ int behaviour_tree::timer_decorator::update(composite* current, composite::updat
 		/* previous call to tick had no chance to know that the node has to be interrupted since it returned RUNNING
 			so we have to interrupt now
 		*/
-		behaviour_tree::composite::interrupt_running(composite::update_input(in.current_task), composite::SUCCESS);
+		in.current_task->interrupt_runner(composite::SUCCESS);
 		return composite::SUCCESS;
 	}
 	else return composite::RUNNING;

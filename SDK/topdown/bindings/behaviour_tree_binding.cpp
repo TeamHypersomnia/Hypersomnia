@@ -20,6 +20,11 @@ namespace bindings {
 			.def_readwrite("maximum_running_time_ms", &behaviour_tree::timer_decorator::maximum_running_time_ms)
 			,
 
+			luabind::class_<behaviour_tree::task>("behaviour_tree_task")
+			.def(luabind::constructor<>())
+			.def("interrupt_runner", &behaviour_tree::task::interrupt_runner)
+,
+
 			luabind::class_<behaviour_tree::composite>("behaviour_node")
 			.def(luabind::constructor<>())
 			.def_readwrite("default_return", &behaviour_tree::composite::default_return)
