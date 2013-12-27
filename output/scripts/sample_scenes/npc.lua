@@ -50,6 +50,9 @@ function npc_class:init()
 	}
 	
 	o.was_seen = false
+	o.is_seen = false
+	o.is_alert = false
+	o.last_seen_velocity = vec2(0, 0)
 		
 	o.steering_behaviours.forward_seeking.target_from:set(o.target_entities.forward)
 	o.steering_behaviours.target_seeking.target_from:set(o.target_entities.navigation)
@@ -69,16 +72,9 @@ function npc_class:refresh_behaviours()
 end
 
 function npc_class:take_weapon_item(item_data)
-		--print(item_data.weapon_info.is_melee)
-		--print(debug.traceback())
 	self.entity.gun = gun_component(item_data.weapon_info)
 	
 	for k, v in pairs(self.weapon_animation_sets) do print(k) end
-	
-	--for k, v in pairs(self.entity.gun.attributes) do
-	--	print(k)
-	--	print("\n")
-	--end
 	
 	self.entity.animate.available_animations = self.weapon_animation_sets[item_data.animation_index]
 	self.current_weapon = item_data
@@ -97,30 +93,39 @@ function npc_class:take_weapon(weapon_entity)
 		end
 	end
 	
-	world:delete_entity(weapon_entity, nil)
+	local msg = destroy_message()
+	msg.subject = weapon_entity
+	world:post_message(msg)
+end
+
+function spawn_weapon(position, item_archetype, instance_data)
+	local my_spawned_weapon = create_entity (archetyped(item_archetype.item_entity, {
+		transform = {
+			pos = position
+		},
+		
+		scriptable = {
+			script_data = {
+				item_data = {}
+			}
+		}
+	}))
+	
+	local item_data_table = my_spawned_weapon.scriptable.script_data.item_data
+	
+	recursive_write(item_data_table, item_archetype, { weapon_info = true })
+	if instance_data ~= nil then item_data_table.weapon_info = gun_component(instance_data) end
+	
+	table.insert(global_item_table, my_spawned_weapon)
+		
+	return my_spawned_weapon
 end
 
 function npc_class:drop_weapon()
 	if self.current_weapon ~= bare_hands then
 		print("dropping weapon...")
-		local my_thrown_weapon = create_entity (archetyped(self.current_weapon.item_entity, {
-			transform = {
-				pos = self.entity.transform.current.pos
-			},
-			
-			scriptable = {
-				script_data = {
-					item_data = {}
-				}
-			}
-		}))
-		
-		local item_data_table = my_thrown_weapon.scriptable.script_data.item_data
-		
-		recursive_write(item_data_table, self.current_weapon, { weapon_info = true })
-		item_data_table.weapon_info = gun_component(self.entity.gun)
-		
-		table.insert(global_item_table, my_thrown_weapon)
+
+		local my_thrown_weapon = spawn_weapon(self.entity.transform.current.pos, self.current_weapon, self.entity.gun)
 		
 		local throw_force = vec2.from_degrees(self.entity.transform.current.rotation) * 14
 		
@@ -133,23 +138,40 @@ function npc_class:drop_weapon()
 	end
 end
 
-function npc_class:pick_up_weapon()
+function npc_class:pick_up_weapon(try_to_pick_weapon)
 	local items_in_range = physics_system:query_body(self.entity, create(b2Filter, filter_pick_up_items), nil)
 	
 	local was_something_on_ground = false
 	
 	for candidate in items_in_range.bodies do
-		print("picking up.. ")
-		
-		self:drop_weapon()
-		self:take_weapon(body_to_entity(candidate))
-		was_something_on_ground = true
-		break
+		if try_to_pick_weapon == nil or (try_to_pick_weapon ~= nil and body_to_entity(candidate) == try_to_pick_weapon) then 
+			print("picking up.. ")
+			
+			self:drop_weapon()
+			self:take_weapon(body_to_entity(candidate))
+			was_something_on_ground = true
+			break
+		end
 	end
 	
-	if not was_something_on_ground then
+	if try_to_pick_weapon == nil and not was_something_on_ground then
 		self:drop_weapon()
 	end
+	
+	return was_something_on_ground
+end
+
+function npc_class:pursue_target(target_entity)			
+	self.steering_behaviours.pursuit.target_from:set(target_entity)
+	self.steering_behaviours.pursuit.enabled = true
+	self.steering_behaviours.obstacle_avoidance.enabled = false
+	self.steering_behaviours.sensor_avoidance.target_from:set(target_entity)
+end
+
+function npc_class:stop_pursuit()	
+	self.steering_behaviours.pursuit.enabled = false
+	self.steering_behaviours.obstacle_avoidance.enabled = true
+	self.steering_behaviours.sensor_avoidance.target_from:set(self.target_entities.navigation)
 end
 
 function npc_class:loop()
@@ -190,7 +212,24 @@ function npc_class:loop()
 		behaviours.wandering.current_wander_angle = behaviours.obstacle_avoidance.last_output_force:get_degrees()
 	end
 	
+	-- resolve player visibility no matter what we're doing 
+	local p1 = entity.transform.current.pos
+	local p2 = player.body.transform.current.pos
 	
+	ray_output = physics_system:ray_cast(p1, p2, create(b2Filter, filter_pathfinding_visibility), entity)
+	
+	if not ray_output.hit then
+		self.target_entities.last_seen.transform.current.pos = player.body.transform.current.pos
+		
+		self.was_seen = true
+		self.is_seen = true
+		self.is_alert = true
+		
+		local player_vel = player.body.physics.body:GetLinearVelocity()
+		self.last_seen_velocity = vec2(player_vel.x, player_vel.y)
+	else
+		self.is_seen = false
+	end
 	
 	--	
 --	local p1 = entity.transform.current.pos
@@ -229,7 +268,7 @@ function npc_class:loop()
 end
 
 
-npc_count = 0
+npc_count = 1
 my_npcs = {}
 
 final_npc_archetype = (archetyped(character_archetype, {
@@ -263,6 +302,10 @@ final_npc_archetype = (archetyped(character_archetype, {
 		}
 }))
 
+
+
+--spawn_weapon(vec2(1300, (-2800)), assault_rifle)
+
 for i=1, npc_count do
 
 	if i == 1 then 
@@ -291,3 +334,5 @@ for i=1, npc_count do
 	
 	my_npcs[i].body.gun.target_camera_to_shake:set(world_camera)
 end
+
+get_scripted(my_npcs[1].body):take_weapon_item(assault_rifle)

@@ -43,8 +43,7 @@ print("Calling commands.lua...")
 
 
 
-get_scripted(player.body):take_weapon_item(shotgun)
-
+print(get_scripted(my_npcs[1].body).is_seen)
 
 
 --create_entity { 

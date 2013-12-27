@@ -1,25 +1,29 @@
 graph g {
 ordering=out;
-"Player seen before"[shape=box]
+Behave--"Common state"
+"Common state"--"Player visibility"
 Playerseen2[label="Player seen before", shape = box]
 Behave--Playerseen2
-Playerseen2--"Can get better weapon"
-Playerseen2--"Get it"
+Playerseen2--"Get better weapon"
+Anythinginhand2[shape = box, label = "Anything in hand"]
 
 Behave--"Player visible"
-Behave--"Player seen before"
-"Player seen before"--"Begin pathfinding to last seen"
-"Player seen before"--"Last seen reached"
-"Player seen before"--"Explore"
+Behave--"Is alert"
+"Is alert"--Anythinginhand2
+Anythinginhand2--"Begin pathfinding to last seen"
+Anythinginhand2--"Last seen reached"
+Anythinginhand2--"Explore"
+"Is alert"--"Escape and evade"
 
+Melee[shape=box]
 "Player visible"--"Anything in hand"
-"Player visible"--"Escape and evade"
-"Anything in hand"--Fight
-Fight--"Is melee range"
+"Anything in hand"--"Has gun and ammo"
+"Anything in hand"--Melee
+Melee--"Is melee range"
+Melee--"Chase player"
 "Is melee range"--"Swing"
-Fight--"Has gun and ammo"
 "Has gun and ammo"--Shoot
-Fight--"Chase player"
+
 
 Behave--"Walk around"
 

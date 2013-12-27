@@ -57,7 +57,7 @@ fireaxe_sprite = create_sprite {
 bare_hands = {
 	weapon_info = create_gun({
 		bullet_damage = minmax(110, 140),
-		shooting_interval_ms = 600,
+		swing_interval_ms = 600,
 		swing_duration = 300,
 		is_melee = true,
 		
@@ -103,7 +103,13 @@ assault_rifle_info = {
 	},
 	
 	max_bullet_distance = 5000,
-	current_rounds = 30
+	current_rounds = 30,
+	
+	swing_radius = 100,
+	swing_angle = 90,
+	swing_angular_offset = 0,
+	swing_duration = 300,
+	swing_interval_ms = 600
 }
 
 assault_rifle = {
