@@ -20,6 +20,8 @@ namespace augmentations {
 			/* maps type hashes into components */
 			util::sorted_vector_map<type_hash, component*> type_to_component;
 		public:
+			std::string name;
+
 			world& owner_world;
 
 			/* only for script binding */
@@ -48,11 +50,13 @@ namespace augmentations {
 			}
 
 			template <typename component_type>
-			void set(const component_type& object) {
+			component_type* set(const component_type& object) {
 				auto* obj = find<component_type>();
 				if (obj) {
 					(*obj) = object;
 				}
+
+				return obj;
 			}
 
 			template <typename component_type>

@@ -116,6 +116,7 @@ namespace augmentations {
 			world();
 			~world();
 
+			entity& create_entity_named(std::string name);
 			entity& create_entity();
 			void delete_entity(entity&, entity* redirect_pointers = nullptr);
 			

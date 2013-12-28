@@ -30,7 +30,13 @@ namespace augmentations {
 		}
 
 		entity& world::create_entity() {
-			return *entities.construct<world&>(*this);
+			return create_entity_named("unknown");
+		}
+
+		entity& world::create_entity_named(std::string name) {
+			auto& res = *entities.construct<world&>(*this);
+			res.name = name;
+			return res;
 		}
 		
 		void world::delete_all_entities(bool clear_systems_manually) {

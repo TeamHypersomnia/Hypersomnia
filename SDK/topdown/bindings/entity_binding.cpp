@@ -32,7 +32,7 @@ namespace bindings {
 			luabind::class_<entity>("_entity")
 			.def("clear", &entity::clear)
 			.def(luabind::const_self == luabind::const_self)
-			
+			.def_readwrite("name", &entity::name)
 			.def("add", &entity::add<animate>)
 			.property("animate", &entity::find<animate>, &entity::set<animate>)
 			.def("add", &entity::add<behaviour_tree>)

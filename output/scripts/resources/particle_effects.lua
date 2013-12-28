@@ -169,7 +169,7 @@ barrel_smoke_1 = {
 
 barrel_smoke_2 = archetyped(barrel_smoke_1, {
 	spread_degrees = 0,
-	stream_duration_ms = minmax(100, 6000),
+	stream_duration_ms = minmax(199900, 9996000),
 	particles_per_sec = minmax(700, 700),
 	velocity = minmax(180, 180),
 	--particle_lifetime_ms = minmax(10, 3000),
