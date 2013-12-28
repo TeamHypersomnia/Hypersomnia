@@ -43,7 +43,7 @@ void chase_system::process_entities(world&) {
 		}
 		else if (chase.type == components::chase::chase_type::ORBIT) {
 			transform.pos = target_transform.pos + chase.rotation_orbit_offset;
-			transform.pos.rotate(target_transform.rotation - chase.rotation_previous, target_transform.pos);
+			transform.pos.rotate(target_transform.rotation, target_transform.pos);
 			transform.rotation = target_transform.rotation + chase.rotation_offset;
 		}
 	}

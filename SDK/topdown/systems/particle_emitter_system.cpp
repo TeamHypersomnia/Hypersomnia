@@ -128,6 +128,7 @@ void particle_emitter_system::process_events(world& owner) {
 			target_stream.stream_particles_to_spawn = 0.f;
 
 			*target_transform = components::transform(it.pos, target_rotation);
+			target_group->previous_transform = *target_transform;
 
 			*target_render = stream->particle_render_template;
 			target_render->model = target_group;
@@ -137,7 +138,7 @@ void particle_emitter_system::process_events(world& owner) {
 				*target_chase = components::chase(it.subject);
 				target_chase->type = components::chase::chase_type::ORBIT;
 				target_chase->rotation_offset = target_rotation - subject_transform.rotation;
-				target_chase->rotation_orbit_offset = (it.pos - subject_transform.pos);
+				target_chase->rotation_orbit_offset = (it.pos - subject_transform.pos).rotate(-subject_transform.rotation, vec2<>(0.f, 0.f));
 			}
 
 			if (it.target_group_to_refresh) {
