@@ -2,6 +2,7 @@
 #include <vector>
 #include "math/vec2d.h"
 #include "particle_emitter_component.h"
+#include "transform_component.h"
 
 #include "../resources/render_info.h"
 
@@ -16,23 +17,36 @@ namespace resources {
 namespace components {
 	/* hack - the only component that has logic */
 	struct particle_group : public augmentations::entity_system::component, public resources::renderable {
-		physics_system* optional_physics;
+		struct stream {
+			physics_system* optional_physics;
 
-		std::vector<resources::particle> particles;
+			struct uncopyable {
+				uncopyable& operator=(const uncopyable& b) { return *this; }
+				std::vector<resources::particle> particles;
+			} particles;
 
-		/* only used by subject stream to indicate that it will no longer emit particles */
-		bool destroy_when_empty;
+			/* only used by subject stream to indicate that it will no longer emit particles */
+			bool destroy_when_empty;
 
-		float stream_lifetime_ms;
-		float stream_max_lifetime_ms;
-		float stream_particles_to_spawn;
-		float swing_spread, swings_per_sec;
+			float stream_lifetime_ms;
+			float stream_max_lifetime_ms;
+			float stream_particles_to_spawn;
+			float swing_spread, swings_per_sec;
 
-		resources::emission* stream_info;
+			resources::emission* stream_info;
 
-		particle_group() 
-			: optional_physics(nullptr), destroy_when_empty(true), stream_info(nullptr), stream_lifetime_ms(0.f), stream_particles_to_spawn(0.f) {}
+			void stop_streaming() {
+				stream_info = nullptr;
+			}
 
+			stream()
+				: optional_physics(nullptr), destroy_when_empty(true), stream_info(nullptr), stream_lifetime_ms(0.f), stream_particles_to_spawn(0.f) {}
+		};
+		
+		components::transform previous_transform;
+
+		std::vector<stream> stream_slots;
+		particle_group() { stream_slots.resize(1); }
 	private:
 		friend class particle_group_system;
 		friend class particle_emitter_system;

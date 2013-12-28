@@ -19,6 +19,11 @@ namespace augmentations {
 		}
 	}
 
+	template <typename T>
+	T lerp(T a, T b, T alpha) {
+		return a + (b - a)*alpha;
+	}
+
 	template <class vec, class d>
 	vec& rotate(vec& v, const vec& origin, d angle) {
 		angle *= static_cast<d>(0.01745329251994329576923690768489);

@@ -7,6 +7,17 @@
 #include "../resources/particle_emitter_info.h"
 #include "../messages/destroy_message.h"
 
+void update_particle(resources::particle& p, float dt) {
+	p.vel += p.acc * dt / 1000.0;
+	p.pos += p.vel * dt / 1000.0;
+	p.rotation += p.rotation_speed * dt;
+
+	p.vel.damp(p.linear_damping * dt / 1000.f);
+	damp(p.rotation_speed, p.angular_damping * dt / 1000.f);
+
+	p.lifetime_ms += dt;
+}
+
 void particle_group_system::process_entities(world& owner) {
 	float delta = static_cast<float>(timer.extract<std::chrono::milliseconds>());
 
@@ -14,38 +25,54 @@ void particle_group_system::process_entities(world& owner) {
 		auto& group = it->get<components::particle_group>();
 		auto& transform = it->get<components::transform>().current;
 
-		if (group.stream_info) {
-			auto& stream = *group.stream_info;
-			float stream_delta = std::min(delta, group.stream_max_lifetime_ms - group.stream_lifetime_ms);
-			group.stream_lifetime_ms += stream_delta;
-			group.stream_lifetime_ms = std::min(group.stream_lifetime_ms, group.stream_max_lifetime_ms);
+		bool should_destroy = true;
 
-			group.stream_particles_to_spawn += randval(stream.particles_per_sec.first, stream.particles_per_sec.second) * (stream_delta / 1000.f);
+		for (auto& stream_slot : group.stream_slots) {
+			auto& particles = stream_slot.particles.particles;
 
-			while (group.stream_particles_to_spawn >= 1.f) {
-				particle_emitter_system::spawn_particle(group, transform.pos, transform.rotation + 
-					group.swing_spread * sin(group.stream_lifetime_ms * group.swings_per_sec)
-				, stream);
-				group.stream_particles_to_spawn -= 1.f;
+			for (auto& particle : particles)
+				update_particle(particle, delta);
+
+			if (stream_slot.stream_info) {
+				auto& stream_info = *stream_slot.stream_info;
+				float stream_delta = std::min(delta, stream_slot.stream_max_lifetime_ms - stream_slot.stream_lifetime_ms);
+				stream_slot.stream_lifetime_ms += stream_delta;
+				stream_slot.stream_lifetime_ms = std::min(stream_slot.stream_lifetime_ms, stream_slot.stream_max_lifetime_ms);
+
+				stream_slot.stream_particles_to_spawn += randval(stream_info.particles_per_sec.first, stream_info.particles_per_sec.second) * (stream_delta / 1000.f);
+
+				int to_spawn = static_cast<int>(std::floor(stream_slot.stream_particles_to_spawn));
+
+				for(int i = 0; i < to_spawn; ++i) {
+					float t = (static_cast<float>(i) / to_spawn);
+					float time_elapsed = (1.f - t) * delta;
+
+					components::transform current_transform(lerp(group.previous_transform.current.pos, transform.pos, vec2<>(t, t)),
+						lerp(group.previous_transform.current.rotation, transform.rotation, t));
+
+					particle_emitter_system::spawn_particle(stream_slot, current_transform.current.pos, current_transform.current.rotation +
+						stream_slot.swing_spread * sin(stream_slot.stream_lifetime_ms * stream_slot.swings_per_sec)
+						, stream_info);
+
+					update_particle(*stream_slot.particles.particles.rbegin(), time_elapsed);
+					stream_slot.stream_particles_to_spawn -= 1.f;
+				}
 			}
+
+			particles.erase(std::remove_if(particles.begin(), particles.end(),
+				[](const resources::particle& a) { return a.should_disappear && a.lifetime_ms >= a.max_lifetime_ms;  }
+			), particles.end());
+
+			if (!
+				(particles.empty() &&
+				stream_slot.destroy_when_empty && 
+				(!stream_slot.stream_info || stream_slot.stream_lifetime_ms >= stream_slot.stream_max_lifetime_ms)))
+				should_destroy = false;
 		}
-
-		for (auto& particle : group.particles) {
-			particle.vel += particle.acc * delta / 1000.0;
-			particle.pos += particle.vel * delta / 1000.0;
-			particle.rotation += particle.rotation_speed * delta;
-			
-			particle.vel.damp(particle.linear_damping * delta / 1000.f);
-			damp(particle.rotation_speed, particle.angular_damping * delta / 1000.f);
-
-			particle.lifetime_ms += delta;
-		}
-
-		group.particles.erase(std::remove_if(group.particles.begin(), group.particles.end(),
-			[](const resources::particle& a) { return a.should_disappear && a.lifetime_ms >= a.max_lifetime_ms;  }
-		), group.particles.end());
 		
-		if (group.particles.empty() && group.destroy_when_empty && (!group.stream_info || group.stream_lifetime_ms >= group.stream_max_lifetime_ms))
+		if (should_destroy)
 			owner.post_message(messages::destroy_message(it));
+
+		group.previous_transform = transform;
 	}
 }
