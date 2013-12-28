@@ -117,6 +117,8 @@ assault_rifle = {
 	
 	animation_index = "ASSAULT_RIFLE",
 	
+	world_orbit_offset = vec2(45, -7),
+	
 	item_entity = archetyped(world_item, { 
 		render = { 
 			model = assault_rifle_sprite
@@ -138,6 +140,7 @@ shotgun = {
 	})),
 	
 	animation_index = "SHOTGUN",
+	world_orbit_offset = vec2(0, 0),
 	
 	item_entity = archetyped(world_item, { 
 		render = { 

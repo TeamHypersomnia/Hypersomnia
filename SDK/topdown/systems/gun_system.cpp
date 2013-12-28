@@ -21,14 +21,18 @@
 
 gun_system::gun_system() : generator(device()) {}
 
-void components::gun::transfer_barrel_smoke(augmentations::entity_system::entity* another) {
-	auto& this_entity =									   barrel_smoke.target_barrel_smoke_group;
-	auto& another_entity = another->get<components::gun>().barrel_smoke.target_barrel_smoke_group;
+void components::gun::transfer_barrel_smoke(augmentations::entity_system::entity* another, bool overwrite_components) {
+	auto& this_entity = get_barrel_smoke();
+	auto& another_entity = another->get<components::gun>().get_barrel_smoke();
 
-	another_entity->set(this_entity->get<components::transform>());
-	another_entity->set(this_entity->get<components::chase>());
+	if (overwrite_components) {
+		another_entity->set(this_entity->get<components::transform>());
+		another_entity->set(this_entity->get<components::chase>());
+	}
+	
 	another_entity->set(this_entity->get<components::render>())->model = another_entity->find<components::particle_group>();
 	another_entity->get<components::chase>().set_target(another);
+	//another_entity->get<components::chase>().rotation_orbit_offset = new_orbit_offset;
 
 	auto& this_group =	     this_entity->get<components::particle_group>().stream_slots;
 	auto& another_group = another_entity->get<components::particle_group>().stream_slots;
@@ -43,18 +47,18 @@ void components::gun::transfer_barrel_smoke(augmentations::entity_system::entity
 
 void gun_system::add(entity* e) {
 	auto& gun = e->get<components::gun>();
-	gun.barrel_smoke.target_barrel_smoke_group.set(&e->owner_world.create_entity_named("barrel smoke group"));
+	gun.get_barrel_smoke().set(&e->owner_world.create_entity_named("barrel smoke group"));
 
-	gun.barrel_smoke.target_barrel_smoke_group->add(components::transform());
-	gun.barrel_smoke.target_barrel_smoke_group->add(components::particle_group()).stream_slots[0].destroy_when_empty = false;
-	gun.barrel_smoke.target_barrel_smoke_group->add(components::chase());
-	gun.barrel_smoke.target_barrel_smoke_group->add(components::render());
+	gun.get_barrel_smoke()->add(components::transform());
+	gun.get_barrel_smoke()->add(components::particle_group()).stream_slots[0].destroy_when_empty = false;
+	gun.get_barrel_smoke()->add(components::chase());
+	gun.get_barrel_smoke()->add(components::render());
 
 	return processing_system::add(e);
 }
 
 void gun_system::remove(entity* e) {
-	e->owner_world.post_message(messages::destroy_message(e->get<components::gun>().barrel_smoke.target_barrel_smoke_group));
+	e->owner_world.post_message(messages::destroy_message(e->get<components::gun>().get_barrel_smoke()));
 	return processing_system::remove(e);
 }
 
@@ -207,7 +211,7 @@ void gun_system::process_entities(world& owner) {
 				burst.rotation = gun_transform.rotation;
 				burst.subject = it;
 				burst.type = messages::particle_burst_message::burst_type::WEAPON_SHOT;
-				burst.target_group_to_refresh = gun.barrel_smoke.target_barrel_smoke_group;
+				burst.target_group_to_refresh = gun.get_barrel_smoke();
 
 				owner.post_message(burst);
  

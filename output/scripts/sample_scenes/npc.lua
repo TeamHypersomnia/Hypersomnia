@@ -84,7 +84,7 @@ end
 global_item_table = {}
 
 function npc_class:take_weapon(weapon_entity)
-	weapon_entity.gun:transfer_barrel_smoke(self.entity)
+	weapon_entity.gun:transfer_barrel_smoke(self.entity, false)
 	
 	self:take_weapon_item(get_scripted(weapon_entity).item_data)
 	
@@ -132,7 +132,8 @@ function npc_class:drop_weapon()
 
 		local my_thrown_weapon = spawn_weapon(self.entity.transform.current.pos, self.current_weapon, self.entity.gun)
 		
-		self.entity.gun:transfer_barrel_smoke(my_thrown_weapon)
+		self.entity.gun:transfer_barrel_smoke(my_thrown_weapon, true)
+		my_thrown_weapon.gun:get_barrel_smoke():get().chase.rotation_orbit_offset = self.current_weapon.world_orbit_offset
 		
 		local throw_force = vec2.from_degrees(self.entity.transform.current.rotation) * 14
 		
