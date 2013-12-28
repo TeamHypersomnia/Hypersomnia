@@ -42,7 +42,8 @@ namespace resources {
 			min_swings_per_sec,
 			max_swings_per_sec,
 			swing_spread_change_rate,
-			swing_speed_change_rate
+			swing_speed_change_rate,
+			fade_when_ms_remaining
 			;
 
 		std::pair<unsigned, unsigned>
@@ -74,6 +75,7 @@ namespace resources {
 			max_swings_per_sec(std::make_pair(0.f, 0.f)),
 			swing_spread_change_rate(std::make_pair(0.f, 0.f)),
 			swing_speed_change_rate(std::make_pair(0.f, 0.f)),
+			fade_when_ms_remaining(std::make_pair(0.f, 0.f)),
 			acceleration(std::make_pair(0.f, 0.f)), randomize_acceleration(false), spread_degrees(0.f), initial_rotation_variation(0.f),
 			offset(0.f, 0.f), angular_offset(std::make_pair(0.f, 0.f))
 		{}

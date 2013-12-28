@@ -172,7 +172,8 @@ barrel_smoke_1 = {
 	swings_per_sec = minmax(2, 2),
 	angular_offset = minmax(0, 0),
 	
-	swing_spread_change_rate = minmax(1, 2)
+	swing_spread_change_rate = minmax(1, 2),
+	fade_when_ms_remaining = minmax(10, 50)
 	--swing_speed_change_rate = minmax(0.05, 0.06)
 }
 
@@ -188,6 +189,8 @@ barrel_smoke_2 = archetyped(barrel_smoke_1, {
 	particle_templates = {
 		{ linear_damping = 5 }
 	},
+	
+	fade_when_ms_remaining = minmax(3000, 5000)
 	--swing_spread = minmax(10, 40),
 	--swings_per_sec = minmax(0.005, 0.005)
 })
@@ -199,7 +202,7 @@ bullet_impact_smoke_1 = archetyped(barrel_smoke_1, {
 
 bullet_impact_smoke_2 = archetyped(barrel_smoke_2, {
 	particles_per_sec = minmax(190, 290),
-	stream_duration_ms = minmax(100, 600),
+	stream_duration_ms = minmax(1000, 6000),
 })
 
 blood_shower = {
@@ -279,8 +282,8 @@ wood_effect = {
 }
 
 metal_effect = {
-	--bullet_impact_smoke_1,
-	--bullet_impact_smoke_2,
+	bullet_impact_smoke_1,
+	bullet_impact_smoke_2,
 	archetyped(sparkles, {
 		velocity = minmax(1000, 2000),
 		particle_lifetime_ms = minmax(1, 300),
@@ -295,7 +298,7 @@ metal_effect = {
 }
 
 gunshot_effect = {
-	--barrel_smoke_1,
+	barrel_smoke_1,
 	barrel_smoke_2,
 	barrel_explosion,
 	archetyped(sparkles, {

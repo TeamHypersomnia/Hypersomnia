@@ -26,6 +26,7 @@ namespace bindings {
 			.def_readwrite("min_swings_per_sec", &emission::min_swings_per_sec)
 			.def_readwrite("max_swing_spread", &emission::max_swing_spread)
 			.def_readwrite("max_swings_per_sec", &emission::max_swings_per_sec)
+			.def_readwrite("fade_when_ms_remaining", &emission::fade_when_ms_remaining)
 			.def_readwrite("swing_spread_change_rate", &emission::swing_spread_change_rate)
 			.def_readwrite("swing_speed_change_rate", &emission::swing_speed_change_rate)
 			.def_readwrite("initial_rotation_variation", &emission::initial_rotation_variation)

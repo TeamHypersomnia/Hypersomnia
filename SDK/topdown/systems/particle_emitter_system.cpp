@@ -24,8 +24,23 @@ void particle_emitter_system::spawn_particle(
 	new_particle.face.size *= randval(emission.size_multiplier);
 	new_particle.rotation = randval(rotation - emission.initial_rotation_variation, rotation + emission.initial_rotation_variation);
 	new_particle.rotation_speed = randval(emission.angular_velocity);
-	new_particle.max_lifetime_ms = randval(emission.particle_lifetime_ms);
 
+	auto truncated_lifetime = emission.particle_lifetime_ms;
+
+	if (emission.type == emission.STREAM) {
+		float remaining_time = group.stream_max_lifetime_ms - group.stream_lifetime_ms;
+
+		/* if remaining time is less than fade_when_ms_remaining */
+		if (group.fade_when_ms_remaining > 0.f && remaining_time < group.fade_when_ms_remaining) {
+			/* truncate particle's lifetime to create fading effect */
+			float multiplier = remaining_time / group.fade_when_ms_remaining;
+
+			truncated_lifetime.first *= multiplier;
+			truncated_lifetime.second *= multiplier;
+		}
+	}
+
+	new_particle.max_lifetime_ms = randval(truncated_lifetime);
 
 	if (emission.randomize_acceleration) {
 		new_particle.acc += vec2<>::from_degrees(
@@ -134,6 +149,8 @@ void particle_emitter_system::process_events(world& owner) {
 			target_stream.stream_particles_to_spawn = 0.f;
 			target_stream.swing_speed_change = randval(stream->swing_speed_change_rate);
 			target_stream.swing_spread_change = randval(stream->swing_spread_change_rate);
+
+			target_stream.fade_when_ms_remaining = randval(stream->fade_when_ms_remaining);
 
 			*target_transform = components::transform(it.pos, target_rotation);
 			target_group->previous_transform = *target_transform;

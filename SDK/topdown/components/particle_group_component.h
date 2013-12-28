@@ -37,6 +37,8 @@ namespace components {
 			float min_swing_spread, max_swing_spread, min_swings_per_sec, max_swings_per_sec;
 			float swing_spread_change, swing_speed_change;
 
+			float fade_when_ms_remaining;
+
 			resources::emission* stream_info;
 
 			void stop_streaming() {

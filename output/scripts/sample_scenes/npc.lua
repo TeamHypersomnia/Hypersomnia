@@ -276,7 +276,7 @@ function npc_class:loop()
 end
 
 
-npc_count = 0
+npc_count = 10
 my_npcs = {}
 
 final_npc_archetype = (archetyped(character_archetype, {
