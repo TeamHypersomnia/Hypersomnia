@@ -50,7 +50,7 @@ namespace components {
 			uncopyable& operator=(const uncopyable& b) { return *this; }
 		} barrel_smoke;
 
-		void transfer_barrel_smoke(gun& another);
+		void transfer_barrel_smoke(augmentations::entity_system::entity* another);
 
 		augmentations::entity_system::entity_ptr target_camera_to_shake;
 

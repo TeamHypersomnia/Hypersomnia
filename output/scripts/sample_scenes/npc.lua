@@ -84,6 +84,8 @@ end
 global_item_table = {}
 
 function npc_class:take_weapon(weapon_entity)
+	weapon_entity.gun:transfer_barrel_smoke(self.entity)
+	
 	self:take_weapon_item(get_scripted(weapon_entity).item_data)
 	
 	for k, v in ipairs(global_item_table) do
@@ -108,7 +110,10 @@ function spawn_weapon(position, item_archetype, instance_data)
 			script_data = {
 				item_data = {}
 			}
-		}
+		},
+		
+		-- adding gun component only to generate barrel smoke
+		gun = {}
 	}))
 	
 	local item_data_table = my_spawned_weapon.scriptable.script_data.item_data
@@ -126,6 +131,8 @@ function npc_class:drop_weapon()
 		print("dropping weapon...")
 
 		local my_thrown_weapon = spawn_weapon(self.entity.transform.current.pos, self.current_weapon, self.entity.gun)
+		
+		self.entity.gun:transfer_barrel_smoke(my_thrown_weapon)
 		
 		local throw_force = vec2.from_degrees(self.entity.transform.current.rotation) * 14
 		
@@ -268,7 +275,7 @@ function npc_class:loop()
 end
 
 
-npc_count = 1
+npc_count = 0
 my_npcs = {}
 
 final_npc_archetype = (archetyped(character_archetype, {

@@ -103,7 +103,7 @@ assault_rifle_info = {
 	},
 	
 	max_bullet_distance = 5000,
-	current_rounds = 30,
+	current_rounds = 30000,
 	
 	swing_radius = 100,
 	swing_angle = 90,
