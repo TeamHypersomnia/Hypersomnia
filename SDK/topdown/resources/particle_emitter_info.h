@@ -36,7 +36,14 @@ namespace resources {
 			acceleration,
 			angular_offset,
 			swing_spread,
-			swings_per_sec;
+			swings_per_sec,
+			min_swing_spread,
+			max_swing_spread,
+			min_swings_per_sec,
+			max_swings_per_sec,
+			swing_spread_change_rate,
+			swing_speed_change_rate
+			;
 
 		std::pair<unsigned, unsigned>
 			particles_per_burst;
@@ -61,8 +68,12 @@ namespace resources {
 			stream_duration_ms(std::make_pair(0.f, 0.f)),
 			particle_lifetime_ms(std::make_pair(0.f, 0.f)),
 			size_multiplier(std::make_pair(0.f, 0.f)),
-			swing_spread(std::make_pair(0.f, 0.f)),
-			swings_per_sec(std::make_pair(0.f, 0.f)),
+			min_swing_spread(std::make_pair(0.f, 0.f)),
+			min_swings_per_sec(std::make_pair(0.f, 0.f)),
+			max_swing_spread(std::make_pair(0.f, 0.f)),
+			max_swings_per_sec(std::make_pair(0.f, 0.f)),
+			swing_spread_change_rate(std::make_pair(0.f, 0.f)),
+			swing_speed_change_rate(std::make_pair(0.f, 0.f)),
 			acceleration(std::make_pair(0.f, 0.f)), randomize_acceleration(false), spread_degrees(0.f), initial_rotation_variation(0.f),
 			offset(0.f, 0.f), angular_offset(std::make_pair(0.f, 0.f))
 		{}

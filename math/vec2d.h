@@ -24,6 +24,12 @@ namespace augmentations {
 		return a + (b - a)*alpha;
 	}
 
+	template <typename T>
+	void clamp(T& a, T min_a, T max_a) {
+		if (a < min_a) a = min_a;
+		if (a > max_a) a = max_a;
+	}
+
 	template <class vec, class d>
 	vec& rotate(vec& v, const vec& origin, d angle) {
 		angle *= static_cast<d>(0.01745329251994329576923690768489);

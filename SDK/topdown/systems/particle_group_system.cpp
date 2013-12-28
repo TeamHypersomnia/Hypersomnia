@@ -41,6 +41,12 @@ void particle_group_system::process_entities(world& owner) {
 
 				stream_slot.stream_particles_to_spawn += randval(stream_info.particles_per_sec.first, stream_info.particles_per_sec.second) * (stream_delta / 1000.f);
 
+				stream_slot.swings_per_sec += randval(-stream_slot.swing_speed_change, stream_slot.swing_speed_change);
+				stream_slot.swing_spread += randval(-stream_slot.swing_spread_change, stream_slot.swing_spread_change);
+
+				augmentations::clamp(stream_slot.swing_spread, stream_slot.min_swing_spread, stream_slot.max_swing_spread);
+				augmentations::clamp(stream_slot.swings_per_sec, stream_slot.min_swings_per_sec, stream_slot.max_swings_per_sec);
+
 				int to_spawn = static_cast<int>(std::floor(stream_slot.stream_particles_to_spawn));
 
 				for(int i = 0; i < to_spawn; ++i) {
@@ -51,7 +57,7 @@ void particle_group_system::process_entities(world& owner) {
 						lerp(group.previous_transform.current.rotation, transform.rotation, t));
 
 					particle_emitter_system::spawn_particle(stream_slot, current_transform.current.pos, current_transform.current.rotation +
-						stream_slot.swing_spread * sin(stream_slot.stream_lifetime_ms * stream_slot.swings_per_sec)
+						stream_slot.swing_spread * sin((stream_slot.stream_lifetime_ms / 1000.f) * 2 * 3.1415926535897932384626433832795f * stream_slot.swings_per_sec)
 						, stream_info);
 
 					update_particle(*stream_slot.particles.particles.rbegin(), time_elapsed);

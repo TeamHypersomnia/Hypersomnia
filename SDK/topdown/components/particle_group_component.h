@@ -31,7 +31,11 @@ namespace components {
 			float stream_lifetime_ms;
 			float stream_max_lifetime_ms;
 			float stream_particles_to_spawn;
-			float swing_spread, swings_per_sec;
+
+			float swing_spread;
+			float swings_per_sec;
+			float min_swing_spread, max_swing_spread, min_swings_per_sec, max_swings_per_sec;
+			float swing_spread_change, swing_speed_change;
 
 			resources::emission* stream_info;
 

@@ -67,10 +67,10 @@ player_shotgun_animation = create_animation {
 
 player_shotgun_shot_animation = create_animation {
 	frames = {
-		{ model = { size_multiplier = npc_size_multiplier, image = images.player_shotgun_shot_1 },  duration_ms = 15*duration_multiplier },
-		{ model = { size_multiplier = npc_size_multiplier, image = images.player_shotgun_shot_2 },  duration_ms = 15*duration_multiplier },
-		{ model = { size_multiplier = npc_size_multiplier, image = images.player_shotgun_shot_3 },  duration_ms = 15*duration_multiplier },
-		{ model = { size_multiplier = npc_size_multiplier, image = images.player_shotgun_shot_4 },  duration_ms = 15*duration_multiplier },
+		{ model = { size_multiplier = npc_size_multiplier, image = images.player_shotgun_shot_1 },  duration_ms = 1*duration_multiplier },
+		{ model = { size_multiplier = npc_size_multiplier, image = images.player_shotgun_shot_2 },  duration_ms = 1*duration_multiplier },
+		{ model = { size_multiplier = npc_size_multiplier, image = images.player_shotgun_shot_3 },  duration_ms = 1*duration_multiplier },
+		{ model = { size_multiplier = npc_size_multiplier, image = images.player_shotgun_shot_4 },  duration_ms = 1*duration_multiplier },
 		{ model = { size_multiplier = npc_size_multiplier, image = images.player_shotgun_shot_5 },  duration_ms = 15*duration_multiplier },
 		{ model = { size_multiplier = npc_size_multiplier, image = images.player_shotgun_shot_4 },  duration_ms = 15*duration_multiplier },
 		{ model = { size_multiplier = npc_size_multiplier, image = images.player_shotgun_shot_3 },  duration_ms = 15*duration_multiplier },

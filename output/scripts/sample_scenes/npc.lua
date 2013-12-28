@@ -129,13 +129,13 @@ end
 function npc_class:drop_weapon()
 	if self.current_weapon ~= bare_hands then
 		print("dropping weapon...")
-
+		self.entity.gun.trigger = false
 		local my_thrown_weapon = spawn_weapon(self.entity.transform.current.pos, self.current_weapon, self.entity.gun)
 		
 		self.entity.gun:transfer_barrel_smoke(my_thrown_weapon, true)
 		my_thrown_weapon.gun:get_barrel_smoke():get().chase.rotation_orbit_offset = self.current_weapon.world_orbit_offset
 		
-		local throw_force = vec2.from_degrees(self.entity.transform.current.rotation) * 14
+		local throw_force = vec2.from_degrees(self.entity.transform.current.rotation) * 15
 		
 		local body = my_thrown_weapon.physics.body
 		
