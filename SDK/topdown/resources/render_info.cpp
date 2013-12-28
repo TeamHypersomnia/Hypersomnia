@@ -279,15 +279,16 @@ namespace resources {
 
 namespace components {
 	void particle_group::draw(resources::buffer& triangles, const components::transform::state& transform, vec2<> camera_pos) {
-		for (auto& it : particles) {
-			auto temp_alpha = it.face.color.a;
+		for (auto& s : stream_slots)
+			for (auto& it : s.particles.particles) {
+				auto temp_alpha = it.face.color.a;
 
-			if (it.should_disappear)
-				it.face.color.a = static_cast<graphics::color>(((it.max_lifetime_ms - it.lifetime_ms) / it.max_lifetime_ms) * static_cast<float>(temp_alpha));
+				if (it.should_disappear)
+					it.face.color.a = static_cast<graphics::color>(((it.max_lifetime_ms - it.lifetime_ms) / it.max_lifetime_ms) * static_cast<float>(temp_alpha));
 
-			it.face.draw(triangles, components::transform::state(it.pos, it.rotation), camera_pos);
-			it.face.color.a = temp_alpha;
-		}
+				it.face.draw(triangles, components::transform::state(it.pos, it.rotation), camera_pos);
+				it.face.color.a = temp_alpha;
+			}
 	}
 
 	bool particle_group::is_visible(rects::xywh visibility_aabb, const components::transform::state& transform) {

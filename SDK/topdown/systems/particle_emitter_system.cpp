@@ -13,27 +13,27 @@
 #include "utility/randval.h"
 
 void particle_emitter_system::spawn_particle(
-	components::particle_group& group, const vec2<>& position, float rotation, const resources::emission& emission) {
-		auto new_particle = emission.particle_templates[randval(0u, emission.particle_templates.size()-1)];
-		new_particle.vel = vec2<>::from_degrees(
+	components::particle_group::stream& group, const vec2<>& position, float rotation, const resources::emission& emission) {
+	auto new_particle = emission.particle_templates[randval(0u, emission.particle_templates.size() - 1)];
+	new_particle.vel = vec2<>::from_degrees(
+		randval(rotation - emission.spread_degrees, rotation + emission.spread_degrees)) *
+		randval(emission.velocity);
+
+	new_particle.pos = position + emission.offset;
+	new_particle.lifetime_ms = 0.f;
+	new_particle.face.size *= randval(emission.size_multiplier);
+	new_particle.rotation = randval(rotation - emission.initial_rotation_variation, rotation + emission.initial_rotation_variation);
+	new_particle.rotation_speed = randval(emission.angular_velocity);
+	new_particle.max_lifetime_ms = randval(emission.particle_lifetime_ms);
+
+
+	if (emission.randomize_acceleration) {
+		new_particle.acc += vec2<>::from_degrees(
 			randval(rotation - emission.spread_degrees, rotation + emission.spread_degrees)) *
-			randval(emission.velocity);
-		
-		new_particle.pos = position + emission.offset;
-		new_particle.lifetime_ms = 0.f;
-		new_particle.face.size *= randval(emission.size_multiplier);
-		new_particle.rotation = randval(rotation - emission.initial_rotation_variation, rotation + emission.initial_rotation_variation);
-		new_particle.rotation_speed = randval(emission.angular_velocity);
-		new_particle.max_lifetime_ms = randval(emission.particle_lifetime_ms);
-		
+			randval(emission.acceleration);
+	}
 
-		if (emission.randomize_acceleration) {
-			new_particle.acc += vec2<>::from_degrees(
-				randval(rotation - emission.spread_degrees, rotation + emission.spread_degrees)) *
-				randval(emission.acceleration);
-		}
-
-		group.particles.push_back(new_particle);
+	group.particles.particles.push_back(new_particle);
 }
 
 void particle_emitter_system::process_events(world& owner) {
@@ -44,8 +44,8 @@ void particle_emitter_system::process_events(world& owner) {
 
 	for (auto it : events) {
 		resources::particle_effect* emissions = nullptr;
-		
-		if (it.set_effect != nullptr) 
+
+		if (it.set_effect != nullptr)
 			emissions = it.set_effect;
 		else {
 			if (it.subject) {
@@ -55,55 +55,94 @@ void particle_emitter_system::process_events(world& owner) {
 
 					if (emissions_found == emitter->available_particle_effects->get_raw().end()) continue;
 					emissions = &(*emissions_found).second;
-				} else continue;
+				}
+				else continue;
 			}
 		}
 
-
+		std::vector<resources::emission*> only_streams;
+		
 		for (auto& emission : *emissions) {
 			float target_rotation = it.rotation + randval(emission.angular_offset);
 
 			if (emission.type == resources::emission::type::BURST) {
 				int burst_amount = randval(emission.particles_per_burst);
-				
+
 				entity& new_burst_entity = owner.create_entity();
 				new_burst_entity.add(components::particle_group());
 				new_burst_entity.add(components::transform());
-				
+
 				components::render new_render = emission.particle_render_template;
 				new_render.model = &new_burst_entity.get<components::particle_group>();
 				new_burst_entity.add(new_render);
 
 				for (int i = 0; i < burst_amount; ++i)
-					spawn_particle(new_burst_entity.get<components::particle_group>(), it.pos, target_rotation, emission);
+					spawn_particle(new_burst_entity.get<components::particle_group>().stream_slots[0], it.pos, target_rotation, emission);
+
 			}
 
 			else if (emission.type == resources::emission::type::STREAM) {
-				components::particle_group new_stream;
-				new_stream.stream_info = &emission;
-				new_stream.stream_lifetime_ms = 0.f;
-				new_stream.swing_spread = randval(emission.swing_spread);
-				new_stream.swings_per_sec = randval(emission.swings_per_sec);
-				new_stream.stream_max_lifetime_ms = randval(emission.stream_duration_ms);
-				new_stream.stream_particles_to_spawn = 0.f;
+				only_streams.push_back(&emission);
+			}
+		}
 
+		if (only_streams.empty()) continue;
+
+		size_t stream_index = 0;
+
+		components::particle_group* target_group = nullptr;
+		components::chase* target_chase = nullptr;
+		components::render* target_render = nullptr;
+		components::transform* target_transform = nullptr;
+
+		if (it.target_group_to_refresh) {
+			target_group = it.target_group_to_refresh->find<components::particle_group>();
+			target_chase = it.target_group_to_refresh->find<components::chase>();
+			target_render = it.target_group_to_refresh->find<components::render>();
+			target_transform = it.target_group_to_refresh->find<components::transform>();
+
+			target_group->stream_slots.resize(only_streams.size());
+		}
+
+		for (auto& stream : only_streams) {
+			if (!it.target_group_to_refresh) {
 				entity& new_stream_entity = owner.create_entity();
-				new_stream_entity.add(new_stream);
-				new_stream_entity.add(components::transform(it.pos, target_rotation));
+				target_group = &new_stream_entity.add(components::particle_group());
+				target_transform = &new_stream_entity.add(components::transform());
+				target_render = &new_stream_entity.add(components::render());
 
-				components::render new_render = emission.particle_render_template;
-				new_render.model = &new_stream_entity.get<components::particle_group>();
-				new_stream_entity.add(new_render);
+				if (it.subject)
+					target_chase = &new_stream_entity.add(components::chase(it.subject));
+			}
 
-				if (it.subject) {
-					components::chase chase(it.subject);
-					auto& subject_transform = it.subject->get<components::transform>().current;
-					chase.type = components::chase::chase_type::ORBIT;
-					chase.rotation_offset = target_rotation - subject_transform.rotation;
-					chase.rotation_orbit_offset = (it.pos - subject_transform.pos);
+			float target_rotation = it.rotation + randval(stream->angular_offset);
 
-					new_stream_entity.add(chase);
-				}
+			//*target_group = components::particle_group();
+			auto& target_stream = target_group->stream_slots[stream_index];
+
+			target_stream.stream_info = stream;
+			target_stream.stream_lifetime_ms = 0.f;
+			target_stream.swing_spread = randval(stream->swing_spread);
+			target_stream.swings_per_sec = randval(stream->swings_per_sec);
+			target_stream.stream_max_lifetime_ms = randval(stream->stream_duration_ms);
+			target_stream.stream_particles_to_spawn = 0.f;
+
+			*target_transform = components::transform(it.pos, target_rotation);
+
+			*target_render = stream->particle_render_template;
+			target_render->model = target_group;
+
+			if (target_chase) {
+				auto& subject_transform = it.subject->get<components::transform>().current;
+				*target_chase = components::chase(it.subject);
+				target_chase->type = components::chase::chase_type::ORBIT;
+				target_chase->rotation_offset = target_rotation - subject_transform.rotation;
+				target_chase->rotation_orbit_offset = (it.pos - subject_transform.pos);
+			}
+
+			if (it.target_group_to_refresh) {
+				++stream_index;
+				target_stream.destroy_when_empty = false;
 			}
 		}
 	}

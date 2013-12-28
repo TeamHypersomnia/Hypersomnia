@@ -5,11 +5,14 @@
 #include "../messages/animate_message.h"
 #include "../messages/particle_burst_message.h"
 #include "../messages/damage_message.h"
+#include "../messages/destroy_message.h"
 
 #include "../components/render_component.h"
 #include "../components/physics_component.h"
 #include "../components/camera_component.h"
 #include "../components/damage_component.h"
+#include "../components/particle_group_component.h"
+#include "../components/chase_component.h"
 
 #include "../systems/physics_system.h"
 #include "../systems/render_system.h"
@@ -17,6 +20,35 @@
 #include "../game/body_helper.h"
 
 gun_system::gun_system() : generator(device()) {}
+
+void components::gun::transfer_barrel_smoke(gun& another) {
+	auto& this_group =            barrel_smoke.target_barrel_smoke_group->get<components::particle_group>().stream_slots;
+	auto& another_group = another.barrel_smoke.target_barrel_smoke_group->get<components::particle_group>().stream_slots;
+
+	another_group.resize(this_group.size());
+	
+	for (size_t i = 0; i < this_group.size(); ++i) {
+		another_group[i] = this_group[i];
+		this_group[i].stop_streaming();
+	}
+}
+
+void gun_system::add(entity* e) {
+	auto& gun = e->get<components::gun>();
+	gun.barrel_smoke.target_barrel_smoke_group.set(&e->owner_world.create_entity());
+
+	gun.barrel_smoke.target_barrel_smoke_group->add(components::transform());
+	gun.barrel_smoke.target_barrel_smoke_group->add(components::particle_group()).stream_slots[0].destroy_when_empty = false;
+	gun.barrel_smoke.target_barrel_smoke_group->add(components::chase());
+	gun.barrel_smoke.target_barrel_smoke_group->add(components::render());
+
+	return processing_system::add(e);
+}
+
+void gun_system::remove(entity* e) {
+	e->owner_world.post_message(messages::destroy_message(e->get<components::gun>().barrel_smoke.target_barrel_smoke_group));
+	return processing_system::remove(e);
+}
 
 void gun_system::process_events(world& owner) {
 	auto events = owner.get_message_queue<messages::intent_message>();
@@ -167,6 +199,7 @@ void gun_system::process_entities(world& owner) {
 				burst.rotation = gun_transform.rotation;
 				burst.subject = it;
 				burst.type = messages::particle_burst_message::burst_type::WEAPON_SHOT;
+				burst.target_group_to_refresh = gun.barrel_smoke.target_barrel_smoke_group;
 
 				owner.post_message(burst);
  

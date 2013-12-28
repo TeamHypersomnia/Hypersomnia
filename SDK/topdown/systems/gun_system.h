@@ -15,6 +15,9 @@ class gun_system : public processing_system_templated<components::transform, com
 	std::mt19937 generator;
 public:
 	gun_system();
+	void add(entity*) override;
+	void remove(entity*) override;
+
 	void process_events(world&) override;
 	void process_entities(world&) override;
 };

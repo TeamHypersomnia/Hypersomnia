@@ -45,6 +45,13 @@ namespace components {
 
 		bool can_drop() const;
 
+		struct uncopyable {
+			augmentations::entity_system::entity_ptr target_barrel_smoke_group;
+			uncopyable& operator=(const uncopyable& b) { return *this; }
+		} barrel_smoke;
+
+		void transfer_barrel_smoke(gun& another);
+
 		augmentations::entity_system::entity_ptr target_camera_to_shake;
 
 		gun()

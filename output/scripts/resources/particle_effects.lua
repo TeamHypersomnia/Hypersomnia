@@ -49,9 +49,9 @@ barrel_explosion_template = {
 
 barrel_smoke_template = {
 	angular_damping = 0,
-	linear_damping = 500,
+	linear_damping = 1000,
 	should_disappear = true,
-	model = { image = images.smoke_particle, color = rgba(255, 255, 255, 3), size_multiplier = vec2(0.2, 0.2) }
+	model = { image = images.smoke_particle, color = rgba(255, 255, 255, 6), size_multiplier = vec2(0.2, 0.2) }
 	--acc = vec2(0, -300)
 }
 
@@ -142,8 +142,8 @@ barrel_explosion = {
 }
 
 barrel_smoke_1 = {
-	spread_degrees = 0.5,
-	particles_per_sec = minmax(190, 290),
+	spread_degrees = 0.0,
+	particles_per_sec = minmax(300, 400),
 	stream_duration_ms = minmax(100, 600),
 	type = emission.STREAM,
 	velocity = minmax(300, 500),
@@ -162,25 +162,35 @@ barrel_smoke_1 = {
 	
 	--swing_spread = minmax(0, 90),
 	--swings_per_sec = minmax(2, 10)
-	swing_spread = minmax(10, 20),
+	swing_spread = minmax(5, 30),
 	swings_per_sec = minmax(0.005, 0.005),
-	angular_offset = minmax(-10, 10)
+	angular_offset = minmax(0, 0)
 }
 
 barrel_smoke_2 = archetyped(barrel_smoke_1, {
-	spread_degrees = 14,
+	spread_degrees = 0,
 	stream_duration_ms = minmax(100, 6000),
-	particles_per_sec = minmax(190, 290),
-	velocity = minmax(100, 200),
+	particles_per_sec = minmax(700, 700),
+	velocity = minmax(180, 180),
 	--particle_lifetime_ms = minmax(10, 3000),
 	
-	size_multiplier = minmax(0.2, 1),
+	size_multiplier = minmax(0.5, 0.7),
 	
 	particle_templates = {
-		{ linear_damping = 10 }
+		{ linear_damping = 5 }
 	},
 	--swing_spread = minmax(10, 40),
 	--swings_per_sec = minmax(0.005, 0.005)
+})
+
+bullet_impact_smoke_1 = archetyped(barrel_smoke_1, {
+	particles_per_sec = minmax(190, 290),
+	stream_duration_ms = minmax(100, 600),
+})
+
+bullet_impact_smoke_2 = archetyped(barrel_smoke_2, {
+	particles_per_sec = minmax(190, 290),
+	stream_duration_ms = minmax(100, 600),
 })
 
 blood_shower = {
@@ -252,16 +262,16 @@ blood_pool = {
 
 -- EFFECTS --
 wood_effect = {
-	barrel_smoke_1,
-	barrel_smoke_2,
+	bullet_impact_smoke_1,
+	bullet_impact_smoke_2,
 	wood_parts_big,
 	wood_parts_small,
 	wood_dust
 }
 
 metal_effect = {
-	barrel_smoke_1,
-	barrel_smoke_2,
+	bullet_impact_smoke_1,
+	bullet_impact_smoke_2,
 	archetyped(sparkles, {
 		velocity = minmax(1000, 2000),
 		particle_lifetime_ms = minmax(1, 300),
