@@ -279,7 +279,7 @@ character_archetype = {
 		},
 		
 		animate = {
-			available_animations = npc_animation_legs_set
+			available_animations = enemy_animation_legs_set
 		}
 	}
 }

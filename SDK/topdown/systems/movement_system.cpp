@@ -4,6 +4,8 @@
 #include "../messages/intent_message.h"
 #include "../messages/animate_message.h"
 
+#include "../components/gun_component.h"
+
 using namespace messages;
 
 void movement_system::process_events(world& owner) {
@@ -66,7 +68,6 @@ void movement_system::process_entities(world& owner) {
 		float32 speed = vel.Normalize() * METERS_TO_PIXELSf;
 
 		animate_message msg;
-		msg.animation_type = animate_message::animation::MOVE;
 
 		msg.change_speed = true;
 		
@@ -80,6 +81,13 @@ void movement_system::process_entities(world& owner) {
 
 		for (auto receiver : movement.animation_receivers) {
 			animate_message copy(msg);
+			copy.animation_type = animate_message::animation::MOVE;
+
+			auto* gun = receiver.target->find<components::gun>();
+
+			if (gun)
+				copy.animation_type = gun->current_swing_direction ? animate_message::animation::MOVE_CW : animate_message::animation::MOVE_CCW;
+
 			copy.subject = receiver.target;
 
 			if (!receiver.stop_at_zero_movement)

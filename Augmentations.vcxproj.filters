@@ -1154,6 +1154,5 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="scripts\entity_creation_util.lua" />
-    <None Include="output\scripts\resources\animations.lua" />
   </ItemGroup>
 </Project>

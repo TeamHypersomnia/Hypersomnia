@@ -805,7 +805,6 @@
     <ClInclude Include="window_framework\window.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="output\scripts\resources\animations.lua" />
     <None Include="scripts\entity_creation_util.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

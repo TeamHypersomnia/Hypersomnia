@@ -37,6 +37,8 @@ namespace bindings {
 				luabind::value("MOVE", animate_message::MOVE),
 				luabind::value("SWING_CW", animate_message::SWING_CW),
 				luabind::value("SWING_CCW", animate_message::SWING_CCW),
+				luabind::value("MOVE_CW", animate_message::MOVE_CW),
+				luabind::value("MOVE_CCW", animate_message::MOVE_CCW),
 				luabind::value("SHOT", animate_message::SHOT)
 			]
 				);

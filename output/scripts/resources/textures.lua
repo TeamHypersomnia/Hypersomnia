@@ -57,11 +57,6 @@ images = {
 
 	crate = "crate.jpg",
 
-	player_shotgun_1 = "player_shotgun_1.png",
-	player_shotgun_2 = "player_shotgun_2.png",
-	player_shotgun_3 = "player_shotgun_3.png",
-	player_shotgun_4 = "player_shotgun_4.png",
-	player_shotgun_5 = "player_shotgun_5.png",
 
 	bullet = "bullet.png",
 
@@ -76,11 +71,17 @@ images = {
 	player_hands_9 = 	"gfx\\player_hands_9.png",
 	player_hands_10 = 	"gfx\\player_hands_10.png",
 	
-	player_shotgun_shot_1 = "player_shotgun_shot_1.png",
-	player_shotgun_shot_2 = "player_shotgun_shot_2.png",
-	player_shotgun_shot_3 = "player_shotgun_shot_3.png",
-	player_shotgun_shot_4 = "player_shotgun_shot_4.png",
-	player_shotgun_shot_5 = "player_shotgun_shot_5.png",
+	enemy_shotgun_1 = "enemy_shotgun_1.png",
+	enemy_shotgun_2 = "enemy_shotgun_2.png",
+	enemy_shotgun_3 = "enemy_shotgun_3.png",
+	enemy_shotgun_4 = "enemy_shotgun_4.png",
+	enemy_shotgun_5 = "enemy_shotgun_5.png",
+	
+	enemy_shotgun_shot_1 = "enemy_shotgun_shot_1.png",
+	enemy_shotgun_shot_2 = "enemy_shotgun_shot_2.png",
+	enemy_shotgun_shot_3 = "enemy_shotgun_shot_3.png",
+	enemy_shotgun_shot_4 = "enemy_shotgun_shot_4.png",
+	enemy_shotgun_shot_5 = "enemy_shotgun_shot_5.png",
 
 	piece_1 = "piece_1.png",
 	piece_2 = "piece_2.png",

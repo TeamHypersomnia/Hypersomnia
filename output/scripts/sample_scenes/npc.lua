@@ -287,7 +287,7 @@ function npc_class:loop()
 end
 
 
-npc_count = 10
+npc_count = 0
 my_npcs = {}
 
 final_npc_archetype = (archetyped(character_archetype, {
@@ -343,10 +343,10 @@ for i=1, npc_count do
 	
 	init_npc(my_npcs[i].body:get(), { 
 		weapon_animation_sets = {
-			BARE_HANDS = npc_animation_body_set,
-			FIREAXE = npc_animation_body_set,
-			ASSAULT_RIFLE = npc_animation_body_shotgun_set,
-			SHOTGUN = npc_animation_body_shotgun_set
+			BARE_HANDS = enemy_animation_body_set,
+			FIREAXE = enemy_animation_body_set,
+			ASSAULT_RIFLE = enemy_animation_body_shotgun_set,
+			SHOTGUN = enemy_animation_body_shotgun_set
 		},
 		
 		health_info = {

@@ -72,10 +72,10 @@ player = ptr_create_entity_group (archetyped(character_archetype, {
 
 init_npc(player.body:get(), { 
 	weapon_animation_sets = {
-		BARE_HANDS = npc_animation_body_set,
-		FIREAXE = npc_animation_body_set,
-		ASSAULT_RIFLE = npc_animation_body_shotgun_set,
-		SHOTGUN = npc_animation_body_shotgun_set
+		BARE_HANDS = player_animation_body_set,
+		FIREAXE = player_animation_body_set,
+		ASSAULT_RIFLE = enemy_animation_body_shotgun_set,
+		SHOTGUN = enemy_animation_body_shotgun_set
 	},
 	
 	health_info = {
