@@ -100,7 +100,7 @@ void gun_system::process_entities(world& owner) {
 				gun.is_swinging = true;
 
 				messages::animate_message msg;
-				msg.animation_type = messages::animate_message::animation::SWING;
+				msg.animation_type = gun.current_swing_direction ? messages::animate_message::animation::SWING_CW : messages::animate_message::animation::SWING_CCW;
 				msg.preserve_state_if_animation_changes = false;
 				msg.change_animation = true;
 				msg.change_speed = true;
@@ -112,6 +112,7 @@ void gun_system::process_entities(world& owner) {
 				owner.post_message(msg);
 				
 				gun.shooting_timer.reset();
+				gun.current_swing_direction = !gun.current_swing_direction;
 			}
 
 			if (gun.is_swinging) {

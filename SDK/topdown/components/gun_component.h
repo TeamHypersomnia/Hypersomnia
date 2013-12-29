@@ -36,6 +36,8 @@ namespace components {
 		bool is_melee;
 		bool is_swinging;
 
+		bool current_swing_direction;
+
 		float swing_duration;
 		float swing_radius;
 		float swing_angle;
@@ -62,7 +64,7 @@ namespace components {
 			: max_rounds(0), bullets_once(0), spread_degrees(0.f), bullet_damage(std::make_pair(0.f, 0.f)), is_automatic(false),
 			bullet_distance_offset(0.f), shake_radius(0.f), shake_spread_degrees(0.f), max_bullet_distance(1000.f), current_rounds(0),
 			is_melee(false), is_swinging(false), swing_radius(0.f), swing_angle(0.f), swing_angular_offset(0.f), query_vertices(7), swing_duration(0.f),
-			reloading(false), trigger(false), target_camera_to_shake(nullptr), bullet_speed(std::make_pair(0.f, 0.f)) {
+			reloading(false), trigger(false), target_camera_to_shake(nullptr), bullet_speed(std::make_pair(0.f, 0.f)), current_swing_direction(false) {
 				bullet_body.filter.groupIndex = -1;
 		}
 

@@ -10,7 +10,8 @@ namespace messages {
 		enum animation {
 			MOVE,
 			SHOT,
-			SWING
+			SWING_CW,
+			SWING_CCW
 		} animation_type;
 
 		enum type {
