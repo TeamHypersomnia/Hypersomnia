@@ -61,7 +61,6 @@ function set_components_from_entry(entity, entry, entities_lookup)
 	def		(crosshair_component, 'crosshair')
 	def_ptr (damage_component, 'damage', { sender = true })
 	def_ptr (gun_component, 'gun', { target_camera_to_shake = true }, { bullet_body = true, bullet_render = true })
-	def		(health_component, 'health', { corpse_body = true, corpse_render = true } )
 	def_ptr (lookat_component, 'lookat', { target = true })
 	def		(particle_emitter_component, 'particle_emitter')
 	def		(scriptable_component, 'scriptable')
@@ -107,12 +106,6 @@ function set_components_from_entry(entity, entry, entities_lookup)
 		
 		set_physics_info(gun.bullet_body, entry.gun.bullet_body)
 		rewrite(gun.bullet_render, entry.gun.bullet_render)
-	end
-	
-	if entry.health ~= nil then
-		local health = entity.health
-		set_physics_info(health.corpse_body, entry.health.corpse_body)
-		rewrite(health.corpse_render, entry.health.corpse_render)
 	end
 	
 	if entry.behaviour_tree ~= nil then

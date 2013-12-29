@@ -15,7 +15,6 @@
 #include "../components/crosshair_component.h"
 #include "../components/damage_component.h"
 #include "../components/gun_component.h"
-#include "../components/health_component.h"
 #include "../components/input_component.h"
 #include "../components/lookat_component.h"
 #include "../components/movement_component.h"
@@ -64,9 +63,6 @@ namespace bindings {
 			.def("remove_gun", &entity::remove<gun>)
 			.def("add", &entity::add<gun>)
 			.property("gun", &entity::find<gun>, &entity::set<gun>)
-			.def("remove_health", &entity::remove<health>)
-			.def("add", &entity::add<health>)
-			.property("health", &entity::find<health>, &entity::set<health>)
 			.def("remove_input", &entity::remove<input>)
 			.def("add", &entity::add<input>)
 			.property("input", &entity::find<input>, &entity::set<input>)

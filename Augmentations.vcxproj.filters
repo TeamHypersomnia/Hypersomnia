@@ -225,9 +225,6 @@
     <ClCompile Include="SDK\topdown\systems\particle_emitter_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\topdown\systems\health_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="entity_system\entity_ptr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -448,9 +445,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SDK\topdown\bindings\gun_component_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SDK\topdown\bindings\health_component_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SDK\topdown\bindings\input_component_binding.cpp">
@@ -834,12 +828,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SDK\topdown\systems\particle_emitter_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SDK\topdown\components\health_component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SDK\topdown\systems\health_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SDK\topdown\messages\damage_message.h">

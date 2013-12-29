@@ -20,7 +20,6 @@
 #include "systems/lookat_system.h"
 #include "systems/chase_system.h"
 #include "systems/damage_system.h"
-#include "systems/health_system.h"
 #include "systems/destroy_system.h"
 #include "systems/particle_group_system.h"
 #include "systems/particle_emitter_system.h"
@@ -78,7 +77,6 @@ int main() {
 	camera_system camera(render);
 	chase_system chase;
 	damage_system damage;
-	health_system health;
 	destroy_system destroy;
 	behaviour_tree_system behaviours;
 
@@ -94,7 +92,6 @@ int main() {
 	my_world.add_system(&crosshairs);
 	my_world.add_system(&guns);
 	my_world.add_system(&damage);
-	my_world.add_system(&health);
 	my_world.add_system(&emitters);
 	my_world.add_system(&particles);
 	my_world.add_system(&animations);
