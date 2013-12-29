@@ -1,4 +1,4 @@
-current_zoom_level = 3000
+current_zoom_level = 0
 
 function set_zoom_level(camera)
 	local mult = 1 + (current_zoom_level / 1000)

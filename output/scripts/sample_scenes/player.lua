@@ -61,6 +61,12 @@ player = ptr_create_entity_group (archetyped(character_archetype, {
 		input = {
 			intent_message.AIM
 		}
+	},
+	
+	legs = {
+		animate = {
+			available_animations = player_animation_legs_set
+		}
 	}
 }))
 

@@ -18,7 +18,7 @@ images = {
 	
 	blank = "blank.png",
 	
-	shotgun = "shotgun.png",
+	shotgun = "shotgun2.png",
 	assault = "m4a1.png",
 	fireaxe = "fireaxe.png",
 	
@@ -32,6 +32,17 @@ images = {
 	legs_8 = "legs_8.png",
 	legs_9 = "legs_9.png",
 	legs_10 = "legs_10.png",
+	
+	player_legs_1 = "player_legs_1.png",
+	player_legs_2 = "player_legs_2.png",
+	player_legs_3 = "player_legs_3.png",
+	player_legs_4 = "player_legs_4.png",
+	player_legs_5 = "player_legs_5.png",
+	player_legs_6 = "player_legs_6.png",
+	player_legs_7 = "player_legs_7.png",
+	player_legs_8 = "player_legs_8.png",
+	player_legs_9 = "player_legs_9.png",
+	player_legs_10 = "player_legs_10.png",
 
 	player_1 = "player_1.png",
 	player_2 = "player_2.png",
@@ -54,6 +65,17 @@ images = {
 
 	bullet = "bullet.png",
 
+	player_hands_1 = 	"gfx\\player_hands_1.png",
+	player_hands_2 = 	"gfx\\player_hands_2.png",
+	player_hands_3 = 	"gfx\\player_hands_3.png",
+	player_hands_4 = 	"gfx\\player_hands_4.png",
+	player_hands_5 = 	"gfx\\player_hands_5.png",
+	player_hands_6 = 	"gfx\\player_hands_6.png",
+	player_hands_7 = 	"gfx\\player_hands_7.png",
+	player_hands_8 = 	"gfx\\player_hands_8.png",
+	player_hands_9 = 	"gfx\\player_hands_9.png",
+	player_hands_10 = 	"gfx\\player_hands_10.png",
+	
 	player_shotgun_shot_1 = "player_shotgun_shot_1.png",
 	player_shotgun_shot_2 = "player_shotgun_shot_2.png",
 	player_shotgun_shot_3 = "player_shotgun_shot_3.png",

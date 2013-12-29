@@ -40,13 +40,11 @@ world_item = {
 }
 
 assault_rifle_sprite = create_sprite {
-	image = images.assault,
-	size_multiplier = vec2(0.4, 0.4)
+	image = images.assault
 }
 
 shotgun_sprite = create_sprite {
-	image = images.shotgun,
-	size_multiplier = vec2(0.15, 0.15)
+	image = images.shotgun
 }
 
 fireaxe_sprite = create_sprite {
@@ -57,8 +55,8 @@ fireaxe_sprite = create_sprite {
 bare_hands = {
 	weapon_info = create_gun({
 		bullet_damage = minmax(110, 140),
-		swing_interval_ms = 600,
-		swing_duration = 300,
+		swing_interval_ms = 400,
+		swing_duration = 150,
 		is_melee = true,
 		
 		bullet_body = {
@@ -140,7 +138,7 @@ shotgun = {
 	})),
 	
 	animation_index = "SHOTGUN",
-	world_orbit_offset = vec2(0, 0),
+	world_orbit_offset = vec2(70, -8),
 	
 	item_entity = archetyped(world_item, { 
 		render = { 
