@@ -14,6 +14,7 @@ namespace augmentations {
 
 			void set(entity*);
 			entity* get() const;
+			bool exists() const;
 
 			operator entity*() const;
 			entity_ptr& operator=(const entity_ptr&) ;

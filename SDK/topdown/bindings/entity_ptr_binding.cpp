@@ -14,6 +14,7 @@ namespace bindings {
 			.def(luabind::constructor<>())
 			.def(luabind::constructor<entity_system::entity*>())
 			.def("get", &entity_ptr::get)
+			.def("exists", &entity_ptr::exists)
 			.def("set", &entity_ptr::set);
 	}
 }

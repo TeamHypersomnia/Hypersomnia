@@ -31,6 +31,10 @@ namespace augmentations {
 			return ptr;
 		}
 
+		bool entity_ptr::exists() const {
+			return ptr != nullptr;
+		}
+
 		entity_ptr::operator entity*() const {
 			return ptr;
 		}
