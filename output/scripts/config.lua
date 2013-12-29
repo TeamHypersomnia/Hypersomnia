@@ -1,11 +1,11 @@
 config_table = {
 	window_name = "example",
-	fullscreen = 0,
+	fullscreen = 1,
 	window_border = 0,
 	window_x = 0,
 	window_y = 0,
 	bpp = 24,
-	resolution_w = 1200,
+	resolution_w = 1400,
 	resolution_h = 800,
 	doublebuffer = 1
 }

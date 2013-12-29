@@ -6,9 +6,17 @@ function player_class:init()
 end
 
 function player_class:loop()
+	if not self:good_health() then
+		self:drop_weapon(0.5)
+		local player_corpse = self:throw_corpse()
+		
+		world_camera.chase:set_target(player_corpse)
+		world_camera.camera.player:set(player_corpse)
+		--world_camera.camera.crosshair:set(nil)
+	end
 end
 
-player = create_entity_group (archetyped(character_archetype, {
+player = ptr_create_entity_group (archetyped(character_archetype, {
 	body = {
 		transform = {},
 		
@@ -26,8 +34,7 @@ player = create_entity_group (archetyped(character_archetype, {
 		},
 		
 		scriptable = {
-			script_data = player_class,
-			available_scripts = nil
+			script_data = player_class
 		}
 	},
 
@@ -57,18 +64,28 @@ player = create_entity_group (archetyped(character_archetype, {
 	}
 }))
 
-init_npc(player.body, { 
+init_npc(player.body:get(), { 
 	weapon_animation_sets = {
 		BARE_HANDS = npc_animation_body_set,
 		FIREAXE = npc_animation_body_set,
 		ASSAULT_RIFLE = npc_animation_body_shotgun_set,
 		SHOTGUN = npc_animation_body_shotgun_set
-	}}
-)
+	},
+	
+	health_info = {
+		hp = 100,
+		
+		corpse_entity = archetyped(corpse_archetype, {
+			render = {
+				model = corpse_sprite
+			}
+		})			
+	}
+})
 
-get_scripted(player.body):take_weapon_item(assault_rifle)
+get_scripted(player.body:get()):take_weapon_item(shotgun)
 
-set_max_speed(player.body, 7000)
+set_max_speed(player.body:get(), 7000)
 
 main_context = create_input_context {
 	intents = { 
@@ -97,9 +114,9 @@ main_context = create_input_context {
 
 input_system:add_context(main_context)
 
-world_camera.chase:set_target(player.body)
-world_camera.camera.player:set(player.body)
-world_camera.camera.crosshair:set(player.crosshair)
-player.body.gun.target_camera_to_shake:set(world_camera)
+world_camera.chase:set_target(player.body:get())
+world_camera.camera.player:set(player.body:get())
+world_camera.camera.crosshair:set(player.crosshair:get())
+player.body:get().gun.target_camera_to_shake:set(world_camera)
 
 set_zoom_level(world_camera)

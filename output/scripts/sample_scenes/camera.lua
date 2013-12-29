@@ -6,7 +6,7 @@ function set_zoom_level(camera)
 	local new_h = config_table.resolution_h*mult
 	camera.camera.ortho = rect_ltrb(rect_xywh((config_table.resolution_w-new_w)/2, (config_table.resolution_h-new_h)/2, new_w, new_h))
 	
-	player.crosshair.crosshair.size_multiplier = vec2(mult, mult)
+	player.crosshair:get().crosshair.size_multiplier = vec2(mult, mult)
 	target_entity.crosshair.size_multiplier = vec2(mult, mult)
 end
 

@@ -45,6 +45,10 @@ ground_point_archetype = {
 	texcoord = vec2(0, 0)
 }
 
+corpse_sprite = create_sprite {
+	image = images.dead_front
+}
+
 dofile "scripts\\sample_scenes\\map.lua"
 
 small_box_archetype = {
@@ -134,6 +138,37 @@ dofile "scripts\\sample_scenes\\steering.lua"
 dofile "scripts\\sample_scenes\\weapons.lua"
 dofile "scripts\\sample_scenes\\soldier_tree.lua"
 
+npc_damage_handler = create_scriptable_info {
+	scripted_events = {	
+		[scriptable_component.DAMAGE_MESSAGE] = function(message)
+			local npc_info = get_scripted(message.subject)
+			npc_info.health_info.hp = npc_info.health_info.hp - message.amount
+			npc_info.last_impact = message.impact_velocity
+			return false
+		end	
+	}
+}
+
+corpse_archetype = {
+	render = {
+		layer = render_layers.ON_GROUND 
+	},
+	
+	transform = {},
+	physics = {
+		body_type = Box2D.b2_dynamicBody,
+		
+		body_info = {
+			filter = filter_corpses,
+			shape_type = physics_info.RECT,
+			rect_size = corpse_sprite.size,
+			fixed_rotation = true,
+			linear_damping = 5,
+			angular_damping = 3
+		}
+	}
+}
+
 character_archetype = {
 	body = {
 		transform = { 
@@ -216,6 +251,10 @@ character_archetype = {
 		 
 		children = {
 			"legs"
+		},
+		
+		scriptable = {
+			available_scripts = npc_damage_handler
 		}
 	},
 	
@@ -256,8 +295,7 @@ loop_only_info = create_scriptable_info {
 					input_system.quit_flag = 1	
 				elseif message.intent == custom_intents.DROP_WEAPON then
 					if message.state_flag then
-						--get_scripted(player.body):drop_weapon()
-						get_scripted(player.body):pick_up_weapon()
+						if player.body:exists() then get_scripted(player.body:get()):pick_up_weapon() end
 					end
 				elseif message.intent == custom_intents.INSTANT_SLOWDOWN then
 					physics_system.timestep_multiplier = 0.000
@@ -276,10 +314,19 @@ loop_only_info = create_scriptable_info {
 		[scriptable_component.LOOP] = function(subject)
 			my_atlas:_bind()
 			
-			for k, v in pairs(my_npcs) do get_scripted(v.body):loop() end
+			for k, v in pairs(my_npcs) do 
+				if v.body:exists() then 
+					get_scripted(v.body:get()):loop()
+				end 
+			end
+			
+			if player.body:exists() then
+				get_scripted(player.body:get()):loop()
+			end
 		end
 	}
 }
+
 
 myloopscript = create_entity {
 	input = {

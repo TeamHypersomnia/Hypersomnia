@@ -83,7 +83,7 @@ bare_hands = {
 assault_rifle_info = {
 	bullets_once = 1,
 	bullet_distance_offset = vec2(120, 0),
-	bullet_damage = minmax(80, 100),
+	bullet_damage = minmax(80, 110),
 	bullet_speed = minmax(6000, 7000),
 	bullet_render = { model = bullet_sprite, layer = render_layers.BULLETS },
 	is_automatic = true,
@@ -103,7 +103,7 @@ assault_rifle_info = {
 	},
 	
 	max_bullet_distance = 5000,
-	current_rounds = 30000,
+	current_rounds = 30,
 	
 	swing_radius = 100,
 	swing_angle = 90,
@@ -132,10 +132,10 @@ shotgun = {
 		bullet_damage = minmax(80, 100),
 		bullet_speed = minmax(4000, 8000),
 		is_automatic = false,
-		shooting_interval_ms = 500,
+		shooting_interval_ms = 700,
 		spread_degrees = 8,
 		
-		current_rounds = 2,
+		current_rounds = 6,
 		max_rounds = 2
 	})),
 	

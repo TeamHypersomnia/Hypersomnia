@@ -22,13 +22,9 @@ void health_system::process_events(world& owner) {
 
 			if (health->hp < 0.f && !health->dead) {
 				health->dead = true;
-
-
 				auto& transform = it.subject->get<components::transform>();
-				/* shortcut */
+				
 				entity& corpse = owner.create_entity();
-
-				corpse.clear();
 				corpse.add(health->corpse_render);
 				transform.current.rotation = it.impact_velocity.get_degrees();
 				corpse.add(transform);
@@ -38,6 +34,9 @@ void health_system::process_events(world& owner) {
 				body->SetLinearDamping(5.f);
 				body->SetFixedRotation(true);
 				body->ApplyLinearImpulse(it.impact_velocity*2, body->GetWorldCenter());
+
+				messages::destroy_message destroy_children(it.subject);
+
 
 				messages::destroy_message msg;
 				msg.subject = it.subject;

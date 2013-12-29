@@ -125,7 +125,7 @@ return
 			node_type = behaviour_node.SELECTOR,
 			on_update = function(entity) 
 				if get_scripted(entity).is_seen then 
-					entity.lookat.target:set(player.body)
+					entity.lookat.target:set(player.body:get())
 					entity.lookat.look_mode = lookat_component.POSITION
 					return behaviour_node.SUCCESS
 				end
@@ -144,7 +144,7 @@ return
 			on_update = function(entity)
 				if entity.gun.current_rounds > 0 then
 					set_max_speed(entity, 1000)
-					get_scripted(entity):pursue_target(player.body)	
+					get_scripted(entity):pursue_target(player.body:get())	
 					get_scripted(entity).steering_behaviours.wandering.weight_multiplier = 1.0
 					return behaviour_node.RUNNING
 				end
@@ -165,7 +165,7 @@ return
 					set_max_speed(entity, 3000)
 					--npc_behaviour_tree.delay_chase.maximum_running_time_ms = 0
 					
-					get_scripted(entity):pursue_target(player.body)
+					get_scripted(entity):pursue_target(player.body:get())
 				
 					return behaviour_node.RUNNING
 				end
@@ -331,7 +331,7 @@ npc_hands_behaviour_tree = create_behaviour_tree {
 		
 		melee_range = {
 			on_update = function(entity) 
-				if (player.body.transform.current.pos - entity.transform.current.pos):length() < 100 then
+				if (player.body:get().transform.current.pos - entity.transform.current.pos):length() < 100 then
 					entity.gun.is_melee = true
 					gun_trigger(entity, true)
 					return behaviour_node.RUNNING

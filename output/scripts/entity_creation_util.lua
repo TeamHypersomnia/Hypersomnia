@@ -143,3 +143,24 @@ function create_entity_group(entries)
 	
 	return entities_lookup
 end
+
+
+function ptr_create_entity(entry)
+	local result = create_entity(entry)
+	local my_new_ptr = entity_ptr()
+	my_new_ptr:set(result)
+	return result
+end
+
+function ptr_create_entity_group(entries)
+	local results = create_entity_group(entries)
+	
+	for name, entry in pairs(results) do
+		local my_new_ptr = entity_ptr()
+		my_new_ptr:set(entry)
+		results[name] = my_new_ptr
+	end
+	
+	return results
+end
+

@@ -58,7 +58,7 @@ namespace augmentations {
 			bool remove(const key_type& key) {
 				auto it = std::lower_bound(raw.begin(), raw.end(), node(key, value_type()));
 
-				if (it != raw.end() && *it == val) {
+				if (it != raw.end() && (*it).key == key) {
 					raw.erase(it);
 					return true;
 				}
