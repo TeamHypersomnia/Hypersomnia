@@ -27,11 +27,13 @@ namespace bindings {
 			.def("get_radians", &vec2<>::get_radians)
 			.def("set_from_degrees", &vec2<>::set_from_degrees)
 			.def("non_zero", &vec2<>::non_zero)
+			.def("rotate", &vec2<>::rotate<vec2<>>)
 			.def_readwrite("x", &vec2<>::x)
 			.def_readwrite("y", &vec2<>::y)
 			.scope
 			[
-				luabind::def("from_degrees", &vec2<>::from_degrees<float>)
+				luabind::def("from_degrees", &vec2<>::from_degrees<float>),
+				luabind::def("rotated", &augmentations::from_rotation<vec2<>, float>)
 			]
 			;
 	}

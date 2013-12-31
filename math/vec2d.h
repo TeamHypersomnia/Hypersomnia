@@ -45,6 +45,13 @@ namespace augmentations {
 		return v = (rotated + origin);
 	}
 
+	template <class vec, class d>
+	vec from_rotation(vec v, vec origin, d angle) {
+		vec new_vec = v;
+		rotate(new_vec, origin, angle);
+		return new_vec;
+	}
+
 	template <class vec>
 	vec mult(const vec& a, const vec& b) {
 		return vec(a.x * b.x, a.y * b.y);
