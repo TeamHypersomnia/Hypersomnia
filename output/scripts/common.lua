@@ -93,8 +93,8 @@ function archetyped(archetype, entries)
 end
 
 function map_uv_square(texcoords_to_map, texture_to_map)
-	local lefttop = vec2()
-	local bottomright = vec2()
+	local lefttop = vec2(texcoords_to_map:get_vertex(0).pos.x, texcoords_to_map:get_vertex(0).pos.y)
+	local bottomright = vec2(texcoords_to_map:get_vertex(0).pos.x, texcoords_to_map:get_vertex(0).pos.y)
 	
 	for i = 0, texcoords_to_map:get_vertex_count()-1 do
 		local v = texcoords_to_map:get_vertex(i).pos
@@ -106,9 +106,12 @@ function map_uv_square(texcoords_to_map, texture_to_map)
 	
 	for i = 0, texcoords_to_map:get_vertex_count()-1 do
 		local v = texcoords_to_map:get_vertex(i)
+		
 		v:set_texcoord (vec2(
 		(v.pos.x - lefttop.x) / (bottomright.x-lefttop.x),
 		(v.pos.y - lefttop.y) / (bottomright.y-lefttop.y)
 		), texture_to_map)
+		
+		
 	end
 end
