@@ -27,6 +27,15 @@ function init_npc(this_entity, optional_write)
 	if optional_write ~= nil then recursive_write(this_entity.scriptable.script_data, optional_write) end
 	
 	this_entity.scriptable.script_data:init()
+	this_entity.scriptable.script_data.head_entity = create_entity (archetyped(this_entity.scriptable.script_data.head_archetype, {
+		chase = {
+			target = this_entity,
+			chase_type = chase_component.ORBIT,
+			rotation_orbit_offset = vec2(4, 0),
+			chase_rotation = false
+		}
+	}))
+		
 end
 
 function npc_class:create(o)  
@@ -78,6 +87,22 @@ function npc_class:refresh_behaviours()
 end
 
 function npc_class:take_weapon_item(item_data)
+	if self.wielded_entity ~= nil then
+		print "DESTROYING"
+		print "DESTROYING"
+		world:delete_entity(self.wielded_entity, nil)
+		--world:post_message(destroy_message())
+		self.wielded_entity = nil
+	end
+
+	if item_data.wielded_entity ~= nil and item_data ~= bare_hands then 
+		self.wielded_entity = create_entity(archetyped(item_data.wielded_entity, {
+			chase = {
+				target = self.entity
+			}
+		}))
+	end
+	
 	self.entity.gun = gun_component(item_data.weapon_info)
 	
 	self.entity.animate.available_animations = self.weapon_animation_sets[item_data.animation_index]
@@ -134,7 +159,7 @@ function npc_class:drop_weapon(force_multiplier)
 	force_multiplier = force_multiplier or 1
 
 	if self.current_weapon ~= bare_hands then
-		print("dropping weapon...")
+		print("dropping weapon..." .. self.current_weapon.animation_index)
 		self.entity.gun.trigger = false
 		local my_thrown_weapon = spawn_weapon(self.entity.transform.current.pos, self.current_weapon, self.entity.gun)
 		
@@ -193,12 +218,10 @@ function npc_class:good_health()
 end
 
 function npc_class:throw_corpse()
-	local destroy_this = destroy_message()
-	destroy_this.subject = self.entity
-	
 	self.entity:remove_behaviour_tree()
 	
-	world:post_message(destroy_this)
+	world:post_message(destroy_message(self.entity))
+	world:post_message(destroy_message(self.head_entity))
 
 	local thrown_corpse_entity = create_entity (archetyped(self.health_info.corpse_entity, {
 			transform = {

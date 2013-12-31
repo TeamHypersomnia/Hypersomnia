@@ -70,7 +70,9 @@ function set_components_from_entry(entity, entry, entities_lookup)
 	def		(behaviour_tree_component, 'behaviour_tree',  {}, { trees = true })
 	
 	if entry.chase ~= nil then
-		entity.chase:set_target(ptr_lookup(entry.chase.target, entities_lookup))
+		if entry.chase.target ~= nil then 
+			entity.chase:set_target(ptr_lookup(entry.chase.target, entities_lookup))
+		end
 	end
 	
 	if entry.visibility ~= nil then
@@ -87,9 +89,16 @@ function set_components_from_entry(entity, entry, entities_lookup)
 		local my_body_data = physics_info()
 		entry.physics.body_info = entry.physics.body_info or {}
 		
-		if entry.physics.body_info.shape_type ~= nil and entry.physics.body_info.shape_type == physics_info.RECT then
+		if entry.physics.body_info.shape_type == physics_info.RECT then
 			if entry.physics.body_info.rect_size == nil then
 				entry.physics.body_info.rect_size = entry.render.model.size
+			end
+		end
+		
+		if entry.physics.body_info.shape_type == physics_info.POLYGON then
+			if entry.physics.body_info.vertices == nil then
+				print("jeste tu")
+				entry.physics.body_info.vertices = entry.render.model
 			end
 		end
 		
@@ -118,8 +127,19 @@ function set_components_from_entry(entity, entry, entities_lookup)
 end
 
 function create_entity(entry)
+	local enabled = true
+	
+	if entry.enabled ~= nil then
+		enabled = entry.enabled
+	end
+	
 	local new_entity = world:create_entity()
 	set_components_from_entry(new_entity, entry, {})
+	
+	if not enabled then 
+		new_entity:disable()
+	end
+	
 	return new_entity
 end
 

@@ -2,7 +2,6 @@ player_class = inherits_from(npc_class)
 
 function player_class:init()
 	self:take_weapon_item(bare_hands)
-	print("player initialised")
 end
 
 function player_class:loop()
@@ -72,10 +71,10 @@ player = ptr_create_entity_group (archetyped(character_archetype, {
 
 init_npc(player.body:get(), { 
 	weapon_animation_sets = {
-		BARE_HANDS = player_animation_body_set,
-		FIREAXE = player_animation_body_set,
-		ASSAULT_RIFLE = enemy_animation_body_shotgun_set,
-		SHOTGUN = enemy_animation_body_shotgun_set
+		BARE_HANDS = player_animation_bare_hands_set,
+		FIREAXE = player_animation_melee_set,
+		ASSAULT_RIFLE = player_animation_firearm_set,
+		SHOTGUN = player_animation_firearm_set
 	},
 	
 	health_info = {
@@ -86,10 +85,36 @@ init_npc(player.body:get(), {
 				model = corpse_sprite
 			}
 		})			
+	},
+	
+	wield_offsets = npc_wield_offsets,
+	
+	head_archetype =  {
+		transform = {},
+		
+		chase = {
+			--rotation_orbit_offset = vec2(2, 0)
+		},
+		
+		render = {
+			layer = layers.HEADS,
+			model = head_walk_sprite
+		}
 	}
-})
+	}
+)
 
+
+--print(vec2.rotated(vec2(7, 24), vec2(17, -10), 150 ).x, vec2.rotated(vec2(7, 24), vec2(17, -10), 150 ).y)
+--print(get_scripted(player.body:get()).wield_offsets.FIREAXE.swing[1].pos.x, get_scripted(player.body:get()).wield_offsets.FIREAXE.swing[1].pos.y)
+
+get_scripted(player.body:get()):take_weapon_item(fireaxe)
+get_scripted(player.body:get()):drop_weapon(0.5)
+get_scripted(player.body:get()):take_weapon_item(assault_rifle)
+get_scripted(player.body:get()):drop_weapon(0.3)
 get_scripted(player.body:get()):take_weapon_item(shotgun)
+get_scripted(player.body:get()):drop_weapon(0.1)
+--spawn_weapon(assault_rifle)
 
 set_max_speed(player.body:get(), 7000)
 

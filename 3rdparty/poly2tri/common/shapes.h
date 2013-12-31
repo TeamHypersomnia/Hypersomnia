@@ -138,7 +138,8 @@ struct Edge {
         p = &p2;
       } else if (p1.x == p2.x) {
         // Repeat points
-        assert(false);
+		  printf("duplicates found: \nX:%f\nY:%f\n", p1.x, p1.y);
+		  assert(false);
       }
     }
 

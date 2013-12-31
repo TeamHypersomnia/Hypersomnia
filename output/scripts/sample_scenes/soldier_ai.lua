@@ -92,43 +92,6 @@ big_box_archetype = (archetyped(small_box_archetype, {
 	}
 }))
 
-environment = create_entity {
-	render = {
-		model = environment_poly,
-		layer = render_layers.OBJECTS
-	},
-	
-	physics = {
-		body_type = Box2D.b2_staticBody,
-		
-		body_info = {
-			shape_type = physics_info.POLYGON,
-			vertices = environment_poly,
-			filter = filter_static_objects,
-			friction = 0
-		}
-	},
-	
-	particle_emitter = {
-		available_particle_effects = metal_effects
-	},
-	
-	transform = {
-		pos = vec2(-1000, 1000)
-	}
-}
-
-ground = create_entity {
-	render = {
-		model = ground_poly,
-		layer = render_layers.GROUND
-	},
-	
-	transform = {
-		pos = vec2(-1000, 1000)
-	}
-}
-
 bullet_sprite = create_sprite {
 	image = images.bullet,
 	size_multiplier = vec2(1.0, 0.6)
@@ -167,6 +130,22 @@ corpse_archetype = {
 			angular_damping = 3
 		}
 	}
+}
+
+head_walk_sprite = create_sprite {
+	image = images.head_walk
+}
+
+head_gun_sprite = create_sprite {
+	image = images.head_gun
+}
+
+head_shot_sprite = create_sprite {
+	image = images.head_shot
+}
+
+head_over_sprite = create_sprite {
+	image = images.head_over
 }
 
 character_archetype = {
@@ -236,8 +215,8 @@ character_archetype = {
 		
 		movement = {
 			input_acceleration = vec2(30000, 30000),
-			max_speed = 4300,
-			max_speed_animation = 1200,
+			max_speed = 3300,
+			max_speed_animation = 2300,
 			
 			receivers = {
 				{ target = "body", stop_at_zero_movement = false }, 
@@ -279,10 +258,109 @@ character_archetype = {
 		},
 		
 		animate = {
-			available_animations = enemy_animation_legs_set
+			available_animations = player_animation_legs_set
 		}
 	}
 }
+
+npc_wield_offsets = {
+	HEAD = {
+		shot = {
+			{ pos = vec2(0, 0)  },
+			{ pos = vec2(-1, 0)  },
+			{ pos = vec2(-2, 0)  },
+			{ pos = vec2(-4, 0)  },
+			{ pos = vec2(-6, 0)  }
+		},
+		
+		walk = {
+			{ pos = vec2(0, 0) },
+			{ pos = vec2(-1, 0) },
+			{ pos = vec2(-2, 0) },
+			{ pos = vec2(-3, 0) },
+			{ pos = vec2(-4, 0) }
+		},
+		
+		walk_cw = {
+			{ pos = vec2(0, 0)  },
+			{ pos = vec2(1, 0)  },
+			{ pos = vec2(2, 0)  },
+			{ pos = vec2(3, 0)  },
+			{ pos = vec2(4, 0)  }
+		},
+		
+		swing = {
+			{ pos = vec2(0, 0)   },
+			{ pos = vec2(0, 1)   },
+			{ pos = vec2(1, 2)  },
+			{ pos = vec2(0, 3)   },
+			{ pos = vec2(0, 4)   }
+		},
+		
+		swing_cw = {
+			{ pos = vec2(0, 0) },
+			{ pos = vec2(0, -1) },
+			{ pos = vec2(-1, -2) },
+			{ pos = vec2(0,  -3) },
+			{ pos = vec2(0,  -4) }
+		}
+	
+	},
+	
+	FIREAXE = {
+		walk = {
+			{ rotation = 180, pos = vec2(7, 24) },
+			{ rotation = 180, pos = vec2(6, 24) },
+			{ rotation = 180, pos = vec2(7, 23) },
+			{ rotation = 180, pos = vec2(6, 24) },
+			{ rotation = 180, pos = vec2(7, 24) }
+		},
+		
+		walk_cw = {
+			{ rotation = 0, pos = vec2(7, -24), flip = true },
+			{ rotation = 0, pos = vec2(6, -24), flip = true },
+			{ rotation = 0, pos = vec2(7, -23), flip = true },
+			{ rotation = 0, pos = vec2(6, -24), flip = true },
+			{ rotation = 0, pos = vec2(7, -24), flip = true }
+		},
+		
+		swing = {
+			{ rotation = 150, pos = vec2(-5, 5)   + vec2.rotated(vec2(7, 24), vec2(17, -10), -30 ) },
+			{ rotation = 120, pos = vec2(-8, 7)   + vec2.rotated(vec2(7, 24), vec2(17, -10), -60 ) },
+			{ rotation = 90,  pos = vec2(-10, 10) + vec2.rotated(vec2(7, 24), vec2(17, -10), -90 )  },
+			{ rotation = 60,  pos = vec2(-12, 12) + vec2.rotated(vec2(7, 24), vec2(17, -10), -120 )  },
+			{ rotation = 30,  pos = vec2(-15, 15) + vec2.rotated(vec2(7, 24), vec2(17, -10), -150 )  }
+		},
+		
+		swing_cw = {
+			{ rotation = 30,  pos = vec2(-15, -15) + vec2.rotated(vec2(7, 24), vec2(17, -10), -150 ) , flip = true },
+			{ rotation = 60,  pos = vec2(-12, -12) + vec2.rotated(vec2(7, 24), vec2(17, -10), -120 ) , flip = true },
+			{ rotation = 90,  pos = vec2(-10, -10) + vec2.rotated(vec2(7, 24), vec2(17, -10), -90 ) , flip = true },
+			{ rotation = 120, pos = vec2(-8, -7)   + vec2.rotated(vec2(7, 24), vec2(17, -10), -60 ), flip = true },
+			{ rotation = 150, pos = vec2(-5, -5)   + vec2.rotated(vec2(7, 24), vec2(17, -10), -30 ), flip = true }
+		}
+	},
+	
+	SHOTGUN = {
+		walk = {
+			{ rotation = 0, pos = vec2(35, 10) },
+			{ rotation = 0, pos = vec2(36, 10) },
+			{ rotation = 0, pos = vec2(37, 10) },
+			{ rotation = 0, pos = vec2(39, 10) },
+			{ rotation = 0, pos = vec2(40, 10) }
+		},
+		
+		shot = {
+			{ rotation = 0, pos = vec2(34, 10)  },
+			{ rotation = 0, pos = vec2(33, 10)  },
+			{ rotation = 0, pos = vec2(32, 10)  },
+			{ rotation = 0, pos = vec2(30, 10)  },
+			{ rotation = 0, pos = vec2(28, 10)  }
+		}
+	}
+}
+
+npc_wield_offsets.ASSAULT_RIFLE = archetyped(npc_wield_offsets.SHOTGUN, {})
 
 dofile "scripts\\sample_scenes\\npc.lua"
 dofile "scripts\\sample_scenes\\player.lua"
@@ -321,8 +399,33 @@ loop_only_info = create_scriptable_info {
 			end
 			
 			if player.body:exists() then
-				get_scripted(player.body:get()):loop()
+				local player_info = get_scripted(player.body:get())
+				player_info:loop()
+			
+				if player.body:get().gun.trigger or player.body:get().gun.is_swinging then
+					player_info.head_entity.render.model = head_shot_sprite
+				elseif player_info.current_weapon.animation_index == "BARE_HANDS" then
+					player_info.head_entity.render.model = head_walk_sprite
+				else
+					player_info.head_entity.render.model = head_gun_sprite
+				end
+				
 			end
+			-- correct animations after checking this
+			-- correct animations after checking this
+			-- correct animations after checking this
+			-- correct animations after checking this
+			-- correct animations after checking this
+			-- correct animations after checking this
+			-- correct animations after checking this
+			--local ppos = player.body:get().transform.current.pos
+			----render_system:push_non_cleared_line(debug_line(vec2(0, 0), vec2(1000, 1000),  rgba(0, 255, 0, 255)))
+			--render_system:push_line(debug_line(ppos, ppos+vec2(7, 24), rgba(0, 0, 255, 255)))
+			--render_system:push_line(debug_line(ppos, ppos+vec2(17, -10), rgba(0, 255, 0, 255)))
+			--
+			--for i=1, 90 do
+			--render_system:push_line(debug_line(ppos, ppos+vec2.rotated(vec2(7, 24), vec2(17, -10), -i), rgba(255, 0, 0, 255)))
+			--end
 		end
 	}
 }

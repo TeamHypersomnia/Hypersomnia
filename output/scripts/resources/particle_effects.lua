@@ -143,7 +143,7 @@ barrel_explosion = {
 
 barrel_smoke_1 = {
 	spread_degrees = 0.0,
-	particles_per_sec = minmax(300, 400),
+	particles_per_sec = minmax(100, 250),
 	stream_duration_ms = minmax(100, 600),
 	type = emission.STREAM,
 	velocity = minmax(300, 500),

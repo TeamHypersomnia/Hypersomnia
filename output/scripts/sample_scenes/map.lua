@@ -214,7 +214,7 @@ floor_archetype = {
 	},
 	
 	render = {
-		layer = render_layers.GROUND
+		--layer = render_layers.GROUND
 	}
 }
 
@@ -235,7 +235,7 @@ wall_archetype = archetyped(floor_archetype, {
 	},
 	
 	render = {
-		layer = render_layers.OBJECTS
+		--layer = render_layers.OBJECTS
 	}
 })
 
@@ -266,16 +266,20 @@ function create_poly (poly_vertices, image_to_map, pick_archetype, reverse_order
 	}))
 end
 
-function create_wall(poly_vertices, image_to_map, reverse_order)
-	create_poly (poly_vertices, image_to_map, wall_archetype, reverse_order)
+function create_wall(poly_vertices, image_to_map, reverse_order, rlayer)	
+	if rlayer == nil then
+		rlayer = render_layers.OBJECTS
+	end
+	
+	create_poly (poly_vertices, image_to_map,  archetyped(wall_archetype, {render = {layer = rlayer } }), reverse_order)
 end
 
-function create_floor(poly_vertices, image_to_map, reverse_order)
-	create_poly (poly_vertices, image_to_map, floor_archetype, reverse_order)
+function create_floor(poly_vertices, image_to_map, reverse_order, rlayer)
+	if rlayer == nil then
+		rlayer = render_layers.GROUND
+	end
+	create_poly (poly_vertices, image_to_map, archetyped(floor_archetype, {render = { layer = rlayer } }), reverse_order)
 end
-
-
-
 
 
 
@@ -294,6 +298,6 @@ create_floor( {
 		vec2(-100, -100) + vec2(500, 500),
 		vec2(-100, -100) + vec2(0, 500)
 		},
-		images.background)
+		images.background, false)
 
 		

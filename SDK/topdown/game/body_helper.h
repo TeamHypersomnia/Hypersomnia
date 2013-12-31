@@ -23,6 +23,8 @@ namespace topdown {
 		augmentations::vec2<> rect_size;
 		b2Filter filter;
 
+		int body_type;
+
 		float density, friction, restitution, angular_damping, linear_damping;
 		bool fixed_rotation, sensor;
 

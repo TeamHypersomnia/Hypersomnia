@@ -39,6 +39,8 @@ world_item = {
 	}
 }
 
+
+
 assault_rifle_sprite = create_sprite {
 	image = images.assault
 }
@@ -48,8 +50,28 @@ shotgun_sprite = create_sprite {
 }
 
 fireaxe_sprite = create_sprite {
-	image = images.fireaxe,
-	size_multiplier = vec2(0.2, 0.2)
+	image = images.fireaxe
+}
+
+shotgun_wielded_sprite = create_sprite {
+	image = images.shotgun_wielded
+}
+
+assault_wielded_sprite = create_sprite {
+	image = images.assault_wielded
+}
+
+wielded_item_archetype = {
+	render = {
+		layer = render_layers.WIELDED
+	},
+	
+	transform = {},
+	chase = {
+		chase_rotation = true,
+		relative = false,
+		chase_type = chase_component.ORBIT
+	}
 }
 
 bare_hands = {
@@ -75,12 +97,14 @@ bare_hands = {
 		--query_vertices = 7
 	}),
 	
-	animation_index = "BARE_HANDS"
+	animation_index = "BARE_HANDS",
+	
+	wielded_entity = {}
 }
 
 assault_rifle_info = {
 	bullets_once = 1,
-	bullet_distance_offset = vec2(120, 0),
+	bullet_distance_offset = vec2(70, 10),
 	bullet_damage = minmax(80, 110),
 	bullet_speed = minmax(6000, 7000),
 	bullet_render = { model = bullet_sprite, layer = render_layers.BULLETS },
@@ -121,7 +145,15 @@ assault_rifle = {
 		render = { 
 			model = assault_rifle_sprite
 		}
-	}) 
+	}),
+	
+	wielded_entity = archetyped(wielded_item_archetype, {
+		render = { 
+			model = assault_wielded_sprite,
+			layer = render_layers.WIELDED_GUNS
+			--model = assault_rifle_topdown_sprite
+		}
+	})	
 }
 
 shotgun = {
@@ -144,7 +176,15 @@ shotgun = {
 		render = { 
 			model = shotgun_sprite
 		}
-	}) 
+	}),
+	
+	wielded_entity = archetyped(wielded_item_archetype, {
+		render = { 
+			--model = nil
+			model = shotgun_wielded_sprite,
+			layer = render_layers.WIELDED_GUNS
+		}
+	})	
 }
 
 fireaxe = {
@@ -171,10 +211,17 @@ fireaxe = {
 	}),
 	
 	animation_index = "FIREAXE",
+	world_orbit_offset = vec2(0, 0),
 	
 	item_entity = archetyped(world_item, { 
 		render = { 
 			model = fireaxe_sprite
 		}
-	}) 
+	}),
+	
+	wielded_entity = archetyped(wielded_item_archetype, {
+		render = { 
+			model = fireaxe_sprite
+		}
+	})	
 }

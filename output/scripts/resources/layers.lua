@@ -2,11 +2,14 @@ render_layers = {
 	GUI_OBJECTS = 0,
 	EFFECTS = 1,
 	OBJECTS = 2,
-	PLAYERS = 3,
-	BULLETS = 4,
-	LEGS = 5,
-	ON_GROUND = 6,
-	GROUND = 7
+	HEADS = 3,
+	WIELDED_GUNS = 4,
+	PLAYERS = 5,
+	BULLETS = 6,
+	WIELDED = 7,
+	LEGS = 8,
+	ON_GROUND = 9,
+	GROUND = 10
 }
 
 custom_intents = create_inverse_enum {
