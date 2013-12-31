@@ -23,7 +23,7 @@ void chase_system::process_entities(world&) {
 
 		auto& target_transform = chase.target->get<components::transform>().current;
 
-		if (chase.type == components::chase::chase_type::OFFSET) {
+		if (chase.chase_type == components::chase::chase_type::OFFSET) {
 			if (chase.relative) {
 				chase.offset = transform.pos - chase.previous;
 				chase.rotation_offset = transform.rotation - chase.rotation_previous;
@@ -41,7 +41,7 @@ void chase_system::process_entities(world&) {
 			chase.previous = target_transform.pos;
 			chase.rotation_previous = target_transform.rotation;
 		}
-		else if (chase.type == components::chase::chase_type::ORBIT) {
+		else if (chase.chase_type == components::chase::chase_type::ORBIT) {
 			transform.pos = target_transform.pos + chase.rotation_orbit_offset;
 			transform.pos.rotate(target_transform.rotation, target_transform.pos);
 			transform.rotation = target_transform.rotation + chase.rotation_offset;

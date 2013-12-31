@@ -161,7 +161,7 @@ void particle_emitter_system::process_events(world& owner) {
 			if (target_chase) {
 				auto& subject_transform = it.subject->get<components::transform>().current;
 				*target_chase = components::chase(it.subject);
-				target_chase->type = components::chase::chase_type::ORBIT;
+				target_chase->chase_type = components::chase::chase_type::ORBIT;
 				target_chase->rotation_offset = target_rotation - subject_transform.rotation;
 				target_chase->rotation_orbit_offset = (it.pos - subject_transform.pos).rotate(-subject_transform.rotation, vec2<>(0.f, 0.f));
 			}
