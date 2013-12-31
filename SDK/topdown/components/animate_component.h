@@ -34,6 +34,7 @@ namespace components {
 	private:
 		friend class animation_system;
 
+		luabind::object saved_callback_out;
 		resources::animation* current_animation;
 
 		int current_priority;

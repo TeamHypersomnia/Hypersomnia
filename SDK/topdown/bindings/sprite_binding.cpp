@@ -14,6 +14,7 @@ namespace bindings {
 			.def(luabind::constructor<>())
 			.def_readwrite("size", &sprite::size)
 			.def_readwrite("image", &sprite::tex)
+			.def_readwrite("rotation_offset", &sprite::rotation_offset)
 			.def_readwrite("color", &sprite::color)
 			.def("update_size", &sprite::update_size);
 	}

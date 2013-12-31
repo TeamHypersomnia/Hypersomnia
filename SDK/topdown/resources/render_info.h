@@ -29,6 +29,7 @@ namespace resources {
 		texture_baker::texture* tex;
 		graphics::pixel_32 color;
 		vec2<> size;
+		float rotation_offset;
 
 		sprite(texture_baker::texture* = nullptr, graphics::pixel_32 = graphics::pixel_32());
 

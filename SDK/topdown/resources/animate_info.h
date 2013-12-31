@@ -7,10 +7,12 @@ namespace resources {
 		struct frame {
 			/* function that is called once this frame enters */
 			luabind::object callback;
+			/* function that is called once this frame quits */
+			luabind::object callback_out;
 
 			sprite model;
 			float duration_milliseconds;
-			frame(sprite model, float duration_milliseconds, luabind::object callback = luabind::object());
+			frame(sprite model, float duration_milliseconds, luabind::object callback = luabind::object(), luabind::object callback_out = luabind::object());
 		};
 
 		std::vector<frame> frames;
@@ -30,8 +32,8 @@ namespace resources {
 		}
 
 		template <typename T>
-		void add_frame(T* model, float duration_milliseconds, luabind::object callback) {
-			frames.push_back(frame(*model, duration_milliseconds, callback));
+		void add_frame(T* model, float duration_milliseconds, luabind::object callback, luabind::object callback_out) {
+			frames.push_back(frame(*model, duration_milliseconds, callback, callback_out));
 		}
 	};
 }

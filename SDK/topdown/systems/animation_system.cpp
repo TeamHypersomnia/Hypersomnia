@@ -72,18 +72,22 @@ void animation_system::process_events(world& owner) {
 	}
 }
 
-void components::animate::set_current_frame(unsigned number, augmentations::entity_system::entity* subject) {
-	current_frame = number;
-	auto callback = current_animation->frames[current_frame].callback;
-
-	if (callback) {
+void call(luabind::object func, augmentations::entity_system::entity* subject) {
+	if (func) {
 		try {
-			luabind::call_function<void>(callback, subject);
+			luabind::call_function<void>(func, subject);
 		}
 		catch (std::exception compilation_error) {
 			std::cout << compilation_error.what() << '\n';
 		}
 	}
+}
+
+void components::animate::set_current_frame(unsigned number, augmentations::entity_system::entity* subject) {
+	call(saved_callback_out, subject);
+	current_frame = number;
+	call(current_animation->frames[current_frame].callback, subject);
+	saved_callback_out = current_animation->frames[current_frame].callback_out;
 }
 
 void animation_system::process_entities(world& owner) {

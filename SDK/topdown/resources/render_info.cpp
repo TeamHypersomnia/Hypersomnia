@@ -40,7 +40,7 @@ namespace resources {
 		return std::vector<vec2<>>();
 	}
 
-	sprite::sprite(texture_baker::texture* tex, graphics::pixel_32 color) : tex(tex), color(color) {
+	sprite::sprite(texture_baker::texture* tex, graphics::pixel_32 color) : tex(tex), color(color), rotation_offset(0.f) {
 		set(tex, color);
 	}
 
@@ -60,7 +60,7 @@ namespace resources {
 	void sprite::draw(buffer& triangles, const components::transform::state& transform, vec2<> camera_pos, components::render* additional_info) {
 		if (tex == nullptr) return;
 		vec2<> v[4];
-		make_rect(transform.pos - camera_pos, vec2<>(size), transform.rotation, v);
+		make_rect(transform.pos - camera_pos, vec2<>(size), transform.rotation + rotation_offset, v);
 
 		vertex_triangle t1, t2;
 		t1.vertices[0].color = t2.vertices[0].color = color;

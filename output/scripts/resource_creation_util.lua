@@ -105,11 +105,11 @@ function create_animation(entries)
 		-- shortcut
 		local m = entries.frames[i].model
 		if m == nil then
-			my_animation:add_frame(create_sprite { image = nil }, entries.frames[i].duration_ms, entries.frames[i].callback)
+			my_animation:add_frame(create_sprite { image = nil }, entries.frames[i].duration_ms, entries.frames[i].callback, entries.frames[i].callback_out)
 		elseif type(m) == "userdata" then
-			my_animation:add_frame(create_sprite{ image = m } , entries.frames[i].duration_ms, entries.frames[i].callback)
+			my_animation:add_frame(create_sprite{ image = m } , entries.frames[i].duration_ms, entries.frames[i].callback, entries.frames[i].callback_out)
 		else
-			my_animation:add_frame(create_sprite(m), entries.frames[i].duration_ms, entries.frames[i].callback)
+			my_animation:add_frame(create_sprite(m), entries.frames[i].duration_ms, entries.frames[i].callback, entries.frames[i].callback_out)
 		end
 	end
 	
