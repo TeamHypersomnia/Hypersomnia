@@ -50,7 +50,7 @@ void render_system::draw(rects::xywh visible_area, components::transform::state 
 		if (it->get<components::render>().mask == mask)
 			entities_by_mask.push_back(it);
 	}
-
+	 
 	for (auto e : entities_by_mask) {
 		auto& render = e->get<components::render>();
 		if (render.model == nullptr) continue;
@@ -68,7 +68,7 @@ void render_system::draw(rects::xywh visible_area, components::transform::state 
 
 	for (auto e : visible_targets) {
 		if (e.first->model == nullptr) continue;
-		e.first->model->draw(triangles, *e.second, camera_transform.pos);
+		e.first->model->draw(triangles, *e.second, camera_transform.pos, e.first);
 	}
 
 	last_camera = camera_transform;

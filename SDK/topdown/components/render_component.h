@@ -17,6 +17,9 @@ namespace components {
 		unsigned layer;
 		unsigned mask;
 
-		render(resources::renderable* model = nullptr) : model(model), layer(0), mask(mask_type::WORLD) {}
+		bool flip_horizontally;
+		bool flip_vertically;
+
+		render(resources::renderable* model = nullptr) : model(model), layer(0), mask(mask_type::WORLD), flip_horizontally(false), flip_vertically(false) {}
 	};
 }

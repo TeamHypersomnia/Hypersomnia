@@ -20,7 +20,7 @@ namespace resources {
 	struct renderable {
 		static void make_rect(vec2<> pos, vec2<> size, float rotation_degrees, vec2<> out[4]);
 
-		virtual void draw(buffer&, const components::transform::state&, vec2<> camera_pos) = 0;
+		virtual void draw(buffer&, const components::transform::state&, vec2<> camera_pos, components::render* additional_info = nullptr) = 0;
 		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) = 0;
 		virtual std::vector<vec2<>> get_vertices();
 	};
@@ -35,7 +35,7 @@ namespace resources {
 		void set(texture_baker::texture*, graphics::pixel_32);
 		void update_size();
 
-		virtual void draw(buffer&, const components::transform::state&, vec2<> camera_pos) override;
+		virtual void draw(buffer&, const components::transform::state&, vec2<> camera_pos, components::render* additional_info = nullptr) override;
 		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) override;
 		virtual std::vector<vec2<>> get_vertices() override;
 	};
@@ -90,7 +90,7 @@ namespace resources {
 		/* construct a set of convex polygons from a potentially concave polygon */
 		void add_concave(const concave&);
 
-		virtual void draw(buffer&, const components::transform::state&, vec2<> camera_pos) override;
+		virtual void draw(buffer&, const components::transform::state&, vec2<> camera_pos, components::render* additional_info = nullptr) override;
 		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) override;
 		virtual std::vector<vec2<>> get_vertices() override;
 	};

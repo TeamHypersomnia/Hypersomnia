@@ -57,7 +57,7 @@ namespace resources {
 			size = tex->get_size();
 	}
 
-	void sprite::draw(buffer& triangles, const components::transform::state& transform, vec2<> camera_pos) {
+	void sprite::draw(buffer& triangles, const components::transform::state& transform, vec2<> camera_pos, components::render* additional_info) {
 		if (tex == nullptr) return;
 		vec2<> v[4];
 		make_rect(transform.pos - camera_pos, vec2<>(size), transform.rotation, v);
@@ -67,10 +67,28 @@ namespace resources {
 		t1.vertices[1].color = t2.vertices[1].color = color;
 		t1.vertices[2].color = t2.vertices[2].color = color;
 
-		t1.vertices[0].texcoord = t2.vertices[0].texcoord = vec2<>(0.f, 0.f);
-		t2.vertices[1].texcoord = vec2<>(1.f, 0.f);
-		t1.vertices[1].texcoord = t2.vertices[2].texcoord = vec2<>(1.f, 1.f);
-		t1.vertices[2].texcoord = vec2<>(0.f, 1.f);
+		vec2<> texcoords[] = {
+			vec2<>(0.f, 0.f),
+			vec2<>(1.f, 0.f),
+			vec2<>(1.f, 1.f),
+			vec2<>(0.f, 1.f)
+		};
+
+		if (additional_info) {
+			if (additional_info->flip_horizontally) 
+				for (auto& v : texcoords)
+					v.x = 1.f - v.x; 
+			if (additional_info->flip_vertically)
+				for (auto& v : texcoords)
+					v.y = 1.f - v.y;
+		}
+
+		t1.vertices[0].texcoord = t2.vertices[0].texcoord = texcoords[0];
+		t2.vertices[1].texcoord =							texcoords[1];
+		t1.vertices[1].texcoord = t2.vertices[2].texcoord = texcoords[2];
+		t1.vertices[2].texcoord =							texcoords[3];
+
+	
 
 		for (int i = 0; i < 3; ++i) {
 			tex->get_uv(t1.vertices[i].texcoord);
@@ -259,7 +277,7 @@ namespace resources {
 	//	convex_models.push_back(model);
 	//}
 
-	void polygon::draw(buffer& triangles, const components::transform::state& transform, vec2<> camera_pos) {
+	void polygon::draw(buffer& triangles, const components::transform::state& transform, vec2<> camera_pos, components::render*) {
 		vertex_triangle new_tri;
 		
 		auto model_transformed = model;
@@ -278,7 +296,7 @@ namespace resources {
 }
 
 namespace components {
-	void particle_group::draw(resources::buffer& triangles, const components::transform::state& transform, vec2<> camera_pos) {
+	void particle_group::draw(resources::buffer& triangles, const components::transform::state& transform, vec2<> camera_pos, components::render*) {
 		for (auto& s : stream_slots)
 			for (auto& it : s.particles.particles) {
 				auto temp_alpha = it.face.color.a;

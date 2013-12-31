@@ -34,6 +34,8 @@ namespace bindings {
 			.def_readwrite("mask", &render::mask)
 			.def_readwrite("layer", &render::layer)
 			.def_readwrite("model", &render::model)
+			.def_readwrite("flip_horizontally", &render::flip_horizontally)
+			.def_readwrite("flip_vertically", &render::flip_vertically)
 			.enum_("mask_type")[
 				luabind::value("WORLD", render::mask_type::WORLD),
 				luabind::value("GUI", render::mask_type::GUI)
