@@ -21,6 +21,7 @@ namespace bindings {
 			,
 
 			luabind::class_<vertex>("vertex")
+			.def(luabind::constructor<vec2<>>())
 			.def(luabind::constructor<vec2<>, vec2<>, graphics::pixel_32, texture_baker::texture*>())
 			.def("set_texcoord", &vertex::set_texcoord)
 			.def_readwrite("pos", &vertex::pos)

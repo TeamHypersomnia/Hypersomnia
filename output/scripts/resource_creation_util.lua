@@ -60,6 +60,20 @@ function create_polygon(entries)
 	return my_polygon
 end
 
+
+function simple_create_polygon(entries) 
+	local my_polygon = polygon()
+	local my_concave = drawable_concave()
+	
+	for k, vert in pairs(entries) do
+		my_concave:add_vertex(vertex(vert))
+	end
+	
+	my_polygon:add_concave(my_concave)
+	
+	return my_polygon
+end
+
 function create_polygon_with_holes(entries) 
 	local my_polygon = polygon()
 	local my_concave_set = concave_set()
@@ -91,11 +105,11 @@ function create_animation(entries)
 		-- shortcut
 		local m = entries.frames[i].model
 		if m == nil then
-			my_animation:add_frame(create_sprite { image = nil }, entries.frames[i].duration_ms)
+			my_animation:add_frame(create_sprite { image = nil }, entries.frames[i].duration_ms, entries.frames[i].callback)
 		elseif type(m) == "userdata" then
-			my_animation:add_frame(create_sprite{ image = m } , entries.frames[i].duration_ms)
+			my_animation:add_frame(create_sprite{ image = m } , entries.frames[i].duration_ms, entries.frames[i].callback)
 		else
-			my_animation:add_frame(create_sprite(m), entries.frames[i].duration_ms)
+			my_animation:add_frame(create_sprite(m), entries.frames[i].duration_ms, entries.frames[i].callback)
 		end
 	end
 	
