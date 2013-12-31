@@ -32,6 +32,8 @@ namespace bindings {
 			.def("clear", &entity::clear)
 			.def(luabind::const_self == luabind::const_self)
 			.def_readwrite("name", &entity::name)
+			.def("enable", &entity::enable)
+			.def("disable", &entity::disable)
 
 			.def("remove_animate", &entity::remove<animate>)
 			.def("add", &entity::add<animate>)

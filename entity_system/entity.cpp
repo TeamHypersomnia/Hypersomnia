@@ -5,7 +5,7 @@
 
 namespace augmentations {
 	namespace entity_system {
-		entity::entity(world& owner_world) : owner_world(owner_world) {}
+		entity::entity(world& owner_world) : owner_world(owner_world), enabled(true) {}
 		entity::~entity() {
 			int breakpoint = 11;
 		}
@@ -15,6 +15,7 @@ namespace augmentations {
 		}
 
 		void entity::clear() {
+			if (!enabled) enable();
 			/* user may have already removed all components using templated remove
 			but anyway world calls this function during deletion */
 			if (type_to_component.raw.empty())
@@ -36,6 +37,32 @@ namespace augmentations {
 			}
 
 			type_to_component.raw.clear();
+		}
+
+		void entity::enable() {
+				if (enabled) return;
+				signature_matcher_bitset my_signature(get_components());
+
+				for (auto sys : owner_world.get_all_systems())
+					/* if a processing_system matches with this */
+				if (sys->components_signature.matches(my_signature))
+					/* we should add this entity there */
+					sys->add(this);
+
+				enabled = true;
+		}
+
+		void entity::disable() {
+			if (!enabled) return;
+			signature_matcher_bitset my_signature(get_components());
+
+			for (auto sys : owner_world.get_all_systems())
+				/* if a processing_system matches with this */
+			if (sys->components_signature.matches(my_signature))
+				/* we should remove this entity from there */
+				sys->remove(this);
+
+			enabled = false;
 		}
 	}
 }

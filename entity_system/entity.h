@@ -14,6 +14,8 @@ namespace augmentations {
 			friend class type_registry;
 			friend class entity_ptr;
 
+			bool enabled;
+
 			entity(world& owner_world);
 			~entity();
 
@@ -34,6 +36,9 @@ namespace augmentations {
 
 			/* removes all components */
 			void clear();
+
+			void enable();
+			void disable();
 
 			/* get specified component */
 			template<class component_class>
@@ -61,6 +66,8 @@ namespace augmentations {
 
 			template <typename component_type>
 			component_type& add(const component_type& object = component_type()) {
+				if (!enabled) enable();
+
 				signature_matcher_bitset old_signature(get_components());
 
 				/* component already exists, overwrite and return */
@@ -93,6 +100,8 @@ namespace augmentations {
 
 			template <typename component_type>
 			void remove() {
+				if (!enabled) enable();
+
 				signature_matcher_bitset old_signature(get_components());
 
 				/* try to find and obtain iterator */

@@ -43,8 +43,9 @@ print("Calling commands.lua...")
 
 
 
-print(get_scripted(my_npcs[1].body).is_seen)
+--print(get_scripted(my_npcs[1].body).is_seen)
 
+wielded_item:enable()
 
 --create_entity { 
 --}
