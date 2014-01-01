@@ -87,26 +87,31 @@ function npc_class:refresh_behaviours()
 end
 
 function npc_class:take_weapon_item(item_data)
+	self.entity.animate:set_current_animation_set(self.weapon_animation_sets[item_data.animation_index], self.entity)
+	
+	self.entity.gun.trigger = false
+	self.entity.gun.is_swinging = false
+	
 	if self.wielded_entity ~= nil then
-		print "DESTROYING"
-		print "DESTROYING"
-		world:delete_entity(self.wielded_entity, nil)
-		--world:post_message(destroy_message())
+		local msg = destroy_message()
+		self.wielded_entity.name = "wielded_entity"
+		msg.subject = self.wielded_entity
+		world:post_destroy_message(msg)
 		self.wielded_entity = nil
 	end
 
-	if item_data.wielded_entity ~= nil and item_data ~= bare_hands then 
+	--if item_data.wielded_entity ~= nil and item_data ~= bare_hands then 
 		self.wielded_entity = create_entity(archetyped(item_data.wielded_entity, {
 			chase = {
 				target = self.entity
 			}
 		}))
-	end
+	--end
 	
 	self.entity.gun = gun_component(item_data.weapon_info)
 	
-	self.entity.animate.available_animations = self.weapon_animation_sets[item_data.animation_index]
 	self.current_weapon = item_data
+	self.entity.gun:set_bullet_filter(create(b2Filter, self.weapon_bullet_filter))
 	print("taking weapon...\n" .. item_data.animation_index)
 end
 
@@ -126,7 +131,7 @@ function npc_class:take_weapon(weapon_entity)
 	
 	local msg = destroy_message()
 	msg.subject = weapon_entity
-	world:post_message(msg)
+	world:post_destroy_message(msg)
 end
 
 function spawn_weapon(position, item_archetype, instance_data)
@@ -204,12 +209,14 @@ function npc_class:pursue_target(target_entity)
 	self.steering_behaviours.pursuit.target_from:set(target_entity)
 	self.steering_behaviours.pursuit.enabled = true
 	self.steering_behaviours.obstacle_avoidance.enabled = false
+	--print(debug.traceback())
 	self.steering_behaviours.sensor_avoidance.target_from:set(target_entity)
 end
 
 function npc_class:stop_pursuit()	
 	self.steering_behaviours.pursuit.enabled = false
 	self.steering_behaviours.obstacle_avoidance.enabled = true
+	--print(debug.traceback())
 	self.steering_behaviours.sensor_avoidance.target_from:set(self.target_entities.navigation)
 end
 
@@ -220,8 +227,15 @@ end
 function npc_class:throw_corpse()
 	self.entity:remove_behaviour_tree()
 	
-	world:post_message(destroy_message(self.entity))
-	world:post_message(destroy_message(self.head_entity))
+	local msg = destroy_message()
+	msg.subject = self.entity
+	world:post_destroy_message(msg)
+	--msg.subject = self.head_entity
+	--world:post_destroy_message(msg)
+	
+	
+	--world:delete_entity(self.entity, nil)
+	--world:delete_entity(self.head_entity, nil)
 
 	local thrown_corpse_entity = create_entity (archetyped(self.health_info.corpse_entity, {
 			transform = {
@@ -231,6 +245,12 @@ function npc_class:throw_corpse()
 		}
 	))
 	
+	self.head_entity.chase:set_target(thrown_corpse_entity)
+	
+	self.head_entity.chase.chase_type = chase_component.ORBIT
+	self.head_entity.chase.chase_rotation = true
+	self.head_entity.chase.rotation_orbit_offset = vec2(55, 0)
+	self.head_entity.chase.rotation_offset = 90
 	local corpse_body = thrown_corpse_entity.physics.body
 	corpse_body:ApplyLinearImpulse(b2Vec2(self.last_impact.x*2, self.last_impact.y*2), corpse_body:GetWorldCenter())
 	
@@ -309,13 +329,86 @@ function npc_class:loop()
 	return true
 end
 
+transform_positions = {
+	vec2(474 , -480),
+	vec2(941 , -279),
+	vec2(1261, -136),
+	vec2(1300, -700),
+	vec2(1967, -333),
+	-- trojka na niebieskim
+	vec2(1255, -1048),
+	vec2(1508, -1184),
+	vec2(1657, -977),
+	
+	--dwojka z lewej
+	vec2(540, -1263),
+	vec2(871, -690),
+	
+	--  w lewym gornym
+	vec2(314, -1651),
+	
+	-- w gornym
+	vec2(1667, -1446),
+	
+	-- prawy dolny
+	vec2(1890, -626),
+	vec2(2457, -354),
+	
+	--prawy
+	vec2(2125, -1088)
+	
+}
 
-npc_count = 0
+head_images = {
+	images.head_1, 
+	images.head_2, 
+	images.head_3, 
+	images.head_4, 
+	images.head_5, 
+	images.head_6, 
+	images.head_7, 
+	images.head_8, 
+	images.head_9, 
+	images.head_10,
+	images.head_11,
+	images.head_12,
+	images.head_13,
+	images.head_14,
+	images.head_15
+}
+
+npc_weapons = {
+	bare_hands,
+	fireaxe,
+	assault_rifle,
+	assault_rifle,
+	shotgun,
+	shotgun,
+	assault_rifle,
+	fireaxe,
+	assault_rifle,
+	fireaxe,
+	shotgun,
+	fireaxe,
+	shotgun,
+	assault_rifle,
+	assault_rifle
+}
+
+head_sprites = {}
+
+for i=1, 15 do
+	head_sprites[i] = create_sprite {
+		image = head_images[i]
+	}
+end
+
+npc_count = 15
 my_npcs = {}
 
 final_npc_archetype = (archetyped(character_archetype, {
 		body = {
-			transform = { pos = vec2(1000, (-2800)) },
+			transform = { pos = vec2(1000, (-4800)) },
 			
 			behaviour_tree = {
 				trees = {
@@ -334,6 +427,12 @@ final_npc_archetype = (archetyped(character_archetype, {
 						
 			scriptable = {
 				script_data = npc_class
+			},
+			
+			physics = {
+				body_info = {
+					filter = filter_enemies
+				}
 			}
 		},
 		
@@ -343,34 +442,41 @@ final_npc_archetype = (archetyped(character_archetype, {
 				look_mode = lookat_component.VELOCITY,
 				easing_mode = lookat_component.EXPONENTIAL,
 				averages_per_sec = 10
+			},
+			
+			
+			animate = {
+				available_animations = enemy_animation_legs_set
 			}
 		}
 }))
 
 
 
---spawn_weapon(vec2(1300, (-2800)), assault_rifle)
-
+--spawn_weapon(vec2(1300, (-2800)), assddd
 for i=1, npc_count do
 
-	if i == 1 then 
-		my_npcs[i] = ptr_create_entity_group(final_npc_archetype)
-	else
-		my_npcs[i] = archetyped(ptr_create_entity_group(final_npc_archetype), {
+	--if i == 1 then 
+		--my_npcs[i] = ptr_create_entity_group(final_npc_archetype)
+	--else
+		my_npcs[i] = ptr_create_entity_group(archetyped(final_npc_archetype, {
 			body = {
-				gun = assault_rifle.weapon_info
+				transform = {
+					pos = transform_positions[i]
+				}
 			}
-		})
-	end
+		})) 
+	--end
 	
 	
 	init_npc(my_npcs[i].body:get(), { 
-		weapon_animation_sets = {
-			BARE_HANDS = enemy_animation_body_set,
-			FIREAXE = enemy_animation_body_set,
-			ASSAULT_RIFLE = enemy_animation_body_shotgun_set,
-			SHOTGUN = enemy_animation_body_shotgun_set
-		},
+	weapon_animation_sets = {
+		BARE_HANDS = enemy_animation_bare_hands_set,
+		FIREAXE = enemy_animation_melee_set,
+		ASSAULT_RIFLE = enemy_animation_firearm_set,
+		SHOTGUN = enemy_animation_firearm_set
+	},
+	
 		
 		health_info = {
 			hp = 100,
@@ -380,7 +486,24 @@ for i=1, npc_count do
 					model = corpse_sprite
 				}
 			})			
-		}
+		},
+			
+		wield_offsets = npc_wield_offsets,
+		
+		head_archetype =  {
+			transform = {},
+			
+			chase = {
+				--rotation_orbit_offset = vec2(2, 0)
+			},
+			
+			render = {
+				layer = layers.HEADS,
+				model = head_sprites[i]
+			}
+		},
+		
+		weapon_bullet_filter = filter_enemy_bullets
 	})
 	
 	local script_data = get_scripted(my_npcs[i].body:get())
@@ -389,6 +512,6 @@ for i=1, npc_count do
 	--my_npcs[i].body.pathfinding:start_exploring()
 	
 	my_npcs[i].body:get().gun.target_camera_to_shake:set(world_camera)
-	get_scripted(my_npcs[i].body:get()):take_weapon_item(shotgun)
+	get_scripted(my_npcs[i].body:get()):take_weapon_item(npc_weapons[i])
 end
 
