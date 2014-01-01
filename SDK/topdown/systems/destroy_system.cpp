@@ -24,6 +24,9 @@ void destroy_system::process_events(world& owner) {
 	};
 
 	for (auto it : events) {
+		if (it.subject->name == "wielded_entity") {
+			int breakp = 2;
+		}
 		if (it.only_children) {
 			auto children = it.subject->find<components::children>();
 			if (children) {
@@ -40,6 +43,9 @@ void destroy_system::process_events(world& owner) {
 	std::sort(to_destroy.begin(), to_destroy.end());
 	to_destroy.resize(std::distance(to_destroy.begin(), std::unique(to_destroy.begin(), to_destroy.end())));
 
-	for (auto it : to_destroy) 
+	for (auto it : to_destroy) {
 		owner.delete_entity(*it.first, it.second);
+	}
+
+	owner.get_message_queue<messages::destroy_message>().clear();
 }

@@ -275,7 +275,7 @@ function create_gun(entries)
 	
 	local msg = destroy_message()
 	msg.subject = temp
-	world:post_message(msg)
+	world:post_destroy_message(msg)
 	
 	return new_gun
 end

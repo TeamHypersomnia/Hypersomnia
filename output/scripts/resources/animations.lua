@@ -96,6 +96,7 @@ function set_offsets(subject, group, index)
 	
 	if offset_info == nil then return end
 	
+	print(debug.traceback())
 	npc_info.wielded_entity.chase.rotation_offset = offset_info[group][index].rotation
 	npc_info.wielded_entity.chase.rotation_orbit_offset = offset_info[group][index].pos
 	
@@ -218,3 +219,5 @@ player_animation_legs_set = create_animation_set {
 		{ event = animation_events.MOVE, animation_response = player_legs_animation }
 	}
 }
+
+dofile "scripts\\resources\\enemy_animations.lua"

@@ -63,6 +63,7 @@ assault_wielded_sprite = create_sprite {
 
 wielded_item_archetype = {
 	render = {
+		model = nil,
 		layer = render_layers.WIELDED
 	},
 	
@@ -99,7 +100,7 @@ bare_hands = {
 	
 	animation_index = "BARE_HANDS",
 	
-	wielded_entity = {}
+	wielded_entity = wielded_item_archetype
 }
 
 assault_rifle_info = {
@@ -111,7 +112,7 @@ assault_rifle_info = {
 	is_automatic = true,
 	max_rounds = 30,
 	shooting_interval_ms = 80,
-	spread_degrees = 2,
+	spread_degrees = 0.5,
 	shake_radius = 9.5,
 	shake_spread_degrees = 45,
 	is_melee = false,

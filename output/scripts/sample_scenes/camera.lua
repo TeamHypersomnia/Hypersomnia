@@ -42,7 +42,7 @@ camera_archetype = {
 		player = nil,
 	
 		orbit_mode = camera_component.LOOK,
-		max_look_expand = vec2(config_table.resolution_w/2, config_table.resolution_h/2)*10,
+		max_look_expand = vec2(config_table.resolution_w/2, config_table.resolution_h/2),
 		angled_look_length = 100
 	},
 	

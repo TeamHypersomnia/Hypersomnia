@@ -19,11 +19,11 @@ blood_piece = {
 }
 
 blood_templates = {
-	archetyped(blood_piece, { model = { image = images.blood_1 } } ),
-	archetyped(blood_piece, { model = { image = images.blood_2 } } ),
-	archetyped(blood_piece, { model = { image = images.blood_3 } } ),
-	archetyped(blood_piece, { model = { image = images.blood_4 } } ),
-	archetyped(blood_piece, { model = { image = images.blood_5 } } )
+	archetyped(blood_piece, { model = { image = images.blood_1, size_multiplier = vec2(2, 2) } } ),
+	archetyped(blood_piece, { model = { image = images.blood_2, size_multiplier = vec2(2, 2) } } ),
+	archetyped(blood_piece, { model = { image = images.blood_3, size_multiplier = vec2(2, 2) } } ),
+	archetyped(blood_piece, { model = { image = images.blood_4, size_multiplier = vec2(2, 2) } } ),
+	archetyped(blood_piece, { model = { image = images.blood_5, size_multiplier = vec2(2, 2) } } )
 }
 
 big_wood_templates = {
@@ -207,7 +207,7 @@ bullet_impact_smoke_2 = archetyped(barrel_smoke_2, {
 
 blood_shower = {
 	spread_degrees = 120.5,
-	particles_per_burst = minmax_u(5, 10),
+	particles_per_burst = minmax_u(15, 25),
 	type = emission.BURST;
 	velocity = minmax(1, 4000),
 	angular_velocity = minmax(0, 1500),
@@ -249,8 +249,8 @@ blood_droplets = {
 
 blood_pool = {
 	spread_degrees = 180.5,
-	particles_per_sec = minmax(20, 100),
-	stream_duration_ms = minmax(100, 300),
+	particles_per_sec = minmax(50, 150),
+	stream_duration_ms = minmax(200, 400),
 	type = emission.STREAM,
 	velocity = minmax(1, 6),
 	angular_velocity = minmax(0, 10),
@@ -311,8 +311,8 @@ gunshot_effect = {
 }
 
 blood_effect = {
-	--blood_shower,
-	--blood_pool,
+	blood_shower,
+	blood_pool,
 	blood_droplets
 }
 

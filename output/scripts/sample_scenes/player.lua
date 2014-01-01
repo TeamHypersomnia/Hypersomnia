@@ -6,6 +6,7 @@ end
 
 function player_class:loop()
 	if not self:good_health() then
+		
 		self:drop_weapon(0.5)
 		local player_corpse = self:throw_corpse()
 		
@@ -69,6 +70,10 @@ player = ptr_create_entity_group (archetyped(character_archetype, {
 	}
 }))
 
+player_corpse_sprite = create_sprite {
+	image = images.dead_front_player
+}
+
 init_npc(player.body:get(), { 
 	weapon_animation_sets = {
 		BARE_HANDS = player_animation_bare_hands_set,
@@ -82,7 +87,7 @@ init_npc(player.body:get(), {
 		
 		corpse_entity = archetyped(corpse_archetype, {
 			render = {
-				model = corpse_sprite
+				model = player_corpse_sprite
 			}
 		})			
 	},
@@ -100,7 +105,9 @@ init_npc(player.body:get(), {
 			layer = layers.HEADS,
 			model = head_walk_sprite
 		}
-	}
+	},
+	
+	weapon_bullet_filter = filter_bullets
 	}
 )
 
@@ -115,6 +122,7 @@ get_scripted(player.body:get()):drop_weapon(0.3)
 get_scripted(player.body:get()):take_weapon_item(shotgun)
 get_scripted(player.body:get()):drop_weapon(0.1)
 --spawn_weapon(assault_rifle)
+player.body:get().name = "player"
 
 set_max_speed(player.body:get(), 7000)
 
@@ -126,8 +134,7 @@ main_context = create_input_context {
 		[keys.S] 				= intent_message.MOVE_BACKWARD,
 		[keys.A] 				= intent_message.MOVE_LEFT,
 		[keys.D] 				= intent_message.MOVE_RIGHT,
-		[keys.R] 				= custom_intents.STEERING_REQUEST,
-		[keys.E] 				= custom_intents.EXPLORING_REQUEST,
+		[keys.R] 				= custom_intents.RESTART,
 		[keys.V] 				= custom_intents.INSTANT_SLOWDOWN,
 		
 		[mouse.ldoubleclick] 	= intent_message.SHOOT,

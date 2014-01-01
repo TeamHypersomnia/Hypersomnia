@@ -51,3 +51,5 @@ print("Calling commands.lua...")
 --}
 
 
+get_scripted(player.body:get()):drop_weapon()
+

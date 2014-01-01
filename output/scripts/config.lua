@@ -6,7 +6,7 @@ config_table = {
 	window_y = 0,
 	bpp = 24,
 	resolution_w = 1000,
-	resolution_h = 1080,
+	resolution_h = 800,
 	doublebuffer = 1
 }
 

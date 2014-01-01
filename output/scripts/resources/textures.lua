@@ -22,6 +22,16 @@ images = {
 	assault = "assault.png",
 	fireaxe = "world_fireaxe.png",
 	
+    floor1 = "floor1.jpg",
+	floor2 = "floor2.jpg",
+	floor3 = "floor3.jpg",
+	floor4 = "floor4.jpg",
+	floor5 = "floor5.jpg",
+	floor6 = "floor6.jpg",
+	wall1 = "wall1.jpg",
+	wall2 = "wall2.jpg",
+	
+	wood_table = "table.png",
 	
 	player_legs_1 = "player\\legs_1.png",
 	player_legs_2 = "player\\legs_2.png",
@@ -66,17 +76,17 @@ images = {
 	player_firearm_walk_5 = 	    "player\\firearm_walk_5.png",
 	
 	
-	enemy_legs_1 = "player\\legs_1.png",
-	enemy_legs_2 = "player\\legs_2.png",
-	enemy_legs_3 = "player\\legs_3.png",
-	enemy_legs_4 = "player\\legs_4.png",
-	enemy_legs_5 = "player\\legs_5.png",
+	enemy_legs_1 = "enemy\\legs_1.png",
+	enemy_legs_2 = "enemy\\legs_2.png",
+	enemy_legs_3 = "enemy\\legs_3.png",
+	enemy_legs_4 = "enemy\\legs_4.png",
+	enemy_legs_5 = "enemy\\legs_5.png",
 
-	enemy_walk_1 = 	"player\\walk_1.png",
-	enemy_walk_2 = 	"player\\walk_2.png",
-	enemy_walk_3 = 	"player\\walk_3.png",
-	enemy_walk_4 = 	"player\\walk_4.png",
-	enemy_walk_5 = 	"player\\walk_5.png",
+	enemy_walk_1 = 	"enemy\\walk_1.png",
+	enemy_walk_2 = 	"enemy\\walk_2.png",
+	enemy_walk_3 = 	"enemy\\walk_3.png",
+	enemy_walk_4 = 	"enemy\\walk_4.png",
+	enemy_walk_5 = 	"enemy\\walk_5.png",
 	
 	enemy_hit_1   = 	"enemy\\hit_1.png",
 	enemy_hit_2   = 	"enemy\\hit_2.png",
@@ -101,6 +111,22 @@ images = {
 	enemy_firearm_walk_3 = 	    "enemy\\firearm_walk_3.png",
 	enemy_firearm_walk_4 = 	    "enemy\\firearm_walk_4.png",
 	enemy_firearm_walk_5 = 	    "enemy\\firearm_walk_5.png",
+	
+	head_1 = "enemy\\head_1.png",
+	head_2 = "enemy\\head_2.png",
+	head_3 = "enemy\\head_3.png",
+	head_4 = "enemy\\head_4.png",
+	head_5 = "enemy\\head_5.png",
+	head_6 = "enemy\\head_6.png",
+	head_7 = "enemy\\head_7.png",
+	head_8 = "enemy\\head_8.png",
+	head_9 = "enemy\\head_9.png",
+	head_10 = "enemy\\head_10.png",
+	head_11 = "enemy\\head_11.png",
+	head_12 = "enemy\\head_12.png",
+	head_13 = "enemy\\head_13.png",
+	head_14 = "enemy\\head_14.png",
+	head_15 = "enemy\\head_15.png",
 	
 	head_walk = "player\\head_walk.png",
 	head_gun = "player\\head_gun.png",
@@ -157,6 +183,7 @@ images = {
 	blood_5 = "blood_5.png",
 
 	dead_front = "dead_front.png",
+	dead_front_player = "player\\dead_front.png",
 	dead_back  = "dead_back.png"
 }
 
