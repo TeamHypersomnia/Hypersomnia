@@ -16,6 +16,7 @@ namespace bindings {
 			luabind::class_<animate>("animate_component")
 			.def(luabind::constructor<>())
 			.def_readwrite("available_animations", &animate::available_animations)
+			.def("set_current_animation_set", &animate::set_current_animation_set)
 			);
 	}
 }

@@ -84,10 +84,31 @@ void call(luabind::object func, augmentations::entity_system::entity* subject) {
 }
 
 void components::animate::set_current_frame(unsigned number, augmentations::entity_system::entity* subject) {
-	call(saved_callback_out, subject);
+	if (saved_callback_out) {
+		call(saved_callback_out, subject);
+	}
 	current_frame = number;
-	call(current_animation->frames[current_frame].callback, subject);
-	saved_callback_out = current_animation->frames[current_frame].callback_out;
+	if (current_animation) {
+		call(current_animation->frames[current_frame].callback, subject);
+		saved_callback_out = current_animation->frames[current_frame].callback_out;
+	} else
+	saved_callback_out = luabind::object();
+}
+
+void components::animate::set_current_animation_set(resources::animate_info* set, augmentations::entity_system::entity* subject) {
+	if (saved_callback_out) {
+		call(saved_callback_out, subject);
+	}
+	available_animations = set;
+	current_frame = 0;
+	saved_callback_out = luabind::object();
+
+	paused_state = components::animate::state::INCREASING;
+	current_state = components::animate::state::PAUSED;
+	current_ms = 0.f;
+	current_animation = nullptr;
+
+	set_current_frame(0, subject);
 }
 
 void animation_system::process_entities(world& owner) {

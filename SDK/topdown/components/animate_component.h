@@ -31,6 +31,8 @@ namespace components {
 		void decrease_frame(augmentations::entity_system::entity* sub) {
 			set_current_frame(current_frame - 1, sub);
 		}
+
+		void set_current_animation_set(resources::animate_info*, augmentations::entity_system::entity* subject);
 	private:
 		friend class animation_system;
 
