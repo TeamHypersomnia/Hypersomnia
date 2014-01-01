@@ -6,12 +6,14 @@
 
 namespace bindings {
 	luabind::scope _gun_component() {
+		
 		return
 			luabind::class_<gun>("gun_component")
 			.def(luabind::constructor<>())
 			.def(luabind::constructor<const gun&>())
 			.def("transfer_barrel_smoke", &gun::transfer_barrel_smoke)
 			.def("get_barrel_smoke", &gun::get_barrel_smoke)
+			.def("set_bullet_filter", &gun::set_bullet_filter)
 			.def_readwrite("current_rounds", &gun::current_rounds)
 			.def_readwrite("reloading", &gun::reloading)
 			.def_readwrite("trigger", &gun::trigger)

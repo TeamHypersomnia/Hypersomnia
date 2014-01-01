@@ -15,7 +15,7 @@ render_layers = {
 custom_intents = create_inverse_enum {
 	"ZOOM_CAMERA",
 	"STEERING_REQUEST",
-	"EXPLORING_REQUEST",
+	"RESTART",
 	"INSTANT_SLOWDOWN",
 	"SPEED_INCREASE",
 	"SPEED_DECREASE",
@@ -29,6 +29,7 @@ create_options {
 	"OBJECTS", 
 	"STATIC_OBJECTS",
 	"BULLETS", 
+	"ENEMY_BULLETS", 
 	"CORPSES",
 	"ITEMS"
 }
@@ -53,6 +54,11 @@ filter_objects = {
 
 filter_characters = {
 	categoryBits = CHARACTERS,
+	maskBits = bitor(OBJECTS, STATIC_OBJECTS, ENEMY_BULLETS, CHARACTERS)
+}
+
+filter_enemies = {
+	categoryBits = CHARACTERS,
 	maskBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS)
 }
 
@@ -63,6 +69,11 @@ filter_characters_separation = {
 
 filter_bullets = {
 	categoryBits = BULLETS,
+	maskBits = bitor(OBJECTS, STATIC_OBJECTS, CHARACTERS)
+}
+
+filter_enemy_bullets = {
+	categoryBits = ENEMY_BULLETS,
 	maskBits = bitor(OBJECTS, STATIC_OBJECTS, CHARACTERS)
 }
 

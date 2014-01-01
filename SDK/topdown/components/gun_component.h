@@ -47,6 +47,10 @@ namespace components {
 
 		bool can_drop() const;
 
+		void set_bullet_filter(b2Filter f) {
+			bullet_body.filter = f;
+		}
+
 		struct uncopyable {
 			augmentations::entity_system::entity_ptr target_barrel_smoke_group;
 			uncopyable& operator=(const uncopyable& b) { return *this; }
