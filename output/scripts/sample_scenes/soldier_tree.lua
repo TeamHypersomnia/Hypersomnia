@@ -96,20 +96,20 @@ npc_legs_behaviour_tree = create_behaviour_tree {
 					for k, v in ipairs(visible_guns) do
 						local dist = (v.item.transform.current.pos - entity.transform.current.pos)
 						if dist:length_sq() < nearest_gun.distance then
-							nearest_gun = { item = v, distance = dist } 
+							nearest_gun = { item = v.item, distance = dist } 
 						end
 					end
 					
 					
 					set_max_speed(entity, 3000)
+			
 					get_scripted(entity):pursue_target(nearest_gun.item)
 					if get_scripted(entity):pick_up_weapon(nearest_gun.item) then
 --print("picked up dropped..")					
 
-				get_scripted(entity):stop_pursuit()
-return 
-						
-					behaviour_node.SUCCESS end
+						get_scripted(entity):stop_pursuit()
+						return behaviour_node.SUCCESS 
+					end
 					
 					return behaviour_node.RUNNING
 				end
@@ -124,6 +124,8 @@ return
 		player_visible = {
 			node_type = behaviour_node.SELECTOR,
 			on_update = function(entity) 
+				if not player.body:exists() then return behaviour_node.FAILURE end
+				
 				if get_scripted(entity).is_seen then 
 					entity.lookat.target:set(player.body:get())
 					entity.lookat.look_mode = lookat_component.POSITION
@@ -142,7 +144,7 @@ return
 		
 		stand_still = {
 			on_update = function(entity)
-				if entity.gun.current_rounds > 0 then
+				if player.body:exists() and entity.gun.current_rounds > 0 then
 					set_max_speed(entity, 1000)
 					get_scripted(entity):pursue_target(player.body:get())	
 					get_scripted(entity).steering_behaviours.wandering.weight_multiplier = 1.0
@@ -159,6 +161,8 @@ return
 		
 		chase_him = {
 			on_update = function(entity)
+				if not player.body:exists() then return behaviour_node.FAILURE end
+				
 				if get_scripted(entity).current_weapon ~= bare_hands then
 					local npc_info = get_scripted(entity)
 					
@@ -260,7 +264,7 @@ return
 				current_task:interrupt_runner(behaviour_node.FAILURE)
 				--npc_behaviour_tree.delay_chase.maximum_running_time_ms = 400
 				set_max_speed(entity, 700)
-				entity.pathfinding:start_exploring()
+				--entity.pathfinding:start_exploring()
 				entity.pathfinding.favor_velocity_parallellness = true
 				get_scripted(entity).steering_behaviours.wandering.weight_multiplier = 0.2 
 			end,
@@ -331,12 +335,13 @@ npc_hands_behaviour_tree = create_behaviour_tree {
 		
 		melee_range = {
 			on_update = function(entity) 
-				if (player.body:get().transform.current.pos - entity.transform.current.pos):length() < 100 then
-					entity.gun.is_melee = true
-					gun_trigger(entity, true)
-					return behaviour_node.RUNNING
+				if player.body:exists() then 
+					if (player.body:get().transform.current.pos - entity.transform.current.pos):length() < 100 then
+						entity.gun.is_melee = true
+						gun_trigger(entity, true)
+						return behaviour_node.RUNNING
+					end
 				end
-				
 				return behaviour_node.FAILURE
 			end,
 			
