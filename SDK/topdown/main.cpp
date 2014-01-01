@@ -46,6 +46,8 @@ using namespace augmentations;
 using namespace entity_system;
 using namespace messages;
 
+resources::script* world_reloading_script = nullptr;
+
 int main() {
 	augmentations::init();
 
@@ -80,7 +82,6 @@ int main() {
 	destroy_system destroy;
 	behaviour_tree_system behaviours;
 
-	my_world.add_system(&scripts);
 	my_world.add_system(&input);
 	my_world.add_system(&steering);
 	my_world.add_system(&movement);
@@ -99,8 +100,10 @@ int main() {
 	my_world.add_system(&pathfinding);
 	my_world.add_system(&behaviours);
 	my_world.add_system(&render);
+	my_world.add_system(&scripts);
 	my_world.add_system(&destroy);
 	my_world.add_system(&camera);
+
 
 	//my_world.register_message_queue<message>();
 	my_world.register_message_queue<intent_message>();
@@ -141,22 +144,30 @@ int main() {
 		my_world.run();
 		//std::cout << physics.ray_casts_per_frame << std::endl;
 
-		auto& scripts_reloaded = resources::script::script_reloader.get_script_files_to_reload();
-		
-		for (auto& script_to_reload : scripts_reloaded) {
-			if (script_to_reload->reload_scene_when_modified) {
-				my_world.delete_all_entities(true);
-				break;
-			}
-		}
-		
-		for (auto& script_to_reload : scripts_reloaded) {
-			script_to_reload->call();
-		}
-		
-		if (!scripts_reloaded.empty()) {
-			std::cout << std::endl;
+		if (world_reloading_script) {
+			my_world.delete_all_entities(true);
+			world_reloading_script->call();
+			world_reloading_script = nullptr;
 			lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
+		}
+		else {
+			auto& scripts_reloaded = resources::script::script_reloader.get_script_files_to_reload();
+
+			for (auto& script_to_reload : scripts_reloaded) {
+				if (script_to_reload->reload_scene_when_modified) {
+					my_world.delete_all_entities(true);
+					break;
+				}
+			}
+
+			for (auto& script_to_reload : scripts_reloaded) {
+				script_to_reload->call();
+			}
+
+			if (!scripts_reloaded.empty()) {
+				std::cout << std::endl;
+				lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
+			}
 		}
 	}
 

@@ -14,6 +14,10 @@
 #include "../messages/intent_message.h"
 
 
+void set_world_reloading_script(resources::script* new_scr) {
+	world_reloading_script = new_scr;
+}
+
 int bitor(lua_State* L) {
 	int arg_count = lua_gettop(L);
 	int result = 0;
@@ -152,7 +156,9 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			bindings::_behaviour_tree_component(), 
 
 			bindings::_entity(),
-			bindings::_body_helper()
+			bindings::_body_helper(),
+
+			luabind::def("set_world_reloading_script", &set_world_reloading_script)
 	];
 
 	luabind::set_pcall_callback(the_callback);
@@ -163,7 +169,8 @@ script_system::~script_system() {
 }
 
 void script_system::process_entities(world& owner) {
-	for (auto it : targets) {
+	auto target_copy = targets;
+	for (auto it : target_copy) {
 		auto& scriptable = it->get<components::scriptable>();
 		if (!scriptable.available_scripts) continue;
 
@@ -184,6 +191,10 @@ void script_system::process_entities(world& owner) {
 template<typename message_type>
 void pass_events_to_script(world& owner, int msg_enum) {
 	auto& events = owner.get_message_queue<message_type>();
+
+	if (std::string(typeid(message_type).name()) == "struct messages::damage_message") {
+		int breakp = 123123;
+	}
 
 	events.erase(
 		std::remove_if(events.begin(), events.end(), [msg_enum](message_type& msg){

@@ -104,9 +104,12 @@ dofile "scripts\\sample_scenes\\soldier_tree.lua"
 npc_damage_handler = create_scriptable_info {
 	scripted_events = {	
 		[scriptable_component.DAMAGE_MESSAGE] = function(message)
+			--if message.subject.scriptable == nil then return false end
+	
 			local npc_info = get_scripted(message.subject)
 			npc_info.health_info.hp = npc_info.health_info.hp - message.amount
 			npc_info.last_impact = message.impact_velocity
+			
 			return false
 		end	
 	}
@@ -357,10 +360,28 @@ npc_wield_offsets = {
 			{ rotation = 0, pos = vec2(30, 10)  },
 			{ rotation = 0, pos = vec2(28, 10)  }
 		}
+	},
+	
+	ASSAULT_RIFLE = {
+		walk = {
+			{ rotation = 0, pos = vec2(35, 10) },
+			{ rotation = 0, pos = vec2(36, 10) },
+			{ rotation = 0, pos = vec2(37, 10) },
+			{ rotation = 0, pos = vec2(39, 10) },
+			{ rotation = 0, pos = vec2(40, 10) }
+		},
+		
+		shot = {
+			{ rotation = 0, pos = vec2(34, 10)  },
+			{ rotation = 0, pos = vec2(33, 10)  },
+			{ rotation = 0, pos = vec2(32, 10)  },
+			{ rotation = 0, pos = vec2(30, 10)  },
+			{ rotation = 0, pos = vec2(28, 10)  }
+		}
 	}
 }
 
-npc_wield_offsets.ASSAULT_RIFLE = archetyped(npc_wield_offsets.SHOTGUN, {})
+--npc_wield_offsets.ASSAULT_RIFLE = archetyped(npc_wield_offsets.SHOTGUN, {})
 
 dofile "scripts\\sample_scenes\\npc.lua"
 dofile "scripts\\sample_scenes\\player.lua"
@@ -370,7 +391,13 @@ loop_only_info = create_scriptable_info {
 		[scriptable_component.INTENT_MESSAGE] = 
 			function(message)
 				if message.intent == custom_intents.QUIT then
-					input_system.quit_flag = 1	
+					input_system.quit_flag = 1
+				elseif message.intent == custom_intents.RESTART then
+					print "INTENT.."
+					if not player.body:exists() then
+					print "RELOADING.."
+						set_world_reloading_script(entities)
+					end
 				elseif message.intent == custom_intents.DROP_WEAPON then
 					if message.state_flag then
 						if player.body:exists() then get_scripted(player.body:get()):pick_up_weapon() end
@@ -400,7 +427,6 @@ loop_only_info = create_scriptable_info {
 			
 			if player.body:exists() then
 				local player_info = get_scripted(player.body:get())
-				player_info:loop()
 			
 				if player.body:get().gun.trigger or player.body:get().gun.is_swinging then
 					player_info.head_entity.render.model = head_shot_sprite
@@ -410,7 +436,14 @@ loop_only_info = create_scriptable_info {
 					player_info.head_entity.render.model = head_gun_sprite
 				end
 				
+				player_info:loop()
+			
+				--print(player.body:get().transform.current.pos.x, player.body:get().transform.current.pos.y)
 			end
+			
+			    
+			  
+				
 			-- correct animations after checking this
 			-- correct animations after checking this
 			-- correct animations after checking this
@@ -437,6 +470,7 @@ myloopscript = create_entity {
 			custom_intents.SPEED_DECREASE,
 			custom_intents.INSTANT_SLOWDOWN,
 			custom_intents.QUIT,
+			custom_intents.RESTART,
 			custom_intents.DROP_WEAPON
 	},
 		
