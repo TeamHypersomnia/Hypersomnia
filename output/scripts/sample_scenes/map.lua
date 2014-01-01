@@ -209,7 +209,7 @@
 
 floor_archetype = {
 	transform = {
-		pos = vec2(0, 0),
+		pos = vec2(0, -2000),
 		rotation = 0
 	},
 	
@@ -241,8 +241,15 @@ wall_archetype = archetyped(floor_archetype, {
 
 global_all_polys = {}
 
+all_counter = 0
+
 function create_poly (poly_vertices, image_to_map, pick_archetype, reverse_order)
 	reverse_order = reverse_order or false
+	
+	for k, v in ipairs(poly_vertices) do
+		poly_vertices[k] = v * vec2(3.5, 3.5)
+		all_counter = all_counter + 1
+	end
 	
 	local out_verts = {}
 	
@@ -284,20 +291,405 @@ end
 
 
 create_wall( {
-		vec2(0, 0),
-		vec2(300, 0),
-		vec2(300, 300),
-		vec2(0, 300)
+
+vec2(557,166),
+vec2(557,186),
+vec2(420,186),
+vec2(420,195),
+vec2(506,195),
+vec2(506,245),
+vec2(514,245),
+vec2(514,195),
+vec2(557,195),
+vec2(565,195),
+vec2(565,186),
+vec2(565,166)
 		},
-		images.crate, true)
+		images.wall2, false)
+
+create_wall( {
+
+vec2(514,319),
+vec2(514,278),
+vec2(506,278),
+vec2(506,319),
+vec2(424,319),
+vec2(424,328),
+vec2(478,328),
+vec2(478,449),
+vec2(487,449),
+vec2(487,328),
+vec2(597,328),
+vec2(597,319)
+		},
+		images.wall2, false)
+
+
+create_wall( {
+
+vec2(328,319),
+vec2(328,274),
+vec2(319,274),
+vec2(319,400),
+vec2(124,400),
+vec2(124,409),
+vec2(319,409),
+vec2(319,440),
+vec2(328,440),
+vec2(328,328),
+vec2(379,328),
+vec2(379,319)
+
+		},
+		images.wall2, false)
+
+
+create_wall( {
+vec2(383,186),
+vec2(327,186),
+vec2(327,166),
+vec2(319,166),
+vec2(319,245),
+vec2(327,245),
+vec2(327,195),
+vec2(383,195)
+		},
+		images.wall2, false)
+
+	create_wall( {
+vec2(487,427),
+vec2(487,436),
+vec2(589,436),
+vec2(589,514),
+vec2(597,514),
+vec2(597,427)
+		},
+		images.wall2, false)
+	
+		create_wall( {
+vec2(328,513),
+vec2(319,513),
+vec2(319,477),
+vec2(328,477)
+		},
+		images.wall2,true)
+
+		create_wall( {
+vec2(487,514),
+vec2(478,514),
+vec2(478,479),
+vec2(487,479)
+		},
+		images.wall2, true)
+
+		create_wall( {
+vec2(696,319),
+vec2(696,157),
+vec2(565,157),
+vec2(565,124),
+vec2(557,124),
+vec2(557,166),
+vec2(687,166),
+vec2(687,319),
+vec2(687,328),
+vec2(729,328),
+vec2(729,514),
+vec2(476,514),
+vec2(476,551),
+vec2(327,551),
+vec2(327,513),
+vec2(57,513),
+vec2(57,521),
+vec2(319,521),
+vec2(319,560),
+vec2(485,560),
+vec2(485,523),
+vec2(737,523),
+vec2(737,319)
+
+		},
+		images.wall1, false)
 		
+
+
+
+
+			create_wall( {
+vec2(645,328),
+vec2(687,328),
+vec2(687,319),
+vec2(645,319)
+
+		},
+		images.wall2, false)	
 		
+			
+			create_wall( {
+vec2(43,32),
+vec2(43,166),
+vec2(116,166),
+vec2(116,157),
+vec2(51,157),
+vec2(51,41),
+vec2(319,41),
+vec2(319,99),
+vec2(327,99),
+vec2(327,32)
+
+		},
+		images.wall1, false)	
+
+					create_wall( {
+vec2(557,25),
+vec2(557,56),
+vec2(328,56),
+vec2(328,65),
+vec2(557,65),
+vec2(557,94),
+vec2(565,94),
+vec2(565,25)
+
+		},
+		images.wall1, false)	
+
+					create_wall( {
+vec2(319,132),
+vec2(319,157),
+vec2(116,157),
+vec2(116,400),
+vec2(57,400),
+vec2(57,479),
+vec2(65,479),
+vec2(65,409),
+vec2(124,409),
+vec2(124,166),
+vec2(327,166),
+vec2(327,132)
+
+
+		},
+		images.wall1, false)
+
+							create_wall( {
+vec2(557,16),
+vec2(557,24),
+vec2(808,24),
+vec2(808,157),
+vec2(696,157),
+vec2(696,166),
+vec2(816,166),
+vec2(816,16)
+
+
+		},
+		images.wall1, false)
+
+-- to jest podloga wiec juz jebac winding elo
 create_floor( {
-		vec2(-100, -100) + vec2(0, 0),
-		vec2(-100, -100) + vec2(500, 0),
-		vec2(-100, -100) + vec2(500, 500),
-		vec2(-100, -100) + vec2(0, 500)
+		vec2(319,513),
+vec2(66,513),
+vec2(66,407),
+vec2(319,407)
 		},
-		images.background, false)
+		images.floor1)
+
+
+
+		create_floor( {
+vec2(319,400),
+vec2(124,400),
+vec2(124,166),
+vec2(319,166)
+		},
+		images.floor2)
+
+
+		create_floor( {
+		vec2(589,514),
+vec2(487,514),
+vec2(487,436),
+vec2(589,436)
+		},
+		images.floor1)
+		
+
+
+		create_floor( {
+	vec2(487,328),
+vec2(487,427),
+vec2(597,427),
+vec2(597,514),
+vec2(729,514),
+vec2(729,328)
+		},
+		images.floor4)
+		
+		create_floor( {
+	vec2(478,551),
+vec2(328,551),
+vec2(328,328),
+vec2(478,328)
+		},
+		images.floor5)
+		
+		create_floor( {
+		vec2(506,319),
+vec2(327,319),
+vec2(327,195),
+vec2(506,195)
+		},
+		images.floor3)
+
+
+
+
+
+				create_floor( {
+vec2(687,195),
+vec2(687,166),
+vec2(565,166),
+vec2(565,195),
+vec2(514,195),
+vec2(514,319),
+vec2(687,319)
+
+		},
+		images.floor5)
+
+				create_floor( {
+vec2(319,157),
+vec2(50,157),
+vec2(50,41),
+vec2(319,41)
+
+
+		},
+		images.floor4)
+
+
+						create_floor( {
+vec2(557,186),
+vec2(328,186),
+vec2(328,65),
+vec2(557,65)
+
+
+		},
+		images.floor2)
+
+
+						create_floor( {
+vec2(808,157),
+vec2(565,157),
+vec2(565,25),
+vec2(808,25)
+		},
+		images.floor6)
+
+
+-- gowna na podlodze
+		
+
+		--szawka wejscie 
+		create_wall( {
+vec2(20, 20) + vec2(88,443),
+vec2(20, 20) + vec2(66,443),
+vec2(20, 20) + vec2(66,411),
+vec2(20, 20) + vec2(88,411)
+
+
+
+		},
+		images.wood_table, true)
+
+
+		--szawka dolny przedpokoj
+				create_wall( {
+				vec2(-30, -40) + vec2(458,551),
+				vec2(-30, -40) + vec2(354,551),
+				vec2(-30, -40) + vec2(354,521),
+				vec2(-30, -40) + vec2(458,521)
+		},
+		images.wood_table, true)
+
+--		--kibel
+--					create_wall( {
+--					vec2(557,485),
+--vec2(589,485),
+--vec2(589,514),
+--vec2(557,514)
+--		},
+--		images.wood_table, true)
+--
+--
+--
+--
+--		--wanna
+--					create_wall( {
+--					vec2(589,457),
+--vec2(533,457),
+--vec2(533,436),
+--vec2(589,436)
+--		},
+--		images.wood_table, true)
+
+
+
+		--dluga szawka kuchnia
+					create_wall( {
+					vec2(514,427),
+vec2(487,427),
+vec2(487,328),
+vec2(514,328)
+
+		},
+		images.wood_table, true)
+
+		--stol na dole
+					create_wall( {
+					vec2(687,469),
+vec2(639,469),
+vec2(639,386),
+vec2(687,386)
+		},
+		images.wood_table, true)
+
+
+		--sofa
+							create_wall( {
+							vec2(292,400),
+vec2(319,400),
+vec2(319,335),
+vec2(292,335)
+		},
+		images.wood_table, true)
+
+		--stol
+								create_wall( {
+								vec2(222,335),
+vec2(163,335),
+vec2(163,251),
+vec2(222,251)
+		},
+		images.wood_table, true)
+
+		--jacuzzi
+								create_wall( {
+vec2(70, 30) + vec2(50,91),
+vec2(70, 30) + vec2(104,91),
+vec2(70, 30) + vec2(104,41),
+vec2(70, 30) + vec2(50,41)
+		},
+		images.wood_table, false)
+
+
+		--schody
+								create_wall( {
+vec2(-70, 30) + vec2(724,64),
+vec2(-70, 30) + vec2(808,64),
+vec2(-70, 30) + vec2(808,25),
+vec2(-70, 30) + vec2(724,25)
+		},
+		images.wood_table, false)
 
 		
