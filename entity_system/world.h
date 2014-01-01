@@ -29,7 +29,7 @@ namespace augmentations {
 
 			boost::object_pool<entity> entities;
 			
-			std::unordered_map<size_t, std::unique_ptr<message_queue>> *input_queue, *output_queue, queues[2];
+			std::unordered_map<size_t, std::unique_ptr<message_queue>> input_queue;
 			std::unordered_map<size_t, boost::pool<>> size_to_container;
 			std::unordered_map<entity*, util::sorted_vector<entity_ptr*>> registered_entity_watchers;
 
@@ -49,19 +49,19 @@ namespace augmentations {
 
 			template <typename T>
 			void register_message_queue() {
-				for (int i = 0; i < 2; ++i)
-					queues[i].emplace(std::make_pair(typeid(T).hash_code(),
+				for (int i = 0; i < 1; ++i)
+					input_queue.emplace(std::make_pair(typeid(T).hash_code(),
 						std::unique_ptr<message_queue>(static_cast <message_queue*>(new templated_message_queue<T>()))));
 			}
 
 			template <typename T>
 			std::vector<T>& get_message_queue() {
-				return (static_cast<templated_message_queue<T>*>(input_queue->at(typeid(T).hash_code()).get()))->messages;
+				return (static_cast<templated_message_queue<T>*>(input_queue.at(typeid(T).hash_code()).get()))->messages;
 			}
 
 			template <typename T>
 			void post_message(const T& message_object) {
-				return (static_cast<templated_message_queue<T>*>(output_queue->at(typeid(T).hash_code()).get()))->messages.push_back(message_object);
+				return (static_cast<templated_message_queue<T>*>(input_queue.at(typeid(T).hash_code()).get()))->messages.push_back(message_object);
 			}
 			
 			std::vector<processing_system*>& get_all_systems() {

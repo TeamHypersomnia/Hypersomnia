@@ -6,7 +6,7 @@
 
 namespace augmentations {
 	namespace entity_system {
-		world::world() : input_queue(queues), output_queue(queues+1) {
+		world::world() {
 		}
 
 		world::~world() {
@@ -84,36 +84,40 @@ namespace augmentations {
 		}
 
 		void world::run() {
-			for (auto& it : queues[0])
-				it.second.get()->clear();
 
-			for (auto& it : queues[1])
-				it.second.get()->clear();
+			//for (auto& it : queues[1])
+			//	it.second.get()->clear();
 
-			for(auto it : systems)
+			for (auto it : systems)
 				it->process_entities(*this);
 
-			bool all_clear = false;
+			for (auto it : systems)
+				it->process_events(*this);
 
-			while(!all_clear) {
-				all_clear = true;
-				for (auto& it : *output_queue) {
-					if (!it.second.get()->empty()) {
-						all_clear = false;
-						break;
-					}
-				}
+			for (auto& it : input_queue)
+				it.second.get()->clear();
 
-				if (!all_clear) {
-					std::swap(input_queue, output_queue);
-					
-					for (auto& it : *output_queue) 
-						it.second.get()->clear();
+			//bool all_clear = false;
 
-					for (auto it : systems)
-						it->process_events(*this);
-				}
-			}
+			//while(!all_clear) {
+			//	all_clear = true;
+			//	for (auto& it : *output_queue) {
+			//		if (!it.second.get()->empty()) {
+			//			all_clear = false;
+			//			break;
+			//		}
+			//	}
+			//
+			//	if (!all_clear) {
+			//		std::swap(input_queue, output_queue);
+			//		
+			//		for (auto& it : *output_queue) 
+			//			it.second.get()->clear();
+			//
+			//		for (auto it : systems)
+			//			it->process_events(*this);
+			//	}
+			//}
 		}
 	}
 }
