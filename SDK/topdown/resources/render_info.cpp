@@ -11,7 +11,6 @@
 #include "utility/sorted_vector.h"
 #include "poly2tri/poly2tri.h"
 
-#include "3rdparty/polyclipper/clipper.hpp"
 #include "3rdparty/polypartition/polypartition.h"
 
 std::vector<render_system::debug_line> global_debug;
@@ -188,79 +187,6 @@ namespace resources {
 			indices.push_back(tri->GetPoint(0)->index);
 			indices.push_back(tri->GetPoint(1)->index);
 			indices.push_back(tri->GetPoint(2)->index);
-		}
-	}
-
-	void polygon::add_concave_set(const concave_set& concaves) {
-		ClipperLib::Polygons subject(1), difference(concaves.holes.size()), solution;
-		/* should use solutiontree instead */
-		ClipperLib::PolyTree solutiontree;
-		
-		for (auto& v : concaves.vertices) {
-			subject[0].push_back(ClipperLib::IntPoint(v.x, v.y));
-		}
-		
-		std::reverse(subject[0].begin(), subject[0].end());
-
-		for (size_t i = 0; i < concaves.holes.size(); ++i) {
-			for (size_t j = 0; j < concaves.holes[i].size(); ++j)
-				difference[i].push_back(ClipperLib::IntPoint(concaves.holes[i][j].x, concaves.holes[i][j].y));
-		}
-
-		ClipperLib::Clipper Clipper;
-		Clipper.AddPolygons(subject, ClipperLib::ptSubject);
-		Clipper.AddPolygons(difference, ClipperLib::ptClip);
-		Clipper.StrictlySimple(true);
-		Clipper.Execute(ClipperLib::ctDifference, solution, ClipperLib::pftNonZero, ClipperLib::pftNonZero);
-
-		
-		std::reverse(solution[0].begin(), solution[0].end());
-
-		list<TPPLPoly> inpolys, outpolys;
-		TPPLPoly subject_poly;
-		subject_poly.Init(solution[0].size());
-		subject_poly.SetHole(false);
-		
-		for (size_t i = 0; i < solution[0].size(); ++i) {
-			vec2<> p(solution[0][i].X, solution[0][i].Y);
-			subject_poly[i].x = p.x;
-			subject_poly[i].y = -p.y;
-
-			original_model.push_back(p);
-		}
-
-		for (size_t i = 1; i < solution.size(); ++i) {
-			TPPLPoly hole_poly;
-			hole_poly.Init(solution[i].size());
-			hole_poly.SetHole(true);
-			std::reverse(solution[i].begin(), solution[i].end());
-
-			basic_polygon new_hole;
-
-			for (size_t j = 0; j < solution[i].size(); ++j) {
-				vec2<> p(solution[i][j].X, solution[i][j].Y);
-				hole_poly[j].x = p.x;
-				hole_poly[j].y = -p.y;
-
-				new_hole.push_back(p);
-			}
-
-			holes.push_back(new_hole);
-			inpolys.push_back(hole_poly);
-		}
-		
-		inpolys.push_back(subject_poly);
-
-		TPPLPartition partition;
-		partition.Triangulate_EC(&inpolys, &outpolys);
-		
-		int index = 0;
-
-		for (auto& out : outpolys) {
-			for (size_t j = 0; j < out.GetNumPoints(); ++j) {
-				model.push_back(vertex(vec2<>(out[j].x, -out[j].y)));
-				indices.push_back(index++);
-			}
 		}
 	}
 

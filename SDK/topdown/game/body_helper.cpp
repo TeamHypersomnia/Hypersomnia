@@ -32,27 +32,12 @@ namespace topdown {
 
 		original_model.insert(original_model.end(), p.original_model.begin(), p.original_model.end());
 		
-		for (auto& hole : p.holes)
-			original_model.insert(original_model.end(), hole.begin(), hole.end());
-
 		for (size_t i = 0; i < p.original_model.size(); ++i) {
 			vec2<> p(p.original_model[i]);
 			subject_poly[i].x = p.x;
 			subject_poly[i].y = -p.y;
 		}
 
-		for (size_t i = 0; i < p.holes.size(); ++i) {
-			TPPLPoly hole_poly;
-			hole_poly.Init(p.holes[i].size());
-			hole_poly.SetHole(true);
-
-			for (size_t j = 0; j < p.holes[i].size(); ++j) {
-				vec2<> p(p.holes[i][j]);
-				hole_poly[j].x = p.x;
-				hole_poly[j].y = -p.y;
-			}
-			inpolys.push_back(hole_poly);
-		}
 		inpolys.push_back(subject_poly);
 
 		TPPLPartition partition;

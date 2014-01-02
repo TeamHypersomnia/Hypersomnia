@@ -58,23 +58,12 @@ namespace resources {
 			void add_vertex(const vertex& v);
 		};
 
-		struct concave_set {
-			basic_polygon vertices;
-			std::vector<basic_polygon> holes;
-
-			void add_hole(const basic_polygon& hole) {
-				holes.push_back(hole);
-			}
-		};
-
 		std::vector<vertex> model;
 
 		/* the "model" is already triangulated so we need to preserve original model vertex data if for example 
 			we want to form a physics body from this object 
 		*/
 		basic_polygon original_model;
-		/* we keep the original holes data as well */
-		std::vector<basic_polygon> holes;
 
 		std::vector<int> indices;
 
@@ -86,8 +75,6 @@ namespace resources {
 			return model[i];
 		}
 
-		/* construct a set of concave polygons from a subject polygon and interior holes */
-		void add_concave_set(const concave_set&);
 		/* construct a set of convex polygons from a potentially concave polygon */
 		void add_concave(const concave&);
 

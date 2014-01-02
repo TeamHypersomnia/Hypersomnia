@@ -92,6 +92,10 @@ function npc_class:take_weapon_item(item_data)
 	self.entity.gun.trigger = false
 	self.entity.gun.is_swinging = false
 	
+	if self.entity.gun.current_rounds > 0 then
+		self.entity.gun.is_melee = false
+	end
+	
 	if self.wielded_entity ~= nil then
 		local msg = destroy_message()
 		self.wielded_entity.name = "wielded_entity"

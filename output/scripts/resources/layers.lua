@@ -40,7 +40,7 @@ filter_nothing = {
 	maskBits = 0
 }
 
-local mask_all = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS, CORPSES, ITEMS)
+local mask_all = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, ENEMY_BULLETS, CHARACTERS, CORPSES, ITEMS)
 
 filter_static_objects = {
 	categoryBits = STATIC_OBJECTS,
@@ -49,7 +49,7 @@ filter_static_objects = {
 
 filter_objects = {
 	categoryBits = OBJECTS,
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS, CORPSES)
+	maskBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, ENEMY_BULLETS, CHARACTERS, CORPSES)
 }
 
 filter_characters = {

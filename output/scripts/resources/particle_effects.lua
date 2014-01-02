@@ -223,11 +223,12 @@ blood_shower = {
 }
 
 blood_droplets = {
-	spread_degrees = 90.5,
-	particles_per_burst = minmax_u(10, 500),
+	spread_degrees = 5.5,
+	angular_offset = minmax(0, 10),
+	particles_per_burst = minmax_u(10, 200),
 	type = emission.BURST;
 	velocity = minmax(1, 5000),
-	angular_velocity = minmax(1, 5000),
+	angular_velocity = minmax(0, 0),
 	
 	particle_templates = archetyped(blood_templates, {
 		{ should_disappear = true },
@@ -237,22 +238,22 @@ blood_droplets = {
 		{ should_disappear = true }
 	}),
 	
-	size_multiplier = minmax(0.2, 0.35),
+	size_multiplier = minmax(0.25, 0.35),
 	initial_rotation_variation = 180,
 	
 	particle_render_template = { 
 		layer = render_layers.ON_GROUND
 	},
 	
-	particle_lifetime_ms = minmax(200, 500)
+	particle_lifetime_ms = minmax(50, 150)
 }
 
 blood_pool = {
 	spread_degrees = 180.5,
 	particles_per_sec = minmax(50, 150),
-	stream_duration_ms = minmax(200, 400),
+	stream_duration_ms = minmax(200, 1000),
 	type = emission.STREAM,
-	velocity = minmax(1, 6),
+	velocity = minmax(1, 12),
 	angular_velocity = minmax(0, 10),
 	
 	particle_templates = archetyped(blood_templates, {
@@ -263,7 +264,7 @@ blood_pool = {
 		{ linear_damping = 2 }
 	}),
 	
-	size_multiplier = minmax(0.3, 1.0),
+	size_multiplier = minmax(0.3, 2.0),
 	initial_rotation_variation = 180,
 	
 	particle_render_template = { 

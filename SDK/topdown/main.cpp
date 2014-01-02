@@ -131,7 +131,6 @@ int main() {
 	std::cout << std::endl;
 	lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
 
-
 	int argc = 0;
 	::testing::InitGoogleTest(&argc, (wchar_t**)nullptr);
 
