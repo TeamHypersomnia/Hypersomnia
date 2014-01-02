@@ -211,6 +211,9 @@ vec2<> steering::flee::steer(scene in) {
 
 
 vec2<> steering::directed::predict_interception(const object_info& subject, const target_info& target, bool flee_prediction) {
+	if (target.info.speed < std::numeric_limits<float>::epsilon() || subject.speed < std::numeric_limits<float>::epsilon())
+		return target.info.position;
+	
 	/* obtain target's velocity */
 	/* how parallel is our current velocity and the direction we our target is to */
 	auto forwardness = subject.unit_vel.dot(target.direction);

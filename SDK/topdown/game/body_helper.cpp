@@ -12,7 +12,7 @@
 
 namespace topdown {
 	physics_info::physics_info() 
-		: rect_size(augmentations::vec2<>()), type(RECT), density(1.f), angular_damping(0.f), linear_damping(0.f), fixed_rotation(false), sensor(false), restitution(0.f),
+		: rect_size(augmentations::vec2<>()), type(RECT), density(1.f), angular_damping(0.f), linear_damping(0.f), fixed_rotation(false), sensor(false), restitution(0.f), friction(0.f),
 		body_type(b2_dynamicBody)
 		{
 	}

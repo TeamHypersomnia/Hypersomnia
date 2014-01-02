@@ -9,7 +9,7 @@ namespace augmentations {
 		animator::method 
 			animator::LINEAR(0.f, 1.f,								[](float x){return x;}), 
 			animator::QUADRATIC(-1.f, 0.f,							[](float x){return -(x*x);}), 
-			animator::SINUSOIDAL(-3.14159265f/2., 3.14159265f/2.,	[](float x){return sin(x);}), 
+			animator::SINUSOIDAL(-3.14159265f/2.f, 3.14159265f/2.f,	[](float x){return sin(x);}), 
 			animator::HYPERBOLIC(-2.f, -0.5f,						[](float x){return -1.f/x;}), 
 			animator::LOGARITHMIC(0.05f, 5.f,						[](float x){return log(x);}),
 			animator::EXPONENTIAL(-3.f, 1.f,						[](float x){return -exp(-x);}); 

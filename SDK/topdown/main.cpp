@@ -40,6 +40,11 @@
 #include "resources/render_info.h"
 #include "resources/animate_info.h"
 #include "resources/scriptable_info.h"
+
+#include <float.h>
+
+//unsigned int fp_control_state = _controlfp(_EM_INEXACT, _MCW_EM);
+
 //separate events and processing passes in systems to enable script callbacks
 // or we can do with polluted data/instruction caches
 using namespace augmentations;
@@ -88,6 +93,7 @@ int main() {
 	my_world.add_system(&movement);
 	my_world.add_subsystem(&physics, &steering);
 	my_world.add_subsystem(&physics, &movement);
+	my_world.add_subsystem(&physics, &behaviours);
 	my_world.add_system(&physics);
 	my_world.add_system(&lookat);
 	my_world.add_system(&chase);
@@ -99,7 +105,6 @@ int main() {
 	my_world.add_system(&animations);
 	my_world.add_system(&visibility);
 	my_world.add_system(&pathfinding);
-	my_world.add_system(&behaviours);
 	my_world.add_system(&render);
 	my_world.add_system(&scripts);
 	my_world.add_system(&destroy);
@@ -138,7 +143,10 @@ int main() {
 	::testing::FLAGS_gtest_catch_exceptions = false;
 	::testing::FLAGS_gtest_break_on_failure = false;
 	auto result = RUN_ALL_TESTS();
-
+	
+	_clearfp();
+	_controlfp(_controlfp(0, 0) & ~(_EM_INVALID | _EM_ZERODIVIDE | _EM_OVERFLOW),
+		_MCW_EM);
 	while (!input.quit_flag) {
 		
 		my_world.run();

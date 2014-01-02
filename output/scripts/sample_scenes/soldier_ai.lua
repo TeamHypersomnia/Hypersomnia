@@ -403,7 +403,7 @@ loop_only_info = create_scriptable_info {
 						if player.body:exists() then get_scripted(player.body:get()):pick_up_weapon() end
 					end
 				elseif message.intent == custom_intents.INSTANT_SLOWDOWN then
-					physics_system.timestep_multiplier = 0.000
+					physics_system.timestep_multiplier = 0.00001
 				elseif message.intent == custom_intents.SPEED_INCREASE then
 					physics_system.timestep_multiplier = physics_system.timestep_multiplier + 0.05
 				elseif message.intent == custom_intents.SPEED_DECREASE then

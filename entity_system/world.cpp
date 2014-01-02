@@ -41,7 +41,7 @@ namespace augmentations {
 		
 		void world::delete_all_entities(bool clear_systems_manually) {
 			if (clear_systems_manually)
-				for (auto* system_to_clean : systems)
+				for (auto* system_to_clean : all_systems)
 					system_to_clean->clear();
 
 			for (auto& watcher_vector : registered_entity_watchers) 
