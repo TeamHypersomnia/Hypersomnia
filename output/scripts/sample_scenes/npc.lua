@@ -407,7 +407,7 @@ for i=1, 15 do
 	}
 end
 
-npc_count = 15
+npc_count = 3
 my_npcs = {}
 
 final_npc_archetype = (archetyped(character_archetype, {

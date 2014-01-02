@@ -50,6 +50,11 @@ std::vector<physics_system::raycast_output> physics_system::ray_cast_all_interse
 	callback.subject = ignore_entity;
 	callback.save_all = true;
 
+	if (!((p1_meters - p2_meters).length_sq() > 0.f)) {
+		printf("ray_cast: X: %f, Y: %f\nX: %f, Y: %f\n", p1_meters.x, p1_meters.y, p2_meters.x, p2_meters.y);
+		std::cout << "error" << std::endl;
+	}
+
 	b2world.RayCast(&callback, p1_meters, p2_meters);
 	return callback.outputs;
 }
@@ -105,6 +110,11 @@ physics_system::raycast_output physics_system::ray_cast(vec2<> p1_meters, vec2<>
 	raycast_input callback;
 	callback.subject_filter = &filter;
 	callback.subject = ignore_entity;
+
+	if (!((p1_meters - p2_meters).length_sq() > 0.f)) {
+		printf("ray_cast: X: %f, Y: %f\nX: %f, Y: %f\n", p1_meters.x, p1_meters.y, p2_meters.x, p2_meters.y);
+		std::cout << "error" << std::endl;
+	}
 
 	b2world.RayCast(&callback, p1_meters, p2_meters);
 	return callback.output;
@@ -196,6 +206,9 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 	auto fix_a = contact->GetFixtureA();
 	auto fix_b = contact->GetFixtureB();
 
+	/* collision messaging happens only for sensors here
+		PreSolve is the counterpart for regular bodies
+	*/
 	if (fix_a->IsSensor() || fix_b->IsSensor()) {
 		auto body_a = fix_a->GetBody();
 		auto body_b = fix_b->GetBody();

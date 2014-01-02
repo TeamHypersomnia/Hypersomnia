@@ -82,8 +82,9 @@ int main() {
 	destroy_system destroy;
 	behaviour_tree_system behaviours;
 
+
 	my_world.add_system(&input);
-	my_world.add_system(&steering);
+	//my_world.add_system(&steering);
 	my_world.add_system(&movement);
 	my_world.add_subsystem(&physics, &steering);
 	my_world.add_subsystem(&physics, &movement);
