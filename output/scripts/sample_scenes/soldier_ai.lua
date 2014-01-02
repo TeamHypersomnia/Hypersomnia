@@ -463,7 +463,6 @@ loop_only_info = create_scriptable_info {
 	}
 }
 
-
 myloopscript = create_entity {
 	input = {
 			custom_intents.SPEED_INCREASE,

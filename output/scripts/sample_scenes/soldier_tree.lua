@@ -264,9 +264,11 @@ npc_legs_behaviour_tree = create_behaviour_tree {
 				current_task:interrupt_runner(behaviour_node.FAILURE)
 				--npc_behaviour_tree.delay_chase.maximum_running_time_ms = 400
 				set_max_speed(entity, 700)
+				entity.pathfinding:clear_pathfinding_info()
 				--entity.pathfinding:start_exploring()
 				entity.pathfinding.favor_velocity_parallellness = true
-				get_scripted(entity).steering_behaviours.wandering.weight_multiplier = 0.2 
+				get_scripted(entity).steering_behaviours.wandering.weight_multiplier = 0.0 
+				--get_scripted(entity).steering_behaviours.forward_seeking.enabled = true 
 			end,
 			
 			on_exit = function(entity, status)

@@ -285,7 +285,7 @@ function npc_class:loop()
 		end
 	else
 		behaviours.target_seeking.enabled = false
-		behaviours.forward_seeking.enabled = false
+		behaviours.forward_seeking.enabled = true
 		--behaviours.obstacle_avoidance.enabled = false
 	end
 	
@@ -437,7 +437,12 @@ final_npc_archetype = (archetyped(character_archetype, {
 				body_info = {
 					filter = filter_enemies
 				}
+			},
+			
+			movement = {
+				max_speed_animation = 700
 			}
+			
 		},
 		
 		legs = {

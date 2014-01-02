@@ -41,7 +41,7 @@
 #include "resources/animate_info.h"
 #include "resources/scriptable_info.h"
 
-#include <float.h>
+//#include <float.h>
 
 //unsigned int fp_control_state = _controlfp(_EM_INEXACT, _MCW_EM);
 
@@ -144,9 +144,9 @@ int main() {
 	::testing::FLAGS_gtest_break_on_failure = false;
 	auto result = RUN_ALL_TESTS();
 	
-	_clearfp();
-	_controlfp(_controlfp(0, 0) & ~(_EM_INVALID | _EM_ZERODIVIDE | _EM_OVERFLOW),
-		_MCW_EM);
+	//_clearfp();
+	//_controlfp(_controlfp(0, 0) & ~(_EM_INVALID | _EM_ZERODIVIDE | _EM_OVERFLOW),
+	//	_MCW_EM);
 	while (!input.quit_flag) {
 		
 		my_world.run();

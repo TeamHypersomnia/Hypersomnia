@@ -7,7 +7,7 @@
 class NullStream {
 public:
 	NullStream() { }
-	template<typename T> NullStream& operator<<(const T const&) { return *this; }
+	template<typename T> NullStream& operator<<(const T &) { return *this; }
 };
 
 //#define NDEBUG
@@ -109,7 +109,7 @@ void behaviour_tree::composite::on_enter(task& current_task) {
 			luabind::call_function<void>(enter_callback, current_task.subject, &current_task);
 		}
 		catch (std::exception compilation_error) {
-			COUT << compilation_error.what() << '\n';
+			std::cout << compilation_error.what() << '\n';
 		}
 	}
 }
@@ -120,7 +120,7 @@ void behaviour_tree::composite::on_exit(task& current_task, int exit_code) {
 			luabind::call_function<void>(exit_callback, current_task.subject, exit_code);
 		}
 		catch (std::exception compilation_error) {
-			COUT << compilation_error.what() << '\n';
+			std::cout << compilation_error.what() << '\n';
 		}
 	}
 	COUT << "quitting " << name << " which was " << get_type_str() << " and resulted in " << get_result_str(exit_code) << '\n';
@@ -134,7 +134,7 @@ int behaviour_tree::composite::on_update(task& current_task) {
 			return result;
 		}
 		catch (std::exception compilation_error) {
-			COUT << compilation_error.what() << '\n';
+			std::cout << compilation_error.what() << '\n';
 		}
 	}
 
