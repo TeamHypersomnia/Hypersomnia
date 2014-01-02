@@ -95,8 +95,9 @@ npc_legs_behaviour_tree = create_behaviour_tree {
 					
 					for k, v in ipairs(visible_guns) do
 						local dist = (v.item.transform.current.pos - entity.transform.current.pos)
-						if dist:length_sq() < nearest_gun.distance then
-							nearest_gun = { item = v.item, distance = dist } 
+						local dist_len = dist:length_sq()
+						if dist_len < nearest_gun.distance then
+							nearest_gun = { item = v.item, distance = dist_len } 
 						end
 					end
 					
