@@ -97,7 +97,6 @@ function set_components_from_entry(entity, entry, entities_lookup)
 		
 		if entry.physics.body_info.shape_type == physics_info.POLYGON then
 			if entry.physics.body_info.vertices == nil then
-				print("jeste tu")
 				entry.physics.body_info.vertices = entry.render.model
 			end
 		end

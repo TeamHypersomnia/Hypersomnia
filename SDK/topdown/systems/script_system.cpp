@@ -93,8 +93,18 @@ namespace bindings {
 }
 
 int the_callback(lua_State *L) {
-	std::cout << lua_tostring(L, -1) << std::endl;
-	return 0;
+	lua_getglobal(L, "debug");
+	lua_getfield(L, -1, "traceback");
+	lua_pushvalue(L, 1);
+	lua_pushinteger(L, 2);
+	lua_call(L, 2, 1);
+	fprintf(stderr, "%s\n", lua_tostring(L, -1));
+	return 1;
+
+	//std::cout << lua_tostring(L, -1) << std::endl;
+	//std::cout << lua_tostring(L, -1) << std::endl;
+	//std::cout << lua_tostring(L, -1) << std::endl;
+	//return 0;
 }
 
 script_system::script_system() : lua_state(luaL_newstate()) {
