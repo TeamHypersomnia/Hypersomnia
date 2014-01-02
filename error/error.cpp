@@ -4,7 +4,6 @@
 #include <Windows.h>
 #undef min
 #undef max
-#define GLEW_STATIC
 #include <gl/glew.h>
 #include "../utility/stream.h"
 #include <cassert>

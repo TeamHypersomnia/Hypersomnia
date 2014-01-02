@@ -531,9 +531,6 @@
     <ClCompile Include="SDK\topdown\resources\vertex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\b2Separator\b2Separator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\poly2tri\sweep\advancing_front.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -873,9 +870,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\readdir\_stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\b2Separator\b2Separator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\poly2tri\poly2tri.h">

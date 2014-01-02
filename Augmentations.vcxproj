@@ -71,7 +71,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
@@ -87,7 +87,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="3rdparty\b2Separator\b2Separator.cpp" />
     <ClCompile Include="3rdparty\Box2D\Collision\b2BroadPhase.cpp" />
     <ClCompile Include="3rdparty\Box2D\Collision\b2CollideCircle.cpp" />
     <ClCompile Include="3rdparty\Box2D\Collision\b2CollideEdge.cpp" />
@@ -635,7 +634,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="3rdparty\b2Separator\b2Separator.h" />
     <ClInclude Include="3rdparty\Box2D\Box2D.h" />
     <ClInclude Include="3rdparty\Box2D\Collision\b2BroadPhase.h" />
     <ClInclude Include="3rdparty\Box2D\Collision\b2Collision.h" />

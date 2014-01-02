@@ -1,6 +1,5 @@
 #pragma once
 #define UNICODE
-#define GLEW_STATIC
 #define BOOST_DISABLE_THREADS
 #pragma message("Compiling precompiled headers.\n")
 
