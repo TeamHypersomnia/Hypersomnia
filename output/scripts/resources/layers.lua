@@ -93,6 +93,21 @@ filter_pick_up_items = {
 	maskBits = ITEMS
 }
 
+filter_melee = {
+	categoryBits = BULLETS,
+	maskBits = CHARACTERS
+}
+
+filter_enemy_melee = {
+	categoryBits = ENEMY_BULLETS,
+	maskBits = CHARACTERS
+}
+
+filter_melee_obstruction = {
+	categoryBits = mask_all,
+	maskBits = bitor(OBJECTS, STATIC_OBJECTS)
+}
+
 filter_pathfinding_visibility = {
 	categoryBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS, CORPSES),
 	maskBits = bitor(STATIC_OBJECTS)

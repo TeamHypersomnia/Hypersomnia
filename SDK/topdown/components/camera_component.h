@@ -26,6 +26,7 @@ namespace components {
 		float angled_look_length;
 		bool enable_smoothing;
 		double smoothing_average_factor, averages_per_sec;
+		augmentations::vec2<> last_interpolant;
 
 		augmentations::vec2<> max_look_expand;
 
@@ -44,7 +45,6 @@ namespace components {
 		friend class camera_system;
 		friend class gun_system;
 
-		augmentations::vec2<> last_interpolant;
 		augmentations::util::timer smooth_timer;
 		augmentations::rects::ltrb last_ortho_interpolant;
 	};

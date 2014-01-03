@@ -19,7 +19,7 @@
 
 #include "../game/body_helper.h"
 
-gun_system::gun_system() : generator(device()) {}
+#include "utility/randval.h"
 
 /* hacky methods to aid transferring barrel smoke to dropped gun */
 void components::gun::transfer_barrel_smoke(augmentations::entity_system::entity* another, bool overwrite_components) {
@@ -77,6 +77,17 @@ bool components::gun::can_drop() const {
 	return !is_melee || (is_melee && !is_swinging && shooting_timer.get<std::chrono::milliseconds>() >= shooting_interval_ms);
 }
 
+void components::gun::shake_camera(float rotation) {
+	if (target_camera_to_shake) {
+		vec2<> shake_dir;
+		shake_dir.set_from_degrees(randval(
+			rotation - shake_spread_degrees,
+			rotation + shake_spread_degrees));
+
+		target_camera_to_shake->get<components::camera>().last_interpolant += shake_dir * shake_radius;
+	}
+}
+
 void gun_system::process_entities(world& owner) {
 	auto& physics_sys = owner.get_system<physics_system>();
 	auto& render = owner.get_system<render_system>();
@@ -86,7 +97,7 @@ void gun_system::process_entities(world& owner) {
 		auto& gun = it->get<components::gun>();
 
 		auto get_damage = [&gun, this](){
-			return std::uniform_real_distribution<float>(gun.bullet_damage.first, gun.bullet_damage.second)(generator);
+			return randval(gun.bullet_damage.first, gun.bullet_damage.second);
 		};
 
 		auto since_shot = gun.shooting_timer.get<std::chrono::milliseconds>();
@@ -140,14 +151,16 @@ void gun_system::process_entities(world& owner) {
 				b2PolygonShape swing_query;
 				swing_query.Set(query_vertices.data(), query_vertices.size());
 
-				auto hit_bodies = physics_sys.query_shape(&swing_query, &gun.bullet_body.filter, it).bodies;
+				auto hit_bodies = physics_sys.query_shape(&swing_query, &gun.melee_filter, it).bodies;
 
 				for (auto hit_body : hit_bodies) {
 					auto target_entity = reinterpret_cast<entity*>(hit_body->GetUserData());
 					auto target_transform = target_entity->get<components::transform>().current;
-					auto ray_output = physics_sys.ray_cast_px(gun_transform.pos, target_transform.pos, gun.bullet_body.filter, it);
+					auto ray_output = physics_sys.ray_cast_px(gun_transform.pos, target_transform.pos, gun.melee_obstruction_filter, it);
+
 
 					if (!ray_output.hit || (ray_output.hit && ray_output.what_entity == target_entity)) {
+						gun.shake_camera(gun_transform.rotation);
 						/* apply damage to the entity */
 						vec2<> impact_pos = ray_output.hit ? ray_output.intersection : target_transform.pos;
 
@@ -185,14 +198,7 @@ void gun_system::process_entities(world& owner) {
 
 				owner.post_message(msg);
 
-				if (gun.target_camera_to_shake) {
-					vec2<> shake_dir;
-					shake_dir.set_from_degrees(std::uniform_real_distribution<float>(
-						gun_transform.rotation - gun.shake_spread_degrees,
-						gun_transform.rotation + gun.shake_spread_degrees)(generator));
-				
-					gun.target_camera_to_shake->get<components::camera>().last_interpolant += shake_dir * gun.shake_radius;
-				}
+				gun.shake_camera(gun_transform.rotation);
 
 				if (!gun.is_automatic)
 					gun.trigger = false;
@@ -222,15 +228,15 @@ void gun_system::process_entities(world& owner) {
 
 					/* randomize bullet direction taking spread into account */
 					vec2<> vel(vec2<>::from_degrees(
-						std::uniform_real_distribution<float> (
+						randval(
 						gun_transform.rotation - gun.spread_degrees,
-						gun_transform.rotation + gun.spread_degrees)(generator)));
+						gun_transform.rotation + gun.spread_degrees)));
 
 					new_transform.rotation = vel.get_degrees();
 					/* add randomized speed to bullet taking velocity variation into account */
-					vel *= std::uniform_real_distribution<float> (
+					vel *= randval (
 						gun.bullet_speed.first,
-						gun.bullet_speed.second)(generator) * PIXELS_TO_METERSf;
+						gun.bullet_speed.second) * PIXELS_TO_METERSf;
 
 					components::damage damage;
 					/* randomize damage */

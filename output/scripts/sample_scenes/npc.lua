@@ -115,6 +115,8 @@ function npc_class:take_weapon_item(item_data)
 	
 	self.current_weapon = item_data
 	self.entity.gun:set_bullet_filter(create(b2Filter, self.weapon_bullet_filter))
+	self.entity.gun.melee_filter = create(b2Filter, self.weapon_melee_filter)
+	self.entity.gun.melee_obstruction_filter = create(b2Filter, self.weapon_melee_obstruction_filter)
 	print("taking weapon...\n" .. item_data.animation_index)
 end
 
@@ -522,7 +524,9 @@ for i=1, npc_count do
 			}
 		},
 		
-		weapon_bullet_filter = filter_enemy_bullets
+		weapon_bullet_filter = filter_enemy_bullets,
+		weapon_melee_filter = filter_enemy_melee,
+		weapon_melee_obstruction_filter = filter_melee_obstruction
 	})
 	
 	local script_data = get_scripted(my_npcs[i].body:get())

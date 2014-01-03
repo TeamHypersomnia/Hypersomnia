@@ -90,12 +90,15 @@ bare_hands = {
 			density = 0.1
 		},
 		
-		swing_radius = 100,
+		swing_radius = 80,
 		
 		swing_angle = 90,
 		
 		swing_angular_offset = 0,
-		target_camera_to_shake = world_camera 
+		target_camera_to_shake = world_camera,
+		
+		shake_radius = 25.5,
+		shake_spread_degrees = 45
 		--query_vertices = 7
 	}),
 	
@@ -169,11 +172,13 @@ shotgun = {
 		spread_degrees = 8,
 		
 		current_rounds = 6,
-		max_rounds = 2
+		max_rounds = 2,
+		
+		shake_radius = 15.5
 	})),
 	
 	animation_index = "SHOTGUN",
-	world_orbit_offset = vec2(70, -8),
+	world_orbit_offset = vec2(50, -8),
 	
 	item_entity = archetyped(world_item, { 
 		render = { 
@@ -210,7 +215,10 @@ fireaxe = {
 	swing_angle = 90,
 	 
 	swing_angular_offset = 0,
-	target_camera_to_shake = world_camera 
+	target_camera_to_shake = world_camera,
+	
+	shake_radius = 25.5,
+	shake_spread_degrees = 45
 	--query_vertices = 7
 	}),
 	

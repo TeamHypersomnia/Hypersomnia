@@ -107,7 +107,9 @@ init_npc(player.body:get(), {
 		}
 	},
 	
-	weapon_bullet_filter = filter_bullets
+	weapon_bullet_filter = filter_bullets,
+	weapon_melee_filter = filter_melee,
+	weapon_melee_obstruction_filter = filter_melee_obstruction
 	}
 )
 

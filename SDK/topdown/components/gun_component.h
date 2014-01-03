@@ -13,6 +13,8 @@ namespace components {
 	struct gun : public augmentations::entity_system::component {
 		components::render bullet_render;
 		topdown::physics_info bullet_body;
+		b2Filter melee_filter;
+		b2Filter melee_obstruction_filter;
 
 		unsigned max_rounds;
 
@@ -50,6 +52,8 @@ namespace components {
 		void set_bullet_filter(b2Filter f) {
 			bullet_body.filter = f;
 		}
+
+		void shake_camera(float direction);
 
 		struct uncopyable {
 			augmentations::entity_system::entity_ptr target_barrel_smoke_group;

@@ -52,6 +52,7 @@ namespace augmentations {
 				bool empty() override { return messages.empty();  }
 				void purify(entity* invalidated_subject) override {
 					messages.erase(std::remove_if(messages.begin(), messages.end(), [invalidated_subject](const message& m){ return m.subject == invalidated_subject; }), messages.end());
+					delayed_messages.erase(std::remove_if(delayed_messages.begin(), delayed_messages.end(), [invalidated_subject](const delayed_message& m){ return m.msg.subject == invalidated_subject; }), delayed_messages.end());
 				}
 			};
 

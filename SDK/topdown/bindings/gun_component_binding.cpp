@@ -25,6 +25,8 @@ namespace bindings {
 			.def_readwrite("bullet_speed", &gun::bullet_speed)
 			.def_readwrite("shooting_interval_ms", &gun::shooting_interval_ms)
 			.def_readwrite("max_bullet_distance", &gun::max_bullet_distance)
+			.def_readwrite("melee_filter", &gun::melee_filter)
+			.def_readwrite("melee_obstruction_filter", &gun::melee_obstruction_filter)
 			.def_readwrite("bullet_distance_offset", &gun::bullet_distance_offset)
 			.def_readwrite("shake_radius", &gun::shake_radius)
 			.def_readwrite("shake_spread_degrees", &gun::shake_spread_degrees)

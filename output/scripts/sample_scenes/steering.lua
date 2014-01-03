@@ -53,7 +53,7 @@ containment_archetype = {
 containment_steering = create_steering (containment_archetype) 
 
 obstacle_avoidance_archetype = {
-	weight = 1000, 
+	weight = 1, 
 	behaviour_type = obstacle_avoidance_behaviour,
 	visibility_type = visibility_component.DYNAMIC_PATHFINDING,
 	
@@ -67,7 +67,7 @@ wander_steering = create_steering {
 	weight = 0.4, 
 	behaviour_type = wander_behaviour,
 	
-	circle_radius = 2000,
+	circle_radius = 200,
 	circle_distance = 2540,
 	displacement_degrees = 15,
 	
