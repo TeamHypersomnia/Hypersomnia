@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <Box2D/Common/b2Math.h>
 #include "rects.h"
+#include "utility/randval.h"
 namespace augmentations {
 	template <class type_val>
 	void damp(type_val& val, type_val len) {
@@ -74,6 +75,11 @@ namespace augmentations {
 			vec2 out;
 			out.set_from_degrees(degrees);
 			return out;
+		}
+
+		template <class t>
+		static vec2 random_on_circle(t radius) {
+			return vec2::from_degrees(randval(0.f, 360.f)) * radius;
 		}
 
 		static bool segment_in_segment(vec2 smaller_p1, vec2 smaller_p2, vec2 bigger_p1, vec2 bigger_p2,

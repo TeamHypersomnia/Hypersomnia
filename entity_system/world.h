@@ -6,6 +6,7 @@
 #include "type_registry.h"
 
 #include "utility/sorted_vector.h"
+#include "utility/timer.h"
 
 namespace augmentations {
 	namespace entity_system {
@@ -16,17 +17,40 @@ namespace augmentations {
 			friend class entity_ptr;
 
 			struct message_queue {
+				virtual void validate_delayed_messages() = 0;
 				virtual void clear() = 0;
+				virtual void clear_delayed() = 0;
 				virtual bool empty() = 0;
 				virtual void purify(entity* invalidated_subject) = 0;
 			};
 
 			template <typename message>
 			struct templated_message_queue : public message_queue {
+				struct delayed_message {
+					util::timer was_sent;
+					float post_after_ms;
+
+					message msg;
+				};
+
+				std::vector<delayed_message> delayed_messages;
 				std::vector<message> messages;
+
+				void validate_delayed_messages() override {
+					delayed_messages.erase(std::remove_if(delayed_messages.begin(), delayed_messages.end(), [this](const delayed_message& m){
+						if (m.was_sent.get<std::chrono::milliseconds>() >= m.post_after_ms) {
+							messages.push_back(m.msg);
+							return true;
+						}
+
+						return false;
+					}), delayed_messages.end());
+				}
+
 				void clear() override { messages.clear(); }
+				void clear_delayed() override { delayed_messages.clear(); }
 				bool empty() override { return messages.empty();  }
-				void purify(entity* invalidated_subject) {
+				void purify(entity* invalidated_subject) override {
 					messages.erase(std::remove_if(messages.begin(), messages.end(), [invalidated_subject](const message& m){ return m.subject == invalidated_subject; }), messages.end());
 				}
 			};
@@ -67,11 +91,22 @@ namespace augmentations {
 				return (static_cast<templated_message_queue<T>*>(input_queue.at(typeid(T).hash_code()).get()))->messages.push_back(message_object);
 			}
 			
+			template <typename T>
+			void post_delayed_message(const T& message_object, float delay_ms) {
+				templated_message_queue<T>::delayed_message msg;
+				msg.msg = message_object;
+				msg.post_after_ms = delay_ms;
+				msg.was_sent.reset();
+
+				return (static_cast<templated_message_queue<T>*>(input_queue.at(typeid(T).hash_code()).get()))->delayed_messages.push_back(msg);
+			}
+
 			std::vector<processing_system*>& get_all_systems() {
 				return all_systems;
 			}
 
 			void purify_queues(entity* invalidated_subject);
+			void validate_delayed_messages();
 
 			template <class T>
 			void register_system(T* new_system) {
@@ -116,6 +151,7 @@ namespace augmentations {
 			void delete_all_entities(bool clear_systems_manually);
 
 			void flush_message_queues();
+			void flush_delayed_message_queues();
 		};
 	}
 }

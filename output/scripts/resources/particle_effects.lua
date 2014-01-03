@@ -19,11 +19,11 @@ blood_piece = {
 }
 
 blood_templates = {
-	archetyped(blood_piece, { model = { image = images.blood_1, size_multiplier = vec2(2, 2) } } ),
-	archetyped(blood_piece, { model = { image = images.blood_2, size_multiplier = vec2(2, 2) } } ),
-	archetyped(blood_piece, { model = { image = images.blood_3, size_multiplier = vec2(2, 2) } } ),
-	archetyped(blood_piece, { model = { image = images.blood_4, size_multiplier = vec2(2, 2) } } ),
-	archetyped(blood_piece, { model = { image = images.blood_5, size_multiplier = vec2(2, 2) } } )
+	archetyped(blood_piece, { model = { image = images.blood_1 } } ),
+	archetyped(blood_piece, { model = { image = images.blood_2 } } ),
+	archetyped(blood_piece, { model = { image = images.blood_3 } } ),
+	archetyped(blood_piece, { model = { image = images.blood_4 } } ),
+	archetyped(blood_piece, { model = { image = images.blood_5 } } )
 }
 
 big_wood_templates = {
@@ -170,9 +170,9 @@ barrel_smoke_1 = {
 	
 	swing_spread = minmax(5, 12),
 	swings_per_sec = minmax(2, 2),
+	swing_spread_change_rate = minmax(1, 2),
 	angular_offset = minmax(0, 0),
 	
-	swing_spread_change_rate = minmax(1, 2),
 	fade_when_ms_remaining = minmax(10, 50)
 	--swing_speed_change_rate = minmax(0.05, 0.06)
 }
@@ -206,15 +206,16 @@ bullet_impact_smoke_2 = archetyped(barrel_smoke_2, {
 })
 
 blood_shower = {
-	spread_degrees = 120.5,
-	particles_per_burst = minmax_u(15, 25),
+	spread_degrees = 10,
+	angular_offset = minmax(0, 180),
+	particles_per_burst = minmax_u(15, 45),
 	type = emission.BURST;
-	velocity = minmax(1, 4000),
-	angular_velocity = minmax(0, 1500),
+	velocity = minmax(1, 3000),
+	angular_velocity = minmax(0, 0),
 	
 	particle_templates = blood_templates,
 	
-	size_multiplier = minmax(0.2, 0.35),
+	size_multiplier = minmax(0.25, 0.35),
 	initial_rotation_variation = 180,
 	
 	particle_render_template = { 
@@ -223,9 +224,9 @@ blood_shower = {
 }
 
 blood_droplets = {
-	spread_degrees = 5.5,
+	spread_degrees = 2.5,
 	angular_offset = minmax(0, 10),
-	particles_per_burst = minmax_u(10, 200),
+	particles_per_burst = minmax_u(600, 1000),
 	type = emission.BURST;
 	velocity = minmax(1, 5000),
 	angular_velocity = minmax(0, 0),
@@ -238,7 +239,7 @@ blood_droplets = {
 		{ should_disappear = true }
 	}),
 	
-	size_multiplier = minmax(0.25, 0.35),
+	size_multiplier = minmax(1, 1),
 	initial_rotation_variation = 180,
 	
 	particle_render_template = { 
@@ -249,26 +250,59 @@ blood_droplets = {
 }
 
 blood_pool = {
-	spread_degrees = 180.5,
-	particles_per_sec = minmax(50, 150),
-	stream_duration_ms = minmax(200, 1000),
+	spread_degrees = 1.5,
+	particles_per_sec = minmax(350, 1050),
+	stream_duration_ms = minmax(100, 200),
 	type = emission.STREAM,
-	velocity = minmax(1, 12),
-	angular_velocity = minmax(0, 10),
+	velocity = minmax(0.1, 50),
+	angular_velocity = minmax(0, 0),
 	
 	particle_templates = archetyped(blood_templates, {
-		{ linear_damping = 2 },
-		{ linear_damping = 2 },
-		{ linear_damping = 2 },
-		{ linear_damping = 2 },
-		{ linear_damping = 2 }
+		{ linear_damping = 1000 },
+		{ linear_damping = 1000 },
+		{ linear_damping = 1000 },
+		{ linear_damping = 1000 },
+		{ linear_damping = 1000 }
 	}),
 	
-	size_multiplier = minmax(0.3, 2.0),
+	size_multiplier = minmax(1, 1),
 	initial_rotation_variation = 180,
 	
 	particle_render_template = { 
 		layer = render_layers.ON_GROUND
+	},
+	
+	min_swing_spread = minmax(2, 5),
+	min_swings_per_sec = minmax(0.5, 1),
+	max_swing_spread = minmax(6, 12),
+	max_swings_per_sec = minmax(1.5, 2),
+	
+	swing_spread = minmax(5, 12),
+	swings_per_sec = minmax(2, 2),
+	swing_spread_change_rate = minmax(1, 2),
+}
+
+blood_under_corpse = {
+	spread_degrees = 180,
+	particles_per_sec = minmax(300, 300),
+	stream_duration_ms = minmax(2000, 2000),
+	type = emission.STREAM,
+	velocity = minmax(1, 4),
+	angular_velocity = minmax(0, 0),
+	
+	particle_templates = archetyped(blood_templates, {
+		{ linear_damping = 1 },
+		{ linear_damping = 1 },
+		{ linear_damping = 1 },
+		{ linear_damping = 1 },
+		{ linear_damping = 1 }
+	}),
+	
+	size_multiplier = minmax(1.5, 2),
+	initial_rotation_variation = 180,
+	
+	particle_render_template = { 
+		layer = render_layers.UNDER_CORPSES
 	}
 }
 
@@ -313,8 +347,13 @@ gunshot_effect = {
 
 blood_effect = {
 	blood_shower,
-	blood_pool,
-	blood_droplets
+	blood_shower
+	--blood_pool,
+	--blood_droplets
+}
+
+blood_under_corpse_effect = create_particle_effect {
+	blood_under_corpse
 }
 
 -- EFFECT SETS --

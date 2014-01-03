@@ -94,7 +94,8 @@ bare_hands = {
 		
 		swing_angle = 90,
 		
-		swing_angular_offset = 0
+		swing_angular_offset = 0,
+		target_camera_to_shake = world_camera 
 		--query_vertices = 7
 	}),
 	
@@ -132,7 +133,8 @@ assault_rifle_info = {
 	swing_angle = 90,
 	swing_angular_offset = 0,
 	swing_duration = 300,
-	swing_interval_ms = 600
+	swing_interval_ms = 600,
+	target_camera_to_shake = world_camera 
 }
 
 assault_rifle = {
@@ -207,7 +209,8 @@ fireaxe = {
 	 
 	swing_angle = 90,
 	 
-	swing_angular_offset = 0
+	swing_angular_offset = 0,
+	target_camera_to_shake = world_camera 
 	--query_vertices = 7
 	}),
 	

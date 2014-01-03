@@ -133,7 +133,8 @@ int main() {
 	auto result = RUN_ALL_TESTS();
 	
 	while (!input.quit_flag) {
-		
+		my_world.validate_delayed_messages();
+
 		input.process_entities(my_world);                  
 		movement.process_entities(my_world);
 
@@ -143,7 +144,6 @@ int main() {
 			damage.process_events(owner);
 			destroy.process_events(owner);
 		};
-
 
 		physics.process_entities(my_world);                 
 		behaviours.process_entities(my_world);              

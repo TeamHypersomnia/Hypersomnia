@@ -17,11 +17,11 @@ namespace augmentations {
 				raw_map[k] = v;
 			}
 
-			const value& at(const key& k) const {
+			value& at(const key& k) {
 				return raw_map.at(k);
 			}
 
-			const value& get(key k) const {
+			value& get(key k) {
 				return raw_map.at(k);
 			}
 

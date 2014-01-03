@@ -22,8 +22,13 @@ namespace bindings {
 			.def("delete_entity", &world::delete_entity)
 			.def("post_message", &world::post_message<animate_message>)
 			.def("post_message", &world::post_message<intent_message>)
-			.def("post_destroy_message", &world::post_message<destroy_message>)
+			.def("post_message", &world::post_message<destroy_message>)
 			.def("post_message", &world::post_message<particle_burst_message>)
+
+			.def("post_delayed_message", &world::post_delayed_message<animate_message>)
+			.def("post_delayed_message", &world::post_delayed_message<intent_message>)
+			.def("post_delayed_message", &world::post_delayed_message<destroy_message>)
+			.def("post_delayed_message", &world::post_delayed_message<particle_burst_message>)
 			,
 
 			luabind::def("post_destroy", helper_destroy);

@@ -99,7 +99,7 @@ function npc_class:take_weapon_item(item_data)
 		local msg = destroy_message()
 		self.wielded_entity.name = "wielded_entity"
 		msg.subject = self.wielded_entity
-		world:post_destroy_message(msg)
+		world:post_message(msg)
 		self.wielded_entity = nil
 	end
 
@@ -134,7 +134,7 @@ function npc_class:take_weapon(weapon_entity)
 	
 	local msg = destroy_message()
 	msg.subject = weapon_entity
-	world:post_destroy_message(msg)
+	world:post_message(msg)
 end
 
 function spawn_weapon(position, item_archetype, instance_data)
@@ -230,9 +230,9 @@ function npc_class:throw_corpse()
 	
 	local msg = destroy_message()
 	msg.subject = self.entity
-	world:post_destroy_message(msg)
+	world:post_message(msg)
 	--msg.subject = self.head_entity
-	--world:post_destroy_message(msg)
+	--world:post_message(msg)
 	
 	
 	--world:delete_entity(self.entity, nil)
@@ -245,6 +245,16 @@ function npc_class:throw_corpse()
 			}
 		}
 	))
+	
+	thrown_corpse_entity.name = "thrown_corpse_entity"
+	local corpse_blood_msg = particle_burst_message()
+	corpse_blood_msg.subject = thrown_corpse_entity
+	corpse_blood_msg.pos = vec2.random_on_circle(randval(30, 30))
+	corpse_blood_msg.rotation = 0
+	corpse_blood_msg.local_transform = true
+	corpse_blood_msg.set_effect = blood_under_corpse_effect
+	
+	world:post_delayed_message(corpse_blood_msg, 300)
 	
 	self.head_entity.chase:set_target(thrown_corpse_entity)
 	
@@ -285,7 +295,7 @@ function npc_class:loop()
 		end
 	else
 		behaviours.target_seeking.enabled = false
-		behaviours.forward_seeking.enabled = true
+		behaviours.forward_seeking.enabled = false
 		--behaviours.obstacle_avoidance.enabled = false
 	end
 	

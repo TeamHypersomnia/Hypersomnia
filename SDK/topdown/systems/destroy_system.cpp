@@ -43,10 +43,9 @@ void destroy_system::process_events(world& owner) {
 	std::sort(to_destroy.begin(), to_destroy.end());
 	to_destroy.resize(std::distance(to_destroy.begin(), std::unique(to_destroy.begin(), to_destroy.end())));
 
+	owner.get_message_queue<messages::destroy_message>().clear();
+
 	for (auto it : to_destroy) {
-		owner.purify_queues(it.first);
 		owner.delete_entity(*it.first, it.second);
 	}
-
-	owner.get_message_queue<messages::destroy_message>().clear();
 }

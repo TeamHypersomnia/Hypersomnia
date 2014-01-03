@@ -265,7 +265,7 @@ npc_legs_behaviour_tree = create_behaviour_tree {
 				entity.pathfinding:clear_pathfinding_info()
 				--entity.pathfinding:start_exploring()
 				entity.pathfinding.favor_velocity_parallellness = true
-				get_scripted(entity).steering_behaviours.wandering.weight_multiplier = 0.0 
+				get_scripted(entity).steering_behaviours.wandering.weight_multiplier = 0.2 
 				--get_scripted(entity).steering_behaviours.forward_seeking.enabled = true 
 			end,
 			

@@ -155,6 +155,6 @@ input_system:add_context(main_context)
 world_camera.chase:set_target(player.body:get())
 world_camera.camera.player:set(player.body:get())
 world_camera.camera.crosshair:set(player.crosshair:get())
-player.body:get().gun.target_camera_to_shake:set(world_camera)
+--player.body:get().gun.target_camera_to_shake:set(world_camera)
 
 set_zoom_level(world_camera)

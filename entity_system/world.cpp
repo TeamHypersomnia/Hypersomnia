@@ -43,8 +43,16 @@ namespace augmentations {
 			for (auto& it : input_queue)
 				it.second->purify(invalidated_subject);
 		}
+		
+		void world::validate_delayed_messages() {
+			for (auto& it : input_queue)
+				it.second->validate_delayed_messages();
+		}
 
 		void world::delete_all_entities(bool clear_systems_manually) {
+			flush_message_queues();
+			flush_delayed_message_queues();
+
 			if (clear_systems_manually)
 				for (auto* system_to_clean : all_systems)
 					system_to_clean->clear();
@@ -60,6 +68,8 @@ namespace augmentations {
 		}
 
 		void world::delete_entity(entity& e, entity* redirect_pointers) {
+			purify_queues(&e);
+
 			auto it = registered_entity_watchers.find(&e);
 
 			if (it != registered_entity_watchers.end()) {
@@ -91,6 +101,11 @@ namespace augmentations {
 		void world::flush_message_queues() {
 			for (auto& it : input_queue)
 				it.second.get()->clear();
+		}
+
+		void world::flush_delayed_message_queues() {
+			for (auto& it : input_queue)
+				it.second.get()->clear_delayed();
 		}
 	}
 }
