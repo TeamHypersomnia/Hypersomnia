@@ -94,7 +94,7 @@ big_box_archetype = (archetyped(small_box_archetype, {
 
 bullet_sprite = create_sprite {
 	image = images.bullet,
-	size_multiplier = vec2(1.0, 0.6)
+	size_multiplier = vec2(1.0, 0.2)
 }
 
 dofile "scripts\\sample_scenes\\steering.lua"

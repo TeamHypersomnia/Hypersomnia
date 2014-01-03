@@ -41,12 +41,6 @@
 #include "resources/animate_info.h"
 #include "resources/scriptable_info.h"
 
-//#include <float.h>
-
-//unsigned int fp_control_state = _controlfp(_EM_INEXACT, _MCW_EM);
-
-//separate events and processing passes in systems to enable script callbacks
-// or we can do with polluted data/instruction caches
 using namespace augmentations;
 using namespace entity_system;
 using namespace messages;
@@ -87,39 +81,26 @@ int main() {
 	destroy_system destroy;
 	behaviour_tree_system behaviours;
 
+	my_world.register_system(&input);
+	my_world.register_system(&steering);
+	my_world.register_system(&movement);
+	my_world.register_system(&animations);
+	my_world.register_system(&crosshairs);
+	my_world.register_system(&lookat);
+	my_world.register_system(&physics);
+	my_world.register_system(&visibility);
+	my_world.register_system(&pathfinding);
+	my_world.register_system(&guns);
+	my_world.register_system(&particles);
+	my_world.register_system(&emitters);
+	my_world.register_system(&render);
+	my_world.register_system(&camera);
+	my_world.register_system(&chase);
+	my_world.register_system(&damage);
+	my_world.register_system(&destroy);
+	my_world.register_system(&behaviours);
+	my_world.register_system(&scripts);
 
-	my_world.add_system(&input);
-	//my_world.add_system(&steering);
-	my_world.add_system(&movement);
-	my_world.add_subsystem(&physics, &steering);
-	my_world.add_subsystem(&physics, &movement);
-	my_world.add_system(&physics);
-	my_world.add_system(&behaviours);
-	my_world.add_system(&lookat);
-	my_world.add_system(&chase);
-	my_world.add_system(&crosshairs);
-	my_world.add_system(&guns);
-	my_world.add_system(&damage);
-	my_world.add_system(&particles);
-	my_world.add_system(&animations);
-	my_world.add_system(&visibility);
-	my_world.add_system(&pathfinding);
-	my_world.add_system(&render);
-	my_world.add_system(&scripts);
-	my_world.add_system(&camera);
-
-	my_world.add_event_processor(&destroy);
-	my_world.add_event_processor(&movement);
-	my_world.add_event_processor(&animations);
-	my_world.add_event_processor(&crosshairs);
-	my_world.add_event_processor(&damage);
-	my_world.add_event_processor(&guns);
-	my_world.add_event_processor(&emitters);
-	my_world.add_event_processor(&camera);
-	my_world.add_event_processor(&scripts);
-	my_world.add_event_processor(&destroy);
-
-	//my_world.register_message_queue<message>();
 	my_world.register_message_queue<intent_message>();
 	my_world.register_message_queue<damage_message>();
 	my_world.register_message_queue<destroy_message>();
@@ -140,7 +121,6 @@ int main() {
 
 	init_script.associate_filename("scripts\\init.lua");
 	init_script.add_reload_dependant(&init_script);
-	// http://google.pl
 	init_script.call();
 	std::cout << std::endl;
 	lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
@@ -152,12 +132,46 @@ int main() {
 	::testing::FLAGS_gtest_break_on_failure = false;
 	auto result = RUN_ALL_TESTS();
 	
-	//_clearfp();
-	//_controlfp(_controlfp(0, 0) & ~(_EM_INVALID | _EM_ZERODIVIDE | _EM_OVERFLOW),
-	//	_MCW_EM);
 	while (!input.quit_flag) {
 		
-		my_world.run();
+		input.process_entities(my_world);                  
+		movement.process_entities(my_world);
+
+		physics.substepping_routine = [&steering, &movement, &damage, &destroy](world& owner){
+			steering.substep(owner);
+			movement.substep(owner);
+			damage.process_events(owner);
+			destroy.process_events(owner);
+		};
+
+
+		physics.process_entities(my_world);                 
+		behaviours.process_entities(my_world);              
+		lookat.process_entities(my_world);                  
+		chase.process_entities(my_world);                   
+		crosshairs.process_entities(my_world);              
+		guns.process_entities(my_world);                   
+		damage.process_entities(my_world);                  
+		particles.process_entities(my_world);               
+		animations.process_entities(my_world);              
+		visibility.process_entities(my_world);              
+		pathfinding.process_entities(my_world);             
+		render.process_entities(my_world);                  
+		scripts.process_entities(my_world);                 
+		camera.process_entities(my_world);                  
+
+		destroy.process_events(my_world);                                            
+		movement.process_events(my_world);                                           
+		animations.process_events(my_world);                                         
+		crosshairs.process_events(my_world);                                         
+		damage.process_events(my_world);                                             
+		guns.process_events(my_world);                                               
+		emitters.process_events(my_world);                                           
+		camera.process_events(my_world);                                             
+		scripts.process_events(my_world);                                            
+		destroy.process_events(my_world);                                            
+
+		my_world.flush_message_queues();
 		//std::cout << physics.ray_casts_per_frame << std::endl;
 
 		if (world_reloading_script) {

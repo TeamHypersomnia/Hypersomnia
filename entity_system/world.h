@@ -38,9 +38,7 @@ namespace augmentations {
 			std::unordered_map<entity*, util::sorted_vector<entity_ptr*>> registered_entity_watchers;
 
 
-			std::vector<processing_system*> systems;
 			std::vector<processing_system*> all_systems;
-			std::vector<processing_system*> event_processors;
 			std::unordered_map<size_t, processing_system*> hash_to_system;
 
 			void register_entity_watcher(entity_ptr&);
@@ -97,24 +95,6 @@ namespace augmentations {
 				/* register to enable by-type system retrieval */
 				hash_to_system[typeid(T).hash_code()] = new_system;
 			}
-
-			template<class T>
-			void add_system(T* new_system) {
-				systems.push_back(new_system);
-				register_system(new_system);
-			}
-
-			template<class T>
-			void add_event_processor(T* new_system) {
-				event_processors.push_back(new_system);
-				register_system(new_system);
-			}
-
-			template<class T>
-			void add_subsystem(processing_system* parent_system, T* new_subsystem) {
-				parent_system->subsystems.push_back(new_subsystem);
-				register_system(new_subsystem);
-			}
 			
 			template<class T>
 			T& get_system() {
@@ -135,7 +115,7 @@ namespace augmentations {
 			
 			void delete_all_entities(bool clear_systems_manually);
 
-			void run();
+			void flush_message_queues();
 		};
 	}
 }

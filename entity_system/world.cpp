@@ -88,13 +88,7 @@ namespace augmentations {
 			return get_container_for_type(type.hash);
 		}
 
-		void world::run() {
-			for (auto it : systems)
-				it->process_entities(*this);
-
-			for (auto it : event_processors)
-				it->process_events(*this);
-
+		void world::flush_message_queues() {
 			for (auto& it : input_queue)
 				it.second.get()->clear();
 		}

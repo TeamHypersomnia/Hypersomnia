@@ -5,6 +5,8 @@
 #include "../components/physics_component.h"
 #include "../components/transform_component.h"
 
+#include <functional>
+
 using namespace augmentations;
 using namespace entity_system;
 
@@ -25,6 +27,8 @@ class physics_system : public processing_system_templated<components::physics, c
 
 	contact_listener listener;
 public:
+	std::function<void(world&)> substepping_routine;
+
 	float timestep_multiplier;
 	int enable_interpolation;
 	int ray_casts_per_frame;
