@@ -105,6 +105,11 @@ int the_callback(lua_State *L) {
 	return 1;
 }
 
+void debugger_break() {
+	int breakp = 12;
+	breakp = 0;
+}
+
 script_system::script_system() : lua_state(luaL_newstate()) {
 	using namespace resources;
 	using namespace topdown;
@@ -166,7 +171,8 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			bindings::_entity(),
 			bindings::_body_helper(),
 
-			luabind::def("set_world_reloading_script", &set_world_reloading_script)
+			luabind::def("set_world_reloading_script", &set_world_reloading_script),
+			luabind::def("debugger_break", &debugger_break)
 	];
 
 	luabind::set_pcall_callback(the_callback);

@@ -93,23 +93,31 @@ int main() {
 	my_world.add_system(&movement);
 	my_world.add_subsystem(&physics, &steering);
 	my_world.add_subsystem(&physics, &movement);
-	my_world.add_subsystem(&physics, &behaviours);
 	my_world.add_system(&physics);
+	my_world.add_system(&behaviours);
 	my_world.add_system(&lookat);
 	my_world.add_system(&chase);
 	my_world.add_system(&crosshairs);
 	my_world.add_system(&guns);
 	my_world.add_system(&damage);
-	my_world.add_system(&emitters);
 	my_world.add_system(&particles);
 	my_world.add_system(&animations);
 	my_world.add_system(&visibility);
 	my_world.add_system(&pathfinding);
 	my_world.add_system(&render);
 	my_world.add_system(&scripts);
-	my_world.add_system(&destroy);
 	my_world.add_system(&camera);
 
+	my_world.add_event_processor(&destroy);
+	my_world.add_event_processor(&movement);
+	my_world.add_event_processor(&animations);
+	my_world.add_event_processor(&crosshairs);
+	my_world.add_event_processor(&damage);
+	my_world.add_event_processor(&guns);
+	my_world.add_event_processor(&emitters);
+	my_world.add_event_processor(&camera);
+	my_world.add_event_processor(&scripts);
+	my_world.add_event_processor(&destroy);
 
 	//my_world.register_message_queue<message>();
 	my_world.register_message_queue<intent_message>();

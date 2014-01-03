@@ -34,8 +34,6 @@ end
 
 
 function rewrite(component, entry, omit_properties)
-	--print(inspect(entry))
-	--print(debug.traceback())
 	if omit_properties == nil then
 		for key, val in pairs(entry) do
 			component[key] = val
@@ -68,7 +66,6 @@ end
 function recursive_write(final_entries, entries, omit_names)
 	omit_names = omit_names or {}
 	
-	--print(debug.traceback())
 	for key, entry in pairs(entries) do
 		if omit_names[key] == nil then
 			if type(entry) == "table" then

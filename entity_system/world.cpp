@@ -39,6 +39,11 @@ namespace augmentations {
 			return res;
 		}
 		
+		void world::purify_queues(entity* invalidated_subject) {
+			for (auto& it : input_queue)
+				it.second->purify(invalidated_subject);
+		}
+
 		void world::delete_all_entities(bool clear_systems_manually) {
 			if (clear_systems_manually)
 				for (auto* system_to_clean : all_systems)
@@ -84,40 +89,14 @@ namespace augmentations {
 		}
 
 		void world::run() {
-
-			//for (auto& it : queues[1])
-			//	it.second.get()->clear();
-
 			for (auto it : systems)
 				it->process_entities(*this);
 
-			for (auto it : systems)
+			for (auto it : event_processors)
 				it->process_events(*this);
 
 			for (auto& it : input_queue)
 				it.second.get()->clear();
-
-			//bool all_clear = false;
-
-			//while(!all_clear) {
-			//	all_clear = true;
-			//	for (auto& it : *output_queue) {
-			//		if (!it.second.get()->empty()) {
-			//			all_clear = false;
-			//			break;
-			//		}
-			//	}
-			//
-			//	if (!all_clear) {
-			//		std::swap(input_queue, output_queue);
-			//		
-			//		for (auto& it : *output_queue) 
-			//			it.second.get()->clear();
-			//
-			//		for (auto it : systems)
-			//			it->process_events(*this);
-			//	}
-			//}
 		}
 	}
 }

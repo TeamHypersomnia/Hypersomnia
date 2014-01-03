@@ -18,6 +18,7 @@ namespace augmentations {
 			struct message_queue {
 				virtual void clear() = 0;
 				virtual bool empty() = 0;
+				virtual void purify(entity* invalidated_subject) = 0;
 			};
 
 			template <typename message>
@@ -25,6 +26,9 @@ namespace augmentations {
 				std::vector<message> messages;
 				void clear() override { messages.clear(); }
 				bool empty() override { return messages.empty();  }
+				void purify(entity* invalidated_subject) {
+					messages.erase(std::remove_if(messages.begin(), messages.end(), [invalidated_subject](const message& m){ return m.subject == invalidated_subject; }), messages.end());
+				}
 			};
 
 			boost::object_pool<entity> entities;
@@ -36,6 +40,7 @@ namespace augmentations {
 
 			std::vector<processing_system*> systems;
 			std::vector<processing_system*> all_systems;
+			std::vector<processing_system*> event_processors;
 			std::unordered_map<size_t, processing_system*> hash_to_system;
 
 			void register_entity_watcher(entity_ptr&);
@@ -68,6 +73,8 @@ namespace augmentations {
 				return all_systems;
 			}
 
+			void purify_queues(entity* invalidated_subject);
+
 			template <class T>
 			void register_system(T* new_system) {
 				bool such_a_system_found = false;
@@ -94,6 +101,12 @@ namespace augmentations {
 			template<class T>
 			void add_system(T* new_system) {
 				systems.push_back(new_system);
+				register_system(new_system);
+			}
+
+			template<class T>
+			void add_event_processor(T* new_system) {
+				event_processors.push_back(new_system);
 				register_system(new_system);
 			}
 

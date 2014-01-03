@@ -15,5 +15,4 @@ class steering_system : public processing_system_templated<components::transform
 public:
 	void substep(world&) override;
 	void process_entities(world&) override;
-	void process_events(world&) override;
 };

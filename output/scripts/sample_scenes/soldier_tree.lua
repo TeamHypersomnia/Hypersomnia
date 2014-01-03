@@ -124,9 +124,7 @@ npc_legs_behaviour_tree = create_behaviour_tree {
 		player_visible = {
 			node_type = behaviour_node.SELECTOR,
 			on_update = function(entity) 
-				if not player.body:exists() then return behaviour_node.FAILURE end
-				
-				if get_scripted(entity).is_seen then 
+				if player.body:exists() and get_scripted(entity).is_seen then 
 					entity.lookat.target:set(player.body:get())
 					entity.lookat.look_mode = lookat_component.POSITION
 					return behaviour_node.SUCCESS

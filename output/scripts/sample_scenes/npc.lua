@@ -1,7 +1,7 @@
 npc_class = { 
-	entity = 0,
-	weapon_animation_sets = {},
-	current_weapon = bare_hands
+	--entity = 0,
+	--weapon_animation_sets = {},
+	--current_weapon = bare_hands
 	--last_impact = vec2(0, 0),
 	--health_info = {
 	--	hp = 100,
@@ -16,7 +16,6 @@ function set_max_speed(entity, max_speed_val)
 end
 
 function get_scripted(entity)
-    --print(debug.traceback())
 	return entity.scriptable.script_data
 end
 
@@ -213,14 +212,12 @@ function npc_class:pursue_target(target_entity)
 	self.steering_behaviours.pursuit.target_from:set(target_entity)
 	self.steering_behaviours.pursuit.enabled = true
 	self.steering_behaviours.obstacle_avoidance.enabled = false
-	--print(debug.traceback())
 	self.steering_behaviours.sensor_avoidance.target_from:set(target_entity)
 end
 
 function npc_class:stop_pursuit()	
 	self.steering_behaviours.pursuit.enabled = false
 	self.steering_behaviours.obstacle_avoidance.enabled = true
-	--print(debug.traceback())
 	self.steering_behaviours.sensor_avoidance.target_from:set(self.target_entities.navigation)
 end
 
@@ -253,8 +250,11 @@ function npc_class:throw_corpse()
 	
 	self.head_entity.chase.chase_type = chase_component.ORBIT
 	self.head_entity.chase.chase_rotation = true
-	self.head_entity.chase.rotation_orbit_offset = vec2(55, 0)
+	self.head_entity.chase.rotation_orbit_offset = vec2(60, 0)
 	self.head_entity.chase.rotation_offset = 90
+	print(self.head_entity.chase.rotation_orbit_offset.x, self.head_entity.chase.rotation_orbit_offset.y)
+	self.head_entity.name = "head_entity"
+	debugger_break()
 	local corpse_body = thrown_corpse_entity.physics.body
 	corpse_body:ApplyLinearImpulse(b2Vec2(self.last_impact.x*2, self.last_impact.y*2), corpse_body:GetWorldCenter())
 	
@@ -479,12 +479,12 @@ for i=1, npc_count do
 	
 	
 	init_npc(my_npcs[i].body:get(), { 
-	weapon_animation_sets = {
-		BARE_HANDS = enemy_animations.sets.bare_hands,
-		FIREAXE = enemy_animations.sets.melee,
-		ASSAULT_RIFLE = enemy_animations.sets.firearm,
-		SHOTGUN = enemy_animations.sets.firearm
-	},
+		weapon_animation_sets = {
+			BARE_HANDS = enemy_animations.sets.bare_hands,
+			FIREAXE = enemy_animations.sets.melee,
+			ASSAULT_RIFLE = enemy_animations.sets.firearm,
+			SHOTGUN = enemy_animations.sets.firearm
+		},
 	
 		
 		health_info = {
@@ -519,7 +519,7 @@ for i=1, npc_count do
 	script_data:refresh_behaviours()
 	script_data:take_weapon_item(bare_hands)
 	--my_npcs[i].body.pathfinding:start_exploring()
-	
+	my_npcs[i].body:get().name = "npc_entity"
 	my_npcs[i].body:get().gun.target_camera_to_shake:set(world_camera)
 	get_scripted(my_npcs[i].body:get()):take_weapon_item(npc_weapons[i])
 end

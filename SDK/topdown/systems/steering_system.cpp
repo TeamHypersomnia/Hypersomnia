@@ -605,7 +605,6 @@ void steering::behaviour_state::update_target_info(const object_info& subject) {
 }
 
 
-void steering_system::process_events(world& owner) {}
 void steering_system::process_entities(world& owner) { substep(owner);  }
 void steering_system::substep(world& owner) {
 	auto& render = owner.get_system<render_system>();

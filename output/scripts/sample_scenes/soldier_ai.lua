@@ -419,7 +419,7 @@ loop_only_info = create_scriptable_info {
 		[scriptable_component.LOOP] = function(subject)
 			my_atlas:_bind()
 			
-			for k, v in pairs(my_npcs) do 
+			for k, v in ipairs(my_npcs) do 
 				if v.body:exists() then 
 					get_scripted(v.body:get()):loop()
 				end 
@@ -437,20 +437,8 @@ loop_only_info = create_scriptable_info {
 				end
 				
 				player_info:loop()
-			
-				--print(player.body:get().transform.current.pos.x, player.body:get().transform.current.pos.y)
 			end
 			
-			    
-			  
-				
-			-- correct animations after checking this
-			-- correct animations after checking this
-			-- correct animations after checking this
-			-- correct animations after checking this
-			-- correct animations after checking this
-			-- correct animations after checking this
-			-- correct animations after checking this
 			--local ppos = player.body:get().transform.current.pos
 			----render_system:push_non_cleared_line(debug_line(vec2(0, 0), vec2(1000, 1000),  rgba(0, 255, 0, 255)))
 			--render_system:push_line(debug_line(ppos, ppos+vec2(7, 24), rgba(0, 0, 255, 255)))
