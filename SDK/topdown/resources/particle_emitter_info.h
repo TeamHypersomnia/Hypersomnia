@@ -83,6 +83,6 @@ namespace resources {
 
 	typedef std::vector<emission> particle_effect;
 	typedef augmentations::util::map_wrapper <
-		messages::particle_burst_message::burst_type, particle_effect
+		int, particle_effect
 	> particle_emitter_info;
 }

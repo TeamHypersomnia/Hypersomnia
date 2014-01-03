@@ -16,6 +16,8 @@ namespace bindings {
 			luabind::class_<components::particle_emitter>("particle_emitter_component")
 			.def(luabind::constructor<>())
 			.def(luabind::constructor<particle_emitter_info*>())
-			.def_readwrite("available_particle_effects", &components::particle_emitter::available_particle_effects));
+			.def_readwrite("available_particle_effects", &components::particle_emitter::available_particle_effects)
+			.def("get_effect", &components::particle_emitter::get_effect))
+			;
 	}
 }

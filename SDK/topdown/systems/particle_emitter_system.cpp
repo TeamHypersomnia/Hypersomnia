@@ -75,6 +75,11 @@ void particle_emitter_system::process_events(world& owner) {
 			}
 		}
 
+		if (it.local_transform && it.subject) {
+			it.pos += it.subject->get<components::transform>().current.pos;
+			it.rotation += it.subject->get<components::transform>().current.rotation;
+		}
+
 		std::vector<resources::emission*> only_streams;
 		
 		for (auto& emission : *emissions) {
