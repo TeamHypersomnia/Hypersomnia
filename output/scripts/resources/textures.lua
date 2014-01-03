@@ -7,9 +7,17 @@ end
 my_atlas = atlas()
 collectgarbage("collect")
 
-parent_root = "resources\\"
+function add_roots(entries, root_path)
+	local new_table = {}
+	
+	for k, v in pairs(entries) do
+		new_table[k] = (parent_root .. v)
+	end
+	
+	return new_table
+end
 
-images = {
+images = add_roots("resources\\", {
 	crate = "crate.jpg",
 	metal = "metal.jpg",
 	
@@ -33,47 +41,6 @@ images = {
 	
 	wood_table = "table.png",
 	
-	player_legs_1 = "player\\legs_1.png",
-	player_legs_2 = "player\\legs_2.png",
-	player_legs_3 = "player\\legs_3.png",
-	player_legs_4 = "player\\legs_4.png",
-	player_legs_5 = "player\\legs_5.png",
-
-	player_walk_1 = 	"player\\walk_1.png",
-	player_walk_2 = 	"player\\walk_2.png",
-	player_walk_3 = 	"player\\walk_3.png",
-	player_walk_4 = 	"player\\walk_4.png",
-	player_walk_5 = 	"player\\walk_5.png",
-
-	player_hands_1 = 	"player\\hands_1.png",
-	player_hands_2 = 	"player\\hands_2.png",
-	player_hands_3 = 	"player\\hands_3.png",
-	player_hands_4 = 	"player\\hands_4.png",
-	player_hands_5 = 	"player\\hands_5.png",
-	
-	player_hit_1   = 	"player\\hit_1.png",
-	player_hit_2   = 	"player\\hit_2.png",
-	player_hit_3   = 	"player\\hit_3.png",
-	player_hit_4   = 	"player\\hit_4.png",
-	player_hit_5   = 	"player\\hit_5.png",
-	
-	player_melee_walk_1 = 	    "player\\melee_walk_1.png",
-	player_melee_walk_2 = 	    "player\\melee_walk_2.png",
-	player_melee_walk_3 = 	    "player\\melee_walk_3.png",
-	player_melee_walk_4 = 	    "player\\melee_walk_4.png",
-	player_melee_walk_5 = 	    "player\\melee_walk_5.png",
-	
-	player_firearm_shot_1 = 	    "player\\firearm_shot_1.png",
-	player_firearm_shot_2 = 	    "player\\firearm_shot_2.png",
-	player_firearm_shot_3 = 	    "player\\firearm_shot_3.png",
-	player_firearm_shot_4 = 	    "player\\firearm_shot_4.png",
-	player_firearm_shot_5 = 	    "player\\firearm_shot_5.png",
-	
-	player_firearm_walk_1 = 	    "player\\firearm_walk_1.png",
-	player_firearm_walk_2 = 	    "player\\firearm_walk_2.png",
-	player_firearm_walk_3 = 	    "player\\firearm_walk_3.png",
-	player_firearm_walk_4 = 	    "player\\firearm_walk_4.png",
-	player_firearm_walk_5 = 	    "player\\firearm_walk_5.png",
 	
 	
 	enemy_legs_1 = "enemy\\legs_1.png",
@@ -185,12 +152,58 @@ images = {
 	dead_front = "dead_front.png",
 	dead_front_player = "player\\dead_front.png",
 	dead_back  = "dead_back.png"
+})
+
+character_filenames = {
+	walk_1 = "walk_1.png",
+	walk_2 = "walk_2.png",
+	walk_3 = "walk_3.png",
+	walk_4 = "walk_4.png",
+	walk_5 = "walk_5.png",
+
+	hands_1 = "hands_1.png",
+	hands_2 = "hands_2.png",
+	hands_3 = "hands_3.png",
+	hands_4 = "hands_4.png",
+	hands_5 = "hands_5.png",
+	
+	hit_1   = "hit_1.png",
+	hit_2   = "hit_2.png",
+	hit_3   = "hit_3.png",
+	hit_4   = "hit_4.png",
+	hit_5   = "hit_5.png",
+	
+	melee_walk_1 = "melee_walk_1.png",
+	melee_walk_2 = "melee_walk_2.png",
+	melee_walk_3 = "melee_walk_3.png",
+	melee_walk_4 = "melee_walk_4.png",
+	melee_walk_5 = "melee_walk_5.png",
+	
+	firearm_shot_1 = "firearm_shot_1.png",
+	firearm_shot_2 = "firearm_shot_2.png",
+	firearm_shot_3 = "firearm_shot_3.png",
+	firearm_shot_4 = "firearm_shot_4.png",
+	firearm_shot_5 = "firearm_shot_5.png",
+	                 
+	firearm_walk_1 = "firearm_walk_1.png",
+	firearm_walk_2 = "firearm_walk_2.png",
+	firearm_walk_3 = "firearm_walk_3.png",
+	firearm_walk_4 = "firearm_walk_4.png",
+	firearm_walk_5 = "firearm_walk_5.png",
 }
 
-for k, v in pairs(images) do
-	images[k] = (parent_root .. v)
-end
+enemy_images = add_roots("resources\\enemy\\", character_filenames)
+player_images = add_roots("resources\\player\\", archetyped(character_filenames, {
+	legs_1 = "legs_1.png",
+	legs_2 = "legs_2.png",
+	legs_3 = "legs_3.png",
+	legs_4 = "legs_4.png",
+	legs_5 = "legs_5.png",
+}))
 
 create_textures(my_atlas, images)
+create_textures(my_atlas, player_images)
+create_textures(my_atlas, enemy_images)
+
 my_atlas:build()
 my_atlas:nearest()

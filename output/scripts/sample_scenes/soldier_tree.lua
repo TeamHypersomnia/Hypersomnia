@@ -101,7 +101,6 @@ npc_legs_behaviour_tree = create_behaviour_tree {
 						end
 					end
 					
-					
 					set_max_speed(entity, 3000)
 			
 					get_scripted(entity):pursue_target(nearest_gun.item)

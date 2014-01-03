@@ -93,12 +93,15 @@ namespace bindings {
 }
 
 int the_callback(lua_State *L) {
+	std::string error_message(lua_tostring(L, -1));
 	lua_getglobal(L, "debug");
 	lua_getfield(L, -1, "my_traceback");
 	lua_pushvalue(L, 1);
 	lua_pushinteger(L, 2);
 	lua_call(L, 2, 1);
-	fprintf(stderr, "%s\n", lua_tostring(L, -1));
+	printf("%s\n", lua_tostring(L, -1));
+	
+	std::cout << error_message << std::endl;
 	return 1;
 }
 
