@@ -455,7 +455,7 @@ final_npc_archetype = (archetyped(character_archetype, {
 			
 			
 			animate = {
-				available_animations = enemy_animation_legs_set
+				available_animations = enemy_animations.sets.legs
 			}
 		}
 }))
@@ -480,10 +480,10 @@ for i=1, npc_count do
 	
 	init_npc(my_npcs[i].body:get(), { 
 	weapon_animation_sets = {
-		BARE_HANDS = enemy_animation_bare_hands_set,
-		FIREAXE = enemy_animation_melee_set,
-		ASSAULT_RIFLE = enemy_animation_firearm_set,
-		SHOTGUN = enemy_animation_firearm_set
+		BARE_HANDS = enemy_animations.sets.bare_hands,
+		FIREAXE = enemy_animations.sets.melee,
+		ASSAULT_RIFLE = enemy_animations.sets.firearm,
+		SHOTGUN = enemy_animations.sets.firearm
 	},
 	
 		

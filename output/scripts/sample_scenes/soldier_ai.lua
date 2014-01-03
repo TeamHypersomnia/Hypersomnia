@@ -261,7 +261,7 @@ character_archetype = {
 		},
 		
 		animate = {
-			available_animations = player_animation_legs_set
+			available_animations = player_animations.sets.legs
 		}
 	}
 }

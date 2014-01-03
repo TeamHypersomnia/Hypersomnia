@@ -65,7 +65,7 @@ player = ptr_create_entity_group (archetyped(character_archetype, {
 	
 	legs = {
 		animate = {
-			available_animations = player_animation_legs_set
+			available_animations = player_animations.sets.legs
 		}
 	}
 }))
@@ -76,10 +76,10 @@ player_corpse_sprite = create_sprite {
 
 init_npc(player.body:get(), { 
 	weapon_animation_sets = {
-		BARE_HANDS = player_animation_bare_hands_set,
-		FIREAXE = player_animation_melee_set,
-		ASSAULT_RIFLE = player_animation_firearm_set,
-		SHOTGUN = player_animation_firearm_set
+		BARE_HANDS = player_animations.sets.bare_hands,
+		FIREAXE = player_animations.sets.melee,
+		ASSAULT_RIFLE = player_animations.sets.firearm,
+		SHOTGUN = player_animations.sets.firearm
 	},
 	
 	health_info = {
