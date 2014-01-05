@@ -177,6 +177,7 @@ void gun_system::process_entities(world& owner) {
 
 						owner.post_message(damage_msg);
 						owner.post_message(burst_msg);
+						owner.post_message(burst_msg);
 					}
 				}
 			}

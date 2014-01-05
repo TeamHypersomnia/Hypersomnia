@@ -50,7 +50,7 @@ player = ptr_create_entity_group (archetyped(character_archetype, {
 		},
 		
 		crosshair = {
-			sensitivity = 5.5
+			sensitivity = config_table.sensitivity
 		},
 		
 		chase = {

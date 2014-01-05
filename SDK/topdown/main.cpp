@@ -49,7 +49,7 @@ resources::script* world_reloading_script = nullptr;
 
 int main() {
 	augmentations::init();
-
+	 
 	script_system scripts;
 	resources::script::script_reloader.report_errors = &std::cout;
 	resources::script::lua_state = scripts.lua_state;
@@ -58,8 +58,9 @@ int main() {
 	window::glwindow gl;
 	gl.create(scripts.lua_state, rects::wh(100, 100));
 	gl.set_show(gl.SHOW);
+	gl.vsync(0);
 	window::cursor(false);
-
+	 
 	world my_world;
 
 	input_system input(gl);

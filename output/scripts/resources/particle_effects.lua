@@ -215,7 +215,7 @@ blood_shower = {
 	
 	particle_templates = blood_templates,
 	
-	size_multiplier = minmax(0.25, 0.35),
+	size_multiplier = minmax(0.25, 0.65),
 	initial_rotation_variation = 180,
 	
 	particle_render_template = { 

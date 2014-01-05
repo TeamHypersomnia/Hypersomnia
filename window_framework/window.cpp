@@ -297,7 +297,7 @@ namespace augmentations {
 			}
 			return ret;
 		}
-		
+		 
 		bool glwindow::vsync(int v) {
 			bool ret = WGLEW_EXT_swap_control != NULL;
 			errs(ret, "vsync not supported!");

@@ -11,6 +11,12 @@ class renderable;
 class gun_system;
 namespace components {
 	struct gun : public augmentations::entity_system::component {
+		enum state {
+
+
+		} current_state;
+
+
 		components::render bullet_render;
 		topdown::physics_info bullet_body;
 		b2Filter melee_filter;

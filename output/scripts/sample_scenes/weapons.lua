@@ -198,7 +198,7 @@ shotgun = {
 fireaxe = {
 	weapon_info = create_gun({
 	bullet_damage = minmax(110, 140),
-	shooting_interval_ms = 500,
+	swing_interval_ms = 500,
 	swing_duration = 300,
 	is_melee = true,
 	

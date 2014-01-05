@@ -338,7 +338,8 @@ npc_hands_behaviour_tree = create_behaviour_tree {
 				if player.body:exists() then 
 					if (player.body:get().transform.current.pos - entity.transform.current.pos):length() < 100 then
 						entity.gun.is_melee = true
-						gun_trigger(entity, true)
+						entity.gun.trigger = true
+						--gun_trigger(entity, true)
 						return behaviour_node.RUNNING
 					end
 				end
@@ -346,7 +347,8 @@ npc_hands_behaviour_tree = create_behaviour_tree {
 			end,
 			
 			on_exit = function(entity) 
-				gun_trigger(entity, false)
+				entity.gun.trigger = false
+				--gun_trigger(entity, false)
 			end
 			
 		},
@@ -355,7 +357,8 @@ npc_hands_behaviour_tree = create_behaviour_tree {
 			on_update = function(entity) 
 				if entity.gun.current_rounds > 0 then
 					entity.gun.is_melee = false
-					gun_trigger(entity, true)
+					entity.gun.trigger = true
+					--gun_trigger(entity, true)
 					return behaviour_node.RUNNING
 				end
 				
@@ -363,7 +366,7 @@ npc_hands_behaviour_tree = create_behaviour_tree {
 			end,
 			
 			on_exit = function(entity) 
-				gun_trigger(entity, false)
+				entity.gun.trigger = false
 			end
 		},
 	},
