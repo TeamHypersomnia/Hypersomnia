@@ -9,7 +9,7 @@ render_layers = {
 	WIELDED = 7,
 	LEGS = 8,
 	ON_GROUND = 9,
-	CORPSES = 10,
+	--CORPSES = 10,
 	UNDER_CORPSES = 11,
 	GROUND = 12
 }

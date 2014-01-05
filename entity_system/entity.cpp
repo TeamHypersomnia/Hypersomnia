@@ -40,16 +40,16 @@ namespace augmentations {
 		}
 
 		void entity::enable() {
-				if (enabled) return;
-				signature_matcher_bitset my_signature(get_components());
+			if (enabled) return;
+			signature_matcher_bitset my_signature(get_components());
 
-				for (auto sys : owner_world.get_all_systems())
-					/* if a processing_system matches with this */
-				if (sys->components_signature.matches(my_signature))
-					/* we should add this entity there */
-					sys->add(this);
+			for (auto sys : owner_world.get_all_systems())
+				/* if a processing_system matches with this */
+			if (sys->components_signature.matches(my_signature))
+				/* we should add this entity there */
+				sys->add(this);
 
-				enabled = true;
+			enabled = true;
 		}
 
 		void entity::disable() {
@@ -63,6 +63,11 @@ namespace augmentations {
 				sys->remove(this);
 
 			enabled = false;
+		}
+
+		void entity::reassign_to_systems() {
+			disable();
+			enable();
 		}
 	}
 }

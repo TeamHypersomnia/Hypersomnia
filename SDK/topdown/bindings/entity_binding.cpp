@@ -34,6 +34,7 @@ namespace bindings {
 			.def_readwrite("name", &entity::name)
 			.def("enable", &entity::enable)
 			.def("disable", &entity::disable)
+			.def("reassign_to_systems", &entity::reassign_to_systems)
 
 			.def("remove_animate", &entity::remove<animate>)
 			.def("add", &entity::add<animate>)

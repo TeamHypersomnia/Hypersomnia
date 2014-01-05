@@ -254,6 +254,10 @@ function npc_class:throw_corpse()
 	self.head_entity.chase:set_target(thrown_corpse_entity)
 	
 	self.head_entity.render.layer = render_layers.ON_GROUND
+	
+	-- reassign so it is always rendered above the thrown corpse entity
+	self.head_entity:reassign_to_systems()
+	
 	self.head_entity.chase.chase_type = chase_component.ORBIT
 	self.head_entity.chase.chase_rotation = true
 	self.head_entity.chase.rotation_orbit_offset = vec2(60, 0)

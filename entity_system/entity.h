@@ -40,6 +40,9 @@ namespace augmentations {
 			void enable();
 			void disable();
 
+			/* just removes and adds to systems again to for some reason move this entity to the end of the each vector */
+			void reassign_to_systems();
+
 			/* get specified component */
 			template<class component_class>
 			component_class& get() {

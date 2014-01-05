@@ -117,7 +117,7 @@ npc_damage_handler = create_scriptable_info {
 
 corpse_archetype = {
 	render = {
-		layer = render_layers.CORPSES 
+		layer = render_layers.ON_GROUND 
 	},
 	
 	transform = {},
