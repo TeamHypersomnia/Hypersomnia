@@ -9,8 +9,9 @@ render_layers = {
 	WIELDED = 7,
 	LEGS = 8,
 	ON_GROUND = 9,
-	UNDER_CORPSES = 10,
-	GROUND = 11
+	CORPSES = 10,
+	UNDER_CORPSES = 11,
+	GROUND = 12
 }
 
 custom_intents = create_inverse_enum {

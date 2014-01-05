@@ -42,14 +42,6 @@ escape_archetype = {
 	end
 }
 
-function gun_trigger(entity, flag)
-	local pull_trigger = intent_message()
-	pull_trigger.subject = entity
-	pull_trigger.intent = intent_message.SHOOT
-	pull_trigger.state_flag = flag
-	world:post_message(pull_trigger)
-end
-
 npc_legs_behaviour_tree = create_behaviour_tree {
 	decorators = {
 		delay_chase = {
@@ -77,7 +69,7 @@ npc_legs_behaviour_tree = create_behaviour_tree {
 				
 				-- if we only have bare hands
 				local npc_info = get_scripted(entity)
-				if entity.gun.is_melee and npc_info.current_weapon == bare_hands then 
+				if npc_info.current_weapon == bare_hands then 
 					-- take anything
 					condition = function(weapon) return true end
 				end
@@ -337,9 +329,7 @@ npc_hands_behaviour_tree = create_behaviour_tree {
 			on_update = function(entity) 
 				if player.body:exists() then 
 					if (player.body:get().transform.current.pos - entity.transform.current.pos):length() < 100 then
-						entity.gun.is_melee = true
-						entity.gun.trigger = true
-						--gun_trigger(entity, true)
+						entity.gun.trigger_mode = gun_component.MELEE
 						return behaviour_node.RUNNING
 					end
 				end
@@ -347,8 +337,7 @@ npc_hands_behaviour_tree = create_behaviour_tree {
 			end,
 			
 			on_exit = function(entity) 
-				entity.gun.trigger = false
-				--gun_trigger(entity, false)
+				entity.gun.trigger_mode = gun_component.NONE
 			end
 			
 		},
@@ -356,9 +345,7 @@ npc_hands_behaviour_tree = create_behaviour_tree {
 		try_to_shoot = {
 			on_update = function(entity) 
 				if entity.gun.current_rounds > 0 then
-					entity.gun.is_melee = false
-					entity.gun.trigger = true
-					--gun_trigger(entity, true)
+					entity.gun.trigger_mode = gun_component.SHOOT
 					return behaviour_node.RUNNING
 				end
 				
@@ -366,7 +353,7 @@ npc_hands_behaviour_tree = create_behaviour_tree {
 			end,
 			
 			on_exit = function(entity) 
-				entity.gun.trigger = false
+				entity.gun.trigger_mode = gun_component.NONE
 			end
 		},
 	},

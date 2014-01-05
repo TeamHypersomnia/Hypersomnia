@@ -117,7 +117,7 @@ npc_damage_handler = create_scriptable_info {
 
 corpse_archetype = {
 	render = {
-		layer = render_layers.ON_GROUND 
+		layer = render_layers.CORPSES 
 	},
 	
 	transform = {},
@@ -428,7 +428,7 @@ loop_only_info = create_scriptable_info {
 			if player.body:exists() then
 				local player_info = get_scripted(player.body:get())
 			
-				if player.body:get().gun.trigger or player.body:get().gun.is_swinging then
+				if player.body:get().gun.current_state == gun_component.SWINGING or player.body:get().gun.current_state == gun_component.SHOOTING_INTERVAL then
 					player_info.head_entity.render.model = head_shot_sprite
 				elseif player_info.current_weapon.animation_index == "BARE_HANDS" then
 					player_info.head_entity.render.model = head_walk_sprite

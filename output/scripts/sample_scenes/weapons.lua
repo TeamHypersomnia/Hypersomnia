@@ -80,7 +80,7 @@ bare_hands = {
 		bullet_damage = minmax(110, 140),
 		swing_interval_ms = 400,
 		swing_duration = 150,
-		is_melee = true,
+		current_rounds = 0,
 		
 		bullet_body = {
 			filter = filter_bullets,
@@ -119,7 +119,6 @@ assault_rifle_info = {
 	spread_degrees = 0.5,
 	shake_radius = 9.5,
 	shake_spread_degrees = 45,
-	is_melee = false,
 	
 	bullet_body = {
 		filter = filter_bullets,
@@ -200,7 +199,7 @@ fireaxe = {
 	bullet_damage = minmax(110, 140),
 	swing_interval_ms = 500,
 	swing_duration = 300,
-	is_melee = true,
+	current_rounds = 0,
 	
 	bullet_body = {
 		filter = filter_bullets,

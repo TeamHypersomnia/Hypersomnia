@@ -88,13 +88,6 @@ end
 function npc_class:take_weapon_item(item_data)
 	self.entity.animate:set_current_animation_set(self.weapon_animation_sets[item_data.animation_index], self.entity)
 	
-	self.entity.gun.trigger = false
-	self.entity.gun.is_swinging = false
-	
-	if self.entity.gun.current_rounds > 0 then
-		self.entity.gun.is_melee = false
-	end
-	
 	if self.wielded_entity ~= nil then
 		local msg = destroy_message()
 		self.wielded_entity.name = "wielded_entity"
@@ -170,7 +163,7 @@ function npc_class:drop_weapon(force_multiplier)
 
 	if self.current_weapon ~= bare_hands then
 		print("dropping weapon..." .. self.current_weapon.animation_index)
-		self.entity.gun.trigger = false
+		self.entity.gun:drop_logic()
 		local my_thrown_weapon = spawn_weapon(self.entity.transform.current.pos, self.current_weapon, self.entity.gun)
 		
 		self.entity.gun:transfer_barrel_smoke(my_thrown_weapon, true)
@@ -260,6 +253,7 @@ function npc_class:throw_corpse()
 	
 	self.head_entity.chase:set_target(thrown_corpse_entity)
 	
+	self.head_entity.render.layer = render_layers.ON_GROUND
 	self.head_entity.chase.chase_type = chase_component.ORBIT
 	self.head_entity.chase.chase_rotation = true
 	self.head_entity.chase.rotation_orbit_offset = vec2(60, 0)
