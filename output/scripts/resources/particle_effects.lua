@@ -18,6 +18,8 @@ blood_piece = {
 	should_disappear = false,
 }
 
+
+
 blood_templates = {
 	archetyped(blood_piece, { model = { image = images.blood_1 } } ),
 	archetyped(blood_piece, { model = { image = images.blood_2 } } ),
@@ -38,6 +40,26 @@ small_wood_templates = {
 	archetyped(small_wood_piece, { model = { image = images.piece_6 } }),
 	archetyped(small_wood_piece, { model = { image = images.piece_7 } }),
 	archetyped(small_wood_piece, { model = { image = images.piece_8 } })
+}
+
+wall_piece = {
+	angular_damping = 600,
+	linear_damping = 5000,
+	should_disappear = false,
+	model = { color = rgba(255, 255, 255, 182)  }
+}
+
+wall_templates = {
+	archetyped(wall_piece, { model = { image = images.wall_piece_1 } }),
+	archetyped(wall_piece, { model = { image = images.wall_piece_2 } }),
+	archetyped(wall_piece, { model = { image = images.wall_piece_3 } }),
+	archetyped(wall_piece, { model = { image = images.wall_piece_4 } }),
+	archetyped(wall_piece, { model = { image = images.wall_piece_5 } }),
+	archetyped(wall_piece, { model = { image = images.wall_piece_6 } }),
+	archetyped(wall_piece, { model = { image = images.wall_piece_7 } }),
+	archetyped(wall_piece, { model = { image = images.wall_piece_8 } }),
+	archetyped(wall_piece, { model = { image = images.wall_piece_9 } }),
+	archetyped(wall_piece, { model = { image = images.wall_piece_10 } })
 }
 
 barrel_explosion_template = {
@@ -61,6 +83,23 @@ dust_template = archetyped(small_wood_piece, {
 })
 
 -- EMISSIONS --
+
+wall_parts = {
+	spread_degrees = 45,
+	type = emission.BURST,
+	initial_rotation_variation = 180,
+	
+	particle_render_template = { 
+		layer = render_layers.ON_GROUND
+	},
+	
+	particles_per_burst = minmax_u(3, 6),
+	velocity = minmax(10, 700),
+	angular_velocity = minmax(10, 100),
+	size_multiplier = minmax(0.3, 1),
+	
+	particle_templates = wall_templates
+}
 
 wood_emission_archetype = {
 	spread_degrees = 45,
@@ -205,6 +244,17 @@ bullet_impact_smoke_2 = archetyped(barrel_smoke_2, {
 	stream_duration_ms = minmax(1000, 6000),
 })
 
+bullet_shell_smoke = archetyped(barrel_smoke_2, {
+	particles_per_sec = minmax(100, 100),
+	stream_duration_ms = minmax(1000, 2000),
+	
+	size_multiplier = minmax(0.4, 0.4),
+	
+	particle_templates = {
+		{ model = { color = rgba(255, 255, 255, 20) } }
+	}
+})
+
 blood_shower = {
 	spread_degrees = 10,
 	angular_offset = minmax(0, 180),
@@ -317,6 +367,7 @@ wood_effect = {
 }
 
 metal_effect = {
+	wall_parts,
 	bullet_impact_smoke_1,
 	bullet_impact_smoke_2,
 	archetyped(sparkles, {
@@ -355,6 +406,10 @@ blood_effect = {
 blood_under_corpse_effect = create_particle_effect {
 	blood_under_corpse
 }
+
+bullet_shell_smoke_effect = create_particle_effect {
+	bullet_shell_smoke
+} 
 
 -- EFFECT SETS --
 wood_effects = create_particle_emitter_info {

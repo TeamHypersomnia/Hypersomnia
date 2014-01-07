@@ -71,7 +71,7 @@ player = ptr_create_entity_group (archetyped(character_archetype, {
 }))
 
 player_corpse_sprite = create_sprite {
-	image = images.dead_front_player
+	image = player_images.dead_front
 }
 
 init_npc(player.body:get(), { 

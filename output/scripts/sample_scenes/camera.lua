@@ -17,7 +17,7 @@ scriptable_zoom = create_scriptable_info {
 					current_zoom_level = current_zoom_level-message.wheel_amount
 					set_zoom_level(message.subject)
 				end
-			return true
+			return false
 		end
 	}
 }

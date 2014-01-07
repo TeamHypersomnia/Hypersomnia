@@ -158,7 +158,11 @@ assault_rifle = {
 			layer = render_layers.WIELDED_GUNS
 			--model = assault_rifle_topdown_sprite
 		}
-	})	
+	}),
+
+	bullet_shell_sprite = assault_shell_sprite,
+	
+	shell_offset = vec2(50, 0)
 }
 
 shotgun = {
@@ -191,7 +195,11 @@ shotgun = {
 			model = shotgun_wielded_sprite,
 			layer = render_layers.WIELDED_GUNS
 		}
-	})	
+	}),
+
+	bullet_shell_sprite = shotgun_shell_sprite,
+	
+	shell_offset = vec2(35, 0)
 }
 
 fireaxe = {

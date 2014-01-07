@@ -85,10 +85,20 @@ images = add_roots("resources\\", {
 	blood_3 = "blood_3.png",
 	blood_4 = "blood_4.png",
 	blood_5 = "blood_5.png",
-
-	dead_front = "dead_front.png",
-	dead_front_player = "player\\dead_front.png",
-	dead_back  = "dead_back.png"
+	
+	assault_shell = "assault_shell.png",
+	shotgun_shell = "shotgun_shell.png",
+	
+	wall_piece_1 = "wall_piece_1.png",
+	wall_piece_2 = "wall_piece_2.png",
+	wall_piece_3 = "wall_piece_3.png",
+	wall_piece_4 = "wall_piece_4.png",
+	wall_piece_5 = "wall_piece_5.png",
+	wall_piece_6 = "wall_piece_6.png",
+	wall_piece_7 = "wall_piece_7.png",
+	wall_piece_8 = "wall_piece_8.png",
+	wall_piece_9 = "wall_piece_9.png",
+	wall_piece_10 = "wall_piece_10.png"
 })
 
 character_filenames = {
@@ -127,6 +137,8 @@ character_filenames = {
 	legs_3 = "legs_3.png",
 	legs_4 = "legs_4.png",
 	legs_5 = "legs_5.png",
+	
+	dead_front = "dead_front.png"
 }
 
 enemy_images = add_roots("resources\\enemy\\", character_filenames)
@@ -135,7 +147,7 @@ player_images = add_roots("resources\\player\\", archetyped(character_filenames,
 	hands_2 = "hands_2.png",
 	hands_3 = "hands_3.png",
 	hands_4 = "hands_4.png",
-	hands_5 = "hands_5.png",
+	hands_5 = "hands_5.png"
 }))
 
 create_textures(my_atlas, images)

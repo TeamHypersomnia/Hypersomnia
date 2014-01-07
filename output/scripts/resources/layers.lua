@@ -8,10 +8,11 @@ render_layers = {
 	BULLETS = 6,
 	WIELDED = 7,
 	LEGS = 8,
-	ON_GROUND = 9,
-	--CORPSES = 10,
-	UNDER_CORPSES = 11,
-	GROUND = 12
+	SHELLS = 9,
+	ON_GROUND = 10,
+	--CORPSES = 11,
+	UNDER_CORPSES = 12,
+	GROUND = 13
 }
 
 custom_intents = create_inverse_enum {
@@ -33,7 +34,8 @@ create_options {
 	"BULLETS", 
 	"ENEMY_BULLETS", 
 	"CORPSES",
-	"ITEMS"
+	"ITEMS",
+	"SHELLS"
 }
 
 
@@ -42,7 +44,12 @@ filter_nothing = {
 	maskBits = 0
 }
 
-local mask_all = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, ENEMY_BULLETS, CHARACTERS, CORPSES, ITEMS)
+local mask_all = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, ENEMY_BULLETS, CHARACTERS, CORPSES, ITEMS, SHELLS)
+
+filter_shells = {
+	categoryBits = SHELLS,
+	maskBits = bitor(SHELLS, STATIC_OBJECTS, OBJECTS)
+}
 
 filter_static_objects = {
 	categoryBits = STATIC_OBJECTS,

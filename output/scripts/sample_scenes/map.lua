@@ -605,10 +605,10 @@ vec2(20, 20) + vec2(88,411)
 
 		--szawka dolny przedpokoj
 				create_wall( {
-				vec2(-30, -40) + vec2(458,551),
-				vec2(-30, -40) + vec2(354,551),
-				vec2(-30, -40) + vec2(354,521),
-				vec2(-30, -40) + vec2(458,521)
+				vec2(-26, -40) + vec2(458,551),
+				vec2(-26, -40) + vec2(354,551),
+				vec2(-26, -40) + vec2(354,521),
+				vec2(-26, -40) + vec2(458,521)
 		},
 		images.wood_table, true)
 

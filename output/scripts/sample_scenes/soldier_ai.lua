@@ -46,7 +46,7 @@ ground_point_archetype = {
 }
 
 corpse_sprite = create_sprite {
-	image = images.dead_front
+	image = enemy_images.dead_front
 }
 
 dofile "scripts\\sample_scenes\\map.lua"
@@ -97,11 +97,19 @@ bullet_sprite = create_sprite {
 	size_multiplier = vec2(1.0, 0.4)
 }
 
+shotgun_shell_sprite = create_sprite {
+	image = images.shotgun_shell
+}
+
+assault_shell_sprite = create_sprite {
+	image = images.assault_shell
+}
+
 dofile "scripts\\sample_scenes\\steering.lua"
 dofile "scripts\\sample_scenes\\weapons.lua"
 dofile "scripts\\sample_scenes\\soldier_tree.lua"
 
-npc_damage_handler = create_scriptable_info {
+npc_script_callbacks = create_scriptable_info {
 	scripted_events = {	
 		[scriptable_component.DAMAGE_MESSAGE] = function(message)
 			--if message.subject.scriptable == nil then return false end
@@ -111,7 +119,58 @@ npc_damage_handler = create_scriptable_info {
 			npc_info.last_impact = message.impact_velocity
 			
 			return false
-		end	
+		end,
+		
+		[scriptable_component.SHOT_MESSAGE] = function(message)
+			local npc_info = get_scripted(message.subject)
+			
+			local shell_offset = vec2(npc_info.current_weapon.shell_offset)
+			shell_offset:rotate(message.subject.transform.current.rotation, vec2(0, 0))
+			
+			local new_pos = message.subject.transform.current.pos + shell_offset
+			
+			local new_bullet = create_entity { 
+				render = {
+					model = npc_info.current_weapon.bullet_shell_sprite,
+					layer = render_layers.ON_GROUND
+				},
+				
+				physics = {
+					body_type = Box2D.b2_dynamicBody,
+					
+					body_info = {
+						filter = filter_shells,
+						shape_type = physics_info.RECT,
+						fixed_rotation = false,
+						linear_damping = 7,
+						angular_damping = 4,
+						restitution = 1
+					}
+				},
+				
+				transform = {
+					pos = new_pos
+				}
+			}
+			
+			local throw_force = vec2(-randval(0.1, 0.5), randval(0.05, 0.3))
+			throw_force:rotate(message.subject.transform.current.rotation, vec2(0, 0))
+			
+			local body = new_bullet.physics.body
+			body:ApplyLinearImpulse(b2Vec2(throw_force.x, throw_force.y), body:GetWorldCenter())
+			body:ApplyAngularImpulse(randval(0.0006, 0.005))
+			
+			local bullet_smoke_msg = particle_burst_message()
+			bullet_smoke_msg.subject = new_bullet
+			bullet_smoke_msg.pos = vec2(0, 0)
+			bullet_smoke_msg.rotation = 0
+			bullet_smoke_msg.local_transform = true
+			bullet_smoke_msg.set_effect = bullet_shell_smoke_effect
+			
+			world:post_message(bullet_smoke_msg)
+			
+			return false
+		end
 	}
 }
 
@@ -236,7 +295,7 @@ character_archetype = {
 		},
 		
 		scriptable = {
-			available_scripts = npc_damage_handler
+			available_scripts = npc_script_callbacks
 		}
 	},
 	
@@ -390,6 +449,8 @@ loop_only_info = create_scriptable_info {
 	scripted_events = {	
 		[scriptable_component.INTENT_MESSAGE] = 
 			function(message)
+				local retval = true
+			
 				if message.intent == custom_intents.QUIT then
 					input_system.quit_flag = 1
 				elseif message.intent == custom_intents.RESTART then
@@ -412,8 +473,9 @@ loop_only_info = create_scriptable_info {
 					if physics_system.timestep_multiplier < 0.01 then
 						physics_system.timestep_multiplier = 0.01
 					end
-				end
-				return true
+				else retval = false end
+				
+				return false
 			end,
 			
 		[scriptable_component.LOOP] = function(subject)
