@@ -1,7 +1,6 @@
 #pragma once
 // #define INCLUDE_DWM
 #define ENABLE_ERRORLOGS /* warning: this module requires error_logging package */
-#define MAXIMUM_COMPONENTS 64
 
 /* cancel out error macros unless we want error_logging included */
 

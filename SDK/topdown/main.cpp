@@ -42,6 +42,9 @@
 #include "resources/animate_info.h"
 #include "resources/scriptable_info.h"
 
+#include <SFML/Audio.hpp>
+
+
 using namespace augmentations;
 using namespace entity_system;
 using namespace messages;

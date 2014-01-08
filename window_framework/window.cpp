@@ -1,4 +1,6 @@
 #include "stdafx.h"
+#include "../options.h"
+
 
 #include "window.h"
 #include "../utility/stream.h"

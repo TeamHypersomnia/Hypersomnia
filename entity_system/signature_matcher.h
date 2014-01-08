@@ -2,7 +2,8 @@
 #include <set>
 #include <bitset>
 #include "type_registry.h"
-#include "../options.h"
+
+#define MAXIMUM_COMPONENTS 64
 
 namespace augmentations {
 	namespace entity_system {

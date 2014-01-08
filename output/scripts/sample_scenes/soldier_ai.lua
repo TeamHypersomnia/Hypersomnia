@@ -501,6 +501,7 @@ loop_only_info = create_scriptable_info {
 				player_info:loop()
 			end
 			
+			print(player.crosshair:get().transform.current.pos.x, player.crosshair:get().transform.current.pos.y)
 			--local ppos = player.body:get().transform.current.pos
 			----render_system:push_non_cleared_line(debug_line(vec2(0, 0), vec2(1000, 1000),  rgba(0, 255, 0, 255)))
 			--render_system:push_line(debug_line(ppos, ppos+vec2(7, 24), rgba(0, 0, 255, 255)))

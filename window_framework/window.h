@@ -1,5 +1,4 @@
 #pragma once
-#include "../options.h"
 
 #include "../math/rects.h"
 #include "event.h"

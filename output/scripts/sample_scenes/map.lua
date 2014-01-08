@@ -316,7 +316,7 @@ door_archetype = archetyped(wall_archetype, {
 			filter = filter_doors,
 			restitution = 0.8,
 			angular_damping = 8,
-			density = 0.1
+			density = 1
 		}
 	},
 	
@@ -327,6 +327,8 @@ door_archetype = archetyped(wall_archetype, {
 })
 
 function create_door(new_pos, starting_angle, new_size)
+	local local_offset = vec2(-(new_size / 2).x, 0)
+	new_pos = new_pos - local_offset
 	
 	local my_sprite = create_sprite { 
 		image = images.door,
@@ -342,13 +344,12 @@ function create_door(new_pos, starting_angle, new_size)
 		
 		transform = {
 			pos = new_pos,
-			rotation = 0
+			rotation = 2* starting_angle
 		}
 	}))
 
 	local body = new_door.physics.body
 	
-	local local_offset = vec2(-(new_size / 2).x, 0)
 	local anchor_point_A = (new_pos + local_offset) / 50
 	local anchor_point_B = local_offset / 50
 	
@@ -365,10 +366,10 @@ function create_door(new_pos, starting_angle, new_size)
 	door_joint.upperAngle =  90 * 0.01745329251994329576923690768489
 	
 	create_joint(world, door_joint)
-	body:SetTransform(body:GetPosition(), 2* starting_angle * 0.01745329251994329576923690768489)
+	--body:SetTransform(body:GetPosition(), 2 * starting_angle * 0.01745329251994329576923690768489)
 end
 
-create_door(vec2(200, 200), 0, vec2(100, 10))
+--create_door(vec2(214, -322), 90, vec2(100, 10))
 
 create_wall( {
 
