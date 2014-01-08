@@ -20,6 +20,7 @@ namespace bindings {
 				luabind::value("COLLISION_MESSAGE", scriptable::script_type::COLLISION_MESSAGE),
 				luabind::value("DAMAGE_MESSAGE", scriptable::script_type::DAMAGE_MESSAGE),
 				luabind::value("INTENT_MESSAGE", scriptable::script_type::INTENT_MESSAGE),
+				luabind::value("SHOT_MESSAGE", scriptable::script_type::SHOT_MESSAGE),
 				luabind::value("LOOP", scriptable::script_type::LOOP)
 			]
 		);

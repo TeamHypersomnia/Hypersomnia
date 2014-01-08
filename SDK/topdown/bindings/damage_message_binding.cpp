@@ -9,9 +9,8 @@
 namespace bindings {
 	luabind::scope _damage_message() {
 		return (
-			luabind::class_<damage_message>("damage_message")
+			luabind::class_<damage_message, message>("damage_message")
 			.def(luabind::constructor<>())
-			.def_readwrite("subject", &damage_message::subject)
 			.def_readwrite("amount", &damage_message::amount)
 			.def_readwrite("impact_velocity", &damage_message::impact_velocity)
 			);

@@ -9,10 +9,9 @@
 namespace bindings {
 	luabind::scope _destroy_message() {
 		return (
-			luabind::class_<destroy_message>("destroy_message")
+			luabind::class_<destroy_message, message>("destroy_message")
 			.def(luabind::constructor<>())
 			//.def(luabind::constructor<entity*>())
-			.def_readwrite("subject", &destroy_message::subject)
 			.def_readwrite("redirection", &destroy_message::redirection)
 			.def_readwrite("only_children", &destroy_message::only_children)
 			);

@@ -9,9 +9,8 @@
 namespace bindings {
 	luabind::scope _collision_message() {
 		return (
-			luabind::class_<collision_message>("collision_message")
+			luabind::class_<collision_message, message>("collision_message")
 			.def(luabind::constructor<>())
-			.def_readwrite("subject", &collision_message::subject)
 			.def_readwrite("collider", &collision_message::collider)
 			.def_readwrite("impact_velocity", &collision_message::impact_velocity)
 			.def_readwrite("point", &collision_message::point)

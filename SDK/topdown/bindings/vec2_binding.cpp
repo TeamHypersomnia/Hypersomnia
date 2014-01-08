@@ -12,6 +12,7 @@ namespace bindings {
 			luabind::class_<vec2<>>("vec2")
 			.def(luabind::constructor<float, float>())
 			.def(luabind::constructor<>())
+			.def(luabind::constructor<const vec2<>&>())
 			.def(luabind::const_self * float())
 			.def(luabind::const_self * luabind::const_self)
 			.def(luabind::const_self / float())

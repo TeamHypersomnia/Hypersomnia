@@ -8,9 +8,8 @@
 namespace bindings {
 	luabind::scope _intent_message() {
 		return
-			luabind::class_<intent_message>("intent_message")
+			luabind::class_<intent_message, message>("intent_message")
 			.def(luabind::constructor<>())
-			.def_readwrite("subject", &intent_message::subject)
 			.def_readwrite("intent", &intent_message::intent)
 			.def_readwrite("state_flag", &intent_message::state_flag)
 			.def_readwrite("mouse_pos", &intent_message::mouse_pos)

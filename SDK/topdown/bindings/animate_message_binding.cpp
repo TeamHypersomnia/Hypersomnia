@@ -11,10 +11,9 @@ namespace bindings {
 	luabind::scope _animate_message() {
 		struct dummy_animation {};
 		return (
-			luabind::class_<animate_message>("animate_message")
+			luabind::class_<animate_message, message>("animate_message")
 			.def(luabind::constructor<>())
 			.def(luabind::constructor<animate_message::animation, animate_message::type, bool, float>())
-			.def_readwrite("subject", &animate_message::subject)
 			.def_readwrite("set_animation", &animate_message::set_animation)
 			.def_readwrite("animation_type", &animate_message::animation_type)
 			.def_readwrite("preserve_state_if_animation_changes", &animate_message::preserve_state_if_animation_changes)

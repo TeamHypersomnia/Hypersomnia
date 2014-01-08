@@ -13,6 +13,7 @@ namespace components {
 			COLLISION_MESSAGE,
 			DAMAGE_MESSAGE,
 			INTENT_MESSAGE,
+			SHOT_MESSAGE,
 			LOOP
 		};
 		

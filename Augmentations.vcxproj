@@ -418,10 +418,16 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SDK\topdown\bindings\destroy_message_binding.cpp" />
+    <ClCompile Include="SDK\topdown\bindings\message_binding.cpp" />
     <ClCompile Include="SDK\topdown\bindings\pathfinding_component_binding.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\shot_message_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SDK\topdown\bindings\visibility_component_binding.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
@@ -970,6 +976,7 @@
     <ClInclude Include="SDK\topdown\components\visibility_component.h" />
     <ClInclude Include="SDK\topdown\components\pathfinding_component.h" />
     <ClInclude Include="SDK\topdown\components\steering_component.h" />
+    <ClInclude Include="SDK\topdown\messages\shot_message.h" />
     <ClInclude Include="SDK\topdown\messages\steering_message.h" />
     <ClInclude Include="SDK\topdown\resources\fbo.h" />
     <ClInclude Include="SDK\topdown\systems\behaviour_tree_system.h" />
