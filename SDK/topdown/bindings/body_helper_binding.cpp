@@ -29,6 +29,26 @@ namespace bindings {
 				luabind::value("RECT", physics_info::RECT)
 			],
 
+			luabind::class_ <b2JointDef>("b2JointDef")
+			.def(luabind::constructor<>())
+			.def_readwrite("bodyA", &b2JointDef::bodyA)
+			.def_readwrite("bodyB", &b2JointDef::bodyB)
+			.def_readwrite("collideConnected", &b2JointDef::collideConnected)
+			,
+
+			luabind::class_ <b2RevoluteJoint>("b2RevoluteJoint"),
+
+			luabind::class_ <b2RevoluteJointDef, b2JointDef>("b2RevoluteJointDef")
+			.def(luabind::constructor<>())
+			.def_readwrite("localAnchorA", &b2RevoluteJointDef::localAnchorA)
+			.def_readwrite("localAnchorB", &b2RevoluteJointDef::localAnchorB)
+			.def_readwrite("referenceAngle", &b2RevoluteJointDef::referenceAngle)
+			.def_readwrite("enableLimit", &b2RevoluteJointDef::enableLimit)
+			.def_readwrite("lowerAngle", &b2RevoluteJointDef::lowerAngle)
+			.def_readwrite("upperAngle", &b2RevoluteJointDef::upperAngle)
+			,
+			
+			luabind::def("create_joint", create_joint),
 			luabind::def("create_physics_component", create_physics_component),
 			luabind::def("body_to_entity", body_to_entity)
 		);

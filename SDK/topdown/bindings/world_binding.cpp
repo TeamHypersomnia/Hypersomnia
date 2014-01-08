@@ -16,7 +16,7 @@ void helper_destroy(world& owner, destroy_message msg) {
 namespace bindings {
 	luabind::scope _world() {
 		return
-			luabind::class_<world>("world")
+			luabind::class_<world>("_world")
 			.def(luabind::constructor<>())
 			.def("create_entity", &world::create_entity)
 			.def("delete_entity", &world::delete_entity)

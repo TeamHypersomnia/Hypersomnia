@@ -91,7 +91,7 @@ void gun_system::process_entities(world& owner) {
 	auto& render = owner.get_system<render_system>();
 
 	for (auto it : targets) {
-		auto& gun_transform = it->get<components::transform>().current;
+		const auto& gun_transform = it->get<components::transform>().current;
 		auto& gun = it->get<components::gun>();
 
 		/* lambdas to simplify notation */

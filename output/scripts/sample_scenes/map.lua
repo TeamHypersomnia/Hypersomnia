@@ -239,27 +239,23 @@ wall_archetype = archetyped(floor_archetype, {
 	}
 })
 
-door_sprite = create_sprite {
-	model = images.door
-}
 
-door_archetype = archetyped(wall_archetype, {
+blank_body = (create_entity {
 	physics = {
-		body_type = Box2D.b2_dynamicBody,
+		body_type = Box2D.b2_staticBody,
 		
 		body_info = {
 			shape_type = physics_info.RECT,
-			--vertices = sample_prostokat,
-			filter = filter_doors,
-			friction = 0
+			rect_size = vec2(10, 10),
+			filter = filter_nothing
 		}
 	},
 	
-	render = {
-		model = door_sprite,
-		layer = render_layers.OBJECTS
+	transform = {
+		pos = vec2(0, 0),
+		rotation = 0
 	}
-})
+}).physics.body
 
 global_all_polys = {}
 
@@ -288,7 +284,7 @@ function create_poly (poly_vertices, image_to_map, pick_archetype, reverse_order
 	
 	map_uv_square(my_poly, image_to_map)
 	
-	my_entity = create_entity (archetyped(pick_archetype, {
+	create_entity (archetyped(pick_archetype, {
 		render = {
 			model = my_poly
 		}
@@ -310,9 +306,69 @@ function create_floor(poly_vertices, image_to_map, reverse_order, rlayer)
 	create_poly (poly_vertices, image_to_map, archetyped(floor_archetype, {render = { layer = rlayer } }), reverse_order)
 end
 
+door_archetype = archetyped(wall_archetype, {
+	physics = {
+		body_type = Box2D.b2_dynamicBody,
+		
+		body_info = {
+			shape_type = physics_info.RECT,
+			--vertices = sample_prostokat,
+			filter = filter_doors,
+			restitution = 0.8,
+			angular_damping = 8,
+			density = 0.1
+		}
+	},
+	
+	render = {
+		model = door_sprite,
+		layer = render_layers.OBJECTS
+	}
+})
 
+function create_door(new_pos, starting_angle, new_size)
+	
+	local my_sprite = create_sprite { 
+		image = images.door,
+		size = new_size
+	}
+	
+	table.insert(global_all_polys, my_sprite)
+	
+	local new_door = create_entity (archetyped(door_archetype, {
+		render = {
+			model = my_sprite
+		},
+		
+		transform = {
+			pos = new_pos,
+			rotation = 0
+		}
+	}))
 
+	local body = new_door.physics.body
+	
+	local local_offset = vec2(-(new_size / 2).x, 0)
+	local anchor_point_A = (new_pos + local_offset) / 50
+	local anchor_point_B = local_offset / 50
+	
+	local door_joint = b2RevoluteJointDef()
+	door_joint.bodyA = blank_body
+	door_joint.bodyB = body
+	door_joint.collideConnected = false
+	
+	door_joint.localAnchorA = b2Vec2(anchor_point_A.x, anchor_point_A.y)
+	door_joint.localAnchorB = b2Vec2(anchor_point_B.x, anchor_point_B.y)
+	door_joint.referenceAngle = starting_angle * 0.01745329251994329576923690768489 
+	door_joint.enableLimit = true
+	door_joint.lowerAngle = -90 * 0.01745329251994329576923690768489
+	door_joint.upperAngle =  90 * 0.01745329251994329576923690768489
+	
+	create_joint(world, door_joint)
+	body:SetTransform(body:GetPosition(), 2* starting_angle * 0.01745329251994329576923690768489)
+end
 
+create_door(vec2(200, 200), 0, vec2(100, 10))
 
 create_wall( {
 

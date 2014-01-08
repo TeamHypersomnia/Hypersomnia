@@ -105,6 +105,7 @@ function npc_class:take_weapon_item(item_data)
 	--end
 	
 	self.entity.gun = gun_component(item_data.weapon_info)
+	self.entity.gun:drop_logic()
 	
 	self.current_weapon = item_data
 	self.entity.gun:set_bullet_filter(create(b2Filter, self.weapon_bullet_filter))
@@ -164,12 +165,13 @@ function npc_class:drop_weapon(force_multiplier)
 	if self.current_weapon ~= bare_hands then
 		print("dropping weapon..." .. self.current_weapon.animation_index)
 		self.entity.gun:drop_logic()
-		local my_thrown_weapon = spawn_weapon(self.entity.transform.current.pos, self.current_weapon, self.entity.gun)
+		local throw_force = vec2.from_degrees(self.entity.transform.current.rotation) * 15 * force_multiplier
+		
+		local my_thrown_weapon = spawn_weapon(self.entity.transform.current.pos + vec2(throw_force):set_length(30), self.current_weapon, self.entity.gun)
 		
 		self.entity.gun:transfer_barrel_smoke(my_thrown_weapon, true)
 		my_thrown_weapon.gun:get_barrel_smoke():get().chase.rotation_orbit_offset = self.current_weapon.world_orbit_offset
 		
-		local throw_force = vec2.from_degrees(self.entity.transform.current.rotation) * 15 * force_multiplier
 		
 		local body = my_thrown_weapon.physics.body
 		
@@ -324,7 +326,7 @@ function npc_class:loop()
 		local p1 = entity.transform.current.pos
 		local p2 = player.body:get().transform.current.pos
 		
-		ray_output = physics_system:ray_cast(p1, p2, create(b2Filter, filter_pathfinding_visibility), entity)
+		ray_output = physics_system:ray_cast(p1, p2, create(b2Filter, filter_player_visibility), entity)
 		
 		if not ray_output.hit then
 			self.target_entities.last_seen.transform.current.pos = player.body:get().transform.current.pos

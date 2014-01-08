@@ -49,7 +49,7 @@ local mask_all = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, ENEMY_BULLETS, CHARACTE
 
 filter_doors = {
 	categoryBits = DOORS,
-	maskBits = bitor(SHELLS, STATIC_OBJECTS, OBJECTS, CORPSES, CHARACTERS, BULLETS, ENEMY_BULLETS, ITEMS)
+	maskBits = bitor(SHELLS, OBJECTS, CORPSES, CHARACTERS, BULLETS, ENEMY_BULLETS, ITEMS)
 }
 
 filter_shells = {
@@ -125,6 +125,11 @@ filter_melee_obstruction = {
 filter_pathfinding_visibility = {
 	categoryBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS, CORPSES),
 	maskBits = bitor(STATIC_OBJECTS)
+}
+
+filter_player_visibility = {
+	categoryBits = mask_all,
+	maskBits = bitor(STATIC_OBJECTS, DOORS)
 }
 
 filter_obstacle_visibility = {

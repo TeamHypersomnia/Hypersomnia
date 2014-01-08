@@ -76,6 +76,8 @@ namespace bindings {
 			.def("ApplyTorque", &b2Body::ApplyTorque)
 			.def("GetLinearVelocity", &b2Body::GetLinearVelocity)
 			.def("GetAngularVelocity", &b2Body::GetAngularVelocity)
+			.def("SetTransform", &b2Body::SetTransform)
+			.def("GetPosition", &b2Body::GetPosition)
 			);
 
 

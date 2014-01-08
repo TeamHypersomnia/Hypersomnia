@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "../systems/physics_system.h"
 
 namespace augmentations {
 	namespace entity_system {
@@ -39,6 +40,9 @@ namespace topdown {
 	//extern void create_physics_component(augmentations::entity_system::entity& subject, b2Filter filter, int = b2_dynamicBody);
 	extern void create_physics_component(const physics_info&, augmentations::entity_system::entity& subject, int = b2_dynamicBody);
 	extern std::vector<b2Vec2> get_transformed_shape_verts(augmentations::entity_system::entity& subject, bool meters = true);
+
+	//template <typename T, typename R>
+	extern b2RevoluteJoint* create_joint(world* owner, b2RevoluteJointDef* joint_def);
 
 	extern augmentations::entity_system::entity* body_to_entity(b2Body*);
 }
