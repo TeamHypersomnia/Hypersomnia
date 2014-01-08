@@ -12,6 +12,7 @@
 #include "../messages/collision_message.h"
 #include "../messages/damage_message.h"
 #include "../messages/intent_message.h"
+#include "../messages/shot_message.h"
 
 #include "utility/randval.h"
 
@@ -63,12 +64,14 @@ namespace bindings {
 		_emission(),
 		_particle_effect(),
 
+		_message(),
 		_intent_message(),
 		_animate_message(),
 		_particle_burst_message(),
 		_collision_message(),
 		_damage_message(),
 		_destroy_message(),
+		_shot_message(),
 
 		_render_component(),
 		_transform_component(),
@@ -143,12 +146,14 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			bindings::_emission(),
 			bindings::_particle_effect(),
 					  
+			bindings::_message(),
 			bindings::_intent_message(),
 			bindings::_animate_message(),
 			bindings::_particle_burst_message(),
 			bindings::_collision_message(),
 			bindings::_damage_message(),
 			bindings::_destroy_message(),
+			bindings::_shot_message(),
 
 			bindings::_render_component(),
 			bindings::_transform_component(),
@@ -209,10 +214,6 @@ template<typename message_type>
 void pass_events_to_script(world& owner, int msg_enum) {
 	auto& events = owner.get_message_queue<message_type>();
 
-	if (std::string(typeid(message_type).name()) == "struct messages::damage_message") {
-		int breakp = 123123;
-	}
-
 	events.erase(
 		std::remove_if(events.begin(), events.end(), [msg_enum](message_type& msg){
 			auto* scriptable = msg.subject->find<components::scriptable>();
@@ -226,6 +227,8 @@ void pass_events_to_script(world& owner, int msg_enum) {
 			
 			return false;
 	}), events.end());
+
+	int breakp = 23;
 }
 using namespace messages;
 void script_system::process_events(world& owner) {
@@ -233,6 +236,7 @@ void script_system::process_events(world& owner) {
 		pass_events_to_script<collision_message>(owner, components::scriptable::COLLISION_MESSAGE);
 		pass_events_to_script<damage_message>(owner, components::scriptable::DAMAGE_MESSAGE);
 		pass_events_to_script<intent_message>(owner, components::scriptable::INTENT_MESSAGE);
+		pass_events_to_script<shot_message>(owner, components::scriptable::SHOT_MESSAGE);
 	}
 	catch (std::exception compilation_error) {
 		std::cout << compilation_error.what() << std::endl;

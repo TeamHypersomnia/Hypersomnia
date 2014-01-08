@@ -6,6 +6,7 @@
 #include "../messages/particle_burst_message.h"
 #include "../messages/damage_message.h"
 #include "../messages/destroy_message.h"
+#include "../messages/shot_message.h"
 
 #include "../components/render_component.h"
 #include "../components/physics_component.h"
@@ -63,7 +64,7 @@ void gun_system::remove(entity* e) {
 	return processing_system::remove(e);
 }
 
-void gun_system::process_events(world& owner) {
+void gun_system::consume_events(world& owner) {
 	auto events = owner.get_message_queue<messages::intent_message>();
 
 	for (auto it : events) {
@@ -98,6 +99,11 @@ void gun_system::process_entities(world& owner) {
 		/********************************************************************************************************/
 
 		auto shooting_routine = [&]() {
+			messages::shot_message shot_msg;
+			shot_msg.subject = it;
+
+			owner.post_message(shot_msg);
+
 			messages::animate_message msg;
 			msg.animation_type = messages::animate_message::animation::SHOT;
 			msg.preserve_state_if_animation_changes = false;
@@ -287,6 +293,6 @@ void gun_system::process_entities(world& owner) {
 			if (gun.outdated(gun.swing_interval_ms)) 
 				state = components::gun::READY;
 		}
-		else assert(0);
+		else assert(0); 
 	}
 }

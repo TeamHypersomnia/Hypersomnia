@@ -10,5 +10,5 @@ public:
 	void add(entity*) override {}
 	void remove(entity*) override {}
 
-	void process_events(world&) override;
+	void consume_events(world&) override;
 };

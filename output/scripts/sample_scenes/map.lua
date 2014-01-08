@@ -239,6 +239,28 @@ wall_archetype = archetyped(floor_archetype, {
 	}
 })
 
+door_sprite = create_sprite {
+	model = images.door
+}
+
+door_archetype = archetyped(wall_archetype, {
+	physics = {
+		body_type = Box2D.b2_dynamicBody,
+		
+		body_info = {
+			shape_type = physics_info.RECT,
+			--vertices = sample_prostokat,
+			filter = filter_doors,
+			friction = 0
+		}
+	},
+	
+	render = {
+		model = door_sprite,
+		layer = render_layers.OBJECTS
+	}
+})
+
 global_all_polys = {}
 
 all_counter = 0
@@ -287,6 +309,8 @@ function create_floor(poly_vertices, image_to_map, reverse_order, rlayer)
 	end
 	create_poly (poly_vertices, image_to_map, archetyped(floor_archetype, {render = { layer = rlayer } }), reverse_order)
 end
+
+
 
 
 
@@ -486,28 +510,28 @@ vec2(816,16)
 
 -- to jest podloga wiec juz jebac winding elo
 create_floor( {
-		vec2(319,513),
-vec2(66,513),
-vec2(66,407),
-vec2(319,407)
+vec2(349,513),
+vec2(57,513),
+vec2(57,407),
+vec2(349,407)
 		},
 		images.floor1)
 
 
 
 		create_floor( {
-vec2(319,400),
-vec2(124,400),
-vec2(124,166),
-vec2(319,166)
+vec2(339,400),
+vec2(122,400),
+vec2(122,166),
+vec2(339,166)
 		},
 		images.floor2)
 
 
 		create_floor( {
-		vec2(589,514),
-vec2(487,514),
-vec2(487,436),
+vec2(589,514),
+vec2(467,514),
+vec2(467,436),
 vec2(589,436)
 		},
 		images.floor1)
@@ -515,20 +539,20 @@ vec2(589,436)
 
 
 		create_floor( {
-	vec2(487,328),
+vec2(487,319),
 vec2(487,427),
-vec2(597,427),
-vec2(597,514),
+vec2(598,427),
+vec2(598,514),
 vec2(729,514),
-vec2(729,328)
+vec2(729,319)
 		},
 		images.floor4)
 		
 		create_floor( {
 	vec2(478,551),
-vec2(328,551),
-vec2(328,328),
-vec2(478,328)
+vec2(326,551),
+vec2(326,319),
+vec2(478,319)
 		},
 		images.floor5)
 		
@@ -549,8 +573,8 @@ vec2(687,195),
 vec2(687,166),
 vec2(565,166),
 vec2(565,195),
-vec2(514,195),
-vec2(514,319),
+vec2(505,195),
+vec2(505,319),
 vec2(687,319)
 
 		},
@@ -568,10 +592,10 @@ vec2(319,41)
 
 
 						create_floor( {
-vec2(557,186),
-vec2(328,186),
-vec2(328,65),
-vec2(557,65)
+vec2(567,196),
+vec2(319,196),
+vec2(319,65),
+vec2(567,65)
 
 
 		},

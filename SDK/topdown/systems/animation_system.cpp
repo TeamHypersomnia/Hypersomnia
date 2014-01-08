@@ -6,7 +6,7 @@
 using namespace messages;
 using namespace resources;
 
-void animation_system::process_events(world& owner) {
+void animation_system::consume_events(world& owner) {
 	auto events = owner.get_message_queue<animate_message>();
 
 	for (auto it : events) {

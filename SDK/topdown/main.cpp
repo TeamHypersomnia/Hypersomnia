@@ -33,6 +33,7 @@
 #include "messages/particle_burst_message.h"
 #include "messages/damage_message.h"
 #include "messages/steering_message.h"
+#include "messages/shot_message.h"
 
 #include "game/body_helper.h"
 #include "game/texture_helper.h"
@@ -108,6 +109,7 @@ int main() {
 	my_world.register_message_queue<animate_message>();
 	my_world.register_message_queue<collision_message>();
 	my_world.register_message_queue<particle_burst_message>();
+	my_world.register_message_queue<shot_message>();
 
 	scripts.global("world", my_world);
 	scripts.global("window", gl);
@@ -139,11 +141,12 @@ int main() {
 		input.process_entities(my_world);                  
 		movement.process_entities(my_world);
 
-		physics.substepping_routine = [&steering, &movement, &damage, &destroy](world& owner){
+		physics.substepping_routine = [&steering, &movement, &damage, &destroy, &scripts](world& owner){
 			steering.substep(owner);
 			movement.substep(owner);
-			damage.process_events(owner);
-			destroy.process_events(owner);
+			scripts.process_entities(owner);
+			scripts.process_events(owner);
+			destroy.consume_events(owner);
 		};
 
 		physics.process_entities(my_world);                 
@@ -158,19 +161,23 @@ int main() {
 		visibility.process_entities(my_world);              
 		pathfinding.process_entities(my_world);             
 		render.process_entities(my_world);                  
-		scripts.process_entities(my_world);                 
 		camera.process_entities(my_world);                  
+		scripts.process_entities(my_world);
+		
+		damage.process_events(my_world);
+		destroy.consume_events(my_world);  
 
-		destroy.process_events(my_world);                                            
-		movement.process_events(my_world);                                           
-		animations.process_events(my_world);                                         
-		crosshairs.process_events(my_world);                                         
-		damage.process_events(my_world);                                             
-		guns.process_events(my_world);                                               
-		emitters.process_events(my_world);                                           
-		camera.process_events(my_world);                                             
-		scripts.process_events(my_world);                                            
-		destroy.process_events(my_world);                                            
+		scripts.process_events(my_world);
+
+		damage.process_events(my_world);
+		destroy.consume_events(my_world);
+
+		movement.consume_events(my_world);
+		animations.consume_events(my_world);
+		crosshairs.consume_events(my_world);
+		guns.consume_events(my_world);
+		emitters.consume_events(my_world);
+		camera.consume_events(my_world);
 
 		my_world.flush_message_queues();
 		//std::cout << physics.ray_casts_per_frame << std::endl;

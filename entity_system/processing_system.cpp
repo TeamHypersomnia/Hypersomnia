@@ -30,5 +30,9 @@ namespace augmentations {
 		void processing_system::process_events(world&) {
 
 		}
+
+		void processing_system::consume_events(world&) {
+
+		}
 	}
 }

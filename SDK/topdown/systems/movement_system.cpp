@@ -8,7 +8,7 @@
 
 using namespace messages;
 
-void movement_system::process_events(world& owner) {
+void movement_system::consume_events(world& owner) {
 	auto events = owner.get_message_queue<messages::intent_message>();
 
 	for (auto it : events) {

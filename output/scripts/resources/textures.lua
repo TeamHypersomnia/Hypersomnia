@@ -57,10 +57,10 @@ images = add_roots("resources\\", {
 	head_14 = "enemy\\head_14.png",
 	head_15 = "enemy\\head_15.png",
 	
-	head_walk = "player\\head_walk.png",
-	head_gun = "player\\head_gun.png",
-	head_shot = "player\\head_shot.png",
-	head_over = "player\\head_over.png",
+	head_walk = "player2\\head_walk.png",
+	head_gun = "player2\\head_gun.png",
+	head_shot = "player2\\head_shot.png",
+	head_over = "player2\\head_over.png",
 	
 	shotgun_wielded = "shotgun_wielded.png",
 	assault_wielded = "assault_wielded.png",
@@ -98,7 +98,9 @@ images = add_roots("resources\\", {
 	wall_piece_7 = "wall_piece_7.png",
 	wall_piece_8 = "wall_piece_8.png",
 	wall_piece_9 = "wall_piece_9.png",
-	wall_piece_10 = "wall_piece_10.png"
+	wall_piece_10 = "wall_piece_10.png",
+	
+	door = "door.png"
 })
 
 character_filenames = {
@@ -142,7 +144,7 @@ character_filenames = {
 }
 
 enemy_images = add_roots("resources\\enemy\\", character_filenames)
-player_images = add_roots("resources\\player\\", archetyped(character_filenames, {
+player_images = add_roots("resources\\player2\\", archetyped(character_filenames, {
 	hands_1 = "hands_1.png",
 	hands_2 = "hands_2.png",
 	hands_3 = "hands_3.png",

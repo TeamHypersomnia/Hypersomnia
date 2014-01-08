@@ -7,7 +7,7 @@
 #include "../components/render_component.h"
 #include "../resources/render_info.h"
 
-void crosshair_system::process_events(world& owner) {
+void crosshair_system::consume_events(world& owner) {
 	auto events = owner.get_message_queue<messages::intent_message>();
 
 	for (auto it : events) {

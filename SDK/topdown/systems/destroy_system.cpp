@@ -8,7 +8,7 @@
 
 #include "../messages/destroy_message.h"
 
-void destroy_system::process_events(world& owner) {
+void destroy_system::consume_events(world& owner) {
 	auto events = owner.get_message_queue<messages::destroy_message>();
 	std::vector <std::pair<entity*, entity*>> to_destroy;
 

@@ -337,7 +337,7 @@ blood_under_corpse = {
 	particles_per_sec = minmax(300, 300),
 	stream_duration_ms = minmax(2000, 2000),
 	type = emission.STREAM,
-	velocity = minmax(1, 4),
+	velocity = minmax(1, 6),
 	angular_velocity = minmax(0, 0),
 	
 	particle_templates = archetyped(blood_templates, {

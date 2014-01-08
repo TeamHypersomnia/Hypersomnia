@@ -35,7 +35,8 @@ create_options {
 	"ENEMY_BULLETS", 
 	"CORPSES",
 	"ITEMS",
-	"SHELLS"
+	"SHELLS",
+	"DOORS"
 }
 
 
@@ -44,11 +45,16 @@ filter_nothing = {
 	maskBits = 0
 }
 
-local mask_all = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, ENEMY_BULLETS, CHARACTERS, CORPSES, ITEMS, SHELLS)
+local mask_all = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, ENEMY_BULLETS, CHARACTERS, CORPSES, ITEMS, SHELLS, DOORS)
+
+filter_doors = {
+	categoryBits = DOORS,
+	maskBits = bitor(SHELLS, STATIC_OBJECTS, OBJECTS, CORPSES, CHARACTERS, BULLETS, ENEMY_BULLETS, ITEMS)
+}
 
 filter_shells = {
 	categoryBits = SHELLS,
-	maskBits = bitor(SHELLS, STATIC_OBJECTS, OBJECTS)
+	maskBits = bitor(SHELLS, STATIC_OBJECTS, OBJECTS, DOORS)
 }
 
 filter_static_objects = {
@@ -58,17 +64,17 @@ filter_static_objects = {
 
 filter_objects = {
 	categoryBits = OBJECTS,
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, ENEMY_BULLETS, CHARACTERS, CORPSES)
+	maskBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, ENEMY_BULLETS, CHARACTERS, CORPSES, DOORS)
 }
 
 filter_characters = {
 	categoryBits = CHARACTERS,
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS, ENEMY_BULLETS, CHARACTERS)
+	maskBits = bitor(OBJECTS, STATIC_OBJECTS, ENEMY_BULLETS, CHARACTERS, DOORS)
 }
 
 filter_enemies = {
 	categoryBits = CHARACTERS,
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS)
+	maskBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS, DOORS)
 }
 
 filter_characters_separation = {
@@ -78,22 +84,22 @@ filter_characters_separation = {
 
 filter_bullets = {
 	categoryBits = BULLETS,
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS, CHARACTERS)
+	maskBits = bitor(OBJECTS, STATIC_OBJECTS, CHARACTERS, DOORS)
 }
 
 filter_enemy_bullets = {
 	categoryBits = ENEMY_BULLETS,
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS, CHARACTERS)
+	maskBits = bitor(OBJECTS, STATIC_OBJECTS, CHARACTERS, DOORS)
 }
 
 filter_corpses = {
 	categoryBits = CORPSES,
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS)
+	maskBits = bitor(OBJECTS, STATIC_OBJECTS, DOORS)
 }
 
 filter_items = {
 	categoryBits = ITEMS,
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS)
+	maskBits = bitor(OBJECTS, STATIC_OBJECTS, DOORS)
 }
 
 filter_pick_up_items = {
@@ -113,7 +119,7 @@ filter_enemy_melee = {
 
 filter_melee_obstruction = {
 	categoryBits = mask_all,
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS)
+	maskBits = bitor(OBJECTS, STATIC_OBJECTS, DOORS)
 }
 
 filter_pathfinding_visibility = {
