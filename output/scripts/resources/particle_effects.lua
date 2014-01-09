@@ -334,18 +334,18 @@ blood_pool = {
 
 blood_under_corpse = {
 	spread_degrees = 180,
-	particles_per_sec = minmax(300, 300),
-	stream_duration_ms = minmax(2000, 2000),
+	particles_per_sec = minmax(400, 400),
+	stream_duration_ms = minmax(3000, 3000),
 	type = emission.STREAM,
-	velocity = minmax(1, 6),
+	velocity = minmax(0, 6),
 	angular_velocity = minmax(0, 0),
 	
 	particle_templates = archetyped(blood_templates, {
-		{ linear_damping = 1 },
-		{ linear_damping = 1 },
-		{ linear_damping = 1 },
-		{ linear_damping = 1 },
-		{ linear_damping = 1 }
+		{ linear_damping = 0.5 },
+		{ linear_damping = 0.5 },
+		{ linear_damping = 0.5 },
+		{ linear_damping = 0.5 },
+		{ linear_damping = 0.5 }
 	}),
 	
 	size_multiplier = minmax(1.5, 2),

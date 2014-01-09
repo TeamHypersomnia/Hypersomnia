@@ -230,7 +230,7 @@ wall_archetype = archetyped(floor_archetype, {
 			shape_type = physics_info.POLYGON,
 			--vertices = sample_prostokat,
 			filter = filter_static_objects,
-			friction = 0
+			friction = 0.1
 		}
 	},
 	

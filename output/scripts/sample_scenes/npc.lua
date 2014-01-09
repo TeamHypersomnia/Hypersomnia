@@ -251,7 +251,7 @@ function npc_class:throw_corpse()
 	corpse_blood_msg.local_transform = true
 	corpse_blood_msg.set_effect = blood_under_corpse_effect
 	
-	world:post_delayed_message(corpse_blood_msg, 300)
+	world:post_delayed_message(corpse_blood_msg, 700)
 	
 	self.head_entity.chase:set_target(thrown_corpse_entity)
 	

@@ -189,7 +189,8 @@ corpse_archetype = {
 			rect_size = corpse_sprite.size,
 			fixed_rotation = true,
 			linear_damping = 5,
-			angular_damping = 3
+			angular_damping = 3,
+			friction = 1000000
 		}
 	}
 }
