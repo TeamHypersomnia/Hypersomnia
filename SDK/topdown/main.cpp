@@ -133,7 +133,6 @@ int main() {
 
 	my_comp2 = my_comp;
 
-
 	resources::script::script_reloader.add_directory(L"scripts", true);
 	resources::script init_script;
 
@@ -141,73 +140,8 @@ int main() {
 	init_script.add_reload_dependant(&init_script);
 	init_script.call();
 
-	//auto& ent = my_world.create_entity();
-	//ent.add<components::transform>();
-	//
-	//topdown::physics_info ph;
-	//ph.rect_size = vec2<>(10, 10);
-	//ph.type = ph.RECT;
-
-	//auto adder = [&ent](const components::physics& object){
-	//	if (!ent.enabled) ent.enable();
-	//
-	//	signature_matcher_bitset old_signature(ent.get_components());
-	//
-	//	/* component already exists, overwrite and return */
-	//	if (ent.type_to_component.find(typeid(components::physics).hash_code())) {
-	//		throw std::exception("component already exists!");
-	//		//if (overwrite_if_exists)
-	//		//(*static_cast<component_type*>((*p.first).second)) = object;
-	//	}
-	//	ent.type_to_component.add(typeid(components::physics).hash_code(), nullptr);
-	//
-	//	auto ptr = ent.type_to_component.get(typeid(components::physics).hash_code());
-	//
-	//	assert(ptr != nullptr);
-	//
-	//	/* allocate new component in corresponding pool */
-	//	(*ptr) = static_cast<component*>(ent.owner_world.get_container_for_type(typeid(components::physics).hash_code()).malloc());
-	//
-	//	assert(*ptr != nullptr);
-	//
-	//	/* construct it in place using placement new operator */
-	//	new (*ptr) components::physics(object);
-	//
-	//	/* get new signature */
-	//	signature_matcher_bitset new_signature(old_signature);
-	//	/* will trigger an exception on debug if the component type was not registered within any existing system */
-	//	new_signature.add(ent.owner_world.component_library.get_registered_type(typeid(components::physics).hash_code()));
-	//
-	//	for (auto sys : ent.owner_world.get_all_systems())
-	//		/* if a processing_system matches with the new signature and not with the old one */
-	//	if (sys->components_signature.matches(new_signature) && !sys->components_signature.matches(old_signature))
-	//		/* we should add this entity there */
-	//		sys->add(&ent);
-	//};
-
-	//adder(my_comp);
-	//ent.add<components::physics>(my_comp);
-	//topdown::create_physics_component(ph, ent, b2_staticBody);
-
-	//auto& my_pool = my_world.get_container_for_type(typeid(components::physics).hash_code());
-	//
-	//auto ptr = my_pool.malloc();
-	//auto ptr2 = my_pool.malloc();
-	//
-	//new (ptr) components::physics(my_comp);
-	//new (ptr2) components::physics(my_comp2);
-	//
-	//((components::physics*)ptr)->~physics();
-	//((components::physics*)ptr2)->~physics();
-	//
-	//my_pool.free(ptr);
-	//my_pool.free(ptr2);
-
 	std::cout << std::endl;
 	lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
-
-	augmentations::deinit();
-	return 0;
 
 	int argc = 0;
 	::testing::InitGoogleTest(&argc, (wchar_t**)nullptr);
@@ -215,7 +149,6 @@ int main() {
 	::testing::FLAGS_gtest_catch_exceptions = false;
 	::testing::FLAGS_gtest_break_on_failure = false;
 	auto result = RUN_ALL_TESTS();
-
 
 	while (!input.quit_flag) {
 		my_world.validate_delayed_messages();

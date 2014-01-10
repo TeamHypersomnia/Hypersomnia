@@ -60,7 +60,9 @@ void gun_system::add(entity* e) {
 }
 
 void gun_system::remove(entity* e) {
-	e->owner_world.post_message(messages::destroy_message(e->get<components::gun>().get_barrel_smoke()));
+	if (e->get<components::gun>().get_barrel_smoke().exists()) 
+		e->owner_world.delete_entity(*e->get<components::gun>().get_barrel_smoke().get());
+
 	return processing_system::remove(e);
 }
 

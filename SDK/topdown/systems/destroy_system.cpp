@@ -24,9 +24,6 @@ void destroy_system::consume_events(world& owner) {
 	};
 
 	for (auto it : events) {
-		if (it.subject->name == "wielded_entity") {
-			int breakp = 2;
-		}
 		if (it.only_children) {
 			auto children = it.subject->find<components::children>();
 			if (children) {
