@@ -45,6 +45,8 @@ int bitflag(lua_State* L) {
 
 namespace bindings {
 	extern luabind::scope
+		_sfml_audio(),
+
 		_minmax(),
 		_vec2(),
 		_b2Filter(),
@@ -127,6 +129,7 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 	lua_register(lua_state, "bitor", bitor);
 	lua_register(lua_state, "bitflag", bitflag);
 	luabind::module(lua_state)[
+			bindings::_sfml_audio(),
 			bindings::_minmax(),
 			bindings::_vec2(),
 			bindings::_b2Filter(),

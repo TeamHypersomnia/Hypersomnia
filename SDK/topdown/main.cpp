@@ -42,18 +42,13 @@
 #include "resources/animate_info.h"
 #include "resources/scriptable_info.h"
 
-#include <SFML/Audio.hpp>
-
-
 using namespace augmentations;
 using namespace entity_system;
 using namespace messages;
 
 resources::script* world_reloading_script = nullptr;
-
 int main() {
 	augmentations::init();
-	 
 	script_system scripts;
 	resources::script::script_reloader.report_errors = &std::cout;
 	resources::script::lua_state = scripts.lua_state;
