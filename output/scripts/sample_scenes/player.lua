@@ -83,7 +83,7 @@ init_npc(player.body:get(), {
 	},
 	
 	health_info = {
-		hp = 100,
+		hp = 100000000,
 		
 		corpse_entity = archetyped(corpse_archetype, {
 			render = {
@@ -152,6 +152,7 @@ main_context = create_input_context {
 	}
 }
 
+input_system:clear_contexts()
 input_system:add_context(main_context)
 
 world_camera.chase:set_target(player.body:get())

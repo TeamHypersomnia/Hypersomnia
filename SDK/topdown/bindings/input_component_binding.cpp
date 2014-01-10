@@ -23,7 +23,9 @@ namespace bindings {
 
 			luabind::class_<input_system>("_input_system")
 			.def_readwrite("quit_flag", &input_system::quit_flag)
-			.def("add_context", &input_system::add_context),
+			.def("add_context", &input_system::add_context)
+			.def("clear_contexts", &input_system::clear_contexts)
+			,
 
 			luabind::class_<input>("input_component")
 			.def(luabind::constructor<>())

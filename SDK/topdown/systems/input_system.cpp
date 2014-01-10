@@ -24,6 +24,10 @@ void input_system::add_context(context* c) {
 	active_contexts.push_back(c);
 }
 
+void input_system::clear_contexts() {
+	active_contexts.clear();
+}
+
 void input_system::post(messages::intent_message incoming_event, world& owner) {
 	auto& m = input_window.events.mouse;
 	incoming_event.mouse_pos = m.pos;

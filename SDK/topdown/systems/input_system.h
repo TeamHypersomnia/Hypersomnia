@@ -39,6 +39,7 @@ struct input_system : public processing_system_templated<components::input> {
 
 	std::vector<context*> active_contexts;
 	void add_context(context*);
+	void clear_contexts();
 
 	window::glwindow& input_window;
 	input_system(window::glwindow&);
