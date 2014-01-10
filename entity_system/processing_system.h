@@ -10,8 +10,8 @@ namespace augmentations {
 			friend class world;
 			friend class entity;
 
-			signature_matcher_bitset components_signature;
 		public:
+			signature_matcher_bitset components_signature;
 			std::vector<entity*> targets;
 			std::vector<processing_system*> subsystems;
 

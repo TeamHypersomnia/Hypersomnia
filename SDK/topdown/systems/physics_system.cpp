@@ -63,6 +63,7 @@ physics_system::edge_edge_output physics_system::edge_edge_intersection(vec2<> p
 	/* prepare b2RayCastOutput/b2RayCastInput data for raw b2EdgeShape::RayCast call */
 	b2RayCastOutput output;
 	b2RayCastInput input;
+	output.fraction = 0.f;
 	input.maxFraction = 1.0;
 	input.p1 = p1_meters;
 	input.p2 = p2_meters;

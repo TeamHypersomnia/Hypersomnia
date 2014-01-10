@@ -12,7 +12,7 @@ namespace components {
 				target(target), stop_at_zero_movement(stop_at_zero_movement) {}
 		};
 
-		void add_animation_receiver(augmentations::entity_system::entity_ptr e, bool stop_at_zero_movement) {
+		void add_animation_receiver(augmentations::entity_system::entity* e, bool stop_at_zero_movement) {
 			animation_receivers.push_back(subscribtion(e, stop_at_zero_movement));
 		}
 

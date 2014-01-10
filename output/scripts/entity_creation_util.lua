@@ -26,7 +26,7 @@ function set_components_from_entry(entity, entry, entities_lookup)
 		
 		if entry.movement.receivers ~= nil then
 			for i, receiver in pairs(entry.movement.receivers) do
-				movement:add_animation_receiver(entity_ptr(ptr_lookup(receiver.target, entities_lookup)), receiver.stop_at_zero_movement)
+				movement:add_animation_receiver(ptr_lookup(receiver.target, entities_lookup), receiver.stop_at_zero_movement)
 			end
 		end
 		

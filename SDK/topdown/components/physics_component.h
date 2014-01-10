@@ -11,5 +11,6 @@ namespace components {
 		std::vector <augmentations::vec2<>> original_model;
 
 		physics(b2Body* body = nullptr) : body(body) {}
+		//~physics() override {}
 	};
 }

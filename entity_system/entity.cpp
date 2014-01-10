@@ -7,7 +7,7 @@ namespace augmentations {
 	namespace entity_system {
 		entity::entity(world& owner_world) : owner_world(owner_world), enabled(true) {}
 		entity::~entity() {
-			int breakpoint = 11;
+			clear();
 		}
 
 		std::vector<registered_type> entity::get_components() const {

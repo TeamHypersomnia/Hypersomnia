@@ -1,6 +1,6 @@
-sexualizer = sfMusic()
-sexualizer:openFromFile("resources\\sfx\\sexualizer.ogg")
-sexualizer:play()
+--sexualizer = sfMusic()
+--sexualizer:openFromFile("resources\\sfx\\sexualizer.ogg")
+--sexualizer:play()
 
 dofile "scripts\\sample_scenes\\camera.lua"
 
@@ -459,11 +459,11 @@ loop_only_info = create_scriptable_info {
 				if message.intent == custom_intents.QUIT then
 					input_system.quit_flag = 1
 				elseif message.intent == custom_intents.RESTART then
-					print "INTENT.."
-					if not player.body:exists() then
-					print "RELOADING.."
+					--print "INTENT.."
+					--if not player.body:exists() then
+					--print "RELOADING.."
 						set_world_reloading_script(entities)
-					end
+					--end
 				elseif message.intent == custom_intents.DROP_WEAPON then
 					if message.state_flag then
 						if player.body:exists() then get_scripted(player.body:get()):pick_up_weapon() end
@@ -506,7 +506,8 @@ loop_only_info = create_scriptable_info {
 				player_info:loop()
 			end
 			
-			print(player.crosshair:get().transform.current.pos.x, player.crosshair:get().transform.current.pos.y)
+			--print(player.crosshair:get().transform.current.pos.x, player.crosshair:get().transform.current.pos.y)
+			
 			--local ppos = player.body:get().transform.current.pos
 			----render_system:push_non_cleared_line(debug_line(vec2(0, 0), vec2(1000, 1000),  rgba(0, 255, 0, 255)))
 			--render_system:push_line(debug_line(ppos, ppos+vec2(7, 24), rgba(0, 0, 255, 255)))

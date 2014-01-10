@@ -22,6 +22,7 @@ namespace augmentations {
 				virtual void clear_delayed() = 0;
 				virtual bool empty() = 0;
 				virtual void purify(entity* invalidated_subject) = 0;
+				virtual ~message_queue() {}
 			};
 
 			template <typename message>
@@ -54,6 +55,8 @@ namespace augmentations {
 					messages.erase(std::remove_if(messages.begin(), messages.end(), [invalidated_subject](const message& m){ return m.subject == invalidated_subject; }), messages.end());
 					delayed_messages.erase(std::remove_if(delayed_messages.begin(), delayed_messages.end(), [invalidated_subject](const delayed_message& m){ return m.msg.subject == invalidated_subject; }), delayed_messages.end());
 				}
+
+				~templated_message_queue() override {}
 			};
 
 			boost::object_pool<entity> entities;

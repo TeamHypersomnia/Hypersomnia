@@ -21,7 +21,7 @@ class physics_system : public processing_system_templated<components::physics, c
 		void EndContact(b2Contact* contact) override;
 		void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override;
 		void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) override;
-		
+
 		world* world_ptr;
 	};
 
@@ -35,6 +35,9 @@ public:
 
 	b2World b2world;
 	physics_system();
+	~physics_system() {
+		int breakp = 22;
+	}
 
 	void process_entities(world&) override;
 	void add(entity*) override;

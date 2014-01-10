@@ -114,6 +114,32 @@ settings.reload_scene_when_modified = false
 
 call_on_modification(commands, {commands})
 
+function count_all(f)
+	local seen = {}
+	local count_table
+	count_table = function(t)
+		if seen[t] then return end
+		f(t)
+		seen[t] = true
+		for k,v in pairs(t) do
+			if type(v) == "table" then
+				count_table(v)
+			elseif type(v) == "userdata" then
+				f(v)
+			end
+		end
+	end
+	count_table(_G)
+end
+
+function all_num()
+	local cnt = 0
+	
+	count_all(function() cnt = cnt + 1 end)
+	
+	print(cnt)
+end
+
 --end, 
 --debug.my_traceback)
 --print (f,vrf)

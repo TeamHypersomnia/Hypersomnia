@@ -14,6 +14,7 @@ namespace augmentations {
 			friend class type_registry;
 			friend class entity_ptr;
 
+		public:
 			bool enabled;
 
 			entity(world& owner_world);
@@ -21,7 +22,6 @@ namespace augmentations {
 
 			/* maps type hashes into components */
 			util::sorted_vector_map<type_hash, component*> type_to_component;
-		public:
 			std::string name;
 
 			world& owner_world;
@@ -81,11 +81,17 @@ namespace augmentations {
 				}
 				type_to_component.add(typeid(component_type).hash_code(), nullptr);
 				
-				auto& ptr = *type_to_component.get(typeid(component_type).hash_code());
+				auto ptr = type_to_component.get(typeid(component_type).hash_code());
+				
+				assert(ptr != nullptr);
+				
 				/* allocate new component in corresponding pool */
-				ptr = static_cast<component*>(owner_world.get_container_for_type(typeid(component_type).hash_code()).malloc());
+				(*ptr) = static_cast<component*>(owner_world.get_container_for_type(typeid(component_type).hash_code()).malloc());
+				
+				assert(*ptr != nullptr);
+
 				/* construct it in place using placement new operator */
-				new (ptr) component_type(object);
+				new (*ptr) component_type(object);
 
 				/* get new signature */
 				signature_matcher_bitset new_signature(old_signature);
@@ -98,7 +104,7 @@ namespace augmentations {
 						/* we should add this entity there */
 						sys->add(this);
 
-				return *static_cast<component_type*>(ptr);
+				return *static_cast<component_type*>(*ptr);
 			}
 
 			template <typename component_type>

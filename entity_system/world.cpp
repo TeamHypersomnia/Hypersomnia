@@ -53,18 +53,16 @@ namespace augmentations {
 			flush_message_queues();
 			flush_delayed_message_queues();
 
-			if (clear_systems_manually)
-				for (auto* system_to_clean : all_systems)
-					system_to_clean->clear();
-
-			for (auto& watcher_vector : registered_entity_watchers) 
-				for (auto& watcher : watcher_vector.second.raw) 
+			for (auto& watcher_vector : registered_entity_watchers)
+				for (auto& watcher : watcher_vector.second.raw)
 					watcher->ptr = nullptr;
 
-			registered_entity_watchers.clear();
+			/* let the entities peacefully destroy themselves one by one */
 
 			entities.~object_pool<entity>();
 			new (&entities) boost::object_pool<entity>();
+
+			registered_entity_watchers.clear();
 		}
 
 		void world::delete_entity(entity& e, entity* redirect_pointers) {
@@ -81,7 +79,6 @@ namespace augmentations {
 				registered_entity_watchers.erase(it);
 			}
 
-			e.clear(); 
 			entities.destroy(&e);
 		}
 

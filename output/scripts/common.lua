@@ -112,3 +112,8 @@ function map_uv_square(texcoords_to_map, texture_to_map)
 		
 	end
 end
+
+global_sound_table = {}
+
+ 
+
