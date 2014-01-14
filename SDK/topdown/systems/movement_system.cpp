@@ -43,7 +43,7 @@ void movement_system::substep(world& owner) {
 			if (movement.braking_damping >= 0.f)
 				physics.body->SetLinearDamping(0.f);
 
-				physics.body->ApplyForce(resultant * PIXELS_TO_METERSf * physics.body->GetMass(), physics.body->GetWorldCenter());
+				physics.body->ApplyForce(resultant * PIXELS_TO_METERSf * physics.body->GetMass(), physics.body->GetWorldCenter(), true);
 		}
 		else if (movement.braking_damping >= 0.f)
 			physics.body->SetLinearDamping(movement.braking_damping);
@@ -53,7 +53,7 @@ void movement_system::substep(world& owner) {
 		float32 speed = vel.Normalize();
 
 		if ((vel.x != 0.f || vel.y != 0.f) && movement.air_resistance > 0.f) 
-			physics.body->ApplyForce(movement.air_resistance * speed * speed * -vel, physics.body->GetWorldCenter());
+			physics.body->ApplyForce(movement.air_resistance * speed * speed * -vel, physics.body->GetWorldCenter(), true);
 		
 		physics.body->SetMaximumLinearVelocity(movement.max_speed * PIXELS_TO_METERSf);
 	}

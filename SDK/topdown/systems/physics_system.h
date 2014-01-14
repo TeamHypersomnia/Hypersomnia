@@ -35,9 +35,6 @@ public:
 
 	b2World b2world;
 	physics_system();
-	~physics_system() {
-		int breakp = 22;
-	}
 
 	void process_entities(world&) override;
 	void add(entity*) override;

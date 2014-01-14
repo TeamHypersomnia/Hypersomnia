@@ -142,6 +142,7 @@
     <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2CircleShape.cpp" />
     <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2EdgeShape.cpp" />
     <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2PolygonShape.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Joints\b2MotorJoint.cpp" />
     <ClCompile Include="3rdparty\GL\glew.c" />
     <ClCompile Include="3rdparty\gtest\src\gtest-death-test.cc" />
     <ClCompile Include="3rdparty\gtest\src\gtest-filepath.cc" />
@@ -846,6 +847,7 @@
     <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2FrictionJoint.h" />
     <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2GearJoint.h" />
     <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2Joint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2MotorJoint.h" />
     <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2MouseJoint.h" />
     <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2PrismaticJoint.h" />
     <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2PulleyJoint.h" />

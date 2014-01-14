@@ -1000,9 +1000,9 @@ struct b2WorldRayCastWrapper
 		b2FixtureProxy* proxy = (b2FixtureProxy*)userData;
 		b2Fixture* fixture = proxy->fixture;
 		int32 index = proxy->childIndex;
-		b2RayCastOutput output;
+		b2RayCastOutput output;		
 		bool hit = false;
-		
+
 		if (callback->ShouldRaycast(fixture))
 			hit = fixture->RayCast(&output, input, index);
 		else hit = false;
@@ -1078,7 +1078,7 @@ void b2World::DrawShape(b2Fixture* fixture, const b2Transform& xf, const b2Color
 	case b2Shape::e_polygon:
 		{
 			b2PolygonShape* poly = (b2PolygonShape*)fixture->GetShape();
-			int32 vertexCount = poly->m_vertexCount;
+			int32 vertexCount = poly->m_count;
 			b2Assert(vertexCount <= b2_maxPolygonVertices);
 			b2Vec2 vertices[b2_maxPolygonVertices];
 
@@ -1259,6 +1259,29 @@ int32 b2World::GetTreeBalance() const
 float32 b2World::GetTreeQuality() const
 {
 	return m_contactManager.m_broadPhase.GetTreeQuality();
+}
+
+void b2World::ShiftOrigin(const b2Vec2& newOrigin)
+{
+	b2Assert((m_flags & e_locked) == 0);
+	if ((m_flags & e_locked) == e_locked)
+	{
+		return;
+	}
+
+	for (b2Body* b = m_bodyList; b; b = b->m_next)
+	{
+		b->m_xf.p -= newOrigin;
+		b->m_sweep.c0 -= newOrigin;
+		b->m_sweep.c -= newOrigin;
+	}
+
+	for (b2Joint* j = m_jointList; j; j = j->m_next)
+	{
+		j->ShiftOrigin(newOrigin);
+	}
+
+	m_contactManager.m_broadPhase.ShiftOrigin(newOrigin);
 }
 
 void b2World::Dump()

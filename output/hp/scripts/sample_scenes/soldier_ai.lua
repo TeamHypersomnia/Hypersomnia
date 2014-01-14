@@ -161,8 +161,8 @@ npc_script_callbacks = create_scriptable_info {
 			throw_force:rotate(message.subject.transform.current.rotation, vec2(0, 0))
 			
 			local body = new_bullet.physics.body
-			body:ApplyLinearImpulse(b2Vec2(throw_force.x, throw_force.y), body:GetWorldCenter())
-			body:ApplyAngularImpulse(randval(0.0006, 0.005))
+			body:ApplyLinearImpulse(b2Vec2(throw_force.x, throw_force.y), body:GetWorldCenter(), true)
+			body:ApplyAngularImpulse(randval(0.0006, 0.005), true)
 			
 			local bullet_smoke_msg = particle_burst_message()
 			bullet_smoke_msg.subject = new_bullet

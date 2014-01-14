@@ -175,8 +175,8 @@ function npc_class:drop_weapon(force_multiplier)
 		
 		local body = my_thrown_weapon.physics.body
 		
-		body:ApplyLinearImpulse(b2Vec2(throw_force.x, throw_force.y), body:GetWorldCenter())
-		body:ApplyAngularImpulse(10 * force_multiplier)
+		body:ApplyLinearImpulse(b2Vec2(throw_force.x, throw_force.y), body:GetWorldCenter(), true)
+		body:ApplyAngularImpulse(10 * force_multiplier, true)
 		
 		self:take_weapon_item(bare_hands)
 	end
@@ -268,7 +268,7 @@ function npc_class:throw_corpse()
 	self.head_entity.name = "head_entity"
 	debugger_break()
 	local corpse_body = thrown_corpse_entity.physics.body
-	corpse_body:ApplyLinearImpulse(b2Vec2(self.last_impact.x*2, self.last_impact.y*2), corpse_body:GetWorldCenter())
+	corpse_body:ApplyLinearImpulse(b2Vec2(self.last_impact.x*2, self.last_impact.y*2), corpse_body:GetWorldCenter(), true)
 	
 	return thrown_corpse_entity
 end
