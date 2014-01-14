@@ -2,7 +2,7 @@
 --sexualizer:openFromFile("resources\\sfx\\sexualizer.ogg")
 --sexualizer:play()
 
-dofile "scripts\\sample_scenes\\camera.lua"
+dofile "hp\\scripts\\sample_scenes\\camera.lua"
 
 crosshair_sprite = create_sprite {
 	image = images.crosshair,
@@ -53,7 +53,7 @@ corpse_sprite = create_sprite {
 	image = enemy_images.dead_front
 }
 
-dofile "scripts\\sample_scenes\\map.lua"
+dofile "hp\\scripts\\sample_scenes\\map.lua"
 
 small_box_archetype = {
 	transform = {
@@ -109,9 +109,9 @@ assault_shell_sprite = create_sprite {
 	image = images.assault_shell
 }
 
-dofile "scripts\\sample_scenes\\steering.lua"
-dofile "scripts\\sample_scenes\\weapons.lua"
-dofile "scripts\\sample_scenes\\soldier_tree.lua"
+dofile "hp\\scripts\\sample_scenes\\steering.lua"
+dofile "hp\\scripts\\sample_scenes\\weapons.lua"
+dofile "hp\\scripts\\sample_scenes\\soldier_tree.lua"
 
 npc_script_callbacks = create_scriptable_info {
 	scripted_events = {	
@@ -447,8 +447,8 @@ npc_wield_offsets = {
 
 --npc_wield_offsets.ASSAULT_RIFLE = archetyped(npc_wield_offsets.SHOTGUN, {})
 
-dofile "scripts\\sample_scenes\\npc.lua"
-dofile "scripts\\sample_scenes\\player.lua"
+dofile "hp\\scripts\\sample_scenes\\npc.lua"
+dofile "hp\\scripts\\sample_scenes\\player.lua"
 
 loop_only_info = create_scriptable_info {
 	scripted_events = {	
@@ -462,7 +462,7 @@ loop_only_info = create_scriptable_info {
 					--print "INTENT.."
 					--if not player.body:exists() then
 					--print "RELOADING.."
-						set_world_reloading_script(entities)
+						set_world_reloading_script(reloader_script)
 					--end
 				elseif message.intent == custom_intents.DROP_WEAPON then
 					if message.state_flag then

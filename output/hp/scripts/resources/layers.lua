@@ -49,7 +49,7 @@ local mask_all = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, ENEMY_BULLETS, CHARACTE
 
 filter_doors = {
 	categoryBits = DOORS,
-	maskBits = bitor(SHELLS, OBJECTS, CORPSES, CHARACTERS, BULLETS, ENEMY_BULLETS, ITEMS)
+	maskBits = bitor(SHELLS, OBJECTS, CORPSES, BULLETS, ENEMY_BULLETS, ITEMS)
 }
 
 filter_shells = {

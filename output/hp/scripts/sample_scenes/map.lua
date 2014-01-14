@@ -314,9 +314,9 @@ door_archetype = archetyped(wall_archetype, {
 			shape_type = physics_info.RECT,
 			--vertices = sample_prostokat,
 			filter = filter_doors,
-			restitution = 0.8,
-			angular_damping = 8,
-			density = 1
+			restitution = 0.4,
+			angular_damping = 4,
+			density = 5
 		}
 	},
 	
@@ -344,7 +344,7 @@ function create_door(new_pos, starting_angle, new_size)
 		
 		transform = {
 			pos = new_pos,
-			rotation = 2* starting_angle
+			rotation = starting_angle
 		}
 	}))
 
@@ -362,14 +362,14 @@ function create_door(new_pos, starting_angle, new_size)
 	door_joint.localAnchorB = b2Vec2(anchor_point_B.x, anchor_point_B.y)
 	door_joint.referenceAngle = starting_angle * 0.01745329251994329576923690768489 
 	door_joint.enableLimit = true
-	door_joint.lowerAngle = -90 * 0.01745329251994329576923690768489
-	door_joint.upperAngle =  90 * 0.01745329251994329576923690768489
+	door_joint.lowerAngle = -160 * 0.01745329251994329576923690768489
+	door_joint.upperAngle =  160 * 0.01745329251994329576923690768489
 	
 	create_joint(world, door_joint)
-	--body:SetTransform(body:GetPosition(), 2 * starting_angle * 0.01745329251994329576923690768489)
+	body:SetTransform(body:GetPosition(), starting_angle * 0.01745329251994329576923690768489)
 end
 
---create_door(vec2(214, -322), 90, vec2(100, 10))
+create_door(vec2(214, -322), 90, vec2(130, 10))
 
 create_wall( {
 

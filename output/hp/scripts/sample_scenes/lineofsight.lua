@@ -44,7 +44,7 @@ ground_point_archetype = {
 }
 
 
-dofile "scripts\\sample_scenes\\map.lua"
+dofile "hp\\scripts\\sample_scenes\\map.lua"
 
 small_box_archetype = {
 	transform = {
@@ -121,9 +121,9 @@ ground = create_entity {
 }
 
 
-dofile "scripts\\sample_scenes\\steering.lua"
-dofile "scripts\\sample_scenes\\npc.lua"
-dofile "scripts\\sample_scenes\\behaviour_tree.lua"
+dofile "hp\\scripts\\sample_scenes\\steering.lua"
+dofile "hp\\scripts\\sample_scenes\\npc.lua"
+dofile "hp\\scripts\\sample_scenes\\behaviour_tree.lua"
 
 npc_script_info = create_scriptable_info {
 	scripted_events = {

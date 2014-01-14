@@ -83,7 +83,7 @@ init_npc(player.body:get(), {
 	},
 	
 	health_info = {
-		hp = 100000000,
+		hp = 100,
 		
 		corpse_entity = archetyped(corpse_archetype, {
 			render = {

@@ -17,7 +17,7 @@ function add_roots(root_path, entries)
 	return new_table
 end
 
-images = add_roots("resources\\", {
+images = add_roots("hp\\resources\\", {
 	crate = "crate.jpg",
 	metal = "metal.jpg",
 	
@@ -143,8 +143,8 @@ character_filenames = {
 	dead_front = "dead_front.png"
 }
 
-enemy_images = add_roots("resources\\enemy\\", character_filenames)
-player_images = add_roots("resources\\player\\", archetyped(character_filenames, {
+enemy_images = add_roots("hp\\resources\\enemy\\", character_filenames)
+player_images = add_roots("hp\\resources\\player\\", archetyped(character_filenames, {
 	hands_1 = "hands_1.png",
 	hands_2 = "hands_2.png",
 	hands_3 = "hands_3.png",
