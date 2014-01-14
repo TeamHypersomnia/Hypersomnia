@@ -36,7 +36,9 @@ namespace bindings {
 			.def_readwrite("collideConnected", &b2JointDef::collideConnected)
 			,
 
-			luabind::class_ <b2RevoluteJoint>("b2RevoluteJoint"),
+			luabind::class_ <b2RevoluteJoint>("b2RevoluteJoint")
+			.def("GetJointAngle", &b2RevoluteJoint::GetJointAngle)
+			,
 
 			luabind::class_ <b2RevoluteJointDef, b2JointDef>("b2RevoluteJointDef")
 			.def(luabind::constructor<>())

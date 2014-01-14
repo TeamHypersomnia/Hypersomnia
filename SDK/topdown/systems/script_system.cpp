@@ -15,7 +15,7 @@
 #include "../messages/shot_message.h"
 
 #include "utility/randval.h"
-
+#include "../resources/scriptable_info.h"
 
 void set_world_reloading_script(resources::script* new_scr) {
 	world_reloading_script = new_scr;
@@ -183,8 +183,12 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 
 			luabind::def("set_world_reloading_script", &set_world_reloading_script),
 			luabind::def("debugger_break", &debugger_break),
-			luabind::def("randval", (float(*)(float, float))&randval)
-	];
+			luabind::def("randval", (float(*)(float, float))&randval),
+
+			luabind::class_<resources::script::reloader>("_script_reloader")
+			.def(luabind::constructor<>())
+			.def("add_directory", &resources::script::reloader::add_directory)
+	]; 
 
 	luabind::set_pcall_callback(the_callback);
 }

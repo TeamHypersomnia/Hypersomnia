@@ -47,21 +47,20 @@ using namespace entity_system;
 using namespace messages;
 
 resources::script* world_reloading_script = nullptr;
+
 int main() {
 	augmentations::init();	
 	script_system scripts;
 	lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
 	resources::script::script_reloader.report_errors = &std::cout;
 	resources::script::lua_state = scripts.lua_state;
-	resources::script::dofile("scripts\\config.lua");
-
+	resources::script::dofile("config.lua");
 
 	window::glwindow gl;
 	gl.create(scripts.lua_state, rects::wh(100, 100));
 	gl.set_show(gl.SHOW);
 	gl.vsync(0);
 	window::cursor(false);
-	 
 
 	input_system input(gl);
 	steering_system steering;
@@ -119,6 +118,7 @@ int main() {
 	scripts.global("pathfinding_system", pathfinding);
 	scripts.global("render_system", render);
 	scripts.global("physics_system", physics);
+	scripts.global("script_reloader", resources::script::script_reloader);
 
 	components::physics my_comp, my_comp2;
 	my_comp.original_model.push_back(augmentations::vec2<>(2342342, 1219839));
@@ -133,10 +133,9 @@ int main() {
 
 	my_comp2 = my_comp;
 
-	resources::script::script_reloader.add_directory(L"scripts", true);
 	resources::script init_script;
 
-	init_script.associate_filename("scripts\\init.lua");
+	init_script.associate_filename("init.lua");
 	init_script.add_reload_dependant(&init_script);
 	init_script.call();
 
