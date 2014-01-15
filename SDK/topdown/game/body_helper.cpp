@@ -13,7 +13,7 @@
 namespace topdown {
 	physics_info::physics_info() 
 		: rect_size(augmentations::vec2<>()), type(RECT), density(1.f), angular_damping(0.f), linear_damping(0.f), fixed_rotation(false), sensor(false), restitution(0.f), friction(0.f),
-		body_type(b2_dynamicBody)
+		body_type(b2_dynamicBody), radius(0.f)
 		{
 	}
 
@@ -84,6 +84,7 @@ namespace topdown {
 		def.userData = (void*) &subject;
 
 		b2PolygonShape shape;
+		b2CircleShape circle_shape;
 
 		b2FixtureDef fixdef;
 		fixdef.density = body_data.density;
@@ -104,7 +105,7 @@ namespace topdown {
 
 			body->CreateFixture(&fixdef);
 		}
-		else {
+		else if (body_data.type == physics_info::POLYGON) {
 			physics_component.original_model = body_data.original_model;
 
 			for (auto convex : body_data.convex_polys) {
@@ -117,7 +118,13 @@ namespace topdown {
 				body->CreateFixture(&fixdef);
 			}
 		}
+		else if (body_data.type == physics_info::CIRCLE) {
+			/* approximate somehow the original_model */
 
+			circle_shape.m_radius = body_data.radius * PIXELS_TO_METERSf;
+			fixdef.shape = &circle_shape;
+			body->CreateFixture(&fixdef);
+		}
 		//b2Vec2 v[4] = {
 		//	vec2<>(0.f, 0.f),
 		//	vec2<>(size.w*PIXELS_TO_METERS, 0.f),

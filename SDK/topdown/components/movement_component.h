@@ -19,7 +19,7 @@ namespace components {
 		std::vector<subscribtion> animation_receivers;
 
 		bool moving_left, moving_right, moving_forward, moving_backward;
-		augmentations::vec2<> input_acceleration;
+		augmentations::vec2<> input_acceleration, force_offset;
 		
 		float air_resistance;
 

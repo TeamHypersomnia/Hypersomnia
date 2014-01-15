@@ -61,6 +61,17 @@ function create_polygon(entries)
 end
 
 
+function gen_circle_vertices(radius, num_verts)
+	local results = {}
+	
+	for i = 1,num_verts do
+		results[i] = (vec2.from_degrees((360 / num_verts) * i))
+		results[i]:set_length(radius)
+	end
+
+	return results
+end
+
 function simple_create_polygon(entries) 
 	local my_polygon = polygon()
 	local my_concave = drawable_concave()

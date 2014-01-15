@@ -43,7 +43,7 @@ void movement_system::substep(world& owner) {
 			if (movement.braking_damping >= 0.f)
 				physics.body->SetLinearDamping(0.f);
 
-				physics.body->ApplyForce(resultant * PIXELS_TO_METERSf * physics.body->GetMass(), physics.body->GetWorldCenter(), true);
+			physics.body->ApplyForce(resultant * PIXELS_TO_METERSf * physics.body->GetMass(), physics.body->GetWorldCenter() + (movement.force_offset * PIXELS_TO_METERSf), true);
 		}
 		else if (movement.braking_damping >= 0.f)
 			physics.body->SetLinearDamping(movement.braking_damping);

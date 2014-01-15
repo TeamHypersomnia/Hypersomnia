@@ -115,5 +115,15 @@ end
 
 global_sound_table = {}
 
+function reversed(input_table)
+	local out_table = {}
+	
+	for i = #input_table, 1, -1 do
+		table.insert(out_table, input_table[i])
+	end
+	
+	return out_table
+end
+
  
 

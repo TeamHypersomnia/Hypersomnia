@@ -17,6 +17,7 @@ namespace bindings {
 			.def_readwrite("shape_type", &physics_info::type)
 			.def_readwrite("filter", &physics_info::filter)
 			.def_readwrite("density", &physics_info::density)
+			.def_readwrite("radius", &physics_info::radius)
 			.def_readwrite("friction", &physics_info::friction)
 			.def_readwrite("restitution", &physics_info::restitution)
 			.def_readwrite("angular_damping", &physics_info::angular_damping)
@@ -26,6 +27,7 @@ namespace bindings {
 			//.def("add_vertex", &physics_info::add_vertex)
 			.enum_("constants")[
 				luabind::value("POLYGON", physics_info::POLYGON),
+				luabind::value("CIRCLE", physics_info::CIRCLE),
 				luabind::value("RECT", physics_info::RECT)
 			],
 

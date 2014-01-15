@@ -16,7 +16,8 @@ namespace topdown {
 	struct physics_info {
 		enum {
 			RECT,
-			POLYGON
+			POLYGON,
+			CIRCLE
 		} type;
 		
 		std::vector < std::vector < augmentations::vec2< >> > convex_polys;
@@ -26,7 +27,7 @@ namespace topdown {
 
 		int body_type;
 
-		float density, friction, restitution, angular_damping, linear_damping;
+		float density, friction, restitution, angular_damping, linear_damping, radius;
 		bool fixed_rotation, sensor;
 
 		void add_convex(const std::vector < augmentations::vec2 < >> &);

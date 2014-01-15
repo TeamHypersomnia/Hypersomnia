@@ -45,9 +45,14 @@ namespace bindings {
 			.def_readwrite("bodies", &physics_system::query_output::bodies, luabind::return_stl_iterator)
 			,
 
+			luabind::class_<b2World>("b2World")
+			.def("SetGravity", &b2World::SetGravity)
+			,
+
 			luabind::class_<physics_system>("_physics_system")
 			.def_readwrite("timestep_multiplier", &physics_system::timestep_multiplier)
 			.def_readwrite("enable_interpolation", &physics_system::enable_interpolation)
+			.def_readwrite("b2world", &physics_system::b2world)
 			.def("ray_cast", &physics_system::ray_cast_px)
 			.def("query_aabb", &physics_system::query_aabb_px)
 			.def("query_body", &physics_system::query_body)

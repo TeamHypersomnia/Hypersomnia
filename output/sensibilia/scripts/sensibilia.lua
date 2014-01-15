@@ -1,8 +1,8 @@
 main_context = create_input_context {
 	intents = { 
 		[mouse.raw_motion] 		= intent_message.AIM,
-		[keys.W] 				= intent_message.MOVE_FORWARD,
 		[keys.ESC] 				= custom_intents.QUIT,
+		[keys.W] 				= intent_message.MOVE_FORWARD,
 		[keys.S] 				= intent_message.MOVE_BACKWARD,
 		[keys.A] 				= intent_message.MOVE_LEFT,
 		[keys.D] 				= intent_message.MOVE_RIGHT,
@@ -42,7 +42,9 @@ environment_archetype = {
 		
 		body_info = {
 			shape_type = physics_info.POLYGON,
-			friction = 10
+			filter = filter_static_objects,
+			density = 1,
+			friction = 100
 		}
 	},
 	
@@ -55,7 +57,7 @@ environment_archetype = {
 	}
 }
 
-ground_poly = simple_create_polygon {
+ground_poly = simple_create_polygon (reversed {
 	vec2(0, 500) + vec2(-800, 0),
 	vec2(0, 500) + vec2(500, 0),
 	vec2(0, 500) + vec2(900, -200),
@@ -63,7 +65,7 @@ ground_poly = simple_create_polygon {
 	vec2(0, 500) + vec2(3000, -300),
 	vec2(0, 500) + vec2(3000, 200),
 	vec2(0, 500) + vec2(-800, 200)
-}
+})
 
 map_uv_square(ground_poly, images.blank)
 set_color(ground_poly, rgba(0, 255, 0, 255))
@@ -73,12 +75,64 @@ player_sprite = create_sprite {
 	size = vec2(30, 100)
 }
 
+player_debug_circle = simple_create_polygon (reversed(gen_circle_vertices(60, 5)))
+map_uv_square(player_debug_circle, images.blank)
 
 environment_entity = create_entity (archetyped(environment_archetype, {
 	render = {
 		model = ground_poly
 	}
 }))
+
+
+player = create_entity_group {
+	body = {
+		physics = {
+			body_type = Box2D.b2_dynamicBody,
+			
+			body_info = {
+				shape_type = physics_info.CIRCLE,
+				radius = 60,
+				filter = filter_objects,
+				density = 1,
+				friction = 100
+				--,
+				--fixed_rotation = true
+			}	
+		},
+		
+		render = {
+			model = player_debug_circle,
+			layer = render_layers.OBJECTS
+		},
+		
+		transform = {
+			pos = vec2(100, -50)
+		},
+		
+		movement = {
+			input_acceleration = vec2(30000, 300000),
+			max_speed = 1000,
+			max_speed_animation = 2300,
+			
+			receivers = {},
+			
+			force_offset = vec2(0, 5)
+			
+			--receivers = {
+			--	{ target = "body", stop_at_zero_movement = false }, 
+			--	{ target = "legs", stop_at_zero_movement = true  }
+			--}
+		},
+		
+		input = {
+			intent_message.MOVE_FORWARD,
+			intent_message.MOVE_BACKWARD,
+			intent_message.MOVE_LEFT,
+			intent_message.MOVE_RIGHT
+		}
+	}
+}
 
 
 loop_only_info = create_scriptable_info {
@@ -124,3 +178,5 @@ create_entity {
 		available_scripts = loop_only_info
 	}	
 }
+
+physics_system.b2world:SetGravity(b2Vec2(0, 100))
