@@ -543,7 +543,7 @@ my_scriptable_info = create_scriptable_info {
 		[scriptable_component.COLLISION_MESSAGE] 	= 	
 		function(message) 
 			print ("calling COLLISION_MESSAGE at point X:" .. message.point.x .. " Y: " .. message.point.y) 
-			message.collider.physics.body:ApplyForce(b2Vec2(-message.impact_velocity.x*100, -message.impact_velocity.y*100), message.collider.physics.body:GetWorldCenter())
+			message.collider.physics.body:ApplyForce(b2Vec2(-message.impact_velocity.x*100, -message.impact_velocity.y*100), message.collider.physics.body:GetWorldCenter(), true)
 			return true 
 			
 		end,
@@ -552,7 +552,7 @@ my_scriptable_info = create_scriptable_info {
 		function(message) 
 			message.amount = 10
 			print ("calling DAMAGE_MESSAGE with damage of amount " .. message.amount)
-			--player.body.physics.body:ApplyForce(b2Vec2(message.impact_velocity.x, message.impact_velocity.y), player.body.physics.body:GetWorldCenter())
+			--player.body.physics.body:ApplyForce(b2Vec2(message.impact_velocity.x, message.impact_velocity.y), player.body.physics.body:GetWorldCenter(), true)
 			return true
 		end
 	}

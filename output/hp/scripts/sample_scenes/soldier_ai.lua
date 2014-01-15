@@ -2,6 +2,7 @@
 --sexualizer:openFromFile("resources\\sfx\\sexualizer.ogg")
 --sexualizer:play()
 
+
 dofile "hp\\scripts\\sample_scenes\\camera.lua"
 
 crosshair_sprite = create_sprite {

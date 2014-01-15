@@ -164,8 +164,4 @@ namespace topdown {
 	augmentations::entity_system::entity* body_to_entity(b2Body* b) {
 		return static_cast<augmentations::entity_system::entity*>(b->GetUserData());
 	}
-
-	b2RevoluteJoint* create_joint(world* owner, b2RevoluteJointDef* joint_def) {
-		return static_cast<b2RevoluteJoint*>(owner->get_system<physics_system>().b2world.CreateJoint(joint_def));
-	}
 }

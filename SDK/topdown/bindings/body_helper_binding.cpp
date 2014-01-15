@@ -49,8 +49,25 @@ namespace bindings {
 			.def_readwrite("lowerAngle", &b2RevoluteJointDef::lowerAngle)
 			.def_readwrite("upperAngle", &b2RevoluteJointDef::upperAngle)
 			,
+
+
+			luabind::class_ <b2WeldJoint>("b2WeldJoint")
+			//.def("GetJointAngle", &b2RevoluteJoint::GetJointAngle)
+			//.def(luabind::constructor<>())
+			,
+
+			luabind::class_ <b2WeldJointDef, b2JointDef>("b2WeldJointDef")
+			.def(luabind::constructor<>())
+			.def("Initialize", &b2WeldJointDef::Initialize)
+			.def_readwrite("localAnchorA", &b2WeldJointDef::localAnchorA)
+			.def_readwrite("localAnchorB", &b2WeldJointDef::localAnchorB)
+			.def_readwrite("referenceAngle", &b2WeldJointDef::referenceAngle)
+			.def_readwrite("frequencyHz", &b2WeldJointDef::frequencyHz)
+			.def_readwrite("dampingRatio", &b2WeldJointDef::dampingRatio)
+			,
 			
-			luabind::def("create_joint", create_joint),
+			luabind::def("create_joint", create_joint<b2RevoluteJoint, b2RevoluteJointDef>),
+			luabind::def("create_joint", create_joint<b2WeldJoint, b2WeldJointDef>),
 			luabind::def("create_physics_component", create_physics_component),
 			luabind::def("body_to_entity", body_to_entity)
 		);

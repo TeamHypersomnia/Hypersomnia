@@ -62,7 +62,7 @@ common = 						open_script "engine\\common.lua"
 resource_creation_util = 		open_script "engine\\resource_creation_util.lua"
 entity_creation_util = 			open_script "engine\\entity_creation_util.lua" 
 
-local CURRENT_SCENE = "hp\\scripts\\hp_init.lua"
+local CURRENT_SCENE = "sensibilia\\scripts\\sensibilia_init.lua"
 entities = 						open_script (CURRENT_SCENE)
 
 call_on_modification(common, 				{ common, layers, entity_creation_util, resource_creation_util, textures, animations, particle_effects, entities }) 
