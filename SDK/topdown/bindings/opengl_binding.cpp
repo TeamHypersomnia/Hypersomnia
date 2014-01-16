@@ -34,23 +34,13 @@ struct wrap_unknown;
 
 template<typename Ret, typename... Args>
 struct wrap_unknown<Ret (__stdcall*) (Args...)> {
-	static Ret(__stdcall *cached_function)(Args...);
-	
+	template <Ret (__stdcall** functor)(Args...)>
 	static Ret invoke(Args... arguments) {
-		return cached_function(arguments...);
+		return (**functor)(arguments...);
 	}
 };
 
-/* static member definition and initialization */
-template<typename Ret, typename... Args>
-Ret(__stdcall *wrap_unknown<Ret(__stdcall*) (Args...)>::cached_function)(Args...) = nullptr;
-
-/* note I can't use macro here as I need to perform additional operation */
-template <typename F>
-auto wrap_ptr(F f) -> decltype(&wrap_unknown<F>::invoke) {
-	wrap_unknown<F>::cached_function = f;
-	return &wrap_unknown<F>::invoke;
-}
+#define wrap_ptr(f) wrap_unknown<decltype(f)>::invoke<&f>
 
 struct A {
 	int __stdcall my_method(double b) {
@@ -63,14 +53,14 @@ namespace bindings {
 		return
 			luabind::def("Clear", wrap(glClear)),
 			luabind::def("glVertex4f", wrap(glVertex4f)),
-			luabind::def("Uniform2f", wrap_ptr(glUniform2f)),
-			luabind::def("Uniform3f", wrap_ptr(glUniform3f)),
-			luabind::def("Uniform4f", wrap_ptr(glUniform4f)),
-			luabind::def("Uniform1f", wrap_ptr(glUniform1i)),
-			luabind::def("Uniform2f", wrap_ptr(glUniform2i)),
-			luabind::def("Uniform3f", wrap_ptr(glUniform3i)),
-			luabind::def("Uniform4f", wrap_ptr(glUniform4i)),
-			luabind::def("GetUniformLocation", wrap_ptr(glGetUniformLocation)),
+			luabind::def("Uniform2f", wrap_ptr(glUniform1f)),
+			//luabind::def("Uniform3f", wrap_ptr(glUniform3f)),
+			//luabind::def("Uniform4f", wrap_ptr(glUniform4f)),
+			//luabind::def("Uniform1f", wrap_ptr(glUniform1i)),
+			//luabind::def("Uniform2f", wrap_ptr(glUniform2i)),
+			//luabind::def("Uniform3f", wrap_ptr(glUniform3i)),
+			//luabind::def("Uniform4f", wrap_ptr(glUniform4i)),
+			//luabind::def("GetUniformLocation", wrap_ptr(glGetUniformLocation)),
 
 			luabind::class_<A>("A")
 			.def("my_method", wrap_member(&A::my_method))
