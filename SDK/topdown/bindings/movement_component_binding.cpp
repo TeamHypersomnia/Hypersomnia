@@ -2,7 +2,6 @@
 #include "stdafx.h"
 #include "bindings.h"
 
-
 #include "../components/movement_component.h"
 
 namespace bindings {

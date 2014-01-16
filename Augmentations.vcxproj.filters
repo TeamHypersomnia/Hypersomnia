@@ -654,6 +654,9 @@
     <ClCompile Include="3rdparty\Box2D\Dynamics\Joints\b2MotorJoint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\opengl_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="entity_system\component.h">

@@ -96,7 +96,9 @@ namespace bindings {
 		_behaviour_tree_component(),
 
 		_entity(),
-		_body_helper();
+		_body_helper(),
+
+		_opengl_binding();
 }
 
 int the_callback(lua_State *L) {
@@ -180,6 +182,10 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 
 			bindings::_entity(),
 			bindings::_body_helper(),
+
+			luabind::module(lua_state, "gl")[
+				bindings::_opengl_binding()
+			],
 
 			luabind::def("set_world_reloading_script", &set_world_reloading_script),
 			luabind::def("debugger_break", &debugger_break),
