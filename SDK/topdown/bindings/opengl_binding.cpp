@@ -15,7 +15,6 @@ struct wrap_known<Ret __stdcall (Args...)> {
 
 #define wrap(f) wrap_known<decltype(f)>::invoke<f>
 
-
 template<typename Signature>
 struct wrap_mem;
 
@@ -40,19 +39,18 @@ struct wrap_unknown<Ret (__stdcall*) (Args...)> {
 	static Ret invoke(Args... arguments) {
 		return cached_function(arguments...);
 	}
-
-	static int init(Ret(__stdcall *ptr)(Args...)) {
-		cached_function = ptr;
-		return 0;
-	}
 };
 
 /* static member definition and initialization */
 template<typename Ret, typename... Args>
 Ret(__stdcall *wrap_unknown<Ret(__stdcall*) (Args...)>::cached_function)(Args...) = nullptr;
 
-/* I know this looks crazy, but this macro's only intention is to later have it stupid simple */
-#define wrap_ptr(f) (decltype(&wrap_unknown<decltype(f)>::invoke))(wrap_unknown<decltype(f)>::init(f) + (char*)(&wrap_unknown<decltype(f)>::invoke))
+/* note I can't use macro here as I need to perform additional operation */
+template <typename F>
+auto wrap_ptr(F f) -> decltype(&wrap_unknown<F>::invoke) {
+	wrap_unknown<F>::cached_function = f;
+	return &wrap_unknown<F>::invoke;
+}
 
 struct A {
 	int __stdcall my_method(double b) {
