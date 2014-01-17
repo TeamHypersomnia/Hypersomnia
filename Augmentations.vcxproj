@@ -1254,7 +1254,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="utility\delta_accumulator.cpp" />
-    <ClCompile Include="utility\input_context.cpp" />
     <ClCompile Include="utility\randval.cpp" />
     <ClCompile Include="utility\timer.cpp" />
     <ClCompile Include="utility\value_animator.cpp" />
@@ -1516,7 +1515,6 @@
     <ClInclude Include="texture_baker\rectpack.h" />
     <ClInclude Include="texture_baker\texture_baker.h" />
     <ClInclude Include="utility\delta_accumulator.h" />
-    <ClInclude Include="utility\input_context.h" />
     <ClInclude Include="utility\map_wrapper.h" />
     <ClInclude Include="utility\randval.h" />
     <ClInclude Include="utility\sorted_vector.h" />
