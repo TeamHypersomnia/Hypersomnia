@@ -34,7 +34,9 @@ namespace bindings {
 			.def("draw_debug_info", &render_system::draw_debug_info)
 			.def("generate_triangles", &render_system::generate_triangles)
 			.def("default_render", &render_system::default_render)
-			, 
+			.def("get_triangle_count", &render_system::get_triangle_count)
+			.def("get_triangle", &render_system::get_triangle)
+			,
 
 			luabind::class_<render>("render_component")
 			.def(luabind::constructor<>())

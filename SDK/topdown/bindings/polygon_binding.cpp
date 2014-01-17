@@ -23,6 +23,11 @@ namespace bindings {
 			.def_readwrite("color", &vertex::color)
 			,
 
+			luabind::class_<vertex_triangle>("vertex_triangle")
+			.def(luabind::constructor<>())
+			.def("get_vert", &vertex_triangle::get_vert)
+			,
+
 			luabind::class_<polygon::concave>("drawable_concave")
 			.def(luabind::constructor<>())
 			.def("add_vertex", &polygon::concave::add_vertex)

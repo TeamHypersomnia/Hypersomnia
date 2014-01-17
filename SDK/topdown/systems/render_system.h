@@ -21,6 +21,10 @@ public:
 	void call_triangles();
 	void push_triangle(const resources::vertex_triangle&);
 	void clear_triangles();
+
+	int get_triangle_count();
+	resources::vertex_triangle& get_triangle(int i);
+
 	void draw_debug_info();
 
 	struct debug_line {

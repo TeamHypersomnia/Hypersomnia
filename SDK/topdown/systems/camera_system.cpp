@@ -65,6 +65,7 @@ void camera_system::process_entities(world& owner) {
 				}
 			}
 
+			auto drawn_transform = transform;
 			if (camera.enable_smoothing) {
 				/* variable time step camera smoothing by averaging last position with the current */
 				float averaging_constant = static_cast<float>(
@@ -85,7 +86,7 @@ void camera_system::process_entities(world& owner) {
 					interp(camera.last_ortho_interpolant.b, camera.ortho.b, averaging_constant);
 
 				/* save smoothing result */
-				transform.pos = camera.last_interpolant;
+				drawn_transform.pos = camera.last_interpolant;
 			}
 
 			glLoadIdentity();
@@ -94,15 +95,15 @@ void camera_system::process_entities(world& owner) {
 
 			if (camera.drawing_callback) {
 				try {
-					/* arguments: subject, renderer, visible_area, transform, mask */
-					luabind::call_function<void>(camera.drawing_callback, e, raw_renderer, rects::xywh(camera.last_ortho_interpolant), transform, camera.mask);
+					/* arguments: subject, renderer, visible_area, target_transform, mask */
+					luabind::call_function<void>(camera.drawing_callback, e, raw_renderer, rects::xywh(camera.last_ortho_interpolant), drawn_transform, transform, camera.mask);
 				}
 				catch (std::exception compilation_error) {
 					std::cout << compilation_error.what() << '\n';
 				}
 			}
 			else {
-				raw_renderer.generate_triangles(camera.last_ortho_interpolant, transform, camera.mask);
+				raw_renderer.generate_triangles(camera.last_ortho_interpolant, drawn_transform, camera.mask);
 				raw_renderer.default_render(camera.last_ortho_interpolant);
 			}
 		}

@@ -97,6 +97,14 @@ void render_system::clear_triangles() {
 	triangles.clear();
 }
 
+int render_system::get_triangle_count() {
+	return triangles.size();
+}
+
+resources::vertex_triangle& render_system::get_triangle(int i) {
+	return triangles[i];
+}
+
 void render_system::draw_debug_info() {
 	if (draw_visibility) {
 		//glColor4f(1.f, 1.f, 1.f, 1.f);

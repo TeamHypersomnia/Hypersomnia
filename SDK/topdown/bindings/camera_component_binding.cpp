@@ -20,6 +20,7 @@ namespace bindings {
 			.def_readwrite("enable_smoothing", &camera::enable_smoothing)
 			.def_readwrite("smoothing_average_factor", &camera::smoothing_average_factor)
 			.def_readwrite("averages_per_sec", &camera::averages_per_sec)
+			.def_readwrite("last_interpolant", &camera::last_interpolant)
 			.def_readwrite("max_look_expand", &camera::max_look_expand)
 			.def_readwrite("player", &camera::player)
 			.def_readwrite("crosshair", &camera::crosshair)
