@@ -42,28 +42,53 @@ struct wrap_unknown<Ret (__stdcall*) (Args...)> {
 
 #define wrap_ptr(f) wrap_unknown<decltype(f)>::invoke<&f>
 
-struct A {
-	int __stdcall my_method(double b) {
-		return 2;
-	}
+struct dummy_GL {
+
 };
+
+#include "../resources/fbo.h"
 
 namespace bindings {
 	luabind::scope _opengl_binding() {
 		return
-			luabind::def("Clear", wrap(glClear)),
-			luabind::def("glVertex4f", wrap(glVertex4f)),
-			luabind::def("Uniform2f", wrap_ptr(glUniform1f)),
-			//luabind::def("Uniform3f", wrap_ptr(glUniform3f)),
-			//luabind::def("Uniform4f", wrap_ptr(glUniform4f)),
-			//luabind::def("Uniform1f", wrap_ptr(glUniform1i)),
-			//luabind::def("Uniform2f", wrap_ptr(glUniform2i)),
-			//luabind::def("Uniform3f", wrap_ptr(glUniform3i)),
-			//luabind::def("Uniform4f", wrap_ptr(glUniform4i)),
-			//luabind::def("GetUniformLocation", wrap_ptr(glGetUniformLocation)),
+			luabind::class_<dummy_GL>("GL")
+			.scope
+			[
+				luabind::def("glEnable", wrap(glEnable)),
+				luabind::def("glDisable", wrap(glDisable)),
+				luabind::def("glColor4f", wrap(glColor4f)),
+				luabind::def("glClear", wrap(glClear)),
+				luabind::def("glBegin", wrap(glBegin)),
+				luabind::def("glEnd", wrap(glEnd)),
+				luabind::def("glVertex2f", wrap(glVertex2f)),
+				luabind::def("glBindTexture", wrap(glBindTexture)),
+				luabind::def("glUseProgram", wrap_ptr(glUseProgram)),
+				luabind::def("glGenerateMipmap", wrap_ptr(glGenerateMipmap)),
+				luabind::def("glUniform1f", wrap_ptr(glUniform1f)),
+				luabind::def("glUniform2f", wrap_ptr(glUniform2f)),
+				luabind::def("glUniform3f", wrap_ptr(glUniform3f)),
+				luabind::def("glUniform4f", wrap_ptr(glUniform4f))
+			].
+			enum_("constants")[
+				luabind::value("GL_TEXTURE_2D", GL_TEXTURE_2D),
+				luabind::value("GL_QUADS", GL_QUADS),
+				luabind::value("GL_LINES", GL_LINES),
+				luabind::value("GL_TRIANGLES", GL_TRIANGLES)
+			],
 
-			luabind::class_<A>("A")
-			.def("my_method", wrap_member(&A::my_method))
+			luabind::class_<fbo>("framebuffer_object")
+			.def(luabind::constructor<>())
+			.def(luabind::constructor<int, int>())
+			.def("create", &fbo::create)
+			.def("destroy", &fbo::destroy)
+			.def("use", &fbo::use)
+			.def("guarded_use", &fbo::guarded_use)
+			.def("get_texture_id", &fbo::get_texture_id)
+			.scope [
+				luabind::def("use_default", &fbo::use_default)
+			]
+
+
 			;
 	}
 }

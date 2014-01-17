@@ -26,6 +26,8 @@ namespace resources {
 
 	struct vertex_triangle {
 		vertex vertices[3];
+
+		vertex& get_vert(int i) { return vertices[i]; }
 	};
 
 	typedef std::vector<vertex_triangle> buffer;

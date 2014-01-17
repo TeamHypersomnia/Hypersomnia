@@ -84,6 +84,6 @@ fbo::~fbo() {
 	destroy();
 }
 
-GLuint fbo::getTextureId() const {
+GLuint fbo::get_texture_id() const {
 	return textureId;
 }

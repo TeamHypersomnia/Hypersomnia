@@ -16,7 +16,7 @@ public:
 	void guarded_use();
 
 	int get_width() const, get_height() const;
-	GLuint getTextureId() const;
+	GLuint get_texture_id() const;
 
 	static void use_default();
 };

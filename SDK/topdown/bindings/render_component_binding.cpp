@@ -27,6 +27,13 @@ namespace bindings {
 			.def("push_line", &render_system::push_line)
 			.def("push_non_cleared_line", &render_system::push_non_cleared_line)
 			.def("clear_non_cleared_lines", &render_system::clear_non_cleared_lines)
+
+			.def("call_triangles", &render_system::call_triangles)
+			.def("push_triangle", &render_system::push_triangle)
+			.def("clear_triangles", &render_system::clear_triangles)
+			.def("draw_debug_info", &render_system::draw_debug_info)
+			.def("generate_triangles", &render_system::generate_triangles)
+			.def("default_render", &render_system::default_render)
 			, 
 
 			luabind::class_<render>("render_component")
