@@ -14,9 +14,15 @@ using namespace entity_system;
 
 class render_system : public processing_system_templated<components::transform, components::render> {
 	resources::buffer triangles;
+	resources::vertex_triangle* last_bound_buffer_location;
 
 	friend class camera_system;
 public:
+	void call_triangles();
+	void push_triangle(const resources::vertex_triangle&);
+	void clear_triangles();
+	void draw_debug_info();
+
 	struct debug_line {
 		debug_line(augmentations::vec2<> a, augmentations::vec2<> b, augmentations::graphics::pixel_32 col = augmentations::graphics::pixel_32(255, 255, 255, 255)) : col(col), a(a), b(b) {}
 
@@ -61,6 +67,6 @@ public:
 
 	void process_entities(world&) override;
 
-	void draw(rects::xywh visible_area, components::transform::state, unsigned mask);
-	void render(rects::xywh visible_area);
+	void generate_triangles(rects::xywh visible_area, components::transform::state, int mask);
+	void default_render(rects::xywh visible_area);
 };

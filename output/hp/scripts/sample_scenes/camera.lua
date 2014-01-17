@@ -60,7 +60,12 @@ world_camera = create_entity (archetyped(camera_archetype, {
 
 	camera = {
 		screen_rect = rect_xywh(0, 0, config_table.resolution_w, config_table.resolution_h),
-		ortho = rect_ltrb(0, 0, config_table.resolution_w, config_table.resolution_h)
+		ortho = rect_ltrb(0, 0, config_table.resolution_w, config_table.resolution_h),
+		
+		drawing_callback = function (subject, renderer, visible_area, camera_transform, mask)
+			renderer:generate_triangles(visible_area, camera_transform, mask)
+			renderer:default_render(visible_area)
+		end
 	},
 	
 	input = {

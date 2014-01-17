@@ -17,7 +17,8 @@ render_system::render_system(window::glwindow& output_window)
 	draw_avoidance_info(0),
 	draw_wandering_info(0),
 	debug_drawing(0),
-	draw_weapon_info(0)
+	draw_weapon_info(0),
+	last_bound_buffer_location(nullptr)
 {
 	output_window.current();
 
@@ -39,7 +40,7 @@ render_system::render_system(window::glwindow& output_window)
 }
 
 static components::transform::state last_camera;
-void render_system::draw(rects::xywh visible_area, components::transform::state camera_transform, unsigned mask) {
+void render_system::generate_triangles(rects::xywh visible_area, components::transform::state camera_transform, int mask) {
 	/* shortcut */
 	typedef std::pair<components::render*, components::transform::state*> cached_pair;
 
@@ -77,93 +78,101 @@ void render_system::draw(rects::xywh visible_area, components::transform::state 
 void render_system::process_entities(world&) {
 }
 
-void render_system::render(rects::xywh visible_area) {
-	fbo::use_default();
+void render_system::call_triangles() {
+	if (last_bound_buffer_location != triangles.data()) {
+		last_bound_buffer_location = triangles.data();
+		glVertexPointer(2, GL_FLOAT, sizeof(resources::vertex), last_bound_buffer_location);
+		glTexCoordPointer(2, GL_FLOAT, sizeof(resources::vertex), (char*) (last_bound_buffer_location) +sizeof(float) * 2);
+		glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(resources::vertex), (char*) (last_bound_buffer_location) +sizeof(float) * 2 + sizeof(float) * 2);
+	}
 
-	glVertexPointer(2, GL_FLOAT, sizeof(resources::vertex), triangles.data());
-	glTexCoordPointer(2, GL_FLOAT, sizeof(resources::vertex), (char*) (triangles.data()) + sizeof(float) * 2);
-	glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(resources::vertex), (char*) (triangles.data()) + sizeof(float) * 2 + sizeof(float) * 2);
-
-	scene_fbo.use();
-	glClear(GL_COLOR_BUFFER_BIT);
 	glDrawArrays(GL_TRIANGLES, 0, triangles.size() * 3);
+}
 
-	//postprocess_fbo.use();
-	//glClear(GL_COLOR_BUFFER_BIT);
-	if (debug_drawing) {
-		glDisable(GL_TEXTURE_2D);
+void render_system::push_triangle(const resources::vertex_triangle& tri) {
+	triangles.push_back(tri);
+}
 
-		if (draw_visibility) {
-			//glColor4f(1.f, 1.f, 1.f, 1.f);
-			glBegin(GL_TRIANGLES);
-			for (auto it : targets) {
-				auto* visibility = it->find<components::visibility>();
-				if (visibility) {
-					for (auto& entry : visibility->visibility_layers.raw) {
-						/* shortcut */
-						auto& request = entry.val;
+void render_system::clear_triangles() {
+	triangles.clear();
+}
 
-						glColor4ub(request.color.r, request.color.g, request.color.b, request.color.a / 2);
-						auto origin = it->get<components::transform>().current.pos;
+void render_system::draw_debug_info() {
+	if (draw_visibility) {
+		//glColor4f(1.f, 1.f, 1.f, 1.f);
+		glBegin(GL_TRIANGLES);
+		for (auto it : targets) {
+			auto* visibility = it->find<components::visibility>();
+			if (visibility) {
+				for (auto& entry : visibility->visibility_layers.raw) {
+					/* shortcut */
+					auto& request = entry.val;
 
-						for (int i = 0; i < request.get_num_triangles(); ++i) {
-							auto& tri = request.get_triangle(i, origin);
+					glColor4ub(request.color.r, request.color.g, request.color.b, request.color.a / 2);
+					auto origin = it->get<components::transform>().current.pos;
 
-							for (auto& p : tri.points) {
-								p -= origin;
+					for (int i = 0; i < request.get_num_triangles(); ++i) {
+						auto& tri = request.get_triangle(i, origin);
 
-								float expansion = 0.f;
-								float distance_from_subject = (p - origin).length();
+						for (auto& p : tri.points) {
+							p -= origin;
 
-								//if (vision_length == 0.f) {
-								//	expansion = max_visibility_expansion_distance;
-								//}
-								//else {
-								//	expansion = max_visibility_expansion_distance / vision_length;
-								//}
+							float expansion = 0.f;
+							float distance_from_subject = (p - origin).length();
 
-								expansion = (distance_from_subject / max_visibility_expansion_distance) * visibility_expansion;
+							expansion = (distance_from_subject / max_visibility_expansion_distance) * visibility_expansion;
 
-								p *= std::min(visibility_expansion, expansion);
-							}
+							p *= std::min(visibility_expansion, expansion);
+						}
 
-							resources::vertex_triangle verts;
+						resources::vertex_triangle verts;
 
-							for (int i = 0; i < 3; ++i) {
-								auto pos = tri.points[i] - last_camera.pos + origin;
+						for (int i = 0; i < 3; ++i) {
+							auto pos = tri.points[i] - last_camera.pos + origin;
 
-								glVertex2f(pos.x, pos.y);
-							}
+							glVertex2f(pos.x, pos.y);
 						}
 					}
 				}
 			}
-			glEnd();
 		}
-
-		glBegin(GL_LINES);
-		for (auto& line : lines) {
-			glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
-			glVertex2f(line.a.x - last_camera.pos.x, line.a.y - last_camera.pos.y);
-			glVertex2f(line.b.x - last_camera.pos.x, line.b.y - last_camera.pos.y);
-		}
-		for (auto& line : manually_cleared_lines) {
-			glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
-			glVertex2f(line.a.x - last_camera.pos.x, line.a.y - last_camera.pos.y);
-			glVertex2f(line.b.x - last_camera.pos.x, line.b.y - last_camera.pos.y);
-		}
-		for (auto& line : non_cleared_lines) {
-			glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
-			glVertex2f(line.a.x - last_camera.pos.x, line.a.y - last_camera.pos.y);
-			glVertex2f(line.b.x - last_camera.pos.x, line.b.y - last_camera.pos.y);
-		}
-		for (auto& line : global_debug) {
-			glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
-			glVertex2f(line.a.x - last_camera.pos.x, line.a.y - last_camera.pos.y);
-			glVertex2f(line.b.x - last_camera.pos.x, line.b.y - last_camera.pos.y);
-		}
-
 		glEnd();
+	}
+
+	glBegin(GL_LINES);
+	for (auto& line : lines) {
+		glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
+		glVertex2f(line.a.x - last_camera.pos.x, line.a.y - last_camera.pos.y);
+		glVertex2f(line.b.x - last_camera.pos.x, line.b.y - last_camera.pos.y);
+	}
+	for (auto& line : manually_cleared_lines) {
+		glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
+		glVertex2f(line.a.x - last_camera.pos.x, line.a.y - last_camera.pos.y);
+		glVertex2f(line.b.x - last_camera.pos.x, line.b.y - last_camera.pos.y);
+	}
+	for (auto& line : non_cleared_lines) {
+		glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
+		glVertex2f(line.a.x - last_camera.pos.x, line.a.y - last_camera.pos.y);
+		glVertex2f(line.b.x - last_camera.pos.x, line.b.y - last_camera.pos.y);
+	}
+	for (auto& line : global_debug) {
+		glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
+		glVertex2f(line.a.x - last_camera.pos.x, line.a.y - last_camera.pos.y);
+		glVertex2f(line.b.x - last_camera.pos.x, line.b.y - last_camera.pos.y);
+	}
+	glEnd();
+}
+
+
+void render_system::default_render(rects::xywh visible_area) {
+	scene_fbo.use();
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	call_triangles();
+
+	if (debug_drawing) {
+		glDisable(GL_TEXTURE_2D);
+		draw_debug_info();
 		glEnable(GL_TEXTURE_2D);
 	}
 
@@ -172,7 +181,7 @@ void render_system::render(rects::xywh visible_area) {
 	fbo::use_default();
 
 	glColor4f(1.f, 1.f, 1.f, 1.f);
-	glBindTexture(GL_TEXTURE_2D, scene_fbo.getTextureId());
+	glBindTexture(GL_TEXTURE_2D, scene_fbo.get_texture_id());
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	glBegin(GL_QUADS);

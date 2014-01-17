@@ -25,8 +25,6 @@ void camera_system::consume_events(world& owner) {
 }
 
 void camera_system::process_entities(world& owner) {
-	glClear(GL_COLOR_BUFFER_BIT);
-
 	double delta = smooth_timer.extract<std::chrono::seconds>();
 
 	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
@@ -96,8 +94,19 @@ void camera_system::process_entities(world& owner) {
 			glOrtho(camera.last_ortho_interpolant.l, camera.last_ortho_interpolant.r, camera.last_ortho_interpolant.b, camera.last_ortho_interpolant.t, 0, 1);
 			glViewport(camera.screen_rect.x, camera.screen_rect.y, camera.screen_rect.w, camera.screen_rect.h);
 
-			raw_renderer.draw(camera.last_ortho_interpolant, transform, camera.mask);
-			raw_renderer.render(camera.last_ortho_interpolant);
+			if (camera.drawing_callback) {
+				try {
+					/* arguments: subject, renderer, visible_area, transform, mask */
+					luabind::call_function<void>(camera.drawing_callback, e, raw_renderer, rects::xywh(camera.last_ortho_interpolant), transform, camera.mask);
+				}
+				catch (std::exception compilation_error) {
+					std::cout << compilation_error.what() << '\n';
+				}
+			}
+			else {
+				raw_renderer.generate_triangles(camera.last_ortho_interpolant, transform, camera.mask);
+				raw_renderer.default_render(camera.last_ortho_interpolant);
+			}
 		}
 	}
 	raw_renderer.output_window.swap_buffers();

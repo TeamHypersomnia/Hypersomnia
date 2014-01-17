@@ -41,6 +41,8 @@ namespace components {
 				smooth_timer.reset();
 		}
 
+		luabind::object drawing_callback;
+
 	private:
 		friend class camera_system;
 		friend class gun_system;

@@ -160,8 +160,8 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			bindings::_destroy_message(),
 			bindings::_shot_message(),
 
-			bindings::_render_component(),
 			bindings::_transform_component(),
+			bindings::_render_component(),
 			bindings::_visibility_component(),
 			bindings::_pathfinding_component(),
 			bindings::_animate_component(),
@@ -183,9 +183,7 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			bindings::_entity(),
 			bindings::_body_helper(),
 
-			luabind::module(lua_state, "gl")[
-				bindings::_opengl_binding()
-			],
+			bindings::_opengl_binding(),
 
 			luabind::def("set_world_reloading_script", &set_world_reloading_script),
 			luabind::def("debugger_break", &debugger_break),
