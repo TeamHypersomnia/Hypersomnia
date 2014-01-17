@@ -52,6 +52,8 @@ camera_archetype = {
 	}
 }
 
+scene_fbo = framebuffer_object(config_table.resolution_w, config_table.resolution_h)
+
 world_camera = create_entity (archetyped(camera_archetype, {
 	transform = {
 		pos = vec2(),
@@ -64,7 +66,31 @@ world_camera = create_entity (archetyped(camera_archetype, {
 		
 		drawing_callback = function (subject, renderer, visible_area, camera_transform, mask)
 			renderer:generate_triangles(visible_area, camera_transform, mask)
-			renderer:default_render(visible_area)
+			
+			scene_fbo:use()
+			
+			GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+			
+			renderer:call_triangles()
+			
+			framebuffer_object.use_default()
+			
+			GL.glColor4f(1, 1, 1, 1)
+			GL.glBindTexture(GL.GL_TEXTURE_2D, scene_fbo:get_texture_id())
+			
+			GL.glGenerateMipmap(GL.GL_TEXTURE_2D)
+			
+			GL.glBegin(GL.GL_QUADS)
+			
+			GL.glTexCoord2f(0, 1); GL.glVertex2i(visible_area.x, visible_area.y)
+			GL.glTexCoord2f(1, 1); GL.glVertex2i(visible_area.r, visible_area.y)
+			GL.glTexCoord2f(1, 0); GL.glVertex2i(visible_area.r, visible_area.b)
+			GL.glTexCoord2f(0, 0); GL.glVertex2i(visible_area.x, visible_area.b)
+			
+			GL.glEnd()
+			
+			renderer:clear_triangles()
+			--renderer:default_render(visible_area)
 		end
 	},
 	

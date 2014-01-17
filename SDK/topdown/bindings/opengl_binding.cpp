@@ -61,6 +61,9 @@ namespace bindings {
 				luabind::def("glBegin", wrap(glBegin)),
 				luabind::def("glEnd", wrap(glEnd)),
 				luabind::def("glVertex2f", wrap(glVertex2f)),
+				luabind::def("glVertex2i", wrap(glVertex2i)),
+				luabind::def("glTexCoord2f", wrap(glTexCoord2f)),
+				luabind::def("glTexCoord2i", wrap(glTexCoord2i)),
 				luabind::def("glBindTexture", wrap(glBindTexture)),
 				luabind::def("glUseProgram", wrap_ptr(glUseProgram)),
 				luabind::def("glGenerateMipmap", wrap_ptr(glGenerateMipmap)),
@@ -73,7 +76,8 @@ namespace bindings {
 				luabind::value("GL_TEXTURE_2D", GL_TEXTURE_2D),
 				luabind::value("GL_QUADS", GL_QUADS),
 				luabind::value("GL_LINES", GL_LINES),
-				luabind::value("GL_TRIANGLES", GL_TRIANGLES)
+				luabind::value("GL_TRIANGLES", GL_TRIANGLES),
+				luabind::value("GL_COLOR_BUFFER_BIT", GL_COLOR_BUFFER_BIT)
 			],
 
 			luabind::class_<fbo>("framebuffer_object")

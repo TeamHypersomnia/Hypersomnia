@@ -6,10 +6,6 @@
 #include "../components/physics_component.h"
 #include "../messages/intent_message.h"
 
-camera_system::camera_system(render_system& raw_renderer) : raw_renderer(raw_renderer) {
-	smooth_timer.reset();
-}
-
 void camera_system::consume_events(world& owner) {
 	auto events = owner.get_message_queue<messages::intent_message>();
 
@@ -25,6 +21,8 @@ void camera_system::consume_events(world& owner) {
 }
 
 void camera_system::process_entities(world& owner) {
+	render_system& raw_renderer = owner.get_system<render_system>();
+
 	double delta = smooth_timer.extract<std::chrono::seconds>();
 
 	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
@@ -109,5 +107,13 @@ void camera_system::process_entities(world& owner) {
 			}
 		}
 	}
+
+	if (raw_renderer.debug_drawing) {
+		glDisable(GL_TEXTURE_2D);
+		raw_renderer.draw_debug_info();
+		glEnable(GL_TEXTURE_2D);
+	}
+
 	raw_renderer.output_window.swap_buffers();
+	raw_renderer.cleanup();
 }

@@ -45,6 +45,8 @@ public:
 		non_cleared_lines.clear();
 	}
 
+	void cleanup();
+
 	fbo scene_fbo, postprocess_fbo;
 
 	float visibility_expansion;

@@ -75,7 +75,7 @@ int main() {
 	particle_group_system particles;
 	particle_emitter_system emitters;
 	render_system render(gl);
-	camera_system camera(render);
+	camera_system camera;
 	chase_system chase;
 	damage_system damage;
 	destroy_system destroy;

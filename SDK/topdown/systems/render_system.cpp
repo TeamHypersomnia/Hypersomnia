@@ -163,21 +163,16 @@ void render_system::draw_debug_info() {
 	glEnd();
 }
 
+void render_system::cleanup() {
+	lines.clear();
+	triangles.clear();
+}
 
 void render_system::default_render(rects::xywh visible_area) {
 	scene_fbo.use();
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	call_triangles();
-
-	if (debug_drawing) {
-		glDisable(GL_TEXTURE_2D);
-		draw_debug_info();
-		glEnable(GL_TEXTURE_2D);
-	}
-
-	lines.clear();
-
 	fbo::use_default();
 
 	glColor4f(1.f, 1.f, 1.f, 1.f);
