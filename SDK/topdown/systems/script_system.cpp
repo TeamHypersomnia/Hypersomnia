@@ -15,6 +15,7 @@
 #include "../messages/shot_message.h"
 
 #include "utility/randval.h"
+#include "utility/vector_wrapper.h"
 #include "../resources/scriptable_info.h"
 
 void set_world_reloading_script(resources::script* new_scr) {
@@ -131,6 +132,10 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 	lua_register(lua_state, "bitor", bitor);
 	lua_register(lua_state, "bitflag", bitflag);
 	luabind::module(lua_state)[
+			luabind::class_<ptr_wrapper<float>>("float_ptr"),
+
+			util::vector_wrapper<float>::bind("float_vector"),
+		
 			bindings::_sfml_audio(),
 			bindings::_minmax(),
 			bindings::_vec2(),

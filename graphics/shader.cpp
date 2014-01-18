@@ -3,17 +3,17 @@
 
 namespace augmentations {
 	namespace graphics {
-		void printShaderInfoLog(GLuint obj) {
+		void printShaderInfoLog(GLuint obj, std::string source_code) {
 			int infologLength = 0;
 			int charsWritten = 0;
 			char *infoLog;
 
 			glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
 
-			if (infologLength > 0) {
+			if (infologLength > 1) {
 				infoLog = (char *) malloc(infologLength);
 				glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog);
-				printf("---------------------------------\n%s\n", infoLog);
+				printf("---------------------------------\n Source code: %s ---------------------------------\n%s\n", source_code.c_str(), infoLog);
 				free(infoLog);
 			}
 		}
@@ -25,10 +25,10 @@ namespace augmentations {
 
 			glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
 
-			if (infologLength > 0) {
+			if (infologLength > 1) {
 				infoLog = (char *) malloc(infologLength);
 				glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog);
-				printf("---------------------------------%s\n", infoLog);
+				printf("---------------------------------\n%s\n", infoLog);
 				free(infoLog);
 			}
 		}
@@ -52,7 +52,7 @@ namespace augmentations {
 				auto* source_ptr = source_code.c_str();
 				glShaderSource(id, 1, &source_ptr, nullptr);
 				glCompileShader(id);
-				printShaderInfoLog(id);
+				printShaderInfoLog(id, source_code);
 			}
 		}
 
@@ -119,7 +119,7 @@ namespace augmentations {
 		}
 
 		void shader_program::use() {
-			assert(built);
+			if (!built) build();
 
 			currently_used_program = id;
 			glUseProgram(id);

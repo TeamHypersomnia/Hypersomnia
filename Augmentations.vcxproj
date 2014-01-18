@@ -1520,11 +1520,13 @@
     <ClInclude Include="texture_baker\texture_baker.h" />
     <ClInclude Include="utility\delta_accumulator.h" />
     <ClInclude Include="utility\map_wrapper.h" />
+    <ClInclude Include="utility\ptr_wrapper.h" />
     <ClInclude Include="utility\randval.h" />
     <ClInclude Include="utility\sorted_vector.h" />
     <ClInclude Include="utility\stream.h" />
     <ClInclude Include="utility\timer.h" />
     <ClInclude Include="utility\value_animator.h" />
+    <ClInclude Include="utility\vector_wrapper.h" />
     <ClInclude Include="window_framework\event.h" />
     <ClInclude Include="window_framework\window.h" />
   </ItemGroup>

@@ -1406,6 +1406,12 @@
     <ClInclude Include="graphics\fbo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="utility\vector_wrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utility\ptr_wrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="scripts\entity_creation_util.lua" />

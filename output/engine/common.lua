@@ -125,5 +125,23 @@ function reversed(input_table)
 	return out_table
 end
 
- 
+
+function add_vals(target_vector, vals)
+	for k, v in ipairs(vals) do
+		target_vector:add(v)
+	end
+end
+
+function orthographic_projection(left, right, bottom, top, near, far)
+	local new_vec = float_vector()
+	add_vals(new_vec, {
+			2/(right-left), 0, 0, 0, 
+			0, 2/(top-bottom), 0, 0,
+			0, 0, -2/(far-near), 0, 
+			-(right+left)/(right-left), -(top+bottom)/(top-bottom), -(far+near)/(far-near), 1
+		}
+	)
+	
+	return new_vec
+end
 

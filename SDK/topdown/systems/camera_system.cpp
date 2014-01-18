@@ -89,8 +89,6 @@ void camera_system::process_entities(world& owner) {
 				drawn_transform.pos = camera.last_interpolant;
 			}
 
-			glLoadIdentity();
-			glOrtho(camera.last_ortho_interpolant.l, camera.last_ortho_interpolant.r, camera.last_ortho_interpolant.b, camera.last_ortho_interpolant.t, 0, 1);
 			glViewport(camera.screen_rect.x, camera.screen_rect.y, camera.screen_rect.w, camera.screen_rect.h);
 
 			if (camera.drawing_callback) {
@@ -103,6 +101,9 @@ void camera_system::process_entities(world& owner) {
 				}
 			}
 			else {
+				glLoadIdentity();
+				glOrtho(camera.last_ortho_interpolant.l, camera.last_ortho_interpolant.r, camera.last_ortho_interpolant.b, camera.last_ortho_interpolant.t, 0, 1);
+
 				raw_renderer.generate_triangles(camera.last_ortho_interpolant, drawn_transform, camera.mask);
 				raw_renderer.default_render(camera.last_ortho_interpolant);
 			}
