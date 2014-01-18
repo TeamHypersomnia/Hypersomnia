@@ -63,6 +63,7 @@ layout(location = 1) in vec2 texcoord;
 layout(location = 2) in vec4 color;
 
 smooth out vec4 theColor;
+smooth out vec2 theTexcoord;
 
 void main() 
 {
@@ -74,6 +75,7 @@ void main()
 	
 	gl_Position = projection_matrix*output_vert;
 	theColor = color;
+	theTexcoord = texcoord;
 }
 
 ]])
@@ -81,12 +83,15 @@ void main()
 my_fragment_shader = GLSL_shader(GL.GL_FRAGMENT_SHADER, [[
 #version 330
 smooth in vec4 theColor;
+smooth in vec2 theTexcoord;
 
 out vec4 outputColor;
 
+uniform sampler2D basic_texture;
+
 void main() 
 {
-    outputColor = vec4(theColor.rgba);
+    outputColor = theColor * texture(basic_texture, theTexcoord);
 }
 
 ]])
@@ -97,6 +102,9 @@ my_shader_program:attach(my_fragment_shader)
 my_shader_program:use()
 
 projection_matrix_uniform = GL.glGetUniformLocation(my_shader_program.id, "projection_matrix")
+basic_texture_uniform = GL.glGetUniformLocation(my_shader_program.id, "basic_texture")
+
+GL.glUniform1i(basic_texture_uniform, 0)
 
 world_camera = create_entity (archetyped(camera_archetype, {
 	transform = {
