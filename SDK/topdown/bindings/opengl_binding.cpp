@@ -63,6 +63,7 @@ namespace bindings {
 			luabind::class_<dummy_GL>("GL")
 			.scope
 			[
+				luabind::def("glActiveTexture", wrap_ptr(glActiveTexture)),
 				luabind::def("glEnable", wrap(glEnable)),
 				luabind::def("glDisable", wrap(glDisable)),
 				//luabind::def("glColor4f", wrap(glColor4f)),

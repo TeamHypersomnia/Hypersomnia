@@ -59,6 +59,10 @@ my_vertex_shader = GLSL_shader(GL.GL_VERTEX_SHADER, [[
 
 uniform mat4 projection_matrix;
 layout(location = 0) in vec2 position;
+layout(location = 1) in vec2 texcoord;
+layout(location = 2) in vec4 color;
+
+smooth out vec4 theColor;
 
 void main() 
 {
@@ -69,17 +73,20 @@ void main()
 	output_vert.w = 1.0f;
 	
 	gl_Position = projection_matrix*output_vert;
+	theColor = color;
 }
 
 ]])
 
 my_fragment_shader = GLSL_shader(GL.GL_FRAGMENT_SHADER, [[
 #version 330
+smooth in vec4 theColor;
+
 out vec4 outputColor;
 
 void main() 
 {
-	outputColor = vec4(1.0f, 0.0f, 1.0f, 1.0f);
+    outputColor = vec4(theColor.rgba);
 }
 
 ]])

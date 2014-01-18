@@ -159,7 +159,7 @@ loop_only_info = create_scriptable_info {
 			end,
 				
 		[scriptable_component.LOOP] = function(subject)
-			my_atlas:_bind()
+			my_atlas:bind()
 		end
 	}
 }

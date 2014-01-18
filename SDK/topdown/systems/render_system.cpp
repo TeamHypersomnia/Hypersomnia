@@ -39,10 +39,15 @@ render_system::render_system(window::glwindow& output_window)
 	//glGenBuffers(1, &color_buffer);
 
 	glGenBuffers(1, &triangle_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer);
 
 	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::POSITION);
-	//glEnableVertexAttribArray(VERTEX_ATTRIBUTES::TEXCOORD);
-	//glEnableVertexAttribArray(VERTEX_ATTRIBUTES::COLOR);
+	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::TEXCOORD);
+	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::COLOR);
+
+	glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(resources::vertex), 0);
+	glVertexAttribPointer(VERTEX_ATTRIBUTES::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(resources::vertex), (char*)(sizeof(float) * 2));
+	glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(resources::vertex), (char*) (sizeof(float) * 2 + sizeof(float) * 2));
 	//glEnableClientState(GL_VERTEX_ARRAY);
 	//glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	//glEnableClientState(GL_COLOR_ARRAY);
@@ -90,9 +95,8 @@ void render_system::process_entities(world&) {
 void render_system::call_triangles() {
 	//if (last_bound_buffer_location != triangles.data()) {
 	//	last_bound_buffer_location = triangles.data();
-		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(resources::vertex_triangle) * triangles.size(), triangles.data(), GL_STREAM_DRAW);
-		glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(resources::vertex), 0);
+	//glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(resources::vertex_triangle) * triangles.size(), triangles.data(), GL_STREAM_DRAW);
 
 		//glBindBuffer(GL_ARRAY_BUFFER, texcoord_buffer);
 		//glBufferData(GL_ARRAY_BUFFER, sizeof(resources::vertex) * triangles.size(), triangles.data(), GL_STREAM_DRAW);

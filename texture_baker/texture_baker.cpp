@@ -211,7 +211,7 @@ namespace augmentations {
 		}
 
 		void atlas::bind() {
-			if(current != id) _bind();
+			_bind();
 		}
 
 		void atlas::_bind() {
