@@ -543,9 +543,6 @@
     <ClCompile Include="3rdparty\poly2tri\common\shapes.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SDK\topdown\resources\fbo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SDK\topdown\systems\steering_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -652,6 +649,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SDK\topdown\bindings\opengl_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\fbo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -900,9 +903,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\poly2tri\common\utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SDK\topdown\resources\fbo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SDK\topdown\messages\steering_message.h">
@@ -1398,6 +1398,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2MotorJoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\fbo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

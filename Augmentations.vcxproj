@@ -994,7 +994,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="SDK\topdown\resources\fbo.cpp">
+    <ClCompile Include="graphics\fbo.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
@@ -1002,6 +1002,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="graphics\shader.cpp" />
     <ClCompile Include="SDK\topdown\resources\vertex.cpp" />
     <ClCompile Include="SDK\topdown\systems\behaviour_tree_system.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
@@ -1460,7 +1461,8 @@
     <ClInclude Include="SDK\topdown\components\steering_component.h" />
     <ClInclude Include="SDK\topdown\messages\shot_message.h" />
     <ClInclude Include="SDK\topdown\messages\steering_message.h" />
-    <ClInclude Include="SDK\topdown\resources\fbo.h" />
+    <ClInclude Include="graphics\fbo.h" />
+    <ClInclude Include="graphics\shader.h" />
     <ClInclude Include="SDK\topdown\systems\behaviour_tree_system.h" />
     <ClInclude Include="SDK\topdown\systems\pathfinding_system.h" />
     <ClInclude Include="SDK\topdown\systems\visibility_system.h" />

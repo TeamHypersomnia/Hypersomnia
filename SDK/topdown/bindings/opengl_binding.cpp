@@ -46,7 +46,8 @@ struct dummy_GL {
 
 };
 
-#include "../resources/fbo.h"
+#include "graphics/fbo.h"
+#include "graphics/shader.h"
 
 namespace bindings {
 	luabind::scope _opengl_binding() {

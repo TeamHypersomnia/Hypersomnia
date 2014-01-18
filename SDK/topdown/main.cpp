@@ -102,7 +102,7 @@ int main() {
 	my_world.register_system(&destroy);
 	my_world.register_system(&behaviours);
 	my_world.register_system(&scripts);
-
+	 
 	my_world.register_message_queue<intent_message>();
 	my_world.register_message_queue<damage_message>();
 	my_world.register_message_queue<destroy_message>();

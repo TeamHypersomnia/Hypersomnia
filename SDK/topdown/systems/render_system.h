@@ -1,5 +1,6 @@
 #pragma once
 #include "window_framework/window.h"
+#include "graphics/fbo.h"
 
 #include "entity_system/processing_system.h"
 
@@ -7,7 +8,6 @@
 #include "../components/render_component.h"
 
 #include "../resources/vertex.h"
-#include "../resources/fbo.h"
 
 using namespace augmentations;
 using namespace entity_system;

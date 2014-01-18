@@ -70,7 +70,7 @@ world_camera = create_entity (archetyped(camera_archetype, {
 			
 			local drawn_dist = (drawn_transform.pos - target_transform.pos):length()
 			if drawn_dist > 20 then
-				target_transform.pos = target_transform.pos + vec2(randval(-drawn_dist/3, drawn_dist/3), randval(-drawn_dist/3, drawn_dist/3))
+				target_transform.pos = target_transform.pos + vec2(randval(-drawn_dist/10, drawn_dist/10), randval(-drawn_dist/10, drawn_dist/10))
 				renderer:generate_triangles(visible_area, target_transform, mask)
 				
 				for i=old_num, renderer:get_triangle_count()-1 do
