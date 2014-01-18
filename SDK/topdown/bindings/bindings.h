@@ -5,6 +5,7 @@ namespace messages {}
 
 namespace augmentations {
 	namespace entity_system {}
+	namespace graphics {}
 }
 
 namespace topdown {}
@@ -13,6 +14,7 @@ using namespace resources;
 using namespace components;
 using namespace augmentations;
 using namespace entity_system;
+using namespace graphics;
 using namespace topdown;
 using namespace messages;
 

@@ -34,9 +34,18 @@ render_system::render_system(window::glwindow& output_window)
 	glLoadIdentity();
 	glMatrixMode(GL_PROJECTION);
 
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
+	//glGenBuffers(1, &position_buffer);
+	//glGenBuffers(1, &texcoord_buffer);
+	//glGenBuffers(1, &color_buffer);
+
+	glGenBuffers(1, &triangle_buffer);
+
+	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::POSITION);
+	//glEnableVertexAttribArray(VERTEX_ATTRIBUTES::TEXCOORD);
+	//glEnableVertexAttribArray(VERTEX_ATTRIBUTES::COLOR);
+	//glEnableClientState(GL_VERTEX_ARRAY);
+	//glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	//glEnableClientState(GL_COLOR_ARRAY);
 }
 
 static components::transform::state last_camera;
@@ -79,12 +88,21 @@ void render_system::process_entities(world&) {
 }
 
 void render_system::call_triangles() {
-	if (last_bound_buffer_location != triangles.data()) {
-		last_bound_buffer_location = triangles.data();
-		glVertexPointer(2, GL_FLOAT, sizeof(resources::vertex), last_bound_buffer_location);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(resources::vertex), (char*) (last_bound_buffer_location) +sizeof(float) * 2);
-		glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(resources::vertex), (char*) (last_bound_buffer_location) +sizeof(float) * 2 + sizeof(float) * 2);
-	}
+	//if (last_bound_buffer_location != triangles.data()) {
+	//	last_bound_buffer_location = triangles.data();
+		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(resources::vertex_triangle) * triangles.size(), triangles.data(), GL_STREAM_DRAW);
+		glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(resources::vertex), 0);
+
+		//glBindBuffer(GL_ARRAY_BUFFER, texcoord_buffer);
+		//glBufferData(GL_ARRAY_BUFFER, sizeof(resources::vertex) * triangles.size(), triangles.data(), GL_STREAM_DRAW);
+		//glBindBuffer(GL_ARRAY_BUFFER, color_buffer);
+		//glBufferData(GL_ARRAY_BUFFER, sizeof(resources::vertex) * triangles.size(), triangles.data(), GL_STREAM_DRAW);
+
+		//glVertexPointer(2, GL_FLOAT, sizeof(resources::vertex), last_bound_buffer_location);
+		//glTexCoordPointer(2, GL_FLOAT, sizeof(resources::vertex), (char*) (last_bound_buffer_location) +sizeof(float) * 2);
+		//glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(resources::vertex), (char*) (last_bound_buffer_location) +sizeof(float) * 2 + sizeof(float) * 2);
+	//}
 
 	glDrawArrays(GL_TRIANGLES, 0, triangles.size() * 3);
 }
@@ -177,22 +195,11 @@ void render_system::cleanup() {
 }
 
 void render_system::default_render(rects::xywh visible_area) {
-	scene_fbo.use();
+	//scene_fbo.use();
+	augmentations::graphics::fbo::use_default();
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	call_triangles();
-	fbo::use_default();
-
-	glColor4f(1.f, 1.f, 1.f, 1.f);
-	glBindTexture(GL_TEXTURE_2D, scene_fbo.get_texture_id());
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.f, 1.f); glVertex2i(visible_area.x, visible_area.y);
-	glTexCoord2f(1.f, 1.f); glVertex2i(visible_area.r(), visible_area.y);
-	glTexCoord2f(1.f, 0.f); glVertex2i(visible_area.r(), visible_area.b());
-	glTexCoord2f(0.f, 0.f); glVertex2i(visible_area.x, visible_area.b());
-	glEnd();
 
 	triangles.clear();
 }

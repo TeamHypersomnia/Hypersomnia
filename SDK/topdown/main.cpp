@@ -41,6 +41,7 @@
 #include "resources/render_info.h"
 #include "resources/animate_info.h"
 #include "resources/scriptable_info.h"
+#include "graphics/shader.h"
 
 using namespace augmentations;
 using namespace entity_system;
@@ -149,6 +150,36 @@ int main() {
 	::testing::FLAGS_gtest_break_on_failure = false;
 	auto result = RUN_ALL_TESTS();
 
+	using namespace augmentations::graphics;
+	
+	shader vertex_shader(GL_VERTEX_SHADER, "#version 330 \n\
+										   										   \n\
+	layout(location = 0) in vec2 position;\n\
+	void main()\n\
+	{\n\
+		vec4 output_vert;\
+		output_vert.x = position.x;		\
+		output_vert.y = position.y;				\
+		output_vert.z = 0.0f;						\
+		output_vert.w = 1.0f; \
+		 \
+		gl_Position = output_vert;\n\
+	}\n");
+
+	shader fragment_shader(GL_FRAGMENT_SHADER, "#version 330 \n\
+											   											   \n\
+		out vec4 outputColor;\n\
+	void main()\n\
+	{\n\
+		outputColor = vec4(1.0f, 0.0f, 1.0f, 1.0f);\n\
+	}");
+
+	shader_program my_program;
+	my_program.attach(vertex_shader);
+	my_program.attach(fragment_shader);
+	my_program.build();
+	my_program.use();
+	
 	while (!input.quit_flag) {
 		my_world.validate_delayed_messages();
 

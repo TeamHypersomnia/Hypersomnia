@@ -18,6 +18,15 @@ class render_system : public processing_system_templated<components::transform, 
 
 	friend class camera_system;
 public:
+	GLuint position_buffer, texcoord_buffer, color_buffer;
+	GLuint triangle_buffer;
+
+	enum VERTEX_ATTRIBUTES {
+		POSITION,
+		TEXCOORD,
+		COLOR
+	};
+
 	void call_triangles();
 	void push_triangle(const resources::vertex_triangle&);
 	void clear_triangles();
@@ -51,7 +60,7 @@ public:
 
 	void cleanup();
 
-	fbo scene_fbo, postprocess_fbo;
+	augmentations::graphics::fbo scene_fbo, postprocess_fbo;
 
 	float visibility_expansion;
 	float max_visibility_expansion_distance;
