@@ -38,7 +38,7 @@ camera_archetype = {
 		smoothing_average_factor = 0.5,
 		averages_per_sec = 20,
 		
-		crosshair = nil,
+		crosshair = nil, 
 		player = nil,
 	
 		orbit_mode = camera_component.LOOK,

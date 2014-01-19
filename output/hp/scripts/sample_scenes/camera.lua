@@ -51,8 +51,76 @@ camera_archetype = {
 		offset = vec2(config_table.resolution_w/(-2), config_table.resolution_h/(-2))
 	}
 }
-
+ 
 scene_fbo = framebuffer_object(config_table.resolution_w, config_table.resolution_h)
+
+film_grain_vertex_shader = GLSL_shader(GL.GL_VERTEX_SHADER, [[
+#version 330
+
+layout(location = 0) in vec2 position;
+
+//smooth out vec2 theTexcoord;
+
+void main() 
+{
+	gl_Position = (vec4(position.xy, 0, 1) * 2.0) - 1.0;
+	//theTexcoord = position;
+}
+
+]])
+
+film_grain_fragment_shader = GLSL_shader(GL.GL_FRAGMENT_SHADER, [[
+#version 330
+uniform float time;
+
+// A single iteration of Bob Jenkins' One-At-A-Time hashing algorithm.
+uint hash( uint x ) {
+    x += ( x << 10u );
+    x ^= ( x >>  6u );
+    x += ( x <<  3u );
+    x ^= ( x >> 11u );
+    x += ( x << 15u );
+    return x;
+}
+
+// Compound versions of the hashing algorithm I whipped together.
+uint hash( uvec2 v ) { return hash( v.x ^ hash(v.y)                         ); }
+uint hash( uvec3 v ) { return hash( v.x ^ hash(v.y) ^ hash(v.z)             ); }
+uint hash( uvec4 v ) { return hash( v.x ^ hash(v.y) ^ hash(v.z) ^ hash(v.w) ); }
+
+// Construct a float with half-open range [0:1] using low 23 bits.
+// All zeroes yields 0.0, all ones yields the next smallest representable value below 1.0.
+float floatConstruct( uint m ) {
+    const uint ieeeMantissa = 0x007FFFFFu; // binary32 mantissa bitmask
+    const uint ieeeOne      = 0x3F800000u; // 1.0 in IEEE binary32
+
+    m &= ieeeMantissa;                     // Keep only mantissa bits (fractional part)
+    m |= ieeeOne;                          // Add fractional part to 1.0
+
+    float  f = uintBitsToFloat( m );       // Range [1:2]
+    return f - 1.0;                        // Range [0:1]
+}
+
+
+
+// Pseudo-random value in half-open range [0:1].
+float random( float x ) { return floatConstruct(hash(floatBitsToUint(x))); }
+float random( vec2  v ) { return floatConstruct(hash(floatBitsToUint(v))); }
+float random( vec3  v ) { return floatConstruct(hash(floatBitsToUint(v))); }
+float random( vec4  v ) { return floatConstruct(hash(floatBitsToUint(v))); }
+
+out vec4 outputColor;
+
+void main() 
+{
+	vec3  inputs = vec3( gl_FragCoord.xy, time ); // Spatial and temporal inputs
+    float rand   = random( inputs );              // Random per-pixel value
+    vec3  luma   = vec3( rand );                  // Expand to RGB
+	
+    outputColor = vec4(luma, 0.1);
+}
+
+]])
 
 my_vertex_shader = GLSL_shader(GL.GL_VERTEX_SHADER, [[
 #version 330
@@ -79,7 +147,7 @@ void main()
 }
 
 ]])
-
+ 
 my_fragment_shader = GLSL_shader(GL.GL_FRAGMENT_SHADER, [[
 #version 330
 smooth in vec4 theColor;
@@ -96,6 +164,12 @@ void main()
 
 ]])
 
+film_grain_program = GLSL_program()
+film_grain_program:attach(film_grain_vertex_shader)
+film_grain_program:attach(film_grain_fragment_shader)
+film_grain_program:use()
+time_uniform = GL.glGetUniformLocation(film_grain_program.id, "time")
+
 my_shader_program = GLSL_program()
 my_shader_program:attach(my_vertex_shader)
 my_shader_program:attach(my_fragment_shader)
@@ -105,6 +179,8 @@ projection_matrix_uniform = GL.glGetUniformLocation(my_shader_program.id, "proje
 basic_texture_uniform = GL.glGetUniformLocation(my_shader_program.id, "basic_texture")
 
 GL.glUniform1i(basic_texture_uniform, 0)
+
+local my_timer = timer()
 
 world_camera = create_entity (archetyped(camera_archetype, {
 	transform = {
@@ -117,6 +193,7 @@ world_camera = create_entity (archetyped(camera_archetype, {
 		ortho = rect_ltrb(0, 0, config_table.resolution_w, config_table.resolution_h),
 		
 		drawing_callback = function (subject, renderer, visible_area, drawn_transform, target_transform, mask)
+			my_shader_program:use()
 			renderer:generate_triangles(visible_area, drawn_transform, mask)
 			
 			GL.glUniformMatrix4fv(
@@ -176,9 +253,18 @@ world_camera = create_entity (archetyped(camera_archetype, {
 			--
 			--GL.glEnd()
 			--
-			
 			renderer:default_render(visible_area)
 			renderer:clear_triangles()
+			
+			film_grain_program:use()
+			GL.glUniform1f(time_uniform, my_timer:get_milliseconds())
+			
+			GL.glBegin(GL.GL_QUADS)	
+				GL.glVertexAttrib2f(0,1,1);
+				GL.glVertexAttrib2f(0,1,0);
+				GL.glVertexAttrib2f(0,0,0);
+				GL.glVertexAttrib2f(0,0,1);
+			GL.glEnd()
 		end
 	},
 	

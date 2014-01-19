@@ -49,7 +49,7 @@ using namespace messages;
 
 resources::script* world_reloading_script = nullptr;
 
-int main() {
+int main() { 
 	augmentations::init();	
 	script_system scripts;
 	lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);

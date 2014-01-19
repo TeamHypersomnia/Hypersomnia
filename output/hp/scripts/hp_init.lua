@@ -12,6 +12,7 @@ steering_file = open_script "hp\\scripts\\sample_scenes\\steering.lua"
 map_file = open_script "hp\\scripts\\sample_scenes\\map.lua"
 weapons_file = open_script "hp\\scripts\\sample_scenes\\weapons.lua"
 player_file = open_script "hp\\scripts\\sample_scenes\\player.lua"
+camera_file = open_script "hp\\scripts\\sample_scenes\\camera.lua"
 
 reloader_script = open_script "hp\\scripts\\sample_scenes\\soldier_ai.lua"
 
@@ -26,6 +27,7 @@ call_on_modification(steering_file, 				{ reloader_script })
 call_on_modification(map_file, 				{ reloader_script })
 call_on_modification(weapons_file, 				{ reloader_script })
 call_on_modification(player_file, 				{ reloader_script })
+call_on_modification(camera_file, 				{ reloader_script })
 
 
 call_on_modification(reloader_script, 				{ reloader_script })
