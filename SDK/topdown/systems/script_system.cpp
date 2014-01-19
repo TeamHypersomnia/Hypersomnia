@@ -63,6 +63,8 @@ namespace bindings {
 		_sprite(),
 		_polygon(),
 
+		_timer(),
+
 		_particle(),
 		_emission(),
 		_particle_effect(),
@@ -151,6 +153,8 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			bindings::_entity_ptr(),
 			bindings::_sprite(),
 			bindings::_polygon(),
+
+			bindings::_timer(),
 
 			bindings::_particle(),
 			bindings::_emission(),
