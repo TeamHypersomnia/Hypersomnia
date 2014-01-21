@@ -131,7 +131,7 @@ layout(location = 1) in vec2 texcoord;
 layout(location = 2) in vec4 color;
 
 smooth out vec4 theColor;
-smooth out vec2 theTexcoord;
+ out vec2 theTexcoord;
 
 void main() 
 {
@@ -151,7 +151,7 @@ void main()
 my_fragment_shader = GLSL_shader(GL.GL_FRAGMENT_SHADER, [[
 #version 330
 smooth in vec4 theColor;
-smooth in vec2 theTexcoord;
+ in vec2 theTexcoord;
 
 out vec4 outputColor;
 
