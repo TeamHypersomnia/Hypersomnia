@@ -54,8 +54,8 @@ namespace bindings {
 			.def_readwrite("enable_interpolation", &physics_system::enable_interpolation)
 			.def_readwrite("b2world", &physics_system::b2world)
 			.def("ray_cast", &physics_system::ray_cast_px)
-			.def("query_aabb", &physics_system::query_aabb_px)
-			.def("query_body", &physics_system::query_body)
+			.def("query_aabb", (physics_system::query_output (__thiscall physics_system::*) (vec2<>, vec2<>, b2Filter*, entity*))(&physics_system::query_aabb_px))
+			.def("query_body", (physics_system::query_output(__thiscall physics_system::*) (entity& subject, b2Filter*, entity*)) (&physics_system::query_body))
 			.def("push_away_from_walls", &physics_system::push_away_from_walls)
 			, 
 
