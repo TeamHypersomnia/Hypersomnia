@@ -13,14 +13,29 @@ player_debug_circle = simple_create_polygon (reversed(gen_circle_vertices(60, 5)
 map_uv_square(player_debug_circle, images.blank)
 
 
+function get_self(entity)
+	return entity.scriptable.script_data
+end
+
 player_scriptable_info = create_scriptable_info {
 	scripted_events = {
 		[scriptable_component.INTENT_MESSANT] = function (message) 
 			if message.intent == custom_intents.JUMP then
-				
-				
-				
-				
+				local this = get_self(message.subject)
+					if this.jump_timer:get_milliseconds() > 100 then
+					
+					local jump_off_candidates = physics_system:query_aabb(this.foot_sensor_p1, this.foot_sensor_p2, filter_npc_feet, message.subject)
+					local can_jump = false
+					
+					for jump_off_candidates.bodies do
+						can_jump = true
+					end
+					
+					if can_jump then
+						local target_body = message.subject.physics.body
+						target_body:ApplyLinearImpulse(b2Vec2(0, 3), target_body:GetWorldCenter()) 
+					end
+				end
 			end
 		end
 	}
@@ -71,6 +86,7 @@ player = create_entity_group {
 		input = {
 			--intent_message.MOVE_FORWARD,
 			--intent_message.MOVE_BACKWARD,
+			custom_intents.JUMP
 			intent_message.MOVE_LEFT,
 			intent_message.MOVE_RIGHT
 		}
