@@ -106,14 +106,14 @@ void camera_system::process_entities(world& owner) {
 
 				raw_renderer.generate_triangles(camera.last_ortho_interpolant, drawn_transform, camera.mask);
 				raw_renderer.default_render(camera.last_ortho_interpolant);
+
+				if (raw_renderer.debug_drawing) {
+					glDisable(GL_TEXTURE_2D);
+					raw_renderer.draw_debug_info(drawn_transform);
+					glEnable(GL_TEXTURE_2D);
+				}
 			}
 		}
-	}
-
-	if (raw_renderer.debug_drawing) {
-		glDisable(GL_TEXTURE_2D);
-		raw_renderer.draw_debug_info();
-		glEnable(GL_TEXTURE_2D);
 	}
 
 	raw_renderer.output_window.swap_buffers();

@@ -53,7 +53,6 @@ render_system::render_system(window::glwindow& output_window)
 	//glEnableClientState(GL_COLOR_ARRAY);
 }
 
-static components::transform::state last_camera;
 void render_system::generate_triangles(rects::xywh visible_area, components::transform::state camera_transform, int mask) {
 	/* shortcut */
 	typedef std::pair<components::render*, components::transform::state*> cached_pair;
@@ -85,8 +84,6 @@ void render_system::generate_triangles(rects::xywh visible_area, components::tra
 		if (e.first->model == nullptr) continue;
 		e.first->model->draw(triangles, *e.second, camera_transform.pos, e.first);
 	}
-
-	last_camera = camera_transform;
 }
 
 void render_system::process_entities(world&) {
@@ -127,7 +124,7 @@ resources::vertex_triangle& render_system::get_triangle(int i) {
 	return triangles[i];
 }
 
-void render_system::draw_debug_info() {
+void render_system::draw_debug_info(components::transform::state camera_transform) {
 	if (draw_visibility) {
 		//glColor4f(1.f, 1.f, 1.f, 1.f);
 		glBegin(GL_TRIANGLES);
@@ -158,7 +155,7 @@ void render_system::draw_debug_info() {
 						resources::vertex_triangle verts;
 
 						for (int i = 0; i < 3; ++i) {
-							auto pos = tri.points[i] - last_camera.pos + origin;
+							auto pos = tri.points[i] - camera_transform.pos + origin;
 
 							glVertex2f(pos.x, pos.y);
 						}
@@ -172,23 +169,23 @@ void render_system::draw_debug_info() {
 	glBegin(GL_LINES);
 	for (auto& line : lines) {
 		glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
-		glVertex2f(line.a.x - last_camera.pos.x, line.a.y - last_camera.pos.y);
-		glVertex2f(line.b.x - last_camera.pos.x, line.b.y - last_camera.pos.y);
+		glVertex2f(line.a.x - camera_transform.pos.x, line.a.y - camera_transform.pos.y);
+		glVertex2f(line.b.x - camera_transform.pos.x, line.b.y - camera_transform.pos.y);
 	}
 	for (auto& line : manually_cleared_lines) {
 		glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
-		glVertex2f(line.a.x - last_camera.pos.x, line.a.y - last_camera.pos.y);
-		glVertex2f(line.b.x - last_camera.pos.x, line.b.y - last_camera.pos.y);
+		glVertex2f(line.a.x - camera_transform.pos.x, line.a.y - camera_transform.pos.y);
+		glVertex2f(line.b.x - camera_transform.pos.x, line.b.y - camera_transform.pos.y);
 	}
 	for (auto& line : non_cleared_lines) {
 		glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
-		glVertex2f(line.a.x - last_camera.pos.x, line.a.y - last_camera.pos.y);
-		glVertex2f(line.b.x - last_camera.pos.x, line.b.y - last_camera.pos.y);
+		glVertex2f(line.a.x - camera_transform.pos.x, line.a.y - camera_transform.pos.y);
+		glVertex2f(line.b.x - camera_transform.pos.x, line.b.y - camera_transform.pos.y);
 	}
 	for (auto& line : global_debug) {
 		glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
-		glVertex2f(line.a.x - last_camera.pos.x, line.a.y - last_camera.pos.y);
-		glVertex2f(line.b.x - last_camera.pos.x, line.b.y - last_camera.pos.y);
+		glVertex2f(line.a.x - camera_transform.pos.x, line.a.y - camera_transform.pos.y);
+		glVertex2f(line.b.x - camera_transform.pos.x, line.b.y - camera_transform.pos.y);
 	}
 	glEnd();
 }
