@@ -1,8 +1,20 @@
+custom_intents = create_inverse_enum {
+	"ZOOM_CAMERA",
+	"STEERING_REQUEST",
+	"RESTART",
+	"INSTANT_SLOWDOWN",
+	"SPEED_INCREASE",
+	"SPEED_DECREASE",
+	"QUIT",
+	"DROP_WEAPON",
+	"JUMP"
+}
+
 main_context = create_input_context {
 	intents = { 
 		[mouse.raw_motion] 		= intent_message.AIM,
 		[keys.ESC] 				= custom_intents.QUIT,
-		[keys.W] 				= intent_message.MOVE_FORWARD,
+		[keys.W] 				= custom_intents.JUMP,
 		[keys.S] 				= intent_message.MOVE_BACKWARD,
 		[keys.A] 				= intent_message.MOVE_LEFT,
 		[keys.D] 				= intent_message.MOVE_RIGHT,

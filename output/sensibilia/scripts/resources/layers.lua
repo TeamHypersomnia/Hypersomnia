@@ -15,17 +15,6 @@ render_layers = {
 	GROUND = 13
 }
 
-custom_intents = create_inverse_enum {
-	"ZOOM_CAMERA",
-	"STEERING_REQUEST",
-	"RESTART",
-	"INSTANT_SLOWDOWN",
-	"SPEED_INCREASE",
-	"SPEED_DECREASE",
-	"QUIT",
-	"DROP_WEAPON"
-}
-
 -- PHYSICS COLLISION LAYERS --
 create_options { 
 	"CHARACTERS", 
