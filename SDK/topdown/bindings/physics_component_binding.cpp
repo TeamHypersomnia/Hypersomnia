@@ -49,6 +49,14 @@ namespace bindings {
 			.def("SetGravity", &b2World::SetGravity)
 			,
 
+			luabind::class_<b2Shape>("b2Shape"),
+			luabind::class_<b2PolygonShape, b2Shape>("b2PolygonShape")
+			.def(luabind::constructor<>())
+			.def("SetAsBox", (void (__thiscall b2PolygonShape::*)(float32, float32))(&b2PolygonShape::SetAsBox))
+			,
+
+
+
 			luabind::class_<physics_system>("_physics_system")
 			.def_readwrite("timestep_multiplier", &physics_system::timestep_multiplier)
 			.def_readwrite("enable_interpolation", &physics_system::enable_interpolation)
@@ -56,7 +64,12 @@ namespace bindings {
 			.def("ray_cast", &physics_system::ray_cast_px)
 			.def("query_aabb", (physics_system::query_output (__thiscall physics_system::*) (vec2<>, vec2<>, b2Filter*, entity*))(&physics_system::query_aabb_px))
 			.def("query_body", (physics_system::query_output(__thiscall physics_system::*) (entity& subject, b2Filter*, entity*)) (&physics_system::query_body))
+			.def("query_shape", (physics_system::query_output(__thiscall physics_system::*) (b2Shape*, b2Filter*, entity*)) (&physics_system::query_shape))
 			.def("push_away_from_walls", &physics_system::push_away_from_walls)
+			.enum_("constants")[
+				luabind::value("PIXELS_TO_METERS", PIXELS_TO_METERSf),
+				luabind::value("METERS_TO_PIXELS", METERS_TO_PIXELSf)
+			]
 			, 
 
 			luabind::class_<physics>("physics_component")

@@ -167,26 +167,18 @@ void render_system::draw_debug_info(components::transform::state camera_transfor
 	}
 
 	glBegin(GL_LINES);
-	for (auto& line : lines) {
-		glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
-		glVertex2f(line.a.x - camera_transform.pos.x, line.a.y - camera_transform.pos.y);
-		glVertex2f(line.b.x - camera_transform.pos.x, line.b.y - camera_transform.pos.y);
-	}
-	for (auto& line : manually_cleared_lines) {
-		glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
-		glVertex2f(line.a.x - camera_transform.pos.x, line.a.y - camera_transform.pos.y);
-		glVertex2f(line.b.x - camera_transform.pos.x, line.b.y - camera_transform.pos.y);
-	}
-	for (auto& line : non_cleared_lines) {
-		glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
-		glVertex2f(line.a.x - camera_transform.pos.x, line.a.y - camera_transform.pos.y);
-		glVertex2f(line.b.x - camera_transform.pos.x, line.b.y - camera_transform.pos.y);
-	}
-	for (auto& line : global_debug) {
-		glColor4ub(line.col.r, line.col.g, line.col.b, line.col.a);
-		glVertex2f(line.a.x - camera_transform.pos.x, line.a.y - camera_transform.pos.y);
-		glVertex2f(line.b.x - camera_transform.pos.x, line.b.y - camera_transform.pos.y);
-	}
+	
+	auto line_lambda = [camera_transform](const debug_line& line) {
+		glVertexAttrib4f(VERTEX_ATTRIBUTES::COLOR, line.col.r / 255.f, line.col.g / 255.f, line.col.b / 255.f, line.col.a / 255.f);
+		glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.a.x - camera_transform.pos.x, line.a.y - camera_transform.pos.y);
+		glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.b.x - camera_transform.pos.x, line.b.y - camera_transform.pos.y);
+	};
+	
+	std::for_each(lines.begin(), lines.end(), line_lambda);
+	std::for_each(manually_cleared_lines.begin(), manually_cleared_lines.end(), line_lambda);
+	std::for_each(non_cleared_lines.begin(), non_cleared_lines.end(), line_lambda);
+	std::for_each(global_debug.begin(), global_debug.end(), line_lambda);
+
 	glEnd();
 }
 
