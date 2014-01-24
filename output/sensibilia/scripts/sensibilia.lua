@@ -50,6 +50,7 @@ environment_entity = create_entity (archetyped(environment_archetype, {
 	}
 }))
 
+dofile "sensibilia\\scripts\\npc.lua"
 dofile "sensibilia\\scripts\\player.lua"
 
 loop_only_info = create_scriptable_info {
@@ -95,5 +96,9 @@ create_entity {
 		available_scripts = loop_only_info
 	}	
 }
+
+
+player.body.name = "player_body"
+environment_entity.name = "environment_entity"
 
 physics_system.b2world:SetGravity(b2Vec2(0, 100))

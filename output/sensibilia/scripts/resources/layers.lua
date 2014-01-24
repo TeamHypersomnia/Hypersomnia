@@ -21,11 +21,10 @@ create_options {
 	"OBJECTS", 
 	"STATIC_OBJECTS",
 	"BULLETS", 
-	"ENEMY_BULLETS", 
+	"ENEMY_BULLETS",
 	"CORPSES",
 	"ITEMS",
-	"SHELLS",
-	"DOORS"
+	"SHELLS"
 }
 
 
@@ -35,6 +34,13 @@ filter_nothing = {
 }
 
 local mask_all = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, ENEMY_BULLETS, CHARACTERS, CORPSES, ITEMS, SHELLS, DOORS)
+
+
+filter_npc_feet = {
+	categoryBits = mask_all,
+	maskBits = bitor(OBJECTS, STATIC_OBJECTS, CHARACTERS, ITEMS, DOORS)
+}
+
 
 filter_doors = {
 	categoryBits = DOORS,
@@ -84,16 +90,6 @@ filter_enemy_bullets = {
 filter_corpses = {
 	categoryBits = CORPSES,
 	maskBits = bitor(OBJECTS, STATIC_OBJECTS, DOORS)
-}
-
-filter_items = {
-	categoryBits = ITEMS,
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS, DOORS)
-}
-
-filter_pick_up_items = {
-	categoryBits = mask_all,
-	maskBits = ITEMS
 }
 
 filter_melee = {

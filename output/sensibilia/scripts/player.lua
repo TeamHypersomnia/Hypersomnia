@@ -12,83 +12,51 @@ debug_sensor = create_sprite {
 player_debug_circle = simple_create_polygon (reversed(gen_circle_vertices(60, 5)))
 map_uv_square(player_debug_circle, images.blank)
 
-
 function get_self(entity)
 	return entity.scriptable.script_data
 end
 
 player_scriptable_info = create_scriptable_info {
 	scripted_events = {
-		[scriptable_component.INTENT_MESSANT] = function (message) 
+		[scriptable_component.INTENT_MESSAGE] = function (message) 
 			if message.intent == custom_intents.JUMP then
-				local this = get_self(message.subject)
-					if this.jump_timer:get_milliseconds() > 100 then
-					
-					local jump_off_candidates = physics_system:query_aabb(this.foot_sensor_p1, this.foot_sensor_p2, filter_npc_feet, message.subject)
-					local can_jump = false
-					
-					for jump_off_candidates.bodies do
-						can_jump = true
-					end
-					
-					if can_jump then
-						local target_body = message.subject.physics.body
-						target_body:ApplyLinearImpulse(b2Vec2(0, 3), target_body:GetWorldCenter()) 
-					end
-				end
+				get_self(message.subject):jump()
+			else 
+				return true
 			end
+			
+			return false
+		end,
+		
+		[scriptable_component.LOOP] = function (subject) 
+			render_system:push_line(debug_line(subject.transform.current.pos + get_self(subject).foot_sensor_p1, subject.transform.current.pos + get_self(subject).foot_sensor_p2, rgba(255, 0, 0, 255)))
 		end
 	}
 }
 
-player = create_entity_group {
+player = spawn_npc {
 	body = {
-		physics = {
-			body_type = Box2D.b2_dynamicBody,
-			
-			body_info = {
-				shape_type = physics_info.RECT,
-				radius = 60,
-				--rect_size = vec2(30, 30),
-				filter = filter_objects,
-				density = 1,
-				friction = 1,
-				
-				--,
-				fixed_rotation = true
-			}	
-		},
-		
 		render = {
-			model = player_sprite,
-			layer = render_layers.OBJECTS
+			model = player_sprite
 		},
 		
 		transform = {
 			pos = vec2(100, -50)
 		},
 		
-		movement = {
-			input_acceleration = vec2(10000, 10000),
-			max_speed = 1000,
-			max_speed_animation = 2300,
-			
-			receivers = {},
-			
-			force_offset = vec2(0, 5)
-			
-			--receivers = {
-			--	{ target = "body", stop_at_zero_movement = false }, 
-			--	{ target = "legs", stop_at_zero_movement = true  }
-			--}
-		},
-		
 		input = {
 			--intent_message.MOVE_FORWARD,
 			--intent_message.MOVE_BACKWARD,
-			custom_intents.JUMP
+			custom_intents.JUMP,
 			intent_message.MOVE_LEFT,
 			intent_message.MOVE_RIGHT
+		},
+		
+		scriptable = {
+			available_scripts = player_scriptable_info
 		}
 	}
 }
+
+
+get_self(player.body):set_foot_sensor_from_sprite(player_sprite, 5)
