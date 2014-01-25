@@ -170,7 +170,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>OpenGL32.lib;Ws2_32.lib;dwmapi.lib;Gdiplus.lib;sfml-audio-s.lib;sfml-system-s.lib;sndfile.lib;openal32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OpenGL32.lib;Ws2_32.lib;dwmapi.lib;Gdiplus.lib;sfml-main.lib;sfml-audio-s.lib;sfml-system-s.lib;openal32.lib;sndfile.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -1446,6 +1446,87 @@
     <ClInclude Include="3rdparty\polypartition\polypartition.h" />
     <ClInclude Include="3rdparty\readdir\_stdafx.h" />
     <ClInclude Include="3rdparty\readdir\targetver.h" />
+    <ClInclude Include="3rdparty\SFML\Audio.hpp" />
+    <ClInclude Include="3rdparty\SFML\Audio\Export.hpp" />
+    <ClInclude Include="3rdparty\SFML\Audio\Listener.hpp" />
+    <ClInclude Include="3rdparty\SFML\Audio\Music.hpp" />
+    <ClInclude Include="3rdparty\SFML\Audio\Sound.hpp" />
+    <ClInclude Include="3rdparty\SFML\Audio\SoundBuffer.hpp" />
+    <ClInclude Include="3rdparty\SFML\Audio\SoundBufferRecorder.hpp" />
+    <ClInclude Include="3rdparty\SFML\Audio\SoundRecorder.hpp" />
+    <ClInclude Include="3rdparty\SFML\Audio\SoundSource.hpp" />
+    <ClInclude Include="3rdparty\SFML\Audio\SoundStream.hpp" />
+    <ClInclude Include="3rdparty\SFML\Config.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\BlendMode.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\CircleShape.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\Color.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\ConvexShape.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\Drawable.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\Export.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\Font.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\Glyph.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\Image.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\PrimitiveType.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\Rect.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\RectangleShape.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\RenderStates.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\RenderTarget.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\RenderTexture.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\RenderWindow.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\Shader.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\Shape.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\Sprite.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\Text.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\Texture.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\Transform.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\Transformable.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\Vertex.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\VertexArray.hpp" />
+    <ClInclude Include="3rdparty\SFML\Graphics\View.hpp" />
+    <ClInclude Include="3rdparty\SFML\Network.hpp" />
+    <ClInclude Include="3rdparty\SFML\Network\Export.hpp" />
+    <ClInclude Include="3rdparty\SFML\Network\Ftp.hpp" />
+    <ClInclude Include="3rdparty\SFML\Network\Http.hpp" />
+    <ClInclude Include="3rdparty\SFML\Network\IpAddress.hpp" />
+    <ClInclude Include="3rdparty\SFML\Network\Packet.hpp" />
+    <ClInclude Include="3rdparty\SFML\Network\Socket.hpp" />
+    <ClInclude Include="3rdparty\SFML\Network\SocketHandle.hpp" />
+    <ClInclude Include="3rdparty\SFML\Network\SocketSelector.hpp" />
+    <ClInclude Include="3rdparty\SFML\Network\TcpListener.hpp" />
+    <ClInclude Include="3rdparty\SFML\Network\TcpSocket.hpp" />
+    <ClInclude Include="3rdparty\SFML\Network\UdpSocket.hpp" />
+    <ClInclude Include="3rdparty\SFML\OpenGL.hpp" />
+    <ClInclude Include="3rdparty\SFML\System.hpp" />
+    <ClInclude Include="3rdparty\SFML\System\Clock.hpp" />
+    <ClInclude Include="3rdparty\SFML\System\Err.hpp" />
+    <ClInclude Include="3rdparty\SFML\System\Export.hpp" />
+    <ClInclude Include="3rdparty\SFML\System\InputStream.hpp" />
+    <ClInclude Include="3rdparty\SFML\System\Lock.hpp" />
+    <ClInclude Include="3rdparty\SFML\System\Mutex.hpp" />
+    <ClInclude Include="3rdparty\SFML\System\NonCopyable.hpp" />
+    <ClInclude Include="3rdparty\SFML\System\Sleep.hpp" />
+    <ClInclude Include="3rdparty\SFML\System\String.hpp" />
+    <ClInclude Include="3rdparty\SFML\System\Thread.hpp" />
+    <ClInclude Include="3rdparty\SFML\System\ThreadLocal.hpp" />
+    <ClInclude Include="3rdparty\SFML\System\ThreadLocalPtr.hpp" />
+    <ClInclude Include="3rdparty\SFML\System\Time.hpp" />
+    <ClInclude Include="3rdparty\SFML\System\Utf.hpp" />
+    <ClInclude Include="3rdparty\SFML\System\Vector2.hpp" />
+    <ClInclude Include="3rdparty\SFML\System\Vector3.hpp" />
+    <ClInclude Include="3rdparty\SFML\Window.hpp" />
+    <ClInclude Include="3rdparty\SFML\Window\Context.hpp" />
+    <ClInclude Include="3rdparty\SFML\Window\ContextSettings.hpp" />
+    <ClInclude Include="3rdparty\SFML\Window\Event.hpp" />
+    <ClInclude Include="3rdparty\SFML\Window\Export.hpp" />
+    <ClInclude Include="3rdparty\SFML\Window\GlResource.hpp" />
+    <ClInclude Include="3rdparty\SFML\Window\Joystick.hpp" />
+    <ClInclude Include="3rdparty\SFML\Window\Keyboard.hpp" />
+    <ClInclude Include="3rdparty\SFML\Window\Mouse.hpp" />
+    <ClInclude Include="3rdparty\SFML\Window\VideoMode.hpp" />
+    <ClInclude Include="3rdparty\SFML\Window\Window.hpp" />
+    <ClInclude Include="3rdparty\SFML\Window\WindowHandle.hpp" />
+    <ClInclude Include="3rdparty\SFML\Window\WindowStyle.hpp" />
     <ClInclude Include="augmentations.h" />
     <ClInclude Include="entity_system\component.h" />
     <ClInclude Include="entity_system\entity.h" />
@@ -1536,6 +1617,13 @@
     <ClInclude Include="window_framework\window.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="3rdparty\SFML\Graphics\Rect.inl" />
+    <None Include="3rdparty\SFML\System\String.inl" />
+    <None Include="3rdparty\SFML\System\Thread.inl" />
+    <None Include="3rdparty\SFML\System\ThreadLocalPtr.inl" />
+    <None Include="3rdparty\SFML\System\Utf.inl" />
+    <None Include="3rdparty\SFML\System\Vector2.inl" />
+    <None Include="3rdparty\SFML\System\Vector3.inl" />
     <None Include="scripts\entity_creation_util.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

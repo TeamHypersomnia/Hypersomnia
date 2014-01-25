@@ -49,7 +49,7 @@ struct dummy_GL {
 #include "graphics/fbo.h"
 #include "graphics/shader.h"
 
-#include "utility/vector_wrapper.h"
+#include "utility/ptr_wrapper.h"
 #include <luabind/tag_function.hpp>
 
 

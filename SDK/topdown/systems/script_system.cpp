@@ -16,6 +16,7 @@
 
 #include "utility/randval.h"
 #include "utility/vector_wrapper.h"
+#include "utility/ptr_wrapper.h"
 #include "../resources/scriptable_info.h"
 
 void set_world_reloading_script(resources::script* new_scr) {
