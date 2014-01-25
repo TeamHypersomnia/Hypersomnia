@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "ptr_wrapper.h"
 
 namespace augmentations {
 	namespace util {
@@ -16,12 +17,12 @@ namespace augmentations {
 				raw.push_back(v);
 			}
 
-			value* data() {
+			ptr_wrapper<value> data() {
 				return raw.data();
 			}
 
 			static luabind::scope bind(const char* name) {
-				return luabind::class_<vector_wrapper<value>>(name)
+				return luabind::class_<vector_wrapper<value>>("float_vector")
 					.def(luabind::constructor<>())
 					.def("add", &add)
 					.def("push_back", &push_back)
