@@ -391,7 +391,8 @@ my_npc_archetype = {
 				linear_damping = 18,
 				
 				fixed_rotation = true,
-				density = 0.1
+				density = 0.1,
+				max_speed = 4300
 			},
 		},
 		
@@ -422,8 +423,7 @@ my_npc_archetype = {
 		},
 		
 		movement = {
-			input_acceleration = vec2(50000, 50000),
-			max_speed = 4300
+			input_acceleration = vec2(50000, 50000)
 		},
 		
 		steering = {

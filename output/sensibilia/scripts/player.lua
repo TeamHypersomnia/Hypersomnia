@@ -60,4 +60,4 @@ player = spawn_npc {
 }
 
 
-get_self(player.body):set_foot_sensor_from_sprite(player_sprite, 10)
+get_self(player.body):set_foot_sensor_from_sprite(player_sprite, 3)

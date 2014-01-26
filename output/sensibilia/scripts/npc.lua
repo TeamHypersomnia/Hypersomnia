@@ -5,7 +5,9 @@ function npc_class:initialize(subject_entity)
 	self.entity = subject_entity
 	self.foot_sensor_p1 = vec2(0, 0)
 	self.foot_sensor_p2 = vec2(0, 0)
+	
 	self.is_jumping = false
+	self.something_under_foot = false
 end
 	
 function npc_class:jump(jump_flag)
@@ -13,36 +15,41 @@ function npc_class:jump(jump_flag)
 end
 
 function npc_class:loop()
-
+	-- determine if something is under foot 
+	local pos = self.entity.transform.current.pos
+	
+	local query_rect_p1 = pos + self.foot_sensor_p1
+	local query_rect_p2 = pos + self.foot_sensor_p2
+	local query_rect = vec2_vector()
+	
+	add_vals(query_rect, { 
+		query_rect_p1,
+		vec2(query_rect_p2.x, query_rect_p1.y),
+		query_rect_p2,
+		vec2(query_rect_p1.x, query_rect_p2.y)
+	})
+		
+		
+	local under_foot_candidates = physics_system:query_polygon(query_rect, create(b2Filter, filter_npc_feet), self.entity)
+	
+	self.something_under_foot = false
+	
+	for candidate in under_foot_candidates.bodies do
+		self.something_under_foot = true
+	end
+	
+	if self.something_under_foot then
+		-- if there is, apply no gravity, simulate feet resistance
+		self.entity.physics.body:SetGravityScale(0)
+	else
+		self.entity.physics.body:SetGravityScale(1)
+	end
+		
 	-- perform jumping 
 	if self.is_jumping and self.jump_timer:get_milliseconds() > 100 then
-		
-		local pos = self.entity.transform.current.pos
-		
-		local query_rect_p1 = pos + self.foot_sensor_p1
-		local query_rect_p2 = pos + self.foot_sensor_p2
-		local query_rect = vec2_vector()
-		
-		add_vals(query_rect, { 
-			query_rect_p1,
-			vec2(query_rect_p2.x, query_rect_p1.y),
-			query_rect_p2,
-			vec2(query_rect_p1.x, query_rect_p2.y)
-		})
-		
-		local jump_off_candidates = physics_system:query_polygon(query_rect, create(b2Filter, filter_npc_feet), self.entity)
-		
-		local can_jump = false
-		print "\nCollisions:\n"
-		for candidate in jump_off_candidates.bodies do
-			print (body_to_entity(candidate).name)
-			can_jump = true
-		end
-		
-		if can_jump then
-			local target_body = self.entity.physics.body
-			target_body:ApplyLinearImpulse(b2Vec2(0, -50), target_body:GetWorldCenter(), true)
-			print("CAN JUMP!!!!")
+		if self.something_under_foot then
+			local body = self.entity.physics.body
+			body:ApplyLinearImpulse(b2Vec2(0, -50), body:GetWorldCenter(), true)
 		end
 		
 		self.jump_timer:reset()
@@ -65,8 +72,7 @@ npc_group_archetype = {
 				--rect_size = vec2(30, 30),
 				filter = filter_objects,
 				density = 1,
-				friction = 1,
-				
+				friction = 0,
 				--,
 				fixed_rotation = true
 			}	
@@ -79,8 +85,7 @@ npc_group_archetype = {
 		transform = {},
 		
 		movement = {
-			input_acceleration = vec2(6000, 0),
-			--max_speed = 1000,
+			input_acceleration = vec2(3000, 0),
 			max_speed_animation = 2300,
 			
 			receivers = {},

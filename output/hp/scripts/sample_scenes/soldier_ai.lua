@@ -244,6 +244,7 @@ character_archetype = {
 				
 				angular_damping = 5,
 				linear_damping = 18,
+				max_speed = 3300,
 				
 				fixed_rotation = true,
 				density = 0.1
@@ -283,7 +284,6 @@ character_archetype = {
 		
 		movement = {
 			input_acceleration = vec2(30000, 30000),
-			max_speed = 3300,
 			max_speed_animation = 2300,
 			
 			receivers = {

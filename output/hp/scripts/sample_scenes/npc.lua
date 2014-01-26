@@ -11,7 +11,7 @@ npc_class = {
 }
 
 function set_max_speed(entity, max_speed_val)
-	entity.movement.max_speed = max_speed_val
+	entity.physics.body:SetMaximumLinearVelocity(max_speed_val / 50)
 	entity.steering.max_resultant_force = max_speed_val
 end
 
