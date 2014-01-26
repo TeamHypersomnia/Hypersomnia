@@ -5,10 +5,17 @@ function npc_class:initialize(subject_entity)
 	self.entity = subject_entity
 	self.foot_sensor_p1 = vec2(0, 0)
 	self.foot_sensor_p2 = vec2(0, 0)
+	self.is_jumping = false
 end
 	
-function npc_class:jump() 
-	if self.jump_timer:get_milliseconds() > 100 then
+function npc_class:jump(jump_flag)
+	self.is_jumping = jump_flag
+end
+
+function npc_class:loop()
+
+	-- perform jumping 
+	if self.is_jumping and self.jump_timer:get_milliseconds() > 100 then
 		
 		local pos = self.entity.transform.current.pos
 		
@@ -34,7 +41,7 @@ function npc_class:jump()
 		
 		if can_jump then
 			local target_body = self.entity.physics.body
-			target_body:ApplyLinearImpulse(b2Vec2(0, -100), target_body:GetWorldCenter(), true)
+			target_body:ApplyLinearImpulse(b2Vec2(0, -50), target_body:GetWorldCenter(), true)
 			print("CAN JUMP!!!!")
 		end
 		
@@ -43,8 +50,8 @@ function npc_class:jump()
 end
 
 function npc_class:set_foot_sensor_from_sprite(subject_sprite, thickness) 
-	self.foot_sensor_p1 = vec2(-subject_sprite.size.x / 2, subject_sprite.size.y / 2)
-	self.foot_sensor_p2 = vec2( subject_sprite.size.x / 2, subject_sprite.size.y / 2 + thickness) 
+	self.foot_sensor_p1 = vec2(-subject_sprite.size.x / 2 - 5, subject_sprite.size.y / 2)
+	self.foot_sensor_p2 = vec2( subject_sprite.size.x / 2 + 5, subject_sprite.size.y / 2 + thickness) 
 end
 
 npc_group_archetype = {
@@ -72,8 +79,8 @@ npc_group_archetype = {
 		transform = {},
 		
 		movement = {
-			input_acceleration = vec2(10000, 10000),
-			max_speed = 1000,
+			input_acceleration = vec2(6000, 0),
+			--max_speed = 1000,
 			max_speed_animation = 2300,
 			
 			receivers = {},
