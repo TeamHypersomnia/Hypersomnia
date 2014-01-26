@@ -13,7 +13,7 @@
 namespace topdown {
 	physics_info::physics_info() 
 		: rect_size(augmentations::vec2<>()), type(RECT), density(1.f), angular_damping(0.f), linear_damping(0.f), fixed_rotation(false), sensor(false), restitution(0.f), friction(0.f),
-		body_type(b2_dynamicBody), radius(0.f)
+		body_type(b2_dynamicBody), radius(0.f), max_speed(-1)
 		{
 	}
 
@@ -141,6 +141,7 @@ namespace topdown {
 		body->SetAngularDamping(body_data.angular_damping);
 		body->SetLinearDamping(body_data.linear_damping);
 		body->SetFixedRotation(body_data.fixed_rotation);
+		body->SetMaximumLinearVelocity(body_data.max_speed * PIXELS_TO_METERSf);
 
 		subject.add(physics_component);
 	}

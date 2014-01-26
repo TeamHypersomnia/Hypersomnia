@@ -27,7 +27,7 @@ namespace topdown {
 
 		int body_type;
 
-		float density, friction, restitution, angular_damping, linear_damping, radius;
+		float density, friction, restitution, angular_damping, linear_damping, radius, max_speed;
 		bool fixed_rotation, sensor;
 
 		void add_convex(const std::vector < augmentations::vec2 < >> &);

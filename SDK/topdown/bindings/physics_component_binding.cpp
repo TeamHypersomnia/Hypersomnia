@@ -88,6 +88,7 @@ namespace bindings {
 			.def("ApplyLinearImpulse", &b2Body::ApplyLinearImpulse)
 			.def("GetWorldCenter", &b2Body::GetWorldCenter)
 			.def("SetFixedRotation", &b2Body::SetFixedRotation)
+			.def("SetGravityScale", &b2Body::SetGravityScale)
 			.def("SetLinearDamping", &b2Body::SetLinearDamping)
 			.def("SetLinearVelocity", &b2Body::SetLinearVelocity)
 			.def("SetAngularDamping", &b2Body::GetAngularDamping)
@@ -95,6 +96,7 @@ namespace bindings {
 			.def("ApplyTorque", &b2Body::ApplyTorque)
 			.def("GetLinearVelocity", &b2Body::GetLinearVelocity)
 			.def("GetAngularVelocity", &b2Body::GetAngularVelocity)
+			.def("SetMaximumLinearVelocity", &b2Body::SetMaximumLinearVelocity)
 			.def("SetTransform", &b2Body::SetTransform)
 			.def("GetPosition", &b2Body::GetPosition)
 			);

@@ -54,8 +54,6 @@ void movement_system::substep(world& owner) {
 
 		if ((vel.x != 0.f || vel.y != 0.f) && movement.air_resistance > 0.f) 
 			physics.body->ApplyForce(movement.air_resistance * speed * speed * -vel, physics.body->GetWorldCenter(), true);
-		
-		physics.body->SetMaximumLinearVelocity(movement.max_speed * PIXELS_TO_METERSf);
 	}
 }
 
