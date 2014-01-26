@@ -179,6 +179,17 @@ physics_system::query_output physics_system::query_body(augmentations::entity_sy
 	return total_output;
 }
 
+physics_system::query_output physics_system::query_polygon(const std::vector<vec2<>>& vertices, b2Filter* filter, void* ignore_userdata) {
+	b2PolygonShape poly_shape;
+	std::vector<b2Vec2> verts;
+
+	for (auto& v : vertices)
+		verts.push_back(PIXELS_TO_METERSf * b2Vec2(v.x, v.y));
+	
+	poly_shape.Set(verts.data(), verts.size());
+	return query_shape(&poly_shape, filter, ignore_userdata);
+}
+
 physics_system::query_output physics_system::query_shape(b2Shape* shape, b2Filter* filter, void* ignore_userdata) {
 	b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
 	

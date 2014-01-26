@@ -1,3 +1,6 @@
+METERS_TO_PIXELS = 50
+PIXELS_TO_METERS = 1/METERS_TO_PIXELS
+
 table.inspect = require("inspect")
 
 function debug.my_traceback() 

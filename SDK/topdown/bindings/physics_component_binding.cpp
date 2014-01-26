@@ -65,6 +65,7 @@ namespace bindings {
 			.def("query_aabb", (physics_system::query_output (__thiscall physics_system::*) (vec2<>, vec2<>, b2Filter*, entity*))(&physics_system::query_aabb_px))
 			.def("query_body", (physics_system::query_output(__thiscall physics_system::*) (entity& subject, b2Filter*, entity*)) (&physics_system::query_body))
 			.def("query_shape", (physics_system::query_output(__thiscall physics_system::*) (b2Shape*, b2Filter*, entity*)) (&physics_system::query_shape))
+			.def("query_polygon", (physics_system::query_output(__thiscall physics_system::*) (const std::vector<vec2<>>&, b2Filter*, entity*)) (&physics_system::query_polygon))
 			.def("push_away_from_walls", &physics_system::push_away_from_walls)
 			.enum_("constants")[
 				luabind::value("PIXELS_TO_METERS", PIXELS_TO_METERSf),

@@ -77,6 +77,7 @@ public:
 
 	query_output query_body(augmentations::entity_system::entity&, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
 
+	query_output query_polygon(const std::vector<vec2<>>& vertices, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
 	query_output query_shape(b2Shape*, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
 private:
 	/* callback structure used in QueryAABB function to get all shapes near-by */

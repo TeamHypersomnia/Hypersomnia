@@ -138,6 +138,7 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			luabind::class_<ptr_wrapper<float>>("float_ptr"),
 
 			util::vector_wrapper<float>::bind("float_vector"),
+			util::vector_wrapper<vec2<>>::bind_vector("vec2_vector"),
 		
 			bindings::_sfml_audio(),
 			bindings::_minmax(),

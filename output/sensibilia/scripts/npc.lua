@@ -11,7 +11,19 @@ function npc_class:jump()
 	if self.jump_timer:get_milliseconds() > 100 then
 		
 		local pos = self.entity.transform.current.pos
-		local jump_off_candidates = physics_system:query_aabb(pos + self.foot_sensor_p1, pos + self.foot_sensor_p2, create(b2Filter, filter_npc_feet), self.entity)
+		
+		local query_rect_p1 = pos + self.foot_sensor_p1
+		local query_rect_p2 = pos + self.foot_sensor_p2
+		local query_rect = vec2_vector()
+		
+		add_vals(query_rect, { 
+			query_rect_p1,
+			vec2(query_rect_p2.x, query_rect_p1.y),
+			query_rect_p2,
+			vec2(query_rect_p1.x, query_rect_p2.y)
+		})
+		
+		local jump_off_candidates = physics_system:query_polygon(query_rect, create(b2Filter, filter_npc_feet), self.entity)
 		
 		local can_jump = false
 		print "\nCollisions:\n"

@@ -9,11 +9,6 @@ namespace bindings {
 	luabind::scope _polygon() {
 		return 	
 			(
-			luabind::class_<basic_polygon>("basic_polygon")
-			.def(luabind::constructor<>())
-			.def("add_vertex", (void (basic_polygon::*)(const vec2<>&))&basic_polygon::push_back)
-			,
-			
 			luabind::class_<vertex>("vertex")
 			.def(luabind::constructor<vec2<>>())
 			.def(luabind::constructor<vec2<>, vec2<>, graphics::pixel_32, texture_baker::texture*>())

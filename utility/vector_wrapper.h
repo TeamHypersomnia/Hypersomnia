@@ -22,11 +22,18 @@ namespace augmentations {
 			}
 
 			static luabind::scope bind(const char* name) {
-				return luabind::class_<vector_wrapper<value>>("float_vector")
+				return luabind::class_<vector_wrapper<value>>(name)
 					.def(luabind::constructor<>())
 					.def("add", &add)
 					.def("push_back", &push_back)
 					.def("data", &data);
+			}
+
+			static luabind::scope bind_vector(const char* name) {
+				return luabind::class_<std::vector<value>>(name)
+					.def(luabind::constructor<>())
+					.def("add", (void (__thiscall std::vector<value>::*) (const value&))(&std::vector<value>::push_back))
+					.def("data", (value* (__thiscall std::vector<value>::*) ()) (&std::vector<value>::data));
 			}
 		};
 	}
