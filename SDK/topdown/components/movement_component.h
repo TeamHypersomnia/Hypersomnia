@@ -21,7 +21,7 @@ namespace components {
 		bool moving_left, moving_right, moving_forward, moving_backward;
 		augmentations::vec2<> input_acceleration, force_offset;
 		
-		bool inverse_thrust_brake;
+		augmentations::vec2<> inverse_thrust_brake;
 
 		float air_resistance;
 
@@ -33,9 +33,12 @@ namespace components {
 		float axis_rotation_degrees;
 		float axis_speed_constraint;
 
+		float thrust_parallel_to_ground_length;
+		b2Filter ground_filter;
+
 		movement(augmentations::vec2<> acceleration = augmentations::vec2<>(), float air_resistance = 0.f) 
 			: input_acceleration(input_acceleration), air_resistance(air_resistance), braking_damping(-1.f), max_speed(-1.f), max_speed_animation(0.f), 
-			axis_rotation_degrees(0.f), axis_speed_constraint(-1.f), inverse_thrust_brake(false) {
+			axis_rotation_degrees(0.f), axis_speed_constraint(-1.f), thrust_parallel_to_ground_length(0.f) {
 			moving_left = moving_right = moving_forward = moving_backward = false;
 		}
 	};

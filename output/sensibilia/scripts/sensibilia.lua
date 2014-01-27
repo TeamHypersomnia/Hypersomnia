@@ -32,13 +32,13 @@ environment_archetype = {
 }
 
 ground_poly = simple_create_polygon (reversed {
-	vec2(0, 500) + vec2(-800, 0),
-	vec2(0, 500) + vec2(500, 0),
-	vec2(0, 500) + vec2(900, -200),
-	vec2(0, 500) + vec2(1400, -300),
-	vec2(0, 500) + vec2(3000, -300),
-	vec2(0, 500) + vec2(3000, 200),
-	vec2(0, 500) + vec2(-800, 200)
+	(vec2(0, 10) + vec2(-800, 0)) 		* vec2(10, 25) ,
+	(vec2(0, 10) + vec2(500, 0))		* vec2(10, 25) ,
+	(vec2(0, 10) + vec2(900, -200))	* vec2(10, 25) ,
+	(vec2(0, 10) + vec2(1400, -300))	* vec2(10, 25) ,
+	(vec2(0, 10) + vec2(3000, -300))	* vec2(10, 25) ,
+	(vec2(0, 10) + vec2(3000, 200))	* vec2(10, 25) ,
+	(vec2(0, 10) + vec2(-800, 200))   *  vec2(10, 25) 
 })
 
 map_uv_square(ground_poly, images.blank)

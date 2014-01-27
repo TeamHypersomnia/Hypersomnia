@@ -61,3 +61,7 @@ player = spawn_npc {
 
 
 get_self(player.body):set_foot_sensor_from_sprite(player_sprite, 3)
+--get_self(player.body):set_foot_sensor_from_circle(60, 6)
+world_camera.chase:set_target(player.body)
+world_camera.camera.player:set(player.body)
+--world_camera.camera.crosshair:set(player.crosshair:get())

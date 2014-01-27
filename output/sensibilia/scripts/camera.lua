@@ -36,7 +36,7 @@ camera_archetype = {
 		
 		enable_smoothing = true,
 		smoothing_average_factor = 0.5,
-		averages_per_sec = 20,
+		averages_per_sec = 5,
 		
 		crosshair = nil, 
 		player = nil,

@@ -30,7 +30,8 @@ function set_components_from_entry(entity, entry, entities_lookup)
 			end
 		end
 		
-		rewrite(movement, entry.movement)
+		rewrite(movement, entry.movement, { ground_filter = true } )
+		recursive_write(movement.ground_filter, entry.movement.ground_filter)
 	end
 	
 	function def(module_name, property_name, omit_properties) 
