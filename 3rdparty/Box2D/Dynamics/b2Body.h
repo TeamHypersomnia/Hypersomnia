@@ -288,6 +288,9 @@ public:
 	/// Set the linear damping of the body.
 	void SetLinearDamping(float32 linearDamping);
 
+	/// Set the linear damping of the body.
+	void SetLinearDampingVec(b2Vec2 linearDamping);
+
 	/// Get the angular damping of the body.
 	float32 GetAngularDamping() const;
 
@@ -460,6 +463,8 @@ public:
 	float32 m_I, m_invI;
 
 	float32 m_linearDamping;
+	b2Vec2 m_linearDampingVec;
+
 	float32 m_angularDamping;
 	float32 m_gravityScale;
 
@@ -597,6 +602,11 @@ inline float32 b2Body::GetLinearDamping() const
 inline void b2Body::SetLinearDamping(float32 linearDamping)
 {
 	m_linearDamping = linearDamping;
+}
+
+inline void b2Body::SetLinearDampingVec(b2Vec2 linearDampingVec)
+{
+	m_linearDampingVec = linearDampingVec;
 }
 
 inline float32 b2Body::GetAngularDamping() const

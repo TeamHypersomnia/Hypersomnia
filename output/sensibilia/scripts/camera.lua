@@ -70,7 +70,7 @@ void main()
 
 film_grain_fragment_shader = GLSL_shader(GL.GL_FRAGMENT_SHADER, [[
 #version 330
-uniform float time;
+uniform int time;
 
 // A single iteration of Bob Jenkins' One-At-A-Time hashing algorithm.
 uint hash( uint x ) {
@@ -212,7 +212,7 @@ world_camera = create_entity (archetyped(camera_archetype, {
 			renderer:clear_triangles()
 			
 			film_grain_program:use()
-			GL.glUniform1f(time_uniform, my_timer:get_milliseconds())
+			GL.glUniform1i(time_uniform, my_timer:get_milliseconds()/50)
 			
 			GL.glBegin(GL.GL_QUADS)	
 				GL.glVertexAttrib2f(0,1,1);

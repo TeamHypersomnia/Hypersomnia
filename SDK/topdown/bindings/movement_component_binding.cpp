@@ -18,6 +18,7 @@ namespace bindings {
 			.def_readwrite("input_acceleration", &movement::input_acceleration)
 			.def_readwrite("braking_damping", &movement::braking_damping)
 			.def_readwrite("max_speed_animation", &movement::max_speed_animation)
+			.def_readwrite("inverse_thrust_brake", &movement::inverse_thrust_brake)
 			.def_readwrite("max_speed", &movement::max_speed)
 			.def_readwrite("air_resistance", &movement::air_resistance);
 	}

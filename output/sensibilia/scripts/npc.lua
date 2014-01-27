@@ -41,8 +41,10 @@ function npc_class:loop()
 	if self.something_under_foot then
 		-- if there is, apply no gravity, simulate feet resistance
 		self.entity.physics.body:SetGravityScale(0)
+		--self.entity.movement.input_acceleration.x = 10000
 	else
-		self.entity.physics.body:SetGravityScale(1)
+		--self.entity.movement.input_acceleration.x = 15000
+		self.entity.physics.body:SetGravityScale(1.2)
 	end
 		
 	-- perform jumping 
@@ -73,6 +75,7 @@ npc_group_archetype = {
 				filter = filter_objects,
 				density = 1,
 				friction = 0,
+				
 				--,
 				fixed_rotation = true
 			}	
@@ -85,8 +88,10 @@ npc_group_archetype = {
 		transform = {},
 		
 		movement = {
-			input_acceleration = vec2(3000, 0),
+			input_acceleration = vec2(10000, 0),
 			max_speed_animation = 2300,
+			air_resistance = 0.1,
+			inverse_thrust_brake = true,
 			
 			receivers = {},
 			

@@ -214,6 +214,8 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 			// Pade approximation:
 			// v2 = v1 * 1 / (1 + c * dt)
 			v *= 1.0f / (1.0f + h * b->m_linearDamping);
+			v.x *= 1.0f / (1.0f + h * b->m_linearDampingVec.x);
+			v.x *= 1.0f / (1.0f + h * b->m_linearDampingVec.y);
 			w *= 1.0f / (1.0f + h * b->m_angularDamping);
 		}
 
