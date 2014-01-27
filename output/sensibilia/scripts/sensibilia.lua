@@ -97,8 +97,57 @@ create_entity {
 	}	
 }
 
+global_sprites = {}
+
+swing_script = create_scriptable_info {
+	scripted_events = {
+		[scriptable_component.LOOP] = function(subject)
+			subject.physics.body:SetGravityScale(randval(-0.01, 0.01))
+			subject.physics.body:ApplyTorque(randval(-0.1, 0.1), true)
+		end
+	}
+}
+
+for i = 1, 70 do
+	local my_sprite = create_sprite {
+		image = images.blank,
+		color = rgba(0, 255, 0, 125),
+		size = vec2(randval(100, 6000), randval(100, 1000))
+	}
+	
+	table.insert(global_sprites, my_sprite)
+
+	local new_entity = create_entity(archetyped(environment_archetype, {
+		transform = {
+			pos = vec2(randval(-8000, 8000), randval(-16000, 1000)),
+			rotation = randval(0, 360)
+		},
+		
+		physics = {
+			body_type = Box2D.b2_staticBody,
+			
+			body_info = {
+				shape_type = physics_info.RECT,
+				density = randval(0.05, 2),
+				restitution = randval(0.00, 0.01)
+			}
+		},
+		
+		render = {
+			model = my_sprite
+		},
+		
+		scriptable = {
+			available_scripts = swing_script
+		}
+	}))
+	
+
+end
+
+
 
 player.body.name = "player_body"
 environment_entity.name = "environment_entity"
 
-physics_system.b2world:SetGravity(b2Vec2(0, 100))
+physics_system.b2world:SetGravity(b2Vec2(0, 120))

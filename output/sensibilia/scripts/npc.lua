@@ -53,7 +53,7 @@ function npc_class:loop()
 	if self.is_jumping and self.jump_timer:get_milliseconds() > 100 then
 		if self.something_under_foot then
 			local body = self.entity.physics.body
-			body:ApplyLinearImpulse(b2Vec2(0, -50), body:GetWorldCenter(), true)
+			body:ApplyLinearImpulse(b2Vec2(0, -150), body:GetWorldCenter(), true)
 		end
 		
 		self.jump_timer:reset()

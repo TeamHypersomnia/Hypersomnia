@@ -212,7 +212,7 @@ world_camera = create_entity (archetyped(camera_archetype, {
 			renderer:clear_triangles()
 			
 			film_grain_program:use()
-			GL.glUniform1i(time_uniform, my_timer:get_milliseconds()/50)
+			GL.glUniform1i(time_uniform, my_timer:get_milliseconds())
 			
 			GL.glBegin(GL.GL_QUADS)	
 				GL.glVertexAttrib2f(0,1,1);
