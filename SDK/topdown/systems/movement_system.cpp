@@ -45,7 +45,7 @@ void movement_system::substep(world& owner) {
 		
 		b2Vec2 vel = physics.body->GetLinearVelocity();
 
-		if (movement.inverse_thrust_brake && resultant.x == 0.f && std::abs(vel.x) > 0.f) {
+		if (movement.inverse_thrust_brake && std::abs(resultant.x) < b2_epsilon && std::abs(vel.x) > b2_epsilon) {
 			physics.body->SetLinearDampingVec(b2Vec2(movement.input_acceleration.x * PIXELS_TO_METERSf / 20.f, 0));
 			//resultant.x 
 			//if (vel.x < b2_epsilon) 

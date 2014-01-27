@@ -40,7 +40,7 @@ function npc_class:loop()
 	
 	if self.something_under_foot then
 		-- if there is, apply no gravity, simulate feet resistance
-		self.entity.physics.body:SetGravityScale(0)
+		self.entity.physics.body:SetGravityScale(0.0)
 		--self.entity.movement.input_acceleration.x = 10000
 	else
 		--self.entity.movement.input_acceleration.x = 15000
@@ -74,7 +74,7 @@ npc_group_archetype = {
 				--rect_size = vec2(30, 30),
 				filter = filter_objects,
 				density = 1,
-				friction = 0,
+				friction = 2,
 				
 				--,
 				fixed_rotation = true
