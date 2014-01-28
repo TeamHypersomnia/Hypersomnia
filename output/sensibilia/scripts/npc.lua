@@ -40,20 +40,20 @@ function npc_class:loop()
 	
 	if self.something_under_foot then
 		-- if there is, apply no gravity, simulate feet resistance
-		self.entity.physics.body:SetGravityScale(0.2)
+		self.entity.physics.body:SetGravityScale(0.0)
 		self.entity.movement.thrust_parallel_to_ground_length = 500
 		--self.entity.movement.input_acceleration.x = 10000
 	else
 		--self.entity.movement.input_acceleration.x = 15000
-		self.entity.physics.body:SetGravityScale(1.2)
-		self.entity.movement.thrust_parallel_to_ground_length = 150
+		self.entity.physics.body:SetGravityScale(1.0)
+		self.entity.movement.thrust_parallel_to_ground_length = 0
 	end
 		
 	-- perform jumping 
 	if self.is_jumping and self.jump_timer:get_milliseconds() > 100 then
 		if self.something_under_foot then
 			local body = self.entity.physics.body
-			body:ApplyLinearImpulse(b2Vec2(0, -150), body:GetWorldCenter(), true)
+			body:ApplyLinearImpulse(b2Vec2(0, -100), body:GetWorldCenter(), true)
 		end
 		
 		self.jump_timer:reset()
@@ -61,8 +61,8 @@ function npc_class:loop()
 end
 
 function npc_class:set_foot_sensor_from_sprite(subject_sprite, thickness) 
-	self.foot_sensor_p1 = vec2(-subject_sprite.size.x / 2, subject_sprite.size.y / 2)
-	self.foot_sensor_p2 = vec2( subject_sprite.size.x / 2, subject_sprite.size.y / 2 + thickness) 
+	self.foot_sensor_p1 = vec2(-subject_sprite.size.x / 2 + 1, subject_sprite.size.y / 2)
+	self.foot_sensor_p2 = vec2( subject_sprite.size.x / 2 - 1, subject_sprite.size.y / 2 + thickness) 
 end
 
 function npc_class:set_foot_sensor_from_circle(radius, thickness) 

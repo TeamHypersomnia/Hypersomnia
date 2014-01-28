@@ -47,8 +47,22 @@ void movement_system::substep(world& owner) {
 		
 		b2Vec2 vel = physics.body->GetLinearVelocity();
 
-		if (std::abs(resultant.x) < b2_epsilon && std::abs(vel.x) > b2_epsilon) {
-			physics.body->SetLinearDampingVec(movement.inverse_thrust_brake * PIXELS_TO_METERSf);
+		float ground_angle = 0.f;
+
+		if (movement.thrust_parallel_to_ground_length > 0.f) {
+			auto out = physics_sys.ray_cast(
+				physics.body->GetPosition(),
+				physics.body->GetPosition() + vec2<>::from_degrees(movement.axis_rotation_degrees + 90) * movement.thrust_parallel_to_ground_length * PIXELS_TO_METERSf,
+				movement.ground_filter, it);
+
+			//assert(out.hit);
+			if (out.hit)
+				ground_angle = out.normal.get_degrees() + 90;
+		}
+
+		//if (std::abs(resultant.x) < b2_epsilon && std::abs(vel.x) > b2_epsilon) {
+		if (std::abs(resultant.x) < b2_epsilon && vel.LengthSquared() > 0) {
+			physics.body->SetLinearDampingVec(vec2<>(movement.inverse_thrust_brake).rotate(ground_angle, vec2<>()) * PIXELS_TO_METERSf);
 			//resultant.x 
 			//if (vel.x < b2_epsilon) 
 			//	resultant.x = movement.input_acceleration.x;
@@ -70,16 +84,7 @@ void movement_system::substep(world& owner) {
 			if (movement.braking_damping >= 0.f)
 				physics.body->SetLinearDamping(0.f);
 			
-			if (movement.thrust_parallel_to_ground_length > 0.f) {
-				auto out = physics_sys.ray_cast(
-					physics.body->GetPosition(), 
-					physics.body->GetPosition() + vec2<>::from_degrees(movement.axis_rotation_degrees + 90) * movement.thrust_parallel_to_ground_length * PIXELS_TO_METERSf,
-					movement.ground_filter, it);
-
-				//assert(out.hit);
-				if (out.hit)
-					resultant.rotate(out.normal.get_degrees() + 90, vec2<>(0.f, 0.f));
-			}
+			resultant.rotate(ground_angle, vec2<>());
 
 			if (movement.axis_rotation_degrees != 0.f)
 				resultant.rotate(movement.axis_rotation_degrees, vec2<>(0, 0));

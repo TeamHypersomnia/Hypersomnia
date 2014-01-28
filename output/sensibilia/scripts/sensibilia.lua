@@ -108,7 +108,7 @@ swing_script = create_scriptable_info {
 	}
 }
 
-for i = 1, 70 do
+for i = 1, 30 do
 	local my_sprite = create_sprite {
 		image = images.blank,
 		color = rgba(0, 255, 0, 125),
