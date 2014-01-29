@@ -1,9 +1,0 @@
-string window_name example
-int fullscreen 0
-int window_border 0
-int window_x 0
-int window_y 0
-int bpp 24
-int resolution_w 800
-int resolution_h 800
-int doublebuffer 1
