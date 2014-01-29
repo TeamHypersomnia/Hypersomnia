@@ -34,10 +34,6 @@ render_system::render_system(window::glwindow& output_window)
 	glLoadIdentity();
 	glMatrixMode(GL_PROJECTION);
 
-	//glGenBuffers(1, &position_buffer);
-	//glGenBuffers(1, &texcoord_buffer);
-	//glGenBuffers(1, &color_buffer);
-
 	glGenBuffers(1, &triangle_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer);
 
@@ -48,9 +44,6 @@ render_system::render_system(window::glwindow& output_window)
 	glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(resources::vertex), 0);
 	glVertexAttribPointer(VERTEX_ATTRIBUTES::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(resources::vertex), (char*)(sizeof(float) * 2));
 	glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(resources::vertex), (char*) (sizeof(float) * 2 + sizeof(float) * 2));
-	//glEnableClientState(GL_VERTEX_ARRAY);
-	//glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	//glEnableClientState(GL_COLOR_ARRAY);
 }
 
 void render_system::generate_triangles(rects::xywh visible_area, components::transform::state camera_transform, int mask) {
@@ -90,21 +83,7 @@ void render_system::process_entities(world&) {
 }
 
 void render_system::call_triangles() {
-	//if (last_bound_buffer_location != triangles.data()) {
-	//	last_bound_buffer_location = triangles.data();
-	//glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(resources::vertex_triangle) * triangles.size(), triangles.data(), GL_STREAM_DRAW);
-
-		//glBindBuffer(GL_ARRAY_BUFFER, texcoord_buffer);
-		//glBufferData(GL_ARRAY_BUFFER, sizeof(resources::vertex) * triangles.size(), triangles.data(), GL_STREAM_DRAW);
-		//glBindBuffer(GL_ARRAY_BUFFER, color_buffer);
-		//glBufferData(GL_ARRAY_BUFFER, sizeof(resources::vertex) * triangles.size(), triangles.data(), GL_STREAM_DRAW);
-
-		//glVertexPointer(2, GL_FLOAT, sizeof(resources::vertex), last_bound_buffer_location);
-		//glTexCoordPointer(2, GL_FLOAT, sizeof(resources::vertex), (char*) (last_bound_buffer_location) +sizeof(float) * 2);
-		//glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(resources::vertex), (char*) (last_bound_buffer_location) +sizeof(float) * 2 + sizeof(float) * 2);
-	//}
-
 	glDrawArrays(GL_TRIANGLES, 0, triangles.size() * 3);
 }
 
@@ -126,7 +105,6 @@ resources::vertex_triangle& render_system::get_triangle(int i) {
 
 void render_system::draw_debug_info(components::transform::state camera_transform) {
 	if (draw_visibility) {
-		//glColor4f(1.f, 1.f, 1.f, 1.f);
 		glBegin(GL_TRIANGLES);
 		for (auto it : targets) {
 			auto* visibility = it->find<components::visibility>();
@@ -188,7 +166,6 @@ void render_system::cleanup() {
 }
 
 void render_system::default_render(rects::xywh visible_area) {
-	//scene_fbo.use();
 	augs::graphics::fbo::use_default();
 	glClear(GL_COLOR_BUFFER_BIT);
 
