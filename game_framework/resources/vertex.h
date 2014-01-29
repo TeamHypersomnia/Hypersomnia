@@ -3,9 +3,9 @@
 #include "math/vec2d.h"
 #include "../game/texture_helper.h"
 
-using namespace augmentations;
+using namespace augs;
 
-namespace augmentations {
+namespace augs {
 	namespace texture_baker {
 		class texture;
 	}

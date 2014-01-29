@@ -7,7 +7,7 @@
 
 #include <functional>
 
-using namespace augmentations;
+using namespace augs;
 using namespace entity_system;
 
 class physics_system : public processing_system_templated<components::physics, components::transform> {
@@ -75,7 +75,7 @@ public:
 	query_output query_aabb(vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
 	query_output query_aabb_px(vec2<> p1, vec2<> p2, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
 
-	query_output query_body(augmentations::entity_system::entity&, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
+	query_output query_body(augs::entity_system::entity&, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
 
 	query_output query_polygon(const std::vector<vec2<>>& vertices, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
 	query_output query_shape(b2Shape*, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);

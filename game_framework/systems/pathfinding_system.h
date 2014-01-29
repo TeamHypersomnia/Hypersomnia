@@ -6,7 +6,7 @@
 #include "../components/transform_component.h"
 #include "../components/physics_component.h"
 
-using namespace augmentations;
+using namespace augs;
 using namespace entity_system;
 
 class pathfinding_system : public processing_system_templated<components::transform, components::visibility, components::pathfinding, components::physics> {

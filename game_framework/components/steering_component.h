@@ -13,14 +13,14 @@ class physics_system;
 namespace components {
 	struct visibility;
 
-	struct steering : public augmentations::entity_system::component {
+	struct steering : public augs::entity_system::component {
 		struct behaviour_state;
 
 		struct object_info {
-			augmentations::vec2<> position, velocity, unit_vel;
+			augs::vec2<> position, velocity, unit_vel;
 			float speed, max_speed;
 
-			void set_velocity(augmentations::vec2<>);
+			void set_velocity(augs::vec2<>);
 			object_info();
 		};
 
@@ -31,7 +31,7 @@ namespace components {
 			visibility* vision;
 			std::vector<b2Vec2>* shape_verts;
 
-			augmentations::entity_system::entity* subject_entity;
+			augs::entity_system::entity* subject_entity;
 			
 			scene();
 		};
@@ -39,26 +39,26 @@ namespace components {
 		struct target_info {
 			object_info info;
 
-			augmentations::vec2<> direction;
+			augs::vec2<> direction;
 			float distance;
 
 			bool is_set;
 
 			target_info();
 
-			void set(const augmentations::entity_system::entity_ptr&);
-			void set(augmentations::vec2<> position, augmentations::vec2<> velocity = augmentations::vec2<>(0.f, 0.f));
+			void set(const augs::entity_system::entity_ptr&);
+			void set(augs::vec2<> position, augs::vec2<> velocity = augs::vec2<>(0.f, 0.f));
 
 			void calc_direction_distance(const object_info& subject);
 		};
 
 		struct behaviour {
-			augmentations::graphics::pixel_32 force_color;
+			augs::graphics::pixel_32 force_color;
 			float max_force_applied;
 			float weight;
 
 			behaviour();
-			virtual augmentations::vec2<> steer(scene) { return augmentations::vec2<>(); }
+			virtual augs::vec2<> steer(scene) { return augs::vec2<>(); }
 		};
 
 		struct directed : behaviour {
@@ -67,8 +67,8 @@ namespace components {
 
 			directed();
 
-			augmentations::vec2<> predict_interception(const object_info& subject, const target_info& target, bool flee_prediction);
-			virtual augmentations::vec2<> steer(scene) { return augmentations::vec2<>(); }
+			augs::vec2<> predict_interception(const object_info& subject, const target_info& target, bool flee_prediction);
+			virtual augs::vec2<> steer(scene) { return augs::vec2<>(); }
 		};
 
 		struct avoidance : behaviour {
@@ -79,7 +79,7 @@ namespace components {
 			avoidance();
 			
 			struct avoidance_info_output {
-				augmentations::vec2<> rightmost_line[2];
+				augs::vec2<> rightmost_line[2];
 				b2Vec2 avoidance[4];
 			} get_avoidance_info(const scene&);
 
@@ -87,21 +87,21 @@ namespace components {
 
 			void optional_align(scene& in);
 			float get_avoidance_length(const object_info& subject) const;
-			virtual augmentations::vec2<> steer(scene) { return augmentations::vec2<>(); }
+			virtual augs::vec2<> steer(scene) { return augs::vec2<>(); }
 		};
 
 		/* now the actual implementations */
 
 		struct seek : directed {
-			augmentations::vec2<> seek_to(const object_info& subject, const target_info& target) const;
+			augs::vec2<> seek_to(const object_info& subject, const target_info& target) const;
 
-			virtual augmentations::vec2<> steer(scene) override;
+			virtual augs::vec2<> steer(scene) override;
 		};
 
 		struct flee : directed {
-			augmentations::vec2<> flee_from(const object_info& subject, const target_info& target) const;
+			augs::vec2<> flee_from(const object_info& subject, const target_info& target) const;
 
-			virtual augmentations::vec2<> steer(scene) override;
+			virtual augs::vec2<> steer(scene) override;
 		};
 
 		struct wander : behaviour {
@@ -111,7 +111,7 @@ namespace components {
 			float displacement_degrees;
 
 			wander();
-			virtual augmentations::vec2<> steer(scene) override;
+			virtual augs::vec2<> steer(scene) override;
 		};
 
 		struct containment : avoidance {
@@ -122,7 +122,7 @@ namespace components {
 			b2Filter ray_filter;
 
 			containment();
-			virtual augmentations::vec2<> steer(scene) override;
+			virtual augs::vec2<> steer(scene) override;
 		};
 		
 		struct flocking : behaviour {
@@ -132,11 +132,11 @@ namespace components {
 			float field_of_vision_degrees;
 
 			flocking();
-			virtual augmentations::vec2<> steer(scene) { return augmentations::vec2<>(); }
+			virtual augs::vec2<> steer(scene) { return augs::vec2<>(); }
 		};
 
 		struct separation : flocking {
-			virtual augmentations::vec2<> steer(scene) override;
+			virtual augs::vec2<> steer(scene) override;
 		};
 
 		struct obstacle_avoidance : avoidance {
@@ -147,7 +147,7 @@ namespace components {
 			float ignore_discontinuities_narrower_than;
 
 			obstacle_avoidance();
-			virtual augmentations::vec2<> steer(scene) override;
+			virtual augs::vec2<> steer(scene) override;
 		};
 
 		struct behaviour_state {
@@ -161,10 +161,10 @@ namespace components {
 			*/
 
 			target_info target;
-			augmentations::entity_system::entity_ptr target_from;
+			augs::entity_system::entity_ptr target_from;
 
-			augmentations::vec2<> last_output_force;
-			augmentations::vec2<> last_estimated_target_position;
+			augs::vec2<> last_output_force;
+			augs::vec2<> last_estimated_target_position;
 			float weight_multiplier;
 
 			bool enabled;

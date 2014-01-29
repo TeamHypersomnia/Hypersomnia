@@ -5,7 +5,7 @@
 #include "entity.h"
 #include "world.h"
 
-namespace augmentations {
+namespace augs {
 	namespace entity_system {
 		signature_matcher_bitset::signature_matcher_bitset(const std::vector<registered_type>& types_with_ids) {
 			add(types_with_ids);

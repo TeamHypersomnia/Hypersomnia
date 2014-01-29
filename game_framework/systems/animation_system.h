@@ -6,7 +6,7 @@
 #include "../components/animate_component.h"
 #include "../components/render_component.h"
 
-using namespace augmentations;
+using namespace augs;
 using namespace entity_system;
 
 class animation_system : public processing_system_templated<components::animate, components::render> {

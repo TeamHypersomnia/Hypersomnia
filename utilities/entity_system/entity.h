@@ -6,7 +6,7 @@
 
 #include "misc/sorted_vector.h"
 
-namespace augmentations {
+namespace augs {
 	namespace entity_system {
 		class entity {
 			/* only world class is allowed to instantiate an entity and it has to do it inside object pool */

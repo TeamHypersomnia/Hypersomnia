@@ -7,7 +7,7 @@
 
 namespace resources {
 	struct particle {
-		augmentations::vec2<> pos, vel, acc;
+		augs::vec2<> pos, vel, acc;
 		resources::sprite face;
 		float rotation;
 		float rotation_speed;
@@ -52,7 +52,7 @@ namespace resources {
 		float initial_rotation_variation;
 		bool randomize_acceleration;
 
-		augmentations::vec2<> offset;
+		augs::vec2<> offset;
 
 		std::vector<particle> particle_templates;
 		components::render particle_render_template;
@@ -82,7 +82,7 @@ namespace resources {
 	};
 
 	typedef std::vector<emission> particle_effect;
-	typedef augmentations::misc::map_wrapper <
+	typedef augs::misc::map_wrapper <
 		int, particle_effect
 	> particle_emitter_info;
 }

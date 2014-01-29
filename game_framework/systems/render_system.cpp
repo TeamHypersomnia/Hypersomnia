@@ -189,7 +189,7 @@ void render_system::cleanup() {
 
 void render_system::default_render(rects::xywh visible_area) {
 	//scene_fbo.use();
-	augmentations::graphics::fbo::use_default();
+	augs::graphics::fbo::use_default();
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	call_triangles();

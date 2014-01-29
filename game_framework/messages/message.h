@@ -1,5 +1,5 @@
 #pragma once
-namespace augmentations {
+namespace augs {
 	namespace entity_system {
 		class entity;
 	}
@@ -7,7 +7,7 @@ namespace augmentations {
 
 namespace messages {
 	struct message {
-		augmentations::entity_system::entity* subject;
-		message(augmentations::entity_system::entity* subject = nullptr) : subject(subject) {}
+		augs::entity_system::entity* subject;
+		message(augs::entity_system::entity* subject = nullptr) : subject(subject) {}
 	};
 }

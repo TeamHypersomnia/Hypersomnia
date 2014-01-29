@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
 
-namespace augmentations {
+namespace augs {
 	namespace misc {
 
 		/* unordered map wrapper that is used to faciliate binding to lua */

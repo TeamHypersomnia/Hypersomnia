@@ -21,11 +21,11 @@ namespace messages {
 		} type;
 
 		resources::particle_effect* set_effect;
-		augmentations::entity_system::entity_ptr target_group_to_refresh;
+		augs::entity_system::entity_ptr target_group_to_refresh;
 
 		bool local_transform;
 
-		augmentations::vec2<> pos;
+		augs::vec2<> pos;
 		float rotation;
 
 		particle_burst_message() : local_transform(false), set_effect(nullptr), rotation(0.f), target_group_to_refresh(nullptr) {}

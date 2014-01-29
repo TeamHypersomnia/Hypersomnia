@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "event.h"
 
-namespace augmentations {
+namespace augs {
 	namespace window {
 		namespace event {
 			namespace keys {

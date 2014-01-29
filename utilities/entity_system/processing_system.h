@@ -4,7 +4,7 @@
 #include <cassert>
 #include "signature_matcher.h"
 
-namespace augmentations {
+namespace augs {
 	namespace entity_system {
 		class processing_system {
 			friend class world;

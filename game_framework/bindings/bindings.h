@@ -3,7 +3,7 @@ namespace resources {}
 namespace components {}
 namespace messages {}
 
-namespace augmentations {
+namespace augs {
 	namespace entity_system {}
 	namespace graphics {}
 	namespace misc {}
@@ -13,7 +13,7 @@ namespace topdown {}
 
 using namespace resources;
 using namespace components;
-using namespace augmentations;
+using namespace augs;
 using namespace misc;
 using namespace entity_system;
 using namespace graphics;

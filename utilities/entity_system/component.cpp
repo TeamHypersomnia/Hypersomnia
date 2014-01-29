@@ -1,6 +1,6 @@
 #include "component.h"
 
-namespace augmentations {
+namespace augs {
 	namespace entity_system {
 		component::~component() {
 		}

@@ -2,7 +2,7 @@
 #include <ratio>
 #include <chrono>
 
-namespace augmentations {
+namespace augs {
 	namespace misc {
 		class timer {
 			std::chrono::high_resolution_clock::time_point ticks;

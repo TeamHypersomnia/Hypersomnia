@@ -7,7 +7,7 @@
 
 struct lua_State;
 
-namespace augmentations {
+namespace augs {
 	namespace config {
 		struct input_file;
 	}

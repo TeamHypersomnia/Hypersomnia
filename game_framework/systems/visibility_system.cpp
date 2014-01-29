@@ -41,7 +41,7 @@ components::visibility::discontinuity* components::visibility::layer::get_discon
 	return nullptr;
 }
 
-components::visibility::triangle components::visibility::layer::get_triangle(int i, augmentations::vec2<> origin) {
+components::visibility::triangle components::visibility::layer::get_triangle(int i, augs::vec2<> origin) {
 	components::visibility::triangle tri = { origin, edges[i].first, edges[i].second };
 	return tri;
 }

@@ -5,13 +5,13 @@
 
 namespace topdown {
 	struct texture_helper {
-		augmentations::texture_baker::image img;
-		augmentations::texture_baker::texture tex;
+		augs::texture_baker::image img;
+		augs::texture_baker::texture tex;
 
-		augmentations::vec2<> get_size() const {
-			return augmentations::vec2<>(tex.get_size());
+		augs::vec2<> get_size() const {
+			return augs::vec2<>(tex.get_size());
 		}
 
-		texture_helper(std::wstring filename, augmentations::texture_baker::atlas& atl);
+		texture_helper(std::wstring filename, augs::texture_baker::atlas& atl);
 	};
 }

@@ -2,7 +2,7 @@
 #include <fstream>
 #include "../options.h"
 
-namespace augmentations {
+namespace augs {
 	namespace error_logging {
 		class log_file {
 			void* dummy, enter(), leave();

@@ -4,7 +4,7 @@
 #include <Box2D/Common/b2Math.h>
 #include "rects.h"
 #include "misc/randval.h"
-namespace augmentations {
+namespace augs {
 	template <class type_val>
 	void damp(type_val& val, type_val len) {
 		type_val zero = static_cast<type_val>(0);
@@ -201,7 +201,7 @@ namespace augmentations {
 
 		template <typename v>
 		vec2& rotate(float angle, v origin) {
-			augmentations::rotate<vec2, float>(*this, origin, angle);
+			augs::rotate<vec2, float>(*this, origin, angle);
 			return *this;
 		}
 

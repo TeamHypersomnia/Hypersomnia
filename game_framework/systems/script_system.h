@@ -5,7 +5,7 @@
 #include "../components/scriptable_component.h"
 
 
-using namespace augmentations;
+using namespace augs;
 using namespace entity_system;
 
 struct lua_State;

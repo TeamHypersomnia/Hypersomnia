@@ -6,7 +6,7 @@
 #include "../misc/stream.h"
 #include <algorithm>
 
-namespace augmentations {
+namespace augs {
 	extern HINSTANCE hinst;
 
 	namespace window {

@@ -10,7 +10,7 @@
 class renderable;
 class gun_system;
 namespace components {
-	struct gun : public augmentations::entity_system::component {
+	struct gun : public augs::entity_system::component {
 		enum state {
 			READY,
 			SWINGING,
@@ -40,7 +40,7 @@ namespace components {
 		float shooting_interval_ms;
 		float max_bullet_distance;
 
-		augmentations::vec2<> bullet_distance_offset;
+		augs::vec2<> bullet_distance_offset;
 		float shake_radius;
 		float shake_spread_degrees;
 
@@ -64,17 +64,17 @@ namespace components {
 		void shake_camera(float direction);
 
 		struct uncopyable {
-			augmentations::entity_system::entity_ptr target_barrel_smoke_group;
+			augs::entity_system::entity_ptr target_barrel_smoke_group;
 			uncopyable& operator=(const uncopyable& b) { return *this; }
 		} barrel_smoke;
 
-		augmentations::entity_system::entity_ptr& get_barrel_smoke() {
+		augs::entity_system::entity_ptr& get_barrel_smoke() {
 			return barrel_smoke.target_barrel_smoke_group;
 		}
 
-		void transfer_barrel_smoke(augmentations::entity_system::entity* another, bool overwrite_comps);
+		void transfer_barrel_smoke(augs::entity_system::entity* another, bool overwrite_comps);
 
-		augmentations::entity_system::entity_ptr target_camera_to_shake;
+		augs::entity_system::entity_ptr target_camera_to_shake;
 
 		gun()
 			: max_rounds(0), bullets_once(0), spread_degrees(0.f), bullet_damage(std::make_pair(0.f, 0.f)), is_automatic(false),
@@ -97,6 +97,6 @@ namespace components {
 	private:
 		friend class gun_system;
 
-		augmentations::misc::timer state_timer;
+		augs::misc::timer state_timer;
 	};
 }

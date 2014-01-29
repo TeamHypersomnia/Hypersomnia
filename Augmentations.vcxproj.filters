@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="augmentations.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\Box2D\Common\b2BlockAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -660,14 +657,11 @@
     <ClCompile Include="utilities\window_framework\window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="utilities\augmentations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="augmentations.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="options.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="3rdparty\readdir\targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1656,6 +1650,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="utilities\window_framework\window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities\augmentations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities\options.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

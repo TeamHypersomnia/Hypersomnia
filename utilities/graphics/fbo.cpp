@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "fbo.h"
 
-namespace augmentations {
+namespace augs {
 	namespace graphics {
 		GLuint fbo::currently_bound_fbo = 0u;
 

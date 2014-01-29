@@ -6,9 +6,9 @@
 #define PIXELS_TO_METERSf 1.0f/METERS_TO_PIXELSf
 
 namespace components {
-	struct physics : public augmentations::entity_system::component {
+	struct physics : public augs::entity_system::component {
 		b2Body* body;
-		std::vector <augmentations::vec2<>> original_model;
+		std::vector <augs::vec2<>> original_model;
 
 		physics(b2Body* body = nullptr) : body(body) {}
 		//~physics() override {}

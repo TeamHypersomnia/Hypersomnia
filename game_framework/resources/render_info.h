@@ -7,7 +7,7 @@
 
 #include "vertex.h"
 
-using namespace augmentations;
+using namespace augs;
 
 #include "../systems/render_system.h"
 extern std::vector<render_system::debug_line> global_debug;

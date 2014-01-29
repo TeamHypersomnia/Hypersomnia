@@ -4,7 +4,7 @@
 #include "processing_system.h"
 #include "entity_ptr.h"
 
-namespace augmentations {
+namespace augs {
 	namespace entity_system {
 		world::world() {
 		}

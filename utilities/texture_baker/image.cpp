@@ -4,7 +4,7 @@
 
 #include "image.h"
 
-namespace augmentations {
+namespace augs {
 	namespace texture_baker {
 		using namespace Gdiplus;
 

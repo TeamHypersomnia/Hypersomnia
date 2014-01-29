@@ -4,11 +4,11 @@
 
 namespace resources {
 	class script;
-	typedef augmentations::misc::map_wrapper<int, luabind::object> scriptable_info;
+	typedef augs::misc::map_wrapper<int, luabind::object> scriptable_info;
 }
 
 namespace components {
-	struct scriptable : augmentations::entity_system::component {
+	struct scriptable : augs::entity_system::component {
 		enum script_type {
 			COLLISION_MESSAGE,
 			DAMAGE_MESSAGE,

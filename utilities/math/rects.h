@@ -5,7 +5,7 @@
 
 struct b2Vec2;
 
-namespace augmentations {
+namespace augs {
 	namespace window {
 		class glwindow;
 	}

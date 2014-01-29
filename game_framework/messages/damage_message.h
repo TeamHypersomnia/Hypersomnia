@@ -5,6 +5,6 @@
 namespace messages {
 	struct damage_message : public message {
 		float amount;
-		augmentations::vec2<> impact_velocity;
+		augs::vec2<> impact_velocity;
 	};
 }

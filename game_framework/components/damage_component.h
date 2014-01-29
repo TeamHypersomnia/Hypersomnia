@@ -5,12 +5,12 @@
 
 
 namespace components {
-	struct damage : public augmentations::entity_system::component {
+	struct damage : public augs::entity_system::component {
 		float amount;
-		augmentations::entity_system::entity_ptr sender;
+		augs::entity_system::entity_ptr sender;
 
 		/* used to destroy bullets */
-		augmentations::vec2<> starting_point;
+		augs::vec2<> starting_point;
 		float max_distance;
 
 

@@ -5,7 +5,7 @@
 #include "../components/physics_component.h"
 #include "../components/transform_component.h"
 
-using namespace augmentations;
+using namespace augs;
 using namespace entity_system;
 
 class damage_system : public processing_system_templated<components::damage, components::transform, components::physics> {

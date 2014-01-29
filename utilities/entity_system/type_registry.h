@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include "templated_list.h"
 
-namespace augmentations {
+namespace augs {
 	namespace entity_system {
 		class entity;
 		typedef size_t type_hash;

@@ -6,7 +6,7 @@
 #include "../components/transform_component.h"
 #include "../components/visibility_component.h"
 
-using namespace augmentations;
+using namespace augs;
 using namespace entity_system;
 
 class physics_system;

@@ -6,7 +6,7 @@ todo:
 * ostateczne rozwiazanie kwestii rejestru, podzielic po prostu na link/object ale na razie to nie moj concern
 */
 
-namespace augmentations {
+namespace augs {
 	namespace texture_baker {
 		class image {
 			std::vector<unsigned char> v;
@@ -42,7 +42,7 @@ namespace augmentations {
 			void destroy();
 		};
 
-		//class image_file : public image, public augmentations::misc::container::registry<image_file> {
+		//class image_file : public image, public augs::misc::container::registry<image_file> {
 		//	const char* filename;
 		//	int force_channels;
 		//public:

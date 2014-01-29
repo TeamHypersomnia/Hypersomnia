@@ -6,7 +6,7 @@ namespace resources {
 }
 
 namespace components {
-	struct render : public augmentations::entity_system::component {
+	struct render : public augs::entity_system::component {
 		resources::renderable* model;
 
 		enum mask_type {

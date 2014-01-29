@@ -65,7 +65,7 @@ void steering::target_info::set(vec2<> t, vec2<> vel) {
 	info.set_velocity(vel);
 }
 
-void steering::target_info::set(const augmentations::entity_system::entity_ptr& t) {
+void steering::target_info::set(const augs::entity_system::entity_ptr& t) {
 	auto physics_comp = t.get()->find<physics>();
 	
 	if (physics_comp)

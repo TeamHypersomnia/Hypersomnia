@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-namespace augmentations {
+namespace augs {
 	namespace misc {
 		template<typename value>
 		struct sorted_vector {

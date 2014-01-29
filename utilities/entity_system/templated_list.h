@@ -2,7 +2,7 @@
 #include <typeinfo>
 #include <vector>
 
-namespace augmentations {
+namespace augs {
 	namespace entity_system {
 		typedef size_t type_hash;
 

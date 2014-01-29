@@ -8,7 +8,7 @@
 #include "misc/sorted_vector.h"
 #include "misc/timer.h"
 
-namespace augmentations {
+namespace augs {
 	namespace entity_system {
 		class entity;
 

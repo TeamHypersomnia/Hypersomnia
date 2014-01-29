@@ -547,7 +547,7 @@
     <ClCompile Include="3rdparty\src\stack_content_by_name.cpp" />
     <ClCompile Include="3rdparty\src\weak_ref.cpp" />
     <ClCompile Include="3rdparty\src\wrapper_base.cpp" />
-    <ClCompile Include="augmentations.cpp">
+    <ClCompile Include="utilities\augmentations.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
@@ -1527,7 +1527,8 @@
     <ClInclude Include="3rdparty\SFML\Window\Window.hpp" />
     <ClInclude Include="3rdparty\SFML\Window\WindowHandle.hpp" />
     <ClInclude Include="3rdparty\SFML\Window\WindowStyle.hpp" />
-    <ClInclude Include="augmentations.h" />
+    <ClInclude Include="utilities\augmentations.h" />
+    <ClInclude Include="stdafx.h" />
     <ClInclude Include="utilities\entity_system\component.h" />
     <ClInclude Include="utilities\entity_system\entity.h" />
     <ClInclude Include="utilities\entity_system\entity_ptr.h" />
@@ -1539,7 +1540,7 @@
     <ClInclude Include="utilities\entity_system\world.h" />
     <ClInclude Include="utilities\error\error.h" />
     <ClInclude Include="utilities\graphics\pixel.h" />
-    <ClInclude Include="options.h" />
+    <ClInclude Include="utilities\options.h" />
     <ClInclude Include="utilities\math\rects.h" />
     <ClInclude Include="utilities\math\vec2d.h" />
     <ClInclude Include="game_framework\bindings\bindings.h" />

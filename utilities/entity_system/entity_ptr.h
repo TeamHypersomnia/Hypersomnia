@@ -1,6 +1,6 @@
 #pragma once
 
-namespace augmentations {
+namespace augs {
 	namespace entity_system {
 		class entity;
 

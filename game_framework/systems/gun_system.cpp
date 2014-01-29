@@ -23,7 +23,7 @@
 #include "misc/randval.h"
 
 /* hacky methods to aid transferring barrel smoke to dropped gun */
-void components::gun::transfer_barrel_smoke(augmentations::entity_system::entity* another, bool overwrite_components) {
+void components::gun::transfer_barrel_smoke(augs::entity_system::entity* another, bool overwrite_components) {
 	auto& this_entity = get_barrel_smoke();
 	auto& another_entity = another->get<components::gun>().get_barrel_smoke();
 

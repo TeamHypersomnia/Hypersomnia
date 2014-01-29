@@ -3,7 +3,7 @@
 #include "math/vec2d.h"
 
 /* everything is a state since for actions we can just ignore states with flag set to false */
-using namespace augmentations;
+using namespace augs;
 
 namespace messages {
 	struct intent_message : public message {

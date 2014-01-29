@@ -6,7 +6,7 @@
 struct FT_Glyph_Metrics_;
 typedef FT_Glyph_Metrics_ FT_Glyph_Metrics;
 
-namespace augmentations {
+namespace augs {
 	namespace texture_baker {
 
 		struct font_file {

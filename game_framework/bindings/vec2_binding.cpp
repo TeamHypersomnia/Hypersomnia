@@ -37,7 +37,7 @@ namespace bindings {
 			[
 				luabind::def("from_degrees", &vec2<>::from_degrees<float>),
 				luabind::def("random_on_circle", &vec2<>::random_on_circle<float>),
-				luabind::def("rotated", &augmentations::from_rotation<vec2<>, float>)
+				luabind::def("rotated", &augs::from_rotation<vec2<>, float>)
 			]
 			;
 	}

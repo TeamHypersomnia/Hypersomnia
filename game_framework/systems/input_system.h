@@ -3,10 +3,10 @@
 #include "../components/input_component.h"
 #include "../messages/intent_message.h"
 
-using namespace augmentations;
+using namespace augs;
 using namespace entity_system;
 
-namespace augmentations {
+namespace augs {
 	namespace window {
 		class glwindow;
 	}

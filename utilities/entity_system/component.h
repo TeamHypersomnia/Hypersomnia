@@ -1,5 +1,5 @@
 #pragma once
-namespace augmentations {
+namespace augs {
 	namespace entity_system {
 		struct component {
 			virtual ~component();

@@ -2,7 +2,7 @@
 #include "entity_system/processing_system.h"
 #include "../components/children_component.h"
 
-using namespace augmentations;
+using namespace augs;
 using namespace entity_system;
 
 class destroy_system : public processing_system_templated<components::children> {

@@ -3,7 +3,7 @@
 #include <functional>
 #include <vector>
 
-namespace augmentations {
+namespace augs {
 	namespace misc {
 		class animator {
 			timer tm;

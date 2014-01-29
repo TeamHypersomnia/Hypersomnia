@@ -5,7 +5,7 @@
 
 #define MAXIMUM_COMPONENTS 64
 
-namespace augmentations {
+namespace augs {
 	namespace entity_system {
 		class world;
 

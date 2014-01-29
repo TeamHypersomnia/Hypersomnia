@@ -3,7 +3,7 @@
 #include "vec2d.h"
 #include <algorithm>
 
-namespace augmentations {
+namespace augs {
 	namespace rects {
 		
 		wh::wh(const ltrb& rr) : w(rr.w()), h(rr.h()) {} 

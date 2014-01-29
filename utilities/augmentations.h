@@ -25,8 +25,8 @@ Gdiplus.lib
 struct FT_LibraryRec_;
 typedef struct FT_LibraryRec_  *FT_Library;
 
-namespace augmentations {
-	enum which_augmentations {
+namespace augs {
+	enum which_augs {
 		GDIPLUS = 1<<0,
 		GLEW = 1<<1,
 		FREETYPE = 1<<2,
@@ -38,6 +38,6 @@ namespace augmentations {
 
 	extern std::unique_ptr<FT_Library> freetype_library;
 
-	extern void init(unsigned which_augmentations = ALL);
+	extern void init(unsigned which_augs = ALL);
 	extern void deinit();
 };

@@ -1,7 +1,7 @@
 #pragma once
 #include "pixel.h"
 
-namespace augmentations {
+namespace augs {
 	namespace graphics {
 		pixel_8::pixel_8(color brightness) : r(brightness) {}
 		pixel_8::operator unsigned char() {return r;}

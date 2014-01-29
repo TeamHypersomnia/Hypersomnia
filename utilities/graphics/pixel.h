@@ -1,5 +1,5 @@
 #pragma once
-namespace augmentations {
+namespace augs {
 	namespace graphics {
 		typedef unsigned char color;
 

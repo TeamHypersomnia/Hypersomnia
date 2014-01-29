@@ -1,7 +1,7 @@
 #pragma once
 #include "timer.h"
 
-namespace augmentations {
+namespace augs {
 	namespace misc {
 		class delta_accumulator {
 			timer ticks;

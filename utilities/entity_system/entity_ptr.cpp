@@ -3,7 +3,7 @@
 #include "entity_ptr.h"
 #include "entity.h"
 
-namespace augmentations {
+namespace augs {
 	namespace entity_system {
 		entity_ptr::entity_ptr(const entity_ptr& p) : entity_ptr(p.ptr) {}
 

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "shader.h"
 
-namespace augmentations {
+namespace augs {
 	namespace graphics {
 		void printShaderInfoLog(GLuint obj, std::string source_code) {
 			int infologLength = 0;

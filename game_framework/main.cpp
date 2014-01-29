@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include <gtest\gtest.h>
-#include "../augmentations.h"
+#include "augmentations.h"
 #include "window_framework/window.h"
 
 #include "entity_system/world.h"
@@ -43,14 +43,14 @@
 #include "resources/scriptable_info.h"
 #include "graphics/shader.h"
 
-using namespace augmentations;
+using namespace augs;
 using namespace entity_system;
 using namespace messages;
 
 resources::script* world_reloading_script = nullptr;
 
 int main() { 
-	augmentations::init();	
+	augs::init();	
 	script_system scripts;
 	lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
 	resources::script::script_reloader.report_errors = &std::cout;
@@ -122,15 +122,15 @@ int main() {
 	scripts.global("script_reloader", resources::script::script_reloader);
 
 	components::physics my_comp, my_comp2;
-	my_comp.original_model.push_back(augmentations::vec2<>(2342342, 1219839));
-	my_comp.original_model.push_back(augmentations::vec2<>(4, 3));
-	my_comp.original_model.push_back(augmentations::vec2<>(5645, 2342));
-	my_comp.original_model.push_back(augmentations::vec2<>(2342342, 1219839));
-	my_comp.original_model.push_back(augmentations::vec2<>(4, 3));
-	my_comp.original_model.push_back(augmentations::vec2<>(5645, 2342));
-	my_comp.original_model.push_back(augmentations::vec2<>(2342342, 1219839));
-	my_comp.original_model.push_back(augmentations::vec2<>(4, 3));
-	my_comp.original_model.push_back(augmentations::vec2<>(5645, 2342));
+	my_comp.original_model.push_back(augs::vec2<>(2342342, 1219839));
+	my_comp.original_model.push_back(augs::vec2<>(4, 3));
+	my_comp.original_model.push_back(augs::vec2<>(5645, 2342));
+	my_comp.original_model.push_back(augs::vec2<>(2342342, 1219839));
+	my_comp.original_model.push_back(augs::vec2<>(4, 3));
+	my_comp.original_model.push_back(augs::vec2<>(5645, 2342));
+	my_comp.original_model.push_back(augs::vec2<>(2342342, 1219839));
+	my_comp.original_model.push_back(augs::vec2<>(4, 3));
+	my_comp.original_model.push_back(augs::vec2<>(5645, 2342));
 
 	my_comp2 = my_comp;
 
@@ -150,7 +150,7 @@ int main() {
 	::testing::FLAGS_gtest_break_on_failure = false;
 	auto result = RUN_ALL_TESTS();
 
-	using namespace augmentations::graphics;
+	using namespace augs::graphics;
 	
 	//shader vertex_shader(GL_VERTEX_SHADER, "#version 330 \n\
 	//uniform mat4 projection_matrix;					   										   \n\
@@ -256,6 +256,6 @@ int main() {
 		}
 	}
 
-	augmentations::deinit();
+	augs::deinit();
 	return 0;
 }

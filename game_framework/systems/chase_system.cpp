@@ -2,7 +2,7 @@
 #include "chase_system.h"
 #include "entity_system/entity.h"
 
-void components::chase::set_target(augmentations::entity_system::entity* new_target) {
+void components::chase::set_target(augs::entity_system::entity* new_target) {
 	target_newly_set = true;
 	target.set(new_target);
 }

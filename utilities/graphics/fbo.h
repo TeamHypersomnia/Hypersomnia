@@ -1,6 +1,6 @@
 #pragma once
 
-namespace augmentations {
+namespace augs {
 	namespace graphics {
 		class fbo {
 			GLuint fboId, textureId, width, height;

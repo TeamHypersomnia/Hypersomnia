@@ -11,7 +11,7 @@ kurwa po ludzku musi to wygladac
 tekstura NIE MUSI wiedziec do jakiego atlasu nalezy, interfejsy maja wiedziec and thats sufficient 
 */
 
-namespace augmentations {
+namespace augs {
 	namespace texture_baker {
 		struct font_file;
 		struct font;

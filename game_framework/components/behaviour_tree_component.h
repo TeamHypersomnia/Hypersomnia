@@ -6,7 +6,7 @@
 #include "misc/timer.h"
 
 namespace components {
-	struct behaviour_tree : public augmentations::entity_system::component {
+	struct behaviour_tree : public augs::entity_system::component {
 		struct task;
 		struct decorator;
 
@@ -97,7 +97,7 @@ namespace components {
 		struct task {
 			void interrupt_runner(int status = composite::status::FAILURE);
 
-			augmentations::entity_system::entity* subject;
+			augs::entity_system::entity* subject;
 
 			composite* running_parent_node;
 			size_t running_index;
@@ -106,7 +106,7 @@ namespace components {
 
 			task();
 			
-			augmentations::misc::timer since_entered;
+			augs::misc::timer since_entered;
 		};
 
 		struct tree_instance {

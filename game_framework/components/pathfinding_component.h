@@ -5,8 +5,8 @@
 #include "visibility_component.h"
 
 namespace components {
-	struct pathfinding : public augmentations::entity_system::component {
-		typedef std::pair<augmentations::vec2<>, augmentations::vec2<>> edge;
+	struct pathfinding : public augs::entity_system::component {
+		typedef std::pair<augs::vec2<>, augs::vec2<>> edge;
 
 		pathfinding() : favor_velocity_parallellness(false), enable_backtracking(true), target_offset(0.f), distance_navpoint_hit(0.f), is_exploring(false), rotate_navpoints(0.f) {}
 
@@ -25,15 +25,15 @@ namespace components {
 
 		struct navigation_hint {
 			bool enabled;
-			augmentations::vec2<> origin, target;
+			augs::vec2<> origin, target;
 			navigation_hint() : enabled(false) {}
 		} custom_exploration_hint;
 
 		struct pathfinding_session {
-			augmentations::vec2<> target, navigate_to;
+			augs::vec2<> target, navigate_to;
 
 			struct navigation_vertex {
-				augmentations::vec2<> location, sensor;
+				augs::vec2<> location, sensor;
 			};
 
 			std::vector<navigation_vertex> discovered_vertices, undiscovered_vertices;
@@ -46,7 +46,7 @@ namespace components {
 			return session_stack.back();
 		}
 
-		void start_pathfinding(augmentations::vec2<> target) {
+		void start_pathfinding(augs::vec2<> target) {
 			clear_pathfinding_info();
 			session_stack.push_back(pathfinding_session());
 			session().target = target;
@@ -60,11 +60,11 @@ namespace components {
 			is_exploring = true;
 		}
 
-		augmentations::vec2<> get_current_navigation_target() {
+		augs::vec2<> get_current_navigation_target() {
 			return session().navigate_to;
 		}
 
-		augmentations::vec2<> get_current_target() {
+		augs::vec2<> get_current_target() {
 			return session().target;
 		}
 

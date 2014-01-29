@@ -12,14 +12,14 @@
 
 namespace topdown {
 	physics_info::physics_info() 
-		: rect_size(augmentations::vec2<>()), type(RECT), density(1.f), angular_damping(0.f), linear_damping(0.f), fixed_rotation(false), sensor(false), restitution(0.f), friction(0.f),
+		: rect_size(augs::vec2<>()), type(RECT), density(1.f), angular_damping(0.f), linear_damping(0.f), fixed_rotation(false), sensor(false), restitution(0.f), friction(0.f),
 		body_type(b2_dynamicBody), radius(0.f), max_speed(-1)
 		{
 	}
 
 	b2World* current_b2world = nullptr;
 
-	void physics_info::add_convex(const std::vector < augmentations::vec2 < >>& verts) {
+	void physics_info::add_convex(const std::vector < augs::vec2 < >>& verts) {
 		original_model.insert(original_model.end(), verts.begin(), verts.end());
 		convex_polys.push_back(verts);
 	}
@@ -44,7 +44,7 @@ namespace topdown {
 		partition.ConvexPartition_HM(&inpolys, &outpolys);
 
 		for (auto& out : outpolys) {
-			std::vector < augmentations::vec2 < >> new_convex;
+			std::vector < augs::vec2 < >> new_convex;
 
 			for (size_t j = 0; j < out.GetNumPoints(); ++j) {
 				new_convex.push_back(vec2<>(out[j].x, -out[j].y));
@@ -56,7 +56,7 @@ namespace topdown {
 		}
 	}
 
-	void physics_info::add_concave(const std::vector < augmentations::vec2 < >> &verts) {
+	void physics_info::add_concave(const std::vector < augs::vec2 < >> &verts) {
 		//original_model.insert(original_model.end(), verts.begin(), verts.end());
 		//
 		//b2Separator separator;
@@ -72,10 +72,10 @@ namespace topdown {
 		//else separator.calcShapes(input, output);
 		//
 		//for (auto& convex : output)
-		//	convex_polys.push_back(std::vector < augmentations::vec2 < >> (convex.begin(), convex.end()));
+		//	convex_polys.push_back(std::vector < augs::vec2 < >> (convex.begin(), convex.end()));
 	}
 
-	void create_physics_component(const physics_info& body_data, augmentations::entity_system::entity& subject, int body_type) {
+	void create_physics_component(const physics_info& body_data, augs::entity_system::entity& subject, int body_type) {
 		physics_system& physics = subject.owner_world.get_system<physics_system>();
 		
 		b2BodyDef def;
@@ -146,7 +146,7 @@ namespace topdown {
 		subject.add(physics_component);
 	}
 
-	std::vector<b2Vec2> get_transformed_shape_verts(augmentations::entity_system::entity& subject, bool meters) {
+	std::vector<b2Vec2> get_transformed_shape_verts(augs::entity_system::entity& subject, bool meters) {
 		std::vector<b2Vec2> output;
 
 		auto b = subject.get<components::physics>().body;
@@ -169,7 +169,7 @@ namespace topdown {
 		return output;
 	}
 
-	augmentations::entity_system::entity* body_to_entity(b2Body* b) {
-		return static_cast<augmentations::entity_system::entity*>(b->GetUserData());
+	augs::entity_system::entity* body_to_entity(b2Body* b) {
+		return static_cast<augs::entity_system::entity*>(b->GetUserData());
 	}
 }

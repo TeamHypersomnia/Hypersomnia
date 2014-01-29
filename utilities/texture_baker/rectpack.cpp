@@ -6,7 +6,7 @@
 
 using namespace std;
 
-namespace augmentations {
+namespace augs {
 	namespace packing {
 		struct node {
 			struct child_node {

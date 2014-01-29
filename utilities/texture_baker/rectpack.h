@@ -2,7 +2,7 @@
 #include <vector>
 #include "../math/rects.h"
 
-namespace augmentations {
+namespace augs {
 	namespace packing {
 		struct bin {
 			rects::wh size;

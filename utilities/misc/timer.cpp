@@ -2,7 +2,7 @@
 #include <algorithm>
 
 
-namespace augmentations {
+namespace augs {
 	namespace misc {
 		timer::timer() {
 			reset();

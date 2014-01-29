@@ -5,7 +5,7 @@
 #include "entity.h"
 #include <algorithm>
 
-namespace augmentations {
+namespace augs {
 	namespace entity_system {
 		void processing_system::add(entity* e) {
 			targets.push_back(e);

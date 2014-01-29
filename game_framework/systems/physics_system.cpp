@@ -163,7 +163,7 @@ physics_system::query_output physics_system::query_aabb(vec2<> p1_meters, vec2<>
 	return std::move(std::vector<b2Body*>(callback.output.begin(), callback.output.end()));
 }
 
-physics_system::query_output physics_system::query_body(augmentations::entity_system::entity& subject, b2Filter* filter, void* ignore_userdata) {
+physics_system::query_output physics_system::query_body(augs::entity_system::entity& subject, b2Filter* filter, void* ignore_userdata) {
 	query_output total_output;
 	
 	for (b2Fixture* f = subject.get<components::physics>().body->GetFixtureList(); f != nullptr; f = f->GetNext()) {

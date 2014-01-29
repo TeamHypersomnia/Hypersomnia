@@ -7,7 +7,7 @@
 #include <gl/glew.h>
 #include "../misc/stream.h"
 #include <cassert>
-namespace augmentations {
+namespace augs {
 	using namespace error_logging;
 	log_file global_log;
 

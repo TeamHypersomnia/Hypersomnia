@@ -1,5 +1,5 @@
 #pragma once
-namespace augmentations {
+namespace augs {
 	namespace window {
 		namespace event {
 			typedef unsigned message;

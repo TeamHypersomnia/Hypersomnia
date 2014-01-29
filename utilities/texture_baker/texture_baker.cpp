@@ -4,7 +4,7 @@
 #include "texture_baker.h"
 #include "font.h"
 
-namespace augmentations {
+namespace augs {
 	namespace texture_baker {
 		void texture::set_uv_unit(double u, double v) {
 			x = float(double(rect.x) * u);

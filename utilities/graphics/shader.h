@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-namespace augmentations {
+namespace augs {
 	namespace graphics {
 		struct shader {
 			GLuint id;

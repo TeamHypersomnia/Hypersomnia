@@ -4,7 +4,7 @@
 #include "options.h"
 #include "window_framework\window.h"
 
-namespace augmentations {
+namespace augs {
 	Gdiplus::GdiplusStartupInput gdi;
 	ULONG_PTR           gdit;
 	WNDCLASSEX wcl = {0};

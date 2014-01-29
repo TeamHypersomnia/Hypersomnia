@@ -3,7 +3,7 @@
 #include "type_registry.h"
 #include "entity.h"
 
-namespace augmentations {
+namespace augs {
 	namespace entity_system {
 		type_registry::type_registry() : next_id(0) {}
 

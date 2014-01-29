@@ -6,11 +6,11 @@
 
 #include "misc/timer.h"
 
-using namespace augmentations;
+using namespace augs;
 using namespace entity_system;
 
 class lookat_system : public processing_system_templated<components::transform, components::lookat> {
-	augmentations::misc::timer smooth_timer;
+	augs::misc::timer smooth_timer;
 public:
 	void process_entities(world&) override;
 };
