@@ -1,0 +1,694 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6CC06ECD-D908-4A12-A57B-CEEEEF078609}</ProjectGuid>
+    <RootNamespace>Augmentations</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)\output\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)\output\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessorDefinitions>_MBCS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <MinimalRebuild>true</MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>OpenGL32.lib;Ws2_32.lib;dwmapi.lib;Gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <MinimalRebuild>true</MinimalRebuild>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>OpenGL32.lib;Ws2_32.lib;dwmapi.lib;Gdiplus.lib;lua52.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="3rdparty\b2Separator\b2Separator.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\b2BroadPhase.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\b2CollideCircle.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\b2CollideEdge.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\b2CollidePolygon.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\b2Collision.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\b2Distance.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\b2DynamicTree.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\b2TimeOfImpact.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2CircleShape.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2EdgeShape.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2PolygonShape.cpp" />
+    <ClCompile Include="3rdparty\GL\glew.c" />
+    <ClCompile Include="3rdparty\gtest\src\gtest-death-test.cc" />
+    <ClCompile Include="3rdparty\gtest\src\gtest-filepath.cc" />
+    <ClCompile Include="3rdparty\gtest\src\gtest-port.cc" />
+    <ClCompile Include="3rdparty\gtest\src\gtest-printers.cc" />
+    <ClCompile Include="3rdparty\gtest\src\gtest-test-part.cc" />
+    <ClCompile Include="3rdparty\gtest\src\gtest-typed-test.cc" />
+    <ClCompile Include="3rdparty\gtest\src\gtest.cc" />
+    <ClCompile Include="3rdparty\poly2tri\common\shapes.cc" />
+    <ClCompile Include="3rdparty\poly2tri\sweep\advancing_front.cc" />
+    <ClCompile Include="3rdparty\poly2tri\sweep\cdt.cc" />
+    <ClCompile Include="3rdparty\poly2tri\sweep\sweep.cc" />
+    <ClCompile Include="3rdparty\poly2tri\sweep\sweep_context.cc" />
+    <ClCompile Include="3rdparty\polyclipper\clipper.cpp" />
+    <ClCompile Include="3rdparty\polypartition\polypartition.cpp" />
+    <ClCompile Include="3rdparty\readdir\ReadDirectoryChanges.cpp" />
+    <ClCompile Include="3rdparty\readdir\ReadDirectoryChangesPrivate.cpp" />
+    <ClCompile Include="3rdparty\readdir\_stdafx.cpp" />
+    <ClCompile Include="3rdparty\src\class.cpp" />
+    <ClCompile Include="3rdparty\src\class_info.cpp" />
+    <ClCompile Include="3rdparty\src\class_registry.cpp" />
+    <ClCompile Include="3rdparty\src\class_rep.cpp" />
+    <ClCompile Include="3rdparty\src\create_class.cpp" />
+    <ClCompile Include="3rdparty\src\error_luabind.cpp" />
+    <ClCompile Include="3rdparty\src\exception_handler.cpp" />
+    <ClCompile Include="3rdparty\src\function.cpp" />
+    <ClCompile Include="3rdparty\src\function_introspection.cpp" />
+    <ClCompile Include="3rdparty\src\inheritance.cpp" />
+    <ClCompile Include="3rdparty\src\link_compatibility.cpp" />
+    <ClCompile Include="3rdparty\src\object_rep.cpp" />
+    <ClCompile Include="3rdparty\src\open.cpp" />
+    <ClCompile Include="3rdparty\src\operator.cpp" />
+    <ClCompile Include="3rdparty\src\pcall.cpp" />
+    <ClCompile Include="3rdparty\src\scope.cpp" />
+    <ClCompile Include="3rdparty\src\set_package_preload.cpp" />
+    <ClCompile Include="3rdparty\src\stack_content_by_name.cpp" />
+    <ClCompile Include="3rdparty\src\weak_ref.cpp" />
+    <ClCompile Include="3rdparty\src\wrapper_base.cpp" />
+    <ClCompile Include="augmentations.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="3rdparty\Box2D\Common\b2BlockAllocator.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Common\b2Draw.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Common\b2Math.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Common\b2Settings.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Common\b2StackAllocator.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Common\b2Timer.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\b2Body.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\b2ContactManager.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\b2Fixture.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\b2Island.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\b2World.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\b2WorldCallbacks.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Contacts\b2ChainAndCircleContact.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Contacts\b2ChainAndPolygonContact.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Contacts\b2CircleContact.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Contacts\b2Contact.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Contacts\b2ContactSolver.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Contacts\b2EdgeAndCircleContact.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Contacts\b2EdgeAndPolygonContact.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Contacts\b2PolygonAndCircleContact.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Contacts\b2PolygonContact.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Joints\b2DistanceJoint.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Joints\b2FrictionJoint.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Joints\b2GearJoint.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Joints\b2Joint.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Joints\b2MouseJoint.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Joints\b2PrismaticJoint.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Joints\b2PulleyJoint.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Joints\b2RevoluteJoint.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Joints\b2RopeJoint.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Joints\b2WeldJoint.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Dynamics\Joints\b2WheelJoint.cpp" />
+    <ClCompile Include="3rdparty\Box2D\Rope\b2Rope.cpp" />
+    <ClCompile Include="entity_system\component.cpp" />
+    <ClCompile Include="entity_system\entity.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="entity_system\entity_ptr.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="entity_system\signature_matcher.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="entity_system\processing_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="entity_system\templated_list.cpp" />
+    <ClCompile Include="entity_system\type_registry.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="entity_system\world.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="error\error.cpp" />
+    <ClCompile Include="graphics\pixel.cpp" />
+    <ClCompile Include="math\rects.cpp" />
+    <ClCompile Include="math\vec2d.cpp" />
+    <ClCompile Include="SDK\topdown\bindings\behaviour_tree_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\pathfinding_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\visibility_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\animate_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\animate_message_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\animation_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\b2Filter_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\body_helper_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\camera_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\chase_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\children_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\collision_message_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\crosshair_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\damage_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\damage_message_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\emission_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\entity_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\entity_ptr_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\glwindow_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\gun_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\health_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\input_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\intent_message_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\lookat_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\minmax_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\movement_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\particle_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\particle_burst_message_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\particle_effect_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\particle_emitter_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\physics_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\polygon_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\rect_ltrb_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\rect_xywh_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\render_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\rgba_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\scriptable_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\script_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\sprite_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\steering_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\resources\fbo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\resources\vertex.cpp" />
+    <ClCompile Include="SDK\topdown\systems\behaviour_tree_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\pathfinding_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\visibility_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\steering_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\texture_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\transform_component_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\vec2_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\bindings\world_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\resources\animate_info.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\game\body_helper.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\game\texture_helper.cpp" />
+    <ClCompile Include="SDK\topdown\main.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\resources\render_info.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\resources\scriptable_info.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\animation_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\camera_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\chase_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\crosshair_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\damage_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\destroy_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\gun_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\health_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\input_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\lookat_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\movement_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\particle_emitter_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\particle_group_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\physics_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\render_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SDK\topdown\systems\script_system.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="texture_baker\image.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="texture_baker\rectpack.cpp" />
+    <ClCompile Include="texture_baker\texture_baker.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="utility\delta_accumulator.cpp" />
+    <ClCompile Include="utility\input_context.cpp" />
+    <ClCompile Include="utility\randval.cpp" />
+    <ClCompile Include="utility\timer.cpp" />
+    <ClCompile Include="utility\value_animator.cpp" />
+    <ClCompile Include="window_framework\event.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="window_framework\window.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="3rdparty\b2Separator\b2Separator.h" />
+    <ClInclude Include="3rdparty\Box2D\Box2D.h" />
+    <ClInclude Include="3rdparty\Box2D\Collision\b2BroadPhase.h" />
+    <ClInclude Include="3rdparty\Box2D\Collision\b2Collision.h" />
+    <ClInclude Include="3rdparty\Box2D\Collision\b2Distance.h" />
+    <ClInclude Include="3rdparty\Box2D\Collision\b2DynamicTree.h" />
+    <ClInclude Include="3rdparty\Box2D\Collision\b2TimeOfImpact.h" />
+    <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h" />
+    <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2CircleShape.h" />
+    <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2EdgeShape.h" />
+    <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2PolygonShape.h" />
+    <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2Shape.h" />
+    <ClInclude Include="3rdparty\Box2D\Common\b2BlockAllocator.h" />
+    <ClInclude Include="3rdparty\Box2D\Common\b2Draw.h" />
+    <ClInclude Include="3rdparty\Box2D\Common\b2GrowableStack.h" />
+    <ClInclude Include="3rdparty\Box2D\Common\b2Math.h" />
+    <ClInclude Include="3rdparty\Box2D\Common\b2Settings.h" />
+    <ClInclude Include="3rdparty\Box2D\Common\b2StackAllocator.h" />
+    <ClInclude Include="3rdparty\Box2D\Common\b2Timer.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\b2Body.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\b2ContactManager.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\b2Fixture.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\b2Island.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\b2TimeStep.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\b2World.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\b2WorldCallbacks.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2ChainAndCircleContact.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2ChainAndPolygonContact.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2CircleContact.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2Contact.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2ContactSolver.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2EdgeAndCircleContact.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2EdgeAndPolygonContact.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2PolygonAndCircleContact.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Contacts\b2PolygonContact.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2DistanceJoint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2FrictionJoint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2GearJoint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2Joint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2MouseJoint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2PrismaticJoint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2PulleyJoint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2RevoluteJoint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2RopeJoint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2WeldJoint.h" />
+    <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2WheelJoint.h" />
+    <ClInclude Include="3rdparty\Box2D\Rope\b2Rope.h" />
+    <ClInclude Include="3rdparty\GL\glew.h" />
+    <ClInclude Include="3rdparty\GL\glxew.h" />
+    <ClInclude Include="3rdparty\GL\wglew.h" />
+    <ClInclude Include="3rdparty\gtest\gtest-death-test.h" />
+    <ClInclude Include="3rdparty\gtest\gtest-message.h" />
+    <ClInclude Include="3rdparty\gtest\gtest-param-test.h" />
+    <ClInclude Include="3rdparty\gtest\gtest-printers.h" />
+    <ClInclude Include="3rdparty\gtest\gtest-spi.h" />
+    <ClInclude Include="3rdparty\gtest\gtest-test-part.h" />
+    <ClInclude Include="3rdparty\gtest\gtest-typed-test.h" />
+    <ClInclude Include="3rdparty\gtest\gtest.h" />
+    <ClInclude Include="3rdparty\gtest\gtest_pred_impl.h" />
+    <ClInclude Include="3rdparty\gtest\gtest_prod.h" />
+    <ClInclude Include="3rdparty\gtest\internal\gtest-death-test-internal.h" />
+    <ClInclude Include="3rdparty\gtest\internal\gtest-filepath.h" />
+    <ClInclude Include="3rdparty\gtest\internal\gtest-internal.h" />
+    <ClInclude Include="3rdparty\gtest\internal\gtest-linked_ptr.h" />
+    <ClInclude Include="3rdparty\gtest\internal\gtest-param-util-generated.h" />
+    <ClInclude Include="3rdparty\gtest\internal\gtest-param-util.h" />
+    <ClInclude Include="3rdparty\gtest\internal\gtest-port.h" />
+    <ClInclude Include="3rdparty\gtest\internal\gtest-string.h" />
+    <ClInclude Include="3rdparty\gtest\internal\gtest-tuple.h" />
+    <ClInclude Include="3rdparty\gtest\internal\gtest-type-util.h" />
+    <ClInclude Include="3rdparty\gtest\src\gtest-internal-inl.h" />
+    <ClInclude Include="3rdparty\poly2tri\common\shapes.h" />
+    <ClInclude Include="3rdparty\poly2tri\common\utils.h" />
+    <ClInclude Include="3rdparty\poly2tri\poly2tri.h" />
+    <ClInclude Include="3rdparty\poly2tri\sweep\advancing_front.h" />
+    <ClInclude Include="3rdparty\poly2tri\sweep\cdt.h" />
+    <ClInclude Include="3rdparty\poly2tri\sweep\sweep.h" />
+    <ClInclude Include="3rdparty\poly2tri\sweep\sweep_context.h" />
+    <ClInclude Include="3rdparty\polyclipper\clipper.hpp" />
+    <ClInclude Include="3rdparty\polypartition\polypartition.h" />
+    <ClInclude Include="3rdparty\readdir\_stdafx.h" />
+    <ClInclude Include="3rdparty\readdir\targetver.h" />
+    <ClInclude Include="augmentations.h" />
+    <ClInclude Include="entity_system\component.h" />
+    <ClInclude Include="entity_system\entity.h" />
+    <ClInclude Include="entity_system\entity_ptr.h" />
+    <ClInclude Include="entity_system\entity_system.h" />
+    <ClInclude Include="entity_system\signature_matcher.h" />
+    <ClInclude Include="entity_system\processing_system.h" />
+    <ClInclude Include="entity_system\templated_list.h" />
+    <ClInclude Include="entity_system\type_registry.h" />
+    <ClInclude Include="entity_system\world.h" />
+    <ClInclude Include="error\error.h" />
+    <ClInclude Include="graphics\pixel.h" />
+    <ClInclude Include="options.h" />
+    <ClInclude Include="math\rects.h" />
+    <ClInclude Include="math\vec2d.h" />
+    <ClInclude Include="SDK\topdown\bindings\bindings.h" />
+    <ClInclude Include="SDK\topdown\components\behaviour_tree_component.h" />
+    <ClInclude Include="SDK\topdown\components\visibility_component.h" />
+    <ClInclude Include="SDK\topdown\components\pathfinding_component.h" />
+    <ClInclude Include="SDK\topdown\components\steering_component.h" />
+    <ClInclude Include="SDK\topdown\messages\steering_message.h" />
+    <ClInclude Include="SDK\topdown\resources\fbo.h" />
+    <ClInclude Include="SDK\topdown\systems\behaviour_tree_system.h" />
+    <ClInclude Include="SDK\topdown\systems\pathfinding_system.h" />
+    <ClInclude Include="SDK\topdown\systems\visibility_system.h" />
+    <ClInclude Include="SDK\topdown\systems\steering_system.h" />
+    <ClInclude Include="SDK\topdown\resources\animate_info.h" />
+    <ClInclude Include="SDK\topdown\components\animate_component.h" />
+    <ClInclude Include="SDK\topdown\components\camera_component.h" />
+    <ClInclude Include="SDK\topdown\components\chase_component.h" />
+    <ClInclude Include="SDK\topdown\components\children_component.h" />
+    <ClInclude Include="SDK\topdown\components\crosshair_component.h" />
+    <ClInclude Include="SDK\topdown\components\damage_component.h" />
+    <ClInclude Include="SDK\topdown\components\health_component.h" />
+    <ClInclude Include="SDK\topdown\components\input_component.h" />
+    <ClInclude Include="SDK\topdown\components\lookat_component.h" />
+    <ClInclude Include="SDK\topdown\components\particle_emitter_component.h" />
+    <ClInclude Include="SDK\topdown\components\movement_component.h" />
+    <ClInclude Include="SDK\topdown\components\particle_group_component.h" />
+    <ClInclude Include="SDK\topdown\components\physics_component.h" />
+    <ClInclude Include="SDK\topdown\components\render_component.h" />
+    <ClInclude Include="SDK\topdown\components\scriptable_component.h" />
+    <ClInclude Include="SDK\topdown\components\transform_component.h" />
+    <ClInclude Include="SDK\topdown\components\gun_component.h" />
+    <ClInclude Include="SDK\topdown\game\body_helper.h" />
+    <ClInclude Include="SDK\topdown\game\texture_helper.h" />
+    <ClInclude Include="SDK\topdown\messages\animate_message.h" />
+    <ClInclude Include="SDK\topdown\messages\collision_message.h" />
+    <ClInclude Include="SDK\topdown\messages\damage_message.h" />
+    <ClInclude Include="SDK\topdown\messages\destroy_message.h" />
+    <ClInclude Include="SDK\topdown\messages\intent_message.h" />
+    <ClInclude Include="SDK\topdown\messages\message.h" />
+    <ClInclude Include="SDK\topdown\messages\particle_burst_message.h" />
+    <ClInclude Include="SDK\topdown\resources\particle_emitter_info.h" />
+    <ClInclude Include="SDK\topdown\resources\render_info.h" />
+    <ClInclude Include="SDK\topdown\resources\scriptable_info.h" />
+    <ClInclude Include="SDK\topdown\systems\animation_system.h" />
+    <ClInclude Include="SDK\topdown\systems\camera_system.h" />
+    <ClInclude Include="SDK\topdown\systems\chase_system.h" />
+    <ClInclude Include="SDK\topdown\systems\crosshair_system.h" />
+    <ClInclude Include="SDK\topdown\systems\damage_system.h" />
+    <ClInclude Include="SDK\topdown\systems\destroy_system.h" />
+    <ClInclude Include="SDK\topdown\systems\gun_system.h" />
+    <ClInclude Include="SDK\topdown\systems\health_system.h" />
+    <ClInclude Include="SDK\topdown\systems\input_system.h" />
+    <ClInclude Include="SDK\topdown\systems\lookat_system.h" />
+    <ClInclude Include="SDK\topdown\systems\movement_system.h" />
+    <ClInclude Include="SDK\topdown\systems\particle_emitter_system.h" />
+    <ClInclude Include="SDK\topdown\systems\particle_group_system.h" />
+    <ClInclude Include="SDK\topdown\systems\physics_system.h" />
+    <ClInclude Include="SDK\topdown\systems\render_system.h" />
+    <ClInclude Include="SDK\topdown\systems\script_system.h" />
+    <ClInclude Include="SDK\topdown\resources\vertex.h" />
+    <ClInclude Include="texture_baker\font.h" />
+    <ClInclude Include="texture_baker\image.h" />
+    <ClInclude Include="texture_baker\rectpack.h" />
+    <ClInclude Include="texture_baker\texture_baker.h" />
+    <ClInclude Include="utility\delta_accumulator.h" />
+    <ClInclude Include="utility\input_context.h" />
+    <ClInclude Include="utility\map_wrapper.h" />
+    <ClInclude Include="utility\randval.h" />
+    <ClInclude Include="utility\sorted_vector.h" />
+    <ClInclude Include="utility\stream.h" />
+    <ClInclude Include="utility\timer.h" />
+    <ClInclude Include="utility\value_animator.h" />
+    <ClInclude Include="window_framework\event.h" />
+    <ClInclude Include="window_framework\window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="scripts\entity_creation_util.lua" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
