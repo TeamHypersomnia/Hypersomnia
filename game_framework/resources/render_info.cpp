@@ -5,8 +5,8 @@
 #include <algorithm>
 #include "entity_system/entity.h"
 
-#include "../../topdown/components/physics_component.h"
-#include "../../topdown/components/particle_group_component.h"
+#include "../components/physics_component.h"
+#include "../components/particle_group_component.h"
 
 #include "misc/sorted_vector.h"
 #include "poly2tri/poly2tri.h"

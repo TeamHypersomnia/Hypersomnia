@@ -61,7 +61,7 @@ int main() {
 	gl.create(scripts.lua_state, rects::wh(100, 100));
 	gl.set_show(gl.SHOW);
 	gl.vsync(0);
-	window::cursor(false);
+	window::cursor(false); 
 
 	input_system input(gl);
 	steering_system steering;
