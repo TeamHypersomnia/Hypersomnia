@@ -94,7 +94,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(IncludePath)</IncludePath>
+    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir)\utilities;C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(IncludePath)</IncludePath>
     <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\output\</OutDir>
   </PropertyGroup>
@@ -103,7 +103,7 @@
     <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(IncludePath)</IncludePath>
+    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir)\utilities;C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(IncludePath)</IncludePath>
     <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\output\</OutDir>
   </PropertyGroup>
@@ -112,7 +112,7 @@
     <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">
-    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(IncludePath)</IncludePath>
+    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir)\utilities;C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(ProjectDir);$(IncludePath)</IncludePath>
     <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\output\</OutDir>
     <LinkIncremental>false</LinkIncremental>
@@ -588,8 +588,8 @@
     <ClCompile Include="3rdparty\Box2D\Dynamics\Joints\b2WeldJoint.cpp" />
     <ClCompile Include="3rdparty\Box2D\Dynamics\Joints\b2WheelJoint.cpp" />
     <ClCompile Include="3rdparty\Box2D\Rope\b2Rope.cpp" />
-    <ClCompile Include="entity_system\component.cpp" />
-    <ClCompile Include="entity_system\entity.cpp">
+    <ClCompile Include="utilities\entity_system\component.cpp" />
+    <ClCompile Include="utilities\entity_system\entity.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
@@ -597,7 +597,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="entity_system\entity_ptr.cpp">
+    <ClCompile Include="utilities\entity_system\entity_ptr.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
@@ -605,7 +605,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="entity_system\signature_matcher.cpp">
+    <ClCompile Include="utilities\entity_system\signature_matcher.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
@@ -613,7 +613,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="entity_system\processing_system.cpp">
+    <ClCompile Include="utilities\entity_system\processing_system.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
@@ -621,8 +621,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="entity_system\templated_list.cpp" />
-    <ClCompile Include="entity_system\type_registry.cpp">
+    <ClCompile Include="utilities\entity_system\templated_list.cpp" />
+    <ClCompile Include="utilities\entity_system\type_registry.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
@@ -630,7 +630,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="entity_system\world.cpp">
+    <ClCompile Include="utilities\entity_system\world.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
@@ -638,10 +638,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="error\error.cpp" />
-    <ClCompile Include="graphics\pixel.cpp" />
-    <ClCompile Include="math\rects.cpp" />
-    <ClCompile Include="math\vec2d.cpp" />
+    <ClCompile Include="utilities\error\error.cpp" />
+    <ClCompile Include="utilities\graphics\pixel.cpp" />
+    <ClCompile Include="utilities\math\rects.cpp" />
+    <ClCompile Include="utilities\math\vec2d.cpp" />
     <ClCompile Include="game_framework\bindings\behaviour_tree_binding.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
@@ -999,7 +999,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="graphics\fbo.cpp">
+    <ClCompile Include="utilities\graphics\fbo.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
@@ -1007,7 +1007,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="graphics\shader.cpp">
+    <ClCompile Include="utilities\graphics\shader.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="game_framework\resources\vertex.cpp" />
@@ -1244,7 +1244,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="texture_baker\image.cpp">
+    <ClCompile Include="utilities\texture_baker\image.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
@@ -1252,8 +1252,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="texture_baker\rectpack.cpp" />
-    <ClCompile Include="texture_baker\texture_baker.cpp">
+    <ClCompile Include="utilities\texture_baker\rectpack.cpp" />
+    <ClCompile Include="utilities\texture_baker\texture_baker.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
@@ -1261,11 +1261,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="misc\delta_accumulator.cpp" />
-    <ClCompile Include="misc\randval.cpp" />
-    <ClCompile Include="misc\timer.cpp" />
-    <ClCompile Include="misc\value_animator.cpp" />
-    <ClCompile Include="window_framework\event.cpp">
+    <ClCompile Include="utilities\misc\delta_accumulator.cpp" />
+    <ClCompile Include="utilities\misc\randval.cpp" />
+    <ClCompile Include="utilities\misc\timer.cpp" />
+    <ClCompile Include="utilities\misc\value_animator.cpp" />
+    <ClCompile Include="utilities\window_framework\event.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
@@ -1273,7 +1273,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="window_framework\window.cpp">
+    <ClCompile Include="utilities\window_framework\window.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
@@ -1528,20 +1528,20 @@
     <ClInclude Include="3rdparty\SFML\Window\WindowHandle.hpp" />
     <ClInclude Include="3rdparty\SFML\Window\WindowStyle.hpp" />
     <ClInclude Include="augmentations.h" />
-    <ClInclude Include="entity_system\component.h" />
-    <ClInclude Include="entity_system\entity.h" />
-    <ClInclude Include="entity_system\entity_ptr.h" />
-    <ClInclude Include="entity_system\entity_system.h" />
-    <ClInclude Include="entity_system\signature_matcher.h" />
-    <ClInclude Include="entity_system\processing_system.h" />
-    <ClInclude Include="entity_system\templated_list.h" />
-    <ClInclude Include="entity_system\type_registry.h" />
-    <ClInclude Include="entity_system\world.h" />
-    <ClInclude Include="error\error.h" />
-    <ClInclude Include="graphics\pixel.h" />
+    <ClInclude Include="utilities\entity_system\component.h" />
+    <ClInclude Include="utilities\entity_system\entity.h" />
+    <ClInclude Include="utilities\entity_system\entity_ptr.h" />
+    <ClInclude Include="utilities\entity_system\entity_system.h" />
+    <ClInclude Include="utilities\entity_system\signature_matcher.h" />
+    <ClInclude Include="utilities\entity_system\processing_system.h" />
+    <ClInclude Include="utilities\entity_system\templated_list.h" />
+    <ClInclude Include="utilities\entity_system\type_registry.h" />
+    <ClInclude Include="utilities\entity_system\world.h" />
+    <ClInclude Include="utilities\error\error.h" />
+    <ClInclude Include="utilities\graphics\pixel.h" />
     <ClInclude Include="options.h" />
-    <ClInclude Include="math\rects.h" />
-    <ClInclude Include="math\vec2d.h" />
+    <ClInclude Include="utilities\math\rects.h" />
+    <ClInclude Include="utilities\math\vec2d.h" />
     <ClInclude Include="game_framework\bindings\bindings.h" />
     <ClInclude Include="game_framework\components\behaviour_tree_component.h" />
     <ClInclude Include="game_framework\components\visibility_component.h" />
@@ -1549,8 +1549,8 @@
     <ClInclude Include="game_framework\components\steering_component.h" />
     <ClInclude Include="game_framework\messages\shot_message.h" />
     <ClInclude Include="game_framework\messages\steering_message.h" />
-    <ClInclude Include="graphics\fbo.h" />
-    <ClInclude Include="graphics\shader.h" />
+    <ClInclude Include="utilities\graphics\fbo.h" />
+    <ClInclude Include="utilities\graphics\shader.h" />
     <ClInclude Include="game_framework\systems\behaviour_tree_system.h" />
     <ClInclude Include="game_framework\systems\pathfinding_system.h" />
     <ClInclude Include="game_framework\systems\visibility_system.h" />
@@ -1600,21 +1600,21 @@
     <ClInclude Include="game_framework\systems\render_system.h" />
     <ClInclude Include="game_framework\systems\script_system.h" />
     <ClInclude Include="game_framework\resources\vertex.h" />
-    <ClInclude Include="texture_baker\font.h" />
-    <ClInclude Include="texture_baker\image.h" />
-    <ClInclude Include="texture_baker\rectpack.h" />
-    <ClInclude Include="texture_baker\texture_baker.h" />
-    <ClInclude Include="misc\delta_accumulator.h" />
-    <ClInclude Include="misc\map_wrapper.h" />
-    <ClInclude Include="misc\ptr_wrapper.h" />
-    <ClInclude Include="misc\randval.h" />
-    <ClInclude Include="misc\sorted_vector.h" />
-    <ClInclude Include="misc\stream.h" />
-    <ClInclude Include="misc\timer.h" />
-    <ClInclude Include="misc\value_animator.h" />
-    <ClInclude Include="misc\vector_wrapper.h" />
-    <ClInclude Include="window_framework\event.h" />
-    <ClInclude Include="window_framework\window.h" />
+    <ClInclude Include="utilities\texture_baker\font.h" />
+    <ClInclude Include="utilities\texture_baker\image.h" />
+    <ClInclude Include="utilities\texture_baker\rectpack.h" />
+    <ClInclude Include="utilities\texture_baker\texture_baker.h" />
+    <ClInclude Include="utilities\misc\delta_accumulator.h" />
+    <ClInclude Include="utilities\misc\map_wrapper.h" />
+    <ClInclude Include="utilities\misc\ptr_wrapper.h" />
+    <ClInclude Include="utilities\misc\randval.h" />
+    <ClInclude Include="utilities\misc\sorted_vector.h" />
+    <ClInclude Include="utilities\misc\stream.h" />
+    <ClInclude Include="utilities\misc\timer.h" />
+    <ClInclude Include="utilities\misc\value_animator.h" />
+    <ClInclude Include="utilities\misc\vector_wrapper.h" />
+    <ClInclude Include="utilities\window_framework\event.h" />
+    <ClInclude Include="utilities\window_framework\window.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="3rdparty\SFML\Graphics\Rect.inl" />

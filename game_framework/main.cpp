@@ -1,8 +1,8 @@
 #pragma once
 #include "stdafx.h"
 #include <gtest\gtest.h>
-#include "../../augmentations.h"
-#include "../../window_framework/window.h"
+#include "../augmentations.h"
+#include "window_framework/window.h"
 
 #include "entity_system/world.h"
 
