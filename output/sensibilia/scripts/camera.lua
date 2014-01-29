@@ -194,6 +194,7 @@ world_camera = create_entity (archetyped(camera_archetype, {
 		
 		drawing_callback = function (subject, renderer, visible_area, drawn_transform, target_transform, mask)
 			my_shader_program:use()
+			my_atlas:bind()
 			renderer:generate_triangles(visible_area, drawn_transform, mask)
 			
 			GL.glUniformMatrix4fv(

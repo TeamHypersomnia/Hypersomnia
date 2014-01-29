@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include "entity_system/component.h"
 #include "entity_system/entity_ptr.h"
-#include "../../../utility/timer.h"
+#include "../../../misc/timer.h"
 
 namespace components {
 	struct behaviour_tree : public augmentations::entity_system::component {
@@ -106,7 +106,7 @@ namespace components {
 
 			task();
 			
-			augmentations::util::timer since_entered;
+			augmentations::misc::timer since_entered;
 		};
 
 		struct tree_instance {

@@ -3,7 +3,7 @@
 #include "ptr_wrapper.h"
 
 namespace augmentations {
-	namespace util {
+	namespace misc {
 		/* vector wrapper that is used to faciliate binding to lua */
 		template<class value>
 		struct vector_wrapper {

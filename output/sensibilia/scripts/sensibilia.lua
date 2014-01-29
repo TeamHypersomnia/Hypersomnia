@@ -1,3 +1,9 @@
+stability = 1
+base_gravity = b2Vec2(0, 120)
+gravity_angle_offset = 0
+
+current_gravity = b2Vec2(0, 120)
+
 dofile "sensibilia\\scripts\\input.lua"
 dofile "sensibilia\\scripts\\camera.lua"
 
@@ -77,7 +83,7 @@ loop_only_info = create_scriptable_info {
 			end,
 				
 		[scriptable_component.LOOP] = function(subject)
-			my_atlas:bind()
+			
 		end
 	}
 }

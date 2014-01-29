@@ -3,7 +3,7 @@
 #include <chrono>
 
 namespace augmentations {
-	namespace util {
+	namespace misc {
 		class timer {
 			std::chrono::high_resolution_clock::time_point ticks;
 		public:

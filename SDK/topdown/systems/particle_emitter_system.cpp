@@ -10,7 +10,7 @@
 
 #include "../messages/particle_burst_message.h"
 
-#include "utility/randval.h"
+#include "misc/randval.h"
 
 void particle_emitter_system::spawn_particle(
 	components::particle_group::stream& group, const vec2<>& position, float rotation, const resources::emission& emission) {

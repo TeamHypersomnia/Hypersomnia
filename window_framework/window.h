@@ -2,7 +2,7 @@
 
 #include "../math/rects.h"
 #include "event.h"
-#include "../utility/timer.h"
+#include "../misc/timer.h"
 #include <functional>
 
 struct lua_State;
@@ -36,7 +36,7 @@ namespace augmentations {
 			
 			void _poll(event::message&, WPARAM, LPARAM);
 			
-			util::timer triple_timer;
+			misc::timer triple_timer;
 			bool doubled;
 		public:
 			enum mode {

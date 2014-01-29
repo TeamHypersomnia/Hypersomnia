@@ -8,7 +8,7 @@
 #include "../../topdown/components/physics_component.h"
 #include "../../topdown/components/particle_group_component.h"
 
-#include "utility/sorted_vector.h"
+#include "misc/sorted_vector.h"
 #include "poly2tri/poly2tri.h"
 
 #include "3rdparty/polypartition/polypartition.h"

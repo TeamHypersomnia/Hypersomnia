@@ -2,7 +2,7 @@
 #include "entity_system/component.h"
 #include "math/vec2d.h"
 #include "render_component.h"
-#include "utility/delta_accumulator.h"
+#include "misc/delta_accumulator.h"
 
 #include "entity_system/entity_ptr.h"
 
@@ -47,7 +47,7 @@ namespace components {
 		friend class camera_system;
 		friend class gun_system;
 
-		augmentations::util::timer smooth_timer;
+		augmentations::misc::timer smooth_timer;
 		augmentations::rects::ltrb last_ortho_interpolant;
 	};
 }

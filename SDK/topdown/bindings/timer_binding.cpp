@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "bindings.h"
 
-#include "utility/timer.h"
+#include "misc/timer.h"
 
 namespace bindings {
 	luabind::scope _timer() {

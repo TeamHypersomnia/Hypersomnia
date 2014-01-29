@@ -5,8 +5,8 @@
 #include "entity.h"
 #include "type_registry.h"
 
-#include "utility/sorted_vector.h"
-#include "utility/timer.h"
+#include "misc/sorted_vector.h"
+#include "misc/timer.h"
 
 namespace augmentations {
 	namespace entity_system {
@@ -28,7 +28,7 @@ namespace augmentations {
 			template <typename message>
 			struct templated_message_queue : public message_queue {
 				struct delayed_message {
-					util::timer was_sent;
+					misc::timer was_sent;
 					float post_after_ms;
 
 					message msg;
@@ -63,7 +63,7 @@ namespace augmentations {
 			
 			std::unordered_map<size_t, std::unique_ptr<message_queue>> input_queue;
 			std::unordered_map<size_t, boost::pool<>> size_to_container;
-			std::unordered_map<entity*, util::sorted_vector<entity_ptr*>> registered_entity_watchers;
+			std::unordered_map<entity*, misc::sorted_vector<entity_ptr*>> registered_entity_watchers;
 
 
 			std::vector<processing_system*> all_systems;

@@ -26,7 +26,7 @@
 #include "systems/script_system.h"
 #include "systems/behaviour_tree_system.h"
 
-#include "messages/destroy_message.h"
+#include "messages/destroy_message.h" 
 #include "messages/collision_message.h"
 #include "messages/intent_message.h"
 #include "messages/animate_message.h"

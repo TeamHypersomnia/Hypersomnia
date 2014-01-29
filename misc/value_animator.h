@@ -4,7 +4,7 @@
 #include <vector>
 
 namespace augmentations {
-	namespace util {
+	namespace misc {
 		class animator {
 			timer tm;
 			std::function<void (float)> callback;

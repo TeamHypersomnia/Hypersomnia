@@ -39,12 +39,6 @@
     <ClCompile Include="texture_baker\rectpack.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="utility\timer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="utility\value_animator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="window_framework\event.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -61,9 +55,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="entity_system\component.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="utility\delta_accumulator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="graphics\pixel.cpp">
@@ -585,9 +576,6 @@
     <ClCompile Include="3rdparty\Box2D\Collision\b2TimeOfImpact.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="utility\randval.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SDK\topdown\systems\visibility_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -660,6 +648,18 @@
     <ClCompile Include="SDK\topdown\bindings\timer_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="misc\delta_accumulator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="misc\randval.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="misc\timer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="misc\value_animator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="entity_system\component.h">
@@ -692,15 +692,6 @@
     <ClInclude Include="texture_baker\texture_baker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utility\stream.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="utility\timer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="utility\value_animator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="window_framework\event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -717,9 +708,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="entity_system\processing_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="utility\delta_accumulator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="graphics\pixel.h">
@@ -768,9 +756,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SDK\topdown\messages\intent_message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="utility\sorted_vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SDK\topdown\components\crosshair_component.h">
@@ -855,9 +840,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="entity_system\entity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="utility\map_wrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\readdir\targetver.h">
@@ -1053,9 +1035,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\Box2D\Collision\b2TimeOfImpact.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="utility\randval.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SDK\topdown\components\pathfinding_component.h">
@@ -1409,12 +1388,6 @@
     <ClInclude Include="graphics\fbo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utility\ptr_wrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="utility\vector_wrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="3rdparty\SFML\Audio\Export.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1656,6 +1629,33 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\SFML\Window.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="misc\delta_accumulator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="misc\map_wrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="misc\ptr_wrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="misc\randval.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="misc\sorted_vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="misc\stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="misc\timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="misc\value_animator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="misc\vector_wrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

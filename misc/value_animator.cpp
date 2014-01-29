@@ -2,7 +2,7 @@
 #include "value_animator.h"
 
 namespace augmentations {
-	namespace util {
+	namespace misc {
 		animator::method::method(float left_x, float right_x, const std::function<float (float)>& increasing_func) 
 			: increasing_func(increasing_func), left_x(left_x), diff_x(right_x - left_x), left_y(increasing_func(left_x)), diff_y(increasing_func(right_x) - left_y) {}
 

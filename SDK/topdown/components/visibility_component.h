@@ -3,7 +3,7 @@
 #include "math/vec2d.h"
 #include "entity_system/component.h"
 #include "graphics/pixel.h"
-#include "utility/sorted_vector.h"
+#include "misc/sorted_vector.h"
 
 namespace components {
 	struct visibility : public augmentations::entity_system::component {
@@ -60,7 +60,7 @@ namespace components {
 			CONTAINMENT
 		};
 
-		augmentations::util::sorted_vector_map<int, layer> visibility_layers;
+		augmentations::misc::sorted_vector_map<int, layer> visibility_layers;
 
 		void add_layer(int key, const layer& val) {
 			visibility_layers.add(key, val);

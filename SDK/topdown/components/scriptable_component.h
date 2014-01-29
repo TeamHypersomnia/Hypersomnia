@@ -1,10 +1,10 @@
 #pragma once
-#include "utility/map_wrapper.h"
+#include "misc/map_wrapper.h"
 #include "entity_system/component.h"
 
 namespace resources {
 	class script;
-	typedef augmentations::util::map_wrapper<int, luabind::object> scriptable_info;
+	typedef augmentations::misc::map_wrapper<int, luabind::object> scriptable_info;
 }
 
 namespace components {

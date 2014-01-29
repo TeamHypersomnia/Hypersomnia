@@ -2,13 +2,13 @@
 #include <unordered_map>
 #include "entity_system/component.h"
 #include "../messages/animate_message.h"
-#include "utility/map_wrapper.h"
+#include "misc/map_wrapper.h"
 
 #include "../resources/animate_info.h"
 
 class animation_system;
 namespace resources {
-	typedef augmentations::util::map_wrapper<int, animation*> animate_info;
+	typedef augmentations::misc::map_wrapper<int, animation*> animate_info;
 }
 
 namespace components {

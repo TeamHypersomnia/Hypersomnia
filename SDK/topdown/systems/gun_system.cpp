@@ -20,7 +20,7 @@
 
 #include "../game/body_helper.h"
 
-#include "utility/randval.h"
+#include "misc/randval.h"
 
 /* hacky methods to aid transferring barrel smoke to dropped gun */
 void components::gun::transfer_barrel_smoke(augmentations::entity_system::entity* another, bool overwrite_components) {

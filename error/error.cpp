@@ -5,7 +5,7 @@
 #undef min
 #undef max
 #include <gl/glew.h>
-#include "../utility/stream.h"
+#include "../misc/stream.h"
 #include <cassert>
 namespace augmentations {
 	using namespace error_logging;
@@ -49,13 +49,13 @@ namespace augmentations {
 		}
 
 		void module::gl_last_error(wchar_t* msgbuf) {
-			wcscpy(msgbuf, util::wstr(glGetError()).c_str());
+			wcscpy(msgbuf, misc::wstr(glGetError()).c_str());
 			//const GLubyte* glstr = gluErrorString(glGetError());
 			//MultiByteToWideChar(CP_UTF8, 0, (const char*)glstr, -1, msgbuf, 1000);
 		}
 		
 		void module::glew_last_error(wchar_t* msgbuf) {
-			//wcscpy(msgbuf, util::wstr(glewGetErrorString(glew_last_errorcode)).c_str());
+			//wcscpy(msgbuf, misc::wstr(glewGetErrorString(glew_last_errorcode)).c_str());
 			const GLubyte* glstr = glewGetErrorString(glew_last_errorcode);
 			MultiByteToWideChar(CP_UTF8, 0, (const char*)glstr, -1, msgbuf, 1000);
 		}

@@ -4,7 +4,7 @@
 #include "component.h"
 #include "signature_matcher.h"
 
-#include "utility/sorted_vector.h"
+#include "misc/sorted_vector.h"
 
 namespace augmentations {
 	namespace entity_system {
@@ -21,7 +21,7 @@ namespace augmentations {
 			~entity();
 
 			/* maps type hashes into components */
-			util::sorted_vector_map<type_hash, component*> type_to_component;
+			misc::sorted_vector_map<type_hash, component*> type_to_component;
 			std::string name;
 
 			world& owner_world;

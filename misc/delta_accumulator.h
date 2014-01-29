@@ -2,7 +2,7 @@
 #include "timer.h"
 
 namespace augmentations {
-	namespace util {
+	namespace misc {
 		class delta_accumulator {
 			timer ticks;
 

@@ -42,7 +42,7 @@ namespace augmentations {
 			void destroy();
 		};
 
-		//class image_file : public image, public augmentations::util::container::registry<image_file> {
+		//class image_file : public image, public augmentations::misc::container::registry<image_file> {
 		//	const char* filename;
 		//	int force_channels;
 		//public:

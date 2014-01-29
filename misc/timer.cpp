@@ -3,7 +3,7 @@
 
 
 namespace augmentations {
-	namespace util {
+	namespace misc {
 		timer::timer() {
 			reset();
 		}

@@ -1,5 +1,5 @@
 #pragma once
-#include "utility/timer.h"
+#include "misc/timer.h"
 
 #include "entity_system/processing_system.h"
 
@@ -9,7 +9,7 @@ using namespace augmentations;
 using namespace entity_system;
 
 class particle_group_system : public processing_system_templated<components::particle_group> {
-	util::timer timer;
+	misc::timer timer;
 public:
 	void process_entities(world&);
 };

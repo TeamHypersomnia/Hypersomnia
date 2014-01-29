@@ -2,7 +2,7 @@
 #include <vector>
 
 namespace augmentations {
-	namespace util {
+	namespace misc {
 		template<typename value>
 		struct sorted_vector {
 			std::vector<value> raw;

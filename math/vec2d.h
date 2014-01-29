@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <Box2D/Common/b2Math.h>
 #include "rects.h"
-#include "utility/randval.h"
+#include "misc/randval.h"
 namespace augmentations {
 	template <class type_val>
 	void damp(type_val& val, type_val len) {

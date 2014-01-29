@@ -3,7 +3,7 @@
 #include "entity_system/entity_ptr.h"
 #include "math/vec2d.h"
 #include "graphics/pixel.h"
-#include "utility/timer.h"
+#include "misc/timer.h"
 
 #include "visibility_component.h"
 

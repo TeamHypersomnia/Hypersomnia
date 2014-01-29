@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include <iostream>
 
-#include "utility/randval.h"
+#include "misc/randval.h"
 
 #include "entity_system/entity.h"
 #include "entity_system/world.h"

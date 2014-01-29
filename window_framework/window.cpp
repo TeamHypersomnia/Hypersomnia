@@ -3,7 +3,7 @@
 
 
 #include "window.h"
-#include "../utility/stream.h"
+#include "../misc/stream.h"
 #include <algorithm>
 
 namespace augmentations {
@@ -506,7 +506,7 @@ namespace augmentations {
 		}
 
 		void imbx(int title, int content) { 
-			MessageBox(0, util::wstr(content).c_str(), util::wstr(title).c_str(), MB_OK); 
+			MessageBox(0, misc::wstr(content).c_str(), misc::wstr(title).c_str(), MB_OK); 
 		}
 
 		void smbx(std::wstring title, std::wstring content) { 

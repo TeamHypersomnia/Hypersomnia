@@ -14,9 +14,9 @@
 #include "../messages/intent_message.h"
 #include "../messages/shot_message.h"
 
-#include "utility/randval.h"
-#include "utility/vector_wrapper.h"
-#include "utility/ptr_wrapper.h"
+#include "misc/randval.h"
+#include "misc/vector_wrapper.h"
+#include "misc/ptr_wrapper.h"
 #include "../resources/scriptable_info.h"
 
 void set_world_reloading_script(resources::script* new_scr) {
@@ -137,8 +137,8 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 	luabind::module(lua_state)[
 			luabind::class_<ptr_wrapper<float>>("float_ptr"),
 
-			util::vector_wrapper<float>::bind("float_vector"),
-			util::vector_wrapper<vec2<>>::bind_vector("vec2_vector"),
+			misc::vector_wrapper<float>::bind("float_vector"),
+			misc::vector_wrapper<vec2<>>::bind_vector("vec2_vector"),
 		
 			bindings::_sfml_audio(),
 			bindings::_minmax(),

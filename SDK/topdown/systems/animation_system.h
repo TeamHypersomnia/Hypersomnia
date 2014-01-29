@@ -1,5 +1,5 @@
 #pragma once
-#include "utility/timer.h"
+#include "misc/timer.h"
 
 #include "entity_system/processing_system.h"
 
@@ -11,7 +11,7 @@ using namespace entity_system;
 
 class animation_system : public processing_system_templated<components::animate, components::render> {
 public:
-	util::timer animation_timer;
+	misc::timer animation_timer;
 	void consume_events(world&) override;
 	void process_entities(world&) override;
 };

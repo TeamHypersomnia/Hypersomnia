@@ -1,6 +1,6 @@
 #pragma once
 
-#include "utility/timer.h"
+#include "misc/timer.h"
 #include "entity_system/component.h"
 #include "entity_system/entity_ptr.h"
 
@@ -97,6 +97,6 @@ namespace components {
 	private:
 		friend class gun_system;
 
-		augmentations::util::timer state_timer;
+		augmentations::misc::timer state_timer;
 	};
 }

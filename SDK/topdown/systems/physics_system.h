@@ -1,5 +1,5 @@
 #pragma once
-#include "utility/delta_accumulator.h"
+#include "misc/delta_accumulator.h"
 #include "entity_system/processing_system.h"
 
 #include "../components/physics_component.h"
@@ -11,7 +11,7 @@ using namespace augmentations;
 using namespace entity_system;
 
 class physics_system : public processing_system_templated<components::physics, components::transform> {
-	util::delta_accumulator accumulator;
+	misc::delta_accumulator accumulator;
 
 	void reset_states();
 	void smooth_states();

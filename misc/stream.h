@@ -3,7 +3,7 @@
 #include <sstream>
 
 namespace augmentations {
-	namespace util {
+	namespace misc {
 
 		/* number to string conversion */
 
