@@ -47,7 +47,7 @@ render_system::render_system(window::glwindow& output_window)
 }
 
 void render_system::generate_triangles(rects::xywh visible_area, components::transform::state camera_transform, int mask) {
-	camera_transform.pos -= vec2<>(visible_area.w / 4, visible_area.h / 4);
+	camera_transform.pos -= vec2<>(visible_area.w / 2, visible_area.h / 2);
 
 	auto verts = rects::ltrb(visible_area).get_vertices<float>();
 
@@ -85,7 +85,15 @@ void render_system::generate_triangles(rects::xywh visible_area, components::tra
 
 	for (auto e : visible_targets) {
 		if (e.first->model == nullptr) continue;
-		e.first->model->draw(triangles, *e.second, camera_transform, e.first);
+
+		resources::renderable::draw_input in;
+		in.output = &triangles;
+		in.transform = *e.second;
+		in.camera_transform = camera_transform;
+		in.additional_info = e.first;
+		in.visible_area = visible_area;
+
+		e.first->model->draw(in);
 	}
 }
 

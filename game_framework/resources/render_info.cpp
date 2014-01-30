@@ -56,15 +56,17 @@ namespace resources {
 			size = tex->get_size();
 	}
 
-	void sprite::draw(buffer& triangles, const components::transform::state& transform, const components::transform::state& camera_transform, components::render* additional_info) {
+	void sprite::draw(draw_input in) {
+		auto& triangles = *in.output;
+
 		if (tex == nullptr) return;
 		vec2<> v[4];
 
-		auto camera_pos = camera_transform.pos;
-		make_rect(transform.pos - camera_pos, vec2<>(size), transform.rotation + rotation_offset, v);
+		auto camera_pos = in.camera_transform.pos;
+		make_rect(in.transform.pos - camera_pos, vec2<>(size), in.transform.rotation + rotation_offset, v);
 
 		for (auto& vert : v) 
-			vert.rotate(camera_transform.rotation, camera_transform.pos);
+			vert.rotate(in.camera_transform.rotation, in.camera_transform.pos);
 
 		vertex_triangle t1, t2;
 		t1.vertices[0].color = t2.vertices[0].color = color;
@@ -78,11 +80,11 @@ namespace resources {
 			vec2<>(0.f, 1.f)
 		};
 
-		if (additional_info) {
-			if (additional_info->flip_horizontally) 
+		if (in.additional_info) {
+			if (in.additional_info->flip_horizontally)
 				for (auto& v : texcoords)
 					v.x = 1.f - v.x; 
-			if (additional_info->flip_vertically)
+				if (in.additional_info->flip_vertically)
 				for (auto& v : texcoords)
 					v.y = 1.f - v.y;
 		}
@@ -207,28 +209,28 @@ namespace resources {
 	//	convex_models.push_back(model);
 	//}
 
-	void polygon::draw(buffer& triangles, const components::transform::state& transform, const components::transform::state& camera_transform, components::render*) {
+	void polygon::draw(draw_input in) {
 		vertex_triangle new_tri;
-		auto camera_pos = camera_transform.pos;
+		auto camera_pos = in.camera_transform.pos;
 
 		auto model_transformed = model;
 		for (auto& v : model_transformed) {
-			v.pos.rotate(transform.rotation, vec2<>(0, 0));
-			v.pos += transform.pos - camera_pos;
-			v.pos.rotate(camera_transform.rotation, camera_transform.pos);
+			v.pos.rotate(in.transform.rotation, vec2<>(0, 0));
+			v.pos += in.transform.pos - camera_pos;
+			v.pos.rotate(in.camera_transform.rotation, in.camera_transform.pos);
 		}
 
 		for (size_t i = 0; i < indices.size(); i += 3) {
 			new_tri.vertices[0] = model_transformed[indices[i]];
 			new_tri.vertices[1] = model_transformed[indices[i + 1]];
 			new_tri.vertices[2] = model_transformed[indices[i + 2]];
-			triangles.push_back(new_tri);
+			in.output->push_back(new_tri);
 		}
 	}
 }
 
 namespace components {
-	void particle_group::draw(resources::buffer& triangles, const components::transform::state& transform, const components::transform::state& camera_transform, components::render*) {
+	void particle_group::draw(draw_input in) {
 		for (auto& s : stream_slots)
 			for (auto& it : s.particles.particles) {
 				auto temp_alpha = it.face.color.a;
@@ -236,7 +238,8 @@ namespace components {
 				if (it.should_disappear)
 					it.face.color.a = static_cast<graphics::color>(((it.max_lifetime_ms - it.lifetime_ms) / it.max_lifetime_ms) * static_cast<float>(temp_alpha));
 
-				it.face.draw(triangles, components::transform::state(it.pos, it.rotation), camera_transform);
+				in.transform = components::transform::state(it.pos, it.rotation);
+				it.face.draw(in);
 				it.face.color.a = temp_alpha;
 			}
 	}
