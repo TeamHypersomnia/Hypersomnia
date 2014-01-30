@@ -47,6 +47,16 @@ render_system::render_system(window::glwindow& output_window)
 }
 
 void render_system::generate_triangles(rects::xywh visible_area, components::transform::state camera_transform, int mask) {
+	camera_transform.pos -= vec2<>(visible_area.w / 4, visible_area.h / 4);
+
+	auto verts = rects::ltrb(visible_area).get_vertices<float>();
+
+	for (auto& v : verts) 
+		v.rotate(camera_transform.rotation, vec2<>());
+
+	/* expanded aabb that takes rotation into consideration */
+	auto rotated_aabb = rects::ltrb::get_aabb<float>(verts.data());
+
 	/* shortcut */
 	typedef std::pair<components::render*, components::transform::state*> cached_pair;
 
@@ -64,7 +74,7 @@ void render_system::generate_triangles(rects::xywh visible_area, components::tra
 		auto& transform = e->get<components::transform>().current;
 
 		/* if an entity's AABB hovers specified visible region */
-		if (render.model->is_visible(visible_area + camera_transform.pos, transform))
+		if (render.model->is_visible(rotated_aabb + camera_transform.pos, transform))
 			visible_targets.push_back(std::make_pair(&render, &transform));
 	}
 
@@ -75,7 +85,7 @@ void render_system::generate_triangles(rects::xywh visible_area, components::tra
 
 	for (auto e : visible_targets) {
 		if (e.first->model == nullptr) continue;
-		e.first->model->draw(triangles, *e.second, camera_transform.pos, e.first);
+		e.first->model->draw(triangles, *e.second, camera_transform, e.first);
 	}
 }
 

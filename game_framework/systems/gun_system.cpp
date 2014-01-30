@@ -84,7 +84,7 @@ void components::gun::shake_camera(float rotation) {
 			rotation - shake_spread_degrees,
 			rotation + shake_spread_degrees));
 
-		target_camera_to_shake->get<components::camera>().last_interpolant += shake_dir * shake_radius;
+		target_camera_to_shake->get<components::camera>().last_interpolant.pos += shake_dir * shake_radius;
 	}
 }
 

@@ -63,6 +63,34 @@ namespace augs {
 				return m.x >= l && m.y >= t && m.x <= r && m.y <= b;
 			}
 
+			template <class T>
+			static ltrb get_aabb(vec2<T>* v) {
+				auto x_pred = [](vec2<T> a, vec2<T> b){ return a.x < b.x; };
+				auto y_pred = [](vec2<T> a, vec2<T> b){ return a.y < b.y; };
+
+				vec2<T> lower(
+					static_cast<T>(std::min_element(v, v + 4, x_pred)->x),
+					static_cast<T>(std::min_element(v, v + 4, y_pred)->y)
+					);
+
+				vec2<T> upper(
+					static_cast<T>(std::max_element(v, v + 4, x_pred)->x),
+					static_cast<T>(std::max_element(v, v + 4, y_pred)->y)
+					);
+
+				return rects::ltrb(lower.x, lower.y, upper.x, upper.y);
+			}
+
+			template <class T>
+			std::vector<vec2<T>> get_vertices() const {
+				std::vector<vec2<T>> out;
+				out.push_back(vec2<T>(l, t));
+				out.push_back(vec2<T>(r, t));
+				out.push_back(vec2<T>(r, b));
+				out.push_back(vec2<T>(l, b));
+				return std::move(out);
+			}
+
 			bool hover(const ltrb&) const;
 			bool hover(const xywh&) const;
 			bool inside(const ltrb& bigger) const;

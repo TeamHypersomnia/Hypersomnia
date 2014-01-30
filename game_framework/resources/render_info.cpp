@@ -56,10 +56,15 @@ namespace resources {
 			size = tex->get_size();
 	}
 
-	void sprite::draw(buffer& triangles, const components::transform::state& transform, vec2<> camera_pos, components::render* additional_info) {
+	void sprite::draw(buffer& triangles, const components::transform::state& transform, const components::transform::state& camera_transform, components::render* additional_info) {
 		if (tex == nullptr) return;
 		vec2<> v[4];
+
+		auto camera_pos = camera_transform.pos;
 		make_rect(transform.pos - camera_pos, vec2<>(size), transform.rotation + rotation_offset, v);
+
+		for (auto& vert : v) 
+			vert.rotate(camera_transform.rotation, camera_transform.pos);
 
 		vertex_triangle t1, t2;
 		t1.vertices[0].color = t2.vertices[0].color = color;
@@ -109,7 +114,6 @@ namespace resources {
 
 		typedef const vec2<>& vc;
 
-		rects::xywh out;
 		auto x_pred = [](vc a, vc b){ return a.x < b.x; };
 		auto y_pred = [](vc a, vc b){ return a.y < b.y; };
 
@@ -123,7 +127,7 @@ namespace resources {
 			static_cast<int>(std::max_element(v, v + 4, y_pred)->y)
 			);
 
-		return rects::ltrb(lower.x, lower.y, upper.x, upper.y).hover(visibility_aabb);
+		return rects::ltrb::get_aabb(v).hover(visibility_aabb);
 	}
 	
 	std::vector<vec2<>> sprite::get_vertices() {
@@ -203,13 +207,15 @@ namespace resources {
 	//	convex_models.push_back(model);
 	//}
 
-	void polygon::draw(buffer& triangles, const components::transform::state& transform, vec2<> camera_pos, components::render*) {
+	void polygon::draw(buffer& triangles, const components::transform::state& transform, const components::transform::state& camera_transform, components::render*) {
 		vertex_triangle new_tri;
-		
+		auto camera_pos = camera_transform.pos;
+
 		auto model_transformed = model;
 		for (auto& v : model_transformed) {
 			v.pos.rotate(transform.rotation, vec2<>(0, 0));
 			v.pos += transform.pos - camera_pos;
+			v.pos.rotate(camera_transform.rotation, camera_transform.pos);
 		}
 
 		for (size_t i = 0; i < indices.size(); i += 3) {
@@ -222,7 +228,7 @@ namespace resources {
 }
 
 namespace components {
-	void particle_group::draw(resources::buffer& triangles, const components::transform::state& transform, vec2<> camera_pos, components::render*) {
+	void particle_group::draw(resources::buffer& triangles, const components::transform::state& transform, const components::transform::state& camera_transform, components::render*) {
 		for (auto& s : stream_slots)
 			for (auto& it : s.particles.particles) {
 				auto temp_alpha = it.face.color.a;
@@ -230,7 +236,7 @@ namespace components {
 				if (it.should_disappear)
 					it.face.color.a = static_cast<graphics::color>(((it.max_lifetime_ms - it.lifetime_ms) / it.max_lifetime_ms) * static_cast<float>(temp_alpha));
 
-				it.face.draw(triangles, components::transform::state(it.pos, it.rotation), camera_pos);
+				it.face.draw(triangles, components::transform::state(it.pos, it.rotation), camera_transform);
 				it.face.color.a = temp_alpha;
 			}
 	}

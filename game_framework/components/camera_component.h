@@ -6,6 +6,8 @@
 
 #include "entity_system/entity_ptr.h"
 
+#include "../components/transform_component.h"
+
 class camera_system;
 class gun_system;
 
@@ -26,7 +28,7 @@ namespace components {
 		float angled_look_length;
 		bool enable_smoothing;
 		double smoothing_average_factor, averages_per_sec;
-		augs::vec2<> last_interpolant;
+		components::transform::state last_interpolant;
 
 		augs::vec2<> max_look_expand;
 
@@ -37,7 +39,7 @@ namespace components {
 			double smoothing_average_factor = 0.004, double averages_per_sec = 60.0) :
 			screen_rect(screen_rect), ortho(ortho), layer(layer), mask(mask), enabled(true), orbit_mode(NONE), player(nullptr), crosshair(nullptr),
 			angled_look_length(100.f), max_look_expand(augs::vec2<double>(600.f, 300.f)), 
-			smoothing_average_factor(smoothing_average_factor), averages_per_sec(averages_per_sec), enable_smoothing(true), last_interpolant(0, 0) {
+			smoothing_average_factor(smoothing_average_factor), averages_per_sec(averages_per_sec), enable_smoothing(true) {
 				smooth_timer.reset();
 		}
 

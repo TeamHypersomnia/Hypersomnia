@@ -25,7 +25,7 @@ namespace augs {
 		bool wh::operator==(const wh& r) const {
 			return w == r.w && h == r.h;
 		}
-		
+
 		ltrb::ltrb() : l(0), t(0), r(0), b(0) {}
 		ltrb::ltrb(const wh& rr) : l(0), t(0), r(rr.w), b(rr.h) {}
 		ltrb::ltrb(const xywh& rr) : l(rr.x), t(rr.y), r(rr.x+rr.w), b(rr.y+rr.h) {}

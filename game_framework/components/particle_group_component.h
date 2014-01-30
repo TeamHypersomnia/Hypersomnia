@@ -57,7 +57,7 @@ namespace components {
 		friend class particle_group_system;
 		friend class particle_emitter_system;
 
-		virtual void draw(resources::buffer&, const components::transform::state&, vec2<> camera_pos, components::render*) override;
+		virtual void draw(resources::buffer&, const components::transform::state&, const components::transform::state&, components::render*) override;
 		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) override;
 	};
 }

@@ -66,6 +66,8 @@ void camera_system::process_entities(world& owner) {
 			}
 
 			auto drawn_transform = transform;
+			auto drawn_ortho = camera.ortho;
+
 			if (camera.enable_smoothing) {
 				/* variable time step camera smoothing by averaging last position with the current */
 				float averaging_constant = static_cast<float>(
@@ -74,7 +76,8 @@ void camera_system::process_entities(world& owner) {
 
 				//if ((transform.pos - camera.last_interpolant).length() < 2.0) camera.last_interpolant = transform.current.pos;
 				//else
-					camera.last_interpolant = camera.last_interpolant * averaging_constant + transform.pos * (1.0f - averaging_constant);
+				camera.last_interpolant.pos = camera.last_interpolant.pos * averaging_constant + transform.pos * (1.0f - averaging_constant);
+				camera.last_interpolant.rotation = camera.last_interpolant.rotation * averaging_constant + transform.rotation * (1.0f - averaging_constant);
 					
 					auto interp = [](float& a, float& b, float averaging_constant){
 						a = static_cast<int>(a * averaging_constant + b * (1.0f - averaging_constant));
@@ -86,7 +89,8 @@ void camera_system::process_entities(world& owner) {
 					interp(camera.last_ortho_interpolant.b, camera.ortho.b, averaging_constant);
 
 				/* save smoothing result */
-				drawn_transform.pos = camera.last_interpolant;
+				drawn_transform = camera.last_interpolant;
+				drawn_ortho = camera.last_ortho_interpolant;
 			}
 
 			glViewport(camera.screen_rect.x, camera.screen_rect.y, camera.screen_rect.w, camera.screen_rect.h);
@@ -94,7 +98,7 @@ void camera_system::process_entities(world& owner) {
 			if (camera.drawing_callback) {
 				try {
 					/* arguments: subject, renderer, visible_area, target_transform, mask */
-					luabind::call_function<void>(camera.drawing_callback, e, raw_renderer, rects::xywh(camera.last_ortho_interpolant), drawn_transform, transform, camera.mask);
+					luabind::call_function<void>(camera.drawing_callback, e, raw_renderer, rects::xywh(drawn_ortho), drawn_transform, transform, camera.mask);
 				}
 				catch (std::exception compilation_error) {
 					std::cout << compilation_error.what() << '\n';
@@ -102,10 +106,10 @@ void camera_system::process_entities(world& owner) {
 			}
 			else {
 				glLoadIdentity();
-				glOrtho(camera.last_ortho_interpolant.l, camera.last_ortho_interpolant.r, camera.last_ortho_interpolant.b, camera.last_ortho_interpolant.t, 0, 1);
+				glOrtho(drawn_ortho.l, drawn_ortho.r, drawn_ortho.b, drawn_ortho.t, 0, 1);
 
-				raw_renderer.generate_triangles(camera.last_ortho_interpolant, drawn_transform, camera.mask);
-				raw_renderer.default_render(camera.last_ortho_interpolant);
+				raw_renderer.generate_triangles(drawn_ortho, drawn_transform, camera.mask);
+				raw_renderer.default_render(drawn_ortho);
 
 				if (raw_renderer.debug_drawing) {
 					glDisable(GL_TEXTURE_2D);
