@@ -6,6 +6,7 @@ namespace augs {
 		class delta_accumulator {
 			timer ticks;
 
+			double fps;
 			double accumulator;
 			double ratio;
 			double fixed_dt_milliseconds;
@@ -30,6 +31,8 @@ namespace augs {
 			
 			/* get fixed_dt_milliseconds */
 			double get_timestep() const;
+
+			double get_hz() const;
 
 			void set_time_multiplier(double);
 		};

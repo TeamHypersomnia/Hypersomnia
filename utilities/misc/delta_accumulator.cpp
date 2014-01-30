@@ -7,7 +7,7 @@
 
 namespace augs {
 	namespace misc {
-		delta_accumulator::delta_accumulator(double fps, unsigned max_steps) : max_steps(max_steps), accumulator(0.0), fixed_dt_milliseconds((1.0/fps) * 1000.0), ratio(0.0) {
+		delta_accumulator::delta_accumulator(double fps, unsigned max_steps) : fps(fps), max_steps(max_steps), accumulator(0.0), fixed_dt_milliseconds((1.0/fps) * 1000.0), ratio(0.0) {
 			reset_timer();
 		}
 
@@ -47,6 +47,10 @@ namespace augs {
 		double delta_accumulator::per_second() const {
 			/* it's 1/fps */
 			return fixed_dt_milliseconds/1000.0; 
+		}
+
+		double delta_accumulator::get_hz() const {
+			return fps;
 		}
 
 		double delta_accumulator::get_timestep() const {

@@ -71,22 +71,24 @@ namespace augs {
 			component_type& add(const component_type& object = component_type()) {
 				if (!enabled) enable();
 
+				auto hash = typeid(component_type).hash_code();
+
 				signature_matcher_bitset old_signature(get_components());
 
 				/* component already exists, overwrite and return */
-				if (type_to_component.find(typeid(component_type).hash_code())) {
+				if (type_to_component.find(hash)) {
 					throw std::exception("component already exists!");
 					//if (overwrite_if_exists)
 						//(*static_cast<component_type*>((*p.first).second)) = object;
 				}
-				type_to_component.add(typeid(component_type).hash_code(), nullptr);
+				type_to_component.add(hash, nullptr);
 				
-				auto ptr = type_to_component.get(typeid(component_type).hash_code());
+				auto ptr = type_to_component.get(hash);
 				
 				assert(ptr != nullptr);
 				
 				/* allocate new component in corresponding pool */
-				(*ptr) = static_cast<component*>(owner_world.get_container_for_type(typeid(component_type).hash_code()).malloc());
+				(*ptr) = static_cast<component*>(owner_world.get_container_for_type(hash).malloc());
 				
 				assert(*ptr != nullptr);
 
@@ -96,7 +98,7 @@ namespace augs {
 				/* get new signature */
 				signature_matcher_bitset new_signature(old_signature);
 				/* will trigger an exception on debug if the component type was not registered within any existing system */
-				new_signature.add(owner_world.component_library.get_registered_type(typeid(component_type).hash_code()));
+				new_signature.add(owner_world.component_library.get_registered_type(hash));
 
 				for (auto sys : owner_world.get_all_systems())
 					/* if a processing_system matches with the new signature and not with the old one */

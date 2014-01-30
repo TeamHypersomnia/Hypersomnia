@@ -75,7 +75,11 @@ namespace bindings {
 
 			luabind::class_<physics>("physics_component")
 			.def(luabind::constructor<>())
-			.def_readwrite("body", &physics::body),
+			.def_readwrite("body", &physics::body)
+			.def_readwrite("target_angle", &physics::target_angle)
+			.def_readwrite("enable_angle_motor", &physics::enable_angle_motor)
+			
+			,
 			
 			luabind::class_<b2Vec2>("b2Vec2")
 			.def(luabind::constructor<float, float>())
@@ -99,6 +103,7 @@ namespace bindings {
 			.def("SetMaximumLinearVelocity", &b2Body::SetMaximumLinearVelocity)
 			.def("SetTransform", &b2Body::SetTransform)
 			.def("GetPosition", &b2Body::GetPosition)
+			.def("GetAngle", &b2Body::GetAngle)
 			);
 
 

@@ -10,7 +10,9 @@ namespace components {
 		b2Body* body;
 		std::vector <augs::vec2<>> original_model;
 
-		physics(b2Body* body = nullptr) : body(body) {}
-		//~physics() override {}
+		bool enable_angle_motor;
+		float target_angle;
+
+		physics(b2Body* body = nullptr) : body(body), enable_angle_motor(false), target_angle(0.f)	{}
 	};
 }
