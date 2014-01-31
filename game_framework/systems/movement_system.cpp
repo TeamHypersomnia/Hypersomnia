@@ -66,7 +66,7 @@ void movement_system::substep(world& owner) {
 		//if (std::abs(resultant.x) < b2_epsilon && std::abs(vel.x) > b2_epsilon) {
 		if (std::abs(resultant.x) < b2_epsilon && vel.LengthSquared() > 0) {
 			physics.body->SetLinearDampingVec(movement.inverse_thrust_brake * PIXELS_TO_METERSf);
-			physics.body->SetLinearDampingAngle(was_ground_hit ? ground_angle : -movement.axis_rotation_degrees);
+			physics.body->SetLinearDampingAngle(was_ground_hit ? ground_angle : movement.axis_rotation_degrees);
 			//resultant.x 
 			//if (vel.x < b2_epsilon) 
 			//	resultant.x = movement.input_acceleration.x;

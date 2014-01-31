@@ -217,12 +217,12 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 			
 			augs::vec2<> temp_vel = v;
 			
-			temp_vel.rotate(b->m_linearDampingAngle, augs::vec2<>());
+			temp_vel.rotate(-b->m_linearDampingAngle, augs::vec2<>());
 
 			temp_vel.x *= 1.0f / (1.0f + h * std::abs(b->m_linearDampingVec.x));
 			temp_vel.y *= 1.0f / (1.0f + h * std::abs(b->m_linearDampingVec.y));
 
-			temp_vel.rotate(-b->m_linearDampingAngle, augs::vec2<>());
+			temp_vel.rotate(b->m_linearDampingAngle, augs::vec2<>());
 			v = temp_vel;
 
 			w *= 1.0f / (1.0f + h * b->m_angularDamping);
