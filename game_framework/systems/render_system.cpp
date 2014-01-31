@@ -47,8 +47,6 @@ render_system::render_system(window::glwindow& output_window)
 }
 
 void render_system::generate_triangles(rects::xywh visible_area, components::transform::state camera_transform, int mask) {
-	//camera_transform.pos -= vec2<>(visible_area.w / 2, visible_area.h / 2);
-
 	auto verts = rects::ltrb(visible_area).get_vertices<float>();
 
 	for (auto& v : verts) 
@@ -121,7 +119,7 @@ resources::vertex_triangle& render_system::get_triangle(int i) {
 	return triangles[i];
 }
 
-void render_system::draw_debug_info(components::transform::state camera_transform) {
+void render_system::draw_debug_info(rects::xywh visible_area, components::transform::state camera_transform) {
 	if (draw_visibility) {
 		glBegin(GL_TRIANGLES);
 		for (auto it : targets) {
@@ -164,10 +162,10 @@ void render_system::draw_debug_info(components::transform::state camera_transfor
 
 	glBegin(GL_LINES);
 	
-	auto line_lambda = [camera_transform](const debug_line& line) {
+	auto line_lambda = [camera_transform, visible_area](const debug_line& line) {
 		glVertexAttrib4f(VERTEX_ATTRIBUTES::COLOR, line.col.r / 255.f, line.col.g / 255.f, line.col.b / 255.f, line.col.a / 255.f);
-		glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.a.x - camera_transform.pos.x, line.a.y - camera_transform.pos.y);
-		glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.b.x - camera_transform.pos.x, line.b.y - camera_transform.pos.y);
+		glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.a.x - camera_transform.pos.x + visible_area.w / 2, line.a.y - camera_transform.pos.y + visible_area.h / 2);
+		glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.b.x - camera_transform.pos.x + visible_area.w / 2, line.b.y - camera_transform.pos.y + visible_area.h / 2);
 	};
 	
 	std::for_each(lines.begin(), lines.end(), line_lambda);

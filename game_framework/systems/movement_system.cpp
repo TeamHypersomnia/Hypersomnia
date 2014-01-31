@@ -48,6 +48,7 @@ void movement_system::substep(world& owner) {
 		b2Vec2 vel = physics.body->GetLinearVelocity();
 
 		float ground_angle = 0.f;
+		bool was_ground_hit = false;
 
 		if (movement.thrust_parallel_to_ground_length > 0.f) {
 			auto out = physics_sys.ray_cast(
@@ -56,13 +57,16 @@ void movement_system::substep(world& owner) {
 				movement.ground_filter, it);
 
 			//assert(out.hit);
-			if (out.hit)
+			was_ground_hit = out.hit;
+			if (was_ground_hit)
 				ground_angle = out.normal.get_degrees() + 90;
+			//else ground_angle = movement.axis_rotation_degrees;
 		}
 
 		//if (std::abs(resultant.x) < b2_epsilon && std::abs(vel.x) > b2_epsilon) {
 		if (std::abs(resultant.x) < b2_epsilon && vel.LengthSquared() > 0) {
-			physics.body->SetLinearDampingVec(vec2<>(movement.inverse_thrust_brake).rotate(ground_angle, vec2<>()) * PIXELS_TO_METERSf);
+			physics.body->SetLinearDampingVec(movement.inverse_thrust_brake * PIXELS_TO_METERSf);
+			physics.body->SetLinearDampingAngle(was_ground_hit ? ground_angle : -movement.axis_rotation_degrees);
 			//resultant.x 
 			//if (vel.x < b2_epsilon) 
 			//	resultant.x = movement.input_acceleration.x;
@@ -84,10 +88,7 @@ void movement_system::substep(world& owner) {
 			if (movement.braking_damping >= 0.f)
 				physics.body->SetLinearDamping(0.f);
 			
-			resultant.rotate(ground_angle, vec2<>());
-
-			if (movement.axis_rotation_degrees != 0.f)
-				resultant.rotate(movement.axis_rotation_degrees, vec2<>(0, 0));
+			resultant.rotate(was_ground_hit ? ground_angle : movement.axis_rotation_degrees, vec2<>());
 
 			physics.body->ApplyForce(resultant * PIXELS_TO_METERSf * physics.body->GetMass(), physics.body->GetWorldCenter() + (movement.force_offset * PIXELS_TO_METERSf), true);
 		}

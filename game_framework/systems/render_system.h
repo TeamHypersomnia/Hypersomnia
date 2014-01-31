@@ -34,7 +34,7 @@ public:
 	int get_triangle_count();
 	resources::vertex_triangle& get_triangle(int i);
 
-	void draw_debug_info(components::transform::state);
+	void draw_debug_info(rects::xywh visible_area, components::transform::state);
 
 	struct debug_line {
 		debug_line(augs::vec2<> a, augs::vec2<> b, augs::graphics::pixel_32 col = augs::graphics::pixel_32(255, 255, 255, 255)) : col(col), a(a), b(b) {}

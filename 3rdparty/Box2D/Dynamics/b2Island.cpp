@@ -179,7 +179,7 @@ b2Island::~b2Island()
 	m_allocator->Free(m_contacts);
 	m_allocator->Free(m_bodies);
 }
-
+#include "math/vec2d.h"
 void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& gravity, bool allowSleep)
 {
 	b2Timer timer;
@@ -214,8 +214,17 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 			// Pade approximation:
 			// v2 = v1 * 1 / (1 + c * dt)
 			v *= 1.0f / (1.0f + h * b->m_linearDamping);
-			v.x *= 1.0f / (1.0f + h * std::abs(b->m_linearDampingVec.x));
-			v.y *= 1.0f / (1.0f + h * std::abs(b->m_linearDampingVec.y));
+			
+			augs::vec2<> temp_vel = v;
+			
+			temp_vel.rotate(b->m_linearDampingAngle, augs::vec2<>());
+
+			temp_vel.x *= 1.0f / (1.0f + h * std::abs(b->m_linearDampingVec.x));
+			temp_vel.y *= 1.0f / (1.0f + h * std::abs(b->m_linearDampingVec.y));
+
+			temp_vel.rotate(-b->m_linearDampingAngle, augs::vec2<>());
+			v = temp_vel;
+
 			w *= 1.0f / (1.0f + h * b->m_angularDamping);
 		}
 

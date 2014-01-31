@@ -113,7 +113,7 @@ void camera_system::process_entities(world& owner) {
 
 				if (raw_renderer.debug_drawing) {
 					glDisable(GL_TEXTURE_2D);
-					raw_renderer.draw_debug_info(drawn_transform);
+					raw_renderer.draw_debug_info(drawn_ortho, drawn_transform);
 					glEnable(GL_TEXTURE_2D);
 				}
 			}
