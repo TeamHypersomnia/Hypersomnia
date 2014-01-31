@@ -15,13 +15,16 @@ void chase_system::process_entities(world&) {
 		if (chase.target == nullptr) continue;
 		
 		if (chase.target_newly_set) {
-			auto& target_chase = chase.target->get<components::transform>().current;
-			chase.previous = target_chase.pos;
-			chase.rotation_previous = target_chase.rotation;
+			auto target_transform = chase.target->get<components::transform>().current;
+			target_transform.rotation *= chase.rotation_multiplier;
+
+			chase.previous = target_transform.pos;
+			chase.rotation_previous = target_transform.rotation;
 			chase.target_newly_set = false;
 		}
 
-		auto& target_transform = chase.target->get<components::transform>().current;
+		auto target_transform = chase.target->get<components::transform>().current;
+		target_transform.rotation *= chase.rotation_multiplier;
 
 		if (chase.chase_type == components::chase::chase_type::OFFSET) {
 			if (chase.relative) {

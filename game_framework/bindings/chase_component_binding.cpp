@@ -18,6 +18,7 @@ namespace bindings {
 			.def_readwrite("relative", &chase::relative)
 			.def_readwrite("chase_rotation", &chase::chase_rotation)
 			.def_readwrite("track_origin", &chase::track_origin)
+			.def_readwrite("rotation_multiplier", &chase::rotation_multiplier)
 			.enum_("chase_type")[
 				luabind::value("OFFSET", chase::chase_type::OFFSET),
 					luabind::value("ORBIT", chase::chase_type::ORBIT)

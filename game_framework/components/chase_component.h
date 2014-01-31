@@ -16,6 +16,7 @@ namespace components {
 
 		augs::vec2<> offset, rotation_orbit_offset;
 		float rotation_offset;
+		float rotation_multiplier;
 
 		bool relative;
 		bool chase_rotation;
@@ -24,7 +25,7 @@ namespace components {
 		bool target_newly_set;
 
 		chase(augs::entity_system::entity* target = nullptr, bool relative = false, augs::vec2<> offset = augs::vec2<>())
-			: target_newly_set(true), chase_type(chase_type::OFFSET), target(target), offset(offset), relative(relative), chase_rotation(false), track_origin(false), rotation_offset(0.f), rotation_orbit_offset(0.f), rotation_previous(0.f)
+			: rotation_multiplier(1.f), target_newly_set(true), chase_type(chase_type::OFFSET), target(target), offset(offset), relative(relative), chase_rotation(false), track_origin(false), rotation_offset(0.f), rotation_orbit_offset(0.f), rotation_previous(0.f)
 		{
 			set_target(target); 
 		}

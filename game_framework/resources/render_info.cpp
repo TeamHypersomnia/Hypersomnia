@@ -62,11 +62,14 @@ namespace resources {
 		if (tex == nullptr) return;
 		vec2<> v[4];
 
-		auto camera_pos = in.camera_transform.pos;
-		make_rect(in.transform.pos - camera_pos, vec2<>(size), in.transform.rotation + rotation_offset, v);
+		auto center = vec2<>(in.visible_area.w(), in.visible_area.h()) / 2;
 
-		for (auto& vert : v) 
-			vert.rotate(in.camera_transform.rotation, in.camera_transform.pos);
+		auto target_position = in.transform.pos - in.camera_transform.pos + center;
+		make_rect(target_position, vec2<>(size), in.transform.rotation + rotation_offset, v);
+
+		/* rotate around the center of the screen */
+		for (auto& vert : v)
+			vert.rotate(in.camera_transform.rotation, center);
 
 		vertex_triangle t1, t2;
 		t1.vertices[0].color = t2.vertices[0].color = color;
@@ -93,8 +96,6 @@ namespace resources {
 		t2.vertices[1].texcoord =							texcoords[1];
 		t1.vertices[1].texcoord = t2.vertices[2].texcoord = texcoords[2];
 		t1.vertices[2].texcoord =							texcoords[3];
-
-	
 
 		for (int i = 0; i < 3; ++i) {
 			tex->get_uv(t1.vertices[i].texcoord);
@@ -215,9 +216,12 @@ namespace resources {
 
 		auto model_transformed = model;
 		for (auto& v : model_transformed) {
+			auto center = vec2<>(in.visible_area.w(), in.visible_area.h()) / 2;
 			v.pos.rotate(in.transform.rotation, vec2<>(0, 0));
-			v.pos += in.transform.pos - camera_pos;
-			v.pos.rotate(in.camera_transform.rotation, in.camera_transform.pos);
+			v.pos += in.transform.pos - camera_pos + center;
+
+			/* rotate around the center of the screen */
+			v.pos.rotate(in.camera_transform.rotation, center);
 		}
 
 		for (size_t i = 0; i < indices.size(); i += 3) {
