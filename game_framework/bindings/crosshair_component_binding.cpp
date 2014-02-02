@@ -13,6 +13,7 @@ namespace bindings {
 			//.def_readwrite("blink", &components::crosshair::blink)
 			.def_readwrite("should_blink", &crosshair::should_blink)
 			.def_readwrite("size_multiplier", &crosshair::size_multiplier)
+			.def_readwrite("rotation_offset", &crosshair::rotation_offset)
 			.def_readwrite("sensitivity", &crosshair::sensitivity);
 	}
 }

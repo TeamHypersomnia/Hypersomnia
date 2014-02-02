@@ -47,19 +47,26 @@ void camera_system::process_entities(world& owner) {
 					vec2<> player_pos = camera.player->get<components::transform>().current.pos;
 					vec2<> dir = (crosshair_pos - player_pos);
 
+					dir.rotate(transform.rotation, vec2<>());
+
 					if (camera.orbit_mode == camera.ANGLED) {
 						vec2<> bound = camera_screen / 2.f;
-						/* save copy */
+						/* save by copy */
 						vec2<> normalized = dir.clamp(bound);
 						transform.pos += normalized.normalize() * camera.angled_look_length;
 					}
 
 					if (camera.orbit_mode == camera.LOOK) {
 						vec2<> bound = camera.max_look_expand + camera_screen / 2.f;
-						/* simple proportion */
-						transform.pos += (dir.clamp(bound) / bound) * camera.max_look_expand;
-					}
 
+						/* simple proportion in local frame of reference */
+						vec2<> camera_offset = (dir.clamp(bound) / bound) * camera.max_look_expand;
+						
+						transform.pos += camera_offset.rotate(-transform.rotation, vec2<>());
+					}
+					
+					/* rotate dir back */
+					dir.rotate(-transform.rotation, vec2<>());
 					/* update crosshair so it is snapped to visible area */
 					crosshair_pos = player_pos + dir;
 				}
