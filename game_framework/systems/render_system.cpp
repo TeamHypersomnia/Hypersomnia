@@ -120,6 +120,8 @@ resources::vertex_triangle& render_system::get_triangle(int i) {
 }
 
 void render_system::draw_debug_info(rects::xywh visible_area, components::transform::state camera_transform) {
+	vec2<> center = (vec2<>(visible_area.w, visible_area.h) / 2);
+
 	if (draw_visibility) {
 		glBegin(GL_TRIANGLES);
 		for (auto it : targets) {
@@ -129,7 +131,7 @@ void render_system::draw_debug_info(rects::xywh visible_area, components::transf
 					/* shortcut */
 					auto& request = entry.val;
 
-					glColor4ub(request.color.r, request.color.g, request.color.b, request.color.a / 2);
+					glVertexAttrib4f(VERTEX_ATTRIBUTES::COLOR, request.color.r / 255.f, request.color.g / 255.f, request.color.b / 255.f, request.color.a / 2 / 255.f);
 					auto origin = it->get<components::transform>().current.pos;
 
 					for (int i = 0; i < request.get_num_triangles(); ++i) {
@@ -149,9 +151,11 @@ void render_system::draw_debug_info(rects::xywh visible_area, components::transf
 						resources::vertex_triangle verts;
 
 						for (int i = 0; i < 3; ++i) {
-							auto pos = tri.points[i] - camera_transform.pos + origin;
 
-							glVertex2f(pos.x, pos.y);
+							auto pos = tri.points[i] - camera_transform.pos + center + origin;
+
+							pos.rotate(camera_transform.rotation, center);
+							glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, pos.x, pos.y);
 						}
 					}
 				}
@@ -162,10 +166,15 @@ void render_system::draw_debug_info(rects::xywh visible_area, components::transf
 
 	glBegin(GL_LINES);
 	
-	auto line_lambda = [camera_transform, visible_area](const debug_line& line) {
+	auto line_lambda = [camera_transform, visible_area, center](debug_line line) {
+		line.a += center - camera_transform.pos;
+		line.b += center - camera_transform.pos;
+
+		line.a.rotate(camera_transform.rotation, center);
+		line.b.rotate(camera_transform.rotation, center);
 		glVertexAttrib4f(VERTEX_ATTRIBUTES::COLOR, line.col.r / 255.f, line.col.g / 255.f, line.col.b / 255.f, line.col.a / 255.f);
-		glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.a.x - camera_transform.pos.x + visible_area.w / 2, line.a.y - camera_transform.pos.y + visible_area.h / 2);
-		glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.b.x - camera_transform.pos.x + visible_area.w / 2, line.b.y - camera_transform.pos.y + visible_area.h / 2);
+		glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.a.x, line.a.y);
+		glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.b.x, line.b.y);
 	};
 	
 	std::for_each(lines.begin(), lines.end(), line_lambda);
