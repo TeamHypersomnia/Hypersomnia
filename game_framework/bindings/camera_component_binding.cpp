@@ -25,6 +25,7 @@ namespace bindings {
 			.def_readwrite("player", &camera::player)
 			.def_readwrite("crosshair", &camera::crosshair)
 			.def_readwrite("drawing_callback", &camera::drawing_callback)
+			.def_readwrite("crosshair_follows_interpolant", &camera::crosshair_follows_interpolant)
 			.enum_("orbit_type")[
 				luabind::value("NONE", camera::orbit_type::NONE),
 				luabind::value("ANGLED", camera::orbit_type::ANGLED),

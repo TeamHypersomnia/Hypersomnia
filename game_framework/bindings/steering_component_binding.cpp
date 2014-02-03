@@ -88,7 +88,9 @@ namespace bindings {
 			.def(luabind::constructor<>())
 			.def("add_behaviour", &steering::add_behaviour)
 			.def("clear_behaviours", &steering::clear_behaviours)
+			.def_readwrite("max_speed", &steering::max_speed)
 			.def_readwrite("max_resultant_force", &steering::max_resultant_force)
+
 			);
 	}
 }

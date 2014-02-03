@@ -179,8 +179,9 @@ namespace components {
 		/* the only reason we are storing pointers instead of values are scripts */
 		std::vector<behaviour_state*> active_behaviours;
 		float max_resultant_force;
+		float max_speed;
 
-		steering() : max_resultant_force(-1.f) {}
+		steering() : max_resultant_force(-1.f), max_speed(0.f) {}
 
 		/* binding facility */
 		void add_behaviour(behaviour_state* b) { active_behaviours.push_back(b); }

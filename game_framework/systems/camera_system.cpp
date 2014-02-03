@@ -98,6 +98,10 @@ void camera_system::process_entities(world& owner) {
 				/* save smoothing result */
 				drawn_transform = camera.last_interpolant;
 				drawn_ortho = camera.last_ortho_interpolant;
+
+				if (camera.crosshair_follows_interpolant) {
+					camera.crosshair->get<components::transform>().current.pos -= transform.pos - camera.last_interpolant.pos;
+				}
 			}
 
 			glViewport(camera.screen_rect.x, camera.screen_rect.y, camera.screen_rect.w, camera.screen_rect.h);

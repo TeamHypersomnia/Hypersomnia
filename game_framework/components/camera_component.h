@@ -27,6 +27,8 @@ namespace components {
 
 		float angled_look_length;
 		bool enable_smoothing;
+		bool crosshair_follows_interpolant;
+
 		double smoothing_average_factor, averages_per_sec;
 		components::transform::state last_interpolant;
 
@@ -39,7 +41,7 @@ namespace components {
 			double smoothing_average_factor = 0.004, double averages_per_sec = 60.0) :
 			screen_rect(screen_rect), ortho(ortho), layer(layer), mask(mask), enabled(true), orbit_mode(NONE), player(nullptr), crosshair(nullptr),
 			angled_look_length(100.f), max_look_expand(augs::vec2<double>(600.f, 300.f)), 
-			smoothing_average_factor(smoothing_average_factor), averages_per_sec(averages_per_sec), enable_smoothing(true) {
+			smoothing_average_factor(smoothing_average_factor), averages_per_sec(averages_per_sec), enable_smoothing(true), crosshair_follows_interpolant(false) {
 				smooth_timer.reset();
 		}
 

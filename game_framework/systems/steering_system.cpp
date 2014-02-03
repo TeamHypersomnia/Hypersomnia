@@ -634,7 +634,7 @@ void steering_system::substep(world& owner) {
 		steering::scene frame_of_reference;
 		frame_of_reference.subject.position = position;
 		frame_of_reference.subject.set_velocity(METERS_TO_PIXELSf * body->GetLinearVelocity());
-		frame_of_reference.subject.max_speed = body->m_max_speed * METERS_TO_PIXELSf;
+		frame_of_reference.subject.max_speed = steer.max_speed;
 		frame_of_reference.shape_verts = &shape_verts;
 		frame_of_reference.physics = &physics_sys;
 		frame_of_reference.subject_entity = it;
