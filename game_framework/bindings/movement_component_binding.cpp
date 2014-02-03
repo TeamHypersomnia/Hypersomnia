@@ -23,6 +23,7 @@ namespace bindings {
 			.def_readwrite("max_speed", &movement::max_speed)
 			.def_readwrite("thrust_parallel_to_ground_length", &movement::thrust_parallel_to_ground_length)
 			.def_readwrite("ground_filter", &movement::ground_filter)
+			.def_readwrite("requested_movement", &movement::requested_movement)
 			.def_readwrite("air_resistance", &movement::air_resistance);
 	}
 }

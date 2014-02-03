@@ -42,8 +42,15 @@ void movement_system::substep(world& owner) {
 		auto& movement = it->get<components::movement>();
 
 		vec2<> resultant;
-		resultant.x = movement.moving_right * movement.input_acceleration.x - movement.moving_left * movement.input_acceleration.x;
-		resultant.y = movement.moving_backward * movement.input_acceleration.y - movement.moving_forward * movement.input_acceleration.y;
+
+		if (movement.requested_movement.non_zero()) {
+			/* rotate to our frame of reference */
+			resultant.x = vec2<>(movement.requested_movement).rotate(-movement.axis_rotation_degrees, vec2<>()).x;
+		}
+		else {
+			resultant.x = movement.moving_right * movement.input_acceleration.x - movement.moving_left * movement.input_acceleration.x;
+			resultant.y = movement.moving_backward * movement.input_acceleration.y - movement.moving_forward * movement.input_acceleration.y;
+		}
 		
 		b2Vec2 vel = physics.body->GetLinearVelocity();
 
