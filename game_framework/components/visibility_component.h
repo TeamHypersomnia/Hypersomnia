@@ -41,6 +41,8 @@ namespace components {
 			float square_side;
 			float ignore_discontinuities_shorter_than;
 
+			augs::vec2<> offset;
+
 			/* output */
 			std::vector<edge> edges;
 			std::vector<augs::vec2<>> vertex_hits;

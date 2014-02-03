@@ -42,7 +42,7 @@ components::visibility::discontinuity* components::visibility::layer::get_discon
 }
 
 components::visibility::triangle components::visibility::layer::get_triangle(int i, augs::vec2<> origin) {
-	components::visibility::triangle tri = { origin, edges[i].first, edges[i].second };
+	components::visibility::triangle tri = { origin + offset, edges[i].first, edges[i].second };
 	return tri;
 }
 
@@ -71,11 +71,9 @@ void visibility_system::process_entities(world& owner) {
 
 		auto body = it->get<components::physics>().body;
 
-		/* transform entity position to Box2D coordinates */
-		vec2<> position_meters = transform.pos * PIXELS_TO_METERSf;
-
 		/* for every visibility type requested for given entity */
 		for (auto& entry : visibility.visibility_layers.raw) {
+
 			/* prepare container for all the vertices that we will cast the ray to */
 			struct target_vertex {
 				bool is_on_a_bound;
@@ -92,6 +90,10 @@ void visibility_system::process_entities(world& owner) {
 
 			/* shortcut */
 			auto& request = entry.val;
+
+			/* transform entity position to Box2D coordinates and take offset into account */
+			vec2<> position_meters = (transform.pos + request.offset) * PIXELS_TO_METERSf;
+
 			/* to Box2D coordinates */
 			float vision_side_meters = request.square_side * PIXELS_TO_METERSf;
 
