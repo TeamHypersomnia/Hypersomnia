@@ -662,7 +662,7 @@ void steering_system::substep(world& owner) {
 				added_force.clamp(subject_behaviour.max_force_applied);
 
 			if (render.draw_substeering_forces)
-				draw_vector(added_force, subject_behaviour.force_color);
+				draw_vector(behaviour.last_output_force, subject_behaviour.force_color);
 
 			resultant_force += added_force;
 		}
