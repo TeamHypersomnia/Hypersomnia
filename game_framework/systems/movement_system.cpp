@@ -56,33 +56,18 @@ void movement_system::substep(world& owner) {
 				physics.body->GetPosition() + vec2<>::from_degrees(movement.axis_rotation_degrees + 90) * movement.thrust_parallel_to_ground_length * PIXELS_TO_METERSf,
 				movement.ground_filter, it);
 
-			//assert(out.hit);
 			was_ground_hit = out.hit;
 			if (was_ground_hit)
 				ground_angle = out.normal.get_degrees() + 90;
-			//else ground_angle = movement.axis_rotation_degrees;
 		}
 
-		//if (std::abs(resultant.x) < b2_epsilon && std::abs(vel.x) > b2_epsilon) {
 		if (std::abs(resultant.x) < b2_epsilon && vel.LengthSquared() > 0) {
 			physics.body->SetLinearDampingVec(movement.inverse_thrust_brake * PIXELS_TO_METERSf);
 			physics.body->SetLinearDampingAngle(was_ground_hit ? ground_angle : movement.axis_rotation_degrees);
-			//resultant.x 
-			//if (vel.x < b2_epsilon) 
-			//	resultant.x = movement.input_acceleration.x;
-			//else if (vel.x > b2_epsilon)
-			//	resultant.x = -movement.input_acceleration.x;
 		}
 		else {
 			physics.body->SetLinearDampingVec(b2Vec2(0, 0));
 		}
-
-		//if (movement.axis_speed_constraint >= 0.f) {
-		//	if (vel.x < movement.axis_speed_constraint)
-		//	clamp(resultant.x, -movement.axis_speed_constraint, movement.axis_speed_constraint);
-		//
-		//
-		//}
 
 		if (resultant.non_zero()) {
 			if (movement.braking_damping >= 0.f)
