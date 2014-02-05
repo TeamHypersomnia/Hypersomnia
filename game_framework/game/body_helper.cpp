@@ -13,7 +13,7 @@
 namespace topdown {
 	physics_info::physics_info() 
 		: rect_size(augs::vec2<>()), type(RECT), density(1.f), angular_damping(0.f), linear_damping(0.f), fixed_rotation(false), sensor(false), restitution(0.f), friction(0.f),
-		body_type(b2_dynamicBody), radius(0.f), max_speed(-1)
+		body_type(b2_dynamicBody), radius(0.f), max_speed(-1), bullet(false)
 		{
 	}
 
@@ -82,6 +82,7 @@ namespace topdown {
 		def.type = b2BodyType(body_type);
 		def.angle = 0;
 		def.userData = (void*) &subject;
+		def.bullet = body_data.bullet;
 
 		b2PolygonShape shape;
 		b2CircleShape circle_shape;

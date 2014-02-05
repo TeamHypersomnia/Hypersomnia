@@ -28,7 +28,7 @@ namespace topdown {
 		int body_type;
 
 		float density, friction, restitution, angular_damping, linear_damping, radius, max_speed;
-		bool fixed_rotation, sensor;
+		bool fixed_rotation, sensor, bullet;
 
 		void add_convex(const std::vector < augs::vec2 < >> &);
 		void add_concave(const std::vector < augs::vec2 < >> &);

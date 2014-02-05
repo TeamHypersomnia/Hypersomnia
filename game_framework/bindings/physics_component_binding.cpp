@@ -104,6 +104,7 @@ namespace bindings {
 			.def("SetTransform", &b2Body::SetTransform)
 			.def("GetPosition", &b2Body::GetPosition)
 			.def("GetAngle", &b2Body::GetAngle)
+			.def("SetBullet", &b2Body::SetBullet)
 			);
 
 
