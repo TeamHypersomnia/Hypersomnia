@@ -55,7 +55,13 @@ namespace bindings {
 			.def("SetAsBox", (void (__thiscall b2PolygonShape::*)(float32, float32))(&b2PolygonShape::SetAsBox))
 			,
 
-
+			luabind::class_<physics_system::stepped_timer>("stepped_timer")
+			.def(luabind::constructor<physics_system*>())
+			.def("reset", &physics_system::stepped_timer::reset)
+			.def("get_milliseconds", &physics_system::stepped_timer::get_milliseconds)
+			.def("extract_milliseconds", &physics_system::stepped_timer::extract_milliseconds)
+			.def("get_steps", &physics_system::stepped_timer::get_steps)
+			.def("extract_steps", &physics_system::stepped_timer::extract_steps),
 
 			luabind::class_<physics_system>("_physics_system")
 			.def_readwrite("timestep_multiplier", &physics_system::timestep_multiplier)
@@ -104,6 +110,7 @@ namespace bindings {
 			.def("SetTransform", &b2Body::SetTransform)
 			.def("GetPosition", &b2Body::GetPosition)
 			.def("GetAngle", &b2Body::GetAngle)
+			.def("GetMass", &b2Body::GetMass)
 			.def("SetBullet", &b2Body::SetBullet)
 			);
 

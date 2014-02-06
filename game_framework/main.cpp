@@ -188,6 +188,8 @@ int main() {
 		input.process_entities(my_world);                  
 		movement.process_entities(my_world);
 
+		scripts.process_entities(my_world);
+		scripts.process_events(my_world);
 		physics.substepping_routine = [&steering, &movement, &damage, &destroy, &scripts](world& owner){
 			steering.substep(owner);
 			movement.substep(owner);

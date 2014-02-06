@@ -8,6 +8,35 @@
 
 #include "../game/body_helper.h"
 
+
+physics_system::stepped_timer::stepped_timer(physics_system* owner) : owner(owner), current_step(0) {
+	reset();
+}
+
+void physics_system::stepped_timer::reset() {
+	current_step = owner->all_steps;
+}
+
+float physics_system::stepped_timer::get_milliseconds() const {
+	return get_steps() * static_cast<float>(owner->accumulator.get_timestep());
+}
+
+float physics_system::stepped_timer::extract_milliseconds() {
+	float result = get_milliseconds();
+	reset();
+	return result;
+}
+
+unsigned physics_system::stepped_timer::get_steps() const {
+	return owner->all_steps - current_step;
+}
+
+unsigned physics_system::stepped_timer::extract_steps() {
+	unsigned result = get_steps();
+	reset();
+	return result;
+}
+
 bool physics_system::raycast_input::ShouldRaycast(b2Fixture* fixture) {
 	entity* fixture_entity = reinterpret_cast<entity*>(fixture->GetBody()->GetUserData());
 	return
@@ -35,7 +64,7 @@ float32 physics_system::raycast_input::ReportFixture(b2Fixture* fixture, const b
 physics_system::raycast_input::raycast_input() : subject_filter(nullptr), subject(nullptr), save_all(false) {}
 
 physics_system::physics_system() : accumulator(60.0, 5), timestep_multiplier(1.f),
-b2world(b2Vec2(0.f, 0.f)), enable_interpolation(true), ray_casts_per_frame(0) {
+b2world(b2Vec2(0.f, 0.f)), enable_interpolation(true), ray_casts_per_frame(0), all_steps(0) {
 		b2world.SetAllowSleeping(false);
 		b2world.SetAutoClearForces(false);
 		b2world.SetContactListener(&listener);
@@ -315,6 +344,7 @@ void physics_system::process_entities(world& owner) {
 
 		b2world.Step(static_cast<float32>(accumulator.per_second()), velocityIterations, positionIterations);
 		b2world.ClearForces();
+		++all_steps;
 	}
 	
 	if(steps == 0) b2world.ClearForces();

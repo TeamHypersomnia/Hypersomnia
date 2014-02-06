@@ -32,7 +32,9 @@ namespace augs {
 			static luabind::scope bind_vector(const char* name) {
 				return luabind::class_<std::vector<value>>(name)
 					.def(luabind::constructor<>())
-					.def("add", (void (__thiscall std::vector<value>::*) (const value&))(&std::vector<value>::push_back))
+					.def("add", (void(__thiscall std::vector<value>::*) (const value&))(&std::vector<value>::push_back))
+					.def("size", (size_t(__thiscall std::vector<value>::*) ())(&std::vector<value>::size))
+					.def("at", (value&(__thiscall std::vector<value>::*) (size_t))(&std::vector<value>::at))
 					.def("data", (value* (__thiscall std::vector<value>::*) ()) (&std::vector<value>::data));
 			}
 		};

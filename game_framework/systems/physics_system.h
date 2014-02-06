@@ -27,6 +27,21 @@ class physics_system : public processing_system_templated<components::physics, c
 
 	contact_listener listener;
 public:
+	struct stepped_timer {
+		physics_system* owner;
+		unsigned current_step;
+
+		stepped_timer(physics_system*);
+		void reset();
+		float get_milliseconds() const;
+		float extract_milliseconds();
+
+		unsigned get_steps() const;
+		unsigned extract_steps();
+	};
+
+	unsigned all_steps;
+
 	std::function<void(world&)> substepping_routine;
 
 	float timestep_multiplier;
