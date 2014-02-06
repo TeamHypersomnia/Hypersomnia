@@ -12,7 +12,7 @@ namespace resources {
 	struct polygon;
 }
 
-namespace topdown {
+namespace helpers {
 	struct physics_info {
 		enum {
 			RECT,

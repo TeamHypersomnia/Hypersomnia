@@ -3,7 +3,7 @@
 #include <string>
 #include "math/vec2d.h"
 
-namespace topdown {
+namespace helpers {
 	struct texture_helper {
 		augs::texture_baker::image img;
 		augs::texture_baker::texture tex;

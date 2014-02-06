@@ -167,7 +167,7 @@ physics_system::query_output physics_system::query_body(augs::entity_system::ent
 	query_output total_output;
 	
 	for (b2Fixture* f = subject.get<components::physics>().body->GetFixtureList(); f != nullptr; f = f->GetNext()) {
-		auto transformed = topdown::get_transformed_shape_verts(subject, true);
+		auto transformed = helpers::get_transformed_shape_verts(subject, true);
 		
 		b2PolygonShape shape;
 		shape.Set(transformed.data(), transformed.size());

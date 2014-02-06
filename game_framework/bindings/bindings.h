@@ -9,7 +9,7 @@ namespace augs {
 	namespace misc {}
 }
 
-namespace topdown {}
+namespace helpers {}
 
 using namespace resources;
 using namespace components;
@@ -17,7 +17,7 @@ using namespace augs;
 using namespace misc;
 using namespace entity_system;
 using namespace graphics;
-using namespace topdown;
+using namespace helpers;
 using namespace messages;
 
 namespace luabind

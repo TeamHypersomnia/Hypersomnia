@@ -10,7 +10,7 @@
 
 #include "3rdparty/polypartition/polypartition.h"
 
-namespace topdown {
+namespace helpers {
 	physics_info::physics_info() 
 		: rect_size(augs::vec2<>()), type(RECT), density(1.f), angular_damping(0.f), linear_damping(0.f), fixed_rotation(false), sensor(false), restitution(0.f), friction(0.f),
 		body_type(b2_dynamicBody), radius(0.f), max_speed(-1), bullet(false)

@@ -125,7 +125,7 @@ void debugger_break() {
 
 script_system::script_system() : lua_state(luaL_newstate()) {
 	using namespace resources;
-	using namespace topdown;
+	using namespace helpers;
 
 	luabind::open(lua_state);
 	luabind::bind_class_info(lua_state);

@@ -621,7 +621,7 @@ void steering_system::substep(world& owner) {
 		/* extract ALL the vertices from the physics body, it will be then used by obstacle avoidance routines to calculate avoidance quad,
 			false means we want pixels
 		*/
-		auto shape_verts = topdown::get_transformed_shape_verts(*it, false);
+		auto shape_verts = helpers::get_transformed_shape_verts(*it, false);
 		auto draw_vector = [&position, &render](vec2<> v, graphics::pixel_32 col){
 			if (v.non_zero())
 				render.manually_cleared_lines.push_back(render_system::debug_line(position, position + v, col));

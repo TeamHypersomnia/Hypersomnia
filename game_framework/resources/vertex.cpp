@@ -7,7 +7,7 @@ namespace resources {
 			tex->get_uv(this->texcoord);
 	}
 
-	void vertex::set_texcoord(vec2<> coord, topdown::texture_helper* helper) {
+	void vertex::set_texcoord(vec2<> coord, helpers::texture_helper* helper) {
 		texcoord = coord;
 		helper->tex.get_uv(this->texcoord);
 	}

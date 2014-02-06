@@ -167,7 +167,7 @@ void gun_system::process_entities(world& owner) {
 				new_bullet.add(damage);
 				new_bullet.add(gun.bullet_render);
 				new_bullet.name = "bullet";
-				topdown::create_physics_component(gun.bullet_body, new_bullet, b2_dynamicBody);
+				helpers::create_physics_component(gun.bullet_body, new_bullet, b2_dynamicBody);
 
 				/* bullet's physics settings */
 				auto body = new_bullet.get<components::physics>().body;
