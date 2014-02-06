@@ -351,6 +351,7 @@ void physics_system::process_entities(world& owner) {
 	
 	if (enable_interpolation)
 		smooth_states();
+	else reset_states();
 
 	ray_casts_per_frame = 0;
 }
