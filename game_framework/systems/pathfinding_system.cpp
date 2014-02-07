@@ -138,6 +138,21 @@ void pathfinding_system::process_entities(world& owner) {
 					/* if a similiar discovered vertex exists */
 					if ((memorised_discovered.location - nav.location).length_sq() < epsilon_distance_the_same_vertex_sq) 
 						return true;
+
+				/* prepare edge shape for sensor to test for overlaps */
+				b2EdgeShape sensor_edge;
+				sensor_edge.Set(nav.location * PIXELS_TO_METERSf, nav.sensor * PIXELS_TO_METERSf);
+
+				/* prepare null transform, both bodies are already in the same frame of reference */
+				b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
+
+				/* if shortest distance between body and sensor fits in distance_navpoint_hit */
+				if (b2TestOverlap(&sensor_edge, 0, &body_poly, 0, null_transform, null_transform, pathfinding.distance_navpoint_hit * PIXELS_TO_METERSf)) {
+					/* save this sensor in discovered ones and return true to remove it from the undiscovered */
+					pathfinding.session().discovered_vertices.push_back(nav);
+					return true;
+				}
+
 				return false;
 			}), undiscs.end());
 
