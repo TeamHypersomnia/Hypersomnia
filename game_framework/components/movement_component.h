@@ -50,6 +50,8 @@ namespace components {
 		used only for side-scrolling environments */
 		float axis_rotation_degrees;
 
+		bool sidescroller_setup;
+
 		/* if this is non-zero, a ray of length of this variable is cast under the player to determine the ground angle and rotate the movement forces
 		to be applied for slopes accordingly
 		used only for side-scrolling environments
@@ -61,7 +63,7 @@ namespace components {
 
 		movement(augs::vec2<> acceleration = augs::vec2<>(), float air_resistance = 0.f) 
 			: input_acceleration(input_acceleration), air_resistance(air_resistance), braking_damping(-1.f), max_speed(-1.f), max_speed_animation(0.f), 
-			axis_rotation_degrees(0.f), thrust_parallel_to_ground_length(0.f) {
+			axis_rotation_degrees(0.f), thrust_parallel_to_ground_length(0.f), sidescroller_setup(false) {
 			moving_left = moving_right = moving_forward = moving_backward = false;
 		}
 	};
