@@ -78,6 +78,7 @@ public:
 	raycast_output ray_cast_px(vec2<> p1, vec2<> p2, b2Filter filter, entity* ignore_entity = nullptr);
 	
 	vec2<> push_away_from_walls(vec2<> position, float radius, int ray_amount, b2Filter filter, entity* ignore_entity = nullptr);
+	float get_closest_wall_intersection(vec2<> position, float radius, int ray_amount, b2Filter filter, entity* ignore_entity = nullptr);
 
 	struct query_output {
 		std::vector<b2Body*> bodies;

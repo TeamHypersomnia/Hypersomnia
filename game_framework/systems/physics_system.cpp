@@ -112,6 +112,23 @@ physics_system::edge_edge_output physics_system::edge_edge_intersection(vec2<> p
 	return out;
 }
 
+float physics_system::get_closest_wall_intersection(vec2<> position, float radius, int ray_amount, b2Filter filter, entity* ignore_entity) {
+	float worst_distance = radius;
+
+	for (int i = 0; i < ray_amount; ++i) {
+		auto out = ray_cast_px(position, position + vec2<>::from_degrees((360.f / ray_amount) * i) * radius, filter, ignore_entity);
+
+		if (out.hit) {
+			auto diff = (out.intersection - position);
+			auto distance = diff.length();
+
+			if (distance < worst_distance) worst_distance = distance;
+		}
+	}
+
+	return worst_distance;
+}
+
 vec2<> physics_system::push_away_from_walls(vec2<> position, float radius, int ray_amount, b2Filter filter, entity* ignore_entity) {
 	vec2<> resultant;
 	
