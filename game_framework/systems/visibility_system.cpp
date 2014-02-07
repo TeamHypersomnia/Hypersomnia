@@ -523,16 +523,15 @@ void visibility_system::process_entities(world& owner) {
 						
 						/* we check all vertices of edges */
 						for (int j = wrap(d.edge_index + cw), k = 0; k < edges_num-1; j = wrap(j + cw), ++k) {
-							/* we've already reached edges that are to CW/CCW side of discontinuity, we're not interested in checking further */
-							if (cw * (d.points.first - transform.pos).cross(request.edges[j].first - transform.pos) <= 0)
-								break;
+							/* if the edge is to the CW/CCW side of discontinuity */
+							if (cw * (d.points.first - transform.pos).cross(request.edges[j].first - transform.pos) >= 0) {
+								/* project this point onto candidate edge */
+								vec2<> close_point = d.points.first.closest_point_on_segment(request.edges[j].first, request.edges[j].second);
 
-							/* project this point onto candidate edge */
-							vec2<> close_point = d.points.first.closest_point_on_segment(request.edges[j].first, request.edges[j].second);
-
-							/* if the distance is less than allowed */
-							if (close_point.compare(d.points.first, request.ignore_discontinuities_shorter_than)) 
-								points_too_close.push_back(close_point);
+								/* if the distance is less than allowed */
+								if (close_point.compare(d.points.first, request.ignore_discontinuities_shorter_than))
+									points_too_close.push_back(close_point);
+							}
 						}
 						
 						/* let's also check the discontinuities - we don't know what is behind them */
