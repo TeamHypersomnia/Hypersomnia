@@ -16,7 +16,6 @@ pathfinding_system::pathfinding_system() : draw_memorised_walls(false), draw_und
 void pathfinding_system::process_entities(world& owner) {
 	/* prepare epsilons to be used later, just to make the notation more clear */
 	const float epsilon_distance_visible_point_sq = epsilon_distance_visible_point * epsilon_distance_visible_point;
-	const float epsilon_distance_the_same_vertex_sq = epsilon_distance_the_same_vertex * epsilon_distance_the_same_vertex;
 	
 	/* we'll need a reference to physics system for raycasting */
 	physics_system& physics = owner.get_system<physics_system>();
@@ -62,7 +61,7 @@ void pathfinding_system::process_entities(world& owner) {
 
 				for (auto& memorised : pathfinding.session().discovered_vertices) {
 					/* if a similiar discovered vertex exists */
-					if ((memorised.location - visible_vertex.second).length_sq() < epsilon_distance_the_same_vertex_sq) {
+					if (memorised.location.compare(visible_vertex.second, epsilon_distance_the_same_vertex)) {
 						this_visible_vertex_is_already_memorised = true;
 						/* overwrite the location just in case */
 						memorised.location = visible_vertex.second;
@@ -92,7 +91,7 @@ void pathfinding_system::process_entities(world& owner) {
 
 				for (auto& memorised_undiscovered : pathfinding.session().undiscovered_vertices) {
 					/* if a discontinuity with the same closer vertex already exists */
-					if ((memorised_undiscovered.location - disc.points.first).length_sq() < epsilon_distance_the_same_vertex_sq) {
+					if (memorised_undiscovered.location.compare(disc.points.first, epsilon_distance_the_same_vertex)) {
 						this_discontinuity_is_already_memorised = true;
 						vert = memorised_undiscovered;
 							//memorised_undiscovered.location = disc.points.first;
@@ -102,7 +101,7 @@ void pathfinding_system::process_entities(world& owner) {
 
 				for (auto& memorised_discovered : pathfinding.session().discovered_vertices) {
 					/* if a discontinuity with the same closer vertex already exists */
-					if ((memorised_discovered.location - disc.points.first).length_sq() < epsilon_distance_the_same_vertex_sq) {
+					if (memorised_discovered.location.compare(disc.points.first, epsilon_distance_the_same_vertex)) {
 						this_discontinuity_is_already_discovered = true;
 						memorised_discovered.location = disc.points.first;
 						break;
@@ -120,23 +119,44 @@ void pathfinding_system::process_entities(world& owner) {
 					/* get the direction the sensor will be going to */
 					vec2<> sensor_direction;
 
-						/* if the first vertex of the edge matches the location */
-						if (associated_edge.first.compare(vert.location))
-							sensor_direction = associated_edge.first - associated_edge.second;
-						/* if it is the second one */
-						else if (associated_edge.second.compare(vert.location))
-							sensor_direction = associated_edge.second - associated_edge.first;
-						/* should never happen */
-						else assert(0);
+					/* if the first vertex of the edge matches the location */
+					if (associated_edge.first.compare(vert.location))
+						sensor_direction = associated_edge.first - associated_edge.second;
+					/* if it is the second one */
+					else if (associated_edge.second.compare(vert.location))
+						sensor_direction = associated_edge.second - associated_edge.first;
+					/* should never happen */
+					else assert(0);
 
-						/* rotate a bit to prevent non-reachable sensors */
-						//float rotation = pathfinding.rotate_navpoints;
-						//if (disc.winding == disc.LEFT) rotation = -rotation;
-						//sensor_direction.rotate(rotation, vec2<>(0, 0));
-						sensor_direction.normalize();
+					/* rotate a bit to prevent non-reachable sensors */
+					//float rotation = pathfinding.rotate_navpoints;
+					//if (disc.winding == disc.LEFT) rotation = -rotation;
+					//sensor_direction.rotate(rotation, vec2<>(0, 0));
+					sensor_direction = transform.pos - vert.location;
+					sensor_direction.normalize();
 
 					vert.sensor = vert.location + sensor_direction * pathfinding.target_offset;
-					pathfinding.session().undiscovered_vertices.push_back(vert);
+
+					/* if this sensor overlaps anything, discard it */
+					std::vector<vec2<>> sensor_polygon = {
+						sensor_direction*10 + vert.location - sensor_direction.perpendicular_cw() * 2,
+						sensor_direction*10 + vert.location - sensor_direction.perpendicular_cw() * 2 + sensor_direction * pathfinding.target_offset,
+						sensor_direction*10 + vert.location + sensor_direction.perpendicular_cw() * 2 + sensor_direction * pathfinding.target_offset,
+						sensor_direction*10 + vert.location + sensor_direction.perpendicular_cw() * 2
+					};
+
+					//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[0], sensor_polygon[1], graphics::pixel_32(255, 255, 255, 255)));
+					//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[1], sensor_polygon[2], graphics::pixel_32(255, 255, 255, 255)));
+					//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[2], sensor_polygon[3], graphics::pixel_32(255, 255, 255, 255)));
+					//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[3], sensor_polygon[0], graphics::pixel_32(255, 255, 255, 255)));
+
+					auto out = physics.query_polygon(sensor_polygon, &vision.filter, it);
+					
+					if (out.bodies.empty()) {
+						vert.sensor = physics.push_away_from_walls(vert.sensor, pathfinding.target_offset, 50, vision.filter, it);
+						pathfinding.session().undiscovered_vertices.push_back(vert);
+					}
+
 				}
 
 				if (!this_discontinuity_is_already_discovered) 
@@ -155,7 +175,7 @@ void pathfinding_system::process_entities(world& owner) {
 
 			/* for every undiscovered navigation point */
 			auto& undiscs = pathfinding.session().undiscovered_vertices;
-			undiscs.erase(std::remove_if(undiscs.begin(), undiscs.end(), [&body, &pathfinding, &body_poly, epsilon_distance_the_same_vertex_sq](const components::pathfinding::pathfinding_session::navigation_vertex& nav){
+			undiscs.erase(std::remove_if(undiscs.begin(), undiscs.end(), [&body, &pathfinding, &body_poly, this](const components::pathfinding::pathfinding_session::navigation_vertex& nav){
 
 				/* if we want to force the entity to touch the sensors, we can't discard undiscovered vertices only by 
 					saying that there exists a discovered vertex (which is discovered only because it is fully visible)
@@ -164,7 +184,7 @@ void pathfinding_system::process_entities(world& owner) {
 					/* find epsilon-close discovered vertices */
 					for (auto& memorised_discovered : pathfinding.session().discovered_vertices)
 						/* if a similiar discovered vertex exists */
-						if ((memorised_discovered.location - nav.location).length_sq() < epsilon_distance_the_same_vertex_sq)
+					if (memorised_discovered.location.compare(nav.location, epsilon_distance_the_same_vertex))
 							return true;
 				//}
 				
@@ -251,8 +271,9 @@ void pathfinding_system::process_entities(world& owner) {
 				if we're exploring, pick only visible undiscovered vertices not to get stuck between two nodes
 			*/
 
-			auto& vertices = (false && pathfinding.is_exploring && pathfinding.session_stack.size() == 1 && !undiscovered_visible.empty()) ?
-				undiscovered_visible : pathfinding.session().undiscovered_vertices;
+			auto& vertices = //(pathfinding.is_exploring && pathfinding.session_stack.size() == 1 && !undiscovered_visible.empty()) ?
+			//undiscovered_visible : 
+			pathfinding.session().undiscovered_vertices;
 
 			/* save only for queries within the function "exists_among_undiscovered_visible" */
 			pathfinding.session().undiscovered_visible = undiscovered_visible;
@@ -267,45 +288,65 @@ void pathfinding_system::process_entities(world& owner) {
 			}
 
 			if (!vertices.empty()) {
-				vec2<> unit_vel = body->GetLinearVelocity();
-				unit_vel.normalize();
+				bool persistent_navpoint_found = false;
 
-				/* find discontinuity that is closest to the target */
-				auto& local_minimum_discontinuity = (*std::min_element(vertices.begin(), vertices.end(),
-					[&pathfinding, &transform, body, unit_vel](const components::pathfinding::pathfinding_session::navigation_vertex& a,
-					const components::pathfinding::pathfinding_session::navigation_vertex& b) {
-						
-						/* if we're exploring, we have no target in the first session */
-					if (pathfinding.is_exploring && pathfinding.session_stack.size() == 1) {
-						if (pathfinding.favor_velocity_parallellness) {
-							float parallellness_a = 0.f;
-							float parallellness_b = 0.f;
+				components::pathfinding::pathfinding_session::navigation_vertex current_target;
 
-							if (pathfinding.custom_exploration_hint.enabled) {
-								vec2<> compared_dir = (pathfinding.custom_exploration_hint.target - pathfinding.custom_exploration_hint.origin).normalize();
-								parallellness_a = (a.location - pathfinding.custom_exploration_hint.origin).normalize().dot(compared_dir);
-								parallellness_b = (b.location - pathfinding.custom_exploration_hint.origin).normalize().dot(compared_dir);
+				if (pathfinding.force_persistent_navpoints) {
+					if (pathfinding.session().persistent_navpoint_set) {
+						for (auto& v : vertices) {
+							if (v.sensor.compare(pathfinding.session().persistent_navpoint.sensor, epsilon_distance_the_same_vertex)) {
+								persistent_navpoint_found = true;
+								break;
 							}
-							else {
-								parallellness_a = (a.location - transform.pos).normalize().dot(unit_vel);
-								parallellness_b = (b.location - transform.pos).normalize().dot(unit_vel);
-							}
-
-							return parallellness_a > parallellness_b;
 						}
-						else if (pathfinding.custom_exploration_hint.enabled) 
-							return (a.location - pathfinding.custom_exploration_hint.origin).length_sq() < (b.location - pathfinding.custom_exploration_hint.origin).length_sq();
-						else return (a.location - transform.pos).length_sq() < (b.location - transform.pos).length_sq();
 					}
+				}
+
+				if (persistent_navpoint_found) {
+					current_target = pathfinding.session().persistent_navpoint;
+				}
+				else {
+					vec2<> unit_vel = body->GetLinearVelocity();
+					unit_vel.normalize();
+
+					/* find discontinuity that is closest to the target */
+					current_target = (*std::min_element(vertices.begin(), vertices.end(),
+						[&pathfinding, &transform, body, unit_vel](const components::pathfinding::pathfinding_session::navigation_vertex& a,
+						const components::pathfinding::pathfinding_session::navigation_vertex& b) {
+
+						/* if we're exploring, we have no target in the first session */
+						if (pathfinding.is_exploring && pathfinding.session_stack.size() == 1) {
+							if (pathfinding.favor_velocity_parallellness) {
+								float parallellness_a = 0.f;
+								float parallellness_b = 0.f;
+
+								if (pathfinding.custom_exploration_hint.enabled) {
+									vec2<> compared_dir = (pathfinding.custom_exploration_hint.target - pathfinding.custom_exploration_hint.origin).normalize();
+									parallellness_a = (a.location - pathfinding.custom_exploration_hint.origin).normalize().dot(compared_dir);
+									parallellness_b = (b.location - pathfinding.custom_exploration_hint.origin).normalize().dot(compared_dir);
+								}
+								else {
+									parallellness_a = (a.location - transform.pos).normalize().dot(unit_vel);
+									parallellness_b = (b.location - transform.pos).normalize().dot(unit_vel);
+								}
+
+								return parallellness_a > parallellness_b;
+							}
+							else if (pathfinding.custom_exploration_hint.enabled)
+								return (a.location - pathfinding.custom_exploration_hint.origin).length_sq() < (b.location - pathfinding.custom_exploration_hint.origin).length_sq();
+							else return (a.location - transform.pos).length_sq() < (b.location - transform.pos).length_sq();
+						}
 
 						auto dist_a = (a.location - pathfinding.session().target).length_sq() + (a.location - transform.pos).length_sq();
 						auto dist_b = (b.location - pathfinding.session().target).length_sq() + (b.location - transform.pos).length_sq();
 						return dist_a < dist_b;
-				}));
+					}));
+				}
 
 				/* extract the closer vertex, condition to faciliate debug */
-				if (local_minimum_discontinuity.sensor != pathfinding.session().navigate_to)
-					pathfinding.session().navigate_to = local_minimum_discontinuity.sensor;
+				if (current_target.sensor != pathfinding.session().navigate_to)
+					pathfinding.session().navigate_to = current_target.sensor;
 
 				bool rays_hit = false;
 				/* extract all transformed vertices of the subject's original model, false means we want pixels */
@@ -315,8 +356,8 @@ void pathfinding_system::process_entities(world& owner) {
 
 				for (auto& subject_vert : subject_verts) {
 					if (
-						is_point_visible(subject_vert, local_minimum_discontinuity.location, vision.filter) ||
-						is_point_visible(subject_vert, local_minimum_discontinuity.sensor, vision.filter)
+						is_point_visible(subject_vert, current_target.location, vision.filter) ||
+						is_point_visible(subject_vert, current_target.sensor, vision.filter)
 						) {
 
 						/* assume for now that the rays DID hit the navpoint */
@@ -335,7 +376,7 @@ void pathfinding_system::process_entities(world& owner) {
 							marked_hole.Set(marked.first, marked.second);
 
 							input.p1 = subject_vert;
-							input.p2 = local_minimum_discontinuity.location;
+							input.p2 = current_target.location;
 
 							/* we don't need to transform edge or ray since they are in the same space
 							but we have to prepare dummy b2Transform as argument for b2EdgeShape::RayCast
@@ -347,7 +388,7 @@ void pathfinding_system::process_entities(world& owner) {
 								break;
 							}
 
-							input.p2 = local_minimum_discontinuity.sensor;
+							input.p2 = current_target.sensor;
 
 							if (marked_hole.RayCast(&output, input, null_transform, 0)) {
 								rays_hit = false;
@@ -358,8 +399,8 @@ void pathfinding_system::process_entities(world& owner) {
 				}
 
 				/* if we can see it, navigate there */
-				if (body->TestPoint(local_minimum_discontinuity.location * PIXELS_TO_METERSf) ||
-					body->TestPoint(local_minimum_discontinuity.sensor * PIXELS_TO_METERSf) ||
+				if (body->TestPoint(current_target.location * PIXELS_TO_METERSf) ||
+					body->TestPoint(current_target.sensor * PIXELS_TO_METERSf) ||
 					rays_hit
 					) {
 				}

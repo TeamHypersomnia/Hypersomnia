@@ -34,13 +34,18 @@ namespace components {
 
 		struct pathfinding_session {
 			augs::vec2<> target, navigate_to;
-
+			
 			struct navigation_vertex {
 				augs::vec2<> location, sensor;
 			};
 
+			bool persistent_navpoint_set;
+			navigation_vertex persistent_navpoint;
+
 			std::vector<navigation_vertex> discovered_vertices, undiscovered_vertices, undiscovered_visible;
 			float temporary_ignore_discontinuities_shorter_than;
+
+			pathfinding_session() : temporary_ignore_discontinuities_shorter_than(0.f), persistent_navpoint_set(false) {}
 		};
 
 		std::vector <pathfinding_session> session_stack;
