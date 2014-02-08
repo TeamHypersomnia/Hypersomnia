@@ -225,6 +225,9 @@ void pathfinding_system::process_entities(world& owner) {
 			auto& vertices = (pathfinding.is_exploring && pathfinding.session_stack.size() == 1 && !undiscovered_visible.empty()) ?
 				undiscovered_visible : pathfinding.session().undiscovered_vertices;
 
+			/* save only for queries within the function "exists_among_undiscovered_visible" */
+			pathfinding.session().undiscovered_visible = undiscovered_visible;
+
 			if (draw_undiscovered) {
 				for (auto& disc : vertices)
 					render.lines.push_back(render_system::debug_line(disc.location, disc.sensor, graphics::pixel_32(0, 127, 255, 255)));

@@ -36,7 +36,7 @@ namespace components {
 				augs::vec2<> location, sensor;
 			};
 
-			std::vector<navigation_vertex> discovered_vertices, undiscovered_vertices;
+			std::vector<navigation_vertex> discovered_vertices, undiscovered_vertices, undiscovered_visible;
 			float temporary_ignore_discontinuities_shorter_than;
 		};
 
@@ -74,6 +74,17 @@ namespace components {
 
 		bool is_still_exploring() const {
 			return is_exploring;
+		}
+
+		bool exists_through_undiscovered_visible(augs::vec2<> navpoint, float max_distance) {
+			for (auto& memorised_undiscovered_visible : session().undiscovered_visible) {
+				/* if a discontinuity with the same closer vertex already exists */
+				if ((memorised_undiscovered_visible.sensor - navpoint).length_sq() < max_distance * max_distance) {
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		void clear_pathfinding_info() {
