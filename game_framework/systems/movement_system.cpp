@@ -81,6 +81,10 @@ void movement_system::substep(world& owner) {
 				physics.body->SetLinearDampingVec(b2Vec2(0, 0));
 			}
 		}
+		else {
+			physics.body->SetLinearDampingVec(b2Vec2(0, 0));
+			physics.body->SetLinearDampingAngle(0.f);
+		}
 		
 		if (resultant.non_zero()) {
 			if (movement.braking_damping >= 0.f)
