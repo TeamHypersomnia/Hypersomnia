@@ -601,6 +601,8 @@ void visibility_system::process_entities(world& owner) {
 					}), discs_copy.end());
 				}
 
+				/* save all marked holes for pathfinding for example */
+				request.marked_holes = marked_holes;
 				/* save cleaned copy in actual discontinuities */
 				request.discontinuities = discs_copy;
 			}

@@ -8,7 +8,7 @@ namespace components {
 	struct pathfinding : public augs::entity_system::component {
 		typedef std::pair<augs::vec2<>, augs::vec2<>> edge;
 
-		pathfinding() : favor_velocity_parallellness(false), enable_backtracking(true), target_offset(0.f), distance_navpoint_hit(0.f), is_exploring(false), rotate_navpoints(0.f) {}
+		pathfinding() : force_persistent_navpoints(true), favor_velocity_parallellness(false), enable_backtracking(true), target_offset(0.f), distance_navpoint_hit(0.f), is_exploring(false), rotate_navpoints(0.f) {}
 
 		bool enable_backtracking;
 		bool is_exploring;
@@ -28,6 +28,8 @@ namespace components {
 			augs::vec2<> origin, target;
 			navigation_hint() : enabled(false) {}
 		} custom_exploration_hint;
+
+		bool force_persistent_navpoints;
 
 		struct pathfinding_session {
 			augs::vec2<> target, navigate_to;

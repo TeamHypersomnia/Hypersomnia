@@ -123,7 +123,10 @@ void pathfinding_system::process_entities(world& owner) {
 					undiscovered_visible.push_back(vert);
 			}
 
-			/* mark vertices whose sensors distance from the the body is less than distance_navpoint_hit as visited */
+			/* mark as visible vertices such that:
+				a) there is a memorised discovered vertex that is epsilon-close to it
+				b) sensor's distance from the the body is less than distance_navpoint_hit 
+			*/
 
 			/* prepare body polygon to test for overlaps */
 			b2PolygonShape body_poly;
@@ -133,12 +136,18 @@ void pathfinding_system::process_entities(world& owner) {
 			/* for every undiscovered navigation point */
 			auto& undiscs = pathfinding.session().undiscovered_vertices;
 			undiscs.erase(std::remove_if(undiscs.begin(), undiscs.end(), [&body, &pathfinding, &body_poly, epsilon_distance_the_same_vertex_sq](const components::pathfinding::pathfinding_session::navigation_vertex& nav){
-				/* check again for duplicates, shouldn't happen very often */
-				for (auto& memorised_discovered : pathfinding.session().discovered_vertices)
-					/* if a similiar discovered vertex exists */
-					if ((memorised_discovered.location - nav.location).length_sq() < epsilon_distance_the_same_vertex_sq) 
-						return true;
 
+				/* if we want to force the entity to touch the sensors, we can't discard undiscovered vertices only by 
+					saying that there exists a discovered vertex (which is discovered only because it is fully visible)
+				*/
+				//if (!pathfinding.force_touch_sensors) {
+					/* find epsilon-close discovered vertices */
+					for (auto& memorised_discovered : pathfinding.session().discovered_vertices)
+						/* if a similiar discovered vertex exists */
+						if ((memorised_discovered.location - nav.location).length_sq() < epsilon_distance_the_same_vertex_sq)
+							return true;
+				//}
+				
 				/* prepare edge shape for sensor to test for overlaps */
 				b2EdgeShape sensor_edge;
 				sensor_edge.Set(nav.location * PIXELS_TO_METERSf, nav.sensor * PIXELS_TO_METERSf);
@@ -281,6 +290,7 @@ void pathfinding_system::process_entities(world& owner) {
 				bool rays_hit = false;
 				/* extract all transformed vertices of the subject's original model, false means we want pixels */
 				auto& subject_verts = helpers::get_transformed_shape_verts(*it, false);
+				subject_verts.clear();
 				subject_verts.push_back(transform.pos);
 
 				for (auto& subject_vert : subject_verts) {
@@ -288,7 +298,42 @@ void pathfinding_system::process_entities(world& owner) {
 						is_point_visible(subject_vert, local_minimum_discontinuity.location, vision.filter) ||
 						is_point_visible(subject_vert, local_minimum_discontinuity.sensor, vision.filter)
 						) {
+
+						/* assume for now that the rays DID hit the navpoint */
 						rays_hit = true;
+
+						/* now see if the navpoint can be seen through marked non-walkable areas
+							prepare raycast data
+						*/
+						b2RayCastOutput output;
+						b2RayCastInput input;
+						input.maxFraction = 1.0;
+
+						for (auto& marked : vision.marked_holes) {
+							/* prepare raycast subject */
+							b2EdgeShape marked_hole;
+							marked_hole.Set(marked.first, marked.second);
+
+							input.p1 = subject_vert;
+							input.p2 = local_minimum_discontinuity.location;
+
+							/* we don't need to transform edge or ray since they are in the same space
+							but we have to prepare dummy b2Transform as argument for b2EdgeShape::RayCast
+							*/
+							b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
+
+							if (marked_hole.RayCast(&output, input, null_transform, 0)) {
+								rays_hit = false;
+								break;
+							}
+
+							input.p2 = local_minimum_discontinuity.sensor;
+
+							if (marked_hole.RayCast(&output, input, null_transform, 0)) {
+								rays_hit = false;
+								break;
+							}
+						}
 					}
 				}
 

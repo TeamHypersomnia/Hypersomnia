@@ -48,6 +48,9 @@ namespace components {
 			std::vector<augs::vec2<>> vertex_hits;
 			std::vector<discontinuity> discontinuities;
 
+			/* segments that denote narrow areas */
+			std::vector<edge> marked_holes;
+
 			discontinuity* get_discontinuity(int edge_num);
 
 			int get_num_triangles();
