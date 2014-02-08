@@ -36,6 +36,7 @@ namespace bindings {
 			.def_readwrite("custom_exploration_hint", &pathfinding::custom_exploration_hint)
 			.def_readwrite("favor_velocity_parallellness", &pathfinding::favor_velocity_parallellness)
 			.def_readwrite("enable_backtracking", &pathfinding::enable_backtracking)
+			.def_readwrite("force_touch_sensors", &pathfinding::force_touch_sensors)
 			.def_readwrite("rotate_navpoints", &pathfinding::rotate_navpoints)
 			.def_readwrite("target_offset", &pathfinding::target_offset)
 			.def_readwrite("distance_navpoint_hit", &pathfinding::distance_navpoint_hit)

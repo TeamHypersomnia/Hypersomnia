@@ -365,7 +365,7 @@ void visibility_system::process_entities(world& owner) {
 							/* interpret it as both rays hit the same vertex
 							for maximum accuracy, push the vertex coordinates instead of the actual intersections */
 
-							request.vertex_hits.push_back(vertex.pos * METERS_TO_PIXELSf);
+							request.vertex_hits.push_back(std::make_pair(double_rays.size(), vertex.pos * METERS_TO_PIXELSf));
 							double_rays.push_back(double_ray(vertex.pos, vertex.pos, true, true));
 							if (draw_cast_rays) draw_line(vertex.pos, graphics::pixel_32(255, 255, 0, 255));
 						}

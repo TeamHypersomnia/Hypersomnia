@@ -45,7 +45,9 @@ namespace components {
 
 			/* output */
 			std::vector<edge> edges;
-			std::vector<augs::vec2<>> vertex_hits;
+
+			/* first: edge index, second: location */
+			std::vector<std::pair<int, augs::vec2<>>> vertex_hits;
 			std::vector<discontinuity> discontinuities;
 
 			/* segments that denote narrow areas */

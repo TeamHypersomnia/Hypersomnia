@@ -33,19 +33,39 @@ void pathfinding_system::process_entities(world& owner) {
 		/* check if we request pathfinding at the moment */
 		if (!pathfinding.session_stack.empty()) {
 			/* get visibility information */
-			auto& vision = visibility.get_layer(components::visibility::DYNAMIC_PATHFINDING);
+			auto vision = visibility.get_layer(components::visibility::DYNAMIC_PATHFINDING);
+			
+			if (pathfinding.force_touch_sensors) {
+				for (auto& vertex_hit : vision.vertex_hits) {
+					components::visibility::discontinuity new_discontinuity;
+					new_discontinuity.edge_index = vertex_hit.first;
+					new_discontinuity.points.first = vertex_hit.second;
+					new_discontinuity.is_boundary = false;
+					
+					/* rest is irrelevant */
+					vision.discontinuities.push_back(new_discontinuity);
+				}
+
+				vision.vertex_hits.clear();
+			}
+
 			//vision.ignore_discontinuities_shorter_than = pathfinding.session().temporary_ignore_discontinuities_shorter_than;
 
 			/* save all fully visible vertices as discovered */
 			for (auto& visible_vertex : vision.vertex_hits) {
 				bool this_visible_vertex_is_already_memorised = false;
 
-				for (auto& memorised_discovered : pathfinding.session().discovered_vertices) {
+				//auto components::pathfinding::pathfinding_session::* location = 
+				//		pathfinding.force_touch_sensors ? 
+				//	&components::pathfinding::pathfinding_session::undiscovered_vertices :
+				//&components::pathfinding::pathfinding_session::discovered_vertices;
+
+				for (auto& memorised : pathfinding.session().discovered_vertices) {
 					/* if a similiar discovered vertex exists */
-					if ((memorised_discovered.location - visible_vertex).length_sq() < epsilon_distance_the_same_vertex_sq) {
+					if ((memorised.location - visible_vertex.second).length_sq() < epsilon_distance_the_same_vertex_sq) {
 						this_visible_vertex_is_already_memorised = true;
 						/* overwrite the location just in case */
-						memorised_discovered.location = visible_vertex;
+						memorised.location = visible_vertex.second;
 						break;
 					}
 				}
@@ -53,7 +73,7 @@ void pathfinding_system::process_entities(world& owner) {
 				/* save if unique */
 				if (!this_visible_vertex_is_already_memorised) {
 					components::pathfinding::pathfinding_session::navigation_vertex vert;
-					vert.location = visible_vertex;
+					vert.location = visible_vertex.second;
 					pathfinding.session().discovered_vertices.push_back(vert);
 				}
 			}
@@ -110,9 +130,9 @@ void pathfinding_system::process_entities(world& owner) {
 						else assert(0);
 
 						/* rotate a bit to prevent non-reachable sensors */
-						float rotation = pathfinding.rotate_navpoints;
-						if (disc.winding == disc.LEFT) rotation = -rotation;
-						sensor_direction.rotate(rotation, vec2<>(0, 0));
+						//float rotation = pathfinding.rotate_navpoints;
+						//if (disc.winding == disc.LEFT) rotation = -rotation;
+						//sensor_direction.rotate(rotation, vec2<>(0, 0));
 						sensor_direction.normalize();
 
 					vert.sensor = vert.location + sensor_direction * pathfinding.target_offset;
@@ -231,7 +251,7 @@ void pathfinding_system::process_entities(world& owner) {
 				if we're exploring, pick only visible undiscovered vertices not to get stuck between two nodes
 			*/
 
-			auto& vertices = (pathfinding.is_exploring && pathfinding.session_stack.size() == 1 && !undiscovered_visible.empty()) ?
+			auto& vertices = (false && pathfinding.is_exploring && pathfinding.session_stack.size() == 1 && !undiscovered_visible.empty()) ?
 				undiscovered_visible : pathfinding.session().undiscovered_vertices;
 
 			/* save only for queries within the function "exists_among_undiscovered_visible" */
