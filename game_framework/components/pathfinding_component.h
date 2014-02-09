@@ -8,7 +8,7 @@ namespace components {
 	struct pathfinding : public augs::entity_system::component {
 		typedef std::pair<augs::vec2<>, augs::vec2<>> edge;
 
-		pathfinding() : force_touch_sensors(true), force_persistent_navpoints(true), favor_velocity_parallellness(false), enable_backtracking(true), target_offset(0.f), distance_navpoint_hit(0.f), is_exploring(false), rotate_navpoints(0.f) {}
+		pathfinding() : force_touch_sensors(false), force_persistent_navpoints(false), favor_velocity_parallellness(false), enable_backtracking(true), target_offset(0.f), distance_navpoint_hit(0.f), is_exploring(false), rotate_navpoints(0.f) {}
 
 		bool enable_backtracking;
 		bool is_exploring;
@@ -31,6 +31,8 @@ namespace components {
 
 		bool force_persistent_navpoints;
 		bool force_touch_sensors;
+
+		luabind::object first_priority_navpoint_check;
 
 		struct pathfinding_session {
 			augs::vec2<> target, navigate_to;
@@ -74,6 +76,10 @@ namespace components {
 
 		augs::vec2<> get_current_target() {
 			return session().target;
+		}
+
+		void reset_persistent_navpoint() {
+			session().persistent_navpoint_set = false;
 		}
 
 		bool is_still_pathfinding() const {

@@ -309,10 +309,8 @@ void pathfinding_system::process_entities(world& owner) {
 				else {
 					vec2<> unit_vel = body->GetLinearVelocity();
 					unit_vel.normalize();
-
-					/* find discontinuity that is closest to the target */
-					current_target = (*std::min_element(vertices.begin(), vertices.end(),
-						[&pathfinding, &transform, body, unit_vel](const components::pathfinding::pathfinding_session::navigation_vertex& a,
+					
+					auto local_minimum_predicate = [&pathfinding, &transform, body, unit_vel](const components::pathfinding::pathfinding_session::navigation_vertex& a,
 						const components::pathfinding::pathfinding_session::navigation_vertex& b) {
 
 						/* if we're exploring, we have no target in the first session */
@@ -341,12 +339,54 @@ void pathfinding_system::process_entities(world& owner) {
 						auto dist_a = (a.location - pathfinding.session().target).length_sq() + (a.location - transform.pos).length_sq();
 						auto dist_b = (b.location - pathfinding.session().target).length_sq() + (b.location - transform.pos).length_sq();
 						return dist_a < dist_b;
-					}));
+					};
+
+					bool first_priority_navpoint_found = false;
+
+					if (pathfinding.first_priority_navpoint_check) {
+						std::vector<components::pathfinding::pathfinding_session::navigation_vertex> first_priority_candidates;
+
+						for (auto& v : vertices) {
+							try {
+								/* arguments: subject, transform, navpoint 
+									returns true or false
+								*/
+								if (luabind::call_function<bool>(pathfinding.first_priority_navpoint_check, it, transform, v.sensor)) {
+									first_priority_candidates.push_back(v);
+								}
+							}
+							catch (std::exception compilation_error) {
+								std::cout << compilation_error.what() << '\n';
+							}
+						}
+
+						if (!first_priority_candidates.empty()) {
+							/* find discontinuity that is closest to the target */
+							current_target = (*std::min_element(first_priority_candidates.begin(), first_priority_candidates.end(), local_minimum_predicate));
+
+							first_priority_navpoint_found = true;
+						}
+					}
+
+					if (!first_priority_navpoint_found) 
+						/* find discontinuity that is closest to the target */
+						current_target = (*std::min_element(vertices.begin(), vertices.end(), local_minimum_predicate));
+
+					if (pathfinding.force_persistent_navpoints) {
+						pathfinding.session().persistent_navpoint_set = true;
+						pathfinding.session().persistent_navpoint = current_target;
+					}
 				}
 
 				/* extract the closer vertex, condition to faciliate debug */
 				if (current_target.sensor != pathfinding.session().navigate_to)
 					pathfinding.session().navigate_to = current_target.sensor;
+
+
+				if (draw_undiscovered) {
+					render.lines.push_back(render_system::debug_line(transform.pos, current_target.sensor, graphics::pixel_32(255, 255, 0, 255)));
+					render.lines.push_back(render_system::debug_line(transform.pos, pathfinding.session().target, graphics::pixel_32(255, 0, 0, 255)));
+				}
 
 				bool rays_hit = false;
 				/* extract all transformed vertices of the subject's original model, false means we want pixels */
