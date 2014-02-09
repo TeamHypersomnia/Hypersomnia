@@ -26,8 +26,9 @@ void pathfinding_system::process_entities(world& owner) {
 		/* get necessary components */
 		auto& visibility = it->get<components::visibility>();
 		auto& pathfinding = it->get<components::pathfinding>();
-		auto& transform = it->get<components::transform>().current;
+		auto transform = it->get<components::transform>().current;
 		auto body = it->get<components::physics>().body;
+		transform.pos += pathfinding.eye_offset;
 
 		/* check if we request pathfinding at the moment */
 		if (!pathfinding.session_stack.empty()) {
@@ -396,7 +397,7 @@ void pathfinding_system::process_entities(world& owner) {
 
 				for (auto& subject_vert : subject_verts) {
 					if (
-						is_point_visible(subject_vert, current_target.location, vision.filter) ||
+						//is_point_visible(subject_vert, current_target.location, vision.filter) ||
 						is_point_visible(subject_vert, current_target.sensor, vision.filter)
 						) {
 

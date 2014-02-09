@@ -40,6 +40,7 @@ namespace bindings {
 			.def_readwrite("force_touch_sensors", &pathfinding::force_touch_sensors)
 			.def_readwrite("rotate_navpoints", &pathfinding::rotate_navpoints)
 			.def_readwrite("target_offset", &pathfinding::target_offset)
+			.def_readwrite("eye_offset", &pathfinding::eye_offset)
 			.def_readwrite("first_priority_navpoint_check", &pathfinding::first_priority_navpoint_check)
 			.def_readwrite("force_touch_sensors", &pathfinding::force_touch_sensors)
 			.def_readwrite("force_persistent_navpoints", &pathfinding::force_persistent_navpoints)

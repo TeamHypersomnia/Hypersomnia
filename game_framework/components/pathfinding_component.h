@@ -34,6 +34,8 @@ namespace components {
 
 		luabind::object first_priority_navpoint_check;
 
+		augs::vec2<> eye_offset;
+
 		struct pathfinding_session {
 			augs::vec2<> target, navigate_to;
 			
