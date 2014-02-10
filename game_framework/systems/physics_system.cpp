@@ -9,7 +9,7 @@
 #include "../game/body_helper.h"
 
 
-physics_system::stepped_timer::stepped_timer(physics_system* owner) : owner(owner), current_step(0) {
+physics_system::stepped_timer::stepped_timer(physics_system* owner) : owner(owner), current_step(-1) {
 	reset();
 }
 

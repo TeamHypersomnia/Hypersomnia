@@ -213,6 +213,10 @@ script_system::~script_system() {
 }
 
 void script_system::process_entities(world& owner) {
+	call_loop(owner, false);
+}
+
+void script_system::call_loop(world& owner, bool substepping_flag) {
 	auto target_copy = targets;
 	for (auto it : target_copy) {
 		auto& scriptable = it->get<components::scriptable>();
@@ -222,7 +226,7 @@ void script_system::process_entities(world& owner) {
 		
 		if (loop_event != scriptable.available_scripts->get_raw().end()) {
 			try {
-				luabind::call_function<void>((*loop_event).second, it);
+				luabind::call_function<void>((*loop_event).second, it, substepping_flag);
 			}
 			catch (std::exception compilation_error) {
 				std::cout << compilation_error.what() << std::endl;
@@ -232,19 +236,24 @@ void script_system::process_entities(world& owner) {
 	}
 }
 
+void script_system::substep(world& owner) {
+	call_loop(owner, true);
+	pass_events(owner, true);
+}
+
 template<typename message_type>
-void pass_events_to_script(world& owner, int msg_enum) {
+void pass_events_to_script(world& owner, int msg_enum, bool substepping_flag) {
 	auto& events = owner.get_message_queue<message_type>();
 
 	events.erase(
-		std::remove_if(events.begin(), events.end(), [msg_enum](message_type& msg){
+		std::remove_if(events.begin(), events.end(), [msg_enum, substepping_flag](message_type& msg){
 			auto* scriptable = msg.subject->find<components::scriptable>();
 			if (scriptable == nullptr || !scriptable->available_scripts) return false;
 
 			auto it = scriptable->available_scripts->get_raw().find(msg_enum);
 
 			if (it != scriptable->available_scripts->get_raw().end()) {
-				return !luabind::call_function<bool>((*it).second, boost::ref(msg));
+				return !luabind::call_function<bool>((*it).second, boost::ref(msg), substepping_flag);
 			}
 			
 			return false;
@@ -253,14 +262,19 @@ void pass_events_to_script(world& owner, int msg_enum) {
 	int breakp = 23;
 }
 using namespace messages;
-void script_system::process_events(world& owner) {
+
+void script_system::pass_events(world& owner, bool substepping_flag) {
 	try {
-		pass_events_to_script<collision_message>(owner, components::scriptable::COLLISION_MESSAGE);
-		pass_events_to_script<damage_message>(owner, components::scriptable::DAMAGE_MESSAGE);
-		pass_events_to_script<intent_message>(owner, components::scriptable::INTENT_MESSAGE);
-		pass_events_to_script<shot_message>(owner, components::scriptable::SHOT_MESSAGE);
+		pass_events_to_script<collision_message>(owner, components::scriptable::COLLISION_MESSAGE, substepping_flag);
+		pass_events_to_script<damage_message>(owner, components::scriptable::DAMAGE_MESSAGE, substepping_flag);
+		pass_events_to_script<intent_message>(owner, components::scriptable::INTENT_MESSAGE, substepping_flag);
+		pass_events_to_script<shot_message>(owner, components::scriptable::SHOT_MESSAGE, substepping_flag);
 	}
 	catch (std::exception compilation_error) {
 		std::cout << compilation_error.what() << std::endl;
 	}
+}
+
+void script_system::process_events(world& owner) {
+	pass_events(owner, false);
 }

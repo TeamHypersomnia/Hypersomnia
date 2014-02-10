@@ -29,7 +29,7 @@ class physics_system : public processing_system_templated<components::physics, c
 public:
 	struct stepped_timer {
 		physics_system* owner;
-		unsigned current_step;
+		int current_step;
 
 		stepped_timer(physics_system*);
 		void reset();
@@ -40,7 +40,7 @@ public:
 		unsigned extract_steps();
 	};
 
-	unsigned all_steps;
+	int all_steps;
 
 	std::function<void(world&)> substepping_routine;
 
