@@ -51,6 +51,7 @@ void movement_system::substep(world& owner) {
 			/* rotate to our frame of reference */
 			//resultant.x = sgn(vec2<>(movement.requested_movement).rotate(-movement.axis_rotation_degrees, vec2<>()).x) * movement.input_acceleration.x;
 			resultant.x = vec2<>(movement.requested_movement).rotate(-movement.axis_rotation_degrees, vec2<>()).x;
+			clamp(resultant.x, -movement.input_acceleration.x, movement.input_acceleration.x);
 		}
 		else {
 			resultant.x = movement.moving_right * movement.input_acceleration.x - movement.moving_left * movement.input_acceleration.x;
