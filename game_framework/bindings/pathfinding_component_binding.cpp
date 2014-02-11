@@ -34,6 +34,7 @@ namespace bindings {
 			.def("is_still_pathfinding", &pathfinding::is_still_pathfinding)
 			.def("exists_through_undiscovered_visible", &pathfinding::exists_through_undiscovered_visible)
 			.def("reset_persistent_navpoint", &pathfinding::reset_persistent_navpoint)
+			.def("clear_internal_data", &pathfinding::clear_internal_data)
 			.def_readwrite("custom_exploration_hint", &pathfinding::custom_exploration_hint)
 			.def_readwrite("favor_velocity_parallellness", &pathfinding::favor_velocity_parallellness)
 			.def_readwrite("enable_backtracking", &pathfinding::enable_backtracking)
@@ -46,6 +47,8 @@ namespace bindings {
 			.def_readwrite("force_persistent_navpoints", &pathfinding::force_persistent_navpoints)
 			.def_readwrite("distance_navpoint_hit", &pathfinding::distance_navpoint_hit)
 			.def_readwrite("starting_ignore_discontinuities_shorter_than", &pathfinding::starting_ignore_discontinuities_shorter_than)
+			.def_readwrite("target_visibility_condition", &pathfinding::target_visibility_condition)
+			.def_readwrite("enable_session_rollbacks", &pathfinding::enable_session_rollbacks)
 			; 
 	}
 }

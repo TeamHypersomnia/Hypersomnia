@@ -41,9 +41,11 @@ void pathfinding_system::process_entities(world& owner) {
 					new_discontinuity.edge_index = vertex_hit.first;
 					new_discontinuity.points.first = vertex_hit.second;
 					new_discontinuity.is_boundary = false;
-					
-					/* rest is irrelevant */
-					vision.discontinuities.push_back(new_discontinuity);
+					/* rest is not worth filling so proceed */
+
+					if (vertex_hit.second.y >= transform.pos.y) {
+						vision.discontinuities.push_back(new_discontinuity);
+					}
 				}
 
 				vision.vertex_hits.clear();
@@ -130,10 +132,10 @@ void pathfinding_system::process_entities(world& owner) {
 					else assert(0);
 
 					/* rotate a bit to prevent non-reachable sensors */
-					//float rotation = pathfinding.rotate_navpoints;
-					//if (disc.winding == disc.LEFT) rotation = -rotation;
-					//sensor_direction.rotate(rotation, vec2<>(0, 0));
-					sensor_direction = transform.pos - vert.location;
+					float rotation = pathfinding.rotate_navpoints;
+					if (disc.winding == disc.LEFT) rotation = -rotation;
+					sensor_direction.rotate(rotation, vec2<>(0, 0));
+					//sensor_direction = transform.pos - vert.location;
 					sensor_direction.normalize();
 
 					vert.sensor = vert.location + sensor_direction * pathfinding.target_offset;
@@ -189,18 +191,20 @@ void pathfinding_system::process_entities(world& owner) {
 							return true;
 				//}
 				
-				/* prepare edge shape for sensor to test for overlaps */
-				b2EdgeShape sensor_edge;
-				sensor_edge.Set(nav.location * PIXELS_TO_METERSf, nav.sensor * PIXELS_TO_METERSf);
+				if (pathfinding.mark_touched_as_discovered) {
+					/* prepare edge shape for sensor to test for overlaps */
+					b2EdgeShape sensor_edge;
+					sensor_edge.Set(nav.location * PIXELS_TO_METERSf, nav.sensor * PIXELS_TO_METERSf);
 
-				/* prepare null transform, both bodies are already in the same frame of reference */
-				b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
+					/* prepare null transform, both bodies are already in the same frame of reference */
+					b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
 
-				/* if shortest distance between body and sensor fits in distance_navpoint_hit */
-				if (b2TestOverlap(&sensor_edge, 0, &body_poly, 0, null_transform, null_transform, pathfinding.distance_navpoint_hit * PIXELS_TO_METERSf)) {
-					/* save this sensor in discovered ones and return true to remove it from the undiscovered */
-					pathfinding.session().discovered_vertices.push_back(nav);
-					return true;
+					/* if shortest distance between body and sensor fits in distance_navpoint_hit */
+					if (b2TestOverlap(&sensor_edge, 0, &body_poly, 0, null_transform, null_transform, pathfinding.distance_navpoint_hit * PIXELS_TO_METERSf)) {
+						/* save this sensor in discovered ones and return true to remove it from the undiscovered */
+						pathfinding.session().discovered_vertices.push_back(nav);
+						return true;
+					}
 				}
 
 				return false;
@@ -209,15 +213,32 @@ void pathfinding_system::process_entities(world& owner) {
 			/* now for the actual pathfinding routine */
 
 			/* helpful lambda */
-			auto& is_point_visible = [&physics, epsilon_distance_visible_point_sq](vec2<> from, vec2<> point, b2Filter& filter){
-				auto line_of_sight = physics.ray_cast_px(from, point, filter);
-				return (!line_of_sight.hit || (line_of_sight.intersection - point).length_sq() < epsilon_distance_visible_point_sq);
+			auto& is_point_visible = [&physics, epsilon_distance_visible_point_sq, &pathfinding, it](vec2<> from, vec2<> point, b2Filter& filter){
+				bool visibility_condition_fulfilled = true;
+				
+				if (pathfinding.target_visibility_condition) {
+					try {
+						/* arguments: subject, transform, navpoint
+						returns true or false
+						*/
+						visibility_condition_fulfilled = luabind::call_function<bool>(pathfinding.target_visibility_condition, it, from, point);
+					}
+					catch (std::exception compilation_error) {
+						std::cout << compilation_error.what() << '\n';
+					}
+				}
+
+				if (visibility_condition_fulfilled) {
+					auto line_of_sight = physics.ray_cast_px(from, point, filter);
+					return (!line_of_sight.hit || (line_of_sight.intersection - point).length_sq() < epsilon_distance_visible_point_sq);
+				}
+				else return false;
 			};
 
 			/* we are sure here that session stack has at least 1 session
 				we drop secondary sessions whose targets are visible
 			*/
-			if (pathfinding.session_stack.size() >= 2) {
+			if (pathfinding.enable_session_rollbacks && pathfinding.session_stack.size() >= 2) {
 				for (auto old_session = pathfinding.session_stack.begin(); old_session != pathfinding.session_stack.end(); ++old_session) {
 					/*  check if there's a line of sight to any of the old targets
 					if there's a line of sight to "navigate_to" it will be visible as target to the newer session
@@ -352,7 +373,7 @@ void pathfinding_system::process_entities(world& owner) {
 								/* arguments: subject, transform, navpoint 
 									returns true or false
 								*/
-								if (luabind::call_function<bool>(pathfinding.first_priority_navpoint_check, it, transform, v.sensor)) {
+								if (luabind::call_function<bool>(pathfinding.first_priority_navpoint_check, it, transform.pos, v.sensor)) {
 									first_priority_candidates.push_back(v);
 								}
 							}
