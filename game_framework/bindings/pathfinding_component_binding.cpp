@@ -49,6 +49,7 @@ namespace bindings {
 			.def_readwrite("starting_ignore_discontinuities_shorter_than", &pathfinding::starting_ignore_discontinuities_shorter_than)
 			.def_readwrite("target_visibility_condition", &pathfinding::target_visibility_condition)
 			.def_readwrite("enable_session_rollbacks", &pathfinding::enable_session_rollbacks)
+			.def_readwrite("mark_touched_as_discovered", &pathfinding::mark_touched_as_discovered)
 			; 
 	}
 }
