@@ -51,6 +51,7 @@ namespace bindings {
 
 		_minmax(),
 		_vec2(),
+		_value_animator(),
 		_b2Filter(),
 		_rgba(),
 		_rect_ltrb(),
@@ -143,6 +144,7 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			bindings::_sfml_audio(),
 			bindings::_minmax(),
 			bindings::_vec2(),
+			bindings::_value_animator(),
 			bindings::_b2Filter(),
 			bindings::_rgba(),
 			bindings::_rect_ltrb(),
@@ -197,6 +199,7 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			bindings::_opengl_binding(),
 
 			luabind::def("set_world_reloading_script", &set_world_reloading_script),
+			luabind::def("clamp", &augs::get_clamp<float>),
 			luabind::def("debugger_break", &debugger_break),
 			luabind::def("randval", (float(*)(float, float))&randval),
 

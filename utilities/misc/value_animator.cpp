@@ -18,6 +18,8 @@ namespace augs {
 			: callback(callback), init_val(init_val), diff(desired_val - init_val), milliseconds(milliseconds), how(how) {
 		}
 
+		animator::animator(float init_val, float desired_val, float milliseconds) : animator( init_val, desired_val, milliseconds, LINEAR) {}
+
 		void animator::start() {
 			tm.extract<std::chrono::microseconds>();
 		}
@@ -29,7 +31,13 @@ namespace augs {
 				callback(result);
 			return finished;
 		}
-		
+	
+		float animator::get_animated() {
+			float out;
+			animate(out);
+			return out;
+		}
+
 		bool animator::animate(float& out_val) {
 			float ms = float(tm.get<std::chrono::milliseconds>());
 			bool finished = ms >= milliseconds;

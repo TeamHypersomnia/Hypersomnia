@@ -30,6 +30,13 @@ namespace augs {
 		if (a < min_a) a = min_a;
 		if (a > max_a) a = max_a;
 	}
+	
+	template <typename T>
+	T get_clamp(T a, T min_a, T max_a) {
+		if (a < min_a) return min_a;
+		if (a > max_a) return max_a;
+		return a;
+	}
 
 	template <class vec, class d>
 	vec& rotate(vec& v, const vec& origin, d angle) {
@@ -222,7 +229,7 @@ namespace augs {
 
 		vec2& normalize_hint(float suggested_length) {
 			float len = suggested_length;
-			if (len < std::numeric_limits<float>::epsilon())
+			if (std::abs(len) < std::numeric_limits<float>::epsilon())
 				return *this;
 
 			float inv_len = 1.f / len;

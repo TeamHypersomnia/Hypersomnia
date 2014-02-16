@@ -48,8 +48,14 @@ using namespace entity_system;
 using namespace messages;
 
 resources::script* world_reloading_script = nullptr;
-
+#include <float.h>
+//unsigned int fp_control_state = _controlfp(_EM_INVALID, _MCW_EM);
 int main() {    
+
+	//_clearfp();
+	//_controlfp(_controlfp(0, 0) & ~(_EM_INVALID | _EM_ZERODIVIDE | _EM_OVERFLOW),
+	//	_MCW_EM);
+
 	augs::init();	
 	script_system scripts;
 	lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
