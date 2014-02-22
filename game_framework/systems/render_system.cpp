@@ -119,7 +119,7 @@ resources::vertex_triangle& render_system::get_triangle(int i) {
 	return triangles[i];
 }
 
-void render_system::draw_debug_info(rects::xywh visible_area, components::transform::state camera_transform) {
+void render_system::draw_debug_info(rects::xywh visible_area, components::transform::state camera_transform, augs::texture_baker::texture* tex) {
 	vec2<> center = (vec2<>(visible_area.w, visible_area.h) / 2);
 
 	if (draw_visibility) {
@@ -130,6 +130,7 @@ void render_system::draw_debug_info(rects::xywh visible_area, components::transf
 				for (auto& entry : visibility->visibility_layers.raw) {
 					/* shortcut */
 					auto& request = entry.val;
+
 
 					glVertexAttrib4f(VERTEX_ATTRIBUTES::COLOR, request.color.r / 255.f, request.color.g / 255.f, request.color.b / 255.f, request.color.a / 2 / 255.f);
 					auto origin = it->get<components::transform>().current.pos;
@@ -155,6 +156,10 @@ void render_system::draw_debug_info(rects::xywh visible_area, components::transf
 							auto pos = tri.points[i] - camera_transform.pos + center + origin;
 
 							pos.rotate(camera_transform.rotation, center);
+							
+							if (tex) 
+								glVertexAttrib2f(VERTEX_ATTRIBUTES::TEXCOORD, tex->get_u(i), tex->get_v(i));
+							
 							glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, pos.x, pos.y);
 						}
 					}
@@ -166,14 +171,16 @@ void render_system::draw_debug_info(rects::xywh visible_area, components::transf
 
 	glBegin(GL_LINES);
 	
-	auto line_lambda = [camera_transform, visible_area, center](debug_line line) {
+	auto line_lambda = [camera_transform, visible_area, center, tex](debug_line line) {
 		line.a += center - camera_transform.pos;
 		line.b += center - camera_transform.pos;
 
 		line.a.rotate(camera_transform.rotation, center);
 		line.b.rotate(camera_transform.rotation, center);
 		glVertexAttrib4f(VERTEX_ATTRIBUTES::COLOR, line.col.r / 255.f, line.col.g / 255.f, line.col.b / 255.f, line.col.a / 255.f);
+		if (tex) glVertexAttrib2f(VERTEX_ATTRIBUTES::TEXCOORD, tex->get_u(0), tex->get_v(0));
 		glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.a.x, line.a.y);
+		if (tex) glVertexAttrib2f(VERTEX_ATTRIBUTES::TEXCOORD, tex->get_u(2), tex->get_v(2));
 		glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.b.x, line.b.y);
 	};
 	

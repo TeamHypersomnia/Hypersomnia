@@ -8,16 +8,18 @@
 #include "../components/render_component.h"
 
 #include "../resources/vertex.h"
+#include "texture_baker/texture_baker.h"
 
 using namespace augs;
 using namespace entity_system;
 
 class render_system : public processing_system_templated<components::transform, components::render> {
-	resources::buffer triangles;
 	resources::vertex_triangle* last_bound_buffer_location;
 
 	friend class camera_system;
 public:
+	resources::buffer triangles;
+
 	GLuint position_buffer, texcoord_buffer, color_buffer;
 	GLuint triangle_buffer;
 
@@ -34,7 +36,7 @@ public:
 	int get_triangle_count();
 	resources::vertex_triangle& get_triangle(int i);
 
-	void draw_debug_info(rects::xywh visible_area, components::transform::state);
+	void draw_debug_info(rects::xywh visible_area, components::transform::state, augs::texture_baker::texture* tex);
 
 	struct debug_line {
 		debug_line(augs::vec2<> a, augs::vec2<> b, augs::graphics::pixel_32 col = augs::graphics::pixel_32(255, 255, 255, 255)) : col(col), a(a), b(b) {}
