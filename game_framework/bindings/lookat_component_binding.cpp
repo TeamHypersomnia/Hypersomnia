@@ -15,6 +15,8 @@ namespace bindings {
 			.def_readwrite("easing_mode", &lookat::easing_mode)
 			.def_readwrite("smoothing_average_factor", &lookat::smoothing_average_factor)
 			.def_readwrite("averages_per_sec", &lookat::averages_per_sec)
+			.def_readwrite("update_value", &lookat::update_value)
+			.def_readwrite("last_value", &lookat::last_value)
 			.enum_("chase_type")[
 				luabind::value("POSITION", lookat::look_type::POSITION),
 				luabind::value("VELOCITY", lookat::look_type::VELOCITY),
