@@ -660,6 +660,9 @@
     <ClCompile Include="utilities\augmentations.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game_framework\bindings\value_animator_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\readdir\targetver.h">
