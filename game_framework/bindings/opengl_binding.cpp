@@ -133,6 +133,9 @@ namespace bindings {
 			.def("build", &shader_program::build)
 			.def("use", &shader_program::use)
 			.def("destroy", &shader_program::destroy)
+			.scope[
+				luabind::def("use_default", &shader_program::use_default)
+			]
 
 			;
 	}

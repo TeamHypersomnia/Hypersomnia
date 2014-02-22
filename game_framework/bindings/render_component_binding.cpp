@@ -12,6 +12,7 @@ namespace bindings {
 			luabind::class_<render_system::debug_line>("debug_line")
 			.def(luabind::constructor<vec2<>, vec2<>, graphics::pixel_32>())
 			,
+			luabind::class_<resources::buffer>("triangle_buffer"),
 
 			luabind::class_<render_system>("_render_system")
 			.def_readwrite("visibility_expansion", &render_system::visibility_expansion)
@@ -24,6 +25,7 @@ namespace bindings {
 			.def_readwrite("draw_visibility", &render_system::draw_visibility)
 			.def_readwrite("draw_weapon_info", &render_system::draw_weapon_info)
 			.def_readwrite("debug_drawing", &render_system::debug_drawing)
+			.def_readwrite("triangles", &render_system::triangles)
 			.def("push_line", &render_system::push_line)
 			.def("push_non_cleared_line", &render_system::push_non_cleared_line)
 			.def("clear_non_cleared_lines", &render_system::clear_non_cleared_lines)

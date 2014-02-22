@@ -33,6 +33,7 @@ namespace bindings {
 			.def("add_concave", &polygon::add_concave)
 			.def("get_vertex_count", &polygon::get_vertex_count)
 			.def("get_vertex", &polygon::get_vertex)
+			.def("draw", &polygon::draw)
 			);
 	}
 }
