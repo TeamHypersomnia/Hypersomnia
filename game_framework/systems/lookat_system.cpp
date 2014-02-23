@@ -9,7 +9,7 @@ void lookat_system::process_entities(world& owner) {
 
 	for (auto it : targets) {
 		auto& lookat = it->get<components::lookat>();
-	
+
 		if (lookat.target == nullptr)
 			continue;
 
@@ -23,7 +23,7 @@ void lookat_system::process_entities(world& owner) {
 		}
 		else {
 			auto target_physics = lookat.target->find<components::physics>();
-			
+
 			if (target_physics != nullptr) {
 				vec2<> direction;
 
@@ -47,8 +47,7 @@ void lookat_system::process_entities(world& owner) {
 			lookat.last_value = lookat.last_rotation_interpolant.get_degrees();
 		}
 		else if (lookat.easing_mode == lookat.NONE) {
-			transform.rotation = new_rotation.get_degrees();
-			lookat.last_value = lookat.last_rotation_interpolant.get_degrees();
+			lookat.last_value = new_rotation.get_degrees();
 		}
 
 		if (lookat.update_value) {

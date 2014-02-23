@@ -165,7 +165,23 @@ namespace resources {
 		vertices.push_back(v);
 	}
 
-	void polygon::add_concave(const concave& polygon) {
+	void polygon::add_concave(const concave& original_polygon) {
+		int i1, i2;
+
+		auto polygon = original_polygon;
+
+		float area = 0;
+		auto& vs = polygon.vertices;
+
+		for (i1 = 0; i1 < vs.size(); i1++) {
+			i2 = i1 + 1;
+			if (i2 == vs.size()) i2 = 0;
+			area += vs[i1].pos.x * vs[i2].pos.y - vs[i1].pos.y * vs[i2].pos.x;
+		}
+
+		/* ensure proper winding */
+		if (area > 0) std::reverse(polygon.vertices.begin(), polygon.vertices.end());
+		
 		using namespace p2t;
 		std::vector<Point> points;
 		std::vector<Point*> input;
