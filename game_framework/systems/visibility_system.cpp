@@ -479,8 +479,9 @@ void visibility_system::process_entities(world& owner) {
 					render.lines.push_back(render_system::debug_line(p1, p2, request.color));
 				}
 
-				/* save new edge */
-				request.edges.push_back(std::make_pair(p1, p2));
+				/* save new edge if it is not degenerate */
+				if (!p1.compare(p2))
+					request.edges.push_back(std::make_pair(p1, p2));
 			}
 
 			/* a little processing on discontinuities, we'll need them in a moment */
