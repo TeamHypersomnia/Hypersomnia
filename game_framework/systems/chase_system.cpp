@@ -15,7 +15,7 @@ void chase_system::process_entities(world&) {
 		if (chase.target == nullptr) continue;
 		
 		if (chase.target_newly_set) {
-			auto target_transform = chase.target->get<components::transform>().current;
+			auto target_transform = chase.subscribe_to_previous ? chase.target->get<components::transform>().previous : chase.target->get<components::transform>().current;
 			target_transform.rotation *= chase.rotation_multiplier;
 
 			chase.previous = target_transform.pos;
@@ -23,7 +23,7 @@ void chase_system::process_entities(world&) {
 			chase.target_newly_set = false;
 		}
 
-		auto target_transform = chase.target->get<components::transform>().current;
+		auto target_transform = chase.subscribe_to_previous ? chase.target->get<components::transform>().previous : chase.target->get<components::transform>().current;
 		target_transform.rotation *= chase.rotation_multiplier;
 
 		if (chase.chase_type == components::chase::chase_type::OFFSET) {
@@ -50,6 +50,9 @@ void chase_system::process_entities(world&) {
 			
 			if (chase.chase_rotation)
 				transform.rotation = target_transform.rotation + chase.rotation_offset;
+		}
+		else if (chase.chase_type == components::chase::chase_type::PARALLAX) {
+			transform.pos = chase.reference_position + (target_transform.pos - chase.target_reference_position) * chase.scrolling_speed;
 		}
 	}
 }

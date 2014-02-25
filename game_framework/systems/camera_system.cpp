@@ -106,6 +106,9 @@ void camera_system::process_entities(world& owner) {
 
 			glViewport(camera.screen_rect.x, camera.screen_rect.y, camera.screen_rect.w, camera.screen_rect.h);
 
+			/* save the smoothing result in previous transform state, will come in handy */
+			e->get<components::transform>().previous = drawn_transform;
+
 			if (camera.drawing_callback) {
 				try {
 					/* arguments: subject, renderer, visible_area, target_transform, mask */
