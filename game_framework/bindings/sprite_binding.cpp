@@ -25,6 +25,9 @@ namespace bindings {
 			.def_readwrite("image", &sprite::tex)
 			.def_readwrite("rotation_offset", &sprite::rotation_offset)
 			.def_readwrite("color", &sprite::color)
-			.def("update_size", &sprite::update_size);
+			.def("update_size", &sprite::update_size)
+			.def("draw", &sprite::draw)
+			
+			;
 	}
 }
