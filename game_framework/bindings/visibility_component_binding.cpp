@@ -25,7 +25,9 @@ namespace bindings {
 			.def_readwrite("color", &visibility::layer::color)
 			.def_readwrite("ignore_discontinuities_shorter_than", &visibility::layer::ignore_discontinuities_shorter_than)
 			.def_readwrite("offset", &visibility::layer::offset)
-			.def_readwrite("postprocessing_subject", &visibility::layer::postprocessing_subject),
+			.def_readwrite("postprocessing_subject", &visibility::layer::postprocessing_subject)
+			.def("get_polygon", &visibility::layer::get_polygon)
+			,
 			
 			luabind::class_<visibility>("visibility_component")
 			.def(luabind::constructor<>())

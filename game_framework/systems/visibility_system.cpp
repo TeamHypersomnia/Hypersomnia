@@ -46,6 +46,23 @@ components::visibility::triangle components::visibility::layer::get_triangle(int
 	return tri;
 }
 
+std::vector<augs::vec2<>> components::visibility::layer::get_polygon(float distance_epsilon) {
+	std::vector<augs::vec2<>> output;
+
+	for (size_t i = 0; i < edges.size(); ++i) {
+		/* always push the first point */
+		output.push_back(edges[i].first);
+		
+		/* push the second one only if it is different from the first point of the next edge */
+		if (!edges[i].second.compare(edges[(i + 1)%edges.size()].first, distance_epsilon)) {
+			output.push_back(edges[i].second);
+		}
+	}
+
+	return output;
+}
+
+
 void visibility_system::process_entities(world& owner) {
 	/* prepare epsilons to be used later, just to make the notation more clear */
 	float epsilon_distance_vertex_hit_sq = epsilon_distance_vertex_hit * PIXELS_TO_METERSf;
@@ -480,7 +497,12 @@ void visibility_system::process_entities(world& owner) {
 				}
 
 				/* save new edge if it is not degenerate */
-				if (!p1.compare(p2))
+				if (!p1.compare(p2) && 
+					std::fpclassify(p1.x) == FP_NORMAL
+					&& std::fpclassify(p1.y) == FP_NORMAL
+					&& std::fpclassify(p2.x) == FP_NORMAL
+					&& std::fpclassify(p2.y) == FP_NORMAL
+					)
 					request.edges.push_back(std::make_pair(p1, p2));
 			}
 

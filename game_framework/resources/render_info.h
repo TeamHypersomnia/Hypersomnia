@@ -23,6 +23,8 @@ namespace resources {
 			components::transform::state transform, camera_transform;
 			components::render* additional_info;
 			rects::ltrb visible_area;
+
+			draw_input() : output(nullptr), additional_info(nullptr) {}
 		};
 
 		static void make_rect(vec2<> pos, vec2<> size, float rotation_degrees, vec2<> out[4]);

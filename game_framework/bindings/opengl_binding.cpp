@@ -68,6 +68,7 @@ namespace bindings {
 				luabind::def("glDisable", wrap(glDisable)),
 				luabind::def("glClearColor", wrap(glClearColor)),
 				luabind::def("glClear", wrap(glClear)),
+				luabind::def("glColorMask", wrap(glColorMask)),
 				luabind::def("glBegin", wrap(glBegin)),
 				luabind::def("glVertexAttrib2f", wrap_ptr(glVertexAttrib2f)),
 				luabind::def("glVertexAttrib4f", wrap_ptr(glVertexAttrib4f)),

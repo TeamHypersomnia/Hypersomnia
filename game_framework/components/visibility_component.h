@@ -57,6 +57,7 @@ namespace components {
 
 			int get_num_triangles();
 			triangle get_triangle(int index, augs::vec2<> origin);
+			std::vector<augs::vec2<>> get_polygon(float distance_epsilon);
 
 			layer() : square_side(0.f), postprocessing_subject(false), ignore_discontinuities_shorter_than(-1.f) {}
 		};
