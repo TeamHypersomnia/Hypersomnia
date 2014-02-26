@@ -122,44 +122,48 @@ void pathfinding_system::process_entities(world& owner) {
 					/* get the direction the sensor will be going to */
 					vec2<> sensor_direction;
 
+					bool degenerate = false;
+
 					/* if the first vertex of the edge matches the location */
 					if (associated_edge.first.compare(vert.location))
 						sensor_direction = associated_edge.first - associated_edge.second;
 					/* if it is the second one */
 					else if (associated_edge.second.compare(vert.location))
 						sensor_direction = associated_edge.second - associated_edge.first;
-					/* should never happen */
-					else assert(0);
-
-					/* rotate a bit to prevent non-reachable sensors */
-					float rotation = pathfinding.rotate_navpoints;
-					if (disc.winding == disc.LEFT) rotation = -rotation;
-					sensor_direction.rotate(rotation, vec2<>(0, 0));
-					//sensor_direction = transform.pos - vert.location;
-					sensor_direction.normalize();
-
-					vert.sensor = vert.location + sensor_direction * pathfinding.target_offset;
-
-					/* if this sensor overlaps anything, discard it */
-					std::vector<vec2<>> sensor_polygon = {
-						sensor_direction*10 + vert.location - sensor_direction.perpendicular_cw() * 2,
-						sensor_direction*10 + vert.location - sensor_direction.perpendicular_cw() * 2 + sensor_direction * pathfinding.target_offset,
-						sensor_direction*10 + vert.location + sensor_direction.perpendicular_cw() * 2 + sensor_direction * pathfinding.target_offset,
-						sensor_direction*10 + vert.location + sensor_direction.perpendicular_cw() * 2
-					};
-
-					//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[0], sensor_polygon[1], graphics::pixel_32(255, 255, 255, 255)));
-					//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[1], sensor_polygon[2], graphics::pixel_32(255, 255, 255, 255)));
-					//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[2], sensor_polygon[3], graphics::pixel_32(255, 255, 255, 255)));
-					//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[3], sensor_polygon[0], graphics::pixel_32(255, 255, 255, 255)));
-
-					auto out = physics.query_polygon(sensor_polygon, &vision.filter, it);
-					
-					if (out.bodies.empty()) {
-						vert.sensor = physics.push_away_from_walls(vert.sensor, pathfinding.target_offset, 50, vision.filter, it);
-						pathfinding.session().undiscovered_vertices.push_back(vert);
+					/* should never happen, degenerate edge */
+					else {
+						degenerate = true;
 					}
+					if (!degenerate) {
+						/* rotate a bit to prevent non-reachable sensors */
+						float rotation = pathfinding.rotate_navpoints;
+						if (disc.winding == disc.LEFT) rotation = -rotation;
+						sensor_direction.rotate(rotation, vec2<>(0, 0));
+						//sensor_direction = transform.pos - vert.location;
+						sensor_direction.normalize();
 
+						vert.sensor = vert.location + sensor_direction * pathfinding.target_offset;
+
+						/* if this sensor overlaps anything, discard it */
+						std::vector<vec2<>> sensor_polygon = {
+							sensor_direction * 10 + vert.location - sensor_direction.perpendicular_cw() * 2,
+							sensor_direction * 10 + vert.location - sensor_direction.perpendicular_cw() * 2 + sensor_direction * pathfinding.target_offset,
+							sensor_direction * 10 + vert.location + sensor_direction.perpendicular_cw() * 2 + sensor_direction * pathfinding.target_offset,
+							sensor_direction * 10 + vert.location + sensor_direction.perpendicular_cw() * 2
+						};
+
+						//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[0], sensor_polygon[1], graphics::pixel_32(255, 255, 255, 255)));
+						//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[1], sensor_polygon[2], graphics::pixel_32(255, 255, 255, 255)));
+						//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[2], sensor_polygon[3], graphics::pixel_32(255, 255, 255, 255)));
+						//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[3], sensor_polygon[0], graphics::pixel_32(255, 255, 255, 255)));
+
+						auto out = physics.query_polygon(sensor_polygon, &vision.filter, it);
+
+						if (out.bodies.empty()) {
+							vert.sensor = physics.push_away_from_walls(vert.sensor, pathfinding.target_offset, 50, vision.filter, it);
+							pathfinding.session().undiscovered_vertices.push_back(vert);
+						}
+					}
 				}
 
 				if (!this_discontinuity_is_already_discovered) 
