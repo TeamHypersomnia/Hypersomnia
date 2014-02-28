@@ -166,6 +166,7 @@ namespace resources {
 	}
 
 	void polygon::add_concave(const concave& original_polygon) {
+		if (original_polygon.vertices.empty()) return;
 		int i1, i2;
 
 		auto polygon = original_polygon;

@@ -41,6 +41,10 @@ namespace augs {
 			bool animate();
 			bool animate(float& out_val);
 
+			bool has_finished() const {
+				return tm.get<std::chrono::milliseconds>() >= milliseconds;
+			}
+
 			void reset(float init_val, float desired_val);
 			void reset(float init_val, float desired_val, float milliseconds);
 		};

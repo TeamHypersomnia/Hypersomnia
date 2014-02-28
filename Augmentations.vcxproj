@@ -165,6 +165,7 @@
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <MinimalRebuild>true</MinimalRebuild>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

@@ -16,6 +16,7 @@ namespace bindings {
 			.def("set_logarithmic", &misc::animator::set_logarithmic)
 			.def("set_exponential", &misc::animator::set_exponential)
 			.def("get_animated", &misc::animator::get_animated)
+			.def("has_finished", &misc::animator::has_finished)
 			.def("start", &misc::animator::start);
 	}
 }

@@ -187,7 +187,10 @@ int main() {
 	//my_program.use();
 	
 	//glGetUniformLocation(my_program.id, "projection_matrix");
-	
+
+	float myval = std::numeric_limits<float>::quiet_NaN();
+	std::cout << std::isnan(myval) << std::endl; 
+
 	while (!input.quit_flag) {
 		my_world.validate_delayed_messages();
 
@@ -233,6 +236,7 @@ int main() {
 
 		my_world.flush_message_queues();
 		//std::cout << physics.ray_casts_per_frame << std::endl;
+
 		 
 		if (world_reloading_script) {
 			my_world.delete_all_entities(true);
