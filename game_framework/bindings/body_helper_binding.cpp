@@ -21,6 +21,7 @@ namespace bindings {
 			.def_readwrite("friction", &physics_info::friction)
 			.def_readwrite("restitution", &physics_info::restitution)
 			.def_readwrite("angular_damping", &physics_info::angular_damping)
+			.def_readwrite("gravity_scale", &physics_info::gravity_scale)
 			.def_readwrite("linear_damping", &physics_info::linear_damping)
 			.def_readwrite("fixed_rotation", &physics_info::fixed_rotation)
 			.def_readwrite("sensor", &physics_info::sensor)

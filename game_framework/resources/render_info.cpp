@@ -211,7 +211,7 @@ namespace resources {
 			for (int i = 0; i < 3; ++i) {
 				auto new_tri_point = out.GetPoint(i);
 
-				for (int j = 0; j < polygon.vertices.size(); ++j) {
+				for (int j = offset; j < polygon.vertices.size(); ++j) {
 					if (polygon.vertices[j].pos.compare(vec2<>(new_tri_point.x, -new_tri_point.y), 1.f)) {
 						indices.push_back(j);
 						break;

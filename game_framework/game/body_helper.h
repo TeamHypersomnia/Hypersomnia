@@ -27,7 +27,7 @@ namespace helpers {
 
 		int body_type;
 
-		float density, friction, restitution, angular_damping, linear_damping, radius, max_speed;
+		float density, friction, restitution, angular_damping, linear_damping, radius, max_speed, gravity_scale;
 		bool fixed_rotation, sensor, bullet;
 
 		void add_convex(const std::vector < augs::vec2 < >> &);

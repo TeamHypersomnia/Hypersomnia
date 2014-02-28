@@ -12,8 +12,11 @@
 
 namespace helpers {
 	physics_info::physics_info() 
-		: rect_size(augs::vec2<>()), type(RECT), density(1.f), angular_damping(0.f), linear_damping(0.f), fixed_rotation(false), sensor(false), restitution(0.f), friction(0.f),
-		body_type(b2_dynamicBody), radius(0.f), max_speed(-1), bullet(false)
+		: rect_size(augs::vec2<>()), type(RECT), 
+		density(1.f), 
+		angular_damping(0.f), 
+		linear_damping(0.f), fixed_rotation(false), sensor(false), restitution(0.f), friction(0.f),
+		body_type(b2_dynamicBody), radius(0.f), gravity_scale(0.f), max_speed(-1), bullet(false)
 		{
 	}
 
@@ -143,6 +146,8 @@ namespace helpers {
 		body->SetLinearDamping(body_data.linear_damping);
 		body->SetFixedRotation(body_data.fixed_rotation);
 		body->SetMaximumLinearVelocity(body_data.max_speed * PIXELS_TO_METERSf);
+		body->SetGravityScale(body_data.gravity_scale);
+
 
 		subject.add(physics_component);
 	}
