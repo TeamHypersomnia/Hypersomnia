@@ -33,12 +33,16 @@ int components::visibility::layer::get_num_triangles() {
 	return edges.size();
 }
 
-components::visibility::discontinuity* components::visibility::layer::get_discontinuity(int n) {
+components::visibility::discontinuity* components::visibility::layer::get_discontinuity_for_edge(int n) {
 	for (auto& disc : discontinuities)
 		if (disc.edge_index == n)
 			return &disc;
 
 	return nullptr;
+}
+
+components::visibility::discontinuity* components::visibility::layer::get_discontinuity(int n) {
+	return &discontinuities[n];
 }
 
 components::visibility::triangle components::visibility::layer::get_triangle(int i, augs::vec2<> origin) {
@@ -50,6 +54,20 @@ std::vector<augs::vec2<>> components::visibility::layer::get_polygon(float dista
 	std::vector<augs::vec2<>> output;
 
 	for (size_t i = 0; i < edges.size(); ++i) {
+		if (
+			std::isnan(edges[i].first.x) ||
+			std::isnan(edges[i].first.y) ||
+			std::isnan(edges[i].second.x) ||
+			std::isnan(edges[i].second.y)
+			)
+		{
+			int found_nan = 24;
+			std::cout << found_nan << std::endl;
+			break;
+
+
+		}
+
 		/* always push the first point */
 		output.push_back(edges[i].first);
 		
@@ -497,12 +515,26 @@ void visibility_system::process_entities(world& owner) {
 				}
 
 				/* save new edge if it is not degenerate */
-				if (!p1.compare(p2) && 
-					std::fpclassify(p1.x) == FP_NORMAL
-					&& std::fpclassify(p1.y) == FP_NORMAL
-					&& std::fpclassify(p2.x) == FP_NORMAL
-					&& std::fpclassify(p2.y) == FP_NORMAL
+				if (p1.compare(p2) ||
+					std::fpclassify(p1.x) != FP_NORMAL
+					|| std::fpclassify(p1.y) != FP_NORMAL
+					|| std::fpclassify(p2.x) != FP_NORMAL
+					|| std::fpclassify(p2.y) != FP_NORMAL
+					|| !(p1.x == p1.x)
+					|| !(p2.x == p2.x)
+					|| !(p1.y == p1.y)
+					|| !(p2.y == p2.y)
 					)
+				{
+
+					request.edges.clear();
+					request.discontinuities.clear();
+					break;
+				//	int found_nan = 24;
+				//std::cout << found_nan << std::endl;
+				//continue;
+				}
+
 					request.edges.push_back(std::make_pair(p1, p2));
 			}
 
