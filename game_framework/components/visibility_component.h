@@ -53,7 +53,12 @@ namespace components {
 			/* segments that denote narrow areas */
 			std::vector<edge> marked_holes;
 
-			discontinuity* get_discontinuity(int edge_num);
+			discontinuity* get_discontinuity_for_edge(int edge_num);
+			discontinuity* get_discontinuity(int disc_num);
+			
+			int get_num_discontinuities() {
+				return discontinuities.size();
+			}
 
 			int get_num_triangles();
 			triangle get_triangle(int index, augs::vec2<> origin);

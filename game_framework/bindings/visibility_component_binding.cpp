@@ -18,6 +18,17 @@ namespace bindings {
 			.def_readwrite("epsilon_threshold_obstacle_hit", &visibility_system::epsilon_threshold_obstacle_hit)
 			,
 
+			luabind::class_<visibility::edge>("visibility_edge")
+			.def(luabind::constructor<>())
+			.def_readwrite("first", &visibility::edge::first)
+			.def_readwrite("second", &visibility::edge::second),
+
+			luabind::class_<visibility::discontinuity>("visibility_discontinuity")
+			.def(luabind::constructor<>())
+			.def_readwrite("points", &visibility::discontinuity::points)
+			.def_readwrite("winding", &visibility::discontinuity::winding),
+			
+
 			luabind::class_<visibility::layer>("visibility_layer")
 			.def(luabind::constructor<>())
 			.def_readwrite("filter", &visibility::layer::filter)
@@ -27,7 +38,9 @@ namespace bindings {
 			.def_readwrite("offset", &visibility::layer::offset)
 			.def_readwrite("postprocessing_subject", &visibility::layer::postprocessing_subject)
 			.def("get_polygon", &visibility::layer::get_polygon)
-			,
+			.def("get_discontinuity", &visibility::layer::get_discontinuity)
+			.def("get_num_discontinuities", &visibility::layer::get_num_discontinuities)
+			, 
 			
 			luabind::class_<visibility>("visibility_component")
 			.def(luabind::constructor<>())
