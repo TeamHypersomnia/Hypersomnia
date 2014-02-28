@@ -86,6 +86,8 @@ namespace resources {
 
 		/* construct a set of convex polygons from a potentially concave polygon */
 		void add_concave(const concave&);
+		//void add_concave_coords(const std::vector<vec2<>>&);
+		//void add_convex(const std::vector<vec2<>>&);
 
 		virtual void draw(draw_input) override;
 		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) override;

@@ -144,7 +144,7 @@ int main() {
 
 	init_script.associate_filename("init.lua");
 	init_script.add_reload_dependant(&init_script);
-	init_script.call();
+ 	init_script.call();
 
 	std::cout << std::endl;
 	lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);

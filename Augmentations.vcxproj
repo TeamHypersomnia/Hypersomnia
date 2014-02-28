@@ -166,6 +166,7 @@
       <MinimalRebuild>true</MinimalRebuild>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <FloatingPointModel>Precise</FloatingPointModel>
+      <StringPooling>true</StringPooling>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -519,11 +520,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="3rdparty\poly2tri\common\shapes.cc" />
-    <ClCompile Include="3rdparty\poly2tri\sweep\advancing_front.cc" />
-    <ClCompile Include="3rdparty\poly2tri\sweep\cdt.cc" />
-    <ClCompile Include="3rdparty\poly2tri\sweep\sweep.cc" />
-    <ClCompile Include="3rdparty\poly2tri\sweep\sweep_context.cc" />
     <ClCompile Include="3rdparty\polypartition\polypartition.cpp" />
     <ClCompile Include="3rdparty\readdir\ReadDirectoryChanges.cpp" />
     <ClCompile Include="3rdparty\readdir\ReadDirectoryChangesPrivate.cpp" />
@@ -1015,6 +1011,7 @@
     </ClCompile>
     <ClCompile Include="utilities\graphics\shader.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="game_framework\resources\vertex.cpp" />
     <ClCompile Include="game_framework\systems\behaviour_tree_system.cpp">
@@ -1442,13 +1439,6 @@
     <ClInclude Include="3rdparty\luabind\weak_ref.hpp" />
     <ClInclude Include="3rdparty\luabind\wrapper_base.hpp" />
     <ClInclude Include="3rdparty\luabind\yield_policy.hpp" />
-    <ClInclude Include="3rdparty\poly2tri\common\shapes.h" />
-    <ClInclude Include="3rdparty\poly2tri\common\utils.h" />
-    <ClInclude Include="3rdparty\poly2tri\poly2tri.h" />
-    <ClInclude Include="3rdparty\poly2tri\sweep\advancing_front.h" />
-    <ClInclude Include="3rdparty\poly2tri\sweep\cdt.h" />
-    <ClInclude Include="3rdparty\poly2tri\sweep\sweep.h" />
-    <ClInclude Include="3rdparty\poly2tri\sweep\sweep_context.h" />
     <ClInclude Include="3rdparty\polypartition\polypartition.h" />
     <ClInclude Include="3rdparty\readdir\_stdafx.h" />
     <ClInclude Include="3rdparty\readdir\targetver.h" />
