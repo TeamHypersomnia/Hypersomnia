@@ -189,6 +189,14 @@ namespace resources {
 		TPPLPoly subject_poly;
 		inpoly.Init(polygon.vertices.size());
 		inpoly.SetHole(false);
+		
+		model.reserve(model.size() + polygon.vertices.size());
+
+		int offset = model.size();
+		for (size_t i = 0; i < polygon.vertices.size(); ++i) {
+			model.push_back(polygon.vertices[i]);
+			original_model.push_back(polygon.vertices[i].pos);
+		}
 
 		for (size_t i = 0; i < polygon.vertices.size(); ++i) {
 			vec2<> p(polygon.vertices[i].pos);
