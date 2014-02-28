@@ -202,6 +202,7 @@ script_system::script_system() : lua_state(luaL_newstate()) {
 			luabind::def("clamp", &augs::get_clamp<float>),
 			luabind::def("debugger_break", &debugger_break),
 			luabind::def("randval", (float(*)(float, float))&randval),
+			luabind::def("randval_i", (int(*)(int, int))&randval),
 
 			luabind::class_<resources::script::reloader>("_script_reloader")
 			.def(luabind::constructor<>())
