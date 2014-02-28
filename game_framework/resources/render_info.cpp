@@ -9,6 +9,7 @@
 #include "../components/particle_group_component.h"
 
 #include "misc/sorted_vector.h"
+#include "poly2tri/poly2tri.h"
 
 #include "3rdparty/polypartition/polypartition.h"
 
@@ -182,34 +183,34 @@ namespace resources {
 		/* ensure proper winding */
 		if (area > 0) std::reverse(polygon.vertices.begin(), polygon.vertices.end());
 		
+		using namespace p2t;
+		std::vector<Point> points;
+		std::vector<Point*> input;
+		
+		points.reserve(polygon.vertices.size());
+		input.reserve(polygon.vertices.size());
+		model.reserve(model.size() + polygon.vertices.size());
 
-		TPPLPoly inpoly;
-		list<TPPLPoly> out_tris;
-
-		TPPLPoly subject_poly;
-		inpoly.Init(polygon.vertices.size());
-		inpoly.SetHole(false);
-
+		int offset = model.size();
 		for (size_t i = 0; i < polygon.vertices.size(); ++i) {
-			vec2<> p(polygon.vertices[i].pos);
-			inpoly[i].x = p.x;
-			inpoly[i].y = -p.y;
+			points.push_back(Point(polygon.vertices[i].pos.x, polygon.vertices[i].pos.y, i + offset));
+			model.push_back(polygon.vertices[i]);
+			
+			original_model.push_back(polygon.vertices[i].pos);
 		}
 
-		TPPLPartition partition;
-		partition.Triangulate_EC(&inpoly, &out_tris);
+		for (auto& v : points) 
+			input.push_back(&v);
 
-		for (auto& out : out_tris) {
-			for (int i = 0; i < 3; ++i) {
-				auto new_tri_point = out.GetPoint(i);
+		/* perform decomposition */		
+		CDT cdt(std::move(input));
+		cdt.Triangulate();
+		auto output = cdt.GetTriangles();
 
-				for (int j = 0; j < polygon.vertices.size(); ++j) {
-					if (polygon.vertices[j].pos.compare(vec2<>(new_tri_point.x, -new_tri_point.y), 1.f)) {
-						indices.push_back(j);
-						break;
-					}
-				}
-			}
+		for (auto& tri : output) {
+			indices.push_back(tri->GetPoint(0)->index);
+			indices.push_back(tri->GetPoint(1)->index);
+			indices.push_back(tri->GetPoint(2)->index);
 		}
 	}
 

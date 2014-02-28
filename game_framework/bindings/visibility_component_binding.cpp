@@ -19,6 +19,7 @@ namespace bindings {
 			,
 
 			luabind::class_<visibility::edge>("visibility_edge")
+			.def(luabind::constructor<>())
 			.def_readwrite("first", &visibility::edge::first)
 			.def_readwrite("second", &visibility::edge::second),
 
