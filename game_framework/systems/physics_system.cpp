@@ -370,7 +370,6 @@ void physics_system::process_entities(world& owner) {
 		smooth_states();
 	else reset_states();
 
-	ray_casts_per_frame = 0;
 }
 
 void physics_system::add(entity*) {

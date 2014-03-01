@@ -196,7 +196,7 @@ int main() {
 		input.process_entities(my_world);                  
 		movement.process_entities(my_world);
 
-		physics.substepping_routine = [&steering, &movement, &damage, &destroy, &scripts](world& owner){
+		physics.substepping_routine = [&steering, &movement, &damage, &destroy, &scripts, &visibility](world& owner){
 			scripts.substep(owner);
 			steering.substep(owner);
 			movement.substep(owner);
@@ -212,8 +212,8 @@ int main() {
 		damage.process_entities(my_world);                  
 		particles.process_entities(my_world);               
 		animations.process_entities(my_world);              
-		visibility.process_entities(my_world);              
-		pathfinding.process_entities(my_world);             
+		visibility.process_entities(my_world);
+		pathfinding.process_entities(my_world);
 		render.process_entities(my_world);                  
 		camera.process_entities(my_world);                  
 		scripts.process_entities(my_world);
@@ -236,7 +236,9 @@ int main() {
 		my_world.flush_message_queues();
 		//std::cout << physics.ray_casts_per_frame << std::endl;
 
-		 
+		physics.ray_casts_per_frame = 0;
+		//lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
+
 		if (world_reloading_script) {
 			my_world.delete_all_entities(true);
 			world_reloading_script->call();

@@ -80,8 +80,15 @@ std::vector<augs::vec2<>> components::visibility::layer::get_polygon(float dista
 	return output;
 }
 
+augs::misc::timer interval;
 
 void visibility_system::process_entities(world& owner) {
+	//if (interval.get<std::chrono::milliseconds>() < 16) {
+	//	return;
+	//}
+	interval.reset();
+
+
 	/* prepare epsilons to be used later, just to make the notation more clear */
 	float epsilon_distance_vertex_hit_sq = epsilon_distance_vertex_hit * PIXELS_TO_METERSf;
 	float epsilon_threshold_obstacle_hit_meters = epsilon_threshold_obstacle_hit * PIXELS_TO_METERSf;

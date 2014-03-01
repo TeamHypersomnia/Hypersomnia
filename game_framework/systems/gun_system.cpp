@@ -174,6 +174,16 @@ void gun_system::process_entities(world& owner) {
 				body->SetLinearVelocity(vel);
 				body->SetAngularVelocity(0);
 				body->SetBullet(true);
+
+				if (gun.bullet_callback) {
+					try {
+						/* arguments: subject, new_bullet */
+						luabind::call_function<void>(gun.bullet_callback, it, &new_bullet);
+					}
+					catch (std::exception compilation_error) {
+						std::cout << compilation_error.what() << '\n';
+					}
+				}
 			}
 		};
 
