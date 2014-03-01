@@ -292,6 +292,9 @@ public:
 	void SetLinearDampingVec(b2Vec2 linearDamping);
 
 	void SetLinearDampingAngle(float32 angle);
+	void SetAngledDampingEnabled(bool flag) {
+		enable_angled_damping = flag;
+	}
 
 	/// Get the angular damping of the body.
 	float32 GetAngularDamping() const;
@@ -465,6 +468,8 @@ public:
 	float32 m_I, m_invI;
 
 	float32 m_linearDamping;
+
+	bool enable_angled_damping;
 	b2Vec2 m_linearDampingVec;
 	float32 m_linearDampingAngle;
 

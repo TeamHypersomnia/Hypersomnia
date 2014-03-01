@@ -24,6 +24,7 @@ namespace bindings {
 			.def_readwrite("gravity_scale", &physics_info::gravity_scale)
 			.def_readwrite("linear_damping", &physics_info::linear_damping)
 			.def_readwrite("fixed_rotation", &physics_info::fixed_rotation)
+			.def_readwrite("angled_damping", &physics_info::angled_damping)
 			.def_readwrite("sensor", &physics_info::sensor)
 			.def_readwrite("bullet", &physics_info::bullet)
 			//.def("add_vertex", &physics_info::add_vertex)

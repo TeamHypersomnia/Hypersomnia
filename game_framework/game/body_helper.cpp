@@ -16,7 +16,7 @@ namespace helpers {
 		density(1.f), 
 		angular_damping(0.f), 
 		linear_damping(0.f), fixed_rotation(false), sensor(false), restitution(0.f), friction(0.f),
-		body_type(b2_dynamicBody), radius(0.f), gravity_scale(0.f), max_speed(-1), bullet(false)
+		body_type(b2_dynamicBody), radius(0.f), gravity_scale(0.f), max_speed(-1), bullet(false), angled_damping(false)
 		{
 	}
 
@@ -147,6 +147,7 @@ namespace helpers {
 		body->SetFixedRotation(body_data.fixed_rotation);
 		body->SetMaximumLinearVelocity(body_data.max_speed * PIXELS_TO_METERSf);
 		body->SetGravityScale(body_data.gravity_scale);
+		body->SetAngledDampingEnabled(body_data.angled_damping);
 
 
 		subject.add(physics_component);

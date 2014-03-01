@@ -55,7 +55,6 @@ int main() {
 	//_clearfp();
 	//_controlfp(_controlfp(0, 0) & ~(_EM_INVALID | _EM_ZERODIVIDE | _EM_OVERFLOW),
 	//	_MCW_EM);
-
 	augs::init();	
 	script_system scripts;
 	lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
@@ -68,7 +67,7 @@ int main() {
 	gl.set_show(gl.SHOW);
 	gl.vsync(0);
 	window::cursor(false); 
-
+	 
 	input_system input(gl);
 	steering_system steering;
 	movement_system movement;

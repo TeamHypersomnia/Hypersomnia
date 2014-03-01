@@ -403,7 +403,7 @@ static Node *getfreepos (Table *t) {
 ** position), new key goes to an empty position.
 */
 TValue *luaH_newkey (lua_State *L, Table *t, const TValue *key) {
-  Node *mp;
+  Node *mp = NULL;
   if (ttisnil(key)) luaG_runerror(L, "table index is nil");
   else if (ttisnumber(key) && luai_numisnan(L, nvalue(key)))
     luaG_runerror(L, "table index is NaN");

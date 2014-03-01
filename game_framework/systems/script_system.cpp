@@ -124,14 +124,17 @@ void debugger_break() {
 	breakp = 0;
 }
 
-script_system::script_system() : lua_state(luaL_newstate()) {
+script_system::script_system() {
 	using namespace resources;
 	using namespace helpers;
 
+	lua_state = luaL_newstate();
 	luabind::open(lua_state);
-	luabind::bind_class_info(lua_state);
 
 	luaL_openlibs(lua_state);
+
+	//luabind::bind_class_info(lua_state);
+
 
 	lua_register(lua_state, "bitor", bitor);
 	lua_register(lua_state, "bitflag", bitflag);
