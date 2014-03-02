@@ -21,6 +21,7 @@ void damage_system::process_events(world& owner) {
 			damage_msg.subject = it.subject;
 			damage_msg.amount = damage->amount;
 			damage_msg.impact_velocity = it.impact_velocity;
+			owner.post_message(damage_msg);
 
 			messages::particle_burst_message burst_msg;
 			burst_msg.subject = it.subject;
@@ -28,9 +29,10 @@ void damage_system::process_events(world& owner) {
 			burst_msg.rotation = (-it.impact_velocity).get_degrees();
 			burst_msg.type = messages::particle_burst_message::burst_type::BULLET_IMPACT;
 
-			owner.post_message(damage_msg);
 			owner.post_message(burst_msg);
-			owner.post_message(messages::destroy_message(it.collider));
+
+			if (damage->destroy_upon_hit)
+				owner.post_message(messages::destroy_message(it.collider));
 		}
 	}
 }
@@ -40,7 +42,9 @@ void damage_system::process_entities(world& owner) {
 		auto& transform = it->get<components::transform>().current;
 		auto& damage = it->get<components::damage>();
 	
-		if (damage.max_distance >= 0.f && (damage.starting_point - transform.pos).length() >= damage.max_distance) 
+		if ((damage.max_lifetime_ms >= 0.f && damage.lifetime.get<std::chrono::milliseconds>() >= damage.max_lifetime_ms)
+			||
+			(damage.max_distance >= 0.f && (damage.starting_point - transform.pos).length() >= damage.max_distance))
 			owner.post_message(messages::destroy_message(it));
 	}
 }
