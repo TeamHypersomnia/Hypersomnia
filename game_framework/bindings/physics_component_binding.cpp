@@ -24,6 +24,14 @@ void set_friction(b2Body* body, float friction) {
 	body->ResetMassData();
 }
 
+void set_filter(b2Body* body, b2Filter filter) {
+	for (b2Fixture* it = body->GetFixtureList(); it; it = it->GetNext()) {
+		it->SetFilterData(filter);
+	}
+
+	body->ResetMassData();
+}
+
 struct dummy_Box2D {
 
 };
@@ -33,6 +41,7 @@ namespace bindings {
 		return
 			(
 			luabind::def("SetDensity", set_density),
+			luabind::def("SetFilter", set_filter),
 			luabind::def("SetFriction", set_friction),
 			luabind::class_<dummy_Box2D>("Box2D")
 			.enum_("constants")	[

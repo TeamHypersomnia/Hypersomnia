@@ -174,7 +174,7 @@ void gun_system::process_entities(world& owner) {
 				body->SetLinearVelocity(vel);
 				body->SetAngularVelocity(0);
 				body->SetBullet(true);
-
+				 
 				if (gun.bullet_callback) {
 					try {
 						/* arguments: subject, new_bullet */

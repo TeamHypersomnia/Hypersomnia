@@ -116,7 +116,7 @@ int the_callback(lua_State *L) {
 	printf("%s\n", lua_tostring(L, -1));
 	
 	std::cout << error_message << std::endl;
-	return 1;
+	return 1; 
 }
 
 void debugger_break() {
@@ -269,6 +269,7 @@ void pass_events_to_script(world& owner, int msg_enum, bool substepping_flag) {
 	int breakp = 23;
 }
 using namespace messages;
+
 
 void script_system::pass_events(world& owner, bool substepping_flag) {
 	try {
