@@ -252,21 +252,16 @@ template<typename message_type>
 void pass_events_to_script(world& owner, int msg_enum, bool substepping_flag) {
 	auto& events = owner.get_message_queue<message_type>();
 
-	events.erase(
-		std::remove_if(events.begin(), events.end(), [msg_enum, substepping_flag](message_type& msg){
-			auto* scriptable = msg.subject->find<components::scriptable>();
-			if (scriptable == nullptr || !scriptable->available_scripts) return false;
+	std::for_each(events.begin(), events.end(), [msg_enum, substepping_flag](message_type msg){
+		auto* scriptable = msg.subject->find<components::scriptable>();
+		if (scriptable == nullptr || !scriptable->available_scripts) return;
 
-			auto it = scriptable->available_scripts->get_raw().find(msg_enum);
+		auto it = scriptable->available_scripts->get_raw().find(msg_enum);
 
-			if (it != scriptable->available_scripts->get_raw().end()) {
-				return !luabind::call_function<bool>((*it).second, boost::ref(msg), substepping_flag);
-			}
-			
-			return false;
-	}), events.end());
-
-	int breakp = 23;
+		if (it != scriptable->available_scripts->get_raw().end()) {
+			luabind::call_function<void>((*it).second, msg, substepping_flag);
+		}
+	});
 }
 using namespace messages;
 
