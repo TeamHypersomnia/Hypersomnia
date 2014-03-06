@@ -32,6 +32,10 @@ namespace components {
 		double smoothing_average_factor, averages_per_sec;
 		components::transform::state last_interpolant;
 
+		/* these are the data filled in the smoothing pass and later used in the rendering pass of camera system */
+		components::transform::state target_transform;
+		augs::rects::ltrb rendered_ortho;
+
 		augs::vec2<> max_look_expand;
 
 		augs::entity_system::entity_ptr player, crosshair;

@@ -193,8 +193,12 @@ int main() {
 	while (!input.quit_flag) {
 		my_world.validate_delayed_messages();
 
-		input.process_entities(my_world);                  
+		input.process_entities(my_world);      
+		camera.consume_events(my_world);
+
 		movement.process_entities(my_world);
+		
+		camera.process_entities(my_world);
 
 		physics.substepping_routine = [&steering, &movement, &damage, &destroy, &scripts, &visibility](world& owner){
 			scripts.substep(owner);
@@ -215,7 +219,6 @@ int main() {
 		visibility.process_entities(my_world);
 		pathfinding.process_entities(my_world);
 		render.process_entities(my_world);                  
-		camera.process_entities(my_world);                  
 		scripts.process_entities(my_world);
 		
 		damage.process_events(my_world);
@@ -231,7 +234,8 @@ int main() {
 		crosshairs.consume_events(my_world);
 		guns.consume_events(my_world);
 		emitters.consume_events(my_world);
-		camera.consume_events(my_world);
+
+		camera.process_rendering(my_world);
 
 		my_world.flush_message_queues();
 		//std::cout << physics.ray_casts_per_frame << std::endl;

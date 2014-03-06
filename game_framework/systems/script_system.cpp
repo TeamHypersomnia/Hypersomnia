@@ -122,7 +122,7 @@ int the_callback(lua_State *L) {
 void debugger_break() {
 	int breakp = 12;
 	breakp = 0;
-}
+} 
 
 script_system::script_system() {
 	using namespace resources;

@@ -11,4 +11,6 @@ class camera_system : public processing_system_templated<components::transform, 
 public:
 	void consume_events(world&) override;
 	void process_entities(world&) override;
+
+	void process_rendering(world& owner);
 };

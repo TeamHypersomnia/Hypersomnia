@@ -21,8 +21,6 @@ void camera_system::consume_events(world& owner) {
 }
 
 void camera_system::process_entities(world& owner) {
-	render_system& raw_renderer = owner.get_system<render_system>();
-
 	double delta = smooth_timer.extract<std::chrono::seconds>();
 
 	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
@@ -104,15 +102,30 @@ void camera_system::process_entities(world& owner) {
 				}
 			}
 
-			glViewport(camera.screen_rect.x, camera.screen_rect.y, camera.screen_rect.w, camera.screen_rect.h);
-
-			/* save the smoothing result in previous transform state, will come in handy */
+			/* save the final smoothing results in previous transform state and component, we'll use them later in the rendering pass */
 			e->get<components::transform>().previous = drawn_transform;
+			camera.rendered_ortho = drawn_ortho;
+			camera.target_transform = transform;
+		}
+	}
+}
+
+void camera_system::process_rendering(world& owner) {
+	render_system& raw_renderer = owner.get_system<render_system>();
+
+	for (auto e : targets) {
+		auto& camera = e->get<components::camera>();
+
+		if (camera.enabled) {
+			glViewport(camera.screen_rect.x, camera.screen_rect.y, camera.screen_rect.w, camera.screen_rect.h);
+			
+			auto drawn_ortho = camera.rendered_ortho;
+			auto drawn_transform = e->get<components::transform>().previous;
 
 			if (camera.drawing_callback) {
 				try {
 					/* arguments: subject, renderer, visible_area, target_transform, mask */
-					luabind::call_function<void>(camera.drawing_callback, e, raw_renderer, rects::xywh(drawn_ortho), drawn_transform, transform, camera.mask);
+					luabind::call_function<void>(camera.drawing_callback, e, raw_renderer, rects::xywh(drawn_ortho), drawn_transform, camera.target_transform, camera.mask);
 				}
 				catch (std::exception compilation_error) {
 					std::cout << compilation_error.what() << '\n';
@@ -131,6 +144,7 @@ void camera_system::process_entities(world& owner) {
 					glEnable(GL_TEXTURE_2D);
 				}
 			}
+
 		}
 	}
 
