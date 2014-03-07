@@ -26,7 +26,7 @@ namespace augs {
 			static method LINEAR, QUADRATIC, SINUSOIDAL, HYPERBOLIC, LOGARITHMIC, EXPONENTIAL;
 			animator(float init_val, float desired_val, float milliseconds, method how, const std::function<void(float) >& callback = nullptr);
 			
-			animator(float init_val, float desired_val, float milliseconds);
+			animator(float init_val = 0.f, float desired_val = 0.f, float milliseconds = 0.f);
 			
 			void set_linear() { how = LINEAR; }
 			void set_quadratic() { how = QUADRATIC; }

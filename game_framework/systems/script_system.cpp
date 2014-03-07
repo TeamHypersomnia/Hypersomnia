@@ -64,6 +64,7 @@ namespace bindings {
 		_entity_ptr(),
 		_sprite(),
 		_polygon(),
+		_polygon_fader(),
 
 		_timer(),
 
@@ -160,6 +161,7 @@ script_system::script_system() {
 			bindings::_entity_ptr(),
 			bindings::_sprite(),
 			bindings::_polygon(),
+			bindings::_polygon_fader(),
 
 			bindings::_timer(),
 

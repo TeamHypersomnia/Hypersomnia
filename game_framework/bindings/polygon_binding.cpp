@@ -5,10 +5,20 @@
 
 #include "../resources/render_info.h"
 
+void set_polygon_color(renderable* poly, pixel_32 col) {
+	polygon* p = (polygon*) poly;
+
+	for (auto& v : p->model) {
+		v.color = col;
+	}
+}
+
 namespace bindings {
 	luabind::scope _polygon() {
 		return 	
 			(
+			luabind::def("set_polygon_color", set_polygon_color),
+
 			luabind::class_<vertex>("vertex")
 			.def(luabind::constructor<vec2<>>())
 			.def(luabind::constructor<vec2<>, vec2<>, graphics::pixel_32, texture_baker::texture*>())

@@ -2,7 +2,6 @@
 #include "stdafx.h"
 #include "bindings.h"
 
-
 #include "graphics/pixel.h"
 
 namespace bindings {
