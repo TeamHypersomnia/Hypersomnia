@@ -132,7 +132,7 @@ namespace resources {
 
 	std::string script::compile() {
 		if (needs_recompilation) {
-			int result = LUA_OK;
+			int result = 0;
 			bytecode.clear();
 
 			if (is_associated_string_filename) {
@@ -151,7 +151,7 @@ namespace resources {
 			else
 				result = luaL_loadstring(lua_state, associated_string.c_str());
 
-			if (result != LUA_OK)
+			if (result != 0)
 				return lua_tostring(lua_state, -1);
 			else {
 				lua_dump(lua_state, lua_writer, &bytecode);
@@ -181,7 +181,7 @@ namespace resources {
 
 		auto info = std::make_pair(true, &bytecode);
 
-		if (lua_load(lua_state, lua_reader, &info, "scriptname", "b") != LUA_OK)
+		if (lua_load(lua_state, lua_reader, &info, "scriptname") != 0)
 			return lua_tostring(lua_state, -1);
 
 		try {

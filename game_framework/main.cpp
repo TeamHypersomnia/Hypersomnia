@@ -125,7 +125,7 @@ int main() {
 	scripts.global("render_system", render);
 	scripts.global("physics_system", physics);
 	scripts.global("script_reloader", resources::script::script_reloader);
-
+	 
 	components::physics my_comp, my_comp2;
 	my_comp.original_model.push_back(augs::vec2<>(2342342, 1219839));
 	my_comp.original_model.push_back(augs::vec2<>(4, 3));
@@ -258,7 +258,7 @@ int main() {
 					break;
 				}
 			}
-
+			 
 			for (auto& script_to_reload : scripts_reloaded) {
 				script_to_reload->call();
 			}
