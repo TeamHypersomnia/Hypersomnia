@@ -10,7 +10,7 @@ namespace augs {
 		}
 
 		world::~world() {
-			delete_all_entities(false);
+			delete_all_entities();
 		}
 
 		void world::register_entity_watcher(entity_ptr& ptr) {
@@ -49,7 +49,7 @@ namespace augs {
 				it.second->validate_delayed_messages();
 		}
 
-		void world::delete_all_entities(bool clear_systems_manually) {
+		void world::delete_all_entities() {
 			flush_message_queues();
 			flush_delayed_message_queues();
 

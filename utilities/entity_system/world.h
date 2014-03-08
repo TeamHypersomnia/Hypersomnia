@@ -152,7 +152,7 @@ namespace augs {
 			entity& create_entity();
 			void delete_entity(entity&, entity* redirect_pointers = nullptr);
 			
-			void delete_all_entities(bool clear_systems_manually);
+			void delete_all_entities();
 
 			void flush_message_queues();
 			void flush_delayed_message_queues();

@@ -13,12 +13,15 @@ namespace helpers {
 		};
 
 		std::vector<trace> traces;
+		int max_traces;
+
+		polygon_fader() : max_traces(100) {}
 
 		void add_trace(resources::polygon poly, augs::misc::animator animator) {
 			trace new_trace;
 			new_trace.poly = poly;
 			new_trace.animator = animator;
-			traces.push_back(new_trace);
+			traces.push_back(new_trace); 
 		}
 
 		void generate_triangles(components::transform::state camera_transform, resources::buffer* output_buffer, rects::xywh visible_area) {
@@ -41,6 +44,10 @@ namespace helpers {
 
 				return false;
 			}), std::end(traces));
+
+			if (max_traces > 0 && traces.size() > max_traces) {
+				traces.erase(traces.begin(), traces.begin() + (traces.size() - max_traces));
+			}
 		}
 
 		size_t get_num_traces() {

@@ -14,31 +14,7 @@ namespace bindings {
 			,
 			luabind::class_<resources::buffer>("triangle_buffer"),
 
-			luabind::class_<render_system>("_render_system")
-			.def_readwrite("visibility_expansion", &render_system::visibility_expansion)
-			.def_readwrite("max_visibility_expansion_distance", &render_system::max_visibility_expansion_distance)
-			.def_readwrite("draw_steering_forces", &render_system::draw_steering_forces)
-			.def_readwrite("draw_substeering_forces", &render_system::draw_substeering_forces)
-			.def_readwrite("draw_velocities", &render_system::draw_velocities)
-			.def_readwrite("draw_avoidance_info", &render_system::draw_avoidance_info)
-			.def_readwrite("draw_wandering_info", &render_system::draw_wandering_info)
-			.def_readwrite("draw_visibility", &render_system::draw_visibility)
-			.def_readwrite("draw_weapon_info", &render_system::draw_weapon_info)
-			.def_readwrite("debug_drawing", &render_system::debug_drawing)
-			.def_readwrite("triangles", &render_system::triangles)
-			.def("push_line", &render_system::push_line)
-			.def("push_non_cleared_line", &render_system::push_non_cleared_line)
-			.def("clear_non_cleared_lines", &render_system::clear_non_cleared_lines)
-
-			.def("call_triangles", &render_system::call_triangles)
-			.def("push_triangle", &render_system::push_triangle)
-			.def("clear_triangles", &render_system::clear_triangles)
-			.def("draw_debug_info", &render_system::draw_debug_info)
-			.def("generate_triangles", &render_system::generate_triangles)
-			.def("default_render", &render_system::default_render)
-			.def("get_triangle_count", &render_system::get_triangle_count)
-			.def("get_triangle", &render_system::get_triangle)
-			,
+		
 
 			luabind::class_<render>("render_component")
 			.def(luabind::constructor<>())

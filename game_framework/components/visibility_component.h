@@ -4,6 +4,7 @@
 #include "entity_system/component.h"
 #include "graphics/pixel.h"
 #include "misc/sorted_vector.h"
+#include "misc/timer.h"
 
 namespace components {
 	struct visibility : public augs::entity_system::component {
@@ -82,5 +83,9 @@ namespace components {
 		layer& get_layer(int key) {
 			return *visibility_layers.get(key);
 		}
+
+		augs::misc::timer interval_timer;
+		float interval_ms;
+		visibility() : interval_ms(-1.f) {}
 	};
 }

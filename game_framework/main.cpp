@@ -48,13 +48,12 @@ using namespace entity_system;
 using namespace messages;
 
 resources::script* world_reloading_script = nullptr;
-#include <float.h>
-//unsigned int fp_control_state = _controlfp(_EM_INVALID, _MCW_EM);
-int main() {    
 
-	//_clearfp();
-	//_controlfp(_controlfp(0, 0) & ~(_EM_INVALID | _EM_ZERODIVIDE | _EM_OVERFLOW),
-	//	_MCW_EM);
+struct world_instance {
+	/* all systems */
+};
+
+int main() {    
 	augs::init();	
 	script_system scripts;
 	lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
@@ -126,19 +125,6 @@ int main() {
 	scripts.global("physics_system", physics);
 	scripts.global("script_reloader", resources::script::script_reloader);
 	 
-	components::physics my_comp, my_comp2;
-	my_comp.original_model.push_back(augs::vec2<>(2342342, 1219839));
-	my_comp.original_model.push_back(augs::vec2<>(4, 3));
-	my_comp.original_model.push_back(augs::vec2<>(5645, 2342));
-	my_comp.original_model.push_back(augs::vec2<>(2342342, 1219839));
-	my_comp.original_model.push_back(augs::vec2<>(4, 3));
-	my_comp.original_model.push_back(augs::vec2<>(5645, 2342));
-	my_comp.original_model.push_back(augs::vec2<>(2342342, 1219839));
-	my_comp.original_model.push_back(augs::vec2<>(4, 3));
-	my_comp.original_model.push_back(augs::vec2<>(5645, 2342));
-
-	my_comp2 = my_comp;
-
 	resources::script init_script;
 
 	init_script.associate_filename("init.lua");
@@ -156,39 +142,6 @@ int main() {
 	auto result = RUN_ALL_TESTS();
 
 	using namespace augs::graphics;
-	
-	//shader vertex_shader(GL_VERTEX_SHADER, "#version 330 \n\
-	//uniform mat4 projection_matrix;					   										   \n\
-	//layout(location = 0) in vec2 position;\n\
-	//void main()\n\
-	//{\n\
-	//	vec4 output_vert;\
-	//	output_vert.x = position.x;		\
-	//	output_vert.y = position.y;				\
-	//	output_vert.z = 0.0f;						\
-	//	output_vert.w = 1.0f; \
-	//	 \
-	//	gl_Position = projection_matrix * output_vert;\n\
-	//}\n");
-	//
-	//shader fragment_shader(GL_FRAGMENT_SHADER, "#version 330 \n\
-	//										   											   \n\
-	//	out vec4 outputColor;\n\
-	//void main()\n\
-	//{\n\
-	//	outputColor = vec4(1.0f, 0.0f, 1.0f, 1.0f);\n\
-	//}");
-
-	//shader_program my_program;
-	//my_program.attach(vertex_shader);
-	//my_program.attach(fragment_shader);
-	//my_program.build();
-	//my_program.use();
-	
-	//glGetUniformLocation(my_program.id, "projection_matrix");
-
-	float myval = std::numeric_limits<float>::quiet_NaN();
-	std::cout << std::isnan(myval) << std::endl; 
 
 	while (!input.quit_flag) {
 		my_world.validate_delayed_messages();
@@ -244,29 +197,28 @@ int main() {
 		//lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
 
 		if (world_reloading_script) {
-			my_world.delete_all_entities(true);
+			my_world.delete_all_entities();
 			world_reloading_script->call();
 			world_reloading_script = nullptr;
 			lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
 		}
-		else {
-			auto& scripts_reloaded = resources::script::script_reloader.get_script_files_to_reload();
 
-			for (auto& script_to_reload : scripts_reloaded) {
-				if (script_to_reload->reload_scene_when_modified) {
-					my_world.delete_all_entities(true);
-					break;
-				}
-			}
-			 
-			for (auto& script_to_reload : scripts_reloaded) {
-				script_to_reload->call();
-			}
+		auto& scripts_reloaded = resources::script::script_reloader.get_script_files_to_reload();
 
-			if (!scripts_reloaded.empty()) {
-				std::cout << std::endl;
-				lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
+		for (auto& script_to_reload : scripts_reloaded) {
+			if (script_to_reload->reload_scene_when_modified) {
+				my_world.delete_all_entities();
+				break;
 			}
+		}
+		 
+		for (auto& script_to_reload : scripts_reloaded) {
+			script_to_reload->call();
+		}
+
+		if (!scripts_reloaded.empty()) {
+			std::cout << std::endl;
+			lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
 		}
 	}
 

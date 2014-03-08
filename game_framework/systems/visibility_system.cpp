@@ -83,12 +83,6 @@ std::vector<augs::vec2<>> components::visibility::layer::get_polygon(float dista
 augs::misc::timer interval;
 
 void visibility_system::process_entities(world& owner) {
-	if (interval.get<std::chrono::milliseconds>() < 16) {
-		return;
-	}
-	interval.reset();
-
-
 	/* prepare epsilons to be used later, just to make the notation more clear */
 	float epsilon_distance_vertex_hit_sq = epsilon_distance_vertex_hit * PIXELS_TO_METERSf;
 	float epsilon_threshold_obstacle_hit_meters = epsilon_threshold_obstacle_hit * PIXELS_TO_METERSf;
@@ -109,6 +103,12 @@ void visibility_system::process_entities(world& owner) {
 	for (auto it : targets) {
 		/* get AI data and position of the entity */
 		auto& visibility = it->get<components::visibility>();
+
+		if (visibility.interval_ms > 0.f && visibility.interval_timer.get<std::chrono::milliseconds>() < visibility.interval_ms) {
+			return;
+		}
+		visibility.interval_timer.reset();
+
 		auto& transform = it->get<components::transform>().current;
 
 		auto body = it->get<components::physics>().body;

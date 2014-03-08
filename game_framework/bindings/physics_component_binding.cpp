@@ -81,27 +81,14 @@ namespace bindings {
 			.def("get_steps", &physics_system::stepped_timer::get_steps)
 			.def("extract_steps", &physics_system::stepped_timer::extract_steps),
 
-			luabind::class_<physics_system>("_physics_system")
-			.def_readwrite("timestep_multiplier", &physics_system::timestep_multiplier)
-			.def_readwrite("enable_interpolation", &physics_system::enable_interpolation)
-			.def_readwrite("b2world", &physics_system::b2world)
-			.def("ray_cast", &physics_system::ray_cast_px)
-			.def("query_aabb", (physics_system::query_output (__thiscall physics_system::*) (vec2<>, vec2<>, b2Filter*, entity*))(&physics_system::query_aabb_px))
-			.def("query_body", (physics_system::query_output(__thiscall physics_system::*) (entity& subject, b2Filter*, entity*)) (&physics_system::query_body))
-			.def("query_shape", (physics_system::query_output(__thiscall physics_system::*) (b2Shape*, b2Filter*, entity*)) (&physics_system::query_shape))
-			.def("query_polygon", (physics_system::query_output(__thiscall physics_system::*) (const std::vector<vec2<>>&, b2Filter*, entity*)) (&physics_system::query_polygon))
-			.def("push_away_from_walls", &physics_system::push_away_from_walls)
-			.enum_("constants")[
-				luabind::value("PIXELS_TO_METERS", PIXELS_TO_METERSf),
-				luabind::value("METERS_TO_PIXELS", METERS_TO_PIXELSf)
-			]
-			, 
+	
 
 			luabind::class_<physics>("physics_component")
 			.def(luabind::constructor<>())
 			.def_readwrite("body", &physics::body)
 			.def_readwrite("target_angle", &physics::target_angle)
 			.def_readwrite("enable_angle_motor", &physics::enable_angle_motor)
+			.def_readwrite("angle_motor_force_multiplier", &physics::angle_motor_force_multiplier)
 			
 			,
 			

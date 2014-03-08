@@ -20,6 +20,7 @@ namespace bindings {
 			.def(luabind::constructor<>())
 			.def("create_entity", &world::create_entity)
 			.def("delete_entity", &world::delete_entity)
+			.def("delete_all_entities", &world::delete_all_entities)
 			.def("post_message", &world::post_message<animate_message>)
 			.def("post_message", &world::post_message<intent_message>)
 			.def("post_message", &world::post_message<destroy_message>)

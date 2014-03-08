@@ -56,6 +56,7 @@ namespace bindings {
 			.def("loop", &polygon_fader::loop)
 			.def("generate_triangles", &polygon_fader::generate_triangles)
 			.def("get_num_traces", &polygon_fader::get_num_traces)
+			.def_readwrite("max_traces", &polygon_fader::max_traces)
 			;
 	}
 }

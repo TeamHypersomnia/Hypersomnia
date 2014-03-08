@@ -29,6 +29,7 @@ namespace bindings {
 			.def("setLoop", &sf::Sound::setLoop)
 			.def("setVolume", &sf::Sound::setVolume)
 			.def("setPitch", &sf::Sound::setPitch)
+			.def("setPosition", (void (sf::Sound::*)(float, float, float))(&sf::Sound::setPosition))
 			);
 	}
 }

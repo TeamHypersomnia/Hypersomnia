@@ -8,15 +8,7 @@
 namespace bindings {
 	luabind::scope _visibility_component() {
 		return
-			luabind::class_<visibility_system>("_visibility_system")
-			.def_readwrite("draw_cast_rays", &visibility_system::draw_cast_rays)
-			.def_readwrite("draw_triangle_edges", &visibility_system::draw_triangle_edges)
-			.def_readwrite("draw_discontinuities", &visibility_system::draw_discontinuities)
-			.def_readwrite("draw_visible_walls", &visibility_system::draw_visible_walls)
-			.def_readwrite("epsilon_ray_distance_variation", &visibility_system::epsilon_ray_distance_variation)
-			.def_readwrite("epsilon_distance_vertex_hit", &visibility_system::epsilon_distance_vertex_hit)
-			.def_readwrite("epsilon_threshold_obstacle_hit", &visibility_system::epsilon_threshold_obstacle_hit)
-			,
+		
 
 			luabind::class_<visibility::edge>("visibility_edge")
 			.def_readwrite("first", &visibility::edge::first)
@@ -45,6 +37,7 @@ namespace bindings {
 			.def(luabind::constructor<>())
 			.def("add_layer", &visibility::add_layer)
 			.def("get_layer", &visibility::get_layer)
+			.def_readwrite("interval_ms", &visibility::interval_ms)
 			.enum_("constants")
 			[
 				luabind::value("OBSTACLE_AVOIDANCE", visibility::OBSTACLE_AVOIDANCE),

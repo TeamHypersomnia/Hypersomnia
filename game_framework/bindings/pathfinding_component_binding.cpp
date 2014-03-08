@@ -8,13 +8,6 @@
 namespace bindings {
 	luabind::scope _pathfinding_component() {
 		return
-			luabind::class_<pathfinding_system>("_pathfinding_system")
-			.def_readwrite("epsilon_max_segment_difference", &pathfinding_system::epsilon_max_segment_difference)
-			.def_readwrite("epsilon_distance_visible_point", &pathfinding_system::epsilon_distance_visible_point)
-			.def_readwrite("draw_memorised_walls", &pathfinding_system::draw_memorised_walls)
-			.def_readwrite("draw_undiscovered", &pathfinding_system::draw_undiscovered)
-			.def_readwrite("epsilon_distance_the_same_vertex", &pathfinding_system::epsilon_distance_the_same_vertex)
-			, 
 			
 			luabind::class_<pathfinding::navigation_hint>("navigation_hint")
 			.def(luabind::constructor<>())

@@ -100,6 +100,7 @@ void render_system::process_entities(world&) {
 
 void render_system::call_triangles() {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(resources::vertex_triangle) * triangles.size(), triangles.data(), GL_STREAM_DRAW);
+	std::cout << "triangles:" << triangles.size() << std::endl;
 	glDrawArrays(GL_TRIANGLES, 0, triangles.size() * 3);
 }
 

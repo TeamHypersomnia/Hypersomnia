@@ -344,6 +344,14 @@ void physics_system::contact_listener::PostSolve(b2Contact* contact, const b2Con
 
 }
 
+template <class T>
+T constrainAngle(T x){
+	x = fmod(x + 180, 360);
+	if (x < 0)
+		x += 360;
+	return x - 180;
+}
+
 void physics_system::process_entities(world& owner) {
 	listener.world_ptr = &owner;
 	accumulator.set_time_multiplier(timestep_multiplier);
@@ -353,8 +361,23 @@ void physics_system::process_entities(world& owner) {
 		int32 velocityIterations = 8;
 		int32 positionIterations = 3;
 
-		reset_states();
-		
+		reset_states(); 
+
+		for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
+			if (b->GetType() == b2_staticBody) continue;
+			auto& physics = static_cast<entity*>(b->GetUserData())->get<components::physics>();
+
+			if (physics.enable_angle_motor) {
+				float nextAngle = b->GetAngle() + b->GetAngularVelocity() / accumulator.get_hz();
+				float totalRotation = (constrainAngle(physics.target_angle) * 0.01745329251994329576923690768489) - nextAngle;
+				while (totalRotation < -180 * 0.01745329251994329576923690768489f) totalRotation += 360 * 0.01745329251994329576923690768489f;
+				while (totalRotation >  180 * 0.01745329251994329576923690768489f) totalRotation -= 360 * 0.01745329251994329576923690768489f;
+				float desiredAngularVelocity = totalRotation * accumulator.get_hz();
+				float impulse = b->GetInertia() * desiredAngularVelocity;// disregard time factor
+				b->ApplyAngularImpulse(impulse*physics.angle_motor_force_multiplier, true);
+			}
+		}
+
 		substepping_routine(owner);
 		//for (auto& sys : subsystems)
 		//	sys->substep(owner);
@@ -392,14 +415,6 @@ void physics_system::remove(entity* e) {
 	b2world.DestroyBody(e->get<components::physics>().body);
 }
 
-template <class T>
-T constrainAngle(T x){
-	x = fmod(x + 180, 360);
-	if (x < 0)
-		x += 360;
-	return x - 180;
-}
-
 void physics_system::reset_states() {
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
@@ -412,16 +427,6 @@ void physics_system::reset_states() {
 		transform.current.rotation *= 180.0f / 3.141592653589793238462f;
 
 		transform.previous = transform.current;
-
-		if (physics.enable_angle_motor) {
-			float nextAngle = b->GetAngle() + b->GetAngularVelocity() / accumulator.get_hz();
-			float totalRotation = (constrainAngle(physics.target_angle) * 0.01745329251994329576923690768489) - nextAngle;
-			while (totalRotation < -180 * 0.01745329251994329576923690768489f) totalRotation += 360 * 0.01745329251994329576923690768489f;
-			while (totalRotation >  180 * 0.01745329251994329576923690768489f) totalRotation -= 360 * 0.01745329251994329576923690768489f;
-			float desiredAngularVelocity = totalRotation * accumulator.get_hz();
-			float impulse = b->GetInertia() * desiredAngularVelocity;// disregard time factor
-			b->ApplyAngularImpulse(impulse, true);
-		}
 	}
 }
 

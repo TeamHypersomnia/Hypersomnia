@@ -121,22 +121,6 @@ namespace resources {
 	bool sprite::is_visible(rects::xywh visibility_aabb, const components::transform::state& transform) {
 		vec2<> v[4];
 		make_rect(transform.pos, vec2<>(size), transform.rotation, v);
-
-		typedef const vec2<>& vc;
-
-		auto x_pred = [](vc a, vc b){ return a.x < b.x; };
-		auto y_pred = [](vc a, vc b){ return a.y < b.y; };
-
-		vec2<int> lower(
-			static_cast<int>(std::min_element(v, v + 4, x_pred)->x),
-			static_cast<int>(std::min_element(v, v + 4, y_pred)->y)
-			);
-
-		vec2<int> upper(
-			static_cast<int>(std::max_element(v, v + 4, x_pred)->x),
-			static_cast<int>(std::max_element(v, v + 4, y_pred)->y)
-			);
-
 		return rects::ltrb::get_aabb(v).hover(visibility_aabb);
 	}
 	
@@ -260,6 +244,27 @@ namespace resources {
 			new_tri.vertices[0] = model_transformed[indices[i]];
 			new_tri.vertices[1] = model_transformed[indices[i + 1]];
 			new_tri.vertices[2] = model_transformed[indices[i + 2]];
+
+			auto* v = new_tri.vertices;
+			typedef const resources::vertex& vc;
+
+			auto x_pred = [](vc a, vc b){ return a.pos.x < b.pos.x; };
+			auto y_pred = [](vc a, vc b){ return a.pos.y < b.pos.y; };
+
+			vec2<int> lower(
+				static_cast<int>(std::min_element(v, v + 3, x_pred)->pos.x),
+				static_cast<int>(std::min_element(v, v + 3, y_pred)->pos.y)
+				);
+
+			vec2<int> upper(
+				static_cast<int>(std::max_element(v, v + 3, x_pred)->pos.x),
+				static_cast<int>(std::max_element(v, v + 3, y_pred)->pos.y)
+				);
+
+			if (rects::ltrb(lower.x, lower.y, upper.x, upper.y).hover(in.visible_area)) {
+
+			}
+
 			in.output->push_back(new_tri);
 		}
 	}

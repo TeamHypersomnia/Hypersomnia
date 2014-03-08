@@ -12,7 +12,8 @@ namespace components {
 
 		bool enable_angle_motor;
 		float target_angle;
+		float angle_motor_force_multiplier;
 
-		physics(b2Body* body = nullptr) : body(body), enable_angle_motor(false), target_angle(0.f)	{}
+		physics(b2Body* body = nullptr) : body(body), enable_angle_motor(false), target_angle(0.f), angle_motor_force_multiplier(1.f) {}
 	};
 }

@@ -105,7 +105,9 @@ namespace bindings {
 		_entity(),
 		_body_helper(),
 
-		_opengl_binding();
+		_opengl_binding(),
+		_all_systems()
+		;
 }
 
 int the_callback(lua_State *L) {
@@ -214,7 +216,8 @@ script_system::script_system() {
 			.def(luabind::constructor<>())
 			.def("add_directory", &resources::script::reloader::add_directory),
 
-			bindings::_polygon_fader()
+			bindings::_polygon_fader(),
+			bindings::_all_systems()
 	];
 
 	luabind::set_pcall_callback(the_callback);
