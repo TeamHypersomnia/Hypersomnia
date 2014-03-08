@@ -81,6 +81,17 @@ namespace augs {
 				return rects::ltrb(lower.x, lower.y, upper.x, upper.y);
 			}
 
+			template <class T = float>
+			static ltrb get_aabb_rotated(vec2<T> initial_size, T rotation) {
+				auto verts = rects::ltrb(0, 0, initial_size.x, initial_size.y).get_vertices<float>();
+
+				for (auto& v : verts)
+					v.rotate(rotation, initial_size / 2);
+
+				/* expanded aabb that takes rotation into consideration */
+				return rects::ltrb::get_aabb<float>(verts.data());
+			}
+
 			template <class T>
 			std::vector<vec2<T>> get_vertices() const {
 				std::vector<vec2<T>> out;

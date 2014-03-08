@@ -47,13 +47,8 @@ render_system::render_system(window::glwindow& output_window)
 }
 
 void render_system::generate_triangles(vec2<> visible_area, components::transform::state camera_transform, int mask) {
-	auto verts = rects::ltrb(0, 0, visible_area.x, visible_area.y).get_vertices<float>();
-
-	for (auto& v : verts)
-		v.rotate(camera_transform.rotation, visible_area / 2);
-
 	/* expanded aabb that takes rotation into consideration */
-	auto rotated_aabb = rects::ltrb::get_aabb<float>(verts.data());
+	auto rotated_aabb = rects::ltrb::get_aabb_rotated<>(visible_area, camera_transform.rotation);
 
 	/* shortcut */
 	typedef std::pair<components::render*, components::transform::state*> cached_pair;

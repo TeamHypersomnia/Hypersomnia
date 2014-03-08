@@ -128,9 +128,6 @@ void camera_system::process_rendering(world& owner) {
 				}
 			}
 			else {
-				glLoadIdentity();
-				glOrtho(0, camera.rendered_size.x, camera.rendered_size.y, 0, 0, 1);
-
 				raw_renderer.generate_triangles(camera.rendered_size, drawn_transform, camera.mask);
 				raw_renderer.default_render(camera.rendered_size);
 
