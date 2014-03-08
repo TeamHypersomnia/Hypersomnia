@@ -69,7 +69,7 @@ namespace resources {
 		if (tex == nullptr) return;
 		vec2<> v[4];
 
-		auto center = vec2<>(in.visible_area.w(), in.visible_area.h()) / 2;
+		auto center = in.visible_area / 2;
 
 		auto target_position = in.transform.pos - in.camera_transform.pos + center;
 		make_rect(target_position, vec2<>(size), in.transform.rotation + rotation_offset, v);
@@ -232,7 +232,7 @@ namespace resources {
 
 		auto model_transformed = model;
 		for (auto& v : model_transformed) {
-			auto center = vec2<>(in.visible_area.w(), in.visible_area.h()) / 2;
+			auto center = in.visible_area / 2;
 			v.pos.rotate(in.transform.rotation, vec2<>(0, 0));
 			v.pos += in.transform.pos - camera_pos + center;
 

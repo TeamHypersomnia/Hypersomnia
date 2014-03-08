@@ -14,7 +14,8 @@ class gun_system;
 namespace components {
 	struct camera : public augs::entity_system::component {
 		augs::rects::xywh screen_rect;
-		augs::rects::ltrb ortho;
+		augs::vec2<> size;
+
 		unsigned layer;
 		unsigned mask;
 		bool enabled;
@@ -34,16 +35,16 @@ namespace components {
 
 		/* these are the data filled in the smoothing pass and later used in the rendering pass of camera system */
 		components::transform::state target_transform;
-		augs::rects::ltrb rendered_ortho;
+		augs::vec2<> rendered_size;
 
 		augs::vec2<> max_look_expand;
 
 		augs::entity_system::entity_ptr player, crosshair;
 
-		camera(augs::rects::xywh screen_rect = augs::rects::xywh(), augs::rects::ltrb ortho = augs::rects::ltrb(), 
+		camera(augs::rects::xywh screen_rect = augs::rects::xywh(), augs::vec2<> size = augs::vec2<>(),
 			unsigned layer = 0, unsigned mask = 0,
 			double smoothing_average_factor = 0.004, double averages_per_sec = 60.0) :
-			screen_rect(screen_rect), ortho(ortho), layer(layer), mask(mask), enabled(true), orbit_mode(NONE), player(nullptr), crosshair(nullptr),
+			screen_rect(screen_rect), size(size), layer(layer), mask(mask), enabled(true), orbit_mode(NONE), player(nullptr), crosshair(nullptr),
 			angled_look_length(100.f), max_look_expand(augs::vec2<double>(600.f, 300.f)), 
 			smoothing_average_factor(smoothing_average_factor), averages_per_sec(averages_per_sec), enable_smoothing(true), crosshair_follows_interpolant(false) {
 				smooth_timer.reset();
@@ -56,6 +57,6 @@ namespace components {
 		friend class gun_system;
 
 		augs::misc::timer smooth_timer;
-		augs::rects::ltrb last_ortho_interpolant;
+		augs::vec2<> last_ortho_interpolant;
 	};
 }

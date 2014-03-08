@@ -23,7 +23,7 @@ namespace resources {
 			buffer* output;
 			components::transform::state transform, camera_transform;
 			components::render* additional_info;
-			rects::ltrb visible_area;
+			augs::vec2<> visible_area;
 
 			draw_input() : output(nullptr), additional_info(nullptr) {}
 		};

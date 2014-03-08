@@ -36,7 +36,7 @@ public:
 	int get_triangle_count();
 	resources::vertex_triangle& get_triangle(int i);
 
-	void draw_debug_info(rects::xywh visible_area, components::transform::state, augs::texture_baker::texture* tex);
+	void draw_debug_info(vec2<> visible_area, components::transform::state, augs::texture_baker::texture* tex);
 
 	struct debug_line {
 		debug_line(augs::vec2<> a, augs::vec2<> b, augs::graphics::pixel_32 col = augs::graphics::pixel_32(255, 255, 255, 255)) : col(col), a(a), b(b) {}
@@ -84,6 +84,6 @@ public:
 
 	void process_entities(world&) override;
 
-	void generate_triangles(rects::xywh visible_area, components::transform::state, int mask);
-	void default_render(rects::xywh visible_area);
+	void generate_triangles(vec2<> visible_area, components::transform::state, int mask);
+	void default_render(vec2<> visible_area);
 };

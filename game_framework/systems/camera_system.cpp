@@ -34,7 +34,6 @@ void camera_system::process_entities(world& owner) {
 		if (camera.enabled) {
 			/* we obtain transform as a copy because we'll be now offsetting it by crosshair position */
 			auto transform = e->get<components::transform>().current;
-			vec2<> camera_screen = vec2<>(vec2<int>(camera.ortho.w(), camera.ortho.h()));
 
 			/* if we set player and crosshair entity targets */
 			if (camera.player && camera.crosshair) {
@@ -48,14 +47,14 @@ void camera_system::process_entities(world& owner) {
 					dir.rotate(transform.rotation, vec2<>());
 
 					if (camera.orbit_mode == camera.ANGLED) {
-						vec2<> bound = camera_screen / 2.f;
+						vec2<> bound = camera.size / 2.f;
 						/* save by copy */
 						vec2<> normalized = dir.clamp(bound);
 						transform.pos += normalized.normalize() * camera.angled_look_length;
 					}
 
 					if (camera.orbit_mode == camera.LOOK) {
-						vec2<> bound = camera.max_look_expand + camera_screen / 2.f;
+						vec2<> bound = camera.max_look_expand + camera.size / 2.f;
 
 						/* simple proportion in local frame of reference */
 						vec2<> camera_offset = (dir.clamp(bound) / bound) * camera.max_look_expand;
@@ -71,7 +70,7 @@ void camera_system::process_entities(world& owner) {
 			}
 
 			auto drawn_transform = transform;
-			auto drawn_ortho = camera.ortho;
+			auto drawn_size = camera.size;
 
 			if (camera.enable_smoothing) {
 				/* variable time step camera smoothing by averaging last position with the current */
@@ -88,14 +87,12 @@ void camera_system::process_entities(world& owner) {
 						a = static_cast<int>(a * averaging_constant + b * (1.0f - averaging_constant));
 					};
 
-					interp(camera.last_ortho_interpolant.l, camera.ortho.l, averaging_constant);
-					interp(camera.last_ortho_interpolant.t, camera.ortho.t, averaging_constant);
-					interp(camera.last_ortho_interpolant.r, camera.ortho.r, averaging_constant);
-					interp(camera.last_ortho_interpolant.b, camera.ortho.b, averaging_constant);
+					interp(camera.last_ortho_interpolant.x, camera.size.x, averaging_constant);
+					interp(camera.last_ortho_interpolant.y, camera.size.y, averaging_constant);
 
 				/* save smoothing result */
 				drawn_transform = camera.last_interpolant;
-				drawn_ortho = camera.last_ortho_interpolant;
+				drawn_size = camera.last_ortho_interpolant;
 
 				if (camera.crosshair_follows_interpolant) {
 					camera.crosshair->get<components::transform>().current.pos -= transform.pos - camera.last_interpolant.pos;
@@ -104,7 +101,7 @@ void camera_system::process_entities(world& owner) {
 
 			/* save the final smoothing results in previous transform state and component, we'll use them later in the rendering pass */
 			e->get<components::transform>().previous = drawn_transform;
-			camera.rendered_ortho = drawn_ortho;
+			camera.rendered_size = drawn_size;
 			camera.target_transform = transform;
 		}
 	}
@@ -119,13 +116,12 @@ void camera_system::process_rendering(world& owner) {
 		if (camera.enabled) {
 			glViewport(camera.screen_rect.x, camera.screen_rect.y, camera.screen_rect.w, camera.screen_rect.h);
 			
-			auto drawn_ortho = camera.rendered_ortho;
 			auto drawn_transform = e->get<components::transform>().previous;
 
 			if (camera.drawing_callback) {
 				try {
 					/* arguments: subject, renderer, visible_area, target_transform, mask */
-					luabind::call_function<void>(camera.drawing_callback, e, raw_renderer, rects::xywh(drawn_ortho), drawn_transform, camera.target_transform, camera.mask);
+					luabind::call_function<void>(camera.drawing_callback, e, raw_renderer, camera.rendered_size, drawn_transform, camera.target_transform, camera.mask);
 				}
 				catch (std::exception compilation_error) {
 					std::cout << compilation_error.what() << '\n';
@@ -133,14 +129,14 @@ void camera_system::process_rendering(world& owner) {
 			}
 			else {
 				glLoadIdentity();
-				glOrtho(drawn_ortho.l, drawn_ortho.r, drawn_ortho.b, drawn_ortho.t, 0, 1);
+				glOrtho(0, camera.rendered_size.x, camera.rendered_size.y, 0, 0, 1);
 
-				raw_renderer.generate_triangles(drawn_ortho, drawn_transform, camera.mask);
-				raw_renderer.default_render(drawn_ortho);
+				raw_renderer.generate_triangles(camera.rendered_size, drawn_transform, camera.mask);
+				raw_renderer.default_render(camera.rendered_size);
 
 				if (raw_renderer.debug_drawing) {
 					glDisable(GL_TEXTURE_2D);
-					raw_renderer.draw_debug_info(drawn_ortho, drawn_transform, nullptr);
+					raw_renderer.draw_debug_info(camera.rendered_size, drawn_transform, nullptr);
 					glEnable(GL_TEXTURE_2D);
 				}
 			}

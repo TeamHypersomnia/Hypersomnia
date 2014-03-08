@@ -11,7 +11,7 @@ namespace bindings {
 			luabind::class_<camera>("camera_component")
 			.def(luabind::constructor<>())
 			.def_readwrite("screen_rect", &camera::screen_rect)
-			.def_readwrite("ortho", &camera::ortho)
+			.def_readwrite("size", &camera::size)
 			.def_readwrite("layer", &camera::layer)
 			.def_readwrite("mask", &camera::mask)
 			.def_readwrite("enabled", &camera::enabled)

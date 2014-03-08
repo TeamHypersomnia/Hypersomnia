@@ -46,11 +46,11 @@ render_system::render_system(window::glwindow& output_window)
 	glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(resources::vertex), (char*) (sizeof(float) * 2 + sizeof(float) * 2));
 }
 
-void render_system::generate_triangles(rects::xywh visible_area, components::transform::state camera_transform, int mask) {
-	auto verts = rects::ltrb(visible_area).get_vertices<float>();
+void render_system::generate_triangles(vec2<> visible_area, components::transform::state camera_transform, int mask) {
+	auto verts = rects::ltrb(0, 0, visible_area.x, visible_area.y).get_vertices<float>();
 
-	for (auto& v : verts) 
-		v.rotate(camera_transform.rotation, vec2<>(visible_area.w, visible_area.h) / 2);
+	for (auto& v : verts)
+		v.rotate(camera_transform.rotation, visible_area / 2);
 
 	/* expanded aabb that takes rotation into consideration */
 	auto rotated_aabb = rects::ltrb::get_aabb<float>(verts.data());
@@ -72,7 +72,7 @@ void render_system::generate_triangles(rects::xywh visible_area, components::tra
 		auto& transform = e->get<components::transform>().current;
 
 		/* if an entity's AABB hovers specified visible region */
-		if (render.model->is_visible(rotated_aabb + camera_transform.pos - vec2<>(visible_area.w, visible_area.h)/ 2, transform))
+		if (render.model->is_visible(rotated_aabb + camera_transform.pos - visible_area / 2, transform))
 			visible_targets.push_back(std::make_pair(&render, &transform));
 	}
 
@@ -120,8 +120,8 @@ resources::vertex_triangle& render_system::get_triangle(int i) {
 	return triangles[i];
 }
 
-void render_system::draw_debug_info(rects::xywh visible_area, components::transform::state camera_transform, augs::texture_baker::texture* tex) {
-	vec2<> center = (vec2<>(visible_area.w, visible_area.h) / 2);
+void render_system::draw_debug_info(vec2<> visible_area, components::transform::state camera_transform, augs::texture_baker::texture* tex) {
+	vec2<> center = visible_area / 2;
 
 	if (draw_visibility) {
 		glBegin(GL_TRIANGLES);
@@ -198,7 +198,7 @@ void render_system::cleanup() {
 	triangles.clear();
 }
 
-void render_system::default_render(rects::xywh visible_area) {
+void render_system::default_render(vec2<> visible_area) {
 	augs::graphics::fbo::use_default();
 	glClear(GL_COLOR_BUFFER_BIT);
 
