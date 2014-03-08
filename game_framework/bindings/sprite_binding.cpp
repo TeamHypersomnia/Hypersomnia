@@ -4,6 +4,7 @@
 
 #include "../resources/render_info.h"
 #include "../game/texture_helper.h"
+#include "../systems/render_system.h"
 
 namespace bindings {
 	luabind::scope _sprite() {

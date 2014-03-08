@@ -5,6 +5,7 @@
 #include "entity_system/entity.h"
 #include "../components/physics_component.h"
 #include "../messages/intent_message.h"
+#include "../resources/render_info.h"
 
 void camera_system::consume_events(world& owner) {
 	auto events = owner.get_message_queue<messages::intent_message>();
@@ -15,7 +16,6 @@ void camera_system::consume_events(world& owner) {
 			if (mode == components::camera::LOOK)
 				mode = components::camera::ANGLED;
 			else mode = components::camera::LOOK;
-
 		}
 	}
 }
@@ -118,17 +118,24 @@ void camera_system::process_rendering(world& owner) {
 			
 			auto drawn_transform = e->get<components::transform>().previous;
 
+			resources::renderable::draw_input in;
+			in.rotated_camera_aabb =
+				rects::ltrb::get_aabb_rotated(camera.rendered_size, drawn_transform.rotation) + drawn_transform.pos - camera.rendered_size / 2;
+			in.camera_transform = drawn_transform;
+			in.output = &raw_renderer;
+			in.visible_area = camera.rendered_size;
+
 			if (camera.drawing_callback) {
 				try {
 					/* arguments: subject, renderer, visible_area, target_transform, mask */
-					luabind::call_function<void>(camera.drawing_callback, e, raw_renderer, camera.rendered_size, drawn_transform, camera.target_transform, camera.mask);
+					luabind::call_function<void>(camera.drawing_callback, e, in, camera.mask);
 				}
 				catch (std::exception compilation_error) {
 					std::cout << compilation_error.what() << '\n';
 				}
 			}
 			else {
-				raw_renderer.generate_triangles(camera.rendered_size, drawn_transform, camera.mask);
+				raw_renderer.generate_triangles(in, camera.mask);
 				raw_renderer.default_render(camera.rendered_size);
 
 				if (raw_renderer.debug_drawing) {

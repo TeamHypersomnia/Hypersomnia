@@ -46,47 +46,27 @@ render_system::render_system(window::glwindow& output_window)
 	glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(resources::vertex), (char*) (sizeof(float) * 2 + sizeof(float) * 2));
 }
 
-void render_system::generate_triangles(vec2<> visible_area, components::transform::state camera_transform, int mask) {
-	/* expanded aabb that takes rotation into consideration */
-	auto rotated_aabb = rects::ltrb::get_aabb_rotated<>(visible_area, camera_transform.rotation);
-
+void render_system::generate_triangles(resources::renderable::draw_input& in, int mask) {
 	/* shortcut */
-	typedef std::pair<components::render*, components::transform::state*> cached_pair;
-
-	std::vector<cached_pair> visible_targets;
-
 	std::vector<entity*> entities_by_mask;
 	for (auto it : targets) {
 		if (it->get<components::render>().mask == mask)
 			entities_by_mask.push_back(it);
 	}
-	 
+	
+	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
+	std::stable_sort(entities_by_mask.begin(), entities_by_mask.end(), [](entity* a, entity* b) {
+		return a->get<components::render>().layer > b->get<components::render>().layer;
+	});
+
 	for (auto e : entities_by_mask) {
 		auto& render = e->get<components::render>();
 		if (render.model == nullptr) continue;
-		auto& transform = e->get<components::transform>().current;
 
-		/* if an entity's AABB hovers specified visible region */
-		if (render.model->is_visible(rotated_aabb + camera_transform.pos - visible_area / 2, transform))
-			visible_targets.push_back(std::make_pair(&render, &transform));
-	}
+		in.transform = e->get<components::transform>().current;
+		in.additional_info = &render;
 
-	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
-	std::stable_sort(visible_targets.begin(), visible_targets.end(), [](const cached_pair& a, const cached_pair& b) {
-		return a.first->layer > b.first->layer;
-	});
-
-	for (auto e : visible_targets) {
-		if (e.first->model == nullptr) continue;
-
-		resources::renderable::draw_input in;
-		in.output = &triangles;
-		in.transform = *e.second;
-		in.camera_transform = camera_transform;
-		in.additional_info = e.first;
-		in.visible_area = visible_area;
-
-		e.first->model->draw(in);
+		render.model->draw(in);
 	}
 }
 
@@ -95,7 +75,7 @@ void render_system::process_entities(world&) {
 
 void render_system::call_triangles() {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(resources::vertex_triangle) * triangles.size(), triangles.data(), GL_STREAM_DRAW);
-	std::cout << "triangles:" << triangles.size() << std::endl;
+	//std::cout << "triangles:" << triangles.size() << std::endl;
 	glDrawArrays(GL_TRIANGLES, 0, triangles.size() * 3);
 }
 
@@ -183,7 +163,6 @@ void render_system::draw_debug_info(vec2<> visible_area, components::transform::
 	std::for_each(lines.begin(), lines.end(), line_lambda);
 	std::for_each(manually_cleared_lines.begin(), manually_cleared_lines.end(), line_lambda);
 	std::for_each(non_cleared_lines.begin(), non_cleared_lines.end(), line_lambda);
-	std::for_each(global_debug.begin(), global_debug.end(), line_lambda);
 
 	glEnd();
 }

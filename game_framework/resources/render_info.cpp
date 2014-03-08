@@ -7,12 +7,11 @@
 
 #include "../components/physics_component.h"
 #include "../components/particle_group_component.h"
+#include "../systems/render_system.h"
 
 #include "misc/sorted_vector.h"
 
 #include "3rdparty/polypartition/polypartition.h"
-
-std::vector<render_system::debug_line> global_debug;
 
 namespace resources {
 	void set_polygon_color(renderable* poly, graphics::pixel_32 col) {
@@ -20,6 +19,35 @@ namespace resources {
 
 		for (auto& v : p->model) {
 			v.color = col;
+		}
+	}
+
+	void map_uv_square(renderable* poly, helpers::texture_helper* texture_to_map) {
+		polygon* p = (polygon*) poly;
+
+		if (p->model.empty()) return;
+
+		auto* v = p->model.data();
+		typedef const resources::vertex& vc;
+
+		auto x_pred = [](vc a, vc b){ return a.pos.x < b.pos.x; };
+		auto y_pred = [](vc a, vc b){ return a.pos.y < b.pos.y; };
+
+		vec2<int> lower(
+			static_cast<int>(std::min_element(v, v + p->model.size(), x_pred)->pos.x),
+			static_cast<int>(std::min_element(v, v + p->model.size(), y_pred)->pos.y)
+			);
+
+		vec2<int> upper(
+			static_cast<int>(std::max_element(v, v + p->model.size(), x_pred)->pos.x),
+			static_cast<int>(std::max_element(v, v + p->model.size(), y_pred)->pos.y)
+			);
+
+		for (auto& v : p->model) {
+			v.set_texcoord(vec2<>(
+				(v.pos.x - lower.x) / (upper.x - lower.x),
+				(v.pos.y - lower.y) / (upper.y - lower.y)
+				), texture_to_map);
 		}
 	}
 
@@ -64,10 +92,11 @@ namespace resources {
 	}
 
 	void sprite::draw(draw_input in) {
-		auto& triangles = *in.output;
+		vec2<> v[4];
+		make_rect(in.transform.pos, vec2<>(size), in.transform.rotation, v);
+		if (!rects::ltrb::get_aabb(v).hover(in.rotated_camera_aabb)) return;
 
 		if (tex == nullptr) return;
-		vec2<> v[4];
 
 		auto center = in.visible_area / 2;
 
@@ -114,16 +143,10 @@ namespace resources {
 		t1.vertices[1].pos = t2.vertices[2].pos = vec2<int>(v[2]);
 		t1.vertices[2].pos = vec2<int>(v[3]);
 
-		triangles.emplace_back(t1);
-		triangles.emplace_back(t2);
+		in.output->push_triangle(t1);
+		in.output->push_triangle(t2);
 	}
 
-	bool sprite::is_visible(rects::xywh visibility_aabb, const components::transform::state& transform) {
-		vec2<> v[4];
-		make_rect(transform.pos, vec2<>(size), transform.rotation, v);
-		return rects::ltrb::get_aabb(v).hover(visibility_aabb);
-	}
-	
 	std::vector<vec2<>> sprite::get_vertices() {
 		std::vector<vec2<>> out;
 		out.push_back(size / -2.f);
@@ -131,11 +154,6 @@ namespace resources {
 		out.push_back(size / -2.f + size);
 		out.push_back(size / -2.f + vec2<>(0.f, size.y));
 		return std::move(out);
-	}
-
-	bool polygon::is_visible(rects::xywh visibility_aabb, const components::transform::state&) {
-		/* perform visibility check! */
-		return true;
 	}
 
 	//triangle::triangle(const vertex& a, const vertex& b, const vertex& c) {
@@ -146,10 +164,6 @@ namespace resources {
 	//
 	//void triangle::draw(buffer& triangles, const components::transform::state& transform, vec2<> camera_pos) {
 	//
-	//}
-	//
-	//bool triangle::is_visible(rects::xywh visibility_aabb, const components::transform::state& transform) {
-	//	return true;
 	//}
 
 	void polygon::concave::add_vertex(const vertex& v) {
@@ -230,20 +244,23 @@ namespace resources {
 		vertex_triangle new_tri;
 		auto camera_pos = in.camera_transform.pos;
 
+		std::vector<int> visible_indices;
+		
 		auto model_transformed = model;
-		for (auto& v : model_transformed) {
-			auto center = in.visible_area / 2;
+
+		/* initial transformation for visibility checks */
+		for (auto& v : model_transformed)
 			v.pos.rotate(in.transform.rotation, vec2<>(0, 0));
-			v.pos += in.transform.pos - camera_pos + center;
-
-			/* rotate around the center of the screen */
-			v.pos.rotate(in.camera_transform.rotation, center);
-		}
-
+		
+		/* visibility checking every triangle */
 		for (size_t i = 0; i < indices.size(); i += 3) {
 			new_tri.vertices[0] = model_transformed[indices[i]];
 			new_tri.vertices[1] = model_transformed[indices[i + 1]];
 			new_tri.vertices[2] = model_transformed[indices[i + 2]];
+
+			new_tri.vertices[0].pos += in.transform.pos;
+			new_tri.vertices[1].pos += in.transform.pos;
+			new_tri.vertices[2].pos += in.transform.pos;
 
 			auto* v = new_tri.vertices;
 			typedef const resources::vertex& vc;
@@ -261,11 +278,29 @@ namespace resources {
 				static_cast<int>(std::max_element(v, v + 3, y_pred)->pos.y)
 				);
 
-			if (rects::ltrb(lower.x, lower.y, upper.x, upper.y).hover(in.visible_area)) {
-
+			/* only if the triangle is visible should we render the indices */
+			if (rects::ltrb(lower.x, lower.y, upper.x, upper.y).hover(in.rotated_camera_aabb)) {
+				visible_indices.push_back(indices[i]);
+				visible_indices.push_back(indices[i + 1]);
+				visible_indices.push_back(indices[i + 2]);
 			}
+		}
 
-			in.output->push_back(new_tri);
+		/* further rotation of the polygon to fit the camera transform */
+		for (auto& v : model_transformed) {
+			auto center = in.visible_area / 2;
+			v.pos += in.transform.pos - camera_pos + center;
+
+			/* rotate around the center of the screen */
+			v.pos.rotate(in.camera_transform.rotation, center);
+		}
+
+		for (size_t i = 0; i < visible_indices.size(); i += 3) {
+			new_tri.vertices[0] = model_transformed[visible_indices[i]];
+			new_tri.vertices[1] = model_transformed[visible_indices[i + 1]];
+			new_tri.vertices[2] = model_transformed[visible_indices[i + 2]];
+
+			in.output->push_triangle(new_tri);
 		}
 	}
 }
@@ -283,10 +318,5 @@ namespace components {
 				it.face.draw(in);
 				it.face.color.a = temp_alpha;
 			}
-	}
-
-	bool particle_group::is_visible(rects::xywh visibility_aabb, const components::transform::state& transform) {
-		/* will be visible most of the time */
-		return true;
 	}
 }

@@ -58,6 +58,5 @@ namespace components {
 		friend class particle_emitter_system;
 
 		virtual void draw(draw_input) override;
-		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) override;
 	};
 }

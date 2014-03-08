@@ -10,6 +10,7 @@ namespace bindings {
 		return 	
 			(
 			luabind::def("set_polygon_color", resources::set_polygon_color),
+			luabind::def("map_uv_square", resources::map_uv_square),
 
 			luabind::class_<vertex>("vertex")
 			.def(luabind::constructor<vec2<>>())

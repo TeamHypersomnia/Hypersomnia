@@ -24,14 +24,11 @@ namespace helpers {
 			traces.push_back(new_trace); 
 		}
 
-		void generate_triangles(components::transform::state camera_transform, resources::buffer* output_buffer, vec2<> visible_area) {
-			resources::renderable::draw_input my_draw_input;
-			my_draw_input.camera_transform = camera_transform;
-			my_draw_input.output = output_buffer;
-			my_draw_input.visible_area = visible_area;
-
-			for (auto& t : traces) 
-				t.poly.draw(my_draw_input);
+		void generate_triangles(resources::renderable::draw_input& camera_draw_input) {
+			for (auto& t : traces) {
+				camera_draw_input.transform = components::transform::state();
+				t.poly.draw(camera_draw_input);
+			}
 		}
 
 		void loop() {

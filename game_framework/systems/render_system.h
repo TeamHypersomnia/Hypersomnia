@@ -8,6 +8,7 @@
 #include "../components/render_component.h"
 
 #include "../resources/vertex.h"
+#include "../resources/render_info.h"
 #include "texture_baker/texture_baker.h"
 
 using namespace augs;
@@ -84,6 +85,6 @@ public:
 
 	void process_entities(world&) override;
 
-	void generate_triangles(vec2<> visible_area, components::transform::state, int mask);
+	void generate_triangles(resources::renderable::draw_input&, int mask);
 	void default_render(vec2<> visible_area);
 };
