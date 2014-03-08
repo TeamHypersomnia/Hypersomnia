@@ -27,6 +27,7 @@ namespace bindings {
 	luabind::scope _all_systems() {
 		return
 			luabind::class_<physics_system>("_physics_system")
+			.def("process_entities", &physics_system::process_entities)
 			.def_readwrite("timestep_multiplier", &physics_system::timestep_multiplier)
 			.def_readwrite("enable_interpolation", &physics_system::enable_interpolation)
 			.def_readwrite("b2world", &physics_system::b2world)
@@ -40,10 +41,14 @@ namespace bindings {
 				luabind::value("PIXELS_TO_METERS", PIXELS_TO_METERSf),
 					luabind::value("METERS_TO_PIXELS", METERS_TO_PIXELSf)
 			],
-			luabind::class_<steering_system>("_steering_system"),
-			luabind::class_<movement_system>("_movement_system"),
+			luabind::class_<steering_system>("_steering_system")
+			.def("process_entities", &steering_system::process_entities),
+			luabind::class_<movement_system>("_movement_system")
+			.def("consume_events", &movement_system::consume_events)
+			.def("process_entities", &movement_system::process_entities),
 			
 			luabind::class_<visibility_system>("_visibility_system")
+			.def("process_entities", &visibility_system::process_entities)
 			.def_readwrite("draw_cast_rays", &visibility_system::draw_cast_rays)
 			.def_readwrite("draw_triangle_edges", &visibility_system::draw_triangle_edges)
 			.def_readwrite("draw_discontinuities", &visibility_system::draw_discontinuities)
@@ -54,6 +59,7 @@ namespace bindings {
 			,
 
 			luabind::class_<pathfinding_system>("_pathfinding_system")
+			.def("process_entities", &pathfinding_system::process_entities)
 			.def_readwrite("epsilon_max_segment_difference", &pathfinding_system::epsilon_max_segment_difference)
 			.def_readwrite("epsilon_distance_visible_point", &pathfinding_system::epsilon_distance_visible_point)
 			.def_readwrite("draw_memorised_walls", &pathfinding_system::draw_memorised_walls)
@@ -61,10 +67,18 @@ namespace bindings {
 			.def_readwrite("epsilon_distance_the_same_vertex", &pathfinding_system::epsilon_distance_the_same_vertex)
 			,
 
-			luabind::class_<animation_system>("_animation_system"),
-			luabind::class_<camera_system>("_camera_system"),
+			luabind::class_<animation_system>("_animation_system")
+			.def("consume_events", &animation_system::consume_events)
+			.def("process_entities", &animation_system::process_entities),
+			luabind::class_<camera_system>("_camera_system")
+			.def("process_rendering", &camera_system::process_rendering)
+			.def("process_entities", &camera_system::process_entities)
+			.def("consume_events", &camera_system::consume_events)
+			
+			,
 
 			luabind::class_<render_system>("_render_system")
+			.def("process_entities", &render_system::process_entities)
 			.def_readwrite("visibility_expansion", &render_system::visibility_expansion)
 			.def_readwrite("max_visibility_expansion_distance", &render_system::max_visibility_expansion_distance)
 			.def_readwrite("draw_steering_forces", &render_system::draw_steering_forces)
@@ -91,20 +105,37 @@ namespace bindings {
 			,
 
 			luabind::class_<input_system>("_input_system")
+			.def("process_entities", &input_system::process_entities)
 			.def_readwrite("quit_flag", &input_system::quit_flag)
 			.def("add_context", &input_system::add_context)
 			.def("clear_contexts", &input_system::clear_contexts),
 
-			luabind::class_<gun_system>("_gun_system"),
-			luabind::class_<crosshair_system>("_crosshair_system"),
-			luabind::class_<lookat_system>("_lookat_system"),
-			luabind::class_<chase_system>("_chase_system"),
-			luabind::class_<damage_system>("_damage_system"),
-			luabind::class_<destroy_system>("_destroy_system"),
-			luabind::class_<particle_group_system>("_particle_group_system"),
-			luabind::class_<particle_emitter_system>("_particle_emitter_system"),
-			luabind::class_<script_system>("_script_system"),
+			luabind::class_<gun_system>("_gun_system")
+			.def("consume_events", &gun_system::consume_events)
+			.def("process_entities", &gun_system::process_entities),
+			luabind::class_<crosshair_system>("_crosshair_system")
+			.def("consume_events", &crosshair_system::consume_events)
+			.def("process_entities", &crosshair_system::process_entities),
+			luabind::class_<lookat_system>("_lookat_system")
+			.def("process_entities", &lookat_system::process_entities),
+			luabind::class_<chase_system>("_chase_system")
+			.def("process_entities", &chase_system::process_entities),
+			luabind::class_<damage_system>("_damage_system")
+			.def("process_events", &damage_system::process_events)
+			.def("process_entities", &damage_system::process_entities),
+			luabind::class_<destroy_system>("_destroy_system")
+			.def("consume_events", &destroy_system::consume_events)
+			.def("process_entities", &destroy_system::process_entities),
+			luabind::class_<particle_group_system>("_particle_group_system")
+			.def("process_entities", &particle_group_system::process_entities),
+			luabind::class_<particle_emitter_system>("_particle_emitter_system")
+			.def("consume_events", &particle_emitter_system::consume_events)
+			.def("process_entities", &particle_emitter_system::process_entities),
+			luabind::class_<script_system>("_script_system")
+			.def("process_events", &script_system::process_events)
+			.def("process_entities", &script_system::process_entities),
 			luabind::class_<behaviour_tree_system>("_behaviour_tree_system")
+			.def("process_entities", &behaviour_tree_system::process_entities)
 			;
 			
 	}

@@ -56,13 +56,16 @@ struct world_instance {
 int main() {    
 	augs::init();	
 	script_system scripts;
-	lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
+	script_system::lua_state_wrapper lua_state;
+	script_system::generate_lua_state(lua_state);
+
+	lua_gc(lua_state, LUA_GCCOLLECT, 0);
 	resources::script::script_reloader.report_errors = &std::cout;
-	resources::script::lua_state = scripts.lua_state;
+	resources::script::lua_state = lua_state;
 	resources::script::dofile("config.lua");
 
 	window::glwindow gl;
-	gl.create(scripts.lua_state, rects::wh(100, 100));
+	gl.create(lua_state, rects::wh(100, 100));
 	gl.set_show(gl.SHOW);
 	gl.vsync(0);
 	window::cursor(false); 
@@ -116,14 +119,14 @@ int main() {
 	my_world.register_message_queue<particle_burst_message>();
 	my_world.register_message_queue<shot_message>();
 
-	scripts.global("world", my_world);
-	scripts.global("window", gl);
-	scripts.global("input_system", input);
-	scripts.global("visibility_system", visibility);
-	scripts.global("pathfinding_system", pathfinding);
-	scripts.global("render_system", render);
-	scripts.global("physics_system", physics);
-	scripts.global("script_reloader", resources::script::script_reloader);
+	scripts.global(lua_state, "world", my_world);
+	scripts.global(lua_state, "window", gl);
+	scripts.global(lua_state, "input_system", input);
+	scripts.global(lua_state, "visibility_system", visibility);
+	scripts.global(lua_state, "pathfinding_system", pathfinding);
+	scripts.global(lua_state, "render_system", render);
+	scripts.global(lua_state, "physics_system", physics);
+	scripts.global(lua_state, "script_reloader", resources::script::script_reloader);
 	 
 	resources::script init_script;
 
@@ -132,7 +135,7 @@ int main() {
  	init_script.call();
 
 	std::cout << std::endl;
-	lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
+	lua_gc(lua_state, LUA_GCCOLLECT, 0);
 
 	int argc = 0;
 	::testing::InitGoogleTest(&argc, (wchar_t**)nullptr);
@@ -143,7 +146,23 @@ int main() {
 
 	using namespace augs::graphics;
 
+	physics.substepping_routine = [&steering, &movement, &damage, &destroy, &scripts, &visibility](world& owner){
+		scripts.substep(owner);
+		steering.substep(owner);
+		movement.substep(owner);
+		destroy.consume_events(owner);
+	};
+
 	while (!input.quit_flag) {
+		if (luabind::globals(lua_state)["augmentations_main_loop_callback"]) {
+			try {
+				luabind::call_function<void>(luabind::globals(lua_state)["augmentations_main_loop_callback"]);
+			}
+			catch (std::exception compilation_error) {
+				std::cout << compilation_error.what() << '\n';
+			}
+		}
+
 		my_world.validate_delayed_messages();
 
 		input.process_entities(my_world);      
@@ -152,13 +171,6 @@ int main() {
 		movement.process_entities(my_world);
 		
 		camera.process_entities(my_world);
-
-		physics.substepping_routine = [&steering, &movement, &damage, &destroy, &scripts, &visibility](world& owner){
-			scripts.substep(owner);
-			steering.substep(owner);
-			movement.substep(owner);
-			destroy.consume_events(owner);
-		};
 
 		physics.process_entities(my_world);                 
 		behaviours.process_entities(my_world);              
@@ -200,7 +212,7 @@ int main() {
 			my_world.delete_all_entities();
 			world_reloading_script->call();
 			world_reloading_script = nullptr;
-			lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
+			lua_gc(lua_state, LUA_GCCOLLECT, 0);
 		}
 
 		auto& scripts_reloaded = resources::script::script_reloader.get_script_files_to_reload();
@@ -218,7 +230,7 @@ int main() {
 
 		if (!scripts_reloaded.empty()) {
 			std::cout << std::endl;
-			lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
+			lua_gc(lua_state, LUA_GCCOLLECT, 0);
 		}
 	}
 

@@ -129,20 +129,21 @@ void debugger_break() {
 }  
  
 script_system::script_system() {
+}
+
+void script_system::generate_lua_state(lua_state_wrapper& new_state) {
 	using namespace resources;
 	using namespace helpers;
 
-	lua_state = luaL_newstate();
-	luabind::open(lua_state);
+	luabind::open(new_state);
 
-	luaL_openlibs(lua_state);
+	luaL_openlibs(new_state);
 
 	//luabind::bind_class_info(lua_state);
 
-
-	lua_register(lua_state, "bitor", bitor);
-	lua_register(lua_state, "bitflag", bitflag);
-	luabind::module(lua_state)[
+	lua_register(new_state, "bitor", bitor);
+	lua_register(new_state, "bitflag", bitflag);
+	luabind::module(new_state)[
 			luabind::class_<ptr_wrapper<float>>("float_ptr"),
 
 			misc::vector_wrapper<float>::bind("float_vector"),
@@ -224,7 +225,6 @@ script_system::script_system() {
 }
 
 script_system::~script_system() {
-	lua_close(lua_state);
 }
 
 void script_system::process_entities(world& owner) {

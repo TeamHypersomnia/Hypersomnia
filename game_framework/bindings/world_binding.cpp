@@ -18,6 +18,8 @@ namespace bindings {
 		return
 			luabind::class_<world>("_world")
 			.def(luabind::constructor<>())
+			.def("validate_delayed_messages", &world::validate_delayed_messages)
+			.def("flush_message_queues", &world::flush_message_queues)
 			.def("create_entity", &world::create_entity)
 			.def("delete_entity", &world::delete_entity)
 			.def("delete_all_entities", &world::delete_all_entities)
@@ -30,7 +32,7 @@ namespace bindings {
 			.def("post_delayed_message", &world::post_delayed_message<intent_message>)
 			.def("post_delayed_message", &world::post_delayed_message<destroy_message>)
 			.def("post_delayed_message", &world::post_delayed_message<particle_burst_message>)
-			,
+			, 
 
 			luabind::def("post_destroy", helper_destroy);
 	}
