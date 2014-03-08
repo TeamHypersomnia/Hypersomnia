@@ -57,6 +57,6 @@ namespace components {
 		friend class particle_group_system;
 		friend class particle_emitter_system;
 
-		virtual void draw(draw_input) override;
+		virtual void draw(draw_input&) override;
 	};
 }

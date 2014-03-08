@@ -17,21 +17,25 @@ namespace helpers {
 
 		polygon_fader() : max_traces(100) {}
 
-		void add_trace(resources::polygon poly, augs::misc::animator animator) {
+		void add_trace(resources::polygon& poly, augs::misc::animator& animator) {
 			trace new_trace;
 			new_trace.poly = poly;
 			new_trace.animator = animator;
-			traces.push_back(new_trace); 
+			traces.emplace_back(new_trace); 
 		}
 
 		void generate_triangles(resources::renderable::draw_input& camera_draw_input) {
+			camera_draw_input.transform = components::transform::state();
 			for (auto& t : traces) {
-				camera_draw_input.transform = components::transform::state();
 				t.poly.draw(camera_draw_input);
 			}
 		}
 
 		void loop() {
+			if (max_traces > 0 && traces.size() > max_traces) {
+				traces.erase(traces.begin(), traces.begin() + (traces.size() - max_traces));
+			}
+
 			traces.erase(std::remove_if(std::begin(traces), std::end(traces), [](trace& t){
 				if (t.animator.has_finished()) return true;
 
@@ -41,10 +45,6 @@ namespace helpers {
 
 				return false;
 			}), std::end(traces));
-
-			if (max_traces > 0 && traces.size() > max_traces) {
-				traces.erase(traces.begin(), traces.begin() + (traces.size() - max_traces));
-			}
 		}
 
 		size_t get_num_traces() {

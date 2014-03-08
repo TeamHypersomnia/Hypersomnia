@@ -91,7 +91,7 @@ namespace resources {
 			size = tex->get_size();
 	}
 
-	void sprite::draw(draw_input in) {
+	void sprite::draw(draw_input& in) {
 		vec2<> v[4];
 		make_rect(in.transform.pos, vec2<>(size), in.transform.rotation, v);
 		if (!rects::ltrb::get_aabb(v).hover(in.rotated_camera_aabb)) return;
@@ -240,7 +240,7 @@ namespace resources {
 	//	convex_models.push_back(model);
 	//}
 
-	void polygon::draw(draw_input in) {
+	void polygon::draw(draw_input& in) {
 		vertex_triangle new_tri;
 		auto camera_pos = in.camera_transform.pos;
 
@@ -306,7 +306,7 @@ namespace resources {
 }
 
 namespace components {
-	void particle_group::draw(draw_input in) {
+	void particle_group::draw(draw_input& in) {
 		for (auto& s : stream_slots)
 			for (auto& it : s.particles.particles) {
 				auto temp_alpha = it.face.color.a;

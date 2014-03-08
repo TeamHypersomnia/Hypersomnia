@@ -32,7 +32,7 @@ namespace resources {
 
 		static void make_rect(vec2<> pos, vec2<> size, float rotation_degrees, vec2<> out[4]);
 
-		virtual void draw(draw_input) = 0;
+		virtual void draw(draw_input&) = 0;
 		virtual std::vector<vec2<>> get_vertices();
 	};
 
@@ -50,7 +50,7 @@ namespace resources {
 		void set(texture_baker::texture*, graphics::pixel_32);
 		void update_size();
 
-		virtual void draw(draw_input) override;
+		virtual void draw(draw_input&) override;
 		virtual std::vector<vec2<>> get_vertices() override;
 	};
 
@@ -93,7 +93,7 @@ namespace resources {
 		//void add_concave_coords(const std::vector<vec2<>>&);
 		//void add_convex(const std::vector<vec2<>>&);
 
-		virtual void draw(draw_input) override;
+		virtual void draw(draw_input&) override;
 		virtual std::vector<vec2<>> get_vertices() override;
 	};
 

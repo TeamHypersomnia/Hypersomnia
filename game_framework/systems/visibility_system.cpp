@@ -50,7 +50,7 @@ components::visibility::triangle components::visibility::layer::get_triangle(int
 	return tri;
 }
 
-std::vector<augs::vec2<>> components::visibility::layer::get_polygon(float distance_epsilon) {
+std::vector<augs::vec2<>> components::visibility::layer::get_polygon(float distance_epsilon, augs::vec2<> expand_origin, float expand_mult) {
 	std::vector<augs::vec2<>> output;
 
 	for (size_t i = 0; i < edges.size(); ++i) {
@@ -73,7 +73,7 @@ std::vector<augs::vec2<>> components::visibility::layer::get_polygon(float dista
 		
 		/* push the second one only if it is different from the first point of the next edge */
 		if (!edges[i].second.compare(edges[(i + 1)%edges.size()].first, distance_epsilon)) {
-			output.push_back(edges[i].second);
+			output.push_back(edges[i].second + (edges[i].second - expand_origin)*expand_mult);
 		}
 	}
 
@@ -105,7 +105,7 @@ void visibility_system::process_entities(world& owner) {
 		auto& visibility = it->get<components::visibility>();
 
 		if (visibility.interval_ms > 0.f && visibility.interval_timer.get<std::chrono::milliseconds>() < visibility.interval_ms) {
-			return;
+			continue;
 		}
 		visibility.interval_timer.reset();
 

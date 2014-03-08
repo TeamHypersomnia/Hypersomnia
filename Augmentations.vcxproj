@@ -166,6 +166,7 @@
       <MinimalRebuild>true</MinimalRebuild>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <FloatingPointModel>Precise</FloatingPointModel>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
