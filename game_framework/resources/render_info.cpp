@@ -15,6 +15,14 @@
 std::vector<render_system::debug_line> global_debug;
 
 namespace resources {
+	void set_polygon_color(renderable* poly, graphics::pixel_32 col) {
+		polygon* p = (polygon*) poly;
+
+		for (auto& v : p->model) {
+			v.color = col;
+		}
+	}
+
 	void renderable::make_rect(vec2<> pos, vec2<> size, float angle, vec2<> v[4]) {
 		vec2<> origin(pos + (size / 2.f));
 

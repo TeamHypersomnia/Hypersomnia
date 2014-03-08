@@ -83,9 +83,9 @@ std::vector<augs::vec2<>> components::visibility::layer::get_polygon(float dista
 augs::misc::timer interval;
 
 void visibility_system::process_entities(world& owner) {
-	//if (interval.get<std::chrono::milliseconds>() < 16) {
-	//	return;
-	//}
+	if (interval.get<std::chrono::milliseconds>() < 16) {
+		return;
+	}
 	interval.reset();
 
 

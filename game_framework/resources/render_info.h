@@ -17,6 +17,7 @@ namespace components {
 }
 
 namespace resources {
+
 	struct renderable {
 		struct draw_input {
 			buffer* output;
@@ -33,6 +34,8 @@ namespace resources {
 		virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) = 0;
 		virtual std::vector<vec2<>> get_vertices();
 	};
+
+	extern void set_polygon_color(renderable* poly, graphics::pixel_32 col);
 
 	struct sprite : public renderable {
 		texture_baker::texture* tex;

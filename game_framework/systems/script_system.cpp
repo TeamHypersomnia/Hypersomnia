@@ -3,6 +3,7 @@
 
 #include "entity_system/world.h"
 #include "entity_system/entity.h"
+#include "entity_system/entity_ptr.h"
 
 #include "script_system.h"
 
@@ -143,11 +144,11 @@ script_system::script_system() {
 			luabind::class_<ptr_wrapper<float>>("float_ptr"),
 
 			misc::vector_wrapper<float>::bind("float_vector"),
-			misc::vector_wrapper<vec2<>>::bind_vector("vec2_vector"),
 		
 			bindings::_sfml_audio(),
 			bindings::_minmax(),
 			bindings::_vec2(),
+			misc::vector_wrapper<vec2<>>::bind_vector("vec2_vector"),
 			bindings::_value_animator(),
 			bindings::_b2Filter(),
 			bindings::_rgba(),
@@ -159,9 +160,9 @@ script_system::script_system() {
 			bindings::_animation(),
 			bindings::_world(),
 			bindings::_entity_ptr(),
+			misc::vector_wrapper<entity_ptr>::bind_vector("entity_ptr_vector"),
 			bindings::_sprite(),
 			bindings::_polygon(),
-			bindings::_polygon_fader(),
 
 			bindings::_timer(),
 
@@ -211,8 +212,10 @@ script_system::script_system() {
 
 			luabind::class_<resources::script::reloader>("_script_reloader")
 			.def(luabind::constructor<>())
-			.def("add_directory", &resources::script::reloader::add_directory)
-	]; 
+			.def("add_directory", &resources::script::reloader::add_directory),
+
+			bindings::_polygon_fader()
+	];
 
 	luabind::set_pcall_callback(the_callback);
 }
