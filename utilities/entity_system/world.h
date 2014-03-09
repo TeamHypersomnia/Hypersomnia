@@ -148,6 +148,11 @@ namespace augs {
 			world();
 			~world();
 
+			world& operator=(const world&) {
+				assert(0);
+				return *this;
+			}
+
 			entity& create_entity_named(std::string name);
 			entity& create_entity();
 			void delete_entity(entity&, entity* redirect_pointers = nullptr);

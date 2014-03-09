@@ -20,6 +20,8 @@
 #include "misc/ptr_wrapper.h"
 #include "../resources/scriptable_info.h"
 
+#include "../world_instance.h"
+
 void set_world_reloading_script(resources::script* new_scr) {
 	world_reloading_script = new_scr;
 }
@@ -218,13 +220,16 @@ void script_system::generate_lua_state(lua_state_wrapper& new_state) {
 			.def("add_directory", &resources::script::reloader::add_directory),
 
 			bindings::_polygon_fader(),
-			bindings::_all_systems()
+			bindings::_all_systems(),
+
+			world_instance::bind()
 	];
 
 	luabind::set_pcall_callback(the_callback);
 }
 
 script_system::~script_system() {
+	int breakp = 233;
 }
 
 void script_system::process_entities(world& owner) {

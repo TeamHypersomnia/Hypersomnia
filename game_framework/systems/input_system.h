@@ -43,6 +43,11 @@ struct input_system : public processing_system_templated<components::input> {
 
 	window::glwindow& input_window;
 	input_system(window::glwindow&);
+	
+	input_system& operator=(const input_system&) {
+		assert(0);
+		return *this;
+	}
 
 	/* returns true if successfully mapped raw input to a high level intent */
 	bool post_intent_from_raw_id(world& owner, const context&, unsigned id, bool state = true);

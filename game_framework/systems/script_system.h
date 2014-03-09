@@ -17,7 +17,9 @@ public:
 	struct lua_state_wrapper {
 		lua_State* raw;
 
-		lua_state_wrapper(const lua_state_wrapper&) = delete;
+		lua_state_wrapper(const lua_state_wrapper&) {
+			assert(0);
+		}
 		lua_state_wrapper() : raw(luaL_newstate()) {}
 		~lua_state_wrapper() { lua_close(raw); }
 
@@ -32,7 +34,7 @@ public:
 	~script_system();
 
 	template<class T>
-	void global(lua_State* lua_state, std::string name, T& obj) {
+	static void global(lua_State* lua_state, std::string name, T& obj) {
 		luabind::globals(lua_state)[name] = &obj;
 	}
 

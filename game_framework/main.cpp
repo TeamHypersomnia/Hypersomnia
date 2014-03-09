@@ -4,37 +4,6 @@
 #include "augmentations.h"
 #include "window_framework/window.h"
 
-#include "entity_system/world.h"
-
-#include "systems/physics_system.h"
-#include "systems/steering_system.h"
-#include "systems/movement_system.h"
-#include "systems/visibility_system.h"
-#include "systems/pathfinding_system.h"
-#include "systems/animation_system.h"
-#include "systems/camera_system.h"
-#include "systems/render_system.h"
-#include "systems/input_system.h"
-#include "systems/gun_system.h"
-#include "systems/crosshair_system.h"
-#include "systems/lookat_system.h"
-#include "systems/chase_system.h"
-#include "systems/damage_system.h"
-#include "systems/destroy_system.h"
-#include "systems/particle_group_system.h"
-#include "systems/particle_emitter_system.h"
-#include "systems/script_system.h"
-#include "systems/behaviour_tree_system.h"
-
-#include "messages/destroy_message.h" 
-#include "messages/collision_message.h"
-#include "messages/intent_message.h"
-#include "messages/animate_message.h"
-#include "messages/particle_burst_message.h"
-#include "messages/damage_message.h"
-#include "messages/steering_message.h"
-#include "messages/shot_message.h"
-
 #include "game/body_helper.h"
 #include "game/texture_helper.h"
 
@@ -43,19 +12,18 @@
 #include "resources/scriptable_info.h"
 #include "graphics/shader.h"
 
+#include "world_instance.h"
+
 using namespace augs;
 using namespace entity_system;
-using namespace messages;
 
 resources::script* world_reloading_script = nullptr;
 
-struct world_instance {
-	/* all systems */
-};
+window::glwindow* global_window = nullptr;
+script_system::lua_state_wrapper* global_lua_state = nullptr;
 
 int main() {    
 	augs::init();	
-	script_system scripts;
 	script_system::lua_state_wrapper lua_state;
 	script_system::generate_lua_state(lua_state);
 
@@ -70,63 +38,12 @@ int main() {
 	gl.vsync(0);
 	window::cursor(false); 
 	 
-	input_system input(gl);
-	steering_system steering;
-	movement_system movement;
-	animation_system animations;
-	crosshair_system crosshairs;
-	lookat_system lookat;
-	physics_system physics;
-	visibility_system visibility;
-	pathfinding_system pathfinding;
-	gun_system guns;
-	particle_group_system particles;
-	particle_emitter_system emitters;
-	render_system render(gl);
-	camera_system camera;
-	chase_system chase;
-	damage_system damage;
-	destroy_system destroy;
-	behaviour_tree_system behaviours;
+	global_window = &gl;
+	global_lua_state = &lua_state;
 
-	world my_world;
-
-	my_world.register_system(&input);
-	my_world.register_system(&steering);
-	my_world.register_system(&movement);
-	my_world.register_system(&animations);
-	my_world.register_system(&crosshairs);
-	my_world.register_system(&lookat);
-	my_world.register_system(&physics);
-	my_world.register_system(&visibility);
-	my_world.register_system(&pathfinding);
-	my_world.register_system(&guns);
-	my_world.register_system(&particles);
-	my_world.register_system(&emitters);
-	my_world.register_system(&render);
-	my_world.register_system(&camera);
-	my_world.register_system(&chase);
-	my_world.register_system(&damage);
-	my_world.register_system(&destroy);
-	my_world.register_system(&behaviours);
-	my_world.register_system(&scripts);
-	 
-	my_world.register_message_queue<intent_message>();
-	my_world.register_message_queue<damage_message>();
-	my_world.register_message_queue<destroy_message>();
-	my_world.register_message_queue<animate_message>();
-	my_world.register_message_queue<collision_message>();
-	my_world.register_message_queue<particle_burst_message>();
-	my_world.register_message_queue<shot_message>();
-
-	scripts.global(lua_state, "world", my_world);
-	scripts.global(lua_state, "window", gl);
-	scripts.global(lua_state, "input_system", input);
-	scripts.global(lua_state, "visibility_system", visibility);
-	scripts.global(lua_state, "pathfinding_system", pathfinding);
-	scripts.global(lua_state, "render_system", render);
-	scripts.global(lua_state, "physics_system", physics);
-	scripts.global(lua_state, "script_reloader", resources::script::script_reloader);
+	script_system::global(*global_lua_state, "window", *global_window);
+	script_system::global(*global_lua_state, "script_reloader", resources::script::script_reloader);
+	//world_instance instance;
 	 
 	resources::script init_script;
 
@@ -134,7 +51,6 @@ int main() {
 	init_script.add_reload_dependant(&init_script);
  	init_script.call();
 
-	std::cout << std::endl;
 	lua_gc(lua_state, LUA_GCCOLLECT, 0);
 
 	int argc = 0;
@@ -146,92 +62,18 @@ int main() {
 
 	using namespace augs::graphics;
 
-	physics.substepping_routine = [&steering, &movement, &damage, &destroy, &scripts, &visibility](world& owner){
-		scripts.substep(owner);
-		steering.substep(owner);
-		movement.substep(owner);
-		destroy.consume_events(owner);
-	};
-
-	while (!input.quit_flag) {
+	int should_quit = 0;
+	while (!should_quit) {
 		if (luabind::globals(lua_state)["augmentations_main_loop_callback"]) {
 			try {
-				luabind::call_function<void>(luabind::globals(lua_state)["augmentations_main_loop_callback"]);
+				should_quit = luabind::call_function<int>(luabind::globals(lua_state)["augmentations_main_loop_callback"]);
 			}
 			catch (std::exception compilation_error) {
 				std::cout << compilation_error.what() << '\n';
 			}
 		}
 
-		my_world.validate_delayed_messages();
-
-		input.process_entities(my_world);      
-		camera.consume_events(my_world);
-
-		movement.process_entities(my_world);
-		
-		camera.process_entities(my_world);
-
-		physics.process_entities(my_world);                 
-		behaviours.process_entities(my_world);              
-		lookat.process_entities(my_world);                  
-		chase.process_entities(my_world);                   
-		crosshairs.process_entities(my_world);              
-		guns.process_entities(my_world);                   
-		damage.process_entities(my_world);                  
-		particles.process_entities(my_world);               
-		animations.process_entities(my_world);              
-		visibility.process_entities(my_world);
-		pathfinding.process_entities(my_world);
-		render.process_entities(my_world);                  
-		scripts.process_entities(my_world);
-		
-		damage.process_events(my_world);
-		destroy.consume_events(my_world);  
-
-		scripts.process_events(my_world);
-
-		damage.process_events(my_world);
-		destroy.consume_events(my_world);
-
-		movement.consume_events(my_world);
-		animations.consume_events(my_world);
-		crosshairs.consume_events(my_world);
-		guns.consume_events(my_world);
-		emitters.consume_events(my_world);
-
-		camera.process_rendering(my_world);
-
-		my_world.flush_message_queues();
-		//std::cout << physics.ray_casts_per_frame << std::endl;
-
-		physics.ray_casts_per_frame = 0;
-		//lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
-
-		if (world_reloading_script) {
-			my_world.delete_all_entities();
-			world_reloading_script->call();
-			world_reloading_script = nullptr;
-			lua_gc(lua_state, LUA_GCCOLLECT, 0);
-		}
-
-		auto& scripts_reloaded = resources::script::script_reloader.get_script_files_to_reload();
-
-		for (auto& script_to_reload : scripts_reloaded) {
-			if (script_to_reload->reload_scene_when_modified) {
-				my_world.delete_all_entities();
-				break;
-			}
-		}
-		 
-		for (auto& script_to_reload : scripts_reloaded) {
-			script_to_reload->call();
-		}
-
-		if (!scripts_reloaded.empty()) {
-			std::cout << std::endl;
-			lua_gc(lua_state, LUA_GCCOLLECT, 0);
-		}
+		//instance.default_loop();
 	}
 
 	augs::deinit();

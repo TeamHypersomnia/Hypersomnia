@@ -81,6 +81,12 @@ public:
 	int draw_weapon_info;
 
 	window::glwindow& output_window;
+	
+	render_system& operator=(const render_system&) {
+		assert(0);
+		return *this;
+	}
+
 	render_system(window::glwindow& output_window);
 
 	void process_entities(world&) override;
