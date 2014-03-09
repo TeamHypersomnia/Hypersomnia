@@ -16,9 +16,9 @@ namespace augs {
 				child_node() : in_use(false), ptr(nullptr) {}
 
 				void set(int l, int t, int r, int b) {
-					if(!ptr) ptr = new node(rects::ltrb(l, t, r, b));
+					if(!ptr) ptr = new node(rects::ltrb<int>(l, t, r, b));
 					else {
-						ptr->rc = rects::ltrb(l, t, r, b);
+						ptr->rc = rects::ltrb<int>(l, t, r, b);
 						ptr->dividable = true;
 					}
 					in_use = true;
@@ -26,17 +26,17 @@ namespace augs {
 			};
 
 			child_node child[2];
-			rects::ltrb rc;
+			rects::ltrb<int> rc;
 			bool dividable;
-			node(rects::ltrb rc = rects::ltrb()) : dividable(true), rc(rc) {}
+			node(rects::ltrb<int> rc = rects::ltrb<int>()) : dividable(true), rc(rc) {}
 
-			void reset(const rects::wh& r) {
+			void reset(const rects::wh<int>& r) {
 				dividable = true;
-				rc = rects::ltrb(0, 0, r.w, r.h);
+				rc = rects::ltrb<int>(0, 0, r.w, r.h);
 				delcheck();
 			}
 
-			node* insert(rects::xywhf& img) {
+			node* insert(rects::xywhf<int>& img) {
 				if(child[0].ptr && child[0].in_use) {
 					node* newn;
 					if(newn = child[0].ptr->insert(img)) return newn;
@@ -44,14 +44,14 @@ namespace augs {
 				}
 
 				if(!dividable) return 0;
-				rects::wh::fit_status f = img.fits(rects::xywh(rc));
+				rects::wh<int>::fit_status f = img.fits(rects::xywh<int>(rc));
 
 				switch(f) {
-				case rects::wh::fit_status::DOESNT_FIT: return 0;
-				case rects::wh::fit_status::FITS_INSIDE:			    img.flipped = false; break;
-				case rects::wh::fit_status::FITS_INSIDE_FLIPPED:		img.flipped = true; break;
-				case rects::wh::fit_status::FITS_PERFECTLY:			dividable = false; img.flipped = false; return this;
-				case rects::wh::fit_status::FITS_PERFECTLY_FLIPPED:	dividable = false; img.flipped = true;  return this;
+				case rects::wh<int>::fit_status::DOESNT_FIT: return 0;
+				case rects::wh<int>::fit_status::FITS_INSIDE:			    img.flipped = false; break;
+				case rects::wh<int>::fit_status::FITS_INSIDE_FLIPPED:		img.flipped = true; break;
+				case rects::wh<int>::fit_status::FITS_PERFECTLY:			dividable = false; img.flipped = false; return this;
+				case rects::wh<int>::fit_status::FITS_PERFECTLY_FLIPPED:	dividable = false; img.flipped = true;  return this;
 				}
 
 				int iw = (img.flipped ? img.h : img.w), 
@@ -80,7 +80,7 @@ namespace augs {
 			}
 		};
 
-		rects::wh _rect2D(rects::xywhf* const * v, int n, int max_s, vector<rects::xywhf*>* succ, vector<rects::xywhf*>* unsucc) {
+		rects::wh<int> _rect2D(rects::xywhf<int>* const * v, int n, int max_s, vector<rects::xywhf<int>*>* succ, vector<rects::xywhf<int>*>* unsucc) {
 			node root;
 
 			enum {
@@ -92,22 +92,22 @@ namespace augs {
 
 			// just add a function to execute more heuristics
 			const int FUNCS = 5;
-			array<bool(*)(rects::xywhf*, rects::xywhf*), FUNCS> functions = {										
-				[](rects::xywhf* a, rects::xywhf* b){ return a->area() > b->area(); },							/* area */
-				[](rects::xywhf* a, rects::xywhf* b){ return a->perimeter() > b->perimeter(); },				/* perimeter */
-				[](rects::xywhf* a, rects::xywhf* b){ return std::max(a->w, a->h) > std::max(b->w, b->h); },	/* maximum side */
-				[](rects::xywhf* a, rects::xywhf* b){ return a->w > b->w; },									/* maximum width */
-				[](rects::xywhf* a, rects::xywhf* b){ return a->h > b->h; }											/* maximum height */
+			array<bool(*)(rects::xywhf<int>*, rects::xywhf<int>*), FUNCS> functions = {										
+				[](rects::xywhf<int>* a, rects::xywhf<int>* b){ return a->area() > b->area(); },							/* area */
+				[](rects::xywhf<int>* a, rects::xywhf<int>* b){ return a->perimeter() > b->perimeter(); },				/* perimeter */
+				[](rects::xywhf<int>* a, rects::xywhf<int>* b){ return std::max(a->w, a->h) > std::max(b->w, b->h); },	/* maximum side */
+				[](rects::xywhf<int>* a, rects::xywhf<int>* b){ return a->w > b->w; },									/* maximum width */
+				[](rects::xywhf<int>* a, rects::xywhf<int>* b){ return a->h > b->h; }											/* maximum height */
 			};
 
-			vector<rects::xywhf*> order[FUNCS];
+			vector<rects::xywhf<int>*> order[FUNCS];
 
 			for(size_t f = 0; f < functions.size(); ++f) { 
-				order[f] = vector<rects::xywhf*>(v, v+n);
+				order[f] = vector<rects::xywhf<int>*>(v, v+n);
 				sort(order[f].begin(), order[f].end(), functions[f]);
 			}
 
-			rects::wh min_bin = rects::wh(max_s, max_s);
+			rects::wh<int> min_bin = rects::wh<int>(max_s, max_s);
 			int min_func = -1, best_func = 0, best_area = 0, _area = 0, step, step_multiplier, i;
 
 			bool fail = false;
@@ -151,7 +151,7 @@ namespace augs {
 						step /= 2;
 					}
 
-					root.reset(rects::wh(
+					root.reset(rects::wh<int>(
 						root.rc.w() + ((pass == SQUARE || pass == WIDTH  )? step_multiplier*step : 0), 
 						root.rc.h() + ((pass == SQUARE || pass == HEIGHT )? step_multiplier*step : 0)
 						));
@@ -162,7 +162,7 @@ namespace augs {
 				}
 
 				if(!fail && (min_bin.area() >= root.rc.area())) {
-					min_bin = rects::wh(root.rc);
+					min_bin = rects::wh<int>(root.rc);
 					min_func = f;
 				}
 
@@ -175,7 +175,7 @@ namespace augs {
 
 			v = order[min_func == -1 ? best_func : min_func].data();
 
-			float clip_x = 0.f, clip_y = 0.f;
+			int clip_x = 0, clip_y = 0;
 			node* ret;
 
 			root.reset(min_bin);
@@ -197,21 +197,21 @@ namespace augs {
 				}
 				else {
 					if(unsucc) unsucc->push_back(v[i]);
-					else return rects::wh(-1, -1);
+					else return rects::wh<int>(-1, -1);
 
 					v[i]->flipped = false;
 				}
 			}
 
-			return rects::wh(clip_x, clip_y);
+			return rects::wh<int>(clip_x, clip_y);
 		}
 
 
-		int rect2D(rects::xywhf* const * v, int n, int max_s, bin& out_bin) {
-			out_bin.size = rects::wh(max_s, max_s);
+		int rect2D(rects::xywhf<int>* const * v, int n, int max_s, bin& out_bin) {
+			out_bin.size = rects::wh<int>(max_s, max_s);
 
 			for(int i = 0; i < n; ++i) 
-				if(v[i]->fits(out_bin.size) == rects::wh::fit_status::DOESNT_FIT) return 2;
+				if(v[i]->fits(out_bin.size) == rects::wh<int>::fit_status::DOESNT_FIT) return 2;
 
 			out_bin.size = _rect2D(v, n, max_s);
 
@@ -219,20 +219,20 @@ namespace augs {
 			return 0;
 		}
 
-		int rect2D(rects::xywhf* const * v, int n, int max_s, std::vector<bin>& bins) {
+		int rect2D(rects::xywhf<int>* const * v, int n, int max_s, std::vector<bin>& bins) {
 			return rect2D(v, n, max_s, bins, -1);
 		}
 
-		int rect2D(rects::xywhf* const * v, int n, int max_s, vector<bin>& bins, int max_bins) {
-			rects::wh bin_rc(max_s, max_s);
+		int rect2D(rects::xywhf<int>* const * v, int n, int max_s, vector<bin>& bins, int max_bins) {
+			rects::wh<int> bin_rc(max_s, max_s);
 
 			for(int i = 0; i < n; ++i) 
-				if(v[i]->fits(bin_rc) == rects::wh::fit_status::DOESNT_FIT) return 2;
+				if(v[i]->fits(bin_rc) == rects::wh<int>::fit_status::DOESNT_FIT) return 2;
 
-			vector<rects::xywhf*> vec[2], *p[2] = { vec, vec+1 };
+			vector<rects::xywhf<int>*> vec[2], *p[2] = { vec, vec+1 };
 			vec[0].resize(n);
 			vec[1].clear();
-			memcpy(&vec[0][0], v, sizeof(rects::xywhf*)*n);
+			memcpy(&vec[0][0], v, sizeof(rects::xywhf<int>*)*n);
 
 			bin* b = 0;
 

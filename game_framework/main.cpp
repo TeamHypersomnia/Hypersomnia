@@ -17,7 +17,7 @@
 using namespace augs;
 using namespace entity_system;
 
-resources::script* world_reloading_script = nullptr;
+resources::script* world_reloading_script = nullptr; 
 
 window::glwindow* global_window = nullptr;
 script_system::lua_state_wrapper* global_lua_state = nullptr;
@@ -33,7 +33,7 @@ int main() {
 	resources::script::dofile("config.lua");
 
 	window::glwindow gl;
-	gl.create(lua_state, rects::wh(100, 100));
+	gl.create(lua_state, rects::wh<int>(100, 100));
 	gl.set_show(gl.SHOW);
 	gl.vsync(0);
 	window::cursor(false); 
@@ -53,7 +53,7 @@ int main() {
 
 	lua_gc(lua_state, LUA_GCCOLLECT, 0);
 
-	int argc = 0;
+	int argc = 0; 
 	::testing::InitGoogleTest(&argc, (wchar_t**)nullptr);
 
 	::testing::FLAGS_gtest_catch_exceptions = false;
@@ -73,8 +73,18 @@ int main() {
 			}
 		}
 
+		if (luabind::globals(lua_state)["call_once_after_loop"]) {
+			try {
+				luabind::call_function<void>(luabind::globals(lua_state)["call_once_after_loop"]);
+			}
+			catch (std::exception compilation_error) {
+				std::cout << compilation_error.what() << '\n';
+			}
+
+			luabind::globals(lua_state)["call_once_after_loop"] = luabind::nil;
+		}
 		//instance.default_loop();
-	}
+	} 
 
 	augs::deinit();
 	return 0;

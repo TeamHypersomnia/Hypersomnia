@@ -124,7 +124,7 @@ int the_callback(lua_State *L) {
 	std::cout << error_message << std::endl;
 	return 1; 
 }
-
+ 
 void debugger_break() {
 	int breakp = 12;
 	breakp = 0;

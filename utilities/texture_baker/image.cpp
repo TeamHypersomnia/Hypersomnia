@@ -20,10 +20,10 @@ namespace augs {
 		}
 
 		void image::create(int w, int h, int ch) {
-			size = rects::wh(w, h);
+			size = vec2<int>(w, h);
 			channels = ch;
 			v.resize(get_bytes());
-			v.shrink_to_fit();
+			//v.shrink_to_fit();
 		}
 
 		bool image::from_file(const std::wstring& filename, unsigned force_channels) {
@@ -145,7 +145,7 @@ namespace augs {
 			channels = img.channels;
 		}
 
-		void image::copy(unsigned char* ptr, int _channels, int pitch, const rects::wh& size) {
+		void image::copy(unsigned char* ptr, int _channels, int pitch, const rects::wh<int>& size) {
 			create(size.w, size.h, _channels);
 			int wbytes = size.w*_channels;
 
@@ -165,7 +165,7 @@ namespace augs {
 #define SCH(src_ch) (src.flipped ? (img.pix(s_y, s_x, src_ch)) : (img.pix(s_x, s_y, src_ch)))
 
 
-		void image::blit(const image& img, int x, int y, const rects::xywhf& src, bool luminance_to_alpha) {
+		void image::blit(const image& img, int x, int y, const rects::xywhf<int>& src, bool luminance_to_alpha) {
 			int c;
 			if(channels == img.channels) {										   
 				LOOP {
@@ -231,7 +231,7 @@ namespace augs {
 		}
 
 
-		void image::blit_channel(const image& img, int x, int y, const rects::xywhf& src, int ch, int src_ch) {
+		void image::blit_channel(const image& img, int x, int y, const rects::xywhf<int>& src, int ch, int src_ch) {
 			LOOP BCH(ch, src_ch);
 		}
 
@@ -260,7 +260,7 @@ namespace augs {
 			return get_bytes()/get_channels();
 		}
 
-		const rects::wh& image::get_size() const {
+		const rects::wh<int>& image::get_size() const {
 			return size;
 		}
 

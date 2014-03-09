@@ -13,12 +13,12 @@ namespace augs {
 			struct glyph {
 				image img;
 				int adv, bear_x, bear_y;
-				rects::wh size;
+				rects::wh<int> size;
 
 				std::vector<std::pair<unsigned, int> > kerning;
 
 				glyph();
-				glyph(int adv, int bear_x, int bear_y, rects::wh size);
+				glyph(int adv, int bear_x, int bear_y, rects::wh<int> size);
 				glyph(const FT_Glyph_Metrics&);
 			private:
 				friend struct font_file;

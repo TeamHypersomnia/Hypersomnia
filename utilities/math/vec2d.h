@@ -111,12 +111,12 @@ namespace augs {
 		}
 
 		vec2(type x = 0, type y = 0) : x(x), y(y) {}
-		vec2(const rects::wh& r) : x(r.w), y(r.h) {
+		vec2(const rects::wh<type>& r) : x(r.w), y(r.h) {
 			x = static_cast<type>(r.w);
 			y = static_cast<type>(r.h);
 		}
-		vec2(const rects::ltrb& r) : x(r.l), y(r.t) {}
-		vec2(const rects::xywh& r) : x(r.x), y(r.y) {}
+		vec2(const rects::ltrb<type>& r) : x(r.l), y(r.t) {}
+		vec2(const rects::xywh<type>& r) : x(r.x), y(r.y) {}
 
 		operator b2Vec2() const {
 			b2Vec2 t;

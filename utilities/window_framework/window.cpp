@@ -200,13 +200,13 @@ namespace augs {
 			return std::wstring(ss.begin(), ss.end());
 		}
 
-		bool glwindow::create(lua_State* L, rects::wh force_minimum_resolution, int _menu) {
+		bool glwindow::create(lua_State* L, rects::wh<int> force_minimum_resolution, int _menu) {
 			luabind::object cfg = luabind::globals(L)["config_table"];
 			luabind::object my_object = cfg["fullscreen"];
 
 			if (luabind::object_cast<int>(my_object)) {
 				auto r = get_display();
-				return create(rects::xywh(0,0, r.w,r.h), 
+				return create(rects::xywh<int>(0,0, r.w,r.h), 
 					luabind::object_cast<int>(cfg["window_border"]) > 0 ? _menu : 0,
 					to_wstr(luabind::object_cast<std::string>(cfg["window_name"])).c_str(),
 					luabind::object_cast<int>(cfg["doublebuffer"]) > 0,
@@ -214,10 +214,10 @@ namespace augs {
 					);
 			}
 			else {
-				return create(rects::xywh(luabind::object_cast<int>(cfg["window_x"]),
+				return create(rects::xywh<int>(luabind::object_cast<int>(cfg["window_x"]),
 					luabind::object_cast<int>(cfg["window_y"]),
-					std::max(force_minimum_resolution.w, luabind::object_cast<float>(cfg["resolution_w"])),
-					std::max(force_minimum_resolution.h, luabind::object_cast<float>(cfg["resolution_h"]))),
+					std::max(force_minimum_resolution.w, int(luabind::object_cast<float>(cfg["resolution_w"]))),
+					std::max(force_minimum_resolution.h, int(luabind::object_cast<float>(cfg["resolution_h"])))),
 					luabind::object_cast<int>(cfg["window_border"]) > 0 ? _menu : 0,
 					to_wstr(luabind::object_cast<std::string>(cfg["window_name"])).c_str(),
 					luabind::object_cast<int>(cfg["doublebuffer"]) > 0,
@@ -226,7 +226,7 @@ namespace augs {
 			}
 		}
 
-		bool glwindow::create(const rects::xywh& crect, int _menu, const wchar_t* _name, 
+		bool glwindow::create(const rects::xywh<int>& crect, int _menu, const wchar_t* _name, 
 				bool doublebuffer, int _bpp) {
 			int f = 1;
 			menu = _menu; bpp = _bpp; doublebuf = doublebuffer; name = _name;
@@ -342,27 +342,27 @@ namespace augs {
 		}
 
 		
-		void glwindow::set_minimum_size(rects::wh r) {
+		void glwindow::set_minimum_size(rects::wh<int> r) {
 			if(!r.good()) r = get_window_rect();
 			cminw = r.w;
 			cminh = r.h;
-			rects::xywh rc = r;
+			rects::xywh<int> rc = r;
 			adjust(rc);
 			minw = rc.w;
 			minh = rc.h;
 		}
 
-		void glwindow::set_maximum_size(rects::wh r) {
+		void glwindow::set_maximum_size(rects::wh<int> r) {
 			if(!r.good()) r = get_window_rect();
 			cmaxw = r.w;
 			cmaxh = r.h;
-			rects::xywh rc = r;
+			rects::xywh<int> rc = r;
 			adjust(rc);
 			maxw = rc.w;
 			maxh = rc.h;
 		}
 
-		bool glwindow::set_window_rect(const rects::xywh& r) {
+		bool glwindow::set_window_rect(const rects::xywh<int>& r) {
 			static RECT wr = {0};
 			int f = 1;
 			errf(SetRect(&wr, r.x, r.y, r.r(), r.b()), f);
@@ -371,7 +371,7 @@ namespace augs {
 			return f != 0;
 		}
 
-		bool glwindow::set_adjusted_rect(const rects::xywh& r) {
+		bool glwindow::set_adjusted_rect(const rects::xywh<int>& r) {
 			return err(MoveWindow(hwnd, r.x, r.y, r.w, r.h, TRUE)) != FALSE;
 		}
 
@@ -388,39 +388,39 @@ namespace augs {
 			return SetWindowText(hwnd, name);
 		}
 
-		rects::wh glwindow::get_minimum_size() const {
-			return rects::wh(cminw, cminh);
+		rects::wh<int> glwindow::get_minimum_size() const {
+			return rects::wh<int>(cminw, cminh);
 		} 
 
-		rects::wh glwindow::get_maximum_size() const {
-			return rects::wh(cmaxw, cmaxh);
+		rects::wh<int> glwindow::get_maximum_size() const {
+			return rects::wh<int>(cmaxw, cmaxh);
 		}
 
-		rects::wh glwindow::get_screen_rect() const {
-			return rects::wh(get_window_rect().w, get_window_rect().h);
+		rects::wh<int> glwindow::get_screen_rect() const {
+			return rects::wh<int>(get_window_rect().w, get_window_rect().h);
 		}
 		
-		rects::xywh glwindow::get_window_rect() const {
+		rects::xywh<int> glwindow::get_window_rect() const {
 			static RECT r;
 			GetClientRect(hwnd, &r);
 			ClientToScreen(hwnd, (POINT*)&r);
 			ClientToScreen(hwnd, (POINT*)&r + 1);
-			return rects::ltrb(r.left, r.top, r.right, r.bottom);
+			return rects::ltrb<int>(r.left, r.top, r.right, r.bottom);
 		}
 
-		rects::xywh glwindow::get_adjusted_rect() const {
+		rects::xywh<int> glwindow::get_adjusted_rect() const {
 			static RECT r;
 			GetWindowRect(hwnd, &r);
-			return rects::ltrb(r.left, r.top, r.right, r.bottom);
+			return rects::ltrb<int>(r.left, r.top, r.right, r.bottom);
 		}
 
-		void glwindow::adjust(rects::xywh& rc) {
+		void glwindow::adjust(rects::xywh<int>& rc) {
 			static RECT wr;
 			SetRect(&wr,0,0,rc.w,rc.h);
 			
 			errs(AdjustWindowRectEx(&wr, style, FALSE, exstyle), "Failed to adjust window rect");
 
-			rc = rects::ltrb(wr.left, wr.top, wr.right, wr.bottom);
+			rc = rects::ltrb<int>(wr.left, wr.top, wr.right, wr.bottom);
 		}
 		
 		HWND glwindow::get_hwnd() const {
@@ -477,10 +477,10 @@ namespace augs {
 			return ChangeDisplaySettings(&screen,CDS_FULLSCREEN) == DISP_CHANGE_SUCCESSFUL;
 		}
 
-		rects::xywh get_display() {
+		rects::xywh<int> get_display() {
 			static RECT rc;
 			GetWindowRect(GetDesktopWindow(), &rc);
-			return rects::xywh(rc.left,rc.top,rc.right-rc.left,rc.bottom-rc.top);
+			return rects::xywh<int>(rc.left,rc.top,rc.right-rc.left,rc.bottom-rc.top);
 		}
 
 		int get_refresh_rate() {

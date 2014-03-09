@@ -84,7 +84,7 @@ void camera_system::process_entities(world& owner) {
 				camera.last_interpolant.rotation = camera.last_interpolant.rotation * averaging_constant + transform.rotation * (1.0f - averaging_constant);
 					
 					auto interp = [](float& a, float& b, float averaging_constant){
-						a = static_cast<int>(a * averaging_constant + b * (1.0f - averaging_constant));
+						a = static_cast<float>(a * averaging_constant + b * (1.0f - averaging_constant));
 					};
 
 					interp(camera.last_ortho_interpolant.x, camera.size.x, averaging_constant);
@@ -120,7 +120,7 @@ void camera_system::process_rendering(world& owner) {
 
 			resources::renderable::draw_input in;
 			in.rotated_camera_aabb =
-				rects::ltrb::get_aabb_rotated(camera.rendered_size, drawn_transform.rotation) + drawn_transform.pos - camera.rendered_size / 2;
+				rects::ltrb<float>::get_aabb_rotated(camera.rendered_size, drawn_transform.rotation) + drawn_transform.pos - camera.rendered_size / 2;
 			in.camera_transform = drawn_transform;
 			in.output = &raw_renderer;
 			in.visible_area = camera.rendered_size;

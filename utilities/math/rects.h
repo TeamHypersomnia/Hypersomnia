@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <sstream>
+#include <algorithm>
 // trzeba usprawnic rect2D - rozszerzyc max_size na wh bo z samego max_s: wielkie prostokaty rozpychaja kwadrat a male wykorzystuja miejsce na dole
 
 struct b2Vec2;
@@ -14,16 +15,17 @@ namespace augs {
 
 	/* faciliates operations on rectangles and points */
 	namespace rects {
-		struct wh;
-		struct ltrb;
-		struct xywh;
+		template <class T> struct wh;
+		template <class T> struct ltrb;
+		template <class T> struct xywh;
 
+		template <class T>
 		struct wh {
 			template<typename type>
-			wh(const vec2<type>& rr) : w(static_cast<float>(rr.x)), h(static_cast<float>(rr.y)) {}
-			wh(const ltrb&);
-			wh(const xywh&);
-			wh(float w = 0, float h = 0);
+			wh(const vec2<type>& rr) : w(static_cast<T>(rr.x)), h(static_cast<T>(rr.y)) {}
+			wh(const ltrb<T>& rr) : w(rr.w()), h(rr.h()) {}
+			wh(const xywh<T>& rr) : w(rr.w), h(rr.h) {}
+			wh(T w = 0, T h = 0) : w(w), h(h) {}
 
 			enum class fit_status {
 				DOESNT_FIT,
@@ -31,33 +33,131 @@ namespace augs {
 				FITS_INSIDE_FLIPPED,
 				FITS_PERFECTLY,
 				FITS_PERFECTLY_FLIPPED
-			} fits(const wh& bigger) const;
+			} fits(const wh& r) const {
+				if (w == r.w && h == r.h) return fit_status::FITS_PERFECTLY;
+				if (h == r.w && w == r.h) return fit_status::FITS_PERFECTLY_FLIPPED;
+				if (w <= r.w && h <= r.h) return fit_status::FITS_INSIDE;
+				if (h <= r.w && w <= r.h) return fit_status::FITS_INSIDE_FLIPPED;
+				return fit_status::DOESNT_FIT;
+			}
 
-			float w,h, area() const, perimeter() const, max_side() const;
-			void stick_relative(const wh& content, vec2<float>& scroll) const;
-			bool is_sticked(const wh& content, vec2<float>& scroll) const;
-			bool inside(const wh& bigger) const;
-
-			bool good() const;
+			T w, h;
 			
-			//wh& operator/=(float d) { w /= d; h /= d; return *this; }
-			//wh& operator/=(float d) { w /= d; h /= d; return *this; }
-			wh operator*(float) const;
-			bool operator==(const wh&) const;
+			void stick_relative(const wh& content, vec2<T>& scroll) const {
+				scroll.x = std::min(scroll.x, T(content.w - w));
+				scroll.x = std::max(scroll.x, 0.f);
+				scroll.y = std::min(scroll.y, T(content.h - h));
+				scroll.y = std::max(scroll.y, 0.f);
+			}
+
+			bool inside(const wh& rc) const {
+				return w <= rc.w && h <= rc.h;
+			}
+
+			bool is_sticked(const wh& content, vec2<T>& scroll) const {
+				return scroll.x >= 0.f && scroll.x <= content.w - w && scroll.y >= 0 && scroll.y <= content.h - h;
+			}
+
+			bool good() const {
+				return w > 0 && h > 0;
+			}
+
+			wh operator*(T s) const {
+				return wh(T(w*s), T(h*s));
+			}
+
+			bool operator==(const wh& r) const {
+				return w == r.w && h == r.h;
+			}
+
+			T area() const {
+				return w*h;
+			}
+
+			T perimeter() const {
+				return 2 * w + 2 * h;
+			}
+
+			T max_side() const {
+				return std::max(w, h);
+			}
 		};
 		
+		template <class T>
 		struct ltrb {
-			ltrb();
-			ltrb(const wh&);
-			ltrb(const xywh&);
-			ltrb(float left, float top, float right, float bottom);
-			ltrb(const vec2<float>&, const wh& = wh());
+			T l, t, r, b;
 
-			void contain(const ltrb& smaller);
-			void contain_positive(const ltrb& smaller);
+			ltrb() : l(0), t(0), r(0), b(0) {}
+			ltrb(const wh<T>& rr) : l(0), t(0), r(rr.w), b(rr.h) {}
+			ltrb(const xywh<T>& rr) : l(rr.x), t(rr.y), r(rr.x + rr.w), b(rr.y + rr.h) {}
+			ltrb(T l, T t, T r, T b) : l(l), t(t), r(r), b(b) {}
 
-			bool clip(const ltrb& bigger);
-			
+			T perimeter() const {
+				return 2 * w() + 2 * h();
+			}
+
+			T max_side() const {
+				return std::max(w(), h());
+			}
+
+			void contain(const ltrb& rc) {
+				l = std::min(l, rc.l);
+				t = std::min(t, rc.t);
+				contain_positive(rc);
+			}
+
+			void contain_positive(const ltrb& rc) {
+				r = std::max(r, rc.r);
+				b = std::max(b, rc.b);
+			}
+
+			bool clip(const ltrb& rc) {
+				if (l >= rc.r || t >= rc.b || r <= rc.l || b <= rc.t) {
+					*this = ltrb();
+					return false;
+				}
+				*this = ltrb(std::max(l, rc.l),
+					std::max(t, rc.t),
+					std::min(r, rc.r),
+					std::min(b, rc.b));
+				return true;
+			}
+
+			bool hover(const ltrb& rc) const {
+				return !(l >= rc.r || t >= rc.b || r <= rc.l || b <= rc.t);
+			}
+
+			bool hover(const xywh<T>& rc) const {
+				return hover(ltrb(rc));
+			}
+
+			bool inside(const ltrb& rc) const {
+				return l >= rc.l && r <= rc.r && t >= rc.t && b <= rc.b;
+			}
+
+			bool stick_x(const ltrb& rc) {
+				vec2<T> offset(0, 0);
+				if (l < rc.l) offset.x += rc.l - l;
+				if (r > rc.r) offset.x += rc.r - r;
+				operator+=(offset);
+
+				return offset.x == 0;
+			}
+
+			bool stick_y(const ltrb& rc) {
+				vec2<T> offset(0, 0);
+				if (t < rc.t) offset.y += rc.t - t;
+				if (b > rc.b) offset.y += rc.b - b;
+				operator+=(offset);
+
+				return offset.y == 0;
+			}
+
+			vec2<T> center() const {
+				return vec2<T>(l + w() / 2.f, t + h() / 2.f);
+			}
+
+
 			template <typename T>
 			bool hover(const vec2<T>& m) const {
 				return m.x >= l && m.y >= t && m.x <= r && m.y <= b;
@@ -78,18 +178,18 @@ namespace augs {
 					static_cast<T>(std::max_element(v, v + 4, y_pred)->y)
 					);
 
-				return rects::ltrb(lower.x, lower.y, upper.x, upper.y);
+				return rects::ltrb<T>(lower.x, lower.y, upper.x, upper.y);
 			}
 
-			template <class T = float>
+			template <class T>
 			static ltrb get_aabb_rotated(vec2<T> initial_size, T rotation) {
-				auto verts = rects::ltrb(0, 0, initial_size.x, initial_size.y).get_vertices<float>();
+				auto verts = rects::ltrb<T>(0, 0, initial_size.x, initial_size.y).get_vertices<T>();
 
 				for (auto& v : verts)
 					v.rotate(rotation, initial_size / 2);
 
 				/* expanded aabb that takes rotation into consideration */
-				return rects::ltrb::get_aabb<float>(verts.data());
+				return get_aabb<T>(verts.data());
 			}
 
 			template <class T>
@@ -102,18 +202,6 @@ namespace augs {
 				return std::move(out);
 			}
 
-			bool hover(const ltrb&) const;
-			bool hover(const xywh&) const;
-			bool inside(const ltrb& bigger) const;
-			
-			bool stick_x(const ltrb& bigger);
-			bool stick_y(const ltrb& bigger);
-			
-			vec2<float> center() const;
-			void center_x(float x);
-			void center_y(float y);
-			void center(const vec2<float>&);
-
 			template <typename type>
 			void snap_point(vec2<type>& v) const {
 				if (v.x < l) v.x = static_cast<type>(l);
@@ -122,89 +210,183 @@ namespace augs {
 				if (v.y > b) v.y = static_cast<type>(b);
 			}
 
-			float l, t, r, b, w() const, h() const, area() const, perimeter() const, max_side() const; // false - null rectangle
-			void x(float), y(float), w(float), h(float);
-			bool good() const;
+			T w() const {
+				return r - l;
+			}
+			
+			T h() const {
+				return b - t;
+			}
+
+			T area() const {
+				return w()*h();
+			}
+
+			void center_x(T c) {
+				T _w = w();
+				l = c - _w / 2;
+				r = l + _w;
+			}
+
+			void center_y(T c) {
+				T _h = h();
+				t = c - _h / 2;
+				b = t + _h;
+			}
+
+			void center(const vec2<T>& c) {
+				center_x(c.x);
+				center_y(c.y);
+			}
+
+			void x(T xx) {
+				*this += (vec2<T>(xx - l, 0));
+			}
+
+			void y(T yy) {
+				*this += (vec2<T>(0, yy - t));
+			}
+
+			void w(T ww) {
+				r = l + ww;
+			}
+
+			void h(T hh) {
+				b = t + hh;
+			}
+
+			bool good() const {
+				return w() > 0 && h() > 0;
+			}
 
 			template <class P>
 			ltrb& operator+=(const P& p) {
-				l += float(p.x);
-				t += float(p.y);
-				r += float(p.x);
-				b += float(p.y);
+				l += T(p.x);
+				t += T(p.y);
+				r += T(p.x);
+				b += T(p.y);
 				return *this;
 			}
-			
+		
 			template <class P>
 			ltrb operator-(const P& p) const {
-				return ltrb(l - float(p.x), t - float(p.y), r - float(p.x), b - float(p.y));
+				return ltrb(l - T(p.x), t - T(p.y), r - T(p.x), b - T(p.y));
 			}
 
 			template <class P>
 			ltrb operator+(const P& p) const {
-				return ltrb(l + float(p.x), t + float(p.y), r + float(p.x), b + float(p.y));
+				return ltrb(l + T(p.x), t + T(p.y), r + T(p.x), b + T(p.y));
 			}
 		};
 
-		struct xywh : public wh {
-			xywh();
-			xywh(const wh&);
-			xywh(const ltrb&);
-			xywh(float x, float y, float width, float height);
-			xywh(float x, float y, const wh&);
-			xywh(const vec2<float>&, const wh&);
-			
-			bool clip(const xywh& bigger); // false - null rectangle
-			bool hover(const vec2<float>& mouse);
-			bool hover(const xywh&);
-			bool hover(const ltrb&);
+		template <class T>
+		struct xywh : public wh<T> {
+			xywh() : x(0), y(0) {}
+			xywh(const wh& rr) : x(0), y(0), wh(rr) {}
+			xywh(const ltrb<T>& rc) : x(rc.l), y(rc.t) { b(rc.b); r(rc.r); }
+			xywh(T x, T y, T w, T h) : x(x), y(y), wh(w, h) {}
+			xywh(T x, T y, const wh& r) : x(x), y(y), wh(r) {}
+			xywh(const vec2<T>& p, const wh& r) : x(p.x), y(p.y), wh(r) {}
 
-			float x, y, r() const, b() const;
-			void r(float), b(float);
+			bool clip(const xywh& rc) {
+				if (x >= rc.r() || y >= rc.b() || r() <= rc.x || b() <= rc.y) {
+					*this = xywh();
+					return false;
+				}
+				*this = ltrb(std::max(x, rc.x),
+					std::max(y, rc.y),
+					std::min(r(), rc.r()),
+					std::min(b(), rc.b()));
+				return true;
+			}
+
+			bool hover(const vec2<T>& m) {
+				return m.x >= x && m.y >= y && m.x <= r() && m.y <= b();
+			}
+
+			bool hover(const ltrb<T>& rc) {
+				return rc.hover(*this);
+			}
+
+			bool hover(const xywh& rc) {
+				return ltrb(rc).hover(*this);
+			}
+
+			T r() const {
+				return x + w;
+			};
+
+			T b() const {
+				return y + h;
+			}
+
+			void r(T right) {
+				w = right - x;
+			}
+
+			void b(T bottom) {
+				h = bottom - y;
+			}
 			
-			bool operator==(const xywh&) const;
+			T x, y;
+
+			bool operator==(const xywh& r) const {
+				return x == r.x && y == r.y && wh<T>::operator==(r);
+			}
 
 			template <class P>
 			xywh& operator+=(const P& p) {
-				x += float(p.x);
-				y += float(p.y);
+				x += T(p.x);
+				y += T(p.y);
 				return *this;
 			}
 			
 			template <class P>
 			xywh operator-(const P& p) const {
-				return xywh(x - float(p.x), y - float(p.y), w, h);
+				return xywh(x - T(p.x), y - T(p.y), w, h);
 			}
 
 			template <class P>
 			xywh operator+(const P& p) const {
-				return xywh(x + float(p.x), y + float(p.y), w, h);
+				return xywh(x + T(p.x), y + T(p.y), w, h);
 			}
 		};
 		
-		struct xywhf : public xywh {
-			xywhf(const wh  &);
-			xywhf(const ltrb&);
-			xywhf(const xywh&);
-			xywhf(float x, float y, float width, float height, bool flipped = false);
-			xywhf();
-			void flip();
-			xywh rc() const;
+		template <class T>
+		struct xywhf : public xywh<T> {
+			xywhf(const ltrb<T>& rr) : xywh(rr), flipped(false) {}
+			xywhf(const xywh<T>& rr) : xywh(rr), flipped(false) {}
+			xywhf(const wh<T>  & rr) : xywh(rr), flipped(false) {}
+			xywhf(T x, T y, T width, T height, bool flipped) : xywh(x, y, width, height), flipped(flipped) {}
+			xywhf() : flipped(false) {}
+
+			void flip() {
+				flipped = !flipped;
+				std::swap(w, h);
+			}
+
+			xywh<T> rc() const {
+				return xywh<T>(x, y, flipped ? h : w, flipped ? w : h);
+			}
+
 			bool flipped;
 		};
 
+		template <class T>
 		struct texture {
-			float u1, v1, u2, v2;
-			texture(float u1 = 1.0, float v1 = 1.0, float u2 = 1.0, float v2 = 1.0);
+			T u1, v1, u2, v2;
+			texture(T u1 = 1.0, T v1 = 1.0, T u2 = 1.0, T v2 = 1.0) : u1(u1), v1(v1), u2(u2), v2(v2) {}
 		};
 
+		template <class T>
 		struct point_texture {
-			float u, v;
+			T u, v;
 		};
 
-		extern std::wostream& operator<<(std::wostream&, const vec2<int>&);
-		extern std::wostream& operator<<(std::wostream&, const vec2<float>&);
-		extern std::ostream& operator<<(std::ostream&, const vec2<int>&);
-		extern std::ostream& operator<<(std::ostream&, const vec2<float>&);
+		template <class T>
+		extern std::wostream& operator<<(std::wostream&, const vec2<T>&);
+
+		template <class T>
+		extern std::ostream& operator<<(std::ostream&, const vec2<T>&);
 	}
 }

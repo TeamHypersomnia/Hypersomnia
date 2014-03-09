@@ -25,7 +25,7 @@ namespace resources {
 			components::render* additional_info;
 			augs::vec2<> visible_area;
 
-			augs::rects::ltrb rotated_camera_aabb;
+			augs::rects::ltrb<float> rotated_camera_aabb;
 
 			draw_input() : output(nullptr), additional_info(nullptr) {}
 		};

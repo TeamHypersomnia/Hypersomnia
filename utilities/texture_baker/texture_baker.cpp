@@ -18,14 +18,14 @@ namespace augs {
 
 		void texture::set(image* _img) {
 			img = _img;
-			rect = rects::xywhf(img->get_size());
+			rect = rects::xywhf<int>(img->get_size());
 		}
 
 		void texture::luminosity_to_alpha(bool flag) {
 			ltoa = flag;
 		}
 
-		rects::xywhf texture::get_rect() const {
+		rects::xywhf<int> texture::get_rect() const {
 			return rect;
 		}
 
@@ -90,7 +90,7 @@ namespace augs {
 			h *= v_scalar;
 		}
 
-		void texture::get_uv(const rects::texture& uv, rects::texture& out) const {
+		void texture::get_uv(const rects::texture<float> &uv, rects::texture<float>& out) const {
 			get_uv(uv.u1, uv.v1, out.u1, out.v1);
 			get_uv(uv.u2, uv.v2, out.u2, out.v2);
 		}
@@ -127,7 +127,7 @@ namespace augs {
 			int cnt = textures.size();
 			ptr_arr.reserve(cnt);
 
-			rects::xywhf** p = ptr_arr.data();
+			rects::xywhf<int>** p = ptr_arr.data();
 
 			for(int i = 0; i < cnt; ++i)
 				p[i] = &textures[i]->rect;
@@ -151,10 +151,10 @@ namespace augs {
 			img.create(b.size.w, b.size.h, atlas_channels);
 			img.fill(pixel);
 
-			rects::xywhf rc;
+			rects::xywhf<int> rc;
 			for(unsigned i = 0; i < textures.size(); ++i) {
 				rc = textures[i]->get_rect();
-				img.blit(*textures[i]->img, rc.x, rc.y, rects::xywhf(0, 0, rc.w, rc.h, rc.flipped), textures[i]->ltoa);  
+				img.blit(*textures[i]->img, rc.x, rc.y, rects::xywhf<int>(0, 0, rc.w, rc.h, rc.flipped), textures[i]->ltoa);  
 
 				if(destroy_images)
 					textures[i]->img->destroy();

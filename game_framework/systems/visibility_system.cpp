@@ -144,7 +144,7 @@ void visibility_system::process_entities(world& owner) {
 			aabb.lowerBound = position_meters - vision_side_meters / 2;
 			aabb.upperBound = position_meters + vision_side_meters / 2;
 
-			rects::ltrb ltrb(aabb.lowerBound.x, aabb.lowerBound.y, aabb.upperBound.x, aabb.upperBound.y);
+			rects::ltrb<float> ltrb(aabb.lowerBound.x, aabb.lowerBound.y, aabb.upperBound.x, aabb.upperBound.y);
 
 			auto& push_vertex = [position_meters, ltrb](vec2<> v, bool check_against_aabb){
 				/* don't bother if it does not hover the aabb */
@@ -336,7 +336,7 @@ void visibility_system::process_entities(world& owner) {
 			}
 			
 			/* process all raycast inputs at once to improve cache coherency */
-			for (int j = 0; j < all_ray_inputs.size(); ++j) {
+			for (size_t j = 0; j < all_ray_inputs.size(); ++j) {
 				all_ray_outputs.push_back(std::make_pair(
 					physics.ray_cast(position_meters, all_ray_inputs[j].targets[0], request.filter, it),
 					all_vertices_transformed[j].is_on_a_bound ? 

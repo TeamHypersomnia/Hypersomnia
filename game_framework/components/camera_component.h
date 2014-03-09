@@ -13,7 +13,7 @@ class gun_system;
 
 namespace components {
 	struct camera : public augs::entity_system::component {
-		augs::rects::xywh screen_rect;
+		augs::rects::xywh<float> screen_rect;
 		augs::vec2<> size;
 
 		unsigned layer;
@@ -41,7 +41,7 @@ namespace components {
 
 		augs::entity_system::entity_ptr player, crosshair;
 
-		camera(augs::rects::xywh screen_rect = augs::rects::xywh(), augs::vec2<> size = augs::vec2<>(),
+		camera(augs::rects::xywh<float> screen_rect = augs::rects::xywh<float>(), augs::vec2<> size = augs::vec2<>(),
 			unsigned layer = 0, unsigned mask = 0,
 			double smoothing_average_factor = 0.004, double averages_per_sec = 60.0) :
 			screen_rect(screen_rect), size(size), layer(layer), mask(mask), enabled(true), orbit_mode(NONE), player(nullptr), crosshair(nullptr),

@@ -41,7 +41,7 @@ namespace augs {
 		
 		if(to_initialize & GLEW) {
 			window::glwindow dummy;
-			dummy.create(rects::xywh(10, 10, 200, 200));
+			dummy.create(rects::xywh<int>(10, 10, 200, 200));
 			
 			glewExperimental = FALSE;
 			errsl((error_logging::glew_last_errorcode = glewInit()) == GLEW_OK, glew_errors, L"Failed to initialize GLEW");

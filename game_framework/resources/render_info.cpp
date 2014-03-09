@@ -94,7 +94,7 @@ namespace resources {
 	void sprite::draw(draw_input& in) {
 		vec2<> v[4];
 		make_rect(in.transform.pos, vec2<>(size), in.transform.rotation, v);
-		if (!rects::ltrb::get_aabb(v).hover(in.rotated_camera_aabb)) return;
+		if (!rects::ltrb<float>::get_aabb(v).hover(in.rotated_camera_aabb)) return;
 
 		if (tex == nullptr) return;
 
@@ -172,7 +172,7 @@ namespace resources {
 
 	void polygon::add_concave(const concave& original_polygon) {
 		if (original_polygon.vertices.empty()) return;
-		int i1, i2;
+		size_t i1, i2;
 
 		auto polygon = original_polygon;
 
@@ -217,7 +217,7 @@ namespace resources {
 			for (int i = 0; i < 3; ++i) {
 				auto new_tri_point = out.GetPoint(i);
 
-				for (int j = offset; j < polygon.vertices.size(); ++j) {
+				for (size_t j = offset; j < polygon.vertices.size(); ++j) {
 					if (polygon.vertices[j].pos.compare(vec2<>(new_tri_point.x, -new_tri_point.y), 1.f)) {
 						indices.push_back(j);
 						break;
@@ -279,7 +279,7 @@ namespace resources {
 				);
 
 			/* only if the triangle is visible should we render the indices */
-			if (rects::ltrb(lower.x, lower.y, upper.x, upper.y).hover(in.rotated_camera_aabb)) {
+			if (rects::ltrb<float>(lower.x, lower.y, upper.x, upper.y).hover(in.rotated_camera_aabb)) {
 				visible_indices.push_back(indices[i]);
 				visible_indices.push_back(indices[i + 1]);
 				visible_indices.push_back(indices[i + 2]);

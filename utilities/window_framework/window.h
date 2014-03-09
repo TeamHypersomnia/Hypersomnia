@@ -28,7 +28,7 @@ namespace augs {
 			MSG wmsg;
 			RECT srect;
 
-			float minw, minh, maxw, maxh, cminw, cminh, cmaxw, cmaxh;
+			int minw, minh, maxw, maxh, cminw, cminh, cmaxw, cmaxh;
 			int bpp, style, exstyle, menu, vsyn;
 			
 			const wchar_t* name;
@@ -68,7 +68,7 @@ namespace augs {
 			NEVER EVER PASS ~RESIZABLE!
 			if you do so, adjustwindowrectex
 			*/
-			bool create(const rects::xywh& client_rectangle, int _menu = ALL, const wchar_t* name = L"Window", bool doublebuffer = true, int bitsperpixel = 24),
+			bool create(const rects::xywh<int>& client_rectangle, int _menu = ALL, const wchar_t* name = L"Window", bool doublebuffer = true, int bitsperpixel = 24),
 				/*
 				example:
 				string window_name Window
@@ -81,7 +81,7 @@ namespace augs {
 				int doublebuffer 1
 				int bpp 24
 				*/
-				create(lua_State*, rects::wh force_minimum_resolution, int _menu = ALL),
+				create(lua_State*, rects::wh<int> force_minimum_resolution, int _menu = ALL),
 			     swap_buffers(), 
 				 focus_keyboard(), 
 				 current(),
@@ -91,28 +91,28 @@ namespace augs {
 #endif
 			bool poll_events(event::message& out);
 
-			void set_minimum_size(rects::wh = rects::wh()),
-			     set_maximum_size(rects::wh = rects::wh());
-			bool set_window_rect(const rects::xywh&),
-			     set_adjusted_rect(const rects::xywh&),
+			void set_minimum_size(rects::wh<int> = rects::wh<int>()),
+			     set_maximum_size(rects::wh<int> = rects::wh<int>());
+			bool set_window_rect(const rects::xywh<int>&),
+			     set_adjusted_rect(const rects::xywh<int>&),
 			     set_show(mode);
 			int  set_caption(const wchar_t*);
 
 			mode get_show() const;
 			const wchar_t* get_caption() const;
 
-			rects::wh 
+			rects::wh<int> 
 				get_minimum_size() const, 
 				get_maximum_size() const,
 				get_screen_rect() const;
-			rects::xywh
+			rects::xywh<int>
 				get_window_rect() const,
 				get_adjusted_rect() const;
 
 			int get_vsync() const;
 			bool is_menu() const, is_transparent() const, is_active() const, is_doublebuffered() const;
 			
-			void adjust(rects::xywh&);
+			void adjust(rects::xywh<int>&);
 
 			HWND get_hwnd() const;
 
@@ -122,7 +122,7 @@ namespace augs {
 
 
 		extern bool set_display(int width, int height, int bpp);
-		extern rects::xywh get_display();
+		extern rects::xywh<int> get_display();
 		extern int get_refresh_rate();
 		extern void warp_cursor(int x, int y);
 		extern void cursor(bool flag);

@@ -18,7 +18,7 @@ namespace augs {
 		class texture {
 			friend class atlas;
 			image* img;
-			rects::xywhf rect;
+			rects::xywhf<int> rect;
 			float x, y, w, h;
 			bool ltoa;
 
@@ -30,12 +30,12 @@ namespace augs {
 			void set(image* img);
 			void luminosity_to_alpha(bool);
 
-			rects::xywhf get_rect() const;
+			rects::xywhf<int> get_rect() const;
 			vec2<int> get_size() const;
 
 			void translate_uv(vec2<float> pixels);
 			void scale_uv(float u_scalar, float v_scalar);
-			void get_uv(const rects::texture& uv, rects::texture& out) const;
+			void get_uv(const rects::texture<float>& uv, rects::texture<float>& out) const;
 			void get_uv(float u, float v, float& u_out, float& v_out) const;
 			void get_uv(vec2<float>& texture_space) const;
 
@@ -51,7 +51,7 @@ namespace augs {
 			static unsigned current;
 			unsigned id;
 			bool mipmaps, lin, rep, built;
-			std::vector<rects::xywhf*> ptr_arr; // for reallocations
+			std::vector<rects::xywhf<int>*> ptr_arr; // for reallocations
 			packing::bin b;
 			float adder, mult;
 
