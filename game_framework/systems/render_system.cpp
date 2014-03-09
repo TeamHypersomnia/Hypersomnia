@@ -22,9 +22,6 @@ render_system::render_system(window::glwindow& output_window)
 {
 	output_window.current();
 
-	scene_fbo.create(output_window.get_screen_rect().w, output_window.get_screen_rect().h);
-	postprocess_fbo.create(output_window.get_screen_rect().w, output_window.get_screen_rect().h);
-
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);

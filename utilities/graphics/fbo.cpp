@@ -42,9 +42,14 @@ namespace augs {
 				0);                    // 5. mipmap level: 0(base)
 
 			// check FBO status
-			GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-			if (status != GL_FRAMEBUFFER_COMPLETE)
-				std::cout << "an error occured during FBO creation" << std::endl;
+			while (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+				int waiting = 24;
+				std::cout << "waiting";
+			} 
+
+			//GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+			//if (status == GL_FRAMEBUFFER_COMPLETE)
+			//	std::cout << "an error occured during FBO creation" << std::endl;
 		}
 
 		void fbo::use() {
@@ -73,13 +78,16 @@ namespace augs {
 		}
 
 		void fbo::destroy() {
-			created = false;
-			width = 0;
-			height = 0;
-			fboId = 0;
-			textureId = 0;
-			glDeleteFramebuffers(1, &fboId);
-			glDeleteTextures(1, &textureId);
+			if (created) {
+				glDeleteFramebuffers(1, &fboId);
+				glDeleteTextures(1, &textureId);
+
+				created = false;
+				width = 0;
+				height = 0;
+				fboId = 0;
+				textureId = 0;
+			}
 		}
 
 		fbo::~fbo() {

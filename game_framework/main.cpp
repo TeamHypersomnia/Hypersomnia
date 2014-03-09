@@ -17,13 +17,13 @@
 using namespace augs;
 using namespace entity_system;
 
-resources::script* world_reloading_script = nullptr; 
+resources::script* world_reloading_script = nullptr;  
 
 window::glwindow* global_window = nullptr;
 script_system::lua_state_wrapper* global_lua_state = nullptr;
 
 int main() {    
-	augs::init();	
+	augs::init();	 
 	script_system::lua_state_wrapper lua_state;
 	script_system::generate_lua_state(lua_state);
 
@@ -53,7 +53,7 @@ int main() {
 
 	lua_gc(lua_state, LUA_GCCOLLECT, 0);
 
-	int argc = 0; 
+	int argc = 0;
 	::testing::InitGoogleTest(&argc, (wchar_t**)nullptr);
 
 	::testing::FLAGS_gtest_catch_exceptions = false;

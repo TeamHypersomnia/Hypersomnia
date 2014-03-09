@@ -69,7 +69,9 @@ namespace augs {
 		int shader_program::currently_used_program = 0;
 
 		shader_program::shader_program() : id(0u), created(false), built(false) {}
-		shader_program::~shader_program() { destroy(); }
+		shader_program::~shader_program() { 
+			destroy(); 
+		}
 
 		void shader_program::create() {
 			if (!created) {
@@ -93,7 +95,7 @@ namespace augs {
 			printProgramInfoLog(id);
 
 			for (auto it : attached_shaders) {
-				glDetachShader(id, it->id);
+				//glDetachShader(id, it->id);
 				it->destroy();
 			}
 

@@ -99,23 +99,23 @@ void world_instance::default_loop() {
 		lua_gc(*global_lua_state, LUA_GCCOLLECT, 0);
 	}
 
-	auto& scripts_reloaded = resources::script::script_reloader.get_script_files_to_reload();
-
-	for (auto& script_to_reload : scripts_reloaded) {
-		if (script_to_reload->reload_scene_when_modified) {
-			my_world.delete_all_entities();
-			break;
-		}
-	}
-
-	for (auto& script_to_reload : scripts_reloaded) {
-		script_to_reload->call();
-	}
-
-	if (!scripts_reloaded.empty()) {
-		std::cout << std::endl;
-		lua_gc(*global_lua_state, LUA_GCCOLLECT, 0);
-	}
+	//auto& scripts_reloaded = resources::script::script_reloader.get_script_files_to_reload();
+	//
+	//for (auto& script_to_reload : scripts_reloaded) {
+	//	if (script_to_reload->reload_scene_when_modified) {
+	//		my_world.delete_all_entities();
+	//		break;
+	//	}
+	//}
+	//
+	//for (auto& script_to_reload : scripts_reloaded) {
+	//	script_to_reload->call();
+	//}
+	//
+	//if (!scripts_reloaded.empty()) {
+	//	std::cout << std::endl;
+	//	lua_gc(*global_lua_state, LUA_GCCOLLECT, 0);
+	//}
 }
 
 luabind::scope world_instance::bind() {

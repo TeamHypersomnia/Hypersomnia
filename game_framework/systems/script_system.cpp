@@ -137,9 +137,9 @@ void script_system::generate_lua_state(lua_state_wrapper& new_state) {
 	using namespace resources;
 	using namespace helpers;
 
+	luaL_openlibs(new_state);
 	luabind::open(new_state);
 
-	luaL_openlibs(new_state);
 
 	//luabind::bind_class_info(lua_state);
 
