@@ -108,7 +108,9 @@ namespace bindings {
 		_body_helper(),
 
 		_opengl_binding(),
-		_all_systems()
+		_all_systems(),
+
+		_text()
 		;
 }
 
@@ -222,7 +224,9 @@ void script_system::generate_lua_state(lua_state_wrapper& new_state) {
 			bindings::_polygon_fader(),
 			bindings::_all_systems(),
 
-			world_instance::bind()
+			world_instance::bind(),
+
+			bindings::_text()
 	];
 
 	luabind::set_pcall_callback(the_callback);

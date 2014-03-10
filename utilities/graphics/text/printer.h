@@ -10,8 +10,6 @@ namespace augs {
 	namespace graphics {
 		namespace gui {
 			namespace text {
-				struct caret_info;
-				class ui;
 				struct drafter;
 				struct printer {
 					/* these integers hold information at what index particular quads are pushed to the resulting vector
@@ -56,14 +54,14 @@ namespace augs {
 										const fstr& str, 
 										vec2<int> pos, 
 										unsigned wrapping_width = 0,
-										const rects::ltrb<int>* parent = 0);
+										rects::ltrb<int>* parent = 0);
 
-				rects::wh<int> quick_print(resources::renderable::draw_input v,
+				rects::wh<int> quick_print_format(resources::renderable::draw_input v,
 										const std::wstring& wstr,
 										style style,
 										vec2<int> pos, 
 										unsigned wrapping_width = 0,
-										const rects::ltrb<int>* parent = 0);
+										rects::ltrb<int>* parent = 0);
 			}
 		}
 	}

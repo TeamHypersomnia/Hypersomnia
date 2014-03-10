@@ -24,7 +24,7 @@ namespace augs {
 					int len = wcslen(_str);
 					for(int i = 0; i < len; ++i) {
 						ch.set(_str[i], s.f, s.color);
-						out.append(1, ch);
+						out.push_back(ch);
 					}
 				}
 
@@ -38,7 +38,7 @@ namespace augs {
 					//out.reserve(len);
 					for(int i = 0; i < len; ++i) {
 						ch.set(_str[i], s.f, s.color);
-						out.append(1, ch);
+						out.push_back(ch);
 					}
 
 					return out;
@@ -50,7 +50,7 @@ namespace augs {
 					int len = _str.length();
 					for(int i = 0; i < len; ++i) {
 						ch.set(_str[i], s.f, s.color);
-						out.append(1, ch);
+						out.push_back(ch);
 					}
 				}
 
@@ -64,7 +64,7 @@ namespace augs {
 					//out.reserve(len);
 					for(int i = 0; i < len; ++i) {
 						ch.set(_str[i], s.f, s.color);
-						out.append(1, ch);
+						out.push_back(ch);
 					}
 
 					return out;

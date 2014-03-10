@@ -88,11 +88,11 @@ namespace augs {
 					} 
 				}
 
-				rects::wh<int> quick_print(resources::renderable::draw_input& v,
+				rects::wh<int> quick_print(resources::renderable::draw_input v,
 										const fstr& str, 
 										vec2<int> pos, 
 										unsigned wrapping_width,
-										const rects::ltrb<int>* clipper) 
+										 rects::ltrb<int>* clipper) 
 				{
 					drafter dr;
 					printer pr;
@@ -102,12 +102,12 @@ namespace augs {
 					return dr.get_bbox();
 				}
 				
-				rects::wh<int> quick_print(resources::renderable::draw_input& v,
+				rects::wh<int> quick_print_format(resources::renderable::draw_input v,
 										const std::wstring& wstr,
 										gui::text::style style,
 										vec2<int> pos, 
 										unsigned wrapping_width,
-										const rects::ltrb<int>* clipper) 
+										rects::ltrb<int>* clipper) 
 				{
 					fstr str = format(wstr.c_str(), style);
 					drafter dr;

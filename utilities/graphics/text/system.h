@@ -25,7 +25,7 @@ namespace augs {
 					operator formatted_char();
 				};
 
-				typedef std::basic_string<formatted_char> fstr;
+				typedef std::vector<formatted_char> fstr;
 			}
 				
 			namespace text {

@@ -112,7 +112,7 @@
     <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">
-    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir)\utilities;C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir)\utilities;C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(ProjectDir);C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\freetype;$(IncludePath)</IncludePath>
     <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
     <OutDir>$(ProjectDir)..\Sensibilia\</OutDir>
     <LinkIncremental>false</LinkIncremental>
@@ -216,7 +216,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>OpenGL32.lib;Ws2_32.lib;dwmapi.lib;Gdiplus.lib;sfml-main.lib;sfml-audio-s.lib;sfml-system-s.lib;openal32.lib;sndfile.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OpenGL32.lib;Ws2_32.lib;dwmapi.lib;Gdiplus.lib;sfml-main.lib;sfml-audio-s.lib;sfml-system-s.lib;openal32.lib;sndfile.lib;winmm.lib;freetype253MT.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">
@@ -329,6 +329,7 @@
     <ClCompile Include="game_framework\bindings\helpers_binding.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="game_framework\bindings\text_binding.cpp" />
     <ClCompile Include="game_framework\bindings\value_animator_binding.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
