@@ -94,7 +94,7 @@ namespace resources {
 	void sprite::draw(draw_input& in) {
 		vec2<> v[4];
 		make_rect(in.transform.pos, vec2<>(size), in.transform.rotation, v);
-		if (!rects::ltrb<float>::get_aabb(v).hover(in.rotated_camera_aabb)) return;
+		if (!in.always_visible && !rects::ltrb<float>::get_aabb(v).hover(in.rotated_camera_aabb)) return;
 
 		if (tex == nullptr) return;
 
@@ -252,37 +252,42 @@ namespace resources {
 		for (auto& v : model_transformed)
 			v.pos.rotate(in.transform.rotation, vec2<>(0, 0));
 		
-		/* visibility checking every triangle */
-		for (size_t i = 0; i < indices.size(); i += 3) {
-			new_tri.vertices[0] = model_transformed[indices[i]];
-			new_tri.vertices[1] = model_transformed[indices[i + 1]];
-			new_tri.vertices[2] = model_transformed[indices[i + 2]];
+		if (in.always_visible) {
+			visible_indices = indices;
+		}
+		else {
+			/* visibility checking every triangle */
+			for (size_t i = 0; i < indices.size(); i += 3) {
+				new_tri.vertices[0] = model_transformed[indices[i]];
+				new_tri.vertices[1] = model_transformed[indices[i + 1]];
+				new_tri.vertices[2] = model_transformed[indices[i + 2]];
 
-			new_tri.vertices[0].pos += in.transform.pos;
-			new_tri.vertices[1].pos += in.transform.pos;
-			new_tri.vertices[2].pos += in.transform.pos;
+				new_tri.vertices[0].pos += in.transform.pos;
+				new_tri.vertices[1].pos += in.transform.pos;
+				new_tri.vertices[2].pos += in.transform.pos;
 
-			auto* v = new_tri.vertices;
-			typedef const resources::vertex& vc;
+				auto* v = new_tri.vertices;
+				typedef const resources::vertex& vc;
 
-			auto x_pred = [](vc a, vc b){ return a.pos.x < b.pos.x; };
-			auto y_pred = [](vc a, vc b){ return a.pos.y < b.pos.y; };
+				auto x_pred = [](vc a, vc b){ return a.pos.x < b.pos.x; };
+				auto y_pred = [](vc a, vc b){ return a.pos.y < b.pos.y; };
 
-			vec2<int> lower(
-				static_cast<int>(std::min_element(v, v + 3, x_pred)->pos.x),
-				static_cast<int>(std::min_element(v, v + 3, y_pred)->pos.y)
-				);
+				vec2<int> lower(
+					static_cast<int>(std::min_element(v, v + 3, x_pred)->pos.x),
+					static_cast<int>(std::min_element(v, v + 3, y_pred)->pos.y)
+					);
 
-			vec2<int> upper(
-				static_cast<int>(std::max_element(v, v + 3, x_pred)->pos.x),
-				static_cast<int>(std::max_element(v, v + 3, y_pred)->pos.y)
-				);
+				vec2<int> upper(
+					static_cast<int>(std::max_element(v, v + 3, x_pred)->pos.x),
+					static_cast<int>(std::max_element(v, v + 3, y_pred)->pos.y)
+					);
 
-			/* only if the triangle is visible should we render the indices */
-			if (rects::ltrb<float>(lower.x, lower.y, upper.x, upper.y).hover(in.rotated_camera_aabb)) {
-				visible_indices.push_back(indices[i]);
-				visible_indices.push_back(indices[i + 1]);
-				visible_indices.push_back(indices[i + 2]);
+				/* only if the triangle is visible should we render the indices */
+				if (rects::ltrb<float>(lower.x, lower.y, upper.x, upper.y).hover(in.rotated_camera_aabb)) {
+					visible_indices.push_back(indices[i]);
+					visible_indices.push_back(indices[i + 1]);
+					visible_indices.push_back(indices[i + 2]);
+				}
 			}
 		}
 

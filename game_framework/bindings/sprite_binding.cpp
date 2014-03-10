@@ -13,11 +13,13 @@ namespace bindings {
 
 			luabind::class_<renderable::draw_input>("draw_input")
 			.def(luabind::constructor<>())
+			.def(luabind::constructor<const renderable::draw_input&>())
 			.def_readwrite("camera_transform", &renderable::draw_input::camera_transform)
 			.def_readwrite("visible_area", &renderable::draw_input::visible_area)
 			.def_readwrite("additional_info", &renderable::draw_input::additional_info)
 			.def_readwrite("output", &renderable::draw_input::output)
 			.def_readwrite("transform", &renderable::draw_input::transform)
+			.def_readwrite("always_visible", &renderable::draw_input::always_visible)
 			,
 
 			luabind::class_<sprite, renderable>("sprite")

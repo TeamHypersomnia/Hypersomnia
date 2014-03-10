@@ -24,10 +24,11 @@ namespace resources {
 			components::transform::state transform, camera_transform;
 			components::render* additional_info;
 			augs::vec2<> visible_area;
+			bool always_visible;
 
 			augs::rects::ltrb<float> rotated_camera_aabb;
 
-			draw_input() : output(nullptr), additional_info(nullptr) {}
+			draw_input() : output(nullptr), additional_info(nullptr), always_visible(false) {}
 		};
 
 		static void make_rect(vec2<> pos, vec2<> size, float rotation_degrees, vec2<> out[4]);
