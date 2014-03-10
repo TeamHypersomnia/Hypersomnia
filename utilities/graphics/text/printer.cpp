@@ -75,9 +75,11 @@ namespace augs {
 									pixel_32 charcolor = style(colors[i]).color;
 									
 									auto my_input_copy = my_input;
-									my_input_copy.transform.pos += vec2<int>(sectors[i] + g.info->bear_x, lines[l].top + lines[l].asc - g.info->bear_y) + pos;
+									
 									resources::sprite new_sprite;
+
 									new_sprite.size = vec2<int>(g.info->size.w, g.info->size.h);
+									my_input_copy.transform.pos += vec2<int>(sectors[i] + g.info->bear_x, lines[l].top + lines[l].asc - g.info->bear_y) + pos + new_sprite.size/2;
 									new_sprite.set(&g.tex, charcolor);
 									new_sprite.draw(my_input_copy);
 									
@@ -88,18 +90,17 @@ namespace augs {
 					} 
 				}
 
-				rects::wh<int> quick_print(resources::renderable::draw_input v,
+				vec2<int> quick_print(resources::renderable::draw_input v,
 										const fstr& str, 
 										vec2<int> pos, 
-										unsigned wrapping_width,
-										 rects::ltrb<int>* clipper) 
+										unsigned wrapping_width) 
 				{
 					drafter dr;
 					printer pr;
 					dr.wrap_width = wrapping_width;
 					dr.draw(str);
-					pr.draw_text(v, dr, str, pos, clipper);
-					return dr.get_bbox();
+					pr.draw_text(v, dr, str, pos, 0);
+					return vec2<int>(dr.get_bbox().w, dr.get_bbox().h);
 				}
 				
 				rects::wh<int> quick_print_format(resources::renderable::draw_input v,

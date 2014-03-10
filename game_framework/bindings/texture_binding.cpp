@@ -33,7 +33,7 @@ namespace bindings {
 			luabind::class_<texture_baker::font>("font_instance")
 			.def(luabind::constructor<>())
 			.def("build", &texture_baker::font::build)
-			.def("add_to_atlas", &texture_baker::font::build)
+			.def("add_to_atlas", &texture_baker::font::add_to_atlas)
 
 			);
 	}

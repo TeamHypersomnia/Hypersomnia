@@ -50,11 +50,10 @@ namespace augs {
 				returns text's bounding box (without clipping)
 				*/
 
-				rects::wh<int> quick_print(resources::renderable::draw_input v,
-										const fstr& str, 
+				vec2<int> quick_print(resources::renderable::draw_input v,
+										const std::vector<formatted_char>& str, 
 										vec2<int> pos, 
-										unsigned wrapping_width = 0,
-										rects::ltrb<int>* parent = 0);
+										unsigned wrapping_width = 0);
 
 				rects::wh<int> quick_print_format(resources::renderable::draw_input v,
 										const std::wstring& wstr,
