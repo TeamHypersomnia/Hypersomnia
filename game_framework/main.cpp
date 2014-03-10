@@ -30,7 +30,10 @@ int main() {
 	lua_gc(lua_state, LUA_GCCOLLECT, 0);
 	resources::script::script_reloader.report_errors = &std::cout;
 	resources::script::lua_state = lua_state;
-	resources::script::dofile("config.lua");
+
+	resources::script config_script;
+	config_script.associate_filename("config.lua");
+	config_script.call();
 
 	window::glwindow gl;
 	gl.create(lua_state, rects::wh<int>(100, 100));
@@ -48,7 +51,6 @@ int main() {
 	resources::script init_script;
 
 	init_script.associate_filename("init.lua");
-	init_script.add_reload_dependant(&init_script);
  	init_script.call();
 
 	lua_gc(lua_state, LUA_GCCOLLECT, 0);
