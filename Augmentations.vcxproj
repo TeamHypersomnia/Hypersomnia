@@ -435,6 +435,10 @@
     </ClCompile>
     <ClCompile Include="utilities\error\error.cpp" />
     <ClCompile Include="utilities\graphics\pixel.cpp" />
+    <ClCompile Include="utilities\graphics\text\drafter.cpp" />
+    <ClCompile Include="utilities\graphics\text\printer.cpp" />
+    <ClCompile Include="utilities\graphics\text\system.cpp" />
+    <ClCompile Include="utilities\graphics\text\word_separator.cpp" />
     <ClCompile Include="utilities\math\rects.cpp" />
     <ClCompile Include="utilities\math\vec2d.cpp" />
     <ClCompile Include="game_framework\bindings\behaviour_tree_binding.cpp">
@@ -806,7 +810,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="game_framework\resources\vertex.cpp" />
+    <ClCompile Include="utilities\graphics\vertex.cpp" />
     <ClCompile Include="game_framework\systems\behaviour_tree_system.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
@@ -1357,6 +1361,10 @@
     <ClInclude Include="utilities\entity_system\world.h" />
     <ClInclude Include="utilities\error\error.h" />
     <ClInclude Include="utilities\graphics\pixel.h" />
+    <ClInclude Include="utilities\graphics\text\drafter.h" />
+    <ClInclude Include="utilities\graphics\text\printer.h" />
+    <ClInclude Include="utilities\graphics\text\system.h" />
+    <ClInclude Include="utilities\graphics\text\word_separator.h" />
     <ClInclude Include="utilities\options.h" />
     <ClInclude Include="utilities\math\rects.h" />
     <ClInclude Include="utilities\math\vec2d.h" />
@@ -1417,7 +1425,7 @@
     <ClInclude Include="game_framework\systems\physics_system.h" />
     <ClInclude Include="game_framework\systems\render_system.h" />
     <ClInclude Include="game_framework\systems\script_system.h" />
-    <ClInclude Include="game_framework\resources\vertex.h" />
+    <ClInclude Include="utilities\graphics\vertex.h" />
     <ClInclude Include="utilities\texture_baker\font.h" />
     <ClInclude Include="utilities\texture_baker\image.h" />
     <ClInclude Include="utilities\texture_baker\rectpack.h" />

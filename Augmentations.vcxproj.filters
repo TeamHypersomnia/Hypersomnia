@@ -414,9 +414,6 @@
     <ClCompile Include="game_framework\resources\scriptable_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\resources\vertex.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -664,6 +661,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utilities\texture_baker\font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utilities\graphics\text\drafter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utilities\graphics\text\printer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utilities\graphics\text\system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utilities\graphics\text\word_separator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utilities\graphics\vertex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1487,9 +1499,6 @@
     <ClInclude Include="game_framework\resources\scriptable_info.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\resources\vertex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="utilities\entity_system\component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1725,6 +1734,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\lua\lzio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities\graphics\text\drafter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities\graphics\text\printer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities\graphics\text\system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities\graphics\text\word_separator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities\graphics\vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

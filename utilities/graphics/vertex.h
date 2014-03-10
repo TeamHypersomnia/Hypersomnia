@@ -1,7 +1,7 @@
 #pragma once
 #include "graphics/pixel.h"
 #include "math/vec2d.h"
-#include "../game/texture_helper.h"
+#include "../../game_framework/game/texture_helper.h"
 
 using namespace augs;
 

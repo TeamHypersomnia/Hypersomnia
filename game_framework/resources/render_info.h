@@ -6,7 +6,7 @@
 #include "..\components\transform_component.h"
 #include "..\components\render_component.h"
 
-#include "vertex.h"
+#include "graphics/vertex.h"
 
 using namespace augs;
 

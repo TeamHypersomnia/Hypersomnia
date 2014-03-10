@@ -7,7 +7,7 @@
 #include "../components/transform_component.h"
 #include "../components/render_component.h"
 
-#include "../resources/vertex.h"
+#include "graphics/vertex.h"
 #include "../resources/render_info.h"
 #include "texture_baker/texture_baker.h"
 
