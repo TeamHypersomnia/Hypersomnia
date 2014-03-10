@@ -8,7 +8,7 @@
 
 #include "../augmentations.h"
 
-namespace augmentations {
+namespace augs {
 	namespace texture_baker {
 		font_file::font_file() : pt(0) {}
 
@@ -65,7 +65,7 @@ namespace augmentations {
 		font_file::glyph::glyph()
 			: adv(0), bear_x(0), bear_y(0) {}
 
-		font_file::glyph::glyph(int adv, int bear_x, int bear_y, rects::wh size)
+		font_file::glyph::glyph(int adv, int bear_x, int bear_y, rects::wh<int> size)
 			: adv(adv), bear_x(bear_x), bear_y(bear_y), size(size) {}
 
 		font_file::glyph::glyph(const FT_Glyph_Metrics& m) 
@@ -108,7 +108,7 @@ namespace augmentations {
 						g.unicode = j;
 
 						if(face->glyph->bitmap.width)
-							g.img.copy(face->glyph->bitmap.buffer, 1, face->glyph->bitmap.pitch, rects::wh(face->glyph->bitmap.width, face->glyph->bitmap.rows));
+							g.img.copy(face->glyph->bitmap.buffer, 1, face->glyph->bitmap.pitch, rects::wh<int>(face->glyph->bitmap.width, face->glyph->bitmap.rows));
 
 						unicode[j] = glyphs.size()-1;
 					}

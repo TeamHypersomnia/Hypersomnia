@@ -25,3 +25,6 @@
 #include <GL/GL.h>
 
 #include <Box2D/Box2D.h>
+
+#include <freetype\ft2build.h> 
+#include FT_FREETYPE_H

@@ -663,6 +663,9 @@
     <ClCompile Include="3rdparty\lua\lua.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="utilities\texture_baker\font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\readdir\targetver.h">
