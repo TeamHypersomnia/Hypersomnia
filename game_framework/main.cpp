@@ -16,7 +16,7 @@
 
 using namespace augs;
 using namespace entity_system;
-
+ 
 resources::script* world_reloading_script = nullptr;  
 
 window::glwindow* global_window = nullptr;

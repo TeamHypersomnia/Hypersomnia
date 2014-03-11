@@ -29,6 +29,7 @@ namespace augs {
 					const fstr& colors,
 					/* if caret is 0, draw no caret */
 					vec2<int> pos,
+					float size_multiplier,
 					const rects::ltrb<int>* clipper) const
 				{
 					/* shortcuts */
@@ -78,9 +79,12 @@ namespace augs {
 									
 									resources::sprite new_sprite;
 
-									new_sprite.size = vec2<int>(g.info->size.w, g.info->size.h);
-									my_input_copy.transform.pos += vec2<int>(sectors[i] + g.info->bear_x, lines[l].top + lines[l].asc - g.info->bear_y) + pos + new_sprite.size/2;
+									//new_sprite.size = vec2<float>(g.info->size.w, g.info->size.h)*size_multiplier;	
+									
 									new_sprite.set(&g.tex, charcolor);
+									new_sprite.size *= size_multiplier;
+									my_input_copy.transform.pos += vec2<float>(sectors[i] + g.info->bear_x, lines[l].top + lines[l].asc - g.info->bear_y) * size_multiplier + pos + new_sprite.size / 2;
+								
 									new_sprite.draw(my_input_copy);
 									
 									/* add the resulting character taking bearings into account */
@@ -101,13 +105,14 @@ namespace augs {
 				vec2<int> quick_print(resources::renderable::draw_input v,
 										const fstr& str, 
 										vec2<int> pos, 
+										float size_multiplier,
 										unsigned wrapping_width) 
 				{
 					drafter dr;
 					printer pr;
 					dr.wrap_width = wrapping_width;
 					dr.draw(str);
-					pr.draw_text(v, dr, str, pos, 0);
+					pr.draw_text(v, dr, str, pos, size_multiplier, 0);
 					return vec2<int>(dr.get_bbox().w, dr.get_bbox().h);
 				}
 				
@@ -115,6 +120,7 @@ namespace augs {
 										const std::wstring& wstr,
 										gui::text::style style,
 										vec2<int> pos, 
+										float size_multiplier,
 										unsigned wrapping_width,
 										rects::ltrb<int>* clipper) 
 				{
@@ -123,7 +129,7 @@ namespace augs {
 					printer pr;
 					dr.wrap_width = wrapping_width;
 					dr.draw(str);
-					pr.draw_text(v, dr, str, pos, clipper);
+					pr.draw_text(v, dr, str, pos, size_multiplier, clipper);
 					return dr.get_bbox();
 				}
 

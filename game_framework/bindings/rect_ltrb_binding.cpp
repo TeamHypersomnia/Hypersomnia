@@ -4,7 +4,7 @@
 
 #include "math/rects.h"
 
-namespace bindings {
+namespace bindings { 
 	luabind::scope _rect_ltrb() {
 		return
 			luabind::class_<rects::ltrb<float>>("rect_ltrb")
@@ -14,6 +14,7 @@ namespace bindings {
 			.def_readwrite("t", &rects::ltrb<float>::t)
 			.def_readwrite("r", &rects::ltrb<float>::r)
 			.def_readwrite("b", &rects::ltrb<float>::b)
+			.def("hover", (bool (rects::ltrb<float>::*)(const vec2<float>& m) const) &rects::ltrb<float>::hover)
 			.property("w", (float (rects::ltrb<float>::*)() const)&rects::ltrb<float>::w, (void (rects::ltrb<float>::*)(float)) &rects::ltrb<float>::w)
 			.property("h", (float (rects::ltrb<float>::*)() const)&rects::ltrb<float>::h, (void (rects::ltrb<float>::*)(float)) &rects::ltrb<float>::h),
 

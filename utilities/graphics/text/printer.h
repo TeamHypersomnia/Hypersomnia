@@ -40,6 +40,7 @@ namespace augs {
 						const fstr& colors,
 						/* if caret is 0, draw no caret */
 						vec2<int> scroll,
+						float size_multiplier,
 						const rects::ltrb<int>* parent = 0) const;
 		 		};
 				
@@ -51,15 +52,18 @@ namespace augs {
 				*/
 
 				vec2<int> get_text_bbox(const std::vector<formatted_char>& str, unsigned wrapping_width = 0);
+				
 				vec2<int> quick_print(resources::renderable::draw_input v,
 										const std::vector<formatted_char>& str, 
 										vec2<int> pos, 
+										float size_multiplier,
 										unsigned wrapping_width = 0);
 
 				rects::wh<int> quick_print_format(resources::renderable::draw_input v,
 										const std::wstring& wstr,
 										style style,
 										vec2<int> pos, 
+										float size_multiplier,
 										unsigned wrapping_width = 0,
 										rects::ltrb<int>* parent = 0);
 			}
