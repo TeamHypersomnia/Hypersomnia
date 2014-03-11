@@ -522,7 +522,7 @@ void visibility_system::process_entities(world& owner) {
 				}
 
 				/* save new edge if it is not degenerate */
-				if (p1.compare(p2) ||
+				if (!(p1.compare(p2) ||
 					std::fpclassify(p1.x) != FP_NORMAL
 					|| std::fpclassify(p1.y) != FP_NORMAL
 					|| std::fpclassify(p2.x) != FP_NORMAL
@@ -530,19 +530,19 @@ void visibility_system::process_entities(world& owner) {
 					|| !(p1.x == p1.x)
 					|| !(p2.x == p2.x)
 					|| !(p1.y == p1.y)
-					|| !(p2.y == p2.y)
+					|| !(p2.y == p2.y))
 					)
 				{
 
-					request.edges.clear();
-					request.discontinuities.clear();
-					break;
+					request.edges.push_back(std::make_pair(p1, p2));
+					//request.edges.clear();
+					//request.discontinuities.clear();
+					//break;
 				//	int found_nan = 24;
 				//std::cout << found_nan << std::endl;
 				//continue;
 				}
 
-					request.edges.push_back(std::make_pair(p1, p2));
 			}
 
 			/* a little processing on discontinuities, we'll need them in a moment */

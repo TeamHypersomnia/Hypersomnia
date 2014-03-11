@@ -50,6 +50,7 @@ namespace augs {
 				returns text's bounding box (without clipping)
 				*/
 
+				vec2<int> get_text_bbox(const std::vector<formatted_char>& str, unsigned wrapping_width = 0);
 				vec2<int> quick_print(resources::renderable::draw_input v,
 										const std::vector<formatted_char>& str, 
 										vec2<int> pos, 

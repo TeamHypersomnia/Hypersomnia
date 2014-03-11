@@ -29,6 +29,7 @@ namespace bindings {
 			misc::vector_wrapper<formatted_char>::bind_vector("formatted_text"),
 			
 			luabind::def("towchar", towchar),
+			luabind::def("get_text_bbox", get_text_bbox),
 			luabind::def("quick_print_text", quick_print)
 			
 			//.def("append", &graphics::gui::text::fstr::append)

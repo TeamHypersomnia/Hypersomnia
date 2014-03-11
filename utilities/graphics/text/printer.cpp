@@ -90,6 +90,14 @@ namespace augs {
 					} 
 				}
 
+				vec2<int> get_text_bbox(const std::vector<formatted_char>& str, unsigned wrapping_width) {
+					drafter dr;
+					printer pr;
+					dr.wrap_width = wrapping_width;
+					dr.draw(str);
+					return vec2<int>(dr.get_bbox().w, dr.get_bbox().h);
+				}
+
 				vec2<int> quick_print(resources::renderable::draw_input v,
 										const fstr& str, 
 										vec2<int> pos, 
