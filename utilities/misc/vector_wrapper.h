@@ -21,11 +21,21 @@ namespace augs {
 				return raw.data();
 			}
 
+			int size() {
+				return raw.size();
+			}
+
+			value at(int i) {
+				return raw.at(i);
+			}
+
 			static luabind::scope bind(const char* name) {
 				return luabind::class_<vector_wrapper<value>>(name)
 					.def(luabind::constructor<>())
 					.def("add", &add)
 					.def("push_back", &push_back)
+					.def("size", &size)
+					.def("at", &at)
 					.def("data", &data);
 			}
 

@@ -13,9 +13,21 @@ wchar_t towchar(const std::wstring& s) {
 	return s[0];
 }
 
+misc::vector_wrapper<wchar_t> towchar_vec(const std::wstring& s) {
+	misc::vector_wrapper<wchar_t> out;
+
+	for (auto& c : s) {
+		out.push_back(c);
+	}
+
+	return out;
+}
+
 namespace bindings {
 	luabind::scope _text() {
 		return
+
+			luabind::class_<wchar_t>("wchar_t"),
 
 			luabind::class_<formatted_char>("formatted_char")
 			.def(luabind::constructor<>())
@@ -26,9 +38,11 @@ namespace bindings {
 			.def_readwrite("b", &formatted_char::b)
 			.def_readwrite("a", &formatted_char::a),
 
+			misc::vector_wrapper<wchar_t>::bind("wchar_t_vec"),
 			misc::vector_wrapper<formatted_char>::bind_vector("formatted_text"),
 			
 			luabind::def("towchar", towchar),
+			luabind::def("towchar_vec", towchar_vec),
 			luabind::def("get_text_bbox", get_text_bbox),
 			luabind::def("quick_print_text", quick_print)
 			
