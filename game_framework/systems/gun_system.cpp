@@ -71,8 +71,9 @@ void gun_system::consume_events(world& owner) {
 
 	for (auto it : events) {
 		if (it.intent == messages::intent_message::intent_type::SHOOT) {
-			auto& gun = it.subject->get<components::gun>();
-			gun.trigger_mode = it.state_flag ? (gun.current_rounds > 0 ? gun.SHOOT : gun.MELEE) : gun.NONE;
+			auto* gun = it.subject->find<components::gun>();
+			if (gun)
+				gun->trigger_mode = it.state_flag ? (gun->current_rounds > 0 ? gun->SHOOT : gun->MELEE) : gun->NONE;
 		}
 	}
 }

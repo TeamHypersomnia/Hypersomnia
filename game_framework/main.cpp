@@ -49,9 +49,9 @@ int main() {
 	//world_instance instance;
 	 
 	resources::script init_script;
-
+	 
 	init_script.associate_filename("init.lua");
- 	init_script.call();
+ 	init_script.call(); 
 
 	lua_gc(lua_state, LUA_GCCOLLECT, 0);
 
