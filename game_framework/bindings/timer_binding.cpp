@@ -17,6 +17,7 @@ namespace bindings {
 			.def("get_seconds", &timer::get<std::chrono::seconds>)
 			.def("get_microseconds", &timer::get<std::chrono::microseconds>)
 			.def("get_nanoseconds", &timer::get<std::chrono::nanoseconds>)
+			.def("pause", &timer::pause)
 			.def("reset", &timer::reset)
 			);
 	}
