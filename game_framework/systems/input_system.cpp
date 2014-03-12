@@ -68,11 +68,11 @@ void input_system::process_entities(world& owner) {
 
 			bool succesfully_mapped = false;
 
-			if (msg == key::down) {
-					succesfully_mapped = post_intent_from_raw_id(owner, *it, input_window.events.key, true);
+			if (msg == key::down && !input_window.events.repeated) {
+				succesfully_mapped = post_intent_from_raw_id(owner, *it, input_window.events.key, true);
 			}
 
-			else if (msg == key::up) 
+			else if (msg == key::up)
 				succesfully_mapped = post_intent_from_raw_id(owner, *it, input_window.events.key, false);
 
 			else if (msg == mouse::ldown)

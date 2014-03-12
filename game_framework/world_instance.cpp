@@ -43,6 +43,7 @@ world_instance::world_instance() : input(*global_window), render(*global_window)
 		steering.substep(owner);
 		movement.substep(owner);
 		destroy.consume_events(owner);
+		owner.flush_message_queues();
 	};
 }
 

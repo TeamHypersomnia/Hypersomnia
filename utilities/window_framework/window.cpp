@@ -67,7 +67,7 @@ namespace augs {
 					break;
 
 				case down:
-					//if(!(lParam & 0x40000000)) {
+					//if (!((lParam & (1 << 30)) != 0)) {
 						events.keys[wParam] = true;
 						switch(wParam) {
 						case CTRL: wParam = (lParam & 0x1000000) ? RCTRL : LCTRL; break;
