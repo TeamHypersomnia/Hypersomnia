@@ -11,6 +11,10 @@ input_system::input_system(window::glwindow& input_window) : input_window(input_
 input_system::context::context() : enabled(true) {
 }
 
+bool input_system::is_down(int key) {
+	return input_window.events.keys[key];
+}
+
 void input_system::clear() {
 	active_contexts.clear();
 	processing_system::clear();

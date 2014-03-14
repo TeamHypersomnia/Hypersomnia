@@ -24,6 +24,14 @@ void set_friction(b2Body* body, float friction) {
 	body->ResetMassData();
 }
 
+void set_restitution(b2Body* body, float restitution) {
+	for (b2Fixture* it = body->GetFixtureList(); it; it = it->GetNext()) {
+		it->SetRestitution(restitution);
+	}
+
+	body->ResetMassData();
+}
+
 void set_filter(b2Body* body, b2Filter filter) {
 	for (b2Fixture* it = body->GetFixtureList(); it; it = it->GetNext()) {
 		it->SetFilterData(filter);
@@ -43,6 +51,7 @@ namespace bindings {
 			luabind::def("SetDensity", set_density),
 			luabind::def("SetFilter", set_filter),
 			luabind::def("SetFriction", set_friction),
+			luabind::def("SetRestitution", set_restitution),
 			luabind::class_<dummy_Box2D>("Box2D")
 			.enum_("constants")	[
 				luabind::value("b2_dynamicBody", b2_dynamicBody),

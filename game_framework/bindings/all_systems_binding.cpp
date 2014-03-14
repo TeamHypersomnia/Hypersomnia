@@ -108,6 +108,7 @@ namespace bindings {
 			.def("process_entities", &input_system::process_entities)
 			.def_readwrite("quit_flag", &input_system::quit_flag)
 			.def("add_context", &input_system::add_context)
+			.def("is_down", &input_system::is_down)
 			.def("clear_contexts", &input_system::clear_contexts),
 
 			luabind::class_<gun_system>("_gun_system")

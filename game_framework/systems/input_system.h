@@ -44,6 +44,8 @@ struct input_system : public processing_system_templated<components::input> {
 	window::glwindow& input_window;
 	input_system(window::glwindow&);
 	
+	bool is_down(int key);
+
 	input_system& operator=(const input_system&) {
 		assert(0);
 		return *this;
