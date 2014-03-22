@@ -35,139 +35,144 @@ void pathfinding_system::process_entities(world& owner) {
 			/* get visibility information */
 			auto vision = visibility.get_layer(components::visibility::DYNAMIC_PATHFINDING);
 			
-			if (pathfinding.force_touch_sensors) {
-				for (auto& vertex_hit : vision.vertex_hits) {
-					components::visibility::discontinuity new_discontinuity;
-					new_discontinuity.edge_index = vertex_hit.first;
-					new_discontinuity.points.first = vertex_hit.second;
-					new_discontinuity.is_boundary = false;
-					/* rest is not worth filling so proceed */
-
-					if (vertex_hit.second.y >= transform.pos.y) {
-						vision.discontinuities.push_back(new_discontinuity);
-					}
-				}
-
-				vision.vertex_hits.clear();
-			}
-
-			//vision.ignore_discontinuities_shorter_than = pathfinding.session().temporary_ignore_discontinuities_shorter_than;
-
-			/* save all fully visible vertices as discovered */
-			for (auto& visible_vertex : vision.vertex_hits) {
-				bool this_visible_vertex_is_already_memorised = false;
-
-				//auto components::pathfinding::pathfinding_session::* location = 
-				//		pathfinding.force_touch_sensors ? 
-				//	&components::pathfinding::pathfinding_session::undiscovered_vertices :
-				//&components::pathfinding::pathfinding_session::discovered_vertices;
-
-				for (auto& memorised : pathfinding.session().discovered_vertices) {
-					/* if a similiar discovered vertex exists */
-					if (memorised.location.compare(visible_vertex.second, epsilon_distance_the_same_vertex)) {
-						this_visible_vertex_is_already_memorised = true;
-						/* overwrite the location just in case */
-						memorised.location = visible_vertex.second;
-						break;
-					}
-				}
-
-				/* save if unique */
-				if (!this_visible_vertex_is_already_memorised) {
-					components::pathfinding::pathfinding_session::navigation_vertex vert;
-					vert.location = visible_vertex.second;
-					pathfinding.session().discovered_vertices.push_back(vert);
-				}
-			}
-
-
 			std::vector<components::pathfinding::pathfinding_session::navigation_vertex> undiscovered_visible;
 
-			/* save all new discontinuities from visibility */
-			for (auto& disc : vision.discontinuities) {
-				if (disc.is_boundary) continue;
+			/* proceed only if the session is not degenerate */
+			if (!vision.edges.empty() && !vision.discontinuities.empty()) {
+				if (pathfinding.force_touch_sensors) {
+					for (auto& vertex_hit : vision.vertex_hits) {
+						components::visibility::discontinuity new_discontinuity;
+						new_discontinuity.edge_index = vertex_hit.first;
+						new_discontinuity.points.first = vertex_hit.second;
+						new_discontinuity.is_boundary = false;
+						/* rest is not worth filling so proceed */
 
-				bool this_discontinuity_is_already_memorised = false;
-				bool this_discontinuity_is_already_discovered = false;
-
-				components::pathfinding::pathfinding_session::navigation_vertex vert;
-
-				for (auto& memorised_undiscovered : pathfinding.session().undiscovered_vertices) {
-					/* if a discontinuity with the same closer vertex already exists */
-					if (memorised_undiscovered.location.compare(disc.points.first, epsilon_distance_the_same_vertex)) {
-						this_discontinuity_is_already_memorised = true;
-						vert = memorised_undiscovered;
-							//memorised_undiscovered.location = disc.points.first;
-						break;
-					}
-				}
-
-				for (auto& memorised_discovered : pathfinding.session().discovered_vertices) {
-					/* if a discontinuity with the same closer vertex already exists */
-					if (memorised_discovered.location.compare(disc.points.first, epsilon_distance_the_same_vertex)) {
-						this_discontinuity_is_already_discovered = true;
-						memorised_discovered.location = disc.points.first;
-						break;
-					}
-				}
-
-				vert.location = disc.points.first;
-				
-				/* if it is unique, push it */
-				if (!this_discontinuity_is_already_memorised && !this_discontinuity_is_already_discovered) {
-
-					/* get the associated edge to prepare a relevant sensor */
-					auto associated_edge = vision.edges[disc.edge_index];
-
-					/* get the direction the sensor will be going to */
-					vec2<> sensor_direction;
-
-					bool degenerate = false;
-
-					/* if the first vertex of the edge matches the location */
-					if (associated_edge.first.compare(vert.location))
-						sensor_direction = associated_edge.first - associated_edge.second;
-					/* if it is the second one */
-					else if (associated_edge.second.compare(vert.location))
-						sensor_direction = associated_edge.second - associated_edge.first;
-					/* should never happen, degenerate edge */
-					else {
-						degenerate = true;
-					}
-					if (!degenerate) {
-						/* rotate a bit to prevent non-reachable sensors */
-						float rotation = pathfinding.rotate_navpoints;
-						if (disc.winding == disc.LEFT) rotation = -rotation;
-						sensor_direction.rotate(rotation, vec2<>(0, 0));
-						//sensor_direction = transform.pos - vert.location;
-						sensor_direction.normalize();
-
-						vert.sensor = vert.location + sensor_direction * pathfinding.target_offset;
-
-						/* if this sensor overlaps anything, discard it */
-						std::vector<vec2<>> sensor_polygon = {
-							sensor_direction * 10 + vert.location - sensor_direction.perpendicular_cw() * 2,
-							sensor_direction * 10 + vert.location - sensor_direction.perpendicular_cw() * 2 + sensor_direction * pathfinding.target_offset,
-							sensor_direction * 10 + vert.location + sensor_direction.perpendicular_cw() * 2 + sensor_direction * pathfinding.target_offset,
-							sensor_direction * 10 + vert.location + sensor_direction.perpendicular_cw() * 2
-						};
-
-						//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[0], sensor_polygon[1], graphics::pixel_32(255, 255, 255, 255)));
-						//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[1], sensor_polygon[2], graphics::pixel_32(255, 255, 255, 255)));
-						//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[2], sensor_polygon[3], graphics::pixel_32(255, 255, 255, 255)));
-						//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[3], sensor_polygon[0], graphics::pixel_32(255, 255, 255, 255)));
-
-						auto out = physics.query_polygon(sensor_polygon, &vision.filter, it);
-
-						if (out.bodies.empty()) {
-							vert.sensor = physics.push_away_from_walls(vert.sensor, pathfinding.target_offset, 50, vision.filter, it);
-							pathfinding.session().undiscovered_vertices.push_back(vert);
+						if (vertex_hit.second.y >= transform.pos.y) {
+							vision.discontinuities.push_back(new_discontinuity);
 						}
 					}
+
+					vision.vertex_hits.clear();
 				}
 
-				if (!this_discontinuity_is_already_discovered) 
-					undiscovered_visible.push_back(vert);
+				//vision.ignore_discontinuities_shorter_than = pathfinding.session().temporary_ignore_discontinuities_shorter_than;
+
+				/* save all fully visible vertices as discovered */
+				for (auto& visible_vertex : vision.vertex_hits) {
+					bool this_visible_vertex_is_already_memorised = false;
+
+					//auto components::pathfinding::pathfinding_session::* location = 
+					//		pathfinding.force_touch_sensors ? 
+					//	&components::pathfinding::pathfinding_session::undiscovered_vertices :
+					//&components::pathfinding::pathfinding_session::discovered_vertices;
+
+					for (auto& memorised : pathfinding.session().discovered_vertices) {
+						/* if a similiar discovered vertex exists */
+						if (memorised.location.compare(visible_vertex.second, epsilon_distance_the_same_vertex)) {
+							this_visible_vertex_is_already_memorised = true;
+							/* overwrite the location just in case */
+							memorised.location = visible_vertex.second;
+							break;
+						}
+					}
+
+					/* save if unique */
+					if (!this_visible_vertex_is_already_memorised) {
+						components::pathfinding::pathfinding_session::navigation_vertex vert;
+						vert.location = visible_vertex.second;
+						pathfinding.session().discovered_vertices.push_back(vert);
+					}
+				}
+
+
+
+				/* save all new discontinuities from visibility */
+				for (auto& disc : vision.discontinuities) {
+					if (disc.is_boundary) continue;
+
+					bool this_discontinuity_is_already_memorised = false;
+					bool this_discontinuity_is_already_discovered = false;
+
+					components::pathfinding::pathfinding_session::navigation_vertex vert;
+
+					for (auto& memorised_undiscovered : pathfinding.session().undiscovered_vertices) {
+						/* if a discontinuity with the same closer vertex already exists */
+						if (memorised_undiscovered.location.compare(disc.points.first, epsilon_distance_the_same_vertex)) {
+							this_discontinuity_is_already_memorised = true;
+							vert = memorised_undiscovered;
+							//memorised_undiscovered.location = disc.points.first;
+							break;
+						}
+					}
+
+					for (auto& memorised_discovered : pathfinding.session().discovered_vertices) {
+						/* if a discontinuity with the same closer vertex already exists */
+						if (memorised_discovered.location.compare(disc.points.first, epsilon_distance_the_same_vertex)) {
+							this_discontinuity_is_already_discovered = true;
+							memorised_discovered.location = disc.points.first;
+							break;
+						}
+					}
+
+					vert.location = disc.points.first;
+
+					/* if it is unique, push it */
+					if (!this_discontinuity_is_already_memorised && !this_discontinuity_is_already_discovered) {
+
+						/* get the associated edge to prepare a relevant sensor */
+						auto associated_edge = vision.edges[disc.edge_index];
+
+						/* get the direction the sensor will be going to */
+						vec2<> sensor_direction;
+
+						bool degenerate = false;
+
+						/* if the first vertex of the edge matches the location */
+						if (associated_edge.first.compare(vert.location))
+							sensor_direction = associated_edge.first - associated_edge.second;
+						/* if it is the second one */
+						else if (associated_edge.second.compare(vert.location))
+							sensor_direction = associated_edge.second - associated_edge.first;
+						/* should never happen, degenerate edge */
+						else {
+							degenerate = true;
+						}
+						if (!degenerate) {
+							/* rotate a bit to prevent non-reachable sensors */
+							float rotation = pathfinding.rotate_navpoints;
+							if (disc.winding == disc.LEFT) rotation = -rotation;
+							sensor_direction.rotate(rotation, vec2<>(0, 0));
+							//sensor_direction = transform.pos - vert.location;
+							sensor_direction.normalize();
+
+							vert.sensor = vert.location + sensor_direction * pathfinding.target_offset;
+
+							/* if this sensor overlaps anything, discard it */
+							std::vector<vec2<>> sensor_polygon = {
+								sensor_direction * 10 + vert.location - sensor_direction.perpendicular_cw() * 2,
+								sensor_direction * 10 + vert.location - sensor_direction.perpendicular_cw() * 2 + sensor_direction * pathfinding.target_offset,
+								sensor_direction * 10 + vert.location + sensor_direction.perpendicular_cw() * 2 + sensor_direction * pathfinding.target_offset,
+								sensor_direction * 10 + vert.location + sensor_direction.perpendicular_cw() * 2
+							};
+
+							//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[0], sensor_polygon[1], graphics::pixel_32(255, 255, 255, 255)));
+							//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[1], sensor_polygon[2], graphics::pixel_32(255, 255, 255, 255)));
+							//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[2], sensor_polygon[3], graphics::pixel_32(255, 255, 255, 255)));
+							//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[3], sensor_polygon[0], graphics::pixel_32(255, 255, 255, 255)));
+
+							auto out = physics.query_polygon(sensor_polygon, &vision.filter, it);
+
+							if (out.bodies.empty()) {
+								vert.sensor = physics.push_away_from_walls(vert.sensor, pathfinding.target_offset, 50, vision.filter, it);
+								pathfinding.session().undiscovered_vertices.push_back(vert);
+							}
+						}
+					}
+
+					if (!this_discontinuity_is_already_discovered)
+						undiscovered_visible.push_back(vert);
+				}
+
 			}
 
 			/* mark as visible vertices such that:
