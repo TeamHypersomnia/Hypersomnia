@@ -167,3 +167,5 @@ pip-log.txt
 .DS_Store
 !*.lua
 /ReleaseDebug
+*.wav
+*.png

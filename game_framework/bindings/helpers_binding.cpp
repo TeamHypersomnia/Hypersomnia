@@ -36,7 +36,7 @@ void loop_instability_gun_bullets(pixel_32 init_color, std::vector<entity_ptr>* 
 			body.ApplyAngularImpulse(randval(0, 0.01), true);
 
 			auto alpha_mult = (1 - (dist_from_start / dmg.max_lifetime_ms));
-			set_polygon_color(model, pixel_32(init_color.r, init_color.g, init_color.b, alpha_mult * alpha_mult * alpha_mult * 255 + (dist_from_starting_point / 5000) * 90));
+			set_polygon_color(model, pixel_32(init_color.r, init_color.g, init_color.b, 255));
 		
 			return false;
 		}), std::end(all_player_bullets));
