@@ -22,10 +22,6 @@
 
 #include "../world_instance.h"
 
-void set_world_reloading_script(resources::script* new_scr) {
-	world_reloading_script = new_scr;
-}
-
 int bitor(lua_State* L) {
 	int arg_count = lua_gettop(L);
 	int result = 0;
@@ -211,7 +207,6 @@ void script_system::generate_lua_state(lua_state_wrapper& new_state) {
 
 			bindings::_opengl_binding(),
 
-			luabind::def("set_world_reloading_script", &set_world_reloading_script),
 			luabind::def("clamp", &augs::get_clamp<float>),
 			luabind::def("debugger_break", &debugger_break),
 			luabind::def("randval", (float(*)(float, float))&randval),
