@@ -1,0 +1,13 @@
+render order:
+
+1. Legs, 1 animation for walking, 1 for running (optional)
+2. Arms, SPRITE for bare handed walking and animation for hitting, and possibly SPRITE for every kind of weapon for holding
+3. Torso, multiple animations per item instance: (walking + shooting for one for every kind of weapon: bare hands, melee, rifle, sniper)
+4. Head, one SPRITE per item instance, also for running.
+
+The above is customizable.
+
+
+
+When the packet with a new position arrives to the server, 
+it should calculate a force vector (or velocity vector) to be applied to the character so that in the next simulation step it reaches the requested position.
