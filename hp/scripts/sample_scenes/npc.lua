@@ -1,4 +1,4 @@
-npc_class = { 
+npc_class = inherits_from { 
 	--entity = 0,
 	--weapon_animation_sets = {},
 	--current_weapon = bare_hands
@@ -20,12 +20,7 @@ function get_scripted(entity)
 end
 
 function init_npc(this_entity, optional_write)
-	this_entity.scriptable.script_data = this_entity.scriptable.script_data:create()
-	this_entity.scriptable.script_data.entity = this_entity
-	
-	if optional_write ~= nil then recursive_write(this_entity.scriptable.script_data, optional_write) end
-	
-	this_entity.scriptable.script_data:init()
+	this_entity.scriptable.script_data = this_entity.scriptable.script_data:create(this_entity, optional_write)
 	this_entity.scriptable.script_data.head_entity = create_entity (archetyped(this_entity.scriptable.script_data.head_archetype, {
 		chase = {
 			target = this_entity,
@@ -37,16 +32,16 @@ function init_npc(this_entity, optional_write)
 		
 end
 
-function npc_class:create(o)  
-	 local inst = o or {}
-     setmetatable(inst, { __index = npc_class } )
-     return inst
+function npc_class:constructor(this_entity, optional_write)
+	if optional_write ~= nil then recursive_write(self, optional_write) end
+	
+	self.entity = this_entity
+	
+	self:take_weapon_item(bare_hands)
 end
 
-function npc_class:init()
-	local o = self
-	
-	o.steering_behaviours = {
+function npc_class:initialize_steering()
+	self.steering_behaviours = {
 		target_seeking = behaviour_state(target_seek_steering),
 		forward_seeking = behaviour_state(forward_seek_steering),
 		
@@ -57,24 +52,22 @@ function npc_class:init()
 		pursuit = behaviour_state(pursuit_steering)
 	}
 	
-	o.target_entities = {
+	self.target_entities = {
 		navigation = create_entity(target_entity_archetype),
 		forward = create_entity(target_entity_archetype),
 		last_seen = create_entity(target_entity_archetype)
 	}
 	
-	o.was_seen = false
-	o.is_seen = false
-	o.is_alert = false
-	o.last_seen_velocity = vec2(0, 0)
+	self.was_seen = false
+	self.is_seen = false
+	self.is_alert = false
+	self.last_seen_velocity = vec2(0, 0)
 		
-	o.steering_behaviours.forward_seeking.target_from:set(o.target_entities.forward)
-	o.steering_behaviours.target_seeking.target_from:set(o.target_entities.navigation)
-	o.steering_behaviours.sensor_avoidance.target_from:set(o.target_entities.navigation)
+	self.steering_behaviours.forward_seeking.target_from:set(self.target_entities.forward)
+	self.steering_behaviours.target_seeking.target_from:set(self.target_entities.navigation)
+	self.steering_behaviours.sensor_avoidance.target_from:set(self.target_entities.navigation)
 	
-	o.steering_behaviours.pursuit.enabled = false
-	
-	o:take_weapon_item(bare_hands)
+	self.steering_behaviours.pursuit.enabled = false
 end
 
 function npc_class:refresh_behaviours() 
@@ -519,7 +512,7 @@ for i=1, npc_count do
 			},
 			
 			render = {
-				layer = layers.HEADS,
+				layer = render_layers.HEADS,
 				model = head_sprites[i]
 			}
 		},
@@ -530,9 +523,10 @@ for i=1, npc_count do
 	})
 	
 	local script_data = get_scripted(my_npcs[i].body:get())
+	script_data:initialize_steering()
 	script_data:refresh_behaviours()
 	script_data:take_weapon_item(bare_hands)
-	--my_npcs[i].body.pathfinding:start_exploring()
+	my_npcs[i].body:get().pathfinding:start_exploring()
 	my_npcs[i].body:get().name = "npc_entity"
 	my_npcs[i].body:get().gun.target_camera_to_shake:set(world_camera)
 	get_scripted(my_npcs[i].body:get()):take_weapon_item(npc_weapons[i])

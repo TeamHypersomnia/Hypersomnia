@@ -10,7 +10,7 @@ target_entity_archetype = {
 target_entity = create_entity(archetyped(target_entity_archetype, {
 	render = { model = crosshair_blue } ,
 	crosshair = {
-			sensitivity = 0
+			sensitivity = vec2(0, 0)
 	}
 }))
 

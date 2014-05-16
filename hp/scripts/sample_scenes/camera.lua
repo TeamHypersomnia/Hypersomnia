@@ -1,27 +1,3 @@
-current_zoom_level = 0
-
-function set_zoom_level(camera)
-	local mult = 1 + (current_zoom_level / 1000)
-	local new_w = config_table.resolution_w*mult
-	local new_h = config_table.resolution_h*mult
-	camera.camera.ortho = rect_ltrb(rect_xywh((config_table.resolution_w-new_w)/2, (config_table.resolution_h-new_h)/2, new_w, new_h))
-	
-	player.crosshair:get().crosshair.size_multiplier = vec2(mult, mult)
-	target_entity.crosshair.size_multiplier = vec2(mult, mult)
-end
-
-scriptable_zoom = create_scriptable_info {
-	scripted_events = {
-		[scriptable_component.INTENT_MESSAGE] = function(message)
-				if message.intent == custom_intents.ZOOM_CAMERA then
-					current_zoom_level = current_zoom_level-message.wheel_amount
-					set_zoom_level(message.subject)
-				end
-			return false
-		end
-	}
-}
-
 camera_archetype = {
 	transform = {
 		pos = vec2(),
@@ -47,8 +23,8 @@ camera_archetype = {
 	},
 	
 	chase = {
-		relative = false,
-		offset = vec2(config_table.resolution_w/(-2), config_table.resolution_h/(-2))
+		relative = false
+		--offset = vec2(config_table.resolution_w/(-2), config_table.resolution_h/(-2))
 	}
 }
  
@@ -182,7 +158,7 @@ GL.glUniform1i(basic_texture_uniform, 0)
 
 local my_timer = timer()
 
-world_camera = create_entity (archetyped(camera_archetype, {
+world_camera_ptr = ptr_create_entity (archetyped(camera_archetype, {
 	transform = {
 		pos = vec2(),
 		rotation = 0
@@ -190,17 +166,20 @@ world_camera = create_entity (archetyped(camera_archetype, {
 
 	camera = {
 		screen_rect = rect_xywh(0, 0, config_table.resolution_w, config_table.resolution_h),
-		ortho = rect_ltrb(0, 0, config_table.resolution_w, config_table.resolution_h),
+		size = vec2(config_table.resolution_w, config_table.resolution_h),
 		
-		drawing_callback = function (subject, renderer, visible_area, drawn_transform, target_transform, mask)
+		drawing_callback = function (subject, camera_draw_input, mask)
+			local renderer = camera_draw_input.output
+			local visible_area = camera_draw_input.visible_area
+			
 			my_shader_program:use()
-			renderer:generate_triangles(visible_area, drawn_transform, mask)
+			renderer:generate_triangles(camera_draw_input, mask)
 			
 			GL.glUniformMatrix4fv(
 			projection_matrix_uniform, 
 			1, 
 			GL.GL_FALSE, 
-			orthographic_projection(visible_area.x, visible_area.r, visible_area.b, visible_area.y, 0, 1):data()
+			orthographic_projection(0, visible_area.x, visible_area.y, 0, 0, 1):data()
 			)
 			
 			--local old_num = renderer:get_triangle_count()
@@ -276,6 +255,19 @@ world_camera = create_entity (archetyped(camera_archetype, {
 	chase = {},
 	
 	scriptable = {
-		available_scripts = scriptable_zoom
+		script_data = {}
 	}
 }))
+
+-- convenience, will always exist
+world_camera = world_camera_ptr:get()
+
+world_camera_self = generate_entity_object(world_camera_ptr, camera_class)
+
+world_camera_self.intent_message = function(self, message)
+	if message.intent == custom_intents.ZOOM_CAMERA then
+		self:set_zoom_level(current_zoom_level-message.wheel_amount)
+	end
+	return false
+end
+

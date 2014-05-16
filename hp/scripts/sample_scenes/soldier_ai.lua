@@ -1,3 +1,15 @@
+level_world = world_class:create()
+
+level_world.loop = function(self)
+	self:process_all_systems()
+	return input_system.quit_flag
+end
+
+level_world:set_current()
+
+dofile "hp\\scripts\\resources\\particle_effects.lua"
+dofile (ENGINE_DIRECTORY .. "settings.lua")
+
 --sexualizer = sfMusic()
 --sexualizer:openFromFile("resources\\sfx\\sexualizer.ogg")
 --sexualizer:play()

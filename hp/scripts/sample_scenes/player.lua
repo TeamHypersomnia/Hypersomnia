@@ -1,6 +1,7 @@
 player_class = inherits_from(npc_class)
 
-function player_class:init()
+function player_class:constructor(this_entity, optional_write)
+	npc_class.constructor(self, this_entity, optional_write)
 	self:take_weapon_item(bare_hands)
 end
 
@@ -102,7 +103,7 @@ init_npc(player.body:get(), {
 		},
 		
 		render = {
-			layer = layers.HEADS,
+			layer = render_layers.HEADS,
 			model = head_walk_sprite
 		}
 	},
@@ -160,4 +161,4 @@ world_camera.camera.player:set(player.body:get())
 world_camera.camera.crosshair:set(player.crosshair:get())
 --player.body:get().gun.target_camera_to_shake:set(world_camera)
 
-set_zoom_level(world_camera)
+--world_camera:set_zoom_level(world_camera)
