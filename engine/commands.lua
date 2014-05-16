@@ -19,7 +19,7 @@ print("Calling commands.lua...")
 
 	--obstacle_avoidance_steering.force_color = rgba(0, 255, 255, 255)
 	
---print(player.body.transform.current.pos.x)
+--print(player.body:get().transform.current.pos.x)
 --ai_system.draw_triangle_edges = 1
 --ai_system.draw_cast_rays = 0
 ----ai_system.draw_visibility = 0
@@ -41,6 +41,9 @@ print("Calling commands.lua...")
 --end
 
 
+--get_self(my_npc.body).steering_behaviours.wandering.enabled = false
+
+
 
 
 --print(get_scripted(my_npcs[1].body).is_seen)
@@ -50,5 +53,9 @@ print("Calling commands.lua...")
 --create_entity { 
 --}
 
-player.body.physics.body:SetTransform(b2Vec2(0, -20000 * PIXELS_TO_METERS), 45*0.01745329251994329576923690768489)
-physics_system.b2world:SetGravity(b2Vec2(-120, 120))
+--player.body:get().physics.body:SetTransform(b2Vec2(0, -20000 * PIXELS_TO_METERS), 45*0.01745329251994329576923690768489)
+--physics_system.b2world:SetGravity(b2Vec2(-120, 120))
+--
+--my_npc
+
+

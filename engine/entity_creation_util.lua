@@ -31,7 +31,9 @@ function set_components_from_entry(entity, entry, entities_lookup)
 		end
 		
 		rewrite(movement, entry.movement, { ground_filter = true } )
-		recursive_write(movement.ground_filter, entry.movement.ground_filter)
+		if entry.movement.ground_filter ~= nil then 
+			recursive_write(movement.ground_filter, entry.movement.ground_filter) 
+		end
 	end
 	
 	function def(module_name, property_name, omit_properties) 
@@ -45,7 +47,7 @@ function set_components_from_entry(entity, entry, entities_lookup)
 		if(entry[property_name] ~= nil) then
 			local component = entity:add(module_name())
 			
-			omit_properties = omit_properties or {}
+			if omit_properties == nil then omit_properties = {} end
 			for k, v in pairs(ptr_variables) do
 				omit_properties[k] = v
 			end
@@ -88,7 +90,7 @@ function set_components_from_entry(entity, entry, entities_lookup)
 	
 	if entry.physics ~= nil then
 		local my_body_data = physics_info()
-		entry.physics.body_info = entry.physics.body_info or {}
+		if entry.physics.body_info == nil then entry.physics.body_info = {} end
 		
 		if entry.physics.body_info.shape_type == physics_info.RECT then
 			if entry.physics.body_info.rect_size == nil then
@@ -110,8 +112,8 @@ function set_components_from_entry(entity, entry, entities_lookup)
 	if entry.gun ~= nil then
 		local gun = entity.gun
 		--print(inspect(entry.gun))
-		entry.gun.bullet_body = entry.gun.bullet_body or {}
-		entry.gun.bullet_render = entry.gun.bullet_render or {} 
+		if entry.gun.bullet_body == nil then entry.gun.bullet_body = {} end
+		if entry.gun.bullet_render == nil then entry.gun.bullet_render = {} end
 		
 		set_physics_info(gun.bullet_body, entry.gun.bullet_body)
 		rewrite(gun.bullet_render, entry.gun.bullet_render)
@@ -143,11 +145,38 @@ function create_entity(entry)
 	return new_entity
 end
 
+function flush_dead_entities_in_group_by_entity()
+	for k, v in pairs(group_by_entity) do
+		if not k:exists() then
+			group_by_entity[k] = nil
+		end
+	end
+end
+
+function get_group_by_entity(entity_entry)
+	flush_dead_entities_in_group_by_entity()
+	
+	for k, v in pairs(group_by_entity) do
+		if k:get() == entity_entry then
+			return v
+		end
+	end
+	
+	return nil
+end
+
 function create_entity_group(entries)
+	flush_dead_entities_in_group_by_entity()
+	
 	local entities_lookup = {}
 	
 	for name, entry in pairs(entries) do
-		entities_lookup[name] = world:create_entity() 
+		local new_entity_ptr = entity_ptr()
+		local new_entity = world:create_entity()
+		new_entity_ptr:set(new_entity)
+		
+		entities_lookup[name] = new_entity
+		group_by_entity[new_entity_ptr] = entities_lookup
 	end
 	
 	for name, entry in pairs(entities_lookup) do
@@ -162,7 +191,7 @@ function ptr_create_entity(entry)
 	local result = create_entity(entry)
 	local my_new_ptr = entity_ptr()
 	my_new_ptr:set(result)
-	return result
+	return my_new_ptr
 end
 
 function ptr_create_entity_group(entries)
@@ -175,5 +204,18 @@ function ptr_create_entity_group(entries)
 	end
 	
 	return results
+end
+
+component_helpers = {}
+component_helpers.parallax_chase = function(_scrolling_speed, init_pos, camera_entity)
+	return {
+			scrolling_speed = _scrolling_speed,
+			reference_position = init_pos,
+			target_reference_position = camera_entity.transform.current.pos,
+			
+			chase_type = chase_component.PARALLAX,
+			target = camera_entity,
+			subscribe_to_previous = true
+		}
 end
 

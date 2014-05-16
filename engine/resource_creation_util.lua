@@ -8,7 +8,7 @@ function create(module, entries)
 end
 
 function create_options(entries, output)
-	output = output or _G
+	if output == nil then output = _G end
 	for k, v in pairs(entries) do
 		output[v] = bitflag(k-1)
 	end
@@ -76,8 +76,8 @@ function simple_create_polygon(entries)
 	local my_polygon = polygon()
 	local my_concave = drawable_concave()
 	
-	for k, vert in pairs(entries) do
-		my_concave:add_vertex(vertex(vert))
+	for i=1, #entries do
+		my_concave:add_vertex(vertex(entries[i]))
 	end
 	
 	my_polygon:add_concave(my_concave)
@@ -128,7 +128,13 @@ function create_particle(entries)
 	local my_particle = particle()
 	rewrite(my_particle, entries, { model = true })
 	
-	my_particle.model = create_sprite( entries.model ) 
+	if type(entries.model) ~= "userdata" then
+		entries.model = create_sprite( entries.model )
+	end
+	
+	table.insert(polygon_particle_userdatas_saved, entries.model)
+	my_particle.model = entries.model
+	
 	return my_particle
 end
 
@@ -195,12 +201,15 @@ function create_steering(entries)
 	local my_behaviour = (entries.behaviour_type)()
 	
 	recursive_write(my_behaviour, entries, { behaviour_type = true, current_target = true, optional_alignment = true })
+	
+	
 	if entries.current_target ~= nil then 
 		my_behaviour.current_target:set(entries.current_target) 
 	end
 	if entries.optional_alignment ~= nil then 
 		my_behaviour.optional_alignment:set(entries.optional_alignment) 
 	end
+	
 	return my_behaviour
 end
 
@@ -232,17 +241,17 @@ function create_behaviour_tree(entries)
 		if v.decorator_chain ~= nil then
 			
 			out_my_nodes[k].decorator_chain = out_my_nodes[v.decorator_chain]
-			print(out_my_nodes[k].decorator_chain.maximum_running_time_ms)
+			--print(out_my_nodes[k].decorator_chain.maximum_running_time_ms)
 		end
 		
 		out_my_nodes[k].name = k
 	end
 	
 	for root, v in pairs(entries.connections) do
-		print("parent is: " .. root)
+		--print("parent is: " .. root)
 		for i=1, #v do
 			
-			print(i, v[i])
+			--print(i, v[i])
 			out_my_nodes[root]:add_child(out_my_nodes[v[i]])
 		end
 	end
@@ -257,7 +266,7 @@ function create_behaviour_tree(entries)
 end
 
 function create_gun(entries)
-	print("creating gun..")
+	--print("creating gun..")
 	local temp = create_entity { gun = entries }
 	local new_gun = gun_component(temp.gun)
 	
