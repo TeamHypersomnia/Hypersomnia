@@ -8,9 +8,6 @@ tiled_map_loader = {
 	
 	texture_property_name = "texture",
 	
-	type_library = "sensibilia/maps/object_types",
-	world_information_library = "sensibilia/maps/world_properties",
-	
 	map_scale = 1.2,
 	allow_unknown_types = true,
 	
@@ -19,15 +16,23 @@ tiled_map_loader = {
 		local err = this.error_callback
 		
 		-- get them by copy
-		local map_table = archetyped(require(filename), {})
-		local type_table = archetyped(require(this.type_library), {})
-		
-		if type_table == nil then 
-			err ("error loading type table " .. this.type_library)
-		end
+		local map_table = clone_table(require(filename))
 		
 		if map_table == nil then 
 			err ("error loading map filename " .. filename)
+		end
+		
+		local type_library_filename = map_table.properties["type_library"]
+		
+		-- type library MUST be provided, at least an empty one
+		if type_library_filename == nil then
+			err ("type_library property is missing for map " .. filename)
+		end
+		
+		local type_table = clone_table(require(type_library_filename))
+		
+		if type_table == nil then 
+			err ("error loading type table " .. type_library_filename)
 		end
 		
 		if type_table.default_type == nil then 
@@ -45,37 +50,34 @@ tiled_map_loader = {
 				
 					local output_type_table = {}
 					
-					-- perform type operations only for non-information entities
-					if require(this.world_information_library)[object.type] == nil then
-						if this.allow_unknown_types and type_table[object.type] == nil then
-							type_table[object.type] = {}
-						end
-					
-						local this_type_table = type_table[object.type]
-						
-						if this_type_table == nil then
-							err ("couldn't find type " .. object.type .. " for object \"" .. object.name .. "\" in layer \"" .. layer.name .. "\"")
-							--print ("couldn't find type " .. object.type .. " for object \"" .. object.name .. "\" in layer \"" .. layer.name .. "\"")
-						end
-						
-						-- validation
-						if this_type_table.entity_archetype == nil then
-							--err("unspecified entity archetype for type " .. object.type)
-							--print("unspecified entity archetype for type " .. object.type)
-							this_type_table.entity_archetype = {}
-						end
-					
-						-- property priority (lowest to biggest):
-						-- layer properties set in Tiled
-						-- type properties from type library
-						-- object-specific properties set in Tiled
-						
-						-- could be written in one line but separated for clarity
-						output_type_table = archetyped(layer.properties, this_type_table)
-						output_type_table = archetyped(output_type_table, object.properties)
-						
-						-- rest of the validations (after the properties have been overridden)
+					if this.allow_unknown_types and type_table[object.type] == nil then
+						type_table[object.type] = {}
 					end
+					
+					local this_type_table = type_table[object.type]
+					
+					if this_type_table == nil then
+						err ("couldn't find type " .. object.type .. " for object \"" .. object.name .. "\" in layer \"" .. layer.name .. "\"")
+						--print ("couldn't find type " .. object.type .. " for object \"" .. object.name .. "\" in layer \"" .. layer.name .. "\"")
+					end
+					
+					-- validation
+					if this_type_table.entity_archetype == nil then
+						--err("unspecified entity archetype for type " .. object.type)
+						--print("unspecified entity archetype for type " .. object.type)
+						this_type_table.entity_archetype = {}
+					end
+					
+					-- property priority (lowest to biggest):
+					-- layer properties set in Tiled
+					-- type properties from type library
+					-- object-specific properties set in Tiled
+					
+					-- could be written in one line but separated for clarity
+					output_type_table = archetyped(layer.properties, this_type_table)
+					output_type_table = archetyped(output_type_table, object.properties)
+					
+					-- rest of the validations (after the properties have been overridden)
 					
 					-- handle object scale now, to simplify further calculations
 					
