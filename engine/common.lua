@@ -271,12 +271,6 @@ function add_roots_to_filenames(root_path, entries)
 	return new_table
 end
 
-function add_textures_from_filenames_to_atlas(atl, entries)
-	for k,v in pairs(entries) do
-		entries[k] = texture(v, atl)
-	end
-end
-
 function get_all_files_in_directory(directory)
 	directory = get_executable_path() .. "\\" .. directory
     local i, t, popen = 0, {}, io.popen
@@ -316,4 +310,16 @@ function save_resource_in_item_library(filename, resource_object, item_library)
 			end
 		end
 	end
+end
+
+function create_atlas_from_filenames(filename_entries)
+	local sprite_library = {}
+	local out_atlas = atlas()
+	
+	-- save every texture object in item library to be used later
+	for k, v in pairs(filename_entries) do
+		save_resource_in_item_library(v, texture(v, out_atlas), sprite_library)
+	end
+	
+	return out_atlas, sprite_library
 end
