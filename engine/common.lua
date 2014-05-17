@@ -298,3 +298,22 @@ function tokenize_string(inputstr, sep)
 	
     return t
 end
+
+function save_resource_in_item_library(filename, resource_object, item_library)
+	local tokens = tokenize_string(filename, "_.")
+	local current_array_level = item_library
+	
+	for i=1, #tokens do
+		-- the last token is file extension
+		if i ~= #tokens then
+			if current_array_level[tokens[i]] == nil then
+				current_array_level[tokens[i]] = {}
+			end
+			
+			-- the one before last should already point to the texture
+			if i == (#tokens - 1) then
+				current_array_level[tokens[i]] = resource_object
+			end
+		end
+	end
+end

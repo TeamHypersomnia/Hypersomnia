@@ -23,6 +23,14 @@ arms_[instances...]_hold_[rifle, pistol, barehanded] 												= 2 + 5 + 3 = 1
 head_[instances...]																					= 1 sprite for every instance
 
 In the end, we're going to tokenize all the filenames and use them to create a nested array to map an item of specified properties to a corresponding texture object.
+This in turn will be used to map an item with name "m4a1" to its sprite, for example.
+
+Storing texture files:
+Gameplay textures - these will be loaded and available all the time in the gpu; ONE FOLDER FOR ALL OF THEM
+Maps textures - another folder for all of them, the game will dynamically determine which files are to be loaded (according to the current map, for example)
+
+
 
 When the packet with a new position arrives to the server, 
 it should calculate a force vector (or velocity vector) to be applied to the character so that in the next simulation step it reaches the requested position.
+
