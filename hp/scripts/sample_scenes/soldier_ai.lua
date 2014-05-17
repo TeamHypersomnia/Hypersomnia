@@ -473,10 +473,11 @@ loop_only_info = create_scriptable_info {
 					input_system.quit_flag = 1
 				elseif message.intent == custom_intents.RESTART then
 					--print "INTENT.."
-					--if not player.body:exists() then
+					if not player.body:exists() then
 					--print "RELOADING.."
-						set_world_reloading_script(reloader_script)
-					--end
+						call_once_after_loop = function () 	dofile "hp\\scripts\\sample_scenes\\soldier_ai.lua" end
+						--set_world_reloading_script(reloader_script)
+					end
 				elseif message.intent == custom_intents.DROP_WEAPON then
 					if message.state_flag then
 						if player.body:exists() then get_scripted(player.body:get()):pick_up_weapon() end

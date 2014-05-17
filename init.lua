@@ -1,4 +1,4 @@
 dofile "engine\\load_libraries.lua"
 
 -- enter the game
-dofile "hp\\scripts\\hp_init.lua"
+dofile "hypersomnia\\scripts\\start.lua"

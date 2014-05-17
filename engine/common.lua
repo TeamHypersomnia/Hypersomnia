@@ -283,7 +283,18 @@ function get_all_files_in_directory(directory)
     for filename in popen('dir "'..directory..'" /b'):lines() do
         i = i + 1
         t[i] = filename
-		print (filename)
     end
+    return t
+end
+
+function tokenize_string(inputstr, sep)
+    if sep == nil then sep = "%s" end
+    local i, t = 1, {}
+	
+    for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+            t[i] = str
+            i = i + 1
+    end
+	
     return t
 end
