@@ -8,6 +8,21 @@ render order:
 The above is customizable.
 
 
+Anyway, firstly we're going to handle only premade torso+legs.
+
+The sprites are going to grow in number, but we'll handle it like this:
+Every sprite will be named with following schema:
+
+torso_[basic, warrior, ninja, ... etc]_[rifle, pistol, barehands]_[shoot, walk]_[1, 2, 3, 4, 5] 	= 30 sprites for every instance
+legs_[instances...]_[walk, run]_[1, 2, 3, 4, 5]      												= 10 sprites for every instance
+
+arms_[instances...]_walk_[1, 2]
+arms_[instances...]_hit_[1, 2, 3, 4, 5]
+arms_[instances...]_hold_[rifle, pistol, barehanded] 												= 2 + 5 + 3 = 10 sprites for every instance
+
+head_[instances...]																					= 1 sprite for every instance
+
+In the end, we're going to tokenize all the filenames and use them to create a nested array to map an item of specified properties to a corresponding texture object.
 
 When the packet with a new position arrives to the server, 
 it should calculate a force vector (or velocity vector) to be applied to the character so that in the next simulation step it reaches the requested position.

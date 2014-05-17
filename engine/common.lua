@@ -260,3 +260,30 @@ function coroutine.get_value_variator(args)
 		end
 	end)
 end
+
+function add_roots_to_filenames(root_path, entries)
+	local new_table = {}
+	
+	for k, v in pairs(entries) do
+		new_table[k] = (root_path .. v)
+	end
+	
+	return new_table
+end
+
+function add_textures_from_filenames_to_atlas(atl, entries)
+	for k,v in pairs(entries) do
+		entries[k] = texture(v, atl)
+	end
+end
+
+function get_all_files_in_directory(directory)
+	directory = get_executable_path() .. "\\" .. directory
+    local i, t, popen = 0, {}, io.popen
+    for filename in popen('dir "'..directory..'" /b'):lines() do
+        i = i + 1
+        t[i] = filename
+		print (filename)
+    end
+    return t
+end
