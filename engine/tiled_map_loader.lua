@@ -4,8 +4,6 @@ tiled_map_loader = {
 		debugger_break()
 	end,
 	
-	world_camera_entity = 0,
-	
 	texture_property_name = "texture",
 	
 	map_scale = 1.2,
@@ -157,7 +155,11 @@ tiled_map_loader = {
 		return world_information
 	end,
 
-	basic_entity_table = function(object, this_type_table, out_polygons, out_rects)
+	basic_entity_table = function(object, this_type_table, out_resource_storage, world_camera_entity)
+		if out_resource_storage.polygons == nil then out_resource_storage.polygons = {} end
+		if out_resource_storage.rects == nil then out_resource_storage.rects = {} end
+		
+		
 		local this = tiled_map_loader
 		local final_entity_table = {}
 			
@@ -180,7 +182,7 @@ tiled_map_loader = {
 			set_polygon_color(new_polygon, final_color)
 			
 			final_entity_table.render = { model = new_polygon }
-			table.insert(out_polygons, new_polygon)
+			table.insert(out_resource_storage.polygons, new_polygon)
 		elseif shape == "rectangle" then
 			physics_body_type = physics_info.RECT
 			
@@ -195,7 +197,7 @@ tiled_map_loader = {
 			
 			-- shift position by half of the rectangle size 
 			object.pos = object.pos + rect_size / 2
-			table.insert(out_rects, new_rectangle)
+			table.insert(out_resource_storage.rects, new_rectangle)
 		else
 			err ("shape type unsupported!")
 		end
@@ -209,7 +211,7 @@ tiled_map_loader = {
 		}
 		
 		if this_type_table.scrolling_speed ~= nil then
-			final_entity_table.chase = component_helpers.parallax_chase (tonumber(this_type_table.scrolling_speed), object.pos, this.world_camera_entity)
+			final_entity_table.chase = component_helpers.parallax_chase (tonumber(this_type_table.scrolling_speed), object.pos, world_camera_entity)
 		end
 		
 		-- handle physical body request
