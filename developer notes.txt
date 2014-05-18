@@ -51,6 +51,15 @@ is that Tiled does not support type libraries in itself and it would be hard to 
 that we can set all possible properties for an entity.
 
 
+Now the primary difference between a scene and a loader:
+A scene encapsulates behaviour that will be common for all scene types, whether are these menus, or arctic maps, or sceneries of dreams.
+It merely loads the resources like gameplay sounds + sprites, and resources associated with the map it is going to load;
+
+All of these scenes will need different kind of cameras, players with different properties and so on.
+The loader is responsible for initializing these gameplay-specific features, like camera, and setting it to follow the player for example.
+If something in the map says so (let it be an initialization script in map properties), the loader should handle it accordingly.
+
+
 TEXTURE ATLASES!
 
 At first, we will probably have only one atlas with both gameplay and map textures.

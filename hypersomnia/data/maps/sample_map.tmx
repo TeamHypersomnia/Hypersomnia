@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="50" height="50" tilewidth="32" tileheight="32">
+ <properties>
+  <property name="texture_directory" value="hypersomnia\data\maps\textures\"/>
+  <property name="type_library" value="hypersomnia\data\maps\basic_type_library"/>
+ </properties>
+ <objectgroup name="Object Layer 1" width="50" height="50">
+  <object type="wall_wood" x="512" y="544" width="480" height="64"/>
+  <object type="crate" x="992" y="864" width="160" height="160"/>
+  <object type="teleport_position" x="736" y="736" width="96" height="96"/>
+ </objectgroup>
+</map>
