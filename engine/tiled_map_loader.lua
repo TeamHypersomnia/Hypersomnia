@@ -9,16 +9,26 @@ tiled_map_loader = {
 	map_scale = 1,
 	allow_unknown_types = true,
 	
-	for_every_object = function(filename, callback)
-		local this = tiled_map_loader
-		local err = this.error_callback
-		
-		-- get them by copy
+	try_to_load_map = function(filename)
+		-- get it by copy
 		local map_table = clone_table(require(filename))
 		
 		if map_table == nil then 
 			err ("error loading map filename " .. filename)
 		end
+		
+		return map_table
+	end
+	
+	get_map_properties = function(filename)
+		return try_to_load_map(filename).properties
+	end
+	
+	for_every_object = function(filename, callback)
+		local this = tiled_map_loader
+		local err = this.error_callback
+		
+		local map_table = try_to_load_map(filename)
 		
 		local type_library_filename = map_table.properties["type_library"]
 		
@@ -160,7 +170,7 @@ tiled_map_loader = {
 		return world_information
 	end,
 
-	basic_entity_table = function(object, this_type_table, out_resource_storage, world_camera_entity)
+	basic_entity_table = function(object, this_type_table, out_resource_storage, world_camera_entity, texture_by_filename)
 		if out_resource_storage.polygons == nil then out_resource_storage.polygons = {} end
 		if out_resource_storage.rects == nil then out_resource_storage.rects = {} end
 		
@@ -176,7 +186,7 @@ tiled_map_loader = {
 		
 		-- begin processing the newly to be created entity
 		local shape = object.shape
-		local used_texture = textures_by_name[this_type_table.texture]
+		local used_texture = texture_by_filename[this_type_table.texture]
 		
 		local physics_body_type = 0
 		
