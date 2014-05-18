@@ -18,17 +18,13 @@ tiled_map_loader = {
 		end
 		
 		return map_table
-	end
-	
-	get_map_properties = function(filename)
-		return try_to_load_map(filename).properties
-	end
+	end,
 	
 	for_every_object = function(filename, callback)
 		local this = tiled_map_loader
 		local err = this.error_callback
 		
-		local map_table = try_to_load_map(filename)
+		local map_table = this.try_to_load_map(filename)
 		
 		local type_library_filename = map_table.properties["type_library"]
 		
@@ -84,6 +80,11 @@ tiled_map_loader = {
 					-- could be written in one line but separated for clarity
 					output_type_table = archetyped(layer.properties, this_type_table)
 					output_type_table = archetyped(output_type_table, object.properties)
+					
+					-- add root directory to the texture if specified in map properties
+					if map_table.properties["texture_directory"] ~= nil and output_type_table[this.texture_property_name] ~= nil then
+						output_type_table[this.texture_property_name] = map_table.properties["texture_directory"] .. output_type_table[this.texture_property_name] 
+					end
 					
 					-- rest of the validations (after the properties have been overridden)
 					
