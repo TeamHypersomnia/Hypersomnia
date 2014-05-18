@@ -128,14 +128,14 @@ function set_components_from_entry(entity, entry, entities_lookup)
 	end
 end
 
-function create_entity(entry)
+function world_class:create_entity(entry)
 	local enabled = true
 	
 	if entry.enabled ~= nil then
 		enabled = entry.enabled
 	end
 	
-	local new_entity = world:create_entity()
+	local new_entity = self.world:create_entity()
 	set_components_from_entry(new_entity, entry, {})
 	
 	if not enabled then 
@@ -145,18 +145,18 @@ function create_entity(entry)
 	return new_entity
 end
 
-function flush_dead_entities_in_group_by_entity()
-	for k, v in pairs(group_by_entity) do
+function world_class:flush_dead_entities_in_group_by_entity()
+	for k, v in pairs(self.group_by_entity) do
 		if not k:exists() then
-			group_by_entity[k] = nil
+			self.group_by_entity[k] = nil
 		end
 	end
 end
 
-function get_group_by_entity(entity_entry)
-	flush_dead_entities_in_group_by_entity()
+function world_class:get_group_by_entity(entity_entry)
+	self:flush_dead_entities_in_group_by_entity()
 	
-	for k, v in pairs(group_by_entity) do
+	for k, v in pairs(self.group_by_entity) do
 		if k:get() == entity_entry then
 			return v
 		end
@@ -165,18 +165,18 @@ function get_group_by_entity(entity_entry)
 	return nil
 end
 
-function create_entity_group(entries)
-	flush_dead_entities_in_group_by_entity()
+function world_class:create_entity_group(entries)
+	self:flush_dead_entities_in_group_by_entity()
 	
 	local entities_lookup = {}
 	
 	for name, entry in pairs(entries) do
 		local new_entity_ptr = entity_ptr()
-		local new_entity = world:create_entity()
+		local new_entity = self.world:create_entity()
 		new_entity_ptr:set(new_entity)
 		
 		entities_lookup[name] = new_entity
-		group_by_entity[new_entity_ptr] = entities_lookup
+		self.group_by_entity[new_entity_ptr] = entities_lookup
 	end
 	
 	for name, entry in pairs(entities_lookup) do
@@ -187,15 +187,15 @@ function create_entity_group(entries)
 end
 
 
-function ptr_create_entity(entry)
-	local result = create_entity(entry)
+function world_class:ptr_create_entity(entry)
+	local result = self:create_entity(entry)
 	local my_new_ptr = entity_ptr()
 	my_new_ptr:set(result)
 	return my_new_ptr
 end
 
-function ptr_create_entity_group(entries)
-	local results = create_entity_group(entries)
+function world_class:ptr_create_entity_group(entries)
+	local results = self:create_entity_group(entries)
 	
 	for name, entry in pairs(results) do
 		local my_new_ptr = entity_ptr()

@@ -1,10 +1,11 @@
 -- gets map filename and scene object to save global entities like players/cameras
 
 return function(map_filename, scene_object)
-	input_system:clear_contexts()
-	input_system:add_context(main_input_context)
+	local world = scene_object.world_object
+	world.input_system:clear_contexts()
+	world.input_system:add_context(main_input_context)
 	
-	scene_object.world_camera = create_world_camera_entity()
+	scene_object.world_camera = create_world_camera_entity(world)
 	get_self(scene_object.world_camera).owner_scene = scene_object
 	
 	-- load map data
@@ -25,7 +26,7 @@ return function(map_filename, scene_object)
 	
 	for i = 1, #environmental_objects do
 		local object = environmental_objects[i]
-		create_entity (tiled_map_loader.basic_entity_table(object, type_table_by_object[object], scene_object.resource_storage, scene_object.world_camera, scene_object.texture_by_filename))
+		world:create_entity (tiled_map_loader.basic_entity_table(object, type_table_by_object[object], scene_object.resource_storage, scene_object.world_camera, scene_object.texture_by_filename))
 	end
 	
 	

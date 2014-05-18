@@ -1,4 +1,4 @@
-function create_world_camera_entity()
+function create_world_camera_entity(owner_world)
 	local camera_archetype = {
 		transform = {
 			pos = vec2(),
@@ -81,7 +81,7 @@ function create_world_camera_entity()
 	
 	GL.glUniform1i(basic_texture_uniform, 0)
 	
-	world_camera_ptr = ptr_create_entity (archetyped(camera_archetype, {
+	world_camera_ptr = owner_world:ptr_create_entity (archetyped(camera_archetype, {
 		transform = {
 			pos = vec2(),
 			rotation = 0
@@ -125,7 +125,7 @@ function create_world_camera_entity()
 		}
 	}))
 	
-	local world_camera_self = generate_entity_object(world_camera_ptr, camera_class)
+	local world_camera_self = owner_world:create_entity_table(world_camera_ptr, camera_class)
 	
 	world_camera_self.intent_message = function(self, message)
 		if message.intent == custom_intents.ZOOM_CAMERA then	

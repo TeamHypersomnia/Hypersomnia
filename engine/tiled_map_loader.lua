@@ -244,7 +244,7 @@ tiled_map_loader = {
 		return archetyped(this_type_table.entity_archetype, final_entity_table)
 	end,
 	
-	create_entities_from_map = function (filename)	
+	create_entities_from_map = function (filename, owner_world)	
 		local this = tiled_map_loader
 		local err = this.error_callback
 		
@@ -263,7 +263,7 @@ tiled_map_loader = {
 			if require(this.world_information_library)[object.type] == nil then
 				
 				-- create the entity
-				local new_entity = create_entity (this.basic_entity_table(object, this_type_table, map_object.all_polygons, map_object.all_sprites))
+				local new_entity = owner_world:create_entity (this.basic_entity_table(object, this_type_table, map_object.all_polygons, map_object.all_sprites))
 				
 				-- and save it in map table
 				if object.name == "" then 

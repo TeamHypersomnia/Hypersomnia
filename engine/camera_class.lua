@@ -1,7 +1,6 @@
 camera_class = inherits_from (entity_class)
 
-function camera_class:constructor(parent_entity)
-	entity_class.constructor(self, parent_entity)
+function camera_class:constructor()
 	self.current_zoom_level = 0
 	self.current_zoom_multiplier = 1
 end

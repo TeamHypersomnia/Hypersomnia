@@ -3,41 +3,35 @@ current_world = nil
 
 function world_class:constructor()
 	self.world_inst = world_instance()
+	-- shortcut 
+	self.world = self.world_inst.world
 	
-	-- shortcuts
-	self.globals = {
-		world = self.world_inst.world,
-		
-		input_system = self.world_inst.input_system,
-		visibility_system = self.world_inst.visibility_system,
-		pathfinding_system = self.world_inst.pathfinding_system,
-		render_system = self.world_inst.render_system,
-		physics_system = self.world_inst.physics_system,
+	self.entity_system_instance = entity_system:create(self)
 	
-		-- internals
-		group_by_entity = {},	
-		polygon_particle_userdatas_saved = {}	
-	}
+	-- shortcuts for systems
+	self.input_system = self.world_inst.input_system
+	self.visibility_system = self.world_inst.visibility_system
+	self.pathfinding_system = self.world_inst.pathfinding_system
+	self.render_system = self.world_inst.render_system
+	self.physics_system = self.world_inst.physics_system
 	
-	-- only for the following entity system creation
-	-- set current here is to be deleted when globals are removed
-	self:set_current()
-	self.entity_system_instance = entity_system:create()
+	-- other internals
+	self.group_by_entity = {}	
+	self.polygon_particle_userdatas_saved = {}	
 	
 	-- convenience shortcuts for entity system
-	self.globals.global_entity_table = self.entity_system_instance.entity_table
-	self.globals.global_message_table = self.entity_system_instance.message_table
+	self.global_entity_table = self.entity_system_instance.entity_table
+	self.global_message_table = self.entity_system_instance.message_table
 		
 	self.is_paused = false
-	
+end
+
+-- shortcut
+function world_class:create_entity_table(...)
+	return self.entity_system_instance:create_entity_table(...)
 end
 
 function world_class:set_current()
-	-- setup shortcuts in global space
-	for k, v in pairs(self.globals) do 
-		_G[k] = v
-	end
-	
 	current_world = self
 	augmentations_main_loop_callback = function() return self:loop() end
 end
@@ -49,7 +43,7 @@ function world_class:process_all_systems()
 	world:validate_delayed_messages()
 	world:flush_message_queues()
 	
-	if not self.is_paused then
+	if not self.is_paused then 
 		my_instance.physics_system:process_entities(world)
     end
     
