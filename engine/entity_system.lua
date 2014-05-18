@@ -7,6 +7,30 @@ function entity_system:constructor()
 	
 	self.message_table[scriptable_component.DAMAGE_MESSAGE] = {}
 	self.message_table[scriptable_component.INTENT_MESSAGE] = {}
+	
+	
+	-- user variables
+	self.enable_loop = true
+	self.registered_modules = {}
+	
+	self.loop_script_info = create_scriptable_info {
+		scripted_events = {
+			[scriptable_component.LOOP] = function(subject, is_substepping)	
+				local this = get_self(subject)
+				
+				if this.enable_loop then
+					this:tick(is_substepping, this.registered_modules)
+				end
+			end
+		}
+	}
+	
+	self.loop_script_entity = create_entity {
+		scriptable = {
+			available_scripts = self.loop_script_info,
+			script_data = self
+		}
+	}
 end
 
 function entity_system:process_all_entities(callback)

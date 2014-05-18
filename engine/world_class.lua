@@ -4,8 +4,6 @@ current_world = nil
 function world_class:constructor()
 	self.world_inst = world_instance()
 	
-	self.entity_system_instance = entity_system:create()
-	
 	-- shortcuts
 	self.globals = {
 		world = self.world_inst.world,
@@ -21,11 +19,17 @@ function world_class:constructor()
 		polygon_particle_userdatas_saved = {}	
 	}
 	
+	-- only for the following entity system creation
+	-- set current here is to be deleted when globals are removed
+	self:set_current()
+	self.entity_system_instance = entity_system:create()
+	
 	-- convenience shortcuts for entity system
 	self.globals.global_entity_table = self.entity_system_instance.entity_table
 	self.globals.global_message_table = self.entity_system_instance.message_table
 		
 	self.is_paused = false
+	
 end
 
 function world_class:set_current()
@@ -74,11 +78,8 @@ function world_class:process_all_systems()
 		my_instance.animation_system:process_entities(world)
 		my_instance.visibility_system:process_entities(world)
 		my_instance.pathfinding_system:process_entities(world)
-	end	
-	
-	if not self.is_paused then
 		my_instance.damage_system:process_events(world)
-	end
+	end	
 	
 	my_instance.script_system:process_events(world)
 	my_instance.script_system:process_entities(world)    
