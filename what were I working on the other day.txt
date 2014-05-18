@@ -1,0 +1,7 @@
+This right here, in case of me taking a break from programming, is to help me recall my train of thought I had the other day.
+
+So, what was that that I were working on the other day?
+
+
+-----------------------------------------------------------------------------
+was about to create render layers/physics filters file and finish this simple demo
