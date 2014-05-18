@@ -6,7 +6,7 @@ tiled_map_loader = {
 	
 	texture_property_name = "texture",
 	
-	map_scale = 1.2,
+	map_scale = 1,
 	allow_unknown_types = true,
 	
 	for_every_object = function(filename, callback)
@@ -105,19 +105,19 @@ tiled_map_loader = {
 	
 	get_all_objects_by_type = function(filename)
 		local this = tiled_map_loader
-		local all_objects_by_type = {}
-		local type_tables_by_object = {}
+		local objects_by_type = {}
+		local type_table_by_object = {}
 	
 		this.for_every_object(filename, function(object, this_type_table)
-			if all_objects_by_type[object.type] == nil then
-				all_objects_by_type[object.type] = {}
+			if objects_by_type[object.type] == nil then
+				objects_by_type[object.type] = {}
 			end
 			
-			table.insert(all_objects_by_type[object.type], object)
-			type_tables_by_object[object] = this_type_table
+			table.insert(objects_by_type[object.type], object)
+			type_table_by_object[object] = this_type_table
 		end)
 		
-		return all_objects_by_type, type_tables_by_object
+		return objects_by_type, type_table_by_object
 	end,
 	
 	get_all_textures = function (filename)
@@ -132,7 +132,12 @@ tiled_map_loader = {
 			end
 		end)
 		
-		return needed_textures
+		local textures_out = {}
+		for k, v in pairs(needed_textures) do
+			table.insert(textures_out, k)
+		end
+		
+		return textures_out
 	end,
 		
 	load_world_properties = function (filename)
