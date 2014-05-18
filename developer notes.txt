@@ -5,7 +5,7 @@ RESOURCE HANDLING
 Anyway, firstly we're going to handle only premade torso+legs.
 
 The sprites are going to grow in number, but we'll handle it like this:
-Every sprite will be named with following schema:
+Every sprite will be named with the following schema:
 
 torso_[basic, warrior, ninja, ... etc]_[rifle, pistol, barehands]_[shoot, walk]_[1, 2, 3, 4, 5] 	= 30 sprites for every instance
 legs_[instances...]_[walk, run]_[1, 2, 3, 4, 5]      												= 10 sprites for every instance
@@ -29,14 +29,9 @@ OUTFIT SYSTEM
 
 render order:
 
-1. Legs, 1 animation for walking, 1 for running (optional)
-2. Arms, SPRITE for bare handed walking and animation for hitting, and possibly SPRITE for every kind of weapon for holding
-3. Torso, multiple animations per item instance: (walking + shooting for one for every kind of weapon: bare hands, melee, rifle, sniper)
-4. Head, one SPRITE per item instance, also for running.
+Legs -> Arms -> Torso -> Head
 
-The above is customizable.
-
-
+All of above should have customizable colors.
 
 --------------------------------------------------------------------------------------------------
 MAPS AND LOADERS
@@ -56,6 +51,10 @@ is that Tiled does not support type libraries in itself and it would be hard to 
 that we can set all possible properties for an entity.
 
 
+TEXTURE ATLASES!
+
+At first, we will probably have only one atlas with both gameplay and map textures.
+As the maps grow in detail, we will create a separate atlas for example for ground art.
 
 
 
@@ -65,4 +64,12 @@ NETWORKING
 
 When the packet with a new position arrives to the server, 
 it should calculate a force vector (or velocity vector) to be applied to the character so that in the next simulation step it reaches the requested position.
+
+
+
+
+
+
+
+
 
