@@ -139,6 +139,10 @@ function archetyped(archetype, entries)
 	return final_entries
 end
 
+function clone_table(entries)
+	return archetyped(entries, {})
+end
+
 function reversed(input_table)
 	local out_table = {}
 	
@@ -271,12 +275,19 @@ function add_roots_to_filenames(root_path, entries)
 	return new_table
 end
 
-function get_all_files_in_directory(directory)
-	directory = get_executable_path() .. "\\" .. directory
+function get_all_files_in_directory(directory, add_roots)
+	local relative_directory = directory
+	directory = get_executable_path() .. "\\" .. relative_directory
+	
     local i, t, popen = 0, {}, io.popen
     for filename in popen('dir "'..directory..'" /b'):lines() do
         i = i + 1
-        t[i] = filename
+		
+		if add_roots == true then
+			t[i] = relative_directory .. "\\" .. filename
+		else
+			t[i] = filename
+		end
     end
     return t
 end
@@ -315,6 +326,7 @@ end
 function create_atlas_from_filenames(filename_entries)
 	local sprite_library = {}
 	local out_atlas = atlas()
+	collectgarbage("collect")
 	
 	-- save every texture object in item library to be used later
 	for k, v in pairs(filename_entries) do
