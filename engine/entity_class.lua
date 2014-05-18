@@ -55,15 +55,12 @@ end
 entity_basic_scriptable_info = create_scriptable_info {
 	scripted_events = {
 		[scriptable_component.LOOP] = function (subject, is_substepping)
-			if not level_world.is_paused then
+			local my_self = get_self(subject)
 			
-				local my_self = get_self(subject)
-			
-				if is_substepping then
-					my_self:substep()
-				else
-					my_self:loop()
-				end
+			if is_substepping then
+				my_self:substep()
+			else
+				my_self:loop()
 			end
 		end,
 		
