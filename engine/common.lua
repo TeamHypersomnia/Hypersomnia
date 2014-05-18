@@ -325,13 +325,21 @@ end
 
 function create_atlas_from_filenames(filename_entries)
 	local sprite_library = {}
+	local texture_by_filename = {}
 	local out_atlas = atlas()
 	collectgarbage("collect")
 	
 	-- save every texture object in item library to be used later
 	for k, v in pairs(filename_entries) do
-		save_resource_in_item_library(v, texture(v, out_atlas), sprite_library)
+		local texture_object = texture(v, out_atlas)
+		
+		-- save for requests from map editor
+		texture_by_filename[v] = texture_object
+		save_resource_in_item_library(v, texture_object, sprite_library)
 	end
 	
-	return out_atlas, sprite_library
+	out_atlas:build()
+	out_atlas:nearest()
+	
+	return out_atlas, sprite_library, texture_by_filename
 end
