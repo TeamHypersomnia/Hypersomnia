@@ -1,8 +1,11 @@
 -- gets map filename and scene object to save global entities like players/cameras
 
 return function(map_filename, scene_object)
+	input_system:clear_contexts()
+	input_system:add_context(main_input_context)
+	
 	scene_object.world_camera = create_world_camera_entity()
-	 get_self(scene_object.world_camera).owner_scene = scene_object
+	get_self(scene_object.world_camera).owner_scene = scene_object
 	
 	-- load map data
 	scene_object.resource_storage = {}
@@ -24,6 +27,7 @@ return function(map_filename, scene_object)
 		local object = environmental_objects[i]
 		create_entity (tiled_map_loader.basic_entity_table(object, type_table_by_object[object], scene_object.resource_storage, scene_object.world_camera, scene_object.texture_by_filename))
 	end
+	
 	
 	-- bind the atlas once
 	GL.glActiveTexture(GL.GL_TEXTURE0)

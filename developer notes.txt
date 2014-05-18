@@ -77,8 +77,13 @@ it should calculate a force vector (or velocity vector) to be applied to the cha
 
 
 
+--------------------------------------------------------------------------------------------------
+GAMEPLAY
+--------------------------------------------------------------------------------------------------
 
-
+Feature: scrolling.
+Player should be able to instantly zoom in and out by using scroll. 
+This will function as a map; it will greatly help in navigation and make the player situationally aware.
 
 
 

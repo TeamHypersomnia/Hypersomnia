@@ -113,10 +113,10 @@ function create_world_camera_entity()
 			end
 		},
 		
-		--input = {
-		--	intent_message.SWITCH_LOOK,
-		--	custom_intents.ZOOM_CAMERA
-		--},
+		input = {
+			intent_message.SWITCH_LOOK,
+			custom_intents.ZOOM_CAMERA
+		},
 		
 		chase = {},
 		
@@ -127,12 +127,18 @@ function create_world_camera_entity()
 	
 	local world_camera_self = generate_entity_object(world_camera_ptr, camera_class)
 	
-	--world_camera_self.intent_message = function(self, message)
-	--	if message.intent == custom_intents.ZOOM_CAMERA then
-	--		self:set_zoom_level(current_zoom_level-message.wheel_amount)
-	--	end
-	--	return false
-	--end
+	world_camera_self.intent_message = function(self, message)
+		if message.intent == custom_intents.ZOOM_CAMERA then	
+			local zoom_level = self:get_zoom_level()
+			
+			zoom_level = zoom_level-message.wheel_amount
+			if zoom_level < 0 then zoom_level = 0 end
+			if zoom_level > 1000 then zoom_level = 1000 end
+			self:set_zoom_level(zoom_level)
+		end
+		
+		return false
+	end
 	
 	return world_camera_ptr:get()
 end
