@@ -78,8 +78,8 @@ tiled_map_loader = {
 					-- object-specific properties set in Tiled
 					
 					-- could be written in one line but separated for clarity
-					output_type_table = archetyped(layer.properties, this_type_table)
-					output_type_table = archetyped(output_type_table, object.properties)
+					output_type_table = override(layer.properties, this_type_table)
+					output_type_table = override(output_type_table, object.properties)
 					
 					-- add root directory to the texture if specified in map properties
 					if map_table.properties["texture_directory"] ~= nil and output_type_table[this.texture_property_name] ~= nil then
@@ -232,7 +232,7 @@ tiled_map_loader = {
 		
 		-- handle physical body request
 		if this_type_table.entity_archetype.physics ~= nil then
-			final_entity_table = archetyped(final_entity_table, { 
+			final_entity_table = override(final_entity_table, { 
 				physics = { 
 					body_info = {
 						shape_type = physics_body_type
@@ -241,7 +241,7 @@ tiled_map_loader = {
 			})
 		end
 		
-		return archetyped(this_type_table.entity_archetype, final_entity_table)
+		return override(this_type_table.entity_archetype, final_entity_table)
 	end,
 	
 	create_entities_from_map = function (filename, owner_world)	

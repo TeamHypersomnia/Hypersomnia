@@ -61,7 +61,7 @@ function entity_system:create_entity_table(what_entity, what_class, ...)
 	
 	-- if scriptable component does not exist, add a new one
 	if what_entity:get().scriptable == nil then what_entity:get():add(scriptable_component()) end
-	--group_table = archetyped( { body = { scriptable = { } } }, group_table )
+	--group_table = override( { body = { scriptable = { } } }, group_table )
 	
 	--print (table.inspect(group_table))
 	--local my_new_entity_group = ptr_create_entity_group (group_table)

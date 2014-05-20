@@ -81,7 +81,7 @@ function create_world_camera_entity(owner_world)
 	
 	GL.glUniform1i(basic_texture_uniform, 0)
 	
-	world_camera_ptr = owner_world:ptr_create_entity (archetyped(camera_archetype, {
+	world_camera_ptr = owner_world:ptr_create_entity (override(camera_archetype, {
 		transform = {
 			pos = vec2(),
 			rotation = 0

@@ -133,14 +133,14 @@ function entries_from_archetypes(archetype, entries, final_entries)
 	recursive_write(final_entries, entries)
 end
 
-function archetyped(archetype, entries)
+function override(archetype, entries)
 	local final_entries = {}
 	entries_from_archetypes(archetype, entries, final_entries)
 	return final_entries
 end
 
 function clone_table(entries)
-	return archetyped(entries, {})
+	return override(entries, {})
 end
 
 function reversed(input_table)
