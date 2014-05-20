@@ -4,9 +4,8 @@ function scene_class:constructor()
 
 end
 
-function scene_class:load_map_and_set_current(map_filename, map_loader_filename)
+function scene_class:load_map(map_filename, map_loader_filename)
 	self.world_object = world_class:create()
-	self.world_object:set_current()
 	
 	-- concatenate table with gameplay textures and table with map textures
 	local all_needed_textures = table.concatenate({ 
@@ -23,4 +22,8 @@ function scene_class:load_map_and_set_current(map_filename, map_loader_filename)
 	
 	-- the loader creates all the entities in the current world
 	require(map_loader_filename)(map_filename, self)
+end
+
+function scene_class:set_current()
+	self.world_object:set_current()
 end
