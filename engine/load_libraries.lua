@@ -26,3 +26,5 @@ dofile (ENGINE_DIRECTORY .. "resource_creation_util.lua")
 
 dofile (ENGINE_DIRECTORY .. "tiled_map_loader.lua")
 dofile (ENGINE_DIRECTORY .. "camera_class.lua")
+
+dofile (ENGINE_DIRECTORY .. "scene_class.lua")

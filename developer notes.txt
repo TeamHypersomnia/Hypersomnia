@@ -7,12 +7,12 @@ Anyway, firstly we're going to handle only premade torso+legs.
 The sprites are going to grow in number, but we'll handle it like this:
 Every sprite will be named with the following schema:
 
-torso_[basic, warrior, ninja, ... etc]_[rifle, pistol, barehands]_[shoot, walk]_[1, 2, 3, 4, 5] 	= 30 sprites for every instance
+torso_[basic, warrior, ninja, ... etc]_[shoot, walk]_[rifle, pistol, barehands, melee]_[1, 2, 3, 4, 5] 	= 40 sprites for every instance
 legs_[instances...]_[walk, run]_[1, 2, 3, 4, 5]      												= 10 sprites for every instance
 
 arms_[instances...]_walk_[1, 2]
 arms_[instances...]_hit_[1, 2, 3, 4, 5]
-arms_[instances...]_hold_[rifle, pistol, barehanded] 												= 2 + 5 + 3 = 10 sprites for every instance
+arms_[instances...]_hold_[rifle, pistol, barehands, melee] 												= 2 + 5 + 4 = 11 sprites for every instance
 
 head_[instances...]																					= 1 sprite for every instance
 
@@ -22,6 +22,9 @@ This in turn will be used to map an item with name "m4a1" to its sprite, for exa
 Storing texture files:
 Gameplay textures - these will be loaded and available all the time in the gpu; ONE FOLDER FOR ALL OF THEM
 Maps textures - another folder for all of them, the game will dynamically determine which files are to be loaded (according to the current map, for example)
+
+
+There will be one animation set per every suitable bodypart (torso, legs) per every weapon type per every outfit.
 
 --------------------------------------------------------------------------------------------------
 OUTFIT SYSTEM
@@ -74,7 +77,10 @@ NETWORKING
 When the packet with a new position arrives to the server, 
 it should calculate a force vector (or velocity vector) to be applied to the character so that in the next simulation step it reaches the requested position.
 
+Regarding dynamic objects:
 
+Inside client simulation, other characters can not at all collide with dynamic objects - only the player can, so it compensates for round trip time.
+Whenever the server detects that a body has left the "sleeping" state, it updates positions for all the players, until they come to sleep again.
 
 
 --------------------------------------------------------------------------------------------------

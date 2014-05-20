@@ -1,12 +1,8 @@
 -- gets map filename and scene object to save global entities like players/cameras
 
 return function(map_filename, scene_object)
+	-- setup shortcut
 	local world = scene_object.world_object
-	world.input_system:clear_contexts()
-	world.input_system:add_context(main_input_context)
-	
-	scene_object.world_camera = create_world_camera_entity(world)
-	get_self(scene_object.world_camera).owner_scene = scene_object
 	
 	-- load map data
 	scene_object.resource_storage = {}
@@ -22,12 +18,41 @@ return function(map_filename, scene_object)
 		return sum_of_all
 	end
 	
+	-- initialize environmental physical objects
 	local environmental_objects = get_all_objects { "wall_wood", "crate" }
 	
 	for i = 1, #environmental_objects do
 		local object = environmental_objects[i]
 		world:create_entity (tiled_map_loader.basic_entity_table(object, type_table_by_object[object], scene_object.resource_storage, scene_object.world_camera, scene_object.texture_by_filename))
 	end
+	
+	
+	
+	
+	-- initialize input
+	world.input_system:clear_contexts()
+	world.input_system:add_context(main_input_context)
+	
+	-- initialize camera
+	scene_object.world_camera = create_world_camera_entity(world)
+	get_self(scene_object.world_camera).owner_scene = scene_object
+	
+	-- initialize player
+	local player_start = objects_by_type["teleport_position"][1]
+	
+	scene_object.crosshair_sprite = create_sprite {
+		image = scene_object.sprite_library["crosshair"],
+		color = rgba(255, 255, 255, 255)
+	}
+	
+	scene_object.player = create_basic_player(world, player_start.pos, scene_object.world_camera, scene_object.crosshair_sprite)
+	scene_object.legs_sets = create_all_legs_sets(scene_object.sprite_library)
+	scene_object.torso_sets = create_all_torso_sets(scene_object.sprite_library)
+
+	scene_object.player.body:get().animate.available_animations = scene_object.torso_sets["white"]["barehands"].set
+	scene_object.player.legs:get().animate.available_animations = scene_object.legs_sets["white"].set
+
+	
 	
 	
 	-- bind the atlas once
