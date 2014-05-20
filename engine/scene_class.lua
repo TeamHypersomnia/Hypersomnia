@@ -7,9 +7,15 @@ end
 function scene_class:load_map(map_filename, map_loader_filename)
 	self.world_object = world_class:create()
 	
+	local gameplay_textures_directory = tiled_map_loader.try_to_load_map(map_filename).properties["gameplay_textures"] 
+	
+	if gameplay_textures_directory == nil then
+		print ("gameplay_textures property unspecified in " .. map_filename)
+	end
+	
 	-- concatenate table with gameplay textures and table with map textures
 	local all_needed_textures = table.concatenate({ 
-		get_all_files_in_directory(tiled_map_loader.try_to_load_map(map_filename).properties["gameplay_textures"], true), 
+		get_all_files_in_directory(gameplay_textures_directory, true), 
 		tiled_map_loader.get_all_textures(map_filename)
 	})
 
