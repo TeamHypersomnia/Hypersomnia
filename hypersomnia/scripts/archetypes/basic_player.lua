@@ -24,7 +24,7 @@ function create_basic_player(owner_world, position, target_camera, crosshair_spr
 					rect_size = vec2(37, 37),
 					
 					angular_damping = 5,
-					linear_damping = 18,
+					--linear_damping = 18,
 					max_speed = 3300,
 					
 					fixed_rotation = true,
@@ -37,7 +37,7 @@ function create_basic_player(owner_world, position, target_camera, crosshair_spr
 				intent_message.MOVE_BACKWARD,
 				intent_message.MOVE_LEFT,
 				intent_message.MOVE_RIGHT,
-				intent_message.SHOOT
+				--intent_message.SHOOT
 			},
 			
 			lookat = {
@@ -56,9 +56,10 @@ function create_basic_player(owner_world, position, target_camera, crosshair_spr
 			},
 			
 			movement = {
-				input_acceleration = vec2(30000, 30000),
-				max_speed_animation = 2300,
-				
+				input_acceleration = vec2(5000, 5000),
+				max_speed_animation = 1000,
+				air_resistance = 0.1,
+				braking_damping = 18,
 				receivers = {
 					{ target = "body", stop_at_zero_movement = false }, 
 					{ target = "legs", stop_at_zero_movement = true  }

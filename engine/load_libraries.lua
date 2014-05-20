@@ -1,6 +1,6 @@
 -- initialize engine libraries
 
-METERS_TO_PIXELS = 50
+METERS_TO_PIXELS = 120
 PIXELS_TO_METERS = 1/METERS_TO_PIXELS
 
 -- immutable libraries used not only for gameplay but also across main menus

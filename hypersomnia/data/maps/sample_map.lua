@@ -24,9 +24,9 @@ return {
           name = "",
           type = "wall_wood",
           shape = "rectangle",
-          x = 512,
+          x = 576,
           y = 544,
-          width = 480,
+          width = 320,
           height = 64,
           visible = true,
           properties = {}
@@ -37,8 +37,8 @@ return {
           shape = "rectangle",
           x = 992,
           y = 864,
-          width = 160,
-          height = 160,
+          width = 96,
+          height = 96,
           visible = true,
           properties = {}
         },
@@ -51,6 +51,77 @@ return {
           width = 96,
           height = 96,
           visible = true,
+          properties = {}
+        },
+        {
+          name = "",
+          type = "wall_wood",
+          shape = "polygon",
+          x = 480,
+          y = 896,
+          width = 0,
+          height = 0,
+          visible = true,
+          polygon = {
+            { x = 0, y = 0 },
+            { x = -160, y = -32 },
+            { x = -320, y = 128 },
+            { x = -96, y = 320 }
+          },
+          properties = {}
+        },
+        {
+          name = "",
+          type = "wall_wood",
+          shape = "polygon",
+          x = 1248,
+          y = 288,
+          width = 0,
+          height = 0,
+          visible = true,
+          polygon = {
+            { x = 0, y = 0 },
+            { x = 64, y = 224 },
+            { x = -160, y = 256 },
+            { x = -160, y = -160 }
+          },
+          properties = {}
+        },
+        {
+          name = "",
+          type = "wall_wood",
+          shape = "polygon",
+          x = 800,
+          y = 992,
+          width = 0,
+          height = 0,
+          visible = true,
+          polygon = {
+            { x = 0, y = 0 },
+            { x = -288, y = 320 },
+            { x = -384, y = 512 },
+            { x = -192, y = 576 },
+            { x = 224, y = 544 },
+            { x = 608, y = 576 },
+            { x = 800, y = 480 },
+            { x = 736, y = 192 },
+            { x = 736, y = -128 },
+            { x = 608, y = -256 },
+            { x = 480, y = -352 },
+            { x = 352, y = -320 },
+            { x = 448, y = -224 },
+            { x = 640, y = -96 },
+            { x = 640, y = 160 },
+            { x = 544, y = 288 },
+            { x = 672, y = 416 },
+            { x = 544, y = 480 },
+            { x = 320, y = 384 },
+            { x = 224, y = 480 },
+            { x = 0, y = 480 },
+            { x = -160, y = 512 },
+            { x = -288, y = 416 },
+            { x = 0, y = 192 }
+          },
           properties = {}
         }
       }
