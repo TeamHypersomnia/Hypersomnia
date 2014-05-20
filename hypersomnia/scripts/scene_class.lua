@@ -10,7 +10,7 @@ function scene_class:load_map_and_set_current(map_filename, map_loader_filename)
 	
 	-- concatenate table with gameplay textures and table with map textures
 	local all_needed_textures = table.concatenate({ 
-		get_all_files_in_directory("hypersomnia\\data\\gfx", true), 
+		get_all_files_in_directory(tiled_map_loader.try_to_load_map(map_filename).properties["gameplay_textures"], true), 
 		tiled_map_loader.get_all_textures(map_filename)
 	})
 
