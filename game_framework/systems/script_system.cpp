@@ -131,6 +131,13 @@ void debugger_break() {
 script_system::script_system() {
 }
 
+std::wstring get_executable_path() {
+	wchar_t buffer[MAX_PATH];
+	GetModuleFileName(NULL, buffer, MAX_PATH);
+	PathRemoveFileSpec(buffer);
+	return buffer;
+}
+
 void script_system::generate_lua_state(lua_state_wrapper& new_state) {
 	using namespace resources;
 	using namespace helpers;
@@ -211,6 +218,8 @@ void script_system::generate_lua_state(lua_state_wrapper& new_state) {
 			luabind::def("debugger_break", &debugger_break),
 			luabind::def("randval", (float(*)(float, float))&randval),
 			luabind::def("randval_i", (int(*)(int, int))&randval),
+
+			luabind::def("get_executable_path", get_executable_path),
 
 			luabind::class_<resources::script::reloader>("_script_reloader")
 			.def(luabind::constructor<>())
