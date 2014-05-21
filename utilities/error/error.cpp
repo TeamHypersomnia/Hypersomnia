@@ -13,11 +13,15 @@ namespace augs {
 
 	module errors(module::last_error, module::last_error, &global_log);
 	module glew_errors(module::glew_last_error, module::glew_last_error, &global_log);
+	
 	namespace window {
 		module errors(module::last_error, module::last_error, &global_log);
 	}
 	namespace texture_baker {
 		module errors(module::gl_last_error, module::gl_last_error, &global_log);
+	}
+	namespace network {
+		module errors(module::wsa_last_error, module::wsa_last_error, &global_log);
 	}
 
 

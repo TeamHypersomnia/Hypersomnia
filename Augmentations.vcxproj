@@ -1049,6 +1049,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="utilities\network\network.cpp" />
+    <ClCompile Include="utilities\network\tcp.cpp" />
+    <ClCompile Include="utilities\network\udp.cpp" />
     <ClCompile Include="utilities\texture_baker\font.cpp" />
     <ClCompile Include="utilities\texture_baker\image.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
@@ -1071,6 +1074,9 @@
     <ClCompile Include="utilities\misc\randval.cpp" />
     <ClCompile Include="utilities\misc\timer.cpp" />
     <ClCompile Include="utilities\misc\value_animator.cpp" />
+    <ClCompile Include="utilities\threads\iocp.cpp" />
+    <ClCompile Include="utilities\threads\overlapped.cpp" />
+    <ClCompile Include="utilities\threads\threads.cpp" />
     <ClCompile Include="utilities\window_framework\event.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
@@ -1370,6 +1376,7 @@
     <ClInclude Include="utilities\graphics\text\printer.h" />
     <ClInclude Include="utilities\graphics\text\system.h" />
     <ClInclude Include="utilities\graphics\text\word_separator.h" />
+    <ClInclude Include="utilities\network\network.h" />
     <ClInclude Include="utilities\options.h" />
     <ClInclude Include="utilities\math\rects.h" />
     <ClInclude Include="utilities\math\vec2d.h" />
@@ -1444,6 +1451,7 @@
     <ClInclude Include="utilities\misc\timer.h" />
     <ClInclude Include="utilities\misc\value_animator.h" />
     <ClInclude Include="utilities\misc\vector_wrapper.h" />
+    <ClInclude Include="utilities\threads\threads.h" />
     <ClInclude Include="utilities\window_framework\event.h" />
     <ClInclude Include="utilities\window_framework\window.h" />
   </ItemGroup>
