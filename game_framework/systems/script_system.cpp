@@ -138,13 +138,12 @@ std::wstring get_executable_path() {
 	return buffer;
 }
 
-void script_system::generate_lua_state(lua_state_wrapper& new_state) {
+void script_system::generate_lua_state(resources::lua_state_wrapper& new_state) {
 	using namespace resources;
 	using namespace helpers;
 
 	luaL_openlibs(new_state);
 	luabind::open(new_state);
-
 
 	//luabind::bind_class_info(lua_state);
 
@@ -233,6 +232,7 @@ void script_system::generate_lua_state(lua_state_wrapper& new_state) {
 			bindings::_text()
 	];
 
+	script_system::global(new_state.raw, "THIS_LUA_STATE", new_state);
 	luabind::set_pcall_callback(the_callback);
 }
 

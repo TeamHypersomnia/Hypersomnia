@@ -7,6 +7,20 @@
 
 struct lua_State;
 namespace resources {
+	struct lua_state_wrapper {
+		lua_State* raw;
+
+		lua_state_wrapper(const lua_state_wrapper&) {
+			assert(0);
+		}
+		lua_state_wrapper() : raw(luaL_newstate()) {}
+		~lua_state_wrapper() { lua_close(raw); }
+
+		operator lua_State*() {
+			return raw;
+		}
+	};
+
 	class script {
 		bool needs_recompilation;
 
@@ -34,11 +48,11 @@ namespace resources {
 		};
 
 		static reloader script_reloader;
-		static lua_State* lua_state;
+		lua_State* lua_state;
 
-		static void dofile(const std::string& filename);
+		static void dofile(lua_state_wrapper& lua_state, const std::string& filename);
 
-		script();
+		script(lua_state_wrapper& owner);
 
 		void associate_string(const std::string&);
 		void associate_filename(const std::string&);

@@ -18,7 +18,7 @@ world_instance::world_instance() : input(*global_window), render(*global_window)
 	my_world.register_system(&lookat);
 	my_world.register_system(&physics);
 	my_world.register_system(&visibility);
-	my_world.register_system(&pathfinding);
+	my_world.register_system(&pathfinding); 
 	my_world.register_system(&guns);
 	my_world.register_system(&particles);
 	my_world.register_system(&emitters);
@@ -92,13 +92,6 @@ void world_instance::default_loop() {
 
 	physics.ray_casts_per_frame = 0;
 	//lua_gc(scripts.lua_state, LUA_GCCOLLECT, 0);
-
-	if (world_reloading_script) {
-		my_world.delete_all_entities();
-		world_reloading_script->call();
-		world_reloading_script = nullptr;
-		lua_gc(*global_lua_state, LUA_GCCOLLECT, 0);
-	}
 
 	//auto& scripts_reloaded = resources::script::script_reloader.get_script_files_to_reload();
 	//

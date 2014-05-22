@@ -10,22 +10,18 @@
 
 using namespace augs;
 using namespace entity_system;
- 
-resources::script* world_reloading_script = nullptr;  
 
 window::glwindow* global_window = nullptr;
-script_system::lua_state_wrapper* global_lua_state = nullptr;
 
-int main() {    
+int main() {
 	augs::init();	 
-	script_system::lua_state_wrapper lua_state;
+	resources::lua_state_wrapper lua_state;
 	script_system::generate_lua_state(lua_state);
 
 	lua_gc(lua_state, LUA_GCCOLLECT, 0);
 	resources::script::script_reloader.report_errors = &std::cout;
-	resources::script::lua_state = lua_state;
 
-	resources::script config_script;
+	resources::script config_script(lua_state);
 	config_script.associate_filename("config.lua");
 	config_script.call();
 
@@ -36,13 +32,12 @@ int main() {
 	window::cursor(false); 
 	 
 	global_window = &gl;
-	global_lua_state = &lua_state;
 
-	script_system::global(*global_lua_state, "window", *global_window);
-	script_system::global(*global_lua_state, "script_reloader", resources::script::script_reloader);
+	script_system::global(lua_state, "window", *global_window);
+	script_system::global(lua_state, "script_reloader", resources::script::script_reloader);
 	//world_instance instance;
 	 
-	resources::script init_script;
+	resources::script init_script(lua_state);
 	 
 	init_script.associate_filename("init.lua");
  	init_script.call(); 

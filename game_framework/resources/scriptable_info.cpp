@@ -4,7 +4,7 @@
 #include <fstream>
 
 namespace resources {
-	script::script() : needs_recompilation(false), is_associated_string_filename(false), reload_scene_when_modified(true) {
+	script::script(lua_state_wrapper& lua_state) : lua_state(lua_state), needs_recompilation(false), is_associated_string_filename(false), reload_scene_when_modified(true) {
 
 	}
 
@@ -14,13 +14,11 @@ namespace resources {
 		needs_recompilation = true;
 	}
 
-	void script::dofile(const std::string& filename) {
-		static script my_script;
+	void script::dofile(lua_state_wrapper& lua_state, const std::string& filename) {
+		static script my_script(lua_state);
 		my_script.associate_filename(filename, false);
 		my_script.call();
 	}
-
-	lua_State* script::lua_state = nullptr;
 
 	script::reloader script::script_reloader;
 	

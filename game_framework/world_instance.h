@@ -29,11 +29,7 @@
 #include "messages/steering_message.h"
 #include "messages/shot_message.h"
 
-
-extern resources::script* world_reloading_script;
-
 extern window::glwindow* global_window;
-extern script_system::lua_state_wrapper* global_lua_state;
 
 struct world_instance {
 	/* all systems */

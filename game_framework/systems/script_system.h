@@ -10,25 +10,15 @@ using namespace entity_system;
 
 struct lua_State;
 
+namespace resources {
+	struct lua_state_wrapper;
+}
+
 extern resources::script* world_reloading_script;
 class script_system : public processing_system_templated<components::scriptable> {
+
 public:
-
-	struct lua_state_wrapper {
-		lua_State* raw;
-
-		lua_state_wrapper(const lua_state_wrapper&) {
-			assert(0);
-		}
-		lua_state_wrapper() : raw(luaL_newstate()) {}
-		~lua_state_wrapper() { lua_close(raw); }
-
-		operator lua_State*() {
-			return raw;
-		}
-	};
-
-	static void generate_lua_state(lua_state_wrapper&);
+	static void generate_lua_state(resources::lua_state_wrapper&);
 
 	script_system();
 	~script_system();
@@ -36,6 +26,11 @@ public:
 	template<class T>
 	static void global(lua_State* lua_state, std::string name, T& obj) {
 		luabind::globals(lua_state)[name] = &obj;
+	}	
+	
+	template<class T>
+		static void global_ptr(lua_State* lua_state, std::string name, T* obj) {
+		luabind::globals(lua_state)[name] = obj;
 	}
 
 	void pass_events(world&, bool);
