@@ -23,30 +23,6 @@ int main() {
 	framework::set_current_window(gl);
 
 	lua_state.dofile("init.lua");
-
-	int should_quit = 0;
-	while (!should_quit) {
-		if (luabind::globals(lua_state)["augmentations_main_loop_callback"]) {
-			try {
-				should_quit = luabind::call_function<int>(luabind::globals(lua_state)["augmentations_main_loop_callback"]);
-			}
-			catch (std::exception compilation_error) {
-				std::cout << compilation_error.what() << '\n';
-			}
-		}
-
-		if (luabind::globals(lua_state)["call_once_after_loop"]) {
-			try {
-				luabind::call_function<void>(luabind::globals(lua_state)["call_once_after_loop"]);
-			}
-			catch (std::exception compilation_error) {
-				std::cout << compilation_error.what() << '\n';
-			}
-
-			luabind::globals(lua_state)["call_once_after_loop"] = luabind::nil;
-		}
-	} 
-
 	framework::deinit();
 	return 0;
 }
