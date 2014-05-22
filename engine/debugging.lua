@@ -1,4 +1,4 @@
-table.inspect = require("inspect")
+table.inspect = require("engine\\inspect")
 
 function debug.my_breakpoint()
 	print(debug.my_traceback())
