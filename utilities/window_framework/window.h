@@ -31,7 +31,7 @@ namespace augs {
 			int minw, minh, maxw, maxh, cminw, cminh, cmaxw, cmaxh;
 			int bpp, style, exstyle, menu, vsyn;
 			
-			const wchar_t* name;
+			std::wstring name;
 			bool active, transparent, doublebuf;
 			
 			void _poll(event::message&, WPARAM, LPARAM);
@@ -53,7 +53,7 @@ namespace augs {
 				RESIZABLE = CAPTION | WS_THICKFRAME,
 				MAXIMIZE_BOX = MENU | WS_MAXIMIZEBOX,
 				MINIMIZE_BOX = MENU | WS_MINIMIZEBOX,
-				ALL = CAPTION | MENU | MINIMIZE_BOX | MAXIMIZE_BOX
+				ALL_WINDOW_ELEMENTS = CAPTION | MENU | MINIMIZE_BOX | MAXIMIZE_BOX
 			};
 
 			event::state events;
@@ -68,7 +68,7 @@ namespace augs {
 			NEVER EVER PASS ~RESIZABLE!
 			if you do so, adjustwindowrectex
 			*/
-			bool create(const rects::xywh<int>& client_rectangle, int _menu = ALL, const wchar_t* name = L"Window", bool doublebuffer = true, int bitsperpixel = 24),
+			int create(rects::xywh<int> client_rectangle, int _menu = ALL_WINDOW_ELEMENTS, std::wstring name = L"Window", int doublebuffer = 1, int bitsperpixel = 24);
 				/*
 				example:
 				string window_name Window
@@ -81,8 +81,8 @@ namespace augs {
 				int doublebuffer 1
 				int bpp 24
 				*/
-				create(lua_State*, rects::wh<int> force_minimum_resolution, int _menu = ALL),
-			     swap_buffers(), 
+				// create(lua_State*, rects::wh<int> force_minimum_resolution, int _menu = ALL_WINDOW_ELEMENTS),
+			     bool swap_buffers(), 
 				 focus_keyboard(), 
 				 current(),
 				 vsync(int);
@@ -125,7 +125,7 @@ namespace augs {
 		extern rects::xywh<int> get_display();
 		extern int get_refresh_rate();
 		extern void warp_cursor(int x, int y);
-		extern void cursor(bool flag);
+		extern void set_cursor_visible(int flag);
 
 		extern void mbx(const wchar_t* title, const wchar_t* content);
 		extern void imbx(int title, int content);

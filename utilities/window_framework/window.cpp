@@ -189,7 +189,7 @@ namespace augs {
 		glwindow* glwindow::context = nullptr;
 		
 		glwindow::glwindow()
-			: hwnd(0), hdc(0), hglrc(0), name(nullptr), bpp(0), resize(nullptr), menu(false), transparent(false), active(false), doubled(false) {
+			: hwnd(0), hdc(0), hglrc(0), bpp(0), resize(nullptr), menu(false), transparent(false), active(false), doubled(false) {
 			for(int i=0;i<256;++i) events.keys[i] = false;
 			events.key = events.utf16 = events.utf32 = 0;
 			events.mouse.state[0] = events.mouse.state[1] = false;
@@ -200,40 +200,40 @@ namespace augs {
 			return std::wstring(ss.begin(), ss.end());
 		}
 
-		bool glwindow::create(lua_State* L, rects::wh<int> force_minimum_resolution, int _menu) {
-			luabind::object cfg = luabind::globals(L)["config_table"];
-			luabind::object my_object = cfg["fullscreen"];
+		//bool glwindow::create(lua_State* L, rects::wh<int> force_minimum_resolution, int _menu) {
+		//	luabind::object cfg = luabind::globals(L)["config_table"];
+		//	luabind::object my_object = cfg["fullscreen"];
+		//
+		//	if (luabind::object_cast<int>(my_object)) {
+		//		auto r = get_display();
+		//		return create(rects::xywh<int>(0,0, r.w,r.h), 
+		//			luabind::object_cast<int>(cfg["window_border"]) > 0 ? _menu : 0,
+		//			to_wstr(luabind::object_cast<std::string>(cfg["window_name"])).c_str(),
+		//			luabind::object_cast<int>(cfg["doublebuffer"]) > 0,
+		//			luabind::object_cast<int>(cfg["bpp"])
+		//			);
+		//	}
+		//	else {
+		//		return create(rects::xywh<int>(luabind::object_cast<int>(cfg["window_x"]),
+		//			luabind::object_cast<int>(cfg["window_y"]),
+		//			std::max(force_minimum_resolution.w, int(luabind::object_cast<float>(cfg["resolution_w"]))),
+		//			std::max(force_minimum_resolution.h, int(luabind::object_cast<float>(cfg["resolution_h"])))),
+		//			luabind::object_cast<int>(cfg["window_border"]) > 0 ? _menu : 0,
+		//			to_wstr(luabind::object_cast<std::string>(cfg["window_name"])).c_str(),
+		//			luabind::object_cast<int>(cfg["doublebuffer"]) > 0,
+		//			luabind::object_cast<int>(cfg["bpp"])
+		//			);
+		//	}
+		//}
 
-			if (luabind::object_cast<int>(my_object)) {
-				auto r = get_display();
-				return create(rects::xywh<int>(0,0, r.w,r.h), 
-					luabind::object_cast<int>(cfg["window_border"]) > 0 ? _menu : 0,
-					to_wstr(luabind::object_cast<std::string>(cfg["window_name"])).c_str(),
-					luabind::object_cast<int>(cfg["doublebuffer"]) > 0,
-					luabind::object_cast<int>(cfg["bpp"])
-					);
-			}
-			else {
-				return create(rects::xywh<int>(luabind::object_cast<int>(cfg["window_x"]),
-					luabind::object_cast<int>(cfg["window_y"]),
-					std::max(force_minimum_resolution.w, int(luabind::object_cast<float>(cfg["resolution_w"]))),
-					std::max(force_minimum_resolution.h, int(luabind::object_cast<float>(cfg["resolution_h"])))),
-					luabind::object_cast<int>(cfg["window_border"]) > 0 ? _menu : 0,
-					to_wstr(luabind::object_cast<std::string>(cfg["window_name"])).c_str(),
-					luabind::object_cast<int>(cfg["doublebuffer"]) > 0,
-					luabind::object_cast<int>(cfg["bpp"])
-					);
-			}
-		}
-
-		bool glwindow::create(const rects::xywh<int>& crect, int _menu, const wchar_t* _name, 
-				bool doublebuffer, int _bpp) {
+			int glwindow::create(rects::xywh<int> crect, int _menu, std::wstring _name,
+				int doublebuffer, int _bpp) {
 			int f = 1;
-			menu = _menu; bpp = _bpp; doublebuf = doublebuffer; name = _name;
+			menu = _menu; bpp = _bpp; doublebuf = doublebuffer; name = _name.c_str();
 
 			style =   menu ? (WS_OVERLAPPED | menu)|WS_CLIPSIBLINGS|WS_CLIPCHILDREN : WS_POPUP;
 			exstyle = menu ? WS_EX_WINDOWEDGE : WS_EX_APPWINDOW; 
-			errf((hwnd = CreateWindowEx(exstyle,L"AugmentedWindow",name,style,0,0,0,0,0,0,hinst,this)), f);
+			errf((hwnd = CreateWindowEx(exstyle, L"AugmentedWindow", _name.c_str(), style, 0, 0, 0, 0, 0, 0, hinst, this)), f);
 
 			set_window_rect(crect);
 
@@ -496,10 +496,9 @@ namespace augs {
 			SetCursorPos(x, y);
 		}
 
-		void cursor(bool flag) {
+		void set_cursor_visible(int flag) {
 			ShowCursor(flag);
 		}
-
 
 		void mbx(const wchar_t* title, const wchar_t* content) { 
 			MessageBox(0, content, title, MB_OK); 

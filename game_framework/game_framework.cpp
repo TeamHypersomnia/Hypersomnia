@@ -28,6 +28,8 @@ namespace framework {
 
 	void set_current_window(augs::window::glwindow& gl) {
 		world_instance::global_window = &gl;
+		gl.set_show(gl.SHOW);
+		gl.current();
 	}
 
 }

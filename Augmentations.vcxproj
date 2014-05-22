@@ -44,7 +44,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -105,7 +105,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir)\utilities;C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(ProjectDir);$(ProjectDir)\3rdparty\freetype;$(IncludePath)</IncludePath>
     <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
-    <OutDir>$(ProjectDir)</OutDir>
+    <OutDir>$(ProjectDir)..\Hypersomnia\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(IncludePath)</IncludePath>
@@ -350,10 +350,15 @@
     </ClCompile>
     <ClCompile Include="game_framework\game_framework.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="game_framework\main.cpp" />
+    <ClCompile Include="game_framework\main.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="game_framework\resources\lua_state_wrapper.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="game_framework\world_instance.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
