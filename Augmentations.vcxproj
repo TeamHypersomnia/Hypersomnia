@@ -348,7 +348,13 @@
     <ClCompile Include="game_framework\game\polygon_fader.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="game_framework\game_framework.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="game_framework\main.cpp" />
+    <ClCompile Include="game_framework\resources\lua_state_wrapper.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="game_framework\world_instance.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
@@ -1360,6 +1366,7 @@
     <ClInclude Include="3rdparty\SFML\Window\WindowStyle.hpp" />
     <ClInclude Include="game_framework\game\polygon_fader.h" />
     <ClInclude Include="game_framework\game_framework.h" />
+    <ClInclude Include="game_framework\resources\lua_state_wrapper.h" />
     <ClInclude Include="game_framework\world_instance.h" />
     <ClInclude Include="utilities\augmentations.h" />
     <ClInclude Include="stdafx.h" />
