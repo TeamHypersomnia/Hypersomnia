@@ -4,6 +4,8 @@
 #include "resources/scriptable_info.h"
 using namespace messages;
 
+augs::window::glwindow* world_instance::global_window = nullptr;
+
 world_instance::~world_instance() {
 	/* delete all entities before the systems get destroyed */
 	my_world.delete_all_entities();

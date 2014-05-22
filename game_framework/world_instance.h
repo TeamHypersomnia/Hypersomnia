@@ -29,9 +29,8 @@
 #include "messages/steering_message.h"
 #include "messages/shot_message.h"
 
-extern window::glwindow* global_window;
-
 struct world_instance {
+	static augs::window::glwindow* global_window;
 	/* all systems */
 	world my_world;
 	input_system input;
