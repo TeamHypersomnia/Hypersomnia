@@ -60,7 +60,7 @@ function open_script(filename)
 	return my_script
 end
 
-commands = script()
+commands = script(THIS_LUA_STATE)
 commands:associate_filename(ENGINE_DIRECTORY .. "commands.lua")
 commands.reload_scene_when_modified = false
 

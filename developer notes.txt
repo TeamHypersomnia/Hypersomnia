@@ -74,6 +74,11 @@ As the maps grow in detail, we will create a separate atlas for example for grou
 NETWORKING
 --------------------------------------------------------------------------------------------------
 
+Perhaps all the networking stuff will be written in C++;
+Lua will be only used for initialization stuff (not only map loading; also new client initialization etc.) 
+and should not be included in realtime logic because it can't be efficiently multithreaded.
+
+
 When the packet with a new position arrives to the server, 
 it should calculate a force vector (or velocity vector) to be applied to the character so that in the next simulation step it reaches the requested position.
 
@@ -82,6 +87,20 @@ Regarding dynamic objects:
 Inside client simulation, other characters can not at all collide with dynamic objects - only the player can, so it compensates for round trip time.
 Whenever the server detects that a body has left the "sleeping" state, it updates positions for all the players, until they come to sleep again.
 
+
+
+The server should simulate physics in some decent intervals, say 60/120 Hz, and there should be another thread that sends all UDP packets with the current game frame at a constant pace.
+
+
+Firstly, we should create a simple connection over TCP/IP, as it will be definitely easier just to use tcp + iocp than to reimplement a reliable protocol over UDP that acts AS GOOD as TCP.
+Anyway it will be of use to gain that knowledge.
+
+Then we are going to make use of some simple UDP class that merely makes non-blocking calls to recv and send.
+NOPE! We are going to use UDP within IOCP, too. At least we'll have all the multithreading in one place.
+
+What is important for now is to create a suitable workplace that will enable us to work on both the client and the server.
+
+Please, try to grasp one concept at a time.
 
 --------------------------------------------------------------------------------------------------
 GAMEPLAY
