@@ -1,3 +1,5 @@
+dofile "config.lua"
+
 dofile "engine\\load_libraries.lua"
 
 -- enter the game
