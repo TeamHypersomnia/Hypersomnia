@@ -5,8 +5,6 @@ VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Augmentations", "Augmentations.vcxproj", "{6CC06ECD-D908-4A12-A57B-CEEEEF078609}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hypersomnia-server", "..\Hypersomnia-server\Hypersomnia-server.vcxproj", "{7F09B933-E2B8-4B6F-9F79-8CFA7E939BBE}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -29,15 +27,6 @@ Global
 		{6CC06ECD-D908-4A12-A57B-CEEEEF078609}.ReleaseDebug|Win32.Build.0 = ReleaseDebug|Win32
 		{6CC06ECD-D908-4A12-A57B-CEEEEF078609}.ReleaseDebug|x64.ActiveCfg = ReleaseDebug|x64
 		{6CC06ECD-D908-4A12-A57B-CEEEEF078609}.ReleaseDebug|x64.Build.0 = ReleaseDebug|x64
-		{7F09B933-E2B8-4B6F-9F79-8CFA7E939BBE}.Debug|Win32.ActiveCfg = Debug|Win32
-		{7F09B933-E2B8-4B6F-9F79-8CFA7E939BBE}.Debug|Win32.Build.0 = Debug|Win32
-		{7F09B933-E2B8-4B6F-9F79-8CFA7E939BBE}.Debug|x64.ActiveCfg = Debug|Win32
-		{7F09B933-E2B8-4B6F-9F79-8CFA7E939BBE}.Release|Win32.ActiveCfg = Release|Win32
-		{7F09B933-E2B8-4B6F-9F79-8CFA7E939BBE}.Release|Win32.Build.0 = Release|Win32
-		{7F09B933-E2B8-4B6F-9F79-8CFA7E939BBE}.Release|x64.ActiveCfg = Release|Win32
-		{7F09B933-E2B8-4B6F-9F79-8CFA7E939BBE}.ReleaseDebug|Win32.ActiveCfg = Release|Win32
-		{7F09B933-E2B8-4B6F-9F79-8CFA7E939BBE}.ReleaseDebug|Win32.Build.0 = Release|Win32
-		{7F09B933-E2B8-4B6F-9F79-8CFA7E939BBE}.ReleaseDebug|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

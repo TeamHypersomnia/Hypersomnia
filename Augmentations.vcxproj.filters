@@ -414,9 +414,6 @@
     <ClCompile Include="game_framework\resources\scriptable_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="utilities\entity_system\component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -697,6 +694,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utilities\threads\overlapped.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1776,6 +1776,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="utilities\threads\threads.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\game_framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
