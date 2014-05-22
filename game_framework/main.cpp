@@ -4,13 +4,7 @@
 #include "augmentations.h"
 #include "window_framework/window.h"
 
-#include "game/body_helper.h"
-#include "game/texture_helper.h"
-
-#include "resources/render_info.h"
-#include "resources/animate_info.h"
 #include "resources/scriptable_info.h"
-#include "graphics/shader.h"
 
 #include "world_instance.h"
 
