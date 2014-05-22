@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "scriptable_info.h"
+#include "lua_state_wrapper.h"
 
 #include <fstream>
 

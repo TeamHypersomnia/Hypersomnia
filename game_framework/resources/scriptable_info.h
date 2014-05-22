@@ -5,21 +5,8 @@
 #include <unordered_map>
 #include "readdir/ReadDirectoryChanges.h"
 
-struct lua_State;
 namespace resources {
-	struct lua_state_wrapper {
-		lua_State* raw;
-
-		lua_state_wrapper(const lua_state_wrapper&) {
-			assert(0);
-		}
-		lua_state_wrapper() : raw(luaL_newstate()) {}
-		~lua_state_wrapper() { lua_close(raw); }
-
-		operator lua_State*() {
-			return raw;
-		}
-	};
+	struct lua_state_wrapper;
 
 	class script {
 		bool needs_recompilation;
