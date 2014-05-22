@@ -220,6 +220,8 @@ namespace resources {
 		];
 
 		global("THIS_LUA_STATE", *this);
+		global("script_reloader", resources::script::script_reloader);
+		
 		luabind::set_pcall_callback(the_callback);
 	}
 
@@ -232,5 +234,11 @@ namespace resources {
 
 	lua_state_wrapper::operator lua_State*() {
 		return raw;
+	}
+
+	void lua_state_wrapper::dofile(const std::string& filename) {
+		script my_script(*this);
+		my_script.associate_filename(filename, false);
+		my_script.call();
 	}
 }

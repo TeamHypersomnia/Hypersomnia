@@ -14,6 +14,8 @@ namespace resources {
 		/* binds to the lua_State entire game framework along with augs utilities */
 		void bind_whole_engine();
 
+		void dofile(const std::string& filename);
+
 		/* helper funcs to bind globals to this lua state */
 		template<class T>
 		void global(std::string name, T& obj) {
