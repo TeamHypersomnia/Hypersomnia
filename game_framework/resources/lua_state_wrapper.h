@@ -5,16 +5,11 @@ namespace resources {
 	struct lua_state_wrapper {
 		lua_State* raw;
 
-		lua_state_wrapper(const lua_state_wrapper&) {
-			assert(0);
-		}
+		lua_state_wrapper(const lua_state_wrapper&);
+		lua_state_wrapper();
+		~lua_state_wrapper();
 
-		lua_state_wrapper() : raw(luaL_newstate()) {}
-		~lua_state_wrapper() { lua_close(raw); }
-
-		operator lua_State*() {
-			return raw;
-		}
+		operator lua_State*();
 
 		/* binds to the lua_State entire game framework along with augs utilities */
 		void bind_whole_engine();

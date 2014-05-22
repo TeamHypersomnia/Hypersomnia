@@ -222,4 +222,15 @@ namespace resources {
 		global("THIS_LUA_STATE", *this);
 		luabind::set_pcall_callback(the_callback);
 	}
+
+	lua_state_wrapper::lua_state_wrapper(const lua_state_wrapper&) {
+		assert(0);
+	}
+
+	lua_state_wrapper::lua_state_wrapper() : raw(luaL_newstate()) {}
+	lua_state_wrapper::~lua_state_wrapper() { lua_close(raw); }
+
+	lua_state_wrapper::operator lua_State*() {
+		return raw;
+	}
 }
