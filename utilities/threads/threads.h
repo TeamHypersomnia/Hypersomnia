@@ -3,6 +3,8 @@
 #include <Windows.h>
 #include <vector>
 
+#include "../error/error.h"
+
 /* todo: rozbudowac pool o priority i critical path */
 
 namespace augs  {
@@ -96,7 +98,7 @@ namespace augs {
 
 			template <class argument>
 			void create_pool(int (*worker)(argument*), argument* arg, int n = get_num_cores()) {
-				if(workers) return;
+				if(workers || !n) return;
 				argp = (void*)arg;
 				workerf = (void*)worker;
 				nworkers = n;

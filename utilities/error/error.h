@@ -67,6 +67,10 @@ namespace augs {
 	namespace texture_baker {
 		extern error_logging::module errors;
 	}
+
+	namespace network {
+		extern error_logging::module errors;
+	}
 }
 
 #define err(expression) errors._err(int(expression), __LINE__, __FILE__, __FUNCTION__)

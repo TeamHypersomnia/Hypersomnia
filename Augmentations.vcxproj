@@ -1055,9 +1055,15 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="utilities\network\network.cpp" />
-    <ClCompile Include="utilities\network\tcp.cpp" />
-    <ClCompile Include="utilities\network\udp.cpp" />
+    <ClCompile Include="utilities\network\network.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="utilities\network\tcp.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="utilities\network\udp.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="utilities\texture_baker\font.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
     </ClCompile>

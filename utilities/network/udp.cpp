@@ -1,4 +1,5 @@
 #pragma once
+#include "stdafx.h"
 #include "network.h"
 #include "../error/error.h"
 
