@@ -696,9 +696,6 @@
     <ClCompile Include="utilities\threads\overlapped.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\game_framework.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

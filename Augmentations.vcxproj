@@ -32,7 +32,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -44,7 +44,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -58,7 +58,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -96,7 +96,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir)\utilities;C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(ProjectDir);$(IncludePath)</IncludePath>
     <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
-    <OutDir>$(ProjectDir)..\Hypersomnia\</OutDir>
+    <OutDir>$(ProjectDir)</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(IncludePath)</IncludePath>
@@ -105,7 +105,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir)\utilities;C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(ProjectDir);$(ProjectDir)\3rdparty\freetype;$(IncludePath)</IncludePath>
     <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
-    <OutDir>$(ProjectDir)..\Hypersomnia\</OutDir>
+    <OutDir>$(ProjectDir)</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(IncludePath)</IncludePath>
@@ -114,7 +114,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">
     <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir)\utilities;C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(ProjectDir);C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\freetype;$(IncludePath)</IncludePath>
     <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
-    <OutDir>$(ProjectDir)..\Hypersomnia\</OutDir>
+    <OutDir>$(ProjectDir)</OutDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">
@@ -351,10 +351,6 @@
     <ClCompile Include="game_framework\game_framework.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\main.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="game_framework\resources\lua_state_wrapper.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
