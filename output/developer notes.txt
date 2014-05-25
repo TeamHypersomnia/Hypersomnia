@@ -74,6 +74,11 @@ As the maps grow in detail, we will create a separate atlas for example for grou
 NETWORKING
 --------------------------------------------------------------------------------------------------
 
+ON THE SERVER: All the logic written in C++ for the sake of easy threading and performance. Only initialization stuff written in lua and consider scripted AI (but not necessarily).
+ON THE CLIENT: Separation of concerns: again - C++ for networking and threading stuff (worker iocp thread, mainly transferring and acknowledging messages), whereas Lua code will simply interpret all the incoming messages.
+There is going to be a queue for incoming messages and outcoming messages, both protected by a critical section that lua code will occassionally step into.
+
+
 Perhaps all the networking stuff will be written in C++;
 Lua will be only used for initialization stuff (not only map loading; also new client initialization etc.) 
 and should not be included in realtime logic because it can't be efficiently multithreaded.
