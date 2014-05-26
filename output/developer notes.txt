@@ -100,6 +100,16 @@ The server should simulate physics in some decent intervals, say 60/120 Hz, and 
 Firstly, we should create a simple connection over TCP/IP, as it will be definitely easier just to use tcp + iocp than to reimplement a reliable protocol over UDP that acts AS GOOD as TCP.
 Anyway it will be of use to gain that knowledge.
 
+THEN AGAIN, I am more biased towards using UDP only. 
+We will have a lot less overhead and the volume of our data will be really really low and TCP optimizes for amount of data sent per fixed amount of time, where with UDP we can optimize
+for latency.
+
+THIS IS ALSO BECAUSE: HERE, USING TCP FOR CHAT MESSAGES/LEVEL DATA IS A PREMATURE OPTIMIZATION.
+I will anyway need a reliable layer on top of UDP for gunshots, since they have to be sent with a higher frequency and that is something I cannot control with TCP.
+When it turns out that we need more flow control over level data or reliable commands, we'll use TCP for each of these accordingly. Period.
+
+
+
 Then we are going to make use of some simple UDP class that merely makes non-blocking calls to recv and send.
 NOPE! We are going to use UDP within IOCP, too. At least we'll have all the multithreading in one place.
 
