@@ -1,12 +1,4 @@
 #pragma once
-#define UNICODE
-#include <winsock2.h>
-#include <Windows.h>
-//#include <ws2tcpip.h>
-//#include <mswsock.h>
-//#include <iphlpapi.h>
-#include <vector>
-
 #include "../error/error.h"
 
 /* todo: rozbudowac pool o priority i critical path */
@@ -65,8 +57,8 @@ namespace augs {
 			completion(overlapped* o = 0, DWORD result = 0, DWORD key = 0);
 
 			template<class T>
-			bool get_user(T*& p) {
-				return (p = (T*)overlap) != 0;
+			bool get_userdata_from_overlapped(T*& target_userdata_object) {
+				return (target_userdata_object = (T*) overlap) != 0;
 			}
 
 			DWORD& get_key(), &get_result();

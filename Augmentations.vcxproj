@@ -835,9 +835,17 @@
     <ClCompile Include="utilities\misc\randval.cpp" />
     <ClCompile Include="utilities\misc\timer.cpp" />
     <ClCompile Include="utilities\misc\value_animator.cpp" />
-    <ClCompile Include="utilities\threads\iocp.cpp" />
-    <ClCompile Include="utilities\threads\overlapped.cpp" />
-    <ClCompile Include="utilities\threads\threads.cpp" />
+    <ClCompile Include="utilities\threads\iocp.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="utilities\threads\overlapped.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="utilities\threads\threads.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="utilities\window_framework\event.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
