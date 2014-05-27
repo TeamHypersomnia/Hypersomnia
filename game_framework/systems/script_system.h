@@ -1,6 +1,4 @@
 #pragma once
-#include "stdafx.h"
-
 #include "entity_system/processing_system.h"
 #include "../components/scriptable_component.h"
 
