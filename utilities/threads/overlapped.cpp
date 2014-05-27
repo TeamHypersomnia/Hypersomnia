@@ -22,12 +22,12 @@ namespace augs {
 		}
 
 		overlapped::~overlapped() {
-			if(overlap.hEvent) err(CloseHandle(overlap.hEvent));
+			if (overlap.hEvent) err(WSACloseEvent(overlap.hEvent));
 			overlap.hEvent = 0;
 		}
 
 		void overlapped::create_event() {
-			if(!overlap.hEvent) err((overlap.hEvent = CreateEvent(NULL, FALSE, TRUE, NULL)));
+			if(!overlap.hEvent) err((overlap.hEvent = WSACreateEvent()));
 		}
 
 		bool overlapped::wait(DWORD timeout) { 

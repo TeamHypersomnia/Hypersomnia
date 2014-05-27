@@ -1,6 +1,10 @@
 #pragma once
 #define UNICODE
+#include <winsock2.h>
 #include <Windows.h>
+//#include <ws2tcpip.h>
+//#include <mswsock.h>
+//#include <iphlpapi.h>
 #include <vector>
 
 #include "../error/error.h"
@@ -33,7 +37,7 @@ namespace augs {
 			friend class augs::network::udp;
 			friend class augs::network::tcp;
 
-			OVERLAPPED overlap;
+			WSAOVERLAPPED overlap;
 			DWORD result;
 		public:
 
