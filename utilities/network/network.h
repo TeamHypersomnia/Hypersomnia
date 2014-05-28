@@ -5,23 +5,6 @@ namespace augs  {
 	namespace network {
 		bool init(), deinit();
 
-		struct overlapped : public augs::threads::overlapped {
-			DWORD flags;
-			overlapped();
-			
-			void reset();
-		};
-
-		class overlapped_accept : public augs::threads::overlapped {
-			friend class tcp;
-			SOCKET accepted;
-			bool create_acceptable();
-			char addr_local[sizeof(sockaddr_in) + 16], addr_remote[sizeof(sockaddr_in) + 16];
-		public:
-			overlapped_accept();
-			~overlapped_accept();
-		};
-
 		struct ip {
 			struct sockaddr_in addr;
 			static int size;
@@ -32,14 +15,34 @@ namespace augs  {
 			static char* get_local_ipv4();
 		};
 
-		class buf {
+		class wsabuf {
 			WSABUF b;
 		public:
-			buf(void* data, int len);
+			wsabuf(void* data = nullptr, int len = 0);
 			void set(void* data, int len),
 				*get() const;
 			int get_len() const;
-		}; 
+		};
+
+		struct overlapped : public augs::threads::overlapped {
+			DWORD flags;
+			overlapped(augs::threads::overlapped_userdata* new_userdata = nullptr);
+
+			ip associated_address;
+			wsabuf associated_buffer;
+
+			void reset();
+		};
+
+		class overlapped_accept : public augs::threads::overlapped {
+			friend class tcp;
+			SOCKET accepted;
+			bool create_acceptable();
+			char addr_local[sizeof(sockaddr_in) + 16], addr_remote[sizeof(sockaddr_in) + 16];
+		public:
+			overlapped_accept(augs::threads::overlapped_userdata* new_userdata = nullptr);
+			~overlapped_accept();
+		};
 
 		class tcp {
 			friend class augs::threads::iocp;
@@ -67,16 +70,16 @@ namespace augs  {
 			
 
 			// 0 - error, 1 - pending, 2 - completed
-			int send(const buf& b, overlapped* request);
-			int send(const buf* bufs, int bufcnt, overlapped* request);
-			int recv(buf& b, overlapped* request);
-			int recv(buf* bufs, int bufcnt, overlapped* request);
+			int send(const wsabuf& b, overlapped* request);
+			int send(const wsabuf* bufs, int bufcnt, overlapped* request);
+			int recv(wsabuf& b, overlapped* request);
+			int recv(wsabuf* bufs, int bufcnt, overlapped* request);
 
 			// 0 - error, 1 - successful
-			bool send(const buf& b, unsigned long& result, unsigned long flags);
-			bool send(const buf* bufs, int bufcnt, unsigned long& result, unsigned long flags);
-			bool recv(buf& b, unsigned long& result, unsigned long& flags);
-			bool recv(buf* bufs, int bufcnt, unsigned long& result, unsigned long& flags);
+			bool send(const wsabuf& b, unsigned long& result, unsigned long flags);
+			bool send(const wsabuf* bufs, int bufcnt, unsigned long& result, unsigned long flags);
+			bool recv(wsabuf& b, unsigned long& result, unsigned long& flags);
+			bool recv(wsabuf* bufs, int bufcnt, unsigned long& result, unsigned long& flags);
 
 			bool close();
 		};
@@ -91,16 +94,16 @@ namespace augs  {
 			bool bind(unsigned short port, char* ipv4 = ip::get_local_ipv4());
 			
 			// 0 - error, 1 - pending, 2 - completed
-			int send(const ip& to, const buf& b, overlapped* request);
-			int send(const ip& to, const buf* bufs, int bufcnt, overlapped* request);
-			int recv(ip& from, buf& b, overlapped* request);
-			int recv(ip& from, buf* bufs, int bufcnt, overlapped* request);
+			int send(overlapped* request);
+			//int send(const ip& to, const buf* bufs, int bufcnt, overlapped* request);
+			int recv(overlapped* request);
+			//int recv(ip& from, buf* bufs, int bufcnt, overlapped* request);
 
 			// 0 - error, 1 - successful
-			bool send(const ip& to, const buf& b, unsigned long& result, unsigned long flags);
-			bool send(const ip& to, const buf* bufs, int bufcnt, unsigned long& result, unsigned long flags);
-			bool recv(ip& from, buf& b, unsigned long& result, unsigned long& flags);
-			bool recv(ip& from, buf* bufs, int bufcnt, unsigned long& result, unsigned long& flags);
+			//bool send(const ip& to, const buf& b, unsigned long& result, unsigned long flags);
+			//bool send(const ip& to, const buf* bufs, int bufcnt, unsigned long& result, unsigned long flags);
+			//bool recv(ip& from, buf& b, unsigned long& result, unsigned long& flags);
+			//bool recv(ip& from, buf* bufs, int bufcnt, unsigned long& result, unsigned long& flags);
 
 			bool get_result(overlapped&) const;
 			bool close();

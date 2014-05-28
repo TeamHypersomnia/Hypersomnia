@@ -48,7 +48,7 @@ namespace augs {
 			return err(!WSACleanup()) == 0;
 		}
 
-		overlapped::overlapped() : flags(0) {}
+		overlapped::overlapped(augs::threads::overlapped_userdata* new_userdata) : augs::threads::overlapped(new_userdata), flags(0) {}
 
 		void overlapped::reset() {
 			threads::overlapped::reset();
@@ -81,20 +81,20 @@ namespace augs {
 
 		int ip::size = 0;
 
-		buf::buf(void* data, int len) {
+		wsabuf::wsabuf(void* data, int len) {
 			set(data, len);
 		}
 
-		void buf::set(void* data, int len) {
+		void wsabuf::set(void* data, int len) {
 			b.buf = static_cast<char*>(data);
 			b.len = len;
 		}
 
-		void *buf::get() const {
+		void *wsabuf::get() const {
 			return b.buf;
 		}
 
-		int buf::get_len() const {
+		int wsabuf::get_len() const {
 			return b.len;
 		}
 

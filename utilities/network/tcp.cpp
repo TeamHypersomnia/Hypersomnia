@@ -5,7 +5,7 @@
 
 namespace augs {
 	namespace network {
-		overlapped_accept::overlapped_accept() : accepted(INVALID_SOCKET) {
+		overlapped_accept::overlapped_accept(augs::threads::overlapped_userdata* new_userdata) : augs::threads::overlapped(new_userdata), accepted(INVALID_SOCKET) {
 			memset(this, 0, sizeof(this));
 		}
 
@@ -81,36 +81,36 @@ namespace augs {
 			return err(acceptex(sock, request->accepted, request->addr_local, 0, sizeof(request->addr_local),  sizeof(request->addr_remote), &request->result, &request->overlap) || WSAGetLastError() == WSA_IO_PENDING) != 0; 
 		}
 
-		int tcp::send(const buf& b, overlapped* request) {
+		int tcp::send(const wsabuf& b, overlapped* request) {
 			return err((WSASend(sock, (LPWSABUF)&b, 1, &request->result, request->flags, &request->overlap, 0) == 0) ? 2 : WSAGetLastError() == WSA_IO_PENDING );
 		}
 		
-		int tcp::send(const buf* bufs, int bufcnt, overlapped* request) {
+		int tcp::send(const wsabuf* bufs, int bufcnt, overlapped* request) {
 			return err((WSASend(sock, (LPWSABUF)bufs, bufcnt, &request->result, request->flags, &request->overlap, 0) == 0) ? 2 : WSAGetLastError() == WSA_IO_PENDING );
 		}
 
-		int tcp::recv(buf& b, overlapped* request) {
+		int tcp::recv(wsabuf& b, overlapped* request) {
 			return err((WSARecv(sock, (LPWSABUF)&b, 1, &request->result, &request->flags, &request->overlap, 0) == 0) ? 2 : WSAGetLastError() == WSA_IO_PENDING ); 
 		}
 
-		int tcp::recv(buf* bufs, int bufcnt, overlapped* request) {
+		int tcp::recv(wsabuf* bufs, int bufcnt, overlapped* request) {
 			return err((WSARecv(sock, (LPWSABUF)bufs, bufcnt, &request->result, &request->flags, &request->overlap, 0) == 0) ? 2 : WSAGetLastError() == WSA_IO_PENDING ); 
 		}
 		
 
-		bool tcp::send(const buf& b, unsigned long& result, unsigned long flags) {
+		bool tcp::send(const wsabuf& b, unsigned long& result, unsigned long flags) {
 			return err(!(WSASend(sock, (LPWSABUF)&b, 1, &result, flags, 0, 0))) != 0;
 		}
 		
-		bool tcp::send(const buf* bufs, int bufcnt, unsigned long& result, unsigned long flags) {
+		bool tcp::send(const wsabuf* bufs, int bufcnt, unsigned long& result, unsigned long flags) {
 			return err(!(WSASend(sock, (LPWSABUF)bufs, bufcnt, &result, flags, 0, 0))) != 0;
 		}
 
-		bool tcp::recv(buf& b, unsigned long& result, unsigned long& flags) {
+		bool tcp::recv(wsabuf& b, unsigned long& result, unsigned long& flags) {
 			return err(!(WSARecv(sock, (LPWSABUF)&b, 1, &result, &flags, 0, 0))) != 0; 
 		}
 
-		bool tcp::recv(buf* bufs, int bufcnt, unsigned long& result, unsigned long& flags) {
+		bool tcp::recv(wsabuf* bufs, int bufcnt, unsigned long& result, unsigned long& flags) {
 			return err(!(WSARecv(sock, (LPWSABUF)bufs, bufcnt, &result, &flags, 0, 0))) != 0; 
 		}
 		
