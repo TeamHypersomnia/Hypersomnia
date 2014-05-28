@@ -66,23 +66,23 @@ namespace augs {
 
 			DWORD& get_key(), &get_result();
 			
-			void get_overlapped(overlapped*&);
-			void get_overlapped(augs::network::overlapped*&);
-			void get_overlapped(augs::network::overlapped_accept*&);
+			void get_operation_info(overlapped*&);
+			void get_operation_info(augs::network::overlapped*&);
+			void get_operation_info(augs::network::overlapped_accept*&);
 		};
 
 		class iocp {
-			HANDLE cport, *workers;
-			int cval, nworkers;
-			void* argp, *workerf;
+			HANDLE cport;
+			std::vector<HANDLE> worker_handles;
+			std::vector<std::function<void()>> worker_functions; // just a container
 
-			template<class T>
-			static DWORD WINAPI ThreadProc(LPVOID p) {
-				iocp* io = (iocp*)p;
-				((int (*)(T*))(io->workerf))((T*)(io->argp));
+			int cval;
+		public:
+			static DWORD WINAPI ThreadProc(LPVOID arg) {
+				(*((std::function<void()>*)arg))();
 				return 0;
 			}
-		public:
+
 			iocp();
 
 			static completion QUIT;
@@ -95,17 +95,7 @@ namespace augs {
 			bool get_completion(completion& out, DWORD ms_timeout = INFINITE);
 			bool post_completion(completion& in);
 
-			template <class argument>
-			void create_pool(int (*worker)(argument*), argument* arg, int n = get_num_cores()) {
-				if(workers || !n) return;
-				argp = (void*)arg;
-				workerf = (void*)worker;
-				nworkers = n;
-				workers = new HANDLE[n];
-				for(int i = 0; i < n; ++i)
-					err(workers[i] = CreateThread(0, 0, ThreadProc<argument>, this, 0, 0));
-			}
-
+			void add_worker(std::function<void()>* worker_function);
 			void quit_pool(void);
 			
 			void close();

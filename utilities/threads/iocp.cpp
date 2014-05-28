@@ -12,24 +12,23 @@ namespace augs {
 
 		DWORD& completion::get_result() { return result; }
 		
-		void completion::get_overlapped(overlapped*& p) {
+		void completion::get_operation_info(overlapped*& p) {
 			p = (overlapped*)overlap;
 		}
 
-		void completion::get_overlapped(augs::network::overlapped*& p) {
+		void completion::get_operation_info(augs::network::overlapped*& p) {
 			p = (augs::network::overlapped*)overlap;
 
 		}
 
-		void completion::get_overlapped(augs::network::overlapped_accept*& p) {
+		void completion::get_operation_info(augs::network::overlapped_accept*& p) {
 			p = (augs::network::overlapped_accept*)overlap;
 
 		}
 
-
 		completion iocp::QUIT;
 
-		iocp::iocp() : cport(0), workers(0) { }
+		iocp::iocp() : cport(0) {}
 
 		void iocp::open(int concurrency_value) {
 			if(!cport) err((cport = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, (cval = concurrency_value))));
@@ -43,15 +42,19 @@ namespace augs {
 			return err(PostQueuedCompletionStatus(cport, in.result, in.key, in.overlap)) != FALSE;
 		}
 
-		void iocp::quit_pool() {
-			if(!workers) return;
-			err(PostQueuedCompletionStatus(cport, 0, 0, 0));
-			WaitForMultipleObjects(nworkers, workers, true, INFINITE);
-			for(int i = 0; i < nworkers; ++i) 
-				err(CloseHandle(workers[i]));
+		void iocp::add_worker(std::function<void()>* worker_function) {
+			HANDLE new_worker;
+			err(new_worker = CreateThread(0, 0, ThreadProc, (LPVOID) &worker_function, 0, 0));
+			worker_handles.push_back(new_worker);
+		}
 
-			delete [] workers;
-			workers = 0;
+		void iocp::quit_pool() {
+			if(!worker_handles.empty()) return;
+			err(PostQueuedCompletionStatus(cport, 0, 0, 0));
+
+			WaitForMultipleObjects(worker_handles.size(), worker_handles.data(), true, INFINITE);
+			for (int i = 0; i < worker_handles.size(); ++i)
+				err(CloseHandle(worker_handles[i]));
 		}
 
 		void iocp::close() {
