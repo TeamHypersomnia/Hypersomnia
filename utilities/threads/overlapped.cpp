@@ -18,7 +18,7 @@ namespace augs {
 			return err(WaitForMultipleObjects(n, events, all, timeout) != WAIT_FAILED) != 0; 
 		}
 
-		overlapped::overlapped() : result(0) {
+		overlapped::overlapped(overlapped_userdata* new_userdata) : userdata(new_userdata), result(0) {
 			reset();
 		}
 
@@ -38,10 +38,6 @@ namespace augs {
 
 		bool overlapped::wait(DWORD timeout) { 
 			return err(WaitForMultipleObjects(1, &overlap.hEvent, TRUE, timeout) != WAIT_FAILED) != 0; 
-		}
-
-		int overlapped::get_result() const {
-			return result;
 		}
 	}
 }

@@ -28,6 +28,10 @@ namespace augs {
 
 		completion iocp::QUIT;
 
+		void overlapped_userdata::on_completion(overlapped* owner) {
+
+		}
+
 		iocp::iocp() : cport(0) {}
 
 		void iocp::open(int concurrency_value) {
@@ -44,7 +48,7 @@ namespace augs {
 
 		void iocp::add_worker(std::function<void()>* worker_function) {
 			HANDLE new_worker;
-			err(new_worker = CreateThread(0, 0, ThreadProc, (LPVOID) &worker_function, 0, 0));
+			err(new_worker = CreateThread(0, 0, ThreadProc, (LPVOID) worker_function, 0, 0));
 			worker_handles.push_back(new_worker);
 		}
 

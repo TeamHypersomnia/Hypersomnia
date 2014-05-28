@@ -1,5 +1,6 @@
 #pragma once
 #include "../error/error.h"
+#include <memory>
 
 /* todo: rozbudowac pool o priority i critical path */
 
@@ -24,14 +25,20 @@ namespace augs {
 			shared_counter& operator--();
 		};
 
+		class overlapped;
+		struct overlapped_userdata {
+			virtual void on_completion(overlapped* owner);
+		};
+
 		class overlapped {
 			friend class completion;
 			friend class augs::network::udp;
 			friend class augs::network::tcp;
-
+		public:
 			OVERLAPPED overlap;
 			DWORD result;
-		public:
+
+			std::unique_ptr<overlapped_userdata> userdata;
 
 			class multiple_waits {
 				HANDLE* events;
@@ -43,15 +50,16 @@ namespace augs {
 				bool wait(DWORD timeout, bool all);
 			};
 
-			overlapped(); ~overlapped();
+			overlapped(overlapped_userdata* new_userdata = nullptr); ~overlapped();
 			
 			void reset();
 
 			void create_event();
 			bool wait(DWORD timeout = INFINITE);
-			int get_result() const;
 		};
 			
+		
+
 		class completion {
 			friend class iocp;
 			OVERLAPPED* overlap;
