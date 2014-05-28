@@ -50,6 +50,11 @@ namespace augs {
 
 		overlapped::overlapped() : flags(0) {}
 
+		void overlapped::reset() {
+			threads::overlapped::reset();
+			flags = 0;
+		}
+
 		ip::ip() {
 			size = sizeof(addr);
 			addr.sin_family = AF_INET;

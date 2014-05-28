@@ -29,7 +29,7 @@ namespace augs {
 			friend class augs::network::udp;
 			friend class augs::network::tcp;
 
-			WSAOVERLAPPED overlap;
+			OVERLAPPED overlap;
 			DWORD result;
 		public:
 
@@ -44,6 +44,9 @@ namespace augs {
 			};
 
 			overlapped(); ~overlapped();
+			
+			void reset();
+
 			void create_event();
 			bool wait(DWORD timeout = INFINITE);
 			int get_result() const;

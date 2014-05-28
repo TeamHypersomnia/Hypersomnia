@@ -19,7 +19,7 @@ namespace augs {
 		}
 
 		overlapped::overlapped() : result(0) {
-			SecureZeroMemory(&overlap, sizeof(overlap));
+			reset();
 		}
 
 		overlapped::~overlapped() {
@@ -29,6 +29,11 @@ namespace augs {
 
 		void overlapped::create_event() {
 			if(!overlap.hEvent) err((overlap.hEvent = WSACreateEvent()));
+		}
+		
+		void overlapped::reset() {
+			SecureZeroMemory(&overlap, sizeof(overlap));
+			result = 0;
 		}
 
 		bool overlapped::wait(DWORD timeout) { 

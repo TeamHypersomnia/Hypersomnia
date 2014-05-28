@@ -8,6 +8,8 @@ namespace augs  {
 		struct overlapped : public augs::threads::overlapped {
 			DWORD flags;
 			overlapped();
+			
+			void reset();
 		};
 
 		class overlapped_accept : public augs::threads::overlapped {
@@ -21,13 +23,13 @@ namespace augs  {
 		};
 
 		struct ip {
-				struct sockaddr_in addr;
-				static int size;
-				ip();
-				ip(unsigned short port, char* ipv4);
-				char* get_ipv4();
-				unsigned short get_port();
-				static char* get_local_ipv4();
+			struct sockaddr_in addr;
+			static int size;
+			ip();
+			ip(unsigned short port, char* ipv4);
+			char* get_ipv4();
+			unsigned short get_port();
+			static char* get_local_ipv4();
 		};
 
 		class buf {

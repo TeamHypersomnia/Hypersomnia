@@ -13,7 +13,9 @@ namespace augs {
 		}
 
 		bool udp::open() {
-			return err(((sock = WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, NULL, 0, WSA_FLAG_OVERLAPPED)) != INVALID_SOCKET)) != 0;
+			auto res = err(((sock = WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, NULL, 0, WSA_FLAG_OVERLAPPED)) != INVALID_SOCKET)) != 0;
+			SetFileCompletionNotificationModes((HANDLE)sock, 0);
+			return res;
 		}
 
 		bool udp::bind(unsigned short port = 0, char* ipv4) {
