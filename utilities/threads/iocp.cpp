@@ -38,8 +38,20 @@ namespace augs {
 			if(!cport) err((cport = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, (cval = concurrency_value))));
 		}
 
-		bool iocp::get_completion(completion& out, DWORD ms_timeout) {
-			return err(GetQueuedCompletionStatus(cport, &out.get_result(), &out.get_key(), &out.overlap, ms_timeout)) != FALSE;
+		completion iocp::get_completion(DWORD ms_timeout) {
+			completion out;
+			auto out_flag = err(GetQueuedCompletionStatus(cport, &out.get_result(), &out.get_key(), &out.overlap, ms_timeout));
+
+			if (out_flag && out.overlap) 
+				out.result_type = completion::result::SUCCESSFUL_IO_OP_OR_CUSTOM;
+			else if (!out_flag && out.overlap) 
+				out.result_type = completion::result::FAILED_IO_OPERATION;
+			else if (!out_flag && !out.overlap) 
+				out.result_type = completion::result::FAILED_TO_DEQUEUE_OR_TIMEOUT;
+			else if (out_flag && !out.overlap) 
+				out.result_type = completion::result::CUSTOM_POST;
+
+			return std::move(out);
 		}
 
 		bool iocp::post_completion(completion& in) {

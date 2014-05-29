@@ -65,6 +65,13 @@ namespace augs {
 			OVERLAPPED* overlap;
 			DWORD result, key;
 		public:
+			enum result {
+				SUCCESSFUL_IO_OP_OR_CUSTOM, /* returns true and non-null overlapped struct */
+				FAILED_IO_OPERATION, /* returns false and non-null overlapped struct */
+				FAILED_TO_DEQUEUE_OR_TIMEOUT,  /* returns false and null overlapped struct */
+				CUSTOM_POST /* returns true and null overlapped struct */
+			} result_type;
+
 			completion(overlapped* o = 0, DWORD result = 0, DWORD key = 0);
 
 			template<class T>
@@ -100,7 +107,7 @@ namespace augs {
 			bool associate(augs::network::udp&, int key);
 			bool associate(augs::network::tcp&, int key);
 
-			bool get_completion(completion& out, DWORD ms_timeout = INFINITE);
+			completion get_completion(DWORD ms_timeout = INFINITE);
 			bool post_completion(completion& in);
 
 			void add_worker(std::function<void()>* worker_function);
