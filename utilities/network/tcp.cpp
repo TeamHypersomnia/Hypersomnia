@@ -1,6 +1,6 @@
 #pragma once
 #include "stdafx.h"
-#include "network.h"
+#include "tcp.h"
 #include "../error/error.h"
 
 namespace augs {
