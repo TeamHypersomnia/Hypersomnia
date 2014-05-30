@@ -32,11 +32,11 @@ namespace augs {
 				request->associated_address.size, &request->overlap, 0) == 0) ? 2 : WSAGetLastError() == WSA_IO_PENDING);
 		}
 		
-		void udp::set_blocking(bool) {
-			DWORD nonBlocking = 1;
+		void udp::set_blocking(bool flag) {
+			DWORD nonBlocking = flag ? 0 : 1;
 			err(ioctlsocket(sock,
 				FIONBIO,
-				&nonBlocking) == 0);
+				&nonBlocking) == NO_ERROR);
 		}
 		//int udp::send(const ip& to, const wsabuf* bufs, int bufcnt, overlapped* request) {
 		//	return err((WSASendTo(sock, (LPWSABUF)bufs, bufcnt, &request->result, request->flags, (SOCKADDR*)&to.addr, to.size, &request->overlap, 0) == 0) ? 2 : WSAGetLastError() == WSA_IO_PENDING );
