@@ -1,6 +1,6 @@
 #pragma once
 #include "stdafx.h"
-#include "network.h"
+#include "udp.h"
 #include "../error/error.h"
 
 namespace augs {
@@ -32,6 +32,12 @@ namespace augs {
 				request->associated_address.size, &request->overlap, 0) == 0) ? 2 : WSAGetLastError() == WSA_IO_PENDING);
 		}
 		
+		void udp::set_blocking(bool) {
+			DWORD nonBlocking = 1;
+			err(ioctlsocket(sock,
+				FIONBIO,
+				&nonBlocking) == 0);
+		}
 		//int udp::send(const ip& to, const wsabuf* bufs, int bufcnt, overlapped* request) {
 		//	return err((WSASendTo(sock, (LPWSABUF)bufs, bufcnt, &request->result, request->flags, (SOCKADDR*)&to.addr, to.size, &request->overlap, 0) == 0) ? 2 : WSAGetLastError() == WSA_IO_PENDING );
 		//}
@@ -49,17 +55,17 @@ namespace augs {
 		//}
 		
 
-		//bool udp::send(const ip& to, const wsabuf& b, unsigned long& result, unsigned long flags) {
-		//	return err((WSASendTo(sock, (LPWSABUF)&b, 1, &result, flags, (SOCKADDR*)&to.addr, to.size, 0, 0)) == 0) != 0;
-		//}
+		bool udp::send(const ip& to, const wsabuf& b, unsigned long& result, unsigned long flags) {
+			return err((WSASendTo(sock, (LPWSABUF)&b, 1, &result, flags, (SOCKADDR*)&to.addr, to.size, 0, 0)) == 0) != 0;
+		}
 		//
 		//bool udp::send(const ip& to, const wsabuf* bufs, int bufcnt, unsigned long& result, unsigned long flags) {
 		//	return err((WSASendTo(sock, (LPWSABUF)bufs, bufcnt, &result, flags, (SOCKADDR*)&to.addr, to.size, 0, 0)) == 0) != 0;
 		//}
 		//
-		//bool udp::recv(ip& from, wsabuf& b, unsigned long& result, unsigned long& flags) {
-		//	return err((WSARecvFrom(sock, (LPWSABUF)&b, 1, &result, &flags, (SOCKADDR*)&from.addr, &from.size, 0, 0)) == 0) != 0; 
-		//}
+		bool udp::recv(ip& from, wsabuf& b, unsigned long& result, unsigned long& flags) {
+			return err((WSARecvFrom(sock, (LPWSABUF)&b, 1, &result, &flags, (SOCKADDR*)&from.addr, &from.size, 0, 0)) == 0) != 0; 
+		}
 		//
 		//bool udp::recv(ip& from, wsabuf* bufs, int bufcnt, unsigned long& result, unsigned long& flags) {
 		//	return err((WSARecvFrom(sock, (LPWSABUF)bufs, bufcnt, &result, &flags, (SOCKADDR*)&from.addr, &from.size, 0, 0)) == 0) != 0; 
