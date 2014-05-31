@@ -54,6 +54,30 @@ namespace augs {
 			}
 		}
 
+		udp::send_result::send_result() : result(-1), bytes_transferred(0ul) {}
+
+		udp::send_result udp::send(const ip& to, packet& input_packet) {
+			wsabuf input_buf;
+			input_buf.set(input_packet.data.data(), input_packet.data.size());
+
+			send_result res;
+			res.result = send(to, input_buf, res.bytes_transferred);
+
+			return std::move(res);
+		}
+
+		udp::recv_result udp::recv() {
+			wsabuf input_buf;
+			input_buf.set(buffer_for_receives, sizeof(buffer_for_receives));
+
+			recv_result res;
+			res.result = recv(res.sender_address, input_buf, res.bytes_transferred);
+
+			res.message.data.assign((char*)input_buf.get(), (char*)(input_buf.get()) + input_buf.get_len());
+
+			return std::move(res);
+		}
+
 		bool udp::get_result(overlapped& t) const {
 			return err(WSAGetOverlappedResult(sock, &t.overlap, &t.result, false, &t.flags) || WSAGetLastError() == WSA_IO_INCOMPLETE) != 0;
 		}

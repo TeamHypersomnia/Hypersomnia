@@ -21,9 +21,25 @@ namespace augs  {
 			int send(const ip& to, const wsabuf& input_packet, unsigned long& result);
 			int recv(ip& from, wsabuf& b, unsigned long& result);
 
-			/* abstracted calls, 0 - error, 1 - successful */
-			bool send(const ip& to, const packet& input_packet, unsigned long& result);
-			bool recv(ip& from, const packet& output_packet, unsigned long& result);
+			struct send_result {
+				int result; /* is io_operation enum */
+				unsigned long bytes_transferred;
+				send_result();
+			};
+
+			struct recv_result : send_result {
+				ip sender_address;
+				packet message;
+			};
+
+			/* more abstract calls */
+			send_result send(const ip& to, packet& input_packet);
+
+			/* WARNING!!! This should not be called from two or more threads on the same socket - I'm using buffer_for_receives member to
+				avoid unnecessary allocations/deallocations
+			*/
+
+			recv_result recv();
 
 			bool get_result(overlapped&) const;
 			bool close();
