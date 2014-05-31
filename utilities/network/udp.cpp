@@ -55,7 +55,8 @@ namespace augs {
 		//}
 		
 
-		bool udp::send(const ip& to, const wsabuf& b, unsigned long& result, unsigned long flags) {
+		bool udp::send(const ip& to, const wsabuf& b, unsigned long& result) {
+			unsigned long flags = 0;
 			return err((WSASendTo(sock, (LPWSABUF)&b, 1, &result, flags, (SOCKADDR*)&to.addr, to.size, 0, 0)) == 0) != 0;
 		}
 		//
@@ -63,7 +64,8 @@ namespace augs {
 		//	return err((WSASendTo(sock, (LPWSABUF)bufs, bufcnt, &result, flags, (SOCKADDR*)&to.addr, to.size, 0, 0)) == 0) != 0;
 		//}
 		//
-		bool udp::recv(ip& from, wsabuf& b, unsigned long& result, unsigned long& flags) {
+		bool udp::recv(ip& from, wsabuf& b, unsigned long& result) {
+			unsigned long flags = 0;
 			return err((WSARecvFrom(sock, (LPWSABUF)&b, 1, &result, &flags, (SOCKADDR*)&from.addr, &from.size, 0, 0)) == 0) != 0; 
 		}
 		//

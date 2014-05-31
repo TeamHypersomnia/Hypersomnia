@@ -22,9 +22,9 @@ namespace augs  {
 			//int recv(ip& from, buf* bufs, int bufcnt, overlapped* request);
 
 			// 0 - error, 1 - successful
-			bool send(const ip& to, const wsabuf& b, unsigned long& result, unsigned long flags);
+			bool send(const ip& to, const wsabuf& b, unsigned long& result);
 			//bool send(const ip& to, const buf* bufs, int bufcnt, unsigned long& result, unsigned long flags);
-			bool recv(ip& from, wsabuf& b, unsigned long& result, unsigned long& flags);
+			bool recv(ip& from, wsabuf& b, unsigned long& result);
 			//bool recv(ip& from, buf* bufs, int bufcnt, unsigned long& result, unsigned long& flags);
 
 			bool get_result(overlapped&) const;
