@@ -30,23 +30,6 @@ namespace augs {
 				&nonBlocking) == NO_ERROR);
 		}
 
-		int udp::send(overlapped* request) {
-			return err((WSASendTo(sock, (LPWSABUF)&request->associated_buffer, 1,
-				&request->result, 
-				request->flags, 
-				(SOCKADDR*)&request->associated_address.addr, 
-				request->associated_address.size, &request->overlap, 0) == 0) ? 2 : WSAGetLastError() == WSA_IO_PENDING);
-		}
-		
-
-		int udp::recv(overlapped* request) {
-			return err((WSARecvFrom(sock, (LPWSABUF) &request->associated_buffer, 1,
-				&request->result, 
-				&request->flags, 
-				(SOCKADDR*) &request->associated_address.addr, 
-				&request->associated_address.size, &request->overlap, 0) == 0) ? 2 : WSAGetLastError() == WSA_IO_PENDING);
-		}
-
 		int udp::send(const ip& to, const wsabuf& b, unsigned long& result) {
 			unsigned long flags = 0;
 			auto call_result = WSASendTo(sock, (LPWSABUF) &b, 1, &result, flags, (SOCKADDR*) &to.addr, to.size, 0, 0);

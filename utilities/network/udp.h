@@ -17,12 +17,6 @@ namespace augs  {
 
 			void set_blocking(bool);
 
-			// 0 - error, 1 - pending, 2 - completed
-			int send(overlapped* request);
-			//int send(const ip& to, const buf* bufs, int bufcnt, overlapped* request);
-			int recv(overlapped* request);
-			//int recv(ip& from, buf* bufs, int bufcnt, overlapped* request);
-
 			/* raw calls, return io_result */
 			int send(const ip& to, const wsabuf& input_packet, unsigned long& result);
 			int recv(ip& from, wsabuf& b, unsigned long& result);
