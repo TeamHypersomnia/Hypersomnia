@@ -8,6 +8,8 @@ namespace augs  {
 			friend class augs::threads::iocp;
 			SOCKET sock;
 			ip addr;
+
+			char buffer_for_receives[66000];
 		public:
 			udp(); ~udp();
 			bool open();
@@ -21,11 +23,13 @@ namespace augs  {
 			int recv(overlapped* request);
 			//int recv(ip& from, buf* bufs, int bufcnt, overlapped* request);
 
-			// 0 - error, 1 - successful
-			bool send(const ip& to, const wsabuf& b, unsigned long& result);
-			//bool send(const ip& to, const buf* bufs, int bufcnt, unsigned long& result, unsigned long flags);
-			bool recv(ip& from, wsabuf& b, unsigned long& result);
-			//bool recv(ip& from, buf* bufs, int bufcnt, unsigned long& result, unsigned long& flags);
+			/* raw calls, return io_result */
+			int send(const ip& to, const wsabuf& input_packet, unsigned long& result);
+			int recv(ip& from, wsabuf& b, unsigned long& result);
+
+			/* abstracted calls, 0 - error, 1 - successful */
+			bool send(const ip& to, const packet& input_packet, unsigned long& result);
+			bool recv(ip& from, const packet& output_packet, unsigned long& result);
 
 			bool get_result(overlapped&) const;
 			bool close();
