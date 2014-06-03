@@ -73,6 +73,10 @@ namespace augs {
 			return inet_ntoa(addr.sin_addr);
 		}
 
+		unsigned long ip::get_address_as_uint() {
+			return addr.sin_addr.s_addr;
+		}
+
 		unsigned short ip::get_port() {
 			return ntohs(addr.sin_port);
 		}

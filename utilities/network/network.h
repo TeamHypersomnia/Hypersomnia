@@ -52,6 +52,10 @@ namespace augs  {
 			ip();
 			ip(unsigned short port, char* ipv4);
 			char* get_ipv4();
+			
+			/* for mapping */
+			unsigned long ip::get_address_as_uint();
+
 			unsigned short get_port();
 			static char* get_local_ipv4();
 		};
