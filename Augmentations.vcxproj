@@ -1106,6 +1106,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='RelDeb|Win32'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="utilities\threads\pool.cpp" />
     <ClCompile Include="utilities\threads\threads.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
@@ -1489,6 +1490,7 @@
     <ClInclude Include="utilities\misc\timer.h" />
     <ClInclude Include="utilities\misc\value_animator.h" />
     <ClInclude Include="utilities\misc\vector_wrapper.h" />
+    <ClInclude Include="utilities\threads\pool.h" />
     <ClInclude Include="utilities\threads\threads.h" />
     <ClInclude Include="utilities\window_framework\event.h" />
     <ClInclude Include="utilities\window_framework\window.h" />
