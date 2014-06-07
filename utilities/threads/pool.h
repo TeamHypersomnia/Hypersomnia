@@ -9,6 +9,8 @@
 namespace augs {
 	namespace threads {
 		class pool {
+		protected:
+			bool acquire_new_task(std::function<void()>& out);
 			void worker_thread();
 		public:
 			bool should_stop;
@@ -21,7 +23,17 @@ namespace augs {
 			pool(size_t num_of_workers = std::thread::hardware_concurrency());
 
 			std::mutex queue_mutex;
-			std::condition_variable condition;
+			std::condition_variable sleeping_workers;
+		};
+
+		class limited_pool : public pool {
+			void worker_thread();
+		public:
+			size_t max_tasks_count = 100000;
+			
+			void enqueue_with_limit(const std::function<void()>&);
+
+			std::condition_variable sleeping_enqueuers;
 		};
 	}
 }
