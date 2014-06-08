@@ -2,27 +2,19 @@
 #include <iostream>
 namespace augs {
 	namespace threads {
-		bool pool::acquire_new_task(std::function<void()>& task) {
-			std::unique_lock<std::mutex> lock(queue_mutex);
-
-			while (!should_stop && tasks.empty())
-				sleeping_workers.wait(lock);
-
-			if (should_stop) {
-				return false;
-			}
-
-			task = tasks.front();
-			tasks.pop_front();
-
-			return true;
-		}
-		 
 		void pool::worker_thread() {
 			std::function<void()> task;
-			while(true) {
-				if(!acquire_new_task(task)) return;
+			while (true) {
+				std::unique_lock<std::mutex> lock(queue_mutex);
 
+				while (!should_stop && tasks.empty())
+					sleeping_workers.wait(lock);
+
+				if (should_stop) 
+					return;
+
+				task = tasks.front();
+				tasks.pop_front();
 				task();
 			}
 		}
@@ -52,27 +44,22 @@ namespace augs {
 				worker.join();
 		}
 
-		limited_pool::limited_pool(size_t max_tasks_count, size_t num_of_workers) : max_tasks_count(max_tasks_count), pool(num_of_workers) {}
-
-		void limited_pool::enqueue_with_limit(const std::function<void()>& new_task) {
-			while (!should_stop && tasks.size() >= max_tasks_count)
-				std::this_thread::yield();
-			
-			{
-				std::unique_lock<std::mutex> lock(queue_mutex);
-				tasks.push_back(new_task);
-			}
-
-			sleeping_workers.notify_one();
+		void pool::enqueue_limit_yield(size_t max_tasks_count, const std::function<void()>& new_task) {
+			while (!should_stop && tasks.size() >= max_tasks_count) std::this_thread::yield();
+			enqueue(new_task);
 		}
 
+		void pool::enqueue_limit_busy(size_t max_tasks_count, const std::function<void()>& new_task) {
+			while (!should_stop && tasks.size() >= max_tasks_count);
+			enqueue(new_task);
+		}
 	}
 }
 
 #include <gtest\gtest.h>
 
 TEST(LimitedThreadPool, MultipleTasksSuccess) {
-	augs::threads::limited_pool my_pool(2);
+	augs::threads::pool my_pool;
 	
 	std::vector<int> mytab;
 	mytab.resize(250 * 100000);
@@ -85,8 +72,8 @@ TEST(LimitedThreadPool, MultipleTasksSuccess) {
 	};
 	
 	for (int i = 0; i < 250; ++i) {
-		my_pool.enqueue_with_limit(std::bind(fill, i * 100000, (i + 1) * 100000));
-		EXPECT_LE(my_pool.tasks.size(), my_pool.max_tasks_count);
+		my_pool.enqueue_limit_yield(2, std::bind(fill, i * 100000, (i + 1) * 100000));
+		EXPECT_LE(my_pool.tasks.size(), 2);
 	}
 	
 	my_pool.enqueue_exit_message();
