@@ -19,21 +19,24 @@ namespace augs {
 			std::deque<std::function<void()>> tasks;
 
 			void enqueue(const std::function<void()>&);
+			void enqueue_exit_message();
 
 			pool(size_t num_of_workers = std::thread::hardware_concurrency());
 
 			std::mutex queue_mutex;
 			std::condition_variable sleeping_workers;
+
+			void join_all();
 		};
 
 		class limited_pool : public pool {
 			void worker_thread();
 		public:
-			size_t max_tasks_count = 100000;
+			size_t max_tasks_count;
+			
+			limited_pool(size_t max_tasks_count, size_t num_of_workers = std::thread::hardware_concurrency());
 			
 			void enqueue_with_limit(const std::function<void()>&);
-
-			std::condition_variable sleeping_enqueuers;
 		};
 	}
 }
