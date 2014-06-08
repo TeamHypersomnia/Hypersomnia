@@ -21,6 +21,7 @@ namespace augs {
 			void enqueue_exit_message();
 
 			pool(size_t num_of_workers = std::thread::hardware_concurrency());
+			~pool();
 
 			std::mutex queue_mutex;
 			std::condition_variable sleeping_workers;

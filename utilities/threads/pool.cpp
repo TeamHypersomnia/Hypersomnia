@@ -19,6 +19,11 @@ namespace augs {
 			}
 		}
 
+		pool::~pool() {
+			should_stop = true;
+			join_all();
+		}
+
 		void pool::enqueue_exit_message() {
 			enqueue([this](){ should_stop = true; sleeping_workers.notify_all(); });
 		}
@@ -41,16 +46,19 @@ namespace augs {
 
 		void pool::join_all() {
 			for (auto& worker : workers)
-				worker.join();
+				if(worker.joinable()) 
+					worker.join();
 		}
 
 		void pool::enqueue_limit_yield(size_t max_tasks_count, const std::function<void()>& new_task) {
 			while (!should_stop && tasks.size() >= max_tasks_count) std::this_thread::yield();
+			
 			enqueue(new_task);
 		}
 
 		void pool::enqueue_limit_busy(size_t max_tasks_count, const std::function<void()>& new_task) {
 			while (!should_stop && tasks.size() >= max_tasks_count);
+			
 			enqueue(new_task);
 		}
 	}
@@ -77,6 +85,8 @@ TEST(LimitedThreadPool, MultipleTasksSuccess) {
 	}
 	
 	my_pool.enqueue_exit_message();
+	my_pool.join_all();
+	my_pool.join_all();
 	my_pool.join_all();
 	
 	bool all_equals_two = true;
