@@ -74,8 +74,49 @@ As the maps grow in detail, we will create a separate atlas for example for grou
 NETWORKING
 --------------------------------------------------------------------------------------------------
 
-ON THE SERVER: All the logic written in C++ for the sake of easy threading and performance. Only initialization stuff written in lua and consider scripted AI (but not necessarily).
-ON THE CLIENT: Separation of concerns: again - C++ for networking and threading stuff (worker iocp thread, mainly transferring and acknowledging messages), whereas Lua code will simply interpret all the incoming messages.
+
+Forget about IOCP. We'll just block on recvfrom in a single thread and dispatch all the recv results to the main, single server logic thread.
+There's no sense in maintaining several logic threads; it imposes too much synchronization.
+
+If it's about multithreading, simply use it INSIDE main server logic for splitting heavy but simple TASKS in parallel.
+
+About packet composition: forget about bit streams or something like this. We'll be writing data byte-wise.
+With bit stream approach you'd gain several bytes at best, as floats/ints will make most of the payload. That's a premature optimization and it's more performant
+to operate on bytes.
+
+
+--------------------------------------------
+MIXING LUA WITH C++
+--------------------------------------------
+
+ON THE SERVER:
+edit:
+we can do this like the client does. Only networking-related stuff written in C++. Everything else, including  asynchronous i/o callbacks, is going to be handled in lua. 
+Consider one global "master" lua_State eg. for current globals (server settings for example) and commands from developer console.
+Then we could have one lua_State per every worker thread.
+Then on any i/o callback, globals from "master" lua_State would be copied to the thread-specific lua_State.
+
+Advantages of this approach are as follows:
+- faster and easier workflow
+- creating NPCs, items and whatnot during server runtime without the need to reboot
+
+Disadvantages:
+- a bit worse performance (but we shouldn't worry now; we'll later seek bottlenecks and reimplement them in C++)
+
+OLD approach:
+(((( 
+All the logic written in C++ for the sake of easy threading and performance. 
+Scripting only for server startup: initialization stuff for entities, maps etc. written in lua (we'll use Tiled maps exported to lua by the way). 
+Consider scripted AI (but not necessarily).
+))))
+
+ON THE CLIENT: Separation of concerns: again - C++ for iocp + networking stuff, eg. my own-rolled reliable udp protocol, all the send/recv and other utility functions.
+How is it going to work: C++ will hold two queues: one for outcoming and one for incoming messages.
+
+
+
+ (worker iocp thread, mainly transferring and acknowledging messages), 
+whereas Lua code will simply interpret all the incoming messages.
 There is going to be a queue for incoming messages and outcoming messages, both protected by a critical section that lua code will occassionally step into.
 
 
