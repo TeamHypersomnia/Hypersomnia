@@ -84,6 +84,19 @@ About packet composition: forget about bit streams or something like this. We'll
 With bit stream approach you'd gain several bytes at best, as floats/ints will make most of the payload. That's a premature optimization and it's more performant
 to operate on bytes.
 
+Firstly write a simple chat channel.
+
+
+RELIABLE TRANSPORT LAYER
+
+About reliable commands:
+We'll simply buffer all the incoming messages and only process packets belonging to the first consecutive chain. That's basically how TCP's recv works.
+
+About channels:
+We'll have a game_protocol class that will hold both sequenced channel and sequenced acknowledged channel (which provides guaranteed in-order delivery).
+
+
+
 
 --------------------------------------------
 MIXING LUA WITH C++
