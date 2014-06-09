@@ -13,6 +13,16 @@ namespace augs {
 		LPFN_CONNECTEX tcp::connectex = NULL;
 		LPFN_GETACCEPTEXSOCKADDRS tcp::getacceptexsockaddrs = NULL;
 
+		packet packet::operator+(const packet& b) const {
+			packet new_packet;
+			new_packet.data = data;
+
+			new_packet.data.resize(data.size() + b.data.size());
+			memcpy(new_packet.data.data() + data.size(), b.data.data(), b.data.size());
+
+			return new_packet;
+		}
+
 		bool init() {
 			int f = 1;
 			errf(!WSAStartup(MAKEWORD(2,2), &wsaData), f);

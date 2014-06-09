@@ -29,6 +29,8 @@ namespace augs  {
 				return return_value;
 			}
 
+			packet operator+(const packet& b) const;
+
 			template <typename T>
 			void write(const T& value) {
 				size_t old_size = data.size();
