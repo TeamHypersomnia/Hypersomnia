@@ -213,7 +213,7 @@
       <AdditionalDependencies>OpenGL32.lib;Ws2_32.lib;dwmapi.lib;Gdiplus.lib;sfml-main.lib;sfml-audio-s.lib;sfml-system-s.lib;openal32.lib;sndfile.lib;winmm.lib;freetype253MT.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
-      <AdditionalDependencies>OpenGL32.lib;Ws2_32.lib;dwmapi.lib;Gdiplus.lib;sfml-main.lib;sfml-audio-s.lib;sfml-system-s.lib;openal32.lib;sndfile.lib;winmm.lib;freetype253MT.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseExe|Win32'">
