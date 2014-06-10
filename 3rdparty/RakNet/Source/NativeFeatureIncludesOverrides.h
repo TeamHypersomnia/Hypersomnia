@@ -1,0 +1,9 @@
+// USER EDITABLE FILE
+// See NativeFeatureIncludes.h
+
+#ifndef __NATIVE_FEATURE_INCLDUES_OVERRIDES_H
+#define __NATIVE_FEATURE_INCLDUES_OVERRIDES_H
+
+//#define LIBCAT_SECURITY 1
+
+#endif
