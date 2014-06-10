@@ -40,7 +40,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\boost;$(ProjectDir)..\Augmentations\3rdparty;$(ProjectDir)..\Augmentations\utilities;C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)..\Augmentations\3rdparty\gtest;$(ProjectDir)..\Augmentations;$(ProjectDir)..\Augmentations\3rdparty\freetype;$(IncludePath)</IncludePath>
+    <IncludePath>C:\boost;$(ProjectDir)..\Augmentations\3rdparty;$(ProjectDir)..\Augmentations\utilities;C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)..\Augmentations\3rdparty\gtest;$(ProjectDir)..\Augmentations;$(ProjectDir)..\Augmentations\3rdparty\freetype;$(ProjectDir)..\Augmentations\3rdparty\RakNet\Source;$(IncludePath)</IncludePath>
     <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
     <OutDir>$(ProjectDir)\output\</OutDir>
   </PropertyGroup>
@@ -84,8 +84,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
