@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+
 struct lua_State;
 
 namespace resources {

@@ -3,10 +3,6 @@
 #define BOOST_DISABLE_THREADS
 #pragma message("Compiling precompiled headers.\n")
 
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <mswsock.h>
-#include <iphlpapi.h>
 #include <vector>
 
 #include <Windows.h>
