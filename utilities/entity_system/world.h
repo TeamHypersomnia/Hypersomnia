@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <vector>
+#include <boost\pool\object_pool.hpp>
 
 #include "entity.h"
 #include "type_registry.h"

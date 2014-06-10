@@ -3,11 +3,6 @@
 #define BOOST_DISABLE_THREADS
 #pragma message("Compiling precompiled headers.\n")
 
-#include <vector>
-
-#include <Windows.h>
-#include <gdiplus.h>
-
 #undef min
 #undef max
 
@@ -16,8 +11,6 @@
 #endif
 
 #include "math/vec2d.h"
-
-#include <boost\pool\object_pool.hpp>
 
 #include <lua/lua.hpp>
 #include <luabind/luabind.hpp>
@@ -28,5 +21,5 @@
 
 #include <Box2D/Box2D.h>
 
-#include <freetype\ft2build.h> 
-#include FT_FREETYPE_H
+#undef min
+#undef max

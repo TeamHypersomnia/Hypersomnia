@@ -1,5 +1,7 @@
 #pragma once
 #include "stdafx.h"
+#include <freetype\ft2build.h> 
+#include FT_FREETYPE_H
 
 #include <set>
 

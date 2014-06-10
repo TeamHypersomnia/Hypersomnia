@@ -1,5 +1,6 @@
 #pragma once
-#include "stdafx.h"
+#include <Windows.h>
+#include <gdiplus.h>
 #include <memory>
 
 #include "image.h"
