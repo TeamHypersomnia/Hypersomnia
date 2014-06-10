@@ -12,13 +12,15 @@ enum GameMessages
 {
 	ID_GAME_MESSAGE_1 = ID_USER_PACKET_ENUM + 1
 };
-
+ 
 
 int main() {
 	framework::init();
 
 	resources::lua_state_wrapper lua_state;
 	lua_state.bind_whole_engine();
+
+	lua_state.dofile("init.lua");
 
 	RakNet::RakPeerInterface *peer = RakNet::RakPeerInterface::GetInstance();
 
@@ -27,7 +29,7 @@ int main() {
 
 	RakNet::Packet *packet;
 
-	while (1)
+	while (1) 
 	{
 		for (packet = peer->Receive(); packet; peer->DeallocatePacket(packet), packet = peer->Receive())
 		{
@@ -73,7 +75,6 @@ int main() {
 	}
 
 
-	lua_state.dofile("init.lua");
 
 	framework::deinit();
 	return 0;
