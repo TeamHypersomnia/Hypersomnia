@@ -36,6 +36,16 @@ namespace augs {
 			std::unordered_map<key, value>& get_raw() {
 				return raw_map;
 			}
+
+			static luabind::scope bind(const char* name) {
+				return luabind::class_<map_wrapper<key, value>>(name)
+					.def(luabind::constructor<>())
+					.def("add", &add)
+					.def("insert", &insert)
+					.def("at", &at)
+					.def("get", &get)
+					.def("size", &size);
+			}
 		};
 	}
 }

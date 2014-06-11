@@ -9,9 +9,7 @@
 namespace bindings {
 	luabind::scope _particle_emitter_component() {
 		return (
-			luabind::class_<particle_emitter_info>("particle_emitter_info")
-			.def(luabind::constructor<>())
-			.def("add", &particle_emitter_info::add),
+			particle_emitter_info::bind("particle_emitter_info"),
 
 			luabind::class_<components::particle_emitter>("particle_emitter_component")
 			.def(luabind::constructor<>())

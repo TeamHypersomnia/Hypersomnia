@@ -9,9 +9,7 @@ namespace bindings {
 	luabind::scope _animate_component() {
 		return
 			(
-			luabind::class_<animate_info>("animate_info")
-			.def(luabind::constructor<>())
-			.def("add", &animate_info::add),
+			animate_info::bind("animate_info"),
 
 			luabind::class_<animate>("animate_component")
 			.def(luabind::constructor<>())

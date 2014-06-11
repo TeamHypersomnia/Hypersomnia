@@ -7,10 +7,7 @@
 namespace bindings {
 	luabind::scope _scriptable_component() {
 		return(
-			luabind::class_<scriptable_info>("scriptable_info")
-			.def(luabind::constructor<>())
-			.def("set", &scriptable_info::add)
-			.def("at", &scriptable_info::get),
+			scriptable_info::bind("scriptable_info"),
 
 			luabind::class_<scriptable>("scriptable_component")
 			.def(luabind::constructor<>())
