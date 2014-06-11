@@ -56,6 +56,8 @@ namespace bindings {
 
 		_timer(),
 
+		_network_binding(),
+
 		_particle(),
 		_emission(),
 		_particle_effect(),
@@ -161,6 +163,8 @@ namespace resources {
 				bindings::_polygon(),
 
 				bindings::_timer(),
+				
+				bindings::_network_binding(),
 
 				bindings::_particle(),
 				bindings::_emission(),
