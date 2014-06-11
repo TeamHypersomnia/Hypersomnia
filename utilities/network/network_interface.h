@@ -5,6 +5,8 @@
 #include "BitStream.h"
 #include "RakNetTypes.h"
 
+#include "PacketPriority.h"
+
 namespace augs {
 	namespace network {
 		struct network_interface {
@@ -14,7 +16,7 @@ namespace augs {
 
 				unsigned char byte(int) const;
 				unsigned length() const;
-				unsigned long guid() const;
+				RakNet::RakNetGUID guid() const;
 
 				void destroy();
 				~packet();
@@ -30,10 +32,22 @@ namespace augs {
 
 			bool receive(packet& output);
 
+			unsigned send(RakNet::BitStream&, int priority, int reliability, int channel, RakNet::RakNetGUID target, bool broadcast);
+
 			network_interface(const network_interface&) = delete;
 			network_interface& operator=(const network_interface&) = delete;
 
 		};
 
 	}
+}
+
+namespace std {
+	template <>
+	struct hash<RakNet::RakNetGUID> {
+		std::size_t operator()(const RakNet::RakNetGUID& k) const {
+			return RakNet::RakNetGUID::ToUint32(k);
+		}
+	};
+
 }

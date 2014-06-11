@@ -36,8 +36,8 @@ namespace augs {
 			return info->length;
 		}
 
-		unsigned long network_interface::packet::guid() const {
-			return RakNet::RakNetGUID::ToUint32(info->guid);
+		RakNet::RakNetGUID network_interface::packet::guid() const {
+			return info->guid;
 		}
 
 		bool network_interface::receive(packet& output) {
@@ -47,6 +47,10 @@ namespace augs {
 			output.owner = peer;
 
 			return output.info != nullptr;
+		}
+
+		unsigned network_interface::send(RakNet::BitStream& bitstream, int priority, int reliability, int channel, RakNet::RakNetGUID target, bool broadcast) {
+			return peer->Send(&bitstream, (PacketPriority) priority, (PacketReliability) reliability, channel, target, broadcast);
 		}
 
 		network_interface::packet::~packet() {
