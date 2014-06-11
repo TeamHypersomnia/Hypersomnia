@@ -63,7 +63,7 @@ int main() {
 				RakNet::BitStream bsIn(packet->data, packet->length, false);
 				bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
 				bsIn.Read(rs);
-				printf("%s\n", rs.C_String());
+				printf("Game message received: %s\n", rs.C_String());
 			}
 				break;
 
