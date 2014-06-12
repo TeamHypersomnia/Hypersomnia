@@ -52,7 +52,30 @@ return function(map_filename, scene_object)
 	scene_object.player.body:get().animate.available_animations = scene_object.torso_sets["white"]["barehands"].set
 	scene_object.player.legs:get().animate.available_animations = scene_object.legs_sets["white"].set
 
+	scene_object.main_input_entity = world:create_entity_table(world:ptr_create_entity {
+		input = {
+			custom_intents.SWITCH_CLIENT_1,
+			custom_intents.SWITCH_CLIENT_2,
+			custom_intents.SWITCH_CLIENT_3,
+			custom_intents.SWITCH_CLIENT_4,
+			
+			custom_intents.QUIT
+		}
+	})
 	
+	scene_object.main_input_entity.intent_message = function(self, message)
+		if message.intent == custom_intents.QUIT then
+			SHOULD_QUIT_FLAG = true
+		elseif message.intent == custom_intents.SWITCH_CLIENT_1 then
+			set_active_client(1)
+		elseif message.intent == custom_intents.SWITCH_CLIENT_2 then
+			set_active_client(2)
+		elseif message.intent == custom_intents.SWITCH_CLIENT_3 then
+			set_active_client(3)
+		elseif message.intent == custom_intents.SWITCH_CLIENT_4 then
+			set_active_client(4)
+		end		
+	end
 	
 	
 	-- bind the atlas once
