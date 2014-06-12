@@ -48,24 +48,6 @@ function debug.my_traceback()
 	return outstr
 end
 
-function call_on_modification(thescript, entries) 
-	for i = 1, #entries do
-		thescript:add_reload_dependant(entries[i])
-	end
-end
-
-function open_script(filename) 
-	local my_script = script()
-	my_script:associate_filename(filename)
-	return my_script
-end
-
-commands = script(THIS_LUA_STATE)
-commands:associate_filename(ENGINE_DIRECTORY .. "commands.lua")
-commands.reload_scene_when_modified = false
-
-call_on_modification(commands, {commands})
-
 function count_all(f)
 	local seen = {}
 	local count_table

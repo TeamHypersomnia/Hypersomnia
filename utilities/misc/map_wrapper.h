@@ -17,6 +17,10 @@ namespace augs {
 				raw_map[k] = v;
 			}
 
+			void remove(const key& k) {
+				raw_map.erase(k);
+			}
+
 			value& at(const key& k) {
 				return raw_map.at(k);
 			}
@@ -44,6 +48,7 @@ namespace augs {
 					.def("insert", &insert)
 					.def("at", &at)
 					.def("get", &get)
+					.def("remove", &remove)
 					.def("size", &size);
 			}
 		};

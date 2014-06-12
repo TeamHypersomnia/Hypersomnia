@@ -12,6 +12,10 @@
 #include <fstream>
 #include <Shlwapi.h>
 
+std::string wstrtostr(std::wstring s) {
+	 return std::string(s.begin(), s.end());
+}
+
 int bitor(lua_State* L) {
 	int arg_count = lua_gettop(L);
 	int result = 0;
@@ -97,7 +101,9 @@ namespace bindings {
 		_opengl_binding(),
 		_all_systems(),
 
-		_text()
+		_text(),
+
+		_file_watcher()
 		;
 }
 
@@ -163,7 +169,7 @@ namespace resources {
 				bindings::_polygon(),
 
 				bindings::_timer(),
-				
+
 				bindings::_network_binding(),
 
 				bindings::_particle(),
@@ -211,9 +217,12 @@ namespace resources {
 
 				luabind::def("get_executable_path", get_executable_path),
 
-				luabind::class_<resources::script::reloader>("_script_reloader")
-				.def(luabind::constructor<>())
-				.def("add_directory", &resources::script::reloader::add_directory),
+				luabind::class_<std::string>("std_string")
+				.def("c_str", &std::string::c_str)
+				,
+
+				misc::vector_wrapper<std::string>::bind("string_vector"),
+				bindings::_file_watcher(),
 
 				bindings::_polygon_fader(),
 				bindings::_all_systems(),
@@ -224,7 +233,6 @@ namespace resources {
 		];
 
 		global("THIS_LUA_STATE", *this);
-		global("script_reloader", resources::script::script_reloader);
 		
 		luabind::set_pcall_callback(the_callback);
 	}
@@ -242,7 +250,7 @@ namespace resources {
 
 	void lua_state_wrapper::dofile(const std::string& filename) {
 		script my_script(*this);
-		my_script.associate_filename(filename, false);
+		my_script.associate_filename(filename);
 		my_script.call();
 	}
 }
