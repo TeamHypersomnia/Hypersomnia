@@ -56,6 +56,7 @@ return function(map_filename, scene_object)
 	
 	
 	-- bind the atlas once
-	GL.glActiveTexture(GL.GL_TEXTURE0)
-	scene_object.all_atlas:bind()
+	-- GL.glActiveTexture(GL.GL_TEXTURE0)
+	-- scene_object.all_atlas:bind()
+	-- now have to bind every time because rendering several clients
 end

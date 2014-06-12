@@ -9,21 +9,35 @@ dofile "hypersomnia\\scripts\\archetypes\\basic_player.lua"
 -- resource handling utilities
 dofile "hypersomnia\\scripts\\resources\\animations.lua"
 
-
-sample_scene = scene_class:create()
-sample_scene:load_map("hypersomnia\\data\\maps\\sample_map", "hypersomnia\\scripts\\loaders\\basic_map_loader")
-
-
-print "Initialization is OK."
 -- main loop
 
 local file_watcher_object = file_watcher()
 file_watcher_object:add_directory("hypersomnia\\scripts", false)
 
+sample_scene = scene_class:create()
+sample_scene:load_map("hypersomnia\\data\\maps\\sample_map", "hypersomnia\\scripts\\loaders\\basic_map_loader")
+
+sample_scene2 = scene_class:create()
+sample_scene2:load_map("hypersomnia\\data\\maps\\sample_map", "hypersomnia\\scripts\\loaders\\basic_map_loader")
+
+sample_scene3 = scene_class:create()
+sample_scene3:load_map("hypersomnia\\data\\maps\\sample_map", "hypersomnia\\scripts\\loaders\\basic_map_loader")
+
+sample_scene4 = scene_class:create()
+sample_scene4:load_map("hypersomnia\\data\\maps\\sample_map", "hypersomnia\\scripts\\loaders\\basic_map_loader")
+
+sample_scene.world_camera.camera.screen_rect = rect_xywh(config_table.resolution_w/2, config_table.resolution_h/2, config_table.resolution_w/2, config_table.resolution_h/2)
+sample_scene2.world_camera.camera.screen_rect = rect_xywh(0, 0, config_table.resolution_w/2, config_table.resolution_h/2)
+sample_scene3.world_camera.camera.screen_rect = rect_xywh(config_table.resolution_w/2, 0, config_table.resolution_w/2, config_table.resolution_h/2)
+sample_scene4.world_camera.camera.screen_rect = rect_xywh(0, config_table.resolution_h/2, config_table.resolution_w/2, config_table.resolution_h/2)
+
 while true do
 	GL.glClear(GL.GL_COLOR_BUFFER_BIT)
 				
 	sample_scene:loop()
+	sample_scene2:loop()
+	sample_scene3:loop()
+	sample_scene4:loop()
 	
 	if (client:receive(received)) then
 		local message_type = received:byte(0)

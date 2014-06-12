@@ -88,11 +88,11 @@ function create_world_camera_entity(owner_world)
 		},
 	
 		camera = {
-			screen_rect = rect_xywh(config_table.resolution_w/2, config_table.resolution_h/2, config_table.resolution_w/2, config_table.resolution_h/2),
+			screen_rect = rect_xywh(0, 0, config_table.resolution_w, config_table.resolution_h),
 			size = vec2(config_table.resolution_w, config_table.resolution_h),
 			
 			drawing_callback = function (subject, camera_draw_input, mask)
-				-- get_self(subject).owner_scene.all_atlas:bind()
+				get_self(subject).owner_scene.all_atlas:bind()
 				-- now assuming that the atlas is already bound upon setting this scene to current
 			
 				local renderer = camera_draw_input.output
