@@ -148,6 +148,5 @@ void camera_system::process_rendering(world& owner) {
 		}
 	}
 
-	raw_renderer.output_window.swap_buffers();
 	raw_renderer.cleanup();
 }
