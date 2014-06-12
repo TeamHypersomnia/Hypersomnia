@@ -18,8 +18,6 @@ namespace framework {
 		::testing::FLAGS_gtest_catch_exceptions = false;
 		::testing::FLAGS_gtest_break_on_failure = false;
 		auto result = RUN_ALL_TESTS();
-
-		resources::script::script_reloader.report_errors = &std::cout;
 	}
 
 	void deinit() {

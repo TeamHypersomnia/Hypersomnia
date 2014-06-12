@@ -5,7 +5,7 @@
 #include <fstream>
 
 namespace resources {
-	script::script(lua_state_wrapper& lua_state) : lua_state(lua_state), needs_recompilation(false), is_associated_string_filename(false), reload_scene_when_modified(true) {
+	script::script(lua_state_wrapper& lua_state) : lua_state(lua_state), needs_recompilation(false), is_associated_string_filename(false) {
 
 	}
 
@@ -14,73 +14,11 @@ namespace resources {
 		is_associated_string_filename = false;
 		needs_recompilation = true;
 	}
-
-	script::reloader script::script_reloader;
 	
-	script::reloader::script_entry::script_entry(script* script_ptr) : script_ptr(script_ptr) {}
-
-	std::vector<script*> script::reloader::get_script_files_to_reload() {
-		std::vector<script*> output;
-
-		if (WaitForSingleObjectEx(changes.GetWaitHandle(), 0, false) == WAIT_OBJECT_0) {
-			if (changes.CheckOverflow()) {
-				throw std::runtime_error("file change command buffer overflow");
-			}
-			else {
-				DWORD dwAction;
-				CStringW wstrFilename;
-
-				std::vector<CStringW> filenames;
-
-				while (changes.Pop(dwAction, wstrFilename))
-					if (dwAction == FILE_ACTION_MODIFIED)
-						filenames.push_back(wstrFilename);
-
-				std::sort(filenames.begin(), filenames.end());
-				filenames.erase(std::unique(filenames.begin(), filenames.end()), filenames.end());
-
-				for (auto& filename : filenames) {
-					auto it = filename_to_script.find(std::wstring(filename));
-
-					if (it != filename_to_script.end()) {
-						for (auto script_to_reload : (*it).second.reload_dependants)
-							output.push_back(script_to_reload);
-
-						(*it).second.script_ptr->needs_recompilation = true;
-					}
-				}
-			}
-		}
-
-		return output;
-	}
-
-	script::reloader::reloader() : report_errors(nullptr) {}
-
-	void script::reloader::add_directory(const std::wstring& wdir, bool subtree) {
-		//std::wstring wdir(directory.begin(), directory.end());
-		changes.AddDirectory(wdir.c_str(), subtree, FILE_NOTIFY_CHANGE_LAST_WRITE);
-	}
-
 	void script::associate_filename(const std::string& str) {
-		associate_filename(str, true);
-	}
-
-	void script::associate_filename(const std::string& str, bool register_for_file_reloading) {
-		if (is_associated_string_filename)
-			script_reloader.filename_to_script.erase(std::wstring(associated_string.begin(), associated_string.end()));
-
-		if (register_for_file_reloading)
-			script_reloader.filename_to_script[std::wstring(str.begin(), str.end())] = reloader::script_entry(this);
-
 		associated_string = str;
 		is_associated_string_filename = true;
 		needs_recompilation = true;
-	}
-
-	void script::add_reload_dependant(script* dependant) {
-		if (!is_associated_string_filename) throw std::runtime_error("add_reload_dependant call on script that is not a file");
-		script_reloader.filename_to_script[std::wstring(associated_string.begin(), associated_string.end())].reload_dependants.push_back(dependant);
 	}
 
 	const std::string& script::get_associated_string() const {
@@ -157,12 +95,11 @@ namespace resources {
 	}
 
 	void script::report_errors(std::string& errors) {
-		if (script_reloader.report_errors != nullptr) {
-			if (is_associated_string_filename) {
-				(*script_reloader.report_errors) << associated_string << ": ";
-			}
-			(*script_reloader.report_errors) << errors << std::endl;
+		if (is_associated_string_filename) {
+			std::cout << associated_string << ": ";
 		}
+
+		std::cout << errors << std::endl;
 	}
 
 	std::string script::call() {
