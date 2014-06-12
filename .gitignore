@@ -169,3 +169,6 @@ pip-log.txt
 /ReleaseDebug
 *.wav
 *.png
+/ReleaseExe
+/RelDeb
+/output

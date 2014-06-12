@@ -13,11 +13,13 @@ namespace augs {
 			struct packet {
 				RakNet::Packet* info = nullptr;
 				RakNet::RakPeerInterface* owner = nullptr;
+				RakNet::BitStream result_bitstream;
 
 				unsigned char byte(int) const;
 				unsigned length() const;
 				RakNet::RakNetGUID guid() const;
 
+				RakNet::BitStream& get_bitstream();
 				void destroy();
 				~packet();
 			};

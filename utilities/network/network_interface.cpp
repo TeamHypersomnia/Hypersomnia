@@ -20,6 +20,10 @@ namespace augs {
 			
 			return result;
 		}
+		
+		RakNet::BitStream& network_interface::packet::get_bitstream() {
+			return result_bitstream;
+		}
 
 		void network_interface::packet::destroy() {
 			if (owner && info)
@@ -44,9 +48,19 @@ namespace augs {
 			output.destroy();
 
 			output.info = peer->Receive();
-			output.owner = peer;
 
-			return output.info != nullptr;
+			if (output.info) {
+				output.owner = peer;
+
+				RakNet::BitStream my_stream(output.info->data, output.info->length, false);
+
+				/* we're not allocating memory in bitstream so it is safe */
+				memcpy(&output.result_bitstream, &my_stream, sizeof(RakNet::BitStream));
+
+				return true;
+			}
+
+			return false;
 		}
 
 		unsigned network_interface::send(RakNet::BitStream& bitstream, int priority, int reliability, int channel, RakNet::RakNetGUID target, bool broadcast) {

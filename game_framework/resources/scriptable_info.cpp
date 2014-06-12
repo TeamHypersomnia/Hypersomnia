@@ -191,7 +191,7 @@ namespace resources {
 		//	
 		//}
 
-		report_errors(std::string("Compilation succesfull."));
+		report_errors(std::string("Compilation successful."));
 		return std::string();
 	}
 }
