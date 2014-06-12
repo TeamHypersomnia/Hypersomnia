@@ -1,5 +1,4 @@
 world_class = inherits_from {}
-current_world = nil
 
 function world_class:constructor()
 	self.world_inst = world_instance()
@@ -29,11 +28,6 @@ end
 -- shortcut
 function world_class:create_entity_table(...)
 	return self.entity_system_instance:create_entity_table(...)
-end
-
-function world_class:set_current()
-	current_world = self
-	augmentations_main_loop_callback = function() return self:loop() end
 end
 
 function world_class:process_all_systems()

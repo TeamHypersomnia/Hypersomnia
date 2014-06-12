@@ -30,6 +30,6 @@ function scene_class:load_map(map_filename, map_loader_filename)
 	require(map_loader_filename)(map_filename, self)
 end
 
-function scene_class:set_current()
-	self.world_object:set_current()
+function scene_class:loop()
+	self.world_object:loop()
 end
