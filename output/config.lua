@@ -1,7 +1,7 @@
 config_table = {
 	window_name = "example",
 	fullscreen = 0,
-	window_border = 0,
+	window_border = 1,
 	window_x = 0,
 	window_y = 0,
 	bpp = 24,
@@ -19,9 +19,9 @@ end
 
 global_gl_window = glwindow()
 
-local borders_type = 0--glwindow.ALL_WINDOW_ELEMENTS
+local borders_type = glwindow.ALL_WINDOW_ELEMENTS
 
-if config_table.fullscreen then
+if config_table.window_border == 0 or config_table.fullscreen then
 	borders_type = 0
 end
 

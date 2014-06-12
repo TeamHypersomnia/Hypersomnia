@@ -98,6 +98,12 @@ We'll have a game_protocol class that will hold both sequenced channel and seque
 
 
 
+We'll use RakNet anyway.
+Now about testing - we should create multiple instances of client in the same application for debugging. RakNet will handle this with GUIDs per RakPeerInstance.
+We will split screens and render portions of the scene accordingly.
+
+
+
 --------------------------------------------
 MIXING LUA WITH C++
 --------------------------------------------
