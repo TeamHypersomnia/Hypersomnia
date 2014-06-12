@@ -21,6 +21,8 @@ local file_watcher_object = file_watcher()
 file_watcher_object:add_directory("hypersomnia\\scripts", false)
 
 while true do
+	GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+				
 	sample_scene:loop()
 	
 	if (client:receive(received)) then
@@ -63,5 +65,7 @@ while true do
 			dofile "hypersomnia\\scripts\\commands.lua"
 		end
 	end
+	
+	global_gl_window:swap_buffers()
 end
 

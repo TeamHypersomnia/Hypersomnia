@@ -88,7 +88,7 @@ function create_world_camera_entity(owner_world)
 		},
 	
 		camera = {
-			screen_rect = rect_xywh(0, 0, config_table.resolution_w, config_table.resolution_h),
+			screen_rect = rect_xywh(config_table.resolution_w/2, config_table.resolution_h/2, config_table.resolution_w/2, config_table.resolution_h/2),
 			size = vec2(config_table.resolution_w, config_table.resolution_h),
 			
 			drawing_callback = function (subject, camera_draw_input, mask)
@@ -108,7 +108,7 @@ function create_world_camera_entity(owner_world)
 				orthographic_projection(0, visible_area.x, visible_area.y, 0, 0, 1):data()
 				)
 	
-				renderer:default_render(visible_area)
+				renderer:call_triangles()
 				renderer:clear_triangles()
 			end
 		},
