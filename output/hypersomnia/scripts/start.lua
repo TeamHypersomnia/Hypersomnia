@@ -17,6 +17,9 @@ sample_scene:load_map("hypersomnia\\data\\maps\\sample_map", "hypersomnia\\scrip
 print "Initialization is OK."
 -- main loop
 
+local file_watcher_object = file_watcher()
+file_watcher_object:add_directory("hypersomnia\\scripts", false)
+
 while true do
 	sample_scene:loop()
 	
@@ -50,6 +53,15 @@ while true do
 	if call_once_after_loop ~= nil then
 		call_once_after_loop()
 		call_once_after_loop = nil
+	end
+	       
+	local files_to_reload = file_watcher_object:get_modified_files()
+	   
+	for i=0, files_to_reload:size()-1 do 
+	print(i)
+		if files_to_reload:at(i) == "hypersomnia\\scripts\\commands.lua" then
+			dofile "hypersomnia\\scripts\\commands.lua"
+		end
 	end
 end
 
