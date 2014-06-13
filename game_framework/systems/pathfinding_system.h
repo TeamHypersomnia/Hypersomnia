@@ -13,7 +13,7 @@ class pathfinding_system : public processing_system_templated<components::transf
 public:
 	pathfinding_system();
 
-	void process_entities(world&) override;
+	void process_entities(world&);
 	float epsilon_max_segment_difference;
 	float epsilon_distance_visible_point;
 	float epsilon_distance_the_same_vertex;

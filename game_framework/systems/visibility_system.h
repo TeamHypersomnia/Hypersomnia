@@ -12,7 +12,7 @@ class visibility_system : public processing_system_templated<components::transfo
 public:
 	visibility_system();
 
-	void process_entities(world&) override;
+	void process_entities(world&);
 
 	int draw_triangle_edges;
 	int draw_cast_rays;

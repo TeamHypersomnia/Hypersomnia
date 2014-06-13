@@ -26,18 +26,6 @@ namespace augs {
 			*/
 			virtual void remove(entity*);
 
-			/* process all entity targets, base function does nothing */
-			virtual void process_entities(world&);
-			
-			/* used in physics systems to apply proper forces every substep */
-			virtual void substep(world&);
-
-			/* process all events involved with this system and possibly generate some new ones */
-			virtual void process_events(world&);
-			
-			/* merely consume existing events; do not modify existing queues */
-			virtual void consume_events(world&);
-
 			/* you are required to override this function to specify components that this system needs to processing */
 			virtual type_pack get_needed_components() const = 0;
 

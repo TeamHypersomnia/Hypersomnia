@@ -66,31 +66,34 @@ void input_system::process_entities(world& owner) {
 	window::event::message msg;
 	unsigned incoming_event = 0;
 
-	while (input_window.poll_events(msg)) {
-		for (auto it : active_contexts) {
-			if (!it->enabled) continue;
+	/* empty active_contexts vector indicates that we don't want input polling for this particular world */
+	if (!active_contexts.empty()) {
+		while (input_window.poll_events(msg)) {
+			for (auto it : active_contexts) {
+				if (!it->enabled) continue;
 
-			bool succesfully_mapped = false;
+				bool succesfully_mapped = false;
 
-			if (msg == key::down && !input_window.events.repeated) {
-				succesfully_mapped = post_intent_from_raw_id(owner, *it, input_window.events.key, true);
+				if (msg == key::down && !input_window.events.repeated) {
+					succesfully_mapped = post_intent_from_raw_id(owner, *it, input_window.events.key, true);
+				}
+
+				else if (msg == key::up)
+					succesfully_mapped = post_intent_from_raw_id(owner, *it, input_window.events.key, false);
+
+				else if (msg == mouse::ldown)
+					succesfully_mapped = post_intent_from_raw_id(owner, *it, mouse::ldown, true);
+				else if (msg == mouse::lup)
+					succesfully_mapped = post_intent_from_raw_id(owner, *it, mouse::ldown, false);
+				else if (msg == mouse::rdown)
+					succesfully_mapped = post_intent_from_raw_id(owner, *it, mouse::rdown, true);
+				else if (msg == mouse::rup)
+					succesfully_mapped = post_intent_from_raw_id(owner, *it, mouse::rdown, false);
+				else
+					succesfully_mapped = post_intent_from_raw_id(owner, *it, msg, true);
+
+				if (succesfully_mapped) break;
 			}
-
-			else if (msg == key::up)
-				succesfully_mapped = post_intent_from_raw_id(owner, *it, input_window.events.key, false);
-
-			else if (msg == mouse::ldown)
-				succesfully_mapped = post_intent_from_raw_id(owner, *it, mouse::ldown, true);
-			else if (msg == mouse::lup)
-				succesfully_mapped = post_intent_from_raw_id(owner, *it, mouse::ldown, false);
-			else if (msg == mouse::rdown)
-				succesfully_mapped = post_intent_from_raw_id(owner, *it, mouse::rdown, true);
-			else if (msg == mouse::rup)
-				succesfully_mapped = post_intent_from_raw_id(owner, *it, mouse::rdown, false);
-			else
-				succesfully_mapped = post_intent_from_raw_id(owner, *it, msg, true);
-
-			if (succesfully_mapped) break;
 		}
 	}
 }

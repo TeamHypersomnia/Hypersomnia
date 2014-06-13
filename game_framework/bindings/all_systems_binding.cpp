@@ -37,6 +37,7 @@ namespace bindings {
 			.def("query_shape", (physics_system::query_output(__thiscall physics_system::*) (b2Shape*, b2Filter*, entity*)) (&physics_system::query_shape))
 			.def("query_polygon", (physics_system::query_output(__thiscall physics_system::*) (const std::vector<vec2<>>&, b2Filter*, entity*)) (&physics_system::query_polygon))
 			.def("push_away_from_walls", &physics_system::push_away_from_walls)
+			.def("configure_stepping", &physics_system::configure_stepping)
 			.enum_("constants")[
 				luabind::value("PIXELS_TO_METERS", PIXELS_TO_METERSf),
 					luabind::value("METERS_TO_PIXELS", METERS_TO_PIXELSf)
@@ -125,13 +126,11 @@ namespace bindings {
 			.def("process_events", &damage_system::process_events)
 			.def("process_entities", &damage_system::process_entities),
 			luabind::class_<destroy_system>("_destroy_system")
-			.def("consume_events", &destroy_system::consume_events)
-			.def("process_entities", &destroy_system::process_entities),
+			.def("consume_events", &destroy_system::consume_events),
 			luabind::class_<particle_group_system>("_particle_group_system")
 			.def("process_entities", &particle_group_system::process_entities),
 			luabind::class_<particle_emitter_system>("_particle_emitter_system")
-			.def("consume_events", &particle_emitter_system::consume_events)
-			.def("process_entities", &particle_emitter_system::process_entities),
+			.def("consume_events", &particle_emitter_system::consume_events),
 			luabind::class_<script_system>("_script_system")
 			.def("process_events", &script_system::process_events)
 			.def("process_entities", &script_system::process_entities),

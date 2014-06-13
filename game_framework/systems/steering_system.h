@@ -13,6 +13,6 @@ class physics_system;
 
 class steering_system : public processing_system_templated<components::transform, components::physics, components::steering> {
 public:
-	void substep(world&) override;
-	void process_entities(world&) override;
+	void substep(world&);
+	void process_entities(world&);
 };

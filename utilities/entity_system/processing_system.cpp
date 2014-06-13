@@ -18,21 +18,5 @@ namespace augs {
 		void processing_system::clear() {
 			targets.clear();
 		}
-
-		void processing_system::process_entities(world&) {
-
-		}
-
-		void processing_system::substep(world&) {
-
-		}
-		
-		void processing_system::process_events(world&) {
-
-		}
-
-		void processing_system::consume_events(world&) {
-
-		}
 	}
 }

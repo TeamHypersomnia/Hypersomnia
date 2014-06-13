@@ -27,7 +27,7 @@ a tak to bys musial zapierdalac po wszystkich ktore maja message component a to 
 struct input_system : public processing_system_templated<components::input> {
 	int quit_flag;
 
-	void process_entities(world&) override;
+	void process_entities(world&);
 	
 	struct context {
 		std::unordered_map<int, int> raw_id_to_intent;

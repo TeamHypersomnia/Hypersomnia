@@ -89,7 +89,7 @@ public:
 
 	render_system(window::glwindow& output_window);
 
-	void process_entities(world&) override;
+	void process_entities(world&);
 
 	void generate_triangles(resources::renderable::draw_input&, int mask);
 	void default_render(vec2<> visible_area);

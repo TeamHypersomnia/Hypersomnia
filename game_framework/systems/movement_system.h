@@ -8,7 +8,7 @@ using namespace entity_system;
 
 class movement_system : public processing_system_templated<components::movement, components::physics> {
 public:
-	void consume_events(world&) override;
-	void substep(world&) override;
-	void process_entities(world&) override;
+	void consume_events(world&);
+	void substep(world&);
+	void process_entities(world&);
 };

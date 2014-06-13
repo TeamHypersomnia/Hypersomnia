@@ -10,7 +10,7 @@ public:
 	void pass_events(world&, bool);
 	void call_loop(world&, bool);
 
-	void process_entities(world&) override;
-	void process_events(world&) override;
-	void substep(world&) override;
+	void process_entities(world&);
+	void process_events(world&);
+	void substep(world&);
 };

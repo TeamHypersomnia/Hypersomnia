@@ -12,5 +12,5 @@ using namespace entity_system;
 class lookat_system : public processing_system_templated<components::transform, components::lookat> {
 	augs::misc::timer smooth_timer;
 public:
-	void process_entities(world&) override;
+	void process_entities(world&);
 };
