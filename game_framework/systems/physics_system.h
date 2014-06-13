@@ -51,10 +51,14 @@ public:
 	b2World b2world;
 	physics_system();
 
-	void process_entities(world&) override;
+	/* returns the number of steps made */
+	unsigned process_entities(world&);
+
 	void add(entity*) override;
 	void remove(entity*) override;
 	void clear() override;
+
+	void configure_stepping(float fps, int max_updates_per_step);
 
 	struct raycast_output {
 		vec2<> intersection, normal;

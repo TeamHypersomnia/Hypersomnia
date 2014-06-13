@@ -352,7 +352,7 @@ T constrainAngle(T x){
 	return x - 180;
 }
 
-void physics_system::process_entities(world& owner) {
+unsigned  physics_system::process_entities(world& owner) {
 	listener.world_ptr = &owner;
 	accumulator.set_time_multiplier(timestep_multiplier);
 	const unsigned steps = accumulator.update_and_extract_steps();
@@ -393,6 +393,7 @@ void physics_system::process_entities(world& owner) {
 		smooth_states();
 	else reset_states();
 
+	return steps;
 }
 
 void physics_system::add(entity*) {
@@ -409,6 +410,10 @@ void physics_system::clear() {
 		b2world.DestroyBody(just_die);
 
 	processing_system::clear();
+}
+
+void physics_system::configure_stepping(float fps, int max_updates_per_step) {
+	accumulator = augs::misc::delta_accumulator(fps, max_updates_per_step);
 }
 
 void physics_system::remove(entity* e) {
