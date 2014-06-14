@@ -27,7 +27,7 @@ function scene_class:load_map(map_filename, map_loader_filename)
 	self.texture_by_filename = texture_by_filename
 	
 	-- the loader creates all the entities in the current world
-	require(map_loader_filename)(map_filename, self)
+	dofile(map_loader_filename)(map_filename, self)
 end
 
 function scene_class:loop()

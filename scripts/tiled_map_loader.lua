@@ -11,7 +11,7 @@ tiled_map_loader = {
 	
 	try_to_load_map = function(filename)
 		-- get it by copy
-		local map_table = clone_table(require(filename))
+		local map_table = clone_table(dofile(filename))
 		
 		if map_table == nil then 
 			err ("error loading map filename " .. filename)
@@ -33,7 +33,7 @@ tiled_map_loader = {
 			err ("type_library property is missing for map " .. filename)
 		end
 		
-		local type_table = clone_table(require(type_library_filename))
+		local type_table = clone_table(dofile(type_library_filename))
 		
 		if type_table == nil then 
 			err ("error loading type table " .. type_library_filename)
@@ -159,7 +159,7 @@ tiled_map_loader = {
 		this.for_every_object(filename, function(object, this_type_table)
 			-- if type of this object matches with any requested world information string (e.g. PLAYER_POS, ENEMY_POS),
 			-- then insert this object into world information table for this map
-			if require(this.world_information_library)[object.type] == true then
+			if dofile(this.world_information_library)[object.type] == true then
 				if world_information[object.type] == nil then
 					world_information[object.type] = {}
 				end
@@ -260,7 +260,7 @@ tiled_map_loader = {
 			
 		this.for_every_object(filename, function(object, this_type_table)
 			-- do it only for non-property entities
-			if require(this.world_information_library)[object.type] == nil then
+			if dofile(this.world_information_library)[object.type] == nil then
 				
 				-- create the entity
 				local new_entity = owner_world:create_entity (this.basic_entity_table(object, this_type_table, map_object.all_polygons, map_object.all_sprites))
