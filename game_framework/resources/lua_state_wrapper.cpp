@@ -132,6 +132,18 @@ std::wstring get_executable_path() {
 	return buffer;
 }
 
+std::string remove_filename_from_path(std::string input_path) {
+	std::wstring wpath(input_path.begin(), input_path.end());
+	wchar_t buffer[MAX_PATH];
+
+	std::copy(wpath.begin(), wpath.end(), buffer);
+
+	PathRemoveFileSpec(buffer);
+
+	wpath = std::wstring(buffer);
+	return std::string(wpath.begin(), wpath.end()) + "\\";
+}
+
 namespace resources {
 	void lua_state_wrapper::bind_whole_engine() {
 		using namespace resources;
@@ -216,7 +228,8 @@ namespace resources {
 				luabind::def("randval_i", (int(*)(int, int))&randval),
 
 				luabind::def("get_executable_path", get_executable_path),
-
+				luabind::def("remove_filename_from_path", remove_filename_from_path),
+				
 				luabind::class_<std::string>("std_string")
 				.def("c_str", &std::string::c_str)
 				,
