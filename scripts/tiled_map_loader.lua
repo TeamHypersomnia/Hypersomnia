@@ -9,31 +9,31 @@ tiled_map_loader = {
 	map_scale = 1,
 	allow_unknown_types = true,
 	
-	try_to_load_map = function(filename)
+	try_to_load_map = function(map_filename)
 		-- get it by copy
-		local map_table = clone_table(dofile(filename))
+		local map_table = clone_table(dofile(map_filename))
 		
 		if map_table == nil then 
-			err ("error loading map filename " .. filename)
+			err ("error loading map filename " .. map_filename)
 		end
 		
 		return map_table
 	end,
 	
-	for_every_object = function(filename, callback)
+	for_every_object = function(map_filename, callback)
 		local this = tiled_map_loader
 		local err = this.error_callback
 		
-		local map_table = this.try_to_load_map(filename)
+		local map_table = this.try_to_load_map(map_filename)
 		
 		local type_library_filename = map_table.properties["type_library"]
 		
 		-- type library MUST be provided, at least an empty one
 		if type_library_filename == nil then
-			err ("type_library property is missing for map " .. filename)
+			err ("type_library property is missing for map " .. map_filename)
 		end
 		
-		local type_table = clone_table(dofile(type_library_filename))
+		local type_table = clone_table(dofile(remove_filename_from_path(map_filename) .. type_library_filename))
 		
 		if type_table == nil then 
 			err ("error loading type table " .. type_library_filename)
@@ -83,7 +83,7 @@ tiled_map_loader = {
 					
 					-- add root directory to the texture if specified in map properties
 					if map_table.properties["texture_directory"] ~= nil and output_type_table[this.texture_property_name] ~= nil then
-						output_type_table[this.texture_property_name] = map_table.properties["texture_directory"] .. output_type_table[this.texture_property_name] 
+						output_type_table[this.texture_property_name] = remove_filename_from_path(map_filename) .. map_table.properties["texture_directory"] .. output_type_table[this.texture_property_name] 
 					end
 					
 					-- rest of the validations (after the properties have been overridden)
@@ -114,12 +114,12 @@ tiled_map_loader = {
 	
 	end,
 	
-	get_all_objects_by_type = function(filename)
+	get_all_objects_by_type = function(map_filename)
 		local this = tiled_map_loader
 		local objects_by_type = {}
 		local type_table_by_object = {}
 	
-		this.for_every_object(filename, function(object, this_type_table)
+		this.for_every_object(map_filename, function(object, this_type_table)
 			if objects_by_type[object.type] == nil then
 				objects_by_type[object.type] = {}
 			end
@@ -131,11 +131,11 @@ tiled_map_loader = {
 		return objects_by_type, type_table_by_object
 	end,
 	
-	get_all_textures = function (filename)
+	get_all_textures = function (map_filename)
 		local this = tiled_map_loader
 		local needed_textures = {}
 		
-		this.for_every_object(filename, function(object, this_type_table)
+		this.for_every_object(map_filename, function(object, this_type_table)
 			local texture_name = this_type_table[this.texture_property_name]
 				
 			if texture_name ~= nil then
@@ -151,12 +151,12 @@ tiled_map_loader = {
 		return textures_out
 	end,
 		
-	load_world_properties = function (filename)
+	load_world_properties = function (map_filename)
 		local this = tiled_map_loader
 		
 		local world_information = {}
 	
-		this.for_every_object(filename, function(object, this_type_table)
+		this.for_every_object(map_filename, function(object, this_type_table)
 			-- if type of this object matches with any requested world information string (e.g. PLAYER_POS, ENEMY_POS),
 			-- then insert this object into world information table for this map
 			if dofile(this.world_information_library)[object.type] == true then
@@ -244,7 +244,7 @@ tiled_map_loader = {
 		return override(this_type_table.entity_archetype, final_entity_table)
 	end,
 	
-	create_entities_from_map = function (filename, owner_world)	
+	create_entities_from_map = function (map_filename, owner_world)	
 		local this = tiled_map_loader
 		local err = this.error_callback
 		
@@ -258,7 +258,7 @@ tiled_map_loader = {
 			all_sprites = {}
 		}
 			
-		this.for_every_object(filename, function(object, this_type_table)
+		this.for_every_object(map_filename, function(object, this_type_table)
 			-- do it only for non-property entities
 			if dofile(this.world_information_library)[object.type] == nil then
 				

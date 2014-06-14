@@ -15,7 +15,7 @@ function scene_class:load_map(map_filename, map_loader_filename)
 	
 	-- concatenate table with gameplay textures and table with map textures
 	local all_needed_textures = table.concatenate({ 
-		get_all_files_in_directory(gameplay_textures_directory, true), 
+		get_all_files_in_directory(remove_filename_from_path(map_filename) .. gameplay_textures_directory, true), 
 		tiled_map_loader.get_all_textures(map_filename)
 	})
 
