@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="50" height="50" tilewidth="32" tileheight="32">
  <properties>
-  <property name="gameplay_textures" value="hypersomnia\data\gfx"/>
-  <property name="texture_directory" value="hypersomnia\data\maps\textures\"/>
-  <property name="type_library" value="hypersomnia\data\maps\basic_type_library"/>
+  <property name="gameplay_textures" value="..\gfx\"/>
+  <property name="texture_directory" value="textures\"/>
+  <property name="type_library" value="basic_type_library.lua"/>
  </properties>
  <objectgroup name="Object Layer 1" width="50" height="50">
   <object type="wall_wood" x="576" y="544" width="320" height="64"/>

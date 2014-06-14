@@ -1,6 +1,7 @@
 -- initialize gameplay libraries
 dofile "hypersomnia\\scripts\\game\\input.lua"
 dofile "hypersomnia\\scripts\\game\\layers.lua"
+dofile "hypersomnia\\scripts\\game\\filters.lua"
 dofile "hypersomnia\\scripts\\game\\camera.lua"
 
 -- archetypes

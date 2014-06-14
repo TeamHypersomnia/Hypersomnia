@@ -4,7 +4,7 @@ network_message.ID_GAME_MESSAGE_1 = network_message.ID_USER_PACKET_ENUM + 1
 	
 function client_screen:constructor(camera_rect)
 	self.sample_scene = scene_class:create()
-	self.sample_scene:load_map("hypersomnia\\data\\maps\\sample_map", "hypersomnia\\scripts\\loaders\\basic_map_loader")
+	self.sample_scene:load_map("hypersomnia\\data\\maps\\sample_map.lua", "hypersomnia\\scripts\\loaders\\basic_map_loader.lua")
 	
 	self.sample_scene.world_camera.camera.screen_rect = camera_rect
 	

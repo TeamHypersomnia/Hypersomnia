@@ -7,9 +7,9 @@ return {
   tilewidth = 32,
   tileheight = 32,
   properties = {
-    ["gameplay_textures"] = "hypersomnia\\data\\gfx",
-    ["texture_directory"] = "hypersomnia\\data\\maps\\textures\\",
-    ["type_library"] = "hypersomnia\\data\\maps\\basic_type_library"
+    ["gameplay_textures"] = "..\\gfx\\",
+    ["texture_directory"] = "textures\\",
+    ["type_library"] = "basic_type_library.lua"
   },
   tilesets = {},
   layers = {
