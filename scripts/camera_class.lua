@@ -3,6 +3,9 @@ camera_class = inherits_from (entity_class)
 function camera_class:constructor()
 	self.current_zoom_level = 0
 	self.current_zoom_multiplier = 1
+	
+	self.min_zoom = 0 
+	self.max_zoom = 1000 
 end
 
 function camera_class:set_zoom_level(new_zoom_level)
@@ -19,4 +22,17 @@ end
 
 function camera_class:get_zoom_level()
 	return self.current_zoom_level
+end
+
+function camera_class:intent_message(message)
+	if message.intent == custom_intents.ZOOM_CAMERA then	
+		local zoom_level = self:get_zoom_level()
+		
+		zoom_level = zoom_level-message.wheel_amount
+		if zoom_level < self.min_zoom then zoom_level = self.min_zoom end
+		if zoom_level > self.max_zoom then zoom_level = self.max_zoom end
+		self:set_zoom_level(zoom_level)
+	end
+	
+	return false
 end
