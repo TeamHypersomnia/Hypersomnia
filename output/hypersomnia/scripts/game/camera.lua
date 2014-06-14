@@ -126,19 +126,5 @@ function create_world_camera_entity(owner_world)
 	}))
 	
 	local world_camera_self = owner_world:create_entity_table(world_camera_ptr, camera_class)
-	
-	world_camera_self.intent_message = function(self, message)
-		if message.intent == custom_intents.ZOOM_CAMERA then	
-			local zoom_level = self:get_zoom_level()
-			
-			zoom_level = zoom_level-message.wheel_amount
-			if zoom_level < 0 then zoom_level = 0 end
-			if zoom_level > 1000 then zoom_level = 1000 end
-			self:set_zoom_level(zoom_level)
-		end
-		
-		return false
-	end
-	
 	return world_camera_ptr:get()
 end
