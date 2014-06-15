@@ -13,14 +13,30 @@ function world_class:constructor()
 	self.pathfinding_system = self.world_inst.pathfinding_system
 	self.render_system = self.world_inst.render_system
 	self.physics_system = self.world_inst.physics_system
+	self.script_system = self.world_inst.script_system
+	
+	self.physics_system.substepping_routine = function(owner)	
+		local my_instance = self.world_inst
+	
+		self.entity_system_instance:tick("substep")
+		
+		my_instance.steering_system:substep(owner)
+		my_instance.movement_system:substep(owner)
+		my_instance.damage_system:process_entities(owner)
+		my_instance.damage_system:process_events(owner)
+		
+		self.entity_system_instance:handle_messages(owner, true)
+		
+		my_instance.destroy_system:consume_events(owner)
+		owner:flush_message_queues()
+	end
 	
 	-- other internals
 	self.group_by_entity = {}	
 	self.polygon_particle_userdatas_saved = {}	
 	
-	-- convenience shortcuts for entity system
+	-- convenience shortcut
 	self.global_entity_table = self.entity_system_instance.entity_table
-	self.global_message_table = self.entity_system_instance.message_table
 		
 	self.is_paused = false
 end
@@ -69,9 +85,9 @@ function world_class:process_all_systems()
 		my_instance.damage_system:process_events(world)
 	end	
 	
-	my_instance.script_system:process_events(world)
-	my_instance.script_system:process_entities(world)    
-    
+	self.entity_system_instance:handle_messages(owner, false)
+	self.entity_system_instance:tick("loop")
+	
 	my_instance.destroy_system:consume_events(world)
 	
 	if not self.is_paused then

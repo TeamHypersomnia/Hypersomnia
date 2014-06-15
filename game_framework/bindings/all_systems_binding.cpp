@@ -23,6 +23,8 @@
 #include "../systems/script_system.h"
 #include "../systems/behaviour_tree_system.h"
 
+#include "misc/vector_wrapper.h"
+
 namespace bindings {
 	luabind::scope _all_systems() {
 		return
@@ -31,6 +33,7 @@ namespace bindings {
 			.def_readwrite("timestep_multiplier", &physics_system::timestep_multiplier)
 			.def_readwrite("enable_interpolation", &physics_system::enable_interpolation)
 			.def_readwrite("b2world", &physics_system::b2world)
+			.def_readwrite("substepping_routine", &physics_system::substepping_routine)
 			.def("ray_cast", &physics_system::ray_cast_px)
 			.def("query_aabb", (physics_system::query_output(__thiscall physics_system::*) (vec2<>, vec2<>, b2Filter*, entity*))(&physics_system::query_aabb_px))
 			.def("query_body", (physics_system::query_output(__thiscall physics_system::*) (entity& subject, b2Filter*, entity*)) (&physics_system::query_body))
@@ -43,8 +46,11 @@ namespace bindings {
 					luabind::value("METERS_TO_PIXELS", METERS_TO_PIXELSf)
 			],
 			luabind::class_<steering_system>("_steering_system")
-			.def("process_entities", &steering_system::process_entities),
+			.def("process_entities", &steering_system::process_entities)
+			.def("substep", &steering_system::substep)
+			,
 			luabind::class_<movement_system>("_movement_system")
+			.def("substep", &movement_system::substep)
 			.def("consume_events", &movement_system::consume_events)
 			.def("process_entities", &movement_system::process_entities),
 			
@@ -131,9 +137,12 @@ namespace bindings {
 			.def("process_entities", &particle_group_system::process_entities),
 			luabind::class_<particle_emitter_system>("_particle_emitter_system")
 			.def("consume_events", &particle_emitter_system::consume_events),
+
+			augs::misc::vector_wrapper<luabind::object>::bind_vector("luabindobject_vector"),
+
 			luabind::class_<script_system>("_script_system")
-			.def("process_events", &script_system::process_events)
-			.def("process_entities", &script_system::process_entities),
+			.def("get_entities_vector", &script_system::get_entities_vector)
+			,
 			luabind::class_<behaviour_tree_system>("_behaviour_tree_system")
 			.def("process_entities", &behaviour_tree_system::process_entities)
 			;

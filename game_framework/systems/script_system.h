@@ -7,10 +7,11 @@ using namespace entity_system;
 
 class script_system : public processing_system_templated<components::scriptable> {
 public:
-	void pass_events(world&, bool);
-	void call_loop(world&, bool);
+	std::vector<luabind::object*> script_entities;
+	
+	std::vector<luabind::object> get_entities_vector() const;
 
-	void process_entities(world&);
-	void process_events(world&);
-	void substep(world&);
+	void add(entity*) override;
+	void remove(entity*) override;
+	void clear() override;
 };

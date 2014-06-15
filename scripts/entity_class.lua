@@ -8,14 +8,14 @@ function get_self(entity)
 end
 
 -- some specific entity may want to provide its own behaviour besides the basic process_all_entity_modules functions
--- in such a case these two functions should be called
+-- in such a case these two functions should be defined
 function entity_class:loop()
 	--self:all_modules("loop")
 end
 
 function entity_class:substep()
 	--self:all_modules("substep")
-	--print "substepping unoverrided character loop func"
+	--print "substepping unoverriden character loop func"
 end
 
 -- perform a given method on all modules (components) of this entity

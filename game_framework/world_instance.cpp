@@ -39,14 +39,6 @@ world_instance::world_instance() : input(*global_window), render(*global_window)
 	my_world.register_message_queue<collision_message>();
 	my_world.register_message_queue<particle_burst_message>();
 	my_world.register_message_queue<shot_message>();
-
-	physics.substepping_routine = [this](world& owner){
-		scripts.substep(owner);
-		steering.substep(owner);
-		movement.substep(owner);
-		destroy.consume_events(owner);
-		owner.flush_message_queues();
-	};
 }
 
 void world_instance::default_loop() {
@@ -71,12 +63,9 @@ void world_instance::default_loop() {
 	visibility.process_entities(my_world);
 	pathfinding.process_entities(my_world);
 	render.process_entities(my_world);
-	scripts.process_entities(my_world);
 
 	damage.process_events(my_world);
 	destroy.consume_events(my_world);
-
-	scripts.process_events(my_world);
 
 	damage.process_events(my_world);
 	destroy.consume_events(my_world);

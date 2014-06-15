@@ -378,6 +378,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="game_framework\bindings\scriptable_component_binding.cpp" />
     <ClCompile Include="game_framework\bindings\text_binding.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
@@ -396,6 +397,9 @@
     </ClCompile>
     <ClCompile Include="game_framework\resources\lua_state_wrapper.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="game_framework\systems\script_system.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="game_framework\world_instance.cpp">
@@ -734,12 +738,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="game_framework\bindings\scriptable_component_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="game_framework\bindings\script_binding.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
@@ -927,12 +925,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="game_framework\systems\render_system.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\systems\script_system.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
@@ -1399,9 +1391,11 @@
     <ClInclude Include="3rdparty\SFML\Window\Window.hpp" />
     <ClInclude Include="3rdparty\SFML\Window\WindowHandle.hpp" />
     <ClInclude Include="3rdparty\SFML\Window\WindowStyle.hpp" />
+    <ClInclude Include="game_framework\components\scriptable_component.h" />
     <ClInclude Include="game_framework\game\polygon_fader.h" />
     <ClInclude Include="game_framework\game_framework.h" />
     <ClInclude Include="game_framework\resources\lua_state_wrapper.h" />
+    <ClInclude Include="game_framework\systems\script_system.h" />
     <ClInclude Include="game_framework\world_instance.h" />
     <ClInclude Include="utilities\augmentations.h" />
     <ClInclude Include="stdafx.h" />
@@ -1451,7 +1445,6 @@
     <ClInclude Include="game_framework\components\particle_group_component.h" />
     <ClInclude Include="game_framework\components\physics_component.h" />
     <ClInclude Include="game_framework\components\render_component.h" />
-    <ClInclude Include="game_framework\components\scriptable_component.h" />
     <ClInclude Include="game_framework\components\transform_component.h" />
     <ClInclude Include="game_framework\components\gun_component.h" />
     <ClInclude Include="game_framework\game\body_helper.h" />
@@ -1480,7 +1473,6 @@
     <ClInclude Include="game_framework\systems\particle_group_system.h" />
     <ClInclude Include="game_framework\systems\physics_system.h" />
     <ClInclude Include="game_framework\systems\render_system.h" />
-    <ClInclude Include="game_framework\systems\script_system.h" />
     <ClInclude Include="utilities\graphics\vertex.h" />
     <ClInclude Include="utilities\texture_baker\font.h" />
     <ClInclude Include="utilities\texture_baker\image.h" />
