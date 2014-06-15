@@ -118,11 +118,7 @@ function create_world_camera_entity(owner_world)
 			custom_intents.ZOOM_CAMERA
 		},
 		
-		chase = {},
-		
-		scriptable = {
-			script_data = {}
-		}
+		chase = {}
 	}))
 	
 	local world_camera_self = owner_world:create_entity_table(world_camera_ptr, camera_class)

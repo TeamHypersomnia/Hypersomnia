@@ -45,10 +45,6 @@ function create_basic_player(owner_world, position, target_camera, crosshair_spr
 				look_mode = lookat_component.POSITION
 			},
 			
-			scriptable = {
-				-- script_data = player_class
-			},
-			
 			gun = {}, 
 	
 			particle_emitter = {
