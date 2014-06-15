@@ -135,6 +135,11 @@ namespace augs {
 				/* register to enable by-type system retrieval */
 				hash_to_system[typeid(T).hash_code()] = new_system;
 			}
+
+			template<typename... needed_components>
+			void register_components() {
+				component_library.register_types(templated_list<needed_components...>::get());
+			}
 			
 			template<class T>
 			T& get_system() {
