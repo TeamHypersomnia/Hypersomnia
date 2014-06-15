@@ -42,7 +42,7 @@ public:
 
 	int all_steps;
 
-	std::function<void(world&)> substepping_routine;
+	luabind::object substepping_routine;
 
 	float timestep_multiplier;
 	int enable_interpolation;

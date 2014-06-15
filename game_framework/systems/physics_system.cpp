@@ -378,9 +378,12 @@ unsigned  physics_system::process_entities(world& owner) {
 			}
 		}
 
-		substepping_routine(owner);
-		//for (auto& sys : subsystems)
-		//	sys->substep(owner);
+		try {
+			luabind::call_function<void>(substepping_routine, &owner);
+		}
+		catch (std::exception compilation_error) {
+			std::cout << compilation_error.what() << '\n';
+		}
 
 		b2world.Step(static_cast<float32>(accumulator.per_second()), velocityIterations, positionIterations);
 		b2world.ClearForces();
