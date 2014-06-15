@@ -6,7 +6,6 @@
 #include "entity_system/entity.h"
 #include "entity_system/world.h"
 
-#include "../messages/steering_message.h"
 #include "../components/visibility_component.h"
 
 #include "../game/body_helper.h"

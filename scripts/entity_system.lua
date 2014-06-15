@@ -127,7 +127,6 @@ function entity_system:tick(is_substepping, module_names)
 		for k, msg in pairs(self.message_table[msg_key]) do
 			local entity_self = get_self(msg.subject)
 			
-			-- callback
 			local callback = entity_self[name_map[msg_key]]
 			
 			if callback ~= nil then

@@ -26,7 +26,6 @@
 #include "messages/animate_message.h"
 #include "messages/particle_burst_message.h"
 #include "messages/damage_message.h"
-#include "messages/steering_message.h"
 #include "messages/shot_message.h"
 
 struct world_instance {

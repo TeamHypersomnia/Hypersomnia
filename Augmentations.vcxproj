@@ -1431,7 +1431,6 @@
     <ClInclude Include="game_framework\components\pathfinding_component.h" />
     <ClInclude Include="game_framework\components\steering_component.h" />
     <ClInclude Include="game_framework\messages\shot_message.h" />
-    <ClInclude Include="game_framework\messages\steering_message.h" />
     <ClInclude Include="utilities\graphics\fbo.h" />
     <ClInclude Include="utilities\graphics\shader.h" />
     <ClInclude Include="game_framework\systems\behaviour_tree_system.h" />
