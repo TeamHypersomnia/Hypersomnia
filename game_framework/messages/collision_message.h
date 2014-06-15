@@ -8,6 +8,6 @@ namespace messages {
 		augs::vec2<> impact_velocity, point;
 
 		bool sensor_end_contact;
-		collision_message() : sensor_end_contact(false) {}
+		collision_message() : sensor_end_contact(false) { send_to_scripts = true;  }
 	};
 }

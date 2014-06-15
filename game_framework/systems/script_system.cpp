@@ -48,7 +48,7 @@ void pass_events_to_script(world& owner, int msg_enum, bool substepping_flag) {
 
 	for (auto msg : events) {
 		auto* scriptable = msg.subject->find<components::scriptable>();
-		if (scriptable == nullptr || !scriptable->available_scripts) continue;
+		if (!msg.send_to_scripts || scriptable == nullptr || !scriptable->available_scripts) continue;
 
 		auto it = scriptable->available_scripts->get_raw().find(msg_enum);
 

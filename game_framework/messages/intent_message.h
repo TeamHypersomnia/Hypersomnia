@@ -25,7 +25,7 @@ namespace messages {
 
 		int wheel_amount;
 
-		intent_message(unsigned intent = 0, bool state_flag = true) : intent(intent), state_flag(state_flag), wheel_amount(0) {}
-		intent_message(unsigned intent, vec2<> mouse_pos, vec2<> mouse_rel) : intent(intent), mouse_pos(mouse_pos), mouse_rel(mouse_rel), state_flag(true), wheel_amount(0) {}
+		intent_message(unsigned intent = 0, bool state_flag = true) : intent(intent), state_flag(state_flag), wheel_amount(0) { send_to_scripts = true; }
+		intent_message(unsigned intent, vec2<> mouse_pos, vec2<> mouse_rel) : intent(intent), mouse_pos(mouse_pos), mouse_rel(mouse_rel), state_flag(true), wheel_amount(0) { send_to_scripts = true; }
 	};
 }
