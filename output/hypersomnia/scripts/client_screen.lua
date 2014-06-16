@@ -3,6 +3,7 @@ client_screen = inherits_from ()
 network_message.ID_INITIAL_STATE = network_message.ID_USER_PACKET_ENUM + 1
 network_message.ID_MOVEMENT = network_message.ID_USER_PACKET_ENUM + 2
 network_message.ID_NEW_PLAYER = network_message.ID_USER_PACKET_ENUM + 3
+network_message.ID_PLAYER_DISCONNECTED = network_message.ID_USER_PACKET_ENUM + 4
 
 function client_screen:constructor(camera_rect)
 	self.sample_scene = scene_class:create()
@@ -14,6 +15,8 @@ function client_screen:constructor(camera_rect)
 	self.client:connect("127.0.0.1", 37017)
 	
 	self.received = network_packet()
+	
+	self.remote_client_map = guid_to_object_map()
 end
 
 function client_screen:loop()
@@ -46,17 +49,36 @@ function client_screen:loop()
 			
 			print "Initial state transferred."
 		elseif message_type == network_message.ID_NEW_PLAYER then
+		
 			local bsIn = self.received:get_bitstream()
 			bsIn:IgnoreBytes(1)
-			create_remote_player(self.sample_scene, self.sample_scene.teleport_position, ReadRakNetGUID(bsIn))
-			print("Game message received: " .. message_type)
+			local remote_guid = ReadRakNetGUID(bsIn)
+			
+			self.remote_client_map:add(remote_guid, create_remote_player(self.sample_scene, self.sample_scene.teleport_position, remote_guid))
+			print("New client connected.")
+			
+		elseif message_type == network_message.ID_PLAYER_DISCONNECTED then
+			local bsIn = self.received:get_bitstream()
+			bsIn:IgnoreBytes(1)
+			local disconnected_guid = ReadRakNetGUID(bsIn)
+			
+			local remote_self = self.remote_client_map:get(disconnected_guid)
+			self.sample_scene.world_object.world:delete_entity(remote_self.parent_entity:get(), nil)
+			self.remote_client_map:remove(disconnected_guid)
+			
+			print("Player disconnected.")
+			
 		else
+			print(network_message.ID_NEW_PLAYER)
 			print("Message with identifier " .. message_type .. " has arrived.")
 		end	
 	end
 end
 
 function client_screen:close_connection()
-	self.client:close_connection(self.server_guid, send_priority.IMMEDIATE_PRIORITY)
+	if self.server_guid ~= nil then
+		self.client:close_connection(self.server_guid, send_priority.IMMEDIATE_PRIORITY)
+	end
+	self.server_guid = nil
 end
 
