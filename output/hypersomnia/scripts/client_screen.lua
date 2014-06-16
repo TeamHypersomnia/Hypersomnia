@@ -1,7 +1,8 @@
 client_screen = inherits_from ()
 
-network_message.ID_GAME_MESSAGE_1 = network_message.ID_USER_PACKET_ENUM + 1
-	
+network_message.ID_MOVEMENT = network_message.ID_USER_PACKET_ENUM + 1
+network_message.ID_NEW_PLAYER = network_message.ID_USER_PACKET_ENUM + 2
+
 function client_screen:constructor(camera_rect)
 	self.sample_scene = scene_class:create()
 	self.sample_scene:load_map("hypersomnia\\data\\maps\\sample_map.lua", "hypersomnia\\scripts\\loaders\\basic_map_loader.lua")
@@ -24,23 +25,20 @@ function client_screen:loop()
 	
 		if message_type == network_message.ID_CONNECTION_REQUEST_ACCEPTED then
 			print("Our connection request has been accepted.");
-		
-			bsOut = BitStream()
-			bsOut:WriteByte(UnsignedChar(network_message.ID_GAME_MESSAGE_1))
-			WriteCString(bsOut, "Hello world")
-			self.client:send(bsOut, send_priority.HIGH_PRIORITY, send_reliability.RELIABLE_ORDERED, 0, self.received:guid(), false)
 		elseif message_type == network_message.ID_NO_FREE_INCOMING_CONNECTIONS then
 			print("The server is full.\n")
 		elseif message_type == network_message.ID_DISCONNECTION_NOTIFICATION then
 			print("A client has disconnected.\n")
 		elseif message_type == network_message.ID_CONNECTION_LOST then
 			print("A client lost the connection.\n")
-		elseif message_type == network_message.ID_GAME_MESSAGE_1 then
-			rs = RakString()
-			bsIn = self.received:get_bitstream()
+			
+		elseif message_type == network_message.ID_NEW_PLAYER then
+			local new_guid = RakNetGUID()
+			local bsIn = self.received:get_bitstream()
 			bsIn:IgnoreBytes(1)
-			bsIn:ReadRakString(rs)
-			print("Game message received: " .. rs:C_String())
+			ReadRakNetGUID(bsIn, new_guid)
+			print("Game message received: " .. message_type)
+			
 		else
 			print("Message with identifier " .. message_type .. " has arrived.")
 		end	

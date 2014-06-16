@@ -45,9 +45,10 @@ return function(map_filename, scene_object)
 		color = rgba(255, 255, 255, 255)
 	}
 	
-	scene_object.player = create_basic_player(world, player_start.pos, scene_object.world_camera, scene_object.crosshair_sprite)
 	scene_object.legs_sets = create_all_legs_sets(scene_object.sprite_library)
 	scene_object.torso_sets = create_all_torso_sets(scene_object.sprite_library)
+	
+	scene_object.player = create_basic_player(world, player_start.pos, scene_object.world_camera, scene_object.crosshair_sprite)
 
 	scene_object.player.body:get().animate.available_animations = scene_object.torso_sets["white"]["barehands"].set
 	scene_object.player.legs:get().animate.available_animations = scene_object.legs_sets["white"].set
