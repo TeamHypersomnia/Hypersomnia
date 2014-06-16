@@ -31,6 +31,17 @@ void Write(RakNet::BitStream& bs, const std::string& str) {
 	bs.Write(str.c_str());
 }
 
+void WriteGuid(RakNet::BitStream& bs, RakNet::RakNetGUID& guid) {
+	bs.Write(guid.g);
+}
+
+void ReadGuid(RakNet::BitStream& bs, RakNet::RakNetGUID& guid) {
+	decltype(guid.g) my_id;
+	bs.Read(my_id);
+
+	guid = RakNet::RakNetGUID(my_id);
+}
+
 namespace bindings {
 	luabind::scope _network_binding() {
 		using namespace network;
@@ -104,14 +115,17 @@ namespace bindings {
 			.def("C_String", &RakNet::RakString::C_String),
 
 
-			/* little helper */
+			/* little helpers */
 			luabind::def("WriteCString", Write),
+			luabind::def("ReadRakNetGUID", ReadGuid),
+			luabind::def("WriteRakNetGUID", WriteGuid),
 
 			luabind::class_<RakNet::BitStream>("BitStream")
 			.def(luabind::constructor<>())
 			.def("IgnoreBytes", &RakNet::BitStream::IgnoreBytes)
 			.def("WriteInt", &RakNet::BitStream::Write<int>)
 			.def("WriteUint", &RakNet::BitStream::Write<unsigned>)
+			.def("WriteUshort", &RakNet::BitStream::Write<unsigned short>)
 			.def("WriteFloat", &RakNet::BitStream::Write<float>)
 			.def("WriteDouble", &RakNet::BitStream::Write<double>)
 			.def("WriteVec2", &RakNet::BitStream::Write<vec2<>>)
@@ -119,6 +133,7 @@ namespace bindings {
 
 			.def("ReadInt", &RakNet::BitStream::Read<int>)
 			.def("ReadUint", &RakNet::BitStream::Read<unsigned>)
+			.def("ReadUshort", &RakNet::BitStream::Read<unsigned short>)
 			.def("ReadFloat", &RakNet::BitStream::Read<float>)
 			.def("ReadDouble", &RakNet::BitStream::Read<double>)
 			.def("ReadVec2", &RakNet::BitStream::Read<vec2<>>)
