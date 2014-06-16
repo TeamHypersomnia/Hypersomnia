@@ -1,7 +1,8 @@
 client_screen = inherits_from ()
 
-network_message.ID_MOVEMENT = network_message.ID_USER_PACKET_ENUM + 1
-network_message.ID_NEW_PLAYER = network_message.ID_USER_PACKET_ENUM + 2
+network_message.ID_INITIAL_STATE = network_message.ID_USER_PACKET_ENUM + 1
+network_message.ID_MOVEMENT = network_message.ID_USER_PACKET_ENUM + 2
+network_message.ID_NEW_PLAYER = network_message.ID_USER_PACKET_ENUM + 3
 
 function client_screen:constructor(camera_rect)
 	self.sample_scene = scene_class:create()
@@ -32,13 +33,22 @@ function client_screen:loop()
 		elseif message_type == network_message.ID_CONNECTION_LOST then
 			print("A client lost the connection.\n")
 			
-		elseif message_type == network_message.ID_NEW_PLAYER then
-			local new_guid = RakNetGUID()
+			
+		elseif message_type == network_message.ID_INITIAL_STATE then
 			local bsIn = self.received:get_bitstream()
 			bsIn:IgnoreBytes(1)
-			ReadRakNetGUID(bsIn, new_guid)
-			print("Game message received: " .. message_type)
+			local num_players = ReadUint(bsIn)
 			
+			for i=1, num_players do
+				create_remote_player(self.sample_scene, self.sample_scene.teleport_position, ReadRakNetGUID(bsIn))
+			end
+			
+			print "Initial state transferred."
+		elseif message_type == network_message.ID_NEW_PLAYER then
+			local bsIn = self.received:get_bitstream()
+			bsIn:IgnoreBytes(1)
+			create_remote_player(self.sample_scene, self.sample_scene.teleport_position, ReadRakNetGUID(bsIn))
+			print("Game message received: " .. message_type)
 		else
 			print("Message with identifier " .. message_type .. " has arrived.")
 		end	

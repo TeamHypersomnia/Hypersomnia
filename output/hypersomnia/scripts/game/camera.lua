@@ -121,6 +121,7 @@ function create_world_camera_entity(owner_world)
 		chase = {}
 	}))
 	
-	local world_camera_self = owner_world:create_entity_table(world_camera_ptr, camera_class)
+	owner_world:create_entity_table(world_camera_ptr, camera_class)
+	
 	return world_camera_ptr:get()
 end

@@ -38,7 +38,7 @@ return function(map_filename, scene_object)
 	get_self(scene_object.world_camera).owner_scene = scene_object
 	
 	-- initialize player
-	local player_start = objects_by_type["teleport_position"][1]
+	scene_object.teleport_position = objects_by_type["teleport_position"][1].pos
 	
 	scene_object.crosshair_sprite = create_sprite {
 		image = scene_object.sprite_library["crosshair"],
@@ -48,7 +48,7 @@ return function(map_filename, scene_object)
 	scene_object.legs_sets = create_all_legs_sets(scene_object.sprite_library)
 	scene_object.torso_sets = create_all_torso_sets(scene_object.sprite_library)
 	
-	scene_object.player = create_basic_player(world, player_start.pos, scene_object.world_camera, scene_object.crosshair_sprite)
+	scene_object.player = create_basic_player(world, scene_object.teleport_position, scene_object.world_camera, scene_object.crosshair_sprite)
 
 	scene_object.player.body:get().animate.available_animations = scene_object.torso_sets["white"]["barehands"].set
 	scene_object.player.legs:get().animate.available_animations = scene_object.legs_sets["white"].set

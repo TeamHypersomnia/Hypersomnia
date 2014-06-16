@@ -6,6 +6,7 @@ dofile "hypersomnia\\scripts\\game\\camera.lua"
 
 -- archetypes
 dofile "hypersomnia\\scripts\\archetypes\\basic_player.lua"
+dofile "hypersomnia\\scripts\\archetypes\\remote_player.lua"
 
 -- resource handling utilities
 dofile "hypersomnia\\scripts\\resources\\animations.lua"
