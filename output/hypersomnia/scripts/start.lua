@@ -61,3 +61,8 @@ while not SHOULD_QUIT_FLAG do
 	global_gl_window:swap_buffers()
 end
 
+
+for i=1, #client_scenes do
+	client_scenes[i]:close_connection()
+end
+
