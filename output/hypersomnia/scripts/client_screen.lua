@@ -4,6 +4,37 @@ network_message.ID_INITIAL_STATE = network_message.ID_USER_PACKET_ENUM + 1
 network_message.ID_MOVEMENT = network_message.ID_USER_PACKET_ENUM + 2
 network_message.ID_NEW_PLAYER = network_message.ID_USER_PACKET_ENUM + 3
 network_message.ID_PLAYER_DISCONNECTED = network_message.ID_USER_PACKET_ENUM + 4
+network_message.ID_COMMAND = network_message.ID_USER_PACKET_ENUM + 5
+
+intent_to_name = {
+	[intent_message.MOVE_FORWARD] = "forward",
+	[intent_message.MOVE_BACKWARD] = "backward",
+	[intent_message.MOVE_LEFT] = "left",
+	[intent_message.MOVE_RIGHT] = "right"
+}
+
+name_to_command = {
+	["+forward"] = 1,
+	["-forward"] = 2,
+	["+backward"] = 3,
+	["-backward"] = 4,
+	["+left"] = 5,
+	["-left"] = 6,
+	["+right"] = 7,
+	["-right"] = 8
+}
+
+name_to_intent = {}
+command_to_name = {}
+
+for k, v in pairs (name_to_command) do
+	command_to_name[v] = k
+end
+
+for k, v in pairs (intent_to_name) do
+	name_to_intent[v] = k
+end
+
 
 function client_screen:constructor(camera_rect)
 	self.sample_scene = scene_class:create()
@@ -17,6 +48,34 @@ function client_screen:constructor(camera_rect)
 	self.received = network_packet()
 	
 	self.remote_client_map = guid_to_object_map()
+	
+	self.network_input_listener = self.sample_scene.world_object:create_entity_table(self.sample_scene.world_object:ptr_create_entity {
+		input = {
+			intent_message.MOVE_FORWARD,
+			intent_message.MOVE_BACKWARD,
+			intent_message.MOVE_LEFT,
+			intent_message.MOVE_RIGHT
+		}
+	})
+	
+	
+	local this_client = self
+	
+	self.network_input_listener.intent_message = function(self, message)
+		local desired_command;
+		
+		if message.state_flag then 
+			desired_command = "+"
+		else 
+			desired_command = "-" 
+		end
+		
+		local bsOut = BitStream()
+		bsOut:WriteByte(UnsignedChar(network_message.ID_COMMAND))
+		bsOut:WriteByte(UnsignedChar(name_to_command[desired_command .. intent_to_name[message.intent]]))
+		
+		this_client.client:send(bsOut, send_priority.IMMEDIATE_PRIORITY, send_reliability.RELIABLE_ORDERED, 0, this_client.server_guid, false)
+	end
 end
 
 function client_screen:loop()
