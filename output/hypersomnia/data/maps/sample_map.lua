@@ -33,10 +33,10 @@ return {
         },
         {
           name = "",
-          type = "crate",
+          type = "wall_wood",
           shape = "rectangle",
-          x = 992,
-          y = 864,
+          x = 736,
+          y = 128,
           width = 96,
           height = 96,
           visible = true,

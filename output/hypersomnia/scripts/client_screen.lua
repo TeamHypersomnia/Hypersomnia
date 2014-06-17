@@ -28,19 +28,21 @@ function client_screen:constructor(camera_rect)
 	local this_client = self
 	
 	self.network_input_listener.intent_message = function(self, message)
-		local desired_command;
-		
-		if message.state_flag then 
-			desired_command = "+"
-		else 
-			desired_command = "-" 
+		if this_client.server_guid ~= nil then
+			local desired_command;
+			
+			if message.state_flag then 
+				desired_command = "+"
+			else 
+				desired_command = "-" 
+			end
+			
+			local bsOut = BitStream()
+			WriteByte(bsOut, network_message.ID_COMMAND)
+			WriteByte(bsOut, name_to_command[desired_command .. intent_to_name[message.intent]])
+			
+			this_client.client:send(bsOut, send_priority.IMMEDIATE_PRIORITY, send_reliability.RELIABLE_ORDERED, 0, this_client.server_guid, false)
 		end
-		
-		local bsOut = BitStream()
-		bsOut:WriteByte(UnsignedChar(network_message.ID_COMMAND))
-		bsOut:WriteByte(UnsignedChar(name_to_command[desired_command .. intent_to_name[message.intent]]))
-		
-		this_client.client:send(bsOut, send_priority.IMMEDIATE_PRIORITY, send_reliability.RELIABLE_ORDERED, 0, this_client.server_guid, false)
 	end
 end
 
@@ -68,8 +70,10 @@ function client_screen:loop()
 			bsIn:IgnoreBytes(1)
 			local num_players = ReadUint(bsIn)
 			
+			
 			for i=1, num_players do
-				create_remote_player(self.sample_scene, self.sample_scene.teleport_position, ReadRakNetGUID(bsIn))
+				local remote_guid = ReadRakNetGUID(bsIn)
+				self.remote_client_map:add(remote_guid, create_remote_player(self.sample_scene, self.sample_scene.teleport_position, remote_guid))
 			end
 			
 			print "Initial state transferred."
@@ -77,8 +81,8 @@ function client_screen:loop()
 		
 			local bsIn = self.received:get_bitstream()
 			bsIn:IgnoreBytes(1)
-			local remote_guid = ReadRakNetGUID(bsIn)
 			
+			local remote_guid = ReadRakNetGUID(bsIn)
 			self.remote_client_map:add(remote_guid, create_remote_player(self.sample_scene, self.sample_scene.teleport_position, remote_guid))
 			print("New client connected.")
 			
@@ -92,6 +96,31 @@ function client_screen:loop()
 			self.remote_client_map:remove(disconnected_guid)
 			
 			print("Player disconnected.")
+		
+		elseif message_type == network_message.ID_STATE_UPDATE then
+			local bsIn = self.received:get_bitstream()
+			bsIn:IgnoreBytes(1)
+				
+			local this_body = self.sample_scene.player.body:get().physics.body
+			this_body:SetTransform(Readb2Vec2(bsIn), 0)
+			this_body:SetLinearVelocity(Readb2Vec2(bsIn))
+	
+			local new_states_num = ReadUshort(bsIn)		
+				print ("states: " .. new_states_num)
+				print ("size: " .. self.remote_client_map:size())
+			for i=1, new_states_num do
+				-- the notification about the new player might yet not have arrived
+				local remote_client = self.remote_client_map:find(ReadRakNetGUID(bsIn))
+				local new_position = Readb2Vec2(bsIn)
+				local new_velocity = Readb2Vec2(bsIn)
+				
+				if remote_client.found then
+					print "found"
+					local body = remote_client.value.parent_entity:get().physics.body
+					body:SetTransform(new_position, 0)
+					body:SetLinearVelocity(new_velocity)
+				end
+			end
 			
 		else
 			print(network_message.ID_NEW_PLAYER)

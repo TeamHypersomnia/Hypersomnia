@@ -7,7 +7,7 @@
  </properties>
  <objectgroup name="Object Layer 1" width="50" height="50">
   <object type="wall_wood" x="576" y="544" width="320" height="64"/>
-  <object type="crate" x="992" y="864" width="96" height="96"/>
+  <object type="wall_wood" x="736" y="128" width="96" height="96"/>
   <object type="teleport_position" x="736" y="736" width="96" height="96"/>
   <object type="wall_wood" x="480" y="896">
    <polygon points="0,0 -160,-32 -320,128 -96,320"/>
