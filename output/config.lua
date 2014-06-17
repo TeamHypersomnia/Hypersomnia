@@ -9,7 +9,12 @@ config_table = {
 	resolution_h = 800,
 	doublebuffer = 1,
 	
-	sensitivity = vec2(2.5, 2.5)
+	sensitivity = vec2(2.5, 2.5),
+	
+	server_address = "127.0.0.1",
+	server_port = 37017,
+	
+	multiple_clients_view = 1
 }
 
 if config_table.fullscreen == 1 then

@@ -9,7 +9,7 @@ function client_screen:constructor(camera_rect)
 	self.sample_scene.world_camera.camera.screen_rect = camera_rect
 	
 	self.client = network_interface()
-	self.client:connect("127.0.0.1", 37017)
+	self.client:connect(config_table.server_address, config_table.server_port)
 	
 	self.received = network_packet()
 	
