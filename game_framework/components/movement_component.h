@@ -20,7 +20,7 @@ namespace components {
 		std::vector<subscribtion> animation_receivers;
 
 		/* levers controlled by intent messages to induce movement */
-		bool moving_left, moving_right, moving_forward, moving_backward;
+		int moving_left, moving_right, moving_forward, moving_backward;
 		
 		/* default acceleration vector used for movement requested by input */
 		augs::vec2<> input_acceleration;
@@ -64,7 +64,7 @@ namespace components {
 		movement(augs::vec2<> acceleration = augs::vec2<>(), float air_resistance = 0.f) 
 			: input_acceleration(input_acceleration), air_resistance(air_resistance), braking_damping(-1.f), max_speed(-1.f), max_speed_animation(0.f), 
 			axis_rotation_degrees(0.f), thrust_parallel_to_ground_length(0.f), sidescroller_setup(false) {
-			moving_left = moving_right = moving_forward = moving_backward = false;
+			moving_left = moving_right = moving_forward = moving_backward = 0;
 		}
 	};
 }
