@@ -10,23 +10,6 @@ struct send_priority {};
 struct send_reliability {};
 struct network_message {};
 
-struct UnsignedChar {
-	unsigned char c;
-
-	UnsignedChar() : c(0) {}
-	UnsignedChar(int d) : c(d) {}
-	UnsignedChar(const unsigned char& c) : c(c) {}
-	UnsignedChar& operator=(const unsigned char& d) { c = d; }
-
-	void set(int d) {
-		c = d;
-	}
-
-	operator unsigned char() {
-		return c;
-	}
-};
-
 void Write(RakNet::BitStream& bs, const std::string& str) {
 	bs.Write(str.c_str());
 }
@@ -35,11 +18,25 @@ void WriteGuid(RakNet::BitStream& bs, RakNet::RakNetGUID& guid) {
 	bs.Write(guid.g);
 }
 
-void ReadGuid(RakNet::BitStream& bs, RakNet::RakNetGUID& guid) {
+RakNet::RakNetGUID ReadGuid(RakNet::BitStream& bs) {
+	RakNet::RakNetGUID guid;
+
 	decltype(guid.g) my_id;
 	bs.Read(my_id);
 
-	guid = RakNet::RakNetGUID(my_id);
+	return RakNet::RakNetGUID(my_id);
+}
+
+template <class T>
+void WritePOD(RakNet::BitStream& bs, T data) {
+	bs.Write<T>(data);
+}
+
+template <class T>
+T ReadPOD(RakNet::BitStream& bs) {
+	T data;
+	bs.Read<T>(data);
+	return data;
 }
 
 namespace bindings {
@@ -48,15 +45,6 @@ namespace bindings {
 
 		return
 			(
-
-			
-			luabind::class_<UnsignedChar>("UnsignedChar")
-			.def(luabind::constructor<>())
-			.def(luabind::constructor<const UnsignedChar&>())
-			.def(luabind::constructor<int>())
-			.def("set", &UnsignedChar::set)
-			,
-
 			luabind::class_<network_message>("network_message")
 			.enum_("network_message")[
 				luabind::value("ID_CONNECTION_REQUEST_ACCEPTED", ID_CONNECTION_REQUEST_ACCEPTED),
@@ -114,38 +102,38 @@ namespace bindings {
 			.def(luabind::constructor<>())
 			.def("C_String", &RakNet::RakString::C_String),
 
+			luabind::class_<RakNet::RakNetGUID>("RakNetGUID")
+			.def(luabind::constructor<>()),
+
+			luabind::class_<RakNet::BitStream>("BitStream")
+			.def(luabind::constructor<>())
+			.def("IgnoreBytes", &RakNet::BitStream::IgnoreBytes)
+			.def("ReadRakString", &RakNet::BitStream::Read<RakNet::RakString>)
+			,
 
 			/* little helpers */
 			luabind::def("WriteCString", Write),
 			luabind::def("ReadRakNetGUID", ReadGuid),
 			luabind::def("WriteRakNetGUID", WriteGuid),
 
-			luabind::class_<RakNet::BitStream>("BitStream")
-			.def(luabind::constructor<>())
-			.def("IgnoreBytes", &RakNet::BitStream::IgnoreBytes)
-			.def("WriteInt", &RakNet::BitStream::Write<int>)
-			.def("WriteUint", &RakNet::BitStream::Write<unsigned>)
-			.def("WriteUshort", &RakNet::BitStream::Write<unsigned short>)
-			.def("WriteFloat", &RakNet::BitStream::Write<float>)
-			.def("WriteDouble", &RakNet::BitStream::Write<double>)
-			.def("WriteVec2", &RakNet::BitStream::Write<vec2<>>)
-			.def("WriteByte", &RakNet::BitStream::Write<UnsignedChar>)
+			luabind::def("WriteInt", WritePOD<int>),
+			luabind::def("WriteByte", WritePOD<unsigned char>),
+			luabind::def("WriteUint", WritePOD<unsigned>),
+			luabind::def("WriteUshort", WritePOD<unsigned short>),
+			luabind::def("WriteFloat", WritePOD<float>),
+			luabind::def("WriteDouble", WritePOD<double>),
+			luabind::def("Writeb2Vec2", WritePOD<b2Vec2>),
+			luabind::def("WriteVec2", WritePOD<vec2<>>),
 
-			.def("ReadInt", &RakNet::BitStream::Read<int>)
-			.def("ReadUint", &RakNet::BitStream::Read<unsigned>)
-			.def("ReadUshort", &RakNet::BitStream::Read<unsigned short>)
-			.def("ReadFloat", &RakNet::BitStream::Read<float>)
-			.def("ReadDouble", &RakNet::BitStream::Read<double>)
-			.def("ReadVec2", &RakNet::BitStream::Read<vec2<>>)
-			.def("ReadByte", &RakNet::BitStream::Read<UnsignedChar>)
-			.def("ReadRakString", &RakNet::BitStream::Read<RakNet::RakString>)
+			luabind::def("ReadInt", ReadPOD<int>),
+			luabind::def("ReadByte", ReadPOD<unsigned char>),
+			luabind::def("ReadUint", ReadPOD<unsigned>),
+			luabind::def("ReadUshort", ReadPOD<unsigned short>),
+			luabind::def("ReadFloat", ReadPOD<float>),
+			luabind::def("ReadDouble", ReadPOD<double>),
+			luabind::def("Readb2Vec2", ReadPOD<b2Vec2>),
+			luabind::def("ReadVec2", ReadPOD<vec2<>>),
 
-			,
-
-
-
-			luabind::class_<RakNet::RakNetGUID>("RakNetGUID")
-			.def(luabind::constructor<>()),
 
 			map_wrapper<RakNet::RakNetGUID, luabind::object>::bind("guid_to_object_map"),
 
@@ -162,6 +150,8 @@ namespace bindings {
 			.def("listen", &network_interface::listen)
 			.def("connect", &network_interface::connect)
 			.def("receive", &network_interface::receive)
+			.def("close_connection", &network_interface::close_connection)
+			.def("shutdown", &network_interface::shutdown)
 			.def("send", &network_interface::send)
 	
 

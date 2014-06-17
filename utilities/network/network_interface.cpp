@@ -63,6 +63,14 @@ namespace augs {
 			return false;
 		}
 
+		void network_interface::close_connection(const RakNet::RakNetGUID& guid, int disconnection_notification_priority) {
+			peer->CloseConnection(guid, true, 0, (PacketPriority) disconnection_notification_priority);
+		}
+
+		void network_interface::shutdown(unsigned block_duration, int disconnection_notification_priority) {
+			peer->Shutdown(block_duration, 0, (PacketPriority) disconnection_notification_priority);
+		}
+
 		unsigned network_interface::send(RakNet::BitStream& bitstream, int priority, int reliability, int channel, RakNet::RakNetGUID target, bool broadcast) {
 			return peer->Send(&bitstream, (PacketPriority) priority, (PacketReliability) reliability, channel, target, broadcast);
 		}
