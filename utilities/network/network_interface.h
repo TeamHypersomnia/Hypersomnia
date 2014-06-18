@@ -34,6 +34,8 @@ namespace augs {
 
 			bool receive(packet& output);
 
+			void enable_lag(float loss, unsigned short latency, unsigned short jitter);
+
 			void close_connection(const RakNet::RakNetGUID&, int disconnection_notification_priority);
 			void shutdown(unsigned block_duration, int disconnection_notification_priority);
 

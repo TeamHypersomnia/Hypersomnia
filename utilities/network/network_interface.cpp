@@ -20,7 +20,11 @@ namespace augs {
 			
 			return result;
 		}
-		
+
+		void network_interface::enable_lag(float loss, unsigned short latency, unsigned short jitter) {
+			peer->ApplyNetworkSimulator(loss, latency, jitter);
+		}
+
 		RakNet::BitStream& network_interface::packet::get_bitstream() {
 			return result_bitstream;
 		}

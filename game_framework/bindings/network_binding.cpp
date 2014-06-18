@@ -150,6 +150,7 @@ namespace bindings {
 			.def("listen", &network_interface::listen)
 			.def("connect", &network_interface::connect)
 			.def("receive", &network_interface::receive)
+			.def("enable_lag", &network_interface::enable_lag)
 			.def("close_connection", &network_interface::close_connection)
 			.def("shutdown", &network_interface::shutdown)
 			.def("send", &network_interface::send)
