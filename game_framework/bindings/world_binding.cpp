@@ -14,18 +14,12 @@
 
 #include "misc/vector_wrapper.h"
 
-#include "../components/scriptable_component.h"
-
-void helper_destroy(world& owner, destroy_message msg) {
-	owner.post_message(msg);
-}
-
 template <typename T>
 std::vector<T> get_message_queue_for_scripts(world& owner) {
 	std::vector<T> msgs = owner.get_message_queue<T>();
 	
 	msgs.erase(std::remove_if(msgs.begin(), msgs.end(), [](const T& msg){
-		return (!msg.send_to_scripts || msg.subject->find<components::scriptable>() == nullptr);
+		return !msg.send_to_scripts;
 	}), msgs.end());
 
 	return msgs;
@@ -58,14 +52,12 @@ namespace bindings {
 			.def("post_delayed_message", &world::post_delayed_message<intent_message>)
 			.def("post_delayed_message", &world::post_delayed_message<destroy_message>)
 			.def("post_delayed_message", &world::post_delayed_message<particle_burst_message>)
-			, 
+			,
 
 			luabind::def("get_destroy_message_queue", get_message_queue_for_scripts<destroy_message>),
 			luabind::def("get_collision_message_queue", get_message_queue_for_scripts<collision_message>),
 			luabind::def("get_damage_message_queue", get_message_queue_for_scripts<damage_message>),
 			luabind::def("get_intent_message_queue", get_message_queue_for_scripts<intent_message>),
-			luabind::def("get_shot_message_queue", get_message_queue_for_scripts<shot_message>),
-
-			luabind::def("post_destroy", helper_destroy);
+			luabind::def("get_shot_message_queue", get_message_queue_for_scripts<shot_message>);
 	}
 }

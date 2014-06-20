@@ -4,7 +4,7 @@
 
 void components::chase::set_target(augs::entity_system::entity* new_target) {
 	target_newly_set = true;
-	target.set(new_target);
+	target.set_ptr(new_target);
 }
 
 void chase_system::process_entities(world&) {

@@ -20,7 +20,6 @@
 #include "../systems/destroy_system.h"
 #include "../systems/particle_group_system.h"
 #include "../systems/particle_emitter_system.h"
-#include "../systems/script_system.h"
 #include "../systems/behaviour_tree_system.h"
 
 #include "misc/vector_wrapper.h"
@@ -139,10 +138,7 @@ namespace bindings {
 			.def("consume_events", &particle_emitter_system::consume_events),
 
 			augs::misc::vector_wrapper<luabind::object>::bind_vector("luabindobject_vector"),
-
-			luabind::class_<script_system>("_script_system")
-			.def("get_entities_vector", &script_system::get_entities_vector)
-			,
+			
 			luabind::class_<behaviour_tree_system>("_behaviour_tree_system")
 			.def("process_entities", &behaviour_tree_system::process_entities)
 			;

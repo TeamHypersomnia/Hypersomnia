@@ -17,7 +17,7 @@ namespace augs {
 				ptr->owner_world.unregister_entity_watcher(*this);
 		}
 
-		void entity_ptr::set(entity* p) {
+		void entity_ptr::set_ptr(entity* p) {
 			if (ptr)
 				ptr->owner_world.unregister_entity_watcher(*this);
 
@@ -35,17 +35,25 @@ namespace augs {
 			return ptr != nullptr;
 		}
 
+		void entity_ptr::clear() {
+			ptr->clear();
+		}
+
+		std::string entity_ptr::get_name() {
+			return ptr->get_name();
+		}
+
 		entity_ptr::operator entity*() const {
 			return ptr;
 		}
 
 		entity_ptr& entity_ptr::operator=(const entity_ptr& p) {
-			set(p.ptr);
+			set_ptr(p.ptr);
 			return *this;
 		}
 		
 		entity_ptr& entity_ptr::operator=(entity* p) {
-			set(p);
+			set_ptr(p);
 			return *this;
 		}
 

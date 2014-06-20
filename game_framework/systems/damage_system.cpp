@@ -31,11 +31,8 @@ void damage_system::process_events(world& owner) {
 
 			owner.post_message(burst_msg);
 
-			if (damage->destroy_upon_hit) {
-				auto new_msg = messages::destroy_message(it.collider);
-				new_msg.send_to_scripts = true;
-				owner.post_message(new_msg);
-			}
+			if (damage->destroy_upon_hit) 
+				owner.post_message(messages::destroy_message(it.collider));
 		}
 	}
 }

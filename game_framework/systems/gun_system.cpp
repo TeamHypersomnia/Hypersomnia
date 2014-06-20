@@ -49,7 +49,7 @@ void components::gun::transfer_barrel_smoke(augs::entity_system::entity* another
 
 void gun_system::add(entity* e) {
 	auto& gun = e->get<components::gun>();
-	gun.get_barrel_smoke().set(&e->owner_world.create_entity_named("barrel smoke group"));
+	gun.get_barrel_smoke().set_ptr(&e->owner_world.create_entity_named("barrel smoke group"));
 
 	gun.get_barrel_smoke()->add(components::transform());
 	gun.get_barrel_smoke()->add(components::particle_group()).stream_slots[0].destroy_when_empty = false;
