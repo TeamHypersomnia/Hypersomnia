@@ -33,7 +33,7 @@ end
 
 
 function set_active_client(which)
-	if config_table.multiple_clients_view ~= 0 then
+	if config_table.multiple_clients_view == 0 then
 		which = 1
 	end
 	

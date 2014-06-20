@@ -8,7 +8,7 @@ function remote_player_class:constructor(remote_guid)
 end
 
 function create_remote_player(owner_scene, position, remote_guid)
-	local player = owner_scene.world_object:ptr_create_entity_group  {
+	local player = owner_scene.world_object:create_entity_group  {
 		-- body also acts as torso
 		body = {
 			render = {
@@ -94,8 +94,8 @@ function create_remote_player(owner_scene, position, remote_guid)
 		}
 	}
 	
-	player.body:get().animate.available_animations = owner_scene.torso_sets["white"]["barehands"].set
-	player.legs:get().animate.available_animations = owner_scene.legs_sets["white"].set
+	player.body.animate.available_animations = owner_scene.torso_sets["white"]["barehands"].set
+	player.legs.animate.available_animations = owner_scene.legs_sets["white"].set
 
 	return owner_scene.world_object:create_entity_table(player.body, remote_player_class, remote_guid)
 end

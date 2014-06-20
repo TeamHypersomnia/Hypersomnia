@@ -11,7 +11,7 @@ config_table = {
 	
 	sensitivity = vec2(2.5, 2.5),
 	
-	server_address = "127.0.0.1",
+	server_address = "25.104.207.109",
 	server_port = 37017,
 	
 	multiple_clients_view = 1

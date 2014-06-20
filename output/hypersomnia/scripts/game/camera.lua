@@ -81,7 +81,7 @@ function create_world_camera_entity(owner_world)
 	
 	GL.glUniform1i(basic_texture_uniform, 0)
 	
-	world_camera_ptr = owner_world:ptr_create_entity (override(camera_archetype, {
+	local world_camera = owner_world:create_entity (override(camera_archetype, {
 		transform = {
 			pos = vec2(),
 			rotation = 0
@@ -92,7 +92,7 @@ function create_world_camera_entity(owner_world)
 			size = vec2(config_table.resolution_w, config_table.resolution_h),
 			
 			drawing_callback = function (subject, camera_draw_input, mask)
-				get_self(subject).owner_scene.all_atlas:bind()
+				subject.script.owner_scene.all_atlas:bind()
 				-- now assuming that the atlas is already bound upon setting this scene to current
 			
 				local renderer = camera_draw_input.output
@@ -118,10 +118,10 @@ function create_world_camera_entity(owner_world)
 			custom_intents.ZOOM_CAMERA
 		},
 		
-		chase = {}
+		chase = {},
+		
+		script_class = camera_class
 	}))
 	
-	owner_world:create_entity_table(world_camera_ptr, camera_class)
-	
-	return world_camera_ptr:get()
+	return world_camera
 end

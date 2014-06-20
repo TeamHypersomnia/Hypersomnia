@@ -15,35 +15,37 @@ function client_screen:constructor(camera_rect)
 	
 	self.remote_client_map = guid_to_object_map()
 	
-	self.network_input_listener = self.sample_scene.world_object:create_entity_table(self.sample_scene.world_object:ptr_create_entity {
+	local this_client = self
+	
+	self.network_input_listener = self.sample_scene.world_object:create_entity {
 		input = {
 			intent_message.MOVE_FORWARD,
 			intent_message.MOVE_BACKWARD,
 			intent_message.MOVE_LEFT,
 			intent_message.MOVE_RIGHT
-		}
-	})
-	
-	
-	local this_client = self
-	
-	self.network_input_listener.intent_message = function(self, message)
-		if this_client.server_guid ~= nil then
-			local desired_command;
-			
-			if message.state_flag then 
-				desired_command = "+"
-			else 
-				desired_command = "-" 
+		},
+		
+		script = {
+			intent_message = function(self, message)
+				if this_client.server_guid ~= nil then
+					local desired_command;
+					
+					if message.state_flag then 
+						desired_command = "+"
+					else 
+						desired_command = "-" 
+					end
+					
+					local bsOut = BitStream()
+					WriteByte(bsOut, network_message.ID_COMMAND)
+					WriteByte(bsOut, name_to_command[desired_command .. intent_to_name[message.intent]])
+					
+					this_client.client:send(bsOut, send_priority.IMMEDIATE_PRIORITY, send_reliability.RELIABLE_ORDERED, 0, this_client.server_guid, false)
+				end
 			end
-			
-			local bsOut = BitStream()
-			WriteByte(bsOut, network_message.ID_COMMAND)
-			WriteByte(bsOut, name_to_command[desired_command .. intent_to_name[message.intent]])
-			
-			this_client.client:send(bsOut, send_priority.IMMEDIATE_PRIORITY, send_reliability.RELIABLE_ORDERED, 0, this_client.server_guid, false)
-		end
-	end
+		
+		}
+	}
 end
 
 function client_screen:loop()
@@ -92,7 +94,7 @@ function client_screen:loop()
 			local disconnected_guid = ReadRakNetGUID(bsIn)
 			
 			local remote_self = self.remote_client_map:get(disconnected_guid)
-			self.sample_scene.world_object.world:delete_entity(remote_self.parent_entity:get(), nil)
+			self.sample_scene.world_object.world:delete_entity(remote_self.parent_entity, nil)
 			self.remote_client_map:remove(disconnected_guid)
 			
 			print("Player disconnected.")
@@ -101,13 +103,13 @@ function client_screen:loop()
 			local bsIn = self.received:get_bitstream()
 			bsIn:IgnoreBytes(1)
 				
-			local this_body = self.sample_scene.player.body:get().physics.body
+			local this_body = self.sample_scene.player.body.physics.body
 			this_body:SetTransform(Readb2Vec2(bsIn), 0)
 			this_body:SetLinearVelocity(Readb2Vec2(bsIn))
 	
 			local new_states_num = ReadUshort(bsIn)		
-				print ("states: " .. new_states_num)
-				print ("size: " .. self.remote_client_map:size())
+				--print ("states: " .. new_states_num)
+				--print ("size: " .. self.remote_client_map:size())
 			for i=1, new_states_num do
 				-- the notification about the new player might yet not have arrived
 				local remote_client = self.remote_client_map:find(ReadRakNetGUID(bsIn))
@@ -115,8 +117,8 @@ function client_screen:loop()
 				local new_velocity = Readb2Vec2(bsIn)
 				
 				if remote_client.found then
-					print "found"
-					local body = remote_client.value.parent_entity:get().physics.body
+					--print "found"
+					local body = remote_client.value.parent_entity.physics.body
 					body:SetTransform(new_position, 0)
 					body:SetLinearVelocity(new_velocity)
 				end

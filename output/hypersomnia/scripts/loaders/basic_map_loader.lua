@@ -35,7 +35,7 @@ return function(map_filename, scene_object)
 	
 	-- initialize camera
 	scene_object.world_camera = create_world_camera_entity(world)
-	get_self(scene_object.world_camera).owner_scene = scene_object
+	scene_object.world_camera.script.owner_scene = scene_object
 	
 	-- initialize player
 	scene_object.teleport_position = objects_by_type["teleport_position"][1].pos
@@ -50,10 +50,10 @@ return function(map_filename, scene_object)
 	
 	scene_object.player = create_basic_player(world, scene_object.teleport_position, scene_object.world_camera, scene_object.crosshair_sprite)
 
-	scene_object.player.body:get().animate.available_animations = scene_object.torso_sets["white"]["barehands"].set
-	scene_object.player.legs:get().animate.available_animations = scene_object.legs_sets["white"].set
+	scene_object.player.body.animate.available_animations = scene_object.torso_sets["white"]["barehands"].set
+	scene_object.player.legs.animate.available_animations = scene_object.legs_sets["white"].set
 
-	scene_object.main_input_entity = world:create_entity_table(world:ptr_create_entity {
+	scene_object.main_input = world:create_entity {
 		input = {
 			custom_intents.SWITCH_CLIENT_1,
 			custom_intents.SWITCH_CLIENT_2,
@@ -61,23 +61,24 @@ return function(map_filename, scene_object)
 			custom_intents.SWITCH_CLIENT_4,
 			
 			custom_intents.QUIT
+		},
+		
+		script = {
+			intent_message = function(self, message)
+				if message.intent == custom_intents.QUIT then
+					SHOULD_QUIT_FLAG = true
+				elseif message.intent == custom_intents.SWITCH_CLIENT_1 then
+					set_active_client(1)
+				elseif message.intent == custom_intents.SWITCH_CLIENT_2 then
+					set_active_client(2)
+				elseif message.intent == custom_intents.SWITCH_CLIENT_3 then
+					set_active_client(3)
+				elseif message.intent == custom_intents.SWITCH_CLIENT_4 then
+					set_active_client(4)
+				end		
+			end
 		}
-	})
-	
-	scene_object.main_input_entity.intent_message = function(self, message)
-		if message.intent == custom_intents.QUIT then
-			SHOULD_QUIT_FLAG = true
-		elseif message.intent == custom_intents.SWITCH_CLIENT_1 then
-			set_active_client(1)
-		elseif message.intent == custom_intents.SWITCH_CLIENT_2 then
-			set_active_client(2)
-		elseif message.intent == custom_intents.SWITCH_CLIENT_3 then
-			set_active_client(3)
-		elseif message.intent == custom_intents.SWITCH_CLIENT_4 then
-			set_active_client(4)
-		end		
-	end
-	
+	}
 	
 	-- bind the atlas once
 	-- GL.glActiveTexture(GL.GL_TEXTURE0)

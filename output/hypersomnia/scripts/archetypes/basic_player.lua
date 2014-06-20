@@ -1,5 +1,5 @@
 function create_basic_player(owner_world, position, target_camera, crosshair_sprite)
-	local player = owner_world:ptr_create_entity_group  {
+	local player = owner_world:create_entity_group  {
 		-- body also acts as torso
 		body = {
 			render = {
@@ -119,9 +119,9 @@ function create_basic_player(owner_world, position, target_camera, crosshair_spr
 	}
 	
 	if target_camera ~= nil then
-		target_camera.chase:set_target(player.body:get())
-		target_camera.camera.player:set(player.body:get())
-		target_camera.camera.crosshair:set(player.crosshair:get())
+		target_camera.chase:set_target(player.body)
+		target_camera.camera.player:set(player.body)
+		target_camera.camera.crosshair:set(player.crosshair)
 	end
 	
 	return player
