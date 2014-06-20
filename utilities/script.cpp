@@ -1,10 +1,10 @@
 #include "stdafx.h"
-#include "scriptable_info.h"
+#include "script.h"
 #include "lua_state_wrapper.h"
 
 #include <fstream>
 
-namespace resources {
+namespace augs {
 	script::script(lua_state_wrapper& lua_state) : lua_state(lua_state), needs_recompilation(false), is_associated_string_filename(false) {
 
 	}

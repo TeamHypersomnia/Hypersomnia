@@ -3,7 +3,7 @@
 
 struct lua_State;
 
-namespace resources {
+namespace augs {
 	struct lua_state_wrapper {
 		lua_State* raw;
 
@@ -12,9 +12,6 @@ namespace resources {
 		~lua_state_wrapper();
 
 		operator lua_State*();
-
-		/* binds to the lua_State entire game framework along with augs utilities */
-		void bind_whole_engine();
 
 		void dofile(const std::string& filename);
 

@@ -614,7 +614,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="game_framework\resources\lua_state_wrapper.cpp">
+    <ClCompile Include="game_framework\whole_engine_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="utilities\lua_state_wrapper.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
@@ -1050,7 +1054,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="game_framework\resources\scriptable_info.cpp">
+    <ClCompile Include="utilities\script.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
@@ -1603,7 +1607,7 @@
     <ClInclude Include="3rdparty\SFML\Window\WindowStyle.hpp" />
     <ClInclude Include="game_framework\game\polygon_fader.h" />
     <ClInclude Include="game_framework\game_framework.h" />
-    <ClInclude Include="game_framework\resources\lua_state_wrapper.h" />
+    <ClInclude Include="utilities\lua_state_wrapper.h" />
     <ClInclude Include="game_framework\world_instance.h" />
     <ClInclude Include="utilities\augmentations.h" />
     <ClInclude Include="stdafx.h" />
@@ -1666,7 +1670,7 @@
     <ClInclude Include="game_framework\messages\particle_burst_message.h" />
     <ClInclude Include="game_framework\resources\particle_emitter_info.h" />
     <ClInclude Include="game_framework\resources\render_info.h" />
-    <ClInclude Include="game_framework\resources\scriptable_info.h" />
+    <ClInclude Include="utilities\script.h" />
     <ClInclude Include="game_framework\systems\animation_system.h" />
     <ClInclude Include="game_framework\systems\camera_system.h" />
     <ClInclude Include="game_framework\systems\chase_system.h" />

@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "world_instance.h"
 
-#include "resources/scriptable_info.h"
-
 using namespace messages;
 
 augs::window::glwindow* world_instance::global_window = nullptr;

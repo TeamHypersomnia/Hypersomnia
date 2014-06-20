@@ -3,7 +3,7 @@
 #include <vector>
 #include <unordered_map>
 
-namespace resources {
+namespace augs {
 	struct lua_state_wrapper;
 
 	class script {

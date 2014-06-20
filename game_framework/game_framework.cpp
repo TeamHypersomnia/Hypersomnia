@@ -5,7 +5,7 @@
 #include <gtest\gtest.h>
 #include "augmentations.h"
 
-#include "resources/scriptable_info.h"
+#include "utilities/script.h"
 #include "world_instance.h"
 
 namespace framework {

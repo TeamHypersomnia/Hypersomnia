@@ -27,6 +27,8 @@
 #include "messages/damage_message.h"
 #include "messages/shot_message.h"
 
+#include "utilities/lua_state_wrapper.h"
+
 struct world_instance {
 	static augs::window::glwindow* global_window;
 	/* all systems */
@@ -54,6 +56,9 @@ struct world_instance {
 	~world_instance();
 
 	void default_loop();
+
+	/* binds to the lua_State entire game framework along with augs utilities */
+	void bind_whole_engine(augs::lua_state_wrapper&);
 
 	world_instance& operator=(const world_instance&) {
 		assert(0);
