@@ -366,3 +366,12 @@ function create_atlas_from_filenames(filename_entries)
 	
 	return out_atlas, sprite_library, texture_by_filename
 end
+
+table.erase = function(self, element)
+	for i=1, #self do
+		if self[i] == element then
+			table.remove(self, i)
+			break
+		end
+	end
+end
