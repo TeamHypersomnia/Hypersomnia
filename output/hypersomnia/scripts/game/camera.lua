@@ -81,7 +81,7 @@ function create_world_camera_entity(owner_world)
 	
 	GL.glUniform1i(basic_texture_uniform, 0)
 	
-	local world_camera = owner_world:create_entity (override(camera_archetype, {
+	return owner_world:create_entity (override(camera_archetype, {
 		transform = {
 			pos = vec2(),
 			rotation = 0
@@ -122,6 +122,4 @@ function create_world_camera_entity(owner_world)
 		
 		script_class = camera_class
 	}))
-	
-	return world_camera
 end

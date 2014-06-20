@@ -2,8 +2,9 @@ remote_player_class = inherits_from(entity_class)
 
 all_remote_players = {}
 
-function remote_player_class:constructor(remote_guid)
+function remote_player_class:constructor(remote_guid, entity)
 	self.guid = remote_guid
+	self.parent_entity = entity
 	table.insert(all_remote_players, self)
 end
 
@@ -97,6 +98,8 @@ function create_remote_player(owner_scene, position, remote_guid)
 	player.body.animate.available_animations = owner_scene.torso_sets["white"]["barehands"].set
 	player.legs.animate.available_animations = owner_scene.legs_sets["white"].set
 
-	return owner_scene.world_object:create_entity_table(player.body, remote_player_class, remote_guid)
+	player.body.script = remote_player_class:create(remote_guid, player.body)
+	
+	return player.body.script
 end
 
