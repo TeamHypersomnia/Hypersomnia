@@ -53,7 +53,6 @@ namespace bindings {
 		_texture(),
 		_animation(),
 		_world(),
-		_entity_ptr(),
 		_sprite(),
 		_polygon(),
 		_polygon_fader(),
@@ -126,7 +125,8 @@ void debugger_break() {
 }
 
 std::wstring get_executable_path() {
-	wchar_t buffer[MAX_PATH];
+	wchar_t buffer[MAX_PATH+1];
+	SecureZeroMemory(buffer, sizeof(buffer));
 	GetModuleFileName(NULL, buffer, MAX_PATH);
 	PathRemoveFileSpec(buffer);
 	return buffer;
@@ -134,7 +134,9 @@ std::wstring get_executable_path() {
 
 std::string remove_filename_from_path(std::string input_path) {
 	std::wstring wpath(input_path.begin(), input_path.end());
-	wchar_t buffer[MAX_PATH];
+	wchar_t buffer[MAX_PATH+1];
+
+	SecureZeroMemory(buffer, sizeof(buffer));
 
 	std::copy(wpath.begin(), wpath.end(), buffer);
 
@@ -175,7 +177,6 @@ namespace resources {
 				bindings::_texture(),
 				bindings::_animation(),
 				bindings::_world(),
-				bindings::_entity_ptr(),
 				misc::vector_wrapper<entity_ptr>::bind_vector("entity_ptr_vector"),
 				bindings::_sprite(),
 				bindings::_polygon(),
