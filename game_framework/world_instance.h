@@ -17,7 +17,6 @@
 #include "systems/destroy_system.h"
 #include "systems/particle_group_system.h"
 #include "systems/particle_emitter_system.h"
-#include "systems/script_system.h"
 #include "systems/behaviour_tree_system.h"
 
 #include "messages/destroy_message.h" 
@@ -50,7 +49,6 @@ struct world_instance {
 	damage_system damage;
 	destroy_system destroy;
 	behaviour_tree_system behaviours;
-	script_system scripts;
 
 	world_instance();
 	~world_instance();

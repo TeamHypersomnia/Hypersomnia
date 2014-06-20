@@ -16,6 +16,7 @@ namespace augs {
 
 		public:
 			bool enabled;
+			luabind::object script_data;
 
 			entity(world& owner_world);
 			~entity();
@@ -23,8 +24,14 @@ namespace augs {
 			/* maps type hashes into components */
 			misc::sorted_vector_map<type_hash, component*> type_to_component;
 			std::string name;
+			
+			std::string get_name();
 
 			world& owner_world;
+
+			world& get_owner_world() {
+				return owner_world;
+			}
 
 			/* only for script binding */
 			bool operator==(const entity& b) const {

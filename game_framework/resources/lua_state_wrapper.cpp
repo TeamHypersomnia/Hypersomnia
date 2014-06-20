@@ -91,7 +91,6 @@ namespace bindings {
 		_particle_emitter_component(),
 		_physics_component(),
 		_steering_component(),
-		_scriptable_component(),
 		_behaviour_tree_component(),
 
 		_entity(),
@@ -215,7 +214,6 @@ namespace resources {
 				bindings::_particle_emitter_component(),
 				bindings::_physics_component(),
 				bindings::_steering_component(),
-				bindings::_scriptable_component(),
 				bindings::_behaviour_tree_component(),
 
 				bindings::_entity(),

@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include <luabind/operator.hpp>
 #include "entity_system/entity.h"
+#include "entity_system/entity_ptr.h"
 
 #include "bindings.h"
 
@@ -20,7 +21,6 @@
 #include "../components/movement_component.h"
 #include "../components/particle_emitter_component.h"
 #include "../components/physics_component.h"
-#include "../components/scriptable_component.h"
 #include "../components/steering_component.h"
 #include "../components/transform_component.h"
 #include "../components/render_component.h"
@@ -31,10 +31,12 @@ namespace bindings {
 			luabind::class_<entity>("_entity")
 			.def("clear", &entity::clear)
 			.def(luabind::const_self == luabind::const_self)
-			.def_readwrite("name", &entity::name)
+			.property("name", &entity::get_name)
 			.def("enable", &entity::enable)
 			.def("disable", &entity::disable)
 			.def("reassign_to_systems", &entity::reassign_to_systems)
+			.def_readwrite("script", &entity::script_data)
+			.property("owner_world", &entity::get_owner_world)
 
 			.def("remove_animate", &entity::remove<animate>)
 			.def("add", &entity::add<animate>)
@@ -81,9 +83,6 @@ namespace bindings {
 			.def("remove_physics", &entity::remove<physics>)
 			.def("add", &entity::add<physics>)
 			.property("physics", &entity::find<physics>, &entity::set<physics>)
-			.def("remove_scriptable", &entity::remove<scriptable>)
-			.def("add", &entity::add<scriptable>)
-			.property("scriptable", &entity::find<scriptable>, &entity::set<scriptable>)
 			.def("remove_steering", &entity::remove<steering>)
 			.def("add", &entity::add<steering>)
 			.property("steering", &entity::find<steering>, &entity::set<steering>)
@@ -92,6 +91,37 @@ namespace bindings {
 			.property("render", &entity::find<render>, &entity::set<render>)
 			.def("remove_transform", &entity::remove<transform>)
 			.def("add", &entity::add<transform>)
-			.property("transform", &entity::find<transform>, &entity::set<transform>);
+			.property("transform", &entity::find<transform>, &entity::set<transform>),
+			
+
+			luabind::class_<entity_ptr>("entity_ptr")
+			.def(luabind::constructor<>())
+			.def(luabind::constructor<entity_system::entity*>())
+			.def("get", &entity_ptr::get)
+			.def("exists", &entity_ptr::exists)
+			.def("set", &entity_ptr::set_ptr)
+			.def("set", (entity_ptr& (entity_ptr::*)(const entity_ptr&))&entity_ptr::operator=)
+
+			//.property("entity", &entity_ptr::get)
+			//.property("animate", &entity_ptr::find<animate>, &entity_ptr::set<animate>)
+			//.property("behaviour_tree", &entity_ptr::find<behaviour_tree>, &entity_ptr::set<behaviour_tree>)
+			//.property("visibility", &entity_ptr::find<visibility>, &entity_ptr::set<visibility>)
+			//.property("pathfinding", &entity_ptr::find<pathfinding>, &entity_ptr::set<pathfinding>)
+			//.property("camera", &entity_ptr::find<camera>, &entity_ptr::set<camera>)
+			//.property("chase", &entity_ptr::find<chase>, &entity_ptr::set<chase>)
+			//.property("children", &entity_ptr::find<children>, &entity_ptr::set<children>)
+			//.property("crosshair", &entity_ptr::find<crosshair>, &entity_ptr::set<crosshair>)
+			//.property("damage", &entity_ptr::find<damage>, &entity_ptr::set<damage>)
+			//.property("gun", &entity_ptr::find<gun>, &entity_ptr::set<gun>)
+			//.property("input", &entity_ptr::find<input>, &entity_ptr::set<input>)
+			//.property("lookat", &entity_ptr::find<lookat>, &entity_ptr::set<lookat>)
+			//.property("movement", &entity_ptr::find<movement>, &entity_ptr::set<movement>)
+			//.property("particle_emitter", &entity_ptr::find<particle_emitter>, &entity_ptr::set<particle_emitter>)
+			//.property("physics", &entity_ptr::find<physics>, &entity_ptr::set<physics>)
+			//.property("scriptable", &entity_ptr::find<scriptable>, &entity_ptr::set<scriptable>)
+			//.property("steering", &entity_ptr::find<steering>, &entity_ptr::set<steering>)
+			//.property("render", &entity_ptr::find<render>, &entity_ptr::set<render>)
+			//.property("transform", &entity_ptr::find<transform>, &entity_ptr::set<transform>);
+			;
 	}
 }

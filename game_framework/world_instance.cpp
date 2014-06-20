@@ -2,6 +2,7 @@
 #include "world_instance.h"
 
 #include "resources/scriptable_info.h"
+
 using namespace messages;
 
 augs::window::glwindow* world_instance::global_window = nullptr;
@@ -30,7 +31,6 @@ world_instance::world_instance() : input(*global_window), render(*global_window)
 	my_world.register_system(&damage);
 	my_world.register_system(&destroy);
 	my_world.register_system(&behaviours);
-	my_world.register_system(&scripts);
 
 	my_world.register_message_queue<intent_message>();
 	my_world.register_message_queue<damage_message>();
@@ -128,6 +128,5 @@ luabind::scope world_instance::bind() {
 		.def_readwrite("damage_system", &world_instance::damage)
 		.def_readwrite("destroy_system", &world_instance::destroy)
 		.def_readwrite("behaviour_tree_system", &world_instance::behaviours)
-		.def_readwrite("script_system", &world_instance::scripts)
 		 ;
 }

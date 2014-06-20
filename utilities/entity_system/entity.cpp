@@ -14,6 +14,10 @@ namespace augs {
 			return owner_world.component_library.get_registered_types(*this);
 		}
 
+		std::string entity::get_name() {
+			return name;
+		}
+
 		void entity::clear() {
 			if (!enabled) enable();
 			/* user may have already removed all components using templated remove
