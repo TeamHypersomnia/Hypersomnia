@@ -5,7 +5,7 @@ function world_class:constructor()
 	-- shortcut 
 	self.world = self.world_inst.world
 	
-	self.entity_system_instance = entity_system:create(self)
+	self.substep_callbacks = {}
 	
 	-- shortcuts for systems
 	self.input_system = self.world_inst.input_system
@@ -18,32 +18,59 @@ function world_class:constructor()
 	self.physics_system.substepping_routine = function(owner)	
 		local my_instance = self.world_inst
 	
-		self.entity_system_instance:tick("substep")
+		for i=1, #self.substep_callbacks do
+			self.substep_callbacks[i]()
+		end
 		
 		my_instance.steering_system:substep(owner)
 		my_instance.movement_system:substep(owner)
 		my_instance.damage_system:process_entities(owner)
 		my_instance.damage_system:process_events(owner)
 		
-		self.entity_system_instance:handle_messages(owner, true)
+		self:handle_message_callbacks()
 		
 		my_instance.destroy_system:consume_events(owner)
 		owner:flush_message_queues()
 	end
 	
-	-- other internals
-	self.group_by_entity = {}	
 	self.polygon_particle_userdatas_saved = {}	
-	
-	-- convenience shortcut
-	self.global_entity_table = self.entity_system_instance.entity_table
 		
 	self.is_paused = false
 end
 
--- shortcut
-function world_class:create_entity_table(...)
-	return self.entity_system_instance:create_entity_table(...)
+function world_class:handle_message_callbacks()
+	local message_names = {
+		"damage_message",
+		"intent_message",
+		"collision_message",
+		"shot_message",
+		"destroy_message"
+	}
+	
+	for i=1, #message_names do
+		local message_vector = _G["get_" .. message_names[i] .. "_queue"](self.world)
+		
+		if message_vector:size() > 0 then
+			for j=0, message_vector:size()-1 do
+				local msg = message_vector:at(j)
+				
+				local entity_self = msg.subject.script
+		
+				local message_callback = entity_self[message_names[i]]
+				
+				-- call an entity-specific callback for this message
+				if message_callback  ~= nil then
+					message_callback (entity_self, msg)
+				end
+				
+				-- call a generic callback for this message
+				if entity_self["message"] ~= nil then
+					entity_self:message(message_names[i], msg)
+				end
+			end
+		end
+	end
+	
 end
 
 function world_class:process_all_systems()
@@ -85,8 +112,7 @@ function world_class:process_all_systems()
 		my_instance.damage_system:process_events(world)
 	end	
 	
-	self.entity_system_instance:handle_messages(owner, false)
-	self.entity_system_instance:tick("loop")
+	self:handle_message_callbacks()
 	
 	my_instance.destroy_system:consume_events(world)
 	
@@ -102,8 +128,7 @@ function world_class:process_all_systems()
 		my_instance.particle_emitter_system:consume_events(world)
 	end
 	
-	my_instance.camera_system:process_rendering(world)
-    
+	my_instance.camera_system:process_rendering(world) 
 end
 
 	-- default loop

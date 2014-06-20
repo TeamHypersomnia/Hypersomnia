@@ -18,9 +18,6 @@ dofile (ENGINE_DIRECTORY .. "button.lua")
 dofile (ENGINE_DIRECTORY .. "integrator.lua")
 --dofile (ENGINE_DIRECTORY .. "sequence.lua")
 
-dofile (ENGINE_DIRECTORY .. "entity_class.lua")
-dofile (ENGINE_DIRECTORY .. "entity_system.lua")
-
 dofile (ENGINE_DIRECTORY .. "world_class.lua")
 
 dofile (ENGINE_DIRECTORY .. "entity_creation_util.lua" )

@@ -1,11 +1,11 @@
-camera_class = inherits_from (entity_class)
+camera_class = inherits_from ()
 
 function camera_class:constructor()
 	self.current_zoom_level = 0
 	self.current_zoom_multiplier = 1
 	
 	self.min_zoom = 0 
-	self.max_zoom = 1000 
+	self.max_zoom = 1000
 end
 
 function camera_class:set_zoom_level(new_zoom_level)
@@ -16,8 +16,8 @@ function camera_class:set_zoom_level(new_zoom_level)
 	local new_h = config_table.resolution_h*mult
 	self.current_zoom_multiplier = mult
 	
-	self.parent_entity:get().camera.size = vec2(new_w, new_h)
-	self.parent_entity:get().camera.max_look_expand = vec2(new_w, new_h)/2
+	self.parent_entity.camera.size = vec2(new_w, new_h)
+	self.parent_entity.camera.max_look_expand = vec2(new_w, new_h)/2
 end
 
 function camera_class:get_zoom_level()

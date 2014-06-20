@@ -1,4 +1,12 @@
-function set_components_from_entry(entity, entry, entities_lookup)
+function set_components_from_entry(entity, entry, entities_lookup)	
+	if entry.script_class ~= nil then
+		entity.script = entry.script_class:create()
+		entity.script.parent_entity = entity
+	else
+		entity.script = entry.script
+	end
+	
+	
 	if entry.transform ~= nil then
 		local transform = entity:add(transform_component())
 		if entry.transform.pos ~= nil then transform.current.pos = entry.transform.pos end
@@ -66,7 +74,6 @@ function set_components_from_entry(entity, entry, entities_lookup)
 	def_ptr (gun_component, 'gun', { target_camera_to_shake = true }, { bullet_body = true, bullet_render = true })
 	def_ptr (lookat_component, 'lookat', { target = true })
 	def		(particle_emitter_component, 'particle_emitter')
-	def		(scriptable_component, 'scriptable')
 	def		(visibility_component, 'visibility', {}, { visibility_layers = true })
 	def		(pathfinding_component, 'pathfinding')
 	def		(steering_component, 'steering')
@@ -126,76 +133,49 @@ function set_components_from_entry(entity, entry, entities_lookup)
 			behaviour_tree:add_tree(v)
 		end
 	end
+	
+	if entry.enabled ~= nil and entry.enabled == false then
+		entity:disable()
+	end
+	
+	return entity
 end
 
 function world_class:create_entity(entry)
-	local enabled = true
-	
-	if entry.enabled ~= nil then
-		enabled = entry.enabled
-	end
-	
-	local new_entity = self.world:create_entity()
-	set_components_from_entry(new_entity, entry, {})
-	
-	if not enabled then 
-		new_entity:disable()
-	end
-	
-	return new_entity
-end
-
-function world_class:flush_dead_entities_in_group_by_entity()
-	for k, v in pairs(self.group_by_entity) do
-		if not k:exists() then
-			self.group_by_entity[k] = nil
-		end
-	end
-end
-
-function world_class:get_group_by_entity(entity_entry)
-	self:flush_dead_entities_in_group_by_entity()
-	
-	for k, v in pairs(self.group_by_entity) do
-		if k:get() == entity_entry then
-			return v
-		end
-	end
-	
-	return nil
+	return set_components_from_entry(self.world:create_entity(), entry, {})
 end
 
 function world_class:create_entity_group(entries)
-	self:flush_dead_entities_in_group_by_entity()
-	
 	local entities_lookup = {}
 	
 	for name, entry in pairs(entries) do
-		local new_entity_ptr = entity_ptr()
 		local new_entity = self.world:create_entity()
-		new_entity_ptr:set(new_entity)
-		
 		entities_lookup[name] = new_entity
-		self.group_by_entity[new_entity_ptr] = entities_lookup
 	end
 	
-	for name, entry in pairs(entities_lookup) do
-		set_components_from_entry(entry, entries[name], entities_lookup)
+	for name, new_entity in pairs(entities_lookup) do
+		set_components_from_entry(new_entity, entries[name], entities_lookup)
+		
+		if new_entity.script == nil then 
+			new_entity.script = {}
+		end
+			
+		new_entity.script.parent_group = entities_lookup
 	end
 	
 	return entities_lookup
 end
 
 
-function world_class:ptr_create_entity(entry)
-	local result = self:create_entity(entry)
+function world_class:create_entity_ptr(entry)
+	local result = self:create_entity_raw(entry)
 	local my_new_ptr = entity_ptr()
 	my_new_ptr:set(result)
 	return my_new_ptr
 end
 
-function world_class:ptr_create_entity_group(entries)
-	local results = self:create_entity_group(entries)
+function world_class:create_entity_ptr_group(entries)
+	local results = self:create_entity_group_raw(entries)
 	
 	for name, entry in pairs(results) do
 		local my_new_ptr = entity_ptr()
