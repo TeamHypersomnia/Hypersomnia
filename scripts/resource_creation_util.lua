@@ -170,16 +170,6 @@ function create_particle_emitter_info(entries)
 	return my_info
 end
 
-function create_scriptable_info(entries)
-	local my_info = scriptable_info()
-	
-	for k, v in pairs(entries.scripted_events) do
-		my_info:add(k, v)
-	end
-	
-	return my_info
-end
-
 function set_physics_info(my_body_data, entries)
 	if entries ~= nil then
 		recursive_write(my_body_data, entries, { "vertices" } )
