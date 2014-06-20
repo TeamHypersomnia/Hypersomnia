@@ -43,8 +43,7 @@ function world_class:handle_message_callbacks()
 		"damage_message",
 		"intent_message",
 		"collision_message",
-		"shot_message",
-		"destroy_message"
+		"shot_message"
 	}
 	
 	for i=1, #message_names do
@@ -55,17 +54,19 @@ function world_class:handle_message_callbacks()
 				local msg = message_vector:at(j)
 				
 				local entity_self = msg.subject.script
-		
-				local message_callback = entity_self[message_names[i]]
 				
-				-- call an entity-specific callback for this message
-				if message_callback  ~= nil then
-					message_callback (entity_self, msg)
-				end
-				
-				-- call a generic callback for this message
-				if entity_self["message"] ~= nil then
-					entity_self:message(message_names[i], msg)
+				if entity_self ~= nil then
+					local message_callback = entity_self[message_names[i]]
+					
+					-- call an entity-specific callback for this message
+					if message_callback  ~= nil then
+						message_callback (entity_self, msg)
+					end
+					
+					-- call a generic callback for this message
+					if entity_self["message"] ~= nil then
+						entity_self:message(message_names[i], msg)
+					end
 				end
 			end
 		end

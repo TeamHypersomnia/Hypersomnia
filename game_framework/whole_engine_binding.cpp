@@ -144,16 +144,17 @@ std::string remove_filename_from_path(std::string input_path) {
 	return std::string(wpath.begin(), wpath.end()) + "\\";
 }
 
+
+
 void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 	using namespace resources;
 	using namespace helpers;
 
 	auto& raw = wrapper.raw;
-	luaL_openlibs(raw);
 	luabind::open(raw);
+	luaL_openlibs(raw);
 
 	//luabind::bind_class_info(lua_state);
-
 	lua_register(raw, "bitor", bitor);
 	lua_register(raw, "bitflag", bitflag);
 	luabind::module(raw)[
