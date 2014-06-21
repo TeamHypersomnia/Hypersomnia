@@ -103,6 +103,44 @@ Now about testing - we should create multiple instances of client in the same ap
 We will split screens and render portions of the scene accordingly.
 
 
+--------------------------------------------
+SERVER ARCHITECTURE
+--------------------------------------------
+
+We'll need an entity system here so even the on_connection logic is encapsulated in a separate system
+client_component is a module that makes a requests for synchronization and receives it
+
+
+synchronization components will be transmitted on object creation and will only contain some flags like,
+whether to synchronize movement+orientation, and they will also hold lag-compensation specific data for given problem domain
+
+for example movementsynchronization component will hold a flag whether to synchronize rotation + position or just position,
+and will additionally hold history of past positions for lag compensation which will be used by raycasthit detection system or smthn like that
+
+
+We will send packets that will contain whole data per-object sequentially;
+so if we consider using entity systems, there can only be one networking(or called "synchronization") component.
+The component itself will contain an array of modules (movementsynchro, orientationsynchro etc) each of which will have its own update function that writes to a bitstream.
+
+We will have gameplay components and a single synchronization component (both in the same entity system).
+This way the gameplay programmer and network programmer will be able to do things in parallel.
+
+But do we really need an ECS architecture for this? Surely, for gameplay, but the synchronization is another beast.
+
+Even where there is 1:1 system-component relationship, ECSes will be useful to handle things like adding/removing objects from global arrays and automatically
+assigning them.
+
+When transmitting entities to client, we will simply attach a bitfield saying what synchronization modules are there to read from incoming bitstreams.
+
+We will use message-oriented approach.
+This will yield the following advantages:
+- when posting an event you only worry about the caller; there are going to be several callee's we don't think about at the moment
+this means that when you'd want to post an artificial network packet, you don't have to call all handlers like player movement handler,
+but instead all the potentially interested systems process the message for you later.
+
+you'll more likely notice it better as soon as the system's complexity increases, as for now it seems like only the way functions are called is different.
+
+- in C++ we would anyway use this design for several other reasons so its best to structure the code so if we're to port the code to C++ after prototyping, it will be more intuitive to do so
 
 --------------------------------------------
 MIXING LUA WITH C++
