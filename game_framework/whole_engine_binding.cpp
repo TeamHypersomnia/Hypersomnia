@@ -40,6 +40,7 @@ namespace bindings {
 	extern luabind::scope
 		_sfml_audio(),
 
+		_id_generator(),
 		_minmax(),
 		_vec2(),
 		_value_animator(),
@@ -163,6 +164,7 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 			misc::vector_wrapper<float>::bind("float_vector"),
 
 			bindings::_sfml_audio(),
+			bindings::_id_generator(),
 			bindings::_minmax(),
 			bindings::_vec2(),
 			misc::vector_wrapper<vec2<>>::bind_vector("vec2_vector"),
