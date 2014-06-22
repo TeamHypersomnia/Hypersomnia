@@ -23,7 +23,7 @@ namespace augs {
 			}
 			
 			bool release_id(T id) {
-				registered_ids.erase(counter);
+				return registered_ids.erase(counter) > 0u;
 			}
 
 			bool exists(T id) {

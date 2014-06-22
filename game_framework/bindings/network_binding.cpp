@@ -116,6 +116,7 @@ namespace bindings {
 			luabind::def("ReadRakNetGUID", ReadGuid),
 			luabind::def("WriteRakNetGUID", WriteGuid),
 
+			luabind::def("WriteBit", WritePOD<bool>),
 			luabind::def("WriteInt", WritePOD<int>),
 			luabind::def("WriteByte", WritePOD<unsigned char>),
 			luabind::def("WriteUint", WritePOD<unsigned>),
@@ -125,6 +126,7 @@ namespace bindings {
 			luabind::def("Writeb2Vec2", WritePOD<b2Vec2>),
 			luabind::def("WriteVec2", WritePOD<vec2<>>),
 
+			luabind::def("ReadBit", ReadPOD<bool>),
 			luabind::def("ReadInt", ReadPOD<int>),
 			luabind::def("ReadByte", ReadPOD<unsigned char>),
 			luabind::def("ReadUint", ReadPOD<unsigned>),
