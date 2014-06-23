@@ -142,6 +142,41 @@ you'll more likely notice it better as soon as the system's complexity increases
 
 - in C++ we would anyway use this design for several other reasons so its best to structure the code so if we're to port the code to C++ after prototyping, it will be more intuitive to do so
 
+
+
+About synchronization:
+we'll likely apply a simple division over update types:
+- reliable events, like "he's now standing still at pos..", "this got deleted/created"
+- streaming, visual unreliable events
+
+thus whole reliable state of the object can be updated regardless of the current streamed visual state (pos/vel);
+and the reliable state for movement module will be simply whether the object is sleeping or not.
+
+
+As soon as we introduce only-proximity updates, the modules will hold a per-client most recently transmitted state, so when the client gets into the proximity of the object again,
+we will only send data that has changed since the client last saw the object. 
+
+Then the client_system:add_client won't call "full_state" on synchronization modules, but rather "delta_state" again but just with a pointer to the client as an another argument.
+
+But for the sake of simplicity now, we will only keep one state per module for delta encoding.
+
+
+Now what if we see an object and then get far away from it, then the object gets destroyed and then we come back to the same place?
+We could solve this by making deletion events global to all of those clients who have ever seen the object.
+
+
+There is a problem regarding objects moving and later standing still.
+Whereas a notification about sleeping may arrive after or before the last movement packet and it will be ok,
+if a notification about awakening arrives after some post-awakening movement updates, then these packets get discarded and basically we're waiting for potential retransmission of an awakening packet.
+
+we could solve this by acknowledging all unreliable sequenced packets from the client and on server just consider an object as sleeping as soon as an acknowledgement 
+that a client has received a vel=0 update arrives.
+
+The client could send these acknowledgements only when it receives an update containing an object with zero velocity.
+
+
+The client should also detect when an object goes outside its view (proximity) and further hide it until it gets a message from the server about its new position/velocity.
+
 --------------------------------------------
 MIXING LUA WITH C++
 --------------------------------------------
