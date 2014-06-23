@@ -375,3 +375,7 @@ table.erase = function(self, element)
 		end
 	end
 end
+
+function bool2int(expr)
+	if expr then return 1 else return 0 end
+end

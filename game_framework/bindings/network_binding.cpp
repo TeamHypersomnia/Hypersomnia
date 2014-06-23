@@ -32,6 +32,10 @@ void WritePOD(RakNet::BitStream& bs, T data) {
 	bs.Write<T>(data);
 }
 
+void WriteBitstream(RakNet::BitStream& in, RakNet::BitStream& out) {
+	in.WriteBits(out.GetData(), out.GetNumberOfBitsUsed(), false);
+}
+
 template <class T>
 T ReadPOD(RakNet::BitStream& bs) {
 	T data;
@@ -109,6 +113,8 @@ namespace bindings {
 			.def(luabind::constructor<>())
 			.def("IgnoreBytes", &RakNet::BitStream::IgnoreBytes)
 			.def("ReadRakString", &RakNet::BitStream::Read<RakNet::RakString>)
+			.def("size", &RakNet::BitStream::GetNumberOfBitsUsed)
+			.def("Reset", &RakNet::BitStream::Reset)
 			,
 
 			/* little helpers */
@@ -116,6 +122,7 @@ namespace bindings {
 			luabind::def("ReadRakNetGUID", ReadGuid),
 			luabind::def("WriteRakNetGUID", WriteGuid),
 
+			luabind::def("WriteBitstrean", WriteBitstream),
 			luabind::def("WriteBit", WritePOD<bool>),
 			luabind::def("WriteInt", WritePOD<int>),
 			luabind::def("WriteByte", WritePOD<unsigned char>),
