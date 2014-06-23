@@ -37,7 +37,7 @@ function client_screen:constructor(camera_rect)
 					end
 					
 					local bsOut = BitStream()
-					WriteByte(bsOut, network_message.ID_COMMAND)
+					WriteByte(bsOut, protocol.message.COMMAND)
 					WriteByte(bsOut, name_to_command[desired_command .. intent_to_name[message.intent]])
 					
 					this_client.client:send(bsOut, send_priority.IMMEDIATE_PRIORITY, send_reliability.RELIABLE_ORDERED, 0, this_client.server_guid, false)
@@ -67,7 +67,7 @@ function client_screen:loop()
 			print("A client lost the connection.\n")
 			
 			
-		elseif message_type == network_message.ID_INITIAL_STATE then
+		elseif message_type == protocol.message.INITIAL_STATE then
 			local bsIn = self.received:get_bitstream()
 			bsIn:IgnoreBytes(1)
 			local num_players = ReadUint(bsIn)
@@ -79,7 +79,7 @@ function client_screen:loop()
 			end
 			
 			print "Initial state transferred."
-		elseif message_type == network_message.ID_NEW_PLAYER then
+		elseif message_type == protocol.message.NEW_PLAYER then
 		
 			local bsIn = self.received:get_bitstream()
 			bsIn:IgnoreBytes(1)
@@ -88,7 +88,7 @@ function client_screen:loop()
 			self.remote_client_map:add(remote_guid, create_remote_player(self.sample_scene, self.sample_scene.teleport_position, remote_guid))
 			print("New client connected.")
 			
-		elseif message_type == network_message.ID_PLAYER_DISCONNECTED then
+		elseif message_type == protocol.message.PLAYER_DISCONNECTED then
 			local bsIn = self.received:get_bitstream()
 			bsIn:IgnoreBytes(1)
 			local disconnected_guid = ReadRakNetGUID(bsIn)
@@ -99,7 +99,7 @@ function client_screen:loop()
 			
 			print("Player disconnected.")
 		
-		elseif message_type == network_message.ID_STATE_UPDATE then
+		elseif message_type == protocol.message.STATE_UPDATE then
 			local bsIn = self.received:get_bitstream()
 			bsIn:IgnoreBytes(1)
 				
@@ -125,7 +125,7 @@ function client_screen:loop()
 			end
 			
 		else
-			print(network_message.ID_NEW_PLAYER)
+			print(protocol.message.NEW_PLAYER)
 			print("Message with identifier " .. message_type .. " has arrived.")
 		end	
 	end
