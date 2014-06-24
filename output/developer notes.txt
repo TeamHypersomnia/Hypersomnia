@@ -174,9 +174,40 @@ that a client has received a vel=0 update arrives.
 
 The client could send these acknowledgements only when it receives an update containing an object with zero velocity.
 
+Another problem arises when a client gets into proximity of an object and first gets its zero-velocity update, succesfully acknowledges it but only then does it get its NEW_OBJECTS message.
+This will be solved by introducing another flag per client called "ack_received" which is set to true on every acknowledgement and set to false on every new state sent.
+
 
 The client should also detect when an object goes outside its view (proximity) and further hide it until it gets a message from the server about its new position/velocity.
+There's another problem when this object is standing still - since the client is not receiving updates about it, it also won't get any update once it gets out and enters its proximity.
+(but the client will hide it)
 
+This may be solved by server setting zero-velocity-acked state to false when an object enters the client's proximity.
+
+
+Perhaps we could use only unreliable sequenced channel even for object states.
+This way we'd have more control over how many packets are sent whereas using built-in raknet's reliable layer you don't know.
+
+Now we could replace the acked/updated flags in remote_states and just have a single "acked" flag.
+
+
+ But perhaps it's just a premature optimization.
+
+A thing to note is that the vast majority of our network traffic will be streamed data that can't be delta compressed in any way (positions, velocities, orientations)
+and the rest will be one-shot events (shooting, dropped weapons, weapons picked up, caused damage)
+the actual state changes like changing outfits will happen so rarely that there's no point in introducing delta compression for them.
+ 
+A way to go would be to think about actual use-cases; think about things we want to synchronize and think whether using delta's will help them.
+ 
+ 
+Another thing to note is that if snapshot based unreliable sequenced updates are only to lower the bandwidth we can throw it right away.
+
+Consider introducing functionality like NetChannel without delta snapshots; that may very well be enough for our needs.
+client component could hold an array of reliable events which then would be added to the outgoing bitstream.
+ 
+Each incoming reliable message will have an opportunity to invalidate existing reliable messages in case it is "more recent" than the other.
+
+The client should also have its own instance of NetChannel since it will also send reliable messages.
 --------------------------------------------
 MIXING LUA WITH C++
 --------------------------------------------
