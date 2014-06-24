@@ -32,7 +32,7 @@ namespace augs {
 
 			static luabind::scope bind(const char* class_name) {
 				return
-					luabind::class_<id_generator<unsigned short>>(class_name)
+					luabind::class_<id_generator<T>>(class_name)
 					.def(luabind::constructor<>())
 					.def("can_be_generated", &can_be_generated)
 					.def("generate_id", &generate_id)

@@ -5,6 +5,8 @@
 #include "network/network_interface.h"
 #include "misc/map_wrapper.h"
 
+#include "network/net_channel.h"
+
 struct connection_attempt_result {};
 struct send_priority {};
 struct send_reliability {};
@@ -49,6 +51,17 @@ namespace bindings {
 
 		return
 			(
+
+			luabind::class_<reliable_channel_sender::message>("net_channel_message")
+			.def(luabind::constructor<>()),
+			
+			luabind::class_<reliable_channel_sender>("net_channel_sender")
+			.def(luabind::constructor<>()),
+			
+			luabind::class_<reliable_channel_receiver>("net_channel_sender")
+			.def(luabind::constructor<>()),
+
+
 			luabind::class_<network_message>("network_message")
 			.enum_("network_message")[
 				luabind::value("ID_CONNECTION_REQUEST_ACCEPTED", ID_CONNECTION_REQUEST_ACCEPTED),
