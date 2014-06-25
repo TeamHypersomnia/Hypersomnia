@@ -1,6 +1,6 @@
 #pragma once
 #include "stdafx.h"
-#include "net_channel.h"
+#include "reliable_channel.h"
 
 namespace augs {
 	namespace network {
@@ -51,24 +51,25 @@ namespace augs {
 		}
 
 		void reliable_sender::read_ack(RakNet::BitStream& input) {
-			unsigned short incoming_ack;
-			input.Read(incoming_ack);
+			unsigned short incoming_ack = 0u;
 
-			if (sequence_more_recent(incoming_ack, ack_sequence)) {
-				auto num_messages_to_erase = sequence_to_reliable_range.find(incoming_ack);
-				
-				if (num_messages_to_erase != sequence_to_reliable_range.end()) {
-					reliable_buf.erase(reliable_buf.begin(), reliable_buf.begin() + (*num_messages_to_erase).second);
+			if (input.Read(incoming_ack)) {
+				if (sequence_more_recent(incoming_ack, ack_sequence)) {
+					auto num_messages_to_erase = sequence_to_reliable_range.find(incoming_ack);
 
-					/* for now just clear the sequence history,
-					we'll implement partial updates on the client later
+					if (num_messages_to_erase != sequence_to_reliable_range.end()) {
+						reliable_buf.erase(reliable_buf.begin(), reliable_buf.begin() + (*num_messages_to_erase).second);
 
-					from now on the client won't acknowledge any other packets than those with ack_sequence equal to incoming_ack,
-					we can safely clear the sequence history.
-					*/
-					sequence_to_reliable_range.clear();
+						/* for now just clear the sequence history,
+						we'll implement partial updates on the client later
 
-					ack_sequence = incoming_ack;
+						from now on the client won't acknowledge any other packets than those with ack_sequence equal to incoming_ack,
+						we can safely clear the sequence history.
+						*/
+						sequence_to_reliable_range.clear();
+
+						ack_sequence = incoming_ack;
+					}
 				}
 			}
 		}

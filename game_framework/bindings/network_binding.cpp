@@ -6,7 +6,7 @@
 #include "misc/map_wrapper.h"
 #include "misc/vector_wrapper.h"
 
-#include "network/net_channel.h"
+#include "network/reliable_channel.h"
 
 struct connection_attempt_result {};
 struct send_priority {};
@@ -172,7 +172,7 @@ namespace bindings {
 			.def_readwrite("ack_sequence", &reliable_sender::ack_sequence)
 			,
 
-			luabind::class_<reliable_receiver>("net_channel_sender")
+			luabind::class_<reliable_receiver>("reliable_receiver")
 			.def(luabind::constructor<>())
 			.def_readwrite("last_sequence", &reliable_receiver::last_sequence)
 			.def("read_sequence", &reliable_receiver::read_sequence)
