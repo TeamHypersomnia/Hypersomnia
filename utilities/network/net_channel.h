@@ -26,7 +26,7 @@ namespace augs {
 			unsigned short ack_sequence = 0u;
 
 			void post_message(message&);
-			void write_data(RakNet::BitStream& output);
+			bool write_data(RakNet::BitStream& output);
 			void read_ack(RakNet::BitStream& input);
 		};
 

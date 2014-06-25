@@ -4,6 +4,7 @@
 
 #include "network/network_interface.h"
 #include "misc/map_wrapper.h"
+#include "misc/vector_wrapper.h"
 
 #include "network/net_channel.h"
 
@@ -151,6 +152,8 @@ namespace bindings {
 			.def_readwrite("flag_for_deletion", &reliable_channel_sender::message::flag_for_deletion)
 			.def_readwrite("script", &reliable_channel_sender::message::script)
 			.def_readwrite("output_bitstream", &reliable_channel_sender::message::output_bitstream),
+			
+			misc::vector_wrapper<reliable_channel_sender::message>::bind_vector("net_channel_message_vector"),
 
 			luabind::class_<reliable_channel_sender>("net_channel_sender")
 			.def(luabind::constructor<>())

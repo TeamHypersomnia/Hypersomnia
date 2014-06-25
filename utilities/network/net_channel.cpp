@@ -20,7 +20,7 @@ namespace augs {
 			reliable_buf.push_back(output);
 		}
 
-		void reliable_channel_sender::write_data(RakNet::BitStream& output) {
+		bool reliable_channel_sender::write_data(RakNet::BitStream& output) {
 			for (auto& iter : sequence_to_reliable_range) {
 				auto new_value = iter.second;
 
@@ -35,6 +35,10 @@ namespace augs {
 			reliable_buf.erase(std::remove_if(reliable_buf.begin(), reliable_buf.end(), [](const message& m){ return m.flag_for_deletion; }), reliable_buf.end());
 
 			output.Write(++sequence);
+
+			if (reliable_buf.empty())
+				return false;
+
 			output.Write(ack_sequence);
 
 			for (auto& msg : reliable_buf)
@@ -42,6 +46,8 @@ namespace augs {
 					output.WriteBits(msg.output_bitstream->GetData(), msg.output_bitstream->GetNumberOfBitsUsed(), false);
 			
 			sequence_to_reliable_range[sequence] = reliable_buf.size();
+		
+			return true;
 		}
 
 		void reliable_channel_sender::read_ack(RakNet::BitStream& input) {
@@ -49,19 +55,21 @@ namespace augs {
 			input.Read(incoming_ack);
 
 			if (sequence_more_recent(incoming_ack, ack_sequence)) {
-				auto num_messages_to_erase = sequence_to_reliable_range[incoming_ack];
+				auto num_messages_to_erase = sequence_to_reliable_range.find(incoming_ack);
+				
+				if (num_messages_to_erase != sequence_to_reliable_range.end()) {
+					reliable_buf.erase(reliable_buf.begin(), reliable_buf.begin() + (*num_messages_to_erase).second);
 
-				reliable_buf.erase(reliable_buf.begin(), reliable_buf.begin() + num_messages_to_erase);
-
-				/* for now just clear the sequence history,
+					/* for now just clear the sequence history,
 					we'll implement partial updates on the client later
 
 					from now on the client won't acknowledge any other packets than those with ack_sequence equal to incoming_ack,
 					we can safely clear the sequence history.
-				*/
-				sequence_to_reliable_range.clear();
+					*/
+					sequence_to_reliable_range.clear();
 
-				ack_sequence = incoming_ack;
+					ack_sequence = incoming_ack;
+				}
 			}
 		}
 		
