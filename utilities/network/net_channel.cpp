@@ -16,11 +16,11 @@ namespace augs {
 				(s2 - s1  > std::numeric_limits<T>::max() / 2);
 		}
 		
-		void reliable_channel_sender::post_message(message& output) {
+		void reliable_sender::post_message(message& output) {
 			reliable_buf.push_back(output);
 		}
 
-		bool reliable_channel_sender::write_data(RakNet::BitStream& output) {
+		bool reliable_sender::write_data(RakNet::BitStream& output) {
 			for (auto& iter : sequence_to_reliable_range) {
 				auto new_value = iter.second;
 
@@ -50,7 +50,7 @@ namespace augs {
 			return true;
 		}
 
-		void reliable_channel_sender::read_ack(RakNet::BitStream& input) {
+		void reliable_sender::read_ack(RakNet::BitStream& input) {
 			unsigned short incoming_ack;
 			input.Read(incoming_ack);
 
@@ -73,23 +73,24 @@ namespace augs {
 			}
 		}
 		
-		bool reliable_channel_receiver::read_sequence(RakNet::BitStream& input) {
+		int reliable_receiver::read_sequence(RakNet::BitStream& input) {
 			unsigned short update_to_sequence = 0u;
 			unsigned short update_from_sequence = 0u;
 
 			input.Read(update_to_sequence);
 			input.Read(update_from_sequence);
 
-			if (sequence_more_recent(update_to_sequence, last_sequence) && update_from_sequence == last_sequence) {
+			bool is_recent = sequence_more_recent(update_to_sequence, last_sequence);
+			if (is_recent && update_from_sequence == last_sequence) {
 				last_sequence = update_to_sequence;
-				return true;
+				
+				return RELIABLE_RECEIVED;
 			}
-			else {
-				return false;
-			}
+			else if (is_recent) return ONLY_UNRELIABLE_RECEIVED;
+			else return NOTHING_RECEIVED;
 		}
 
-		void reliable_channel_receiver::write_ack(RakNet::BitStream& output) {
+		void reliable_receiver::write_ack(RakNet::BitStream& output) {
 			output.Write(last_sequence);
 		}
 	}
@@ -102,11 +103,11 @@ using namespace augs;
 using namespace network;
 
 TEST(NetChannel, SingleTransmissionDeleteAllPending) {
-	reliable_channel_sender sender;
-	reliable_channel_receiver receiver;
+	reliable_sender sender;
+	reliable_receiver receiver;
 
 	RakNet::BitStream bs[15];
-	reliable_channel_sender::message msg[15];
+	reliable_sender::message msg[15];
 
 	for (int i = 0; i < 15; ++i) {
 		bs[i].Write(int(i));
@@ -140,11 +141,11 @@ TEST(NetChannel, SingleTransmissionDeleteAllPending) {
 }
 
 TEST(NetChannel, PastAcknowledgementDeletesSeveralPending) {
-	reliable_channel_sender sender;
-	reliable_channel_receiver receiver;
+	reliable_sender sender;
+	reliable_receiver receiver;
 
 	RakNet::BitStream bs[15];
-	reliable_channel_sender::message msg[15];
+	reliable_sender::message msg[15];
 
 	for (int i = 0; i < 15; ++i) {
 		bs[i].Write(int(i));
@@ -186,11 +187,11 @@ TEST(NetChannel, PastAcknowledgementDeletesSeveralPending) {
 }
 
 TEST(NetChannel, FlagForDeletionAndAck) {
-	reliable_channel_sender sender;
-	reliable_channel_receiver receiver;
+	reliable_sender sender;
+	reliable_receiver receiver;
 
 	RakNet::BitStream bs[15];
-	reliable_channel_sender::message msg[15];
+	reliable_sender::message msg[15];
 
 	for (int i = 0; i < 15; ++i) {
 		bs[i].Write(int(i));
@@ -260,8 +261,8 @@ TEST(NetChannel, FlagForDeletionAndAck) {
 
 TEST(NetChannel, SequenceNumberOverflowMultipleTries) {
 
-	reliable_channel_sender sender;
-	reliable_channel_receiver receiver;
+	reliable_sender sender;
+	reliable_receiver receiver;
 
 	sender.sequence = std::numeric_limits<unsigned short>::max();
 	sender.ack_sequence = std::numeric_limits<unsigned short>::max();
@@ -270,7 +271,7 @@ TEST(NetChannel, SequenceNumberOverflowMultipleTries) {
 
 	for (int k = 0; k < 10; ++k) {
 		RakNet::BitStream bs[15];
-		reliable_channel_sender::message msg[15];
+		reliable_sender::message msg[15];
 
 		for (int i = 0; i < 15; ++i) {
 			bs[i].Write(int(i));
@@ -341,8 +342,8 @@ TEST(NetChannel, SequenceNumberOverflowMultipleTries) {
 
 
 TEST(NetChannel, OutOfDatePackets) {
-	reliable_channel_sender sender;
-	reliable_channel_receiver receiver;
+	reliable_sender sender;
+	reliable_receiver receiver;
 
 	sender.sequence = std::numeric_limits<unsigned short>::max();
 	sender.ack_sequence = std::numeric_limits<unsigned short>::max();
@@ -351,7 +352,7 @@ TEST(NetChannel, OutOfDatePackets) {
 
 	for (int k = 0; k < 10; ++k) {
 		RakNet::BitStream bs[15];
-		reliable_channel_sender::message msg[15];
+		reliable_sender::message msg[15];
 
 		for (int i = 0; i < 15; ++i) {
 			bs[i].Write(int(i));

@@ -10,7 +10,7 @@
 
 namespace augs {
 	namespace network {
-		struct reliable_channel_sender {
+		struct reliable_sender {
 			struct message {
 				luabind::object script;
 				bool flag_for_deletion = false;
@@ -30,10 +30,17 @@ namespace augs {
 			void read_ack(RakNet::BitStream& input);
 		};
 
-		struct reliable_channel_receiver {
+		struct reliable_receiver {
 			unsigned short last_sequence = 0u;
 
-			bool read_sequence(RakNet::BitStream& input);
+			enum result {
+				RELIABLE_RECEIVED,
+				ONLY_UNRELIABLE_RECEIVED,
+				NOTHING_RECEIVED
+			};
+
+			/* returns result enum */
+			int read_sequence(RakNet::BitStream& input);
 			void write_ack(RakNet::BitStream& input);
 		};
 	}

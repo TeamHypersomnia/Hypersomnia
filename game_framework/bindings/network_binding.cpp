@@ -13,6 +13,8 @@ struct send_priority {};
 struct send_reliability {};
 struct network_message {};
 
+struct receive_result {};
+
 void Write(RakNet::BitStream& bs, const std::string& str) {
 	bs.Write(str.c_str());
 }
@@ -148,26 +150,33 @@ namespace bindings {
 			luabind::def("Readb2Vec2", ReadPOD<b2Vec2>),
 			luabind::def("ReadVec2", ReadPOD<vec2<>>),
 
-			luabind::class_<reliable_channel_sender::message>("net_channel_message")
-			.def_readwrite("flag_for_deletion", &reliable_channel_sender::message::flag_for_deletion)
-			.def_readwrite("script", &reliable_channel_sender::message::script)
-			.def_readwrite("output_bitstream", &reliable_channel_sender::message::output_bitstream),
-			
-			misc::vector_wrapper<reliable_channel_sender::message>::bind_vector("net_channel_message_vector"),
+			luabind::class_<receive_result>("receive_result")
+			.enum_("receive_result")[
+				luabind::value("RELIABLE_RECEIVED", reliable_receiver::RELIABLE_RECEIVED),
+				luabind::value("ONLY_UNRELIABLE_RECEIVED", reliable_receiver::ONLY_UNRELIABLE_RECEIVED),
+				luabind::value("NOTHING_RECEIVED", reliable_receiver::NOTHING_RECEIVED)
+			],
 
-			luabind::class_<reliable_channel_sender>("net_channel_sender")
+			luabind::class_<reliable_sender::message>("net_channel_message")
+			.def_readwrite("flag_for_deletion", &reliable_sender::message::flag_for_deletion)
+			.def_readwrite("script", &reliable_sender::message::script)
+			.def_readwrite("output_bitstream", &reliable_sender::message::output_bitstream),
+			
+			misc::vector_wrapper<reliable_sender::message>::bind_vector("net_channel_message_vector"),
+
+			luabind::class_<reliable_sender>("reliable_sender")
 			.def(luabind::constructor<>())
-			.def("post_message", &reliable_channel_sender::post_message)
-			.def_readwrite("reliable_buf", &reliable_channel_sender::reliable_buf)
-			.def_readwrite("sequence", &reliable_channel_sender::sequence)
-			.def_readwrite("ack_sequence", &reliable_channel_sender::ack_sequence)
+			.def("post_message", &reliable_sender::post_message)
+			.def_readwrite("reliable_buf", &reliable_sender::reliable_buf)
+			.def_readwrite("sequence", &reliable_sender::sequence)
+			.def_readwrite("ack_sequence", &reliable_sender::ack_sequence)
 			,
 
-			luabind::class_<reliable_channel_receiver>("net_channel_sender")
+			luabind::class_<reliable_receiver>("net_channel_sender")
 			.def(luabind::constructor<>())
-			.def_readwrite("last_sequence", &reliable_channel_receiver::last_sequence)
-			.def("read_sequence", &reliable_channel_receiver::read_sequence)
-			.def("write_ack", &reliable_channel_receiver::write_ack),
+			.def_readwrite("last_sequence", &reliable_receiver::last_sequence)
+			.def("read_sequence", &reliable_receiver::read_sequence)
+			.def("write_ack", &reliable_receiver::write_ack),
 
 			map_wrapper<RakNet::RakNetGUID, luabind::object>::bind("guid_to_object_map"),
 
