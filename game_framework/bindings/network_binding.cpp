@@ -121,8 +121,10 @@ namespace bindings {
 			.def("ReadRakString", &RakNet::BitStream::Read<RakNet::RakString>)
 			.def("size", &RakNet::BitStream::GetNumberOfBitsUsed)
 			.def("Reset", &RakNet::BitStream::Reset)
+			.def("ResetReadPointer", &RakNet::BitStream::ResetReadPointer)
+			.def("SetReadOffset", &RakNet::BitStream::SetReadOffset)
 			,
-
+			
 
 			/* little helpers */
 			luabind::def("WriteCString", Write),
@@ -168,9 +170,10 @@ namespace bindings {
 			.def(luabind::constructor<>())
 			.def("post_message", &reliable_sender::post_message)
 			.def_readwrite("reliable_buf", &reliable_sender::reliable_buf)
+			.def_readwrite("unreliable_buf", &reliable_sender::unreliable_buf)
 			.def_readwrite("sequence", &reliable_sender::sequence)
 			.def_readwrite("ack_sequence", &reliable_sender::ack_sequence)
-			,
+			, 
 
 			luabind::class_<reliable_receiver>("reliable_receiver")
 			.def(luabind::constructor<>())

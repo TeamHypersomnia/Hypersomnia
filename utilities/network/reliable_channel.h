@@ -17,11 +17,13 @@ namespace augs {
 
 				RakNet::BitStream* output_bitstream = nullptr;
 			};
-			
+
 			std::vector<message> reliable_buf;
+			RakNet::BitStream* unreliable_buf = nullptr;
 
 			std::unordered_map<unsigned, unsigned> sequence_to_reliable_range;
 
+			unsigned short unreliable_only_sequence = 0u;
 			unsigned short sequence = 0u;
 			unsigned short ack_sequence = 0u;
 
@@ -32,6 +34,7 @@ namespace augs {
 
 		struct reliable_receiver {
 			unsigned short last_sequence = 0u;
+			unsigned short last_unreliable_only_sequence = 0u;
 
 			enum result {
 				RELIABLE_RECEIVED,

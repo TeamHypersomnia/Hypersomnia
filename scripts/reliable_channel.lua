@@ -2,6 +2,8 @@ reliable_sender_class = inherits_from ()
 
 function reliable_sender_class:constructor() 
 	self.channel = reliable_sender()
+	self.unreliable_buf = BitStream()
+	self.channel.unreliable_buf = self.unreliable_buf
 end
 
 function reliable_sender_class:post(message)

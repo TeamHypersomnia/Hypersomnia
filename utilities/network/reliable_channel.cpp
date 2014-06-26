@@ -21,6 +21,7 @@ namespace augs {
 		}
 
 		bool reliable_sender::write_data(RakNet::BitStream& output) {
+			/* handle messages flagged for deletion by decremending reliable ranges in history */
 			for (auto& iter : sequence_to_reliable_range) {
 				auto new_value = iter.second;
 
@@ -32,20 +33,33 @@ namespace augs {
 				iter.second = new_value;
 			}
 
+			/* delete flagged messages from vector */
 			reliable_buf.erase(std::remove_if(reliable_buf.begin(), reliable_buf.end(), [](const message& m){ return m.flag_for_deletion; }), reliable_buf.end());
 
-			output.Write(++sequence);
-
-			if (reliable_buf.empty())
+			/* if we have nothing to send */
+			if (reliable_buf.empty() && unreliable_buf && unreliable_buf->GetNumberOfBitsUsed() <= 0)
 				return false;
 
-			output.Write(ack_sequence);
+			/* reliable + maybe unreliable */
+			if (!reliable_buf.empty()) {
+				output.Write<bool>(1);
+				output.Write(++sequence);
+				output.Write(ack_sequence);
 
-			for (auto& msg : reliable_buf)
-				if(msg.output_bitstream) 
-					output.WriteBits(msg.output_bitstream->GetData(), msg.output_bitstream->GetNumberOfBitsUsed(), false);
-			
-			sequence_to_reliable_range[sequence] = reliable_buf.size();
+				for (auto& msg : reliable_buf)
+					if (msg.output_bitstream)
+						output.WriteBits(msg.output_bitstream->GetData(), msg.output_bitstream->GetNumberOfBitsUsed(), false);
+
+				sequence_to_reliable_range[sequence] = reliable_buf.size();
+			}
+			/* only unreliable */
+			else {
+				output.Write<bool>(0);
+				output.Write(++unreliable_only_sequence);
+			}
+
+			/* either way append unreliable buffer */
+			if (unreliable_buf) output.WriteBits(unreliable_buf->GetData(), unreliable_buf->GetNumberOfBitsUsed(), false);
 		
 			return true;
 		}
@@ -78,17 +92,39 @@ namespace augs {
 			unsigned short update_to_sequence = 0u;
 			unsigned short update_from_sequence = 0u;
 
-			input.Read(update_to_sequence);
-			input.Read(update_from_sequence);
+			bool contains_reliable_data = false;
+			if (!input.Read<bool>(contains_reliable_data)) return NOTHING_RECEIVED;
 
-			bool is_recent = sequence_more_recent(update_to_sequence, last_sequence);
-			if (is_recent && update_from_sequence == last_sequence) {
-				last_sequence = update_to_sequence;
-				
-				return RELIABLE_RECEIVED;
+			/* reliable + maybe unreliable */
+			if (contains_reliable_data) {
+				if (!input.Read(update_to_sequence)) return NOTHING_RECEIVED;
+				if (!input.Read(update_from_sequence)) return NOTHING_RECEIVED;
+
+				bool is_recent = sequence_more_recent(update_to_sequence, last_sequence);
+				if (is_recent && update_from_sequence == last_sequence) {
+					last_sequence = update_to_sequence;
+
+					return RELIABLE_RECEIVED;
+				}
+				/* if we couldn't match state numbers so that they could be updated,
+				we can only rely on the unreliable data of the moment - but only if the sequence number is more recent
+				*/
+				else if (is_recent) return ONLY_UNRELIABLE_RECEIVED;
+				else return NOTHING_RECEIVED;
 			}
-			else if (is_recent) return ONLY_UNRELIABLE_RECEIVED;
-			else return NOTHING_RECEIVED;
+			/* only unreliable */
+			else {
+				if (!input.Read(update_to_sequence)) return NOTHING_RECEIVED;
+				
+				if (sequence_more_recent(update_to_sequence, last_unreliable_only_sequence)) {
+					last_unreliable_only_sequence = update_to_sequence;
+
+					return ONLY_UNRELIABLE_RECEIVED;
+				}
+				
+				/* discard out of date packets */
+				return NOTHING_RECEIVED;
+			}
 		}
 
 		void reliable_receiver::write_ack(RakNet::BitStream& output) {

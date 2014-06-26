@@ -379,3 +379,12 @@ end
 function bool2int(expr)
 	if expr then return 1 else return 0 end
 end
+
+
+function copy_bitstream_for_reading(input_bs)
+	local copy_bs = BitStream()
+	WriteBitstream(copy_bs, input_bs)
+	copy_bs:SetReadOffset(input_bs:GetReadOffset())
+	
+	return copy_bs
+end
