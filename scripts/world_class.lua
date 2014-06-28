@@ -38,6 +38,41 @@ function world_class:constructor()
 	self.is_paused = false
 end
 
+function world_class:get_messages(message_name)
+	return _G["get_" .. message_name .. "_queue"](self.world)
+end
+
+function world_class:get_messages_filter_components(message_name, needed_components)
+	local output_messages = {}
+	
+	local message_vector = self:get_messages(message_names[i])
+	
+	if message_vector:size() > 0 then
+		for i=0, message_vector:size()-1 do
+			local msg = message_vector:at(i)
+			
+			local entity_self = msg.subject.script
+			
+			if entity_self ~= nil then
+				local matches = true
+				
+				for n=1, #needed_components do
+					if entity_self[needed_components[n]] == nil then
+						matches = false
+						break
+					end
+				end
+				
+				if matches then
+					table.insert(output_messages, msg)
+				end
+			end
+		end
+	end
+	
+	return output_messages			
+end
+
 function world_class:handle_message_callbacks()
 	local message_names = {
 		"damage_message",
@@ -47,7 +82,7 @@ function world_class:handle_message_callbacks()
 	}
 	
 	for i=1, #message_names do
-		local message_vector = _G["get_" .. message_names[i] .. "_queue"](self.world)
+		local message_vector = self:get_messages(message_names[i])
 		
 		if message_vector:size() > 0 then
 			for j=0, message_vector:size()-1 do
@@ -62,7 +97,7 @@ function world_class:handle_message_callbacks()
 					if message_callback  ~= nil then
 						message_callback (entity_self, msg)
 					end
-					
+
 					-- call a generic callback for this message
 					if entity_self["message"] ~= nil then
 						entity_self:message(message_names[i], msg)
@@ -81,6 +116,7 @@ function world_class:process_all_systems()
 	world:validate_delayed_messages()
 	world:flush_message_queues()
 	
+	-- physics must run first because the substep routine may flush message queues
 	if not self.is_paused then 
 		my_instance.physics_system:process_entities(world)
     end

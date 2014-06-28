@@ -123,6 +123,7 @@ namespace bindings {
 			.def("Reset", &RakNet::BitStream::Reset)
 			.def("ResetReadPointer", &RakNet::BitStream::ResetReadPointer)
 			.def("SetReadOffset", &RakNet::BitStream::SetReadOffset)
+			.def("GetNumberOfUnreadBits", &RakNet::BitStream::SetReadOffset)
 			,
 			
 
