@@ -208,6 +208,63 @@ client component could hold an array of reliable events which then would be adde
 Each incoming reliable message will have an opportunity to invalidate existing reliable messages in case it is "more recent" than the other.
 
 The client should also have its own instance of NetChannel since it will also send reliable messages.
+
+
+
+
+The only places where clients and server synchronize object states are classes from sync_modules. Note that we may also want to synchronize appearance of objects,
+and so there should be "appearance_module" that handles things like outfits or just simply environmental object textures.
+
+For now just stick to basic_player + remote_player classes in the client, then experiment with modules.
+
+It might be necessary for the server to send a message every time an object gets out of player's proximity.
+
+
+--------------------------------------------
+TRANSFERRING OBJECT STATE
+--------------------------------------------
+
+if the entity was not yet transmitted to us, then there is an archetype identifier to read
+spawn the entity according to the given archetype and add synchronization component
+
+we may consider just adding an "appearance" module which handles things like outfits
+or whether the entity has legs underneath.
+
+for now just spawn a remote player
+
+for the moment, spawn an entity with only synchronization component attached - 
+if the looping logic decides, it may later add any component the entity needs deducing from module set.
+
+how about separating concerns - synchronization system (or rather module receiving system) only receives and alters DATA
+inside these objects.
+
+what if on the client, sync objects were just another components? bad idea, that doesn't solve anything
+
+on the server - modules are actually the right thing to do - we don't need to duplicate variables;
+the modules themselves can get them from parent entity
+we might need to duplicate them for the sake of comparision if we introduce delta;
+or we can simply have an update flag for each module to upload whole module again.
+
+on the client modules can simply modify their parent entities in place whenever new data arrives.
+then the modules themselves may impose a particular component's existence, for example health or outfit.
+
+
+the problem we're seeing here is that the whole entity and its components are to be determined based upon the data 
+that may arrive within the modules themselves - 
+if modules call their own writing logic from input data (eg. velocity setting for box2d bodies),
+then we can't call them when the entity is newly created;
+on the other side, existence of some game components may depend on either module existence or its particular setting;
+for example "has_legs" in appearance_sync module induces creation of another cpp entity.
+
+we could make it like this: let the synchronization system worry only about receiving/altering data for the modules.
+the modules would save everything that is received inside appropriate variables then used in an "update" function,
+called only AFTER entity creation.
+
+the asymmetry comes from the fact that on the server it is the developer that creates whole entity and its modules;
+and there, game components and modules don't even have to match,
+whereas the client has to deduce how to represent these modules with game components.
+
+
 --------------------------------------------
 MIXING LUA WITH C++
 --------------------------------------------
