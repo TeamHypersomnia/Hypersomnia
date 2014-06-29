@@ -1,25 +1,27 @@
 protocol = {}
 
+-- enables modules to be read/written correctly in order
 protocol.module_mappings = {
 	"movement",
 	"orientation"
 }
+
+protocol.GAME_TRANSMISSION = network_event.ID_USER_PACKET_ENUM + 1
 
 protocol.messages = {
 	-- client to server
 	"COMMAND",
 	
 	-- server to client
-	"INITIAL_STATE",
-	
-	"NEW_OBJECTS",
-	"DELETE_OBJECT",
+	"ASSIGN_SYNC_ID",
 	
 	-- used for guaranteed in-order delivery state changes
-	"STATE_UPDATE"
+	"STATE_UPDATE",
 	-- used for sequenced visuals like positions/velocities
-	"STREAM_UPDATE"
+	"STREAM_UPDATE",
 	-- we must have these two types of updates because of differing transportation methods
+	
+	"DELETE_OBJECT"
 }
 
 
@@ -44,16 +46,18 @@ protocol.name_to_command = {
 protocol.name_to_intent = {}
 protocol.command_to_name = {}
 
-for k, v in pairs (name_to_command) do
+for k, v in pairs (protocol.name_to_command) do
 	protocol.command_to_name[v] = k
 end
 
-for k, v in pairs (intent_to_name) do
+for k, v in pairs (protocol.intent_to_name) do
 	protocol.name_to_intent[v] = k
 end
 
-for i=1, #protocol.messages[i] do
-	local new_table = {}
-
-	new_table[protocol.messages[i]] = network_message.ID_USER_PACKET_ENUM + i
+local new_msg_table = {}
+	
+for i=1, #protocol.messages do
+	new_msg_table[protocol.messages[i]] = i
 end	
+
+protocol.messages = new_msg_table
