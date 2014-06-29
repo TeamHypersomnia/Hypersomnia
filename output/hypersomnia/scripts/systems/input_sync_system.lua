@@ -36,8 +36,8 @@ function input_sync_system:update()
 			end
 			
 			local output_bs = BitStream()
-			WriteByte(output_bs, protocol.message.COMMAND)
-			WriteByte(output_bs, protocol.name_to_command[desired_command .. protocol.intent_to_name[msg.intent]])
+			output_bs:WriteByte(protocol.message.COMMAND)
+			output_bs:WriteByte(protocol.name_to_command[desired_command .. protocol.intent_to_name[msg.intent]])
 			
 			self.owner_entity_system.all_systems["client"].reliable_sender:post_bitstream(output_bs)
 		end

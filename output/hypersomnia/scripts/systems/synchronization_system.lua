@@ -12,7 +12,7 @@ function synchronization_system:read_object_state(object, input_bs)
 	local modules = object.synchronization.modules
 			
 	for i=1, #protocol.module_mappings do
-		if ReadBit(input_bs) then
+		if input_bs:ReadBit() then
 			local module_name = protocol.module_mappings[i]
 			
 			if modules[module_name] == nil then
@@ -39,10 +39,10 @@ function synchronization_system:read_object_stream(object, input_bs)
 end
 
 function synchronization_system:update_states_from_bitstream(input_bs)
-	local num_of_objects = ReadUshort(input_bs)
+	local num_of_objects = input_bs:ReadUshort()
 
 	for i=1, num_of_objects do
-		local incoming_id = ReadUshort(input_bs)
+		local incoming_id = input_bs:ReadUshort()
 		
 		local is_object_new;
 		local object = self.object_by_id[incoming_id]
@@ -54,7 +54,7 @@ function synchronization_system:update_states_from_bitstream(input_bs)
 			object = { synchronization = { modules = {}, id = incoming_id } }
 		end	
 		
-		self:read_object_state(object, input_bitstream)
+		self:read_object_state(object, input_bs)
 		
 		if is_object_new then
 			-- if the object was just created, create an entity before updating object state
@@ -64,7 +64,7 @@ function synchronization_system:update_states_from_bitstream(input_bs)
 			
 			if incoming_id == self.my_sync_id then
 				new_entity = components.create_components {
-					cpp_entity = self.owner_scene.player,
+					cpp_entity = self.owner_scene.player.body,
 					input_sync = {}
 				}
 			else
@@ -91,11 +91,11 @@ end
 
 
 function synchronization_system:update_streams_from_bitstream(input_bs)
-	local num_of_objects = ReadUshort(input_bs)
+	local num_of_objects = input_bs:ReadUshort()
 
 	for i=1, num_of_objects do
 		-- we assume streams never contain a non-existent id
-		self:read_object_stream(self.object_by_id[ReadUshort(input_bs)], input_bs)
+		self:read_object_stream(self.object_by_id[input_bs:ReadUshort()], input_bs)
 	end
 end
 
@@ -107,19 +107,18 @@ function synchronization_system:update()
 		
 		-- read commands until we come to the end of the buffer
 		while input_bs:GetNumberOfUnreadBits() >= 8 do
-			local command_type = ReadByte(input_bs)
-		
+			local command_type = input_bs:ReadByte()
 			if command_type == protocol.messages.STATE_UPDATE then
 				self:update_states_from_bitstream(input_bs)
 			elseif command_type == protocol.messages.STREAM_UPDATE then
 				self:update_streams_from_bitstream(input_bs)
 			elseif command_type == protocol.messages.DELETE_OBJECT then
-				local removed_id = ReadUshort(input_bs)
+				local removed_id = input_bs:ReadUshort()
 				self.owner_entity_system:remove_entity(self.object_by_id[removed_id])
 				
 				self.object_by_id[removed_id] = nil	
 			elseif command_type == protocol.messages.ASSIGN_SYNC_ID then
-				self.my_sync_id = ReadUshort(input_bs)
+				self.my_sync_id = input_bs:ReadUshort()
 			end
 		end
 	end

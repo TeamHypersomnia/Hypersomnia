@@ -57,13 +57,13 @@ function reliable_channel:write_data()
 	-- send updates over UDP/IP
 	if self.sender:write_data(output_bs) or self.ack_requested then
 		-- write a dumb byte to differentiate from raknet's network messages 
-		WriteByte(final_bs, protocol.GAME_TRANSMISSION)
+		final_bs:WriteByte(protocol.GAME_TRANSMISSION)
 	
 		-- redundantly write an ack for the the remote sender
 		self.receiver:write_ack(final_bs)
 		self.ack_requested = false
 		
-		WriteBitstream(final_bs, output_bs)	
+		final_bs:WriteBitstream(output_bs)	
 	end
 	
 	return final_bs

@@ -51,7 +51,6 @@ function client_screen:loop()
 	
 	if (self.server:receive(self.received)) then
 		local message_type = self.received:byte(0)
-		print (message_type)
 			
 		if message_type == network_event.ID_CONNECTION_REQUEST_ACCEPTED then
 			self.systems.client.server_guid = self.received:guid()
