@@ -18,6 +18,31 @@ struct network_message {};
 
 struct receive_result {};
 
+std::string auto_string_indent(std::string in) {
+	size_t i = 0;
+	int level = 0;
+
+	while (i < in.length()) {
+		switch(in[i]) {
+		case '{': ++level; break;
+		case '}': --level; break;
+		case '\n': {
+			bool end_found = false;
+			if (i + 1 < in.length())
+				end_found = in[i + 1] == '}';
+
+			in.insert(i+1, (level-end_found)*2, ' '); 
+		}
+			break;
+		default: break;
+		}
+
+		++i;
+	}
+
+	return in;
+}
+
 
 namespace bindings {
 	luabind::scope _network_binding() {
@@ -25,6 +50,7 @@ namespace bindings {
 
 		return
 			(
+			luabind::def("auto_string_indent", auto_string_indent),
 
 			luabind::class_<network_message>("network_event")
 			.enum_("network_event")[
@@ -89,6 +115,7 @@ namespace bindings {
 			luabind::class_<bitstream>("BitStream")
 			.def(luabind::constructor<>())
 			.def_readwrite("content", &bitstream::content)
+			.def("name_property", &bitstream::name_property)
 			.def("IgnoreBytes", &bitstream::IgnoreBytes)
 			.def("ReadRakString", &bitstream::Read<RakNet::RakString>)
 			.def("size", &bitstream::GetNumberOfBitsUsed)

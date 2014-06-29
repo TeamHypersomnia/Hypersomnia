@@ -12,9 +12,20 @@ namespace augs {
 		struct bitstream {
 			RakNet::BitStream stream;
 			std::string content;
+			std::string next_property;
 			
 			RakNet::BitStream& get_stream() {
 				return stream;
+			}
+
+			void name_property(std::string str) {
+				next_property = str;
+			}
+			
+			std::string get_next_property() {
+				auto copy = next_property;
+				next_property.clear();
+				return copy;
 			}
 
 			template <class T>
@@ -22,7 +33,16 @@ namespace augs {
 				stream.Write(in);
 				std::stringstream instr;
 
-				instr << typeid(T).name() << ": " << in << std::endl;
+				instr << typeid(T).name() << " " << get_next_property() << " = " << in << std::endl;
+				content += instr.str();
+			}
+
+			template <>
+			void Write(unsigned char const& in) {
+				stream.Write(in);
+				std::stringstream instr;
+
+				instr << typeid(unsigned char).name() << " " << get_next_property() << " = " << int(in) << std::endl;
 				content += instr.str();
 			}
 
@@ -36,20 +56,25 @@ namespace augs {
 				stream.Write(in);
 				std::stringstream instr;
 
-				instr << typeid(T).name() << ": " << in.x << '\t' << in.y << std::endl;
+				instr << typeid(T).name() << " " << get_next_property() << " = " << in.x << '\t' << in.y << std::endl;
 				content += instr.str();
 			}
-
+			
 			void WriteString(const std::string& str) {
 				stream.Write(str.c_str());
-				content += "std::string: ";
+				content += "std::string ";
+				content += get_next_property() + ':';
 				content += str;
 				content += '\n';
 			}
 
 			void WriteBitstream(bitstream& other) {
-				stream.WriteBits(other.stream.GetData(), other.stream.GetNumberOfBitsUsed(), false);
-				content += other.content;
+				if (other.stream.GetNumberOfBitsUsed() > 0) {
+					stream.WriteBits(other.stream.GetData(), other.stream.GetNumberOfBitsUsed(), false);
+
+					content += '\n' + get_next_property() + std::string(" { \n") + other.content;
+					content += "\n}";
+				}
 			}
 
 			void WriteGuid(RakNet::RakNetGUID& guid) {

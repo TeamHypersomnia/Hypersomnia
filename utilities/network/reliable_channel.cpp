@@ -43,25 +43,34 @@ namespace augs {
 
 			/* reliable + maybe unreliable */
 			if (!reliable_buf.empty()) {
+				output.name_property("has_reliable");
 				output.Write<bool>(1);
+				output.name_property("sequence");
 				output.Write(++sequence);
+				output.name_property("ack_sequence");
 				output.Write(ack_sequence);
 
 				for (auto& msg : reliable_buf)
-					if (msg.output_bitstream)
+					if (msg.output_bitstream) {
+						output.name_property("reliable message");
 						output.WriteBitstream(*msg.output_bitstream);
+					}
 
 				sequence_to_reliable_range[sequence] = reliable_buf.size();
 			}
 			/* only unreliable */
 			else {
+				output.name_property("has_reliable");
 				output.Write<bool>(0);
+				output.name_property("unreliable_only_sequence");
 				output.Write(++unreliable_only_sequence);
 			}
 
 			/* either way append unreliable buffer */
-			if (unreliable_buf) 
+			if (unreliable_buf)  {
+				output.name_property("unreliable buffer");
 				output.WriteBitstream(*unreliable_buf);
+			}
 		
 			return true;
 		}
@@ -130,6 +139,7 @@ namespace augs {
 		}
 
 		void reliable_receiver::write_ack(bitstream& output) {
+			output.name_property("receiver channel ack");
 			output.Write(last_sequence);
 		}
 	}
