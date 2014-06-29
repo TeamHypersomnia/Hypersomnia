@@ -45,7 +45,7 @@ function debug.my_traceback()
 	file:write(outstr .. globals_str)
 	file:close()
 	
-	return outstr
+	return debug.traceback()
 end
 
 function count_all(f)

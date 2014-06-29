@@ -45,7 +45,7 @@ end
 function world_class:get_messages_filter_components(message_name, needed_components)
 	local output_messages = {}
 	
-	local message_vector = self:get_messages(message_names[i])
+	local message_vector = self:get_messages(message_name)
 	
 	if message_vector:size() > 0 then
 		for i=0, message_vector:size()-1 do

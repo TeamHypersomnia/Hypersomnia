@@ -17,8 +17,8 @@ function entity_system:flush_messages()
 	end
 end
 
-function entity_system:post(msg_name, msg_table)
-	table.insert(self.messages[msg_name], msg_table)
+function entity_system:post(msg_table)
+	table.insert(self.messages[msg_table.name], msg_table)
 end
 
 function entity_system:register_systems(new_systems)
@@ -83,7 +83,11 @@ components.create_components = function(entry)
 	local output = {}
 	
 	for k, v in pairs(entry) do
-		output[k] = components[k]:create(v)
+		if type(v) == "table" then
+			output[k] = components[k]:create(v)
+		else
+			output[k] = v
+		end
 	end	
 	
 	return output

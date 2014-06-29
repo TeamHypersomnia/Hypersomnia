@@ -11,7 +11,9 @@
 namespace framework {
 	void init() {
 		augs::init();
+	}
 
+	void run_tests() {
 		int argc = 0;
 		::testing::InitGoogleTest(&argc, (wchar_t**)nullptr);
 
