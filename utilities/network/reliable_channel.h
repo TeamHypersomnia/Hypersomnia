@@ -3,23 +3,20 @@
 #include <unordered_map>
 #include <memory>
 
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
-#include "RakNetTypes.h"
-
 namespace augs {
 	namespace network {
+		struct bitstream;
+
 		struct reliable_sender {
 			struct message {
 				luabind::object script;
 				bool flag_for_deletion = false;
 
-				RakNet::BitStream* output_bitstream = nullptr;
+				bitstream* output_bitstream = nullptr;
 			};
 
 			std::vector<message> reliable_buf;
-			RakNet::BitStream* unreliable_buf = nullptr;
+			bitstream* unreliable_buf = nullptr;
 
 			std::unordered_map<unsigned, unsigned> sequence_to_reliable_range;
 
@@ -28,8 +25,8 @@ namespace augs {
 			unsigned short ack_sequence = 0u;
 
 			void post_message(message&);
-			bool write_data(RakNet::BitStream& output);
-			void read_ack(RakNet::BitStream& input);
+			bool write_data(bitstream& output);
+			void read_ack(bitstream& input);
 		};
 
 		struct reliable_receiver {
@@ -43,8 +40,8 @@ namespace augs {
 			};
 
 			/* returns result enum */
-			int read_sequence(RakNet::BitStream& input);
-			void write_ack(RakNet::BitStream& input);
+			int read_sequence(bitstream& input);
+			void write_ack(bitstream& input);
 		};
 	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "reliable_channel.h"
+#include "bitstream_wrapper.h"
 
 namespace augs {
 	namespace network {
@@ -20,7 +21,7 @@ namespace augs {
 			reliable_buf.push_back(output);
 		}
 
-		bool reliable_sender::write_data(RakNet::BitStream& output) {
+		bool reliable_sender::write_data(bitstream& output) {
 			/* handle messages flagged for deletion by decremending reliable ranges in history */
 			for (auto& iter : sequence_to_reliable_range) {
 				auto new_value = iter.second;
@@ -48,7 +49,7 @@ namespace augs {
 
 				for (auto& msg : reliable_buf)
 					if (msg.output_bitstream)
-						output.WriteBits(msg.output_bitstream->GetData(), msg.output_bitstream->GetNumberOfBitsUsed(), false);
+						output.WriteBitstream(*msg.output_bitstream);
 
 				sequence_to_reliable_range[sequence] = reliable_buf.size();
 			}
@@ -59,12 +60,13 @@ namespace augs {
 			}
 
 			/* either way append unreliable buffer */
-			if (unreliable_buf) output.WriteBits(unreliable_buf->GetData(), unreliable_buf->GetNumberOfBitsUsed(), false);
+			if (unreliable_buf) 
+				output.WriteBitstream(*unreliable_buf);
 		
 			return true;
 		}
 
-		void reliable_sender::read_ack(RakNet::BitStream& input) {
+		void reliable_sender::read_ack(bitstream& input) {
 			unsigned short incoming_ack = 0u;
 
 			if (input.Read(incoming_ack)) {
@@ -88,7 +90,7 @@ namespace augs {
 			}
 		}
 		
-		int reliable_receiver::read_sequence(RakNet::BitStream& input) {
+		int reliable_receiver::read_sequence(bitstream& input) {
 			unsigned short update_to_sequence = 0u;
 			unsigned short update_from_sequence = 0u;
 
@@ -127,7 +129,7 @@ namespace augs {
 			}
 		}
 
-		void reliable_receiver::write_ack(RakNet::BitStream& output) {
+		void reliable_receiver::write_ack(bitstream& output) {
 			output.Write(last_sequence);
 		}
 	}
@@ -143,7 +145,7 @@ TEST(NetChannel, SingleTransmissionDeleteAllPending) {
 	reliable_sender sender;
 	reliable_receiver receiver;
 
-	RakNet::BitStream bs[15];
+	bitstream bs[15];
 	reliable_sender::message msg[15];
 
 	for (int i = 0; i < 15; ++i) {
@@ -157,8 +159,8 @@ TEST(NetChannel, SingleTransmissionDeleteAllPending) {
 	sender.post_message(msg[2]);
 	sender.post_message(msg[3]);
 
-	RakNet::BitStream sender_bs;
-	RakNet::BitStream receiver_bs;
+	bitstream sender_bs;
+	bitstream receiver_bs;
 
 	sender.write_data(sender_bs);
 
@@ -181,7 +183,7 @@ TEST(NetChannel, PastAcknowledgementDeletesSeveralPending) {
 	reliable_sender sender;
 	reliable_receiver receiver;
 
-	RakNet::BitStream bs[15];
+	bitstream bs[15];
 	reliable_sender::message msg[15];
 
 	for (int i = 0; i < 15; ++i) {
@@ -189,8 +191,8 @@ TEST(NetChannel, PastAcknowledgementDeletesSeveralPending) {
 		msg[i].output_bitstream = &bs[i];
 	}
 
-	RakNet::BitStream sender_packets[15];
-	RakNet::BitStream receiver_packet;
+	bitstream sender_packets[15];
+	bitstream receiver_packet;
 
 	/* post four messages */
 	sender.post_message(msg[0]);
@@ -227,7 +229,7 @@ TEST(NetChannel, FlagForDeletionAndAck) {
 	reliable_sender sender;
 	reliable_receiver receiver;
 
-	RakNet::BitStream bs[15];
+	bitstream bs[15];
 	reliable_sender::message msg[15];
 
 	for (int i = 0; i < 15; ++i) {
@@ -235,8 +237,8 @@ TEST(NetChannel, FlagForDeletionAndAck) {
 		msg[i].output_bitstream = &bs[i];
 	}
 
-	RakNet::BitStream sender_packets[15];
-	RakNet::BitStream receiver_packet;
+	bitstream sender_packets[15];
+	bitstream receiver_packet;
 
 	/* post four messages */
 	sender.post_message(msg[0]);
@@ -307,7 +309,7 @@ TEST(NetChannel, SequenceNumberOverflowMultipleTries) {
 	receiver.last_sequence = std::numeric_limits<unsigned short>::max();
 
 	for (int k = 0; k < 10; ++k) {
-		RakNet::BitStream bs[15];
+		bitstream bs[15];
 		reliable_sender::message msg[15];
 
 		for (int i = 0; i < 15; ++i) {
@@ -315,8 +317,8 @@ TEST(NetChannel, SequenceNumberOverflowMultipleTries) {
 			msg[i].output_bitstream = &bs[i];
 		}
 
-		RakNet::BitStream sender_packets[15];
-		RakNet::BitStream receiver_packet;
+		bitstream sender_packets[15];
+		bitstream receiver_packet;
 
 		/* post four messages */
 		sender.post_message(msg[0]);
@@ -388,7 +390,7 @@ TEST(NetChannel, OutOfDatePackets) {
 	receiver.last_sequence = std::numeric_limits<unsigned short>::max();
 
 	for (int k = 0; k < 10; ++k) {
-		RakNet::BitStream bs[15];
+		bitstream bs[15];
 		reliable_sender::message msg[15];
 
 		for (int i = 0; i < 15; ++i) {
@@ -396,8 +398,8 @@ TEST(NetChannel, OutOfDatePackets) {
 			msg[i].output_bitstream = &bs[i];
 		}
 
-		RakNet::BitStream sender_packets[15];
-		RakNet::BitStream receiver_packet;
+		bitstream sender_packets[15];
+		bitstream receiver_packet;
 
 		/* post four messages */
 		sender.post_message(msg[0]);

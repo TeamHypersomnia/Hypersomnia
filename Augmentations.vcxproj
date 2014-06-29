@@ -2009,6 +2009,8 @@
     <ClInclude Include="utilities\graphics\text\word_separator.h" />
     <ClInclude Include="utilities\misc\file_watcher.h" />
     <ClInclude Include="utilities\misc\id_generator.h" />
+    <ClInclude Include="utilities\network\bitstream.h" />
+    <ClInclude Include="utilities\network\bitstream_wrapper.h" />
     <ClInclude Include="utilities\network\network_interface.h" />
     <ClInclude Include="utilities\network\reliable_channel.h" />
     <ClInclude Include="utilities\options.h" />

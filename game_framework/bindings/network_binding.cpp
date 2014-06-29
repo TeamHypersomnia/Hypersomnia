@@ -2,11 +2,14 @@
 #include "stdafx.h"
 #include "bindings.h"
 
+#include <sstream>
+
 #include "network/network_interface.h"
 #include "misc/map_wrapper.h"
 #include "misc/vector_wrapper.h"
 
 #include "network/reliable_channel.h"
+#include "network/bitstream_wrapper.h"
 
 struct connection_attempt_result {};
 struct send_priority {};
@@ -15,38 +18,6 @@ struct network_message {};
 
 struct receive_result {};
 
-void Write(RakNet::BitStream& bs, const std::string& str) {
-	bs.Write(str.c_str());
-}
-
-void WriteGuid(RakNet::BitStream& bs, RakNet::RakNetGUID& guid) {
-	bs.Write(guid.g);
-}
-
-RakNet::RakNetGUID ReadGuid(RakNet::BitStream& bs) {
-	RakNet::RakNetGUID guid;
-
-	decltype(guid.g) my_id;
-	bs.Read(my_id);
-
-	return RakNet::RakNetGUID(my_id);
-}
-
-template <class T>
-void WritePOD(RakNet::BitStream& bs, T data) {
-	bs.Write<T>(data);
-}
-
-void WriteBitstream(RakNet::BitStream& in, RakNet::BitStream& out) {
-	in.WriteBits(out.GetData(), out.GetNumberOfBitsUsed(), false);
-}
-
-template <class T>
-T ReadPOD(RakNet::BitStream& bs) {
-	T data;
-	bs.Read<T>(data);
-	return data;
-}
 
 namespace bindings {
 	luabind::scope _network_binding() {
@@ -55,8 +26,8 @@ namespace bindings {
 		return
 			(
 
-			luabind::class_<network_message>("network_message")
-			.enum_("network_message")[
+			luabind::class_<network_message>("network_event")
+			.enum_("network_event")[
 				luabind::value("ID_CONNECTION_REQUEST_ACCEPTED", ID_CONNECTION_REQUEST_ACCEPTED),
 				luabind::value("ID_CONNECTION_ATTEMPT_FAILED", ID_CONNECTION_ATTEMPT_FAILED),
 				luabind::value("ID_ALREADY_CONNECTED", ID_ALREADY_CONNECTED),
@@ -115,43 +86,42 @@ namespace bindings {
 			luabind::class_<RakNet::RakNetGUID>("RakNetGUID")
 			.def(luabind::constructor<>()),
 
-			luabind::class_<RakNet::BitStream>("BitStream")
+			luabind::class_<bitstream>("BitStream")
 			.def(luabind::constructor<>())
-			.def("IgnoreBytes", &RakNet::BitStream::IgnoreBytes)
-			.def("ReadRakString", &RakNet::BitStream::Read<RakNet::RakString>)
-			.def("size", &RakNet::BitStream::GetNumberOfBitsUsed)
-			.def("Reset", &RakNet::BitStream::Reset)
-			.def("ResetReadPointer", &RakNet::BitStream::ResetReadPointer)
-			.def("SetReadOffset", &RakNet::BitStream::SetReadOffset)
-			.def("GetNumberOfUnreadBits", &RakNet::BitStream::SetReadOffset)
-			,
+			.def_readwrite("content", &bitstream::content)
+			.def("IgnoreBytes", &bitstream::IgnoreBytes)
+			.def("ReadRakString", &bitstream::Read<RakNet::RakString>)
+			.def("size", &bitstream::GetNumberOfBitsUsed)
+			.def("Reset", &bitstream::Reset)
+			.def("ResetReadPointer", &bitstream::ResetReadPointer)
+			.def("SetReadOffset", &bitstream::SetReadOffset)
+			.def("GetReadOffset", &bitstream::GetReadOffset)
+			.def("GetNumberOfUnreadBits", &bitstream::GetNumberOfUnreadBits)
+
+			.def("WriteBitstream", &bitstream::WriteBitstream)
+			.def("WriteBit", &bitstream::WritePOD<bool>)
+			.def("WriteInt", &bitstream::WritePOD<int>)
+			.def("WriteByte", &bitstream::WritePOD<unsigned char>)
+			.def("WriteUint", &bitstream::WritePOD<unsigned>)
+			.def("WriteUshort", &bitstream::WritePOD<unsigned short>)
+			.def("WriteFloat", &bitstream::WritePOD<float>)
+			.def("WriteDouble", &bitstream::WritePOD<double>)
+			.def("Writeb2Vec2", &bitstream::WriteVec<b2Vec2>)
+			.def("WriteVec2", &bitstream::WriteVec<vec2<>>)
+
+			.def("ReadRakNetGUID", &bitstream::ReadGuid)
+			.def("WriteRakNetGUID", &bitstream::WriteGuid)
 			
-
-			/* little helpers */
-			luabind::def("WriteCString", Write),
-			luabind::def("ReadRakNetGUID", ReadGuid),
-			luabind::def("WriteRakNetGUID", WriteGuid),
-
-			luabind::def("WriteBitstrean", WriteBitstream),
-			luabind::def("WriteBit", WritePOD<bool>),
-			luabind::def("WriteInt", WritePOD<int>),
-			luabind::def("WriteByte", WritePOD<unsigned char>),
-			luabind::def("WriteUint", WritePOD<unsigned>),
-			luabind::def("WriteUshort", WritePOD<unsigned short>),
-			luabind::def("WriteFloat", WritePOD<float>),
-			luabind::def("WriteDouble", WritePOD<double>),
-			luabind::def("Writeb2Vec2", WritePOD<b2Vec2>),
-			luabind::def("WriteVec2", WritePOD<vec2<>>),
-
-			luabind::def("ReadBit", ReadPOD<bool>),
-			luabind::def("ReadInt", ReadPOD<int>),
-			luabind::def("ReadByte", ReadPOD<unsigned char>),
-			luabind::def("ReadUint", ReadPOD<unsigned>),
-			luabind::def("ReadUshort", ReadPOD<unsigned short>),
-			luabind::def("ReadFloat", ReadPOD<float>),
-			luabind::def("ReadDouble", ReadPOD<double>),
-			luabind::def("Readb2Vec2", ReadPOD<b2Vec2>),
-			luabind::def("ReadVec2", ReadPOD<vec2<>>),
+			.def("ReadBit", &bitstream::ReadPOD<bool>)
+			.def("ReadInt", &bitstream::ReadPOD<int>)
+			.def("ReadByte", &bitstream::ReadPOD<unsigned char>)
+			.def("ReadUint", &bitstream::ReadPOD<unsigned>)
+			.def("ReadUshort", &bitstream::ReadPOD<unsigned short>)
+			.def("ReadFloat", &bitstream::ReadPOD<float>)
+			.def("ReadDouble", &bitstream::ReadPOD<double>)
+			.def("Readb2Vec2", &bitstream::ReadPOD<b2Vec2>)
+			.def("ReadVec2", &bitstream::ReadPOD<vec2<>>)
+			,
 
 			luabind::class_<receive_result>("receive_result")
 			.enum_("receive_result")[
@@ -161,6 +131,7 @@ namespace bindings {
 			],
 
 			luabind::class_<reliable_sender::message>("net_channel_message")
+			.def(luabind::constructor<>())
 			.def_readwrite("flag_for_deletion", &reliable_sender::message::flag_for_deletion)
 			.def_readwrite("script", &reliable_sender::message::script)
 			.def_readwrite("output_bitstream", &reliable_sender::message::output_bitstream),
@@ -170,6 +141,8 @@ namespace bindings {
 			luabind::class_<reliable_sender>("reliable_sender")
 			.def(luabind::constructor<>())
 			.def("post_message", &reliable_sender::post_message)
+			.def("read_ack", &reliable_sender::read_ack)
+			.def("write_data", &reliable_sender::write_data)
 			.def_readwrite("reliable_buf", &reliable_sender::reliable_buf)
 			.def_readwrite("unreliable_buf", &reliable_sender::unreliable_buf)
 			.def_readwrite("sequence", &reliable_sender::sequence)

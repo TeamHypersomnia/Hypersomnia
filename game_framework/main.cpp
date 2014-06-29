@@ -6,6 +6,7 @@ using namespace augs;
 
 int main() {
 	framework::init();
+	framework::run_tests();
 
 	augs::lua_state_wrapper lua_state;
 	framework::bind_whole_engine(lua_state);
