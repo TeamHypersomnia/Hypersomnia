@@ -12,11 +12,13 @@ function synchronization_system:read_object_state(object, input_bs)
 	local modules = object.synchronization.modules
 			
 	for i=1, #protocol.module_mappings do
+		input_bs:name_property("has_module " .. i)
 		if input_bs:ReadBit() then
 			local module_name = protocol.module_mappings[i]
 			
 			if modules[module_name] == nil then
-				modules[module_name] = sync_modules[module_name]:create(object)
+				print (module_name)
+				modules[module_name] = sync_modules[module_name]:create()
 			end
 			
 			modules[module_name]:read_state(input_bs)
@@ -32,6 +34,8 @@ function synchronization_system:read_object_stream(object, input_bs)
 	local modules = object.synchronization.modules
 	
 	for i=1, #protocol.module_mappings do
+		local module_name = protocol.module_mappings[i]
+			
 		if modules[module_name] ~= nil then
 			modules[module_name]:read_stream(object, input_bs)
 		end
@@ -61,12 +65,13 @@ function synchronization_system:update_states_from_bitstream(input_bs)
 			
 			-- for now, simply create remote player object or player object if the id is ours
 			local new_entity;
-			
 			if incoming_id == self.my_sync_id then
 				new_entity = components.create_components {
 					cpp_entity = self.owner_scene.player.body,
 					input_sync = {}
 				}
+				
+				new_entity.cpp_entity.script = new_entity
 			else
 				local new_remote_player = create_remote_player(self.owner_scene)
 				
@@ -91,11 +96,15 @@ end
 
 
 function synchronization_system:update_streams_from_bitstream(input_bs)
+	input_bs:name_property("streamed_count")
 	local num_of_objects = input_bs:ReadUshort()
 
 	for i=1, num_of_objects do
+		input_bs:name_property("object_id")
 		-- we assume streams never contain a non-existent id
-		self:read_object_stream(self.object_by_id[input_bs:ReadUshort()], input_bs)
+		local incoming_id = input_bs:ReadUshort()
+		
+		self:read_object_stream(self.object_by_id[incoming_id], input_bs)
 	end
 end
 
@@ -104,15 +113,19 @@ function synchronization_system:update()
 	
 	for i=1, #msgs do
 		local input_bs = msgs[i]:get_bitstream()
-		
+		local in_size = input_bs:size()
 		-- read commands until we come to the end of the buffer
 		while input_bs:GetNumberOfUnreadBits() >= 8 do
+			input_bs:name_property("command_type")
 			local command_type = input_bs:ReadByte()
+			--print ("command: " ..  command_type .. "\nbits left: " .. input_bs:GetNumberOfUnreadBits() .. "\n")
+			
 			if command_type == protocol.messages.STATE_UPDATE then
 				self:update_states_from_bitstream(input_bs)
 			elseif command_type == protocol.messages.STREAM_UPDATE then
 				self:update_streams_from_bitstream(input_bs)
 			elseif command_type == protocol.messages.DELETE_OBJECT then
+				input_bs:name_property("removed_id")
 				local removed_id = input_bs:ReadUshort()
 				self.owner_entity_system:remove_entity(self.object_by_id[removed_id])
 				
@@ -121,6 +134,9 @@ function synchronization_system:update()
 				self.my_sync_id = input_bs:ReadUshort()
 			end
 		end
+		
+		--print("Receiving " .. in_size .. " bits: \n\n" .. input_bs.read_report .. "\n\n") 
+		print("Receiving: \n\n" .. input_bs.read_report .. "\n\n") 
 	end
 	
 	-- modules may need some work to do, e.g. prediction, appearance updating

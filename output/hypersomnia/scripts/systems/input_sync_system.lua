@@ -15,7 +15,9 @@ end
 
 function input_sync_system:update()
 	local msgs = self.subject_world:get_messages_filter_components("intent_message", { "input_sync" } )
-				
+				if #msgs > 0 then
+				print(#msgs)
+				end
 	for i=1, #msgs do
 		local msg = msgs[i]
 
@@ -36,10 +38,12 @@ function input_sync_system:update()
 			end
 			
 			local output_bs = BitStream()
-			output_bs:WriteByte(protocol.message.COMMAND)
+			output_bs:name_property("COMMAND")
+			output_bs:WriteByte(protocol.messages.COMMAND)
+			output_bs:name_property("command_id")
 			output_bs:WriteByte(protocol.name_to_command[desired_command .. protocol.intent_to_name[msg.intent]])
 			
-			self.owner_entity_system.all_systems["client"].reliable_sender:post_bitstream(output_bs)
+			self.owner_entity_system.all_systems["client"].net_channel:post_bitstream(output_bs)
 		end
 		
 	end

@@ -4,7 +4,7 @@ function client_system:constructor(network)
 	self.network = network
 		
 	-- setup reliable channel
-	self.net_channel = reliable_channel:create()
+	self.net_channel = reliable_channel_wrapper:create()
 	
 	self.my_sync_id = nil
 	
@@ -37,9 +37,10 @@ end
 
 function client_system:update_tick()
 	-- write all pending reliable and unreliable data
-	local output_bs = self.net_channel:write_data()
+	local output_bs = self.net_channel:send()
 	
 	if self.server_guid ~= nil and output_bs:size() > 0 then
+		print("Sending: \n\n" .. auto_string_indent(output_bs.content) .. "\n\n")
 		self.network:send(output_bs, send_priority.IMMEDIATE_PRIORITY, send_reliability.UNRELIABLE, 0, self.server_guid, false)
 	end
 end
