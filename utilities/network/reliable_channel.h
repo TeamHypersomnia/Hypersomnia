@@ -26,7 +26,7 @@ namespace augs {
 
 			void post_message(message&);
 			bool write_data(bitstream& output);
-			void read_ack(bitstream& input);
+			bool read_ack(bitstream& input);
 		};
 
 		struct reliable_receiver {
@@ -42,6 +42,27 @@ namespace augs {
 			/* returns result enum */
 			int read_sequence(bitstream& input);
 			void write_ack(bitstream& input);
+
+			std::string last_read_report;
+		};
+
+
+		struct reliable_channel {
+			reliable_receiver receiver;
+			reliable_sender sender;
+
+			bool add_starting_byte = false;
+			bool ack_requested = false;
+
+			std::string starting_byte_name = "GAME_TRANSMISSION";
+			unsigned char starting_byte;
+
+			void enable_starting_byte(unsigned char);
+			void disable_starting_byte();
+
+			void send(bitstream& out);
+			/* returns result enum */
+			int recv(bitstream& in);
 		};
 	}
 }

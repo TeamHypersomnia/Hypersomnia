@@ -2013,6 +2013,7 @@
     <ClInclude Include="utilities\network\bitstream_wrapper.h" />
     <ClInclude Include="utilities\network\network_interface.h" />
     <ClInclude Include="utilities\network\reliable_channel.h" />
+    <ClInclude Include="utilities\network\reliable_channel_tests.h" />
     <ClInclude Include="utilities\options.h" />
     <ClInclude Include="utilities\math\rects.h" />
     <ClInclude Include="utilities\math\vec2d.h" />

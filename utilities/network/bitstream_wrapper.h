@@ -12,8 +12,21 @@ namespace augs {
 		struct bitstream {
 			RakNet::BitStream stream;
 			std::string content;
+			std::string read_report;
 			std::string next_property;
 			
+			bitstream& operator=(const bitstream& other) {
+				stream.Reset();
+				WriteBitstream(other);
+				SetReadOffset(other.GetReadOffset());
+
+				content = other.content;
+				read_report = other.read_report;
+				next_property = other.next_property;
+
+				return *this;
+			}
+
 			RakNet::BitStream& get_stream() {
 				return stream;
 			}
@@ -52,7 +65,7 @@ namespace augs {
 			}
 
 			template <class T>
-			void WriteVec(T const& in) {
+			void WriteVec(T in) {
 				stream.Write(in);
 				std::stringstream instr;
 
@@ -68,7 +81,7 @@ namespace augs {
 				content += '\n';
 			}
 
-			void WriteBitstream(bitstream& other) {
+			void WriteBitstream(const bitstream& other) {
 				if (other.stream.GetNumberOfBitsUsed() > 0) {
 					stream.WriteBits(other.stream.GetData(), other.stream.GetNumberOfBitsUsed(), false);
 
@@ -83,14 +96,64 @@ namespace augs {
 
 			template <class T>
 			bool Read(T& out) {
-				return stream.Read(out);
+				auto result = stream.Read(out);
+				
+				std::stringstream instr;
+
+				if (result) {
+					instr << typeid(T).name() << " " << get_next_property() << " = " << out << std::endl;
+				}
+				else {
+					instr << "Couldn't read " << typeid(T).name() << " " << get_next_property() << std::endl;
+				}
+
+				read_report += instr.str();
+
+				return result;
+			}
+
+			template <>
+			bool Read(unsigned char& out) {
+				auto result = stream.Read(out);
+
+				std::stringstream instr;
+
+				if (result) {
+					instr << typeid(unsigned char).name() << " " << get_next_property() << " = " << int(out) << std::endl;
+				}
+				else {
+					instr << "Couldn't read " << typeid(unsigned char).name() << " " << get_next_property() << std::endl;
+				}
+
+				read_report += instr.str();
+
+				return result;
+			}
+
+			template <class T>
+			T ReadVec() {
+				T out;
+				auto result = stream.Read(out);
+
+				std::stringstream instr;
+
+				if (result) {
+					instr << typeid(T).name() << " " << get_next_property() << " = " << out.x << '\t' << out.y << std::endl;
+				}
+				else {
+					instr << "Couldn't read " << typeid(T).name() << " " << get_next_property() << std::endl;
+				}
+
+				read_report += instr.str();
+
+				return out;
 			}
 
 			RakNet::RakNetGUID ReadGuid() {
 				RakNet::RakNetGUID guid;
 
 				decltype(guid.g) my_id;
-				stream.Read(my_id);
+				Read(my_id);
 
 				return RakNet::RakNetGUID(my_id);
 			}
@@ -99,20 +162,25 @@ namespace augs {
 			template <class T>
 			T ReadPOD() {
 				T data;
-				stream.Read<T>(data);
+				Read(data);
 				return data;
 			}
 
 			void IgnoreBytes(unsigned int n) {
+				std::stringstream instr;
+				instr << "Ignored " << n << " bytes.\n";
+				read_report += instr.str();
+
 				return stream.IgnoreBytes(n);
 			}
 
-			RakNet::BitSize_t GetNumberOfBitsUsed() {
+			RakNet::BitSize_t GetNumberOfBitsUsed() const {
 				return stream.GetNumberOfBitsUsed();
 			}
 
 			void Reset() {
 				content = std::string();
+				read_report = std::string();
 				return stream.Reset();
 			}
 
@@ -124,12 +192,16 @@ namespace augs {
 				return stream.SetReadOffset(n);
 			}
 
-			RakNet::BitSize_t GetReadOffset() {
+			RakNet::BitSize_t GetReadOffset() const {
 				return stream.GetReadOffset();
 			}
 
-			RakNet::BitSize_t GetNumberOfUnreadBits() {
+			RakNet::BitSize_t GetNumberOfUnreadBits() const {
 				return stream.GetNumberOfUnreadBits();
+			}
+
+			RakNet::BitSize_t GetNumberOfAllBits() const {
+				return GetNumberOfUnreadBits() + GetReadOffset();
 			}
 		};
 	}

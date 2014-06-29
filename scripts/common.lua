@@ -383,8 +383,6 @@ end
 
 function copy_bitstream_for_reading(input_bs)
 	local copy_bs = BitStream()
-	copy_bs:WriteBitstream(input_bs)
-	copy_bs:SetReadOffset(input_bs:GetReadOffset())
-	
+	copy_bs:assign(input_bs)
 	return copy_bs
 end

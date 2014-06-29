@@ -115,6 +115,8 @@ namespace bindings {
 			luabind::class_<bitstream>("BitStream")
 			.def(luabind::constructor<>())
 			.def_readwrite("content", &bitstream::content)
+			.def_readwrite("read_report", &bitstream::read_report)
+			.def("assign", &bitstream::operator=)
 			.def("name_property", &bitstream::name_property)
 			.def("IgnoreBytes", &bitstream::IgnoreBytes)
 			.def("ReadRakString", &bitstream::Read<RakNet::RakString>)
@@ -146,8 +148,8 @@ namespace bindings {
 			.def("ReadUshort", &bitstream::ReadPOD<unsigned short>)
 			.def("ReadFloat", &bitstream::ReadPOD<float>)
 			.def("ReadDouble", &bitstream::ReadPOD<double>)
-			.def("Readb2Vec2", &bitstream::ReadPOD<b2Vec2>)
-			.def("ReadVec2", &bitstream::ReadPOD<vec2<>>)
+			.def("Readb2Vec2", &bitstream::ReadVec<b2Vec2>) 
+			.def("ReadVec2", &bitstream::ReadVec<vec2<>>)
 			,
 
 			luabind::class_<receive_result>("receive_result")
@@ -181,6 +183,15 @@ namespace bindings {
 			.def_readwrite("last_sequence", &reliable_receiver::last_sequence)
 			.def("read_sequence", &reliable_receiver::read_sequence)
 			.def("write_ack", &reliable_receiver::write_ack),
+
+			luabind::class_<reliable_channel>("reliable_channel")
+			.def(luabind::constructor<>())
+			.def_readwrite("receiver", &reliable_channel::receiver)
+			.def_readwrite("sender", &reliable_channel::sender)
+			.def("disable_starting_byte", &reliable_channel::disable_starting_byte)
+			.def("enable_starting_byte", &reliable_channel::enable_starting_byte)
+			.def("send", &reliable_channel::send)
+			.def("recv", &reliable_channel::recv),
 
 			map_wrapper<RakNet::RakNetGUID, luabind::object>::bind("guid_to_object_map"),
 

@@ -75,9 +75,10 @@ namespace augs {
 			return true;
 		}
 
-		void reliable_sender::read_ack(bitstream& input) {
+		bool reliable_sender::read_ack(bitstream& input) {
 			unsigned short incoming_ack = 0u;
-
+			
+			input.name_property("incoming ack");
 			if (input.Read(incoming_ack)) {
 				if (sequence_more_recent(incoming_ack, ack_sequence)) {
 					auto num_messages_to_erase = sequence_to_reliable_range.find(incoming_ack);
@@ -96,19 +97,29 @@ namespace augs {
 						ack_sequence = incoming_ack;
 					}
 				}
+
+				return true;
 			}
+
+			return false;
 		}
 		
 		int reliable_receiver::read_sequence(bitstream& input) {
+			std::stringstream report;
+
 			unsigned short update_to_sequence = 0u;
 			unsigned short update_from_sequence = 0u;
 
 			bool contains_reliable_data = false;
+			
+			input.name_property("has_reliable");
 			if (!input.Read<bool>(contains_reliable_data)) return NOTHING_RECEIVED;
 
 			/* reliable + maybe unreliable */
 			if (contains_reliable_data) {
+				input.name_property("sequence");
 				if (!input.Read(update_to_sequence)) return NOTHING_RECEIVED;
+				input.name_property("ack_sequence");
 				if (!input.Read(update_from_sequence)) return NOTHING_RECEIVED;
 
 				bool is_recent = sequence_more_recent(update_to_sequence, last_sequence);
@@ -125,6 +136,7 @@ namespace augs {
 			}
 			/* only unreliable */
 			else {
+				input.name_property("unreliable_only_sequence");
 				if (!input.Read(update_to_sequence)) return NOTHING_RECEIVED;
 				
 				if (sequence_more_recent(update_to_sequence, last_unreliable_only_sequence)) {
@@ -141,6 +153,52 @@ namespace augs {
 		void reliable_receiver::write_ack(bitstream& output) {
 			output.name_property("receiver channel ack");
 			output.Write(last_sequence);
+		}
+
+
+		void reliable_channel::enable_starting_byte(unsigned char c) {
+			starting_byte = c;
+			add_starting_byte = true;
+		}
+
+		void reliable_channel::disable_starting_byte() {
+			add_starting_byte = false;
+		}
+
+		int reliable_channel::recv(bitstream& in) {
+			if (add_starting_byte) {
+				unsigned char byte;
+				in.name_property("Starting byte");
+				in.Read(byte);
+			}
+
+			sender.read_ack(in);
+			auto recv_result = receiver.read_sequence(in);
+
+			if (recv_result == receiver.RELIABLE_RECEIVED) 
+				ack_requested = true;
+
+			return recv_result;
+		}
+
+
+		void reliable_channel::send(bitstream& out) {
+			bitstream output_bs;
+
+			if (sender.write_data(output_bs) || ack_requested) {
+				if (add_starting_byte) {
+					out.name_property(starting_byte_name);
+					out.Write(starting_byte);
+				}
+
+				receiver.write_ack(out);
+				ack_requested = false;
+
+				if (output_bs.GetNumberOfBitsUsed() > 0) {
+					out.name_property("sender channel");
+					out.WriteBitstream(output_bs);
+				}
+			}
 		}
 	}
 }
@@ -471,3 +529,5 @@ TEST(NetChannel, OutOfDatePackets) {
 	}
 
 }
+
+#include "reliable_channel_tests.h"

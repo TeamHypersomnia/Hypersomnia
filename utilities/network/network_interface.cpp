@@ -56,10 +56,12 @@ namespace augs {
 			if (output.info) {
 				output.owner = peer;
 
+				output.result_bitstream.Reset();
 				RakNet::BitStream my_stream(output.info->data, output.info->length, false);
 
 				/* we're not allocating memory in bitstream so it is safe */
 				memcpy(&output.result_bitstream.stream, &my_stream, sizeof(RakNet::BitStream));
+				
 
 				return true;
 			}
