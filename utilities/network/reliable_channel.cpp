@@ -53,8 +53,8 @@ namespace augs {
 					reliable_bs.WriteBitstream(*msg.output_bitstream);
 					}
 
-				output.name_property("reliable_length");
-				output.Write<unsigned short>(reliable_bs.GetNumberOfBitsUsed());
+				output.name_property("has_reliable");
+				output.Write<bool>(reliable_bs.GetNumberOfBitsUsed() > 0);
 				output.name_property("sequence");
 				output.Write(++sequence);
 				output.name_property("ack_sequence");
@@ -67,8 +67,8 @@ namespace augs {
 			}
 			/* only unreliable */
 			else {
-				output.name_property("reliable_length");
-				output.Write<unsigned short>(0);
+				output.name_property("has_reliable");
+				output.Write<bool>(0);
 				output.name_property("unreliable_only_sequence");
 				output.Write(++unreliable_only_sequence);
 			}
@@ -136,10 +136,10 @@ namespace augs {
 			unsigned short update_to_sequence = 0u;
 			unsigned short update_from_sequence = 0u;
 
-			unsigned short reliable_length = 0u;
+			bool reliable_length = 0u;
 			
-			input.name_property("reliable_length");
-			if (!input.Read<unsigned short>(reliable_length)) return NOTHING_RECEIVED;
+			input.name_property("has_reliable");
+			if (!input.Read<bool>(reliable_length)) return NOTHING_RECEIVED;
 
 			/* reliable + maybe unreliable */
 			if (reliable_length > 0) {
