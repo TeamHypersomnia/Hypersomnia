@@ -3,6 +3,7 @@ server_commands = inherits_from ()
 function server_commands:constructor(init)
 	self.name = "server_commands"
 	self.subject = init.subject
+	self.recv_result = init.recv_result
 	self.bitstream = init.bitstream
 end
 

@@ -26,10 +26,12 @@ function client_system:handle_incoming_commands()
 		
 		local input_bs = data:get_bitstream()
 	
+		local result = self.net_channel:recv(input_bs)
 		-- if there are some commands or streams to be read from the server
-		if self.net_channel:recv(input_bs) ~= receive_result.NOTHING_RECEIVED then
+		if result ~= receive_result.NOTHING_RECEIVED then
 			self.owner_entity_system:post( server_commands:create { 
-				bitstream = input_bs
+				bitstream = input_bs,
+				recv_result = result
 			})
 		end
 	end

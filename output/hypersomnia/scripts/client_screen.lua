@@ -53,7 +53,8 @@ function client_screen:loop()
 		local message_type = self.received:byte(0)
 			
 		if message_type == network_event.ID_CONNECTION_REQUEST_ACCEPTED then
-			self.systems.client.server_guid = self.received:guid()
+			self.server_guid = self.received:guid()
+			self.systems.client.server_guid = self.server_guid
 			print("Our connection request has been accepted.");
 		elseif message_type == network_event.ID_NO_FREE_INCOMING_CONNECTIONS then
 			print("The server is full.\n")
@@ -88,7 +89,7 @@ end
 
 function client_screen:close_connection()
 	if self.server_guid ~= nil then
-		self.client:close_connection(self.server_guid, send_priority.IMMEDIATE_PRIORITY)
+		self.server:close_connection(self.server_guid, send_priority.IMMEDIATE_PRIORITY)
 	end
 	self.server_guid = nil
 end
