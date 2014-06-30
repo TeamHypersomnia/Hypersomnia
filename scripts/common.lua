@@ -386,3 +386,10 @@ function copy_bitstream_for_reading(input_bs)
 	copy_bs:assign(input_bs)
 	return copy_bs
 end
+
+function set_rate(target, what_rate, updates_per_second)
+	target[what_rate .. "_rate"] = updates_per_second
+	target[what_rate .. "_interval_ms"] = 1000/updates_per_second
+	target[what_rate .. "_timer"] = timer()
+end
+
