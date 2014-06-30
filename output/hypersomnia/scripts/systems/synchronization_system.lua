@@ -17,7 +17,6 @@ function synchronization_system:read_object_state(object, input_bs)
 			local module_name = protocol.module_mappings[i]
 			
 			if modules[module_name] == nil then
-				print (module_name)
 				modules[module_name] = sync_modules[module_name]:create()
 			end
 			
@@ -103,17 +102,9 @@ function synchronization_system:update_streams_from_bitstream(input_bs)
 
 	for i=1, num_of_objects do
 		input_bs:name_property("object_id")
-		-- streams are unreliable; therefore, we have to check for id existence:
-		-- the reliable data with state update may have been discarded because of unmatching ack_sequence and sequence.
-		local incoming_id = input_bs:ReadUshort()
-		local object = self.object_by_id[incoming_id]
-		
-		if object ~= nil then
-			self:read_object_stream(object, input_bs)
-		else
-			-- invalidate bitstream
-			input_bs:Reset()
-		end
+		-- we never read streams if there was reliable data attached and it got mismatched, so it is
+		-- safe to assume that streams always contain existing ids
+		self:read_object_stream(self.object_by_id[input_bs:ReadUshort()], input_bs)
 	end
 end
 
