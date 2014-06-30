@@ -130,10 +130,6 @@ namespace augs {
 			return false;
 		}
 		
-		reliable_receiver::reliable_receiver() {
-			length_by_sequence[0] = 0;
-		}
-
 		int reliable_receiver::read_sequence(bitstream& input) {
 			std::stringstream report;
 
@@ -154,47 +150,18 @@ namespace augs {
 
 				bool is_recent = sequence_more_recent(update_to_sequence, last_sequence);
 
-				if (!enable_partial_updates) {
-					if (is_recent && update_from_sequence == last_sequence) {
-						last_sequence = update_to_sequence;
-						ack_requested = true;
-						return RELIABLE_RECEIVED;
-					}
-					/*
-					we can't only rely on the unreliable data of the moment
-					*/
-					else if (is_recent)
-						ack_requested = true;
-					
-					return NOTHING_RECEIVED;
+				if (is_recent && update_from_sequence == last_sequence) {
+					last_sequence = update_to_sequence;
+					ack_requested = true;
+					return RELIABLE_RECEIVED;
 				}
-				else {
-					/* the story is quite different when we consider partial updates 
-					
-					we only ever consider the most recent sequences
-					*/
-					if (is_recent) {
-						/* count how many bits should we skip */
-						unsigned skip_bits = length_by_sequence[last_sequence] - length_by_sequence[update_from_sequence];
-						
-						if (!(length_by_sequence[last_sequence] >= length_by_sequence[update_from_sequence])) {
-							int breakp = 22;
-							breakp = 10;
-						}
-						length_by_sequence[update_from_sequence] = 0;
-
-						length_by_sequence[update_to_sequence] = reliable_length;
-
-						input.IgnoreBits(skip_bits);
-						last_sequence = update_to_sequence;
-
-						/* only to induce acknowledgement */
-						return RELIABLE_RECEIVED;
-					}
-					
-					return NOTHING_RECEIVED;
-				}
-
+				/*
+				we can't only rely on the unreliable data of the moment
+				*/
+				else if (is_recent)
+					ack_requested = true;
+				
+				return NOTHING_RECEIVED;
 			}
 			/* only unreliable */
 			else {
@@ -265,73 +232,6 @@ namespace augs {
 
 using namespace augs;
 using namespace network;
-
-TEST(NetChannel, PartialUpdates) {
-	reliable_channel a, b;
-	a.enable_starting_byte(135);
-	b.enable_starting_byte(135);
-
-	a.sender.enable_partial_updates = true;
-	a.receiver.enable_partial_updates = true;
-	a.sender.enable_partial_updates = true;
-	b.receiver.enable_partial_updates = true;
-
-	bitstream bs[15];
-	reliable_sender::message msg[15];
-
-	bitstream s_packets[15];
-	bitstream r_packets[15];
-
-	for (int i = 0; i < 15; ++i) {
-		bs[i].Write(int(i));
-		msg[i].output_bitstream = &bs[i];
-	}
-
-	a.sender.post_message(msg[1]);
-	a.send(s_packets[1]);
-	a.sender.post_message(msg[2]);
-	a.send(s_packets[2]);
-	a.sender.post_message(msg[3]);
-	a.send(s_packets[3]);
-
-	b.recv(s_packets[2]);
-	b.send(r_packets[2]);
-
-	a.recv(r_packets[2]);
-
-	a.sender.post_message(msg[4]);
-	a.sender.post_message(msg[5]);
-	a.sender.post_message(msg[6]);
-	a.send(s_packets[4]);
-
-	b.recv(s_packets[3]);
-	b.send(r_packets[3]);
-
-	a.recv(r_packets[3]);
-
-
-	a.sender.post_message(msg[7]);
-	a.send(s_packets[5]);
-
-	b.recv(s_packets[4]);
-	b.send(r_packets[4]);
-
-	a.recv(r_packets[4]);
-
-	EXPECT_EQ(1, a.sender.reliable_buf.size());
-	EXPECT_EQ(msg[7].output_bitstream, a.sender.reliable_buf[0].output_bitstream);
-
-
-	EXPECT_EQ(1, s_packets[2].ReadPOD<int>());
-	EXPECT_EQ(2, s_packets[2].ReadPOD<int>());
-	EXPECT_EQ(3, s_packets[3].ReadPOD<int>());
-
-	/* read the outcome from the receiver */
-	EXPECT_EQ(4, s_packets[4].ReadPOD<int>());
-	EXPECT_EQ(5, s_packets[4].ReadPOD<int>());
-	EXPECT_EQ(6, s_packets[4].ReadPOD<int>());
-}
-
 
 TEST(NetChannel, PartialUpdatesSimpleCase) {
 	reliable_channel a, b;

@@ -38,11 +38,6 @@ namespace augs {
 			unsigned short last_sequence = 0u;
 			unsigned short last_unreliable_only_sequence = 0u;
 
-			reliable_receiver();
-
-			/* only for partial updates */
-			std::map<unsigned, unsigned> length_by_sequence;
-
 			enum result {
 				RELIABLE_RECEIVED,
 				ONLY_UNRELIABLE_RECEIVED,
