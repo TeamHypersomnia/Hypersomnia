@@ -3,6 +3,9 @@ entity_system = inherits_from ()
 function entity_system:constructor()
 	self.all_systems = {}
 	self.messages = {}
+	
+	self.cpp_entity = cpp_entity_system:create()
+	self:register_systems( { ["cpp_entity"] = self.cpp_entity } )
 end
 
 function entity_system:register_messages(msgs)
@@ -54,7 +57,7 @@ function entity_system:add_entity(new_entity)
 end
 
 function entity_system:remove_entity(to_be_removed)
-	self:for_all_matching_systems(new_entity, function(matching_system) matching_system:remove_entity(new_entity) end)
+	self:for_all_matching_systems(to_be_removed, function(matching_system) matching_system:remove_entity(to_be_removed) end)
 end
 
 processing_system = inherits_from ()
@@ -72,7 +75,7 @@ function processing_system:add_entity(new_entity)
 end
 
 function processing_system:remove_entity(to_be_removed) 
-	table.remove(self.targets, to_be_removed)
+	table.erase(self.targets, to_be_removed)
 end
 
 
@@ -107,8 +110,8 @@ end
 
 function cpp_entity_system:remove_entity(removed_entity)
 	-- get world object owning that entity and delete it
-	local world_entity = removed_entity.cpp_entity.world_entity
-	world_entity.owner_world:delete_entity(removed_entity.cpp_entity, nil)
+	local owner_world = removed_entity.cpp_entity.owner_world
+	owner_world:delete_entity(removed_entity.cpp_entity, nil)
 end
 
 

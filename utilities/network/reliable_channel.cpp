@@ -43,25 +43,30 @@ namespace augs {
 
 			/* reliable + maybe unreliable */
 			if (!reliable_buf.empty()) {
-				output.name_property("has_reliable");
-				output.Write<bool>(1);
+				bitstream reliable_bs;
+				
+				for (auto& msg : reliable_buf)
+					if (msg.output_bitstream) {
+					reliable_bs.name_property("reliable message");
+					reliable_bs.WriteBitstream(*msg.output_bitstream);
+					}
+
+				output.name_property("reliable_length");
+				output.Write<unsigned short>(reliable_bs.GetNumberOfBitsUsed());
 				output.name_property("sequence");
 				output.Write(++sequence);
 				output.name_property("ack_sequence");
 				output.Write(ack_sequence);
 
-				for (auto& msg : reliable_buf)
-					if (msg.output_bitstream) {
-						output.name_property("reliable message");
-						output.WriteBitstream(*msg.output_bitstream);
-					}
+				output.name_property("reliable buffer");
+				output.WriteBitstream(reliable_bs);
 
 				sequence_to_reliable_range[sequence] = reliable_buf.size();
 			}
 			/* only unreliable */
 			else {
-				output.name_property("has_reliable");
-				output.Write<bool>(0);
+				output.name_property("reliable_length");
+				output.Write<unsigned short>(0);
 				output.name_property("unreliable_only_sequence");
 				output.Write(++unreliable_only_sequence);
 			}
@@ -110,13 +115,13 @@ namespace augs {
 			unsigned short update_to_sequence = 0u;
 			unsigned short update_from_sequence = 0u;
 
-			bool contains_reliable_data = false;
+			unsigned short reliable_length = 0u;
 			
-			input.name_property("has_reliable");
-			if (!input.Read<bool>(contains_reliable_data)) return NOTHING_RECEIVED;
+			input.name_property("reliable_length");
+			if (!input.Read<unsigned short>(reliable_length)) return NOTHING_RECEIVED;
 
 			/* reliable + maybe unreliable */
-			if (contains_reliable_data) {
+			if (reliable_length > 0) {
 				input.name_property("sequence");
 				if (!input.Read(update_to_sequence)) return NOTHING_RECEIVED;
 				input.name_property("ack_sequence");
@@ -130,8 +135,13 @@ namespace augs {
 				}
 				/* if we couldn't match state numbers so that they could be updated,
 				we can only rely on the unreliable data of the moment - but only if the sequence number is more recent
+				
+				skip the bitstream so game logic reads only unreliable commands
 				*/
-				else if (is_recent) return ONLY_UNRELIABLE_RECEIVED;
+				else if (is_recent) {
+					input.IgnoreBits(reliable_length);
+					return ONLY_UNRELIABLE_RECEIVED;
+				}
 				else return NOTHING_RECEIVED;
 			}
 			/* only unreliable */

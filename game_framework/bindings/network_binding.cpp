@@ -119,6 +119,7 @@ namespace bindings {
 			.def("assign", &bitstream::operator=)
 			.def("name_property", &bitstream::name_property)
 			.def("IgnoreBytes", &bitstream::IgnoreBytes)
+			.def("IgnoreBits", &bitstream::IgnoreBits)
 			.def("ReadRakString", &bitstream::Read<RakNet::RakString>)
 			.def("size", &bitstream::GetNumberOfBitsUsed)
 			.def("Reset", &bitstream::Reset)

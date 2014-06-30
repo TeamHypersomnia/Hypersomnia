@@ -174,6 +174,14 @@ namespace augs {
 				return stream.IgnoreBytes(n);
 			}
 
+			void IgnoreBits(unsigned int n) {
+				std::stringstream instr;
+				instr << "Ignored " << n << " bits.\n";
+				read_report += instr.str();
+
+				return stream.IgnoreBits(n);
+			}
+
 			RakNet::BitSize_t GetNumberOfBitsUsed() const {
 				return stream.GetNumberOfBitsUsed();
 			}
