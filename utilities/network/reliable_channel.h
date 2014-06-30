@@ -8,8 +8,6 @@ namespace augs {
 		struct bitstream;
 
 		struct reliable_sender {
-			bool enable_partial_updates = false;
-
 			struct message {
 				luabind::object script;
 				bool flag_for_deletion = false;

@@ -22,22 +22,20 @@ namespace augs {
 		}
 
 		bool reliable_sender::write_data(bitstream& output) {
-			if (!enable_partial_updates) {
-				/* handle messages flagged for deletion by decremending reliable ranges in history */
-				for (auto& iter : sequence_to_reliable_range) {
-					auto new_value = iter.second;
+			/* handle messages flagged for deletion by decremending reliable ranges in history */
+			for (auto& iter : sequence_to_reliable_range) {
+				auto new_value = iter.second;
 
-					for (size_t i = 0; i < reliable_buf.size(); ++i) {
-						if (reliable_buf[i].flag_for_deletion && i < iter.second)
-							--new_value;
-					}
-
-					iter.second = new_value;
+				for (size_t i = 0; i < reliable_buf.size(); ++i) {
+					if (reliable_buf[i].flag_for_deletion && i < iter.second)
+						--new_value;
 				}
 
-				/* delete flagged messages from vector */
-				reliable_buf.erase(std::remove_if(reliable_buf.begin(), reliable_buf.end(), [](const message& m){ return m.flag_for_deletion; }), reliable_buf.end());
+				iter.second = new_value;
 			}
+
+			/* delete flagged messages from vector */
+			reliable_buf.erase(std::remove_if(reliable_buf.begin(), reliable_buf.end(), [](const message& m){ return m.flag_for_deletion; }), reliable_buf.end());
 			
 			/* if we have nothing to send */
 			if (reliable_buf.empty() && unreliable_buf && unreliable_buf->GetNumberOfBitsUsed() <= 0)
@@ -93,33 +91,13 @@ namespace augs {
 					if (num_messages_to_erase != sequence_to_reliable_range.end()) {
 						reliable_buf.erase(reliable_buf.begin(), reliable_buf.begin() + (*num_messages_to_erase).second);
 
-						if (!enable_partial_updates) {
-							/* for now just clear the sequence history,
-							we'll implement partial updates on the client later
+						/* for now just clear the sequence history,
+						we'll implement partial updates on the client later
 
-							from now on the client won't acknowledge any other packets than those with ack_sequence equal to incoming_ack,
-							so we can safely clear the sequence history.
-							*/
-							sequence_to_reliable_range.clear();
-						} 
-						else {
-							/* iterate through ranges and decrease them by acknowledged sequence length */
-							unsigned acknowledged_length = sequence_to_reliable_range[incoming_ack];
-
-							sequence_to_reliable_range.erase(incoming_ack);
-
-							for (unsigned i = incoming_ack; i != sequence+1; ++i) {
-								auto iter = sequence_to_reliable_range.find(i);
-								
-								if (iter != sequence_to_reliable_range.end()) {
-									(*iter).second -= acknowledged_length;
-
-									if ((*iter).second == 0u)
-										sequence_to_reliable_range.erase(iter);
-								}
-							}
-						}
-						
+						from now on the client won't acknowledge any other packets than those with ack_sequence equal to incoming_ack,
+						so we can safely clear the sequence history.
+						*/
+						sequence_to_reliable_range.clear();
 						ack_sequence = incoming_ack;
 					}
 				}
@@ -232,41 +210,6 @@ namespace augs {
 
 using namespace augs;
 using namespace network;
-
-TEST(NetChannel, PartialUpdatesSimpleCase) {
-	reliable_channel a, b;
-	a.enable_starting_byte(135);
-	b.enable_starting_byte(135);
-
-	a.sender.enable_partial_updates = true;
-	a.receiver.enable_partial_updates = true;
-	a.sender.enable_partial_updates = true;
-	b.receiver.enable_partial_updates = true;
-
-	bitstream bs[15];
-	reliable_sender::message msg[15];
-
-	bitstream s_packets[15];
-	bitstream r_packets[15];
-
-	for (int i = 0; i < 15; ++i) {
-		bs[i].Write(int(i));
-		msg[i].output_bitstream = &bs[i];
-	}
-
-	for (int i = 0; i < 15; ++i) {
-		a.sender.post_message(msg[i]);
-		a.send(s_packets[i]);
-
-		b.recv(s_packets[i]);
-		b.send(r_packets[i]);
-
-		a.recv(r_packets[i]);
-
-		EXPECT_EQ(i, s_packets[i].ReadPOD<int>());
-	}
-}
-
 
 TEST(NetChannel, SingleTransmissionDeleteAllPending) {
 	reliable_sender sender;
