@@ -1,5 +1,5 @@
 
-TEST(NetChannelWrapperWrapper, SingleTransmissionDeleteAllPending) {
+TEST(NetChannelWrapper, SingleTransmissionDeleteAllPending) {
 	reliable_channel a, b;
 	a.enable_starting_byte(135);
 	b.enable_starting_byte(135);
@@ -21,15 +21,15 @@ TEST(NetChannelWrapperWrapper, SingleTransmissionDeleteAllPending) {
 	bitstream sender_bs;
 	bitstream receiver_bs;
 
-	EXPECT_EQ(false, a.ack_requested);
+	EXPECT_EQ(false, a.receiver.ack_requested);
 	a.send(sender_bs);
-	EXPECT_EQ(false, a.ack_requested);
+	EXPECT_EQ(false, a.receiver.ack_requested);
 
 	b.recv(sender_bs);
-	EXPECT_EQ(true, b.ack_requested);
+	EXPECT_EQ(true, b.receiver.ack_requested);
 
 	b.send(receiver_bs);
-	EXPECT_EQ(false, b.ack_requested);
+	EXPECT_EQ(false, b.receiver.ack_requested);
 
 	a.recv(receiver_bs);
 

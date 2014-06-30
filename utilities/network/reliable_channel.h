@@ -8,6 +8,8 @@ namespace augs {
 		struct bitstream;
 
 		struct reliable_sender {
+			bool enable_partial_updates = false;
+
 			struct message {
 				luabind::object script;
 				bool flag_for_deletion = false;
@@ -30,8 +32,16 @@ namespace augs {
 		};
 
 		struct reliable_receiver {
+			bool enable_partial_updates = false;
+			bool ack_requested = false;
+
 			unsigned short last_sequence = 0u;
 			unsigned short last_unreliable_only_sequence = 0u;
+
+			reliable_receiver();
+
+			/* only for partial updates */
+			std::map<unsigned, unsigned> length_by_sequence;
 
 			enum result {
 				RELIABLE_RECEIVED,
@@ -52,7 +62,6 @@ namespace augs {
 			reliable_sender sender;
 
 			bool add_starting_byte = false;
-			bool ack_requested = false;
 
 			std::string starting_byte_name = "GAME_TRANSMISSION";
 			unsigned char starting_byte;

@@ -22,21 +22,23 @@ namespace augs {
 		}
 
 		bool reliable_sender::write_data(bitstream& output) {
-			/* handle messages flagged for deletion by decremending reliable ranges in history */
-			for (auto& iter : sequence_to_reliable_range) {
-				auto new_value = iter.second;
+			if (!enable_partial_updates) {
+				/* handle messages flagged for deletion by decremending reliable ranges in history */
+				for (auto& iter : sequence_to_reliable_range) {
+					auto new_value = iter.second;
 
-				for (size_t i = 0; i < reliable_buf.size(); ++i) {
-					if (reliable_buf[i].flag_for_deletion && i < iter.second)
-						--new_value;
+					for (size_t i = 0; i < reliable_buf.size(); ++i) {
+						if (reliable_buf[i].flag_for_deletion && i < iter.second)
+							--new_value;
+					}
+
+					iter.second = new_value;
 				}
 
-				iter.second = new_value;
+				/* delete flagged messages from vector */
+				reliable_buf.erase(std::remove_if(reliable_buf.begin(), reliable_buf.end(), [](const message& m){ return m.flag_for_deletion; }), reliable_buf.end());
 			}
-
-			/* delete flagged messages from vector */
-			reliable_buf.erase(std::remove_if(reliable_buf.begin(), reliable_buf.end(), [](const message& m){ return m.flag_for_deletion; }), reliable_buf.end());
-
+			
 			/* if we have nothing to send */
 			if (reliable_buf.empty() && unreliable_buf && unreliable_buf->GetNumberOfBitsUsed() <= 0)
 				return false;
@@ -91,14 +93,33 @@ namespace augs {
 					if (num_messages_to_erase != sequence_to_reliable_range.end()) {
 						reliable_buf.erase(reliable_buf.begin(), reliable_buf.begin() + (*num_messages_to_erase).second);
 
-						/* for now just clear the sequence history,
-						we'll implement partial updates on the client later
+						if (!enable_partial_updates) {
+							/* for now just clear the sequence history,
+							we'll implement partial updates on the client later
 
-						from now on the client won't acknowledge any other packets than those with ack_sequence equal to incoming_ack,
-						we can safely clear the sequence history.
-						*/
-						sequence_to_reliable_range.clear();
+							from now on the client won't acknowledge any other packets than those with ack_sequence equal to incoming_ack,
+							so we can safely clear the sequence history.
+							*/
+							sequence_to_reliable_range.clear();
+						} 
+						else {
+							/* iterate through ranges and decrease them by acknowledged sequence length */
+							unsigned acknowledged_length = sequence_to_reliable_range[incoming_ack];
 
+							sequence_to_reliable_range.erase(incoming_ack);
+
+							for (unsigned i = incoming_ack; i != sequence+1; ++i) {
+								auto iter = sequence_to_reliable_range.find(i);
+								
+								if (iter != sequence_to_reliable_range.end()) {
+									(*iter).second -= acknowledged_length;
+
+									if ((*iter).second == 0u)
+										sequence_to_reliable_range.erase(iter);
+								}
+							}
+						}
+						
 						ack_sequence = incoming_ack;
 					}
 				}
@@ -109,6 +130,10 @@ namespace augs {
 			return false;
 		}
 		
+		reliable_receiver::reliable_receiver() {
+			length_by_sequence[0] = 0;
+		}
+
 		int reliable_receiver::read_sequence(bitstream& input) {
 			std::stringstream report;
 
@@ -128,21 +153,48 @@ namespace augs {
 				if (!input.Read(update_from_sequence)) return NOTHING_RECEIVED;
 
 				bool is_recent = sequence_more_recent(update_to_sequence, last_sequence);
-				if (is_recent && update_from_sequence == last_sequence) {
-					last_sequence = update_to_sequence;
 
-					return RELIABLE_RECEIVED;
+				if (!enable_partial_updates) {
+					if (is_recent && update_from_sequence == last_sequence) {
+						last_sequence = update_to_sequence;
+						ack_requested = true;
+						return RELIABLE_RECEIVED;
+					}
+					/*
+					we can't only rely on the unreliable data of the moment
+					*/
+					else if (is_recent)
+						ack_requested = true;
+					
+					return NOTHING_RECEIVED;
 				}
-				/* if we couldn't match state numbers so that they could be updated,
-				we can only rely on the unreliable data of the moment - but only if the sequence number is more recent
-				
-				skip the bitstream so game logic reads only unreliable commands
-				*/
-				else if (is_recent) {
-					input.IgnoreBits(reliable_length);
-					return ONLY_UNRELIABLE_RECEIVED;
+				else {
+					/* the story is quite different when we consider partial updates 
+					
+					we only ever consider the most recent sequences
+					*/
+					if (is_recent) {
+						/* count how many bits should we skip */
+						unsigned skip_bits = length_by_sequence[last_sequence] - length_by_sequence[update_from_sequence];
+						
+						if (!(length_by_sequence[last_sequence] >= length_by_sequence[update_from_sequence])) {
+							int breakp = 22;
+							breakp = 10;
+						}
+						length_by_sequence[update_from_sequence] = 0;
+
+						length_by_sequence[update_to_sequence] = reliable_length;
+
+						input.IgnoreBits(skip_bits);
+						last_sequence = update_to_sequence;
+
+						/* only to induce acknowledgement */
+						return RELIABLE_RECEIVED;
+					}
+					
+					return NOTHING_RECEIVED;
 				}
-				else return NOTHING_RECEIVED;
+
 			}
 			/* only unreliable */
 			else {
@@ -183,26 +235,21 @@ namespace augs {
 			}
 
 			sender.read_ack(in);
-			auto recv_result = receiver.read_sequence(in);
-
-			if (recv_result == receiver.RELIABLE_RECEIVED) 
-				ack_requested = true;
-
-			return recv_result;
+			return receiver.read_sequence(in);
 		}
 
 
 		void reliable_channel::send(bitstream& out) {
 			bitstream output_bs;
 
-			if (sender.write_data(output_bs) || ack_requested) {
+			if (sender.write_data(output_bs) || receiver.ack_requested) {
 				if (add_starting_byte) {
 					out.name_property(starting_byte_name);
 					out.Write(starting_byte);
 				}
 
 				receiver.write_ack(out);
-				ack_requested = false;
+				receiver.ack_requested = false;
 
 				if (output_bs.GetNumberOfBitsUsed() > 0) {
 					out.name_property("sender channel");
@@ -218,6 +265,108 @@ namespace augs {
 
 using namespace augs;
 using namespace network;
+
+TEST(NetChannel, PartialUpdates) {
+	reliable_channel a, b;
+	a.enable_starting_byte(135);
+	b.enable_starting_byte(135);
+
+	a.sender.enable_partial_updates = true;
+	a.receiver.enable_partial_updates = true;
+	a.sender.enable_partial_updates = true;
+	b.receiver.enable_partial_updates = true;
+
+	bitstream bs[15];
+	reliable_sender::message msg[15];
+
+	bitstream s_packets[15];
+	bitstream r_packets[15];
+
+	for (int i = 0; i < 15; ++i) {
+		bs[i].Write(int(i));
+		msg[i].output_bitstream = &bs[i];
+	}
+
+	a.sender.post_message(msg[1]);
+	a.send(s_packets[1]);
+	a.sender.post_message(msg[2]);
+	a.send(s_packets[2]);
+	a.sender.post_message(msg[3]);
+	a.send(s_packets[3]);
+
+	b.recv(s_packets[2]);
+	b.send(r_packets[2]);
+
+	a.recv(r_packets[2]);
+
+	a.sender.post_message(msg[4]);
+	a.sender.post_message(msg[5]);
+	a.sender.post_message(msg[6]);
+	a.send(s_packets[4]);
+
+	b.recv(s_packets[3]);
+	b.send(r_packets[3]);
+
+	a.recv(r_packets[3]);
+
+
+	a.sender.post_message(msg[7]);
+	a.send(s_packets[5]);
+
+	b.recv(s_packets[4]);
+	b.send(r_packets[4]);
+
+	a.recv(r_packets[4]);
+
+	EXPECT_EQ(1, a.sender.reliable_buf.size());
+	EXPECT_EQ(msg[7].output_bitstream, a.sender.reliable_buf[0].output_bitstream);
+
+
+	EXPECT_EQ(1, s_packets[2].ReadPOD<int>());
+	EXPECT_EQ(2, s_packets[2].ReadPOD<int>());
+	EXPECT_EQ(3, s_packets[3].ReadPOD<int>());
+
+	/* read the outcome from the receiver */
+	EXPECT_EQ(4, s_packets[4].ReadPOD<int>());
+	EXPECT_EQ(5, s_packets[4].ReadPOD<int>());
+	EXPECT_EQ(6, s_packets[4].ReadPOD<int>());
+}
+
+
+TEST(NetChannel, PartialUpdatesSimpleCase) {
+	reliable_channel a, b;
+	a.enable_starting_byte(135);
+	b.enable_starting_byte(135);
+
+	a.sender.enable_partial_updates = true;
+	a.receiver.enable_partial_updates = true;
+	a.sender.enable_partial_updates = true;
+	b.receiver.enable_partial_updates = true;
+
+	bitstream bs[15];
+	reliable_sender::message msg[15];
+
+	bitstream s_packets[15];
+	bitstream r_packets[15];
+
+	for (int i = 0; i < 15; ++i) {
+		bs[i].Write(int(i));
+		msg[i].output_bitstream = &bs[i];
+	}
+
+	for (int i = 0; i < 15; ++i) {
+		a.sender.post_message(msg[i]);
+		a.send(s_packets[i]);
+
+		b.recv(s_packets[i]);
+		b.send(r_packets[i]);
+
+		a.recv(r_packets[i]);
+
+		EXPECT_EQ(i, s_packets[i].ReadPOD<int>());
+	}
+}
+
 
 TEST(NetChannel, SingleTransmissionDeleteAllPending) {
 	reliable_sender sender;

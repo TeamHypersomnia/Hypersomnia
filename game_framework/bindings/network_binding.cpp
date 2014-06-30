@@ -173,6 +173,7 @@ namespace bindings {
 			.def("post_message", &reliable_sender::post_message)
 			.def("read_ack", &reliable_sender::read_ack)
 			.def("write_data", &reliable_sender::write_data)
+			.def_readwrite("enable_partial_updates", &reliable_sender::enable_partial_updates)
 			.def_readwrite("reliable_buf", &reliable_sender::reliable_buf)
 			.def_readwrite("unreliable_buf", &reliable_sender::unreliable_buf)
 			.def_readwrite("sequence", &reliable_sender::sequence)
@@ -182,6 +183,7 @@ namespace bindings {
 			luabind::class_<reliable_receiver>("reliable_receiver")
 			.def(luabind::constructor<>())
 			.def_readwrite("last_sequence", &reliable_receiver::last_sequence)
+			.def_readwrite("enable_partial_updates", &reliable_receiver::enable_partial_updates)
 			.def("read_sequence", &reliable_receiver::read_sequence)
 			.def("write_ack", &reliable_receiver::write_ack),
 
