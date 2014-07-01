@@ -19,21 +19,22 @@ function input_prediction_system:substep_callback(owner_world)
 		local movement = self.targets[i].cpp_entity.movement
 		
 		local history_entry = { 
-			position = self.targets[i].cpp_entity.physics.body:GetPosition(),
+			position = b2Vec2(self.targets[i].cpp_entity.physics.body:GetPosition()),
 			moving_left = movement.moving_left,
 			moving_right = movement.moving_right,
 			moving_forward = movement.moving_forward,
 			moving_backward = movement.moving_backward
 		}
-		
-		
-		self.substepping_world.render_system:clear_non_cleared_lines()
-		self.substepping_world.render_system:push_non_cleared_line(debug_line(vec2(history_entry.position.x*50, history_entry.position.y*50), vec2(0, 0), rgba(255, 255, 255, 255)))
+		clearl()
 		
 		table.insert(prediction.state_history, history_entry)
 		
 		if #prediction.state_history > 60 then
 			table.remove(prediction.state_history, 1)
+		end
+		
+		for j=1, #prediction.state_history do
+			debuglb2(rgba(255, 255, 255, 255), prediction.state_history[j].position)
 		end
 		
 		print(table.inspect(history_entry))

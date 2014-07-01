@@ -41,7 +41,7 @@ return function(map_filename, scene_object)
 	scene_object.world_camera.script.owner_scene = scene_object
 	
 	-- initialize player
-	scene_object.teleport_position = objects_by_type["teleport_position"][1].pos
+	scene_object.teleport_position = vec2(0, 0)--objects_by_type["teleport_position"][1].pos
 	
 	scene_object.crosshair_sprite = create_sprite {
 		image = scene_object.sprite_library["crosshair"],

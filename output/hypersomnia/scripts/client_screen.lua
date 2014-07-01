@@ -49,6 +49,9 @@ function client_screen:constructor(camera_rect)
 end
 
 function client_screen:loop()
+
+	setlsys(self.sample_scene.world_object.render_system)
+		
 	-- handle networking
 	local packet = self.received
 	
