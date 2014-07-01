@@ -8,12 +8,14 @@ dofile "hypersomnia\\scripts\\messages\\network_message.lua"
 dofile "hypersomnia\\scripts\\messages\\server_commands.lua"
 
 dofile "hypersomnia\\scripts\\components\\input_sync.lua"
+dofile "hypersomnia\\scripts\\components\\input_prediction.lua"
 
 dofile "hypersomnia\\scripts\\sync_modules\\modules.lua"
 dofile "hypersomnia\\scripts\\sync_modules\\movement_sync.lua"
 
 dofile "hypersomnia\\scripts\\systems\\client_system.lua"
 dofile "hypersomnia\\scripts\\systems\\input_sync_system.lua"
+dofile "hypersomnia\\scripts\\systems\\input_prediction_system.lua"
 dofile "hypersomnia\\scripts\\systems\\synchronization_system.lua"
 
 client_screen = inherits_from ()
@@ -40,6 +42,7 @@ function client_screen:constructor(camera_rect)
 	self.systems = {}
 	self.systems.client = client_system:create(self.server)
 	self.systems.input_sync = input_sync_system:create(self.sample_scene.world_object)
+	self.systems.input_prediction = input_prediction_system:create(self.sample_scene.simulation_world, self.sample_scene.world_object)
 	self.systems.synchronization = synchronization_system:create(self.sample_scene)
 	
 	self.entity_system_instance:register_systems(self.systems)

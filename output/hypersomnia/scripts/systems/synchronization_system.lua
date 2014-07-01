@@ -36,7 +36,7 @@ function synchronization_system:read_object_stream(object, input_bs)
 		local module_name = protocol.module_mappings[i]
 			
 		if modules[module_name] ~= nil then
-			modules[module_name]:read_stream(object, input_bs)
+			modules[module_name]:read_stream(object, input_bs, self.my_sync_id)
 		end
 	end
 end
@@ -69,7 +69,8 @@ function synchronization_system:update_states_from_bitstream(input_bs)
 			if incoming_id == self.my_sync_id then
 				new_entity = components.create_components {
 					cpp_entity = self.owner_scene.player.body,
-					input_sync = {}
+					input_sync = {},
+					input_prediction = {}
 				}
 				
 				new_entity.cpp_entity.script = new_entity
@@ -127,7 +128,6 @@ function synchronization_system:update()
 			elseif command_type == protocol.messages.DELETE_OBJECT then
 				input_bs:name_property("removed_id")
 				local removed_id = input_bs:ReadUshort()
-				if (msgs[i].recv_result ~= receive_result.RELIABLE_RECEIVED) then  print("(Partial report) Receiving: \n\n" .. input_bs.read_report .. "\n\n") end
 				self.owner_entity_system:remove_entity(self.object_by_id[removed_id])
 				
 				self.object_by_id[removed_id] = nil	
@@ -137,7 +137,7 @@ function synchronization_system:update()
 		end
 		
 		--print("Receiving " .. in_size .. " bits: \n\n" .. input_bs.read_report .. "\n\n") 
-		if (msgs[i].recv_result == receive_result.RELIABLE_RECEIVED) then print("Receiving: \n\n" .. input_bs.read_report .. "\n\n") end
+		-- if (msgs[i].recv_result == receive_result.RELIABLE_RECEIVED) then print("Receiving: \n\n" .. input_bs.read_report .. "\n\n") end
 	end
 	
 	-- modules may need some work to do, e.g. prediction, appearance updating

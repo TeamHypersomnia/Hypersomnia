@@ -4,6 +4,8 @@ return function(map_filename, scene_object)
 	-- setup shortcut
 	local world = scene_object.world_object
 	
+	scene_object.simulation_world = simulation_world_class:create()
+	
 	-- load map data
 	scene_object.resource_storage = {}
 	local objects_by_type, type_table_by_object = tiled_map_loader.get_all_objects_by_type(map_filename)
@@ -28,13 +30,14 @@ return function(map_filename, scene_object)
 	
 	
 	
+	world.physics_system.enable_interpolation = 1
 	
 	-- initialize input
 	world.input_system:clear_contexts()
 	world.input_system:add_context(main_input_context)
 	
 	-- initialize camera
-	scene_object.world_camera = create_world_camera_entity(world)
+	scene_object.world_camera = create_world_camera_entity(world, scene_object.sprite_library["blank"])
 	scene_object.world_camera.script.owner_scene = scene_object
 	
 	-- initialize player

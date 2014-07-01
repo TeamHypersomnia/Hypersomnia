@@ -1,4 +1,4 @@
-function create_world_camera_entity(owner_world)
+function create_world_camera_entity(owner_world, blank_sprite)
 	local camera_archetype = {
 		transform = {
 			pos = vec2(),
@@ -109,6 +109,7 @@ function create_world_camera_entity(owner_world)
 				)
 	
 				renderer:call_triangles()
+				renderer:draw_debug_info(camera_draw_input.visible_area, camera_draw_input.camera_transform, blank_sprite.tex)
 				renderer:clear_triangles()
 			end
 		},

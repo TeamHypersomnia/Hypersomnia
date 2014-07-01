@@ -48,7 +48,7 @@ function client_system:update_tick()
 		self.cmd_requested = false
 		self.cmd_rate_timer:reset()
 		
-		print("Sending: \n\n" .. auto_string_indent(output_bs.content) .. "\n\n")
+		-- print("Sending: \n\n" .. auto_string_indent(output_bs.content) .. "\n\n")
 		self.network:send(output_bs, send_priority.IMMEDIATE_PRIORITY, send_reliability.UNRELIABLE, 0, self.server_guid, false)
 	end
 end

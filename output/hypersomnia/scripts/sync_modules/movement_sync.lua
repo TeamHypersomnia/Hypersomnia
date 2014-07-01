@@ -10,8 +10,11 @@ function sync_modules.movement:read_stream(object, input)
 	input:name_property("velocity")
 	local velocity = input:Readb2Vec2()
 	
-	body:SetTransform(position, 0)
-	body:SetLinearVelocity(velocity)
+	
+	--if my_sync ~= object.synchronization.id then 
+		--body:SetTransform(position, 0)
+		--body:SetLinearVelocity(velocity)
+	--end 
 end
 
 
