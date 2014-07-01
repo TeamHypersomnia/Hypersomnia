@@ -45,3 +45,11 @@ function input_prediction_system:apply_correction(entity, new_position)
 
 
 end
+
+function input_prediction_system:update()
+	for i=1, #self.targets do
+		local prediction = self.targets[i].input_prediction
+		
+	end
+end
+

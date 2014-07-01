@@ -6,16 +6,9 @@ function sync_modules.movement:read_stream(object, input)
 	local body = object.cpp_entity.physics.body
 	
 	input:name_property("position")
-	local position = input:Readb2Vec2()
+	self.position = input:Readb2Vec2()
 	input:name_property("velocity")
-	local velocity = input:Readb2Vec2()
-	
-	
-	debuglb2(rgba(255, 0, 0, 255), position, b2Vec2(position.x+velocity.x, position.y+velocity.y))
-	--if my_sync ~= object.synchronization.id then 
-		--body:SetTransform(position, 0)
-		--body:SetLinearVelocity(velocity)
-	--end 
+	self.velocity = input:Readb2Vec2()
 end
 
 

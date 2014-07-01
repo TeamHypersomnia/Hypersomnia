@@ -70,7 +70,9 @@ function synchronization_system:update_states_from_bitstream(input_bs)
 				new_entity = components.create_components {
 					cpp_entity = self.owner_scene.player.body,
 					input_sync = {},
-					input_prediction = {}
+					input_prediction = {
+						simulation_entity = self.owner_scene.simulation_player
+					}
 				}
 				
 				new_entity.cpp_entity.script = new_entity
