@@ -13,7 +13,6 @@ function world_class:constructor()
 	self.pathfinding_system = self.world_inst.pathfinding_system
 	self.render_system = self.world_inst.render_system
 	self.physics_system = self.world_inst.physics_system
-	self.script_system = self.world_inst.script_system
 	
 	self.physics_system.substepping_routine = function(owner)	
 		local my_instance = self.world_inst

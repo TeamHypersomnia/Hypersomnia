@@ -48,11 +48,15 @@ public:
 	int enable_interpolation;
 	int ray_casts_per_frame;
 
+	bool enable_motors = false;
+	void enable_listener(bool flag);
+
 	b2World b2world;
 	physics_system();
 
 	/* returns the number of steps made */
 	unsigned process_entities(world&);
+	void process_steps(world&, unsigned);
 
 	void add(entity*) override;
 	void remove(entity*) override;

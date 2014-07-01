@@ -1,7 +1,7 @@
 -- initialize engine libraries
 
-METERS_TO_PIXELS = 120
-PIXELS_TO_METERS = 1/METERS_TO_PIXELS
+METERS_TO_PIXELS = 50
+PIXELS_TO_METERS = 50/METERS_TO_PIXELS
 
 -- immutable libraries used not only for gameplay but also across main menus
 
@@ -29,3 +29,5 @@ dofile (ENGINE_DIRECTORY .. "tiled_map_loader.lua")
 dofile (ENGINE_DIRECTORY .. "camera_class.lua")
 
 dofile (ENGINE_DIRECTORY .. "scene_class.lua")
+
+dofile (ENGINE_DIRECTORY .. "simulation_world_class.lua")

@@ -67,7 +67,7 @@ physics_system::physics_system() : accumulator(60.0, 5), timestep_multiplier(1.f
 b2world(b2Vec2(0.f, 0.f)), enable_interpolation(true), ray_casts_per_frame(0), all_steps(0) {
 		b2world.SetAllowSleeping(false);
 		b2world.SetAutoClearForces(false);
-		b2world.SetContactListener(&listener);
+		enable_listener(true);
 }
 
 std::vector<physics_system::raycast_output> physics_system::ray_cast_all_intersections
@@ -352,18 +352,23 @@ T constrainAngle(T x){
 	return x - 180;
 }
 
-unsigned  physics_system::process_entities(world& owner) {
+void physics_system::enable_listener(bool flag) {
+	b2world.SetContactListener(flag ? &listener : nullptr);
+}
+
+
+void physics_system::process_steps(world& owner, unsigned steps) {
 	listener.world_ptr = &owner;
-	accumulator.set_time_multiplier(timestep_multiplier);
-	const unsigned steps = accumulator.update_and_extract_steps();
 
 	for (unsigned i = 0; i < steps; ++i) {
 		int32 velocityIterations = 8;
 		int32 positionIterations = 3;
 
-		reset_states(); 
+		if (enable_interpolation)
+			reset_states();
 
-		for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
+		if (enable_motors)
+			for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 			if (b->GetType() == b2_staticBody) continue;
 			auto& physics = static_cast<entity*>(b->GetUserData())->get<components::physics>();
 
@@ -376,7 +381,7 @@ unsigned  physics_system::process_entities(world& owner) {
 				float impulse = b->GetInertia() * desiredAngularVelocity;// disregard time factor
 				b->ApplyAngularImpulse(impulse*physics.angle_motor_force_multiplier, true);
 			}
-		}
+			}
 
 		try {
 			luabind::call_function<void>(substepping_routine, &owner);
@@ -389,12 +394,19 @@ unsigned  physics_system::process_entities(world& owner) {
 		b2world.ClearForces();
 		++all_steps;
 	}
-	
-	if(steps == 0) b2world.ClearForces();
-	
+
+	if (steps == 0) b2world.ClearForces();
+
 	if (enable_interpolation)
 		smooth_states();
 	else reset_states();
+}
+
+unsigned physics_system::process_entities(world& owner) {
+	accumulator.set_time_multiplier(timestep_multiplier);
+	const unsigned steps = accumulator.update_and_extract_steps();
+
+	process_steps(owner, steps);
 
 	return steps;
 }

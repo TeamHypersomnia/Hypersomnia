@@ -29,6 +29,8 @@ namespace bindings {
 		return
 			luabind::class_<physics_system>("_physics_system")
 			.def("process_entities", &physics_system::process_entities)
+			.def("process_steps", &physics_system::process_steps)
+			.def("enable_listener", &physics_system::enable_listener)
 			.def_readwrite("timestep_multiplier", &physics_system::timestep_multiplier)
 			.def_readwrite("enable_interpolation", &physics_system::enable_interpolation)
 			.def_readwrite("b2world", &physics_system::b2world)

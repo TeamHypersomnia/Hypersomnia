@@ -393,3 +393,27 @@ function set_rate(target, what_rate, updates_per_second)
 	target[what_rate .. "_timer"] = timer()
 end
 
+function setlsys(sys)
+	debug_line_system = sys
+end
+
+function clearl()
+	debug_line_system:clear_non_cleared_lines()
+end
+
+function debugl(col, pos, pos2)
+	if pos2 == nil then 
+		pos2 = vec2(pos)
+		pos2.y = pos2.y + 25
+	end
+	
+	debug_line_system:push_non_cleared_line(debug_line(pos, pos2, col))
+end
+
+function debuglb2(col, pos, pos2)
+	if pos2 == nil then 
+		debugl(col, vec2(pos.x, pos.y))
+	else
+		debugl(col, vec2(pos.x*METERS_TO_PIXELS, pos.y*METERS_TO_PIXELS), vec2(pos2.x*METERS_TO_PIXELS, pos2.y*METERS_TO_PIXELS))
+	end
+end
