@@ -12,6 +12,9 @@ protocol.messages = {
 	-- client to server
 	"COMMAND",
 	
+	-- bidirectional
+	"CLIENT_PREDICTION",
+	
 	-- server to client
 	"ASSIGN_SYNC_ID",
 	

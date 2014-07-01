@@ -121,8 +121,6 @@ function synchronization_system:update()
 		while input_bs:GetNumberOfUnreadBits() >= 8 do
 			input_bs:name_property("command_type")
 			local command_type = input_bs:ReadByte()
-			--print ("command: " ..  command_type .. "\nbits left: " .. input_bs:GetNumberOfUnreadBits() .. "\n")
-			
 			if command_type == protocol.messages.STATE_UPDATE then
 				self:update_states_from_bitstream(input_bs)
 			elseif command_type == protocol.messages.STREAM_UPDATE then
@@ -133,6 +131,16 @@ function synchronization_system:update()
 				self.owner_entity_system:remove_entity(self.object_by_id[removed_id])
 				
 				self.object_by_id[removed_id] = nil	
+				
+			elseif command_type == protocol.messages.CLIENT_PREDICTION then
+				input_bs:name_property("input_sequence")
+				local input_sequence = input_bs:ReadUshort()
+				input_bs:name_property("actual_position")
+				local position = input_bs:Readb2Vec2()
+				input_bs:name_property("actual_velocity")
+				local velocity = input_bs:Readb2Vec2()
+				
+				print (input_bs.read_report)
 			elseif command_type == protocol.messages.ASSIGN_SYNC_ID then
 				self.my_sync_id = input_bs:ReadUshort()
 			end

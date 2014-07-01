@@ -75,6 +75,9 @@ function client_screen:loop()
 		end
 	end
 	
+	
+	
+	
 	self.systems.client:handle_incoming_commands()
 	
 	--print "sync upd"
@@ -83,12 +86,13 @@ function client_screen:loop()
 	--print "input upd"
 	self.systems.input_sync:update()
 	
+	self.systems.input_prediction:update()
 	--print "client tick"
 	self.systems.client:update_tick()
 	
 	--print "flush"
 	self.entity_system_instance:flush_messages()
-	
+
 	--print "scene loop"
 	self.sample_scene:loop()
 end

@@ -1,6 +1,9 @@
 sync_modules.movement = inherits_from ()
 
-function sync_modules.movement:constructor() end
+function sync_modules.movement:constructor()
+	self.position = b2Vec2()
+	self.velocity = b2Vec2()
+ end
 
 function sync_modules.movement:read_stream(object, input)
 	local body = object.cpp_entity.physics.body

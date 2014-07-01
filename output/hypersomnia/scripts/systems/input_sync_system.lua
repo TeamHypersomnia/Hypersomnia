@@ -15,9 +15,6 @@ end
 
 function input_sync_system:update()
 	local msgs = self.subject_world:get_messages_filter_components("intent_message", { "input_sync" } )
-				if #msgs > 0 then
-				print(#msgs)
-				end
 	for i=1, #msgs do
 		local msg = msgs[i]
 
