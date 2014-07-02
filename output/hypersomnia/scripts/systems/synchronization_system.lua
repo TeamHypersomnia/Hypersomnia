@@ -69,7 +69,6 @@ function synchronization_system:update_states_from_bitstream(input_bs)
 			if incoming_id == self.my_sync_id then
 				new_entity = components.create_components {
 					cpp_entity = self.owner_scene.player.body,
-					input_sync = {},
 					input_prediction = {
 						simulation_entity = self.owner_scene.simulation_player
 					}

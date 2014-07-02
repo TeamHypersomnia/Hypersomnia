@@ -10,8 +10,6 @@ protocol.GAME_TRANSMISSION = network_event.ID_USER_PACKET_ENUM + 1
 
 protocol.messages = {
 	-- client to server
-	"COMMAND",
-	
 	"INPUT_SNAPSHOT",
 	
 	-- bidirectional
