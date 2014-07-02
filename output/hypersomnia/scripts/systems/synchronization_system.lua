@@ -133,33 +133,16 @@ function synchronization_system:update()
 				self.object_by_id[removed_id] = nil	
 				
 			elseif command_type == protocol.messages.CLIENT_PREDICTION then
-				input_bs:name_property("input_sequence")
-				local input_sequence = input_bs:ReadUint()
+				input_bs:name_property("at_step_sequence")
+				local at_step_sequence = input_bs:ReadUint()
 				input_bs:name_property("actual_position")
 				local position = input_bs:Readb2Vec2()
 				input_bs:name_property("actual_velocity")
 				local velocity = input_bs:Readb2Vec2()
 				
-				local movement = {}
+		
 				
-				if input_bs:ReadBit() then
-					movement.moving_left = 1
-					else movement.moving_left = 0
-				end
-				if input_bs:ReadBit() then
-					movement.moving_right = 1
-					else movement.moving_right = 0
-				end
-				if input_bs:ReadBit() then
-					movement.moving_forward = 1
-					else movement.moving_forward = 0
-				end
-				if input_bs:ReadBit() then
-					movement.moving_backward = 1
-					else movement.moving_backward = 0
-				end
-				
-				self.owner_entity_system.all_systems["input_prediction"]:apply_correction(input_sequence, position, velocity, movement)
+				self.owner_entity_system.all_systems["input_prediction"]:apply_correction(at_step_sequence, position, velocity)
 				
 		
 				--print (input_bs.read_report)

@@ -32,7 +32,7 @@ function input_prediction_system:substep_callback(owner_world)
 		prediction.state_history[prediction.first_state + prediction.count] = history_entry
 		prediction.count = prediction.count + 1
 		
-		if prediction.count > 320 then
+		if prediction.count > 60 then
 			prediction.state_history[prediction.first_state] = nil
 			prediction.first_state = prediction.first_state + 1
 			prediction.count = prediction.count - 1
@@ -45,6 +45,7 @@ function input_prediction_system:substep_callback(owner_world)
 		local command_bs = BitStream()
 		
 		command_bs:WriteByte(protocol.messages.INPUT_SNAPSHOT)
+		command_bs:WriteUint(prediction.first_state + prediction.count - 1)
 		command_bs:WriteBit(movement.moving_left > 0)
 		command_bs:WriteBit(movement.moving_right > 0)
 		command_bs:WriteBit(movement.moving_forward > 0)
@@ -65,7 +66,7 @@ function input_prediction_system:substep_callback(owner_world)
 	end
 end
 
-function input_prediction_system:apply_correction(input_sequence, new_position, new_velocity, movement) 
+function input_prediction_system:apply_correction(input_sequence, new_position, new_velocity) 
 	-- we don't have more than one target at the moment
 	for i=1, #self.targets do
 		local prediction = self.targets[i].input_prediction
@@ -73,10 +74,6 @@ function input_prediction_system:apply_correction(input_sequence, new_position, 
 		--input_sequence = prediction.first_state
 		if prediction.count > 0 and input_sequence < prediction.first_state + prediction.count and input_sequence >= prediction.first_state then
 			local correct_from = prediction.state_history[input_sequence]
-			
-			--for k, v in pairs(movement) do
-			--	correct_from[k] = v
-			--end
 			
 			local simulation_entity = prediction.simulation_entity
 			local simulation_body = simulation_entity.physics.body
@@ -113,8 +110,8 @@ function input_prediction_system:apply_correction(input_sequence, new_position, 
 			print((to_pixels(corrected_pos) - to_pixels(self.targets[i].cpp_entity.physics.body:GetPosition())):length())
 			
 			if (to_pixels(corrected_pos) - to_pixels(self.targets[i].cpp_entity.physics.body:GetPosition())):length() > config_table.divergence_radius then
-				--self.targets[i].cpp_entity.physics.body:SetTransform(corrected_pos, 0)
-				--self.targets[i].cpp_entity.physics.body:SetLinearVelocity(corrected_vel)
+				self.targets[i].cpp_entity.physics.body:SetTransform(corrected_pos, 0)
+				self.targets[i].cpp_entity.physics.body:SetLinearVelocity(corrected_vel)
 			end
 			
 			local new_state_history = {}
@@ -151,16 +148,16 @@ function input_prediction_system:update()
 		
 		
 		-- write the most recent prediction and request correction
-		local prediction_request = BitStream()
-		prediction_request:name_property("CLIENT_PREDICTION")
-		prediction_request:WriteByte(protocol.messages.CLIENT_PREDICTION)
-		prediction_request:name_property("input_sequence")
+		--local prediction_request = BitStream()
+		--prediction_request:name_property("CLIENT_PREDICTION")
+		--prediction_request:WriteByte(protocol.messages.CLIENT_PREDICTION)
+		--prediction_request:name_property("input_sequence")
 		-- we're already ahead of one prediction
 		-- as substep callback is called before b2World::Step
-		prediction_request:WriteUint(prediction.first_state + prediction.count)
+		--prediction_request:WriteUint(prediction.first_state + prediction.count - 1)
 		-- write our current position
 		
-		self.owner_entity_system.all_systems["client"].net_channel.unreliable_buf:WriteBitstream(prediction_request)
+		--self.owner_entity_system.all_systems["client"].net_channel.unreliable_buf:WriteBitstream(prediction_request)
 	end
 end
 
