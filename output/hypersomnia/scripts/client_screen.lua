@@ -27,7 +27,13 @@ function client_screen:constructor(camera_rect)
 	self.sample_scene.world_camera.camera.screen_rect = camera_rect
 	
 	self.server = network_interface()
+	
 	self.server:connect(config_table.server_address, config_table.server_port)
+	
+	if config_table.simulate_lag ~= 0 then
+		print "Simulating lag..."
+		self.server:enable_lag(config_table.packet_loss, config_table.min_latency, config_table.jitter)
+	end
 	
 	self.received = network_packet()
 	

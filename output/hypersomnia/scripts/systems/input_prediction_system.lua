@@ -39,7 +39,7 @@ function input_prediction_system:substep_callback(owner_world)
 		end
 		
 		for j=prediction.first_state, prediction.first_state+prediction.count-1 do
-			debuglb2(rgba(255, 255, 255, 255), prediction.state_history[j].position)
+			--debuglb2(rgba(255, 255, 255, 255), prediction.state_history[j].position)
 		end
 		
 	end
@@ -50,21 +50,21 @@ function input_prediction_system:apply_correction(input_sequence, new_position, 
 	for i=1, #self.targets do
 		local prediction = self.targets[i].input_prediction
 		
-		input_sequence = prediction.first_state
+		--input_sequence = prediction.first_state
 		if prediction.count > 0 and input_sequence < prediction.first_state + prediction.count and input_sequence >= prediction.first_state then
 			local correct_from = prediction.state_history[input_sequence]
 			
-			--for k, v in pairs(movement) do
-			--	correct_from[k] = v
-			--end
+			for k, v in pairs(movement) do
+				correct_from[k] = v
+			end
 			
 			local simulation_entity = prediction.simulation_entity
 			local simulation_body = simulation_entity.physics.body
 			
 			--print(correct_from.position.x, correct_from.position.y)
 			--print(to_pixels(new_position).x, to_pixels(new_position).y)
-			simulation_body:SetTransform(correct_from.position, 0)
-			simulation_body:SetLinearVelocity(correct_from.vel)
+			simulation_body:SetTransform(new_position, 0)
+			simulation_body:SetLinearVelocity(new_velocity)
 			
 			local simulation_step = input_sequence
 			
@@ -89,8 +89,13 @@ function input_prediction_system:apply_correction(input_sequence, new_position, 
 			local corrected_pos = simulation_body:GetPosition()
 			local corrected_vel = simulation_body:GetLinearVelocity()
 			
-			--self.targets[i].cpp_entity.physics.body:SetTransform(corrected_pos, 0)
-			--self.targets[i].cpp_entity.physics.body:SetLinearVelocity(corrected_vel)
+			local vel = to_pixels(self.targets[i].cpp_entity.physics.body:GetLinearVelocity())
+			print((to_pixels(corrected_pos) - to_pixels(self.targets[i].cpp_entity.physics.body:GetPosition())):length())
+			
+			if (to_pixels(corrected_pos) - to_pixels(self.targets[i].cpp_entity.physics.body:GetPosition())):length() > config_table.divergence_radius then
+				self.targets[i].cpp_entity.physics.body:SetTransform(corrected_pos, 0)
+				--self.targets[i].cpp_entity.physics.body:SetLinearVelocity(corrected_vel)
+			end
 			
 			local new_state_history = {}
 			
@@ -107,14 +112,13 @@ function input_prediction_system:apply_correction(input_sequence, new_position, 
 			prediction.state_history = new_state_history
 			
 			--if (to_pixels(corrected_pos) - to_pixels(self.targets[i].cpp_entity.physics.body:GetPosition())):length() > 0.0 then
-				print((to_pixels(corrected_pos) - to_pixels(self.targets[i].cpp_entity.physics.body:GetPosition())):length())
 			--end
 			
 			--print(corrected_pos.x, corrected_pos.y)
 			--print(corrected_vel.x, corrected_vel.y)
 			clearlc(1)
-			debuglc(1, rgba(255, 0, 0, 255), to_pixels(new_position), to_pixels(new_velocity) + to_pixels(new_velocity) )
-			debuglc(1, rgba(0, 255, 0, 255), to_pixels(correct_from.position), to_pixels(correct_from.position) + to_pixels(correct_from.vel))
+			debuglc(1, rgba(255, 0, 0, 255), to_pixels(new_position), to_pixels(new_position) + to_pixels(new_velocity) )
+			--debuglc(1, rgba(0, 255, 0, 255), to_pixels(correct_from.position), to_pixels(correct_from.position) + to_pixels(correct_from.vel))
 			debuglc(1, rgba(0, 255, 255, 255), to_pixels(corrected_pos), (to_pixels(corrected_vel) + to_pixels(corrected_pos)))
 		end
 	end

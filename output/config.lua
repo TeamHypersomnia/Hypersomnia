@@ -14,7 +14,13 @@ config_table = {
 	server_address = "127.0.0.1",
 	server_port = 37017,
 	
-	multiple_clients_view = 0
+	multiple_clients_view = 0,
+	divergence_radius = 70,
+	
+	simulate_lag = 1,
+	packet_loss = 0.0,
+	min_latency = 80,
+	jitter = 5
 }
 
 if config_table.fullscreen == 1 then

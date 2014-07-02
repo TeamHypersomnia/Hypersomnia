@@ -8,7 +8,7 @@ function client_system:constructor(network)
 	
 	self.my_sync_id = nil
 	
-	set_rate(self, "cmd_rate", 60)
+	set_rate(self, "cmd_rate", 66)
 	self.cmd_requested = false
 	
 	processing_system.constructor(self)
