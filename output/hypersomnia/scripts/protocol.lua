@@ -12,6 +12,8 @@ protocol.messages = {
 	-- client to server
 	"COMMAND",
 	
+	"INPUT_SNAPSHOT",
+	
 	-- bidirectional
 	"CLIENT_PREDICTION",
 	

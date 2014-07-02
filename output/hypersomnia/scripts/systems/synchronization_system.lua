@@ -144,15 +144,19 @@ function synchronization_system:update()
 				
 				if input_bs:ReadBit() then
 					movement.moving_left = 1
+					else movement.moving_left = 0
 				end
 				if input_bs:ReadBit() then
 					movement.moving_right = 1
+					else movement.moving_right = 0
 				end
 				if input_bs:ReadBit() then
 					movement.moving_forward = 1
+					else movement.moving_forward = 0
 				end
 				if input_bs:ReadBit() then
 					movement.moving_backward = 1
+					else movement.moving_backward = 0
 				end
 				
 				self.owner_entity_system.all_systems["input_prediction"]:apply_correction(input_sequence, position, velocity, movement)

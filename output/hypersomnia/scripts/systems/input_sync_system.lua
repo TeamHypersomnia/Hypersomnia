@@ -41,8 +41,8 @@ function input_sync_system:update()
 			output_bs:name_property("command_id")
 			output_bs:WriteByte(protocol.name_to_command[desired_command .. protocol.intent_to_name[intent]])
 			
-			self.owner_entity_system.all_systems["client"].net_channel:post_bitstream(output_bs)
-			self.owner_entity_system.all_systems["client"].cmd_requested = true
+			--self.owner_entity_system.all_systems["client"].net_channel:post_bitstream(output_bs)
+			--self.owner_entity_system.all_systems["client"].cmd_requested = true
 		end
 		
 	end

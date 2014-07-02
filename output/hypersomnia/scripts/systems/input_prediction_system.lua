@@ -32,16 +32,36 @@ function input_prediction_system:substep_callback(owner_world)
 		prediction.state_history[prediction.first_state + prediction.count] = history_entry
 		prediction.count = prediction.count + 1
 		
-		if prediction.count > 120 then
+		if prediction.count > 320 then
 			prediction.state_history[prediction.first_state] = nil
 			prediction.first_state = prediction.first_state + 1
 			prediction.count = prediction.count - 1
 		end
 		
 		for j=prediction.first_state, prediction.first_state+prediction.count-1 do
-			--debuglb2(rgba(255, 255, 255, 255), prediction.state_history[j].position)
+			debuglb2(rgba(255, 255, 255, 255), prediction.state_history[j].position)
 		end
 		
+		local command_bs = BitStream()
+		
+		command_bs:WriteByte(protocol.messages.INPUT_SNAPSHOT)
+		command_bs:WriteBit(movement.moving_left > 0)
+		command_bs:WriteBit(movement.moving_right > 0)
+		command_bs:WriteBit(movement.moving_forward > 0)
+		command_bs:WriteBit(movement.moving_backward > 0)
+		
+		self.owner_entity_system.all_systems["client"].net_channel:post_bitstream(command_bs)
+		self.owner_entity_system.all_systems["client"].cmd_requested = true
+		
+		
+		
+		global_logfile:write(("Step number.." .. (prediction.first_state + prediction.count - 1)))
+		global_logfile:write(("\nApplying inputs.."))
+		global_logfile:write(("\nLeft:" .. history_entry.moving_left))
+		global_logfile:write(("\nRight:" .. history_entry.moving_right))
+		global_logfile:write(("\nForward:" .. history_entry.moving_forward))
+		global_logfile:write(("\nBackward:" .. history_entry.moving_backward))
+		global_logfile:write("\n")
 	end
 end
 
@@ -54,9 +74,9 @@ function input_prediction_system:apply_correction(input_sequence, new_position, 
 		if prediction.count > 0 and input_sequence < prediction.first_state + prediction.count and input_sequence >= prediction.first_state then
 			local correct_from = prediction.state_history[input_sequence]
 			
-			for k, v in pairs(movement) do
-				correct_from[k] = v
-			end
+			--for k, v in pairs(movement) do
+			--	correct_from[k] = v
+			--end
 			
 			local simulation_entity = prediction.simulation_entity
 			local simulation_body = simulation_entity.physics.body
@@ -93,7 +113,7 @@ function input_prediction_system:apply_correction(input_sequence, new_position, 
 			print((to_pixels(corrected_pos) - to_pixels(self.targets[i].cpp_entity.physics.body:GetPosition())):length())
 			
 			if (to_pixels(corrected_pos) - to_pixels(self.targets[i].cpp_entity.physics.body:GetPosition())):length() > config_table.divergence_radius then
-				self.targets[i].cpp_entity.physics.body:SetTransform(corrected_pos, 0)
+				--self.targets[i].cpp_entity.physics.body:SetTransform(corrected_pos, 0)
 				--self.targets[i].cpp_entity.physics.body:SetLinearVelocity(corrected_vel)
 			end
 			
@@ -106,10 +126,10 @@ function input_prediction_system:apply_correction(input_sequence, new_position, 
 				cnt=cnt+1
 			end
 			
-			prediction.first_state = input_sequence+1
-			prediction.count = cnt
+			--prediction.first_state = input_sequence+1
+			--prediction.count = cnt
 			
-			prediction.state_history = new_state_history
+			--prediction.state_history = new_state_history
 			
 			--if (to_pixels(corrected_pos) - to_pixels(self.targets[i].cpp_entity.physics.body:GetPosition())):length() > 0.0 then
 			--end
@@ -139,8 +159,6 @@ function input_prediction_system:update()
 		-- as substep callback is called before b2World::Step
 		prediction_request:WriteUint(prediction.first_state + prediction.count)
 		-- write our current position
-		prediction_request:name_property("predicted_pos")
-		prediction_request:Writeb2Vec2(self.targets[i].cpp_entity.physics.body:GetPosition())
 		
 		self.owner_entity_system.all_systems["client"].net_channel.unreliable_buf:WriteBitstream(prediction_request)
 	end
