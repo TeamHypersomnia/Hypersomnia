@@ -134,13 +134,28 @@ function synchronization_system:update()
 				
 			elseif command_type == protocol.messages.CLIENT_PREDICTION then
 				input_bs:name_property("input_sequence")
-				local input_sequence = input_bs:ReadUshort()
+				local input_sequence = input_bs:ReadUint()
 				input_bs:name_property("actual_position")
 				local position = input_bs:Readb2Vec2()
 				input_bs:name_property("actual_velocity")
 				local velocity = input_bs:Readb2Vec2()
 				
-				self.owner_entity_system.all_systems["input_prediction"]:apply_correction(input_sequence, position, velocity)
+				local movement = {}
+				
+				if input_bs:ReadBit() then
+					movement.moving_left = 1
+				end
+				if input_bs:ReadBit() then
+					movement.moving_right = 1
+				end
+				if input_bs:ReadBit() then
+					movement.moving_forward = 1
+				end
+				if input_bs:ReadBit() then
+					movement.moving_backward = 1
+				end
+				
+				self.owner_entity_system.all_systems["input_prediction"]:apply_correction(input_sequence, position, velocity, movement)
 				
 		
 				--print (input_bs.read_report)

@@ -22,6 +22,7 @@ function input_prediction_system:substep_callback(owner_world)
 		local history_entry = { 
 			-- position here is only for debugging
 			position = to_pixels(position_meters),
+			vel = to_pixels(self.targets[i].cpp_entity.physics.body:GetLinearVelocity()),
 			moving_left = movement.moving_left,
 			moving_right = movement.moving_right,
 			moving_forward = movement.moving_forward,
@@ -29,27 +30,35 @@ function input_prediction_system:substep_callback(owner_world)
 		}
 		clearl()
 		
-		table.insert(prediction.state_history, history_entry)
+		prediction.state_history[prediction.first_state + prediction.count] = history_entry
+		prediction.count = prediction.count + 1
 		
-		--if #prediction.state_history > 60 then
-		--	table.remove(prediction.state_history, 1)
-		--end
+		if prediction.count > 120 then
+			prediction.state_history[prediction.first_state] = nil
+			prediction.first_state = prediction.first_state + 1
+			prediction.count = prediction.count - 1
+		end
 		
-		for j=1, #prediction.state_history do
+		for j=prediction.first_state, prediction.first_state+prediction.count-1 do
 			debugl(rgba(255, 255, 255, 255), prediction.state_history[j].position)
 		end
+		
 	end
 end
 
-function input_prediction_system:apply_correction(input_sequence, new_position, new_velocity) 
+function input_prediction_system:apply_correction(input_sequence, new_position, new_velocity, movement) 
 	-- we don't have more than one target at the moment
 	for i=1, #self.targets do
 		local prediction = self.targets[i].input_prediction
 		
-		print(input_sequence, #prediction.state_history)
-		if input_sequence <= #prediction.state_history-1 then
-			
+		print(input_sequence, prediction.last_state)
+		if prediction.count > 0 and input_sequence < prediction.first_state + prediction.count and input_sequence >= prediction.first_state then
 			local correct_from = prediction.state_history[input_sequence]
+			
+			for k, v in pairs(movement) do
+				correct_from[k] = v
+			end
+			
 			local simulation_entity = prediction.simulation_entity
 			local simulation_body = simulation_entity.physics.body
 			
@@ -74,7 +83,7 @@ function input_prediction_system:apply_correction(input_sequence, new_position, 
 				simulation_callback
 			}
 			
-			self.simulation_world:process_steps(#prediction.state_history - input_sequence + 1)
+			self.simulation_world:process_steps(prediction.first_state + prediction.count - input_sequence)
 			
 			local corrected_pos = simulation_body:GetPosition()
 			local corrected_vel = simulation_body:GetLinearVelocity()
@@ -85,9 +94,14 @@ function input_prediction_system:apply_correction(input_sequence, new_position, 
 			local new_state_history = {}
 			
 			-- save states only more recent than input_sequence
-			for j=input_sequence+1, #prediction.state_history do
-				table.insert(new_state_history, prediction.state_history[j])
+			local cnt = 0
+			for j=input_sequence+1, prediction.first_state+prediction.count-1 do
+				new_state_history[j] = prediction.state_history[j]
+				cnt=cnt+1
 			end
+			
+			prediction.first_state = input_sequence+1
+			prediction.count = cnt
 			
 			prediction.state_history = new_state_history
 			
@@ -112,7 +126,7 @@ function input_prediction_system:update()
 		prediction_request:name_property("input_sequence")
 		-- we're already ahead of one prediction
 		-- as substep callback is called before b2World::Step
-		prediction_request:WriteUshort(#prediction.state_history+1)
+		prediction_request:WriteUint(prediction.first_state + prediction.count)
 		-- write our current position
 		prediction_request:name_property("predicted_pos")
 		prediction_request:Writeb2Vec2(self.targets[i].cpp_entity.physics.body:GetPosition())
