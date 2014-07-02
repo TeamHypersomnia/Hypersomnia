@@ -114,10 +114,11 @@ function world_class:process_all_systems()
 	
 	world:validate_delayed_messages()
 	world:flush_message_queues()
+	local steps_made = 0
 	
 	-- physics must run first because the substep routine may flush message queues
 	if not self.is_paused then 
-		my_instance.physics_system:process_entities(world)
+		steps_made = my_instance.physics_system:process_entities(world)
     end
     
 	my_instance.input_system:process_entities(world)
@@ -165,11 +166,11 @@ function world_class:process_all_systems()
 	end
 	
 	my_instance.camera_system:process_rendering(world) 
+	
+	return steps_made
 end
 
 	-- default loop
 function world_class:loop()
-	self:process_all_systems()
-	
-	return self.world_inst.input_system.quit_flag
+	return self:process_all_systems()
 end

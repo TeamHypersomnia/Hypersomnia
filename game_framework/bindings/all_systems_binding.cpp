@@ -100,6 +100,8 @@ namespace bindings {
 			.def_readwrite("triangles", &render_system::triangles)
 			.def("push_line", &render_system::push_line)
 			.def("push_non_cleared_line", &render_system::push_non_cleared_line)
+			.def("push_line_channel", &render_system::push_line_channel)
+			.def("clear_channel", &render_system::clear_channel)
 			.def("clear_non_cleared_lines", &render_system::clear_non_cleared_lines)
 
 			.def("call_triangles", &render_system::call_triangles)

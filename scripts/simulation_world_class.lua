@@ -1,4 +1,4 @@
-simulation_world_class = inherits_from ()
+simulation_world_class = inherits_from (world_class)
 
 function simulation_world_class:constructor()
 	self.world_inst = world_instance()

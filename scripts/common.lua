@@ -48,6 +48,14 @@ function to_vec2(b2Vec2_)
 	return vec2(b2Vec2_.x, b2Vec2_.y)
 end
 
+function to_pixels(b2Vec2_)
+	return vec2(b2Vec2_.x*METERS_TO_PIXELS, b2Vec2_.y*METERS_TO_PIXELS)
+end
+
+function to_meters(vec2_)
+	return b2Vec2(vec2_.x*PIXELS_TO_METERS, vec2_.y*PIXELS_TO_METERS)
+end
+
 function inherits_from(baseClass)
 
     -- The following lines are equivalent to the SimpleClass example:
@@ -404,7 +412,7 @@ end
 function debugl(col, pos, pos2)
 	if pos2 == nil then 
 		pos2 = vec2(pos)
-		pos2.y = pos2.y + 25
+		pos2.y = pos2.y + 10
 	end
 	
 	debug_line_system:push_non_cleared_line(debug_line(pos, pos2, col))
@@ -412,8 +420,29 @@ end
 
 function debuglb2(col, pos, pos2)
 	if pos2 == nil then 
-		debugl(col, vec2(pos.x, pos.y))
+		debugl(col, vec2(pos.x*METERS_TO_PIXELS, pos.y*METERS_TO_PIXELS))
 	else
 		debugl(col, vec2(pos.x*METERS_TO_PIXELS, pos.y*METERS_TO_PIXELS), vec2(pos2.x*METERS_TO_PIXELS, pos2.y*METERS_TO_PIXELS))
+	end
+end
+
+function clearlc(c)
+	debug_line_system:clear_channel(c)
+end
+
+function debuglc(c, col, pos, pos2)
+	if pos2 == nil then 
+		pos2 = vec2(pos)
+		pos2.y = pos2.y + 10
+	end
+	
+	debug_line_system:push_line_channel(debug_line(pos, pos2, col), c)
+end
+
+function debuglcb2(c, col, pos, pos2)
+	if pos2 == nil then 
+		debugl(c, col, vec2(pos.x*METERS_TO_PIXELS, pos.y*METERS_TO_PIXELS))
+	else
+		debugl(c, col, vec2(pos.x*METERS_TO_PIXELS, pos.y*METERS_TO_PIXELS), vec2(pos2.x*METERS_TO_PIXELS, pos2.y*METERS_TO_PIXELS))
 	end
 end

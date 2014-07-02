@@ -103,6 +103,7 @@ namespace bindings {
 			
 			luabind::class_<b2Vec2>("b2Vec2")
 			.def(luabind::constructor<float, float>())
+			.def(luabind::constructor<const b2Vec2&>())
 			.def(luabind::constructor<>())
 			.def_readwrite("x", &b2Vec2::x)
 			.def_readwrite("y", &b2Vec2::y),

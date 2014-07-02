@@ -158,6 +158,11 @@ void render_system::draw_debug_info(vec2<> visible_area, components::transform::
 	};
 	
 	std::for_each(lines.begin(), lines.end(), line_lambda);
+
+	for (int i = 0; i < 20; ++i) {
+		std::for_each(lines_channels[i].begin(), lines_channels[i].end(), line_lambda);
+	}
+
 	std::for_each(manually_cleared_lines.begin(), manually_cleared_lines.end(), line_lambda);
 	std::for_each(non_cleared_lines.begin(), non_cleared_lines.end(), line_lambda);
 
