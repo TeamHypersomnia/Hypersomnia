@@ -19,11 +19,12 @@ function input_sync_system:update()
 		local msg = msgs[i]
 
 		local subject = msg.subject.script
+		local intent = msg.intent
 		
-		if msg.intent == intent_message.MOVE_FORWARD or
-		   msg.intent == intent_message.MOVE_BACKWARD or
-		   msg.intent == intent_message.MOVE_LEFT or
-		   msg.intent == intent_message.MOVE_RIGHT
+		if intent == intent_message.MOVE_FORWARD or
+		   intent == intent_message.MOVE_BACKWARD or
+		   intent == intent_message.MOVE_LEFT or
+		   intent == intent_message.MOVE_RIGHT
 		then
 		
 			local desired_command;
@@ -38,7 +39,7 @@ function input_sync_system:update()
 			output_bs:name_property("COMMAND")
 			output_bs:WriteByte(protocol.messages.COMMAND)
 			output_bs:name_property("command_id")
-			output_bs:WriteByte(protocol.name_to_command[desired_command .. protocol.intent_to_name[msg.intent]])
+			output_bs:WriteByte(protocol.name_to_command[desired_command .. protocol.intent_to_name[intent]])
 			
 			self.owner_entity_system.all_systems["client"].net_channel:post_bitstream(output_bs)
 			self.owner_entity_system.all_systems["client"].cmd_requested = true

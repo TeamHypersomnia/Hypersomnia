@@ -140,7 +140,10 @@ function synchronization_system:update()
 				input_bs:name_property("actual_velocity")
 				local velocity = input_bs:Readb2Vec2()
 				
-				print (input_bs.read_report)
+				self.owner_entity_system.all_systems["input_prediction"]:apply_correction(input_sequence, position, velocity)
+				
+		
+				--print (input_bs.read_report)
 			elseif command_type == protocol.messages.ASSIGN_SYNC_ID then
 				self.my_sync_id = input_bs:ReadUshort()
 			end
