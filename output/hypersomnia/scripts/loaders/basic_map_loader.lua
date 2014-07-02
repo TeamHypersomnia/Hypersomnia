@@ -25,7 +25,14 @@ return function(map_filename, scene_object)
 	
 	for i = 1, #environmental_objects do
 		local object = environmental_objects[i]
-		world:create_entity (tiled_map_loader.basic_entity_table(object, type_table_by_object[object], scene_object.resource_storage, scene_object.world_camera, scene_object.texture_by_filename))
+		
+		local new_entity = tiled_map_loader.basic_entity_table(object, type_table_by_object[object], scene_object.resource_storage, scene_object.world_camera, scene_object.texture_by_filename)
+		
+		world:create_entity (new_entity)
+		scene_object.simulation_world:create_entity {
+			transform = new_entity.transform,
+			physics = new_entity.physics
+		}
 	end
 	
 	
