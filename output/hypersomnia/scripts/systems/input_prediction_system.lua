@@ -38,9 +38,9 @@ function input_prediction_system:substep_callback(owner_world)
 			prediction.count = prediction.count - 1
 		end
 		
-		for j=prediction.first_state, prediction.first_state+prediction.count-1 do
-			debuglb2(rgba(255, 255, 255, 255), prediction.state_history[j].position)
-		end
+		--for j=prediction.first_state, prediction.first_state+prediction.count-1 do
+		--	debuglb2(rgba(255, 255, 255, 255), prediction.state_history[j].position)
+		--end
 		
 		local command_bs = BitStream()
 		
@@ -53,14 +53,6 @@ function input_prediction_system:substep_callback(owner_world)
 		
 		self.owner_entity_system.all_systems["client"].net_channel:post_bitstream(command_bs)
 		self.owner_entity_system.all_systems["client"].cmd_requested = true
-		
-		global_logfile:write(("Step number.." .. (prediction.first_state + prediction.count - 1)))
-		global_logfile:write(("\nApplying inputs.."))
-		global_logfile:write(("\nLeft:" .. history_entry.moving_left))
-		global_logfile:write(("\nRight:" .. history_entry.moving_right))
-		global_logfile:write(("\nForward:" .. history_entry.moving_forward))
-		global_logfile:write(("\nBackward:" .. history_entry.moving_backward))
-		global_logfile:write("\n")
 	end
 end
 
@@ -101,9 +93,6 @@ function input_prediction_system:apply_correction(input_sequence, new_position, 
 			local corrected_pos = simulation_body:GetPosition()
 			local corrected_vel = simulation_body:GetLinearVelocity()
 			
-			local vel = to_pixels(self.targets[i].cpp_entity.physics.body:GetLinearVelocity())
-			print((to_pixels(corrected_pos) - to_pixels(self.targets[i].cpp_entity.physics.body:GetPosition())):length())
-			
 			if (to_pixels(corrected_pos) - to_pixels(self.targets[i].cpp_entity.physics.body:GetPosition())):length() > config_table.divergence_radius then
 				self.targets[i].cpp_entity.physics.body:SetTransform(corrected_pos, 0)
 				self.targets[i].cpp_entity.physics.body:SetLinearVelocity(corrected_vel)
@@ -123,10 +112,10 @@ function input_prediction_system:apply_correction(input_sequence, new_position, 
 			
 			prediction.state_history = new_state_history
 			
-			clearlc(1)
-			debuglc(1, rgba(255, 0, 0, 255), to_pixels(new_position), to_pixels(new_position) + to_pixels(new_velocity) )
+			--clearlc(1)
+			--debuglc(1, rgba(255, 0, 0, 255), to_pixels(new_position), to_pixels(new_position) + to_pixels(new_velocity) )
 			--debuglc(1, rgba(0, 255, 0, 255), to_pixels(correct_from.position), to_pixels(correct_from.position) + to_pixels(correct_from.vel))
-			debuglc(1, rgba(0, 255, 255, 255), to_pixels(corrected_pos), (to_pixels(corrected_vel) + to_pixels(corrected_pos)))
+			--debuglc(1, rgba(0, 255, 255, 255), to_pixels(corrected_pos), (to_pixels(corrected_vel) + to_pixels(corrected_pos)))
 		end
 	end
 end
