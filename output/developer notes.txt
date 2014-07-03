@@ -220,6 +220,22 @@ For now just stick to basic_player + remote_player classes in the client, then e
 It might be necessary for the server to send a message every time an object gets out of player's proximity.
 
 
+
+Consider "parties" or anything where an object's state may differ across the players.
+Example:
+
+For every member in the party, serwer transmits each other's crosshairs positions (8 bytes), not only player orientations (2 bytes if we just send angles 1-65536).
+If you don't belong to any party, you can only ever see other players' orientations.
+
+So it becomes obvious we don't want to waste these 2 bytes if we either way have to send 8.
+
+The solution to this might be introducing state groups and assigning clients to them.
+Whenever we send an object state for the client, we check to what state group it belongs for a given client.
+
+It's worth noting that a client may belong to many state groups (friends, party, guild),
+but an object belongs to only one state group for a given client.
+
+
 --------------------------------------------
 TRANSFERRING OBJECT STATE
 --------------------------------------------
