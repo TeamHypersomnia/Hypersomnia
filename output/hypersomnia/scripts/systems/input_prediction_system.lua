@@ -52,16 +52,23 @@ function input_prediction_system:substep()
 end
 
 function input_prediction_system:update()
-	local msgs = self.owner_entity_system.messages["CLIENT_PREDICTION"]
+	local msgs = self.owner_entity_system.messages["CURRENT_STEP"]
+	
+	local new_step = false
+	local at_step_sequence;
 	
 	for i=1, #msgs do
-		local at_step_sequence = msgs[i].data.at_step
-		local new_position = msgs[i].data.position
-		local new_velocity = msgs[i].data.velocity
-		-- we don't have more than one target at the moment
-		local target = self.targets[1]
-		
-		if target ~= nil then
+		new_step = true
+		at_step_sequence = msgs[i].data.at_step
+	end
+	
+	if new_step then
+		for i=1, #self.targets do
+			local target = self.targets[i]
+			local new_position = self.targets[i].synchronization.modules.movement.position
+			local new_velocity = self.targets[i].synchronization.modules.movement.velocity
+			-- we don't have more than one target at the moment
+			
 			local prediction = target.input_prediction
 			
 			if prediction.count > 0 and at_step_sequence < prediction.first_state + prediction.count and at_step_sequence >= prediction.first_state then

@@ -18,11 +18,9 @@ protocol.message_by_id = {
 		}
 	},
 	{
-		name = "CLIENT_PREDICTION",
+		name = "CURRENT_STEP",
 		data = {
-			"Uint", "at_step",
-			"b2Vec2", "position",
-			"b2Vec2", "velocity"
+			"Uint", "at_step"
 		}
 	},
 	{

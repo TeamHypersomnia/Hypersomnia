@@ -15,13 +15,10 @@ function sync_modules.movement:read_stream(input)
 end
 
 function sync_modules.movement:read_state(input)
-	self.property = input:ReadUint ()
-	print ("Reading.." .. self.property)
 end
 
 -- optional
 function sync_modules.movement:update_game_object(object)
-	
 end
 
 -- SERVER CODE
@@ -32,8 +29,4 @@ function sync_modules.movement:write_stream(object, output)
 end
 
 function sync_modules.movement:write_state(output)
-	--if self.property ~= nil then
-	output:WriteUint (self.property)
-	print ("Writing.." .. self.property)
-	--end
 end
