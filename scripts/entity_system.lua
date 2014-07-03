@@ -20,8 +20,12 @@ function entity_system:flush_messages()
 	end
 end
 
-function entity_system:post(msg_table)
-	table.insert(self.messages[msg_table.name], msg_table)
+function entity_system:post(name, msg_table)
+	self:post_table(name, _G[name]:create(msg_table))
+end
+
+function entity_system:post_table(name, msg_table)
+	table.insert(self.messages[name], msg_table)
 end
 
 function entity_system:register_systems(new_systems)
