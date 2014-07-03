@@ -4,11 +4,13 @@ dofile "hypersomnia\\scripts\\protocol.lua"
 dofile "hypersomnia\\scripts\\reliable_channel.lua"
 
 dofile "hypersomnia\\scripts\\components\\input_prediction.lua"
+dofile "hypersomnia\\scripts\\components\\interpolation.lua"
 
 dofile "hypersomnia\\scripts\\sync_modules\\modules.lua"
 dofile "hypersomnia\\scripts\\sync_modules\\movement_sync.lua"
 
 dofile "hypersomnia\\scripts\\systems\\protocol_system.lua"
+dofile "hypersomnia\\scripts\\systems\\interpolation_system.lua"
 dofile "hypersomnia\\scripts\\systems\\client_system.lua"
 dofile "hypersomnia\\scripts\\systems\\input_prediction_system.lua"
 dofile "hypersomnia\\scripts\\systems\\synchronization_system.lua"
@@ -46,6 +48,7 @@ function client_screen:constructor(camera_rect)
 	self.systems.input_prediction = input_prediction_system:create(self.sample_scene.simulation_world)
 	self.systems.synchronization = synchronization_system:create(self.sample_scene)
 	self.systems.protocol = protocol_system:create(function(msg) self.systems.synchronization:handle_variable_message(msg) end)
+	self.systems.interpolation = interpolation_system:create()
 	
 	table.insert(self.sample_scene.world_object.substep_callbacks, function () 
 		self.systems.client:substep()
@@ -89,6 +92,7 @@ function client_screen:loop()
 	self.systems.protocol:handle_incoming_commands()
 	
 	self.systems.input_prediction:update()
+	self.systems.interpolation:update()
 	
 	--print "client tick"
 	self.systems.client:send_all_data()
