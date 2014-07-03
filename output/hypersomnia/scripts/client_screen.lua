@@ -43,9 +43,15 @@ function client_screen:constructor(camera_rect)
 	
 	self.systems = {}
 	self.systems.client = client_system:create(self.server)
-	self.systems.input_prediction = input_prediction_system:create(self.sample_scene.simulation_world, self.sample_scene.world_object)
+	self.systems.input_prediction = input_prediction_system:create(self.sample_scene.simulation_world)
 	self.systems.synchronization = synchronization_system:create(self.sample_scene)
 	self.systems.protocol = protocol_system:create(function(msg) self.systems.synchronization:handle_variable_message(msg) end)
+	
+	table.insert(self.sample_scene.world_object.substep_callbacks, function () 
+		self.systems.client:substep()
+		self.systems.input_prediction:substep()
+	end)
+	
 	
 	self.entity_system_instance:register_systems(self.systems)
 end
@@ -78,12 +84,14 @@ function client_screen:loop()
 		end
 	end
 	
+	self.systems.client:clear_unreliable()
+	
 	self.systems.protocol:handle_incoming_commands()
 	
 	self.systems.input_prediction:update()
 	
 	--print "client tick"
-	self.systems.client:update_tick()
+	self.systems.client:send_all_data()
 	
 	--print "flush"
 	self.entity_system_instance:flush_messages()

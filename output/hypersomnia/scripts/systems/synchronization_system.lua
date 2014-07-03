@@ -117,7 +117,7 @@ function synchronization_system:handle_variable_message(msg)
 	elseif msg.info.name == "ASSIGN_SYNC_ID" then
 		self.my_sync_id = msg.data.sync_id
 	elseif msg.info.name == "DELETE_OBJECT" then
-		local id = msgs[i].data.removed_id
+		local id = msg.data.removed_id
 		self.owner_entity_system:remove_entity(self.object_by_id[id])
 		
 		self.object_by_id[id] = nil

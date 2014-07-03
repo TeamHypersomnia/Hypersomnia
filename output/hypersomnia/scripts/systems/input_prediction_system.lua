@@ -1,10 +1,7 @@
 input_prediction_system = inherits_from (processing_system)
 
-function input_prediction_system:constructor(simulation_world, substepping_world) 
+function input_prediction_system:constructor(simulation_world) 
 	self.simulation_world = simulation_world
-	self.substepping_world = substepping_world
-	
-	table.insert(self.substepping_world.substep_callbacks, function () self:substep_callback(self.substepping_world) end)
 	
 	processing_system.constructor(self)
 end
@@ -13,7 +10,7 @@ function input_prediction_system:get_required_components()
 	return { "input_prediction", "cpp_entity" }
 end
 
-function input_prediction_system:substep_callback(owner_world)
+function input_prediction_system:substep()
 	for i=1, #self.targets do
 		local prediction = self.targets[i].input_prediction
 		local movement = self.targets[i].cpp_entity.movement 
@@ -42,15 +39,17 @@ function input_prediction_system:substep_callback(owner_world)
 		--	debuglb2(rgba(255, 255, 255, 255), prediction.state_history[j].position)
 		--end
 		
-		self.owner_entity_system.all_systems["client"].net_channel:post_reliable("INPUT_SNAPSHOT", {
+		self.owner_entity_system.all_systems["client"].substep_unreliable:WriteBitstream(protocol.write_msg("INPUT_SNAPSHOT", {
 			at_step = prediction.first_state + prediction.count - 1,
 			moving_left = movement.moving_left,
 			moving_right = movement.moving_right,
 			moving_forward = movement.moving_forward,
 			moving_backward = movement.moving_backward
-		})
+		}))
 		
 		self.owner_entity_system.all_systems["client"].cmd_requested = true
+		
+		print"stepping"
 	end
 end
 
