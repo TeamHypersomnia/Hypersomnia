@@ -13,8 +13,21 @@ function reliable_channel_wrapper:constructor()
 end
 
 
-function reliable_channel_wrapper:post_bitstream(output_bs)
+function reliable_channel_wrapper:post_reliable_bs(output_bs)
 	self:post( { output_bitstream = output_bs } )
+end
+
+
+function reliable_channel_wrapper:post_reliable(name, entry)
+	self:post_reliable_bs(protocol.write_msg(name, entry))
+end
+
+function reliable_channel_wrapper:post_unreliable_bs(output_bs)
+	self.unreliable_buf:WriteBitstream(output_bs)
+end
+
+function reliable_channel_wrapper:post_unreliable(name, entry)
+	self:post_unreliable_bs(protocol.write_msg(name, entry))
 end
 
 function reliable_channel_wrapper:post(message)

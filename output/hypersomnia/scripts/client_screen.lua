@@ -3,15 +3,12 @@ dofile "hypersomnia\\scripts\\protocol.lua"
 
 dofile "hypersomnia\\scripts\\reliable_channel.lua"
 
-
-dofile "hypersomnia\\scripts\\messages\\network_message.lua"
-dofile "hypersomnia\\scripts\\messages\\server_commands.lua"
-
 dofile "hypersomnia\\scripts\\components\\input_prediction.lua"
 
 dofile "hypersomnia\\scripts\\sync_modules\\modules.lua"
 dofile "hypersomnia\\scripts\\sync_modules\\movement_sync.lua"
 
+dofile "hypersomnia\\scripts\\systems\\protocol_system.lua"
 dofile "hypersomnia\\scripts\\systems\\client_system.lua"
 dofile "hypersomnia\\scripts\\systems\\input_prediction_system.lua"
 dofile "hypersomnia\\scripts\\systems\\synchronization_system.lua"
@@ -39,14 +36,16 @@ function client_screen:constructor(camera_rect)
 	self.entity_system_instance = entity_system:create()
 	
 	self.entity_system_instance:register_messages {
-		"network_message",
-		"server_commands"
+		"network_message"
 	}
+	
+	self.entity_system_instance:register_messages (protocol.message_names)
 	
 	self.systems = {}
 	self.systems.client = client_system:create(self.server)
 	self.systems.input_prediction = input_prediction_system:create(self.sample_scene.simulation_world, self.sample_scene.world_object)
 	self.systems.synchronization = synchronization_system:create(self.sample_scene)
+	self.systems.protocol = protocol_system:create(function(msg) self.systems.synchronization:handle_variable_message(msg) end)
 	
 	self.entity_system_instance:register_systems(self.systems)
 end
@@ -72,16 +71,16 @@ function client_screen:loop()
 		elseif message_type == network_event.ID_CONNECTION_LOST then
 			print("Server lost the connection.\n")
 		elseif message_type == protocol.GAME_TRANSMISSION then
-			self.entity_system_instance:post(network_message:create {
-				data = packet
+			self.entity_system_instance:post_table("network_message", {
+				data = packet,
+				channel = self.systems.client.net_channel 
 			})
 		end
 	end
 	
-	self.systems.client:handle_incoming_commands()
+	self.systems.protocol:handle_incoming_commands()
 	
-	--print "sync upd"
-	self.systems.synchronization:update()
+	self.systems.input_prediction:update()
 	
 	--print "client tick"
 	self.systems.client:update_tick()

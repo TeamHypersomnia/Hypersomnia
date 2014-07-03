@@ -6,26 +6,124 @@ protocol.module_mappings = {
 	"orientation"
 }
 
+protocol.message_by_id = {
+	{
+		name = "INPUT_SNAPSHOT",
+		data = {
+			"Uint", "at_step", 
+			"Bit", 	"moving_left",
+			"Bit", 	"moving_right",
+			"Bit", 	"moving_forward",
+			"Bit", 	"moving_backward"
+		}
+	},
+	{
+		name = "CLIENT_PREDICTION",
+		data = {
+			"Uint", "at_step",
+			"b2Vec2", "position",
+			"b2Vec2", "velocity"
+		}
+	},
+	{
+		name = "ASSIGN_SYNC_ID",
+		data = {
+			"Ushort", "sync_id"
+		},
+		read_immediately = true
+	},
+	{
+		name = "STATE_UPDATE",
+		data = {
+			"Ushort", "object_count"
+		},
+		read_immediately = true
+	},
+	{
+		name = "STREAM_UPDATE",
+		data = {
+			"Ushort", "object_count"
+		},
+		read_immediately = true
+	},
+	
+	{
+		name = "DELETE_OBJECT",
+		data = {
+			"Ushort", "removed_id"
+		},
+		read_immediately = true
+	}
+}
+
+-- internals
 protocol.GAME_TRANSMISSION = network_event.ID_USER_PACKET_ENUM + 1
 
-protocol.messages = {
-	-- client to server
-	"INPUT_SNAPSHOT",
+protocol.messages = {}
+protocol.message_names = {}
+protocol.id_by_message = {}
+
+for i=1, #protocol.message_by_id do
+	local name = protocol.message_by_id[i].name
+	protocol.messages[name] = protocol.message_by_id[i]
+	table.insert(protocol.message_names, name)
+	protocol.id_by_message[name] = i
+end	
+
+protocol.write_msg = function(name, entry)
+	local out_bs = BitStream()
+	out_bs:name_property(name)
+	out_bs:WriteByte(protocol.id_by_message[name])
 	
-	-- bidirectional
-	"CLIENT_PREDICTION",
+	local data = protocol.messages[name].data
 	
-	-- server to client
-	"ASSIGN_SYNC_ID",
+	for i=1, (#data/2) do
+		local var_type = data[i*2-1]
+		local var_name = data[i*2]
+		
+		out_bs:name_property(var_name)
+		
+		if var_type == "Bit" then
+			entry[var_name] = entry[var_name] > 0
+		end
+		out_bs["Write" .. var_type](out_bs, entry[var_name])
+	end
 	
-	-- used for guaranteed in-order delivery state changes
-	"STATE_UPDATE",
-	-- used for sequenced visuals like positions/velocities
-	"STREAM_UPDATE",
-	-- we must have these two types of updates because of differing transportation methods
+	return out_bs
+end
+
+protocol.read_msg = function(in_bs)
+	local out_entry = {}
 	
-	"DELETE_OBJECT"
-}
+	in_bs:name_property("message_type")
+	local message_type = in_bs:ReadByte()
+	
+	out_entry.info = protocol.message_by_id[message_type]
+	out_entry.data = {}
+	
+	local data = protocol.message_by_id[message_type].data
+	
+	for i=1, (#data/2) do
+		local var_type = data[i*2-1]
+		local var_name = data[i*2]
+		
+		in_bs:name_property(var_name)
+		
+		out_entry.data[var_name] = in_bs["Read" .. var_type](in_bs)
+		
+		if var_type == "Bit" then
+			out_entry.data[var_name] = bool2int(out_entry.data[var_name])
+		end
+	end
+	
+	return out_entry
+end
+
+
+
+
+
+
 
 
 protocol.intent_to_name = {
@@ -56,11 +154,3 @@ end
 for k, v in pairs (protocol.intent_to_name) do
 	protocol.name_to_intent[v] = k
 end
-
-local new_msg_table = {}
-	
-for i=1, #protocol.messages do
-	new_msg_table[protocol.messages[i]] = i
-end	
-
-protocol.messages = new_msg_table

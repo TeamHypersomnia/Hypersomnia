@@ -41,11 +41,10 @@ function synchronization_system:read_object_stream(object, input_bs)
 	end
 end
 
-function synchronization_system:update_states_from_bitstream(input_bs)
-	input_bs:name_property("object_count")
-	local num_of_objects = input_bs:ReadUshort()
-
-	for i=1, num_of_objects do
+function synchronization_system:update_states_from_bitstream(msg)
+	local input_bs = msg.input_bs
+	
+	for i=1, msg.data.object_count do
 		input_bs:name_property("object_id")
 		local incoming_id = input_bs:ReadUshort()
 		
@@ -76,6 +75,7 @@ function synchronization_system:update_states_from_bitstream(input_bs)
 				
 				new_entity.cpp_entity.script = new_entity
 			else
+				print(incoming_id)
 				local new_remote_player = create_remote_player(self.owner_scene)
 				
 				new_entity = components.create_components {
@@ -98,11 +98,10 @@ function synchronization_system:update_states_from_bitstream(input_bs)
 end
 
 
-function synchronization_system:update_streams_from_bitstream(input_bs)
-	input_bs:name_property("streamed_count")
-	local num_of_objects = input_bs:ReadUshort()
+function synchronization_system:update_streams_from_bitstream(msg)
+	local input_bs = msg.input_bs
 
-	for i=1, num_of_objects do
+	for i=1, msg.data.object_count do
 		input_bs:name_property("object_id")
 		-- we never read streams if there was reliable data attached and it got mismatched, so it is
 		-- safe to assume that streams always contain existing ids
@@ -110,52 +109,17 @@ function synchronization_system:update_streams_from_bitstream(input_bs)
 	end
 end
 
-function synchronization_system:update()
-	local msgs = self.owner_entity_system.messages["server_commands"]
-	
-	for i=1, #msgs do
-		local input_bs = msgs[i]:get_bitstream()
-		local in_size = input_bs:size()
-		-- read commands until we come to the end of the buffer
-		while input_bs:GetNumberOfUnreadBits() >= 8 do
-			input_bs:name_property("command_type")
-			local command_type = input_bs:ReadByte()
-			if command_type == protocol.messages.STATE_UPDATE then
-				self:update_states_from_bitstream(input_bs)
-			elseif command_type == protocol.messages.STREAM_UPDATE then
-				self:update_streams_from_bitstream(input_bs)
-			elseif command_type == protocol.messages.DELETE_OBJECT then
-				input_bs:name_property("removed_id")
-				local removed_id = input_bs:ReadUshort()
-				self.owner_entity_system:remove_entity(self.object_by_id[removed_id])
-				
-				self.object_by_id[removed_id] = nil	
-				
-			elseif command_type == protocol.messages.CLIENT_PREDICTION then
-				input_bs:name_property("at_step_sequence")
-				local at_step_sequence = input_bs:ReadUint()
-				input_bs:name_property("actual_position")
-				local position = input_bs:Readb2Vec2()
-				input_bs:name_property("actual_velocity")
-				local velocity = input_bs:Readb2Vec2()
-				
+function synchronization_system:handle_variable_message(msg)
+	if msg.info.name == "STATE_UPDATE" then
+		self:update_states_from_bitstream(msg)
+	elseif msg.info.name == "STREAM_UPDATE" then
+		self:update_streams_from_bitstream(msg)
+	elseif msg.info.name == "ASSIGN_SYNC_ID" then
+		self.my_sync_id = msg.data.sync_id
+	elseif msg.info.name == "DELETE_OBJECT" then
+		local id = msgs[i].data.removed_id
+		self.owner_entity_system:remove_entity(self.object_by_id[id])
 		
-				
-				self.owner_entity_system.all_systems["input_prediction"]:apply_correction(at_step_sequence, position, velocity)
-				
-		
-				--print (input_bs.read_report)
-			elseif command_type == protocol.messages.ASSIGN_SYNC_ID then
-				self.my_sync_id = input_bs:ReadUshort()
-			end
-		end
-		
-		--print("Receiving " .. in_size .. " bits: \n\n" .. input_bs.read_report .. "\n\n") 
-		-- if (msgs[i].recv_result == receive_result.RELIABLE_RECEIVED) then print("Receiving: \n\n" .. input_bs.read_report .. "\n\n") end
-	end
-	
-	-- modules may need some work to do, e.g. prediction, appearance updating
-	for i=1, #self.targets do
-	
+		self.object_by_id[id] = nil
 	end
 end
