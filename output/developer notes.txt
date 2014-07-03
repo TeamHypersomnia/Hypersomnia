@@ -236,6 +236,18 @@ It's worth noting that a client may belong to many state groups (friends, party,
 but an object belongs to only one state group for a given client.
 
 
+Let us simplify the above concept:
+Let the client simply hold a table that maps an existing object id to its client-specific module set.
+
+For a scenario where we wanted to synchronize an entity with only one player,
+we can create an entity with NO synchronization modules and make synchronization system assume that 0 modules are not worth for even transmitting a new ID.
+
+Or just make a dedicated client-specific entity table for this exact scenario, then just concatenate this table with table returned by function getting entities in proximity.
+
+When removing an alternative module set, just set remote_states[id] to nil so it updates again.
+
+
+
 --------------------------------------------
 TRANSFERRING OBJECT STATE
 --------------------------------------------

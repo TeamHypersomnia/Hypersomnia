@@ -70,16 +70,10 @@ for i=1, #protocol.message_by_id do
 	protocol.id_by_message[name] = i
 end	
 
-protocol.write_msg = function(name, entry)
-	local out_bs = BitStream()
-	out_bs:name_property(name)
-	out_bs:WriteByte(protocol.id_by_message[name])
-	
-	local data = protocol.messages[name].data
-	
-	for i=1, (#data/2) do
-		local var_type = data[i*2-1]
-		local var_name = data[i*2]
+protocol.write_sig = function(sig, entry, out_bs)
+	for i=1, (#sig/2) do
+		local var_type = sig[i*2-1]
+		local var_name = sig[i*2]
 		
 		out_bs:name_property(var_name)
 		
@@ -88,12 +82,42 @@ protocol.write_msg = function(name, entry)
 		end
 		out_bs["Write" .. var_type](out_bs, entry[var_name])
 	end
+end
+
+protocol.write_msg = function(name, entry)
+	local out_bs = BitStream()
+	out_bs:name_property(name)
+	out_bs:WriteByte(protocol.id_by_message[name])
+	
+	local data = protocol.messages[name].data
+	
+	protocol.write_sig(data, entry, out_bs)
 	
 	return out_bs
 end
 
-protocol.read_msg = function(in_bs)
-	local out_entry = {}
+
+protocol.read_sig = function(sig, out_entry, in_bs)
+	for i=1, (#sig/2) do
+		local var_type = sig[i*2-1]
+		local var_name = sig[i*2]
+		
+		in_bs:name_property(var_name)
+		
+		out_entry[var_name] = in_bs["Read" .. var_type](in_bs)
+		
+		if var_type == "Bit" then
+			out_entry[var_name] = bool2int(out_entry[var_name])
+		end
+	end
+end
+
+protocol.read_msg = function(in_bs, out_table)
+	local out_entry = out_table
+	
+	if out_entry == nil then
+		out_entry = {}
+	end
 	
 	in_bs:name_property("message_type")
 	local message_type = in_bs:ReadByte()
@@ -103,19 +127,8 @@ protocol.read_msg = function(in_bs)
 	
 	local data = protocol.message_by_id[message_type].data
 	
-	for i=1, (#data/2) do
-		local var_type = data[i*2-1]
-		local var_name = data[i*2]
-		
-		in_bs:name_property(var_name)
-		
-		out_entry.data[var_name] = in_bs["Read" .. var_type](in_bs)
-		
-		if var_type == "Bit" then
-			out_entry.data[var_name] = bool2int(out_entry.data[var_name])
-		end
-	end
-	
+	protocol.read_sig(data, out_entry.data, in_bs)
+
 	return out_entry
 end
 

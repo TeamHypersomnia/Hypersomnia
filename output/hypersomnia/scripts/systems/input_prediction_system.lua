@@ -24,7 +24,7 @@ function input_prediction_system:substep()
 			moving_forward = movement.moving_forward,
 			moving_backward = movement.moving_backward
 		}
-		clearl()
+		--clearl()
 		
 		prediction.state_history[prediction.first_state + prediction.count] = history_entry
 		prediction.count = prediction.count + 1
@@ -48,8 +48,6 @@ function input_prediction_system:substep()
 		}))
 		
 		self.owner_entity_system.all_systems["client"].cmd_requested = true
-		
-		print"stepping"
 	end
 end
 

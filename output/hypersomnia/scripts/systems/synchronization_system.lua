@@ -36,7 +36,7 @@ function synchronization_system:read_object_stream(object, input_bs)
 		local module_name = protocol.module_mappings[i]
 			
 		if modules[module_name] ~= nil then
-			modules[module_name]:read_stream(object, input_bs, self.my_sync_id)
+			modules[module_name]:read_stream(input_bs)
 		end
 	end
 end
@@ -91,6 +91,7 @@ function synchronization_system:update_states_from_bitstream(msg)
 			self.owner_entity_system:add_entity(new_entity)
 		end
 		
+		-- we might consider offloading this part to separate systems
 		for k, v in pairs (object.synchronization.modules) do
 			v:update_game_object(object)
 		end
