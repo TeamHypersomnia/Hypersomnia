@@ -8,6 +8,7 @@ dofile "hypersomnia\\scripts\\components\\interpolation.lua"
 
 dofile "hypersomnia\\scripts\\sync_modules\\modules.lua"
 dofile "hypersomnia\\scripts\\sync_modules\\movement_sync.lua"
+dofile "hypersomnia\\scripts\\sync_modules\\crosshair_sync.lua"
 
 dofile "hypersomnia\\scripts\\systems\\protocol_system.lua"
 dofile "hypersomnia\\scripts\\systems\\interpolation_system.lua"

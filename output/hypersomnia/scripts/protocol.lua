@@ -3,6 +3,7 @@ protocol = {}
 -- enables modules to be read/written correctly in order
 protocol.module_mappings = {
 	"movement",
+	"crosshair",
 	"orientation"
 }
 

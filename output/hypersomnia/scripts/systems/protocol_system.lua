@@ -31,7 +31,10 @@ function protocol_system:handle_incoming_commands()
 					self.owner_entity_system:post_table(msg.info.name, msg)
 				end
 			end
-			--print(input_bs.read_report)
+		end
+		
+		if result == receive_result.RELIABLE_RECEIVED then
+			print(input_bs.read_report)
 		end
 	end
 end
