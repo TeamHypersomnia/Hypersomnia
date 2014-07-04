@@ -33,8 +33,9 @@ function protocol_system:handle_incoming_commands()
 			end
 		end
 		
-		if result == receive_result.RELIABLE_RECEIVED then
+		--if result == receive_result.RELIABLE_RECEIVED then
+			--global_logfile:write(input_bs.read_report)
 			--print(input_bs.read_report)
-		end
+		--end
 	end
 end

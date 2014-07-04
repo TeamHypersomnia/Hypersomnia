@@ -8,8 +8,48 @@ function reliable_channel_wrapper:constructor()
 	self.sender = self.channel.sender
 	self.receiver = self.channel.receiver
 	
+	-- acknowledged, cleared, appended automatically to output bs
+	self.reliable_sequenced_messages = {}
+	-- only acknowledged and cleared, appended manually
+	self.reliable_sequenced_bitstreams = {}
+	
 	self.unreliable_buf = BitStream()
 	self.sender.unreliable_buf = self.unreliable_buf
+end
+
+
+-- only the most recent message is guaranteed to arrive
+function reliable_channel_wrapper:reliable_seq_bs(channel, out_bs)
+	-- treat "name" as slot identifier
+	self.reliable_sequenced_bitstreams[name] = {
+		-- will "probably" be issued on the next update
+		sequence = self.sender.sequence+1,
+		bitstream = out_bs
+	}
+end
+
+-- for manually appended messages (e.g. module data while updating streams)
+function reliable_channel_wrapper:get_reliable_seq_bs(channel)
+	local entry = self.reliable_sequenced_bitstreams[channel]
+	
+	if entry == nil then
+		return BitStream()
+	else
+		return entry.bitstream
+	end
+end
+
+function reliable_channel_wrapper:reliable_seq_msg(name, entry, retry)
+	local data = protocol.write_msg(name, entry)
+	local slot = { bitstream = data }
+	
+	if retry ~= nil and retry == true then
+		-- will be issued on the next update and will request a reliable sequence
+		slot.sequence = self.sender.sequence+1
+	end
+	
+	-- treat "name" as slot identifier
+	self.reliable_sequenced_messages[name] = slot
 end
 
 
@@ -55,11 +95,44 @@ function reliable_channel_wrapper:disable_starting_byte(...)
 end
 
 function reliable_channel_wrapper:recv(input_bs)	
-	return self.channel:recv(input_bs)
+	self.channel:recv(input_bs)
+	
+	-- invalidate reliable sequenced slots
+	for k, v in pairs(self.reliable_sequenced_messages) do
+		print (v.sequence, self.sender.ack_sequence)
+		if v.sequence ~= nil and v.sequence <= self.sender.ack_sequence then
+			self.reliable_sequenced_messages[k] = nil
+		end
+	end
+	
+	for k, v in pairs(self.reliable_sequenced_bitstreams) do
+		if v.sequence ~= nil and v.sequence <= self.sender.ack_sequence then
+			self.reliable_sequenced_bitstreams[k] = nil
+		end
+	end
 end
 
 function reliable_channel_wrapper:send()
+	for k, v in pairs(self.reliable_sequenced_messages) do
+		if v.sequence then
+			self.sender.request_reliable_sequence = true
+		end
+		
+		self:post_unreliable_bs(v.bitstream)
+	end
+	
+	for k, v in pairs(self.reliable_sequenced_bitstreams) do
+		if v.sequence then
+			self.sender.request_reliable_sequence = true
+		end
+		
+		self:post_unreliable_bs(v.bitstream)
+	end
+	
 	local final_bs = BitStream()
 	self.channel:send(final_bs)
+	
+	self.unreliable_buf:Reset()
+	
 	return final_bs
 end
