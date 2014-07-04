@@ -18,34 +18,38 @@ function input_prediction_system:substep()
 		local history_entry = { 
 			-- position here is only for debugging
 			position = b2Vec2(self.targets[i].cpp_entity.physics.body:GetPosition()),
-			vel = b2Vec2(self.targets[i].cpp_entity.physics.body:GetLinearVelocity()),
 			moving_left = movement.moving_left,
 			moving_right = movement.moving_right,
 			moving_forward = movement.moving_forward,
 			moving_backward = movement.moving_backward
 		}
-		--clearl()
+		clearl()
 		
 		prediction.state_history[prediction.first_state + prediction.count] = history_entry
 		prediction.count = prediction.count + 1
 		
-		if prediction.count > 60 then
+		if prediction.count > 1000 then
 			prediction.state_history[prediction.first_state] = nil
 			prediction.first_state = prediction.first_state + 1
 			prediction.count = prediction.count - 1
 		end
 		
-		--for j=prediction.first_state, prediction.first_state+prediction.count-1 do
-		--	debuglb2(rgba(255, 255, 255, 255), prediction.state_history[j].position)
-		--end
+		for j=prediction.first_state, prediction.first_state+prediction.count-1 do
+			debuglb2(rgba(255, 255, 255, 255), prediction.state_history[j].position)
+		end
 		
-		self.owner_entity_system.all_systems["client"].substep_unreliable:WriteBitstream(protocol.write_msg("INPUT_SNAPSHOT", {
-			at_step = prediction.first_state + prediction.count - 1,
-			moving_left = movement.moving_left,
-			moving_right = movement.moving_right,
-			moving_forward = movement.moving_forward,
-			moving_backward = movement.moving_backward
-		}))
+		--self.owner_entity_system.all_systems["client"].substep_unreliable:WriteBitstream(protocol.write_msg("INPUT_SNAPSHOT", {
+		
+		if prediction.count <= 1 or not table.compare(history_entry, prediction.state_history[prediction.first_state + prediction.count - 2], { position = true } ) 
+								 --or not table.compare(history_entry, prediction.state_history[prediction.first_state + prediction.count - 3], { position = true } )
+		then
+			local to_send = {}
+			rewrite(to_send, history_entry, { position = true } )
+			
+			to_send.at_step = prediction.first_state + prediction.count - 1
+			
+			self.owner_entity_system.all_systems["client"].net_channel:post_reliable_bs(protocol.write_msg("INPUT_SNAPSHOT", to_send))
+		end
 		
 		self.owner_entity_system.all_systems["client"].cmd_requested = true
 	end
