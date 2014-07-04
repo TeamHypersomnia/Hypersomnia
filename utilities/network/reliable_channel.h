@@ -24,6 +24,8 @@ namespace augs {
 			unsigned short sequence = 0u;
 			unsigned short ack_sequence = 0u;
 
+			bool request_reliable_sequence = false;
+
 			void post_message(message&);
 			bool write_data(bitstream& output);
 			bool read_ack(bitstream& input);

@@ -173,6 +173,7 @@ namespace bindings {
 			.def("post_message", &reliable_sender::post_message)
 			.def("read_ack", &reliable_sender::read_ack)
 			.def("write_data", &reliable_sender::write_data)
+			.def_readwrite("request_reliable_sequence", &reliable_sender::request_reliable_sequence)
 			.def_readwrite("reliable_buf", &reliable_sender::reliable_buf)
 			.def_readwrite("unreliable_buf", &reliable_sender::unreliable_buf)
 			.def_readwrite("sequence", &reliable_sender::sequence)

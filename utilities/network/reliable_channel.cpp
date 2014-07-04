@@ -42,7 +42,7 @@ namespace augs {
 				return false;
 
 			/* reliable + maybe unreliable */
-			if (!reliable_buf.empty()) {
+			if (request_reliable_sequence || !reliable_buf.empty()) {
 				bitstream reliable_bs;
 				
 				for (auto& msg : reliable_buf)
@@ -52,7 +52,7 @@ namespace augs {
 					}
 
 				output.name_property("has_reliable");
-				output.Write<bool>(reliable_bs.GetNumberOfBitsUsed() > 0);
+				output.Write<bool>(request_reliable_sequence || reliable_bs.GetNumberOfBitsUsed() > 0);
 				output.name_property("sequence");
 				output.Write(++sequence);
 				output.name_property("ack_sequence");
@@ -62,6 +62,7 @@ namespace augs {
 				output.WriteBitstream(reliable_bs);
 
 				sequence_to_reliable_range[sequence] = reliable_buf.size();
+				request_reliable_sequence = false;
 			}
 			/* only unreliable */
 			else {
