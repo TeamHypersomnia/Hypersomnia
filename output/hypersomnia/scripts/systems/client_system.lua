@@ -35,7 +35,7 @@ function client_system:send_all_data()
 	
 	if self.server_guid ~= nil and self.cmd_requested then
 		self.cmd_requested = false
-		--self.cmd_rate_timer:reset()
+		self.cmd_rate_timer:reset()
 		
 		self.net_channel:post_unreliable_bs(self.substep_unreliable)
 		local output_bs = self.net_channel:send()

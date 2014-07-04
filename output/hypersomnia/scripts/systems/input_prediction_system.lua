@@ -28,7 +28,7 @@ function input_prediction_system:substep()
 		prediction.state_history[prediction.first_state + prediction.count] = history_entry
 		prediction.count = prediction.count + 1
 		
-		if prediction.count > 1000 then
+		if prediction.count > 60 then
 			prediction.state_history[prediction.first_state] = nil
 			prediction.first_state = prediction.first_state + 1
 			prediction.count = prediction.count - 1
@@ -54,8 +54,8 @@ function input_prediction_system:substep()
 			
 			self.owner_entity_system.all_systems["client"].substep_unreliable:WriteBitstream(protocol.write_msg("INPUT_SNAPSHOT", to_send))
 				
-			self.owner_entity_system.all_systems["client"].cmd_requested = true
 		end
+			self.owner_entity_system.all_systems["client"].cmd_requested = true
 		
 	end
 end
