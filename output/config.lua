@@ -5,8 +5,8 @@ config_table = {
 	window_x = 0,
 	window_y = 0,
 	bpp = 24,
-	resolution_w = 1300,
-	resolution_h = 800,
+	resolution_w = 1800,
+	resolution_h = 1000,
 	doublebuffer = 1,
 	
 	sensitivity = vec2(2.5, 2.5),

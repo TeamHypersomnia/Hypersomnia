@@ -80,7 +80,7 @@ function synchronization_system:update_states_from_bitstream(msg)
 				
 				new_entity.cpp_entity.script = new_entity
 			else
-				local new_remote_player = create_remote_player(self.owner_scene)
+				local new_remote_player = create_remote_player(self.owner_scene, self.owner_scene.crosshair_sprite)
 				
 				new_entity = components.create_components {
 					cpp_entity = new_remote_player.body,

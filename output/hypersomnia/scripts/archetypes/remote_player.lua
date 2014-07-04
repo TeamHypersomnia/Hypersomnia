@@ -1,4 +1,4 @@
-function create_remote_player(owner_scene)
+function create_remote_player(owner_scene, crosshair_sprite)
 	local player = owner_scene.world_object:create_entity_group  {
 		-- body also acts as torso
 		body = {

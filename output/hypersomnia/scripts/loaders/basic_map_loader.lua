@@ -49,6 +49,11 @@ return function(map_filename, scene_object)
 	scene_object.world_camera = create_world_camera_entity(world, scene_object.sprite_library["blank"])
 	scene_object.world_camera.script.owner_scene = scene_object
 	
+	if config_table.multiple_clients_view then
+		scene_object.world_camera.script.min_zoom = -400
+		scene_object.world_camera.script:set_zoom_level(-400)
+	end
+	
 	-- initialize player
 	scene_object.teleport_position = vec2(0, 0)--objects_by_type["teleport_position"][1].pos
 	
