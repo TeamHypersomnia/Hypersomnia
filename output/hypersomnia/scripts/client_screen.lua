@@ -91,7 +91,6 @@ function client_screen:loop()
 		end
 	end
 	
-	self.systems.client:clear_unreliable()
 	
 	self.systems.protocol:handle_incoming_commands()
 	

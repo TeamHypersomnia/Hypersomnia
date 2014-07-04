@@ -25,9 +25,6 @@ function client_system:substep()
 	self.substep_unreliable:Reset()
 end
 
-function client_system:clear_unreliable()
-	self.net_channel.unreliable_buf:Reset()
-end
 	
 function client_system:send_all_data()
 	-- write all pending reliable and unreliable data
@@ -42,6 +39,7 @@ function client_system:send_all_data()
 	
 		if output_bs:size() > 0 then
 			print("Sending: \n\n" .. auto_string_indent(output_bs.content) .. "\n\n")
+			global_logfile:write("Sending: \n\n" .. auto_string_indent(output_bs.content) .. "\n\n")
 			self.network:send(output_bs, send_priority.IMMEDIATE_PRIORITY, send_reliability.UNRELIABLE, 0, self.server_guid, false)
 		end
 	end
