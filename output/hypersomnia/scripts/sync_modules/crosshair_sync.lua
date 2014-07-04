@@ -1,10 +1,10 @@
 sync_modules.crosshair = inherits_from ()
 
 function sync_modules.crosshair:constructor()
-	self.crosshair_pos = b2Vec2(1, 1)
+	self.position = vec2(1, 1)
 	
 	self.pos_sig = {
-		"b2Vec2", "crosshair_pos"
+		"Vec2", "position"
 	}
  end
 

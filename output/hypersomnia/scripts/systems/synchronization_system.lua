@@ -70,6 +70,11 @@ function synchronization_system:update_states_from_bitstream(msg)
 					cpp_entity = self.owner_scene.player.body,
 					input_prediction = {
 						simulation_entity = self.owner_scene.simulation_player
+					},
+					
+					orientation = {
+						receiver = false,
+						crosshair_entity = self.owner_scene.player.crosshair
 					}
 				}
 				
@@ -78,8 +83,13 @@ function synchronization_system:update_states_from_bitstream(msg)
 				local new_remote_player = create_remote_player(self.owner_scene)
 				
 				new_entity = components.create_components {
-					cpp_entity = new_remote_player,
-					interpolation = {}
+					cpp_entity = new_remote_player.body,
+					interpolation = {},
+					
+					orientation = {
+						receiver = true,
+						crosshair_entity = new_remote_player.crosshair
+					}
 				}
 			end
 			

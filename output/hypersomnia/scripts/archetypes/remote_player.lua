@@ -33,7 +33,11 @@ function create_remote_player(owner_scene)
 			
 			lookat = {
 				target = "crosshair",
-				look_mode = lookat_component.POSITION
+				look_mode = lookat_component.POSITION,
+				
+				easing_mode = lookat_component.EXPONENTIAL,
+				smoothing_average_factor = 0.5,	
+				averages_per_sec = 80	
 			},
 			
 			gun = {}, 
@@ -55,6 +59,27 @@ function create_remote_player(owner_scene)
 		 
 			children = {
 				"legs"
+			}
+		},
+		
+		crosshair = { 
+			transform = {
+				pos = vec2(0, 0),
+				rotation = 0
+			},
+			
+			render = {
+				layer = render_layers.GUI_OBJECTS,
+				model = crosshair_sprite
+			},
+			
+			crosshair = {
+				sensitivity = config_table.sensitivity
+			},
+			
+			chase = {
+				target = "body",
+				relative = true
 			}
 		},
 		
@@ -86,6 +111,6 @@ function create_remote_player(owner_scene)
 	player.body.animate.available_animations = owner_scene.torso_sets["white"]["barehands"].set
 	player.legs.animate.available_animations = owner_scene.legs_sets["white"].set
 
-	return player.body
+	return player
 end
 

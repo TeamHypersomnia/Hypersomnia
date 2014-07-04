@@ -19,6 +19,12 @@ protocol.message_by_id = {
 		}
 	},
 	{
+		name = "CROSSHAIR_SNAPSHOT",
+		data = {
+			"Vec2", "position"
+		}
+	},
+	{
 		name = "CURRENT_STEP",
 		data = {
 			"Uint", "at_step"
