@@ -34,7 +34,7 @@ function protocol_system:handle_incoming_commands()
 		end
 		
 		if result == receive_result.RELIABLE_RECEIVED then
-			print(input_bs.read_report)
+			--print(input_bs.read_report)
 		end
 	end
 end

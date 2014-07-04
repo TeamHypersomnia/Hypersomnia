@@ -38,20 +38,25 @@ function input_prediction_system:substep()
 			debuglb2(rgba(255, 255, 255, 255), prediction.state_history[j].position)
 		end
 		
-		--self.owner_entity_system.all_systems["client"].substep_unreliable:WriteBitstream(protocol.write_msg("INPUT_SNAPSHOT", {
 		
 		if prediction.count <= 1 or not table.compare(history_entry, prediction.state_history[prediction.first_state + prediction.count - 2], { position = true } ) 
 								 --or not table.compare(history_entry, prediction.state_history[prediction.first_state + prediction.count - 3], { position = true } )
 		then
+			prediction.same_since = prediction.first_state+prediction.count-1
+			--self.owner_entity_system.all_systems["client"].net_channel:post_reliable_bs(protocol.write_msg("INPUT_SNAPSHOT", to_send))
+		end
+		
+		if prediction.last_acked_step <= prediction.same_since then
 			local to_send = {}
 			rewrite(to_send, history_entry, { position = true } )
 			
 			to_send.at_step = prediction.first_state + prediction.count - 1
 			
-			self.owner_entity_system.all_systems["client"].net_channel:post_reliable_bs(protocol.write_msg("INPUT_SNAPSHOT", to_send))
+			self.owner_entity_system.all_systems["client"].substep_unreliable:WriteBitstream(protocol.write_msg("INPUT_SNAPSHOT", to_send))
+				
+			self.owner_entity_system.all_systems["client"].cmd_requested = true
 		end
 		
-		self.owner_entity_system.all_systems["client"].cmd_requested = true
 	end
 end
 
@@ -74,6 +79,7 @@ function input_prediction_system:update()
 			-- we don't have more than one target at the moment
 			
 			local prediction = target.input_prediction
+			prediction.last_acked_step = at_step_sequence
 			
 			if prediction.count > 0 and at_step_sequence < prediction.first_state + prediction.count and at_step_sequence >= prediction.first_state then
 				local correct_from = prediction.state_history[at_step_sequence]
@@ -129,7 +135,7 @@ function input_prediction_system:update()
 				clearlc(1)
 				debuglc(1, rgba(255, 0, 0, 255), to_pixels(new_position), to_pixels(new_position) + to_pixels(new_velocity) )
 				--debuglc(1, rgba(0, 255, 0, 255), to_pixels(correct_from.position), to_pixels(correct_from.position) + to_pixels(correct_from.vel))
-				--debuglc(1, rgba(0, 255, 255, 255), to_pixels(corrected_pos), (to_pixels(corrected_vel) + to_pixels(corrected_pos)))
+				debuglc(1, rgba(0, 255, 255, 255), to_pixels(corrected_pos), (to_pixels(corrected_vel) + to_pixels(corrected_pos)))
 			end
 		end
 	end
