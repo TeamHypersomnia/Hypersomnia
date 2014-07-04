@@ -10,6 +10,26 @@ function table.shuffle(array)
     return array
 end
 
+function table.compare(a, bigger, omit_properties)
+	if omit_properties == nil then
+		for k, v in pairs(a) do
+			if a[k] ~= bigger[k] then
+				return false
+			end
+		end
+	else
+		for k, v in pairs(a) do
+			if omit_properties[k] == nil then
+				if a[k] ~= bigger[k] then
+					return false
+				end
+			end
+		end
+	end
+	
+	return true
+end
+
 function coroutine.wait_routine(my_timer, ms_wait, loop_func, constant_delta)
 	if constant_delta == nil then constant_delta = false end
 
@@ -399,6 +419,14 @@ function set_rate(target, what_rate, updates_per_second)
 	target[what_rate .. "_rate"] = updates_per_second
 	target[what_rate .. "_interval_ms"] = 1000/updates_per_second
 	target[what_rate .. "_timer"] = timer()
+	
+	target[what_rate .. "_ready"] = function(self)
+		return self[what_rate .. "_timer"]:get_milliseconds() > self[what_rate .. "_interval_ms"]
+	end
+	
+	target[what_rate .. "_reset"] = function(self)
+		self[what_rate .. "_timer"]:reset()
+	end
 end
 
 function setlsys(sys)
