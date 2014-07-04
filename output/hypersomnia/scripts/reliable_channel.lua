@@ -99,7 +99,6 @@ function reliable_channel_wrapper:recv(input_bs)
 	
 	-- invalidate reliable sequenced slots
 	for k, v in pairs(self.reliable_sequenced_messages) do
-		print (v.sequence, self.sender.ack_sequence)
 		if v.sequence ~= nil and v.sequence <= self.sender.ack_sequence then
 			self.reliable_sequenced_messages[k] = nil
 		end
