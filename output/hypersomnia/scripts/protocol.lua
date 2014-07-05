@@ -115,6 +115,8 @@ protocol.read_sig = function(sig, out_entry, in_bs)
 			out_entry[var_name] = bool2int(out_entry[var_name])
 		end
 	end
+	
+	protocol.LAST_READ_BITSTREAM = in_bs
 end
 
 protocol.read_msg = function(in_bs, out_table)

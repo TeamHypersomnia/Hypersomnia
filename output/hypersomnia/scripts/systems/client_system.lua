@@ -38,7 +38,7 @@ function client_system:send_all_data()
 		local output_bs = self.net_channel:send()
 	
 		if output_bs:size() > 0 then
-			print("Sending: \n\n" .. auto_string_indent(output_bs.content) .. "\n\n")
+			--print("Sending: \n\n" .. auto_string_indent(output_bs.content) .. "\n\n")
 			global_logfile:write("Sending: \n\n" .. auto_string_indent(output_bs.content) .. "\n\n")
 			self.network:send(output_bs, send_priority.IMMEDIATE_PRIORITY, send_reliability.UNRELIABLE, 0, self.server_guid, false)
 		end

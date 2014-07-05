@@ -95,7 +95,7 @@ function reliable_channel_wrapper:disable_starting_byte(...)
 end
 
 function reliable_channel_wrapper:recv(input_bs)	
-	self.channel:recv(input_bs)
+	local result = self.channel:recv(input_bs)
 	
 	-- invalidate reliable sequenced slots
 	for k, v in pairs(self.reliable_sequenced_messages) do
@@ -109,6 +109,8 @@ function reliable_channel_wrapper:recv(input_bs)
 			self.reliable_sequenced_bitstreams[k] = nil
 		end
 	end
+	
+	return result
 end
 
 function reliable_channel_wrapper:send()
