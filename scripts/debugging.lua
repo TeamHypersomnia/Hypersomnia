@@ -1,5 +1,3 @@
-table.inspect = dofile (ENGINE_DIRECTORY .. "inspect.lua")
-
 function debug.my_breakpoint()
 	print(debug.my_traceback())
 	debugger_break()
@@ -45,6 +43,12 @@ function debug.my_traceback()
 	file:write(outstr .. globals_str)
 	file:close()
 	
+	if protocol ~= nil then
+		if protocol.LAST_READ_BITSTREAM ~= nil then
+			print (protocol.LAST_READ_BITSTREAM.read_report)
+		end 
+	end
+	
 	return debug.traceback()
 end
 
@@ -73,3 +77,19 @@ function all_num()
 	
 	print(cnt)
 end
+
+table.inspect = dofile (ENGINE_DIRECTORY .. "inspect.lua")
+
+package.path = package.path .. ";C:/Users/Anon/Downloads/ZeroBraneStudio/lualibs/?/?.lua" .. ";C:/Users/Anon/Downloads/ZeroBraneStudio/lualibs/?.lua"
+package.cpath = package.cpath .. ";C:/Users/Anon/Downloads/ZeroBraneStudio/bin/clibs52/?.dll" .. ";C:/Users/Anon/Downloads/ZeroBraneStudio/bin/?.dll";
+
+local old_tostr = tostring
+tostring = function(input)
+	if type(input) == 'userdata' then
+		return table.inspect(input)
+	else
+		return old_tostr(input)
+	end
+end
+
+require("mobdebug").start()
