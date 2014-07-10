@@ -17,8 +17,9 @@ function world_class:constructor()
 	self.physics_system.substepping_routine = function(owner)	
 		local my_instance = self.world_inst
 	
+		local dt = self.physics_system:get_timestep_ms()
 		for i=1, #self.substep_callbacks do
-			self.substep_callbacks[i]()
+			self.substep_callbacks[i](dt)
 		end
 		
 		my_instance.steering_system:substep(owner)
