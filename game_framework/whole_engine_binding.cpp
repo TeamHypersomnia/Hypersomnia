@@ -146,6 +146,7 @@ std::string remove_filename_from_path(std::string input_path) {
 }
 
 
+#include "luabind/class_info.hpp"
 
 void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 	using namespace resources;
@@ -155,7 +156,6 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 	luabind::open(raw);
 	luaL_openlibs(raw);
 
-	//luabind::bind_class_info(lua_state);
 	lua_register(raw, "bitor", bitor);
 	lua_register(raw, "bitflag", bitflag);
 	luabind::module(raw)[
@@ -249,4 +249,5 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 	wrapper.global("THIS_LUA_STATE", wrapper);
 
 	luabind::set_pcall_callback(the_callback);
+	luabind::bind_class_info(raw);
 }

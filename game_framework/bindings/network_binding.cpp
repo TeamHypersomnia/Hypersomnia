@@ -43,6 +43,21 @@ std::string auto_string_indent(std::string in) {
 	return in;
 }
 
+void ReplaceStringInPlace(std::string& subject, const std::string& search,
+	const std::string& replace) {
+	size_t pos = 0;
+	while ((pos = subject.find(search, pos)) != std::string::npos) {
+		subject.replace(pos, search.length(), replace);
+		pos += replace.length();
+	}
+}
+
+std::string auto_string_format(std::string in) {
+	ReplaceStringInPlace(in, "{", "{\n");
+
+	return auto_string_indent(in);
+}
+
 
 namespace bindings {
 	luabind::scope _network_binding() {
@@ -51,6 +66,7 @@ namespace bindings {
 		return
 			(
 			luabind::def("auto_string_indent", auto_string_indent),
+			luabind::def("auto_string_format", auto_string_format),
 
 			luabind::class_<network_message>("network_event")
 			.enum_("network_event")[

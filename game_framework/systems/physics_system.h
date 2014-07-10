@@ -63,6 +63,7 @@ public:
 	void clear() override;
 
 	void configure_stepping(float fps, int max_updates_per_step);
+	double get_timestep_ms();
 
 	struct raycast_output {
 		vec2<> intersection, normal;

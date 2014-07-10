@@ -431,6 +431,10 @@ void physics_system::configure_stepping(float fps, int max_updates_per_step) {
 	accumulator = augs::misc::delta_accumulator(fps, max_updates_per_step);
 }
 
+double physics_system::get_timestep_ms() {
+	return accumulator.get_timestep();
+}
+
 void physics_system::remove(entity* e) {
 	b2world.DestroyBody(e->get<components::physics>().body);
 }
