@@ -80,16 +80,18 @@ end
 
 table.inspect = dofile (ENGINE_DIRECTORY .. "inspect.lua")
 
-package.path = package.path .. ";C:/Users/Anon/Downloads/ZeroBraneStudio/lualibs/?/?.lua" .. ";C:/Users/Anon/Downloads/ZeroBraneStudio/lualibs/?.lua"
-package.cpath = package.cpath .. ";C:/Users/Anon/Downloads/ZeroBraneStudio/bin/clibs52/?.dll" .. ";C:/Users/Anon/Downloads/ZeroBraneStudio/bin/?.dll";
-
-local old_tostr = tostring
-tostring = function(input)
-	if type(input) == 'userdata' then
-		return table.inspect(input)
-	else
-		return old_tostr(input)
+function setup_debugger()
+	package.path = package.path .. ";C:/Users/Anon/Downloads/ZeroBraneStudio/lualibs/?/?.lua" .. ";C:/Users/Anon/Downloads/ZeroBraneStudio/lualibs/?.lua"
+	package.cpath = package.cpath .. ";C:/Users/Anon/Downloads/ZeroBraneStudio/bin/clibs52/?.dll" .. ";C:/Users/Anon/Downloads/ZeroBraneStudio/bin/?.dll";
+	
+	local old_tostr = tostring
+	tostring = function(input)
+		if type(input) == 'userdata' then
+			return table.inspect(input)
+		else
+			return old_tostr(input)
+		end
 	end
+	
+	require("mobdebug").start()
 end
-
-require("mobdebug").start()
