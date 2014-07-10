@@ -147,6 +147,28 @@ end
 
 -------------------------------------------------------------------
 function inspect.inspect(rootObject, options)
+  local parse_userdata = function(v)
+	local in_table = {}
+	
+	if type(v) == 'userdata' then
+		local c_info = class_info(v)
+		
+		if c_info ~= nil then
+			for key, val in pairs(c_info.attributes) do
+				if v[val] ~= nil then
+					if type(v[val]) == 'table' then
+						in_table[val] = "script_table"
+					else
+						in_table[val] = v[val]
+					end
+				end
+			end
+		end
+	end
+	
+	return in_table
+  end
+
   options       = options or {}
   local depth   = options.depth or math.huge
   local filter  = parse_filter(options.filter or {})
@@ -206,13 +228,13 @@ function inspect.inspect(rootObject, options)
     puts("]")
   end
 
-  local function putTable(t)
-    if alreadyVisited(t) then
+  local function putTable(t, force_unique)
+    if not force_unique and alreadyVisited(t) then
       puts('<table ', getId(t), '>')
     elseif level >= depth then
       puts('{...}')
     else
-      if tableAppearances[t] > 1 then puts('<', getId(t), '>') end
+      if not force_unique and tableAppearances[t] ~= nil and tableAppearances[t] > 1 then puts('<', getId(t), '>') end
 
       local dictKeys          = getDictionaryKeys(t)
       local length            = #t
@@ -271,6 +293,8 @@ function inspect.inspect(rootObject, options)
         puts(smartQuote(unescape(v)))
       elseif tv == 'number' or tv == 'boolean' or tv == 'nil' then
         puts(tostring(v))
+      elseif tv == 'userdata' then
+		putTable(parse_userdata(v), true)
       elseif tv == 'table' then
         putTable(v)
       else
