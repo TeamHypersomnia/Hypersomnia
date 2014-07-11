@@ -15,12 +15,12 @@ config_table = {
 	server_port = 37017,
 	
 	multiple_clients_view = 0,
-	divergence_radius = 25,
+	divergence_radius = 35,
 	
 	simulate_lag = 1,
 	packet_loss = 0.01,
-	min_latency = 80,
-	jitter = 10
+	min_latency = 70,
+	jitter = 5
 }
 
 if config_table.fullscreen == 1 then

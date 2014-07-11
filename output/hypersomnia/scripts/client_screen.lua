@@ -6,6 +6,7 @@ dofile "hypersomnia\\scripts\\reliable_channel.lua"
 dofile "hypersomnia\\scripts\\components\\orientation.lua"
 dofile "hypersomnia\\scripts\\components\\input_prediction.lua"
 dofile "hypersomnia\\scripts\\components\\interpolation.lua"
+dofile "hypersomnia\\scripts\\components\\weapon.lua"
 
 dofile "hypersomnia\\scripts\\sync_modules\\modules.lua"
 dofile "hypersomnia\\scripts\\sync_modules\\movement_sync.lua"
@@ -17,6 +18,7 @@ dofile "hypersomnia\\scripts\\systems\\orientation_system.lua"
 dofile "hypersomnia\\scripts\\systems\\client_system.lua"
 dofile "hypersomnia\\scripts\\systems\\input_prediction_system.lua"
 dofile "hypersomnia\\scripts\\systems\\synchronization_system.lua"
+dofile "hypersomnia\\scripts\\systems\\weapon_system.lua"
 
 client_screen = inherits_from ()
 
@@ -53,14 +55,17 @@ function client_screen:constructor(camera_rect)
 	self.systems.protocol = protocol_system:create(function(msg) self.systems.synchronization:handle_variable_message(msg) end)
 	self.systems.interpolation = interpolation_system:create()
 	self.systems.orientation = orientation_system:create()
+	self.systems.weapon = weapon_system:create(self.sample_scene.world_object, self.sample_scene.world_camera)
 	
-	table.insert(self.sample_scene.world_object.substep_callbacks, function () 
+	table.insert(self.sample_scene.world_object.substep_callbacks, function (dt) 
 		self.systems.client:substep()
 		self.systems.input_prediction:substep()
+		self.systems.weapon:substep(dt)
 	end)
 	
-	
 	self.entity_system_instance:register_systems(self.systems)
+	
+	create_weapons(self.sample_scene)
 end
 
 function client_screen:loop()
@@ -91,8 +96,9 @@ function client_screen:loop()
 		end
 	end
 	
-	
 	self.systems.protocol:handle_incoming_commands()
+	
+	self.systems.weapon:handle_messages()
 	
 	self.systems.input_prediction:update()
 	self.systems.interpolation:update()

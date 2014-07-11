@@ -75,7 +75,9 @@ function synchronization_system:update_states_from_bitstream(msg)
 					orientation = {
 						receiver = false,
 						crosshair_entity = self.owner_scene.player.crosshair
-					}
+					},
+					
+					weapon = self.owner_scene.weapons.m4a1
 				}
 				
 				new_entity.cpp_entity.script = new_entity

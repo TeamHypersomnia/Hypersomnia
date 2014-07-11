@@ -58,7 +58,7 @@ function create_basic_player(owner_world, position, target_camera, crosshair_spr
 				intent_message.MOVE_BACKWARD,
 				intent_message.MOVE_LEFT,
 				intent_message.MOVE_RIGHT,
-				--intent_message.SHOOT
+				intent_message.SHOOT
 			},
 			
 			lookat = {
@@ -66,7 +66,6 @@ function create_basic_player(owner_world, position, target_camera, crosshair_spr
 				look_mode = lookat_component.POSITION
 			},
 			
-			gun = {}, 
 	
 			particle_emitter = {
 				available_particle_effects = npc_effects

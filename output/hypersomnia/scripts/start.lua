@@ -4,6 +4,8 @@ dofile "hypersomnia\\scripts\\game\\layers.lua"
 dofile "hypersomnia\\scripts\\game\\filters.lua"
 dofile "hypersomnia\\scripts\\game\\camera.lua"
 
+dofile "hypersomnia\\scripts\\game\\weapons.lua"
+
 -- archetypes
 dofile "hypersomnia\\scripts\\archetypes\\basic_player.lua"
 dofile "hypersomnia\\scripts\\archetypes\\remote_player.lua"
