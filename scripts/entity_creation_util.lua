@@ -71,7 +71,6 @@ function set_components_from_entry(entity, entry, entities_lookup)
 	def_ptr	(chase_component, 'chase', { }, { target = true } )
 	def		(crosshair_component, 'crosshair')
 	def_ptr (damage_component, 'damage', { sender = true })
-	def_ptr (gun_component, 'gun', { target_camera_to_shake = true }, { bullet_body = true, bullet_render = true })
 	def_ptr (lookat_component, 'lookat', { target = true })
 	def		(particle_emitter_component, 'particle_emitter')
 	def		(visibility_component, 'visibility', {}, { visibility_layers = true })
@@ -116,15 +115,15 @@ function set_components_from_entry(entity, entry, entities_lookup)
 		create_physics_component(my_body_data, entity, entry.physics.body_type)
 	end
 
-	if entry.gun ~= nil then
-		local gun = entity.gun
-		--print(inspect(entry.gun))
-		if entry.gun.bullet_body == nil then entry.gun.bullet_body = {} end
-		if entry.gun.bullet_render == nil then entry.gun.bullet_render = {} end
-		
-		set_physics_info(gun.bullet_body, entry.gun.bullet_body)
-		rewrite(gun.bullet_render, entry.gun.bullet_render)
-	end
+	--if entry.gun ~= nil then
+	--	local gun = entity.gun
+	--	--print(inspect(entry.gun))
+	--	if entry.gun.bullet_body == nil then entry.gun.bullet_body = {} end
+	--	if entry.gun.bullet_render == nil then entry.gun.bullet_render = {} end
+	--	
+	--	set_physics_info(gun.bullet_body, entry.gun.bullet_body)
+	--	rewrite(gun.bullet_render, entry.gun.bullet_render)
+	--end
 	
 	if entry.behaviour_tree ~= nil then
 		local behaviour_tree = entity.behaviour_tree

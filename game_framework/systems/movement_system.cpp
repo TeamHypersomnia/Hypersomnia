@@ -2,7 +2,6 @@
 #include "movement_system.h"
 #include "entity_system/world.h"
 #include "../messages/intent_message.h"
-#include "../messages/animate_message.h"
 
 #include "../components/gun_component.h"
 
@@ -132,12 +131,7 @@ void movement_system::process_entities(world& owner) {
 
 		for (auto receiver : movement.animation_receivers) {
 			animate_message copy(msg);
-			copy.animation_type = animate_message::animation::MOVE;
-
-			auto* gun = receiver.target->find<components::gun>();
-
-			if (gun)
-				copy.animation_type = gun->current_swing_direction ? animate_message::animation::MOVE_CW : animate_message::animation::MOVE_CCW;
+			copy.animation_type = movement.animation_message;
 
 			copy.subject = receiver.target;
 

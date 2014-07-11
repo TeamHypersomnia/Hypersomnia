@@ -254,16 +254,3 @@ function create_behaviour_tree(entries)
 	
 	return out_my_nodes
 end
-
-function create_gun(entries)
-	--print("creating gun..")
-	local temp = create_entity { gun = entries }
-	local new_gun = gun_component(temp.gun)
-	
-	local msg = destroy_message()
-	msg.subject = temp
-	world:post_message(msg)
-	
-	return new_gun
-end
-

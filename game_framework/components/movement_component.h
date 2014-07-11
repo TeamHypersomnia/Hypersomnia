@@ -1,6 +1,7 @@
 #pragma once
 #include "entity_system/component.h"
 #include "entity_system/entity_ptr.h"
+#include "../messages/animate_message.h"
 #include "math/vec2d.h"
 
 namespace components {
@@ -15,6 +16,9 @@ namespace components {
 		void add_animation_receiver(augs::entity_system::entity* e, bool stop_at_zero_movement) {
 			animation_receivers.push_back(subscribtion(e, stop_at_zero_movement));
 		}
+
+		/* default message that gets sent when entity moves */
+		int animation_message = messages::animate_message::animation::MOVE;
 
 		/* entities whom the animation_message will be sent to, including information about subject entity's movement speed */
 		std::vector<subscribtion> animation_receivers;

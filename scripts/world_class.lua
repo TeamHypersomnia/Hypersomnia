@@ -141,7 +141,6 @@ function world_class:process_all_systems()
 	my_instance.crosshair_system:process_entities(world)
 	
 	if not self.is_paused then
-		my_instance.gun_system:process_entities(world)
 		my_instance.damage_system:process_entities(world)
 		my_instance.particle_group_system:process_entities(world)
 		my_instance.animation_system:process_entities(world)
@@ -162,7 +161,6 @@ function world_class:process_all_systems()
 	my_instance.crosshair_system:consume_events(world)
 	
 	if not self.is_paused then
-		my_instance.gun_system:consume_events(world)
 		my_instance.particle_emitter_system:consume_events(world)
 	end
 	
