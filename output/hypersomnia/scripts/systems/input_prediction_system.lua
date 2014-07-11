@@ -70,15 +70,16 @@ function input_prediction_system:update()
 	local msgs = self.owner_entity_system.messages["CURRENT_STEP"]
 	
 	local new_step = false
-	local at_step_sequence;
+	local recent_data;
 	
 	for i=1, #msgs do
 		new_step = true
-		at_step_sequence = msgs[i].data.at_step
+		recent_data = msgs[i].data
 	end
 	
 	if new_step then
 		for i=1, #self.targets do
+			local at_step_sequence = recent_data.at_step
 			local target = self.targets[i]
 			local new_position = self.targets[i].synchronization.modules.movement.position
 			local new_velocity = self.targets[i].synchronization.modules.movement.velocity
@@ -89,6 +90,10 @@ function input_prediction_system:update()
 			
 			if prediction.count > 0 and at_step_sequence < prediction.first_state + prediction.count and at_step_sequence >= prediction.first_state then
 				local correct_from = prediction.state_history[at_step_sequence]
+				correct_from.moving_left = recent_data.moving_left
+				correct_from.moving_right = recent_data.moving_right
+				correct_from.moving_forward = recent_data.moving_forward
+				correct_from.moving_backward = recent_data.moving_backward
 				
 				local simulation_entity = prediction.simulation_entity
 				local simulation_body = simulation_entity.physics.body

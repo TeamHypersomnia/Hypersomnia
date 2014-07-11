@@ -15,7 +15,7 @@ config_table = {
 	server_port = 37017,
 	
 	multiple_clients_view = 0,
-	divergence_radius = 15,
+	divergence_radius = 20.2,
 	
 	tickrate = 60,
 	
