@@ -447,9 +447,12 @@ void physics_system::reset_states() {
 		
 		transform.current.pos = b->GetPosition();
 		transform.current.pos *= METERS_TO_PIXELSf;
-		transform.current.rotation = b->GetAngle();
-		transform.current.rotation *= 180.0f / 3.141592653589793238462f;
-
+		
+		if (!b->IsFixedRotation()) {
+			transform.current.rotation = b->GetAngle();
+			transform.current.rotation *= 180.0f / 3.141592653589793238462f;
+		}
+		
 		transform.previous = transform.current;
 	}
 }
@@ -463,6 +466,8 @@ void physics_system::smooth_states() {
 		auto& transform = static_cast<entity*>(b->GetUserData())->get<components::transform>();
 
 		transform.current.pos = transform.previous.pos + ratio * (METERS_TO_PIXELSf*b->GetPosition() - transform.previous.pos);
-		transform.current.rotation = static_cast<float>(transform.previous.rotation + ratio * (b->GetAngle()*180.0/3.141592653589793238462 - transform.previous.rotation));
+		
+		if (!b->IsFixedRotation())
+			transform.current.rotation = static_cast<float>(transform.previous.rotation + ratio * (b->GetAngle()*180.0/3.141592653589793238462 - transform.previous.rotation));
 	}
 }
