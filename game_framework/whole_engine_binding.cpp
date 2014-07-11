@@ -225,6 +225,7 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 
 			luabind::def("clamp", &augs::get_clamp<float>),
 			luabind::def("debugger_break", &debugger_break),
+			luabind::def("randval", (float(*)(std::pair<float, float>))&randval),
 			luabind::def("randval", (float(*)(float, float))&randval),
 			luabind::def("randval_i", (int(*)(int, int))&randval),
 
