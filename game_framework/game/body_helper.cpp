@@ -80,12 +80,21 @@ namespace helpers {
 
 	void create_physics_component(const physics_info& body_data, augs::entity_system::entity& subject, int body_type) {
 		physics_system& physics = subject.owner_world.get_system<physics_system>();
-		
+
+		auto& transform = subject.get<components::transform>().current;
+		subject.get<components::transform>().previous = subject.get<components::transform>().current;
+
 		b2BodyDef def;
 		def.type = b2BodyType(body_type);
 		def.angle = 0;
 		def.userData = (void*) &subject;
 		def.bullet = body_data.bullet;
+		def.position = transform.pos*PIXELS_TO_METERSf;
+		def.angle = transform.rotation*0.01745329251994329576923690768489f;
+		def.angularDamping = body_data.angular_damping;
+		def.linearDamping = body_data.linear_damping;
+		def.fixedRotation = body_data.fixed_rotation;
+		def.gravityScale = body_data.gravity_scale;
 
 		b2PolygonShape shape;
 		b2CircleShape circle_shape;
@@ -138,17 +147,8 @@ namespace helpers {
 
 		//shape.Set(v, 4);
 
-		auto& transform = subject.get<components::transform>().current;
-
-		body->SetTransform(transform.pos*PIXELS_TO_METERSf, transform.rotation*0.01745329251994329576923690768489f);
-
-		body->SetAngularDamping(body_data.angular_damping);
-		body->SetLinearDamping(body_data.linear_damping);
-		body->SetFixedRotation(body_data.fixed_rotation);
-		body->SetMaximumLinearVelocity(body_data.max_speed * PIXELS_TO_METERSf);
-		body->SetGravityScale(body_data.gravity_scale);
 		body->SetAngledDampingEnabled(body_data.angled_damping);
-
+		body->SetMaximumLinearVelocity(body_data.max_speed * PIXELS_TO_METERSf);
 
 		subject.add(physics_component);
 	}
