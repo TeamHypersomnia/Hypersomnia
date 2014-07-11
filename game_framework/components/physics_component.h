@@ -1,9 +1,9 @@
 #pragma once
 #include "entity_system/component.h"
-#define METERS_TO_PIXELS 50.0
-#define PIXELS_TO_METERS 1.0/METERS_TO_PIXELS
-#define METERS_TO_PIXELSf 50.f
-#define PIXELS_TO_METERSf 1.0f/METERS_TO_PIXELSf
+extern double METERS_TO_PIXELS;
+extern double PIXELS_TO_METERS;
+extern float METERS_TO_PIXELSf;
+extern float PIXELS_TO_METERSf;
 
 namespace components {
 	struct physics : public augs::entity_system::component {

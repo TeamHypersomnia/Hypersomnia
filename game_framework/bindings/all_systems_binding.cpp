@@ -42,11 +42,8 @@ namespace bindings {
 			.def("query_polygon", (physics_system::query_output(__thiscall physics_system::*) (const std::vector<vec2<>>&, b2Filter*, entity*)) (&physics_system::query_polygon))
 			.def("push_away_from_walls", &physics_system::push_away_from_walls)
 			.def("get_timestep_ms", &physics_system::get_timestep_ms)
-			.def("configure_stepping", &physics_system::configure_stepping)
-			.enum_("constants")[
-				luabind::value("PIXELS_TO_METERS", PIXELS_TO_METERSf),
-					luabind::value("METERS_TO_PIXELS", METERS_TO_PIXELSf)
-			],
+			.def("configure_stepping", &physics_system::configure_stepping),
+
 			luabind::class_<steering_system>("_steering_system")
 			.def("process_entities", &steering_system::process_entities)
 			.def("substep", &steering_system::substep)

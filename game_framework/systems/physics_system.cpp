@@ -1,5 +1,11 @@
 #include "stdafx.h"
+
 #include "physics_system.h"
+double METERS_TO_PIXELS = 100.0;
+double PIXELS_TO_METERS = 1.0 / METERS_TO_PIXELS;
+float METERS_TO_PIXELSf = 100.f;
+float PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
+
 #include "entity_system/entity.h"
 
 #include "../components/damage_component.h"

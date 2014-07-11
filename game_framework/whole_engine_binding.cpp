@@ -148,6 +148,17 @@ std::string remove_filename_from_path(std::string input_path) {
 
 #include "luabind/class_info.hpp"
 
+double get_meters_to_pixels() {
+	return METERS_TO_PIXELS;
+}
+
+void set_meters_to_pixels(double val) {
+	METERS_TO_PIXELS = val;
+	PIXELS_TO_METERS = 1.0 / METERS_TO_PIXELS;
+	METERS_TO_PIXELSf = float(val);
+	PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
+}
+
 void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 	using namespace resources;
 	using namespace helpers;
@@ -229,6 +240,8 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 			luabind::def("randval", (float(*)(float, float))&randval),
 			luabind::def("randval_i", (int(*)(int, int))&randval),
 
+			luabind::def("get_meters_to_pixels", get_meters_to_pixels),
+			luabind::def("set_meters_to_pixels", set_meters_to_pixels),
 			luabind::def("get_executable_path", get_executable_path),
 			luabind::def("remove_filename_from_path", remove_filename_from_path),
 
