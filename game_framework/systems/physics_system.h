@@ -68,8 +68,8 @@ public:
 	struct raycast_output {
 		vec2<> intersection, normal;
 		bool hit;
-		b2Fixture* what_fixture;
-		entity* what_entity;
+		b2Fixture* what_fixture = nullptr;
+		entity* what_entity = nullptr;
 
 		raycast_output() : hit(false), what_fixture(nullptr) {}
 	};
