@@ -23,11 +23,11 @@ namespace augs {
 			}
 			
 			bool release_id(T id) {
-				return registered_ids.erase(counter) > 0u;
+				return registered_ids.erase(id) > 0u;
 			}
 
 			bool exists(T id) {
-				return registered_ids.find(counter) != registered_ids.end();
+				return registered_ids.find(id) != registered_ids.end();
 			}
 
 			static luabind::scope bind(const char* class_name) {
