@@ -1,5 +1,5 @@
-function create(module, entries)
-	local new_instance = module()
+function create(module_name, entries)
+	local new_instance = module_name()
 	for k, v in pairs(entries) do
 		new_instance[k] = entries[k]
 	end
@@ -14,6 +14,16 @@ function create_options(entries, output)
 	end
 	
 	return entries
+end
+
+function create_enum(entries)
+	local new_table = {}
+	
+	for k, v in pairs(entries) do
+		new_table[v] = k
+	end
+	
+	return new_table
 end
 
 function create_inverse_enum(entries)
