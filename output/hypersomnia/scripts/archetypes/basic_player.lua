@@ -8,7 +8,7 @@ local player_physics_component = {
 		
 		angular_damping = 5,
 		--linear_damping = 18,
-		max_speed = 3300,
+		--max_speed = 3300,
 		
 		fixed_rotation = true,
 		density = 0.1
@@ -16,9 +16,9 @@ local player_physics_component = {
 }
 			
 local player_movement_component = {
-	input_acceleration = vec2(5000, 5000),
-	max_speed_animation = 1000,
-	air_resistance = 0.1,
+	input_acceleration = vec2(8000, 8000),
+	max_speed_animation = 800,
+	air_resistance = 0.05,
 	braking_damping = 18,
 	receivers = {
 		{ target = "body", stop_at_zero_movement = false }, 

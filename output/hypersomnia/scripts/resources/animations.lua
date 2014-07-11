@@ -164,15 +164,15 @@ function create_torso_set_for(sprite_library, outfit, weapon_type)
 	elseif weapon_type == "rifle" then
 		local new_walk_animation = create_animation {
 			frames = {
-				{ model = { image = walk_frames["1"] }, duration_ms = 20 },
-				{ model = { image = walk_frames["2"] }, duration_ms = 20 },
-				{ model = { image = walk_frames["3"] }, duration_ms = 20 },
-				{ model = { image = walk_frames["4"] }, duration_ms = 20 },
-				{ model = { image = walk_frames["5"] }, duration_ms = 20 },
-				{ model = { image = walk_frames["4"] }, duration_ms = 20 },
-				{ model = { image = walk_frames["3"] }, duration_ms = 20 },
-				{ model = { image = walk_frames["2"] }, duration_ms = 20 },
-				{ model = { image = walk_frames["1"] }, duration_ms = 20 },
+				{ model = { image = walk_frames["1"] }, duration_ms = 30 },
+				{ model = { image = walk_frames["2"] }, duration_ms = 30 },
+				{ model = { image = walk_frames["3"] }, duration_ms = 30 },
+				{ model = { image = walk_frames["4"] }, duration_ms = 30 },
+				{ model = { image = walk_frames["5"] }, duration_ms = 30 },
+				{ model = { image = walk_frames["4"] }, duration_ms = 30 },
+				{ model = { image = walk_frames["3"] }, duration_ms = 30 },
+				{ model = { image = walk_frames["2"] }, duration_ms = 30 },
+				{ model = { image = walk_frames["1"] }, duration_ms = 30 },
 			},
 			loop_mode = animation.REPEAT
 		}

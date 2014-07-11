@@ -28,7 +28,7 @@ function input_prediction_system:substep()
 		prediction.state_history[prediction.first_state + prediction.count] = history_entry
 		prediction.count = prediction.count + 1
 		
-		if prediction.count > 60 then
+		if prediction.count > 260 then
 			prediction.state_history[prediction.first_state] = nil
 			prediction.first_state = prediction.first_state + 1
 			prediction.count = prediction.count - 1
@@ -52,6 +52,12 @@ function input_prediction_system:substep()
 			
 			to_send.at_step = prediction.first_state + prediction.count - 1
 			
+		--global_logfile:write("\nStep: " .. to_send.at_step)
+		--global_logfile:write("\nleft: " .. movement.moving_left)
+		--global_logfile:write("\nright: " .. movement.moving_right)
+		--global_logfile:write("\nforward: " .. movement.moving_forward)
+		--global_logfile:write("\nbackward: " .. movement.moving_backward)
+		
 			self.owner_entity_system.all_systems["client"].substep_unreliable:WriteBitstream(protocol.write_msg("INPUT_SNAPSHOT", to_send))
 				
 		end

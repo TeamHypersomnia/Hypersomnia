@@ -60,6 +60,7 @@ function client_screen:constructor(camera_rect)
 	table.insert(self.sample_scene.world_object.substep_callbacks, function (dt) 
 		self.systems.client:substep()
 		self.systems.input_prediction:substep()
+		self.systems.client:send_all_data()
 		self.systems.weapon:substep(dt)
 	end)
 	
@@ -105,7 +106,6 @@ function client_screen:loop()
 	self.systems.orientation:update()
 	
 	--print "client tick"
-	self.systems.client:send_all_data()
 	
 	--print "flush"
 	self.entity_system_instance:flush_messages()
