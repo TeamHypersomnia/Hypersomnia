@@ -248,6 +248,16 @@ When removing an alternative module set, just set remote_states[id] to nil so it
 
 
 
+
+There's a problem with reliable+unreliable transmission.
+Let us maintain following data types:
+
+(STATE_UPDATE)(STREAM_UPDATE) (INPUT_SNAPSHOT, CROSSHAIR_SNAPSHOT etc.)
+[RELIABLE BUF][UNRELIABLE BUF][ONCE BUF]
+
+ONCE BUF should not get dropped even when we failed to match reliable data.
+UNRELIABLE BUF should only be dropped if there is a state update changing the stream data layout, what will be included in the message's signature.
+
 --------------------------------------------
 TRANSFERRING OBJECT STATE
 --------------------------------------------

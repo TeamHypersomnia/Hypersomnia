@@ -40,6 +40,7 @@ protocol.message_by_id = {
 	{
 		name = "STATE_UPDATE",
 		data = {
+			"Ushort", "bits",
 			"Ushort", "object_count"
 		},
 		read_immediately = true
@@ -47,6 +48,7 @@ protocol.message_by_id = {
 	{
 		name = "STREAM_UPDATE",
 		data = {
+			"Ushort", "bits",
 			"Ushort", "object_count"
 		},
 		read_immediately = true

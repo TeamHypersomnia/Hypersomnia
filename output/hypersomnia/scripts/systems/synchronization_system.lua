@@ -123,16 +123,34 @@ function synchronization_system:update_streams_from_bitstream(msg)
 end
 
 function synchronization_system:handle_variable_message(msg)
-	if msg.info.name == "STATE_UPDATE" then
-		self:update_states_from_bitstream(msg)
-	elseif msg.info.name == "STREAM_UPDATE" then
-		self:update_streams_from_bitstream(msg)
-	elseif msg.info.name == "ASSIGN_SYNC_ID" then
-		self.my_sync_id = msg.data.sync_id
-	elseif msg.info.name == "DELETE_OBJECT" then
-		local id = msg.data.removed_id
-		self.owner_entity_system:remove_entity(self.object_by_id[id])
+	-- skip to the readable data of the moment
+	if msg.result == receive_result.UNMATCHING_RELIABLE_RECEIVED then
 		
-		self.object_by_id[id] = nil
+		if msg.info.name == "STATE_UPDATE" then
+		print "skipping state"
+		print (msg.data.bits)
+			msg.input_bs:IgnoreBits(msg.data.bits)
+		-- todo: only skip whole stream update if state update tells that
+		-- the data layout has changed
+		-- we may firstly read object ids for example
+		-- and only skip objects whose state has been modified
+		elseif msg.info.name == "STREAM_UPDATE" then
+		print "skipping stream"
+		print (msg.data.bits)
+			msg.input_bs:IgnoreBits(msg.data.bits)
+		end
+	else
+		if msg.info.name == "STATE_UPDATE" then
+			self:update_states_from_bitstream(msg)
+		elseif msg.info.name == "STREAM_UPDATE" then
+			self:update_streams_from_bitstream(msg)
+		elseif msg.info.name == "ASSIGN_SYNC_ID" then
+			self.my_sync_id = msg.data.sync_id
+		elseif msg.info.name == "DELETE_OBJECT" then
+			local id = msg.data.removed_id
+			self.owner_entity_system:remove_entity(self.object_by_id[id])
+			
+			self.object_by_id[id] = nil
+		end
 	end
 end

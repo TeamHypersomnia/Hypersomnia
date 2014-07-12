@@ -14,13 +14,14 @@ function protocol_system:handle_incoming_commands()
 	
 		local result = msgs[i].channel:recv(input_bs)
 		
-		if result == receive_result.MESSAGES_RECEIVED then
+		if result ~= receive_result.NOTHING_RECEIVED then
 			print "Receiving data..."
 			while input_bs:GetNumberOfUnreadBits() >= 8 do
 				local msg = protocol.read_msg(input_bs)
 				
 				-- server might want to copy the subject client
 				msg.subject = msgs[i].subject
+				msg.result = result
 				
 				-- if the message type has a data layout of variable size, 
 				-- or it is a message altering existence of some entities,
@@ -36,7 +37,7 @@ function protocol_system:handle_incoming_commands()
 		end
 		
 		transmission_log:write(input_bs.read_report)
-		print("Result: " .. result .. "\n" .. input_bs.read_report)
+		--print("Result: " .. result .. "\n" .. input_bs.read_report)
 			
 		--if result == receive_result.RELIABLE_RECEIVED then
 		--end
