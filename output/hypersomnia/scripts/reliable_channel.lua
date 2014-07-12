@@ -23,7 +23,7 @@ function reliable_channel_wrapper:reliable_seq_bs(channel, out_bs)
 	-- treat "name" as slot identifier
 	self.reliable_sequenced_bitstreams[name] = {
 		-- will "probably" be issued on the next update
-		sequence = self.sender.sequence+1,
+		sequence = self.sender.unreliable_sequence+1,
 		bitstream = out_bs
 	}
 end
@@ -44,8 +44,8 @@ function reliable_channel_wrapper:reliable_seq_msg(name, entry, retry)
 	local slot = { bitstream = data }
 	
 	if retry ~= nil and retry == true then
-		-- will be issued on the next update and will request a reliable sequence
-		slot.sequence = self.sender.sequence+1
+		-- will be issued on the next update
+		slot.sequence = self.sender.unreliable_sequence+1
 	end
 	
 	-- treat "name" as slot identifier
@@ -99,13 +99,13 @@ function reliable_channel_wrapper:recv(input_bs)
 	
 	-- invalidate reliable sequenced slots
 	for k, v in pairs(self.reliable_sequenced_messages) do
-		if v.sequence ~= nil and v.sequence <= self.sender.ack_sequence then
+		if v.sequence ~= nil and v.sequence <= self.sender.unreliable_ack_sequence then
 			self.reliable_sequenced_messages[k] = nil
 		end
 	end
 	
 	for k, v in pairs(self.reliable_sequenced_bitstreams) do
-		if v.sequence ~= nil and v.sequence <= self.sender.ack_sequence then
+		if v.sequence ~= nil and v.sequence <= self.sender.unreliable_ack_sequence then
 			self.reliable_sequenced_bitstreams[k] = nil
 		end
 	end
@@ -116,7 +116,7 @@ end
 function reliable_channel_wrapper:send()
 	for k, v in pairs(self.reliable_sequenced_messages) do
 		if v.sequence then
-			self.sender.request_reliable_sequence = true
+			self.sender.request_ack_for_unreliable = true
 		end
 		
 		self:post_unreliable_bs(v.bitstream)
@@ -124,7 +124,7 @@ function reliable_channel_wrapper:send()
 	
 	for k, v in pairs(self.reliable_sequenced_bitstreams) do
 		if v.sequence then
-			self.sender.request_reliable_sequence = true
+			self.sender.request_ack_for_unreliable = true
 		end
 		
 		self:post_unreliable_bs(v.bitstream)

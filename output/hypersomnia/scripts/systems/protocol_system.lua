@@ -14,8 +14,8 @@ function protocol_system:handle_incoming_commands()
 	
 		local result = msgs[i].channel:recv(input_bs)
 		
-		if result ~= receive_result.NOTHING_RECEIVED and result ~= receive_result.UNMATCHING_RELIABLE_RECEIVED then
-		print "Receiving data..."
+		if result == receive_result.MESSAGES_RECEIVED then
+			print "Receiving data..."
 			while input_bs:GetNumberOfUnreadBits() >= 8 do
 				local msg = protocol.read_msg(input_bs)
 				
@@ -32,11 +32,13 @@ function protocol_system:handle_incoming_commands()
 					self.owner_entity_system:post_table(msg.info.name, msg)
 				end
 			end
+			
 		end
 		
+		transmission_log:write(input_bs.read_report)
+		print("Result: " .. result .. "\n" .. input_bs.read_report)
+			
 		--if result == receive_result.RELIABLE_RECEIVED then
-			transmission_log:write(input_bs.read_report)
-			print(input_bs.read_report)
 		--end
 	end
 end
