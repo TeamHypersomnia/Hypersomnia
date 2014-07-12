@@ -46,7 +46,8 @@ function input_prediction_system:substep()
 			--self.owner_entity_system.all_systems["client"].net_channel:post_reliable_bs(protocol.write_msg("INPUT_SNAPSHOT", to_send))
 		end
 		
-		if prediction.last_acked_step <= prediction.same_since then
+		--print(prediction.last_acked_step, prediction.same_since)
+		if prediction.last_acked_step-1 <= prediction.same_since then
 			local to_send = {}
 			rewrite(to_send, history_entry, { position = true } )
 			
@@ -57,7 +58,7 @@ function input_prediction_system:substep()
 			--global_logfile:write("\nright: " .. movement.moving_right)
 			--global_logfile:write("\nforward: " .. movement.moving_forward)
 			--global_logfile:write("\nbackward: " .. movement.moving_backward)
-		
+			--print ("sending snapshot " .. to_send.at_step)
 			self.owner_entity_system.all_systems["client"].substep_unreliable:WriteBitstream(protocol.write_msg("INPUT_SNAPSHOT", to_send))
 				
 		end
@@ -87,6 +88,7 @@ function input_prediction_system:update()
 			
 			local prediction = target.input_prediction
 			prediction.last_acked_step = at_step_sequence
+			--print ("recvd snapshot " .. at_step_sequence)
 			
 			if prediction.count > 0 and at_step_sequence < prediction.first_state + prediction.count and at_step_sequence >= prediction.first_state then
 				local correct_from = prediction.state_history[at_step_sequence]
