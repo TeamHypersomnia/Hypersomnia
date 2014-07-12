@@ -15,13 +15,13 @@ config_table = {
 	server_port = 37017,
 	
 	multiple_clients_view = 0,
-	divergence_radius = 20.2,
+	divergence_radius = 1,
 	
 	tickrate = 60,
 	
 	simulate_lag = 1,
 	packet_loss = 0.00,
-	min_latency = 70,
+	min_latency = 120,
 	jitter = 0
 }
 

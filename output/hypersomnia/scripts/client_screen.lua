@@ -29,6 +29,7 @@ function client_screen:constructor(camera_rect)
 	self.sample_scene.world_camera.camera.screen_rect = camera_rect
 	
 	self.server = network_interface()
+	self.server:occasional_ping(false)
 	
 	self.server:connect(config_table.server_address, config_table.server_port)
 	

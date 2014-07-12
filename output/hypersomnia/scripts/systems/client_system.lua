@@ -13,6 +13,8 @@ function client_system:constructor(network)
 	set_rate(self, "cmd_rate", 20)
 	self.cmd_requested = false
 	
+	self.global_time = timer()
+	
 	processing_system.constructor(self)
 end
 
@@ -39,7 +41,7 @@ function client_system:send_all_data()
 	
 		if output_bs:size() > 0 then
 			--print("Sending: \n\n" .. auto_string_indent(output_bs.content) .. "\n\n")
-			--global_logfile:write("Sending: \n\n" .. auto_string_indent(output_bs.content) .. "\n\n")
+			--transmission_log:write("Sending time: " .. self.global_time:get_milliseconds() .. "\n\n" .. auto_string_indent(output_bs.content) .. "\n\n")
 			self.network:send(output_bs, send_priority.IMMEDIATE_PRIORITY, send_reliability.UNRELIABLE, 0, self.server_guid, false)
 		end
 	end
