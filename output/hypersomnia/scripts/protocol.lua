@@ -27,11 +27,7 @@ protocol.message_by_id = {
 	{
 		name = "CURRENT_STEP",
 		data = {
-			"Uint", "at_step",
-			"Bit", 	"moving_left",
-			"Bit", 	"moving_right",
-			"Bit", 	"moving_forward",
-			"Bit", 	"moving_backward"
+			"Uint", "at_step"
 		}
 	},
 	{

@@ -46,7 +46,6 @@ function input_prediction_system:substep()
 			--self.owner_entity_system.all_systems["client"].net_channel:post_reliable_bs(protocol.write_msg("INPUT_SNAPSHOT", to_send))
 		end
 		
-		--print(prediction.last_acked_step, prediction.same_since)
 		if prediction.last_acked_step-1 <= prediction.same_since then
 			local to_send = {}
 			rewrite(to_send, history_entry, { position = true } )
@@ -92,10 +91,6 @@ function input_prediction_system:update()
 			
 			if prediction.count > 0 and at_step_sequence < prediction.first_state + prediction.count and at_step_sequence >= prediction.first_state then
 				local correct_from = prediction.state_history[at_step_sequence]
-				--correct_from.moving_left = recent_data.moving_left
-				--correct_from.moving_right = recent_data.moving_right
-				--correct_from.moving_forward = recent_data.moving_forward
-				--correct_from.moving_backward = recent_data.moving_backward
 				
 				print((to_pixels(new_position) - to_pixels(correct_from.position)):length())
 				
