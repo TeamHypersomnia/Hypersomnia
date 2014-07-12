@@ -59,9 +59,8 @@ function input_prediction_system:substep()
 			--global_logfile:write("\nbackward: " .. movement.moving_backward)
 			--print ("sending snapshot " .. to_send.at_step)
 			self.owner_entity_system.all_systems["client"].substep_unreliable:WriteBitstream(protocol.write_msg("INPUT_SNAPSHOT", to_send))
-				
-		end
 			self.owner_entity_system.all_systems["client"].cmd_requested = true
+		end
 		
 	end
 end
@@ -92,7 +91,7 @@ function input_prediction_system:update()
 			if prediction.count > 0 and at_step_sequence < prediction.first_state + prediction.count and at_step_sequence >= prediction.first_state then
 				local correct_from = prediction.state_history[at_step_sequence]
 				
-				print((to_pixels(new_position) - to_pixels(correct_from.position)):length())
+				--print((to_pixels(new_position) - to_pixels(correct_from.position)):length())
 				
 				local simulation_entity = prediction.simulation_entity
 				local simulation_body = simulation_entity.physics.body

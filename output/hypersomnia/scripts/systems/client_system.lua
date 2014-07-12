@@ -32,7 +32,7 @@ function client_system:send_all_data()
 	-- write all pending reliable and unreliable data
 	
 	
-	if self.server_guid ~= nil and self.cmd_requested then
+	if self.server_guid ~= nil and self.cmd_requested or self.net_channel.receiver.ack_requested then
 		self.cmd_requested = false
 		self.cmd_rate_timer:reset()
 		
@@ -40,6 +40,7 @@ function client_system:send_all_data()
 		local output_bs = self.net_channel:send()
 	
 		if output_bs:size() > 0 then
+			print "Sending data..."
 			--print("Sending: \n\n" .. auto_string_indent(output_bs.content) .. "\n\n")
 			transmission_log:write("\nSending time: " .. self.global_time:get_milliseconds() .. "\n\n" .. auto_string_indent(output_bs.content) .. "\n\n")
 			self.network:send(output_bs, send_priority.IMMEDIATE_PRIORITY, send_reliability.UNRELIABLE, 0, self.server_guid, false)

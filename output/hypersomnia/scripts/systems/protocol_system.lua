@@ -14,7 +14,8 @@ function protocol_system:handle_incoming_commands()
 	
 		local result = msgs[i].channel:recv(input_bs)
 		
-		if result ~= receive_result.NOTHING_RECEIVED then
+		if result ~= receive_result.NOTHING_RECEIVED and result ~= receive_result.UNMATCHING_RELIABLE_RECEIVED then
+		print "Receiving data..."
 			while input_bs:GetNumberOfUnreadBits() >= 8 do
 				local msg = protocol.read_msg(input_bs)
 				
