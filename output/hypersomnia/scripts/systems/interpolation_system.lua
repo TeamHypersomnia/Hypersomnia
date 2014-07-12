@@ -15,15 +15,15 @@ function interpolation_system:update()
 		at_step_sequence = msgs[i].data.at_step
 	end
 	
-	if new_step then
-		for i=1, #self.targets do
-			local target = self.targets[i]
-			local new_position = self.targets[i].synchronization.modules.movement.position
-			local new_velocity = self.targets[i].synchronization.modules.movement.velocity
-			
-			self.targets[i].cpp_entity.physics.body:SetTransform(new_position, 0)
-			self.targets[i].cpp_entity.physics.body:SetLinearVelocity(new_velocity)
-		end
+	--if new_step then
+	for i=1, #self.targets do
+		local target = self.targets[i]
+		local new_position = self.targets[i].synchronization.modules.movement.position
+		local new_velocity = self.targets[i].synchronization.modules.movement.velocity
+		
+		self.targets[i].cpp_entity.physics.body:SetTransform(new_position, 0)
+		self.targets[i].cpp_entity.physics.body:SetLinearVelocity(new_velocity)
 	end
+	--end
 end
 

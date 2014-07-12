@@ -36,7 +36,7 @@ function protocol_system:handle_incoming_commands()
 		
 		--if result == receive_result.RELIABLE_RECEIVED then
 			transmission_log:write(input_bs.read_report)
-			--print(input_bs.read_report)
+			print(input_bs.read_report)
 		--end
 	end
 end
