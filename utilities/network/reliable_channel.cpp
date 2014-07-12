@@ -42,125 +42,155 @@ namespace augs {
 				return false;
 
 			/* reliable + maybe unreliable */
-			if (request_reliable_sequence || !reliable_buf.empty()) {
-				bitstream reliable_bs;
-				
-				for (auto& msg : reliable_buf)
-					if (msg.output_bitstream) {
+			bitstream reliable_bs;
+
+			for (auto& msg : reliable_buf) {
+				if (msg.output_bitstream) {
 					reliable_bs.name_property("reliable message");
 					reliable_bs.WriteBitstream(*msg.output_bitstream);
-					}
+				}
+			}
 
+			if (reliable_bs.GetNumberOfBitsUsed() > 0) {
 				output.name_property("has_reliable");
-				output.Write<bool>(request_reliable_sequence || reliable_bs.GetNumberOfBitsUsed() > 0);
+				output.Write<bool>(1);
 				output.name_property("sequence");
 				output.Write(++sequence);
 				output.name_property("ack_sequence");
 				output.Write(ack_sequence);
 
-				output.name_property("reliable buffer");
-				output.WriteBitstream(reliable_bs);
-
 				sequence_to_reliable_range[sequence] = reliable_buf.size();
-				request_reliable_sequence = false;
 			}
-			/* only unreliable */
 			else {
 				output.name_property("has_reliable");
 				output.Write<bool>(0);
-				output.name_property("unreliable_only_sequence");
-				output.Write(++unreliable_only_sequence);
 			}
 
-			/* either way append unreliable buffer */
-			if (unreliable_buf)  {
-				output.name_property("unreliable buffer");
-				output.WriteBitstream(*unreliable_buf);
+			/* only unreliable */
+			if (unreliable_buf && unreliable_buf->GetNumberOfBitsUsed() > 0) {
+				output.name_property("has_unreliable");
+				output.Write<bool>(1);
+				output.name_property("unreliable_sequence");
+				output.Write(++unreliable_sequence);
+				output.name_property("request_ack_for_unreliable");
+				output.Write<bool>(request_ack_for_unreliable);
+
+				request_ack_for_unreliable = false;
 			}
+			else {
+				output.name_property("has_unreliable");
+				output.Write<bool>(0);
+			}
+
+			output.name_property("reliable_buffer");
+			output.WriteBitstream(reliable_bs);
+			output.name_property("unreliable_buffer");
+			output.WriteBitstream(*unreliable_buf);
 		
 			return true;
 		}
 
 		bool reliable_sender::read_ack(bitstream& input) {
-			unsigned short incoming_ack = 0u;
+			unsigned short reliable_ack = 0u;
+			unsigned short unreliable_ack = 0u;
+
+			input.name_property("reliable_ack");
+			if (!input.Read(reliable_ack)) return false;
+			input.name_property("unreliable_ack");
+			if (!input.Read(unreliable_ack)) return false;
 			
-			input.name_property("incoming ack");
-			if (input.Read(incoming_ack)) {
-				if (sequence_more_recent(incoming_ack, ack_sequence)) {
-					auto num_messages_to_erase = sequence_to_reliable_range.find(incoming_ack);
+			if (sequence_more_recent(reliable_ack, ack_sequence)) {
+				auto num_messages_to_erase = sequence_to_reliable_range.find(reliable_ack);
 
-					if (num_messages_to_erase != sequence_to_reliable_range.end()) {
-						reliable_buf.erase(reliable_buf.begin(), reliable_buf.begin() + (*num_messages_to_erase).second);
+				if (num_messages_to_erase != sequence_to_reliable_range.end()) {
+					reliable_buf.erase(reliable_buf.begin(), reliable_buf.begin() + (*num_messages_to_erase).second);
 
-						/* for now just clear the sequence history,
-						we'll implement partial updates on the client later
+					/* for now just clear the sequence history,
+					we'll implement partial updates on the client later
 
-						from now on the client won't acknowledge any other packets than those with ack_sequence equal to incoming_ack,
-						so we can safely clear the sequence history.
-						*/
-						sequence_to_reliable_range.clear();
-						ack_sequence = incoming_ack;
-					}
+					from now on the client won't acknowledge any other packets than those with ack_sequence equal to incoming_ack,
+					so we can safely clear the sequence history.
+					*/
+					sequence_to_reliable_range.clear();
+					ack_sequence = reliable_ack;
 				}
-
-				return true;
 			}
 
-			return false;
+			if (sequence_more_recent(unreliable_ack, unreliable_ack_sequence)) {
+				unreliable_ack_sequence = unreliable_ack;
+			}
+
+			return true;
 		}
 		
 		int reliable_receiver::read_sequence(bitstream& input) {
 			std::stringstream report;
 
-			unsigned short update_to_sequence = 0u;
 			unsigned short update_from_sequence = 0u;
 
-			bool reliable_length = 0u;
+			bool has_reliable = false;
+			bool has_unreliable = false;
+			auto result = MESSAGES_RECEIVED;
+
+			bool request_ack_for_unreliable = false;
 			
 			input.name_property("has_reliable");
-			if (!input.Read<bool>(reliable_length)) return NOTHING_RECEIVED;
+			if (!input.Read<bool>(has_reliable)) return NOTHING_RECEIVED;
 
 			/* reliable + maybe unreliable */
-			if (reliable_length > 0) {
+			if (has_reliable) {
 				input.name_property("sequence");
-				if (!input.Read(update_to_sequence)) return NOTHING_RECEIVED;
+				if (!input.Read(received_sequence)) return NOTHING_RECEIVED;
 				input.name_property("ack_sequence");
 				if (!input.Read(update_from_sequence)) return NOTHING_RECEIVED;
 
-				bool is_recent = sequence_more_recent(update_to_sequence, last_sequence);
+				bool is_recent = sequence_more_recent(received_sequence, last_sequence);
 
 				if (is_recent && update_from_sequence == last_sequence) {
-					last_sequence = update_to_sequence;
+					last_sequence = received_sequence;
 					ack_requested = true;
-					return RELIABLE_RECEIVED;
+					result = MESSAGES_RECEIVED;
 				}
-				/*
-				we can't only rely on the unreliable data of the moment
-				*/
-				else if (is_recent)
+				else if (is_recent) {
 					ack_requested = true;
-				
-				return NOTHING_RECEIVED;
+					result = UNMATCHING_RELIABLE_RECEIVED;
+				} 
+				else {
+					/* if even the reliable sequence is out of date, the unreliable sequence will be out of date too, so it can't be read anyway */
+					return NOTHING_RECEIVED;
+				}
 			}
-			/* only unreliable */
-			else {
-				input.name_property("unreliable_only_sequence");
-				if (!input.Read(update_to_sequence)) return NOTHING_RECEIVED;
-				
-				if (sequence_more_recent(update_to_sequence, last_unreliable_only_sequence)) {
-					last_unreliable_only_sequence = update_to_sequence;
 
-					return ONLY_UNRELIABLE_RECEIVED;
+			input.name_property("has_unreliable");
+			if (!input.Read<bool>(has_unreliable)) return NOTHING_RECEIVED;
+			
+			if (has_unreliable) {
+				input.name_property("unreliable_sequence");
+				if (!input.Read(received_unreliable_sequence)) return NOTHING_RECEIVED;
+				input.name_property("request_ack_for_unreliable");
+				if (!input.Read(request_ack_for_unreliable)) return NOTHING_RECEIVED;
+
+				if (sequence_more_recent(received_unreliable_sequence, last_unreliable_sequence)) {
+					last_unreliable_sequence = received_unreliable_sequence;
+
+					if (request_ack_for_unreliable)
+						ack_requested = true;
+
+					return result;
 				}
 				
 				/* discard out of date packets */
 				return NOTHING_RECEIVED;
 			}
+
+			return result;
 		}
 
 		void reliable_receiver::write_ack(bitstream& output) {
-			output.name_property("receiver channel ack");
+			output.name_property("reliable_ack");
 			output.Write(last_sequence);
+			output.name_property("unreliable_ack");
+			output.Write(last_unreliable_sequence);
 		}
 
 

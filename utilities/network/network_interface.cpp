@@ -29,6 +29,10 @@ namespace augs {
 			return result_bitstream;
 		}
 
+		void network_interface::occasional_ping(bool flag) {
+			peer->SetOccasionalPing(flag);
+		}
+
 		void network_interface::packet::destroy() {
 			if (owner && info)
 				owner->DeallocatePacket(info);

@@ -20,11 +20,12 @@ namespace augs {
 
 			std::unordered_map<unsigned, unsigned> sequence_to_reliable_range;
 
-			unsigned short unreliable_only_sequence = 0u;
+			unsigned short unreliable_sequence = 0u;
+			unsigned short unreliable_ack_sequence = 0u;
 			unsigned short sequence = 0u;
 			unsigned short ack_sequence = 0u;
 
-			bool request_reliable_sequence = false;
+			bool request_ack_for_unreliable = false;
 
 			void post_message(message&);
 			bool write_data(bitstream& output);
@@ -35,12 +36,15 @@ namespace augs {
 			bool enable_partial_updates = false;
 			bool ack_requested = false;
 
+			unsigned short received_sequence = 0u;
+			unsigned short received_unreliable_sequence = 0u;
+
 			unsigned short last_sequence = 0u;
-			unsigned short last_unreliable_only_sequence = 0u;
+			unsigned short last_unreliable_sequence = 0u;
 
 			enum result {
-				RELIABLE_RECEIVED,
-				ONLY_UNRELIABLE_RECEIVED,
+				MESSAGES_RECEIVED,
+				UNMATCHING_RELIABLE_RECEIVED,
 				NOTHING_RECEIVED
 			};
 

@@ -171,8 +171,8 @@ namespace bindings {
 
 			luabind::class_<receive_result>("receive_result")
 			.enum_("receive_result")[
-				luabind::value("RELIABLE_RECEIVED", reliable_receiver::RELIABLE_RECEIVED),
-				luabind::value("ONLY_UNRELIABLE_RECEIVED", reliable_receiver::ONLY_UNRELIABLE_RECEIVED),
+				luabind::value("MESSAGES_RECEIVED", reliable_receiver::MESSAGES_RECEIVED),
+				luabind::value("UNMATCHING_RELIABLE_RECEIVED", reliable_receiver::UNMATCHING_RELIABLE_RECEIVED),
 				luabind::value("NOTHING_RECEIVED", reliable_receiver::NOTHING_RECEIVED)
 			],
 
@@ -189,17 +189,23 @@ namespace bindings {
 			.def("post_message", &reliable_sender::post_message)
 			.def("read_ack", &reliable_sender::read_ack)
 			.def("write_data", &reliable_sender::write_data)
-			.def_readwrite("request_reliable_sequence", &reliable_sender::request_reliable_sequence)
 			.def_readwrite("reliable_buf", &reliable_sender::reliable_buf)
 			.def_readwrite("unreliable_buf", &reliable_sender::unreliable_buf)
 			.def_readwrite("sequence", &reliable_sender::sequence)
 			.def_readwrite("ack_sequence", &reliable_sender::ack_sequence)
+			.def_readwrite("unreliable_sequence", &reliable_sender::unreliable_sequence)
+			.def_readwrite("unreliable_ack_sequence", &reliable_sender::unreliable_ack_sequence)
+			.def_readwrite("request_ack_for_unreliable", &reliable_sender::request_ack_for_unreliable)
 			, 
 
 			luabind::class_<reliable_receiver>("reliable_receiver")
 			.def(luabind::constructor<>())
 			.def_readwrite("last_sequence", &reliable_receiver::last_sequence)
+			.def_readwrite("last_unreliable_sequence", &reliable_receiver::last_unreliable_sequence)
+			.def_readwrite("received_sequence", &reliable_receiver::received_sequence)
+			.def_readwrite("received_unreliable_sequence", &reliable_receiver::received_unreliable_sequence)
 			.def_readwrite("enable_partial_updates", &reliable_receiver::enable_partial_updates)
+			.def_readwrite("ack_requested", &reliable_receiver::ack_requested)
 			.def("read_sequence", &reliable_receiver::read_sequence)
 			.def("write_ack", &reliable_receiver::write_ack),
 
@@ -231,7 +237,8 @@ namespace bindings {
 			.def("close_connection", &network_interface::close_connection)
 			.def("shutdown", &network_interface::shutdown)
 			.def("send", &network_interface::send)
-	
+			.def("occasional_ping", &network_interface::occasional_ping)
+			
 
 			);
 	}
