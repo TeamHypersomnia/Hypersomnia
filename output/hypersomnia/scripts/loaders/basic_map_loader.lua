@@ -63,7 +63,8 @@ return function(map_filename, scene_object)
 	}
 	
 	scene_object.bullet_sprite = create_sprite {
-		image = scene_object.sprite_library["bullet"]
+		image = scene_object.sprite_library["bullet"],
+		size_multiplier = vec2(1.0, 0.5)
 	}
 	
 	scene_object.legs_sets = create_all_legs_sets(scene_object.sprite_library)

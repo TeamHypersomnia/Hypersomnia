@@ -385,4 +385,50 @@ Player should be able to instantly zoom in and out by using scroll.
 This will function as a map; it will greatly help in navigation and make the player situationally aware.
 
 
+--------------------------------------------
+BULLETS
+--------------------------------------------
 
+Implement the penetration as follows: assign an initial damage to the bullet, then
+on BeginContact/EndContact play particle effects, and on every PreSolve disable the contact and decrease the damage by some arbitrary, density value.
+If the bullet's damage becomes less than zero, delete the bullet.
+
+
+About server-client synchronization:
+Assuming the environment is static, things are very simple. 
+The server simply broadcasts the message that the bullet was fired. 
+If the bullet lands on a player or another interactive object - simply if it causes an important even to happen (death, for example) - broadcast this fact.
+If it hits the wall, we don't care about broadcasting this information since if the environment is static the clients will simulate things the same way.
+
+Things become problematic when we consider dynamic objects - the question arises, who decides about the lifetime of the bullet on the client?
+If the client, it is very responsive, we have less bandwidth, but we may falsely simulate a hit against a moving crate, while the bullet actually just flew past it and actually hit the player, for example.
+If the server, the hits become less responsive and the bandwidth is doubled, but the hits are always correctly shown only where they occur.
+
+Or, a mix of both: how about sending info only when the bullet hits a dynamic object, and on the client never check against collisions with dynamic objects?
++ still responsive against static terrain;
++ it's better to falsely show a bullet passing through the client-driven character than a false hit against a crate standing in front of us when the bullet actually hit us;
+- a little more bandwidth; it's far from being doubled, though.
+
+For the client-driven bullets, do the opposite - check collisions with dynamic objects and only ever receive events caused by the bullet.
+
+Summarizing:
+
+Client-side:
+- local bullet hits a static object
+- local bullet hits a dynamic object
+- remote bullet hits a static object
+
+Server-size:
+- remote bullet hits a dynamic object
+- local bullet makes an event (hits the player)
+- remote bullet makes an event (hits the player)
+
+
+What if we do the hit-detection client-side?
+Now if we send a "I hit that player!" message to the server, the server goes back in time resimulates bullet+static environment and only checks whether such a bullet landed on such a player.
+
+We will need to reliably measure the lag between the server and the client to properly advance the bullet forward in time on the server;
+without the possibility of cheating.
+
+
+Note that when receiving "new_bullet" notification, we may want to move it forward in time on the client, by the amount of lag.

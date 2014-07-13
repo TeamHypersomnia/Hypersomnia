@@ -63,11 +63,18 @@ function weapon_system:shot_routine(target)
 		new_transform.rotation = vel:get_degrees()
 			
 		vel = vel * randval(weapon.bullet_speed)
-
-		local bullet = self.world_object:create_entity (override(weapon.bullet_entity, { transform = { 
-			pos = new_transform.pos,
-			rotation = new_transform.rotation
-		} }) )
+		
+		local bullet = self.world_object:create_entity (override(weapon.bullet_entity, { 
+			transform = { 
+				pos = new_transform.pos,
+				rotation = new_transform.rotation
+			},
+			
+			damage = {
+				max_distance = weapon.max_bullet_distance,
+				starting_point = new_transform.pos
+			}
+		}))
 		
 		local body = bullet.physics.body
 		body:SetLinearVelocity(to_meters(vel))
