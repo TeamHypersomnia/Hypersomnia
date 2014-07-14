@@ -1,12 +1,9 @@
 weapon_system = inherits_from (processing_system)
 
-function weapon_system:constructor(world_object, camera_to_shake)
+function weapon_system:constructor(world_object)
 	self.world_object = world_object
 	self.physics = world_object.physics_system
-	self.world = world_object.world
-	
-	self.camera_to_shake = camera_to_shake
-	
+	self.delta_timer = timer()
 	processing_system.constructor(self)
 end
 
@@ -18,30 +15,8 @@ function weapon_system:shot_routine(target)
 	local weapon = target.weapon
 	local entity = target.cpp_entity
 	
-	local msg = animate_message()
-	msg.animation_type = animation_events.SHOT
-	msg.preserve_state_if_animation_changes = false
-	msg.change_animation = true
-	msg.change_speed = true
-	msg.speed_factor = 1
-	msg.subject = entity
-	msg.message_type = animate_message.START
-	msg.animation_priority = 1
-
-	self.world:post_message(msg)
-	
 	local gun_transform = entity.transform.current
 	local gun_rotation = gun_transform.rotation
-	
-	if self.camera_to_shake ~= nil then 
-		local shake_dir = vec2()
-		
-		shake_dir:set_from_degrees(randval(
-			gun_rotation - weapon.shake_spread_degrees,
-			gun_rotation + weapon.shake_spread_degrees));
-
-		self.camera_to_shake.camera.last_interpolant.pos = self.camera_to_shake.camera.last_interpolant.pos + shake_dir * weapon.shake_radius;
-	end
 	
 	weapon.current_rounds = weapon.current_rounds - 1
 	
@@ -54,6 +29,11 @@ function weapon_system:shot_routine(target)
 		new_transform.pos = result.intersection
 	end
 	
+	local new_shot_message = {
+		subject = target,
+		bullets = {}
+	}
+		
 	for i=1, weapon.bullets_once do
 		local vel = vec2.from_degrees(
 			randval(
@@ -64,21 +44,14 @@ function weapon_system:shot_routine(target)
 			
 		vel = vel * randval(weapon.bullet_speed)
 		
-		local bullet = self.world_object:create_entity (override(weapon.bullet_entity, { 
-			transform = { 
-				pos = new_transform.pos,
-				rotation = new_transform.rotation
-			},
-			
-			damage = {
-				max_distance = weapon.max_bullet_distance,
-				starting_point = new_transform.pos
-			}
-		}))
-		
-		local body = bullet.physics.body
-		body:SetLinearVelocity(to_meters(vel))
+		table.insert(new_shot_message.bullets, { 
+			pos = new_transform.pos,
+			rotation = new_transform.rotation,
+			["vel"] = vel
+		})	
 	end
+	
+	self.owner_entity_system:post_table("shot_message", new_shot_message)
 end
 
 function weapon_system:handle_messages()
@@ -93,6 +66,11 @@ function weapon_system:handle_messages()
 			end
 		end
 	end
+end
+
+
+function weapon_system:update()
+	self:substep(self.delta_timer:extract_milliseconds())
 end
 
 function weapon_system:substep(dt)

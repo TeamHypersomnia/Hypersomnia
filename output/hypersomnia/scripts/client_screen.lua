@@ -19,6 +19,7 @@ dofile "hypersomnia\\scripts\\systems\\client_system.lua"
 dofile "hypersomnia\\scripts\\systems\\input_prediction_system.lua"
 dofile "hypersomnia\\scripts\\systems\\synchronization_system.lua"
 dofile "hypersomnia\\scripts\\systems\\weapon_system.lua"
+dofile "hypersomnia\\scripts\\systems\\bullet_creation_system.lua"
 
 client_screen = inherits_from ()
 
@@ -44,7 +45,8 @@ function client_screen:constructor(camera_rect)
 	self.entity_system_instance = entity_system:create()
 	
 	self.entity_system_instance:register_messages {
-		"network_message"
+		"network_message",
+		"shot_message"
 	}
 	
 	self.entity_system_instance:register_messages (protocol.message_names)
@@ -56,13 +58,13 @@ function client_screen:constructor(camera_rect)
 	self.systems.protocol = protocol_system:create(function(msg) self.systems.synchronization:handle_variable_message(msg) end)
 	self.systems.interpolation = interpolation_system:create()
 	self.systems.orientation = orientation_system:create()
-	self.systems.weapon = weapon_system:create(self.sample_scene.world_object, self.sample_scene.world_camera)
+	self.systems.weapon = weapon_system:create(self.sample_scene.world_object)
+	self.systems.bullet_creation = bullet_creation_system:create(self.sample_scene.world_object, self.sample_scene.world_camera)
 	
 	table.insert(self.sample_scene.world_object.substep_callbacks, function (dt) 
 		self.systems.client:substep()
 		self.systems.input_prediction:substep()
 		self.systems.client:send_all_data()
-		self.systems.weapon:substep(dt)
 	end)
 	
 	self.entity_system_instance:register_systems(self.systems)
@@ -105,6 +107,8 @@ function client_screen:loop()
 	self.systems.input_prediction:update()
 	self.systems.interpolation:update()
 	self.systems.orientation:update()
+	self.systems.weapon:update()
+	self.systems.bullet_creation:update()
 	
 	--print "client tick"
 	
