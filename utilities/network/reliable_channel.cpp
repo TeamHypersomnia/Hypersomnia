@@ -84,8 +84,11 @@ namespace augs {
 
 			output.name_property("reliable_buffer");
 			output.WriteBitstream(reliable_bs);
-			output.name_property("unreliable_buffer");
-			output.WriteBitstream(*unreliable_buf);
+			
+			if (unreliable_buf) {
+				output.name_property("unreliable_buffer");
+				output.WriteBitstream(*unreliable_buf);
+			}
 		
 			return true;
 		}
@@ -531,12 +534,12 @@ TEST(NetChannel, OutOfDatePackets) {
 		sender.write_data(sender_packets[5]);
 
 		receiver.read_sequence(sender_packets[1]);
-		receiver.read_sequence(sender_packets[0]);
+		EXPECT_EQ(receiver.NOTHING_RECEIVED, receiver.read_sequence(sender_packets[0]));
 		int table[4];
-		sender_packets[0].Read(table[0]);
-		sender_packets[0].Read(table[1]);
-		sender_packets[0].Read(table[2]);
-		sender_packets[0].Read(table[3]);
+		sender_packets[1].Read(table[0]);
+		sender_packets[1].Read(table[1]);
+		sender_packets[1].Read(table[2]);
+		sender_packets[1].Read(table[3]);
 
 		EXPECT_EQ(0, table[0]);
 		EXPECT_EQ(1, table[1]);
