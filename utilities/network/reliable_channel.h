@@ -10,15 +10,13 @@ namespace augs {
 		struct reliable_sender {
 			struct message {
 				luabind::object script;
-				bool flag_for_deletion = false;
-
 				bitstream* output_bitstream = nullptr;
 			};
 
 			std::vector<message> reliable_buf;
 			bitstream unreliable_buf;
 
-			std::unordered_map<unsigned, unsigned> sequence_to_reliable_range;
+			std::map<unsigned, unsigned> sequence_to_reliable_range;
 
 			unsigned short unreliable_sequence = 0u;
 			unsigned short unreliable_ack_sequence = 0u;
@@ -26,6 +24,10 @@ namespace augs {
 			unsigned short ack_sequence = 0u;
 
 			bool request_ack_for_unreliable = false;
+
+			bool message_indexing = false;
+			unsigned first_message = 0u;
+			unsigned last_message = 0u;
 
 			void post_message(message&);
 			bool write_data(bitstream& output);

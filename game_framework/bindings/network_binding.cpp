@@ -178,7 +178,6 @@ namespace bindings {
 
 			luabind::class_<reliable_sender::message>("net_channel_message")
 			.def(luabind::constructor<>())
-			.def_readwrite("flag_for_deletion", &reliable_sender::message::flag_for_deletion)
 			.def_readwrite("script", &reliable_sender::message::script)
 			.def_readwrite("output_bitstream", &reliable_sender::message::output_bitstream),
 			
@@ -193,6 +192,7 @@ namespace bindings {
 			.def_readwrite("unreliable_buf", &reliable_sender::unreliable_buf)
 			.def_readwrite("sequence", &reliable_sender::sequence)
 			.def_readwrite("ack_sequence", &reliable_sender::ack_sequence)
+			.def_readwrite("message_indexing", &reliable_sender::message_indexing)
 			.def_readwrite("unreliable_sequence", &reliable_sender::unreliable_sequence)
 			.def_readwrite("unreliable_ack_sequence", &reliable_sender::unreliable_ack_sequence)
 			.def_readwrite("request_ack_for_unreliable", &reliable_sender::request_ack_for_unreliable)
