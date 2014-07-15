@@ -16,7 +16,7 @@ namespace augs {
 			};
 
 			std::vector<message> reliable_buf;
-			bitstream* unreliable_buf = nullptr;
+			bitstream unreliable_buf;
 
 			std::unordered_map<unsigned, unsigned> sequence_to_reliable_range;
 
@@ -33,7 +33,7 @@ namespace augs {
 		};
 
 		struct reliable_receiver {
-			bool enable_partial_updates = false;
+			bool acknowledge_all_sequences = false;
 			bool ack_requested = false;
 
 			unsigned short received_sequence = 0u;

@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
-#include "reliable_channel.h"
 #include "bitstream_wrapper.h"
+#include "reliable_channel.h"
 
 namespace augs {
 	namespace network {
@@ -38,7 +38,7 @@ namespace augs {
 			reliable_buf.erase(std::remove_if(reliable_buf.begin(), reliable_buf.end(), [](const message& m){ return m.flag_for_deletion; }), reliable_buf.end());
 			
 			/* if we have nothing to send */
-			if (reliable_buf.empty() && unreliable_buf && unreliable_buf->GetNumberOfBitsUsed() <= 0)
+			if (reliable_buf.empty() && unreliable_buf.GetNumberOfBitsUsed() <= 0)
 				return false;
 
 			/* reliable + maybe unreliable */
@@ -67,7 +67,7 @@ namespace augs {
 			}
 
 			/* only unreliable */
-			if (unreliable_buf && unreliable_buf->GetNumberOfBitsUsed() > 0) {
+			if (unreliable_buf.GetNumberOfBitsUsed() > 0) {
 				output.name_property("has_unreliable");
 				output.Write<bool>(1);
 				output.name_property("unreliable_sequence");
@@ -85,10 +85,8 @@ namespace augs {
 			output.name_property("reliable_buffer");
 			output.WriteBitstream(reliable_bs);
 			
-			if (unreliable_buf) {
-				output.name_property("unreliable_buffer");
-				output.WriteBitstream(*unreliable_buf);
-			}
+			output.name_property("unreliable_buffer");
+			output.WriteBitstream(unreliable_buf);
 		
 			return true;
 		}
@@ -147,20 +145,18 @@ namespace augs {
 				input.name_property("ack_sequence");
 				if (!input.Read(update_from_sequence)) return NOTHING_RECEIVED;
 
-				bool is_recent = sequence_more_recent(received_sequence, last_sequence);
-
-				if (is_recent && update_from_sequence == last_sequence) {
+				/* if even the reliable sequence is out of date, the unreliable sequence will be out of date too, so it can't be read anyway */
+				if (!sequence_more_recent(received_sequence, last_sequence))
+					return NOTHING_RECEIVED;
+				
+				if (acknowledge_all_sequences || update_from_sequence == last_sequence) {
 					last_sequence = received_sequence;
 					ack_requested = true;
 					result = MESSAGES_RECEIVED;
 				}
-				else if (is_recent) {
+				else {
 					ack_requested = true;
 					result = UNMATCHING_RELIABLE_RECEIVED;
-				} 
-				else {
-					/* if even the reliable sequence is out of date, the unreliable sequence will be out of date too, so it can't be read anyway */
-					return NOTHING_RECEIVED;
 				}
 			}
 
