@@ -8,15 +8,22 @@ function reliable_channel_wrapper:constructor()
 	self.sender = self.channel.sender
 	self.receiver = self.channel.receiver
 	
+	self.sender.message_indexing = true
+	self.receiver.message_indexing = true
+	
 	-- acknowledged, cleared, appended automatically to output bs
 	self.reliable_sequenced_messages = {}
 	-- only acknowledged and cleared, appended manually
 	self.reliable_sequenced_bitstreams = {}
 	
-	self.unreliable_buf = BitStream()
-	self.sender.unreliable_buf = self.unreliable_buf
+	self.unreliable_buf = self.sender.unreliable_buf
 end
 
+function reliable_channel_wrapper:has_something_to_send()
+	return next(self.reliable_sequenced_messages) ~= nil or
+		   next(self.reliable_sequenced_bitstreams) ~= nil or
+			self.unreliable_buf:size() > 0 or self.sender.reliable_buf:size() > 0 or self.receiver.ack_requested
+end
 
 -- only the most recent message is guaranteed to arrive
 function reliable_channel_wrapper:reliable_seq_bs(channel, out_bs)
@@ -71,13 +78,6 @@ function reliable_channel_wrapper:post_unreliable(name, entry)
 end
 
 function reliable_channel_wrapper:post(message)
-	if message["should_invalidate_message"] ~= nil then
-		local msgs = self.sender.reliable_buf
-		for i=0, self.sender.reliable_buf:size()-1 do
-			msgs[i].flag_for_deletion = message:should_invalidate_message(msgs[i].script)
-		end
-	end
-	
 	local new_msg = net_channel_message()
 	new_msg.script = message
 	new_msg.output_bitstream = message.output_bitstream

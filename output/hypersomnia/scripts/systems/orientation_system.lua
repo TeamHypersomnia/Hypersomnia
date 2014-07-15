@@ -34,7 +34,7 @@ function orientation_system:update()
 				--print ("send retry is.. ") 
 				--print (send_retry)
 				self.owner_entity_system.all_systems["client"].net_channel:reliable_seq_msg("CROSSHAIR_SNAPSHOT", { position = current_pos }, send_retry)
-				self.owner_entity_system.all_systems["client"].cmd_requested = true
+				--self.owner_entity_system.all_systems["client"].cmd_requested = true
 			end
 			
 		end
