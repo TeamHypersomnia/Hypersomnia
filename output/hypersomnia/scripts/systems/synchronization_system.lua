@@ -80,6 +80,7 @@ function synchronization_system:update_states_from_bitstream(msg)
 					weapon = self.owner_scene.weapons.m4a1
 				}
 				
+				new_entity.weapon.transmit_bullets = true
 				new_entity.cpp_entity.script = new_entity
 			else
 				local new_remote_player = create_remote_player(self.owner_scene, self.owner_scene.crosshair_sprite)
@@ -91,8 +92,13 @@ function synchronization_system:update_states_from_bitstream(msg)
 					orientation = {
 						receiver = true,
 						crosshair_entity = new_remote_player.crosshair
-					}
+					},
+					
+					weapon = self.owner_scene.weapons.m4a1
 				}
+				
+				new_entity.weapon.constrain_requested_bullets = false
+				new_entity.weapon.transmit_bullets = false
 			end
 			
 			-- save synchronization data (not as component)
@@ -124,19 +130,20 @@ end
 
 function synchronization_system:handle_variable_message(msg)
 	-- skip to the readable data of the moment
-	if msg.result == receive_result.UNMATCHING_RELIABLE_RECEIVED then
+	if msg.should_skip then
 		
 		if msg.info.name == "STATE_UPDATE" then
-		print "skipping state"
-		print (msg.data.bits)
+		--print "skipping state"
+		--print (msg.data.bits)
 			msg.input_bs:IgnoreBits(msg.data.bits)
 		-- todo: only skip whole stream update if state update tells that
 		-- the data layout has changed
 		-- we may firstly read object ids for example
 		-- and only skip objects whose state has been modified
+		-- bad idea: we can't skip individual objects because of varying data layout.
 		elseif msg.info.name == "STREAM_UPDATE" then
-		print "skipping stream"
-		print (msg.data.bits)
+		--print "skipping stream"
+		--print (msg.data.bits)
 			msg.input_bs:IgnoreBits(msg.data.bits)
 		end
 	else

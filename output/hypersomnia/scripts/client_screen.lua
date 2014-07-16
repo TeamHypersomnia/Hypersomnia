@@ -58,18 +58,18 @@ function client_screen:constructor(camera_rect)
 	self.systems.protocol = protocol_system:create(function(msg) self.systems.synchronization:handle_variable_message(msg) end)
 	self.systems.interpolation = interpolation_system:create()
 	self.systems.orientation = orientation_system:create()
-	self.systems.weapon = weapon_system:create(self.sample_scene.world_object)
+	self.systems.weapon = weapon_system:create(self.sample_scene.world_object, self.sample_scene.world_object.physics_system)
 	self.systems.bullet_creation = bullet_creation_system:create(self.sample_scene.world_object, self.sample_scene.world_camera)
 	
 	table.insert(self.sample_scene.world_object.substep_callbacks, function (dt) 
-		self.systems.client:substep()
 		self.systems.input_prediction:substep()
 		self.systems.client:send_all_data()
+		self.systems.client:substep()
 	end)
 	
 	self.entity_system_instance:register_systems(self.systems)
 	
-	create_weapons(self.sample_scene)
+	create_weapons(self.sample_scene, true)
 end
 
 function client_screen:loop()
@@ -107,7 +107,10 @@ function client_screen:loop()
 	self.systems.input_prediction:update()
 	self.systems.interpolation:update()
 	self.systems.orientation:update()
+	
+	self.systems.weapon:translate_shot_info_msgs()
 	self.systems.weapon:update()
+	
 	self.systems.bullet_creation:update()
 	
 	--print "client tick"

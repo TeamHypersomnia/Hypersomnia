@@ -9,6 +9,28 @@ protocol.module_mappings = {
 
 protocol.message_by_id = {
 	{
+		name = "HIT_REQUEST",
+		data = {
+			"Ushort", "bullet_id",
+			"Ushort", "subject_id"
+		}
+	},
+	{
+		name = "SHOT_REQUEST",
+		data = {
+			"Vec2", "position",
+			"Float", "rotation"
+		}
+	},
+	{
+		name = "SHOT_INFO",
+		data = {
+			"Ushort", "subject_id",
+			"Vec2", "position",
+			"Float", "rotation"
+		}
+	},
+	{
 		name = "INPUT_SNAPSHOT",
 		data = {
 			"Uint", "at_step", 
@@ -28,7 +50,8 @@ protocol.message_by_id = {
 		name = "CURRENT_STEP",
 		data = {
 			"Uint", "at_step"
-		}
+		},
+		read_unmatching = true
 	},
 	{
 		name = "ASSIGN_SYNC_ID",

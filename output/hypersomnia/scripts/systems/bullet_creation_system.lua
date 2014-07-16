@@ -28,7 +28,9 @@ function bullet_creation_system:update()
 		msg.animation_priority = 1
 	
 		self.world:post_message(msg)
-	
+		
+		local client_sys = self.owner_entity_system.all_systems["client"]
+		
 		for b=1, #msgs[i].bullets do
 			local bullet = msgs[i].bullets[b]
 			
@@ -57,6 +59,22 @@ function bullet_creation_system:update()
 			
 			local body = bullet_entity.physics.body
 			body:SetLinearVelocity(to_meters(bullet.vel))
+		end
+		
+		if target.weapon.transmit_bullets == true then
+			if #msgs[i].bullets == 1 then
+				client_sys.net_channel:post_reliable("SHOT_REQUEST", {
+					position = msgs[i].gun_transform.pos,
+					rotation = msgs[i].gun_transform.rotation
+				})
+				
+				print "sending data"
+			elseif #msgs[i].bullets > 1 then
+			
+			end
+			
+			-- bullet events are so important that they need to be issued right away
+			client_sys:send_all_data()
 		end
 	end
 end

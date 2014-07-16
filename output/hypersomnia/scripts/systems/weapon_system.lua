@@ -1,8 +1,8 @@
 weapon_system = inherits_from (processing_system)
 
-function weapon_system:constructor(world_object)
+function weapon_system:constructor(world_object, physics)
 	self.world_object = world_object
-	self.physics = world_object.physics_system
+	self.physics = physics
 	self.delta_timer = timer()
 	processing_system.constructor(self)
 end
@@ -11,26 +11,32 @@ function weapon_system:get_required_components()
 	return { "weapon" }
 end
 
-function weapon_system:shot_routine(target)
+function weapon_system:shot_routine(target, gun_transform)
+	-- remember about correct differentiation between requests that need to be processed
+	-- for correctness and those on the client only for showing remote players' bullets
+
 	local weapon = target.weapon
 	local entity = target.cpp_entity
 	
-	local gun_transform = entity.transform.current
-	local gun_rotation = gun_transform.rotation
+	local barrel_transform = transform_state(gun_transform)
+	barrel_transform.pos = barrel_transform.pos + vec2(weapon.bullet_barrel_offset):rotate(gun_transform.rotation, vec2())
 	
-	weapon.current_rounds = weapon.current_rounds - 1
+	-- this chunk won't be executed only for remote players on the client
+	if weapon.constrain_requested_bullets then
+		weapon.current_rounds = weapon.current_rounds - 1
+		-- security-check for the distance between the entity position and the requested position
 	
-	local new_transform = transform_state(gun_transform)
-	new_transform.pos = new_transform.pos + vec2(weapon.bullet_distance_offset):rotate(gun_rotation, vec2())
-
-	local result = self.physics:ray_cast(gun_transform.pos, new_transform.pos, create(b2Filter, weapon.bullet_entity.physics.body_info.filter), entity);
-
-	if result.hit then
-		new_transform.pos = result.intersection
+		
+		local result = self.physics:ray_cast(gun_transform.pos, barrel_transform.pos, create(b2Filter, weapon.bullet_entity.physics.body_info.filter), entity);
+	
+		if result.hit then
+			barrel_transform.pos = result.intersection
+		end
 	end
 	
 	local new_shot_message = {
 		subject = target,
+		gun_transform = transform_state(gun_transform),
 		bullets = {}
 	}
 		
@@ -40,18 +46,21 @@ function weapon_system:shot_routine(target)
 			gun_transform.rotation - weapon.spread_degrees,
 			gun_transform.rotation + weapon.spread_degrees))
 
-		new_transform.rotation = vel:get_degrees()
+		barrel_transform.rotation = vel:get_degrees()
 			
 		vel = vel * randval(weapon.bullet_speed)
 		
 		table.insert(new_shot_message.bullets, { 
-			pos = new_transform.pos,
-			rotation = new_transform.rotation,
+			pos = barrel_transform.pos,
+			rotation = barrel_transform.rotation,
 			["vel"] = vel
 		})	
 	end
 	
+	-- client - produce visual output from wherever the shot originates and inform the server about the shot
+	-- server - broadcast the information about the shot and possibly store their ids for later resimulation
 	self.owner_entity_system:post_table("shot_message", new_shot_message)
+	print "shotmsg"
 end
 
 function weapon_system:handle_messages()
@@ -69,6 +78,22 @@ function weapon_system:handle_messages()
 end
 
 
+function weapon_system:translate_shot_info_msgs()
+	local msgs = self.owner_entity_system.messages["SHOT_INFO"]
+	
+	for i=1, #msgs do
+	--print "getting info"
+	--print(msgs[i].data.subject_id)
+	--print(self.owner_entity_system.all_systems["synchronization"].my_sync_id)
+		local subject = self.owner_entity_system.all_systems["synchronization"].object_by_id[msgs[i].data.subject_id]
+		--print(subject.weapon.transmit_bullets)
+		table.insert(subject.weapon.buffered_actions, { trigger = components.weapon.triggers.SHOOT, premade_shot = {
+			position = msgs[i].data.position,
+			rotation = msgs[i].data.rotation
+		}})
+	end
+end
+
 function weapon_system:update()
 	self:substep(self.delta_timer:extract_milliseconds())
 end
@@ -85,21 +110,45 @@ function weapon_system:substep(dt)
 		weapon.time_ms = weapon.time_ms + dt
 		
 		if state == states.READY then
-			local trigger = weapon.trigger;
+			local trigger = weapon.trigger
+			local entity = target.cpp_entity
+			
+			local gun_transform = transform_state(entity.transform.current)
+			
+			if #weapon.buffered_actions > 0 then
+				trigger = weapon.buffered_actions[1].trigger
+				local premade_shot = weapon.buffered_actions[1].premade_shot
+				
+				gun_transform.pos = premade_shot.position
+				gun_transform.rotation = premade_shot.rotation
+				
+				-- assume that a valid action will always be executed on "READY" state, 
+				-- and right away pop it
+				
+				-- on the server: invalid action should anyway be invalidated
+				-- on the client: the commands won't be constrained so they will be always executed
+				table.remove(weapon.buffered_actions, 1)
+				print "buffered action"
+			end
+			
 			local triggers = components.weapon.triggers
 	
 			if trigger == triggers.MELEE then
 				--weapon:set_state("SWINGING")
 				--begin_swinging_routine()
 			elseif trigger == triggers.SHOOT then
-				if weapon.current_rounds > 0 then
-					self:shot_routine(target)
-					
-					if not weapon.is_automatic then
-						trigger = triggers.NONE
+				if weapon.constrain_requested_bullets then
+					if weapon.current_rounds > 0 then
+						self:shot_routine(target, gun_transform)
+						
+						if not weapon.is_automatic then
+							trigger = triggers.NONE
+						end
+						
+						weapon:set_state("SHOOTING_INTERVAL")
 					end
-	
-					weapon:set_state("SHOOTING_INTERVAL")
+				else
+					self:shot_routine(target, gun_transform)
 				end
 			end
 		

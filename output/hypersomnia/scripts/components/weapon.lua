@@ -40,7 +40,7 @@ function components.weapon:constructor(init_table)
 	--self.shooting_interval_ms = 0
 	--self.max_bullet_distance = 0
 	--
-	--self.bullet_distance_offset = vec2(0, 0)
+	--self.bullet_barrel_offset = vec2(0, 0)
 	
 	--self.bullet_entity = {}
 	--
@@ -58,6 +58,19 @@ function components.weapon:constructor(init_table)
 	--self.query_vertices = 0
 		
 	-- internals 
+	
+	-- this should be a reference to the item holding 
+	-- all gun instance properties like "current_rounds", "time_ms"
+	self.target_weapon_item = nil
+	
+	self.buffered_actions = {}
+	
+	self.transmit_bullets = false
+	
+	-- always false for remote guns on the client
+	-- true on the server for every gun instance
+	self.constrain_requested_bullets = true
+	
 	self.current_swing_direction = false
 	self:set_state("READY")
 	

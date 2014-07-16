@@ -7,7 +7,7 @@ dofile "config.lua"
 ENGINE_DIRECTORY = "..\\..\\Augmentations\\scripts\\"
 dofile (ENGINE_DIRECTORY .. "load_libraries.lua")
 
-setup_debugger()
+--setup_debugger()
 -- enter the game
 dofile "hypersomnia\\scripts\\start.lua"
 
