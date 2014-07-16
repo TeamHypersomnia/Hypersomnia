@@ -12,16 +12,19 @@ function protocol_system:handle_incoming_commands()
 	for i=1, #msgs do
 		local input_bs = msgs[i].data:get_bitstream()
 	
-		local result = msgs[i].channel:recv(input_bs)
+		local how_many_to_skip = msgs[i].channel:recv(input_bs)
+		local commands_skipped = 0
 		
-		if result ~= receive_result.NOTHING_RECEIVED then
-			print "Receiving data..."
+		if how_many_to_skip ~= -1 then
+			--print "Receiving data..."
 			while input_bs:GetNumberOfUnreadBits() >= 8 do
 				local msg = protocol.read_msg(input_bs)
 				
 				-- server might want to copy the subject client
 				msg.subject = msgs[i].subject
-				msg.result = result
+				
+				msg.should_skip = commands_skipped < how_many_to_skip
+				commands_skipped = commands_skipped + 1
 				
 				-- if the message type has a data layout of variable size, 
 				-- or it is a message altering existence of some entities,
@@ -29,7 +32,7 @@ function protocol_system:handle_incoming_commands()
 				if msg.info.read_immediately ~= nil and msg.info.read_immediately == true then
 					msg.input_bs = input_bs
 					self.variable_message_callback(msg)
-				else
+				elseif not msg.should_skip then
 					self.owner_entity_system:post_table(msg.info.name, msg)
 				end
 			end
