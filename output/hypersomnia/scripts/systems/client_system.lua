@@ -22,6 +22,9 @@ function client_system:get_required_components()
 	return { "client" }
 end
 
+function client_system:get_last_ping()
+	return self.network:get_last_ping(self.server_guid)
+end
 
 function client_system:substep()
 	self.substep_unreliable:Reset()
@@ -32,7 +35,7 @@ function client_system:send_all_data()
 	
 	
 	if self.server_guid ~= nil then --and self:cmd_rate_ready() then
-		--print(self.network:get_last_ping(self.server_guid))
+		--print()
 		--self.cmd_requested = false
 		--self.cmd_rate_timer:reset()
 		

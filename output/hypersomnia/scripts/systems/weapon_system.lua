@@ -11,12 +11,21 @@ function weapon_system:get_required_components()
 	return { "weapon" }
 end
 
-function weapon_system:shot_routine(target, gun_transform)
+function weapon_system:shot_routine(target, premade_shot)
 	-- remember about correct differentiation between requests that need to be processed
 	-- for correctness and those on the client only for showing remote players' bullets
 
 	local weapon = target.weapon
 	local entity = target.cpp_entity
+	
+	local gun_transform = transform_state(entity.transform.current)
+	-- cancel out interpolation
+	gun_transform.pos = to_pixels(entity.physics.body:GetPosition())
+		
+	if premade_shot ~= nil then
+		gun_transform.pos = premade_shot.position
+		gun_transform.rotation = premade_shot.rotation
+	end
 	
 	local barrel_transform = transform_state(gun_transform)
 	barrel_transform.pos = barrel_transform.pos + vec2(weapon.bullet_barrel_offset):rotate(gun_transform.rotation, vec2())
@@ -49,6 +58,11 @@ function weapon_system:shot_routine(target, gun_transform)
 		barrel_transform.rotation = vel:get_degrees()
 			
 		vel = vel * randval(weapon.bullet_speed)
+		
+		if premade_shot ~= nil and premade_shot.simulate_forward ~= nil then
+			print (premade_shot.simulate_forward)
+			barrel_transform.pos = barrel_transform.pos + (vel*premade_shot.simulate_forward/1000)
+		end
 		
 		table.insert(new_shot_message.bullets, { 
 			pos = barrel_transform.pos,
@@ -85,10 +99,13 @@ function weapon_system:translate_shot_info_msgs()
 	--print(msgs[i].data.subject_id)
 	--print(self.owner_entity_system.all_systems["synchronization"].my_sync_id)
 		local subject = self.owner_entity_system.all_systems["synchronization"].object_by_id[msgs[i].data.subject_id]
+		local forward_time = msgs[i].data.subject_ping/2 + self.owner_entity_system.all_systems["client"]:get_last_ping()/2
+		print(forward_time)
 		--print(subject.weapon.transmit_bullets)
 		table.insert(subject.weapon.buffered_actions, { trigger = components.weapon.triggers.SHOOT, premade_shot = {
 			position = msgs[i].data.position,
-			rotation = msgs[i].data.rotation
+			rotation = msgs[i].data.rotation,
+			simulate_forward = forward_time
 		}})
 	end
 end
@@ -112,16 +129,11 @@ function weapon_system:substep(dt)
 			local trigger = weapon.trigger
 			local entity = target.cpp_entity
 			
-			local gun_transform = transform_state(entity.transform.current)
-			-- cancel out interpolation
-			gun_transform.pos = to_pixels(entity.physics.body:GetPosition())
-			
+			local premade_shot;
+				
 			if #weapon.buffered_actions > 0 then
 				trigger = weapon.buffered_actions[1].trigger
-				local premade_shot = weapon.buffered_actions[1].premade_shot
-				
-				gun_transform.pos = premade_shot.position
-				gun_transform.rotation = premade_shot.rotation
+				premade_shot = weapon.buffered_actions[1].premade_shot
 				
 				-- assume that a valid action will always be executed on "READY" state, 
 				-- and right away pop it
@@ -139,7 +151,7 @@ function weapon_system:substep(dt)
 			elseif trigger == triggers.SHOOT then
 				if weapon.constrain_requested_bullets then
 					if weapon.current_rounds > 0 then
-						self:shot_routine(target, gun_transform)
+						self:shot_routine(target, premade_shot)
 						
 						if not weapon.is_automatic then
 							trigger = triggers.NONE
@@ -148,7 +160,7 @@ function weapon_system:substep(dt)
 						weapon:set_state("SHOOTING_INTERVAL")
 					end
 				else
-					self:shot_routine(target, gun_transform)
+					self:shot_routine(target, premade_shot)
 				end
 			end
 		
