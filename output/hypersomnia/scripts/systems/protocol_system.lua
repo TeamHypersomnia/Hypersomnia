@@ -1,7 +1,8 @@
 protocol_system = inherits_from (processing_system)
 
-function protocol_system:constructor(variable_message_callback)
+function protocol_system:constructor(variable_message_callback, custom_header_callback)
 	self.variable_message_callback = variable_message_callback
+	self.custom_header_callback = custom_header_callback
 	processing_system.constructor(self)
 end
 
@@ -16,6 +17,7 @@ function protocol_system:handle_incoming_commands()
 		local commands_skipped = 0
 		
 		if how_many_to_skip ~= -1 then
+			self.custom_header_callback(input_bs)
 			--print "Receiving data..."
 			while input_bs:GetNumberOfUnreadBits() >= 8 do
 				local msg = protocol.read_msg(input_bs)

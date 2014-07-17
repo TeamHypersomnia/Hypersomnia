@@ -46,7 +46,7 @@ function input_prediction_system:substep()
 			--self.owner_entity_system.all_systems["client"].net_channel:post_reliable_bs(protocol.write_msg("INPUT_SNAPSHOT", to_send))
 		end
 		
-		if prediction.last_acked_step-10 <= prediction.same_since then
+		--if prediction.last_acked_step-10 <= prediction.same_since then
 			local to_send = {}
 			rewrite(to_send, history_entry, { position = true } )
 			
@@ -59,7 +59,7 @@ function input_prediction_system:substep()
 			--global_logfile:write("\nbackward: " .. movement.moving_backward)
 			--print ("sending snapshot " .. to_send.at_step)
 			self.owner_entity_system.all_systems["client"].substep_unreliable:WriteBitstream(protocol.write_msg("INPUT_SNAPSHOT", to_send))
-		end
+		--end
 		
 	end
 end
@@ -122,6 +122,7 @@ function input_prediction_system:update()
 				local corrected_vel = simulation_body:GetLinearVelocity()
 				
 				if (to_pixels(corrected_pos) - to_pixels(target.cpp_entity.physics.body:GetPosition())):length() > config_table.divergence_radius then
+					print((to_pixels(corrected_pos) - to_pixels(target.cpp_entity.physics.body:GetPosition())):length())
 					target.cpp_entity.physics.body:SetTransform(corrected_pos, 0)
 					target.cpp_entity.physics.body:SetLinearVelocity(corrected_vel)
 				end

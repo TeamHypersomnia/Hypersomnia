@@ -30,7 +30,7 @@ function client_screen:constructor(camera_rect)
 	self.sample_scene.world_camera.camera.screen_rect = camera_rect
 	
 	self.server = network_interface()
-	self.server:occasional_ping(false)
+	self.server:occasional_ping(true)
 	
 	self.server:connect(config_table.server_address, config_table.server_port)
 	
@@ -55,7 +55,12 @@ function client_screen:constructor(camera_rect)
 	self.systems.client = client_system:create(self.server)
 	self.systems.input_prediction = input_prediction_system:create(self.sample_scene.simulation_world)
 	self.systems.synchronization = synchronization_system:create(self.sample_scene)
-	self.systems.protocol = protocol_system:create(function(msg) self.systems.synchronization:handle_variable_message(msg) end)
+	self.systems.protocol = protocol_system:create(function(msg) self.systems.synchronization:handle_variable_message(msg) end,
+	
+	function (input_bs)
+		
+	end
+	)
 	self.systems.interpolation = interpolation_system:create()
 	self.systems.orientation = orientation_system:create()
 	self.systems.weapon = weapon_system:create(self.sample_scene.world_object, self.sample_scene.world_object.physics_system)

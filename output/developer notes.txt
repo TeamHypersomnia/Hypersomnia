@@ -433,4 +433,9 @@ without the possibility of cheating.
 
 Note that when receiving "new_bullet" notification, we may want to move it forward in time on the client, by the amount of lag.
 
-With every update, 
+
+RIGHT NOW - worry only about the experience. We'll think about the security implications only when we'll achieve the best possible implementation regarding client's experience/lag perception.
+
+Basically, there are things that will look different across the clients according to their individual ping times - especially objects' positions.
+But there are also events whose visual impact can be very well synchronized across all the clients upon the arrival of course - bullets for example, won't change their trajectory and even if it is the client
+that is authoritative about the bullet's lifetime, we may succeed in showing the bullet position consistently across all the clients, regardless of differing pings.
