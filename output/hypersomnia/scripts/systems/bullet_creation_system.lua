@@ -67,8 +67,6 @@ function bullet_creation_system:update()
 					position = msgs[i].gun_transform.pos,
 					rotation = msgs[i].gun_transform.rotation
 				})
-				
-				print "sending data"
 			elseif #msgs[i].bullets > 1 then
 			
 			end

@@ -37,7 +37,7 @@ return function(map_filename, scene_object)
 	
 	
 	
-	world.physics_system.enable_interpolation = 1
+	world.physics_system.enable_interpolation = 0
 	world.physics_system:configure_stepping(config_table.tickrate, 5)
 	scene_object.simulation_world.physics_system:configure_stepping(config_table.tickrate, 5)
 	

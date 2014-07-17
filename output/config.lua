@@ -21,7 +21,7 @@ config_table = {
 	
 	simulate_lag = 1,
 	packet_loss = 0.00,
-	min_latency = 75,
+	min_latency = 25,
 	jitter = 0
 }
 

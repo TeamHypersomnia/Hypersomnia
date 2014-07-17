@@ -418,7 +418,7 @@ Client-side:
 - local bullet hits a dynamic object
 - remote bullet hits a static object
 
-Server-size:
+Client gets info about events in which:
 - remote bullet hits a dynamic object
 - local bullet makes an event (hits the player)
 - remote bullet makes an event (hits the player)
@@ -432,3 +432,5 @@ without the possibility of cheating.
 
 
 Note that when receiving "new_bullet" notification, we may want to move it forward in time on the client, by the amount of lag.
+
+With every update, 

@@ -24,8 +24,8 @@ function weapon_system:shot_routine(target, gun_transform)
 	-- this chunk won't be executed only for remote players on the client
 	if weapon.constrain_requested_bullets then
 		weapon.current_rounds = weapon.current_rounds - 1
-		-- security-check for the distance between the entity position and the requested position
-	
+		-- buffer a security-check for the distance between the entity position and the requested position
+		-- it will be executed somewhere else
 		
 		local result = self.physics:ray_cast(gun_transform.pos, barrel_transform.pos, create(b2Filter, weapon.bullet_entity.physics.body_info.filter), entity);
 	
@@ -60,7 +60,6 @@ function weapon_system:shot_routine(target, gun_transform)
 	-- client - produce visual output from wherever the shot originates and inform the server about the shot
 	-- server - broadcast the information about the shot and possibly store their ids for later resimulation
 	self.owner_entity_system:post_table("shot_message", new_shot_message)
-	print "shotmsg"
 end
 
 function weapon_system:handle_messages()
@@ -114,6 +113,8 @@ function weapon_system:substep(dt)
 			local entity = target.cpp_entity
 			
 			local gun_transform = transform_state(entity.transform.current)
+			-- cancel out interpolation
+			gun_transform.pos = to_pixels(entity.physics.body:GetPosition())
 			
 			if #weapon.buffered_actions > 0 then
 				trigger = weapon.buffered_actions[1].trigger
@@ -128,7 +129,6 @@ function weapon_system:substep(dt)
 				-- on the server: invalid action should anyway be invalidated
 				-- on the client: the commands won't be constrained so they will be always executed
 				table.remove(weapon.buffered_actions, 1)
-				print "buffered action"
 			end
 			
 			local triggers = components.weapon.triggers
