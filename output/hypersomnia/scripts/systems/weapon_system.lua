@@ -46,6 +46,7 @@ function weapon_system:shot_routine(target, premade_shot)
 	local new_shot_message = {
 		subject = target,
 		gun_transform = transform_state(gun_transform),
+		["premade_shot"] = premade_shot,
 		bullets = {}
 	}
 		
@@ -58,11 +59,6 @@ function weapon_system:shot_routine(target, premade_shot)
 		barrel_transform.rotation = vel:get_degrees()
 			
 		vel = vel * randval(weapon.bullet_speed)
-		
-		if premade_shot ~= nil and premade_shot.simulate_forward ~= nil then
-			print (premade_shot.simulate_forward)
-			barrel_transform.pos = barrel_transform.pos + (vel*premade_shot.simulate_forward/1000)
-		end
 		
 		table.insert(new_shot_message.bullets, { 
 			pos = barrel_transform.pos,

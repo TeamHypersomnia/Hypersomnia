@@ -44,6 +44,11 @@ function bullet_creation_system:update()
 				self.camera_to_shake.camera.last_interpolant.pos = self.camera_to_shake.camera.last_interpolant.pos + shake_dir * weapon.shake_radius
 			end
 			
+			local premade_shot = msgs[i].premade_shot
+			if premade_shot ~= nil and premade_shot.simulate_forward ~= nil then
+				print (premade_shot.simulate_forward)
+				bullet.pos = bullet.pos + (bullet.vel*premade_shot.simulate_forward/1000)
+			end
 			
 			local bullet_entity = self.world_object:create_entity (override(weapon.bullet_entity, { 
 				transform = { 
@@ -60,6 +65,7 @@ function bullet_creation_system:update()
 			local body = bullet_entity.physics.body
 			body:SetLinearVelocity(to_meters(bullet.vel))
 		end
+		
 		
 		if target.weapon.transmit_bullets == true then
 			if #msgs[i].bullets == 1 then
