@@ -204,7 +204,7 @@ namespace bindings {
 			.def_readwrite("last_unreliable_sequence", &reliable_receiver::last_unreliable_sequence)
 			.def_readwrite("received_sequence", &reliable_receiver::received_sequence)
 			.def_readwrite("received_unreliable_sequence", &reliable_receiver::received_unreliable_sequence)
-			.def_readwrite("acknowledge_all_sequences", &reliable_receiver::acknowledge_all_sequences)
+			.def_readwrite("message_indexing", &reliable_receiver::message_indexing)
 			.def_readwrite("ack_requested", &reliable_receiver::ack_requested)
 			.def("read_sequence", &reliable_receiver::read_sequence)
 			.def("write_ack", &reliable_receiver::write_ack),

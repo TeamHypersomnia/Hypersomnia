@@ -35,8 +35,11 @@ namespace augs {
 		};
 
 		struct reliable_receiver {
-			bool acknowledge_all_sequences = false;
+			bool message_indexing = false;
 			bool ack_requested = false;
+
+			unsigned last_message;
+			unsigned first_message;
 
 			unsigned short received_sequence = 0u;
 			unsigned short received_unreliable_sequence = 0u;
@@ -45,12 +48,12 @@ namespace augs {
 			unsigned short last_unreliable_sequence = 0u;
 
 			enum result {
+				NOTHING_RECEIVED = -1,
 				MESSAGES_RECEIVED,
-				UNMATCHING_RELIABLE_RECEIVED,
-				NOTHING_RECEIVED
+				UNMATCHING_RELIABLE_RECEIVED
 			};
 
-			/* returns result enum */
+			/* returns result enum or how many messages to skip if message_indexing == true */
 			int read_sequence(bitstream& input);
 			void write_ack(bitstream& input);
 

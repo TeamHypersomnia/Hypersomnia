@@ -45,6 +45,13 @@ namespace augs {
 				output.name_property("ack_sequence");
 				output.Write(ack_sequence);
 
+				if (message_indexing) {
+					output.name_property("first_message");
+					output.Write(first_message);
+					output.name_property("last_message");
+					output.Write(last_message);
+				}
+
 				sequence_to_reliable_range[sequence] = last_message;
 			}
 			else {
@@ -66,13 +73,6 @@ namespace augs {
 			else {
 				output.name_property("has_unreliable");
 				output.Write<bool>(0);
-			}
-
-			if (message_indexing) {
-				output.name_property("first_message");
-				output.Write(first_message);
-				output.name_property("last_message");
-				output.Write(last_message);
 			}
 
 			output.name_property("reliable_buffer");
@@ -120,12 +120,13 @@ namespace augs {
 			std::stringstream report;
 
 			unsigned short update_from_sequence = 0u;
+			unsigned received_first_message = 0u, received_last_message = 0u;
 
-			bool has_reliable = false;
-			bool has_unreliable = false;
-			auto result = MESSAGES_RECEIVED;
+			bool has_reliable = false, 
+				 has_unreliable = false, 
+				 request_ack_for_unreliable = false;
 
-			bool request_ack_for_unreliable = false;
+			int result = MESSAGES_RECEIVED;
 			
 			input.name_property("has_reliable");
 			if (!input.Read<bool>(has_reliable)) return NOTHING_RECEIVED;
@@ -137,14 +138,26 @@ namespace augs {
 				input.name_property("ack_sequence");
 				if (!input.Read(update_from_sequence)) return NOTHING_RECEIVED;
 
+				if (message_indexing) {
+					input.name_property("first_message");
+					if (!input.Read(received_first_message)) return NOTHING_RECEIVED;
+					input.name_property("last_message");
+					if (!input.Read(received_last_message)) return NOTHING_RECEIVED;
+				}
+
 				/* if even the reliable sequence is out of date, the unreliable sequence will be out of date too, so it can't be read anyway */
 				if (!sequence_more_recent(received_sequence, last_sequence))
 					return NOTHING_RECEIVED;
 				
-				if (acknowledge_all_sequences || update_from_sequence == last_sequence) {
+				if (message_indexing || update_from_sequence == last_sequence) {
 					last_sequence = received_sequence;
 					ack_requested = true;
 					result = MESSAGES_RECEIVED;
+
+					if (message_indexing) {
+						result = last_message - received_first_message;
+						last_message = received_last_message;
+					}
 				}
 				else {
 					ack_requested = true;
