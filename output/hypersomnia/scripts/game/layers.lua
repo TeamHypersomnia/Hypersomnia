@@ -14,16 +14,3 @@ render_layers = {
 	UNDER_CORPSES = 12,
 	GROUND = 13
 }
-
--- PHYSICS COLLISION LAYERS --
-create_options { 
-	"CHARACTERS", 
-	"OBJECTS", 
-	"STATIC_OBJECTS",
-	"BULLETS", 
-	"ENEMY_BULLETS", 
-	"CORPSES",
-	"ITEMS",
-	"SHELLS",
-	"DOORS"
-}

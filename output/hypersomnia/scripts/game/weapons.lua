@@ -19,7 +19,7 @@ function create_weapons(scene, include_render)
 				body_type = Box2D.b2_dynamicBody,
 	
 				body_info = {
-					filter = filter_bullets,
+					filter = filters.BULLET,
 					shape_type = physics_info.RECT,
 					rect_size = vec2(35, 19*0.05),
 					fixed_rotation = true,

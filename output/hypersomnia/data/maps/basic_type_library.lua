@@ -4,7 +4,7 @@ local dynamic_object_archetype = {
 		
 		body_info = {
 			shape_type = physics_info.POLYGON,
-			filter = filter_objects,
+			filter = filters.OBJECT,
 			density = 1.0,
 			friction = 0.1,
 			
@@ -20,7 +20,7 @@ local static_object_archetype = {
 		
 		body_info = {
 			shape_type = physics_info.POLYGON,
-			filter = filter_objects,
+			filter = filters.STATIC_OBJECT,
 			density = 1.0,
 			friction = 0.1
 		}

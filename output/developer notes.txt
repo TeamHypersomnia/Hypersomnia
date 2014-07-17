@@ -439,3 +439,12 @@ RIGHT NOW - worry only about the experience. We'll think about the security impl
 Basically, there are things that will look different across the clients according to their individual ping times - especially objects' positions.
 But there are also events whose visual impact can be very well synchronized across all the clients upon the arrival of course - bullets for example, won't change their trajectory and even if it is the client
 that is authoritative about the bullet's lifetime, we may succeed in showing the bullet position consistently across all the clients, regardless of differing pings.
+
+
+Security implications regarding penetration of dynamic objects:
+Locally, every time client's bullet hits a dynamic object (be it a crate), it sends an according notification to the server "i'm inside that crate" with the step number,
+so the server can immediately broadcast the fact of hitting the crate to the clients
+
+Eventually, the client will hit the player and tell the server so;
+now if during the resimulation the server sees that the bullet DID hit the crate, it checks if an according message was earlier sent by the client.
+If not, we have a liar or a poor connection. If yes, the server decreases the damage of the bullet and continues simulation check.

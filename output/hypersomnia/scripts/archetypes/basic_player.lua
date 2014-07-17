@@ -2,7 +2,7 @@ local player_physics_component = {
 	body_type = Box2D.b2_dynamicBody,
 	
 	body_info = {
-		filter = filter_characters,
+		filter = filters.CHARACTER,
 		shape_type = physics_info.RECT,
 		rect_size = vec2(37, 37),
 		

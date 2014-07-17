@@ -36,7 +36,7 @@ function weapon_system:shot_routine(target, premade_shot)
 		-- buffer a security-check for the distance between the entity position and the requested position
 		-- it will be executed somewhere else
 		
-		local result = self.physics:ray_cast(gun_transform.pos, barrel_transform.pos, create(b2Filter, weapon.bullet_entity.physics.body_info.filter), entity)
+		local result = self.physics:ray_cast(gun_transform.pos, barrel_transform.pos, weapon.bullet_entity.physics.body_info.filter, entity)
 	
 		if result.hit then
 			barrel_transform.pos = result.intersection

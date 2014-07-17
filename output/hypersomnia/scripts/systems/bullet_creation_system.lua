@@ -52,7 +52,7 @@ function bullet_creation_system:update()
 				local v1 = msgs[i].gun_transform.pos
 				local v2 = bullet.pos + (bullet.vel*premade_shot.simulate_forward/1000)
 				local result = self.world_object.physics_system
-							:ray_cast(v1, v2, create(b2Filter, weapon.bullet_entity.physics.body_info.filter), entity)
+							:ray_cast(v1, v2, weapon.bullet_entity.physics.body_info.filter, entity)
 				
 				if result.hit then
 					bullet.pos = result.intersection

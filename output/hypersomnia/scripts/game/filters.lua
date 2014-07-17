@@ -1,97 +1,50 @@
+-- PHYSICS COLLISION LAYERS --
+filters = {
+	STATIC_OBJECT = "ALL",
 
-filter_nothing = {
-	categoryBits = 0,
-	maskBits = 0
+	CHARACTER = {
+		"STATIC_OBJECT", "REMOTE_CHARACTER"
+	},
+	
+	REMOTE_CHARACTER = {
+		"STATIC_OBJECT", "BULLET", "CHARACTER", "REMOTE_CHARACTER"
+	},
+	
+	BULLET = {
+		"STATIC_OBJECT", "REMOTE_CHARACTER"
+	},
+	
+	REMOTE_BULLET = {
+		"STATIC_OBJECT"
+	}
 }
 
-local mask_all = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, ENEMY_BULLETS, CHARACTERS, CORPSES, ITEMS, SHELLS, DOORS)
+-- processing
 
-filter_doors = {
-	categoryBits = DOORS,
-	maskBits = bitor(SHELLS, OBJECTS, CORPSES, BULLETS, ENEMY_BULLETS, ITEMS)
-}
+local all_keys = {}
+local all_categories = {}
 
-filter_shells = {
-	categoryBits = SHELLS,
-	maskBits = bitor(SHELLS, STATIC_OBJECTS, OBJECTS, DOORS)
-}
+for k, v in pairs(filters) do
+	table.insert(all_keys, k)
+end
 
-filter_static_objects = {
-	categoryBits = STATIC_OBJECTS,
-	maskBits = mask_all
-}
+create_options(all_keys, all_categories)
 
-filter_objects = {
-	categoryBits = OBJECTS,
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, ENEMY_BULLETS, CHARACTERS, CORPSES, DOORS)
-}
+for k, v in pairs(filters) do
+	if type(v) == "string" and v == "ALL" then
+		filters[k] = all_keys
+	end
+end
 
-filter_characters = {
-	categoryBits = CHARACTERS,
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS, ENEMY_BULLETS, CHARACTERS, DOORS)
-}
-
-filter_enemies = {
-	categoryBits = CHARACTERS,
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS, DOORS)
-}
-
-filter_characters_separation = {
-	categoryBits = CHARACTERS,
-	maskBits = bitor(CHARACTERS)
-}
-
-filter_bullets = {
-	categoryBits = BULLETS,
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS, CHARACTERS, DOORS)
-}
-
-filter_enemy_bullets = {
-	categoryBits = ENEMY_BULLETS,
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS, CHARACTERS, DOORS)
-}
-
-filter_corpses = {
-	categoryBits = CORPSES,
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS, DOORS)
-}
-
-filter_items = {
-	categoryBits = ITEMS,
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS, DOORS)
-}
-
-filter_pick_up_items = {
-	categoryBits = mask_all,
-	maskBits = ITEMS
-}
-
-filter_melee = {
-	categoryBits = BULLETS,
-	maskBits = CHARACTERS
-}
-
-filter_enemy_melee = {
-	categoryBits = ENEMY_BULLETS,
-	maskBits = CHARACTERS
-}
-
-filter_melee_obstruction = {
-	categoryBits = mask_all,
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS, DOORS)
-}
-
-filter_pathfinding_visibility = {
-	categoryBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS, CORPSES),
-	maskBits = bitor(STATIC_OBJECTS)
-}
-
-filter_player_visibility = {
-	categoryBits = mask_all,
-	maskBits = bitor(STATIC_OBJECTS, DOORS)
-}
-
-filter_obstacle_visibility = {
-	categoryBits = bitor(OBJECTS, STATIC_OBJECTS, BULLETS, CHARACTERS, CORPSES),
-	maskBits = bitor(OBJECTS, STATIC_OBJECTS, CHARACTERS)
-}
+for k, v in pairs(filters) do
+	local mask = 0
+	
+	for i=1, #filters[k] do
+		mask = bitor(all_categories[filters[k][i]], mask)
+	end
+	
+	filters[k] = create(b2Filter, {
+		categoryBits = all_categories[k],
+		maskBits = mask
+	})
+end
