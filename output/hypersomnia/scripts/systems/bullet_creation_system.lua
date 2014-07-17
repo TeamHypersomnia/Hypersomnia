@@ -2,6 +2,7 @@ bullet_creation_system = inherits_from (processing_system)
 
 function bullet_creation_system:constructor(world_object, camera_to_shake)
 	self.camera_to_shake = camera_to_shake
+	self.simulation_world = simulation_world
 	
 	self.world_object = world_object
 	self.world = world_object.world
@@ -47,7 +48,17 @@ function bullet_creation_system:update()
 			local premade_shot = msgs[i].premade_shot
 			if premade_shot ~= nil and premade_shot.simulate_forward ~= nil then
 				print (premade_shot.simulate_forward)
-				bullet.pos = bullet.pos + (bullet.vel*premade_shot.simulate_forward/1000)
+				
+				local v1 = msgs[i].gun_transform.pos
+				local v2 = bullet.pos + (bullet.vel*premade_shot.simulate_forward/1000)
+				local result = self.world_object.physics_system
+							:ray_cast(v1, v2, create(b2Filter, weapon.bullet_entity.physics.body_info.filter), entity)
+				
+				if result.hit then
+					bullet.pos = result.intersection
+				else
+					bullet.pos = bullet.pos + (bullet.vel*premade_shot.simulate_forward/1000)
+				end
 			end
 			
 			local bullet_entity = self.world_object:create_entity (override(weapon.bullet_entity, { 

@@ -21,7 +21,7 @@ function create_weapons(scene, include_render)
 				body_info = {
 					filter = filter_bullets,
 					shape_type = physics_info.RECT,
-					rect_size = vec2(35, 19*0.5),
+					rect_size = vec2(35, 19*0.05),
 					fixed_rotation = true,
 					density = 0.1,
 					bullet = true

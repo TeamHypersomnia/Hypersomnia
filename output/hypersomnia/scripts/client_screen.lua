@@ -64,7 +64,7 @@ function client_screen:constructor(camera_rect)
 	self.systems.interpolation = interpolation_system:create()
 	self.systems.orientation = orientation_system:create()
 	self.systems.weapon = weapon_system:create(self.sample_scene.world_object, self.sample_scene.world_object.physics_system)
-	self.systems.bullet_creation = bullet_creation_system:create(self.sample_scene.world_object, self.sample_scene.world_camera)
+	self.systems.bullet_creation = bullet_creation_system:create(self.sample_scene.world_object, self.sample_scene.world_camera, self.sample_scene.simulation_world)
 	
 	table.insert(self.sample_scene.world_object.substep_callbacks, function (dt) 
 		self.systems.input_prediction:substep()
