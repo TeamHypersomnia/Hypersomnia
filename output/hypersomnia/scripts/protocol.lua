@@ -25,7 +25,7 @@ protocol.message_by_id = {
 	{
 		name = "SHOT_INFO",
 		data = {
-			"Ushort", "subject_ping",
+			"Ushort", "delay_time",
 			"Ushort", "subject_id",
 			"Vec2", "position",
 			"Float", "rotation"
