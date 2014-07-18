@@ -33,6 +33,14 @@ namespace augs {
 			peer->SetOccasionalPing(flag);
 		}
 
+		int network_interface::get_last_ping(const RakNet::RakNetGUID& g) {
+			return peer->GetLastPing(g);
+		}
+
+		int network_interface::get_average_ping(const RakNet::RakNetGUID& g) {
+			return peer->GetAveragePing(g);
+		}
+
 		void network_interface::packet::destroy() {
 			if (owner && info)
 				owner->DeallocatePacket(info);

@@ -30,7 +30,8 @@ function world_class:constructor()
 		self:handle_message_callbacks()
 		
 		my_instance.destroy_system:consume_events(owner)
-		owner:flush_message_queues()
+		self:clear_queue("destroy_message")
+		self:clear_queue("damage_message")
 	end
 	
 	self.polygon_particle_userdatas_saved = {}	
@@ -109,12 +110,19 @@ function world_class:handle_message_callbacks()
 	
 end
 
+function world_class:clear_queue(message_name)
+	self:get_messages(message_name):clear()
+end
+
+function world_class:flush_messages()
+	self.world_inst.world:validate_delayed_messages()
+	self.world_inst.world:flush_message_queues()
+end
+
 function world_class:process_all_systems()
 	local my_instance = self.world_inst
 	local world = my_instance.world
 	
-	world:validate_delayed_messages()
-	world:flush_message_queues()
 	local steps_made = 0
 	
 	-- physics must run first because the substep routine may flush message queues

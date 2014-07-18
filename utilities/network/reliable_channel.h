@@ -15,6 +15,7 @@ namespace augs {
 
 			std::vector<message> reliable_buf;
 			bitstream unreliable_buf;
+			bitstream custom_header;
 
 			std::map<unsigned, unsigned> sequence_to_reliable_range;
 

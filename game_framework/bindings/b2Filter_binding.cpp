@@ -7,6 +7,7 @@ namespace bindings {
 		return
 			luabind::class_<b2Filter>("b2Filter")
 			.def(luabind::constructor<>())
+			.def(luabind::constructor<const b2Filter&>())
 			.def_readwrite("categoryBits", &b2Filter::categoryBits)
 			.def_readwrite("maskBits", &b2Filter::maskBits)
 			.def_readwrite("groupIndex", &b2Filter::groupIndex);

@@ -71,6 +71,10 @@ namespace augs {
 			}
 
 			value_type* get(const key_type& key) {
+				if (raw.empty()) {
+					return nullptr;
+				}
+
 				auto it = std::lower_bound(raw.begin(), raw.end(), node(key, value_type()));
 				if (it == raw.end() || (*it).key != key)
 					return nullptr;

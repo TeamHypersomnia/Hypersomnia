@@ -397,6 +397,10 @@ function set_rate(target, what_rate, updates_per_second)
 	target[what_rate .. "_reset"] = function(self)
 		self[what_rate .. "_timer"]:reset()
 	end
+	
+	target[what_rate .. "_time_remaining"] = function(self)
+		return self[what_rate .. "_interval_ms"] - self[what_rate .. "_timer"]:get_milliseconds() 
+	end
 end
 
 function setlsys(sys)

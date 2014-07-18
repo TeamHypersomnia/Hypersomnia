@@ -41,6 +41,8 @@ namespace augs {
 			void shutdown(unsigned block_duration, int disconnection_notification_priority);
 
 			void occasional_ping(bool);
+			int get_last_ping(const RakNet::RakNetGUID&);
+			int get_average_ping(const RakNet::RakNetGUID&);
 
 			unsigned send(bitstream&, int priority, int reliability, int channel, RakNet::RakNetGUID target, bool broadcast);
 

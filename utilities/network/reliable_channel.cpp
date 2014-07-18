@@ -74,6 +74,9 @@ namespace augs {
 				output.name_property("has_unreliable");
 				output.Write<bool>(0);
 			}
+			
+			output.name_property("custom_header");
+			output.WriteBitstream(custom_header);
 
 			output.name_property("reliable_buffer");
 			output.WriteBitstream(reliable_bs);

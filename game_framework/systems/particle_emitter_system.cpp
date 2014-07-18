@@ -65,7 +65,7 @@ void particle_emitter_system::consume_events(world& owner) {
 		else {
 			if (it.subject) {
 				auto* emitter = it.subject->find<particle_emitter>();
-				if (emitter) {
+				if (emitter && emitter->available_particle_effects) {
 					auto emissions_found = emitter->available_particle_effects->get_raw().find(it.type);
 
 					if (emissions_found == emitter->available_particle_effects->get_raw().end()) continue;
