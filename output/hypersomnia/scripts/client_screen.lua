@@ -116,15 +116,14 @@ function client_screen:loop()
 	self.systems.weapon:translate_shot_info_msgs()
 	self.systems.weapon:update()
 	
+	self.sample_scene.world_object:flush_messages()
+	
 	self.systems.bullet_creation:update()
 	
-	--print "client tick"
-	
-	--print "flush"
-	self.entity_system_instance:flush_messages()
-
 	--print "scene loop"
 	self.sample_scene:loop()
+	
+	self.entity_system_instance:flush_messages()
 end
 
 function client_screen:close_connection()

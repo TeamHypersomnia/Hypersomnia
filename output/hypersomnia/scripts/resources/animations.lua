@@ -189,7 +189,7 @@ function create_torso_set_for(sprite_library, outfit, weapon_type)
 				{ model = { image = shoot_frames["2"] }, duration_ms = 20 },
 				{ model = { image = shoot_frames["1"] }, duration_ms = 20 },
 			},
-			loop_mode = animation.REPEAT
+			loop_mode = animation.NONE
 		}
 		
 		table.insert(animation_container, new_walk_animation)
