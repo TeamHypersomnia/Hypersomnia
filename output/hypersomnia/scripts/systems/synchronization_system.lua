@@ -86,6 +86,9 @@ function synchronization_system:update_states_from_bitstream(msg)
 			else
 				local new_remote_player = create_remote_player(self.owner_scene, self.owner_scene.crosshair_sprite)
 				
+				new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["white"]["rifle"].set
+				new_remote_player.legs.animate.available_animations = self.owner_scene.legs_sets["white"].set
+	
 				new_entity = components.create_components {
 					cpp_entity = new_remote_player.body,
 					interpolation = {},

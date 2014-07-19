@@ -24,8 +24,8 @@ file_watcher_object:add_directory("hypersomnia\\scripts", false)
 if config_table.multiple_clients_view ~= 0 then
 	client_scenes = {
 		client_screen:create(rect_xywh(config_table.resolution_w/2, config_table.resolution_h/2, config_table.resolution_w/2, config_table.resolution_h/2)),
-		--client_screen:create(rect_xywh(0, 0, config_table.resolution_w/2, config_table.resolution_h/2)),
-		--client_screen:create(rect_xywh(config_table.resolution_w/2, 0, config_table.resolution_w/2, config_table.resolution_h/2)),
+		client_screen:create(rect_xywh(0, 0, config_table.resolution_w/2, config_table.resolution_h/2)),
+		client_screen:create(rect_xywh(config_table.resolution_w/2, 0, config_table.resolution_w/2, config_table.resolution_h/2)),
 		client_screen:create(rect_xywh(0, config_table.resolution_h/2, config_table.resolution_w/2, config_table.resolution_h/2))
 	}
 else	
