@@ -20,6 +20,8 @@ return function(map_filename, scene_object)
 		return sum_of_all
 	end
 	
+	create_particle_effects(scene_object)
+	
 	-- initialize environmental physical objects
 	local environmental_objects = get_all_objects { "wall_wood", "crate" }
 	
@@ -27,6 +29,9 @@ return function(map_filename, scene_object)
 		local object = environmental_objects[i]
 		
 		local new_entity = tiled_map_loader.basic_entity_table(object, type_table_by_object[object], scene_object.resource_storage, scene_object.world_camera, scene_object.texture_by_filename)
+		new_entity.particle_emitter = {
+			available_particle_effects = scene_object.particles.metal_effects
+		}
 		
 		world:create_entity (new_entity)
 		scene_object.simulation_world:create_entity {
@@ -67,15 +72,17 @@ return function(map_filename, scene_object)
 		size_multiplier = vec2(1.0, 0.5)
 	}
 	
+	
 	scene_object.legs_sets = create_all_legs_sets(scene_object.sprite_library)
 	scene_object.torso_sets = create_all_torso_sets(scene_object.sprite_library)
 	
-	scene_object.player = create_basic_player(world, scene_object.teleport_position, scene_object.world_camera, scene_object.crosshair_sprite)
+	scene_object.player = create_basic_player(scene_object, scene_object.teleport_position, scene_object.world_camera, scene_object.crosshair_sprite)
 	scene_object.simulation_player = create_simulation_player(scene_object.simulation_world)
 	
 	scene_object.player.body.animate.available_animations = scene_object.torso_sets["white"]["rifle"].set
 	scene_object.player.legs.animate.available_animations = scene_object.legs_sets["white"].set
 
+	
 	scene_object.main_input = world:create_entity {
 		input = {
 			custom_intents.SWITCH_CLIENT_1,

@@ -46,6 +46,7 @@ function weapon_system:shot_routine(target, premade_shot)
 	local new_shot_message = {
 		subject = target,
 		gun_transform = transform_state(gun_transform),
+		barrel_transform = transform_state(barrel_transform),
 		["premade_shot"] = premade_shot,
 		bullets = {}
 	}

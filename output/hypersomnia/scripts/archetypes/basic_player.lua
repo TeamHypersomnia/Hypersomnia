@@ -34,8 +34,8 @@ function create_simulation_player(owner_world)
 	}
 end
 
-function create_basic_player(owner_world, position, target_camera, crosshair_sprite)
-	local player = owner_world:create_entity_group  {
+function create_basic_player(scene_object, position, target_camera, crosshair_sprite)
+	local player = scene_object.world_object:create_entity_group  {
 		-- body also acts as torso
 		body = {
 			render = {
@@ -65,10 +65,9 @@ function create_basic_player(owner_world, position, target_camera, crosshair_spr
 				target = "crosshair",
 				look_mode = lookat_component.POSITION
 			},
-			
 	
 			particle_emitter = {
-				available_particle_effects = npc_effects
+				available_particle_effects = scene_object.particles.npc_effects
 			},
 			
 			movement = player_movement_component,

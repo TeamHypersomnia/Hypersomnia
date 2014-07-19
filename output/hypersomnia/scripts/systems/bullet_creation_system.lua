@@ -27,8 +27,17 @@ function bullet_creation_system:update()
 		msg.subject = entity
 		msg.message_type = animate_message.START
 		msg.animation_priority = 1
-	
+		
 		self.world:post_message(msg)
+		
+		local burst = particle_burst_message()
+		burst.pos = msgs[i].barrel_transform.pos
+		burst.rotation = msgs[i].barrel_transform.rotation
+		burst.subject = entity
+		burst.type = particle_burst_message.WEAPON_SHOT
+		print("burst " .. particle_burst_message.WEAPON_SHOT)
+		--burst.target_group_to_refresh = gun.get_barrel_smoke()
+		self.world:post_message(burst)
 		
 		local client_sys = self.owner_entity_system.all_systems["client"]
 		

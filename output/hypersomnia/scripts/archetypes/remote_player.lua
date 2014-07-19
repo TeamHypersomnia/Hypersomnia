@@ -43,7 +43,7 @@ function create_remote_player(owner_scene, crosshair_sprite)
 			gun = {}, 
 	
 			particle_emitter = {
-				available_particle_effects = npc_effects
+				available_particle_effects = owner_scene.particles.npc_effects
 			},
 			
 			movement = {

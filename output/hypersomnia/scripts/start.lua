@@ -12,6 +12,7 @@ dofile "hypersomnia\\scripts\\archetypes\\remote_player.lua"
 
 -- resource handling utilities
 dofile "hypersomnia\\scripts\\resources\\animations.lua"
+dofile "hypersomnia\\scripts\\resources\\particle_effects.lua"
 
 dofile "hypersomnia\\scripts\\client_screen.lua"
 
