@@ -20,13 +20,13 @@ void damage_system::process_events(world& owner) {
 			messages::damage_message damage_msg;
 			damage_msg.subject = it.subject;
 			damage_msg.amount = damage->amount;
-			damage_msg.impact_velocity = it.impact_velocity;
+			// damage_msg.impact_velocity = it.impact_velocity;
 			owner.post_message(damage_msg);
 
 			messages::particle_burst_message burst_msg;
 			burst_msg.subject = it.subject;
 			burst_msg.pos = it.point;
-			burst_msg.rotation = (-it.impact_velocity).get_degrees();
+		//	burst_msg.rotation = (-it.impact_velocity).get_degrees();
 			burst_msg.type = messages::particle_burst_message::burst_type::BULLET_IMPACT;
 
 			owner.post_message(burst_msg);

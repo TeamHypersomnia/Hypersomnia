@@ -8,8 +8,6 @@ float PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 
 #include "entity_system/entity.h"
 
-#include "../components/damage_component.h"
-
 #include "../messages/collision_message.h"
 
 #include "../game/body_helper.h"
@@ -283,13 +281,16 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 		msg.collider = static_cast<entity*>(body_b->GetUserData());
 
 		if (fix_a->IsSensor()) {
-			msg.impact_velocity = (body_b->GetLinearVelocity());
+			msg.subject_impact_velocity = (body_a->GetLinearVelocity());
+			msg.collider_impact_velocity = (body_b->GetLinearVelocity());
 			world_ptr->post_message(msg);
 		}
 
 		if (fix_b->IsSensor()) {
+			msg.subject_impact_velocity = (body_b->GetLinearVelocity());
+			msg.collider_impact_velocity = (body_a->GetLinearVelocity());
+
 			std::swap(msg.collider, msg.subject);
-			msg.impact_velocity = (body_a->GetLinearVelocity());
 			world_ptr->post_message(msg);
 		}
 	}
@@ -311,13 +312,15 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 		msg.sensor_end_contact = true;
 		
 		if (fix_a->IsSensor()) {
-			msg.impact_velocity = -body_b->GetLinearVelocity();
+			msg.subject_impact_velocity = -body_a->GetLinearVelocity();
+			msg.collider_impact_velocity = -body_b->GetLinearVelocity();
 			world_ptr->post_message(msg);
 		}
 
 		if (fix_b->IsSensor()) {
 			std::swap(msg.collider, msg.subject);
-			msg.impact_velocity = -body_a->GetLinearVelocity();
+			msg.subject_impact_velocity = -body_b->GetLinearVelocity();
+			msg.collider_impact_velocity = -body_a->GetLinearVelocity();
 			world_ptr->post_message(msg);
 		}
 	}
@@ -338,11 +341,12 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 	msg.point = manifold.points[0];
 	msg.point *= METERS_TO_PIXELSf;
 
-	msg.impact_velocity = body_b->GetLinearVelocityFromWorldPoint(manifold.points[0]);
+	msg.subject_impact_velocity = body_a->GetLinearVelocityFromWorldPoint(manifold.points[0]);
+	msg.collider_impact_velocity = body_b->GetLinearVelocityFromWorldPoint(manifold.points[0]);
 	world_ptr->post_message(msg);
 
 	std::swap(msg.collider, msg.subject);
-	msg.impact_velocity = body_a->GetLinearVelocityFromWorldPoint(manifold.points[0]);
+	std::swap(msg.subject_impact_velocity, msg.collider_impact_velocity);
 	world_ptr->post_message(msg);
 }
 
