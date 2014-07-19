@@ -112,7 +112,7 @@ function input_prediction_system:update()
 					simulation_step = simulation_step + 1
 				end
 				
-				self.simulation_world.substep_callbacks = {
+				self.simulation_world.prestep_callbacks = {
 					simulation_callback
 				}
 				

@@ -69,10 +69,17 @@ function client_screen:constructor(camera_rect)
 	self.systems.weapon = weapon_system:create(self.sample_scene.world_object, self.sample_scene.world_object.physics_system)
 	self.systems.bullet_creation = bullet_creation_system:create(self.sample_scene.world_object, self.sample_scene.world_camera, self.sample_scene.simulation_world)
 	
-	table.insert(self.sample_scene.world_object.substep_callbacks, function (dt) 
+	table.insert(self.sample_scene.world_object.prestep_callbacks, function (dt)
 		self.systems.input_prediction:substep()
+		
 		self.systems.client:send_all_data()
 		self.systems.client:substep()
+	end)
+	
+	table.insert(self.sample_scene.world_object.poststep_callbacks, function (dt)
+		self.systems.lifetime:resolve_collisions()
+		
+		self.entity_system_instance:handle_removed_entities()
 	end)
 	
 	self.entity_system_instance:register_systems(self.systems)
@@ -108,6 +115,11 @@ function client_screen:loop()
 		end
 	end
 	
+	local cpp_world = self.sample_scene.world_object
+	
+	cpp_world:handle_input()
+	cpp_world:handle_physics()
+	
 	self.systems.protocol:handle_incoming_commands()
 	
 	self.systems.weapon:handle_messages()
@@ -120,15 +132,17 @@ function client_screen:loop()
 	self.systems.weapon:update()
 	
 	self.systems.lifetime:update()
-	
-	self.sample_scene.world_object:flush_messages()
-	
+
 	self.systems.bullet_creation:update()
 	
-	--print "scene loop"
-	self.sample_scene:loop()
+		
+	self.entity_system_instance:flush_messages()	
 	
-	self.entity_system_instance:flush_messages()
+	cpp_world:process_all_systems()
+
+	self.entity_system_instance:handle_removed_entities()
+	cpp_world:consume_events()
+	cpp_world:render()
 end
 
 function client_screen:close_connection()

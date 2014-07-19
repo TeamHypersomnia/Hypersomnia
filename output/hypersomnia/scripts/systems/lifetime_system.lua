@@ -10,12 +10,8 @@ function lifetime_system:get_required_components()
 	return { "lifetime" }
 end
 
-function lifetime_system:update()
-	local to_delete = {}
-
+function lifetime_system:resolve_collisions()
 	local msgs = self.world_object:get_messages_filter_components("collision_message", { "lifetime" } )
-	
-	--print "here"
 	
 	for i=1, #msgs do
 		local message = msgs[i]
@@ -29,9 +25,11 @@ function lifetime_system:update()
 		
 		message.collider.owner_world:post_message(burst_msg)
 		
-		table.insert(to_delete, message.subject.script)
+		self.owner_entity_system:post_remove(message.subject.script)
 	end
+end
 
+function lifetime_system:update()
 	for i=1, #self.targets do
 		local lifetime = self.targets[i].lifetime
 		
@@ -41,11 +39,7 @@ function lifetime_system:update()
 			(lifetime.max_distance > -1
 			and (self.targets[i].cpp_entity.transform.current.pos - lifetime.starting_point):length() >= lifetime.max_distance)
 		then
-			table.insert(to_delete, self.targets[i])
+			self.owner_entity_system:post_remove(self.targets[i])
 		end
-	end
-	
-	for i=1, #to_delete do
-		self.owner_entity_system:remove_entity(to_delete[i])
 	end
 end
