@@ -39,8 +39,8 @@ namespace augs {
 			bool message_indexing = false;
 			bool ack_requested = false;
 
-			unsigned last_message;
-			unsigned first_message;
+			unsigned last_message = 0u;
+			unsigned first_message = 0u;
 
 			unsigned short received_sequence = 0u;
 			unsigned short received_unreliable_sequence = 0u;
@@ -50,8 +50,8 @@ namespace augs {
 
 			enum result {
 				NOTHING_RECEIVED = -1,
-				MESSAGES_RECEIVED,
-				UNMATCHING_RELIABLE_RECEIVED
+				MESSAGES_RECEIVED = 0,
+				UNMATCHING_RELIABLE_RECEIVED = 1
 			};
 
 			/* returns result enum or how many messages to skip if message_indexing == true */

@@ -113,8 +113,9 @@ int the_callback(lua_State *L) {
 	lua_pushinteger(L, 2);
 	lua_call(L, 2, 1);
 	printf("%s\n", lua_tostring(L, -1));
-
+	int a;
 	std::cout << error_message << std::endl;
+	std::cin >> a;
 	return 1;
 }
 
