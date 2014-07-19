@@ -18,7 +18,9 @@ namespace messages {
 		enum burst_type {
 			BULLET_IMPACT,
 			WEAPON_SHOT
-		} type;
+		};
+
+		int type;
 
 		resources::particle_effect* set_effect;
 		augs::entity_system::entity_ptr target_group_to_refresh;

@@ -11,6 +11,7 @@ namespace bindings {
 			luabind::class_<particle_burst_message, message>("particle_burst_message")
 			.def(luabind::constructor<>())
 			.def_readwrite("pos", &particle_burst_message::pos)
+			.def_readwrite("type", &particle_burst_message::type)
 			.def_readwrite("rotation", &particle_burst_message::rotation)
 			.def_readwrite("set_effect", &particle_burst_message::set_effect)
 			.def_readwrite("local_transform", &particle_burst_message::local_transform)
