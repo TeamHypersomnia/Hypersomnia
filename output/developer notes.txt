@@ -448,3 +448,11 @@ so the server can immediately broadcast the fact of hitting the crate to the cli
 Eventually, the client will hit the player and tell the server so;
 now if during the resimulation the server sees that the bullet DID hit the crate, it checks if an according message was earlier sent by the client.
 If not, we have a liar or a poor connection. If yes, the server decreases the damage of the bullet and continues simulation check.
+
+
+
+
+
+The synchronization_system should in fact be named "replication_system".
+We should keep a library of item objects and their creation callbacks with an option to differ between client-side and server-side objects.
+Then just send an object id type and information about synchronized modules, or just specify these modules in the archetype itself, or have both options available.

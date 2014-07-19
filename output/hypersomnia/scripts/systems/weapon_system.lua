@@ -15,7 +15,7 @@ function weapon_system:remove_entity(new_entity)
 	local group = new_entity.weapon.barrel_smoke_group 
 	
 	if group ~= nil then
-		group.owner_world:delete_entity(group)
+		group.owner_world:delete_entity(group, nil)
 	end
 end
 

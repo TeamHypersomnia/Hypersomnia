@@ -41,6 +41,7 @@ function protocol_system:handle_incoming_commands()
 			
 		end
 		
+		transmission_log:write("How many to skip... " .. how_many_to_skip .. "\n")
 		transmission_log:write(input_bs.read_report)
 		--print("Result: " .. result .. "\n" .. input_bs.read_report)
 			
