@@ -74,5 +74,5 @@ function components.weapon:constructor(init_table)
 	self.current_swing_direction = false
 	self:set_state("READY")
 	
-	rewrite(self, init_table)
+	recursive_write(self, init_table)
 end

@@ -97,6 +97,7 @@ function synchronization_system:update_states_from_bitstream(msg)
 					weapon = self.owner_scene.weapons.m4a1
 				}
 				
+				new_entity.weapon.bullet_entity.physics.body_info.filter = filters.REMOTE_BULLET
 				new_entity.weapon.constrain_requested_bullets = false
 				new_entity.weapon.transmit_bullets = false
 			end
