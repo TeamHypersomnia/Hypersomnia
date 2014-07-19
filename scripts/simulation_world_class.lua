@@ -5,18 +5,18 @@ function simulation_world_class:constructor()
 	-- shortcut 
 	self.world = self.world_inst.world
 	
-	self.substep_callbacks = {}
+	self.prestep_callbacks = {}
 	
 	-- shortcuts for systems
 	self.physics_system = self.world_inst.physics_system
 	self.physics_system:enable_listener(false)
 	self.physics_system.enable_interpolation = 0
 	
-	self.physics_system.substepping_routine = function(owner)	
+	self.physics_system.prestepping_routine = function(owner)	
 		local my_instance = self.world_inst
 	
-		for i=1, #self.substep_callbacks do
-			self.substep_callbacks[i]()
+		for i=1, #self.prestep_callbacks do
+			self.prestep_callbacks[i]()
 		end
 		
 		my_instance.movement_system:substep(owner)

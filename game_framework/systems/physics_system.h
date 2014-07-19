@@ -42,7 +42,8 @@ public:
 
 	int all_steps;
 
-	luabind::object substepping_routine;
+	luabind::object prestepping_routine;
+	luabind::object poststepping_routine;
 
 	float timestep_multiplier;
 	int enable_interpolation;

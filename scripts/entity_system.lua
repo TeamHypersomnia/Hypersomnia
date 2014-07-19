@@ -4,6 +4,8 @@ function entity_system:constructor()
 	self.all_systems = {}
 	self.messages = {}
 	
+	self.to_be_removed = {}
+	
 	self.cpp_entity = cpp_entity_system:create()
 	self:register_systems( { ["cpp_entity"] = self.cpp_entity } )
 end
@@ -35,6 +37,18 @@ function entity_system:register_systems(new_systems)
 	end
 end
 
+function entity_system:post_remove(removed_entity)
+	self.to_be_removed[removed_entity] = true
+end
+
+function entity_system:handle_removed_entities()
+	for k, v in pairs (self.to_be_removed) do
+		self:remove_entity(k)
+	end
+	
+	self.to_be_removed = {}
+end
+
 function entity_system:for_all_matching_systems(component_set, callback)
 	for k, v in pairs(self.all_systems) do
 		local required_components = v:get_required_components()
@@ -58,6 +72,8 @@ end
 
 function entity_system:add_entity(new_entity)
 	self:for_all_matching_systems(new_entity, function(matching_system) matching_system:add_entity(new_entity) end)
+	
+	return new_entity
 end
 
 function entity_system:remove_entity(to_be_removed)
@@ -110,13 +126,15 @@ end
 
 function cpp_entity_system:add_entity(new_entity)
 	-- don't store anything
+	--new_entity.cpp_entity.script = new_entity
 end
 
 function cpp_entity_system:remove_entity(removed_entity)
 	-- get world object owning that entity and delete it
 	local owner_world = removed_entity.cpp_entity.owner_world
-	owner_world:delete_entity(removed_entity.cpp_entity, nil)
+	owner_world:post_message(destroy_message(removed_entity.cpp_entity, nil))
 end
+
 
 
 

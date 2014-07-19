@@ -29,7 +29,3 @@ function scene_class:load_map(map_filename, map_loader_filename)
 	-- the loader creates all the entities in the current world
 	dofile(map_loader_filename)(map_filename, self)
 end
-
-function scene_class:loop()
-	self.world_object:loop()
-end

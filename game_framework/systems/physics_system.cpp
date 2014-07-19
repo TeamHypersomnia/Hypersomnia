@@ -393,16 +393,29 @@ void physics_system::process_steps(world& owner, unsigned steps) {
 			}
 			}
 
-		try {
-			luabind::call_function<void>(substepping_routine, &owner);
-		}
-		catch (std::exception compilation_error) {
-			std::cout << compilation_error.what() << '\n';
+		owner.get_message_queue<messages::collision_message>().clear();
+
+		if (prestepping_routine) {
+			try {
+				luabind::call_function<void>(prestepping_routine, &owner);
+			}
+			catch (std::exception compilation_error) {
+				std::cout << compilation_error.what() << '\n';
+			}
 		}
 
 		b2world.Step(static_cast<float32>(accumulator.per_second()), velocityIterations, positionIterations);
 		b2world.ClearForces();
 		++all_steps;
+
+		if (poststepping_routine) {
+			try {
+				luabind::call_function<void>(poststepping_routine, &owner);
+			}
+			catch (std::exception compilation_error) {
+				std::cout << compilation_error.what() << '\n';
+			}
+		}
 	}
 
 	if (steps == 0) b2world.ClearForces();
