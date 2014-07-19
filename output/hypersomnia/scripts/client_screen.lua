@@ -7,6 +7,7 @@ dofile "hypersomnia\\scripts\\components\\orientation.lua"
 dofile "hypersomnia\\scripts\\components\\input_prediction.lua"
 dofile "hypersomnia\\scripts\\components\\interpolation.lua"
 dofile "hypersomnia\\scripts\\components\\weapon.lua"
+dofile "hypersomnia\\scripts\\components\\lifetime.lua"
 
 dofile "hypersomnia\\scripts\\sync_modules\\modules.lua"
 dofile "hypersomnia\\scripts\\sync_modules\\movement_sync.lua"
@@ -20,6 +21,7 @@ dofile "hypersomnia\\scripts\\systems\\input_prediction_system.lua"
 dofile "hypersomnia\\scripts\\systems\\synchronization_system.lua"
 dofile "hypersomnia\\scripts\\systems\\weapon_system.lua"
 dofile "hypersomnia\\scripts\\systems\\bullet_creation_system.lua"
+dofile "hypersomnia\\scripts\\systems\\lifetime_system.lua"
 
 client_screen = inherits_from ()
 
@@ -61,6 +63,7 @@ function client_screen:constructor(camera_rect)
 		
 	end
 	)
+	self.systems.lifetime = lifetime_system:create(self.sample_scene.world_object)
 	self.systems.interpolation = interpolation_system:create()
 	self.systems.orientation = orientation_system:create()
 	self.systems.weapon = weapon_system:create(self.sample_scene.world_object, self.sample_scene.world_object.physics_system)
@@ -115,6 +118,8 @@ function client_screen:loop()
 	
 	self.systems.weapon:translate_shot_info_msgs()
 	self.systems.weapon:update()
+	
+	self.systems.lifetime:update()
 	
 	self.sample_scene.world_object:flush_messages()
 	

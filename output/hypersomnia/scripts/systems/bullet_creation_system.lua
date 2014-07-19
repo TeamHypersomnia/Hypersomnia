@@ -78,13 +78,18 @@ function bullet_creation_system:update()
 				transform = { 
 					pos = bullet.pos,
 					rotation = bullet.rotation
-				},
-				
-				damage = {
-					max_distance = weapon.max_bullet_distance,
-					starting_point = bullet.pos
 				}
 			}))
+			
+			bullet_entity.script = self.owner_entity_system:add_entity(components.create_components {
+				lifetime = {
+					max_distance = weapon.max_bullet_distance,
+					starting_point = vec2(bullet.pos)
+				},
+				
+				cpp_entity = bullet_entity
+			})
+			
 			
 			local body = bullet_entity.physics.body
 			body:SetLinearVelocity(to_meters(bullet.vel))
