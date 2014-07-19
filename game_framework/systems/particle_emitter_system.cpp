@@ -12,6 +12,17 @@
 
 #include "misc/randval.h"
 
+entity& particle_emitter_system::create_refreshable_particle_group(world& owner) {
+	auto& ent = owner.create_entity();
+	
+	ent.add(components::transform());
+	ent.add(components::particle_group()).stream_slots[0].destroy_when_empty = false;
+	ent.add(components::chase());
+	ent.add(components::render());
+
+	return ent;
+}
+
 void particle_emitter_system::spawn_particle(
 	components::particle_group::stream& group, const vec2<>& position, float rotation, const resources::emission& emission) {
 	auto new_particle = emission.particle_templates[randval(0u, emission.particle_templates.size() - 1)];

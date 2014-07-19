@@ -18,7 +18,7 @@ namespace components {
 	/* hack - the only component that has logic */
 	struct particle_group : public augs::entity_system::component, public resources::renderable {
 		struct stream {
-			physics_system* optional_physics;
+			physics_system* optional_physics = nullptr;
 
 			struct uncopyable {
 				uncopyable& operator=(const uncopyable& b) { return *this; }
@@ -26,27 +26,24 @@ namespace components {
 			} particles;
 
 			/* only used by subject stream to indicate that it will no longer emit particles */
-			bool destroy_when_empty;
+			bool destroy_when_empty = true;
 
-			float stream_lifetime_ms;
-			float stream_max_lifetime_ms;
-			float stream_particles_to_spawn;
+			float stream_lifetime_ms = 0.f;
+			float stream_max_lifetime_ms = 0.f;
+			float stream_particles_to_spawn = 0.f;
 
-			float swing_spread;
-			float swings_per_sec;
-			float min_swing_spread, max_swing_spread, min_swings_per_sec, max_swings_per_sec;
-			float swing_spread_change, swing_speed_change;
+			float swing_spread = 0.f;
+			float swings_per_sec = 0.f;
+			float min_swing_spread = 0.f, max_swing_spread = 0.f, min_swings_per_sec = 0.f, max_swings_per_sec = 0.f;
+			float swing_spread_change = 0.f, swing_speed_change = 0.f;
 
-			float fade_when_ms_remaining;
+			float fade_when_ms_remaining = 0.f;
 
-			resources::emission* stream_info;
+			resources::emission* stream_info = nullptr;
 
 			void stop_streaming() {
 				stream_info = nullptr;
 			}
-
-			stream()
-				: optional_physics(nullptr), destroy_when_empty(true), stream_info(nullptr), stream_lifetime_ms(0.f), stream_particles_to_spawn(0.f) {}
 		};
 		
 		components::transform previous_transform;

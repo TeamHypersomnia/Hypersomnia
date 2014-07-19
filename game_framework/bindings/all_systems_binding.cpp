@@ -139,6 +139,8 @@ namespace bindings {
 			luabind::class_<particle_emitter_system>("_particle_emitter_system")
 			.def("consume_events", &particle_emitter_system::consume_events),
 
+			luabind::def("create_refreshable_particle_group", &particle_emitter_system::create_refreshable_particle_group),
+
 			augs::misc::vector_wrapper<luabind::object>::bind_vector("luabindobject_vector"),
 			
 			luabind::class_<behaviour_tree_system>("_behaviour_tree_system")
