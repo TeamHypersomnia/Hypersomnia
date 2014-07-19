@@ -76,3 +76,7 @@ function components.weapon:constructor(init_table)
 	
 	recursive_write(self, init_table)
 end
+
+function components.weapon:create_smoke_group(world_owner)
+	self.barrel_smoke_group = create_refreshable_particle_group(world_owner)
+end

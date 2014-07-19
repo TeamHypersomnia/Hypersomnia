@@ -11,6 +11,15 @@ function weapon_system:get_required_components()
 	return { "weapon" }
 end
 
+function weapon_system:remove_entity(new_entity)
+	local group = new_entity.weapon.barrel_smoke_group 
+	
+	if group ~= nil then
+		group.owner_world:delete_entity(group)
+	end
+end
+
+
 function weapon_system:shot_routine(target, premade_shot)
 	-- remember about correct differentiation between requests that need to be processed
 	-- for correctness and those on the client only for showing remote players' bullets

@@ -36,7 +36,11 @@ function bullet_creation_system:update()
 		burst.subject = entity
 		burst.type = particle_burst_message.WEAPON_SHOT
 		print("burst " .. particle_burst_message.WEAPON_SHOT)
-		--burst.target_group_to_refresh = gun.get_barrel_smoke()
+		
+		if weapon.barrel_smoke_group ~= nil then
+			burst.target_group_to_refresh:set(weapon.barrel_smoke_group)
+		end
+		
 		self.world:post_message(burst)
 		
 		local client_sys = self.owner_entity_system.all_systems["client"]
