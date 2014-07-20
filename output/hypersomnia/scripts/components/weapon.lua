@@ -74,6 +74,9 @@ function components.weapon:constructor(init_table)
 	self.current_swing_direction = false
 	self:set_state("READY")
 	
+	-- maps a bullet id to a timer to control the lifetime of bullets
+	self.existing_bullets = {}
+	
 	recursive_write(self, init_table)
 end
 

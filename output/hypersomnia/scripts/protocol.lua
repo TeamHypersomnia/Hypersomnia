@@ -11,7 +11,7 @@ protocol.message_by_id = {
 	{
 		name = "HIT_REQUEST",
 		data = {
-			"Ushort", "bullet_id",
+			"Uint", "bullet_id",
 			"Ushort", "subject_id"
 		}
 	},
@@ -27,6 +27,7 @@ protocol.message_by_id = {
 		data = {
 			"Ushort", "delay_time",
 			"Ushort", "subject_id",
+			--"Uint", "starting_bullet_id",
 			"Vec2", "position",
 			"Float", "rotation"
 		}

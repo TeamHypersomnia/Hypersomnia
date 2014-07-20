@@ -106,7 +106,7 @@ function weapon_system:translate_shot_info_msgs()
 	--print(self.owner_entity_system.all_systems["synchronization"].my_sync_id)
 		local subject = self.owner_entity_system.all_systems["synchronization"].object_by_id[msgs[i].data.subject_id]
 		local forward_time = msgs[i].data.delay_time + self.owner_entity_system.all_systems["client"]:get_last_ping()/2
-		print(forward_time)
+		--print(forward_time)
 		--print(subject.weapon.transmit_bullets)
 		table.insert(subject.weapon.buffered_actions, { trigger = components.weapon.triggers.SHOOT, premade_shot = {
 			position = msgs[i].data.position,

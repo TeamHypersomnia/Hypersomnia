@@ -35,7 +35,6 @@ function bullet_creation_system:update()
 		burst.rotation = msgs[i].barrel_transform.rotation
 		burst.subject = entity
 		burst.type = particle_burst_message.WEAPON_SHOT
-		print("burst " .. particle_burst_message.WEAPON_SHOT)
 		
 		if weapon.barrel_smoke_group ~= nil then
 			burst.target_group_to_refresh:set(weapon.barrel_smoke_group)
@@ -60,8 +59,6 @@ function bullet_creation_system:update()
 			
 			local premade_shot = msgs[i].premade_shot
 			if premade_shot ~= nil and premade_shot.simulate_forward ~= nil then
-				print (premade_shot.simulate_forward)
-				
 				local v1 = msgs[i].gun_transform.pos
 				local v2 = bullet.pos + (bullet.vel*premade_shot.simulate_forward/1000)
 				local result = self.world_object.physics_system
@@ -81,10 +78,11 @@ function bullet_creation_system:update()
 				}
 			}))
 			
-			bullet_entity.script = self.owner_entity_system:add_entity(components.create_components {
+			self.owner_entity_system:add_entity(components.create_components {
 				lifetime = {
-					max_distance = weapon.max_bullet_distance,
-					starting_point = vec2(bullet.pos)
+					max_lifetime_ms = weapon.max_lifetime_ms
+					--max_distance = weapon.max_bullet_distance,
+					--starting_point = vec2(bullet.pos)
 				},
 				
 				cpp_entity = bullet_entity

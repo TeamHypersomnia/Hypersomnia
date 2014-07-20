@@ -16,7 +16,6 @@ function lifetime_system:resolve_collisions()
 	for i=1, #msgs do
 		local message = msgs[i]
 		
-		print "Hit!"
 		burst_msg = particle_burst_message()
 		burst_msg.subject = message.collider
 		burst_msg.pos = message.point

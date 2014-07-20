@@ -29,7 +29,7 @@ function create_weapons(scene, include_render)
 			}
 		},				
 		
-		max_bullet_distance = 1000	
+		max_lifetime_ms = 500	
 	}
 	
 	if include_render == true then
