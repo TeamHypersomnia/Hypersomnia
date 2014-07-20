@@ -126,7 +126,7 @@ end
 
 function cpp_entity_system:add_entity(new_entity)
 	-- don't store anything
-	--new_entity.cpp_entity.script = new_entity
+	new_entity.cpp_entity.script = new_entity
 end
 
 function cpp_entity_system:remove_entity(removed_entity)

@@ -53,19 +53,11 @@ function world_class:get_messages_filter_components(message_name, needed_compone
 	
 	local message_vector = self:get_messages(message_name)
 	
-	if message_name == "collision_message" then
-		if message_vector:size() > 0 then print (message_vector:size()) end
-	end
-	
 	if message_vector:size() > 0 then
 		for i=0, message_vector:size()-1 do
 			local msg = message_vector:at(i)
 			
 			local entity_self = msg.subject.script
-			
-	if message_name == "collision_message" then
-		print "matches"
-	end
 			if entity_self ~= nil then
 				local matches = true
 				
