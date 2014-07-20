@@ -22,6 +22,7 @@ end
 
 function lifetime_system:translate_hit_infos()
 	local msgs = {}
+	local objects = self.owner_entity_system.all_systems["synchronization"].object_by_id
 
 	local hit_infos = self.owner_entity_system.messages["HIT_INFO"]
 
@@ -31,10 +32,25 @@ function lifetime_system:translate_hit_infos()
 		print (msg.data.sender_id)
 		print (msg.data.victim_id)
 		print (msg.data.bullet_id)
-		--local new_collision = {}
-		--
-	    --
-		--table.insert(msgs, new_collision)
+		
+		local victim = objects[msg.data.victim_id]
+		local sender = objects[msg.data.sender_id]
+		local bullet = objects[msg.data.sender_id].weapon.existing_bullets[msg.data.bullet_id]
+		
+		local new_collision = {}
+		
+		if bullet ~= nil then
+			new_collision.subject = bullet.owner_entity.cpp_entity
+			new_collision.subject_impact_velocity = to_pixels(bullet.owner_entity.cpp_entity.physics.body:GetLinearVelocity())
+		else
+			new_collision.subject_impact_velocity = vec2(1, 0)
+		end
+	
+		new_collision.collider = victim.cpp_entity
+		new_collision.point = vec2(victim.cpp_entity.transform.current.pos)
+		new_collision.sender = sender
+	    
+		table.insert(msgs, new_collision)
 	end
 	
 	self:resolve_collisions(msgs)
@@ -51,20 +67,25 @@ function lifetime_system:resolve_collisions(msgs)
 	for i=1, #msgs do
 		local message = msgs[i]
 		
-		local collider_script = message.collider.script
-		local lifetime = message.subject.script.lifetime
+		-- we could have posted info about a remote bullet that already does not exist
+		if message.subject ~= nil then
+			local collider_script = message.collider.script
+			local lifetime = message.subject.script.lifetime
+		
+			if lifetime.sender.weapon.transmit_bullets 
+				and collider_script ~= nil and collider_script.synchronization ~= nil
+			then
+				needs_send = true
+				
+				client_sys.net_channel:post_reliable("HIT_REQUEST", {
+					victim_id = collider_script.synchronization.id,
+					bullet_id = lifetime.bullet_id
+				})
+			end
 	
-		if lifetime.sender.weapon.transmit_bullets 
-			and collider_script ~= nil and collider_script.synchronization ~= nil
-		then
-			needs_send = true
-			
-			client_sys.net_channel:post_reliable("HIT_REQUEST", {
-				victim_id = collider_script.synchronization.id,
-				bullet_id = lifetime.bullet_id
-			})
+			self.owner_entity_system:post_remove(message.subject.script)
 		end
-	
+		
 		burst_msg = particle_burst_message()
 		burst_msg.subject = message.collider
 		burst_msg.pos = message.point
@@ -72,8 +93,6 @@ function lifetime_system:resolve_collisions(msgs)
 		burst_msg.type = particle_burst_message.BULLET_IMPACT
 		
 		message.collider.owner_world:post_message(burst_msg)
-		
-		self.owner_entity_system:post_remove(message.subject.script)
 	end
 	
 	if needs_send then
