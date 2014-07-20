@@ -70,7 +70,15 @@ function weapon_system:shot_routine(target, premade_shot)
 			
 		vel = vel * randval(weapon.bullet_speed)
 		
-		table.insert(new_shot_message.bullets, { 
+		weapon.last_bullet_id = weapon.last_bullet_id + 1
+		
+		-- the timer is here created for the server to be authoritative about old bullet invalidation
+		weapon.existing_bullets[weapon.last_bullet_id] = {
+			lifetime = timer()	
+		}
+	
+		table.insert(new_shot_message.bullets, {
+			id = weapon.last_bullet_id,
 			pos = barrel_transform.pos,
 			rotation = barrel_transform.rotation,
 			["vel"] = vel

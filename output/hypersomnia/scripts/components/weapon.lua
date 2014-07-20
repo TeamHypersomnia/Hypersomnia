@@ -76,6 +76,7 @@ function components.weapon:constructor(init_table)
 	
 	-- maps a bullet id to a timer to control the lifetime of bullets
 	self.existing_bullets = {}
+	self.last_bullet_id = 0
 	
 	recursive_write(self, init_table)
 end

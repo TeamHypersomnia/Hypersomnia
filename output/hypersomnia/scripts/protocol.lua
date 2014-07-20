@@ -8,11 +8,20 @@ protocol.module_mappings = {
 }
 
 protocol.message_by_id = {
+	
+	{
+		name = "HIT_INFO",
+		data = {
+			"Ushort", "sender_id",
+			"Ushort", "victim_id",
+			"Uint", "bullet_id"
+		}
+	},
 	{
 		name = "HIT_REQUEST",
 		data = {
-			"Uint", "bullet_id",
-			"Ushort", "subject_id"
+			"Ushort", "victim_id",
+			"Uint", "bullet_id"
 		}
 	},
 	{

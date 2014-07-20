@@ -42,8 +42,6 @@ function bullet_creation_system:update()
 		
 		self.world:post_message(burst)
 		
-		local client_sys = self.owner_entity_system.all_systems["client"]
-		
 		for b=1, #msgs[i].bullets do
 			local bullet = msgs[i].bullets[b]
 			
@@ -78,9 +76,12 @@ function bullet_creation_system:update()
 				}
 			}))
 			
-			self.owner_entity_system:add_entity(components.create_components {
+			local bullet_script = self.owner_entity_system:add_entity(components.create_components {
 				lifetime = {
-					max_lifetime_ms = weapon.max_lifetime_ms
+					max_lifetime_ms = weapon.max_lifetime_ms,
+					bullet_id = bullet.id,
+					sender = target
+					
 					--max_distance = weapon.max_bullet_distance,
 					--starting_point = vec2(bullet.pos)
 				},
@@ -88,11 +89,14 @@ function bullet_creation_system:update()
 				cpp_entity = bullet_entity
 			})
 			
+			weapon.existing_bullets[bullet.id].owner_entity = bullet_script
 			
 			local body = bullet_entity.physics.body
 			body:SetLinearVelocity(to_meters(bullet.vel))
 		end
 		
+		
+		local client_sys = self.owner_entity_system.all_systems["client"]
 		
 		if target.weapon.transmit_bullets == true then
 			if #msgs[i].bullets == 1 then

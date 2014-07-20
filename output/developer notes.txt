@@ -456,3 +456,18 @@ If not, we have a liar or a poor connection. If yes, the server decreases the da
 The synchronization_system should in fact be named "replication_system".
 We should keep a library of item objects and their creation callbacks with an option to differ between client-side and server-side objects.
 Then just send an object id type and information about synchronized modules, or just specify these modules in the archetype itself, or have both options available.
+
+
+
+For the case where the client gets deleted because of death and his bullets still exists - consider a client as another entity with its own synchronization id, and its physical body another entity.
+On client death, only the physical body gets deleted, the client still exists and thus the ownership of bullets is retained.
+Then only ever delete the client when all of its bullets are freed.
+
+When predicting remote bullets on the client, they might get deleted before the hit notification arrives.
+
+We have several options here:
+a) for remote bullets, don't delete bullets on collision and keep track of some amount of past weapon.existing_bullets
+b) send all the impact data along with the hit information
+c) simply delete the bullet only if it still exists and if it doesn't, make up some default impact data.
+
+we'll probably do a mix od b) and c)

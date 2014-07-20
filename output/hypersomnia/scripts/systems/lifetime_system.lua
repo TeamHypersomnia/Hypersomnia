@@ -6,6 +6,16 @@ function lifetime_system:constructor(world_object)
 end
 
 
+function lifetime_system:remove_entity(removed_entity)
+	local id = removed_entity.lifetime.bullet_id
+	
+	if id ~= nil then
+		removed_entity.lifetime.sender.weapon.existing_bullets[id] = nil
+	end
+
+	processing_system.remove_entity(self, removed_entity)
+end
+
 function lifetime_system:get_required_components()
 	return { "lifetime" }
 end
@@ -13,9 +23,36 @@ end
 function lifetime_system:resolve_collisions()
 	local msgs = self.world_object:get_messages_filter_components("collision_message", { "lifetime" } )
 	
+	-- concatenate msgs with received HIT_INFOs
+	local hit_infos = self.owner_entity_system.messages["HIT_INFO"]
+
+	for i=1, #hit_infos do
+		local new_collision = {}
+		
+	
+		table.insert(msgs, new_collision)
+	end
+	
+	local client_sys = self.owner_entity_system.all_systems["client"]
+	local needs_send = false
+	
 	for i=1, #msgs do
 		local message = msgs[i]
 		
+		local collider_script = message.collider.script
+		local lifetime = message.subject.script.lifetime
+	
+		if lifetime.sender.weapon.transmit_bullets 
+			and collider_script ~= nil and collider_script.synchronization ~= nil
+		then
+			needs_send = true
+			
+			client_sys.net_channel:post_reliable("HIT_REQUEST", {
+				victim_id = collider_script.synchronization.id,
+				bullet_id = lifetime.bullet_id
+			})
+		end
+	
 		burst_msg = particle_burst_message()
 		burst_msg.subject = message.collider
 		burst_msg.pos = message.point
@@ -25,6 +62,10 @@ function lifetime_system:resolve_collisions()
 		message.collider.owner_world:post_message(burst_msg)
 		
 		self.owner_entity_system:post_remove(message.subject.script)
+	end
+	
+	if needs_send then
+		client_sys:send_all_data()
 	end
 end
 
