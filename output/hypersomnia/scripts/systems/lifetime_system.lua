@@ -20,19 +20,31 @@ function lifetime_system:get_required_components()
 	return { "lifetime" }
 end
 
-function lifetime_system:resolve_collisions()
-	local msgs = self.world_object:get_messages_filter_components("collision_message", { "lifetime" } )
-	
-	-- concatenate msgs with received HIT_INFOs
+function lifetime_system:translate_hit_infos()
+	local msgs = {}
+
 	local hit_infos = self.owner_entity_system.messages["HIT_INFO"]
 
 	for i=1, #hit_infos do
-		local new_collision = {}
-		
-	
-		table.insert(msgs, new_collision)
+		local msg = hit_infos[i]
+		print "received hit info"
+		print (msg.data.sender_id)
+		print (msg.data.victim_id)
+		print (msg.data.bullet_id)
+		--local new_collision = {}
+		--
+	    --
+		--table.insert(msgs, new_collision)
 	end
 	
+	self:resolve_collisions(msgs)
+end
+
+function lifetime_system:poststep()
+	self:resolve_collisions(self.world_object:get_messages_filter_components("collision_message", { "lifetime" } ))
+end
+
+function lifetime_system:resolve_collisions(msgs)
 	local client_sys = self.owner_entity_system.all_systems["client"]
 	local needs_send = false
 	

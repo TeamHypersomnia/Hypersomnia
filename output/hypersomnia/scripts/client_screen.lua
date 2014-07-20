@@ -77,7 +77,7 @@ function client_screen:constructor(camera_rect)
 	end)
 	
 	table.insert(self.sample_scene.world_object.poststep_callbacks, function (dt)
-		self.systems.lifetime:resolve_collisions()
+		self.systems.lifetime:poststep()
 		
 		self.entity_system_instance:handle_removed_entities()
 	end)
@@ -135,6 +135,9 @@ function client_screen:loop()
 
 	self.systems.bullet_creation:update()
 	
+	-- hit info translation implies deleting some of the bullets so it is to be executed
+	-- after their potential creation (bullet_creation:update())
+	self.systems.lifetime:translate_hit_infos()
 		
 	self.entity_system_instance:flush_messages()	
 	
