@@ -36,6 +36,7 @@ function lifetime_system:translate_hit_infos()
 		local victim = objects[msg.data.victim_id]
 		local sender = objects[msg.data.sender_id]
 		local bullet = objects[msg.data.sender_id].weapon.existing_bullets[msg.data.bullet_id]
+		print (bullet ~= nil)
 		
 		local new_collision = {}
 		

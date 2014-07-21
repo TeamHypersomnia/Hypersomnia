@@ -36,7 +36,7 @@ protocol.message_by_id = {
 		data = {
 			"Ushort", "delay_time",
 			"Ushort", "subject_id",
-			--"Uint", "starting_bullet_id",
+			"Uint", "starting_bullet_id",
 			"Vec2", "position",
 			"Float", "rotation"
 		}

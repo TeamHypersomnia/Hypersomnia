@@ -69,15 +69,15 @@ function weapon_system:shot_routine(target, premade_shot)
 		barrel_transform.rotation = vel:get_degrees()
 			
 		vel = vel * randval(weapon.bullet_speed)
-		
-		weapon.last_bullet_id = weapon.last_bullet_id + 1
-	
+
 		table.insert(new_shot_message.bullets, {
-			id = weapon.last_bullet_id,
+			id = weapon.next_bullet_id,
 			pos = barrel_transform.pos,
 			rotation = barrel_transform.rotation,
 			["vel"] = vel
 		})	
+		
+		weapon.next_bullet_id = weapon.next_bullet_id + 1
 	end
 	
 	-- client - produce visual output from wherever the shot originates and inform the server about the shot
@@ -111,6 +111,8 @@ function weapon_system:translate_shot_info_msgs()
 		local forward_time = msgs[i].data.delay_time + self.owner_entity_system.all_systems["client"]:get_last_ping()/2
 		--print(forward_time)
 		--print(subject.weapon.transmit_bullets)
+		subject.weapon.next_bullet_id = msgs[i].data.starting_bullet_id
+		
 		table.insert(subject.weapon.buffered_actions, { trigger = components.weapon.triggers.SHOOT, premade_shot = {
 			position = msgs[i].data.position,
 			rotation = msgs[i].data.rotation,
