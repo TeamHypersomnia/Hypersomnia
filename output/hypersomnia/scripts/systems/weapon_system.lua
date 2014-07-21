@@ -4,6 +4,10 @@ function weapon_system:constructor(world_object, physics)
 	self.world_object = world_object
 	self.physics = physics
 	self.delta_timer = timer()
+	
+	self.random_seed = std_random_device()
+	self.random_generator = std_mt19937(self.random_seed)
+	
 	processing_system.constructor(self)
 end
 
@@ -60,15 +64,17 @@ function weapon_system:shot_routine(target, premade_shot)
 		bullets = {}
 	}
 		
+	self.random_generator:seed(weapon.next_bullet_id + target.synchronization.id*1000)
+	
 	for i=1, weapon.bullets_once do
 		local vel = vec2.from_degrees(
 			randval(
 			gun_transform.rotation - weapon.spread_degrees,
-			gun_transform.rotation + weapon.spread_degrees))
+			gun_transform.rotation + weapon.spread_degrees, self.random_generator))
 
 		barrel_transform.rotation = vel:get_degrees()
 			
-		vel = vel * randval(weapon.bullet_speed)
+		vel = vel * randval(weapon.bullet_speed, self.random_generator)
 
 		table.insert(new_shot_message.bullets, {
 			id = weapon.next_bullet_id,

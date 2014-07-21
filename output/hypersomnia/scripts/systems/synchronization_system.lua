@@ -77,7 +77,7 @@ function synchronization_system:update_states_from_bitstream(msg)
 						crosshair_entity = self.owner_scene.player.crosshair
 					},
 					
-					weapon = self.owner_scene.weapons.m4a1
+					weapon = self.owner_scene.weapons.shotgun
 				}
 				
 				new_entity.weapon:create_smoke_group(self.owner_scene.world_object.world)
@@ -98,7 +98,7 @@ function synchronization_system:update_states_from_bitstream(msg)
 						crosshair_entity = new_remote_player.crosshair
 					},
 					
-					weapon = self.owner_scene.weapons.m4a1
+					weapon = self.owner_scene.weapons.shotgun
 				}
 				
 				new_entity.weapon:create_smoke_group(self.owner_scene.world_object.world)

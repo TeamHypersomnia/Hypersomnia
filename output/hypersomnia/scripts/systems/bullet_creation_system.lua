@@ -101,15 +101,11 @@ function bullet_creation_system:update()
 		local client_sys = self.owner_entity_system.all_systems["client"]
 		
 		if target.weapon.transmit_bullets == true then
-			if #msgs[i].bullets == 1 then
-				client_sys.net_channel:post_reliable("SHOT_REQUEST", {
-					position = msgs[i].gun_transform.pos,
-					rotation = msgs[i].gun_transform.rotation
-				})
-			elseif #msgs[i].bullets > 1 then
-			
-			end
-			
+			client_sys.net_channel:post_reliable("SHOT_REQUEST", {
+				position = msgs[i].gun_transform.pos,
+				rotation = msgs[i].gun_transform.rotation
+			})
+				
 			-- bullet events are so important that they need to be issued right away
 			client_sys:send_all_data()
 		end
