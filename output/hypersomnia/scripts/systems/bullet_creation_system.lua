@@ -89,7 +89,9 @@ function bullet_creation_system:update()
 				cpp_entity = bullet_entity
 			})
 			
-			weapon.existing_bullets[bullet.id].owner_entity = bullet_script
+			weapon.existing_bullets[bullet.id] =  {
+				owner_entity = bullet_script
+			}
 			
 			local body = bullet_entity.physics.body
 			body:SetLinearVelocity(to_meters(bullet.vel))
