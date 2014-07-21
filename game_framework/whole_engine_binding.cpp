@@ -97,6 +97,7 @@ namespace bindings {
 		_body_helper(),
 
 		_opengl_binding(),
+		_random_binding(),
 		_all_systems(),
 
 		_text(),
@@ -237,9 +238,7 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 
 			luabind::def("clamp", &augs::get_clamp<float>),
 			luabind::def("debugger_break", &debugger_break),
-			luabind::def("randval", (float(*)(std::pair<float, float>))&randval),
-			luabind::def("randval", (float(*)(float, float))&randval),
-			luabind::def("randval_i", (int(*)(int, int))&randval),
+			bindings::_random_binding(),
 
 			luabind::def("get_meters_to_pixels", get_meters_to_pixels),
 			luabind::def("set_meters_to_pixels", set_meters_to_pixels),

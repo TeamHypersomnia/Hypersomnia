@@ -8,33 +8,33 @@ function debug.my_traceback()
 	
 	local globals_str = "\n"
 	
-	globals_str = globals_str .. "Globals:\n"
+	--globals_str = globals_str .. "Globals:\n"
+	--
+	--for k,v in pairs(_G) do
+	--	globals_str = globals_str .. k .. ":\n" .. table.inspect(v) .. "\n\n"
+	--end
 	
-	for k,v in pairs(_G) do
-		globals_str = globals_str .. k .. ":\n" .. table.inspect(v) .. "\n\n"
-	end
-	
-	local level_idx = 2
-	while true do
-		outstr = outstr .. "level " .. level_idx .. ": "
-		
-		local variables = {}
-		local idx = 1
-		while true do
-			local ln, lv = debug.getlocal(level_idx, idx)
-			if ln ~= nil then
-			variables[ln] = lv
-			else
-			break
-			end
-			idx = 1 + idx
-		end
-		
-		outstr = outstr .. table.inspect(variables) .. "\n"
-		
-		level_idx = level_idx + 1
-		if debug.getinfo(level_idx) == nil then break end
-	end
+	--local level_idx = 2
+	--while true do
+	--	outstr = outstr .. "level " .. level_idx .. ": "
+	--	
+	--	local variables = {}
+	--	local idx = 1
+	--	while true do
+	--		local ln, lv = debug.getlocal(level_idx, idx)
+	--		if ln ~= nil then
+	--		variables[ln] = lv
+	--		else
+	--		break
+	--		end
+	--		idx = 1 + idx
+	--	end
+	--	
+	--	outstr = outstr .. table.inspect(variables) .. "\n"
+	--	
+	--	level_idx = level_idx + 1
+	--	if debug.getinfo(level_idx) == nil then break end
+	--end
 	
 	outstr = outstr .. "\n" .. debug.traceback() 
 	

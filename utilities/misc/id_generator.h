@@ -15,8 +15,7 @@ namespace augs {
 			}
 
 			T generate_id() {
-				while (exists(counter)) 
-					++counter;
+				while (exists(++counter));
 
 				registered_ids.insert(counter);
 				return counter;
