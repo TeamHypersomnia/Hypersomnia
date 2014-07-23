@@ -42,8 +42,8 @@ function client_system:send_all_data()
 		self.net_channel:post_unreliable_bs(self.substep_unreliable)
 		
 		if self.net_channel:has_something_to_send() then
-			--print "Sending data..."
-			--print(self.global_time:get_milliseconds())
+			print "Sending data..."
+			print(self.global_time:get_milliseconds())
 			local output_bs = self.net_channel:send()
 			
 			transmission_log:write("\nSending time: " .. self.global_time:get_milliseconds() .. "\n\n" .. auto_string_indent(output_bs.content) .. "\n\n")

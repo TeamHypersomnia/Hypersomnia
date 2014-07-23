@@ -7,6 +7,4 @@ function components.orientation:constructor(init_table)
 	set_rate(self, "cmd", 10)
 	
 	self.last_pos = vec2(0, 0)
-	self.idle = false
-	self.idle_timer = timer()
 end

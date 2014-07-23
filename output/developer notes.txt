@@ -471,3 +471,7 @@ b) send all the impact data along with the hit information
 c) simply delete the bullet only if it still exists and if it doesn't, make up some default impact data.
 
 we'll probably do a mix od b) and c)
+
+
+As for the conception of dying and throwing a corpse, we have to consider still-existing bullets shot by the deleted entity.
+The solution is simple: treat bullets as independent objects and when the SHOT_INFO arrives to the client, save any metadata about the sender (e.g. nick) in the bullet entity.

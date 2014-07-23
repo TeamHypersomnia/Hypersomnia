@@ -15,28 +15,10 @@ function orientation_system:update()
 			--orientation:cmd_rate_reset()
 			local current_pos =  vec2(orientation.crosshair_entity.transform.current.pos - target.cpp_entity.transform.current.pos)
 			
-			local send_retry;
-			
-			if orientation.last_pos == nil or (orientation.last_pos - current_pos):length() > 2 then
-				orientation.idle = false
-				orientation.idle_timer:reset()
-				
+			if orientation.last_pos == nil or (orientation.last_pos - current_pos):length() > 0 then
 				orientation.last_pos = vec2(current_pos)
-				send_retry = false
+				self.owner_entity_system.all_systems["client"].net_channel:reliable_seq_msg("CROSSHAIR_SNAPSHOT", { position = current_pos }, true)
 			end
-			
-			if orientation.idle_timer:get_milliseconds() > 100 and not orientation.idle then
-				orientation.idle = true
-				send_retry = true
-			end
-			
-			if send_retry ~= nil then 
-				--print ("send retry is.. ") 
-				--print (send_retry)
-				self.owner_entity_system.all_systems["client"].net_channel:reliable_seq_msg("CROSSHAIR_SNAPSHOT", { position = current_pos }, send_retry)
-				--self.owner_entity_system.all_systems["client"].cmd_requested = true
-			end
-			
 		end
 	end
 end
