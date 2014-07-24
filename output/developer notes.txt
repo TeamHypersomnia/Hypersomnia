@@ -475,3 +475,93 @@ we'll probably do a mix od b) and c)
 
 As for the conception of dying and throwing a corpse, we have to consider still-existing bullets shot by the deleted entity.
 The solution is simple: treat bullets as independent objects and when the SHOT_INFO arrives to the client, save any metadata about the sender (e.g. nick) in the bullet entity.
+
+-----------------------------------------------------------------------------------------
+DESIGNING THE REPLICATION SYSTEM
+-----------------------------------------------------------------------------------------
+ 
+Problem: Data like pos/vel/orientation will need to be updated in batches, specifying the data layout ONLY ONCE to save per-packet bandwidth.
+Solution: a dedicated STREAM_UPDATE message and sync_modules with reliable state.
+
+Data like health points will be updated less frequently, so things like health updates can have their own message ids and layouts, 
+although we only need to care about delivering the most recent state.
+
+Given that the most recently received event associated with an object compensates for every previous event of this type,
+the full object state can be reproduced using only the set of the most recently occurred events 
+and an objects' initial values, what in turn is estabilished between the server and the client even before the transmission begins.
+
+Some updates will be as simple as transferring the fact of changing a value (health points) 
+but sometimes we will need to transfer RESULTS of one's actions, for example positions or velocities doesn't just mean overwriting some values - on the client, we'll need to interpolate.
+
+
+We will also need objects whose state can't be reproduced using only set of the last events. 
+Consider an object that depicts a set of squad points drawn by the leader, where possible changes include removing or adding a point.
+
+It becomes obvious we'll need some kind of delta comparision between the last sent state and the current state.
+
+We don't need delta for things like health.
+
+
+Consider the following: 
+Let the sync_modules just implement these methods:
+
+write_state
+write_stream
+write_recent
+
+read_state
+read_stream
+read_recent
+
+the separation is necessary because of differing transportation methodology:
+[STATE_UPDATE] [OBJECT_COUNT]...[id][modules_changed][write_state] ...[id][write_state] ...
+[RECENT_UPDATE][OBJECT_COUNT]...[id][modules_changed][write_recent]...[id][write_recent]...
+[STREAM_UPDATE][OBJECT_COUNT]...[id][write_stream]...[id][write_stream]...
+
+optimized STREAM_UPDATE:
+[STREAM_UPDATE][OBJECT_ID_SET]...[write_stream]...[write_stream]...[write_stream]...
+
+Additional message: 
+[MODULESET_INFO][id][STATE_MODULES_BITSET][STREAM_MODULES_BITSET]
+This will always induce object creation on the remote peer.
+It will also handle changes in STREAM_UPDATE data layout.
+It will now replace STATE_UPDATE completely unless we find a usecase.
+
+Explanation:
+STATE_UPDATE -  for state that can't be reproduced by just sending the last change and needs to be delta encoded.
+RECENT_UPDATE - for state that can be reproduced by just sending the last change, for example: health points, controlled object id.
+STREAM_UPDATE - for state that is constantly sent for almost every object, 
+and thus it's too costly to send data layout on every update - in fact, we need to specify it only when it changes - for example,
+a player stops moving and does not need its pos/vel transmitted, but they still move their crosshairs.
+
+Once the reliable_channel.lua detects that a sync_module has been acknowledged,
+it will issue a notification (MODULESET_INFO) that the moduleset for streaming has changed.
+
+Here it will be best to create separate mappings for streaming-only modules and state modules.
+
+
+
+in fact, state updates will be rare.
+most updates will be transferred in a sequenced reliable manner.
+
+IMPLEMENTATION:
+Firstly, make sync_modules simply components. They can still be accessed in-order, object-wise.
+
+We also need to remember that if an object is synchronized differently across multiple clients (client.alternative_modules)
+then upon updating a module, we need to ensure that all objects variants are respectively updated, too.
+
+Firstly, make delta-encoding for RECENT_UPDATE only module-wise. 
+This means the whole module is updated when something changes inside.
+
+If needed, we'll also implement it field-wise.
+
+We still don't have any use-case for STATE_UPDATE other than creating entities and transferring moduleset bitfield.
+
+-----------------------------------------------------
+VARIOUS RELIABILITY OPTIONS
+-----------------------------------------------------
+
+what we have available:
+- per-message reliable in-order delivery
+- per-message reliable sequenced delivery
+- appended unreliable messages that we don't care about acknowledging
