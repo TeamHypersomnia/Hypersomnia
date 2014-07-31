@@ -7,6 +7,13 @@ function bullet_creation_system:constructor(world_object, camera_to_shake)
 	self.world_object = world_object
 	self.world = world_object.world
 	
+	self.next_bullet_global_id = 1
+	self.next_bullet_local_id = 1
+	
+	self.remote_bullets = {}
+	
+	self.random_generator = std_mt19937(std_random_device())
+
 	processing_system.constructor(self)
 end
 
@@ -42,8 +49,21 @@ function bullet_creation_system:update()
 		
 		self.world:post_message(burst)
 		
+		local premade_shot = msgs[i].premade_shot
+		
+		-- random seed for local shots
+		local random_seed = target.synchronization.id*10 + self.next_bullet_local_id
+		
+		-- this is a remote shot
+		if premade_shot ~= nil then
+			random_seed = premade_shot.random_seed
+			self.next_bullet_global_id = premade_shot.starting_global_id
+		end
+		
+		self.random_generator:seed(random_seed)
+		
 		for b=1, #msgs[i].bullets do
-			local bullet = msgs[i].bullets[b]
+			local bullet = msgs[i].bullets[b](self.random_generator)
 			
 			if self.camera_to_shake ~= nil then 
 				local shake_dir = vec2()
@@ -55,8 +75,8 @@ function bullet_creation_system:update()
 				self.camera_to_shake.camera.last_interpolant.pos = self.camera_to_shake.camera.last_interpolant.pos + shake_dir * weapon.shake_radius
 			end
 			
-			local premade_shot = msgs[i].premade_shot
-			if premade_shot ~= nil and premade_shot.simulate_forward ~= nil then
+			-- this is a remote shot
+			if premade_shot ~= nil and premade_shot.simulate_forward then
 				local v1 = msgs[i].gun_transform.pos
 				local v2 = bullet.pos + (bullet.vel*premade_shot.simulate_forward/1000)
 				local result = self.world_object.physics_system
@@ -76,10 +96,13 @@ function bullet_creation_system:update()
 				}
 			}))
 			
+			
+			
 			local bullet_script = self.owner_entity_system:add_entity(components.create_components {
 				lifetime = {
 					max_lifetime_ms = weapon.max_lifetime_ms,
-					bullet_id = bullet.id,
+					local_id = self.next_bullet_local_id,
+					--global_id = self.next_bullet_global_id,
 					sender = target
 					
 					--max_distance = weapon.max_bullet_distance,
@@ -89,9 +112,18 @@ function bullet_creation_system:update()
 				cpp_entity = bullet_entity
 			})
 			
-			weapon.existing_bullets[bullet.id] =  {
-				owner_entity = bullet_script
-			}
+			if target.weapon.transmit_bullets then
+				-- increment local bullet id to keep in sync with the server as we send hit requests
+				self.next_bullet_local_id = self.next_bullet_local_id + 1
+			else
+				bullet_script.lifetime.global_id = self.next_bullet_global_id
+				
+				self.remote_bullets[self.next_bullet_global_id] =  {
+					owner_entity = bullet_script
+				}
+				
+				self.next_bullet_global_id = self.next_bullet_global_id + 1
+			end
 			
 			local body = bullet_entity.physics.body
 			body:SetLinearVelocity(to_meters(bullet.vel))

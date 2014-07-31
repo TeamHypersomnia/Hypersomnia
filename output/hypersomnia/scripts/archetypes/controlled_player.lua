@@ -34,7 +34,7 @@ function create_simulation_player(owner_world)
 	}
 end
 
-function create_basic_player(scene_object, position, target_camera, crosshair_sprite)
+function create_controlled_player(scene_object, position, target_camera, crosshair_sprite)
 	local player = scene_object.world_object:create_entity_group  {
 		-- body also acts as torso
 		body = {

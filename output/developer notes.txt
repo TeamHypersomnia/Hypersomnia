@@ -502,6 +502,13 @@ It becomes obvious we'll need some kind of delta comparision between the last se
 We don't need delta for things like health.
 
 
+
+
+
+
+
+
+
 Consider the following: 
 Let the sync_modules just implement these methods:
 
@@ -513,31 +520,37 @@ read_state
 read_stream
 read_recent
 
-the separation is necessary because of differing transportation methodology:
-[STATE_UPDATE] [OBJECT_COUNT]...[id][modules_changed][write_state] ...[id][write_state] ...
-[RECENT_UPDATE][OBJECT_COUNT]...[id][modules_changed][write_recent]...[id][write_recent]...
-[STREAM_UPDATE][OBJECT_COUNT]...[id][write_stream]...[id][write_stream]...
+the separation is necessary because of differing transportation methodology (reliable/sequenced/unreliable), 
+but also because of differing data layouts:
 
-optimized STREAM_UPDATE:
-[STREAM_UPDATE][OBJECT_ID_SET]...[write_stream]...[write_stream]...[write_stream]...
+[MODULESET_INFO][OBJECT_COUNT]...[id][STATE_MODULES_BITSET][STREAM_MODULES_BITSET]	...
+[STATE_UPDATE]  [OBJECT_COUNT]...[id][modules_changed][write_state] 			  	...[id][modules_changed][write_state] ...
+[RECENT_UPDATE] [OBJECT_COUNT]...[id][modules_changed][write_recent]				...[id][modules_changed][write_recent]...
+[STREAM_UPDATE] [OBJECT_COUNT]...[id][write_stream]									...[id][write_stream]...
 
-Additional message: 
-[MODULESET_INFO][id][STATE_MODULES_BITSET][STREAM_MODULES_BITSET]
-This will always induce object creation on the remote peer.
-It will also handle changes in STREAM_UPDATE data layout.
-It will now replace STATE_UPDATE completely unless we find a usecase.
 
 Explanation:
-STATE_UPDATE -  for state that can't be reproduced by just sending the last change and needs to be delta encoded.
-RECENT_UPDATE - for state that can be reproduced by just sending the last change, for example: health points, controlled object id.
-STREAM_UPDATE - for state that is constantly sent for almost every object, 
+MODULESET_INFO (in-order, reliable):
+This "could" be just named "NEW_OBJECTS", as it is to induce object creation on the remote peer.
+This may also change the modules attached to an existing object and thus change STREAM_UPDATE data layout.
+
+STATE_UPDATE (in-order, reliable): 
+For state that can't be reproduced by just sending the last change and needs to be delta encoded, for example: 
+a set of items in inventory or a set of squad waypoints drafted by the squad leader.
+
+RECENT_UPDATE (reliable sequenced):
+For state that can be reproduced by just sending the last change, for example: health points, controlled object id.
+
+STREAM_UPDATE (reliable sequenced if acking every update; otherwise (optimal): unreliable but acknowledged on demand):
+For state that is constantly sent per almost every object, 
 and thus it's too costly to send data layout on every update - in fact, we need to specify it only when it changes - for example,
-a player stops moving and does not need its pos/vel transmitted, but they still move their crosshairs.
+a player stops moving and does not need its pos/vel transmitted, yet they still move their crosshairs.
+So the layout in output bitstream changes from [id][pos][vel][orient] ---> [id][orient]
 
-Once the reliable_channel.lua detects that a sync_module has been acknowledged,
-it will issue a notification (MODULESET_INFO) that the moduleset for streaming has changed.
+Once the reliable_channel.lua detects that a [reliable sequenced message] for a given sync_module has been acknowledged,
+it will issue a notification (MODULESET_INFO) that the STREAM_MODULES_BITSET has changed.
 
-Here it will be best to create separate mappings for streaming-only modules and state modules.
+Here it will be best to create separate mappings for streaming-only modules and state-only modules.
 
 
 
@@ -545,7 +558,7 @@ in fact, state updates will be rare.
 most updates will be transferred in a sequenced reliable manner.
 
 IMPLEMENTATION:
-Firstly, make sync_modules simply components. They can still be accessed in-order, object-wise.
+Firstly, make sync_modules simply components. They can still be accessed object-wise.
 
 We also need to remember that if an object is synchronized differently across multiple clients (client.alternative_modules)
 then upon updating a module, we need to ensure that all objects variants are respectively updated, too.
@@ -553,9 +566,16 @@ then upon updating a module, we need to ensure that all objects variants are res
 Firstly, make delta-encoding for RECENT_UPDATE only module-wise. 
 This means the whole module is updated when something changes inside.
 
-If needed, we'll also implement it field-wise.
+When needed, we'll also implement field-wise delta.
 
 We still don't have any use-case for STATE_UPDATE other than creating entities and transferring moduleset bitfield.
+
+
+
+Later optimizations:
+
+optimized STREAM_UPDATE:
+[STREAM_UPDATE][OBJECT_ID_SET]...[write_stream]...[write_stream]...[write_stream]...
 
 -----------------------------------------------------
 VARIOUS RELIABILITY OPTIONS
@@ -565,3 +585,103 @@ what we have available:
 - per-message reliable in-order delivery
 - per-message reliable sequenced delivery
 - appended unreliable messages that we don't care about acknowledging
+
+
+
+
+------------------------------------------------------------------------------------------
+REPLICATION SYSTEM - FINAL PLAN
+------------------------------------------------------------------------------------------
+
+
+
+Look: Every object that contains only PODs (let it even be vec2's) can ALWAYS be replicated by just sending the last recent state (or "change").
+These objects should not contain vectors of objects.
+
+For example, every item in inventory should have its own ID, as well as every squad waypoint. 
+This of course assumes that we have enough IDs for all of our objects.
+Every magazine for the gun. Just let all of these simply hold its owner ID.
+
+If we need something like transmitting EVERY health change, e.g. for the sake of correctly displaying damage-numbers,
+we simply add a new transient event to the protocol and still synchronize the health by STATE_UPDATE.
+
+So we don't need to separate the concepts of STATE_UPDATE and RECENT_UPDATE. Let's only have STATE_UPDATE (which is, in fact, RECENT_UPDATE).
+
+for every sync_module, we'll have multiple reliable sequencing channels:
+one is: sync_module_STREAM, as this is of sufficient granularity
+and we'll have one sequencing channel per module field.
+
+Consider merging the concepts of STATE_UPDATE and STREAM_UPDATE. 
+
+Consider having an independent copy of modulesets per synchronized object inside every client object.
+This way we can control synchronization options individually per-client.
+
+Let's now merge the concepts of state_update and stream_update and optimize later.
+
+
+Assume there is a game object on the server that the players share.
+3 commands come at once that change the game object's state. Now comes the update phase.
+We iterate through clients, get their Area of Interest (let's now assume it is the whole world),
+create new objects, destroy the ones that went outside AoI, 
+then loop through their modules and see if the game object they are referring to has changed relevantly.
+
+First make difference-updates module-wise. Only then switch to checking for change in individual fields if bandwidth becomes too high.
+
+
+
+If an object does not change at all, don't iterate through all remote states for the client for performance.
+
+
+
+We could take a way different approach by just having a moduleset instance per GROUP per object (and not per-object-per-client).
+We could simply derive update rules from these groups and hold no internal space per client. That could possibly mean reliable in-order updates, but think about it.
+
+
+
+Best solution: Just create a single object instance per group, then replicate the object ONCE per group, and choose which replica to send to the client.
+Then in every group just check once which values have changed. Concatenate dirty flags these with found in remote_states table.
+The client then should only hold network-specific data like which modules (and fields) were already acknowledged, and not full object instances.
+
+
+If we introduce AoI, for the above to work we HAVE to assume that the object going outside AoI gets deleted on the client.
+
+
+Assign different type-id to a player-controlled character and different type-id to a remotely controlled character and let the server resolve the difference.
+
+
+What if an object existed for such a short period of time that we had both NEW_OBJECTS and DELETE_OBJECTS in a single update?
+What if we had reliable message stream like NEW_OBJECTS|SHOT_INFO|DELETE_OBJECT ? We should have an update separator.
+
+We'll read in-order reliable updates loop-by-loop, whereas the most recent state will be read only when there are no loops left.
+We should think about what to send by STATE_UPDATE and what to use reliable in-order delivery for.
+
+
+What if SHOT_INFO with id=X is posted before posting NEW_OBJECTS with id=X?
+For a case like this we would make "object-dependent events" - if an object is outside of client's AoI and we still get an event that needs the object's existence on the client,
+we would compose a stream like this: [NEW_OBJECTS][EVENT][DELETE_OBJECTS], whereas the object would:
+a) be created using a dedicated module_set.
+b) be created using a standard PUBLIC module_set.
+
+Redesign the way reliable messages are posted. (especially these existential)
+
+
+Note we don't have to force the server to preserve proper reliable message ordering - loop separators are enough and the client will handle given types of messages
+in a correct order since client-side loop is designed this way.
+
+To cope with object-dependent events we can simply create a table like client.one_time_AoI and when the event occurs, simply push the dependency's id there. 
+The table is then cleared in synchronization_system on every client's update.
+Note that to correctly reproduce the event we might need to reliably send the initial object state to the client, so an option to reliably send STATE_UPDATE's would be handy.
+Or even better, differentiate between reliable replica modules/fields. There's also this consideration if the object should be in another group if its outside of clients proximity. Perhaps.
+
+
+To cope with a [SHOT_INFO][NEW_OBJECTS][DELETE_OBJECTS] case, we can only ever delete pending entities when an update tick is called. 
+And then, send these delete events within the same loop separator.
+The thing is to always request a valid existent ids from synchronization_system:update_object_states
+
+If we call all systems, and thus generate events and post them reliably only during update pass, we are ensured that the server ticks are fully reproduced on the client.
+We would still handle incoming packets every loop but at the moment only post them as generic "game_messages" with timestamps.
+This could work better or worse under low tickrate conditions (especially considering physics),
+but maybe we only have to assure that the delete events are to be handled and posted only every update pass.
+Potential problem: if we then proceed to simulate the whole world with a higher tickrate, an object that was requested by the logic to be deleted might still exist for a several ticks and influence the logic.
+
+To handle transferring reliable in-order value changes (as we would need in case of controlled_object_id inside client_info)

@@ -21,8 +21,8 @@ function interpolation_system:update()
 		local new_position = self.targets[i].synchronization.modules.movement.position
 		local new_velocity = self.targets[i].synchronization.modules.movement.velocity
 		
-		self.targets[i].cpp_entity.physics.body:SetTransform(new_position, 0)
-		self.targets[i].cpp_entity.physics.body:SetLinearVelocity(new_velocity)
+		if new_position ~= nil then self.targets[i].cpp_entity.physics.body:SetTransform(new_position, 0) end
+		if new_velocity ~= nil then self.targets[i].cpp_entity.physics.body:SetLinearVelocity(new_velocity) end
 	end
 	--end
 end

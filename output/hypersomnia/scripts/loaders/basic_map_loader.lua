@@ -76,7 +76,7 @@ return function(map_filename, scene_object)
 	scene_object.legs_sets = create_all_legs_sets(scene_object.sprite_library)
 	scene_object.torso_sets = create_all_torso_sets(scene_object.sprite_library)
 	
-	scene_object.player = create_basic_player(scene_object, scene_object.teleport_position, scene_object.world_camera, scene_object.crosshair_sprite)
+	scene_object.player = create_controlled_player(scene_object, scene_object.teleport_position, scene_object.world_camera, scene_object.crosshair_sprite)
 	scene_object.simulation_player = create_simulation_player(scene_object.simulation_world)
 	
 	scene_object.player.body.animate.available_animations = scene_object.torso_sets["white"]["rifle"].set

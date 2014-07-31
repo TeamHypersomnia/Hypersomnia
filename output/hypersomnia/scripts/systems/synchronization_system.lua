@@ -8,35 +8,15 @@ function synchronization_system:constructor(owner_scene)
 end
 
 function synchronization_system:read_object_state(object, input_bs)
-	-- read what modules the entity has or have changed
-	local modules = object.synchronization.modules
+	-- read what modules have changed
+	local replica = object.synchronization.modules
 			
-	for i=1, #protocol.module_mappings do
-		input_bs:name_property("has_module " .. i)
-		if input_bs:ReadBit() then
-			local module_name = protocol.module_mappings[i]
-			
-			if modules[module_name] == nil then
-				modules[module_name] = sync_modules[module_name]:create()
-			end
-			
-			modules[module_name]:read_state(input_bs)
-		end
-	end
-end
-
-function synchronization_system:read_object_stream(object, input_bs)
-	-- assume all modules are streaming data in module_mappings order
-	-- some modules may specify they won't stream data for the moment and will send a notification via reliable state change
-	-- in which case both sides will know about it by the time altered stream data arrives
-	
-	local modules = object.synchronization.modules
-	
 	for i=1, #protocol.module_mappings do
 		local module_name = protocol.module_mappings[i]
-			
-		if modules[module_name] ~= nil then
-			modules[module_name]:read_stream(input_bs)
+		local module_object = replica[module_name]
+	
+		if module_object ~= nil then
+			module_object:read_state(object, input_bs)
 		end
 	end
 end
@@ -46,26 +26,45 @@ function synchronization_system:update_states_from_bitstream(msg)
 	
 	for i=1, msg.data.object_count do
 		input_bs:name_property("object_id")
-		local incoming_id = input_bs:ReadUshort()
 		
-		local is_object_new;
-		local object = self.object_by_id[incoming_id]
-		
-		if object == nil then
-			is_object_new = true
-			
-			-- create space for modules
-			object = { synchronization = { modules = {}, id = incoming_id } }
-		end	
+		local id = input_bs:ReadUshort()
+		protocol.LAST_READ_BITSTREAM = input_bs
+		local object = self.object_by_id[id]
 		
 		self:read_object_state(object, input_bs)
+	end
+end
+
+function synchronization_system:create_objects_or_change_modules(msg)
+	local input_bs = msg.input_bs
+	
+	for i=1, msg.data.object_count do
+		local new_object = {} 
+		protocol.read_sig(protocol.new_object_signature, new_object, input_bs)
 		
-		if is_object_new then
-			-- if the object was just created, create an entity before updating object state
+		local archetype_name = protocol.archetype_by_id[new_object.archetype_id]
+		
+		local object = self.object_by_id[new_object.id]
+		local replica = {}
+		
+		-- read what modules the replica has
+		for i=1, #protocol.module_mappings do
+			input_bs:name_property("has_module " .. i)
+			if input_bs:ReadBit() then
+				local module_name = protocol.module_mappings[i]
+				
+				replica[module_name] = replication_module:create(protocol.replication_tables[module_name])
+			end
+		end
 			
-			-- for now, simply create remote player object or player object if the id is ours
+		if object == nil then
+			-- create space for modules
+			object = { synchronization = { ["modules"] = replica, id = new_object.id } }
+			
 			local new_entity;
-			if incoming_id == self.my_sync_id then
+			
+			-- resolve the archetype
+			if archetype_name == "CONTROLLED_PLAYER" then
 				new_entity = components.create_components {
 					cpp_entity = self.owner_scene.player.body,
 					input_prediction = {
@@ -83,7 +82,7 @@ function synchronization_system:update_states_from_bitstream(msg)
 				new_entity.weapon:create_smoke_group(self.owner_scene.world_object.world)
 				new_entity.weapon.transmit_bullets = true
 				new_entity.cpp_entity.script = new_entity
-			else
+			elseif archetype_name == "REMOTE_PLAYER" then
 				local new_remote_player = create_remote_player(self.owner_scene, self.owner_scene.crosshair_sprite)
 				
 				new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["white"]["rifle"].set
@@ -105,65 +104,66 @@ function synchronization_system:update_states_from_bitstream(msg)
 				new_entity.weapon.bullet_entity.physics.body_info.filter = filters.REMOTE_BULLET
 				new_entity.weapon.constrain_requested_bullets = false
 				new_entity.weapon.transmit_bullets = false
+			elseif archetype_name == "CLIENT_INFO" then
+				new_entity = components.create_components {
+					client_info = {}
+				}
 			end
 			
-			-- save synchronization data (not as component)
+			-- save synchronization data (not as a component; just a table)
 			new_entity.synchronization = object.synchronization
 			
 			-- save the newly created entity
-			self.object_by_id[incoming_id] = new_entity
+			print "adding"
+			print(new_object.id)
+			self.object_by_id[new_object.id] = new_entity
 			self.owner_entity_system:add_entity(new_entity)
-		end
-		
-		-- we might consider offloading this part to separate systems
-		for k, v in pairs (object.synchronization.modules) do
-			v:update_game_object(object)
+		else
+			print "WARNING! Recreating an existing object (not implemented)"
 		end
 	end
 end
 
+function synchronization_system:get_variable_message_size(msg)
+	if msg.info.name == "STATE_UPDATE" then
+		return msg.data.bits
+	elseif msg.info.name == "NEW_OBJECTS" then
+		return msg.data.bits
+	end
+	
+	return 0
+end
 
-function synchronization_system:update_streams_from_bitstream(msg)
-	local input_bs = msg.input_bs
 
-	for i=1, msg.data.object_count do
-		input_bs:name_property("object_id")
-		-- we never read streams if there was reliable data attached and it got mismatched, so it is
-		-- safe to assume that streams always contain existing ids
-		self:read_object_stream(self.object_by_id[input_bs:ReadUshort()], input_bs)
+function synchronization_system:create_new_objects()
+	local msgs = self.owner_entity_system.messages["NEW_OBJECTS"]
+	
+	for i=1, #msgs do
+		self:create_objects_or_change_modules(msgs[i])
 	end
 end
 
-function synchronization_system:handle_variable_message(msg)
-	-- skip to the readable data of the moment
-	if msg.should_skip then
+function synchronization_system:update_object_states()
+	local msgs = self.owner_entity_system.messages["ASSIGN_SYNC_ID"]
+	
+	for i=1, #msgs do
+		self.my_sync_id = msgs[i].data.sync_id
+	end
+	
+	msgs = self.owner_entity_system.messages["STATE_UPDATE"]
+	
+	for i=1, #msgs do
+		self:update_states_from_bitstream(msgs[i])
+	end
+end
+
+function synchronization_system:delete_objects()
+	local msgs = self.owner_entity_system.messages["DELETE_OBJECT"]
+	
+	for i=1, #msgs do
+		local id = msgs[i].data.removed_id
+		self.owner_entity_system:remove_entity(self.object_by_id[id])
 		
-		if msg.info.name == "STATE_UPDATE" then
-		--print "skipping state"
-		--print (msg.data.bits)
-			msg.input_bs:IgnoreBits(msg.data.bits)
-		-- todo: only skip whole stream update if state update tells that
-		-- the data layout has changed
-		-- we may firstly read object ids for example
-		-- and only skip objects whose state has been modified
-		-- bad idea: we can't skip individual objects because of varying data layout.
-		elseif msg.info.name == "STREAM_UPDATE" then
-		--print "skipping stream"
-		--print (msg.data.bits)
-			msg.input_bs:IgnoreBits(msg.data.bits)
-		end
-	else
-		if msg.info.name == "STATE_UPDATE" then
-			self:update_states_from_bitstream(msg)
-		elseif msg.info.name == "STREAM_UPDATE" then
-			self:update_streams_from_bitstream(msg)
-		elseif msg.info.name == "ASSIGN_SYNC_ID" then
-			self.my_sync_id = msg.data.sync_id
-		elseif msg.info.name == "DELETE_OBJECT" then
-			local id = msg.data.removed_id
-			self.owner_entity_system:remove_entity(self.object_by_id[id])
-			
-			self.object_by_id[id] = nil
-		end
+		self.object_by_id[id] = nil
 	end
 end

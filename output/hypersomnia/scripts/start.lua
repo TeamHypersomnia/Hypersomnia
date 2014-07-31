@@ -6,8 +6,14 @@ dofile "hypersomnia\\scripts\\game\\camera.lua"
 
 dofile "hypersomnia\\scripts\\game\\weapons.lua"
 
+-- network defines
+dofile "hypersomnia\\scripts\\protocol.lua"
+
+dofile "hypersomnia\\scripts\\reliable_channel.lua"
+
 -- archetypes
-dofile "hypersomnia\\scripts\\archetypes\\basic_player.lua"
+dofile "hypersomnia\\scripts\\archetypes\\archetype_library.lua"
+dofile "hypersomnia\\scripts\\archetypes\\controlled_player.lua"
 dofile "hypersomnia\\scripts\\archetypes\\remote_player.lua"
 
 -- resource handling utilities

@@ -1,28 +1,9 @@
 protocol = {}
 
--- enables modules to be read/written correctly in order
-protocol.module_mappings = {
-	"movement",
-	"crosshair",
-	"orientation"
-}
-
 protocol.message_by_id = {
-	
 	{
-		name = "HIT_INFO",
-		data = {
-			"Ushort", "sender_id",
-			"Ushort", "victim_id",
-			"Uint", "bullet_id"
-		}
-	},
-	{
-		name = "HIT_REQUEST",
-		data = {
-			"Ushort", "victim_id",
-			"Uint", "bullet_id"
-		}
+		name = "LOOP_SEPARATOR",
+		data = {}
 	},
 	{
 		name = "SHOT_REQUEST",
@@ -36,9 +17,28 @@ protocol.message_by_id = {
 		data = {
 			"Ushort", "delay_time",
 			"Ushort", "subject_id",
+			-- global space id
+			"Uint", "random_seed",
 			"Uint", "starting_bullet_id",
 			"Vec2", "position",
 			"Float", "rotation"
+		}
+	},
+	{
+		name = "HIT_REQUEST",
+		data = {
+			"Ushort", "victim_id",
+			-- client-space id
+			"Uint", "bullet_id"
+		}
+	},
+	{
+		name = "HIT_INFO",
+		data = {
+			"Ushort", "victim_id",
+			-- global space id
+			-- the sender themself doesn't need a hit confirmation
+			"Uint", "bullet_id"
 		}
 	},
 	{
@@ -61,15 +61,22 @@ protocol.message_by_id = {
 		name = "CURRENT_STEP",
 		data = {
 			"Uint", "at_step"
-		},
-		read_unmatching = true
+		}
 	},
+	
 	{
 		name = "ASSIGN_SYNC_ID",
 		data = {
 			"Ushort", "sync_id"
+		}
+	},
+	{
+		name = "NEW_OBJECTS",
+		data = {
+			"Ushort", "bits",
+			"Ushort", "object_count"
 		},
-		read_immediately = true
+		variable_size = true
 	},
 	{
 		name = "STATE_UPDATE",
@@ -77,24 +84,19 @@ protocol.message_by_id = {
 			"Ushort", "bits",
 			"Ushort", "object_count"
 		},
-		read_immediately = true
+		variable_size = true
 	},
-	{
-		name = "STREAM_UPDATE",
-		data = {
-			"Ushort", "bits",
-			"Ushort", "object_count"
-		},
-		read_immediately = true
-	},
-	
 	{
 		name = "DELETE_OBJECT",
 		data = {
 			"Ushort", "removed_id"
-		},
-		read_immediately = true
+		}
 	}
+}
+
+protocol.new_object_signature = {
+	"Ushort", "id",
+	"Ushort", "archetype_id"
 }
 
 -- internals
@@ -111,17 +113,32 @@ for i=1, #protocol.message_by_id do
 	protocol.id_by_message[name] = i
 end	
 
+protocol.read_var = function(var_type, in_bs)
+	protocol.LAST_READ_BITSTREAM = in_bs
+	local out = in_bs["Read" .. var_type](in_bs)
+	
+	if var_type == "Bit" then
+		out = bool2int(out)
+	end
+	
+	return out
+end
+
+protocol.write_var = function(var_type, var, out_bs)
+	if var_type == "Bit" then
+		var = var > 0
+	end
+	
+	out_bs["Write" .. var_type](out_bs, var)
+end
+
 protocol.write_sig = function(sig, entry, out_bs)
 	for i=1, (#sig/2) do
 		local var_type = sig[i*2-1]
 		local var_name = sig[i*2]
 		
 		out_bs:name_property(var_name)
-		
-		if var_type == "Bit" then
-			entry[var_name] = entry[var_name] > 0
-		end
-		out_bs["Write" .. var_type](out_bs, entry[var_name])
+		protocol.write_var(var_type, entry[var_name], out_bs)
 	end
 end
 
@@ -144,18 +161,14 @@ protocol.read_sig = function(sig, out_entry, in_bs)
 		local var_name = sig[i*2]
 		
 		in_bs:name_property(var_name)
-		
-		out_entry[var_name] = in_bs["Read" .. var_type](in_bs)
-		
-		if var_type == "Bit" then
-			out_entry[var_name] = bool2int(out_entry[var_name])
-		end
+		out_entry[var_name] = protocol.read_var(var_type, in_bs)
 	end
 	
 	protocol.LAST_READ_BITSTREAM = in_bs
 end
 
 protocol.read_msg = function(in_bs, out_table)
+	protocol.LAST_READ_BITSTREAM = in_bs
 	local out_entry = out_table
 	
 	if out_entry == nil then

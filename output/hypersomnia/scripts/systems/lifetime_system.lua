@@ -7,10 +7,11 @@ end
 
 
 function lifetime_system:remove_entity(removed_entity)
-	local id = removed_entity.lifetime.bullet_id
+	local id = removed_entity.lifetime.global_id
 	
+	-- this is nil if the bullet was locally created
 	if id ~= nil then
-		removed_entity.lifetime.sender.weapon.existing_bullets[id] = nil
+		self.owner_entity_system.all_systems["bullet_creation"].remote_bullets[id] = nil
 	end
 
 	processing_system.remove_entity(self, removed_entity)
@@ -23,19 +24,18 @@ end
 function lifetime_system:translate_hit_infos()
 	local msgs = {}
 	local objects = self.owner_entity_system.all_systems["synchronization"].object_by_id
+	local bullet_creation = self.owner_entity_system.all_systems["bullet_creation"]
 
 	local hit_infos = self.owner_entity_system.messages["HIT_INFO"]
 
 	for i=1, #hit_infos do
 		local msg = hit_infos[i]
 		print "received hit info"
-		print (msg.data.sender_id)
 		print (msg.data.victim_id)
 		print (msg.data.bullet_id)
 		
 		local victim = objects[msg.data.victim_id]
-		local sender = objects[msg.data.sender_id]
-		local bullet = objects[msg.data.sender_id].weapon.existing_bullets[msg.data.bullet_id]
+		local bullet = bullet_creation.remote_bullets[msg.data.bullet_id]
 		print (bullet ~= nil)
 		
 		local new_collision = {}
@@ -49,19 +49,18 @@ function lifetime_system:translate_hit_infos()
 	
 		new_collision.collider = victim.cpp_entity
 		new_collision.point = vec2(victim.cpp_entity.transform.current.pos)
-		new_collision.sender = sender
 	    
 		table.insert(msgs, new_collision)
 	end
 	
-	self:resolve_collisions(msgs)
+	self:resolve_collisions(msgs, false)
 end
 
 function lifetime_system:poststep()
-	self:resolve_collisions(self.world_object:get_messages_filter_components("collision_message", { "lifetime" } ))
+	self:resolve_collisions(self.world_object:get_messages_filter_components("collision_message", { "lifetime" } ), true)
 end
 
-function lifetime_system:resolve_collisions(msgs)
+function lifetime_system:resolve_collisions(msgs, post_requests)
 	local client_sys = self.owner_entity_system.all_systems["client"]
 	local needs_send = false
 	
@@ -73,14 +72,14 @@ function lifetime_system:resolve_collisions(msgs)
 			local collider_script = message.collider.script
 			local lifetime = message.subject.script.lifetime
 		
-			if lifetime.sender.weapon.transmit_bullets 
+			if post_requests
 				and collider_script ~= nil and collider_script.synchronization ~= nil
 			then
 				needs_send = true
 				
 				client_sys.net_channel:post_reliable("HIT_REQUEST", {
 					victim_id = collider_script.synchronization.id,
-					bullet_id = lifetime.bullet_id
+					bullet_id = lifetime.local_id
 				})
 			end
 	

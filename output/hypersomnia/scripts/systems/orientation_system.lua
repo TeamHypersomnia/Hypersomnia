@@ -9,7 +9,7 @@ function orientation_system:update()
 		local target = self.targets[i]
 		local orientation = target.orientation
 		
-		if orientation.receiver then
+		if orientation.receiver and target.synchronization.modules.crosshair.position ~= nil then
 			orientation.crosshair_entity.transform.current.pos = target.synchronization.modules.crosshair.position + target.cpp_entity.transform.current.pos
 		else--if orientation:cmd_rate_ready() then
 			--orientation:cmd_rate_reset()

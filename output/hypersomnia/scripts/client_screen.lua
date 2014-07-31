@@ -1,8 +1,3 @@
-
-dofile "hypersomnia\\scripts\\protocol.lua"
-
-dofile "hypersomnia\\scripts\\reliable_channel.lua"
-
 dofile "hypersomnia\\scripts\\components\\orientation.lua"
 dofile "hypersomnia\\scripts\\components\\input_prediction.lua"
 dofile "hypersomnia\\scripts\\components\\interpolation.lua"
@@ -57,12 +52,13 @@ function client_screen:constructor(camera_rect)
 	self.systems.client = client_system:create(self.server)
 	self.systems.input_prediction = input_prediction_system:create(self.sample_scene.simulation_world)
 	self.systems.synchronization = synchronization_system:create(self.sample_scene)
-	self.systems.protocol = protocol_system:create(function(msg) self.systems.synchronization:handle_variable_message(msg) end,
-	
+	self.systems.protocol = protocol_system:create(function(msg) return self.systems.synchronization:get_variable_message_size(msg) end,
 	function (input_bs)
 		
-	end
-	)
+	end)
+	
+	self.systems.protocol.pack_updates = true
+
 	self.systems.lifetime = lifetime_system:create(self.sample_scene.world_object)
 	self.systems.interpolation = interpolation_system:create()
 	self.systems.orientation = orientation_system:create()
@@ -121,6 +117,13 @@ function client_screen:loop()
 	cpp_world:handle_physics()
 	
 	self.systems.protocol:handle_incoming_commands()
+	self.systems.protocol:unpack_oldest_loop()
+	
+	self.systems.synchronization:create_new_objects()
+
+	-- there's always one STATE_UPDATE per LOOP_SEPARATOR so it is valid to call this update now
+	-- as all objects have been created
+	self.systems.synchronization:update_object_states()
 	
 	self.systems.weapon:handle_messages()
 	
@@ -142,6 +145,8 @@ function client_screen:loop()
 	self.entity_system_instance:flush_messages()	
 	
 	cpp_world:process_all_systems()
+
+	self.systems.synchronization:delete_objects()
 
 	self.entity_system_instance:handle_removed_entities()
 	cpp_world:consume_events()

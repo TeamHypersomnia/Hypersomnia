@@ -5,9 +5,6 @@ function weapon_system:constructor(world_object, physics)
 	self.physics = physics
 	self.delta_timer = timer()
 	
-	self.random_seed = std_random_device()
-	self.random_generator = std_mt19937(self.random_seed)
-	
 	processing_system.constructor(self)
 end
 
@@ -34,7 +31,7 @@ function weapon_system:shot_routine(target, premade_shot)
 	local gun_transform = transform_state(entity.transform.current)
 	-- cancel out interpolation
 	gun_transform.pos = to_pixels(entity.physics.body:GetPosition())
-		
+	
 	if premade_shot ~= nil then
 		gun_transform.pos = premade_shot.position
 		gun_transform.rotation = premade_shot.rotation
@@ -63,27 +60,26 @@ function weapon_system:shot_routine(target, premade_shot)
 		["premade_shot"] = premade_shot,
 		bullets = {}
 	}
-		
-	self.random_generator:seed(weapon.next_bullet_id + target.synchronization.id*1000)
 	
 	for i=1, weapon.bullets_once do
-		local vel = vec2.from_degrees(
-			randval(
-			gun_transform.rotation - weapon.spread_degrees,
-			gun_transform.rotation + weapon.spread_degrees, self.random_generator))
-
-		barrel_transform.rotation = vel:get_degrees()
+		local function unpack_bullet(random_generator)
+			local vel = vec2.from_degrees(
+				randval(
+				gun_transform.rotation - weapon.spread_degrees,
+				gun_transform.rotation + weapon.spread_degrees, random_generator))
+	
+			barrel_transform.rotation = vel:get_degrees()
+				
+			vel = vel * randval(weapon.bullet_speed, random_generator)
 			
-		vel = vel * randval(weapon.bullet_speed, self.random_generator)
-
-		table.insert(new_shot_message.bullets, {
-			id = weapon.next_bullet_id,
-			pos = barrel_transform.pos,
-			rotation = barrel_transform.rotation,
-			["vel"] = vel
-		})	
+			return {
+				pos = barrel_transform.pos,
+				rotation = barrel_transform.rotation,
+				["vel"] = vel
+			}
+		end
 		
-		weapon.next_bullet_id = weapon.next_bullet_id + 1
+		table.insert(new_shot_message.bullets, unpack_bullet)
 	end
 	
 	-- client - produce visual output from wherever the shot originates and inform the server about the shot
@@ -117,12 +113,13 @@ function weapon_system:translate_shot_info_msgs()
 		local forward_time = msgs[i].data.delay_time + self.owner_entity_system.all_systems["client"]:get_last_ping()/2
 		--print(forward_time)
 		--print(subject.weapon.transmit_bullets)
-		subject.weapon.next_bullet_id = msgs[i].data.starting_bullet_id
-		
+		subject.weapon.random_seed = 
 		table.insert(subject.weapon.buffered_actions, { trigger = components.weapon.triggers.SHOOT, premade_shot = {
 			position = msgs[i].data.position,
 			rotation = msgs[i].data.rotation,
-			simulate_forward = forward_time
+			simulate_forward = forward_time,
+			starting_global_id = msgs[i].data.starting_bullet_id,
+			random_seed = msgs[i].data.random_seed
 		}})
 	end
 end
