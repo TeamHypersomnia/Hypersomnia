@@ -144,6 +144,7 @@ namespace bindings {
 			.def("GetReadOffset", &bitstream::GetReadOffset)
 			.def("GetNumberOfUnreadBits", &bitstream::GetNumberOfUnreadBits)
 
+			.def("WriteBits", &bitstream::WriteBits)
 			.def("WriteBitstream", &bitstream::WriteBitstream)
 			.def("WriteBit", &bitstream::WritePOD<bool>)
 			.def("WriteInt", &bitstream::WritePOD<int>)
@@ -207,6 +208,8 @@ namespace bindings {
 			.def_readwrite("received_unreliable_sequence", &reliable_receiver::received_unreliable_sequence)
 			.def_readwrite("message_indexing", &reliable_receiver::message_indexing)
 			.def_readwrite("ack_requested", &reliable_receiver::ack_requested)
+			.def_readwrite("last_message", &reliable_receiver::last_message)
+			.def_readwrite("first_message", &reliable_receiver::first_message)
 			.def("read_sequence", &reliable_receiver::read_sequence)
 			.def("write_ack", &reliable_receiver::write_ack),
 

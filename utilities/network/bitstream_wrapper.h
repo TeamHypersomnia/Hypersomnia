@@ -81,6 +81,13 @@ namespace augs {
 				content += '\n';
 			}
 
+			void WriteBits(bitstream& other, size_t n) {
+				stream.Write(other.stream, n);
+
+				content += '\n' + get_next_property() + std::string(" { \n") + other.content;
+				content += "\n}";
+			}
+
 			void WriteBitstream(const bitstream& other) {
 				if (other.stream.GetNumberOfBitsUsed() > 0) {
 					stream.WriteBits(other.stream.GetData(), other.stream.GetNumberOfBitsUsed(), false);

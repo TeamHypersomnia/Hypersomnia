@@ -391,7 +391,9 @@ function set_rate(target, what_rate, updates_per_second)
 	target[what_rate .. "_timer"] = timer()
 	
 	target[what_rate .. "_ready"] = function(self)
-		return self[what_rate .. "_timer"]:get_milliseconds() > self[what_rate .. "_interval_ms"]
+		local result = self[what_rate .. "_timer"]:get_milliseconds() > self[what_rate .. "_interval_ms"]
+		if result then self[what_rate .. "_reset"](self) end
+		return result
 	end
 	
 	target[what_rate .. "_reset"] = function(self)

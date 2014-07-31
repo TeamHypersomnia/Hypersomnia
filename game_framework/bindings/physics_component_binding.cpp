@@ -105,9 +105,11 @@ namespace bindings {
 			.def(luabind::constructor<float, float>())
 			.def(luabind::constructor<const b2Vec2&>())
 			.def(luabind::constructor<>())
+			.def("LengthSquared", &b2Vec2::LengthSquared)
+			.def("Length", &b2Vec2::Length)
 			.def_readwrite("x", &b2Vec2::x)
 			.def_readwrite("y", &b2Vec2::y),
-
+			
 			luabind::class_<b2Body>("b2Body")
 			.def("ApplyForce", &b2Body::ApplyForce)
 			.def("ApplyLinearImpulse", &b2Body::ApplyLinearImpulse)

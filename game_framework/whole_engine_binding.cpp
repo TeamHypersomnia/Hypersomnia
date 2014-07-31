@@ -108,6 +108,7 @@ namespace bindings {
 
 int the_callback(lua_State *L) {
 	std::string error_message(lua_tostring(L, -1));
+	std::cout << error_message << std::endl;
 	lua_getglobal(L, "debug");
 	lua_getfield(L, -1, "my_traceback");
 	lua_pushvalue(L, 1);
