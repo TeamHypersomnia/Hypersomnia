@@ -82,6 +82,8 @@ function replication_system:create_objects_or_change_modules(msg)
 						crosshair_entity = player_cpp_entity.crosshair
 					},
 					
+					health = {},
+					
 					weapon = self.owner_scene.weapons.shotgun
 				}
 				
@@ -102,6 +104,8 @@ function replication_system:create_objects_or_change_modules(msg)
 						receiver = true,
 						crosshair_entity = new_remote_player.crosshair
 					},
+					
+					health = {},
 					
 					weapon = self.owner_scene.weapons.shotgun
 				}

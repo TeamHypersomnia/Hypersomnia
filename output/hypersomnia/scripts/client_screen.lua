@@ -3,6 +3,7 @@ dofile "hypersomnia\\scripts\\components\\input_prediction.lua"
 dofile "hypersomnia\\scripts\\components\\interpolation.lua"
 dofile "hypersomnia\\scripts\\components\\weapon.lua"
 dofile "hypersomnia\\scripts\\components\\lifetime.lua"
+dofile "hypersomnia\\scripts\\components\\health.lua"
 
 dofile "hypersomnia\\scripts\\sync_modules\\modules.lua"
 dofile "hypersomnia\\scripts\\sync_modules\\movement_sync.lua"
@@ -17,6 +18,8 @@ dofile "hypersomnia\\scripts\\systems\\replication_system.lua"
 dofile "hypersomnia\\scripts\\systems\\weapon_system.lua"
 dofile "hypersomnia\\scripts\\systems\\bullet_creation_system.lua"
 dofile "hypersomnia\\scripts\\systems\\lifetime_system.lua"
+
+dofile "hypersomnia\\scripts\\systems\\health_system.lua"
 
 client_screen = inherits_from ()
 
@@ -64,6 +67,8 @@ function client_screen:constructor(camera_rect)
 	self.systems.orientation = orientation_system:create()
 	self.systems.weapon = weapon_system:create(self.sample_scene.world_object, self.sample_scene.world_object.physics_system)
 	self.systems.bullet_creation = bullet_creation_system:create(self.sample_scene.world_object, self.sample_scene.world_camera, self.sample_scene.simulation_world)
+	
+	self.systems.health = health_system:create(self.sample_scene)
 	
 	table.insert(self.sample_scene.world_object.prestep_callbacks, function (dt)
 		self.systems.input_prediction:substep()
@@ -141,6 +146,9 @@ function client_screen:loop()
 	-- hit info translation implies deleting some of the bullets so it is to be executed
 	-- after their potential creation (bullet_creation:update())
 	self.systems.lifetime:translate_hit_infos()
+		
+		
+	self.systems.health:update()
 		
 	self.entity_system_instance:flush_messages()	
 	
