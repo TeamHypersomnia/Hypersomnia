@@ -13,7 +13,7 @@ dofile "hypersomnia\\scripts\\systems\\interpolation_system.lua"
 dofile "hypersomnia\\scripts\\systems\\orientation_system.lua"
 dofile "hypersomnia\\scripts\\systems\\client_system.lua"
 dofile "hypersomnia\\scripts\\systems\\input_prediction_system.lua"
-dofile "hypersomnia\\scripts\\systems\\synchronization_system.lua"
+dofile "hypersomnia\\scripts\\systems\\replication_system.lua"
 dofile "hypersomnia\\scripts\\systems\\weapon_system.lua"
 dofile "hypersomnia\\scripts\\systems\\bullet_creation_system.lua"
 dofile "hypersomnia\\scripts\\systems\\lifetime_system.lua"
@@ -51,8 +51,8 @@ function client_screen:constructor(camera_rect)
 	self.systems = {}
 	self.systems.client = client_system:create(self.server)
 	self.systems.input_prediction = input_prediction_system:create(self.sample_scene.simulation_world)
-	self.systems.synchronization = synchronization_system:create(self.sample_scene)
-	self.systems.protocol = protocol_system:create(function(msg) return self.systems.synchronization:get_variable_message_size(msg) end,
+	self.systems.replication = replication_system:create(self.sample_scene)
+	self.systems.protocol = protocol_system:create(function(msg) return self.systems.replication:get_variable_message_size(msg) end,
 	function (input_bs)
 		
 	end)
@@ -119,11 +119,11 @@ function client_screen:loop()
 	self.systems.protocol:handle_incoming_commands()
 	self.systems.protocol:unpack_oldest_loop()
 	
-	self.systems.synchronization:create_new_objects()
+	self.systems.replication:create_new_objects()
 
 	-- there's always one STATE_UPDATE per LOOP_SEPARATOR so it is valid to call this update now
 	-- as all objects have been created
-	self.systems.synchronization:update_object_states()
+	self.systems.replication:update_object_states()
 	
 	self.systems.weapon:handle_messages()
 	
@@ -146,7 +146,7 @@ function client_screen:loop()
 	
 	cpp_world:process_all_systems()
 
-	self.systems.synchronization:delete_objects()
+	self.systems.replication:delete_objects()
 
 	self.entity_system_instance:handle_removed_entities()
 	cpp_world:consume_events()

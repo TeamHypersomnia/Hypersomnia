@@ -108,8 +108,8 @@ function weapon_system:translate_shot_info_msgs()
 	for i=1, #msgs do
 	--print "getting info"
 	--print(msgs[i].data.subject_id)
-	--print(self.owner_entity_system.all_systems["synchronization"].my_sync_id)
-		local subject = self.owner_entity_system.all_systems["synchronization"].object_by_id[msgs[i].data.subject_id]
+	--print(self.owner_entity_system.all_systems["replication"].my_sync_id)
+		local subject = self.owner_entity_system.all_systems["replication"].object_by_id[msgs[i].data.subject_id]
 		local forward_time = msgs[i].data.delay_time + self.owner_entity_system.all_systems["client"]:get_last_ping()/2
 		--print(forward_time)
 		--print(subject.weapon.transmit_bullets)

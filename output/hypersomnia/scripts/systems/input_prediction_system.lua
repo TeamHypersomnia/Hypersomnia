@@ -79,8 +79,8 @@ function input_prediction_system:update()
 		for i=1, #self.targets do
 			local at_step_sequence = recent_data.at_step+1
 			local target = self.targets[i]
-			local new_position = self.targets[i].synchronization.modules.movement.position
-			local new_velocity = self.targets[i].synchronization.modules.movement.velocity
+			local new_position = self.targets[i].replication.modules.movement.position
+			local new_velocity = self.targets[i].replication.modules.movement.velocity
 			-- we don't have more than one target at the moment
 			
 			local prediction = target.input_prediction

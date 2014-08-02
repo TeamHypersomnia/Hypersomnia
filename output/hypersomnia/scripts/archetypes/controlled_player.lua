@@ -134,6 +134,9 @@ function create_controlled_player(scene_object, position, target_camera, crossha
 		target_camera.camera.crosshair:set(player.crosshair)
 	end
 	
+	player.body.animate.available_animations = scene_object.torso_sets["white"]["rifle"].set
+	player.legs.animate.available_animations = scene_object.legs_sets["white"].set
+	
 	return player
 end
 

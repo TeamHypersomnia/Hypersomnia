@@ -52,7 +52,7 @@ function bullet_creation_system:update()
 		local premade_shot = msgs[i].premade_shot
 		
 		-- random seed for local shots
-		local random_seed = target.synchronization.id*10 + self.next_bullet_local_id
+		local random_seed = target.replication.id*10 + self.next_bullet_local_id
 		
 		-- this is a remote shot
 		if premade_shot ~= nil then

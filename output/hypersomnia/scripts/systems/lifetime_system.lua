@@ -23,7 +23,7 @@ end
 
 function lifetime_system:translate_hit_infos()
 	local msgs = {}
-	local objects = self.owner_entity_system.all_systems["synchronization"].object_by_id
+	local objects = self.owner_entity_system.all_systems["replication"].object_by_id
 	local bullet_creation = self.owner_entity_system.all_systems["bullet_creation"]
 
 	local hit_infos = self.owner_entity_system.messages["HIT_INFO"]
@@ -73,12 +73,12 @@ function lifetime_system:resolve_collisions(msgs, post_requests)
 			local lifetime = message.subject.script.lifetime
 		
 			if post_requests
-				and collider_script ~= nil and collider_script.synchronization ~= nil
+				and collider_script ~= nil and collider_script.replication ~= nil
 			then
 				needs_send = true
 				
 				client_sys.net_channel:post_reliable("HIT_REQUEST", {
-					victim_id = collider_script.synchronization.id,
+					victim_id = collider_script.replication.id,
 					bullet_id = lifetime.local_id
 				})
 			end

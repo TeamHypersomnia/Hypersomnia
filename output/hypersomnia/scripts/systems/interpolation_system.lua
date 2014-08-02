@@ -18,8 +18,8 @@ function interpolation_system:update()
 	--if new_step then
 	for i=1, #self.targets do
 		local target = self.targets[i]
-		local new_position = self.targets[i].synchronization.modules.movement.position
-		local new_velocity = self.targets[i].synchronization.modules.movement.velocity
+		local new_position = self.targets[i].replication.modules.movement.position
+		local new_velocity = self.targets[i].replication.modules.movement.velocity
 		
 		if new_position ~= nil then self.targets[i].cpp_entity.physics.body:SetTransform(new_position, 0) end
 		if new_velocity ~= nil then self.targets[i].cpp_entity.physics.body:SetLinearVelocity(new_velocity) end

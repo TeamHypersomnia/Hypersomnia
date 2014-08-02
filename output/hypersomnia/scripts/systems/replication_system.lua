@@ -1,15 +1,15 @@
-synchronization_system = inherits_from (processing_system)
+replication_system = inherits_from (processing_system)
 
-function synchronization_system:constructor(owner_scene)
+function replication_system:constructor(owner_scene)
 	self.object_by_id = {}
 	self.owner_scene = owner_scene
 
 	processing_system.constructor(self)
 end
 
-function synchronization_system:read_object_state(object, input_bs)
+function replication_system:read_object_state(object, input_bs)
 	-- read what modules have changed
-	local replica = object.synchronization.modules
+	local replica = object.replication.modules
 			
 	for i=1, #protocol.module_mappings do
 		local module_name = protocol.module_mappings[i]
@@ -21,7 +21,7 @@ function synchronization_system:read_object_state(object, input_bs)
 	end
 end
 
-function synchronization_system:update_states_from_bitstream(msg)
+function replication_system:update_states_from_bitstream(msg)
 	local input_bs = msg.input_bs
 	
 	for i=1, msg.data.object_count do
@@ -35,7 +35,7 @@ function synchronization_system:update_states_from_bitstream(msg)
 	end
 end
 
-function synchronization_system:create_objects_or_change_modules(msg)
+function replication_system:create_objects_or_change_modules(msg)
 	local input_bs = msg.input_bs
 	
 	for i=1, msg.data.object_count do
@@ -59,21 +59,27 @@ function synchronization_system:create_objects_or_change_modules(msg)
 			
 		if object == nil then
 			-- create space for modules
-			object = { synchronization = { ["modules"] = replica, id = new_object.id } }
+			object = { replication = { ["modules"] = replica, id = new_object.id } }
 			
 			local new_entity;
 			
 			-- resolve the archetype
 			if archetype_name == "CONTROLLED_PLAYER" then
+				local player_cpp_entity = create_controlled_player(
+				self.owner_scene,
+				self.owner_scene.teleport_position, 
+				self.owner_scene.world_camera, 
+				self.owner_scene.crosshair_sprite)
+	
 				new_entity = components.create_components {
-					cpp_entity = self.owner_scene.player.body,
+					cpp_entity = player_cpp_entity.body,
 					input_prediction = {
 						simulation_entity = self.owner_scene.simulation_player
 					},
 					
 					orientation = {
 						receiver = false,
-						crosshair_entity = self.owner_scene.player.crosshair
+						crosshair_entity = player_cpp_entity.crosshair
 					},
 					
 					weapon = self.owner_scene.weapons.shotgun
@@ -110,8 +116,8 @@ function synchronization_system:create_objects_or_change_modules(msg)
 				}
 			end
 			
-			-- save synchronization data (not as a component; just a table)
-			new_entity.synchronization = object.synchronization
+			-- save replication data (not as a component; just a table)
+			new_entity.replication = object.replication
 			
 			-- save the newly created entity
 			print "adding"
@@ -124,7 +130,7 @@ function synchronization_system:create_objects_or_change_modules(msg)
 	end
 end
 
-function synchronization_system:get_variable_message_size(msg)
+function replication_system:get_variable_message_size(msg)
 	if msg.info.name == "STATE_UPDATE" then
 		return msg.data.bits
 	elseif msg.info.name == "NEW_OBJECTS" then
@@ -135,7 +141,7 @@ function synchronization_system:get_variable_message_size(msg)
 end
 
 
-function synchronization_system:create_new_objects()
+function replication_system:create_new_objects()
 	local msgs = self.owner_entity_system.messages["NEW_OBJECTS"]
 	
 	for i=1, #msgs do
@@ -143,7 +149,7 @@ function synchronization_system:create_new_objects()
 	end
 end
 
-function synchronization_system:update_object_states()
+function replication_system:update_object_states()
 	local msgs = self.owner_entity_system.messages["ASSIGN_SYNC_ID"]
 	
 	for i=1, #msgs do
@@ -157,7 +163,7 @@ function synchronization_system:update_object_states()
 	end
 end
 
-function synchronization_system:delete_objects()
+function replication_system:delete_objects()
 	local msgs = self.owner_entity_system.messages["DELETE_OBJECT"]
 	
 	for i=1, #msgs do
