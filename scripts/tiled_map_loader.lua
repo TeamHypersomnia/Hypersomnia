@@ -241,7 +241,11 @@ tiled_map_loader = {
 			})
 		end
 		
-		return override(this_type_table.entity_archetype, final_entity_table)
+		if this_type_table.entity_archetype ~= nil then
+			final_entity_table = override(this_type_table.entity_archetype, final_entity_table)
+		end
+		
+		return final_entity_table
 	end,
 	
 	create_entities_from_map = function (map_filename, owner_world)	

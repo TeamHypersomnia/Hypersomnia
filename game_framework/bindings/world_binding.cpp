@@ -15,20 +15,16 @@
 #include "misc/vector_wrapper.h"
 
 template <typename T>
-std::vector<T> get_message_queue_for_scripts(world& owner) {
-	std::vector<T> msgs = owner.get_message_queue<T>();
-	
-	msgs.erase(std::remove_if(msgs.begin(), msgs.end(), [](const T& msg){
-		return !msg.send_to_scripts;
-	}), msgs.end());
-
-	return msgs;
+std::vector<T>& get_message_queue_for_scripts(world& owner) {
+	return owner.get_message_queue<T>();
 }
 
 namespace bindings {
 	luabind::scope _world() {
 		return
 			augs::misc::vector_wrapper<destroy_message>::bind_vector("destroy_message_vector"),
+			augs::misc::vector_wrapper<animate_message>::bind_vector("animate_message_vector"),
+			augs::misc::vector_wrapper<particle_burst_message>::bind_vector("particle_burst_message_vector"),
 			augs::misc::vector_wrapper<collision_message>::bind_vector("collision_message_vector"),
 			augs::misc::vector_wrapper<damage_message>::bind_vector("damage_message_vector"),
 			augs::misc::vector_wrapper<intent_message>::bind_vector("intent_message_vector"),
@@ -58,6 +54,8 @@ namespace bindings {
 			luabind::def("get_collision_message_queue", get_message_queue_for_scripts<collision_message>),
 			luabind::def("get_damage_message_queue", get_message_queue_for_scripts<damage_message>),
 			luabind::def("get_intent_message_queue", get_message_queue_for_scripts<intent_message>),
+			luabind::def("get_particle_burst_message_queue", get_message_queue_for_scripts<particle_burst_message>),
+			luabind::def("get_animate_message_queue", get_message_queue_for_scripts<animate_message>),
 			luabind::def("get_shot_message_queue", get_message_queue_for_scripts<shot_message>);
 	}
 }

@@ -1,6 +1,7 @@
 entity_system = inherits_from ()
 
-function entity_system:constructor()
+function entity_system:constructor(deletes_caller)
+	self.deletes_caller = deletes_caller
 	self.all_systems = {}
 	self.messages = {}
 	
@@ -47,6 +48,8 @@ function entity_system:handle_removed_entities()
 	end
 	
 	self.to_be_removed = {}
+	
+	self.deletes_caller()
 end
 
 function entity_system:for_all_matching_systems(component_set, callback)

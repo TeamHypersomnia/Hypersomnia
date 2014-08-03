@@ -116,11 +116,6 @@ function world_class:clear_queue(message_name)
 	self:get_messages(message_name):clear()
 end
 
-function world_class:flush_messages()
-	self.world_inst.world:validate_delayed_messages()
-	self.world_inst.world:flush_message_queues()
-end
-
 function world_class:handle_input()
 	local my_instance = self.world_inst
 	local world = my_instance.world
@@ -169,15 +164,22 @@ function world_class:process_all_systems()
 	return steps_made
 end
 
+function world_class:call_deletes()
+	local my_instance = self.world_inst
+	local world = my_instance.world
+	
+	my_instance.destroy_system:consume_events(world)
+end
+
 function world_class:consume_events()
+	self.world_inst.world:validate_delayed_messages()
+	
 	local my_instance = self.world_inst
 	local world = my_instance.world
 	
 	my_instance.camera_system:consume_events(world)
 	
 	self:handle_message_callbacks()
-	
-	my_instance.destroy_system:consume_events(world)
 	
 	if not self.is_paused then
 		my_instance.movement_system:consume_events(world)
@@ -190,7 +192,9 @@ function world_class:consume_events()
 		my_instance.particle_emitter_system:consume_events(world)
 	end
 	
-	self:flush_messages()
+	self:clear_queue("intent_message")
+	self:clear_queue("particle_burst_message")
+	self:clear_queue("animate_message")
 end
 
 function world_class:render()

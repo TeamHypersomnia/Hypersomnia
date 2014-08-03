@@ -1,35 +1,6 @@
 -- Create a new class that inherits from a base class
 --
 
-function table.shuffle(array)
-    local n = #array
-    for i = n, 2, -1 do
-        local j = randval_i(1, i)
-        array[i], array[j] = array[j], array[i]
-    end
-    return array
-end
-
-function table.compare(a, bigger, omit_properties)
-	if omit_properties == nil then
-		for k, v in pairs(a) do
-			if a[k] ~= bigger[k] then
-				return false
-			end
-		end
-	else
-		for k, v in pairs(a) do
-			if omit_properties[k] == nil then
-				if a[k] ~= bigger[k] then
-					return false
-				end
-			end
-		end
-	end
-	
-	return true
-end
-
 function coroutine.wait_routine(my_timer, ms_wait, loop_func, constant_delta)
 	if constant_delta == nil then constant_delta = false end
 
@@ -108,8 +79,6 @@ function inherits_from(baseClass)
 
     return new_class
 end
-
-
 
 function rewrite(component, entry, omit_properties)
 	if omit_properties == nil then
@@ -449,4 +418,22 @@ function debuglcb2(c, col, pos, pos2)
 	else
 		debugl(c, col, vec2(pos.x*METERS_TO_PIXELS, pos.y*METERS_TO_PIXELS), vec2(pos2.x*METERS_TO_PIXELS, pos2.y*METERS_TO_PIXELS))
 	end
+end
+
+array_shuffler = inherits_from()
+
+function array_shuffler:constructor(array)
+	self.array = table.shuffle(array)
+	self.current_index = 1
+end
+
+function array_shuffler:next_value()
+	if self.current_index > #self.array then
+		self.current_index = 1
+		self.array = table.shuffle(self.array)
+	end
+
+	local out = self.array[self.current_index]
+	self.current_index = self.current_index + 1
+	return out
 end

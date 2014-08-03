@@ -27,3 +27,32 @@ end
 function clone_table(entries)
 	return override(entries, {})
 end
+
+function table.shuffle(array)
+    local n = #array
+    for i = n, 2, -1 do
+        local j = randval_i(1, i)
+        array[i], array[j] = array[j], array[i]
+    end
+    return array
+end
+
+function table.compare(a, bigger, omit_properties)
+	if omit_properties == nil then
+		for k, v in pairs(a) do
+			if a[k] ~= bigger[k] then
+				return false
+			end
+		end
+	else
+		for k, v in pairs(a) do
+			if omit_properties[k] == nil then
+				if a[k] ~= bigger[k] then
+					return false
+				end
+			end
+		end
+	end
+	
+	return true
+end
