@@ -15,7 +15,7 @@ return {
   layers = {
     {
       type = "objectgroup",
-      name = "Object Layer 1",
+      name = "objects",
       visible = true,
       opacity = 1,
       properties = {},
@@ -37,17 +37,6 @@ return {
           shape = "rectangle",
           x = 736,
           y = 128,
-          width = 96,
-          height = 96,
-          visible = true,
-          properties = {}
-        },
-        {
-          name = "",
-          type = "teleport_position",
-          shape = "rectangle",
-          x = 736,
-          y = 736,
           width = 96,
           height = 96,
           visible = true,
@@ -129,7 +118,7 @@ return {
     {
       type = "objectgroup",
       name = "ground",
-      visible = true,
+      visible = false,
       opacity = 1,
       properties = {},
       objects = {
@@ -145,6 +134,114 @@ return {
           properties = {
             ["texture"] = "snow.jpg"
           }
+        }
+      }
+    },
+    {
+      type = "objectgroup",
+      name = "teleporters",
+      visible = true,
+      opacity = 1,
+      properties = {},
+      objects = {
+        {
+          name = "",
+          type = "teleport_position",
+          shape = "rectangle",
+          x = 192,
+          y = 160,
+          width = 96,
+          height = 96,
+          visible = true,
+          properties = {}
+        },
+        {
+          name = "",
+          type = "teleport_position",
+          shape = "rectangle",
+          x = 672,
+          y = 1344,
+          width = 96,
+          height = 96,
+          visible = true,
+          properties = {}
+        },
+        {
+          name = "",
+          type = "teleport_position",
+          shape = "rectangle",
+          x = 1280,
+          y = 1312,
+          width = 96,
+          height = 96,
+          visible = true,
+          properties = {}
+        },
+        {
+          name = "",
+          type = "teleport_position",
+          shape = "rectangle",
+          x = 1408,
+          y = 608,
+          width = 96,
+          height = 96,
+          visible = true,
+          properties = {}
+        },
+        {
+          name = "",
+          type = "teleport_position",
+          shape = "rectangle",
+          x = 128,
+          y = 1152,
+          width = 96,
+          height = 96,
+          visible = true,
+          properties = {}
+        },
+        {
+          name = "",
+          type = "teleport_position",
+          shape = "rectangle",
+          x = 320,
+          y = 1344,
+          width = 96,
+          height = 96,
+          visible = true,
+          properties = {}
+        },
+        {
+          name = "",
+          type = "teleport_position",
+          shape = "rectangle",
+          x = 832,
+          y = 1056,
+          width = 96,
+          height = 96,
+          visible = true,
+          properties = {}
+        },
+        {
+          name = "",
+          type = "teleport_position",
+          shape = "rectangle",
+          x = 704,
+          y = 640,
+          width = 96,
+          height = 96,
+          visible = true,
+          properties = {}
+        },
+        {
+          name = "",
+          type = "teleport_position",
+          shape = "rectangle",
+          x = 1312,
+          y = 160,
+          width = 96,
+          height = 96,
+          visible = true,
+          properties = {}
         }
       }
     }
