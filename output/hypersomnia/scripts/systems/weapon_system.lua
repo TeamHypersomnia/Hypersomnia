@@ -18,6 +18,8 @@ function weapon_system:remove_entity(new_entity)
 	if group ~= nil then
 		group.owner_world:delete_entity(group, nil)
 	end
+	
+	processing_system.remove_entity(self, new_entity)
 end
 
 
