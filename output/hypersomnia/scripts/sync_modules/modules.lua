@@ -77,6 +77,16 @@ function replication_module:replicate(object)
 end
 
 
+function replication_module:get_all_marked(next_sequence)
+	local out = {}
+	
+	for i=1, #self.replication_table.properties do
+		out[i] = next_sequence
+	end
+	
+	return out
+end
+
 function replication_module:update_flags(flags_table, next_sequence, ack_sequence)
 	-- firstly mark acked
 	for key, field_sequence in pairs(flags_table) do
