@@ -6,17 +6,7 @@
   <property name="type_library" value="basic_type_library.lua"/>
  </properties>
  <objectgroup name="objects" width="50" height="50">
-  <object type="wall_wood" x="576" y="544" width="320" height="64"/>
-  <object type="wall_wood" x="736" y="128" width="96" height="96"/>
-  <object type="wall_wood" x="480" y="896">
-   <polygon points="0,0 -160,-32 -320,128 -96,320"/>
-  </object>
-  <object type="wall_wood" x="1248" y="288">
-   <polygon points="0,0 64,224 -160,256 -160,-160"/>
-  </object>
-  <object type="wall_wood" x="800" y="992">
-   <polygon points="0,0 -288,320 -384,512 -192,576 224,544 608,576 800,480 736,192 736,-128 608,-256 480,-352 352,-320 448,-224 640,-96 640,160 544,288 672,416 544,480 320,384 224,480 0,480 -160,512 -288,416 0,192"/>
-  </object>
+  <object x="128" y="96" width="672" height="64"/>
  </objectgroup>
  <objectgroup name="ground" width="50" height="50" visible="0">
   <object type="ground" x="-320" y="-128" width="2208" height="1888">
@@ -24,8 +14,48 @@
     <property name="texture" value="snow.jpg"/>
    </properties>
   </object>
+  <object type="ground" x="1888" y="-128" width="2208" height="1888">
+   <properties>
+    <property name="texture" value="snow.jpg"/>
+   </properties>
+  </object>
+  <object type="ground" x="1888" y="-2016" width="2208" height="1888">
+   <properties>
+    <property name="texture" value="snow.jpg"/>
+   </properties>
+  </object>
+  <object type="ground" x="-320" y="-2016" width="2208" height="1888">
+   <properties>
+    <property name="texture" value="snow.jpg"/>
+   </properties>
+  </object>
+  <object type="ground" x="-2528" y="-2016" width="2208" height="1888">
+   <properties>
+    <property name="texture" value="snow.jpg"/>
+   </properties>
+  </object>
+  <object type="ground" x="-2528" y="-128" width="2208" height="1888">
+   <properties>
+    <property name="texture" value="snow.jpg"/>
+   </properties>
+  </object>
+  <object type="ground" x="-2528" y="1760" width="2208" height="1888">
+   <properties>
+    <property name="texture" value="snow.jpg"/>
+   </properties>
+  </object>
+  <object type="ground" x="1888" y="1760" width="2208" height="1888">
+   <properties>
+    <property name="texture" value="snow.jpg"/>
+   </properties>
+  </object>
+  <object type="ground" x="-320" y="1760" width="2208" height="1888">
+   <properties>
+    <property name="texture" value="snow.jpg"/>
+   </properties>
+  </object>
  </objectgroup>
- <objectgroup name="teleporters" width="50" height="50">
+ <objectgroup name="teleporters" width="50" height="50" visible="0">
   <object type="teleport_position" x="192" y="160" width="96" height="96"/>
   <object type="teleport_position" x="672" y="1344" width="96" height="96"/>
   <object type="teleport_position" x="1280" y="1312" width="96" height="96"/>

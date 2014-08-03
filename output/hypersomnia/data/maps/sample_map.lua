@@ -118,7 +118,7 @@ return {
     {
       type = "objectgroup",
       name = "ground",
-      visible = false,
+      visible = true,
       opacity = 1,
       properties = {},
       objects = {
@@ -128,6 +128,110 @@ return {
           shape = "rectangle",
           x = -320,
           y = -128,
+          width = 2208,
+          height = 1888,
+          visible = true,
+          properties = {
+            ["texture"] = "snow.jpg"
+          }
+        },
+        {
+          name = "",
+          type = "ground",
+          shape = "rectangle",
+          x = 1888,
+          y = -128,
+          width = 2208,
+          height = 1888,
+          visible = true,
+          properties = {
+            ["texture"] = "snow.jpg"
+          }
+        },
+        {
+          name = "",
+          type = "ground",
+          shape = "rectangle",
+          x = 1888,
+          y = -2016,
+          width = 2208,
+          height = 1888,
+          visible = true,
+          properties = {
+            ["texture"] = "snow.jpg"
+          }
+        },
+        {
+          name = "",
+          type = "ground",
+          shape = "rectangle",
+          x = -320,
+          y = -2016,
+          width = 2208,
+          height = 1888,
+          visible = true,
+          properties = {
+            ["texture"] = "snow.jpg"
+          }
+        },
+        {
+          name = "",
+          type = "ground",
+          shape = "rectangle",
+          x = -2528,
+          y = -2016,
+          width = 2208,
+          height = 1888,
+          visible = true,
+          properties = {
+            ["texture"] = "snow.jpg"
+          }
+        },
+        {
+          name = "",
+          type = "ground",
+          shape = "rectangle",
+          x = -2528,
+          y = -128,
+          width = 2208,
+          height = 1888,
+          visible = true,
+          properties = {
+            ["texture"] = "snow.jpg"
+          }
+        },
+        {
+          name = "",
+          type = "ground",
+          shape = "rectangle",
+          x = -2528,
+          y = 1760,
+          width = 2208,
+          height = 1888,
+          visible = true,
+          properties = {
+            ["texture"] = "snow.jpg"
+          }
+        },
+        {
+          name = "",
+          type = "ground",
+          shape = "rectangle",
+          x = 1888,
+          y = 1760,
+          width = 2208,
+          height = 1888,
+          visible = true,
+          properties = {
+            ["texture"] = "snow.jpg"
+          }
+        },
+        {
+          name = "",
+          type = "ground",
+          shape = "rectangle",
+          x = -320,
+          y = 1760,
           width = 2208,
           height = 1888,
           visible = true,

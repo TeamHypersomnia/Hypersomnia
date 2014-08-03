@@ -14,7 +14,7 @@ end
 function health_system:add_entity(new_entity)
 	new_entity.health.health_bar_sprite = create_sprite {
 		image = self.owner_scene.sprite_library["blank"],
-		color = rgba(0, 255, 0, 255)
+		color = rgba(0, 194, 0, 255)
 	}
 	
 	new_entity.health.under_bar_sprite = create_sprite {
@@ -61,8 +61,9 @@ function health_system:update()
 	for i=1, #self.targets do
 		local health = self.targets[i].health
 		
-		health.under_bar_sprite.size = vec2(100, 3)
+		health.under_bar_sprite.size = vec2(102, 5)
 		health.health_bar_sprite.size = vec2(health.hp, 3)
+		health.health_bar_sprite.color = rgba(255*(1-health.hp/100), 194*health.hp/100, 0, 255)
 		health.health_bar_entity.chase.offset.x = - (100-health.hp)/2
 	end
 end

@@ -1,6 +1,6 @@
 config_table = {
 	window_name = "example",
-	fullscreen = 0,
+	fullscreen = 1,
 	window_border = 1,
 	window_x = 0,
 	window_y = 0,
@@ -11,7 +11,7 @@ config_table = {
 	
 	sensitivity = vec2(2.5, 2.5),
 	
-	server_address = "127.0.0.1",
+	server_address = "25.197.86.75",
 	server_port = 37017,
 	
 	multiple_clients_view = 0,

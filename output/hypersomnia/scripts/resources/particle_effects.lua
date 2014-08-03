@@ -19,7 +19,7 @@ function create_particle_effects(scene)
 	particles.blood_piece = {
 		angular_damping = 1000,
 		linear_damping = 80500,
-		should_disappear = false,
+		should_disappear = true,
 	}
 	
 	particles.blood_templates = {
@@ -216,6 +216,8 @@ function create_particle_effects(scene)
 		size_multiplier = minmax(0.25, 0.65),
 		initial_rotation_variation = 180,
 		
+		particle_lifetime_ms = minmax(4250, 20550),
+		
 		particle_render_template = { 
 			layer = render_layers.ON_GROUND
 		}
@@ -350,8 +352,8 @@ function create_particle_effects(scene)
 	}
 	
 	particles.blood_effect = {
-		particles.blood_shower,
 		particles.blood_shower
+		--particles.blood_shower
 		--blood_pool,
 		--blood_droplets
 	}
