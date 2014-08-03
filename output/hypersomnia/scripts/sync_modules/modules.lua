@@ -2,8 +2,8 @@
 protocol.module_mappings = {
 	--"client_info",
 	"movement",
-	"crosshair"--,
-	--"orientation"
+	"crosshair",
+	"health"
 }
 
 protocol.replication_tables = {}
@@ -69,6 +69,7 @@ function replication_module:replicate(object)
 			then
 			
 			-- variable is a subject to rentransmission if it changed while being within somebody's AoI
+			-- objects outside AoI are dropped
 			self.has_variable_changed[i] = true
 			self[i] = real_gameobject_value
 		end

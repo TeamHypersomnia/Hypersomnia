@@ -64,8 +64,8 @@ function protocol_system:handle_incoming_commands()
 			
 		end
 		
-		--transmission_log:write("How many to skip... " .. how_many_to_skip .. "\n")
-		--transmission_log:write(input_bs.read_report)
+		transmission_log:write("How many to skip... " .. how_many_to_skip .. "\n")
+		transmission_log:write(input_bs.read_report)
 		--print("Result: " .. how_many_to_skip .. "\n" .. input_bs.read_report)
 			
 		--if result == receive_result.RELIABLE_RECEIVED then

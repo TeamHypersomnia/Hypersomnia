@@ -44,5 +44,9 @@ return {
 		render_layer = "OBJECTS",
 		texture = "crate.jpg",
 		entity_archetype = dynamic_object_archetype
+	},
+	
+	ground = {
+		render_layer = "GROUND"
 	}
 }

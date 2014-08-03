@@ -34,9 +34,9 @@ function input_prediction_system:substep()
 			prediction.count = prediction.count - 1
 		end
 		
-		for j=prediction.first_state, prediction.first_state+prediction.count-1 do
-			debuglb2(rgba(255, 255, 255, 255), prediction.state_history[j].position)
-		end
+		--for j=prediction.first_state, prediction.first_state+prediction.count-1 do
+		--	debuglb2(rgba(255, 255, 255, 255), prediction.state_history[j].position)
+		--end
 		
 		
 		if prediction.count <= 1 or not table.compare(history_entry, prediction.state_history[prediction.first_state + prediction.count - 2], { position = true } ) 
@@ -141,10 +141,10 @@ function input_prediction_system:update()
 				
 				prediction.state_history = new_state_history
 				
-				clearlc(1)
-				debuglc(1, rgba(255, 0, 0, 255), to_pixels(new_position), to_pixels(new_position) + to_pixels(new_velocity) )
+				--clearlc(1)
+				--debuglc(1, rgba(255, 0, 0, 255), to_pixels(new_position), to_pixels(new_position) + to_pixels(new_velocity) )
 				--debuglc(1, rgba(0, 255, 0, 255), to_pixels(correct_from.position), to_pixels(correct_from.position) + to_pixels(correct_from.vel))
-				debuglc(1, rgba(0, 255, 255, 255), to_pixels(corrected_pos), (to_pixels(corrected_vel) + to_pixels(corrected_pos)))
+				--debuglc(1, rgba(0, 255, 255, 255), to_pixels(corrected_pos), (to_pixels(corrected_vel) + to_pixels(corrected_pos)))
 			end
 		end
 	end

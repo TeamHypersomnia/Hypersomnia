@@ -22,13 +22,24 @@ return function(map_filename, scene_object)
 	
 	create_particle_effects(scene_object)
 	
+	local function basic_table(object)
+		return tiled_map_loader.basic_entity_table(object, type_table_by_object[object], scene_object.resource_storage, scene_object.world_camera, scene_object.texture_by_filename)
+	end
+	
+	local background_objects = get_all_objects { "ground" }
+	for i = 1, #background_objects do
+		local object = background_objects[i]
+		world:create_entity (basic_table(object))
+	end
+	
 	-- initialize environmental physical objects
 	local environmental_objects = get_all_objects { "wall_wood", "crate" }
 	
 	for i = 1, #environmental_objects do
 		local object = environmental_objects[i]
 		
-		local new_entity = tiled_map_loader.basic_entity_table(object, type_table_by_object[object], scene_object.resource_storage, scene_object.world_camera, scene_object.texture_by_filename)
+		local new_entity = basic_table(object)
+		
 		new_entity.particle_emitter = {
 			available_particle_effects = scene_object.particles.metal_effects
 		}

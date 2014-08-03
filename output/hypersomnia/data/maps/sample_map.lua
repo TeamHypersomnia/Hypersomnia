@@ -125,6 +125,28 @@ return {
           properties = {}
         }
       }
+    },
+    {
+      type = "objectgroup",
+      name = "ground",
+      visible = true,
+      opacity = 1,
+      properties = {},
+      objects = {
+        {
+          name = "",
+          type = "ground",
+          shape = "rectangle",
+          x = -320,
+          y = -128,
+          width = 2208,
+          height = 1888,
+          visible = true,
+          properties = {
+            ["texture"] = "snow.jpg"
+          }
+        }
+      }
     }
   }
 }

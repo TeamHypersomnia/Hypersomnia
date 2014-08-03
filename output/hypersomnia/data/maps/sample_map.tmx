@@ -19,4 +19,11 @@
    <polygon points="0,0 -288,320 -384,512 -192,576 224,544 608,576 800,480 736,192 736,-128 608,-256 480,-352 352,-320 448,-224 640,-96 640,160 544,288 672,416 544,480 320,384 224,480 0,480 -160,512 -288,416 0,192"/>
   </object>
  </objectgroup>
+ <objectgroup name="ground" width="50" height="50">
+  <object type="ground" x="-320" y="-128" width="2208" height="1888">
+   <properties>
+    <property name="texture" value=""/>
+   </properties>
+  </object>
+ </objectgroup>
 </map>
