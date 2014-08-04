@@ -172,7 +172,7 @@ function replication_system:delete_objects()
 	
 	for i=1, #msgs do
 		local id = msgs[i].data.removed_id
-		self.owner_entity_system:remove_entity(self.object_by_id[id])
+		self.owner_entity_system:post_remove(self.object_by_id[id])
 		
 		self.object_by_id[id] = nil
 	end

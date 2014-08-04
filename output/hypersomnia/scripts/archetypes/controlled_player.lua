@@ -73,7 +73,8 @@ function create_controlled_player(scene_object, position, target_camera, crossha
 			movement = player_movement_component,
 		 
 			children = {
-				"legs"
+				"legs",
+				"crosshair"
 			}
 		},
 	

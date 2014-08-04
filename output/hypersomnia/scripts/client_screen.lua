@@ -151,13 +151,14 @@ function client_screen:loop()
 		
 	self.systems.health:update()
 		
-	self.entity_system_instance:flush_messages()	
 	
 	cpp_world:process_all_systems()
 
 	self.systems.replication:delete_objects()
 
 	self.entity_system_instance:handle_removed_entities()
+	
+	self.entity_system_instance:flush_messages()	
 	
 	cpp_world:consume_events()
 	cpp_world:render()

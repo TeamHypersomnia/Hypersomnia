@@ -51,8 +51,9 @@ function health_system:add_entity(new_entity)
 end
 
 function health_system:remove_entity(removed_entity)
-	self.owner_world:delete_entity(removed_entity.health.under_bar_entity)
-	self.owner_world:delete_entity(removed_entity.health.health_bar_entity)
+	local owner_world = removed_entity.cpp_entity.owner_world
+	owner_world:post_message(destroy_message(removed_entity.health.under_bar_entity, nil))
+	owner_world:post_message(destroy_message(removed_entity.health.health_bar_entity, nil))
 	
 	processing_system.remove_entity(self, removed_entity)
 end

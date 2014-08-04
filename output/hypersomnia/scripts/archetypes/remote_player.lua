@@ -58,7 +58,8 @@ function create_remote_player(owner_scene, crosshair_sprite)
 			},
 		 
 			children = {
-				"legs"
+				"legs",
+				"crosshair"
 			}
 		},
 		
