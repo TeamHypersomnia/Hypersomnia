@@ -240,6 +240,7 @@ namespace bindings {
 			.def("enable_lag", &network_interface::enable_lag)
 			.def("get_last_ping", &network_interface::get_last_ping)
 			.def("get_average_ping", &network_interface::get_average_ping)
+			.def("set_timeout_all", &network_interface::set_timeout_all)
 			.def("close_connection", &network_interface::close_connection)
 			.def("shutdown", &network_interface::shutdown)
 			.def("send", &network_interface::send)

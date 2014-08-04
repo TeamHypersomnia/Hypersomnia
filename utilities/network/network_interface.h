@@ -44,6 +44,9 @@ namespace augs {
 			int get_last_ping(const RakNet::RakNetGUID&);
 			int get_average_ping(const RakNet::RakNetGUID&);
 
+			void set_timeout(unsigned ms, const RakNet::SystemAddress&);
+			void set_timeout_all(unsigned ms);
+
 			unsigned send(bitstream&, int priority, int reliability, int channel, RakNet::RakNetGUID target, bool broadcast);
 
 			network_interface(const network_interface&) = delete;

@@ -144,6 +144,10 @@ function world_class:create_entity(entry)
 	return set_components_from_entry(self.world:create_entity(), entry, {})
 end
 
+function world_class:delete_entity(what_entity, redirect)
+	self.world:delete_entity(what_entity, redirect)
+end
+
 function world_class:create_entity_group(entries)
 	local entities_lookup = {}
 	

@@ -41,6 +41,14 @@ namespace augs {
 			return peer->GetAveragePing(g);
 		}
 
+		void network_interface::set_timeout(unsigned ms, const RakNet::SystemAddress& target) {
+			peer->SetTimeoutTime(ms, target);
+		}
+
+		void network_interface::set_timeout_all(unsigned ms) {
+			set_timeout(ms, RakNet::UNASSIGNED_SYSTEM_ADDRESS);
+		}
+
 		void network_interface::packet::destroy() {
 			if (owner && info)
 				owner->DeallocatePacket(info);
