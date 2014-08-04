@@ -131,6 +131,13 @@ function replication_system:create_objects_or_change_modules(msg)
 		else
 			print "WARNING! Recreating an existing object (not implemented)"
 		end
+		
+		for i=1, #protocol.module_mappings do
+			local module_name = protocol.module_mappings[i]
+			if replica[module_name] ~= nil then
+				replica[module_name]:read_initial_state(object, input_bs)
+			end
+		end
 	end
 end
 

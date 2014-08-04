@@ -38,10 +38,10 @@ function create_replication_properties(entry)
 	return output
 end
 
-function create_replication_table(entry, optional_updaters, initial_variables)
+function create_replication_table(entry, optional_updaters, init_only_fields)
 	local output = { 
 		properties = create_replication_properties (entry), 
-		initial_variables = create_replication_properties (initial_variables), 
+		["init_only_fields"] = create_replication_properties (init_only_fields), 
 		updaters = optional_updaters
 	}
 	
@@ -59,6 +59,32 @@ replication_module = inherits_from ()
 
 function replication_module:constructor(replication_table)
 	self.replication_table = replication_table
+end
+
+function replication_module:write_initial_state(object, output_bs)
+	-- this time, replicate as we go
+	local properties = self.replication_table.init_only_fields
+	
+	for i=1, #properties do
+		local field = properties[i]
+		
+		local real_gameobject_value = field.replication_func(object)
+				
+		output_bs:name_property(field.name)
+		protocol.write_var(field.type, real_gameobject_value, output_bs)
+	end
+end
+
+
+function replication_module:read_initial_state(object, input_bs)
+	local properties = self.replication_table.init_only_fields
+	
+	for i=1, #properties do
+		local field = properties[i]
+		
+		self[field.name] = protocol.read_var(field.type, input_bs)
+		self:call_updater(object, field)
+	end
 end
 
 function replication_module:replicate(object)
@@ -112,12 +138,14 @@ function replication_module:update_flags(flags_table, next_sequence, ack_sequenc
 end
 
 function replication_module:write_state(which_fields, output_bs)
+	local properties = self.replication_table.properties
+	if #properties <= 0 then return false end
+	
 	local module_changed = next(which_fields) ~= nil
 	
 	output_bs:name_property("has module changed")
 	output_bs:WriteBit(module_changed)
 	
-	local properties = self.replication_table.properties
 	
 	if module_changed then
 		for i=1, #properties do
@@ -141,12 +169,26 @@ function replication_module:write_state(which_fields, output_bs)
 	return false
 end
 
+function replication_module:call_updater(object, field)
+	local updaters = self.replication_table.updaters
+			
+	if updaters ~= nil then
+		if updaters[field.name] ~= nil then
+			updaters[field.name](object, self[field.name], self)
+		elseif updaters.GENERIC_UPDATER ~= nil then
+			updaters.GENERIC_UPDATER(object, field.name, self[field.name], self)
+		end
+	end
+end
+
 function replication_module:read_state(object, input_bs)
+	local properties = self.replication_table.properties
+	if #properties <= 0 then return false end
+	
 	input_bs:name_property("has module changed")
 	local module_changed = input_bs:ReadBit()
 	
 	if module_changed then
-		local properties = self.replication_table.properties
 		
 		for i=1, #properties do
 			local field = properties[i]
@@ -155,16 +197,7 @@ function replication_module:read_state(object, input_bs)
 			
 			if input_bs:ReadBit() then
 				self[field.name] = protocol.read_var(field.type, input_bs)
-				
-				local updaters = self.replication_table.updaters
-				
-				if updaters ~= nil then
-					if updaters[field.name] ~= nil then
-						updaters[field.name](object, self[field.name], self)
-					elseif updaters.GENERIC_UPDATER ~= nil then
-						updaters.GENERIC_UPDATER(object, field.name, self[field.name], self)
-					end
-				end
+				self:call_updater(object, field)
 			end
 		end
 	end
