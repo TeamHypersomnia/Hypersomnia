@@ -685,3 +685,52 @@ but maybe we only have to assure that the delete events are to be handled and po
 Potential problem: if we then proceed to simulate the whole world with a higher tickrate, an object that was requested by the logic to be deleted might still exist for a several ticks and influence the logic.
 
 To handle transferring reliable in-order value changes (as we would need in case of controlled_object_id inside client_info)
+we could insert state updates in-between reliable messages.
+
+------------------------------------------------------------------------------------------
+ITEM SYSTEM
+------------------------------------------------------------------------------------------
+
+In fact, what the server sends to the clients is merely:
+- the results of actions
+- data that can be used to "unpack" or "simulate" the actions relying on the current state,
+which means reliably in-order sent state, especially not current STATE_UPDATEs (which, in fact, are the said results themselves).
+
+Thus, before the commands for the item are transmitted, item state needs to be reliably synchronized, especially the fact of picking it up.
+
+
+Target behaviour:
+
+Server-side, all items are properly simulated - that is, every dropped/wielded item contains the same instance of all information about this item.
+Client-side, only the items wielded by the subject are fully replicated, all others are only synchronized in terms of their appearance.
+
+Still, we need to synchronize "some" data about the items, for example to know how to simulate remote shot messages.
+
+So what we know for sure is this: dropped, unactive items don't need their item data synchronized.
+
+We need to separate archetype-constant parameters (like maybe weapon spread and bullet velocity) and changeable parameters like current rounds left.
+
+Method:
+
+Client-side, create dropped items according to the entity archetype + server modules. No item data.
+Have "wield" component for all characters. Remote commands should be u
+
+
+Consider this:
+
+1. dropped items with only PUBLIC moduleset
+2. wielded items with PUBLIC, OWNER, (SQUAD) modulesets
+
+Current rounds need to be synchronized only once (when wielded).
+
+
+
+
+
+
+
+
+
+
+
+

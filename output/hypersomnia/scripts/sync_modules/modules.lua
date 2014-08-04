@@ -11,8 +11,10 @@ protocol.replication_tables = {}
 
 local NUM_FIELD_PROPERTIES = 3
 
-function create_replication_table(entry, optional_updaters)
-	local output = { properties = {} }
+function create_replication_properties(entry)
+	local output = {}
+	if entry == nil then return {} end
+	
 	local k = NUM_FIELD_PROPERTIES
 	
 	for i=1, (#entry/k) do
@@ -30,10 +32,18 @@ function create_replication_table(entry, optional_updaters)
 			new_var.update_object_func = update_object_func
 		end
 		
-		output.properties[#output.properties+1] = new_var
+		output[#output+1] = new_var
 	end
-		
-	output.updaters = optional_updaters
+	
+	return output
+end
+
+function create_replication_table(entry, optional_updaters, initial_variables)
+	local output = { 
+		properties = create_replication_properties (entry), 
+		initial_variables = create_replication_properties (initial_variables), 
+		updaters = optional_updaters
+	}
 	
 	return output
 end

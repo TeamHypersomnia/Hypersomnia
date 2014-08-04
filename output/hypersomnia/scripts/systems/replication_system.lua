@@ -84,7 +84,7 @@ function replication_system:create_objects_or_change_modules(msg)
 					
 					health = {},
 					
-					weapon = self.owner_scene.weapons.shotgun
+					weapon = self.owner_scene.weapons.m4a1
 				}
 				
 				new_entity.weapon:create_smoke_group(self.owner_scene.world_object.world)
@@ -107,7 +107,7 @@ function replication_system:create_objects_or_change_modules(msg)
 					
 					health = {},
 					
-					weapon = self.owner_scene.weapons.shotgun
+					weapon = self.owner_scene.weapons.m4a1
 				}
 				
 				new_entity.weapon:create_smoke_group(self.owner_scene.world_object.world)
