@@ -1,6 +1,6 @@
 config_table = {
 	window_name = "example",
-	fullscreen = 1,
+	fullscreen = 0,
 	window_border = 1,
 	window_x = 0,
 	window_y = 0,
