@@ -128,16 +128,17 @@ function replication_system:create_objects_or_change_modules(msg)
 			print(new_object.id)
 			self.object_by_id[new_object.id] = new_entity
 			self.owner_entity_system:add_entity(new_entity)
+			
+			for i=1, #protocol.module_mappings do
+				local module_name = protocol.module_mappings[i]
+				if replica[module_name] ~= nil then
+					replica[module_name]:read_initial_state(new_entity, input_bs)
+				end
+			end
 		else
 			print "WARNING! Recreating an existing object (not implemented)"
 		end
 		
-		for i=1, #protocol.module_mappings do
-			local module_name = protocol.module_mappings[i]
-			if replica[module_name] ~= nil then
-				replica[module_name]:read_initial_state(object, input_bs)
-			end
-		end
 	end
 end
 

@@ -687,6 +687,20 @@ Potential problem: if we then proceed to simulate the whole world with a higher 
 To handle transferring reliable in-order value changes (as we would need in case of controlled_object_id inside client_info)
 we could insert state updates in-between reliable messages.
 
+
+ABOUT INIT-ONLY RELIABLE DATA AND RELIABLE COMMANDS IN/OUT OF PROXIMITY:
+Simple. Whenever a reliable event that occurs for a replicable object and that events possibly changes its initial-only reliable state, 
+iterate through its remote_state table and send the message to all clients that remote_state is non-nil for. 
+
+If an event is dependent on the object and should be transmitted even outside of the basic proximity, 
+we should replicate the object and post it BEFORE applying the changes.
+Or just make it not dependent on the changes THAT THIS EVENT TRIGGERS (is it enough?).
+
+And really, don't bother with writing a system that tries to reliably broadcast all variable changes on object field basis;
+just stick to hand-written messages because most of the time, they will anyway trigger more actions than just "changing the value"
+so you will anyway need to hand-write another message structure.
+
+
 ------------------------------------------------------------------------------------------
 ITEM SYSTEM
 ------------------------------------------------------------------------------------------

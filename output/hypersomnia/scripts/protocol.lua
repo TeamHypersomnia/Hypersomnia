@@ -6,6 +6,13 @@ protocol.message_by_id = {
 		data = {}
 	},
 	{
+		name = "DAMAGE_MESSAGE",
+		data = {
+			"Float", "amount",
+			"Ushort", "victim_id"
+		}
+	},
+	{
 		name = "SHOT_REQUEST",
 		data = {
 			"Vec2", "position",

@@ -82,6 +82,7 @@ function replication_module:read_initial_state(object, input_bs)
 	for i=1, #properties do
 		local field = properties[i]
 		
+		input_bs:name_property(field.name)
 		self[field.name] = protocol.read_var(field.type, input_bs)
 		self:call_updater(object, field)
 	end
