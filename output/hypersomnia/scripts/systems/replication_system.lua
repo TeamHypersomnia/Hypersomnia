@@ -83,6 +83,8 @@ function replication_system:create_objects_or_change_modules(msg)
 					},
 					
 					health = {},
+
+					wield = {},
 					
 					weapon = self.owner_scene.weapons.m4a1
 				}
@@ -107,6 +109,8 @@ function replication_system:create_objects_or_change_modules(msg)
 					
 					health = {},
 					
+					wield = {},
+					
 					weapon = self.owner_scene.weapons.m4a1
 				}
 				
@@ -117,6 +121,13 @@ function replication_system:create_objects_or_change_modules(msg)
 			elseif archetype_name == "CLIENT_INFO" then
 				new_entity = components.create_components {
 					client_info = {}
+				}
+			
+			elseif archetype_name == "m4a1" then
+				new_entity = components.create_components {
+					
+				
+					weapon = self.owner_scene.weapons.m4a1
 				}
 			end
 			

@@ -1,7 +1,7 @@
 orientation_system = inherits_from (processing_system)
 
 function orientation_system:get_required_components()
-	return { "orientation", "cpp_entity" }
+	return { "orientation" }
 end
 
 function orientation_system:update()

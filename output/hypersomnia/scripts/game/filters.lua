@@ -2,6 +2,10 @@
 filters = {
 	STATIC_OBJECT = "ALL",
 
+	DROPPED_ITEM = {
+		"STATIC_OBJECT"
+	},
+	
 	CHARACTER = {
 		"STATIC_OBJECT", "REMOTE_CHARACTER"
 	},

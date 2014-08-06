@@ -7,7 +7,7 @@ function input_prediction_system:constructor(simulation_world)
 end
 
 function input_prediction_system:get_required_components()
-	return { "input_prediction", "cpp_entity" }
+	return { "input_prediction" }
 end
 
 function input_prediction_system:substep()

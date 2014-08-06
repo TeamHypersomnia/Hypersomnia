@@ -700,6 +700,9 @@ And really, don't bother with writing a system that tries to reliably broadcast 
 just stick to hand-written messages because most of the time, they will anyway trigger more actions than just "changing the value"
 so you will anyway need to hand-write another message structure.
 
+Don't forget to remotely delete already out-of-proximity objects inside object state update function inside replication system.
+
+
 
 ------------------------------------------------------------------------------------------
 ITEM SYSTEM
@@ -727,7 +730,7 @@ We need to separate archetype-constant parameters (like maybe weapon spread and 
 Method:
 
 Client-side, create dropped items according to the entity archetype + server modules. No item data.
-Have "wield" component for all characters. Remote commands should be u
+Have "wield" component for all characters. Remote commands that are to be "resimulated" will run without constraints like current_rounds > 0 check
 
 
 Consider this:
@@ -735,13 +738,41 @@ Consider this:
 1. dropped items with only PUBLIC moduleset
 2. wielded items with PUBLIC, OWNER, (SQUAD) modulesets
 
-Current rounds need to be synchronized only once (when wielded).
+Current rounds need to be synchronized only once (when weapon is picked up).
 
 
 
+New idea:
+
+Items are always the same entities, regardless of being dropped/picked.
+
+When the item is wielded:
+The client that owns the item maps the item's id (client.group_by_id) to OWNER group.
+The other clients map to PUBLIC group.
+
+When the item is dropped:
+All clients map to single PUBLIC group for the dropped item.
+
+When the item is being picked up:
+We "replace" PUBLIC group with OWNER group and transmit initial data for the OWNER group.
+
+
+The character object depends on its wielded entity (if any) which means the wielded item is replicated beforehand.
+
+The character object will have a module with only reliable-initial-state synchronized 
+and whenever it changes clients will be notified by DROP_ITEM/PICK_ITEM reliable messages.
+
+
+Later if it turns out that the item systems need such a mechanism, we'll implement reliable in-order variable changes.
+But for now it all can be done with custom messages so let's first at least prove that we need such a feature.
+
+
+We might need to synchronize weapon state (shooting_interval, ready, etc.) as init data.
 
 
 
+Remember to do the character ownership similiar way as item ownership, that is, by passing events to systems which in turn 
+update group_by_id tables etc.
 
 
 

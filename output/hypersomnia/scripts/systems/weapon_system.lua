@@ -30,6 +30,12 @@ function weapon_system:shot_routine(target, premade_shot)
 	local weapon = target.weapon
 	local entity = target.cpp_entity
 	
+	-- try to recover the owner entity if we're dealing with an item
+	if target.item ~= nil and target.item.ownership ~= nil then
+		entity = target.item.ownership.cpp_entity
+	end
+	
+	
 	local gun_transform = transform_state(entity.transform.current)
 	-- cancel out interpolation
 	gun_transform.pos = to_pixels(entity.physics.body:GetPosition())
@@ -143,7 +149,6 @@ function weapon_system:substep(dt)
 		
 		if state == states.READY then
 			local trigger = weapon.trigger
-			local entity = target.cpp_entity
 			
 			local premade_shot;
 				

@@ -122,7 +122,11 @@ end
 
 protocol.read_var = function(var_type, in_bs)
 	protocol.LAST_READ_BITSTREAM = in_bs
-	local out = in_bs["Read" .. var_type](in_bs)
+	
+	local read_type = var_type
+	if read_type == "Bool" then read_type = "Bit" end
+	
+	local out = in_bs["Read" .. read_type](in_bs)
 	
 	if var_type == "Bit" then
 		out = bool2int(out)
@@ -134,6 +138,9 @@ end
 protocol.write_var = function(var_type, var, out_bs)
 	if var_type == "Bit" then
 		var = var > 0
+	elseif var_type == "Bool" then
+		-- if it's bool, it's already conditional and not an integer
+		var_type = "Bit"
 	end
 	
 	out_bs["Write" .. var_type](out_bs, var)

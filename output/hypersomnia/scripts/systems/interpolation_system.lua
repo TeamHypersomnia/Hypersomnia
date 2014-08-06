@@ -1,7 +1,7 @@
 interpolation_system = inherits_from (processing_system)
 
 function interpolation_system:get_required_components()
-	return { "interpolation", "cpp_entity" }
+	return { "interpolation" }
 end
 
 function interpolation_system:update()

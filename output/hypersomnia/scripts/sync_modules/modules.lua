@@ -3,7 +3,9 @@ protocol.module_mappings = {
 	--"client_info",
 	"movement",
 	"crosshair",
-	"health"
+	"health",
+	"wield",
+	"gun_init_info"
 }
 
 protocol.replication_tables = {}
