@@ -25,6 +25,11 @@ function bullet_creation_system:update()
 		local weapon = target.weapon
 		local entity = target.cpp_entity
 	
+		-- try to recover the owner entity if we're dealing with an item
+		if target.item ~= nil and target.item.ownership ~= nil then
+			entity = target.item.ownership.cpp_entity
+		end
+	
 		local msg = animate_message()
 		msg.animation_type = animation_events.SHOT
 		msg.preserve_state_if_animation_changes = false

@@ -84,14 +84,19 @@ function replication_system:create_objects_or_change_modules(msg)
 					
 					health = {},
 
-					wield = {},
-					
-					weapon = self.owner_scene.weapons.m4a1
+					wield = {}
 				}
 				
-				new_entity.weapon:create_smoke_group(self.owner_scene.world_object.world)
-				new_entity.weapon.transmit_bullets = true
-				new_entity.cpp_entity.script = new_entity
+				new_entity.wield.on_pickup = function(this)
+					local picked = this.wield.wielded_item
+					
+					if picked.weapon ~= nil then
+						picked.weapon.transmit_bullets = true
+						picked.weapon.constrain_requested_bullets = true
+						picked.weapon.bullet_entity.physics.body_info.filter = filters.BULLET
+					end
+				end
+				
 			elseif archetype_name == "REMOTE_PLAYER" then
 				local new_remote_player = create_remote_player(self.owner_scene, self.owner_scene.crosshair_sprite)
 				
@@ -109,15 +114,19 @@ function replication_system:create_objects_or_change_modules(msg)
 					
 					health = {},
 					
-					wield = {},
-					
-					weapon = self.owner_scene.weapons.m4a1
+					wield = {}
 				}
 				
-				new_entity.weapon:create_smoke_group(self.owner_scene.world_object.world)
-				new_entity.weapon.bullet_entity.physics.body_info.filter = filters.REMOTE_BULLET
-				new_entity.weapon.constrain_requested_bullets = false
-				new_entity.weapon.transmit_bullets = false
+				
+				new_entity.wield.on_pickup = function(this)
+					local picked = this.wield.wielded_item
+					
+					if picked.weapon ~= nil then
+						picked.weapon.transmit_bullets = false
+						picked.weapon.constrain_requested_bullets = false
+						picked.weapon.bullet_entity.physics.body_info.filter = filters.REMOTE_BULLET
+					end
+				end
 			elseif archetype_name == "m4a1" then
 				new_entity = components.create_components {
 					item = {
@@ -142,6 +151,8 @@ function replication_system:create_objects_or_change_modules(msg)
 				
 					weapon = self.owner_scene.weapons.m4a1
 				}
+				
+				new_entity.weapon:create_smoke_group(self.owner_scene.world_object.world)
 			end
 			
 			-- save replication data (not as a component; just a table)
@@ -165,7 +176,8 @@ function replication_system:create_objects_or_change_modules(msg)
 				if new_entity.item.is_owned then
 					self.owner_entity_system:post_table("item_ownership", {
 						subject = self.object_by_id[new_entity.item.ownership_id],
-						item = new_entity
+						item = new_entity,
+						pick = true
 					})
 				end
 			end

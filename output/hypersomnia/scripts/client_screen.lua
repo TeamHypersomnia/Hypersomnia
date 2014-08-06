@@ -143,6 +143,7 @@ function client_screen:loop()
 	self.systems.replication:update_object_states()
 	
 	self.systems.wield:update()
+	self.systems.wield:ownership_callbacks()
 	
 	self.systems.weapon:handle_messages()
 	

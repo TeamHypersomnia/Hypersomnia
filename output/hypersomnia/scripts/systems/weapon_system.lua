@@ -96,14 +96,18 @@ function weapon_system:shot_routine(target, premade_shot)
 end
 
 function weapon_system:handle_messages()
-	local msgs = self.world_object:get_messages_filter_components("intent_message", { "weapon" } )
+	local msgs = self.world_object:get_messages_filter_components("intent_message", { "wield" } )
 	
 	for i=1, #msgs do
-		if msgs[i].intent == intent_message.SHOOT then
-			if msgs[i].state_flag then
-				msgs[i].subject.script.weapon.trigger = components.weapon.triggers.SHOOT
-			else
-				msgs[i].subject.script.weapon.trigger = components.weapon.triggers.NONE
+		local item_subject = msgs[i].subject.script.wield.wielded_item
+		
+		if item_subject ~= nil and item_subject.weapon ~= nil then
+			if msgs[i].intent == intent_message.SHOOT then
+				if msgs[i].state_flag then
+					item_subject.weapon.trigger = components.weapon.triggers.SHOOT
+				else
+					item_subject.weapon.trigger = components.weapon.triggers.NONE
+				end
 			end
 		end
 	end
@@ -117,7 +121,12 @@ function weapon_system:translate_shot_info_msgs()
 	--print "getting info"
 	--print(msgs[i].data.subject_id)
 	--print(self.owner_entity_system.all_systems["replication"].my_sync_id)
-		local subject = self.owner_entity_system.all_systems["replication"].object_by_id[msgs[i].data.subject_id]
+		local subject = self.owner_entity_system.all_systems["replication"].object_by_id[msgs[i].data.subject_id].wield.wielded_item
+		
+		--if subject ~= nil and subject.weapon ~= nil then
+		--
+		--end
+		
 		local forward_time = msgs[i].data.delay_time + self.owner_entity_system.all_systems["client"]:get_last_ping()/2
 		--print(forward_time)
 		--print(subject.weapon.transmit_bullets)
