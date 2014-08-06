@@ -42,7 +42,8 @@ function wield_system:update()
 				if item.item ~= nil and item.item.ownership == nil then
 					-- only server-side
 					if subject.client_controller ~= nil then
-						-- subject.client_controller.owner_client.client.group_by_id[item.replication.id] = "OWNER"
+						item.replication:switch_group_for_client(subject.client_controller.owner_client, "OWNER")
+						item.replication:switch_public_group("PUBLIC")
 					end
 					
 					item.item:set_ownership(subject)
@@ -57,6 +58,8 @@ function wield_system:update()
 					-- unmap that item		
 					-- only server-side		
 					if subject.client_controller ~= nil then
+						item.replication:switch_public_group("DROPPED_PUBLIC")
+						item.replication:switch_group_for_client(subject.client_controller.owner_client, "DROPPED_PUBLIC")
 						-- subject.client_controller.owner_client.client.group_by_id[item.replication.id] = nil
 					end
 				
