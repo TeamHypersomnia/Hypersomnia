@@ -10,6 +10,16 @@ protocol.module_mappings = {
 
 protocol.replication_tables = {}
 
+function create_replica(modules)
+	local new_object = {}
+	
+	for i=1, #modules do
+		new_object[modules[i]] = replication_module:create(protocol.replication_tables[modules[i]])
+	end
+	
+	return new_object
+end
+
 
 local NUM_FIELD_PROPERTIES = 3
 
