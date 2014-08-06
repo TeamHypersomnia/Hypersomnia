@@ -6,6 +6,19 @@ protocol.message_by_id = {
 		data = {}
 	},
 	{
+		name = "ITEM_PICKED",
+		data = {
+			"Ushort", "subject_id",
+			"Ushort", "item_id"
+		}
+	},
+	{
+		name = "ITEM_DROPPED",
+		data = {
+			"Ushort", "subject_id"
+		}
+	},
+	{
 		name = "DAMAGE_MESSAGE",
 		data = {
 			"Float", "amount",

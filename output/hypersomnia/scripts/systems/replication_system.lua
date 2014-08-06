@@ -159,6 +159,16 @@ function replication_system:create_objects_or_change_modules(msg)
 					replica[module_name]:read_initial_state(new_entity, input_bs)
 				end
 			end
+			
+			-- after all initial data is read, call construction callbacks
+			if archetype_name == "m4a1" then
+				if new_entity.item.is_owned then
+					self.owner_entity_system:post_table("item_ownership", {
+						subject = self.object_by_id[new_entity.item.ownership_id],
+						item = new_entity
+					})
+				end
+			end
 		else
 			print "WARNING! Recreating an existing object (not implemented)"
 		end

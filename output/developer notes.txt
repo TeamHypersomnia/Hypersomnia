@@ -776,6 +776,5 @@ update group_by_id tables etc.
 
 
 
-
-
-
+Remember not to remotely delete "out of proximity objects" when dealing with custom_targets (usecase: wield_system)
+also that the initial state needs to be replicated on the go if we want to only call update_state when a message is object-dependent.
