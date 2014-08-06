@@ -118,14 +118,27 @@ function replication_system:create_objects_or_change_modules(msg)
 				new_entity.weapon.bullet_entity.physics.body_info.filter = filters.REMOTE_BULLET
 				new_entity.weapon.constrain_requested_bullets = false
 				new_entity.weapon.transmit_bullets = false
-			elseif archetype_name == "CLIENT_INFO" then
-				new_entity = components.create_components {
-					client_info = {}
-				}
-			
 			elseif archetype_name == "m4a1" then
 				new_entity = components.create_components {
-					
+					item = {
+						physics_table = {
+							body_type = Box2D.b2_dynamicBody,
+							
+							body_info = {
+								filter = filters.DROPPED_ITEM,
+								shape_type = physics_info.RECT,
+								rect_size = vec2(98, 36),
+								
+								linear_damping = 4,
+								angular_damping = 4,
+								fixed_rotation = false,
+								density = 0.1,
+								friction = 0,
+								restitution = 0.4,
+								sensor = false
+							}
+						}
+					},
 				
 					weapon = self.owner_scene.weapons.m4a1
 				}

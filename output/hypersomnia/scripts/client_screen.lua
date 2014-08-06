@@ -11,7 +11,7 @@ dofile "hypersomnia\\scripts\\sync_modules\\modules.lua"
 dofile "hypersomnia\\scripts\\sync_modules\\movement_sync.lua"
 dofile "hypersomnia\\scripts\\sync_modules\\health_sync.lua"
 dofile "hypersomnia\\scripts\\sync_modules\\crosshair_sync.lua"
-dofile "hypersomnia\\scripts\\sync_modules\\wield_sync.lua"
+dofile "hypersomnia\\scripts\\sync_modules\\item_sync.lua"
 dofile "hypersomnia\\scripts\\sync_modules\\gun_sync.lua"
 
 dofile "hypersomnia\\scripts\\systems\\protocol_system.lua"
@@ -23,6 +23,9 @@ dofile "hypersomnia\\scripts\\systems\\replication_system.lua"
 dofile "hypersomnia\\scripts\\systems\\weapon_system.lua"
 dofile "hypersomnia\\scripts\\systems\\bullet_creation_system.lua"
 dofile "hypersomnia\\scripts\\systems\\lifetime_system.lua"
+
+dofile "hypersomnia\\scripts\\systems\\wield_system.lua"
+dofile "hypersomnia\\scripts\\systems\\item_system.lua"
 
 dofile "hypersomnia\\scripts\\systems\\health_system.lua"
 
@@ -51,7 +54,8 @@ function client_screen:constructor(camera_rect)
 	
 	self.entity_system_instance:register_messages {
 		"network_message",
-		"shot_message"
+		"shot_message",
+		"item_ownership"
 	}
 	
 	self.entity_system_instance:register_messages (protocol.message_names)
@@ -74,6 +78,9 @@ function client_screen:constructor(camera_rect)
 	self.systems.bullet_creation = bullet_creation_system:create(self.sample_scene.world_object, self.sample_scene.world_camera, self.sample_scene.simulation_world)
 	
 	self.systems.health = health_system:create(self.sample_scene)
+	
+	self.systems.wield = wield_system:create()
+	self.systems.item = item_system:create(true, self.sample_scene.world_object)
 	
 	table.insert(self.sample_scene.world_object.prestep_callbacks, function (dt)
 		self.systems.input_prediction:substep()
@@ -134,6 +141,8 @@ function client_screen:loop()
 	-- there's always one STATE_UPDATE per LOOP_SEPARATOR so it is valid to call this update now
 	-- as all objects have been created
 	self.systems.replication:update_object_states()
+	
+	self.systems.wield:update()
 	
 	self.systems.weapon:handle_messages()
 	

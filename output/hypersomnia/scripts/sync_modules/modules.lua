@@ -4,7 +4,7 @@ protocol.module_mappings = {
 	"movement",
 	"crosshair",
 	"health",
-	"wield",
+	"item",
 	"gun_init_info"
 }
 
