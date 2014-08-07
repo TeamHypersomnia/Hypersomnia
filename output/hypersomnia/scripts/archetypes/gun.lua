@@ -3,7 +3,8 @@ for k, v in pairs(world_archetype_groups.guns) do
 		creation = function(self)
 			local new_entity = components.create_components {
 				item = self.owner_scene.weapons[v].item_info,
-				weapon = self.owner_scene.weapons[v].weapon_info
+				weapon = self.owner_scene.weapons[v].weapon_info,
+				interpolation = {}
 			}
 			
 			new_entity.weapon:create_smoke_group(self.owner_scene.world_object.world)
