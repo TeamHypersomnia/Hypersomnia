@@ -18,6 +18,8 @@ for k, v in pairs(world_archetype_groups.guns) do
 					item = new_entity,
 					pick = true
 				})
+			else
+				new_entity.item.on_drop(new_entity)
 			end
 		end
 	}
