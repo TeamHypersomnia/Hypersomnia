@@ -15,6 +15,7 @@ dofile "hypersomnia\\scripts\\reliable_channel.lua"
 dofile "hypersomnia\\scripts\\archetypes\\archetype_library.lua"
 dofile "hypersomnia\\scripts\\archetypes\\controlled_player.lua"
 dofile "hypersomnia\\scripts\\archetypes\\remote_player.lua"
+dofile "hypersomnia\\scripts\\archetypes\\gun.lua"
 
 -- resource handling utilities
 dofile "hypersomnia\\scripts\\resources\\animations.lua"

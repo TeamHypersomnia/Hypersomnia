@@ -1,14 +1,18 @@
 -- enables modules to be read/written correctly in order
-protocol.module_mappings = {
-	--"client_info",
-	"movement",
-	"crosshair",
-	"health",
-	"item",
-	"gun_init_info"
-}
+protocol.module_mappings = {}
 
 protocol.replication_tables = {}
+
+protocol.replication_tables.register = function (table_name, entry)
+	table.insert(protocol.module_mappings, table_name)
+	table.sort(protocol.module_mappings)
+	
+	protocol.replication_tables[table_name] = { 
+		properties = create_replication_properties (entry.properties), 
+		init_only_fields = create_replication_properties (entry.init_only_fields), 
+		updaters = entry.optional_updaters
+	}
+end
 
 function create_replica(modules)
 	local new_object = {}
@@ -49,17 +53,6 @@ function create_replication_properties(entry)
 	
 	return output
 end
-
-function create_replication_table(entry, optional_updaters, init_only_fields)
-	local output = { 
-		properties = create_replication_properties (entry), 
-		["init_only_fields"] = create_replication_properties (init_only_fields), 
-		updaters = optional_updaters
-	}
-	
-	return output
-end
-
 
 protocol.diff_operators = {
 	-- accept divergences maximum of 0.1 pixels

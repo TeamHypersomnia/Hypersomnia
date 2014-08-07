@@ -141,4 +141,42 @@ function create_controlled_player(scene_object, position, target_camera, crossha
 	return player
 end
 
+world_archetype_callbacks["CONTROLLED_PLAYER"] = {
+	creation = function(self)
+		local player_cpp_entity = create_controlled_player(
+		self.owner_scene,
+		self.owner_scene.teleport_position, 
+		self.owner_scene.world_camera, 
+		self.owner_scene.crosshair_sprite)
+	
+		local new_entity = components.create_components {
+			cpp_entity = player_cpp_entity.body,
+			input_prediction = {
+				simulation_entity = self.owner_scene.simulation_player
+			},
+			
+			orientation = {
+				receiver = false,
+				crosshair_entity = player_cpp_entity.crosshair
+			},
+			
+			health = {},
+
+			wield = {}
+		}
+		
+		new_entity.wield.on_pickup = function(this)
+			local picked = this.wield.wielded_item
+			
+			if picked.weapon ~= nil then
+				picked.weapon.transmit_bullets = true
+				picked.weapon.constrain_requested_bullets = true
+				picked.weapon.bullet_entity.physics.body_info.filter = filters.BULLET
+			end
+		end
+		
+		return new_entity
+	end
+}
+
 

@@ -115,3 +115,40 @@ function create_remote_player(owner_scene, crosshair_sprite)
 	return player
 end
 
+
+world_archetype_callbacks["REMOTE_PLAYER"] = {
+	creation = function(self)
+		local new_remote_player = create_remote_player(self.owner_scene, self.owner_scene.crosshair_sprite)
+		
+		new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["white"]["rifle"].set
+		new_remote_player.legs.animate.available_animations = self.owner_scene.legs_sets["white"].set
+	
+		local new_entity = components.create_components {
+			cpp_entity = new_remote_player.body,
+			interpolation = {},
+			
+			orientation = {
+				receiver = true,
+				crosshair_entity = new_remote_player.crosshair
+			},
+			
+			health = {},
+			
+			wield = {}
+		}
+		
+		new_entity.wield.on_pickup = function(this)
+			local picked = this.wield.wielded_item
+			
+			if picked.weapon ~= nil then
+				picked.weapon.transmit_bullets = false
+				picked.weapon.constrain_requested_bullets = false
+				picked.weapon.bullet_entity.physics.body_info.filter = filters.REMOTE_BULLET
+			end
+		end
+		
+		return new_entity
+	end
+}
+
+
