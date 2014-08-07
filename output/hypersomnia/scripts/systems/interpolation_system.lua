@@ -25,19 +25,21 @@ function interpolation_system:update()
 		end
 		
 		if movement_module ~= nil then
-			local new_position = movement_module.position
-			local new_velocity = movement_module.velocity
-			local new_angle = movement_module.angle
+			local target =  self.targets[i].cpp_entity
 			
-			if new_angle == nil then
-				new_angle = 0
-			end
-			
-			if new_position ~= nil then self.targets[i].cpp_entity.physics.body:SetTransform(new_position, new_angle) end
-			if new_velocity ~= nil then self.targets[i].cpp_entity.physics.body:SetLinearVelocity(new_velocity) end
+			--if target.physics ~= nil then
+				local new_position = movement_module.position
+				local new_velocity = movement_module.velocity
+				local new_angle = movement_module.angle
+				
+				if new_angle == nil then
+					new_angle = 0
+				end
+				
+				if new_position ~= nil then target.physics.body:SetTransform(new_position, new_angle) end
+				if new_velocity ~= nil then target.physics.body:SetLinearVelocity(new_velocity) end
+			--end
 		end
-		
 	end
-	--end
 end
 

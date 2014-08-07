@@ -1,6 +1,7 @@
 custom_intents = create_inverse_enum {
 	"QUIT",
-	"DROP_WEAPON",
+	"DROP_ITEM",
+	"PICK_REQUEST",
 	"ZOOM_CAMERA",
 	
 	"SWITCH_CLIENT_1",
@@ -30,8 +31,8 @@ main_input_context = create_input_context {
 		
 		[keys.ESC] 				= custom_intents.QUIT,
 			
-		[mouse.rdown] 			= custom_intents.DROP_WEAPON,
-		[mouse.rdoubleclick] 	= custom_intents.DROP_WEAPON,
+		[mouse.rdown] 			= custom_intents.PICK_REQUEST,
+		[mouse.rdoubleclick] 	= custom_intents.PICK_REQUEST,
 		[mouse.wheel]			= custom_intents.ZOOM_CAMERA
 	}
 }

@@ -6,6 +6,10 @@ protocol.message_by_id = {
 		data = {}
 	},
 	{
+		name = "PICK_REQUEST",
+		data = {}
+	},
+	{
 		name = "ITEM_PICKED",
 		data = {
 			"Ushort", "subject_id",

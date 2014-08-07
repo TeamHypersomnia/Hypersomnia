@@ -58,6 +58,7 @@ function create_controlled_player(scene_object, position, target_camera, crossha
 				intent_message.MOVE_BACKWARD,
 				intent_message.MOVE_LEFT,
 				intent_message.MOVE_RIGHT,
+				custom_intents.PICK_REQUEST,
 				intent_message.SHOOT
 			},
 			
@@ -178,7 +179,7 @@ world_archetype_callbacks["CONTROLLED_PLAYER"] = {
 		end
 		
 		new_entity.wield.on_drop = function(this)
-			new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["white"]["barehands"].set
+			player_cpp_entity.body.animate.available_animations = self.owner_scene.torso_sets["white"]["barehands"].set
 		end
 		
 		return new_entity

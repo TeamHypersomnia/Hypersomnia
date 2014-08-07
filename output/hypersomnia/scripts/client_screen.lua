@@ -142,6 +142,8 @@ function client_screen:loop()
 	-- as all objects have been created
 	self.systems.replication:update_object_states()
 	
+	self.systems.wield:send_pick_requests(self.sample_scene.world_object)
+	self.systems.wield:receive_item_ownership()
 	self.systems.wield:update()
 	self.systems.wield:ownership_callbacks()
 	

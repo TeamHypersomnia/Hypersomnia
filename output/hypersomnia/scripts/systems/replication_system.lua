@@ -44,7 +44,7 @@ function replication_system:create_objects_or_change_modules(msg)
 		
 		local archetype_name = protocol.archetype_by_id[new_object.archetype_id]
 		
-		local object = self.object_by_id[new_object.id]
+		local is_object_new = self.object_by_id[new_object.id] == nil
 		local replica = {}
 		
 		-- read what modules the replica has
@@ -57,36 +57,40 @@ function replication_system:create_objects_or_change_modules(msg)
 			end
 		end
 			
-		if object == nil then
-			-- create space for modules
-			object = { replication = { ["modules"] = replica, id = new_object.id } }
-			
-			local new_entity = world_archetype_callbacks[archetype_name].creation(self)
+		local new_entity;
+		
+		-- if the object is new
+		if is_object_new then
+			-- creation phase
+			new_entity = world_archetype_callbacks[archetype_name].creation(self)
 			
 			-- save replication data (not as a component; just a table)
-			new_entity.replication = object.replication
+			new_entity.replication = { modules = replica, id = new_object.id }
 			
 			-- save the newly created entity
 			self.object_by_id[new_object.id] = new_entity
 			self.owner_entity_system:add_entity(new_entity)
-			
-			for i=1, #protocol.module_mappings do
-				local module_name = protocol.module_mappings[i]
-				if replica[module_name] ~= nil then
-					replica[module_name]:read_initial_state(new_entity, input_bs)
-				end
-			end
-			
-			-- creation is necessary, though construction is not
-			local construction_callback = world_archetype_callbacks[archetype_name].construction
-			
-			if construction_callback then 
-				construction_callback (self, new_entity) 
-			end
+		-- otherwise just update the replica
 		else
-			print "WARNING! Recreating an existing object (not implemented)"
+			print "RECREATING OBJECT"
+			new_entity = self.object_by_id[new_object.id]
+			new_entity.replication.modules = replica
 		end
 		
+		-- whole initial state is always read
+		for i=1, #protocol.module_mappings do
+			local module_name = protocol.module_mappings[i]
+			if replica[module_name] ~= nil then
+				replica[module_name]:read_initial_state(new_entity, input_bs)
+			end
+		end
+			
+		-- creation is necessary, though construction is not
+		local construction_callback = world_archetype_callbacks[archetype_name].construction
+		
+		if construction_callback then 
+			construction_callback (self, new_entity, is_object_new)
+		end
 	end
 end
 
