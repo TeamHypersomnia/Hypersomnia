@@ -165,7 +165,7 @@ world_archetype_callbacks["CONTROLLED_PLAYER"] = {
 			wield = {}
 		}
 		
-		new_entity.wield.on_pickup = function(this)
+		new_entity.wield.on_pick = function(this)
 			local picked = this.wield.wielded_item
 			
 			if picked.weapon ~= nil then

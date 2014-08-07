@@ -23,7 +23,6 @@ function create_weapons(scene, include_render)
 		}
 	end
 	
-	
 	weapons.m4a1 = {
 		weapon_info = {
 			current_rounds = 300,
@@ -42,30 +41,72 @@ function create_weapons(scene, include_render)
 			bullet_entity = basic_bullet_entity,				
 			
 			max_lifetime_ms = 500	
+		},
+		
+		item_info = {
+			on_drop = function(object)
+				object.cpp_entity.render.model = scene.sprite_object_library["m4a1_world"]
+				object.cpp_entity.render.layer = render_layers.ON_GROUND
+			end,
+			
+			on_pick = function(object)
+				object.cpp_entity.render.model = nil
+			end,
+				
+			entity_archetype = {
+				render = {
+					
+				},
+				
+				physics = {
+					body_type = Box2D.b2_dynamicBody,
+					
+					body_info = {
+						filter = filters.DROPPED_ITEM,
+						shape_type = physics_info.RECT,
+						rect_size = vec2(98, 36),
+						
+						linear_damping = 4,
+						angular_damping = 4,
+						fixed_rotation = false,
+						density = 0.1,
+						friction = 0,
+						restitution = 0.4,
+						sensor = false
+					}
+				}
+			}
 		}
 	}
 	
-	weapons.shotgun = {
-		weapon_info = {
-			current_rounds = 300,
-			is_automatic = false,
-			bullets_once = 12,
-			bullet_damage = 12,
-			bullet_speed = minmax(3000, 4000),
-			
-			shooting_interval_ms = 400,
-			spread_degrees = 12,
-			shake_radius = 1.5,
-			shake_spread_degrees = 45,
-			
-			bullet_barrel_offset = vec2(50, 0),
-			
-			bullet_entity = basic_bullet_entity,				
-			
-			max_lifetime_ms = 500
-		}
-	}
+	--weapons.shotgun = {
+	--	weapon_info = {
+	--		current_rounds = 300,
+	--		is_automatic = false,
+	--		bullets_once = 12,
+	--		bullet_damage = 12,
+	--		bullet_speed = minmax(3000, 4000),
+	--		
+	--		shooting_interval_ms = 400,
+	--		spread_degrees = 12,
+	--		shake_radius = 1.5,
+	--		shake_spread_degrees = 45,
+	--		
+	--		bullet_barrel_offset = vec2(50, 0),
+	--		
+	--		bullet_entity = basic_bullet_entity,				
+	--		
+	--		max_lifetime_ms = 500
+	--	}
+	--}
 	
+	if not include_render then
+		for k, v in pairs (weapons) do
+			v.item_info.entity_archetype.render = nil
+			v.item_info.entity_archetype.on_drop = nil
+			v.item_info.entity_archetype.on_pick = nil
+		end
+	end
 	
 	scene.weapons = weapons
 end

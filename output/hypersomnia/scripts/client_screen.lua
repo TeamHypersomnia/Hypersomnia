@@ -80,7 +80,7 @@ function client_screen:constructor(camera_rect)
 	self.systems.health = health_system:create(self.sample_scene)
 	
 	self.systems.wield = wield_system:create()
-	self.systems.item = item_system:create(true, self.sample_scene.world_object)
+	self.systems.item = item_system:create(self.sample_scene.world_object)
 	
 	table.insert(self.sample_scene.world_object.prestep_callbacks, function (dt)
 		self.systems.input_prediction:substep()

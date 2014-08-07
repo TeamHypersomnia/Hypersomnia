@@ -1,7 +1,6 @@
 item_system = inherits_from (processing_system)
 
-function item_system:constructor(add_render, world_object)
-	self.add_render = add_render
+function item_system:constructor(world_object)
 	self.world_object = world_object
 	
 	processing_system.constructor(self)
@@ -55,16 +54,11 @@ function item_system:add_entity(new_entity)
 	new_entity.item.entity = new_entity
 	
 	if new_entity.cpp_entity == nil then
-		local cpp_entity_table = {
+		new_entity.cpp_entity = self.world_object:create_entity ( override({
 			transform = {},
 			chase = {}
-		}
+		}, new_entity.item.entity_archetype) )
 		
-		if self.add_render then
-			cpp_entity_table.render = {}
-		end
-	
-		new_entity.cpp_entity = self.world_object:create_entity (cpp_entity_table)
 		new_entity.cpp_entity.script = new_entity
 	end
 	
