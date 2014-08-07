@@ -44,6 +44,8 @@ function create_weapons(scene, include_render)
 		},
 		
 		item_info = {
+			wield_type = "rifle",
+		
 			on_drop = function(object)
 				object.cpp_entity.render.model = scene.sprite_object_library["m4a1_world"]
 				object.cpp_entity.render.layer = render_layers.ON_GROUND

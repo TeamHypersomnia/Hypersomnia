@@ -24,7 +24,7 @@ function components.item:set_ownership(new_owner)
 		item.cpp_entity:remove_physics()
 	elseif new_owner == nil and item.cpp_entity.physics == nil then
 		-- drop it to the ground
-		add_physics_component(item.cpp_entity, item.item.physics_table)
+		add_physics_component(item.cpp_entity, item.item.entity_archetype.physics)
 		
 		-- if we had an owner, copy its transform
 		if item.item.ownership ~= nil then

@@ -135,7 +135,7 @@ function create_controlled_player(scene_object, position, target_camera, crossha
 		target_camera.camera.crosshair:set(player.crosshair)
 	end
 	
-	player.body.animate.available_animations = scene_object.torso_sets["white"]["rifle"].set
+	player.body.animate.available_animations = scene_object.torso_sets["white"]["barehands"].set
 	player.legs.animate.available_animations = scene_object.legs_sets["white"].set
 	
 	return player
@@ -168,11 +168,17 @@ world_archetype_callbacks["CONTROLLED_PLAYER"] = {
 		new_entity.wield.on_pick = function(this)
 			local picked = this.wield.wielded_item
 			
+			player_cpp_entity.body.animate.available_animations = self.owner_scene.torso_sets["white"][picked.item.wield_type].set
+			
 			if picked.weapon ~= nil then
 				picked.weapon.transmit_bullets = true
 				picked.weapon.constrain_requested_bullets = true
 				picked.weapon.bullet_entity.physics.body_info.filter = filters.BULLET
 			end
+		end
+		
+		new_entity.wield.on_drop = function(this)
+			new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["white"]["barehands"].set
 		end
 		
 		return new_entity
