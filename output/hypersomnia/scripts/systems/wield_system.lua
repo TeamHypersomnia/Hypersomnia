@@ -71,8 +71,6 @@ function wield_system:handle_pick_requests(world_object)
 			if wield ~= nil then
 				local found_item = self:get_item_in_range(world_object.physics_system, character.cpp_entity)
 				
-				print "found?"
-				print (found_item ~= nil)
 				-- subject validity ensured here
 				if wield.wielded_item ~= nil then
 					self.owner_entity_system:post_table("item_ownership", {
@@ -81,7 +79,6 @@ function wield_system:handle_pick_requests(world_object)
 					})
 				end
 			
-				
 				if found_item then
 					self.owner_entity_system:post_table("item_ownership", {
 						subject = character,

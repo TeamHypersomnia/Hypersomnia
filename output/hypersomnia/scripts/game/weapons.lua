@@ -104,9 +104,9 @@ function create_weapons(scene, include_render)
 	
 	if not include_render then
 		for k, v in pairs (weapons) do
-			v.item_info.entity_archetype.render = nil
-			v.item_info.entity_archetype.on_drop = nil
-			v.item_info.entity_archetype.on_pick = nil
+			v.item_info.render = nil
+			v.item_info.on_drop = nil
+			v.item_info.on_pick = nil
 		end
 	end
 	

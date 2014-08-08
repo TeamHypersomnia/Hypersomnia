@@ -41,7 +41,9 @@ function item_system:remove_entity(removed_entity)
 	
 	if owner ~= nil then
 		local wield = owner.wield
-
+		
+		removed_entity.item:set_ownership(nil)
+		
 		if wield.on_drop ~= nil then
 			wield.on_drop(owner, wield.wielded_item)
 		end

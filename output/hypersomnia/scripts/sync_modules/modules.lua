@@ -194,6 +194,8 @@ function replication_module:read_state(object, input_bs)
 	input_bs:name_property("has module changed")
 	local module_changed = input_bs:ReadBit()
 	
+	self.FIELDS_READ = {}
+	
 	if module_changed then
 		
 		for i=1, #properties do
@@ -201,7 +203,9 @@ function replication_module:read_state(object, input_bs)
 			
 			input_bs:name_property("has field " .. field.name .. " changed")
 			
+			
 			if input_bs:ReadBit() then
+				self.FIELDS_READ[field.name] = true
 				self[field.name] = protocol.read_var(field.type, input_bs)
 				self:call_updater(object, field)
 			end
