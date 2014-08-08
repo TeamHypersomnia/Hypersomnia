@@ -34,7 +34,7 @@ function wield_system:send_pick_requests(world_object)
 	local msgs = world_object:get_messages_filter_components("intent_message", { "wield" } )
 	
 	for i=1, #msgs do
-		if msgs[i].intent == custom_intents.PICK_REQUEST then
+		if msgs[i].state_flag and msgs[i].intent == custom_intents.PICK_REQUEST then
 			local client_sys = self.owner_entity_system.all_systems["client"]
 		
 			client_sys.net_channel:post_reliable("PICK_REQUEST", {})
@@ -42,6 +42,57 @@ function wield_system:send_pick_requests(world_object)
 	end
 end
 
+function wield_system:get_item_in_range(physics_system, what_entity, try_to_pick_weapon)
+	local items_in_range = physics_system:query_body(what_entity, filters.ITEM_PICK, nil)
+	
+	local found_item;
+	
+	for candidate in items_in_range.bodies do
+		if try_to_pick_weapon == nil or (try_to_pick_weapon ~= nil and body_to_entity(candidate) == try_to_pick_weapon) then 
+			found_item = body_to_entity(candidate).script
+			break
+		end
+	end
+	
+	return found_item
+end
+
+
+function wield_system:handle_pick_requests(world_object)
+	local msgs = self.owner_entity_system.messages["PICK_REQUEST"]
+	
+	for i=1, #msgs do
+		local msg = msgs[i]
+		local subject = msg.subject
+		local character = subject.client.controlled_object
+		
+		if character ~= nil then
+			local wield = character.wield
+			if wield ~= nil then
+				local found_item = self:get_item_in_range(world_object.physics_system, character.cpp_entity)
+				
+				print "found?"
+				print (found_item ~= nil)
+				-- subject validity ensured here
+				if wield.wielded_item ~= nil then
+					self.owner_entity_system:post_table("item_ownership", {
+						subject = character,
+						drop = true
+					})
+				end
+			
+				
+				if found_item then
+					self.owner_entity_system:post_table("item_ownership", {
+						subject = character,
+						item = found_item,
+						pick = true
+					})
+				end
+			end
+		end
+	end
+end
 
 function wield_system:receive_item_ownership()
 	local msgs = self.owner_entity_system.messages["ITEM_DROPPED"]
@@ -55,32 +106,20 @@ function wield_system:receive_item_ownership()
 			drop = true
 		})
 	end
-end
-
-function wield_system:handle_pick_requests()
-	local msgs = self.owner_entity_system.messages["PICK_REQUEST"]
+	
+	msgs = self.owner_entity_system.messages["ITEM_PICKED"]
 	
 	for i=1, #msgs do
 		local msg = msgs[i]
-		local subject = msg.subject
-		local character = subject.client.controlled_object
 		
-		if character ~= nil then
-			local wield = character.wield
-			if wield ~= nil then
-				-- subject validity ensured here
-				if wield.wielded_item ~= nil then
-					self.owner_entity_system:post_table("item_ownership", { 
-						subject = character,
-						drop = true
-					})
-				end
-				
-			end
-		end
-	
+		self.owner_entity_system:post_table("item_ownership", {
+			subject = replication.object_by_id[msg.data.subject_id],
+			item = replication.object_by_id[msg.data.item_id],
+			pick = true
+		})
 	end
 end
+
 
 function wield_system:update()
 	local msgs = self.owner_entity_system.messages["item_ownership"]

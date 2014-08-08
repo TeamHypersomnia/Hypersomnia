@@ -3,7 +3,11 @@ filters = {
 	STATIC_OBJECT = "ALL",
 
 	DROPPED_ITEM = {
-		"STATIC_OBJECT"
+		"ITEM_PICK", "STATIC_OBJECT"
+	},
+	
+	ITEM_PICK = {
+		"DROPPED_ITEM"
 	},
 	
 	CHARACTER = {
