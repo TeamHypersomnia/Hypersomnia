@@ -20,10 +20,11 @@ function scene_class:load_map(map_filename, map_loader_filename)
 	})
 
 	-- create texture atlas
-	local all_atlas, sprite_library, texture_by_filename = create_atlas_from_filenames(all_needed_textures)
+	local all_atlas, sprite_library, sprite_object_library, texture_by_filename = create_atlas_from_filenames(all_needed_textures)
 	
 	self.all_atlas = all_atlas
 	self.sprite_library = sprite_library
+	self.sprite_object_library = sprite_object_library
 	self.texture_by_filename = texture_by_filename
 	
 	-- the loader creates all the entities in the current world

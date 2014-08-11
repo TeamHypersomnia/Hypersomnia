@@ -310,6 +310,8 @@ end
 
 function create_atlas_from_filenames(filename_entries)
 	local sprite_library = {}
+	local sprite_object_library = {}
+	
 	local texture_by_filename = {}
 	local out_atlas = atlas()
 	collectgarbage("collect")
@@ -317,6 +319,10 @@ function create_atlas_from_filenames(filename_entries)
 	-- save every texture object in item library to be used later
 	for k, v in pairs(filename_entries) do
 		local texture_object = texture(v, out_atlas)
+		
+		local sprite_object = create_sprite {
+			image = texture_object
+		}
 		
 		-- save for requests from map editor
 		texture_by_filename[v] = texture_object
@@ -326,12 +332,13 @@ function create_atlas_from_filenames(filename_entries)
 		
 		-- the last token is just filename + extension
 		save_resource_in_item_library(tokenized[#tokenized], texture_object, sprite_library)
+		save_resource_in_item_library(tokenized[#tokenized], sprite_object, sprite_object_library)
 	end
 	
 	out_atlas:build()
 	out_atlas:nearest()
 	
-	return out_atlas, sprite_library, texture_by_filename
+	return out_atlas, sprite_library, sprite_object_library, texture_by_filename
 end
 
 table.erase = function(self, element)

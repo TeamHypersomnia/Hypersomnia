@@ -1,3 +1,24 @@
+function add_physics_component(entity, entry)
+	local my_body_data = physics_info()
+	if entry.body_info == nil then entry.body_info = {} end
+	
+	if entry.body_info.shape_type == physics_info.RECT then
+		if entry.body_info.rect_size == nil then
+			entry.body_info.rect_size = entity.render.model.size
+		end
+	end
+	
+	if entry.body_info.shape_type == physics_info.POLYGON then
+		if entry.body_info.vertices == nil then
+			entry.body_info.vertices = entity.render.model
+		end
+	end
+	
+	set_physics_info(my_body_data, entry.body_info)
+	
+	create_physics_component(my_body_data, entity, entry.body_type)
+end
+
 function set_components_from_entry(entity, entry, entities_lookup)	
 	if entry.script_class ~= nil then
 		entity.script = entry.script_class:create()
@@ -95,24 +116,7 @@ function set_components_from_entry(entity, entry, entities_lookup)
 	end
 	
 	if entry.physics ~= nil then
-		local my_body_data = physics_info()
-		if entry.physics.body_info == nil then entry.physics.body_info = {} end
-		
-		if entry.physics.body_info.shape_type == physics_info.RECT then
-			if entry.physics.body_info.rect_size == nil then
-				entry.physics.body_info.rect_size = entry.render.model.size
-			end
-		end
-		
-		if entry.physics.body_info.shape_type == physics_info.POLYGON then
-			if entry.physics.body_info.vertices == nil then
-				entry.physics.body_info.vertices = entry.render.model
-			end
-		end
-		
-		set_physics_info(my_body_data, entry.physics.body_info)
-		
-		create_physics_component(my_body_data, entity, entry.physics.body_type)
+		add_physics_component(entity, entry.physics)
 	end
 
 	--if entry.gun ~= nil then
