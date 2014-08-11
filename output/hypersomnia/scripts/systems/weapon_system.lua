@@ -118,19 +118,9 @@ function weapon_system:translate_shot_info_msgs()
 	local msgs = self.owner_entity_system.messages["SHOT_INFO"]
 	
 	for i=1, #msgs do
-	--print "getting info"
-	--print(msgs[i].data.subject_id)
-	--print(self.owner_entity_system.all_systems["replication"].my_sync_id)
 		local subject = self.owner_entity_system.all_systems["replication"].object_by_id[msgs[i].data.subject_id].wield.wielded_item
-		
-		--if subject ~= nil and subject.weapon ~= nil then
-		--
-		--end
-		
 		local forward_time = msgs[i].data.delay_time + self.owner_entity_system.all_systems["client"]:get_last_ping()/2
-		--print(forward_time)
-		--print(subject.weapon.transmit_bullets)
-		subject.weapon.random_seed = 
+		
 		table.insert(subject.weapon.buffered_actions, { trigger = components.weapon.triggers.SHOOT, premade_shot = {
 			position = msgs[i].data.position,
 			rotation = msgs[i].data.rotation,

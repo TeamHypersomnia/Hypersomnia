@@ -57,7 +57,8 @@ end
 protocol.diff_operators = {
 	-- accept divergences maximum of 0.1 pixels
 	["b2Vec2"] = function (a, b) return b2Vec2(a.x-b.x, a.y-b.y):LengthSquared() > (0.5 * PIXELS_TO_METERS)*(0.5 * PIXELS_TO_METERS) end,
-	["Vec2"] =   function (a, b) return (a-b):length_sq() > 0.5*0.5 end
+	["Vec2"] =   function (a, b) return (a-b):length_sq() > 0.5*0.5 end,
+	["Float"] =   function (a, b) return math.abs(a-b) > 0.01 end
 }
 
 replication_module = inherits_from ()
