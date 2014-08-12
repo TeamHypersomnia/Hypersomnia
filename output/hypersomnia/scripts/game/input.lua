@@ -2,6 +2,7 @@ custom_intents = create_inverse_enum {
 	"QUIT",
 	"DROP_ITEM",
 	"PICK_REQUEST",
+	"DROP_REQUEST",
 	"ZOOM_CAMERA",
 	
 	"SWITCH_CLIENT_1",
@@ -18,10 +19,12 @@ main_input_context = create_input_context {
 		[keys.A] 				= intent_message.MOVE_LEFT,
 		[keys.D] 				= intent_message.MOVE_RIGHT,
 		
-		[keys._1] 				= custom_intents.SWITCH_CLIENT_1,
-		[keys._2] 				= custom_intents.SWITCH_CLIENT_2,
-		[keys._3] 				= custom_intents.SWITCH_CLIENT_3,
-		[keys._4] 				= custom_intents.SWITCH_CLIENT_4,
+		[keys.G] 				= custom_intents.DROP_REQUEST,
+		
+		[keys._7] 				= custom_intents.SWITCH_CLIENT_1,
+		[keys._8] 				= custom_intents.SWITCH_CLIENT_2,
+		[keys._9] 				= custom_intents.SWITCH_CLIENT_3,
+		[keys._0] 				= custom_intents.SWITCH_CLIENT_4,
 		
 		[mouse.ldoubleclick] 	= intent_message.SHOOT,
 		[mouse.ltripleclick] 	= intent_message.SHOOT,

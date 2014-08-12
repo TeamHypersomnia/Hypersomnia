@@ -800,3 +800,6 @@ Then all the items have their own "switch_value" specified - that is, how much t
 
 In fact, all responsibility that the wield_system should yield is merely selecting/unselecting a given item as current. 
 It will accept any subject and item ids and the ownership issues should be handled somewhere else.
+
+three events: wield, unwield, drop.
+this requires all three callbacks defined both on the wielder and the item.
