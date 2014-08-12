@@ -42,9 +42,6 @@ function wield_system:send_pick_requests(world_object)
 	end
 end
 
-
-
-
 function wield_system:receive_item_ownership()
 	local msgs = self.owner_entity_system.messages["ITEM_DROPPED"]
 	local replication = self.owner_entity_system.all_systems["replication"]
@@ -71,7 +68,6 @@ function wield_system:receive_item_ownership()
 	end
 end
 
-
 function wield_system:update()
 	local msgs = self.owner_entity_system.messages["item_ownership"]
 	
@@ -87,14 +83,6 @@ function wield_system:update()
 				local item = msg.item
 				-- check if it is not already picked by somebody else
 				if item.item ~= nil and item.item.ownership == nil then
-					-- only server-side
-					if subject.client_controller ~= nil then
-						subject.replication.sub_entities["ITEM_ENTITY"] = item
-						
-						item.replication:switch_group_for_client("OWNER", subject.client_controller.owner_client)
-						item.replication:switch_public_group("OWNED_PUBLIC")
-					end
-					
 					msg.succeeded = true
 					item.item:set_ownership(subject)
 					wield.wielded_item = item
@@ -105,15 +93,6 @@ function wield_system:update()
 				local item = wield.wielded_item 
 				
 				if item ~= nil and item.item ~= nil then
-					-- unmap that item		
-					-- only server-side		
-					if subject.client_controller ~= nil then
-						subject.replication.sub_entities["ITEM_ENTITY"] = nil
-						
-						item.replication:switch_public_group("PUBLIC")
-						item.replication:switch_group_for_client("PUBLIC", subject.client_controller.owner_client)
-					end
-				
 					msg.dropped_item = item
 					msg.succeeded = true
 					item.item:set_ownership(nil)
