@@ -803,3 +803,41 @@ It will accept any subject and item ids and the ownership issues should be handl
 
 three events: wield, unwield, drop.
 this requires all three callbacks defined both on the wielder and the item.
+
+inventory system receives SELECT_ITEM_REQUESTs and converts them to WIELD_ITEM messages which are in turn handled by the wield_system.
+If the item does not exist in the inventory, we most likely have a hacked client.
+
+the inventory system also receives DROP_ITEM_REQUEST and handles it accordingly.
+
+If we unwield an item we only unmap it from subentities, we don't change the groups.
+
+WIELD_ITEM message may contain a nil-subject which means we want to simply unwield the currently wielded item.
+
+We can safely assume "not-being-owned-by-anyone" with being dropped on the ground, that is, being added a physics component.
+That does mean that an item that is dropped can't be given commands by anyone.
+Still, the item that is in the inventory has its ownership nil.
+
+If we're talking about a case like a character owning a flying rocket, then we have "pilot" item entity and the rocket is a totally different entity driven by different mechanisms
+unrelated to item systems.
+
+so DROPPING == SETTING ITEM'S OWNERSHIP TO NIL
+
+So:
+
+drop => ownership = nil
+ownership = subject => pick
+
+especially:
+
+ownership = nil =/> drop
+
+so item can be:
+
+dropped and not wielded
+picked and wielded
+picked and not wielded
+
+to not repeat the logic of unpicking while dropping, we can assume that drop_message is always preceded by an item_ownership message with subject = nil.
+or just firstly iterate through drop_message's and post subject ownership messages already inside the system.
+
+The concept of dropping is introduced by the inventory_system and partially by item_system, and is transparent to the wield_system.

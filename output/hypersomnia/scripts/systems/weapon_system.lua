@@ -31,8 +31,8 @@ function weapon_system:shot_routine(target, premade_shot)
 	local entity = target.cpp_entity
 	
 	-- try to recover the owner entity if we're dealing with an item
-	if target.item ~= nil and target.item.ownership ~= nil then
-		entity = target.item.ownership.cpp_entity
+	if target.item ~= nil and target.item.wielder ~= nil then
+		entity = target.item.wielder.cpp_entity
 	end
 	
 	

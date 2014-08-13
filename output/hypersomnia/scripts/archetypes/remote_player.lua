@@ -134,9 +134,7 @@ world_archetype_callbacks["REMOTE_PLAYER"] = {
 			wield = {}
 		}
 		
-		new_entity.wield.on_pick = function(this)
-			local picked = this.wield.wielded_item
-			
+		new_entity.wield.on_item_selected = function(this, picked)
 			new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["white"][picked.item.wield_type].set
 			
 			if picked.weapon ~= nil then

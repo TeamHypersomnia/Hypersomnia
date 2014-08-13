@@ -16,11 +16,10 @@ for k, v in pairs(world_archetype_groups.guns) do
 			-- nothing to do if we're recreating
 			if not is_object_new then return end
 			
-			if new_entity.item.is_owned then
-				self.owner_entity_system:post_table("item_ownership", {
-					subject = self.object_by_id[new_entity.item.ownership_id],
-					item = new_entity,
-					pick = true
+			if new_entity.item.is_wielded then
+				self.owner_entity_system:post_table("wield_item", {
+					subject = self.object_by_id[new_entity.item.wielder_id],
+					item = new_entity
 				})
 			else
 				new_entity.item.on_drop(new_entity)

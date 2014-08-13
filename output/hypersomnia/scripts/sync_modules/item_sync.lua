@@ -1,7 +1,7 @@
 protocol.replication_tables.register("item", {
 	init_only_fields = {
-		"Bool", "is_owned", function (object) return object.item.ownership ~= nil end,
-		"Ushort", "ownership_id", function (object) if object.item.ownership ~= nil then return object.item.ownership.replication.id else return 0 end end
+		"Bool", "is_wielded", function (object) return object.item.wielder ~= nil end,
+		"Ushort", "wielder_id", function (object) if object.item.wielder ~= nil then return object.item.wielder.replication.id else return 0 end end
 	},
 	
 	optional_updaters = {

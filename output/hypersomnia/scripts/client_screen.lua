@@ -55,7 +55,7 @@ function client_screen:constructor(camera_rect)
 	self.entity_system_instance:register_messages {
 		"network_message",
 		"shot_message",
-		"item_ownership"
+		"wield_item"
 	}
 	
 	self.entity_system_instance:register_messages (protocol.message_names)
@@ -143,9 +143,8 @@ function client_screen:loop()
 	self.systems.replication:update_object_states()
 	
 	self.systems.wield:send_pick_requests(self.sample_scene.world_object)
-	self.systems.wield:receive_item_ownership()
+	self.systems.wield:receive_item_selections()
 	self.systems.wield:update()
-	self.systems.wield:ownership_callbacks()
 	
 	self.systems.weapon:handle_messages()
 	

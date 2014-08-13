@@ -10,45 +10,52 @@ function item_system:get_required_components()
 	return { "item" }
 end
 
-function components.item:set_ownership(new_owner)
+function components.item:drop()
+	local item = self.entity
+	
+	if item.cpp_entity.physics == nil then
+		-- drop it to the ground
+		add_physics_component(item.cpp_entity, item.item.entity_archetype.physics)
+		
+		-- if we had a wielder, copy its transform
+		if item.item.wielder ~= nil then
+			item.cpp_entity.transform.current = item.item.wielder.cpp_entity.transform.current
+		end
+	end
+	
+	self:set_wielder(nil)
+	
+	item.item.on_drop(item)
+end
+
+function components.item:set_wielder(new_owner)
 	local item = self.entity
 	local cpp_chase = nil
 	
 	if new_owner ~= nil then
 		cpp_chase = new_owner.cpp_entity
+		
+		if item.cpp_entity.physics ~= nil then 
+			item.cpp_entity:remove_physics()
+		end
 	end
 	
 	item.cpp_entity.chase:set_target(cpp_chase)
-
-	if new_owner ~= nil and item.cpp_entity.physics ~= nil then
-		item.cpp_entity:remove_physics()
-	elseif new_owner == nil and item.cpp_entity.physics == nil then
-		-- drop it to the ground
-		add_physics_component(item.cpp_entity, item.item.entity_archetype.physics)
-		
-		-- if we had an owner, copy its transform
-		if item.item.ownership ~= nil then
-			item.cpp_entity.transform.current = item.item.ownership.cpp_entity.transform.current
-		end
-	end
+	item.item.wielder = new_owner
 	
-	item.item.ownership = new_owner
+	if item.item.on_wielder_changed then
+		item.item.on_wielder_changed(item)
+	end
 end
 
-
 function item_system:remove_entity(removed_entity)
-	local owner = removed_entity.item.ownership
+	local wielder = removed_entity.item.wielder
 	
-	if owner ~= nil then
-		local wield = owner.wield
-		
-		removed_entity.item:set_ownership(nil)
-		
-		if wield.on_drop ~= nil then
-			wield.on_drop(owner, wield.wielded_item)
-		end
-		
-		wield.wielded_item = nil
+	if wielder ~= nil then
+		-- the same will happen both on the client and the server upon item deletion
+		-- so there's no need to generate an "wield_item" message for such an event
+		components.wield.select_item(wielder, nil)
+		removed_entity.item:set_wielder(nil)
 	end
 end
 
@@ -64,7 +71,7 @@ function item_system:add_entity(new_entity)
 		new_entity.cpp_entity.script = new_entity
 	end
 	
-	new_entity.item:set_ownership(nil)
+	new_entity.item:set_wielder(nil)
 	--processing_system.add_entity(self, new_entity)
 end
 
