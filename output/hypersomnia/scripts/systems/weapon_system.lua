@@ -99,7 +99,7 @@ function weapon_system:handle_messages()
 	local msgs = self.world_object:get_messages_filter_components("intent_message", { "wield" } )
 	
 	for i=1, #msgs do
-		local item_subject = msgs[i].subject.script.wield.wielded_item
+		local item_subject = msgs[i].subject.script.wield.wielded_items[components.wield.keys.PRIMARY_WEAPON]
 		
 		if item_subject ~= nil and item_subject.weapon ~= nil then
 			if msgs[i].intent == intent_message.SHOOT then
@@ -118,7 +118,7 @@ function weapon_system:translate_shot_info_msgs()
 	local msgs = self.owner_entity_system.messages["SHOT_INFO"]
 	
 	for i=1, #msgs do
-		local subject = self.owner_entity_system.all_systems["replication"].object_by_id[msgs[i].data.subject_id].wield.wielded_item
+		local subject = self.owner_entity_system.all_systems["replication"].object_by_id[msgs[i].data.subject_id].wield.wielded_items[components.wield.keys.PRIMARY_WEAPON]
 		local forward_time = msgs[i].data.delay_time + self.owner_entity_system.all_systems["client"]:get_last_ping()/2
 		
 		table.insert(subject.weapon.buffered_actions, { trigger = components.weapon.triggers.SHOOT, premade_shot = {

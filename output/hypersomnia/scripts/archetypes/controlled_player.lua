@@ -166,8 +166,8 @@ world_archetype_callbacks["CONTROLLED_PLAYER"] = {
 			wield = {}
 		}
 		
-		new_entity.wield.on_item_selected = function(this, picked)
-			player_cpp_entity.body.animate.available_animations = self.owner_scene.torso_sets["white"][picked.item.wield_type].set
+		new_entity.wield.on_item_wielded = function(this, picked)
+			player_cpp_entity.body.animate.available_animations = self.owner_scene.torso_sets["white"][picked.item.outfit_type].set
 			
 			if picked.weapon ~= nil then
 				picked.weapon.transmit_bullets = true
@@ -176,7 +176,7 @@ world_archetype_callbacks["CONTROLLED_PLAYER"] = {
 			end
 		end
 		
-		new_entity.wield.on_drop = function(this)
+		new_entity.wield.on_item_unwielded = function(this)
 			player_cpp_entity.body.animate.available_animations = self.owner_scene.torso_sets["white"]["barehands"].set
 		end
 		

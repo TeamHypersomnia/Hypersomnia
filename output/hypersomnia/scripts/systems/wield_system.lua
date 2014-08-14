@@ -18,8 +18,8 @@ function wield_system:remove_entity(removed_entity)
 	-- AND IF SO, IT SHOULD POST A DROP MESSAGE BEFORE POSTING DELETION OF THE OBJECT
 	
 	-- IF THE ITEM ISN'T DROPPED, IT IS SIMPLY DELETED
-	if removed_entity.wield.wielded_item ~= nil then
-		self.owner_entity_system:remove_entity(removed_entity.wield.wielded_item)
+	for k, v in pairs(removed_entity.wield.wielded_items) do
+		self.owner_entity_system:remove_entity(v)
 	end
 	
 	--processing_system.remove_entity(self, removed_entity)
@@ -67,46 +67,91 @@ function wield_system:receive_item_selections()
 	--end
 end
 
-components.wield.select_item = function(wielder, new_item)
+components.wield.wield_item = function(wielder, new_item, wielding_key)
 	local self = wielder.wield
 	
-	local old_item = self.wielded_item
-	self.wielded_item = new_item
+	local old_item = self.wielded_items[wielding_key]
+	self.wielded_items[wielding_key] = new_item
+	new_item.item.wielding_key = wielding_key
 	
-	if self.on_item_selected then
-		print "callback"
-		self.on_item_selected(wielder, new_item, old_item)
+	if old_item then
+		old_item.item:set_wielder(nil)
+	end
+	
+	if self.on_item_wielded then
+		self.on_item_wielded(wielder, new_item, old_item, wielding_key)
 	end
 end
 
+components.wield.unwield_item = function(wielder, old_item, wielding_key_hint)
+	local found = false
+	local self = wielder.wield
+	
+	if wielding_key_hint ~= nil then
+		old_item = self.wielded_items[wielding_key_hint]
+		
+		if old_item then
+			found = true
+		end
+		
+		self.wielded_items[wielding_key_hint] = nil
+	else
+		for k, v in pairs(self.wielded_items) do
+			if v == old_item then
+				wielding_key_hint = k
+				self.wielded_items[k] = nil
+				found = true
+				break
+			end
+		end
+	end
+	
+	if found and self.on_item_unwielded then
+		self.on_item_unwielded(wielder, old_item, wielding_key_hint)
+	end
+	
+	return found
+end
+
 function wield_system:update()
-	local msgs = self.owner_entity_system.messages["wield_item"]
+	local msgs = self.owner_entity_system.messages["unwield_item"]
+	-- subject
+	-- item OR wielding_key
 	
 	for i=1, #msgs do
 		local msg = msgs[i]
 		local subject = msg.subject
-		local wield = subject.wield
 		
 		-- check subject validity
-		if wield ~= nil	then
+		if subject.wield ~= nil	then
+			local item = components.wield.unwield_item(subject, msg.item, msg.wielding_key)
+
+			if item then
+				msg.succeeded = true
+				msg.item = item
+				item.item:set_wielder(nil)
+			end
+		end
+	end
+	
+	msgs = self.owner_entity_system.messages["wield_item"]
+	-- subject
+	-- item 
+	-- wielding_key
+	
+	for i=1, #msgs do
+		local msg = msgs[i]
+		local subject = msg.subject
+		
+		-- check subject validity
+		if subject.wield ~= nil	then
 			local item = msg.item
 			
-			local previous_item = wield.wielded_item
-			
-			-- unwielding
-			if item == nil then
+			if item.item.wielder == nil then
 				msg.succeeded = true
-				components.wield.select_item(subject, nil)
-			-- we can only wield an unwielded item
-			elseif item.item.wielder == nil then
-				msg.succeeded = true
-				components.wield.select_item(subject, item)
+				print "wielding!"
+				components.wield.wield_item(subject, msg.item, msg.wielding_key)
 				item.item:set_wielder(subject)
-			end
-			
-			-- we wield only one item at a time
-			if msg.succeeded and previous_item then
-				previous_item.item:set_wielder(nil)
 			end
 		end
 	end

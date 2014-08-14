@@ -134,8 +134,8 @@ world_archetype_callbacks["REMOTE_PLAYER"] = {
 			wield = {}
 		}
 		
-		new_entity.wield.on_item_selected = function(this, picked)
-			new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["white"][picked.item.wield_type].set
+		new_entity.wield.on_item_wielded = function(this, picked)
+			new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["white"][picked.item.outfit_type].set
 			
 			if picked.weapon ~= nil then
 				picked.weapon.transmit_bullets = false
@@ -144,7 +144,7 @@ world_archetype_callbacks["REMOTE_PLAYER"] = {
 			end
 		end
 		
-		new_entity.wield.on_drop = function(this)
+		new_entity.wield.on_item_unwielded = function(this)
 			new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["white"]["barehands"].set
 		end
 		

@@ -841,3 +841,35 @@ to not repeat the logic of unpicking while dropping, we can assume that drop_mes
 or just firstly iterate through drop_message's and post subject ownership messages already inside the system.
 
 The concept of dropping is introduced by the inventory_system and partially by item_system, and is transparent to the wield_system.
+
+
+An item has 3 states:
+
+1. Wielded
+2. In the inventory
+3. Dropped to the ground
+
+1. OWNER knows everything; OWNED_PUBLIC knows only things needed to simulate remote item events
+2. OWNER knows everything; nobody except him knows about the object existence.
+3. Everybody knows the same.
+
+The only responsibilities of wield_system are as follows:
+
+1. set pointers to wielders and wielded items, call on_drop/on_wielder_change/on_item_selected callbacks
+2. receive/send item and wielder ownership ids to interested parties
+3. if an object is wielded, make it subentity "ITEM_ENTITY" of the wielder and: 
+3.1. set OWNER group for wielder
+3.2. set OWNED_PUBLIC group for the rest
+4. if an object is unwielded, don't longer replicate it to anyone simply by setting subentity "ITEM_ENTITY" to nil.
+group settings are retained but an item is no longer replicated unless wielded again;
+if, in such a case, the item needs to be replicated anyway (in inventory for example), it is the other system's responsibility
+to set proper subentities and and groups. It must be noted though that once wielded, the group settings will be overwritten again.
+
+inventory system should merely give an opportunity to give a request to wield a given entity.
+
+Item should always be created as "Dropped" and only later be operated on. It is because "Dropped" items are the least dependent from others.
+
+
+
+After all, i think the best solution would be when no-item-ownership ALWAYS implies it being dropped.
+Then, the inventory would just be another entity. 

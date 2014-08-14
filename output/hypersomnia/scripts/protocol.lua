@@ -6,20 +6,38 @@ protocol.message_by_id = {
 		data = {}
 	},
 	{
-		name = "PICK_REQUEST",
+		name = "PICK_ITEM_REQUEST",
 		data = {}
-	},
+	},	
 	{
-		name = "ITEM_PICKED",
+		name = "SELECT_ITEM_REQUEST",
 		data = {
-			"Ushort", "subject_id",
+			"Ushort", "item_id"
+		}
+	},	
+	{
+		name = "DROP_ITEM_REQUEST",
+		data = {
 			"Ushort", "item_id"
 		}
 	},
 	{
-		name = "ITEM_DROPPED",
+		name = "UNSELECT_ITEM_REQUEST",
+		data = {}
+	},
+	{
+		name = "ITEM_WIELDED",
 		data = {
-			"Ushort", "subject_id"
+			"Ushort", "subject_id",
+			"Ushort", "item_id",
+			"Ushort", "wielding_key"
+		}
+	},
+	{
+		name = "ITEM_UNWIELDED",
+		data = {
+			"Ushort", "subject_id",
+			"Ushort", "wielding_key",
 		}
 	},
 	{

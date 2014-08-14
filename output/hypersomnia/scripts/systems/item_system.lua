@@ -10,24 +10,6 @@ function item_system:get_required_components()
 	return { "item" }
 end
 
-function components.item:drop()
-	local item = self.entity
-	
-	if item.cpp_entity.physics == nil then
-		-- drop it to the ground
-		add_physics_component(item.cpp_entity, item.item.entity_archetype.physics)
-		
-		-- if we had a wielder, copy its transform
-		if item.item.wielder ~= nil then
-			item.cpp_entity.transform.current = item.item.wielder.cpp_entity.transform.current
-		end
-	end
-	
-	self:set_wielder(nil)
-	
-	item.item.on_drop(item)
-end
-
 function components.item:set_wielder(new_owner)
 	local item = self.entity
 	local cpp_chase = nil
@@ -38,6 +20,22 @@ function components.item:set_wielder(new_owner)
 		if item.cpp_entity.physics ~= nil then 
 			item.cpp_entity:remove_physics()
 		end
+	elseif item.cpp_entity.physics == nil then
+		-- drop it to the ground
+		add_physics_component(item.cpp_entity, item.item.entity_archetype.physics)
+		
+		-- if we had a wielder, copy its transform
+		if item.item.wielder ~= nil then
+			item.cpp_entity.transform.current = item.item.wielder.cpp_entity.transform.current
+		end
+		
+		if item.item.on_drop then
+			item.item.on_drop(item)
+		end
+	end
+	
+	if new_owner == nil then
+		self.wielding_key = nil
 	end
 	
 	item.cpp_entity.chase:set_target(cpp_chase)
@@ -53,8 +51,8 @@ function item_system:remove_entity(removed_entity)
 	
 	if wielder ~= nil then
 		-- the same will happen both on the client and the server upon item deletion
-		-- so there's no need to generate an "wield_item" message for such an event
-		components.wield.select_item(wielder, nil)
+		-- so there's no need to generate a	"wield_item" message for such an event
+		components.wield.unwield_item(wielder, nil, removed_entity.item.wielding_key)
 		removed_entity.item:set_wielder(nil)
 	end
 end
