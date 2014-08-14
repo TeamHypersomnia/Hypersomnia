@@ -81,21 +81,19 @@ components.wield.wield_item = function(wielder, new_item, wielding_key)
 		old_item.item:set_wielder(nil)
 	end
 	
+	new_item.item:set_wielder(wielder)
+	
 	if self.on_item_wielded then
 		self.on_item_wielded(wielder, new_item, old_item, wielding_key)
 	end
 end
 
 components.wield.unwield_item = function(wielder, old_item, wielding_key_hint)
-	local found = false
+	local found_item;
 	local self = wielder.wield
 	
 	if wielding_key_hint ~= nil then
-		old_item = self.wielded_items[wielding_key_hint]
-		
-		if old_item then
-			found = true
-		end
+		found_item = self.wielded_items[wielding_key_hint]
 		
 		self.wielded_items[wielding_key_hint] = nil
 	else
@@ -103,17 +101,21 @@ components.wield.unwield_item = function(wielder, old_item, wielding_key_hint)
 			if v == old_item then
 				wielding_key_hint = k
 				self.wielded_items[k] = nil
-				found = true
+				found_item = old_item
 				break
 			end
 		end
 	end
 	
-	if found and self.on_item_unwielded then
-		self.on_item_unwielded(wielder, old_item, wielding_key_hint)
+	if found_item then
+		found_item.item:set_wielder(nil)
 	end
 	
-	return found
+	if found_item and self.on_item_unwielded then
+		self.on_item_unwielded(wielder, found_item, wielding_key_hint)
+	end
+	
+	return found_item
 end
 
 function wield_system:update()
@@ -139,7 +141,6 @@ function wield_system:update()
 				if item then
 					msg.succeeded = true
 					msg.item = item
-					item.item:set_wielder(nil)
 				end
 			elseif msg.wield then
 				local item = msg.item
@@ -147,7 +148,6 @@ function wield_system:update()
 				if item.item.wielder == nil then
 					msg.succeeded = true
 					components.wield.wield_item(subject, msg.item, msg.wielding_key)
-					item.item:set_wielder(subject)
 				end
 			end
 		end

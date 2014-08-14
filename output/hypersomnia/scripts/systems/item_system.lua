@@ -53,7 +53,6 @@ function item_system:remove_entity(removed_entity)
 		-- the same will happen both on the client and the server upon item deletion
 		-- so there's no need to generate a	"wield_item" message for such an event
 		components.wield.unwield_item(wielder, nil, removed_entity.item.wielding_key)
-		removed_entity.item:set_wielder(nil)
 	end
 end
 
