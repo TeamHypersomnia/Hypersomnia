@@ -19,7 +19,8 @@ for k, v in pairs(world_archetype_groups.guns) do
 			print "construction!"
 			if new_entity.item.is_wielded then
 				print "construction!"
-				self.owner_entity_system:post_table("wield_item", {
+				self.owner_entity_system:post_table("item_wielder_change", {
+					wield = true,
 					subject = self.object_by_id[new_entity.item.wielder_id],
 					item = new_entity,
 					wielding_key = components.wield.keys.PRIMARY_WEAPON

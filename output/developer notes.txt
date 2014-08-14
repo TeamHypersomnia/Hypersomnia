@@ -873,3 +873,14 @@ Item should always be created as "Dropped" and only later be operated on. It is 
 
 After all, i think the best solution would be when no-item-ownership ALWAYS implies it being dropped.
 Then, the inventory would just be another entity. 
+
+We may consider processing ALL item events strictly in-order, that is, to replace separation of wield/unwield events with a single "item_event".
+
+OLD NOTES:
+			-- subject's subentity "ITEM_ENTITY" is already overwritten with nil or the newly selected item
+			-- the previously wielded item won't longer be replicated and if it will be in the future,
+			-- it is only by posting drop_item/wield_item message and thus
+			-- it will be assigned a meaningful replication group on the go
+			
+			-- or it may be replicated in the inventory - in such a case, it is the inventory_system's responsibility
+			-- to set a meaningful group upon putting an item to the inventory

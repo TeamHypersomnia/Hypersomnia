@@ -55,8 +55,7 @@ function client_screen:constructor(camera_rect)
 	self.entity_system_instance:register_messages {
 		"network_message",
 		"shot_message",
-		"wield_item",
-		"unwield_item"
+		"item_wielder_change"
 	}
 	
 	self.entity_system_instance:register_messages (protocol.message_names)

@@ -74,6 +74,9 @@ components.wield.wield_item = function(wielder, new_item, wielding_key)
 	self.wielded_items[wielding_key] = new_item
 	new_item.item.wielding_key = wielding_key
 	
+	-- this should actually never happen
+	-- as the wielding in the place of an old item
+	-- should be preceded by the unwield of this old item
 	if old_item then
 		old_item.item:set_wielder(nil)
 	end
@@ -114,27 +117,12 @@ components.wield.unwield_item = function(wielder, old_item, wielding_key_hint)
 end
 
 function wield_system:update()
-	local msgs = self.owner_entity_system.messages["unwield_item"]
+	local msgs = self.owner_entity_system.messages["item_wielder_change"]
+	-- unwield = true
 	-- subject
 	-- item OR wielding_key
 	
-	for i=1, #msgs do
-		local msg = msgs[i]
-		local subject = msg.subject
-		
-		-- check subject validity
-		if subject.wield ~= nil	then
-			local item = components.wield.unwield_item(subject, msg.item, msg.wielding_key)
-
-			if item then
-				msg.succeeded = true
-				msg.item = item
-				item.item:set_wielder(nil)
-			end
-		end
-	end
-	
-	msgs = self.owner_entity_system.messages["wield_item"]
+	-- wield = true
 	-- subject
 	-- item 
 	-- wielding_key
@@ -145,13 +133,22 @@ function wield_system:update()
 		
 		-- check subject validity
 		if subject.wield ~= nil	then
-			local item = msg.item
+			if msg.unwield then
+				local item = components.wield.unwield_item(subject, msg.item, msg.wielding_key)
+	
+				if item then
+					msg.succeeded = true
+					msg.item = item
+					item.item:set_wielder(nil)
+				end
+			elseif msg.wield then
+				local item = msg.item
 			
-			if item.item.wielder == nil then
-				msg.succeeded = true
-				print "wielding!"
-				components.wield.wield_item(subject, msg.item, msg.wielding_key)
-				item.item:set_wielder(subject)
+				if item.item.wielder == nil then
+					msg.succeeded = true
+					components.wield.wield_item(subject, msg.item, msg.wielding_key)
+					item.item:set_wielder(subject)
+				end
 			end
 		end
 	end
