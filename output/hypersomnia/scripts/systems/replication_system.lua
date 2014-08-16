@@ -99,6 +99,8 @@ function replication_system:get_variable_message_size(msg)
 		return msg.data.bits
 	elseif msg.info.name == "NEW_OBJECTS" then
 		return msg.data.bits
+	elseif msg.info.name == "DELETE_OBJECTS" then
+		return msg.data.bits
 	end
 	
 	return 0
@@ -132,8 +134,23 @@ function replication_system:delete_objects()
 	
 	for i=1, #msgs do
 		local id = msgs[i].data.removed_id
-		self.owner_entity_system:post_remove(self.object_by_id[id])
 		
+		self.owner_entity_system:post_remove(self.object_by_id[id])
 		self.object_by_id[id] = nil
+	end
+	
+	msgs = self.owner_entity_system.messages["DELETE_OBJECTS"]
+	
+	for i=1, #msgs do
+		local msg = msgs[i]
+		local input_bs = msg.input_bs
+		
+		for j=1, msg.data.object_count do
+			input_bs:name_property("deleted_object_id")
+			local id = input_bs:ReadUshort()
+			
+			self.owner_entity_system:post_remove(self.object_by_id[id])
+			self.object_by_id[id] = nil
+		end
 	end
 end

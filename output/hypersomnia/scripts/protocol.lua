@@ -133,6 +133,14 @@ protocol.message_by_id = {
 		data = {
 			"Ushort", "removed_id"
 		}
+	},
+	{
+		name = "DELETE_OBJECTS",
+		data = {
+			"Ushort", "bits",
+			"Ushort", "object_count"
+		},
+		variable_size = true
 	}
 }
 
