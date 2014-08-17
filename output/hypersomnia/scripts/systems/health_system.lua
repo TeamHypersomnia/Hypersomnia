@@ -62,8 +62,6 @@ function health_system:update()
 	local msgs = self.owner_entity_system.messages["DAMAGE_MESSAGE"]
 	
 	for i=1, #msgs do
-		print "amount"
-		print (msgs[i].data.amount)
 		local health = self.owner_entity_system.all_systems["replication"].object_by_id[msgs[i].data.victim_id].health
 		health.hp = health.hp - msgs[i].data.amount
 	end

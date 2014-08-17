@@ -16,9 +16,7 @@ for k, v in pairs(world_archetype_groups.guns) do
 			-- nothing to do if we're recreating
 			if not is_object_new then return end
 			
-			print "construction!"
 			if new_entity.item.is_wielded then
-				print "construction!"
 				self.owner_entity_system:post_table("item_wielder_change", {
 					wield = true,
 					subject = self.object_by_id[new_entity.item.wielder_id],

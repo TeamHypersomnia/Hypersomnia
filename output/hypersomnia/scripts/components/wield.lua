@@ -1,7 +1,8 @@
 components.wield = inherits_from()
 
 components.wield.keys = create_enum {
-	"PRIMARY_WEAPON"
+	"PRIMARY_WEAPON",
+	"INVENTORY"
 } 
 
 function components.wield:constructor(init_table)

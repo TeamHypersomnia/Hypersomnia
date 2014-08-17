@@ -6,7 +6,6 @@ protocol.replication_tables.register("gun_init_info", {
 	optional_updaters = {
 		GENERIC_UPDATER = function(object, field_name, new_value, replica_module)
 			object.weapon[field_name] = new_value
-			print (field_name, new_value)
 		end
 	}
 })

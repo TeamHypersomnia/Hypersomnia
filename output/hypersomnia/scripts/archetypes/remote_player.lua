@@ -116,7 +116,7 @@ function create_remote_player(owner_scene, crosshair_sprite)
 end
 
 
-world_archetype_callbacks["REMOTE_PLAYER"] = {
+world_archetype_callbacks.REMOTE_PLAYER = {
 	creation = function(self)
 		local new_remote_player = create_remote_player(self.owner_scene, self.owner_scene.crosshair_sprite)
 	
@@ -134,18 +134,22 @@ world_archetype_callbacks["REMOTE_PLAYER"] = {
 			wield = {}
 		}
 		
-		new_entity.wield.on_item_wielded = function(this, picked)
-			new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["white"][picked.item.outfit_type].set
-			
-			if picked.weapon ~= nil then
-				picked.weapon.transmit_bullets = false
-				picked.weapon.constrain_requested_bullets = false
-				picked.weapon.bullet_entity.physics.body_info.filter = filters.REMOTE_BULLET
+		new_entity.wield.on_item_wielded = function(this, picked, old_item, wielding_key)
+			if wielding_key == components.wield.keys.PRIMARY_WEAPON then
+				new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["white"][picked.item.outfit_type].set
+				
+				if picked.weapon ~= nil then
+					picked.weapon.transmit_bullets = false
+					picked.weapon.constrain_requested_bullets = false
+					picked.weapon.bullet_entity.physics.body_info.filter = filters.REMOTE_BULLET
+				end
 			end
 		end
 		
-		new_entity.wield.on_item_unwielded = function(this)
-			new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["white"]["barehands"].set
+		new_entity.wield.on_item_unwielded = function(this, old_item, wielding_key)
+			if wielding_key == components.wield.keys.PRIMARY_WEAPON then
+				new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["white"]["barehands"].set
+			end
 		end
 		
 		return new_entity

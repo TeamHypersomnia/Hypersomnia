@@ -30,14 +30,8 @@ function lifetime_system:translate_hit_infos()
 
 	for i=1, #hit_infos do
 		local msg = hit_infos[i]
-		print "received hit info"
-		print (msg.data.victim_id)
-		print (msg.data.bullet_id)
-		
 		local victim = objects[msg.data.victim_id]
 		local bullet = bullet_creation.remote_bullets[msg.data.bullet_id]
-		print (bullet ~= nil)
-		
 		local new_collision = {}
 		
 		if bullet ~= nil then

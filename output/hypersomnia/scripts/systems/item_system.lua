@@ -17,12 +17,14 @@ function components.item:set_wielder(new_owner)
 	if new_owner ~= nil then
 		cpp_chase = new_owner.cpp_entity
 		
-		if item.cpp_entity.physics ~= nil then 
+		if item.cpp_entity.physics ~= nil then
 			item.cpp_entity:remove_physics()
 		end
 	elseif item.cpp_entity.physics == nil then
 		-- drop it to the ground
-		add_physics_component(item.cpp_entity, item.item.entity_archetype.physics)
+		if item.item.entity_archetype ~= nil then
+			add_physics_component(item.cpp_entity, item.item.entity_archetype.physics)
+		end
 		
 		-- if we had a wielder, copy its transform
 		if item.item.wielder ~= nil then
@@ -42,7 +44,7 @@ function components.item:set_wielder(new_owner)
 	item.item.wielder = new_owner
 	
 	if item.item.on_wielder_changed then
-		item.item.on_wielder_changed(item)
+		item.item.on_wielder_changed(item, new_owner)
 	end
 end
 
@@ -60,15 +62,19 @@ function item_system:add_entity(new_entity)
 	new_entity.item.entity = new_entity
 	
 	if new_entity.cpp_entity == nil then
+		local archetype = new_entity.item.entity_archetype
+		if archetype == nil then archetype = {} end
+		
 		new_entity.cpp_entity = self.world_object:create_entity ( override({
 			transform = {},
 			chase = {}
-		}, new_entity.item.entity_archetype) )
+		}, archetype) )
 		
 		new_entity.cpp_entity.script = new_entity
 	end
 	
-	new_entity.item:set_wielder(nil)
+	components.item.set_wielder(new_entity.item, nil)
+	--new_entity.item:set_wielder(nil)
 	--processing_system.add_entity(self, new_entity)
 end
 

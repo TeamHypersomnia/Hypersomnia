@@ -51,7 +51,7 @@ function create_weapons(scene, include_render)
 				object.cpp_entity.render.layer = render_layers.ON_GROUND
 			end,
 			
-			on_wielder_changed = function(object)
+			on_wielder_changed = function(object, new_wielder)
 				object.cpp_entity.render.model = nil
 			end,
 				

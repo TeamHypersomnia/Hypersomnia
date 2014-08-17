@@ -51,7 +51,7 @@ function interpolation_system:update()
 				
 				if new_position ~= nil then target.physics.body:SetTransform(new_position, new_angle) end
 				if new_velocity ~= nil then target.physics.body:SetLinearVelocity(new_velocity) end
-				if new_angular_velocity ~= nil then print(new_angular_velocity) target.physics.body:SetAngularVelocity(new_angular_velocity) end
+				if new_angular_velocity ~= nil then target.physics.body:SetAngularVelocity(new_angular_velocity) end
 			--end
 		end
 	end

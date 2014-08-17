@@ -62,7 +62,7 @@ function replication_system:create_objects_or_change_modules(msg)
 		-- if the object is new
 		if is_object_new then
 			-- creation phase
-			new_entity = world_archetype_callbacks[archetype_name].creation(self)
+			new_entity = world_archetype_callbacks[archetype_name].creation(self, new_object.id)
 			
 			-- save replication data (not as a component; just a table)
 			new_entity.replication = { modules = replica, id = new_object.id }

@@ -142,8 +142,8 @@ function create_controlled_player(scene_object, position, target_camera, crossha
 	return player
 end
 
-world_archetype_callbacks["CONTROLLED_PLAYER"] = {
-	creation = function(self)
+world_archetype_callbacks.CONTROLLED_PLAYER = {
+	creation = function(self, id)
 		local player_cpp_entity = create_controlled_player(
 		self.owner_scene,
 		self.owner_scene.teleport_position, 
@@ -166,19 +166,25 @@ world_archetype_callbacks["CONTROLLED_PLAYER"] = {
 			wield = {}
 		}
 		
-		new_entity.wield.on_item_wielded = function(this, picked)
-			player_cpp_entity.body.animate.available_animations = self.owner_scene.torso_sets["white"][picked.item.outfit_type].set
-			
-			if picked.weapon ~= nil then
-				picked.weapon.transmit_bullets = true
-				picked.weapon.constrain_requested_bullets = true
-				picked.weapon.bullet_entity.physics.body_info.filter = filters.BULLET
+		new_entity.wield.on_item_wielded = function(this, picked, old_item, wielding_key)
+			if wielding_key == components.wield.keys.PRIMARY_WEAPON then
+				player_cpp_entity.body.animate.available_animations = self.owner_scene.torso_sets["white"][picked.item.outfit_type].set
+				
+				if picked.weapon ~= nil then
+					picked.weapon.transmit_bullets = true
+					picked.weapon.constrain_requested_bullets = true
+					picked.weapon.bullet_entity.physics.body_info.filter = filters.BULLET
+				end
 			end
 		end
 		
-		new_entity.wield.on_item_unwielded = function(this)
-			player_cpp_entity.body.animate.available_animations = self.owner_scene.torso_sets["white"]["barehands"].set
+		new_entity.wield.on_item_unwielded = function(this, unwielded, wielding_key)
+			if wielding_key == components.wield.keys.PRIMARY_WEAPON then
+				player_cpp_entity.body.animate.available_animations = self.owner_scene.torso_sets["white"]["barehands"].set
+			end
 		end
+		
+		self.controlled_character_id = id
 		
 		return new_entity
 	end

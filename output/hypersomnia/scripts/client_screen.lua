@@ -6,6 +6,7 @@ dofile "hypersomnia\\scripts\\components\\lifetime.lua"
 dofile "hypersomnia\\scripts\\components\\health.lua"
 dofile "hypersomnia\\scripts\\components\\wield.lua"
 dofile "hypersomnia\\scripts\\components\\item.lua"
+dofile "hypersomnia\\scripts\\components\\inventory.lua"
 
 dofile "hypersomnia\\scripts\\sync_modules\\modules.lua"
 dofile "hypersomnia\\scripts\\sync_modules\\movement_sync.lua"

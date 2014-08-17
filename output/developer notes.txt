@@ -884,3 +884,19 @@ OLD NOTES:
 			
 			-- or it may be replicated in the inventory - in such a case, it is the inventory_system's responsibility
 			-- to set a meaningful group upon putting an item to the inventory
+			
+			
+Consider a callback-based group assignment approach.
+
+Performance-wise, we should right away sweep all sub-entities for whose group mapping for a given client does not exist 
+- so that the rest of the sub-entities are not even checked for the replication.
+
+Although, flexibility-wise, there may be a case where a deep subentity does not want to inherit its parent group.
+For example, some items in the inventory (a pistol, a glowing lamp) could be visible to the public.
+
+We should make a flag to support both modes. For now, stick to the performance-wise solution.
+
+To handle several replication groups mapping to the same replica, just assign a string like this: SQUAD = "OWNER" and handle them internally.
+
+Remember that messages posted on the very creation of the object are going to encounter EMPTY remote_states table - therefore, no messages will be transmitted,
+ only initial states during the update pass.
