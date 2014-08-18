@@ -56,3 +56,27 @@ function table.compare(a, bigger, omit_properties)
 	
 	return true
 end
+
+function table.push_children(tree, write_children)
+	local function push_children_targets(parents)
+		local children_targets = {}
+		
+		local function write_child(new_child)
+			children_targets[#children_targets + 1] = new_child
+			tree[#tree + 1] = new_child
+		end
+		
+		for i=1, #parents do
+			write_children(parents[i], write_child)
+		end
+		
+		return children_targets
+	end
+
+	local new_children = tree
+	
+	while next(new_children) ~= nil do
+		new_children = push_children_targets(new_children)
+	end
+end
+
