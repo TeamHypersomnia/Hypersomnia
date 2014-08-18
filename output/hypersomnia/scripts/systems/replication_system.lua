@@ -69,7 +69,6 @@ function replication_system:create_objects_or_change_modules(msg)
 			
 			-- save the newly created entity
 			self.object_by_id[new_object.id] = new_entity
-			self.owner_entity_system:add_entity(new_entity)
 		-- otherwise just update the replica
 		else
 			print "RECREATING OBJECT"
@@ -90,6 +89,11 @@ function replication_system:create_objects_or_change_modules(msg)
 		
 		if construction_callback then 
 			construction_callback (self, new_entity, is_object_new)
+		end
+		
+		-- call the system constructors after the archetype construction phase
+		if is_object_new then
+			self.owner_entity_system:add_entity(new_entity)
 		end
 	end
 end
