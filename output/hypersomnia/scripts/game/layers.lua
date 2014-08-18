@@ -1,8 +1,4 @@
-render_layers = create_enum {
-	"CROSSHAIRS",
-	"INVENTORY_SLOTS",
-	"HEALTH_BARS",
-	
+world_render_layers = {
 	"EFFECTS",
 	"OBJECTS",
 	"HEADS",
@@ -16,3 +12,14 @@ render_layers = create_enum {
 	"UNDER_CORPSES",
 	"GROUND"
 }
+
+hud_render_layers = {
+	"CROSSHAIRS",
+	"INVENTORY_SLOTS",
+	"HEALTH_BARS"
+}
+
+render_layers = create_enum (table.concatenate {
+	hud_render_layers,
+	world_render_layers 
+})

@@ -23,7 +23,7 @@ world_archetype_callbacks.INVENTORY = {
 				}
 			})
 			
-			new_entity.inventory.target_camera = self.owner_scene.world_camera
+			new_entity.inventory.draw_as_owner = true
 		end
 		
 		if new_entity.item.is_wielded then

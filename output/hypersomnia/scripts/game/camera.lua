@@ -98,8 +98,16 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				local renderer = camera_draw_input.output
 				local visible_area = camera_draw_input.visible_area
 				
+				renderer:generate_layers(mask)
 				my_shader_program:use()
-				renderer:generate_triangles(camera_draw_input, mask)
+				
+				for i=#world_render_layers, 1, -1  do
+					renderer:draw_layer(camera_draw_input, render_layers[world_render_layers[i]])
+				end
+				
+				renderer:draw_layer(camera_draw_input, render_layers.HEALTH_BARS)
+				renderer:draw_layer(camera_draw_input, render_layers.INVENTORY_SLOTS)
+				renderer:draw_layer(camera_draw_input, render_layers.CROSSHAIRS)
 				
 				GL.glUniformMatrix4fv(
 				projection_matrix_uniform, 

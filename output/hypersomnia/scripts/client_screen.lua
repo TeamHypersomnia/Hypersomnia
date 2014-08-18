@@ -159,7 +159,7 @@ function client_screen:loop()
 	self.systems.weapon:update()
 	
 	self.systems.lifetime:update()
-	--self.systems.inventory:update()
+	self.systems.inventory:update()
 
 	self.systems.bullet_creation:update()
 	
