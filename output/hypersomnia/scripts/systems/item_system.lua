@@ -70,8 +70,16 @@ function item_system:add_entity(new_entity)
 			chase = {}
 		}, archetype) )
 		
-		new_entity.cpp_entity.script = new_entity
+	else
+		if new_entity.cpp_entity.transform == nil then
+			new_entity.cpp_entity:add(transform_component())
+		end
+		if new_entity.cpp_entity.chase == nil then
+			new_entity.cpp_entity:add(chase_component())
+		end
 	end
+	
+	new_entity.cpp_entity.script = new_entity
 	
 	components.item.set_wielder(new_entity.item, nil)
 	--new_entity.item:set_wielder(nil)

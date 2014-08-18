@@ -8,7 +8,14 @@ custom_intents = create_inverse_enum {
 	"SWITCH_CLIENT_1",
 	"SWITCH_CLIENT_2",
 	"SWITCH_CLIENT_3",
-	"SWITCH_CLIENT_4"
+	"SWITCH_CLIENT_4",
+	
+	"SELECT_ITEM_1",
+	"SELECT_ITEM_2",
+	"SELECT_ITEM_3",
+	"SELECT_ITEM_4",
+	"SELECT_ITEM_5",
+	"SELECT_ITEM_6"
 }
 
 main_input_context = create_input_context {
@@ -20,6 +27,13 @@ main_input_context = create_input_context {
 		[keys.D] 				= intent_message.MOVE_RIGHT,
 		
 		[keys.G] 				= custom_intents.DROP_REQUEST,
+		
+		[keys._1] 				= custom_intents.SELECT_ITEM_1,
+		[keys._2] 				= custom_intents.SELECT_ITEM_2,
+		[keys._3] 				= custom_intents.SELECT_ITEM_3,
+		[keys._4] 				= custom_intents.SELECT_ITEM_4,
+		[keys._5] 				= custom_intents.SELECT_ITEM_5,
+		[keys._6] 				= custom_intents.SELECT_ITEM_6,
 		
 		[keys._7] 				= custom_intents.SWITCH_CLIENT_1,
 		[keys._8] 				= custom_intents.SWITCH_CLIENT_2,

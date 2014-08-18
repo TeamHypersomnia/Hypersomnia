@@ -86,7 +86,7 @@ function create_controlled_player(scene_object, position, target_camera, crossha
 			},
 			
 			render = {
-				layer = render_layers.GUI_OBJECTS,
+				layer = render_layers.CROSSHAIRS,
 				model = crosshair_sprite
 			},
 			

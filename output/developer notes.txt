@@ -900,3 +900,20 @@ To handle several replication groups mapping to the same replica, just assign a 
 
 Remember that messages posted on the very creation of the object are going to encounter EMPTY remote_states table - therefore, no messages will be transmitted,
  only initial states during the update pass.
+ 
+If a lag causes a hit request to come before the bullet coming into existence, we might just safely assume that the shot was missed.
+
+
+
+Our interface overlay will consist of 3 main elements (in order of rendering):
+
+1. WORLD highlights: crosshairs, selected items, important areas, health bars, targets and so on.
+1.1. draw highlights, shader pass
+
+2. CHARACTER hud: current rounds, proximity object list, radar, immediate-selection items
+2.1. draw controls backgrounds
+2.2. draw highlights (strokes mainly), shader pass
+2.3. draw objects
+
+3. GUI - chat, trade, every object that is selectible and movable by mouse
+here it is worth mentioning that selecting controls like immediate inventory slots are done by an additional gui event object.

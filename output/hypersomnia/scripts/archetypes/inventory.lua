@@ -1,17 +1,30 @@
 world_archetype_callbacks.INVENTORY = {
 	creation = function(self)
-		local new_entity = components.create_components {
+		return components.create_components {
 			inventory = {},
 			wield = {},
 			item = {}
 		}
-		
-		return new_entity
 	end,
 	
 	construction = function(self, new_entity, is_object_new)
 		-- nothing to do if we're recreating
 		if not is_object_new then return end
+		
+		if new_entity.item.wielder_id == self.controlled_character_id then
+			new_entity.cpp_entity = self.owner_scene.world_object:create_entity ( {
+				input = {
+					custom_intents.SELECT_ITEM_1,
+					custom_intents.SELECT_ITEM_2,
+					custom_intents.SELECT_ITEM_3,
+					custom_intents.SELECT_ITEM_4,
+					custom_intents.SELECT_ITEM_5,
+					custom_intents.SELECT_ITEM_6
+				}
+			})
+			
+			new_entity.inventory.target_camera = self.owner_scene.world_camera
+		end
 		
 		if new_entity.item.is_wielded then
 			print "constructing inventory!"

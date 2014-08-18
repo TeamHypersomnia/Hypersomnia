@@ -24,7 +24,7 @@ function health_system:add_entity(new_entity)
 	
 	local bar_entity = {
 		render = {
-			layer = render_layers.GUI_OBJECTS
+			layer = render_layers.HEALTH_BARS
 		},
 		
 		transform = {},

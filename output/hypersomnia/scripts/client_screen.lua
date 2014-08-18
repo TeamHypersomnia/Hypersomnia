@@ -24,6 +24,7 @@ dofile "hypersomnia\\scripts\\systems\\replication_system.lua"
 dofile "hypersomnia\\scripts\\systems\\weapon_system.lua"
 dofile "hypersomnia\\scripts\\systems\\bullet_creation_system.lua"
 dofile "hypersomnia\\scripts\\systems\\lifetime_system.lua"
+dofile "hypersomnia\\scripts\\systems\\inventory_system.lua"
 
 dofile "hypersomnia\\scripts\\systems\\wield_system.lua"
 dofile "hypersomnia\\scripts\\systems\\item_system.lua"
@@ -82,6 +83,7 @@ function client_screen:constructor(camera_rect)
 	
 	self.systems.wield = wield_system:create()
 	self.systems.item = item_system:create(self.sample_scene.world_object)
+	self.systems.inventory = inventory_system:create(self.sample_scene)
 	
 	table.insert(self.sample_scene.world_object.prestep_callbacks, function (dt)
 		self.systems.input_prediction:substep()
@@ -157,6 +159,7 @@ function client_screen:loop()
 	self.systems.weapon:update()
 	
 	self.systems.lifetime:update()
+	--self.systems.inventory:update()
 
 	self.systems.bullet_creation:update()
 	

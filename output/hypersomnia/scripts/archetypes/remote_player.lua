@@ -70,7 +70,7 @@ function create_remote_player(owner_scene, crosshair_sprite)
 			},
 			
 			render = {
-				layer = render_layers.GUI_OBJECTS,
+				layer = render_layers.CROSSHAIRS,
 				model = crosshair_sprite
 			},
 			
