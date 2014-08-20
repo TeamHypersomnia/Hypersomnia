@@ -64,43 +64,50 @@ function inventory_system:remove_entity(removed_entity)
 	processing_system.remove_entity(self, removed_entity)
 end
 
-function inventory_system:update()
+function inventory_system:handle_picked_up_items()
 	local msgs = self.owner_entity_system.messages["item_wielder_change"]
 	
 	for i=1, #msgs do
 		local msg = msgs[i]
 		
-		if msg.succeeded then
+		if msg.succeeded and msg.wield then
 			local inventory = msg.subject.inventory
 			local wield = msg.subject.wield
 			
 			if inventory then
-				for j=1, #inventory.slots do
-					local slot = inventory.slots[j]
-					
-					if not slot.stored_item then
-						slot.stored_item = msg.item
-						slot.stored_sprite = create_sprite { image = msg.item.item.item_sprite }
-						slot.entity.render.model = slot.stored_sprite
-						print "Slot:" print (j)
-						msg.item.item.inventory_slot = j
-						
-						-- if wield.pri
-						break
+				local found_slot = msg.predefined_slot
+				
+				if found_slot == nil then
+					for j=1, #inventory.slots do
+						if not inventory.slots[j].stored_item then
+							found_slot = j
+							break
+						end
 					end
 				end
+						
+				local slot = inventory.slots[found_slot]
+				
+				slot.stored_item = msg.item
+				slot.stored_sprite = create_sprite { image = msg.item.item.item_sprite }
+				slot.entity.render.model = slot.stored_sprite
+				print "Slot:" print (found_slot)
+				msg.item.item.inventory_slot = found_slot
 			end
 		end
 	end
-	
-	msgs = self.owner_world:get_messages_filter_components("intent_message", { "inventory" } )
+end
+
+function inventory_system:update()
+	local msgs = self.owner_world:get_messages_filter_components("intent_message", { "inventory" } )
 	local client_sys = self.owner_entity_system.all_systems["client"]
 	
 	for i=1, #msgs do
 		local msg = msgs[i]
 		
-		local subject = msgs[i].subject.script
-		local inventory = subject.inventory
+		local subject_inventory = msgs[i].subject.script
+		local inventory = subject_inventory.inventory
+		local wielder = subject_inventory.item.wielder
 		
 		if msg.state_flag then
 			local intent = msg.intent
@@ -108,7 +115,7 @@ function inventory_system:update()
 			if intent == custom_intents.PICK_REQUEST then
 				client_sys.net_channel:post_reliable("PICK_ITEM_REQUEST", {})
 			elseif intent == custom_intents.DROP_REQUEST then
-				local to_be_dropped = subject.item.wielder.wield.wielded_items[components.wield.keys.PRIMARY_WEAPON]
+				local to_be_dropped = wielder.wield.wielded_items[components.wield.keys.PRIMARY_WEAPON]
 				
 				if to_be_dropped then
 					client_sys.net_channel:post_reliable("DROP_ITEM_REQUEST", {
@@ -116,26 +123,89 @@ function inventory_system:update()
 					})		
 				end
 			elseif intent == custom_intents.HOLSTER_ITEM then
-				inventory.active_item = nil
+				if inventory.active_item then
+					local item = inventory.slots[inventory.active_item].stored_item
+					
+					-- predict the holstering on the client
+					
+					-- liberate the wielded object
+					self.owner_entity_system:post_table("item_wielder_change", { 
+						unwield = true,
+						subject = wielder,
+						wielding_key = components.wield.keys.PRIMARY_WEAPON
+					})
+					
+					-- and hide it to the inventory
+					self.owner_entity_system:post_table("item_wielder_change", { 
+						wield = true,
+						subject = subject_inventory,
+						["item"] = item,
+						wielding_key = item.replication.id,
+						
+						predefined_slot = inventory.active_item
+					})
+					
+					inventory.active_item = nil
+				end	
 			else
 				for j=1, #inventory.slots do
 					if intent == custom_intents["SELECT_ITEM_" .. j] then
 						local item = inventory.slots[j].stored_item
 						
-						if item then
+						if item and inventory.active_item ~= j then
 							client_sys.net_channel:post_reliable("SELECT_ITEM_REQUEST", {
 								item_id = item.replication.id
 							})
 							
+							-- predict the selection on the client
+							
+							-- liberate the selected object from the inventory
+							self.owner_entity_system:post_table("item_wielder_change", { 
+								unwield = true,
+								subject = subject_inventory,
+								wielding_key = item.replication.id
+							})
+							
+							local previously_worn = wielder.wield.wielded_items[components.wield.keys.PRIMARY_WEAPON]
+							
+							if previously_worn then
+								-- liberate the previously wielded object
+								self.owner_entity_system:post_table("item_wielder_change", { 
+									unwield = true,
+									subject = wielder,
+									wielding_key = components.wield.keys.PRIMARY_WEAPON
+								})
+					
+								-- and the previously worn item should be hidden back into the inventory
+								-- first we should check if it actually was in the inventory, by checking for the existence
+								-- of the "inventory_slot" field
+								self.owner_entity_system:post_table("item_wielder_change", { 
+									wield = true,
+									subject = subject_inventory,
+									["item"] = previously_worn,
+									wielding_key = previously_worn.replication.id,
+						
+									predefined_slot = inventory.active_item
+								})
+							end
+							
+							-- let the newly selected item be held by the character
+							self.owner_entity_system:post_table("item_wielder_change", { 
+								wield = true,
+								subject = wielder,
+								["item"] = item,
+								wielding_key = components.wield.keys.PRIMARY_WEAPON
+							})
+							
 							inventory.active_item = j
 						end
-						
-						
 						break
 					end
 				end
 			end
 		end
+		
+		print(inventory.active_item)
 	end
 	
 	for i=1, #self.targets do

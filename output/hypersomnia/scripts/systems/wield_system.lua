@@ -64,9 +64,6 @@ components.wield.wield_item = function(wielder, new_item, wielding_key)
 	self.wielded_items[wielding_key] = new_item
 	new_item.item.wielding_key = wielding_key
 	
-	-- this should actually never happen
-	-- as the wielding in the place of an old item
-	-- should be preceded by the unwield of this old item
 	if old_item then
 		old_item.item:set_wielder(nil)
 	end
@@ -134,7 +131,7 @@ function wield_system:update()
 				end
 			elseif msg.wield then
 				local item = msg.item
-				if not msg.wield_if_unwielded or item.item.wielder == nil then
+				if item.item.wielder == nil then
 					print "WIELDING..."
 					msg.succeeded = true
 					components.wield.wield_item(subject, msg.item, msg.wielding_key)

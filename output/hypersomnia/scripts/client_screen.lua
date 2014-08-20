@@ -158,7 +158,10 @@ function client_screen:loop()
 	self.systems.weapon:update()
 	
 	self.systems.lifetime:update()
+	self.systems.inventory:handle_picked_up_items()
 	self.systems.inventory:update()
+	-- post-inventory pass update for prediction
+	self.systems.wield:update()
 
 	self.systems.bullet_creation:update()
 	
