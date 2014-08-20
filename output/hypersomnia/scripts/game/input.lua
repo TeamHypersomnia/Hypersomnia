@@ -1,14 +1,14 @@
 custom_intents = create_inverse_enum {
 	"QUIT",
-	"DROP_ITEM",
-	"PICK_REQUEST",
-	"DROP_REQUEST",
 	"ZOOM_CAMERA",
 	
 	"SWITCH_CLIENT_1",
 	"SWITCH_CLIENT_2",
 	"SWITCH_CLIENT_3",
 	"SWITCH_CLIENT_4",
+	
+	"PICK_REQUEST",
+	"DROP_REQUEST",
 	
 	"SELECT_ITEM_1",
 	"SELECT_ITEM_2",

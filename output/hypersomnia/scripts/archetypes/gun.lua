@@ -12,7 +12,7 @@ for k, v in pairs(world_archetype_groups.guns) do
 			return new_entity
 		end,
 		
-		construction = function(self, new_entity, is_object_new)
+		post_construction = function(self, new_entity, is_object_new)
 			-- nothing to do if we're recreating
 			if not is_object_new then return end
 			

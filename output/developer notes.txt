@@ -917,3 +917,10 @@ Our interface overlay will consist of 3 main elements (in order of rendering):
 
 3. GUI - chat, trade, every object that is selectible and movable by mouse
 here it is worth mentioning that selecting controls like immediate inventory slots are done by an additional gui event object.
+
+
+The current approach: dividing the inventory and the primary wielding slot - makes the most sense.
+It's just like in Tibia for example - there is a separate slot for a weapon you're holding and if you want to "select" the weapon from your backpack,
+the item is likely "unwieleded" from the backpack and wielded to the character slot.
+
+The confusion comes from the way you want to display the information about the current weapon, which is highlighting it in place where it previously were.

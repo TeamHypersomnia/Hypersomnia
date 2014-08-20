@@ -17,10 +17,15 @@ function health_system:add_entity(new_entity)
 		color = rgba(0, 194, 0, 255)
 	}
 	
+	new_entity.health.under_bar_outline_sprite = create_sprite {
+		image = self.owner_scene.sprite_library["blank"],
+		color = rgba(11, 23, 35, 255)
+	}
+	
 	new_entity.health.under_bar_sprite = create_sprite {
 		image = self.owner_scene.sprite_library["blank"],
-		color = rgba(0, 0, 0, 255)
-	}
+		color = rgba(11, 23, 35, 255)
+	}	
 	
 	local bar_entity = {
 		render = {
@@ -34,6 +39,12 @@ function health_system:add_entity(new_entity)
 			offset = vec2(0, -40)
 		}
 	}
+	
+	new_entity.health.under_bar_outline_entity = self.owner_world:create_entity (override(bar_entity, { 
+		render = { 
+			model = new_entity.health.under_bar_outline_sprite
+		}
+	}))
 	
 	new_entity.health.under_bar_entity = self.owner_world:create_entity (override(bar_entity, { 
 		render = { 
@@ -54,6 +65,7 @@ function health_system:remove_entity(removed_entity)
 	local owner_world = removed_entity.cpp_entity.owner_world
 	owner_world:post_message(destroy_message(removed_entity.health.under_bar_entity, nil))
 	owner_world:post_message(destroy_message(removed_entity.health.health_bar_entity, nil))
+	owner_world:post_message(destroy_message(removed_entity.health.under_bar_outline_entity, nil))
 	
 	processing_system.remove_entity(self, removed_entity)
 end
@@ -69,9 +81,15 @@ function health_system:update()
 	for i=1, #self.targets do
 		local health = self.targets[i].health
 		
-		health.under_bar_sprite.size = vec2(102, 5)
-		health.health_bar_sprite.size = vec2(health.hp, 3)
-		health.health_bar_sprite.color = rgba(255*(1-health.hp/100), 194*health.hp/100, 0, 255)
+		health.under_bar_sprite.size = vec2(102, 4)
+		health.under_bar_outline_sprite.size = vec2(104, 6)
+		health.health_bar_sprite.size = vec2(health.hp, 2)
+		local mult = health.hp/100
+		health.health_bar_sprite.color = rgba(255*(1-mult*mult), 255*mult*mult, 255*mult, 255)--rgba(255*(1-health.hp/100), 194*health.hp/100, 0, 255)
+		health.under_bar_outline_sprite.color = health.health_bar_sprite.color
+		--health.health_bar_sprite.color.r = health.health_bar_sprite.color.r*0.7
+		--health.health_bar_sprite.color.g = health.health_bar_sprite.color.g*0.7
+		--health.health_bar_sprite.color.b = health.health_bar_sprite.color.b*0.7
 		health.health_bar_entity.chase.offset.x = - (100-health.hp)/2
 	end
 end

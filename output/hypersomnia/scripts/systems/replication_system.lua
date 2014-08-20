@@ -95,6 +95,12 @@ function replication_system:create_objects_or_change_modules(msg)
 		if is_object_new then
 			self.owner_entity_system:add_entity(new_entity)
 		end
+	
+		local post_construction_callback = world_archetype_callbacks[archetype_name].post_construction
+		
+		if post_construction_callback then 
+			post_construction_callback (self, new_entity, is_object_new)
+		end
 	end
 end
 
