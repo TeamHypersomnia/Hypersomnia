@@ -103,6 +103,8 @@ namespace bindings {
 			.def("clear_channel", &render_system::clear_channel)
 			.def("clear_non_cleared_lines", &render_system::clear_non_cleared_lines)
 
+			.def("generate_layers", &render_system::generate_layers)
+			.def("draw_layer", &render_system::draw_layer)
 			.def("call_triangles", &render_system::call_triangles)
 			.def("push_triangle", &render_system::push_triangle)
 			.def("clear_triangles", &render_system::clear_triangles)

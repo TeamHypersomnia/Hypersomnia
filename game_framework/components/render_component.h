@@ -7,24 +7,23 @@ namespace resources {
 
 namespace components {
 	struct render : public augs::entity_system::component {
-		resources::renderable* model;
+		resources::renderable* model = nullptr;
 
 		enum mask_type {
 			WORLD,
 			GUI
 		};
 
-		unsigned layer;
-		unsigned mask;
+		unsigned layer = 0;
+		unsigned mask = mask_type::WORLD;
 
-		bool flip_horizontally;
-		bool flip_vertically;
+		bool flip_horizontally = false;
+		bool flip_vertically = false;
+		bool absolute_transform = false;
 
 		template <typename T>
 		T* get_renderable() {
 			return (T*) model;
 		}
-
-		render(resources::renderable* model = nullptr) : model(model), layer(0), mask(mask_type::WORLD), flip_horizontally(false), flip_vertically(false) {}
 	};
 }

@@ -43,28 +43,52 @@ render_system::render_system(window::glwindow& output_window)
 	glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(resources::vertex), (char*) (sizeof(float) * 2 + sizeof(float) * 2));
 }
 
-void render_system::generate_triangles(resources::renderable::draw_input& in, int mask) {
+void render_system::generate_layers(int mask) {
+	layers.clear();
+
 	/* shortcut */
 	std::vector<entity*> entities_by_mask;
 	for (auto it : targets) {
 		if (it->get<components::render>().mask == mask)
 			entities_by_mask.push_back(it);
 	}
-	
-	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
-	std::stable_sort(entities_by_mask.begin(), entities_by_mask.end(), [](entity* a, entity* b) {
-		return a->get<components::render>().layer > b->get<components::render>().layer;
-	});
 
-	for (auto e : entities_by_mask) {
+	for (auto it : entities_by_mask) {
+		auto layer = it->get<components::render>().layer;
+		
+		if (layer >= layers.size()) 
+			layers.resize(layer+1);
+
+		layers[layer].push_back(it);
+	}
+}
+
+void render_system::draw_layer(resources::renderable::draw_input& in, int layer) {
+	auto in_camera_transform = in.camera_transform;
+	auto in_always_visible = in.always_visible;
+
+	for (auto e : layers[layer]) {
 		auto& render = e->get<components::render>();
 		if (render.model == nullptr) continue;
 
 		in.transform = e->get<components::transform>().current;
 		in.additional_info = &render;
 
+		in.camera_transform = render.absolute_transform ? components::transform::state() : in_camera_transform;
+		in.always_visible = render.absolute_transform ? true : in_always_visible;
+
 		render.model->draw(in);
 	}
+
+	in.camera_transform = in_camera_transform;
+	in.always_visible = in_always_visible;
+}
+
+void render_system::generate_triangles(resources::renderable::draw_input& in, int mask) {
+	generate_layers(mask);
+
+	for (int i = 0; i < layers.size(); ++i)
+		draw_layer(in, layers.size()-i-1);
 }
 
 void render_system::process_entities(world&) {
