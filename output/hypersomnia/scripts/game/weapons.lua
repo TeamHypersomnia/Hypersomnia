@@ -45,14 +45,16 @@ function create_weapons(scene, include_render)
 		
 		item_info = {
 			outfit_type = "rifle",
-		
-			on_drop = function(object)
-				object.cpp_entity.render.model = scene.sprite_object_library["m4a1"]["world"]
-				object.cpp_entity.render.layer = render_layers.ON_GROUND
-			end,
 			
+			item_model = scene.sprite_object_library["m4a1"]["world"],
+		
 			on_wielder_changed = function(object, new_wielder)
-				object.cpp_entity.render.model = nil
+				if new_wielder then
+					object.cpp_entity.render.model = nil
+				else
+					object.cpp_entity.render.model = scene.sprite_object_library["m4a1"]["world"]
+					object.cpp_entity.render.layer = render_layers.ON_GROUND
+				end
 			end,
 				
 			entity_archetype = {

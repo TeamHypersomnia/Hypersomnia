@@ -107,6 +107,7 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				
 				renderer:draw_layer(camera_draw_input, render_layers.HEALTH_BARS)
 				renderer:draw_layer(camera_draw_input, render_layers.INVENTORY_SLOTS)
+				renderer:draw_layer(camera_draw_input, render_layers.INVENTORY_ITEMS)
 				renderer:draw_layer(camera_draw_input, render_layers.CROSSHAIRS)
 				
 				GL.glUniformMatrix4fv(

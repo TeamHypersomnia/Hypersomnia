@@ -886,7 +886,7 @@ OLD NOTES:
 			-- to set a meaningful group upon putting an item to the inventory
 			
 			
-Consider a callback-based group assignment approach.
+Consider a callback-based group-name assignment approach.
 
 Performance-wise, we should right away sweep all sub-entities for whose group mapping for a given client does not exist 
 - so that the rest of the sub-entities are not even checked for the replication.
@@ -924,3 +924,20 @@ It's just like in Tibia for example - there is a separate slot for a weapon you'
 the item is likely "unwieleded" from the backpack and wielded to the character slot.
 
 The confusion comes from the way you want to display the information about the current weapon, which is highlighting it in place where it previously were.
+
+
+
+Do it like this:
+
+Number of slots in immediate inventory defines how much items you can carry there,
+while allowing you to holster the current one.
+
+This means that you are only able to wield a weapon AFTER it is placed in immediate inventory. This makes the most sense.
+
+Let's estabilish a rule that a server will always send wield_item for the immediate inventory entity, and only then wield_item for the character entity.
+
+
+To remove the overhead of rendering on the server:
+- simply load all texture names and fill sprite libraries to preserve logic correctness
+- don't perform render pass
+- delete the texture atlas

@@ -29,42 +29,32 @@ function wield_system:get_required_components()
 	return { "wield" }
 end
 
-function wield_system:send_pick_requests(world_object)
-	--local msgs = world_object:get_messages_filter_components("intent_message", { "wield" } )
-	--
-	--for i=1, #msgs do
-	--	if msgs[i].state_flag and msgs[i].intent == custom_intents.PICK_REQUEST then
-	--		local client_sys = self.owner_entity_system.all_systems["client"]
-	--	
-	--		client_sys.net_channel:post_reliable("PICK_REQUEST", {})
-	--	end
-	--end
-end
-
-function wield_system:receive_item_selections()
-	--local msgs = self.owner_entity_system.messages["ITEM_DROPPED"]
-	--local replication = self.owner_entity_system.all_systems["replication"]
-	--
-	--for i=1, #msgs do
-	--	local msg = msgs[i]
-	--	
-	--	self.owner_entity_system:post_table("drop_item", {
-	--		subject = replication.object_by_id[msg.data.subject_id],
-	--		drop = true
-	--	})
-	--end
-	--
-	--msgs = self.owner_entity_system.messages["ITEM_PICKED"]
-	--
-	--for i=1, #msgs do
-	--	local msg = msgs[i]
-	--	
-	--	self.owner_entity_system:post_table("wield_item", {
-	--		subject = replication.object_by_id[msg.data.subject_id],
-	--		item = replication.object_by_id[msg.data.item_id],
-	--		pick = true
-	--	})
-	--end
+function wield_system:receive_item_wieldings()
+	local msgs = self.owner_entity_system.messages["ITEM_UNWIELDED"]
+	
+	for i=1, #msgs do
+		local data = msgs[i].data
+		
+		self.owner_entity_system:post_table("item_wielder_change", {
+			subject = replication.object_by_id[data.subject_id],
+			wielding_key = data.wielding_key,
+			unwield = true
+		})
+	end
+	
+	msgs = self.owner_entity_system.messages["ITEM_WIELDED"]
+	local replication = self.owner_entity_system.all_systems["replication"]
+	
+	for i=1, #msgs do
+		local data = msgs[i].data
+		print "ITEM_WIELDED"
+		self.owner_entity_system:post_table("item_wielder_change", {
+			subject = replication.object_by_id[data.subject_id],
+			item = replication.object_by_id[data.item_id],
+			wielding_key = data.wielding_key,
+			wield = true
+		})
+	end
 end
 
 components.wield.wield_item = function(wielder, new_item, wielding_key)
@@ -134,7 +124,7 @@ function wield_system:update()
 		local subject = msg.subject
 		
 		-- check subject validity
-		if subject.wield ~= nil	then
+		if not msg.succeeded and subject.wield ~= nil then
 			if msg.unwield then
 				local item = components.wield.unwield_item(subject, msg.item, msg.wielding_key)
 	
@@ -144,8 +134,8 @@ function wield_system:update()
 				end
 			elseif msg.wield then
 				local item = msg.item
-			
-				if item.item.wielder == nil then
+				if not msg.wield_if_unwielded or item.item.wielder == nil then
+					print "WIELDING..."
 					msg.succeeded = true
 					components.wield.wield_item(subject, msg.item, msg.wielding_key)
 				end

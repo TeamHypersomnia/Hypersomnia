@@ -145,8 +145,7 @@ function client_screen:loop()
 	-- as all objects have been created
 	self.systems.replication:update_object_states()
 	
-	self.systems.wield:send_pick_requests(self.sample_scene.world_object)
-	self.systems.wield:receive_item_selections()
+	self.systems.wield:receive_item_wieldings()
 	self.systems.wield:update()
 	
 	self.systems.weapon:handle_messages()

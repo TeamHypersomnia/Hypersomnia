@@ -24,7 +24,7 @@ for k, v in pairs(world_archetype_groups.guns) do
 					wielding_key = components.wield.keys.PRIMARY_WEAPON
 				})
 			else
-				new_entity.item.on_drop(new_entity)
+				new_entity.item.on_wielder_changed(new_entity, nil)
 			end
 		end
 	}

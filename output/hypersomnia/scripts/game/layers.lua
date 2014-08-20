@@ -16,6 +16,7 @@ world_render_layers = {
 hud_render_layers = {
 	"CROSSHAIRS",
 	"INVENTORY_SLOTS",
+	"INVENTORY_ITEMS",
 	"HEALTH_BARS"
 }
 

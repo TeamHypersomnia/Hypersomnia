@@ -30,10 +30,6 @@ function components.item:set_wielder(new_owner)
 		if item.item.wielder ~= nil then
 			item.cpp_entity.transform.current = item.item.wielder.cpp_entity.transform.current
 		end
-		
-		if item.item.on_drop then
-			item.item.on_drop(item)
-		end
 	end
 	
 	if new_owner == nil then
