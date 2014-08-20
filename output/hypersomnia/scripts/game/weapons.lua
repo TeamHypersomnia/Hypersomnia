@@ -46,7 +46,7 @@ function create_weapons(scene, include_render)
 		item_info = {
 			outfit_type = "rifle",
 			
-			item_model = scene.sprite_object_library["m4a1"]["world"],
+			item_sprite = scene.sprite_library["m4a1"]["world"],
 		
 			on_wielder_changed = function(object, new_wielder)
 				if new_wielder then

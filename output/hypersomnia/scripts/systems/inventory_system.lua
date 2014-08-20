@@ -43,7 +43,9 @@ function inventory_system:add_entity(new_entity)
 					transform = {
 						pos = slot_pos
 					}
-				}
+				},
+				
+				stored_sprite = create_sprite {}
 			}
 		end
 	end
@@ -78,7 +80,8 @@ function inventory_system:update()
 					
 					if not slot.stored_item then
 						slot.stored_item = msg.item
-						slot.entity.render.model = msg.item.item.item_model
+						slot.stored_sprite = create_sprite { image = msg.item.item.item_sprite }
+						slot.entity.render.model = slot.stored_sprite
 						print "Slot:" print (j)
 						msg.item.item.inventory_slot = j
 						
@@ -112,7 +115,8 @@ function inventory_system:update()
 						item_id = to_be_dropped.replication.id
 					})		
 				end
-			
+			elseif intent == custom_intents.HOLSTER_ITEM then
+				inventory.active_item = nil
 			else
 				for j=1, #inventory.slots do
 					if intent == custom_intents["SELECT_ITEM_" .. j] then
@@ -122,7 +126,10 @@ function inventory_system:update()
 							client_sys.net_channel:post_reliable("SELECT_ITEM_REQUEST", {
 								item_id = item.replication.id
 							})
+							
+							inventory.active_item = j
 						end
+						
 						
 						break
 					end
@@ -135,8 +142,17 @@ function inventory_system:update()
 		local inventory = self.targets[i].inventory
 		
 		if inventory.draw_as_owner then
-			for i=1, #inventory.slots do
-				inventory.slots[i].bg_entity.render.model = self.owner_scene.sprite_object_library["slot"]["inactive"]
+			for j=1, #inventory.slots do
+				local model = "inactive"
+				
+				if inventory.active_item == j then
+					model = "active"
+					inventory.slots[j].stored_sprite.color.a = 255
+				else
+					inventory.slots[j].stored_sprite.color.a = 120
+				end
+				
+				inventory.slots[j].bg_entity.render.model = self.owner_scene.sprite_object_library["slot"][model]
 			end
 		end
 	end

@@ -16,6 +16,10 @@ protocol.message_by_id = {
 		}
 	},	
 	{
+		name = "HOLSTER_ITEM",
+		data = {}
+	},	
+	{
 		name = "DROP_ITEM_REQUEST",
 		data = {
 			"Ushort", "item_id"

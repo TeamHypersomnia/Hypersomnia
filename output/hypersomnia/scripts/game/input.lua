@@ -9,6 +9,7 @@ custom_intents = create_inverse_enum {
 	
 	"PICK_REQUEST",
 	"DROP_REQUEST",
+	"HOLSTER_ITEM",
 	
 	"SELECT_ITEM_1",
 	"SELECT_ITEM_2",
@@ -27,6 +28,7 @@ main_input_context = create_input_context {
 		[keys.D] 				= intent_message.MOVE_RIGHT,
 		
 		[keys.G] 				= custom_intents.DROP_REQUEST,
+		[keys.H] 				= custom_intents.HOLSTER_ITEM,
 		
 		[keys._1] 				= custom_intents.SELECT_ITEM_1,
 		[keys._2] 				= custom_intents.SELECT_ITEM_2,
