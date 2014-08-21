@@ -941,3 +941,12 @@ To remove the overhead of rendering on the server:
 - simply load all texture names and fill sprite libraries to preserve logic correctness
 - don't perform render pass
 - delete the texture atlas
+
+We don't have to exactly share the inventory logic between the server and the client - the server does not need to hold per-slot data 
+(as it is in the case of client: render entities etc)
+it is enough that it maps id as a wielding key and that every item holds its slot number which is then replicated to the client.
+
+
+When wielding an already wielded item, resultant wielding and unwielding might need to act as a separate messages, 
+as some clients may be interested in both unwielding and wielding (player holsters or switches a weapon)
+and some may only need to be presented with unwielding information (somebody sees the aforementioned player - they don't know about the target inventory existence)
