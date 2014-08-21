@@ -86,7 +86,6 @@ function inventory_system:handle_picked_up_item(msg)
 			slot.stored_item = msg.item
 			slot.stored_sprite = create_sprite { image = msg.item.item.item_sprite }
 			slot.entity.render.model = slot.stored_sprite
-			print "Slot:" print (found_slot)
 			msg.item.item.inventory_slot = found_slot
 		end
 	end
@@ -109,12 +108,29 @@ function inventory_system:update()
 			if intent == custom_intents.PICK_REQUEST then
 				client_sys.net_channel:post_reliable("PICK_ITEM_REQUEST", {})
 			elseif intent == custom_intents.DROP_REQUEST then
-				local to_be_dropped = wielder.wield.wielded_items[components.wield.keys.PRIMARY_WEAPON]
-				
-				if to_be_dropped then
+				if inventory.active_item then
+					local item = inventory.slots[inventory.active_item].stored_item
+					
 					client_sys.net_channel:post_reliable("DROP_ITEM_REQUEST", {
-						item_id = to_be_dropped.replication.id
-					})		
+						item_id = item.replication.id
+					})
+
+					-- predict the holstering on the client
+					self:holster_item(subject_inventory, wielder, item, inventory.active_item)
+					
+					local slot = inventory.slots[inventory.active_item]
+					slot.stored_item = nil
+					inventory.active_item = nil
+
+					self.owner_entity_system:post_table("item_wielder_change", { 
+						unwield = true,
+						subject = subject_inventory,
+						wielding_key = item.replication.id
+					})
+					
+					slot.stored_sprite = create_sprite {}
+					slot.entity.render.model = nil
+					item.item.inventory_slot = nil
 				end
 			elseif intent == custom_intents.HOLSTER_ITEM then
 				if inventory.active_item then
@@ -150,8 +166,6 @@ function inventory_system:update()
 				end
 			end
 		end
-		
-		print(inventory.active_item)
 	end
 	
 	for i=1, #self.targets do
