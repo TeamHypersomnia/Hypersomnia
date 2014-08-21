@@ -75,7 +75,7 @@ function inventory_system:handle_picked_up_items()
 			local wield = msg.subject.wield
 			
 			if inventory then
-				local found_slot = msg.predefined_slot
+				local found_slot;-- = msg.predefined_slot
 				
 				if found_slot == nil then
 					for j=1, #inventory.slots do
@@ -105,7 +105,7 @@ function inventory_system:update()
 	for i=1, #msgs do
 		local msg = msgs[i]
 		
-		local subject_inventory = msgs[i].subject.script
+		local subject_inventory = msg.subject.script
 		local inventory = subject_inventory.inventory
 		local wielder = subject_inventory.item.wielder
 		
@@ -158,47 +158,14 @@ function inventory_system:update()
 							})
 							
 							-- predict the selection on the client
-							
-							-- liberate the selected object from the inventory
-							self.owner_entity_system:post_table("item_wielder_change", { 
-								unwield = true,
-								subject = subject_inventory,
-								wielding_key = item.replication.id
-							})
-							
-							local previously_worn = wielder.wield.wielded_items[components.wield.keys.PRIMARY_WEAPON]
-							
-							if previously_worn then
-								-- liberate the previously wielded object
-								self.owner_entity_system:post_table("item_wielder_change", { 
-									unwield = true,
-									subject = wielder,
-									wielding_key = components.wield.keys.PRIMARY_WEAPON
-								})
-					
-								-- and the previously worn item should be hidden back into the inventory
-								-- first we should check if it actually was in the inventory, by checking for the existence
-								-- of the "inventory_slot" field
-								self.owner_entity_system:post_table("item_wielder_change", { 
-									wield = true,
-									subject = subject_inventory,
-									["item"] = previously_worn,
-									wielding_key = previously_worn.replication.id,
-						
-									predefined_slot = inventory.active_item
-								})
-							end
-							
-							-- let the newly selected item be held by the character
-							self.owner_entity_system:post_table("item_wielder_change", { 
-								wield = true,
-								subject = wielder,
-								["item"] = item,
-								wielding_key = components.wield.keys.PRIMARY_WEAPON
+							self.owner_entity_system:post_table("item_selection", {
+								["subject_inventory"] = subject_inventory,
+								["item"] = item
 							})
 							
 							inventory.active_item = j
 						end
+						
 						break
 					end
 				end
@@ -228,8 +195,53 @@ function inventory_system:update()
 	end
 end
 
-function inventory_system:handle_item_requests()
-
+function inventory_system:handle_item_selections()
+	local msgs = self.owner_entity_system.messages["item_selection"]
+	
+	for i=1, #msgs do
+		local msg = msgs[i]
+		
+		local subject_inventory = msg.subject_inventory
+		local inventory = subject_inventory.inventory
+		local wielder = subject_inventory.item.wielder
+		local item = msg.item
+		
+		-- liberate the selected object from the inventory
+		self.owner_entity_system:post_table("item_wielder_change", { 
+			unwield = true,
+			subject = subject_inventory,
+			wielding_key = item.replication.id
+		})
+		
+		local previously_worn = wielder.wield.wielded_items[components.wield.keys.PRIMARY_WEAPON]
+		
+		if previously_worn then
+			-- liberate the previously wielded object
+			self.owner_entity_system:post_table("item_wielder_change", { 
+				unwield = true,
+				subject = wielder,
+				wielding_key = components.wield.keys.PRIMARY_WEAPON
+			})
+		
+			-- and the previously worn item should be hidden back into the inventory
+			-- first we should check if it actually was in the inventory, by checking for the existence
+			-- of the "inventory_slot" field
+			self.owner_entity_system:post_table("item_wielder_change", { 
+				wield = true,
+				subject = subject_inventory,
+				["item"] = previously_worn,
+				wielding_key = previously_worn.replication.id
+			})
+		end
+		
+		-- let the newly selected item be held by the character
+		self.owner_entity_system:post_table("item_wielder_change", { 
+			wield = true,
+			subject = wielder,
+			["item"] = item,
+			wielding_key = components.wield.keys.PRIMARY_WEAPON
+		})
+	end
 end
 --
 --function inventory_system:send_item_requests()
