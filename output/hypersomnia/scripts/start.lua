@@ -63,7 +63,9 @@ while not SHOULD_QUIT_FLAG do
 	GL.glClear(GL.GL_COLOR_BUFFER_BIT)
 	
 	for i=1, #client_scenes do
+		local NOW_CLIENT_NUMBER = CURRENT_CLIENT_NUMBER
 		CURRENT_CLIENT_NUMBER = i
+		
 		client_scenes[i]:loop()
 	end
 	

@@ -950,3 +950,8 @@ it is enough that it maps id as a wielding key and that every item holds its slo
 When wielding an already wielded item, resultant wielding and unwielding might need to act as a separate messages, 
 as some clients may be interested in both unwielding and wielding (player holsters or switches a weapon)
 and some may only need to be presented with unwielding information (somebody sees the aforementioned player - they don't know about the target inventory existence)
+
+
+We must right away call the wielding logic (along with the server-side part) while processing select weapon requests.
+The problem is with requests clumped up into a single packet - we process more than one of them before updating wielding state and we're posting 
+messages based on irrelevant logic - this is why some items pop-up on the server laying on the ground.

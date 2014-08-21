@@ -139,7 +139,6 @@ function wield_system:update()
 			elseif msg.wield then
 				local item = msg.item
 				if item.item.wielder == nil then
-					print "WIELDING..."
 					msg.succeeded = true
 					components.wield.wield_item(subject, msg.item, msg.wielding_key)
 				end

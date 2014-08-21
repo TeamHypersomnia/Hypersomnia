@@ -1,4 +1,10 @@
 function inventory_system:holster_item(subject_inventory, wielder, item, predefined_slot, excluded_client)
+	--if item == wielder.wield.wielded_items[components.wield.keys.PRIMARY_WEAPON] then
+	--	print "MATCHING WIELDED!"
+	--else
+	--	print "UNMATCHING WIELDED!"
+	--end
+	
 	-- liberate the wielded object
 	self.owner_entity_system:post_table("item_wielder_change", { 
 		unwield = true,
