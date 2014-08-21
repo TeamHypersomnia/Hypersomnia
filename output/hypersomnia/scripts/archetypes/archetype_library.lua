@@ -19,7 +19,8 @@
 
 world_archetype_groups = {
 	guns = {
-		"m4a1"
+		"m4a1",
+		"shotgun"
 	},
 	
 	UNGROUPED = {

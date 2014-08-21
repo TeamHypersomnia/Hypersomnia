@@ -23,65 +23,88 @@ function create_weapons(scene, include_render)
 		}
 	end
 	
-	weapons.m4a1 = {
-		weapon_info = {
-			current_rounds = 300,
-			is_automatic = true,
-			bullets_once = 1,
-			bullet_damage = 5,
-			bullet_speed = minmax(3000, 3000),
+	local function create_weapon(weapon_name, weapon_type, weapon_properties)
+		weapons[weapon_name] = {
+			weapon_info = weapon_properties,
 			
-			shooting_interval_ms = 100,
-			spread_degrees = 0,
-			shake_radius = 9.5,
-			shake_spread_degrees = 45,
-			
-			bullet_barrel_offset = vec2(50, 0),
-			
-			bullet_entity = basic_bullet_entity,				
-			
-			max_lifetime_ms = 500	
-		},
-		
-		item_info = {
-			outfit_type = "rifle",
-			
-			item_sprite = scene.sprite_library["m4a1"]["world"],
-		
-			on_wielder_changed = function(object, new_wielder)
-				if new_wielder then
-					object.cpp_entity.render.model = nil
-				else
-					object.cpp_entity.render.model = scene.sprite_object_library["m4a1"]["world"]
-					object.cpp_entity.render.layer = render_layers.ON_GROUND
-				end
-			end,
+			item_info = {
+				outfit_type = weapon_type,
 				
-			entity_archetype = {
-				render = {
+				item_sprite = scene.sprite_library[weapon_name]["world"],
+			
+				on_wielder_changed = function(object, new_wielder)
+					if new_wielder then
+						object.cpp_entity.render.model = nil
+					else
+						object.cpp_entity.render.model = scene.sprite_object_library[weapon_name]["world"]
+						object.cpp_entity.render.layer = render_layers.ON_GROUND
+					end
+				end,
 					
-				},
-				
-				physics = {
-					body_type = Box2D.b2_dynamicBody,
-					
-					body_info = {
-						filter = filters.DROPPED_ITEM,
-						shape_type = physics_info.RECT,
-						rect_size = vec2(98, 36),
+				entity_archetype = {
+					render = {
 						
-						linear_damping = 4,
-						angular_damping = 4,
-						fixed_rotation = false,
-						density = 0.1,
-						friction = 0,
-						restitution = 0.4,
-						sensor = false
+					},
+					
+					physics = {
+						body_type = Box2D.b2_dynamicBody,
+						
+						body_info = {
+							filter = filters.DROPPED_ITEM,
+							shape_type = physics_info.RECT,
+							rect_size = scene.sprite_library[weapon_name]["world"].size,
+							
+							linear_damping = 4,
+							angular_damping = 4,
+							fixed_rotation = false,
+							density = 0.1,
+							friction = 0,
+							restitution = 0.4,
+							sensor = false
+						}
 					}
 				}
 			}
 		}
-	}
+	end
+	
+	create_weapon("m4a1", "rifle", {
+		current_rounds = 300,
+		is_automatic = true,
+		bullets_once = 1,
+		bullet_damage = 5,
+		bullet_speed = minmax(3000, 3000),
+		
+		shooting_interval_ms = 100,
+		spread_degrees = 0,
+		shake_radius = 9.5,
+		shake_spread_degrees = 45,
+		
+		bullet_barrel_offset = vec2(50, 0),
+		
+		bullet_entity = basic_bullet_entity,				
+		
+		max_lifetime_ms = 500	
+	})
+	
+	create_weapon("shotgun", "rifle", {
+		current_rounds = 300,
+		is_automatic = false,
+		bullets_once = 12,
+		bullet_damage = 12,
+		bullet_speed = minmax(3000, 4000),
+		
+		shooting_interval_ms = 400,
+		spread_degrees = 12,
+		shake_radius = 1.5,
+		shake_spread_degrees = 45,
+		
+		bullet_barrel_offset = vec2(50, 0),
+		
+		bullet_entity = basic_bullet_entity,				
+		
+		max_lifetime_ms = 500	
+	})
 	
 	--weapons.shotgun = {
 	--	weapon_info = {
