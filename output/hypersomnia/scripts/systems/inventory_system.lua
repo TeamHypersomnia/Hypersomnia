@@ -75,7 +75,7 @@ function inventory_system:handle_picked_up_items()
 			local wield = msg.subject.wield
 			
 			if inventory then
-				local found_slot;-- = msg.predefined_slot
+				local found_slot = msg.predefined_slot
 				
 				if found_slot == nil then
 					for j=1, #inventory.slots do
@@ -126,8 +126,12 @@ function inventory_system:update()
 				if inventory.active_item then
 					local item = inventory.slots[inventory.active_item].stored_item
 					
+					client_sys.net_channel:post_reliable("HOLSTER_ITEM", {
+						item_id = item.replication.id
+					})		
+					
 					-- predict the holstering on the client
-					self:holster_item(subject_inventory, wielder, item)
+					self:holster_item(subject_inventory, wielder, item, inventory.active_item)
 					
 					inventory.active_item = nil
 				end	
@@ -141,7 +145,8 @@ function inventory_system:update()
 								item_id = item.replication.id
 							})
 							
-							self:select_item(subject_inventory, wielder, item)
+							-- predict the selecting on the client
+							self:select_item(subject_inventory, wielder, item, inventory.active_item)
 							
 							inventory.active_item = j
 						end

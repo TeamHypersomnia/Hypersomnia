@@ -26,10 +26,6 @@ protocol.message_by_id = {
 		}
 	},
 	{
-		name = "UNSELECT_ITEM_REQUEST",
-		data = {}
-	},
-	{
 		name = "ITEM_WIELDED",
 		data = {
 			"Ushort", "subject_id",
