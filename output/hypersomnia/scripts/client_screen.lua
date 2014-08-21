@@ -25,6 +25,7 @@ dofile "hypersomnia\\scripts\\systems\\weapon_system.lua"
 dofile "hypersomnia\\scripts\\systems\\bullet_creation_system.lua"
 dofile "hypersomnia\\scripts\\systems\\lifetime_system.lua"
 dofile "hypersomnia\\scripts\\systems\\inventory_system.lua"
+dofile "hypersomnia\\scripts\\systems\\inventory_system_shared.lua"
 
 dofile "hypersomnia\\scripts\\systems\\wield_system.lua"
 dofile "hypersomnia\\scripts\\systems\\item_system.lua"

@@ -61,6 +61,8 @@ function replication_system:create_objects_or_change_modules(msg)
 		
 		-- if the object is new
 		if is_object_new then
+		
+			print ("Client: " .. CURRENT_CLIENT_NUMBER .. "\nCreating " .. archetype_name .. " id: " .. new_object.id .. "\n")
 			-- creation phase
 			new_entity = world_archetype_callbacks[archetype_name].creation(self, new_object.id)
 			
@@ -71,7 +73,7 @@ function replication_system:create_objects_or_change_modules(msg)
 			self.object_by_id[new_object.id] = new_entity
 		-- otherwise just update the replica
 		else
-			print "RECREATING OBJECT"
+			print ("Client: " .. CURRENT_CLIENT_NUMBER .. "\nRecreating " .. archetype_name .. " id: " .. new_object.id .. "\n")
 			new_entity = self.object_by_id[new_object.id]
 			new_entity.replication.modules = replica
 		end
@@ -145,6 +147,7 @@ function replication_system:delete_objects()
 	for i=1, #msgs do
 		local id = msgs[i].data.removed_id
 		
+		print ("Client: " .. CURRENT_CLIENT_NUMBER .. "\nRemoving id: " .. id .. "\n")
 		self.owner_entity_system:post_remove(self.object_by_id[id])
 		self.object_by_id[id] = nil
 	end
@@ -159,6 +162,8 @@ function replication_system:delete_objects()
 			input_bs:name_property("deleted_object_id")
 			local id = input_bs:ReadUshort()
 			
+			print ("Client: " .. CURRENT_CLIENT_NUMBER .. "\nRemoving id: " .. id .. "\n")
+		
 			self.owner_entity_system:post_remove(self.object_by_id[id])
 			self.object_by_id[id] = nil
 		end

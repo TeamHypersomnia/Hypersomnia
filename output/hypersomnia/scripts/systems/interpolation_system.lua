@@ -44,7 +44,6 @@ function interpolation_system:update()
 				local new_angle = movement_module.angle
 				local new_angular_velocity = movement_module.angular_velocity
 				
-				print "setting"
 				if new_angle == nil then
 					new_angle = 0
 				end

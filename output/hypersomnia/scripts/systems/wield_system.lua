@@ -30,6 +30,7 @@ function wield_system:get_required_components()
 end
 
 function wield_system:receive_item_wieldings()
+	local replication = self.owner_entity_system.all_systems["replication"]
 	local msgs = self.owner_entity_system.messages["ITEM_UNWIELDED"]
 	
 	for i=1, #msgs do
@@ -43,11 +44,17 @@ function wield_system:receive_item_wieldings()
 	end
 	
 	msgs = self.owner_entity_system.messages["ITEM_WIELDED"]
-	local replication = self.owner_entity_system.all_systems["replication"]
 	
 	for i=1, #msgs do
 		local data = msgs[i].data
-		print "ITEM_WIELDED"
+		--print "ITEM_WIELDED"
+		--
+		--global_logfile:write( "\nsubject_id: \n" )
+		--global_logfile:write( (data.subject_id) )
+		--
+		--global_logfile:write( "\nobjects: \n" )
+		--global_logfile:write( (table.inspect(replication.object_by_id)))
+		
 		self.owner_entity_system:post_table("item_wielder_change", {
 			subject = replication.object_by_id[data.subject_id],
 			item = replication.object_by_id[data.item_id],
