@@ -4,6 +4,7 @@ function entity_system:constructor(deletes_caller)
 	self.deletes_caller = deletes_caller
 	self.all_systems = {}
 	self.messages = {}
+	self.message_groups = {}
 	
 	self.to_be_removed = {}
 	
@@ -15,11 +16,27 @@ function entity_system:register_messages(msgs)
 	for k, v in pairs(msgs) do
 		if self.messages[v] == nil then self.messages[v] = {} end
 	end
+	
+	self:flush_messages()
+end
+
+function entity_system:register_message_group(group_name, msgs)
+	self.message_groups[group_name] = msgs
+	self:flush_messages()
 end
 
 function entity_system:flush_messages()
 	for k, v in pairs(self.messages) do
 		self.messages[k] = {}
+	end
+	
+	for group_name, messages_in_group in pairs(self.message_groups) do
+		self.messages[group_name] = {}
+		
+		for ind, msg_name in pairs(messages_in_group) do
+			-- point message name to its group
+			self.messages[msg_name] = self.messages[group_name]
+		end
 	end
 end
 
@@ -29,6 +46,8 @@ end
 
 GLOBAL_MESSAGE_ID = 0
 function entity_system:post_table(name, msg_table)
+	msg_table.name = name
+	
 	if name == "item_wielder_change" then 
 		GLOBAL_MESSAGE_ID = GLOBAL_MESSAGE_ID + 1
 		msg_table._MESSAGE_ID = GLOBAL_MESSAGE_ID
