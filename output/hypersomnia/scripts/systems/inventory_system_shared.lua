@@ -1,14 +1,3 @@
-function inventory_system:drop_item_from_inventory(subject_inventory, item, excluded_client)
-	-- liberate the object from the inventory
-	self.owner_entity_system:post_table("item_wielder_change", { 
-		unwield = true,
-		subject = subject_inventory,
-		wielding_key = item.replication.id,
-		
-		exclude_client = excluded_client
-	})
-end
-
 function inventory_system:holster_item(subject_inventory, wielder, item, predefined_slot, excluded_client)
 	-- liberate the wielded object
 	self.owner_entity_system:post_table("item_wielder_change", { 

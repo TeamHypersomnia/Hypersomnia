@@ -116,7 +116,7 @@ function inventory_system:update()
 					})
 
 					-- predict the holstering on the client
-					self:holster_item(subject_inventory, wielder, item, inventory.active_item)
+					--self:holster_item(subject_inventory, wielder, item, inventory.active_item)
 					
 					local slot = inventory.slots[inventory.active_item]
 					slot.stored_item = nil
@@ -124,8 +124,8 @@ function inventory_system:update()
 
 					self.owner_entity_system:post_table("item_wielder_change", { 
 						unwield = true,
-						subject = subject_inventory,
-						wielding_key = item.replication.id
+						subject = wielder,
+						wielding_key = components.wield.keys.PRIMARY_WEAPON
 					})
 					
 					slot.stored_sprite = create_sprite {}

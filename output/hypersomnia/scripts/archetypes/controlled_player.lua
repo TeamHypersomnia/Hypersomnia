@@ -181,6 +181,19 @@ world_archetype_callbacks.CONTROLLED_PLAYER = {
 		new_entity.wield.on_item_unwielded = function(this, unwielded, wielding_key)
 			if wielding_key == components.wield.keys.PRIMARY_WEAPON then
 				player_cpp_entity.body.animate.available_animations = self.owner_scene.torso_sets["white"]["barehands"].set
+				
+				if unwielded.cpp_entity.physics == nil then return end
+				
+				local body = unwielded.cpp_entity.physics.body
+				local force = (this.orientation.last_pos):normalize() * 100
+				
+				if this.orientation.last_pos:length() < 0.01 then
+					force = vec2(100, 0)
+				end
+				print "force:" 
+				print (force.x, force.y)
+				body:ApplyLinearImpulse(to_meters(force), body:GetWorldCenter(), true)
+				body:ApplyAngularImpulse(4, true)
 			end
 		end
 		
