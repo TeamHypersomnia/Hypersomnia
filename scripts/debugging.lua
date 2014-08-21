@@ -3,7 +3,7 @@ function debug.my_breakpoint()
 	debugger_break()
 end
 
-function debug.my_traceback() 
+function debug.get_stack_contents()
 	local outstr = "\n"
 	
 	local globals_str = "\n"
@@ -36,8 +36,12 @@ function debug.my_traceback()
 		if debug.getinfo(level_idx) == nil then break end
 	end
 	
-	outstr = outstr .. "\n" .. debug.traceback() 
-	
+	return debug.traceback() .. outstr .. "\n" .. debug.traceback(), globals_str
+end
+
+
+function debug.my_traceback() 
+	local outstr, globals_str = debug.get_stack_contents()
 	
 	local file = io.open("error_message.txt", "w")
 	file:write(outstr .. globals_str)

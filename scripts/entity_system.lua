@@ -27,7 +27,16 @@ function entity_system:post(name, msg_table)
 	self:post_table(name, _G[name]:create(msg_table))
 end
 
+GLOBAL_MESSAGE_ID = 0
 function entity_system:post_table(name, msg_table)
+	if name == "item_wielder_change" then 
+		GLOBAL_MESSAGE_ID = GLOBAL_MESSAGE_ID + 1
+		msg_table._MESSAGE_ID = GLOBAL_MESSAGE_ID
+	--	
+		--local out = debug.traceback()
+		global_logfile:write("\nMESSAGE ID: \n" .. GLOBAL_MESSAGE_ID .. "\n\n")
+		global_logfile:write(debug.traceback())
+	end
 	table.insert(self.messages[name], msg_table)
 end
 
