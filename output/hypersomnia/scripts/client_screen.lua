@@ -57,10 +57,7 @@ function client_screen:constructor(camera_rect)
 	self.entity_system_instance:register_messages {
 		"network_message",
 		"shot_message",
-		"item_wielder_change",
-		
-		"item_selection",
-		"item_holster"
+		"item_wielder_change"
 	}
 	
 	self.entity_system_instance:register_messages (protocol.message_names)
@@ -163,7 +160,6 @@ function client_screen:loop()
 	self.systems.lifetime:update()
 	self.systems.inventory:handle_picked_up_items()
 	self.systems.inventory:update()
-	self.systems.inventory:handle_item_selections()
 	-- post-inventory pass update for prediction
 	self.systems.wield:update()
 
