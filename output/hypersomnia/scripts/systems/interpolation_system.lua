@@ -19,26 +19,26 @@ function interpolation_system:update()
 	for i=1, #self.targets do
 		local target = self.targets[i]
 		
-		local movement_module = self.targets[i].replication.modules.movement
-		if movement_module == nil then
-			movement_module = self.targets[i].replication.modules.movement_rotated
-		end
-		
-		if movement_module ~= nil and (
-			movement_module.FIELDS_READ.position or
-			movement_module.FIELDS_READ.velocity or
-			movement_module.FIELDS_READ.angle or
-			movement_module.FIELDS_READ.angular_velocity
-			)
-		then
-			movement_module.FIELDS_READ.position = nil
-			movement_module.FIELDS_READ.velocity = nil
-			movement_module.FIELDS_READ.angle = nil
-			movement_module.FIELDS_READ.angular_velocity = nil
+		if target.cpp_entity.physics then
+			local movement_module = self.targets[i].replication.modules.movement
+			if movement_module == nil then
+				movement_module = self.targets[i].replication.modules.movement_rotated
+			end
 			
-			local target =  self.targets[i].cpp_entity
-			
-			--if target.physics ~= nil then
+			if movement_module ~= nil and (
+				movement_module.FIELDS_READ.position or
+				movement_module.FIELDS_READ.velocity or
+				movement_module.FIELDS_READ.angle or
+				movement_module.FIELDS_READ.angular_velocity
+				)
+			then
+				movement_module.FIELDS_READ.position = nil
+				movement_module.FIELDS_READ.velocity = nil
+				movement_module.FIELDS_READ.angle = nil
+				movement_module.FIELDS_READ.angular_velocity = nil
+				
+				local body = self.targets[i].cpp_entity.physics.body
+				
 				local new_position = movement_module.position
 				local new_velocity = movement_module.velocity
 				local new_angle = movement_module.angle
@@ -48,10 +48,10 @@ function interpolation_system:update()
 					new_angle = 0
 				end
 				
-				if new_position ~= nil then target.physics.body:SetTransform(new_position, new_angle) end
-				if new_velocity ~= nil then target.physics.body:SetLinearVelocity(new_velocity) end
-				if new_angular_velocity ~= nil then target.physics.body:SetAngularVelocity(new_angular_velocity) end
-			--end
+				if new_position ~= nil then body:SetTransform(new_position, new_angle) end
+				if new_velocity ~= nil then body:SetLinearVelocity(new_velocity) end
+				if new_angular_velocity ~= nil then body:SetAngularVelocity(new_angular_velocity) end
+			end
 		end
 	end
 end
