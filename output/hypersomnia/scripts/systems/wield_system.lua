@@ -112,8 +112,7 @@ components.wield.unwield_item = function(wielder, old_item, wielding_key_hint)
 	return found_item
 end
 
-function wield_system:update()
-	local msgs = self.owner_entity_system.messages["item_wielder_change"]
+function wield_system:handle_wielder_change(msg)
 	-- unwield = true
 	-- subject
 	-- item OR wielding_key
@@ -123,25 +122,22 @@ function wield_system:update()
 	-- item 
 	-- wielding_key
 	
-	for i=1, #msgs do
-		local msg = msgs[i]
-		local subject = msg.subject
-		
-		-- check subject validity
-		if not msg.succeeded and subject.wield ~= nil then
-			if msg.unwield then
-				local item = components.wield.unwield_item(subject, msg.item, msg.wielding_key)
+	local subject = msg.subject
 	
-				if item then
-					msg.succeeded = true
-					msg.item = item
-				end
-			elseif msg.wield then
-				local item = msg.item
-				if item.item.wielder == nil then
-					msg.succeeded = true
-					components.wield.wield_item(subject, msg.item, msg.wielding_key)
-				end
+	-- check subject validity
+	if not msg.succeeded and subject.wield ~= nil then
+		if msg.unwield then
+			local item = components.wield.unwield_item(subject, msg.item, msg.wielding_key)
+	
+			if item then
+				msg.succeeded = true
+				msg.item = item
+			end
+		elseif msg.wield then
+			local item = msg.item
+			if item.item.wielder == nil then
+				msg.succeeded = true
+				components.wield.wield_item(subject, msg.item, msg.wielding_key)
 			end
 		end
 	end

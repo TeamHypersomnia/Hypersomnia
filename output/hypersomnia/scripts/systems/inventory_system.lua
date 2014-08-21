@@ -64,36 +64,30 @@ function inventory_system:remove_entity(removed_entity)
 	processing_system.remove_entity(self, removed_entity)
 end
 
-function inventory_system:handle_picked_up_items()
-	local msgs = self.owner_entity_system.messages["item_wielder_change"]
-	
-	for i=1, #msgs do
-		local msg = msgs[i]
+function inventory_system:handle_picked_up_item(msg)
+	if msg.succeeded and msg.wield then
+		local inventory = msg.subject.inventory
+		local wield = msg.subject.wield
 		
-		if msg.succeeded and msg.wield then
-			local inventory = msg.subject.inventory
-			local wield = msg.subject.wield
+		if inventory then
+			local found_slot = msg.predefined_slot
 			
-			if inventory then
-				local found_slot = msg.predefined_slot
-				
-				if found_slot == nil then
-					for j=1, #inventory.slots do
-						if not inventory.slots[j].stored_item then
-							found_slot = j
-							break
-						end
+			if found_slot == nil then
+				for j=1, #inventory.slots do
+					if not inventory.slots[j].stored_item then
+						found_slot = j
+						break
 					end
 				end
-						
-				local slot = inventory.slots[found_slot]
-				
-				slot.stored_item = msg.item
-				slot.stored_sprite = create_sprite { image = msg.item.item.item_sprite }
-				slot.entity.render.model = slot.stored_sprite
-				print "Slot:" print (found_slot)
-				msg.item.item.inventory_slot = found_slot
 			end
+					
+			local slot = inventory.slots[found_slot]
+			
+			slot.stored_item = msg.item
+			slot.stored_sprite = create_sprite { image = msg.item.item.item_sprite }
+			slot.entity.render.model = slot.stored_sprite
+			print "Slot:" print (found_slot)
+			msg.item.item.inventory_slot = found_slot
 		end
 	end
 end

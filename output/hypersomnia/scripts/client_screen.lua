@@ -101,6 +101,13 @@ function client_screen:constructor(camera_rect)
 	
 	self.entity_system_instance:register_systems(self.systems)
 	
+	self.entity_system_instance:register_callbacks {
+		item_wielder_change = function(msg) 
+			self.systems.wield:handle_wielder_change(msg)
+			self.systems.inventory:handle_picked_up_item(msg)
+		end
+	}
+	
 	create_weapons(self.sample_scene, true)
 end
 
@@ -147,7 +154,6 @@ function client_screen:loop()
 	self.systems.replication:update_object_states()
 	
 	self.systems.wield:receive_item_wieldings()
-	self.systems.wield:update()
 	
 	self.systems.weapon:handle_messages()
 	
@@ -159,10 +165,8 @@ function client_screen:loop()
 	self.systems.weapon:update()
 	
 	self.systems.lifetime:update()
-	self.systems.inventory:handle_picked_up_items()
 	self.systems.inventory:update()
 	-- post-inventory pass update for prediction
-	self.systems.wield:update()
 
 	self.systems.bullet_creation:update()
 	

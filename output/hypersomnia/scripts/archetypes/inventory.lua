@@ -29,7 +29,9 @@ world_archetype_callbacks.INVENTORY = {
 			
 			new_entity.inventory.draw_as_owner = true
 		end
-		
+	end,
+	
+	post_construction = function(self, new_entity, is_object_new)
 		if new_entity.item.is_wielded then
 			print "constructing inventory!"
 			self.owner_entity_system:post_table("item_wielder_change", {
