@@ -6,6 +6,8 @@ function entity_system:constructor(deletes_caller)
 	self.messages = {}
 	self.message_groups = {}
 	
+	self.callbacks = {}
+	
 	self.to_be_removed = {}
 	
 	self.cpp_entity = cpp_entity_system:create()
@@ -18,6 +20,11 @@ function entity_system:register_messages(msgs)
 	end
 	
 	self:flush_messages()
+end
+
+
+function entity_system:register_callbacks(callbacks)
+	self.callbacks = callbacks
 end
 
 function entity_system:register_message_group(group_name, msgs)
@@ -48,15 +55,20 @@ GLOBAL_MESSAGE_ID = 0
 function entity_system:post_table(name, msg_table)
 	msg_table.name = name
 	
-	if name == "item_wielder_change" then 
-		GLOBAL_MESSAGE_ID = GLOBAL_MESSAGE_ID + 1
-		msg_table._MESSAGE_ID = GLOBAL_MESSAGE_ID
-	--	
-		--local out = debug.traceback()
-		global_logfile:write("\nMESSAGE ID: \n" .. GLOBAL_MESSAGE_ID .. "\n\n")
-		global_logfile:write(debug.traceback())
+	--if name == "item_wielder_change" then 
+	--	GLOBAL_MESSAGE_ID = GLOBAL_MESSAGE_ID + 1
+	--	msg_table._MESSAGE_ID = GLOBAL_MESSAGE_ID
+	----	
+	--	--local out = debug.traceback()
+	--	global_logfile:write("\nMESSAGE ID: \n" .. GLOBAL_MESSAGE_ID .. "\n\n")
+	--	global_logfile:write(debug.traceback())
+	--end
+	
+	if self.callbacks[name] then
+		self.callbacks[name](msg_table)
+	else
+		table.insert(self.messages[name], msg_table)
 	end
-	table.insert(self.messages[name], msg_table)
 end
 
 function entity_system:register_systems(new_systems)
