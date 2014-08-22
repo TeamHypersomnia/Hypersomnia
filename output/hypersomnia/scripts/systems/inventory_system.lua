@@ -136,6 +136,12 @@ function inventory_system:update()
 					slot.stored_sprite = create_sprite {}
 					slot.entity.render.model = nil
 					item.item.inventory_slot = nil
+					
+					for j=#inventory.slots, 1, -1 do
+						if inventory.slots[j].stored_item then
+							intent = custom_intents["SELECT_ITEM_" .. j]
+						end
+					end
 				end
 			elseif intent == custom_intents.HOLSTER_ITEM then
 				if inventory.active_item then
@@ -150,31 +156,32 @@ function inventory_system:update()
 					
 					inventory:set_active(nil)
 				end
-			else
-				if intent == custom_intents.SELECT_LAST_ITEM then
-					if inventory.last_item then
-						intent = custom_intents["SELECT_ITEM_" .. inventory.last_item]
-					end
+			end
+			
+			-- some events may request selecting another item
+			if intent == custom_intents.SELECT_LAST_ITEM then
+				if inventory.last_item then
+					intent = custom_intents["SELECT_ITEM_" .. inventory.last_item]
 				end
-				
-				for j=1, #inventory.slots do
-					if intent == custom_intents["SELECT_ITEM_" .. j] then
-						local item = inventory.slots[j].stored_item
+			end
+			
+			for j=1, #inventory.slots do
+				if intent == custom_intents["SELECT_ITEM_" .. j] then
+					local item = inventory.slots[j].stored_item
+					
+					if item and inventory.active_item ~= j then
+						client_sys.net_channel:post_reliable("SELECT_ITEM_REQUEST", {
+							item_id = item.replication.id
+						})
 						
-						if item and inventory.active_item ~= j then
-							client_sys.net_channel:post_reliable("SELECT_ITEM_REQUEST", {
-								item_id = item.replication.id
-							})
-							
-							-- predict the selecting on the client
-							self:select_item(subject_inventory, wielder, item, inventory.active_item)
-							
-							
-							inventory:set_active(j)
-						end
+						-- predict the selecting on the client
+						self:select_item(subject_inventory, wielder, item, inventory.active_item)
 						
-						break
+						
+						inventory:set_active(j)
 					end
+					
+					break
 				end
 			end
 		end
