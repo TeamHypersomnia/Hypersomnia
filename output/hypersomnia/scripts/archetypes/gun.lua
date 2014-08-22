@@ -1,10 +1,21 @@
 for k, v in pairs(world_archetype_groups.guns) do
 	world_archetype_callbacks[v] = {
 		creation = function(self)
+			local item_table = self.owner_scene.weapons[v]
+			
 			local new_entity = components.create_components {
-				item = self.owner_scene.weapons[v].item_info,
-				weapon = self.owner_scene.weapons[v].weapon_info,
-				interpolation = {}
+				item = item_table.item_info,
+				weapon = item_table.weapon_info,
+				interpolation = { 
+					extrapolate = true,
+					
+					create_simulation_entity = function() 
+						return self.owner_scene.simulation_world:create_entity {
+							transform = {},
+							physics = item_table.item_info.entity_archetype.physics
+						}
+					end
+				}
 			}
 			
 			new_entity.weapon:create_smoke_group(self.owner_scene.world_object.world)

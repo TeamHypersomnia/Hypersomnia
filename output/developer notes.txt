@@ -955,3 +955,14 @@ and some may only need to be presented with unwielding information (somebody see
 We must right away call the wielding logic (along with the server-side part) while processing select weapon requests.
 The problem is with requests clumped up into a single packet - we process more than one of them before updating wielding state and we're posting 
 messages based on irrelevant logic - this is why some items pop-up on the server laying on the ground.
+
+
+Forward simulation of dropped entities:
+
+It is simpler than the input prediction in these matters:
+- as these entities are ballistic, we don't apply movement, so no substep callbacks
+- we can simply count steps from zero the moment the item is dropped; the server sends which step is the correction from via an unreliable message
+
+Just do an "extrapolation" component that simulates entities forward in time by ping whenever an update comes for them.
+
+Consider just making a flag to the interpolation component and right away use the interpolation system to avoid code duplication.

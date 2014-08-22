@@ -23,7 +23,11 @@ function client_system:get_required_components()
 end
 
 function client_system:get_last_ping()
-	return self.network:get_last_ping(self.server_guid)
+	if self.server_guid then
+		return self.network:get_last_ping(self.server_guid)
+	else
+		return 0
+	end
 end
 
 function client_system:substep()
