@@ -23,6 +23,7 @@ world_archetype_callbacks.INVENTORY = {
 					
 					custom_intents.PICK_REQUEST,
 					custom_intents.HOLSTER_ITEM,
+					custom_intents.SELECT_LAST_ITEM,
 					custom_intents.DROP_REQUEST
 				}
 			})

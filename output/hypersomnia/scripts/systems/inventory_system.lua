@@ -91,6 +91,11 @@ function inventory_system:handle_picked_up_item(msg)
 	end
 end
 
+function components.inventory:set_active(slot_index)
+	self.last_item = self.active_item
+	self.active_item = slot_index
+end
+
 function inventory_system:update()
 	local msgs = self.owner_world:get_messages_filter_components("intent_message", { "inventory" } )
 	local client_sys = self.owner_entity_system.all_systems["client"]
@@ -120,7 +125,7 @@ function inventory_system:update()
 					
 					local slot = inventory.slots[inventory.active_item]
 					slot.stored_item = nil
-					inventory.active_item = nil
+					inventory:set_active(nil)
 
 					self.owner_entity_system:post_table("item_wielder_change", { 
 						unwield = true,
@@ -143,9 +148,15 @@ function inventory_system:update()
 					-- predict the holstering on the client
 					self:holster_item(subject_inventory, wielder, item, inventory.active_item)
 					
-					inventory.active_item = nil
-				end	
+					inventory:set_active(nil)
+				end
 			else
+				if intent == custom_intents.SELECT_LAST_ITEM then
+					if inventory.last_item then
+						intent = custom_intents["SELECT_ITEM_" .. inventory.last_item]
+					end
+				end
+				
 				for j=1, #inventory.slots do
 					if intent == custom_intents["SELECT_ITEM_" .. j] then
 						local item = inventory.slots[j].stored_item
@@ -158,7 +169,8 @@ function inventory_system:update()
 							-- predict the selecting on the client
 							self:select_item(subject_inventory, wielder, item, inventory.active_item)
 							
-							inventory.active_item = j
+							
+							inventory:set_active(j)
 						end
 						
 						break

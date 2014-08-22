@@ -11,6 +11,7 @@ custom_intents = create_inverse_enum {
 	"DROP_REQUEST",
 	"HOLSTER_ITEM",
 	
+	"SELECT_LAST_ITEM",
 	"SELECT_ITEM_1",
 	"SELECT_ITEM_2",
 	"SELECT_ITEM_3",
@@ -30,6 +31,7 @@ main_input_context = create_input_context {
 		[keys.G] 				= custom_intents.DROP_REQUEST,
 		[keys.H] 				= custom_intents.HOLSTER_ITEM,
 		
+		[keys.Q] 				= custom_intents.SELECT_LAST_ITEM,
 		[keys._1] 				= custom_intents.SELECT_ITEM_1,
 		[keys._2] 				= custom_intents.SELECT_ITEM_2,
 		[keys._3] 				= custom_intents.SELECT_ITEM_3,
