@@ -94,10 +94,10 @@ function create_weapons(scene, include_render)
 		is_automatic = false,
 		bullets_once = 12,
 		bullet_damage = 12,
-		bullet_speed = minmax(3000, 4000),
+		bullet_speed = minmax(2000, 4000),
 		
 		shooting_interval_ms = 400,
-		spread_degrees = 12,
+		spread_degrees = 5,
 		shake_radius = 1.5,
 		shake_spread_degrees = 45,
 		

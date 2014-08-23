@@ -12,14 +12,10 @@ wield_system = inherits_from (processing_system)
 --end
 
 function wield_system:remove_entity(removed_entity)
-	-- if we wield an item, we may need to drop it
-	
-	-- THIS IS THE GAME LOGIC THAT SHOULD DECIDE IF THE OBJECT IS TO BE DROPPED,
-	-- AND IF SO, IT SHOULD POST A DROP MESSAGE BEFORE POSTING DELETION OF THE OBJECT
-	
 	-- IF THE ITEM ISN'T DROPPED, IT IS SIMPLY DELETED
 	for k, v in pairs(removed_entity.wield.wielded_items) do
-		self.owner_entity_system:remove_entity(v)
+		v.item.wielder = nil
+		self.owner_entity_system:post_remove(v)
 	end
 	
 	--processing_system.remove_entity(self, removed_entity)
