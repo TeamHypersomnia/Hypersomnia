@@ -122,11 +122,11 @@ function replication_module:replicate(object)
 end
 
 
-function replication_module:get_all_marked(next_sequence)
+function replication_module:get_all_marked()
 	local out = {}
 	
 	for i=1, #self.replication_table.properties do
-		out[i] = next_sequence
+		out[i] = true
 	end
 	
 	return out
@@ -162,19 +162,25 @@ function replication_module:write_state(which_fields, output_bs)
 	local properties = self.replication_table.properties
 	if #properties <= 0 then return false end
 	
-	local module_changed = next(which_fields) ~= nil
+	local module_transmitted = false
+	
+	for k, v in pairs(which_fields) do
+		if type(v) == "number" then 
+			module_transmitted = true 
+			break 
+		end
+	end
 	
 	output_bs:name_property("has module changed")
-	output_bs:WriteBit(module_changed)
+	output_bs:WriteBit(module_transmitted)
 	
-	
-	if module_changed then
+	if module_transmitted then
 		for i=1, #properties do
 			local field = properties[i]
 			
 			output_bs:name_property("has field " .. field.name .. " changed")
 	
-			if which_fields[i] ~= nil then
+			if type(which_fields[i]) == "number" then
 				output_bs:WriteBit(true)
 				
 				output_bs:name_property(field.name)
