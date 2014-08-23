@@ -82,7 +82,7 @@ function interpolation_system:update()
 				
 				local interpolation = target.interpolation
 				
-				if interpolation.extrapolate then
+				if interpolation.extrapolate and steps_forward > 0 then
 					target_body = interpolation.simulation_entity.physics.body
 				end
 				
@@ -91,7 +91,7 @@ function interpolation_system:update()
 				if new_angular_velocity ~= nil then target_body:SetAngularVelocity(new_angular_velocity) end
 				
 				if interpolation.extrapolate and steps_forward > 0 then
-					--print "how many steps"
+					--print "extrapolating.."
 					--print (steps_forward)
 					local last_results = {}
 					local step_number = 1

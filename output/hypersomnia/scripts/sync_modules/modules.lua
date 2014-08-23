@@ -65,6 +65,8 @@ replication_module = inherits_from ()
 
 function replication_module:constructor(replication_table)
 	self.replication_table = replication_table
+	self.has_variable_changed = {}
+	self.FIELDS_READ = {}
 end
 
 function replication_module:write_initial_state(object, output_bs)
@@ -130,17 +132,29 @@ function replication_module:get_all_marked(next_sequence)
 	return out
 end
 
-function replication_module:update_flags(flags_table, next_sequence, ack_sequence)
-	-- firstly mark acked
+function replication_module:ack_flags(flags_table, ack_sequence)
 	for key, field_sequence in pairs(flags_table) do
-		if field_sequence <= ack_sequence then
+		-- if field_sequence is a boolean,
+		-- the flag was not yet transmitted because of differing replication rates,
+		-- thus it has to stay marked for that client for later transmission
+		if type(field_sequence) == "number" and field_sequence <= ack_sequence then
 			flags_table[key] = nil
 		end
 	end
-	
-	-- now create dirty flags requested by the replica (self)
-	for key, field in pairs(self.has_variable_changed) do
-		flags_table[key] = next_sequence
+end
+
+function replication_module:mark_out_of_date_fields(flags_table)
+	-- create dirty flags requested by the replica (self)
+	for key in pairs(self.has_variable_changed) do
+		flags_table[key] = true
+	end
+end
+
+replication_module.request_fields_transmission = function(flags_table, next_sequence)
+	for key, field in pairs(flags_table) do
+		if type(field) == "boolean" then
+			flags_table[key] = next_sequence
+		end
 	end
 end
 

@@ -26,7 +26,7 @@ function bullet_creation_system:update()
 		local entity = target.cpp_entity
 	
 		-- try to recover the owner entity if we're dealing with an item
-		if target.item ~= nil and target.item.wielder ~= nil then
+		if target.item and target.item.wielder then
 			entity = target.item.wielder.cpp_entity
 		end
 	
@@ -48,7 +48,7 @@ function bullet_creation_system:update()
 		burst.subject = entity
 		burst.type = particle_burst_message.WEAPON_SHOT
 		
-		if weapon.barrel_smoke_group ~= nil then
+		if weapon.barrel_smoke_group then
 			burst.target_group_to_refresh:set(weapon.barrel_smoke_group)
 		end
 		
@@ -60,7 +60,7 @@ function bullet_creation_system:update()
 		local random_seed = target.replication.id*10 + self.next_bullet_local_id
 		
 		-- this is a remote shot
-		if premade_shot ~= nil then
+		if premade_shot then
 			random_seed = premade_shot.random_seed
 			self.next_bullet_global_id = premade_shot.starting_global_id
 		end
@@ -70,7 +70,7 @@ function bullet_creation_system:update()
 		for b=1, #msgs[i].bullets do
 			local bullet = msgs[i].bullets[b](self.random_generator)
 			
-			if self.camera_to_shake ~= nil then 
+			if self.camera_to_shake then 
 				local shake_dir = vec2()
 				
 				shake_dir:set_from_degrees(randval(
@@ -81,7 +81,7 @@ function bullet_creation_system:update()
 			end
 			
 			-- this is a remote shot
-			if premade_shot ~= nil and premade_shot.simulate_forward then
+			if premade_shot and premade_shot.simulate_forward then
 				local v1 = msgs[i].gun_transform.pos
 				local v2 = bullet.pos + (bullet.vel*premade_shot.simulate_forward/1000)
 				local result = self.world_object.physics_system

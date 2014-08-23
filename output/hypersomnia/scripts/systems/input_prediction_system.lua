@@ -81,70 +81,73 @@ function input_prediction_system:update()
 			local target = self.targets[i]
 			local new_position = self.targets[i].replication.modules.movement.position
 			local new_velocity = self.targets[i].replication.modules.movement.velocity
-			-- we don't have more than one target at the moment
 			
-			local prediction = target.input_prediction
-			prediction.last_acked_step = at_step_sequence
-			--print ("recvd snapshot " .. at_step_sequence)
-			
-			if prediction.count > 0 and at_step_sequence < prediction.first_state + prediction.count and at_step_sequence >= prediction.first_state then
-				local correct_from = prediction.state_history[at_step_sequence]
+			if new_position and new_velocity then
+				-- we don't have more than one target at the moment
 				
-				--print((to_pixels(new_position) - to_pixels(correct_from.position)):length())
+				local prediction = target.input_prediction
+				prediction.last_acked_step = at_step_sequence
+				--print ("recvd snapshot " .. at_step_sequence)
 				
-				local simulation_entity = prediction.simulation_entity
-				local simulation_body = simulation_entity.physics.body
-				
-				simulation_body:SetTransform(new_position, 0)
-				simulation_body:SetLinearVelocity(new_velocity)
-				
-				local simulation_step = at_step_sequence
-				
-				local simulation_callback = function ()
-					local state = prediction.state_history[simulation_step]
-					local movement = simulation_entity.movement
+				if prediction.count > 0 and at_step_sequence < prediction.first_state + prediction.count and at_step_sequence >= prediction.first_state then
+					local correct_from = prediction.state_history[at_step_sequence]
 					
-					movement.moving_left = state.moving_left
-					movement.moving_right = state.moving_right
-					movement.moving_forward = state.moving_forward
-					movement.moving_backward = state.moving_backward
-				
-					simulation_step = simulation_step + 1
+					--print((to_pixels(new_position) - to_pixels(correct_from.position)):length())
+					
+					local simulation_entity = prediction.simulation_entity
+					local simulation_body = simulation_entity.physics.body
+					
+					simulation_body:SetTransform(new_position, 0)
+					simulation_body:SetLinearVelocity(new_velocity)
+					
+					local simulation_step = at_step_sequence
+					
+					local simulation_callback = function ()
+						local state = prediction.state_history[simulation_step]
+						local movement = simulation_entity.movement
+						
+						movement.moving_left = state.moving_left
+						movement.moving_right = state.moving_right
+						movement.moving_forward = state.moving_forward
+						movement.moving_backward = state.moving_backward
+					
+						simulation_step = simulation_step + 1
+					end
+					
+					self.simulation_world.prestep_callbacks = {
+						simulation_callback
+					}
+					
+					self.simulation_world:process_steps(prediction.first_state + prediction.count - at_step_sequence)
+					
+					local corrected_pos = simulation_body:GetPosition()
+					local corrected_vel = simulation_body:GetLinearVelocity()
+					
+					if (to_pixels(corrected_pos) - to_pixels(target.cpp_entity.physics.body:GetPosition())):length() > config_table.divergence_radius then
+						print((to_pixels(corrected_pos) - to_pixels(target.cpp_entity.physics.body:GetPosition())):length())
+						target.cpp_entity.physics.body:SetTransform(corrected_pos, 0)
+						target.cpp_entity.physics.body:SetLinearVelocity(corrected_vel)
+					end
+					
+					local new_state_history = {}
+					
+					-- save states only more recent than at_step_sequence
+					local cnt = 0
+					for j=at_step_sequence+1, prediction.first_state+prediction.count-1 do
+						new_state_history[j] = prediction.state_history[j]
+						cnt=cnt+1
+					end
+					
+					prediction.first_state = at_step_sequence+1
+					prediction.count = cnt
+					
+					prediction.state_history = new_state_history
+					
+					--clearlc(1)
+					--debuglc(1, rgba(255, 0, 0, 255), to_pixels(new_position), to_pixels(new_position) + to_pixels(new_velocity) )
+					--debuglc(1, rgba(0, 255, 0, 255), to_pixels(correct_from.position), to_pixels(correct_from.position) + to_pixels(correct_from.vel))
+					--debuglc(1, rgba(0, 255, 255, 255), to_pixels(corrected_pos), (to_pixels(corrected_vel) + to_pixels(corrected_pos)))
 				end
-				
-				self.simulation_world.prestep_callbacks = {
-					simulation_callback
-				}
-				
-				self.simulation_world:process_steps(prediction.first_state + prediction.count - at_step_sequence)
-				
-				local corrected_pos = simulation_body:GetPosition()
-				local corrected_vel = simulation_body:GetLinearVelocity()
-				
-				if (to_pixels(corrected_pos) - to_pixels(target.cpp_entity.physics.body:GetPosition())):length() > config_table.divergence_radius then
-					print((to_pixels(corrected_pos) - to_pixels(target.cpp_entity.physics.body:GetPosition())):length())
-					target.cpp_entity.physics.body:SetTransform(corrected_pos, 0)
-					target.cpp_entity.physics.body:SetLinearVelocity(corrected_vel)
-				end
-				
-				local new_state_history = {}
-				
-				-- save states only more recent than at_step_sequence
-				local cnt = 0
-				for j=at_step_sequence+1, prediction.first_state+prediction.count-1 do
-					new_state_history[j] = prediction.state_history[j]
-					cnt=cnt+1
-				end
-				
-				prediction.first_state = at_step_sequence+1
-				prediction.count = cnt
-				
-				prediction.state_history = new_state_history
-				
-				--clearlc(1)
-				--debuglc(1, rgba(255, 0, 0, 255), to_pixels(new_position), to_pixels(new_position) + to_pixels(new_velocity) )
-				--debuglc(1, rgba(0, 255, 0, 255), to_pixels(correct_from.position), to_pixels(correct_from.position) + to_pixels(correct_from.vel))
-				--debuglc(1, rgba(0, 255, 255, 255), to_pixels(corrected_pos), (to_pixels(corrected_vel) + to_pixels(corrected_pos)))
 			end
 		end
 	end

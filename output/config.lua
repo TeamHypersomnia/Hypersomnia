@@ -14,7 +14,7 @@ config_table = {
 	server_address = "127.0.0.1",
 	server_port = 37017,
 	
-	multiple_clients_view = 0,
+	multiple_clients_view = 1,
 	divergence_radius = 1,
 	
 	tickrate = 60,
