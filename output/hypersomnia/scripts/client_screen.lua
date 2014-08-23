@@ -53,7 +53,10 @@ function client_screen:constructor(camera_rect)
 	self.received = network_packet()
 	
 	-- entity system setup
-	self.entity_system_instance = entity_system:create(function () self.sample_scene.world_object:call_deletes() end)
+	self.entity_system_instance = entity_system:create(function () 
+		self.sample_scene.world_object:call_deletes() 
+		self.sample_scene.simulation_world:call_deletes() 
+	end)
 	
 	self.entity_system_instance:register_messages {
 		"network_message",

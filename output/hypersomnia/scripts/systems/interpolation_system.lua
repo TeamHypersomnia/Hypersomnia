@@ -90,22 +90,55 @@ function interpolation_system:update()
 				if new_velocity ~= nil then target_body:SetLinearVelocity(new_velocity) end
 				if new_angular_velocity ~= nil then target_body:SetAngularVelocity(new_angular_velocity) end
 				
-				if interpolation.extrapolate then
+				if interpolation.extrapolate and steps_forward > 0 then
 					--print "how many steps"
 					--print (steps_forward)
+					local last_results = {}
+					local step_number = 1
+					
 					self.simulation_world.prestep_callbacks = {}
-					self.simulation_world:process_steps(steps_forward)
+					self.simulation_world.poststep_callbacks = {
+						function()
+							if step_number > steps_forward - 4 then
+								last_results[#last_results + 1] = {
+									pos = b2Vec2(target_body:GetPosition()),
+									angle = target_body:GetAngle() + 0,
+									angular_vel = target_body:GetAngularVelocity() + 0,
+									vel = b2Vec2(target_body:GetLinearVelocity())
+								}
+							end
+							
+							step_number = step_number + 1
+						end
+					}
 					
-					local corrected_pos = target_body:GetPosition()
-					local corrected_angle = target_body:GetAngle()
-					local corrected_angular_vel = target_body:GetAngularVelocity()
-					local corrected_vel = target_body:GetLinearVelocity()
+					-- jitter may make us several steps ahead or behind, so simulate 2 more just in case
+					self.simulation_world:process_steps(steps_forward + 2)
+					self.simulation_world.poststep_callbacks = {}
 					
-					if (to_pixels(corrected_pos) - to_pixels(target.cpp_entity.physics.body:GetPosition())):length() > config_table.divergence_radius then
-						print((to_pixels(corrected_pos) - to_pixels(target.cpp_entity.physics.body:GetPosition())):length())
-						target.cpp_entity.physics.body:SetTransform(corrected_pos, corrected_angle)
-						target.cpp_entity.physics.body:SetLinearVelocity(corrected_vel)
-						target.cpp_entity.physics.body:SetAngularVelocity(corrected_angular_vel)
+					-- find the result of the smallest discrepancy
+					
+					local actual_pos = to_pixels(target.cpp_entity.physics.body:GetPosition())
+					
+					local smallest_dist;
+					local best_candidate;
+					
+					for r=1, #last_results do
+						local new_dist = (to_pixels(last_results[r].pos) - actual_pos):length_sq()
+						
+						if smallest_dist == nil or new_dist < smallest_dist then
+							smallest_dist = new_dist
+							best_candidate = r
+						end
+					end
+					
+					local corrected = last_results[best_candidate]
+					
+					if math.sqrt(smallest_dist) > config_table.divergence_radius then
+						print(math.sqrt(smallest_dist))
+						target.cpp_entity.physics.body:SetTransform(corrected.pos, corrected.angle)
+						target.cpp_entity.physics.body:SetLinearVelocity(corrected.vel)
+						target.cpp_entity.physics.body:SetAngularVelocity(corrected.angular_vel)
 					end
 				end
 			end
