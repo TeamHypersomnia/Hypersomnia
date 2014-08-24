@@ -6,6 +6,7 @@ function simulation_world_class:constructor()
 	self.world = self.world_inst.world
 	
 	self.prestep_callbacks = {}
+	self.poststep_callbacks = {}
 	
 	-- shortcuts for systems
 	self.physics_system = self.world_inst.physics_system
@@ -19,9 +20,19 @@ function simulation_world_class:constructor()
 			self.prestep_callbacks[i]()
 		end
 		
+		my_instance.steering_system:substep(owner)
 		my_instance.movement_system:substep(owner)
+	end
+	
+	self.physics_system.poststepping_routine = function(owner)
+		local my_instance = self.world_inst
 		
-		owner:flush_message_queues()
+		local dt = self.physics_system:get_timestep_ms()
+		for i=1, #self.poststep_callbacks do
+			self.poststep_callbacks[i](dt)
+		end
+		
+		my_instance.destroy_system:consume_events(owner)
 	end
 end
 

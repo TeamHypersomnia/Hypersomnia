@@ -42,7 +42,7 @@ void destroy_system::consume_events(world& owner) {
 
 	owner.get_message_queue<messages::destroy_message>().clear();
 
-	for (auto it : to_destroy) {
-		owner.delete_entity(*it.first, it.second);
+	for (int i = 0; i < to_destroy.size(); ++i) {
+		owner.delete_entity(*to_destroy[i].first, to_destroy[i].second);
 	}
 }

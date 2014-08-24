@@ -49,7 +49,7 @@ function debug.my_traceback()
 	
 	if protocol ~= nil then
 		if protocol.LAST_READ_BITSTREAM ~= nil then
-			print (protocol.LAST_READ_BITSTREAM.read_report)
+			--print (protocol.LAST_READ_BITSTREAM.read_report)
 		end 
 	end
 	
