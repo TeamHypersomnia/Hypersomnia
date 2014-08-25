@@ -66,8 +66,6 @@ struct hypersomnia_gui {
 
 
 struct command_textbox {
-	crect background;
-
 	cslider sl = cslider(20);
 	cslider slh = cslider(20);
 	cscrollarea myscrtx = cscrollarea(scrollarea(rect_xywh(0, 0, 10, 0), &textbox_object, &sl, scrollarea::orientation::VERTICAL));

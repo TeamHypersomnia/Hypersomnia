@@ -122,6 +122,9 @@ function client_screen:constructor(camera_rect)
 	self.main_chatbox = command_textbox(self.my_gui)
 	self.main_chatbox:setup(rect_xywh(20, camera_rect.h - 400, 400, 100))
 	
+	self.commands_chatbox = command_textbox(self.my_gui)
+	self.commands_chatbox:setup(rect_xywh(520, camera_rect.h - 400, 400, 100))
+	
 	self.sample_scene.world_object.input_system.event_callback = function () 
 		self.my_gui:poll_events() 
 	end

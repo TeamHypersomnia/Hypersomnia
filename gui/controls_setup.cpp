@@ -37,15 +37,17 @@ rect_xywh _xywh(augs::rects::xywh<float>& xx) {
 }
 
 command_textbox::command_textbox(hypersomnia_gui& owner) : owner(&owner) {
-	owner.main_window.root.children.push_back(&background);
+	owner.main_window.root.children.push_back(&myscrtx);
+	owner.main_window.root.children.push_back(&myscrhtx);
+	owner.main_window.root.children.push_back(&textbox_object);
 }
 
 void command_textbox::setup(augs::rects::xywh<float> area) 
 {
-	background = crect(rect_xywh(0, 0, 1000, 1000));
+	//background = crect(rect_xywh(0, 0, 1000, 1000));
 	textbox_object = callback_textbox(ctextbox(textbox(_xywh(area), text::style(owner->fonts + 0, white))));
 
-	background.scrollable = false;
+	//background.scrollable = false;
 	//background.clip = false;
 
 	//chat_content = ctextbox(textbox(rect_xywh(rect_ltrb(20, 20, 600 - 20, 400 - 20)), text::style(fonts + 0, white)));
@@ -73,7 +75,4 @@ void command_textbox::setup(augs::rects::xywh<float> area)
 	myscrhtx.align();
 	myscrtx.align();
 
-	background.children.push_back(&myscrtx);
-	background.children.push_back(&myscrhtx);
-	background.children.push_back(&textbox_object);
 }
