@@ -2,6 +2,8 @@
 #include "../../MicroPlus/code/depthbase/include/db.h"
 #include "misc/timer.h"
 #include "math/vec2d.h"
+
+#include <functional>
 using namespace db::graphics::gui::controls::stylesheeted;
 
 const int IMAGES = 1;
@@ -9,24 +11,31 @@ const int FONTS = 1;
 
 DB_USE_ALL_NAMESPACES;
 
-struct callback_textbox : public ctextbox {
+namespace luabind {
+	struct object;
+}
+
+struct command_textbox_callback : public ctextbox {
+	std::function<void(std::wstring)> command_callback;
+
 	void event_proc(event_info m) override {
 
 		if (m.msg == rect::event::character || m.msg == rect::event::keydown) {
 			if (m.owner.owner.events.utf16 == db::event::keys::ENTER && !m.owner.owner.events.keys[db::event::keys::LSHIFT]) {
-				//this->editor.select_all();
-				//this->editor.backspace();
-				//
-				//return;
+				editor.select_all();
+				editor.backspace();
+				
+				if (command_callback)
+					command_callback(wstr(editor.get_str()));
+
+				return;
 			}
 		}
 
 		ctextbox::event_proc(m);
 	}
 
-	callback_textbox(const ctextbox& t = ctextbox()) : ctextbox(t) {
-
-	}
+	command_textbox_callback(const ctextbox& t = ctextbox()) : ctextbox(t) {}
 };
 
 namespace augs {
@@ -74,12 +83,14 @@ struct command_textbox {
 	text::style   active;
 	text::style inactive;
 	
-	callback_textbox  textbox_object;
+	command_textbox_callback textbox_object;
 
 	bool was_added = false;
 
 	hypersomnia_gui* owner = nullptr;
 	command_textbox() {}
 	command_textbox(hypersomnia_gui& owner);
+	
+	void set_callback(luabind::object);
 	void setup(augs::rects::xywh<float>);
 };

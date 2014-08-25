@@ -45,7 +45,7 @@ command_textbox::command_textbox(hypersomnia_gui& owner) : owner(&owner) {
 void command_textbox::setup(augs::rects::xywh<float> area) 
 {
 	//background = crect(rect_xywh(0, 0, 1000, 1000));
-	textbox_object = callback_textbox(ctextbox(textbox(_xywh(area), text::style(owner->fonts + 0, white))));
+	textbox_object = command_textbox_callback(ctextbox(textbox(_xywh(area), text::style(owner->fonts + 0, white))));
 
 	//background.scrollable = false;
 	//background.clip = false;
@@ -74,5 +74,4 @@ void command_textbox::setup(augs::rects::xywh<float> area)
 
 	myscrhtx.align();
 	myscrtx.align();
-
 }
