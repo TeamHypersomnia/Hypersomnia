@@ -2,11 +2,12 @@
 #include "stdafx.h"
 #include "utilities/lua_state_wrapper.h"
 #include "hypersomnia_gui.h"
+#include "misc/vector_wrapper.h"
 
 void command_textbox::set_callback(luabind::object callback) {
 	//luabind::object callbackobj = *callback;
-	textbox_object.command_callback = [callback](std::wstring&)	{
-		luabind::call_function<void>(callback);
+	textbox_object.command_callback = [callback](std::wstring& wstr)	{
+		luabind::call_function<void>(callback, augs::misc::towchar_vec(wstr));
 	};
 }
 

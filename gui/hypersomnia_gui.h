@@ -22,11 +22,11 @@ struct command_textbox_callback : public ctextbox {
 
 		if (m.msg == rect::event::character || m.msg == rect::event::keydown) {
 			if (m.owner.owner.events.utf16 == db::event::keys::ENTER && !m.owner.owner.events.keys[db::event::keys::LSHIFT]) {
-				editor.select_all();
-				editor.backspace();
-				
 				if (command_callback)
 					command_callback(wstr(editor.get_str()));
+
+				editor.select_all();
+				editor.backspace();
 
 				return;
 			}
