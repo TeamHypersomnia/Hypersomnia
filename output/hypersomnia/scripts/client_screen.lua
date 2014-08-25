@@ -36,6 +36,7 @@ client_screen = inherits_from ()
 
 function client_screen:constructor(camera_rect)
 	self.sample_scene = scene_class:create()
+	
 	self.sample_scene:load_map("hypersomnia\\data\\maps\\sample_map.lua", "hypersomnia\\scripts\\loaders\\basic_map_loader.lua")
 	
 	self.sample_scene.world_camera.camera.screen_rect = camera_rect
@@ -45,6 +46,7 @@ function client_screen:constructor(camera_rect)
 	
 	self.server:connect(config_table.server_address, config_table.server_port)
 	
+	self.sample_scene.world_object.owner_client_screen = self
 	if config_table.simulate_lag ~= 0 then
 		print "Simulating lag..."
 		self.server:enable_lag(config_table.packet_loss, config_table.min_latency, config_table.jitter)
@@ -112,6 +114,13 @@ function client_screen:constructor(camera_rect)
 	}
 	
 	create_weapons(self.sample_scene, true)
+	
+	
+	self.my_gui = hypersomnia_gui(global_gl_window)
+	
+	self.sample_scene.world_object.input_system.event_callback = function () 
+		self.my_gui:poll_events() 
+	end
 end
 
 function client_screen:loop()

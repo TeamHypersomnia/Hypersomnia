@@ -14,7 +14,7 @@ config_table = {
 	server_address = "127.0.0.1",
 	server_port = 37017,
 	
-	multiple_clients_view = 1,
+	multiple_clients_view = 0,
 	divergence_radius = 1,
 	
 	tickrate = 60,
@@ -50,5 +50,5 @@ global_gl_window:create(
 	
 global_gl_window:vsync(0)
 
-set_cursor_visible(0)
+--set_cursor_visible(0)
 framework_set_current_window(global_gl_window)
