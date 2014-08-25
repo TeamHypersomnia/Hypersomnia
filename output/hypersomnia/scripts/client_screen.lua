@@ -117,6 +117,10 @@ function client_screen:constructor(camera_rect)
 	
 	
 	self.my_gui = hypersomnia_gui(global_gl_window)
+	self.my_gui:setup()
+	
+	self.main_chatbox = command_textbox(self.my_gui)
+	self.main_chatbox:setup(rect_xywh(20, camera_rect.h - 400, 400, 100))
 	
 	self.sample_scene.world_object.input_system.event_callback = function () 
 		self.my_gui:poll_events() 

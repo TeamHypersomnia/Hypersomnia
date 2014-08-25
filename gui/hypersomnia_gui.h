@@ -1,8 +1,7 @@
 #pragma once
-#include "hypersomnia_gui.h"
-
 #include "../../MicroPlus/code/depthbase/include/db.h"
-
+#include "misc/timer.h"
+#include "math/vec2d.h"
 using namespace db::graphics::gui::controls::stylesheeted;
 
 const int IMAGES = 1;
@@ -25,14 +24,22 @@ struct callback_textbox : public ctextbox {
 		ctextbox::event_proc(m);
 	}
 
-	callback_textbox(const ctextbox& t) : ctextbox(t) {}
+	callback_textbox(const ctextbox& t = ctextbox()) : ctextbox(t) {
+
+	}
 };
 
 namespace augs {
 	struct lua_state_wrapper;
+
+	namespace window {
+		struct glwindow;
+	}
 }
 
 struct hypersomnia_gui {
+	augs::misc::timer delta_timer;
+
 	glwindow gl;
 	augs::window::glwindow& actual_window;
 
@@ -43,26 +50,38 @@ struct hypersomnia_gui {
 	font      fonts[FONTS];
 	
 	io::input::atlas atl;
-
+	
 	gui::system sys = gui::system(gl.events);
 	gui::group main_window = gui::group(sys);
 
-	crect background = crect(rect_ltrb(0, 0, 800 - 20, 600 - 20));
+	hypersomnia_gui(augs::window::glwindow& actual_window) : actual_window(actual_window) {}
 
-	callback_textbox  chat_textbox = callback_textbox(ctextbox(textbox(rect_xywh(rect_ltrb(10, 17, 800 - 20, 600 - 20)), text::style(fonts + 0, white))));
-
-	cslider   sl = cslider(20);
-	cslider  slh = cslider(20);
-	cscrollarea  myscrtx = cscrollarea(scrollarea(rect_xywh(0, 0, 10, 0), &chat_textbox, &sl, scrollarea::orientation::VERTICAL));
-	cscrollarea myscrhtx = cscrollarea(scrollarea(rect_xywh(0, 0, 0, 10), &chat_textbox, &slh, scrollarea::orientation::HORIZONTAL));
-
-	text::style   active = text::style(fonts + 1, ltblue);
-	text::style inactive = text::style(fonts + 0, white);
-
-	hypersomnia_gui(augs::window::glwindow& actual_window);
+	void setup();
 
 	void poll_events();
 	void draw_call();
 
 	static void bind(augs::lua_state_wrapper&);
+};
+
+
+struct command_textbox {
+	crect background;
+
+	cslider sl = cslider(20);
+	cslider slh = cslider(20);
+	cscrollarea myscrtx = cscrollarea(scrollarea(rect_xywh(0, 0, 10, 0), &textbox_object, &sl, scrollarea::orientation::VERTICAL));
+	cscrollarea myscrhtx = cscrollarea(scrollarea(rect_xywh(0, 0, 0, 10), &textbox_object, &slh, scrollarea::orientation::HORIZONTAL));
+
+	text::style   active;
+	text::style inactive;
+	
+	callback_textbox  textbox_object;
+
+	bool was_added = false;
+
+	hypersomnia_gui* owner = nullptr;
+	command_textbox() {}
+	command_textbox(hypersomnia_gui& owner);
+	void setup(augs::rects::xywh<float>);
 };

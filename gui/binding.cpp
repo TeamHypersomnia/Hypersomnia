@@ -8,6 +8,11 @@ void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
 		luabind::class_<hypersomnia_gui>("hypersomnia_gui")
 		.def(luabind::constructor<augs::window::glwindow&>())
 		.def("poll_events", &poll_events)
-		.def("draw_call", &draw_call)
+		.def("setup", &setup)
+		.def("draw_call", &draw_call),
+
+		luabind::class_<command_textbox>("command_textbox")
+		.def(luabind::constructor<hypersomnia_gui&>())
+		.def("setup", &command_textbox::setup)
 	];
 }
