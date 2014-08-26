@@ -17,23 +17,32 @@ function protocol_system:handle_incoming_commands()
 	local new_loop = {}
 	
 	for i=1, #msgs do
-		local input_bs = msgs[i].data:get_bitstream()
+		local msg = msgs[i]
+		local input_bs = msg.data:get_bitstream()
 	
-		local how_many_to_skip = msgs[i].channel:recv(input_bs)
+		local how_many_to_skip = 0
+		local reliable_commands_num = 0
 		local commands_read = 0
-		local reliable_commands_num = msgs[i].channel.receiver.last_message - msgs[i].channel.receiver.first_message
+		
+		if not msg.is_reliable_transmission then 
+			msgs[i].channel:recv(input_bs)
+			reliable_commands_num = msg.channel.receiver.last_message - msg.channel.receiver.first_message
+		else
+			input_bs:IgnoreBytes(1)
+		end
 		
 		if how_many_to_skip ~= -1 then
 			self.custom_header_callback(input_bs)
 			--print "Receiving data..."
 			while input_bs:GetNumberOfUnreadBits() >= 8 do
 				local msg = protocol.read_msg(input_bs)
-				local is_unreliable = commands_read >= reliable_commands_num
+				-- unreliable commands don't need to be packed in loops
+				local is_unreliable = not msg.is_reliable_transmission and commands_read >= reliable_commands_num
 				
 				-- server might want to copy the subject client
 				msg.subject = msgs[i].subject
 				
-				local should_skip = commands_read < how_many_to_skip
+				local should_skip = not msg.is_reliable_transmission and commands_read < how_many_to_skip
 				
 				if msg.info.variable_size ~= nil and msg.info.variable_size == true then
 					local num_bits = self.variable_message_callback(msg)

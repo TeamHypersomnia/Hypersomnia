@@ -2,6 +2,12 @@ protocol = {}
 
 protocol.message_by_id = {
 	{
+		name = "CHAT_MESSAGE",
+		data = {
+			"WString", "message"
+		}
+	},
+	{
 		name = "LOOP_SEPARATOR",
 		data = {}
 	},
@@ -151,6 +157,18 @@ protocol.new_object_signature = {
 
 -- internals
 protocol.GAME_TRANSMISSION = network_event.ID_USER_PACKET_ENUM + 1
+protocol.RELIABLE_TRANSMISSION = network_event.ID_USER_PACKET_ENUM + 2
+
+protocol.make_reliable_bs = function(append_bs)
+	local out = BitStream()
+	out:WriteByte(protocol.RELIABLE_TRANSMISSION)
+	
+	if append_bs then
+		out:WriteBitstream(append_bs)
+	end
+	
+	return out
+end
 
 protocol.messages = {}
 protocol.message_names = {}
@@ -166,27 +184,46 @@ end
 protocol.read_var = function(var_type, in_bs)
 	protocol.LAST_READ_BITSTREAM = in_bs
 	
-	local read_type = var_type
-	if read_type == "Bool" then read_type = "Bit" end
-	
-	local out = in_bs["Read" .. read_type](in_bs)
-	
-	if var_type == "Bit" then
-		out = bool2int(out)
+	if var_type == "WString" then
+		local str_len = in_bs:ReadUshort()
+		local out = wchar_t_vec()
+		
+		for i=1, str_len do
+			out:add(in_bs:ReadUshort())
+		end
+		
+		return out
+	else
+		local read_type = var_type
+		if read_type == "Bool" then read_type = "Bit" end
+		
+		local out = in_bs["Read" .. read_type](in_bs)
+		
+		if var_type == "Bit" then
+			out = bool2int(out)
+		end
+		
+		return out
 	end
-	
-	return out
 end
 
 protocol.write_var = function(var_type, var, out_bs)
-	if var_type == "Bit" then
-		var = var > 0
-	elseif var_type == "Bool" then
-		-- if it's bool, it's already conditional and not an integer
-		var_type = "Bit"
+	if var_type == "WString" then
+		out_bs:WriteUshort(var:size())
+		
+		for i=0, var:size()-1 do
+			out_bs:WriteUshort(var:at(i))
+		end
+	else
+		if var_type == "Bit" then
+			var = var > 0
+		elseif var_type == "Bool" then
+			-- if it's bool, it's already conditional and not an integer
+			var_type = "Bit"
+		end
+		
+		out_bs["Write" .. var_type](out_bs, var)
 	end
-	
-	out_bs["Write" .. var_type](out_bs, var)
 end
 
 protocol.write_sig = function(sig, entry, out_bs)

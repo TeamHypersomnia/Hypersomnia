@@ -32,6 +32,8 @@ dofile "hypersomnia\\scripts\\systems\\item_system.lua"
 
 dofile "hypersomnia\\scripts\\systems\\health_system.lua"
 
+dofile "hypersomnia\\scripts\\chat.lua"
+
 client_screen = inherits_from ()
 
 function client_screen:constructor(camera_rect)
@@ -134,9 +136,11 @@ function client_screen:constructor(camera_rect)
 			print "HELLO THERE!" 
 			print(wchar_vec_to_str(wvec))
 		
-			-- append a newline
-			wvec:add(13)
-			self.content_chatbox:append_text(wvec, rgba(0, 255, 0, 255))
+			if self.server then
+				self.server:send(protocol.make_reliable_bs(protocol.write_msg("CHAT_MESSAGE", {
+					message = wvec
+				})), send_priority.LOW_PRIORITY, send_reliability.RELIABLE_ORDERED, 0, self.server_guid, false)
+			end
 		end
 		
 	end)
@@ -155,6 +159,7 @@ function client_screen:loop()
 	
 	if (self.server:receive(self.received)) then
 		local message_type = self.received:byte(0)
+		local is_reliable_transmission = message_type == protocol.RELIABLE_TRANSMISSION
 			
 		if message_type == network_event.ID_CONNECTION_REQUEST_ACCEPTED then
 			self.server_guid = self.received:guid()
@@ -166,9 +171,10 @@ function client_screen:loop()
 			print("Server has disconnected.\n")
 		elseif message_type == network_event.ID_CONNECTION_LOST then
 			print("Server lost the connection.\n")
-		elseif message_type == protocol.GAME_TRANSMISSION then
+		elseif message_type == protocol.GAME_TRANSMISSION or is_reliable_transmission then
 			self.entity_system_instance:post_table("network_message", {
 				data = packet,
+				["is_reliable_transmission"] = is_reliable_transmission,
 				channel = self.systems.client.net_channel 
 			})
 		end
@@ -218,6 +224,8 @@ function client_screen:loop()
 	self.systems.replication:delete_objects()
 
 	self.entity_system_instance:handle_removed_entities()
+	
+	handle_incoming_chat(self)
 	
 	self.entity_system_instance:flush_messages()	
 	
