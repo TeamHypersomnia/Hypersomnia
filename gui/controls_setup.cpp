@@ -72,6 +72,7 @@ void callback_textbox::setup(augs::rects::xywh<float> area, bool is_input_textbo
 	textbox_object.print.align_caret_height = true;
 	textbox_object.print.caret_width = 1;
 	textbox_object.drag.vel_mult = 100.0;
+	textbox_object.editable = is_input_textbox;
 
 	myscrhtx.align();
 	myscrtx.align();
