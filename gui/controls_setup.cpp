@@ -42,6 +42,11 @@ callback_textbox::callback_textbox(hypersomnia_gui& owner) : owner(&owner) {
 	owner.main_window.root.children.push_back(&textbox_object);
 }
 
+void callback_textbox::clear_text() {
+	textbox_object.editor.select_all();
+	textbox_object.editor.backspace();
+}
+
 void callback_textbox::setup(augs::rects::xywh<float> area, bool is_input_textbox)
 {
 	//background = crect(rect_xywh(0, 0, 1000, 1000));

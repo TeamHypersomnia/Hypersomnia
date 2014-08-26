@@ -1,9 +1,18 @@
 #pragma once
+#include <functional>
 #include "../../MicroPlus/code/depthbase/include/db.h"
 #include "misc/timer.h"
 #include "math/vec2d.h"
+#include "graphics/pixel.h"
 
-#include <functional>
+namespace augs {
+	namespace misc {
+		/* vector wrapper that is used to faciliate binding to lua */
+		template<class value>
+		struct vector_wrapper;
+	}
+}
+
 using namespace db::graphics::gui::controls::stylesheeted;
 
 const int IMAGES = 1;
@@ -96,5 +105,9 @@ struct callback_textbox {
 	callback_textbox(hypersomnia_gui& owner);
 	
 	void set_command_callback(luabind::object);
+	
+	void append_text(augs::misc::vector_wrapper<wchar_t>&, augs::graphics::pixel_32);
+	void clear_text();
+
 	void setup(augs::rects::xywh<float>, bool is_input_textbox);
 };

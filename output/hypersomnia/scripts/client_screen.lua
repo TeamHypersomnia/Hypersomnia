@@ -127,12 +127,18 @@ function client_screen:constructor(camera_rect)
 	self.main_chatbox:setup(rect_xywh(20, camera_rect.h - 160, 400, 100), true)
 	
 	self.main_chatbox:set_command_callback(function(wvec)
-		for i=0, wvec:size()-1 do
-			print(wvec:at(i))
+		if wvec:size() > 0 then
+			for i=0, wvec:size()-1 do
+				print(wvec:at(i))
+			end
+			print "HELLO THERE!" 
+			print(wchar_vec_to_str(wvec))
+		
+			-- append a newline
+			wvec:add(13)
+			self.content_chatbox:append_text(wvec, rgba(0, 255, 0, 255))
 		end
-		print "HELLO THERE!" 
-		print(wchar_vec_to_str(wvec))
-	
+		
 	end)
 	
 	self.sample_scene.world_object.input_system.event_callback = function () 
