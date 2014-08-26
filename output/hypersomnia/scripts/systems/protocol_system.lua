@@ -25,7 +25,7 @@ function protocol_system:handle_incoming_commands()
 		local commands_read = 0
 		
 		if not msg.is_reliable_transmission then 
-			msgs[i].channel:recv(input_bs)
+			how_many_to_skip = msgs[i].channel:recv(input_bs)
 			reliable_commands_num = msg.channel.receiver.last_message - msg.channel.receiver.first_message
 		else
 			input_bs:IgnoreBytes(1)
