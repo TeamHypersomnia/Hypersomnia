@@ -36,16 +36,17 @@ rect_xywh _xywh(augs::rects::xywh<float>& xx) {
 	return rect_xywh(xx.x, xx.y, xx.w, xx.h);
 }
 
-command_textbox::command_textbox(hypersomnia_gui& owner) : owner(&owner) {
+callback_textbox::callback_textbox(hypersomnia_gui& owner) : owner(&owner) {
 	owner.main_window.root.children.push_back(&myscrtx);
 	owner.main_window.root.children.push_back(&myscrhtx);
 	owner.main_window.root.children.push_back(&textbox_object);
 }
 
-void command_textbox::setup(augs::rects::xywh<float> area) 
+void callback_textbox::setup(augs::rects::xywh<float> area, bool is_input_textbox)
 {
 	//background = crect(rect_xywh(0, 0, 1000, 1000));
-	textbox_object = command_textbox_callback(ctextbox(textbox(_xywh(area), text::style(owner->fonts + 0, white))));
+	textbox_object = textbox_wrapper(ctextbox(textbox(_xywh(area), text::style(owner->fonts + 0, white))));
+	textbox_object.is_input_textbox = is_input_textbox;
 
 	//background.scrollable = false;
 	//background.clip = false;

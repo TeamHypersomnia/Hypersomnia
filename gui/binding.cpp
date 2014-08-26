@@ -4,7 +4,7 @@
 #include "hypersomnia_gui.h"
 #include "misc/vector_wrapper.h"
 
-void command_textbox::set_callback(luabind::object callback) {
+void callback_textbox::set_command_callback(luabind::object callback) {
 	//luabind::object callbackobj = *callback;
 	textbox_object.command_callback = [callback](std::wstring& wstr)	{
 		luabind::call_function<void>(callback, augs::misc::towchar_vec(wstr));
@@ -19,9 +19,9 @@ void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
 		.def("setup", &setup)
 		.def("draw_call", &draw_call),
 
-		luabind::class_<command_textbox>("command_textbox")
+		luabind::class_<callback_textbox>("callback_textbox")
 		.def(luabind::constructor<hypersomnia_gui&>())
-		.def("setup", &command_textbox::setup)
-		.def("set_callback", &command_textbox::set_callback)
+		.def("setup", &callback_textbox::setup)
+		.def("set_command_callback", &callback_textbox::set_command_callback)
 	];
 }

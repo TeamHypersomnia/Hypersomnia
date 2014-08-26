@@ -119,9 +119,14 @@ function client_screen:constructor(camera_rect)
 	self.my_gui = hypersomnia_gui(global_gl_window)
 	self.my_gui:setup()
 	
-	self.main_chatbox = command_textbox(self.my_gui)
-	self.main_chatbox:setup(rect_xywh(20, camera_rect.h - 400, 400, 100))
-	self.main_chatbox:set_callback(function(wvec)
+	
+	self.content_chatbox = callback_textbox(self.my_gui)
+	self.content_chatbox:setup(rect_xywh(20, camera_rect.h - 500, 400, 300), false)
+	
+	self.main_chatbox = callback_textbox(self.my_gui)
+	self.main_chatbox:setup(rect_xywh(20, camera_rect.h - 160, 400, 100), true)
+	
+	self.main_chatbox:set_command_callback(function(wvec)
 		for i=0, wvec:size()-1 do
 			print(wvec:at(i))
 		end
