@@ -36,6 +36,14 @@ dofile "hypersomnia\\scripts\\chat.lua"
 
 client_screen = inherits_from ()
 
+function cprint(str, color)
+	local text_color = rgba(255, 255, 0, 255)
+	if color then text_color = color end
+	local vec_str = towchar_vec(str)
+	vec_str:add(13)
+	client_scenes[CURRENT_CLIENT_NUMBER].content_chatbox:append_text(vec_str, text_color)
+end
+
 function client_screen:constructor(camera_rect)
 	self.sample_scene = scene_class:create()
 	
@@ -121,22 +129,15 @@ function client_screen:constructor(camera_rect)
 	self.my_gui = hypersomnia_gui(global_gl_window)
 	self.my_gui:setup()
 	
-	
 	self.content_chatbox = callback_textbox(self.my_gui)
-	self.content_chatbox:setup(rect_xywh(20, camera_rect.h - 500, 400, 300), false)
+	self.content_chatbox:setup(rect_xywh(20, camera_rect.h - 500 + 100, 400, 200), false)
 	
 	self.main_chatbox = callback_textbox(self.my_gui)
 	self.main_chatbox:setup(rect_xywh(20, camera_rect.h - 160, 400, 100), true)
 	
 	self.main_chatbox:set_command_callback(function(wvec)
 		if wvec:size() > 0 then
-			for i=0, wvec:size()-1 do
-				print(wvec:at(i))
-			end
-			print "HELLO THERE!" 
-			print(wchar_vec_to_str(wvec))
-		
-			if self.server then
+			if self.server_guid then
 				self.server:send(protocol.make_reliable_bs(protocol.write_msg("CHAT_MESSAGE", {
 					message = wvec
 				})), send_priority.LOW_PRIORITY, send_reliability.RELIABLE_ORDERED, 0, self.server_guid, false)
@@ -164,13 +165,19 @@ function client_screen:loop()
 		if message_type == network_event.ID_CONNECTION_REQUEST_ACCEPTED then
 			self.server_guid = self.received:guid()
 			self.systems.client.server_guid = self.server_guid
+			
 			print("Our connection request has been accepted.");
+			
+			cprint "Our connection request has been accepted."
 		elseif message_type == network_event.ID_NO_FREE_INCOMING_CONNECTIONS then
 			print("The server is full.\n")
+			cprint("The server is full.\n")
 		elseif message_type == network_event.ID_DISCONNECTION_NOTIFICATION then
 			print("Server has disconnected.\n")
+			cprint("Server has disconnected.\n")
 		elseif message_type == network_event.ID_CONNECTION_LOST then
 			print("Server lost the connection.\n")
+			cprint("Server lost the connection.\n")
 		elseif message_type == protocol.GAME_TRANSMISSION or is_reliable_transmission then
 			self.entity_system_instance:post_table("network_message", {
 				data = packet,
