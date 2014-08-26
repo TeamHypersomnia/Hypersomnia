@@ -32,6 +32,10 @@ function create_weapons(scene, include_render)
 				
 				item_sprite = scene.sprite_library[weapon_name]["world"],
 			
+				can_be_unwielded = function(object)
+					return object.weapon:can_be_unwielded()
+				end,
+				
 				on_wielder_changed = function(object, new_wielder)
 					object.weapon.trigger = components.weapon.triggers.NONE
 	

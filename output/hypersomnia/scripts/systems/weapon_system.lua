@@ -95,6 +95,10 @@ function weapon_system:shot_routine(target, premade_shot)
 	self.owner_entity_system:post_table("shot_message", new_shot_message)
 end
 
+function components.weapon:can_be_unwielded()
+	return next(self.buffered_actions) == nil
+end
+
 function weapon_system:handle_messages()
 	local msgs = self.world_object:get_messages_filter_components("intent_message", { "wield" } )
 	
@@ -161,6 +165,7 @@ function weapon_system:substep(dt)
 				-- on the server: invalid action should anyway be invalidated
 				-- on the client: the commands won't be constrained so they will be always executed
 				table.remove(weapon.buffered_actions, 1)
+				print "POPPING ACTION"
 			end
 			
 			local triggers = components.weapon.triggers
