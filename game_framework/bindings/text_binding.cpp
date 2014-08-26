@@ -13,14 +13,10 @@ wchar_t towchar(const std::wstring& s) {
 	return s[0];
 }
 
-misc::vector_wrapper<wchar_t> towchar_vec(const std::wstring& s) {
-	misc::vector_wrapper<wchar_t> out;
+std::string wchar_vec_to_str(misc::vector_wrapper<wchar_t> str) {
+	auto out_w = std::wstring(str.raw.begin(), str.raw.end());
 
-	for (auto& c : s) {
-		out.push_back(c);
-	}
-
-	return out;
+	return std::string(out_w.begin(), out_w.end());
 }
 
 namespace bindings {
@@ -41,6 +37,7 @@ namespace bindings {
 			misc::vector_wrapper<wchar_t>::bind("wchar_t_vec"),
 			misc::vector_wrapper<formatted_char>::bind_vector("formatted_text"),
 			
+			luabind::def("wchar_vec_to_str", wchar_vec_to_str),
 			luabind::def("towchar", towchar),
 			luabind::def("towchar_vec", towchar_vec),
 			luabind::def("get_text_bbox", get_text_bbox),

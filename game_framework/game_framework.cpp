@@ -9,8 +9,8 @@
 #include "world_instance.h"
 
 namespace framework {
-	void init() {
-		augs::init();
+	void init(unsigned which) {
+		augs::init(which);
 	}
 
 	void run_tests() {

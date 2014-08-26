@@ -21,7 +21,7 @@ namespace bindings {
 			.def("build", &texture_baker::atlas::default_build)
 			.def("linear", &texture_baker::atlas::linear)
 			.def("nearest", &texture_baker::atlas::nearest)
-			//.def("bind", &texture_baker::atlas::bind)
+			.def("force_bind", &texture_baker::atlas::_bind)
 			.def("bind", &texture_baker::atlas::bind),
 
 			luabind::class_<texture_baker::font_file>("font_file")

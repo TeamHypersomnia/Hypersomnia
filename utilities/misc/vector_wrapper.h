@@ -4,6 +4,7 @@
 
 namespace augs {
 	namespace misc {
+
 		/* vector wrapper that is used to faciliate binding to lua */
 		template<class value>
 		struct vector_wrapper {
@@ -49,5 +50,7 @@ namespace augs {
 					.def("data", (value* (__thiscall std::vector<value>::*) ()) (&std::vector<value>::data));
 			}
 		};
+
+		extern vector_wrapper<wchar_t> towchar_vec(const std::wstring& s);
 	}
 }

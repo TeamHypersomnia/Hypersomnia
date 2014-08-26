@@ -118,6 +118,7 @@ namespace bindings {
 			luabind::class_<input_system>("_input_system")
 			.def("process_entities", &input_system::process_entities)
 			.def_readwrite("quit_flag", &input_system::quit_flag)
+			.def_readwrite("event_callback", &input_system::event_callback)
 			.def("add_context", &input_system::add_context)
 			.def("is_down", &input_system::is_down)
 			.def("clear_contexts", &input_system::clear_contexts),

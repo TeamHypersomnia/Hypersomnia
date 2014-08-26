@@ -69,6 +69,15 @@ void input_system::process_entities(world& owner) {
 	/* empty active_contexts vector indicates that we don't want input polling for this particular world */
 	if (!active_contexts.empty()) {
 		while (input_window.poll_events(msg)) {
+			if (event_callback) {
+				try {
+					luabind::call_function<void>(event_callback);
+				}
+				catch (std::exception compilation_error) {
+					std::cout << compilation_error.what() << '\n';
+				}
+			}
+
 			for (auto it : active_contexts) {
 				if (!it->enabled) continue;
 
