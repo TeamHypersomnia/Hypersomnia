@@ -26,7 +26,74 @@ void callback_textbox::append_text(augs::misc::vector_wrapper<wchar_t>& wstr, au
 	textbox_object.editor.set_selection_offset(prev_caret_sel);
 }
 
+stylesheet::style* resolve_attr(stylesheet& subject, std::string a) {
+	if (a == "released") {
+		return &subject.released;
+	}
+	else if (a == "focused") {
+		return &subject.focused;
+	}
+	else if (a == "hovered") {
+		return &subject.hovered;
+	}
+	else if (a == "pushed") {
+		return &subject.pushed;
+	}
+
+	return nullptr;
+}
+
+void set_color(stylesheet& subject, std::string attr, augs::graphics::pixel_32 rgba) {
+	auto* s = resolve_attr(subject, attr);
+
+	if (s) {
+		db::graphics::pixel_32 col;
+		memcpy(&col, &rgba, sizeof(col));
+		s->color.set(col);
+	}
+}
+
+void set_border(stylesheet& subject, std::string attr, int w, augs::graphics::pixel_32 rgba) {
+	auto* s = resolve_attr(subject, attr);
+
+	if (s) {
+		db::graphics::pixel_32 col;
+		memcpy(&col, &rgba, sizeof(col));
+
+		s->border.set(solid_stroke(w, material(col)));
+	}
+}
+
+
+template <typename... Args>
+void invokem (Args...) {
+
+}
+
+
+template<typename Signature>
+struct setter_wrapper;
+
+template<typename Ret, typename First, typename... Args>
+struct setter_wrapper<Ret (First, Args...)> {
+	template <typename T, stylesheet& get_style(T&), Ret setter_func(First, Args...)>
+	static Ret setter(T& subject, Args... arguments) {
+		return setter_func(get_style(subject), arguments...);
+	}
+};
+
+#define wrap_set(_s, _g, _t) setter_wrapper<decltype(_s)>::setter<_t, _g, _s> 
+
+stylesheet& get_textbox_style(callback_textbox& c) {
+	return c.textbox_object.styles;
+}
+
 void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
+	callback_textbox a;
+	invokem(a.textbox_object.styles, "aaa", augs::graphics::pixel_32(1, 1, 1, 1));
+
+	//setter_wrapper<decltype(set_color)>::invoke(a, "aaa", augs::graphics::pixel_32(1, 1, 1, 1));
+	(a, "aaa", augs::graphics::pixel_32(1, 1, 1, 1));
 	luabind::module(wrapper.raw)[
 		luabind::class_<hypersomnia_gui>("hypersomnia_gui")
 		.def(luabind::constructor<augs::window::glwindow&>())
@@ -38,6 +105,10 @@ void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
 		.def(luabind::constructor<hypersomnia_gui&>())
 		.def("append_text", &callback_textbox::append_text)
 		.def("setup", &callback_textbox::setup)
-		.def("set_command_callback", &callback_textbox::set_command_callback)
+		.def("set_command_callback", &callback_textbox::set_command_callback),
+
+		luabind::def("set_color", wrap_set(set_color, get_textbox_style, callback_textbox)),
+		luabind::def("set_border", wrap_set(set_border, get_textbox_style, callback_textbox))
+
 	];
 }

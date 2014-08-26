@@ -132,8 +132,16 @@ function client_screen:constructor(camera_rect)
 	self.content_chatbox = callback_textbox(self.my_gui)
 	self.content_chatbox:setup(rect_xywh(20, camera_rect.h - 500 + 100, 400, 200), false)
 	
+	
 	self.main_chatbox = callback_textbox(self.my_gui)
 	self.main_chatbox:setup(rect_xywh(20, camera_rect.h - 160, 400, 100), true)
+	
+	set_color(self.content_chatbox, "released", rgba(0, 0, 0, 100))
+	--set_color(self.main_chatbox, "released", rgba(0, 0, 0, 100))
+	--set_color(self.main_chatbox, "focused", rgba(0, 255, 255, 100))
+	--
+	--set_border(self.content_chatbox, "focused", 1, rgba(0, 255, 255, 150))
+	--set_border(self.content_chatbox, "released", 0, rgba(0, 255, 255, 0))
 	
 	self.main_chatbox:set_command_callback(function(wvec)
 		if wvec:size() > 0 then
