@@ -127,17 +127,20 @@ function client_screen:constructor(camera_rect)
 	
 	
 	self.my_gui = hypersomnia_gui(global_gl_window)
-	self.my_gui:setup()
+	self.my_gui:setup(vec2(camera_rect.w, camera_rect.h))
+	
+	self.focusable_bg = callback_rect(self.my_gui)
+	self.focusable_bg:setup(rect_xywh(0, 0, camera_rect.w, camera_rect.h), true)
 	
 	self.content_chatbox = callback_textbox(self.my_gui)
-	self.content_chatbox:setup(rect_xywh(20, camera_rect.h - 500 + 100, 400, 200), false)
-	
+	self.content_chatbox:setup(rect_xywh(20, camera_rect.h - 500 + 100 + 40, 350, 150), false)
 	
 	self.main_chatbox = callback_textbox(self.my_gui)
-	self.main_chatbox:setup(rect_xywh(20, camera_rect.h - 160, 400, 100), true)
+	self.main_chatbox:setup(rect_xywh(20, camera_rect.h - 160 + 40, 350, 75), true)
 	
-	set_color(self.content_chatbox, "released", rgba(0, 0, 0, 100))
-	--set_color(self.main_chatbox, "released", rgba(0, 0, 0, 100))
+	set_color(self.content_chatbox, "released", rgba(0, 0, 0, 50))
+	set_color(self.main_chatbox, "released", rgba(0, 0, 0, 100))
+	set_color(self.focusable_bg, "released", rgba(0, 0, 0, 0))
 	--set_color(self.main_chatbox, "focused", rgba(0, 255, 255, 100))
 	--
 	--set_border(self.content_chatbox, "focused", 1, rgba(0, 255, 255, 150))

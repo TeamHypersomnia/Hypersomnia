@@ -11,6 +11,31 @@ void callback_textbox::set_command_callback(luabind::object callback) {
 	};
 }
 
+
+void callback_rect::set_focus_callback(luabind::object callback) {
+	rect_obj.focus_callback = [callback]()	{
+		luabind::call_function<void>(callback);
+	};
+}
+
+void callback_rect::set_lpressed_callback(luabind::object callback) {
+	rect_obj.lpressed_callback = [callback]()	{
+		luabind::call_function<void>(callback);
+	};
+}
+
+void callback_rect::set_hover_callback(luabind::object callback) {
+	rect_obj.hover_callback = [callback]()	{
+		luabind::call_function<void>(callback);
+	};
+}
+
+void callback_rect::set_blur_callback(luabind::object callback) {
+	rect_obj.blur_callback = [callback]()	{
+		luabind::call_function<void>(callback);
+	};
+}
+
 void callback_textbox::append_text(augs::misc::vector_wrapper<wchar_t>& wstr, augs::graphics::pixel_32 color) {
 	auto prev_caret_pos = textbox_object.editor.get_caret_pos();
 	auto prev_caret_sel = textbox_object.editor.get_selection_offset();
@@ -88,6 +113,10 @@ stylesheet& get_textbox_style(callback_textbox& c) {
 	return c.textbox_object.styles;
 }
 
+stylesheet& get_rect_style(callback_rect& c) {
+	return c.rect_obj.styles;
+}
+
 void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
 	callback_textbox a;
 	invokem(a.textbox_object.styles, "aaa", augs::graphics::pixel_32(1, 1, 1, 1));
@@ -108,7 +137,18 @@ void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
 		.def("set_command_callback", &callback_textbox::set_command_callback),
 
 		luabind::def("set_color", wrap_set(set_color, get_textbox_style, callback_textbox)),
-		luabind::def("set_border", wrap_set(set_border, get_textbox_style, callback_textbox))
+		luabind::def("set_color", wrap_set(set_color, get_rect_style, callback_rect)),
+
+		luabind::def("set_border", wrap_set(set_border, get_textbox_style, callback_textbox)),
+		luabind::def("set_border", wrap_set(set_border, get_rect_style, callback_rect)),
+
+		luabind::class_<callback_rect>("callback_rect")
+		.def(luabind::constructor<hypersomnia_gui&>())
+		.def("setup", &callback_rect::setup)
+		.def("set_focus_callback", &callback_rect::set_focus_callback)
+		.def("set_lpressed_callback", &callback_rect::set_lpressed_callback)
+		.def("set_hover_callback", &callback_rect::set_hover_callback)
+		.def("set_blur_callback", &callback_rect::set_blur_callback)
 
 	];
 }

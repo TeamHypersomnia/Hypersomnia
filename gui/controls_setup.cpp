@@ -2,7 +2,8 @@
 
 using namespace stylesheeted;
 
-void hypersomnia_gui::setup() {
+void hypersomnia_gui::setup(augs::vec2<> camera) {
+	camera_size = camera;
 	images[0].create(4, 4, 1);
 	images[0].fill(255);
 	gui::null_texture = textures + 0;
@@ -29,6 +30,12 @@ void hypersomnia_gui::setup() {
 	ltblue_theme();
 
 	main_window.middlescroll.speed_mult = 90.0f;
+	focusable_bg = rect(rect_xywh(0, 0, camera_size.x, camera_size.y));
+
+	focusable_bg.focusable = true;
+
+	//main_window.root.children.push_back(&focusable_bg);
+
 	//main_window.middlescroll.mat = material(textures + 4, pixel_32(255, 255, 255, 180));
 }
 
@@ -81,4 +88,14 @@ void callback_textbox::setup(augs::rects::xywh<float> area, bool is_input_textbo
 
 	myscrhtx.align();
 	myscrtx.align();
+}
+
+
+callback_rect::callback_rect(hypersomnia_gui& owner) : owner(&owner) {
+	owner.main_window.root.children.push_back(&rect_obj);
+}
+
+void callback_rect::setup(augs::rects::xywh<float> area, bool focusable) {
+	rect_obj = rect_wrapper(crect(_xywh(area)));
+	rect_obj.focusable = focusable;
 }

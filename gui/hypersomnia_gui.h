@@ -77,10 +77,12 @@ struct hypersomnia_gui {
 	
 	gui::system sys = gui::system(gl.events);
 	gui::group main_window = gui::group(sys);
+	rect focusable_bg;
 
 	hypersomnia_gui(augs::window::glwindow& actual_window) : actual_window(actual_window) {}
 
-	void setup();
+	augs::vec2<> camera_size;
+	void setup(augs::vec2<> camera_size);
 
 	void poll_events();
 	void draw_call();
@@ -88,6 +90,35 @@ struct hypersomnia_gui {
 	static void bind(augs::lua_state_wrapper&);
 };
 
+
+struct rect_wrapper : crect {
+	std::function<void()> focus_callback, lpressed_callback, hover_callback, blur_callback;
+
+	void event_proc(event_info m) override {
+		auto msg = m.msg;
+		switch (msg) {
+		case rect::event::blur: if (blur_callback) blur_callback(); break;
+		case rect::event::focus: if (focus_callback) focus_callback(); break;
+		case rect::event::lpressed: if (lpressed_callback) lpressed_callback(); break;
+		case rect::event::hover: if (hover_callback) hover_callback(); break;
+		default: break;
+		}
+
+		crect::event_proc(m);
+	}
+
+	rect_wrapper(const crect& t = crect()) : crect(t) {}
+};
+
+struct callback_rect {
+	rect_wrapper rect_obj;
+	hypersomnia_gui* owner = nullptr;
+
+	callback_rect(hypersomnia_gui& owner);
+	
+	void setup(augs::rects::xywh<float>, bool focusable);
+	void set_focus_callback(luabind::object), set_lpressed_callback(luabind::object), set_hover_callback(luabind::object), set_blur_callback(luabind::object);
+};
 
 struct callback_textbox {
 	cslider sl = cslider(20);
