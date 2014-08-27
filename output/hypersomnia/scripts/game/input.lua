@@ -26,6 +26,7 @@ custom_intents = create_inverse_enum {
 gui_input_context = create_input_context {
 	intents = {
 		[keys.LALT] 			= custom_intents.ENABLE_GUI,
+		[keys.ESC] 				= custom_intents.QUIT,
 		[keys.ENTER] 			= custom_intents.ENTER_CHAT
 	}
 }

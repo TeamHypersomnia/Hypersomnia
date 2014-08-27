@@ -111,6 +111,10 @@ void callback_rect::focus() {
 	owner->main_window.set_focus(&rect_obj);
 }
 
+bool callback_textbox::is_focused() {
+	return owner->main_window.get_focus() == &textbox_object;
+}
+
 void callback_textbox::focus() {
 	owner->main_window.set_focus(&textbox_object);
 }

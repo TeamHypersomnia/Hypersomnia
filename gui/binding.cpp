@@ -135,6 +135,7 @@ void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
 		.def(luabind::constructor<hypersomnia_gui&>())
 		.def("append_text", &callback_textbox::append_text)
 		.def("setup", &callback_textbox::setup)
+		.def("is_focused", &callback_textbox::is_focused)
 		.def("focus", &callback_textbox::focus)
 		.def("clear_text", &callback_textbox::clear_text)
 		.def("is_clean", &callback_textbox::is_clean)

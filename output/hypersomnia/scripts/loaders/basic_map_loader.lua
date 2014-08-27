@@ -76,7 +76,7 @@ return function(map_filename, scene_object)
 	
 	scene_object.crosshair_sprite = create_sprite {
 		image = scene_object.sprite_library["crosshair"],
-		color = rgba(255, 255, 255, 255)
+		color = rgba(0, 255, 255, 255)
 	}
 	
 	scene_object.bullet_sprite = create_sprite {

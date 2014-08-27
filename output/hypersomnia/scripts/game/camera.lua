@@ -20,7 +20,7 @@ function create_world_camera_entity(owner_world, blank_sprite)
 		
 			orbit_mode = camera_component.LOOK,
 			max_look_expand = vec2(config_table.resolution_w/2, config_table.resolution_h/2),
-			angled_look_length = 100
+			angled_look_length = 10
 		},
 		
 		chase = {

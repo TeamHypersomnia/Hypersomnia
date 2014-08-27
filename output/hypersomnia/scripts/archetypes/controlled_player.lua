@@ -91,7 +91,8 @@ function create_controlled_player(scene_object, position, target_camera, crossha
 			},
 			
 			crosshair = {
-				sensitivity = config_table.sensitivity
+				sensitivity = config_table.sensitivity,
+				should_blink = false
 			},
 			
 			chase = {

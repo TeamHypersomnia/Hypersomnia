@@ -53,9 +53,6 @@ struct textbox_wrapper : public ctextbox {
 					if (command_callback)
 						command_callback(wstr(editor.get_str()));
 
-					editor.select_all();
-					editor.backspace();
-
 					return;
 				}
 			}
@@ -161,6 +158,7 @@ struct callback_textbox {
 	void append_text(augs::misc::vector_wrapper<wchar_t>&, augs::graphics::pixel_32);
 	void clear_text();
 	bool is_clean();
+	bool is_focused();
 
 	void setup(augs::rects::xywh<float>, bool is_input_textbox);
 };

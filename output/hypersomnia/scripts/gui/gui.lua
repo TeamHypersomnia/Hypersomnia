@@ -76,8 +76,15 @@ function gui_class:constructor(camera_rect, world_object, owner_client)
 					if message.intent == custom_intents.ENABLE_GUI then
 						self:set_enabled(not self.gui_enabled)
 					elseif message.intent == custom_intents.ENTER_CHAT then
-						self:set_enabled(true)
-						self.main_chatbox:focus()
+						if not self.ignore_intent and not self.main_chatbox:is_focused() then
+							--self:set_enabled(false)
+						--else						
+							self:set_enabled(true)
+							self.main_chatbox:focus()	
+						end
+						
+						self.ignore_intent = nil
+						--end
 					end
 				end
 			end
@@ -111,12 +118,18 @@ function gui_class:constructor(camera_rect, world_object, owner_client)
 	--set_border(self.content_chatbox, "released", 0, rgba(0, 255, 255, 0))
 	
 	self.main_chatbox:set_command_callback(function(wvec)
+		self.ignore_intent = true
+		
 		if wvec:size() > 0 then
 			if self.owner_client.server_guid then
 				self.owner_client.server:send(protocol.make_reliable_bs(protocol.write_msg("CHAT_MESSAGE", {
 					message = wvec
 				})), send_priority.LOW_PRIORITY, send_reliability.RELIABLE_ORDERED, 0, self.owner_client.server_guid, false)
 			end
+			
+			self.main_chatbox:clear_text()
+		else
+			self:set_enabled(false)
 		end
 		
 	end)

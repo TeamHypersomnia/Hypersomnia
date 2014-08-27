@@ -75,7 +75,8 @@ function create_remote_player(owner_scene, crosshair_sprite)
 			},
 			
 			crosshair = {
-				sensitivity = config_table.sensitivity
+				sensitivity = config_table.sensitivity,
+				should_blink = false
 			},
 			
 			chase = {
