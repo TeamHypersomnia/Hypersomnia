@@ -104,3 +104,7 @@ void callback_rect::setup(augs::rects::xywh<float> area, bool focusable) {
 void callback_rect::focus() {
 	owner->main_window.set_focus(&rect_obj);
 }
+
+void hypersomnia_gui::blur() {
+	main_window.set_focus(nullptr);
+}

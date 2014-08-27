@@ -100,6 +100,7 @@ struct hypersomnia_gui {
 
 	void poll_events();
 	void draw_call();
+	void blur();
 
 	static void bind(augs::lua_state_wrapper&);
 };

@@ -128,6 +128,7 @@ void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
 		.def(luabind::constructor<augs::window::glwindow&>())
 		.def("poll_events", &poll_events)
 		.def("setup", &setup)
+		.def("blur", &blur)
 		.def("draw_call", &draw_call),
 
 		luabind::class_<callback_textbox>("callback_textbox")
