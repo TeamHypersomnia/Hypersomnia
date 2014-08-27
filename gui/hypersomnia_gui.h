@@ -44,8 +44,12 @@ struct textbox_wrapper : public ctextbox {
 		}
 
 		if (is_input_textbox) {
-			if (m.msg == rect::event::character || m.msg == rect::event::keydown) {
-				if (m.owner.owner.events.utf16 == db::event::keys::ENTER && !m.owner.owner.events.keys[db::event::keys::LSHIFT]) {
+			if (m.msg == rect::event::character && m.owner.owner.events.utf16 == db::event::keys::ENTER) {
+				return;
+			}
+
+			if (m.msg == rect::event::keydown) {
+				if (m.owner.owner.events.key == db::event::keys::ENTER && !m.owner.owner.events.keys[db::event::keys::LSHIFT]) {
 					if (command_callback)
 						command_callback(wstr(editor.get_str()));
 
@@ -156,6 +160,7 @@ struct callback_textbox {
 	void focus();
 	void append_text(augs::misc::vector_wrapper<wchar_t>&, augs::graphics::pixel_32);
 	void clear_text();
+	bool is_clean();
 
 	void setup(augs::rects::xywh<float>, bool is_input_textbox);
 };

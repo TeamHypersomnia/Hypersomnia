@@ -54,6 +54,10 @@ void callback_textbox::clear_text() {
 	textbox_object.editor.backspace();
 }
 
+bool callback_textbox::is_clean() {
+	return textbox_object.editor.get_str().empty();
+}
+
 void callback_textbox::setup(augs::rects::xywh<float> area, bool is_input_textbox)
 {
 	//background = crect(rect_xywh(0, 0, 1000, 1000));
@@ -61,6 +65,8 @@ void callback_textbox::setup(augs::rects::xywh<float> area, bool is_input_textbo
 	textbox_object.is_input_textbox = is_input_textbox;
 	textbox_object.sl = &myscrtx;
 	textbox_object.slh = &myscrhtx;
+	myscrtx.enabled = false;
+	myscrhtx.enabled = false;
 	//background.scrollable = false;
 	//background.clip = false;
 

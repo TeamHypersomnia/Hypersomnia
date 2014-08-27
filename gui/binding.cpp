@@ -136,6 +136,8 @@ void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
 		.def("append_text", &callback_textbox::append_text)
 		.def("setup", &callback_textbox::setup)
 		.def("focus", &callback_textbox::focus)
+		.def("clear_text", &callback_textbox::clear_text)
+		.def("is_clean", &callback_textbox::is_clean)
 		.def("set_command_callback", &callback_textbox::set_command_callback),
 
 		luabind::def("set_color", wrap_set(set_color, get_textbox_style, callback_textbox)),

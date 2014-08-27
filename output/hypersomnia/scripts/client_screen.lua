@@ -37,13 +37,6 @@ dofile "hypersomnia\\scripts\\gui\\gui.lua"
 
 client_screen = inherits_from ()
 
-function cprint(str, color)
-	local text_color = rgba(255, 255, 0, 255)
-	if color then text_color = color end
-	local vec_str = towchar_vec(str)
-	vec_str:add(13)
-	client_scenes[CURRENT_CLIENT_NUMBER].my_gui.content_chatbox:append_text(vec_str, text_color)
-end
 
 function client_screen:constructor(camera_rect)
 	self.sample_scene = scene_class:create()

@@ -1,10 +1,28 @@
 gui_class = inherits_from()
 
+function cprint(str, color, target_box)
+	local text_color = rgba(255, 255, 0, 255)
+	if color then text_color = color end
+	local vec_str = towchar_vec(str)
+	vec_str:add(13)
+	
+	if target_box == nil then
+		target_box = client_scenes[CURRENT_CLIENT_NUMBER].my_gui.content_chatbox
+	end
+	
+	target_box:append_text(vec_str, text_color)
+end
+
 function gui_class:set_enabled(flag)
 	if self.gui_enabled ~= flag then
 		self.gui_enabled = flag
 		
 		if flag then
+			if self.press_info_written then
+				self.main_chatbox:clear_text()
+				self.press_info_written = false
+			end
+			
 			main_input_context.enabled = false
 			gui_input_context.enabled = true
 		
@@ -20,6 +38,11 @@ function gui_class:set_enabled(flag)
 			set_color(self.main_chatbox, "released", rgba(0, 0, 0, 30))
 			
 			self.gui:blur()
+			
+			if self.main_chatbox:is_clean() then
+				cprint("Press Enter to chat or Alt to enable GUI...", rgba(255, 255, 255, 120), self.main_chatbox)
+				self.press_info_written = true
+			end
 		end
 		
 		
@@ -32,6 +55,8 @@ end
 function gui_class:constructor(camera_rect, world_object, owner_client)
 	self.owner_client = owner_client
 	self.gui_enabled = true
+	
+	self.press_info_written = false
 	
 	world_object.input_system.event_callback = function () 
 		if self.gui_enabled then
