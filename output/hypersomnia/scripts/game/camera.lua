@@ -118,7 +118,7 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				)
 	
 				renderer:call_triangles()
-				owner_world.owner_client_screen.my_gui:draw_call()
+				owner_world.owner_client_screen.my_gui.gui:draw_call()
 				renderer:draw_debug_info(camera_draw_input.visible_area, camera_draw_input.camera_transform, blank_sprite.tex)
 				renderer:clear_triangles()
 				

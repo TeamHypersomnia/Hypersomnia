@@ -33,6 +33,7 @@ dofile "hypersomnia\\scripts\\systems\\item_system.lua"
 dofile "hypersomnia\\scripts\\systems\\health_system.lua"
 
 dofile "hypersomnia\\scripts\\chat.lua"
+dofile "hypersomnia\\scripts\\gui\\gui.lua"
 
 client_screen = inherits_from ()
 
@@ -41,7 +42,7 @@ function cprint(str, color)
 	if color then text_color = color end
 	local vec_str = towchar_vec(str)
 	vec_str:add(13)
-	client_scenes[CURRENT_CLIENT_NUMBER].content_chatbox:append_text(vec_str, text_color)
+	client_scenes[CURRENT_CLIENT_NUMBER].my_gui.content_chatbox:append_text(vec_str, text_color)
 end
 
 function client_screen:constructor(camera_rect)
@@ -125,61 +126,7 @@ function client_screen:constructor(camera_rect)
 	
 	create_weapons(self.sample_scene, true)
 	
-	
-	self.my_gui = hypersomnia_gui(global_gl_window)
-	self.my_gui:setup(vec2(camera_rect.w, camera_rect.h))
-	
-	self.focusable_bg = callback_rect(self.my_gui)
-	self.focusable_bg:setup(rect_xywh(0, 0, camera_rect.w, camera_rect.h), true)
-	
-	self.content_chatbox = callback_textbox(self.my_gui)
-	self.content_chatbox:setup(rect_xywh(20, camera_rect.h - 500 + 100 + 150, 350, 150), false)
-	
-	self.main_chatbox = callback_textbox(self.my_gui)
-	self.main_chatbox:setup(rect_xywh(20, camera_rect.h - 160 + 90, 350, 35), true)
-	
-	--set_color(self.content_chatbox, "released", rgba(0, 0, 0, 50))
-	--set_color(self.main_chatbox, "released", rgba(0, 0, 0, 100))
-	--set_color(self.focusable_bg, "released", rgba(0, 0, 0, 0))
-	
-	local blurring_callback = function()
-		print "blurring gui.."
-	
-		set_border(self.content_chatbox, "released", 0, rgba(255, 255, 255, 150))
-		set_color(self.content_chatbox, "released", rgba(0, 0, 0, 0))
-		set_color(self.main_chatbox, "released", rgba(0, 0, 0, 30))
-	end
-	-- blurring gui
-	self.focusable_bg:set_focus_callback(blurring_callback)	
-	
-	-- focusing gui
-	self.focusable_bg:set_blur_callback(function()
-		print "focusing gui.."
-	
-		set_border(self.content_chatbox, "released", 1, rgba(255, 255, 255, 30))
-		set_color(self.content_chatbox, "released", rgba(0, 0, 0, 50))
-		set_color(self.main_chatbox, "released", rgba(0, 0, 0, 100))
-	end)
-	
-	self.focusable_bg:focus()
-	--set_color(self.main_chatbox, "focused", rgba(0, 255, 255, 100))
-	--
-	--set_border(self.content_chatbox, "released", 0, rgba(0, 255, 255, 0))
-	
-	self.main_chatbox:set_command_callback(function(wvec)
-		if wvec:size() > 0 then
-			if self.server_guid then
-				self.server:send(protocol.make_reliable_bs(protocol.write_msg("CHAT_MESSAGE", {
-					message = wvec
-				})), send_priority.LOW_PRIORITY, send_reliability.RELIABLE_ORDERED, 0, self.server_guid, false)
-			end
-		end
-		
-	end)
-	
-	self.sample_scene.world_object.input_system.event_callback = function () 
-		self.my_gui:poll_events() 
-	end
+	self.my_gui = gui_class:create(camera_rect, self.sample_scene.world_object)
 end
 
 function client_screen:loop()

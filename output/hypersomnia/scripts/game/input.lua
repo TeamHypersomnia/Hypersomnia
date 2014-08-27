@@ -17,7 +17,17 @@ custom_intents = create_inverse_enum {
 	"SELECT_ITEM_3",
 	"SELECT_ITEM_4",
 	"SELECT_ITEM_5",
-	"SELECT_ITEM_6"
+	"SELECT_ITEM_6",
+	
+	"ENABLE_GUI",
+	"ENTER_CHAT"
+}
+
+gui_input_context = create_input_context {
+	intents = {
+		[keys.LALT] 			= custom_intents.ENABLE_GUI,
+		[keys.ENTER] 			= custom_intents.ENTER_CHAT
+	}
 }
 
 main_input_context = create_input_context {
@@ -49,6 +59,7 @@ main_input_context = create_input_context {
 		[mouse.ldown] 			= intent_message.SHOOT,
 
 		[keys.LSHIFT] 			= intent_message.SWITCH_LOOK,
+		
 		
 		[keys.ESC] 				= custom_intents.QUIT,
 			

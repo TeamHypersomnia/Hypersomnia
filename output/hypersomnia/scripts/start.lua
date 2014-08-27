@@ -53,6 +53,7 @@ function set_active_client(which)
 	end
 	
 	client_scenes[which].sample_scene.world_object.input_system:add_context(main_input_context)
+	client_scenes[which].sample_scene.world_object.input_system:add_context(gui_input_context)
 end
 
 set_active_client(1)

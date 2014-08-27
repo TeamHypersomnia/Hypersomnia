@@ -60,6 +60,7 @@ return function(map_filename, scene_object)
 	-- initialize input
 	world.input_system:clear_contexts()
 	world.input_system:add_context(main_input_context)
+	world.input_system:add_context(gui_input_context)
 	
 	-- initialize camera
 	scene_object.world_camera = create_world_camera_entity(world, scene_object.sprite_library["blank"])
