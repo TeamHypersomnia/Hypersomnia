@@ -25,10 +25,24 @@ namespace luabind {
 }
 
 struct textbox_wrapper : public ctextbox {
+	cscrollarea* sl = nullptr;
+	cscrollarea* slh = nullptr;
+
 	std::function<void(std::wstring)> command_callback;
 	bool is_input_textbox;
 
 	void event_proc(event_info m) override {
+		if (sl && slh) {
+			if (m.msg == rect::event::focus) {
+				sl->enabled = true;
+				slh->enabled = true;
+			}
+			if (m.msg == rect::event::blur) {
+				sl->enabled = false;
+				slh->enabled = false;
+			}
+		}
+
 		if (is_input_textbox) {
 			if (m.msg == rect::event::character || m.msg == rect::event::keydown) {
 				if (m.owner.owner.events.utf16 == db::event::keys::ENTER && !m.owner.owner.events.keys[db::event::keys::LSHIFT]) {

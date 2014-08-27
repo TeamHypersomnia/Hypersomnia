@@ -59,7 +59,8 @@ void callback_textbox::setup(augs::rects::xywh<float> area, bool is_input_textbo
 	//background = crect(rect_xywh(0, 0, 1000, 1000));
 	textbox_object = textbox_wrapper(ctextbox(textbox(_xywh(area), text::style(owner->fonts + 0, white))));
 	textbox_object.is_input_textbox = is_input_textbox;
-
+	textbox_object.sl = &myscrtx;
+	textbox_object.slh = &myscrhtx;
 	//background.scrollable = false;
 	//background.clip = false;
 
