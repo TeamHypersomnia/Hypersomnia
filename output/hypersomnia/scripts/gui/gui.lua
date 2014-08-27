@@ -1,6 +1,36 @@
 gui_class = inherits_from()
 
-function gui_class:constructor(camera_rect, world_object)
+function gui_class:set_enabled(flag)
+	if self.gui_enabled ~= flag then
+		self.gui_enabled = flag
+		
+		if flag then
+			main_input_context.enabled = false
+			gui_input_context.enabled = true
+		
+			set_border(self.content_chatbox, "released", 1, rgba(255, 255, 255, 30))
+			set_color(self.content_chatbox, "released", rgba(0, 0, 0, 50))
+			set_color(self.main_chatbox, "released", rgba(0, 0, 0, 100))
+		else
+			main_input_context.enabled = true
+			gui_input_context.enabled = true
+			
+			set_border(self.content_chatbox, "released", 0, rgba(255, 255, 255, 150))
+			set_color(self.content_chatbox, "released", rgba(0, 0, 0, 0))
+			set_color(self.main_chatbox, "released", rgba(0, 0, 0, 30))
+			
+			self.gui:blur()
+		end
+		
+		
+		local val = 0
+		if flag then val = 1 end
+		set_cursor_visible(val)
+	end
+end
+
+function gui_class:constructor(camera_rect, world_object, owner_client)
+	self.owner_client = owner_client
 	self.gui_enabled = true
 	
 	world_object.input_system.event_callback = function () 
@@ -16,12 +46,12 @@ function gui_class:constructor(camera_rect, world_object)
 		},
 		
 		script = {
-			intent_message = function(self, message)
+			intent_message = function(this, message)
 				if message.state_flag then
 					if message.intent == custom_intents.ENABLE_GUI then
-						print "enabling"
+						self:set_enabled(not self.gui_enabled)
 					elseif message.intent == custom_intents.ENTER_CHAT then
-						print "entering"
+						self:set_enabled(true)
 					end
 				end
 			end
@@ -44,36 +74,22 @@ function gui_class:constructor(camera_rect, world_object)
 	--set_color(self.main_chatbox, "released", rgba(0, 0, 0, 100))
 	--set_color(self.focusable_bg, "released", rgba(0, 0, 0, 0))
 	
-	local blurring_callback = function()
-		print "blurring gui.."
+	self.focusable_bg:set_focus_callback(function() self:set_enabled(false) end)
 	
-		set_border(self.content_chatbox, "released", 0, rgba(255, 255, 255, 150))
-		set_color(self.content_chatbox, "released", rgba(0, 0, 0, 0))
-		set_color(self.main_chatbox, "released", rgba(0, 0, 0, 30))
-	end
-	-- blurring gui
-	self.focusable_bg:set_focus_callback(blurring_callback)	
+	-- focusing gui like this should never happen; it is only possible through enter/alt
+	--self.focusable_bg:set_blur_callback( function() self:set_enabled(true) end)	
 	
-	-- focusing gui
-	self.focusable_bg:set_blur_callback(function()
-		print "focusing gui.."
-	
-		set_border(self.content_chatbox, "released", 1, rgba(255, 255, 255, 30))
-		set_color(self.content_chatbox, "released", rgba(0, 0, 0, 50))
-		set_color(self.main_chatbox, "released", rgba(0, 0, 0, 100))
-	end)
-	
-	self.focusable_bg:focus()
+	self:set_enabled(false)
 	--set_color(self.main_chatbox, "focused", rgba(0, 255, 255, 100))
 	--
 	--set_border(self.content_chatbox, "released", 0, rgba(0, 255, 255, 0))
 	
 	self.main_chatbox:set_command_callback(function(wvec)
 		if wvec:size() > 0 then
-			if self.server_guid then
-				self.server:send(protocol.make_reliable_bs(protocol.write_msg("CHAT_MESSAGE", {
+			if self.owner_client.server_guid then
+				self.owner_client.server:send(protocol.make_reliable_bs(protocol.write_msg("CHAT_MESSAGE", {
 					message = wvec
-				})), send_priority.LOW_PRIORITY, send_reliability.RELIABLE_ORDERED, 0, self.server_guid, false)
+				})), send_priority.LOW_PRIORITY, send_reliability.RELIABLE_ORDERED, 0, self.owner_client.server_guid, false)
 			end
 		end
 		

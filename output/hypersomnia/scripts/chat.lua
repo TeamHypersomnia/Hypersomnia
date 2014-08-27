@@ -4,6 +4,7 @@ function handle_incoming_chat(client)
 	for i=1, #msgs do
 		local wvec = msgs[i].data.message
 		wvec:add(13)
-		client.content_chatbox:append_text(wvec, rgba(0, 255, 0, 255))
+		print "msg!!!!!!!!"
+		client.my_gui.content_chatbox:append_text(wvec, rgba(0, 255, 0, 255))
 	end
 end

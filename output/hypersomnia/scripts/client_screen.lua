@@ -126,7 +126,7 @@ function client_screen:constructor(camera_rect)
 	
 	create_weapons(self.sample_scene, true)
 	
-	self.my_gui = gui_class:create(camera_rect, self.sample_scene.world_object)
+	self.my_gui = gui_class:create(camera_rect, self.sample_scene.world_object, self)
 end
 
 function client_screen:loop()
