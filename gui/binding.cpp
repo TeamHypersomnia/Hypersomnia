@@ -145,6 +145,7 @@ void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
 		luabind::class_<callback_rect>("callback_rect")
 		.def(luabind::constructor<hypersomnia_gui&>())
 		.def("setup", &callback_rect::setup)
+		.def("focus", &callback_rect::focus)
 		.def("set_focus_callback", &callback_rect::set_focus_callback)
 		.def("set_lpressed_callback", &callback_rect::set_lpressed_callback)
 		.def("set_hover_callback", &callback_rect::set_hover_callback)

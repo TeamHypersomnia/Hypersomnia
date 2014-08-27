@@ -116,6 +116,7 @@ struct callback_rect {
 
 	callback_rect(hypersomnia_gui& owner);
 	
+	void focus();
 	void setup(augs::rects::xywh<float>, bool focusable);
 	void set_focus_callback(luabind::object), set_lpressed_callback(luabind::object), set_hover_callback(luabind::object), set_blur_callback(luabind::object);
 };

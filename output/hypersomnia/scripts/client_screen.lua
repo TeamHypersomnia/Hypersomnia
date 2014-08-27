@@ -133,17 +133,37 @@ function client_screen:constructor(camera_rect)
 	self.focusable_bg:setup(rect_xywh(0, 0, camera_rect.w, camera_rect.h), true)
 	
 	self.content_chatbox = callback_textbox(self.my_gui)
-	self.content_chatbox:setup(rect_xywh(20, camera_rect.h - 500 + 100 + 40, 350, 150), false)
+	self.content_chatbox:setup(rect_xywh(20, camera_rect.h - 500 + 100 + 150, 350, 150), false)
 	
 	self.main_chatbox = callback_textbox(self.my_gui)
-	self.main_chatbox:setup(rect_xywh(20, camera_rect.h - 160 + 40, 350, 75), true)
+	self.main_chatbox:setup(rect_xywh(20, camera_rect.h - 160 + 90, 350, 35), true)
 	
-	set_color(self.content_chatbox, "released", rgba(0, 0, 0, 50))
-	set_color(self.main_chatbox, "released", rgba(0, 0, 0, 100))
-	set_color(self.focusable_bg, "released", rgba(0, 0, 0, 0))
+	--set_color(self.content_chatbox, "released", rgba(0, 0, 0, 50))
+	--set_color(self.main_chatbox, "released", rgba(0, 0, 0, 100))
+	--set_color(self.focusable_bg, "released", rgba(0, 0, 0, 0))
+	
+	local blurring_callback = function()
+		print "blurring gui.."
+	
+		set_border(self.content_chatbox, "released", 0, rgba(255, 255, 255, 150))
+		set_color(self.content_chatbox, "released", rgba(0, 0, 0, 0))
+		set_color(self.main_chatbox, "released", rgba(0, 0, 0, 30))
+	end
+	-- blurring gui
+	self.focusable_bg:set_focus_callback(blurring_callback)	
+	
+	-- focusing gui
+	self.focusable_bg:set_blur_callback(function()
+		print "focusing gui.."
+	
+		set_border(self.content_chatbox, "released", 1, rgba(255, 255, 255, 30))
+		set_color(self.content_chatbox, "released", rgba(0, 0, 0, 50))
+		set_color(self.main_chatbox, "released", rgba(0, 0, 0, 100))
+	end)
+	
+	self.focusable_bg:focus()
 	--set_color(self.main_chatbox, "focused", rgba(0, 255, 255, 100))
 	--
-	--set_border(self.content_chatbox, "focused", 1, rgba(0, 255, 255, 150))
 	--set_border(self.content_chatbox, "released", 0, rgba(0, 255, 255, 0))
 	
 	self.main_chatbox:set_command_callback(function(wvec)

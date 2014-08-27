@@ -77,7 +77,7 @@ void callback_textbox::setup(augs::rects::xywh<float> area, bool is_input_textbo
 	textbox_object.print.blink.interval_ms = 500;
 	textbox_object.print.selection_bg_mat = pixel_32(128, 255, 255, 120);
 	textbox_object.print.selection_inactive_bg_mat = pixel_32(128, 255, 255, 40);
-	textbox_object.print.highlight_mat = pixel_32(15, 15, 15, 255);
+	textbox_object.print.highlight_mat = pixel_32(15, 15, 15, 150);
 	textbox_object.print.caret_mat = pixel_32(255, 255, 255, 255);
 	textbox_object.print.highlight_current_line = true;
 	textbox_object.print.highlight_during_selection = true;
@@ -98,4 +98,8 @@ callback_rect::callback_rect(hypersomnia_gui& owner) : owner(&owner) {
 void callback_rect::setup(augs::rects::xywh<float> area, bool focusable) {
 	rect_obj = rect_wrapper(crect(_xywh(area)));
 	rect_obj.focusable = focusable;
+}
+
+void callback_rect::focus() {
+	owner->main_window.set_focus(&rect_obj);
 }
