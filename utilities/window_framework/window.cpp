@@ -66,6 +66,10 @@ namespace augs {
 				case event::close:
 					break;
 
+				case WM_SYSKEYUP:
+					m = events.msg = up;
+				case WM_SYSKEYDOWN:
+					m = events.msg = down;
 				case down:
 					//if (!((lParam & (1 << 30)) != 0)) {
 						events.keys[wParam] = true;
