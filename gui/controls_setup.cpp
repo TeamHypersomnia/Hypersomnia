@@ -105,6 +105,10 @@ void callback_rect::focus() {
 	owner->main_window.set_focus(&rect_obj);
 }
 
+void callback_textbox::focus() {
+	owner->main_window.set_focus(&textbox_object);
+}
+
 void hypersomnia_gui::blur() {
 	main_window.set_focus(nullptr);
 }

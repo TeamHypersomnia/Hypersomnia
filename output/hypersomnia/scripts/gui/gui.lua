@@ -52,6 +52,7 @@ function gui_class:constructor(camera_rect, world_object, owner_client)
 						self:set_enabled(not self.gui_enabled)
 					elseif message.intent == custom_intents.ENTER_CHAT then
 						self:set_enabled(true)
+						self.main_chatbox:focus()
 					end
 				end
 			end

@@ -153,6 +153,7 @@ struct callback_textbox {
 	
 	void set_command_callback(luabind::object);
 	
+	void focus();
 	void append_text(augs::misc::vector_wrapper<wchar_t>&, augs::graphics::pixel_32);
 	void clear_text();
 
