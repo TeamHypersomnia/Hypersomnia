@@ -1,5 +1,6 @@
 #pragma once
 #include "math/vec2d.h"
+#include <Windows.h>
 namespace augs {
 	namespace window {
 		namespace event {

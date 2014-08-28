@@ -3,7 +3,7 @@
 
 /* Undo/Redo interface applicable to interfaces like map editor or textbox */
 
-namespace db {
+namespace augs {
 	namespace misc {
 
 		/* "command" may itself implement memento or command pattern */
