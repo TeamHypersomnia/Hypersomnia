@@ -1,16 +1,16 @@
 #pragma once
-#include "../pixel.h"
-#include "../io/texture.h"
+#include "graphics/pixel.h"
+#include "texture_baker/texture_baker.h"
 
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
-			extern io::input::texture* null_texture;
+			extern augs::texture_baker::texture* null_texture;
 
 			struct material {
-				io::input::texture* tex;
+				augs::texture_baker::texture* tex;
 				pixel_32 color;
-				material(io::input::texture* = null_texture, const pixel_32& = pixel_32()); 
+				material(augs::texture_baker::texture* = null_texture, const pixel_32& = pixel_32()); 
 				material(const pixel_32&); 
 			};
 
@@ -39,7 +39,7 @@ namespace db {
 				returns clipped rectangle
 			*/
 			extern rect_ltrb add_quad(const material&, const rect_ltrb& origin, const rect_ltrb* clipper, std::vector<quad>& v);
-			extern void scale_virtual_res(rect_wh vres, rect_wh display, vector<quad>& quads);
+			extern void scale_virtual_res(rect_wh vres, rect_wh display, std::vector<quad>& quads);
 		}
 	}
 }

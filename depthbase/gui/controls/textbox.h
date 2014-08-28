@@ -3,10 +3,10 @@
 #include "../rect.h"
 #include "../text\printer.h"
 #include "../text\ui.h"
-#include "../../../misc/undoredo.h"
+#include "misc/undoredo.h"
 #include <functional>
 
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			namespace controls {
@@ -65,7 +65,7 @@ namespace db {
 					/* we should not pass newlines through */
 					virtual void on_character(wchar_t) override;
 
-					std::function<void (wstring&)> property_guard;
+					std::function<void (std::wstring&)> property_guard;
 
 					property_textbox(point pos, int width, text::style default_style, std::function<void (wstring&)> property_guard = nullptr);
 					
@@ -91,7 +91,7 @@ namespace db {
 						return wnum<T>(editor.get_str());
 					}
 
-					wstring get_str() const;
+					std::wstring get_str() const;
 
 				};
 			}

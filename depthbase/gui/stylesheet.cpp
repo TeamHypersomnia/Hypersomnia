@@ -2,7 +2,7 @@
 #include "stylesheet.h"
 #include "rect.h"
 
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			stylesheet::style::style() 
@@ -10,7 +10,7 @@ namespace db {
 			}
 
 			stylesheet::style::style(const attribute<pixel_32>& c, 
-				const attribute<io::input::texture*>& b, 
+				const attribute<augs::texture_baker::texture*>& b, 
 				const attribute<solid_stroke>& br) 
 				: color(c), background_image(b), border(br) {
 					color.active = background_image.active = border.active = true;

@@ -1,7 +1,7 @@
 #pragma once
-#include "../../math/math.h"
+#include "math/vec2d.h"
 
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			struct dragger {

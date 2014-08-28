@@ -1,9 +1,9 @@
 #include "text_rect.h"
 
-namespace db {
+namespace augs {
 	using namespace math;
 	namespace graphics {
-		using namespace io::input;
+		using namespace augs::texture_baker;
 		namespace gui {
 			namespace text {
 				text_rect::text_rect(const rect& r, const fstr& _str) : rect(r), draft(_str) {

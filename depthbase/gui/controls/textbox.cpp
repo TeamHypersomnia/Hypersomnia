@@ -1,11 +1,11 @@
 #pragma once
 #include "textbox.h"
 #include "../text\drafter.h"
-#include "../../../misc/stream.h"
+#include "misc/stream.h"
 
-namespace db {
+namespace augs {
 	namespace graphics {
-	using namespace io::input;
+	using namespace augs::texture_baker;
 		namespace gui {
 			namespace controls {
 				textbox::textbox(const rect& r, text::style default_style) 
@@ -123,7 +123,7 @@ namespace db {
 				}
 
 				void textbox::handle_interface(event_info e) {
-					using namespace db::event::keys;
+					using namespace augs::window::event::keys;
 					auto& w = e.owner.owner.events;
 					auto* k = w.keys;
 					point mouse = w.mouse.pos;
@@ -211,17 +211,17 @@ namespace db {
 				}
 
 				
-				property_textbox::property_textbox(point pos, int width, text::style default_style, std::function<void (wstring&)> property_guard)
+				property_textbox::property_textbox(point pos, int width, text::style default_style, std::function<void(std::wstring&)> property_guard)
 					: textbox(rect_xywh(pos.x, pos.y, width, default_style.f->get_height()), default_style), property_guard(property_guard) {
 				}
 				
-				wstring property_textbox::get_str() const {
+				std::wstring property_textbox::get_str() const {
 					return misc::wstr(editor.get_str());
 				}
 
 				void property_textbox::event_proc(event_info e) {
 					if(e.msg == rect::event::blur) {
-						wstring ws = misc::wstr(editor.get_str()); 
+						std::wstring ws = misc::wstr(editor.get_str());
 						if(property_guard) property_guard(ws);
 						editor.select_all(); 
 						editor.insert(text::format(ws, editor.get_default_style()));

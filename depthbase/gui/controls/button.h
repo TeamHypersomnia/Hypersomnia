@@ -3,7 +3,7 @@
 #include <functional>
 #include "../text/text_rect.h"
 
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			namespace controls {
@@ -30,7 +30,7 @@ namespace db {
 					text_button(const button&, const text::fstr&); 
 					text_button(const button&, math::point, const text::fstr&);
 
-					void get_member_children(vector<rect*>& children) override;
+					void get_member_children(std::vector<rect*>& children) override;
 
 					void draw_label(draw_info);
 					void center();

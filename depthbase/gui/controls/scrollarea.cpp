@@ -4,7 +4,7 @@
 #undef max
 #undef min
 #include <algorithm>
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			namespace controls {

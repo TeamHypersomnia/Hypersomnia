@@ -2,7 +2,7 @@
 #include "stroke.h"
 #include "rect.h"
 
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			solid_stroke::solid_stroke(int width, const material& mat, type _type) : _type(_type) {

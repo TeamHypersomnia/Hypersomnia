@@ -1,7 +1,7 @@
 #pragma once
 #include "../rect.h"
 
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			namespace controls {

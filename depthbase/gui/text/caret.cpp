@@ -1,6 +1,6 @@
 #include "caret.h"
 
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			namespace text {

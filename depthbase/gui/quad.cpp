@@ -1,7 +1,7 @@
 #pragma once
 #include "quad.h"
 
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			void scale_virtual_res(rect_wh vres, rect_wh display, vector<quad>& quads) {
@@ -18,7 +18,7 @@ namespace db {
 				}
 			}
 
-			material::material(io::input::texture* tex, const pixel_32& color) : tex(tex), color(color) {}
+			material::material(augs::texture_baker::texture* tex, const pixel_32& color) : tex(tex), color(color) {}
 
 			material::material(const pixel_32& color) : tex(gui::null_texture), color(color) {}
 

@@ -1,12 +1,10 @@
 #pragma once
 #include "system.h"
 #include "rect.h"
-#include "../../window/window.h"
+#include "window_framework/window.h"
 #include <GL/GL.h>
 #undef max
-namespace db {
-	using namespace window;
-	using namespace math;
+namespace augs {
 	namespace misc {
 		std::wstring wstr(const graphics::gui::text::fstr& f) {
 			size_t l = f.size();
@@ -20,9 +18,9 @@ namespace db {
 	}
 
 	namespace graphics {
-		using namespace io::input;
+		using namespace augs::texture_baker;
 		namespace gui {
-			io::input::texture* null_texture = 0;
+			augs::texture_baker::texture* null_texture = 0;
 
 			namespace text {
 				void format(const wchar_t* _str, style s, fstr& out) {
@@ -102,7 +100,7 @@ namespace db {
 				}
 			}
 
-			system::system(event::state& events) : events(events), own_copy(false), own_clip(false), fetch_clipboard(true) {
+			system::system(augs::window::event::state& events) : events(events), own_copy(false), own_clip(false), fetch_clipboard(true) {
 			}
 
 			bool system::is_clipboard_own() {
@@ -208,13 +206,14 @@ namespace db {
 			}
 
 			void group::poll_events() {
-				event::state& gl = owner.events;
-				using namespace event::key;
+				augs::window::event::state& gl = owner.events;
+				using namespace augs::window::event::key;
+				using namespace augs::window;
 				rect::poll_info in(*this, gl.msg);
 				bool pass = true;
 
 				if(middlescroll.subject) {
-					if(gl.msg == event::mouse::mdown || gl.msg == event::mouse::mdoubleclick) {
+					if (gl.msg == event::mouse::mdown || gl.msg == event::mouse::mdoubleclick) {
 						pass = false;
 						middlescroll.subject = 0;
 					}

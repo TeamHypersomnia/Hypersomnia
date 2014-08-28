@@ -11,10 +11,10 @@
 
 /* printer's draw needs revising in terms of scrolling */
 
-namespace db {
+namespace augs {
 	using namespace math;
 	namespace graphics {
-		using namespace io::input;
+		using namespace augs::texture_baker;
 		namespace gui {
 			namespace text {
 				printer::printer() :

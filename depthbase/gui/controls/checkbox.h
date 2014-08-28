@@ -3,7 +3,7 @@
 #include "../text/text_rect.h"
 #include <functional>
 
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			namespace controls {
@@ -33,12 +33,12 @@ namespace db {
 					text::text_rect active_text;
 					text::text_rect inactive_text;
 
-					checklabel(const checkbox&, const wstring& label, const text::style& style_active, const text::style& style_inactive);
+					checklabel(const checkbox&, const std::wstring& label, const text::style& style_active, const text::style& style_inactive);
 					checklabel(const checkbox&, const text::fstr& active_str, const text::fstr& inactive_str);
 
 					virtual void on_change(bool set) override;
 					
-					void get_member_children(vector<rect*>&) override;
+					void get_member_children(std::vector<rect*>&) override;
 
 					text::text_rect& active_label();
 				};

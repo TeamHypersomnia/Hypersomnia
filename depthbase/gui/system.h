@@ -1,8 +1,10 @@
 #pragma once
 #include <vector>
-#include "../../math/math.h"
-#include "../../event.h"
-#include "../../window/timer.h"
+#include "math/vec2d.h"
+#include "window_framework/event.h"
+#include "misc/timer.h"
+#include "graphics/pixel.h"
+#include "texture_baker/texture_baker.h"
 #include "rect.h"
 /* window - defined as the rect that fetches events to only itself 
 
@@ -26,13 +28,11 @@ BBOX JEST GLOBALNY!!! twuj stary jest globalny, teraz sa lokalne
 
 */
 
-namespace db {
+namespace augs {
 	namespace graphics {
-		extern window::fpstimer fps;
+		extern misc::fpstimer fps;
 		namespace gui {
-			struct font;
-			using namespace math;
-			extern io::input::texture* null_texture;
+			extern augs::texture_baker::texture* null_texture;
 			namespace text {
 				struct formatted_char {
 					font* font_used;
@@ -59,10 +59,10 @@ namespace db {
 					own_copy, 
 					own_clip;
 			public:
-				event::state& events;
+				augs::window::event::state& events;
 				text::fstr clipboard;
 
-				system(event::state& subscribe_events);
+				system(augs::window::event::state& subscribe_events);
 
 				void change_clipboard();
 				void copy_clipboard(text::fstr&);

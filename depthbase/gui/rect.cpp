@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <functional>
 
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			rect::draw_info::draw_info(group& owner, std::vector<quad>& v) : owner(owner), v(v) {}
@@ -129,7 +129,7 @@ namespace db {
 				auto& sys =	e.owner.owner;
 				auto& wnd = sys.events;
 				if(e == event::wheel) {
-					if(wnd.keys[db::event::keys::SHIFT]) {
+					if(wnd.keys[augs::window::event::keys::SHIFT]) {
 						int temp(int(scroll.x));
 						if(scrollable) {
 							scroll.x -= wnd.mouse.scroll;
@@ -184,7 +184,7 @@ namespace db {
 			}
 			
 			bool rect::handle_tab(event_info e) {
-				using namespace db::event::keys;
+				using namespace augs::window::event::keys;
 				if(e == event::keydown && e.owner.owner.events.key == TAB) {
 					rect* f = seek_focusable(this, e.owner.owner.events.keys[LSHIFT]);
 					if(f) e.owner.set_focus(f);
@@ -196,7 +196,7 @@ namespace db {
 			}
 
 			bool rect::handle_arrows(event_info e) {
-				using namespace db::event::keys;
+				using namespace augs::window::event::keys;
 				if(e == event::keydown) {
 					rect* f = nullptr;
 					switch(e.owner.owner.events.key) {
@@ -217,7 +217,7 @@ namespace db {
 			}
 
 			bool rect::handle_enter(event_info e) {
-				using namespace db::event::keys;
+				using namespace augs::window::event::keys;
 				if(e == event::keydown && e.owner.owner.events.key == ENTER) {
 					rect* f = seek_focusable(this, e.owner.owner.events.keys[LSHIFT]);
 					if(f) e.owner.set_focus(f);
@@ -248,7 +248,7 @@ namespace db {
 			}
 
 			void rect::poll_message(poll_info& inf) {
-				using namespace db::event;
+				using namespace augs::window::event;
 				using namespace mouse;
 				auto& gr = inf.owner;
 				auto& m = gr.owner.events.mouse;

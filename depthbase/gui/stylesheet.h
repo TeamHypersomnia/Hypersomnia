@@ -2,7 +2,7 @@
 #include "stroke.h"
 #include "rect.h"
 
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			struct stylesheet {
@@ -39,12 +39,12 @@ namespace db {
 
 				struct style {
 					attribute<pixel_32> color;
-					attribute<io::input::texture*> background_image;
+					attribute<augs::texture_baker::texture*> background_image;
 					attribute<solid_stroke> border;
 
 					style();
 					style(const attribute<pixel_32>& color, 
-						const attribute<io::input::texture*>& background_image, 
+						const attribute<augs::texture_baker::texture*>& background_image, 
 						const attribute<solid_stroke>& border);
 
 					operator material() const;

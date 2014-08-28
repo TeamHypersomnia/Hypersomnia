@@ -2,10 +2,10 @@
 #include "dragger.h"
 #include "../../window/timer.h"
 
-namespace db {
+namespace augs {
 	using namespace math;
 	namespace graphics {
-		extern db::window::fpstimer fps;
+		extern augs::window::fpstimer fps;
 
 		namespace gui {
 			dragger::dragger() : vel_mult(1.f) {

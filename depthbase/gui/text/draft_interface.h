@@ -1,6 +1,6 @@
 #pragma once
 #include "drafter.h"
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			namespace text {

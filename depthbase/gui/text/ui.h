@@ -1,10 +1,10 @@
 #pragma once
 #include "caret.h"
 #include "draft_interface.h"
-#include "../../../misc/undoredo.h"
-#include "../font.h"
+#include "misc/undoredo.h"
+#include "texture_baker/font.h"
 
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			namespace text {/* Undo/Redo interface implementation to satisfy the template, you shouldn't care */
@@ -20,7 +20,7 @@ namespace db {
 						formatted_char character;
 						fstr _str, replaced;
 
-						vector<bool> states;
+						std::vector<bool> states;
 						bool unapply;
 
 						enum type {
@@ -31,7 +31,7 @@ namespace db {
 						action(ui& subject, int where, const formatted_char&, const fstr& replaced);
 						action(ui& subject, int where, const fstr&, type flag = INSERT);
 						action(ui& subject, int where, const fstr&, const fstr& replaced = fstr());
-						action(ui& subject, int left, int right, bool unapply, vector<bool>&, type flag);
+						action(ui& subject, int left, int right, bool unapply, std::vector<bool>&, type flag);
 
 						bool include(const action&);
 						void execute(bool undo);
@@ -56,7 +56,7 @@ namespace db {
 					/* 0 - unlimited */
 					unsigned max_characters; 
 					pixel_32 global_color;
-					misc::undoredo<action> edit;
+					augs::misc::undoredo<action> edit;
 
 					bool allow_unknown_characters_as_default;
 					

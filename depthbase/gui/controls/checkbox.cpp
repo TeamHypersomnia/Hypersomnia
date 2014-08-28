@@ -1,7 +1,7 @@
 #pragma once
 #include "checkbox.h"
 
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			namespace controls {
@@ -29,7 +29,7 @@ namespace db {
 
 				void checkbox::event_proc(event_info e) {
 					if(e == rect::event::lclick ||
-					   e == rect::event::keydown && (e.owner.owner.events.key == db::event::keys::ENTER)) {
+					   e == rect::event::keydown && (e.owner.owner.events.key == augs::event::keys::ENTER)) {
 						set_state(!get_state());
 						if(callback) callback(get_state());
 					}
@@ -38,7 +38,7 @@ namespace db {
 					handle_arrows(e);
 				}
 					
-				checklabel::checklabel(const checkbox& r, const wstring& label, const text::style& style_active, const text::style& style_inactive) 
+				checklabel::checklabel(const checkbox& r, const std::wstring& label, const text::style& style_active, const text::style& style_inactive)
 					: checkbox(r), active_text(rect_xywh(), text::format(label, style_active)), inactive_text(rect_xywh(), text::format(label, style_inactive)) {
 					stretch_rc();
 				}
@@ -48,7 +48,7 @@ namespace db {
 					stretch_rc();
 				}
 					
-				void checklabel::get_member_children(vector<rect*>& c) {
+				void checklabel::get_member_children(std::vector<rect*>& c) {
 					c.push_back(&active_label());
 				}
 

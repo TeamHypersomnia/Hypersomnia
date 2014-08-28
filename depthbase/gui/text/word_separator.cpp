@@ -1,7 +1,7 @@
 #pragma once
 #include "word_separator.h"
 
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			namespace text {

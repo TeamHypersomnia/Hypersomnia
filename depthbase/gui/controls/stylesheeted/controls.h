@@ -5,7 +5,7 @@
 #include "../textbox.h"
 #include "../button.h"
 
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			namespace controls {

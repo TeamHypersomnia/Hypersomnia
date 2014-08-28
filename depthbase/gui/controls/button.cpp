@@ -3,7 +3,7 @@
 #include "../../../event.h"
 #include "../system.h"
 
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			namespace controls {
@@ -28,7 +28,7 @@ namespace db {
 					case event::hover: if(on_hover) on_hover(); break;
 					case event::ldown: if(on_lmousedown) on_mousedown(); break;
 					case event::lup: if(on_lmouseup) on_mouseup(); break;
-					case event::keydown: if(m.owner.owner.events.key == db::event::keys::ENTER) on_click(); break;
+					case event::keydown: if(m.owner.owner.events.key == augs::window::event::keys::ENTER) on_click(); break;
 					default: break;
 					}
 					handle_focus(m);
@@ -44,7 +44,7 @@ namespace db {
 				text_button::text_button(const button& b, math::point p, const text::fstr& f) : button(b), label(rect_xywh(p.x, p.y, 0, 0), f) {
 				}
 
-				void text_button::get_member_children(vector<rect*>& v) {
+				void text_button::get_member_children(std::vector<rect*>& v) {
 					v.push_back(&label);
 				}
 				

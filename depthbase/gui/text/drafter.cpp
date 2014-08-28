@@ -2,14 +2,13 @@
 #include <algorithm>
 #include "../rect.h"
 #include "drafter.h"
-#include "../../../window/window.h"
+#include "window_framework/window.h"
 
 #undef min
 #undef max
-namespace db {
-	using namespace math;
+namespace augs {
 	namespace graphics {
-		using namespace io::input;
+		using namespace augs::texture_baker;
 		namespace gui {
 			namespace text {
 				bool drafter::is_newline(unsigned i) {
@@ -50,8 +49,8 @@ namespace db {
 						asc = getf(in, l)->parent->ascender, desc = getf(in, l)->parent->descender;
 
 						for(int j = l; j < r; ++j) {
-							asc =  max(asc, getf(in, j)->parent->ascender);
-							desc = min(desc, getf(in, j)->parent->descender);
+							asc =  std::max(asc, getf(in, j)->parent->ascender);
+							desc = std::min(desc, getf(in, j)->parent->descender);
 						}
 					}
 				}
@@ -77,8 +76,8 @@ namespace db {
 				}
 				
 				void drafter::line::adjust(font* f) {
-					asc =  max(asc, f->parent->ascender);
-					desc = min(desc, f->parent->descender);
+					asc =  std::max(asc, f->parent->ascender);
+					desc = std::min(desc, f->parent->descender);
 				}
 
 				bool drafter::line::empty() const {
@@ -261,7 +260,7 @@ namespace db {
 							}
 							
 							/* expand text bounding box's right coordinate */
-							max_x = max(max_x, unsigned(lines[l].right));
+							max_x = std::max(max_x, unsigned(lines[l].right));
 
 							/* proceed to the newly created line */
 							++l;
@@ -273,7 +272,7 @@ namespace db {
 					*/
 					(*lines.rbegin()).end = cached.size();
 					(*lines.rbegin()).right = pen.x;
-					max_x = max(max_x, unsigned((*lines.rbegin()).right));
+					max_x = std::max(max_x, unsigned((*lines.rbegin()).right));
 
 					/* SECOND PASS: GENERATE SECTORS AND FILL LINE INFO DEPENDING ON CHARACTERS HEIGHT */
 					
@@ -305,7 +304,7 @@ namespace db {
 					return rect_wh(max_x+1, lines[lines.size()-1].bottom());
 				}
 
-				pair<int, int> drafter::get_line_visibility(const rect_ltrb& clipper) const {
+				std::pair<int, int> drafter::get_line_visibility(const rect_ltrb& clipper) const {
 					if(!clipper.good() || !clipper.hover(get_bbox())) 
 						return make_pair(-1, -1);
 

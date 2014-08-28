@@ -1,11 +1,11 @@
 #pragma once
-#include "../font.h"
+#include "texture_baker/font.h"
 #include "../system.h"
 #include "word_separator.h"
 // ui relates on draft object (result) only
 // if bugs viewing the caret, check the viewcaret where "car" variable was changed to caret_rect
 // neither drafter nor printer have their fstr declared as member fields because it is better to pass it around than rewrite each time we want to change string
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			struct rect;
@@ -62,7 +62,7 @@ namespace db {
 					/* 
 					clipper is in local drafter's space: (0, 0) = left top corner
 					if any in the pair is -1, there's no line visible */
-					pair<int, int> get_line_visibility(const rect_ltrb& clipper) const;
+					std::pair<int, int> get_line_visibility(const rect_ltrb& clipper) const;
 				private:
 					unsigned max_x;
 					void find_ascdesc(const fstr& source, int i, int j, int&, int&) const;

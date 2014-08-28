@@ -1,7 +1,7 @@
 #pragma once
 #include "../system.h"
 // got to revise gui systems in terms of rectangle update'ing
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			namespace text {
@@ -28,7 +28,7 @@ namespace db {
 						//static void regular_blink(blinker&, quad& caret);
 						//void (*blink_func)(blinker&, quad&);
 
-						window::timer timer;
+						misc::timer timer;
 						blinker();
 						void update();
 						void reset();

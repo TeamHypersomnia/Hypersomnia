@@ -2,7 +2,7 @@
 #include <vector>
 #include "quad.h"
 
-namespace db {
+namespace augs {
 	namespace graphics {
 		namespace gui {
 			struct stylesheet;
@@ -125,7 +125,7 @@ namespace db {
 					 draw_rect		(draw_info in, const stylesheet&),
 					 draw_children	(draw_info in);
 
-				virtual void get_member_children(vector<rect*>& children);
+				virtual void get_member_children(std::vector<rect*>& children);
 
 				/* passes 0 or clipper's rc_clipped as clipper depending on clipper's clip flag */
 				static rect_ltrb add_quad (const material&, const rect_ltrb& global, const rect* clipper, std::vector<quad>& v);
