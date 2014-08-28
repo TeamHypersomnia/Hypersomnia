@@ -76,7 +76,7 @@ namespace augs {
 						const drafter& d, 
 						const fstr& colors,
 						const caret_info* caret,
-						point pos,
+						vec2<int> pos,
 						const rect_ltrb* clipper
 						) const 
 				{
@@ -87,9 +87,9 @@ namespace augs {
 					bool clip = clipper != nullptr;
 
 					//if(clip) 
-					//	pos = point(*parent);
+					//	pos = vec2<int>(*parent);
 					//
-					//point global = scroll;
+					//vec2<int> global = scroll;
 
 					/* we'll draw caret at the very end of procedure so we have to declare this variable here */
 					rect_xywh caret_rect(0, 0, 0, 0);
@@ -218,7 +218,7 @@ namespace augs {
 
 				rect_wh quick_print(std::vector<quad>& v,
 										const fstr& str, 
-										point pos, 
+										vec2<int> pos, 
 										unsigned wrapping_width,
 										const rect_ltrb* clipper) 
 				{
@@ -233,7 +233,7 @@ namespace augs {
 				rect_wh quick_print(std::vector<quad>& v,
 										const std::wstring& wstr,
 										gui::text::style style,
-										point pos, 
+										vec2<int> pos, 
 										unsigned wrapping_width,
 										const rect_ltrb* clipper) 
 				{

@@ -130,8 +130,8 @@ namespace augs {
 					lines.push_back(line());
 				}
 
-				point drafter::view_caret(unsigned caret_pos, const rect_ltrb& clipper) const {
-					point offset(0, 0);
+				vec2<int> drafter::view_caret(unsigned caret_pos, const rect_ltrb& clipper) const {
+					vec2<int> offset(0, 0);
 
 					if(!clipper.good() || !clipper.hover(get_bbox()))
 						return offset;
@@ -157,7 +157,7 @@ namespace augs {
 					return offset;
 				}
 
-				unsigned drafter::map_to_line(const point& p) const {
+				unsigned drafter::map_to_line(const vec2<int>& p) const {
 					if(lines.empty() || sectors.empty() || p.y < 0) return 0;
 					line l;
 					l.top = p.y;
@@ -167,7 +167,7 @@ namespace augs {
 					return res;
 				}
 
-				unsigned drafter::map_to_caret_pos(const point& p) const {
+				unsigned drafter::map_to_caret_pos(const vec2<int>& p) const {
 					return lines[map_to_line(p)].hover(p.x, sectors);
 				}
 
@@ -198,7 +198,7 @@ namespace augs {
 
 					}
 
-					point pen(0, 0);
+					vec2<int> pen(0, 0);
 					
 					/* FIRST PASS: ONLY GENERATE LINES DEPENDING ON NEWLINE CHARACTERS AND WRAPPING WIDTH */
 					/* for every character */
@@ -208,7 +208,7 @@ namespace augs {
 
 						/* advance pen taking kerning into consideration */
 						pen.x += get_kern(source, i, l) + g.info->adv;
-						/* at this point "pen.x" means "where would caret be AFTER placing this character" */
+						/* at this vec2<int> "pen.x" means "where would caret be AFTER placing this character" */
 						bool wrap = (wrap_width > 0 && pen.x + g.info->bear_x >= int(wrap_width));
 
 						/* if we have just encountered a newline character or there is need to wrap, we have to break the current line and 
@@ -277,7 +277,7 @@ namespace augs {
 					/* SECOND PASS: GENERATE SECTORS AND FILL LINE INFO DEPENDING ON CHARACTERS HEIGHT */
 					
 					/* just to make sure */
-					pen = point();
+					pen = vec2<int>();
 					for(unsigned l = 0; l < lines.size(); ++l) {
 						lines[l].top = pen.y;
 
@@ -309,7 +309,7 @@ namespace augs {
 						return make_pair(-1, -1);
 
 					/* we are now sure that both rectangles intersect */
-					return make_pair(map_to_line(point(0, clipper.t)), map_to_line(point(0, clipper.b)));
+					return make_pair(map_to_line(vec2<int>(0, clipper.t)), map_to_line(vec2<int>(0, clipper.b)));
 				}
 			}
 		}

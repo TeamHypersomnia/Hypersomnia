@@ -11,7 +11,7 @@ namespace augs {
 		namespace gui {
 			namespace controls {
 				class textbox : public rect {
-					point local_mouse(point global_mouse);
+					vec2<int> local_mouse(vec2<int> global_mouse);
 				public:
 					virtual void on_caret_left(bool select);
 					virtual void on_caret_right(bool select);
@@ -21,9 +21,9 @@ namespace augs {
 					virtual void on_caret_down(bool select);
 					virtual void on_caret_ctrl_up();
 					virtual void on_caret_ctrl_down();
-					virtual void on_place_caret(point mouse, bool select);
-					virtual void on_select_word(point mouse);
-					virtual void on_select_line(point mouse);
+					virtual void on_place_caret(vec2<int> mouse, bool select);
+					virtual void on_select_word(vec2<int> mouse);
+					virtual void on_select_line(vec2<int> mouse);
 					virtual void on_select_all();
 					virtual void on_home(bool select);
 					virtual void on_end(bool select);
@@ -39,7 +39,7 @@ namespace augs {
 					virtual void on_redo();
 					virtual void on_backspace(bool);
 					virtual void on_del(bool);
-					virtual void on_drag(point mouse);
+					virtual void on_drag(vec2<int> mouse);
 
 					virtual rect_wh get_content_size() override;
 					virtual void event_proc(event_info) override;
@@ -67,7 +67,7 @@ namespace augs {
 
 					std::function<void (std::wstring&)> property_guard;
 
-					property_textbox(point pos, int width, text::style default_style, std::function<void (wstring&)> property_guard = nullptr);
+					property_textbox(vec2<int> pos, int width, text::style default_style, std::function<void (wstring&)> property_guard = nullptr);
 					
 					template <class T>
 					void set(T val) {

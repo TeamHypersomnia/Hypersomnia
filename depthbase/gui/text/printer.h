@@ -68,7 +68,7 @@ namespace augs {
 						const fstr& colors,
 						/* if caret is 0, draw no caret */
 						const caret_info* caret,
-						point scroll,
+						vec2<int> scroll,
 						const rect_ltrb* parent = 0) const;
 		 		};
 				
@@ -81,14 +81,14 @@ namespace augs {
 
 				rect_wh quick_print(std::vector<quad>& v,
 										const fstr& str, 
-										point pos, 
+										vec2<int> pos, 
 										unsigned wrapping_width = 0,
 										const rect_ltrb* parent = 0);
 
 				rect_wh quick_print(std::vector<quad>& v,
 										const std::wstring& wstr,
 										style style,
-										point pos, 
+										vec2<int> pos, 
 										unsigned wrapping_width = 0,
 										const rect_ltrb* parent = 0);
 			}

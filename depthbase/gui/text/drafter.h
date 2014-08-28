@@ -46,12 +46,12 @@ namespace augs {
 					drafter();
 
 					/* returns offset that clipper must be moved to show whole caret */
-					point view_caret(unsigned caret_pos, const rect_ltrb& clipper) const; 
+					vec2<int> view_caret(unsigned caret_pos, const rect_ltrb& clipper) const; 
 					unsigned get_line(unsigned caret_pos) const;
 					
-					/* note: point is taken LOCALLY.*/
-					unsigned map_to_line(const point&) const;
-					unsigned map_to_caret_pos(const point&) const;
+					/* note: vec2<int> is taken LOCALLY.*/
+					unsigned map_to_line(const vec2<int>&) const;
+					unsigned map_to_caret_pos(const vec2<int>&) const;
 				
 					/* returns text's bounding box */
 					rect_wh get_bbox() const;

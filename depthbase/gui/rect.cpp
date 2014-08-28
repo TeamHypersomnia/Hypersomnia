@@ -50,7 +50,7 @@ namespace augs {
 				/* if we have parent */
 				if(parent) {
 					/* we have to save our global coordinates in absolute_xy */
-					absolute_xy = parent->absolute_xy + point(rc) - parent->scroll;
+					absolute_xy = parent->absolute_xy + vec2<int>(rc) - parent->scroll;
  					rc_clipped  = rect_xywh(absolute_xy.x, absolute_xy.y, rc.w(), rc.h());
 					
 					/* and we have to clip by first clipping parent's rc_clipped */
@@ -337,7 +337,7 @@ namespace augs {
 							event_proc(e = event::ldrag);
 						}
 					//}
-					if(gr.lholded != this) drag_origin = point(rc.l, rc.t);
+					if(gr.lholded != this) drag_origin = vec2<int>(rc.l, rc.t);
 				}
 			}
 
@@ -371,8 +371,8 @@ namespace augs {
 				if(parent) {
 					rect_ltrb global = get_rect_absolute();
 					rect_ltrb parent_global = parent->get_rect_absolute();
-					point off1 = point(max(0, global.r + 2 - parent_global.r), max(0, global.b + 2 - parent_global.b));
-					point off2 = point(max(0, parent_global.l - global.l + 2 + off1.x), max(0, parent_global.t - global.t + 2 + off1.y));
+					vec2<int> off1 = vec2<int>(max(0, global.r + 2 - parent_global.r), max(0, global.b + 2 - parent_global.b));
+					vec2<int> off2 = vec2<int>(max(0, parent_global.l - global.l + 2 + off1.x), max(0, parent_global.t - global.t + 2 + off1.y));
 					parent->scroll += off1;
 					parent->scroll -= off2;
 					parent->scroll_to_view();
@@ -477,7 +477,7 @@ namespace augs {
 				return rect_xywh(absolute_xy.x, absolute_xy.y, rc.w(), rc.h());
 			}
 
-			const point& rect::get_absolute_xy() const {
+			const vec2<int>& rect::get_absolute_xy() const {
 				return absolute_xy;
 			}
 

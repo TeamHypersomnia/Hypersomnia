@@ -89,7 +89,7 @@ namespace augs {
 				rect* focus_next, *focus_prev;
 
 				bool draw, clip, fetch_wheel, scrollable, snap_scroll_to_content, preserve_focus, focusable;
-				point drag_origin;
+				vec2<int> drag_origin;
 				rect_ltrb rc; /* actual rectangle */ 
 				rect_wh content_size; /* content's (children's) bounding box */
 				vec2<> scroll; /* scrolls content */
@@ -152,7 +152,7 @@ namespace augs {
 				
 				const rect_ltrb& get_clipped_rect() const;
 				rect_ltrb get_rect_absolute() const;
-				const point& get_absolute_xy() const;
+				const vec2<int>& get_absolute_xy() const;
 				rect_ltrb get_local_clipper() const;
 				rect_ltrb get_clipping_rect() const;
 				rect* get_parent() const;
@@ -163,7 +163,7 @@ namespace augs {
 				rect* parent; 
 			private:
 				rect_ltrb rc_clipped, clipping_rect;
-				point absolute_xy;
+				vec2<int> absolute_xy;
 
 				bool was_hovered;
 			};

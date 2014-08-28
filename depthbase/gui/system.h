@@ -6,27 +6,6 @@
 #include "graphics/pixel.h"
 #include "texture_baker/texture_baker.h"
 #include "rect.h"
-/* window - defined as the rect that fetches events to only itself 
-
-todo:
-w textboxie poprawic przeciaganie zaznaczen double/triple clickow
-WYDZIELIC W SYSTEMIE OUTPUT GUI_RECT I BACKEND QUAD'OWY
-struct {
-gui_rect caret;
-vector<gui_rect> characters;
-vector<gui_rect> selections;
-}
-i tak dalej
-pros:
-- kazdy draw_proc generuje elementy do wyrysowania wedlug dowolnej kolejnosci => prostszy kod
-cons:
-- wincyj pamieci zuzytej w kazdym rect'cie
-
-z bboxami ma byc tak jak jest bo zauwaz ze bboxa rozpychaja tylko pierwsze child recty a nie ich wlasne bboxy
-BBOX JEST GLOBALNY!!! twuj stary jest globalny, teraz sa lokalne
-
-
-*/
 
 namespace augs {
 	namespace graphics {
@@ -75,7 +54,7 @@ namespace augs {
 				struct {
 					material mat;
 					rect_wh size;
-					point pos;
+					vec2<int> pos;
 					rect* subject;
 					float speed_mult;
 				} middlescroll;

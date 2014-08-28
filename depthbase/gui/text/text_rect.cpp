@@ -23,7 +23,7 @@ namespace augs {
 					draft.guarded_redraw();
 					auto bbox = draft.get_draft().get_bbox();
 
-					rc = rect_xywh(point(r.w()/2 - bbox.w/2, r.h()/2 - bbox.h/2), rect_wh(0, 0));
+					rc = rect_xywh(vec2<int>(r.w()/2 - bbox.w/2, r.h()/2 - bbox.h/2), rect_wh(0, 0));
 				}
 
 			}

@@ -39,7 +39,7 @@ namespace augs {
 					print.blink.update();
 				}
 				
-				point textbox::local_mouse(point global_mouse) {
+				vec2<int> textbox::local_mouse(vec2<int> global_mouse) {
 					return global_mouse + scroll - get_absolute_xy();
 				}
 
@@ -73,7 +73,7 @@ namespace augs {
 						scroll.y += float(editor.get_draft().lines[li+1].get_rect().h);  
 				}
 
-				void textbox::on_place_caret(point mouse, bool s) {  
+				void textbox::on_place_caret(vec2<int> mouse, bool s) {  
 						editor.guarded_redraw();
 						//if(!s) caret.selection_offset = 0;
 						editor.set_caret(editor.get_draft().map_to_caret_pos(local_mouse(mouse)), s);
@@ -81,14 +81,14 @@ namespace augs {
 						if(!s) view_caret = true; 
 				}
 
-				void textbox::on_select_word(point mouse) {
+				void textbox::on_select_word(vec2<int> mouse) {
 						editor.guarded_redraw();
 						editor.select_word(editor.get_draft().map_to_caret_pos(local_mouse(mouse)));
 						blink_reset = true;
 						view_caret = true; 
 				}
 
-				void textbox::on_select_line(point mouse) { 
+				void textbox::on_select_line(vec2<int> mouse) { 
 						editor.guarded_redraw();
 						editor.select_line(editor.get_draft().map_to_caret_pos(local_mouse(mouse)));
 						blink_reset = true;
@@ -111,7 +111,7 @@ namespace augs {
 				void textbox::on_backspace(bool c)		{ editor.backspace(c);								view_caret = true; blink_reset = true;	}
 				void textbox::on_del(bool c)			{ editor.del(c);									view_caret = true; blink_reset = true;	}
 				
-				void textbox::on_drag(point mouse)	{ 
+				void textbox::on_drag(vec2<int> mouse)	{ 
 						editor.set_caret(editor.get_draft().map_to_caret_pos(local_mouse(mouse)), true);
 						drag.drag(local_mouse(mouse), get_local_clipper()); 
 						blink_reset = true;
@@ -126,7 +126,7 @@ namespace augs {
 					using namespace augs::window::event::keys;
 					auto& w = e.owner.owner.events;
 					auto* k = w.keys;
-					point mouse = w.mouse.pos;
+					vec2<int> mouse = w.mouse.pos;
 					bool s = k[SHIFT], c = k[CTRL];
 
 					switch(e.msg) {
@@ -211,7 +211,7 @@ namespace augs {
 				}
 
 				
-				property_textbox::property_textbox(point pos, int width, text::style default_style, std::function<void(std::wstring&)> property_guard)
+				property_textbox::property_textbox(vec2<int> pos, int width, text::style default_style, std::function<void(std::wstring&)> property_guard)
 					: textbox(rect_xywh(pos.x, pos.y, width, default_style.f->get_height()), default_style), property_guard(property_guard) {
 				}
 				

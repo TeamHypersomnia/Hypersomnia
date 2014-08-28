@@ -88,7 +88,7 @@ namespace augs {
 				return rc;
 			}
 
-			void quad::move(const point& v) {
+			void quad::move(const vec2<int>& v) {
 				for(int i = 0; i < 4; ++i) {
 					p[i].x += v.x;
 					p[i].y += v.y;
