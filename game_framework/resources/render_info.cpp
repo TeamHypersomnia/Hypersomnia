@@ -143,6 +143,11 @@ namespace resources {
 		t1.vertices[1].pos = t2.vertices[2].pos = vec2<int>(v[2]);
 		t1.vertices[2].pos = vec2<int>(v[3]);
 
+		if (in.additional_info) {
+			/* compute average */
+			in.additional_info->last_screen_pos = (vec2<>(v[0]) + vec2<>(v[1]) + vec2<>(v[2]) + vec2<>(v[3])) / 4;
+		}
+
 		in.output->push_triangle(t1);
 		in.output->push_triangle(t2);
 	}

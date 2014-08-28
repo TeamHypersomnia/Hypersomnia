@@ -83,15 +83,17 @@ void camera_system::process_entities(world& owner) {
 				camera.last_interpolant.pos = camera.last_interpolant.pos * averaging_constant + transform.pos * (1.0f - averaging_constant);
 				camera.last_interpolant.rotation = camera.last_interpolant.rotation * averaging_constant + transform.rotation * (1.0f - averaging_constant);
 					
-					auto interp = [](float& a, float& b, float averaging_constant){
-						a = static_cast<float>(a * averaging_constant + b * (1.0f - averaging_constant));
-					};
+				auto interp = [](float& a, float& b, float averaging_constant){
+					a = static_cast<float>(a * averaging_constant + b * (1.0f - averaging_constant));
+				};
 
-					interp(camera.last_ortho_interpolant.x, camera.size.x, averaging_constant);
-					interp(camera.last_ortho_interpolant.y, camera.size.y, averaging_constant);
+				interp(camera.last_ortho_interpolant.x, camera.size.x, averaging_constant);
+				interp(camera.last_ortho_interpolant.y, camera.size.y, averaging_constant);
 
 				/* save smoothing result */
+				//if ((drawn_transform.pos - camera.last_interpolant.pos).length() > 5)
 				drawn_transform = camera.last_interpolant;
+				
 				drawn_size = camera.last_ortho_interpolant;
 
 				if (camera.crosshair_follows_interpolant) {

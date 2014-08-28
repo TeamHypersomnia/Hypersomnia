@@ -23,6 +23,7 @@ namespace bindings {
 			.def_readwrite("mask", &render::mask)
 			.def_readwrite("layer", &render::layer)
 			.def_readwrite("model", &render::model)
+			.def_readwrite("last_screen_pos", &render::last_screen_pos)
 			.def_readwrite("flip_horizontally", &render::flip_horizontally)
 			.def_readwrite("flip_vertically", &render::flip_vertically)
 			.def_readwrite("absolute_transform", &render::absolute_transform)

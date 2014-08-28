@@ -444,3 +444,14 @@ function array_shuffler:next_value()
 	self.current_index = self.current_index + 1
 	return out
 end
+
+expiration_timer = inherits_from()
+
+function expiration_timer:constructor(expiration_ms)
+	self.expiration_ms = expiration_ms
+	self.timer_obj = timer()
+end
+
+function expiration_timer:expired()
+	return self.timer_obj:get_milliseconds() > self.expiration_ms
+end
