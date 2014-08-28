@@ -35,17 +35,17 @@ namespace augs {
 			extern augs::texture_baker::texture* null_texture;
 			namespace text {
 				struct formatted_char {
-					font* font_used;
+					augs::texture_baker::font* font_used;
 					wchar_t c;
 					unsigned char r, g, b, a;
-					void set(wchar_t, font* = 0, const pixel_32& = pixel_32());
-					void set(font* = 0, const pixel_32& = pixel_32());
+					void set(wchar_t, augs::texture_baker::font* = 0, const pixel_32& = pixel_32());
+					void set(augs::texture_baker::font* = 0, const pixel_32& = pixel_32());
 				};
 
 				struct style {
-					font* f;
+					augs::texture_baker::font* f;
 					pixel_32 color;
-					style(font* = nullptr, pixel_32 = pixel_32());
+					style(augs::texture_baker::font* = nullptr, pixel_32 = pixel_32());
 					style(const formatted_char&);
 					operator formatted_char();
 				};

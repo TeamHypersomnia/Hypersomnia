@@ -1,19 +1,19 @@
 #pragma once
 #include "dragger.h"
-#include "../../window/timer.h"
+#include "misc/timer.h"
 
 namespace augs {
 	using namespace math;
 	namespace graphics {
-		extern augs::window::fpstimer fps;
+		extern augs::misc::fpstimer fps;
 
 		namespace gui {
 			dragger::dragger() : vel_mult(1.f) {
 				stop();
 			}
 
-			void dragger::move(pointf& p) {
-				p -= pointf(float(vel[0] * fps.frame_speed()), float(vel[1] * fps.frame_speed()));
+			void dragger::move(vec2<>& p) {
+				p -= vec2<>(float(vel[0] * fps.frame_speed()), float(vel[1] * fps.frame_speed()));
 			}
 
 			void dragger::drag(const point& m, const rect_ltrb& rc) {

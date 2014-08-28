@@ -17,7 +17,7 @@ namespace augs {
 					forced_bold(false),
 					redraw(true),
 					forced_italics(false), max_characters(0), whitelist(nullptr), blacklist(nullptr), allow_unknown_characters_as_default(false) {}
-				font* ui::getf(unsigned i) const {
+				augs::texture_baker::font* ui::getf(unsigned i) const {
 					return (i < get_str().length() && get_str()[i].font_used) ? get_str()[i].font_used : caret.default_style.f;
 				}
 

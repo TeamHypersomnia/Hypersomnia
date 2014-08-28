@@ -8,7 +8,7 @@ namespace augs {
 				float vel[2], vel_mult;
 				dragger();
 				void stop();
-				void move(math::pointf&);
+				void move(augs::vec2<>&);
 				void drag(const math::point& mouse, const math::rect_ltrb&);
 			};
 		}

@@ -23,7 +23,7 @@ namespace augs {
 					bool is_needed();
 
 					class slider : public rect {
-						pointf val;
+						vec2<> val;
 						friend class scrollarea;
 					public:
 						virtual void event_proc(event_info) override;

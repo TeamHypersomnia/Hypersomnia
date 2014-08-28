@@ -92,7 +92,7 @@ namespace augs {
 				point drag_origin;
 				rect_ltrb rc; /* actual rectangle */ 
 				rect_wh content_size; /* content's (children's) bounding box */
-				pointf scroll; /* scrolls content */
+				vec2<> scroll; /* scrolls content */
 				
 				std::vector<rect*> children;
 				
