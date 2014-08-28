@@ -3,7 +3,6 @@
 #include "misc/timer.h"
 
 namespace augs {
-	using namespace math;
 	namespace graphics {
 		extern augs::misc::fpstimer fps;
 

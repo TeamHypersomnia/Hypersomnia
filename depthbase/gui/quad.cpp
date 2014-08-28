@@ -4,7 +4,7 @@
 namespace augs {
 	namespace graphics {
 		namespace gui {
-			void scale_virtual_res(rects::wh<float> vres, rects::wh<float> display, vector<quad>& quads) {
+			void scale_virtual_res(rects::wh<float> vres, rects::wh<float> display, std::vector<quad>& quads) {
 				if(vres == display) return;
 
 				float x_mult = display.w/float(vres.w);

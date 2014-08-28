@@ -372,8 +372,8 @@ namespace augs {
 				if(parent) {
 					rects::ltrb<float> global = get_rect_absolute();
 					rects::ltrb<float> parent_global = parent->get_rect_absolute();
-					vec2<int> off1 = vec2<int>(std::max(0, global.r + 2 - parent_global.r), std::max(0, global.b + 2 - parent_global.b));
-					vec2<int> off2 = vec2<int>(std::max(0, parent_global.l - global.l + 2 + off1.x), std::max(0, parent_global.t - global.t + 2 + off1.y));
+					vec2<int> off1 = vec2<int>(std::max(0.f, global.r + 2 - parent_global.r), std::max(0.f, global.b + 2 - parent_global.b));
+					vec2<int> off2 = vec2<int>(std::max(0.f, parent_global.l - global.l + 2 + off1.x), std::max(0.f, parent_global.t - global.t + 2 + off1.y));
 					parent->scroll += off1;
 					parent->scroll -= off2;
 					parent->scroll_to_view();

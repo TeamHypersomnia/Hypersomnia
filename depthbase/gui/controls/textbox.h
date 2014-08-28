@@ -67,7 +67,7 @@ namespace augs {
 
 					std::function<void (std::wstring&)> property_guard;
 
-					property_textbox(vec2<int> pos, int width, text::style default_style, std::function<void (wstring&)> property_guard = nullptr);
+					property_textbox(vec2<int> pos, int width, text::style default_style, std::function<void (std::wstring&)> property_guard = nullptr);
 					
 					template <class T>
 					void set(T val) {
