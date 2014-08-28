@@ -23,7 +23,7 @@ namespace augs {
 			material::material(const pixel_32& color) : tex(gui::null_texture), color(color) {}
 
 			quad::quad() {}
-			quad::quad(const rects::ltrb<float>& rc, const material& mat, const rect_texture& t) {
+			quad::quad(const rects::ltrb<float>& rc, const material& mat, const rects::texture<float>& t) {
 				p[0].x = p[3].x = rc.l;
 				p[0].y = p[1].y = rc.t;
 				p[1].x = p[2].x = rc.r;
@@ -41,14 +41,14 @@ namespace augs {
 				rects::ltrb<float> rc = origin;
 				rc.clip(c);
 
-				static rect_texture diff;
+				static rects::texture<float> diff;
 				static float tw, th;
 				static quad q;
 
 				tw = 1.0f / origin.w();
 				th = 1.0f / origin.h();
 
-				diff = rect_texture(((q.p[0].x = q.p[3].x = rc.l) - origin.l) * tw,
+				diff = rects::texture<float>(((q.p[0].x = q.p[3].x = rc.l) - origin.l) * tw,
 					((q.p[0].y = q.p[1].y = rc.t) - origin.t) * th,
 					((q.p[1].x = q.p[2].x = rc.r) - origin.r) * tw + 1.0f,
 					((q.p[2].y = q.p[3].y = rc.b) - origin.b) * th + 1.0f);
@@ -72,7 +72,7 @@ namespace augs {
 				float tw = 1.f / origin.w();
 				float th = 1.f / origin.h();
 
-				rect_texture diff  (((q.p[0].x = q.p[3].x = rc.l) - origin.l) * tw,
+				rects::texture<float> diff  (((q.p[0].x = q.p[3].x = rc.l) - origin.l) * tw,
 					((q.p[0].y = q.p[1].y = rc.t) - origin.t) * th,
 					((q.p[1].x = q.p[2].x = rc.r) - origin.r) * tw + 1.0f,
 					((q.p[2].y = q.p[3].y = rc.b) - origin.b) * th + 1.0f);

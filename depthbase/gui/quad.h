@@ -23,7 +23,7 @@ namespace augs {
 			struct quad {
 				vertex p[4];
 				quad();
-				quad(const rects::ltrb<float>&, const material&, const rect_texture& = rect_texture(0.f, 0.f, 1.f, 1.f));
+				quad(const rects::ltrb<float>&, const material&, const rects::texture<float>& = rects::texture<float>(0.f, 0.f, 1.f, 1.f));
 
 				static quad clipped(const rects::ltrb<float>&, const rects::ltrb<float>&, const material&);
 				void clip(const rects::ltrb<float>&);

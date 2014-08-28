@@ -1,7 +1,6 @@
 #include "text_rect.h"
 
 namespace augs {
-	using namespace math;
 	namespace graphics {
 		using namespace augs::texture_baker;
 		namespace gui {

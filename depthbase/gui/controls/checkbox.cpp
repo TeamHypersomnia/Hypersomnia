@@ -29,7 +29,7 @@ namespace augs {
 
 				void checkbox::event_proc(event_info e) {
 					if(e == rect::event::lclick ||
-					   e == rect::event::keydown && (e.owner.owner.events.key == augs::event::keys::ENTER)) {
+					   e == rect::event::keydown && (e.owner.owner.events.key == augs::window::event::keys::ENTER)) {
 						set_state(!get_state());
 						if(callback) callback(get_state());
 					}
