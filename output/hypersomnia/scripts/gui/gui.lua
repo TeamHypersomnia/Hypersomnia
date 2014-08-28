@@ -1,16 +1,28 @@
+dofile "hypersomnia\\scripts\\gui\\recent_messages.lua"
+
 gui_class = inherits_from()
 
-function cprint(str, color, target_box)
+function cprint(str, color, target_box, duration)
 	local text_color = rgba(255, 255, 0, 255)
 	if color then text_color = color end
 	local vec_str = towchar_vec(str)
-	vec_str:add(13)
 	
 	if target_box == nil then
-		target_box = client_scenes[CURRENT_CLIENT_NUMBER].my_gui.content_chatbox
+		client_scenes[CURRENT_CLIENT_NUMBER].my_gui.recent_messages:append_message({
+			{
+				str = vec_str,
+				color = text_color
+			}
+		}, false, duration)
+	else
+		vec_str:add(13)
+		target_box:append_text(vec_str, text_color)
 	end
-	
-	target_box:append_text(vec_str, text_color)
+end
+
+function gui_class:draw_call()
+	self.recent_messages:loop()
+	self.gui:draw_call()
 end
 
 function gui_class:set_enabled(flag)
@@ -102,6 +114,10 @@ function gui_class:constructor(camera_rect, world_object, owner_client)
 	
 	self.main_chatbox = callback_textbox(self.gui)
 	self.main_chatbox:setup(rect_xywh(20, camera_rect.h - 160 + 90, 350, 35), true)
+	
+	self.recent_messages_textbox = callback_textbox(self.gui)
+	self.recent_messages_textbox:setup(rect_xywh(20, camera_rect.h - 500 + 100 + 150, 350, 150), false)
+	self.recent_messages = recent_messages_class:create(self.recent_messages_textbox, nil)-- self.content_chatbox)
 	
 	--set_color(self.content_chatbox, "released", rgba(0, 0, 0, 50))
 	--set_color(self.main_chatbox, "released", rgba(0, 0, 0, 100))

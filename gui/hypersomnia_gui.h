@@ -160,5 +160,11 @@ struct callback_textbox {
 	bool is_clean();
 	bool is_focused();
 
+	void set_alpha_range(int pos1, int pos2, unsigned val);
+
+	void set_caret(unsigned pos, bool select = false);
+	void remove_line();
+	void backspace();
+	
 	void setup(augs::rects::xywh<float>, bool is_input_textbox);
 };

@@ -115,6 +115,24 @@ bool callback_textbox::is_focused() {
 	return owner->main_window.get_focus() == &textbox_object;
 }
 
+void callback_textbox::set_caret(unsigned pos, bool select) {
+	textbox_object.editor.set_caret(pos, select);
+}
+
+void callback_textbox::set_alpha_range(int pos1, int pos2, unsigned val) {
+	for (int i = pos1; i < pos2; ++i) {
+		textbox_object.editor.str()[i].a = val;
+	}
+}
+
+void callback_textbox::remove_line() {
+	textbox_object.editor.remove_line();
+}
+
+void callback_textbox::backspace() {
+	textbox_object.editor.backspace();
+}
+
 void callback_textbox::focus() {
 	owner->main_window.set_focus(&textbox_object);
 }
