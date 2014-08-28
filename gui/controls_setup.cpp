@@ -58,6 +58,11 @@ bool callback_textbox::is_clean() {
 	return textbox_object.editor.get_str().empty();
 }
 
+void callback_textbox::set_area(augs::rects::xywh<float> area) {
+	textbox_object.rc = rect_xywh(area.x, area.y, area.w, area.h);
+
+}
+
 void callback_textbox::setup(augs::rects::xywh<float> area, bool is_input_textbox)
 {
 	//background = crect(rect_xywh(0, 0, 1000, 1000));
@@ -132,6 +137,12 @@ void callback_textbox::remove_line() {
 void callback_textbox::backspace() {
 	textbox_object.editor.backspace();
 }
+
+augs::vec2<> callback_textbox::get_text_bbox() {
+	auto result = textbox_object.editor.get_draft().get_bbox();
+	return augs::vec2<>(result.w, result.h);
+}
+
 
 void callback_textbox::draw(bool flag) {
 	textbox_object.draw = flag;

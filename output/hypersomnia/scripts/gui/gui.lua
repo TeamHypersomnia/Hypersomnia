@@ -21,6 +21,10 @@ function cprint(str, color, target_box, duration)
 end
 
 function gui_class:draw_call()
+	local content_height = self.recent_messages_textbox:get_text_bbox().y
+	
+	self.recent_messages_textbox:set_area(rect_xywh(20, self.camera_rect.h - 500 + 100 + 150 + 150 - content_height, 350, content_height))
+	
 	self.recent_messages:loop()
 	self.gui:draw_call()
 end
@@ -72,6 +76,7 @@ end
 function gui_class:constructor(camera_rect, world_object, owner_client)
 	self.owner_client = owner_client
 	self.gui_enabled = true
+	self.camera_rect = camera_rect
 	
 	self.press_info_written = false
 	

@@ -166,7 +166,10 @@ struct callback_textbox {
 	void remove_line();
 	void backspace();
 
+	augs::vec2<> get_text_bbox();
+
 	void draw(bool);
 	
+	void set_area(augs::rects::xywh<float>);
 	void setup(augs::rects::xywh<float>, bool is_input_textbox);
 };

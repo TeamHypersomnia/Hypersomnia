@@ -13,7 +13,7 @@ function recent_messages_class:append_message(formatted, raw_string, message_dur
 	local message_len = 0
 	
 	if not message_duration then
-		message_duration = 6000
+		message_duration = 20000
 	end
 	
 	formatted[#formatted].str:add(13)
