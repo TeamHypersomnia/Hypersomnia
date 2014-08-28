@@ -51,6 +51,23 @@ void callback_textbox::append_text(augs::misc::vector_wrapper<wchar_t>& wstr, au
 	textbox_object.editor.set_selection_offset(prev_caret_sel);
 }
 
+void text_rect_wrapper::append_text(augs::misc::vector_wrapper<wchar_t>& wstr, augs::graphics::pixel_32 color) {
+	auto resultant_style = default_style;
+	resultant_style.color = pixel_32(color.r, color.g, color.b, color.a);
+
+	rc.draft.str() += format(std::wstring(wstr.raw.begin(), wstr.raw.end()), resultant_style);
+}
+
+void text_rect_wrapper::set_color(augs::graphics::pixel_32 col) {
+	auto& str = rc.draft.str();
+	for (auto& c : str) {
+		c.r = col.r;
+		c.g = col.g;
+		c.b = col.b;
+		c.a = col.a;
+	}
+}
+
 stylesheet::style* resolve_attr(stylesheet& subject, std::string a) {
 	if (a == "released") {
 		return &subject.released;
@@ -163,7 +180,12 @@ void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
 		.def("set_focus_callback", &callback_rect::set_focus_callback)
 		.def("set_lpressed_callback", &callback_rect::set_lpressed_callback)
 		.def("set_hover_callback", &callback_rect::set_hover_callback)
-		.def("set_blur_callback", &callback_rect::set_blur_callback)
+		.def("set_blur_callback", &callback_rect::set_blur_callback),
 
+		luabind::class_<text_rect_wrapper>("text_rect")
+		.def(luabind::constructor<hypersomnia_gui&>())
+		.def("setup", &text_rect_wrapper::setup)
+		.def("append_text", &text_rect_wrapper::append_text)
+		.def("set_color", &text_rect_wrapper::set_color)
 	];
 }

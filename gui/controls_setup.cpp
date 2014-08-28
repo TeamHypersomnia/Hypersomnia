@@ -30,9 +30,10 @@ void hypersomnia_gui::setup(augs::vec2<> camera) {
 	ltblue_theme();
 
 	main_window.middlescroll.speed_mult = 90.0f;
-	focusable_bg = rect(rect_xywh(0, 0, camera_size.x, camera_size.y));
 
-	focusable_bg.focusable = true;
+	world_text = rect(rect_xywh(0, 0, camera_size.x, camera_size.y));
+	world_text.clip = false;
+	main_window.root.children.push_back(&world_text);
 
 	//main_window.root.children.push_back(&focusable_bg);
 
@@ -163,4 +164,13 @@ unsigned callback_textbox::get_length() {
 
 void hypersomnia_gui::blur() {
 	main_window.set_focus(nullptr);
+}
+
+
+text_rect_wrapper::text_rect_wrapper(hypersomnia_gui& owner) {
+	owner.world_text.children.push_back(&rc);
+}
+
+void text_rect_wrapper::setup(augs::rects::xywh<float> area) {
+	rc = text_rect(rect(_xywh(area)));
 }

@@ -7,6 +7,7 @@ dofile "hypersomnia\\scripts\\components\\health.lua"
 dofile "hypersomnia\\scripts\\components\\wield.lua"
 dofile "hypersomnia\\scripts\\components\\item.lua"
 dofile "hypersomnia\\scripts\\components\\inventory.lua"
+dofile "hypersomnia\\scripts\\components\\label.lua"
 
 dofile "hypersomnia\\scripts\\sync_modules\\modules.lua"
 dofile "hypersomnia\\scripts\\sync_modules\\movement_sync.lua"
@@ -29,6 +30,7 @@ dofile "hypersomnia\\scripts\\systems\\inventory_system_shared.lua"
 
 dofile "hypersomnia\\scripts\\systems\\wield_system.lua"
 dofile "hypersomnia\\scripts\\systems\\item_system.lua"
+dofile "hypersomnia\\scripts\\systems\\label_system.lua"
 
 dofile "hypersomnia\\scripts\\systems\\health_system.lua"
 

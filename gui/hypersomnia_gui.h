@@ -92,9 +92,10 @@ struct hypersomnia_gui {
 	
 	gui::system sys = gui::system(gl.events);
 	gui::group main_window = gui::group(sys);
-	rect focusable_bg;
+	rect world_text;
 
-	hypersomnia_gui(augs::window::glwindow& actual_window) : actual_window(actual_window) {}
+	hypersomnia_gui(augs::window::glwindow& actual_window) : actual_window(actual_window) {
+	}
 
 	augs::vec2<> camera_size;
 	void setup(augs::vec2<> camera_size);
@@ -175,4 +176,16 @@ struct callback_textbox {
 	
 	void set_area(augs::rects::xywh<float>);
 	void setup(augs::rects::xywh<float>, bool is_input_textbox);
+};
+
+struct text_rect_wrapper {
+	text_rect rc;
+
+	text::style default_style;
+
+	text_rect_wrapper(hypersomnia_gui& owner);
+	void setup(augs::rects::xywh<float>);
+
+	void append_text(augs::misc::vector_wrapper<wchar_t>&, augs::graphics::pixel_32);
+	void set_color(augs::graphics::pixel_32);
 };
