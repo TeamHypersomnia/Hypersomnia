@@ -96,7 +96,7 @@ namespace augs {
 				
 				std::vector<rect*> children;
 				
-				rect(const math::rect_xywh& rc = math::rect_xywh());
+				rect(const rect_xywh& rc = rect_xywh());
 				
 				virtual rect_wh get_content_size();
 				
