@@ -39,12 +39,12 @@ namespace augs {
 				}
 					
 				checklabel::checklabel(const checkbox& r, const std::wstring& label, const text::style& style_active, const text::style& style_inactive)
-					: checkbox(r), active_text(rect_xywh(), text::format(label, style_active)), inactive_text(rect_xywh(), text::format(label, style_inactive)) {
+					: checkbox(r), active_text(rects::xywh<float>(), text::format(label, style_active)), inactive_text(rects::xywh<float>(), text::format(label, style_inactive)) {
 					stretch_rc();
 				}
 
 				checklabel::checklabel(const checkbox& r, const text::fstr& active_str, const text::fstr& inactive_str) 
-					: checkbox(r), active_text(rect_xywh(), active_str), inactive_text(rect_xywh(), inactive_str) {
+					: checkbox(r), active_text(rects::xywh<float>(), active_str), inactive_text(rects::xywh<float>(), inactive_str) {
 					stretch_rc();
 				}
 					

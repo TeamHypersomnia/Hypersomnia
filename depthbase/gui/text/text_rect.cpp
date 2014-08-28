@@ -19,11 +19,11 @@ namespace augs {
 					draw(in, *this);
 				}
 
-				void text_rect::center(rect_ltrb r) {
+				void text_rect::center(rects::ltrb<float> r) {
 					draft.guarded_redraw();
 					auto bbox = draft.get_draft().get_bbox();
 
-					rc = rect_xywh(vec2<int>(r.w()/2 - bbox.w/2, r.h()/2 - bbox.h/2), rect_wh(0, 0));
+					rc = rects::xywh<float>(vec2<int>(r.w()/2 - bbox.w/2, r.h()/2 - bbox.h/2), rects::wh<float>(0, 0));
 				}
 
 			}

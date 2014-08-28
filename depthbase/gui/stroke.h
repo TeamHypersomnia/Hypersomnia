@@ -20,7 +20,7 @@ namespace augs {
 				void set_width(int);
 				void set_material(const material&);
 
-				void draw(std::vector<quad>& out, rect_ltrb origin, const rect_ltrb* clipper = nullptr) const;
+				void draw(std::vector<quad>& out, rects::ltrb<float> origin, const rects::ltrb<float>* clipper = nullptr) const;
 				void draw(std::vector<quad>& out, const rect&) const;
 			};
 		}

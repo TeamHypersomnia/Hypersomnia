@@ -1,6 +1,8 @@
 #pragma once
 #include "math/vec2d.h"
 #include <Windows.h>
+#undef max
+#undef min
 namespace augs {
 	namespace window {
 		namespace event {

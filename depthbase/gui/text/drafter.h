@@ -13,7 +13,7 @@ namespace augs {
 				struct drafter {
 					struct line {
 						unsigned hover(int x, const std::vector<int>& sectors) const;  /* return sector that is the closest x  */
-						rect_xywh get_rect() const; /* actual line rect */
+						rects::xywh<float> get_rect() const; /* actual line rect */
 
 						int top, right, height() const, bottom() const, /* coordinates */
 							asc, desc;
@@ -46,7 +46,7 @@ namespace augs {
 					drafter();
 
 					/* returns offset that clipper must be moved to show whole caret */
-					vec2<int> view_caret(unsigned caret_pos, const rect_ltrb& clipper) const; 
+					vec2<int> view_caret(unsigned caret_pos, const rects::ltrb<float>& clipper) const; 
 					unsigned get_line(unsigned caret_pos) const;
 					
 					/* note: vec2<int> is taken LOCALLY.*/
@@ -54,7 +54,7 @@ namespace augs {
 					unsigned map_to_caret_pos(const vec2<int>&) const;
 				
 					/* returns text's bounding box */
-					rect_wh get_bbox() const;
+					rects::wh<float> get_bbox() const;
 				
 					void draw(const fstr&);
 					static bool is_newline(unsigned i);
@@ -62,7 +62,7 @@ namespace augs {
 					/* 
 					clipper is in local drafter's space: (0, 0) = left top corner
 					if any in the pair is -1, there's no line visible */
-					std::pair<int, int> get_line_visibility(const rect_ltrb& clipper) const;
+					std::pair<int, int> get_line_visibility(const rects::ltrb<float>& clipper) const;
 				private:
 					unsigned max_x;
 					void find_ascdesc(const fstr& source, int i, int j, int&, int&) const;

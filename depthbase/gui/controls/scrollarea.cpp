@@ -8,7 +8,7 @@ namespace augs {
 	namespace graphics {
 		namespace gui {
 			namespace controls {
-				scrollarea::scrollarea(const rect_xywh& rc, rect* origin, slider* box, orientation flags)
+				scrollarea::scrollarea(const rects::xywh<float>& rc, rect* origin, slider* box, orientation flags)
 					: rect(rc), origin(origin), box(box), flags(flags), disappear_if_fits(true) {
 						children.push_back(box);
 				}
@@ -35,7 +35,7 @@ namespace augs {
 				void scrollarea::update_proc(group& inf) {
 					bool n = is_needed();
 					box->draw = draw = !(disappear_if_fits && !n);
-					rect_ltrb& sl = box->rc;
+					rects::ltrb<float>& sl = box->rc;
 
 					if(flags & orientation::HORIZONTAL) {
 						sl.stick_x(rc);

@@ -39,7 +39,7 @@ namespace augs {
 						OMNI = (HORIZONTAL | VERTICAL)
 					} flags;
 
-					scrollarea(const rect_xywh& rc, rect* origin, slider* box, orientation flags);
+					scrollarea(const rects::xywh<float>& rc, rect* origin, slider* box, orientation flags);
 
 					void draw_slider(draw_info);
 				};

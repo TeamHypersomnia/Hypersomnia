@@ -4,7 +4,7 @@
 namespace augs {
 	namespace graphics {
 		namespace gui {
-			void scale_virtual_res(rect_wh vres, rect_wh display, vector<quad>& quads) {
+			void scale_virtual_res(rects::wh<float> vres, rects::wh<float> display, vector<quad>& quads) {
 				if(vres == display) return;
 
 				float x_mult = display.w/float(vres.w);
@@ -23,7 +23,7 @@ namespace augs {
 			material::material(const pixel_32& color) : tex(gui::null_texture), color(color) {}
 
 			quad::quad() {}
-			quad::quad(const rect_ltrb& rc, const material& mat, const rect_texture& t) {
+			quad::quad(const rects::ltrb<float>& rc, const material& mat, const rect_texture& t) {
 				p[0].x = p[3].x = rc.l;
 				p[0].y = p[1].y = rc.t;
 				p[1].x = p[2].x = rc.r;
@@ -37,8 +37,8 @@ namespace augs {
 				mat.tex->get_uv(t.u1, t.v2, p[3].u, p[3].v);
 			}
 
-			quad quad::clipped(const rect_ltrb& origin, const rect_ltrb& c, const material& mat) {
-				rect_ltrb rc = origin;
+			quad quad::clipped(const rects::ltrb<float>& origin, const rects::ltrb<float>& c, const material& mat) {
+				rects::ltrb<float> rc = origin;
 				rc.clip(c);
 
 				static rect_texture diff;
@@ -63,8 +63,8 @@ namespace augs {
 				return q;
 			}
 
-			rect_ltrb gui::add_quad(const material& mat, const rect_ltrb& origin, const rect_ltrb* p, std::vector<quad>& v) {
-				rect_ltrb rc = origin;
+			rects::ltrb<float> gui::add_quad(const material& mat, const rects::ltrb<float>& origin, const rects::ltrb<float>* p, std::vector<quad>& v) {
+				rects::ltrb<float> rc = origin;
 				if((p && !rc.clip(*p)) || !rc.good()) return rc;
 
 				quad q;
@@ -95,7 +95,7 @@ namespace augs {
 				}
 			}
 
-			void quad::set(const rect_ltrb& rc) {
+			void quad::set(const rects::ltrb<float>& rc) {
 				p[0].x = p[3].x = rc.l;
 				p[0].y = p[1].y = rc.t;
 				p[1].x = p[2].x = rc.r;
@@ -116,8 +116,8 @@ namespace augs {
 				}
 			}
 
-			rect_ltrb quad::get_rect() const {
-				return rect_ltrb(p[0].x, p[0].y, p[2].x, p[2].y);
+			rects::ltrb<float> quad::get_rect() const {
+				return rects::ltrb<float>(p[0].x, p[0].y, p[2].x, p[2].y);
 			}
 		}
 	}

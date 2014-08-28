@@ -111,7 +111,7 @@ namespace augs {
 			/* default middlescroll setup */
 				middlescroll.subject = 0;
 				middlescroll.speed_mult = 1.f;
-				middlescroll.size = rect_wh(25, 25);
+				middlescroll.size = rects::wh<float>(25, 25);
 				root.clip = false;
 				root.focusable = false;
 				root.scrollable = false;
@@ -156,7 +156,7 @@ namespace augs {
 				root.draw_children(in);
 				
 				if(middlescroll.subject) {
-					rect_ltrb scroller = rect_wh(middlescroll.size);
+					rects::ltrb<float> scroller = rects::wh<float>(middlescroll.size);
 					scroller.center(middlescroll.pos);
 					rect::add_quad(middlescroll.mat, scroller, &root, quad_array); 
 				}

@@ -53,7 +53,7 @@ namespace augs {
 			public:
 				struct {
 					material mat;
-					rect_wh size;
+					rects::wh<float> size;
 					vec2<int> pos;
 					rect* subject;
 					float speed_mult;

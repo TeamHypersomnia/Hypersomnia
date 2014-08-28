@@ -14,7 +14,7 @@ namespace augs {
 					void draw(draw_info, rect& subject);
 					virtual void draw_proc(draw_info) override;
 
-					void center(rect_ltrb);
+					void center(rects::ltrb<float>);
 				};
 			}
 		}

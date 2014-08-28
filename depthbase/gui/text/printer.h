@@ -69,7 +69,7 @@ namespace augs {
 						/* if caret is 0, draw no caret */
 						const caret_info* caret,
 						vec2<int> scroll,
-						const rect_ltrb* parent = 0) const;
+						const rects::ltrb<float>* parent = 0) const;
 		 		};
 				
 				/* 
@@ -79,18 +79,18 @@ namespace augs {
 				returns text's bounding box (without clipping)
 				*/
 
-				rect_wh quick_print(std::vector<quad>& v,
+				rects::wh<float> quick_print(std::vector<quad>& v,
 										const fstr& str, 
 										vec2<int> pos, 
 										unsigned wrapping_width = 0,
-										const rect_ltrb* parent = 0);
+										const rects::ltrb<float>* parent = 0);
 
-				rect_wh quick_print(std::vector<quad>& v,
+				rects::wh<float> quick_print(std::vector<quad>& v,
 										const std::wstring& wstr,
 										style style,
 										vec2<int> pos, 
 										unsigned wrapping_width = 0,
-										const rect_ltrb* parent = 0);
+										const rects::ltrb<float>* parent = 0);
 			}
 		}
 	}

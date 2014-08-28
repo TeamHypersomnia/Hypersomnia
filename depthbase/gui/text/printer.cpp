@@ -4,7 +4,7 @@
 #include "drafter.h"
 #include "printer.h"
 #include "../rect.h"
-#include "../../../window/window.h"
+#include "window_framework/window.h"
 
 #undef min
 #undef max
@@ -12,7 +12,6 @@
 /* printer's draw needs revising in terms of scrolling */
 
 namespace augs {
-	using namespace math;
 	namespace graphics {
 		using namespace augs::texture_baker;
 		namespace gui {
@@ -46,15 +45,15 @@ namespace augs {
 			//	}
 
 				void printer::blinker::update() {
-					if(timer.get_miliseconds() > interval_ms) {
+					if(timer.get<std::chrono::milliseconds>() > interval_ms) {
 						caret_visible = !caret_visible;
-						timer.microseconds();
+						timer.reset();
 					}
 					//if(blink_func) blink_func(*this, caret);
 				}
 
 				void printer::blinker::reset() {
-					timer.microseconds();
+					timer.reset();
 					caret_visible = true;
 				}
 				
@@ -77,7 +76,7 @@ namespace augs {
 						const fstr& colors,
 						const caret_info* caret,
 						vec2<int> pos,
-						const rect_ltrb* clipper
+						const rects::ltrb<float>* clipper
 						) const 
 				{
 					/* shortcuts */
@@ -92,7 +91,7 @@ namespace augs {
 					//vec2<int> global = scroll;
 
 					/* we'll draw caret at the very end of procedure so we have to declare this variable here */
-					rect_xywh caret_rect(0, 0, 0, 0);
+					rects::xywh<float> caret_rect(0, 0, 0, 0);
 					
 					/* validations */
 					/* return if we want to clip but the clipper is not a valid rectangle */
@@ -101,7 +100,7 @@ namespace augs {
 					/* here we highlight the line caret is currently on */
 					if(caret && active && highlight_current_line) {
 						drafter::line highlighted = lines.size() ? lines[d.get_line(caret->pos)] : drafter::line();
-						gui::add_quad(highlight_mat, rect_xywh(0, highlighted.top, clipper ? d.get_bbox().w + clipper->w() : d.get_bbox().w,
+						gui::add_quad(highlight_mat, rects::xywh<float>(0, highlighted.top, clipper ? d.get_bbox().w + clipper->w() : d.get_bbox().w,
 
 							/* snap to default style's height */
 							highlighted.empty() ? caret->default_style.f->parent->get_height() 
@@ -110,11 +109,11 @@ namespace augs {
 
 					if(!lines.empty() && !sectors.empty()) {
 						/* only these lines we want to process */
-						pair<int, int> visible;
+						std::pair<int, int> visible;
 						
 						if(clip)
 							visible = d.get_line_visibility(*clipper - pos);
-						else visible = make_pair(0, lines.size()-1);
+						else visible = std::make_pair(0, lines.size()-1);
 
 						/* if this happens:
 						- check if there is always an empty line
@@ -140,15 +139,15 @@ namespace augs {
 							if(caret->selection_offset) {
 								unsigned select_left_line =  d.get_line(select_left);
 								unsigned select_right_line = d.get_line(select_right);
-								unsigned first_visible_selection = max(select_left_line, unsigned(visible.first));
-								unsigned last_visible_selection	 = min(select_right_line, unsigned(visible.second));
+								unsigned first_visible_selection = std::max(select_left_line, unsigned(visible.first));
+								unsigned last_visible_selection	 = std::min(select_right_line, unsigned(visible.second));
 
 								/* manage selections */
 								for(unsigned i = first_visible_selection; i <= last_visible_selection; ++i) {
 									/* init selection rect on line rectangle;
 									its values won't change if selecting between first and the last line
 									*/
-									rect_ltrb sel_rect = d.lines[i].get_rect();
+									rects::ltrb<float> sel_rect = d.lines[i].get_rect();
 
 									/* if it's the first line to process and we can see it, we have to trim its x coordinate */
 									if(i == first_visible_selection && select_left_line >= first_visible_selection)
@@ -184,7 +183,7 @@ namespace augs {
 									
 									/* add the resulting character taking bearings into account */
 									gui::add_quad(material(&g.tex, charcolor), 
-									rect_xywh (sectors[i] + g.info->bear_x, lines[l].top + lines[l].asc - g.info->bear_y, g.info->size.w, g.info->size.h) + pos, clipper, 
+									rects::xywh<float> (sectors[i] + g.info->bear_x, lines[l].top + lines[l].asc - g.info->bear_y, g.info->size.w, g.info->size.h) + pos, clipper, 
 									v);
 								}
 							}
@@ -194,33 +193,33 @@ namespace augs {
 							/* if we can retrieve some sane values */
 							if(!lines[caret_line].empty()) {
 								if(align_caret_height)
-									caret_rect = rect_xywh(sectors[caret->pos], lines[caret_line].top, caret_width, lines[caret_line].height());
+									caret_rect = rects::xywh<float>(sectors[caret->pos], lines[caret_line].top, caret_width, lines[caret_line].height());
 								else {
-									int pos = max(1u, caret->pos);
+									int pos = std::max(1u, caret->pos);
 									auto& glyph_font = *colors[pos-1].font_used->parent;
-									caret_rect = rect_xywh(sectors[caret->pos], lines[caret_line].top + lines[caret_line].asc - glyph_font.ascender, 
+									caret_rect = rects::xywh<float>(sectors[caret->pos], lines[caret_line].top + lines[caret_line].asc - glyph_font.ascender, 
 										caret_width, glyph_font.get_height());
 								}
 							}
 							/* otherwise set caret's height to default style's height to avoid strange situations */
 							else
-								caret_rect = rect_xywh(0, d.lines[caret_line].top, caret_width, caret->default_style.f->parent->get_height());
+								caret_rect = rects::xywh<float>(0, d.lines[caret_line].top, caret_width, caret->default_style.f->parent->get_height());
 
 						}
 					} 
 					/* there is nothing to draw, but we are still active so we want to draw caret anyway */
 					else if(active && caret)
-						caret_rect = rect_xywh(0, 0, caret_width, caret->default_style.f->parent->get_height());
+						caret_rect = rects::xywh<float>(0, 0, caret_width, caret->default_style.f->parent->get_height());
 					
 //					this->quad_indices.caret = v.size();
 					if(blink.caret_visible) gui::add_quad(caret_mat, caret_rect + pos, clipper, v); 
 				}
 
-				rect_wh quick_print(std::vector<quad>& v,
+				rects::wh<float> quick_print(std::vector<quad>& v,
 										const fstr& str, 
 										vec2<int> pos, 
 										unsigned wrapping_width,
-										const rect_ltrb* clipper) 
+										const rects::ltrb<float>* clipper) 
 				{
 					drafter dr;
 					printer pr;
@@ -230,12 +229,12 @@ namespace augs {
 					return dr.get_bbox();
 				}
 				
-				rect_wh quick_print(std::vector<quad>& v,
+				rects::wh<float> quick_print(std::vector<quad>& v,
 										const std::wstring& wstr,
 										gui::text::style style,
 										vec2<int> pos, 
 										unsigned wrapping_width,
-										const rect_ltrb* clipper) 
+										const rects::ltrb<float>* clipper) 
 				{
 					fstr str = format(wstr.c_str(), style);
 					drafter dr;

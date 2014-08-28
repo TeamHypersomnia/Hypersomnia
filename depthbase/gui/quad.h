@@ -23,14 +23,14 @@ namespace augs {
 			struct quad {
 				vertex p[4];
 				quad();
-				quad(const rect_ltrb&, const material&, const rect_texture& = rect_texture(0.f, 0.f, 1.f, 1.f));
+				quad(const rects::ltrb<float>&, const material&, const rect_texture& = rect_texture(0.f, 0.f, 1.f, 1.f));
 
-				static quad clipped(const rect_ltrb&, const rect_ltrb&, const material&);
-				void clip(const rect_ltrb&);
+				static quad clipped(const rects::ltrb<float>&, const rects::ltrb<float>&, const material&);
+				void clip(const rects::ltrb<float>&);
 				void move(const vec2<int>&);
-				void set (const rect_ltrb&);
+				void set (const rects::ltrb<float>&);
 				void rotate90(int times);
-				rect_ltrb get_rect() const;
+				rects::ltrb<float> get_rect() const;
 			};
 
 			/* 
@@ -38,8 +38,8 @@ namespace augs {
 			clipper = 0 means no clipping
 				returns clipped rectangle
 			*/
-			extern rect_ltrb add_quad(const material&, const rect_ltrb& origin, const rect_ltrb* clipper, std::vector<quad>& v);
-			extern void scale_virtual_res(rect_wh vres, rect_wh display, std::vector<quad>& quads);
+			extern rects::ltrb<float> add_quad(const material&, const rects::ltrb<float>& origin, const rects::ltrb<float>* clipper, std::vector<quad>& v);
+			extern void scale_virtual_res(rects::wh<float> vres, rects::wh<float> display, std::vector<quad>& quads);
 		}
 	}
 }

@@ -16,7 +16,7 @@ namespace augs {
 				p -= vec2<>(float(vel[0] * fps.frame_speed()), float(vel[1] * fps.frame_speed()));
 			}
 
-			void dragger::drag(const vec2<int>& m, const rect_ltrb& rc) {
+			void dragger::drag(const vec2<int>& m, const rects::ltrb<float>& rc) {
 				stop();
 				if(m.x < rc.l) vel[0] = float(-(rc.l - m.x));
 				else if(m.x > rc.r) vel[0] = float(m.x - rc.r);

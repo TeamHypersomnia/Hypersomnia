@@ -3,7 +3,8 @@
 #include "stylesheet.h"
 #include <algorithm>
 #include <functional>
-
+#undef max
+#undef min
 namespace augs {
 	namespace graphics {
 		namespace gui {
@@ -21,17 +22,17 @@ namespace augs {
 			}
 
 
-			rect::rect(const rect_xywh& rc) 
+			rect::rect(const rects::xywh<float>& rc) 
 				: rc(rc), parent(nullptr), snap_scroll_to_content(true),
-				draw(true), was_hovered(false), fetch_wheel(false), clip(true), scrollable(true), content_size(rect_wh()), rc_clipped(rc), preserve_focus(false), focusable(true),
-				focus_next(nullptr), focus_prev(nullptr), clipping_rect(0, 0, numeric_limits<int>::max()/2, numeric_limits<int>::max()/2) 
+				draw(true), was_hovered(false), fetch_wheel(false), clip(true), scrollable(true), content_size(rects::wh<float>()), rc_clipped(rc), preserve_focus(false), focusable(true),
+				focus_next(nullptr), focus_prev(nullptr), clipping_rect(0, 0, std::numeric_limits<int>::max()/2, std::numeric_limits<int>::max()/2) 
 			{
 				quad_indices.background = -1;
 			}
 			
-			rect_wh rect::get_content_size() {
+			rects::wh<float> rect::get_content_size() {
 				/* init on zero */
-				rect_ltrb content = rect_ltrb(0, 0, 0, 0);
+				rects::ltrb<float> content = rects::ltrb<float>(0, 0, 0, 0);
 				
 				/* enlarge the content size by every child */
 				auto children_all = children;
@@ -51,7 +52,7 @@ namespace augs {
 				if(parent) {
 					/* we have to save our global coordinates in absolute_xy */
 					absolute_xy = parent->absolute_xy + vec2<int>(rc) - parent->scroll;
- 					rc_clipped  = rect_xywh(absolute_xy.x, absolute_xy.y, rc.w(), rc.h());
+ 					rc_clipped  = rects::xywh<float>(absolute_xy.x, absolute_xy.y, rc.w(), rc.h());
 					
 					/* and we have to clip by first clipping parent's rc_clipped */
 					//auto* clipping = get_clipping_parent(); 
@@ -106,7 +107,7 @@ namespace augs {
 				}
 			}
 			 
-			void rect::get_member_children(vector<rect*>& children) {
+			void rect::get_member_children(std::vector<rect*>& children) {
 
 			}
 			
@@ -156,7 +157,7 @@ namespace augs {
 				auto& gr = e.owner;
 				auto& wnd = gr.owner.events;
 				if(e == event::mdown || e == event::mdoubleclick) {
-					if(scrollable && !content_size.inside(rect_wh(rc))) {
+					if(scrollable && !content_size.inside(rects::wh<float>(rc))) {
 						gr.middlescroll.subject = this;
 						gr.middlescroll.pos = wnd.mouse.pos;
 						gr.set_focus(this);
@@ -360,30 +361,30 @@ namespace augs {
 			}
 
 			bool rect::is_scroll_aligned() {
-				return rect_wh(rc).is_sticked(content_size, scroll);
+				return rects::wh<float>(rc).is_sticked(content_size, scroll);
 			}
 			
 			void rect::align_scroll() {
-				rect_wh(rc).stick_relative(content_size, scroll);
+				rects::wh<float>(rc).stick_relative(content_size, scroll);
 			}
 
 			void rect::scroll_to_view() {
 				if(parent) {
-					rect_ltrb global = get_rect_absolute();
-					rect_ltrb parent_global = parent->get_rect_absolute();
-					vec2<int> off1 = vec2<int>(max(0, global.r + 2 - parent_global.r), max(0, global.b + 2 - parent_global.b));
-					vec2<int> off2 = vec2<int>(max(0, parent_global.l - global.l + 2 + off1.x), max(0, parent_global.t - global.t + 2 + off1.y));
+					rects::ltrb<float> global = get_rect_absolute();
+					rects::ltrb<float> parent_global = parent->get_rect_absolute();
+					vec2<int> off1 = vec2<int>(std::max(0, global.r + 2 - parent_global.r), std::max(0, global.b + 2 - parent_global.b));
+					vec2<int> off2 = vec2<int>(std::max(0, parent_global.l - global.l + 2 + off1.x), std::max(0, parent_global.t - global.t + 2 + off1.y));
 					parent->scroll += off1;
 					parent->scroll -= off2;
 					parent->scroll_to_view();
 				}
 			}
 
-			rect_ltrb rect::local_add(const material& mat, const rect_ltrb& origin, std::vector<quad>& v) const {
+			rects::ltrb<float> rect::local_add(const material& mat, const rects::ltrb<float>& origin, std::vector<quad>& v) const {
 				return add_quad(mat, origin+get_absolute_xy()-scroll, this, v);
 			}
 			
-			rect_ltrb rect::add_quad(const material& mat, const rect_ltrb& origin, const rect* p, std::vector<quad>& v) {
+			rects::ltrb<float> rect::add_quad(const material& mat, const rects::ltrb<float>& origin, const rect* p, std::vector<quad>& v) {
 				/* if p is null, we don't clip at all
 				   if p is not null and p->clip is true, we take p->rc_clipped as clipper
 				   if p is not null and p->clip is false, we search for the first clipping parent's rc_clipped
@@ -457,15 +458,15 @@ namespace augs {
 				}
 			}
 
-			const rect_ltrb& rect::get_clipped_rect() const {
+			const rects::ltrb<float>& rect::get_clipped_rect() const {
 				return rc_clipped;
 			}
 			
-			rect_ltrb rect::get_local_clipper() const {
-				return rect_ltrb(rect_wh(rc)) + scroll;
+			rects::ltrb<float> rect::get_local_clipper() const {
+				return rects::ltrb<float>(rects::wh<float>(rc)) + scroll;
 			}
 
-			rect_ltrb rect::get_clipping_rect() const {
+			rects::ltrb<float> rect::get_clipping_rect() const {
 				return clipping_rect;
 			}
 				
@@ -473,8 +474,8 @@ namespace augs {
 				return parent;
 			}
 				
-			rect_ltrb rect::get_rect_absolute() const {
-				return rect_xywh(absolute_xy.x, absolute_xy.y, rc.w(), rc.h());
+			rects::ltrb<float> rect::get_rect_absolute() const {
+				return rects::xywh<float>(absolute_xy.x, absolute_xy.y, rc.w(), rc.h());
 			}
 
 			const vec2<int>& rect::get_absolute_xy() const {

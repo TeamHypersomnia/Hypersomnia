@@ -41,7 +41,7 @@ namespace augs {
 					virtual void on_del(bool);
 					virtual void on_drag(vec2<int> mouse);
 
-					virtual rect_wh get_content_size() override;
+					virtual rects::wh<float> get_content_size() override;
 					virtual void event_proc(event_info) override;
 					virtual void update_proc(group&) override;
 

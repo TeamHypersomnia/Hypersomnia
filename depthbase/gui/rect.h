@@ -90,15 +90,15 @@ namespace augs {
 
 				bool draw, clip, fetch_wheel, scrollable, snap_scroll_to_content, preserve_focus, focusable;
 				vec2<int> drag_origin;
-				rect_ltrb rc; /* actual rectangle */ 
-				rect_wh content_size; /* content's (children's) bounding box */
+				rects::ltrb<float> rc; /* actual rectangle */ 
+				rects::wh<float> content_size; /* content's (children's) bounding box */
 				vec2<> scroll; /* scrolls content */
 				
 				std::vector<rect*> children;
 				
-				rect(const rect_xywh& rc = rect_xywh());
+				rect(const rects::xywh<float>& rc = rects::xywh<float>());
 				
-				virtual rect_wh get_content_size();
+				virtual rects::wh<float> get_content_size();
 				
 				void update_rectangles();
 				virtual void update_proc(group&);
@@ -128,10 +128,10 @@ namespace augs {
 				virtual void get_member_children(std::vector<rect*>& children);
 
 				/* passes 0 or clipper's rc_clipped as clipper depending on clipper's clip flag */
-				static rect_ltrb add_quad (const material&, const rect_ltrb& global, const rect* clipper, std::vector<quad>& v);
+				static rects::ltrb<float> add_quad (const material&, const rects::ltrb<float>& global, const rect* clipper, std::vector<quad>& v);
 				
 				/* simpler routine for more complex draws like text, origin is shifted to be local */
-				rect_ltrb		 local_add(const material&, const rect_ltrb& local, std::vector<quad>& v) const;
+				rects::ltrb<float>		 local_add(const material&, const rects::ltrb<float>& local, std::vector<quad>& v) const;
 				
 				/* how should rect look like depending on incoming event */
 				static appearance get_appearance(event m); 
@@ -150,11 +150,11 @@ namespace augs {
 				void gen_focus_links_depth(rect* next = nullptr);
 				void gen_focus_links	  ();
 				
-				const rect_ltrb& get_clipped_rect() const;
-				rect_ltrb get_rect_absolute() const;
+				const rects::ltrb<float>& get_clipped_rect() const;
+				rects::ltrb<float> get_rect_absolute() const;
 				const vec2<int>& get_absolute_xy() const;
-				rect_ltrb get_local_clipper() const;
-				rect_ltrb get_clipping_rect() const;
+				rects::ltrb<float> get_local_clipper() const;
+				rects::ltrb<float> get_clipping_rect() const;
 				rect* get_parent() const;
 
 				static rect* seek_focusable(rect*, bool);
@@ -162,7 +162,7 @@ namespace augs {
 				friend class group;
 				rect* parent; 
 			private:
-				rect_ltrb rc_clipped, clipping_rect;
+				rects::ltrb<float> rc_clipped, clipping_rect;
 				vec2<int> absolute_xy;
 
 				bool was_hovered;

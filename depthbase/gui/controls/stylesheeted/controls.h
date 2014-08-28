@@ -26,7 +26,7 @@ namespace augs {
 
 					struct crect : public rect {
 						stylesheet styles;
-						crect(const rect_xywh& r = rect_xywh(), const stylesheet& styles = rect_style);
+						crect(const rects::xywh<float>& r = rects::xywh<float>(), const stylesheet& styles = rect_style);
 
 						virtual void draw_proc(draw_info in) override;
 						virtual void event_proc(event_info) override;

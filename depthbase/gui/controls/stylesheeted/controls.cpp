@@ -80,7 +80,7 @@ namespace augs {
 					cproperty_textbox::cproperty_textbox(const property_textbox& r, const stylesheet& styles)
 						: styles(styles), property_textbox(r) {}
 
-					crect::crect(const rect_xywh& r, const stylesheet& styles) 
+					crect::crect(const rects::xywh<float>& r, const stylesheet& styles) 
 						: styles(styles), rect(r)  { focusable = false; }
 
 					cchecklabel::cchecklabel(const checklabel& c, const stylesheet& styles_active, const stylesheet& styles_inactive) 

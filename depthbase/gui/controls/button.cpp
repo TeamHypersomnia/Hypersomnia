@@ -1,6 +1,6 @@
 #pragma once
 #include "button.h"
-#include "../../../event.h"
+#include "window_framework/event.h"
 #include "../system.h"
 
 namespace augs {
@@ -41,7 +41,7 @@ namespace augs {
 					center();
 				}
 
-				text_button::text_button(const button& b, augs::vec2<int> p, const text::fstr& f) : button(b), label(rect_xywh(p.x, p.y, 0, 0), f) {
+				text_button::text_button(const button& b, augs::vec2<int> p, const text::fstr& f) : button(b), label(rects::xywh<float>(p.x, p.y, 0, 0), f) {
 				}
 
 				void text_button::get_member_children(std::vector<rect*>& v) {

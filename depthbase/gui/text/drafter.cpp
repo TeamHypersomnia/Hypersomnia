@@ -65,8 +65,8 @@ namespace augs {
 
 				drafter::line::line() : begin(0), end(0), top(0), right(0), asc(0), desc(0), wrapped(false) {}
 
-				rect_xywh drafter::line::get_rect() const {
-					return rect_ltrb(0, top, right, bottom());
+				rects::xywh<float> drafter::line::get_rect() const {
+					return rects::ltrb<float>(0, top, right, bottom());
 				}
 
 				void drafter::line::set(int _y, int _asc, int _desc) {
@@ -130,7 +130,7 @@ namespace augs {
 					lines.push_back(line());
 				}
 
-				vec2<int> drafter::view_caret(unsigned caret_pos, const rect_ltrb& clipper) const {
+				vec2<int> drafter::view_caret(unsigned caret_pos, const rects::ltrb<float>& clipper) const {
 					vec2<int> offset(0, 0);
 
 					if(!clipper.good() || !clipper.hover(get_bbox()))
@@ -298,13 +298,13 @@ namespace augs {
 					sectors.push_back(pen.x);
 				}
 
-				rect_wh drafter::get_bbox() const {
-					if(sectors.empty() || lines.empty()) return rect_wh(0,0);
+				rects::wh<float> drafter::get_bbox() const {
+					if(sectors.empty() || lines.empty()) return rects::wh<float>(0,0);
 					/* plus 1 for caret, so the view caret is not canceled by align_scroll */
-					return rect_wh(max_x+1, lines[lines.size()-1].bottom());
+					return rects::wh<float>(max_x+1, lines[lines.size()-1].bottom());
 				}
 
-				std::pair<int, int> drafter::get_line_visibility(const rect_ltrb& clipper) const {
+				std::pair<int, int> drafter::get_line_visibility(const rects::ltrb<float>& clipper) const {
 					if(!clipper.good() || !clipper.hover(get_bbox())) 
 						return make_pair(-1, -1);
 

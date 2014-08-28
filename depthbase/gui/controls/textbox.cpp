@@ -117,7 +117,7 @@ namespace augs {
 						blink_reset = true;
 				}
 
-				rect_wh textbox::get_content_size() {
+				rects::wh<float> textbox::get_content_size() {
 					editor.guarded_redraw();
 					return editor.get_draft().get_bbox();
 				}
@@ -212,7 +212,7 @@ namespace augs {
 
 				
 				property_textbox::property_textbox(vec2<int> pos, int width, text::style default_style, std::function<void(std::wstring&)> property_guard)
-					: textbox(rect_xywh(pos.x, pos.y, width, default_style.f->get_height()), default_style), property_guard(property_guard) {
+					: textbox(rects::xywh<float>(pos.x, pos.y, width, default_style.f->get_height()), default_style), property_guard(property_guard) {
 				}
 				
 				std::wstring property_textbox::get_str() const {

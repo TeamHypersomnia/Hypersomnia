@@ -22,7 +22,7 @@ namespace augs {
 				draw(out, r.get_rect_absolute(), &r.get_parent()->get_clipping_rect());
 			}
 
-			void solid_stroke::draw(std::vector<quad>& out, rect_ltrb g, const rect_ltrb* clipper) const {
+			void solid_stroke::draw(std::vector<quad>& out, rects::ltrb<float> g, const rects::ltrb<float>* clipper) const {
 				if(_type == OUTSIDE) {
 					g.l -= left.width;
 					g.t -= top.width;
@@ -30,7 +30,7 @@ namespace augs {
 					g.b += bottom.width;
 				}
 
-				rect_ltrb lines[4] = { g, g, g, g }; 
+				rects::ltrb<float> lines[4] = { g, g, g, g }; 
 
 				lines[0].r = g.l + left.width;
 				lines[1].b = g.t + top.width;
