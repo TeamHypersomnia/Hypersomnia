@@ -60,6 +60,7 @@ bool callback_textbox::is_clean() {
 
 void callback_textbox::set_area(augs::rects::xywh<float> area) {
 	textbox_object.rc = rect_xywh(area.x, area.y, area.w, area.h);
+	textbox_object.editor.draft().wrap_width = area.w;
 
 }
 
@@ -81,7 +82,7 @@ void callback_textbox::setup(augs::rects::xywh<float> area, bool is_input_textbo
 	textbox_object.editor.draft().wrap_width = 0;
 	textbox_object.editor.draft().kerning = false;
 
-	//chat_textbox.editor.draft().wrap_width = w;
+	textbox_object.editor.draft().wrap_width = area.w;
 	//chat_textbox.rc.b = background.rc.b;
 
 	/* visual settings */
@@ -138,6 +139,10 @@ void callback_textbox::backspace() {
 	textbox_object.editor.backspace();
 }
 
+void callback_textbox::view_caret() {
+	textbox_object.show_caret();
+}
+
 augs::vec2<> callback_textbox::get_text_bbox() {
 	auto result = textbox_object.editor.get_draft().get_bbox();
 	return augs::vec2<>(result.w, result.h);
@@ -150,6 +155,10 @@ void callback_textbox::draw(bool flag) {
 
 void callback_textbox::focus() {
 	owner->main_window.set_focus(&textbox_object);
+}
+
+unsigned callback_textbox::get_length() {
+	return textbox_object.editor.get_str().size();
 }
 
 void hypersomnia_gui::blur() {

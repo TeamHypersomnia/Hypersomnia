@@ -163,8 +163,11 @@ struct callback_textbox {
 	void set_alpha_range(int pos1, int pos2, unsigned val);
 
 	void set_caret(unsigned pos, bool select = false);
+	unsigned get_length();
 	void remove_line();
 	void backspace();
+
+	void view_caret();
 
 	augs::vec2<> get_text_bbox();
 
