@@ -165,6 +165,8 @@ struct callback_textbox {
 	void set_caret(unsigned pos, bool select = false);
 	void remove_line();
 	void backspace();
+
+	void draw(bool);
 	
 	void setup(augs::rects::xywh<float>, bool is_input_textbox);
 };

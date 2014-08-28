@@ -140,6 +140,7 @@ void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
 		.def("remove_line", &callback_textbox::remove_line)
 		.def("is_focused", &callback_textbox::is_focused)
 		.def("focus", &callback_textbox::focus)
+		.def("draw", &callback_textbox::draw)
 		.def("clear_text", &callback_textbox::clear_text)
 		.def("is_clean", &callback_textbox::is_clean)
 		.def("set_alpha_range", &callback_textbox::set_alpha_range)

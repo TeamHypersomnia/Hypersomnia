@@ -38,10 +38,15 @@ function gui_class:set_enabled(flag)
 			main_input_context.enabled = false
 			gui_input_context.enabled = true
 		
+			self.content_chatbox:draw(true)
+			self.recent_messages_textbox:draw(false)
 			set_border(self.content_chatbox, "released", 1, rgba(255, 255, 255, 30))
 			set_color(self.content_chatbox, "released", rgba(0, 0, 0, 50))
 			set_color(self.main_chatbox, "released", rgba(0, 0, 0, 100))
 		else
+			self.content_chatbox:draw(false)
+			self.recent_messages_textbox:draw(true)
+			
 			main_input_context.enabled = true
 			gui_input_context.enabled = true
 			
@@ -117,9 +122,10 @@ function gui_class:constructor(camera_rect, world_object, owner_client)
 	
 	self.recent_messages_textbox = callback_textbox(self.gui)
 	self.recent_messages_textbox:setup(rect_xywh(20, camera_rect.h - 500 + 100 + 150, 350, 150), false)
-	self.recent_messages = recent_messages_class:create(self.recent_messages_textbox, nil)-- self.content_chatbox)
+	self.recent_messages = recent_messages_class:create(self.recent_messages_textbox, self.content_chatbox)
 	
-	--set_color(self.content_chatbox, "released", rgba(0, 0, 0, 50))
+	set_color(self.recent_messages_textbox, "released", rgba(0, 0, 0, 0))
+	set_border(self.recent_messages_textbox, "released", 0, rgba(0, 0, 0, 0))
 	--set_color(self.main_chatbox, "released", rgba(0, 0, 0, 100))
 	--set_color(self.focusable_bg, "released", rgba(0, 0, 0, 0))
 	

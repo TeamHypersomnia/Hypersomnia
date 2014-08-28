@@ -13,7 +13,7 @@ function recent_messages_class:append_message(formatted, raw_string, message_dur
 	local message_len = 0
 	
 	if not message_duration then
-		message_duration = 2000
+		message_duration = 6000
 	end
 	
 	formatted[#formatted].str:add(13)
@@ -25,11 +25,9 @@ function recent_messages_class:append_message(formatted, raw_string, message_dur
 		
 		self.subject_textbox:append_text(formatted[i].str, formatted[i].color)
 		
-		if second_textbox then
+		if self.second_textbox then
 			self.second_textbox:append_text(formatted[i].str, formatted[i].color)
 		end
-		
-		self.second_textbox = second_textbox
 	
 		message_len = message_len + formatted[i].str:size()
 	end

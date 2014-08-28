@@ -133,6 +133,10 @@ void callback_textbox::backspace() {
 	textbox_object.editor.backspace();
 }
 
+void callback_textbox::draw(bool flag) {
+	textbox_object.draw = flag;
+}
+
 void callback_textbox::focus() {
 	owner->main_window.set_focus(&textbox_object);
 }
