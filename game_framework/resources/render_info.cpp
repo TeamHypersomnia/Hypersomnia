@@ -92,6 +92,10 @@ namespace resources {
 	}
 
 	void sprite::draw(draw_input& in) {
+		if (in.additional_info) {
+			in.additional_info->was_drawn = false;
+		}
+
 		vec2<> v[4];
 		make_rect(in.transform.pos, vec2<>(size), in.transform.rotation, v);
 		if (!in.always_visible && !rects::ltrb<float>::get_aabb(v).hover(in.rotated_camera_aabb)) return;
@@ -146,6 +150,7 @@ namespace resources {
 		if (in.additional_info) {
 			/* compute average */
 			in.additional_info->last_screen_pos = (vec2<>(v[0]) + vec2<>(v[1]) + vec2<>(v[2]) + vec2<>(v[3])) / 4;
+			in.additional_info->was_drawn = true;
 		}
 
 		in.output->push_triangle(t1);

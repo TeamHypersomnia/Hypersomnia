@@ -24,7 +24,7 @@ std::string wchar_vec_to_str(misc::vector_wrapper<wchar_t> str) {
 
 rects::wh<float> quick_print_wrapper(resources::renderable::draw_input v,
 	const std::vector<formatted_char>& str,
-	vec2<int> pos,
+	vec2<> pos,
 	unsigned wrapping_width,
 	const rects::ltrb<float>* clipper)
 {
