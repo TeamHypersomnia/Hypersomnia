@@ -106,6 +106,8 @@ function client_screen:constructor(camera_rect)
 	self.systems.item = item_system:create(self.sample_scene.world_object)
 	self.systems.inventory = inventory_system:create(self.sample_scene)
 	
+	self.systems.label = label_system:create()
+	
 	table.insert(self.sample_scene.world_object.prestep_callbacks, function (dt)
 		self.systems.input_prediction:substep()
 		

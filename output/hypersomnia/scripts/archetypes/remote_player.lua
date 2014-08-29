@@ -132,7 +132,19 @@ world_archetype_callbacks.REMOTE_PLAYER = {
 			
 			health = {},
 			
-			wield = {}
+			wield = {},
+			
+			label = {
+				position = components.label.positioning.OVER_HEALTH_BAR,
+				
+				text = {
+					{
+						str = "Cristopher Zderzacki",
+						col = rgba(255, 255, 255, 255),
+						font = self.owner_scene.font_by_name["kubasta"]
+					}
+				}
+			}
 		}
 		
 		new_entity.wield.on_item_wielded = function(this, picked, old_item, wielding_key)

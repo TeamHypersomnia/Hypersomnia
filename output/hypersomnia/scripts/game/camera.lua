@@ -117,6 +117,8 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				orthographic_projection(0, visible_area.x, visible_area.y, 0, 0, 1):data()
 				)
 	
+				owner_world.owner_client_screen.systems.label:draw_labels(camera_draw_input)
+				
 				owner_world.owner_client_screen.my_gui:draw_call(camera_draw_input)
 				renderer:call_triangles()
 				renderer:draw_debug_info(camera_draw_input.visible_area, camera_draw_input.camera_transform, blank_sprite.tex)
