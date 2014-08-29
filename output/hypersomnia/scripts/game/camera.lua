@@ -92,7 +92,7 @@ function create_world_camera_entity(owner_world, blank_sprite)
 			size = vec2(config_table.resolution_w, config_table.resolution_h),
 			
 			drawing_callback = function (subject, camera_draw_input, mask)
-				subject.script.owner_scene.all_atlas:force_bind()
+				subject.script.owner_scene.all_atlas:bind()
 				-- now assuming that the atlas is already bound upon setting this scene to current
 			
 				local renderer = camera_draw_input.output
@@ -117,8 +117,8 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				orthographic_projection(0, visible_area.x, visible_area.y, 0, 0, 1):data()
 				)
 	
+				owner_world.owner_client_screen.my_gui:draw_call(camera_draw_input)
 				renderer:call_triangles()
-				owner_world.owner_client_screen.my_gui:draw_call()
 				renderer:draw_debug_info(camera_draw_input.visible_area, camera_draw_input.camera_transform, blank_sprite.tex)
 				renderer:clear_triangles()
 				

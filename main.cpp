@@ -6,8 +6,7 @@
 #include "augmentations.h"
 
 int main() {
-	/* temporarily don't enable freetype */
-	framework::init(augs::which_augs::GDIPLUS | augs::which_augs::GLEW | augs::which_augs::WINDOWS_API);
+	framework::init();
 
 	augs::lua_state_wrapper lua_state;
 	framework::bind_whole_engine(lua_state);

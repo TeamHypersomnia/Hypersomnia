@@ -4,16 +4,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hypersomnia", "Hypersomnia.vcxproj", "{C3710A9A-6D71-4981-A34A-6CD74BD93E18}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D983A311-7041-491C-89AF-4B15E1249C21} = {D983A311-7041-491C-89AF-4B15E1249C21}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Augmentations", "..\Augmentations\Augmentations.vcxproj", "{6CC06ECD-D908-4A12-A57B-CEEEEF078609}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D983A311-7041-491C-89AF-4B15E1249C21} = {D983A311-7041-491C-89AF-4B15E1249C21}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DepthBase", "..\MicroPlus\code\depthbase\DepthBase.vcxproj", "{D983A311-7041-491C-89AF-4B15E1249C21}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,12 +29,6 @@ Global
 		{6CC06ECD-D908-4A12-A57B-CEEEEF078609}.Release|Win32.Build.0 = Release|Win32
 		{6CC06ECD-D908-4A12-A57B-CEEEEF078609}.Release|x64.ActiveCfg = Release|x64
 		{6CC06ECD-D908-4A12-A57B-CEEEEF078609}.Release|x64.Build.0 = Release|x64
-		{D983A311-7041-491C-89AF-4B15E1249C21}.Debug|Win32.ActiveCfg = Debug|Win32
-		{D983A311-7041-491C-89AF-4B15E1249C21}.Debug|Win32.Build.0 = Debug|Win32
-		{D983A311-7041-491C-89AF-4B15E1249C21}.Debug|x64.ActiveCfg = Debug|Win32
-		{D983A311-7041-491C-89AF-4B15E1249C21}.Release|Win32.ActiveCfg = Release|Win32
-		{D983A311-7041-491C-89AF-4B15E1249C21}.Release|Win32.Build.0 = Release|Win32
-		{D983A311-7041-491C-89AF-4B15E1249C21}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

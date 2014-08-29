@@ -1,10 +1,12 @@
 #pragma once
 #include <functional>
-#include "../../MicroPlus/code/depthbase/include/db.h"
+#include "depthbase/gui/system.h"
+#include "depthbase/gui/controls/stylesheeted/controls.h"
 #include "misc/timer.h"
 #include "math/vec2d.h"
 #include "graphics/pixel.h"
 
+#include "game_framework/resources/render_info.h"
 namespace augs {
 	namespace misc {
 		/* vector wrapper that is used to faciliate binding to lua */
@@ -13,16 +15,16 @@ namespace augs {
 	}
 }
 
-using namespace db::graphics::gui::controls::stylesheeted;
-
 const int IMAGES = 1;
 const int FONTS = 1;
-
-DB_USE_ALL_NAMESPACES;
 
 namespace luabind {
 	struct object;
 }
+
+using namespace augs::window;
+using namespace augs::graphics::gui::controls::stylesheeted;
+using namespace augs::graphics::gui::controls;
 
 struct textbox_wrapper : public ctextbox {
 	cscrollarea* sl = nullptr;
@@ -44,14 +46,14 @@ struct textbox_wrapper : public ctextbox {
 		}
 
 		if (is_input_textbox) {
-			if (m.msg == rect::event::character && m.owner.owner.events.utf16 == db::event::keys::ENTER) {
+			if (m.msg == rect::event::character && m.owner.owner.events.utf16 == window::event::keys::ENTER) {
 				return;
 			}
 
 			if (m.msg == rect::event::keydown) {
-				if (m.owner.owner.events.key == db::event::keys::ENTER && !m.owner.owner.events.keys[db::event::keys::LSHIFT]) {
+				if (m.owner.owner.events.key == window::event::keys::ENTER && !m.owner.owner.events.keys[window::event::keys::LSHIFT]) {
 					if (command_callback)
-						command_callback(wstr(editor.get_str()));
+						command_callback(augs::misc::wstr(editor.get_str()));
 
 					return;
 				}
@@ -79,29 +81,18 @@ namespace augs {
 struct hypersomnia_gui {
 	augs::misc::timer delta_timer;
 
-	glwindow gl;
-	augs::window::glwindow& actual_window;
+	augs::window::glwindow& gl;
 
-	image images[IMAGES];
-	texture textures[IMAGES];
+	augs::graphics::gui::system sys;
+	augs::graphics::gui::group main_window = augs::graphics::gui::group(sys);
 
-	font_file fontf[FONTS];
-	font      fonts[FONTS];
-	
-	io::input::atlas atl;
-	
-	gui::system sys = gui::system(gl.events);
-	gui::group main_window = gui::group(sys);
-	rect world_text;
-
-	hypersomnia_gui(augs::window::glwindow& actual_window) : actual_window(actual_window) {
-	}
+	hypersomnia_gui(augs::window::glwindow& gl);
 
 	augs::vec2<> camera_size;
-	void setup(augs::vec2<> camera_size);
+	void setup(augs::vec2<> camera_size, texture_baker::texture* blank_texture);
 
 	void poll_events();
-	void draw_call();
+	void draw_call(resources::renderable::draw_input& in);
 	void blur();
 
 	static void bind(augs::lua_state_wrapper&);
@@ -141,11 +132,11 @@ struct callback_rect {
 struct callback_textbox {
 	cslider sl = cslider(20);
 	cslider slh = cslider(20);
-	cscrollarea myscrtx = cscrollarea(scrollarea(rect_xywh(0, 0, 10, 0), &textbox_object, &sl, scrollarea::orientation::VERTICAL));
-	cscrollarea myscrhtx = cscrollarea(scrollarea(rect_xywh(0, 0, 0, 10), &textbox_object, &slh, scrollarea::orientation::HORIZONTAL));
+	cscrollarea myscrtx = cscrollarea(scrollarea(rects::xywh<float>(0, 0, 10, 0), &textbox_object, &sl, scrollarea::orientation::VERTICAL));
+	cscrollarea myscrhtx = cscrollarea(scrollarea(rects::xywh<float>(0, 0, 0, 10), &textbox_object, &slh, scrollarea::orientation::HORIZONTAL));
 
-	text::style   active;
-	text::style inactive;
+	augs::graphics::gui::text::style   active;
+	augs::graphics::gui::text::style inactive;
 	
 	textbox_wrapper textbox_object;
 	
@@ -175,17 +166,5 @@ struct callback_textbox {
 	void draw(bool);
 	
 	void set_area(augs::rects::xywh<float>);
-	void setup(augs::rects::xywh<float>, bool is_input_textbox);
-};
-
-struct text_rect_wrapper {
-	text_rect rc;
-
-	text::style default_style;
-
-	text_rect_wrapper(hypersomnia_gui& owner);
-	void setup(augs::rects::xywh<float>);
-
-	void append_text(augs::misc::vector_wrapper<wchar_t>&, augs::graphics::pixel_32);
-	void set_color(augs::graphics::pixel_32);
+	void setup(augs::rects::xywh<float>, bool is_input_textbox, texture_baker::font*);
 };

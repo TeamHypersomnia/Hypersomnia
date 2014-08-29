@@ -43,30 +43,14 @@ void callback_textbox::append_text(augs::misc::vector_wrapper<wchar_t>& wstr, au
 	textbox_object.editor.set_caret_end(false);
 
 	auto resultant_style = textbox_object.editor.get_default_style();
-	resultant_style.color = pixel_32(color.r, color.g, color.b, color.a);
+	resultant_style.color = color;
 
 	textbox_object.editor.insert(format(std::wstring(wstr.raw.begin(), wstr.raw.end()), resultant_style));
 
 	textbox_object.editor.set_caret(prev_caret_pos, false);
 	textbox_object.editor.set_selection_offset(prev_caret_sel);
 }
-
-void text_rect_wrapper::append_text(augs::misc::vector_wrapper<wchar_t>& wstr, augs::graphics::pixel_32 color) {
-	auto resultant_style = default_style;
-	resultant_style.color = pixel_32(color.r, color.g, color.b, color.a);
-
-	rc.draft.str() += format(std::wstring(wstr.raw.begin(), wstr.raw.end()), resultant_style);
-}
-
-void text_rect_wrapper::set_color(augs::graphics::pixel_32 col) {
-	auto& str = rc.draft.str();
-	for (auto& c : str) {
-		c.r = col.r;
-		c.g = col.g;
-		c.b = col.b;
-		c.a = col.a;
-	}
-}
+using namespace graphics::gui;
 
 stylesheet::style* resolve_attr(stylesheet& subject, std::string a) {
 	if (a == "released") {
@@ -88,22 +72,15 @@ stylesheet::style* resolve_attr(stylesheet& subject, std::string a) {
 void set_color(stylesheet& subject, std::string attr, augs::graphics::pixel_32 rgba) {
 	auto* s = resolve_attr(subject, attr);
 
-	if (s) {
-		db::graphics::pixel_32 col;
-		memcpy(&col, &rgba, sizeof(col));
-		s->color.set(col);
-	}
+	if (s) 
+		s->color.set(rgba);
 }
 
 void set_border(stylesheet& subject, std::string attr, int w, augs::graphics::pixel_32 rgba) {
 	auto* s = resolve_attr(subject, attr);
 
-	if (s) {
-		db::graphics::pixel_32 col;
-		memcpy(&col, &rgba, sizeof(col));
-
-		s->border.set(solid_stroke(w, material(col)));
-	}
+	if (s) 
+		s->border.set(solid_stroke(w, material(rgba)));
 }
 
 
@@ -180,12 +157,6 @@ void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
 		.def("set_focus_callback", &callback_rect::set_focus_callback)
 		.def("set_lpressed_callback", &callback_rect::set_lpressed_callback)
 		.def("set_hover_callback", &callback_rect::set_hover_callback)
-		.def("set_blur_callback", &callback_rect::set_blur_callback),
-
-		luabind::class_<text_rect_wrapper>("text_rect")
-		.def(luabind::constructor<hypersomnia_gui&>())
-		.def("setup", &text_rect_wrapper::setup)
-		.def("append_text", &text_rect_wrapper::append_text)
-		.def("set_color", &text_rect_wrapper::set_color)
+		.def("set_blur_callback", &callback_rect::set_blur_callback)
 	];
 }
