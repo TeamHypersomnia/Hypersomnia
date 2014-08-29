@@ -28,7 +28,7 @@ function label_system:draw_labels(camera_draw_input)
 		
 		local label_bbox = get_text_bbox(formatted, 0)
 		
-		if label.position == components.label.positioning.OVER_HEALTH_BAR and target.health then
+		if label.position == components.label.positioning.OVER_HEALTH_BAR and target.health and target.health.under_bar_entity.render.was_drawn then
 			quick_print_text(
 				camera_draw_input, 
 				formatted, 
