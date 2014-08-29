@@ -43,7 +43,16 @@ client_screen = inherits_from ()
 function client_screen:constructor(camera_rect)
 	self.sample_scene = scene_class:create()
 	
-	self.sample_scene:load_map("hypersomnia\\data\\maps\\sample_map.lua", "hypersomnia\\scripts\\loaders\\basic_map_loader.lua")
+	self.sample_scene:load_map("hypersomnia\\data\\maps\\sample_map.lua", "hypersomnia\\scripts\\loaders\\basic_map_loader.lua",
+	{
+		kubasta = {
+			filename = "hypersomnia/data/Kubasta.ttf", 
+			size = 16,
+			letters = " ABCDEFGHIJKLMNOPRSTUVWXYZQabcdefghijklmnoprstuvwxyzq0123456789.!@#$%^&*()_+-=[];'\\,./{}:\"|<>?"
+		}
+	}
+	
+	)
 	
 	self.sample_scene.world_camera.camera.screen_rect = camera_rect
 	

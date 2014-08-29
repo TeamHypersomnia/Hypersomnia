@@ -20,13 +20,13 @@ function cprint(str, color, target_box, duration)
 	end
 end
 
-function gui_class:draw_call()
+function gui_class:draw_call(camera_input)
 	local content_height = self.recent_messages_textbox:get_text_bbox().y
 	
 	self.recent_messages_textbox:set_area(rect_xywh(20, self.camera_rect.h - 500 + 100 + 150 + 150 - content_height, 350, content_height))
 	
 	self.recent_messages:loop()
-	self.gui:draw_call()
+	self.gui:draw_call(camera_input)
 end
 
 function gui_class:set_enabled(flag)
@@ -114,19 +114,19 @@ function gui_class:constructor(camera_rect, world_object, owner_client)
 	}
 
 	self.gui = hypersomnia_gui(global_gl_window)
-	self.gui:setup(vec2(camera_rect.w, camera_rect.h))
+	self.gui:setup(vec2(camera_rect.w, camera_rect.h), owner_client.sample_scene.sprite_library["blank"].tex)
 	
 	self.focusable_bg = callback_rect(self.gui)
 	self.focusable_bg:setup(rect_xywh(0, 0, camera_rect.w, camera_rect.h), true)
 	
 	self.content_chatbox = callback_textbox(self.gui)
-	self.content_chatbox:setup(rect_xywh(20, camera_rect.h - 500 + 100 + 150, 350, 150), false)
+	self.content_chatbox:setup(rect_xywh(20, camera_rect.h - 500 + 100 + 150, 350, 150), false, owner_client.sample_scene.font_by_name.kubasta)
 	
 	self.main_chatbox = callback_textbox(self.gui)
-	self.main_chatbox:setup(rect_xywh(20, camera_rect.h - 160 + 90, 350, 35), true)
+	self.main_chatbox:setup(rect_xywh(20, camera_rect.h - 160 + 90, 350, 35), true, owner_client.sample_scene.font_by_name.kubasta)
 	
 	self.recent_messages_textbox = callback_textbox(self.gui)
-	self.recent_messages_textbox:setup(rect_xywh(20, camera_rect.h - 500 + 100 + 150, 350, 150), false)
+	self.recent_messages_textbox:setup(rect_xywh(20, camera_rect.h - 500 + 100 + 150, 350, 150), false, owner_client.sample_scene.font_by_name.kubasta)
 	self.recent_messages = recent_messages_class:create(self.recent_messages_textbox, self.content_chatbox)
 	
 	set_color(self.recent_messages_textbox, "released", rgba(0, 0, 0, 0))
