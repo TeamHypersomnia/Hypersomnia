@@ -78,14 +78,15 @@ namespace augs {
 				 parent = 0 means no clipping/shifting
 				returns text's bounding box (without clipping)
 				*/
+				extern vec2<int> get_text_bbox(const std::basic_string<formatted_char>& str, unsigned wrapping_width);
 
-				rects::wh<float> quick_print(std::vector<quad>& v,
+				extern rects::wh<float> quick_print(std::vector<quad>& v,
 										const fstr& str, 
 										vec2<int> pos, 
 										unsigned wrapping_width = 0,
 										const rects::ltrb<float>* parent = 0);
 
-				rects::wh<float> quick_print(std::vector<quad>& v,
+				extern rects::wh<float> quick_print(std::vector<quad>& v,
 										const std::wstring& wstr,
 										style style,
 										vec2<int> pos, 

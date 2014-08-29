@@ -4,7 +4,7 @@
 
 namespace augs {
 	namespace graphics {
-		extern augs::misc::fpstimer fps;
+		augs::misc::fpstimer fps;
 
 		namespace gui {
 			dragger::dragger() : vel_mult(1.f) {

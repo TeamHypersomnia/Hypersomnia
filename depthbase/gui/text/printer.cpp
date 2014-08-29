@@ -214,6 +214,14 @@ namespace augs {
 //					this->quad_indices.caret = v.size();
 					if(blink.caret_visible) gui::add_quad(caret_mat, caret_rect + pos, clipper, v); 
 				}
+				
+				vec2<int> get_text_bbox(const std::basic_string<formatted_char>& str, unsigned wrapping_width)
+				{
+					 drafter dr;
+					 dr.wrap_width = wrapping_width;
+					 dr.draw(str);
+					 return vec2<int>(dr.get_bbox().w, dr.get_bbox().h);
+				}
 
 				rects::wh<float> quick_print(std::vector<quad>& v,
 										const fstr& str, 

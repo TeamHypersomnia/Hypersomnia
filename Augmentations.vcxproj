@@ -918,14 +918,6 @@
     </ClCompile>
     <ClCompile Include="utilities\error\error.cpp" />
     <ClCompile Include="utilities\graphics\pixel.cpp" />
-    <ClCompile Include="utilities\graphics\text\drafter.cpp" />
-    <ClCompile Include="utilities\graphics\text\printer.cpp" />
-    <ClCompile Include="utilities\graphics\text\system.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugExe|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="utilities\graphics\text\word_separator.cpp" />
     <ClCompile Include="utilities\math\rects.cpp" />
     <ClCompile Include="utilities\math\vec2d.cpp" />
     <ClCompile Include="game_framework\bindings\behaviour_tree_binding.cpp">
@@ -1992,10 +1984,6 @@
     <ClInclude Include="utilities\entity_system\world.h" />
     <ClInclude Include="utilities\error\error.h" />
     <ClInclude Include="utilities\graphics\pixel.h" />
-    <ClInclude Include="utilities\graphics\text\drafter.h" />
-    <ClInclude Include="utilities\graphics\text\printer.h" />
-    <ClInclude Include="utilities\graphics\text\system.h" />
-    <ClInclude Include="utilities\graphics\text\word_separator.h" />
     <ClInclude Include="utilities\misc\file_watcher.h" />
     <ClInclude Include="utilities\misc\id_generator.h" />
     <ClInclude Include="utilities\network\bitstream.h" />

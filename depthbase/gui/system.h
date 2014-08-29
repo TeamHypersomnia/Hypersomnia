@@ -11,7 +11,6 @@ namespace augs {
 	namespace graphics {
 		extern misc::fpstimer fps;
 		namespace gui {
-			extern augs::texture_baker::texture* null_texture;
 			namespace text {
 				struct formatted_char {
 					augs::texture_baker::font* font_used;

@@ -2,8 +2,8 @@
 #include "stdafx.h"
 #include "bindings.h"
 
-#include "graphics/text/printer.h"
-#include "graphics/text/drafter.h"
+#include "depthbase/gui/text/printer.h"
+#include "depthbase/gui/text/drafter.h"
 
 #include "misc/vector_wrapper.h"
 
@@ -40,8 +40,8 @@ namespace bindings {
 			luabind::def("wchar_vec_to_str", wchar_vec_to_str),
 			luabind::def("towchar", towchar),
 			luabind::def("towchar_vec", towchar_vec),
-			luabind::def("get_text_bbox", get_text_bbox),
-			luabind::def("quick_print_text", quick_print)
+			luabind::def("get_text_bbox", get_text_bbox)
+//			luabind::def("quick_print_text", quick_print)
 			
 			//.def("append", &graphics::gui::text::fstr::append)
 

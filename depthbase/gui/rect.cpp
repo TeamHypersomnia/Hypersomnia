@@ -46,12 +46,13 @@ namespace augs {
 
 			void rect::update_rectangles() {
 				/* init; later to be processed absolute and clipped with local rc */
-				absolute_xy = rc_clipped = rc;
+				rc_clipped = rc;
+				absolute_xy = vec2<int>(rc.l, rc.t);
 
 				/* if we have parent */
 				if(parent) {
 					/* we have to save our global coordinates in absolute_xy */
-					absolute_xy = parent->absolute_xy + vec2<int>(rc) - parent->scroll;
+					absolute_xy = parent->absolute_xy + vec2<int>(rc.l, rc.t) - vec2<int>(int(parent->scroll.x), int(parent->scroll.y));
  					rc_clipped  = rects::xywh<float>(absolute_xy.x, absolute_xy.y, rc.w(), rc.h());
 					
 					/* and we have to clip by first clipping parent's rc_clipped */

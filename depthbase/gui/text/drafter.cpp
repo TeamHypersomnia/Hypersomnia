@@ -133,7 +133,7 @@ namespace augs {
 				vec2<int> drafter::view_caret(unsigned caret_pos, const rects::ltrb<float>& clipper) const {
 					vec2<int> offset(0, 0);
 
-					if(!clipper.good() || !clipper.hover(get_bbox()))
+					if(!clipper.good() || !clipper.hover(rects::ltrb<float>(get_bbox())))
 						return offset;
 					
 					/* we are now sure that both rectangles intersect */
@@ -305,11 +305,11 @@ namespace augs {
 				}
 
 				std::pair<int, int> drafter::get_line_visibility(const rects::ltrb<float>& clipper) const {
-					if(!clipper.good() || !clipper.hover(get_bbox())) 
-						return make_pair(-1, -1);
+					if (!clipper.good() || !clipper.hover(rects::ltrb<float>(get_bbox())))
+						return std::make_pair(-1, -1);
 
 					/* we are now sure that both rectangles intersect */
-					return make_pair(map_to_line(vec2<int>(0, clipper.t)), map_to_line(vec2<int>(0, clipper.b)));
+					return std::make_pair(map_to_line(vec2<int>(0, clipper.t)), map_to_line(vec2<int>(0, clipper.b)));
 				}
 			}
 		}
