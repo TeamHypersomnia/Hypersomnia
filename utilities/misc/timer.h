@@ -53,8 +53,8 @@ namespace augs {
 		/* WARNING! This variable timestep timer should be replaced with delta accumulation functionality! */
 		class fpstimer : private timer {
 			double maxfps;
-			double sumframes, secs;
 		public:
+			double sumframes, secs;
 			void set_max_fps(double);
 			double get_max_fps();
 			void start();

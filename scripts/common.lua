@@ -308,7 +308,11 @@ function save_resource_in_item_library(filename, resource_object, item_library)
 	end
 end
 
-function create_atlas_from_filenames(filename_entries)
+function create_atlas_from_filenames(filename_entries, all_fonts)
+	if not all_fonts then
+		all_fonts = {}
+	end
+	
 	local sprite_library = {}
 	local sprite_object_library = {}
 	
@@ -334,11 +338,31 @@ function create_atlas_from_filenames(filename_entries)
 		save_resource_in_item_library(tokenized[#tokenized], texture_object, sprite_library)
 		save_resource_in_item_library(tokenized[#tokenized], sprite_object, sprite_object_library)
 	end
+		
+	local font_files = {}
+	local font_by_name = {}
+	
+	local function get_font(filename, size, letters)
+		local new_font_file = font_file()
+		new_font_file:open(filename, size, letters)
+		
+		local new_font_object = font_instance()
+		new_font_object:build(new_font_file)
+		new_font_object:add_to_atlas(out_atlas)	
+	
+		table.insert(font_files, new_font_file)
+		
+		return new_font_object
+	end
+	
+	for k, v in pairs(all_fonts) do
+		font_by_name[k] = get_font(v.filename, v.size, v.letters)
+	end
 	
 	out_atlas:build()
 	out_atlas:nearest()
 	
-	return out_atlas, sprite_library, sprite_object_library, texture_by_filename
+	return out_atlas, sprite_library, sprite_object_library, texture_by_filename, font_files, font_by_name
 end
 
 table.erase = function(self, element)

@@ -4,7 +4,7 @@ function scene_class:constructor()
 
 end
 
-function scene_class:load_map(map_filename, map_loader_filename)
+function scene_class:load_map(map_filename, map_loader_filename, all_fonts)
 	self.world_object = world_class:create()
 	
 	local gameplay_textures_directory = tiled_map_loader.try_to_load_map(map_filename).properties["gameplay_textures"] 
@@ -20,12 +20,15 @@ function scene_class:load_map(map_filename, map_loader_filename)
 	})
 
 	-- create texture atlas
-	local all_atlas, sprite_library, sprite_object_library, texture_by_filename = create_atlas_from_filenames(all_needed_textures)
+	local all_atlas, sprite_library, sprite_object_library, texture_by_filename, font_files, font_by_name = create_atlas_from_filenames(all_needed_textures, all_fonts)
 	
 	self.all_atlas = all_atlas
 	self.sprite_library = sprite_library
 	self.sprite_object_library = sprite_object_library
 	self.texture_by_filename = texture_by_filename
+	
+	self.font_files = font_files
+	self.font_by_name = font_by_name
 	
 	-- the loader creates all the entities in the current world
 	dofile(map_loader_filename)(map_filename, self)

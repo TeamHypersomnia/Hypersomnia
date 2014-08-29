@@ -80,7 +80,7 @@ namespace augs {
 
 			errsf(error != FT_Err_Unknown_File_Format, L"font format unsupported", f);
 			errsf(!error, L"coulnd't open font file", f);
-			errsf(!FT_Set_Char_Size(face, 0, pt << 6, 96, 96), L"couldn't set char size", f);
+			errsf(!FT_Set_Char_Size(face, 0, pt << 6, 72, 72), L"couldn't set char size", f);
 			errsf(!FT_Select_Charmap(face, FT_ENCODING_UNICODE), L"couldn't set encoding", f);
 
 			if(!f) {
