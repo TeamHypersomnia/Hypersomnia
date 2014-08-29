@@ -57,11 +57,11 @@ namespace augs {
 					caret_visible = true;
 				}
 				
-				void printer::draw_text(std::vector<quad>& out, ui& u, const rect& parent) const {
+				void printer::draw_text(std::vector<resources::vertex_triangle>& out, ui& u, const rect& parent) const {
 					draw_text(out, u.get_draft(), u.get_str(), &u.caret, parent);
 				}
 
-				void printer::draw_text(std::vector<quad>& out, 
+				void printer::draw_text(std::vector<resources::vertex_triangle>& out, 
 						const drafter& d, 
 						const fstr& colors,
 						const caret_info* caret,
@@ -71,7 +71,7 @@ namespace augs {
 					/* note that parent's scroll is already taken into account by absolute_xy */
 					draw_text(out, d, colors, caret, subject.get_absolute_xy() - subject.scroll, subject.clip ? &subject.get_clipping_rect() : &subject.get_parent()->get_clipping_rect());
 				}
-				void printer::draw_text(std::vector<quad>& out, 
+				void printer::draw_text(std::vector<resources::vertex_triangle>& out, 
 						const drafter& d, 
 						const fstr& colors,
 						const caret_info* caret,
@@ -223,7 +223,7 @@ namespace augs {
 					 return vec2<int>(dr.get_bbox().w, dr.get_bbox().h);
 				}
 
-				rects::wh<float> quick_print(std::vector<quad>& v,
+				rects::wh<float> quick_print(std::vector<resources::vertex_triangle>& v,
 										const fstr& str, 
 										vec2<int> pos, 
 										unsigned wrapping_width,
@@ -237,7 +237,7 @@ namespace augs {
 					return dr.get_bbox();
 				}
 				
-				rects::wh<float> quick_print(std::vector<quad>& v,
+				rects::wh<float> quick_print(std::vector<resources::vertex_triangle>& v,
 										const std::wstring& wstr,
 										gui::text::style style,
 										vec2<int> pos, 

@@ -136,9 +136,9 @@ namespace augs {
 			}
 
 			void group::draw_gl_fixed() {
-				glVertexPointer(2, GL_FLOAT, sizeof(vertex), quad_array.data());
-				glTexCoordPointer(2, GL_FLOAT, sizeof(vertex), (char*)(quad_array.data()) + sizeof(int)*2);
-				glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(vertex), (char*)(quad_array.data()) + sizeof(int)*2 + sizeof(float)*2);
+				glVertexPointer(2, GL_FLOAT, sizeof(resources::vertex_triangle), quad_array.data());
+				glTexCoordPointer(2, GL_FLOAT, sizeof(resources::vertex_triangle), (char*) (quad_array.data()) + sizeof(int) * 2);
+				glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(resources::vertex_triangle), (char*) (quad_array.data()) + sizeof(int) * 2 + sizeof(float) * 2);
 				glDrawArrays(GL_QUADS, 0, quad_array.size() * 4);
 			}
 			
