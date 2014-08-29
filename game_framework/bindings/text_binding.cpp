@@ -5,6 +5,9 @@
 #include "depthbase/gui/text/printer.h"
 #include "depthbase/gui/text/drafter.h"
 
+#include "game_framework/resources/render_info.h"
+#include "game_framework/systems/render_system.h"
+
 #include "misc/vector_wrapper.h"
 
 using namespace graphics::gui::text;
@@ -17,6 +20,19 @@ std::string wchar_vec_to_str(misc::vector_wrapper<wchar_t> str) {
 	auto out_w = std::wstring(str.raw.begin(), str.raw.end());
 
 	return std::string(out_w.begin(), out_w.end());
+}
+
+rects::wh<float> quick_print_wrapper(resources::renderable::draw_input v,
+	const std::vector<formatted_char>& str,
+	vec2<int> pos,
+	unsigned wrapping_width,
+	const rects::ltrb<float>* clipper)
+{
+	return quick_print(v.output->triangles, fstr(str.begin(), str.end()), pos, wrapping_width, clipper);
+}
+
+vec2<int> get_text_bbox_wrapper(const std::vector<formatted_char>& str, unsigned wrapping_width) {
+	return get_text_bbox(fstr(str.begin(), str.end()), wrapping_width);
 }
 
 namespace bindings {
@@ -40,8 +56,8 @@ namespace bindings {
 			luabind::def("wchar_vec_to_str", wchar_vec_to_str),
 			luabind::def("towchar", towchar),
 			luabind::def("towchar_vec", towchar_vec),
-			luabind::def("get_text_bbox", get_text_bbox)
-//			luabind::def("quick_print_text", quick_print)
+			luabind::def("get_text_bbox", get_text_bbox_wrapper),
+			luabind::def("quick_print_text", quick_print_wrapper)
 			
 			//.def("append", &graphics::gui::text::fstr::append)
 

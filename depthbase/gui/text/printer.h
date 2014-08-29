@@ -86,7 +86,7 @@ namespace augs {
 										unsigned wrapping_width = 0,
 										const rects::ltrb<float>* parent = 0);
 
-				extern rects::wh<float> quick_print(std::vector<resources::vertex_triangle>& v,
+				extern rects::wh<float> quick_print_format(std::vector<resources::vertex_triangle>& v,
 										const std::wstring& wstr,
 										style style,
 										vec2<int> pos, 

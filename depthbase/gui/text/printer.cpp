@@ -237,7 +237,7 @@ namespace augs {
 					return dr.get_bbox();
 				}
 				
-				rects::wh<float> quick_print(std::vector<resources::vertex_triangle>& v,
+				rects::wh<float> quick_print_format(std::vector<resources::vertex_triangle>& v,
 										const std::wstring& wstr,
 										gui::text::style style,
 										vec2<int> pos, 

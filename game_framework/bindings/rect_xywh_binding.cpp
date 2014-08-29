@@ -7,6 +7,13 @@
 namespace bindings {
 	luabind::scope _rect_xywh() {
 		return
+			luabind::class_<rects::wh<float>>("rect_wh")
+			.def(luabind::constructor<float, float>())
+			.def(luabind::constructor<const rects::wh<float>&>())
+			.def_readwrite("w", &rects::xywh<float>::w)
+			.def_readwrite("h", &rects::xywh<float>::h)
+			,
+
 			luabind::class_<rects::xywh<float>>("rect_xywh")
 			.def(luabind::constructor<float, float, float, float>())
 			.def(luabind::constructor<const rects::ltrb<float>&>())
