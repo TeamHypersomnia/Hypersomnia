@@ -171,8 +171,18 @@ world_archetype_callbacks.CONTROLLED_PLAYER = {
 				
 				text = {
 					{
-						str = "Daedalus #euphoric",
+						str = "Konto ",
 						col = rgba(255, 255, 255, 255),
+						font = self.owner_scene.font_by_name["kubasta"]
+					},
+					{
+						str = "[VIP] ",
+						col = rgba(255, 0, 0, 255),
+						font = self.owner_scene.font_by_name["kubasta"]
+					},
+					{
+						str = "Neutroni",
+						col = rgba(0, 255, 255, 255),
 						font = self.owner_scene.font_by_name["kubasta"]
 					}
 				}

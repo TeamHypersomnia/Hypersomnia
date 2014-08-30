@@ -75,7 +75,7 @@ function create_weapons(scene, include_render)
 	end
 	
 	create_weapon("m4a1", "rifle", {
-		current_rounds = 300,
+		current_rounds = 30,
 		is_automatic = true,
 		bullets_once = 1,
 		bullet_damage = 5,
@@ -94,7 +94,7 @@ function create_weapons(scene, include_render)
 	})
 	
 	create_weapon("shotgun", "rifle", {
-		current_rounds = 300,
+		current_rounds = 6,
 		is_automatic = false,
 		bullets_once = 12,
 		bullet_damage = 12,

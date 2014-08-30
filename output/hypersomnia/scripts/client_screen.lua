@@ -135,6 +135,10 @@ function client_screen:constructor(camera_rect)
 	self.my_gui = gui_class:create(camera_rect, self.sample_scene.world_object, self)
 end
 
+function client_screen:send(msg_bs)
+	self.server:send(protocol.make_reliable_bs(msg_bs), send_priority.IMMEDIATE_PRIORITY, send_reliability.RELIABLE_ORDERED, 0, self.server_guid, false)
+end
+
 function client_screen:loop()
 
 	setlsys(self.sample_scene.world_object.render_system)
@@ -153,6 +157,10 @@ function client_screen:loop()
 			print("Our connection request has been accepted.");
 			
 			cprint "Our connection request has been accepted."
+			
+			self:send(protocol.write_msg("BEGIN_SESSION", {
+				nickname = towchar_vec(config_table.nickname)
+			}))
 		elseif message_type == network_event.ID_NO_FREE_INCOMING_CONNECTIONS then
 			print("The server is full.\n")
 			cprint("The server is full.\n")

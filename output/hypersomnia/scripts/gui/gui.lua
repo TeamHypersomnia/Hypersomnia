@@ -149,9 +149,9 @@ function gui_class:constructor(camera_rect, world_object, owner_client)
 		
 		if wvec:size() > 0 then
 			if self.owner_client.server_guid then
-				self.owner_client.server:send(protocol.make_reliable_bs(protocol.write_msg("CHAT_MESSAGE", {
+				self.owner_client:send(protocol.write_msg("CHAT_MESSAGE", {
 					message = wvec
-				})), send_priority.LOW_PRIORITY, send_reliability.RELIABLE_ORDERED, 0, self.owner_client.server_guid, false)
+				}))
 			end
 			
 			self.main_chatbox:clear_text()

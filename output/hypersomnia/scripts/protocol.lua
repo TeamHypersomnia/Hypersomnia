@@ -2,6 +2,12 @@ protocol = {}
 
 protocol.message_by_id = {
 	{
+		name = "BEGIN_SESSION",
+		data = {
+			"WString", "nickname"
+		}
+	},
+	{
 		name = "CHAT_MESSAGE",
 		data = {
 			"WString", "message"
@@ -275,7 +281,7 @@ protocol.read_msg = function(in_bs, out_table)
 	out_entry.info = protocol.message_by_id[message_type]
 	out_entry.data = {}
 	
-	local data = protocol.message_by_id[message_type].data
+	local data = out_entry.info.data
 	
 	protocol.read_sig(data, out_entry.data, in_bs)
 

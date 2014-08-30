@@ -14,6 +14,8 @@ config_table = {
 	server_address = "127.0.0.1",
 	server_port = 37017,
 	
+	nickname = "Daedalus",
+	
 	multiple_clients_view = 0,
 	divergence_radius = 1,
 	
