@@ -17,16 +17,18 @@ function protocol_system:handle_incoming_commands()
 	local new_loop = {}
 	
 	for i=1, #msgs do
-		local msg = msgs[i]
-		local input_bs = msg.data:get_bitstream()
+		local network_msg = msgs[i]
+		local input_bs = network_msg.data:get_bitstream()
 	
 		local how_many_to_skip = 0
 		local reliable_commands_num = 0
 		local commands_read = 0
 		
-		if not msg.is_reliable_transmission then 
-			how_many_to_skip = msgs[i].channel:recv(input_bs)
-			reliable_commands_num = msg.channel.receiver.last_message - msg.channel.receiver.first_message
+		if not network_msg.is_reliable_transmission and network_msg.channel then
+			local channel = network_msg.channel
+			
+			how_many_to_skip = channel:recv(input_bs)
+			reliable_commands_num = channel.receiver.last_message - channel.receiver.first_message
 		else
 			input_bs:IgnoreBytes(1)
 		end
@@ -41,6 +43,7 @@ function protocol_system:handle_incoming_commands()
 				
 				-- server might want to copy the subject client
 				msg.subject = msgs[i].subject
+				msg.guid = msgs[i].guid
 				
 				local should_skip = not msg.is_reliable_transmission and commands_read < how_many_to_skip
 				
