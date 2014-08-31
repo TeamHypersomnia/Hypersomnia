@@ -11,6 +11,12 @@ function label_system:draw_labels(camera_draw_input)
 		local target = self.targets[i]
 		local label = target.label
 		
+		for j=1, #label.text do
+			if not label.text[j].font then
+				label.text[j].font = label.default_font
+			end
+		end
+		
 		local formatted = format_text(label.text)
 		
 		if target.health then

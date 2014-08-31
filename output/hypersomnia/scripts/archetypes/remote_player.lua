@@ -136,14 +136,9 @@ world_archetype_callbacks.REMOTE_PLAYER = {
 			
 			label = {
 				position = components.label.positioning.OVER_HEALTH_BAR,
+				default_font = self.owner_scene.font_by_name["kubasta"],
 				
-				text = {
-					{
-						str = "Cristopher Zderzacki",
-						col = rgba(255, 255, 255, 255),
-						font = self.owner_scene.font_by_name["kubasta"]
-					}
-				}
+				text = {}
 			}
 		}
 		

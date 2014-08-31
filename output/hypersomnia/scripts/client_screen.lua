@@ -15,6 +15,7 @@ dofile "hypersomnia\\scripts\\sync_modules\\health_sync.lua"
 dofile "hypersomnia\\scripts\\sync_modules\\crosshair_sync.lua"
 dofile "hypersomnia\\scripts\\sync_modules\\item_sync.lua"
 dofile "hypersomnia\\scripts\\sync_modules\\gun_sync.lua"
+dofile "hypersomnia\\scripts\\sync_modules\\label_sync.lua"
 
 dofile "hypersomnia\\scripts\\systems\\protocol_system.lua"
 dofile "hypersomnia\\scripts\\systems\\interpolation_system.lua"
