@@ -8,6 +8,13 @@ protocol.message_by_id = {
 		}
 	},
 	{
+		name = "REMOTE_CHAT_MESSAGE",
+		data = {
+			"WString", "nickname",
+			"WString", "message"
+		}
+	},
+	{
 		name = "CHAT_MESSAGE",
 		data = {
 			"WString", "message"
