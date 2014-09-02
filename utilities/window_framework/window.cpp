@@ -516,45 +516,57 @@ namespace augs {
 			MessageBox(0, content.c_str(), title.c_str(), MB_OK); 
 		}
 
-		void copy_clipboard (std::wstring& from) {
-			OpenClipboard(0);
-			EmptyClipboard();
-			HGLOBAL h = GlobalAlloc(GMEM_DDESHARE, (from.length()+1)*sizeof(WCHAR));
-			LPWSTR p = (LPWSTR)GlobalLock(h);
+		void copy_clipboard(std::wstring& from) {
+			if (OpenClipboard(0)) {
+				if (EmptyClipboard()) {
+					HGLOBAL h = GlobalAlloc(GMEM_DDESHARE, (from.length() + 1)*sizeof(WCHAR));
+					if (h) {
+						LPWSTR p = (LPWSTR) GlobalLock(h);
 
-			for(unsigned i = 0; i < from.length(); ++i)
-				p[i] = from[i];
+						if (p) {
+							for (unsigned i = 0; i < from.length(); ++i)
+								p[i] = from[i];
 
-			p[from.length()] = 0;
+							p[from.length()] = 0;
 
-			SetClipboardData(CF_UNICODETEXT, h);
-			GlobalUnlock(p);
-			CloseClipboard();
+							SetClipboardData(CF_UNICODETEXT, h);
+							GlobalUnlock(p);
+							CloseClipboard();
+						}
+					}
+				}
+			}
 		}
-		
+
 		bool is_newline(unsigned i) {
 			return (i == 0x000A || i == 0x000D);
 		}
 
 		void paste_clipboard(std::wstring& to) {
-			OpenClipboard(NULL);
-			if(!IsClipboardFormatAvailable(CF_UNICODETEXT)) {
+			if (OpenClipboard(NULL)) {
+				if (!IsClipboardFormatAvailable(CF_UNICODETEXT)) {
+					CloseClipboard();
+					return;
+				}
+				HANDLE clip0 = GetClipboardData(CF_UNICODETEXT);
+
+				if (clip0) {
+					LPWSTR p = (LPWSTR) GlobalLock(clip0);
+					if (p) {
+						size_t len = wcslen(p);
+						to.clear();
+						to.reserve(len);
+
+						for (size_t i = 0; i < len; ++i) {
+							to += p[i];
+							if (is_newline(p[i]) && i < len - 1 && is_newline(p[i + 1])) ++i;
+						}
+					}
+					GlobalUnlock(clip0);
+				}
+
 				CloseClipboard();
-				return;
 			}
-			HANDLE clip0 = GetClipboardData(CF_UNICODETEXT);
-			LPWSTR p = (LPWSTR)GlobalLock(clip0);
-			size_t len = wcslen(p);
-			to.clear();
-			to.reserve(len);
-
-			for(size_t i = 0; i < len; ++i) {
-				to += p[i];
-				if(is_newline(p[i]) && i < len-1 && is_newline(p[i+1])) ++i;
-			}
-
-			GlobalUnlock(clip0);
-			CloseClipboard();
 		}
 	}
 }
