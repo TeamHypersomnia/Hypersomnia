@@ -2,7 +2,12 @@ function format_text(text_entries)
 	local output = formatted_text()
 	
 	for i=1, #text_entries do
-		local wstr = towchar_vec(text_entries[i].str)
+		local wstr = text_entries[i].wstr
+		
+		if not wstr then
+			wstr = towchar_vec(text_entries[i].str)
+		end
+		
 		local color = text_entries[i].col
 			
 		for j=0, wstr:size()-1 do
