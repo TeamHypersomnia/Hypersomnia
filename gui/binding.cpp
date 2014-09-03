@@ -4,11 +4,23 @@
 #include "hypersomnia_gui.h"
 #include "misc/vector_wrapper.h"
 
+#include "misc/stream.h"
+#include <chrono>
+#include <ctime>
 void callback_textbox::set_command_callback(luabind::object callback) {
 	//luabind::object callbackobj = *callback;
 	textbox_object.command_callback = [callback](std::wstring& wstr)	{
 		luabind::call_function<void>(callback, augs::misc::towchar_vec(wstr));
 	};
+}
+
+augs::misc::vector_wrapper<wchar_t> get_local_time() {
+	auto now = std::chrono::system_clock::now();
+	auto now_c = std::chrono::system_clock::to_time_t(now);
+	auto tm = std::localtime(&now_c);
+
+	return augs::misc::towchar_vec
+		(L'[' + augs::misc::wstr<int>(tm->tm_hour) + L':' + augs::misc::wstr<int>(tm->tm_min) + L':' + augs::misc::wstr<int>(tm->tm_sec) + L']');
 }
 
 
@@ -149,9 +161,11 @@ void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
 		.def("set_alpha_range", &callback_textbox::set_alpha_range)
 		.def("set_command_callback", &callback_textbox::set_command_callback),
 
+		luabind::def("get_local_time", get_local_time),
+
 		luabind::def("set_color", wrap_set(set_color, get_textbox_style, callback_textbox)),
 		luabind::def("set_color", wrap_set(set_color, get_rect_style, callback_rect)),
-
+		
 		luabind::def("set_border", wrap_set(set_border, get_textbox_style, callback_textbox)),
 		luabind::def("set_border", wrap_set(set_border, get_rect_style, callback_rect)),
 
