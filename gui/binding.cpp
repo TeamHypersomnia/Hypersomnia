@@ -19,8 +19,16 @@ augs::misc::vector_wrapper<wchar_t> get_local_time() {
 	auto now_c = std::chrono::system_clock::to_time_t(now);
 	auto tm = std::localtime(&now_c);
 
+	auto hours = augs::misc::wstr<int>(tm->tm_hour);
+	auto mins = augs::misc::wstr<int>(tm->tm_min);
+	auto secs = augs::misc::wstr<int>(tm->tm_sec);
+
+	if (tm->tm_hour < 10) hours = L'0' + hours;
+	if (tm->tm_min < 10) mins = L'0' + mins;
+	if (tm->tm_sec < 10) secs = L'0' + secs;
+
 	return augs::misc::towchar_vec
-		(L'[' + augs::misc::wstr<int>(tm->tm_hour) + L':' + augs::misc::wstr<int>(tm->tm_min) + L':' + augs::misc::wstr<int>(tm->tm_sec) + L']');
+		(L'[' + hours + L':' + mins + L':' + secs + L']');
 }
 
 
