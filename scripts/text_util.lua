@@ -8,9 +8,6 @@ function format_text(text_entries, append_newline)
 			wstr = towchar_vec(text_entries[i].str)
 		end
 		
-		if i == #text_entries and append_newline then
-			wstr:add(13)
-		end
 		
 		local color = text_entries[i].color
 			
@@ -21,6 +18,11 @@ function format_text(text_entries, append_newline)
 			})
 			
 			output:add(newchar)
+			
+			if j == wstr:size()-1 and i == #text_entries and append_newline then
+				newchar.c = 13
+				output:add(newchar)
+			end
 		end	
 	end
 	
