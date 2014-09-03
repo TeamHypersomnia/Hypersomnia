@@ -9,31 +9,21 @@ function recent_messages_class:constructor(subject_textbox, second_textbox)
 	self.fading_duration = 1000
 end
 
-function recent_messages_class:append_message(formatted, raw_string, message_duration)
+function recent_messages_class:append_message(formatted, message_duration)
 	local message_len = 0
 	
 	if not message_duration then
 		message_duration = 20000
 	end
 	
-	formatted[#formatted].str:add(13)
+	self.subject_textbox:append_text(formatted, true)
 	
-	for i=1, #formatted do
-		if raw_string then
-			formatted[i].str = towchar_vec(formatted[i].str)
-		end
-		
-		self.subject_textbox:append_text(formatted[i].str, formatted[i].color)
-		
-		if self.second_textbox then
-			self.second_textbox:append_text(formatted[i].str, formatted[i].color)
-		end
-	
-		message_len = message_len + formatted[i].str:size()
+	if self.second_textbox then
+		self.second_textbox:append_text(formatted, true)
 	end
-	
+		
 	self.recent_messages[#self.recent_messages+1] = {
-		length = message_len,
+		length = formatted:size(),
 		duration_timer = expiration_timer:create(message_duration)
 	}	
 end

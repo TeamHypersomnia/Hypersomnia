@@ -36,16 +36,21 @@ void callback_rect::set_blur_callback(luabind::object callback) {
 	};
 }
 
-void callback_textbox::append_text(augs::misc::vector_wrapper<wchar_t>& wstr, augs::graphics::pixel_32 color) {
+void callback_textbox::append_text(augs::graphics::gui::text::fstr& str, bool set_default_font) {
 	auto prev_caret_pos = textbox_object.editor.get_caret_pos();
 	auto prev_caret_sel = textbox_object.editor.get_selection_offset();
 
 	textbox_object.editor.set_caret_end(false);
 
-	auto resultant_style = textbox_object.editor.get_default_style();
-	resultant_style.color = color;
+	if (set_default_font) {
+		auto def_style = textbox_object.editor.get_default_style();
+	
+		for (auto& c : str) {
+			c.font_used = def_style.f;
+		}
+	}
 
-	textbox_object.editor.insert(format(std::wstring(wstr.raw.begin(), wstr.raw.end()), resultant_style));
+	textbox_object.editor.insert(str);
 
 	textbox_object.editor.set_caret(prev_caret_pos, false);
 	textbox_object.editor.set_selection_offset(prev_caret_sel);

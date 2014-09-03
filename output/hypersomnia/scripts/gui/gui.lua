@@ -5,18 +5,18 @@ gui_class = inherits_from()
 function cprint(str, color, target_box, duration)
 	local text_color = rgba(255, 255, 0, 255)
 	if color then text_color = color end
-	local vec_str = towchar_vec(str)
 	
+	local formatted_fstr = format_text ({
+		{
+			["str"] = str,
+			color = text_color
+		}
+	}, true)
+			
 	if target_box == nil then
-		client_scenes[CURRENT_CLIENT_NUMBER].my_gui.recent_messages:append_message({
-			{
-				str = vec_str,
-				color = text_color
-			}
-		}, false, duration)
+		client_scenes[CURRENT_CLIENT_NUMBER].my_gui.recent_messages:append_message(formatted_fstr, duration)
 	else
-		vec_str:add(13)
-		target_box:append_text(vec_str, text_color)
+		target_box:append_text(formatted_fstr, true)
 	end
 end
 
