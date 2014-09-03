@@ -8,7 +8,14 @@ function handle_incoming_chat(client)
 		local chat_msg = { wstr = msgs[i].data.message, color = rgba(255, 255, 255, 255) }
 		local chat_nick = { wstr = msgs[i].data.nickname, color = rgba(0, 255, 255, 255) }
 	
-		client.my_gui.recent_messages:append_message( format_text ({ chat_nick, chat_msg }, true) )
+		local target_text = { chat_msg }
+	
+		if not client.my_gui.last_message_nickname or not wstr_eq(client.my_gui.last_message_nickname, msgs[i].data.nickname) then
+			client.my_gui.last_message_nickname = msgs[i].data.nickname
+			target_text = { chat_nick, chat_msg }
+		end
+		
+		client.my_gui.recent_messages:append_message_separate( format_text({ chat_nick, chat_msg }, true), format_text (target_text, true) )
 	
 		if not client.my_gui.content_chatbox:is_focused() then
 			client.my_gui.content_chatbox:set_caret(client.my_gui.content_chatbox:get_length(), false)

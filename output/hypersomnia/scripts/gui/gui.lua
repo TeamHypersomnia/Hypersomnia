@@ -15,6 +15,7 @@ function cprint(str, color, target_box, duration)
 			
 	if target_box == nil then
 		client_scenes[CURRENT_CLIENT_NUMBER].my_gui.recent_messages:append_message(formatted_fstr, duration)
+		client_scenes[CURRENT_CLIENT_NUMBER].my_gui.last_message_nickname = nil
 	else
 		target_box:append_text(formatted_fstr, true)
 	end

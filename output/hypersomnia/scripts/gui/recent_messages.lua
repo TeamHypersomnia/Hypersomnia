@@ -10,6 +10,10 @@ function recent_messages_class:constructor(subject_textbox, second_textbox)
 end
 
 function recent_messages_class:append_message(formatted, message_duration)
+	self:append_message_separate(formatted, formatted, message_duration)
+end
+
+function recent_messages_class:append_message_separate(formatted, formatted_second, message_duration)
 	local message_len = 0
 	
 	if not message_duration then
@@ -19,7 +23,7 @@ function recent_messages_class:append_message(formatted, message_duration)
 	self.subject_textbox:append_text(formatted, true)
 	
 	if self.second_textbox then
-		self.second_textbox:append_text(formatted, true)
+		self.second_textbox:append_text(formatted_second, true)
 	end
 		
 	self.recent_messages[#self.recent_messages+1] = {
