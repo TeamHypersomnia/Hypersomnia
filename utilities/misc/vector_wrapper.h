@@ -40,6 +40,16 @@ namespace augs {
 					.def("data", &data);
 			}
 
+			static luabind::scope bind_string(const char* name) {
+				return luabind::class_<std::basic_string<value>>(name)
+					.def(luabind::constructor<>())
+					.def("add", (&std::basic_string<value>::push_back))
+					.def("size", (size_t(__thiscall std::basic_string<value>::*) ())(&std::basic_string<value>::size))
+					.def("at", (value&(__thiscall std::basic_string<value>::*) (size_t))(&std::basic_string<value>::at))
+					.def("clear", &std::basic_string<value>::clear)
+					.def("data", (value* (__thiscall std::basic_string<value>::*) ()) (&std::basic_string<value>::data));
+			}
+
 			static luabind::scope bind_vector(const char* name) {
 				return luabind::class_<std::vector<value>>(name)
 					.def(luabind::constructor<>())

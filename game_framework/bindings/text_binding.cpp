@@ -23,16 +23,16 @@ std::string wchar_vec_to_str(misc::vector_wrapper<wchar_t> str) {
 }
 
 rects::wh<float> quick_print_wrapper(resources::renderable::draw_input v,
-	const std::vector<formatted_char>& str,
+	const fstr& str,
 	vec2<> pos,
 	unsigned wrapping_width,
 	const rects::ltrb<float>* clipper)
 {
-	return quick_print(v.output->triangles, fstr(str.begin(), str.end()), pos, wrapping_width, clipper);
+	return quick_print(v.output->triangles, str, pos, wrapping_width, clipper);
 }
 
-vec2<int> get_text_bbox_wrapper(const std::vector<formatted_char>& str, unsigned wrapping_width) {
-	return get_text_bbox(fstr(str.begin(), str.end()), wrapping_width);
+vec2<int> get_text_bbox_wrapper(const fstr& str, unsigned wrapping_width) {
+	return get_text_bbox(str, wrapping_width);
 }
 
 namespace bindings {
@@ -51,7 +51,7 @@ namespace bindings {
 			.def_readwrite("a", &formatted_char::a),
 
 			misc::vector_wrapper<wchar_t>::bind("wchar_t_vec"),
-			misc::vector_wrapper<formatted_char>::bind_vector("formatted_text"),
+			misc::vector_wrapper<formatted_char>::bind_string("formatted_text"),
 			
 			luabind::def("wchar_vec_to_str", wchar_vec_to_str),
 			luabind::def("towchar", towchar),

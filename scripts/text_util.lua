@@ -1,4 +1,4 @@
-function format_text(text_entries)
+function format_text(text_entries, append_newline)
 	local output = formatted_text()
 	
 	for i=1, #text_entries do
@@ -8,7 +8,11 @@ function format_text(text_entries)
 			wstr = towchar_vec(text_entries[i].str)
 		end
 		
-		local color = text_entries[i].col
+		if i == #text_entries and append_newline then
+			wstr:add(13)
+		end
+		
+		local color = text_entries[i].color
 			
 		for j=0, wstr:size()-1 do
 			local newchar = create(formatted_char, {
@@ -21,4 +25,14 @@ function format_text(text_entries)
 	end
 	
 	return output
+end
+
+function wstr_eq(a, b)
+	if a:size() ~= b:size() then return false end
+	
+	for i=0, a:size()-1 do
+		if a:at(i) ~= b:at(i) then return false end 
+	end
+	
+	return true
 end
