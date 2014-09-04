@@ -22,6 +22,10 @@ void callback_textbox::set_area(augs::rects::xywh<float> area) {
 
 }
 
+void callback_textbox::set_wrapping_width(unsigned w) {
+	textbox_object.editor.draft().wrap_width = w;
+}
+
 void callback_textbox::setup(augs::rects::xywh<float> area, bool is_input_textbox, texture_baker::font* default_font)
 {
 	//background = crect(rect_xywh(0, 0, 1000, 1000));

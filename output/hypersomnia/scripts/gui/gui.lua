@@ -26,6 +26,7 @@ function gui_class:draw_call(camera_input)
 	
 	self.recent_messages_textbox:set_area(rect_xywh(20, self.camera_rect.h - 500 + 100 + 150 + 150 - content_height, 350, content_height))
 	
+	self.gui:update()
 	self.recent_messages:loop()
 	self.character_hud:draw_call(camera_input)
 end

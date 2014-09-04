@@ -34,6 +34,7 @@ end
 
 function recent_messages_class:loop()
 	local oldest = self.recent_messages[1]
+	local was_removed = false
 	
 	if oldest and oldest.duration_timer:expired() then
 		if not oldest.alpha_timer then
@@ -46,9 +47,12 @@ function recent_messages_class:loop()
 			self.subject_textbox:set_caret(0, false)
 			self.subject_textbox:set_caret(oldest.length, true)
 			self.subject_textbox:backspace()
+			was_removed = true
 			table.remove(self.recent_messages, 1)
 		else
 			self.subject_textbox:set_alpha_range(0, oldest.length, target_alpha)
 		end
 	end
+	
+	return oldest ~= nil, was_removed
 end

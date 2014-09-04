@@ -44,10 +44,42 @@ function label_system:draw_labels(camera_draw_input)
 		end
 		
 		local object_pos = target.cpp_entity.render.last_screen_pos
-		if label.messages_overlay then
-			label.messages_overlay.recent_textbox:set_area(rect_xywh(object_pos.x+130, object_pos.y, 200, 70))
-			label.messages_overlay.recent_messages:loop()
-			label.messages_overlay.group:draw_call(camera_draw_input)
+		local overlay = label.messages_overlay
+		
+		if overlay and target.cpp_entity.render.was_drawn then
+			
+			local still_has_messages, was_removed = overlay.recent_messages:loop()
+			
+			overlay.group:draw_call(camera_draw_input)
+			
+			local current_bbox = vec2(overlay.recent_textbox:get_text_bbox())
+			local previous_bbox = overlay.previous_bbox
+			
+			if not previous_bbox then previous_bbox = vec2(0, 0) end
+			
+			if previous_bbox.x ~= current_bbox.x or previous_bbox.y ~= current_bbox.y then
+				overlay.size_w_animator = value_animator(previous_bbox.x, current_bbox.x, 300)
+				overlay.size_h_animator = value_animator(previous_bbox.y, current_bbox.y, 300)
+				overlay.size_w_animator:set_exponential()
+				overlay.size_h_animator:set_exponential()
+				overlay.size_w_animator:start()
+				overlay.size_h_animator:start()
+				
+				overlay.update_animator = nil
+			end
+			
+			overlay.previous_bbox = current_bbox
+			
+			if overlay.size_w_animator and overlay.size_h_animator then
+				overlay.recent_textbox:set_area(rect_xywh(object_pos.x+50, object_pos.y - 25, 
+					overlay.size_w_animator:get_animated(),  overlay.size_h_animator:get_animated()))
+				
+				overlay.recent_textbox:set_wrapping_width(350)
+			end
+			
+			if not still_has_messages and overlay.size_w_animator:has_finished() and overlay.size_h_animator:has_finished() then
+				label.messages_overlay = nil
+			end
 		end
 	end
 end

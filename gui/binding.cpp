@@ -157,6 +157,7 @@ void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
 		.def(luabind::constructor<gui_group&>())
 		.def("append_text", &callback_textbox::append_text)
 		.def("setup", &callback_textbox::setup)
+		.def("set_wrapping_width", &callback_textbox::set_wrapping_width)
 		.def("set_caret", &callback_textbox::set_caret)
 		.def("backspace", &callback_textbox::backspace)
 		.def("view_caret", &callback_textbox::view_caret)

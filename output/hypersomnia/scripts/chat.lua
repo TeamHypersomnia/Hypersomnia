@@ -28,6 +28,7 @@ function handle_incoming_chat(client)
 				overlay.group = gui_group(client.my_gui.gui)
 				overlay.recent_textbox = callback_textbox(overlay.group)
 				overlay.recent_textbox:setup(rect_xywh(0, 0, 0, 0), false, client.sample_scene.font_by_name.kubasta)
+				overlay.recent_textbox:set_wrapping_width(350)
 				
 				set_border(overlay.recent_textbox, "released", 1, rgba(255, 255, 255, 30))
 				set_color(overlay.recent_textbox, "released", rgba(0, 0, 0, 50))
@@ -38,6 +39,7 @@ function handle_incoming_chat(client)
 			end
 			
 			object.label.messages_overlay.recent_messages:append_message(format_text({ chat_msg }, true) )
+			object.label.messages_overlay.update_animator = true
 		end
 		
 		client.my_gui.recent_messages:append_message_separate( format_text({ chat_nick, chat_msg }, true), format_text (target_text, true) )

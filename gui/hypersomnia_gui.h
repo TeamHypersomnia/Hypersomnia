@@ -168,6 +168,7 @@ struct callback_textbox {
 
 	void draw(bool);
 	
+	void set_wrapping_width(unsigned);
 	void set_area(augs::rects::xywh<float>);
 	void setup(augs::rects::xywh<float>, bool is_input_textbox, texture_baker::font*);
 };
