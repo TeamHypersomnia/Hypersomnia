@@ -27,7 +27,7 @@ function gui_class:draw_call(camera_input)
 	self.recent_messages_textbox:set_area(rect_xywh(20, self.camera_rect.h - 500 + 100 + 150 + 150 - content_height, 350, content_height))
 	
 	self.recent_messages:loop()
-	self.gui:draw_call(camera_input)
+	self.character_hud:draw_call(camera_input)
 end
 
 function gui_class:set_enabled(flag)
@@ -59,7 +59,7 @@ function gui_class:set_enabled(flag)
 			set_color(self.content_chatbox, "released", rgba(0, 0, 0, 0))
 			set_color(self.main_chatbox, "released", rgba(0, 0, 0, 30))
 			
-			self.gui:blur()
+			self.character_hud:blur()
 			
 			if self.main_chatbox:is_clean() then
 				cprint("Press Enter to chat or Alt to enable GUI...", rgba(255, 255, 255, 120), self.main_chatbox)
@@ -83,7 +83,7 @@ function gui_class:constructor(camera_rect, world_object, owner_client)
 	
 	world_object.input_system.event_callback = function () 
 		if self.gui_enabled then
-			self.gui:poll_events()
+			self.character_hud:poll_events()
 		end
 	end
 	
@@ -114,19 +114,19 @@ function gui_class:constructor(camera_rect, world_object, owner_client)
 		}
 	}
 
-	self.gui = hypersomnia_gui(global_gl_window)
-	self.gui:setup(vec2(camera_rect.w, camera_rect.h), owner_client.sample_scene.sprite_library["blank"].tex)
+	self.gui = hypersomnia_gui(global_gl_window, owner_client.sample_scene.sprite_library["blank"].tex)
+	self.character_hud = gui_group(self.gui)
 	
-	self.focusable_bg = callback_rect(self.gui)
+	self.focusable_bg = callback_rect(self.character_hud)
 	self.focusable_bg:setup(rect_xywh(0, 0, camera_rect.w, camera_rect.h), true)
 	
-	self.content_chatbox = callback_textbox(self.gui)
+	self.content_chatbox = callback_textbox(self.character_hud)
 	self.content_chatbox:setup(rect_xywh(20, camera_rect.h - 500 + 100 + 150, 350, 150), false, owner_client.sample_scene.font_by_name.kubasta)
 	
-	self.main_chatbox = callback_textbox(self.gui)
+	self.main_chatbox = callback_textbox(self.character_hud)
 	self.main_chatbox:setup(rect_xywh(20, camera_rect.h - 160 + 90, 350, 35), true, owner_client.sample_scene.font_by_name.kubasta)
 	
-	self.recent_messages_textbox = callback_textbox(self.gui)
+	self.recent_messages_textbox = callback_textbox(self.character_hud)
 	self.recent_messages_textbox:setup(rect_xywh(20, camera_rect.h - 500 + 100 + 150, 350, 150), false, owner_client.sample_scene.font_by_name.kubasta)
 	self.recent_messages = recent_messages_class:create(self.recent_messages_textbox, self.content_chatbox)
 	

@@ -84,18 +84,21 @@ struct hypersomnia_gui {
 	augs::window::glwindow& gl;
 
 	augs::graphics::gui::system sys;
-	augs::graphics::gui::group main_window = augs::graphics::gui::group(sys);
 
-	hypersomnia_gui(augs::window::glwindow& gl);
+	hypersomnia_gui(augs::window::glwindow& gl, texture_baker::texture* blank_texture);
 
-	augs::vec2<> camera_size;
-	void setup(augs::vec2<> camera_size, texture_baker::texture* blank_texture);
+	void update();
 
+	static void bind(augs::lua_state_wrapper&);
+};
+
+struct gui_group {
+	augs::graphics::gui::group main_window;
 	void poll_events();
 	void draw_call(resources::renderable::draw_input& in);
 	void blur();
 
-	static void bind(augs::lua_state_wrapper&);
+	gui_group(hypersomnia_gui& owner);
 };
 
 
@@ -120,9 +123,9 @@ struct rect_wrapper : crect {
 
 struct callback_rect {
 	rect_wrapper rect_obj;
-	hypersomnia_gui* owner = nullptr;
+	gui_group* owner = nullptr;
 
-	callback_rect(hypersomnia_gui& owner);
+	callback_rect(gui_group& owner);
 	
 	void focus();
 	void setup(augs::rects::xywh<float>, bool focusable);
@@ -140,9 +143,9 @@ struct callback_textbox {
 	
 	textbox_wrapper textbox_object;
 	
-	hypersomnia_gui* owner = nullptr;
+	gui_group* owner = nullptr;
 	callback_textbox() {}
-	callback_textbox(hypersomnia_gui& owner);
+	callback_textbox(gui_group& owner);
 	
 	void set_command_callback(luabind::object);
 	

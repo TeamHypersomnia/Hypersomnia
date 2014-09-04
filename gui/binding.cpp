@@ -144,14 +144,17 @@ void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
 	(a, "aaa", augs::graphics::pixel_32(1, 1, 1, 1));
 	luabind::module(wrapper.raw)[
 		luabind::class_<hypersomnia_gui>("hypersomnia_gui")
-		.def(luabind::constructor<augs::window::glwindow&>())
-		.def("poll_events", &poll_events)
-		.def("setup", &setup)
-		.def("blur", &blur)
-		.def("draw_call", &draw_call),
+			.def(luabind::constructor<augs::window::glwindow&, texture_baker::texture*>())
+			.def("update", &update),
+
+		luabind::class_<gui_group>("gui_group")
+			.def(luabind::constructor<hypersomnia_gui&>())
+			.def("poll_events", &gui_group::poll_events)
+			.def("blur", &gui_group::blur)
+			.def("draw_call", &gui_group::draw_call),
 
 		luabind::class_<callback_textbox>("callback_textbox")
-		.def(luabind::constructor<hypersomnia_gui&>())
+		.def(luabind::constructor<gui_group&>())
 		.def("append_text", &callback_textbox::append_text)
 		.def("setup", &callback_textbox::setup)
 		.def("set_caret", &callback_textbox::set_caret)
@@ -178,7 +181,7 @@ void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
 		luabind::def("set_border", wrap_set(set_border, get_rect_style, callback_rect)),
 
 		luabind::class_<callback_rect>("callback_rect")
-		.def(luabind::constructor<hypersomnia_gui&>())
+		.def(luabind::constructor<gui_group&>())
 		.def("setup", &callback_rect::setup)
 		.def("focus", &callback_rect::focus)
 		.def("set_focus_callback", &callback_rect::set_focus_callback)

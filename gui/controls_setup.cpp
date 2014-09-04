@@ -1,27 +1,7 @@
 #include "hypersomnia_gui.h"
 
 using namespace stylesheeted;
-
-void hypersomnia_gui::setup(augs::vec2<> camera, texture_baker::texture* blank_texture) {
-	camera_size = camera;
-	graphics::gui::null_texture = blank_texture;
-
-	//wchar_t* str = L" qvxQVXaπbcÊdeÍfghijkl≥mnÒoÛprsútuwyzüøA•BC∆DE FGHIJKL£MN—O”PRSåTUWYZèØ0123456789.!@#$%^&*()_+-=[];'\\,./{}:\"|<>?";
-	//
-	//fontf[0].open(fin, "hypersomnia/data/Kubasta.ttf", 16, str);
-
-	graphics::gui::null_texture->translate_uv(vec2<>(2, 2));
-	graphics::gui::null_texture->scale_uv(0.000000001f, 0.000000001f);
-
-	ltblue_theme();
-
-	main_window.middlescroll.speed_mult = 90.0f;
-	//main_window.root.children.push_back(&focusable_bg);
-
-	//main_window.middlescroll.mat = material(textures + 4, pixel_32(255, 255, 255, 180));
-}
-
-callback_textbox::callback_textbox(hypersomnia_gui& owner) : owner(&owner) {
+callback_textbox::callback_textbox(gui_group& owner) : owner(&owner) {
 	owner.main_window.root.children.push_back(&myscrtx);
 	owner.main_window.root.children.push_back(&myscrhtx);
 	owner.main_window.root.children.push_back(&textbox_object);
@@ -82,7 +62,7 @@ void callback_textbox::setup(augs::rects::xywh<float> area, bool is_input_textbo
 }
 
 
-callback_rect::callback_rect(hypersomnia_gui& owner) : owner(&owner) {
+callback_rect::callback_rect(gui_group& owner) : owner(&owner) {
 	owner.main_window.root.children.push_back(&rect_obj);
 }
 
@@ -139,6 +119,6 @@ unsigned callback_textbox::get_length() {
 	return textbox_object.editor.get_str().size();
 }
 
-void hypersomnia_gui::blur() {
+void gui_group::blur() {
 	main_window.set_focus(nullptr);
 }
