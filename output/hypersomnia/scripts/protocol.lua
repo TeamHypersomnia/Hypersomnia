@@ -11,7 +11,8 @@ protocol.message_by_id = {
 		name = "REMOTE_CHAT_MESSAGE",
 		data = {
 			"WString", "nickname",
-			"WString", "message"
+			"WString", "message",
+			"Ushort", "optional_object_id"
 		}
 	},
 	{

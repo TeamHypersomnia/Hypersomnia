@@ -42,6 +42,13 @@ function label_system:draw_labels(camera_draw_input)
 				0, nil
 			)
 		end
+		
+		local object_pos = target.cpp_entity.render.last_screen_pos
+		if label.messages_overlay then
+			label.messages_overlay.recent_textbox:set_area(rect_xywh(object_pos.x+130, object_pos.y, 200, 70))
+			label.messages_overlay.recent_messages:loop()
+			label.messages_overlay.group:draw_call(camera_draw_input)
+		end
 	end
 end
 
