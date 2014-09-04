@@ -42,17 +42,20 @@ function bullet_creation_system:update()
 		
 		self.world:post_message(msg)
 		
-		local burst = particle_burst_message()
-		burst.pos = msgs[i].barrel_transform.pos
-		burst.rotation = msgs[i].barrel_transform.rotation
-		burst.subject = entity
-		burst.type = particle_burst_message.WEAPON_SHOT
+		if not weapon.is_melee then
+			local burst = particle_burst_message()
+			burst.pos = msgs[i].barrel_transform.pos
+			burst.rotation = msgs[i].barrel_transform.rotation
+			burst.subject = entity
+			burst.type = particle_burst_message.WEAPON_SHOT
+			
+			if weapon.barrel_smoke_group then
+				burst.target_group_to_refresh:set(weapon.barrel_smoke_group)
+			end
 		
-		if weapon.barrel_smoke_group then
-			burst.target_group_to_refresh:set(weapon.barrel_smoke_group)
+			self.world:post_message(burst)
 		end
 		
-		self.world:post_message(burst)
 		
 		local premade_shot = msgs[i].premade_shot
 		
@@ -108,10 +111,10 @@ function bullet_creation_system:update()
 					max_lifetime_ms = weapon.max_lifetime_ms,
 					local_id = self.next_bullet_local_id,
 					--global_id = self.next_bullet_global_id,
-					sender = target
+					sender = target,
 					
-					--max_distance = weapon.max_bullet_distance,
-					--starting_point = vec2(bullet.pos)
+					max_distance = weapon.max_bullet_distance,
+					starting_point = vec2(bullet.pos)
 				},
 				
 				cpp_entity = bullet_entity

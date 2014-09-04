@@ -110,6 +110,29 @@ function create_weapons(scene, include_render)
 		bullet_entity = basic_bullet_entity,				
 		
 		max_lifetime_ms = 500	
+	})	
+	
+	create_weapon("fireaxe", "rifle", {
+		is_melee = true,
+	
+		current_rounds = 1000000000,
+		is_automatic = false,
+		bullets_once = 1,
+		bullet_damage = 12,
+		bullet_speed = minmax(6000, 6000),
+		
+		shooting_interval_ms = 400,
+		spread_degrees = 0,
+		shake_radius = 0,
+		shake_spread_degrees = 0,
+		
+		bullet_barrel_offset = vec2(2, 0),
+		
+		bullet_entity = basic_bullet_entity,				
+		
+		max_bullet_distance = 100,
+		
+		max_lifetime_ms = 300
 	})
 	
 	--weapons.shotgun = {
