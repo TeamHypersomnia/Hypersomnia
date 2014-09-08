@@ -91,15 +91,16 @@ void movement_system::substep(world& owner) {
 		}
 		
 		if (resultant.non_zero()) {
-			if (movement.braking_damping >= 0.f)
-				physics.body->SetLinearDamping(0.f);
-			
 			resultant.rotate(was_ground_hit ? ground_angle : movement.axis_rotation_degrees, vec2<>());
 
 			physics.body->ApplyForce(resultant * PIXELS_TO_METERSf * physics.body->GetMass(), physics.body->GetWorldCenter() + (movement.force_offset * PIXELS_TO_METERSf), true);
 		}
-		else if (movement.braking_damping >= 0.f)
-			physics.body->SetLinearDamping(movement.braking_damping);
+
+		if (movement.braking_damping >= 0.f) {
+			physics.body->SetLinearDampingVec(b2Vec2(
+				resultant.x_non_zero() ? 0.f : movement.braking_damping,
+				resultant.y_non_zero() ? 0.f : movement.braking_damping));
+		}
 
 
 		float32 speed = vel.Normalize();

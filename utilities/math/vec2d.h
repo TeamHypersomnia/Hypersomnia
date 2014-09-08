@@ -278,8 +278,16 @@ namespace augs {
 			return *this;
 		}
 
+		bool x_non_zero() const {
+			return std::abs(x) > std::numeric_limits<type>::epsilon();
+		}
+
+		bool y_non_zero() const {
+			return std::abs(y) > std::numeric_limits<type>::epsilon();
+		}
+
 		bool non_zero() const {
-			return std::abs(x) > std::numeric_limits<type>::epsilon() || std::abs(y) > std::numeric_limits<type>::epsilon();
+			return x_non_zero() || y_non_zero();
 		}
 		
 		vec2 operator-() { return vec2(x * -1, y * -1); }
