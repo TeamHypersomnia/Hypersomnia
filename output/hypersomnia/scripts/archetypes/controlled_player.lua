@@ -165,7 +165,9 @@ world_archetype_callbacks.CONTROLLED_PLAYER = {
 			
 			health = {},
 
-			wield = {},
+			wield = {
+				wield_offsets = npc_wield_offsets
+			},
 			
 			label = {
 				position = components.label.positioning.OVER_HEALTH_BAR,
@@ -178,6 +180,7 @@ world_archetype_callbacks.CONTROLLED_PLAYER = {
 		new_entity.wield.on_item_wielded = function(this, picked, old_item, wielding_key)
 			if wielding_key == components.wield.keys.PRIMARY_WEAPON then
 				player_cpp_entity.body.animate.available_animations = self.owner_scene.torso_sets["white"][picked.item.outfit_type].set
+				
 				player_cpp_entity.body.movement.animation_message = animation_events.MOVE
 				
 				if picked.weapon ~= nil then
@@ -193,6 +196,23 @@ world_archetype_callbacks.CONTROLLED_PLAYER = {
 					picked.weapon.constrain_requested_bullets = true
 					picked.weapon.bullet_entity.physics.body_info.filter = filters.BULLET
 				end
+				
+				
+				local stop_msg = animate_message()
+				stop_msg.subject = player_cpp_entity.body
+				stop_msg.message_type = animate_message.STOP
+				stop_msg.animation_priority = 100
+				
+				local msg = animate_message()
+				msg.subject = player_cpp_entity.body
+				msg.message_type = animate_message.START
+				msg.change_speed = true
+				msg.animation_type = player_cpp_entity.body.movement.animation_message
+				msg.speed_factor = 0
+				msg.animation_priority = 0
+				
+				player_cpp_entity.body.owner_world:post_message(stop_msg)
+				player_cpp_entity.body.owner_world:post_message(msg)
 			end
 		end
 		

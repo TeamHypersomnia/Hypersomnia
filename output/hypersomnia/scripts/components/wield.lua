@@ -7,4 +7,6 @@ components.wield.keys = create_enum {
 
 function components.wield:constructor(init_table)
 	self.wielded_items = {}
+	
+	rewrite(self, init_table)
 end

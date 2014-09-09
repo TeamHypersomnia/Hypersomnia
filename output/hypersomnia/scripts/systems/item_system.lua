@@ -65,7 +65,11 @@ function item_system:add_entity(new_entity)
 		
 		new_entity.cpp_entity = self.world_object:create_entity ( override({
 			transform = {},
-			chase = {}
+			chase = {
+				chase_type = chase_component.ORBIT,
+				chase_rotation = true,
+				relative = false
+			}
 		}, archetype) )
 		
 	else

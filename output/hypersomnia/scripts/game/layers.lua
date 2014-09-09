@@ -5,7 +5,7 @@ world_render_layers = {
 	"WIELDED_GUNS",
 	"PLAYERS",
 	"BULLETS",
-	"WIELDED",
+	"WIELDED_MELEE",
 	"LEGS",
 	"SHELLS",
 	"ON_GROUND",

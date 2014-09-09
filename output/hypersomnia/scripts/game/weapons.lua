@@ -23,7 +23,7 @@ function create_weapons(scene, include_render)
 		}
 	end
 	
-	local function create_weapon(weapon_name, weapon_type, weapon_properties)
+	local function create_weapon(weapon_name, weapon_type, weapon_properties, use_world_sprite_to_wielded)
 		weapons[weapon_name] = {
 			weapon_info = weapon_properties,
 			
@@ -40,7 +40,21 @@ function create_weapons(scene, include_render)
 					object.weapon.trigger = components.weapon.triggers.NONE
 	
 					if new_wielder then
-						object.cpp_entity.render.model = nil
+						if new_wielder.inventory then
+							object.cpp_entity.render.model = nil
+						else
+							if use_world_sprite_to_wielded then
+								object.cpp_entity.render.model = scene.sprite_object_library[weapon_name]["world"]
+							else
+								object.cpp_entity.render.model = scene.sprite_object_library[weapon_name]["wield"]
+							end
+							
+							if weapon_properties.is_melee then
+								object.cpp_entity.render.layer = render_layers.WIELDED_MELEE
+							else
+								object.cpp_entity.render.layer = render_layers.WIELDED_GUNS
+							end
+						end
 					else
 						object.cpp_entity.render.model = scene.sprite_object_library[weapon_name]["world"]
 						object.cpp_entity.render.layer = render_layers.ON_GROUND
@@ -141,7 +155,7 @@ function create_weapons(scene, include_render)
 		
 		swing_duration = 100,
 		swing_interval_ms = 100
-	})
+	}, true)
 	
 	--weapons.shotgun = {
 	--	weapon_info = {
@@ -174,3 +188,99 @@ function create_weapons(scene, include_render)
 	
 	scene.weapons = weapons
 end
+
+npc_wield_offsets = {
+	HEAD = {
+		shot = {
+			{ pos = vec2(0, 0)  },
+			{ pos = vec2(-1, 0)  },
+			{ pos = vec2(-2, 0)  },
+			{ pos = vec2(-4, 0)  },
+			{ pos = vec2(-6, 0)  }
+		},
+		
+		walk = {
+			{ pos = vec2(0, 0) },
+			{ pos = vec2(-1, 0) },
+			{ pos = vec2(-2, 0) },
+			{ pos = vec2(-3, 0) },
+			{ pos = vec2(-4, 0) }
+		},
+		
+		walk_cw = {
+			{ pos = vec2(0, 0)  },
+			{ pos = vec2(1, 0)  },
+			{ pos = vec2(2, 0)  },
+			{ pos = vec2(3, 0)  },
+			{ pos = vec2(4, 0)  }
+		},
+		
+		swing = {
+			{ pos = vec2(0, 0)   },
+			{ pos = vec2(0, 1)   },
+			{ pos = vec2(1, 2)  },
+			{ pos = vec2(0, 3)   },
+			{ pos = vec2(0, 4)   }
+		},
+		
+		swing_cw = {
+			{ pos = vec2(0, 0) },
+			{ pos = vec2(0, -1) },
+			{ pos = vec2(-1, -2) },
+			{ pos = vec2(0,  -3) },
+			{ pos = vec2(0,  -4) }
+		}
+	},
+	
+	melee = {
+		walk = {
+			{ rotation = 180-90, pos = vec2(7, 24), flip = true  },
+			{ rotation = 180-90, pos = vec2(6, 24), flip = true  },
+			{ rotation = 180-90, pos = vec2(7, 23), flip = true  },
+			{ rotation = 180-90, pos = vec2(6, 24), flip = true  },
+			{ rotation = 180-90, pos = vec2(7, 24), flip = true  }
+		},
+		
+		walk_cw = {
+			{ rotation = 0-90, pos = vec2(7, -24)},
+			{ rotation = 0-90, pos = vec2(6, -24)},
+			{ rotation = 0-90, pos = vec2(7, -23)},
+			{ rotation = 0-90, pos = vec2(6, -24)},
+			{ rotation = 0-90, pos = vec2(7, -24)}
+		},
+		
+		swing = {
+			{ rotation = 150-90, pos = vec2(-5, 5)   + vec2.rotated(vec2(7, 24), vec2(17, -10), -30 ) , flip = true },
+			{ rotation = 120-90, pos = vec2(-8, 7)   + vec2.rotated(vec2(7, 24), vec2(17, -10), -60 ) , flip = true },
+			{ rotation = 90-90,  pos = vec2(-10, 10) + vec2.rotated(vec2(7, 24), vec2(17, -10), -90 ) , flip = true  },
+			{ rotation = 60-90,  pos = vec2(-12, 12) + vec2.rotated(vec2(7, 24), vec2(17, -10), -120 ), flip = true   },
+			{ rotation = 30-90,  pos = vec2(-15, 15) + vec2.rotated(vec2(7, 24), vec2(17, -10), -150 ), flip = true   }
+		},
+		
+		swing_cw = {
+			{ rotation = 30-90,  pos = vec2(-15, -15) + vec2.rotated(vec2(7, 24), vec2(17, -10), -150) },
+			{ rotation = 60-90,  pos = vec2(-12, -12) + vec2.rotated(vec2(7, 24), vec2(17, -10), -120) },
+			{ rotation = 90-90,  pos = vec2(-10, -10) + vec2.rotated(vec2(7, 24), vec2(17, -10), -90 ) },
+			{ rotation = 120-90, pos = vec2(-8, -7)   + vec2.rotated(vec2(7, 24), vec2(17, -10), -60 )},
+			{ rotation = 150-90, pos = vec2(-5, -5)   + vec2.rotated(vec2(7, 24), vec2(17, -10), -30 )}
+		}
+	},
+	
+	rifle = {
+		walk = {
+			{ rotation = 0, pos = vec2(35, 10) },
+			{ rotation = 0, pos = vec2(36, 10) },
+			{ rotation = 0, pos = vec2(37, 10) },
+			{ rotation = 0, pos = vec2(39, 10) },
+			{ rotation = 0, pos = vec2(40, 10) }
+		},
+		
+		shot = {
+			{ rotation = 0, pos = vec2(34, 10)  },
+			{ rotation = 0, pos = vec2(33, 10)  },
+			{ rotation = 0, pos = vec2(32, 10)  },
+			{ rotation = 0, pos = vec2(30, 10)  },
+			{ rotation = 0, pos = vec2(28, 10)  }
+		}
+	}
+}
