@@ -17,7 +17,7 @@ void animation_system::consume_events(world& owner) {
 			if (it.change_speed)
 				animate.speed_factor = it.speed_factor;
 
-			if (it.change_animation) {
+			//if (it.change_animation) {
 				resources::animation* new_instance = nullptr;
 				if (it.set_animation)
 					new_instance = it.set_animation;
@@ -30,16 +30,20 @@ void animation_system::consume_events(world& owner) {
 
 				if (new_instance != animate.current_animation) {
 					animate.current_animation = new_instance;
-					if (!it.preserve_state_if_animation_changes) {
-						animate.set_current_frame(0, it.subject);
-						animate.current_ms = 0.f;
+
+					if (it.message_type == animate_message::type::CONTINUE) {
+						it.message_type = animate_message::type::START;
 					}
-					else {
+					//if (!it.preserve_state_if_animation_changes) {
+					//	animate.set_current_frame(0, it.subject);
+					//	animate.current_ms = 0.f;
+					//}
+					//else {
 						/* update callback */
-						animate.set_current_frame(animate.get_current_frame(), it.subject);
-					}
+						//animate.set_current_frame(animate.get_current_frame(), it.subject);
+					//}
 				}
-			}
+			//}
 			
 			animate.current_priority = it.animation_priority;
 
@@ -91,6 +95,8 @@ void components::animate::set_current_frame(unsigned number, augs::entity_system
 	if (current_animation) {
 		call(current_animation->frames[current_frame].callback, subject);
 		saved_callback_out = current_animation->frames[current_frame].callback_out;
+
+		subject->get<components::render>().model = &current_animation->frames[get_current_frame()].model;
 	} else
 	saved_callback_out = luabind::object();
 }
