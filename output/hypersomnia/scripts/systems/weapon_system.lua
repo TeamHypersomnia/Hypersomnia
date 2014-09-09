@@ -108,7 +108,11 @@ function weapon_system:handle_messages()
 		if item_subject ~= nil and item_subject.weapon ~= nil then
 			if msgs[i].intent == intent_message.SHOOT then
 				if msgs[i].state_flag then
-					item_subject.weapon.trigger = components.weapon.triggers.SHOOT
+					if item_subject.weapon.is_melee or item_subject.weapon.current_rounds <= 0 then
+						item_subject.weapon.trigger = components.weapon.triggers.MELEE
+					else
+						item_subject.weapon.trigger = components.weapon.triggers.SHOOT
+					end
 				else
 					item_subject.weapon.trigger = components.weapon.triggers.NONE
 				end
@@ -137,6 +141,13 @@ end
 
 function weapon_system:update()
 	self:substep(self.delta_timer:extract_milliseconds())
+end
+
+
+function weapon_system:swinging_routine(target)
+	-- the client checks for collisions with hit sensor
+	
+	
 end
 
 function weapon_system:substep(dt)
@@ -170,10 +181,7 @@ function weapon_system:substep(dt)
 			
 			local triggers = components.weapon.triggers
 	
-			if trigger == triggers.MELEE then
-				--weapon:set_state("SWINGING")
-				--begin_swinging_routine()
-			elseif trigger == triggers.SHOOT then
+			if trigger == triggers.SHOOT then
 				if weapon.constrain_requested_bullets then
 					if weapon.current_rounds > 0 then
 						self:shot_routine(target, premade_shot)
@@ -187,13 +195,22 @@ function weapon_system:substep(dt)
 				else
 					self:shot_routine(target, premade_shot)
 				end
+			elseif trigger == triggers.MELEE then
+				-- swinging is always automatic
+				weapon:set_state("SWINGING")
+				
+				self.owner_entity_system:post_table("begin_swinging", {
+					subject = target
+				})
 			end
 		
 		elseif state == states.SWINGING then
 			if weapon:passed("swing_duration") then
 				weapon:set_state("SWINGING_INTERVAL")
 			else
-				swinging_routine()
+				self.owner_entity_system:post_table("swing_hitcheck", {
+					subject = target
+				})
 			end
 			
 		elseif (state == states.SHOOTING_INTERVAL and weapon:passed("shooting_interval_ms")) or

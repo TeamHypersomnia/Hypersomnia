@@ -24,10 +24,11 @@ function create_remote_player(owner_scene, crosshair_sprite)
 					
 					angular_damping = 5,
 					--linear_damping = 18,
-					max_speed = 3300,
+					--max_speed = 3300,
 					
 					fixed_rotation = true,
-					density = 0.1
+					density = 0.1,
+					angled_damping = true
 				},
 			},
 			
@@ -145,8 +146,17 @@ world_archetype_callbacks.REMOTE_PLAYER = {
 		new_entity.wield.on_item_wielded = function(this, picked, old_item, wielding_key)
 			if wielding_key == components.wield.keys.PRIMARY_WEAPON then
 				new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["white"][picked.item.outfit_type].set
+				new_remote_player.body.movement.animation_message = animation_events.MOVE
 				
 				if picked.weapon ~= nil then
+					if picked.weapon.is_melee then
+						if picked.weapon.current_swing_direction then
+							new_remote_player.body.movement.animation_message = animation_events.MOVE_CW
+						else
+							new_remote_player.body.movement.animation_message = animation_events.MOVE_CCW
+						end
+					end
+					
 					picked.weapon.transmit_bullets = false
 					picked.weapon.constrain_requested_bullets = false
 					picked.weapon.bullet_entity.physics.body_info.filter = filters.REMOTE_BULLET
@@ -156,6 +166,7 @@ world_archetype_callbacks.REMOTE_PLAYER = {
 		
 		new_entity.wield.on_item_unwielded = function(this, old_item, wielding_key)
 			if wielding_key == components.wield.keys.PRIMARY_WEAPON then
+				new_remote_player.body.movement.animation_message = animation_events.MOVE
 				new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["white"]["barehands"].set
 			end
 		end

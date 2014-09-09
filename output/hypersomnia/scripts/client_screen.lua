@@ -33,6 +33,8 @@ dofile "hypersomnia\\scripts\\systems\\wield_system.lua"
 dofile "hypersomnia\\scripts\\systems\\item_system.lua"
 dofile "hypersomnia\\scripts\\systems\\label_system.lua"
 
+dofile "hypersomnia\\scripts\\systems\\melee_system.lua"
+
 dofile "hypersomnia\\scripts\\systems\\health_system.lua"
 
 dofile "hypersomnia\\scripts\\chat.lua"
@@ -79,7 +81,10 @@ function client_screen:constructor(camera_rect)
 	self.entity_system_instance:register_messages {
 		"network_message",
 		"shot_message",
-		"item_wielder_change"
+		"item_wielder_change",
+		
+		"begin_swinging",
+		"swing_hitcheck"
 	}
 	
 	self.entity_system_instance:register_messages (protocol.message_names)
@@ -108,6 +113,8 @@ function client_screen:constructor(camera_rect)
 	self.systems.inventory = inventory_system:create(self.sample_scene)
 	
 	self.systems.label = label_system:create()
+	
+	self.systems.melee = melee_system:create()
 	
 	table.insert(self.sample_scene.world_object.prestep_callbacks, function (dt)
 		self.systems.input_prediction:substep()
@@ -204,6 +211,8 @@ function client_screen:loop()
 	
 	self.systems.weapon:translate_shot_info_msgs()
 	self.systems.weapon:update()
+	
+	self.systems.melee:process_swinging()
 	
 	self.systems.lifetime:update()
 	self.systems.inventory:update()

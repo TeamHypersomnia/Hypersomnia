@@ -68,6 +68,25 @@ protocol.message_by_id = {
 		}
 	},
 	{
+		name = "SWING_REQUEST",
+		data = {
+		}
+	},
+	{
+		name = "SWING_INFO",
+		data = {
+			"Ushort", "subject_id"
+		}
+	},
+	{
+		name = "MELEE_HIT_REQUEST",
+		data = {
+			-- we don't need no "final rotation" thing
+			-- because crosshair snapshots live in the same time space
+			"Ushort", "suggested_subject"
+		}
+	},
+	{
 		name = "SHOT_REQUEST",
 		data = {
 			"Vec2", "position",

@@ -5,7 +5,8 @@ available_resources = {
 	
 	weapon_types = {
 		"barehands",
-		"rifle"
+		"rifle",
+		"melee"
 	}
 }
 
@@ -74,7 +75,9 @@ function create_legs_set_for(sprite_library, outfit)
 	
 	local new_animation_set = create_animation_set {
 		animations = { 
-			{ event = animation_events.MOVE, animation_response = new_legs_animation }
+			{ event = animation_events.MOVE, animation_response = new_legs_animation },
+			{ event = animation_events.MOVE_CW, animation_response = new_legs_animation },
+			{ event = animation_events.MOVE_CCW, animation_response = new_legs_animation }
 		}
 	}
 	
@@ -89,7 +92,6 @@ function create_torso_set_for(sprite_library, outfit, weapon_type)
 	
 	local animation_container = {}
 	local animation_set;
-	
 	if weapon_type == "barehands" then
 		local new_walk_animation = create_animation {
 			frames = {
@@ -204,7 +206,72 @@ function create_torso_set_for(sprite_library, outfit, weapon_type)
 			{ event = animation_events.SWING_CCW, animation_response = new_shot_animation }
 		}
 	elseif weapon_type == "melee" then
-	
+		local new_walk_cw_animation = create_animation {
+			frames = {
+				{ model = { image = walk_frames["1"] }, duration_ms = 30, callback = function(subject) subject.render.flip_vertically = true end },
+				{ model = { image = walk_frames["2"] }, duration_ms = 30, callback = function(subject) subject.render.flip_vertically = true end },
+				{ model = { image = walk_frames["3"] }, duration_ms = 30, callback = function(subject) subject.render.flip_vertically = true end },
+				{ model = { image = walk_frames["4"] }, duration_ms = 30, callback = function(subject) subject.render.flip_vertically = true end },
+				{ model = { image = walk_frames["5"] }, duration_ms = 30, callback = function(subject) subject.render.flip_vertically = true end },
+				{ model = { image = walk_frames["4"] }, duration_ms = 30, callback = function(subject) subject.render.flip_vertically = true end },
+				{ model = { image = walk_frames["3"] }, duration_ms = 30, callback = function(subject) subject.render.flip_vertically = true end },
+				{ model = { image = walk_frames["2"] }, duration_ms = 30, callback = function(subject) subject.render.flip_vertically = true end },
+				{ model = { image = walk_frames["1"] }, duration_ms = 30, callback = function(subject) subject.render.flip_vertically = true end },
+			},
+			loop_mode = animation.REPEAT
+		}
+		
+		local new_walk_ccw_animation = create_animation {
+			frames = {
+				{ model = { image = walk_frames["1"] }, duration_ms = 30, callback = function(subject) subject.render.flip_vertically = false end },
+				{ model = { image = walk_frames["2"] }, duration_ms = 30, callback = function(subject) subject.render.flip_vertically = false end  },
+				{ model = { image = walk_frames["3"] }, duration_ms = 30, callback = function(subject) subject.render.flip_vertically = false end  },
+				{ model = { image = walk_frames["4"] }, duration_ms = 30, callback = function(subject) subject.render.flip_vertically = false end  },
+				{ model = { image = walk_frames["5"] }, duration_ms = 30, callback = function(subject) subject.render.flip_vertically = false end  },
+				{ model = { image = walk_frames["4"] }, duration_ms = 30, callback = function(subject) subject.render.flip_vertically = false end  },
+				{ model = { image = walk_frames["3"] }, duration_ms = 30, callback = function(subject) subject.render.flip_vertically = false end  },
+				{ model = { image = walk_frames["2"] }, duration_ms = 30, callback = function(subject) subject.render.flip_vertically = false end  },
+				{ model = { image = walk_frames["1"] }, duration_ms = 30, callback = function(subject) subject.render.flip_vertically = false end  },
+			},
+			loop_mode = animation.REPEAT
+		}
+			
+		local new_swing_cw_animation = create_animation {
+			frames = {
+				{ model = { image = shoot_frames["1"] }, duration_ms = 20, callback = function(subject) subject.render.flip_vertically = true end },
+				{ model = { image = shoot_frames["2"] }, duration_ms = 20, callback = function(subject) subject.render.flip_vertically = true end },
+				{ model = { image = shoot_frames["3"] }, duration_ms = 20, callback = function(subject) subject.render.flip_vertically = true end },
+				{ model = { image = shoot_frames["4"] }, duration_ms = 20, callback = function(subject) subject.render.flip_vertically = true end },
+				{ model = { image = shoot_frames["5"] }, duration_ms = 20, callback = function(subject) subject.render.flip_vertically = true end }
+			},
+		
+			loop_mode = animation.NONE
+		}
+		
+		local new_swing_ccw_animation = create_animation {
+			frames = {
+				{ model = { image = shoot_frames["1"] }, duration_ms = 20, callback = function(subject) subject.render.flip_vertically = false end },
+				{ model = { image = shoot_frames["2"] }, duration_ms = 20, callback = function(subject) subject.render.flip_vertically = false end },
+				{ model = { image = shoot_frames["3"] }, duration_ms = 20, callback = function(subject) subject.render.flip_vertically = false end },
+				{ model = { image = shoot_frames["4"] }, duration_ms = 20, callback = function(subject) subject.render.flip_vertically = false end },
+				{ model = { image = shoot_frames["5"] }, duration_ms = 20, callback = function(subject) subject.render.flip_vertically = false end }
+			},
+		
+			loop_mode = animation.NONE
+		}
+		
+		table.insert(animation_container, new_walk_cw_animation)
+		table.insert(animation_container, new_walk_ccw_animation)
+		table.insert(animation_container, new_swing_cw_animation)
+		table.insert(animation_container, new_swing_ccw_animation)
+		
+		animation_set = {
+			{ event = animation_events.MOVE_CW, animation_response = new_walk_cw_animation },
+			{ event = animation_events.MOVE_CCW, animation_response = new_walk_ccw_animation },
+			{ event = animation_events.SWING_CW, animation_response = new_swing_cw_animation },
+			{ event = animation_events.SWING_CCW, animation_response = new_swing_ccw_animation }
+		}
+		
 	end
 	
 	return { set = create_animation_set { animations = animation_set }, animations = animation_container } 

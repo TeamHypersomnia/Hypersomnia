@@ -11,7 +11,8 @@ local player_physics_component = {
 		--max_speed = 3300,
 		
 		fixed_rotation = true,
-		density = 0.1
+		density = 0.1,
+		angled_damping = true
 	}
 }
 			
@@ -177,8 +178,17 @@ world_archetype_callbacks.CONTROLLED_PLAYER = {
 		new_entity.wield.on_item_wielded = function(this, picked, old_item, wielding_key)
 			if wielding_key == components.wield.keys.PRIMARY_WEAPON then
 				player_cpp_entity.body.animate.available_animations = self.owner_scene.torso_sets["white"][picked.item.outfit_type].set
+				player_cpp_entity.body.movement.animation_message = animation_events.MOVE
 				
 				if picked.weapon ~= nil then
+					if picked.weapon.is_melee then
+						if picked.weapon.current_swing_direction then
+							player_cpp_entity.body.movement.animation_message = animation_events.MOVE_CW
+						else
+							player_cpp_entity.body.movement.animation_message = animation_events.MOVE_CCW
+						end
+					end
+					
 					picked.weapon.transmit_bullets = true
 					picked.weapon.constrain_requested_bullets = true
 					picked.weapon.bullet_entity.physics.body_info.filter = filters.BULLET
@@ -189,6 +199,7 @@ world_archetype_callbacks.CONTROLLED_PLAYER = {
 		new_entity.wield.on_item_unwielded = function(this, unwielded, wielding_key)
 			if wielding_key == components.wield.keys.PRIMARY_WEAPON then
 				player_cpp_entity.body.animate.available_animations = self.owner_scene.torso_sets["white"]["barehands"].set
+				player_cpp_entity.body.movement.animation_message = animation_events.MOVE
 				
 				if unwielded.cpp_entity.physics == nil then return end
 				
