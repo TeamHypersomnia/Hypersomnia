@@ -133,7 +133,9 @@ world_archetype_callbacks.REMOTE_PLAYER = {
 			
 			health = {},
 			
-			wield = {},
+			wield = {
+				wield_offsets = npc_wield_offsets
+			},
 			
 			label = {
 				position = components.label.positioning.OVER_HEALTH_BAR,
@@ -146,6 +148,7 @@ world_archetype_callbacks.REMOTE_PLAYER = {
 		new_entity.wield.on_item_wielded = function(this, picked, old_item, wielding_key)
 			if wielding_key == components.wield.keys.PRIMARY_WEAPON then
 				new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["white"][picked.item.outfit_type].set
+
 				new_remote_player.body.movement.animation_message = animation_events.MOVE
 				
 				if picked.weapon ~= nil then
@@ -157,10 +160,28 @@ world_archetype_callbacks.REMOTE_PLAYER = {
 						end
 					end
 					
+					
 					picked.weapon.transmit_bullets = false
 					picked.weapon.constrain_requested_bullets = false
 					picked.weapon.bullet_entity.physics.body_info.filter = filters.REMOTE_BULLET
 				end
+				
+				local stop_msg = animate_message()
+				stop_msg.subject = new_remote_player.body
+				stop_msg.message_type = animate_message.STOP
+				stop_msg.animation_priority = 100
+				
+				local msg = animate_message()
+				msg.subject = new_remote_player.body
+				msg.message_type = animate_message.START
+				msg.change_speed = true
+				msg.animation_type = new_remote_player.body.movement.animation_message
+				msg.speed_factor = 0
+				msg.animation_priority = 0
+				
+				new_remote_player.body.owner_world:post_message(stop_msg)
+				new_remote_player.body.owner_world:post_message(msg)
+				
 			end
 		end
 		
@@ -168,6 +189,11 @@ world_archetype_callbacks.REMOTE_PLAYER = {
 			if wielding_key == components.wield.keys.PRIMARY_WEAPON then
 				new_remote_player.body.movement.animation_message = animation_events.MOVE
 				new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["white"]["barehands"].set
+				
+				local stop_msg = animate_message()
+				stop_msg.subject = new_remote_player.body
+				stop_msg.message_type = animate_message.STOP
+				stop_msg.animation_priority = 100
 			end
 		end
 		

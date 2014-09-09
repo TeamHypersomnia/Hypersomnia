@@ -233,6 +233,11 @@ world_archetype_callbacks.CONTROLLED_PLAYER = {
 				print (force.x, force.y)
 				body:ApplyLinearImpulse(to_meters(force), body:GetWorldCenter(), true)
 				body:ApplyAngularImpulse(4, true)
+				
+				local stop_msg = animate_message()
+				stop_msg.subject = player_cpp_entity.body
+				stop_msg.message_type = animate_message.STOP
+				stop_msg.animation_priority = 100
 			end
 		end
 		
