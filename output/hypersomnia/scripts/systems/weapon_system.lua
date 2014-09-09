@@ -124,9 +124,10 @@ end
 
 function weapon_system:translate_shot_info_msgs()
 	local msgs = self.owner_entity_system.messages["SHOT_INFO"]
+	local object_by_id = self.owner_entity_system.all_systems["replication"].object_by_id
 	
 	for i=1, #msgs do
-		local subject = self.owner_entity_system.all_systems["replication"].object_by_id[msgs[i].data.subject_id].wield.wielded_items[components.wield.keys.PRIMARY_WEAPON]
+		local subject = object_by_id[msgs[i].data.subject_id].wield.wielded_items[components.wield.keys.PRIMARY_WEAPON]
 		local forward_time = msgs[i].data.delay_time + self.owner_entity_system.all_systems["client"]:get_last_ping()/2
 		
 		table.insert(subject.weapon.buffered_actions, { trigger = components.weapon.triggers.SHOOT, premade_shot = {
@@ -136,6 +137,14 @@ function weapon_system:translate_shot_info_msgs()
 			starting_global_id = msgs[i].data.starting_bullet_id,
 			random_seed = msgs[i].data.random_seed
 		}})
+	end
+	
+	msgs = self.owner_entity_system.messages["SWING_INFO"]
+	
+	for i=1, #msgs do
+		local subject = object_by_id[msgs[i].data.subject_id].wield.wielded_items[components.wield.keys.PRIMARY_WEAPON]
+		
+		table.insert(subject.weapon.buffered_actions, { trigger = components.weapon.triggers.MELEE, premade_shot = {}})
 	end
 end
 

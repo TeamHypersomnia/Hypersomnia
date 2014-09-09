@@ -6,7 +6,8 @@ melee_system = inherits_from (processing_system)
 
 function melee_system:process_swinging()
 	local msgs = self.owner_entity_system.messages["begin_swinging"]
-	
+	local client_sys = self.owner_entity_system.all_systems["client"]
+				
 	for i=1, #msgs do
 		local msg = msgs[i]
 		local target = msg.subject
@@ -38,6 +39,10 @@ function melee_system:process_swinging()
 		
 		target.cpp_entity.owner_world:post_message(anim_msg)
 		weapon.current_swing_direction = not weapon.current_swing_direction
+		
+		if weapon.transmit_bullets == true then
+			client_sys.net_channel:post_reliable("SWING_REQUEST", {})
+		end
 	end
 	
 	msgs = self.owner_entity_system.messages["swing_hitcheck"]

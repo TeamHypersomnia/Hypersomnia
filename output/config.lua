@@ -16,7 +16,7 @@ config_table = {
 	
 	nickname = "Daedalus",
 	
-	multiple_clients_view = 0,
+	multiple_clients_view = 1,
 	divergence_radius = 1,
 	
 	tickrate = 60,
