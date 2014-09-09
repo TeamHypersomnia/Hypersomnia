@@ -46,6 +46,8 @@ namespace components {
 			}
 		};
 		
+		bool pause_emission = false;
+
 		components::transform previous_transform;
 
 		std::vector<stream> stream_slots;

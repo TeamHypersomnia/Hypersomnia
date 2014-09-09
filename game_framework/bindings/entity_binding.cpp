@@ -20,6 +20,7 @@
 #include "../components/lookat_component.h"
 #include "../components/movement_component.h"
 #include "../components/particle_emitter_component.h"
+#include "../components/particle_group_component.h"
 #include "../components/physics_component.h"
 #include "../components/steering_component.h"
 #include "../components/transform_component.h"
@@ -77,6 +78,9 @@ namespace bindings {
 			.def("remove_movement", &entity::remove<movement>)
 			.def("add", &entity::add<movement>)
 			.property("movement", &entity::find<movement>, &entity::set<movement>)
+			.def("remove_particle_group", &entity::remove<particle_group>)
+			.def("add", &entity::add<particle_group>)
+			.property("particle_group", &entity::find<particle_group>, &entity::set<particle_group>)
 			.def("remove_particle_emitter", &entity::remove<particle_emitter>)
 			.def("add", &entity::add<particle_emitter>)
 			.property("particle_emitter", &entity::find<particle_emitter>, &entity::set<particle_emitter>)

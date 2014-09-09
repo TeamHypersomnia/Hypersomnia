@@ -49,19 +49,24 @@ void particle_group_system::process_entities(world& owner) {
 
 				int to_spawn = static_cast<int>(std::floor(stream_slot.stream_particles_to_spawn));
 
-				for(int i = 0; i < to_spawn; ++i) {
-					float t = (static_cast<float>(i) / to_spawn);
-					float time_elapsed = (1.f - t) * delta;
+				if (!group.pause_emission) {
+					for (int i = 0; i < to_spawn; ++i) {
+						float t = (static_cast<float>(i) / to_spawn);
+						float time_elapsed = (1.f - t) * delta;
 
-					components::transform current_transform(lerp(group.previous_transform.current.pos, transform.pos, vec2<>(t, t)),
-						lerp(group.previous_transform.current.rotation, transform.rotation, t));
+						components::transform current_transform(lerp(group.previous_transform.current.pos, transform.pos, vec2<>(t, t)),
+							lerp(group.previous_transform.current.rotation, transform.rotation, t));
 
-					particle_emitter_system::spawn_particle(stream_slot, current_transform.current.pos, current_transform.current.rotation +
-						stream_slot.swing_spread * sin((stream_slot.stream_lifetime_ms / 1000.f) * 2 * 3.1415926535897932384626433832795f * stream_slot.swings_per_sec)
-						, stream_info);
+						particle_emitter_system::spawn_particle(stream_slot, current_transform.current.pos, current_transform.current.rotation +
+							stream_slot.swing_spread * sin((stream_slot.stream_lifetime_ms / 1000.f) * 2 * 3.1415926535897932384626433832795f * stream_slot.swings_per_sec)
+							, stream_info);
 
-					update_particle(*stream_slot.particles.particles.rbegin(), time_elapsed);
-					stream_slot.stream_particles_to_spawn -= 1.f;
+						update_particle(*stream_slot.particles.particles.rbegin(), time_elapsed);
+						stream_slot.stream_particles_to_spawn -= 1.f;
+					}
+				}
+				else {
+					stream_slot.stream_particles_to_spawn -= to_spawn;
 				}
 			}
 
