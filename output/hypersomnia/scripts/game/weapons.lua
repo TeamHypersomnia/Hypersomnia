@@ -37,27 +37,50 @@ function create_weapons(scene, include_render)
 				end,
 				
 				on_wielder_changed = function(object, new_wielder)
-					object.weapon.trigger = components.weapon.triggers.NONE
-	
-					if new_wielder then
-						if new_wielder.inventory then
-							object.cpp_entity.render.model = nil
-						else
-							if use_world_sprite_to_wielded then
-								object.cpp_entity.render.model = scene.sprite_object_library[weapon_name]["world"]
+					if object.weapon then	
+						object.weapon.trigger = components.weapon.triggers.NONE
+					end
+					
+					-- following is only view
+					if include_render then
+						object.weapon.barrel_smoke_group.particle_group.pause_emission = false
+					
+						if new_wielder then
+							if new_wielder.inventory then
+								object.cpp_entity.render.model = nil
+								
+								if object.weapon then
+									object.weapon.barrel_smoke_group.particle_group.pause_emission = true
+								end
 							else
-								object.cpp_entity.render.model = scene.sprite_object_library[weapon_name]["wield"]
+								local target_sprite;
+								
+								if use_world_sprite_to_wielded then
+									target_sprite = scene.sprite_object_library[weapon_name]["world"]
+								else
+									target_sprite = scene.sprite_object_library[weapon_name]["wield"]
+								end
+								
+								object.cpp_entity.render.model = target_sprite
+								
+								if object.weapon then
+									object.weapon.barrel_smoke_group.chase.rotation_orbit_offset = vec2(target_sprite.size.x/2, 0)
+								end
+								
+								if weapon_properties.is_melee then
+									object.cpp_entity.render.layer = render_layers.WIELDED_MELEE
+								else
+									object.cpp_entity.render.layer = render_layers.WIELDED_GUNS
+								end
 							end
+						else
+							object.cpp_entity.render.model = scene.sprite_object_library[weapon_name]["world"]
+							object.cpp_entity.render.layer = render_layers.ON_GROUND
 							
-							if weapon_properties.is_melee then
-								object.cpp_entity.render.layer = render_layers.WIELDED_MELEE
-							else
-								object.cpp_entity.render.layer = render_layers.WIELDED_GUNS
+							if object.weapon then
+								object.weapon.barrel_smoke_group.chase.rotation_orbit_offset = weapon_properties.world_barrel_offset
 							end
 						end
-					else
-						object.cpp_entity.render.model = scene.sprite_object_library[weapon_name]["world"]
-						object.cpp_entity.render.layer = render_layers.ON_GROUND
 					end
 				end,
 					
@@ -106,6 +129,7 @@ function create_weapons(scene, include_render)
 		shake_radius = 9.5,
 		shake_spread_degrees = 45,
 		
+		world_barrel_offset = vec2(49, -8),
 		bullet_barrel_offset = vec2(70, 10),
 		
 		bullet_entity = basic_bullet_entity,				
@@ -128,6 +152,7 @@ function create_weapons(scene, include_render)
 		shake_radius = 1.5,
 		shake_spread_degrees = 45,
 		
+		world_barrel_offset = vec2(51, -5),
 		bullet_barrel_offset = vec2(50, 0),
 		
 		bullet_entity = basic_bullet_entity,				
@@ -151,6 +176,7 @@ function create_weapons(scene, include_render)
 		shake_radius = 0,
 		shake_spread_degrees = 0,
 		
+		world_barrel_offset = vec2(0, 0),
 		bullet_barrel_offset = vec2(0, 0),
 		
 		bullet_entity = basic_bullet_entity,				
