@@ -57,7 +57,7 @@ void animation_system::consume_events(world& owner) {
 			case animate_message::type::STOP:
 				animate.paused_state = components::animate::state::INCREASING;
 				animate.current_state = components::animate::state::PAUSED;
-				animate.set_current_frame(0, it.subject);
+				animate.set_current_frame(0, it.subject, false);
 				animate.current_ms = 0.f;
 				break;
 			case animate_message::type::START:
@@ -87,14 +87,16 @@ void call(luabind::object func, augs::entity_system::entity* subject) {
 	}
 }
 
-void components::animate::set_current_frame(unsigned number, augs::entity_system::entity* subject) {
+void components::animate::set_current_frame(unsigned number, augs::entity_system::entity* subject, bool do_callback) {
 	if (saved_callback_out) {
 		call(saved_callback_out, subject);
 	}
 	current_frame = number;
 	if (current_animation) {
-		call(current_animation->frames[current_frame].callback, subject);
-		saved_callback_out = current_animation->frames[current_frame].callback_out;
+		if (do_callback) {
+			call(current_animation->frames[current_frame].callback, subject);
+			saved_callback_out = current_animation->frames[current_frame].callback_out;
+		}
 
 		subject->get<components::render>().model = &current_animation->frames[get_current_frame()].model;
 	} else
