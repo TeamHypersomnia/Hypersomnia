@@ -374,7 +374,12 @@ function create_particle_effects(scene)
 	
 	particles.npc_effects = create_particle_emitter_info {
 		effects_subscribtion = {
-			[particle_burst_message.BULLET_IMPACT] = particles.blood_effect,
+			[particle_burst_message.BULLET_IMPACT] = particles.blood_effect
+		}
+	}
+	
+	particles.gun_effects = create_particle_emitter_info {
+		effects_subscribtion = {
 			[particle_burst_message.WEAPON_SHOT] = particles.gunshot_effect
 		}
 	}

@@ -46,7 +46,7 @@ function bullet_creation_system:update()
 			local burst = particle_burst_message()
 			burst.pos = msgs[i].barrel_transform.pos
 			burst.rotation = msgs[i].barrel_transform.rotation
-			burst.subject = entity
+			burst.subject = target.cpp_entity
 			burst.type = particle_burst_message.WEAPON_SHOT
 			
 			if weapon.barrel_smoke_group then

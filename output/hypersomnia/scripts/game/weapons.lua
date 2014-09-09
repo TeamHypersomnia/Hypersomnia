@@ -86,6 +86,12 @@ function create_weapons(scene, include_render)
 				}
 			}
 		}
+		
+		if scene.particles then
+			weapons[weapon_name].item_info.entity_archetype.particle_emitter = {
+				available_particle_effects = scene.particles.gun_effects
+			}
+		end	
 	end
 	
 	create_weapon("m4a1", "rifle", {
@@ -100,7 +106,7 @@ function create_weapons(scene, include_render)
 		shake_radius = 9.5,
 		shake_spread_degrees = 45,
 		
-		bullet_barrel_offset = vec2(50, 0),
+		bullet_barrel_offset = vec2(70, 10),
 		
 		bullet_entity = basic_bullet_entity,				
 		
