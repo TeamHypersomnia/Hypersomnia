@@ -210,7 +210,10 @@ physics_system::query_output physics_system::query_aabb(vec2<> p1_meters, vec2<>
 	aabb.upperBound = p2_meters;
 
 	b2world.QueryAABB(&callback, aabb);
-	return std::move(std::vector<b2Body*>(callback.output.begin(), callback.output.end()));
+
+	physics_system::query_output out;
+	out.bodies = std::move(std::vector<b2Body*>(callback.output.begin(), callback.output.end()));
+	return out;
 }
 
 physics_system::query_output physics_system::query_body(augs::entity_system::entity& subject, b2Filter* filter, void* ignore_userdata) {
@@ -252,12 +255,24 @@ physics_system::query_output physics_system::query_shape(b2Shape* shape, b2Filte
 	b2world.QueryAABB(&callback, shape_aabb);
 	
 	std::set<b2Body*> bodies;
+	std::set<physics_system::query_output::queried_result> details;
 
-	for (auto fixture : callback.out_fixtures) 
-		if (b2TestOverlap(shape, 0, fixture->GetShape(), 0, null_transform, fixture->GetBody()->GetTransform())) 
+	for (auto fixture : callback.out_fixtures) {
+		auto result = b2TestOverlapInfo(shape, 0, fixture->GetShape(), 0, null_transform, fixture->GetBody()->GetTransform());
+		if (result.overlap) {
 			bodies.insert(fixture->GetBody());
+			details.insert({
+				fixture->GetBody(),
+				result.pointA
+			});
+		}
+	}
 
-	return std::move(std::vector<b2Body*>(bodies.begin(), bodies.end()));
+	physics_system::query_output out;
+	out.bodies = std::vector<b2Body*>(bodies.begin(), bodies.end());
+	out.details = std::vector<physics_system::query_output::queried_result>(details.begin(), details.end());
+
+	return out;
 }
 
 physics_system::query_output physics_system::query_aabb_px(vec2<> p1, vec2<> p2, b2Filter* filter, void* ignore_userdata) {

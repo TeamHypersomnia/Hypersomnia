@@ -249,6 +249,17 @@ bool b2TestOverlap(	const b2Shape* shapeA, int32 indexA,
 					const b2Shape* shapeB, int32 indexB,
 					const b2Transform& xfA, const b2Transform& xfB, float32 maximum_distance = 10.0f * b2_epsilon);
 
+struct b2TestOverlapOutput {
+	b2Vec2 pointA;		///< closest point on shapeA
+	b2Vec2 pointB;		///< closest point on shapeB
+	bool overlap = false;
+};
+
+/// Determine if two generic shapes overlap.
+b2TestOverlapOutput b2TestOverlapInfo(const b2Shape* shapeA, int32 indexA,
+	const b2Shape* shapeB, int32 indexB,
+	const b2Transform& xfA, const b2Transform& xfB, float32 maximum_distance = 10.0f * b2_epsilon);
+
 // ---------------- Inline Functions ------------------------------------------
 
 inline bool b2AABB::IsValid() const

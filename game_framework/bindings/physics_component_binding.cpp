@@ -67,9 +67,16 @@ namespace bindings {
 			.def_readwrite("what_entity", &physics_system::raycast_output::what_entity)
 			,
 
+			luabind::class_<physics_system::query_output::queried_result>("queried_result")
+			.def(luabind::constructor<>())
+			.def_readwrite("location", &physics_system::query_output::queried_result::location)
+			.def_readwrite("body", &physics_system::query_output::queried_result::body)
+			,
+
 			luabind::class_<physics_system::query_output>("query_output")
 			.def(luabind::constructor<>())
 			.def_readwrite("bodies", &physics_system::query_output::bodies, luabind::return_stl_iterator)
+			.def_readwrite("details", &physics_system::query_output::details, luabind::return_stl_iterator)
 			,
 
 			luabind::class_<b2World>("b2World")

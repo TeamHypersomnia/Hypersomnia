@@ -91,9 +91,20 @@ public:
 	float get_closest_wall_intersection(vec2<> position, float radius, int ray_amount, b2Filter filter, entity* ignore_entity = nullptr);
 
 	struct query_output {
+		struct queried_result {
+			b2Body* body;
+			b2Vec2 location;
+
+			bool operator<(const queried_result& b) const {
+				return body < b.body;
+			}
+			bool operator==(const queried_result& b) const {
+				return body == b.body;
+			}
+		};
+
 		std::vector<b2Body*> bodies;
-		query_output() {}
-		query_output(const std::vector<b2Body*>& b) : bodies(b) {}
+		std::vector<queried_result> details;
 	};
 
 	query_output query_square(vec2<> p1_meters, float side_meters, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);

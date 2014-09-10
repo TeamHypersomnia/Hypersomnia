@@ -251,3 +251,31 @@ bool b2TestOverlap( const b2Shape* shapeA, int32 indexA,
 	if (maximum_distance < 0.f) maximum_distance = 10.f * b2_epsilon;
 	return output.distance < maximum_distance;
 }
+
+b2TestOverlapOutput b2TestOverlapInfo(const b2Shape* shapeA, int32 indexA,
+	const b2Shape* shapeB, int32 indexB,
+	const b2Transform& xfA, const b2Transform& xfB, float32 maximum_distance) {
+
+	b2TestOverlapOutput out;
+
+	b2DistanceInput input;
+	input.proxyA.Set(shapeA, indexA);
+	input.proxyB.Set(shapeB, indexB);
+	input.transformA = xfA;
+	input.transformB = xfB;
+	input.useRadii = true;
+
+	b2SimplexCache cache;
+	cache.count = 0;
+
+	b2DistanceOutput output;
+
+	b2Distance(&output, &cache, &input);
+
+	if (maximum_distance < 0.f) maximum_distance = 10.f * b2_epsilon;
+	out.overlap = output.distance < maximum_distance;
+	out.pointA = output.pointA;
+	out.pointB = output.pointB;
+	
+	return out;
+}
