@@ -87,28 +87,47 @@ function melee_system:process_swinging()
 		local bodies = self.owner_world.physics_system:query_polygon(queried_area, filters.BULLET, entity)
 		
 		while weapon.hits_remaining > 0 do
+			local axis = vec2.from_degrees(entity.transform.current.rotation)
+			
+			local smallest_cross;
+		
 			for candidate in bodies.details do
+				local hit_entity = body_to_entity(candidate.body)
+				
+				if not weapon.entities_hit[hit_entity] then
+					local direction = entity.transform.current.pos - to_pixels(candidate.location)
+				
+					local cross_value = math.abs(axis:cross(direction:normalize()))
+				
+					if not smallest_cross or cross_value < smallest_cross.value then
+						smallest_cross = {
+							["candidate"] = candidate,
+							["direction"] = direction,
+							value = cross_value
+						}
+					end
+				end
+			end
+			
+			if smallest_cross then
+				local candidate = smallest_cross.candidate
 				local hit_entity = body_to_entity(candidate.body)
 				local hit_object = hit_entity.script
 				
-				if not weapon.entities_hit[hit_entity] then
-					if hit_object then
-						
-					end
-					
-					burst_msg = particle_burst_message()
-					burst_msg.subject = hit_entity
-					burst_msg.pos = to_pixels(candidate.location)
-					burst_msg.rotation = (entity.transform.current.pos -  to_pixels(candidate.location)):get_degrees()
-					burst_msg.type = particle_burst_message.BULLET_IMPACT
-					
-					hit_entity.owner_world:post_message(burst_msg)
+				burst_msg = particle_burst_message()
+				burst_msg.subject = hit_entity
+				burst_msg.pos = to_pixels(candidate.location)
+				burst_msg.rotation = smallest_cross.direction:get_degrees()
+				burst_msg.type = particle_burst_message.BULLET_IMPACT
+				
+				hit_entity.owner_world:post_message(burst_msg)
 		
-					weapon.entities_hit[hit_entity] = true
-				end
+				weapon.entities_hit[hit_entity] = true
+				
+				weapon.hits_remaining = weapon.hits_remaining - 1
+			else
+				break
 			end
-		
-			weapon.hits_remaining = weapon.hits_remaining - 1
 		end
 	end
 end

@@ -193,7 +193,7 @@ function create_weapons(scene, include_render)
 		
 		swing_duration = 100,
 		swing_interval_ms = 100,
-		swing_angle = 90,
+		swing_angle = 140,
 		swing_radius = 100,
 		hits_per_swing = 1
 	}, true)
