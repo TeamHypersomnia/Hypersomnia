@@ -37,3 +37,4 @@ dofile (ENGINE_DIRECTORY .. "camera_class.lua")
 dofile (ENGINE_DIRECTORY .. "scene_class.lua")
 
 dofile (ENGINE_DIRECTORY .. "simulation_world_class.lua")
+dofile (ENGINE_DIRECTORY .. "sound_util.lua")

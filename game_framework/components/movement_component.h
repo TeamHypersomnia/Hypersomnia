@@ -28,6 +28,9 @@ namespace components {
 		
 		/* default acceleration vector used for movement requested by input */
 		augs::vec2<> input_acceleration;
+	
+		/* used to truncate acceleration vector if for example both up and right buttons are pressed */
+		float max_accel_len = -1.f;
 
 		/* if this is non-zero, the movement vector will be mapped to XY axis based on this vector and not on the inputs */
 		augs::vec2<> requested_movement;

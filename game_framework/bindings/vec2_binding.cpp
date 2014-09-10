@@ -26,6 +26,7 @@ luabind::scope get_scope(const char* name) {
 		.def("clamp", &vec2<T>::clamp<T>)
 		.def("get_radians", &vec2<T>::get_radians)
 		.def("set_length", &vec2<T>::set_length)
+		.def("cross", &vec2<T>::cross)
 		.def("set_from_degrees", &vec2<T>::set_from_degrees)
 		.def("non_zero", &vec2<T>::non_zero)
 		.def("perpendicular_cw", &vec2<T>::perpendicular_cw)

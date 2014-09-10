@@ -25,6 +25,7 @@ namespace bindings {
 			.def_readwrite("thrust_parallel_to_ground_length", &movement::thrust_parallel_to_ground_length)
 			.def_readwrite("ground_filter", &movement::ground_filter)
 			.def_readwrite("requested_movement", &movement::requested_movement)
+			.def_readwrite("max_accel_len", &movement::max_accel_len)
 			.def_readwrite("sidescroller_setup", &movement::sidescroller_setup)
 			.def_readwrite("air_resistance", &movement::air_resistance);
 	}

@@ -93,6 +93,12 @@ void movement_system::substep(world& owner) {
 		if (resultant.non_zero()) {
 			resultant.rotate(was_ground_hit ? ground_angle : movement.axis_rotation_degrees, vec2<>());
 
+			auto len = resultant.length();
+
+			if (movement.max_accel_len > 0 && len > movement.max_accel_len) {
+				resultant.set_length(movement.max_accel_len);
+			}
+
 			physics.body->ApplyForce(resultant * PIXELS_TO_METERSf * physics.body->GetMass(), physics.body->GetWorldCenter() + (movement.force_offset * PIXELS_TO_METERSf), true);
 		}
 
@@ -106,7 +112,7 @@ void movement_system::substep(world& owner) {
 		float32 speed = vel.Normalize();
 
 		if ((vel.x != 0.f || vel.y != 0.f) && movement.air_resistance > 0.f) 
-			physics.body->ApplyForce(movement.air_resistance * speed * speed * -vel, physics.body->GetWorldCenter(), true);
+			physics.body->ApplyForce(movement.air_resistance * speed * -vel, physics.body->GetWorldCenter(), true);
 	}
 }
 
