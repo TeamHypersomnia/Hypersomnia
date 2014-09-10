@@ -140,6 +140,7 @@ function create_weapons(scene, include_render)
 		swing_interval_ms = 100,
 		swing_angle = 20,
 		swing_radius = 70,
+		swing_damage = 35,
 		hits_per_swing = 1
 	})
 	
@@ -165,6 +166,7 @@ function create_weapons(scene, include_render)
 		swing_interval_ms = 100,
 		swing_angle = 20,
 		swing_radius = 70,
+		swing_damage = 30,
 		hits_per_swing = 1
 	})	
 	
@@ -195,6 +197,7 @@ function create_weapons(scene, include_render)
 		swing_interval_ms = 100,
 		swing_angle = 140,
 		swing_radius = 100,
+		swing_damage = 75,
 		hits_per_swing = 1
 	}, true)
 	

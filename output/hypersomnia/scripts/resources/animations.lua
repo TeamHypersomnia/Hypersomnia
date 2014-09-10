@@ -104,20 +104,9 @@ function create_torso_set_for(sprite_library, outfit, weapon_type)
 		--npc_info.head_entity.chase.rotation_orbit_offset = head_info[group][index].pos
 		
 		if not offset_info  or not offset_info[group] then return end
-		print (group, index)
 		
-		wielded.
-		cpp_entity.
-		chase.
-		rotation_offset = 
-		offset_info
-		[group]
-		[index]
-		.rotation
-		
+		wielded.cpp_entity.chase.rotation_offset = offset_info[group][index].rotation
 		wielded.cpp_entity.chase.rotation_orbit_offset = offset_info[group][index].pos
-		print(wielded.cpp_entity.chase.rotation_offset)
-		print(wielded.cpp_entity.chase.rotation_orbit_offset.x, wielded.cpp_entity.chase.rotation_orbit_offset.y)
 		
 		if offset_info[group][index].flip ~= nil then
 			wielded.cpp_entity.render.flip_vertically = offset_info[group][index].flip
