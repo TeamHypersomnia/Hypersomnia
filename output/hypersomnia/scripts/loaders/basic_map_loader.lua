@@ -117,6 +117,24 @@ return function(map_filename, scene_object)
 		}
 	}
 	
+	local all_sound_files = get_all_files_in_directory("hypersomnia\\data\\sfx")
+	local sound_by_filename = {}
+	local sound_library = {}
+	
+	for k, v in pairs(all_sound_files) do
+		local sound_object = create_sound("hypersomnia\\data\\sfx\\" .. v)
+		
+		sound_by_filename[k] = sound_object
+		
+		-- tokenize filename to only get the filename and the extension
+		local tokenized = tokenize_string(v, "\\/")
+		
+		-- the last token is just filename + extension
+		save_resource_in_item_library(tokenized[#tokenized], sound_object, sound_library)
+	end
+	
+	scene_object.sound_library = sound_library
+	scene_object.sound_by_filename = sound_by_filename
 	-- bind the atlas once
 	-- GL.glActiveTexture(GL.GL_TEXTURE0)
 	-- scene_object.all_atlas:bind()

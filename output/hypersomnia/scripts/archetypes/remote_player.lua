@@ -48,9 +48,10 @@ function create_remote_player(owner_scene, crosshair_sprite)
 			},
 			
 			movement = {
-				input_acceleration = vec2(5000, 5000),
+				input_acceleration = vec2(10000, 10000),
+				max_accel_len = 10000,
 				max_speed_animation = 1000,
-				air_resistance = 0.1,
+				air_resistance = 0.5,
 				braking_damping = 18,
 				receivers = {
 					{ target = "body", stop_at_zero_movement = false }, 
