@@ -137,7 +137,7 @@ function create_weapons(scene, include_render)
 		max_lifetime_ms = 500,
 		
 		swing_duration = 100,
-		swing_interval_ms = 100,
+		swing_interval_ms = 400,
 		swing_angle = 20,
 		swing_radius = 70,
 		swing_damage = 35,
@@ -163,7 +163,7 @@ function create_weapons(scene, include_render)
 		
 		max_lifetime_ms = 500,
 		swing_duration = 100,
-		swing_interval_ms = 100,
+		swing_interval_ms = 400,
 		swing_angle = 20,
 		swing_radius = 70,
 		swing_damage = 30,
@@ -194,9 +194,9 @@ function create_weapons(scene, include_render)
 		max_lifetime_ms = 0,
 		
 		swing_duration = 100,
-		swing_interval_ms = 100,
+		swing_interval_ms = 400,
 		swing_angle = 140,
-		swing_radius = 100,
+		swing_radius = 90,
 		swing_damage = 75,
 		hits_per_swing = 1
 	}, true)

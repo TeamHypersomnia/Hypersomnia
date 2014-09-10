@@ -49,6 +49,8 @@ function melee_system:process_swinging()
 	
 	msgs = self.owner_entity_system.messages["swing_hitcheck"]
 	
+	clearlc(2)
+	
 	for i=1, #msgs do
 		local msg = msgs[i]
 		local target = msg.subject
@@ -79,10 +81,10 @@ function melee_system:process_swinging()
 				prev = queried_area:at(j-1-1)
 			end
 			
-			debuglc(2, rgba(255, 255, 255, 255), prev, new_vert)
+			--debuglc(2, rgba(255, 255, 255, 255), prev, new_vert)
 		end
 		
-		debuglc(2, rgba(255, 255, 255, 255), queried_area:at(num_verts-1), entity.transform.current.pos)
+		--debuglc(2, rgba(255, 255, 255, 255), queried_area:at(num_verts-1), entity.transform.current.pos)
 		
 		local bodies = self.owner_world.physics_system:query_polygon(queried_area, filters.SWING_HITSENSOR, entity)
 		
