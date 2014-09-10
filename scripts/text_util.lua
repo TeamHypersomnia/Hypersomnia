@@ -38,3 +38,14 @@ function wstr_eq(a, b)
 	
 	return true
 end
+
+
+function wstr_eq_n(a, b, n)
+	if a:size() < n or b:size() < n then return false end
+
+	for i=0, n-1 do
+		if a:at(i) ~= b:at(i) then return false end 
+	end
+	
+	return true
+end
