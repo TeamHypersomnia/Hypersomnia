@@ -144,6 +144,7 @@ namespace bindings {
 			.def("GetReadOffset", &bitstream::GetReadOffset)
 			.def("GetNumberOfUnreadBits", &bitstream::GetNumberOfUnreadBits)
 
+			.def("WriteString", &bitstream::WriteString)
 			.def("WriteBits", &bitstream::WriteBits)
 			.def("WriteBitstream", &bitstream::WriteBitstream)
 			.def("WriteBit", &bitstream::WritePOD<bool>)
@@ -159,6 +160,7 @@ namespace bindings {
 			.def("ReadRakNetGUID", &bitstream::ReadGuid)
 			.def("WriteRakNetGUID", &bitstream::WriteGuid)
 			
+			.def("ReadString", &bitstream::ReadString)
 			.def("ReadBit", &bitstream::ReadPOD<bool>)
 			.def("ReadInt", &bitstream::ReadPOD<int>)
 			.def("ReadByte", &bitstream::ReadPOD<unsigned char>)

@@ -74,11 +74,27 @@ namespace augs {
 			}
 			
 			void WriteString(const std::string& str) {
-				stream.Write(str.c_str());
+				stream.Write<unsigned short>(str.length());
+				
+				for (auto& c : str) {
+					stream.Write<char>(c);
+				}
+
 				content += "std::string ";
 				content += get_next_property() + ':';
 				content += str;
 				content += '\n';
+			}
+
+			std::string ReadString() {
+				std::string out;
+				out.resize(ReadPOD<unsigned short>());
+
+				for (auto& c : out) {
+					c = ReadPOD<char>();
+				}
+
+				return out;
 			}
 
 			void WriteBits(bitstream& other, size_t n) {
