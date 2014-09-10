@@ -157,7 +157,7 @@ function create_weapons(scene, include_render)
 		shake_spread_degrees = 45,
 		
 		world_barrel_offset = vec2(51, -5),
-		bullet_barrel_offset = vec2(50, 0),
+		bullet_barrel_offset = vec2(72, 10),
 		
 		bullet_entity = basic_bullet_entity,				
 		
