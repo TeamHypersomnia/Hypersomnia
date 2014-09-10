@@ -14,8 +14,14 @@ function cprint(str, color, target_box, duration)
 	}, true)
 			
 	if target_box == nil then
-		client_scenes[CURRENT_CLIENT_NUMBER].my_gui.recent_messages:append_message(formatted_fstr, duration)
-		client_scenes[CURRENT_CLIENT_NUMBER].my_gui.last_message_nickname = nil
+		local client = client_scenes[CURRENT_CLIENT_NUMBER]
+		client.my_gui.recent_messages:append_message(formatted_fstr, duration)
+		client.my_gui.last_message_nickname = nil
+		
+		if not client.my_gui.content_chatbox:is_focused() then
+			client.my_gui.content_chatbox:set_caret(client.my_gui.content_chatbox:get_length(), false)
+			client.my_gui.content_chatbox:view_caret()
+		end
 	else
 		target_box:append_text(formatted_fstr, true)
 	end

@@ -1,4 +1,3 @@
-
 global_logfile = io.open("client_logfile.txt", "w")
 transmission_log = io.open("client_transmission.txt", "w")
 

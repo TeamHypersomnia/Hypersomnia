@@ -8,6 +8,12 @@ protocol.message_by_id = {
 		}
 	},
 	{
+		name = "REMOTE_COMMANDS",
+		data = {
+			"String", "script",
+		}
+	},
+	{
 		name = "REMOTE_CHAT_MESSAGE",
 		data = {
 			"WString", "nickname",
