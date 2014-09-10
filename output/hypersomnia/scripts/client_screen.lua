@@ -114,7 +114,7 @@ function client_screen:constructor(camera_rect)
 	
 	self.systems.label = label_system:create()
 	
-	self.systems.melee = melee_system:create()
+	self.systems.melee = melee_system:create(self.sample_scene.world_object)
 	
 	table.insert(self.sample_scene.world_object.prestep_callbacks, function (dt)
 		self.systems.input_prediction:substep()

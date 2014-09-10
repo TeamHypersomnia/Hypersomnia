@@ -211,15 +211,20 @@ function weapon_system:substep(dt)
 				self.owner_entity_system:post_table("begin_swinging", {
 					subject = target
 				})
+				
+				weapon.hits_remaining = weapon.hits_per_swing
+				weapon.entities_hit = {}
 			end
 		
 		elseif state == states.SWINGING then
 			if weapon:passed("swing_duration") then
 				weapon:set_state("SWINGING_INTERVAL")
 			else
-				self.owner_entity_system:post_table("swing_hitcheck", {
-					subject = target
-				})
+				if weapon.hits_remaining > 0 then
+					self.owner_entity_system:post_table("swing_hitcheck", {
+						subject = target
+					})
+				end
 			end
 			
 		elseif (state == states.SHOOTING_INTERVAL and weapon:passed("shooting_interval_ms")) or

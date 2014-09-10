@@ -137,7 +137,10 @@ function create_weapons(scene, include_render)
 		max_lifetime_ms = 500,
 		
 		swing_duration = 100,
-		swing_interval_ms = 100
+		swing_interval_ms = 100,
+		swing_angle = 20,
+		swing_radius = 70,
+		hits_per_swing = 1
 	})
 	
 	create_weapon("shotgun", "rifle", {
@@ -159,7 +162,10 @@ function create_weapons(scene, include_render)
 		
 		max_lifetime_ms = 500,
 		swing_duration = 100,
-		swing_interval_ms = 100
+		swing_interval_ms = 100,
+		swing_angle = 20,
+		swing_radius = 70,
+		hits_per_swing = 1
 	})	
 	
 	create_weapon("fireaxe", "melee", {
@@ -186,7 +192,10 @@ function create_weapons(scene, include_render)
 		max_lifetime_ms = 0,
 		
 		swing_duration = 100,
-		swing_interval_ms = 100
+		swing_interval_ms = 100,
+		swing_angle = 90,
+		swing_radius = 100,
+		hits_per_swing = 1
 	}, true)
 	
 	--weapons.shotgun = {
