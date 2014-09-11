@@ -57,13 +57,13 @@ return {
 	
 	static_snow = {
 		render_layer = "OBJECTS",
-		texture = "snow3.jpg",
+		texture = "wall2.jpg",
 		entity_archetype = static_object_archetype
 	},
 	
 	ground_snow = {
 		render_layer = "GROUND",
-		texture = "snow2.jpg"
+		texture = "snow3.jpg"
 	},
 	
 	dynamic = {

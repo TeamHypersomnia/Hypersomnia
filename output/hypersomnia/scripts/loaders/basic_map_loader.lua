@@ -81,7 +81,7 @@ return function(map_filename, scene_object)
 	
 	scene_object.bullet_sprite = create_sprite {
 		image = scene_object.sprite_library["bullet"],
-		size_multiplier = vec2(1.0, 0.5)
+		size_multiplier = vec2(1.0, 1.0)
 	}
 	
 	
