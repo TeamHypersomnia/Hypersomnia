@@ -55,87 +55,86 @@ function melee_system:process_swinging()
 		local msg = msgs[i]
 		local target = msg.subject
 		local weapon = target.weapon
-		local entity = target.cpp_entity
 				
-		-- try to recover the owner entity if we're dealing with an item
+		-- try to recover the owner entity since we're dealing with an item
 		if target.item and target.item.wielder then
-			entity = target.item.wielder.cpp_entity
-		end
+			local entity = target.item.wielder.cpp_entity
 		
-		local queried_area = vec2_vector()
-		local num_verts = 8
-		
-		clearlc(2)
-		
-		for j=1, num_verts do
-			local new_vert = entity.transform.current.pos + vec2.from_degrees(
-				entity.transform.current.rotation - (weapon.swing_angle / 2) 
-				+ (j-1) * (weapon.swing_angle / (num_verts - 1)) 
-				) * weapon.swing_radius
-		
-			queried_area:add(new_vert)
+			local queried_area = vec2_vector()
+			local num_verts = 8
 			
-			local prev = entity.transform.current.pos
+			clearlc(2)
 			
-			if j > 1 then
-				prev = queried_area:at(j-1-1)
+			for j=1, num_verts do
+				local new_vert = entity.transform.current.pos + vec2.from_degrees(
+					entity.transform.current.rotation - (weapon.swing_angle / 2) 
+					+ (j-1) * (weapon.swing_angle / (num_verts - 1)) 
+					) * weapon.swing_radius
+			
+				queried_area:add(new_vert)
+				
+				local prev = entity.transform.current.pos
+				
+				if j > 1 then
+					prev = queried_area:at(j-1-1)
+				end
+				
+				--debuglc(2, rgba(255, 255, 255, 255), prev, new_vert)
 			end
 			
-			--debuglc(2, rgba(255, 255, 255, 255), prev, new_vert)
-		end
-		
-		--debuglc(2, rgba(255, 255, 255, 255), queried_area:at(num_verts-1), entity.transform.current.pos)
-		
-		local bodies = self.owner_world.physics_system:query_polygon(queried_area, filters.SWING_HITSENSOR, entity)
-		
-		while weapon.hits_remaining > 0 do
-			local axis = vec2.from_degrees(entity.transform.current.rotation)
+			--debuglc(2, rgba(255, 255, 255, 255), queried_area:at(num_verts-1), entity.transform.current.pos)
 			
-			local smallest_cross;
-		
-			for candidate in bodies.details do
-				local hit_entity = body_to_entity(candidate.body)
+			local bodies = self.owner_world.physics_system:query_polygon(queried_area, filters.SWING_HITSENSOR, entity)
+			
+			while weapon.hits_remaining > 0 do
+				local axis = vec2.from_degrees(entity.transform.current.rotation)
 				
-				if not weapon.entities_hit[hit_entity] then
-					local direction = entity.transform.current.pos - to_pixels(candidate.location)
-				
-					local cross_value = math.abs(axis:cross(direction:normalize()))
-				
-					if not smallest_cross or cross_value < smallest_cross.value then
-						smallest_cross = {
-							["candidate"] = candidate,
-							["direction"] = direction,
-							value = cross_value
-						}
+				local smallest_cross;
+			
+				for candidate in bodies.details do
+					local hit_entity = body_to_entity(candidate.body)
+					
+					if not weapon.entities_hit[hit_entity] then
+						local direction = entity.transform.current.pos - to_pixels(candidate.location)
+					
+						local cross_value = math.abs(axis:cross(direction:normalize()))
+					
+						if not smallest_cross or cross_value < smallest_cross.value then
+							smallest_cross = {
+								["candidate"] = candidate,
+								["direction"] = direction,
+								value = cross_value
+							}
+						end
 					end
 				end
-			end
+				
+				if smallest_cross then
+					local candidate = smallest_cross.candidate
+					local hit_entity = body_to_entity(candidate.body)
+					local hit_object = hit_entity.script
+					
+					burst_msg = particle_burst_message()
+					burst_msg.subject = hit_entity
+					burst_msg.pos = to_pixels(candidate.location)
+					burst_msg.rotation = smallest_cross.direction:get_degrees()
+					burst_msg.type = particle_burst_message.BULLET_IMPACT
+					
+					hit_entity.owner_world:post_message(burst_msg)
+					print "posting impact"
 			
-			if smallest_cross then
-				local candidate = smallest_cross.candidate
-				local hit_entity = body_to_entity(candidate.body)
-				local hit_object = hit_entity.script
-				
-				burst_msg = particle_burst_message()
-				burst_msg.subject = hit_entity
-				burst_msg.pos = to_pixels(candidate.location)
-				burst_msg.rotation = smallest_cross.direction:get_degrees()
-				burst_msg.type = particle_burst_message.BULLET_IMPACT
-				
-				hit_entity.owner_world:post_message(burst_msg)
-				print "posting impact"
-		
-				weapon.entities_hit[hit_entity] = true
-				
-				weapon.hits_remaining = weapon.hits_remaining - 1
-				
-				if weapon.transmit_bullets and hit_object and hit_object.replication then
-					client_sys.net_channel:post_reliable("MELEE_HIT_REQUEST", {
-						suggested_subject = hit_object.replication.id
-					})
+					weapon.entities_hit[hit_entity] = true
+					
+					weapon.hits_remaining = weapon.hits_remaining - 1
+					
+					if weapon.transmit_bullets and hit_object and hit_object.replication then
+						client_sys.net_channel:post_reliable("MELEE_HIT_REQUEST", {
+							suggested_subject = hit_object.replication.id
+						})
+					end
+				else
+					break
 				end
-			else
-				break
 			end
 		end
 	end

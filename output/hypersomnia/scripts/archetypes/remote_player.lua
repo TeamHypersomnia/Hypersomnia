@@ -112,8 +112,8 @@ function create_remote_player(owner_scene, crosshair_sprite)
 		}
 	}
 	
-	player.body.animate.available_animations = owner_scene.torso_sets["white"]["barehands"].set
-	player.legs.animate.available_animations = owner_scene.legs_sets["white"].set
+	player.body.animate.available_animations = owner_scene.torso_sets["basic"]["barehands"].set
+	player.legs.animate.available_animations = owner_scene.legs_sets["basic"].set
 
 	return player
 end
@@ -148,7 +148,7 @@ world_archetype_callbacks.REMOTE_PLAYER = {
 		
 		new_entity.wield.on_item_wielded = function(this, picked, old_item, wielding_key)
 			if wielding_key == components.wield.keys.PRIMARY_WEAPON then
-				new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["white"][picked.item.outfit_type].set
+				new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["basic"][picked.item.outfit_type].set
 
 				new_remote_player.body.movement.animation_message = animation_events.MOVE
 				
@@ -189,7 +189,7 @@ world_archetype_callbacks.REMOTE_PLAYER = {
 		new_entity.wield.on_item_unwielded = function(this, old_item, wielding_key)
 			if wielding_key == components.wield.keys.PRIMARY_WEAPON then
 				new_remote_player.body.movement.animation_message = animation_events.MOVE
-				new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["white"]["barehands"].set
+				new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["basic"]["barehands"].set
 				
 				local stop_msg = animate_message()
 				stop_msg.subject = new_remote_player.body

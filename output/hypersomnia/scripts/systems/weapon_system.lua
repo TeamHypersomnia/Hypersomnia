@@ -160,7 +160,7 @@ function weapon_system:swinging_routine(target)
 end
 
 function weapon_system:substep(dt)
-	if dt <= 0 then return end
+	--if dt <= 0 then return end
 	
 	for i=1, #self.targets do
 		local target = self.targets[i]

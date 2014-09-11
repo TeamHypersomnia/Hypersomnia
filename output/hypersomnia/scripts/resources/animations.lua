@@ -1,6 +1,7 @@
 available_resources = {
 	outfits = {
-		"white"
+		"white",
+		"basic"
 	},
 	
 	weapon_types = {

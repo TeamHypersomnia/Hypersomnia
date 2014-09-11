@@ -139,8 +139,8 @@ function create_controlled_player(scene_object, position, target_camera, crossha
 		target_camera.camera.crosshair:set(player.crosshair)
 	end
 	
-	player.body.animate.available_animations = scene_object.torso_sets["white"]["barehands"].set
-	player.legs.animate.available_animations = scene_object.legs_sets["white"].set
+	player.body.animate.available_animations = scene_object.torso_sets["basic"]["barehands"].set
+	player.legs.animate.available_animations = scene_object.legs_sets["basic"].set
 	
 	return player
 end
@@ -180,7 +180,7 @@ world_archetype_callbacks.CONTROLLED_PLAYER = {
 		
 		new_entity.wield.on_item_wielded = function(this, picked, old_item, wielding_key)
 			if wielding_key == components.wield.keys.PRIMARY_WEAPON then
-				player_cpp_entity.body.animate.available_animations = self.owner_scene.torso_sets["white"][picked.item.outfit_type].set
+				player_cpp_entity.body.animate.available_animations = self.owner_scene.torso_sets["basic"][picked.item.outfit_type].set
 				
 				player_cpp_entity.body.movement.animation_message = animation_events.MOVE
 				
@@ -219,7 +219,7 @@ world_archetype_callbacks.CONTROLLED_PLAYER = {
 		
 		new_entity.wield.on_item_unwielded = function(this, unwielded, wielding_key)
 			if wielding_key == components.wield.keys.PRIMARY_WEAPON then
-				player_cpp_entity.body.animate.available_animations = self.owner_scene.torso_sets["white"]["barehands"].set
+				player_cpp_entity.body.animate.available_animations = self.owner_scene.torso_sets["basic"]["barehands"].set
 				player_cpp_entity.body.movement.animation_message = animation_events.MOVE
 				
 				if unwielded.cpp_entity.physics == nil then return end
