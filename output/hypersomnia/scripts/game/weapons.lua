@@ -118,11 +118,11 @@ function create_weapons(scene, include_render)
 	end
 	
 	create_weapon("m4a1", "rifle", {
-		current_rounds = 30,
+		current_rounds = 3000,
 		is_automatic = true,
 		bullets_once = 1,
 		bullet_damage = 5,
-		bullet_speed = minmax(3000, 3000),
+		bullet_speed = minmax(5000, 7000),
 		
 		shooting_interval_ms = 100,
 		spread_degrees = 0,

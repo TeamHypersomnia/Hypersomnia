@@ -52,9 +52,9 @@ function create_particle_effects(scene)
 	
 	particles.barrel_explosion_template = {
 		angular_damping = 0,
-		linear_damping = 55000,
+		linear_damping = 5000,
 		should_disappear = true,
-		model = { image = sprites.bullet, size_multiplier = vec2(4, 4) },
+		model = { image = sprites.bullet, size_multiplier = vec2(4, 1) },
 	}
 	
 	particles.barrel_smoke_template = {
@@ -110,22 +110,23 @@ function create_particle_effects(scene)
 	}
 	
 	particles.barrel_explosion = {
-		spread_degrees = 15.5,
-		particles_per_burst = minmax_u(10, 50),
+		spread_degrees = 12.5,
+		particles_per_burst = minmax_u(30, 50),
 		type = emission.BURST,
-		velocity = minmax(1000, 10000),
+		velocity = minmax(50, 2000),
 		angular_velocity = minmax(0, 0),
-		particle_lifetime_ms = minmax(0, 20),
+		particle_lifetime_ms = minmax(30, 50),
 		particle_templates = {
 			particles.barrel_explosion_template
 		},
 		
-		size_multiplier = minmax(0.8, 1.2),
+		size_multiplier = minmax(0.5, 0.5),
 			
 		particle_render_template = { 
 			layer = render_layers.EFFECTS
 		},
-		initial_rotation_variation = 20
+		
+		initial_rotation_variation = 10
 	}
 	
 	particles.barrel_smoke_1 = {
@@ -341,14 +342,14 @@ function create_particle_effects(scene)
 	particles.gunshot_effect = {
 		particles.barrel_smoke_1,
 		particles.barrel_smoke_2,
-		particles.barrel_explosion,
-		override(particles.sparkles, {
-			size_multiplier = minmax(0.1, 35),
-			angular_offset = minmax(-15, 15),
-			particles_per_burst = minmax_u(10, 150),
-			velocity = minmax(1000, 3400),
-			initial_rotation_variation = 40
-		})
+		particles.barrel_explosion
+		--override(particles.sparkles, {
+		--	size_multiplier = minmax(0.1, 35),
+		--	angular_offset = minmax(-15, 15),
+		--	particles_per_burst = minmax_u(10, 150),
+		--	velocity = minmax(1000, 3400),
+		--	initial_rotation_variation = 40
+		--})
 	}
 	
 	particles.blood_effect = {
