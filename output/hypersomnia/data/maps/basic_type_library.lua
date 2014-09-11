@@ -48,5 +48,26 @@ return {
 	
 	ground = {
 		render_layer = "GROUND"
+	},
+	
+	static = {
+		render_layer = "OBJECTS",
+		entity_archetype = static_object_archetype
+	},	
+	
+	static_snow = {
+		render_layer = "OBJECTS",
+		texture = "snow3.jpg",
+		entity_archetype = static_object_archetype
+	},
+	
+	ground_snow = {
+		render_layer = "GROUND",
+		texture = "snow2.jpg"
+	},
+	
+	dynamic = {
+		render_layer = "OBJECTS",
+		entity_archetype = dynamic_object_archetype
 	}
 }

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="90" height="80" tilewidth="100" tileheight="100">
+ <properties>
+  <property name="gameplay_textures" value="..\\gfx\\"/>
+  <property name="texture_directory" value="snow_textures\\"/>
+  <property name="type_library" value="basic_type_library.lua"/>
+ </properties>
+ <layer name="Tile Layer 1" width="90" height="80">
+  <data encoding="base64" compression="zlib">
+   eJztwTEBAAAAwqD1T20ND6AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAdwNwgAAB
+  </data>
+ </layer>
+ <objectgroup name="objects" width="90" height="80">
+  <object type="static_snow" x="3200" y="2600">
+   <polygon points="0,0 200,-200 1000,-200 1200,0 1200,800 1000,1000 200,1000 0,800"/>
+  </object>
+  <object type="static_snow" x="5000" y="2600">
+   <polygon points="0,0 200,-200 1000,-200 1200,0 1200,800 1000,1000 200,1000 0,800"/>
+  </object>
+  <object type="static_snow" x="3200" y="4400">
+   <polygon points="0,0 200,-200 1000,-200 1200,0 1200,800 1000,1000 200,1000 0,800"/>
+  </object>
+  <object type="static_snow" x="4992" y="4400">
+   <polygon points="0,0 200,-200 1000,-200 1200,0 1200,800 1000,1000 200,1000 0,800"/>
+  </object>
+  <object type="static_snow" x="3400" y="1900" width="100" height="500"/>
+  <object type="static_snow" x="3400" y="5400" width="100" height="500"/>
+  <object type="static_snow" x="5900" y="5400" width="100" height="500"/>
+  <object type="static_snow" x="5900" y="1900" width="100" height="500"/>
+  <object type="static_snow" x="8200" y="1800"/>
+  <object type="static_snow" x="4600" y="400" width="200" height="700"/>
+  <object type="static_snow" x="2300" y="200" width="4800" height="200"/>
+  <object type="static_snow" x="8300" y="200" width="200" height="7400"/>
+  <object type="static_snow" x="5700" y="400">
+   <polygon points="0,0 100,200 400,200 500,0"/>
+  </object>
+  <object type="static_snow" x="7100" y="200">
+   <polygon points="0,0 0,200 1200,700 1200,0"/>
+  </object>
+  <object type="static_snow" x="6400" y="400">
+   <polygon points="0,0 100,200 400,200 500,0"/>
+  </object>
+  <object type="static_snow" x="4600" y="6700" width="200" height="700"/>
+  <object type="static_snow" x="2300" y="7400" width="4800" height="200"/>
+  <object type="static_snow" x="7100" y="7400">
+   <polygon points="0,0 1200,-500 1200,200 0,200"/>
+  </object>
+  <object type="static_snow" x="7400" y="1300" width="200" height="2500"/>
+  <object type="static_snow" x="5700" y="7400">
+   <polygon points="0,0 100,-200 400,-200 500,0"/>
+  </object>
+  <object type="static_snow" x="6400" y="7400">
+   <polygon points="0,0 100,-200 400,-200 500,0"/>
+  </object>
+  <object type="static_snow" x="2500" y="7400">
+   <polygon points="0,0 100,-200 400,-200 500,0"/>
+  </object>
+  <object type="static_snow" x="3200" y="7400">
+   <polygon points="0,0 100,-200 400,-200 500,0"/>
+  </object>
+  <object type="static_snow" x="3200" y="400">
+   <polygon points="0,0 100,200 400,200 500,0"/>
+  </object>
+  <object type="static_snow" x="2500" y="400">
+   <polygon points="0,0 100,200 400,200 500,0"/>
+  </object>
+  <object type="static_snow" x="7400" y="4000" width="200" height="2500"/>
+  <object type="static_snow" x="2300" y="7600">
+   <polygon points="0,0 0,-200 -1200,-700 -1200,0"/>
+  </object>
+  <object type="static_snow" x="900" y="200" width="200" height="7400"/>
+  <object type="static_snow" x="2300" y="400">
+   <polygon points="0,0 -1200,500 -1200,-200 0,-200"/>
+  </object>
+  <object type="static_snow" x="1800" y="1300" width="200" height="2500"/>
+  <object type="static_snow" x="1800" y="4000" width="200" height="2500"/>
+ </objectgroup>
+ <objectgroup name="ground" width="90" height="80" visible="0">
+  <object type="ground_snow" x="900" y="200" width="2100" height="2100"/>
+  <object type="ground_snow" x="3000" y="200" width="2100" height="2100"/>
+  <object type="ground_snow" x="5100" y="200" width="2100" height="2100"/>
+  <object type="ground_snow" x="900" y="2300" width="2100" height="2100"/>
+  <object type="ground_snow" x="3000" y="2300" width="2100" height="2100"/>
+  <object type="ground_snow" x="5100" y="2300" width="2100" height="2100"/>
+  <object type="ground_snow" x="900" y="4400" width="2100" height="2100"/>
+  <object type="ground_snow" x="3000" y="4400" width="2100" height="2100"/>
+  <object type="ground_snow" x="5100" y="4400" width="2100" height="2100"/>
+  <object type="ground_snow" x="900" y="6500" width="2100" height="2100"/>
+  <object type="ground_snow" x="3000" y="6500" width="2100" height="2100"/>
+  <object type="ground_snow" x="5100" y="6500" width="2100" height="2100"/>
+  <object type="ground_snow" x="7200" y="6500" width="2100" height="2100"/>
+  <object type="ground_snow" x="7200" y="2300" width="2100" height="2100"/>
+  <object type="ground_snow" x="7200" y="4400" width="2100" height="2100"/>
+  <object type="ground_snow" x="7200" y="200" width="2100" height="2100"/>
+  <object type="ground_snow" x="-1200" y="6500" width="2100" height="2100"/>
+  <object type="ground_snow" x="-1200" y="2300" width="2100" height="2100"/>
+  <object type="ground_snow" x="-1200" y="4400" width="2100" height="2100"/>
+  <object type="ground_snow" x="-1200" y="200" width="2100" height="2100"/>
+  <object type="ground_snow" x="-1200" y="-1900" width="2100" height="2100"/>
+  <object type="ground_snow" x="5100" y="-1900" width="2100" height="2100"/>
+  <object type="ground_snow" x="900" y="-1900" width="2100" height="2100"/>
+  <object type="ground_snow" x="3000" y="-1900" width="2100" height="2100"/>
+  <object type="ground_snow" x="7200" y="-1900" width="2100" height="2100"/>
+  <object type="ground_snow" x="9300" y="6500" width="2100" height="2100"/>
+  <object type="ground_snow" x="9300" y="4400" width="2100" height="2100"/>
+  <object type="ground_snow" x="9300" y="2300" width="2100" height="2100"/>
+  <object type="ground_snow" x="9300" y="200" width="2100" height="2100"/>
+  <object type="ground_snow" x="9300" y="-1900" width="2100" height="2100"/>
+ </objectgroup>
+ <objectgroup name="teleports" width="90" height="80">
+  <object type="teleport_position" x="2400" y="1700" width="300" height="300"/>
+  <object type="teleport_position" x="2400" y="2400" width="300" height="300"/>
+  <object type="teleport_position" x="2400" y="3100" width="300" height="300"/>
+  <object type="teleport_position" x="2400" y="3800" width="300" height="300"/>
+  <object type="teleport_position" x="2400" y="5200" width="300" height="300"/>
+  <object type="teleport_position" x="2400" y="4500" width="300" height="300"/>
+  <object type="teleport_position" x="2400" y="5900" width="300" height="300"/>
+  <object type="teleport_position" x="6700" y="2400" width="300" height="300"/>
+  <object type="teleport_position" x="6700" y="3800" width="300" height="300"/>
+  <object type="teleport_position" x="6700" y="5200" width="300" height="300"/>
+  <object type="teleport_position" x="6700" y="1700" width="300" height="300"/>
+  <object type="teleport_position" x="6700" y="5900" width="300" height="300"/>
+  <object type="teleport_position" x="6700" y="4500" width="300" height="300"/>
+  <object type="teleport_position" x="6700" y="3100" width="300" height="300"/>
+  <object type="teleport_position" x="4600" y="3700" width="300" height="300"/>
+  <object type="teleport_position" x="4500" y="5900" width="300" height="300"/>
+  <object type="teleport_position" x="4600" y="1700" width="300" height="300"/>
+  <object type="teleport_position" x="5000" y="500" width="300" height="300"/>
+  <object type="teleport_position" x="4000" y="500" width="300" height="300"/>
+  <object type="teleport_position" x="7800" y="1300" width="300" height="300"/>
+  <object type="teleport_position" x="7800" y="3800" width="300" height="300"/>
+  <object type="teleport_position" x="7800" y="6100" width="300" height="300"/>
+  <object type="teleport_position" x="1300" y="6100" width="300" height="300"/>
+  <object type="teleport_position" x="1200" y="3800" width="300" height="300"/>
+  <object type="teleport_position" x="1200" y="1300" width="300" height="300"/>
+ </objectgroup>
+</map>
