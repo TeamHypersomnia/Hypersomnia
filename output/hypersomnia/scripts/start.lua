@@ -63,7 +63,7 @@ SHOULD_QUIT_FLAG = false
 function get_scene()
 	return client_scenes[CURRENT_CLIENT_NUMBER].sample_scene
 end
-
+GL.glClearColor(0, 0, 0, 0)
 while not SHOULD_QUIT_FLAG do
 	GL.glClear(GL.GL_COLOR_BUFFER_BIT)
 	

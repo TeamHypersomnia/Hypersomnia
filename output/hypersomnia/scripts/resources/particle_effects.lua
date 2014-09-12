@@ -65,56 +65,56 @@ function create_particle_effects(scene)
 		angular_damping = 0,
 		linear_damping = 20,
 		should_disappear = true,
-		model = { image = sprites.smoke1, color = rgba(255, 255, 255, 10), size_multiplier = vec2(0.2, 0.2) },
-		alpha_levels = 3,
-		ignore_rotation = true
+		model = { image = sprites.smoke1, color = rgba(255, 255, 255, 150), size_multiplier = vec2(0.4, 0.4) },
+		--alpha_levels = 255,
+		--ignore_rotation = true
 		--acc = vec2(0, -300)
 	}
 	
 	-- EMISSIONS --
 	
 	particles.wall_parts = {
-		spread_degrees = 45,
+		spread_degrees = 65,
 		type = emission.BURST,
-		particle_lifetime_ms = minmax(100000, 200000),
+		particle_lifetime_ms = minmax(20000, 40000),
 		initial_rotation_variation = 180,
 		
 		particle_render_template = { 
 			layer = render_layers.ON_GROUND
 		},
 		
-		particles_per_burst = minmax_u(3, 6),
-		velocity = minmax(10, 700),
+		particles_per_burst = minmax_u(2, 6),
+		velocity = minmax(10, 1200),
 		angular_velocity = minmax(10, 100),
 		size_multiplier = minmax(0.3, 1),
 		
 		particle_templates = particles.wall_templates
 	}
 	
-	particles.sparkles = {
-		spread_degrees = 15,
-		particles_per_burst = minmax_u(0, 50),
-		type = emission.BURST,
-		velocity = minmax(1000, 10000),
-		angular_velocity = minmax(0, 0),
-		particle_lifetime_ms = minmax(20, 40),
-		particle_templates = {
-			{ 
-				should_disappear = true,
-				model = {
-					image = sprites.bullet,
-					size_multiplier = vec2(0.1, 0.05),
-					color = rgba(255, 255, 255, 120)
-				}
-			}
-		},
-		
-		size_multiplier = minmax(0.001, 5),
-			
-		particle_render_template = { 
-			layer = render_layers.EFFECTS
-		}
-	}
+	--particles.sparkles = {
+	--	spread_degrees = 15,
+	--	particles_per_burst = minmax_u(0, 50),
+	--	type = emission.BURST,
+	--	velocity = minmax(1000, 10000),
+	--	angular_velocity = minmax(0, 0),
+	--	particle_lifetime_ms = minmax(20, 40),
+	--	particle_templates = {
+	--		{ 
+	--			should_disappear = true,
+	--			model = {
+	--				image = sprites.bullet,
+	--				size_multiplier = vec2(0.1, 0.05),
+	--				color = rgba(255, 255, 255, 120)
+	--			}
+	--		}
+	--	},
+	--	
+	--	size_multiplier = minmax(0.001, 5),
+	--		
+	--	particle_render_template = { 
+	--		layer = render_layers.EFFECTS
+	--	}
+	--}
 	
 	particles.barrel_explosion = {
 		spread_degrees = 12.5,
@@ -148,6 +148,13 @@ function create_particle_effects(scene)
 		initial_rotation_variation = 10
 	}
 	
+	particles.sparkles = override (particles.barrel_explosion, {
+		spread_degrees = 42.5,
+		velocity = minmax(200, 1000),
+		particle_lifetime_ms = minmax(10, 100),
+		size_multiplier = minmax(0.1, 2),
+	})
+	
 	particles.barrel_smoke_1 = {
 		spread_degrees = 0.0,
 		particles_per_sec = minmax(5, 15),
@@ -155,6 +162,7 @@ function create_particle_effects(scene)
 		type = emission.STREAM,
 		velocity = minmax(1, 110),
 		particle_lifetime_ms = minmax(100, 1500),
+		angular_velocity = minmax(0, 0.4),
 		
 		particle_templates = {
 			particles.barrel_smoke_template,
@@ -170,14 +178,17 @@ function create_particle_effects(scene)
 			}),
 			override(particles.barrel_smoke_template, {
 				model = { image = sprites.smoke5 }
+			}),
+			override(particles.barrel_smoke_template, {
+				model = { image = sprites.smoke6 }
 			})
 		},
 		
-		size_multiplier = minmax(1, 36),
-		--initial_rotation_variation = 180,
+		size_multiplier = minmax(0.5, 1),
+		initial_rotation_variation = 180,
 		
 		particle_render_template = { 
-			layer = render_layers.EFFECTS
+			layer = render_layers.SMOKES
 		},
 		
 		--swing_spread = minmax(0, 90),
@@ -186,10 +197,10 @@ function create_particle_effects(scene)
 		min_swing_spread = minmax(2, 5),
 		min_swings_per_sec = minmax(0.5, 1),
 		max_swing_spread = minmax(6, 12),
-		max_swings_per_sec = minmax(1.5, 2),
+		max_swings_per_sec = minmax(1.5, 4),
 		
 		swing_spread = minmax(5, 12),
-		swings_per_sec = minmax(2, 2),
+		swings_per_sec = minmax(2, 4),
 		swing_spread_change_rate = minmax(1, 2),
 		angular_offset = minmax(0, 0),
 		
@@ -200,11 +211,11 @@ function create_particle_effects(scene)
 	particles.barrel_smoke_2 = override(particles.barrel_smoke_1, {
 		spread_degrees = 0,
 		stream_duration_ms = minmax(1000, 6000),
-		particles_per_sec = minmax(10, 20),
-		velocity = minmax(1, 90),
+		particles_per_sec = minmax(30, 40),
+		velocity = minmax(1, 150),
 		--particle_lifetime_ms = minmax(10, 3000),
 		
-		size_multiplier = minmax(1, 14),
+		size_multiplier = minmax(0.5, 2),
 		
 		particle_templates = {
 			{ linear_damping = 5 }
@@ -368,7 +379,7 @@ function create_particle_effects(scene)
 		particles.wall_parts,
 		particles.bullet_impact_smoke_1,
 		particles.bullet_impact_smoke_2,
-		particles.metal_sparkles
+		particles.sparkles
 	}
 	
 	particles.gunshot_effect = {

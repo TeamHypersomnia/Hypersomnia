@@ -1,5 +1,4 @@
 world_render_layers = {
-	"EFFECTS",
 	"OBJECTS",
 	"HEADS",
 	"WIELDED_GUNS",
@@ -13,6 +12,11 @@ world_render_layers = {
 	"GROUND"
 }
 
+other_layers = {
+	"EFFECTS",
+	"SMOKES"
+}
+
 hud_render_layers = {
 	"CROSSHAIRS",
 	"INVENTORY_SLOTS",
@@ -22,5 +26,6 @@ hud_render_layers = {
 
 render_layers = create_enum (table.concatenate {
 	hud_render_layers,
+	other_layers,
 	world_render_layers 
 })
