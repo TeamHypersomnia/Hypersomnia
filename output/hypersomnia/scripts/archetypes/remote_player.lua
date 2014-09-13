@@ -121,15 +121,15 @@ end
 
 world_archetype_callbacks.REMOTE_PLAYER = {
 	creation = function(self)
-		local new_remote_player = create_remote_player(self.owner_scene, self.owner_scene.crosshair_sprite)
+		local entity_group = create_remote_player(self.owner_scene, self.owner_scene.crosshair_sprite)
 	
 		local new_entity = components.create_components {
-			cpp_entity = new_remote_player.body,
+			cpp_entity = entity_group.body,
 			interpolation = {},
 			
 			orientation = {
 				receiver = true,
-				crosshair_entity = new_remote_player.crosshair
+				crosshair_entity = entity_group.crosshair
 			},
 			
 			health = {},
@@ -146,56 +146,13 @@ world_archetype_callbacks.REMOTE_PLAYER = {
 			}
 		}
 		
+				
 		new_entity.wield.on_item_wielded = function(this, picked, old_item, wielding_key)
-			if wielding_key == components.wield.keys.PRIMARY_WEAPON then
-				new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["basic"][picked.item.outfit_type].set
-
-				new_remote_player.body.movement.animation_message = animation_events.MOVE
-				
-				if picked.weapon ~= nil then
-					if picked.weapon.is_melee then
-						if picked.weapon.current_swing_direction then
-							new_remote_player.body.movement.animation_message = animation_events.MOVE_CW
-						else
-							new_remote_player.body.movement.animation_message = animation_events.MOVE_CCW
-						end
-					end
-					
-					
-					picked.weapon.transmit_bullets = false
-					picked.weapon.constrain_requested_bullets = false
-					picked.weapon.bullet_entity.physics.body_info.filter = filters.REMOTE_BULLET
-				end
-				
-				local stop_msg = animate_message()
-				stop_msg.subject = new_remote_player.body
-				stop_msg.message_type = animate_message.STOP
-				stop_msg.animation_priority = 100
-				
-				local msg = animate_message()
-				msg.subject = new_remote_player.body
-				msg.message_type = animate_message.START
-				msg.change_speed = true
-				msg.animation_type = new_remote_player.body.movement.animation_message
-				msg.speed_factor = 0
-				msg.animation_priority = 0
-				
-				new_remote_player.body.owner_world:post_message(stop_msg)
-				new_remote_player.body.owner_world:post_message(msg)
-				
-			end
+			return character_wielding_procedure(self.owner_scene, entity_group, false, this, picked, old_item, wielding_key)
 		end
 		
-		new_entity.wield.on_item_unwielded = function(this, old_item, wielding_key)
-			if wielding_key == components.wield.keys.PRIMARY_WEAPON then
-				new_remote_player.body.movement.animation_message = animation_events.MOVE
-				new_remote_player.body.animate.available_animations = self.owner_scene.torso_sets["basic"]["barehands"].set
-				
-				local stop_msg = animate_message()
-				stop_msg.subject = new_remote_player.body
-				stop_msg.message_type = animate_message.STOP
-				stop_msg.animation_priority = 100
-			end
+		new_entity.wield.on_item_unwielded = function(this, unwielded, wielding_key)
+			return character_unwielding_procedure(self.owner_scene, entity_group, false, this, unwielded, wielding_key)
 		end
 		
 		return new_entity

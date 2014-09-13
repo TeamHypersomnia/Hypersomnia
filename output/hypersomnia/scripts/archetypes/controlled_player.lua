@@ -145,23 +145,94 @@ function create_controlled_player(scene_object, position, target_camera, crossha
 	return player
 end
 
+function character_wielding_procedure(owner_scene, entity_group, is_controlled, this, picked, old_item, wielding_key)
+	if wielding_key == components.wield.keys.PRIMARY_WEAPON then
+		entity_group.body.animate.available_animations = owner_scene.torso_sets["basic"][picked.item.outfit_type].set
+		
+		entity_group.body.movement.animation_message = animation_events.MOVE
+		
+		if picked.weapon ~= nil then
+			if picked.weapon.is_melee then
+				if picked.weapon.current_swing_direction then
+					entity_group.body.movement.animation_message = animation_events.MOVE_CW
+				else
+					entity_group.body.movement.animation_message = animation_events.MOVE_CCW
+				end
+			end
+			
+			if is_controlled then
+				picked.weapon.transmit_bullets = true
+				picked.weapon.constrain_requested_bullets = true
+				picked.weapon.bullet_entity.physics.body_info.filter = filters.BULLET
+			else
+				picked.weapon.transmit_bullets = false
+				picked.weapon.constrain_requested_bullets = false
+				picked.weapon.bullet_entity.physics.body_info.filter = filters.REMOTE_BULLET
+			end
+		end
+		
+		
+		local stop_msg = animate_message()
+		stop_msg.subject = entity_group.body
+		stop_msg.message_type = animate_message.STOP
+		stop_msg.animation_priority = 100
+		
+		local msg = animate_message()
+		msg.subject = entity_group.body
+		msg.message_type = animate_message.START
+		msg.change_speed = true
+		msg.animation_type = entity_group.body.movement.animation_message
+		msg.speed_factor = 0
+		msg.animation_priority = 0
+		
+		entity_group.body.owner_world:post_message(stop_msg)
+		entity_group.body.owner_world:post_message(msg)
+	end
+end
+
+function character_unwielding_procedure(owner_scene, entity_group, is_controlled, this, unwielded, wielding_key)
+	if wielding_key == components.wield.keys.PRIMARY_WEAPON then
+		entity_group.body.animate.available_animations = owner_scene.torso_sets["basic"]["barehands"].set
+		entity_group.body.movement.animation_message = animation_events.MOVE
+		
+		local stop_msg = animate_message()
+		stop_msg.subject = entity_group.body
+		stop_msg.message_type = animate_message.STOP
+		stop_msg.animation_priority = 100
+		
+		if is_controlled then
+			if unwielded.cpp_entity.physics == nil then return end
+		
+			local body = unwielded.cpp_entity.physics.body
+			local force = (this.orientation.last_pos):normalize() * 100
+			
+			if this.orientation.last_pos:length() < 0.01 then
+				force = vec2(100, 0)
+			end
+			
+			body:ApplyLinearImpulse(to_meters(force), body:GetWorldCenter(), true)
+			body:ApplyAngularImpulse(4, true)
+		end
+	end
+end
+
 world_archetype_callbacks.CONTROLLED_PLAYER = {
 	creation = function(self, id)
-		local player_cpp_entity = create_controlled_player(
+		local player_group = create_controlled_player(
 		self.owner_scene,
 		self.owner_scene.teleport_position, 
 		self.owner_scene.world_camera, 
 		self.owner_scene.crosshair_sprite)
 	
 		local new_entity = components.create_components {
-			cpp_entity = player_cpp_entity.body,
+			cpp_entity = player_group.body,
 			input_prediction = {
 				simulation_entity = self.owner_scene.simulation_player
 			},
 			
 			orientation = {
 				receiver = false,
-				crosshair_entity = player_cpp_entity.crosshair
+				crosshair_entity = player_group.crosshair
 			},
 			
 			health = {},
@@ -179,67 +250,11 @@ world_archetype_callbacks.CONTROLLED_PLAYER = {
 		}
 		
 		new_entity.wield.on_item_wielded = function(this, picked, old_item, wielding_key)
-			if wielding_key == components.wield.keys.PRIMARY_WEAPON then
-				player_cpp_entity.body.animate.available_animations = self.owner_scene.torso_sets["basic"][picked.item.outfit_type].set
-				
-				player_cpp_entity.body.movement.animation_message = animation_events.MOVE
-				
-				if picked.weapon ~= nil then
-					if picked.weapon.is_melee then
-						if picked.weapon.current_swing_direction then
-							player_cpp_entity.body.movement.animation_message = animation_events.MOVE_CW
-						else
-							player_cpp_entity.body.movement.animation_message = animation_events.MOVE_CCW
-						end
-					end
-					
-					picked.weapon.transmit_bullets = true
-					picked.weapon.constrain_requested_bullets = true
-					picked.weapon.bullet_entity.physics.body_info.filter = filters.BULLET
-				end
-				
-				
-				local stop_msg = animate_message()
-				stop_msg.subject = player_cpp_entity.body
-				stop_msg.message_type = animate_message.STOP
-				stop_msg.animation_priority = 100
-				
-				local msg = animate_message()
-				msg.subject = player_cpp_entity.body
-				msg.message_type = animate_message.START
-				msg.change_speed = true
-				msg.animation_type = player_cpp_entity.body.movement.animation_message
-				msg.speed_factor = 0
-				msg.animation_priority = 0
-				
-				player_cpp_entity.body.owner_world:post_message(stop_msg)
-				player_cpp_entity.body.owner_world:post_message(msg)
-			end
+			return character_wielding_procedure(self.owner_scene, player_group, true, this, picked, old_item, wielding_key)
 		end
 		
 		new_entity.wield.on_item_unwielded = function(this, unwielded, wielding_key)
-			if wielding_key == components.wield.keys.PRIMARY_WEAPON then
-				player_cpp_entity.body.animate.available_animations = self.owner_scene.torso_sets["basic"]["barehands"].set
-				player_cpp_entity.body.movement.animation_message = animation_events.MOVE
-				
-				if unwielded.cpp_entity.physics == nil then return end
-				
-				local body = unwielded.cpp_entity.physics.body
-				local force = (this.orientation.last_pos):normalize() * 100
-				
-				if this.orientation.last_pos:length() < 0.01 then
-					force = vec2(100, 0)
-				end
-				print "force:" 
-				print (force.x, force.y)
-				body:ApplyLinearImpulse(to_meters(force), body:GetWorldCenter(), true)
-				body:ApplyAngularImpulse(4, true)
-				
-				local stop_msg = animate_message()
-				stop_msg.subject = player_cpp_entity.body
-				stop_msg.message_type = animate_message.STOP
-				stop_msg.animation_priority = 100
-			end
+			return character_unwielding_procedure(self.owner_scene, player_group, true, this, unwielded, wielding_key)
 		end
 		
 		self.controlled_character_id = id

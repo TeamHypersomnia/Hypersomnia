@@ -1,6 +1,6 @@
 config_table = {
 	window_name = "example",
-	fullscreen = 1,
+	fullscreen = 0,
 	window_border = 1,
 	window_x = 0,
 	window_y = 0,
@@ -16,7 +16,7 @@ config_table = {
 	
 	nickname = "Daedalus",
 	
-	multiple_clients_view = 0,
+	multiple_clients_view = 1,
 	divergence_radius = 1,
 	
 	tickrate = 60,
