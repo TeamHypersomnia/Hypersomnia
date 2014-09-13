@@ -12,7 +12,7 @@ config_table = {
 	sensitivity = vec2(2.5, 2.5),
 	
 	server_address = "127.0.0.1",
-	server_port = 37017,
+	server_port = 27014,
 	
 	nickname = "Daedalus",
 	

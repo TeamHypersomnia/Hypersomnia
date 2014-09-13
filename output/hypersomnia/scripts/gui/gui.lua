@@ -163,9 +163,11 @@ function gui_class:constructor(camera_rect, world_object, owner_client)
 			end
 			
 			self.main_chatbox:clear_text()
-		else
-			self:set_enabled(false)
+		--else
+		--	self:set_enabled(false)
 		end
+			
+		self:set_enabled(false)
 		
 	end)
 end
