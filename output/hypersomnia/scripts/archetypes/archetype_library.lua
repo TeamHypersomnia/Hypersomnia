@@ -27,7 +27,9 @@ world_archetype_groups = {
 	UNGROUPED = {
 		"CONTROLLED_PLAYER",
 		"REMOTE_PLAYER",
-		"INVENTORY"
+		"INVENTORY",
+		
+		"SOLDIER"
 	}
 }
 

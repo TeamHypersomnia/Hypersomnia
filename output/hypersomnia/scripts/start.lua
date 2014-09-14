@@ -18,6 +18,8 @@ dofile "hypersomnia\\scripts\\archetypes\\remote_player.lua"
 dofile "hypersomnia\\scripts\\archetypes\\gun.lua"
 dofile "hypersomnia\\scripts\\archetypes\\inventory.lua"
 
+dofile "hypersomnia\\scripts\\archetypes\\soldier.lua"
+
 -- resource handling utilities
 dofile "hypersomnia\\scripts\\resources\\animations.lua"
 dofile "hypersomnia\\scripts\\resources\\particle_effects.lua"
