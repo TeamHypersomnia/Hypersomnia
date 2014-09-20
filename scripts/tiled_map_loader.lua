@@ -6,7 +6,7 @@ tiled_map_loader = {
 	
 	texture_property_name = "texture",
 	
-	map_scale = 1,
+	map_scale = 0.5,
 	allow_unknown_types = true,
 	
 	try_to_load_map = function(map_filename)

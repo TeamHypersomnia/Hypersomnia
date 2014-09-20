@@ -86,6 +86,8 @@ namespace bindings {
 
 			luabind::class_<steering>("steering_component")
 			.def(luabind::constructor<>())
+			.def_readwrite("last_resultant_force", &steering::last_resultant_force)
+			.def_readwrite("apply_force", &steering::apply_force)
 			.def("add_behaviour", &steering::add_behaviour)
 			.def("clear_behaviours", &steering::clear_behaviours)
 			.def_readwrite("max_speed", &steering::max_speed)

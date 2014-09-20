@@ -670,7 +670,9 @@ void steering_system::substep(world& owner) {
 		if (steer.max_resultant_force >= 0.f)
 			resultant_force.clamp(steer.max_resultant_force);
 
-		if (resultant_force.non_zero())
+		steer.last_resultant_force = resultant_force;
+
+		if (steer.apply_force && resultant_force.non_zero())
 			body->ApplyForce(resultant_force*PIXELS_TO_METERSf * body->GetMass(), body->GetWorldCenter(), true);
 
 		if (render.draw_steering_forces)
