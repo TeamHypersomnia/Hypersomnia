@@ -124,6 +124,10 @@ void visibility_system::process_entities(world& owner) {
 
 				bool operator<(const target_vertex& b) {
 					return angle < b.angle;
+				}				
+				
+				bool operator==(const target_vertex& b) {
+					return pos.compare(b.pos);
 				}
 			};
 
@@ -247,6 +251,7 @@ void visibility_system::process_entities(world& owner) {
 
 			/* SORT ALL VERTICES BY ANGLE */
 			std::sort(all_vertices_transformed.begin(), all_vertices_transformed.end());
+			all_vertices_transformed.erase(std::unique(all_vertices_transformed.begin(), all_vertices_transformed.end()), all_vertices_transformed.end());
 
 			/* by now we have ensured that all_vertices_transformed is non-empty
 
@@ -270,6 +275,33 @@ void visibility_system::process_entities(world& owner) {
 
 			/* container for these */
 			std::vector<double_ray> double_rays;
+
+			auto push_double_ray = [&double_rays](const double_ray& ray_b) -> bool {
+				bool is_same_as_previous = false;
+				vec2<> p2 = ray_b.first * METERS_TO_PIXELSf;
+
+				if (!double_rays.empty()) {
+					auto& ray_a = *double_rays.rbegin();
+
+					vec2<> p1 = ray_a.second * METERS_TO_PIXELSf;
+
+					is_same_as_previous = p1.compare(p2);
+				}
+
+				/* save new double_ray if it is not degenerate */
+				if (!is_same_as_previous
+					&& (std::fpclassify(p2.x) == FP_NORMAL || std::fpclassify(p2.x) == FP_ZERO)
+					&& (std::fpclassify(p2.y) == FP_NORMAL || std::fpclassify(p2.y) == FP_ZERO)
+					&& p2.x == p2.x
+					&& p2.y == p2.y)
+				{
+					double_rays.push_back(ray_b);
+					return true;
+				}
+
+				return false;
+			};
+
 
 			/* helper debugging lambda */
 			auto draw_line = [&position_meters, &render](vec2<> point, graphics::pixel_32 col) {
@@ -375,8 +407,8 @@ void visibility_system::process_entities(world& owner) {
 
 					new_discontinuity.is_boundary = true;
 					//request.discontinuities.push_back(new_discontinuity);
-					double_rays.push_back(double_ray(vertex.pos, vertex.pos, true, true));
-					if (draw_cast_rays) draw_line(vertex.pos, graphics::pixel_32(255, 255, 0, 255));
+					if (push_double_ray(double_ray(vertex.pos, vertex.pos, true, true)))
+						if (draw_cast_rays) draw_line(vertex.pos, graphics::pixel_32(255, 255, 0, 255));
 				}
 				else if (!vertex.is_on_a_bound) {
 					/* if we did not intersect with anything */
@@ -407,9 +439,10 @@ void visibility_system::process_entities(world& owner) {
 							/* interpret it as both rays hit the same vertex
 							for maximum accuracy, push the vertex coordinates instead of the actual intersections */
 
-							request.vertex_hits.push_back(std::make_pair(double_rays.size(), vertex.pos * METERS_TO_PIXELSf));
-							double_rays.push_back(double_ray(vertex.pos, vertex.pos, true, true));
-							if (draw_cast_rays) draw_line(vertex.pos, graphics::pixel_32(255, 255, 0, 255));
+							if (push_double_ray(double_ray(vertex.pos, vertex.pos, true, true))) {
+								request.vertex_hits.push_back(std::make_pair(double_rays.size()-1, vertex.pos * METERS_TO_PIXELSf));
+								if (draw_cast_rays) draw_line(vertex.pos, graphics::pixel_32(255, 255, 0, 255));
+							}
 						}
 						/* we're here so:
 						they reached the target or even further (guaranteed by first condition),
@@ -454,10 +487,11 @@ void visibility_system::process_entities(world& owner) {
 								new_discontinuity.edge_index = double_rays.size();
 								if (draw_cast_rays) draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 255, 255));
 							}
+							
 							/* save new double ray */
-							double_rays.push_back(new_double_ray);
-							/* save new discontinuity */
-							request.discontinuities.push_back(new_discontinuity);
+							if (push_double_ray(new_double_ray))
+								/* save new discontinuity */
+								request.discontinuities.push_back(new_discontinuity);
 						}
 					}
 					/* the case where exactly one of the rays did not hit anything so we cast it against boundaries,
@@ -480,22 +514,26 @@ void visibility_system::process_entities(world& owner) {
 
 										new_discontinuity.points.first = vertex.pos;
 										new_discontinuity.points.second = actual_intersection;
-
+										
+										double_ray new_double_ray;
 										/* if the left-handed ray intersected with boundary and thus the right-handed intersected with an obstacle */
 										if (k == 0) {
 											new_discontinuity.winding = components::visibility::discontinuity::LEFT;
 											new_discontinuity.edge_index = double_rays.size();
-											double_rays.push_back(double_ray(actual_intersection, vertex.pos, false, true));
+											new_double_ray = double_ray(actual_intersection, vertex.pos, false, true);
 										}
 										/* if the right-handed ray intersected with boundary and thus the left-handed intersected with an obstacle */
 										else if (k == 1) {
 											new_discontinuity.winding = components::visibility::discontinuity::RIGHT;
 											new_discontinuity.edge_index = double_rays.size() - 1;
-											double_rays.push_back(double_ray(vertex.pos, actual_intersection, true, false));
+											new_double_ray = double_ray(vertex.pos, actual_intersection, true, false);
 										}
-										request.discontinuities.push_back(new_discontinuity);
 
-										if (draw_cast_rays) draw_line(actual_intersection, graphics::pixel_32(0, 0, 255, 255));
+										/* save new double ray */
+										if (push_double_ray(new_double_ray)) {
+											request.discontinuities.push_back(new_discontinuity);
+											if (draw_cast_rays) draw_line(actual_intersection, graphics::pixel_32(0, 0, 255, 255));
+										}
 									}
 								}
 								break;
@@ -521,28 +559,7 @@ void visibility_system::process_entities(world& owner) {
 					render.lines.push_back(render_system::debug_line(p1, p2, request.color));
 				}
 
-				/* save new edge if it is not degenerate */
-				if (!(p1.compare(p2) ||
-					std::fpclassify(p1.x) != FP_NORMAL
-					|| std::fpclassify(p1.y) != FP_NORMAL
-					|| std::fpclassify(p2.x) != FP_NORMAL
-					|| std::fpclassify(p2.y) != FP_NORMAL
-					|| !(p1.x == p1.x)
-					|| !(p2.x == p2.x)
-					|| !(p1.y == p1.y)
-					|| !(p2.y == p2.y))
-					)
-				{
-
-					request.edges.push_back(std::make_pair(p1, p2));
-					//request.edges.clear();
-					//request.discontinuities.clear();
-					//break;
-				//	int found_nan = 24;
-				//std::cout << found_nan << std::endl;
-				//continue;
-				}
-
+				request.edges.push_back(std::make_pair(p1, p2));
 			}
 
 			/* a little processing on discontinuities, we'll need them in a moment */

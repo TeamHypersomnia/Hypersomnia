@@ -149,10 +149,10 @@ void pathfinding_system::process_entities(world& owner) {
 
 							/* if this sensor overlaps anything, discard it */
 							std::vector<vec2<>> sensor_polygon = {
-								sensor_direction * 10 + vert.location - sensor_direction.perpendicular_cw() * 2,
-								sensor_direction * 10 + vert.location - sensor_direction.perpendicular_cw() * 2 + sensor_direction * pathfinding.target_offset,
-								sensor_direction * 10 + vert.location + sensor_direction.perpendicular_cw() * 2 + sensor_direction * pathfinding.target_offset,
-								sensor_direction * 10 + vert.location + sensor_direction.perpendicular_cw() * 2
+								sensor_direction * 10 + vert.location - sensor_direction.perpendicular_cw() * 4,
+								sensor_direction * 10 + vert.location - sensor_direction.perpendicular_cw() * 4 + sensor_direction * pathfinding.target_offset,
+								sensor_direction * 10 + vert.location + sensor_direction.perpendicular_cw() * 4 + sensor_direction * pathfinding.target_offset,
+								sensor_direction * 10 + vert.location + sensor_direction.perpendicular_cw() * 4
 							};
 
 							//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[0], sensor_polygon[1], graphics::pixel_32(255, 255, 255, 255)));
@@ -491,6 +491,8 @@ void pathfinding_system::process_entities(world& owner) {
 				//if (pathfinding.session_stack.size() == 1) {
 					pathfinding.session().discovered_vertices.clear();
 					pathfinding.session().undiscovered_vertices.clear();
+					pathfinding.session().persistent_navpoint_set = false;
+					pathfinding.session().undiscovered_visible.clear();
 					//pathfinding.session().temporary_ignore_discontinuities_shorter_than /= 1.5f;
 				//}
 				//pathfinding.session_stack.resize(1);
