@@ -20,6 +20,10 @@ namespace bindings {
 			.def_readwrite("angular_damping", &particle::angular_damping)
 			.def_readwrite("lifetime_ms", &particle::lifetime_ms)
 			.def_readwrite("max_lifetime_ms", &particle::max_lifetime_ms)
-			.def_readwrite("should_disappear", &particle::should_disappear);
+			.def_readwrite("alpha_levels", &particle::alpha_levels)
+			.def_readwrite("should_disappear", &particle::should_disappear)
+			.def_readwrite("ignore_rotation", &particle::ignore_rotation)
+			
+			;
 	}
 }

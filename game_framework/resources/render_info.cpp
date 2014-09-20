@@ -326,10 +326,17 @@ namespace components {
 			for (auto& it : s.particles.particles) {
 				auto temp_alpha = it.face.color.a;
 
-				if (it.should_disappear)
-					it.face.color.a = static_cast<graphics::color>(((it.max_lifetime_ms - it.lifetime_ms) / it.max_lifetime_ms) * static_cast<float>(temp_alpha));
+				if (it.should_disappear) {
+					auto desired_alpha = static_cast<graphics::color>(((it.max_lifetime_ms - it.lifetime_ms) / it.max_lifetime_ms) * static_cast<float>(temp_alpha));
+					if (it.alpha_levels > 0) {
+						it.face.color.a = desired_alpha == 0 ? 0 : ((255 / it.alpha_levels) * (1 + (desired_alpha / (255 / it.alpha_levels))));
+					}
+					else {
+						it.face.color.a = desired_alpha;
+					}
+				}
 
-				in.transform = components::transform::state(it.pos, it.rotation);
+				in.transform = it.ignore_rotation ? components::transform::state(it.pos, 0) : components::transform::state(it.pos, it.rotation);
 				it.face.draw(in);
 				it.face.color.a = temp_alpha;
 			}

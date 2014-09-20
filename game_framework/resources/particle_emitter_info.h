@@ -15,6 +15,8 @@ namespace resources {
 		float angular_damping = 0.f;
 		float lifetime_ms = 0.f, max_lifetime_ms = 0.f;
 		bool should_disappear = true;
+		bool ignore_rotation = false;
+		int alpha_levels = -1;
 	};
 
 	struct emission {
