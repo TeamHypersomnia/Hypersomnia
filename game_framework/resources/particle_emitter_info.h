@@ -25,9 +25,8 @@ namespace resources {
 			STREAM
 		} type;
 
-		float spread_degrees = 0.f;
-
 		std::pair<float, float>
+			spread_degrees = std::make_pair(0.f, 0.f),
 			velocity = std::make_pair(0.f, 0.f),
 			angular_velocity = std::make_pair(0.f, 0.f),
 			particles_per_sec = std::make_pair(0.f, 0.f),

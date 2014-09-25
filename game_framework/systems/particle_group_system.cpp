@@ -59,7 +59,7 @@ void particle_group_system::process_entities(world& owner) {
 
 						particle_emitter_system::spawn_particle(stream_slot, current_transform.current.pos, current_transform.current.rotation +
 							stream_slot.swing_spread * sin((stream_slot.stream_lifetime_ms / 1000.f) * 2 * 3.1415926535897932384626433832795f * stream_slot.swings_per_sec)
-							, stream_info);
+							, stream_slot.target_spread, stream_info);
 
 						update_particle(*stream_slot.particles.particles.rbegin(), time_elapsed);
 						stream_slot.stream_particles_to_spawn -= 1.f;

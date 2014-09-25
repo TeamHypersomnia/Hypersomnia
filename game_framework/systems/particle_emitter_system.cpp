@@ -24,10 +24,10 @@ entity& particle_emitter_system::create_refreshable_particle_group(world& owner)
 }
 
 void particle_emitter_system::spawn_particle(
-	components::particle_group::stream& group, const vec2<>& position, float rotation, const resources::emission& emission) {
+	components::particle_group::stream& group, const vec2<>& position, float rotation, float spread, const resources::emission& emission) {
 	auto new_particle = emission.particle_templates[randval(0u, emission.particle_templates.size() - 1)];
 	new_particle.vel = vec2<>::from_degrees(
-		randval(rotation - emission.spread_degrees, rotation + emission.spread_degrees)) *
+		randval(rotation - spread, rotation + spread)) *
 		randval(emission.velocity);
 
 	new_particle.pos = position + emission.offset;
@@ -55,7 +55,7 @@ void particle_emitter_system::spawn_particle(
 
 	if (emission.randomize_acceleration) {
 		new_particle.acc += vec2<>::from_degrees(
-			randval(rotation - emission.spread_degrees, rotation + emission.spread_degrees)) *
+			randval(rotation - spread, rotation + spread)) *
 			randval(emission.acceleration);
 	}
 
@@ -95,6 +95,7 @@ void particle_emitter_system::consume_events(world& owner) {
 		
 		for (auto& emission : *emissions) {
 			float target_rotation = it.rotation + randval(emission.angular_offset);
+			float target_spread = randval(emission.spread_degrees);
 
 			if (emission.type == resources::emission::type::BURST) {
 				int burst_amount = randval(emission.particles_per_burst);
@@ -108,7 +109,7 @@ void particle_emitter_system::consume_events(world& owner) {
 				new_burst_entity.add(new_render);
 
 				for (int i = 0; i < burst_amount; ++i)
-					spawn_particle(new_burst_entity.get<components::particle_group>().stream_slots[0], it.pos, target_rotation, emission);
+					spawn_particle(new_burst_entity.get<components::particle_group>().stream_slots[0], it.pos, target_rotation, target_spread, emission);
 
 			}
 
@@ -153,6 +154,7 @@ void particle_emitter_system::consume_events(world& owner) {
 
 			target_stream.stream_info = stream;
 			target_stream.stream_lifetime_ms = 0.f;
+			target_stream.target_spread = randval(stream->spread_degrees);
 			target_stream.swing_spread = randval(stream->swing_spread);
 			target_stream.swings_per_sec = randval(stream->swings_per_sec);
 

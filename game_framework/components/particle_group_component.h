@@ -32,6 +32,8 @@ namespace components {
 			float stream_max_lifetime_ms = 0.f;
 			float stream_particles_to_spawn = 0.f;
 
+			float target_spread = 0.f;
+
 			float swing_spread = 0.f;
 			float swings_per_sec = 0.f;
 			float min_swing_spread = 0.f, max_swing_spread = 0.f, min_swings_per_sec = 0.f, max_swings_per_sec = 0.f;

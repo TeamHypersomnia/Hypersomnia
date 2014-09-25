@@ -127,7 +127,7 @@ void visibility_system::process_entities(world& owner) {
 				}				
 				
 				bool operator==(const target_vertex& b) {
-					return pos.compare(b.pos);
+					return pos.compare(b.pos) || (b.angle - angle) <= std::numeric_limits<float>::epsilon();
 				}
 			};
 
