@@ -7,11 +7,7 @@ filters = {
 	},
 	
 	DROPPED_ITEM = {
-		"ITEM_PICK", "STATIC_OBJECT"
-	},
-	
-	ITEM_PICK = {
-		"DROPPED_ITEM"
+		"STATIC_OBJECT"
 	},
 	
 	CHARACTER = {
@@ -64,7 +60,7 @@ end
 query_filter_category = 0
 	
 for k, v in pairs(all_categories) do
-	query_filter_category = bitor(v, query_filter_all_categories)
+	query_filter_category = bitor(v, query_filter_category)
 end
 
 function create_query_filter(entries)
