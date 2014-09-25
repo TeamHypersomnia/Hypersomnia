@@ -966,3 +966,9 @@ It is simpler than the input prediction in these matters:
 Just do an "extrapolation" component that simulates entities forward in time by ping whenever an update comes for them.
 
 Consider just making a flag to the interpolation component and right away use the interpolation system to avoid code duplication.
+
+
+Sounds in 3d relative to the players position;
+Enemies after several shots randomly starting to escape while there's line of sight;
+blood like barrel explosions and delayed stains on the ground;
+apply impulse upon melee hit

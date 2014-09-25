@@ -2,6 +2,10 @@
 filters = {
 	STATIC_OBJECT = "ALL",
 
+	AVOIDANCE = {
+		"STATIC_OBJECT"
+	},
+	
 	DROPPED_ITEM = {
 		"ITEM_PICK", "STATIC_OBJECT"
 	},

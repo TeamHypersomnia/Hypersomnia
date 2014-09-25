@@ -203,22 +203,20 @@ function client_screen:loop()
 	
 	self.systems.wield:receive_item_wieldings()
 	
-	self.systems.weapon:handle_messages()
 	
 	self.systems.input_prediction:update()
 	self.systems.interpolation:update()
 	self.systems.orientation:update()
 	
-	self.systems.weapon:translate_shot_info_msgs()
-	self.systems.weapon:update()
-	
-	self.systems.melee:process_swinging()
-	
 	self.systems.lifetime:update()
 	self.systems.inventory:update()
 	-- post-inventory pass update for prediction
 
+	self.systems.weapon:handle_messages()
+	self.systems.weapon:translate_shot_info_msgs()
+	self.systems.weapon:update()
 	self.systems.bullet_creation:update()
+	self.systems.melee:process_swinging()
 	
 	-- hit info translation implies deleting some of the bullets so it is to be executed
 	-- after their potential creation (bullet_creation:update())

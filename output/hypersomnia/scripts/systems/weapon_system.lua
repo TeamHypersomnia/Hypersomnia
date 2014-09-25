@@ -180,6 +180,11 @@ function weapon_system:substep(dt)
 				
 			if #weapon.buffered_actions > 0 then
 				trigger = weapon.buffered_actions[1].trigger
+				
+				if weapon.buffered_actions[1].flag_msg then
+					weapon.buffered_actions[1].flag_msg.handled = true
+				end
+				
 				premade_shot = weapon.buffered_actions[1].premade_shot
 				
 				-- assume that a valid action will always be executed on "READY" state, 
