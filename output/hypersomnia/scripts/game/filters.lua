@@ -19,7 +19,7 @@ filters = {
 	},
 	
 	REMOTE_CHARACTER = {
-		"BULLET", "CHARACTER", "SWING_HITSENSOR"
+		"BULLET", "CHARACTER"
 	},
 	
 	BULLET = {
@@ -28,10 +28,6 @@ filters = {
 	
 	REMOTE_BULLET = {
 		"STATIC_OBJECT"
-	},
-	
-	SWING_HITSENSOR = {
-		"STATIC_OBJECT", "REMOTE_CHARACTER"
 	}
 }
 
@@ -61,6 +57,25 @@ for k, v in pairs(filters) do
 	
 	filters[k] = create(b2Filter, {
 		categoryBits = all_categories[k],
+		maskBits = mask
+	})
+end
+
+query_filter_category = 0
+	
+for k, v in pairs(all_categories) do
+	query_filter_category = bitor(v, query_filter_all_categories)
+end
+
+function create_query_filter(entries)
+	local mask = 0
+	
+	for i=1, #entries do
+		mask = bitor(all_categories[entries[i]], mask)
+	end
+	
+	return create(b2Filter, {
+		categoryBits = query_filter_category,
 		maskBits = mask
 	})
 end

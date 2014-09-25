@@ -84,7 +84,7 @@ function melee_system:process_swinging()
 			
 			--debuglc(2, rgba(255, 255, 255, 255), queried_area:at(num_verts-1), entity.transform.current.pos)
 			
-			local bodies = self.owner_world.physics_system:query_polygon(queried_area, filters.SWING_HITSENSOR, entity)
+			local bodies = self.owner_world.physics_system:query_polygon(queried_area, create_query_filter({"STATIC_OBJECT", "REMOTE_CHARACTER"}), entity)
 			
 			while weapon.hits_remaining > 0 do
 				local axis = vec2.from_degrees(entity.transform.current.rotation)

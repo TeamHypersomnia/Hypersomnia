@@ -74,7 +74,7 @@ function create_particle_effects(scene)
 	-- EMISSIONS --
 	
 	particles.wall_parts = {
-		spread_degrees = 65,
+		spread_degrees = minmax(65, 65),
 		type = emission.BURST,
 		particle_lifetime_ms = minmax(20000, 40000),
 		initial_rotation_variation = 180,
@@ -83,10 +83,10 @@ function create_particle_effects(scene)
 			layer = render_layers.ON_GROUND
 		},
 		
-		particles_per_burst = minmax_u(1, 3),
+		particles_per_burst = minmax_u(0, 2),
 		velocity = minmax(10, 1200),
 		angular_velocity = minmax(10, 100),
-		size_multiplier = minmax(0.3, 1),
+		size_multiplier = minmax(0.1, 0.8),
 		
 		particle_templates = particles.wall_templates
 	}
@@ -117,7 +117,7 @@ function create_particle_effects(scene)
 	--}
 	
 	particles.barrel_explosion = {
-		spread_degrees = 12.5,
+		spread_degrees = minmax(5.5, 12.5),
 		particles_per_burst = minmax_u(30, 50),
 		type = emission.BURST,
 		velocity = minmax(50, 2000),
@@ -149,15 +149,15 @@ function create_particle_effects(scene)
 	}
 	
 	particles.sparkles = override (particles.barrel_explosion, {
-		spread_degrees = 42.5,
+		spread_degrees = minmax(12.5, 22.5),
 		velocity = minmax(200, 1000),
 		particle_lifetime_ms = minmax(10, 100),
 		size_multiplier = minmax(0.1, 2),
 	})
 	
 	particles.barrel_smoke_1 = {
-		spread_degrees = 0.0,
-		particles_per_sec = minmax(5, 30),
+		spread_degrees = minmax(0, 0),
+		particles_per_sec = minmax(5, 60),
 		stream_duration_ms = minmax(100, 600),
 		type = emission.STREAM,
 		velocity = minmax(1, 120),
@@ -184,7 +184,7 @@ function create_particle_effects(scene)
 			})
 		},
 		
-		size_multiplier = minmax(0.5, 1),
+		size_multiplier = minmax(0.9, 1),
 		initial_rotation_variation = 180,
 		
 		particle_render_template = { 
@@ -209,13 +209,13 @@ function create_particle_effects(scene)
 	}
 	
 	particles.barrel_smoke_2 = override(particles.barrel_smoke_1, {
-		spread_degrees = 0,
+		spread_degrees = minmax(0, 0),
 		stream_duration_ms = minmax(1000, 6000),
-		particles_per_sec = minmax(30, 60),
+		particles_per_sec = minmax(30, 120),
 		velocity = minmax(1, 150),
 		--particle_lifetime_ms = minmax(10, 3000),
 		
-		size_multiplier = minmax(0.5, 2),
+		size_multiplier = minmax(0.9, 1),
 		
 		particle_templates = {
 			{ linear_damping = 5 }
@@ -248,7 +248,7 @@ function create_particle_effects(scene)
 	})
 	
 	particles.blood_shower = {
-		spread_degrees = 10,
+		spread_degrees = minmax(10, 10),
 		angular_offset = minmax(0, 180),
 		particles_per_burst = minmax_u(35, 45),
 		type = emission.BURST;
@@ -268,7 +268,7 @@ function create_particle_effects(scene)
 	}
 	
 	particles.blood_droplets = {
-		spread_degrees = 2.5,
+		spread_degrees = minmax(2.5, 2.5),
 		angular_offset = minmax(0, 10),
 		particles_per_burst = minmax_u(600, 1000),
 		type = emission.BURST;
@@ -294,7 +294,7 @@ function create_particle_effects(scene)
 	}
 	
 	particles.blood_pool = {
-		spread_degrees = 1.5,
+		spread_degrees = minmax(1.5, 1.5),
 		particles_per_sec = minmax(350, 1050),
 		stream_duration_ms = minmax(100, 200),
 		type = emission.STREAM,
@@ -327,7 +327,7 @@ function create_particle_effects(scene)
 	}
 	
 	particles.blood_under_corpse = {
-		spread_degrees = 180,
+		spread_degrees = minmax(180, 180),
 		particles_per_sec = minmax(400, 400),
 		stream_duration_ms = minmax(3000, 3000),
 		type = emission.STREAM,
@@ -351,7 +351,7 @@ function create_particle_effects(scene)
 	}
 	
 	particles.metal_sparkles = {		
-		spread_degrees = 15,
+		spread_degrees = minmax(15, 15),
 		particles_per_burst = minmax_u(0, 50),
 		type = emission.BURST,
 		velocity = minmax(700, 1100),
