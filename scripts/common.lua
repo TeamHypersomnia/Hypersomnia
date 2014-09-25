@@ -479,3 +479,22 @@ end
 function expiration_timer:expired()
 	return self.timer_obj:get_milliseconds() > self.expiration_ms
 end
+
+function table.best(entries, better)
+	if not entries or #entries < 1 then return nil end
+	if #entries == 1 then return entries[1] end
+	
+	local best_elem = entries[1]
+	
+	if not better then
+		better = function (a, b) return a < b end 
+	end
+	
+	for i=2, #subject do
+		if better(entries[i], minimum) then
+			best_elem = entries[i] 
+		end
+	end
+	
+	return best_elem
+end

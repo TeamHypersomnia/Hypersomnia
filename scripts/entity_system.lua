@@ -145,8 +145,15 @@ end
 -- convenience table
 components = {}
 
+local function position_getter(tab, key)
+	if key == "pos" then
+		return tab.cpp_entity.transform.current.pos
+	end
+end
+
 components.create_components = function(entry)
 	local output = {}
+	setmetatable(output, { __index = position_getter })
 	
 	for k, v in pairs(entry) do
 		if type(v) == "table" then
