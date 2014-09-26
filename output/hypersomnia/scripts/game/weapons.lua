@@ -121,7 +121,7 @@ function create_weapons(scene, include_render)
 		current_rounds = 3000,
 		is_automatic = true,
 		bullets_once = 1,
-		bullet_damage = 5,
+		bullet_damage = 35,
 		bullet_speed = minmax(5000, 7000),
 		
 		shooting_interval_ms = 100,

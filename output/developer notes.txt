@@ -972,3 +972,6 @@ Sounds in 3d relative to the players position;
 Enemies after several shots randomly starting to escape while there's line of sight;
 blood like barrel explosions and delayed stains on the ground;
 apply impulse upon melee hit
+
+
+Npcs should later memorize item of interests that went out of view.

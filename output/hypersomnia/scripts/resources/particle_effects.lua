@@ -35,9 +35,8 @@ function create_particle_effects(scene)
 		angular_damping = 600,
 		linear_damping = 5000,
 		should_disappear = true,
-		model = { color = rgba(255, 255, 255, 182)  },
-		alpha_levels = 1,
-		ignore_rotation = true
+		model = { color = rgba(0, 0, 0, 255)  },
+		alpha_levels = 1
 	}
 	
 	particles.wall_templates = {
@@ -45,12 +44,12 @@ function create_particle_effects(scene)
 		override(particles.wall_piece, { model = { image = sprites.wall.piece["2"] } }),
 		override(particles.wall_piece, { model = { image = sprites.wall.piece["3"] } }),
 		override(particles.wall_piece, { model = { image = sprites.wall.piece["4"] } }),
-		override(particles.wall_piece, { model = { image = sprites.wall.piece["5"] } }),
-		override(particles.wall_piece, { model = { image = sprites.wall.piece["6"] } }),
-		override(particles.wall_piece, { model = { image = sprites.wall.piece["7"] } }),
-		override(particles.wall_piece, { model = { image = sprites.wall.piece["8"] } }),
-		override(particles.wall_piece, { model = { image = sprites.wall.piece["9"] } }),
-		override(particles.wall_piece, { model = { image = sprites.wall.piece["10"] } })
+		override(particles.wall_piece, { model = { image = sprites.wall.piece["5"] , color = rgba(100, 100, 100, 255)} }),
+		override(particles.wall_piece, { model = { image = sprites.wall.piece["6"] , color = rgba(80, 80, 80, 255) } }),
+		override(particles.wall_piece, { model = { image = sprites.wall.piece["7"] , color = rgba(80, 80, 80, 255) } }),
+		override(particles.wall_piece, { model = { image = sprites.wall.piece["8"] , color = rgba(80, 80, 80, 255) } }),
+		override(particles.wall_piece, { model = { image = sprites.wall.piece["9"] , color = rgba(80, 80, 80, 255) } }),
+		override(particles.wall_piece, { model = { image = sprites.wall.piece["10"], color = rgba(80, 80, 80, 255)  } })
 	}
 	
 	particles.barrel_explosion_template = {
@@ -86,7 +85,7 @@ function create_particle_effects(scene)
 		particles_per_burst = minmax_u(0, 2),
 		velocity = minmax(10, 1200),
 		angular_velocity = minmax(10, 100),
-		size_multiplier = minmax(0.1, 0.8),
+		size_multiplier = minmax(0.1, 1.4),
 		
 		particle_templates = particles.wall_templates
 	}
