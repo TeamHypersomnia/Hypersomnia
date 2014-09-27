@@ -46,6 +46,8 @@ int behaviour_tree::composite::update(update_input in) {
 }
 
 int behaviour_tree::composite::tick(update_input in) {
+	auto& parent_chain = in.current_task->parent_chain;
+
 	if (!is_currently_running(*in.current_task))
 		on_enter(*in.current_task);
 	
@@ -61,7 +63,28 @@ int behaviour_tree::composite::tick(update_input in) {
 
 	/* traverse further only if script succeeds at this node */
 	if (current_status == status::SUCCESS) {
+		parent_chain.push_back(this);
 		current_status = traverse(*in.current_task);
+		parent_chain.erase(parent_chain.end() - 1);
+	}
+	else if (current_status == status::FAILURE) {
+		/* check if this node was an ancestor of the previously running node 
+			if it is, all indices should point to the same addresses in both chains
+
+			to reduce the number of checks, we start from the end
+
+			if we'd have the same number of parents and all poining to the same structures,
+			it'd mean that it is just the currently running node that has returned failure
+
+			so a parent must have a shorter chain
+		*/
+		if (parent_chain.empty() || (parent_chain.size() < in.current_task->running_node_parent_chain.size() &&
+			std::equal(parent_chain.begin(), 
+					   parent_chain.end(), 
+					   in.current_task->running_node_parent_chain.begin()
+					   ))) {
+			in.current_task->interrupt_runner(current_status);
+		}
 	}
 	
 	/* end this node if it was running but has just finalized */
@@ -148,6 +171,7 @@ void behaviour_tree::composite::set_running(update_input in, int exit_code) {
 	COUT << "setting " << in.parent->children[in.child_index]->name << "as currently RUNNING" << '\n';
 	in.current_task->running_index = in.child_index;
 	in.current_task->running_parent_node = in.parent;
+	in.current_task->running_node_parent_chain = in.current_task->parent_chain;
 	in.current_task->since_entered.reset();
 }
 
@@ -393,8 +417,6 @@ TEST(BehaviourTree, TwoSequentialRunningExitCount) {
 }
 
 TEST(BehaviourTree, RunningInterruptions) {
-
-
 	mock_behaviour my_behaviours[NODE_COUNT];
 	my_behaviours[0].children.push_back(my_behaviours + 1);
 	my_behaviours[1].children.push_back(my_behaviours + 2);
@@ -476,6 +498,45 @@ TEST(BehaviourTree, RunningInterruptions) {
 
 	//for (int i = 0; i < NODE_COUNT; ++i) 
 	//	EXPECT_EQ(my_behaviours[i].current_status, behaviour_tree::behaviour::INVALID);
+}
+
+TEST(BehaviourTree, InterruptDescendantRunner) {
+	const int NODES = 15;
+	mock_behaviour my_behaviours[NODES];
+
+	my_behaviours[0].children.push_back(my_behaviours + 10);
+	my_behaviours[10].children.push_back(my_behaviours + 11);
+	my_behaviours[11].children.push_back(my_behaviours + 12);
+	my_behaviours[12].children.push_back(my_behaviours + 13);
+	my_behaviours[13].children.push_back(my_behaviours + 14);
+	
+	my_behaviours[0].children.push_back(my_behaviours + 1);
+	my_behaviours[1].children.push_back(my_behaviours + 2);
+	my_behaviours[2].children.push_back(my_behaviours + 3);
+	my_behaviours[3].children.push_back(my_behaviours + 4);
+	my_behaviours[4].children.push_back(my_behaviours + 5);
+	my_behaviours[5].children.push_back(my_behaviours + 6);
+	my_behaviours[6].children.push_back(my_behaviours + 7);
+	my_behaviours[7].children.push_back(my_behaviours + 8);
+	my_behaviours[8].children.push_back(my_behaviours + 9);
+
+	for (int i = 0; i < NODES; ++i) {
+		my_behaviours[i].node_type = behaviour_tree::composite::SEQUENCER;
+		my_behaviours[i].default_return = behaviour_tree::behaviour::SUCCESS;
+	}
+
+	my_behaviours[6].default_return = behaviour_tree::behaviour::RUNNING;
+
+	behaviour_tree::task my_task;
+	my_behaviours[0].begin_traversal(my_task);
+	
+	my_behaviours[4].default_return = behaviour_tree::behaviour::FAILURE;
+	my_behaviours[0].begin_traversal(my_task);
+
+	/* check if the previously running correctly quit */
+	EXPECT_EQ(1, my_behaviours[6].enter_called);
+	EXPECT_EQ(1, my_behaviours[6].update_called);
+	EXPECT_EQ(1, my_behaviours[6].exit_called);
 }
 
 TEST(BehaviourTree, InitValues) {

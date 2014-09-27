@@ -47,6 +47,8 @@ namespace components {
 			struct update_input {
 				task* current_task;
 				composite* parent;
+				std::vector<composite*>* parent_chain;
+
 				size_t child_index;
 				update_input(task* current_task = nullptr) : current_task(current_task), child_index(0u), parent(nullptr) {}
 			};
@@ -101,6 +103,8 @@ namespace components {
 
 			composite* running_parent_node;
 			size_t running_index;
+			std::vector<composite*> parent_chain;
+			std::vector<composite*> running_node_parent_chain;
 
 			bool operator==(const task&) const;
 
