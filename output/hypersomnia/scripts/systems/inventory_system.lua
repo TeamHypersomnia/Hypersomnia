@@ -109,6 +109,15 @@ function inventory_system:update()
 		
 		if msg.state_flag then
 			local intent = msg.intent
+				
+			-- some events may request selecting another item
+			if intent == custom_intents.SELECT_LAST_ITEM then
+				if inventory.last_item then
+					intent = custom_intents["SELECT_ITEM_" .. inventory.last_item]
+				else
+					intent = custom_intents.HOLSTER_ITEM
+				end
+			end
 			
 			if intent == custom_intents.PICK_REQUEST then
 				client_sys.net_channel:post_reliable("PICK_ITEM_REQUEST", {})
@@ -157,13 +166,7 @@ function inventory_system:update()
 					inventory:set_active(nil)
 				end
 			end
-			
-			-- some events may request selecting another item
-			if intent == custom_intents.SELECT_LAST_ITEM then
-				if inventory.last_item then
-					intent = custom_intents["SELECT_ITEM_" .. inventory.last_item]
-				end
-			end
+		
 			
 			for j=1, #inventory.slots do
 				if intent == custom_intents["SELECT_ITEM_" .. j] then
