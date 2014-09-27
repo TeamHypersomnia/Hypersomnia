@@ -480,19 +480,30 @@ function expiration_timer:expired()
 	return self.timer_obj:get_milliseconds() > self.expiration_ms
 end
 
-function table.best(entries, better)
-	if not entries or #entries < 1 then return nil end
-	if #entries == 1 then return entries[1] end
+function closest_to(target_pos)
+	return function(a, b) return (a.pos - target_pos):length_sq() < (b.pos - target_pos):length_sq() end
+end
+
+function table.best(entries, better, it_method)
+	if not entries or not next(entries) then return nil end
 	
-	local best_elem = entries[1]
+	local best_elem = entries[next(entries)]
 	
 	if not better then
 		better = function (a, b) return a < b end 
 	end
 	
-	for i=2, #subject do
-		if better(entries[i], minimum) then
-			best_elem = entries[i] 
+	if it_method then
+		for k, v in it_method(entries) do
+			if better(entries[i], minimum) then
+				best_elem = entries[i] 
+			end
+		end
+	else
+		for i=2, #entries do
+			if better(entries[i], minimum) then
+				best_elem = entries[i] 
+			end
 		end
 	end
 	

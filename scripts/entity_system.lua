@@ -114,6 +114,7 @@ function entity_system:for_all_matching_systems(component_set, callback)
 end
 
 function entity_system:add_entity(new_entity)
+	new_entity.owner_entity_system = self
 	self:for_all_matching_systems(new_entity, function(matching_system) matching_system:add_entity(new_entity) end)
 	
 	return new_entity
