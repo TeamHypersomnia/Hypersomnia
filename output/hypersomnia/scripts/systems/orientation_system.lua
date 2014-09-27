@@ -9,8 +9,13 @@ function orientation_system:update()
 		local target = self.targets[i]
 		local orientation = target.orientation
 		
-		if orientation.receiver and target.replication.modules.crosshair.position ~= nil then
-			orientation.crosshair_entity.transform.current.pos = target.replication.modules.crosshair.position + target.cpp_entity.transform.current.pos
+		if orientation.receiver then
+			local modules = target.replication.modules
+			if modules.crosshair and modules.crosshair.position ~= nil then
+				orientation.crosshair_entity.transform.current.pos = modules.crosshair.position + target.cpp_entity.transform.current.pos
+			elseif modules.orientation and modules.orientation.orientation ~= nil then				
+				orientation.crosshair_entity.transform.current.pos = modules.orientation.orientation + target.cpp_entity.transform.current.pos
+			end
 		else--if orientation:cmd_rate_ready() then
 			--orientation:cmd_rate_reset()
 			local current_pos =  vec2(orientation.crosshair_entity.transform.current.pos - target.cpp_entity.transform.current.pos)
