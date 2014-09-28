@@ -48,6 +48,7 @@ int behaviour_tree::composite::update(update_input in) {
 int behaviour_tree::composite::tick(update_input in) {
 	auto& parent_chain = in.current_task->parent_chain;
 
+	in.current_task->callbacking_node = this;
 	if (!is_currently_running(*in.current_task))
 		on_enter(*in.current_task);
 	
@@ -151,7 +152,7 @@ void behaviour_tree::composite::on_exit(task& current_task, int exit_code) {
 int behaviour_tree::composite::on_update(task& current_task) {
 	if (update_callback) {
 		try {
-			int result = luabind::call_function<int>(update_callback, current_task.subject);
+			int result = luabind::call_function<int>(update_callback, current_task.subject, &current_task);
 			COUT << "updating " << name << " which is " << get_type_str() << " results in " << get_result_str(result) << '\n';
 			return result;
 		}
@@ -172,6 +173,11 @@ void behaviour_tree::composite::set_running(update_input in, int exit_code) {
 	in.current_task->running_parent_node = in.parent;
 	in.current_task->running_node_parent_chain = in.current_task->parent_chain;
 	in.current_task->since_entered.reset();
+}
+
+void behaviour_tree::task::interrupt_other_runner(int exit_code) {
+	if (!callbacking_node->is_currently_running(*this)) 
+		interrupt_runner(exit_code);
 }
 
 void behaviour_tree::task::interrupt_runner(int exit_code) {

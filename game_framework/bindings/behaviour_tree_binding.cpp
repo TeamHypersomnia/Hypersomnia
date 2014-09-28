@@ -23,7 +23,8 @@ namespace bindings {
 			luabind::class_<behaviour_tree::task>("behaviour_tree_task")
 			.def(luabind::constructor<>())
 			.def("interrupt_runner", &behaviour_tree::task::interrupt_runner)
-,
+			.def("interrupt_other_runner", &behaviour_tree::task::interrupt_other_runner)
+			, 
 
 			luabind::class_<behaviour_tree::composite>("behaviour_node")
 			.def(luabind::constructor<>())

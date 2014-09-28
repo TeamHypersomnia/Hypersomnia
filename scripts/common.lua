@@ -494,7 +494,7 @@ function table.best(entries, better, it_method)
 	end
 	
 	if it_method then
-		for k, v in it_method(entries) do
+		for k, v in pairs(entries) do
 			if better(v, best_elem) then
 				best_elem = v 
 			end

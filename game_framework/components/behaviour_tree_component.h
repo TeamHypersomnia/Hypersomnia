@@ -98,11 +98,14 @@ namespace components {
 		};
 
 		struct task {
+			void interrupt_other_runner(int status = composite::status::FAILURE);
 			void interrupt_runner(int status = composite::status::FAILURE);
 
 			augs::entity_system::entity* subject;
 
 			composite* running_parent_node;
+
+			composite* callbacking_node = nullptr;
 			size_t running_index;
 			std::vector<composite*> parent_chain;
 			std::vector<composite*> running_node_parent_chain;
