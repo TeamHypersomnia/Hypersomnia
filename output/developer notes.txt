@@ -975,3 +975,14 @@ apply impulse upon melee hit
 
 
 Npcs should later memorize item of interests that went out of view.
+
+
+
+
+If we want to prevent skipping to running nodes in cases like where children of the root node may return RUNNING,
+simply make every child never return RUNNING and let them have another child that can return RUNNING.
+
+For cases like: WALKING returned RUNNING but now we want to exit WALKING since we saw a better weapon,
+simply interrupt the runner inside the script, as soon as we know that we will be RUNNING ourselves.
+
+

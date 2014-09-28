@@ -34,12 +34,11 @@ world_archetype_callbacks.INVENTORY = {
 	
 	post_construction = function(self, new_entity, is_object_new)
 		if new_entity.item.is_wielded then
-			print "constructing inventory!"
 			self.owner_entity_system:post_table("item_wielder_change", {
 				wield = true,
 				subject = self.object_by_id[new_entity.item.wielder_id],
 				item = new_entity,
-				wielding_key = components.wield.keys.INVENTORY
+				wielding_key = new_entity.item.remote_wielding_key
 			})
 		else
 			new_entity.item.on_drop(new_entity)

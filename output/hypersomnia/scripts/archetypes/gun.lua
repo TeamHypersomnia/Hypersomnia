@@ -32,7 +32,7 @@ for k, v in pairs(world_archetype_groups.guns) do
 					wield = true,
 					subject = self.object_by_id[new_entity.item.wielder_id],
 					item = new_entity,
-					wielding_key = components.wield.keys.PRIMARY_WEAPON
+					wielding_key = new_entity.item.remote_wielding_key
 				})
 			else
 				new_entity.item.on_wielder_changed(new_entity, nil)
