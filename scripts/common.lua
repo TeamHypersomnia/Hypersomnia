@@ -495,13 +495,13 @@ function table.best(entries, better, it_method)
 	
 	if it_method then
 		for k, v in it_method(entries) do
-			if better(entries[i], minimum) then
-				best_elem = entries[i] 
+			if better(v, best_elem) then
+				best_elem = v 
 			end
 		end
 	else
 		for i=2, #entries do
-			if better(entries[i], minimum) then
+			if better(entries[i], best_elem) then
 				best_elem = entries[i] 
 			end
 		end

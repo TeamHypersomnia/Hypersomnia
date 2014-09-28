@@ -187,7 +187,7 @@ vec2<> steering::flee::flee_from(const object_info& in, const target_info& targe
 	if (radius_of_effect > 0.f) {
 		/* get the proportion and clip it to max_speed */
 		auto clipped_speed = std::max(0.f, (in.max_speed * (1 - (target.distance / radius_of_effect))));
-		auto desired_velocity = target.direction * clipped_speed;
+		auto desired_velocity = target.direction * (-1) * clipped_speed;
 
 		if (desired_velocity.non_zero())
 			return desired_velocity - in.velocity;
