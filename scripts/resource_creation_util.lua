@@ -217,20 +217,22 @@ function create_behaviour_tree(entries)
 	--local my_allocator = behaviour_tree_allocator()
 	local out_my_nodes = {}
 	
-	for k, v in pairs(entries.decorators) do 
-		out_my_nodes[k] = (v.decorator_type)()
-		rewrite(out_my_nodes[k], v, { decorator_type = true })
+	if entries.decorators then
+		for k, v in pairs(entries.decorators) do 
+			out_my_nodes[k] = (v.decorator_type)()
+			rewrite(out_my_nodes[k], v, { decorator_type = true })
+			
+			--if v.base_node ~= nil then
+			--	out_my_nodes[k].base_node = out_my_nodes[v.base_node]
+			--end
+			
+			out_my_nodes[k].name = k
+		end
 		
-		--if v.base_node ~= nil then
-		--	out_my_nodes[k].base_node = out_my_nodes[v.base_node]
-		--end
-		
-		out_my_nodes[k].name = k
-	end
-	
-	for k, v in pairs(entries.decorators) do
-		if v.next_decorator then
-			out_my_nodes[k].next_decorator = out_my_nodes[v.next_decorator]
+		for k, v in pairs(entries.decorators) do
+			if v.next_decorator then
+				out_my_nodes[k].next_decorator = out_my_nodes[v.next_decorator]
+			end
 		end
 	end
 	

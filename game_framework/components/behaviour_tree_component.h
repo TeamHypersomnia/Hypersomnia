@@ -15,7 +15,8 @@ namespace components {
 			enum status {
 				RUNNING,
 				FAILURE,
-				SUCCESS
+				SUCCESS,
+				INTERRUPTED
 			};
 		};
 

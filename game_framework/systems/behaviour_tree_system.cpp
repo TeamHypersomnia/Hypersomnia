@@ -78,22 +78,21 @@ int behaviour_tree::composite::tick(update_input in) {
 
 			so a parent must have a shorter chain
 		*/
-		if (parent_chain.empty() || (parent_chain.size() < in.current_task->running_node_parent_chain.size() &&
-			std::equal(parent_chain.begin(), 
-					   parent_chain.end(), 
-					   in.current_task->running_node_parent_chain.begin()
-					   ))) {
-			in.current_task->interrupt_runner(current_status);
+		if (parent_chain.empty() || parent_chain.size() < in.current_task->running_node_parent_chain.size()) {
+			auto comparision_chain = parent_chain;
+			comparision_chain.push_back(this);
+
+			if (std::equal(comparision_chain.begin(), comparision_chain.end(),
+				in.current_task->running_node_parent_chain.begin()
+				)) {
+				in.current_task->interrupt_runner(current_status);
+			}
 		}
 	}
 	
 	/* end this node if it was running but has just finalized */
 	if (is_currently_running(*in.current_task) && current_status != status::RUNNING) {
 		in.current_task->interrupt_runner(current_status);
-	}
-	/* else call on_exit for a regular finalized node */
-	else if (!is_currently_running(*in.current_task)) {
-		on_exit(*in.current_task, current_status);
 	}
 	
 	return current_status;

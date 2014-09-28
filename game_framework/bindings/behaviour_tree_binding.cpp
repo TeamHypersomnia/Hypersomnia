@@ -39,8 +39,9 @@ namespace bindings {
 			.def("add_child", &behaviour_tree::composite::add_child)
 			.enum_("constants")[
 				luabind::value("SUCCESS", behaviour_tree::composite::SUCCESS),
-				luabind::value("RUNNING", behaviour_tree::composite::RUNNING),
+				luabind::value("RUNNING", behaviour_tree::composite::RUNNING), 
 				luabind::value("FAILURE", behaviour_tree::composite::FAILURE),
+				luabind::value("INTERRUPTED", behaviour_tree::composite::INTERRUPTED),
 				luabind::value("SEQUENCER", behaviour_tree::composite::SEQUENCER),
 				luabind::value("SELECTOR", behaviour_tree::composite::SELECTOR),
 				luabind::value("CONCURRENT", behaviour_tree::composite::CONCURRENT)

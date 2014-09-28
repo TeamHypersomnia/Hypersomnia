@@ -149,6 +149,12 @@ components = {}
 local function position_getter(tab, key)
 	if key == "pos" then
 		return tab.cpp_entity.transform.current.pos
+	elseif key == "vel" then
+		return to_pixels(tab.cpp_entity.physics.body:GetLinearVelocity())
+	elseif key == "veln" then
+		return to_pixels(tab.cpp_entity.physics.body:GetLinearVelocity()):normalize()
+	elseif key == "rot" then
+		return tab.cpp_entity.transform.current.pos
 	end
 end
 
