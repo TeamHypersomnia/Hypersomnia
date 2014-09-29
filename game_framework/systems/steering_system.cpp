@@ -495,22 +495,9 @@ vec2<> steering::obstacle_avoidance::steer(scene in) {
 
 		vec2<> steering;
 
-		if (navigation_seek)
-			steering += navigation_seek->seek_to(in.subject, navigation_target) * navigation_seek->weight;
-		if (navigation_correction) {
-			vec2<> correction = 
-				navigation_correction->steer(in);
-			
-			if (correction.non_zero()) {
-				vec2<> perpendicular_cw = (best_candidate - in.subject.position).normalize().perpendicular_cw() * in.subject.max_speed;
 
-				correction = discontinuity_info.clockwise ? perpendicular_cw : -perpendicular_cw;
-			}
-
-			steering += correction * navigation_correction->weight;
-		}
-
-		return steering.set_length(in.subject.velocity.length());
+		return vec2<>(best_candidate - in.subject.position).set_length(in.subject.velocity.length()).
+			perpendicular_cw() * (discontinuity_info.clockwise ? 1 : -1);
 	}
 
 	/* no obstacle on the way, no force applied */
