@@ -39,6 +39,9 @@ namespace augs {
 			bool message_indexing = false;
 			bool ack_requested = false;
 
+			bool has_reliable = false;
+			bool has_unreliable = false;
+
 			unsigned last_message = 0u;
 			unsigned first_message = 0u;
 

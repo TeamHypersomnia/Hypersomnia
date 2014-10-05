@@ -125,9 +125,9 @@ namespace augs {
 			unsigned short update_from_sequence = 0u;
 			unsigned received_first_message = 0u, received_last_message = 0u;
 
-			bool has_reliable = false, 
-				 has_unreliable = false, 
-				 request_ack_for_unreliable = false;
+			has_reliable = false;
+			has_unreliable = false;
+			bool request_ack_for_unreliable = false;
 
 			int result = MESSAGES_RECEIVED;
 			
@@ -159,6 +159,7 @@ namespace augs {
 
 					if (message_indexing) {
 						result = last_message - received_first_message;
+						first_message = received_first_message;
 						last_message = received_last_message;
 					}
 				}

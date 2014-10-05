@@ -212,6 +212,8 @@ namespace bindings {
 			.def_readwrite("ack_requested", &reliable_receiver::ack_requested)
 			.def_readwrite("last_message", &reliable_receiver::last_message)
 			.def_readwrite("first_message", &reliable_receiver::first_message)
+			.def_readwrite("has_reliable", &reliable_receiver::has_reliable)
+			.def_readwrite("has_unreliable", &reliable_receiver::has_unreliable)
 			.def("read_sequence", &reliable_receiver::read_sequence)
 			.def("write_ack", &reliable_receiver::write_ack),
 

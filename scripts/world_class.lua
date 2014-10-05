@@ -169,7 +169,7 @@ function world_class:call_deletes()
 	local world = my_instance.world
 	if 
 	self:get_messages("destroy_message"):size() > 0 then
-	print "destroy consuming"
+	
 	end
 	my_instance.destroy_system:consume_events(world)
 end
