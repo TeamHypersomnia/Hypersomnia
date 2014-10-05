@@ -50,8 +50,8 @@ function client_system:send_all_data()
 			--print(self.global_time:get_milliseconds())
 			local output_bs = self.net_channel:send()
 			
-			local send_log = "\nSending time: " .. self.global_time:get_milliseconds() .. "\n\n" .. auto_string_indent(output_bs.content) .. "\n\n"
-			transmission_log:write(send_log)
+			--local send_log = "\nSending time: " .. self.global_time:get_milliseconds() .. "\n\n" .. auto_string_indent(output_bs.content) .. "\n\n"
+			--transmission_log:write(send_log)
 			--print (send_log)
 			self.network:send(output_bs, send_priority.IMMEDIATE_PRIORITY, send_reliability.UNRELIABLE, 0, self.server_guid, false)
 		end

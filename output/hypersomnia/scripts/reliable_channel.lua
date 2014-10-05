@@ -86,7 +86,7 @@ function reliable_channel_wrapper:disable_starting_byte(...)
 end
 
 function reliable_channel_wrapper:recv(input_bs)	
-	local result = self.channel:recv(input_bs)
+	local how_many_to_skip = self.channel:recv(input_bs)
 	
 	-- invalidate reliable sequenced slots
 	for k, v in pairs(self.reliable_sequenced_messages) do
@@ -95,7 +95,13 @@ function reliable_channel_wrapper:recv(input_bs)
 		end
 	end
 	
-	return result
+	local reliable_commands_num = 0
+	
+	if self.receiver.has_reliable then
+		reliable_commands_num = self.receiver.last_message - self.receiver.first_message
+	end
+	
+	return how_many_to_skip, reliable_commands_num
 end
 
 function reliable_channel_wrapper:send()

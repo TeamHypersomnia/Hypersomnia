@@ -16,7 +16,7 @@ function weapon_system:remove_entity(new_entity)
 	local group = new_entity.weapon.barrel_smoke_group 
 	
 	if group ~= nil then
-		group.owner_world:delete_entity(group, nil)
+		group.owner_world:post_message(destroy_message(group, nil))
 	end
 	
 	processing_system.remove_entity(self, new_entity)
@@ -193,7 +193,6 @@ function weapon_system:substep(dt)
 				-- on the server: invalid action should anyway be invalidated
 				-- on the client: the commands won't be constrained so they will be always executed
 				table.remove(weapon.buffered_actions, 1)
-				print "POPPING ACTION"
 			end
 			
 			local triggers = components.weapon.triggers

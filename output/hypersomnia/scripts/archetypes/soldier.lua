@@ -38,7 +38,7 @@ function create_soldier(owner_scene, crosshair_sprite)
 				
 				easing_mode = lookat_component.EXPONENTIAL,
 				smoothing_average_factor = 0.5,	
-				averages_per_sec = 20	
+				averages_per_sec = 80	
 			},
 			
 			particle_emitter = {

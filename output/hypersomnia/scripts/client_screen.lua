@@ -98,7 +98,7 @@ function client_screen:constructor(camera_rect)
 		
 	end)
 	
-	self.systems.protocol.pack_updates = true
+	self.systems.protocol.pack_loops = true
 
 	self.systems.lifetime = lifetime_system:create(self.sample_scene.world_object)
 	self.systems.interpolation = interpolation_system:create(self.sample_scene.simulation_world)
@@ -197,7 +197,7 @@ function client_screen:loop()
 	
 	self.systems.replication:create_new_objects()
 
-	-- there's always one STATE_UPDATE per LOOP_SEPARATOR so it is valid to call this update now
+	-- it is valid to call this update now
 	-- as all objects have been created
 	self.systems.replication:update_object_states()
 	
