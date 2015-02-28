@@ -188,6 +188,7 @@ void CCRakNetSlidingWindow::OnNAK(CCTimeType curTime, DatagramSequenceNumberType
 	}
 }
 // ----------------------------------------------------------------------------------------------------------------------------
+#include <algorithm>
 void CCRakNetSlidingWindow::OnAck(CCTimeType curTime, CCTimeType rtt, bool hasBAndAS, BytesPerMicrosecond _B, BytesPerMicrosecond _AS, double totalUserDataBytesAcked, bool isContinuousSend, DatagramSequenceNumberType sequenceNumber )
 {
 	(void) _B;
@@ -208,7 +209,7 @@ void CCRakNetSlidingWindow::OnAck(CCTimeType curTime, CCTimeType rtt, bool hasBA
 		double d = .05;
 		double difference = rtt - estimatedRTT;
 		estimatedRTT = estimatedRTT + d * difference;
-		deviationRtt = deviationRtt + d * (abs(difference) - deviationRtt);
+		deviationRtt = deviationRtt + d * (std::abs(difference) - deviationRtt);
 	}
 
 	_isContinuousSend=isContinuousSend;

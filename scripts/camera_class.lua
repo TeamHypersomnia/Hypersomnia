@@ -4,8 +4,8 @@ function camera_class:constructor()
 	self.current_zoom_level = 0
 	self.current_zoom_multiplier = 1
 	
-	self.min_zoom = 0 
-	self.max_zoom = 1000
+	self.min_zoom = -2000 
+	self.max_zoom = 2000
 end
 
 function camera_class:set_zoom_level(new_zoom_level)

@@ -16,7 +16,7 @@ namespace augs {
 
 		void timer::pause(bool flag) {
 			if (!is_paused && flag) {
-				paused_difference += (std::chrono::high_resolution_clock::now() - ticks);
+				paused_difference += std::chrono::duration_cast<std::chrono::duration<std::chrono::system_clock::rep, std::chrono::system_clock::period>>(std::chrono::high_resolution_clock::now() - ticks);
 			}
 			else if(is_paused && !flag) {
 				ticks = std::chrono::high_resolution_clock::now();

@@ -14,6 +14,13 @@ namespace bindings {
 			.def_readwrite("h", &rects::xywh<float>::h)
 			,
 
+			luabind::class_<rects::wh<int>>("rect_wh_i")
+			.def(luabind::constructor<int, int>())
+			.def(luabind::constructor<const rects::wh<int>&>())
+			.def_readwrite("w", &rects::xywh<int>::w)
+			.def_readwrite("h", &rects::xywh<int>::h)
+			,
+
 			luabind::class_<rects::xywh<float>>("rect_xywh")
 			.def(luabind::constructor<float, float, float, float>())
 			.def(luabind::constructor<const rects::ltrb<float>&>())
