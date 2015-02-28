@@ -1,0 +1,302 @@
+﻿<?xml version="1.0" encoding="Windows-1252"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|Win32">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|Win32">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{093EBEC7-4F84-4723-A720-A9EA97EA2707}</ProjectGUID>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>Win32</Platform>
+    <ProjectName>sfml-system</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+    <PropertyGroup>
+      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\lib\Debug\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sfml-system.dir\Debug\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sfml-system-s-d</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\lib\Release\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sfml-system.dir\Release\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sfml-system-s</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\lib\MinSizeRel\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">sfml-system.dir\MinSizeRel\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">sfml-system-s</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\lib\RelWithDebInfo\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">sfml-system.dir\RelWithDebInfo\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">sfml-system</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
+    </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Debug/</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Release/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat></DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>MinSizeRel/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat></DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>RelWithDebInfo/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/System/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML -BC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML --check-stamp-file C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/System/CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/System/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML -BC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML --check-stamp-file C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/System/CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/System/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML -BC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML --check-stamp-file C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/System/CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/System/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML -BC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML --check-stamp-file C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/System/CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Clock.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Err.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Export.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\InputStream.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Lock.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Mutex.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\NonCopyable.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Sleep.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\String.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\String.inl" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Thread.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Thread.inl" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\ThreadLocal.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\ThreadLocalPtr.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\ThreadLocalPtr.inl" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Time.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Utf.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Utf.inl" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Vector2.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Vector2.inl" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Vector3.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Vector3.inl" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Win32\ClockImpl.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Win32\MutexImpl.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Win32\SleepImpl.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Win32\ThreadImpl.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Win32\ThreadLocalImpl.hpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Clock.cpp"  />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Err.cpp"  />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Lock.cpp"  />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Mutex.cpp"  />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Sleep.cpp"  />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\String.cpp"  />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Thread.cpp"  />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\ThreadLocal.cpp"  />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Time.cpp"  />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Win32\ClockImpl.cpp"  />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Win32\MutexImpl.cpp"  />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Win32\SleepImpl.cpp"  />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Win32\ThreadImpl.cpp"  />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Win32\ThreadLocalImpl.cpp"  />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/ZERO_CHECK.vcxproj">
+      <Project>3D78D515-69D8-4361-8014-E250615790C0</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

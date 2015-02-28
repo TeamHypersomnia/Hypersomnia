@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="Windows-1252"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Clock.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Err.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Lock.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Mutex.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Sleep.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\String.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Thread.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\ThreadLocal.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Time.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Win32\ClockImpl.cpp">
+      <Filter>windows</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Win32\MutexImpl.cpp">
+      <Filter>windows</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Win32\SleepImpl.cpp">
+      <Filter>windows</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Win32\ThreadImpl.cpp">
+      <Filter>windows</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Win32\ThreadLocalImpl.cpp">
+      <Filter>windows</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Clock.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Err.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Export.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\InputStream.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Lock.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Mutex.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\NonCopyable.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Sleep.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\String.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\String.inl" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Thread.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Thread.inl" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\ThreadLocal.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\ThreadLocalPtr.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\ThreadLocalPtr.inl" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Time.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Utf.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Utf.inl" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Vector2.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Vector2.inl" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Vector3.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\System\Vector3.inl" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Win32\ClockImpl.hpp">
+      <Filter>windows</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Win32\MutexImpl.hpp">
+      <Filter>windows</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Win32\SleepImpl.hpp">
+      <Filter>windows</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Win32\ThreadImpl.hpp">
+      <Filter>windows</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\Win32\ThreadLocalImpl.hpp">
+      <Filter>windows</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\System\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="windows">
+      <UniqueIdentifier>{9053CBD3-655F-492B-96CA-26453F0D71AD}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

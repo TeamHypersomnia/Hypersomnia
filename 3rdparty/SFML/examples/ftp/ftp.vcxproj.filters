@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="Windows-1252"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\ftp\Ftp.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\ftp\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+</Project>

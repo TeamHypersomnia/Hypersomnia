@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="Windows-1252"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\ALCheck.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\AlResource.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\AudioDevice.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\Listener.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\Music.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\Sound.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundBuffer.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundBufferRecorder.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundFile.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundRecorder.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundSource.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundStream.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\ALCheck.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\AlResource.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\AudioDevice.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\Export.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\Listener.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\Music.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\Sound.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\SoundBuffer.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\SoundBufferRecorder.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundFile.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\SoundRecorder.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\SoundSource.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\SoundStream.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+</Project>

@@ -96,12 +96,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir)\utilities;C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(ProjectDir);$(ProjectDir)\3rdparty\freetype;$(ProjectDir)3rdparty\RakNet\Source;$(IncludePath)</IncludePath>
+    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir)\utilities;C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(ProjectDir);$(ProjectDir)\3rdparty\freetype;$(ProjectDir)3rdparty\RakNet\Source;$(ProjectDir)\3rdparty\SFML\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
     <OutDir>$(ProjectDir)</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir)\utilities;C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(ProjectDir);$(ProjectDir)\3rdparty\freetype;$(ProjectDir)3rdparty\RakNet\Source;$(IncludePath)</IncludePath>
+    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir)\utilities;C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(ProjectDir);$(ProjectDir)\3rdparty\freetype;$(ProjectDir)3rdparty\RakNet\Source;$(ProjectDir)\3rdparty\SFML\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
     <OutDir>$(ProjectDir)</OutDir>
     <TargetName>$(ProjectName)-debug</TargetName>
@@ -2075,6 +2075,14 @@
     <None Include="3rdparty\SFML\System\Utf.inl" />
     <None Include="3rdparty\SFML\System\Vector2.inl" />
     <None Include="3rdparty\SFML\System\Vector3.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="3rdparty\SFML\src\SFML\Audio\sfml-audio.vcxproj">
+      <Project>{4e5955c3-101e-433c-b9ff-92a8bc6aa498}</Project>
+    </ProjectReference>
+    <ProjectReference Include="3rdparty\SFML\src\SFML\System\sfml-system.vcxproj">
+      <Project>{093ebec7-4f84-4723-a720-a9ea97ea2707}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

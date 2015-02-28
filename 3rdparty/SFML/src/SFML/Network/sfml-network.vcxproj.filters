@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="Windows-1252"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Network\Ftp.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Network\Http.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Network\IpAddress.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Network\Packet.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Network\Socket.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Network\SocketSelector.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Network\TcpListener.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Network\TcpSocket.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Network\UdpSocket.cpp" />
+    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Network\Win32\SocketImpl.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Network\Export.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Network\Ftp.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Network\Http.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Network\IpAddress.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Network\Packet.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Network\Socket.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Network\SocketImpl.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Network\SocketHandle.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Network\SocketSelector.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Network\TcpListener.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Network\TcpSocket.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Network\UdpSocket.hpp" />
+    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Network\Win32\SocketImpl.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Network\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+</Project>

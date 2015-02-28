@@ -1,0 +1,220 @@
+﻿<?xml version="1.0" encoding="Windows-1252"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|Win32">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|Win32">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{8F3C40FF-D9F8-4ED8-BCD1-0E1C291755C0}</ProjectGUID>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>Win32</Platform>
+    <ProjectName>ALL_BUILD</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+    <PropertyGroup>
+      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML -BC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML --check-stamp-file C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\3.1.0-rc2\CMakeSystem.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeSystemSpecificInitialize.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\3.1.0-rc2\CMakeCCompiler.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\3.1.0-rc2\CMakeCXXCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeGenericSystem.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\Windows.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\WindowsPaths.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeCInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\Windows-MSVC.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\3.1.0-rc2\CMakeRCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeRCInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeCXXInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\Windows-MSVC.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeCommonLanguageInclude.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\cmake\Config.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CheckTypeSize.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CheckIncludeFile.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CheckIncludeFileCXX.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML -BC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML --check-stamp-file C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\3.1.0-rc2\CMakeSystem.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeSystemSpecificInitialize.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\3.1.0-rc2\CMakeCCompiler.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\3.1.0-rc2\CMakeCXXCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeGenericSystem.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\Windows.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\WindowsPaths.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeCInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\Windows-MSVC.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\3.1.0-rc2\CMakeRCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeRCInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeCXXInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\Windows-MSVC.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeCommonLanguageInclude.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\cmake\Config.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CheckTypeSize.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CheckIncludeFile.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CheckIncludeFileCXX.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML -BC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML --check-stamp-file C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\3.1.0-rc2\CMakeSystem.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeSystemSpecificInitialize.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\3.1.0-rc2\CMakeCCompiler.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\3.1.0-rc2\CMakeCXXCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeGenericSystem.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\Windows.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\WindowsPaths.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeCInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\Windows-MSVC.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\3.1.0-rc2\CMakeRCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeRCInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeCXXInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\Windows-MSVC.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeCommonLanguageInclude.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\cmake\Config.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CheckTypeSize.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CheckIncludeFile.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CheckIncludeFileCXX.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML -BC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML --check-stamp-file C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\3.1.0-rc2\CMakeSystem.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeSystemSpecificInitialize.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\3.1.0-rc2\CMakeCCompiler.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\3.1.0-rc2\CMakeCXXCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeGenericSystem.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\Windows.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\WindowsPaths.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeCInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\Windows-MSVC.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\3.1.0-rc2\CMakeRCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeRCInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeCXXInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\Platform\Windows-MSVC.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeCommonLanguageInclude.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\cmake\Config.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CheckTypeSize.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CheckIncludeFile.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CheckIncludeFileCXX.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/ZERO_CHECK.vcxproj">
+      <Project>3D78D515-69D8-4361-8014-E250615790C0</Project>
+    </ProjectReference>
+    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/ftp/ftp.vcxproj">
+      <Project>C7D63D56-8401-48EE-B5FD-AF80DAE9C4EB</Project>
+    </ProjectReference>
+    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/opengl/opengl.vcxproj">
+      <Project>1FF1465E-0A4B-4A9F-81B5-F7BF477264F6</Project>
+    </ProjectReference>
+    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/pong/pong.vcxproj">
+      <Project>5C30A879-D1AD-4ADF-9BC2-FAF7CAD0D009</Project>
+    </ProjectReference>
+    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/sfml-audio.vcxproj">
+      <Project>4E5955C3-101E-433C-B9FF-92A8BC6AA498</Project>
+    </ProjectReference>
+    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/sfml-graphics.vcxproj">
+      <Project>E8EA226A-B64C-43E1-BCDE-F9A87A6B9EB1</Project>
+    </ProjectReference>
+    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Main/sfml-main.vcxproj">
+      <Project>0850246B-C25B-40D4-8CA0-EECCF4DAC138</Project>
+    </ProjectReference>
+    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Network/sfml-network.vcxproj">
+      <Project>A8208FAF-C583-4AB8-B3DE-8F574D8F5D9D</Project>
+    </ProjectReference>
+    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/System/sfml-system.vcxproj">
+      <Project>093EBEC7-4F84-4723-A720-A9EA97EA2707</Project>
+    </ProjectReference>
+    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Window/sfml-window.vcxproj">
+      <Project>E164425B-0356-41C3-92F2-B46CA15F558C</Project>
+    </ProjectReference>
+    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/shader/shader.vcxproj">
+      <Project>12E24C97-1991-4CD6-BA02-64E1B0E5F93B</Project>
+    </ProjectReference>
+    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/sockets/sockets.vcxproj">
+      <Project>8F01AD19-7A3A-4A87-A873-BE8EDF1038FE</Project>
+    </ProjectReference>
+    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/sound/sound.vcxproj">
+      <Project>CB97E0B1-C776-4E7E-A99A-946DFE20E313</Project>
+    </ProjectReference>
+    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/sound_capture/sound-capture.vcxproj">
+      <Project>9F653E57-DF57-4903-AEEA-4429A2C77F4D</Project>
+    </ProjectReference>
+    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/voip/voip.vcxproj">
+      <Project>9E077630-6C37-4325-B57E-B13D04825D65</Project>
+    </ProjectReference>
+    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/win32/win32.vcxproj">
+      <Project>F9D173E1-3BBD-466D-81D3-A74079A62C94</Project>
+    </ProjectReference>
+    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/window/window.vcxproj">
+      <Project>65BA183A-C44D-4EAC-8A72-7ACC49452DD9</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
