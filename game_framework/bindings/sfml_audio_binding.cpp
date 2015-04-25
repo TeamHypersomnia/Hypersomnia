@@ -4,9 +4,24 @@
 
 #include <SFML/Audio.hpp>
 
+#include "game_framework/game/sound_effects.h"
+
 bool has_sound_stopped_playing(sf::Sound* s) {
 	return s->getStatus() == sf::Sound::Status::Stopped;
 }
+
+void sf_Listener_setPosition(float x, float y, float z) {
+	sf::Listener::setPosition(x, y, z);
+}
+
+void sf_Listener_setDirection(float x, float y, float z) {
+	sf::Listener::setDirection(x, y, z);
+}
+
+void sf_Listener_setGlobalVolume(float volume) {
+	sf::Listener::setGlobalVolume(volume);
+}
+
 
 namespace bindings {
 	luabind::scope _sfml_audio() {
@@ -14,18 +29,37 @@ namespace bindings {
 			(
 			luabind::def("has_sound_stopped_playing", has_sound_stopped_playing),
 
+			luabind::def("sf_Listener_setPosition", sf_Listener_setPosition),
+			luabind::def("sf_Listener_setDirection", sf_Listener_setDirection),
+			luabind::def("sf_Listener_setGlobalVolume", sf_Listener_setGlobalVolume),
+			
 			luabind::class_<sf::Music>("sfMusic")
 			.def(luabind::constructor<>())
+			.def("play", &sf::SoundStream::play)
+			.def("pause", &sf::SoundStream::pause)
+			.def("stop", &sf::SoundStream::stop)
 			.def("openFromFile", &sf::Music::openFromFile)
-			.def("play", &sf::Music::play)
-			.def("pause", &sf::Music::pause)
-			.def("stop", &sf::Music::stop)
 			.def("setVolume", &sf::Music::setVolume)
 			.def("setPitch", &sf::Music::setPitch)
 			.def("setPlayingOffset", &sf::Music::setPlayingOffset)
 			.def("setLoop", &sf::Music::setLoop)
 			.def("setRelativeToListener", &sf::Music::setRelativeToListener)
-			.def("setPlayingOffset", &sf::Music::setPlayingOffset)
+			.def("setMinDistance", &sf::Music::setMinDistance)
+			.def("setAttenuation", &sf::Music::setAttenuation)
+			.def("setPosition", (void (sf::SoundSource::*)(float x, float y, float z))&sf::Music::setPosition)
+			.def("setPlayingOffset", &sf::Music::setPlayingOffset),
+
+			luabind::class_<helpers::filtered_sound>("filtered_sound")
+			.def(luabind::constructor<>())
+			.def("play", &sf::SoundStream::play)
+			.def("pause", &sf::SoundStream::pause)
+			.def("stop", &sf::SoundStream::stop)
+			.def("setVolume", &sf::SoundStream::setVolume)
+			.def_readwrite("lowpass_cutoff", &helpers::filtered_sound::lowpass_cutoff)
+			,
+
+			luabind::class_<helpers::noise_generator, filtered_sound>("noise_generator")
+			.def(luabind::constructor<>())
 			,
 
 			luabind::class_<sf::SoundBuffer>("sfSoundBuffer")

@@ -10,6 +10,8 @@ namespace bindings {
 		return
 			(
 			luabind::def("get_display", window::get_display),
+			luabind::def("set_display", window::set_display),
+			
 			luabind::def("set_cursor_visible", window::set_cursor_visible),
 			luabind::def("framework_set_current_window", framework::set_current_window),
 			
