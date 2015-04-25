@@ -18,6 +18,7 @@ function label_system:draw_labels(camera_draw_input)
 		end
 		
 		local formatted = format_text(label.text)
+		local formatted_black = format_text(label.text)
 		
 		if target.health then
 			local target_color = target.health.health_bar_sprite.color
@@ -32,13 +33,50 @@ function label_system:draw_labels(camera_draw_input)
 			end
 		end
 		
+		for j=0, formatted_black:size()-1 do
+			local my_char = formatted_black:at(j)
+			
+			my_char.r = 0.0;
+			my_char.g = 0.0;
+			my_char.b = 0.0;
+			my_char.a = 255.0;
+		end
+
 		local label_bbox = get_text_bbox(formatted, 0)
 		
 		if label.position == components.label.positioning.OVER_HEALTH_BAR and target.health and target.health.under_bar_entity.render.was_drawn then
+			local label_pos = target.health.under_bar_entity.render.last_screen_pos - vec2(label_bbox.x/2, 5 + label_bbox.y)
+
+			quick_print_text(
+				camera_draw_input, 
+				formatted_black, 
+				label_pos + vec2(0, 1),
+				0, nil
+			)
+			quick_print_text(
+				camera_draw_input, 
+				formatted_black, 
+				label_pos + vec2(0, -1),
+				0, nil
+			)
+
+			quick_print_text(
+				camera_draw_input, 
+				formatted_black, 
+				label_pos + vec2(-1, 0),
+				0, nil
+			)
+			quick_print_text(
+				camera_draw_input, 
+				formatted_black, 
+				label_pos + vec2(1, 0),
+				0, nil
+			)
+
 			quick_print_text(
 				camera_draw_input, 
 				formatted, 
-				target.health.under_bar_entity.render.last_screen_pos - vec2(label_bbox.x/2, 10 + label_bbox.y),
+				label_pos,
 				0, nil
 			)
 		end

@@ -36,7 +36,7 @@ function health_system:add_entity(new_entity)
 		
 		chase = {
 			target = new_entity.cpp_entity,
-			offset = vec2(0, -40)
+			offset = vec2(0, -20)
 		}
 	}
 	
@@ -78,18 +78,19 @@ function health_system:update()
 		health.hp = health.hp - msgs[i].data.amount
 	end
 	
+	local bar_width = 50
 	for i=1, #self.targets do
 		local health = self.targets[i].health
 		
-		health.under_bar_sprite.size = vec2(102, 4)
-		health.under_bar_outline_sprite.size = vec2(104, 6)
-		health.health_bar_sprite.size = vec2(health.hp, 2)
-		local mult = health.hp/100
+		health.under_bar_sprite.size = vec2(bar_width + 2, 3)
+		health.under_bar_outline_sprite.size = vec2(bar_width + 4, 5)
+		health.health_bar_sprite.size = vec2(health.hp*bar_width/100, 1)
+		local mult = health.hp/bar_width
 		health.health_bar_sprite.color = rgba(255*(1-mult*mult), 255*mult*mult, 255*mult, 255)--rgba(255*(1-health.hp/100), 194*health.hp/100, 0, 255)
 		health.under_bar_outline_sprite.color = health.health_bar_sprite.color
 		--health.health_bar_sprite.color.r = health.health_bar_sprite.color.r*0.7
 		--health.health_bar_sprite.color.g = health.health_bar_sprite.color.g*0.7
 		--health.health_bar_sprite.color.b = health.health_bar_sprite.color.b*0.7
-		health.health_bar_entity.chase.offset.x = - (100-health.hp)/2
+		health.health_bar_entity.chase.offset.x = - (bar_width-health.hp*bar_width/100)/2
 	end
 end

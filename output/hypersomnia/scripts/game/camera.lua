@@ -20,7 +20,7 @@ function create_world_camera_entity(owner_world, blank_sprite)
 		
 			orbit_mode = camera_component.LOOK,
 			max_look_expand = vec2(config_table.resolution_w/2, config_table.resolution_h/2),
-			angled_look_length = 10
+			angled_look_length = 20
 		},
 		
 		chase = {
@@ -57,16 +57,16 @@ function create_world_camera_entity(owner_world, blank_sprite)
 	out vec4 outputColor;
 	
 	uniform sampler2D smoke_texture;
-	
+	const int levels = 3;
 	void main() 
 	{	
 		vec4 pixel =  texture(smoke_texture, theTexcoord);
 		int desired_alpha = int(pixel.r * float(255));
 		
-		int out_value = desired_alpha == 0 ? 0 : ((255 / 3) * ( (desired_alpha / (255 / 3))));
+		int out_value = desired_alpha == 0 ? 0 : ((255 / levels) * ( (desired_alpha / (255 / levels))));
 		float outf = float(out_value) / 255.0;
 		
-		outputColor = vec4(1.0, 1.0, 1.0, outf/3.0);
+		outputColor = vec4(0, outf/levels+0.7, outf/levels+0.7, outf/levels > 0 ? 1.0 : 0.0);
 	}
 	]]
 	

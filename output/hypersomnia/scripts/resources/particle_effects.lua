@@ -56,13 +56,13 @@ function create_particle_effects(scene)
 		angular_damping = 0,
 		linear_damping = 5000,
 		should_disappear = true,
-		model = { image = sprites.barrel1, size_multiplier = vec2(1, 1) },
+		model = { image = sprites.barrel1, size_multiplier = vec2(1, 1), color = rgba(0, 255, 255, 255) },
 		alpha_levels = 1
 	}
 	
 	particles.barrel_smoke_template = {
 		angular_damping = 0,
-		linear_damping = 20,
+		linear_damping = 10,
 		should_disappear = true,
 		model = { image = sprites.smoke1, color = rgba(255, 255, 255, 120), size_multiplier = vec2(0.4, 0.4) },
 		--alpha_levels = 255,
@@ -116,12 +116,12 @@ function create_particle_effects(scene)
 	--}
 	
 	particles.barrel_explosion = {
-		spread_degrees = minmax(5.5, 12.5),
-		particles_per_burst = minmax_u(30, 50),
+		spread_degrees = minmax(5.5, 25.5),
+		particles_per_burst = minmax_u(30, 120),
 		type = emission.BURST,
-		velocity = minmax(50, 2000),
+		velocity = minmax(50, 2500),
 		angular_velocity = minmax(0, 0),
-		particle_lifetime_ms = minmax(30, 50),
+		particle_lifetime_ms = minmax(1, 50),
 		particle_templates = {
 			particles.barrel_explosion_template,
 			override(particles.barrel_explosion_template, {
@@ -138,7 +138,7 @@ function create_particle_effects(scene)
 			})
 		},
 		
-		size_multiplier = minmax(1, 5),
+		size_multiplier = minmax(1.3, 1),
 			
 		particle_render_template = { 
 			layer = render_layers.EFFECTS
@@ -155,13 +155,13 @@ function create_particle_effects(scene)
 	})
 	
 	particles.barrel_smoke_1 = {
-		spread_degrees = minmax(0, 0),
-		particles_per_sec = minmax(5, 60),
+		spread_degrees = minmax(0, 5),
+		particles_per_sec = minmax(5, 1560),
 		stream_duration_ms = minmax(100, 600),
 		type = emission.STREAM,
-		velocity = minmax(1, 120),
-		particle_lifetime_ms = minmax(100, 1500),
-		angular_velocity = minmax(0, 0.4),
+		velocity = minmax(180, 230),
+		particle_lifetime_ms = minmax(10000, 10000),
+		angular_velocity = minmax(0.4, 0.8),
 		
 		particle_templates = {
 			particles.barrel_smoke_template,
@@ -183,7 +183,7 @@ function create_particle_effects(scene)
 			})
 		},
 		
-		size_multiplier = minmax(0.9, 1),
+		size_multiplier = minmax(0.8, 1),
 		initial_rotation_variation = 180,
 		
 		particle_render_template = { 
@@ -198,9 +198,9 @@ function create_particle_effects(scene)
 		max_swing_spread = minmax(6, 12),
 		max_swings_per_sec = minmax(1.5, 4),
 		
-		swing_spread = minmax(5, 12),
-		swings_per_sec = minmax(2, 4),
-		swing_spread_change_rate = minmax(1, 2),
+		swing_spread = minmax(5, 52),
+		swings_per_sec = minmax(2, 8),
+		swing_spread_change_rate = minmax(1, 4),
 		angular_offset = minmax(0, 0),
 		
 		fade_when_ms_remaining = minmax(10, 50)
@@ -208,17 +208,13 @@ function create_particle_effects(scene)
 	}
 	
 	particles.barrel_smoke_2 = override(particles.barrel_smoke_1, {
-		spread_degrees = minmax(0, 0),
+		spread_degrees = minmax(0, 5),
 		stream_duration_ms = minmax(1000, 6000),
-		particles_per_sec = minmax(30, 120),
-		velocity = minmax(1, 150),
+		particles_per_sec = minmax(30, 1400),
+		velocity = minmax(110, 150),
 		--particle_lifetime_ms = minmax(10, 3000),
 		
-		size_multiplier = minmax(0.9, 1),
-		
-		particle_templates = {
-			{ linear_damping = 5 }
-		},
+		size_multiplier = minmax(0.8, 1),
 		
 		fade_when_ms_remaining = minmax(100, 200)
 		--swing_spread = minmax(10, 40),
