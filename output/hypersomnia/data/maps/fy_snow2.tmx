@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="90" height="80" tilewidth="100" tileheight="100">
+<map version="1.0" orientation="orthogonal" width="450" height="450" tilewidth="32" tileheight="32">
  <properties>
   <property name="gameplay_textures" value="..\\gfx\\"/>
   <property name="texture_directory" value="snow_textures\\"/>
   <property name="type_library" value="basic_type_library.lua"/>
  </properties>
- <layer name="Tile Layer 1" width="90" height="80">
+ <tileset firstgid="1" name="hypersomniatileset1" tilewidth="32" tileheight="32">
+  <image source="tileset.png" width="385" height="546"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="150" height="150" visible="0">
   <data encoding="base64" compression="zlib">
-   eJztwTEBAAAAwqD1T20ND6AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAdwNwgAAB
+   eJztwQENAAAAwqD3T20PBxQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMCnAV+fAAE=
   </data>
  </layer>
- <objectgroup name="objects" width="90" height="80">
+ <layer name="Tile Layer 2" width="150" height="150">
+  <data encoding="base64" compression="zlib">
+   eJztwQENAAAAwqD3T20PBxQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMCnAV+fAAE=
+  </data>
+ </layer>
+ <objectgroup name="objects" width="150" height="150">
   <object type="static_snow" x="3200" y="2600">
    <polygon points="0,0 200,-200 1000,-200 1200,0 1200,800 1000,1000 200,1000 0,800"/>
   </object>
@@ -28,7 +36,6 @@
   <object type="static_snow" x="5900" y="5400" width="100" height="500"/>
   <object type="static_snow" x="5900" y="1900" width="100" height="500"/>
   <object type="static_snow" x="8200" y="1800"/>
-  <object type="static_snow" x="4600" y="400" width="200" height="700"/>
   <object type="static_snow" x="2300" y="200" width="4800" height="200"/>
   <object type="static_snow" x="8300" y="200" width="200" height="7400"/>
   <object type="static_snow" x="5700" y="400">
@@ -40,8 +47,7 @@
   <object type="static_snow" x="6400" y="400">
    <polygon points="0,0 100,200 400,200 500,0"/>
   </object>
-  <object type="static_snow" x="4600" y="6700" width="200" height="700"/>
-  <object type="static_snow" x="2300" y="7400" width="4800" height="200"/>
+  <object type="static_snow" x="2300" y="7400" width="3900" height="200"/>
   <object type="static_snow" x="7100" y="7400">
    <polygon points="0,0 1200,-500 1200,200 0,200"/>
   </object>
@@ -74,8 +80,48 @@
   </object>
   <object type="static_snow" x="1800" y="1300" width="200" height="2500"/>
   <object type="static_snow" x="1800" y="4000" width="200" height="2500"/>
+  <object type="static_snow" x="6400" y="7400" width="700" height="200"/>
+  <object type="static_snow" x="6400" y="7600">
+   <polygon points="0,0 -400,600 -300,1400 200,1700 1000,1900 1600,2400 4300,0"/>
+  </object>
+  <object type="static_snow" x="6200" y="7600">
+   <polygon points="0,0 -1200,1400 -4000,0"/>
+  </object>
+  <object type="static_snow" x="1600" y="7600">
+   <polygon points="0,0 4100,2200 900,2000 -400,1700"/>
+  </object>
+  <object type="static_snow" x="5800" y="9300">
+   <polygon points="0,0 900,1600 1700,600"/>
+  </object>
+  <object type="static_snow" x="2400" y="9900">
+   <polygon points="0,0 3500,500 3500,1700"/>
+  </object>
+  <object type="static_snow" x="7000" y="11500">
+   <polygon points="0,0 2200,-2100 4500,-2900 3000,-200"/>
+  </object>
+  <object type="static_snow" x="2600" y="7800">
+   <polygon points="0,0 -100,100 0,200 400,200"/>
+  </object>
+  <object type="static_snow" x="3400" y="8200">
+   <polygon points="0,0 0,200 600,300"/>
+  </object>
+  <object type="static_snow" x="2600" y="8200">
+   <polygon points="0,0 200,-100 600,300"/>
+  </object>
+  <object type="static_snow" x="4100" y="8700">
+   <polygon points="0,0 -500,0 100,400"/>
+  </object>
+  <object type="static_snow" x="4400" y="9700">
+   <polygon points="0,0 400,300 900,0"/>
+  </object>
+  <object type="static_snow" x="6300" y="10100">
+   <polygon points="0,0 -200,500 400,500"/>
+  </object>
+  <object type="static_snow" x="6100" y="8600">
+   <polygon points="0,0 -800,500 -600,700 -300,500"/>
+  </object>
  </objectgroup>
- <objectgroup name="ground" width="90" height="80" visible="0">
+ <objectgroup name="ground" width="150" height="150" visible="0">
   <object type="ground_snow" x="900" y="200" width="2100" height="2100"/>
   <object type="ground_snow" x="3000" y="200" width="2100" height="2100"/>
   <object type="ground_snow" x="5100" y="200" width="2100" height="2100"/>
@@ -106,8 +152,42 @@
   <object type="ground_snow" x="9300" y="2300" width="2100" height="2100"/>
   <object type="ground_snow" x="9300" y="200" width="2100" height="2100"/>
   <object type="ground_snow" x="9300" y="-1900" width="2100" height="2100"/>
+  <object type="ground_snow" x="5100" y="8600" width="2100" height="2100"/>
+  <object type="ground_snow" x="9300" y="8600" width="2100" height="2100"/>
+  <object type="ground_snow" x="3000" y="8600" width="2100" height="2100"/>
+  <object type="ground_snow" x="-1200" y="8600" width="2100" height="2100"/>
+  <object type="ground_snow" x="900" y="8600" width="2100" height="2100"/>
+  <object type="ground_snow" x="7200" y="8600" width="2100" height="2100"/>
+  <object type="ground_snow" x="5100" y="10700" width="2100" height="2100"/>
+  <object type="ground_snow" x="9300" y="10700" width="2100" height="2100"/>
+  <object type="ground_snow" x="3000" y="10700" width="2100" height="2100"/>
+  <object type="ground_snow" x="-1200" y="10700" width="2100" height="2100"/>
+  <object type="ground_snow" x="900" y="10700" width="2100" height="2100"/>
+  <object type="ground_snow" x="7200" y="10700" width="2100" height="2100"/>
+  <object type="ground_snow" x="5100" y="12800" width="2100" height="2100"/>
+  <object type="ground_snow" x="9300" y="12800" width="2100" height="2100"/>
+  <object type="ground_snow" x="3000" y="12800" width="2100" height="2100"/>
+  <object type="ground_snow" x="-1200" y="12800" width="2100" height="2100"/>
+  <object type="ground_snow" x="900" y="12800" width="2100" height="2100"/>
+  <object type="ground_snow" x="7200" y="12800" width="2100" height="2100"/>
+  <object type="ground_snow" x="11400" y="-1900" width="2100" height="2100"/>
+  <object type="ground_snow" x="11400" y="4400" width="2100" height="2100"/>
+  <object type="ground_snow" x="11400" y="6500" width="2100" height="2100"/>
+  <object type="ground_snow" x="11400" y="10700" width="2100" height="2100"/>
+  <object type="ground_snow" x="11400" y="200" width="2100" height="2100"/>
+  <object type="ground_snow" x="11400" y="2300" width="2100" height="2100"/>
+  <object type="ground_snow" x="11400" y="8600" width="2100" height="2100"/>
+  <object type="ground_snow" x="11400" y="12800" width="2100" height="2100"/>
+  <object type="ground_snow" x="13500" y="-1900" width="2100" height="2100"/>
+  <object type="ground_snow" x="13500" y="4400" width="2100" height="2100"/>
+  <object type="ground_snow" x="13500" y="6500" width="2100" height="2100"/>
+  <object type="ground_snow" x="13500" y="10700" width="2100" height="2100"/>
+  <object type="ground_snow" x="13500" y="200" width="2100" height="2100"/>
+  <object type="ground_snow" x="13500" y="2300" width="2100" height="2100"/>
+  <object type="ground_snow" x="13500" y="8600" width="2100" height="2100"/>
+  <object type="ground_snow" x="13500" y="12800" width="2100" height="2100"/>
  </objectgroup>
- <objectgroup name="teleports" width="90" height="80">
+ <objectgroup name="teleports" width="150" height="150" visible="0">
   <object type="teleport_position" x="2400" y="1700" width="300" height="300"/>
   <object type="teleport_position" x="2400" y="2400" width="300" height="300"/>
   <object type="teleport_position" x="2400" y="3100" width="300" height="300"/>
