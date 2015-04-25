@@ -129,10 +129,20 @@ namespace augs {
 
 			rects::xywhf<int>** p = ptr_arr.data();
 
-			for(int i = 0; i < cnt; ++i)
+			for (int i = 0; i < cnt; ++i)
+			{
 				p[i] = &textures[i]->rect;
+				p[i]->w+=2;
+				p[i]->h+=2;
+			}
 
 			int res = rect2D(p, cnt, max_size, b);
+
+			for (int i = 0; i < cnt; ++i)
+			{
+				p[i]->w -= 2;
+				p[i]->h -= 2;
+			}
 
 			if (res == 1) throw std::runtime_error("not enough space in texture atlas!");
 			if (res == 2) throw std::runtime_error("there's a texture larger than maximum atlas size");
@@ -147,7 +157,7 @@ namespace augs {
 			for(unsigned i = 0; i < textures.size(); ++i)
 				textures[i]->set_uv_unit(u, v);
 
-			unsigned char pixel[] = { 0, atlas_channels == 2 ? 255 : 0, 0, 255 };
+			unsigned char pixel[] = { 0, atlas_channels == 2 ? 255 : 0, 0, 0 };
 			img.create(b.size.w, b.size.h, atlas_channels);
 			img.fill(pixel);
 
