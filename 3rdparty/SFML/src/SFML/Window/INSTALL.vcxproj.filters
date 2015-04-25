@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="Windows-1252"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\5149490319644aea27e3fb3b15b5919b\INSTALL_force.rule">
+    <CustomBuild Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\a9e01f3395546683917b029932d4f39c\INSTALL_force.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
   </ItemGroup>

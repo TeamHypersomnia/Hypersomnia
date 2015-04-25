@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Main
+# Install script for directory: F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Main
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -29,13 +29,13 @@ endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "devel")
   if("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Dd][Ee][Bb][Uu][Gg])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/lib/Debug/sfml-main-d.lib")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "F:/Projects/GitHub/Augmentations/3rdparty/SFML/lib/Debug/sfml-main-d.lib")
   elseif("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Rr][Ee][Ll][Ee][Aa][Ss][Ee])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/lib/Release/sfml-main.lib")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "F:/Projects/GitHub/Augmentations/3rdparty/SFML/lib/Release/sfml-main.lib")
   elseif("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Mm][Ii][Nn][Ss][Ii][Zz][Ee][Rr][Ee][Ll])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/lib/MinSizeRel/sfml-main.lib")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "F:/Projects/GitHub/Augmentations/3rdparty/SFML/lib/MinSizeRel/sfml-main.lib")
   elseif("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Rr][Ee][Ll][Ww][Ii][Tt][Hh][Dd][Ee][Bb][Ii][Nn][Ff][Oo])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/lib/RelWithDebInfo/sfml-main.lib")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "F:/Projects/GitHub/Augmentations/3rdparty/SFML/lib/RelWithDebInfo/sfml-main.lib")
   endif()
 endif()
 

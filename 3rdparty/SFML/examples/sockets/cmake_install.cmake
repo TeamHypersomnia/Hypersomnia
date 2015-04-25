@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/sockets
+# Install script for directory: F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/sockets
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -29,21 +29,21 @@ endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "examples")
   if("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Dd][Ee][Bb][Uu][Gg])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/sockets" TYPE EXECUTABLE FILES "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/sockets/Debug/sockets-d.exe")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/sockets" TYPE EXECUTABLE FILES "F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/sockets/Debug/sockets-d.exe")
   elseif("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Rr][Ee][Ll][Ee][Aa][Ss][Ee])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/sockets" TYPE EXECUTABLE FILES "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/sockets/Release/sockets.exe")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/sockets" TYPE EXECUTABLE FILES "F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/sockets/Release/sockets.exe")
   elseif("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Mm][Ii][Nn][Ss][Ii][Zz][Ee][Rr][Ee][Ll])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/sockets" TYPE EXECUTABLE FILES "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/sockets/MinSizeRel/sockets.exe")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/sockets" TYPE EXECUTABLE FILES "F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/sockets/MinSizeRel/sockets.exe")
   elseif("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Rr][Ee][Ll][Ww][Ii][Tt][Hh][Dd][Ee][Bb][Ii][Nn][Ff][Oo])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/sockets" TYPE EXECUTABLE FILES "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/sockets/RelWithDebInfo/sockets.exe")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/sockets" TYPE EXECUTABLE FILES "F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/sockets/RelWithDebInfo/sockets.exe")
   endif()
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "examples")
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/sockets" TYPE FILE FILES
-    "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/sockets/Sockets.cpp"
-    "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/sockets/TCP.cpp"
-    "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/sockets/UDP.cpp"
+    "F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/sockets/Sockets.cpp"
+    "F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/sockets/TCP.cpp"
+    "F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/sockets/UDP.cpp"
     )
 endif()
 

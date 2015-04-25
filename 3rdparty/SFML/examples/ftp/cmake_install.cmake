@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/ftp
+# Install script for directory: F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/ftp
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -29,17 +29,17 @@ endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "examples")
   if("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Dd][Ee][Bb][Uu][Gg])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/ftp" TYPE EXECUTABLE FILES "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/ftp/Debug/ftp-d.exe")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/ftp" TYPE EXECUTABLE FILES "F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/ftp/Debug/ftp-d.exe")
   elseif("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Rr][Ee][Ll][Ee][Aa][Ss][Ee])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/ftp" TYPE EXECUTABLE FILES "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/ftp/Release/ftp.exe")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/ftp" TYPE EXECUTABLE FILES "F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/ftp/Release/ftp.exe")
   elseif("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Mm][Ii][Nn][Ss][Ii][Zz][Ee][Rr][Ee][Ll])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/ftp" TYPE EXECUTABLE FILES "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/ftp/MinSizeRel/ftp.exe")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/ftp" TYPE EXECUTABLE FILES "F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/ftp/MinSizeRel/ftp.exe")
   elseif("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Rr][Ee][Ll][Ww][Ii][Tt][Hh][Dd][Ee][Bb][Ii][Nn][Ff][Oo])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/ftp" TYPE EXECUTABLE FILES "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/ftp/RelWithDebInfo/ftp.exe")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/ftp" TYPE EXECUTABLE FILES "F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/ftp/RelWithDebInfo/ftp.exe")
   endif()
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "examples")
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/ftp" TYPE FILE FILES "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/ftp/Ftp.cpp")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/ftp" TYPE FILE FILES "F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/ftp/Ftp.cpp")
 endif()
 

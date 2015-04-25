@@ -58,26 +58,26 @@
   <PropertyGroup Label="UserMacros" />
     <PropertyGroup>
       <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\lib\Debug\</OutDir>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\lib\Debug\</OutDir>
       <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sfml-graphics.dir\Debug\</IntDir>
       <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sfml-graphics-s-d</TargetName>
       <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\lib\Release\</OutDir>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\lib\Release\</OutDir>
       <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sfml-graphics.dir\Release\</IntDir>
       <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sfml-graphics-s</TargetName>
       <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\lib\MinSizeRel\</OutDir>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\lib\MinSizeRel\</OutDir>
       <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">sfml-graphics.dir\MinSizeRel\</IntDir>
       <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">sfml-graphics-s</TargetName>
       <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\lib\RelWithDebInfo\</OutDir>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\lib\RelWithDebInfo\</OutDir>
       <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">sfml-graphics.dir\RelWithDebInfo\</IntDir>
       <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">sfml-graphics</TargetName>
       <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
     </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>Debug/</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <CompileAs>CompileAsCpp</CompileAs>
@@ -94,10 +94,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;GLEW_STATIC;STBI_FAILURE_USERMSG;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -107,7 +107,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>Release/</AssemblerListingLocation>
       <CompileAs>CompileAsCpp</CompileAs>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -123,10 +123,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;GLEW_STATIC;STBI_FAILURE_USERMSG;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -136,7 +136,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>MinSizeRel/</AssemblerListingLocation>
       <CompileAs>CompileAsCpp</CompileAs>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -152,10 +152,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;GLEW_STATIC;STBI_FAILURE_USERMSG;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -165,7 +165,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>RelWithDebInfo/</AssemblerListingLocation>
       <CompileAs>CompileAsCpp</CompileAs>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -181,10 +181,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;GLEW_STATIC;STBI_FAILURE_USERMSG;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\stb_image;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\jpeg;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libfreetype\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -193,10 +193,10 @@
     </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeLists.txt">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/CMakeLists.txt</Message>
+    <CustomBuild Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
-"C:\Program Files (x86)\CMake\bin\cmake.exe" -HC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML -BC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML --check-stamp-file C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeFiles\generate.stamp
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HF:/Projects/GitHub/Augmentations/3rdparty/SFML -BF:/Projects/GitHub/Augmentations/3rdparty/SFML --check-stamp-file F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeFiles\generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -204,12 +204,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeLists.txt;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindOpenGL.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\cmake\Modules\FindGLEW.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindJPEG.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindFreetype.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/CMakeLists.txt;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeLists.txt;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindOpenGL.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;F:\Projects\GitHub\Augmentations\3rdparty\SFML\cmake\Modules\FindGLEW.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindJPEG.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindFreetype.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
-"C:\Program Files (x86)\CMake\bin\cmake.exe" -HC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML -BC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML --check-stamp-file C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeFiles\generate.stamp
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HF:/Projects/GitHub/Augmentations/3rdparty/SFML -BF:/Projects/GitHub/Augmentations/3rdparty/SFML --check-stamp-file F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeFiles\generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -217,12 +217,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeLists.txt;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindOpenGL.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\cmake\Modules\FindGLEW.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindJPEG.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindFreetype.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/CMakeLists.txt;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeLists.txt;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindOpenGL.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;F:\Projects\GitHub\Augmentations\3rdparty\SFML\cmake\Modules\FindGLEW.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindJPEG.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindFreetype.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
-"C:\Program Files (x86)\CMake\bin\cmake.exe" -HC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML -BC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML --check-stamp-file C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeFiles\generate.stamp
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HF:/Projects/GitHub/Augmentations/3rdparty/SFML -BF:/Projects/GitHub/Augmentations/3rdparty/SFML --check-stamp-file F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeFiles\generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -230,12 +230,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeLists.txt;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindOpenGL.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\cmake\Modules\FindGLEW.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindJPEG.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindFreetype.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/CMakeLists.txt;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeLists.txt;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindOpenGL.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;F:\Projects\GitHub\Augmentations\3rdparty\SFML\cmake\Modules\FindGLEW.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindJPEG.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindFreetype.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
-"C:\Program Files (x86)\CMake\bin\cmake.exe" -HC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML -BC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML --check-stamp-file C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeFiles\generate.stamp
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HF:/Projects/GitHub/Augmentations/3rdparty/SFML -BF:/Projects/GitHub/Augmentations/3rdparty/SFML --check-stamp-file F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeFiles\generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -243,83 +243,83 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeLists.txt;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindOpenGL.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\cmake\Modules\FindGLEW.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindJPEG.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindFreetype.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/CMakeLists.txt;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeLists.txt;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindOpenGL.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;F:\Projects\GitHub\Augmentations\3rdparty\SFML\cmake\Modules\FindGLEW.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindJPEG.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindFreetype.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\BlendMode.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Color.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Export.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Font.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Glyph.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\GLCheck.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\GLExtensions.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Image.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\ImageLoader.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\PrimitiveType.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Rect.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Rect.inl" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\RenderStates.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\RenderTexture.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\RenderTarget.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\RenderWindow.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Shader.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Texture.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\TextureSaver.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Transform.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Transformable.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\View.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Vertex.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Drawable.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Shape.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\CircleShape.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\RectangleShape.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\ConvexShape.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Sprite.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Text.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\VertexArray.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RenderTextureImpl.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RenderTextureImplFBO.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RenderTextureImplDefault.hpp" />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\BlendMode.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Color.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Font.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\GLCheck.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\GLExtensions.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Image.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\ImageLoader.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RenderStates.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RenderTexture.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RenderTarget.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RenderWindow.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Shader.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Texture.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\TextureSaver.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Transform.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Transformable.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\View.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Vertex.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Shape.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CircleShape.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RectangleShape.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\ConvexShape.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Sprite.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Text.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\VertexArray.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RenderTextureImpl.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RenderTextureImplFBO.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RenderTextureImplDefault.cpp"  />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\BlendMode.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Color.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Export.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Font.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Glyph.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\GLCheck.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\GLExtensions.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Image.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\ImageLoader.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\PrimitiveType.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Rect.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Rect.inl" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\RenderStates.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\RenderTexture.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\RenderTarget.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\RenderWindow.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Shader.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Texture.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\TextureSaver.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Transform.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Transformable.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\View.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Vertex.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Drawable.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Shape.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\CircleShape.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\RectangleShape.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\ConvexShape.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Sprite.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\Text.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Graphics\VertexArray.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RenderTextureImpl.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RenderTextureImplFBO.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RenderTextureImplDefault.hpp" />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\BlendMode.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Color.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Font.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\GLCheck.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\GLExtensions.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Image.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\ImageLoader.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RenderStates.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RenderTexture.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RenderTarget.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RenderWindow.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Shader.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Texture.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\TextureSaver.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Transform.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Transformable.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\View.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Vertex.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Shape.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\CircleShape.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RectangleShape.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\ConvexShape.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Sprite.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\Text.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\VertexArray.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RenderTextureImpl.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RenderTextureImplFBO.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Graphics\RenderTextureImplDefault.cpp"  />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/ZERO_CHECK.vcxproj">
+    <ProjectReference Include="F:/Projects/GitHub/Augmentations/3rdparty/SFML/ZERO_CHECK.vcxproj">
       <Project>3D78D515-69D8-4361-8014-E250615790C0</Project>
     </ProjectReference>
-    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/System/sfml-system.vcxproj">
+    <ProjectReference Include="F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/System/sfml-system.vcxproj">
       <Project>093EBEC7-4F84-4723-A720-A9EA97EA2707</Project>
     </ProjectReference>
-    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Window/sfml-window.vcxproj">
+    <ProjectReference Include="F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Window/sfml-window.vcxproj">
       <Project>E164425B-0356-41C3-92F2-B46CA15F558C</Project>
     </ProjectReference>
   </ItemGroup>

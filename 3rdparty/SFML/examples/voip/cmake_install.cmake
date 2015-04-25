@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/voip
+# Install script for directory: F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/voip
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -29,21 +29,21 @@ endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "examples")
   if("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Dd][Ee][Bb][Uu][Gg])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/voip" TYPE EXECUTABLE FILES "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/voip/Debug/voip-d.exe")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/voip" TYPE EXECUTABLE FILES "F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/voip/Debug/voip-d.exe")
   elseif("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Rr][Ee][Ll][Ee][Aa][Ss][Ee])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/voip" TYPE EXECUTABLE FILES "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/voip/Release/voip.exe")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/voip" TYPE EXECUTABLE FILES "F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/voip/Release/voip.exe")
   elseif("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Mm][Ii][Nn][Ss][Ii][Zz][Ee][Rr][Ee][Ll])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/voip" TYPE EXECUTABLE FILES "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/voip/MinSizeRel/voip.exe")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/voip" TYPE EXECUTABLE FILES "F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/voip/MinSizeRel/voip.exe")
   elseif("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Rr][Ee][Ll][Ww][Ii][Tt][Hh][Dd][Ee][Bb][Ii][Nn][Ff][Oo])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/voip" TYPE EXECUTABLE FILES "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/voip/RelWithDebInfo/voip.exe")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/voip" TYPE EXECUTABLE FILES "F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/voip/RelWithDebInfo/voip.exe")
   endif()
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "examples")
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/./examples/voip" TYPE FILE FILES
-    "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/voip/VoIP.cpp"
-    "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/voip/Client.cpp"
-    "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/voip/Server.cpp"
+    "F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/voip/VoIP.cpp"
+    "F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/voip/Client.cpp"
+    "F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/voip/Server.cpp"
     )
 endif()
 

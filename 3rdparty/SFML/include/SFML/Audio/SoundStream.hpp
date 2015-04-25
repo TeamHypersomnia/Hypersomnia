@@ -178,7 +178,7 @@ public:
     ////////////////////////////////////////////////////////////
     bool getLoop() const;
 
-protected:
+public:
 
     ////////////////////////////////////////////////////////////
     /// \brief Default constructor
@@ -221,7 +221,7 @@ protected:
     /// \return True to continue playback, false to stop
     ///
     ////////////////////////////////////////////////////////////
-    virtual bool onGetData(Chunk& data) = 0;
+	virtual bool onGetData(Chunk& data) { return false; };
 
     ////////////////////////////////////////////////////////////
     /// \brief Change the current playing position in the stream source
@@ -232,7 +232,7 @@ protected:
     /// \param timeOffset New playing position, relative to the beginning of the stream
     ///
     ////////////////////////////////////////////////////////////
-    virtual void onSeek(Time timeOffset) = 0;
+	virtual void onSeek(Time timeOffset) {};
 
 private:
 

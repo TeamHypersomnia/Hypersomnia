@@ -58,25 +58,25 @@
   <PropertyGroup Label="UserMacros" />
     <PropertyGroup>
       <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\Debug\</OutDir>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\Debug\</OutDir>
       <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pong.dir\Debug\</IntDir>
       <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pong-d</TargetName>
       <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.exe</TargetExt>
       <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
       <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\Release\</OutDir>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\Release\</OutDir>
       <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pong.dir\Release\</IntDir>
       <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pong</TargetName>
       <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.exe</TargetExt>
       <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
       <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\MinSizeRel\</OutDir>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\MinSizeRel\</OutDir>
       <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">pong.dir\MinSizeRel\</IntDir>
       <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">pong</TargetName>
       <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.exe</TargetExt>
       <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkIncremental>
       <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">true</GenerateManifest>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\RelWithDebInfo\</OutDir>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\RelWithDebInfo\</OutDir>
       <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">pong.dir\RelWithDebInfo\</IntDir>
       <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">pong</TargetName>
       <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.exe</TargetExt>
@@ -85,7 +85,7 @@
     </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>Debug/</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <CompileAs>CompileAsCpp</CompileAs>
@@ -102,10 +102,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -118,8 +118,8 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/pong/Debug/pong-d.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/pong/Debug/pong-d.pdb</ProgramDataBaseFile>
+      <ImportLibrary>F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/pong/Debug/pong-d.lib</ImportLibrary>
+      <ProgramDataBaseFile>F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/pong/Debug/pong-d.pdb</ProgramDataBaseFile>
       <SubSystem>Windows</SubSystem>
       <Version></Version>
     </Link>
@@ -129,7 +129,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>Release/</AssemblerListingLocation>
       <CompileAs>CompileAsCpp</CompileAs>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -145,10 +145,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -161,8 +161,8 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/pong/Release/pong.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/pong/Release/pong.pdb</ProgramDataBaseFile>
+      <ImportLibrary>F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/pong/Release/pong.lib</ImportLibrary>
+      <ProgramDataBaseFile>F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/pong/Release/pong.pdb</ProgramDataBaseFile>
       <SubSystem>Windows</SubSystem>
       <Version></Version>
     </Link>
@@ -172,7 +172,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>MinSizeRel/</AssemblerListingLocation>
       <CompileAs>CompileAsCpp</CompileAs>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -188,10 +188,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -204,8 +204,8 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/pong/MinSizeRel/pong.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/pong/MinSizeRel/pong.pdb</ProgramDataBaseFile>
+      <ImportLibrary>F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/pong/MinSizeRel/pong.lib</ImportLibrary>
+      <ProgramDataBaseFile>F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/pong/MinSizeRel/pong.pdb</ProgramDataBaseFile>
       <SubSystem>Windows</SubSystem>
       <Version></Version>
     </Link>
@@ -215,7 +215,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>RelWithDebInfo/</AssemblerListingLocation>
       <CompileAs>CompileAsCpp</CompileAs>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -231,10 +231,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -247,8 +247,8 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/pong/RelWithDebInfo/pong.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/pong/RelWithDebInfo/pong.pdb</ProgramDataBaseFile>
+      <ImportLibrary>F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/pong/RelWithDebInfo/pong.lib</ImportLibrary>
+      <ProgramDataBaseFile>F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/pong/RelWithDebInfo/pong.pdb</ProgramDataBaseFile>
       <SubSystem>Windows</SubSystem>
       <Version></Version>
     </Link>
@@ -257,10 +257,10 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeLists.txt">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/pong/CMakeLists.txt</Message>
+    <CustomBuild Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/pong/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
-"C:\Program Files (x86)\CMake\bin\cmake.exe" -HC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML -BC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML --check-stamp-file C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeFiles\generate.stamp
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HF:/Projects/GitHub/Augmentations/3rdparty/SFML -BF:/Projects/GitHub/Augmentations/3rdparty/SFML --check-stamp-file F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeFiles\generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -268,12 +268,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/pong/CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/pong/CMakeLists.txt;F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeLists.txt;F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/pong/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/pong/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
-"C:\Program Files (x86)\CMake\bin\cmake.exe" -HC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML -BC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML --check-stamp-file C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeFiles\generate.stamp
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HF:/Projects/GitHub/Augmentations/3rdparty/SFML -BF:/Projects/GitHub/Augmentations/3rdparty/SFML --check-stamp-file F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeFiles\generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -281,12 +281,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/pong/CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/pong/CMakeLists.txt;F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeLists.txt;F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/pong/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/pong/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
-"C:\Program Files (x86)\CMake\bin\cmake.exe" -HC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML -BC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML --check-stamp-file C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeFiles\generate.stamp
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HF:/Projects/GitHub/Augmentations/3rdparty/SFML -BF:/Projects/GitHub/Augmentations/3rdparty/SFML --check-stamp-file F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeFiles\generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -294,12 +294,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/pong/CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/pong/CMakeLists.txt;F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeLists.txt;F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/pong/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/pong/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
-"C:\Program Files (x86)\CMake\bin\cmake.exe" -HC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML -BC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML --check-stamp-file C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeFiles\generate.stamp
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HF:/Projects/GitHub/Augmentations/3rdparty/SFML -BF:/Projects/GitHub/Augmentations/3rdparty/SFML --check-stamp-file F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeFiles\generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -307,31 +307,31 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/pong/CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/pong/CMakeLists.txt;F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeLists.txt;F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\Pong.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\Pong.cpp"  />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/ZERO_CHECK.vcxproj">
+    <ProjectReference Include="F:/Projects/GitHub/Augmentations/3rdparty/SFML/ZERO_CHECK.vcxproj">
       <Project>3D78D515-69D8-4361-8014-E250615790C0</Project>
     </ProjectReference>
-    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/sfml-audio.vcxproj">
+    <ProjectReference Include="F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/sfml-audio.vcxproj">
       <Project>4E5955C3-101E-433C-B9FF-92A8BC6AA498</Project>
     </ProjectReference>
-    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/sfml-graphics.vcxproj">
+    <ProjectReference Include="F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/sfml-graphics.vcxproj">
       <Project>E8EA226A-B64C-43E1-BCDE-F9A87A6B9EB1</Project>
     </ProjectReference>
-    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Main/sfml-main.vcxproj">
+    <ProjectReference Include="F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Main/sfml-main.vcxproj">
       <Project>0850246B-C25B-40D4-8CA0-EECCF4DAC138</Project>
     </ProjectReference>
-    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/System/sfml-system.vcxproj">
+    <ProjectReference Include="F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/System/sfml-system.vcxproj">
       <Project>093EBEC7-4F84-4723-A720-A9EA97EA2707</Project>
     </ProjectReference>
-    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Window/sfml-window.vcxproj">
+    <ProjectReference Include="F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Window/sfml-window.vcxproj">
       <Project>E164425B-0356-41C3-92F2-B46CA15F558C</Project>
     </ProjectReference>
   </ItemGroup>

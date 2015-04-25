@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML
+# Install script for directory: F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -29,12 +29,12 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/System/cmake_install.cmake")
-  include("C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Main/cmake_install.cmake")
-  include("C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Window/cmake_install.cmake")
-  include("C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Network/cmake_install.cmake")
-  include("C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/cmake_install.cmake")
-  include("C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/cmake_install.cmake")
+  include("F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/System/cmake_install.cmake")
+  include("F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Main/cmake_install.cmake")
+  include("F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Window/cmake_install.cmake")
+  include("F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Network/cmake_install.cmake")
+  include("F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Graphics/cmake_install.cmake")
+  include("F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/cmake_install.cmake")
 
 endif()
 

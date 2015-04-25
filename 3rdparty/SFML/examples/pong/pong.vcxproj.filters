@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="Windows-1252"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\Pong.cpp" />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\Pong.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeLists.txt" />
+    <CustomBuild Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\examples\pong\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

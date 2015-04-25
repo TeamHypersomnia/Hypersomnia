@@ -58,26 +58,26 @@
   <PropertyGroup Label="UserMacros" />
     <PropertyGroup>
       <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\lib\Debug\</OutDir>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\lib\Debug\</OutDir>
       <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sfml-audio.dir\Debug\</IntDir>
       <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sfml-audio-s-d</TargetName>
       <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\lib\Release\</OutDir>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\lib\Release\</OutDir>
       <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sfml-audio.dir\Release\</IntDir>
       <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sfml-audio-s</TargetName>
       <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\lib\MinSizeRel\</OutDir>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\lib\MinSizeRel\</OutDir>
       <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">sfml-audio.dir\MinSizeRel\</IntDir>
       <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">sfml-audio-s</TargetName>
       <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\lib\RelWithDebInfo\</OutDir>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\lib\RelWithDebInfo\</OutDir>
       <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">sfml-audio.dir\RelWithDebInfo\</IntDir>
       <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">sfml-audio</TargetName>
       <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
     </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\AL;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\AL;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>Debug/</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <CompileAs>CompileAsCpp</CompileAs>
@@ -94,10 +94,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\AL;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\AL;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\AL;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\AL;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -107,7 +107,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\AL;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\AL;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>Release/</AssemblerListingLocation>
       <CompileAs>CompileAsCpp</CompileAs>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -123,10 +123,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\AL;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\AL;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\AL;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\AL;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -136,7 +136,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\AL;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\AL;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>MinSizeRel/</AssemblerListingLocation>
       <CompileAs>CompileAsCpp</CompileAs>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -152,10 +152,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\AL;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\AL;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\AL;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\AL;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -165,7 +165,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\AL;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\AL;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>RelWithDebInfo/</AssemblerListingLocation>
       <CompileAs>CompileAsCpp</CompileAs>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -181,10 +181,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_STATIC;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\AL;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\AL;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\AL;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\GitHub\Augmentations\3rdparty\SFML\include;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\AL;F:\Projects\Github\Augmentations\3rdparty\SFML\extlibs\headers\libsndfile\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -193,10 +193,10 @@
     </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeLists.txt">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/CMakeLists.txt</Message>
+    <CustomBuild Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
-"C:\Program Files (x86)\CMake\bin\cmake.exe" -HC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML -BC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML --check-stamp-file C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeFiles\generate.stamp
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HF:/Projects/GitHub/Augmentations/3rdparty/SFML -BF:/Projects/GitHub/Augmentations/3rdparty/SFML --check-stamp-file F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeFiles\generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -204,12 +204,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeLists.txt;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindOpenAL.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\cmake\Modules\FindSndfile.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/CMakeLists.txt;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeLists.txt;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindOpenAL.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;F:\Projects\GitHub\Augmentations\3rdparty\SFML\cmake\Modules\FindSndfile.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
-"C:\Program Files (x86)\CMake\bin\cmake.exe" -HC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML -BC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML --check-stamp-file C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeFiles\generate.stamp
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HF:/Projects/GitHub/Augmentations/3rdparty/SFML -BF:/Projects/GitHub/Augmentations/3rdparty/SFML --check-stamp-file F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeFiles\generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -217,12 +217,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeLists.txt;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindOpenAL.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\cmake\Modules\FindSndfile.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/CMakeLists.txt;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeLists.txt;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindOpenAL.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;F:\Projects\GitHub\Augmentations\3rdparty\SFML\cmake\Modules\FindSndfile.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
-"C:\Program Files (x86)\CMake\bin\cmake.exe" -HC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML -BC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML --check-stamp-file C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeFiles\generate.stamp
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HF:/Projects/GitHub/Augmentations/3rdparty/SFML -BF:/Projects/GitHub/Augmentations/3rdparty/SFML --check-stamp-file F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeFiles\generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -230,12 +230,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeLists.txt;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindOpenAL.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\cmake\Modules\FindSndfile.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/CMakeLists.txt;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeLists.txt;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindOpenAL.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;F:\Projects\GitHub\Augmentations\3rdparty\SFML\cmake\Modules\FindSndfile.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
-"C:\Program Files (x86)\CMake\bin\cmake.exe" -HC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML -BC:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML --check-stamp-file C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeFiles\generate.stamp
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HF:/Projects/GitHub/Augmentations/3rdparty/SFML -BF:/Projects/GitHub/Augmentations/3rdparty/SFML --check-stamp-file F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeFiles\generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -243,43 +243,43 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/CMakeLists.txt;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeLists.txt;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindOpenAL.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\cmake\Modules\FindSndfile.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/CMakeLists.txt;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeLists.txt;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindOpenAL.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;F:\Projects\GitHub\Augmentations\3rdparty\SFML\cmake\Modules\FindSndfile.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeParseArguments.cmake;F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\ALCheck.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\AlResource.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\AudioDevice.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\Export.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\Listener.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\Music.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\Sound.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\SoundBuffer.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\SoundBufferRecorder.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundFile.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\SoundRecorder.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\SoundSource.hpp" />
-    <ClInclude Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\SoundStream.hpp" />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\ALCheck.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\AlResource.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\AudioDevice.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\Listener.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\Music.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\Sound.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundBuffer.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundBufferRecorder.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundFile.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundRecorder.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundSource.cpp"  />
-    <ClCompile Include="C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundStream.cpp"  />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\ALCheck.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\AlResource.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\AudioDevice.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\Export.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\Listener.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\Music.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\Sound.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\SoundBuffer.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\SoundBufferRecorder.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundFile.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\SoundRecorder.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\SoundSource.hpp" />
+    <ClInclude Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\include\SFML\Audio\SoundStream.hpp" />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\ALCheck.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\AlResource.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\AudioDevice.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\Listener.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\Music.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\Sound.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundBuffer.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundBufferRecorder.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundFile.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundRecorder.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundSource.cpp"  />
+    <ClCompile Include="F:\Projects\GitHub\Augmentations\3rdparty\SFML\src\SFML\Audio\SoundStream.cpp"  />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/ZERO_CHECK.vcxproj">
+    <ProjectReference Include="F:/Projects/GitHub/Augmentations/3rdparty/SFML/ZERO_CHECK.vcxproj">
       <Project>3D78D515-69D8-4361-8014-E250615790C0</Project>
     </ProjectReference>
-    <ProjectReference Include="C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/System/sfml-system.vcxproj">
+    <ProjectReference Include="F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/System/sfml-system.vcxproj">
       <Project>093EBEC7-4F84-4723-A720-A9EA97EA2707</Project>
     </ProjectReference>
   </ItemGroup>

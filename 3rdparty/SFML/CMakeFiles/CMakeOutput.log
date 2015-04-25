@@ -44,7 +44,7 @@ Compilation of the C compiler identification source "CMakeCCompilerId.c" produce
 
 Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.vcxproj"
 
-The C compiler identification is MSVC, found in "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/3.1.0-rc2/CompilerIdC/CompilerIdC.exe"
+The C compiler identification is MSVC, found in "F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/3.1.0-rc2/CompilerIdC/CompilerIdC.exe"
 
 Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
 Compiler:  
@@ -91,10 +91,10 @@ Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" p
 
 Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.vcxproj"
 
-The CXX compiler identification is MSVC, found in "C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/3.1.0-rc2/CompilerIdCXX/CompilerIdCXX.exe"
+The CXX compiler identification is MSVC, found in "F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/3.1.0-rc2/CompilerIdCXX/CompilerIdCXX.exe"
 
 Determining if the C compiler works passed with the following output:
-Change Dir: C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp
+Change Dir: F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp
 
 Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTryCompileExec1938180575.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=14.0"
 Microsoft (R) Build Engine version 14.0.22310.1
@@ -119,7 +119,7 @@ ClCompile:
   
   testCCompiler.c
 Link:
-  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec1938180575.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec1938180575.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec1938180575.lib" /MACHINE:X86 /SAFESEH  /machine:X86 /debug cmTryCompileExec1938180575.dir\Debug\testCCompiler.obj
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec1938180575.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec1938180575.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec1938180575.lib" /MACHINE:X86 /SAFESEH  /machine:X86 /debug cmTryCompileExec1938180575.dir\Debug\testCCompiler.obj
   cmTryCompileExec1938180575.vcxproj -> C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec1938180575.exe
 FinalizeBuildStatus:
   Deleting file "cmTryCompileExec1938180575.dir\Debug\cmTryCom.5A8F0521.tlog\unsuccessfulbuild".
@@ -134,7 +134,7 @@ Time Elapsed 00:00:00.31
 
 
 Detecting C compiler ABI info compiled with the following output:
-Change Dir: C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp
+Change Dir: F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp
 
 Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTryCompileExec2081291456.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=14.0"
 Microsoft (R) Build Engine version 14.0.22310.1
@@ -159,7 +159,7 @@ ClCompile:
   cl /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec2081291456.dir\Debug\\" /Fd"cmTryCompileExec2081291456.dir\Debug\vc140.pdb" /Gd /TC /analyze- /errorReport:queue "C:\Program Files (x86)\CMake\share\cmake-3.1\Modules\CMakeCCompilerABI.c"
   
 Link:
-  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec2081291456.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec2081291456.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec2081291456.lib" /MACHINE:X86 /SAFESEH  /machine:X86 /debug cmTryCompileExec2081291456.dir\Debug\CMakeCCompilerABI.obj
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec2081291456.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec2081291456.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec2081291456.lib" /MACHINE:X86 /SAFESEH  /machine:X86 /debug cmTryCompileExec2081291456.dir\Debug\CMakeCCompilerABI.obj
   cmTryCompileExec2081291456.vcxproj -> C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec2081291456.exe
 FinalizeBuildStatus:
   Deleting file "cmTryCompileExec2081291456.dir\Debug\cmTryCom.252780F2.tlog\unsuccessfulbuild".
@@ -174,7 +174,7 @@ Time Elapsed 00:00:00.32
 
 
 Determining if the CXX compiler works passed with the following output:
-Change Dir: C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp
+Change Dir: F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp
 
 Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTryCompileExec1394797839.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=14.0"
 Microsoft (R) Build Engine version 14.0.22310.1
@@ -199,7 +199,7 @@ ClCompile:
   
   testCXXCompiler.cxx
 Link:
-  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec1394797839.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec1394797839.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec1394797839.lib" /MACHINE:X86 /SAFESEH  /machine:X86 /debug cmTryCompileExec1394797839.dir\Debug\testCXXCompiler.obj
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec1394797839.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec1394797839.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec1394797839.lib" /MACHINE:X86 /SAFESEH  /machine:X86 /debug cmTryCompileExec1394797839.dir\Debug\testCXXCompiler.obj
   cmTryCompileExec1394797839.vcxproj -> C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec1394797839.exe
 FinalizeBuildStatus:
   Deleting file "cmTryCompileExec1394797839.dir\Debug\cmTryCom.939B9734.tlog\unsuccessfulbuild".
@@ -214,7 +214,7 @@ Time Elapsed 00:00:00.31
 
 
 Detecting CXX compiler ABI info compiled with the following output:
-Change Dir: C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp
+Change Dir: F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp
 
 Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTryCompileExec269089728.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=14.0"
 Microsoft (R) Build Engine version 14.0.22310.1
@@ -239,7 +239,7 @@ ClCompile:
   
   CMakeCXXCompilerABI.cpp
 Link:
-  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec269089728.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec269089728.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec269089728.lib" /MACHINE:X86 /SAFESEH  /machine:X86 /debug cmTryCompileExec269089728.dir\Debug\CMakeCXXCompilerABI.obj
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec269089728.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec269089728.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec269089728.lib" /MACHINE:X86 /SAFESEH  /machine:X86 /debug cmTryCompileExec269089728.dir\Debug\CMakeCXXCompilerABI.obj
   cmTryCompileExec269089728.vcxproj -> C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec269089728.exe
 FinalizeBuildStatus:
   Deleting file "cmTryCompileExec269089728.dir\Debug\cmTryCom.4CC0DA1E.tlog\unsuccessfulbuild".
@@ -254,7 +254,7 @@ Time Elapsed 00:00:00.32
 
 
 Determining if the include file sys/types.h exists passed with the following output:
-Change Dir: C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp
+Change Dir: F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp
 
 Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTryCompileExec1069060593.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=14.0"
 Microsoft (R) Build Engine version 14.0.22310.1
@@ -279,7 +279,7 @@ ClCompile:
   cl /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec1069060593.dir\Debug\\" /Fd"cmTryCompileExec1069060593.dir\Debug\vc140.pdb" /Gd /TC /analyze- /errorReport:queue C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\CheckIncludeFile.c
   
 Link:
-  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec1069060593.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec1069060593.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec1069060593.lib" /MACHINE:X86 /SAFESEH  /machine:X86 /debug cmTryCompileExec1069060593.dir\Debug\CheckIncludeFile.obj
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec1069060593.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec1069060593.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec1069060593.lib" /MACHINE:X86 /SAFESEH  /machine:X86 /debug cmTryCompileExec1069060593.dir\Debug\CheckIncludeFile.obj
   cmTryCompileExec1069060593.vcxproj -> C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec1069060593.exe
 FinalizeBuildStatus:
   Deleting file "cmTryCompileExec1069060593.dir\Debug\cmTryCom.AD468390.tlog\unsuccessfulbuild".
@@ -294,7 +294,7 @@ Time Elapsed 00:00:00.31
 
 
 Determining if the include file stdint.h exists passed with the following output:
-Change Dir: C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp
+Change Dir: F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp
 
 Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTryCompileExec2030546270.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=14.0"
 Microsoft (R) Build Engine version 14.0.22310.1
@@ -319,7 +319,7 @@ ClCompile:
   
   CheckIncludeFile.c
 Link:
-  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec2030546270.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec2030546270.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec2030546270.lib" /MACHINE:X86 /SAFESEH  /machine:X86 /debug cmTryCompileExec2030546270.dir\Debug\CheckIncludeFile.obj
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec2030546270.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec2030546270.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec2030546270.lib" /MACHINE:X86 /SAFESEH  /machine:X86 /debug cmTryCompileExec2030546270.dir\Debug\CheckIncludeFile.obj
   cmTryCompileExec2030546270.vcxproj -> C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec2030546270.exe
 FinalizeBuildStatus:
   Deleting file "cmTryCompileExec2030546270.dir\Debug\cmTryCom.E9543479.tlog\unsuccessfulbuild".
@@ -334,7 +334,7 @@ Time Elapsed 00:00:00.32
 
 
 Determining if the include file stddef.h exists passed with the following output:
-Change Dir: C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp
+Change Dir: F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp
 
 Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTryCompileExec4128408042.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=14.0"
 Microsoft (R) Build Engine version 14.0.22310.1
@@ -359,7 +359,7 @@ ClCompile:
   
   CheckIncludeFile.c
 Link:
-  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec4128408042.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec4128408042.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec4128408042.lib" /MACHINE:X86 /SAFESEH  /machine:X86 /debug cmTryCompileExec4128408042.dir\Debug\CheckIncludeFile.obj
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec4128408042.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec4128408042.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec4128408042.lib" /MACHINE:X86 /SAFESEH  /machine:X86 /debug cmTryCompileExec4128408042.dir\Debug\CheckIncludeFile.obj
   cmTryCompileExec4128408042.vcxproj -> C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec4128408042.exe
 FinalizeBuildStatus:
   Deleting file "cmTryCompileExec4128408042.dir\Debug\cmTryCom.E2B3D96E.tlog\unsuccessfulbuild".
@@ -374,7 +374,7 @@ Time Elapsed 00:00:00.31
 
 
 Determining size of void* passed with the following output:
-Change Dir: C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp
+Change Dir: F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp
 
 Run Build Command:"C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe" "cmTryCompileExec4224933538.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=14.0"
 Microsoft (R) Build Engine version 14.0.22310.1
@@ -399,7 +399,7 @@ ClCompile:
   
   SIZEOF_VOID_PTR.c
 Link:
-  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec4224933538.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec4224933538.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec4224933538.lib" /MACHINE:X86 /SAFESEH  /machine:X86 /debug cmTryCompileExec4224933538.dir\Debug\SIZEOF_VOID_PTR.obj
+  C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:QUEUE /OUT:"C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec4224933538.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec4224933538.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:/Projects/Github/Augmentations/3rdparty/SFML/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec4224933538.lib" /MACHINE:X86 /SAFESEH  /machine:X86 /debug cmTryCompileExec4224933538.dir\Debug\SIZEOF_VOID_PTR.obj
   cmTryCompileExec4224933538.vcxproj -> C:\Users\Anon\Documents\GitHub\Augmentations\3rdparty\SFML\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec4224933538.exe
 FinalizeBuildStatus:
   Deleting file "cmTryCompileExec4224933538.dir\Debug\cmTryCom.DBA59EEE.tlog\unsuccessfulbuild".

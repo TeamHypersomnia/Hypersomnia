@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples
+# Install script for directory: F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -29,16 +29,16 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/ftp/cmake_install.cmake")
-  include("C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/opengl/cmake_install.cmake")
-  include("C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/pong/cmake_install.cmake")
-  include("C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/shader/cmake_install.cmake")
-  include("C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/sockets/cmake_install.cmake")
-  include("C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/sound/cmake_install.cmake")
-  include("C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/sound_capture/cmake_install.cmake")
-  include("C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/voip/cmake_install.cmake")
-  include("C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/window/cmake_install.cmake")
-  include("C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/examples/win32/cmake_install.cmake")
+  include("F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/ftp/cmake_install.cmake")
+  include("F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/opengl/cmake_install.cmake")
+  include("F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/pong/cmake_install.cmake")
+  include("F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/shader/cmake_install.cmake")
+  include("F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/sockets/cmake_install.cmake")
+  include("F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/sound/cmake_install.cmake")
+  include("F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/sound_capture/cmake_install.cmake")
+  include("F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/voip/cmake_install.cmake")
+  include("F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/window/cmake_install.cmake")
+  include("F:/Projects/GitHub/Augmentations/3rdparty/SFML/examples/win32/cmake_install.cmake")
 
 endif()
 

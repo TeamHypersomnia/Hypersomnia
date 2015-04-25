@@ -1,10 +1,10 @@
 # CMake generation dependency list for this directory.
-C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/CMakeLists.txt
+F:/Projects/GitHub/Augmentations/3rdparty/SFML/src/SFML/Audio/CMakeLists.txt
 C:/Program Files (x86)/CMake/share/cmake-3.1/Modules/FindOpenAL.cmake
 C:/Program Files (x86)/CMake/share/cmake-3.1/Modules/FindPackageHandleStandardArgs.cmake
 C:/Program Files (x86)/CMake/share/cmake-3.1/Modules/FindPackageMessage.cmake
 C:/Program Files (x86)/CMake/share/cmake-3.1/Modules/CMakeParseArguments.cmake
-C:/Users/Anon/Documents/GitHub/Augmentations/3rdparty/SFML/cmake/Modules/FindSndfile.cmake
+F:/Projects/GitHub/Augmentations/3rdparty/SFML/cmake/Modules/FindSndfile.cmake
 C:/Program Files (x86)/CMake/share/cmake-3.1/Modules/FindPackageHandleStandardArgs.cmake
 C:/Program Files (x86)/CMake/share/cmake-3.1/Modules/FindPackageMessage.cmake
 C:/Program Files (x86)/CMake/share/cmake-3.1/Modules/CMakeParseArguments.cmake
