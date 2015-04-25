@@ -66,18 +66,20 @@ void render_system::generate_layers(int mask) {
 void render_system::draw_layer(resources::renderable::draw_input& in, int layer) {
 	auto in_camera_transform = in.camera_transform;
 	auto in_always_visible = in.always_visible;
+	
+	if (layer < layers.size() && !layers[layer].empty()) {
+		for (auto e : layers[layer]) {
+			auto& render = e->get<components::render>();
+			if (render.model == nullptr) continue;
 
-	for (auto e : layers[layer]) {
-		auto& render = e->get<components::render>();
-		if (render.model == nullptr) continue;
+			in.transform = e->get<components::transform>().current;
+			in.additional_info = &render;
 
-		in.transform = e->get<components::transform>().current;
-		in.additional_info = &render;
+			in.camera_transform = render.absolute_transform ? components::transform::state() : in_camera_transform;
+			in.always_visible = render.absolute_transform ? true : in_always_visible;
 
-		in.camera_transform = render.absolute_transform ? components::transform::state() : in_camera_transform;
-		in.always_visible = render.absolute_transform ? true : in_always_visible;
-
-		render.model->draw(in);
+			render.model->draw(in);
+		}
 	}
 
 	in.camera_transform = in_camera_transform;
