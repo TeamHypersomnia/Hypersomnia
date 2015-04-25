@@ -6,7 +6,7 @@ tiled_map_loader = {
 	
 	texture_property_name = "texture",
 	
-	map_scale = 0.5,
+	map_scale = 1.0,
 	allow_unknown_types = true,
 	
 	try_to_load_map = function(map_filename)
@@ -20,7 +20,7 @@ tiled_map_loader = {
 		return map_table
 	end,
 	
-	for_every_object = function(map_filename, callback)
+	for_every_object = function(map_filename, callback, tilelayer_callback)
 		local this = tiled_map_loader
 		local err = this.error_callback
 		
@@ -46,66 +46,72 @@ tiled_map_loader = {
 		local map_center_translation = vec2(map_table.width*map_table.tilewidth, map_table.height*map_table.tileheight) / 2
 					
 		for a, layer in ipairs(map_table.layers) do
-			if layer.type == "objectgroup" then
-				for b, object in ipairs(layer.objects) do
-					if object.type == "" then
-						object.type = "default_type"
-					end
-				
-					local output_type_table = {}
-					
-					if this.allow_unknown_types and type_table[object.type] == nil then
-						type_table[object.type] = {}
-					end
-					
-					local this_type_table = type_table[object.type]
-					
-					if this_type_table == nil then
-						err ("couldn't find type " .. object.type .. " for object \"" .. object.name .. "\" in layer \"" .. layer.name .. "\"")
-						--print ("couldn't find type " .. object.type .. " for object \"" .. object.name .. "\" in layer \"" .. layer.name .. "\"")
-					end
-					
-					-- validation
-					if this_type_table.entity_archetype == nil then
-						--err("unspecified entity archetype for type " .. object.type)
-						--print("unspecified entity archetype for type " .. object.type)
-						this_type_table.entity_archetype = {}
-					end
-					
-					-- property priority (lowest to biggest):
-					-- layer properties set in Tiled
-					-- type properties from type library
-					-- object-specific properties set in Tiled
-					
-					-- could be written in one line but separated for clarity
-					output_type_table = override(layer.properties, this_type_table)
-					output_type_table = override(output_type_table, object.properties)
-					
-					-- add root directory to the texture if specified in map properties
-					if map_table.properties["texture_directory"] ~= nil and output_type_table[this.texture_property_name] ~= nil then
-						output_type_table[this.texture_property_name] = remove_filename_from_path(map_filename) .. map_table.properties["texture_directory"] .. output_type_table[this.texture_property_name] 
-					end
-					
-					-- rest of the validations (after the properties have been overridden)
-					
-					-- handle object scale now, to simplify further calculations
-					
-					object.x = (object.x - map_center_translation.x) * this.map_scale
-					object.y = (object.y - map_center_translation.y) * this.map_scale
-					object.width = object.width * this.map_scale
-					object.height = object.height * this.map_scale
-					
-					if object.polygon ~= nil then
-						for k, v in ipairs(object.polygon) do
-							object.polygon[k] = vec2(v.x * this.map_scale, v.y * this.map_scale)
+			if layer.visible then
+				if layer.type == "objectgroup" and callback then
+					for b, object in ipairs(layer.objects) do
+						if object.visible then
+							if object.type == "" then
+								object.type = "default_type"
+							end
+						
+							local output_type_table = {}
+							
+							if this.allow_unknown_types and type_table[object.type] == nil then
+								type_table[object.type] = {}
+							end
+							
+							local this_type_table = type_table[object.type]
+							
+							if this_type_table == nil then
+								err ("couldn't find type " .. object.type .. " for object \"" .. object.name .. "\" in layer \"" .. layer.name .. "\"")
+								--print ("couldn't find type " .. object.type .. " for object \"" .. object.name .. "\" in layer \"" .. layer.name .. "\"")
+							end
+							
+							-- validation
+							if this_type_table.entity_archetype == nil then
+								--err("unspecified entity archetype for type " .. object.type)
+								--print("unspecified entity archetype for type " .. object.type)
+								this_type_table.entity_archetype = {}
+							end
+							
+							-- property priority (lowest to biggest):
+							-- layer properties set in Tiled
+							-- type properties from type library
+							-- object-specific properties set in Tiled
+							
+							-- could be written in one line but separated for clarity
+							output_type_table = override(layer.properties, this_type_table)
+							output_type_table = override(output_type_table, object.properties)
+							
+							-- add root directory to the texture if specified in map properties
+							if map_table.properties["texture_directory"] ~= nil and output_type_table[this.texture_property_name] ~= nil then
+								output_type_table[this.texture_property_name] = remove_filename_from_path(map_filename) .. map_table.properties["texture_directory"] .. output_type_table[this.texture_property_name] 
+							end
+							
+							-- rest of the validations (after the properties have been overridden)
+							
+							-- handle object scale now, to simplify further calculations
+							
+							object.x = object.x * this.map_scale
+							object.y = object.y * this.map_scale
+							object.width = object.width * this.map_scale
+							object.height = object.height * this.map_scale
+							
+							if object.polygon ~= nil then
+								for k, v in ipairs(object.polygon) do
+									object.polygon[k] = vec2(v.x * this.map_scale, v.y * this.map_scale)
+								end
+							end
+							
+							-- convenience field
+							object.pos = vec2(object.x, object.y)
+						
+							-- callback
+							callback(object, output_type_table)
 						end
 					end
-					
-					-- convenience field
-					object.pos = vec2(object.x, object.y)
-			
-					-- callback
-					callback(object, output_type_table)
+				elseif layer.type == "tilelayer" and tilelayer_callback then
+					tilelayer_callback(layer)
 				end
 			end
 		end
@@ -131,6 +137,29 @@ tiled_map_loader = {
 		return objects_by_type, type_table_by_object
 	end,
 	
+	get_tileset_textures = function (map_filename)
+		local this = tiled_map_loader
+		local needed_textures = {}
+		local tile_id_to_texture_filename = {}
+
+		local map_table = this.try_to_load_map(map_filename)
+
+		for i, tileset_table in ipairs(map_table.tilesets) do
+			for j, tiletype_table in ipairs(tileset_table.tiles) do
+				tiletype_table.image = remove_filename_from_path(map_filename) .. tiletype_table.image
+				needed_textures[tiletype_table.image] = true
+				tile_id_to_texture_filename[tiletype_table.id+1] = tiletype_table.image
+			end
+		end
+		
+		local textures_out = {}
+		for k, v in pairs(needed_textures) do
+			table.insert(textures_out, k)
+		end
+
+		return textures_out, tile_id_to_texture_filename
+	end,
+
 	get_all_textures = function (map_filename)
 		local this = tiled_map_loader
 		local needed_textures = {}
@@ -143,7 +172,8 @@ tiled_map_loader = {
 			end
 		end)
 		
-		local textures_out = {}
+		local textures_out = this.get_tileset_textures(map_filename)
+
 		for k, v in pairs(needed_textures) do
 			table.insert(textures_out, k)
 		end

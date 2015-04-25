@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "render_info.h"
 
 #include <algorithm>
@@ -316,6 +315,54 @@ namespace resources {
 			new_tri.vertices[2] = model_transformed[visible_indices[i + 2]];
 
 			in.output->push_triangle(new_tri);
+		}
+	}
+
+	tile_layer::tile_layer(rects::wh<int> size) : size(size) {
+		tiles.reserve(size.area());
+	}
+
+	tile_layer::tile::tile(unsigned type) : type_id(type) {}
+	tileset::tile_type::tile_type(texture_baker::texture* tile_texture) : tile_texture(tile_texture) {
+
+	}
+
+	void tile_layer::draw(draw_input& in) {
+		auto transform_offset = in.transform.pos - in.camera_transform.pos;
+
+		auto off = in.transform.pos;
+		
+		rects::ltrb<int> visible;
+
+		if (!in.rotated_camera_aabb.hover(rects::xywh<float>(off.x, off.y, size.w*square_size, size.h*square_size))) return;
+		visible.l = int((in.rotated_camera_aabb.l - in.transform.pos.x) / 32.f);
+		visible.t = int((in.rotated_camera_aabb.t - in.transform.pos.y) / 32.f);
+		visible.r = int((in.rotated_camera_aabb.r - in.transform.pos.x) / 32.f) + 1;
+		visible.b = int( (in.rotated_camera_aabb.b - in.transform.pos.y) / 32.f) + 1;
+		visible.l = std::max(0, visible.l);
+		visible.t = std::max(0, visible.t);
+		visible.r = std::min(size.w, visible.r);
+		visible.b = std::min(size.h, visible.b);
+
+		draw_input draw_input_copy = in;
+		
+		for (int y = visible.t; y < visible.b; ++y) {
+			for (int x = visible.l; x < visible.r; ++x) {
+				vertex_triangle t1, t2;
+				
+				auto tile_offset = vec2<int>(x, y) * square_size;
+				
+				int idx = y * size.w + x;
+				
+				if (tiles[idx].type_id == 0) continue;
+				
+				auto& type = layer_tileset->tile_types[tiles[idx].type_id-1];
+
+				sprite tile_sprite(type.tile_texture);
+				draw_input_copy.transform.pos = vec2<int>(in.transform.pos) + tile_offset + vec2<>(square_size / 2, square_size/2);
+				
+				tile_sprite.draw(draw_input_copy);
+			}
 		}
 	}
 }

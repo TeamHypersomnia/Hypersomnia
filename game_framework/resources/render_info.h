@@ -55,6 +55,34 @@ namespace resources {
 		virtual std::vector<vec2<>> get_vertices() override;
 	};
 
+	struct tileset {
+		struct tile_type {
+			texture_baker::texture* tile_texture;
+			tile_type(texture_baker::texture* = nullptr);
+		};
+		
+		std::vector<tile_type> tile_types;
+	};
+
+	struct tile_layer : public renderable {
+		rects::wh<int> size;
+		int square_size = 32;
+
+		tileset* layer_tileset = nullptr;
+
+		struct tile {
+			unsigned type_id = 0;
+
+			tile(unsigned type);
+		};
+		
+		tile_layer(rects::wh<int> size);
+		
+		virtual void draw(draw_input&) override;
+
+		std::vector<tile> tiles;
+	};
+
 	//struct triangle : public renderable {
 	//	vertex vertices[3];
 	//	triangle(const vertex&, const vertex&, const vertex&);
