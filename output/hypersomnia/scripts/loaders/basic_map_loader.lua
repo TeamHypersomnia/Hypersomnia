@@ -51,7 +51,21 @@ return function(map_filename, scene_object)
 		}
 	end
 	
-	
+	scene_object:load_tile_functionality(map_filename)
+
+	local tile_layers = tiled_map_loader.for_every_object(map_filename, nil, function(tile_layer_table)
+		local new_model = scene_object:generate_tile_layer(tile_layer_table)
+		
+		world:create_entity {
+			render = {
+				model = new_model,
+				layer = render_layers["GROUND"]
+			},
+
+			transform = {}
+		}
+
+	end)
 	
 	world.physics_system.enable_interpolation = 1
 	world.physics_system:configure_stepping(config_table.tickrate, 5)
@@ -81,7 +95,7 @@ return function(map_filename, scene_object)
 	
 	scene_object.bullet_sprite = create_sprite {
 		image = scene_object.sprite_library["bullet"],
-		size_multiplier = vec2(1.0, 1.0)
+		size_multiplier = vec2(1, 1)
 	}
 	
 	
@@ -135,6 +149,7 @@ return function(map_filename, scene_object)
 	
 	scene_object.sound_library = sound_library
 	scene_object.sound_by_filename = sound_by_filename
+	
 	-- bind the atlas once
 	-- GL.glActiveTexture(GL.GL_TEXTURE0)
 	-- scene_object.all_atlas:bind()

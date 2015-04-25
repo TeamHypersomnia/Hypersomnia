@@ -122,7 +122,7 @@ function create_weapons(scene, include_render)
 		is_automatic = true,
 		bullets_once = 1,
 		bullet_damage = 35,
-		bullet_speed = minmax(10000, 10000),
+		bullet_speed = minmax(5000, 6000),
 		
 		shooting_interval_ms = 100,
 		spread_degrees = 0,
@@ -149,7 +149,7 @@ function create_weapons(scene, include_render)
 		is_automatic = false,
 		bullets_once = 12,
 		bullet_damage = 9,
-		bullet_speed = minmax(5000, 7000),
+		bullet_speed = minmax(4000, 5000),
 		
 		shooting_interval_ms = 400,
 		spread_degrees = 5,

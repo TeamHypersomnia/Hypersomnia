@@ -17,10 +17,10 @@ local player_physics_component = {
 }
 			
 local player_movement_component = {
-	input_acceleration = vec2(10000, 10000),
-	max_accel_len = 10000,
-	max_speed_animation = 800,
-	air_resistance = 0.2,
+	input_acceleration = vec2(5000, 5000),
+	max_accel_len = 5000,
+	max_speed_animation = 200,
+	air_resistance = 0.6,
 	braking_damping = 18,
 	receivers = {
 		{ target = "body", stop_at_zero_movement = false }, 
@@ -246,6 +246,13 @@ world_archetype_callbacks.CONTROLLED_PLAYER = {
 				default_font = self.owner_scene.font_by_name["kubasta"],
 				
 				text = {}
+			},
+			
+			sound = {
+				listener = true
+				,
+				
+				effect_type = components.sound.effect_types.AMBIENT_NOISE
 			}
 		}
 		

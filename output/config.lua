@@ -1,20 +1,20 @@
 config_table = {
 	window_name = "example",
-	fullscreen = 0,
+	fullscreen = 1,
 	window_border = 1,
 	window_x = 0,
 	window_y = 0,
 	bpp = 24,
-	resolution_w = 1300,
-	resolution_h = 1000,
+	resolution_w = 1280,
+	resolution_h = 720,
 	doublebuffer = 1,
 	
-	sensitivity = vec2(2.5, 2.5),
+	sensitivity = vec2(1.5, 1.5),
 	
 	server_address = "127.0.0.1",
 	server_port = 27014,
 	
-	nickname = "Daedalus",
+	nickname = "Alex the Cat",
 	
 	multiple_clients_view = 0,
 	divergence_radius = 1,
@@ -32,6 +32,7 @@ if config_table.fullscreen == 1 then
 	config_table.resolution_h = get_display().h
 end
 
+set_display(1920, 1080, 32)
 global_gl_window = glwindow()
 
 local borders_type = glwindow.ALL_WINDOW_ELEMENTS
@@ -54,3 +55,4 @@ global_gl_window:vsync(0)
 
 --set_cursor_visible(0)
 framework_set_current_window(global_gl_window)
+

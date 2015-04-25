@@ -8,6 +8,7 @@ dofile "hypersomnia\\scripts\\components\\wield.lua"
 dofile "hypersomnia\\scripts\\components\\item.lua"
 dofile "hypersomnia\\scripts\\components\\inventory.lua"
 dofile "hypersomnia\\scripts\\components\\label.lua"
+dofile "hypersomnia\\scripts\\components\\sound.lua"
 
 dofile "hypersomnia\\scripts\\sync_modules\\modules.lua"
 dofile "hypersomnia\\scripts\\sync_modules\\movement_sync.lua"
@@ -36,6 +37,7 @@ dofile "hypersomnia\\scripts\\systems\\label_system.lua"
 dofile "hypersomnia\\scripts\\systems\\melee_system.lua"
 
 dofile "hypersomnia\\scripts\\systems\\health_system.lua"
+dofile "hypersomnia\\scripts\\systems\\sound_system.lua"
 
 dofile "hypersomnia\\scripts\\chat.lua"
 dofile "hypersomnia\\scripts\\gui\\gui.lua"
@@ -46,7 +48,7 @@ client_screen = inherits_from ()
 function client_screen:constructor(camera_rect)
 	self.sample_scene = scene_class:create()
 	
-	self.sample_scene:load_map("hypersomnia\\data\\maps\\sample_map.lua", "hypersomnia\\scripts\\loaders\\basic_map_loader.lua",
+	self.sample_scene:load_map("hypersomnia\\data\\maps\\cathedral2.lua", "hypersomnia\\scripts\\loaders\\basic_map_loader.lua",
 	{
 		kubasta = {
 			filename = "hypersomnia/data/Kubasta.ttf", 
@@ -105,7 +107,7 @@ function client_screen:constructor(camera_rect)
 	self.systems.orientation = orientation_system:create()
 	self.systems.weapon = weapon_system:create(self.sample_scene.world_object, self.sample_scene.world_object.physics_system)
 	self.systems.bullet_creation = bullet_creation_system:create(self.sample_scene.world_object, self.sample_scene.world_camera, self.sample_scene.simulation_world)
-	
+
 	self.systems.health = health_system:create(self.sample_scene)
 	
 	self.systems.wield = wield_system:create()
@@ -115,6 +117,7 @@ function client_screen:constructor(camera_rect)
 	self.systems.label = label_system:create()
 	
 	self.systems.melee = melee_system:create(self.sample_scene.world_object)
+	self.systems.sound = sound_system:create(self.sample_scene.world_object)
 	
 	table.insert(self.sample_scene.world_object.prestep_callbacks, function (dt)
 		self.systems.input_prediction:substep()
@@ -141,14 +144,65 @@ function client_screen:constructor(camera_rect)
 	create_weapons(self.sample_scene, true)
 	
 	self.my_gui = gui_class:create(camera_rect, self.sample_scene.world_object, self)
+	
+	sf_Listener_setDirection(0, 1, 0)
+	sf_Listener_setGlobalVolume(100)
+	sf_Listener_setPosition(0, 0, 0)
+	
+	local ch_l = create_music("hypersomnia\\data\\music\\choir_l.ogg")
+	local ch_r = create_music("hypersomnia\\data\\music\\choir_r.ogg")
+	
+	self.sample_scene.choir_l = self.entity_system_instance:add_entity (components.create_components {
+		cpp_entity = self.sample_scene.world_object:create_entity {
+			transform = {
+				pos = vec2(-1400 - 100, -2900)
+			}
+		},
+		
+		sound = {
+			effect_type = components.sound.effect_types.MUSIC,
+			music_object = ch_l
+		}
+	})
+	
+	self.sample_scene.choir_l = self.entity_system_instance:add_entity (components.create_components {
+		cpp_entity = self.sample_scene.world_object:create_entity {
+			transform = {
+				pos = vec2(-1400 + 100, -2900)
+			}
+		},
+		
+		sound = {
+			effect_type = components.sound.effect_types.MUSIC,
+			music_object = ch_r
+		}
+	})
+
+	self.sample_scene.sprite_object_library.torso.white.walk.rifle["2"].size_multiplier = vec2(50, 50)
+
+	self.sample_scene.aaaa = self.entity_system_instance:add_entity (components.create_components {
+		cpp_entity = self.sample_scene.world_object:create_entity {
+			transform = {
+				pos = vec2(608, 448)
+			},
+
+			render = {
+				model = self.sample_scene.sprite_object_library.torso.white.walk.rifle["2"],
+				layer = render_layers.CROSSHAIRS
+			}
+		}
+	})
+
+	print(table.inspect(self.sample_scene.sprite_object_library))
 end
 
 function client_screen:send(msg_bs)
 	self.server:send(protocol.make_reliable_bs(msg_bs), send_priority.IMMEDIATE_PRIORITY, send_reliability.RELIABLE_ORDERED, 0, self.server_guid, false)
 end
 
+stabilitytimer = timer()
 function client_screen:loop()
-
+	self.sample_scene.aaaa.cpp_entity.transform.current.pos.x = self.sample_scene.aaaa.cpp_entity.transform.current.pos.x - 50*stabilitytimer:extract_seconds()
 	setlsys(self.sample_scene.world_object.render_system)
 		
 	-- handle networking
@@ -224,6 +278,7 @@ function client_screen:loop()
 		
 		
 	self.systems.health:update()
+	self.systems.sound:update()
 		
 	
 	cpp_world:process_all_systems()
@@ -238,6 +293,8 @@ function client_screen:loop()
 	
 	cpp_world:consume_events()
 	cpp_world:render()
+	
+	collectgarbage("collect")
 end
 
 function client_screen:close_connection()
