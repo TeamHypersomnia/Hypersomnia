@@ -138,7 +138,7 @@ function create_particle_effects(scene)
 			})
 		},
 		
-		size_multiplier = minmax(1.3, 1),
+		size_multiplier = minmax(1, 1.3),
 			
 		particle_render_template = { 
 			layer = render_layers.EFFECTS
@@ -219,6 +219,23 @@ function create_particle_effects(scene)
 		fade_when_ms_remaining = minmax(100, 200)
 		--swing_spread = minmax(10, 40),
 		--swings_per_sec = minmax(0.005, 0.005)
+	})
+
+	particles.born_smoke_1 = override(particles.barrel_smoke_1, {
+		velocity = minmax(20, 150),
+		spread_degrees = minmax(0, 0),
+		particle_lifetime_ms = minmax(1000, 3000),
+		particles_per_sec = minmax(300, 400),
+
+
+		min_swing_spread = minmax(0, 0),
+		min_swings_per_sec = minmax(0, 0),
+		max_swing_spread = minmax(0, 0),
+		max_swings_per_sec = minmax(0, 0),
+
+		swing_spread = minmax(20, 20),
+		swings_per_sec = minmax(8, 8),
+		swing_spread_change_rate = minmax(0, 0)
 	})
 	
 	particles.bullet_impact_smoke_1 = override(particles.barrel_smoke_1, {
@@ -397,6 +414,11 @@ function create_particle_effects(scene)
 		--blood_droplets
 	}
 	
+
+	particles.born_effect = create_particle_effect {
+		particles.born_smoke_1
+	}
+
 	particles.blood_under_corpse_effect = create_particle_effect {
 		particles.blood_under_corpse
 	}
