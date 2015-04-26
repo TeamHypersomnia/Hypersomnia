@@ -270,7 +270,13 @@ protocol.write_sig = function(sig, entry, out_bs)
 		local var_type = sig[i*2-1]
 		local var_name = sig[i*2]
 		
-		out_bs:name_property(var_name)
+		local debug_name = var_name
+		
+		if var_name == "archetype_id" then
+			debug_name = debug_name .. " = " .. protocol.archetype_by_id[entry[var_name]]
+		end
+
+		out_bs:name_property(debug_name)
 		protocol.write_var(var_type, entry[var_name], out_bs)
 	end
 end
