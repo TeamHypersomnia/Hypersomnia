@@ -83,7 +83,7 @@ function create_controlled_player(scene_object, position, target_camera, crossha
 	
 		crosshair = { 
 			transform = {
-				pos = vec2(0, 0),
+				pos = vec2(0, -100),
 				rotation = 0
 			},
 			
@@ -267,6 +267,28 @@ world_archetype_callbacks.CONTROLLED_PLAYER = {
 		self.controlled_character_id = id
 		
 		return new_entity
+	end,
+
+	post_unreliable_construction = function (self, new_entity)
+		local burst = particle_burst_message()
+		new_entity.cpp_entity.transform.current.pos = to_pixels(new_entity.replication.modules.movement.position)
+		new_entity.cpp_entity.physics.body:SetTransform(new_entity.replication.modules.movement.position, 0)
+		new_entity.parent_group.crosshair.transform.current.pos = new_entity.cpp_entity.transform.current.pos - vec2(0, 100)
+		self.owner_scene.world_camera.camera.dont_smooth_once = true
+		--print ("BURST!!!!!")
+		--print(burst.pos.x, burst.pos.y)
+		--burst.rotation = 0
+		burst.local_transform = true
+		burst.subject = new_entity.cpp_entity
+		burst.set_effect = self.owner_scene.particles.born_effect
+		
+		self.owner_scene.world_object.world:post_message(burst)
+		burst.rotation = 90
+		self.owner_scene.world_object.world:post_message(burst)
+		burst.rotation = 180
+		self.owner_scene.world_object.world:post_message(burst)
+		burst.rotation = 270
+		self.owner_scene.world_object.world:post_message(burst)
 	end
 }
 

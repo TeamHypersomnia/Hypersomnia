@@ -2,6 +2,11 @@ replication_system = inherits_from (processing_system)
 
 function replication_system:constructor(owner_scene)
 	self.object_by_id = {}
+
+	-- table that holds objects whose post_unreliable_callback is yet to be called
+	-- will be called after the unreliable data is read the first time for a new object  
+	self.pending_post_unreliable_constructions = {}
+	
 	self.owner_scene = owner_scene
 
 	processing_system.constructor(self)
@@ -32,6 +37,11 @@ function replication_system:update_states_from_bitstream(msg)
 		local object = self.object_by_id[id]
 		
 		self:read_object_state(object, input_bs)
+
+		if self.pending_post_unreliable_constructions[id] then
+			self.pending_post_unreliable_constructions[id]()
+			self.pending_post_unreliable_constructions[id] = nil
+		end
 	end
 end
 
@@ -102,6 +112,11 @@ function replication_system:create_objects_or_change_modules(msg)
 		
 		if post_construction_callback then 
 			post_construction_callback (self, new_entity, is_object_new)
+		end
+
+		local post_unreliable_callback = world_archetype_callbacks[archetype_name].post_unreliable_construction
+		if post_unreliable_callback then
+			self.pending_post_unreliable_constructions[new_object.id] = function() post_unreliable_callback(self, new_entity, is_object_new) end
 		end
 	end
 end
