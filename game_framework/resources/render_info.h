@@ -38,7 +38,13 @@ namespace resources {
 	};
 
 	extern void set_polygon_color(renderable* poly, graphics::pixel_32 col);
-	extern void map_uv_square(renderable* poly, helpers::texture_helper*);
+
+	enum uv_mapping_mode {
+		OVERLAY,
+		STRETCH
+	};
+
+	extern void map_texture_to_polygon(renderable* poly, helpers::texture_helper*, unsigned uv_mapping_mode);
 
 	struct sprite : public renderable {
 		texture_baker::texture* tex;

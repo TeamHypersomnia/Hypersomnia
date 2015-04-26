@@ -5,12 +5,23 @@
 
 #include "../resources/render_info.h"
 
+struct dummy_uv_mapping_mode {
+
+};
+
 namespace bindings {
 	luabind::scope _polygon() {
 		return 	
 			(
+
+			luabind::class_<dummy_uv_mapping_mode>("uv_mapping_mode")
+			.enum_("chase_type")[
+				luabind::value("STRETCH", uv_mapping_mode::STRETCH),
+					luabind::value("OVERLAY", uv_mapping_mode::OVERLAY)
+			],
+
 			luabind::def("set_polygon_color", resources::set_polygon_color),
-			luabind::def("map_uv_square", resources::map_uv_square),
+			luabind::def("map_texture_to_polygon", resources::map_texture_to_polygon),
 
 			luabind::class_<vertex>("vertex")
 			.def(luabind::constructor<vec2<>>())

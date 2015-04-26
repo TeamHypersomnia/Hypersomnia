@@ -21,7 +21,7 @@ namespace resources {
 		}
 	}
 
-	void map_uv_square(renderable* poly, helpers::texture_helper* texture_to_map) {
+	void map_texture_to_polygon(renderable* poly, helpers::texture_helper* texture_to_map, unsigned uv_mapping_mode) {
 		polygon* p = (polygon*) poly;
 
 		if (p->model.empty()) return;
@@ -42,11 +42,23 @@ namespace resources {
 			static_cast<int>(std::max_element(v, v + p->model.size(), y_pred)->pos.y)
 			);
 
-		for (auto& v : p->model) {
-			v.set_texcoord(vec2<>(
-				(v.pos.x - lower.x) / (upper.x - lower.x),
-				(v.pos.y - lower.y) / (upper.y - lower.y)
-				), texture_to_map);
+		if (uv_mapping_mode == uv_mapping_mode::STRETCH) {
+			for (auto& v : p->model) {
+				v.set_texcoord(vec2<>(
+					(v.pos.x - lower.x) / (upper.x - lower.x),
+					(v.pos.y - lower.y) / (upper.y - lower.y)
+					), texture_to_map);
+			}
+		}
+		else if (uv_mapping_mode == uv_mapping_mode::OVERLAY) {
+			auto size = texture_to_map->get_size();
+
+			for (auto& v : p->model) {
+				v.set_texcoord(vec2<>(
+					(v.pos.x - lower.x) / size.x,
+					(v.pos.y - lower.y) / size.y
+					), texture_to_map);
+			}
 		}
 	}
 
@@ -107,8 +119,9 @@ namespace resources {
 		make_rect(target_position, vec2<>(size), in.transform.rotation + rotation_offset, v);
 
 		/* rotate around the center of the screen */
-		for (auto& vert : v)
-			vert.rotate(in.camera_transform.rotation, center);
+		if(std::abs(in.camera_transform.rotation) > 0)
+			for (auto& vert : v)
+				vert.rotate(in.camera_transform.rotation, center);
 
 		vertex_triangle t1, t2;
 		t1.vertices[0].color = t2.vertices[0].color = color;
@@ -258,8 +271,9 @@ namespace resources {
 		auto model_transformed = model;
 
 		/* initial transformation for visibility checks */
-		for (auto& v : model_transformed)
-			v.pos.rotate(in.transform.rotation, vec2<>(0, 0));
+		if(std::abs(in.transform.rotation) > 0.f)
+			for (auto& v : model_transformed)
+				v.pos.rotate(in.transform.rotation, vec2<>(0, 0));
 		
 		if (in.always_visible) {
 			visible_indices = indices;
@@ -306,7 +320,11 @@ namespace resources {
 			v.pos += in.transform.pos - camera_pos + center;
 
 			/* rotate around the center of the screen */
-			v.pos.rotate(in.camera_transform.rotation, center);
+			if (std::abs(in.camera_transform.rotation) > 0.f)
+				v.pos.rotate(in.camera_transform.rotation, center);
+
+			v.pos.x = int(v.pos.x);
+			v.pos.y = int(v.pos.y);
 		}
 
 		for (size_t i = 0; i < visible_indices.size(); i += 3) {
