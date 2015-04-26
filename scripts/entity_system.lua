@@ -183,6 +183,13 @@ end
 
 function cpp_entity_system:add_entity(new_entity)
 	-- don't store anything
+	local old_content = {}
+	
+	if new_entity.cpp_entity.script ~= nil then
+		rewrite(old_content, new_entity.cpp_entity.script)
+	end
+
+	rewrite(new_entity, old_content)
 	new_entity.cpp_entity.script = new_entity
 end
 
