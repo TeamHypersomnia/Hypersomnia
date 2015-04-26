@@ -61,6 +61,12 @@ return {
 		entity_archetype = static_object_archetype
 	},
 	
+	cathedral_wall = {
+		render_layer = "OBJECTS",
+		texture = "snow1.jpg",
+		entity_archetype = static_object_archetype
+	},
+
 	ground_snow = {
 		render_layer = "GROUND",
 		texture = "snow3.jpg"

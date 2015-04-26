@@ -215,6 +215,9 @@ function replication_module:read_state(object, input_bs)
 	input_bs:name_property("has module changed")
 	local module_changed = input_bs:ReadBit()
 	
+	-- additional table to tell the game code that the server has something new to tell about this field
+	-- (in other words, it has changed)
+	-- useful for non-callback systems that continuously loop like interpolation_system that may also extrapolate
 	self.FIELDS_READ = {}
 	
 	if module_changed then
