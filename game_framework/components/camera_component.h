@@ -28,6 +28,7 @@ namespace components {
 
 		float angled_look_length;
 		bool enable_smoothing;
+		bool dont_smooth_once = false;
 		bool crosshair_follows_interpolant;
 
 		double smoothing_average_factor, averages_per_sec;
