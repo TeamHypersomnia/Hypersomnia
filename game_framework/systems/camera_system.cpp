@@ -104,6 +104,9 @@ void camera_system::process_entities(world& owner) {
 				}
 			}
 			
+2			drawn_transform.pos = vec2<int>(drawn_transform.pos);
+			drawn_size = vec2<int>(drawn_size);
+
 			camera.dont_smooth_once = false;
 
 			/* save the final smoothing results in previous transform state and component, we'll use them later in the rendering pass */
