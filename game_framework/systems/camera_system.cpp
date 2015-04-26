@@ -77,6 +77,9 @@ void camera_system::process_entities(world& owner) {
 				float averaging_constant = static_cast<float>(
 					pow(camera.smoothing_average_factor, camera.averages_per_sec * delta)
 					);
+				
+				if (camera.dont_smooth_once)
+					averaging_constant = 0.f;
 
 				//if ((transform.pos - camera.last_interpolant).length() < 2.0) camera.last_interpolant = transform.current.pos;
 				//else
@@ -100,6 +103,8 @@ void camera_system::process_entities(world& owner) {
 					camera.crosshair->get<components::transform>().current.pos -= transform.pos - camera.last_interpolant.pos;
 				}
 			}
+			
+			camera.dont_smooth_once = false;
 
 			/* save the final smoothing results in previous transform state and component, we'll use them later in the rendering pass */
 			e->get<components::transform>().previous = drawn_transform;

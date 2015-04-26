@@ -18,6 +18,7 @@ namespace bindings {
 			.def_readwrite("orbit_mode", &camera::orbit_mode)
 			.def_readwrite("angled_look_length", &camera::angled_look_length)
 			.def_readwrite("enable_smoothing", &camera::enable_smoothing)
+			.def_readwrite("dont_smooth_once", &camera::dont_smooth_once)
 			.def_readwrite("smoothing_average_factor", &camera::smoothing_average_factor)
 			.def_readwrite("averages_per_sec", &camera::averages_per_sec)
 			.def_readwrite("last_interpolant", &camera::last_interpolant)
