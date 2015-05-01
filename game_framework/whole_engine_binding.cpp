@@ -102,7 +102,9 @@ namespace bindings {
 
 		_text(),
 
-		_file_watcher()
+		_file_watcher(),
+
+		_utilities()
 		;
 }
 
@@ -258,7 +260,9 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 
 			world_instance::bind(),
 
-			bindings::_text()
+			bindings::_text(),
+
+			bindings::_utilities()
 	];
 
 	wrapper.global("THIS_LUA_STATE", wrapper);
