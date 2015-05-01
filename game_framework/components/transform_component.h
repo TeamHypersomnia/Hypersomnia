@@ -5,13 +5,14 @@
 
 namespace components {
 	struct transform : public augs::entity_system::component {
+		template <typename T = float>
 		struct state {
-			augs::vec2<> pos;
-			float rotation;
-			state() : rotation(0.f) { }
-			state(augs::vec2<> pos, float rotation) : rotation(rotation), pos(pos) { }
+			augs::vec2<T> pos;
+			T rotation;
+			state() : rotation(static_cast<T>(0)) { }
+			state(augs::vec2<T> pos, T rotation) : rotation(rotation), pos(pos) { }
 		};
-		state previous, current;
+		state<> previous, current;
 
 		transform(augs::vec2<> pos = augs::vec2<>(), float rotation = 0.f) {
 			current.pos = pos;
@@ -19,7 +20,7 @@ namespace components {
 			previous = current;
 		}
 		
-		transform(const state& s) {
+		transform(const state<>& s) {
 			current.pos = s.pos;
 			current.rotation = s.rotation;
 			previous = current;

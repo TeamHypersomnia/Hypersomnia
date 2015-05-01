@@ -25,7 +25,7 @@ namespace helpers {
 		}
 
 		void generate_triangles(resources::renderable::draw_input& camera_draw_input) {
-			camera_draw_input.transform = components::transform::state();
+			camera_draw_input.transform = components::transform::state<>();
 			for (auto& t : traces) {
 				t.poly.draw(camera_draw_input);
 			}

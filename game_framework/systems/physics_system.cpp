@@ -394,18 +394,18 @@ void physics_system::process_steps(world& owner, unsigned steps) {
 
 		if (enable_motors)
 			for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
-			if (b->GetType() == b2_staticBody) continue;
-			auto& physics = static_cast<entity*>(b->GetUserData())->get<components::physics>();
+				if (b->GetType() == b2_staticBody) continue;
+				auto& physics = static_cast<entity*>(b->GetUserData())->get<components::physics>();
 
-			if (physics.enable_angle_motor) {
-				float nextAngle = b->GetAngle() + b->GetAngularVelocity() / accumulator.get_hz();
-				float totalRotation = (constrainAngle(physics.target_angle) * 0.01745329251994329576923690768489) - nextAngle;
-				while (totalRotation < -180 * 0.01745329251994329576923690768489f) totalRotation += 360 * 0.01745329251994329576923690768489f;
-				while (totalRotation >  180 * 0.01745329251994329576923690768489f) totalRotation -= 360 * 0.01745329251994329576923690768489f;
-				float desiredAngularVelocity = totalRotation * accumulator.get_hz();
-				float impulse = b->GetInertia() * desiredAngularVelocity;// disregard time factor
-				b->ApplyAngularImpulse(impulse*physics.angle_motor_force_multiplier, true);
-			}
+				if (physics.enable_angle_motor) {
+					float nextAngle = b->GetAngle() + b->GetAngularVelocity() / accumulator.get_hz();
+					float totalRotation = (constrainAngle(physics.target_angle) * 0.01745329251994329576923690768489) - nextAngle;
+					while (totalRotation < -180 * 0.01745329251994329576923690768489f) totalRotation += 360 * 0.01745329251994329576923690768489f;
+					while (totalRotation >  180 * 0.01745329251994329576923690768489f) totalRotation -= 360 * 0.01745329251994329576923690768489f;
+					float desiredAngularVelocity = totalRotation * accumulator.get_hz();
+					float impulse = b->GetInertia() * desiredAngularVelocity;// disregard time factor
+					b->ApplyAngularImpulse(impulse*physics.angle_motor_force_multiplier, true);
+				}
 			}
 
 		owner.get_message_queue<messages::collision_message>().clear();

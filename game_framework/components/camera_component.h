@@ -32,10 +32,8 @@ namespace components {
 		bool crosshair_follows_interpolant;
 
 		double smoothing_average_factor, averages_per_sec;
-		components::transform::state last_interpolant;
+		components::transform::state<double> last_interpolant;
 
-		/* these are the data filled in the smoothing pass and later used in the rendering pass of camera system */
-		components::transform::state target_transform;
 		augs::vec2<> rendered_size;
 
 		augs::vec2<> max_look_expand;

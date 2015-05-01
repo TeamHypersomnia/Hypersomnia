@@ -21,7 +21,7 @@ namespace resources {
 	struct renderable {
 		struct draw_input {
 			render_system* output;
-			components::transform::state transform, camera_transform;
+			components::transform::state<> transform, camera_transform;
 			components::render* additional_info;
 			augs::vec2<> visible_area;
 			bool always_visible;

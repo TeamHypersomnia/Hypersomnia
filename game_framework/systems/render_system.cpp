@@ -75,7 +75,7 @@ void render_system::draw_layer(resources::renderable::draw_input& in, int layer)
 			in.transform = e->get<components::transform>().current;
 			in.additional_info = &render;
 
-			in.camera_transform = render.absolute_transform ? components::transform::state() : in_camera_transform;
+			in.camera_transform = render.absolute_transform ? components::transform::state<>() : in_camera_transform;
 			in.always_visible = render.absolute_transform ? true : in_always_visible;
 
 			render.model->draw(in);
@@ -118,7 +118,7 @@ resources::vertex_triangle& render_system::get_triangle(int i) {
 	return triangles[i];
 }
 
-void render_system::draw_debug_info(vec2<> visible_area, components::transform::state camera_transform, augs::texture_baker::texture* tex) {
+void render_system::draw_debug_info(vec2<> visible_area, components::transform::state<> camera_transform, augs::texture_baker::texture* tex) {
 	vec2<> center = visible_area / 2;
 
 	if (draw_visibility) {
