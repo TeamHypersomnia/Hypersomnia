@@ -16,6 +16,13 @@ namespace bindings {
 			.def_readwrite("rotation", &transform::state<>::rotation)
 			,
 
+			luabind::class_<transform::state<double>>("transform_state_double")
+			.def(luabind::constructor<>())
+			.def(luabind::constructor<const transform::state<double>&>())
+			.def_readwrite("pos", &transform::state<double>::pos)
+			.def_readwrite("rotation", &transform::state<double>::rotation)
+			,
+
 			luabind::class_<transform>("transform_component")
 			.def(luabind::constructor<>())
 			.def(luabind::constructor<const transform&>())

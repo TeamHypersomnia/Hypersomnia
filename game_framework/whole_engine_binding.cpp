@@ -109,18 +109,39 @@ namespace bindings {
 }
 
 int the_callback(lua_State *L) {
-	std::string error_message(lua_tostring(L, -1));
+	std::string error_message;
+	auto str = lua_tostring(L, -1);
+	if (str) error_message = std::string(str);
 	std::cout << error_message << std::endl;
 	lua_getglobal(L, "debug");
-	lua_getfield(L, -1, "my_traceback");
+	lua_getfield(L, -1, "pre_traceback");
 	lua_pushvalue(L, 1);
 	lua_pushinteger(L, 2);
 	lua_call(L, 2, 1);
 	printf("%s\n", lua_tostring(L, -1));
 	int a;
 	std::cout << error_message << std::endl;
+
+	lua_getglobal(L, "debug");
+	lua_getfield(L, -1, "post_traceback");
+	lua_pushvalue(L, 1);
+	lua_pushinteger(L, 2);
+	lua_call(L, 2, 1);
+
 	std::cin >> a;
 	return 1;
+}
+
+void luabind_error_callback(lua_State *L) {
+	the_callback(L);
+	//lua_getglobal(L, "debug");
+	//lua_getfield(L, -1, "my_traceback");
+	//lua_pushvalue(L, 1);
+	//lua_pushinteger(L, 2);
+	//lua_call(L, 2, 1);
+	//printf("%s\n", lua_tostring(L, -1));
+	//int a;
+	//std::cin >> a;
 }
 
 void debugger_break() {

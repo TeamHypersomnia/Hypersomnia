@@ -40,7 +40,11 @@ function debug.get_stack_contents()
 end
 
 
-function debug.my_traceback() 
+function debug.pre_traceback()
+	return debug.traceback()
+end
+
+function debug.post_traceback() 
 	local outstr, globals_str = debug.get_stack_contents()
 	
 	local file = io.open("error_message.txt", "w")
@@ -52,8 +56,6 @@ function debug.my_traceback()
 			print (protocol.LAST_READ_BITSTREAM.read_report)
 		end 
 	end
-	
-	return debug.traceback()
 end
 
 function count_all(f)

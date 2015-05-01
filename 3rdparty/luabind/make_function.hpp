@@ -11,6 +11,8 @@
 # include <luabind/detail/deduce_signature.hpp>
 # include <luabind/detail/format_signature.hpp>
 
+extern void luabind_error_callback(lua_State*);
+
 namespace luabind {
 
 namespace detail
@@ -65,6 +67,7 @@ namespace detail
           catch (...)
           {
               exception_caught = true;
+			  luabind_error_callback(L);
               handle_exception_aux(L);
           }
 
