@@ -25,6 +25,7 @@ void chase_system::process_entities(world&) {
 
 		auto target_transform = chase.subscribe_to_previous ? chase.target->get<components::transform>().previous : chase.target->get<components::transform>().current;
 		target_transform.rotation *= chase.rotation_multiplier;
+		target_transform.pos = vec2<int>(target_transform.pos);
 
 		if (chase.chase_type == components::chase::chase_type::OFFSET) {
 			if (chase.relative) {

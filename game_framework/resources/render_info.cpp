@@ -108,14 +108,15 @@ namespace resources {
 		}
 
 		vec2<> v[4];
-		make_rect(in.transform.pos, vec2<>(size), in.transform.rotation, v);
+		vec2<int> transform_pos = in.transform.pos;
+		make_rect(transform_pos, vec2<>(size), in.transform.rotation, v);
 		if (!in.always_visible && !rects::ltrb<float>::get_aabb(v).hover(in.rotated_camera_aabb)) return;
 
 		if (tex == nullptr) return;
 
 		auto center = in.visible_area / 2;
 
-		auto target_position = in.transform.pos - in.camera_transform.pos + center;
+		auto target_position = transform_pos - in.camera_transform.pos + center;
 		make_rect(target_position, vec2<>(size), in.transform.rotation + rotation_offset, v);
 
 		/* rotate around the center of the screen */
@@ -346,26 +347,24 @@ namespace resources {
 	}
 
 	void tile_layer::draw(draw_input& in) {
-		auto transform_offset = in.transform.pos - in.camera_transform.pos;
+		/* if it is not visible, return */
+		if (!in.rotated_camera_aabb.hover(rects::xywh<float>(in.transform.pos.x, in.transform.pos.y, size.w*square_size, size.h*square_size))) return;
 
-		auto off = in.transform.pos;
-		
-		rects::ltrb<int> visible;
+		rects::ltrb<int> visible_tiles;
 
-		if (!in.rotated_camera_aabb.hover(rects::xywh<float>(off.x, off.y, size.w*square_size, size.h*square_size))) return;
-		visible.l = int((in.rotated_camera_aabb.l - in.transform.pos.x) / 32.f);
-		visible.t = int((in.rotated_camera_aabb.t - in.transform.pos.y) / 32.f);
-		visible.r = int((in.rotated_camera_aabb.r - in.transform.pos.x) / 32.f) + 1;
-		visible.b = int( (in.rotated_camera_aabb.b - in.transform.pos.y) / 32.f) + 1;
-		visible.l = std::max(0, visible.l);
-		visible.t = std::max(0, visible.t);
-		visible.r = std::min(size.w, visible.r);
-		visible.b = std::min(size.h, visible.b);
+		visible_tiles.l = int((in.rotated_camera_aabb.l - in.transform.pos.x) / 32.f);
+		visible_tiles.t = int((in.rotated_camera_aabb.t - in.transform.pos.y) / 32.f);
+		visible_tiles.r = int((in.rotated_camera_aabb.r - in.transform.pos.x) / 32.f) + 1;
+		visible_tiles.b = int( (in.rotated_camera_aabb.b - in.transform.pos.y) / 32.f) + 1;
+		visible_tiles.l = std::max(0, visible_tiles.l);
+		visible_tiles.t = std::max(0, visible_tiles.t);
+		visible_tiles.r = std::min(size.w, visible_tiles.r);
+		visible_tiles.b = std::min(size.h, visible_tiles.b);
 
 		draw_input draw_input_copy = in;
 		
-		for (int y = visible.t; y < visible.b; ++y) {
-			for (int x = visible.l; x < visible.r; ++x) {
+		for (int y = visible_tiles.t; y < visible_tiles.b; ++y) {
+			for (int x = visible_tiles.l; x < visible_tiles.r; ++x) {
 				vertex_triangle t1, t2;
 				
 				auto tile_offset = vec2<int>(x, y) * square_size;
@@ -401,7 +400,7 @@ namespace components {
 					}
 				}
 
-				in.transform = it.ignore_rotation ? components::transform::state(it.pos, 0) : components::transform::state(it.pos, it.rotation);
+				in.transform = it.ignore_rotation ? components::transform::state<>(it.pos, 0) : components::transform::state<>(it.pos, it.rotation);
 				it.face.draw(in);
 				it.face.color.a = temp_alpha;
 			}
