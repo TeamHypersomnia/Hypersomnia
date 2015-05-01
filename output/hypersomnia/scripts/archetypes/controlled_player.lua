@@ -134,9 +134,7 @@ function create_controlled_player(scene_object, position, target_camera, crossha
 	}
 	
 	if target_camera ~= nil then
-		target_camera.chase:set_target(player.body)
-		target_camera.camera.player:set(player.body)
-		target_camera.camera.crosshair:set(player.crosshair)
+		target_camera:chase_player(player.body, player.crosshair)
 	end
 	
 	player.body.animate.available_animations = scene_object.torso_sets["basic"]["barehands"].set
@@ -221,7 +219,7 @@ world_archetype_callbacks.CONTROLLED_PLAYER = {
 		local player_group = create_controlled_player(
 		self.owner_scene,
 		self.owner_scene.teleport_position, 
-		self.owner_scene.world_camera, 
+		self.owner_scene.world_camera.script, 
 		self.owner_scene.crosshair_sprite)
 	
 		local new_entity = components.create_components {
@@ -271,7 +269,9 @@ world_archetype_callbacks.CONTROLLED_PLAYER = {
 
 	post_unreliable_construction = function (self, new_entity)
 		local burst = particle_burst_message()
+		self.owner_scene.player = new_entity
 		new_entity.cpp_entity.transform.current.pos = to_pixels(new_entity.replication.modules.movement.position)
+
 		new_entity.cpp_entity.physics.body:SetTransform(new_entity.replication.modules.movement.position, 0)
 		new_entity.parent_group.crosshair.transform.current.pos = new_entity.cpp_entity.transform.current.pos - vec2(0, 100)
 		self.owner_scene.world_camera.camera.dont_smooth_once = true

@@ -202,7 +202,9 @@ end
 
 stabilitytimer = timer()
 function client_screen:loop()
-	self.sample_scene.aaaa.cpp_entity.transform.current.pos.x = self.sample_scene.aaaa.cpp_entity.transform.current.pos.x - 50*stabilitytimer:extract_seconds()
+	if self.sample_scene.player then
+	--self.sample_scene.player.cpp_entity.transform.current.pos.x = self.sample_scene.player.cpp_entity.transform.current.pos.x + 50*stabilitytimer:extract_seconds()
+	end
 	setlsys(self.sample_scene.world_object.render_system)
 		
 	-- handle networking
@@ -293,7 +295,8 @@ function client_screen:loop()
 	
 	cpp_world:consume_events()
 	cpp_world:render()
-	
+
+	self.sample_scene.world_camera.script:tick()
 	collectgarbage("collect")
 end
 

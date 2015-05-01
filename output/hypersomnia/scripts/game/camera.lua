@@ -13,14 +13,14 @@ function create_world_camera_entity(owner_world, blank_sprite)
 			
 			enable_smoothing = true,
 			smoothing_average_factor = 0.5,
-			averages_per_sec = 20,
+			averages_per_sec = 25,
 			
 			crosshair = nil,
 			player = nil,
 		
 			orbit_mode = camera_component.LOOK,
 			max_look_expand = vec2(config_table.resolution_w/2, config_table.resolution_h/2),
-			angled_look_length = 20
+			angled_look_length = 10
 		},
 		
 		chase = {
@@ -110,7 +110,13 @@ function create_world_camera_entity(owner_world, blank_sprite)
 	
 	void main() 
 	{
-		outputColor = theColor * texture(basic_texture, theTexcoord);
+		float light_intensity = 1.0;
+
+		//light_intensity = gl_FragCoord.x + gl_FragCoord.y;
+		//if(light_intensity > 1.0) light_intensity = 0;
+		vec4 pixel = theColor * texture(basic_texture, theTexcoord);
+		pixel.rgb *= light_intensity;
+		outputColor = pixel;
 	}
 	
 	]])
