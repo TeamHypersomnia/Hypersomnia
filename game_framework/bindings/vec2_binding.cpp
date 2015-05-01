@@ -44,6 +44,6 @@ luabind::scope get_scope(const char* name) {
 
 namespace bindings {
 	luabind::scope _vec2() {
-		return get_scope<float>("vec2"), get_scope<int>("vec2_i");
+		return get_scope<float>("vec2"), get_scope<int>("vec2_i"), get_scope<double>("vec2_d");
 	}
 }
