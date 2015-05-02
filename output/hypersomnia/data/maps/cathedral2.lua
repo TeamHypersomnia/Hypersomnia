@@ -7,7 +7,7 @@ return {
   height = 300,
   tilewidth = 32,
   tileheight = 32,
-  nextobjectid = 21,
+  nextobjectid = 39,
   properties = {
     ["gameplay_textures"] = "..\\\\gfx\\\\",
     ["texture_directory"] = "snow_textures\\\\",
@@ -1412,6 +1412,119 @@ return {
             { x = 576, y = 128 },
             { x = 96, y = 192 }
           },
+          properties = {}
+        }
+      }
+    },
+    {
+      type = "objectgroup",
+      name = "fires",
+      visible = true,
+      opacity = 1,
+      properties = {},
+      objects = {
+        {
+          id = 21,
+          name = "",
+          type = "fire",
+          shape = "rectangle",
+          x = 96,
+          y = 64,
+          width = 32,
+          height = 32,
+          rotation = 90,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 22,
+          name = "",
+          type = "fire",
+          shape = "rectangle",
+          x = 288,
+          y = 64,
+          width = 32,
+          height = 32,
+          rotation = 90,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 33,
+          name = "",
+          type = "fire",
+          shape = "rectangle",
+          x = 1184,
+          y = 64,
+          width = 32,
+          height = 32,
+          rotation = 90,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 34,
+          name = "",
+          type = "fire",
+          shape = "rectangle",
+          x = 672,
+          y = 64,
+          width = 32,
+          height = 32,
+          rotation = 90,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 35,
+          name = "",
+          type = "fire",
+          shape = "rectangle",
+          x = 1024,
+          y = 64,
+          width = 32,
+          height = 32,
+          rotation = 90,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 36,
+          name = "",
+          type = "fire",
+          shape = "rectangle",
+          x = 832,
+          y = 64,
+          width = 32,
+          height = 32,
+          rotation = 90,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 37,
+          name = "",
+          type = "fire",
+          shape = "rectangle",
+          x = 480,
+          y = 64,
+          width = 32,
+          height = 32,
+          rotation = 90,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 38,
+          name = "",
+          type = "fire",
+          shape = "rectangle",
+          x = 640,
+          y = 64,
+          width = 32,
+          height = 32,
+          rotation = 90,
+          visible = true,
           properties = {}
         }
       }

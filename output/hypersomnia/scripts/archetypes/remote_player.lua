@@ -160,7 +160,7 @@ world_archetype_callbacks.REMOTE_PLAYER = {
 			},
 
 			light = {
-				color = rgba(0, 255, 0, 255)
+				color = rgba(255, 255, 0, 255)
 			}
 		}
 		

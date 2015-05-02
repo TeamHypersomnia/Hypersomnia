@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="300" height="300" tilewidth="32" tileheight="32" nextobjectid="21">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="300" height="300" tilewidth="32" tileheight="32" nextobjectid="39">
  <properties>
   <property name="gameplay_textures" value="..\\gfx\\"/>
   <property name="texture_directory" value="snow_textures\\"/>
@@ -189,5 +189,15 @@
   <object id="20" type="cathedral_wall" x="640" y="1024">
    <polygon points="0,0 288,-32 576,128 96,192"/>
   </object>
+ </objectgroup>
+ <objectgroup name="fires">
+  <object id="21" type="fire" x="96" y="64" width="32" height="32" rotation="90"/>
+  <object id="22" type="fire" x="288" y="64" width="32" height="32" rotation="90"/>
+  <object id="33" type="fire" x="1184" y="64" width="32" height="32" rotation="90"/>
+  <object id="34" type="fire" x="672" y="64" width="32" height="32" rotation="90"/>
+  <object id="35" type="fire" x="1024" y="64" width="32" height="32" rotation="90"/>
+  <object id="36" type="fire" x="832" y="64" width="32" height="32" rotation="90"/>
+  <object id="37" type="fire" x="480" y="64" width="32" height="32" rotation="90"/>
+  <object id="38" type="fire" x="640" y="64" width="32" height="32" rotation="90"/>
  </objectgroup>
 </map>
