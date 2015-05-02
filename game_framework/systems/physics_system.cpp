@@ -165,6 +165,8 @@ physics_system::raycast_output physics_system::ray_cast(vec2<> p1_meters, vec2<>
 	if (!((p1_meters - p2_meters).length_sq() > 0.f)) {
 		printf("ray_cast: X: %f, Y: %f\nX: %f, Y: %f\n", p1_meters.x, p1_meters.y, p2_meters.x, p2_meters.y);
 		std::cout << "error" << std::endl;
+
+		return callback.output;
 	}
 
 	b2world.RayCast(&callback, p1_meters, p2_meters);
