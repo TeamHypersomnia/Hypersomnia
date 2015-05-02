@@ -268,7 +268,7 @@ world_archetype_callbacks.CONTROLLED_PLAYER = {
 			},
 
 			light = {
-				color = rgba(0, 255, 255, 255)
+				color = rgba(0, 200, 255, 255)
 			}
 		}
 		

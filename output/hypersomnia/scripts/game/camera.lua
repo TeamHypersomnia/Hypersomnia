@@ -57,16 +57,20 @@ function create_world_camera_entity(owner_world, blank_sprite)
 	out vec4 outputColor;
 	
 	uniform sampler2D smoke_texture;
+	uniform sampler2D light_texture;
 	const int levels = 3;
 	void main() 
 	{	
 		vec4 pixel =  texture(smoke_texture, theTexcoord);
-		int desired_alpha = int(pixel.r * float(255));
+		int desired_alpha = int((pixel.r + pixel.g + pixel.b) * float(255));
 		
 		int out_value = desired_alpha == 0 ? 0 : ((255 / levels) * ( (desired_alpha / (255 / levels))));
 		float outf = float(out_value) / 255.0;
 		
-		outputColor = vec4(0, outf/levels+0.7, outf/levels+0.7, outf/levels > 0 ? 1.0 : 0.0);
+		vec2 texcoord = gl_FragCoord.xy;
+		texcoord.x /= ]] .. config_table.resolution_w .. [[; 
+		texcoord.y /= ]] .. config_table.resolution_h .. [[; 
+		outputColor = vec4(0, outf/levels+0.7, outf/levels+0.7, outf/levels > 0 ? 1.0 : 0.0) * texture(light_texture, texcoord);
 	}
 	]]
 
@@ -110,19 +114,49 @@ function create_world_camera_entity(owner_world, blank_sprite)
 	
 	void main() 
 	{
-		float light_intensity = 1.0;
-
-		//light_intensity = gl_FragCoord.x + gl_FragCoord.y;
-		//if(light_intensity > 1.0) light_intensity = 0;
 		vec4 pixel = theColor * texture(basic_texture, theTexcoord);
-		pixel.rgb *= light_intensity;
+		outputColor = pixel;
+	}
+	
+	]])	
+
+
+	local illuminated_fragment_shader = GLSL_shader(GL.GL_FRAGMENT_SHADER, [[
+	#version 330
+	smooth in vec4 theColor;
+	in vec2 theTexcoord;
+	
+	out vec4 outputColor;
+	
+	uniform sampler2D basic_texture;
+	uniform sampler2D light_texture;
+	
+	void main() 
+	{
+		vec2 texcoord = gl_FragCoord.xy;
+		texcoord.x /= ]] .. config_table.resolution_w .. [[; 
+		texcoord.y /= ]] .. config_table.resolution_h .. [[; 
+		vec4 pixel = theColor * texture(basic_texture, theTexcoord) * texture(light_texture, texcoord);
 		outputColor = pixel;
 	}
 	
 	]])
-	
+	local illuminated_vertex_shader = GLSL_shader(GL.GL_VERTEX_SHADER, vertex_shader_code)
+
 	local smoke_fragment_shader = GLSL_shader(GL.GL_FRAGMENT_SHADER, smoke_fragment_shader_code)
 	
+	local illuminated_shader_program = GLSL_program()
+	illuminated_shader_program:attach(illuminated_vertex_shader)
+	illuminated_shader_program:attach(illuminated_fragment_shader)
+	illuminated_shader_program:use()
+
+	local illuminated_projection_matrix_uniform = GL.glGetUniformLocation(illuminated_shader_program.id, "projection_matrix")
+	local illuminated_basic_texture_uniform = GL.glGetUniformLocation(illuminated_shader_program.id, "basic_texture")
+	local illuminated_light_texture_uniform = GL.glGetUniformLocation(illuminated_shader_program.id, "light_texture")
+	
+	GL.glUniform1i(illuminated_basic_texture_uniform, 0)
+	GL.glUniform1i(illuminated_light_texture_uniform, 2)
+
 	local my_shader_program = GLSL_program()
 	my_shader_program:attach(my_vertex_shader)
 	my_shader_program:attach(my_fragment_shader)
@@ -140,7 +174,9 @@ function create_world_camera_entity(owner_world, blank_sprite)
 	my_smoke_program:use()
 	
 	local smoke_texture_uniform = GL.glGetUniformLocation(my_smoke_program.id, "smoke_texture")
+	local smoke_light_uniform = GL.glGetUniformLocation(my_smoke_program.id, "light_texture")
 	GL.glUniform1i(smoke_texture_uniform, 1)
+	GL.glUniform1i(smoke_light_uniform, 2)
 	
 	return owner_world:create_entity (override(camera_archetype, {
 		transform = {
@@ -153,13 +189,26 @@ function create_world_camera_entity(owner_world, blank_sprite)
 			size = vec2(config_table.resolution_w, config_table.resolution_h),
 			
 			drawing_callback = function (subject, camera_draw_input, mask)
+				
 				subject.script.owner_scene.all_atlas:bind()
 				-- now assuming that the atlas is already bound upon setting this scene to current
 			
 				local renderer = camera_draw_input.output
 				local visible_area = camera_draw_input.visible_area
-				
 				renderer:generate_layers(mask)
+				
+
+				subject.script.owner_scene.owner_client_screen.systems.light:process_entities(renderer, camera_draw_input)
+
+				my_shader_program:use()
+
+				GL.glUniformMatrix4fv(
+				projection_matrix_uniform, 
+				1, 
+				GL.GL_FALSE, 
+				orthographic_projection(0, visible_area.x, visible_area.y, 0, 0, 1):data()
+				)
+
 				
 				smoke_fbo:use()
 				GL.glClear(GL.GL_COLOR_BUFFER_BIT)
@@ -171,6 +220,7 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				framebuffer_object.use_default()
 				
 				
+				illuminated_shader_program:use()
 				
 				renderer:draw_layer(camera_draw_input, render_layers.GROUND)
 				renderer:draw_layer(camera_draw_input, render_layers.UNDER_CORPSES)
@@ -181,10 +231,9 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				renderer:draw_layer(camera_draw_input, render_layers.BULLETS)
 
 
-				subject.script.owner_scene.owner_client_screen.systems.light:process_entities(renderer, camera_draw_input)
-				my_shader_program:use()
-				
+
 				renderer:draw_layer(camera_draw_input, render_layers.PLAYERS)
+				renderer:draw_layer(camera_draw_input, render_layers.WIELDED_GUNS)
 				renderer:draw_layer(camera_draw_input, render_layers.OBJECTS)
 
 				
@@ -204,11 +253,11 @@ function create_world_camera_entity(owner_world, blank_sprite)
 					GL.glVertexAttrib2f(0,0,1)
 				GL.glEnd()
 				
-				my_shader_program:use()
+				illuminated_shader_program:use()
 				
 
 				GL.glUniformMatrix4fv(
-				projection_matrix_uniform, 
+				illuminated_projection_matrix_uniform, 
 				1, 
 				GL.GL_FALSE, 
 				orthographic_projection(0, visible_area.x, visible_area.y, 0, 0, 1):data()

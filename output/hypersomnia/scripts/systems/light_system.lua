@@ -62,7 +62,7 @@ function light_system:constructor(blank_texture)
 	self.light_pos_uniform = GL.glGetUniformLocation(self.my_light_program.id, "light_pos")
 	self.light_attenuation_uniform = GL.glGetUniformLocation(self.my_light_program.id, "light_attenuation")
 
-	GL.glUniform3f(self.light_attenuation_uniform, 1, 0.0003, 0.00005)
+	GL.glUniform3f(self.light_attenuation_uniform, 1, 0.00002, 0.00004)
 
 	self.projection_matrix_uniform = GL.glGetUniformLocation(self.my_light_program.id, "projection_matrix")
 
@@ -76,8 +76,11 @@ function light_system:process_entities(renderer, camera_draw_input)
 	renderer:call_triangles()
 	renderer:clear_triangles()
 
-	--self.light_fbo:use()
-	--GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+	self.light_fbo:use()
+
+	GL.glClearColor(0, 0.1, 0.0, 1.0)
+	GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+	GL.glClearColor(0, 0, 0, 0)
 
 	local visible_area = camera_draw_input.visible_area
 
@@ -117,6 +120,9 @@ function light_system:process_entities(renderer, camera_draw_input)
 		renderer:clear_triangles()
 	end
 
+	framebuffer_object.use_default()
 
-	--framebuffer_object.use_default()
+	GL.glActiveTexture(GL.GL_TEXTURE2)
+	GL.glBindTexture(GL.GL_TEXTURE_2D, self.light_fbo:get_texture_id())
+	GL.glActiveTexture(GL.GL_TEXTURE0)
 end
