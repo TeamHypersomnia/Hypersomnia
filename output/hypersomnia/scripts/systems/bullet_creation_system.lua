@@ -74,7 +74,7 @@ function bullet_creation_system:update()
 			local bullet = msgs[i].bullets[b](self.random_generator)
 			
 			if self.camera_to_shake then 
-				local shake_dir = vec2()
+				local shake_dir = vec2_d()
 				
 				shake_dir:set_from_degrees(randval(
 					bullet.rotation - weapon.shake_spread_degrees,
