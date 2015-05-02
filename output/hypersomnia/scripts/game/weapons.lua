@@ -144,6 +144,32 @@ function create_weapons(scene, include_render)
 		hits_per_swing = 1
 	})
 	
+	create_weapon("pistol", "rifle", {
+		current_rounds = 3000,
+		is_automatic = false,
+		bullets_once = 1,
+		bullet_damage = 27,
+		bullet_speed = minmax(4000, 5000),
+		
+		shooting_interval_ms = 50,
+		spread_degrees = 1,
+		shake_radius = 1.5,
+		shake_spread_degrees = 45,
+		
+		world_barrel_offset = vec2(51, -5),
+		bullet_barrel_offset = vec2(72, 10),
+		
+		bullet_entity = basic_bullet_entity,				
+		
+		max_lifetime_ms = 500,
+		swing_duration = 100,
+		swing_interval_ms = 400,
+		swing_angle = 20,
+		swing_radius = 70,
+		swing_damage = 30,
+		hits_per_swing = 1
+	})	
+
 	create_weapon("shotgun", "rifle", {
 		current_rounds = 3000,
 		is_automatic = false,

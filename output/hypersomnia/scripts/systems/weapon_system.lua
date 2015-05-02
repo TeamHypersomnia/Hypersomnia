@@ -203,7 +203,7 @@ function weapon_system:substep(dt)
 						self:shot_routine(target, premade_shot)
 						
 						if not weapon.is_automatic then
-							trigger = triggers.NONE
+							weapon.trigger = triggers.NONE
 						end
 						
 						weapon:set_state("SHOOTING_INTERVAL")
