@@ -186,18 +186,18 @@ function client_screen:constructor(camera_rect)
 
 	self.sample_scene.sprite_object_library.torso.white.walk.rifle["2"].size_multiplier = vec2(50, 50)
 
-	self.sample_scene.aaaa = self.entity_system_instance:add_entity (components.create_components {
-		cpp_entity = self.sample_scene.world_object:create_entity {
-			transform = {
-				pos = vec2(608, 448)
-			},
-
-			render = {
-				model = self.sample_scene.sprite_object_library.torso.white.walk.rifle["2"],
-				layer = render_layers.CROSSHAIRS
-			}
-		}
-	})
+	--self.sample_scene.aaaa = self.entity_system_instance:add_entity (components.create_components {
+--	--	cpp_entity = self.sample_scene.world_object:create_entity {
+--	--		transform = {
+--	--			pos = vec2(608, 448)
+--	--		},
+--
+	--		render = {
+	--			model = self.sample_scene.sprite_object_library.torso.white.walk.rifle["2"],
+	--			layer = render_layers.CROSSHAIRS
+	--		}
+	--	}
+	--})
 end
 
 function client_screen:send(msg_bs)
@@ -206,9 +206,9 @@ end
 
 stabilitytimer = timer()
 function client_screen:loop()
-	if self.sample_scene.player then
+	--if self.sample_scene.player then
 	--self.sample_scene.player.cpp_entity.transform.current.pos.x = self.sample_scene.player.cpp_entity.transform.current.pos.x + 50*stabilitytimer:extract_seconds()
-	end
+	--end
 	setlsys(self.sample_scene.world_object.render_system)
 		
 	-- handle networking

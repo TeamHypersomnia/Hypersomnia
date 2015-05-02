@@ -115,6 +115,13 @@ function light_system:process_entities(renderer, camera_draw_input)
 		GL.glUniform2f(self.light_pos_uniform, screen_pos.x, screen_pos.y)
 
 		my_light_poly:draw(camera_draw_input)
+		
+		GL.glUniform3f(self.light_attenuation_uniform, 1, 0.00002, 0.00004)
+		renderer:call_triangles()
+		renderer:clear_triangles()
+
+		GL.glUniform3f(self.light_attenuation_uniform, 1, 0.00002, 0.00017)
+		renderer:draw_layer(camera_draw_input, render_layers.OBJECTS)
 	
 		renderer:call_triangles()
 		renderer:clear_triangles()

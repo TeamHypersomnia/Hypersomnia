@@ -173,14 +173,6 @@ void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
 		.def("set_alpha_range", &callback_textbox::set_alpha_range)
 		.def("set_command_callback", &callback_textbox::set_command_callback),
 
-		luabind::def("get_local_time", get_local_time),
-
-		luabind::def("set_color", wrap_set(set_color, get_textbox_style, callback_textbox)),
-		luabind::def("set_color", wrap_set(set_color, get_rect_style, callback_rect)),
-		
-		luabind::def("set_border", wrap_set(set_border, get_textbox_style, callback_textbox)),
-		luabind::def("set_border", wrap_set(set_border, get_rect_style, callback_rect)),
-
 		luabind::class_<callback_rect>("callback_rect")
 		.def(luabind::constructor<gui_group&>())
 		.def("setup", &callback_rect::setup)
@@ -188,6 +180,16 @@ void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
 		.def("set_focus_callback", &callback_rect::set_focus_callback)
 		.def("set_lpressed_callback", &callback_rect::set_lpressed_callback)
 		.def("set_hover_callback", &callback_rect::set_hover_callback)
-		.def("set_blur_callback", &callback_rect::set_blur_callback)
+		.def("set_blur_callback", &callback_rect::set_blur_callback),
+
+		luabind::def("get_local_time", get_local_time),
+
+		luabind::def("set_color", wrap_set(set_color, get_textbox_style, callback_textbox)),
+		luabind::def("set_color", wrap_set(set_color, get_rect_style, callback_rect)),
+		
+		luabind::def("set_border", wrap_set(set_border, get_textbox_style, callback_textbox)),
+		luabind::def("set_border", wrap_set(set_border, get_rect_style, callback_rect))
+
+
 	];
 }

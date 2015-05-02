@@ -119,7 +119,7 @@ function create_particle_effects(scene)
 		spread_degrees = minmax(5.5, 25.5),
 		particles_per_burst = minmax_u(30, 120),
 		type = emission.BURST,
-		velocity = minmax(50, 2500),
+		velocity = minmax(50, 500),
 		angular_velocity = minmax(0, 0),
 		particle_lifetime_ms = minmax(1, 50),
 		particle_templates = {
@@ -138,7 +138,7 @@ function create_particle_effects(scene)
 			})
 		},
 		
-		size_multiplier = minmax(1, 1.3),
+		size_multiplier = minmax(6.3, 2.3),
 			
 		particle_render_template = { 
 			layer = render_layers.EFFECTS
@@ -156,10 +156,10 @@ function create_particle_effects(scene)
 	
 	particles.barrel_smoke_1 = {
 		spread_degrees = minmax(0, 5),
-		particles_per_sec = minmax(5, 1560),
+		particles_per_sec = minmax(5, 560),
 		stream_duration_ms = minmax(100, 600),
 		type = emission.STREAM,
-		velocity = minmax(180, 230),
+		velocity = minmax(20, 30),
 		particle_lifetime_ms = minmax(10000, 10000),
 		angular_velocity = minmax(0.4, 0.8),
 		
@@ -183,7 +183,7 @@ function create_particle_effects(scene)
 			})
 		},
 		
-		size_multiplier = minmax(0.8, 1),
+		size_multiplier = minmax(0.5, 1),
 		initial_rotation_variation = 180,
 		
 		particle_render_template = { 
@@ -209,12 +209,13 @@ function create_particle_effects(scene)
 	
 	particles.barrel_smoke_2 = override(particles.barrel_smoke_1, {
 		spread_degrees = minmax(0, 5),
-		stream_duration_ms = minmax(1000, 6000),
-		particles_per_sec = minmax(30, 1400),
-		velocity = minmax(110, 150),
+		stream_duration_ms = minmax(5000, 6000),
+		particles_per_sec = minmax(30, 400),
+		velocity = minmax(170, 180),
+		--particle_lifetime_ms = minmax(5000, 6000),
 		--particle_lifetime_ms = minmax(10, 3000),
 		
-		size_multiplier = minmax(0.8, 1),
+		size_multiplier = minmax(0.3, 0.5),
 		
 		fade_when_ms_remaining = minmax(100, 200)
 		--swing_spread = minmax(10, 40),
@@ -240,7 +241,8 @@ function create_particle_effects(scene)
 	
 	particles.bullet_impact_smoke_1 = override(particles.barrel_smoke_1, {
 		particles_per_sec = minmax(10, 20),
-		stream_duration_ms = minmax(100, 600),
+		velocity = minmax(50, 60),
+		stream_duration_ms = minmax(100, 600)
 	})
 	
 	particles.bullet_impact_smoke_2 = override(particles.barrel_smoke_2, {
@@ -390,12 +392,12 @@ function create_particle_effects(scene)
 	particles.metal_effect = {
 		particles.wall_parts,
 		particles.bullet_impact_smoke_1,
-		particles.bullet_impact_smoke_2,
+		--particles.bullet_impact_smoke_2,
 		particles.sparkles
 	}
 	
 	particles.gunshot_effect = {
-		particles.barrel_smoke_1,
+		--particles.barrel_smoke_1,
 		particles.barrel_smoke_2,
 		particles.barrel_explosion
 		--override(particles.sparkles, {

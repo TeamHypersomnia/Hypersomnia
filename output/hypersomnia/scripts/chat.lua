@@ -30,7 +30,7 @@ function handle_incoming_chat(client)
 				overlay.recent_textbox:setup(rect_xywh(0, 0, 0, 0), false, client.sample_scene.font_by_name.kubasta)
 				overlay.recent_textbox:set_wrapping_width(350)
 				
-				set_border(overlay.recent_textbox, "released", 1, rgba(255, 255, 255, 30))
+				set_border(overlay.recent_textbox, "released", 1, rgba(0, 255, 255, 30))
 				set_color(overlay.recent_textbox, "released", rgba(0, 0, 0, 150))
 			
 				overlay.recent_messages = recent_messages_class:create(overlay.recent_textbox)

@@ -52,9 +52,12 @@ function gui_class:set_enabled(flag)
 		
 			self.content_chatbox:draw(true)
 			self.recent_messages_textbox:draw(false)
-			set_border(self.content_chatbox, "released", 1, rgba(255, 255, 255, 30))
+			set_border(self.content_chatbox, "released", 1, rgba(0, 255, 255, 50))
+			set_border(self.content_chatbox, "focused", 1, rgba(0, 255, 255, 255))
 			set_color(self.content_chatbox, "released", rgba(0, 0, 0, 200))
 			set_color(self.main_chatbox, "released", rgba(0, 0, 0, 150))
+			set_border(self.main_chatbox, "released", 1, rgba(0, 255, 255, 50))
+			set_border(self.main_chatbox, "focused", 1, rgba(0, 255, 255, 255))
 		else
 			self.content_chatbox:draw(false)
 			self.recent_messages_textbox:draw(true)
@@ -64,7 +67,8 @@ function gui_class:set_enabled(flag)
 			
 			set_border(self.content_chatbox, "released", 0, rgba(255, 255, 255, 150))
 			set_color(self.content_chatbox, "released", rgba(0, 0, 0, 100))
-			set_color(self.main_chatbox, "released", rgba(0, 0, 0, 130))
+			set_color(self.main_chatbox, "released", rgba(0, 255, 255, 10))
+			set_border(self.main_chatbox, "released", 1, rgba(0, 255, 255, 100))
 			
 			self.character_hud:blur()
 			

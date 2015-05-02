@@ -58,19 +58,20 @@ function create_world_camera_entity(owner_world, blank_sprite)
 	
 	uniform sampler2D smoke_texture;
 	uniform sampler2D light_texture;
-	const int levels = 3;
+	const int levels = 1;
+	const int step = 255/levels;
+
 	void main() 
 	{	
 		vec4 pixel =  texture(smoke_texture, theTexcoord);
 		int desired_alpha = int((pixel.r + pixel.g + pixel.b) * float(255));
 		
-		int out_value = desired_alpha == 0 ? 0 : ((255 / levels) * ( (desired_alpha / (255 / levels))));
-		float outf = float(out_value) / 255.0;
+		float outf = float(step * (desired_alpha / step)) / 255.0;
 		
 		vec2 texcoord = gl_FragCoord.xy;
 		texcoord.x /= ]] .. config_table.resolution_w .. [[; 
 		texcoord.y /= ]] .. config_table.resolution_h .. [[; 
-		outputColor = vec4(0, outf/levels+0.7, outf/levels+0.7, outf/levels > 0 ? 1.0 : 0.0) * texture(light_texture, texcoord);
+		outputColor = vec4(0, outf, outf, outf > 0.0 ? 1.0 : 0.0) * texture(light_texture, texcoord);
 	}
 	]]
 
@@ -131,12 +132,30 @@ function create_world_camera_entity(owner_world, blank_sprite)
 	uniform sampler2D basic_texture;
 	uniform sampler2D light_texture;
 	
+	const int levels = 6;
+	const int step = 255/levels;
+
 	void main() 
 	{
 		vec2 texcoord = gl_FragCoord.xy;
 		texcoord.x /= ]] .. config_table.resolution_w .. [[; 
-		texcoord.y /= ]] .. config_table.resolution_h .. [[; 
-		vec4 pixel = theColor * texture(basic_texture, theTexcoord) * texture(light_texture, texcoord);
+		texcoord.y /= ]] .. config_table.resolution_h .. [[;
+
+		vec4 light = texture(light_texture, texcoord);
+		//light.r = float(step * (int(light.r * 255.0) / step)) / 255.0;
+		//light.g = float(step * (int(light.g * 255.0) / step)) / 255.0;
+		//light.b = float(step * (int(light.b * 255.0) / step)) / 255.0;
+		//light.a = float(step * (int(light.a * 255.0) / step)) / 255.0;
+
+		float intensity = (light.r + light.g + light.b) / 3;
+		intensity = float(
+			
+			step * (int(intensity * 255.0) / step + levels)
+
+			) / 255.0;
+		light.rgb *= intensity;
+
+		vec4 pixel = theColor * texture(basic_texture, theTexcoord) * light;
 		outputColor = pixel;
 	}
 	
@@ -189,7 +208,7 @@ function create_world_camera_entity(owner_world, blank_sprite)
 			size = vec2(config_table.resolution_w, config_table.resolution_h),
 			
 			drawing_callback = function (subject, camera_draw_input, mask)
-				
+
 				subject.script.owner_scene.all_atlas:bind()
 				-- now assuming that the atlas is already bound upon setting this scene to current
 			
@@ -222,13 +241,23 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				
 				illuminated_shader_program:use()
 				
+				GL.glUniformMatrix4fv(
+				illuminated_projection_matrix_uniform, 
+				1, 
+				GL.GL_FALSE, 
+				orthographic_projection(0, visible_area.x, visible_area.y, 0, 0, 1):data()
+				)
+
+
 				renderer:draw_layer(camera_draw_input, render_layers.GROUND)
 				renderer:draw_layer(camera_draw_input, render_layers.UNDER_CORPSES)
 				renderer:draw_layer(camera_draw_input, render_layers.ON_GROUND)
 				renderer:draw_layer(camera_draw_input, render_layers.SHELLS)
 				renderer:draw_layer(camera_draw_input, render_layers.LEGS)
 				renderer:draw_layer(camera_draw_input, render_layers.WIELDED_MELEE)
-				renderer:draw_layer(camera_draw_input, render_layers.BULLETS)
+
+
+
 
 
 
@@ -236,9 +265,8 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				renderer:draw_layer(camera_draw_input, render_layers.WIELDED_GUNS)
 				renderer:draw_layer(camera_draw_input, render_layers.OBJECTS)
 
-				
-
 				renderer:call_triangles()
+				renderer:clear_triangles()
 				
 				GL.glActiveTexture(GL.GL_TEXTURE1)
 				GL.glBindTexture(GL.GL_TEXTURE_2D, smoke_fbo:get_texture_id())
@@ -253,35 +281,32 @@ function create_world_camera_entity(owner_world, blank_sprite)
 					GL.glVertexAttrib2f(0,0,1)
 				GL.glEnd()
 				
-				illuminated_shader_program:use()
-				
 
-				GL.glUniformMatrix4fv(
-				illuminated_projection_matrix_uniform, 
-				1, 
-				GL.GL_FALSE, 
-				orthographic_projection(0, visible_area.x, visible_area.y, 0, 0, 1):data()
-				)
+				my_shader_program:use()
 
-				
-				renderer:clear_triangles()
-				
+				renderer:draw_layer(camera_draw_input, render_layers.BULLETS)
 				renderer:draw_layer(camera_draw_input, render_layers.EFFECTS)
 				
-				
+
+				renderer:call_triangles()
+				renderer:clear_triangles()
+
+				illuminated_shader_program:use()
+
 				renderer:draw_layer(camera_draw_input, render_layers.HEALTH_BARS)
+				owner_world.owner_client_screen.systems.label:draw_labels(camera_draw_input)
+
+				renderer:call_triangles()
+				renderer:clear_triangles()
+				
+				my_shader_program:use()
+
 				renderer:draw_layer(camera_draw_input, render_layers.INVENTORY_SLOTS)
 				renderer:draw_layer(camera_draw_input, render_layers.INVENTORY_ITEMS)
 				
-
-
-
-
-
 				renderer:draw_layer(camera_draw_input, render_layers.CROSSHAIRS)
 				
 
-				owner_world.owner_client_screen.systems.label:draw_labels(camera_draw_input)
 				
 				owner_world.owner_client_screen.my_gui:draw_call(camera_draw_input)
 				renderer:call_triangles()
