@@ -1,4 +1,6 @@
 function create_remote_player(owner_scene, crosshair_sprite)
+	local light_filter = create_query_filter({"STATIC_OBJECT"})
+
 	local player = owner_scene.world_object:create_entity_group  {
 		-- body also acts as torso
 		body = {
@@ -62,6 +64,18 @@ function create_remote_player(owner_scene, crosshair_sprite)
 			children = {
 				"legs",
 				"crosshair"
+			},
+
+			visibility = {
+				interval_ms = 1,
+				visibility_layers = {
+					[visibility_layers.BASIC_LIGHTING] = {
+						square_side = 4000,
+						color = rgba(0, 255, 255, 10),
+						ignore_discontinuities_shorter_than = -1,
+						filter = light_filter
+					}
+				}
 			}
 		},
 		
@@ -143,6 +157,10 @@ world_archetype_callbacks.REMOTE_PLAYER = {
 				default_font = self.owner_scene.font_by_name["kubasta"],
 				
 				text = {}
+			},
+
+			light = {
+				color = rgba(0, 255, 0, 255)
 			}
 		}
 		

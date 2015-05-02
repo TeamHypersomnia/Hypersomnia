@@ -69,7 +69,7 @@ function create_world_camera_entity(owner_world, blank_sprite)
 		outputColor = vec4(0, outf/levels+0.7, outf/levels+0.7, outf/levels > 0 ? 1.0 : 0.0);
 	}
 	]]
-	
+
 	local vertex_shader_code = [[
 	#version 330
 	
@@ -161,15 +161,6 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				
 				renderer:generate_layers(mask)
 				
-				GL.glUniformMatrix4fv(
-				projection_matrix_uniform, 
-				1, 
-				GL.GL_FALSE, 
-				orthographic_projection(0, visible_area.x, visible_area.y, 0, 0, 1):data()
-				)
-	
-				my_shader_program:use()
-				
 				smoke_fbo:use()
 				GL.glClear(GL.GL_COLOR_BUFFER_BIT)
 				
@@ -181,11 +172,23 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				
 				
 				
-				for i=#world_render_layers, 1, -1  do
-					renderer:draw_layer(camera_draw_input, render_layers[world_render_layers[i]])
-				end
+				renderer:draw_layer(camera_draw_input, render_layers.GROUND)
+				renderer:draw_layer(camera_draw_input, render_layers.UNDER_CORPSES)
+				renderer:draw_layer(camera_draw_input, render_layers.ON_GROUND)
+				renderer:draw_layer(camera_draw_input, render_layers.SHELLS)
+				renderer:draw_layer(camera_draw_input, render_layers.LEGS)
+				renderer:draw_layer(camera_draw_input, render_layers.WIELDED_MELEE)
+				renderer:draw_layer(camera_draw_input, render_layers.BULLETS)
+
+
+				subject.script.owner_scene.owner_client_screen.systems.light:process_entities(renderer, camera_draw_input)
+				my_shader_program:use()
 				
+				renderer:draw_layer(camera_draw_input, render_layers.PLAYERS)
+				renderer:draw_layer(camera_draw_input, render_layers.OBJECTS)
+
 				
+
 				renderer:call_triangles()
 				
 				GL.glActiveTexture(GL.GL_TEXTURE1)
@@ -203,6 +206,14 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				
 				my_shader_program:use()
 				
+
+				GL.glUniformMatrix4fv(
+				projection_matrix_uniform, 
+				1, 
+				GL.GL_FALSE, 
+				orthographic_projection(0, visible_area.x, visible_area.y, 0, 0, 1):data()
+				)
+
 				
 				renderer:clear_triangles()
 				
@@ -212,6 +223,12 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				renderer:draw_layer(camera_draw_input, render_layers.HEALTH_BARS)
 				renderer:draw_layer(camera_draw_input, render_layers.INVENTORY_SLOTS)
 				renderer:draw_layer(camera_draw_input, render_layers.INVENTORY_ITEMS)
+				
+
+
+
+
+
 				renderer:draw_layer(camera_draw_input, render_layers.CROSSHAIRS)
 				
 
@@ -219,7 +236,7 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				
 				owner_world.owner_client_screen.my_gui:draw_call(camera_draw_input)
 				renderer:call_triangles()
-				renderer:draw_debug_info(camera_draw_input.visible_area, camera_draw_input.camera_transform, blank_sprite.tex)
+				--renderer:draw_debug_info(camera_draw_input.visible_area, camera_draw_input.camera_transform, blank_sprite.tex)
 				renderer:clear_triangles()
 				
 			end

@@ -9,6 +9,7 @@ dofile "hypersomnia\\scripts\\components\\item.lua"
 dofile "hypersomnia\\scripts\\components\\inventory.lua"
 dofile "hypersomnia\\scripts\\components\\label.lua"
 dofile "hypersomnia\\scripts\\components\\sound.lua"
+dofile "hypersomnia\\scripts\\components\\light.lua"
 
 dofile "hypersomnia\\scripts\\sync_modules\\modules.lua"
 dofile "hypersomnia\\scripts\\sync_modules\\movement_sync.lua"
@@ -39,6 +40,8 @@ dofile "hypersomnia\\scripts\\systems\\melee_system.lua"
 dofile "hypersomnia\\scripts\\systems\\health_system.lua"
 dofile "hypersomnia\\scripts\\systems\\sound_system.lua"
 
+dofile "hypersomnia\\scripts\\systems\\light_system.lua"
+
 dofile "hypersomnia\\scripts\\chat.lua"
 dofile "hypersomnia\\scripts\\gui\\gui.lua"
 
@@ -47,7 +50,8 @@ client_screen = inherits_from ()
 
 function client_screen:constructor(camera_rect)
 	self.sample_scene = scene_class:create()
-	
+	self.sample_scene.owner_client_screen = self
+
 	self.sample_scene:load_map("hypersomnia\\data\\maps\\cathedral2.lua", "hypersomnia\\scripts\\loaders\\basic_map_loader.lua",
 	{
 		kubasta = {
@@ -118,6 +122,7 @@ function client_screen:constructor(camera_rect)
 	
 	self.systems.melee = melee_system:create(self.sample_scene.world_object)
 	self.systems.sound = sound_system:create(self.sample_scene.world_object)
+	self.systems.light = light_system:create(self.sample_scene.sprite_library["blank"])
 	
 	table.insert(self.sample_scene.world_object.prestep_callbacks, function (dt)
 		self.systems.input_prediction:substep()
@@ -141,6 +146,7 @@ function client_screen:constructor(camera_rect)
 		end
 	}
 	
+
 	create_weapons(self.sample_scene, true)
 	
 	self.my_gui = gui_class:create(camera_rect, self.sample_scene.world_object, self)
@@ -192,8 +198,6 @@ function client_screen:constructor(camera_rect)
 			}
 		}
 	})
-
-	print(table.inspect(self.sample_scene.sprite_object_library))
 end
 
 function client_screen:send(msg_bs)

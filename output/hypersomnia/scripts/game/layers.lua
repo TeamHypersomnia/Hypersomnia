@@ -29,3 +29,11 @@ render_layers = create_enum (table.concatenate {
 	other_layers,
 	world_render_layers 
 })
+
+visibility_layers = {
+	BASIC_LIGHTING = 998,
+	
+	
+	LIGHT_BOUNCE = 999
+	-- do not add anything below as these values are used by another light bounces
+}

@@ -37,6 +37,8 @@ function create_simulation_player(owner_world)
 end
 
 function create_controlled_player(scene_object, position, target_camera, crosshair_sprite)
+	local light_filter = create_query_filter({"STATIC_OBJECT"})
+
 	local player = scene_object.world_object:create_entity_group  {
 		-- body also acts as torso
 		body = {
@@ -78,6 +80,18 @@ function create_controlled_player(scene_object, position, target_camera, crossha
 			children = {
 				"legs",
 				"crosshair"
+			},
+
+			visibility = {
+				interval_ms = 1,
+				visibility_layers = {
+					[visibility_layers.BASIC_LIGHTING] = {
+						square_side = 4000,
+						color = rgba(0, 255, 255, 10),
+						ignore_discontinuities_shorter_than = -1,
+						filter = light_filter
+					}
+				}
 			}
 		},
 	
@@ -221,7 +235,7 @@ world_archetype_callbacks.CONTROLLED_PLAYER = {
 		self.owner_scene.teleport_position, 
 		self.owner_scene.world_camera.script, 
 		self.owner_scene.crosshair_sprite)
-	
+
 		local new_entity = components.create_components {
 			cpp_entity = player_group.body,
 			input_prediction = {
@@ -251,6 +265,10 @@ world_archetype_callbacks.CONTROLLED_PLAYER = {
 				,
 				
 				effect_type = components.sound.effect_types.AMBIENT_NOISE
+			},
+
+			light = {
+				color = rgba(0, 255, 255, 255)
 			}
 		}
 		
