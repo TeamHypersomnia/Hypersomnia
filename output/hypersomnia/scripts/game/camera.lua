@@ -200,36 +200,44 @@ function create_world_camera_entity(owner_world, blank_sprite)
 
 
 
-	--local highlights_fragment_shader = GLSL_shader(GL.GL_FRAGMENT_SHADER, [[
---	--#version 330
---	--smooth in vec4 theColor;
---	--in vec2 theTexcoord;
---	--
---	--out vec4 outputColor;
---	--
---	--uniform sampler2D basic_texture;
---	--uniform sampler2D light_texture;
---
---	--void main() 
---	--{
---	--	vec2 texcoord = gl_FragCoord.xy;
---	--	texcoord.x /= ]] .. config_table.resolution_w .. [[; 
---	--	texcoord.y /= ]] .. config_table.resolution_h .. [[;
---
---	--	vec4 light = texture(light_texture, texcoord);
---	--	float intensity = (light.r + light.g + light.b) / 3;
---	--	intensity = float(
---	--		
---	--		step * (int(intensity * 255.0) / step + levels)
---
---	--		) / 255.0;
---	--	light.rgb *= intensity;
---
-	--	vec4 pixel = theColor * texture(basic_texture, theTexcoord) * light;
-	--	outputColor = pixel;
-	--}
-	--
-	--]])
+	local highlights_fragment_shader = GLSL_shader(GL.GL_FRAGMENT_SHADER, [[
+	#version 330
+	smooth in vec4 theColor;
+	in vec2 theTexcoord;
+	
+	out vec4 outputColor;
+	
+	uniform sampler2D basic_texture;
+	uniform sampler2D light_texture;
+	
+	const int levels = 4;
+	const int step = 255/levels;
+
+	void main() 
+	{
+		vec2 texcoord = gl_FragCoord.xy;
+		texcoord.x /= ]] .. config_table.resolution_w .. [[; 
+		texcoord.y /= ]] .. config_table.resolution_h .. [[;
+
+		vec4 light = texture(light_texture, texcoord);
+		float intensity = max(max(light.r, light.g), light.b);
+		int level = int(intensity * 255.0) / step + levels;
+		intensity = float(
+			
+			step * (level)
+
+			) / 255.0;
+		light.rgb *= intensity;
+		if (level < 5) discard;
+		light.rgb *= intensity * intensity;
+
+		vec4 pixel = theColor * texture(basic_texture, theTexcoord) * light;
+		outputColor = pixel;
+	}
+	
+	]])
+
+	local highlights_vertex_shader = GLSL_shader(GL.GL_VERTEX_SHADER, vertex_shader_code)
 
 	local illuminated_vertex_shader = GLSL_shader(GL.GL_VERTEX_SHADER, vertex_shader_code)
 
@@ -246,6 +254,22 @@ function create_world_camera_entity(owner_world, blank_sprite)
 	
 	GL.glUniform1i(illuminated_basic_texture_uniform, 0)
 	GL.glUniform1i(illuminated_light_texture_uniform, 2)
+
+
+
+	local highlights_shader_program = GLSL_program()
+	highlights_shader_program:attach(highlights_vertex_shader)
+	highlights_shader_program:attach(highlights_fragment_shader)
+	highlights_shader_program:use()
+
+	local highlights_projection_matrix_uniform = GL.glGetUniformLocation(highlights_shader_program.id, "projection_matrix")
+	local highlights_basic_texture_uniform = GL.glGetUniformLocation(highlights_shader_program.id, "basic_texture")
+	local highlights_light_texture_uniform = GL.glGetUniformLocation(highlights_shader_program.id, "light_texture")
+	
+	GL.glUniform1i(highlights_basic_texture_uniform, 0)
+	GL.glUniform1i(highlights_light_texture_uniform, 2)
+
+
 
 	local my_shader_program = GLSL_program()
 	my_shader_program:attach(my_vertex_shader)
@@ -353,7 +377,7 @@ function create_world_camera_entity(owner_world, blank_sprite)
 
 							transform = {
 								pos = vec2(coordinate.x, coordinate.y),
-								rotation = randval(0, 90)
+								rotation = randval(0, 0)
 							},
 
 							animate = {
@@ -381,7 +405,28 @@ function create_world_camera_entity(owner_world, blank_sprite)
 
 
 
+				renderer:call_triangles()
+				renderer:clear_triangles()
+				
+				highlights_shader_program:use()
+
+				GL.glUniformMatrix4fv(
+				illuminated_projection_matrix_uniform, 
+				1, 
+				GL.GL_FALSE, 
+				orthographic_projection(0, visible_area.x, visible_area.y, 0, 0, 1):data()
+				)
+
+
 				renderer:draw_layer(camera_draw_input, render_layers.SPECULAR_HIGHLIGHTS)
+
+
+				renderer:call_triangles()
+				renderer:clear_triangles()
+
+				illuminated_shader_program:use()
+
+
 				renderer:draw_layer(camera_draw_input, render_layers.PLAYERS)
 				renderer:draw_layer(camera_draw_input, render_layers.WIELDED_GUNS)
 				renderer:draw_layer(camera_draw_input, render_layers.OBJECTS)
