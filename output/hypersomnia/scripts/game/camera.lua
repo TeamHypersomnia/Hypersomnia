@@ -292,6 +292,8 @@ function create_world_camera_entity(owner_world, blank_sprite)
 	GL.glUniform1i(smoke_texture_uniform, 1)
 	GL.glUniform1i(smoke_light_uniform, 2)
 	
+	local blink_time = 1
+
 	local blink_timer = timer()
 
 	return owner_world:create_entity (override(camera_archetype, {
@@ -357,13 +359,35 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				local shining_tiles = int_vector()
 				shining_tiles:add(1)
 
-				for m=1, 1 do
+				if subject.script.chased_player then
 					blink_timer:reset()
 					for i=1, #subject.script.owner_scene.tile_layers do
 						camera_draw_input.transform.pos = vec2(0, 0)
 						camera_draw_input.additional_info = nil
 
+						local camera_aabb_copy = rect_ltrb(camera_draw_input.rotated_camera_aabb)
+						local aabb = rect_ltrb(0, 0, 0, 0)
+
+						local focus_w = 100 
+						local focus_h = 100 
+
+						aabb.l = subject.script.chased_player.transform.current.pos.x - focus_w 
+						aabb.t = subject.script.chased_player.transform.current.pos.y - focus_h 
+						aabb.r = subject.script.chased_player.transform.current.pos.x + focus_w 
+						aabb.b = subject.script.chased_player.transform.current.pos.y + focus_h 
+
+						blink_time = blink_time + 1
+						
+						if blink_time ~= 3 then
+							camera_draw_input.rotated_camera_aabb = aabb
+						else
+							blink_time = 1
+						end
+
 						local coordinate = get_random_coordinate_on_a_special_tile (subject.script.owner_scene.tile_layers[i], shining_tiles, camera_draw_input)
+
+						camera_draw_input.rotated_camera_aabb = camera_aabb_copy
+
 						if coordinate.x > -1 then
 
 

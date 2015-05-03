@@ -241,7 +241,7 @@ return function(map_filename, scene_object)
 				wall_attenuation = {
 					1,
 					0.0,
-					0.00057,
+					0.00037,
 					750
 				},
 

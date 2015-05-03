@@ -216,10 +216,10 @@ function character_unwielding_procedure(owner_scene, entity_group, is_controlled
 			if unwielded.cpp_entity.physics == nil then return end
 		
 			local body = unwielded.cpp_entity.physics.body
-			local force = (this.orientation.last_pos):normalize() * 100
+			local force = (this.orientation.last_pos):normalize() * 20
 			
 			if this.orientation.last_pos:length() < 0.01 then
-				force = vec2(100, 0)
+				force = vec2(20, 0)
 			end
 			
 			body:ApplyLinearImpulse(to_meters(force), body:GetWorldCenter(), true)

@@ -13,30 +13,11 @@ vec2<int> get_random_coordinate_on_a_special_tile(
 	resources::renderable::draw_input& in) {
 
 	auto visible_tiles = tile_layer.get_visible_tiles(in);
+	tile_layer.generate_indices_by_type(visible_tiles);
 
-	auto draw_input_copy = in;
-	auto& tiles = tile_layer.tiles;
-
-	std::vector<vec2<int>> all_shining_indices;
-
-	for (int y = visible_tiles.t; y < visible_tiles.b; ++y) {
-		for (int x = visible_tiles.l; x < visible_tiles.r; ++x) {
-			auto tile_offset = vec2<int>(x, y) * tile_layer.square_size;
-
-			int idx = y * tile_layer.size.w + x;
-
-			bool found_shining = false;
-
-			for (int k = 0; k < shining.size(); ++k) {
-				if (tiles[idx].type_id == shining.at(k)) {
-					found_shining = true;
-					all_shining_indices.push_back(tile_offset);
-					break;
-				}
-			}
-
-		}
-	}
-
-	return all_shining_indices.empty() ? vec2<int>(-1, -1) : all_shining_indices[randval(int(0), int(all_shining_indices.size() - 1))];
+	int random_type = shining.at(randval(int(0), int(shining.size() - 1)));
+	if (int(tile_layer.indices_by_type.size()) - 1 < random_type) return vec2<int>(-1, -1);
+	if (tile_layer.indices_by_type[random_type].empty()) return vec2<int>(-1, -1);
+	
+	return tile_layer.indices_by_type[random_type][randval(int(0), int(tile_layer.indices_by_type[random_type].size() - 1))];
 }
