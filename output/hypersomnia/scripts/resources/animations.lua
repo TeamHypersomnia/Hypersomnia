@@ -41,6 +41,24 @@ function create_all_torso_sets(sprite_library)
 	return torso_sets
 end
 
+function create_animations(output, sprite_library)
+	local frames = sprite_library["blink"]
+
+	output.blink_animation = create_animation {
+		frames = {
+			{ model = { image = frames["1"] }, duration_ms = 50 },
+			{ model = { image = frames["2"] }, duration_ms = 50 },
+			{ model = { image = frames["3"] }, duration_ms = 50 },
+			{ model = { image = frames["4"] }, duration_ms = 50 },
+			{ model = { image = frames["5"] }, duration_ms = 50 },
+			{ model = { image = frames["6"] }, duration_ms = 50 },
+			{ model = nil, duration_ms = 20 }
+		},
+
+		loop_mode = animation.NONE
+	}
+end
+
 -- returns newly created animation set and an animation container
 function create_legs_set_for(sprite_library, outfit)
 	local animation_container = {}

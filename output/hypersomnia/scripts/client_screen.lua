@@ -64,13 +64,13 @@ function client_screen:constructor(camera_rect)
 	)
 	
 	self.sample_scene.world_camera.camera.screen_rect = camera_rect
+	self.sample_scene.world_object.owner_client_screen = self
 	
 	self.server = network_interface()
 	self.server:occasional_ping(true)
 	
 	self.server:connect(config_table.server_address, config_table.server_port)
 	
-	self.sample_scene.world_object.owner_client_screen = self
 	if config_table.simulate_lag ~= 0 then
 		print "Simulating lag..."
 		self.server:enable_lag(config_table.packet_loss, config_table.min_latency, config_table.jitter)
@@ -155,36 +155,36 @@ function client_screen:constructor(camera_rect)
 	sf_Listener_setGlobalVolume(100)
 	sf_Listener_setPosition(0, 0, 0)
 	
-	local ch_l = create_music("hypersomnia\\data\\music\\choir_l.ogg")
-	local ch_r = create_music("hypersomnia\\data\\music\\choir_r.ogg")
-	
-	self.sample_scene.choir_l = self.entity_system_instance:add_entity (components.create_components {
-		cpp_entity = self.sample_scene.world_object:create_entity {
-			transform = {
-				pos = vec2(-1400 - 100, -2900)
-			}
-		},
-		
-		sound = {
-			effect_type = components.sound.effect_types.MUSIC,
-			music_object = ch_l
-		}
-	})
-	
-	self.sample_scene.choir_l = self.entity_system_instance:add_entity (components.create_components {
-		cpp_entity = self.sample_scene.world_object:create_entity {
-			transform = {
-				pos = vec2(-1400 + 100, -2900)
-			}
-		},
-		
-		sound = {
-			effect_type = components.sound.effect_types.MUSIC,
-			music_object = ch_r
-		}
-	})
-
-	self.sample_scene.sprite_object_library.torso.white.walk.rifle["2"].size_multiplier = vec2(50, 50)
+	--local ch_l = create_music("hypersomnia\\data\\music\\choir_l.ogg")
+	--local ch_r = create_music("hypersomnia\\data\\music\\choir_r.ogg")
+	--
+	--self.sample_scene.choir_l = self.entity_system_instance:add_entity (components.create_components {
+	--	cpp_entity = self.sample_scene.world_object:create_entity {
+	--		transform = {
+	--			pos = vec2(-1400 - 100, -2900)
+	--		}
+	--	},
+	--	
+	--	sound = {
+	--		effect_type = components.sound.effect_types.MUSIC,
+	--		music_object = ch_l
+	--	}
+	--})
+	--
+	--self.sample_scene.choir_l = self.entity_system_instance:add_entity (components.create_components {
+	--	cpp_entity = self.sample_scene.world_object:create_entity {
+	--		transform = {
+	--			pos = vec2(-1400 + 100, -2900)
+	--		}
+	--	},
+	--	
+	--	sound = {
+	--		effect_type = components.sound.effect_types.MUSIC,
+	--		music_object = ch_r
+	--	}
+	--})
+--
+	--self.sample_scene.sprite_object_library.torso.white.walk.rifle["2"].size_multiplier = vec2(50, 50)
 
 	--self.sample_scene.aaaa = self.entity_system_instance:add_entity (components.create_components {
 --	--	cpp_entity = self.sample_scene.world_object:create_entity {
@@ -198,6 +198,7 @@ function client_screen:constructor(camera_rect)
 	--		}
 	--	}
 	--})
+	self.sample_scene.load_objects()
 end
 
 function client_screen:send(msg_bs)
@@ -284,7 +285,7 @@ function client_screen:loop()
 		
 		
 	self.systems.health:update()
-	self.systems.sound:update()
+	--self.systems.sound:update()
 		
 	
 	cpp_world:process_all_systems()

@@ -58,20 +58,57 @@ function create_world_camera_entity(owner_world, blank_sprite)
 	
 	uniform sampler2D smoke_texture;
 	uniform sampler2D light_texture;
-	const int levels = 1;
-	const int step = 255/levels;
+	const int levels = 4;
+	const int level_step = 255/levels + 1;
+
+	vec3 rgb2hsv(vec3 c)
+	{
+	    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+	    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+	    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+	
+	    float d = q.x - min(q.w, q.y);
+	    float e = 1.0e-10;
+	    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+	}
+	
+	vec3 hsv2rgb(vec3 c)
+	{
+	    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+	    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+	    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+	}
 
 	void main() 
 	{	
 		vec4 pixel =  texture(smoke_texture, theTexcoord);
-		int desired_alpha = int((pixel.r + pixel.g + pixel.b) * float(255));
-		
-		float outf = float(step * (desired_alpha / step)) / 255.0;
+
+		float intensity = max(max(pixel.r, pixel.g), pixel.b);
+		if(intensity == 0.0) discard;
+
+		vec3 pixel_hsv = rgb2hsv(pixel.rgb);
+		int discrete_intensity = int(intensity * 255.0);		
+		int add_one = discrete_intensity > 0.0 ? 1 : 0;
+		int level = discrete_intensity / level_step + add_one;
+		intensity = float(level_step * level) / 255.0;
 		
 		vec2 texcoord = gl_FragCoord.xy;
 		texcoord.x /= ]] .. config_table.resolution_w .. [[; 
 		texcoord.y /= ]] .. config_table.resolution_h .. [[; 
-		outputColor = vec4(0, outf, outf, outf > 0.0 ? 1.0 : 0.0) * texture(light_texture, texcoord);
+
+		vec4 light_pixel =  texture(light_texture, texcoord);
+		float light_intensity = max(max(light_pixel.r, light_pixel.g), light_pixel.b);
+		vec3 light_hsv =  rgb2hsv(light_pixel.rgb);
+
+		vec4 final_pixel = vec4(intensity, intensity, intensity, level>2?1.0:0.0);
+		vec3 final_pixel_hsv = rgb2hsv(final_pixel.rgb);
+		//final_pixel_hsv.xy = pixel_hsv.xy;
+		final_pixel_hsv.xy = vec2(mix(pixel_hsv.x, light_hsv.x, 0.0), pixel_hsv.y);
+
+		final_pixel.rgb = hsv2rgb(final_pixel_hsv.rgb);
+		//final_pixel.rgb *= min(1, light_intensity+0.4);
+
+		outputColor = final_pixel;
 	}
 	]]
 
@@ -197,6 +234,8 @@ function create_world_camera_entity(owner_world, blank_sprite)
 	GL.glUniform1i(smoke_texture_uniform, 1)
 	GL.glUniform1i(smoke_light_uniform, 2)
 	
+	local blink_timer = timer()
+
 	return owner_world:create_entity (override(camera_archetype, {
 		transform = {
 			pos = vec2(),
@@ -257,10 +296,58 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				renderer:draw_layer(camera_draw_input, render_layers.WIELDED_MELEE)
 
 
+				local shining_tiles = int_vector()
+				shining_tiles:add(1)
+
+				if true then
+					blink_timer:reset()
+					for i=1, #subject.script.owner_scene.tile_layers do
+						camera_draw_input.transform.pos = vec2(0, 0)
+						camera_draw_input.additional_info = nil
+
+						local coordinate = get_random_coordinate_on_a_special_tile (subject.script.owner_scene.tile_layers[i], shining_tiles, camera_draw_input)
+						if coordinate.x > -1 then
+
+
+						coordinate = coordinate + vec2_i(randval(0, 32), randval(0, 32))
+
+						local blink_entity = subject.script.owner_scene.world_object:create_entity {
+							render = {
+								model = nil,
+								layer = render_layers.SPECULAR_HIGHLIGHTS
+							},
+
+							transform = {
+								pos = vec2(coordinate.x, coordinate.y),
+								rotation = randval(0, 90)
+							},
+
+							animate = {
+
+							}
+						}
+
+						local msg = animate_message()
+
+						msg.set_animation = subject.script.owner_scene.blink_animation
+						msg.preserve_state_if_animation_changes = false
+						msg.change_animation = true
+						msg.change_speed = true
+						msg.speed_factor = 1
+						msg.subject = blink_entity
+						msg.message_type = animate_message.START
+						msg.animation_priority = 1
+						
+						subject.owner_world:post_message(msg)
+						end
+
+					end
+				end
 
 
 
 
+				renderer:draw_layer(camera_draw_input, render_layers.SPECULAR_HIGHLIGHTS)
 				renderer:draw_layer(camera_draw_input, render_layers.PLAYERS)
 				renderer:draw_layer(camera_draw_input, render_layers.WIELDED_GUNS)
 				renderer:draw_layer(camera_draw_input, render_layers.OBJECTS)

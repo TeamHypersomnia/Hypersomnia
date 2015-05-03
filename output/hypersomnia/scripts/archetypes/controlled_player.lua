@@ -83,7 +83,7 @@ function create_controlled_player(scene_object, position, target_camera, crossha
 			},
 
 			visibility = {
-				interval_ms = 1,
+				interval_ms = 16,
 				visibility_layers = {
 					[visibility_layers.BASIC_LIGHTING] = {
 						square_side = 4000,

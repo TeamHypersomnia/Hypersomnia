@@ -40,11 +40,15 @@ function light_system:constructor(blank_texture)
 	
 	uniform vec2 light_pos;
 	uniform vec3 light_attenuation;
+	uniform vec3 multiply_color;
+	uniform float max_distance;
 
 	void main() 
 	{	
 		float light_distance = length(gl_FragCoord.xy - light_pos);
+		if(light_distance > max_distance) discard;
 		vec4 final_color = theColor;
+		final_color.rgb *= multiply_color;
 		final_color.a *= 1.0/(light_attenuation.x+light_attenuation.y*light_distance+light_attenuation.z*light_distance*light_distance); 
 
 		outputColor = final_color;
@@ -61,8 +65,8 @@ function light_system:constructor(blank_texture)
 
 	self.light_pos_uniform = GL.glGetUniformLocation(self.my_light_program.id, "light_pos")
 	self.light_attenuation_uniform = GL.glGetUniformLocation(self.my_light_program.id, "light_attenuation")
-
-	GL.glUniform3f(self.light_attenuation_uniform, 1, 0.00002, 0.00004)
+	self.light_max_distance_uniform = GL.glGetUniformLocation(self.my_light_program.id, "max_distance")
+	self.light_multiply_color_uniform = GL.glGetUniformLocation(self.my_light_program.id, "multiply_color")
 
 	self.projection_matrix_uniform = GL.glGetUniformLocation(self.my_light_program.id, "projection_matrix")
 
@@ -136,15 +140,42 @@ function light_system:process_entities(renderer, camera_draw_input)
 
 		my_light_poly:draw(camera_draw_input)
 		
-		GL.glUniform3f(self.light_attenuation_uniform, 1 + light.attenuation_variations[1].value, 0.00002 + light.attenuation_variations[2].value, 0.00007 + light.attenuation_variations[3].value)
+		local atten = light.attenuation
+
+		GL.glUniform1f(self.light_max_distance_uniform, atten[4])
+
+		GL.glUniform3f(self.light_attenuation_uniform, 
+			atten[1] + light.attenuation_variations[1].value, 
+			atten[2] + light.attenuation_variations[2].value, 
+			atten[3] + light.attenuation_variations[3].value)
+
 		renderer:call_triangles()
 		renderer:clear_triangles()
 
-		GL.glUniform3f(self.light_attenuation_uniform, 1 + light.attenuation_variations[1].value, 0.00002 + light.attenuation_variations[2].value, 0.00017 + light.attenuation_variations[3].value)
+		atten = light.wall_attenuation
+
+		GL.glUniform1f(self.light_max_distance_uniform, atten[4])
+
+		GL.glUniform3f(self.light_attenuation_uniform, 
+			atten[1] + light.attenuation_variations[1].value, 
+			atten[2] + light.attenuation_variations[2].value, 
+			atten[3] + light.attenuation_variations[3].value)
+
+
+		GL.glUniform3f(self.light_multiply_color_uniform, 
+			light.color.r, 
+			light.color.g, 
+			light.color.b)
+
 		renderer:draw_layer(camera_draw_input, render_layers.OBJECTS)
 	
 		renderer:call_triangles()
 		renderer:clear_triangles()
+
+		GL.glUniform3f(self.light_multiply_color_uniform, 
+			1, 
+			1, 
+			1)
 	end
 
 	framebuffer_object.use_default()

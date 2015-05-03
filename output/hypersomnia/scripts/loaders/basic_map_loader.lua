@@ -8,65 +8,9 @@ return function(map_filename, scene_object)
 	
 	-- load map data
 	scene_object.resource_storage = {}
-	local objects_by_type, type_table_by_object = tiled_map_loader.get_all_objects_by_type(map_filename)
-
-	-- helper function for getting all objects of given type
-	local function get_all_objects(entries)
-		local sum_of_all = {}
-		for i = 1, #entries do
-			sum_of_all = table.concatenate( { sum_of_all, objects_by_type[entries[i]] } )
-		end
-		
-		return sum_of_all
-	end
-	
 	create_particle_effects(scene_object)
-	
-	local function basic_table(object)
-		return tiled_map_loader.basic_entity_table(object, type_table_by_object[object], scene_object.resource_storage, scene_object.world_camera, scene_object.texture_by_filename)
-	end
-	
-	local background_objects = get_all_objects { "ground_snow" }
-	for i = 1, #background_objects do
-		local object = background_objects[i]
-		world:create_entity (basic_table(object))
-	end
-	
-	-- initialize environmental physical objects
-	local environmental_objects = get_all_objects { "static_snow" }
-	
-	for i = 1, #environmental_objects do
-		local object = environmental_objects[i]
-		
-		local new_entity = basic_table(object)
-		
-		new_entity.particle_emitter = {
-			available_particle_effects = scene_object.particles.metal_effects
-		}
-		
-		world:create_entity (new_entity)
-		scene_object.simulation_world:create_entity {
-			transform = new_entity.transform,
-			physics = new_entity.physics
-		}
-	end
-	
-	scene_object:load_tile_functionality(map_filename)
 
-	local tile_layers = tiled_map_loader.for_every_object(map_filename, nil, function(tile_layer_table)
-		local new_model = scene_object:generate_tile_layer(tile_layer_table)
-		
-		world:create_entity {
-			render = {
-				model = new_model,
-				layer = render_layers["GROUND"]
-			},
 
-			transform = {}
-		}
-
-	end)
-	
 	world.physics_system.enable_interpolation = 1
 	world.physics_system:configure_stepping(config_table.tickrate, 5)
 	scene_object.simulation_world.physics_system:configure_stepping(config_table.tickrate, 5)
@@ -154,4 +98,196 @@ return function(map_filename, scene_object)
 	-- GL.glActiveTexture(GL.GL_TEXTURE0)
 	-- scene_object.all_atlas:bind()
 	-- now have to bind every time because rendering several clients
+
+	local visibility_system = world.visibility_system
+	local pathfinding_system = world.pathfinding_system
+	local render_system = world.render_system
+
+	--visibility_system.draw_cast_rays = 0
+	--visibility_system.draw_triangle_edges = 0
+	--visibility_system.draw_discontinuities = 0
+	--visibility_system.draw_visible_walls = 0
+	
+	visibility_system.epsilon_ray_distance_variation = 0.001
+	visibility_system.epsilon_threshold_obstacle_hit = 2
+	visibility_system.epsilon_distance_vertex_hit = 1
+	
+	--pathfinding_system.draw_memorised_walls = 0
+	--pathfinding_system.draw_undiscovered = 0
+	--pathfinding_system.epsilon_max_segment_difference = 4
+	--pathfinding_system.epsilon_distance_visible_point = 2
+	--pathfinding_system.epsilon_distance_the_same_vertex = 10
+	--
+	--render_system.debug_drawing = 1
+	--
+	--render_system.draw_steering_forces = 1
+	--render_system.draw_substeering_forces = 1
+	--render_system.draw_velocities = 1
+	--
+	--render_system.draw_avoidance_info = 1
+	--render_system.draw_wandering_info = 1
+	--
+	--render_system.visibility_expansion = 0.0
+	--render_system.max_visibility_expansion_distance = 0
+	--render_system.draw_visibility = 0
+
+	scene_object.load_objects = function()
+
+	create_animations(scene_object, scene_object.sprite_library)
+
+	local objects_by_type, type_table_by_object = tiled_map_loader.get_all_objects_by_type(map_filename)
+
+	-- helper function for getting all objects of given type
+	local function get_all_objects(entries)
+		local sum_of_all = {}
+		for i = 1, #entries do
+			sum_of_all = table.concatenate( { sum_of_all, objects_by_type[entries[i]] } )
+		end
+		
+		return sum_of_all
+	end
+	
+	
+	local function basic_table(object)
+		return tiled_map_loader.basic_entity_table(object, type_table_by_object[object], scene_object.resource_storage, scene_object.world_camera, scene_object.texture_by_filename)
+	end
+	
+	local background_objects = get_all_objects { "ground_snow" }
+	for i = 1, #background_objects do
+		local object = background_objects[i]
+		world:create_entity (basic_table(object))
+	end
+	
+	-- initialize environmental physical objects
+	local environmental_objects = get_all_objects { "cathedral_wall" }
+	
+	for i = 1, #environmental_objects do
+		local object = environmental_objects[i]
+		
+		local new_entity = basic_table(object)
+		
+		new_entity.particle_emitter = {
+			available_particle_effects = scene_object.particles.metal_effects
+		}
+		
+		world:create_entity (new_entity)
+		scene_object.simulation_world:create_entity {
+			transform = new_entity.transform,
+			physics = new_entity.physics
+		}
+	end
+	
+	scene_object:load_tile_functionality(map_filename)
+
+	scene_object.tile_layers = {}
+
+	tiled_map_loader.for_every_object(map_filename, nil, function(tile_layer_table)
+		local new_model = scene_object:generate_tile_layer(tile_layer_table)
+		
+		world:create_entity {
+			render = {
+				model = new_model,
+				layer = render_layers["GROUND"]
+			},
+
+			transform = {}
+		}
+
+		scene_object.tile_layers[#scene_object.tile_layers+1] = new_model
+	end)
+	
+	local fire_objects = get_all_objects { "fire" }
+	
+	for i = 1, #fire_objects do
+		local burst = particle_burst_message()
+		local light_filter = create_query_filter({"STATIC_OBJECT"})
+
+		local new_fire_entity = world:create_entity {
+			transform = {
+				pos = fire_objects[i].pos + vec2(10, 10),
+				rotation = fire_objects[i].rotation
+			},
+
+			visibility = {
+				interval_ms = 32,
+				visibility_layers = {
+					[visibility_layers.BASIC_LIGHTING] = {
+						square_side = 1500,
+						color = rgba(0, 255, 255, 10),
+						ignore_discontinuities_shorter_than = -1,
+						filter = light_filter
+					}
+				}
+			}
+		}
+
+		burst.local_transform = true
+		burst.subject = new_fire_entity
+		burst.set_effect = scene_object.particles.fire_effect
+		
+		local new_light_entity = components.create_components {
+			cpp_entity = new_fire_entity,
+
+			light = {
+				color = rgba(255, 255, 0, 255),
+
+				attenuation = {
+					0.7,
+					0.0,
+					0.00027,
+					750
+				},
+
+				wall_attenuation = {
+					1,
+					0.0,
+					0.00057,
+					750
+				},
+
+				attenuation_variations = 
+				{
+					{
+						value = 0,
+						min_value = -0.3,
+						max_value = 0.0,
+						change_speed = 0.0/5
+					},
+			
+					{
+						value = 0,
+						min_value = -0.00001,
+						max_value = 0.00002,
+						change_speed = 0.00027
+					},
+		
+					{
+						value = 0,
+						min_value = -0.00005,
+						max_value = 0.00030,
+						change_speed = 0.00067
+					},
+	
+				-- light position variation
+					{
+						value = 0,
+						min_value = -10,
+						max_value = 10,
+						change_speed = 50
+					},
+		
+					{
+						value = 0,
+						min_value = -5,
+						max_value = 5,
+						change_speed = 50
+					}
+				}
+			}
+		}
+
+		scene_object.world_object.world:post_message(burst)
+		scene_object.owner_client_screen.entity_system_instance:add_entity(new_light_entity)
+	end
+	end
 end

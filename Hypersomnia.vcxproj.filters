@@ -30,12 +30,24 @@
     <ClCompile Include="gui\controls_setup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\bindings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\draw_tile_highlights.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gui\hypersomnia_gui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\bindings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\utilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

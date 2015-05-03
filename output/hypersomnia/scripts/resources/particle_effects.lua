@@ -64,7 +64,7 @@ function create_particle_effects(scene)
 		angular_damping = 0,
 		linear_damping = 10,
 		should_disappear = true,
-		model = { image = sprites.smoke1, color = rgba(255, 255, 255, 120), size_multiplier = vec2(0.4, 0.4) },
+		model = { image = sprites.smoke1, color = rgba(0, 255, 255, 126), size_multiplier = vec2(0.4, 0.4) },
 		--alpha_levels = 255,
 		--ignore_rotation = true
 		--acc = vec2(0, -300)
@@ -416,6 +416,52 @@ function create_particle_effects(scene)
 		--blood_droplets
 	}
 	
+
+	particles.fire_emission = {
+		spread_degrees = minmax(45, 45),
+		particles_per_sec = minmax(15, 55),
+		stream_duration_ms = minmax(60000000, 60000000),
+		type = emission.STREAM,
+		velocity = minmax(10, 40),
+		particle_lifetime_ms = minmax(1000, 2000),
+		angular_velocity = minmax(0.3, 0.6),
+		
+		particle_templates = {
+			override(particles.barrel_smoke_template, {
+				model = { image = sprites.smoke2, color = rgba(255, 200, 0, 220) }
+			})
+			,
+			override(particles.barrel_smoke_template, {
+				model = { image = sprites.smoke3, color = rgba(255, 200, 0, 220) }
+			}),
+			override(particles.barrel_smoke_template, {
+				model = { image = sprites.smoke4, color = rgba(255, 200, 0, 220) }
+			}),
+			override(particles.barrel_smoke_template, {
+				model = { image = sprites.smoke5, color = rgba(255, 200, 0, 220) }
+			}),
+			override(particles.barrel_smoke_template, {
+				model = { image = sprites.smoke6, color = rgba(255, 200, 0, 220) }
+			})
+		},
+		
+		size_multiplier = minmax(0.3, 0.5),
+		initial_rotation_variation = 180,
+		
+		particle_render_template = { 
+			layer = render_layers.SMOKES
+		},
+		
+		--swing_spread = minmax(0, 90),
+		--swings_per_sec = minmax(2, 10)
+		
+		fade_when_ms_remaining = minmax(10, 50)
+		--swing_speed_change_rate = minmax(0.05, 0.06)
+	}
+
+	particles.fire_effect = create_particle_effect {
+		particles.fire_emission
+	}
 
 	particles.born_effect = create_particle_effect {
 		particles.born_smoke_1

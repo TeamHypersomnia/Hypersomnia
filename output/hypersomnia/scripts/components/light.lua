@@ -1,6 +1,22 @@
 components.light = inherits_from()
 
 function components.light:constructor(init_table)
+	self.attenuation = {
+		1,
+		0.00002,
+		0.00007,
+
+		2000
+	}
+
+	self.wall_attenuation = {
+		1,
+		0.00002,
+		0.000017,
+
+		2000
+	}
+
 	self.attenuation_variations = {
 		{
 			value = 0,

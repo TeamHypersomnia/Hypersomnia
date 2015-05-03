@@ -7,6 +7,7 @@ world_render_layers = {
 	"WIELDED_MELEE",
 	"LEGS",
 	"SHELLS",
+	"SPECULAR_HIGHLIGHTS",
 	"ON_GROUND",
 	"UNDER_CORPSES",
 	"GROUND"
