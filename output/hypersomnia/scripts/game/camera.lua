@@ -295,6 +295,7 @@ function create_world_camera_entity(owner_world, blank_sprite)
 	local blink_time = 1
 
 	local blink_timer = timer()
+	local blink_accumulator = 0
 
 	return owner_world:create_entity (override(camera_archetype, {
 		transform = {
@@ -359,23 +360,31 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				local shining_tiles = int_vector()
 				shining_tiles:add(1)
 
+				
 				if subject.script.chased_player then
-					blink_timer:reset()
-					for i=1, #subject.script.owner_scene.tile_layers do
-						camera_draw_input.transform.pos = vec2(0, 0)
-						camera_draw_input.additional_info = nil
+				blink_accumulator = blink_accumulator + blink_timer:extract_seconds()
+				
+				local blinks_per_sec = 300
+				local blinks = math.floor(blink_accumulator*blinks_per_sec)
 
-						local camera_aabb_copy = rect_ltrb(camera_draw_input.rotated_camera_aabb)
-						local aabb = rect_ltrb(0, 0, 0, 0)
+				blink_accumulator = blink_accumulator - blinks/blinks_per_sec
 
-						local focus_w = 100 
-						local focus_h = 100 
+				camera_draw_input.transform.pos = vec2(0, 0)
+				camera_draw_input.additional_info = nil
 
-						aabb.l = subject.script.chased_player.transform.current.pos.x - focus_w 
-						aabb.t = subject.script.chased_player.transform.current.pos.y - focus_h 
-						aabb.r = subject.script.chased_player.transform.current.pos.x + focus_w 
-						aabb.b = subject.script.chased_player.transform.current.pos.y + focus_h 
+				local camera_aabb_copy = rect_ltrb(camera_draw_input.rotated_camera_aabb)
+				local aabb = rect_ltrb(0, 0, 0, 0)
 
+				local focus_w = 100 
+				local focus_h = 100 
+
+				aabb.l = subject.script.chased_player.transform.current.pos.x - focus_w 
+				aabb.t = subject.script.chased_player.transform.current.pos.y - focus_h 
+				aabb.r = subject.script.chased_player.transform.current.pos.x + focus_w 
+				aabb.b = subject.script.chased_player.transform.current.pos.y + focus_h 
+
+				for i=1, #subject.script.owner_scene.tile_layers do
+					for b=1, blinks do
 						blink_time = blink_time + 1
 						
 						if blink_time ~= 3 then
@@ -389,7 +398,6 @@ function create_world_camera_entity(owner_world, blank_sprite)
 						camera_draw_input.rotated_camera_aabb = camera_aabb_copy
 
 						if coordinate.x > -1 then
-
 
 						coordinate = coordinate + vec2_i(randval(0, 32), randval(0, 32))
 
@@ -424,6 +432,7 @@ function create_world_camera_entity(owner_world, blank_sprite)
 						end
 
 					end
+				end
 				end
 
 
