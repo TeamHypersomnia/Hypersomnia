@@ -153,7 +153,7 @@ function create_weapons(scene, include_render)
 		
 		shooting_interval_ms = 50,
 		spread_degrees = 1,
-		shake_radius = 1.5,
+		shake_radius = 9.5,
 		shake_spread_degrees = 45,
 		
 		world_barrel_offset = vec2(51, -5),

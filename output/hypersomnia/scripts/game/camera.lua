@@ -103,10 +103,10 @@ function create_world_camera_entity(owner_world, blank_sprite)
 		vec4 final_pixel = vec4(intensity, intensity, intensity, level>2?1.0:0.0);
 		vec3 final_pixel_hsv = rgb2hsv(final_pixel.rgb);
 		//final_pixel_hsv.xy = pixel_hsv.xy;
-		final_pixel_hsv.xy = vec2(mix(pixel_hsv.x, light_hsv.x, 0.0), pixel_hsv.y);
+		final_pixel_hsv.xy = vec2(mix(pixel_hsv.x, light_hsv.x, 0.2), pixel_hsv.y);
 
 		final_pixel.rgb = hsv2rgb(final_pixel_hsv.rgb);
-		//final_pixel.rgb *= min(1, light_intensity+0.4);
+		//final_pixel.rgb *= min(1, light_intensity+0.3);
 
 		outputColor = final_pixel;
 	}
@@ -169,7 +169,7 @@ function create_world_camera_entity(owner_world, blank_sprite)
 	uniform sampler2D basic_texture;
 	uniform sampler2D light_texture;
 	
-	const int levels = 6;
+	const int levels = 4;
 	const int step = 255/levels;
 
 	void main() 
@@ -184,7 +184,7 @@ function create_world_camera_entity(owner_world, blank_sprite)
 		//light.b = float(step * (int(light.b * 255.0) / step)) / 255.0;
 		//light.a = float(step * (int(light.a * 255.0) / step)) / 255.0;
 
-		float intensity = (light.r + light.g + light.b) / 3;
+		float intensity = max(max(light.r, light.g), light.b);
 		intensity = float(
 			
 			step * (int(intensity * 255.0) / step + levels)
@@ -197,6 +197,40 @@ function create_world_camera_entity(owner_world, blank_sprite)
 	}
 	
 	]])
+
+
+
+	--local highlights_fragment_shader = GLSL_shader(GL.GL_FRAGMENT_SHADER, [[
+--	--#version 330
+--	--smooth in vec4 theColor;
+--	--in vec2 theTexcoord;
+--	--
+--	--out vec4 outputColor;
+--	--
+--	--uniform sampler2D basic_texture;
+--	--uniform sampler2D light_texture;
+--
+--	--void main() 
+--	--{
+--	--	vec2 texcoord = gl_FragCoord.xy;
+--	--	texcoord.x /= ]] .. config_table.resolution_w .. [[; 
+--	--	texcoord.y /= ]] .. config_table.resolution_h .. [[;
+--
+--	--	vec4 light = texture(light_texture, texcoord);
+--	--	float intensity = (light.r + light.g + light.b) / 3;
+--	--	intensity = float(
+--	--		
+--	--		step * (int(intensity * 255.0) / step + levels)
+--
+--	--		) / 255.0;
+--	--	light.rgb *= intensity;
+--
+	--	vec4 pixel = theColor * texture(basic_texture, theTexcoord) * light;
+	--	outputColor = pixel;
+	--}
+	--
+	--]])
+
 	local illuminated_vertex_shader = GLSL_shader(GL.GL_VERTEX_SHADER, vertex_shader_code)
 
 	local smoke_fragment_shader = GLSL_shader(GL.GL_FRAGMENT_SHADER, smoke_fragment_shader_code)
@@ -299,7 +333,7 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				local shining_tiles = int_vector()
 				shining_tiles:add(1)
 
-				if true then
+				for m=1, 1 do
 					blink_timer:reset()
 					for i=1, #subject.script.owner_scene.tile_layers do
 						camera_draw_input.transform.pos = vec2(0, 0)

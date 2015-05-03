@@ -52,7 +52,7 @@ function create_animations(output, sprite_library)
 			{ model = { image = frames["4"] }, duration_ms = 50 },
 			{ model = { image = frames["5"] }, duration_ms = 50 },
 			{ model = { image = frames["6"] }, duration_ms = 50 },
-			{ model = nil, duration_ms = 20 }
+			{ model = nil, duration_ms = 20, callback = function(subject) subject.owner_world:post_message(destroy_message(subject, nil)) end }
 		},
 
 		loop_mode = animation.NONE

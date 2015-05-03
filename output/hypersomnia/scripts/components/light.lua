@@ -12,7 +12,7 @@ function components.light:constructor(init_table)
 	self.wall_attenuation = {
 		1,
 		0.00002,
-		0.000017,
+		0.000037,
 
 		2000
 	}
