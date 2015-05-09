@@ -146,14 +146,14 @@ function create_weapons(scene, include_render)
 	
 	create_weapon("pistol", "rifle", {
 		current_rounds = 3000,
-		is_automatic = false,
+		is_automatic = true,
 		bullets_once = 1,
 		bullet_damage = 27,
 		bullet_speed = minmax(4000, 5000),
 		
-		shooting_interval_ms = 50,
+		shooting_interval_ms = 100,
 		spread_degrees = 1,
-		shake_radius = 9.5,
+		shake_radius = 2.5,
 		shake_spread_degrees = 45,
 		
 		world_barrel_offset = vec2(51, -5),

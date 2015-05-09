@@ -100,10 +100,10 @@ function create_world_camera_entity(owner_world, blank_sprite)
 		float light_intensity = max(max(light_pixel.r, light_pixel.g), light_pixel.b);
 		vec3 light_hsv =  rgb2hsv(light_pixel.rgb);
 
-		vec4 final_pixel = vec4(intensity, intensity, intensity, level>2?1.0:0.0);
+		vec4 final_pixel = vec4(intensity, intensity, intensity, level>2?0.95:0.0);
 		vec3 final_pixel_hsv = rgb2hsv(final_pixel.rgb);
 		//final_pixel_hsv.xy = pixel_hsv.xy;
-		final_pixel_hsv.xy = vec2(mix(pixel_hsv.x, light_hsv.x, 0.2), pixel_hsv.y);
+		final_pixel_hsv.xy = vec2(mix(pixel_hsv.x, light_hsv.x, intensity == 1.0 ? 0.2 : 0.0), pixel_hsv.y);
 
 		final_pixel.rgb = hsv2rgb(final_pixel_hsv.rgb);
 		//final_pixel.rgb *= min(1, light_intensity+0.3);
@@ -500,6 +500,9 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				
 				my_shader_program:use()
 
+				owner_world.owner_client_screen.systems.label:draw_damage_indicators(camera_draw_input)
+				
+				
 				renderer:draw_layer(camera_draw_input, render_layers.INVENTORY_SLOTS)
 				renderer:draw_layer(camera_draw_input, render_layers.INVENTORY_ITEMS)
 				

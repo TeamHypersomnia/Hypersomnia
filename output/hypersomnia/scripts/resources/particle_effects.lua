@@ -56,7 +56,7 @@ function create_particle_effects(scene)
 		angular_damping = 0,
 		linear_damping = 5000,
 		should_disappear = true,
-		model = { image = sprites.barrel1, size_multiplier = vec2(1, 1), color = rgba(0, 255, 255, 255) },
+		model = { image = sprites.barrel1, size_multiplier = vec2(1, 1), color = rgba(0, 254, 254, 255) },
 		alpha_levels = 1
 	}
 	
@@ -64,7 +64,7 @@ function create_particle_effects(scene)
 		angular_damping = 0,
 		linear_damping = 10,
 		should_disappear = true,
-		model = { image = sprites.smoke1, color = rgba(0, 255, 255, 126), size_multiplier = vec2(0.4, 0.4) },
+		model = { image = sprites.smoke1, color = rgba(0, 254, 254, 126), size_multiplier = vec2(0.4, 0.4) },
 		--alpha_levels = 255,
 		--ignore_rotation = true
 		--acc = vec2(0, -300)
@@ -269,6 +269,40 @@ function create_particle_effects(scene)
 		angular_velocity = minmax(1.8, 1.8),
 
 		size_multiplier = minmax(0.2, 0.5)
+	})	
+
+	particles.blood_impact = override(particles.bullet_impact_smoke_1, {
+		particles_per_sec = minmax(5, 5),
+		velocity = minmax(30, 70),
+		num_of_particles_to_spawn_initially = minmax(55, 55),
+		stream_duration_ms = minmax(3000, 3000),
+		spread_degrees = minmax(180, 180),
+		
+		particle_templates = {			
+			override(particles.barrel_smoke_template, {
+				model = { image = sprites.smoke1, color = rgba(255, 0, 0, 126) }
+			}),
+			override(particles.barrel_smoke_template, {
+				model = { image = sprites.smoke2, color = rgba(255, 0, 0, 126) }
+			})
+			,
+			override(particles.barrel_smoke_template, {
+				model = { image = sprites.smoke3, color = rgba(255, 0, 0, 126) }
+			}),
+			override(particles.barrel_smoke_template, {
+				model = { image = sprites.smoke4, color = rgba(255, 0, 0, 126) }
+			}),
+			override(particles.barrel_smoke_template, {
+				model = { image = sprites.smoke5, color = rgba(255, 0, 0, 126) }
+			}),
+			override(particles.barrel_smoke_template, {
+				model = { image = sprites.smoke6, color = rgba(255, 0, 0, 126) }
+			})
+		},
+
+		angular_velocity = minmax(1.8, 1.8),
+
+		size_multiplier = minmax(0.2, 0.5)
 	})
 	
 	particles.bullet_impact_smoke_2 = override(particles.barrel_smoke_2, {
@@ -288,23 +322,25 @@ function create_particle_effects(scene)
 	})
 	
 	particles.blood_shower = {
-		spread_degrees = minmax(10, 10),
+		spread_degrees = minmax(180, 180),
 		angular_offset = minmax(0, 180),
-		particles_per_burst = minmax_u(35, 45),
+		particles_per_burst = minmax_u(5, 15),
 		type = emission.BURST;
 		velocity = minmax(1, 3000),
 		angular_velocity = minmax(0, 0),
 		
 		particle_templates = particles.blood_templates,
 		
-		size_multiplier = minmax(0.25, 0.65),
+		size_multiplier = minmax(0.5, 1),
 		initial_rotation_variation = 180,
 		
-		particle_lifetime_ms = minmax(4250, 20550),
+		particle_lifetime_ms = minmax(10250, 10250),
 		
 		particle_render_template = { 
 			layer = render_layers.ON_GROUND
-		}
+		},
+
+		fade_when_ms_remaining = minmax(1, 2)
 	}
 	
 	particles.blood_droplets = {
@@ -464,20 +500,20 @@ function create_particle_effects(scene)
 
 		particle_templates = {
 			override(particles.barrel_smoke_template, {
-				model = { image = sprites.smoke2, color = rgba(0, 255, 255, 240) }
+				model = { image = sprites.smoke2, color = rgba(0, 254, 254, 240) }
 			})
 			,
 			override(particles.barrel_smoke_template, {
-				model = { image = sprites.smoke3, color = rgba(0, 255, 255, 240) }
+				model = { image = sprites.smoke3, color = rgba(0, 254, 254, 240) }
 			}),
 			override(particles.barrel_smoke_template, {
-				model = { image = sprites.smoke4, color = rgba(0, 255, 255, 240) }
+				model = { image = sprites.smoke4, color = rgba(0, 254, 254, 240) }
 			}),
 			override(particles.barrel_smoke_template, {
-				model = { image = sprites.smoke5, color = rgba(0, 255, 255, 240) }
+				model = { image = sprites.smoke5, color = rgba(0, 254, 254, 240) }
 			}),
 			override(particles.barrel_smoke_template, {
-				model = { image = sprites.smoke6, color = rgba(0, 255, 255, 240) }
+				model = { image = sprites.smoke6, color = rgba(0, 254, 254, 240) }
 			})
 		},
 	})
@@ -505,7 +541,9 @@ function create_particle_effects(scene)
 	}
 	
 	particles.blood_effect = {
-		particles.blood_shower
+		particles.blood_shower,
+		particles.blood_impact,
+		particles.sparkles
 		--particles.blood_shower
 		--blood_pool,
 		--blood_droplets

@@ -1,4 +1,6 @@
 function create_soldier(owner_scene, crosshair_sprite)
+	local light_filter = create_query_filter({"STATIC_OBJECT"})
+
 	local player = owner_scene.world_object:create_entity_group  {
 		-- body also acts as torso
 		body = {
@@ -46,10 +48,10 @@ function create_soldier(owner_scene, crosshair_sprite)
 			},
 			
 			movement = {
-				input_acceleration = vec2(10000, 10000),
-				max_accel_len = 10000,
-				max_speed_animation = 1000,
-				air_resistance = 0.5,
+				input_acceleration = vec2(5000, 5000),
+				max_accel_len = 5000,
+				max_speed_animation = 200,
+				air_resistance = 0.6,
 				braking_damping = 18,
 				receivers = {
 					{ target = "body", stop_at_zero_movement = false }, 
@@ -60,6 +62,18 @@ function create_soldier(owner_scene, crosshair_sprite)
 			children = {
 				"legs",
 				"crosshair"
+			},
+
+			visibility = {
+				interval_ms = 32,
+				visibility_layers = {
+					[visibility_layers.BASIC_LIGHTING] = {
+						square_side = 200,
+						color = rgba(0, 255, 255, 10),
+						ignore_discontinuities_shorter_than = -1,
+						filter = light_filter
+					}
+				}
 			}
 		},
 		
@@ -71,7 +85,7 @@ function create_soldier(owner_scene, crosshair_sprite)
 			
 			render = {
 				layer = render_layers.CROSSHAIRS,
-				model = crosshair_sprite
+				model = nil
 			},
 
 			chase = {
@@ -137,8 +151,65 @@ world_archetype_callbacks.SOLDIER = {
 				
 				text = {
 					{
-						str = "Soldier",
+						str = "Goliathus",
 						color = rgba(255, 255, 255, 255)
+					}
+				}
+			},
+
+			light = {
+				color = rgba(0, 255, 0, 255),
+
+				attenuation = {
+					1,
+					0.01,
+					0.0027,
+					80
+				},
+
+				wall_attenuation = {
+					1,
+					0.01,
+					0.0037,
+					80
+				},
+
+				attenuation_variations = 
+				{
+					{
+						value = 0,
+						min_value = -0.3,
+						max_value = 0.0,
+						change_speed = 0.0/5
+					},
+			
+					{
+						value = 0,
+						min_value = -0.00001,
+						max_value = 0.00002,
+						change_speed = 0.0000
+					},
+		
+					{
+						value = 0,
+						min_value = -0.00005,
+						max_value = 0.00030,
+						change_speed = 0.0000
+					},
+	
+				-- light position variation
+					{
+						value = 0,
+						min_value = -10,
+						max_value = 10,
+						change_speed = 50
+					},
+		
+					{
+						value = 0,
+						min_value = -5,
+						max_value = 5,
+						change_speed = 50
 					}
 				}
 			}
