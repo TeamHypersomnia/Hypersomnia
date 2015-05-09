@@ -111,8 +111,6 @@ void visibility_system::process_entities(world& owner) {
 
 		auto& transform = it->get<components::transform>().current;
 
-		auto body = it->get<components::physics>().body;
-
 		/* for every visibility type requested for given entity */
 		for (auto& entry : visibility.visibility_layers.raw) {
 
