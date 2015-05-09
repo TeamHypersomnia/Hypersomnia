@@ -205,6 +205,7 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 			bindings::_minmax(),
 			bindings::_vec2(),
 			misc::vector_wrapper<vec2<>>::bind_vector("vec2_vector"),
+			misc::vector_wrapper<int>::bind("int_vector"),
 			bindings::_value_animator(),
 			bindings::_b2Filter(),
 			bindings::_rgba(),

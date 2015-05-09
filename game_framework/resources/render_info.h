@@ -84,8 +84,13 @@ namespace resources {
 		
 		tile_layer(rects::wh<int> size);
 		
+		rects::ltrb<int> get_visible_tiles(draw_input&);
 		virtual void draw(draw_input&) override;
 
+		std::vector<std::vector<vec2<int>>> indices_by_type;
+		rects::ltrb<int> indices_by_type_visibility;
+
+		void generate_indices_by_type(rects::ltrb<int>);
 		std::vector<tile> tiles;
 	};
 

@@ -346,20 +346,26 @@ namespace resources {
 
 	}
 
-	void tile_layer::draw(draw_input& in) {
-		/* if it is not visible, return */
-		if (!in.rotated_camera_aabb.hover(rects::xywh<float>(in.transform.pos.x, in.transform.pos.y, size.w*square_size, size.h*square_size))) return;
-
+	rects::ltrb<int> tile_layer::get_visible_tiles(draw_input& in) {
 		rects::ltrb<int> visible_tiles;
 
 		visible_tiles.l = int((in.rotated_camera_aabb.l - in.transform.pos.x) / 32.f);
 		visible_tiles.t = int((in.rotated_camera_aabb.t - in.transform.pos.y) / 32.f);
 		visible_tiles.r = int((in.rotated_camera_aabb.r - in.transform.pos.x) / 32.f) + 1;
-		visible_tiles.b = int( (in.rotated_camera_aabb.b - in.transform.pos.y) / 32.f) + 1;
+		visible_tiles.b = int((in.rotated_camera_aabb.b - in.transform.pos.y) / 32.f) + 1;
 		visible_tiles.l = std::max(0, visible_tiles.l);
 		visible_tiles.t = std::max(0, visible_tiles.t);
 		visible_tiles.r = std::min(size.w, visible_tiles.r);
 		visible_tiles.b = std::min(size.h, visible_tiles.b);
+
+		return visible_tiles;
+	}
+
+	void tile_layer::draw(draw_input& in) {
+		/* if it is not visible, return */
+		if (!in.rotated_camera_aabb.hover(rects::xywh<float>(in.transform.pos.x, in.transform.pos.y, size.w*square_size, size.h*square_size))) return;
+
+		auto visible_tiles = get_visible_tiles(in);
 
 		draw_input draw_input_copy = in;
 		
@@ -379,6 +385,30 @@ namespace resources {
 				draw_input_copy.transform.pos = vec2<int>(in.transform.pos) + tile_offset + vec2<>(square_size / 2, square_size/2);
 				
 				tile_sprite.draw(draw_input_copy);
+			}
+		}
+	}
+
+	void tile_layer::generate_indices_by_type(rects::ltrb<int> visible_tiles) {
+		if (visible_tiles == indices_by_type_visibility)
+			return;
+
+		indices_by_type_visibility = visible_tiles;
+		
+		for (auto& index_vector : indices_by_type)
+			index_vector.clear();
+
+		for (int y = visible_tiles.t; y < visible_tiles.b; ++y) {
+			for (int x = visible_tiles.l; x < visible_tiles.r; ++x) {
+				int i = y * size.w + x;
+
+				auto type = tiles[i].type_id;
+				if (type == 0) continue;
+
+				if (indices_by_type.size() < type + 1)
+					indices_by_type.resize(type + 1);
+
+				indices_by_type[type].push_back(vec2<int>(x, y) * square_size);
 			}
 		}
 	}
