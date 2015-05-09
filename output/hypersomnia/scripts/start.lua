@@ -13,12 +13,11 @@ dofile "hypersomnia\\scripts\\reliable_channel.lua"
 
 -- archetypes
 dofile "hypersomnia\\scripts\\archetypes\\archetype_library.lua"
-dofile "hypersomnia\\scripts\\archetypes\\controlled_player.lua"
-dofile "hypersomnia\\scripts\\archetypes\\remote_player.lua"
-dofile "hypersomnia\\scripts\\archetypes\\gun.lua"
-dofile "hypersomnia\\scripts\\archetypes\\inventory.lua"
-
-dofile "hypersomnia\\scripts\\archetypes\\soldier.lua"
+dofile "hypersomnia\\scripts\\archetypes\\controlled_player_archetype.lua"
+dofile "hypersomnia\\scripts\\archetypes\\remote_player_archetype.lua"
+dofile "hypersomnia\\scripts\\archetypes\\gun_archetype.lua"
+dofile "hypersomnia\\scripts\\archetypes\\inventory_archetype.lua"
+dofile "hypersomnia\\scripts\\archetypes\\soldier_archetype.lua"
 
 -- resource handling utilities
 dofile "hypersomnia\\scripts\\resources\\animations.lua"
