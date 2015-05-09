@@ -509,3 +509,15 @@ function table.best(entries, better, it_method)
 	
 	return best_elem
 end
+
+
+function math.lerp(a, b, f)
+	return a + f * (b - a)
+end
+
+function math.lerp_object(target, a, b, f, components)
+	components:gsub(".", function(c)
+		local comp = "" .. c 
+    	target[comp] = math.lerp(a[comp], b[comp], f) -- do something with c
+	end)
+end
