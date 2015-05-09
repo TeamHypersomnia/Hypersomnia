@@ -30,6 +30,8 @@ void particle_emitter_system::spawn_particle(
 		randval(rotation - spread, rotation + spread)) *
 		randval(emission.velocity);
 
+	rotation = new_particle.vel.get_degrees();
+
 	new_particle.pos = position + emission.offset;
 	new_particle.lifetime_ms = 0.f;
 	new_particle.face.size *= randval(emission.size_multiplier);
@@ -158,13 +160,14 @@ void particle_emitter_system::consume_events(world& owner) {
 			target_stream.swing_spread = randval(stream->swing_spread);
 			target_stream.swings_per_sec = randval(stream->swings_per_sec);
 
+
 			target_stream.min_swing_spread = randval(stream->min_swing_spread);
 			target_stream.min_swings_per_sec = randval(stream->min_swings_per_sec);
 			target_stream.max_swing_spread = randval(stream->max_swing_spread);
 			target_stream.max_swings_per_sec = randval(stream->max_swings_per_sec);
 
 			target_stream.stream_max_lifetime_ms = randval(stream->stream_duration_ms);
-			target_stream.stream_particles_to_spawn = 0.f;
+			target_stream.stream_particles_to_spawn = randval(stream->num_of_particles_to_spawn_initially);
 			target_stream.swing_speed_change = randval(stream->swing_speed_change_rate);
 			target_stream.swing_spread_change = randval(stream->swing_spread_change_rate);
 

@@ -43,7 +43,8 @@ namespace resources {
 			max_swings_per_sec = std::make_pair(0.f, 0.f),
 			swing_spread_change_rate = std::make_pair(0.f, 0.f),
 			swing_speed_change_rate = std::make_pair(0.f, 0.f),
-			fade_when_ms_remaining = std::make_pair(0.f, 0.f)
+			fade_when_ms_remaining = std::make_pair(0.f, 0.f),
+			num_of_particles_to_spawn_initially = std::make_pair(0.f, 0.f)
 			;
 
 		std::pair<unsigned, unsigned>
