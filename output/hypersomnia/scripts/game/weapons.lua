@@ -109,12 +109,6 @@ function create_weapons(scene, include_render)
 				}
 			}
 		}
-		
-		if scene.particles then
-			weapons[weapon_name].item_info.entity_archetype.particle_emitter = {
-				available_particle_effects = scene.particles.gun_effects
-			}
-		end	
 	end
 	
 	create_weapon("m4a1", "rifle", {

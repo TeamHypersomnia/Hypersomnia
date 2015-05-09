@@ -158,24 +158,7 @@ return function(map_filename, scene_object)
 		world:create_entity (basic_table(object))
 	end
 	
-	-- initialize environmental physical objects
-	local environmental_objects = get_all_objects { "cathedral_wall" }
-	
-	for i = 1, #environmental_objects do
-		local object = environmental_objects[i]
-		
-		local new_entity = basic_table(object)
-		
-		new_entity.particle_emitter = {
-			available_particle_effects = scene_object.particles.metal_effects
-		}
-		
-		world:create_entity (new_entity)
-		scene_object.simulation_world:create_entity {
-			transform = new_entity.transform,
-			physics = new_entity.physics
-		}
-	end
+
 	
 	scene_object:load_tile_functionality(map_filename)
 
@@ -223,7 +206,8 @@ return function(map_filename, scene_object)
 
 		burst.local_transform = true
 		burst.subject = new_fire_entity
-		burst.set_effect = scene_object.particles.fire_effect
+		burst.type = particle_burst_message.CUSTOM
+		burst:set_effect(scene_object.particles.fire_effect)
 		
 		local new_light_entity = components.create_components {
 			cpp_entity = new_fire_entity,
@@ -289,5 +273,33 @@ return function(map_filename, scene_object)
 		scene_object.world_object.world:post_message(burst)
 		scene_object.owner_client_screen.entity_system_instance:add_entity(new_light_entity)
 	end
+
+		-- initialize environmental physical objects
+	local environmental_objects = get_all_objects { "cathedral_wall" }
+	
+	for i = 1, #environmental_objects do
+		local object = environmental_objects[i]
+		
+		local new_entity_table = basic_table(object)
+
+		local new_entity = world:create_entity (new_entity_table)
+
+		scene_object.simulation_world:create_entity {
+			transform = new_entity_table.transform,
+			physics = new_entity_table.physics
+		}
+
+		local new_wall_entity = components.create_components {
+			cpp_entity = new_entity,
+			
+			particle_response = {
+				response = scene_object.particles.metal_response
+			}
+		}
+
+		scene_object.owner_client_screen.entity_system_instance:add_entity(new_wall_entity)
+
+	end
+
 	end
 end

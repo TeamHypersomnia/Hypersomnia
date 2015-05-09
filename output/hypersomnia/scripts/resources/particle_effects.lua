@@ -6,16 +6,6 @@ function create_particle_effects(scene)
 	scene.particles = {}
 	local particles = scene.particles
 	
-	-- handy redirections
-	
-	local function create_particle_effect(...)
-		return scene.world_object:create_particle_effect(...)
-	end
-	
-	local function create_particle_emitter_info(...)
-		return scene.world_object:create_particle_emitter_info(...)
-	end
-	
 	particles.blood_piece = {
 		angular_damping = 1000,
 		linear_damping = 80500,
@@ -548,8 +538,6 @@ function create_particle_effects(scene)
 		--blood_pool,
 		--blood_droplets
 	}
-	
-
 
 	particles.fire_effect = create_particle_effect {
 		particles.fire_emission
@@ -567,21 +555,15 @@ function create_particle_effects(scene)
 		particles.bullet_shell_smoke
 	} 
 	
-	particles.metal_effects = create_particle_emitter_info {
-		effects_subscribtion = {
-			[particle_burst_message.BULLET_IMPACT] = particles.metal_effect
-		}
+	particles.metal_response = {
+		BULLET_IMPACT = particles.metal_effect
 	}
 	
-	particles.npc_effects = create_particle_emitter_info {
-		effects_subscribtion = {
-			[particle_burst_message.BULLET_IMPACT] = particles.blood_effect
-		}
+	particles.npc_response = {
+		BULLET_IMPACT = particles.blood_effect
 	}
 	
-	particles.gun_effects = create_particle_emitter_info {
-		effects_subscribtion = {
-			[particle_burst_message.WEAPON_SHOT] = particles.gunshot_effect
-		}
+	particles.gun_response = {
+		WEAPON_SHOT = particles.gunshot_effect
 	}
 end

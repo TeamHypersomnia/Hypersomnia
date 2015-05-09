@@ -10,6 +10,7 @@ dofile "hypersomnia\\scripts\\components\\inventory.lua"
 dofile "hypersomnia\\scripts\\components\\label.lua"
 dofile "hypersomnia\\scripts\\components\\sound.lua"
 dofile "hypersomnia\\scripts\\components\\light.lua"
+dofile "hypersomnia\\scripts\\components\\particle_response.lua"
 
 dofile "hypersomnia\\scripts\\sync_modules\\modules.lua"
 dofile "hypersomnia\\scripts\\sync_modules\\movement_sync.lua"

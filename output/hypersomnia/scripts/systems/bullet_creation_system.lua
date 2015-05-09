@@ -47,7 +47,7 @@ function bullet_creation_system:update()
 			burst.pos = entity.transform.current.pos + msgs[i].barrel_offset
 			burst.rotation = msgs[i].barrel_transform.rotation
 			burst.subject = target.cpp_entity
-			burst.type = particle_burst_message.WEAPON_SHOT
+			burst:set_effect (create_particle_effect (target.particle_response.response.WEAPON_SHOT) )
 			
 			if weapon.barrel_smoke_group then
 				burst.target_group_to_refresh:set(weapon.barrel_smoke_group)

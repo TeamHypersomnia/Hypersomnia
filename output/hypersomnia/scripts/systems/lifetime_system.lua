@@ -80,13 +80,16 @@ function lifetime_system:resolve_collisions(msgs, post_requests)
 			self.owner_entity_system:post_remove(message.subject.script)
 		end
 		
-		burst_msg = particle_burst_message()
-		burst_msg.subject = message.collider
-		burst_msg.pos = message.point
-		burst_msg.rotation = (message.subject_impact_velocity * -1):get_degrees()
-		burst_msg.type = particle_burst_message.BULLET_IMPACT
-		
-		message.collider.owner_world:post_message(burst_msg)
+		if message.collider.script and message.collider.script.particle_response then
+			print "BURSITN!!!!"
+			burst_msg = particle_burst_message()
+			burst_msg.subject = message.collider
+			burst_msg.pos = message.point
+			burst_msg.rotation = (message.subject_impact_velocity * -1):get_degrees()
+			burst_msg:set_effect (create_particle_effect (message.collider.script.particle_response.response.BULLET_IMPACT) )
+			
+			message.collider.owner_world:post_message(burst_msg)
+		end
 	end
 	
 	if needs_send then
