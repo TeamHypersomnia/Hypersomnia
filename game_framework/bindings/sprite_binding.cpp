@@ -22,6 +22,7 @@ namespace bindings {
 			.def_readwrite("output", &renderable::draw_input::output)
 			.def_readwrite("transform", &renderable::draw_input::transform)
 			.def_readwrite("always_visible", &renderable::draw_input::always_visible)
+			.def_readwrite("rotated_camera_aabb", &renderable::draw_input::rotated_camera_aabb)
 			,
 
 			luabind::class_<sprite, renderable>("sprite")
@@ -53,6 +54,7 @@ namespace bindings {
 
 			luabind::class_<tile_layer, renderable>("tile_layer")
 			.def(luabind::constructor<rects::wh<int>>())
+			.def("generate_indices_by_type", &tile_layer::generate_indices_by_type)
 			.def_readwrite("size", &tile_layer::size)
 			.def_readwrite("tiles", &tile_layer::tiles)
 			.def_readwrite("layer_tileset", &tile_layer::layer_tileset)

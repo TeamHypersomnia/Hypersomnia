@@ -10,7 +10,7 @@ namespace bindings {
 			luabind::class_<chase>("chase_component")
 			.def(luabind::constructor<>())
 			.def("set_target", &chase::set_target)
-			//.def_readwrite("target", &chase::target)
+			.def_readwrite("target", &chase::target)
 			.def_readwrite("chase_type", &chase::chase_type)
 			.def_readwrite("reference_position", &chase::reference_position)
 			.def_readwrite("target_reference_position", &chase::target_reference_position)

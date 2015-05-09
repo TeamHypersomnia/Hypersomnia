@@ -34,6 +34,8 @@ namespace bindings {
 			.def_readwrite("offset", &emission::offset)
 			.def_readwrite("angular_offset", &emission::angular_offset)
 			.def_readwrite("particle_render_template", &emission::particle_render_template)
+			.def_readwrite("num_of_particles_to_spawn_initially", &emission::num_of_particles_to_spawn_initially)
+			
 			.def("add_particle_template", &emission::add_particle_template)
 			.enum_("emission_type")[
 				luabind::value("BURST", emission::BURST),

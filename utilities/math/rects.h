@@ -277,6 +277,10 @@ namespace augs {
 			ltrb operator+(const P& p) const {
 				return ltrb(l + T(p.x), t + T(p.y), r + T(p.x), b + T(p.y));
 			}
+
+			bool operator==(const ltrb& a) {
+				return l == a.l && r == a.r && t == a.t && b == a.b;
+			}
 		};
 
 		template <class T>

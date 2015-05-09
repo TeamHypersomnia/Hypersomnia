@@ -73,6 +73,7 @@ namespace bindings {
 				luabind::def("glVertexAttrib2f", wrap_ptr(glVertexAttrib2f)),
 				luabind::def("glVertexAttrib4f", wrap_ptr(glVertexAttrib4f)),
 				luabind::def("glEnd", wrap(glEnd)),
+				luabind::def("glViewport", wrap(glViewport)),
 				luabind::def("glBindTexture", wrap(glBindTexture)),
 				luabind::def("glUseProgram", wrap_ptr(glUseProgram)),
 				luabind::def("glGenerateMipmap", wrap_ptr(glGenerateMipmap)),

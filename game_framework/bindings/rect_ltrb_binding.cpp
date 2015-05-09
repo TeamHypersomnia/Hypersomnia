@@ -9,6 +9,7 @@ namespace bindings {
 		return
 			luabind::class_<rects::ltrb<float>>("rect_ltrb")
 			.def(luabind::constructor<const rects::xywh<float>&>())
+			.def(luabind::constructor<const rects::ltrb<float>&>())
 			.def(luabind::constructor<float, float, float, float>())
 			.def_readwrite("l", &rects::ltrb<float>::l)
 			.def_readwrite("t", &rects::ltrb<float>::t)
@@ -21,6 +22,7 @@ namespace bindings {
 
 			luabind::class_<rects::ltrb<int>>("rect_ltrb_i")
 			.def(luabind::constructor<const rects::xywh<int>&>())
+			.def(luabind::constructor<const rects::ltrb<int>&>())
 			.def(luabind::constructor<int, int, int, int>())
 			.def_readwrite("l", &rects::ltrb<int>::l)
 			.def_readwrite("t", &rects::ltrb<int>::t)
