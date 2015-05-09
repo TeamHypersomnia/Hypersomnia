@@ -15,9 +15,18 @@ namespace augs {
 			pixel_24(color red = 255, color green = 255, color blue = 255);
 		};
 
+		struct hsv {
+			double h;       // angle in degrees
+			double s;       // percent
+			double v;       // percent
+			hsv(double = 0.0, double = 0.0, double = 0.0);
+		};
+
 		struct pixel_32 {
 			color r, g, b, a;
 			pixel_32(color red = 255, color green = 255, color blue = 255, color alpha = 255);
+			hsv get_hsv() const;
+			pixel_32& set_hsv(hsv);
 		};
 
 		namespace colors {
