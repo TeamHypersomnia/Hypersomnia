@@ -57,6 +57,22 @@ function create_animations(output, sprite_library)
 
 		loop_mode = animation.NONE
 	}
+ 	
+ 	frames = sprite_library["weapon"]["shot"]
+
+	output.weapon_shot_animation = create_animation {
+		frames = {
+			{ model = { image = frames["1"], size_multiplier = vec2(3, 3),  color = rgba(0, 255, 255, 255) }, duration_ms = 30 },
+			{ model = { image = frames["2"], size_multiplier = vec2(3, 3),  color = rgba(0, 255, 255, 255) }, duration_ms = 30 },
+			{ model = { image = frames["3"], size_multiplier = vec2(3, 3),  color = rgba(0, 255, 255, 255) }, duration_ms = 30 },
+			{ model = { image = frames["4"], size_multiplier = vec2(3, 3),  color = rgba(0, 255, 255, 255) }, duration_ms = 30 },
+			{ model = { image = frames["5"], size_multiplier = vec2(3, 3),  color = rgba(0, 255, 255, 255) }, duration_ms = 30 },
+			{ model = nil, duration_ms = 20, callback = function(subject) subject.owner_world:post_message(destroy_message(subject, nil)) end }
+		},
+
+		loop_mode = animation.NONE
+	}
+
 end
 
 -- returns newly created animation set and an animation container

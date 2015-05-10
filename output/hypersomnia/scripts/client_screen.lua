@@ -52,7 +52,6 @@ client_screen = inherits_from ()
 function client_screen:constructor(camera_rect)
 	self.sample_scene = scene_class:create()
 	self.sample_scene.owner_client_screen = self
-
 	self.sample_scene:load_map("hypersomnia\\data\\maps\\cathedral2.lua", "hypersomnia\\scripts\\loaders\\basic_map_loader.lua",
 	{
 		kubasta = {
@@ -199,6 +198,7 @@ function client_screen:constructor(camera_rect)
 	--		}
 	--	}
 	--})
+	SCENE = self.sample_scene
 	self.sample_scene.load_objects()
 end
 

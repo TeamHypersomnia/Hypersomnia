@@ -52,8 +52,45 @@ function bullet_creation_system:update()
 			if weapon.barrel_smoke_group then
 				burst.target_group_to_refresh:set(weapon.barrel_smoke_group)
 			end
-		
+			
+			print ("posting!!")
 			self.world:post_message(burst)
+
+						local shot_entity = self.world_object:create_entity {
+							render = {
+								model = nil,
+								layer = render_layers.CROSSHAIRS
+							},
+
+							transform = {
+								pos = burst.pos,
+								rotation = burst.rotation
+							},
+
+							animate = {
+
+							},
+
+							chase = {
+								target = target.cpp_entity,
+								relative = true
+							}
+						}
+
+						local anim_msg = animate_message()
+
+						anim_msg.set_animation = SCENE.weapon_shot_animation
+						anim_msg.preserve_state_if_animation_changes = false
+						anim_msg.change_animation = true
+						anim_msg.change_speed = true
+						anim_msg.speed_factor = 1
+						anim_msg.subject = shot_entity
+						anim_msg.message_type = animate_message.START
+						anim_msg.animation_priority = 1
+						
+						self.world:post_message(anim_msg)
+
+
 		end
 		
 		
@@ -112,7 +149,7 @@ function bullet_creation_system:update()
 					local_id = self.next_bullet_local_id,
 					--global_id = self.next_bullet_global_id,
 					sender = target,
-					
+					avg_damage = weapon.bullet_damage,
 					max_distance = weapon.max_bullet_distance,
 					starting_point = vec2(bullet.pos)
 				},

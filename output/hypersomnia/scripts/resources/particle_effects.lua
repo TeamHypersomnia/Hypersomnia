@@ -510,17 +510,17 @@ function create_particle_effects(scene)
 
 	particles.metal_effect = {
 		--particles.wall_parts,
-		particles.bullet_impact_smoke_1,
-		particles.cyan_fire,
+		impact = particles.bullet_impact_smoke_1,
+		fire = particles.cyan_fire,
 		--particles.bullet_impact_smoke_2,
 		particles.sparkles
 	}
 	
 	particles.gunshot_effect = {
 		--particles.barrel_smoke_1,
-		particles.bullet_impact_smoke_1,
+		impact = particles.bullet_impact_smoke_1,
+		fire = particles.cyan_fire,
 		particles.barrel_explosion,
-		particles.cyan_fire
 		--override(particles.sparkles, {
 		--	size_multiplier = minmax(0.1, 35),
 		--	angular_offset = minmax(-15, 15),
@@ -531,8 +531,8 @@ function create_particle_effects(scene)
 	}
 	
 	particles.blood_effect = {
+		impact = particles.blood_impact,
 		particles.blood_shower,
-		particles.blood_impact,
 		particles.sparkles
 		--particles.blood_shower
 		--blood_pool,

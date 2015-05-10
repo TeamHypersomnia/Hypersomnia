@@ -78,18 +78,34 @@ function lifetime_system:resolve_collisions(msgs, post_requests)
 			end
 	
 			self.owner_entity_system:post_remove(message.subject.script)
+
+			if message.collider.script and message.collider.script.particle_response then
+				print "BURSITN!!!!"
+				burst_msg = particle_burst_message()
+				burst_msg.subject = message.collider
+				burst_msg.pos = message.point
+				burst_msg.rotation = (message.subject_impact_velocity * -1):get_degrees()
+				
+				local response = {}
+				recursive_write(response, message.collider.script.particle_response.response.BULLET_IMPACT)
+				local dmg = message.subject.script.lifetime.avg_damage
+				
+				if response.impact then
+					response.impact.num_of_particles_to_spawn_initially = minmax(dmg, dmg)
+				end
+
+				if response.fire then
+					response.fire.particles_per_sec = minmax(dmg/2, dmg/2)
+				end
+
+				burst_msg:set_effect (create_particle_effect (response) )
+				
+				message.collider.owner_world:post_message(burst_msg)
+			end
+
 		end
 		
-		if message.collider.script and message.collider.script.particle_response then
-			print "BURSITN!!!!"
-			burst_msg = particle_burst_message()
-			burst_msg.subject = message.collider
-			burst_msg.pos = message.point
-			burst_msg.rotation = (message.subject_impact_velocity * -1):get_degrees()
-			burst_msg:set_effect (create_particle_effect (message.collider.script.particle_response.response.BULLET_IMPACT) )
-			
-			message.collider.owner_world:post_message(burst_msg)
-		end
+
 	end
 	
 	if needs_send then
