@@ -473,12 +473,7 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				
 				my_smoke_program:use()
 				
-				GL.glBegin(GL.GL_QUADS)	
-					GL.glVertexAttrib2f(0,1,1)
-					GL.glVertexAttrib2f(0,1,0)
-					GL.glVertexAttrib2f(0,0,0)
-					GL.glVertexAttrib2f(0,0,1)
-				GL.glEnd()
+				renderer:fullscreen_quad()
 				
 
 				my_shader_program:use()
