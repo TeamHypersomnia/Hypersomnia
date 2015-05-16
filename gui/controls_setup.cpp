@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "hypersomnia_gui.h"
 
 using namespace stylesheeted;
