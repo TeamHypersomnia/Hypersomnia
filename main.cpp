@@ -10,13 +10,18 @@
 #include "game/utilities.h"
 #include "game/bindings.h"
 
-int main() {
+#include <gtest\gtest.h>
+
+int main(int argc, char** argv) {
 	framework::init();
 
 	augs::lua_state_wrapper lua_state;
 	framework::bind_whole_engine(lua_state);
 	hypersomnia_gui::bind(lua_state);
 	bind_hypersomnia_implementations(lua_state);
+
+	//::testing::InitGoogleTest(&argc, argv);
+	//RUN_ALL_TESTS();
 
 	lua_state.dofile("init.lua");
 
