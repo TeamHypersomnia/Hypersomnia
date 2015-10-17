@@ -166,7 +166,8 @@ pip-log.txt
 # Mac crap
 .DS_Store
 !*.lua
-/ReleaseDebug
+ReleaseDebug/
+logs/
 #rays_fractals.rar
 #error_message.txt
 #error_message.txt
