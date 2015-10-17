@@ -986,3 +986,33 @@ For cases like: WALKING returned RUNNING but now we want to exit WALKING since w
 simply interrupt the runner inside the script, as soon as we know that we will be RUNNING ourselves.
 
 
+
+
+
+
+
+
+
+SEPARATION OF CONCERNS: THOUGHTS ON ENTITY SYSTEMS, WIELD SYSTEM AND ITEM SYSTEM
+
+
+Firstly, putting any functionality into ECS will improve performance in the end thanks to assemblage buckets that we are going to introduce.
+
+Functionality is likely to be defined outside of ECS if:
+- it is a resource or low-level functionality that in itself is not interested in any external events or per-frame updates
+std::vector, fbo, vbo, texture, utility containers, math classes like Vector2D, rect_xywh
+- its scale is not proportional to the number of entities in the game world
+examples: reliable_channel, glwindow
+
+functionality is likely to fall into the category of ECS when:
+- most importantly: it is the highest level game functionality that is a subject to composition
+and needs to process events that ultimately originate from the systems that update every frame
+(but it may need an update every frame as well, say it is a rocket with a limited lifetime)
+examples: health, damage, item, inventory, rocket
+
+- it is not necessarily the highest level game functionality, but it needs to be updated every frame
+so performance-wise it makes sense to make them ECS to take advantage of assemblage buckets
+examples: physics, visibility, pathfinding
+
+- it implies alteration in the logic of an existing processing system and does not fall into any existing component's problem domain
+for example: relation system, chasing system

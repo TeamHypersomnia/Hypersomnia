@@ -1,6 +1,6 @@
 config_table = {
 	window_name = "example",
-	fullscreen = 1,
+	fullscreen = 0,
 	window_border = 1,
 	window_x = 0,
 	window_y = 0,
@@ -14,7 +14,7 @@ config_table = {
 	server_address = "127.0.0.1",
 	server_port = 27014,
 	
-	nickname = "Alex the Cat",
+	nickname = "Daedalus",
 	
 	multiple_clients_view = 0,
 	divergence_radius = 1,
