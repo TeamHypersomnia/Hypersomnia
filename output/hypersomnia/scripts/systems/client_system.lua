@@ -39,7 +39,6 @@ function client_system:send_all_data()
 	
 	
 	if self.server_guid ~= nil then --and self:cmd_rate_ready() then
-		--print()
 		--self.cmd_requested = false
 		--self.cmd_rate_timer:reset()
 		

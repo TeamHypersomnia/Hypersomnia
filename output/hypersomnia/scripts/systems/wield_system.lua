@@ -43,8 +43,6 @@ function wield_system:receive_item_wieldings()
 	
 	for i=1, #msgs do
 		local data = msgs[i].data
-		--print "ITEM_WIELDED"
-		--
 		--global_logfile:write( "\nsubject_id: \n" )
 		--global_logfile:write( (data.subject_id) )
 		--
@@ -134,6 +132,8 @@ function wield_system:handle_wielder_change(msg)
 			if item.item.wielder == nil then
 				msg.succeeded = true
 				components.wield.wield_item(subject, msg.item, msg.wielding_key)
+			else
+				colored_print(YELLOW, "trying to wield an owned item!")
 			end
 		end
 	end

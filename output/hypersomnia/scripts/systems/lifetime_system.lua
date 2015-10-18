@@ -80,7 +80,6 @@ function lifetime_system:resolve_collisions(msgs, post_requests)
 			self.owner_entity_system:post_remove(message.subject.script)
 
 			if message.collider.script and message.collider.script.particle_response then
-				print "BURSITN!!!!"
 				burst_msg = particle_burst_message()
 				burst_msg.subject = message.collider
 				burst_msg.pos = message.point

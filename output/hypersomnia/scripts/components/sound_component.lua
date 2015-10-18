@@ -20,7 +20,5 @@ function components.sound:constructor(init_table)
 		
 		--self.music_object:setPosition(1, 0, 0) 
 		self.music_object:play()
-		
-		print ("doing!!!")
 	end
 end

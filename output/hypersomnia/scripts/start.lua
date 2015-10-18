@@ -28,7 +28,7 @@ dofile "hypersomnia\\scripts\\client_screen.lua"
 -- main loop
 
 local file_watcher_object = file_watcher()
-file_watcher_object:add_directory("hypersomnia\\scripts", false)
+file_watcher_object:add_directory("hypersomnia\\scripts")
 
 if config_table.multiple_clients_view ~= 0 then
 	client_scenes = {
@@ -82,7 +82,8 @@ while not SHOULD_QUIT_FLAG do
 	       
 	local files_to_reload = file_watcher_object:get_modified_files()
 	   
-	for i=0, files_to_reload:size()-1 do 
+	for i=0, files_to_reload:size()-1 do
+		print ( "File to reload: " .. files_to_reload:at(i) ) 
 		if files_to_reload:at(i) == "hypersomnia\\scripts\\commands.lua" then
 			dofile "hypersomnia\\scripts\\commands.lua"
 		end

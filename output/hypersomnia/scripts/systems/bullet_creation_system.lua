@@ -53,7 +53,6 @@ function bullet_creation_system:update()
 				burst.target_group_to_refresh:set(weapon.barrel_smoke_group)
 			end
 			
-			print ("posting!!")
 			self.world:post_message(burst)
 
 						local shot_entity = self.world_object:create_entity {

@@ -124,8 +124,6 @@ function melee_system:process_swinging()
 						hit_entity.owner_world:post_message(burst_msg)
 					end
 
-					print "posting impact"
-			
 					weapon.entities_hit[hit_entity] = true
 					
 					weapon.hits_remaining = weapon.hits_remaining - 1

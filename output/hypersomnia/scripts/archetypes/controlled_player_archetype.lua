@@ -293,8 +293,6 @@ world_archetype_callbacks.CONTROLLED_PLAYER = {
 		new_entity.cpp_entity.physics.body:SetTransform(new_entity.replication.modules.movement.position, 0)
 		new_entity.parent_group.crosshair.transform.current.pos = new_entity.cpp_entity.transform.current.pos - vec2(0, 100)
 		self.owner_scene.world_camera.camera.dont_smooth_once = true
-		--print ("BURST!!!!!")
-		--print(burst.pos.x, burst.pos.y)
 		--burst.rotation = 0
 		burst.local_transform = true
 		burst.subject = new_entity.cpp_entity
