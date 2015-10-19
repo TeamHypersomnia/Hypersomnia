@@ -37,6 +37,7 @@ public:
 	int get_triangle_count();
 	resources::vertex_triangle& get_triangle(int i);
 
+	void fullscreen_quad();
 	void draw_debug_info(vec2<> visible_area, components::transform::state<>, augs::texture_baker::texture* tex);
 
 	struct debug_line {

@@ -102,6 +102,7 @@ namespace bindings {
 			.def("push_line_channel", &render_system::push_line_channel)
 			.def("clear_channel", &render_system::clear_channel)
 			.def("clear_non_cleared_lines", &render_system::clear_non_cleared_lines)
+			.def("fullscreen_quad", &render_system::fullscreen_quad)
 
 			.def("generate_layers", &render_system::generate_layers)
 			.def("draw_layer", &render_system::draw_layer)

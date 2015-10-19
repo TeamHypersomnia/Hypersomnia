@@ -27,10 +27,6 @@ render_system::render_system(window::glwindow& output_window)
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glMatrixMode(GL_PROJECTION);
-
 	glGenBuffers(1, &triangle_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer);
 
@@ -116,6 +112,32 @@ int render_system::get_triangle_count() {
 
 resources::vertex_triangle& render_system::get_triangle(int i) {
 	return triangles[i];
+}
+
+void render_system::fullscreen_quad() {
+	static float vertices[] = {
+		1.f, 1.f,
+		1.f, 0.f,
+		0.f, 0.f,
+		0.f, 1.f
+	};
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);	
+	glDisableVertexAttribArray(VERTEX_ATTRIBUTES::TEXCOORD);
+	glDisableVertexAttribArray(VERTEX_ATTRIBUTES::COLOR);
+	glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), vertices);
+	
+	glDrawArrays(GL_QUADS, 0, 4);
+
+	glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer);
+
+	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::POSITION);
+	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::TEXCOORD);
+	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::COLOR);
+
+	glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(resources::vertex), 0);
+	glVertexAttribPointer(VERTEX_ATTRIBUTES::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(resources::vertex), (char*)(sizeof(float) * 2));
+	glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(resources::vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2));
 }
 
 void render_system::draw_debug_info(vec2<> visible_area, components::transform::state<> camera_transform, augs::texture_baker::texture* tex) {
