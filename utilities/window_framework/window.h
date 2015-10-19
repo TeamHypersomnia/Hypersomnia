@@ -39,6 +39,8 @@ namespace augs {
 			misc::timer triple_timer;
 			bool doubled;
 		public:
+			static void colored_print(int, const char* text);
+
 			enum mode {
 				MINIMIZE = SW_MINIMIZE,
 				MAXIMIZE = SW_MAXIMIZE,
