@@ -13,7 +13,7 @@ namespace bindings {
 			luabind::class_<std::mt19937>("std_mt19937")
 			.def(luabind::constructor<>())
 			.def(luabind::constructor<unsigned>())
-			.def("seed", &std::mt19937::seed),
+			.def("seed", (void(std::mt19937::*)(unsigned))&std::mt19937::seed),
 
 			luabind::def("std_random_device", std_random_device),
 
