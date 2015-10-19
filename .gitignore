@@ -172,3 +172,8 @@ pip-log.txt
 /ReleaseExe
 /RelDeb
 /output
+
+*.log
+*.tlog
+*.idb
+*.lastbuildstate
