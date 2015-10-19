@@ -22,6 +22,7 @@ world_archetype_groups = {
 		"m4a1",
 		"fireaxe",
 		"shotgun",
+		"pinkm4",
 		"pistol"
 	},
 	

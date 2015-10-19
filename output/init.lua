@@ -1,5 +1,5 @@
-global_logfile = io.open("client_logfile.txt", "w")
-transmission_log = io.open("client_transmission.txt", "w")
+global_logfile = io.open("client_logfile.log", "w")
+transmission_log = io.open("client_transmission.log", "w")
 
 dofile "config.lua"
 

@@ -181,3 +181,12 @@ logs/
 #*.jpg
 #*.mp3
 #*.ogg
+
+
+
+*.log
+*.tlog
+*.idb
+*.lastbuildstate
+*.ipdb
+*.iobj

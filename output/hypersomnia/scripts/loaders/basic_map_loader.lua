@@ -23,6 +23,7 @@ return function(map_filename, scene_object)
 	-- initialize camera
 	scene_object.world_camera = create_world_camera_entity(world, scene_object.sprite_library["blank"])
 	scene_object.world_camera.script.owner_scene = scene_object
+	scene_object.world_camera.transform.pos = vec2(100, 100)
 	
 	--if config_table.multiple_clients_view == 1 then
 	--	scene_object.world_camera.script.min_zoom = -400
@@ -39,7 +40,14 @@ return function(map_filename, scene_object)
 	
 	scene_object.bullet_sprite = create_sprite {
 		image = scene_object.sprite_library["bullet"],
-		size_multiplier = vec2(3, 0.4)
+		size_multiplier = vec2(3, 0.4),
+		color = rgba(0, 255, 255, 255)
+	}	
+
+	scene_object.pink_bullet_sprite = create_sprite {
+		image = scene_object.sprite_library["bullet"],
+		size_multiplier = vec2(3, 0.4),
+		color = rgba(255, 0, 255, 255)
 	}
 	
 	

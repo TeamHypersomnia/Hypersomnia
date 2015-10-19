@@ -23,6 +23,12 @@ function create_weapons(scene, include_render)
 		}
 	end
 	
+	local pink_bullet = clone_table(basic_bullet_entity)
+	
+	if pink_bullet.render then
+		pink_bullet.render.model = scene.pink_bullet_sprite
+	end
+
 	local function create_weapon(weapon_name, weapon_type, weapon_properties, use_world_sprite_to_wielded)
 		weapons[weapon_name] = {
 			weapon_info = weapon_properties,
@@ -127,6 +133,33 @@ function create_weapons(scene, include_render)
 		bullet_barrel_offset = vec2(70, 10),
 		
 		bullet_entity = basic_bullet_entity,				
+		
+		max_lifetime_ms = 500,
+		
+		swing_duration = 100,
+		swing_interval_ms = 400,
+		swing_angle = 20,
+		swing_radius = 70,
+		swing_damage = 35,
+		hits_per_swing = 1
+	})
+
+	create_weapon("pinkm4", "rifle", {
+		current_rounds = 3000,
+		is_automatic = true,
+		bullets_once = 1,
+		bullet_damage = 35,
+		bullet_speed = minmax(5000, 6000),
+		
+		shooting_interval_ms = 100,
+		spread_degrees = 0,
+		shake_radius = 9.5,
+		shake_spread_degrees = 45,
+		
+		world_barrel_offset = vec2(49, -8),
+		bullet_barrel_offset = vec2(70, 10),
+		
+		bullet_entity = pink_bullet,				
 		
 		max_lifetime_ms = 500,
 		
