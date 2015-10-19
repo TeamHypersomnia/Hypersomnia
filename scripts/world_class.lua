@@ -38,9 +38,6 @@ function world_class:constructor()
 		my_instance.destroy_system:consume_events(owner)
 	end
 	
-	
-	self.polygon_particle_userdatas_saved = {}	
-		
 	self.is_paused = false
 end
 
@@ -137,25 +134,32 @@ function world_class:handle_physics()
 	return steps_made
 end
 
-function world_class:process_all_systems()
+function world_class:process_all_systems(is_view)
+	if is_view == nil then
+		is_view = true
+	end
+
 	local my_instance = self.world_inst
 	local world = my_instance.world
 	
 	if not self.is_paused then
-		my_instance.movement_system:process_entities(world)
+		if is_view then my_instance.movement_system:process_entities(world) end
 	end
      
 	if not self.is_paused then
 		my_instance.behaviour_tree_system:process_entities(world)
 	end
 	
-	my_instance.lookat_system:process_entities(world)
+	if is_view then my_instance.lookat_system:process_entities(world) end
 	my_instance.chase_system:process_entities(world)
-	my_instance.crosshair_system:process_entities(world)
+	if is_view then my_instance.crosshair_system:process_entities(world) end
 	
 	if not self.is_paused then
-		my_instance.particle_group_system:process_entities(world)
-		my_instance.animation_system:process_entities(world)
+		if is_view then 
+			my_instance.particle_group_system:process_entities(world)
+			my_instance.animation_system:process_entities(world)
+		end
+
 		my_instance.visibility_system:process_entities(world)
 		my_instance.pathfinding_system:process_entities(world)
 	end	
@@ -174,25 +178,33 @@ function world_class:call_deletes()
 	my_instance.destroy_system:consume_events(world)
 end
 
-function world_class:consume_events()
+function world_class:consume_events(is_view)
+	if is_view == nil then
+		is_view = true
+	end
+
 	self.world_inst.world:validate_delayed_messages()
 	
 	local my_instance = self.world_inst
 	local world = my_instance.world
 	
-	my_instance.camera_system:consume_events(world)
-	
+	if is_view then
+		my_instance.camera_system:consume_events(world)
+	end
+
 	self:handle_message_callbacks()
 	
-	if not self.is_paused then
-		my_instance.movement_system:consume_events(world)
-		my_instance.animation_system:consume_events(world)
-	end
-	
-	my_instance.crosshair_system:consume_events(world)
-	
-	if not self.is_paused then
-		my_instance.particle_emitter_system:consume_events(world)
+	if is_view then
+		if not self.is_paused then
+			my_instance.movement_system:consume_events(world)
+			my_instance.animation_system:consume_events(world)
+		end
+		
+		my_instance.crosshair_system:consume_events(world)
+		
+		if not self.is_paused then
+			my_instance.particle_emitter_system:consume_events(world)
+		end
 	end
 	
 	self:clear_queue("intent_message")

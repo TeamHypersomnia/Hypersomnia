@@ -23,6 +23,8 @@ function scene_class:generate_tile_layer(tile_layer_table)
 	local new_tile_layer = tile_layer(rect_wh_i(tile_layer_table.width, tile_layer_table.height))
 	new_tile_layer.layer_tileset = self.map_tileset
 
+	new_tile_layer.tiles:reserve(#tile_layer_table.data)
+	
 	for i=1, #tile_layer_table.data do
 		new_tile_layer.tiles:add(tile_object(tile_layer_table.data[i]))
 	end 

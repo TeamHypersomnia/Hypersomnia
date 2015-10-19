@@ -73,8 +73,8 @@ void particle_emitter_system::consume_events(world& owner) {
 	for (auto it : events) {
 		resources::particle_effect* emissions = nullptr;
 
-		if (it.set_effect != nullptr)
-			emissions = it.set_effect;
+		if (it.type == it.CUSTOM)
+			emissions = &it.effect;
 		else {
 			if (it.subject) {
 				auto* emitter = it.subject->find<particle_emitter>();
@@ -154,7 +154,8 @@ void particle_emitter_system::consume_events(world& owner) {
 			//*target_group = components::particle_group();
 			auto& target_stream = target_group->stream_slots[stream_index];
 
-			target_stream.stream_info = stream;
+			target_stream.stream_info = *stream;
+			target_stream.is_streaming = true;
 			target_stream.stream_lifetime_ms = 0.f;
 			target_stream.target_spread = randval(stream->spread_degrees);
 			target_stream.swing_spread = randval(stream->swing_spread);

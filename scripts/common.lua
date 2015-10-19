@@ -521,3 +521,7 @@ function math.lerp_object(target, a, b, f, components)
     	target[comp] = math.lerp(a[comp], b[comp], f) -- do something with c
 	end)
 end
+
+RED = 1
+GREEN = 2
+YELLOW = 3

@@ -33,8 +33,8 @@ void particle_group_system::process_entities(world& owner) {
 			for (auto& particle : particles)
 				update_particle(particle, delta);
 
-			if (stream_slot.stream_info) {
-				auto& stream_info = *stream_slot.stream_info;
+			if (stream_slot.is_streaming) {
+				auto& stream_info = stream_slot.stream_info;
 				float stream_delta = std::min(delta, stream_slot.stream_max_lifetime_ms - stream_slot.stream_lifetime_ms);
 				stream_slot.stream_lifetime_ms += stream_delta;
 				stream_slot.stream_lifetime_ms = std::min(stream_slot.stream_lifetime_ms, stream_slot.stream_max_lifetime_ms);
@@ -79,7 +79,7 @@ void particle_group_system::process_entities(world& owner) {
 			if (!
 				(particles.empty() &&
 				stream_slot.destroy_when_empty && 
-				(!stream_slot.stream_info || stream_slot.stream_lifetime_ms >= stream_slot.stream_max_lifetime_ms)))
+				(!stream_slot.is_streaming || stream_slot.stream_lifetime_ms >= stream_slot.stream_max_lifetime_ms)))
 				should_destroy = false;
 		}
 		

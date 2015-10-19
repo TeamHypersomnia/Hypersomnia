@@ -224,7 +224,7 @@ tiled_map_loader = {
 		if shape == "polygon" then
 			physics_body_type = physics_info.POLYGON
 			local new_polygon = simple_create_polygon (reversed((object.polygon)))
-			map_uv_square(new_polygon, used_texture)
+			map_texture_to_polygon(new_polygon, used_texture, uv_mapping_mode.OVERLAY)
 			set_polygon_color(new_polygon, final_color)
 			
 			final_entity_table.render = { model = new_polygon }

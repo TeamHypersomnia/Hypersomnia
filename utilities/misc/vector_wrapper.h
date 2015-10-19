@@ -57,6 +57,7 @@ namespace augs {
 					.def("size", (size_t(__thiscall std::vector<value>::*) ())(&std::vector<value>::size))
 					.def("at", (value&(__thiscall std::vector<value>::*) (size_t))(&std::vector<value>::at))
 					.def("clear", &std::vector<value>::clear)
+					.def("reserve", &std::vector<value>::reserve)
 					.def("data", (value* (__thiscall std::vector<value>::*) ()) (&std::vector<value>::data));
 			}
 		};

@@ -196,7 +196,8 @@ end
 function cpp_entity_system:remove_entity(removed_entity)
 	-- get world object owning that entity and delete it
 	local owner_world = removed_entity.cpp_entity.owner_world
-	
+	print ("REMOVING ENTITY CPP ENTITY SYSTEM: " )
+	print (removed_entity)
 	--global_logfile:write(table.inspect(removed_entity))
 	--
 	--print ("removing..")

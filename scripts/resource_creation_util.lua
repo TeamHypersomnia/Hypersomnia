@@ -134,7 +134,7 @@ function create_input_context(entries)
 	return my_input_context
 end
 
-function world_class:create_particle(entries)
+function create_particle(entries)
 	local my_particle = particle()
 	rewrite(my_particle, entries, { model = true })
 	
@@ -142,39 +142,38 @@ function world_class:create_particle(entries)
 		entries.model = create_sprite( entries.model )
 	end
 	
-	table.insert(self.polygon_particle_userdatas_saved, entries.model)
 	my_particle.model = entries.model
 	
 	return my_particle
 end
 
-function world_class:create_emission(entries)
+function create_emission(entries)
 	local my_emission = emission()
 	rewrite(my_emission, entries, { particle_templates = true, particle_render_template = true })
 	
 	for k, v in pairs(entries.particle_templates) do
-		my_emission:add_particle_template(self:create_particle(v))
+		my_emission:add_particle_template(create_particle(v))
 	end
 	
 	my_emission.particle_render_template = create(render_component, entries.particle_render_template)
 	return my_emission
 end
 
-function world_class:create_particle_effect(entries)
+function create_particle_effect(entries)
 	local my_effect = particle_effect()
 	
 	for k, v in pairs(entries) do
-		my_effect:add(self:create_emission(v))
+		my_effect:add(create_emission(v))
 	end
 	
 	return my_effect
 end
 	
-function world_class:create_particle_emitter_info(entries)
+function create_particle_emitter_info(entries)
 	local my_info = particle_emitter_info()
 	
 	for k, v in pairs(entries.effects_subscribtion) do
-		my_info:add(k, self:create_particle_effect(v))
+		my_info:add(k, create_particle_effect(v))
 	end
 	
 	return my_info

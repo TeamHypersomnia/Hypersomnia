@@ -41,10 +41,11 @@ namespace components {
 
 			float fade_when_ms_remaining = 0.f;
 
-			resources::emission* stream_info = nullptr;
+			resources::emission stream_info;
+			bool is_streaming = false;
 
 			void stop_streaming() {
-				stream_info = nullptr;
+				is_streaming = false;
 			}
 		};
 		
