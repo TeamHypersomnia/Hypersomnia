@@ -200,9 +200,10 @@ namespace augs {
 			case 2: format = GL_LUMINANCE_ALPHA; break;
 			case 3: format = GL_BGR; break;
 			case 4: format = GL_BGRA; break;
+			default: assert(0);
 			}
 
-			glTexImage2D(GL_TEXTURE_2D, 0, im.get_channels(), im.get_size().w, im.get_size().h, 0, format, GL_UNSIGNED_BYTE, im.ptr());
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, im.get_size().w, im.get_size().h, 0, format, GL_UNSIGNED_BYTE, im.ptr());
 
 			if(mipmaps) glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -250,14 +251,14 @@ namespace augs {
 			bind();
 			lin = false;
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmaps ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST); 
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmaps ? GL_NEAREST : GL_NEAREST);
 		}
 
 		void atlas::linear() {
 			bind();
 			lin = true;
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmaps ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR); 
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmaps ? GL_LINEAR : GL_LINEAR);
 		}
 	}
 }
