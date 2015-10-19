@@ -38,7 +38,7 @@ int bitflag(lua_State* L) {
 
 namespace bindings {
 	extern luabind::scope
-		_sfml_audio(),
+		_audio(),
 
 		_id_generator(),
 		_minmax(),
@@ -200,7 +200,6 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 
 			misc::vector_wrapper<float>::bind("float_vector"),
 
-			bindings::_sfml_audio(),
 			bindings::_id_generator(),
 			bindings::_minmax(),
 			bindings::_vec2(),
