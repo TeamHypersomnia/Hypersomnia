@@ -96,32 +96,32 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir)\utilities;C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(ProjectDir);$(ProjectDir)\3rdparty\freetype;$(ProjectDir)3rdparty\RakNet\Source;$(ProjectDir)\3rdparty\SFML\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(AUG_3RDPARTY)\boost;$(ProjectDir)\3rdparty;$(ProjectDir)\utilities;$(ProjectDir)\3rdparty\gtest;$(ProjectDir);$(ProjectDir)\3rdparty\freetype;$(ProjectDir)3rdparty\RakNet\Source;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
     <OutDir>$(ProjectDir)</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir)\utilities;C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(ProjectDir);$(ProjectDir)\3rdparty\freetype;$(ProjectDir)3rdparty\RakNet\Source;$(ProjectDir)\3rdparty\SFML\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(AUG_3RDPARTY)\boost;$(ProjectDir)\3rdparty;$(ProjectDir)\utilities;$(ProjectDir)\3rdparty\gtest;$(ProjectDir);$(ProjectDir)\3rdparty\freetype;$(ProjectDir)3rdparty\RakNet\Source;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
     <OutDir>$(ProjectDir)</OutDir>
     <TargetName>$(ProjectName)-debug</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugExe|Win32'">
-    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir)\utilities;C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(ProjectDir);$(ProjectDir)\3rdparty\freetype;$(ProjectDir)3rdparty\RakNet\Source;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(AUG_3RDPARTY)\boost;$(ProjectDir)\3rdparty;$(ProjectDir)\utilities;$(ProjectDir)\3rdparty\gtest;$(ProjectDir);$(ProjectDir)\3rdparty\freetype;$(ProjectDir)3rdparty\RakNet\Source;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
     <OutDir>$(ProjectDir)</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);$(ProjectDir)\3rdparty\gtest;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);$(ProjectDir)\3rdparty\gtest;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugExe|x64'">
-    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);C:\WinDDK\7600.16385.1\inc\atl71;$(ProjectDir)\3rdparty\gtest;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\WinDDK\7600.16385.1\lib\ATL\i386;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\boost;$(ProjectDir)\3rdparty;$(ProjectDir);$(ProjectDir)\3rdparty\gtest;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -134,9 +134,12 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <MinimalRebuild>true</MinimalRebuild>
-      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FloatingPointModel>Precise</FloatingPointModel>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <ExceptionHandling>false</ExceptionHandling>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -270,6 +273,8 @@
     <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2EdgeShape.cpp" />
     <ClCompile Include="3rdparty\Box2D\Collision\Shapes\b2PolygonShape.cpp" />
     <ClCompile Include="3rdparty\Box2D\Dynamics\Joints\b2MotorJoint.cpp" />
+    <ClCompile Include="3rdparty\FileWatcher\FileWatcher.cpp" />
+    <ClCompile Include="3rdparty\FileWatcher\FileWatcherWin32.cpp" />
     <ClCompile Include="3rdparty\GL\glew.c" />
     <ClCompile Include="3rdparty\gtest\src\gtest-death-test.cc" />
     <ClCompile Include="3rdparty\gtest\src\gtest-filepath.cc" />
@@ -719,9 +724,6 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;SFML_STATIC;_DEBUG%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='DebugExe|Win32'">_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;SFML_STATIC;_DEBUG%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="3rdparty\readdir\ReadDirectoryChanges.cpp" />
-    <ClCompile Include="3rdparty\readdir\ReadDirectoryChangesPrivate.cpp" />
-    <ClCompile Include="3rdparty\readdir\_stdafx.cpp" />
     <ClCompile Include="3rdparty\src\class.cpp" />
     <ClCompile Include="3rdparty\src\class_info.cpp" />
     <ClCompile Include="3rdparty\src\class_registry.cpp" />
@@ -795,6 +797,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugExe|Win32'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="game_framework\bindings\utilities_binding.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="game_framework\bindings\value_animator_binding.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
@@ -805,6 +810,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugExe|Win32'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="game_framework\game\sound_effects.cpp" />
     <ClCompile Include="game_framework\game_framework.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
@@ -1372,6 +1378,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugExe|x64'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="utilities\misc\smooth_value_field.cpp" />
     <ClCompile Include="utilities\misc\vector_wrapper.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugExe|Win32'">Use</PrecompiledHeader>
@@ -1605,6 +1612,9 @@
     <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2WeldJoint.h" />
     <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2WheelJoint.h" />
     <ClInclude Include="3rdparty\Box2D\Rope\b2Rope.h" />
+    <ClInclude Include="3rdparty\FileWatcher\FileWatcher.h" />
+    <ClInclude Include="3rdparty\FileWatcher\FileWatcherImpl.h" />
+    <ClInclude Include="3rdparty\FileWatcher\FileWatcherWin32.h" />
     <ClInclude Include="3rdparty\GL\glew.h" />
     <ClInclude Include="3rdparty\GL\glxew.h" />
     <ClInclude Include="3rdparty\GL\wglew.h" />
@@ -1866,8 +1876,6 @@
     <ClInclude Include="3rdparty\RakNet\Source\WSAStartupSingleton.h" />
     <ClInclude Include="3rdparty\RakNet\Source\XBox360Includes.h" />
     <ClInclude Include="3rdparty\RakNet\Source\_FindFirst.h" />
-    <ClInclude Include="3rdparty\readdir\_stdafx.h" />
-    <ClInclude Include="3rdparty\readdir\targetver.h" />
     <ClInclude Include="3rdparty\SFML\Audio.hpp" />
     <ClInclude Include="3rdparty\SFML\Audio\Export.hpp" />
     <ClInclude Include="3rdparty\SFML\Audio\Listener.hpp" />
@@ -1968,6 +1976,7 @@
     <ClInclude Include="depthbase\gui\text\ui.h" />
     <ClInclude Include="depthbase\gui\text\word_separator.h" />
     <ClInclude Include="game_framework\game\polygon_fader.h" />
+    <ClInclude Include="game_framework\game\sound_effects.h" />
     <ClInclude Include="game_framework\game_framework.h" />
     <ClInclude Include="utilities\lua_state_wrapper.h" />
     <ClInclude Include="game_framework\world_instance.h" />
@@ -1986,6 +1995,7 @@
     <ClInclude Include="utilities\graphics\pixel.h" />
     <ClInclude Include="utilities\misc\file_watcher.h" />
     <ClInclude Include="utilities\misc\id_generator.h" />
+    <ClInclude Include="utilities\misc\smooth_value_field.h" />
     <ClInclude Include="utilities\network\bitstream.h" />
     <ClInclude Include="utilities\network\bitstream_wrapper.h" />
     <ClInclude Include="utilities\network\network_interface.h" />
@@ -2075,14 +2085,6 @@
     <None Include="3rdparty\SFML\System\Utf.inl" />
     <None Include="3rdparty\SFML\System\Vector2.inl" />
     <None Include="3rdparty\SFML\System\Vector3.inl" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="3rdparty\SFML\src\SFML\Audio\sfml-audio.vcxproj">
-      <Project>{4e5955c3-101e-433c-b9ff-92a8bc6aa498}</Project>
-    </ProjectReference>
-    <ProjectReference Include="3rdparty\SFML\src\SFML\System\sfml-system.vcxproj">
-      <Project>{093ebec7-4f84-4723-a720-a9ea97ea2707}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
