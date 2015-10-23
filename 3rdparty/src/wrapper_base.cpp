@@ -52,3 +52,4 @@ namespace luabind { namespace detail
 		lua_remove(L, -2); // remove the crep table
 	}
 }}
+

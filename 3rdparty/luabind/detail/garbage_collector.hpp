@@ -51,3 +51,4 @@ namespace luabind { namespace detail
 }}
 
 #endif // LUABIND_GARBAGE_COLLECTOR_HPP_INCLUDED
+

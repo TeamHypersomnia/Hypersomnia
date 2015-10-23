@@ -27,11 +27,13 @@
 #include <luabind/luabind.hpp>
 #include <luabind/class_info.hpp>
 #include <luabind/detail/class_registry.hpp>
+#include <luabind/lua_argument_proxy.hpp>
+#include <luabind/lua_iterator_proxy.hpp>
 
-
+/*
 #include <iostream>
-//#define VERBOSE(X) std::cout << __FILE__ << ":" << __LINE__ << ": " << X << std::endl
-#define ALLOW_CLASS_REPS false
+#define VERBOSE(X) std::cout << __FILE__ << ":" << __LINE__ << ": " << X << std::endl
+*/
 #define VERBOSE(X)
 
 namespace luabind
@@ -43,7 +45,7 @@ namespace luabind
 		bool givenClassRep = false;
 
 		o.push(L);
-		if (ALLOW_CLASS_REPS && detail::is_class_rep(L, -1)) {
+		if (detail::is_class_rep(L, -1)) {
 			VERBOSE("OK, got a class rep");
 			// OK, o is a class rep, now at the top of the stack
 			givenClassRep = true;

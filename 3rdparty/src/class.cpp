@@ -22,13 +22,12 @@
 
 #define LUABIND_BUILDING
 
-#include <boost/foreach.hpp>
-
 #include <luabind/lua_include.hpp>
 
 #include <luabind/config.hpp>
 #include <luabind/class.hpp>
 #include <luabind/nil.hpp>
+#include <luabind/detail/debug.hpp>
 
 #include <cstring>
 #include <iostream>
@@ -160,10 +159,9 @@ namespace luabind { namespace detail {
         if (has_wrapper)
             class_ids->put(m_wrapper_id, m_wrapper_type);
 
-        BOOST_FOREACH(cast_entry const& e, m_casts)
-        {
-            casts->insert(e.src, e.target, e.cast);
-        }
+		for (auto const& e : m_casts) {
+			casts->insert(e.src, e.target, e.cast);
+		}
 
         for (std::vector<base_desc>::iterator i = m_bases.begin();
             i != m_bases.end(); ++i)
@@ -235,7 +233,7 @@ namespace luabind { namespace detail {
     // -- interface ---------------------------------------------------------
 
     class_base::class_base(char const* name)
-        : scope(std::auto_ptr<registration>(
+        : scope(std::unique_ptr<registration>(
                 m_registration = new class_registration(name))
           )
     {
@@ -258,14 +256,14 @@ namespace luabind { namespace detail {
 
 	void class_base::add_member(registration* member)
 	{
-		std::auto_ptr<registration> ptr(member);
-		m_registration->m_members.operator,(scope(ptr));
+		std::unique_ptr<registration> ptr(member);
+		m_registration->m_members.operator,(scope(std::move(ptr)));
 	}
 
 	void class_base::add_default_member(registration* member)
 	{
-		std::auto_ptr<registration> ptr(member);
-		m_registration->m_default_members.operator,(scope(ptr));
+		std::unique_ptr<registration> ptr(member);
+		m_registration->m_default_members.operator,(scope(std::move(ptr)));
 	}
 
     const char* class_base::name() const 

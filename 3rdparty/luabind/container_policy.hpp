@@ -20,44 +20,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
 
-
 #ifndef LUABIND_CONTAINER_POLICY_HPP_INCLUDED
 #define LUABIND_CONTAINER_POLICY_HPP_INCLUDED
 
 #include <luabind/config.hpp>
-#include <luabind/detail/policy.hpp>    // for policy_cons, etc
-#include <luabind/detail/decorate_type.hpp>  // for LUABIND_DECORATE_TYPE
+#include <luabind/detail/policy.hpp>
+#include <luabind/detail/decorate_type.hpp>  // for decorated_type
 #include <luabind/detail/primitives.hpp>  // for null_type (ptr only), etc
-#include <boost/mpl/apply_wrap.hpp>
-#include <boost/mpl/if.hpp>             // for if_
-#include <boost/type_traits/is_same.hpp>  // for is_same
 
 namespace luabind { namespace detail {
-
-	namespace mpl = boost::mpl;
 
 	template<class Policies>
 	struct container_converter_lua_to_cpp
 	{
-        int consumed_args(...) const
-        {
-            return 1;
-        }
+		enum { consumed_args = 1 };
 
         template<class T>
-		T apply(lua_State* L, by_const_reference<T>, int index)
+		T to_cpp(lua_State* L, by_const_reference<T>, int index)
 		{
 			typedef typename T::value_type value_type;
-
-			typedef typename find_conversion_policy<1, Policies>::type converter_policy;
-			typename mpl::apply_wrap2<converter_policy,value_type,lua_to_cpp>::type converter;
+			specialized_converter_policy_n<1, Policies, value_type, lua_to_cpp> converter;
 
 			T container;
 
 			lua_pushnil(L);
-			while (lua_next(L, index))
+			while (lua_next(L, index-1))
 			{
-				container.push_back(converter.apply(L, LUABIND_DECORATE_TYPE(value_type), -1));
+				container.push_back(converter.apply(L, decorated_type<value_type>(), -1));
 				lua_pop(L, 1); // pop value
 			}
 
@@ -65,15 +54,21 @@ namespace luabind { namespace detail {
 		}
 
 		template<class T>
-		T apply(lua_State* L, by_value<T>, int index)
+		T to_cpp(lua_State* L, by_value<T>, int index)
 		{
-			return apply(L, by_const_reference<T>(), index);
+			return to_cpp(L, by_const_reference<T>(), index);
 		}
 
 		template<class T>
 		static int match(lua_State* L, by_const_reference<T>, int index)
 		{
-			if (lua_istable(L, index)) return 0; else return -1;
+			if (lua_istable(L, index)) return 0; else return no_match;
+		}
+
+		template<class T>
+		static int match(lua_State* L, by_value<T>, int index)
+		{
+			return match(L, by_const_reference<T>(), index);
 		}
 
 		template<class T>
@@ -84,44 +79,40 @@ namespace luabind { namespace detail {
 	struct container_converter_cpp_to_lua
 	{
 		template<class T>
-		void apply(lua_State* L, const T& container)
+		void to_lua(lua_State* L, const T& container)
 		{
 			typedef typename T::value_type value_type;
-
-			typedef typename find_conversion_policy<1, Policies>::type converter_policy;
-			typename mpl::apply_wrap2<converter_policy,value_type,lua_to_cpp>::type converter;
+			specialized_converter_policy_n<1, Policies, value_type, lua_to_cpp> converter;
 
 			lua_newtable(L);
 
 			int index = 1;
 
-			for (typename T::const_iterator i = container.begin(); i != container.end(); ++i)
+			for (const auto& element : container )
 			{
-				converter.apply(L, *i);
+				converter.apply(L, element);
 				lua_rawseti(L, -2, index);
 				++index;
 			}
 		}
 	};
 
-	template<int N, class Policies>
-//	struct container_policy : converter_policy_tag
-	struct container_policy : conversion_policy<N>
+	template<class Policies = no_policies>
+	struct container_policy
 	{
-//		BOOST_STATIC_CONSTANT(int, index = N);
-
-		static void precall(lua_State*, const index_map&) {}
-		static void postcall(lua_State*, const index_map&) {}
-
 		struct only_accepts_nonconst_pointers {};
 
 		template<class T, class Direction>
-		struct apply
-		{
-			typedef typename boost::mpl::if_<boost::is_same<lua_to_cpp, Direction>
-				, container_converter_lua_to_cpp<Policies>
-				, container_converter_cpp_to_lua<Policies>
-			>::type type;
+		struct specialize;
+
+		template<class T>
+		struct specialize<T, lua_to_cpp> {
+			using type = container_converter_lua_to_cpp<Policies>;
+		};
+
+		template<class T>
+		struct specialize<T, cpp_to_lua> {
+			using type = container_converter_cpp_to_lua<Policies>;
 		};
 	};
 
@@ -129,19 +120,9 @@ namespace luabind { namespace detail {
 
 namespace luabind
 {
-	template<int N>
-	detail::policy_cons<detail::container_policy<N, detail::null_type>, detail::null_type> 
-	container(LUABIND_PLACEHOLDER_ARG(N)) 
-	{ 
-		return detail::policy_cons<detail::container_policy<N, detail::null_type>, detail::null_type>(); 
-	}
-
-	template<int N, class Policies>
-	detail::policy_cons<detail::container_policy<N, Policies>, detail::null_type> 
-	container(LUABIND_PLACEHOLDER_ARG(N), const Policies&) 
-	{ 
-		return detail::policy_cons<detail::container_policy<N, Policies>, detail::null_type>(); 
-	}
+	template<unsigned int N, typename ElementPolicies = no_policies >
+	using container_policy = meta::type_list<converter_policy_injector<N,detail::container_policy<ElementPolicies>>>;
 }
 
 #endif // LUABIND_CONTAINER_POLICY_HPP_INCLUDED
+

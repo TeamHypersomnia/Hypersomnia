@@ -368,3 +368,4 @@ bool luabind::detail::class_rep::has_operator_in_lua(lua_State* L, int id)
 
 	return (m_operator_cache & mask) != 0;
 }
+

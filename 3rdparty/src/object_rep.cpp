@@ -38,7 +38,8 @@ namespace luabind { namespace detail
 		: m_instance(instance)
 		, m_classrep(crep)
 		, m_dependency_cnt(0)
-	{}
+	{
+	}
 
 	object_rep::~object_rep()
 	{

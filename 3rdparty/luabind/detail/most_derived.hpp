@@ -23,16 +23,15 @@
 #ifndef MOST_DERIVED_051018_HPP
 # define MOST_DERIVED_051018_HPP
 
-# include <boost/mpl/if.hpp>
-# include <boost/type_traits/is_base_and_derived.hpp>
+# include <type_traits>
 
 namespace luabind { namespace detail {
 
 template<class Class, class WrappedClass>
 struct most_derived
 {
-    typedef typename boost::mpl::if_<
-        boost::is_base_and_derived<Class, WrappedClass>
+    typedef typename std::conditional<
+		std::is_base_of<Class, WrappedClass>::value
       , WrappedClass
       , Class
     >::type type;

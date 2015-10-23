@@ -8,251 +8,226 @@
 #include <map>
 #include <vector>
 #include <queue>
-#include <boost/dynamic_bitset.hpp>
-#include <boost/foreach.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/tuple/tuple_comparison.hpp>
+#include <vector>
 #include <luabind/typeid.hpp>
 #include <luabind/detail/inheritance.hpp>
 
-namespace luabind { namespace detail {
+namespace luabind { 
+	
+	namespace detail {
 
-class_id const class_id_map::local_id_base =
-    std::numeric_limits<class_id>::max() / 2;
+		class_id const class_id_map::local_id_base = std::numeric_limits<class_id>::max() / 2;
 
-namespace
-{
+		namespace
+		{
 
-  struct edge
-  {
-      edge(class_id target, cast_function cast)
-        : target(target)
-        , cast(cast)
-      {}
+			struct edge
+			{
+				edge(class_id target, cast_function cast)
+					: target(target), cast(cast)
+				{}
 
-      class_id target;
-      cast_function cast;
-  };
+				class_id target;
+				cast_function cast;
+			};
 
-  bool operator<(edge const& x, edge const& y)
-  {
-      return x.target < y.target;
-  }
+			bool operator<(edge const& x, edge const& y)
+			{
+				return x.target < y.target;
+			}
 
-  struct vertex
-  {
-      vertex(class_id id)
-        : id(id)
-      {}
+			struct vertex
+			{
+				vertex(class_id id)
+					: id(id)
+				{}
 
-      class_id id;
-      std::vector<edge> edges;
-  };
+				class_id id;
+				std::vector<edge> edges;
+			};
 
-  typedef std::pair<std::ptrdiff_t, int> cache_entry;
+			typedef std::pair<std::ptrdiff_t, int> cache_entry;
 
-  class cache
-  {
-  public:
-      static std::ptrdiff_t const unknown;
-      static std::ptrdiff_t const invalid;
+			class cache
+			{
+			public:
+				static std::ptrdiff_t const unknown;
+				static std::ptrdiff_t const invalid;
 
-      cache_entry get(
-          class_id src, class_id target, class_id dynamic_id
-        , std::ptrdiff_t object_offset) const;
+				cache_entry get(class_id src, class_id target, class_id dynamic_id, std::ptrdiff_t object_offset) const;
 
-      void put(
-          class_id src, class_id target, class_id dynamic_id
-        , std::ptrdiff_t object_offset
-        , std::ptrdiff_t offset, int distance);
+				void put( class_id src, class_id target, class_id dynamic_id, std::ptrdiff_t object_offset, std::ptrdiff_t offset, int distance);
+				void invalidate();
 
-      void invalidate();
+			private:
+				typedef std::tuple<class_id, class_id, class_id, std::ptrdiff_t> key_type;
+				typedef std::map<key_type, cache_entry> map_type;
+				map_type m_cache;
+			};
 
-  private:
-      typedef boost::tuple<
-          class_id, class_id, class_id, std::ptrdiff_t> key_type;
-      typedef std::map<key_type, cache_entry> map_type;
-      map_type m_cache;
-  };
+			std::ptrdiff_t const cache::unknown = std::numeric_limits<std::ptrdiff_t>::max();
+			std::ptrdiff_t const cache::invalid = cache::unknown - 1;
 
-  std::ptrdiff_t const cache::unknown =
-      std::numeric_limits<std::ptrdiff_t>::max();
-  std::ptrdiff_t const cache::invalid = cache::unknown - 1;
+			cache_entry cache::get(class_id src, class_id target, class_id dynamic_id, std::ptrdiff_t object_offset) const
+			{
+				map_type::const_iterator i = m_cache.find(
+					key_type(src, target, dynamic_id, object_offset));
+				return i != m_cache.end() ? i->second : cache_entry(unknown, -1);
+			}
 
-  cache_entry cache::get(
-      class_id src, class_id target, class_id dynamic_id
-    , std::ptrdiff_t object_offset) const
-  {
-      map_type::const_iterator i = m_cache.find(
-          key_type(src, target, dynamic_id, object_offset));
-      return i != m_cache.end() ? i->second : cache_entry(unknown, -1);
-  }
+			void cache::put(class_id src, class_id target, class_id dynamic_id, std::ptrdiff_t object_offset, std::ptrdiff_t offset, int distance)
+			{
+				m_cache.insert(std::make_pair(key_type(src, target, dynamic_id, object_offset), cache_entry(offset, distance)));
+			}
 
-  void cache::put(
-      class_id src, class_id target, class_id dynamic_id
-    , std::ptrdiff_t object_offset, std::ptrdiff_t offset, int distance)
-  {
-      m_cache.insert(std::make_pair(
-          key_type(src, target, dynamic_id, object_offset)
-        , cache_entry(offset, distance)
-      ));
-  }
+			void cache::invalidate()
+			{
+				m_cache.clear();
+			}
 
-  void cache::invalidate()
-  {
-      m_cache.clear();
-  }
+		} // namespace anonymous
 
-} // namespace unnamed
+		class cast_graph::impl
+		{
+		public:
+			std::pair<void*, int> cast(
+				void* p, class_id src, class_id target
+				, class_id dynamic_id, void const* dynamic_ptr) const;
+			void insert(class_id src, class_id target, cast_function cast);
 
-class cast_graph::impl
-{
-public:
-    std::pair<void*, int> cast(
-        void* p, class_id src, class_id target
-      , class_id dynamic_id, void const* dynamic_ptr) const;
-    void insert(class_id src, class_id target, cast_function cast);
+		private:
+			std::vector<vertex> m_vertices;
+			mutable cache m_cache;
+		};
 
-private:
-    std::vector<vertex> m_vertices;
-    mutable cache m_cache;
-};
+		namespace
+		{
 
-namespace
-{
+			struct queue_entry
+			{
+				queue_entry(void* p, class_id vertex_id, int distance)
+				: p(p)
+				, vertex_id(vertex_id)
+				, distance(distance)
+				{}
 
-  struct queue_entry
-  {
-      queue_entry(void* p, class_id vertex_id, int distance)
-        : p(p)
-        , vertex_id(vertex_id)
-        , distance(distance)
-      {}
+				void* p;
+				class_id vertex_id;
+				int distance;
+			};
 
-      void* p;
-      class_id vertex_id;
-      int distance;
-  };
+		} // namespace anonymous
 
-} // namespace unnamed
+		std::pair<void*, int> cast_graph::impl::cast(void* const p, class_id src, class_id target, class_id dynamic_id, void const* dynamic_ptr) const
+		{
+			if (src == target) return std::make_pair(p, 0);
+			if (src >= m_vertices.size() || target >= m_vertices.size()) return std::pair<void*, int>((void*)0, -1);
 
-std::pair<void*, int> cast_graph::impl::cast(
-    void* const p, class_id src, class_id target
-  , class_id dynamic_id, void const* dynamic_ptr) const
-{
-    if (src == target)
-        return std::make_pair(p, 0);
+			std::ptrdiff_t const object_offset = (char const*)dynamic_ptr - (char const*)p;
+			cache_entry cached = m_cache.get(src, target, dynamic_id, object_offset);
 
-    if (src >= m_vertices.size() || target >= m_vertices.size())
-        return std::pair<void*, int>((void*)0, -1);
+			if (cached.first != cache::unknown)
+			{
+				if (cached.first == cache::invalid)
+					return std::pair<void*, int>((void*)0, -1);
+				return std::make_pair((char*)p + cached.first, cached.second);
+			}
 
-    std::ptrdiff_t const object_offset =
-        (char const*)dynamic_ptr - (char const*)p;
+			std::queue<queue_entry> q;
+			q.push(queue_entry(p, src, 0));
 
-    cache_entry cached = m_cache.get(src, target, dynamic_id, object_offset);
+			// Original source used boost::dynamic_bitset but didn't make use
+			// of its advanced capability of set operations, that's why I think
+			// it's safe to use a std::vector<bool> here.
 
-    if (cached.first != cache::unknown)
-    {
-        if (cached.first == cache::invalid)
-            return std::pair<void*, int>((void*)0, -1);
-        return std::make_pair((char*)p + cached.first, cached.second);
-    }
+			std::vector<bool> visited(m_vertices.size(),false);
 
-    std::queue<queue_entry> q;
-    q.push(queue_entry(p, src, 0));
+			while (!q.empty())
+			{
+				queue_entry const qe = q.front();
+				q.pop();
 
-    boost::dynamic_bitset<> visited(m_vertices.size());
+				visited[qe.vertex_id] = true;
+				vertex const& v = m_vertices[qe.vertex_id];
 
-    while (!q.empty())
-    {
-        queue_entry const qe = q.front();
-        q.pop();
+				if (v.id == target)
+				{
+					m_cache.put(
+						src, target, dynamic_id, object_offset
+						, (char*)qe.p - (char*)p, qe.distance
+					);
 
-        visited[qe.vertex_id] = true;
-        vertex const& v = m_vertices[qe.vertex_id];
+					return std::make_pair(qe.p, qe.distance);
+				}
 
-        if (v.id == target)
-        {
-            m_cache.put(
-                src, target, dynamic_id, object_offset
-              , (char*)qe.p - (char*)p, qe.distance
-            );
+				for (auto const& e : v.edges) {
+					if (visited[e.target])
+						continue;
+					if (void* casted = e.cast(qe.p))
+						q.push(queue_entry(casted, e.target, qe.distance + 1));
+				}
+			}
 
-            return std::make_pair(qe.p, qe.distance);
-        }
+			m_cache.put(src, target, dynamic_id, object_offset, cache::invalid, -1);
 
-        BOOST_FOREACH(edge const& e, v.edges)
-        {
-            if (visited[e.target])
-                continue;
-            if (void* casted = e.cast(qe.p))
-                q.push(queue_entry(casted, e.target, qe.distance + 1));
-        }
-    }
+			return std::pair<void*, int>((void*)0, -1);
+		}
 
-    m_cache.put(src, target, dynamic_id, object_offset, cache::invalid, -1);
+		void cast_graph::impl::insert(class_id src, class_id target, cast_function cast)
+		{
+			class_id const max_id = std::max(src, target);
 
-    return std::pair<void*, int>((void*)0, -1);
-}
+			if (max_id >= m_vertices.size())
+			{
+				m_vertices.reserve(max_id + 1);
+				for (class_id i = m_vertices.size(); i < max_id + 1; ++i)
+					m_vertices.push_back(vertex(i));
+			}
 
-void cast_graph::impl::insert(
-    class_id src, class_id target, cast_function cast)
-{
-    class_id const max_id = std::max(src, target);
+			std::vector<edge>& edges = m_vertices[src].edges;
 
-    if (max_id >= m_vertices.size())
-    {
-        m_vertices.reserve(max_id + 1);
-        for (class_id i = m_vertices.size(); i < max_id + 1; ++i)
-            m_vertices.push_back(vertex(i));
-    }
+			std::vector<edge>::iterator i = std::lower_bound(
+				edges.begin(), edges.end(), edge(target, 0)
+			);
 
-    std::vector<edge>& edges = m_vertices[src].edges;
+			if (i == edges.end() || i->target != target)
+			{
+				edges.insert(i, edge(target, cast));
+				m_cache.invalidate();
+			}
+		}
 
-    std::vector<edge>::iterator i = std::lower_bound(
-        edges.begin(), edges.end(), edge(target, 0)
-    );
+		std::pair<void*, int> cast_graph::cast(void* p, class_id src, class_id target, class_id dynamic_id, void const* dynamic_ptr) const
+		{
+			return m_impl->cast(p, src, target, dynamic_id, dynamic_ptr);
+		}
 
-    if (i == edges.end() || i->target != target)
-    {
-        edges.insert(i, edge(target, cast));
-        m_cache.invalidate();
-    }
-}
+		void cast_graph::insert(class_id src, class_id target, cast_function cast)
+		{
+			m_impl->insert(src, target, cast);
+		}
 
-std::pair<void*, int> cast_graph::cast(
-    void* p, class_id src, class_id target
-  , class_id dynamic_id, void const* dynamic_ptr) const
-{
-    return m_impl->cast(p, src, target, dynamic_id, dynamic_ptr);
-}
+		cast_graph::cast_graph()
+			: m_impl(new impl)
+		{}
 
-void cast_graph::insert(class_id src, class_id target, cast_function cast)
-{
-    m_impl->insert(src, target, cast);
-}
+		cast_graph::~cast_graph()
+		{}
 
-cast_graph::cast_graph()
-  : m_impl(new impl)
-{}
+		LUABIND_API class_id allocate_class_id(type_id const& cls)
+		{
+			typedef std::map<type_id, class_id> map_type;
 
-cast_graph::~cast_graph()
-{}
+			static map_type registered;
+			static class_id id = 0;
 
-LUABIND_API class_id allocate_class_id(type_id const& cls)
-{
-    typedef std::map<type_id, class_id> map_type;
+			std::pair<map_type::iterator, bool> inserted = registered.insert(std::make_pair(cls, id));
+			if (inserted.second) ++id;
 
-    static map_type registered;
-    static class_id id = 0;
+			return inserted.first->second;
+		}
 
-    std::pair<map_type::iterator, bool> inserted = registered.insert(
-        std::make_pair(cls, id));
+	}	// namespace detail
 
-    if (inserted.second)
-        ++id;
+} // namespace luabind
 
-    return inserted.first->second;
-}
-
-}} // namespace luabind::detail

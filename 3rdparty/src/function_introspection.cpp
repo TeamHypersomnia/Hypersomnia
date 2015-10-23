@@ -38,12 +38,18 @@
 // Internal Includes
 #include <luabind/function_introspection.hpp>
 #include <luabind/config.hpp>           // for LUABIND_API
+
+#include <luabind/wrapper_base.hpp>
+#include <luabind/detail/call_member.hpp>
+
 #include <luabind/detail/stack_utils.hpp>  // for stack_pop
 #include <luabind/function.hpp>         // for def, is_luabind_function
 #include <luabind/detail/call.hpp>      // for function_object
 #include <luabind/detail/object.hpp>    // for argument, object, etc
 #include <luabind/from_stack.hpp>       // for from_stack
 #include <luabind/scope.hpp>            // for module, module_, scope
+#include <luabind/lua_argument_proxy.hpp>
+#include <luabind/detail/conversion_policies/conversion_policies.hpp>
 
 // Library/third-party includes
 // - none
@@ -108,3 +114,4 @@ LUABIND_API int bind_function_introspection(lua_State * L) {
 }
 
 } // end of namespace luabind
+

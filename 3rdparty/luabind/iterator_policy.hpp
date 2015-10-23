@@ -25,7 +25,7 @@ struct iterator
 
         if (self->first != self->last)
         {
-            convert_to_lua(L, *self->first);
+            push_to_lua(L, *self->first);
             ++self->first;
         }
         else
@@ -76,41 +76,35 @@ struct iterator_converter
     typedef iterator_converter type;
 
     template <class Container>
-    void apply(lua_State* L, Container& container)
+    void to_lua(lua_State* L, Container& container)
     {
         make_range(L, container);
     }
 
     template <class Container>
-    void apply(lua_State* L, Container const& container)
+    void tu_lua(lua_State* L, Container const& container)
     {
         make_range(L, container);
     }
 };
 
-struct iterator_policy : conversion_policy<0>
+struct iterator_policy
 {
-    static void precall(lua_State*, index_map const&)
-    {}
-
-    static void postcall(lua_State*, index_map const&)
-    {}
-
     template <class T, class Direction>
-    struct apply
+    struct specialize
     {
+		static_assert(std::is_same<Direction, cpp_to_lua>::value, "Iterator policy can only convert from cpp to lua.");
         typedef iterator_converter type;
     };
 };
 
 }} // namespace luabind::detail
 
-namespace luabind { namespace {
+namespace luabind { 
 
-LUABIND_ANONYMOUS_FIX detail::policy_cons<
-    detail::iterator_policy, detail::null_type> return_stl_iterator;
+	using return_stl_iterator = policy_list<converter_policy_injector<0,detail::iterator_policy>>;
 
-}} // namespace luabind::unnamed
+} // namespace luabind::unnamed
 
 #endif // LUABIND_ITERATOR_POLICY__071111_HPP
 

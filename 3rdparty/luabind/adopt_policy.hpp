@@ -32,12 +32,11 @@
 
 #include <luabind/detail/policy.hpp>
 #include <luabind/back_reference_fwd.hpp>
-#include <boost/type_traits/is_polymorphic.hpp>
 
 namespace luabind { namespace detail 
 {
     template <class T>
-    void adjust_backref_ownership(T* ptr, mpl::true_)
+    void adjust_backref_ownership(T* ptr, std::true_type)
     {
         if (wrap_base* p = dynamic_cast<wrap_base*>(ptr))
         {
@@ -47,7 +46,7 @@ namespace luabind { namespace detail
         }
     }
 
-    inline void adjust_backref_ownership(void*, mpl::false_)
+    inline void adjust_backref_ownership(void*, std::false_type)
     {}
 
 	template <class Pointer, class Direction = lua_to_cpp>
@@ -55,22 +54,19 @@ namespace luabind { namespace detail
 	{
 		typedef adopt_pointer type;
 
-        int consumed_args(...) const
-        {
-            return 1;
-        }
+		enum { consumed_args = 1 };
 
 		template<class T>
-		T* apply(lua_State* L, by_pointer<T>, int index)
+		T* to_cpp(lua_State* L, by_pointer<T>, int index)
 		{
-            T* ptr = pointer_converter::apply(
-                L, LUABIND_DECORATE_TYPE(T*), index);
+            T* ptr = pointer_converter::to_cpp(
+                L, decorated_type<T*>(), index);
 
             object_rep* obj = static_cast<object_rep*>(
                 lua_touserdata(L, index));
             obj->release();
 
-            adjust_backref_ownership(ptr, boost::is_polymorphic<T>());
+            adjust_backref_ownership(ptr, std::is_polymorphic<T>());
 
             return ptr;
 		}
@@ -78,8 +74,7 @@ namespace luabind { namespace detail
 		template<class T>
 		int match(lua_State* L, by_pointer<T>, int index)
 		{
-            return pointer_converter::match(
-                L, LUABIND_DECORATE_TYPE(T*), index);
+            return pointer_converter::match( L, decorated_type<T*>(), index );
 		}
 
 		template<class T>
@@ -95,7 +90,7 @@ namespace luabind { namespace detail
     template <class T>
     struct pointer_or_default<void, T>
     {
-        typedef std::auto_ptr<T> type;
+        typedef std::unique_ptr<T> type;
     };
 
 	template <class Pointer>
@@ -104,7 +99,7 @@ namespace luabind { namespace detail
 		typedef adopt_pointer type;
 
 		template<class T>
-		void apply(lua_State* L, T* ptr)
+		void to_lua(lua_State* L, T* ptr)
 		{
 			if (ptr == 0) 
 			{
@@ -121,29 +116,18 @@ namespace luabind { namespace detail
             typedef typename pointer_or_default<Pointer, T>::type
                 pointer_type;
 
-            make_instance(L, pointer_type(ptr));
+            make_pointer_instance(L, pointer_type(ptr));
 		}
 	};
 
-	template <int N, class Pointer = void>
-	struct adopt_policy : conversion_policy<N>
+	template <class Pointer>
+	struct adopt_policy_impl
 	{
-//		BOOST_STATIC_CONSTANT(int, index = N);
-
-		static void precall(lua_State*, const index_map&) {}
-		static void postcall(lua_State*, const index_map&) {}
-
-		struct only_accepts_nonconst_pointers {};
-
 		template<class T, class Direction>
-		struct apply
+		struct specialize
 		{
-			typedef luabind::detail::is_nonconst_pointer<T> is_nonconst_p;
-			typedef typename boost::mpl::if_<
-                is_nonconst_p
-              , adopt_pointer<Pointer, Direction>
-              , only_accepts_nonconst_pointers
-            >::type type;
+			static_assert(detail::is_nonconst_pointer<T>::value, "Adopt policy only accepts non-const pointers");
+			using type = adopt_pointer<Pointer, Direction>;
 		};
 	};
 
@@ -151,19 +135,9 @@ namespace luabind { namespace detail
 
 namespace luabind
 {
-	template<int N>
-	detail::policy_cons<detail::adopt_policy<N>, detail::null_type> 
-	adopt(LUABIND_PLACEHOLDER_ARG(N))
-	{ 
-		return detail::policy_cons<detail::adopt_policy<N>, detail::null_type>(); 
-	}
-
-    template <class Pointer, int N>
-    detail::policy_cons<detail::adopt_policy<N, Pointer>, detail::null_type>
-    adopt(LUABIND_PLACEHOLDER_ARG(N))
-    {
-        return detail::policy_cons<detail::adopt_policy<N, Pointer>, detail::null_type>();
-    }
+	// Caution: if we use the aliased type "policy_list" here, MSVC crashes.
+	template<unsigned int N, typename Pointer = void>
+	using adopt_policy = meta::type_list<converter_policy_injector<N,detail::adopt_policy_impl<Pointer>>>;
 }
 
 #endif // LUABIND_ADOPT_POLICY_HPP_INCLUDE

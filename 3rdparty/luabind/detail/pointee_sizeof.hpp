@@ -23,8 +23,7 @@
 #ifndef POINTEE_SIZEOF_040211_HPP
 #define POINTEE_SIZEOF_040211_HPP
 
-#include <boost/mpl/int.hpp>
-
+// TODO: Unused in whole project => Remove.
 namespace luabind {
 
     namespace detail {
@@ -41,11 +40,8 @@ namespace luabind {
     template<class T>
     struct pointee_sizeof
     {
-        BOOST_STATIC_CONSTANT(int, value = (
-            sizeof(detail::deref_type((T(*)())0), 0L)
-        ));
-
-        typedef boost::mpl::int_<value> type;
+		static const int value = sizeof(detail::deref_type((T(*)())0), 0L);
+		typedef std::integral_constant<int, value> type;
     };
 
 } // namespace luabind

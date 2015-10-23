@@ -28,8 +28,8 @@ extern "C"
 {
 #endif
 
-	#include <lua/lua.h>
-	#include <lua/lauxlib.h>
+	#include "lua.h"
+	#include "lauxlib.h"
 
 #ifndef LUABIND_CPLUSPLUS_LUA
 }

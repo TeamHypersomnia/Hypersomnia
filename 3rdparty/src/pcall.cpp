@@ -30,12 +30,12 @@ namespace luabind { namespace detail
 {
 	int pcall(lua_State *L, int nargs, int nresults)
 	{
-		pcall_callback_fun e = get_pcall_callback();
+		pcall_callback_fun e=get_pcall_callback();
 		int en = 0;
 		if ( e )
 		{
 			int base = lua_gettop(L) - nargs;
-			lua_pushcfunction(L, e);
+			e(L);
 			lua_insert(L, base);  // push pcall_callback under chunk and args
 			en = base;
   		}
@@ -58,3 +58,4 @@ namespace luabind { namespace detail
 	}
 
 }}
+

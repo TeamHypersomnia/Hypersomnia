@@ -23,32 +23,29 @@
 #ifndef LUABIND_BACK_REFERENCE_040510_HPP
 #define LUABIND_BACK_REFERENCE_040510_HPP
 
+#include <luabind/config.hpp>
 #include <luabind/lua_state_fwd.hpp>
+#include <type_traits>
 
 #if !defined(LUABIND_NO_RTTI) && !defined(LUABIND_WRAPPER_BASE_HPP_INCLUDED)
-# include <luabind/wrapper_base.hpp>
+#include <luabind/wrapper_base.hpp>
 #endif
 
-#include <luabind/detail/has_get_pointer.hpp>
-#include <luabind/get_pointer.hpp>
-#include <boost/type_traits/is_polymorphic.hpp>
-#include <boost/mpl/bool.hpp>
+#include <luabind/pointer_traits.hpp>
 
 namespace luabind {
   struct wrap_base;
 
 namespace detail
-{
-  namespace mpl = boost::mpl;
- 
+{ 
   template<class T>
-  wrap_base const* get_back_reference_aux0(T const* p, mpl::true_)
+  wrap_base const* get_back_reference_aux0(T const* p, std::true_type)
   {
       return dynamic_cast<wrap_base const*>(p);
   }
 
   template<class T>
-  wrap_base const* get_back_reference_aux0(T const*, mpl::false_)
+  wrap_base const* get_back_reference_aux0(T const*, std::false_type)
   {
       return 0;
   }
@@ -56,17 +53,17 @@ namespace detail
   template<class T>
   wrap_base const* get_back_reference_aux1(T const* p)
   {
-      return get_back_reference_aux0(p, boost::is_polymorphic<T>());
+      return get_back_reference_aux0(p, std::is_polymorphic<T>());
   }
 
   template<class T>
-  wrap_base const* get_back_reference_aux2(T const& x, mpl::true_)
+  wrap_base const* get_back_reference_aux2(T const& x, std::true_type)
   {
       return get_back_reference_aux1(get_pointer(x));
   }
 
   template<class T>
-  wrap_base const* get_back_reference_aux2(T const& x, mpl::false_)
+  wrap_base const* get_back_reference_aux2(T const& x, std::false_type)
   {
       return get_back_reference_aux1(&x);
   }

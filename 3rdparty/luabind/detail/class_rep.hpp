@@ -24,9 +24,6 @@
 #ifndef LUABIND_CLASS_REP_HPP_INCLUDED
 #define LUABIND_CLASS_REP_HPP_INCLUDED
 
-#include <boost/limits.hpp>
-#include <boost/preprocessor/repetition/enum_params_with_a_default.hpp>
-
 #include <string>
 #include <utility>
 #include <vector>
@@ -213,3 +210,4 @@ namespace luabind { namespace detail
 //#include <luabind/detail/overload_rep_impl.hpp>
 
 #endif // LUABIND_CLASS_REP_HPP_INCLUDED
+

@@ -89,3 +89,4 @@ LUABIND_API void register_exception_handler(exception_handler_base* handler)
 }} // namespace luabind::detail
 
 #endif // LUABIND_NO_EXCEPTIONS
+

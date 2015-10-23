@@ -32,41 +32,41 @@
 
 namespace luabind {
 
-namespace
-{
+	namespace
+	{
 
-  int make_property(lua_State* L)
-  {
-      int args = lua_gettop(L);
+		int make_property(lua_State* L)
+		{
+			int args = lua_gettop(L);
 
-      if (args == 0 || args > 2)
-      {
-          lua_pushstring(L, "make_property() called with wrong number of arguments.");
-          lua_error(L);
-      }
+			if (args == 0 || args > 2)
+			{
+				lua_pushstring(L, "make_property() called with wrong number of arguments.");
+				lua_error(L);
+			}
 
-      if (args == 1)
-          lua_pushnil(L);
+			if (args == 1)
+				lua_pushnil(L);
 
-      lua_pushcclosure(L, &detail::property_tag, 2);
-      return 1;
-  }
+			lua_pushcclosure(L, &detail::property_tag, 2);
+			return 1;
+		}
 
-  int main_thread_tag;
+		int main_thread_tag;
 
-  int deprecated_super(lua_State* L)
-  {
-      lua_pushstring(L,
-          "DEPRECATION: 'super' has been deprecated in favor of "
-          "directly calling the base class __init() function. "
-          "This error can be disabled by calling 'luabind::disable_super_deprecation()'."
-      );
-      lua_error(L);
+		int deprecated_super(lua_State* L)
+		{
+			lua_pushstring(L,
+				"DEPRECATION: 'super' has been deprecated in favor of "
+				"directly calling the base class __init() function. "
+				"This error can be disabled by calling 'luabind::disable_super_deprecation()'."
+			);
+			lua_error(L);
 
-      return 0;
-  }
+			return 0;
+		}
 
-} // namespace unnamed
+	} // namespace unnamed
 
     LUABIND_API lua_State* get_main_thread(lua_State* L)
     {
@@ -80,7 +80,9 @@ namespace
 
         return result;
     }
+
     namespace {
+
         template<typename T>
         inline void * shared_create_userdata(lua_State* L, const char * name) {
             lua_pushstring(L, name);
@@ -110,7 +112,8 @@ namespace
             // placement "new"
             new (storage) T(constructorArg);
         }
-    }
+
+    }	// namespace anonymous
 
     LUABIND_API void open(lua_State* L)
     {
@@ -144,7 +147,7 @@ namespace
         lua_pushcclosure(L, &deprecated_super, 0);
         lua_setglobal(L, "super");
 
-        //set_package_preload(L, "luabind.function_introspection", &bind_function_introspection);
+        set_package_preload(L, "luabind.function_introspection", &bind_function_introspection);
     }
 
 } // namespace luabind

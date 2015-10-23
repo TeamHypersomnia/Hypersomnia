@@ -78,3 +78,4 @@ namespace luabind { namespace detail {
 }}
 
 #endif // LUABIND_OPERATOR_ID_HPP_INCLUDED
+

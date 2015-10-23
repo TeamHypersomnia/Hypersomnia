@@ -20,56 +20,46 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
 
-#define LUABIND_BUILDING
+#ifndef LUABIND_CALL_SHARED_HPP_INCLUDED
+#define LUABIND_CALL_SHARED_HPP_INCLUDED
 
-#include <luabind/error.hpp>
+namespace luabind {
+	namespace detail {
 
+		inline void call_error(lua_State* L)
+		{
+#ifndef LUABIND_NO_EXCEPTIONS
+			throw luabind::error(L);
+#else
+			error_callback_fun e = get_error_callback();
+			if (e) e(L);
 
-namespace luabind
-{
-
-	namespace
-	{
-		pcall_callback_fun pcall_callback = 0;
-#ifdef LUABIND_NO_EXCEPTIONS
-		error_callback_fun error_callback = 0;
-		cast_failed_callback_fun cast_failed_callback = 0;
+			assert(0 && "the lua function threw an error and exceptions are disabled."
+				" If you want to handle the error you can use luabind::set_error_callback()");
+			std::terminate();
 #endif
+		}
+
+		template<typename T>
+		void cast_error(lua_State* L)
+		{
+#ifndef LUABIND_NO_EXCEPTIONS
+			throw cast_failed(L, typeid(T));
+#else
+			cast_failed_callback_fun e = get_cast_failed_callback();
+			if (e) e(L, typeid(Ret));
+
+			assert(0 && "the lua function's return value could not be converted."
+				" If you want to handle the error you can use luabind::set_error_callback()");
+			std::terminate();
+#endif	
+		}
+
+		template< typename... Args >
+		void expand_hack(Args... args)
+		{}
+
 	}
-
-
-#ifdef LUABIND_NO_EXCEPTIONS
-
-	void set_error_callback(error_callback_fun e)
-	{
-		error_callback = e;
-	}
-
-	void set_cast_failed_callback(cast_failed_callback_fun c)
-	{
-		cast_failed_callback = c;
-	}
-
-	error_callback_fun get_error_callback()
-	{
-		return error_callback;
-	}
-
-	cast_failed_callback_fun get_cast_failed_callback()
-	{
-		return cast_failed_callback;
-	}
-
-#endif
-
-	void set_pcall_callback(pcall_callback_fun e)
-	{
-		pcall_callback = e;
-	}
-
-	pcall_callback_fun get_pcall_callback()
-	{
-		return pcall_callback;
-	}
-
 }
+
+#endif

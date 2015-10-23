@@ -6,7 +6,7 @@
 # define LUABIND_CONVERSION_STORAGE_080930_HPP
 
 # include <luabind/config.hpp>
-# include <boost/aligned_storage.hpp>
+# include <type_traits>
 
 namespace luabind { namespace detail {
 
@@ -31,7 +31,7 @@ struct conversion_storage
     // Unfortunately the converters currently doesn't have access to
     // the actual type being converted when this is instantiated, so
     // we have to guess a max size.
-    boost::aligned_storage<128> data;
+    std::aligned_storage<128> data;
     destruction_function destructor;
 };
 

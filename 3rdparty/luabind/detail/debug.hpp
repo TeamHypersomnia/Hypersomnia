@@ -53,3 +53,4 @@ namespace luabind { namespace detail
 #endif
 
 #endif // LUABIND_DEBUG_HPP_INCLUDED
+

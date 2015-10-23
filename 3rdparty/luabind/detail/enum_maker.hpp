@@ -121,3 +121,4 @@ namespace luabind
 }
 
 #endif // LUABIND_ENUM_MAKER_HPP_INCLUDED
+
