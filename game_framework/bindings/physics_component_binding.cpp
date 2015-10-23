@@ -75,8 +75,8 @@ namespace bindings {
 
 			luabind::class_<physics_system::query_output>("query_output")
 			.def(luabind::constructor<>())
-			.def_readwrite("bodies", &physics_system::query_output::bodies, luabind::return_stl_iterator)
-			.def_readwrite("details", &physics_system::query_output::details, luabind::return_stl_iterator)
+			.def_readwrite("bodies", &physics_system::query_output::bodies, luabind::return_stl_iterator())
+			.def_readwrite("details", &physics_system::query_output::details, luabind::return_stl_iterator())
 			,
 
 			luabind::class_<b2World>("b2World")

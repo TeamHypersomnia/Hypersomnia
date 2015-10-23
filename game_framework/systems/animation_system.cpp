@@ -2,6 +2,7 @@
 #include "animation_system.h"
 #include "entity_system/world.h"
 #include "../messages/animate_message.h"
+#include <iostream>
 
 using namespace messages;
 using namespace resources;

@@ -6,10 +6,6 @@
 #undef min
 #undef max
 
-#ifdef INCLUDE_DWM
-#include <dwmapi.h>
-#endif
-
 #include "math/vec2d.h"
 
 #include <lua/lua.hpp>

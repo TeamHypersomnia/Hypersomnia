@@ -12,6 +12,7 @@
 
 #include <limits>
 #include <set>
+#include <iostream>
 
 template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
@@ -64,8 +65,6 @@ std::vector<augs::vec2<>> components::visibility::layer::get_polygon(float dista
 			int found_nan = 24;
 			std::cout << found_nan << std::endl;
 			break;
-
-
 		}
 
 		/* always push the first point */

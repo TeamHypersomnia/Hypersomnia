@@ -32,12 +32,12 @@ namespace luabind
 			return lua_type(s, index) == LUA_TSTRING ? 0 : -1;
 		}
 
-		std::wstring from(lua_State * s, int index) {
+		std::wstring to_cpp_deferred(lua_State * s, int index) {
 			std::string utf8str(lua_tostring(s, index));
 			return std::wstring(utf8str.begin(), utf8str.end());
 		}
 
-		void to(lua_State * s, const std::wstring & wstr) {
+		void to_lua_deferred(lua_State * s, const std::wstring & wstr) {
 			auto str = wstrtostr(wstr);
 			lua_pushstring(s, str.c_str());
 		}

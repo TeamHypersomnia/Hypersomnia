@@ -3,6 +3,7 @@
 #include "lua_state_wrapper.h"
 
 #include <fstream>
+#include <iostream>
 
 namespace augs {
 	script::script(lua_state_wrapper& lua_state) : lua_state(lua_state), needs_recompilation(false), is_associated_string_filename(false) {

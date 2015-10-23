@@ -4,10 +4,10 @@
 
 namespace messages {
 	struct collision_message : public message {
-		augs::entity_system::entity* collider;
+		augs::entity_system::entity* collider = nullptr;
 		augs::vec2<> collider_impact_velocity, subject_impact_velocity, point;
 
-		bool sensor_end_contact;
-		collision_message() : sensor_end_contact(false) { send_to_scripts = true;  }
+		bool sensor_end_contact = false;
+		collision_message() { send_to_scripts = true; }
 	};
 }

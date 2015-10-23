@@ -10,6 +10,8 @@
 #include "../resources/render_info.h"
 #include "../game/body_helper.h"
 
+#include <iostream>
+
 pathfinding_system::pathfinding_system() : draw_memorised_walls(false), draw_undiscovered(false),
 	epsilon_distance_the_same_vertex(3.f) {}
 

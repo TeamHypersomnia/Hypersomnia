@@ -1,25 +1,5 @@
 #pragma once
 
-/*
-Debug:
-
-glew32sd.lib
-OpenGL32.lib
-Ws2_32.lib
-dwmapi.lib
-freetype2412MT_D.lib
-Gdiplus.lib
-
-Release:
-
-glew32s.lib
-OpenGL32.lib
-Ws2_32.lib
-dwmapi.lib
-freetype2412MT.lib
-Gdiplus.lib
-*/
-
 #include <memory>
 
 struct FT_LibraryRec_;

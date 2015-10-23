@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <iostream>
 #include "fbo.h"
 
 namespace augs {
