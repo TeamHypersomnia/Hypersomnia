@@ -13,5 +13,5 @@
 #define errsf(expression, str, retflag) retflag = retflag ? int(expression) : 0;
 
 #else
-#include "error\error.h"
+#include "error\augs_error.h"
 #endif

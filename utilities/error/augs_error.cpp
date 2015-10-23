@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "error.h"
+#include "augs_error.h"
 #define UNICODE
 #include <Windows.h>
 #undef min
@@ -11,19 +11,19 @@ namespace augs {
 	using namespace error_logging;
 	log_file global_log;
 
-	module errors(module::last_error, module::last_error, &global_log);
-	module glew_errors(module::glew_last_error, module::glew_last_error, &global_log);
+	module errors = module(module::last_error, module::last_error, &global_log);
+	module glew_errors = module(module::glew_last_error, module::glew_last_error, &global_log);
 	
 	namespace window {
-		module errors(module::last_error, module::last_error, &global_log);
+		module errors = module(module::last_error, module::last_error, &global_log);
 	}
 	
 	namespace texture_baker {
-		module errors(module::gl_last_error, module::gl_last_error, &global_log);
+		module errors = module(module::gl_last_error, module::gl_last_error, &global_log);
 	}
 
 	namespace network {
-		module errors(module::wsa_last_error, module::wsa_last_error, &global_log);
+		module errors = module(module::wsa_last_error, module::wsa_last_error, &global_log);
 	}
 
 

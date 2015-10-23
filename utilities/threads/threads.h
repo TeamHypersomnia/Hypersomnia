@@ -1,5 +1,5 @@
 #pragma once
-#include "../error/error.h"
+#include "../error/augs_error.h"
 #include <memory>
 
 /* todo: rozbudowac pool o priority i critical path */
