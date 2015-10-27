@@ -47,7 +47,7 @@ end
 function debug.post_traceback() 
 	local outstr, globals_str = debug.get_stack_contents()
 	
-	local file = io.open("error_message.log", "w")
+	local file = io.open("logs/error_message.log", "w")
 	file:write(outstr .. globals_str)
 	file:close()
 	

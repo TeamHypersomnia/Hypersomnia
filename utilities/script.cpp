@@ -86,7 +86,7 @@ namespace augs {
 			if (result != 0)
 				return lua_tostring(lua_state, -1);
 			else {
-				lua_dump(lua_state, lua_writer, &bytecode);
+				lua_dump(lua_state, lua_writer, &bytecode, 0);
 				lua_pop(lua_state, 1);
 			}
 		}
@@ -119,7 +119,7 @@ namespace augs {
 			luabind::call_function<void>(luabind::object(luabind::from_stack(lua_state, -1)));
 			lua_pop(lua_state, 1);
 		}
-		catch (std::exception error_exception) {
+		catch (luabind::error error_exception) {
 			//std::string compilation_error;//(lua_tostring(lua_state, -1));
 			report_errors(std::string(error_exception.what()));
 			return compilation_error;

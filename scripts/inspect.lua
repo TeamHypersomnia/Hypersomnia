@@ -150,7 +150,7 @@ function inspect.inspect(rootObject, options)
   local parse_userdata = function(v)
 	local in_table = {}
 	
-	if type(v) == 'userdata' then
+	if false then
 		local c_info = class_info(v)
 		
 		if c_info ~= nil then

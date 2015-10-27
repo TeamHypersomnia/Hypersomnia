@@ -3,6 +3,7 @@
 #include "entity_system/entity.h"
 
 #include "input_system.h"
+#include <iostream>
 
 input_system::input_system(window::glwindow& input_window) : input_window(input_window), quit_flag(0) {
 
