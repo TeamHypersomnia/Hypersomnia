@@ -79,9 +79,11 @@ function gui_class:set_enabled(flag)
 		end
 		
 		
-		local val = 0
-		if flag then val = 1 end
-		set_cursor_visible(val)
+		if flag then 
+			set_cursor_visible(1)
+		else 
+			set_cursor_visible(0) 
+		end
 	end
 end
 

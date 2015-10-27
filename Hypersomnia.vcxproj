@@ -40,12 +40,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(AUG_3RDPARTY)\boost;$(ProjectDir)..\Augmentations\3rdparty;$(ProjectDir)..\Augmentations\utilities;$(ProjectDir)..\Augmentations\3rdparty\gtest;$(ProjectDir)..\Augmentations;$(ProjectDir)..\Augmentations\3rdparty\freetype;$(ProjectDir)..\Augmentations\3rdparty\RakNet\Source;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\Augmentations\3rdparty;$(ProjectDir)..\Augmentations\utilities;$(ProjectDir)..\Augmentations\3rdparty\gtest;$(ProjectDir)..\Augmentations;$(ProjectDir)..\Augmentations\3rdparty\freetype;$(ProjectDir)..\Augmentations\3rdparty\RakNet\Source;$(ProjectDir)..\Augmentations\3rdparty\lua;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)..\Augmentations\3rdparty\libs;$(LibraryPath)</LibraryPath>
     <OutDir>$(ProjectDir)\output\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(AUG_3RDPARTY)\boost;$(ProjectDir)..\Augmentations\3rdparty;$(ProjectDir)..\Augmentations\utilities;$(ProjectDir)..\Augmentations\3rdparty\gtest;$(ProjectDir)..\Augmentations;$(ProjectDir)..\Augmentations\3rdparty\freetype;$(ProjectDir)..\Augmentations\3rdparty\RakNet\Source;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\Augmentations\3rdparty;$(ProjectDir)..\Augmentations\utilities;$(ProjectDir)..\Augmentations\3rdparty\gtest;$(ProjectDir)..\Augmentations;$(ProjectDir)..\Augmentations\3rdparty\freetype;$(ProjectDir)..\Augmentations\3rdparty\RakNet\Source;$(ProjectDir)..\Augmentations\3rdparty\lua;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)..\Augmentations\3rdparty\libs;$(LibraryPath)</LibraryPath>
     <OutDir>$(ProjectDir)\output\</OutDir>
     <TargetName>$(ProjectName)-debug</TargetName>
@@ -68,7 +68,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>OpenGL32.lib;Ws2_32.lib;dwmapi.lib;Gdiplus.lib;openal32.lib;sndfile.lib;winmm.lib;freetype253MT.lib;liblua52.a;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OpenGL32.lib;Ws2_32.lib;Gdiplus.lib;openal32.lib;sndfile.lib;winmm.lib;freetype253MT.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -85,7 +85,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>OpenGL32.lib;Ws2_32.lib;dwmapi.lib;Gdiplus.lib;openal32.lib;sndfile.lib;winmm.lib;freetype253MT.lib;liblua52.a;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OpenGL32.lib;Ws2_32.lib;Gdiplus.lib;openal32.lib;sndfile.lib;winmm.lib;freetype253MT.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
