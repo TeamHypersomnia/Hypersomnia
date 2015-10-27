@@ -9,6 +9,7 @@
 #include "utilities/script.h"
 
 #include <fstream>
+#include <iostream>
 #include <Shlwapi.h>
 
 std::string wstrtostr(std::wstring s) {
@@ -107,48 +108,6 @@ namespace bindings {
 		_utilities()
 		;
 }
-
-int the_callback(lua_State *L) {
-	std::string error_message;
-	auto str = lua_tostring(L, -1);
-	if (str) error_message = std::string(str);
-	std::cout << error_message << std::endl;
-	lua_getglobal(L, "debug");
-	lua_getfield(L, -1, "pre_traceback");
-	lua_pushvalue(L, 1);
-	lua_pushinteger(L, 2);
-	lua_call(L, 2, 1);
-	printf("%s\n", lua_tostring(L, -1));
-	int a;
-	std::cout << error_message << std::endl;
-
-	lua_getglobal(L, "debug");
-	lua_getfield(L, -1, "post_traceback");
-	lua_pushvalue(L, 1);
-	lua_pushinteger(L, 2);
-	lua_call(L, 2, 1);
-
-	std::cin >> a;
-	return 1;
-}
-
-void luabind_error_callback(lua_State *L) {
-	the_callback(L);
-	//lua_getglobal(L, "debug");
-	//lua_getfield(L, -1, "my_traceback");
-	//lua_pushvalue(L, 1);
-	//lua_pushinteger(L, 2);
-	//lua_call(L, 2, 1);
-	//printf("%s\n", lua_tostring(L, -1));
-	//int a;
-	//std::cin >> a;
-}
-
-void debugger_break() {
-	int breakp = 12;
-	breakp = 0;
-}
-
 std::wstring get_executable_path() {
 	wchar_t buffer[MAX_PATH + 1];
 	SecureZeroMemory(buffer, sizeof(buffer));
@@ -171,6 +130,65 @@ std::string remove_filename_from_path(std::string input_path) {
 	return std::string(wpath.begin(), wpath.end()) + "\\";
 }
 
+void open_editor(std::string error_message) {
+	std::stringstream ss(error_message);
+	std::string to;
+
+	std::string full_command = std::string("\"") + getenv("AUG_SCRIPTEDITOR") + "\" ";
+
+	while (std::getline(ss, to, '\n')) {
+		std::stringstream line(to);
+		std::string to2;
+		line >> to2;
+		to2.erase(to2.end() - 1);
+		if (to2.find(".lua") != std::string::npos) {
+			auto ws = get_executable_path();
+			std::string exe_path(ws.begin(), ws.end());
+			std::string full_file_path = (exe_path + "\\" + to2);
+			std::cout << full_file_path << std::endl;
+
+			full_command += full_file_path + " ";
+		}
+	}
+
+	//std::cout << full_command << std::endl;
+	system(full_command.c_str());
+	return;
+}
+
+void luabind_error_callback(lua_State *L) {
+	std::string error_message;
+	auto str = lua_tostring(L, -1);
+	if (str) error_message = std::string(str);
+	lua_pop(L, 1);
+
+	lua_getglobal(L, "debug");
+	lua_getfield(L, -1, "pre_traceback");
+	lua_pushvalue(L, 1);
+	lua_pushinteger(L, 2);
+	lua_call(L, 2, 1);
+
+	error_message += lua_tostring(L, -1);
+	std::cout << error_message << std::endl;
+
+	open_editor(error_message);
+
+	lua_getglobal(L, "debug");
+	lua_getfield(L, -1, "post_traceback");
+	lua_pushvalue(L, 1);
+	lua_pushinteger(L, 2);
+	lua_call(L, 2, 1);
+
+	int a;
+	std::cin >> a;
+}
+
+void debugger_break() {
+	int breakp = 12;
+	breakp = 0;
+}
+
+
 
 #include "luabind/class_info.hpp"
 
@@ -185,13 +203,13 @@ void set_meters_to_pixels(double val) {
 	PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 }
 
+
 void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 	using namespace resources;
 	using namespace helpers;
 
 	auto& raw = wrapper.raw;
 	luabind::open(raw);
-	luaL_openlibs(raw);
 
 	lua_register(raw, "bitor", bitor);
 	lua_register(raw, "bitflag", bitflag);
@@ -215,7 +233,7 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 			bindings::_texture(),
 			bindings::_animation(),
 			bindings::_world(),
-			misc::vector_wrapper<entity_ptr>::bind_vector("entity_ptr_vector"),
+			misc::vector_wrapper<entity_id>::bind_vector("entity_ptr_vector"),
 			bindings::_sprite(),
 			bindings::_polygon(),
 
@@ -264,6 +282,7 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 			luabind::def("debugger_break", &debugger_break),
 			bindings::_random_binding(),
 
+			luabind::def("open_editor", open_editor),
 			luabind::def("get_meters_to_pixels", get_meters_to_pixels),
 			luabind::def("set_meters_to_pixels", set_meters_to_pixels),
 			luabind::def("get_executable_path", get_executable_path),
@@ -288,6 +307,5 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 
 	wrapper.global("THIS_LUA_STATE", wrapper);
 
-	luabind::set_pcall_callback(the_callback);
-	luabind::bind_class_info(raw);
+	//luabind::bind_class_info(raw);
 }

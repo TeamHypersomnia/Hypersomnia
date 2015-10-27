@@ -20,48 +20,77 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef LUABIND_CALL_SHARED_HPP_INCLUDED
-#define LUABIND_CALL_SHARED_HPP_INCLUDED
+#define LUABIND_BUILDING
 
-void luabind_error_callback(lua_State* st);
-
-namespace luabind {
-	namespace detail {
-
-		inline void call_error(lua_State* L)
-		{
-#ifndef LUABIND_NO_EXCEPTIONS
-			luabind_error_callback(L);
-#else
-			error_callback_fun e = get_error_callback();
-			if (e) e(L);
-
-			assert(0 && "the lua function threw an error and exceptions are disabled."
-				" If you want to handle the error you can use luabind::set_error_callback()");
-			std::terminate();
+#include <luabind/error.hpp>
+#ifndef LUA_INCLUDE_HPP_INCLUDED
+#include <luabind/lua_include.hpp>
 #endif
-		}
 
-		template<typename T>
-		void cast_error(lua_State* L)
+
+namespace luabind
+{
+	error::error(lua_State* L)
+	{
+		const char* message=lua_tostring(L, -1);
+		
+		if (message)
 		{
-#ifndef LUABIND_NO_EXCEPTIONS
-			throw cast_failed(L, typeid(T));
-#else
-			cast_failed_callback_fun e = get_cast_failed_callback();
-			if (e) e(L, typeid(Ret));
-
-			assert(0 && "the lua function's return value could not be converted."
-				" If you want to handle the error you can use luabind::set_error_callback()");
-			std::terminate();
-#endif	
+			m_message=message;
 		}
 
-		template< typename... Args >
-		void expand_hack(Args... args)
-		{}
-
+		lua_pop(L, 1);
 	}
+
+
+	const char* error::what() const throw()
+	{
+		return m_message.c_str();
+	}
+
+	namespace
+	{
+		pcall_callback_fun pcall_callback = 0;
+#ifdef LUABIND_NO_EXCEPTIONS
+		error_callback_fun error_callback = 0;
+		cast_failed_callback_fun cast_failed_callback = 0;
+#endif
+	}
+
+
+#ifdef LUABIND_NO_EXCEPTIONS
+
+	void set_error_callback(error_callback_fun e)
+	{
+		error_callback = e;
+	}
+
+	void set_cast_failed_callback(cast_failed_callback_fun c)
+	{
+		cast_failed_callback = c;
+	}
+
+	error_callback_fun get_error_callback()
+	{
+		return error_callback;
+	}
+
+	cast_failed_callback_fun get_cast_failed_callback()
+	{
+		return cast_failed_callback;
+	}
+
+#endif
+
+	void set_pcall_callback(pcall_callback_fun e)
+	{
+		pcall_callback = e;
+	}
+
+	pcall_callback_fun get_pcall_callback()
+	{
+		return pcall_callback;
+	}
+
 }
 
-#endif

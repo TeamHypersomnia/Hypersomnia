@@ -11,6 +11,8 @@ namespace augs {
 		lua_state_wrapper();
 		~lua_state_wrapper();
 
+		std::string get_traceback();
+
 		operator lua_State*();
 
 		void dofile(const std::string& filename);
