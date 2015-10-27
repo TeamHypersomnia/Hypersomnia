@@ -134,6 +134,8 @@ namespace augs {
 		extern void smbx(std::wstring title, std::wstring content);
 		extern void copy_clipboard (std::wstring& from);
 		extern void paste_clipboard(std::wstring& to);
+		extern std::wstring get_executable_path();
+		extern std::string remove_filename_from_path(std::string input_path);
 
 	}
 }

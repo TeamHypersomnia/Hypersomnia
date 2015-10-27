@@ -5,10 +5,10 @@
 #include <fstream>
 #include <iostream>
 
-namespace augs {
-	script::script(lua_state_wrapper& lua_state) : lua_state(lua_state), needs_recompilation(false), is_associated_string_filename(false) {
+#include "window_framework/window.h"
 
-	}
+namespace augs {
+	script::script(lua_state_wrapper& lua_state) : lua_state(lua_state) {}
 
 	void script::associate_string(const std::string& str) {
 		associated_string = str;
@@ -62,7 +62,7 @@ namespace augs {
 		needs_recompilation = true;
 	}
 
-	std::string script::compile() {
+	bool script::compile() {
 		if (needs_recompilation) {
 			int result = 0;
 			bytecode.clear();
@@ -84,7 +84,7 @@ namespace augs {
 				result = luaL_loadstring(lua_state, associated_string.c_str());
 
 			if (result != 0)
-				return lua_tostring(lua_state, -1);
+				return false;
 			else {
 				lua_dump(lua_state, lua_writer, &bytecode, 0);
 				lua_pop(lua_state, 1);
@@ -92,44 +92,22 @@ namespace augs {
 		}
 
 		needs_recompilation = false;
-		return std::string();
+		return true;
 	}
 
-	void script::report_errors(std::string& errors) {
-		if (is_associated_string_filename) {
-			std::cout << associated_string << ": ";
-		}
-
-		std::cout << errors << std::endl;
-	}
-
-	std::string script::call() {
-		auto compilation_error = compile();
-		if (!compilation_error.empty()) {
-			report_errors(compilation_error);
-			return compilation_error;
-		}
+	bool script::call() {
+		if (!compile())
+			return false;
 
 		auto info = std::make_pair(true, &bytecode);
 
 		if (lua_load(lua_state, lua_reader, &info, "scriptname", "b") != 0)
-			return lua_tostring(lua_state, -1);
+			return false;
 
-		try {
-			luabind::call_function<void>(luabind::object(luabind::from_stack(lua_state, -1)));
-			lua_pop(lua_state, 1);
-		}
-		catch (luabind::error error_exception) {
-			//std::string compilation_error;//(lua_tostring(lua_state, -1));
-			report_errors(std::string(error_exception.what()));
-			return compilation_error;
-		}
+		luabind::call_function<void>(luabind::object(luabind::from_stack(lua_state, -1)));
+		lua_pop(lua_state, 1);
 
-		//if (lua_pcall(lua_state, 0, LUA_MULTRET, 0) != LUA_OK) {
-		//	
-		//}
-
-		report_errors(std::string("Compilation successful."));
-		return std::string();
+		return true;
 	}
+
 }

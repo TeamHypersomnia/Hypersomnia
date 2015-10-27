@@ -7,15 +7,14 @@ namespace augs {
 	struct lua_state_wrapper;
 
 	class script {
-		bool needs_recompilation;
+		bool needs_recompilation = false;
 
 		std::string associated_string;
-		bool is_associated_string_filename;
+		bool is_associated_string_filename = false;
 
 		std::vector<char> bytecode;
-		void report_errors(std::string& errors);
 	public:
-		lua_State* lua_state;
+		lua_state_wrapper& lua_state;
 
 		script(lua_state_wrapper& owner);
 
@@ -34,8 +33,8 @@ namespace augs {
 
 		returns compilation error, if any.
 		*/
-		std::string compile();
+		bool compile();
 
-		std::string call();
+		bool call();
 	};
 }

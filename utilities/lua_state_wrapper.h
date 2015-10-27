@@ -7,15 +7,14 @@ namespace augs {
 	struct lua_state_wrapper {
 		lua_State* raw;
 
-		lua_state_wrapper(const lua_state_wrapper&);
+		explicit lua_state_wrapper(lua_State*);
+		lua_state_wrapper(const lua_state_wrapper&) = delete;
 		lua_state_wrapper();
 		~lua_state_wrapper();
 
-		std::string get_traceback();
-
 		operator lua_State*();
 
-		void dofile(const std::string& filename);
+		bool dofile(const std::string& filename);
 
 		/* helper funcs to bind globals to this lua state */
 		template<class T>
@@ -27,5 +26,16 @@ namespace augs {
 		void global_ptr(std::string name, T* obj) {
 			luabind::globals(raw)[name] = obj;
 		}
+
+		bool owns = true;
+
+		// utilities
+
+		// returns lines opened by the editor
+		static std::string open_editor(std::string errors);
+		std::string get_error_and_stack();
+		void save_verbose_log();
+
+		void debug_response();
 	};
 }

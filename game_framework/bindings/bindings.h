@@ -20,8 +20,6 @@ using namespace graphics;
 using namespace helpers;
 using namespace messages;
 
-extern std::string wstrtostr(std::wstring s);
-
 namespace luabind
 {
 	template <>
@@ -38,7 +36,7 @@ namespace luabind
 		}
 
 		void to_lua_deferred(lua_State * s, const std::wstring & wstr) {
-			auto str = wstrtostr(wstr);
+			std::string str(wstr.begin(), wstr.end());
 			lua_pushstring(s, str.c_str());
 		}
 	};

@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "../options.h"
 
-
 #include "window.h"
 #include "../misc/stream.h"
 #include <algorithm>
+#include <Shlwapi.h>
 
 namespace augs {
 	extern HINSTANCE hinst;
@@ -599,5 +599,28 @@ namespace augs {
 				CloseClipboard();
 			}
 		}
+
+		std::wstring get_executable_path() {
+			wchar_t buffer[MAX_PATH + 1];
+			SecureZeroMemory(buffer, sizeof(buffer));
+			GetModuleFileName(NULL, buffer, MAX_PATH);
+			PathRemoveFileSpec(buffer);
+			return buffer;
+		}
+
+		std::string remove_filename_from_path(std::string input_path) {
+			std::wstring wpath(input_path.begin(), input_path.end());
+			wchar_t buffer[MAX_PATH + 1];
+
+			SecureZeroMemory(buffer, sizeof(buffer));
+
+			std::copy(wpath.begin(), wpath.end(), buffer);
+
+			PathRemoveFileSpec(buffer);
+
+			wpath = std::wstring(buffer);
+			return std::string(wpath.begin(), wpath.end()) + "\\";
+		}
+
 	}
 }

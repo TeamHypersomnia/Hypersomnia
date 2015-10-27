@@ -10,26 +10,6 @@
 
 #include <fstream>
 #include <iostream>
-#include <Shlwapi.h>
-
-std::string wstrtostr(std::wstring s) {
-	return std::string(s.begin(), s.end());
-}
-
-int bitor(lua_State* L) {
-	int arg_count = lua_gettop(L);
-	int result = 0;
-
-	for (int i = 1; i <= arg_count; i++) {
-		luabind::object obj(luabind::from_stack(L, i));
-
-		if (luabind::type(obj) == LUA_TNUMBER)
-			result |= luabind::object_cast<int>(obj);
-	}
-
-	lua_pushinteger(L, result);
-	return 1;
-}
 
 int bitflag(lua_State* L) {
 	int result = 1 << luabind::object_cast<int>(luabind::object(luabind::from_stack(L, 1)));
@@ -108,89 +88,6 @@ namespace bindings {
 		_utilities()
 		;
 }
-std::wstring get_executable_path() {
-	wchar_t buffer[MAX_PATH + 1];
-	SecureZeroMemory(buffer, sizeof(buffer));
-	GetModuleFileName(NULL, buffer, MAX_PATH);
-	PathRemoveFileSpec(buffer);
-	return buffer;
-}
-
-std::string remove_filename_from_path(std::string input_path) {
-	std::wstring wpath(input_path.begin(), input_path.end());
-	wchar_t buffer[MAX_PATH + 1];
-
-	SecureZeroMemory(buffer, sizeof(buffer));
-
-	std::copy(wpath.begin(), wpath.end(), buffer);
-
-	PathRemoveFileSpec(buffer);
-
-	wpath = std::wstring(buffer);
-	return std::string(wpath.begin(), wpath.end()) + "\\";
-}
-
-void open_editor(std::string error_message) {
-	std::stringstream ss(error_message);
-	std::string to;
-
-	std::string full_command = std::string("\"") + getenv("AUG_SCRIPTEDITOR") + "\" ";
-
-	while (std::getline(ss, to, '\n')) {
-		std::stringstream line(to);
-		std::string to2;
-		line >> to2;
-		to2.erase(to2.end() - 1);
-		if (to2.find(".lua") != std::string::npos) {
-			auto ws = get_executable_path();
-			std::string exe_path(ws.begin(), ws.end());
-			std::string full_file_path = (exe_path + "\\" + to2);
-			std::cout << full_file_path << std::endl;
-
-			full_command += full_file_path + " ";
-		}
-	}
-
-	//std::cout << full_command << std::endl;
-	system(full_command.c_str());
-	return;
-}
-
-void luabind_error_callback(lua_State *L) {
-	std::string error_message;
-	auto str = lua_tostring(L, -1);
-	if (str) error_message = std::string(str);
-	lua_pop(L, 1);
-
-	lua_getglobal(L, "debug");
-	lua_getfield(L, -1, "pre_traceback");
-	lua_pushvalue(L, 1);
-	lua_pushinteger(L, 2);
-	lua_call(L, 2, 1);
-
-	error_message += lua_tostring(L, -1);
-	std::cout << error_message << std::endl;
-
-	open_editor(error_message);
-
-	lua_getglobal(L, "debug");
-	lua_getfield(L, -1, "post_traceback");
-	lua_pushvalue(L, 1);
-	lua_pushinteger(L, 2);
-	lua_call(L, 2, 1);
-
-	int a;
-	std::cin >> a;
-}
-
-void debugger_break() {
-	int breakp = 12;
-	breakp = 0;
-}
-
-
-
-#include "luabind/class_info.hpp"
 
 double get_meters_to_pixels() {
 	return METERS_TO_PIXELS;
@@ -203,7 +100,6 @@ void set_meters_to_pixels(double val) {
 	PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 }
 
-
 void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 	using namespace resources;
 	using namespace helpers;
@@ -211,7 +107,6 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 	auto& raw = wrapper.raw;
 	luabind::open(raw);
 
-	lua_register(raw, "bitor", bitor);
 	lua_register(raw, "bitflag", bitflag);
 	luabind::module(raw)[
 		luabind::class_<ptr_wrapper<float>>("float_ptr"),
@@ -279,14 +174,13 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 			bindings::_opengl_binding(),
 
 			luabind::def("clamp", &augs::get_clamp<float>),
-			luabind::def("debugger_break", &debugger_break),
 			bindings::_random_binding(),
 
-			luabind::def("open_editor", open_editor),
+			luabind::def("open_editor", lua_state_wrapper::open_editor),
 			luabind::def("get_meters_to_pixels", get_meters_to_pixels),
 			luabind::def("set_meters_to_pixels", set_meters_to_pixels),
-			luabind::def("get_executable_path", get_executable_path),
-			luabind::def("remove_filename_from_path", remove_filename_from_path),
+			luabind::def("get_executable_path", window::get_executable_path),
+			luabind::def("remove_filename_from_path", window::remove_filename_from_path),
 
 			luabind::class_<std::string>("std_string")
 			.def("c_str", &std::string::c_str)
