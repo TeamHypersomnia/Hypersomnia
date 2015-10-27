@@ -3,6 +3,7 @@
 #include "particle_group_system.h"
 #include "particle_emitter_system.h"
 #include "entity_system/entity.h"
+#include "entity_system/world.h"
 
 #include "../resources/particle_emitter_info.h"
 #include "../messages/destroy_message.h"

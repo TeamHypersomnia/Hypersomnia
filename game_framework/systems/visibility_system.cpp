@@ -176,7 +176,7 @@ void visibility_system::process_entities(world& owner) {
 			/* for every fixture that intersected with the visibility square */
 			for (auto b : bodies) {
 				/* get shape vertices from misc that transforms them to current entity's position and rotation in Box2D space */
-				auto verts = helpers::get_transformed_shape_verts(*reinterpret_cast<entity*>(b->GetUserData()));
+				auto verts = helpers::get_transformed_shape_verts(b->GetUserData());
 				/* for every vertex in given fixture's shape */
 				for (auto& v : verts) 
 					push_vertex(v, true);

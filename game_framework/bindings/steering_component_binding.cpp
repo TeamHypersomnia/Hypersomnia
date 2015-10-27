@@ -9,7 +9,7 @@ namespace bindings {
 		return(
 			luabind::class_<steering::target_info>("target_info")
 			.def(luabind::constructor<>())
-			.def("set", (void (steering::target_info::*)(const entity_ptr&))&steering::target_info::set)
+			.def("set", (void (steering::target_info::*)(entity_id))&steering::target_info::set)
 			.def("set", (void (steering::target_info::*)(vec2<>, vec2<>))&steering::target_info::set)
 			.def_readwrite("is_set", &steering::target_info::is_set)
 			,

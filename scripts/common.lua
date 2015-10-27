@@ -106,7 +106,10 @@ function rewrite_ptr(component, entry, properties, entities_lookup)
 	if properties == nil then return end
 	
 	for key, val in pairs(properties) do
-		component[key]:set(ptr_lookup(entry[key], entities_lookup))
+		local target_id = ptr_lookup(entry[key], entities_lookup)
+		if target_id ~= nil then
+			component[key]:set(target_id)
+		end
 	end
 end
 

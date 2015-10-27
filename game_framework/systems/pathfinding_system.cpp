@@ -184,7 +184,7 @@ void pathfinding_system::process_entities(world& owner) {
 
 			/* prepare body polygon to test for overlaps */
 			b2PolygonShape body_poly;
-			auto verts = helpers::get_transformed_shape_verts(*reinterpret_cast<entity*>(body->GetUserData()));
+			auto verts = helpers::get_transformed_shape_verts(body->GetUserData());
 			body_poly.Set(verts.data(), verts.size());
 
 			/* for every undiscovered navigation point */
@@ -423,7 +423,7 @@ void pathfinding_system::process_entities(world& owner) {
 
 				bool rays_hit = false;
 				/* extract all transformed vertices of the subject's original model, false means we want pixels */
-				auto& subject_verts = helpers::get_transformed_shape_verts(*it, false);
+				auto& subject_verts = helpers::get_transformed_shape_verts(it, false);
 				subject_verts.clear();
 				subject_verts.push_back(transform.pos);
 

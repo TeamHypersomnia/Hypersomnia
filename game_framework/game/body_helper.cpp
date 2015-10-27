@@ -78,16 +78,16 @@ namespace helpers {
 		//	convex_polys.push_back(std::vector < augs::vec2 < >> (convex.begin(), convex.end()));
 	}
 
-	void create_physics_component(const physics_info& body_data, augs::entity_system::entity& subject, int body_type) {
-		physics_system& physics = subject.owner_world.get_system<physics_system>();
+	void create_physics_component(const physics_info& body_data, augs::entity_system::entity_id subject, int body_type) {
+		physics_system& physics = subject->owner_world.get_system<physics_system>();
 
-		auto& transform = subject.get<components::transform>().current;
-		subject.get<components::transform>().previous = subject.get<components::transform>().current;
+		auto& transform = subject->get<components::transform>().current;
+		subject->get<components::transform>().previous = subject->get<components::transform>().current;
 
 		b2BodyDef def;
 		def.type = b2BodyType(body_type);
 		def.angle = 0;
-		def.userData = (void*) &subject;
+		def.userData = subject;
 		def.bullet = body_data.bullet;
 		def.position = transform.pos*PIXELS_TO_METERSf;
 		def.angle = transform.rotation*0.01745329251994329576923690768489f;
@@ -150,15 +150,15 @@ namespace helpers {
 		body->SetAngledDampingEnabled(body_data.angled_damping);
 		body->SetMaximumLinearVelocity(body_data.max_speed * PIXELS_TO_METERSf);
 
-		subject.add(physics_component);
+		subject->add(physics_component);
 	}
 
-	std::vector<b2Vec2> get_transformed_shape_verts(augs::entity_system::entity& subject, bool meters) {
+	std::vector<b2Vec2> get_transformed_shape_verts(augs::entity_system::entity_id subject, bool meters) {
 		std::vector<b2Vec2> output;
 
-		auto b = subject.get<components::physics>().body;
+		auto b = subject->get<components::physics>().body;
 
-		auto& verts = reinterpret_cast<entity*>(b->GetUserData())->get<components::physics>().original_model;
+		auto& verts = b->GetUserData()->get<components::physics>().original_model;
 		/* for every vertex in given fixture's shape */
 		for (auto& v : verts) {
 			auto position = METERS_TO_PIXELSf * b->GetPosition();
@@ -176,7 +176,7 @@ namespace helpers {
 		return output;
 	}
 
-	augs::entity_system::entity* body_to_entity(b2Body* b) {
-		return static_cast<augs::entity_system::entity*>(b->GetUserData());
+	augs::entity_system::entity_id body_to_entity(b2Body* b) {
+		return static_cast<augs::entity_system::entity_id>(b->GetUserData());
 	}
 }

@@ -2,7 +2,7 @@
 #include <vector>
 
 #include "texture_baker/texture_baker.h"
-#include "entity_system/entity_ptr.h"
+#include "entity_system/entity.h"
 #include "..\components\transform_component.h"
 #include "..\components\render_component.h"
 

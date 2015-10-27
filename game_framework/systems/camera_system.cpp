@@ -7,6 +7,8 @@
 #include "../messages/intent_message.h"
 #include "../resources/render_info.h"
 
+#include <iostream>
+
 void camera_system::consume_events(world& owner) {
 	auto events = owner.get_message_queue<messages::intent_message>();
 
@@ -24,7 +26,7 @@ void camera_system::process_entities(world& owner) {
 	double delta = smooth_timer.extract<std::chrono::seconds>();
 
 	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
-	std::sort(targets.begin(), targets.end(), [](entity* a, entity* b) {
+	std::sort(targets.begin(), targets.end(), [](entity_id a, entity_id b) {
 		return a->get<components::camera>().layer > b->get<components::camera>().layer;
 	});
 
@@ -38,7 +40,7 @@ void camera_system::process_entities(world& owner) {
 			vec2<int> crosshair_offset;
 
 			/* if we set player and crosshair entity targets */
-			if (camera.player && camera.crosshair) {
+			if (camera.player.alive() && camera.crosshair.alive()) {
 				/* skip calculations if no orbit_mode is specified */
 				if (camera.orbit_mode != camera.NONE) {
 					/* shortcuts */

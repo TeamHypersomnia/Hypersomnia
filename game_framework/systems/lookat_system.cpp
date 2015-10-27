@@ -10,7 +10,7 @@ void lookat_system::process_entities(world& owner) {
 	for (auto it : targets) {
 		auto& lookat = it->get<components::lookat>();
 
-		if (lookat.target == nullptr)
+		if (lookat.target.dead())
 			continue;
 
 		auto& transform = it->get<components::transform>().current;

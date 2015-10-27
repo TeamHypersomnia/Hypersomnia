@@ -1,28 +1,25 @@
 #pragma once
 #include <unordered_map>
 #include <vector>
-#include <boost\pool\object_pool.hpp>
 
-#include "entity.h"
 #include "type_registry.h"
 
+#include "misc/object_pool.h"
 #include "misc/sorted_vector.h"
 #include "misc/timer.h"
 
+#include "entity.h"
+
 namespace augs {
 	namespace entity_system {
-		class entity;
-
 		class processing_system;
 		class world {
-			friend class entity_ptr;
-
 			struct message_queue {
 				virtual void validate_delayed_messages() = 0;
 				virtual void clear() = 0;
 				virtual void clear_delayed() = 0;
 				virtual bool empty() = 0;
-				virtual void purify(entity* invalidated_subject) = 0;
+				virtual void remove_messages_with_dead_entity(entity_id invalidated_subject) = 0;
 				virtual ~message_queue() {}
 			};
 
@@ -52,30 +49,29 @@ namespace augs {
 				void clear() override { messages.clear(); }
 				void clear_delayed() override { delayed_messages.clear(); }
 				bool empty() override { return messages.empty();  }
-				void purify(entity* invalidated_subject) override {
-					messages.erase(std::remove_if(messages.begin(), messages.end(), [invalidated_subject](const message& m){ return m.subject == invalidated_subject; }), messages.end());
+				void remove_messages_with_dead_entity(entity_id invalidated_subject) override {
+					
+					messages.erase(std::remove_if(messages.begin(), messages.end(), [invalidated_subject](const message& m) {
+						return m.subject == invalidated_subject; 
+					}), messages.end());
+
 					delayed_messages.erase(std::remove_if(delayed_messages.begin(), delayed_messages.end(), [invalidated_subject](const delayed_message& m){ return m.msg.subject == invalidated_subject; }), delayed_messages.end());
 				}
 
 				~templated_message_queue() override {}
 			};
 
-			boost::object_pool<entity> entities;
+			object_pool<entity> entities;
 			
 			std::unordered_map<size_t, std::unique_ptr<message_queue>> input_queue;
-			std::unordered_map<size_t, boost::pool<>> size_to_container;
-			std::unordered_map<entity*, misc::sorted_vector<entity_ptr*>> registered_entity_watchers;
-
+			std::unordered_map<size_t, memory_pool> size_to_container;
 
 			std::vector<processing_system*> all_systems;
 			std::unordered_map<size_t, processing_system*> hash_to_system;
-
-			void register_entity_watcher(entity_ptr&);
-			void unregister_entity_watcher(entity_ptr&);
 		public:
-			boost::pool<>& get_container_for_size(size_t size);
-			boost::pool<>& get_container_for_type(type_hash hash);
-			boost::pool<>& get_container_for_type(const base_type& type);
+			memory_pool& get_container_for_size(size_t size);
+			memory_pool& get_container_for_type(type_hash hash);
+			memory_pool& get_container_for_type(const base_type& type);
 			
 			type_registry component_library;
 
@@ -110,7 +106,7 @@ namespace augs {
 				return all_systems;
 			}
 
-			void purify_queues(entity* invalidated_subject);
+			void remove_messages_with_dead_entity(entity_id invalidated_subject);
 			void validate_delayed_messages();
 
 			template <class T>
@@ -159,9 +155,11 @@ namespace augs {
 				return *this;
 			}
 
-			entity& create_entity_named(std::string name);
-			entity& create_entity();
-			void delete_entity(entity&, entity* redirect_pointers = nullptr);
+			entity_id create_entity_named(std::string name);
+			entity_id create_entity();
+			void delete_entity(entity_id);
+
+			entity_id get_id(entity*);
 			
 			void delete_all_entities();
 

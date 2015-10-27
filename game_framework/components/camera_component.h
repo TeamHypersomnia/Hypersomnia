@@ -4,7 +4,7 @@
 #include "render_component.h"
 #include "misc/delta_accumulator.h"
 
-#include "entity_system/entity_ptr.h"
+#include "entity_system/entity.h"
 
 #include "../components/transform_component.h"
 
@@ -38,12 +38,12 @@ namespace components {
 
 		augs::vec2<> max_look_expand;
 
-		augs::entity_system::entity_ptr player, crosshair;
+		augs::entity_system::entity_id player, crosshair;
 
 		camera(augs::rects::xywh<float> screen_rect = augs::rects::xywh<float>(), augs::vec2<> size = augs::vec2<>(),
 			unsigned layer = 0, unsigned mask = 0,
 			double smoothing_average_factor = 0.004, double averages_per_sec = 60.0) :
-			screen_rect(screen_rect), size(size), layer(layer), mask(mask), enabled(true), orbit_mode(NONE), player(nullptr), crosshair(nullptr),
+			screen_rect(screen_rect), size(size), layer(layer), mask(mask), enabled(true), orbit_mode(NONE),
 			angled_look_length(100.f), max_look_expand(augs::vec2<double>(600.f, 300.f)), 
 			smoothing_average_factor(smoothing_average_factor), averages_per_sec(averages_per_sec), enable_smoothing(true), crosshair_follows_interpolant(false) {
 				smooth_timer.reset();

@@ -21,9 +21,10 @@
 #include "../game/body_helper.h"
 
 #include "misc/randval.h"
+#include <iostream>
 
 /* hacky methods to aid transferring barrel smoke to dropped gun */
-void components::gun::transfer_barrel_smoke(augs::entity_system::entity* another, bool overwrite_components) {
+void components::gun::transfer_barrel_smoke(augs::entity_system::entity_id another, bool overwrite_components) {
 	auto& this_entity = get_barrel_smoke();
 	auto& another_entity = another->get<components::gun>().get_barrel_smoke();
 
@@ -47,9 +48,9 @@ void components::gun::transfer_barrel_smoke(augs::entity_system::entity* another
 	}
 }
 
-void gun_system::add(entity* e) {
+void gun_system::add(entity_id e) {
 	auto& gun = e->get<components::gun>();
-	gun.get_barrel_smoke().set_ptr(&e->owner_world.create_entity_named("barrel smoke group"));
+	gun.get_barrel_smoke() = e->owner_world.create_entity_named("barrel smoke group");
 
 	gun.get_barrel_smoke()->add(components::transform());
 	gun.get_barrel_smoke()->add(components::particle_group()).stream_slots[0].destroy_when_empty = false;
@@ -59,9 +60,9 @@ void gun_system::add(entity* e) {
 	return processing_system::add(e);
 }
 
-void gun_system::remove(entity* e) {
-	if (e->get<components::gun>().get_barrel_smoke().exists()) 
-		e->owner_world.delete_entity(*e->get<components::gun>().get_barrel_smoke().get());
+void gun_system::remove(entity_id e) {
+	if (e->get<components::gun>().get_barrel_smoke().alive()) 
+		e->owner_world.delete_entity(e->get<components::gun>().get_barrel_smoke());
 
 	return processing_system::remove(e);
 }
@@ -79,7 +80,7 @@ void gun_system::consume_events(world& owner) {
 }
 
 void components::gun::shake_camera(float rotation) {
-	if (target_camera_to_shake) {
+	if (target_camera_to_shake.alive()) {
 		vec2<> shake_dir;
 		shake_dir.set_from_degrees(randval(
 			rotation - shake_spread_degrees,
@@ -142,7 +143,7 @@ void gun_system::process_entities(world& owner) {
 			owner.post_message(burst);
 
 			for (unsigned i = 0; i < gun.bullets_once; ++i) {
-				entity& new_bullet = owner.create_entity();
+				entity_id new_bullet = owner.create_entity();
 
 				/* randomize bullet direction taking spread into account */
 				vec2<> vel(vec2<>::from_degrees(
@@ -164,14 +165,14 @@ void gun_system::process_entities(world& owner) {
 				damage.starting_point = new_transform.pos;
 
 				/* add components that make up a bullet */
-				new_bullet.add(components::transform(new_transform));
-				new_bullet.add(damage);
-				new_bullet.add(gun.bullet_render);
-				new_bullet.name = "bullet";
+				new_bullet->add(components::transform(new_transform));
+				new_bullet->add(damage);
+				new_bullet->add(gun.bullet_render);
+				new_bullet->name = "bullet";
 				helpers::create_physics_component(gun.bullet_body, new_bullet, b2_dynamicBody);
 
 				/* bullet's physics settings */
-				auto body = new_bullet.get<components::physics>().body;
+				auto body = new_bullet->get<components::physics>().body;
 				body->SetLinearVelocity(vel);
 				body->SetAngularVelocity(0);
 				body->SetBullet(true);
@@ -236,7 +237,7 @@ void gun_system::process_entities(world& owner) {
 			auto hit_bodies = physics_sys.query_shape(&swing_query, &gun.melee_filter, it).bodies;
 
 			for (auto hit_body : hit_bodies) {
-				auto target_entity = reinterpret_cast<entity*>(hit_body->GetUserData());
+				auto target_entity = hit_body->GetUserData();
 				auto target_transform = target_entity->get<components::transform>().current;
 				auto ray_output = physics_sys.ray_cast_px(gun_transform.pos, target_transform.pos, gun.melee_obstruction_filter, it);
 

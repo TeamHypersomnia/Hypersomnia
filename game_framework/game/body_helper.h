@@ -38,14 +38,14 @@ namespace helpers {
 		physics_info();
 	};
 
-	//extern void create_physics_component(augs::entity_system::entity& subject, b2Filter filter, int = b2_dynamicBody);
-	extern void create_physics_component(const physics_info&, augs::entity_system::entity& subject, int = b2_dynamicBody);
-	extern std::vector<b2Vec2> get_transformed_shape_verts(augs::entity_system::entity& subject, bool meters = true);
+	//extern void create_physics_component(augs::entity_system::entity_id subject, b2Filter filter, int = b2_dynamicBody);
+	extern void create_physics_component(const physics_info&, augs::entity_system::entity_id subject, int = b2_dynamicBody);
+	extern std::vector<b2Vec2> get_transformed_shape_verts(augs::entity_system::entity_id subject, bool meters = true);
 	
 	template <typename T, typename TDef>
 	T* create_joint(world* owner, TDef* joint_def) {
 		return static_cast<T*>(owner->get_system<physics_system>().b2world.CreateJoint(joint_def));
 	}
 
-	extern augs::entity_system::entity* body_to_entity(b2Body*);
+	extern augs::entity_system::entity_id body_to_entity(b2Body*);
 }

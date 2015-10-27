@@ -102,7 +102,7 @@ public:
 	void process_entities(world&);
 
 
-	std::vector<std::vector<entity*>> layers;
+	std::vector<std::vector<entity_id>> layers;
 
 	void generate_layers(int mask);
 	void draw_layer(resources::renderable::draw_input& in, int layer);

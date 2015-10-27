@@ -43,7 +43,7 @@ void render_system::generate_layers(int mask) {
 	layers.clear();
 
 	/* shortcut */
-	std::vector<entity*> entities_by_mask;
+	std::vector<entity_id> entities_by_mask;
 	for (auto it : targets) {
 		if (it->get<components::render>().mask == mask)
 			entities_by_mask.push_back(it);

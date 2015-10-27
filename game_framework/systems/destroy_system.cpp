@@ -10,17 +10,17 @@
 
 void destroy_system::consume_events(world& owner) {
 	auto events = owner.get_message_queue<messages::destroy_message>();
-	std::vector <std::pair<entity*, entity*>> to_destroy;
+	std::vector <std::pair<entity_id, entity_id>> to_destroy;
 
-	std::function < void (entity* subject, entity* redirection) > push_destroyed;
+	std::function < void (entity_id subject, entity_id redirection) > push_destroyed;
 
-	push_destroyed = [&to_destroy, &push_destroyed](entity* subject, entity* redirection){
+	push_destroyed = [&to_destroy, &push_destroyed](entity_id subject, entity_id redirection){
 		to_destroy.push_back(std::make_pair(subject, redirection));
 		auto children = subject->find<components::children>();
 		
 		if (children != nullptr)
 			for (auto child : children->children_entities)
-				if (child != nullptr) push_destroyed(child, redirection);
+				if (child.alive()) push_destroyed(child, redirection);
 	};
 
 	for (auto it : events) {
@@ -43,6 +43,6 @@ void destroy_system::consume_events(world& owner) {
 	owner.get_message_queue<messages::destroy_message>().clear();
 
 	for (int i = 0; i < to_destroy.size(); ++i) {
-		owner.delete_entity(*to_destroy[i].first, to_destroy[i].second);
+		owner.delete_entity(to_destroy[i].first);// , to_destroy[i].second);
 	}
 }

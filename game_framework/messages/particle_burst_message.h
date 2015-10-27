@@ -2,7 +2,7 @@
 #include "message.h"
 #include "math/vec2d.h"
 
-#include "entity_system/entity_ptr.h"
+#include "entity_system/entity.h"
 #include "../resources/particle_emitter_info.h"
 
 namespace resources {
@@ -31,13 +31,11 @@ namespace messages {
 			effect = *eff;
 		}
 
-		augs::entity_system::entity_ptr target_group_to_refresh;
+		augs::entity_system::entity_id target_group_to_refresh;
 
-		bool local_transform;
+		bool local_transform = false;
 
 		augs::vec2<> pos;
-		float rotation;
-
-		particle_burst_message() : local_transform(false), rotation(0.f), target_group_to_refresh(nullptr) {}
+		float rotation = 0.f;
 	};
 }

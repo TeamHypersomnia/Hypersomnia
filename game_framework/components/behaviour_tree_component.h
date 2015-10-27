@@ -2,7 +2,7 @@
 #include <vector>
 #include <unordered_map>
 #include "entity_system/component.h"
-#include "entity_system/entity_ptr.h"
+#include "entity_system/entity.h"
 #include "misc/timer.h"
 
 namespace components {
@@ -101,7 +101,7 @@ namespace components {
 			void interrupt_other_runner(int status = composite::status::FAILURE);
 			void interrupt_runner(int status = composite::status::FAILURE);
 
-			augs::entity_system::entity* subject;
+			augs::entity_system::entity_id subject;
 
 			composite* running_parent_node;
 

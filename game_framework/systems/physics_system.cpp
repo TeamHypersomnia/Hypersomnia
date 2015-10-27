@@ -7,10 +7,12 @@ float METERS_TO_PIXELSf = 100.f;
 float PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 
 #include "entity_system/entity.h"
+#include "entity_system/world.h"
 
 #include "../messages/collision_message.h"
-
 #include "../game/body_helper.h"
+
+#include <iostream>
 
 
 physics_system::stepped_timer::stepped_timer(physics_system* owner) : owner(owner), current_step(-1) {
@@ -42,7 +44,7 @@ unsigned physics_system::stepped_timer::extract_steps() {
 }
 
 bool physics_system::raycast_input::ShouldRaycast(b2Fixture* fixture) {
-	entity* fixture_entity = reinterpret_cast<entity*>(fixture->GetBody()->GetUserData());
+	entity_id fixture_entity = fixture->GetBody()->GetUserData();
 	return
 		(!subject || fixture_entity != subject) &&
 		(b2ContactFilter::ShouldCollide(subject_filter, &fixture->GetFilterData()));
@@ -54,7 +56,7 @@ float32 physics_system::raycast_input::ReportFixture(b2Fixture* fixture, const b
 
 		output.hit = true;
 		output.what_fixture = fixture;
-		output.what_entity = reinterpret_cast<entity*>(fixture->GetBody()->GetUserData());
+		output.what_entity = fixture->GetBody()->GetUserData();
 		output.normal = normal;
 
 		if (save_all) {
@@ -65,8 +67,6 @@ float32 physics_system::raycast_input::ReportFixture(b2Fixture* fixture, const b
 		return fraction;
 }
 
-physics_system::raycast_input::raycast_input() : subject_filter(nullptr), subject(nullptr), save_all(false) {}
-
 physics_system::physics_system() : accumulator(60.0, 5), timestep_multiplier(1.f),
 b2world(b2Vec2(0.f, 0.f)), enable_interpolation(true), ray_casts_per_frame(0), all_steps(0) {
 		b2world.SetAllowSleeping(false);
@@ -75,7 +75,7 @@ b2world(b2Vec2(0.f, 0.f)), enable_interpolation(true), ray_casts_per_frame(0), a
 }
 
 std::vector<physics_system::raycast_output> physics_system::ray_cast_all_intersections
-	(vec2<> p1_meters, vec2<> p2_meters, b2Filter filter, entity* ignore_entity) {
+	(vec2<> p1_meters, vec2<> p2_meters, b2Filter filter, entity_id ignore_entity) {
 	++ray_casts_per_frame;
 
 	raycast_input callback;
@@ -116,7 +116,7 @@ physics_system::edge_edge_output physics_system::edge_edge_intersection(vec2<> p
 	return out;
 }
 
-float physics_system::get_closest_wall_intersection(vec2<> position, float radius, int ray_amount, b2Filter filter, entity* ignore_entity) {
+float physics_system::get_closest_wall_intersection(vec2<> position, float radius, int ray_amount, b2Filter filter, entity_id ignore_entity) {
 	float worst_distance = radius;
 
 	for (int i = 0; i < ray_amount; ++i) {
@@ -133,7 +133,7 @@ float physics_system::get_closest_wall_intersection(vec2<> position, float radiu
 	return worst_distance;
 }
 
-vec2<> physics_system::push_away_from_walls(vec2<> position, float radius, int ray_amount, b2Filter filter, entity* ignore_entity) {
+vec2<> physics_system::push_away_from_walls(vec2<> position, float radius, int ray_amount, b2Filter filter, entity_id ignore_entity) {
 	vec2<> resultant;
 	
 	float worst_distance = radius;
@@ -155,7 +155,7 @@ vec2<> physics_system::push_away_from_walls(vec2<> position, float radius, int r
 	else return position;
 }
 
-physics_system::raycast_output physics_system::ray_cast(vec2<> p1_meters, vec2<> p2_meters, b2Filter filter, entity* ignore_entity) {
+physics_system::raycast_output physics_system::ray_cast(vec2<> p1_meters, vec2<> p2_meters, b2Filter filter, entity_id ignore_entity) {
 	++ray_casts_per_frame;
 
 	raycast_input callback;
@@ -173,18 +173,16 @@ physics_system::raycast_output physics_system::ray_cast(vec2<> p1_meters, vec2<>
 	return callback.output;
 }
 
-physics_system::raycast_output physics_system::ray_cast_px (vec2<> p1, vec2<> p2, b2Filter filter, entity* ignore_entity) {
+physics_system::raycast_output physics_system::ray_cast_px (vec2<> p1, vec2<> p2, b2Filter filter, entity_id ignore_entity) {
 	auto out = ray_cast(p1 * PIXELS_TO_METERSf, p2 * PIXELS_TO_METERSf, filter, ignore_entity);
 	out.intersection *= METERS_TO_PIXELSf;
 	
 	return out;
 }
 
-physics_system::query_aabb_input::query_aabb_input() : ignore_userdata(nullptr), filter(nullptr) {}
-
 bool physics_system::query_aabb_input::ReportFixture(b2Fixture* fixture) {
 	if ((b2ContactFilter::ShouldCollide(filter, &fixture->GetFilterData()))
-		&& fixture->GetBody()->GetUserData() != ignore_userdata) {
+		&& fixture->GetBody()->GetUserData() != ignore_entity) {
 		output.insert(fixture->GetBody());
 		out_fixtures.push_back(fixture);
 	}
@@ -192,21 +190,21 @@ bool physics_system::query_aabb_input::ReportFixture(b2Fixture* fixture) {
 	return true;
 }
 
-physics_system::query_output physics_system::query_square(vec2<> p1_meters, float side_meters, b2Filter* filter, void* ignore_userdata) {
+physics_system::query_output physics_system::query_square(vec2<> p1_meters, float side_meters, b2Filter* filter, entity_id ignore_entity) {
 	b2AABB aabb;
 	aabb.lowerBound = p1_meters - side_meters / 2;
 	aabb.upperBound = p1_meters + side_meters / 2;
-	return query_aabb(aabb.lowerBound, aabb.upperBound, filter, ignore_userdata);
+	return query_aabb(aabb.lowerBound, aabb.upperBound, filter, ignore_entity);
 }
 
-physics_system::query_output physics_system::query_square_px(vec2<> p1, float side, b2Filter* filter, void* ignore_userdata) {
-	return query_square(p1 * PIXELS_TO_METERSf, side * PIXELS_TO_METERSf, filter, ignore_userdata);
+physics_system::query_output physics_system::query_square_px(vec2<> p1, float side, b2Filter* filter, entity_id ignore_entity) {
+	return query_square(p1 * PIXELS_TO_METERSf, side * PIXELS_TO_METERSf, filter, ignore_entity);
 }
 
-physics_system::query_output physics_system::query_aabb(vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter, void* ignore_userdata) {
+physics_system::query_output physics_system::query_aabb(vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter, entity_id ignore_entity) {
 	query_aabb_input callback;
 	callback.filter = filter;
-	callback.ignore_userdata = ignore_userdata;
+	callback.ignore_entity = ignore_entity;
 	b2AABB aabb;
 	aabb.lowerBound = p1_meters;
 	aabb.upperBound = p2_meters;
@@ -218,23 +216,23 @@ physics_system::query_output physics_system::query_aabb(vec2<> p1_meters, vec2<>
 	return out;
 }
 
-physics_system::query_output physics_system::query_body(augs::entity_system::entity& subject, b2Filter* filter, void* ignore_userdata) {
+physics_system::query_output physics_system::query_body(augs::entity_system::entity_id subject, b2Filter* filter, entity_id ignore_entity) {
 	query_output total_output;
 	
-	for (b2Fixture* f = subject.get<components::physics>().body->GetFixtureList(); f != nullptr; f = f->GetNext()) {
+	for (b2Fixture* f = subject->get<components::physics>().body->GetFixtureList(); f != nullptr; f = f->GetNext()) {
 		auto transformed = helpers::get_transformed_shape_verts(subject, true);
 		
 		b2PolygonShape shape;
 		shape.Set(transformed.data(), transformed.size());
 
-		auto this_result = query_shape(&shape, filter, ignore_userdata);
+		auto this_result = query_shape(&shape, filter, ignore_entity);
 		total_output.bodies.insert(total_output.bodies.end(), this_result.bodies.begin(), this_result.bodies.end());
 	}
 
 	return total_output;
 }
 
-physics_system::query_output physics_system::query_polygon(const std::vector<vec2<>>& vertices, b2Filter* filter, void* ignore_userdata) {
+physics_system::query_output physics_system::query_polygon(const std::vector<vec2<>>& vertices, b2Filter* filter, entity_id ignore_entity) {
 	b2PolygonShape poly_shape;
 	std::vector<b2Vec2> verts;
 
@@ -242,15 +240,15 @@ physics_system::query_output physics_system::query_polygon(const std::vector<vec
 		verts.push_back(PIXELS_TO_METERSf * b2Vec2(v.x, v.y));
 	
 	poly_shape.Set(verts.data(), verts.size());
-	return query_shape(&poly_shape, filter, ignore_userdata);
+	return query_shape(&poly_shape, filter, ignore_entity);
 }
 
-physics_system::query_output physics_system::query_shape(b2Shape* shape, b2Filter* filter, void* ignore_userdata) {
+physics_system::query_output physics_system::query_shape(b2Shape* shape, b2Filter* filter, entity_id ignore_entity) {
 	b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
 	
 	query_aabb_input callback;
 	callback.filter = filter;
-	callback.ignore_userdata = ignore_userdata;
+	callback.ignore_entity = ignore_entity;
 	
 	b2AABB shape_aabb;
 	shape->ComputeAABB(&shape_aabb, null_transform, 0);
@@ -277,8 +275,8 @@ physics_system::query_output physics_system::query_shape(b2Shape* shape, b2Filte
 	return out;
 }
 
-physics_system::query_output physics_system::query_aabb_px(vec2<> p1, vec2<> p2, b2Filter* filter, void* ignore_userdata) {
-	return query_aabb(p1 * PIXELS_TO_METERSf, p2 * PIXELS_TO_METERSf, filter, ignore_userdata);
+physics_system::query_output physics_system::query_aabb_px(vec2<> p1, vec2<> p2, b2Filter* filter, entity_id ignore_entity) {
+	return query_aabb(p1 * PIXELS_TO_METERSf, p2 * PIXELS_TO_METERSf, filter, ignore_entity);
 }
 
 void physics_system::contact_listener::BeginContact(b2Contact* contact) {
@@ -294,8 +292,8 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 
 		messages::collision_message msg;
 
-		msg.subject = static_cast<entity*>(body_a->GetUserData());
-		msg.collider = static_cast<entity*>(body_b->GetUserData());
+		msg.subject = static_cast<entity_id>(body_a->GetUserData());
+		msg.collider = static_cast<entity_id>(body_b->GetUserData());
 
 		if (fix_a->IsSensor()) {
 			msg.subject_impact_velocity = (body_a->GetLinearVelocity());
@@ -323,8 +321,8 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 
 		messages::collision_message msg;
 
-		msg.subject = static_cast<entity*>(body_a->GetUserData());
-		msg.collider = static_cast<entity*>(body_b->GetUserData());
+		msg.subject = static_cast<entity_id>(body_a->GetUserData());
+		msg.collider = static_cast<entity_id>(body_b->GetUserData());
 
 		msg.sensor_end_contact = true;
 		
@@ -352,8 +350,8 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 
 	messages::collision_message msg;
 
-	msg.subject = static_cast<entity*>(body_a->GetUserData());
-	msg.collider = static_cast<entity*>(body_b->GetUserData());
+	msg.subject = static_cast<entity_id>(body_a->GetUserData());
+	msg.collider = static_cast<entity_id>(body_b->GetUserData());
 
 	msg.point = manifold.points[0];
 	msg.point *= METERS_TO_PIXELSf;
@@ -397,7 +395,7 @@ void physics_system::process_steps(world& owner, unsigned steps) {
 		if (enable_motors)
 			for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 				if (b->GetType() == b2_staticBody) continue;
-				auto& physics = static_cast<entity*>(b->GetUserData())->get<components::physics>();
+				auto& physics = static_cast<entity_id>(b->GetUserData())->get<components::physics>();
 
 				if (physics.enable_angle_motor) {
 					float nextAngle = b->GetAngle() + b->GetAngularVelocity() / accumulator.get_hz();
@@ -451,7 +449,7 @@ unsigned physics_system::process_entities(world& owner) {
 	return steps;
 }
 
-void physics_system::add(entity*) {
+void physics_system::add(entity_id) {
 
 }
 
@@ -475,15 +473,15 @@ double physics_system::get_timestep_ms() {
 	return accumulator.get_timestep();
 }
 
-void physics_system::remove(entity* e) {
+void physics_system::remove(entity_id e) {
 	b2world.DestroyBody(e->get<components::physics>().body);
 }
 
 void physics_system::reset_states() {
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
-		auto& transform = static_cast<entity*>(b->GetUserData())->get<components::transform>();
-		auto& physics = static_cast<entity*>(b->GetUserData())->get<components::physics>();
+		auto& transform = static_cast<entity_id>(b->GetUserData())->get<components::transform>();
+		auto& physics = static_cast<entity_id>(b->GetUserData())->get<components::physics>();
 		
 		transform.current.pos = b->GetPosition();
 		transform.current.pos *= METERS_TO_PIXELSf;
@@ -503,7 +501,7 @@ void physics_system::smooth_states() {
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
  
-		auto& transform = static_cast<entity*>(b->GetUserData())->get<components::transform>();
+		auto& transform = static_cast<entity_id>(b->GetUserData())->get<components::transform>();
 
 		transform.current.pos = transform.previous.pos + ratio * (METERS_TO_PIXELSf*b->GetPosition() - transform.previous.pos);
 		

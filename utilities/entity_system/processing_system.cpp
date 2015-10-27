@@ -7,11 +7,11 @@
 
 namespace augs {
 	namespace entity_system {
-		void processing_system::add(entity* e) {
+		void processing_system::add(entity_id e) {
 			targets.push_back(e);
 		}
 		
-		void processing_system::remove(entity* e) {
+		void processing_system::remove(entity_id e) {
 			targets.erase(std::remove(targets.begin(), targets.end(), e), targets.end());
 		}
 

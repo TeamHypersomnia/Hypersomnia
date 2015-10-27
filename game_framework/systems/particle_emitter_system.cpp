@@ -12,13 +12,13 @@
 
 #include "misc/randval.h"
 
-entity& particle_emitter_system::create_refreshable_particle_group(world& owner) {
-	auto& ent = owner.create_entity();
+entity_id particle_emitter_system::create_refreshable_particle_group(world& owner) {
+	entity_id ent = owner.create_entity();
 	
-	ent.add(components::transform());
-	ent.add(components::particle_group()).stream_slots[0].destroy_when_empty = false;
-	ent.add(components::chase());
-	ent.add(components::render());
+	ent->add(components::transform());
+	ent->add(components::particle_group()).stream_slots[0].destroy_when_empty = false;
+	ent->add(components::chase());
+	ent->add(components::render());
 
 	return ent;
 }
@@ -76,7 +76,7 @@ void particle_emitter_system::consume_events(world& owner) {
 		if (it.type == it.CUSTOM)
 			emissions = &it.effect;
 		else {
-			if (it.subject) {
+			if (it.subject.alive()) {
 				auto* emitter = it.subject->find<particle_emitter>();
 				if (emitter && emitter->available_particle_effects) {
 					auto emissions_found = emitter->available_particle_effects->get_raw().find(it.type);
@@ -88,7 +88,7 @@ void particle_emitter_system::consume_events(world& owner) {
 			}
 		}
 
-		if (it.local_transform && it.subject) {
+		if (it.local_transform && it.subject.alive()) {
 			it.pos += it.subject->get<components::transform>().current.pos;
 			it.rotation += it.subject->get<components::transform>().current.rotation;
 		}
@@ -102,16 +102,16 @@ void particle_emitter_system::consume_events(world& owner) {
 			if (emission.type == resources::emission::type::BURST) {
 				int burst_amount = randval(emission.particles_per_burst);
 
-				entity& new_burst_entity = owner.create_entity();
-				new_burst_entity.add(components::particle_group());
-				new_burst_entity.add(components::transform());
+				entity_id new_burst_entity = owner.create_entity();
+				new_burst_entity->add(components::particle_group());
+				new_burst_entity->add(components::transform());
 
 				components::render new_render = emission.particle_render_template;
-				new_render.model = &new_burst_entity.get<components::particle_group>();
-				new_burst_entity.add(new_render);
+				new_render.model = &new_burst_entity->get<components::particle_group>();
+				new_burst_entity->add(new_render);
 
 				for (int i = 0; i < burst_amount; ++i)
-					spawn_particle(new_burst_entity.get<components::particle_group>().stream_slots[0], it.pos, target_rotation, target_spread, emission);
+					spawn_particle(new_burst_entity->get<components::particle_group>().stream_slots[0], it.pos, target_rotation, target_spread, emission);
 
 			}
 
@@ -129,7 +129,7 @@ void particle_emitter_system::consume_events(world& owner) {
 		components::render* target_render = nullptr;
 		components::transform* target_transform = nullptr;
 
-		if (it.target_group_to_refresh) {
+		if (it.target_group_to_refresh.alive()) {
 			target_group = it.target_group_to_refresh->find<components::particle_group>();
 			target_chase = it.target_group_to_refresh->find<components::chase>();
 			target_render = it.target_group_to_refresh->find<components::render>();
@@ -140,13 +140,13 @@ void particle_emitter_system::consume_events(world& owner) {
 
 		for (auto& stream : only_streams) {
 			if (!it.target_group_to_refresh) {
-				entity& new_stream_entity = owner.create_entity();
-				target_group = &new_stream_entity.add(components::particle_group());
-				target_transform = &new_stream_entity.add(components::transform());
-				target_render = &new_stream_entity.add(components::render());
+				entity_id new_stream_entity = owner.create_entity();
+				target_group = &new_stream_entity->add(components::particle_group());
+				target_transform = &new_stream_entity->add(components::transform());
+				target_render = &new_stream_entity->add(components::render());
 
-				if (it.subject)
-					target_chase = &new_stream_entity.add(components::chase(it.subject));
+				if (it.subject.alive())
+					target_chase = &new_stream_entity->add(components::chase(it.subject));
 			}
 
 			float target_rotation = it.rotation + randval(stream->angular_offset);
@@ -188,7 +188,7 @@ void particle_emitter_system::consume_events(world& owner) {
 				target_chase->rotation_orbit_offset = (it.pos - subject_transform.pos).rotate(-subject_transform.rotation, vec2<>(0.f, 0.f));
 			}
 
-			if (it.target_group_to_refresh) {
+			if (it.target_group_to_refresh.alive()) {
 				++stream_index;
 				target_stream.destroy_when_empty = false;
 			}

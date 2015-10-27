@@ -55,7 +55,13 @@ function set_components_from_entry(entity, entry, entities_lookup)
 		
 		if entry.movement.receivers ~= nil then
 			for i, receiver in pairs(entry.movement.receivers) do
-				movement:add_animation_receiver(ptr_lookup(receiver.target, entities_lookup), receiver.stop_at_zero_movement)
+				local new_receiver = ptr_lookup(receiver.target, entities_lookup)
+
+				if new_receiver == nil then
+					print "WARNING! Movement animation receiver entity could not be found!"
+				else
+					movement:add_animation_receiver(new_receiver, receiver.stop_at_zero_movement)
+				end
 			end
 		end
 		
@@ -145,6 +151,7 @@ function set_components_from_entry(entity, entry, entities_lookup)
 end
 
 function world_class:create_entity(entry)
+	print("Creating entity")
 	return set_components_from_entry(self.world:create_entity(), entry, {})
 end
 
@@ -153,6 +160,7 @@ function world_class:delete_entity(what_entity, redirect)
 end
 
 function world_class:create_entity_group(entries)
+	print("Creating group")
 	local entities_lookup = {}
 	
 	for name, entry in pairs(entries) do
@@ -161,6 +169,7 @@ function world_class:create_entity_group(entries)
 	end
 	
 	for name, new_entity in pairs(entities_lookup) do
+		print("Creating " .. name)
 		set_components_from_entry(new_entity, entries[name], entities_lookup)
 		
 		if new_entity.script == nil then 
@@ -171,26 +180,6 @@ function world_class:create_entity_group(entries)
 	end
 	
 	return entities_lookup
-end
-
-
-function world_class:create_entity_ptr(entry)
-	local result = self:create_entity_raw(entry)
-	local my_new_ptr = entity_ptr()
-	my_new_ptr:set(result)
-	return my_new_ptr
-end
-
-function world_class:create_entity_ptr_group(entries)
-	local results = self:create_entity_group_raw(entries)
-	
-	for name, entry in pairs(results) do
-		local my_new_ptr = entity_ptr()
-		my_new_ptr:set(entry)
-		results[name] = my_new_ptr
-	end
-	
-	return results
 end
 
 component_helpers = {}

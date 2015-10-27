@@ -10,9 +10,9 @@ namespace messages {
 	only by setting send_to_script flag in certain places in game_framework do we note that scripts should be notified of this event.
 	*/
 	struct message {
-		augs::entity_system::entity* subject;
+		augs::entity_system::entity_id subject;
 		bool send_to_scripts = false;
 
-		message(augs::entity_system::entity* subject = nullptr) : subject(subject) {}
+		message(augs::entity_system::entity_id subject = augs::entity_system::entity_id()) : subject(subject) {}
 	};
 }

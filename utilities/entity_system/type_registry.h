@@ -1,10 +1,10 @@
 #pragma once
 #include <unordered_map>
 #include "templated_list.h"
+#include "entity_system/entity_id.h"
 
 namespace augs {
 	namespace entity_system {
-		class entity;
 		typedef size_t type_hash;
 
 		struct registered_type : base_type {
@@ -23,7 +23,7 @@ namespace augs {
 			std::vector<registered_type> register_types(const type_pack& raw_types);
 			/* only returns existing types */
 			std::vector<registered_type> get_registered_types(const std::vector<type_hash>& raw_types) const;
-			std::vector<registered_type> get_registered_types(const entity&) const;
+			std::vector<registered_type> get_registered_types(entity_id) const;
 
 			/* get single type information from its hash */
 			registered_type get_registered_type(type_hash) const;

@@ -22,6 +22,8 @@
 #include <Box2D/Common/b2Math.h>
 #include <Box2D/Collision/Shapes/b2Shape.h>
 #include <memory>
+#include "entity_system/entity_id.h"
+typedef augs::entity_system::entity_id Userdata;
 
 class b2Fixture;
 class b2Joint;
@@ -53,7 +55,6 @@ struct b2BodyDef
 	/// This constructor sets the body definition default values.
 	b2BodyDef()
 	{
-		userData = NULL;
 		position.Set(0.0f, 0.0f);
 		angle = 0.0f;
 		linearVelocity.Set(0.0f, 0.0f);
@@ -116,7 +117,7 @@ struct b2BodyDef
 	bool active;
 
 	/// Use this to store application specific body data.
-	void* userData;
+	Userdata userData;
 
 	/// Scale the gravity applied to this body.
 	float32 gravityScale;
@@ -381,10 +382,10 @@ public:
 	const b2Body* GetNext() const;
 
 	/// Get the user data pointer that was provided in the body definition.
-	void* GetUserData() const;
+	Userdata GetUserData() const;
 
 	/// Set the user data. Use this to store your application specific data.
-	void SetUserData(void* data);
+	void SetUserData(const Userdata& data);
 
 	/// Get the parent world of this body.
 	b2World* GetWorld();
@@ -478,7 +479,7 @@ public:
 
 	float32 m_sleepTime;
 
-	void* m_userData;
+	Userdata m_userData;
 };
 
 inline b2BodyType b2Body::GetType() const
@@ -753,12 +754,12 @@ inline const b2Body* b2Body::GetNext() const
 	return m_next;
 }
 
-inline void b2Body::SetUserData(void* data)
+inline void b2Body::SetUserData(const Userdata& data)
 {
 	m_userData = data;
 }
 
-inline void* b2Body::GetUserData() const
+inline Userdata b2Body::GetUserData() const
 {
 	return m_userData;
 }

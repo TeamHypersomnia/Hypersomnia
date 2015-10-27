@@ -17,8 +17,7 @@
 using namespace components;
 
 steering::scene::scene()
-	: physics(nullptr), subject_entity(nullptr),
-	vision(nullptr), shape_verts(nullptr), state(nullptr) {
+	: physics(nullptr), vision(nullptr), shape_verts(nullptr), state(nullptr) {
 }
 
 steering::behaviour::behaviour() : max_force_applied(-1.f), weight(1.f) {}
@@ -64,13 +63,13 @@ void steering::target_info::set(vec2<> t, vec2<> vel) {
 	info.set_velocity(vel);
 }
 
-void steering::target_info::set(const augs::entity_system::entity_ptr& t) {
-	auto physics_comp = t.get()->find<physics>();
+void steering::target_info::set(entity_id t) {
+	auto physics_comp = t->find<physics>();
 	
 	if (physics_comp)
-		set(t.get()->get<transform>().current.pos, vec2<>(physics_comp->body->GetLinearVelocity())*METERS_TO_PIXELSf);
+		set(t->get<transform>().current.pos, vec2<>(physics_comp->body->GetLinearVelocity())*METERS_TO_PIXELSf);
 	else 
-		set(t.get()->get<transform>().current.pos);
+		set(t->get<transform>().current.pos);
 }
 
 void steering::target_info::calc_direction_distance(const object_info& in) {
@@ -582,9 +581,8 @@ vec2<> steering::separation::steer(scene in) {
 }
 
 void steering::behaviour_state::update_target_info(const object_info& subject) {
-	if (target_from) {
+	if (target_from.alive())
 		target.set(target_from);
-	}
 	
 	/* calculate target information for all the behaviours */
 	target.calc_direction_distance(subject);
@@ -607,7 +605,7 @@ void steering_system::substep(world& owner) {
 		/* extract ALL the vertices from the physics body, it will be then used by obstacle avoidance routines to calculate avoidance quad,
 			false means we want pixels
 		*/
-		auto shape_verts = helpers::get_transformed_shape_verts(*it, false);
+		auto shape_verts = helpers::get_transformed_shape_verts(it, false);
 		auto draw_vector = [&position, &render](vec2<> v, graphics::pixel_32 col){
 			if (v.non_zero())
 				render.manually_cleared_lines.push_back(render_system::debug_line(position, position + v, col));

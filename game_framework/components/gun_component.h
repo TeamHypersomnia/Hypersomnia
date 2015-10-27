@@ -2,7 +2,7 @@
 
 #include "misc/timer.h"
 #include "entity_system/component.h"
-#include "entity_system/entity_ptr.h"
+#include "entity_system/entity.h"
 
 #include "render_component.h"
 #include "../game/body_helper.h"
@@ -67,23 +67,23 @@ namespace components {
 		void shake_camera(float direction);
 
 		struct uncopyable {
-			augs::entity_system::entity_ptr target_barrel_smoke_group;
+			augs::entity_system::entity_id target_barrel_smoke_group;
 			uncopyable& operator=(const uncopyable& b) { return *this; }
 		} barrel_smoke;
 
-		augs::entity_system::entity_ptr& get_barrel_smoke() {
+		augs::entity_system::entity_id& get_barrel_smoke() {
 			return barrel_smoke.target_barrel_smoke_group;
 		}
 
-		void transfer_barrel_smoke(augs::entity_system::entity* another, bool overwrite_comps);
+		void transfer_barrel_smoke(augs::entity_system::entity_id another, bool overwrite_comps);
 
-		augs::entity_system::entity_ptr target_camera_to_shake;
+		augs::entity_system::entity_id target_camera_to_shake;
 
 		gun()
 			: max_rounds(0), bullets_once(0), spread_degrees(0.f), bullet_damage(std::make_pair(0.f, 0.f)), is_automatic(false),
 			bullet_distance_offset(0.f), shake_radius(0.f), shake_spread_degrees(0.f), max_bullet_distance(1000.f), current_rounds(0),
 			 swing_radius(0.f), swing_angle(0.f), swing_angular_offset(0.f), query_vertices(7), swing_duration(0.f),
-			 trigger_mode(NONE), current_state(READY), target_camera_to_shake(nullptr), bullet_speed(std::make_pair(0.f, 0.f)), current_swing_direction(false) {
+			 trigger_mode(NONE), current_state(READY), bullet_speed(std::make_pair(0.f, 0.f)), current_swing_direction(false) {
 				bullet_body.filter.groupIndex = -1;
 		}
 

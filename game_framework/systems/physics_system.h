@@ -59,8 +59,8 @@ public:
 	unsigned process_entities(world&);
 	void process_steps(world&, unsigned);
 
-	void add(entity*) override;
-	void remove(entity*) override;
+	void add(entity_id) override;
+	void remove(entity_id) override;
 	void clear() override;
 
 	void configure_stepping(float fps, int max_updates_per_step);
@@ -70,12 +70,12 @@ public:
 		vec2<> intersection, normal;
 		bool hit;
 		b2Fixture* what_fixture = nullptr;
-		entity* what_entity = nullptr;
+		entity_id what_entity;
 
 		raycast_output() : hit(false), what_fixture(nullptr) {}
 	};
 
-	std::vector<raycast_output> ray_cast_all_intersections(vec2<> p1_meters, vec2<> p2_meters, b2Filter filter, entity* ignore_entity = nullptr);
+	std::vector<raycast_output> ray_cast_all_intersections(vec2<> p1_meters, vec2<> p2_meters, b2Filter filter, entity_id ignore_entity = entity_id());
 	
 	struct edge_edge_output {
 		vec2<> intersection;
@@ -84,11 +84,11 @@ public:
 
 	edge_edge_output edge_edge_intersection(vec2<> p1_meters, vec2<> p2_meters, vec2<> edge_p1, vec2<> edge_p2);
 
-	raycast_output ray_cast(vec2<> p1_meters, vec2<> p2_meters, b2Filter filter, entity* ignore_entity = nullptr);
-	raycast_output ray_cast_px(vec2<> p1, vec2<> p2, b2Filter filter, entity* ignore_entity = nullptr);
+	raycast_output ray_cast(vec2<> p1_meters, vec2<> p2_meters, b2Filter filter, entity_id ignore_entity = entity_id());
+	raycast_output ray_cast_px(vec2<> p1, vec2<> p2, b2Filter filter, entity_id ignore_entity = entity_id());
 	
-	vec2<> push_away_from_walls(vec2<> position, float radius, int ray_amount, b2Filter filter, entity* ignore_entity = nullptr);
-	float get_closest_wall_intersection(vec2<> position, float radius, int ray_amount, b2Filter filter, entity* ignore_entity = nullptr);
+	vec2<> push_away_from_walls(vec2<> position, float radius, int ray_amount, b2Filter filter, entity_id ignore_entity = entity_id());
+	float get_closest_wall_intersection(vec2<> position, float radius, int ray_amount, b2Filter filter, entity_id ignore_entity = entity_id());
 
 	struct query_output {
 		struct queried_result {
@@ -107,37 +107,35 @@ public:
 		std::vector<queried_result> details;
 	};
 
-	query_output query_square(vec2<> p1_meters, float side_meters, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
-	query_output query_square_px(vec2<> p1, float side, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
-	query_output query_aabb(vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
-	query_output query_aabb_px(vec2<> p1, vec2<> p2, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
+	query_output query_square(vec2<> p1_meters, float side_meters, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
+	query_output query_square_px(vec2<> p1, float side, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
+	query_output query_aabb(vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
+	query_output query_aabb_px(vec2<> p1, vec2<> p2, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
 
-	query_output query_body(augs::entity_system::entity&, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
+	query_output query_body(augs::entity_system::entity_id, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
 
-	query_output query_polygon(const std::vector<vec2<>>& vertices, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
-	query_output query_shape(b2Shape*, b2Filter* filter = nullptr, void* ignore_userdata = nullptr);
+	query_output query_polygon(const std::vector<vec2<>>& vertices, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
+	query_output query_shape(b2Shape*, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
 private:
 	/* callback structure used in QueryAABB function to get all shapes near-by */
 	struct query_aabb_input : b2QueryCallback {
-		void* ignore_userdata;
-		b2Filter* filter;
+		entity_id ignore_entity;
+		b2Filter* filter = nullptr;
 		std::set<b2Body*> output;
 		std::vector<b2Fixture*> out_fixtures;
 
-		query_aabb_input();
 		bool ReportFixture(b2Fixture* fixture) override;
 	};
 
 	struct raycast_input : public b2RayCastCallback {
-		entity* subject;
-		b2Filter* subject_filter;
+		entity_id subject;
+		b2Filter* subject_filter = nullptr;
 		
-		bool save_all;
+		bool save_all = false;
 		raycast_output output;
 		std::vector<raycast_output> outputs;
 
 		bool ShouldRaycast(b2Fixture* fixture);
 		float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction);
-		raycast_input();
 	};
 };

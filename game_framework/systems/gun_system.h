@@ -12,8 +12,8 @@ class physics_system;
 
 class gun_system : public processing_system_templated<components::transform, components::gun> {
 public:
-	void add(entity*) override;
-	void remove(entity*) override;
+	void add(entity_id) override;
+	void remove(entity_id) override;
 
 	void consume_events(world&);
 	void process_entities(world&);

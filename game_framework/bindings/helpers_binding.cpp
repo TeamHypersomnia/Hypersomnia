@@ -11,13 +11,13 @@
 #include "../resources/render_info.h"
 #include "entity_system/entity.h"
 // sensibilia bottlenecks
-void loop_instability_gun_bullets(pixel_32 init_color, std::vector<entity_ptr>* bullets, float instability,
+void loop_instability_gun_bullets(pixel_32 init_color, std::vector<entity_id>* bullets, float instability,
 	float timestep_multiplier, vec2<> base_gravity) {
 	auto all_player_bullets = *bullets;
-		all_player_bullets.erase(std::remove_if(std::begin(all_player_bullets), std::end(all_player_bullets), [&](entity_ptr& p){
-			if (!p.exists()) return true;
+		all_player_bullets.erase(std::remove_if(std::begin(all_player_bullets), std::end(all_player_bullets), [&](entity_id p){
+			if (!p.alive()) return true;
 
-			auto* ent = p.get();
+			entity* ent = p.ptr();
 			auto& dmg = ent->get<damage>();
 			auto& model = ent->get<render>().model;
 			auto& current = ent->get<transform>().current;

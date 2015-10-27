@@ -2,9 +2,9 @@
 #include "chase_system.h"
 #include "entity_system/entity.h"
 
-void components::chase::set_target(augs::entity_system::entity* new_target) {
+void components::chase::set_target(augs::entity_system::entity_id new_target) {
 	target_newly_set = true;
-	target.set_ptr(new_target);
+	target = new_target;
 }
 
 void chase_system::process_entities(world&) {
@@ -12,7 +12,7 @@ void chase_system::process_entities(world&) {
 		auto& transform = it->get<components::transform>().current;
 		auto& chase = it->get<components::chase>();
 
-		if (chase.target == nullptr) continue;
+		if (chase.target.dead()) continue;
 		
 		if (chase.target_newly_set) {
 			auto target_transform = chase.subscribe_to_previous ? chase.target->get<components::transform>().previous : chase.target->get<components::transform>().current;

@@ -1,6 +1,6 @@
 #pragma once
 #include "misc/timer.h"
-#include "entity_system/entity_ptr.h"
+#include "entity_system/entity.h"
 
 #include "../resources/particle_emitter_info.h"
 

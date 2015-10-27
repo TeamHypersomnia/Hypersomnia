@@ -4,6 +4,8 @@
 #include "entity_system/world.h"
 #include "entity_system/entity.h"
 
+#include <iostream>
+
 class NullStream {
 public:
 	NullStream() { }
@@ -19,7 +21,7 @@ public:
 
 using namespace components;
 
-behaviour_tree::task::task() : subject(nullptr), running_parent_node(nullptr), running_index(0u) {}
+behaviour_tree::task::task() : running_parent_node(nullptr), running_index(0u) {}
 
 bool behaviour_tree::task::operator==(const task& b) const {
 	return running_parent_node == b.running_parent_node && running_index == b.running_index;

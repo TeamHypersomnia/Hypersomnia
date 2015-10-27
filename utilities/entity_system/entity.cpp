@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "entity.h"
+#include "world.h"
 #include "signature_matcher.h"
 
 namespace augs {
@@ -10,8 +11,12 @@ namespace augs {
 			clear();
 		}
 
-		std::vector<registered_type> entity::get_components() const {
-			return owner_world.component_library.get_registered_types(*this);
+		entity_id entity::get_id() {
+			return owner_world.get_id(this);
+		}
+
+		std::vector<registered_type> entity::get_components() {
+			return owner_world.component_library.get_registered_types(get_id());
 		}
 
 		std::string entity::get_name() {
@@ -30,12 +35,12 @@ namespace augs {
 			for (auto sys : owner_world.get_all_systems()) {
 				/* if the system potentially owns this entity */
 				if(sys->components_signature.matches(my_signature))
-					sys->remove(this);
+					sys->remove(get_id());
 			}
 
 			for (auto type : type_to_component.raw) {
 				/* call polymorphic destructor */
-				type.val->~component();
+				((component*)(type.val.ptr()))->~component();
 				/* delete component from corresponding pool, we must get component's size from the library */
 				owner_world.get_container_for_type(type.key).free(type.val);
 			}
@@ -51,7 +56,7 @@ namespace augs {
 				/* if a processing_system matches with this */
 			if (sys->components_signature.matches(my_signature))
 				/* we should add this entity there */
-				sys->add(this);
+				sys->add(get_id());
 
 			enabled = true;
 		}
@@ -64,7 +69,7 @@ namespace augs {
 				/* if a processing_system matches with this */
 			if (sys->components_signature.matches(my_signature))
 				/* we should remove this entity from there */
-				sys->remove(this);
+				sys->remove(get_id());
 
 			enabled = false;
 		}

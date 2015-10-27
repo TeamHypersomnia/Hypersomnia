@@ -1,6 +1,6 @@
 #pragma once
 #include "entity_system/component.h"
-#include "entity_system/entity_ptr.h"
+#include "entity_system/entity_id.h"
 
 namespace components {
 	struct lookat : public augs::entity_system::component {
@@ -26,12 +26,12 @@ namespace components {
 
 		unsigned look_mode;
 
-		augs::entity_system::entity_ptr target;
+		augs::entity_system::entity_id target;
 
 		float last_value;
 		bool update_value;
 
-		lookat(augs::entity_system::entity* target = nullptr, unsigned look_mode = look_type::POSITION) 
+		lookat(augs::entity_system::entity_id target = augs::entity_system::entity_id(), unsigned look_mode = look_type::POSITION)
 			: target(target), look_mode(look_mode), smoothing_average_factor(0.5), averages_per_sec(20.0), easing_mode(NONE), last_value(0.f),
 				update_value(true)
 			{}

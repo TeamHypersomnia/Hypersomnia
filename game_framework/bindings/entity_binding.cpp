@@ -2,7 +2,6 @@
 #include "stdafx.h"
 #include <luabind/operator.hpp>
 #include "entity_system/entity.h"
-#include "entity_system/entity_ptr.h"
 
 #include "bindings.h"
 
@@ -26,12 +25,46 @@
 #include "../components/transform_component.h"
 #include "../components/render_component.h"
 
+template <class T>
+T& add(entity_id* _this, const T& c) {
+	return _this->get().add<T>(c);
+}
+
+template<>
+components::visibility& add<components::visibility>(entity_id* _this, const components::visibility& c) {
+	components::visibility& vis = _this->get().add<components::visibility>(c);
+	assert(&_this->get().get<components::visibility>() == &vis);
+	assert(_this->get().find<components::visibility>() == &vis);
+	return vis;
+}
+
+template <class T>
+void set(entity_id* _this, const T& c) {
+	_this->get().set<T>(c);
+}
+
+template <class T>
+T* find(entity_id* _this) {
+	return _this->get().find<T>();
+}
+
+template <class T>
+void remove(entity_id* _this) {
+	return _this->get().remove<T>();
+}
+
+luabind::object get_script(entity_id* _this) {
+	return _this->get().script_data;
+}
+void set_script(entity_id* _this, luabind::object set) {
+	_this->get().script_data = set;
+}
+
 namespace bindings {
 	luabind::scope _entity() {
 		return
 			luabind::class_<entity>("_entity")
 			.def("clear", &entity::clear)
-			.def(luabind::const_self == luabind::const_self)
 			.property("name", &entity::get_name)
 			.def("enable", &entity::enable)
 			.def("disable", &entity::disable)
@@ -98,34 +131,73 @@ namespace bindings {
 			.property("transform", &entity::find<transform>, &entity::set<transform>),
 			
 
-			luabind::class_<entity_ptr>("entity_ptr")
+			luabind::class_<entity_id>("entity_id")
 			.def(luabind::constructor<>())
-			.def(luabind::constructor<entity_system::entity*>())
-			.def("get", &entity_ptr::get)
-			.def("exists", &entity_ptr::exists)
-			.def("set", &entity_ptr::set_ptr)
-			.def("set", (entity_ptr& (entity_ptr::*)(const entity_ptr&))&entity_ptr::operator=)
+			.def(luabind::constructor<const entity_id&>())
+			.def(luabind::const_self == luabind::const_self)
+			.def("get", (entity& (entity_id::*)())&entity_id::get)
+			.def("exists", &entity_id::alive)
+			.def("get_pool", &entity_id::get_pool)
+			.def("set", (entity_id& (entity_id::*)(const entity_id&))&entity_id::operator=)
+			.property("script", get_script, set_script)
 
-			//.property("entity", &entity_ptr::get)
-			//.property("animate", &entity_ptr::find<animate>, &entity_ptr::set<animate>)
-			//.property("behaviour_tree", &entity_ptr::find<behaviour_tree>, &entity_ptr::set<behaviour_tree>)
-			//.property("visibility", &entity_ptr::find<visibility>, &entity_ptr::set<visibility>)
-			//.property("pathfinding", &entity_ptr::find<pathfinding>, &entity_ptr::set<pathfinding>)
-			//.property("camera", &entity_ptr::find<camera>, &entity_ptr::set<camera>)
-			//.property("chase", &entity_ptr::find<chase>, &entity_ptr::set<chase>)
-			//.property("children", &entity_ptr::find<children>, &entity_ptr::set<children>)
-			//.property("crosshair", &entity_ptr::find<crosshair>, &entity_ptr::set<crosshair>)
-			//.property("damage", &entity_ptr::find<damage>, &entity_ptr::set<damage>)
-			//.property("gun", &entity_ptr::find<gun>, &entity_ptr::set<gun>)
-			//.property("input", &entity_ptr::find<input>, &entity_ptr::set<input>)
-			//.property("lookat", &entity_ptr::find<lookat>, &entity_ptr::set<lookat>)
-			//.property("movement", &entity_ptr::find<movement>, &entity_ptr::set<movement>)
-			//.property("particle_emitter", &entity_ptr::find<particle_emitter>, &entity_ptr::set<particle_emitter>)
-			//.property("physics", &entity_ptr::find<physics>, &entity_ptr::set<physics>)
-			//.property("scriptable", &entity_ptr::find<scriptable>, &entity_ptr::set<scriptable>)
-			//.property("steering", &entity_ptr::find<steering>, &entity_ptr::set<steering>)
-			//.property("render", &entity_ptr::find<render>, &entity_ptr::set<render>)
-			//.property("transform", &entity_ptr::find<transform>, &entity_ptr::set<transform>);
+			.def("remove_animate", remove<animate>)
+			.def("add", add<animate>)
+			.property("animate", find<animate>, set<animate>)
+			.def("remove_behaviour_tree", remove<behaviour_tree>)
+			.def("add", add<behaviour_tree>)
+			.property("behaviour_tree", find<behaviour_tree>, set<behaviour_tree>)
+			.def("remove_visibility", remove<visibility>)
+			.def("add", add<visibility>)
+			.property("visibility", find<visibility>, set<visibility>)
+			.def("remove_pathfinding", remove<pathfinding>)
+			.def("add", add<pathfinding>)
+			.property("pathfinding", find<pathfinding>, set<pathfinding>)
+			.def("remove_camera", remove<camera>)
+			.def("add", add<camera>)
+			.property("camera", find<camera>, set<camera>)
+			.def("remove_chase", remove<chase>)
+			.def("add", add<chase>)
+			.property("chase", find<chase>, set<chase>)
+			.def("remove_children", remove<children>)
+			.def("add", add<children>)
+			.property("children", find<children>, set<children>)
+			.def("remove_crosshair", remove<crosshair>)
+			.def("add", add<crosshair>)
+			.property("crosshair", find<crosshair>, set<crosshair>)
+			.def("remove_damage", remove<damage>)
+			.def("add", add<damage>)
+			.property("damage", find<damage>, set<damage>)
+			.def("remove_gun", remove<gun>)
+			.def("add", add<gun>)
+			.property("gun", find<gun>, set<gun>)
+			.def("remove_input", remove<input>)
+			.def("add", add<input>)
+			.property("input", find<input>, set<input>)
+			.def("remove_lookat", remove<lookat>)
+			.def("add", add<lookat>)
+			.property("lookat", find<lookat>, set<lookat>)
+			.def("remove_movement", remove<movement>)
+			.def("add", add<movement>)
+			.property("movement", find<movement>, set<movement>)
+			.def("remove_particle_group", remove<particle_group>)
+			.def("add", add<particle_group>)
+			.property("particle_group", find<particle_group>, set<particle_group>)
+			.def("remove_particle_emitter", remove<particle_emitter>)
+			.def("add", add<particle_emitter>)
+			.property("particle_emitter", find<particle_emitter>, set<particle_emitter>)
+			.def("remove_physics", remove<physics>)
+			.def("add", add<physics>)
+			.property("physics", find<physics>, set<physics>)
+			.def("remove_steering", remove<steering>)
+			.def("add", add<steering>)
+			.property("steering", find<steering>, set<steering>)
+			.def("remove_render", remove<render>)
+			.def("add", add<render>)
+			.property("render", find<render>, set<render>)
+			.def("remove_transform", remove<transform>)
+			.def("add", add<transform>)
+			.property("transform", find<transform>, set<transform>)
 			;
 	}
 }

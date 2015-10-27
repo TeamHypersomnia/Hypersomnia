@@ -1,18 +1,22 @@
 #pragma once
 #include "processing_system.h"
-#include "world.h"
 #include "component.h"
 #include "signature_matcher.h"
 
 #include "misc/sorted_vector.h"
+#include "misc/object_pool.h"
+#include "luabind/detail/object.hpp"
 
 namespace augs {
 	namespace entity_system {
+		class world;
+
+		class entity;
+		typedef object_pool<entity>::id entity_id;
+
 		class entity {
 			/* only world class is allowed to instantiate an entity and it has to do it inside object pool */
-			friend class boost::object_pool<entity>;
 			friend class type_registry;
-			friend class entity_ptr;
 
 		public:
 			bool enabled;
@@ -22,10 +26,12 @@ namespace augs {
 			~entity();
 
 			/* maps type hashes into components */
-			misc::sorted_vector_map<type_hash, component*> type_to_component;
+			misc::sorted_vector_map<type_hash, memory_pool::id> type_to_component;
 			std::string name;
 			
 			std::string get_name();
+
+			entity_id get_id();
 
 			world& owner_world;
 
@@ -33,13 +39,8 @@ namespace augs {
 				return owner_world;
 			}
 
-			/* only for script binding */
-			bool operator==(const entity& b) const {
-				return this == &b;
-			}
-
 			/* get information about component types */
-			std::vector<registered_type> get_components() const;
+			std::vector<registered_type> get_components();
 
 			/* removes all components */
 			void clear();
@@ -60,7 +61,7 @@ namespace augs {
 			component_class* find() {
 				auto found = type_to_component.get(typeid(component_class).hash_code());
 				if (found)
-					return static_cast<component_class*>(*found);
+					return reinterpret_cast<component_class*>(found->ptr());
 				return nullptr;
 			}
 
@@ -88,19 +89,15 @@ namespace augs {
 					//if (overwrite_if_exists)
 						//(*static_cast<component_type*>((*p.first).second)) = object;
 				}
-				type_to_component.add(hash, nullptr);
+				type_to_component.add(hash, memory_pool::id());
 				
-				auto ptr = type_to_component.get(hash);
+				memory_pool::id& component_ptr = *type_to_component.get(hash);
 				
-				assert(ptr != nullptr);
+				/* allocate new component in a corresponding pool */
+				component_ptr = owner_world.get_container_for_type(hash).allocate();
 				
-				/* allocate new component in corresponding pool */
-				(*ptr) = static_cast<component*>(owner_world.get_container_for_type(hash).malloc());
-				
-				assert(*ptr != nullptr);
-
 				/* construct it in place using placement new operator */
-				new (*ptr) component_type(object);
+				new (component_ptr.ptr()) component_type(object);
 
 				/* get new signature */
 				signature_matcher_bitset new_signature(old_signature);
@@ -108,12 +105,15 @@ namespace augs {
 				new_signature.add(owner_world.component_library.get_registered_type(hash));
 
 				for (auto sys : owner_world.get_all_systems())
-					/* if a processing_system matches with the new signature and not with the old one */
-					if (sys->components_signature.matches(new_signature) && !sys->components_signature.matches(old_signature))
-						/* we should add this entity there */
-						sys->add(this);
+				{
+					bool matches_new = sys->components_signature.matches(new_signature);
+					bool doesnt_match_old = !sys->components_signature.matches(old_signature);
+					
+					if (matches_new && doesnt_match_old)
+						sys->add(get_id());
+				}
 
-				return *static_cast<component_type*>(*ptr);
+				return *reinterpret_cast<component_type*>(component_ptr.ptr());
 			}
 
 			template <typename component_type>
@@ -122,10 +122,8 @@ namespace augs {
 
 				signature_matcher_bitset old_signature(get_components());
 
-				/* try to find and obtain iterator */
-				auto it = type_to_component.get(typeid(component_type).hash_code());
-				/* not found, return */
-				if (it == nullptr) return;
+				/* obtain iterator, fail early */
+				memory_pool::id& it = *type_to_component.get(typeid(component_type).hash_code());
 
 				signature_matcher_bitset new_signature(old_signature);
 				new_signature.remove(owner_world.component_library.get_registered_type(typeid(component_type).hash_code()));
@@ -134,11 +132,11 @@ namespace augs {
 					/* if a processing_system does not match with the new signature and does with the old one */
 					if (!sys->components_signature.matches(new_signature) && sys->components_signature.matches(old_signature))
 						/* we should remove this entity from there */
-						sys->remove(this);
+						sys->remove(get_id());
 
 				/* delete component from corresponding pool, first cast to component_type to avoid polymorphic indirection */
-				static_cast<component_type*>(*it)->~component_type();
-				owner_world.get_container_for_type(typeid(component_type).hash_code()).free(*it);
+				reinterpret_cast<component_type*>(it.ptr())->~component_type();
+				owner_world.get_container_for_type(typeid(component_type).hash_code()).free(it);
 
 				/* delete component from entity's map */
 				type_to_component.remove(typeid(component_type).hash_code());
@@ -146,3 +144,4 @@ namespace augs {
 		};
 	}
 }
+

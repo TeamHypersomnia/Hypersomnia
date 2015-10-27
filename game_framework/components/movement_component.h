@@ -1,19 +1,18 @@
 #pragma once
 #include "entity_system/component.h"
-#include "entity_system/entity_ptr.h"
 #include "../messages/animate_message.h"
 #include "math/vec2d.h"
 
 namespace components {
 	struct movement : public augs::entity_system::component {
 		struct subscribtion {
-			augs::entity_system::entity_ptr target;
+			augs::entity_system::entity_id target;
 			bool stop_at_zero_movement;
-			subscribtion(augs::entity_system::entity* target, bool stop_at_zero_movement = true) :
+			subscribtion(augs::entity_system::entity_id target, bool stop_at_zero_movement = true) :
 				target(target), stop_at_zero_movement(stop_at_zero_movement) {}
 		};
 
-		void add_animation_receiver(augs::entity_system::entity* e, bool stop_at_zero_movement) {
+		void add_animation_receiver(augs::entity_system::entity_id e, bool stop_at_zero_movement) {
 			animation_receivers.push_back(subscribtion(e, stop_at_zero_movement));
 		}
 

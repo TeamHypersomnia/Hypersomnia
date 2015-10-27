@@ -12,7 +12,7 @@ using namespace entity_system;
 
 class particle_emitter_system : public processing_system_templated<components::particle_emitter> {
 public:
-	static entity& create_refreshable_particle_group(world&);
+	static entity_id create_refreshable_particle_group(world&);
 	static void spawn_particle(components::particle_group::stream&, const vec2<>&, float, float spread, const resources::emission&);
 	void consume_events(world&);
 };

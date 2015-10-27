@@ -1,6 +1,6 @@
 #pragma once
 #include "entity_system/component.h"
-#include "entity_system/entity_ptr.h"
+#include "entity_system/entity.h"
 #include "math/vec2d.h"
 #include "graphics/pixel.h"
 #include "misc/timer.h"
@@ -31,7 +31,7 @@ namespace components {
 			visibility* vision;
 			std::vector<b2Vec2>* shape_verts;
 
-			augs::entity_system::entity* subject_entity;
+			augs::entity_system::entity_id subject_entity;
 			
 			scene();
 		};
@@ -46,7 +46,7 @@ namespace components {
 
 			target_info();
 
-			void set(const augs::entity_system::entity_ptr&);
+			void set(entity_id);
 			void set(augs::vec2<> position, augs::vec2<> velocity = augs::vec2<>(0.f, 0.f));
 
 			void calc_direction_distance(const object_info& subject);
@@ -161,7 +161,7 @@ namespace components {
 			*/
 
 			target_info target;
-			augs::entity_system::entity_ptr target_from;
+			augs::entity_system::entity_id target_from;
 
 			augs::vec2<> last_output_force;
 			augs::vec2<> last_estimated_target_position;
