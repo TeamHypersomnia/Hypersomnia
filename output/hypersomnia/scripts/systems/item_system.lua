@@ -12,7 +12,7 @@ end
 
 function components.item:set_wielder(new_owner)
 	local item = self.entity
-	local cpp_chase = nil
+	local cpp_chase = entity_id()
 	
 	if new_owner ~= nil then
 		cpp_chase = new_owner.cpp_entity

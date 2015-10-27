@@ -48,7 +48,7 @@ for k, v in pairs(filters) do
 	local mask = 0
 	
 	for i=1, #filters[k] do
-		mask = bitor(all_categories[filters[k][i]], mask)
+		mask = all_categories[filters[k][i]] | mask
 	end
 	
 	filters[k] = create(b2Filter, {
@@ -60,14 +60,14 @@ end
 query_filter_category = 0
 	
 for k, v in pairs(all_categories) do
-	query_filter_category = bitor(v, query_filter_category)
+	query_filter_category = v | query_filter_category
 end
 
 function create_query_filter(entries)
 	local mask = 0
 	
 	for i=1, #entries do
-		mask = bitor(all_categories[entries[i]], mask)
+		mask = all_categories[entries[i]] | mask
 	end
 	
 	return create(b2Filter, {

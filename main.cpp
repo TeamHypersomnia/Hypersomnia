@@ -12,7 +12,12 @@
 
 #include <gtest\gtest.h>
 
+#include <iostream>
 #include <signal.h>
+#include "script.h"
+
+using namespace std;
+using namespace augs;
 
 void SignalHandler(int signal) { throw "Access violation!"; }
 
@@ -30,12 +35,12 @@ int main(int argc, char** argv) {
 	signal(SIGSEGV, SignalHandler);
 
 	try {
-		lua_state.dofile("init.lua");
+		if (!lua_state.dofile("init.lua"))		
+			lua_state.debug_response();
 	}
 	catch (char* e) {
-		std::cout << "Exception thrown! " << e << "\n" << lua_state.get_traceback();
-		int stop;
-		std::cin >> stop;
+		cout << "Exception thrown! " << e << "\n";
+		lua_state.debug_response();
 	}
 
 	framework::deinit();
