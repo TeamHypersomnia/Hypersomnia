@@ -19,7 +19,7 @@ const int IMAGES = 1;
 const int FONTS = 1;
 
 namespace luabind {
-	struct object;
+	class object;
 }
 
 using namespace augs::window;
