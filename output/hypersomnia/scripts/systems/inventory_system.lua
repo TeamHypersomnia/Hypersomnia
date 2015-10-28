@@ -58,7 +58,7 @@ function inventory_system:remove_entity(removed_entity)
 	local owner_world = removed_entity.cpp_entity.owner_world
 
 	for i=1, #inventory.slots do
-		owner_world:post_message(destroy_message(inventory.slots[i].bg_entity, nil))
+		owner_world:post_message(destroy_message(inventory.slots[i].bg_entity, entity_id()))
 	end
 	
 	processing_system.remove_entity(self, removed_entity)

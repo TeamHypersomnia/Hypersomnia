@@ -63,9 +63,9 @@ end
 
 function health_system:remove_entity(removed_entity)
 	local owner_world = removed_entity.cpp_entity.owner_world
-	owner_world:post_message(destroy_message(removed_entity.health.under_bar_entity, nil))
-	owner_world:post_message(destroy_message(removed_entity.health.health_bar_entity, nil))
-	owner_world:post_message(destroy_message(removed_entity.health.under_bar_outline_entity, nil))
+	owner_world:post_message(destroy_message(removed_entity.health.under_bar_entity, entity_id()))
+	owner_world:post_message(destroy_message(removed_entity.health.health_bar_entity, entity_id()))
+	owner_world:post_message(destroy_message(removed_entity.health.under_bar_outline_entity, entity_id()))
 	
 	processing_system.remove_entity(self, removed_entity)
 end

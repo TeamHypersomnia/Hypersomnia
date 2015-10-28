@@ -25,7 +25,7 @@ function interpolation_system:remove_entity(removed_entity)
 	
 	if sim_entity then
 		local owner_world = sim_entity.owner_world
-		owner_world:post_message(destroy_message(sim_entity, nil))
+		owner_world:post_message(destroy_message(sim_entity, entity_id()))
 	end
 
 	processing_system.remove_entity(self, removed_entity)

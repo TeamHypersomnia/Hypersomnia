@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C3710A9A-6D71-4981-A34A-6CD74BD93E18}</ProjectGuid>
     <RootNamespace>Hypersomniaserver</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -45,7 +46,7 @@
     <OutDir>$(ProjectDir)\output\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(ProjectDir)..\Augmentations\3rdparty;$(ProjectDir)..\Augmentations\utilities;$(ProjectDir)..\Augmentations\3rdparty\gtest;$(ProjectDir)..\Augmentations;$(ProjectDir)..\Augmentations\3rdparty\freetype;$(ProjectDir)..\Augmentations\3rdparty\RakNet\Source;$(ProjectDir)..\Augmentations\3rdparty\lua;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\Augmentations\3rdparty\RakNet\Source;$(ProjectDir)..\Augmentations\3rdparty;$(ProjectDir)..\Augmentations\utilities;$(ProjectDir)..\Augmentations\3rdparty\gtest;$(ProjectDir)..\Augmentations;$(ProjectDir)..\Augmentations\3rdparty\freetype;$(ProjectDir)..\Augmentations\3rdparty\lua;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)..\Augmentations\3rdparty\libs;$(LibraryPath)</LibraryPath>
     <OutDir>$(ProjectDir)\output\</OutDir>
     <TargetName>$(ProjectName)-debug</TargetName>
@@ -56,11 +57,9 @@
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PreprocessorDefinitions>_MBCS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ExceptionHandling>false</ExceptionHandling>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>

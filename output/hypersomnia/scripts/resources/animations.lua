@@ -52,7 +52,7 @@ function create_animations(output, sprite_library)
 			{ model = { image = frames["4"] }, duration_ms = 50 },
 			{ model = { image = frames["5"] }, duration_ms = 50 },
 			{ model = { image = frames["6"] }, duration_ms = 50 },
-			{ model = nil, duration_ms = 20, callback = function(subject) subject.owner_world:post_message(destroy_message(subject, nil)) end }
+			{ model = nil, duration_ms = 20, callback = function(subject) subject.owner_world:post_message(destroy_message(subject, entity_id())) end }
 		},
 
 		loop_mode = animation.NONE
@@ -67,7 +67,7 @@ function create_animations(output, sprite_library)
 			{ model = { image = frames["3"], size_multiplier = vec2(3, 3),  color = rgba(0, 255, 255, 255) }, duration_ms = 30 },
 			{ model = { image = frames["4"], size_multiplier = vec2(3, 3),  color = rgba(0, 255, 255, 255) }, duration_ms = 30 },
 			{ model = { image = frames["5"], size_multiplier = vec2(3, 3),  color = rgba(0, 255, 255, 255) }, duration_ms = 30 },
-			{ model = nil, duration_ms = 20, callback = function(subject) subject.owner_world:post_message(destroy_message(subject, nil)) end }
+			{ model = nil, duration_ms = 20, callback = function(subject) subject.owner_world:post_message(destroy_message(subject, entity_id())) end }
 		},
 
 		loop_mode = animation.NONE
