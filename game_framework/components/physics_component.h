@@ -10,10 +10,10 @@ namespace components {
 		b2Body* body;
 		std::vector <augs::vec2<>> original_model;
 
-		bool enable_angle_motor;
-		float target_angle;
-		float angle_motor_force_multiplier;
+		bool enable_angle_motor = false;
+		float target_angle = 0.f;
+		float angle_motor_force_multiplier = 1.f;
 
-		physics(b2Body* body = nullptr) : body(body), enable_angle_motor(false), target_angle(0.f), angle_motor_force_multiplier(1.f) {}
+		physics(b2Body* body = nullptr) : body(body) {}
 	};
 }

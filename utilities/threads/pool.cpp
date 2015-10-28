@@ -81,7 +81,7 @@ TEST(LimitedThreadPool, MultipleTasksSuccess) {
 	
 	for (int i = 0; i < 250; ++i) {
 		my_pool.enqueue_limit_yield(2, std::bind(fill, i * 100000, (i + 1) * 100000));
-		EXPECT_LE(my_pool.tasks.size(), 2);
+		EXPECT_LE(my_pool.tasks.size(), 2u);
 	}
 	
 	my_pool.enqueue_exit_message();

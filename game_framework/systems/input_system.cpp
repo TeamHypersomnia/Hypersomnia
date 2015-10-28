@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "window_framework/window.h"
 #include "entity_system/entity.h"
+#include "entity_system/world.h"
 
 #include "input_system.h"
 #include <iostream>

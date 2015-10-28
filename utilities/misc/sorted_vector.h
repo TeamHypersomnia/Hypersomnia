@@ -76,9 +76,17 @@ namespace augs {
 				}
 
 				auto it = std::lower_bound(raw.begin(), raw.end(), node(key, value_type()));
-				if (it == raw.end() || (*it).key != key)
-					return nullptr;
-				return &(*it).val;
+
+				if (it != raw.end()) {
+					int index = it - raw.begin();
+					node& found = raw[index];
+
+					if (found.key == key)
+						return &found.val;
+					else
+						return nullptr;
+				}
+				return nullptr;
 			}
 		};
 	}

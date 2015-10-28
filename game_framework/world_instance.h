@@ -33,6 +33,7 @@ struct world_instance {
 	static augs::window::glwindow* global_window;
 	/* all systems */
 	world my_world;
+	world& get_world() { return my_world; }
 	input_system input;
 	steering_system steering;
 	movement_system movement;

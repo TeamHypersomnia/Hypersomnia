@@ -29,6 +29,10 @@ namespace augs {
 				remove(*i);
 		}
 			
+		bool signature_matcher_bitset::operator==(const signature_matcher_bitset& b) const {
+			return signature == b.signature;
+		}
+
 		bool signature_matcher_bitset::matches(const signature_matcher_bitset& bigger) const {
 			return (signature & bigger.signature) == signature;
 		}

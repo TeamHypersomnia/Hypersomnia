@@ -2,28 +2,9 @@
 #include "stdafx.h"
 #include <luabind/operator.hpp>
 #include "entity_system/entity.h"
+#include "entity_system/world.h"
 
 #include "bindings.h"
-
-#include "../components/behaviour_tree_component.h"
-#include "../components/visibility_component.h"
-#include "../components/pathfinding_component.h"
-#include "../components/animate_component.h"
-#include "../components/camera_component.h"
-#include "../components/chase_component.h"
-#include "../components/children_component.h"
-#include "../components/crosshair_component.h"
-#include "../components/damage_component.h"
-#include "../components/gun_component.h"
-#include "../components/input_component.h"
-#include "../components/lookat_component.h"
-#include "../components/movement_component.h"
-#include "../components/particle_emitter_component.h"
-#include "../components/particle_group_component.h"
-#include "../components/physics_component.h"
-#include "../components/steering_component.h"
-#include "../components/transform_component.h"
-#include "../components/render_component.h"
 
 template <class T>
 T& add(entity_id* _this, const T& c) {
@@ -58,6 +39,14 @@ luabind::object get_script(entity_id* _this) {
 }
 void set_script(entity_id* _this, luabind::object set) {
 	_this->get().script_data = set;
+}
+
+world& get_owner_world(entity_id* _this) {
+	return _this->get().get_owner_world();
+}
+
+std::string get_name(entity_id* _this) {
+	return _this->get().get_name();
 }
 
 namespace bindings {
@@ -140,6 +129,9 @@ namespace bindings {
 			.def("get_pool", &entity_id::get_pool)
 			.def("set", (entity_id& (entity_id::*)(const entity_id&))&entity_id::operator=)
 			.property("script", get_script, set_script)
+			.property("owner_world", get_owner_world)
+			.property("name", get_name)
+			
 
 			.def("remove_animate", remove<animate>)
 			.def("add", add<animate>)

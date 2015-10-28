@@ -10,6 +10,9 @@
 
 #include "entity.h"
 
+#include "../../game_framework/components/all_components.h"
+#include <tuple>
+
 namespace augs {
 	namespace entity_system {
 		class processing_system;
@@ -64,15 +67,16 @@ namespace augs {
 			object_pool<entity> entities;
 			
 			std::unordered_map<size_t, std::unique_ptr<message_queue>> input_queue;
-			std::unordered_map<size_t, memory_pool> size_to_container;
+			std::tuple<ALL_COMPONENTS(OBJECT_POOL_TYPE)> type_to_container;
 
 			std::vector<processing_system*> all_systems;
 			std::unordered_map<size_t, processing_system*> hash_to_system;
 		public:
-			memory_pool& get_container_for_size(size_t size);
-			memory_pool& get_container_for_type(type_hash hash);
-			memory_pool& get_container_for_type(const base_type& type);
-			
+			template<class T>
+			object_pool<T>& world::get_container_for_type() {
+				return std::get<augs::object_pool<T>>(type_to_container);
+			}
+
 			type_registry component_library;
 
 			template <typename T>
@@ -150,10 +154,8 @@ namespace augs {
 			world();
 			~world();
 
-			world& operator=(const world&) {
-				assert(0);
-				return *this;
-			}
+			world& operator=(const world&) = delete;
+			world(const world&) = delete;
 
 			entity_id create_entity_named(std::string name);
 			entity_id create_entity();

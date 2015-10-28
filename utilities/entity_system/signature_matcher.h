@@ -20,6 +20,7 @@ namespace augs {
 			void remove(const registered_type&);
 			void remove(const std::vector<registered_type>& = std::vector<registered_type>());
 
+			bool operator==(const signature_matcher_bitset&) const;
 			bool matches(const signature_matcher_bitset& bigger) const;
 		};
 	}

@@ -71,8 +71,8 @@ namespace bindings {
 			.def_readwrite("dampingRatio", &b2WeldJointDef::dampingRatio)
 			,
 			
-			luabind::def("create_joint", create_joint<b2RevoluteJoint, b2RevoluteJointDef>),
-			luabind::def("create_joint", create_joint<b2WeldJoint, b2WeldJointDef>),
+			//luabind::def("create_joint", create_joint<b2RevoluteJoint, b2RevoluteJointDef>),
+			//luabind::def("create_joint", create_joint<b2WeldJoint, b2WeldJointDef>),
 			luabind::def("create_physics_component", create_physics_component),
 			luabind::def("body_to_entity", body_to_entity)
 		);

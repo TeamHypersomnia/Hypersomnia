@@ -87,9 +87,11 @@ namespace augs {
 		return allocated_id;
 	}
 
-	bool memory_pool::free(id object) {
+	std::pair<int, int> memory_pool::internal_free(id object) {
+		auto result = std::make_pair(-1, -1);
+		
 		if (!alive(object))
-			return false;
+			return result;
 
 		int dead_index = indirectors[object.indirection_index].real_index;
 
@@ -98,6 +100,8 @@ namespace augs {
 
 		// therefore we must increase version of the dead indirector
 		++indirectors[object.indirection_index].version;
+
+		result = std::make_pair(dead_index, dead_index);
 
 		if (dead_index != size() - 1) {
 			int indirector_of_last_element = slots[size() - 1].pointing_indirector;
@@ -111,14 +115,27 @@ namespace augs {
 			// because of this, indirector number at dead_index metadata needs to be updated as well
 			slots[dead_index].pointing_indirector = indirector_of_last_element;
 
-			int last_offset = (size() - 1) * slot_size;
-			int dead_offset = dead_index * slot_size;
+			result.second = size() - 1;
+		}
+
+		--count;
+		return result;
+	}
+
+	bool memory_pool::free(id object) {
+		auto swap_elements = internal_free(object);
+
+		if (swap_elements.first == -1 && swap_elements.second == -1)
+			return false;
+
+		if (swap_elements.first != swap_elements.second) {
+			int dead_offset = swap_elements.first * slot_size;
+			int last_offset = swap_elements.second * slot_size;
 
 			// move bytes from the last element to the dead element's position
 			memcpy(pool.data() + dead_offset, pool.data() + last_offset, slot_size);
 		}
 
-		--count;
 		return true;
 	}
 

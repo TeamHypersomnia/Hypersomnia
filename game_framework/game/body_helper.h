@@ -1,12 +1,7 @@
 #pragma once
 #include <string>
 #include "../systems/physics_system.h"
-
-namespace augs {
-	namespace entity_system {
-		class entity;
-	}
-}
+#include "entity_system/entity_id.h"
 
 namespace resources {
 	struct polygon;
@@ -42,10 +37,10 @@ namespace helpers {
 	extern void create_physics_component(const physics_info&, augs::entity_system::entity_id subject, int = b2_dynamicBody);
 	extern std::vector<b2Vec2> get_transformed_shape_verts(augs::entity_system::entity_id subject, bool meters = true);
 	
-	template <typename T, typename TDef>
-	T* create_joint(world* owner, TDef* joint_def) {
-		return static_cast<T*>(owner->get_system<physics_system>().b2world.CreateJoint(joint_def));
-	}
+	//template <typename T, typename TDef>
+	//T* create_joint(world* owner, TDef* joint_def) {
+	//	return static_cast<T*>(owner->get_system<physics_system>().b2world.CreateJoint(joint_def));
+	//}
 
 	extern augs::entity_system::entity_id body_to_entity(b2Body*);
 }

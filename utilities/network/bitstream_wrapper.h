@@ -74,7 +74,7 @@ namespace augs {
 			}
 			
 			void WriteString(const std::string& str) {
-				stream.Write<unsigned short>(str.length());
+				stream.Write<unsigned short>(static_cast<unsigned short>(str.length()));
 				
 				for (auto& c : str) {
 					stream.Write<char>(c);

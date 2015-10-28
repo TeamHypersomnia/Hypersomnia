@@ -38,7 +38,7 @@ function set_components_from_entry(entity, entry, entities_lookup)
 		local children = entity:add(children_component())
 		
 		for i, child in pairs(entry.children) do
-			children:add(entity_ptr(ptr_lookup(child, entities_lookup)))
+			children:add(ptr_lookup(child, entities_lookup))
 		end
 	end
 	
@@ -151,7 +151,6 @@ function set_components_from_entry(entity, entry, entities_lookup)
 end
 
 function world_class:create_entity(entry)
-	print("Creating entity")
 	return set_components_from_entry(self.world:create_entity(), entry, {})
 end
 
@@ -160,7 +159,6 @@ function world_class:delete_entity(what_entity, redirect)
 end
 
 function world_class:create_entity_group(entries)
-	print("Creating group")
 	local entities_lookup = {}
 	
 	for name, entry in pairs(entries) do

@@ -6,6 +6,7 @@
 #include "../components/physics_component.h"
 #include "../messages/intent_message.h"
 #include "../resources/render_info.h"
+#include "entity_system/world.h"
 
 #include <iostream>
 

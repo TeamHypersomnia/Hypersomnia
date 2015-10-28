@@ -2,7 +2,5 @@
 
 namespace augs {
 	namespace entity_system {
-		component::~component() {
-		}
 	}
 }

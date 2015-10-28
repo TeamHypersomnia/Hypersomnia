@@ -29,11 +29,11 @@ void loop_instability_gun_bullets(pixel_32 init_color, std::vector<entity_id>* b
 			auto dist_from_start = dmg.lifetime.get<std::chrono::milliseconds>();
 				
 			auto dist_from_starting_point = (dmg.starting_point - current.pos).length();
-			vel.set_length(0.005 * dist_from_start);
+			vel.set_length(0.005f * static_cast<float>(dist_from_start));
 			vel += base_gravity / 10 * (dist_from_starting_point / 700);
 
 			body.ApplyForce(vel, body.GetWorldCenter(), true);
-			body.ApplyAngularImpulse(randval(0, 0.01), true);
+			body.ApplyAngularImpulse(randval(0.f, 0.01f), true);
 
 			auto alpha_mult = (1 - (dist_from_start / dmg.max_lifetime_ms));
 			set_polygon_color(model, pixel_32(init_color.r, init_color.g, init_color.b, 255));

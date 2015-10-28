@@ -13,6 +13,10 @@ namespace augs {
 	public:
 		typedef typed_id<T> id;
 
+		object_pool(int slot_count = 0) {
+			initialize(slot_count);
+		}
+
 		void initialize(int slot_count) {
 			memory_pool::initialize(slot_count, sizeof(T));
 		}
@@ -26,7 +30,21 @@ namespace augs {
 
 		bool free(id object) {
 			object.get().~T();
-			return memory_pool::free(*reinterpret_cast<memory_pool::id*>(&object));
+
+			auto swap_elements = memory_pool::internal_free(*reinterpret_cast<memory_pool::id*>(&object));
+
+			if (swap_elements.first == -1 && swap_elements.second == -1)
+				return false;
+
+			if (swap_elements.first != swap_elements.second) {
+				int dead_offset = swap_elements.first * slot_size;
+				int last_offset = swap_elements.second * slot_size;
+
+				// move construct at the dead element's position from the last element's position
+				new (pool.data() + dead_offset) T(std::move(*(T*)(pool.data() + last_offset)));
+			}
+
+			return true;
 		}
 
 		T& get(id object) { 

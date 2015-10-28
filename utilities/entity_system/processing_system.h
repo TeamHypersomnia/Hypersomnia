@@ -3,7 +3,6 @@
 #include <functional>
 #include <cassert>
 #include "signature_matcher.h"
-#include "world.h"
 
 namespace augs {
 	namespace entity_system {

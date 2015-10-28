@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "particle_emitter_system.h"
+#include "entity_system/world.h"
 #include "entity_system/entity.h"
 
 #include "../resources/particle_emitter_info.h"

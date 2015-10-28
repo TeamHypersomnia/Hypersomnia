@@ -107,7 +107,7 @@ luabind::scope world_instance::bind() {
 		.def(luabind::constructor<>())
 		.def("default_loop", &world_instance::default_loop)
 
-		.def_readwrite("world", &world_instance::my_world)
+		.property("world", &world_instance::get_world)
 		.def_readwrite("input_system", &world_instance::input)
 		.def_readwrite("steering_system", &world_instance::steering)
 		.def_readwrite("movement_system", &world_instance::movement)

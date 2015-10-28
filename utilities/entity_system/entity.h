@@ -11,9 +11,6 @@ namespace augs {
 	namespace entity_system {
 		class world;
 
-		class entity;
-		typedef object_pool<entity>::id entity_id;
-
 		class entity {
 			/* only world class is allowed to instantiate an entity and it has to do it inside object pool */
 			friend class type_registry;
@@ -91,29 +88,27 @@ namespace augs {
 				}
 				type_to_component.add(hash, memory_pool::id());
 				
-				memory_pool::id& component_ptr = *type_to_component.get(hash);
+				auto& component_ptr = *reinterpret_cast<object_pool<component_type>::id*>(type_to_component.get(hash));
 				
 				/* allocate new component in a corresponding pool */
-				component_ptr = owner_world.get_container_for_type(hash).allocate();
+				component_ptr = owner_world.get_container_for_type<component_type>().allocate(object);
 				
-				/* construct it in place using placement new operator */
-				new (component_ptr.ptr()) component_type(object);
-
 				/* get new signature */
 				signature_matcher_bitset new_signature(old_signature);
 				/* will trigger an exception on debug if the component type was not registered within any existing system */
 				new_signature.add(owner_world.component_library.get_registered_type(hash));
 
+				entity_id this_id = get_id();
 				for (auto sys : owner_world.get_all_systems())
 				{
 					bool matches_new = sys->components_signature.matches(new_signature);
 					bool doesnt_match_old = !sys->components_signature.matches(old_signature);
 					
 					if (matches_new && doesnt_match_old)
-						sys->add(get_id());
+						sys->add(this_id);
 				}
 
-				return *reinterpret_cast<component_type*>(component_ptr.ptr());
+				return component_ptr.get();
 			}
 
 			template <typename component_type>
@@ -121,22 +116,27 @@ namespace augs {
 				if (!enabled) enable();
 
 				signature_matcher_bitset old_signature(get_components());
-
-				/* obtain iterator, fail early */
-				memory_pool::id& it = *type_to_component.get(typeid(component_type).hash_code());
-
+				
 				signature_matcher_bitset new_signature(old_signature);
 				new_signature.remove(owner_world.component_library.get_registered_type(typeid(component_type).hash_code()));
+
+				bool is_already_removed = old_signature == new_signature;
+
+				if (is_already_removed)
+					return;
+
+				entity_id this_id = get_id();
 
 				for (auto sys : owner_world.get_all_systems())
 					/* if a processing_system does not match with the new signature and does with the old one */
 					if (!sys->components_signature.matches(new_signature) && sys->components_signature.matches(old_signature))
 						/* we should remove this entity from there */
-						sys->remove(get_id());
+						sys->remove(this_id);
+
+				auto& component_ptr = *reinterpret_cast<object_pool<component_type>::id*>(type_to_component.get(typeid(component_type).hash_code()));
 
 				/* delete component from corresponding pool, first cast to component_type to avoid polymorphic indirection */
-				reinterpret_cast<component_type*>(it.ptr())->~component_type();
-				owner_world.get_container_for_type(typeid(component_type).hash_code()).free(it);
+				owner_world.get_container_for_type<component_type>().free(component_ptr);
 
 				/* delete component from entity's map */
 				type_to_component.remove(typeid(component_type).hash_code());

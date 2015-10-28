@@ -13,7 +13,7 @@ namespace helpers {
 		};
 
 		std::vector<trace> traces;
-		int max_traces;
+		unsigned max_traces;
 
 		polygon_fader() : max_traces(100) {}
 
@@ -40,7 +40,7 @@ namespace helpers {
 				if (t.animator.has_finished()) return true;
 
 				for (auto& v : t.poly.model) {
-					v.color.a = t.animator.get_animated();
+					v.color.a = static_cast<color>(t.animator.get_animated());
 				}
 
 				return false;

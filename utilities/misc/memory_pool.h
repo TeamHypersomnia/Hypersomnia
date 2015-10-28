@@ -99,5 +99,8 @@ namespace augs {
 
 		int size() const;
 		int capacity() const;
+
+	protected:
+		std::pair<int, int> internal_free(id);
 	};
 }
