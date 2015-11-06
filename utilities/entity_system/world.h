@@ -93,7 +93,7 @@ namespace augs {
 
 			template <typename T>
 			void post_message(const T& message_object) {
-				return (static_cast<templated_message_queue<T>*>(input_queue.at(typeid(T).hash_code()).get()))->messages.push_back(message_object);
+				return get_message_queue<T>().push_back(message_object);
 			}
 			
 			template <typename T>
