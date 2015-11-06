@@ -839,11 +839,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugExe|Win32'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="game_framework\game\polygon_fader.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugExe|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="game_framework\game\sound_effects.cpp" />
     <ClCompile Include="game_framework\game_framework.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
@@ -951,7 +946,7 @@
     <ClCompile Include="utilities\error\augs_error.cpp" />
     <ClCompile Include="utilities\graphics\pixel.cpp" />
     <ClCompile Include="utilities\math\rects.cpp" />
-    <ClCompile Include="utilities\math\vec2d.cpp" />
+    <ClCompile Include="utilities\math\vec2.cpp" />
     <ClCompile Include="game_framework\bindings\behaviour_tree_binding.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
@@ -1569,12 +1564,6 @@
     <ClCompile Include="utilities\misc\randval.cpp" />
     <ClCompile Include="utilities\misc\timer.cpp" />
     <ClCompile Include="utilities\misc\value_animator.cpp" />
-    <ClCompile Include="utilities\threads\pool.cpp" />
-    <ClCompile Include="utilities\threads\threads.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugExe|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="utilities\window_framework\event.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
@@ -2049,7 +2038,6 @@
     <ClInclude Include="depthbase\gui\text\text_rect.h" />
     <ClInclude Include="depthbase\gui\text\ui.h" />
     <ClInclude Include="depthbase\gui\text\word_separator.h" />
-    <ClInclude Include="game_framework\game\polygon_fader.h" />
     <ClInclude Include="game_framework\game\sound_effects.h" />
     <ClInclude Include="game_framework\game_framework.h" />
     <ClInclude Include="utilities\lua_state_wrapper.h" />
@@ -2066,6 +2054,7 @@
     <ClInclude Include="utilities\entity_system\world.h" />
     <ClInclude Include="utilities\error\augs_error.h" />
     <ClInclude Include="utilities\graphics\pixel.h" />
+    <ClInclude Include="utilities\math\vec2declare.h" />
     <ClInclude Include="utilities\misc\file_watcher.h" />
     <ClInclude Include="utilities\misc\id_generator.h" />
     <ClInclude Include="utilities\misc\memory_pool.h" />
@@ -2078,7 +2067,7 @@
     <ClInclude Include="utilities\network\reliable_channel_tests.h" />
     <ClInclude Include="utilities\options.h" />
     <ClInclude Include="utilities\math\rects.h" />
-    <ClInclude Include="utilities\math\vec2d.h" />
+    <ClInclude Include="utilities\math\vec2.h" />
     <ClInclude Include="game_framework\bindings\bindings.h" />
     <ClInclude Include="game_framework\components\behaviour_tree_component.h" />
     <ClInclude Include="game_framework\components\visibility_component.h" />
@@ -2147,8 +2136,6 @@
     <ClInclude Include="utilities\misc\timer.h" />
     <ClInclude Include="utilities\misc\value_animator.h" />
     <ClInclude Include="utilities\misc\vector_wrapper.h" />
-    <ClInclude Include="utilities\threads\pool.h" />
-    <ClInclude Include="utilities\threads\threads.h" />
     <ClInclude Include="utilities\window_framework\event.h" />
     <ClInclude Include="utilities\window_framework\window.h" />
   </ItemGroup>

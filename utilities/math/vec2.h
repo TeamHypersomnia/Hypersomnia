@@ -1,9 +1,9 @@
-
 #pragma once
 #include <algorithm>
-#include <Box2D/Common/b2Math.h>
 #include "rects.h"
 #include "misc/randval.h"
+#include "vec2declare.h"
+
 namespace augs {
 	template <class type_val>
 	void damp(type_val& val, type_val len) {
@@ -74,8 +74,6 @@ namespace augs {
 		target.y = source.y;
 	}
 
-	template <class type = float> struct vec2;
-
 	template <class type>
 	struct vec2 {
 		type x, y;
@@ -120,13 +118,6 @@ namespace augs {
 		}
 		vec2(const rects::ltrb<type>& r) : x(r.l), y(r.t) {}
 		vec2(const rects::xywh<type>& r) : x(r.x), y(r.y) {}
-
-		operator b2Vec2() const {
-			b2Vec2 t;
-			t.x = x;
-			t.y = y;
-			return t;
-		}
 
 		/* from http://stackoverflow.com/a/1501725 */
 		type distance_from_segment_sq(vec2 v, vec2 w) const {
