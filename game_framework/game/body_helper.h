@@ -15,9 +15,9 @@ namespace helpers {
 			CIRCLE
 		} type;
 		
-		std::vector < std::vector < augs::vec2< >> > convex_polys;
-		std::vector <augs::vec2<>> original_model;
-		augs::vec2<> rect_size;
+		std::vector<std::vector<vec2>> convex_polys;
+		std::vector<vec2> original_model;
+		vec2 rect_size;
 		b2Filter filter;
 
 		int body_type;
@@ -25,8 +25,8 @@ namespace helpers {
 		float density, friction, restitution, angular_damping, linear_damping, radius, max_speed, gravity_scale;
 		bool fixed_rotation, sensor, bullet, angled_damping;
 
-		void add_convex(const std::vector < augs::vec2 < >> &);
-		void add_concave(const std::vector < augs::vec2 < >> &);
+		void add_convex(const std::vector<vec2> &);
+		void add_concave(const std::vector<vec2> &);
 
 		void from_renderable(const resources::polygon&);
 

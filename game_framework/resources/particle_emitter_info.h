@@ -7,7 +7,7 @@
 
 namespace resources {
 	struct particle {
-		augs::vec2<> pos, vel, acc;
+		vec2 pos, vel, acc;
 		resources::sprite face = nullptr;
 		float rotation = 0.f;
 		float rotation_speed = 0.f;
@@ -53,7 +53,7 @@ namespace resources {
 		float initial_rotation_variation = 0.f;
 		bool randomize_acceleration = false;
 
-		augs::vec2<> offset;
+		vec2 offset;
 
 		std::vector<particle> particle_templates;
 		components::render particle_render_template;

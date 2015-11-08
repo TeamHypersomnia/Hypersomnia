@@ -10,7 +10,7 @@ namespace augs {
 		type_val zero = static_cast<type_val>(0);
 		if (val > zero) {
 			val -= len;
-			if (val < zero) 
+			if (val < zero)
 				val = zero;
 		}
 		else if (val < zero) {
@@ -30,7 +30,7 @@ namespace augs {
 		if (a < min_a) a = min_a;
 		if (a > max_a) a = max_a;
 	}
-	
+
 	template <typename T>
 	T get_clamp(T a, T min_a, T max_a) {
 		if (a < min_a) return min_a;
@@ -73,24 +73,25 @@ namespace augs {
 		target.x = source.x;
 		target.y = source.y;
 	}
+}
 
 	template <class type>
-	struct vec2 {
+	struct vec2t {
 		type x, y;
 		
 		template <class t>
-		static vec2 from_degrees(t degrees) {
-			vec2 out;
+		static vec2t from_degrees(t degrees) {
+			vec2t out;
 			out.set_from_degrees(degrees);
 			return out;
 		}
 
 		template <class t>
-		static vec2 random_on_circle(t radius) {
-			return vec2::from_degrees(randval(0.f, 360.f)) * radius;
+		static vec2t random_on_circle(t radius) {
+			return vec2t::from_degrees(randval(0.f, 360.f)) * radius;
 		}
 
-		static bool segment_in_segment(vec2 smaller_p1, vec2 smaller_p2, vec2 bigger_p1, vec2 bigger_p2,
+		static bool segment_in_segment(vec2t smaller_p1, vec2t smaller_p2, vec2t bigger_p1, vec2t bigger_p2,
 			type maximum_offset
 			) {
 				return
@@ -102,25 +103,25 @@ namespace augs {
 		}
 
 		template <class t>
-		vec2(const t& v) : x(static_cast<type>(v.x)), y(static_cast<type>(v.y)) {}
+		vec2t(const t& v) : x(static_cast<type>(v.x)), y(static_cast<type>(v.y)) {}
 
 		template <class t>
-		vec2& operator=(const t& v) {
+		vec2t& operator=(const t& v) {
 			x = static_cast<type>(v.x);
 			y = static_cast<type>(v.y);
 			return *this;
 		}
 
-		vec2(type x = 0, type y = 0) : x(x), y(y) {}
-		vec2(const rects::wh<type>& r) : x(r.w), y(r.h) {
+		vec2t(type x = 0, type y = 0) : x(x), y(y) {}
+		vec2t(const augs::rects::wh<type>& r) : x(r.w), y(r.h) {
 			x = static_cast<type>(r.w);
 			y = static_cast<type>(r.h);
 		}
-		vec2(const rects::ltrb<type>& r) : x(r.l), y(r.t) {}
-		vec2(const rects::xywh<type>& r) : x(r.x), y(r.y) {}
+		vec2t(const augs::rects::ltrb<type>& r) : x(r.l), y(r.t) {}
+		vec2t(const augs::rects::xywh<type>& r) : x(r.x), y(r.y) {}
 
 		/* from http://stackoverflow.com/a/1501725 */
-		type distance_from_segment_sq(vec2 v, vec2 w) const {
+		type distance_from_segment_sq(vec2t v, vec2t w) const {
 			auto& p = *this;
 			// Return minimum distance between line segment vw and point p
 			const float l2 = (v - w).length_sq();  // i.e. |w-v|^2 -  avoid a sqrt
@@ -131,20 +132,20 @@ namespace augs {
 			const float t = (p - v).dot(w - v) / l2;
 			if (t < 0.f) return (p - v).length_sq();       // Beyond the 'v' end of the segment
 			else if (t > 1.f) return (p - w).length_sq();  // Beyond the 'w' end of the segment
-			const vec2 projection = v + t * (w - v);  // Projection falls on the segment
+			const vec2t projection = v + t * (w - v);  // Projection falls on the segment
 			return (p - projection).length_sq();
 		}
 
-		type distance_from_segment(vec2 v, vec2 w) const {
+		type distance_from_segment(vec2t v, vec2t w) const {
 			return sqrt(distance_from_segment_sq(v, w));
 		}
 
-		vec2 project_onto(vec2 v, vec2 w) const {
+		vec2t project_onto(vec2t v, vec2t w) const {
 			const float t = ((*this) - v).dot(w - v) / (v - w).length_sq();
 			return v + t * (w - v);
 		}
 
-		vec2 closest_point_on_segment(vec2 v, vec2 w) const {
+		vec2t closest_point_on_segment(vec2t v, vec2t w) const {
 			const float t = ((*this) - v).dot(w - v) / (v - w).length_sq();
 			
 			if (t < 0.f) return v;
@@ -153,11 +154,11 @@ namespace augs {
 			return v + t * (w - v);
 		}
 
-		float dot(vec2 v) const {
+		float dot(vec2t v) const {
 			return x * v.x + y * v.y;
 		}
 
-		float cross(vec2 v) const {
+		float cross(vec2t v) const {
 			return x * v.y - y * v.x;
 		}
 
@@ -177,23 +178,23 @@ namespace augs {
 			return get_radians()*180.0f/3.141592653589793238462f;
 		}
 
-		float angle_between(const vec2<>& v) {
+		float angle_between(const vec2t<>& v) {
 			return get_degrees() - v.get_degrees();
 		}
 
 		template<class A, class B>
-		vec2& set(const A& vx, const B& vy) {
+		vec2t& set(const A& vx, const B& vy) {
 			x = vx; y = vy;
 			return *this;
 		}
 		
 		template<class v>
-		vec2& set(const v& t) {
+		vec2t& set(const v& t) {
 			set(t.x, t.y);
 			return *this;
 		}
 
-		vec2& set_from_degrees(float degrees) {
+		vec2t& set_from_degrees(float degrees) {
 			float radians = degrees * 0.01745329251994329576923690768489f;
 			set(cos(radians), sin(radians));
 			normalize();
@@ -201,27 +202,27 @@ namespace augs {
 		}
 
 		template <typename v>
-		vec2& rotate(float angle, v origin) {
-			augs::rotate<vec2, float>(*this, origin, angle);
+		vec2t& rotate(float angle, v origin) {
+			augs::rotate<vec2t, float>(*this, origin, angle);
 			return *this;
 		}
 
-		vec2 lerp(const vec2& bigger, float ratio) const {
+		vec2t lerp(const vec2t& bigger, float ratio) const {
 			return (*this) + (bigger - (*this)) * ratio;
 		}
 
-		vec2& set_length(float len) {
+		vec2t& set_length(float len) {
 			normalize();
 			return (*this) *= len;
 		}
 
-		vec2& add_length(float len) {
+		vec2t& add_length(float len) {
 			float actual_length = length();
 			normalize_hint(actual_length);
 			return (*this) *= (actual_length + len);
 		}
 
-		vec2& normalize_hint(float suggested_length) {
+		vec2t& normalize_hint(float suggested_length) {
 			float len = suggested_length;
 			if (std::abs(len) < std::numeric_limits<float>::epsilon())
 				return *this;
@@ -233,22 +234,22 @@ namespace augs {
 			return *this;
 		}
 
-		vec2& normalize() {
+		vec2t& normalize() {
 			return normalize_hint(length());
 		}
 
-		vec2 perpendicular_cw() {
-			return vec2(-y, x);
+		vec2t perpendicular_cw() {
+			return vec2t(-y, x);
 		}
 		
 		template<class t>
-		vec2& damp(t len) {
+		vec2t& damp(t len) {
 			if (len == static_cast<t>(0)) return *this;
 
 			t current_length = length();
 			
 			if (current_length <= len) {
-				return *this = vec2(static_cast<type>(0), static_cast<type>(0));
+				return *this = vec2t(static_cast<type>(0), static_cast<type>(0));
 			}
 
 			normalize();
@@ -256,7 +257,7 @@ namespace augs {
 		}
 
 		template<class t>
-		vec2& clamp(vec2<t> rect) {
+		vec2t& clamp(vec2t<t> rect) {
 			if (x > rect.x) x = rect.x;
 			if (y > rect.y) y = rect.y;
 			if (x < -rect.x) x = -rect.x;
@@ -264,7 +265,7 @@ namespace augs {
 			return *this;
 		}
 
-		vec2& clamp(float max_length) {
+		vec2t& clamp(float max_length) {
 			if (length_sq() > max_length*max_length) {
 				normalize();
 				(*this) *= max_length;
@@ -284,16 +285,16 @@ namespace augs {
 			return x_non_zero() || y_non_zero();
 		}
 		
-		vec2 operator-() { return vec2(x * -1, y * -1); }
+		vec2t operator-() { return vec2t(x * -1, y * -1); }
 
-		bool compare_abs(const vec2& b, const float epsilon = 0.00001f) {
+		bool compare_abs(const vec2t& b, const float epsilon = 0.00001f) {
 			if (std::abs(x - b.x) < epsilon && std::abs(y - b.y) < epsilon)
 				return true;
 
 			return false;
 		}
 
-		bool compare(const vec2& b, const float epsilon = 0.00001f) {
+		bool compare(const vec2t& b, const float epsilon = 0.00001f) {
 			if ((*this - b).length_sq() <= epsilon*epsilon)
 				return true;
 
@@ -304,45 +305,44 @@ namespace augs {
 		template <class v> bool operator==(const v& p) const { return x == p.x && y == p.y; }
 		template <class v> bool operator!=(const v& p) const { return x != p.x || y != p.y; }
 
-		template <class v> vec2 operator-(const v& p) const { return vec2(x - p.x, y - p.y); }
-		template <class v> vec2 operator+(const v& p) const { return vec2(x + p.x, y + p.y); }
-		template <class v> vec2 operator*(const v& p) const { return vec2(x * p.x, y * p.y); }
-		template <class v> vec2 operator/(const v& p) const { return vec2(x / p.x, y / p.y); }
+		template <class v> vec2t operator-(const v& p) const { return vec2t(x - p.x, y - p.y); }
+		template <class v> vec2t operator+(const v& p) const { return vec2t(x + p.x, y + p.y); }
+		template <class v> vec2t operator*(const v& p) const { return vec2t(x * p.x, y * p.y); }
+		template <class v> vec2t operator/(const v& p) const { return vec2t(x / p.x, y / p.y); }
 
-		vec2 operator-(double d) const { return vec2(x - static_cast<type>(d), y - static_cast<type>(d)); }
-		vec2 operator+(double d) const { return vec2(x + static_cast<type>(d), y + static_cast<type>(d)); }
-		vec2 operator*(double d) const { return vec2(x * static_cast<type>(d), y * static_cast<type>(d)); }
-		vec2 operator/(double d) const { return vec2(x / static_cast<type>(d), y / static_cast<type>(d)); }
+		vec2t operator-(double d) const { return vec2t(x - static_cast<type>(d), y - static_cast<type>(d)); }
+		vec2t operator+(double d) const { return vec2t(x + static_cast<type>(d), y + static_cast<type>(d)); }
+		vec2t operator*(double d) const { return vec2t(x * static_cast<type>(d), y * static_cast<type>(d)); }
+		vec2t operator/(double d) const { return vec2t(x / static_cast<type>(d), y / static_cast<type>(d)); }
 		
-		vec2 operator-(float d) const { return vec2(x - d, y - d); }
-		vec2 operator+(float d) const { return vec2(x + d, y + d); }
-		vec2 operator*(float d) const { return vec2(x * d, y * d); }
-		vec2 operator/(float d) const { return vec2(x / d, y / d); }
+		vec2t operator-(float d) const { return vec2t(x - d, y - d); }
+		vec2t operator+(float d) const { return vec2t(x + d, y + d); }
+		vec2t operator*(float d) const { return vec2t(x * d, y * d); }
+		vec2t operator/(float d) const { return vec2t(x / d, y / d); }
 		
-		vec2 operator-(int d) const { return vec2(x - static_cast<type>(d), y - static_cast<type>(d)); }
-		vec2 operator+(int d) const { return vec2(x + static_cast<type>(d), y + static_cast<type>(d)); }
-		vec2 operator*(int d) const { return vec2(x * static_cast<type>(d), y * static_cast<type>(d)); }
-		vec2 operator/(int d) const { return vec2(x / static_cast<type>(d), y / static_cast<type>(d)); }
+		vec2t operator-(int d) const { return vec2t(x - static_cast<type>(d), y - static_cast<type>(d)); }
+		vec2t operator+(int d) const { return vec2t(x + static_cast<type>(d), y + static_cast<type>(d)); }
+		vec2t operator*(int d) const { return vec2t(x * static_cast<type>(d), y * static_cast<type>(d)); }
+		vec2t operator/(int d) const { return vec2t(x / static_cast<type>(d), y / static_cast<type>(d)); }
 
-		template <class v> vec2& operator-=(const v& p) { x -= p.x; y -= p.y; return *this; }
-		template <class v> vec2& operator+=(const v& p) { x += p.x; y += p.y; return *this; }
-		template <class v> vec2& operator*=(const v& p) { x *= p.x; y *= p.y; return *this; }
-		template <class v> vec2& operator/=(const v& p) { x /= p.x; y /= p.y; return *this; }
+		template <class v> vec2t& operator-=(const v& p) { x -= p.x; y -= p.y; return *this; }
+		template <class v> vec2t& operator+=(const v& p) { x += p.x; y += p.y; return *this; }
+		template <class v> vec2t& operator*=(const v& p) { x *= p.x; y *= p.y; return *this; }
+		template <class v> vec2t& operator/=(const v& p) { x /= p.x; y /= p.y; return *this; }
 
-		vec2& operator-=(double d) { x -= d; y -= d; return *this; }
-		vec2& operator+=(double d) { x += d; y += d; return *this; }
-		vec2& operator*=(double d) { x *= d; y *= d; return *this; }
-		vec2& operator/=(double d) { x /= d; y /= d; return *this; }
+		vec2t& operator-=(double d) { x -= d; y -= d; return *this; }
+		vec2t& operator+=(double d) { x += d; y += d; return *this; }
+		vec2t& operator*=(double d) { x *= d; y *= d; return *this; }
+		vec2t& operator/=(double d) { x /= d; y /= d; return *this; }
 		
-		vec2& operator-=(float d) { x -= d; y -= d; return *this; }
-		vec2& operator+=(float d) { x += d; y += d; return *this; }
-		vec2& operator*=(float d) { x *= d; y *= d; return *this; }
-		vec2& operator/=(float d) { x /= d; y /= d; return *this; }
+		vec2t& operator-=(float d) { x -= d; y -= d; return *this; }
+		vec2t& operator+=(float d) { x += d; y += d; return *this; }
+		vec2t& operator*=(float d) { x *= d; y *= d; return *this; }
+		vec2t& operator/=(float d) { x /= d; y /= d; return *this; }
 		
-		vec2& operator-=(int d) { x -= d; y -= d; return *this; }
-		vec2& operator+=(int d) { x += d; y += d; return *this; }
-		vec2& operator*=(int d) { x *= d; y *= d; return *this; }
-		vec2& operator/=(int d) { x /= d; y /= d; return *this; }
+		vec2t& operator-=(int d) { x -= d; y -= d; return *this; }
+		vec2t& operator+=(int d) { x += d; y += d; return *this; }
+		vec2t& operator*=(int d) { x *= d; y *= d; return *this; }
+		vec2t& operator/=(int d) { x /= d; y /= d; return *this; }
 	};
-}
 

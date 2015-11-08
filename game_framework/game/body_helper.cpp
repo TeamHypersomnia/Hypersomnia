@@ -15,7 +15,7 @@
 
 namespace helpers {
 	physics_info::physics_info() 
-		: rect_size(augs::vec2<>()), type(RECT), 
+		: rect_size(vec2()), type(RECT), 
 		density(1.f), 
 		angular_damping(0.f), 
 		linear_damping(0.f), fixed_rotation(false), sensor(false), restitution(0.f), friction(0.f),
@@ -25,7 +25,7 @@ namespace helpers {
 
 	b2World* current_b2world = nullptr;
 
-	void physics_info::add_convex(const std::vector < augs::vec2 < >>& verts) {
+	void physics_info::add_convex(const std::vector <vec2>& verts) {
 		original_model.insert(original_model.end(), verts.begin(), verts.end());
 		convex_polys.push_back(verts);
 	}
@@ -39,7 +39,7 @@ namespace helpers {
 		original_model.insert(original_model.end(), p.original_model.begin(), p.original_model.end());
 		
 		for (size_t i = 0; i < p.original_model.size(); ++i) {
-			vec2<> p(p.original_model[i]);
+			vec2 p(p.original_model[i]);
 			subject_poly[i].x = p.x;
 			subject_poly[i].y = -p.y;
 		}
@@ -50,10 +50,10 @@ namespace helpers {
 		partition.ConvexPartition_HM(&inpolys, &outpolys);
 
 		for (auto& out : outpolys) {
-			std::vector < augs::vec2 < >> new_convex;
+			std::vector <vec2> new_convex;
 
 			for (long j = 0; j < out.GetNumPoints(); ++j) {
-				new_convex.push_back(vec2<>(static_cast<float>(out[j].x), static_cast<float>(-out[j].y)));
+				new_convex.push_back(vec2(static_cast<float>(out[j].x), static_cast<float>(-out[j].y)));
 			}
 
 			std::reverse(new_convex.begin(), new_convex.end());
@@ -62,7 +62,7 @@ namespace helpers {
 		}
 	}
 
-	void physics_info::add_concave(const std::vector < augs::vec2 < >> &verts) {
+	void physics_info::add_concave(const std::vector <vec2> &verts) {
 		//original_model.insert(original_model.end(), verts.begin(), verts.end());
 		//
 		//b2Separator separator;
@@ -78,7 +78,7 @@ namespace helpers {
 		//else separator.calcShapes(input, output);
 		//
 		//for (auto& convex : output)
-		//	convex_polys.push_back(std::vector < augs::vec2 < >> (convex.begin(), convex.end()));
+		//	convex_polys.push_back(std::vector <vec2> (convex.begin(), convex.end()));
 	}
 
 	void create_physics_component(const physics_info& body_data, augs::entity_system::entity_id subject, int body_type) {
@@ -117,7 +117,7 @@ namespace helpers {
 			shape.SetAsBox(static_cast<float>(body_data.rect_size.x) / 2.f * PIXELS_TO_METERSf, static_cast<float>(body_data.rect_size.y) / 2.f * PIXELS_TO_METERSf);
 			
 			for (int i = 0; i < shape.GetVertexCount(); ++i) 
-				physics_component.original_model.push_back(vec2<>(shape.GetVertex(i))*METERS_TO_PIXELSf);
+				physics_component.original_model.push_back(vec2(shape.GetVertex(i))*METERS_TO_PIXELSf);
 
 			body->CreateFixture(&fixdef);
 		}
@@ -142,10 +142,10 @@ namespace helpers {
 			body->CreateFixture(&fixdef);
 		}
 		//b2Vec2 v[4] = {
-		//	vec2<>(0.f, 0.f),
-		//	vec2<>(size.w*PIXELS_TO_METERS, 0.f),
-		//	vec2<>(size.w*PIXELS_TO_METERS, size.h*PIXELS_TO_METERS),
-		//	vec2<>(0.f, size.h*PIXELS_TO_METERS)
+		//	vec2(0.f, 0.f),
+		//	vec2(size.w*PIXELS_TO_METERS, 0.f),
+		//	vec2(size.w*PIXELS_TO_METERS, size.h*PIXELS_TO_METERS),
+		//	vec2(0.f, size.h*PIXELS_TO_METERS)
 		//};
 
 		//shape.Set(v, 4);
@@ -169,7 +169,7 @@ namespace helpers {
 			auto rotation = b->GetAngle() / 0.01745329251994329576923690768489f;
 			
 			/* transform vertex to current entity's position and rotation */
-			vec2<> out_vert = (vec2<>(v).rotate(rotation, b2Vec2(0, 0)) + position);
+			vec2 out_vert = (vec2(v).rotate(rotation, b2Vec2(0, 0)) + position);
 			
 			if (meters) out_vert *= PIXELS_TO_METERSf;
 			

@@ -35,7 +35,7 @@ namespace messages {
 
 		bool local_transform = false;
 
-		augs::vec2<> pos;
+		vec2 pos;
 		float rotation = 0.f;
 	};
 }

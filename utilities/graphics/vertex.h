@@ -13,15 +13,15 @@ namespace augs {
 
 namespace resources {
 	struct vertex {
-		vec2<> pos;
-		vec2<> texcoord;
+		vec2 pos;
+		vec2 texcoord;
 		graphics::pixel_32 color;
 
 		vertex() {}
-		vertex(vec2<> pos) : pos(pos) {}
-		vertex(vec2<> pos, vec2<> texcoord, graphics::pixel_32 color, texture_baker::texture* tex);
+		vertex(vec2 pos) : pos(pos) {}
+		vertex(vec2 pos, vec2 texcoord, graphics::pixel_32 color, texture_baker::texture* tex);
 
-		void set_texcoord(vec2<>, helpers::texture_helper* tex);
+		void set_texcoord(vec2, helpers::texture_helper* tex);
 	};
 
 	struct vertex_triangle {

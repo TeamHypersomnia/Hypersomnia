@@ -53,7 +53,7 @@ namespace augs {
 				struct {
 					material mat;
 					rects::wh<float> size;
-					vec2<int> pos;
+					vec2i pos;
 					rect* subject;
 					float speed_mult;
 				} middlescroll;

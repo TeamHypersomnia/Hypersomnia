@@ -9,19 +9,19 @@
 
 namespace components {
 	struct visibility : public augs::entity_system::component {
-		typedef std::pair<augs::vec2<>, augs::vec2<>> edge;
+		typedef std::pair<vec2, vec2> edge;
 
 		struct triangle {
-			augs::vec2<> points[3];
+			vec2 points[3];
 		};
 
 		struct discontinuity {
 			int edge_index;
 			bool is_boundary;
-			augs::vec2<> normal;
+			vec2 normal;
 
 			edge points;
-			augs::vec2<> last_undiscovered_wall;
+			vec2 last_undiscovered_wall;
 
 			enum {
 				RIGHT,
@@ -29,7 +29,7 @@ namespace components {
 			} winding;
 
 			discontinuity(const edge& points = edge(),
-				augs::vec2<> last_undiscovered_wall = augs::vec2<>()) :
+				vec2 last_undiscovered_wall = vec2()) :
 				points(points), winding(RIGHT),
 				last_undiscovered_wall(last_undiscovered_wall), edge_index(0), is_boundary(false) {}
 		};
@@ -43,13 +43,13 @@ namespace components {
 			float square_side;
 			float ignore_discontinuities_shorter_than;
 
-			augs::vec2<> offset;
+			vec2 offset;
 
 			/* output */
 			std::vector<edge> edges;
 
 			/* first: edge index, second: location */
-			std::vector<std::pair<int, augs::vec2<>>> vertex_hits;
+			std::vector<std::pair<int, vec2>> vertex_hits;
 			std::vector<discontinuity> discontinuities;
 
 			/* segments that denote narrow areas */
@@ -63,8 +63,8 @@ namespace components {
 			}
 
 			int get_num_triangles();
-			triangle get_triangle(int index, augs::vec2<> origin);
-			std::vector<augs::vec2<>> get_polygon(float distance_epsilon, augs::vec2<> expand_origin, float expand_mult);
+			triangle get_triangle(int index, vec2 origin);
+			std::vector<vec2> get_polygon(float distance_epsilon, vec2 expand_origin, float expand_mult);
 
 			layer() : square_side(0.f), postprocessing_subject(false), ignore_discontinuities_shorter_than(-1.f) {}
 		};

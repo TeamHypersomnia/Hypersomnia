@@ -38,13 +38,13 @@ public:
 	resources::vertex_triangle& get_triangle(int i);
 
 	void fullscreen_quad();
-	void draw_debug_info(vec2<> visible_area, components::transform::state<>, augs::texture_baker::texture* tex);
+	void draw_debug_info(vec2 visible_area, components::transform::state<>, augs::texture_baker::texture* tex);
 
 	struct debug_line {
-		debug_line(augs::vec2<> a, augs::vec2<> b, augs::graphics::pixel_32 col = augs::graphics::pixel_32(255, 255, 255, 255)) : col(col), a(a), b(b) {}
+		debug_line(vec2 a, vec2 b, augs::graphics::pixel_32 col = augs::graphics::pixel_32(255, 255, 255, 255)) : col(col), a(a), b(b) {}
 
 		augs::graphics::pixel_32 col;
-		augs::vec2<> a, b;
+		vec2 a, b;
 	};
 	std::vector<debug_line> lines;
 	std::vector<debug_line> lines_channels[20];
@@ -108,5 +108,5 @@ public:
 	void draw_layer(resources::renderable::draw_input& in, int layer);
 
 	void generate_triangles(resources::renderable::draw_input&, int mask);
-	void default_render(vec2<> visible_area);
+	void default_render(vec2 visible_area);
 };

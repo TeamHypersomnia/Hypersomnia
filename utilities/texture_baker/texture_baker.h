@@ -31,13 +31,13 @@ namespace augs {
 			void luminosity_to_alpha(bool);
 
 			rects::xywhf<int> get_rect() const;
-			vec2<int> get_size() const;
+			vec2i get_size() const;
 
-			void translate_uv(vec2<float> pixels);
+			void translate_uv(vec2 pixels);
 			void scale_uv(float u_scalar, float v_scalar);
 			void get_uv(const rects::texture<float>& uv, rects::texture<float>& out) const;
 			void get_uv(float u, float v, float& u_out, float& v_out) const;
-			void get_uv(vec2<float>& texture_space) const;
+			void get_uv(vec2& texture_space) const;
 
 			/* gets u coordinate from a standard rectangular quad with origin coordinates 0.0, 0.0, 1.0, 1.0 */
 			float get_u(int vertex_num_from_cw_rect) const;

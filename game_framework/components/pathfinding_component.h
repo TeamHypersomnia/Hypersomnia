@@ -6,7 +6,7 @@
 
 namespace components {
 	struct pathfinding : public augs::entity_system::component {
-		typedef std::pair<augs::vec2<>, augs::vec2<>> edge;
+		typedef std::pair<vec2, vec2> edge;
 
 		pathfinding() : force_touch_sensors(false), enable_session_rollbacks(true), mark_touched_as_discovered(false), force_persistent_navpoints(false), favor_velocity_parallellness(false), enable_backtracking(true), target_offset(0.f), distance_navpoint_hit(0.f), is_exploring(false), rotate_navpoints(0.f) {}
 
@@ -25,7 +25,7 @@ namespace components {
 
 		struct navigation_hint {
 			bool enabled;
-			augs::vec2<> origin, target;
+			vec2 origin, target;
 			navigation_hint() : enabled(false) {}
 		} custom_exploration_hint;
 
@@ -34,16 +34,16 @@ namespace components {
 		bool enable_session_rollbacks;
 		bool mark_touched_as_discovered;
 
-		std::function<bool(augs::entity_system::entity_id, augs::vec2<>, augs::vec2<>)> 
+		std::function<bool(augs::entity_system::entity_id, vec2, vec2)> 
 			first_priority_navpoint_check, target_visibility_condition;
 
-		augs::vec2<> eye_offset;
+		vec2 eye_offset;
 
 		struct pathfinding_session {
-			augs::vec2<> target, navigate_to;
+			vec2 target, navigate_to;
 			
 			struct navigation_vertex {
-				augs::vec2<> location, sensor;
+				vec2 location, sensor;
 			};
 
 			bool persistent_navpoint_set;
@@ -61,7 +61,7 @@ namespace components {
 			return session_stack.back();
 		}
 
-		void start_pathfinding(augs::vec2<> target) {
+		void start_pathfinding(vec2 target) {
 			clear_pathfinding_info();
 			session_stack.push_back(pathfinding_session());
 			session().target = target;
@@ -75,11 +75,11 @@ namespace components {
 			is_exploring = true;
 		}
 
-		augs::vec2<> get_current_navigation_target() {
+		vec2 get_current_navigation_target() {
 			return session().navigate_to;
 		}
 
-		augs::vec2<> get_current_target() {
+		vec2 get_current_target() {
 			return session().target;
 		}
 
@@ -95,7 +95,7 @@ namespace components {
 			return is_exploring;
 		}
 
-		bool exists_through_undiscovered_visible(augs::vec2<> navpoint, float max_distance) {
+		bool exists_through_undiscovered_visible(vec2 navpoint, float max_distance) {
 			for (auto& memorised_undiscovered_visible : session().undiscovered_visible) {
 				/* if a discontinuity with the same closer vertex already exists */
 				if ((memorised_undiscovered_visible.sensor - navpoint).length_sq() < max_distance * max_distance) {

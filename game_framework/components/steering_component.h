@@ -17,10 +17,10 @@ namespace components {
 		struct behaviour_state;
 
 		struct object_info {
-			augs::vec2<> position, velocity, unit_vel;
+			vec2 position, velocity, unit_vel;
 			float speed, max_speed;
 
-			void set_velocity(augs::vec2<>);
+			void set_velocity(vec2);
 			object_info();
 		};
 
@@ -39,7 +39,7 @@ namespace components {
 		struct target_info {
 			object_info info;
 
-			augs::vec2<> direction;
+			vec2 direction;
 			float distance;
 
 			bool is_set;
@@ -47,7 +47,7 @@ namespace components {
 			target_info();
 
 			void set(entity_id);
-			void set(augs::vec2<> position, augs::vec2<> velocity = augs::vec2<>(0.f, 0.f));
+			void set(vec2 position, vec2 velocity = vec2(0.f, 0.f));
 
 			void calc_direction_distance(const object_info& subject);
 		};
@@ -58,7 +58,7 @@ namespace components {
 			float weight;
 
 			behaviour();
-			virtual augs::vec2<> steer(scene) { return augs::vec2<>(); }
+			virtual vec2 steer(scene) { return vec2(); }
 		};
 
 		struct directed : behaviour {
@@ -67,8 +67,8 @@ namespace components {
 
 			directed();
 
-			augs::vec2<> predict_interception(const object_info& subject, const target_info& target, bool flee_prediction);
-			virtual augs::vec2<> steer(scene) { return augs::vec2<>(); }
+			vec2 predict_interception(const object_info& subject, const target_info& target, bool flee_prediction);
+			virtual vec2 steer(scene) { return vec2(); }
 		};
 
 		struct avoidance : behaviour {
@@ -79,7 +79,7 @@ namespace components {
 			avoidance();
 			
 			struct avoidance_info_output {
-				augs::vec2<> rightmost_line[2];
+				vec2 rightmost_line[2];
 				b2Vec2 avoidance[4];
 			} get_avoidance_info(const scene&);
 
@@ -87,21 +87,21 @@ namespace components {
 
 			void optional_align(scene& in);
 			float get_avoidance_length(const object_info& subject) const;
-			virtual augs::vec2<> steer(scene) { return augs::vec2<>(); }
+			virtual vec2 steer(scene) { return vec2(); }
 		};
 
 		/* now the actual implementations */
 
 		struct seek : directed {
-			augs::vec2<> seek_to(const object_info& subject, const target_info& target) const;
+			vec2 seek_to(const object_info& subject, const target_info& target) const;
 
-			virtual augs::vec2<> steer(scene) override;
+			virtual vec2 steer(scene) override;
 		};
 
 		struct flee : directed {
-			augs::vec2<> flee_from(const object_info& subject, const target_info& target) const;
+			vec2 flee_from(const object_info& subject, const target_info& target) const;
 
-			virtual augs::vec2<> steer(scene) override;
+			virtual vec2 steer(scene) override;
 		};
 
 		struct wander : behaviour {
@@ -111,7 +111,7 @@ namespace components {
 			float displacement_degrees;
 
 			wander();
-			virtual augs::vec2<> steer(scene) override;
+			virtual vec2 steer(scene) override;
 		};
 
 		struct containment : avoidance {
@@ -122,7 +122,7 @@ namespace components {
 			b2Filter ray_filter;
 
 			containment();
-			virtual augs::vec2<> steer(scene) override;
+			virtual vec2 steer(scene) override;
 		};
 		
 		struct flocking : behaviour {
@@ -132,11 +132,11 @@ namespace components {
 			float field_of_vision_degrees;
 
 			flocking();
-			virtual augs::vec2<> steer(scene) { return augs::vec2<>(); }
+			virtual vec2 steer(scene) { return vec2(); }
 		};
 
 		struct separation : flocking {
-			virtual augs::vec2<> steer(scene) override;
+			virtual vec2 steer(scene) override;
 		};
 
 		struct obstacle_avoidance : avoidance {
@@ -147,7 +147,7 @@ namespace components {
 			float ignore_discontinuities_narrower_than;
 
 			obstacle_avoidance();
-			virtual augs::vec2<> steer(scene) override;
+			virtual vec2 steer(scene) override;
 		};
 
 		struct behaviour_state {
@@ -163,8 +163,8 @@ namespace components {
 			target_info target;
 			augs::entity_system::entity_id target_from;
 
-			augs::vec2<> last_output_force;
-			augs::vec2<> last_estimated_target_position;
+			vec2 last_output_force;
+			vec2 last_estimated_target_position;
 			float weight_multiplier;
 
 			bool enabled;
@@ -181,7 +181,7 @@ namespace components {
 		float max_resultant_force = -1.f;
 		float max_speed = 0.f;
 		bool apply_force = true;
-		vec2<> last_resultant_force;
+		vec2 last_resultant_force;
 
 		/* binding facility */
 		void add_behaviour(behaviour_state* b) { active_behaviours.push_back(b); }

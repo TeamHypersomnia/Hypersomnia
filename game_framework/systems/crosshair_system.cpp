@@ -17,7 +17,7 @@ void crosshair_system::consume_events(world& owner) {
 			if (!transform || !crosshair) continue;
 
 			/* move crosshair according to its sensitivity and relative mouse movement (easier to support multiple resolutions) */
-			transform->current.pos += vec2<float>(it.mouse_rel * crosshair->sensitivity).rotate(crosshair->rotation_offset, vec2<>());
+			transform->current.pos += vec2(it.mouse_rel * crosshair->sensitivity).rotate(crosshair->rotation_offset, vec2());
 
 			//if (it.mouse_rel.non_zero()) {
 			//	/* align the crosshair to bounds rect */
@@ -41,7 +41,7 @@ void crosshair_system::process_entities(world& owner) {
 			crosshair.blink.animate(ratio);
 			auto crosshair_sprite = static_cast < resources::sprite*>(render->model);
 			if (crosshair_sprite)
-				crosshair_sprite->size = vec2<>(crosshair_sprite->tex->get_size())*crosshair.size_multiplier*ratio;
+				crosshair_sprite->size = vec2(crosshair_sprite->tex->get_size())*crosshair.size_multiplier*ratio;
 		}
 	}
 }

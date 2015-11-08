@@ -15,9 +15,9 @@ namespace components {
 			PARALLAX
 		} chase_type;
 
-		augs::vec2<> offset, rotation_orbit_offset;
+		vec2 offset, rotation_orbit_offset;
 		
-		augs::vec2<> reference_position, target_reference_position;
+		vec2 reference_position, target_reference_position;
 		float scrolling_speed;
 
 		float rotation_offset;
@@ -30,7 +30,7 @@ namespace components {
 		bool target_newly_set;
 		bool subscribe_to_previous;
 
-		chase(augs::entity_system::entity_id target = augs::entity_system::entity_id(), bool relative = false, augs::vec2<> offset = augs::vec2<>())
+		chase(augs::entity_system::entity_id target = augs::entity_system::entity_id(), bool relative = false, vec2 offset = vec2())
 			: scrolling_speed(1.f), subscribe_to_previous(false), rotation_multiplier(1.f), target_newly_set(true), chase_type(chase_type::OFFSET), target(target), offset(offset), relative(relative), chase_rotation(false), track_origin(false), rotation_offset(0.f), rotation_orbit_offset(0.f), rotation_previous(0.f)
 		{
 			set_target(target); 
@@ -41,7 +41,7 @@ namespace components {
 	private:
 		friend class chase_system;
 
-		augs::vec2<> previous;
+		vec2 previous;
 		float rotation_previous;
 	};
 }

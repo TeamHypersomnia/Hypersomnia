@@ -24,7 +24,7 @@ namespace components {
 		double averages_per_sec = 20.0;
 		
 		/* for linear smoothing */
-		augs::vec2<> last_rotation_interpolant;
+		vec2 last_rotation_interpolant;
 
 		unsigned look_mode = look_type::POSITION;
 

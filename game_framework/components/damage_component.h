@@ -12,7 +12,7 @@ namespace components {
 		augs::entity_system::entity_id sender;
 
 		/* used to destroy bullets */
-		augs::vec2<> starting_point;
+		vec2 starting_point;
 		float max_distance;
 		float max_lifetime_ms;
 		augs::misc::timer lifetime;

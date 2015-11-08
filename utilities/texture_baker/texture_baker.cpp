@@ -31,8 +31,8 @@ namespace augs {
 			return rect;
 		}
 
-		vec2<int> texture::get_size() const {
-			return !rect.flipped ? vec2<int>(rect.w, rect.h) : vec2<int>(rect.h, rect.w);
+		vec2i texture::get_size() const {
+			return !rect.flipped ? vec2i(rect.w, rect.h) : vec2i(rect.h, rect.w);
 		}
 
 		void texture::get_uv(float u, float v, float& u_out, float& v_out) const {
@@ -46,7 +46,7 @@ namespace augs {
 			}
 		}
 		
-		void texture::get_uv(vec2<float>& texture_space) const {
+		void texture::get_uv(vec2& texture_space) const {
 			auto temp = texture_space;
 			get_uv(temp.x, temp.y, texture_space.x, texture_space.y);
 		}
@@ -81,8 +81,8 @@ namespace augs {
 			return y + h * v;
 		}
 
-		void texture::translate_uv(vec2<float> uv) {
-			uv *= vec2<float>(w/rect.w, h/rect.h);
+		void texture::translate_uv(vec2 uv) {
+			uv *= vec2(w/rect.w, h/rect.h);
 			x += uv.x;
 			y += uv.y;
 		}

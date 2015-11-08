@@ -56,7 +56,7 @@ void particle_group_system::process_entities(world& owner) {
 						float t = (static_cast<float>(i) / to_spawn);
 						float time_elapsed = (1.f - t) * delta;
 
-						components::transform current_transform(lerp(group.previous_transform.current.pos, transform.pos, vec2<>(t, t)),
+						components::transform current_transform(lerp(group.previous_transform.current.pos, transform.pos, vec2(t, t)),
 							lerp(group.previous_transform.current.rotation, transform.rotation, t));
 
 						particle_emitter_system::spawn_particle(stream_slot, current_transform.current.pos, current_transform.current.rotation +

@@ -89,10 +89,10 @@ namespace augs {
 				rect* focus_next, *focus_prev;
 
 				bool draw, clip, fetch_wheel, scrollable, snap_scroll_to_content, preserve_focus, focusable;
-				vec2<int> drag_origin;
+				vec2i drag_origin;
 				rects::ltrb<float> rc; /* actual rectangle */ 
 				rects::wh<float> content_size; /* content's (children's) bounding box */
-				vec2<> scroll; /* scrolls content */
+				vec2 scroll; /* scrolls content */
 				
 				std::vector<rect*> children;
 				
@@ -152,7 +152,7 @@ namespace augs {
 				
 				const rects::ltrb<float>& get_clipped_rect() const;
 				rects::ltrb<float> get_rect_absolute() const;
-				const vec2<int>& get_absolute_xy() const;
+				const vec2i& get_absolute_xy() const;
 				rects::ltrb<float> get_local_clipper() const;
 				rects::ltrb<float> get_clipping_rect() const;
 				rect* get_parent() const;
@@ -163,7 +163,7 @@ namespace augs {
 				rect* parent; 
 			private:
 				rects::ltrb<float> rc_clipped, clipping_rect;
-				vec2<int> absolute_xy;
+				vec2i absolute_xy;
 
 				bool was_hovered;
 			};

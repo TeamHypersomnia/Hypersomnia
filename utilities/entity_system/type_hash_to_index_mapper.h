@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_map>
-#include "templated_list.h"
+#include "templated_list_to_hash_vector.h"
 #include "entity_system/entity_id.h"
 
 namespace augs {

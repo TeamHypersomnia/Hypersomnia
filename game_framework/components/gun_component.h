@@ -40,7 +40,7 @@ namespace components {
 		float shooting_interval_ms;
 		float max_bullet_distance;
 
-		augs::vec2<> bullet_distance_offset;
+		vec2 bullet_distance_offset;
 		float shake_radius;
 		float shake_spread_degrees;
 

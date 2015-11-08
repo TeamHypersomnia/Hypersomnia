@@ -22,7 +22,7 @@ template <typename T> int sgn(T val) {
 source:
 http://stackoverflow.com/questions/16542042/fastest-way-to-sort-vectors-by-angle-without-actually-computing-that-angle
 */
-float comparable_angle(vec2<> diff) {
+float comparable_angle(vec2 diff) {
 	return sgn(diff.y) * (
 		1 - (diff.x / (std::abs(diff.x) + std::abs(diff.y)))
 		);
@@ -46,13 +46,13 @@ components::visibility::discontinuity* components::visibility::layer::get_discon
 	return &discontinuities[n];
 }
 
-components::visibility::triangle components::visibility::layer::get_triangle(int i, augs::vec2<> origin) {
+components::visibility::triangle components::visibility::layer::get_triangle(int i, vec2 origin) {
 	components::visibility::triangle tri = { origin + offset, edges[i].first, edges[i].second };
 	return tri;
 }
 
-std::vector<augs::vec2<>> components::visibility::layer::get_polygon(float distance_epsilon, augs::vec2<> expand_origin, float expand_mult) {
-	std::vector<augs::vec2<>> output;
+std::vector<vec2> components::visibility::layer::get_polygon(float distance_epsilon, vec2 expand_origin, float expand_mult) {
+	std::vector<vec2> output;
 
 	for (size_t i = 0; i < edges.size(); ++i) {
 		if (
@@ -93,7 +93,7 @@ void visibility_system::process_entities(world& owner) {
 	render_system& render = owner.get_system<render_system>();
 
 	struct ray_input {
-		vec2<> targets[2];
+		vec2 targets[2];
 	};
 
 	std::vector<std::pair<physics_system::raycast_output, physics_system::raycast_output>> all_ray_outputs;
@@ -117,7 +117,7 @@ void visibility_system::process_entities(world& owner) {
 			struct target_vertex {
 				bool is_on_a_bound;
 				float angle;
-				vec2<> pos;
+				vec2 pos;
 
 				bool operator<(const target_vertex& b) {
 					return angle < b.angle;
@@ -135,7 +135,7 @@ void visibility_system::process_entities(world& owner) {
 			auto& request = entry.val;
 
 			/* transform entity position to Box2D coordinates and take offset into account */
-			vec2<> position_meters = (transform.pos + request.offset) * PIXELS_TO_METERSf;
+			vec2 position_meters = (transform.pos + request.offset) * PIXELS_TO_METERSf;
 
 			/* to Box2D coordinates */
 			float vision_side_meters = request.square_side * PIXELS_TO_METERSf;
@@ -147,16 +147,16 @@ void visibility_system::process_entities(world& owner) {
 
 			rects::ltrb<float> ltrb(aabb.lowerBound.x, aabb.lowerBound.y, aabb.upperBound.x, aabb.upperBound.y);
 
-			auto& push_vertex = [position_meters, ltrb](vec2<> v, bool check_against_aabb){
+			auto& push_vertex = [position_meters, ltrb](vec2 v, bool check_against_aabb){
 				/* don't bother if it does not hover the aabb */
-				if (check_against_aabb && !ltrb.hover(vec2<>(v))) 
+				if (check_against_aabb && !ltrb.hover(vec2(v))) 
 					return;
 
 				target_vertex new_vertex;
 				new_vertex.pos = v;
 
 				/* calculate difference vector */
-				vec2<> diff = new_vertex.pos - position_meters;
+				vec2 diff = new_vertex.pos - position_meters;
 				/*
 				compute angle to be compared while sorting
 				source:
@@ -185,9 +185,9 @@ void visibility_system::process_entities(world& owner) {
 			/* extract the actual vertices from visibility AABB to cast rays to */
 			b2Vec2 whole_vision [] = {
 				aabb.lowerBound,
-				aabb.lowerBound + vec2<>(vision_side_meters, 0),
+				aabb.lowerBound + vec2(vision_side_meters, 0),
 				aabb.upperBound,
-				aabb.upperBound - vec2<>(vision_side_meters, 0)
+				aabb.upperBound - vec2(vision_side_meters, 0)
 			};
 
 			/* prepare edge shapes given above vertices to cast rays against when no obstacle was hit
@@ -195,17 +195,17 @@ void visibility_system::process_entities(world& owner) {
 			*/
 			b2EdgeShape bounds[4];
 			float moving_epsilon = 1.f * PIXELS_TO_METERSf;
-			bounds[0].Set(vec2<>(whole_vision[0]) + vec2<>(-moving_epsilon, 0.f), vec2<>(whole_vision[1]) + vec2<>(moving_epsilon, 0.f));
-			bounds[1].Set(vec2<>(whole_vision[1]) + vec2<>(0.f, -moving_epsilon), vec2<>(whole_vision[2]) + vec2<>(0.f, moving_epsilon));
-			bounds[2].Set(vec2<>(whole_vision[2]) + vec2<>(moving_epsilon, 0.f), vec2<>(whole_vision[3]) + vec2<>(-moving_epsilon, 0.f));
-			bounds[3].Set(vec2<>(whole_vision[3]) + vec2<>(0.f, moving_epsilon), vec2<>(whole_vision[0]) + vec2<>(0.f, -moving_epsilon));
+			bounds[0].Set(vec2(whole_vision[0]) + vec2(-moving_epsilon, 0.f), vec2(whole_vision[1]) + vec2(moving_epsilon, 0.f));
+			bounds[1].Set(vec2(whole_vision[1]) + vec2(0.f, -moving_epsilon), vec2(whole_vision[2]) + vec2(0.f, moving_epsilon));
+			bounds[2].Set(vec2(whole_vision[2]) + vec2(moving_epsilon, 0.f), vec2(whole_vision[3]) + vec2(-moving_epsilon, 0.f));
+			bounds[3].Set(vec2(whole_vision[3]) + vec2(0.f, moving_epsilon), vec2(whole_vision[0]) + vec2(0.f, -moving_epsilon));
 
 			/* debug drawing of the visibility square */
 			if (draw_cast_rays || draw_triangle_edges) {
-				render.lines.push_back(render_system::debug_line((vec2<>(whole_vision[0]) + vec2<>(-moving_epsilon, 0.f))*METERS_TO_PIXELSf, (vec2<>(whole_vision[1]) + vec2<>(moving_epsilon, 0.f))*METERS_TO_PIXELSf));
-				render.lines.push_back(render_system::debug_line((vec2<>(whole_vision[1]) + vec2<>(0.f, -moving_epsilon))*METERS_TO_PIXELSf, (vec2<>(whole_vision[2]) + vec2<>(0.f, moving_epsilon))*METERS_TO_PIXELSf));
-				render.lines.push_back(render_system::debug_line((vec2<>(whole_vision[2]) + vec2<>(moving_epsilon, 0.f))*METERS_TO_PIXELSf, (vec2<>(whole_vision[3]) + vec2<>(-moving_epsilon, 0.f))*METERS_TO_PIXELSf));
-				render.lines.push_back(render_system::debug_line((vec2<>(whole_vision[3]) + vec2<>(0.f, moving_epsilon))*METERS_TO_PIXELSf, (vec2<>(whole_vision[0]) + vec2<>(0.f, -moving_epsilon))*METERS_TO_PIXELSf));
+				render.lines.push_back(render_system::debug_line((vec2(whole_vision[0]) + vec2(-moving_epsilon, 0.f))*METERS_TO_PIXELSf, (vec2(whole_vision[1]) + vec2(moving_epsilon, 0.f))*METERS_TO_PIXELSf));
+				render.lines.push_back(render_system::debug_line((vec2(whole_vision[1]) + vec2(0.f, -moving_epsilon))*METERS_TO_PIXELSf, (vec2(whole_vision[2]) + vec2(0.f, moving_epsilon))*METERS_TO_PIXELSf));
+				render.lines.push_back(render_system::debug_line((vec2(whole_vision[2]) + vec2(moving_epsilon, 0.f))*METERS_TO_PIXELSf, (vec2(whole_vision[3]) + vec2(-moving_epsilon, 0.f))*METERS_TO_PIXELSf));
+				render.lines.push_back(render_system::debug_line((vec2(whole_vision[3]) + vec2(0.f, moving_epsilon))*METERS_TO_PIXELSf, (vec2(whole_vision[0]) + vec2(0.f, -moving_epsilon))*METERS_TO_PIXELSf));
 			}
 
 			/* raycast through the bounds to add another vertices where the shapes go beyond visibility square */
@@ -215,7 +215,7 @@ void visibility_system::process_entities(world& owner) {
 				auto output2 = physics.ray_cast_all_intersections(bound.m_vertex2, bound.m_vertex1, request.filter, it);
 
 				/* check for duplicates */
-				std::vector<vec2<>> output;
+				std::vector<vec2> output;
 
 				for (auto& inter : output1) {
 					output.push_back(inter.intersection);
@@ -261,11 +261,11 @@ void visibility_system::process_entities(world& owner) {
 
 			/* double_ray pair for holding both left-epsilon and right-epsilon rays */
 			struct double_ray {
-				vec2<> first, second;
+				vec2 first, second;
 				bool first_reached_destination, second_reached_destination;
 
 				double_ray() : first_reached_destination(false), second_reached_destination(false) {}
-				double_ray(vec2<> first, vec2<> second, bool a, bool b)
+				double_ray(vec2 first, vec2 second, bool a, bool b)
 					: first(first), second(second), first_reached_destination(a), second_reached_destination(b) {
 				}
 			};
@@ -275,12 +275,12 @@ void visibility_system::process_entities(world& owner) {
 
 			auto push_double_ray = [&double_rays](const double_ray& ray_b) -> bool {
 				bool is_same_as_previous = false;
-				vec2<> p2 = ray_b.first * METERS_TO_PIXELSf;
+				vec2 p2 = ray_b.first * METERS_TO_PIXELSf;
 
 				if (!double_rays.empty()) {
 					auto& ray_a = *double_rays.rbegin();
 
-					vec2<> p1 = ray_a.second * METERS_TO_PIXELSf;
+					vec2 p1 = ray_a.second * METERS_TO_PIXELSf;
 
 					is_same_as_previous = p1.compare(p2);
 				}
@@ -301,7 +301,7 @@ void visibility_system::process_entities(world& owner) {
 
 
 			/* helper debugging lambda */
-			auto draw_line = [&position_meters, &render](vec2<> point, graphics::pixel_32 col) {
+			auto draw_line = [&position_meters, &render](vec2 point, graphics::pixel_32 col) {
 				render.lines.push_back(render_system::debug_line(position_meters * METERS_TO_PIXELSf, point * METERS_TO_PIXELSf, col));
 			};
 
@@ -324,14 +324,14 @@ void visibility_system::process_entities(world& owner) {
 				*/
 
 				/* calculate the perpendicular direction to properly apply epsilon_ray_distance_variation */
-				vec2<> perpendicular_cw = (vertex.pos - position_meters).normalize().perpendicular_cw();
+				vec2 perpendicular_cw = (vertex.pos - position_meters).normalize().perpendicular_cw();
 
-				vec2<> directions[2] = {
+				vec2 directions[2] = {
 					((vertex.pos - perpendicular_cw * epsilon_ray_distance_variation * PIXELS_TO_METERSf) - position_meters).normalize(),
 					((vertex.pos + perpendicular_cw * epsilon_ray_distance_variation * PIXELS_TO_METERSf) - position_meters).normalize()
 				};
 
-				vec2<> targets[2] = {
+				vec2 targets[2] = {
 					position_meters + directions[0] * vision_side_meters / 2 * 1.5,
 					position_meters + directions[1] * vision_side_meters / 2 * 1.5
 				};
@@ -390,8 +390,8 @@ void visibility_system::process_entities(world& owner) {
 					new_discontinuity.edge_index = double_rays.size();
 					new_discontinuity.points.first = vertex.pos;
 
-					vec2<> actual_normal;// = (ray_callbacks[0].normal / 2;
-					vec2<> actual_intersection;// = (+ray_callbacks[1].intersection) / 2;
+					vec2 actual_normal;// = (ray_callbacks[0].normal / 2;
+					vec2 actual_intersection;// = (+ray_callbacks[1].intersection) / 2;
 					new_discontinuity.points.second = ray_callbacks[0].intersection;
 					new_discontinuity.normal = actual_normal;
 
@@ -547,8 +547,8 @@ void visibility_system::process_entities(world& owner) {
 				auto& ray_b = double_rays[(i + 1)%double_rays.size()];
 
 				/* transform intersection locations to pixels */
-				vec2<> p1 = ray_a.second * METERS_TO_PIXELSf;
-				vec2<> p2 = ray_b.first * METERS_TO_PIXELSf;
+				vec2 p1 = ray_a.second * METERS_TO_PIXELSf;
+				vec2 p2 = ray_b.first * METERS_TO_PIXELSf;
 
 				if (draw_triangle_edges) {
 					draw_line(p1 * PIXELS_TO_METERSf, request.color);
@@ -592,7 +592,7 @@ void visibility_system::process_entities(world& owner) {
 				discs_copy.erase(std::remove_if(discs_copy.begin(), discs_copy.end(),
 					[&request, edges_num, &transform, &wrap, &render, &marked_holes, this]
 				(const components::visibility::discontinuity& d){
-						std::vector<vec2<>> points_too_close;
+						std::vector<vec2> points_too_close;
 
 						/* let's handle both CW and CCW cases in one go, only the sign differs somewhere */
 						int cw = d.winding == d.RIGHT ? 1 : -1;
@@ -605,7 +605,7 @@ void visibility_system::process_entities(world& owner) {
 								cw * (d.points.first - transform.pos).cross(request.edges[j].second - transform.pos) >= 0
 								) {
 								/* project this point onto candidate edge */
-								vec2<> close_point = d.points.first.closest_point_on_segment(request.edges[j].first, request.edges[j].second);
+								vec2 close_point = d.points.first.closest_point_on_segment(request.edges[j].first, request.edges[j].second);
 
 								/* if the distance is less than allowed */
 								if (close_point.compare(d.points.first, request.ignore_discontinuities_shorter_than))
@@ -619,7 +619,7 @@ void visibility_system::process_entities(world& owner) {
 								/* if a discontinuity is to CW/CCW respectively */
 								if (!(cw * (d.points.first - transform.pos).cross(old_disc.points.first - transform.pos) <= 0)) {
 									/* project this point onto candidate discontinuity */
-									vec2<> close_point = d.points.first.closest_point_on_segment(old_disc.points.first, old_disc.points.second);
+									vec2 close_point = d.points.first.closest_point_on_segment(old_disc.points.first, old_disc.points.second);
 
 									if (close_point.compare(d.points.first, request.ignore_discontinuities_shorter_than))
 										points_too_close.push_back(close_point);
@@ -630,8 +630,8 @@ void visibility_system::process_entities(world& owner) {
 						/* if there is any threatening close point */
 						if (!points_too_close.empty()) {
 							/* pick the one closest to the entity */
-							vec2<> closest_point = *std::min_element(points_too_close.begin(), points_too_close.end(), 
-								[&transform](vec2<> a, vec2<> b) {
+							vec2 closest_point = *std::min_element(points_too_close.begin(), points_too_close.end(), 
+								[&transform](vec2 a, vec2 b) {
 								return (a - transform.pos).length_sq() < (b - transform.pos).length_sq();
 							});
 

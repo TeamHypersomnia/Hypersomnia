@@ -24,7 +24,7 @@ namespace resources {
 			render_system* output;
 			components::transform::state<> transform, camera_transform;
 			components::render* additional_info;
-			augs::vec2<> visible_area;
+			vec2 visible_area;
 			bool always_visible;
 
 			augs::rects::ltrb<float> rotated_camera_aabb;
@@ -32,10 +32,10 @@ namespace resources {
 			draw_input() : output(nullptr), additional_info(nullptr), always_visible(false) {}
 		};
 
-		static void make_rect(vec2<> pos, vec2<> size, float rotation_degrees, vec2<> out[4]);
+		static void make_rect(vec2 pos, vec2 size, float rotation_degrees, vec2 out[4]);
 
 		virtual void draw(draw_input&) = 0;
-		virtual std::vector<vec2<>> get_vertices();
+		virtual std::vector<vec2> get_vertices();
 	};
 
 	extern void set_polygon_color(renderable* poly, graphics::pixel_32 col);
@@ -50,7 +50,7 @@ namespace resources {
 	struct sprite : public renderable {
 		texture_baker::texture* tex;
 		graphics::pixel_32 color;
-		vec2<> size;
+		vec2 size;
 		float rotation_offset;
 
 		sprite(texture_baker::texture* = nullptr, graphics::pixel_32 = graphics::pixel_32());
@@ -59,7 +59,7 @@ namespace resources {
 		void update_size();
 
 		virtual void draw(draw_input&) override;
-		virtual std::vector<vec2<>> get_vertices() override;
+		virtual std::vector<vec2> get_vertices() override;
 	};
 
 	struct tileset {
@@ -88,7 +88,7 @@ namespace resources {
 		rects::ltrb<int> get_visible_tiles(draw_input&);
 		virtual void draw(draw_input&) override;
 
-		std::vector<std::vector<vec2<int>>> indices_by_type;
+		std::vector<std::vector<vec2i>> indices_by_type;
 		rects::ltrb<int> indices_by_type_visibility;
 
 		void generate_indices_by_type(rects::ltrb<int>);
@@ -99,11 +99,11 @@ namespace resources {
 	//	vertex vertices[3];
 	//	triangle(const vertex&, const vertex&, const vertex&);
 	//
-	//	virtual void draw(buffer&, const components::transform::state&, vec2<> camera_pos) override;
+	//	virtual void draw(buffer&, const components::transform::state&, vec2 camera_pos) override;
 	//	virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) override;
 	//};
 
-	typedef std::vector<vec2<>> basic_polygon;
+	typedef std::vector<vec2> basic_polygon;
 
 	struct polygon : public renderable {
 		/* binding facility */
@@ -131,11 +131,11 @@ namespace resources {
 
 		/* construct a set of convex polygons from a potentially concave polygon */
 		void add_concave(const concave&);
-		//void add_concave_coords(const std::vector<vec2<>>&);
-		//void add_convex(const std::vector<vec2<>>&);
+		//void add_concave_coords(const std::vector<vec2>&);
+		//void add_convex(const std::vector<vec2>&);
 
 		virtual void draw(draw_input&) override;
-		virtual std::vector<vec2<>> get_vertices() override;
+		virtual std::vector<vec2> get_vertices() override;
 	};
 
 	struct particles : public renderable {

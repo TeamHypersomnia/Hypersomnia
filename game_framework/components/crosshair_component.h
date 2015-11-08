@@ -11,8 +11,8 @@ namespace components {
 		bool should_blink = true;
 
 		float rotation_offset = 0.f;
-		augs::vec2<> size_multiplier = augs::vec2<>(1.0f, 1.0f);
-		augs::vec2<> sensitivity = augs::vec2<>(1.0f, 1.0f);
+		vec2 size_multiplier = vec2(1.0f, 1.0f);
+		vec2 sensitivity = vec2(1.0f, 1.0f);
 
 		crosshair() {
 			blink.animators.push_back(augs::misc::animator(0.8f, 1.f, 200, augs::misc::animator::QUADRATIC));

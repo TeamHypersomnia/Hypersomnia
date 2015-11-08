@@ -9,7 +9,7 @@ namespace resources {
 namespace components {
 	struct render : public augs::entity_system::component {
 		resources::renderable* model = nullptr;
-		augs::vec2<> last_screen_pos;
+		vec2 last_screen_pos;
 		bool was_drawn = false;
 
 		enum mask_type {

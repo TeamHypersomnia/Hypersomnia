@@ -16,7 +16,7 @@ namespace bindings {
 			.def_readwrite("t", &rects::ltrb<float>::t)
 			.def_readwrite("r", &rects::ltrb<float>::r)
 			.def_readwrite("b", &rects::ltrb<float>::b)
-			.def("hover", (bool (rects::ltrb<float>::*)(const vec2<float>& m) const) &rects::ltrb<float>::hover)
+			.def("hover", (bool (rects::ltrb<float>::*)(const vec2& m) const) &rects::ltrb<float>::hover)
 			.property("w", (float (rects::ltrb<float>::*)() const)&rects::ltrb<float>::w, (void (rects::ltrb<float>::*)(float)) &rects::ltrb<float>::w)
 			.property("h", (float (rects::ltrb<float>::*)() const)&rects::ltrb<float>::h, (void (rects::ltrb<float>::*)(float)) &rects::ltrb<float>::h),
 
@@ -41,7 +41,7 @@ namespace bindings {
 			.def_readwrite("t", &rects::ltrb<long double>::t)
 			.def_readwrite("r", &rects::ltrb<long double>::r)
 			.def_readwrite("b", &rects::ltrb<long double>::b)
-			.def("hover", (bool (rects::ltrb<long double>::*)(const vec2<long double>& m) const) &rects::ltrb<long double>::hover)
+			.def("hover", (bool (rects::ltrb<long double>::*)(const vec2t<long double>& m) const) &rects::ltrb<long double>::hover)
 			.property("w", (long double (rects::ltrb<long double>::*)() const)&rects::ltrb<long double>::w, (void (rects::ltrb<long double>::*)(long double)) &rects::ltrb<long double>::w)
 			.property("h", (long double (rects::ltrb<long double>::*)() const)&rects::ltrb<long double>::h, (void (rects::ltrb<long double>::*)(long double)) &rects::ltrb<long double>::h)
 

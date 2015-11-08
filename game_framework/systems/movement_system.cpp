@@ -47,12 +47,12 @@ void movement_system::substep(world& owner) {
 		auto& physics = it->get<components::physics>();
 		auto& movement = it->get<components::movement>();
 
-		vec2<> resultant;
+		vec2 resultant;
 
 		if (movement.requested_movement.non_zero()) {
 			/* rotate to our frame of reference */
-			//resultant.x = sgn(vec2<>(movement.requested_movement).rotate(-movement.axis_rotation_degrees, vec2<>()).x) * movement.input_acceleration.x;
-			resultant.x = vec2<>(movement.requested_movement).rotate(-movement.axis_rotation_degrees, vec2<>()).x;
+			//resultant.x = sgn(vec2(movement.requested_movement).rotate(-movement.axis_rotation_degrees, vec2()).x) * movement.input_acceleration.x;
+			resultant.x = vec2(movement.requested_movement).rotate(-movement.axis_rotation_degrees, vec2()).x;
 			clamp(resultant.x, -movement.input_acceleration.x, movement.input_acceleration.x);
 		}
 		else {
@@ -69,7 +69,7 @@ void movement_system::substep(world& owner) {
 			if (movement.thrust_parallel_to_ground_length > 0.f) {
 				auto out = physics_sys.ray_cast(
 					physics.body->GetPosition(),
-					physics.body->GetPosition() + vec2<>::from_degrees(movement.axis_rotation_degrees + 90) * movement.thrust_parallel_to_ground_length * PIXELS_TO_METERSf,
+					physics.body->GetPosition() + vec2::from_degrees(movement.axis_rotation_degrees + 90) * movement.thrust_parallel_to_ground_length * PIXELS_TO_METERSf,
 					movement.ground_filter, it);
 
 				was_ground_hit = out.hit;
@@ -91,7 +91,7 @@ void movement_system::substep(world& owner) {
 		}
 		
 		if (resultant.non_zero()) {
-			resultant.rotate(was_ground_hit ? ground_angle : movement.axis_rotation_degrees, vec2<>());
+			resultant.rotate(was_ground_hit ? ground_angle : movement.axis_rotation_degrees, vec2());
 
 			auto len = resultant.length();
 

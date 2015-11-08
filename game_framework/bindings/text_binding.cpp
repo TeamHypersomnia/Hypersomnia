@@ -24,14 +24,14 @@ std::string wchar_vec_to_str(misc::vector_wrapper<wchar_t> str) {
 
 rects::wh<float> quick_print_wrapper(resources::renderable::draw_input v,
 	const fstr& str,
-	vec2<> pos,
+	vec2 pos,
 	unsigned wrapping_width,
 	const rects::ltrb<float>* clipper)
 {
 	return quick_print(v.output->triangles, str, pos, wrapping_width, clipper);
 }
 
-vec2<int> get_text_bbox_wrapper(const fstr& str, unsigned wrapping_width) {
+vec2i get_text_bbox_wrapper(const fstr& str, unsigned wrapping_width) {
 	return get_text_bbox(str, wrapping_width);
 }
 

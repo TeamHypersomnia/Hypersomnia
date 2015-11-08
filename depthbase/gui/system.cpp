@@ -170,7 +170,7 @@ namespace augs {
 				root.update_proc(*this);
 
 				if(middlescroll.subject) {
-					vec2<int> tempp = middlescroll.subject->scroll; 
+					vec2i tempp = middlescroll.subject->scroll; 
 					middlescroll.subject->scroll += (owner.events.mouse.pos - middlescroll.pos) * float(middlescroll.speed_mult*fps.frame_speed());
 				}
 			}

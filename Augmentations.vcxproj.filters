@@ -987,9 +987,6 @@
     <ClCompile Include="utilities\entity_system\processing_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="utilities\entity_system\templated_list.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="utilities\entity_system\world.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1087,6 +1084,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\GL\OpenGL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utilities\entity_system\templated_list_to_hash_vector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2645,9 +2645,6 @@
     <ClInclude Include="utilities\entity_system\processing_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utilities\entity_system\templated_list.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="utilities\entity_system\world.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2775,6 +2772,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\GL\OpenGL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\bindings\bind_callbacks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities\entity_system\templated_list_to_hash_vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

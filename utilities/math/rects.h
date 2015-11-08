@@ -2,6 +2,7 @@
 #include <vector>
 #include <sstream>
 #include <algorithm>
+#include "vec2declare.h"
 // trzeba usprawnic rect2D - rozszerzyc max_size na wh bo z samego max_s: wielkie prostokaty rozpychaja kwadrat a male wykorzystuja miejsce na dole
 
 struct b2Vec2;
@@ -10,8 +11,6 @@ namespace augs {
 	namespace window {
 		class glwindow;
 	}
-		
-	template<typename type> struct vec2;
 
 	/* faciliates operations on rectangles and points */
 	namespace rects {
@@ -22,7 +21,7 @@ namespace augs {
 		template <class T>
 		struct wh {
 			template<typename type>
-			wh(const vec2<type>& rr) : w(static_cast<T>(rr.x)), h(static_cast<T>(rr.y)) {}
+			wh(const vec2t<type>& rr) : w(static_cast<T>(rr.x)), h(static_cast<T>(rr.y)) {}
 			wh(const ltrb<T>& rr) : w(rr.w()), h(rr.h()) {}
 			wh(const xywh<T>& rr) : w(rr.w), h(rr.h) {}
 			wh(T w = 0, T h = 0) : w(w), h(h) {}
@@ -43,7 +42,7 @@ namespace augs {
 
 			T w, h;
 			
-			void stick_relative(const wh& content, vec2<T>& scroll) const {
+			void stick_relative(const wh& content, vec2t<T>& scroll) const {
 				scroll.x = std::min(scroll.x, T(content.w - w));
 				scroll.x = std::max(scroll.x, 0.f);
 				scroll.y = std::min(scroll.y, T(content.h - h));
@@ -54,7 +53,7 @@ namespace augs {
 				return w <= rc.w && h <= rc.h;
 			}
 
-			bool is_sticked(const wh& content, vec2<T>& scroll) const {
+			bool is_sticked(const wh& content, vec2t<T>& scroll) const {
 				return scroll.x >= 0.f && scroll.x <= content.w - w && scroll.y >= 0 && scroll.y <= content.h - h;
 			}
 
@@ -136,7 +135,7 @@ namespace augs {
 			}
 
 			bool stick_x(const ltrb& rc) {
-				vec2<T> offset(0, 0);
+				vec2t<T> offset(0, 0);
 				if (l < rc.l) offset.x += rc.l - l;
 				if (r > rc.r) offset.x += rc.r - r;
 				operator+=(offset);
@@ -145,7 +144,7 @@ namespace augs {
 			}
 
 			bool stick_y(const ltrb& rc) {
-				vec2<T> offset(0, 0);
+				vec2t<T> offset(0, 0);
 				if (t < rc.t) offset.y += rc.t - t;
 				if (b > rc.b) offset.y += rc.b - b;
 				operator+=(offset);
@@ -153,27 +152,27 @@ namespace augs {
 				return offset.y == 0;
 			}
 
-			vec2<T> center() const {
-				return vec2<T>(l + w() / 2.f, t + h() / 2.f);
+			vec2t<T> center() const {
+				return vec2t<T>(l + w() / 2.f, t + h() / 2.f);
 			}
 
 
 			template <typename T>
-			bool hover(const vec2<T>& m) const {
+			bool hover(const vec2t<T>& m) const {
 				return m.x >= l && m.y >= t && m.x <= r && m.y <= b;
 			}
 
 			template <class T>
-			static ltrb get_aabb(vec2<T>* v) {
-				auto x_pred = [](vec2<T> a, vec2<T> b){ return a.x < b.x; };
-				auto y_pred = [](vec2<T> a, vec2<T> b){ return a.y < b.y; };
+			static ltrb get_aabb(vec2t<T>* v) {
+				auto x_pred = [](vec2t<T> a, vec2t<T> b){ return a.x < b.x; };
+				auto y_pred = [](vec2t<T> a, vec2t<T> b){ return a.y < b.y; };
 
-				vec2<T> lower(
+				vec2t<T> lower(
 					static_cast<T>(std::min_element(v, v + 4, x_pred)->x),
 					static_cast<T>(std::min_element(v, v + 4, y_pred)->y)
 					);
 
-				vec2<T> upper(
+				vec2t<T> upper(
 					static_cast<T>(std::max_element(v, v + 4, x_pred)->x),
 					static_cast<T>(std::max_element(v, v + 4, y_pred)->y)
 					);
@@ -182,7 +181,7 @@ namespace augs {
 			}
 
 			template <class T>
-			static ltrb get_aabb_rotated(vec2<T> initial_size, T rotation) {
+			static ltrb get_aabb_rotated(vec2t<T> initial_size, T rotation) {
 				auto verts = rects::ltrb<T>(0, 0, initial_size.x, initial_size.y).get_vertices<T>();
 
 				for (auto& v : verts)
@@ -193,17 +192,17 @@ namespace augs {
 			}
 
 			template <class T>
-			std::vector<vec2<T>> get_vertices() const {
-				std::vector<vec2<T>> out;
-				out.push_back(vec2<T>(l, t));
-				out.push_back(vec2<T>(r, t));
-				out.push_back(vec2<T>(r, b));
-				out.push_back(vec2<T>(l, b));
+			std::vector<vec2t<T>> get_vertices() const {
+				std::vector<vec2t<T>> out;
+				out.push_back(vec2t<T>(l, t));
+				out.push_back(vec2t<T>(r, t));
+				out.push_back(vec2t<T>(r, b));
+				out.push_back(vec2t<T>(l, b));
 				return std::move(out);
 			}
 
 			template <typename type>
-			void snap_point(vec2<type>& v) const {
+			void snap_point(vec2t<type>& v) const {
 				if (v.x < l) v.x = static_cast<type>(l);
 				if (v.y < t) v.y = static_cast<type>(t);
 				if (v.x > r) v.x = static_cast<type>(r);
@@ -234,17 +233,17 @@ namespace augs {
 				b = t + _h;
 			}
 
-			void center(const vec2<T>& c) {
+			void center(const vec2t<T>& c) {
 				center_x(c.x);
 				center_y(c.y);
 			}
 
 			void x(T xx) {
-				*this += (vec2<T>(xx - l, 0));
+				*this += (vec2t<T>(xx - l, 0));
 			}
 
 			void y(T yy) {
-				*this += (vec2<T>(0, yy - t));
+				*this += (vec2t<T>(0, yy - t));
 			}
 
 			void w(T ww) {
@@ -290,7 +289,7 @@ namespace augs {
 			xywh(const ltrb<T>& rc) : x(rc.l), y(rc.t) { b(rc.b); r(rc.r); }
 			xywh(T x, T y, T w, T h) : x(x), y(y), wh(w, h) {}
 			xywh(T x, T y, const wh& r) : x(x), y(y), wh(r) {}
-			xywh(const vec2<T>& p, const wh& r) : x(p.x), y(p.y), wh(r) {}
+			xywh(const vec2t<T>& p, const wh& r) : x(p.x), y(p.y), wh(r) {}
 
 			bool clip(const xywh& rc) {
 				if (x >= rc.r() || y >= rc.b() || r() <= rc.x || b() <= rc.y) {
@@ -304,7 +303,7 @@ namespace augs {
 				return true;
 			}
 
-			bool hover(const vec2<T>& m) {
+			bool hover(const vec2t<T>& m) {
 				return m.x >= x && m.y >= y && m.x <= r() && m.y <= b();
 			}
 
@@ -388,9 +387,9 @@ namespace augs {
 		};
 
 		template <class T>
-		extern std::wostream& operator<<(std::wostream&, const vec2<T>&);
+		extern std::wostream& operator<<(std::wostream&, const vec2t<T>&);
 
 		template <class T>
-		extern std::ostream& operator<<(std::ostream&, const vec2<T>&);
+		extern std::ostream& operator<<(std::ostream&, const vec2t<T>&);
 	}
 }

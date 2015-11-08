@@ -14,7 +14,7 @@ void lookat_system::process_entities(world& owner) {
 			continue;
 
 		auto& transform = it->get<components::transform>().current;
-		vec2<> new_rotation;
+		vec2 new_rotation;
 
 		if (lookat.look_mode == components::lookat::look_type::POSITION) {
 			auto target_transform = lookat.target->find<components::transform>();
@@ -25,13 +25,13 @@ void lookat_system::process_entities(world& owner) {
 			auto target_physics = lookat.target->find<components::physics>();
 
 			if (target_physics != nullptr) {
-				vec2<> direction;
+				vec2 direction;
 
 				if (lookat.look_mode == components::lookat::look_type::VELOCITY)
-					direction = vec2<>(target_physics->body->GetLinearVelocity());
+					direction = vec2(target_physics->body->GetLinearVelocity());
 
 				if (lookat.look_mode == components::lookat::look_type::ACCELEARATION)
-					direction = vec2<>(target_physics->body->m_last_force);
+					direction = vec2(target_physics->body->m_last_force);
 
 				if (direction.non_zero())
 					new_rotation = direction.normalize();

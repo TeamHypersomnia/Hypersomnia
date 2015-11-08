@@ -626,7 +626,7 @@
     <ClCompile Include="utilities\entity_system\entity.cpp" />
     <ClCompile Include="utilities\entity_system\processing_system.cpp" />
     <ClCompile Include="utilities\entity_system\component_bitset_matcher.cpp" />
-    <ClCompile Include="utilities\entity_system\templated_list.cpp" />
+    <ClCompile Include="utilities\entity_system\templated_list_to_hash_vector.cpp" />
     <ClCompile Include="utilities\entity_system\type_hash_to_index_mapper.cpp" />
     <ClCompile Include="utilities\entity_system\world.cpp" />
     <ClCompile Include="utilities\error\augs_error.cpp" />
@@ -1118,6 +1118,7 @@
     <ClInclude Include="depthbase\gui\text\ui.h" />
     <ClInclude Include="depthbase\gui\text\word_separator.h" />
     <ClInclude Include="game_framework\bindings\bindings.h" />
+    <ClInclude Include="game_framework\bindings\bind_callbacks.h" />
     <ClInclude Include="game_framework\components\all_components.h" />
     <ClInclude Include="game_framework\components\animate_component.h" />
     <ClInclude Include="game_framework\components\behaviour_tree_component.h" />
@@ -1180,7 +1181,7 @@
     <ClInclude Include="utilities\entity_system\entity_system.h" />
     <ClInclude Include="utilities\entity_system\processing_system.h" />
     <ClInclude Include="utilities\entity_system\component_bitset_matcher.h" />
-    <ClInclude Include="utilities\entity_system\templated_list.h" />
+    <ClInclude Include="utilities\entity_system\templated_list_to_hash_vector.h" />
     <ClInclude Include="utilities\entity_system\type_hash_to_index_mapper.h" />
     <ClInclude Include="utilities\entity_system\world.h" />
     <ClInclude Include="utilities\error\augs_error.h" />

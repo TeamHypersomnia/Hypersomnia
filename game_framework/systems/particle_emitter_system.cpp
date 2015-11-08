@@ -24,9 +24,9 @@ entity_id particle_emitter_system::create_refreshable_particle_group(world& owne
 }
 
 void particle_emitter_system::spawn_particle(
-	components::particle_group::stream& group, const vec2<>& position, float rotation, float spread, const resources::emission& emission) {
+	components::particle_group::stream& group, const vec2& position, float rotation, float spread, const resources::emission& emission) {
 	auto new_particle = emission.particle_templates[randval(0u, emission.particle_templates.size() - 1)];
-	new_particle.vel = vec2<>::from_degrees(
+	new_particle.vel = vec2::from_degrees(
 		randval(rotation - spread, rotation + spread)) *
 		randval(emission.velocity);
 
@@ -56,7 +56,7 @@ void particle_emitter_system::spawn_particle(
 	new_particle.max_lifetime_ms = randval(truncated_lifetime);
 
 	if (emission.randomize_acceleration) {
-		new_particle.acc += vec2<>::from_degrees(
+		new_particle.acc += vec2::from_degrees(
 			randval(rotation - spread, rotation + spread)) *
 			randval(emission.acceleration);
 	}
@@ -185,7 +185,7 @@ void particle_emitter_system::consume_events(world& owner) {
 				*target_chase = components::chase(it.subject);
 				target_chase->chase_type = components::chase::chase_type::ORBIT;
 				target_chase->rotation_offset = target_rotation - subject_transform.rotation;
-				target_chase->rotation_orbit_offset = (it.pos - subject_transform.pos).rotate(-subject_transform.rotation, vec2<>(0.f, 0.f));
+				target_chase->rotation_orbit_offset = (it.pos - subject_transform.pos).rotate(-subject_transform.rotation, vec2(0.f, 0.f));
 			}
 
 			if (it.target_group_to_refresh.alive()) {

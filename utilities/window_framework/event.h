@@ -10,7 +10,7 @@ namespace augs {
 
 			struct state {
 				struct mouse_info {
-					vec2<int> pos, rel, raw_rel, ldrag, rdrag;
+					vec2i pos, rel, raw_rel, ldrag, rdrag;
 					bool state[3];
 					int scroll;
 				} mouse;

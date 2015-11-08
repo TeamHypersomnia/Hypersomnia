@@ -75,7 +75,7 @@ namespace augs {
 						const drafter& d, 
 						const fstr& colors,
 						const caret_info* caret,
-						vec2<int> pos,
+						vec2i pos,
 						const rects::ltrb<float>* clipper
 						) const 
 				{
@@ -86,9 +86,9 @@ namespace augs {
 					bool clip = clipper != nullptr;
 
 					//if(clip) 
-					//	pos = vec2<int>(*parent);
+					//	pos = vec2i(*parent);
 					//
-					//vec2<int> global = scroll;
+					//vec2i global = scroll;
 
 					/* we'll draw caret at the very end of procedure so we have to declare this variable here */
 					rects::xywh<float> caret_rect(0, 0, 0, 0);
@@ -215,17 +215,17 @@ namespace augs {
 					if(blink.caret_visible) gui::add_quad(caret_mat, caret_rect + pos, clipper, v); 
 				}
 				
-				vec2<int> get_text_bbox(const std::basic_string<formatted_char>& str, unsigned wrapping_width)
+				vec2i get_text_bbox(const std::basic_string<formatted_char>& str, unsigned wrapping_width)
 				{
 					 drafter dr;
 					 dr.wrap_width = wrapping_width;
 					 dr.draw(str);
-					 return vec2<int>(dr.get_bbox().w, dr.get_bbox().h);
+					 return vec2i(dr.get_bbox().w, dr.get_bbox().h);
 				}
 
 				rects::wh<float> quick_print(std::vector<resources::vertex_triangle>& v,
 										const fstr& str, 
-										vec2<int> pos, 
+										vec2i pos, 
 										unsigned wrapping_width,
 										const rects::ltrb<float>* clipper) 
 				{
@@ -240,7 +240,7 @@ namespace augs {
 				rects::wh<float> quick_print_format(std::vector<resources::vertex_triangle>& v,
 										const std::wstring& wstr,
 										gui::text::style style,
-										vec2<int> pos, 
+										vec2i pos, 
 										unsigned wrapping_width,
 										const rects::ltrb<float>* clipper) 
 				{

@@ -15,7 +15,7 @@ class gun_system;
 namespace components {
 	struct camera : public augs::entity_system::component {
 		augs::rects::xywh<int> screen_rect;
-		augs::vec2<> size;
+		vec2 size;
 
 		unsigned layer = 0;
 		unsigned mask = 0;
@@ -37,9 +37,9 @@ namespace components {
 
 		components::transform::state<> last_interpolant;
 
-		augs::vec2<> rendered_size;
+		vec2 rendered_size;
 
-		augs::vec2<> max_look_expand = augs::vec2<>(600.f, 300.f);
+		vec2 max_look_expand = vec2(600.f, 300.f);
 
 		augs::entity_system::entity_id player, crosshair;
 
@@ -53,6 +53,6 @@ namespace components {
 		friend class gun_system;
 
 		augs::misc::timer smooth_timer;
-		augs::vec2<> last_ortho_interpolant;
+		vec2 last_ortho_interpolant;
 	};
 }

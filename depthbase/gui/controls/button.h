@@ -28,7 +28,7 @@ namespace augs {
 
 					/* centers label */
 					text_button(const button&, const text::fstr&); 
-					text_button(const button&, augs::vec2<int>, const text::fstr&);
+					text_button(const button&, vec2i, const text::fstr&);
 
 					void get_member_children(std::vector<rect*>& children) override;
 

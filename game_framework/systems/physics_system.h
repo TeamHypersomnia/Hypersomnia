@@ -68,7 +68,7 @@ public:
 	double get_timestep_ms();
 
 	struct raycast_output {
-		vec2<> intersection, normal;
+		vec2 intersection, normal;
 		bool hit;
 		b2Fixture* what_fixture = nullptr;
 		entity_id what_entity;
@@ -76,20 +76,20 @@ public:
 		raycast_output() : hit(false), what_fixture(nullptr) {}
 	};
 
-	std::vector<raycast_output> ray_cast_all_intersections(vec2<> p1_meters, vec2<> p2_meters, b2Filter filter, entity_id ignore_entity = entity_id());
+	std::vector<raycast_output> ray_cast_all_intersections(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity = entity_id());
 	
 	struct edge_edge_output {
-		vec2<> intersection;
+		vec2 intersection;
 		bool hit;
 	};
 
-	edge_edge_output edge_edge_intersection(vec2<> p1_meters, vec2<> p2_meters, vec2<> edge_p1, vec2<> edge_p2);
+	edge_edge_output edge_edge_intersection(vec2 p1_meters, vec2 p2_meters, vec2 edge_p1, vec2 edge_p2);
 
-	raycast_output ray_cast(vec2<> p1_meters, vec2<> p2_meters, b2Filter filter, entity_id ignore_entity = entity_id());
-	raycast_output ray_cast_px(vec2<> p1, vec2<> p2, b2Filter filter, entity_id ignore_entity = entity_id());
+	raycast_output ray_cast(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity = entity_id());
+	raycast_output ray_cast_px(vec2 p1, vec2 p2, b2Filter filter, entity_id ignore_entity = entity_id());
 	
-	vec2<> push_away_from_walls(vec2<> position, float radius, int ray_amount, b2Filter filter, entity_id ignore_entity = entity_id());
-	float get_closest_wall_intersection(vec2<> position, float radius, int ray_amount, b2Filter filter, entity_id ignore_entity = entity_id());
+	vec2 push_away_from_walls(vec2 position, float radius, int ray_amount, b2Filter filter, entity_id ignore_entity = entity_id());
+	float get_closest_wall_intersection(vec2 position, float radius, int ray_amount, b2Filter filter, entity_id ignore_entity = entity_id());
 
 	struct query_output {
 		struct queried_result {
@@ -108,14 +108,14 @@ public:
 		std::vector<queried_result> details;
 	};
 
-	query_output query_square(vec2<> p1_meters, float side_meters, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
-	query_output query_square_px(vec2<> p1, float side, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
-	query_output query_aabb(vec2<> p1_meters, vec2<> p2_meters, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
-	query_output query_aabb_px(vec2<> p1, vec2<> p2, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
+	query_output query_square(vec2 p1_meters, float side_meters, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
+	query_output query_square_px(vec2 p1, float side, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
+	query_output query_aabb(vec2 p1_meters, vec2 p2_meters, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
+	query_output query_aabb_px(vec2 p1, vec2 p2, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
 
 	query_output query_body(augs::entity_system::entity_id, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
 
-	query_output query_polygon(const std::vector<vec2<>>& vertices, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
+	query_output query_polygon(const std::vector<vec2>& vertices, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
 	query_output query_shape(b2Shape*, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
 private:
 	/* callback structure used in QueryAABB function to get all shapes near-by */

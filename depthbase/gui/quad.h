@@ -28,7 +28,7 @@ namespace augs {
 			//
 			//	static quad clipped(const rects::ltrb<float>&, const rects::ltrb<float>&, const material&);
 			//	void clip(const rects::ltrb<float>&);
-			//	void move(const vec2<int>&);
+			//	void move(const vec2i&);
 			//	void set (const rects::ltrb<float>&);
 			//	void rotate90(int times);
 			//	rects::ltrb<float> get_rect() const;

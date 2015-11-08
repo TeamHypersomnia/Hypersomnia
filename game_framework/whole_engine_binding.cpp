@@ -7,6 +7,7 @@
 #include "world_instance.h"
 #include "game_framework.h"
 #include "utilities/script.h"
+#include "components/physics_component.h"
 
 #include <fstream>
 #include <iostream>
@@ -115,7 +116,7 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 			bindings::_id_generator(),
 			bindings::_minmax(),
 			bindings::_vec2(),
-			bind_stdvector<vec2<>>("vec2_vector"),
+			bind_stdvector<vec2>("vec2_vector"),
 			bind_vector_wrapper<int>("int_vector"),
 			bindings::_value_animator(),
 			bindings::_b2Filter(),

@@ -37,45 +37,45 @@ void camera_system::process_entities(world& owner) {
 		if (camera.enabled) {
 			/* we obtain transform as a copy because we'll be now offsetting it by crosshair position */
 			auto transform = e->get<components::transform>().current;
-			transform.pos = vec2<int>(transform.pos);
-			vec2<int> crosshair_offset;
+			transform.pos = vec2i(transform.pos);
+			vec2i crosshair_offset;
 
 			/* if we set player and crosshair entity targets */
 			if (camera.player.alive() && camera.crosshair.alive()) {
 				/* skip calculations if no orbit_mode is specified */
 				if (camera.orbit_mode != camera.NONE) {
 					/* shortcuts */
-					vec2<int> crosshair_pos = camera.crosshair->get<components::transform>().current.pos;
-					vec2<int> player_pos = camera.player->get<components::transform>().current.pos;
-					vec2<> dir = (crosshair_pos - player_pos);
+					vec2i crosshair_pos = camera.crosshair->get<components::transform>().current.pos;
+					vec2i player_pos = camera.player->get<components::transform>().current.pos;
+					vec2 dir = (crosshair_pos - player_pos);
 
-					dir.rotate(transform.rotation, vec2<>());
+					dir.rotate(transform.rotation, vec2());
 
 					if (camera.orbit_mode == camera.ANGLED) {
-						vec2<> bound = camera.size / 2.f;
+						vec2 bound = camera.size / 2.f;
 						/* save by copy */
-						vec2<> normalized = dir.clamp(bound);
+						vec2 normalized = dir.clamp(bound);
 						crosshair_offset = normalized.normalize() * camera.angled_look_length;
 					}
 
 					if (camera.orbit_mode == camera.LOOK) {
-						vec2<> bound = camera.max_look_expand + camera.size / 2.f;
+						vec2 bound = camera.max_look_expand + camera.size / 2.f;
 
 						/* simple proportion in local frame of reference */
-						vec2<> camera_offset = (dir.clamp(bound) / bound) * camera.max_look_expand;
+						vec2 camera_offset = (dir.clamp(bound) / bound) * camera.max_look_expand;
 						
-						crosshair_offset = camera_offset.rotate(-transform.rotation, vec2<>());
+						crosshair_offset = camera_offset.rotate(-transform.rotation, vec2());
 					}
 					
 					/* rotate dir back */
-					dir.rotate(-transform.rotation, vec2<>());
+					dir.rotate(-transform.rotation, vec2());
 					/* update crosshair so it is snapped to visible area */
 					camera.crosshair->get<components::transform>().current.pos = player_pos + dir;
 				}
 			}
 
 			components::transform::state<> drawn_transform;
-			augs::vec2<> drawn_size;
+			vec2 drawn_size;
 
 			if (camera.enable_smoothing) {
 				/* variable time step camera smoothing by averaging last position with the current */
@@ -88,10 +88,10 @@ void camera_system::process_entities(world& owner) {
 				//if ((transform.pos - camera.last_interpolant).length() < 2.0) camera.last_interpolant = transform.current.pos;
 				//else
 
-				vec2<int> target = transform.pos + crosshair_offset;
-				vec2<int> smoothed_part = crosshair_offset;
+				vec2i target = transform.pos + crosshair_offset;
+				vec2i smoothed_part = crosshair_offset;
 
-				camera.last_interpolant.pos = camera.last_interpolant.pos * averaging_constant + vec2<double>(smoothed_part) * (1.0f - averaging_constant);
+				camera.last_interpolant.pos = camera.last_interpolant.pos * averaging_constant + vec2d(smoothed_part) * (1.0f - averaging_constant);
 				camera.last_interpolant.rotation = camera.last_interpolant.rotation * averaging_constant + transform.rotation * (1.0f - averaging_constant);
 					
 				auto interp = [](float& a, float& b, float averaging_constant){
@@ -119,8 +119,8 @@ void camera_system::process_entities(world& owner) {
 				drawn_transform.pos += crosshair_offset;
 			}
 			
-			drawn_transform.pos = vec2<int>(drawn_transform.pos);
-			drawn_size = vec2<int>(drawn_size);
+			drawn_transform.pos = vec2i(drawn_transform.pos);
+			drawn_size = vec2i(drawn_size);
 
 			camera.dont_smooth_once = false;
 

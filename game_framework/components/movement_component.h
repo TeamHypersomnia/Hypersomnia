@@ -27,20 +27,20 @@ namespace components {
 		int moving_left, moving_right, moving_forward, moving_backward;
 		
 		/* default acceleration vector used for movement requested by input */
-		augs::vec2<> input_acceleration;
+		vec2 input_acceleration;
 	
 		/* used to truncate acceleration vector if for example both up and right buttons are pressed */
 		float max_accel_len = -1.f;
 
 		/* if this is non-zero, the movement vector will be mapped to XY axis based on this vector and not on the inputs */
-		augs::vec2<> requested_movement;
+		vec2 requested_movement;
 			
 		/* force is applied to the body's center by default, you can offset this position by changing this value */
-		augs::vec2<> force_offset;
+		vec2 force_offset;
 		
 		/* two-dimensional damping value (though you're most likely interested in only X axis) 
 		applied when the character is not moving in the side-scrolling environment */
-		augs::vec2<> inverse_thrust_brake;
+		vec2 inverse_thrust_brake;
 
 		/* a physically realistic alternative to max_speed variable, the bigger the value is, the lesser the maximum speed */
 		float air_resistance;
@@ -68,7 +68,7 @@ namespace components {
 		/* filter for the aforementioned ray cast */
 		b2Filter ground_filter;
 
-		movement(augs::vec2<> acceleration = augs::vec2<>(), float air_resistance = 0.f) 
+		movement(vec2 acceleration = vec2(), float air_resistance = 0.f) 
 			: input_acceleration(input_acceleration), air_resistance(air_resistance), braking_damping(-1.f), max_speed(-1.f), max_speed_animation(0.f), 
 			axis_rotation_degrees(0.f), thrust_parallel_to_ground_length(0.f), sidescroller_setup(false) {
 			moving_left = moving_right = moving_forward = moving_backward = 0;

@@ -47,12 +47,12 @@ namespace augs {
 			void rect::update_rectangles() {
 				/* init; later to be processed absolute and clipped with local rc */
 				rc_clipped = rc;
-				absolute_xy = vec2<int>(rc.l, rc.t);
+				absolute_xy = vec2i(rc.l, rc.t);
 
 				/* if we have parent */
 				if(parent) {
 					/* we have to save our global coordinates in absolute_xy */
-					absolute_xy = parent->absolute_xy + vec2<int>(rc.l, rc.t) - vec2<int>(int(parent->scroll.x), int(parent->scroll.y));
+					absolute_xy = parent->absolute_xy + vec2i(rc.l, rc.t) - vec2i(int(parent->scroll.x), int(parent->scroll.y));
  					rc_clipped  = rects::xywh<float>(absolute_xy.x, absolute_xy.y, rc.w(), rc.h());
 					
 					/* and we have to clip by first clipping parent's rc_clipped */
@@ -339,7 +339,7 @@ namespace augs {
 							event_proc(e = event::ldrag);
 						}
 					//}
-					if(gr.lholded != this) drag_origin = vec2<int>(rc.l, rc.t);
+					if(gr.lholded != this) drag_origin = vec2i(rc.l, rc.t);
 				}
 			}
 
@@ -373,8 +373,8 @@ namespace augs {
 				if(parent) {
 					rects::ltrb<float> global = get_rect_absolute();
 					rects::ltrb<float> parent_global = parent->get_rect_absolute();
-					vec2<int> off1 = vec2<int>(std::max(0.f, global.r + 2 - parent_global.r), std::max(0.f, global.b + 2 - parent_global.b));
-					vec2<int> off2 = vec2<int>(std::max(0.f, parent_global.l - global.l + 2 + off1.x), std::max(0.f, parent_global.t - global.t + 2 + off1.y));
+					vec2i off1 = vec2i(std::max(0.f, global.r + 2 - parent_global.r), std::max(0.f, global.b + 2 - parent_global.b));
+					vec2i off2 = vec2i(std::max(0.f, parent_global.l - global.l + 2 + off1.x), std::max(0.f, parent_global.t - global.t + 2 + off1.y));
 					parent->scroll += off1;
 					parent->scroll -= off2;
 					parent->scroll_to_view();
@@ -479,7 +479,7 @@ namespace augs {
 				return rects::xywh<float>(absolute_xy.x, absolute_xy.y, rc.w(), rc.h());
 			}
 
-			const vec2<int>& rect::get_absolute_xy() const {
+			const vec2i& rect::get_absolute_xy() const {
 				return absolute_xy;
 			}
 

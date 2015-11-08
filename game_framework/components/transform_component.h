@@ -7,14 +7,14 @@ namespace components {
 	struct transform : public augs::entity_system::component {
 		template <typename T = float>
 		struct state {
-			augs::vec2<T> pos;
+			vec2t<T> pos;
 			T rotation;
 			state() : rotation(static_cast<T>(0)) { }
-			state(augs::vec2<T> pos, T rotation) : rotation(rotation), pos(pos) { }
+			state(vec2t<T> pos, T rotation) : rotation(rotation), pos(pos) { }
 		};
 		state<> previous, current;
 
-		transform(augs::vec2<> pos = augs::vec2<>(), float rotation = 0.f) {
+		transform(vec2 pos = vec2(), float rotation = 0.f) {
 			current.pos = pos;
 			current.rotation = rotation;
 			previous = current;

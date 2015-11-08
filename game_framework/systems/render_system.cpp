@@ -140,8 +140,8 @@ void render_system::fullscreen_quad() {
 	glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(resources::vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr
 }
 
-void render_system::draw_debug_info(vec2<> visible_area, components::transform::state<> camera_transform, augs::texture_baker::texture* tex) {
-	vec2<> center = visible_area / 2;
+void render_system::draw_debug_info(vec2 visible_area, components::transform::state<> camera_transform, augs::texture_baker::texture* tex) {
+	vec2 center = visible_area / 2;
 
 	if (draw_visibility) {
 		glBegin(GL_TRIANGLES); glerr
@@ -222,7 +222,7 @@ void render_system::cleanup() {
 	triangles.clear();
 }
 
-void render_system::default_render(vec2<> visible_area) {
+void render_system::default_render(vec2 visible_area) {
 	augs::graphics::fbo::use_default();
 	glClear(GL_COLOR_BUFFER_BIT); glerr
 

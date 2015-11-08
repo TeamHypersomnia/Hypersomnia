@@ -97,7 +97,7 @@ namespace augs {
 							box->rc.center_y(wnd.mouse.pos.y - get_rect_absolute().t);
 							update_scroll_y();
 						}
-						box->drag_origin = vec2<int>(box->rc.l, box->rc.t);
+						box->drag_origin = vec2i(box->rc.l, box->rc.t);
 					}
 				}
 

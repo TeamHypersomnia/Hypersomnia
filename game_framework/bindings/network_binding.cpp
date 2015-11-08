@@ -156,7 +156,7 @@ namespace bindings {
 			.def("WriteFloat", &bitstream::WritePOD<float>)
 			.def("WriteDouble", &bitstream::WritePOD<double>)
 			.def("Writeb2Vec2", &bitstream::WriteVec<b2Vec2>)
-			.def("WriteVec2", &bitstream::WriteVec<vec2<>>)
+			.def("WriteVec2", &bitstream::WriteVec<vec2>)
 
 			.def("ReadRakNetGUID", &bitstream::ReadGuid)
 			.def("WriteRakNetGUID", &bitstream::WriteGuid)
@@ -170,7 +170,7 @@ namespace bindings {
 			.def("ReadFloat", &bitstream::ReadPOD<float>)
 			.def("ReadDouble", &bitstream::ReadPOD<double>)
 			.def("Readb2Vec2", &bitstream::ReadVec<b2Vec2>) 
-			.def("ReadVec2", &bitstream::ReadVec<vec2<>>)
+			.def("ReadVec2", &bitstream::ReadVec<vec2>)
 			,
 
 			luabind::class_<receive_result>("receive_result")

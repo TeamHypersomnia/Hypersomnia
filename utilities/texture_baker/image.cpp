@@ -21,7 +21,7 @@ namespace augs {
 		}
 
 		void image::create(int w, int h, int ch) {
-			size = vec2<int>(w, h);
+			size = vec2i(w, h);
 			channels = ch;
 			v.resize(get_bytes());
 			//v.shrink_to_fit();

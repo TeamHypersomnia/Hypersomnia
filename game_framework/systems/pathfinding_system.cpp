@@ -124,7 +124,7 @@ void pathfinding_system::process_entities(world& owner) {
 						auto associated_edge = vision.edges[disc.edge_index];
 
 						/* get the direction the sensor will be going to */
-						vec2<> sensor_direction;
+						vec2 sensor_direction;
 
 						bool degenerate = false;
 
@@ -142,14 +142,14 @@ void pathfinding_system::process_entities(world& owner) {
 							/* rotate a bit to prevent non-reachable sensors */
 							float rotation = pathfinding.rotate_navpoints;
 							if (disc.winding == disc.LEFT) rotation = -rotation;
-							sensor_direction.rotate(rotation, vec2<>(0, 0));
+							sensor_direction.rotate(rotation, vec2(0, 0));
 							//sensor_direction = transform.pos - vert.location;
 							sensor_direction.normalize();
 
 							vert.sensor = vert.location + sensor_direction * pathfinding.target_offset;
 
 							/* if this sensor overlaps anything, discard it */
-							std::vector<vec2<>> sensor_polygon = {
+							std::vector<vec2> sensor_polygon = {
 								sensor_direction * 10 + vert.location - sensor_direction.perpendicular_cw() * 4,
 								sensor_direction * 10 + vert.location - sensor_direction.perpendicular_cw() * 4 + sensor_direction * pathfinding.target_offset,
 								sensor_direction * 10 + vert.location + sensor_direction.perpendicular_cw() * 4 + sensor_direction * pathfinding.target_offset,
@@ -223,7 +223,7 @@ void pathfinding_system::process_entities(world& owner) {
 			/* now for the actual pathfinding routine */
 
 			/* helpful lambda */
-			auto& is_point_visible = [&physics, epsilon_distance_visible_point_sq, &pathfinding, it](vec2<> from, vec2<> point, b2Filter& filter){
+			auto& is_point_visible = [&physics, epsilon_distance_visible_point_sq, &pathfinding, it](vec2 from, vec2 point, b2Filter& filter){
 				bool visibility_condition_fulfilled = true;
 				
 				if (pathfinding.target_visibility_condition)
@@ -307,7 +307,7 @@ void pathfinding_system::process_entities(world& owner) {
 
 				for (auto& disc : pathfinding.session().discovered_vertices)
 					//if(disc.sensor.non_zero())
-					render.lines.push_back(render_system::debug_line(disc.location, disc.location + vec2<>(0, pathfinding.target_offset), graphics::pixel_32(0, 255, 0, 255)));
+					render.lines.push_back(render_system::debug_line(disc.location, disc.location + vec2(0, pathfinding.target_offset), graphics::pixel_32(0, 255, 0, 255)));
 			}
 
 			if (!vertices.empty()) {
@@ -330,7 +330,7 @@ void pathfinding_system::process_entities(world& owner) {
 					current_target = pathfinding.session().persistent_navpoint;
 				}
 				else {
-					vec2<> unit_vel = body->GetLinearVelocity();
+					vec2 unit_vel = body->GetLinearVelocity();
 					unit_vel.normalize();
 					
 					auto local_minimum_predicate = [&pathfinding, &transform, body, unit_vel](const components::pathfinding::pathfinding_session::navigation_vertex& a,
@@ -343,7 +343,7 @@ void pathfinding_system::process_entities(world& owner) {
 								float parallellness_b = 0.f;
 
 								if (pathfinding.custom_exploration_hint.enabled) {
-									vec2<> compared_dir = (pathfinding.custom_exploration_hint.target - pathfinding.custom_exploration_hint.origin).normalize();
+									vec2 compared_dir = (pathfinding.custom_exploration_hint.target - pathfinding.custom_exploration_hint.origin).normalize();
 									parallellness_a = (a.location - pathfinding.custom_exploration_hint.origin).normalize().dot(compared_dir);
 									parallellness_b = (b.location - pathfinding.custom_exploration_hint.origin).normalize().dot(compared_dir);
 								}
@@ -470,7 +470,7 @@ void pathfinding_system::process_entities(world& owner) {
 				/* else start new navigation session */
 				else {
 					if (pathfinding.enable_backtracking) {
-						vec2<> new_target = pathfinding.session().navigate_to;
+						vec2 new_target = pathfinding.session().navigate_to;
 						pathfinding.session_stack.push_back(components::pathfinding::pathfinding_session());
 						pathfinding.session().target = new_target;
 						pathfinding.session().temporary_ignore_discontinuities_shorter_than = pathfinding.starting_ignore_discontinuities_shorter_than;

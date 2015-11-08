@@ -68,7 +68,7 @@ namespace augs {
 						const fstr& colors,
 						/* if caret is 0, draw no caret */
 						const caret_info* caret,
-						vec2<int> scroll,
+						vec2i scroll,
 						const rects::ltrb<float>* parent = 0) const;
 		 		};
 				
@@ -78,18 +78,18 @@ namespace augs {
 				 parent = 0 means no clipping/shifting
 				returns text's bounding box (without clipping)
 				*/
-				extern vec2<int> get_text_bbox(const std::basic_string<formatted_char>& str, unsigned wrapping_width);
+				extern vec2i get_text_bbox(const std::basic_string<formatted_char>& str, unsigned wrapping_width);
 
 				extern rects::wh<float> quick_print(std::vector<resources::vertex_triangle>& v,
 										const fstr& str, 
-										vec2<int> pos, 
+										vec2i pos, 
 										unsigned wrapping_width = 0,
 										const rects::ltrb<float>* parent = 0);
 
 				extern rects::wh<float> quick_print_format(std::vector<resources::vertex_triangle>& v,
 										const std::wstring& wstr,
 										style style,
-										vec2<int> pos, 
+										vec2i pos, 
 										unsigned wrapping_width = 0,
 										const rects::ltrb<float>* parent = 0);
 			}

@@ -31,19 +31,19 @@ namespace resources {
 		auto x_pred = [](vc a, vc b){ return a.pos.x < b.pos.x; };
 		auto y_pred = [](vc a, vc b){ return a.pos.y < b.pos.y; };
 
-		vec2<int> lower(
+		vec2i lower(
 			static_cast<int>(std::min_element(v, v + p->model.size(), x_pred)->pos.x),
 			static_cast<int>(std::min_element(v, v + p->model.size(), y_pred)->pos.y)
 			);
 
-		vec2<int> upper(
+		vec2i upper(
 			static_cast<int>(std::max_element(v, v + p->model.size(), x_pred)->pos.x),
 			static_cast<int>(std::max_element(v, v + p->model.size(), y_pred)->pos.y)
 			);
 
 		if (uv_mapping_mode == uv_mapping_mode::STRETCH) {
 			for (auto& v : p->model) {
-				v.set_texcoord(vec2<>(
+				v.set_texcoord(vec2(
 					(v.pos.x - lower.x) / (upper.x - lower.x),
 					(v.pos.y - lower.y) / (upper.y - lower.y)
 					), texture_to_map);
@@ -53,7 +53,7 @@ namespace resources {
 			auto size = texture_to_map->get_size();
 
 			for (auto& v : p->model) {
-				v.set_texcoord(vec2<>(
+				v.set_texcoord(vec2(
 					(v.pos.x - lower.x) / size.x,
 					(v.pos.y - lower.y) / size.y
 					), texture_to_map);
@@ -61,13 +61,13 @@ namespace resources {
 		}
 	}
 
-	void renderable::make_rect(vec2<> pos, vec2<> size, float angle, vec2<> v[4]) {
-		vec2<> origin(pos + (size / 2.f));
+	void renderable::make_rect(vec2 pos, vec2 size, float angle, vec2 v[4]) {
+		vec2 origin(pos + (size / 2.f));
 
 		v[0] = pos;
-		v[1] = pos + vec2<>(size.x, 0.f);
+		v[1] = pos + vec2(size.x, 0.f);
 		v[2] = pos + size;
-		v[3] = pos + vec2<>(0.f, size.y);
+		v[3] = pos + vec2(0.f, size.y);
 
 		v[0].rotate(angle, origin);
 		v[1].rotate(angle, origin);
@@ -80,8 +80,8 @@ namespace resources {
 		v[3] -= size / 2.f;
 	}
 
-	std::vector<vec2<>> renderable::get_vertices() {
-		return std::vector<vec2<>>();
+	std::vector<vec2> renderable::get_vertices() {
+		return std::vector<vec2>();
 	}
 
 	sprite::sprite(texture_baker::texture* tex, graphics::pixel_32 color) : tex(tex), color(color), rotation_offset(0.f) {
@@ -106,9 +106,9 @@ namespace resources {
 			in.additional_info->was_drawn = false;
 		}
 
-		vec2<> v[4];
-		vec2<int> transform_pos = in.transform.pos;
-		make_rect(transform_pos, vec2<>(size), in.transform.rotation, v);
+		vec2 v[4];
+		vec2i transform_pos = in.transform.pos;
+		make_rect(transform_pos, vec2(size), in.transform.rotation, v);
 		if (!in.always_visible && !rects::ltrb<float>::get_aabb(v).hover(in.rotated_camera_aabb)) return;
 
 		if (tex == nullptr) return;
@@ -116,7 +116,7 @@ namespace resources {
 		auto center = in.visible_area / 2;
 
 		auto target_position = transform_pos - in.camera_transform.pos + center;
-		make_rect(target_position, vec2<>(size), in.transform.rotation + rotation_offset, v);
+		make_rect(target_position, vec2(size), in.transform.rotation + rotation_offset, v);
 
 		/* rotate around the center of the screen */
 		if(std::abs(in.camera_transform.rotation) > 0)
@@ -128,11 +128,11 @@ namespace resources {
 		t1.vertices[1].color = t2.vertices[1].color = color;
 		t1.vertices[2].color = t2.vertices[2].color = color;
 
-		vec2<> texcoords[] = {
-			vec2<>(0.f, 0.f),
-			vec2<>(1.f, 0.f),
-			vec2<>(1.f, 1.f),
-			vec2<>(0.f, 1.f)
+		vec2 texcoords[] = {
+			vec2(0.f, 0.f),
+			vec2(1.f, 0.f),
+			vec2(1.f, 1.f),
+			vec2(0.f, 1.f)
 		};
 
 		if (in.additional_info) {
@@ -154,14 +154,14 @@ namespace resources {
 			tex->get_uv(t2.vertices[i].texcoord);
 		}
 
-		t1.vertices[0].pos = t2.vertices[0].pos = vec2<int>(v[0]);
-		t2.vertices[1].pos = vec2<int>(v[1]);
-		t1.vertices[1].pos = t2.vertices[2].pos = vec2<int>(v[2]);
-		t1.vertices[2].pos = vec2<int>(v[3]);
+		t1.vertices[0].pos = t2.vertices[0].pos = vec2i(v[0]);
+		t2.vertices[1].pos = vec2i(v[1]);
+		t1.vertices[1].pos = t2.vertices[2].pos = vec2i(v[2]);
+		t1.vertices[2].pos = vec2i(v[3]);
 
 		if (in.additional_info) {
 			/* compute average */
-			in.additional_info->last_screen_pos = (vec2<>(v[0]) + vec2<>(v[1]) + vec2<>(v[2]) + vec2<>(v[3])) / 4;
+			in.additional_info->last_screen_pos = (vec2(v[0]) + vec2(v[1]) + vec2(v[2]) + vec2(v[3])) / 4;
 			in.additional_info->was_drawn = true;
 		}
 
@@ -169,12 +169,12 @@ namespace resources {
 		in.output->push_triangle(t2);
 	}
 
-	std::vector<vec2<>> sprite::get_vertices() {
-		std::vector<vec2<>> out;
+	std::vector<vec2> sprite::get_vertices() {
+		std::vector<vec2> out;
 		out.push_back(size / -2.f);
-		out.push_back(size / -2.f + vec2<>(size.x, 0.f));
+		out.push_back(size / -2.f + vec2(size.x, 0.f));
 		out.push_back(size / -2.f + size);
-		out.push_back(size / -2.f + vec2<>(0.f, size.y));
+		out.push_back(size / -2.f + vec2(0.f, size.y));
 		return std::move(out);
 	}
 
@@ -184,7 +184,7 @@ namespace resources {
 	//	vertices[2] = c;
 	//}
 	//
-	//void triangle::draw(buffer& triangles, const components::transform::state& transform, vec2<> camera_pos) {
+	//void triangle::draw(buffer& triangles, const components::transform::state& transform, vec2 camera_pos) {
 	//
 	//}
 
@@ -227,7 +227,7 @@ namespace resources {
 		}
 
 		for (size_t i = 0; i < polygon.vertices.size(); ++i) {
-			vec2<> p(polygon.vertices[i].pos);
+			vec2 p(polygon.vertices[i].pos);
 			inpoly[i].x = p.x;
 			inpoly[i].y = -p.y;
 		}
@@ -240,7 +240,7 @@ namespace resources {
 				auto new_tri_point = out.GetPoint(i);
 
 				for (size_t j = offset; j < polygon.vertices.size(); ++j) {
-					if (polygon.vertices[j].pos.compare(vec2<>(new_tri_point.x, -new_tri_point.y), 1.f)) {
+					if (polygon.vertices[j].pos.compare(vec2(new_tri_point.x, -new_tri_point.y), 1.f)) {
 						indices.push_back(j);
 						break;
 					}
@@ -249,8 +249,8 @@ namespace resources {
 		}
 	}
 
-	std::vector<vec2<>> polygon::get_vertices() {
-		std::vector<vec2<>> out;
+	std::vector<vec2> polygon::get_vertices() {
+		std::vector<vec2> out;
 
 		for (auto& v : model) 
 			out.push_back(v.pos);
@@ -273,7 +273,7 @@ namespace resources {
 		/* initial transformation for visibility checks */
 		if(std::abs(in.transform.rotation) > 0.f)
 			for (auto& v : model_transformed)
-				v.pos.rotate(in.transform.rotation, vec2<>(0, 0));
+				v.pos.rotate(in.transform.rotation, vec2(0, 0));
 		
 		if (in.always_visible) {
 			visible_indices = indices;
@@ -295,12 +295,12 @@ namespace resources {
 				auto x_pred = [](vc a, vc b){ return a.pos.x < b.pos.x; };
 				auto y_pred = [](vc a, vc b){ return a.pos.y < b.pos.y; };
 
-				vec2<int> lower(
+				vec2i lower(
 					static_cast<int>(std::min_element(v, v + 3, x_pred)->pos.x),
 					static_cast<int>(std::min_element(v, v + 3, y_pred)->pos.y)
 					);
 
-				vec2<int> upper(
+				vec2i upper(
 					static_cast<int>(std::max_element(v, v + 3, x_pred)->pos.x),
 					static_cast<int>(std::max_element(v, v + 3, y_pred)->pos.y)
 					);
@@ -372,7 +372,7 @@ namespace resources {
 			for (int x = visible_tiles.l; x < visible_tiles.r; ++x) {
 				vertex_triangle t1, t2;
 				
-				auto tile_offset = vec2<int>(x, y) * square_size;
+				auto tile_offset = vec2i(x, y) * square_size;
 				
 				int idx = y * size.w + x;
 				
@@ -381,7 +381,7 @@ namespace resources {
 				auto& type = layer_tileset->tile_types[tiles[idx].type_id-1];
 
 				sprite tile_sprite(type.tile_texture);
-				draw_input_copy.transform.pos = vec2<int>(in.transform.pos) + tile_offset + vec2<>(square_size / 2, square_size/2);
+				draw_input_copy.transform.pos = vec2i(in.transform.pos) + tile_offset + vec2(square_size / 2, square_size/2);
 				
 				tile_sprite.draw(draw_input_copy);
 			}
@@ -407,7 +407,7 @@ namespace resources {
 				if (indices_by_type.size() < type + 1)
 					indices_by_type.resize(type + 1);
 
-				indices_by_type[type].push_back(vec2<int>(x, y) * square_size);
+				indices_by_type[type].push_back(vec2i(x, y) * square_size);
 			}
 		}
 	}

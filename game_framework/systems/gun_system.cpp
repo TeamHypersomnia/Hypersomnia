@@ -80,7 +80,7 @@ void gun_system::consume_events(world& owner) {
 
 void components::gun::shake_camera(float rotation) {
 	if (target_camera_to_shake.alive()) {
-		vec2<> shake_dir;
+		vec2 shake_dir;
 		shake_dir.set_from_degrees(randval(
 			rotation - shake_spread_degrees,
 			rotation + shake_spread_degrees));
@@ -125,7 +125,7 @@ void gun_system::process_entities(world& owner) {
 
 			/* place bullets near the very barrel */
 			auto new_transform = gun_transform;
-			new_transform.pos += vec2<>(gun.bullet_distance_offset).rotate(gun_transform.rotation, vec2<>());
+			new_transform.pos += vec2(gun.bullet_distance_offset).rotate(gun_transform.rotation, vec2());
 
 			auto result = physics_sys.ray_cast_px(gun_transform.pos, new_transform.pos, gun.bullet_body.filter, it);
 
@@ -145,7 +145,7 @@ void gun_system::process_entities(world& owner) {
 				entity_id new_bullet = owner.create_entity();
 
 				/* randomize bullet direction taking spread into account */
-				vec2<> vel(vec2<>::from_degrees(
+				vec2 vel(vec2::from_degrees(
 					randval(
 					gun_transform.rotation - gun.spread_degrees,
 					gun_transform.rotation + gun.spread_degrees)));
@@ -204,7 +204,7 @@ void gun_system::process_entities(world& owner) {
 			query_vertices[gun.query_vertices] = gun_transform.pos;
 
 			for (int i = 0; i < gun.query_vertices; ++i) {
-				query_vertices[i] = gun_transform.pos + vec2<>::from_degrees(
+				query_vertices[i] = gun_transform.pos + vec2::from_degrees(
 					gun_transform.rotation + gun.swing_angular_offset - (gun.swing_angle / 2)
 					+ i * (gun.swing_angle / (gun.query_vertices - 1))
 					) * gun.swing_radius;
@@ -234,7 +234,7 @@ void gun_system::process_entities(world& owner) {
 				if (!ray_output.hit || (ray_output.hit && ray_output.what_entity == target_entity)) {
 					gun.shake_camera(gun_transform.rotation);
 					/* apply damage to the entity */
-					vec2<> impact_pos = ray_output.hit ? ray_output.intersection : target_transform.pos;
+					vec2 impact_pos = ray_output.hit ? ray_output.intersection : target_transform.pos;
 
 					messages::damage_message damage_msg;
 					damage_msg.subject = target_entity;
