@@ -10,7 +10,7 @@ namespace bindings {
 	luabind::scope _render_component() {
 		return
 			luabind::class_<render_system::debug_line>("debug_line")
-			.def(luabind::constructor<vec2, vec2, graphics::pixel_32>())
+			.def(luabind::constructor<vec2, vec2, pixel_32>())
 			,
 			luabind::class_<augs::vertex_triangle_buffer>("triangle_buffer"),
 

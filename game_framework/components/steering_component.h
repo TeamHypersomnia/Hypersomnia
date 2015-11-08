@@ -53,7 +53,7 @@ namespace components {
 		};
 
 		struct behaviour {
-			augs::graphics::pixel_32 force_color;
+			augs::pixel_32 force_color;
 			float max_force_applied;
 			float weight;
 

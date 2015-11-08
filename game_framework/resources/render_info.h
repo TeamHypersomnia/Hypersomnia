@@ -38,7 +38,7 @@ namespace resources {
 		virtual std::vector<vec2> get_vertices();
 	};
 
-	extern void set_polygon_color(renderable* poly, graphics::pixel_32 col);
+	extern void set_polygon_color(renderable* poly, pixel_32 col);
 
 	enum uv_mapping_mode {
 		OVERLAY,
@@ -49,13 +49,13 @@ namespace resources {
 
 	struct sprite : public renderable {
 		texture* tex;
-		graphics::pixel_32 color;
+		pixel_32 color;
 		vec2 size;
 		float rotation_offset;
 
-		sprite(texture* = nullptr, graphics::pixel_32 = graphics::pixel_32());
+		sprite(texture* = nullptr, pixel_32 = pixel_32());
 
-		void set(texture*, graphics::pixel_32);
+		void set(texture*, pixel_32);
 		void update_size();
 
 		virtual void draw(draw_input&) override;

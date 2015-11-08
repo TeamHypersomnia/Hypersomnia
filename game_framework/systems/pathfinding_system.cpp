@@ -156,10 +156,10 @@ void pathfinding_system::process_entities(world& owner) {
 								sensor_direction * 10 + vert.location + sensor_direction.perpendicular_cw() * 4
 							};
 
-							//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[0], sensor_polygon[1], graphics::pixel_32(255, 255, 255, 255)));
-							//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[1], sensor_polygon[2], graphics::pixel_32(255, 255, 255, 255)));
-							//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[2], sensor_polygon[3], graphics::pixel_32(255, 255, 255, 255)));
-							//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[3], sensor_polygon[0], graphics::pixel_32(255, 255, 255, 255)));
+							//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[0], sensor_polygon[1], pixel_32(255, 255, 255, 255)));
+							//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[1], sensor_polygon[2], pixel_32(255, 255, 255, 255)));
+							//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[2], sensor_polygon[3], pixel_32(255, 255, 255, 255)));
+							//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[3], sensor_polygon[0], pixel_32(255, 255, 255, 255)));
 
 							auto out = physics.query_polygon(sensor_polygon, &vision.filter, it);
 
@@ -303,11 +303,11 @@ void pathfinding_system::process_entities(world& owner) {
 
 			if (draw_undiscovered) {
 				for (auto& disc : vertices)
-					render.lines.push_back(render_system::debug_line(disc.location, disc.sensor, graphics::pixel_32(0, 127, 255, 255)));
+					render.lines.push_back(render_system::debug_line(disc.location, disc.sensor, pixel_32(0, 127, 255, 255)));
 
 				for (auto& disc : pathfinding.session().discovered_vertices)
 					//if(disc.sensor.non_zero())
-					render.lines.push_back(render_system::debug_line(disc.location, disc.location + vec2(0, pathfinding.target_offset), graphics::pixel_32(0, 255, 0, 255)));
+					render.lines.push_back(render_system::debug_line(disc.location, disc.location + vec2(0, pathfinding.target_offset), pixel_32(0, 255, 0, 255)));
 			}
 
 			if (!vertices.empty()) {
@@ -407,8 +407,8 @@ void pathfinding_system::process_entities(world& owner) {
 
 
 				if (draw_undiscovered) {
-					render.lines.push_back(render_system::debug_line(transform.pos, current_target.sensor, graphics::pixel_32(255, 255, 0, 255)));
-					render.lines.push_back(render_system::debug_line(transform.pos, pathfinding.session().target, graphics::pixel_32(255, 0, 0, 255)));
+					render.lines.push_back(render_system::debug_line(transform.pos, current_target.sensor, pixel_32(255, 255, 0, 255)));
+					render.lines.push_back(render_system::debug_line(transform.pos, pathfinding.session().target, pixel_32(255, 0, 0, 255)));
 				}
 
 				bool rays_hit = false;

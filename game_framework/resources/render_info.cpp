@@ -12,7 +12,7 @@
 #include "3rdparty/polypartition/polypartition.h"
 
 namespace resources {
-	void set_polygon_color(renderable* poly, graphics::pixel_32 col) {
+	void set_polygon_color(renderable* poly, pixel_32 col) {
 		polygon* p = (polygon*) poly;
 
 		for (auto& v : p->model) {
@@ -84,11 +84,11 @@ namespace resources {
 		return std::vector<vec2>();
 	}
 
-	sprite::sprite(texture* tex, graphics::pixel_32 color) : tex(tex), color(color), rotation_offset(0.f) {
+	sprite::sprite(texture* tex, pixel_32 color) : tex(tex), color(color), rotation_offset(0.f) {
 		set(tex, color);
 	}
 
-	void sprite::set(texture* _tex, graphics::pixel_32 _color) {
+	void sprite::set(texture* _tex, pixel_32 _color) {
 		tex = _tex;
 		color = _color;
 
@@ -420,7 +420,7 @@ namespace components {
 				auto temp_alpha = it.face.color.a;
 
 				if (it.should_disappear) {
-					auto desired_alpha = static_cast<graphics::color>(((it.max_lifetime_ms - it.lifetime_ms) / it.max_lifetime_ms) * static_cast<float>(temp_alpha));
+					auto desired_alpha = static_cast<color>(((it.max_lifetime_ms - it.lifetime_ms) / it.max_lifetime_ms) * static_cast<float>(temp_alpha));
 					if (it.alpha_levels > 0) {
 						it.face.color.a = desired_alpha == 0 ? 0 : ((255 / it.alpha_levels) * (1 + (desired_alpha / (255 / it.alpha_levels))));
 					}

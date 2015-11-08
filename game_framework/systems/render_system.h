@@ -41,9 +41,9 @@ public:
 	void draw_debug_info(vec2 visible_area, components::transform::state<>, augs::texture* tex);
 
 	struct debug_line {
-		debug_line(vec2 a, vec2 b, augs::graphics::pixel_32 col = augs::graphics::pixel_32(255, 255, 255, 255)) : col(col), a(a), b(b) {}
+		debug_line(vec2 a, vec2 b, augs::pixel_32 col = augs::pixel_32(255, 255, 255, 255)) : col(col), a(a), b(b) {}
 
-		augs::graphics::pixel_32 col;
+		augs::pixel_32 col;
 		vec2 a, b;
 	};
 	std::vector<debug_line> lines;

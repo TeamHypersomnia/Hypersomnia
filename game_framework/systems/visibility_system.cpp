@@ -236,7 +236,7 @@ void visibility_system::process_entities(world& owner) {
 				}
 
 				if (draw_cast_rays) 
-					render.lines.push_back(render_system::debug_line(METERS_TO_PIXELSf * bound.m_vertex1, METERS_TO_PIXELSf * bound.m_vertex2, graphics::pixel_32(255, 0, 0, 255)));
+					render.lines.push_back(render_system::debug_line(METERS_TO_PIXELSf * bound.m_vertex1, METERS_TO_PIXELSf * bound.m_vertex2, pixel_32(255, 0, 0, 255)));
 
 				for (auto& v : output)
 					push_vertex(v, false);
@@ -301,7 +301,7 @@ void visibility_system::process_entities(world& owner) {
 
 
 			/* helper debugging lambda */
-			auto draw_line = [&position_meters, &render](vec2 point, graphics::pixel_32 col) {
+			auto draw_line = [&position_meters, &render](vec2 point, pixel_32 col) {
 				render.lines.push_back(render_system::debug_line(position_meters * METERS_TO_PIXELSf, point * METERS_TO_PIXELSf, col));
 			};
 
@@ -405,7 +405,7 @@ void visibility_system::process_entities(world& owner) {
 					new_discontinuity.is_boundary = true;
 					//request.discontinuities.push_back(new_discontinuity);
 					if (push_double_ray(double_ray(vertex.pos, vertex.pos, true, true)))
-						if (draw_cast_rays) draw_line(vertex.pos, graphics::pixel_32(255, 255, 0, 255));
+						if (draw_cast_rays) draw_line(vertex.pos, pixel_32(255, 255, 0, 255));
 				}
 				else if (!vertex.is_on_a_bound) {
 					/* if we did not intersect with anything */
@@ -429,7 +429,7 @@ void visibility_system::process_entities(world& owner) {
 
 						if ((ray_callbacks[0].intersection - position_meters).length() + epsilon_threshold_obstacle_hit_meters < distance_from_origin &&
 							(ray_callbacks[1].intersection - position_meters).length() + epsilon_threshold_obstacle_hit_meters < distance_from_origin) {
-							if (draw_cast_rays) draw_line(vertex.pos, graphics::pixel_32(255, 0, 0, 255));
+							if (draw_cast_rays) draw_line(vertex.pos, pixel_32(255, 0, 0, 255));
 						}
 						/* distance between both intersections fit in epsilon which means ray intersected with the same vertex */
 						else if ((ray_callbacks[0].intersection - ray_callbacks[1].intersection).length_sq() < epsilon_distance_vertex_hit_sq) {
@@ -438,7 +438,7 @@ void visibility_system::process_entities(world& owner) {
 
 							if (push_double_ray(double_ray(vertex.pos, vertex.pos, true, true))) {
 								request.vertex_hits.push_back(std::make_pair(double_rays.size()-1, vertex.pos * METERS_TO_PIXELSf));
-								if (draw_cast_rays) draw_line(vertex.pos, graphics::pixel_32(255, 255, 0, 255));
+								if (draw_cast_rays) draw_line(vertex.pos, pixel_32(255, 255, 0, 255));
 							}
 						}
 						/* we're here so:
@@ -470,7 +470,7 @@ void visibility_system::process_entities(world& owner) {
 								new_discontinuity.points.second = ray_callbacks[1].intersection;
 								new_discontinuity.winding = components::visibility::discontinuity::RIGHT;
 								new_discontinuity.edge_index = double_rays.size() - 1;
-								if (draw_cast_rays) draw_line(ray_callbacks[1].intersection, graphics::pixel_32(255, 0, 255, 255));
+								if (draw_cast_rays) draw_line(ray_callbacks[1].intersection, pixel_32(255, 0, 255, 255));
 							}
 							/* otherwise the free area is to the left */
 							else {
@@ -482,7 +482,7 @@ void visibility_system::process_entities(world& owner) {
 								new_discontinuity.points.second = ray_callbacks[0].intersection;
 								new_discontinuity.winding = components::visibility::discontinuity::LEFT;
 								new_discontinuity.edge_index = double_rays.size();
-								if (draw_cast_rays) draw_line(ray_callbacks[0].intersection, graphics::pixel_32(255, 0, 255, 255));
+								if (draw_cast_rays) draw_line(ray_callbacks[0].intersection, pixel_32(255, 0, 255, 255));
 							}
 							
 							/* save new double ray */
@@ -529,7 +529,7 @@ void visibility_system::process_entities(world& owner) {
 										/* save new double ray */
 										if (push_double_ray(new_double_ray)) {
 											request.discontinuities.push_back(new_discontinuity);
-											if (draw_cast_rays) draw_line(actual_intersection, graphics::pixel_32(0, 0, 255, 255));
+											if (draw_cast_rays) draw_line(actual_intersection, pixel_32(0, 0, 255, 255));
 										}
 									}
 								}
@@ -639,7 +639,7 @@ void visibility_system::process_entities(world& owner) {
 							marked_holes.push_back(components::visibility::edge(closest_point, d.points.first));
 							
 							if (draw_discontinuities)
-								render.lines.push_back(render_system::debug_line(closest_point, d.points.first, graphics::pixel_32(255, 255, 255, 255)));
+								render.lines.push_back(render_system::debug_line(closest_point, d.points.first, pixel_32(255, 255, 255, 255)));
 							
 							/* remove this discontinuity */
 							return true;
@@ -688,7 +688,7 @@ void visibility_system::process_entities(world& owner) {
 
 			if (draw_discontinuities)
 				for (auto& disc : request.discontinuities)
-					render.lines.push_back(render_system::debug_line(disc.points.first, disc.points.second, graphics::pixel_32(0, 127, 255, 255)));
+					render.lines.push_back(render_system::debug_line(disc.points.first, disc.points.second, pixel_32(0, 127, 255, 255)));
 		}
 	}
 }

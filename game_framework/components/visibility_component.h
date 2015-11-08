@@ -37,7 +37,7 @@ namespace components {
 		struct layer {
 			/* input */
 			bool postprocessing_subject;
-			augs::graphics::pixel_32 color;
+			augs::pixel_32 color;
 			
 			b2Filter filter;
 			float square_side;
