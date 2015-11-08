@@ -26,7 +26,7 @@ namespace resources {
 		if (p->model.empty()) return;
 
 		auto* v = p->model.data();
-		typedef const resources::vertex& vc;
+		typedef const augs::vertex& vc;
 
 		auto x_pred = [](vc a, vc b){ return a.pos.x < b.pos.x; };
 		auto y_pred = [](vc a, vc b){ return a.pos.y < b.pos.y; };
@@ -290,7 +290,7 @@ namespace resources {
 				new_tri.vertices[2].pos += in.transform.pos;
 
 				auto* v = new_tri.vertices;
-				typedef const resources::vertex& vc;
+				typedef const augs::vertex& vc;
 
 				auto x_pred = [](vc a, vc b){ return a.pos.x < b.pos.x; };
 				auto y_pred = [](vc a, vc b){ return a.pos.y < b.pos.y; };

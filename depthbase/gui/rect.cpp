@@ -8,7 +8,7 @@
 namespace augs {
 	namespace graphics {
 		namespace gui {
-			rect::draw_info::draw_info(group& owner, std::vector<resources::vertex_triangle>& v) : owner(owner), v(v) {}
+			rect::draw_info::draw_info(group& owner, std::vector<augs::vertex_triangle>& v) : owner(owner), v(v) {}
 			rect::poll_info::poll_info(group& owner, unsigned msg) : owner(owner), msg(msg), mouse_fetched(false), scroll_fetched(false) {}
 			rect::event_info::event_info(group& owner, rect::event msg) : owner(owner), msg(msg) {}
 			
@@ -381,11 +381,11 @@ namespace augs {
 				}
 			}
 
-			rects::ltrb<float> rect::local_add(const material& mat, const rects::ltrb<float>& origin, std::vector<resources::vertex_triangle>& v) const {
+			rects::ltrb<float> rect::local_add(const material& mat, const rects::ltrb<float>& origin, std::vector<augs::vertex_triangle>& v) const {
 				return add_quad(mat, origin+get_absolute_xy()-scroll, this, v);
 			}
 			
-			rects::ltrb<float> rect::add_quad(const material& mat, const rects::ltrb<float>& origin, const rect* p, std::vector<resources::vertex_triangle>& v) {
+			rects::ltrb<float> rect::add_quad(const material& mat, const rects::ltrb<float>& origin, const rect* p, std::vector<augs::vertex_triangle>& v) {
 				/* if p is null, we don't clip at all
 				   if p is not null and p->clip is true, we take p->rc_clipped as clipper
 				   if p is not null and p->clip is false, we search for the first clipping parent's rc_clipped

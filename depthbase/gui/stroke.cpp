@@ -18,11 +18,11 @@ namespace augs {
 				left.mat = top.mat = right.mat = bottom.mat = mat; 
 			}
 				
-			void solid_stroke::draw(std::vector<resources::vertex_triangle>& out, const rect& r) const {
+			void solid_stroke::draw(std::vector<augs::vertex_triangle>& out, const rect& r) const {
 				draw(out, r.get_rect_absolute(), &r.get_parent()->get_clipping_rect());
 			}
 
-			void solid_stroke::draw(std::vector<resources::vertex_triangle>& out, rects::ltrb<float> g, const rects::ltrb<float>* clipper) const {
+			void solid_stroke::draw(std::vector<augs::vertex_triangle>& out, rects::ltrb<float> g, const rects::ltrb<float>* clipper) const {
 				if(_type == OUTSIDE) {
 					g.l -= left.width;
 					g.t -= top.width;

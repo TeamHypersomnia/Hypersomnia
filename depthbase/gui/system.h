@@ -62,7 +62,7 @@ namespace augs {
 				rect *lholded, *rholded;
 
 				rect root;
-				std::vector<resources::vertex_triangle> quad_array;
+				std::vector<augs::vertex_triangle> quad_array;
 
 				group(system& owner);
 

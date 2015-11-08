@@ -12,9 +12,7 @@ namespace bindings {
 			luabind::class_<render_system::debug_line>("debug_line")
 			.def(luabind::constructor<vec2, vec2, graphics::pixel_32>())
 			,
-			luabind::class_<resources::buffer>("triangle_buffer"),
-
-		
+			luabind::class_<augs::vertex_triangle_buffer>("triangle_buffer"),
 
 			luabind::class_<render>("render_component")
 			.def(luabind::constructor<>())

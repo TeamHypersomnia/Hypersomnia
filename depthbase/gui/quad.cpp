@@ -4,7 +4,7 @@
 namespace augs {
 	namespace graphics {
 		namespace gui {
-			//void scale_virtual_res(rects::wh<float> vres, rects::wh<float> display, std::vector<resources::vertex_triangle>& quads) {
+			//void scale_virtual_res(rects::wh<float> vres, rects::wh<float> display, std::vector<augs::vertex_triangle>& quads) {
 			//	if(vres == display) return;
 			//
 			//	float x_mult = display.w/float(vres.w);
@@ -63,11 +63,11 @@ namespace augs {
 			//	return q;
 			//}
 
-			rects::ltrb<float> gui::add_quad(const material& mat, const rects::ltrb<float>& origin, const rects::ltrb<float>* parent, std::vector<resources::vertex_triangle>& v) {
+			rects::ltrb<float> gui::add_quad(const material& mat, const rects::ltrb<float>& origin, const rects::ltrb<float>* parent, std::vector<augs::vertex_triangle>& v) {
 				rects::ltrb<float> rc = origin;
 				if ((parent && !rc.clip(*parent)) || !rc.good()) return rc;
 
-				resources::vertex p[4];
+				augs::vertex p[4];
 
 				float tw = 1.f / origin.w();
 				float th = 1.f / origin.h();
@@ -84,7 +84,7 @@ namespace augs {
 				mat.tex->get_uv(diff.u2, diff.v2, p[2].texcoord.x,  p[2].texcoord.y);
 				mat.tex->get_uv(diff.u1, diff.v2, p[3].texcoord.x,  p[3].texcoord.y);
 
-				resources::vertex_triangle out[2];
+				augs::vertex_triangle out[2];
 				out[0].vertices[0] = p[0];
 				out[0].vertices[1] = p[1];
 				out[0].vertices[2] = p[2];

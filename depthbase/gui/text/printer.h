@@ -51,10 +51,10 @@ namespace augs {
 					
 					printer();
 
-					void draw_text(std::vector<resources::vertex_triangle>& out, ui&, const rect& parent) const;
+					void draw_text(std::vector<augs::vertex_triangle>& out, ui&, const rect& parent) const;
 					
 					void draw_text(
-						std::vector<resources::vertex_triangle>& out, 
+						std::vector<augs::vertex_triangle>& out, 
 						const drafter&, 
 						const fstr& colors, 
 						/* if caret is 0, draw no caret */
@@ -63,7 +63,7 @@ namespace augs {
 						) const;
 					
 					void draw_text(
-						std::vector<resources::vertex_triangle>& out, 
+						std::vector<augs::vertex_triangle>& out, 
 						const drafter&, 
 						const fstr& colors,
 						/* if caret is 0, draw no caret */
@@ -80,13 +80,13 @@ namespace augs {
 				*/
 				extern vec2i get_text_bbox(const std::basic_string<formatted_char>& str, unsigned wrapping_width);
 
-				extern rects::wh<float> quick_print(std::vector<resources::vertex_triangle>& v,
+				extern rects::wh<float> quick_print(std::vector<augs::vertex_triangle>& v,
 										const fstr& str, 
 										vec2i pos, 
 										unsigned wrapping_width = 0,
 										const rects::ltrb<float>* parent = 0);
 
-				extern rects::wh<float> quick_print_format(std::vector<resources::vertex_triangle>& v,
+				extern rects::wh<float> quick_print_format(std::vector<augs::vertex_triangle>& v,
 										const std::wstring& wstr,
 										style style,
 										vec2i pos, 

@@ -15,11 +15,11 @@ using namespace augs;
 
 
 class render_system : public processing_system_templated<components::transform, components::render> {
-	resources::vertex_triangle* last_bound_buffer_location;
+	augs::vertex_triangle* last_bound_buffer_location;
 
 	friend class camera_system;
 public:
-	resources::buffer triangles;
+	augs::vertex_triangle_buffer triangles;
 
 	GLuint position_buffer, texcoord_buffer, color_buffer;
 	GLuint triangle_buffer;
@@ -31,11 +31,11 @@ public:
 	};
 
 	void call_triangles();
-	void push_triangle(const resources::vertex_triangle&);
+	void push_triangle(const augs::vertex_triangle&);
 	void clear_triangles();
 
 	int get_triangle_count();
-	resources::vertex_triangle& get_triangle(int i);
+	augs::vertex_triangle& get_triangle(int i);
 
 	void fullscreen_quad();
 	void draw_debug_info(vec2 visible_area, components::transform::state<>, augs::texture* tex);

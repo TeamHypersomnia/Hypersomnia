@@ -6,10 +6,6 @@
 using namespace augs;
 
 namespace augs {
-	class texture;
-}
-
-namespace resources {
 	struct vertex {
 		vec2 pos;
 		vec2 texcoord;
@@ -28,5 +24,5 @@ namespace resources {
 		vertex& get_vert(int i) { return vertices[i]; }
 	};
 
-	typedef std::vector<vertex_triangle> buffer;
+	typedef std::vector<vertex_triangle> vertex_triangle_buffer;
 }

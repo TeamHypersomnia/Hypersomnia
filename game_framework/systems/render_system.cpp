@@ -34,9 +34,9 @@ render_system::render_system(window::glwindow& output_window)
 	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::TEXCOORD); glerr
 	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::COLOR); glerr
 
-	glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(resources::vertex), 0); glerr
-	glVertexAttribPointer(VERTEX_ATTRIBUTES::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(resources::vertex), (char*)(sizeof(float) * 2)); glerr
-	glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(resources::vertex), (char*) (sizeof(float) * 2 + sizeof(float) * 2)); glerr
+	glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(augs::vertex), 0); glerr
+	glVertexAttribPointer(VERTEX_ATTRIBUTES::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(augs::vertex), (char*)(sizeof(float) * 2)); glerr
+	glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(augs::vertex), (char*) (sizeof(float) * 2 + sizeof(float) * 2)); glerr
 }
 
 void render_system::generate_layers(int mask) {
@@ -93,12 +93,12 @@ void render_system::process_entities(world&) {
 }
 
 void render_system::call_triangles() {
-	glBufferData(GL_ARRAY_BUFFER, sizeof(resources::vertex_triangle) * triangles.size(), triangles.data(), GL_STREAM_DRAW); glerr
+	glBufferData(GL_ARRAY_BUFFER, sizeof(augs::vertex_triangle) * triangles.size(), triangles.data(), GL_STREAM_DRAW); glerr
 	//std::cout << "triangles:" << triangles.size() << std::endl;
 	glDrawArrays(GL_TRIANGLES, 0, triangles.size() * 3); glerr
 }
 
-void render_system::push_triangle(const resources::vertex_triangle& tri) {
+void render_system::push_triangle(const augs::vertex_triangle& tri) {
 	triangles.push_back(tri);
 }
 
@@ -110,7 +110,7 @@ int render_system::get_triangle_count() {
 	return triangles.size();
 }
 
-resources::vertex_triangle& render_system::get_triangle(int i) {
+augs::vertex_triangle& render_system::get_triangle(int i) {
 	return triangles[i];
 }
 
@@ -135,9 +135,9 @@ void render_system::fullscreen_quad() {
 	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::TEXCOORD); glerr
 	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::COLOR); glerr
 
-	glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(resources::vertex), 0); glerr
-	glVertexAttribPointer(VERTEX_ATTRIBUTES::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(resources::vertex), (char*)(sizeof(float) * 2)); glerr
-	glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(resources::vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr
+	glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(augs::vertex), 0); glerr
+	glVertexAttribPointer(VERTEX_ATTRIBUTES::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(augs::vertex), (char*)(sizeof(float) * 2)); glerr
+	glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(augs::vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr
 }
 
 void render_system::draw_debug_info(vec2 visible_area, components::transform::state<> camera_transform, augs::texture* tex) {
@@ -170,7 +170,7 @@ void render_system::draw_debug_info(vec2 visible_area, components::transform::st
 							p *= std::min(visibility_expansion, expansion);
 						}
 
-						resources::vertex_triangle verts;
+						augs::vertex_triangle verts;
 
 						for (int i = 0; i < 3; ++i) {
 

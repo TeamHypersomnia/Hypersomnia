@@ -39,8 +39,8 @@ namespace augs {
 			clipper = 0 means no clipping
 				returns clipped rectangle
 			*/
-			extern rects::ltrb<float> add_quad(const material&, const rects::ltrb<float>& origin, const rects::ltrb<float>* clipper, std::vector<resources::vertex_triangle>& v);
-			//extern void scale_virtual_res(rects::wh<float> vres, rects::wh<float> display, std::vector<resources::vertex_triangle>& quads);
+			extern rects::ltrb<float> add_quad(const material&, const rects::ltrb<float>& origin, const rects::ltrb<float>* clipper, std::vector<augs::vertex_triangle>& v);
+			//extern void scale_virtual_res(rects::wh<float> vres, rects::wh<float> display, std::vector<augs::vertex_triangle>& quads);
 		}
 	}
 }
