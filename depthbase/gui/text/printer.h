@@ -28,7 +28,7 @@ namespace augs {
 						//static void regular_blink(blinker&, quad& caret);
 						//void (*blink_func)(blinker&, quad&);
 
-						misc::timer timer;
+						timer timer;
 						blinker();
 						void update();
 						void reset();

@@ -36,7 +36,7 @@ namespace augs {
 			
 			void _poll(event::message&, WPARAM, LPARAM);
 			
-			misc::timer triple_timer;
+			timer triple_timer;
 			bool doubled;
 		public:
 			static void colored_print(int, const char* text);

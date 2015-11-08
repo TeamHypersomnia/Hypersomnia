@@ -15,7 +15,7 @@ namespace components {
 		vec2 starting_point;
 		float max_distance;
 		float max_lifetime_ms;
-		augs::misc::timer lifetime;
+		augs::timer lifetime;
 
 		bool destroy_upon_hit;
 

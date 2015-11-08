@@ -15,7 +15,7 @@ namespace augs {
 			double averages_per_sec = 20.0;
 			double smoothing_average_factor = 0.5;
 
-			augs::misc::timer delta_timer;
+			augs::timer delta_timer;
 
 			void tick();
 		};

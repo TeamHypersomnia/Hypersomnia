@@ -6,7 +6,7 @@
 using namespace augs;
 
 class camera_system : public processing_system_templated<components::transform, components::camera> {
-	augs::misc::timer smooth_timer;
+	augs::timer smooth_timer;
 public:
 	void consume_events(world&);
 	void process_entities(world&);

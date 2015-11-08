@@ -114,7 +114,7 @@ namespace components {
 
 			task();
 			
-			augs::misc::timer since_entered;
+			augs::timer since_entered;
 		};
 
 		struct tree_instance {

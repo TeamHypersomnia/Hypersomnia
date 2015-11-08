@@ -85,7 +85,7 @@ namespace components {
 			return *visibility_layers.get(key);
 		}
 
-		augs::misc::timer interval_timer;
+		augs::timer interval_timer;
 		float interval_ms;
 		visibility() : interval_ms(-1.f) {}
 	};

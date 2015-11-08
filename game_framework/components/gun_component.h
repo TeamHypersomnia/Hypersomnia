@@ -97,6 +97,6 @@ namespace components {
 	private:
 		friend class gun_system;
 
-		augs::misc::timer state_timer;
+		augs::timer state_timer;
 	};
 }

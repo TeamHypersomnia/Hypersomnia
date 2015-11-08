@@ -9,7 +9,7 @@ using namespace augs;
 
 
 class particle_group_system : public processing_system_templated<components::particle_group> {
-	misc::timer timer;
+	timer timer;
 public:
 	void process_entities(world&);
 };

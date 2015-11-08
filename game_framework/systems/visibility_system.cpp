@@ -79,7 +79,7 @@ std::vector<vec2> components::visibility::layer::get_polygon(float distance_epsi
 	return output;
 }
 
-augs::misc::timer interval;
+augs::timer interval;
 
 void visibility_system::process_entities(world& owner) {
 	/* prepare epsilons to be used later, just to make the notation more clear */

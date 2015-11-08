@@ -9,7 +9,7 @@
 
 namespace augs {
 	namespace graphics {
-		extern misc::fpstimer fps;
+		extern fpstimer fps;
 		namespace gui {
 			namespace text {
 				struct formatted_char {
