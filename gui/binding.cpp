@@ -10,11 +10,11 @@
 void callback_textbox::set_command_callback(luabind::object callback) {
 	//luabind::object callbackobj = *callback;
 	textbox_object.command_callback = [callback](std::wstring& wstr)	{
-		luabind::call_function<void>(callback, augs::misc::towchar_vec(wstr));
+		luabind::call_function<void>(callback, augs::towchar_vec(wstr));
 	};
 }
 
-augs::misc::vector_wrapper<wchar_t> get_local_time() {
+augs::vector_wrapper<wchar_t> get_local_time() {
 	auto now = std::chrono::system_clock::now();
 	auto now_c = std::chrono::system_clock::to_time_t(now);
 	auto tm = std::localtime(&now_c);
@@ -27,7 +27,7 @@ augs::misc::vector_wrapper<wchar_t> get_local_time() {
 	if (tm->tm_min < 10) mins = L'0' + mins;
 	if (tm->tm_sec < 10) secs = L'0' + secs;
 
-	return augs::misc::towchar_vec
+	return augs::towchar_vec
 		(L'[' + hours + L':' + mins + L':' + secs + L']');
 }
 
@@ -144,7 +144,7 @@ void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
 	(a, "aaa", augs::graphics::pixel_32(1, 1, 1, 1));
 	luabind::module(wrapper.raw)[
 		luabind::class_<hypersomnia_gui>("hypersomnia_gui")
-			.def(luabind::constructor<augs::window::glwindow&, texture_baker::texture*>())
+			.def(luabind::constructor<augs::window::glwindow&, texture*>())
 			.def("update", &update),
 
 		luabind::class_<gui_group>("gui_group")

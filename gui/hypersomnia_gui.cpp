@@ -6,7 +6,7 @@
 #include "game_framework/systems/render_system.h"
 
 
-hypersomnia_gui::hypersomnia_gui(glwindow& gl, texture_baker::texture* blank_texture) : sys(gl.events), gl(gl) {
+hypersomnia_gui::hypersomnia_gui(glwindow& gl, texture* blank_texture) : sys(gl.events), gl(gl) {
 	graphics::gui::null_texture = blank_texture;
 
 	//wchar_t* str = L" qvxQVXa¹bcædeêfghijkl³mnñoóprsœtuwyzŸ¿A¥BCÆDEÊFGHIJKL£MNÑOÓPRSŒTUWYZ¯0123456789.!@#$%^&*()_+-=[];'\\,./{}:\"|<>?";

@@ -12,5 +12,5 @@ extern void draw_tile_highlights(
 
 extern vec2i get_random_coordinate_on_a_special_tile (
 		resources::tile_layer&,
-		augs::misc::vector_wrapper<int>&,
+		augs::vector_wrapper<int>&,
 		resources::renderable::draw_input& in);

@@ -10,7 +10,7 @@ void draw_tile_highlights(
 
 vec2i get_random_coordinate_on_a_special_tile(
 	resources::tile_layer& tile_layer,
-	augs::misc::vector_wrapper<int>& shining,
+	augs::vector_wrapper<int>& shining,
 	resources::renderable::draw_input& in) {
 
 	auto visible_tiles = tile_layer.get_visible_tiles(in);

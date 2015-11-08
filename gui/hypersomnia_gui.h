@@ -79,13 +79,13 @@ namespace augs {
 }
 
 struct hypersomnia_gui {
-	augs::misc::timer delta_timer;
+	augs::timer delta_timer;
 
 	augs::window::glwindow& gl;
 
 	augs::graphics::gui::system sys;
 
-	hypersomnia_gui(augs::window::glwindow& gl, texture_baker::texture* blank_texture);
+	hypersomnia_gui(augs::window::glwindow& gl, texture* blank_texture);
 
 	void update();
 
@@ -170,5 +170,5 @@ struct callback_textbox {
 	
 	void set_wrapping_width(unsigned);
 	void set_area(augs::rects::xywh<float>);
-	void setup(augs::rects::xywh<float>, bool is_input_textbox, texture_baker::font*);
+	void setup(augs::rects::xywh<float>, bool is_input_textbox, font*);
 };
