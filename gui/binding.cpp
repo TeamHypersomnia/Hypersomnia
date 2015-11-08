@@ -94,14 +94,14 @@ stylesheet::style* resolve_attr(stylesheet& subject, std::string a) {
 	return nullptr;
 }
 
-void set_color(stylesheet& subject, std::string attr, augs::graphics::pixel_32 rgba) {
+void set_color(stylesheet& subject, std::string attr, augs::pixel_32 rgba) {
 	auto* s = resolve_attr(subject, attr);
 
 	if (s) 
 		s->color.set(rgba);
 }
 
-void set_border(stylesheet& subject, std::string attr, int w, augs::graphics::pixel_32 rgba) {
+void set_border(stylesheet& subject, std::string attr, int w, augs::pixel_32 rgba) {
 	auto* s = resolve_attr(subject, attr);
 
 	if (s) 
@@ -138,10 +138,10 @@ stylesheet& get_rect_style(callback_rect& c) {
 
 void hypersomnia_gui::bind(augs::lua_state_wrapper& wrapper) {
 	callback_textbox a;
-	invokem(a.textbox_object.styles, "aaa", augs::graphics::pixel_32(1, 1, 1, 1));
+	invokem(a.textbox_object.styles, "aaa", augs::pixel_32(1, 1, 1, 1));
 
-	//setter_wrapper<decltype(set_color)>::invoke(a, "aaa", augs::graphics::pixel_32(1, 1, 1, 1));
-	(a, "aaa", augs::graphics::pixel_32(1, 1, 1, 1));
+	//setter_wrapper<decltype(set_color)>::invoke(a, "aaa", augs::pixel_32(1, 1, 1, 1));
+	(a, "aaa", augs::pixel_32(1, 1, 1, 1));
 	luabind::module(wrapper.raw)[
 		luabind::class_<hypersomnia_gui>("hypersomnia_gui")
 			.def(luabind::constructor<augs::window::glwindow&, texture*>())
