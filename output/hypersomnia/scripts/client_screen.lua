@@ -256,7 +256,7 @@ function client_screen:loop()
 	cpp_world:render()
 
 	self.sample_scene.world_camera.script:tick()
-	--collectgarbage("collect")
+	collectgarbage("collect")
 end
 
 function client_screen:close_connection()

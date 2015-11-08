@@ -10,7 +10,7 @@ extern void draw_tile_highlights(
 	std::vector<int>&,
 	resources::renderable::draw_input&); 
 
-extern vec2<int> get_random_coordinate_on_a_special_tile (
+extern vec2i get_random_coordinate_on_a_special_tile (
 		resources::tile_layer&,
 		augs::misc::vector_wrapper<int>&,
 		resources::renderable::draw_input& in);

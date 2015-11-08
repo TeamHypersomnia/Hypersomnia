@@ -106,9 +106,9 @@ void callback_textbox::view_caret() {
 	textbox_object.show_caret();
 }
 
-augs::vec2<> callback_textbox::get_text_bbox() {
+vec2 callback_textbox::get_text_bbox() {
 	auto result = textbox_object.editor.get_draft().get_bbox();
-	return augs::vec2<>(result.w, result.h);
+	return vec2(result.w, result.h);
 }
 
 

@@ -13,7 +13,7 @@ hypersomnia_gui::hypersomnia_gui(glwindow& gl, texture_baker::texture* blank_tex
 	//
 	//fontf[0].open(fin, "hypersomnia/data/Kubasta.ttf", 16, str);
 
-	graphics::gui::null_texture->translate_uv(vec2<>(2, 2));
+	graphics::gui::null_texture->translate_uv(vec2(2, 2));
 	graphics::gui::null_texture->scale_uv(0.000000001f, 0.000000001f);
 
 	ltblue_theme();

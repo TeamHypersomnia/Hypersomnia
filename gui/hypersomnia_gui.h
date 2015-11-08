@@ -164,7 +164,7 @@ struct callback_textbox {
 
 	void view_caret();
 
-	augs::vec2<> get_text_bbox();
+	vec2 get_text_bbox();
 
 	void draw(bool);
 	
