@@ -1,7 +1,7 @@
-#include "stdafx.h"
+#include "math/vec2.h"
 #include "camera_system.h"
 
-#include <gl\GL.h>
+#include <GL/OpenGL.h>
 #include "entity_system/entity.h"
 #include "../components/physics_component.h"
 #include "../messages/intent_message.h"
@@ -79,11 +79,11 @@ void camera_system::process_entities(world& owner) {
 
 			if (camera.enable_smoothing) {
 				/* variable time step camera smoothing by averaging last position with the current */
-				double averaging_constant =
+				float averaging_constant =
 					pow(camera.smoothing_average_factor, camera.averages_per_sec * delta);
 				
 				if (camera.dont_smooth_once)
-					averaging_constant = 0.0;
+					averaging_constant = 0.0f;
 
 				//if ((transform.pos - camera.last_interpolant).length() < 2.0) camera.last_interpolant = transform.current.pos;
 				//else
@@ -91,12 +91,11 @@ void camera_system::process_entities(world& owner) {
 				vec2<int> target = transform.pos + crosshair_offset;
 				vec2<int> smoothed_part = crosshair_offset;
 
-
-				camera.last_interpolant.pos = camera.last_interpolant.pos * averaging_constant + vec2<double>(smoothed_part) * (1.0 - averaging_constant);
-				camera.last_interpolant.rotation = camera.last_interpolant.rotation * averaging_constant + static_cast<double>(transform.rotation) * (1.0 - averaging_constant);
+				camera.last_interpolant.pos = camera.last_interpolant.pos * averaging_constant + vec2<double>(smoothed_part) * (1.0f - averaging_constant);
+				camera.last_interpolant.rotation = camera.last_interpolant.rotation * averaging_constant + transform.rotation * (1.0f - averaging_constant);
 					
-				auto interp = [](float& a, float& b, double averaging_constant){
-					a = static_cast<float>(a * averaging_constant + b * (1.0 - averaging_constant));
+				auto interp = [](float& a, float& b, float averaging_constant){
+					a = a * averaging_constant + b * (1.0f - averaging_constant);
 				};
 
 				interp(camera.last_ortho_interpolant.x, camera.size.x, averaging_constant);
@@ -150,15 +149,8 @@ void camera_system::process_rendering(world& owner) {
 			in.output = &raw_renderer;
 			in.visible_area = camera.rendered_size;
 
-			if (camera.drawing_callback) {
-				try {
-					/* arguments: subject, renderer, visible_area, target_transform, mask */
-					luabind::call_function<void>(camera.drawing_callback, e, in, camera.mask);
-				}
-				catch (std::exception compilation_error) {
-					std::cout << compilation_error.what() << '\n';
-				}
-			}
+			if (camera.drawing_callback)
+				camera.drawing_callback(e, in, camera.mask);
 			else {
 				raw_renderer.generate_triangles(in, camera.mask);
 				raw_renderer.default_render(camera.rendered_size);
@@ -169,7 +161,6 @@ void camera_system::process_rendering(world& owner) {
 					glEnable(GL_TEXTURE_2D);
 				}
 			}
-
 		}
 	}
 

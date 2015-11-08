@@ -2,7 +2,7 @@
 #include "system.h"
 #include "rect.h"
 #include "window_framework/window.h"
-#include <GL/GL.h>
+#include <GL/OpenGL.h>
 #undef max
 namespace augs {
 	namespace misc {

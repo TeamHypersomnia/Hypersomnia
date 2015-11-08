@@ -1,4 +1,5 @@
-#include "stdafx.h"
+#include <GL/OpenGL.h>
+#include <cassert>
 #include "shader.h"
 
 namespace augs {
@@ -8,11 +9,11 @@ namespace augs {
 			int charsWritten = 0;
 			char *infoLog;
 
-			glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
+			glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &infologLength); glerr
 
 			if (infologLength > 1) {
 				infoLog = (char *) malloc(infologLength);
-				glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog);
+				glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog); glerr
 				printf("---------------------------------\n Source code: %s ---------------------------------\n%s\n", source_code.c_str(), infoLog);
 				free(infoLog);
 			}
@@ -23,11 +24,11 @@ namespace augs {
 			int charsWritten = 0;
 			char *infoLog;
 
-			glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
+			glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &infologLength); glerr
 
 			if (infologLength > 1) {
 				infoLog = (char *) malloc(infologLength);
-				glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog);
+				glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog); glerr
 				printf("---------------------------------\n%s\n", infoLog);
 				free(infoLog);
 			}
@@ -47,18 +48,18 @@ namespace augs {
 		void shader::create(GLuint shader_type, std::string source_code) {
 			if (!built) {
 				built = true;
-				id = glCreateShader(shader_type);
+				id = glCreateShader(shader_type); glerr
 
 				auto* source_ptr = source_code.c_str();
-				glShaderSource(id, 1, &source_ptr, nullptr);
-				glCompileShader(id);
+				glShaderSource(id, 1, &source_ptr, nullptr); glerr
+				glCompileShader(id); glerr
 				printShaderInfoLog(id, source_code);
 			}
 		}
 
 		void shader::destroy() {
 			if (built) {
-				glDeleteShader(id);
+				glDeleteShader(id); glerr
 				built = false;
 			}
 		}
@@ -75,7 +76,7 @@ namespace augs {
 
 		void shader_program::create() {
 			if (!created) {
-				id = glCreateProgram();
+				id = glCreateProgram(); glerr
 				created = true;
 			}
 		}
@@ -84,14 +85,14 @@ namespace augs {
 			create();
 
 			attached_shaders.push_back(&s);
-			glAttachShader(id, s.id);
+			glAttachShader(id, s.id); glerr
 		}
 		
 		void shader_program::build() {
 			assert(created && !built);
 			
 			built = true;
-			glLinkProgram(id);
+			glLinkProgram(id); glerr
 			printProgramInfoLog(id);
 
 			for (auto it : attached_shaders) {
@@ -109,13 +110,13 @@ namespace augs {
 				if (currently_used_program == id) 
 					use_default();
 
-				glDeleteProgram(id);
+				glDeleteProgram(id); glerr
 			}
 		}
 
 		void shader_program::use_default() {
 			if (currently_used_program != 0) {
-				glUseProgram(0);
+				glUseProgram(0); glerr
 				currently_used_program = 0;
 			}
 		}
@@ -124,7 +125,7 @@ namespace augs {
 			if (!built) build();
 
 			currently_used_program = id;
-			glUseProgram(id);
+			glUseProgram(id); glerr
 		}
 
 		void shader_program::guarded_use() {

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "math/vec2.h"
 #include "movement_system.h"
 #include "entity_system/world.h"
 #include "../messages/intent_message.h"

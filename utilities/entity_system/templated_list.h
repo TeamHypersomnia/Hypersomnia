@@ -4,49 +4,26 @@
 
 namespace augs {
 	namespace entity_system {
-		typedef size_t type_hash;
-
-		struct base_type {
-			size_t bytes;
-			type_hash hash;
-
-			template <class T>
-			void set() {
-				bytes = sizeof(T);
-				hash = typeid(T).hash_code();
-			}
-
-			bool operator<(const base_type& b) const {
-				return hash < b.hash;
-			}
-
-			bool operator==(const base_type& b) const {
-				return hash == b.hash;
-			}
-		};
-
-		typedef std::vector<base_type> type_pack;
+		typedef std::vector<size_t> type_hash_vector;
 
 		template<typename... args>
-		struct templated_list {
-			static type_pack get() {
-				type_pack ret;
-				get_types(templated_list<args...>(), ret);
-				return ret;
+		struct templated_list_to_hash_vector {
+			static type_hash_vector unpack() {
+				type_hash_vector result;
+				unpack_types(templated_list_to_hash_vector<args...>(), result);
+				return result;
 			}
 		};
 		
 		template<typename t, typename... rest> 
-		extern void get_types(templated_list<t, rest...>, type_pack& v);
+		extern void unpack_types(templated_list_to_hash_vector<t, rest...>, type_hash_vector& v);
 
 		template<typename t, typename... rest>
-		void get_types(templated_list<t, rest...>, type_pack& v) {
-			base_type info; 
-			info.set<t>();
-			v.push_back(info);
-			get_types(templated_list<rest...>(), v);
+		void unpack_types(templated_list_to_hash_vector<t, rest...>, type_hash_vector& v) {
+			v.push_back(typeid(t).hash_code());
+			unpack_types(templated_list_to_hash_vector<rest...>(), v);
 		}
 
-		extern void get_types(templated_list<>, type_pack&);
+		extern void unpack_types(templated_list_to_hash_vector<>, type_hash_vector&);
 	}
 }

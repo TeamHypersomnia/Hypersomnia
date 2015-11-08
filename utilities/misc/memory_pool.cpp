@@ -1,5 +1,7 @@
 #pragma once
 #include "memory_pool.h"
+#include "unsafe_type_collection.h"
+#include <cassert>
 
 namespace augs {
 	memory_pool::memory_pool(int slot_count, int slot_size) { initialize(slot_count, slot_size);  }
@@ -137,6 +139,37 @@ namespace augs {
 		}
 
 		return true;
+	}
+
+	memory_pool::id memory_pool::allocate_with_default_construct(size_t type_hash) {
+		assert(0);
+		return memory_pool::id();
+	}
+	
+	bool memory_pool::free_with_destructor(id object, size_t type_hash) {
+		unsafe_type_collection::destructors[type_hash](object.ptr());
+
+		auto swap_elements = memory_pool::internal_free(object);
+
+		if (swap_elements.first == -1 && swap_elements.second == -1)
+			return false;
+
+		if (swap_elements.first != swap_elements.second) {
+			int dead_offset = swap_elements.first * slot_size;
+			int last_offset = swap_elements.second * slot_size;
+
+			// move construct at the dead element's position from the last element's position
+			unsafe_type_collection::move_constructors[type_hash](pool.data() + dead_offset, pool.data() + last_offset);
+		}
+
+		return true;
+	}
+
+	void memory_pool::destruct_all(size_t type_hash) {
+		auto destructor = unsafe_type_collection::destructors[type_hash];
+
+		for (int i = 0; i < size(); ++i)
+			destructor((*this)[i]);
 	}
 
 	void memory_pool::free_all() {

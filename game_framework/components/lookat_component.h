@@ -1,6 +1,7 @@
 #pragma once
 #include "entity_system/component.h"
 #include "entity_system/entity_id.h"
+#include "math/vec2.h"
 
 namespace components {
 	struct lookat : public augs::entity_system::component {
@@ -16,24 +17,20 @@ namespace components {
 			EXPONENTIAL
 		};
 		
-		int easing_mode;
+		int easing_mode = NONE;
 		
 		/* for exponential smoothing */
-		double smoothing_average_factor, averages_per_sec;
+		double smoothing_average_factor = 0.5;
+		double averages_per_sec = 20.0;
 		
 		/* for linear smoothing */
 		augs::vec2<> last_rotation_interpolant;
 
-		unsigned look_mode;
+		unsigned look_mode = look_type::POSITION;
 
 		augs::entity_system::entity_id target;
 
-		float last_value;
-		bool update_value;
-
-		lookat(augs::entity_system::entity_id target = augs::entity_system::entity_id(), unsigned look_mode = look_type::POSITION)
-			: target(target), look_mode(look_mode), smoothing_average_factor(0.5), averages_per_sec(20.0), easing_mode(NONE), last_value(0.f),
-				update_value(true)
-			{}
+		float last_value = 0.0f;
+		bool update_value = true;
 	};
 }

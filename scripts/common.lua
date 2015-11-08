@@ -334,6 +334,7 @@ function create_atlas_from_filenames(filename_entries, all_fonts)
 		-- save for requests from map editor
 		texture_by_filename[v] = texture_object
 		
+		print(v)
 		-- tokenize filename to only get the filename and the extension
 		local tokenized = tokenize_string(v, "\\/")
 		

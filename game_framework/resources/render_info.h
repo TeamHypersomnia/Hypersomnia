@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "math/vec2.h"
 
 #include "texture_baker/texture_baker.h"
 #include "entity_system/entity.h"

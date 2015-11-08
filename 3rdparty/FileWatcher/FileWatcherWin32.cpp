@@ -49,7 +49,7 @@ namespace FW
 		bool mStopNow;
 		FileWatcherImpl* mFileWatcher;
 		FileWatchListener* mFileWatchListener;
-		char* mDirName;
+		wchar_t* mDirName;
 		WatchID mWatchid;
 	};
 
@@ -197,8 +197,8 @@ namespace FW
 		watch->mWatchid = watchid;
 		watch->mFileWatcher = this;
 		watch->mFileWatchListener = watcher;
-		watch->mDirName = new char[directory.length()+1];
-		strcpy(watch->mDirName, directory.c_str());
+		watch->mDirName = new wchar_t[directory.length()+1];
+		memcpy(watch->mDirName, directory.c_str(), directory.length() * sizeof(wchar_t));
 
 		mWatches.insert(std::make_pair(watchid, watch));
 

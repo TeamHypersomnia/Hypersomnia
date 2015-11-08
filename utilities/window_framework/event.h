@@ -1,6 +1,6 @@
 #pragma once
-#include "math/vec2d.h"
-#include <Windows.h>
+#include "math/vec2.h"
+#include <windows.h>
 #undef max
 #undef min
 namespace augs {

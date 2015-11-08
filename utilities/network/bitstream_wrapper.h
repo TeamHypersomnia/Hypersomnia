@@ -6,6 +6,7 @@
 #include "MessageIdentifiers.h"
 #include "BitStream.h"
 #include "RakNetTypes.h"
+#include <Box2D\Common\b2Math.h>
 
 namespace augs {
 	namespace network {

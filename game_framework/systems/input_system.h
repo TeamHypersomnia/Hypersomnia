@@ -27,7 +27,7 @@ a tak to bys musial zapierdalac po wszystkich ktore maja message component a to 
 struct input_system : public processing_system_templated<components::input> {
 	int quit_flag;
 
-	luabind::object event_callback;
+	std::function<void()> event_callback;
 
 	void process_entities(world&);
 	

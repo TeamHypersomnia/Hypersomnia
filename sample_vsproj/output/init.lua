@@ -1,1 +1,0 @@
-print "Initialization successful."

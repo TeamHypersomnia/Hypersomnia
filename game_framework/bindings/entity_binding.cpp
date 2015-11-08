@@ -5,6 +5,7 @@
 #include "entity_system/world.h"
 
 #include "bindings.h"
+#include "game_framework/components/all_components.h"
 
 template <class T>
 T& add(entity_id* _this, const T& c) {
@@ -35,10 +36,10 @@ void remove(entity_id* _this) {
 }
 
 luabind::object get_script(entity_id* _this) {
-	return _this->get().script_data;
+	return *(luabind::object*)(_this->get().script_data);
 }
 void set_script(entity_id* _this, luabind::object set) {
-	_this->get().script_data = set;
+	*(luabind::object*)(_this->get().script_data) = set;
 }
 
 world& get_owner_world(entity_id* _this) {
@@ -46,7 +47,7 @@ world& get_owner_world(entity_id* _this) {
 }
 
 std::string get_name(entity_id* _this) {
-	return _this->get().get_name();
+	return _this->get().name;
 }
 
 namespace bindings {
@@ -54,11 +55,7 @@ namespace bindings {
 		return
 			luabind::class_<entity>("_entity")
 			.def("clear", &entity::clear)
-			.property("name", &entity::get_name)
-			.def("enable", &entity::enable)
-			.def("disable", &entity::disable)
-			.def("reassign_to_systems", &entity::reassign_to_systems)
-			.def_readwrite("script", &entity::script_data)
+			.def_readwrite("name", &entity::name)
 			.property("owner_world", &entity::get_owner_world)
 
 			.def("remove_animate", &entity::remove<animate>)

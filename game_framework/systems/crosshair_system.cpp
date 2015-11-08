@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "crosshair_system.h"
 #include "entity_system/world.h"
 

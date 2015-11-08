@@ -4,6 +4,6 @@
 
 namespace augs {
 	namespace entity_system {
-		void get_types(templated_list<>, std::vector<base_type>&) {}
+		void unpack_types(templated_list_to_hash_vector<>, type_hash_vector&) {}
 	}
 }

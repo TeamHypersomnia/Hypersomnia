@@ -1,6 +1,6 @@
 #pragma once
 #include "message.h"
-#include "math/vec2d.h"
+#include "math/vec2.h"
 
 /* everything is a state since for actions we can just ignore states with flag set to false */
 using namespace augs;

@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "entity_system/world.h"
 #include "bindings.h"
+#include "bind_callbacks.h"
 
 #include "../systems/physics_system.h"
 #include "../systems/steering_system.h"
@@ -119,7 +120,7 @@ namespace bindings {
 			luabind::class_<input_system>("_input_system")
 			.def("process_entities", &input_system::process_entities)
 			.def_readwrite("quit_flag", &input_system::quit_flag)
-			.def_readwrite("event_callback", &input_system::event_callback)
+			.property("event_callback", bind_callback(&input_system::event_callback))
 			.def("add_context", &input_system::add_context)
 			.def("is_down", &input_system::is_down)
 			.def("clear_contexts", &input_system::clear_contexts),
@@ -146,7 +147,7 @@ namespace bindings {
 
 			luabind::def("create_refreshable_particle_group", &particle_emitter_system::create_refreshable_particle_group),
 
-			augs::misc::vector_wrapper<luabind::object>::bind_vector("luabindobject_vector"),
+			bind_vector_wrapper<luabind::object>("luabindobject_vector"),
 			
 			luabind::class_<behaviour_tree_system>("_behaviour_tree_system")
 			.def("process_entities", &behaviour_tree_system::process_entities)

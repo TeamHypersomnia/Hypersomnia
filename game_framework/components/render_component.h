@@ -1,5 +1,6 @@
 #pragma once
 #include "entity_system/component.h"
+#include "math/vec2.h"
 
 namespace resources {
 	struct renderable;

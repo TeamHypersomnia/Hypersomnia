@@ -1,8 +1,10 @@
 #pragma once
-#include "stdafx.h"
+#include <GL/OpenGL.h>
+#include <cassert>
 
 #include "texture_baker.h"
 #include "font.h"
+#include <iostream>
 
 namespace augs {
 	namespace texture_baker {
@@ -119,7 +121,7 @@ namespace augs {
 
 		bool atlas::pack() {
 			GLint tsize;
-			glGetIntegerv(GL_MAX_TEXTURE_SIZE, &tsize);
+			glGetIntegerv(GL_MAX_TEXTURE_SIZE, &tsize); glerr
 			return pack(tsize);
 		} 
 
@@ -177,7 +179,7 @@ namespace augs {
 
 		void atlas::destroy() {
 			if(built)
-				glDeleteTextures(1, &id);
+				glDeleteTextures(1, &id); glerr
 
 			rep = true;
 			lin = mipmaps = built = false;
@@ -189,7 +191,7 @@ namespace augs {
 
 			image& im = raw_texture ? *raw_texture : img;
 
-			glGenTextures(1, &id);
+			glGenTextures(1, &id); glerr
 			_bind();
 
 			lin = !lin; if(!lin) linear(); else nearest();
@@ -203,9 +205,9 @@ namespace augs {
 			default: assert(0);
 			}
 
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, im.get_size().w, im.get_size().h, 0, format, GL_UNSIGNED_BYTE, im.ptr());
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, im.get_size().w, im.get_size().h, 0, format, GL_UNSIGNED_BYTE, im.ptr()); glerr
 
-			if(mipmaps) glGenerateMipmap(GL_TEXTURE_2D);
+			if(mipmaps) glGenerateMipmap(GL_TEXTURE_2D); glerr
 
 			built = true;
 
@@ -226,15 +228,15 @@ namespace augs {
 		}
 
 		void atlas::_bind() {
-			glBindTexture(GL_TEXTURE_2D, current = id);
+			glBindTexture(GL_TEXTURE_2D, current = id); glerr
 		}
 
 		void atlas::repeat() {
 			if(!rep) {
 				rep = true;
 				bind();
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); glerr
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); glerr
 			}
 		}
 
@@ -242,23 +244,23 @@ namespace augs {
 			if(rep) {
 				rep = false;
 				bind();
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); glerr
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); glerr
 			}
 		}
 
 		void atlas::nearest() {
 			bind();
 			lin = false;
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmaps ? GL_NEAREST : GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); glerr
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmaps ? GL_NEAREST : GL_NEAREST); glerr
 		}
 
 		void atlas::linear() {
 			bind();
 			lin = true;
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmaps ? GL_LINEAR : GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); glerr
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmaps ? GL_LINEAR : GL_LINEAR); glerr
 		}
 	}
 }

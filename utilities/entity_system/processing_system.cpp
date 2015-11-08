@@ -1,6 +1,4 @@
 #pragma once
-#include "stdafx.h"
-
 #include "processing_system.h"
 #include "entity.h"
 #include <algorithm>

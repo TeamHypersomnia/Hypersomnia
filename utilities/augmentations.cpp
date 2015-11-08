@@ -1,10 +1,7 @@
-#define UNICODE
 #include <Windows.h>
 #include <gdiplus.h>
 
-#include <gl/glew.h>
-#include <gl/wglew.h>
-#include <GL/GL.h>
+#include <GL/OpenGL.h>
 
 #include <freetype\ft2build.h>
 #include FT_FREETYPE_H

@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include <algorithm>
 #include <functional>
 
@@ -42,7 +41,7 @@ void destroy_system::consume_events(world& owner) {
 
 	owner.get_message_queue<messages::destroy_message>().clear();
 
-	for (int i = 0; i < to_destroy.size(); ++i) {
+	for (size_t i = 0; i < to_destroy.size(); ++i) {
 		owner.delete_entity(to_destroy[i].first);// , to_destroy[i].second);
 	}
 }

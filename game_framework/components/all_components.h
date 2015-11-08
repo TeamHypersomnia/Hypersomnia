@@ -19,28 +19,29 @@
 #include "transform_component.h"
 #include "render_component.h"
 
-#include "misc/object_pool.h"
+//#include "misc/object_pool.h"
 
-#define OBJECT_POOL_SLOT_COUNT(ccc, ...) __VA_ARGS__
-#define OBJECT_POOL_CONSTRUCT(ccc, ...) augs::object_pool<components::##ccc##>(__VA_ARGS__)
-#define OBJECT_POOL_TYPE(ccc, ...) augs::object_pool<components::##ccc##>
+#define REGISTER_COMPONENT_TYPE(ccc, object) object.register_component<##ccc##>()
+//#define OBJECT_POOL_SLOT_COUNT(ccc, ...) __VA_ARGS__
+//#define OBJECT_POOL_CONSTRUCT(ccc, ...) augs::object_pool<##ccc##>(__VA_ARGS__)
+//#define OBJECT_POOL_TYPE(ccc, ...) augs::object_pool<##ccc##>
 #define ALL_COMPONENTS(COMPONENT_NAME, ...) \
-COMPONENT_NAME(animate, __VA_ARGS__), \
-COMPONENT_NAME(behaviour_tree, __VA_ARGS__), \
-COMPONENT_NAME(camera, __VA_ARGS__), \
-COMPONENT_NAME(chase, __VA_ARGS__), \
-COMPONENT_NAME(children, __VA_ARGS__), \
-COMPONENT_NAME(crosshair, __VA_ARGS__), \
-COMPONENT_NAME(damage, __VA_ARGS__), \
-COMPONENT_NAME(gun, __VA_ARGS__), \
-COMPONENT_NAME(input, __VA_ARGS__), \
-COMPONENT_NAME(lookat, __VA_ARGS__), \
-COMPONENT_NAME(movement, __VA_ARGS__), \
-COMPONENT_NAME(particle_emitter, __VA_ARGS__), \
-COMPONENT_NAME(particle_group, __VA_ARGS__), \
-COMPONENT_NAME(pathfinding, __VA_ARGS__), \
-COMPONENT_NAME(physics, __VA_ARGS__), \
-COMPONENT_NAME(render, __VA_ARGS__), \
-COMPONENT_NAME(steering, __VA_ARGS__), \
-COMPONENT_NAME(transform, __VA_ARGS__), \
-COMPONENT_NAME(visibility, __VA_ARGS__)
+COMPONENT_NAME(components::animate, __VA_ARGS__), \
+COMPONENT_NAME(components::behaviour_tree, __VA_ARGS__), \
+COMPONENT_NAME(components::camera, __VA_ARGS__), \
+COMPONENT_NAME(components::chase, __VA_ARGS__), \
+COMPONENT_NAME(components::children, __VA_ARGS__), \
+COMPONENT_NAME(components::crosshair, __VA_ARGS__), \
+COMPONENT_NAME(components::damage, __VA_ARGS__), \
+COMPONENT_NAME(components::gun, __VA_ARGS__), \
+COMPONENT_NAME(components::input, __VA_ARGS__), \
+COMPONENT_NAME(components::lookat, __VA_ARGS__), \
+COMPONENT_NAME(components::movement, __VA_ARGS__), \
+COMPONENT_NAME(components::particle_emitter, __VA_ARGS__), \
+COMPONENT_NAME(components::particle_group, __VA_ARGS__), \
+COMPONENT_NAME(components::pathfinding, __VA_ARGS__), \
+COMPONENT_NAME(components::physics, __VA_ARGS__), \
+COMPONENT_NAME(components::render, __VA_ARGS__), \
+COMPONENT_NAME(components::steering, __VA_ARGS__), \
+COMPONENT_NAME(components::transform, __VA_ARGS__), \
+COMPONENT_NAME(components::visibility, __VA_ARGS__)

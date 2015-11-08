@@ -2,6 +2,7 @@
 #include <vector>
 #include <unordered_map>
 #include <memory>
+#include <map>
 
 namespace augs {
 	namespace network {
@@ -9,7 +10,6 @@ namespace augs {
 
 		struct reliable_sender {
 			struct message {
-				luabind::object script;
 				bitstream* output_bitstream = nullptr;
 			};
 

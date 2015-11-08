@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "behaviour_tree_system.h"
 
 #include "entity_system/world.h"
@@ -129,38 +128,22 @@ std::string behaviour_tree::composite::get_result_str(int result) const {
 
 void behaviour_tree::composite::on_enter(task& current_task) {
 	COUT << "entering " << name << " which is " << get_type_str() << '\n';
-	if (enter_callback) {
-		try {
-			luabind::call_function<void>(enter_callback, current_task.subject, &current_task);
-		}
-		catch (std::exception compilation_error) {
-			std::cout << compilation_error.what() << '\n';
-		}
-	}
+	if (enter_callback)
+		enter_callback(current_task.subject, current_task);
 }
 
 void behaviour_tree::composite::on_exit(task& current_task, int exit_code) {
-	if (exit_callback) {
-		try {
-			luabind::call_function<void>(exit_callback, current_task.subject, exit_code);
-		}
-		catch (std::exception compilation_error) {
-			std::cout << compilation_error.what() << '\n';
-		}
-	}
+	if (exit_callback)
+		exit_callback(current_task.subject, exit_code);
+
 	COUT << "quitting " << name << " which was " << get_type_str() << " and resulted in " << get_result_str(exit_code) << '\n';
 }
 
 int behaviour_tree::composite::on_update(task& current_task) {
 	if (update_callback) {
-		try {
-			int result = luabind::call_function<int>(update_callback, current_task.subject, &current_task);
-			COUT << "updating " << name << " which is " << get_type_str() << " results in " << get_result_str(result) << '\n';
-			return result;
-		}
-		catch (std::exception compilation_error) {
-			std::cout << compilation_error.what() << '\n';
-		}
+		int result = update_callback(current_task.subject, current_task);
+		COUT << "updating " << name << " which is " << get_type_str() << " results in " << get_result_str(result) << '\n';
+		return result;
 	}
 
 	COUT << "updating " << name << " which is " << get_type_str() << " returns by default " << get_result_str(default_return) << '\n';

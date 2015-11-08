@@ -24,9 +24,6 @@ namespace components {
 			SHOOT
 		};
 
-		/* called for every fired bullet */
-		luabind::object bullet_callback;
-
 		int current_state, trigger_mode;
 
 		components::render bullet_render;

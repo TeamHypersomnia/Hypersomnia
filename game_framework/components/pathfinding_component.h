@@ -1,6 +1,6 @@
 #pragma once
 #include "entity_system/component.h"
-#include "math/vec2d.h"
+#include "math/vec2.h"
 
 #include "visibility_component.h"
 
@@ -34,8 +34,8 @@ namespace components {
 		bool enable_session_rollbacks;
 		bool mark_touched_as_discovered;
 
-		luabind::object first_priority_navpoint_check;
-		luabind::object target_visibility_condition;
+		std::function<bool(augs::entity_system::entity_id, augs::vec2<>, augs::vec2<>)> 
+			first_priority_navpoint_check, target_visibility_condition;
 
 		augs::vec2<> eye_offset;
 

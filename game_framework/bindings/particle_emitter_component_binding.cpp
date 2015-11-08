@@ -9,7 +9,7 @@
 namespace bindings {
 	luabind::scope _particle_emitter_component() {
 		return (
-			particle_emitter_info::bind("particle_emitter_info"),
+			bind_map_wrapper<int, particle_effect>("particle_emitter_info"),
 
 			luabind::class_<components::particle_group>("particle_group_component")
 			.def(luabind::constructor<>())

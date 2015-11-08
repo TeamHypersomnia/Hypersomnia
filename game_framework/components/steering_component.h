@@ -1,7 +1,7 @@
 #pragma once
 #include "entity_system/component.h"
 #include "entity_system/entity.h"
-#include "math/vec2d.h"
+#include "math/vec2.h"
 #include "graphics/pixel.h"
 #include "misc/timer.h"
 

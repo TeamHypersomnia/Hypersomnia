@@ -49,11 +49,15 @@ inline float32 b2InvSqrt(float32 x)
 #define	b2Sqrt(x)	sqrtf(x)
 #define	b2Atan2(y, x)	atan2f(y, x)
 
+#include "math/vec2declare.h"
+
 /// A 2D column vector.
 struct b2Vec2
 {
 	/// Default constructor does nothing (for performance).
 	b2Vec2() {}
+
+	b2Vec2(const augs::vec2<float32>& vec);
 
 	/// Construct using coordinates.
 	b2Vec2(float32 x, float32 y) : x(x), y(y) {}
@@ -139,6 +143,7 @@ struct b2Vec2
 
 	float32 x, y;
 };
+
 
 /// A 2D column vector with 3 elements.
 struct b2Vec3

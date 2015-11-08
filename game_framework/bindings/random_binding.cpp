@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "bindings.h"
 #include <random>
+#include "misc/randval.h"
 
 unsigned std_random_device() {
 	return std::random_device()();

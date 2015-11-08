@@ -70,9 +70,9 @@ namespace components {
 			static void set_running(update_input, int status = status::FAILURE);
 
 			/* actual implemented behaviours */
-			luabind::object enter_callback;
-			luabind::object exit_callback;
-			luabind::object update_callback;
+			std::function<void(augs::entity_system::entity_id, task&)> enter_callback;
+			std::function<int(augs::entity_system::entity_id, task&)> update_callback;
+			std::function<void(augs::entity_system::entity_id, int)> exit_callback;
 
 			composite();
 

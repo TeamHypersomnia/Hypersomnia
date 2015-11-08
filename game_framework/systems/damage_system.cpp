@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "damage_system.h"
 #include "entity_system/world.h"
 #include "entity_system/entity.h"

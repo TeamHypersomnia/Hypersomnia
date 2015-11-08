@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+#include "math/vec2.h"
 #include "bindings.h"
 
 #include <sstream>
@@ -181,10 +182,9 @@ namespace bindings {
 
 			luabind::class_<reliable_sender::message>("net_channel_message")
 			.def(luabind::constructor<>())
-			.def_readwrite("script", &reliable_sender::message::script)
 			.def_readwrite("output_bitstream", &reliable_sender::message::output_bitstream),
 			
-			misc::vector_wrapper<reliable_sender::message>::bind_vector("net_channel_message_vector"),
+			bind_vector_wrapper<reliable_sender::message>("net_channel_message_vector"),
 
 			luabind::class_<reliable_sender>("reliable_sender")
 			.def(luabind::constructor<>())
@@ -226,7 +226,7 @@ namespace bindings {
 			.def("send", &reliable_channel::send)
 			.def("recv", &reliable_channel::recv),
 
-			map_wrapper<RakNet::RakNetGUID, luabind::object>::bind("guid_to_object_map"),
+			bind_map_wrapper<RakNet::RakNetGUID, luabind::object>("guid_to_object_map"),
 
 			luabind::class_<network_interface::packet>("network_packet")
 			.def(luabind::constructor<>())

@@ -97,18 +97,25 @@ end
 
 function create_animation(entries) 
 	local my_animation = animation()
-	rewrite(my_animation, entries)
+	rewrite(my_animation, entries, { frames = true })
 	
 	for i = 1, #(entries.frames) do
+		local f = animation_frame()
+		f.callback = entries.frames[i].callback
+		f.callback_out = entries.frames[i].callback_out
+		f.duration_milliseconds = entries.frames[i].duration_ms
+
 		-- shortcut
 		local m = entries.frames[i].model
 		if m == nil then
-			my_animation:add_frame(create_sprite { image = nil }, entries.frames[i].duration_ms, entries.frames[i].callback, entries.frames[i].callback_out)
+			f.model = create_sprite { image = nil }
 		elseif type(m) == "userdata" then
-			my_animation:add_frame(create_sprite{ image = m } , entries.frames[i].duration_ms, entries.frames[i].callback, entries.frames[i].callback_out)
+			f.model = create_sprite { image = m }
 		else
-			my_animation:add_frame(create_sprite(m), entries.frames[i].duration_ms, entries.frames[i].callback, entries.frames[i].callback_out)
+			f.model = create_sprite(m)
 		end
+		
+		my_animation.frames:add(f)
 	end
 	
 	return my_animation
@@ -220,6 +227,7 @@ function create_behaviour_tree(entries)
 		for k, v in pairs(entries.decorators) do 
 			out_my_nodes[k] = (v.decorator_type)()
 			rewrite(out_my_nodes[k], v, { decorator_type = true })
+			-- todo: handle on enter callbacks
 			
 			--if v.base_node ~= nil then
 			--	out_my_nodes[k].base_node = out_my_nodes[v.base_node]

@@ -1,5 +1,6 @@
 #pragma once
-#include "stdafx.h"
+#include "lua/lua.hpp"
+#include <luabind/luabind.hpp>
 #include "lua_state_wrapper.h"
 #include "script.h"
 #include "window_framework/window.h"

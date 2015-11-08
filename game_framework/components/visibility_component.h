@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
-#include "math/vec2d.h"
+#include "math/vec2.h"
+#include <Box2D\Dynamics\b2Fixture.h>
 #include "entity_system/component.h"
 #include "graphics/pixel.h"
 #include "misc/sorted_vector.h"

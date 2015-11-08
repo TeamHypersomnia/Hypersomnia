@@ -28,42 +28,27 @@
 #include "messages/shot_message.h"
 
 #include "utilities/lua_state_wrapper.h"
+#include <luabind/luabind.hpp>
 
 struct world_instance {
 	static augs::window::glwindow* global_window;
 	/* all systems */
 	world my_world;
 	world& get_world() { return my_world; }
-	input_system input;
-	steering_system steering;
-	movement_system movement;
-	animation_system animations;
-	crosshair_system crosshairs;
-	lookat_system lookat;
-	physics_system physics;
-	visibility_system visibility;
-	pathfinding_system pathfinding;
-	gun_system guns;
-	particle_group_system particles;
-	particle_emitter_system emitters;
-	render_system render;
-	camera_system camera;
-	chase_system chase;
-	damage_system damage;
-	destroy_system destroy;
-	behaviour_tree_system behaviours;
 
 	world_instance();
 	~world_instance();
 
 	void default_loop();
 
-	/* binds to the lua_State entire game framework along with augs utilities */
-	void bind_whole_engine(augs::lua_state_wrapper&);
-
 	world_instance& operator=(const world_instance&) {
 		assert(0);
 		return *this;
+	}
+
+	template<typename T>
+	T* get() {
+		return &my_world.get_system<T>();
 	}
 
 	static luabind::scope bind();

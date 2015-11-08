@@ -1,5 +1,4 @@
 #pragma once
-#include "stdafx.h"
 #include "game_framework.h"
 
 #include <gtest\gtest.h>

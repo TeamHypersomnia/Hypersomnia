@@ -1,4 +1,5 @@
 #pragma once
+#include <Box2D\Box2D.h>
 #include "misc/delta_accumulator.h"
 #include "entity_system/processing_system.h"
 
@@ -42,8 +43,8 @@ public:
 
 	int all_steps;
 
-	luabind::object prestepping_routine;
-	luabind::object poststepping_routine;
+	std::function<void(world&)> prestepping_routine;
+	std::function<void(world&)> poststepping_routine;
 
 	float timestep_multiplier;
 	int enable_interpolation;

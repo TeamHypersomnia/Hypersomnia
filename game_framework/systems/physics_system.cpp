@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include "physics_system.h"
 double METERS_TO_PIXELS = 100.0;
 double PIXELS_TO_METERS = 1.0 / METERS_TO_PIXELS;
@@ -371,7 +369,7 @@ void physics_system::contact_listener::PostSolve(b2Contact* contact, const b2Con
 
 template <class T>
 T constrainAngle(T x){
-	x = fmod(x + 180, 360);
+	x = static_cast<T>(fmod(x + 180, 360));
 	if (x < 0)
 		x += 360;
 	return x - 180;
@@ -398,11 +396,11 @@ void physics_system::process_steps(world& owner, unsigned steps) {
 				auto& physics = static_cast<entity_id>(b->GetUserData())->get<components::physics>();
 
 				if (physics.enable_angle_motor) {
-					float nextAngle = b->GetAngle() + b->GetAngularVelocity() / accumulator.get_hz();
-					float totalRotation = (constrainAngle(physics.target_angle) * 0.01745329251994329576923690768489) - nextAngle;
+					float nextAngle = static_cast<float>(b->GetAngle() + b->GetAngularVelocity() / accumulator.get_hz());
+					float totalRotation = (constrainAngle(physics.target_angle) * 0.01745329251994329576923690768489f) - nextAngle;
 					while (totalRotation < -180 * 0.01745329251994329576923690768489f) totalRotation += 360 * 0.01745329251994329576923690768489f;
 					while (totalRotation >  180 * 0.01745329251994329576923690768489f) totalRotation -= 360 * 0.01745329251994329576923690768489f;
-					float desiredAngularVelocity = totalRotation * accumulator.get_hz();
+					float desiredAngularVelocity = totalRotation * static_cast<float>(accumulator.get_hz());
 					float impulse = b->GetInertia() * desiredAngularVelocity;// disregard time factor
 					b->ApplyAngularImpulse(impulse*physics.angle_motor_force_multiplier, true);
 				}
@@ -410,27 +408,15 @@ void physics_system::process_steps(world& owner, unsigned steps) {
 
 		owner.get_message_queue<messages::collision_message>().clear();
 
-		if (prestepping_routine) {
-			try {
-				luabind::call_function<void>(prestepping_routine, &owner);
-			}
-			catch (std::exception compilation_error) {
-				std::cout << compilation_error.what() << '\n';
-			}
-		}
+		if (prestepping_routine)
+			prestepping_routine(owner);
 
 		b2world.Step(static_cast<float32>(accumulator.per_second()), velocityIterations, positionIterations);
 		b2world.ClearForces();
 		++all_steps;
 
-		if (poststepping_routine) {
-			try {
-				luabind::call_function<void>(poststepping_routine, &owner);
-			}
-			catch (std::exception compilation_error) {
-				std::cout << compilation_error.what() << '\n';
-			}
-		}
+		if (poststepping_routine)
+			poststepping_routine(owner);
 	}
 
 	if (steps == 0) b2world.ClearForces();

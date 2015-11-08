@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "math/vec2d.h"
+#include "math/vec2.h"
 #include "window_framework/event.h"
 #include "misc/timer.h"
 #include "graphics/pixel.h"

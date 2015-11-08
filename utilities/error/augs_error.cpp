@@ -1,10 +1,9 @@
 ﻿#pragma once
 #include "augs_error.h"
-#define UNICODE
 #include <Windows.h>
 #undef min
 #undef max
-#include <gl/glew.h>
+#include <GL/OpenGL.h>
 #include "../misc/stream.h"
 #include <cassert>
 namespace augs {

@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+#include <GL/OpenGL.h>
 #include "bindings.h"
 
 template<typename Signature>

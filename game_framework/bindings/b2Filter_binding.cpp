@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "bindings.h"
+#include <Box2D\Dynamics\b2Fixture.h>
 
 namespace bindings {
 	luabind::scope _b2Filter() {

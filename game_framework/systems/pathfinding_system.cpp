@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "pathfinding_system.h"
 
 #include "entity_system/world.h"
@@ -227,17 +226,8 @@ void pathfinding_system::process_entities(world& owner) {
 			auto& is_point_visible = [&physics, epsilon_distance_visible_point_sq, &pathfinding, it](vec2<> from, vec2<> point, b2Filter& filter){
 				bool visibility_condition_fulfilled = true;
 				
-				if (pathfinding.target_visibility_condition) {
-					try {
-						/* arguments: subject, transform, navpoint
-						returns true or false
-						*/
-						visibility_condition_fulfilled = luabind::call_function<bool>(pathfinding.target_visibility_condition, it, from, point);
-					}
-					catch (std::exception compilation_error) {
-						std::cout << compilation_error.what() << '\n';
-					}
-				}
+				if (pathfinding.target_visibility_condition)
+					visibility_condition_fulfilled = pathfinding.target_visibility_condition(it, from, point);
 
 				if (visibility_condition_fulfilled) {
 					auto line_of_sight = physics.ray_cast_px(from, point, filter);
@@ -384,7 +374,7 @@ void pathfinding_system::process_entities(world& owner) {
 								/* arguments: subject, transform, navpoint 
 									returns true or false
 								*/
-								if (luabind::call_function<bool>(pathfinding.first_priority_navpoint_check, it, transform.pos, v.sensor)) {
+								if (pathfinding.first_priority_navpoint_check(it, transform.pos, v.sensor)) {
 									first_priority_candidates.push_back(v);
 								}
 							}

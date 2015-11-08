@@ -1,7 +1,7 @@
 #pragma once
 #include "texture_baker/texture_baker.h"
 #include <string>
-#include "math/vec2d.h"
+#include "math/vec2.h"
 
 namespace helpers {
 	struct texture_helper {

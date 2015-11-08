@@ -1,7 +1,8 @@
 #pragma once
-#include "stdafx.h"
 #include "bitstream_wrapper.h"
 #include "reliable_channel.h"
+#undef min
+#undef max
 
 namespace augs {
 	namespace network {

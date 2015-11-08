@@ -17,6 +17,9 @@
 */
 
 #include <Box2D/Common/b2Math.h>
+#include "math/vec2.h"
+
+b2Vec2::b2Vec2(const augs::vec2<float32>& vec) : b2Vec2(vec.x, vec.y) {}
 
 const b2Vec2 b2Vec2_zero(0.0f, 0.0f);
 

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include <GL/OpenGL.h>
 #include <algorithm>
 
 #include "render_system.h"
@@ -22,21 +22,21 @@ render_system::render_system(window::glwindow& output_window)
 {
 	output_window.current();
 
-	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_BLEND);
-	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
-	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glEnable(GL_TEXTURE_2D); glerr
+	glEnable(GL_BLEND); glerr
+	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE); glerr
+	glClearColor(0.0, 0.0, 0.0, 1.0); glerr
 
-	glGenBuffers(1, &triangle_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer);
+	glGenBuffers(1, &triangle_buffer); glerr
+	glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer); glerr
 
-	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::POSITION);
-	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::TEXCOORD);
-	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::COLOR);
+	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::POSITION); glerr
+	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::TEXCOORD); glerr
+	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::COLOR); glerr
 
-	glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(resources::vertex), 0);
-	glVertexAttribPointer(VERTEX_ATTRIBUTES::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(resources::vertex), (char*)(sizeof(float) * 2));
-	glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(resources::vertex), (char*) (sizeof(float) * 2 + sizeof(float) * 2));
+	glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(resources::vertex), 0); glerr
+	glVertexAttribPointer(VERTEX_ATTRIBUTES::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(resources::vertex), (char*)(sizeof(float) * 2)); glerr
+	glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(resources::vertex), (char*) (sizeof(float) * 2 + sizeof(float) * 2)); glerr
 }
 
 void render_system::generate_layers(int mask) {
@@ -85,7 +85,7 @@ void render_system::draw_layer(resources::renderable::draw_input& in, int layer)
 void render_system::generate_triangles(resources::renderable::draw_input& in, int mask) {
 	generate_layers(mask);
 
-	for (int i = 0; i < layers.size(); ++i)
+	for (size_t i = 0; i < layers.size(); ++i)
 		draw_layer(in, layers.size()-i-1);
 }
 
@@ -93,9 +93,9 @@ void render_system::process_entities(world&) {
 }
 
 void render_system::call_triangles() {
-	glBufferData(GL_ARRAY_BUFFER, sizeof(resources::vertex_triangle) * triangles.size(), triangles.data(), GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(resources::vertex_triangle) * triangles.size(), triangles.data(), GL_STREAM_DRAW); glerr
 	//std::cout << "triangles:" << triangles.size() << std::endl;
-	glDrawArrays(GL_TRIANGLES, 0, triangles.size() * 3);
+	glDrawArrays(GL_TRIANGLES, 0, triangles.size() * 3); glerr
 }
 
 void render_system::push_triangle(const resources::vertex_triangle& tri) {
@@ -122,29 +122,29 @@ void render_system::fullscreen_quad() {
 		0.f, 1.f
 	};
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);	
-	glDisableVertexAttribArray(VERTEX_ATTRIBUTES::TEXCOORD);
-	glDisableVertexAttribArray(VERTEX_ATTRIBUTES::COLOR);
-	glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), vertices);
+	glBindBuffer(GL_ARRAY_BUFFER, 0); glerr
+	glDisableVertexAttribArray(VERTEX_ATTRIBUTES::TEXCOORD); glerr
+	glDisableVertexAttribArray(VERTEX_ATTRIBUTES::COLOR); glerr
+	glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), vertices); glerr
 	
-	glDrawArrays(GL_QUADS, 0, 4);
+	glDrawArrays(GL_QUADS, 0, 4); glerr
 
-	glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer); glerr
 
-	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::POSITION);
-	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::TEXCOORD);
-	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::COLOR);
+	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::POSITION); glerr
+	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::TEXCOORD); glerr
+	glEnableVertexAttribArray(VERTEX_ATTRIBUTES::COLOR); glerr
 
-	glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(resources::vertex), 0);
-	glVertexAttribPointer(VERTEX_ATTRIBUTES::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(resources::vertex), (char*)(sizeof(float) * 2));
-	glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(resources::vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2));
+	glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(resources::vertex), 0); glerr
+	glVertexAttribPointer(VERTEX_ATTRIBUTES::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(resources::vertex), (char*)(sizeof(float) * 2)); glerr
+	glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(resources::vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr
 }
 
 void render_system::draw_debug_info(vec2<> visible_area, components::transform::state<> camera_transform, augs::texture_baker::texture* tex) {
 	vec2<> center = visible_area / 2;
 
 	if (draw_visibility) {
-		glBegin(GL_TRIANGLES);
+		glBegin(GL_TRIANGLES); glerr
 		for (auto it : targets) {
 			auto* visibility = it->find<components::visibility>();
 			if (visibility) {
@@ -153,7 +153,7 @@ void render_system::draw_debug_info(vec2<> visible_area, components::transform::
 					auto& request = entry.val;
 
 
-					glVertexAttrib4f(VERTEX_ATTRIBUTES::COLOR, request.color.r / 255.f, request.color.g / 255.f, request.color.b / 255.f, request.color.a / 2 / 255.f);
+					glVertexAttrib4f(VERTEX_ATTRIBUTES::COLOR, request.color.r / 255.f, request.color.g / 255.f, request.color.b / 255.f, request.color.a / 2 / 255.f); glerr
 					auto origin = it->get<components::transform>().current.pos;
 
 					for (int i = 0; i < request.get_num_triangles(); ++i) {
@@ -179,18 +179,18 @@ void render_system::draw_debug_info(vec2<> visible_area, components::transform::
 							pos.rotate(camera_transform.rotation, center);
 							
 							if (tex) 
-								glVertexAttrib2f(VERTEX_ATTRIBUTES::TEXCOORD, tex->get_u(i), tex->get_v(i));
+								glVertexAttrib2f(VERTEX_ATTRIBUTES::TEXCOORD, tex->get_u(i), tex->get_v(i)); glerr
 							
-							glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, pos.x, pos.y);
+							glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, pos.x, pos.y); glerr
 						}
 					}
 				}
 			}
 		}
-		glEnd();
+		glEnd(); glerr
 	}
 
-	glBegin(GL_LINES);
+	glBegin(GL_LINES); glerr
 	
 	auto line_lambda = [camera_transform, visible_area, center, tex](debug_line line) {
 		line.a += center - camera_transform.pos;
@@ -198,11 +198,11 @@ void render_system::draw_debug_info(vec2<> visible_area, components::transform::
 
 		line.a.rotate(camera_transform.rotation, center);
 		line.b.rotate(camera_transform.rotation, center);
-		glVertexAttrib4f(VERTEX_ATTRIBUTES::COLOR, line.col.r / 255.f, line.col.g / 255.f, line.col.b / 255.f, line.col.a / 255.f);
-		if (tex) glVertexAttrib2f(VERTEX_ATTRIBUTES::TEXCOORD, tex->get_u(0), tex->get_v(0));
-		glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.a.x, line.a.y);
-		if (tex) glVertexAttrib2f(VERTEX_ATTRIBUTES::TEXCOORD, tex->get_u(2), tex->get_v(2));
-		glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.b.x, line.b.y);
+		glVertexAttrib4f(VERTEX_ATTRIBUTES::COLOR, line.col.r / 255.f, line.col.g / 255.f, line.col.b / 255.f, line.col.a / 255.f); glerr
+		if (tex) glVertexAttrib2f(VERTEX_ATTRIBUTES::TEXCOORD, tex->get_u(0), tex->get_v(0)); glerr
+		glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.a.x, line.a.y); glerr
+		if (tex) glVertexAttrib2f(VERTEX_ATTRIBUTES::TEXCOORD, tex->get_u(2), tex->get_v(2)); glerr
+		glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.b.x, line.b.y); glerr
 	};
 	
 	std::for_each(lines.begin(), lines.end(), line_lambda);
@@ -214,7 +214,7 @@ void render_system::draw_debug_info(vec2<> visible_area, components::transform::
 	std::for_each(manually_cleared_lines.begin(), manually_cleared_lines.end(), line_lambda);
 	std::for_each(non_cleared_lines.begin(), non_cleared_lines.end(), line_lambda);
 
-	glEnd();
+	glEnd(); glerr
 }
 
 void render_system::cleanup() {
@@ -224,7 +224,7 @@ void render_system::cleanup() {
 
 void render_system::default_render(vec2<> visible_area) {
 	augs::graphics::fbo::use_default();
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT); glerr
 
 	call_triangles();
 

@@ -1,9 +1,5 @@
 #pragma once
-namespace augs {
-	namespace entity_system {
-		class entity;
-	}
-}
+#include "entity_system/entity_id.h"
 
 namespace messages {
 	/* by default, all messages are considered to be of internal C++ framework use; 

@@ -35,12 +35,10 @@ namespace bindings {
 			.def_readwrite("rotate_navpoints", &pathfinding::rotate_navpoints)
 			.def_readwrite("target_offset", &pathfinding::target_offset)
 			.def_readwrite("eye_offset", &pathfinding::eye_offset)
-			.def_readwrite("first_priority_navpoint_check", &pathfinding::first_priority_navpoint_check)
 			.def_readwrite("force_touch_sensors", &pathfinding::force_touch_sensors)
 			.def_readwrite("force_persistent_navpoints", &pathfinding::force_persistent_navpoints)
 			.def_readwrite("distance_navpoint_hit", &pathfinding::distance_navpoint_hit)
 			.def_readwrite("starting_ignore_discontinuities_shorter_than", &pathfinding::starting_ignore_discontinuities_shorter_than)
-			.def_readwrite("target_visibility_condition", &pathfinding::target_visibility_condition)
 			.def_readwrite("enable_session_rollbacks", &pathfinding::enable_session_rollbacks)
 			.def_readwrite("mark_touched_as_discovered", &pathfinding::mark_touched_as_discovered)
 			; 

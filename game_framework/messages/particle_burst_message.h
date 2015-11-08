@@ -1,6 +1,6 @@
 #pragma once
 #include "message.h"
-#include "math/vec2d.h"
+#include "math/vec2.h"
 
 #include "entity_system/entity.h"
 #include "../resources/particle_emitter_info.h"

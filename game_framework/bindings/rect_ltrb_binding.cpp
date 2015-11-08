@@ -3,6 +3,7 @@
 #include "bindings.h"
 
 #include "math/rects.h"
+#include "math/vec2.h"
 
 namespace bindings { 
 	luabind::scope _rect_ltrb() {

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include <GL/OpenGL.h>
 #include "../options.h"
 
 #include "window.h"
@@ -235,33 +235,7 @@ namespace augs {
 			return std::wstring(ss.begin(), ss.end());
 		}
 
-		//bool glwindow::create(lua_State* L, rects::wh<int> force_minimum_resolution, int _menu) {
-		//	luabind::object cfg = luabind::globals(L)["config_table"];
-		//	luabind::object my_object = cfg["fullscreen"];
-		//
-		//	if (luabind::object_cast<int>(my_object)) {
-		//		auto r = get_display();
-		//		return create(rects::xywh<int>(0,0, r.w,r.h), 
-		//			luabind::object_cast<int>(cfg["window_border"]) > 0 ? _menu : 0,
-		//			to_wstr(luabind::object_cast<std::string>(cfg["window_name"])).c_str(),
-		//			luabind::object_cast<int>(cfg["doublebuffer"]) > 0,
-		//			luabind::object_cast<int>(cfg["bpp"])
-		//			);
-		//	}
-		//	else {
-		//		return create(rects::xywh<int>(luabind::object_cast<int>(cfg["window_x"]),
-		//			luabind::object_cast<int>(cfg["window_y"]),
-		//			std::max(force_minimum_resolution.w, int(luabind::object_cast<float>(cfg["resolution_w"]))),
-		//			std::max(force_minimum_resolution.h, int(luabind::object_cast<float>(cfg["resolution_h"])))),
-		//			luabind::object_cast<int>(cfg["window_border"]) > 0 ? _menu : 0,
-		//			to_wstr(luabind::object_cast<std::string>(cfg["window_name"])).c_str(),
-		//			luabind::object_cast<int>(cfg["doublebuffer"]) > 0,
-		//			luabind::object_cast<int>(cfg["bpp"])
-		//			);
-		//	}
-		//}
-
-			int glwindow::create(rects::xywh<int> crect, int _menu, std::wstring _name,
+		int glwindow::create(rects::xywh<int> crect, int _menu, std::wstring _name,
 				int doublebuffer, int _bpp) {
 			int f = 1;
 			menu = _menu; bpp = _bpp; doublebuf = doublebuffer; name = _name.c_str();
@@ -290,7 +264,7 @@ namespace augs {
 			errf(pf = ChoosePixelFormat(hdc, &p), f);
 			errf(SetPixelFormat(hdc,pf,&p), f);
 
-			errf(hglrc = wglCreateContext(hdc), f);
+			errf(hglrc = wglCreateContext(hdc), f); glerr
 
 			current();
 
@@ -329,7 +303,7 @@ namespace augs {
 		bool glwindow::current() {
 			bool ret = true;
 			if(context != this) {
-				ret = err(wglMakeCurrent(hdc, hglrc)) != FALSE;
+				ret = err(wglMakeCurrent(hdc, hglrc)) != FALSE; glerr
 				context = this;
 			}
 			return ret;
@@ -340,7 +314,7 @@ namespace augs {
 			errs(ret, "vsync not supported!");
 			if(ret) {
 				errs(ret = current(), "error enabling vsync, could not set current context");
-				wglSwapIntervalEXT(v);
+				wglSwapIntervalEXT(v); glerr
 				vsyn = v;
 			}
 			return ret;
@@ -485,8 +459,8 @@ namespace augs {
 		void glwindow::destroy() {
 			if(hwnd) {
 				if(context == this) {
-					wglMakeCurrent(NULL, NULL);
-					wglDeleteContext(hglrc);
+					wglMakeCurrent(NULL, NULL); glerr
+					wglDeleteContext(hglrc); glerr
 					context = 0;
 				}
 				ReleaseDC(hwnd, hdc);

@@ -1,55 +1,52 @@
 #pragma once
 #include "entity_system/component.h"
-#include "math/vec2d.h"
+#include "math/vec2.h"
 #include "render_component.h"
 #include "misc/delta_accumulator.h"
 
 #include "entity_system/entity.h"
 
 #include "../components/transform_component.h"
+#include "../resources/render_info.h"
 
 class camera_system;
 class gun_system;
 
 namespace components {
 	struct camera : public augs::entity_system::component {
-		augs::rects::xywh<float> screen_rect;
+		augs::rects::xywh<int> screen_rect;
 		augs::vec2<> size;
 
-		unsigned layer;
-		unsigned mask;
-		bool enabled;
+		unsigned layer = 0;
+		unsigned mask = 0;
+		bool enabled = true;
 
 		enum orbit_type {
 			NONE,
 			ANGLED,
 			LOOK
-		} orbit_mode;
+		} orbit_mode = NONE;
 
-		float angled_look_length;
-		bool enable_smoothing;
+		float angled_look_length = 100.f;
+		bool enable_smoothing = true;
 		bool dont_smooth_once = false;
-		bool crosshair_follows_interpolant;
+		bool crosshair_follows_interpolant = false;
 
-		double smoothing_average_factor, averages_per_sec;
-		components::transform::state<double> last_interpolant;
+		float smoothing_average_factor = 0.004f;
+		float averages_per_sec = 60.0f;
+
+		components::transform::state<> last_interpolant;
 
 		augs::vec2<> rendered_size;
 
-		augs::vec2<> max_look_expand;
+		augs::vec2<> max_look_expand = augs::vec2<>(600.f, 300.f);
 
 		augs::entity_system::entity_id player, crosshair;
 
-		camera(augs::rects::xywh<float> screen_rect = augs::rects::xywh<float>(), augs::vec2<> size = augs::vec2<>(),
-			unsigned layer = 0, unsigned mask = 0,
-			double smoothing_average_factor = 0.004, double averages_per_sec = 60.0) :
-			screen_rect(screen_rect), size(size), layer(layer), mask(mask), enabled(true), orbit_mode(NONE),
-			angled_look_length(100.f), max_look_expand(augs::vec2<double>(600.f, 300.f)), 
-			smoothing_average_factor(smoothing_average_factor), averages_per_sec(averages_per_sec), enable_smoothing(true), crosshair_follows_interpolant(false) {
-				smooth_timer.reset();
-		}
+		camera() { smooth_timer.reset(); }
 
-		luabind::object drawing_callback;
+		/* arguments: subject, renderer, mask */
+		std::function<void(augs::entity_system::entity_id, resources::renderable::draw_input, int)> drawing_callback;
 
 	private:
 		friend class camera_system;

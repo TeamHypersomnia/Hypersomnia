@@ -1,8 +1,8 @@
-#include "stdafx.h"
 #include "lookat_system.h"
 #include "entity_system/entity.h"
 
 #include "../components/physics_component.h"
+#include <Box2D\Dynamics\b2Body.h>
 
 void lookat_system::process_entities(world& owner) {
 	double delta = smooth_timer.extract<std::chrono::seconds>();

@@ -39,9 +39,8 @@ end
 function simulation_world_class:process_steps(steps)
 	local my_instance = self.world_inst
 	local world = my_instance.world
-	
-	world:validate_delayed_messages()
-	world:flush_message_queues()
+
+	self:clear_all_queues()
 	
 	my_instance.physics_system:process_steps(world, steps)
 end

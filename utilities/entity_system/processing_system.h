@@ -2,7 +2,7 @@
 #include <vector>
 #include <functional>
 #include <cassert>
-#include "signature_matcher.h"
+#include "component_bitset_matcher.h"
 
 namespace augs {
 	namespace entity_system {
@@ -11,7 +11,7 @@ namespace augs {
 			friend class entity;
 
 		public:
-			signature_matcher_bitset components_signature;
+			component_bitset_matcher components_signature;
 			std::vector<entity_id> targets;
 			std::vector<processing_system*> subsystems;
 
@@ -27,7 +27,7 @@ namespace augs {
 			virtual void remove(entity_id);
 
 			/* you are required to override this function to specify components that this system needs to processing */
-			virtual type_pack get_needed_components() const = 0;
+			virtual type_hash_vector get_needed_components() const = 0;
 
 			virtual void clear();
 		};
@@ -36,8 +36,8 @@ namespace augs {
 		template<typename... needed_components>
 		class processing_system_templated : public processing_system {
 		public:
-			virtual type_pack get_needed_components() const override {
-				return templated_list<needed_components...>::get();
+			virtual type_hash_vector get_needed_components() const override {
+				return templated_list_to_hash_vector<needed_components...>::unpack();
 			}
 		};
 		

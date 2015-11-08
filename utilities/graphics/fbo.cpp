@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include <GL/OpenGL.h>
 #include <iostream>
 #include "fbo.h"
 
@@ -20,19 +20,19 @@ namespace augs {
 			width = w;
 			height = h;
 
-			glGenTextures(1, &textureId);
-			glBindTexture(GL_TEXTURE_2D, textureId);
+			glGenTextures(1, &textureId); glerr
+			glBindTexture(GL_TEXTURE_2D, textureId); glerr
 
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); glerr
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); glerr
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); glerr
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); glerr
 			//glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0,
-				GL_RGBA, GL_UNSIGNED_BYTE, 0);
-			glBindTexture(GL_TEXTURE_2D, 0);
+				GL_RGBA, GL_UNSIGNED_BYTE, 0); glerr
+			glBindTexture(GL_TEXTURE_2D, 0); glerr
 
-			glGenFramebuffers(1, &fboId);
+			glGenFramebuffers(1, &fboId); glerr
 			use();
 
 			// attach the texture to FBO color attachment point
@@ -41,11 +41,11 @@ namespace augs {
 				GL_TEXTURE_2D,         // 3. tex target: GL_TEXTURE_2D
 				textureId,             // 4. tex ID
 				0);                    // 5. mipmap level: 0(base)
-
+			glerr
 			// check FBO status
 			while (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 				int waiting = 24;
-				std::cout << "waiting";
+				std::cout << glGetError() << std::endl;
 			} 
 
 			//GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -54,7 +54,7 @@ namespace augs {
 		}
 
 		void fbo::use() {
-			glBindFramebuffer(GL_FRAMEBUFFER, fboId);
+			glBindFramebuffer(GL_FRAMEBUFFER, fboId); glerr
 			currently_bound_fbo = fboId;
 		}
 
@@ -65,7 +65,7 @@ namespace augs {
 
 		void fbo::use_default() {
 			if (currently_bound_fbo != 0) {
-				glBindFramebuffer(GL_FRAMEBUFFER, 0);
+				glBindFramebuffer(GL_FRAMEBUFFER, 0); glerr
 				currently_bound_fbo = 0;
 			}
 		}
@@ -80,8 +80,8 @@ namespace augs {
 
 		void fbo::destroy() {
 			if (created) {
-				glDeleteFramebuffers(1, &fboId);
-				glDeleteTextures(1, &textureId);
+				glDeleteFramebuffers(1, &fboId); glerr
+				glDeleteTextures(1, &textureId); glerr
 
 				created = false;
 				width = 0;

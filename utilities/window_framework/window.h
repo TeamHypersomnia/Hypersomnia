@@ -65,7 +65,11 @@ namespace augs {
 			unsigned triple_click_delay; /* maximum delay time for the next click (after doubleclick) to be considered tripleclick (in milliseconds) */
 			
 			glwindow();
-			
+			glwindow(const glwindow&) = delete;
+			glwindow(glwindow&&) = delete;
+			glwindow& operator=(const glwindow&) = delete;
+			~glwindow();
+
 			/*
 			NEVER EVER PASS ~RESIZABLE!
 			if you do so, adjustwindowrectex
@@ -119,7 +123,6 @@ namespace augs {
 			HWND get_hwnd() const;
 
 			void destroy();
-			~glwindow();
 		};
 
 

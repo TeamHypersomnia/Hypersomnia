@@ -1,7 +1,7 @@
 #pragma once
 #include "entity_system/component.h"
 #include "entity_system/entity.h"
-#include "math/vec2d.h"
+#include "math/vec2.h"
 
 class chase_system;
 

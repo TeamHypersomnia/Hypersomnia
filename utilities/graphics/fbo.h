@@ -1,4 +1,5 @@
 #pragma once
+#include <GL/OpenGL.h>
 
 namespace augs {
 	namespace graphics {

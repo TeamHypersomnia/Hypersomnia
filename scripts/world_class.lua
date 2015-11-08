@@ -113,6 +113,16 @@ function world_class:clear_queue(message_name)
 	self:get_messages(message_name):clear()
 end
 
+function world_class:clear_all_queues()
+	self:clear_queue("intent_message")
+	self:clear_queue("particle_burst_message")
+	self:clear_queue("animate_message")
+	self:clear_queue("collision_message")
+	self:clear_queue("damage_message")
+	self:clear_queue("shot_message")
+	self:clear_queue("destroy_message")
+end
+
 function world_class:handle_input()
 	local my_instance = self.world_inst
 	local world = my_instance.world
@@ -183,8 +193,6 @@ function world_class:consume_events(is_view)
 		is_view = true
 	end
 
-	self.world_inst.world:validate_delayed_messages()
-	
 	local my_instance = self.world_inst
 	local world = my_instance.world
 	

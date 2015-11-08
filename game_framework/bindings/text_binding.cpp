@@ -50,8 +50,8 @@ namespace bindings {
 			.def_readwrite("b", &formatted_char::b)
 			.def_readwrite("a", &formatted_char::a),
 
-			misc::vector_wrapper<wchar_t>::bind("wchar_t_vec"),
-			misc::vector_wrapper<formatted_char>::bind_string("formatted_text"),
+			bind_vector_wrapper<wchar_t>("wchar_t_vec"),
+			bind_vector_wrapper_as_string<formatted_char>("formatted_text"),
 			
 			luabind::def("wchar_vec_to_str", wchar_vec_to_str),
 			luabind::def("towchar", towchar),

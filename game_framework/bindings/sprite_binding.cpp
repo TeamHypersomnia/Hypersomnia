@@ -39,7 +39,7 @@ namespace bindings {
 			.def(luabind::constructor<texture_baker::texture*>())
 			.def_readwrite("tile_texture", &tileset::tile_type::tile_texture),
 
-			augs::misc::vector_wrapper<tileset::tile_type>::bind_vector("tile_type_vector"),
+			bind_stdvector<tileset::tile_type>("tile_type_vector"),
 
 			luabind::class_<tileset>("tileset")
 			.def(luabind::constructor<>())
@@ -50,7 +50,7 @@ namespace bindings {
 			.def_readwrite("type", &tile_layer::tile::type_id)
 			,
 
-			augs::misc::vector_wrapper<tile_layer::tile>::bind_vector("tile_vector"),
+			bind_stdvector<tile_layer::tile>("tile_vector"),
 
 			luabind::class_<tile_layer, renderable>("tile_layer")
 			.def(luabind::constructor<rects::wh<int>>())

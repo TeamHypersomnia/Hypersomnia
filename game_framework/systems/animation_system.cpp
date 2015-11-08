@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "animation_system.h"
 #include "entity_system/world.h"
 #include "../messages/animate_message.h"
@@ -77,21 +76,15 @@ void animation_system::consume_events(world& owner) {
 	}
 }
 
-void call(luabind::object func, augs::entity_system::entity_id subject) {
-	if (func) {
-		try {
-			luabind::call_function<void>(func, subject);
-		}
-		catch (std::exception compilation_error) {
-			std::cout << compilation_error.what() << '\n';
-		}
-	}
+void call(animation_callback func, augs::entity_system::entity_id subject) {
+	if (func) 
+		func(subject);
 }
 
 void components::animate::set_current_frame(unsigned number, augs::entity_system::entity_id subject, bool do_callback) {
-	if (saved_callback_out) {
+	if (saved_callback_out)
 		call(saved_callback_out, subject);
-	}
+	
 	current_frame = number;
 	if (current_animation) {
 		if (do_callback) {
@@ -100,8 +93,9 @@ void components::animate::set_current_frame(unsigned number, augs::entity_system
 		}
 
 		subject->get<components::render>().model = &current_animation->frames[get_current_frame()].model;
-	} else
-	saved_callback_out = luabind::object();
+	} 
+	else
+		saved_callback_out = nullptr;
 }
 
 void components::animate::set_current_animation_set(resources::animate_info* set, augs::entity_system::entity_id subject) {
@@ -110,7 +104,7 @@ void components::animate::set_current_animation_set(resources::animate_info* set
 	}
 	available_animations = set;
 	current_frame = 0;
-	saved_callback_out = luabind::object();
+	saved_callback_out = nullptr;
 
 	paused_state = components::animate::state::INCREASING;
 	current_state = components::animate::state::PAUSED;

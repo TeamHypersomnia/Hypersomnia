@@ -1,7 +1,8 @@
 #pragma once
+#include <Box2D/Dynamics/b2Fixture.h>
 #include "entity_system/component.h"
 #include "../messages/animate_message.h"
-#include "math/vec2d.h"
+#include "math/vec2.h"
 
 namespace components {
 	struct movement : public augs::entity_system::component {

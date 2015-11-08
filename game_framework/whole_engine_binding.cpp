@@ -36,7 +36,6 @@ namespace bindings {
 		_world(),
 		_sprite(),
 		_polygon(),
-		_polygon_fader(),
 
 		_timer(),
 
@@ -111,13 +110,13 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 	luabind::module(raw)[
 		luabind::class_<ptr_wrapper<float>>("float_ptr"),
 
-			misc::vector_wrapper<float>::bind("float_vector"),
+			bind_vector_wrapper<float>("float_vector"),
 
 			bindings::_id_generator(),
 			bindings::_minmax(),
 			bindings::_vec2(),
-			misc::vector_wrapper<vec2<>>::bind_vector("vec2_vector"),
-			misc::vector_wrapper<int>::bind("int_vector"),
+			bind_stdvector<vec2<>>("vec2_vector"),
+			bind_vector_wrapper<int>("int_vector"),
 			bindings::_value_animator(),
 			bindings::_b2Filter(),
 			bindings::_rgba(),
@@ -128,7 +127,7 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 			bindings::_texture(),
 			bindings::_animation(),
 			bindings::_world(),
-			misc::vector_wrapper<entity_id>::bind_vector("entity_ptr_vector"),
+			bind_stdvector<entity_id>("entity_ptr_vector"),
 			bindings::_sprite(),
 			bindings::_polygon(),
 
@@ -186,10 +185,10 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 			.def("c_str", &std::string::c_str)
 			,
 
-			misc::vector_wrapper<std::string>::bind("string_vector"),
+			bind_stdvector<std::string>("string_vector"),
+			bind_stdvector<std::wstring>("wstring_vector"),
 			bindings::_file_watcher(),
 
-			bindings::_polygon_fader(),
 			bindings::_all_systems(),
 
 			world_instance::bind(),

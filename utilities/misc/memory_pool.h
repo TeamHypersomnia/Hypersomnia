@@ -87,6 +87,10 @@ namespace augs {
 		bool free(id);
 		void free_all();
 
+		id allocate_with_default_construct(size_t type_hash);
+		bool free_with_destructor(id, size_t type_hash);
+		void destruct_all(size_t type_hash);
+
 		id get_id(byte* address);
 
 		byte* get(id object);

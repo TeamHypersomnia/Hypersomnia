@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "vector_wrapper.h"
 
 namespace augs {

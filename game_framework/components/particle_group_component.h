@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "math/vec2d.h"
+#include "math/vec2.h"
 #include "particle_emitter_component.h"
 #include "transform_component.h"
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "message.h"
-#include "math/vec2d.h"
+#include "math/vec2.h"
 
 namespace messages {
 	struct damage_message : public message {

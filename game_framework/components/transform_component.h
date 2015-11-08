@@ -1,7 +1,7 @@
 #pragma once
 #include "entity_system/component.h"
 #include "math/rects.h"
-#include "math/vec2d.h"
+#include "math/vec2.h"
 
 namespace components {
 	struct transform : public augs::entity_system::component {

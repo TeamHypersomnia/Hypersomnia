@@ -21,7 +21,6 @@ namespace bindings {
 			.def_readwrite("target_camera_to_shake", &gun::target_camera_to_shake)
 			.def_readwrite("bullets_once", &gun::bullets_once)
 			.def_readwrite("max_rounds", &gun::max_rounds)
-			.def_readwrite("bullet_callback", &gun::bullet_callback)
 			.def_readwrite("spread_degrees", &gun::spread_degrees)
 			.def_readwrite("bullet_damage", &gun::bullet_damage)
 			.def_readwrite("bullet_speed", &gun::bullet_speed)

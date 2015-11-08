@@ -1,18 +1,20 @@
 #pragma once
 #include <vector>
+#include <functional>
 #include "render_info.h"
 
 namespace resources {
+	typedef std::function<void(augs::entity_system::entity_id)> animation_callback;
+
 	struct animation {
 		struct frame {
 			/* function that is called once this frame enters */
-			luabind::object callback;
+			animation_callback callback;
 			/* function that is called once this frame quits */
-			luabind::object callback_out;
+			animation_callback callback_out;
 
 			sprite model;
-			float duration_milliseconds;
-			frame(sprite model, float duration_milliseconds, luabind::object callback = luabind::object(), luabind::object callback_out = luabind::object());
+			float duration_milliseconds = 0.f;
 		};
 
 		std::vector<frame> frames;
@@ -26,14 +28,5 @@ namespace resources {
 		loop_type loop_mode;
 
 		animation();
-		~animation() {
-			int wtflol = 0;
-			wtflol = 2;
-		}
-
-		template <typename T>
-		void add_frame(T* model, float duration_milliseconds, luabind::object callback, luabind::object callback_out) {
-			frames.push_back(frame(*model, duration_milliseconds, callback, callback_out));
-		}
 	};
 }

@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "render_info.h"
 
 #include <algorithm>

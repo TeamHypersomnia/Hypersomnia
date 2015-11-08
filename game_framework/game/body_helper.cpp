@@ -1,4 +1,7 @@
-#include "stdafx.h"
+#pragma once
+#include "math/vec2.h"
+#include <Box2D/Box2D.h>
+
 #include "body_helper.h"
 #include "../components/physics_component.h"
 #include "../components/render_component.h"
@@ -49,8 +52,8 @@ namespace helpers {
 		for (auto& out : outpolys) {
 			std::vector < augs::vec2 < >> new_convex;
 
-			for (size_t j = 0; j < out.GetNumPoints(); ++j) {
-				new_convex.push_back(vec2<>(out[j].x, -out[j].y));
+			for (long j = 0; j < out.GetNumPoints(); ++j) {
+				new_convex.push_back(vec2<>(static_cast<float>(out[j].x), static_cast<float>(-out[j].y)));
 			}
 
 			std::reverse(new_convex.begin(), new_convex.end());

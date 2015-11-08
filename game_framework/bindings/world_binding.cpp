@@ -22,33 +22,24 @@ std::vector<T>& get_message_queue_for_scripts(world& owner) {
 namespace bindings {
 	luabind::scope _world() {
 		return
-			augs::misc::vector_wrapper<destroy_message>::bind_vector("destroy_message_vector"),
-			augs::misc::vector_wrapper<animate_message>::bind_vector("animate_message_vector"),
-			augs::misc::vector_wrapper<particle_burst_message>::bind_vector("particle_burst_message_vector"),
-			augs::misc::vector_wrapper<collision_message>::bind_vector("collision_message_vector"),
-			augs::misc::vector_wrapper<damage_message>::bind_vector("damage_message_vector"),
-			augs::misc::vector_wrapper<intent_message>::bind_vector("intent_message_vector"),
-			augs::misc::vector_wrapper<shot_message>::bind_vector("shot_message_vector"),
+			bind_stdvector<destroy_message>("destroy_message_vector"),
+			bind_stdvector<animate_message>("animate_message_vector"),
+			bind_stdvector<particle_burst_message>("particle_burst_message_vector"),
+			bind_stdvector<collision_message>("collision_message_vector"),
+			bind_stdvector<damage_message>("damage_message_vector"),
+			bind_stdvector<intent_message>("intent_message_vector"),
+			bind_stdvector<shot_message>("shot_message_vector"),
 
 
 			luabind::class_<world>("_world")
 			.def(luabind::constructor<>())
-			.def("validate_delayed_messages", &world::validate_delayed_messages)
-			.def("flush_message_queues", &world::flush_message_queues)
 			.def("create_entity", &world::create_entity)
 			.def("delete_entity", &world::delete_entity)
 			.def("delete_all_entities", &world::delete_all_entities)
 			.def("post_message", &world::post_message<animate_message>)
 			.def("post_message", &world::post_message<intent_message>)
 			.def("post_message", &world::post_message<destroy_message>)
-			.def("post_message", &world::post_message<particle_burst_message>)
-
-
-			.def("post_delayed_message", &world::post_delayed_message<animate_message>)
-			.def("post_delayed_message", &world::post_delayed_message<intent_message>)
-			.def("post_delayed_message", &world::post_delayed_message<destroy_message>)
-			.def("post_delayed_message", &world::post_delayed_message<particle_burst_message>)
-			,
+			.def("post_message", &world::post_message<particle_burst_message>),
 
 			luabind::def("get_destroy_message_queue", get_message_queue_for_scripts<destroy_message>),
 			luabind::def("get_collision_message_queue", get_message_queue_for_scripts<collision_message>),

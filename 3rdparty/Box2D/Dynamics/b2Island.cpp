@@ -179,7 +179,7 @@ b2Island::~b2Island()
 	m_allocator->Free(m_contacts);
 	m_allocator->Free(m_bodies);
 }
-#include "math/vec2d.h"
+#include "math/vec2.h"
 void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& gravity, bool allowSleep)
 {
 	b2Timer timer;
@@ -224,7 +224,7 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 				temp_vel.y *= 1.0f / (1.0f + h * std::abs(b->m_linearDampingVec.y));
 
 				temp_vel.rotate(b->m_linearDampingAngle, augs::vec2<>());
-				v = temp_vel;
+				v = b2Vec2(temp_vel.x, temp_vel.y);
 			}
 
 			w *= 1.0f / (1.0f + h * b->m_angularDamping);
