@@ -9,8 +9,8 @@ return {
   tileheight = 32,
   nextobjectid = 39,
   properties = {
-    ["gameplay_textures"] = "..\\\\gfx\\\\",
-    ["texture_directory"] = "snow_textures\\\\",
+    ["gameplay_textures"] = "../gfx/",
+    ["texture_directory"] = "snow_textures/",
     ["type_library"] = "basic_type_library.lua"
   },
   tilesets = {

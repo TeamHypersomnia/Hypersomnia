@@ -1,5 +1,6 @@
-#include "stdafx.h"
+#include "math/vec2.h"
 #include "utilities.h"
+
 void draw_tile_highlights(
 	resources::tile_layer& tile_layer, 
 	resources::animation& blink_animation, 

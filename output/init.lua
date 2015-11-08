@@ -19,7 +19,7 @@ end, function(error_message)
 		print(full_error)
 		open_editor(full_error)
 		if debug.post_traceback ~= nil then 
-			--debug.post_traceback() 
+			debug.post_traceback() 
 			print("post traceback written.") 
 		else
 			print("post traceback not yet defined.") 

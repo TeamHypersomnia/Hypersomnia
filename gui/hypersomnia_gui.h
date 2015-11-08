@@ -3,7 +3,7 @@
 #include "depthbase/gui/system.h"
 #include "depthbase/gui/controls/stylesheeted/controls.h"
 #include "misc/timer.h"
-#include "math/vec2d.h"
+#include "math/vec2.h"
 #include "graphics/pixel.h"
 
 #include "game_framework/resources/render_info.h"
@@ -74,7 +74,7 @@ namespace augs {
 	struct lua_state_wrapper;
 
 	namespace window {
-		struct glwindow;
+		class glwindow;
 	}
 }
 

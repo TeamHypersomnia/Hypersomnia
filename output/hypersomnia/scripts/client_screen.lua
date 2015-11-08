@@ -63,7 +63,7 @@ function client_screen:constructor(camera_rect)
 	
 	)
 	
-	self.sample_scene.world_camera.camera.screen_rect = camera_rect
+	self.sample_scene.world_camera.camera.screen_rect = rect_xywh_i(camera_rect.x, camera_rect.y, camera_rect.w, camera_rect.h)
 	self.sample_scene.world_object.owner_client_screen = self
 	
 	self.server = network_interface()

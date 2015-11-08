@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "math/vec2.h"
 #include "hypersomnia_gui.h"
 
 using namespace stylesheeted;
@@ -19,7 +19,7 @@ bool callback_textbox::is_clean() {
 
 void callback_textbox::set_area(augs::rects::xywh<float> area) {
 	textbox_object.rc = rects::xywh<float>(area.x, area.y, area.w, area.h);
-	textbox_object.editor.draft().wrap_width = area.w;
+	textbox_object.editor.draft().wrap_width = static_cast<unsigned>(area.w);
 
 }
 

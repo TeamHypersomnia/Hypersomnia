@@ -1,5 +1,5 @@
-#include "stdafx.h"
 #pragma once
+#include "math/vec2.h"
 #include "hypersomnia_gui.h"
 #include "window_framework/window.h"
 

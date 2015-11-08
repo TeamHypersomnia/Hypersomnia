@@ -304,7 +304,7 @@ function create_world_camera_entity(owner_world, blank_sprite)
 		},
 	
 		camera = {
-			screen_rect = rect_xywh(0, 0, config_table.resolution_w, config_table.resolution_h),
+			screen_rect = rect_xywh_i(0, 0, config_table.resolution_w, config_table.resolution_h),
 			size = vec2(config_table.resolution_w, config_table.resolution_h),
 			
 			drawing_callback = function (subject, camera_draw_input, mask)

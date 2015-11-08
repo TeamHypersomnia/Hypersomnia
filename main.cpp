@@ -1,6 +1,4 @@
 #pragma once
-#include "stdafx.h"
-
 #include "utilities/lua_state_wrapper.h"
 #include "game_framework/game_framework.h"
 
