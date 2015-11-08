@@ -8,7 +8,7 @@ extern float PIXELS_TO_METERSf;
 
 class b2Body;
 namespace components {
-	struct physics : public augs::entity_system::component {
+	struct physics : public augs::component {
 		b2Body* body;
 		std::vector <vec2> original_model;
 

@@ -4,7 +4,6 @@ namespace components {}
 namespace messages {}
 
 namespace augs {
-	namespace entity_system {}
 	namespace graphics {}
 	namespace misc {}
 }
@@ -15,7 +14,7 @@ using namespace resources;
 using namespace components;
 using namespace augs;
 using namespace misc;
-using namespace entity_system;
+
 using namespace graphics;
 using namespace helpers;
 using namespace messages;

@@ -3,7 +3,7 @@
 #include "../components/children_component.h"
 
 using namespace augs;
-using namespace entity_system;
+
 
 class destroy_system : public processing_system_templated<components::children> {
 public:

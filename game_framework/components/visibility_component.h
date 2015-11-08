@@ -8,7 +8,7 @@
 #include "misc/timer.h"
 
 namespace components {
-	struct visibility : public augs::entity_system::component {
+	struct visibility : public augs::component {
 		typedef std::pair<vec2, vec2> edge;
 
 		struct triangle {

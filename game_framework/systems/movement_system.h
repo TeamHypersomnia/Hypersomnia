@@ -4,7 +4,7 @@
 #include "../components/movement_component.h"
 
 using namespace augs;
-using namespace entity_system;
+
 
 class movement_system : public processing_system_templated<components::movement, components::physics> {
 public:

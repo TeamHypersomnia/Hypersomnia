@@ -4,7 +4,7 @@
 #include "../messages/intent_message.h"
 
 using namespace augs;
-using namespace entity_system;
+
 
 namespace augs {
 	namespace window {

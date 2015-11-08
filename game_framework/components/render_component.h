@@ -7,7 +7,7 @@ namespace resources {
 }
 
 namespace components {
-	struct render : public augs::entity_system::component {
+	struct render : public augs::component {
 		resources::renderable* model = nullptr;
 		vec2 last_screen_pos;
 		bool was_drawn = false;

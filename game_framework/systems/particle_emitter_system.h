@@ -8,7 +8,7 @@
 #include "../components/particle_group_component.h"
 
 using namespace augs;
-using namespace entity_system;
+
 
 class particle_emitter_system : public processing_system_templated<components::particle_emitter> {
 public:

@@ -81,7 +81,7 @@ namespace helpers {
 		//	convex_polys.push_back(std::vector <vec2> (convex.begin(), convex.end()));
 	}
 
-	void create_physics_component(const physics_info& body_data, augs::entity_system::entity_id subject, int body_type) {
+	void create_physics_component(const physics_info& body_data, augs::entity_id subject, int body_type) {
 		physics_system& physics = subject->owner_world.get_system<physics_system>();
 
 		auto& transform = subject->get<components::transform>().current;
@@ -156,7 +156,7 @@ namespace helpers {
 		subject->add(physics_component);
 	}
 
-	std::vector<b2Vec2> get_transformed_shape_verts(augs::entity_system::entity_id subject, bool meters) {
+	std::vector<b2Vec2> get_transformed_shape_verts(augs::entity_id subject, bool meters) {
 		std::vector<b2Vec2> output;
 
 		auto b = subject->get<components::physics>().body;
@@ -179,7 +179,7 @@ namespace helpers {
 		return output;
 	}
 
-	augs::entity_system::entity_id body_to_entity(b2Body* b) {
-		return static_cast<augs::entity_system::entity_id>(b->GetUserData());
+	augs::entity_id body_to_entity(b2Body* b) {
+		return static_cast<augs::entity_id>(b->GetUserData());
 	}
 }

@@ -4,7 +4,7 @@
 #include "render_info.h"
 
 namespace resources {
-	typedef std::function<void(augs::entity_system::entity_id)> animation_callback;
+	typedef std::function<void(augs::entity_id)> animation_callback;
 
 	struct animation {
 		struct frame {

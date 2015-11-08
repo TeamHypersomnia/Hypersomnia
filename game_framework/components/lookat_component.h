@@ -4,7 +4,7 @@
 #include "math/vec2.h"
 
 namespace components {
-	struct lookat : public augs::entity_system::component {
+	struct lookat : public augs::component {
 		enum look_type {
 			POSITION,
 			VELOCITY,
@@ -28,7 +28,7 @@ namespace components {
 
 		unsigned look_mode = look_type::POSITION;
 
-		augs::entity_system::entity_id target;
+		augs::entity_id target;
 
 		float last_value = 0.0f;
 		bool update_value = true;

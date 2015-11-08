@@ -13,7 +13,7 @@ class camera_system;
 class gun_system;
 
 namespace components {
-	struct camera : public augs::entity_system::component {
+	struct camera : public augs::component {
 		augs::rects::xywh<int> screen_rect;
 		vec2 size;
 
@@ -41,12 +41,12 @@ namespace components {
 
 		vec2 max_look_expand = vec2(600.f, 300.f);
 
-		augs::entity_system::entity_id player, crosshair;
+		augs::entity_id player, crosshair;
 
 		camera() { smooth_timer.reset(); }
 
 		/* arguments: subject, renderer, mask */
-		std::function<void(augs::entity_system::entity_id, resources::renderable::draw_input, int)> drawing_callback;
+		std::function<void(augs::entity_id, resources::renderable::draw_input, int)> drawing_callback;
 
 	private:
 		friend class camera_system;

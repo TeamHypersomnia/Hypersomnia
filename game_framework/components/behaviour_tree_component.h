@@ -6,7 +6,7 @@
 #include "misc/timer.h"
 
 namespace components {
-	struct behaviour_tree : public augs::entity_system::component {
+	struct behaviour_tree : public augs::component {
 		struct task;
 		struct decorator;
 
@@ -70,9 +70,9 @@ namespace components {
 			static void set_running(update_input, int status = status::FAILURE);
 
 			/* actual implemented behaviours */
-			std::function<void(augs::entity_system::entity_id, task&)> enter_callback;
-			std::function<int(augs::entity_system::entity_id, task&)> update_callback;
-			std::function<void(augs::entity_system::entity_id, int)> exit_callback;
+			std::function<void(augs::entity_id, task&)> enter_callback;
+			std::function<int(augs::entity_id, task&)> update_callback;
+			std::function<void(augs::entity_id, int)> exit_callback;
 
 			composite();
 
@@ -101,7 +101,7 @@ namespace components {
 			void interrupt_other_runner(int status = composite::status::FAILURE);
 			void interrupt_runner(int status = composite::status::FAILURE);
 
-			augs::entity_system::entity_id subject;
+			augs::entity_id subject;
 
 			composite* running_parent_node;
 

@@ -12,7 +12,7 @@
 #include "texture_baker/texture_baker.h"
 
 using namespace augs;
-using namespace entity_system;
+
 
 class render_system : public processing_system_templated<components::transform, components::render> {
 	resources::vertex_triangle* last_bound_buffer_location;

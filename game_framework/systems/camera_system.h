@@ -4,7 +4,6 @@
 #include "render_system.h"
 
 using namespace augs;
-using namespace entity_system;
 
 class camera_system : public processing_system_templated<components::transform, components::camera> {
 	augs::misc::timer smooth_timer;

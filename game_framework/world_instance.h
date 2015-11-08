@@ -7,8 +7,8 @@
 struct world_instance {
 	static augs::window::glwindow* global_window;
 	/* all systems */
-	augs::entity_system::world my_world;
-	augs::entity_system::world& get_world() { return my_world; }
+	augs::world my_world;
+	augs::world& get_world() { return my_world; }
 
 	world_instance();
 	~world_instance();

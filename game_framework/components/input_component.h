@@ -5,7 +5,7 @@
 #include "../messages/intent_message.h"
 
 namespace components {
-	struct input : public augs::entity_system::component {
+	struct input : public augs::component {
 		augs::misc::sorted_vector<unsigned> intents;
 
 		void add(messages::intent_message::intent_type _intent) {

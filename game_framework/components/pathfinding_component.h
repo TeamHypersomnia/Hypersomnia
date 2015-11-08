@@ -5,7 +5,7 @@
 #include "visibility_component.h"
 
 namespace components {
-	struct pathfinding : public augs::entity_system::component {
+	struct pathfinding : public augs::component {
 		typedef std::pair<vec2, vec2> edge;
 
 		pathfinding() : force_touch_sensors(false), enable_session_rollbacks(true), mark_touched_as_discovered(false), force_persistent_navpoints(false), favor_velocity_parallellness(false), enable_backtracking(true), target_offset(0.f), distance_navpoint_hit(0.f), is_exploring(false), rotate_navpoints(0.f) {}
@@ -34,7 +34,7 @@ namespace components {
 		bool enable_session_rollbacks;
 		bool mark_touched_as_discovered;
 
-		std::function<bool(augs::entity_system::entity_id, vec2, vec2)> 
+		std::function<bool(augs::entity_id, vec2, vec2)> 
 			first_priority_navpoint_check, target_visibility_condition;
 
 		vec2 eye_offset;

@@ -10,7 +10,7 @@
 class renderable;
 class gun_system;
 namespace components {
-	struct gun : public augs::entity_system::component {
+	struct gun : public augs::component {
 		enum state {
 			READY,
 			SWINGING,
@@ -64,17 +64,17 @@ namespace components {
 		void shake_camera(float direction);
 
 		struct uncopyable {
-			augs::entity_system::entity_id target_barrel_smoke_group;
+			augs::entity_id target_barrel_smoke_group;
 			uncopyable& operator=(const uncopyable& b) { return *this; }
 		} barrel_smoke;
 
-		augs::entity_system::entity_id& get_barrel_smoke() {
+		augs::entity_id& get_barrel_smoke() {
 			return barrel_smoke.target_barrel_smoke_group;
 		}
 
-		void transfer_barrel_smoke(augs::entity_system::entity_id another, bool overwrite_comps);
+		void transfer_barrel_smoke(augs::entity_id another, bool overwrite_comps);
 
-		augs::entity_system::entity_id target_camera_to_shake;
+		augs::entity_id target_camera_to_shake;
 
 		gun()
 			: max_rounds(0), bullets_once(0), spread_degrees(0.f), bullet_damage(std::make_pair(0.f, 0.f)), is_automatic(false),

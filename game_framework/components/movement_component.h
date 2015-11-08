@@ -5,15 +5,15 @@
 #include "math/vec2.h"
 
 namespace components {
-	struct movement : public augs::entity_system::component {
+	struct movement : public augs::component {
 		struct subscribtion {
-			augs::entity_system::entity_id target;
+			augs::entity_id target;
 			bool stop_at_zero_movement;
-			subscribtion(augs::entity_system::entity_id target, bool stop_at_zero_movement = true) :
+			subscribtion(augs::entity_id target, bool stop_at_zero_movement = true) :
 				target(target), stop_at_zero_movement(stop_at_zero_movement) {}
 		};
 
-		void add_animation_receiver(augs::entity_system::entity_id e, bool stop_at_zero_movement) {
+		void add_animation_receiver(augs::entity_id e, bool stop_at_zero_movement) {
 			animation_receivers.push_back(subscribtion(e, stop_at_zero_movement));
 		}
 

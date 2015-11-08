@@ -13,7 +13,7 @@ class physics_system;
 namespace components {
 	struct visibility;
 
-	struct steering : public augs::entity_system::component {
+	struct steering : public augs::component {
 		struct behaviour_state;
 
 		struct object_info {
@@ -31,7 +31,7 @@ namespace components {
 			visibility* vision;
 			std::vector<b2Vec2>* shape_verts;
 
-			augs::entity_system::entity_id subject_entity;
+			augs::entity_id subject_entity;
 			
 			scene();
 		};
@@ -161,7 +161,7 @@ namespace components {
 			*/
 
 			target_info target;
-			augs::entity_system::entity_id target_from;
+			augs::entity_id target_from;
 
 			vec2 last_output_force;
 			vec2 last_estimated_target_position;

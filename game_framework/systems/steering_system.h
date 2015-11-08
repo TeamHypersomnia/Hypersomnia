@@ -7,7 +7,7 @@
 #include "../components/visibility_component.h"
 
 using namespace augs;
-using namespace entity_system;
+
 
 class physics_system;
 

@@ -23,7 +23,7 @@
 #include <Box2D/Collision/Shapes/b2Shape.h>
 #include <memory>
 #include "entity_system/entity_id.h"
-typedef augs::entity_system::entity_id Userdata;
+typedef augs::entity_id Userdata;
 
 class b2Fixture;
 class b2Joint;

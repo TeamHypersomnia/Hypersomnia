@@ -7,7 +7,7 @@
 #include "misc/timer.h"
 
 using namespace augs;
-using namespace entity_system;
+
 
 class lookat_system : public processing_system_templated<components::transform, components::lookat> {
 	augs::misc::timer smooth_timer;

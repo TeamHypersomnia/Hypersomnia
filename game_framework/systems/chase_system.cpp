@@ -1,7 +1,7 @@
 #include "chase_system.h"
 #include "entity_system/entity.h"
 
-void components::chase::set_target(augs::entity_system::entity_id new_target) {
+void components::chase::set_target(augs::entity_id new_target) {
 	target_newly_set = true;
 	target = new_target;
 }

@@ -5,10 +5,10 @@
 
 namespace components {
 	/* synchronizes death of multiple entities */
-	struct children : public augs::entity_system::component {
-		std::vector<augs::entity_system::entity_id> children_entities;
+	struct children : public augs::component {
+		std::vector<augs::entity_id> children_entities;
 
-		void add(const augs::entity_system::entity_id& p) {
+		void add(const augs::entity_id& p) {
 			children_entities.push_back(p);
 		}
 	};

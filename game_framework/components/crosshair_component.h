@@ -5,7 +5,7 @@
 #include "misc/value_animator.h"
 
 namespace components {
-	struct crosshair : public augs::entity_system::component {
+	struct crosshair : public augs::component {
 		//augs::rects::ltrb bounds;
 		augs::misc::animation blink;
 		bool should_blink = true;

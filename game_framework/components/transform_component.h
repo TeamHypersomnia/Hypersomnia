@@ -4,7 +4,7 @@
 #include "math/vec2.h"
 
 namespace components {
-	struct transform : public augs::entity_system::component {
+	struct transform : public augs::component {
 		template <typename T = float>
 		struct state {
 			vec2t<T> pos;

@@ -76,12 +76,12 @@ void animation_system::consume_events(world& owner) {
 	}
 }
 
-void call(animation_callback func, augs::entity_system::entity_id subject) {
+void call(animation_callback func, augs::entity_id subject) {
 	if (func) 
 		func(subject);
 }
 
-void components::animate::set_current_frame(unsigned number, augs::entity_system::entity_id subject, bool do_callback) {
+void components::animate::set_current_frame(unsigned number, augs::entity_id subject, bool do_callback) {
 	if (saved_callback_out)
 		call(saved_callback_out, subject);
 	
@@ -98,7 +98,7 @@ void components::animate::set_current_frame(unsigned number, augs::entity_system
 		saved_callback_out = nullptr;
 }
 
-void components::animate::set_current_animation_set(resources::animate_info* set, augs::entity_system::entity_id subject) {
+void components::animate::set_current_animation_set(resources::animate_info* set, augs::entity_id subject) {
 	if (saved_callback_out) {
 		call(saved_callback_out, subject);
 	}

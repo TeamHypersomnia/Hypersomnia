@@ -214,7 +214,7 @@ physics_system::query_output physics_system::query_aabb(vec2 p1_meters, vec2 p2_
 	return out;
 }
 
-physics_system::query_output physics_system::query_body(augs::entity_system::entity_id subject, b2Filter* filter, entity_id ignore_entity) {
+physics_system::query_output physics_system::query_body(augs::entity_id subject, b2Filter* filter, entity_id ignore_entity) {
 	query_output total_output;
 	
 	for (b2Fixture* f = subject->get<components::physics>().body->GetFixtureList(); f != nullptr; f = f->GetNext()) {

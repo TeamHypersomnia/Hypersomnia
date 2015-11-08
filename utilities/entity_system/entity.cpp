@@ -4,65 +4,63 @@
 #include "component_bitset_matcher.h"
 
 namespace augs {
-	namespace entity_system {
-		entity::entity(world& owner_world) : owner_world(owner_world) {}
+	entity::entity(world& owner_world) : owner_world(owner_world) {}
 
-		entity::~entity() {
-			clear();
+	entity::~entity() {
+		clear();
+	}
+
+	component_bitset_matcher entity::get_component_signature() {
+		std::vector<unsigned> indices;
+
+		for (auto& raw : type_to_component.raw) {
+			int index = owner_world.component_library.get_index(raw.key);
+			indices.push_back(index);
 		}
 
-		component_bitset_matcher entity::get_component_signature() {
-			std::vector<unsigned> indices;
+		return indices;
+	}
 
-			for(auto& raw : type_to_component.raw) {
-				int index = owner_world.component_library.get_index(raw.key);
-				indices.push_back(index);
-			}
+	entity_id entity::get_id() {
+		return owner_world.get_id(this);
+	}
 
-			return indices;
-		}
+	void entity::clear() {
+		auto ids_to_remove = type_to_component.raw;
 
-		entity_id entity::get_id() {
-			return owner_world.get_id(this);
-		}
+		for (auto c : ids_to_remove)
+			remove(c.key);
+	}
 
-		void entity::clear() {
-			auto ids_to_remove = type_to_component.raw;
+	void entity::remove(size_t component_type_hash) {
+		component_bitset_matcher old_signature(get_component_signature());
 
-			for (auto c : ids_to_remove)
-				remove(c.key);
-		}
+		component_bitset_matcher new_signature(old_signature);
+		new_signature.remove(owner_world.component_library.get_index(component_type_hash));
 
-		void entity::remove(size_t component_type_hash) {
-			component_bitset_matcher old_signature(get_component_signature());
+		bool is_already_removed = old_signature == new_signature;
 
-			component_bitset_matcher new_signature(old_signature);
-			new_signature.remove(owner_world.component_library.get_index(component_type_hash));
+		if (is_already_removed)
+			return;
 
-			bool is_already_removed = old_signature == new_signature;
+		entity_id this_id = get_id();
 
-			if (is_already_removed)
-				return;
+		for (auto sys : owner_world.get_all_systems())
+			/* if a processing_system does not match with the new signature and does with the old one */
+			if (!sys->components_signature.matches(new_signature) && sys->components_signature.matches(old_signature))
+				/* we should remove this entity from there */
+				sys->remove(this_id);
 
-			entity_id this_id = get_id();
+		auto* component_ptr = type_to_component.get(component_type_hash);
 
-			for (auto sys : owner_world.get_all_systems())
-				/* if a processing_system does not match with the new signature and does with the old one */
-				if (!sys->components_signature.matches(new_signature) && sys->components_signature.matches(old_signature))
-					/* we should remove this entity from there */
-					sys->remove(this_id);
+		/* delete component from corresponding pool, first cast to component_type to avoid polymorphic indirection */
+		owner_world.get_components_by_hash(component_type_hash).free_with_destructor(*component_ptr, component_type_hash);
 
-			auto* component_ptr = type_to_component.get(component_type_hash);
-
-			/* delete component from corresponding pool, first cast to component_type to avoid polymorphic indirection */
-			owner_world.get_components_by_hash(component_type_hash).free_with_destructor(*component_ptr, component_type_hash);
-
-			/* delete component from entity's map */
-			type_to_component.remove(component_type_hash);
+		/* delete component from entity's map */
+		type_to_component.remove(component_type_hash);
 
 #ifdef INCLUDE_COMPONENT_NAMES
-			typestrs.remove(component_type_hash);
+		typestrs.remove(component_type_hash);
 #endif
-		}
 	}
 }

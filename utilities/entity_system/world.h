@@ -13,93 +13,91 @@
 #include "misc/unsafe_type_collection.h"
 
 namespace augs {
-	namespace entity_system {
-		class processing_system;
-		class world {
-			object_pool<entity> entities;
-			
-			unsafe_container_collection<std::vector> message_queues;
-			unsafe_container_collection<object_pool> component_containers;
+	class processing_system;
+	class world {
+		object_pool<entity> entities;
 
-			unsafe_type_collection all_systems_map;
+		unsafe_container_collection<std::vector> message_queues;
+		unsafe_container_collection<object_pool> component_containers;
 
-			std::vector<processing_system*> all_systems;
-		public:
-			type_hash_to_index_mapper component_library;
+		unsafe_type_collection all_systems_map;
 
-			world();
-			~world();
+		std::vector<processing_system*> all_systems;
+	public:
+		type_hash_to_index_mapper component_library;
 
-			template <class T>
-			void register_component() {
-				unsafe_type_collection::register_type<T>();
-				component_containers.register_destructor<T>();
-				component_containers.add<T>(20000);
-			}
+		world();
+		~world();
 
-			template <typename T>
-			void register_message_queue() {
-				message_queues.add<T>();
-				message_queues.register_destructor<T>();
-			}
+		template <class T>
+		void register_component() {
+			unsafe_type_collection::register_type<T>();
+			component_containers.register_destructor<T>();
+			component_containers.add<T>(20000);
+		}
 
-			template <class T, typename... Args>
-			void register_system(Args... args) {
-				if (all_systems_map.find<T>())
-					return;
+		template <typename T>
+		void register_message_queue() {
+			message_queues.add<T>();
+			message_queues.register_destructor<T>();
+		}
 
-				all_systems_map.add<T>(args...);
-				all_systems_map.register_type<T>();
+		template <class T, typename... Args>
+		void register_system(Args... args) {
+			if (all_systems_map.find<T>())
+				return;
 
-				T& new_system = all_systems_map.get<T>();
+			all_systems_map.add<T>(args...);
+			all_systems_map.register_type<T>();
 
-				all_systems.push_back(&new_system);
+			T& new_system = all_systems_map.get<T>();
 
-				component_library.add_hash_to_index_mappings(new_system.get_needed_components());
-				
-				new_system.components_signature = component_bitset_matcher(component_library.generate_indices(new_system.get_needed_components()));
-			}
+			all_systems.push_back(&new_system);
 
-			template <typename T>
-			void post_message(const T& message_object) {
-				return get_message_queue<T>().push_back(message_object);
-			}
+			component_library.add_hash_to_index_mappings(new_system.get_needed_components());
 
-			template<class T>
-			object_pool<T>& get_components_by_type() {
-				return component_containers.get<T>();
-			}
+			new_system.components_signature = component_bitset_matcher(component_library.generate_indices(new_system.get_needed_components()));
+		}
 
-			memory_pool& get_components_by_hash(size_t hash) {
-				return *((memory_pool*)component_containers.find(hash));
-			}
+		template <typename T>
+		void post_message(const T& message_object) {
+			return get_message_queue<T>().push_back(message_object);
+		}
 
-			template <typename T>
-			std::vector<T>& get_message_queue() {
-				return message_queues.get<T>();
-			}
+		template<class T>
+		object_pool<T>& get_components_by_type() {
+			return component_containers.get<T>();
+		}
 
-			template<class T>
-			T& get_system() {
-				return all_systems_map.get<T>();
-			}
+		memory_pool& get_components_by_hash(size_t hash) {
+			return *((memory_pool*)component_containers.find(hash));
+		}
 
-			std::vector<processing_system*>& get_all_systems() {
-				return all_systems;
-			}
+		template <typename T>
+		std::vector<T>& get_message_queue() {
+			return message_queues.get<T>();
+		}
 
-			entity_id create_entity_named(std::string name);
-			entity_id create_entity();
-			void delete_entity(entity_id);
+		template<class T>
+		T& get_system() {
+			return all_systems_map.get<T>();
+		}
 
-			entity_id get_id(entity*);
-			
-			void delete_all_entities();
+		std::vector<processing_system*>& get_all_systems() {
+			return all_systems;
+		}
 
-		private:
-			world& operator=(const world&) = delete;
-			world(const world&) = delete;
-			world(const world&&) = delete;
-		};
-	}
+		entity_id create_entity_named(std::string name);
+		entity_id create_entity();
+		void delete_entity(entity_id);
+
+		entity_id get_id(entity*);
+
+		void delete_all_entities();
+
+	private:
+		world& operator=(const world&) = delete;
+		world(const world&) = delete;
+		world(const world&&) = delete;
+	};
 }

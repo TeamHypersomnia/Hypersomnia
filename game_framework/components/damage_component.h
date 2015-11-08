@@ -7,9 +7,9 @@
 
 
 namespace components {
-	struct damage : public augs::entity_system::component {
+	struct damage : public augs::component {
 		float amount;
-		augs::entity_system::entity_id sender;
+		augs::entity_id sender;
 
 		/* used to destroy bullets */
 		vec2 starting_point;

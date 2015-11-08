@@ -16,7 +16,7 @@ namespace resources {
 
 namespace components {
 	/* hack - the only component that has logic */
-	struct particle_group : public augs::entity_system::component, public resources::renderable {
+	struct particle_group : public augs::component, public resources::renderable {
 		struct stream {
 			physics_system* optional_physics = nullptr;
 

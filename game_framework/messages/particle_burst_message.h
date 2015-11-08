@@ -31,7 +31,7 @@ namespace messages {
 			effect = *eff;
 		}
 
-		augs::entity_system::entity_id target_group_to_refresh;
+		augs::entity_id target_group_to_refresh;
 
 		bool local_transform = false;
 

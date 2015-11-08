@@ -5,7 +5,7 @@
 #include "../components/transform_component.h"
 
 using namespace augs;
-using namespace entity_system;
+
 
 class crosshair_system : public processing_system_templated<components::transform, components::crosshair> {
 public:
