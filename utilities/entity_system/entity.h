@@ -22,9 +22,9 @@ namespace augs {
 		~entity();
 
 		/* maps type hashes into components */
-		misc::sorted_vector_map<size_t, memory_pool::id> type_to_component;
+		sorted_associative_vector<size_t, memory_pool::id> type_to_component;
 #ifdef INCLUDE_COMPONENT_NAMES
-		misc::sorted_vector_map<size_t, std::string> typestrs;
+		sorted_associative_vector<size_t, std::string> typestrs;
 #endif
 		std::string name;
 

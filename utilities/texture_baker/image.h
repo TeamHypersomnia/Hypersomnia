@@ -41,19 +41,5 @@ namespace augs {
 
 			void destroy();
 		};
-
-		//class image_file : public image, public augs::misc::container::registry<image_file> {
-		//	const char* filename;
-		//	int force_channels;
-		//public:
-		//	bool opened, operator==(const image_file&);
-		//	image_file&  operator= (const image_file&); // set
-
-		//	image_file();
-		//	void open(const char* filename, unsigned force_channels = 0), destroy();
-		//	bool is_open();
-		//	
-		//	~image_file();
-		//};
 	}
 }

@@ -4,20 +4,18 @@
 #include "misc/timer.h"
 
 namespace augs {
-	namespace misc {
-		class smooth_value_field {
-		public:
-			vec2i discrete_value;
-			vec2 value;
+	class smooth_value_field {
+	public:
+		vec2i discrete_value;
+		vec2 value;
 
-			vec2 target_value;
+		vec2 target_value;
 
-			double averages_per_sec = 20.0;
-			double smoothing_average_factor = 0.5;
+		double averages_per_sec = 20.0;
+		double smoothing_average_factor = 0.5;
 
-			augs::timer delta_timer;
+		augs::timer delta_timer;
 
-			void tick();
-		};
-	}
+		void tick();
+	};
 }

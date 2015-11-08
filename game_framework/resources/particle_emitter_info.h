@@ -64,7 +64,7 @@ namespace resources {
 	};
 
 	typedef std::vector<emission> particle_effect;
-	typedef augs::misc::map_wrapper <
+	typedef augs::map_wrapper <
 		int, particle_effect
 	> particle_emitter_info;
 }

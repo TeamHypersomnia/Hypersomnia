@@ -6,7 +6,7 @@
 
 namespace components {
 	struct input : public augs::component {
-		augs::misc::sorted_vector<unsigned> intents;
+		augs::sorted_vector<unsigned> intents;
 
 		void add(messages::intent_message::intent_type _intent) {
 			intents.add(_intent);

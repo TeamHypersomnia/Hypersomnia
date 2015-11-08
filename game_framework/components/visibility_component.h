@@ -75,7 +75,7 @@ namespace components {
 			CONTAINMENT
 		};
 
-		augs::misc::sorted_vector_map<int, layer> visibility_layers;
+		augs::sorted_associative_vector<int, layer> visibility_layers;
 
 		void add_layer(int key, const layer& val) {
 			visibility_layers.add(key, val);

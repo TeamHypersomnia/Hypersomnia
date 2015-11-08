@@ -92,7 +92,7 @@ static luabind::scope bind_stdvector(const char* name) {
 
 template<class key, class value>
 static luabind::scope bind_map_wrapper(const char* name) {
-	typedef augs::misc::map_wrapper<key, value> V;
+	typedef augs::map_wrapper<key, value> V;
 
 	return
 		luabind::class_<V::find_result>((std::string(name) + std::string("find_result")).c_str())

@@ -452,7 +452,7 @@ void physics_system::clear() {
 }
 
 void physics_system::configure_stepping(float fps, int max_updates_per_step) {
-	accumulator = augs::misc::delta_accumulator(fps, max_updates_per_step);
+	accumulator = augs::delta_accumulator(fps, max_updates_per_step);
 }
 
 double physics_system::get_timestep_ms() {

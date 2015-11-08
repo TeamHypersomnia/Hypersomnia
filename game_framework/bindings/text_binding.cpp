@@ -16,7 +16,7 @@ wchar_t towchar(const std::wstring& s) {
 	return s[0];
 }
 
-std::string wchar_vec_to_str(misc::vector_wrapper<wchar_t> str) {
+std::string wchar_vec_to_str(vector_wrapper<wchar_t> str) {
 	auto out_w = std::wstring(str.raw.begin(), str.raw.end());
 
 	return std::string(out_w.begin(), out_w.end());

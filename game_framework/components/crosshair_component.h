@@ -7,7 +7,7 @@
 namespace components {
 	struct crosshair : public augs::component {
 		//augs::rects::ltrb bounds;
-		augs::misc::animation blink;
+		augs::value_animation blink;
 		bool should_blink = true;
 
 		float rotation_offset = 0.f;
@@ -15,8 +15,8 @@ namespace components {
 		vec2 sensitivity = vec2(1.0f, 1.0f);
 
 		crosshair() {
-			blink.animators.push_back(augs::misc::animator(0.8f, 1.f, 200, augs::misc::animator::QUADRATIC));
-			blink.animators.push_back(augs::misc::animator(1.f, 0.8f, 200, augs::misc::animator::QUADRATIC));
+			blink.animators.push_back(augs::value_animator(0.8f, 1.f, 200, augs::value_animator::QUADRATIC));
+			blink.animators.push_back(augs::value_animator(1.f, 0.8f, 200, augs::value_animator::QUADRATIC));
 		}
 	};
 }

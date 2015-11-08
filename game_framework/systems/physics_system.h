@@ -12,7 +12,7 @@ using namespace augs;
 
 
 class physics_system : public processing_system_templated<components::physics, components::transform> {
-	misc::delta_accumulator accumulator;
+	delta_accumulator accumulator;
 
 	void reset_states();
 	void smooth_states();
