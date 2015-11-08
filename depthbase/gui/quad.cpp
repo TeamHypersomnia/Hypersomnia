@@ -18,7 +18,7 @@ namespace augs {
 			//	}
 			//}
 
-			material::material(augs::texture_baker::texture* tex, const pixel_32& color) : tex(tex), color(color) {}
+			material::material(augs::texture* tex, const pixel_32& color) : tex(tex), color(color) {}
 
 			material::material(const pixel_32& color) : tex(gui::null_texture), color(color) {}
 

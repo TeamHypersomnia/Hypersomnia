@@ -140,7 +140,7 @@ void render_system::fullscreen_quad() {
 	glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(resources::vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr
 }
 
-void render_system::draw_debug_info(vec2 visible_area, components::transform::state<> camera_transform, augs::texture_baker::texture* tex) {
+void render_system::draw_debug_info(vec2 visible_area, components::transform::state<> camera_transform, augs::texture* tex) {
 	vec2 center = visible_area / 2;
 
 	if (draw_visibility) {

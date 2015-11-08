@@ -6,12 +6,12 @@
 namespace augs {
 	namespace graphics {
 		namespace gui {
-			extern augs::texture_baker::texture* null_texture;
+			extern augs::texture* null_texture;
 
 			struct material {
-				augs::texture_baker::texture* tex;
+				augs::texture* tex;
 				pixel_32 color;
-				material(augs::texture_baker::texture* = null_texture, const pixel_32& = pixel_32()); 
+				material(augs::texture* = null_texture, const pixel_32& = pixel_32()); 
 				material(const pixel_32&); 
 			};
 

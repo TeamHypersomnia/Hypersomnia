@@ -5,7 +5,6 @@
 
 namespace augs {
 	namespace graphics {
-	using namespace augs::texture_baker;
 		namespace gui {
 			namespace controls {
 				textbox::textbox(const rect& r, text::style default_style) 

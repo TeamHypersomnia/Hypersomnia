@@ -39,12 +39,12 @@ namespace augs {
 
 				struct style {
 					attribute<pixel_32> color;
-					attribute<augs::texture_baker::texture*> background_image;
+					attribute<augs::texture*> background_image;
 					attribute<solid_stroke> border;
 
 					style();
 					style(const attribute<pixel_32>& color, 
-						const attribute<augs::texture_baker::texture*>& background_image, 
+						const attribute<augs::texture*>& background_image, 
 						const attribute<solid_stroke>& border);
 
 					operator material() const;

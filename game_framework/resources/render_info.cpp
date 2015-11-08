@@ -84,11 +84,11 @@ namespace resources {
 		return std::vector<vec2>();
 	}
 
-	sprite::sprite(texture_baker::texture* tex, graphics::pixel_32 color) : tex(tex), color(color), rotation_offset(0.f) {
+	sprite::sprite(texture* tex, graphics::pixel_32 color) : tex(tex), color(color), rotation_offset(0.f) {
 		set(tex, color);
 	}
 
-	void sprite::set(texture_baker::texture* _tex, graphics::pixel_32 _color) {
+	void sprite::set(texture* _tex, graphics::pixel_32 _color) {
 		tex = _tex;
 		color = _color;
 
@@ -341,7 +341,7 @@ namespace resources {
 	}
 
 	tile_layer::tile::tile(unsigned type) : type_id(type) {}
-	tileset::tile_type::tile_type(texture_baker::texture* tile_texture) : tile_texture(tile_texture) {
+	tileset::tile_type::tile_type(texture* tile_texture) : tile_texture(tile_texture) {
 
 	}
 

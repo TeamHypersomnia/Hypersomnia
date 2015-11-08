@@ -21,11 +21,11 @@ namespace augs {
 						bool wrapped;
 						line();
 						void set(int y, int asc, int desc);
-						void adjust(augs::texture_baker::font*);
+						void adjust(augs::font*);
 						bool empty() const;
 					};
 
-					std::vector<augs::texture_baker::font::glyph*> cached;
+					std::vector<augs::font::glyph*> cached;
 					std::vector<line> lines;
 					std::vector<int> sectors;
 
@@ -40,8 +40,8 @@ namespace augs {
 					wchar_t password_character;
 					
 					/* default glyph placed instead null characters */
-					augs::texture_baker::font_file::glyph default_info;
-					augs::texture_baker::font::glyph default_glyph;
+					augs::font_file::glyph default_info;
+					augs::font::glyph default_glyph;
 
 					drafter();
 
@@ -67,8 +67,8 @@ namespace augs {
 					unsigned max_x;
 					void find_ascdesc(const fstr& source, int i, int j, int&, int&) const;
 					int get_kern(const fstr& source, unsigned code1, unsigned code2) const;
-					const augs::texture_baker::font::glyph& get_cached(int i) const;
-					augs::texture_baker::font* getf(const fstr& source, unsigned i) const;
+					const augs::font::glyph& get_cached(int i) const;
+					augs::font* getf(const fstr& source, unsigned i) const;
 				};
 			}
 		}

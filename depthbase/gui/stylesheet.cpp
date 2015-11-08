@@ -10,7 +10,7 @@ namespace augs {
 			}
 
 			stylesheet::style::style(const attribute<pixel_32>& c, 
-				const attribute<augs::texture_baker::texture*>& b, 
+				const attribute<augs::texture*>& b, 
 				const attribute<solid_stroke>& br) 
 				: color(c), background_image(b), border(br) {
 					color.active = background_image.active = border.active = true;

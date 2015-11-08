@@ -48,14 +48,14 @@ namespace resources {
 	extern void map_texture_to_polygon(renderable* poly, helpers::texture_helper*, unsigned uv_mapping_mode);
 
 	struct sprite : public renderable {
-		texture_baker::texture* tex;
+		texture* tex;
 		graphics::pixel_32 color;
 		vec2 size;
 		float rotation_offset;
 
-		sprite(texture_baker::texture* = nullptr, graphics::pixel_32 = graphics::pixel_32());
+		sprite(texture* = nullptr, graphics::pixel_32 = graphics::pixel_32());
 
-		void set(texture_baker::texture*, graphics::pixel_32);
+		void set(texture*, graphics::pixel_32);
 		void update_size();
 
 		virtual void draw(draw_input&) override;
@@ -64,8 +64,8 @@ namespace resources {
 
 	struct tileset {
 		struct tile_type {
-			texture_baker::texture* tile_texture;
-			tile_type(texture_baker::texture* = nullptr);
+			texture* tile_texture;
+			tile_type(texture* = nullptr);
 		};
 		
 		std::vector<tile_type> tile_types;

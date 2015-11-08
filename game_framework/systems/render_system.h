@@ -38,7 +38,7 @@ public:
 	resources::vertex_triangle& get_triangle(int i);
 
 	void fullscreen_quad();
-	void draw_debug_info(vec2 visible_area, components::transform::state<>, augs::texture_baker::texture* tex);
+	void draw_debug_info(vec2 visible_area, components::transform::state<>, augs::texture* tex);
 
 	struct debug_line {
 		debug_line(vec2 a, vec2 b, augs::graphics::pixel_32 col = augs::graphics::pixel_32(255, 255, 255, 255)) : col(col), a(a), b(b) {}

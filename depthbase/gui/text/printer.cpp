@@ -13,7 +13,6 @@
 
 namespace augs {
 	namespace graphics {
-		using namespace augs::texture_baker;
 		namespace gui {
 			namespace text {
 				printer::printer() :

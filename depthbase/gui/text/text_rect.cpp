@@ -2,7 +2,6 @@
 
 namespace augs {
 	namespace graphics {
-		using namespace augs::texture_baker;
 		namespace gui {
 			namespace text {
 				text_rect::text_rect(const rect& r, const fstr& _str) : rect(r), draft(_str) {

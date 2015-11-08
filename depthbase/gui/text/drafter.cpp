@@ -8,7 +8,6 @@
 #undef max
 namespace augs {
 	namespace graphics {
-		using namespace augs::texture_baker;
 		namespace gui {
 			namespace text {
 				bool drafter::is_newline(unsigned i) {

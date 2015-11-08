@@ -36,7 +36,7 @@ namespace bindings {
 			
 
 			luabind::class_<tileset::tile_type>("tile_type")
-			.def(luabind::constructor<texture_baker::texture*>())
+			.def(luabind::constructor<texture*>())
 			.def_readwrite("tile_texture", &tileset::tile_type::tile_texture),
 
 			bind_stdvector<tileset::tile_type>("tile_type_vector"),
