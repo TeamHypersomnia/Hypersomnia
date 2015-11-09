@@ -38,7 +38,7 @@ void damage_system::process_events(world& owner) {
 
 void damage_system::process_entities(world& owner) {
 	for (auto it : targets) {
-		auto& transform = it->get<components::transform>().current;
+		auto& transform = it->get<components::transform>();
 		auto& damage = it->get<components::damage>();
 	
 		if ((damage.max_lifetime_ms >= 0.f && damage.lifetime.get<std::chrono::milliseconds>() >= damage.max_lifetime_ms)

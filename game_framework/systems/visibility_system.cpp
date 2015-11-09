@@ -108,7 +108,7 @@ void visibility_system::process_entities(world& owner) {
 		}
 		visibility.interval_timer.reset();
 
-		auto& transform = it->get<components::transform>().current;
+		auto& transform = it->get<components::transform>();
 
 		/* for every visibility type requested for given entity */
 		for (auto& entry : visibility.visibility_layers.raw) {

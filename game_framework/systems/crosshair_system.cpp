@@ -17,7 +17,7 @@ void crosshair_system::consume_events(world& owner) {
 			if (!transform || !crosshair) continue;
 
 			/* move crosshair according to its sensitivity and relative mouse movement (easier to support multiple resolutions) */
-			transform->current.pos += vec2(it.mouse_rel * crosshair->sensitivity).rotate(crosshair->rotation_offset, vec2());
+			transform->pos += vec2(it.mouse_rel * crosshair->sensitivity).rotate(crosshair->rotation_offset, vec2());
 
 			//if (it.mouse_rel.non_zero()) {
 			//	/* align the crosshair to bounds rect */

@@ -1,5 +1,7 @@
 #pragma once
 #include "entity_system/component.h"
+#include "transform_component.h"
+
 #include "math/vec2.h"
 
 namespace resources {
@@ -11,6 +13,8 @@ namespace components {
 		resources::renderable* model = nullptr;
 		vec2 last_screen_pos;
 		bool was_drawn = false;
+
+		transform previous_transform;
 
 		enum mask_type {
 			WORLD,

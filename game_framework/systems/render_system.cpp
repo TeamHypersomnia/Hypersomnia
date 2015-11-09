@@ -68,10 +68,10 @@ void render_system::draw_layer(resources::renderable::draw_input& in, int layer)
 			auto& render = e->get<components::render>();
 			if (render.model == nullptr) continue;
 
-			in.transform = e->get<components::transform>().current;
+			in.transform = e->get<components::transform>();
 			in.additional_info = &render;
 
-			in.camera_transform = render.absolute_transform ? components::transform::state<>() : in_camera_transform;
+			in.camera_transform = render.absolute_transform ? components::transform() : in_camera_transform;
 			in.always_visible = render.absolute_transform ? true : in_always_visible;
 
 			render.model->draw(in);
@@ -140,7 +140,7 @@ void render_system::fullscreen_quad() {
 	glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(augs::vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr
 }
 
-void render_system::draw_debug_info(vec2 visible_area, components::transform::state<> camera_transform, augs::texture* tex) {
+void render_system::draw_debug_info(vec2 visible_area, components::transform camera_transform, augs::texture* tex) {
 	vec2 center = visible_area / 2;
 
 	if (draw_visibility) {
@@ -154,7 +154,7 @@ void render_system::draw_debug_info(vec2 visible_area, components::transform::st
 
 
 					glVertexAttrib4f(VERTEX_ATTRIBUTES::COLOR, request.color.r / 255.f, request.color.g / 255.f, request.color.b / 255.f, request.color.a / 2 / 255.f); glerr
-					auto origin = it->get<components::transform>().current.pos;
+					auto origin = it->get<components::transform>().pos;
 
 					for (int i = 0; i < request.get_num_triangles(); ++i) {
 						auto& tri = request.get_triangle(i, origin);

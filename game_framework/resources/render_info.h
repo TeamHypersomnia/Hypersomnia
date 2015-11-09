@@ -22,7 +22,7 @@ namespace resources {
 	struct renderable {
 		struct draw_input {
 			render_system* output;
-			components::transform::state<> transform, camera_transform;
+			components::transform transform, camera_transform;
 			components::render* additional_info;
 			vec2 visible_area;
 			bool always_visible;
@@ -99,8 +99,8 @@ namespace resources {
 	//	vertex vertices[3];
 	//	triangle(const vertex&, const vertex&, const vertex&);
 	//
-	//	virtual void draw(buffer&, const components::transform::state&, vec2 camera_pos) override;
-	//	virtual bool is_visible(rects::xywh visibility_aabb, const components::transform::state&) override;
+	//	virtual void draw(buffer&, const components::transform&, vec2 camera_pos) override;
+	//	virtual bool is_visible(rects::xywh visibility_aabb, const components::transform&) override;
 	//};
 
 	typedef std::vector<vec2> basic_polygon;

@@ -66,9 +66,9 @@ void steering::target_info::set(entity_id t) {
 	auto physics_comp = t->find<physics>();
 	
 	if (physics_comp)
-		set(t->get<transform>().current.pos, vec2(physics_comp->body->GetLinearVelocity())*METERS_TO_PIXELSf);
+		set(t->get<transform>().pos, vec2(physics_comp->body->GetLinearVelocity())*METERS_TO_PIXELSf);
 	else 
-		set(t->get<transform>().current.pos);
+		set(t->get<transform>().pos);
 }
 
 void steering::target_info::calc_direction_distance(const object_info& in) {
@@ -598,7 +598,7 @@ void steering_system::substep(world& owner) {
 
 	for (auto it : targets) {
 		auto& steer = it->get<steering>();
-		auto& position = it->get<transform>().current.pos;
+		auto& position = it->get<transform>().pos;
 		auto body = it->get<physics>().body;
 
 		/* extract ALL the vertices from the physics body, it will be then used by obstacle avoidance routines to calculate avoidance quad,

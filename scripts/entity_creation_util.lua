@@ -27,13 +27,6 @@ function set_components_from_entry(entity, entry, entities_lookup)
 		entity.script = entry.script
 	end
 	
-	
-	if entry.transform ~= nil then
-		local transform = entity:add(transform_component())
-		if entry.transform.pos ~= nil then transform.current.pos = entry.transform.pos end
-		if entry.transform.rotation ~= nil then transform.current.rotation = entry.transform.rotation end
-	end	
-	
 	if entry.children ~= nil then
 		local children = entity:add(children_component())
 		
@@ -92,6 +85,7 @@ function set_components_from_entry(entity, entry, entities_lookup)
 		end
 	end
 	
+	def		(transform_component, 'transform')
 	def		(render_component, 'render')
 	def		(animate_component, 'animate')
 	def_ptr	(camera_component, 'camera', { crosshair = true, player = true})
@@ -185,7 +179,7 @@ component_helpers.parallax_chase = function(_scrolling_speed, init_pos, camera_e
 	return {
 			scrolling_speed = _scrolling_speed,
 			reference_position = init_pos,
-			target_reference_position = camera_entity.transform.current.pos,
+			target_reference_position = camera_entity.transform.pos,
 			
 			chase_type = chase_component.PARALLAX,
 			target = camera_entity,

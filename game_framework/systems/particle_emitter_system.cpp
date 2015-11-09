@@ -89,8 +89,8 @@ void particle_emitter_system::consume_events(world& owner) {
 		}
 
 		if (it.local_transform && it.subject.alive()) {
-			it.pos += it.subject->get<components::transform>().current.pos;
-			it.rotation += it.subject->get<components::transform>().current.rotation;
+			it.pos += it.subject->get<components::transform>().pos;
+			it.rotation += it.subject->get<components::transform>().rotation;
 		}
 
 		std::vector<resources::emission*> only_streams;
@@ -181,7 +181,7 @@ void particle_emitter_system::consume_events(world& owner) {
 			target_render->model = target_group;
 
 			if (target_chase) {
-				auto& subject_transform = it.subject->get<components::transform>().current;
+				auto& subject_transform = it.subject->get<components::transform>();
 				*target_chase = components::chase(it.subject);
 				target_chase->chase_type = components::chase::chase_type::ORBIT;
 				target_chase->rotation_offset = target_rotation - subject_transform.rotation;

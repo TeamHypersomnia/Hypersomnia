@@ -30,5 +30,4 @@ namespace framework {
 		gl.set_show(gl.SHOW);
 		gl.current();
 	}
-
 }

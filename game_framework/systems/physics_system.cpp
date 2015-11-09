@@ -462,22 +462,25 @@ double physics_system::get_timestep_ms() {
 void physics_system::remove(entity_id e) {
 	b2world.DestroyBody(e->get<components::physics>().body);
 }
-
+#include "../components/render_component.h"
 void physics_system::reset_states() {
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
 		auto& transform = static_cast<entity_id>(b->GetUserData())->get<components::transform>();
 		auto& physics = static_cast<entity_id>(b->GetUserData())->get<components::physics>();
 		
-		transform.current.pos = b->GetPosition();
-		transform.current.pos *= METERS_TO_PIXELSf;
+		transform.pos = b->GetPosition();
+		transform.pos *= METERS_TO_PIXELSf;
 		
 		if (!b->IsFixedRotation()) {
-			transform.current.rotation = b->GetAngle();
-			transform.current.rotation *= 180.0f / 3.141592653589793238462f;
+			transform.rotation = b->GetAngle();
+			transform.rotation *= 180.0f / 3.141592653589793238462f;
 		}
 		
-		transform.previous = transform.current;
+		auto* render = static_cast<entity_id>(b->GetUserData())->find<components::render>();
+
+		if(render)
+			render->previous_transform = transform;
 	}
 }
 
@@ -488,10 +491,14 @@ void physics_system::smooth_states() {
 		if (b->GetType() == b2_staticBody) continue;
  
 		auto& transform = static_cast<entity_id>(b->GetUserData())->get<components::transform>();
+		auto* render = static_cast<entity_id>(b->GetUserData())->find<components::render>();
 
-		transform.current.pos = transform.previous.pos + ratio * (METERS_TO_PIXELSf*b->GetPosition() - transform.previous.pos);
-		
-		if (!b->IsFixedRotation())
-			transform.current.rotation = static_cast<float>(transform.previous.rotation + ratio * (b->GetAngle()*180.0/3.141592653589793238462 - transform.previous.rotation));
+		if (render)
+		{
+			transform.pos = render->previous_transform.pos + ratio * (METERS_TO_PIXELSf*b->GetPosition() - render->previous_transform.pos);
+			
+			if (!b->IsFixedRotation())
+				transform.rotation = static_cast<float>(render->previous_transform.rotation + ratio * (b->GetAngle()*180.0/3.141592653589793238462 - render->previous_transform.rotation));
+		}
 	}
 }

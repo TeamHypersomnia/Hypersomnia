@@ -13,35 +13,36 @@ namespace components {
 			OFFSET,
 			ORBIT,
 			PARALLAX
-		} chase_type;
+		} chase_type = chase_type::OFFSET;
 
-		vec2 offset, rotation_orbit_offset;
+		vec2 offset;
+		vec2 rotation_orbit_offset;
 		
-		vec2 reference_position, target_reference_position;
-		float scrolling_speed;
+		vec2 reference_position;
+		vec2 target_reference_position;
+		
+		float scrolling_speed = 1.0f;
 
-		float rotation_offset;
-		float rotation_multiplier;
+		float rotation_offset = 0.0f;
+		float rotation_multiplier = 1.0f;
 
-		bool relative;
-		bool chase_rotation;
-		bool track_origin;
+		bool relative = false;
+		bool chase_rotation = false;
+		bool track_origin = false;
 
-		bool target_newly_set;
-		bool subscribe_to_previous;
+		bool target_newly_set = true;
+		bool subscribe_to_previous = false;
 
-		chase(augs::entity_id target = augs::entity_id(), bool relative = false, vec2 offset = vec2())
-			: scrolling_speed(1.f), subscribe_to_previous(false), rotation_multiplier(1.f), target_newly_set(true), chase_type(chase_type::OFFSET), target(target), offset(offset), relative(relative), chase_rotation(false), track_origin(false), rotation_offset(0.f), rotation_orbit_offset(0.f), rotation_previous(0.f)
-		{
-			set_target(target); 
+		chase(augs::entity_id id = augs::entity_id()) {
+			set_target(id);
 		}
-		
+
 		void set_target(augs::entity_id);
 
 	private:
 		friend class chase_system;
 
 		vec2 previous;
-		float rotation_previous;
+		float rotation_previous = 0.0f;
 	};
 }

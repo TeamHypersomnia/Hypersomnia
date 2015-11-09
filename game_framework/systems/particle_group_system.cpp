@@ -23,7 +23,7 @@ void particle_group_system::process_entities(world& owner) {
 
 	for (auto it : targets) {
 		auto& group = it->get<components::particle_group>();
-		auto& transform = it->get<components::transform>().current;
+		auto& transform = it->get<components::transform>();
 
 		bool should_destroy = true;
 
@@ -56,10 +56,10 @@ void particle_group_system::process_entities(world& owner) {
 						float t = (static_cast<float>(i) / to_spawn);
 						float time_elapsed = (1.f - t) * delta;
 
-						components::transform current_transform(lerp(group.previous_transform.current.pos, transform.pos, vec2(t, t)),
-							lerp(group.previous_transform.current.rotation, transform.rotation, t));
+						components::transform current_transform(lerp(group.previous_transform.pos, transform.pos, vec2(t, t)),
+							lerp(group.previous_transform.rotation, transform.rotation, t));
 
-						particle_emitter_system::spawn_particle(stream_slot, current_transform.current.pos, current_transform.current.rotation +
+						particle_emitter_system::spawn_particle(stream_slot, current_transform.pos, current_transform.rotation +
 							stream_slot.swing_spread * sin((stream_slot.stream_lifetime_ms / 1000.f) * 2 * 3.1415926535897932384626433832795f * stream_slot.swings_per_sec)
 							, stream_slot.target_spread, stream_info);
 

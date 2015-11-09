@@ -27,7 +27,7 @@ void pathfinding_system::process_entities(world& owner) {
 		/* get necessary components */
 		auto& visibility = it->get<components::visibility>();
 		auto& pathfinding = it->get<components::pathfinding>();
-		auto transform = it->get<components::transform>().current;
+		auto transform = it->get<components::transform>();
 		auto body = it->get<components::physics>().body;
 		transform.pos += pathfinding.eye_offset;
 

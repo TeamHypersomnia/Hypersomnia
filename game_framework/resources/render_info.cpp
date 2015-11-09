@@ -184,7 +184,7 @@ namespace resources {
 	//	vertices[2] = c;
 	//}
 	//
-	//void triangle::draw(buffer& triangles, const components::transform::state& transform, vec2 camera_pos) {
+	//void triangle::draw(buffer& triangles, const components::transform& transform, vec2 camera_pos) {
 	//
 	//}
 
@@ -429,7 +429,7 @@ namespace components {
 					}
 				}
 
-				in.transform = it.ignore_rotation ? components::transform::state<>(it.pos, 0) : components::transform::state<>(it.pos, it.rotation);
+				in.transform = it.ignore_rotation ? components::transform(it.pos, 0) : components::transform({ it.pos, it.rotation });
 				it.face.draw(in);
 				it.face.color.a = temp_alpha;
 			}

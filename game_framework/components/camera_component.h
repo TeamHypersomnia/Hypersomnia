@@ -35,7 +35,8 @@ namespace components {
 		float smoothing_average_factor = 0.004f;
 		float averages_per_sec = 60.0f;
 
-		components::transform::state<> last_interpolant;
+		components::transform last_interpolant;
+		components::transform previously_drawn_at;
 
 		vec2 rendered_size;
 

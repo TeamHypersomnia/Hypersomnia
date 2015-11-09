@@ -84,8 +84,9 @@ namespace helpers {
 	void create_physics_component(const physics_info& body_data, augs::entity_id subject, int body_type) {
 		physics_system& physics = subject->owner_world.get_system<physics_system>();
 
-		auto& transform = subject->get<components::transform>().current;
-		subject->get<components::transform>().previous = subject->get<components::transform>().current;
+		auto& transform = subject->get<components::transform>();
+		if(subject->find<components::render>())
+			subject->get<components::render>().previous_transform = subject->get<components::transform>();
 
 		b2BodyDef def;
 		def.type = b2BodyType(body_type);

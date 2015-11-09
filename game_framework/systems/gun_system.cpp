@@ -94,7 +94,7 @@ void gun_system::process_entities(world& owner) {
 	auto& render = owner.get_system<render_system>();
 
 	for (auto it : targets) {
-		const auto& gun_transform = it->get<components::transform>().current;
+		const auto& gun_transform = it->get<components::transform>();
 		auto& gun = it->get<components::gun>();
 
 		/* lambdas to simplify notation */
@@ -227,7 +227,7 @@ void gun_system::process_entities(world& owner) {
 
 			for (auto hit_body : hit_bodies) {
 				auto target_entity = hit_body->GetUserData();
-				auto target_transform = target_entity->get<components::transform>().current;
+				auto target_transform = target_entity->get<components::transform>();
 				auto ray_output = physics_sys.ray_cast_px(gun_transform.pos, target_transform.pos, gun.melee_obstruction_filter, it);
 
 
