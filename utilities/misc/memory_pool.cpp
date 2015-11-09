@@ -142,6 +142,7 @@ namespace augs {
 	}
 
 	memory_pool::id memory_pool::allocate_with_default_construct(size_t type_hash) {
+		// TODO typed memory allocation but only if needed
 		assert(0);
 		return memory_pool::id();
 	}

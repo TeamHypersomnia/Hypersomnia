@@ -2468,9 +2468,6 @@
     <ClInclude Include="game_framework\bindings\bindings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\components\all_components.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\components\animate_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>

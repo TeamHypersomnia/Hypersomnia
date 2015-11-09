@@ -27,8 +27,6 @@
 #include "messages/damage_message.h"
 #include "messages/shot_message.h"
 
-#include "game_framework/components/all_components.h"
-
 using namespace messages;
 
 augs::window::glwindow* world_instance::global_window = nullptr;
@@ -39,7 +37,26 @@ world_instance::~world_instance() {
 }
 
 world_instance::world_instance() {
-	ALL_COMPONENTS(REGISTER_COMPONENT_TYPE, my_world);
+	my_world.register_component<components::animate>();
+	my_world.register_component<components::behaviour_tree>();
+	my_world.register_component<components::camera>();
+	my_world.register_component<components::chase>();
+	my_world.register_component<components::children>();
+	my_world.register_component<components::crosshair>();
+	my_world.register_component<components::damage>();
+	my_world.register_component<components::gun>();
+	my_world.register_component<components::input>();
+	my_world.register_component<components::lookat>();
+	my_world.register_component<components::movement>();
+	my_world.register_component<components::particle_emitter>();
+	my_world.register_component<components::particle_group>();
+	my_world.register_component<components::pathfinding>();
+	my_world.register_component<components::physics>();
+	my_world.register_component<components::render>();
+	my_world.register_component<components::steering>();
+	my_world.register_component<components::transform>();
+	my_world.register_component<components::visibility>();
+
 
 	my_world.register_system<input_system>(std::ref(*global_window));
 	my_world.register_system<steering_system>();

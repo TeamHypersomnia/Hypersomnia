@@ -100,7 +100,7 @@ void set_meters_to_pixels(double val) {
 	PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 }
 
-void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
+void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper, std::function<void()> custom_world_binding) {
 	using namespace resources;
 	using namespace helpers;
 
@@ -115,7 +115,6 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 
 			bindings::_id_generator(),
 			bindings::_minmax(),
-			bindings::_vec2(),
 			bind_stdvector<vec2>("vec2_vector"),
 			bind_vector_wrapper<int>("int_vector"),
 			bindings::_value_animator(),
@@ -132,7 +131,6 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 			bindings::_sprite(),
 			bindings::_polygon(),
 
-			bindings::_timer(),
 
 			bindings::_network_binding(),
 
@@ -196,7 +194,9 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper) {
 
 			bindings::_text(),
 
-			bindings::_utilities()
+			bindings::_timer(),
+			bindings::_utilities(),
+			bindings::_vec2()
 	];
 
 	wrapper.global("THIS_LUA_STATE", wrapper);

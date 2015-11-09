@@ -1119,7 +1119,6 @@
     <ClInclude Include="depthbase\gui\text\word_separator.h" />
     <ClInclude Include="game_framework\bindings\bindings.h" />
     <ClInclude Include="game_framework\bindings\bind_callbacks.h" />
-    <ClInclude Include="game_framework\components\all_components.h" />
     <ClInclude Include="game_framework\components\animate_component.h" />
     <ClInclude Include="game_framework\components\behaviour_tree_component.h" />
     <ClInclude Include="game_framework\components\camera_component.h" />

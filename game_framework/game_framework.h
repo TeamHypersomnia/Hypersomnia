@@ -10,5 +10,5 @@ namespace framework {
 	extern void deinit();
 	extern void run_tests();
 	extern void set_current_window(augs::window::glwindow&);
-	extern void bind_whole_engine(augs::lua_state_wrapper&);
+	extern void bind_whole_engine(augs::lua_state_wrapper&, std::function<void()> custom_world_binding = std::function<void()>());
 }

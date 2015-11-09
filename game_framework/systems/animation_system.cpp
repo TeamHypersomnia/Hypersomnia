@@ -77,8 +77,9 @@ void animation_system::consume_events(world& owner) {
 }
 
 void call(animation_callback func, augs::entity_id subject) {
-	if (func) 
-		func(subject);
+	// HACK uncomment this when bugs are fixed
+	//if (func) 
+	//	func(subject);
 }
 
 void components::animate::set_current_frame(unsigned number, augs::entity_id subject, bool do_callback) {
