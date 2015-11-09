@@ -28,11 +28,14 @@ local player_movement_component = {
 	}
 }
 
+local simulation_player_movement_component = clone_table(player_movement_component)
+simulation_player_movement_component.receivers = {}
+
 function create_simulation_player(owner_world)
 	return owner_world:create_entity {
 		transform = {},
 		physics = player_physics_component,
-		movement = player_movement_component
+		movement = simulation_player_movement_component
 	}
 end
 

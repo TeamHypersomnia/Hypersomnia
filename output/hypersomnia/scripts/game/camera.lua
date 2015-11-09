@@ -364,7 +364,7 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				if subject.script.chased_player then
 				blink_accumulator = blink_accumulator + blink_timer:extract_seconds()
 				
-				local blinks_per_sec = 300
+				local blinks_per_sec = 0
 				local blinks = math.floor(blink_accumulator*blinks_per_sec)
 
 				blink_accumulator = blink_accumulator - blinks/blinks_per_sec

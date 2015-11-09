@@ -130,70 +130,73 @@ function create_torso_set_for(sprite_library, outfit, weapon_type)
 		
 	local function set_offsets(subject, group, index)
 		local entity = subject.script
-		local wielded = entity.wield.wielded_items[components.wield.keys.PRIMARY_WEAPON]
-		
-		if not wielded then return end
-		local offset_info = entity.wield.wield_offsets[wielded.item.outfit_type]
-		--local head_info = npc_info.wield_offsets["HEAD"]
-		--
-		--npc_info.head_entity.chase.rotation_orbit_offset = head_info[group][index].pos
-		
-		if not offset_info  or not offset_info[group] then return end
-		
-		wielded.cpp_entity.chase.rotation_offset = offset_info[group][index].rotation
-		wielded.cpp_entity.chase.rotation_orbit_offset = offset_info[group][index].pos
-		
-		if offset_info[group][index].flip ~= nil then
-			wielded.cpp_entity.render.flip_vertically = offset_info[group][index].flip
-		else 
-			wielded.cpp_entity.render.flip_vertically = false
+
+		if entity.wield ~= nil then
+			local wielded = entity.wield.wielded_items[components.wield.keys.PRIMARY_WEAPON]
+			
+			if not wielded then return end
+			local offset_info = entity.wield.wield_offsets[wielded.item.outfit_type]
+			--local head_info = npc_info.wield_offsets["HEAD"]
+			--
+			--npc_info.head_entity.chase.rotation_orbit_offset = head_info[group][index].pos
+			
+			if not offset_info  or not offset_info[group] then return end
+			
+			wielded.cpp_entity.chase.rotation_offset = offset_info[group][index].rotation
+			wielded.cpp_entity.chase.rotation_orbit_offset = offset_info[group][index].pos
+			
+			if offset_info[group][index].flip ~= nil then
+				wielded.cpp_entity.render.flip_vertically = offset_info[group][index].flip
+			else 
+				wielded.cpp_entity.render.flip_vertically = false
+			end
 		end
 	end
 		
-	local function frame(n, should_flip, group)
+	local function frame_func(n, should_flip, group)
 		return function(subject)
-			set_offsets(subject, group, n)
-			subject.render.flip_vertically = should_flip
+			--set_offsets(subject, group, n)
+			--subject.render.flip_vertically = should_flip
 		end
 	end
 	
 	if weapon_type == "barehands" then
 		local new_walk_animation = create_animation {
 			frames = {
-				{ model = { image = walk_frames["1"] }, duration_ms = 20, callback = frame(1, false, "walk") },
-				{ model = { image = walk_frames["2"] }, duration_ms = 20, callback = frame(2, false, "walk") },
-				{ model = { image = walk_frames["3"] }, duration_ms = 20, callback = frame(3, false, "walk") },
-				{ model = { image = walk_frames["4"] }, duration_ms = 20, callback = frame(4, false, "walk") },
-				{ model = { image = walk_frames["5"] }, duration_ms = 20, callback = frame(5, false, "walk") },
-				{ model = { image = walk_frames["4"] }, duration_ms = 20, callback = frame(4, false, "walk") },
-				{ model = { image = walk_frames["3"] }, duration_ms = 20, callback = frame(3, false, "walk") },
-				{ model = { image = walk_frames["2"] }, duration_ms = 20, callback = frame(2, false, "walk") },
-				{ model = { image = walk_frames["1"] }, duration_ms = 20, callback = frame(1, false, "walk") },
+				{ model = { image = walk_frames["1"] }, duration_ms = 20, callback = frame_func(1, false, "walk") },
+				{ model = { image = walk_frames["2"] }, duration_ms = 20, callback = frame_func(2, false, "walk") },
+				{ model = { image = walk_frames["3"] }, duration_ms = 20, callback = frame_func(3, false, "walk") },
+				{ model = { image = walk_frames["4"] }, duration_ms = 20, callback = frame_func(4, false, "walk") },
+				{ model = { image = walk_frames["5"] }, duration_ms = 20, callback = frame_func(5, false, "walk") },
+				{ model = { image = walk_frames["4"] }, duration_ms = 20, callback = frame_func(4, false, "walk") },
+				{ model = { image = walk_frames["3"] }, duration_ms = 20, callback = frame_func(3, false, "walk") },
+				{ model = { image = walk_frames["2"] }, duration_ms = 20, callback = frame_func(2, false, "walk") },
+				{ model = { image = walk_frames["1"] }, duration_ms = 20, callback = frame_func(1, false, "walk") },
 				
-				{ model = { image = walk_frames["1"] }, duration_ms = 20, callback = frame(1, true, "walk_cw") },
-				{ model = { image = walk_frames["2"] }, duration_ms = 20, callback = frame(2, true, "walk_cw") },
-				{ model = { image = walk_frames["3"] }, duration_ms = 20, callback = frame(3, true, "walk_cw") },
-				{ model = { image = walk_frames["4"] }, duration_ms = 20, callback = frame(4, true, "walk_cw") },
-				{ model = { image = walk_frames["5"] }, duration_ms = 20, callback = frame(5, true, "walk_cw") },
-				{ model = { image = walk_frames["4"] }, duration_ms = 20, callback = frame(4, true, "walk_cw") },
-				{ model = { image = walk_frames["3"] }, duration_ms = 20, callback = frame(3, true, "walk_cw") },
-				{ model = { image = walk_frames["2"] }, duration_ms = 20, callback = frame(2, true, "walk_cw") },
-				{ model = { image = walk_frames["1"] }, duration_ms = 20, callback = frame(1, true, "walk_cw") }
+				{ model = { image = walk_frames["1"] }, duration_ms = 20, callback = frame_func(1, true, "walk_cw") },
+				{ model = { image = walk_frames["2"] }, duration_ms = 20, callback = frame_func(2, true, "walk_cw") },
+				{ model = { image = walk_frames["3"] }, duration_ms = 20, callback = frame_func(3, true, "walk_cw") },
+				{ model = { image = walk_frames["4"] }, duration_ms = 20, callback = frame_func(4, true, "walk_cw") },
+				{ model = { image = walk_frames["5"] }, duration_ms = 20, callback = frame_func(5, true, "walk_cw") },
+				{ model = { image = walk_frames["4"] }, duration_ms = 20, callback = frame_func(4, true, "walk_cw") },
+				{ model = { image = walk_frames["3"] }, duration_ms = 20, callback = frame_func(3, true, "walk_cw") },
+				{ model = { image = walk_frames["2"] }, duration_ms = 20, callback = frame_func(2, true, "walk_cw") },
+				{ model = { image = walk_frames["1"] }, duration_ms = 20, callback = frame_func(1, true, "walk_cw") }
 			},
 			loop_mode = animation.REPEAT
 		}
 	
 		local new_swing_cw_animation = create_animation {
 			frames = {
-				{ model = { image = shoot_frames["1"] }, duration_ms = 20, callback = frame(1, true, "swing_cw")  },
-				{ model = { image = shoot_frames["2"] }, duration_ms = 20, callback = frame(2, true, "swing_cw")  },
-				{ model = { image = shoot_frames["3"] }, duration_ms = 20, callback = frame(3, true, "swing_cw")  },
-				{ model = { image = shoot_frames["4"] }, duration_ms = 20, callback = frame(4, true, "swing_cw")  },
-				{ model = { image = shoot_frames["5"] }, duration_ms = 65, callback = frame(5, true, "swing_cw")  },
-				{ model = { image = shoot_frames["4"] }, duration_ms = 25, callback = frame(4, true, "swing_cw")  },
-				{ model = { image = shoot_frames["3"] }, duration_ms = 25, callback = frame(3, true, "swing_cw")  },
-				{ model = { image = shoot_frames["2"] }, duration_ms = 25, callback = frame(2, true, "swing_cw")  },
-				{ model = { image = shoot_frames["1"] }, duration_ms = 25, callback = frame(1, true, "swing_cw")  }
+				{ model = { image = shoot_frames["1"] }, duration_ms = 20, callback = frame_func(1, true, "swing_cw")  },
+				{ model = { image = shoot_frames["2"] }, duration_ms = 20, callback = frame_func(2, true, "swing_cw")  },
+				{ model = { image = shoot_frames["3"] }, duration_ms = 20, callback = frame_func(3, true, "swing_cw")  },
+				{ model = { image = shoot_frames["4"] }, duration_ms = 20, callback = frame_func(4, true, "swing_cw")  },
+				{ model = { image = shoot_frames["5"] }, duration_ms = 65, callback = frame_func(5, true, "swing_cw")  },
+				{ model = { image = shoot_frames["4"] }, duration_ms = 25, callback = frame_func(4, true, "swing_cw")  },
+				{ model = { image = shoot_frames["3"] }, duration_ms = 25, callback = frame_func(3, true, "swing_cw")  },
+				{ model = { image = shoot_frames["2"] }, duration_ms = 25, callback = frame_func(2, true, "swing_cw")  },
+				{ model = { image = shoot_frames["1"] }, duration_ms = 25, callback = frame_func(1, true, "swing_cw")  }
 			},
 		
 			loop_mode = animation.NONE
@@ -201,15 +204,15 @@ function create_torso_set_for(sprite_library, outfit, weapon_type)
 		
 		local new_swing_ccw_animation = create_animation {
 			frames = {
-				{ model = { image = shoot_frames["1"] }, duration_ms = 20, callback = frame(1, false, "swing") },
-				{ model = { image = shoot_frames["2"] }, duration_ms = 20, callback = frame(2, false, "swing") },
-				{ model = { image = shoot_frames["3"] }, duration_ms = 20, callback = frame(3, false, "swing") },
-				{ model = { image = shoot_frames["4"] }, duration_ms = 20, callback = frame(4, false, "swing") },
-				{ model = { image = shoot_frames["5"] }, duration_ms = 65, callback = frame(5, false, "swing") },
-				{ model = { image = shoot_frames["4"] }, duration_ms = 25, callback = frame(4, false, "swing") },
-				{ model = { image = shoot_frames["3"] }, duration_ms = 25, callback = frame(3, false, "swing") },
-				{ model = { image = shoot_frames["2"] }, duration_ms = 25, callback = frame(2, false, "swing") },
-				{ model = { image = shoot_frames["1"] }, duration_ms = 25, callback = frame(1, false, "swing") }
+				{ model = { image = shoot_frames["1"] }, duration_ms = 20, callback = frame_func(1, false, "swing") },
+				{ model = { image = shoot_frames["2"] }, duration_ms = 20, callback = frame_func(2, false, "swing") },
+				{ model = { image = shoot_frames["3"] }, duration_ms = 20, callback = frame_func(3, false, "swing") },
+				{ model = { image = shoot_frames["4"] }, duration_ms = 20, callback = frame_func(4, false, "swing") },
+				{ model = { image = shoot_frames["5"] }, duration_ms = 65, callback = frame_func(5, false, "swing") },
+				{ model = { image = shoot_frames["4"] }, duration_ms = 25, callback = frame_func(4, false, "swing") },
+				{ model = { image = shoot_frames["3"] }, duration_ms = 25, callback = frame_func(3, false, "swing") },
+				{ model = { image = shoot_frames["2"] }, duration_ms = 25, callback = frame_func(2, false, "swing") },
+				{ model = { image = shoot_frames["1"] }, duration_ms = 25, callback = frame_func(1, false, "swing") }
 			},
 		
 			loop_mode = animation.NONE
@@ -231,30 +234,30 @@ function create_torso_set_for(sprite_library, outfit, weapon_type)
 	elseif weapon_type == "rifle" then
 		local new_walk_animation = create_animation {
 			frames = {
-				{ model = { image = walk_frames["1"], rotation_offset = 30 }, duration_ms = 30, callback = frame(1, false, "walk") },
-				{ model = { image = walk_frames["2"], rotation_offset = 30 }, duration_ms = 30, callback = frame(2, false, "walk") },
-				{ model = { image = walk_frames["3"], rotation_offset = 30 }, duration_ms = 30, callback = frame(3, false, "walk") },
-				{ model = { image = walk_frames["4"], rotation_offset = 30 }, duration_ms = 30, callback = frame(4, false, "walk") },
-				{ model = { image = walk_frames["5"], rotation_offset = 30 }, duration_ms = 30, callback = frame(5, false, "walk") },
-				{ model = { image = walk_frames["4"], rotation_offset = 30 }, duration_ms = 30, callback = frame(4, false, "walk") },
-				{ model = { image = walk_frames["3"], rotation_offset = 30 }, duration_ms = 30, callback = frame(3, false, "walk") },
-				{ model = { image = walk_frames["2"], rotation_offset = 30 }, duration_ms = 30, callback = frame(2, false, "walk") },
-				{ model = { image = walk_frames["1"], rotation_offset = 30 }, duration_ms = 30, callback = frame(1, false, "walk") },
+				{ model = { image = walk_frames["1"], rotation_offset = 30 }, duration_ms = 30, callback = frame_func(1, false, "walk") },
+				{ model = { image = walk_frames["2"], rotation_offset = 30 }, duration_ms = 30, callback = frame_func(2, false, "walk") },
+				{ model = { image = walk_frames["3"], rotation_offset = 30 }, duration_ms = 30, callback = frame_func(3, false, "walk") },
+				{ model = { image = walk_frames["4"], rotation_offset = 30 }, duration_ms = 30, callback = frame_func(4, false, "walk") },
+				{ model = { image = walk_frames["5"], rotation_offset = 30 }, duration_ms = 30, callback = frame_func(5, false, "walk") },
+				{ model = { image = walk_frames["4"], rotation_offset = 30 }, duration_ms = 30, callback = frame_func(4, false, "walk") },
+				{ model = { image = walk_frames["3"], rotation_offset = 30 }, duration_ms = 30, callback = frame_func(3, false, "walk") },
+				{ model = { image = walk_frames["2"], rotation_offset = 30 }, duration_ms = 30, callback = frame_func(2, false, "walk") },
+				{ model = { image = walk_frames["1"], rotation_offset = 30 }, duration_ms = 30, callback = frame_func(1, false, "walk") },
 			},
 			loop_mode = animation.REPEAT
 		}
 		
 		local new_shot_animation = create_animation {
 			frames = {
-				{ model = { image = shoot_frames["1"], rotation_offset = 30 }, duration_ms = 20, callback = frame(1, false, "shot") },
-				{ model = { image = shoot_frames["2"], rotation_offset = 30 }, duration_ms = 20, callback = frame(2, false, "shot") },
-				{ model = { image = shoot_frames["3"], rotation_offset = 30 }, duration_ms = 20, callback = frame(3, false, "shot") },
-				{ model = { image = shoot_frames["4"], rotation_offset = 30 }, duration_ms = 20, callback = frame(4, false, "shot") },
-				{ model = { image = shoot_frames["5"], rotation_offset = 30 }, duration_ms = 20, callback = frame(5, false, "shot") },
-				{ model = { image = shoot_frames["4"], rotation_offset = 30 }, duration_ms = 20, callback = frame(4, false, "shot") },
-				{ model = { image = shoot_frames["3"], rotation_offset = 30 }, duration_ms = 20, callback = frame(3, false, "shot") },
-				{ model = { image = shoot_frames["2"], rotation_offset = 30 }, duration_ms = 20, callback = frame(2, false, "shot") },
-				{ model = { image = shoot_frames["1"], rotation_offset = 30 }, duration_ms = 20, callback = frame(1, false, "shot") },
+				{ model = { image = shoot_frames["1"], rotation_offset = 30 }, duration_ms = 20, callback = frame_func(1, false, "shot") },
+				{ model = { image = shoot_frames["2"], rotation_offset = 30 }, duration_ms = 20, callback = frame_func(2, false, "shot") },
+				{ model = { image = shoot_frames["3"], rotation_offset = 30 }, duration_ms = 20, callback = frame_func(3, false, "shot") },
+				{ model = { image = shoot_frames["4"], rotation_offset = 30 }, duration_ms = 20, callback = frame_func(4, false, "shot") },
+				{ model = { image = shoot_frames["5"], rotation_offset = 30 }, duration_ms = 20, callback = frame_func(5, false, "shot") },
+				{ model = { image = shoot_frames["4"], rotation_offset = 30 }, duration_ms = 20, callback = frame_func(4, false, "shot") },
+				{ model = { image = shoot_frames["3"], rotation_offset = 30 }, duration_ms = 20, callback = frame_func(3, false, "shot") },
+				{ model = { image = shoot_frames["2"], rotation_offset = 30 }, duration_ms = 20, callback = frame_func(2, false, "shot") },
+				{ model = { image = shoot_frames["1"], rotation_offset = 30 }, duration_ms = 20, callback = frame_func(1, false, "shot") },
 			},
 			loop_mode = animation.NONE
 		}
@@ -273,41 +276,41 @@ function create_torso_set_for(sprite_library, outfit, weapon_type)
 	elseif weapon_type == "melee" then
 		local new_walk_cw_animation = create_animation {
 			frames = {
-				{ model = { image = walk_frames["1"] }, duration_ms = 30, callback = frame(1, true, "walk_cw") },
-				{ model = { image = walk_frames["2"] }, duration_ms = 30, callback = frame(2, true, "walk_cw") },
-				{ model = { image = walk_frames["3"] }, duration_ms = 30, callback = frame(3, true, "walk_cw") },
-				{ model = { image = walk_frames["4"] }, duration_ms = 30, callback = frame(4, true, "walk_cw") },
-				{ model = { image = walk_frames["5"] }, duration_ms = 30, callback = frame(5, true, "walk_cw") },
-				{ model = { image = walk_frames["4"] }, duration_ms = 30, callback = frame(4, true, "walk_cw") },
-				{ model = { image = walk_frames["3"] }, duration_ms = 30, callback = frame(3, true, "walk_cw") },
-				{ model = { image = walk_frames["2"] }, duration_ms = 30, callback = frame(2, true, "walk_cw") },
-				{ model = { image = walk_frames["1"] }, duration_ms = 30, callback = frame(1, true, "walk_cw") },
+				{ model = { image = walk_frames["1"] }, duration_ms = 30, callback = frame_func(1, true, "walk_cw") },
+				{ model = { image = walk_frames["2"] }, duration_ms = 30, callback = frame_func(2, true, "walk_cw") },
+				{ model = { image = walk_frames["3"] }, duration_ms = 30, callback = frame_func(3, true, "walk_cw") },
+				{ model = { image = walk_frames["4"] }, duration_ms = 30, callback = frame_func(4, true, "walk_cw") },
+				{ model = { image = walk_frames["5"] }, duration_ms = 30, callback = frame_func(5, true, "walk_cw") },
+				{ model = { image = walk_frames["4"] }, duration_ms = 30, callback = frame_func(4, true, "walk_cw") },
+				{ model = { image = walk_frames["3"] }, duration_ms = 30, callback = frame_func(3, true, "walk_cw") },
+				{ model = { image = walk_frames["2"] }, duration_ms = 30, callback = frame_func(2, true, "walk_cw") },
+				{ model = { image = walk_frames["1"] }, duration_ms = 30, callback = frame_func(1, true, "walk_cw") },
 			},
 			loop_mode = animation.REPEAT
 		}
 		
 		local new_walk_ccw_animation = create_animation {
 			frames = {
-				{ model = { image = walk_frames["1"] }, duration_ms = 30, callback = frame(1, false, "walk") },
-				{ model = { image = walk_frames["2"] }, duration_ms = 30, callback = frame(2, false, "walk")  },
-				{ model = { image = walk_frames["3"] }, duration_ms = 30, callback = frame(3, false, "walk")  },
-				{ model = { image = walk_frames["4"] }, duration_ms = 30, callback = frame(4, false, "walk")  },
-				{ model = { image = walk_frames["5"] }, duration_ms = 30, callback = frame(5, false, "walk")  },
-				{ model = { image = walk_frames["4"] }, duration_ms = 30, callback = frame(4, false, "walk")  },
-				{ model = { image = walk_frames["3"] }, duration_ms = 30, callback = frame(3, false, "walk")  },
-				{ model = { image = walk_frames["2"] }, duration_ms = 30, callback = frame(2, false, "walk")  },
-				{ model = { image = walk_frames["1"] }, duration_ms = 30, callback = frame(1, false, "walk")  },
+				{ model = { image = walk_frames["1"] }, duration_ms = 30, callback = frame_func(1, false, "walk") },
+				{ model = { image = walk_frames["2"] }, duration_ms = 30, callback = frame_func(2, false, "walk")  },
+				{ model = { image = walk_frames["3"] }, duration_ms = 30, callback = frame_func(3, false, "walk")  },
+				{ model = { image = walk_frames["4"] }, duration_ms = 30, callback = frame_func(4, false, "walk")  },
+				{ model = { image = walk_frames["5"] }, duration_ms = 30, callback = frame_func(5, false, "walk")  },
+				{ model = { image = walk_frames["4"] }, duration_ms = 30, callback = frame_func(4, false, "walk")  },
+				{ model = { image = walk_frames["3"] }, duration_ms = 30, callback = frame_func(3, false, "walk")  },
+				{ model = { image = walk_frames["2"] }, duration_ms = 30, callback = frame_func(2, false, "walk")  },
+				{ model = { image = walk_frames["1"] }, duration_ms = 30, callback = frame_func(1, false, "walk")  },
 			},
 			loop_mode = animation.REPEAT
 		}
 			
 		local new_swing_cw_animation = create_animation {
 			frames = {
-				{ model = { image = shoot_frames["1"] }, duration_ms = 20, callback = frame(1, true, "swing_cw") },
-				{ model = { image = shoot_frames["2"] }, duration_ms = 20, callback = frame(2, true, "swing_cw") },
-				{ model = { image = shoot_frames["3"] }, duration_ms = 20, callback = frame(3, true, "swing_cw") },
-				{ model = { image = shoot_frames["4"] }, duration_ms = 20, callback = frame(4, true, "swing_cw") },
-				{ model = { image = shoot_frames["5"] }, duration_ms = 20, callback = frame(5, true, "swing_cw") }
+				{ model = { image = shoot_frames["1"] }, duration_ms = 20, callback = frame_func(1, true, "swing_cw") },
+				{ model = { image = shoot_frames["2"] }, duration_ms = 20, callback = frame_func(2, true, "swing_cw") },
+				{ model = { image = shoot_frames["3"] }, duration_ms = 20, callback = frame_func(3, true, "swing_cw") },
+				{ model = { image = shoot_frames["4"] }, duration_ms = 20, callback = frame_func(4, true, "swing_cw") },
+				{ model = { image = shoot_frames["5"] }, duration_ms = 20, callback = frame_func(5, true, "swing_cw") }
 			},
 		
 			loop_mode = animation.NONE
@@ -315,11 +318,11 @@ function create_torso_set_for(sprite_library, outfit, weapon_type)
 		
 		local new_swing_ccw_animation = create_animation {
 			frames = {
-				{ model = { image = shoot_frames["1"] }, duration_ms = 20, callback = frame(1, false, "swing") },
-				{ model = { image = shoot_frames["2"] }, duration_ms = 20, callback = frame(2, false, "swing") },
-				{ model = { image = shoot_frames["3"] }, duration_ms = 20, callback = frame(3, false, "swing") },
-				{ model = { image = shoot_frames["4"] }, duration_ms = 20, callback = frame(4, false, "swing") },
-				{ model = { image = shoot_frames["5"] }, duration_ms = 20, callback = frame(5, false, "swing") }
+				{ model = { image = shoot_frames["1"] }, duration_ms = 20, callback = frame_func(1, false, "swing") },
+				{ model = { image = shoot_frames["2"] }, duration_ms = 20, callback = frame_func(2, false, "swing") },
+				{ model = { image = shoot_frames["3"] }, duration_ms = 20, callback = frame_func(3, false, "swing") },
+				{ model = { image = shoot_frames["4"] }, duration_ms = 20, callback = frame_func(4, false, "swing") },
+				{ model = { image = shoot_frames["5"] }, duration_ms = 20, callback = frame_func(5, false, "swing") }
 			},
 		
 			loop_mode = animation.NONE

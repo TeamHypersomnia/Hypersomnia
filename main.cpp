@@ -8,8 +8,6 @@
 #include "game/utilities.h"
 #include "game/bindings.h"
 
-#include <gtest\gtest.h>
-
 #include <iostream>
 #include <signal.h>
 #include "script.h"

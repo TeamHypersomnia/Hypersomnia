@@ -309,5 +309,101 @@ return function(map_filename, scene_object)
 
 	end
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		-- local client object for offline testing
+		local player_group = create_controlled_player(
+		scene_object,
+		scene_object.teleport_position, 
+		scene_object.world_camera.script, 
+		scene_object.crosshair_sprite)
+
+		local new_entity = components.create_components {
+			cpp_entity = player_group.body,
+			input_prediction = {
+				simulation_entity = scene_object.simulation_player
+			},
+			
+			orientation = {
+				receiver = false,
+				crosshair_entity = player_group.crosshair
+			},
+			
+			--health = {},
+
+			--wield = {
+			--	wield_offsets = npc_wield_offsets
+			--},
+			
+			--label = {
+			--	position = components.label.positioning.OVER_HEALTH_BAR,
+			--	default_font = scene_object.font_by_name["kubasta"],
+			--	
+			--	text = {}
+			--},
+			
+			particle_response = {
+				response = scene_object.particles.npc_response
+			},
+
+			--sound = {
+			--	listener = true
+			--	,
+			--	
+			--	effect_type = components.sound.effect_types.AMBIENT_NOISE
+			--},
+
+			light = {
+				color = rgba(0, 200, 255, 255)
+			}
+		}
+		
+		--new_entity.wield.on_item_wielded = function(this, picked, old_item, wielding_key)
+		--	return character_wielding_procedure(scene_object, player_group, true, this, picked, old_item, wielding_key)
+		--end
+		--
+		--new_entity.wield.on_item_unwielded = function(this, unwielded, wielding_key)
+		--	return character_unwielding_procedure(scene_object, player_group, true, this, unwielded, wielding_key)
+		--end
+		
+
+		scene_object.owner_client_screen.entity_system_instance:add_entity(new_entity)
+
+		scene_object.player_group = player_group
+
+		local burst = particle_burst_message()
+		scene_object.player = new_entity
+		new_entity.cpp_entity.transform.pos = scene_object.teleport_position
+
+		scene_object.world_camera.camera.dont_smooth_once = true
+		--burst.rotation = 0
+		burst.local_transform = true
+		burst.subject = new_entity.cpp_entity
+		burst:set_effect(scene_object.particles.born_effect)
+		
+		scene_object.world_object.world:post_message(burst)
+		burst.rotation = 90
+		scene_object.world_object.world:post_message(burst)
+		burst.rotation = 180
+		scene_object.world_object.world:post_message(burst)
+		burst.rotation = 270
+		scene_object.world_object.world:post_message(burst)
+
 	end
+
+
 end
