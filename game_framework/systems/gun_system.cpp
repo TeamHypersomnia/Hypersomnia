@@ -150,7 +150,7 @@ void gun_system::process_entities(world& owner) {
 					gun_transform.rotation - gun.spread_degrees,
 					gun_transform.rotation + gun.spread_degrees)));
 
-				new_transform.rotation = vel.get_degrees();
+				new_transform.rotation = vel.degrees();
 				/* add randomized speed to bullet taking velocity variation into account */
 				vel *= randval(
 					gun.bullet_speed.first,
@@ -244,7 +244,7 @@ void gun_system::process_entities(world& owner) {
 					messages::particle_burst_message burst_msg;
 					burst_msg.subject = target_entity;
 					burst_msg.pos = impact_pos;
-					burst_msg.rotation = (-damage_msg.impact_velocity).get_degrees();
+					burst_msg.rotation = (-damage_msg.impact_velocity).degrees();
 					burst_msg.type = messages::particle_burst_message::burst_type::BULLET_IMPACT;
 
 					owner.post_message(damage_msg);

@@ -87,7 +87,7 @@ render_system* _render = nullptr;
 
 steering::avoidance::avoidance_info_output steering::avoidance::get_avoidance_info(const scene& in) {
 	avoidance_info_output out;
-	float velocity_angle = in.subject.unit_vel.get_degrees();
+	float velocity_angle = in.subject.unit_vel.degrees();
 	float avoidance_rectangle_length = get_avoidance_length(in.subject);
 
 	/* copied vector to hold rotated vertices */

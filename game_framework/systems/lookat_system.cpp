@@ -44,10 +44,10 @@ void lookat_system::process_entities(world& owner) {
 				);
 
 			lookat.last_rotation_interpolant = (lookat.last_rotation_interpolant * averaging_constant + new_rotation * (1.0f - averaging_constant)).normalize();
-			lookat.last_value = lookat.last_rotation_interpolant.get_degrees();
+			lookat.last_value = lookat.last_rotation_interpolant.degrees();
 		}
 		else if (lookat.easing_mode == lookat.NONE) {
-			lookat.last_value = new_rotation.get_degrees();
+			lookat.last_value = new_rotation.degrees();
 		}
 
 		if (lookat.update_value) {

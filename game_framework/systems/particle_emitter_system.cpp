@@ -30,7 +30,7 @@ void particle_emitter_system::spawn_particle(
 		randval(rotation - spread, rotation + spread)) *
 		randval(emission.velocity);
 
-	rotation = new_particle.vel.get_degrees();
+	rotation = new_particle.vel.degrees();
 
 	new_particle.pos = position + emission.offset;
 	new_particle.lifetime_ms = 0.f;

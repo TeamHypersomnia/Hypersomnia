@@ -74,7 +74,7 @@ void movement_system::substep(world& owner) {
 
 				was_ground_hit = out.hit;
 				if (was_ground_hit)
-					ground_angle = out.normal.get_degrees() + 90;
+					ground_angle = out.normal.degrees() + 90;
 			}
 
 			if (std::abs(resultant.x) < b2_epsilon && vel.LengthSquared() > 0) {

@@ -170,16 +170,16 @@ namespace augs {
 			return x*x + y*y;
 		}
 
-		float get_radians() const {
+		float radians() const {
 			return atan2(y, x);
 		}
 
-		float get_degrees() const {
-			return get_radians()*180.0f/3.141592653589793238462f;
+		float degrees() const {
+			return radians()*180.0f/3.141592653589793238462f;
 		}
 
 		float angle_between(const vec2t<>& v) {
-			return get_degrees() - v.get_degrees();
+			return degrees() - v.degrees();
 		}
 
 		template<class A, class B>
