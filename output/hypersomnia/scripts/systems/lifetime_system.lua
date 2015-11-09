@@ -83,7 +83,7 @@ function lifetime_system:resolve_collisions(msgs, post_requests)
 				burst_msg = particle_burst_message()
 				burst_msg.subject = message.collider
 				burst_msg.pos = message.point
-				burst_msg.rotation = (message.subject_impact_velocity * -1):get_degrees()
+				burst_msg.rotation = (message.subject_impact_velocity * -1):degrees()
 				
 				local response = {}
 				recursive_write(response, message.collider.script.particle_response.response.BULLET_IMPACT)

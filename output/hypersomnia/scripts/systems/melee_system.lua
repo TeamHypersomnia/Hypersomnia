@@ -118,7 +118,7 @@ function melee_system:process_swinging()
 						burst_msg = particle_burst_message()
 						burst_msg.subject = hit_entity
 						burst_msg.pos = to_pixels(candidate.location)
-						burst_msg.rotation = smallest_cross.direction:get_degrees()
+						burst_msg.rotation = smallest_cross.direction:degrees()
 						burst_msg:set_effect (create_particle_effect (hit_object.particle_response.response.BULLET_IMPACT) )
 						
 						hit_entity.owner_world:post_message(burst_msg)

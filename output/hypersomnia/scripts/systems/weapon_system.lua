@@ -79,7 +79,7 @@ function weapon_system:shot_routine(target, premade_shot)
 				gun_transform.rotation - weapon.spread_degrees,
 				gun_transform.rotation + weapon.spread_degrees, random_generator))
 	
-			barrel_transform.rotation = vel:get_degrees()
+			barrel_transform.rotation = vel:degrees()
 				
 			vel = vel * randval(weapon.bullet_speed, random_generator)
 			
