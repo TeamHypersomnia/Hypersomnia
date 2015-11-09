@@ -23,14 +23,14 @@ function components.item:set_wielder(new_owner)
 	elseif item.cpp_entity.physics == nil then
 		-- drop it to the ground
 		if item.item.entity_archetype ~= nil then
-			item.cpp_entity.transform.current.rotation = 0
+			item.cpp_entity.transform.rotation = 0
 			
 			add_physics_component(item.cpp_entity, item.item.entity_archetype.physics)
 		end
 		
 		-- if we had a wielder, copy its transform
 		if item.item.wielder ~= nil then
-			item.cpp_entity.transform.current = item.item.wielder.cpp_entity.transform.current
+			item.cpp_entity.transform = item.item.wielder.cpp_entity.transform
 		end
 	end
 	

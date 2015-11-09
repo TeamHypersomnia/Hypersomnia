@@ -44,7 +44,7 @@ function bullet_creation_system:update()
 		
 		if not weapon.is_melee then
 			local burst = particle_burst_message()
-			burst.pos = entity.transform.current.pos + msgs[i].barrel_offset
+			burst.pos = entity.transform.pos + msgs[i].barrel_offset
 			burst.rotation = msgs[i].barrel_transform.rotation
 			burst.subject = target.cpp_entity
 			burst:set_effect (create_particle_effect (target.particle_response.response.WEAPON_SHOT) )

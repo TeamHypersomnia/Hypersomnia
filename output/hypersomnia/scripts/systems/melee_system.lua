@@ -66,14 +66,14 @@ function melee_system:process_swinging()
 			clearlc(2)
 			
 			for j=1, num_verts do
-				local new_vert = entity.transform.current.pos + vec2.from_degrees(
-					entity.transform.current.rotation - (weapon.swing_angle / 2) 
+				local new_vert = entity.transform.pos + vec2.from_degrees(
+					entity.transform.rotation - (weapon.swing_angle / 2) 
 					+ (j-1) * (weapon.swing_angle / (num_verts - 1)) 
 					) * weapon.swing_radius
 			
 				queried_area:add(new_vert)
 				
-				local prev = entity.transform.current.pos
+				local prev = entity.transform.pos
 				
 				if j > 1 then
 					prev = queried_area:at(j-1-1)
@@ -82,12 +82,12 @@ function melee_system:process_swinging()
 				--debuglc(2, rgba(255, 255, 255, 255), prev, new_vert)
 			end
 			
-			--debuglc(2, rgba(255, 255, 255, 255), queried_area:at(num_verts-1), entity.transform.current.pos)
+			--debuglc(2, rgba(255, 255, 255, 255), queried_area:at(num_verts-1), entity.transform.pos)
 			
 			local bodies = self.owner_world.physics_system:query_polygon(queried_area, create_query_filter({"STATIC_OBJECT", "REMOTE_CHARACTER"}), entity)
 			
 			while weapon.hits_remaining > 0 do
-				local axis = vec2.from_degrees(entity.transform.current.rotation)
+				local axis = vec2.from_degrees(entity.transform.rotation)
 				
 				local smallest_cross;
 			
@@ -95,7 +95,7 @@ function melee_system:process_swinging()
 					local hit_entity = body_to_entity(candidate.body)
 					
 					if not weapon.entities_hit[hit_entity] then
-						local direction = entity.transform.current.pos - to_pixels(candidate.location)
+						local direction = entity.transform.pos - to_pixels(candidate.location)
 					
 						local cross_value = math.abs(axis:cross(direction:normalize()))
 					

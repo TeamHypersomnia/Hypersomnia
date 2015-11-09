@@ -36,7 +36,7 @@ function weapon_system:shot_routine(target, premade_shot)
 	end
 	
 	
-	local gun_transform = transform_state(entity.transform.current)
+	local gun_transform = transform_component(entity.transform)
 	-- cancel out interpolation
 	gun_transform.pos = to_pixels(entity.physics.body:GetPosition())
 	
@@ -47,7 +47,7 @@ function weapon_system:shot_routine(target, premade_shot)
 	
 	local barrel_offset = vec2(weapon.bullet_barrel_offset):rotate(gun_transform.rotation, vec2())
 	
-	local barrel_transform = transform_state(gun_transform)
+	local barrel_transform = transform_component(gun_transform)
 	barrel_transform.pos = barrel_transform.pos + barrel_offset
 	
 	-- this chunk won't be executed only for remote players on the client
@@ -66,8 +66,8 @@ function weapon_system:shot_routine(target, premade_shot)
 	local new_shot_message = {
 		subject = target,
 		["barrel_offset"] = barrel_offset,
-		gun_transform = transform_state(gun_transform),
-		barrel_transform = transform_state(barrel_transform),
+		gun_transform = transform_component(gun_transform),
+		barrel_transform = transform_component(barrel_transform),
 		["premade_shot"] = premade_shot,
 		bullets = {}
 	}

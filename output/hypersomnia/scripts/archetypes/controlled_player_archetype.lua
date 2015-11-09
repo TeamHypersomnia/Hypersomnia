@@ -288,10 +288,10 @@ world_archetype_callbacks.CONTROLLED_PLAYER = {
 	post_unreliable_construction = function (self, new_entity)
 		local burst = particle_burst_message()
 		self.owner_scene.player = new_entity
-		new_entity.cpp_entity.transform.current.pos = to_pixels(new_entity.replication.modules.movement.position)
+		new_entity.cpp_entity.transform.pos = to_pixels(new_entity.replication.modules.movement.position)
 
 		new_entity.cpp_entity.physics.body:SetTransform(new_entity.replication.modules.movement.position, 0)
-		new_entity.parent_group.crosshair.transform.current.pos = new_entity.cpp_entity.transform.current.pos - vec2(0, 100)
+		new_entity.parent_group.crosshair.transform.pos = new_entity.cpp_entity.transform.pos - vec2(0, 100)
 		self.owner_scene.world_camera.camera.dont_smooth_once = true
 		--burst.rotation = 0
 		burst.local_transform = true

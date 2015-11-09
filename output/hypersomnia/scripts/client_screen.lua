@@ -162,7 +162,7 @@ end
 stabilitytimer = timer()
 function client_screen:loop()
 	--if self.sample_scene.player then
-	--self.sample_scene.player.cpp_entity.transform.current.pos.x = self.sample_scene.player.cpp_entity.transform.current.pos.x + 50*stabilitytimer:extract_seconds()
+	--self.sample_scene.player.cpp_entity.transform.pos.x = self.sample_scene.player.cpp_entity.transform.pos.x + 50*stabilitytimer:extract_seconds()
 	--end
 	setlsys(self.sample_scene.world_object.render_system)
 		

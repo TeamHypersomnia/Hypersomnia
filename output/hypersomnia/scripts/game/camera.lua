@@ -378,10 +378,10 @@ function create_world_camera_entity(owner_world, blank_sprite)
 				local focus_w = 100 
 				local focus_h = 100 
 
-				aabb.l = subject.script.chased_player.transform.current.pos.x - focus_w 
-				aabb.t = subject.script.chased_player.transform.current.pos.y - focus_h 
-				aabb.r = subject.script.chased_player.transform.current.pos.x + focus_w 
-				aabb.b = subject.script.chased_player.transform.current.pos.y + focus_h 
+				aabb.l = subject.script.chased_player.transform.pos.x - focus_w 
+				aabb.t = subject.script.chased_player.transform.pos.y - focus_h 
+				aabb.r = subject.script.chased_player.transform.pos.x + focus_w 
+				aabb.b = subject.script.chased_player.transform.pos.y + focus_h 
 
 				for i=1, #subject.script.owner_scene.tile_layers do
 					for b=1, blinks do

@@ -42,7 +42,7 @@ function lifetime_system:translate_hit_infos()
 		end
 	
 		new_collision.collider = victim.cpp_entity
-		new_collision.point = vec2(victim.cpp_entity.transform.current.pos)
+		new_collision.point = vec2(victim.cpp_entity.transform.pos)
 	    
 		table.insert(msgs, new_collision)
 	end
@@ -120,7 +120,7 @@ function lifetime_system:update()
 			and lifetime.current_lifetime:get_milliseconds() >= lifetime.max_lifetime_ms )
 		or
 			(lifetime.max_distance > -1
-			and (self.targets[i].cpp_entity.transform.current.pos - lifetime.starting_point):length() >= lifetime.max_distance)
+			and (self.targets[i].cpp_entity.transform.pos - lifetime.starting_point):length() >= lifetime.max_distance)
 		then
 			self.owner_entity_system:post_remove(self.targets[i])
 		end

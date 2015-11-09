@@ -12,13 +12,13 @@ function orientation_system:update()
 		if orientation.receiver then
 			local modules = target.replication.modules
 			if modules.crosshair and modules.crosshair.position ~= nil then
-				orientation.crosshair_entity.transform.current.pos = modules.crosshair.position + target.cpp_entity.transform.current.pos
+				orientation.crosshair_entity.transform.pos = modules.crosshair.position + target.cpp_entity.transform.pos
 			elseif modules.orientation and modules.orientation.orientation ~= nil then				
-				orientation.crosshair_entity.transform.current.pos = modules.orientation.orientation + target.cpp_entity.transform.current.pos
+				orientation.crosshair_entity.transform.pos = modules.orientation.orientation + target.cpp_entity.transform.pos
 			end
 		else--if orientation:cmd_rate_ready() then
 			--orientation:cmd_rate_reset()
-			local current_pos =  vec2(orientation.crosshair_entity.transform.current.pos - target.cpp_entity.transform.current.pos)
+			local current_pos =  vec2(orientation.crosshair_entity.transform.pos - target.cpp_entity.transform.pos)
 			
 			if orientation.last_pos == nil or (orientation.last_pos - current_pos):length() > 0 then
 				orientation.last_pos = vec2(current_pos)

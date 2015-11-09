@@ -27,8 +27,7 @@ int main(int argc, char** argv) {
 	hypersomnia_gui::bind(lua_state);
 	bind_hypersomnia_implementations(lua_state);
 	
-	//::testing::InitGoogleTest(&argc, argv);
-	//RUN_ALL_TESTS();
+	framework::run_tests();
 
 	signal(SIGSEGV, SignalHandler);
 

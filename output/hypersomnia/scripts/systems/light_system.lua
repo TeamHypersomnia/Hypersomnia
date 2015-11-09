@@ -104,7 +104,7 @@ function light_system:process_entities(renderer, camera_draw_input)
 	for i=1, #self.targets do
 		local target = self.targets[i]
 		local light = target.light
-		local pos = target.cpp_entity.transform.current.pos
+		local pos = target.cpp_entity.transform.pos
 
 
 		for i=1, #light.attenuation_variations do
