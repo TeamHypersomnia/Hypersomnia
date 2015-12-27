@@ -12,6 +12,8 @@
 #include <signal.h>
 #include "script.h"
 
+#include "game/hypersomnia_world.h"
+
 using namespace std;
 using namespace augs;
 
@@ -20,23 +22,32 @@ void SignalHandler(int signal) { throw "Access violation!"; }
 int main(int argc, char** argv) {
 	framework::init();
 
-	augs::lua_state_wrapper lua_state;
-	framework::bind_whole_engine(lua_state);
-	hypersomnia_gui::bind(lua_state);
-	bind_hypersomnia_implementations(lua_state);
-	
+	augs::lua_state_wrapper lua;
+
+	framework::bind_whole_engine(lua);
+	bind_whole_hypersomnia(lua);
+
+	hypersomnia_world new_world;
+	new_world.bind_this_to_lua_global(lua, "WORLD");
+
 	framework::run_tests();
 
 	signal(SIGSEGV, SignalHandler);
 
 	try {
-		if (!lua_state.dofile("init.lua"))		
-			lua_state.debug_response();
+		if (!lua.dofile("init.lua"))
+			lua.debug_response();
 	}
 	catch (char* e) {
 		cout << "Exception thrown! " << e << "\n";
-		lua_state.debug_response();
+		lua.debug_response();
 	}
+	catch (...) {
+		cout << "Exception thrown! " << "\n";
+		lua.debug_response();
+	}
+
+	new_world.simulate();
 
 	framework::deinit();
 	return 0;
