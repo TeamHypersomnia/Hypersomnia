@@ -5,15 +5,13 @@
 #include "input_system.h"
 #include <iostream>
 
-input_system::input_system(window::glwindow& input_window) : input_window(input_window), quit_flag(0) {
-
-}
+using namespace augs::window;
 
 input_system::context::context() : enabled(true) {
 }
 
 bool input_system::is_down(int key) {
-	return input_window.events.keys[key];
+	return augs::window::glwindow::get_current()->events.keys[key];
 }
 
 void input_system::clear() {
@@ -34,7 +32,7 @@ void input_system::clear_contexts() {
 }
 
 void input_system::post(messages::intent_message incoming_event, world& owner) {
-	auto& m = input_window.events.mouse;
+	auto& m = glwindow::get_current()->events.mouse;
 	incoming_event.mouse_pos = m.pos;
 	incoming_event.mouse_rel = m.raw_rel;
 	incoming_event.wheel_amount = m.scroll;
@@ -69,7 +67,7 @@ void input_system::process_entities(world& owner) {
 
 	/* empty active_contexts vector indicates that we don't want input polling for this particular world */
 	if (!active_contexts.empty()) {
-		while (input_window.poll_events(msg)) {
+		while (glwindow::get_current()->poll_events(msg)) {
 			if (event_callback)
 				event_callback();
 
@@ -78,12 +76,12 @@ void input_system::process_entities(world& owner) {
 
 				bool succesfully_mapped = false;
 
-				if (msg == key::down && !input_window.events.repeated) {
-					succesfully_mapped = post_intent_from_raw_id(owner, *it, input_window.events.key, true);
+				if (msg == key::down && !glwindow::get_current()->events.repeated) {
+					succesfully_mapped = post_intent_from_raw_id(owner, *it, glwindow::get_current()->events.key, true);
 				}
 
 				else if (msg == key::up)
-					succesfully_mapped = post_intent_from_raw_id(owner, *it, input_window.events.key, false);
+					succesfully_mapped = post_intent_from_raw_id(owner, *it, glwindow::get_current()->events.key, false);
 
 				else if (msg == mouse::ldown)
 					succesfully_mapped = post_intent_from_raw_id(owner, *it, mouse::ldown, true);

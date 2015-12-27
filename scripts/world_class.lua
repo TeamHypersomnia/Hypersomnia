@@ -1,41 +1,39 @@
 world_class = inherits_from {}
 
 function world_class:constructor()
-	self.world_inst = world_instance()
-	-- shortcut 
-	self.world = self.world_inst.world
+	self.world = WORLD
 	
 	self.prestep_callbacks = {}
 	self.poststep_callbacks = {}
 	
 	-- shortcuts for systems
-	self.input_system = self.world_inst.input_system
-	self.visibility_system = self.world_inst.visibility_system
-	self.pathfinding_system = self.world_inst.pathfinding_system
-	self.render_system = self.world_inst.render_system
-	self.physics_system = self.world_inst.physics_system
+	self.input_system = self.world.input_system
+	self.visibility_system = self.world.visibility_system
+	self.pathfinding_system = self.world.pathfinding_system
+	self.render_system = self.world.render_system
+	self.physics_system = self.world.physics_system
 	
 	self.physics_system.prestepping_routine = function(owner)
-		local my_instance = self.world_inst
+		local world = self.world
 	
 		local dt = self.physics_system:get_timestep_ms()
 		for i=1, #self.prestep_callbacks do
 			self.prestep_callbacks[i](dt)
 		end
 		
-		my_instance.steering_system:substep(owner)
-		my_instance.movement_system:substep(owner)
+		world.steering_system:substep(owner)
+		world.movement_system:substep(owner)
 	end
 	
 	self.physics_system.poststepping_routine = function(owner)
-		local my_instance = self.world_inst
+		local world = self.world
 		
 		local dt = self.physics_system:get_timestep_ms()
 		for i=1, #self.poststep_callbacks do
 			self.poststep_callbacks[i](dt)
 		end
 		
-		my_instance.destroy_system:consume_events(owner)
+		world.destroy_system:consume_events(owner)
 	end
 	
 	self.is_paused = false
@@ -124,54 +122,49 @@ function world_class:clear_all_queues()
 end
 
 function world_class:handle_input()
-	local my_instance = self.world_inst
-	local world = my_instance.world
-	
-	my_instance.input_system:process_entities(world)
+	self.world.input_system:process_entities(self.world)
 end
 
 function world_class:handle_physics()
-	local my_instance = self.world_inst
-	local world = my_instance.world
+	local world = self.world
 	
 	local steps_made = 0
 	
 	-- physics must run first because the substep routine may flush message queues
 	if not self.is_paused then 
-		steps_made = my_instance.physics_system:process_entities(world)
+		steps_made = world.physics_system:process_entities(world)
     end
 	
 	return steps_made
 end
 
 function world_class:process_all_systems(is_view)
+	local world = self.world
+
 	if is_view == nil then
 		is_view = true
 	end
 
-	local my_instance = self.world_inst
-	local world = my_instance.world
-	
 	if not self.is_paused then
-		if is_view then my_instance.movement_system:process_entities(world) end
+		if is_view then world.movement_system:process_entities(world) end
 	end
      
 	if not self.is_paused then
-		my_instance.behaviour_tree_system:process_entities(world)
+		world.behaviour_tree_system:process_entities(world)
 	end
 	
-	if is_view then my_instance.lookat_system:process_entities(world) end
-	my_instance.chase_system:process_entities(world)
-	if is_view then my_instance.crosshair_system:process_entities(world) end
+	if is_view then world.lookat_system:process_entities(world) end
+	world.chase_system:process_entities(world)
+	if is_view then world.crosshair_system:process_entities(world) end
 	
 	if not self.is_paused then
 		if is_view then 
-			my_instance.particle_group_system:process_entities(world)
-			my_instance.animation_system:process_entities(world)
+			world.particle_group_system:process_entities(world)
+			world.animation_system:process_entities(world)
 		end
 
-		my_instance.visibility_system:process_entities(world)
-		my_instance.pathfinding_system:process_entities(world)
+		world.visibility_system:process_entities(world)
+		world.pathfinding_system:process_entities(world)
 	end	
 	
 	
@@ -179,39 +172,35 @@ function world_class:process_all_systems(is_view)
 end
 
 function world_class:call_deletes()
-	local my_instance = self.world_inst
-	local world = my_instance.world
-	if 
-	self:get_messages("destroy_message"):size() > 0 then
-	
+	if self:get_messages("destroy_message"):size() > 0 then
 	end
-	my_instance.destroy_system:consume_events(world)
+
+	self.world.destroy_system:consume_events(self.world)
 end
 
 function world_class:consume_events(is_view)
+	local world = self.world
+
 	if is_view == nil then
 		is_view = true
 	end
 
-	local my_instance = self.world_inst
-	local world = my_instance.world
-	
 	if is_view then
-		my_instance.camera_system:consume_events(world)
+		world.camera_system:consume_events(world)
 	end
 
 	self:handle_message_callbacks()
 	
 	if is_view then
 		if not self.is_paused then
-			my_instance.movement_system:consume_events(world)
-			my_instance.animation_system:consume_events(world)
+			world.movement_system:consume_events(world)
+			world.animation_system:consume_events(world)
 		end
 		
-		my_instance.crosshair_system:consume_events(world)
+		world.crosshair_system:consume_events(world)
 		
 		if not self.is_paused then
-			my_instance.particle_emitter_system:consume_events(world)
+			world.particle_emitter_system:consume_events(world)
 		end
 	end
 	
@@ -221,9 +210,6 @@ function world_class:consume_events(is_view)
 end
 
 function world_class:render()
-	local my_instance = self.world_inst
-	local world = my_instance.world
-	
-	my_instance.camera_system:process_entities(world)
-	my_instance.camera_system:process_rendering(world) 
+	self.world.camera_system:process_entities(self.world)
+	self.world.camera_system:process_rendering(self.world) 
 end

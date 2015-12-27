@@ -738,46 +738,13 @@
     <ClCompile Include="game_framework\bindings\all_systems_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\bindings\animate_component_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\animate_message_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\bindings\animation_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game_framework\bindings\b2Filter_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\bindings\behaviour_tree_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\bindings\body_helper_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\camera_component_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\chase_component_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\children_component_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\collision_message_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\crosshair_component_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\damage_component_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\damage_message_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\destroy_message_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game_framework\bindings\emission_binding.cpp">
@@ -792,28 +759,10 @@
     <ClCompile Include="game_framework\bindings\glwindow_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\bindings\gun_component_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\bindings\id_generator_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\bindings\input_component_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\intent_message_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\lookat_component_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\message_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\bindings\minmax_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\movement_component_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game_framework\bindings\network_binding.cpp">
@@ -825,19 +774,7 @@
     <ClCompile Include="game_framework\bindings\particle_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\bindings\particle_burst_message_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\bindings\particle_effect_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\particle_emitter_component_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\pathfinding_component_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\physics_component_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game_framework\bindings\polygon_binding.cpp">
@@ -852,9 +789,6 @@
     <ClCompile Include="game_framework\bindings\rect_xywh_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\bindings\render_component_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\bindings\rgba_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -864,13 +798,7 @@
     <ClCompile Include="game_framework\bindings\sfml_audio_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\bindings\shot_message_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\bindings\sprite_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\steering_component_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game_framework\bindings\text_binding.cpp">
@@ -882,9 +810,6 @@
     <ClCompile Include="game_framework\bindings\timer_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\bindings\transform_component_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\bindings\utilities_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -892,9 +817,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game_framework\bindings\vec2_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\visibility_component_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game_framework\bindings\world_binding.cpp">
@@ -973,9 +895,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game_framework\whole_engine_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\world_instance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utilities\entity_system\component.cpp">
@@ -1087,6 +1006,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utilities\entity_system\templated_list_to_hash_vector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\bindings\all_components_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\bindings\all_messages_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2624,9 +2549,6 @@
     <ClInclude Include="game_framework\game_framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\world_instance.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="utilities\entity_system\component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2775,6 +2697,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="utilities\entity_system\templated_list_to_hash_vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\all_component_includes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\all_message_includes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\all_system_includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

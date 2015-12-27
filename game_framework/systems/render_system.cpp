@@ -8,20 +8,7 @@
 #include "../components/visibility_component.h"
 #include "../components/physics_component.h"
 
-render_system::render_system(window::glwindow& output_window)
-	: output_window(output_window), visibility_expansion(1.f), max_visibility_expansion_distance(1000.f),
-	draw_visibility(0),
-	draw_substeering_forces(0),
-	draw_steering_forces(0),
-	draw_velocities(0),
-	draw_avoidance_info(0),
-	draw_wandering_info(0),
-	debug_drawing(0),
-	draw_weapon_info(0),
-	last_bound_buffer_location(nullptr)
-{
-	output_window.current();
-
+render_system::render_system() {
 	glEnable(GL_TEXTURE_2D); glerr
 	glEnable(GL_BLEND); glerr
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE); glerr
@@ -89,10 +76,11 @@ void render_system::generate_triangles(resources::renderable::draw_input& in, in
 		draw_layer(in, layers.size()-i-1);
 }
 
-void render_system::process_entities(world&) {
-}
-
 void render_system::call_triangles() {
+	if (triangles.empty()) return;
+
+	glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer); glerr
+
 	glBufferData(GL_ARRAY_BUFFER, sizeof(augs::vertex_triangle) * triangles.size(), triangles.data(), GL_STREAM_DRAW); glerr
 	//std::cout << "triangles:" << triangles.size() << std::endl;
 	glDrawArrays(GL_TRIANGLES, 0, triangles.size() * 3); glerr

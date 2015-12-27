@@ -217,7 +217,7 @@ namespace augs {
 				}
 		}
 
-		glwindow* glwindow::getcurrent() {
+		glwindow* glwindow::get_current() {
 			return context;
 		}
 

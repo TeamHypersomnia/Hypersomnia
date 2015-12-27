@@ -25,7 +25,7 @@ a tak to bys musial zapierdalac po wszystkich ktore maja message component a to 
 
 */
 struct input_system : public processing_system_templated<components::input> {
-	int quit_flag;
+	int quit_flag = 0;
 
 	std::function<void()> event_callback;
 
@@ -43,9 +43,6 @@ struct input_system : public processing_system_templated<components::input> {
 	void add_context(context*);
 	void clear_contexts();
 
-	window::glwindow& input_window;
-	input_system(window::glwindow&);
-	
 	bool is_down(int key);
 
 	input_system& operator=(const input_system&) {

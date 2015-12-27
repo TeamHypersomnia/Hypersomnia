@@ -4,10 +4,12 @@
 
 #include "misc/vector_wrapper.h"
 
-#include "world_instance.h"
 #include "game_framework.h"
 #include "utilities/script.h"
 #include "components/physics_component.h"
+
+#include "entity_system/entity_id.h"
+#include "utilities/lua_state_wrapper.h"
 
 #include <fstream>
 #include <iostream>
@@ -46,33 +48,8 @@ namespace bindings {
 		_emission(),
 		_particle_effect(),
 
-		_message(),
-		_intent_message(),
-		_animate_message(),
-		_particle_burst_message(),
-		_collision_message(),
-		_damage_message(),
-		_destroy_message(),
-		_shot_message(),
-
-		_render_component(),
-		_transform_component(),
-		_visibility_component(),
-		_pathfinding_component(),
-		_animate_component(),
-		_camera_component(),
-		_chase_component(),
-		_children_component(),
-		_crosshair_component(),
-		_damage_component(),
-		_gun_component(),
-		_input_component(),
-		_lookat_component(),
-		_movement_component(),
-		_particle_emitter_component(),
-		_physics_component(),
-		_steering_component(),
-		_behaviour_tree_component(),
+		_all_messages(),
+		_all_components(),
 
 		_entity(),
 		_body_helper(),
@@ -111,12 +88,16 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper, std::functio
 	luabind::module(raw)[
 		luabind::class_<ptr_wrapper<float>>("float_ptr"),
 
+			bind_stdvector<std::string>("string_vector"),
+			bind_stdvector<std::wstring>("wstring_vector"),
+			bind_stdvector<vec2>("vec2_vector"),
+			bind_stdvector<entity_id>("entity_ptr_vector"),
+
+			bind_vector_wrapper<int>("int_vector"),
 			bind_vector_wrapper<float>("float_vector"),
 
 			bindings::_id_generator(),
 			bindings::_minmax(),
-			bind_stdvector<vec2>("vec2_vector"),
-			bind_vector_wrapper<int>("int_vector"),
 			bindings::_value_animator(),
 			bindings::_b2Filter(),
 			bindings::_rgba(),
@@ -127,10 +108,8 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper, std::functio
 			bindings::_texture(),
 			bindings::_animation(),
 			bindings::_world(),
-			bind_stdvector<entity_id>("entity_ptr_vector"),
 			bindings::_sprite(),
 			bindings::_polygon(),
-
 
 			bindings::_network_binding(),
 
@@ -138,33 +117,9 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper, std::functio
 			bindings::_emission(),
 			bindings::_particle_effect(),
 
-			bindings::_message(),
-			bindings::_intent_message(),
-			bindings::_animate_message(),
-			bindings::_particle_burst_message(),
-			bindings::_collision_message(),
-			bindings::_damage_message(),
-			bindings::_destroy_message(),
-			bindings::_shot_message(),
-
-			bindings::_transform_component(),
-			bindings::_render_component(),
-			bindings::_visibility_component(),
-			bindings::_pathfinding_component(),
-			bindings::_animate_component(),
-			bindings::_camera_component(),
-			bindings::_chase_component(),
-			bindings::_children_component(),
-			bindings::_crosshair_component(),
-			bindings::_damage_component(),
-			bindings::_gun_component(),
-			bindings::_input_component(),
-			bindings::_lookat_component(),
-			bindings::_movement_component(),
-			bindings::_particle_emitter_component(),
-			bindings::_physics_component(),
-			bindings::_steering_component(),
-			bindings::_behaviour_tree_component(),
+			bindings::_all_messages(),
+			bindings::_all_components(),
+			bindings::_all_systems(),
 
 			bindings::_entity(),
 			bindings::_body_helper(),
@@ -184,13 +139,7 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper, std::functio
 			.def("c_str", &std::string::c_str)
 			,
 
-			bind_stdvector<std::string>("string_vector"),
-			bind_stdvector<std::wstring>("wstring_vector"),
 			bindings::_file_watcher(),
-
-			bindings::_all_systems(),
-
-			world_instance::bind(),
 
 			bindings::_text(),
 

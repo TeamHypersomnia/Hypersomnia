@@ -20,7 +20,6 @@ namespace augs {
 			friend LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
 
 			static glwindow* context;
-			static glwindow* getcurrent();
 
 			HWND hwnd;
 			HDC hdc;
@@ -40,6 +39,7 @@ namespace augs {
 			bool doubled;
 		public:
 			static void colored_print(int, const char* text);
+			static glwindow* get_current();
 
 			enum mode {
 				MINIMIZE = SW_MINIMIZE,
