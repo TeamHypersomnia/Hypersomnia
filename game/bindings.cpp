@@ -18,7 +18,7 @@ void bind_whole_hypersomnia(augs::lua_state_wrapper& wrapper) {
 
 	luabind::module(wrapper.raw)[
 		luabind::class_<hypersomnia_world, augs::world>("hypersomnia_world")
-		.def(luabind::constructor<>())
+		.def(luabind::constructor<overworld&>())
 			,
 
 		// bottlenecks

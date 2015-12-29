@@ -7,6 +7,8 @@
 #include "graphics/pixel.h"
 
 #include "game_framework/resources/render_info.h"
+#include "window_framework/window.h"
+
 namespace augs {
 	namespace misc {
 		/* vector wrapper that is used to faciliate binding to lua */
@@ -51,7 +53,7 @@ struct textbox_wrapper : public ctextbox {
 			}
 
 			if (m.msg == rect::event::keydown) {
-				if (m.owner.owner.events.key == window::event::keys::ENTER && !m.owner.owner.events.keys[window::event::keys::LSHIFT]) {
+				if (m.owner.owner.events.key == window::event::keys::ENTER && !window::glwindow::get_current()->events.keys[window::event::keys::LSHIFT]) {
 					if (command_callback)
 						command_callback(augs::misc::wstr(editor.get_str()));
 
@@ -95,7 +97,7 @@ struct hypersomnia_gui {
 struct gui_group {
 	augs::graphics::gui::group main_window;
 	void poll_events();
-	void draw_call(resources::renderable::draw_input& in);
+	void draw_call(resources::renderable::drawing_state& in);
 	void blur();
 
 	gui_group(hypersomnia_gui& owner);

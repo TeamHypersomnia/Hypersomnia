@@ -39,6 +39,9 @@
     <ClInclude Include="game\all_message_includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\hypersomnia_overworld.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -63,6 +66,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\hypersomnia_world.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\hypersomnia_overworld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

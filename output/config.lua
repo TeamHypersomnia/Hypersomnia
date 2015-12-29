@@ -33,8 +33,6 @@ if config_table.fullscreen == 1 then
 	set_display(config_table.resolution_w, config_table.resolution_h, 32)
 end
 
-global_gl_window = glwindow()
-
 local borders_type = glwindow.ALL_WINDOW_ELEMENTS
 
 if config_table.window_border == 0 or config_table.fullscreen then

@@ -5,13 +5,13 @@ void draw_tile_highlights(
 	resources::tile_layer& tile_layer, 
 	resources::animation& blink_animation, 
 	std::vector<int>& shining,
-	resources::renderable::draw_input& in) {
+	resources::renderable::drawing_state& in) {
 }
 
 vec2i get_random_coordinate_on_a_special_tile(
 	resources::tile_layer& tile_layer,
 	augs::vector_wrapper<int>& shining,
-	resources::renderable::draw_input& in) {
+	resources::renderable::drawing_state& in) {
 
 	auto visible_tiles = tile_layer.get_visible_tiles(in);
 	tile_layer.generate_indices_by_type(visible_tiles);

@@ -7,7 +7,7 @@
 using namespace components;
 using namespace messages;
 
-hypersomnia_world::hypersomnia_world() {
+hypersomnia_world::hypersomnia_world(augs::overworld& overworld) : world(overworld) {
 	register_messages_components_systems();
 }
 
@@ -27,7 +27,7 @@ void hypersomnia_world::register_messages_components_systems() {
 	register_component<particle_group>();
 	register_component<pathfinding>();
 	register_component<physics>();
-	register_component<render>();
+	register_component<components::render>();
 	register_component<steering>();
 	register_component<transform>();
 	register_component<visibility>();
@@ -58,9 +58,22 @@ void hypersomnia_world::register_messages_components_systems() {
 	register_message_queue<collision_message>();
 	register_message_queue<particle_burst_message>();
 	register_message_queue<shot_message>();
+	register_message_queue<raw_window_input_message>();
 }
 
-void hypersomnia_world::simulate() {
+void hypersomnia_world::perform_logic_step() {
+	get_system<input_system>().generate_input_intents_for_next_step();
+	get_system<render_system>().set_current_transforms_as_previous_for_interpolation();
 
+	get_system<camera_system>().react_to_input_intents();
 
+	get_system<physics_system>().step_and_set_new_transforms();
+
+	get_system<destroy_system>().delete_queued_entities();
 }
+
+void hypersomnia_world::render() {
+	get_system<camera_system>().resolve_cameras_transforms_and_smoothing();
+	get_system<camera_system>().render_all_cameras();
+}
+

@@ -8,17 +8,12 @@ namespace augs {
 
 class hypersomnia_world : public augs::world {
 public:
-	unsigned long long current_state_number = 0;
-
-	hypersomnia_world();
+	hypersomnia_world(augs::overworld&);
 	
 	void bind_this_to_lua_global(augs::lua_state_wrapper&, std::string global);
 
 	void register_messages_components_systems();
 	
-	void acquire_entropic_input();
-	
-	void simulate();
-
+	void perform_logic_step();
 	void render();
 };
