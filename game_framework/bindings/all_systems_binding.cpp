@@ -12,22 +12,14 @@ namespace bindings {
 	luabind::scope _all_systems() {
 		return
 			luabind::class_<physics_system>("_physics_system")
-			.def("process_entities", &physics_system::process_entities)
-			.def("process_steps", &physics_system::process_steps)
 			.def("enable_listener", &physics_system::enable_listener)
-			.def_readwrite("timestep_multiplier", &physics_system::timestep_multiplier)
-			.def_readwrite("enable_interpolation", &physics_system::enable_interpolation)
 			.def_readwrite("b2world", &physics_system::b2world)
-			.def_readwrite("prestepping_routine", &physics_system::prestepping_routine)
-			.def_readwrite("poststepping_routine", &physics_system::poststepping_routine)
 			.def("ray_cast", &physics_system::ray_cast_px)
 			.def("query_aabb", (physics_system::query_output(__thiscall physics_system::*) (vec2, vec2, b2Filter*, entity_id))(&physics_system::query_aabb_px))
 			.def("query_body", (physics_system::query_output(__thiscall physics_system::*) (entity_id subject, b2Filter*, entity_id)) (&physics_system::query_body))
 			.def("query_shape", (physics_system::query_output(__thiscall physics_system::*) (b2Shape*, b2Filter*, entity_id)) (&physics_system::query_shape))
 			.def("query_polygon", (physics_system::query_output(__thiscall physics_system::*) (const std::vector<vec2>&, b2Filter*, entity_id)) (&physics_system::query_polygon))
-			.def("push_away_from_walls", &physics_system::push_away_from_walls)
-			.def("get_timestep_ms", &physics_system::get_timestep_ms)
-			.def("configure_stepping", &physics_system::configure_stepping),
+			.def("push_away_from_walls", &physics_system::push_away_from_walls),
 
 			luabind::class_<steering_system>("_steering_system")
 			.def("process_entities", &steering_system::process_entities)
@@ -61,50 +53,46 @@ namespace bindings {
 			luabind::class_<animation_system>("_animation_system")
 			.def("consume_events", &animation_system::consume_events)
 			.def("process_entities", &animation_system::process_entities),
+
 			luabind::class_<camera_system>("_camera_system")
-			.def("process_rendering", &camera_system::process_rendering)
-			.def("process_entities", &camera_system::process_entities)
-			.def("consume_events", &camera_system::consume_events)
+			,
 			
+			luabind::class_<renderer>("renderer")
+			.def_readwrite("visibility_expansion", &renderer::visibility_expansion)
+			.def_readwrite("max_visibility_expansion_distance", &renderer::max_visibility_expansion_distance)
+			.def_readwrite("draw_steering_forces", &renderer::draw_steering_forces)
+			.def_readwrite("draw_substeering_forces", &renderer::draw_substeering_forces)
+			.def_readwrite("draw_velocities", &renderer::draw_velocities)
+			.def_readwrite("draw_avoidance_info", &renderer::draw_avoidance_info)
+			.def_readwrite("draw_wandering_info", &renderer::draw_wandering_info)
+			.def_readwrite("draw_visibility", &renderer::draw_visibility)
+			.def_readwrite("draw_weapon_info", &renderer::draw_weapon_info)
+			.def_readwrite("debug_drawing", &renderer::debug_drawing)
+			.def_readwrite("triangles", &renderer::triangles)
+			.def("push_line", &renderer::push_line)
+			.def("push_non_cleared_line", &renderer::push_non_cleared_line)
+			.def("push_line_channel", &renderer::push_line_channel)
+			.def("clear_channel", &renderer::clear_channel)
+			.def("clear_non_cleared_lines", &renderer::clear_non_cleared_lines)
+			.def("fullscreen_quad", &renderer::fullscreen_quad)
+
+			.def("default_render", &renderer::default_render)
+			.def("get_triangle_count", &renderer::get_triangle_count)
+			.def("get_triangle", &renderer::get_triangle)
+			.def("call_triangles", &renderer::call_triangles)
+			.def("push_triangle", &renderer::push_triangle)
+			.def("clear_triangles", &renderer::clear_triangles)
+			.def("draw_debug_info", &renderer::draw_debug_info)
 			,
 
 			luabind::class_<render_system>("_render_system")
-			.def_readwrite("visibility_expansion", &render_system::visibility_expansion)
-			.def_readwrite("max_visibility_expansion_distance", &render_system::max_visibility_expansion_distance)
-			.def_readwrite("draw_steering_forces", &render_system::draw_steering_forces)
-			.def_readwrite("draw_substeering_forces", &render_system::draw_substeering_forces)
-			.def_readwrite("draw_velocities", &render_system::draw_velocities)
-			.def_readwrite("draw_avoidance_info", &render_system::draw_avoidance_info)
-			.def_readwrite("draw_wandering_info", &render_system::draw_wandering_info)
-			.def_readwrite("draw_visibility", &render_system::draw_visibility)
-			.def_readwrite("draw_weapon_info", &render_system::draw_weapon_info)
-			.def_readwrite("debug_drawing", &render_system::debug_drawing)
-			.def_readwrite("triangles", &render_system::triangles)
-			.def("push_line", &render_system::push_line)
-			.def("push_non_cleared_line", &render_system::push_non_cleared_line)
-			.def("push_line_channel", &render_system::push_line_channel)
-			.def("clear_channel", &render_system::clear_channel)
-			.def("clear_non_cleared_lines", &render_system::clear_non_cleared_lines)
-			.def("fullscreen_quad", &render_system::fullscreen_quad)
-
 			.def("generate_layers", &render_system::generate_layers)
 			.def("draw_layer", &render_system::draw_layer)
-			.def("call_triangles", &render_system::call_triangles)
-			.def("push_triangle", &render_system::push_triangle)
-			.def("clear_triangles", &render_system::clear_triangles)
-			.def("draw_debug_info", &render_system::draw_debug_info)
-			.def("generate_triangles", &render_system::generate_triangles)
-			.def("default_render", &render_system::default_render)
-			.def("get_triangle_count", &render_system::get_triangle_count)
-			.def("get_triangle", &render_system::get_triangle)
+			.def("generate_and_draw_all_layers", &render_system::generate_and_draw_all_layers)
 			,
 
 			luabind::class_<input_system>("_input_system")
-			.def("process_entities", &input_system::process_entities)
-			.def_readwrite("quit_flag", &input_system::quit_flag)
-			.property("event_callback", bind_callback(&input_system::event_callback))
 			.def("add_context", &input_system::add_context)
-			.def("is_down", &input_system::is_down)
 			.def("clear_contexts", &input_system::clear_contexts),
 
 			luabind::class_<gun_system>("_gun_system")
@@ -120,8 +108,7 @@ namespace bindings {
 			luabind::class_<damage_system>("_damage_system")
 			.def("process_events", &damage_system::process_events)
 			.def("process_entities", &damage_system::process_entities),
-			luabind::class_<destroy_system>("_destroy_system")
-			.def("consume_events", &destroy_system::consume_events),
+			luabind::class_<destroy_system>("_destroy_system"),
 			luabind::class_<particle_group_system>("_particle_group_system")
 			.def("process_entities", &particle_group_system::process_entities),
 			luabind::class_<particle_emitter_system>("_particle_emitter_system")

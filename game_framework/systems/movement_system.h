@@ -5,10 +5,11 @@
 
 using namespace augs;
 
-
 class movement_system : public processing_system_templated<components::movement, components::physics> {
 public:
-	void consume_events(world&);
-	void substep(world&);
-	void process_entities(world&);
+	using processing_system_templated::processing_system_templated;
+
+	void consume_events();
+	void substep();
+	void process_entities();
 };

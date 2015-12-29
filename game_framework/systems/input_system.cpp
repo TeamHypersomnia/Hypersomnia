@@ -2,16 +2,16 @@
 #include "entity_system/entity.h"
 #include "entity_system/world.h"
 
+#include "../messages/raw_window_input_message.h"
+
 #include "input_system.h"
 #include <iostream>
+
+#include "utilities/misc/stream.h"
 
 using namespace augs::window;
 
 input_system::context::context() : enabled(true) {
-}
-
-bool input_system::is_down(int key) {
-	return augs::window::glwindow::get_current()->events.keys[key];
 }
 
 void input_system::clear() {
@@ -31,70 +31,63 @@ void input_system::clear_contexts() {
 	active_contexts.clear();
 }
 
-void input_system::post(messages::intent_message incoming_event, world& owner) {
-	auto& m = glwindow::get_current()->events.mouse;
-	incoming_event.mouse_pos = m.pos;
-	incoming_event.mouse_rel = m.raw_rel;
-	incoming_event.wheel_amount = m.scroll;
-
-	for (auto it = targets.begin(); it != targets.end(); ++it) {
-		if ((*it)->get<components::input>().intents.find(incoming_event.intent)) {
-			incoming_event.subject = *it;
-			owner.post_message(incoming_event);
-		}
-	}
+void input_system::inputs_per_step::serialize(std::ofstream& f) {
+	augs::serialize_vector(f, events);
 }
 
-bool input_system::post_intent_from_raw_id(world& owner, const context& active_context, unsigned id, bool state) {
-	auto input_map = active_context.raw_id_to_intent;
-	auto found_intent = input_map.find(id);
+void input_system::inputs_per_step::deserialize(std::ifstream& f) {
+	augs::deserialize_vector(f, events);
+}
 
-	if (found_intent != input_map.end()) {
-		post(messages::intent_message((*found_intent).second, state), owner);
-		return true;
-	}
+void input_system::generate_input_intents_for_next_step() {
+	inputs_per_step inputs_for_this_step;
+
+	for (auto& m : parent_world.get_message_queue<messages::raw_window_input_message>())
+		inputs_for_this_step.events.push_back(m.raw_window_input);
 	
-	return false;
-}
+	// record/replay total entropia
+	player.biserialize(inputs_for_this_step);
 
-void input_system::process_entities(world& owner) {
-	using namespace messages;
-	using namespace window::event;
-	using namespace keys;
-
-	window::event::message msg;
-	unsigned incoming_event = 0;
-
-	/* empty active_contexts vector indicates that we don't want input polling for this particular world */
 	if (!active_contexts.empty()) {
-		while (glwindow::get_current()->poll_events(msg)) {
-			if (event_callback)
-				event_callback();
-
+		for(auto& state : inputs_for_this_step.events) {
 			for (auto it : active_contexts) {
 				if (!it->enabled) continue;
 
-				bool succesfully_mapped = false;
+				unsigned intent_searched;
+				bool pressed_flag;
 
-				if (msg == key::down && !glwindow::get_current()->events.repeated) {
-					succesfully_mapped = post_intent_from_raw_id(owner, *it, glwindow::get_current()->events.key, true);
+				if (state.key_event == event::PRESSED) {
+					intent_searched = state.key;
+					pressed_flag = true;
+				}
+				else if (state.key_event == event::RELEASED) {
+					intent_searched = state.key;
+					pressed_flag = false;
+				}
+				else {
+					intent_searched = state.msg;
+					pressed_flag = true;
 				}
 
-				else if (msg == key::up)
-					succesfully_mapped = post_intent_from_raw_id(owner, *it, glwindow::get_current()->events.key, false);
+				auto input_map = it->raw_id_to_intent;
+				auto found_intent = input_map.find(intent_searched);
 
-				else if (msg == mouse::ldown)
-					succesfully_mapped = post_intent_from_raw_id(owner, *it, mouse::ldown, true);
-				else if (msg == mouse::lup)
-					succesfully_mapped = post_intent_from_raw_id(owner, *it, mouse::ldown, false);
-				else if (msg == mouse::rdown)
-					succesfully_mapped = post_intent_from_raw_id(owner, *it, mouse::rdown, true);
-				else if (msg == mouse::rup)
-					succesfully_mapped = post_intent_from_raw_id(owner, *it, mouse::rdown, false);
-				else
-					succesfully_mapped = post_intent_from_raw_id(owner, *it, msg, true);
+				if (found_intent != input_map.end()) {
+					messages::intent_message intent;
 
-				if (succesfully_mapped) break;
+					intent.intent = (*found_intent).second;
+					intent.pressed_flag = pressed_flag;
+					intent.state = state;
+
+					for (auto it = targets.begin(); it != targets.end(); ++it) {
+						if ((*it)->get<components::input>().intents.find(intent.intent)) {
+							intent.subject = *it;
+							parent_world.post_message(intent);
+						}
+					}
+
+					break;
+				}
 			}
 		}
 	}

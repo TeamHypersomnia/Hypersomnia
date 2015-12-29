@@ -10,6 +10,8 @@ using namespace augs;
 
 class damage_system : public processing_system_templated<components::damage, components::transform, components::physics> {
 public:
-	void process_events(world&);
-	void process_entities(world&);
+	using processing_system_templated::processing_system_templated;
+
+	void process_events();
+	void process_entities();
 };

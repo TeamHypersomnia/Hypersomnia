@@ -83,8 +83,6 @@ void steering::target_info::calc_direction_distance(const object_info& in) {
 		direction /= distance;
 }
 
-render_system* _render = nullptr;
-
 steering::avoidance::avoidance_info_output steering::avoidance::get_avoidance_info(const scene& in) {
 	avoidance_info_output out;
 	float velocity_angle = in.subject.unit_vel.degrees();
@@ -247,14 +245,16 @@ vec2 steering::containment::steer(scene in) {
 	/* get avoidance info */
 	auto avoidance = get_avoidance_info(in);
 
-	/* debug drawing */
-	if (_render->draw_avoidance_info) {
-		_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance.avoidance[0], avoidance.avoidance[1], pixel_32(255, 255, 255, 255)));
-		_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance.avoidance[1], avoidance.avoidance[2], pixel_32(255, 255, 255, 255)));
-		_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance.avoidance[2], avoidance.avoidance[3], pixel_32(255, 255, 255, 255)));
-		_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance.avoidance[3], avoidance.avoidance[0], pixel_32(255, 255, 255, 255)));
+	auto& renderer = augs::renderer::get_current();
 
-		_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance.rightmost_line[0], avoidance.rightmost_line[1], pixel_32(255, 255, 255, 255)));
+	/* debug drawing */
+	if (renderer.draw_avoidance_info) {
+		renderer.manually_cleared_lines.push_back(renderer::debug_line(avoidance.avoidance[0], avoidance.avoidance[1], pixel_32(255, 255, 255, 255)));
+		renderer.manually_cleared_lines.push_back(renderer::debug_line(avoidance.avoidance[1], avoidance.avoidance[2], pixel_32(255, 255, 255, 255)));
+		renderer.manually_cleared_lines.push_back(renderer::debug_line(avoidance.avoidance[2], avoidance.avoidance[3], pixel_32(255, 255, 255, 255)));
+		renderer.manually_cleared_lines.push_back(renderer::debug_line(avoidance.avoidance[3], avoidance.avoidance[0], pixel_32(255, 255, 255, 255)));
+
+		renderer.manually_cleared_lines.push_back(renderer::debug_line(avoidance.rightmost_line[0], avoidance.rightmost_line[1], pixel_32(255, 255, 255, 255)));
 	}
 
 	/* prepare the line we will cast rays along */
@@ -288,8 +288,8 @@ vec2 steering::containment::steer(scene in) {
 		else
 			p2 = ray_location.project_onto(avoidance.avoidance[1], avoidance.avoidance[2]);
 
-		if (_render->draw_avoidance_info)
-			_render->manually_cleared_lines.push_back(render_system::debug_line(p1, p2, pixel_32(255, 0, 0, 255)));
+		if (renderer.draw_avoidance_info)
+			renderer.manually_cleared_lines.push_back(renderer::debug_line(p1, p2, pixel_32(255, 0, 0, 255)));
 		
 		/* cast the ray and save output */
 		auto output = in.physics->ray_cast_px(p1, p2, ray_filter, in.subject_entity);
@@ -297,8 +297,8 @@ vec2 steering::containment::steer(scene in) {
 		/* if our ray hits anything */
 		if (output.hit) {
 			
-			if (_render->draw_avoidance_info)
-				_render->manually_cleared_lines.push_back(render_system::debug_line(p1, output.intersection, pixel_32(0, 255, 255, 255)));
+			if (renderer.draw_avoidance_info)
+				renderer.manually_cleared_lines.push_back(renderer::debug_line(p1, output.intersection, pixel_32(0, 255, 255, 255)));
 			
 			vec2 rightmost_projection = ray_location.project_onto(avoidance.rightmost_line[0], avoidance.rightmost_line[1]);
 
@@ -330,6 +330,8 @@ vec2 steering::containment::steer(scene in) {
 }
 
 vec2 steering::obstacle_avoidance::steer(scene in) {
+	auto& renderer = augs::renderer::get_current();
+
 	float avoidance_rectangle_length = get_avoidance_length(in.subject);
 
 	if (in.subject.speed < 0.001f) return vec2();
@@ -411,9 +413,9 @@ vec2 steering::obstacle_avoidance::steer(scene in) {
 				}
 			}
 			else {
-				if (_render->draw_avoidance_info) {
-					_render->manually_cleared_lines.push_back(render_system::debug_line(visibility_edges[j].first, visibility_edges[j].second, pixel_32(255, 0, 0, 255)));
-					_render->manually_cleared_lines.push_back(render_system::debug_line(visibility_edges[wrap(j - 1)].first, visibility_edges[wrap(j - 1)].second, pixel_32(255, 0, 0, 255)));
+				if (renderer.draw_avoidance_info) {
+					renderer.manually_cleared_lines.push_back(renderer::debug_line(visibility_edges[j].first, visibility_edges[j].second, pixel_32(255, 0, 0, 255)));
+					renderer.manually_cleared_lines.push_back(renderer::debug_line(visibility_edges[wrap(j - 1)].first, visibility_edges[wrap(j - 1)].second, pixel_32(255, 0, 0, 255)));
 				}
 			}
 
@@ -437,19 +439,19 @@ vec2 steering::obstacle_avoidance::steer(scene in) {
 					}
 				}
 				else {
-					if (_render->draw_avoidance_info) {
-						_render->manually_cleared_lines.push_back(render_system::debug_line(visibility_edges[j].first, visibility_edges[j].second, pixel_32(255, 0, 0, 255)));
-						_render->manually_cleared_lines.push_back(render_system::debug_line(visibility_edges[wrap(j + 1)].first, visibility_edges[wrap(j + 1)].second, pixel_32(255, 0, 0, 255)));
+					if (renderer.draw_avoidance_info) {
+						renderer.manually_cleared_lines.push_back(renderer::debug_line(visibility_edges[j].first, visibility_edges[j].second, pixel_32(255, 0, 0, 255)));
+						renderer.manually_cleared_lines.push_back(renderer::debug_line(visibility_edges[wrap(j + 1)].first, visibility_edges[wrap(j + 1)].second, pixel_32(255, 0, 0, 255)));
 					}
 				}
 	}
 
-	auto draw_avoidance = [&avoidance, this](pixel_32 col) {
-		if (_render->draw_avoidance_info) {
-			_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance.avoidance[0], avoidance.avoidance[1], force_color));
-			_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance.avoidance[1], avoidance.avoidance[2], force_color));
-			_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance.avoidance[2], avoidance.avoidance[3], force_color));
-			_render->manually_cleared_lines.push_back(render_system::debug_line(avoidance.avoidance[3], avoidance.avoidance[0], force_color));
+	auto draw_avoidance = [&avoidance, &renderer,this](pixel_32 col) {
+		if (renderer.draw_avoidance_info) {
+			renderer.manually_cleared_lines.push_back(renderer::debug_line(avoidance.avoidance[0], avoidance.avoidance[1], force_color));
+			renderer.manually_cleared_lines.push_back(renderer::debug_line(avoidance.avoidance[1], avoidance.avoidance[2], force_color));
+			renderer.manually_cleared_lines.push_back(renderer::debug_line(avoidance.avoidance[2], avoidance.avoidance[3], force_color));
+			renderer.manually_cleared_lines.push_back(renderer::debug_line(avoidance.avoidance[3], avoidance.avoidance[0], force_color));
 		}
 	};
 
@@ -467,8 +469,8 @@ vec2 steering::obstacle_avoidance::steer(scene in) {
 		best_candidate = discontinuity_info.vertex_ptr;
 
 		/* debug drawing */
-		if (_render->draw_avoidance_info) {
-			_render->manually_cleared_lines.push_back(render_system::debug_line(in.subject.position, best_candidate, pixel_32(0, 255, 0, 255)));
+		if (renderer.draw_avoidance_info) {
+			renderer.manually_cleared_lines.push_back(renderer::debug_line(in.subject.position, best_candidate, pixel_32(0, 255, 0, 255)));
 
 			/* angle the entity has to turn by to face the navigation candidate */
 			float angle = (best_candidate - in.subject.position).angle_between(in.subject.unit_vel);
@@ -476,7 +478,7 @@ vec2 steering::obstacle_avoidance::steer(scene in) {
 			for (auto& p : avoidance.avoidance)
 				p = vec2(p).rotate(angle, in.subject.position);
 
-			_render->manually_cleared_lines.push_back(render_system::debug_line(in.subject.position, best_candidate, pixel_32(0, 255, 255, 255)));
+			renderer.manually_cleared_lines.push_back(renderer::debug_line(in.subject.position, best_candidate, pixel_32(0, 255, 255, 255)));
 
 			draw_avoidance(pixel_32());
 		}
@@ -503,6 +505,8 @@ vec2 steering::obstacle_avoidance::steer(scene in) {
 }
 
 vec2 steering::wander::steer(scene in) {
+	auto& renderer = augs::renderer::get_current();
+
 	/* rotate the current displacement angle by a random offset */
 	in.state->current_wander_angle += randval(-displacement_degrees, displacement_degrees);
 
@@ -513,21 +517,23 @@ vec2 steering::wander::steer(scene in) {
 
 	vec2 displacement_force = displacement_position - in.subject.position;
 
-	if (_render->draw_wandering_info) {
-		_render->manually_cleared_lines.push_back(render_system::debug_line(circle_center - vec2(circle_radius, 0), circle_center + vec2(circle_radius, 0), pixel_32(0, 255, 255, 255)));
-		_render->manually_cleared_lines.push_back(render_system::debug_line(circle_center - vec2(0, circle_radius), circle_center + vec2(0, circle_radius), pixel_32(0, 255, 255, 255)));
-		_render->manually_cleared_lines.push_back(render_system::debug_line(circle_center, displacement_position, pixel_32(255, 0, 0, 255)));
-		_render->manually_cleared_lines.push_back(render_system::debug_line(in.subject.position, displacement_position, pixel_32(0, 255, 0, 255)));
+	if (renderer.draw_wandering_info) {
+		renderer.manually_cleared_lines.push_back(renderer::debug_line(circle_center - vec2(circle_radius, 0), circle_center + vec2(circle_radius, 0), pixel_32(0, 255, 255, 255)));
+		renderer.manually_cleared_lines.push_back(renderer::debug_line(circle_center - vec2(0, circle_radius), circle_center + vec2(0, circle_radius), pixel_32(0, 255, 255, 255)));
+		renderer.manually_cleared_lines.push_back(renderer::debug_line(circle_center, displacement_position, pixel_32(255, 0, 0, 255)));
+		renderer.manually_cleared_lines.push_back(renderer::debug_line(in.subject.position, displacement_position, pixel_32(0, 255, 0, 255)));
 	}
 
 	return displacement_force.normalize() * in.subject.max_speed;
 }
 
 vec2 steering::separation::steer(scene in) {
+	auto& renderer = augs::renderer::get_current();
+
 	auto bodies = in.physics->query_square_px(in.subject.position, square_side, &group, in.subject_entity).bodies;
 
 	/* debug drawing */
-	if (_render->draw_avoidance_info) {
+	if (renderer.draw_avoidance_info) {
 		b2AABB aabb;
 		aabb.lowerBound = in.subject.position - square_side / 2;
 		aabb.upperBound = in.subject.position + square_side / 2;
@@ -539,10 +545,10 @@ vec2 steering::separation::steer(scene in) {
 			aabb.upperBound - vec2(square_side, 0)
 		};
 
-		_render->manually_cleared_lines.push_back(render_system::debug_line((vec2(whole_vision[0]) + vec2(-1.f, 0.f)), (vec2(whole_vision[1]) + vec2(1.f, 0.f))));
-		_render->manually_cleared_lines.push_back(render_system::debug_line((vec2(whole_vision[1]) + vec2(0.f, -1.f)), (vec2(whole_vision[2]) + vec2(0.f, 1.f))));
-		_render->manually_cleared_lines.push_back(render_system::debug_line((vec2(whole_vision[2]) + vec2(1.f, 0.f)), (vec2(whole_vision[3]) + vec2(-1.f, 0.f))));
-		_render->manually_cleared_lines.push_back(render_system::debug_line((vec2(whole_vision[3]) + vec2(0.f, 1.f)), (vec2(whole_vision[0]) + vec2(0.f, -1.f))));
+		renderer.manually_cleared_lines.push_back(renderer::debug_line((vec2(whole_vision[0]) + vec2(-1.f, 0.f)), (vec2(whole_vision[1]) + vec2(1.f, 0.f))));
+		renderer.manually_cleared_lines.push_back(renderer::debug_line((vec2(whole_vision[1]) + vec2(0.f, -1.f)), (vec2(whole_vision[2]) + vec2(0.f, 1.f))));
+		renderer.manually_cleared_lines.push_back(renderer::debug_line((vec2(whole_vision[2]) + vec2(1.f, 0.f)), (vec2(whole_vision[3]) + vec2(-1.f, 0.f))));
+		renderer.manually_cleared_lines.push_back(renderer::debug_line((vec2(whole_vision[3]) + vec2(0.f, 1.f)), (vec2(whole_vision[0]) + vec2(0.f, -1.f))));
 	}
 
 	vec2 center;
@@ -588,13 +594,14 @@ void steering::behaviour_state::update_target_info(const object_info& subject) {
 }
 
 
-void steering_system::process_entities(world& owner) { substep(owner);  }
-void steering_system::substep(world& owner) {
-	auto& render = owner.get_system<render_system>();
-	auto& physics_sys = owner.get_system<physics_system>();
-	_render = &render;
+void steering_system::process_entities() { substep();  }
+void steering_system::substep() {
+	auto& renderer = get_renderer();
 
-	render.manually_cleared_lines.clear();
+	auto& render = parent_world.get_system<render_system>();
+	auto& physics_sys = parent_world.get_system<physics_system>();
+
+	renderer.manually_cleared_lines.clear();
 
 	for (auto it : targets) {
 		auto& steer = it->get<steering>();
@@ -605,9 +612,9 @@ void steering_system::substep(world& owner) {
 			false means we want pixels
 		*/
 		auto shape_verts = helpers::get_transformed_shape_verts(it, false);
-		auto draw_vector = [&position, &render](vec2 v, pixel_32 col){
+		auto draw_vector = [&position, &renderer](vec2 v, pixel_32 col){
 			if (v.non_zero())
-				render.manually_cleared_lines.push_back(render_system::debug_line(position, position + v, col));
+				renderer.manually_cleared_lines.push_back(renderer::debug_line(position, position + v, col));
 		};
 		
 		/* resultant force that sums all behaviours and that is to be finally applied */
@@ -644,7 +651,7 @@ void steering_system::substep(world& owner) {
 			if (subject_behaviour.max_force_applied >= 0.f)
 				added_force.clamp(subject_behaviour.max_force_applied);
 
-			if (render.draw_substeering_forces)
+			if (renderer.draw_substeering_forces)
 				draw_vector(behaviour.last_output_force, subject_behaviour.force_color);
 
 			resultant_force += added_force;
@@ -659,10 +666,10 @@ void steering_system::substep(world& owner) {
 		if (steer.apply_force && resultant_force.non_zero())
 			body->ApplyForce(resultant_force*PIXELS_TO_METERSf * body->GetMass(), body->GetWorldCenter(), true);
 
-		if (render.draw_steering_forces)
+		if (renderer.draw_steering_forces)
 			draw_vector(resultant_force, pixel_32(255, 255, 255, 122));
 
-		if (render.draw_velocities)
+		if (renderer.draw_velocities)
 			draw_vector(METERS_TO_PIXELSf * body->GetLinearVelocity(), pixel_32(0, 255, 0, 255));
 	}
 }

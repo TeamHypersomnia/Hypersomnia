@@ -1,8 +1,40 @@
 #pragma once
 #include <string>
 #include <sstream>
+#include <fstream>
+#include <vector>
 
 namespace augs {
+	template <typename T>
+	void serialize(std::ofstream& f, const T& t) {
+		f.write((const char*)&t, sizeof(T));
+	}
+
+	template <typename T>
+	void deserialize(std::ifstream& f, T& t) {
+		f.read((char*)&t, sizeof(T));
+	}
+
+	template <typename T>
+	void serialize_vector(std::ofstream& f, const std::vector<T>& t) {
+		size_t size = t.size();
+		f.write((const char*)&size, sizeof(size));
+
+		for (auto& p : t)
+			f.write((const char*)&p, sizeof(p));
+	}
+
+	template <typename T>
+	void deserialize_vector(std::ifstream& f, std::vector<T>& t) {
+		size_t size;
+		f.read((char*)&size, sizeof(size));
+
+		t.resize(size);
+
+		for (auto& p : t)
+			f.read((char*)&p, sizeof(p));
+	}
+
 	namespace misc {
 
 		/* number to string conversion */

@@ -66,13 +66,15 @@ namespace bindings {
 			.def_readwrite("redirection", &destroy_message::redirection)
 			.def_readwrite("only_children", &destroy_message::only_children),
 
+			luabind::class_<window::event::state>("event_state")
+			.def(luabind::constructor<>())
+			,
+
 			luabind::class_<intent_message, message>("intent_message")
 			.def(luabind::constructor<>())
 			.def_readwrite("intent", &intent_message::intent)
-			.def_readwrite("state_flag", &intent_message::state_flag)
-			.def_readwrite("mouse_pos", &intent_message::mouse_pos)
-			.def_readwrite("mouse_rel", &intent_message::mouse_rel)
-			.def_readwrite("wheel_amount", &intent_message::wheel_amount)
+			.def_readwrite("pressed_flag", &intent_message::pressed_flag)
+			.def_readwrite("state", &intent_message::state)
 			.enum_("intent_type")[
 				luabind::value("MOVE_FORWARD", intent_message::intent_type::MOVE_FORWARD),
 					luabind::value("MOVE_BACKWARD", intent_message::intent_type::MOVE_BACKWARD),

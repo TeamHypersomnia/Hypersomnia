@@ -242,11 +242,11 @@ int behaviour_tree::composite::begin_traversal(task& current_task) {
 	return status;
 }
 
-void behaviour_tree_system::process_entities(world& owner) {
-	substep(owner);
+void behaviour_tree_system::process_entities() {
+	substep();
 }
 
-void behaviour_tree_system::substep(world& owner) {
+void behaviour_tree_system::substep() {
 	for (auto it : targets) {
 		auto& trees = it->get<components::behaviour_tree>();
 		

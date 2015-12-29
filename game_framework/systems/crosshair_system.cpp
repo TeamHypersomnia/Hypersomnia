@@ -6,8 +6,8 @@
 #include "../components/render_component.h"
 #include "../resources/render_info.h"
 
-void crosshair_system::consume_events(world& owner) {
-	auto events = owner.get_message_queue<messages::intent_message>();
+void crosshair_system::consume_events() {
+	auto events = parent_world.get_message_queue<messages::intent_message>();
 
 	for (auto it : events) {
 		if (it.intent == messages::intent_message::intent_type::AIM) {
@@ -17,7 +17,7 @@ void crosshair_system::consume_events(world& owner) {
 			if (!transform || !crosshair) continue;
 
 			/* move crosshair according to its sensitivity and relative mouse movement (easier to support multiple resolutions) */
-			transform->pos += vec2(it.mouse_rel * crosshair->sensitivity).rotate(crosshair->rotation_offset, vec2());
+			transform->pos += vec2(it.state.mouse.rel * crosshair->sensitivity).rotate(crosshair->rotation_offset, vec2());
 
 			//if (it.mouse_rel.non_zero()) {
 			//	/* align the crosshair to bounds rect */
@@ -31,7 +31,7 @@ void crosshair_system::consume_events(world& owner) {
 	}
 }
 
-void crosshair_system::process_entities(world& owner) {
+void crosshair_system::process_entities() {
 	for (auto it : targets) {
 		auto render = it->find<components::render>();
 		auto& crosshair = it->get<components::crosshair>();

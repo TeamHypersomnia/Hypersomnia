@@ -2,7 +2,7 @@
 #include "processing_system.h"
 
 namespace augs {
-	world::world() {
+	world::world(overworld& parent_overworld) : parent_overworld(parent_overworld) {
 		entities.initialize(10000);
 	}
 

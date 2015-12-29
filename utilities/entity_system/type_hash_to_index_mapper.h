@@ -11,7 +11,7 @@ namespace augs {
 	public:
 		type_hash_to_index_mapper();
 
-		/* creates new types if not found */
+		/* creates new types in the library and indexes them if not found */
 		void add_hash_to_index_mappings(type_hash_vector type_hashes);
 		std::vector<unsigned> generate_indices(type_hash_vector type_hashes) const;
 

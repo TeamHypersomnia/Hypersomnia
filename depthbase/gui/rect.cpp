@@ -1,6 +1,8 @@
 #pragma once
 #include "rect.h"
 #include "stylesheet.h"
+#include "window_framework/window.h"
+
 #include <algorithm>
 #include <functional>
 #undef max
@@ -131,7 +133,7 @@ namespace augs {
 				auto& sys =	e.owner.owner;
 				auto& wnd = sys.events;
 				if(e == event::wheel) {
-					if(wnd.keys[augs::window::event::keys::SHIFT]) {
+					if(window::glwindow::get_current()->events.keys[augs::window::event::keys::SHIFT]) {
 						int temp(int(scroll.x));
 						if(scrollable) {
 							scroll.x -= wnd.mouse.scroll;
@@ -188,7 +190,7 @@ namespace augs {
 			bool rect::handle_tab(event_info e) {
 				using namespace augs::window::event::keys;
 				if(e == event::keydown && e.owner.owner.events.key == TAB) {
-					rect* f = seek_focusable(this, e.owner.owner.events.keys[LSHIFT]);
+					rect* f = seek_focusable(this, window::glwindow::get_current()->events.keys[LSHIFT]);
 					if(f) e.owner.set_focus(f);
 					return true;
 				}
@@ -221,7 +223,7 @@ namespace augs {
 			bool rect::handle_enter(event_info e) {
 				using namespace augs::window::event::keys;
 				if(e == event::keydown && e.owner.owner.events.key == ENTER) {
-					rect* f = seek_focusable(this, e.owner.owner.events.keys[LSHIFT]);
+					rect* f = seek_focusable(this, window::glwindow::get_current()->events.keys[LSHIFT]);
 					if(f) e.owner.set_focus(f);
 					return true;
 				}

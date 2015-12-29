@@ -7,8 +7,8 @@
 
 #include "../messages/destroy_message.h"
 
-void destroy_system::consume_events(world& owner) {
-	auto events = owner.get_message_queue<messages::destroy_message>();
+void destroy_system::delete_queued_entities() {
+	auto events = parent_world.get_message_queue<messages::destroy_message>();
 	std::vector <std::pair<entity_id, entity_id>> to_destroy;
 
 	std::function < void (entity_id subject, entity_id redirection) > push_destroyed;
@@ -39,9 +39,9 @@ void destroy_system::consume_events(world& owner) {
 	std::sort(to_destroy.begin(), to_destroy.end());
 	to_destroy.resize(std::distance(to_destroy.begin(), std::unique(to_destroy.begin(), to_destroy.end())));
 
-	owner.get_message_queue<messages::destroy_message>().clear();
+	parent_world.get_message_queue<messages::destroy_message>().clear();
 
 	for (size_t i = 0; i < to_destroy.size(); ++i) {
-		owner.delete_entity(to_destroy[i].first);// , to_destroy[i].second);
+		parent_world.delete_entity(to_destroy[i].first);// , to_destroy[i].second);
 	}
 }

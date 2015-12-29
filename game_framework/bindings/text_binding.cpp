@@ -22,7 +22,7 @@ std::string wchar_vec_to_str(vector_wrapper<wchar_t> str) {
 	return std::string(out_w.begin(), out_w.end());
 }
 
-rects::wh<float> quick_print_wrapper(resources::renderable::draw_input v,
+rects::wh<float> quick_print_wrapper(resources::renderable::drawing_state v,
 	const fstr& str,
 	vec2 pos,
 	unsigned wrapping_width,
@@ -65,11 +65,11 @@ namespace bindings {
 
 
 			//.def(luabind::constructor<>())
-			//.def_readwrite("camera_transform", &renderable::draw_input::camera_transform)
-			//.def_readwrite("visible_area", &renderable::draw_input::visible_area)
-			//.def_readwrite("additional_info", &renderable::draw_input::additional_info)
-			//.def_readwrite("output", &renderable::draw_input::output)
-			//.def_readwrite("transform", &renderable::draw_input::transform)
+			//.def_readwrite("camera_transform", &renderable::drawing_state::camera_transform)
+			//.def_readwrite("visible_area", &renderable::drawing_state::visible_area)
+			//.def_readwrite("additional_info", &renderable::drawing_state::additional_info)
+			//.def_readwrite("output", &renderable::drawing_state::output)
+			//.def_readwrite("transform", &renderable::drawing_state::transform)
 			//,
 
 			;

@@ -6,6 +6,8 @@
 namespace augs {
 	memory_pool::memory_pool(int slot_count, int slot_size) { initialize(slot_count, slot_size);  }
 	
+	memory_pool::id::id() {}
+
 	memory_pool::byte* memory_pool::id::ptr() { return owner->get(*this); }
 	const memory_pool::byte* memory_pool::id::ptr() const { return owner->get(*this); }
 

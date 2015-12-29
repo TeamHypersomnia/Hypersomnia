@@ -3,34 +3,12 @@
 #include "../components/input_component.h"
 #include "../messages/intent_message.h"
 
+#include "window_framework/event.h"
+#include "misc/input_player.h"
+
 using namespace augs;
 
-
-namespace augs {
-	namespace window {
-		class glwindow;
-	}
-}
-/* input to inna domena eventów bo mamy taki sam payload a masa zupelnie co innego znaczacych enumow 
-zwykle message to beda po prostu message_component i sorted vector przyjmowanych enumow
-
-rozwazyc generyczny message component a w bazowym message enum type
-key message z booleanem
-mouse message z vec2 i juz jebac ze sean proponowal w jednym to trzymac
-
-ew jakas hybryda ze obok siebie istnieja message i input componenty
-
-jednak bedzie input component jako normalny component bo wlasnie o to chodzi w componentach ze one serve purpose of grouping
-a tak to bys musial zapierdalac po wszystkich ktore maja message component a to by bylo chujowe
-
-*/
 struct input_system : public processing_system_templated<components::input> {
-	int quit_flag = 0;
-
-	std::function<void()> event_callback;
-
-	void process_entities(world&);
-	
 	struct context {
 		std::unordered_map<int, int> raw_id_to_intent;
 		bool enabled;
@@ -39,21 +17,22 @@ struct input_system : public processing_system_templated<components::input> {
 		void set_intent(unsigned, messages::intent_message::intent_type);
 	};
 
-	std::vector<context*> active_contexts;
+	struct inputs_per_step {
+		std::vector<augs::window::event::state> events;
+
+		void serialize(std::ofstream&);
+		void deserialize(std::ifstream&);
+	};
+
+	using processing_system_templated::processing_system_templated;
+
+	void generate_input_intents_for_next_step();
+	
 	void add_context(context*);
 	void clear_contexts();
 
-	bool is_down(int key);
-
-	input_system& operator=(const input_system&) {
-		assert(0);
-		return *this;
-	}
-
-	/* returns true if successfully mapped raw input to a high level intent */
-	bool post_intent_from_raw_id(world& owner, const context&, unsigned id, bool state = true);
-
-	void post(messages::intent_message incoming_event, world& owner);
-
 	void clear() override;
+
+	std::vector<context*> active_contexts;
+	input_player<inputs_per_step> player;
 };

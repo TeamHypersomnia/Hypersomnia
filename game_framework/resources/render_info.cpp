@@ -101,7 +101,7 @@ namespace resources {
 			size = tex->get_size();
 	}
 
-	void sprite::draw(draw_input& in) {
+	void sprite::draw(drawing_state& in) {
 		if (in.additional_info) {
 			in.additional_info->was_drawn = false;
 		}
@@ -262,7 +262,7 @@ namespace resources {
 	//	convex_models.push_back(model);
 	//}
 
-	void polygon::draw(draw_input& in) {
+	void polygon::draw(drawing_state& in) {
 		vertex_triangle new_tri;
 		auto camera_pos = in.camera_transform.pos;
 
@@ -345,7 +345,7 @@ namespace resources {
 
 	}
 
-	rects::ltrb<int> tile_layer::get_visible_tiles(draw_input& in) {
+	rects::ltrb<int> tile_layer::get_visible_tiles(drawing_state& in) {
 		rects::ltrb<int> visible_tiles;
 
 		visible_tiles.l = int((in.rotated_camera_aabb.l - in.transform.pos.x) / 32.f);
@@ -360,13 +360,13 @@ namespace resources {
 		return visible_tiles;
 	}
 
-	void tile_layer::draw(draw_input& in) {
+	void tile_layer::draw(drawing_state& in) {
 		/* if it is not visible, return */
 		if (!in.rotated_camera_aabb.hover(rects::xywh<float>(in.transform.pos.x, in.transform.pos.y, size.w*square_size, size.h*square_size))) return;
 
 		auto visible_tiles = get_visible_tiles(in);
 
-		draw_input draw_input_copy = in;
+		drawing_state draw_input_copy = in;
 		
 		for (int y = visible_tiles.t; y < visible_tiles.b; ++y) {
 			for (int x = visible_tiles.l; x < visible_tiles.r; ++x) {
@@ -414,7 +414,7 @@ namespace resources {
 }
 
 namespace components {
-	void particle_group::draw(draw_input& in) {
+	void particle_group::draw(drawing_state& in) {
 		for (auto& s : stream_slots)
 			for (auto& it : s.particles.particles) {
 				auto temp_alpha = it.face.color.a;

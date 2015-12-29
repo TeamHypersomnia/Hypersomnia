@@ -11,17 +11,15 @@
 
 #include <iostream>
 
-pathfinding_system::pathfinding_system() : draw_memorised_walls(false), draw_undiscovered(false),
+pathfinding_system::pathfinding_system(world& parent_world) : processing_system_templated(parent_world), draw_memorised_walls(false), draw_undiscovered(false),
 	epsilon_distance_the_same_vertex(3.f) {}
 
-void pathfinding_system::process_entities(world& owner) {
+void pathfinding_system::process_entities() {
 	/* prepare epsilons to be used later, just to make the notation more clear */
 	const float epsilon_distance_visible_point_sq = epsilon_distance_visible_point * epsilon_distance_visible_point;
 	
 	/* we'll need a reference to physics system for raycasting */
-	physics_system& physics = owner.get_system<physics_system>();
-	/* we'll need a reference to render system for debug drawing */
-	render_system& render = owner.get_system<render_system>();
+	physics_system& physics = parent_world.get_system<physics_system>();
 
 	for (auto it : targets) {
 		/* get necessary components */
@@ -156,10 +154,10 @@ void pathfinding_system::process_entities(world& owner) {
 								sensor_direction * 10 + vert.location + sensor_direction.perpendicular_cw() * 4
 							};
 
-							//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[0], sensor_polygon[1], pixel_32(255, 255, 255, 255)));
-							//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[1], sensor_polygon[2], pixel_32(255, 255, 255, 255)));
-							//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[2], sensor_polygon[3], pixel_32(255, 255, 255, 255)));
-							//render.non_cleared_lines.push_back(render_system::debug_line(sensor_polygon[3], sensor_polygon[0], pixel_32(255, 255, 255, 255)));
+							//render.non_cleared_lines.push_back(renderer(sensor_polygon[0], sensor_polygon[1], pixel_32(255, 255, 255, 255)));
+							//render.non_cleared_lines.push_back(renderer(sensor_polygon[1], sensor_polygon[2], pixel_32(255, 255, 255, 255)));
+							//render.non_cleared_lines.push_back(renderer(sensor_polygon[2], sensor_polygon[3], pixel_32(255, 255, 255, 255)));
+							//render.non_cleared_lines.push_back(renderer(sensor_polygon[3], sensor_polygon[0], pixel_32(255, 255, 255, 255)));
 
 							auto out = physics.query_polygon(sensor_polygon, &vision.filter, it);
 
@@ -303,11 +301,11 @@ void pathfinding_system::process_entities(world& owner) {
 
 			if (draw_undiscovered) {
 				for (auto& disc : vertices)
-					render.lines.push_back(render_system::debug_line(disc.location, disc.sensor, pixel_32(0, 127, 255, 255)));
+					get_renderer().lines.push_back(renderer::debug_line(disc.location, disc.sensor, pixel_32(0, 127, 255, 255)));
 
 				for (auto& disc : pathfinding.session().discovered_vertices)
 					//if(disc.sensor.non_zero())
-					render.lines.push_back(render_system::debug_line(disc.location, disc.location + vec2(0, pathfinding.target_offset), pixel_32(0, 255, 0, 255)));
+					get_renderer().lines.push_back(renderer::debug_line(disc.location, disc.location + vec2(0, pathfinding.target_offset), pixel_32(0, 255, 0, 255)));
 			}
 
 			if (!vertices.empty()) {
@@ -407,8 +405,8 @@ void pathfinding_system::process_entities(world& owner) {
 
 
 				if (draw_undiscovered) {
-					render.lines.push_back(render_system::debug_line(transform.pos, current_target.sensor, pixel_32(255, 255, 0, 255)));
-					render.lines.push_back(render_system::debug_line(transform.pos, pathfinding.session().target, pixel_32(255, 0, 0, 255)));
+					get_renderer().lines.push_back(renderer::debug_line(transform.pos, current_target.sensor, pixel_32(255, 255, 0, 255)));
+					get_renderer().lines.push_back(renderer::debug_line(transform.pos, pathfinding.session().target, pixel_32(255, 0, 0, 255)));
 				}
 
 				bool rays_hit = false;

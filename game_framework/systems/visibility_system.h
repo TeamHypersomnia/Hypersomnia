@@ -9,9 +9,9 @@ using namespace augs;
 
 class visibility_system : public processing_system_templated<components::transform, components::visibility> {
 public:
-	visibility_system();
+	visibility_system(world&);
 
-	void process_entities(world&);
+	void process_entities();
 
 	int draw_triangle_edges;
 	int draw_cast_rays;

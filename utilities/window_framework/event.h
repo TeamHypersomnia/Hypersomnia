@@ -1,6 +1,8 @@
 #pragma once
 #include "math/vec2.h"
 #include <windows.h>
+#include <bitset>
+
 #undef max
 #undef min
 namespace augs {
@@ -8,19 +10,25 @@ namespace augs {
 		namespace event {
 			typedef unsigned message;
 
+			enum {
+				PRESSED = 1,
+				RELEASED = 2
+			};
+
 			struct state {
 				struct mouse_info {
 					vec2i pos, rel, raw_rel, ldrag, rdrag;
-					bool state[3];
-					int scroll;
+					bool state[3] = { false, false, false };
+					int scroll = 0;
 				} mouse;
 
 				event::message msg;
-				int key;
-				bool repeated;
-				wchar_t utf16;
-				unsigned utf32;
-				bool keys[256];
+				int key_event = 0;
+				int key = 0;
+				bool repeated = false;
+				wchar_t utf16 = 0;
+				unsigned utf32 = 0;
+				std::bitset<256> keys;
 			};
 
 			enum {

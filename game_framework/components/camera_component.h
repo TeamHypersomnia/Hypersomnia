@@ -47,7 +47,7 @@ namespace components {
 		camera() { smooth_timer.reset(); }
 
 		/* arguments: subject, renderer, mask */
-		std::function<void(augs::entity_id, resources::renderable::draw_input, int)> drawing_callback;
+		std::function<void(augs::entity_id, resources::renderable::drawing_state, int)> drawing_callback;
 
 	private:
 		friend class camera_system;

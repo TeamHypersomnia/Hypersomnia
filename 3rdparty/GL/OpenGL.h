@@ -5,4 +5,4 @@
 #include <string>
 
 void report_glerr(GLenum __error, std::string location);
-#define glerr { report_glerr(glGetError(), __FUNCTION__); }
+#define glerr { report_glerr(glGetError(), __FUNCTION__); };

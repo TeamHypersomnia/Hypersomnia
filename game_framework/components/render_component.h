@@ -15,6 +15,7 @@ namespace components {
 		bool was_drawn = false;
 
 		transform previous_transform;
+		bool interpolate = true;
 
 		enum mask_type {
 			WORLD,

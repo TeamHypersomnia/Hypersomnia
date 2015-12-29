@@ -11,7 +11,9 @@ using namespace augs;
 
 class animation_system : public processing_system_templated<components::animate, components::render> {
 public:
+	using processing_system_templated::processing_system_templated;
+
 	timer animation_timer;
-	void consume_events(world&);
-	void process_entities(world&);
+	void consume_events();
+	void process_entities();
 };

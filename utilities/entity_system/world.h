@@ -11,6 +11,7 @@
 #include "entity.h"
 
 #include "misc/unsafe_type_collection.h"
+#include "overworld.h"
 
 namespace augs {
 	class processing_system;
@@ -24,9 +25,11 @@ namespace augs {
 
 		std::vector<processing_system*> all_systems;
 	public:
+		overworld& parent_overworld;
+
 		type_hash_to_index_mapper component_library;
 
-		world();
+		world(overworld& parent_overworld);
 		~world();
 
 		template <class T>
@@ -47,7 +50,7 @@ namespace augs {
 			if (all_systems_map.find<T>())
 				return;
 
-			all_systems_map.add<T>(args...);
+			all_systems_map.add<T>(std::ref(*this), args...);
 			all_systems_map.register_type<T>();
 
 			T& new_system = all_systems_map.get<T>();

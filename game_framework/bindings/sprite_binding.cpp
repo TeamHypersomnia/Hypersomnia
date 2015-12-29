@@ -13,16 +13,16 @@ namespace bindings {
 		return
 			luabind::class_<renderable>("renderable"),
 
-			luabind::class_<renderable::draw_input>("draw_input")
+			luabind::class_<renderable::drawing_state>("drawing_state")
 			.def(luabind::constructor<>())
-			.def(luabind::constructor<const renderable::draw_input&>())
-			.def_readwrite("camera_transform", &renderable::draw_input::camera_transform)
-			.def_readwrite("visible_area", &renderable::draw_input::visible_area)
-			.def_readwrite("additional_info", &renderable::draw_input::additional_info)
-			.def_readwrite("output", &renderable::draw_input::output)
-			.def_readwrite("transform", &renderable::draw_input::transform)
-			.def_readwrite("always_visible", &renderable::draw_input::always_visible)
-			.def_readwrite("rotated_camera_aabb", &renderable::draw_input::rotated_camera_aabb)
+			.def(luabind::constructor<const renderable::drawing_state&>())
+			.def_readwrite("camera_transform", &renderable::drawing_state::camera_transform)
+			.def_readwrite("visible_area", &renderable::drawing_state::visible_area)
+			.def_readwrite("additional_info", &renderable::drawing_state::additional_info)
+			.def_readwrite("output", &renderable::drawing_state::output)
+			.def_readwrite("transform", &renderable::drawing_state::transform)
+			.def_readwrite("always_visible", &renderable::drawing_state::always_visible)
+			.def_readwrite("rotated_camera_aabb", &renderable::drawing_state::rotated_camera_aabb)
 			,
 
 			luabind::class_<sprite, renderable>("sprite")

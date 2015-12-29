@@ -124,7 +124,7 @@ namespace augs {
 				void textbox::handle_interface(event_info e) {
 					using namespace augs::window::event::keys;
 					auto& w = e.owner.owner.events;
-					auto* k = w.keys;
+					auto& k = w.keys;
 					vec2i mouse = w.mouse.pos;
 					bool s = k[SHIFT], c = k[CTRL];
 

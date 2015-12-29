@@ -82,6 +82,8 @@ namespace augs {
 
 				events.mouse.rel.x = 0;
 				events.mouse.rel.y = 0;
+				events.key_event = 0;
+
 				switch (m) {
 				case character:
 					events.utf16 = wchar_t(wParam);
@@ -111,6 +113,7 @@ namespace augs {
 						}
 						events.keys[wParam] = true;
 						events.key = wParam;
+						events.key_event = event::PRESSED;
 						events.repeated = ((lParam & (1 << 30)) != 0);
 					//}
 					break;								
@@ -118,11 +121,12 @@ namespace augs {
 				case up:							
 					events.keys[wParam] = false;
 					switch(wParam) {
-					case CTRL:	   events.keys[RCTRL] =		events.keys[LCTRL] = false; break;
+					case CTRL:	   events.keys[RCTRL] = events.keys[LCTRL] = false; break;
 					case SHIFT:	   events.keys[RSHIFT] =	events.keys[LSHIFT] = false; break;
 					case ALT:	   events.keys[RALT] =		events.keys[LALT] = events.keys[LCTRL] = events.keys[CTRL] = false; break;
 					}
 					events.key = wParam;
+					events.key_event = event::RELEASED;
 					break;
 
 					using namespace event::mouse;
@@ -130,32 +134,48 @@ namespace augs {
 					events.mouse.scroll = GET_WHEEL_DELTA_WPARAM(wParam);
 					break;
 				case ldown:
-						events.mouse.state[0] = events.keys[LMOUSE] = true;  
-						if(doubled && triple_timer.extract<std::chrono::milliseconds>() < triple_click_delay) {
-							m = events.msg = ltripleclick;
-							doubled = false;
-						}
-						SetCapture(hwnd);
+					events.key_event = event::PRESSED;
+					events.key = LMOUSE;
+					events.mouse.state[0] = events.keys[LMOUSE] = true;
+
+					if (doubled && triple_timer.extract<std::chrono::milliseconds>() < triple_click_delay) {
+						m = events.msg = ltripleclick;
+						doubled = false;
+					}
+					SetCapture(hwnd);
 					break;
 				case rdown:				    
+					events.key_event = event::PRESSED;
+					events.key = RMOUSE;
 					events.mouse.state[1] = events.keys[RMOUSE] = true;  break;
 				case mdown:				    
+					events.key_event = event::PRESSED;
+					events.key = MMOUSE;
 					events.mouse.state[2] = events.keys[MMOUSE] = true;  break;
 				case ldoubleclick:
+					events.key = LMOUSE;
 					SetCapture(hwnd);
-					events.mouse.state[0] = events.keys[LMOUSE] = true; 
+					events.mouse.state[0] = events.keys[LMOUSE] = true;
 					triple_timer.extract<std::chrono::microseconds>();
 					doubled = true;
 					break;
 				case rdoubleclick:			    
+					events.key = RMOUSE;
 					events.mouse.state[1] = events.keys[RMOUSE] = true;  break;
 				case mdoubleclick:			    
+					events.key = MMOUSE;
 					events.mouse.state[2] = events.keys[MMOUSE] = true;  break;
 				case lup:				    
+					events.key_event = event::RELEASED;
+					events.key = LMOUSE;
 					events.mouse.state[0] = events.keys[LMOUSE] = false; if(GetCapture() == hwnd) ReleaseCapture(); break;
 				case rup:				    
+					events.key_event = event::RELEASED;
+					events.key = RMOUSE;
 					events.mouse.state[1] = events.keys[RMOUSE] = false; break;
 				case mup:				    
+					events.key_event = event::RELEASED;
+					events.key = MMOUSE;
 					events.mouse.state[2] = events.keys[MMOUSE] = false; break;
 				case motion:
 					p = MAKEPOINTS(lParam);
@@ -223,11 +243,10 @@ namespace augs {
 
 		glwindow* glwindow::context = nullptr;
 		
-		glwindow::glwindow()
-			: hwnd(0), hdc(0), hglrc(0), bpp(0), resize(nullptr), menu(false), transparent(false), active(false), doubled(false) {
-			for(int i=0;i<256;++i) events.keys[i] = false;
-			events.key = events.utf16 = events.utf32 = 0;
-			events.mouse.state[0] = events.mouse.state[1] = false;
+		glwindow::glwindow() {
+			for (int i = 0; i < 256; ++i)
+				events.keys[i] = false;
+			
 			triple_click_delay = GetDoubleClickTime();
 		}
 		
@@ -291,6 +310,10 @@ namespace augs {
 			return f != 0;
 		}
 
+		void glwindow::initial_gl_calls() {
+			glrenderer.initialize();
+		}
+
 		bool glwindow::swap_buffers() {
 			if(this != context) current();
 			return err(SwapBuffers(hdc)) != FALSE;
@@ -331,7 +354,7 @@ namespace augs {
 		}
 #endif
 
-		bool glwindow::poll_events(event::message& out) {
+		bool glwindow::poll_event(event::message& out) {
 			if(PeekMessageW(&wmsg, hwnd, 0, 0, PM_REMOVE)) {
 				 //DispatchMessage(&wmsg); 
 				using namespace event::key;
@@ -350,6 +373,19 @@ namespace augs {
 			return false;
 		}
 
+		std::vector<event::state> glwindow::poll_events() {
+			window::event::message msg;
+			std::vector<event::state> output;
+
+			while (poll_event(msg)) {
+				auto& state = glwindow::get_current()->events;
+
+				if (!state.repeated)
+					output.push_back(state);
+			}
+
+			return output;
+		}
 		
 		void glwindow::set_minimum_size(rects::wh<int> r) {
 			if(!r.good()) r = get_window_rect();

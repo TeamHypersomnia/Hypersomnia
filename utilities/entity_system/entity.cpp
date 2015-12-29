@@ -53,10 +53,10 @@ namespace augs {
 
 		auto* component_ptr = type_to_component.get(component_type_hash);
 
-		/* delete component from corresponding pool, first cast to component_type to avoid polymorphic indirection */
+		/* delete component from the corresponding pool, use hash to identify the proper destructor */
 		owner_world.get_components_by_hash(component_type_hash).free_with_destructor(*component_ptr, component_type_hash);
 
-		/* delete component from entity's map */
+		/* delete component entry from entity's map */
 		type_to_component.remove(component_type_hash);
 
 #ifdef INCLUDE_COMPONENT_NAMES

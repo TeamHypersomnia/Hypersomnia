@@ -66,14 +66,14 @@ void gun_system::remove(entity_id e) {
 	return processing_system::remove(e);
 }
 
-void gun_system::consume_events(world& owner) {
-	auto events = owner.get_message_queue<messages::intent_message>();
+void gun_system::consume_events() {
+	auto events = parent_world.get_message_queue<messages::intent_message>();
 
 	for (auto it : events) {
 		if (it.intent == messages::intent_message::intent_type::SHOOT) {
 			auto* gun = it.subject->find<components::gun>();
 			if (gun)
-				gun->trigger_mode = it.state_flag ? (gun->current_rounds > 0 ? gun->SHOOT : gun->MELEE) : gun->NONE;
+				gun->trigger_mode = it.pressed_flag ? (gun->current_rounds > 0 ? gun->SHOOT : gun->MELEE) : gun->NONE;
 		}
 	}
 }
@@ -89,9 +89,9 @@ void components::gun::shake_camera(float rotation) {
 	}
 }
 
-void gun_system::process_entities(world& owner) {
-	auto& physics_sys = owner.get_system<physics_system>();
-	auto& render = owner.get_system<render_system>();
+void gun_system::process_entities() {
+	auto& physics_sys = parent_world.get_system<physics_system>();
+	auto& render = parent_world.get_system<render_system>();
 
 	for (auto it : targets) {
 		const auto& gun_transform = it->get<components::transform>();
@@ -101,11 +101,11 @@ void gun_system::process_entities(world& owner) {
 
 		/********************************************************************************************************/
 
-		auto shooting_routine = [&]() {
+		auto shooting_routine = [this, &it, &gun, &gun_transform, &physics_sys]() {
 			messages::shot_message shot_msg;
 			shot_msg.subject = it;
 
-			owner.post_message(shot_msg);
+			parent_world.post_message(shot_msg);
 
 			messages::animate_message msg;
 			msg.animation_type = messages::animate_message::animation::SHOT;
@@ -117,7 +117,7 @@ void gun_system::process_entities(world& owner) {
 			msg.message_type = messages::animate_message::type::START;
 			msg.animation_priority = 1;
 
-			owner.post_message(msg);
+			parent_world.post_message(msg);
 
 			gun.shake_camera(gun_transform.rotation);
 
@@ -139,10 +139,10 @@ void gun_system::process_entities(world& owner) {
 			burst.type = messages::particle_burst_message::burst_type::WEAPON_SHOT;
 			burst.target_group_to_refresh = gun.get_barrel_smoke();
 
-			owner.post_message(burst);
+			parent_world.post_message(burst);
 
 			for (unsigned i = 0; i < gun.bullets_once; ++i) {
-				entity_id new_bullet = owner.create_entity();
+				entity_id new_bullet = parent_world.create_entity();
 
 				/* randomize bullet direction taking spread into account */
 				vec2 vel(vec2::from_degrees(
@@ -191,7 +191,7 @@ void gun_system::process_entities(world& owner) {
 			msg.message_type = messages::animate_message::type::START;
 			msg.animation_priority = 1;
 
-			owner.post_message(msg);
+			parent_world.post_message(msg);
 
 			gun.current_swing_direction = !gun.current_swing_direction;
 		};
@@ -212,9 +212,10 @@ void gun_system::process_entities(world& owner) {
 
 			query_vertices[gun.query_vertices] = gun_transform.pos;
 
-			if (render.draw_weapon_info)
+			auto& renderer = get_renderer();
+			if (renderer.draw_weapon_info)
 			for (size_t i = 0; i < query_vertices.size(); ++i) {
-				render.lines.push_back(render_system::debug_line(query_vertices[i], query_vertices[(i + 1) % query_vertices.size()]));
+				renderer.lines.push_back(renderer::debug_line(query_vertices[i], query_vertices[(i + 1) % query_vertices.size()]));
 			}
 
 			for (auto& v : query_vertices)
@@ -247,9 +248,9 @@ void gun_system::process_entities(world& owner) {
 					burst_msg.rotation = (-damage_msg.impact_velocity).degrees();
 					burst_msg.type = messages::particle_burst_message::burst_type::BULLET_IMPACT;
 
-					owner.post_message(damage_msg);
-					owner.post_message(burst_msg);
-					owner.post_message(burst_msg);
+					parent_world.post_message(damage_msg);
+					parent_world.post_message(burst_msg);
+					parent_world.post_message(burst_msg);
 				}
 			}
 		};

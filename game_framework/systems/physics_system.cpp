@@ -12,34 +12,7 @@ float PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 
 #include <iostream>
 
-
-physics_system::stepped_timer::stepped_timer(physics_system* owner) : owner(owner), current_step(-1) {
-	reset();
-}
-
-void physics_system::stepped_timer::reset() {
-	current_step = owner->all_steps;
-}
-
-float physics_system::stepped_timer::get_milliseconds() const {
-	return get_steps() * static_cast<float>(owner->accumulator.get_timestep());
-}
-
-float physics_system::stepped_timer::extract_milliseconds() {
-	float result = get_milliseconds();
-	reset();
-	return result;
-}
-
-unsigned physics_system::stepped_timer::get_steps() const {
-	return owner->all_steps - current_step;
-}
-
-unsigned physics_system::stepped_timer::extract_steps() {
-	unsigned result = get_steps();
-	reset();
-	return result;
-}
+using namespace augs;
 
 bool physics_system::raycast_input::ShouldRaycast(b2Fixture* fixture) {
 	entity_id fixture_entity = fixture->GetBody()->GetUserData();
@@ -65,8 +38,8 @@ float32 physics_system::raycast_input::ReportFixture(b2Fixture* fixture, const b
 		return fraction;
 }
 
-physics_system::physics_system() : accumulator(60.0, 5), timestep_multiplier(1.f),
-b2world(b2Vec2(0.f, 0.f)), enable_interpolation(true), ray_casts_per_frame(0), all_steps(0) {
+physics_system::physics_system(world& parent_world) : processing_system_templated(parent_world),
+b2world(b2Vec2(0.f, 0.f)), ray_casts_per_frame(0) {
 		b2world.SetAllowSleeping(false);
 		b2world.SetAutoClearForces(false);
 		enable_listener(true);
@@ -380,59 +353,37 @@ void physics_system::enable_listener(bool flag) {
 }
 
 
-void physics_system::process_steps(world& owner, unsigned steps) {
-	listener.world_ptr = &owner;
+void physics_system::step_and_set_new_transforms() {
+	parent_world.get_message_queue<messages::collision_message>().clear();
 
-	for (unsigned i = 0; i < steps; ++i) {
-		int32 velocityIterations = 8;
-		int32 positionIterations = 3;
+	listener.world_ptr = &parent_world;
 
-		if (enable_interpolation)
-			reset_states();
+	int32 velocityIterations = 8;
+	int32 positionIterations = 3;
 
-		if (enable_motors)
-			for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
-				if (b->GetType() == b2_staticBody) continue;
-				auto& physics = static_cast<entity_id>(b->GetUserData())->get<components::physics>();
+	if (enable_motors) {
+		for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
+			if (b->GetType() == b2_staticBody) continue;
+			auto& physics = static_cast<entity_id>(b->GetUserData())->get<components::physics>();
 
-				if (physics.enable_angle_motor) {
-					float nextAngle = static_cast<float>(b->GetAngle() + b->GetAngularVelocity() / accumulator.get_hz());
-					float totalRotation = (constrainAngle(physics.target_angle) * 0.01745329251994329576923690768489f) - nextAngle;
-					while (totalRotation < -180 * 0.01745329251994329576923690768489f) totalRotation += 360 * 0.01745329251994329576923690768489f;
-					while (totalRotation >  180 * 0.01745329251994329576923690768489f) totalRotation -= 360 * 0.01745329251994329576923690768489f;
-					float desiredAngularVelocity = totalRotation * static_cast<float>(accumulator.get_hz());
-					float impulse = b->GetInertia() * desiredAngularVelocity;// disregard time factor
-					b->ApplyAngularImpulse(impulse*physics.angle_motor_force_multiplier, true);
-				}
+			if (physics.enable_angle_motor) {
+				float nextAngle = static_cast<float>(b->GetAngle() + b->GetAngularVelocity() / parent_overworld.accumulator.get_hz());
+				float totalRotation = (constrainAngle(physics.target_angle) * 0.01745329251994329576923690768489f) - nextAngle;
+				while (totalRotation < -180 * 0.01745329251994329576923690768489f) totalRotation += 360 * 0.01745329251994329576923690768489f;
+				while (totalRotation >  180 * 0.01745329251994329576923690768489f) totalRotation -= 360 * 0.01745329251994329576923690768489f;
+				float desiredAngularVelocity = totalRotation * static_cast<float>(parent_overworld.accumulator.get_hz());
+				float impulse = b->GetInertia() * desiredAngularVelocity;// disregard time factor
+				b->ApplyAngularImpulse(impulse*physics.angle_motor_force_multiplier, true);
 			}
-
-		owner.get_message_queue<messages::collision_message>().clear();
-
-		if (prestepping_routine)
-			prestepping_routine(owner);
-
-		b2world.Step(static_cast<float32>(accumulator.per_second()), velocityIterations, positionIterations);
-		b2world.ClearForces();
-		++all_steps;
-
-		if (poststepping_routine)
-			poststepping_routine(owner);
+		}
 	}
 
-	if (steps == 0) b2world.ClearForces();
+	b2world.Step(static_cast<float32>(per_second()), velocityIterations, positionIterations);
+	b2world.ClearForces();
 
-	if (enable_interpolation)
-		smooth_states();
-	else reset_states();
-}
-
-unsigned physics_system::process_entities(world& owner) {
-	accumulator.set_time_multiplier(timestep_multiplier);
-	const unsigned steps = accumulator.update_and_extract_steps();
-
-	process_steps(owner, steps);
-
-	return steps;
+	b2world.ClearForces();
+	
+	reset_states();
 }
 
 void physics_system::add(entity_id) {
@@ -451,17 +402,10 @@ void physics_system::clear() {
 	processing_system::clear();
 }
 
-void physics_system::configure_stepping(float fps, int max_updates_per_step) {
-	accumulator = augs::delta_accumulator(fps, max_updates_per_step);
-}
-
-double physics_system::get_timestep_ms() {
-	return accumulator.get_timestep();
-}
-
 void physics_system::remove(entity_id e) {
 	b2world.DestroyBody(e->get<components::physics>().body);
 }
+
 #include "../components/render_component.h"
 void physics_system::reset_states() {
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
@@ -481,24 +425,5 @@ void physics_system::reset_states() {
 
 		if(render)
 			render->previous_transform = transform;
-	}
-}
-
-void physics_system::smooth_states() {
-	const float ratio = static_cast<float>(accumulator.get_ratio());
- 
-	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
-		if (b->GetType() == b2_staticBody) continue;
- 
-		auto& transform = static_cast<entity_id>(b->GetUserData())->get<components::transform>();
-		auto* render = static_cast<entity_id>(b->GetUserData())->find<components::render>();
-
-		if (render)
-		{
-			transform.pos = render->previous_transform.pos + ratio * (METERS_TO_PIXELSf*b->GetPosition() - render->previous_transform.pos);
-			
-			if (!b->IsFixedRotation())
-				transform.rotation = static_cast<float>(render->previous_transform.rotation + ratio * (b->GetAngle()*180.0/3.141592653589793238462 - render->previous_transform.rotation));
-		}
 	}
 }

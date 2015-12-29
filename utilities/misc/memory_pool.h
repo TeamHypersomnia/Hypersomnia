@@ -41,10 +41,12 @@ namespace augs {
 			friend class memory_pool;
 
 			memory_pool* owner = nullptr;
-			int version;
-			int indirection_index;
+			int version = 0xdeadbeef;
+			int indirection_index = 0xdeadbeef;
 			
 		public:
+			id();
+
 			bool operator<(const id&) const;
 			bool operator!() const;
 			bool operator!=(const id&) const;
@@ -61,6 +63,8 @@ namespace augs {
 		template <typename T>
 		class typed_id : private id {
 		public:
+			typed_id() {}
+
 			const T& get() const { return *reinterpret_cast<T*>(id::ptr()); }
 			const T* ptr() const { return  reinterpret_cast<T*>(id::ptr()); }
 

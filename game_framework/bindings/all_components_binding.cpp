@@ -506,16 +506,6 @@ namespace bindings {
 													.def("SetAsBox", (void(__thiscall b2PolygonShape::*)(float32, float32))(&b2PolygonShape::SetAsBox))
 													,
 
-													luabind::class_<physics_system::stepped_timer>("stepped_timer")
-													.def(luabind::constructor<physics_system*>())
-													.def("reset", &physics_system::stepped_timer::reset)
-													.def("get_milliseconds", &physics_system::stepped_timer::get_milliseconds)
-													.def("extract_milliseconds", &physics_system::stepped_timer::extract_milliseconds)
-													.def("get_steps", &physics_system::stepped_timer::get_steps)
-													.def("extract_steps", &physics_system::stepped_timer::extract_steps),
-
-
-
 													luabind::class_<physics>("physics_component")
 													.def(luabind::constructor<>())
 													.def_readwrite("body", &physics::body)
@@ -555,7 +545,7 @@ namespace bindings {
 													.def("GetMass", &b2Body::GetMass)
 													.def("SetBullet", &b2Body::SetBullet),
 
-													luabind::class_<render_system::debug_line>("debug_line")
+													luabind::class_<renderer::debug_line>("debug_line")
 													.def(luabind::constructor<vec2, vec2, pixel_32>())
 													,
 													luabind::class_<augs::vertex_triangle_buffer>("triangle_buffer"),

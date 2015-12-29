@@ -11,8 +11,8 @@
 
 using namespace messages;
 
-void movement_system::consume_events(world& owner) {
-	auto events = owner.get_message_queue<messages::intent_message>();
+void movement_system::consume_events() {
+	auto events = parent_world.get_message_queue<messages::intent_message>();
 
 	for (auto it : events) {
 		auto* movement = it.subject->find<components::movement>();
@@ -20,16 +20,16 @@ void movement_system::consume_events(world& owner) {
 
 		switch (it.intent) {
 		case intent_message::intent_type::MOVE_FORWARD:
-			movement->moving_forward = it.state_flag;
+			movement->moving_forward = it.pressed_flag;
 			break;
 		case intent_message::intent_type::MOVE_BACKWARD:
-			movement->moving_backward = it.state_flag;
+			movement->moving_backward = it.pressed_flag;
 			break;
 		case intent_message::intent_type::MOVE_LEFT:
-			movement->moving_left = it.state_flag;
+			movement->moving_left = it.pressed_flag;
 			break;
 		case intent_message::intent_type::MOVE_RIGHT:
-			movement->moving_right = it.state_flag;
+			movement->moving_right = it.pressed_flag;
 			break;
 		default: break;
 		}
@@ -40,8 +40,8 @@ template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
 
-void movement_system::substep(world& owner) {
-	auto& physics_sys = owner.get_system<physics_system>();
+void movement_system::substep() {
+	auto& physics_sys = parent_world.get_system<physics_system>();
 
 	for (auto it : targets) {
 		auto& physics = it->get<components::physics>();
@@ -116,7 +116,7 @@ void movement_system::substep(world& owner) {
 	}
 }
 
-void movement_system::process_entities(world& owner) {
+void movement_system::process_entities() {
 	for (auto it : targets) {
 		auto& physics = it->get<components::physics>();
 		auto& movement = it->get<components::movement>();
@@ -145,7 +145,7 @@ void movement_system::process_entities(world& owner) {
 			if (!receiver.stop_at_zero_movement)
 				copy.message_type = animate_message::type::CONTINUE;
 
-			owner.post_message(copy);
+			parent_world.post_message(copy);
 		}
 	}
 }

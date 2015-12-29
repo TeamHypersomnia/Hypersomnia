@@ -27,7 +27,7 @@ namespace bindings {
 
 
 			luabind::class_<world>("_world")
-			.def(luabind::constructor<>())
+			.def(luabind::constructor<overworld&>())
 			.def("create_entity", &world::create_entity)
 			.def("delete_entity", &world::delete_entity)
 			.def("delete_all_entities", &world::delete_all_entities)

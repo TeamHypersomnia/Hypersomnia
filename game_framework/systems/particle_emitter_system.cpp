@@ -12,8 +12,8 @@
 
 #include "misc/randval.h"
 
-entity_id particle_emitter_system::create_refreshable_particle_group(world& owner) {
-	entity_id ent = owner.create_entity();
+entity_id particle_emitter_system::create_refreshable_particle_group(world& parent_world) {
+	entity_id ent = parent_world.create_entity();
 	
 	ent->add(components::transform());
 	ent->add(components::particle_group()).stream_slots[0].destroy_when_empty = false;
@@ -64,11 +64,11 @@ void particle_emitter_system::spawn_particle(
 	group.particles.particles.push_back(new_particle);
 }
 
-void particle_emitter_system::consume_events(world& owner) {
+void particle_emitter_system::consume_events() {
 	using namespace components;
 	using namespace messages;
 
-	auto events = owner.get_message_queue<particle_burst_message>();
+	auto events = parent_world.get_message_queue<particle_burst_message>();
 
 	for (auto it : events) {
 		resources::particle_effect* emissions = nullptr;
@@ -102,7 +102,7 @@ void particle_emitter_system::consume_events(world& owner) {
 			if (emission.type == resources::emission::type::BURST) {
 				int burst_amount = randval(emission.particles_per_burst);
 
-				entity_id new_burst_entity = owner.create_entity();
+				entity_id new_burst_entity = parent_world.create_entity();
 				new_burst_entity->add(components::particle_group());
 				new_burst_entity->add(components::transform());
 
@@ -140,7 +140,7 @@ void particle_emitter_system::consume_events(world& owner) {
 
 		for (auto& stream : only_streams) {
 			if (!it.target_group_to_refresh) {
-				entity_id new_stream_entity = owner.create_entity();
+				entity_id new_stream_entity = parent_world.create_entity();
 				target_group = &new_stream_entity->add(components::particle_group());
 				target_transform = &new_stream_entity->add(components::transform());
 				target_render = &new_stream_entity->add(components::render());

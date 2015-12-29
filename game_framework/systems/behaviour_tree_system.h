@@ -10,6 +10,8 @@ class physics_system;
 
 class behaviour_tree_system : public processing_system_templated<components::behaviour_tree> {
 public:
-	void substep(world&);
-	void process_entities(world&);
+	using processing_system_templated::processing_system_templated;
+
+	void substep();
+	void process_entities();
 };

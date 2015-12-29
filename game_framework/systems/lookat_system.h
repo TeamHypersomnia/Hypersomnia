@@ -12,5 +12,7 @@ using namespace augs;
 class lookat_system : public processing_system_templated<components::transform, components::lookat> {
 	augs::timer smooth_timer;
 public:
-	void process_entities(world&);
+	using processing_system_templated::processing_system_templated;
+
+	void process_entities();
 };

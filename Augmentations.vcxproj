@@ -527,6 +527,7 @@
     <ClCompile Include="utilities\augmentations.cpp" />
     <ClCompile Include="utilities\entity_system\component.cpp" />
     <ClCompile Include="utilities\entity_system\entity.cpp" />
+    <ClCompile Include="utilities\entity_system\overworld.cpp" />
     <ClCompile Include="utilities\entity_system\processing_system.cpp" />
     <ClCompile Include="utilities\entity_system\component_bitset_matcher.cpp" />
     <ClCompile Include="utilities\entity_system\templated_list_to_hash_vector.cpp" />
@@ -535,6 +536,7 @@
     <ClCompile Include="utilities\error\augs_error.cpp" />
     <ClCompile Include="utilities\graphics\fbo.cpp" />
     <ClCompile Include="utilities\graphics\pixel.cpp" />
+    <ClCompile Include="utilities\graphics\renderer.cpp" />
     <ClCompile Include="utilities\graphics\shader.cpp" />
     <ClCompile Include="utilities\graphics\vertex.cpp" />
     <ClCompile Include="utilities\lua_state_wrapper.cpp" />
@@ -1055,6 +1057,7 @@
     <ClInclude Include="game_framework\messages\intent_message.h" />
     <ClInclude Include="game_framework\messages\message.h" />
     <ClInclude Include="game_framework\messages\particle_burst_message.h" />
+    <ClInclude Include="game_framework\messages\raw_window_input_message.h" />
     <ClInclude Include="game_framework\messages\shot_message.h" />
     <ClInclude Include="game_framework\resources\animate_info.h" />
     <ClInclude Include="game_framework\resources\particle_emitter_info.h" />
@@ -1083,14 +1086,17 @@
     <ClInclude Include="utilities\entity_system\entity.h" />
     <ClInclude Include="utilities\entity_system\entity_id.h" />
     <ClInclude Include="utilities\entity_system\entity_system.h" />
+    <ClInclude Include="utilities\entity_system\overworld.h" />
     <ClInclude Include="utilities\entity_system\processing_system.h" />
     <ClInclude Include="utilities\entity_system\component_bitset_matcher.h" />
     <ClInclude Include="utilities\entity_system\templated_list_to_hash_vector.h" />
     <ClInclude Include="utilities\entity_system\type_hash_to_index_mapper.h" />
     <ClInclude Include="utilities\entity_system\world.h" />
     <ClInclude Include="utilities\error\augs_error.h" />
+    <ClInclude Include="utilities\file.h" />
     <ClInclude Include="utilities\graphics\fbo.h" />
     <ClInclude Include="utilities\graphics\pixel.h" />
+    <ClInclude Include="utilities\graphics\renderer.h" />
     <ClInclude Include="utilities\graphics\shader.h" />
     <ClInclude Include="utilities\graphics\vertex.h" />
     <ClInclude Include="utilities\lua_state_wrapper.h" />
@@ -1100,6 +1106,7 @@
     <ClInclude Include="utilities\misc\delta_accumulator.h" />
     <ClInclude Include="utilities\misc\file_watcher.h" />
     <ClInclude Include="utilities\misc\id_generator.h" />
+    <ClInclude Include="utilities\misc\input_player.h" />
     <ClInclude Include="utilities\misc\map_wrapper.h" />
     <ClInclude Include="utilities\misc\memory_pool.h" />
     <ClInclude Include="utilities\misc\object_pool.h" />

@@ -9,6 +9,8 @@ using namespace augs;
 
 class crosshair_system : public processing_system_templated<components::transform, components::crosshair> {
 public:
-	void consume_events(world&);
-	void process_entities(world&);
+	using processing_system_templated::processing_system_templated;
+
+	void consume_events();
+	void process_entities();
 };

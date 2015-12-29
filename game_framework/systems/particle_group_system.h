@@ -11,5 +11,7 @@ using namespace augs;
 class particle_group_system : public processing_system_templated<components::particle_group> {
 	timer timer;
 public:
-	void process_entities(world&);
+	using processing_system_templated::processing_system_templated;
+
+	void process_entities();
 };

@@ -6,3 +6,4 @@
 #include "messages/particle_burst_message.h"
 #include "messages/damage_message.h"
 #include "messages/shot_message.h"
+#include "messages/raw_window_input_message.h"

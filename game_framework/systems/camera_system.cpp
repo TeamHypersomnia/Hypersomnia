@@ -10,11 +10,11 @@
 
 #include <iostream>
 
-void camera_system::consume_events(world& owner) {
-	auto events = owner.get_message_queue<messages::intent_message>();
+void camera_system::react_to_input_intents() {
+	auto events = parent_world.get_message_queue<messages::intent_message>();
 
 	for (auto it : events) {
-		if (it.intent == messages::intent_message::intent_type::SWITCH_LOOK && it.state_flag) {
+		if (it.intent == messages::intent_message::intent_type::SWITCH_LOOK && it.pressed_flag) {
 			auto& mode = it.subject->get<components::camera>().orbit_mode;
 			if (mode == components::camera::LOOK)
 				mode = components::camera::ANGLED;
@@ -23,7 +23,7 @@ void camera_system::consume_events(world& owner) {
 	}
 }
 
-void camera_system::process_entities(world& owner) {
+void camera_system::resolve_cameras_transforms_and_smoothing() {
 	double delta = smooth_timer.extract<std::chrono::seconds>();
 
 	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
@@ -130,8 +130,8 @@ void camera_system::process_entities(world& owner) {
 	}
 }
 
-void camera_system::process_rendering(world& owner) {
-	render_system& raw_renderer = owner.get_system<render_system>();
+void camera_system::render_all_cameras() {
+	auto& renderer = get_renderer();
 
 	for (auto e : targets) {
 		auto& camera = e->get<components::camera>();
@@ -141,27 +141,27 @@ void camera_system::process_rendering(world& owner) {
 			
 			auto drawn_transform = camera.previously_drawn_at;
 
-			resources::renderable::draw_input in;
+			resources::renderable::drawing_state in;
 			in.rotated_camera_aabb =
 				rects::ltrb<float>::get_aabb_rotated(camera.rendered_size, drawn_transform.rotation) + drawn_transform.pos - camera.rendered_size / 2;
 			in.camera_transform = drawn_transform;
-			in.output = &raw_renderer;
+			in.output = &renderer;
 			in.visible_area = camera.rendered_size;
 
 			if (camera.drawing_callback)
 				camera.drawing_callback(e, in, camera.mask);
 			else {
-				raw_renderer.generate_triangles(in, camera.mask);
-				raw_renderer.default_render(camera.rendered_size);
+				parent_world.get_system<render_system>().generate_and_draw_all_layers(in, camera.mask);
+				renderer.default_render(camera.rendered_size);
 
-				if (raw_renderer.debug_drawing) {
+				if (renderer.debug_drawing) {
 					glDisable(GL_TEXTURE_2D);
-					raw_renderer.draw_debug_info(camera.rendered_size, drawn_transform, nullptr);
+					renderer.draw_debug_info(camera.rendered_size, drawn_transform, nullptr, parent_world.get_system<render_system>().targets);
 					glEnable(GL_TEXTURE_2D);
 				}
 			}
 		}
 	}
 
-	raw_renderer.cleanup();
+	renderer.clear_geometry();
 }

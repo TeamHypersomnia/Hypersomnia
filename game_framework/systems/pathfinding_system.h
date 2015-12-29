@@ -11,9 +11,9 @@ using namespace augs;
 
 class pathfinding_system : public processing_system_templated<components::transform, components::visibility, components::pathfinding, components::physics> {
 public:
-	pathfinding_system();
+	pathfinding_system(world&);
 
-	void process_entities(world&);
+	void process_entities();
 	float epsilon_max_segment_difference;
 	float epsilon_distance_visible_point;
 	float epsilon_distance_the_same_vertex;

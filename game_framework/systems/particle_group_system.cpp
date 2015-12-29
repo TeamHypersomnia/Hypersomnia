@@ -18,7 +18,7 @@ void update_particle(resources::particle& p, float dt) {
 	p.lifetime_ms += dt;
 }
 
-void particle_group_system::process_entities(world& owner) {
+void particle_group_system::process_entities() {
 	float delta = static_cast<float>(timer.extract<std::chrono::milliseconds>());
 
 	for (auto it : targets) {
@@ -84,7 +84,7 @@ void particle_group_system::process_entities(world& owner) {
 		}
 		
 		if (should_destroy)
-			owner.post_message(messages::destroy_message(it));
+			parent_world.post_message(messages::destroy_message(it));
 
 		group.previous_transform = transform;
 	}

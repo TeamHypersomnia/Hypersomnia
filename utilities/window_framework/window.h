@@ -5,6 +5,8 @@
 #include "../misc/timer.h"
 #include <functional>
 
+#include "../graphics/renderer.h"
+
 struct lua_State;
 
 namespace augs {
@@ -21,25 +23,27 @@ namespace augs {
 
 			static glwindow* context;
 
-			HWND hwnd;
-			HDC hdc;
-			HGLRC hglrc;
+			HWND hwnd = nullptr;
+			HDC hdc = nullptr;
+			HGLRC hglrc = nullptr;
 			MSG wmsg;
 			RECT srect;
 
 			int minw, minh, maxw, maxh, cminw, cminh, cmaxw, cmaxh;
-			int bpp, style, exstyle, menu, vsyn;
+			int bpp = 0, style, exstyle, menu = 0, vsyn;
 			
 			std::wstring name;
-			bool active, transparent, doublebuf;
+			bool active = false, transparent = false, doublebuf;
 			
 			void _poll(event::message&, WPARAM, LPARAM);
 			
 			timer triple_timer;
-			bool doubled;
+			bool doubled = false;
 		public:
 			static void colored_print(int, const char* text);
 			static glwindow* get_current();
+
+			renderer glrenderer;
 
 			enum mode {
 				MINIMIZE = SW_MINIMIZE,
@@ -59,7 +63,7 @@ namespace augs {
 			};
 
 			event::state events;
-				
+
 			/* user settings */
 			std::function<void (glwindow&)> resize; /* resize function */
 			unsigned triple_click_delay; /* maximum delay time for the next click (after doubleclick) to be considered tripleclick (in milliseconds) */
@@ -95,7 +99,10 @@ namespace augs {
 #ifdef INCLUDE_DWM
 			bool transparency(bool);
 #endif
-			bool poll_events(event::message& out);
+			void initial_gl_calls();
+
+			bool poll_event(event::message& out);
+			std::vector<event::state> poll_events();
 
 			void set_minimum_size(rects::wh<int> = rects::wh<int>()),
 			     set_maximum_size(rects::wh<int> = rects::wh<int>());

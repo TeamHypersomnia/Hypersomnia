@@ -6,8 +6,8 @@
 using namespace messages;
 using namespace resources;
 
-void animation_system::consume_events(world& owner) {
-	auto events = owner.get_message_queue<animate_message>();
+void animation_system::consume_events() {
+	auto events = parent_world.get_message_queue<animate_message>();
 
 	for (auto it : events) {
 		auto ptr = it.subject->find<components::animate>();
@@ -115,7 +115,7 @@ void components::animate::set_current_animation_set(resources::animate_info* set
 	set_current_frame(0, subject);
 }
 
-void animation_system::process_entities(world& owner) {
+void animation_system::process_entities() {
 	float delta = static_cast<float>(animation_timer.extract<std::chrono::milliseconds>());
 
 	for (auto it : targets) {

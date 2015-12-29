@@ -11,7 +11,9 @@
 
 using namespace augs;
 
-class render_system;
+namespace augs {
+	class renderer;
+}
 
 namespace components {
 	struct particle_group;
@@ -20,8 +22,8 @@ namespace components {
 
 namespace resources {
 	struct renderable {
-		struct draw_input {
-			render_system* output;
+		struct drawing_state {
+			renderer* output;
 			components::transform transform, camera_transform;
 			components::render* additional_info;
 			vec2 visible_area;
@@ -29,12 +31,12 @@ namespace resources {
 
 			augs::rects::ltrb<float> rotated_camera_aabb;
 
-			draw_input() : output(nullptr), additional_info(nullptr), always_visible(false) {}
+			drawing_state() : output(nullptr), additional_info(nullptr), always_visible(false) {}
 		};
 
 		static void make_rect(vec2 pos, vec2 size, float rotation_degrees, vec2 out[4]);
 
-		virtual void draw(draw_input&) = 0;
+		virtual void draw(drawing_state&) = 0;
 		virtual std::vector<vec2> get_vertices();
 	};
 
@@ -58,7 +60,7 @@ namespace resources {
 		void set(texture*, pixel_32);
 		void update_size();
 
-		virtual void draw(draw_input&) override;
+		virtual void draw(drawing_state&) override;
 		virtual std::vector<vec2> get_vertices() override;
 	};
 
@@ -85,8 +87,8 @@ namespace resources {
 		
 		tile_layer(rects::wh<int> size);
 		
-		rects::ltrb<int> get_visible_tiles(draw_input&);
-		virtual void draw(draw_input&) override;
+		rects::ltrb<int> get_visible_tiles(drawing_state&);
+		virtual void draw(drawing_state&) override;
 
 		std::vector<std::vector<vec2i>> indices_by_type;
 		rects::ltrb<int> indices_by_type_visibility;
@@ -134,7 +136,7 @@ namespace resources {
 		//void add_concave_coords(const std::vector<vec2>&);
 		//void add_convex(const std::vector<vec2>&);
 
-		virtual void draw(draw_input&) override;
+		virtual void draw(drawing_state&) override;
 		virtual std::vector<vec2> get_vertices() override;
 	};
 

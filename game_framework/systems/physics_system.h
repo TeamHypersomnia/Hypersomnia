@@ -1,7 +1,7 @@
 #pragma once
 #include <Box2D\Box2D.h>
-#include "misc/delta_accumulator.h"
 #include "entity_system/processing_system.h"
+#include "entity_system/entity_id.h"
 
 #include "../components/physics_component.h"
 #include "../components/transform_component.h"
@@ -10,12 +10,8 @@
 
 using namespace augs;
 
-
-class physics_system : public processing_system_templated<components::physics, components::transform> {
-	delta_accumulator accumulator;
-
+class physics_system : public augs::processing_system_templated<components::physics, components::transform> {
 	void reset_states();
-	void smooth_states();
 
 	struct contact_listener : public b2ContactListener {
 		void BeginContact(b2Contact* contact) override;
@@ -23,49 +19,26 @@ class physics_system : public processing_system_templated<components::physics, c
 		void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override;
 		void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) override;
 
-		world* world_ptr;
+		augs::world* world_ptr;
 	};
 
 	contact_listener listener;
 public:
-	struct stepped_timer {
-		physics_system* owner;
-		int current_step;
+	using processing_system_templated::processing_system_templated;
 
-		stepped_timer(physics_system*);
-		void reset();
-		float get_milliseconds() const;
-		float extract_milliseconds();
-
-		unsigned get_steps() const;
-		unsigned extract_steps();
-	};
-
-	int all_steps;
-
-	std::function<void(world&)> prestepping_routine;
-	std::function<void(world&)> poststepping_routine;
-
-	float timestep_multiplier;
-	int enable_interpolation;
-	int ray_casts_per_frame;
+	int ray_casts_per_frame = 0;
 
 	bool enable_motors = false;
 	void enable_listener(bool flag);
 
 	b2World b2world;
-	physics_system();
+	physics_system(world&);
 
-	/* returns the number of steps made */
-	unsigned process_entities(world&);
-	void process_steps(world&, unsigned);
+	void step_and_set_new_transforms();
 
 	void add(entity_id) override;
 	void remove(entity_id) override;
 	void clear() override;
-
-	void configure_stepping(float fps, int max_updates_per_step);
-	double get_timestep_ms();
 
 	struct raycast_output {
 		vec2 intersection, normal;

@@ -7,7 +7,7 @@ void components::chase::set_target(augs::entity_id new_target) {
 	target = new_target;
 }
 
-void chase_system::process_entities(world&) {
+void chase_system::process_entities() {
 	for (auto it : targets) {
 		auto& transform = it->get<components::transform>();
 		auto& chase = it->get<components::chase>();
