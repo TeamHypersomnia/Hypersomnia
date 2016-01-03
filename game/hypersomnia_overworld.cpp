@@ -70,7 +70,9 @@ void hypersomnia_overworld::simulate() {
 			game_world.perform_logic_step();
 		}
 
-		game_world.render();
+		game_window.clear();
+
+		game_world.draw();
 
 		game_window.swap_buffers();
 	}

@@ -34,7 +34,7 @@ void gui_group::poll_events() {
 	main_window.poll_events();
 }
 
-void gui_group::draw_call(resources::renderable::drawing_state& in) {
+void gui_group::draw_call(shared::drawing_state& in) {
 	main_window.default_update();
 
 	in.output->triangles.insert(in.output->triangles.end(), main_window.quad_array.begin(), main_window.quad_array.end());

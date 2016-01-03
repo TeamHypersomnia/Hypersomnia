@@ -15,5 +15,5 @@ public:
 	void register_messages_components_systems();
 	
 	void perform_logic_step();
-	void render();
+	void draw();
 };

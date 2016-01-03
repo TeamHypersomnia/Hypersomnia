@@ -4,6 +4,8 @@
 
 using namespace augs;
 
+#include "game_framework/scene_builders/scene_builders.h"
+
 int main(int argc, char** argv) {
 	framework::init();
 	//framework::run_tests();
@@ -12,6 +14,9 @@ int main(int argc, char** argv) {
 	overworld.initialize();
 	overworld.configure_scripting();
 	overworld.call_window_script("config.lua");
+
+	scene_builders::testbed(overworld.game_world);
+
 	overworld.simulate();
 
 	framework::deinit();

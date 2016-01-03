@@ -6,8 +6,9 @@
 #include "math/vec2.h"
 #include "graphics/pixel.h"
 
-#include "game_framework/resources/render_info.h"
 #include "window_framework/window.h"
+
+#include "game_framework/shared/drawing_state.h"
 
 namespace augs {
 	namespace misc {
@@ -97,7 +98,7 @@ struct hypersomnia_gui {
 struct gui_group {
 	augs::graphics::gui::group main_window;
 	void poll_events();
-	void draw_call(resources::renderable::drawing_state& in);
+	void draw_call(shared::drawing_state& in);
 	void blur();
 
 	gui_group(hypersomnia_gui& owner);

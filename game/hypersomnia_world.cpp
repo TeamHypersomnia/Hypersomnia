@@ -27,10 +27,13 @@ void hypersomnia_world::register_messages_components_systems() {
 	register_component<particle_group>();
 	register_component<pathfinding>();
 	register_component<physics>();
-	register_component<components::render>();
+	register_component<render>();
 	register_component<steering>();
 	register_component<transform>();
 	register_component<visibility>();
+	register_component<sprite>();
+	register_component<polygon>();
+	register_component<tile_layer>();
 
 	register_system<input_system>();
 	register_system<steering_system>();
@@ -66,13 +69,22 @@ void hypersomnia_world::perform_logic_step() {
 	get_system<render_system>().set_current_transforms_as_previous_for_interpolation();
 
 	get_system<camera_system>().react_to_input_intents();
+	get_system<crosshair_system>().react_to_aiming_intents();
+	get_system<movement_system>().set_movement_flags_from_input();
 
+	get_system<movement_system>().apply_movement_forces();
 	get_system<physics_system>().step_and_set_new_transforms();
+	get_system<lookat_system>().update_rotations();
+
+	get_system<chase_system>().update_transforms();
 
 	get_system<destroy_system>().delete_queued_entities();
 }
 
-void hypersomnia_world::render() {
+void hypersomnia_world::draw() {
+	get_system<crosshair_system>().animate_crosshair_sizes();
+	get_system<movement_system>().animate_movement();
+
 	get_system<camera_system>().resolve_cameras_transforms_and_smoothing();
 	get_system<camera_system>().render_all_cameras();
 }
