@@ -4,8 +4,9 @@
 
 #include "body_helper.h"
 #include "../components/physics_component.h"
+#include "../components/polygon_component.h"
 #include "../components/render_component.h"
-#include "../resources/render_info.h"
+#include "../shared/drawing_state.h"
 
 #include "../systems/physics_system.h"
 
@@ -30,7 +31,7 @@ namespace helpers {
 		convex_polys.push_back(verts);
 	}
 
-	void physics_info::from_renderable(const resources::polygon& p) {
+	void physics_info::from_renderable(const components::polygon& p) {
 		list<TPPLPoly> inpolys, outpolys;
 		TPPLPoly subject_poly;
 		subject_poly.Init(p.original_model.size());

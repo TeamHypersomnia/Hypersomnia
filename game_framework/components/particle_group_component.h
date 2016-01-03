@@ -4,8 +4,6 @@
 #include "particle_emitter_component.h"
 #include "transform_component.h"
 
-#include "../resources/render_info.h"
-
 class physics_system;
 class particle_group_system;
 class particle_emitter_system;
@@ -14,9 +12,13 @@ namespace resources {
 	struct emission;
 }
 
+namespace shared {
+	class drawing_state;
+}
+
 namespace components {
 	/* hack - the only component that has logic */
-	struct particle_group : public augs::component, public resources::renderable {
+	struct particle_group {
 		struct stream {
 			physics_system* optional_physics = nullptr;
 
@@ -55,10 +57,10 @@ namespace components {
 
 		std::vector<stream> stream_slots;
 		particle_group() { stream_slots.resize(1); }
+
+		void draw(shared::drawing_state&);
 	private:
 		friend class particle_group_system;
 		friend class particle_emitter_system;
-
-		virtual void draw(drawing_state&) override;
 	};
 }

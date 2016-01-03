@@ -113,11 +113,6 @@ namespace augs {
 
 	unsigned atlas::current = 0;
 
-	bool atlas::gen_packed(std::vector<texture*>& in_textures,
-		std::vector<atlas*>& inout_atlases) {
-		return true;
-	}
-
 	bool atlas::pack() {
 		GLint tsize;
 		glGetIntegerv(GL_MAX_TEXTURE_SIZE, &tsize); glerr
@@ -213,6 +208,35 @@ namespace augs {
 		atlas_texture.set(&im);
 		atlas_texture.set_uv_unit(1.0 / im.get_size().w, 1.0 / im.get_size().h);
 	}
+
+	//void atlas::add_texture_by_name(std::wstring name) {
+	//	textures.push_back(&name_to_texture[name].tex);
+	//}
+
+	//void atlas::add_textures_by_names(std::vector<std::wstring> names) {
+	//	for (auto& name : names)
+	//		add_texture_by_name(name);
+	//}
+
+	//atlas::texture_entry::texture_entry(image img) : img(img) {
+	//	tex.set(&img);
+	//}
+
+	//void atlas::register_textures_from_filenames(std::vector<std::wstring> filenames) {
+	//	for (auto& name : filenames)
+	//		register_texture_from_filename(name, name);
+	//}
+
+	//void atlas::register_texture_from_filename(std::wstring name, std::wstring filename) {
+	//	image img;
+	//	img.from_file(filename);
+
+	//	name_to_texture[name] = texture_entry(img);
+	//}
+
+	//void atlas::register_texture_from_image(std::wstring name, image img) {
+	//	name_to_texture[name] = texture_entry(img);
+	//}
 
 	void atlas::default_build() {
 		pack();

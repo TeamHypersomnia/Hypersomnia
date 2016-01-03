@@ -8,51 +8,43 @@
 namespace augs {
 	namespace window {
 		namespace event {
-			typedef unsigned message;
-
-			enum {
+			enum key_changed {
+				NONE = 0,
 				PRESSED = 1,
 				RELEASED = 2
 			};
 
-			struct state {
-				struct mouse_info {
-					vec2i pos, rel, raw_rel, ldrag, rdrag;
-					bool state[3] = { false, false, false };
-					int scroll = 0;
-				} mouse;
-
-				event::message msg;
-				int key_event = 0;
-				int key = 0;
-				bool repeated = false;
-				wchar_t utf16 = 0;
-				unsigned utf32 = 0;
-				std::bitset<256> keys;
-			};
-
-			enum {
+			enum message {
+				ltripleclick,
+				raw_mousemotion,
 				close = SC_CLOSE,
 				move = WM_MOVE,
 				activate = WM_ACTIVATE,
 				minimize = SC_MINIMIZE,
 				maximize = SC_MAXIMIZE,
 				restore = SC_RESTORE,
-				clipboard_change = WM_CLIPBOARDUPDATE
+				clipboard_change = WM_CLIPBOARDUPDATE,
+				keydown = WM_KEYDOWN,
+				keyup = WM_KEYUP,
+				character = WM_CHAR,
+				unichar = WM_UNICHAR,
+				mousemotion = WM_MOUSEMOVE,
+				wheel = WM_MOUSEWHEEL,
+				ldoubleclick = WM_LBUTTONDBLCLK,
+				mdoubleclick = WM_MBUTTONDBLCLK,
+				rdoubleclick = WM_RBUTTONDBLCLK,
+				ldown = WM_LBUTTONDOWN,
+				lup = WM_LBUTTONUP,
+				mdown = WM_MBUTTONDOWN,
+				mup = WM_MBUTTONUP,
+				rdown = WM_RBUTTONDOWN,
+				rup = WM_RBUTTONUP
 			};
-
-			namespace key {
-				enum { 	
-					down			= WM_KEYDOWN	  ,
-					up				= WM_KEYUP		  ,
-					character		= WM_CHAR		  ,
-					unichar			= WM_UNICHAR	  
-				};
-			}
 
 			namespace keys {
 				extern bool is_numpad_key(int);
-				enum {
+				enum key {
+					NONE,
 					LMOUSE			= VK_LBUTTON      ,
 					RMOUSE			= VK_RBUTTON      ,
 					MMOUSE			= VK_MBUTTON      ,    
@@ -175,23 +167,21 @@ namespace augs {
 				};
 			};
 
-			namespace mouse {
-				enum {
-					ltripleclick,
-					raw_motion,
-					motion = WM_MOUSEMOVE,
-					wheel =		    WM_MOUSEWHEEL,
-					ldoubleclick =	WM_LBUTTONDBLCLK,
-					mdoubleclick =	WM_MBUTTONDBLCLK,
-					rdoubleclick =	WM_RBUTTONDBLCLK,
-					ldown =			WM_LBUTTONDOWN,
-					lup =			WM_LBUTTONUP,
-					mdown =			WM_MBUTTONDOWN,
-					mup =			WM_MBUTTONUP,
-					rdown =			WM_RBUTTONDOWN,
-					rup =			WM_RBUTTONUP
-				};
+			struct state {
+				struct mouse_info {
+					vec2i pos, rel, raw_rel, ldrag, rdrag;
+					bool state[3] = { false, false, false };
+					int scroll = 0;
+				} mouse;
+
+				message msg;
+				key_changed key_event = key_changed::NONE;
+				keys::key key = keys::key::NONE;
+				bool repeated = false;
+				wchar_t utf16 = 0;
+				unsigned utf32 = 0;
+				std::bitset<256> keys;
 			};
-		};
+		}
 	}
 }

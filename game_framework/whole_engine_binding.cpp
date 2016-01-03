@@ -92,37 +92,37 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper, std::functio
 			bind_stdvector<std::wstring>("wstring_vector"),
 			bind_stdvector<vec2>("vec2_vector"),
 			bind_stdvector<entity_id>("entity_ptr_vector"),
-
+			
 			bind_vector_wrapper<int>("int_vector"),
 			bind_vector_wrapper<float>("float_vector"),
-
+			
 			bindings::_id_generator(),
 			bindings::_minmax(),
 			bindings::_value_animator(),
-			bindings::_b2Filter(),
+			//bindings::_b2Filter(),
 			bindings::_rgba(),
 			bindings::_rect_ltrb(),
 			bindings::_rect_xywh(),
 			bindings::_glwindow(),
 			bindings::_script(),
-			bindings::_texture(),
-			bindings::_animation(),
+			//bindings::_texture(),
+			//bindings::_animation(),
 			bindings::_world(),
-			bindings::_sprite(),
-			bindings::_polygon(),
+			//bindings::_sprite(),
+			//bindings::_polygon(),
+			//
+			//bindings::_network_binding(),
+			//
+			//bindings::_particle(),
+			//bindings::_emission(),
+			//bindings::_particle_effect(),
 
-			bindings::_network_binding(),
+			//bindings::_all_messages(),
+			//bindings::_all_components(),
+			//bindings::_all_systems(),
 
-			bindings::_particle(),
-			bindings::_emission(),
-			bindings::_particle_effect(),
-
-			bindings::_all_messages(),
-			bindings::_all_components(),
-			bindings::_all_systems(),
-
-			bindings::_entity(),
-			bindings::_body_helper(),
+			//bindings::_entity(),
+			//bindings::_body_helper(),
 
 			bindings::_opengl_binding(),
 
@@ -130,14 +130,13 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper, std::functio
 			bindings::_random_binding(),
 
 			luabind::def("open_editor", lua_state_wrapper::open_editor),
-			luabind::def("get_meters_to_pixels", get_meters_to_pixels),
-			luabind::def("set_meters_to_pixels", set_meters_to_pixels),
+			//luabind::def("get_meters_to_pixels", get_meters_to_pixels),
+			//luabind::def("set_meters_to_pixels", set_meters_to_pixels),
 			luabind::def("get_executable_path", window::get_executable_path),
 			luabind::def("remove_filename_from_path", window::remove_filename_from_path),
 
 			luabind::class_<std::string>("std_string")
-			.def("c_str", &std::string::c_str)
-			,
+			.def("c_str", &std::string::c_str),
 
 			bindings::_file_watcher(),
 

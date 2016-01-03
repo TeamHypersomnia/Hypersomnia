@@ -368,136 +368,36 @@
     <ClCompile Include="depthbase\gui\text\text_rect.cpp" />
     <ClCompile Include="depthbase\gui\text\ui.cpp" />
     <ClCompile Include="depthbase\gui\text\word_separator.cpp" />
-    <ClCompile Include="game_framework\bindings\all_components_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\all_messages_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\all_systems_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\animation_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\b2Filter_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\body_helper_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\emission_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\entity_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\file_watcher_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\glwindow_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\id_generator_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\minmax_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\network_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\opengl_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\particle_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\particle_effect_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\polygon_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\random_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\rect_ltrb_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\rect_xywh_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\rgba_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\script_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\sfml_audio_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\sprite_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\texture_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\text_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\timer_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\utilities_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\value_animator_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\vec2_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="game_framework\bindings\world_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
+    <ClCompile Include="game_framework\archetypes\sprite.cpp" />
+    <ClCompile Include="game_framework\archetypes\camera.cpp" />
+    <ClCompile Include="game_framework\archetypes\wsad_player.cpp" />
+    <ClCompile Include="game_framework\bindings\file_watcher_binding.cpp" />
+    <ClCompile Include="game_framework\bindings\glwindow_binding.cpp" />
+    <ClCompile Include="game_framework\bindings\id_generator_binding.cpp" />
+    <ClCompile Include="game_framework\bindings\minmax_binding.cpp" />
+    <ClCompile Include="game_framework\bindings\opengl_binding.cpp" />
+    <ClCompile Include="game_framework\bindings\random_binding.cpp" />
+    <ClCompile Include="game_framework\bindings\rect_ltrb_binding.cpp" />
+    <ClCompile Include="game_framework\bindings\rect_xywh_binding.cpp" />
+    <ClCompile Include="game_framework\bindings\rgba_binding.cpp" />
+    <ClCompile Include="game_framework\bindings\script_binding.cpp" />
+    <ClCompile Include="game_framework\bindings\text_binding.cpp" />
+    <ClCompile Include="game_framework\bindings\timer_binding.cpp" />
+    <ClCompile Include="game_framework\bindings\utilities_binding.cpp" />
+    <ClCompile Include="game_framework\bindings\value_animator_binding.cpp" />
+    <ClCompile Include="game_framework\bindings\vec2_binding.cpp" />
+    <ClCompile Include="game_framework\bindings\world_binding.cpp" />
+    <ClCompile Include="game_framework\components\particle_group_component.cpp" />
+    <ClCompile Include="game_framework\components\polygon_component.cpp" />
+    <ClCompile Include="game_framework\components\sprite_component.cpp" />
+    <ClCompile Include="game_framework\components\tile_layer_component.cpp" />
     <ClCompile Include="game_framework\game\body_helper.cpp" />
     <ClCompile Include="game_framework\game\sound_effects.cpp" />
-    <ClCompile Include="game_framework\game\texture_helper.cpp" />
     <ClCompile Include="game_framework\game_framework.cpp" />
     <ClCompile Include="game_framework\resources\animate_info.cpp" />
-    <ClCompile Include="game_framework\resources\render_info.cpp" />
+    <ClCompile Include="game_framework\resources\manager.cpp" />
+    <ClCompile Include="game_framework\scene_builders\scripts\testbed_rendering.cpp" />
+    <ClCompile Include="game_framework\scene_builders\testbed.cpp" />
     <ClCompile Include="game_framework\systems\animation_system.cpp" />
     <ClCompile Include="game_framework\systems\behaviour_tree_system.cpp" />
     <ClCompile Include="game_framework\systems\camera_system.cpp" />
@@ -534,6 +434,7 @@
     <ClCompile Include="utilities\entity_system\type_hash_to_index_mapper.cpp" />
     <ClCompile Include="utilities\entity_system\world.cpp" />
     <ClCompile Include="utilities\error\augs_error.cpp" />
+    <ClCompile Include="utilities\file.cpp" />
     <ClCompile Include="utilities\graphics\fbo.cpp" />
     <ClCompile Include="utilities\graphics\pixel.cpp" />
     <ClCompile Include="utilities\graphics\renderer.cpp" />
@@ -557,6 +458,7 @@
     <ClCompile Include="utilities\script.cpp" />
     <ClCompile Include="utilities\texture_baker\font.cpp" />
     <ClCompile Include="utilities\texture_baker\image.cpp" />
+    <ClCompile Include="utilities\texture_baker\lodepng.cpp" />
     <ClCompile Include="utilities\texture_baker\rectpack.cpp" />
     <ClCompile Include="utilities\texture_baker\texture_baker.cpp" />
     <ClCompile Include="utilities\window_framework\event.cpp" />
@@ -1025,6 +927,13 @@
     <ClInclude Include="game_framework\all_component_includes.h" />
     <ClInclude Include="game_framework\all_message_includes.h" />
     <ClInclude Include="game_framework\all_system_includes.h" />
+    <ClInclude Include="game_framework\archetypes\archetypes.h" />
+    <ClInclude Include="game_framework\archetypes\renderable_includes.h" />
+    <ClInclude Include="game_framework\assets\asset.h" />
+    <ClInclude Include="game_framework\assets\atlas.h" />
+    <ClInclude Include="game_framework\assets\callback.h" />
+    <ClInclude Include="game_framework\assets\program.h" />
+    <ClInclude Include="game_framework\assets\shader.h" />
     <ClInclude Include="game_framework\bindings\bindings.h" />
     <ClInclude Include="game_framework\bindings\bind_callbacks.h" />
     <ClInclude Include="game_framework\components\animate_component.h" />
@@ -1042,13 +951,17 @@
     <ClInclude Include="game_framework\components\particle_group_component.h" />
     <ClInclude Include="game_framework\components\pathfinding_component.h" />
     <ClInclude Include="game_framework\components\physics_component.h" />
+    <ClInclude Include="game_framework\components\polygon_component.h" />
     <ClInclude Include="game_framework\components\render_component.h" />
+    <ClInclude Include="game_framework\components\sprite_component.h" />
     <ClInclude Include="game_framework\components\steering_component.h" />
+    <ClInclude Include="game_framework\components\tile_layer_component.h" />
     <ClInclude Include="game_framework\components\transform_component.h" />
     <ClInclude Include="game_framework\components\visibility_component.h" />
+    <ClInclude Include="game_framework\assets\animation.h" />
+    <ClInclude Include="game_framework\assets\texture.h" />
     <ClInclude Include="game_framework\game\body_helper.h" />
     <ClInclude Include="game_framework\game\sound_effects.h" />
-    <ClInclude Include="game_framework\game\texture_helper.h" />
     <ClInclude Include="game_framework\game_framework.h" />
     <ClInclude Include="game_framework\messages\animate_message.h" />
     <ClInclude Include="game_framework\messages\collision_message.h" />
@@ -1060,8 +973,11 @@
     <ClInclude Include="game_framework\messages\raw_window_input_message.h" />
     <ClInclude Include="game_framework\messages\shot_message.h" />
     <ClInclude Include="game_framework\resources\animate_info.h" />
+    <ClInclude Include="game_framework\resources\manager.h" />
     <ClInclude Include="game_framework\resources\particle_emitter_info.h" />
-    <ClInclude Include="game_framework\resources\render_info.h" />
+    <ClInclude Include="game_framework\scene_builders\scripts\rendering_procedures.h" />
+    <ClInclude Include="game_framework\scene_builders\scene_builders.h" />
+    <ClInclude Include="game_framework\shared\drawing_state.h" />
     <ClInclude Include="game_framework\systems\animation_system.h" />
     <ClInclude Include="game_framework\systems\behaviour_tree_system.h" />
     <ClInclude Include="game_framework\systems\camera_system.h" />
@@ -1100,6 +1016,7 @@
     <ClInclude Include="utilities\graphics\shader.h" />
     <ClInclude Include="utilities\graphics\vertex.h" />
     <ClInclude Include="utilities\lua_state_wrapper.h" />
+    <ClInclude Include="utilities\math\matrix.h" />
     <ClInclude Include="utilities\math\rects.h" />
     <ClInclude Include="utilities\math\vec2.h" />
     <ClInclude Include="utilities\math\vec2declare.h" />
@@ -1128,6 +1045,7 @@
     <ClInclude Include="utilities\script.h" />
     <ClInclude Include="utilities\texture_baker\font.h" />
     <ClInclude Include="utilities\texture_baker\image.h" />
+    <ClInclude Include="utilities\texture_baker\lodepng.h" />
     <ClInclude Include="utilities\texture_baker\rectpack.h" />
     <ClInclude Include="utilities\texture_baker\texture_baker.h" />
     <ClInclude Include="utilities\window_framework\event.h" />

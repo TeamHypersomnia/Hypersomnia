@@ -6,7 +6,8 @@
 /* credits goes to http://www.unagames.com/blog/daniele/2010/06/fixed-time-step-implementation-box2d */
 
 namespace augs {
-	delta_accumulator::delta_accumulator(double fps, unsigned max_steps) : fps(fps), max_steps(max_steps), accumulator(0.0), fixed_dt_milliseconds((1.0 / fps) * 1000.0), ratio(0.0) {
+	delta_accumulator::delta_accumulator(double fps, unsigned max_steps) 
+		: fps(fps), max_steps(max_steps), accumulator(0.0), fixed_dt_milliseconds((1.0 / fps) * 1000.0), ratio(0.0), time_multiplier(1.0) {
 		reset_timer();
 	}
 

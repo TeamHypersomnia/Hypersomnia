@@ -7,7 +7,6 @@
 #include "render_component.h"
 #include "../game/body_helper.h"
 
-class renderable;
 class gun_system;
 namespace components {
 	struct gun : public augs::component {

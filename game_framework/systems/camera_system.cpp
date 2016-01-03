@@ -5,7 +5,7 @@
 #include "entity_system/entity.h"
 #include "../components/physics_component.h"
 #include "../messages/intent_message.h"
-#include "../resources/render_info.h"
+#include "../shared/drawing_state.h"
 #include "entity_system/world.h"
 
 #include <iostream>
@@ -141,7 +141,7 @@ void camera_system::render_all_cameras() {
 			
 			auto drawn_transform = camera.previously_drawn_at;
 
-			resources::renderable::drawing_state in;
+			shared::drawing_state in;
 			in.rotated_camera_aabb =
 				rects::ltrb<float>::get_aabb_rotated(camera.rendered_size, drawn_transform.rotation) + drawn_transform.pos - camera.rendered_size / 2;
 			in.camera_transform = drawn_transform;
@@ -156,7 +156,7 @@ void camera_system::render_all_cameras() {
 
 				if (renderer.debug_drawing) {
 					glDisable(GL_TEXTURE_2D);
-					renderer.draw_debug_info(camera.rendered_size, drawn_transform, nullptr, parent_world.get_system<render_system>().targets);
+					renderer.draw_debug_info(camera.rendered_size, drawn_transform, assets::texture_id::BLANK, parent_world.get_system<render_system>().targets);
 					glEnable(GL_TEXTURE_2D);
 				}
 			}

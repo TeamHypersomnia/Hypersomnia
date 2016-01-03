@@ -7,7 +7,7 @@
 #include "entity_system/entity.h"
 
 #include "../components/transform_component.h"
-#include "../resources/render_info.h"
+#include "../shared/drawing_state.h"
 
 class camera_system;
 class gun_system;
@@ -47,7 +47,8 @@ namespace components {
 		camera() { smooth_timer.reset(); }
 
 		/* arguments: subject, renderer, mask */
-		std::function<void(augs::entity_id, resources::renderable::drawing_state, int)> drawing_callback;
+		typedef std::function<void(augs::entity_id, shared::drawing_state, int)> drawing_procedure;
+		drawing_procedure drawing_callback;
 
 	private:
 		friend class camera_system;

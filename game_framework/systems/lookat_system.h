@@ -14,5 +14,5 @@ class lookat_system : public processing_system_templated<components::transform, 
 public:
 	using processing_system_templated::processing_system_templated;
 
-	void process_entities();
+	void update_rotations();
 };

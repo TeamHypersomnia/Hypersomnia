@@ -18,3 +18,6 @@
 #include "components/steering_component.h"
 #include "components/transform_component.h"
 #include "components/render_component.h"
+#include "components/sprite_component.h"
+#include "components/polygon_component.h"
+#include "components/tile_layer_component.h"

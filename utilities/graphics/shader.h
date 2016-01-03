@@ -5,21 +5,26 @@
 namespace augs {
 	namespace graphics {
 		struct shader {
-			GLuint id;
+			enum class type {
+				VERTEX,
+				FRAGMENT
+			};
+
+			unsigned int id;
 			bool built;
 
-			shader(GLuint shader_type, std::string source_code);
+			shader(type, std::string source_code);
 			shader();
 			~shader();
 
-			void create(GLuint shader_type, std::string source_code);
+			void create(type shader_type, std::string source_code);
 			void destroy();
 		};
 
 		struct shader_program {
 			static int currently_used_program;
 
-			GLuint id;
+			unsigned int id;
 			bool created, built;
 			std::vector<shader*> attached_shaders;
 

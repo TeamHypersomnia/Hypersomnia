@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <Shlwapi.h>
 
+#include <iostream>
+
 namespace augs {
 	extern HINSTANCE hinst;
 
@@ -25,7 +27,8 @@ namespace augs {
 					return 0;
 				}
 				else if(umsg == WM_GETMINMAXINFO) {
-					wnd->_poll(umsg, wParam, lParam);
+					event::message in = event::message(umsg);
+					wnd->_poll(in, wParam, lParam);
 					return 0;
 				}
 				else if(umsg == WM_SIZE) {
@@ -69,8 +72,8 @@ namespace augs {
 		}
 
 		void glwindow::_poll(event::message& m, WPARAM wParam, LPARAM lParam) {
-				using namespace event::key;
 				using namespace event::keys;
+				using namespace event;
 
 				static POINTS p;
 				static RECT* r;
@@ -80,9 +83,9 @@ namespace augs {
 				static UINT dwSize = 40;
 				static RAWINPUT* raw;
 
-				events.mouse.rel.x = 0;
-				events.mouse.rel.y = 0;
-				events.key_event = 0;
+				events.repeated = false;
+				events.mouse.rel.set(0, 0);
+				events.key_event = key_changed::NONE;
 
 				switch (m) {
 				case character:
@@ -100,10 +103,10 @@ namespace augs {
 					break;
 
 				case WM_SYSKEYUP:
-					m = events.msg = up;
+					m = events.msg = keyup;
 				case WM_SYSKEYDOWN:
-					m = events.msg = down;
-				case down:
+					m = events.msg = keydown;
+				case keydown:
 					//if (!((lParam & (1 << 30)) != 0)) {
 						events.keys[wParam] = true;
 						switch(wParam) {
@@ -112,24 +115,24 @@ namespace augs {
 						case ALT: wParam = (lParam & 0x1000000) ? RALT : LALT; break;
 						}
 						events.keys[wParam] = true;
-						events.key = wParam;
+						events.key = key(wParam);
 						events.key_event = event::PRESSED;
 						events.repeated = ((lParam & (1 << 30)) != 0);
 					//}
 					break;								
 
-				case up:							
+				case keyup:							
 					events.keys[wParam] = false;
 					switch(wParam) {
 					case CTRL:	   events.keys[RCTRL] = events.keys[LCTRL] = false; break;
 					case SHIFT:	   events.keys[RSHIFT] =	events.keys[LSHIFT] = false; break;
 					case ALT:	   events.keys[RALT] =		events.keys[LALT] = events.keys[LCTRL] = events.keys[CTRL] = false; break;
 					}
-					events.key = wParam;
+					events.key = key(wParam);
 					events.key_event = event::RELEASED;
+
 					break;
 
-					using namespace event::mouse;
 				case wheel:
 					events.mouse.scroll = GET_WHEEL_DELTA_WPARAM(wParam);
 					break;
@@ -177,7 +180,7 @@ namespace augs {
 					events.key_event = event::RELEASED;
 					events.key = MMOUSE;
 					events.mouse.state[2] = events.keys[MMOUSE] = false; break;
-				case motion:
+				case mousemotion:
 					p = MAKEPOINTS(lParam);
 					events.mouse.rel.x = p.x - events.mouse.pos.x;
 					events.mouse.rel.y = p.y - events.mouse.pos.y;
@@ -206,7 +209,7 @@ namespace augs {
 						events.mouse.raw_rel.x = raw->data.mouse.lLastX;
 						events.mouse.raw_rel.y = raw->data.mouse.lLastY;
 
-						m = events.msg = raw_motion;
+						m = events.msg = raw_mousemotion;
 					}
 
 					break;
@@ -230,7 +233,7 @@ namespace augs {
 					case SC_MAXIMIZE: break;
 					default: DefWindowProc(hwnd, events.msg, wParam, lParam); break;
 					}
-					m = events.msg = wParam;
+					m = events.msg = event::message(wParam);
 					break;
 
 				default: DefWindowProc(hwnd, events.msg, wParam, lParam); return;
@@ -314,6 +317,10 @@ namespace augs {
 			glrenderer.initialize();
 		}
 
+		void glwindow::clear() {
+			glrenderer.clear();
+		}
+
 		bool glwindow::swap_buffers() {
 			if(this != context) current();
 			return err(SwapBuffers(hdc)) != FALSE;
@@ -357,8 +364,7 @@ namespace augs {
 		bool glwindow::poll_event(event::message& out) {
 			if(PeekMessageW(&wmsg, hwnd, 0, 0, PM_REMOVE)) {
 				 //DispatchMessage(&wmsg); 
-				using namespace event::key;
-				out = events.msg = wmsg.message;
+				out = events.msg = event::message(wmsg.message);
 				_poll(out, wmsg.wParam, wmsg.lParam);
 				
 				if(out == event::minimize)

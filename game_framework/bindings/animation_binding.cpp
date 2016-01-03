@@ -4,7 +4,7 @@
 #include "bind_callbacks.h"
 
 #include "../resources/animate_info.h"
-#include "../resources/render_info.h"
+#include "../shared/drawing_state.h"
 
 namespace bindings {
 	luabind::scope _animation() {
@@ -12,7 +12,7 @@ namespace bindings {
 			luabind::class_<animation::frame>("animation_frame")
 			.def(luabind::constructor<>())
 			.def_readwrite("duration_milliseconds", &animation::frame::duration_milliseconds)
-			.def_readwrite("model", &animation::frame::model)
+			.def_readwrite("model", &animation::frame::sprite)
 			.property("callback", bind_callback(&animation::frame::callback))
 			.property("callback_out", bind_callback(&animation::frame::callback_out))
 			,

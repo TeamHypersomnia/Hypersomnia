@@ -9,6 +9,7 @@ namespace augs {
 }
 
 namespace helpers {}
+namespace shared {}
 
 using namespace resources;
 using namespace components;
@@ -18,6 +19,7 @@ using namespace misc;
 using namespace graphics;
 using namespace helpers;
 using namespace messages;
+using namespace shared;
 
 namespace luabind
 {

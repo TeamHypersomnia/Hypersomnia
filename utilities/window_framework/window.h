@@ -96,6 +96,9 @@ namespace augs {
 				 focus_keyboard(), 
 				 current(),
 				 vsync(int);
+
+			void clear();
+
 #ifdef INCLUDE_DWM
 			bool transparency(bool);
 #endif

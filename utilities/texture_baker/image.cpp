@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "image.h"
+#include "lodepng.h"
 
 namespace augs {
 	using namespace Gdiplus;
@@ -30,66 +31,23 @@ namespace augs {
 		std::string errstr("Coudn't load ");
 		errstr += std::string(filename.begin(), filename.end());
 
-		channels = force_channels;
-		std::shared_ptr<Gdiplus::Bitmap> pBitmap(Gdiplus::Bitmap::FromFile(filename.c_str(), FALSE));
+		channels = 4;
 
-		if (pBitmap.get() == 0 || pBitmap.get()->GetLastStatus() != Gdiplus::Ok)
-			throw std::runtime_error(errstr.c_str());
+		std::string lodepngfname(filename.begin(), filename.end());
 
-		// GDI+ orients bitmap images top-bottom.
-		// OpenGL expects bitmap images to be oriented bottom-top by default.
-		//pBitmap->RotateFlip(Gdiplus::RotateNoneFlipY);
+		unsigned width;
+		unsigned height;
 
-		// GDI+ pads each scanline of the loaded bitmap image to 4-byte memory
-		// boundaries. Fortunately OpenGL also aligns bitmap images to 4-byte
-		// memory boundaries by default.
-		int width = pBitmap->GetWidth();
-		int height = pBitmap->GetHeight();
-		//int pitch = ((width * 32 + 31) & ~31) >> 3;
-
-		int format = PixelFormat32bppARGB;
-
-		switch (channels) {
-		case 0: format = pBitmap->GetPixelFormat();
-			switch (format) {
-			case PixelFormat8bppIndexed:
-				channels = 1; break;
-			case PixelFormat16bppGrayScale:
-				channels = 2; break;
-			case PixelFormat24bppRGB:
-				channels = 3; break;
-			case PixelFormat32bppARGB:
-				channels = 4; break;
-			default: throw std::runtime_error(errstr.c_str()); break;
-			}
-			break;
-		case 1: format = PixelFormat8bppIndexed; break;
-		case 2: format = PixelFormat16bppGrayScale; break;
-		case 3: format = PixelFormat24bppRGB; break;
-		case 4: format = PixelFormat32bppARGB; break;
-		default: format = PixelFormat32bppARGB; break;
-		}
-
-		create(width, height, channels);
-		//v.resize(pitch * height);
-		//size = rects::wh(width, height);
-		Gdiplus::BitmapData bdata;
-		Gdiplus::Rect rect(0, 0, width, height);
-
-		// Convert to 32-bit BGRA pixel format and fetch the pixel data.
-		if (pBitmap->LockBits(&rect, Gdiplus::ImageLockModeRead, format, &bdata) != Gdiplus::Ok)
+		if (lodepng::decode(v, width, height, lodepngfname)) {
 			return false;
-
-		if (bdata.Stride == width*channels)
-			memcpy(&v[0], bdata.Scan0, width * height * channels);
-		else {
-			unsigned char *pSrcPixels = static_cast<unsigned char *>(bdata.Scan0);
-
-			for (int i = 0; i < height; ++i)
-				memcpy(&v[i * width * channels], &pSrcPixels[i * bdata.Stride], width * channels);
 		}
 
-		pBitmap->UnlockBits(&bdata);
+		size.w = width;
+		size.h = height;
+
+		for (int i = 0; i < size.area(); ++i) {
+			std::swap(v[i * 4 + 0], v[i * 4 + 2]);
+		}
 
 		return true;
 	}

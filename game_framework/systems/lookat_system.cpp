@@ -4,7 +4,7 @@
 #include "../components/physics_component.h"
 #include <Box2D\Dynamics\b2Body.h>
 
-void lookat_system::process_entities() {
+void lookat_system::update_rotations() {
 	double delta = smooth_timer.extract<std::chrono::seconds>();
 
 	for (auto it : targets) {

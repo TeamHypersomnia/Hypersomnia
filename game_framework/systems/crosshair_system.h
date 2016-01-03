@@ -11,6 +11,6 @@ class crosshair_system : public processing_system_templated<components::transfor
 public:
 	using processing_system_templated::processing_system_templated;
 
-	void consume_events();
-	void process_entities();
+	void react_to_aiming_intents();
+	void animate_crosshair_sizes();
 };

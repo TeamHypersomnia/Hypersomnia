@@ -7,6 +7,8 @@
 #include "game_framework/components/transform_component.h"
 #include "utilities/entity_system/entity_id.h"
 
+#include "game_framework/assets/texture.h"
+
 namespace augs {
 	class renderer {
 	public:
@@ -58,8 +60,9 @@ namespace augs {
 		}
 
 		void fullscreen_quad();
-		void draw_debug_info(vec2 visible_area, components::transform, augs::texture* tex, std::vector<entity_id> target_entities);
+		void draw_debug_info(vec2 visible_area, components::transform, assets::texture_id tex, std::vector<entity_id> target_entities);
 
+		void clear();
 		void call_triangles();
 		void push_triangle(const augs::vertex_triangle&);
 		void clear_triangles();

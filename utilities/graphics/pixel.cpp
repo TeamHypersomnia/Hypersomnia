@@ -117,6 +117,10 @@ namespace augs {
 	pixel_32::pixel_32(color red, color green, color blue, color alpha) : r(red), g(green), b(blue), a(alpha) {}
 
 	hsv::hsv(double h, double s, double v) : h(h), s(s), v(v) {}
+	
+	void pixel_32::set(color red, color green, color blue, color alpha) {
+		*this = pixel_32(red, green, blue, alpha);
+	}
 
 	hsv pixel_32::get_hsv() const {
 		auto res = rgb2hsv({ r / 255.0, g / 255.0, b / 255.0 });

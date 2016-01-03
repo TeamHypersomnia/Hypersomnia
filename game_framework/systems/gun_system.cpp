@@ -32,7 +32,7 @@ void components::gun::transfer_barrel_smoke(augs::entity_id another, bool overwr
 		another_entity->set(this_entity->get<components::chase>());
 	}
 	
-	another_entity->set(this_entity->get<components::render>())->model = another_entity->find<components::particle_group>();
+	another_entity->set(this_entity->get<components::render>());
 	another_entity->get<components::chase>().set_target(another);
 	//another_entity->get<components::chase>().rotation_orbit_offset = new_orbit_offset;
 

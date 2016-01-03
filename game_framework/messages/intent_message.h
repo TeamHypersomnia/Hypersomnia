@@ -17,6 +17,7 @@ namespace messages {
 			SHOOT,
 			AIM,
 			SWITCH_LOOK,
+			ZOOM_CAMERA,
 			SWITCH_WEAPON
 		};
 

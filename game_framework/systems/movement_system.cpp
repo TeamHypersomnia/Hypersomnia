@@ -11,7 +11,7 @@
 
 using namespace messages;
 
-void movement_system::consume_events() {
+void movement_system::set_movement_flags_from_input() {
 	auto events = parent_world.get_message_queue<messages::intent_message>();
 
 	for (auto it : events) {
@@ -40,12 +40,12 @@ template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
 
-void movement_system::substep() {
+void movement_system::apply_movement_forces() {
 	auto& physics_sys = parent_world.get_system<physics_system>();
 
 	for (auto it : targets) {
-		auto& physics = it->get<components::physics>();
 		auto& movement = it->get<components::movement>();
+		auto* maybe_physics = it->find<components::physics>();
 
 		vec2 resultant;
 
@@ -59,7 +59,14 @@ void movement_system::substep() {
 			resultant.x = movement.moving_right * movement.input_acceleration.x - movement.moving_left * movement.input_acceleration.x;
 			resultant.y = movement.moving_backward * movement.input_acceleration.y - movement.moving_forward * movement.input_acceleration.y;
 		}
-		
+
+		if (maybe_physics == nullptr) {
+			it->get<components::transform>().pos += resultant * per_second();
+			continue;
+		}
+
+		auto& physics = *maybe_physics;
+
 		b2Vec2 vel = physics.body->GetLinearVelocity();
 
 		float ground_angle = 0.f;
@@ -116,10 +123,15 @@ void movement_system::substep() {
 	}
 }
 
-void movement_system::process_entities() {
+void movement_system::animate_movement() {
 	for (auto it : targets) {
-		auto& physics = it->get<components::physics>();
 		auto& movement = it->get<components::movement>();
+		auto* maybe_physics = it->find<components::physics>();
+		
+		if (maybe_physics == nullptr)
+			continue;
+
+		auto& physics = *maybe_physics;
 
 		b2Vec2 vel = physics.body->GetLinearVelocity();
 		float32 speed = vel.Normalize() * METERS_TO_PIXELSf;

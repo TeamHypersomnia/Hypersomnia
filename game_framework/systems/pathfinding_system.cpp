@@ -6,7 +6,6 @@
 #include "render_system.h"
 #include "physics_system.h"
 
-#include "../resources/render_info.h"
 #include "../game/body_helper.h"
 
 #include <iostream>

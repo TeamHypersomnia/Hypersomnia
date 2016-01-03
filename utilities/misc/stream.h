@@ -31,8 +31,9 @@ namespace augs {
 
 		t.resize(size);
 
-		for (auto& p : t)
-			f.read((char*)&p, sizeof(p));
+		if(size)
+			for (auto& p : t)
+				f.read((char*)&p, sizeof(p));
 	}
 
 	namespace misc {

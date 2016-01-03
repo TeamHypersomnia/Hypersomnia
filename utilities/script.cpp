@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "window_framework/window.h"
+#include "file.h"
 
 namespace augs {
 	script::script(lua_state_wrapper& lua_state) : lua_state(lua_state) {}
@@ -67,19 +68,8 @@ namespace augs {
 			int result = 0;
 			bytecode.clear();
 
-			if (is_associated_string_filename) {
-				std::ifstream t(associated_string);
-				std::string script_file;
-
-				t.seekg(0, std::ios::end);
-				script_file.reserve(static_cast<unsigned>(t.tellg()));
-				t.seekg(0, std::ios::beg);
-
-				script_file.assign((std::istreambuf_iterator<char>(t)),
-					std::istreambuf_iterator<char>());
-
-				result = luaL_loadstring(lua_state, script_file.c_str());
-			}
+			if (is_associated_string_filename)
+				result = luaL_loadstring(lua_state, get_file_contents(associated_string).c_str());
 			else
 				result = luaL_loadstring(lua_state, associated_string.c_str());
 

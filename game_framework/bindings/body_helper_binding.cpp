@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "bindings.h"
 
-#include "../resources/render_info.h"
+#include "../shared/drawing_state.h"
 #include "../game/body_helper.h"
 
 #include "entity_system/entity.h"

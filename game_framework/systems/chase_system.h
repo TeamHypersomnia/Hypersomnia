@@ -11,5 +11,5 @@ class chase_system : public processing_system_templated<components::transform, c
 public:
 	using processing_system_templated::processing_system_templated;
 
-	void process_entities();
+	void update_transforms();
 };

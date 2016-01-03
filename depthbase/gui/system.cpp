@@ -206,13 +206,12 @@ namespace augs {
 
 			void group::poll_events() {
 				augs::window::event::state& gl = owner.events;
-				using namespace augs::window::event::key;
 				using namespace augs::window;
 				rect::poll_info in(*this, gl.msg);
 				bool pass = true;
 
 				if(middlescroll.subject) {
-					if (gl.msg == event::mouse::mdown || gl.msg == event::mouse::mdoubleclick) {
+					if (gl.msg == event::mdown || gl.msg == event::mdoubleclick) {
 						pass = false;
 						middlescroll.subject = 0;
 					}
@@ -221,7 +220,7 @@ namespace augs {
 
 				rect::event_info e(*this, rect::event::unknown);
 
-				if(gl.msg == event::mouse::lup) {
+				if(gl.msg == event::lup) {
 					if(lholded) {
 						if(lholded->get_clipped_rect().hover(gl.mouse.pos)) {
 							lholded->event_proc(e = rect::event::lup);
@@ -234,7 +233,7 @@ namespace augs {
 					}
 				} 
 				
-				if(gl.msg == event::mouse::rup) {
+				if(gl.msg == event::rup) {
 					if(rholded) {
 						if(rholded->get_clipped_rect().hover(gl.mouse.pos)) {
 							rholded->event_proc(e = rect::event::rup);
@@ -247,7 +246,7 @@ namespace augs {
 					}
 				} 
 
-				if(focus && focus->fetch_wheel && gl.msg == event::mouse::wheel) {
+				if(focus && focus->fetch_wheel && gl.msg == event::wheel) {
 					   if(focus->draw) focus->poll_message(in);
 					   pass = false;
 				}
@@ -261,9 +260,9 @@ namespace augs {
 				}*/
 				if(focus) {
 					switch(gl.msg) {
-					case down:		if(focus->draw) focus->event_proc(e = rect::event::keydown); pass = false; break;
-					case up:		if(focus->draw) focus->event_proc(e = rect::event::keyup); pass = false; break;
-					case character: if(focus->draw) focus->event_proc(e = rect::event::character); pass = false; break;
+					case event::keydown:   if(focus->draw) focus->event_proc(e = rect::event::keydown); pass = false; break;
+					case event::keyup:	   if(focus->draw) focus->event_proc(e = rect::event::keyup); pass = false; break;
+					case event::character: if(focus->draw) focus->event_proc(e = rect::event::character); pass = false; break;
 					default: break; 
 					}
 				}

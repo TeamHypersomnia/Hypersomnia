@@ -1,7 +1,8 @@
 #pragma once
 #include <vector>
 #include <functional>
-#include "render_info.h"
+#include "game_framework/components/sprite_component.h"
+#include "entity_system/entity_id.h"
 
 namespace resources {
 	typedef std::function<void(augs::entity_id)> animation_callback;
@@ -13,7 +14,7 @@ namespace resources {
 			/* function that is called once this frame quits */
 			animation_callback callback_out;
 
-			sprite model;
+			components::sprite sprite;
 			float duration_milliseconds = 0.f;
 		};
 

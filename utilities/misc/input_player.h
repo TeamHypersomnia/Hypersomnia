@@ -46,7 +46,7 @@ namespace augs {
 			
 			std::ifstream source(filename, std::ios::in | std::ios::binary);
 
-			while (!source.eof()) {
+			while (source.peek() != EOF) {
 				entry_type entry;
 
 				deserialize(source, entry.step_occurred);
@@ -73,10 +73,17 @@ namespace augs {
 
 				std::ofstream recording_file(live_saving_filename, std::ios::out | std::ios::binary | std::ios::app);
 
-				serialize(recording_file, new_entry.step_occurred);
-				new_entry.internal_data.serialize(recording_file);
+				if (new_entry.internal_data.should_serialize()) {
+					serialize(recording_file, new_entry.step_occurred);
+					new_entry.internal_data.serialize(recording_file);
+				}
 			}
 			else if (current_player_state == player_state::REPLAYING) {
+				if (next_entry_to_be_replayed >= loaded_recording.size()) {
+					stop();
+					return;
+				}
+
 				auto& next = loaded_recording[next_entry_to_be_replayed];
 				
 				if (next.step_occurred == player_position) {

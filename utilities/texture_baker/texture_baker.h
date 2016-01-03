@@ -3,14 +3,6 @@
 #include "image.h"
 #include "rectpack.h"
 
-/* zrobic w klasie texture atlasu dodawanie tekstur i generowanie in place, potem do poszczegolnych interfejsow uzytkownik sam daje wskaznik do atlasu == elastycznosc i mozliwosc all in one
-+ statyczna funkcja na multiple atlas distribution
-jeszcze taka opcja ze do texture atlas funkcja pack() zeby mozna bylo robic cos w stylu online packing
-najlepiej jakby przyjmowal image's i zwracal jakies info typu rects::texture dla kazdego
-kurwa po ludzku musi to wygladac
-tekstura NIE MUSI wiedziec do jakiego atlasu nalezy, interfejsy maja wiedziec and thats sufficient
-*/
-
 namespace augs {
 	struct font_file;
 	struct font;
@@ -57,10 +49,33 @@ namespace augs {
 	public:
 		atlas(int white_pixel_size = 0); ~atlas();
 
-		static bool gen_packed(std::vector<texture*>& in_textures,
-			std::vector<atlas*>& inout_atlases);
-
 		std::vector<texture*> textures;
+
+		//struct texture_entry {
+		//	image img;
+		//	texture tex;
+		//
+		//	texture_entry(image img);
+		//};
+		//
+		//class texture_id {
+		//	int id = -1;
+		//	std::wstring custom_name;
+		//public:
+		//	texture_id(int);
+		//	texture_id(std::wstring);
+		//
+		//	void set(int);
+		//	void set(std::wstring);
+		//};
+		//
+		//typedef int texture_id;
+		//
+		//static std::unordered_map<texture_id, texture_entry> id_to_texture;
+		//
+		////static void register_textures_from_filenames(std::vector<std::wstring> filenames);
+		//static void register_texture_from_filename(texture_id id, std::wstring filename);
+		//static void register_texture_from_image(texture_id id, image);
 
 		texture atlas_texture;
 		image img;
@@ -71,6 +86,8 @@ namespace augs {
 		void create_image(int atlas_channels, bool destroy_images);
 		void build(bool mipmaps = false, bool linear = false, image* raw_texture = 0), bind(), _bind(), nearest(), linear(), clamp(), repeat();
 
+		//void add_texture_by_name(texture_id);
+		//void add_textures_by_names(std::vector<texture_id>);
 		void default_build();
 
 		bool is_mipmapped() const;

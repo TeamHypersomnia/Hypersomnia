@@ -26,6 +26,8 @@ namespace augs {
 			wh(const xywh<T>& rr) : w(rr.w), h(rr.h) {}
 			wh(T w = 0, T h = 0) : w(w), h(h) {}
 
+			void set(T w, T h) { *this = wh(w, h); }
+
 			enum class fit_status {
 				DOESNT_FIT,
 				FITS_INSIDE,
@@ -90,6 +92,7 @@ namespace augs {
 			ltrb(const wh<T>& rr) : l(0), t(0), r(rr.w), b(rr.h) {}
 			ltrb(const xywh<T>& rr) : l(rr.x), t(rr.y), r(rr.x + rr.w), b(rr.y + rr.h) {}
 			ltrb(T l, T t, T r, T b) : l(l), t(t), r(r), b(b) {}
+			void set(T l, T t, T r, T b) { *this = ltrb(l, t, r, b); }
 
 			T perimeter() const {
 				return 2 * w() + 2 * h();
@@ -290,6 +293,8 @@ namespace augs {
 			xywh(T x, T y, T w, T h) : x(x), y(y), wh(w, h) {}
 			xywh(T x, T y, const wh& r) : x(x), y(y), wh(r) {}
 			xywh(const vec2t<T>& p, const wh& r) : x(p.x), y(p.y), wh(r) {}
+
+			void set(T x, T y, T w, T h) { *this = xywh(x, y, w, h); }
 
 			bool clip(const xywh& rc) {
 				if (x >= rc.r() || y >= rc.b() || r() <= rc.x || b() <= rc.y) {

@@ -3,7 +3,7 @@
 #include "../systems/physics_system.h"
 #include "entity_system/entity_id.h"
 
-namespace resources {
+namespace components {
 	struct polygon;
 }
 
@@ -28,7 +28,7 @@ namespace helpers {
 		void add_convex(const std::vector<vec2> &);
 		void add_concave(const std::vector<vec2> &);
 
-		void from_renderable(const resources::polygon&);
+		void from_renderable(const components::polygon&);
 
 		physics_info();
 	};

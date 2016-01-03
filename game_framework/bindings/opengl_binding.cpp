@@ -121,24 +121,24 @@ namespace bindings {
 			.def("get_texture_id", &fbo::get_texture_id)
 			.scope [
 				luabind::def("use_default", &fbo::use_default)
-			],
-
-			luabind::class_<shader>("GLSL_shader")
-			.def(luabind::constructor<>())
-			.def(luabind::constructor<GLuint, std::string>())
-			.def("create", &shader::create)
-			.def("destroy", &shader::destroy),
-
-			luabind::class_<shader_program>("GLSL_program")
-			.def(luabind::constructor<>())
-			.def_readwrite("id", &shader_program::id)
-			.def("attach", &shader_program::attach)
-			.def("build", &shader_program::build)
-			.def("use", &shader_program::use)
-			.def("destroy", &shader_program::destroy)
-			.scope[
-				luabind::def("use_default", &shader_program::use_default)
 			]
+
+			//luabind::class_<shader>("GLSL_shader")
+			//.def(luabind::constructor<>())
+			//.def(luabind::constructor<GLuint, std::string>())
+			//.def("create", &shader::create)
+			//.def("destroy", &shader::destroy),
+			//
+			//luabind::class_<shader_program>("GLSL_program")
+			//.def(luabind::constructor<>())
+			//.def_readwrite("id", &shader_program::id)
+			//.def("attach", &shader_program::attach)
+			//.def("build", &shader_program::build)
+			//.def("use", &shader_program::use)
+			//.def("destroy", &shader_program::destroy)
+			//.scope[
+			//	luabind::def("use_default", &shader_program::use_default)
+			//]
 
 			;
 	}

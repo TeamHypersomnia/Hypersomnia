@@ -20,6 +20,7 @@ struct input_system : public processing_system_templated<components::input> {
 	struct inputs_per_step {
 		std::vector<augs::window::event::state> events;
 
+		bool should_serialize();
 		void serialize(std::ofstream&);
 		void deserialize(std::ifstream&);
 	};
@@ -28,11 +29,11 @@ struct input_system : public processing_system_templated<components::input> {
 
 	void generate_input_intents_for_next_step();
 	
-	void add_context(context*);
+	void add_context(context);
 	void clear_contexts();
 
 	void clear() override;
 
-	std::vector<context*> active_contexts;
+	std::vector<context> active_contexts;
 	input_player<inputs_per_step> player;
 };

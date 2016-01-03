@@ -37,7 +37,7 @@ namespace augs {
 
 		shader::shader() : built(false) {}
 		
-		shader::shader(GLuint shader_type, std::string source_code) : shader() {
+		shader::shader(type shader_type, std::string source_code) : shader() {
 			create(shader_type, source_code);
 		}
 
@@ -45,10 +45,14 @@ namespace augs {
 			destroy();
 		}
 
-		void shader::create(GLuint shader_type, std::string source_code) {
+		void shader::create(type shader_type, std::string source_code) {
 			if (!built) {
 				built = true;
-				id = glCreateShader(shader_type); glerr
+
+				if (shader_type == type::VERTEX)
+					id = glCreateShader(GL_VERTEX_SHADER); glerr;
+				if (shader_type == type::FRAGMENT)
+					id = glCreateShader(GL_FRAGMENT_SHADER); glerr;
 
 				auto* source_ptr = source_code.c_str();
 				glShaderSource(id, 1, &source_ptr, nullptr); glerr

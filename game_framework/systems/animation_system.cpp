@@ -93,7 +93,7 @@ void components::animate::set_current_frame(unsigned number, augs::entity_id sub
 			saved_callback_out = current_animation->frames[current_frame].callback_out;
 		}
 
-		subject->get<components::render>().model = &current_animation->frames[get_current_frame()].model;
+		subject->get<components::sprite>() = current_animation->frames[get_current_frame()].sprite;
 	} 
 	else
 		saved_callback_out = nullptr;
@@ -120,7 +120,7 @@ void animation_system::process_entities() {
 
 	for (auto it : targets) {
 		auto& animate = it->get<components::animate>();
-		auto& render = it->get<components::render>();
+
 		if (animate.current_animation == nullptr) continue;
 
 		auto& animation = *animate.current_animation;
@@ -182,6 +182,7 @@ void animation_system::process_entities() {
 			}
 		}
 
-		render.model = &animation.frames[animate.get_current_frame()].model;
+		auto& sprite = it->get<components::sprite>();
+		sprite = animation.frames[animate.get_current_frame()].sprite;
 	}
 }

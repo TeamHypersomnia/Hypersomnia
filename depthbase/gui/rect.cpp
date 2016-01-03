@@ -253,7 +253,6 @@ namespace augs {
 
 			void rect::poll_message(poll_info& inf) {
 				using namespace augs::window::event;
-				using namespace mouse;
 				auto& gr = inf.owner;
 				auto& m = gr.owner.events.mouse;
 				unsigned msg = inf.msg;
@@ -314,11 +313,11 @@ namespace augs {
 								event_proc(e = event::wheel);
 							}
 
-							if(gr.lholded == this && msg == motion && m.state[0] && rc_clipped.hover(m.ldrag)) {
+							if(gr.lholded == this && msg == mousemotion && m.state[0] && rc_clipped.hover(m.ldrag)) {
 								gr.lholded = this;
 								event_proc(e = event::lpressed);
 							}
-							if(gr.rholded == this && msg == motion && m.state[1] && rc_clipped.hover(m.rdrag)) {
+							if(gr.rholded == this && msg == mousemotion && m.state[1] && rc_clipped.hover(m.rdrag)) {
 								gr.rholded = this;
 								event_proc(e = event::rpressed);
 							}
@@ -327,7 +326,7 @@ namespace augs {
 
 						}
 						else if(!hover) {
-							if(msg == motion) {
+							if(msg == mousemotion) {
 								if(was_hovered) {
 									event_proc(e = event::hout);
 									was_hovered = false;
@@ -337,7 +336,7 @@ namespace augs {
 								}
 							}
 						}
-						if(gr.lholded == this && msg == motion) {
+						if(gr.lholded == this && msg == mousemotion) {
 							event_proc(e = event::ldrag);
 						}
 					//}

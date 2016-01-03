@@ -23,7 +23,7 @@ void input_system::context::set_intent(unsigned raw_id, messages::intent_message
 	raw_id_to_intent[raw_id] = intent;
 }
 
-void input_system::add_context(context* c) {
+void input_system::add_context(context c) {
 	active_contexts.push_back(c);
 }
 
@@ -35,11 +35,17 @@ void input_system::inputs_per_step::serialize(std::ofstream& f) {
 	augs::serialize_vector(f, events);
 }
 
+bool input_system::inputs_per_step::should_serialize() {
+	return !events.empty();
+}
+
 void input_system::inputs_per_step::deserialize(std::ifstream& f) {
 	augs::deserialize_vector(f, events);
 }
 
 void input_system::generate_input_intents_for_next_step() {
+	parent_world.get_message_queue<messages::intent_message>().clear();
+
 	inputs_per_step inputs_for_this_step;
 
 	for (auto& m : parent_world.get_message_queue<messages::raw_window_input_message>())
@@ -51,7 +57,7 @@ void input_system::generate_input_intents_for_next_step() {
 	if (!active_contexts.empty()) {
 		for(auto& state : inputs_for_this_step.events) {
 			for (auto it : active_contexts) {
-				if (!it->enabled) continue;
+				if (!it.enabled) continue;
 
 				unsigned intent_searched;
 				bool pressed_flag;
@@ -59,6 +65,7 @@ void input_system::generate_input_intents_for_next_step() {
 				if (state.key_event == event::PRESSED) {
 					intent_searched = state.key;
 					pressed_flag = true;
+					std::cout << "PRESSED\n";
 				}
 				else if (state.key_event == event::RELEASED) {
 					intent_searched = state.key;
@@ -69,7 +76,7 @@ void input_system::generate_input_intents_for_next_step() {
 					pressed_flag = true;
 				}
 
-				auto input_map = it->raw_id_to_intent;
+				auto input_map = it.raw_id_to_intent;
 				auto found_intent = input_map.find(intent_searched);
 
 				if (found_intent != input_map.end()) {
@@ -91,4 +98,7 @@ void input_system::generate_input_intents_for_next_step() {
 			}
 		}
 	}
+
+	if(!parent_world.get_message_queue<messages::raw_window_input_message>().empty())
+		parent_world.get_message_queue<messages::raw_window_input_message>().clear();
 }

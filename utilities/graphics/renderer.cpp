@@ -13,6 +13,8 @@
 
 #include "../window_framework/window.h"
 
+#include "game_framework/resources/manager.h"
+
 namespace augs {
 	renderer& renderer::get_current() {
 		return window::glwindow::get_current()->glrenderer;
@@ -22,7 +24,7 @@ namespace augs {
 		glEnable(GL_TEXTURE_2D); glerr;
 		glEnable(GL_BLEND); glerr;
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE); glerr;
-		glClearColor(1.0, 0.0, 0.0, 1.0); glerr;
+		glClearColor(0.0, 0.0, 0.0, 1.0); glerr;
 
 		glGenBuffers(1, &triangle_buffer); glerr;
 		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer); glerr;
@@ -34,6 +36,11 @@ namespace augs {
 		glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(augs::vertex), 0); glerr;
 		glVertexAttribPointer(VERTEX_ATTRIBUTES::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(augs::vertex), (char*)(sizeof(float) * 2)); glerr;
 		glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(augs::vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr;
+	}
+
+	void renderer::clear() {
+		graphics::fbo::use_default();
+		glClear(GL_COLOR_BUFFER_BIT);
 	}
 
 	void renderer::call_triangles() {
@@ -88,7 +95,9 @@ namespace augs {
 		glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(augs::vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr;
 	}
 
-	void renderer::draw_debug_info(vec2 visible_area, components::transform camera_transform, augs::texture* tex, std::vector<entity_id> target_entities) {
+	void renderer::draw_debug_info(vec2 visible_area, components::transform camera_transform, assets::texture_id tex_id, std::vector<entity_id> target_entities) {
+		auto& tex = resource_manager.find(tex_id)->tex;
+		
 		vec2 center = visible_area / 2;
 
 		if (draw_visibility) {
@@ -126,8 +135,7 @@ namespace augs {
 
 								pos.rotate(camera_transform.rotation, center);
 
-								if (tex)
-									glVertexAttrib2f(VERTEX_ATTRIBUTES::TEXCOORD, tex->get_u(i), tex->get_v(i)); glerr;
+								glVertexAttrib2f(VERTEX_ATTRIBUTES::TEXCOORD, tex.get_u(i), tex.get_v(i)); glerr;
 
 								glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, pos.x, pos.y); glerr;
 							}
@@ -147,9 +155,9 @@ namespace augs {
 			line.a.rotate(camera_transform.rotation, center);
 			line.b.rotate(camera_transform.rotation, center);
 			glVertexAttrib4f(VERTEX_ATTRIBUTES::COLOR, line.col.r / 255.f, line.col.g / 255.f, line.col.b / 255.f, line.col.a / 255.f); glerr;
-			if (tex) glVertexAttrib2f(VERTEX_ATTRIBUTES::TEXCOORD, tex->get_u(0), tex->get_v(0)); glerr;
+			glVertexAttrib2f(VERTEX_ATTRIBUTES::TEXCOORD, tex.get_u(0), tex.get_v(0)); glerr;
 			glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.a.x, line.a.y); glerr;
-			if (tex) glVertexAttrib2f(VERTEX_ATTRIBUTES::TEXCOORD, tex->get_u(2), tex->get_v(2)); glerr;
+			glVertexAttrib2f(VERTEX_ATTRIBUTES::TEXCOORD, tex.get_u(2), tex.get_v(2)); glerr;
 			glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.b.x, line.b.y); glerr;
 		};
 
@@ -173,6 +181,8 @@ namespace augs {
 	void renderer::default_render(vec2 visible_area) {
 		augs::graphics::fbo::use_default();
 		glClear(GL_COLOR_BUFFER_BIT); glerr;
+		
+		resource_manager.find(assets::atlas_id::GAME_WORLD_ATLAS)->bind();
 
 		call_triangles();
 

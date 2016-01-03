@@ -2,13 +2,12 @@
 #include "misc/map_wrapper.h"
 #include "../messages/particle_burst_message.h"
 #include "../components/render_component.h"
-
-#include "../resources/render_info.h"
+#include "../components/sprite_component.h"
 
 namespace resources {
 	struct particle {
 		vec2 pos, vel, acc;
-		resources::sprite face = nullptr;
+		components::sprite face;
 		float rotation = 0.f;
 		float rotation_speed = 0.f;
 		float linear_damping = 0.f;

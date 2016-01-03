@@ -24,6 +24,8 @@ namespace augs {
 	struct pixel_32 {
 		color r, g, b, a;
 		pixel_32(color red = 255, color green = 255, color blue = 255, color alpha = 255);
+		void set(color red = 255, color green = 255, color blue = 255, color alpha = 255);
+
 		hsv get_hsv() const;
 		pixel_32& set_hsv(hsv);
 	};

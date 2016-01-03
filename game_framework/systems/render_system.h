@@ -8,10 +8,13 @@
 #include "../components/render_component.h"
 
 #include "graphics/vertex.h"
-#include "../resources/render_info.h"
 #include "texture_baker/texture_baker.h"
 
 using namespace augs;
+
+namespace shared {
+	class drawing_state;
+}
 
 class render_system : public processing_system_templated<components::transform, components::render> {
 public:
@@ -20,9 +23,8 @@ public:
 	std::vector<std::vector<entity_id>> layers;
 
 	void generate_layers(int mask);
-	void draw_layer(resources::renderable::drawing_state& in, int layer);
-	void generate_and_draw_all_layers(resources::renderable::drawing_state& in, int mask);
+	void draw_layer(shared::drawing_state& in, int layer);
+	void generate_and_draw_all_layers(shared::drawing_state& in, int mask);
 
 	void set_current_transforms_as_previous_for_interpolation();
-	
 };

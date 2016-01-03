@@ -37,6 +37,10 @@ namespace augs {
 			unsafe_type_collection::register_type<T>();
 			component_containers.register_destructor<T>();
 			component_containers.add<T>(20000);
+
+			auto hash = templated_list_to_hash_vector<T>::unpack();
+			component_library.add_hash_to_index_mappings(hash);
+			component_library.generate_indices(hash);
 		}
 
 		template <typename T>

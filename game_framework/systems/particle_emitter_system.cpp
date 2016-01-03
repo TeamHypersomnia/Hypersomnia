@@ -105,10 +105,7 @@ void particle_emitter_system::consume_events() {
 				entity_id new_burst_entity = parent_world.create_entity();
 				new_burst_entity->add(components::particle_group());
 				new_burst_entity->add(components::transform());
-
-				components::render new_render = emission.particle_render_template;
-				new_render.model = &new_burst_entity->get<components::particle_group>();
-				new_burst_entity->add(new_render);
+				new_burst_entity->add(emission.particle_render_template);
 
 				for (int i = 0; i < burst_amount; ++i)
 					spawn_particle(new_burst_entity->get<components::particle_group>().stream_slots[0], it.pos, target_rotation, target_spread, emission);
@@ -178,7 +175,6 @@ void particle_emitter_system::consume_events() {
 			target_group->previous_transform = *target_transform;
 
 			*target_render = stream->particle_render_template;
-			target_render->model = target_group;
 
 			if (target_chase) {
 				auto& subject_transform = it.subject->get<components::transform>();

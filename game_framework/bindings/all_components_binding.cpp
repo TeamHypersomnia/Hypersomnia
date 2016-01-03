@@ -552,11 +552,8 @@ namespace bindings {
 
 													luabind::class_<render>("render_component")
 													.def(luabind::constructor<>())
-													.def("get_sprite", &render::get_renderable<resources::sprite>)
-													.def("get_polygon", &render::get_renderable<resources::polygon>)
 													.def_readwrite("mask", &render::mask)
 													.def_readwrite("layer", &render::layer)
-													.def_readwrite("model", &render::model)
 													.def_readwrite("last_screen_pos", &render::last_screen_pos)
 													.def_readwrite("was_drawn", &render::was_drawn)
 													.def_readwrite("flip_horizontally", &render::flip_horizontally)
