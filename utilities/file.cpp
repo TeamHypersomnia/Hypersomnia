@@ -4,6 +4,11 @@
 #include <fstream>
 
 namespace augs {
+	bool file_exists(std::wstring filename) {
+		std::ifstream infile(filename);
+		return infile.good();
+	}
+
 	std::vector<std::wstring> get_all_files_in_directory(std::wstring dirpath) {
 		std::vector<std::wstring> out;
 

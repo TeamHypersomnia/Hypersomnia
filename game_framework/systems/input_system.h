@@ -10,11 +10,13 @@ using namespace augs;
 
 struct input_system : public processing_system_templated<components::input> {
 	struct context {
-		std::unordered_map<int, int> raw_id_to_intent;
+		std::unordered_map<window::event::keys::key, messages::intent_message::intent_type> key_to_intent;
+		std::unordered_map<window::event::message, messages::intent_message::intent_type> event_to_intent;
 		bool enabled;
 		context();
 
-		void set_intent(unsigned, messages::intent_message::intent_type);
+		void map_key_to_intent(window::event::keys::key, messages::intent_message::intent_type);
+		void map_event_to_intent(window::event::message, messages::intent_message::intent_type);
 	};
 
 	struct inputs_per_step {

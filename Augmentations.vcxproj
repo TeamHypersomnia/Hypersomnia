@@ -396,6 +396,7 @@
     <ClCompile Include="game_framework\game_framework.cpp" />
     <ClCompile Include="game_framework\resources\animate_info.cpp" />
     <ClCompile Include="game_framework\resources\manager.cpp" />
+    <ClCompile Include="game_framework\scene_builders\scene_builder.cpp" />
     <ClCompile Include="game_framework\scene_builders\scripts\testbed_rendering.cpp" />
     <ClCompile Include="game_framework\scene_builders\testbed.cpp" />
     <ClCompile Include="game_framework\systems\animation_system.cpp" />
@@ -972,11 +973,14 @@
     <ClInclude Include="game_framework\messages\particle_burst_message.h" />
     <ClInclude Include="game_framework\messages\raw_window_input_message.h" />
     <ClInclude Include="game_framework\messages\shot_message.h" />
+    <ClInclude Include="game_framework\messages\unmapped_intent_message.h" />
     <ClInclude Include="game_framework\resources\animate_info.h" />
     <ClInclude Include="game_framework\resources\manager.h" />
     <ClInclude Include="game_framework\resources\particle_emitter_info.h" />
+    <ClInclude Include="game_framework\scene_builders\scene_builder.h" />
     <ClInclude Include="game_framework\scene_builders\scripts\rendering_procedures.h" />
-    <ClInclude Include="game_framework\scene_builders\scene_builders.h" />
+    <ClInclude Include="game_framework\scene_builders\all_builders.h" />
+    <ClInclude Include="game_framework\scene_builders\testbed.h" />
     <ClInclude Include="game_framework\shared\drawing_state.h" />
     <ClInclude Include="game_framework\systems\animation_system.h" />
     <ClInclude Include="game_framework\systems\behaviour_tree_system.h" />

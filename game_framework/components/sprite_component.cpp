@@ -45,8 +45,7 @@ namespace components {
 	}
 
 	void sprite::update_size() {
-		if (tex)
-			size = vec2i(resource_manager.find(tex)->tex.get_size());
+		size = vec2i(resource_manager.find(tex)->tex.get_size());
 	}
 
 	void sprite::draw(drawing_state& in) {

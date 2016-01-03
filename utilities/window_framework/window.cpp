@@ -136,16 +136,24 @@ namespace augs {
 				case wheel:
 					events.mouse.scroll = GET_WHEEL_DELTA_WPARAM(wParam);
 					break;
+				case ldoubleclick:
 				case ldown:
 					events.key_event = event::PRESSED;
 					events.key = LMOUSE;
+					SetCapture(hwnd);
 					events.mouse.state[0] = events.keys[LMOUSE] = true;
 
-					if (doubled && triple_timer.extract<std::chrono::milliseconds>() < triple_click_delay) {
-						m = events.msg = ltripleclick;
-						doubled = false;
+					if (m == ldown) {
+						if (doubled && triple_timer.extract<std::chrono::milliseconds>() < triple_click_delay) {
+							m = events.msg = ltripleclick;
+							doubled = false;
+						}
 					}
-					SetCapture(hwnd);
+					else {
+						triple_timer.extract<std::chrono::microseconds>();
+						doubled = true;
+					}
+
 					break;
 				case rdown:				    
 					events.key_event = event::PRESSED;
@@ -155,13 +163,7 @@ namespace augs {
 					events.key_event = event::PRESSED;
 					events.key = MMOUSE;
 					events.mouse.state[2] = events.keys[MMOUSE] = true;  break;
-				case ldoubleclick:
-					events.key = LMOUSE;
-					SetCapture(hwnd);
-					events.mouse.state[0] = events.keys[LMOUSE] = true;
-					triple_timer.extract<std::chrono::microseconds>();
-					doubled = true;
-					break;
+
 				case rdoubleclick:			    
 					events.key = RMOUSE;
 					events.mouse.state[1] = events.keys[RMOUSE] = true;  break;
@@ -197,6 +199,9 @@ namespace augs {
 						events.mouse.rdrag.x = events.mouse.pos.x;
 						events.mouse.rdrag.y = events.mouse.pos.y;
 					}
+					
+					m = events.msg = mousemotion;
+
 					break;
 
 				case WM_INPUT:

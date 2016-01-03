@@ -1005,6 +1005,9 @@
     <ClCompile Include="utilities\texture_baker\lodepng.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game_framework\scene_builders\scene_builder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -2705,9 +2708,6 @@
     <ClInclude Include="game_framework\archetypes\archetypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\scene_builders\scene_builders.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\components\sprite_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2760,6 +2760,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="utilities\texture_baker\lodepng.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\scene_builders\all_builders.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\scene_builders\scene_builder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\scene_builders\testbed.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\messages\unmapped_intent_message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

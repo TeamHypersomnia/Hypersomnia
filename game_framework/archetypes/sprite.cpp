@@ -15,4 +15,9 @@ namespace archetypes {
 		e->add(sprite);
 		e->add(transform);
 	}
+
+	void sprite_scalled(augs::entity_id e, vec2 pos, vec2i size, assets::texture_id id, augs::pixel_32 col) {
+		sprite(e, pos, id, col);
+		e->get<components::sprite>().size = size;
+	}
 }

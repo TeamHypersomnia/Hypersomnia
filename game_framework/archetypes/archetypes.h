@@ -9,6 +9,7 @@
 namespace archetypes {
 	void camera(augs::entity_id, int w, int h);
 	void sprite(augs::entity_id, vec2 pos, assets::texture_id = assets::texture_id::BLANK, augs::pixel_32 col = augs::pixel_32(255, 255, 255, 255));
+	void sprite_scalled(augs::entity_id, vec2 pos, vec2i size, assets::texture_id = assets::texture_id::BLANK, augs::pixel_32 col = augs::pixel_32(255, 255, 255, 255));
 	
 	void wsad_player_crosshair(augs::entity_id);
 	void wsad_player(augs::entity_id, augs::entity_id crosshair_entity, augs::entity_id camera_entity);
