@@ -4,16 +4,24 @@
 
 #include "utilities/entity_system/overworld.h"
 
+#include <memory>
+
+#include "game_framework/scene_builders/scene_builder.h"
+
 class hypersomnia_overworld : public augs::overworld {
+	std::unique_ptr<scene_builder> current_scene_builder;
+
 public:
 	hypersomnia_overworld();
 
 	window::glwindow game_window;
 
+
 	hypersomnia_world game_world;
 	augs::lua_state_wrapper lua;
 
-	void initialize();
+	void set_scene_builder(std::unique_ptr<scene_builder> builder);
+	void initialize_scene();
 
 	void call_window_script(std::string filename);
 

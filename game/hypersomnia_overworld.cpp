@@ -22,8 +22,12 @@ hypersomnia_overworld::hypersomnia_overworld()
 	: game_world(*this) {
 }
 
-void hypersomnia_overworld::initialize() {
+void hypersomnia_overworld::set_scene_builder(std::unique_ptr<scene_builder> builder) {
+	current_scene_builder = std::move(builder);
+}
 
+void hypersomnia_overworld::initialize_scene() {
+	current_scene_builder->initialize(game_world);
 }
 
 void hypersomnia_overworld::call_window_script(std::string filename) {
@@ -68,10 +72,12 @@ void hypersomnia_overworld::simulate() {
 
 		while (steps_to_do--) {
 			game_world.perform_logic_step();
+			current_scene_builder->perform_logic_step(game_world);
 		}
 
 		game_window.clear();
 
+		current_scene_builder->draw(game_world);
 		game_world.draw();
 
 		game_window.swap_buffers();

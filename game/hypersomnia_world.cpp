@@ -62,6 +62,7 @@ void hypersomnia_world::register_messages_components_systems() {
 	register_message_queue<particle_burst_message>();
 	register_message_queue<shot_message>();
 	register_message_queue<raw_window_input_message>();
+	register_message_queue<unmapped_intent_message>();
 }
 
 void hypersomnia_world::perform_logic_step() {

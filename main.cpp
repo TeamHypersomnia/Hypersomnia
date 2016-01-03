@@ -4,18 +4,18 @@
 
 using namespace augs;
 
-#include "game_framework/scene_builders/scene_builders.h"
+#include "game_framework/scene_builders/all_builders.h"
 
 int main(int argc, char** argv) {
 	framework::init();
 	//framework::run_tests();
 
 	hypersomnia_overworld overworld;
-	overworld.initialize();
 	overworld.configure_scripting();
 	overworld.call_window_script("config.lua");
 
-	scene_builders::testbed(overworld.game_world);
+	overworld.set_scene_builder(std::unique_ptr<scene_builder>(new scene_builders::testbed));
+	overworld.initialize_scene();
 
 	overworld.simulate();
 

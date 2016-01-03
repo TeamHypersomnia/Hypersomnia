@@ -175,3 +175,5 @@ WorkingAssets/
 *.ipdb
 *.iobj
 *.opendb
+*.inputs
+output/builds/
