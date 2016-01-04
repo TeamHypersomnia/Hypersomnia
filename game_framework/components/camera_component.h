@@ -9,6 +9,8 @@
 #include "../components/transform_component.h"
 #include "../shared/drawing_state.h"
 
+#include "utilities/misc/smooth_value_field.h"
+
 class camera_system;
 class gun_system;
 
@@ -43,6 +45,8 @@ namespace components {
 		vec2 max_look_expand = vec2(600.f, 300.f);
 
 		augs::entity_id player, crosshair;
+
+		augs::smooth_value_field smoothing_player_pos;
 
 		camera() { smooth_timer.reset(); }
 

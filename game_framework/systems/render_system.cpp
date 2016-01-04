@@ -41,10 +41,41 @@ void render_system::set_current_transforms_as_previous_for_interpolation() {
 		}
 	}
 }
-#include <iostream>
-void render_system::draw_layer(drawing_state& in, int layer) {
+
+void render_system::calculate_and_set_interpolated_transforms() {
 	auto ratio = view_interpolation_ratio();
 
+	for (auto e : targets) {
+		auto& render = e->get<components::render>();
+
+		if (render.interpolate) {
+			auto& actual_transform = e->get<components::transform>();
+			render.saved_actual_transform = actual_transform;
+
+			components::transform interpolated_transform;
+			interpolated_transform.pos = actual_transform.pos * ratio + render.previous_transform.pos * (1.0f - ratio);
+			interpolated_transform.rotation = vec2::from_degrees(render.previous_transform.rotation).lerp(vec2::from_degrees(actual_transform.rotation), ratio).degrees();
+
+			if ((actual_transform.pos - interpolated_transform.pos).length_sq() > 1.f)
+				actual_transform.pos = interpolated_transform.pos;
+			if (std::abs(actual_transform.rotation - interpolated_transform.rotation) > 1.f)
+				actual_transform.rotation = interpolated_transform.rotation;
+
+		}
+	}
+}
+
+void render_system::restore_actual_transforms() {
+	for (auto it : targets) {
+		auto& render = it->get<components::render>();
+
+		if (render.interpolate) {
+			it->get<components::transform>() = render.saved_actual_transform;
+		}
+	}
+}
+
+void render_system::draw_layer(drawing_state& in, int layer) {
 	auto in_camera_transform = in.camera_transform;
 	auto in_always_visible = in.always_visible;
 	
@@ -52,18 +83,10 @@ void render_system::draw_layer(drawing_state& in, int layer) {
 		for (auto e : layers[layer]) {
 			auto& render = e->get<components::render>();
 
-			if (render.interpolate) {
-				auto& actual_transform = e->get<components::transform>();
-			
-				components::transform interpolated_transform;
-				interpolated_transform.pos = actual_transform.pos * ratio + render.previous_transform.pos * (1.0f - ratio);
-				interpolated_transform.rotation = vec2::from_degrees(render.previous_transform.rotation).lerp(vec2::from_degrees(actual_transform.rotation), ratio).degrees();
-			
-				in.drawn_transform = interpolated_transform;
-			}
-			else
-				in.drawn_transform = e->get<components::transform>();
-			
+			in.drawn_transform = e->get<components::transform>();
+			in.drawn_transform.pos = vec2i(in.drawn_transform.pos);
+			in.drawn_transform.rotation = int(in.drawn_transform.rotation);
+
 			in.subject = e;
 
 			in.camera_transform = render.absolute_transform ? components::transform() : in_camera_transform;

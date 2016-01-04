@@ -10,6 +10,7 @@ namespace components {
 		bool was_drawn = false;
 
 		transform previous_transform;
+		transform saved_actual_transform;
 		bool interpolate = true;
 
 		enum mask_type {

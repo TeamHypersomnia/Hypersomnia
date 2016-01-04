@@ -8,7 +8,9 @@ namespace components {
 	struct crosshair : public augs::component {
 		//augs::rects::ltrb bounds;
 		augs::value_animation blink;
-		bool should_blink = true;
+		bool should_blink = false;
+
+		vec2 base_offset;
 
 		float rotation_offset = 0.f;
 		vec2 size_multiplier = vec2(1.0f, 1.0f);

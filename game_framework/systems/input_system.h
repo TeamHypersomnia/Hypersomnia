@@ -28,8 +28,10 @@ struct input_system : public processing_system_templated<components::input> {
 	};
 
 	using processing_system_templated::processing_system_templated;
-
-	void generate_input_intents_for_next_step();
+	
+	void acquire_inputs_from_rendering_time();
+	void generate_input_intents_for_rendering_time();
+	void generate_input_intents_for_logic_step();
 	
 	void add_context(context);
 	void clear_contexts();
@@ -38,4 +40,10 @@ struct input_system : public processing_system_templated<components::input> {
 
 	std::vector<context> active_contexts;
 	input_player<inputs_per_step> player;
+
+private:
+	inputs_per_step buffered_inputs_for_next_step;
+	inputs_per_step inputs_from_last_rendering_time;
+
+	void post_intents_from_inputs(const inputs_per_step&);
 };

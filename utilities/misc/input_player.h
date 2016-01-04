@@ -7,15 +7,17 @@
 namespace augs {
 	template <typename entry_internal_type>
 	class input_player {
-		int player_position = 0;
-		int next_entry_to_be_replayed = 0;
-
+	public:
 		enum class player_state {
 			DISABLED,
 			RECORDING,
 			REPLAYING
 		};
-		
+
+	private:
+		int player_position = 0;
+		int next_entry_to_be_replayed = 0;
+
 		player_state current_player_state = player_state::DISABLED;
 
 		struct entry_type {

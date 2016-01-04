@@ -27,4 +27,6 @@ public:
 	void generate_and_draw_all_layers(shared::drawing_state& in, int mask);
 
 	void set_current_transforms_as_previous_for_interpolation();
+	void calculate_and_set_interpolated_transforms();
+	void restore_actual_transforms();
 };

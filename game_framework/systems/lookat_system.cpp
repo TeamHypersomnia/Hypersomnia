@@ -19,7 +19,7 @@ void lookat_system::update_rotations() {
 		if (lookat.look_mode == components::lookat::look_type::POSITION) {
 			auto target_transform = lookat.target->find<components::transform>();
 			if (target_transform != nullptr)
-				new_rotation = (target_transform->pos - transform.pos).normalize();
+				new_rotation = (vec2(vec2i(target_transform->pos) - vec2i(transform.pos))).normalize();
 		}
 		else {
 			auto target_physics = lookat.target->find<components::physics>();

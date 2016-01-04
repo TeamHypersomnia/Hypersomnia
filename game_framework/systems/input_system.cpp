@@ -48,20 +48,9 @@ void input_system::inputs_per_step::deserialize(std::ifstream& f) {
 	augs::deserialize_vector(f, events);
 }
 
-void input_system::generate_input_intents_for_next_step() {
-	parent_world.get_message_queue<messages::unmapped_intent_message>().clear();
-	parent_world.get_message_queue<messages::intent_message>().clear();
-
-	inputs_per_step inputs_for_this_step;
-
-	for (auto& m : parent_world.get_message_queue<messages::raw_window_input_message>())
-		inputs_for_this_step.events.push_back(m.raw_window_input);
-	
-	// record/replay total entropia
-	player.biserialize(inputs_for_this_step);
-
+void input_system::post_intents_from_inputs(const inputs_per_step& inputs_for_this_step) {
 	if (!active_contexts.empty()) {
-		for(auto& state : inputs_for_this_step.events) {
+		for (auto& state : inputs_for_this_step.events) {
 			for (auto it : active_contexts) {
 				if (!it.enabled) continue;
 
@@ -108,5 +97,38 @@ void input_system::generate_input_intents_for_next_step() {
 		}
 	}
 
+}
+
+void input_system::acquire_inputs_from_rendering_time() {
+	inputs_from_last_rendering_time.events.clear();
+
+	for (auto& m : parent_world.get_message_queue<messages::raw_window_input_message>()) {
+		buffered_inputs_for_next_step.events.push_back(m.raw_window_input);
+		inputs_from_last_rendering_time.events.push_back(m.raw_window_input);
+	}
+
 	parent_world.get_message_queue<messages::raw_window_input_message>().clear();
+}
+
+void input_system::generate_input_intents_for_rendering_time() {
+	/* if we are replaying, let's pass some mouse strokes registered during logic step time
+		just that some of the original mouse movements appear in the recordings
+	*/
+	if (player.get_state() != augs::input_player<inputs_per_step>::player_state::REPLAYING) {
+		parent_world.get_message_queue<messages::unmapped_intent_message>().clear();
+		parent_world.get_message_queue<messages::intent_message>().clear();
+	}
+
+	post_intents_from_inputs(inputs_from_last_rendering_time);
+}
+	
+void input_system::generate_input_intents_for_logic_step() {
+	parent_world.get_message_queue<messages::unmapped_intent_message>().clear();
+	parent_world.get_message_queue<messages::intent_message>().clear();
+
+	// record/replay total entropia
+	player.biserialize(buffered_inputs_for_next_step);
+	post_intents_from_inputs(buffered_inputs_for_next_step);
+
+	buffered_inputs_for_next_step.events.clear();
 }

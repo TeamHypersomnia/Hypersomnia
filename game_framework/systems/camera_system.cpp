@@ -4,6 +4,7 @@
 #include <GL/OpenGL.h>
 #include "entity_system/entity.h"
 #include "../components/physics_component.h"
+#include "../components/crosshair_component.h"
 #include "../messages/intent_message.h"
 #include "../shared/drawing_state.h"
 #include "entity_system/world.h"
@@ -21,6 +22,11 @@ void camera_system::react_to_input_intents() {
 			else mode = components::camera::LOOK;
 		}
 	}
+}
+
+
+void camera_system::crosshair_positioning_within_bounds() {
+
 }
 
 void camera_system::resolve_cameras_transforms_and_smoothing() {
@@ -45,8 +51,8 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 				/* skip calculations if no orbit_mode is specified */
 				if (camera.orbit_mode != camera.NONE) {
 					/* shortcuts */
-					vec2i crosshair_pos = camera.crosshair->get<components::transform>().pos;
 					vec2i player_pos = camera.player->get<components::transform>().pos;
+					vec2i crosshair_pos = camera.crosshair->get<components::crosshair>().base_offset + player_pos;
 					vec2 dir = (crosshair_pos - player_pos);
 
 					dir.rotate(transform.rotation, vec2());
@@ -71,11 +77,17 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 					dir.rotate(-transform.rotation, vec2());
 					/* update crosshair so it is snapped to visible area */
 					camera.crosshair->get<components::transform>().pos = player_pos + dir;
+					camera.crosshair->get<components::crosshair>().base_offset = dir;
 				}
 			}
 
 			components::transform drawn_transform;
 			vec2 drawn_size;
+
+			drawn_transform = transform;
+			drawn_size = camera.size;
+
+			drawn_transform.pos += crosshair_offset;
 
 			if (camera.enable_smoothing) {
 				/* variable time step camera smoothing by averaging last position with the current */
@@ -103,20 +115,30 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 
 				/* save smoothing result */
 				//if ((drawn_transform.pos - camera.last_interpolant.pos).length() > 5)
-				drawn_transform.pos = target - smoothed_part + camera.last_interpolant.pos;
-				drawn_transform.rotation = camera.last_interpolant.rotation;
-				
+				vec2 calculated_smoothed_pos = target - smoothed_part + camera.last_interpolant.pos;
+				int calculated_smoothed_rotation = camera.last_interpolant.rotation;
+
+				if (vec2i(calculated_smoothed_pos) == vec2i(drawn_transform.pos))
+					camera.last_interpolant.pos = smoothed_part;
+				if (int(calculated_smoothed_rotation) == int(drawn_transform.rotation))
+					camera.last_interpolant.rotation = drawn_transform.rotation;
+				/*
+				if ((calculated_smoothed_pos - drawn_transform.pos).length_sq() < 1.f)
+					camera.last_interpolant.pos = smoothed_part;
+				if (std::abs(calculated_smoothed_rotation - drawn_transform.rotation) < 1.f)
+					camera.last_interpolant.rotation = drawn_transform.rotation;
+				*/
+
+				drawn_transform.pos = calculated_smoothed_pos;
+				drawn_transform.rotation = calculated_smoothed_rotation;
+
+				//smoothing_player_pos
+
 				drawn_size = camera.last_ortho_interpolant;
 
 				if (camera.crosshair_follows_interpolant) {
 					camera.crosshair->get<components::transform>().pos -= transform.pos - camera.last_interpolant.pos;
 				}
-			}
-			else {
-				drawn_transform = transform;
-				drawn_size = camera.size;
-
-				drawn_transform.pos += crosshair_offset;
 			}
 			
 			drawn_transform.pos = vec2i(drawn_transform.pos);

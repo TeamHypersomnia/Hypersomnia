@@ -11,13 +11,13 @@ void crosshair_system::react_to_aiming_intents() {
 
 	for (auto it : events) {
 		if (it.intent == messages::intent_message::intent_type::AIM) {
-			auto transform = it.subject->find<components::transform>();
 			auto crosshair = it.subject->find<components::crosshair>();
 
-			if (!transform || !crosshair) continue;
+			if (!crosshair) 
+				continue;
 
 			/* move crosshair according to its sensitivity and relative mouse movement (easier to support multiple resolutions) */
-			transform->pos += vec2(it.state.mouse.rel * crosshair->sensitivity).rotate(crosshair->rotation_offset, vec2());
+			crosshair->base_offset += vec2(it.state.mouse.rel * crosshair->sensitivity).rotate(crosshair->rotation_offset, vec2());
 		}
 	}
 }

@@ -17,19 +17,18 @@ namespace archetypes {
 		components::transform transform;
 		components::input input;
 		components::crosshair crosshair;
-		components::chase chase;
 
 		sprite.set(assets::texture_id::TEST_CROSSHAIR, pixel_32(255, 0, 0, 255));
 
 		input.add(messages::intent_message::AIM);
 
 		render.layer = 0;
+		render.interpolate = false;
 
 		crosshair.sensitivity.set(3, 3);
 
 		e->add(render);
 		e->add(sprite);
-		e->add(chase);
 		e->add(transform);
 		e->add(input);
 		e->add(crosshair);
@@ -67,8 +66,5 @@ namespace archetypes {
 		camera_entity->get<components::camera>().player = e;
 		camera_entity->get<components::camera>().crosshair = crosshair_entity;
 		camera_entity->get<components::chase>().set_target(e);
-
-		crosshair_entity->get<components::chase>().set_target(e);
-		crosshair_entity->get<components::chase>().relative = true;
 	}
 }

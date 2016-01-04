@@ -53,16 +53,17 @@ namespace scene_builders {
 
 		world.get_system<input_system>().add_context(active_context);
 
-		if (augs::file_exists(L"myinputslol.dat")) {
-			world.get_system<input_system>().player.load_recording("myinputslol.dat");
-			world.get_system<input_system>().player.replay();
-		}
-		else {
-			world.get_system<input_system>().player.record("myinputslol.dat");
-		}
-
 		world.parent_overworld.configure_stepping(60.0, 5);
-		world.parent_overworld.accumulator.set_time_multiplier(1.0);
+
+		//if (augs::file_exists(L"recorded.inputs")) {
+		//	world.get_system<input_system>().player.load_recording("recorded.inputs");
+		//	world.get_system<input_system>().player.replay();
+		//	world.parent_overworld.accumulator.set_time_multiplier(6.0);
+		//}
+		//else {
+		//	world.get_system<input_system>().player.record("recorded.inputs");
+		//}
+
 	}
 
 	void testbed::perform_logic_step(world& world) {

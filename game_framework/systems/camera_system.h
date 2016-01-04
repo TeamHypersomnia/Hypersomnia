@@ -12,6 +12,7 @@ public:
 
 	void react_to_input_intents();
 
+	void crosshair_positioning_within_bounds();
 	void resolve_cameras_transforms_and_smoothing();
 	void render_all_cameras();
 };
