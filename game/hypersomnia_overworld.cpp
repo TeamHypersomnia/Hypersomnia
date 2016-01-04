@@ -68,19 +68,19 @@ void hypersomnia_overworld::simulate() {
 			game_world.post_message(msg);
 		}
 
+		game_window.clear();
+
+		game_world.draw();
+		current_scene_builder->draw(game_world);
+
+		game_window.swap_buffers();
+
 		auto steps_to_do = accumulator.update_and_extract_steps();
 
 		while (steps_to_do--) {
 			game_world.perform_logic_step();
 			current_scene_builder->perform_logic_step(game_world);
 		}
-
-		game_window.clear();
-
-		current_scene_builder->draw(game_world);
-		game_world.draw();
-
-		game_window.swap_buffers();
 	}
 }
 
