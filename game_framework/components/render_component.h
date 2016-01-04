@@ -11,6 +11,11 @@ namespace components {
 
 		transform previous_transform;
 		transform saved_actual_transform;
+		
+		vec2 interpolation_direction() {
+			return saved_actual_transform.pos - previous_transform.pos;
+		}
+
 		bool interpolate = true;
 
 		enum mask_type {

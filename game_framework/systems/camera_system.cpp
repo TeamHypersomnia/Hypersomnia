@@ -118,16 +118,15 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 				vec2 calculated_smoothed_pos = target - smoothed_part + camera.last_interpolant.pos;
 				int calculated_smoothed_rotation = camera.last_interpolant.rotation;
 
-				if (vec2i(calculated_smoothed_pos) == vec2i(drawn_transform.pos))
-					camera.last_interpolant.pos = smoothed_part;
-				if (int(calculated_smoothed_rotation) == int(drawn_transform.rotation))
-					camera.last_interpolant.rotation = drawn_transform.rotation;
-				/*
-				if ((calculated_smoothed_pos - drawn_transform.pos).length_sq() < 1.f)
+				//if (vec2i(calculated_smoothed_pos) == vec2i(drawn_transform.pos))
+				//	camera.last_interpolant.pos = smoothed_part;
+				//if (int(calculated_smoothed_rotation) == int(drawn_transform.rotation))
+				//	camera.last_interpolant.rotation = drawn_transform.rotation;
+				
+				if (calculated_smoothed_pos.compare_abs(drawn_transform.pos, 1.f))
 					camera.last_interpolant.pos = smoothed_part;
 				if (std::abs(calculated_smoothed_rotation - drawn_transform.rotation) < 1.f)
 					camera.last_interpolant.rotation = drawn_transform.rotation;
-				*/
 
 				drawn_transform.pos = calculated_smoothed_pos;
 				drawn_transform.rotation = calculated_smoothed_rotation;
@@ -140,8 +139,23 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 					camera.crosshair->get<components::transform>().pos -= transform.pos - camera.last_interpolant.pos;
 				}
 			}
-			
-			drawn_transform.pos = vec2i(drawn_transform.pos);
+
+			vec2 target_value = camera.player->get<components::render>().interpolation_direction();
+			target_value.set_length(100);
+
+			//if (target_value.length() > 100)
+			//	target_value.set_length(100);
+
+			//if (target_value.length() < camera.smoothing_player_pos.value.length())
+			//	camera.smoothing_player_pos.averages_per_sec = 8;
+			//else
+				camera.smoothing_player_pos.averages_per_sec = 5;
+
+
+			camera.smoothing_player_pos.target_value = target_value * (-1);
+			camera.smoothing_player_pos.tick();
+
+			drawn_transform.pos = vec2i(drawn_transform.pos + camera.smoothing_player_pos.value);
 			drawn_size = vec2i(drawn_size);
 
 			camera.dont_smooth_once = false;
