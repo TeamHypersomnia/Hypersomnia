@@ -2387,9 +2387,6 @@
     <ClInclude Include="depthbase\gui\system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\components\animate_component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\components\behaviour_tree_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2448,9 +2445,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\game\sound_effects.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game_framework\messages\animate_message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\messages\collision_message.h">
@@ -2790,6 +2784,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\resources\animation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\components\animation_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\messages\animation_message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,7 +2,7 @@
 #include "components/behaviour_tree_component.h"
 #include "components/visibility_component.h"
 #include "components/pathfinding_component.h"
-#include "components/animate_component.h"
+#include "components/animation_component.h"
 #include "components/camera_component.h"
 #include "components/chase_component.h"
 #include "components/children_component.h"

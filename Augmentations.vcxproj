@@ -939,7 +939,7 @@
     <ClInclude Include="game_framework\assets\shader.h" />
     <ClInclude Include="game_framework\bindings\bindings.h" />
     <ClInclude Include="game_framework\bindings\bind_callbacks.h" />
-    <ClInclude Include="game_framework\components\animate_component.h" />
+    <ClInclude Include="game_framework\components\animation_component.h" />
     <ClInclude Include="game_framework\components\behaviour_tree_component.h" />
     <ClInclude Include="game_framework\components\camera_component.h" />
     <ClInclude Include="game_framework\components\chase_component.h" />
@@ -966,7 +966,7 @@
     <ClInclude Include="game_framework\game\body_helper.h" />
     <ClInclude Include="game_framework\game\sound_effects.h" />
     <ClInclude Include="game_framework\game_framework.h" />
-    <ClInclude Include="game_framework\messages\animate_message.h" />
+    <ClInclude Include="game_framework\messages\animation_message.h" />
     <ClInclude Include="game_framework\messages\collision_message.h" />
     <ClInclude Include="game_framework\messages\crosshair_intent_message.h" />
     <ClInclude Include="game_framework\messages\damage_message.h" />

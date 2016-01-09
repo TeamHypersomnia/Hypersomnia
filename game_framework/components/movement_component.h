@@ -1,7 +1,7 @@
 #pragma once
 #include <Box2D/Dynamics/b2Fixture.h>
 #include "entity_system/component.h"
-#include "../messages/animate_message.h"
+#include "../messages/animation_message.h"
 #include "math/vec2.h"
 
 namespace components {
@@ -18,7 +18,7 @@ namespace components {
 		}
 
 		/* default message that gets sent when entity moves */
-		int animation_message = messages::animate_message::animation::MOVE;
+		int animation_message = messages::animation_message::response::MOVE;
 
 		/* entities whom the animation_message will be sent to, including information about subject entity's movement speed */
 		std::vector<subscribtion> animation_receivers;

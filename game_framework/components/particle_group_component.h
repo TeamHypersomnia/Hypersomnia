@@ -17,7 +17,6 @@ namespace shared {
 }
 
 namespace components {
-	/* hack - the only component that has logic */
 	struct particle_group {
 		struct stream {
 			physics_system* optional_physics = nullptr;

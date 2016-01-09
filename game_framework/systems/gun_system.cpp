@@ -1,7 +1,7 @@
 #include "gun_system.h"
 #include "entity_system/world.h"
 #include "../messages/intent_message.h"
-#include "../messages/animate_message.h"
+#include "../messages/animation_message.h"
 #include "../messages/particle_burst_message.h"
 #include "../messages/damage_message.h"
 #include "../messages/destroy_message.h"
@@ -107,14 +107,14 @@ void gun_system::process_entities() {
 
 			parent_world.post_message(shot_msg);
 
-			messages::animate_message msg;
-			msg.animation_type = messages::animate_message::animation::SHOT;
+			messages::animation_message msg;
+			msg.animation_type = messages::animation_message::response::SHOT;
 			msg.preserve_state_if_animation_changes = false;
 			msg.change_animation = true;
 			msg.change_speed = true;
 			msg.speed_factor = 1.f;
 			msg.subject = it;
-			msg.message_type = messages::animate_message::type::START;
+			msg.message_type = messages::animation_message::action::START;
 			msg.animation_priority = 1;
 
 			parent_world.post_message(msg);
@@ -181,14 +181,14 @@ void gun_system::process_entities() {
 		/********************************************************************************************************/
 
 		auto begin_swinging_routine = [&]() {
-			messages::animate_message msg;
-			msg.animation_type = gun.current_swing_direction ? messages::animate_message::animation::SWING_CW : messages::animate_message::animation::SWING_CCW;
+			messages::animation_message msg;
+			msg.animation_type = gun.current_swing_direction ? messages::animation_message::response::SWING_CW : messages::animation_message::response::SWING_CCW;
 			msg.preserve_state_if_animation_changes = false;
 			msg.change_animation = true;
 			msg.change_speed = true;
 			msg.speed_factor = 1.f;
 			msg.subject = it;
-			msg.message_type = messages::animate_message::type::START;
+			msg.message_type = messages::animation_message::action::START;
 			msg.animation_priority = 1;
 
 			parent_world.post_message(msg);

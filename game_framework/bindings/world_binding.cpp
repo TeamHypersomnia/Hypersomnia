@@ -18,7 +18,7 @@ namespace bindings {
 	luabind::scope _world() {
 		return
 			bind_stdvector<destroy_message>("destroy_message_vector"),
-			bind_stdvector<animate_message>("animate_message_vector"),
+			bind_stdvector<animation_message>("animation_message_vector"),
 			bind_stdvector<particle_burst_message>("particle_burst_message_vector"),
 			bind_stdvector<collision_message>("collision_message_vector"),
 			bind_stdvector<damage_message>("damage_message_vector"),
@@ -31,7 +31,7 @@ namespace bindings {
 			.def("create_entity", &world::create_entity)
 			.def("delete_entity", &world::delete_entity)
 			.def("delete_all_entities", &world::delete_all_entities)
-			.def("post_message", &world::post_message<animate_message>)
+			.def("post_message", &world::post_message<animation_message>)
 			.def("post_message", &world::post_message<intent_message>)
 			.def("post_message", &world::post_message<destroy_message>)
 			.def("post_message", &world::post_message<particle_burst_message>)
@@ -61,7 +61,7 @@ namespace bindings {
 			luabind::def("get_damage_message_queue", get_message_queue_for_scripts<damage_message>),
 			luabind::def("get_intent_message_queue", get_message_queue_for_scripts<intent_message>),
 			luabind::def("get_particle_burst_message_queue", get_message_queue_for_scripts<particle_burst_message>),
-			luabind::def("get_animate_message_queue", get_message_queue_for_scripts<animate_message>),
+			luabind::def("get_animation_message_queue", get_message_queue_for_scripts<animation_message>),
 			luabind::def("get_shot_message_queue", get_message_queue_for_scripts<shot_message>);
 	}
 }

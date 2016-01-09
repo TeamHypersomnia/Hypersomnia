@@ -132,7 +132,7 @@ void movement_system::animate_movement() {
 		b2Vec2 vel = physics.body->GetLinearVelocity();
 		float32 speed = vel.Normalize() * METERS_TO_PIXELSf;
 
-		animate_message msg;
+		animation_message msg;
 
 		msg.change_speed = true;
 		
@@ -141,17 +141,17 @@ void movement_system::animate_movement() {
 		
 		msg.change_animation = true;
 		msg.preserve_state_if_animation_changes = false;
-		msg.message_type = ((speed <= 1.f) ? animate_message::type::STOP : animate_message::type::CONTINUE);
+		msg.message_type = ((speed <= 1.f) ? animation_message::action::STOP : animation_message::action::CONTINUE);
 		msg.animation_priority = 0;
 
 		for (auto receiver : movement.animation_receivers) {
-			animate_message copy(msg);
+			animation_message copy(msg);
 			copy.animation_type = movement.animation_message;
 
 			copy.subject = receiver.target;
 
 			if (!receiver.stop_at_zero_movement)
-				copy.message_type = animate_message::type::CONTINUE;
+				copy.message_type = animation_message::action::CONTINUE;
 
 			parent_world.post_message(copy);
 		}
