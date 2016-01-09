@@ -741,9 +741,6 @@
     <ClCompile Include="game_framework\game\sound_effects.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\resources\animate_info.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\systems\animation_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1008,7 +1005,10 @@
     <ClCompile Include="game_framework\scene_builders\scene_builder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="utilities\misc\simple_pool.cpp">
+    <ClCompile Include="utilities\misc\time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\resources\animation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2474,9 +2474,6 @@
     <ClInclude Include="game_framework\messages\shot_message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\resources\animate_info.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\resources\particle_emitter_info.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2778,6 +2775,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\messages\crosshair_intent_message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities\misc\step_player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities\misc\simple_pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities\misc\time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\assets\animation_set.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\resources\animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

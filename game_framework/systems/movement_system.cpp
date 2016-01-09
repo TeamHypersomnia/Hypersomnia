@@ -5,10 +5,6 @@
 
 #include "../components/gun_component.h"
 
-/* leave the air drag to simulate top speeds in a sidescroller
-
-*/
-
 using namespace messages;
 
 void movement_system::set_movement_flags_from_input() {

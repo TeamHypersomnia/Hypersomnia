@@ -14,6 +14,7 @@
 #include "game_framework/messages/crosshair_intent_message.h"
 
 #include "utilities/file.h"
+#include "misc/time.h"
 
 using namespace augs;
 
@@ -59,19 +60,22 @@ namespace scene_builders {
 
 		world.parent_overworld.configure_stepping(60.0, 5);
 
-		if (augs::file_exists(L"recordings/recorded.inputs")) {
-			world.get_system<input_system>().raw_window_input_player.player.load_recording("recordings/recorded.inputs");
-			world.get_system<input_system>().raw_window_input_player.player.replay();
+		world.get_system<input_system>().raw_window_input_player.player.record("recordings/" + augs::get_timestamp() + " recorded.inputs");
+		world.get_system<input_system>().crosshair_intent_player.player.record("recordings/" + augs::get_timestamp() + " recorded_crosshair.inputs");
 		
-			world.get_system<input_system>().crosshair_intent_player.player.load_recording("recordings/recorded_crosshair.inputs");
-			world.get_system<input_system>().crosshair_intent_player.player.replay();
-			
-			//world.parent_overworld.accumulator.set_time_multiplier(6.0);
-		}
-		else {
-			world.get_system<input_system>().raw_window_input_player.player.record("recordings/recorded.inputs");
-			world.get_system<input_system>().crosshair_intent_player.player.record("recordings/recorded_crosshair.inputs");
-		}
+		//if (augs::file_exists(L"recordings/recorded.inputs")) {
+		//	world.get_system<input_system>().raw_window_input_player.player.load_recording("recordings/recorded.inputs");
+		//	world.get_system<input_system>().raw_window_input_player.player.replay();
+		//
+		//	world.get_system<input_system>().crosshair_intent_player.player.load_recording("recordings/recorded_crosshair.inputs");
+		//	world.get_system<input_system>().crosshair_intent_player.player.replay();
+		//	
+		//	//world.parent_overworld.accumulator.set_time_multiplier(6.0);
+		//}
+		//else {
+		//	world.get_system<input_system>().raw_window_input_player.player.record("recordings/recorded.inputs");
+		//	world.get_system<input_system>().crosshair_intent_player.player.record("recordings/recorded_crosshair.inputs");
+		//}
 	}
 
 	void testbed::perform_logic_step(world& world) {

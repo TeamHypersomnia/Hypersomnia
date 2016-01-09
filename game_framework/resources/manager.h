@@ -3,6 +3,10 @@
 #include "../assets/atlas.h"
 #include "../assets/shader.h"
 #include "../assets/program.h"
+#include "../assets/animation.h"
+#include "../assets/animation_set.h"
+
+#include "../resources/animation.h"
 
 #include "texture_baker/texture_baker.h"
 #include "graphics/shader.h"
@@ -35,6 +39,7 @@ namespace resources {
 		augs::atlas& create(assets::atlas_id, atlas_creation_mode);
 		texture& create(assets::texture_id, std::wstring filename);
 		texture& create(assets::texture_id, augs::image img);
+		animation& create(assets::animation_id);
 
 		augs::graphics::shader& create(assets::shader_id, std::wstring filename, augs::graphics::shader::type);
 		augs::graphics::shader_program& create(assets::program_id, assets::shader_id vertex, assets::shader_id fragment);

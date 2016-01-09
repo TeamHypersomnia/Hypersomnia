@@ -9,8 +9,19 @@
 #include "game_framework/components/sprite_component.h"
 #include "game_framework/components/movement_component.h"
 #include "game_framework/components/lookat_component.h"
+#include "game_framework/components/animate_component.h"
 
 namespace archetypes {
+	void wsad_player_legs(augs::entity_id e) {
+		components::sprite sprite;
+		components::render render;
+		components::animate animate;
+		components::transform transform;
+
+
+
+	}
+
 	void wsad_player_crosshair(augs::entity_id e) {
 		components::sprite sprite;
 		components::render render;

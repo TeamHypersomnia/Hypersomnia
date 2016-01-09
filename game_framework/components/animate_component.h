@@ -4,7 +4,9 @@
 #include "../messages/animate_message.h"
 #include "misc/map_wrapper.h"
 
-#include "../resources/animate_info.h"
+#include "../resources/animation.h"
+
+#include "../assets/animation_set.h"
 
 class animation_system;
 namespace resources {
