@@ -63,27 +63,25 @@ void hypersomnia_world::register_messages_components_systems() {
 	register_message_queue<shot_message>();
 	register_message_queue<raw_window_input_message>();
 	register_message_queue<unmapped_intent_message>();
-}
-
-void hypersomnia_world::perform_logic_step() {
-	get_system<input_system>().generate_input_intents_for_logic_step();
-	get_system<render_system>().set_current_transforms_as_previous_for_interpolation();
-
-	get_system<camera_system>().react_to_input_intents();
-	get_system<crosshair_system>().react_to_aiming_intents();
-	get_system<movement_system>().set_movement_flags_from_input();
-
-	get_system<movement_system>().apply_movement_forces();
-	get_system<physics_system>().step_and_set_new_transforms();
-
-	get_system<destroy_system>().delete_queued_entities();
+	register_message_queue<crosshair_intent_message>();
 }
 
 void hypersomnia_world::draw() {
 	get_system<render_system>().calculate_and_set_interpolated_transforms();
+	
+	/* read-only message generation */
 
-	get_system<input_system>().acquire_inputs_from_rendering_time();
-	get_system<input_system>().generate_input_intents_for_rendering_time();
+	get_system<input_system>().acquire_raw_window_inputs();
+	get_system<input_system>().post_input_intents_for_rendering_time();
+
+	// supposed to be read-only
+	get_system<crosshair_system>().generate_crosshair_intents();
+
+	get_system<input_system>().replay_rendering_time_events_passed_to_last_logic_step();
+
+	/* application of messages */
+
+	get_system<crosshair_system>().reapply_crosshair_intents();
 
 	get_system<crosshair_system>().animate_crosshair_sizes();
 	get_system<movement_system>().animate_movement();
@@ -94,5 +92,21 @@ void hypersomnia_world::draw() {
 
 	get_system<camera_system>().render_all_cameras();
 	get_system<render_system>().restore_actual_transforms();
+
+	get_system<input_system>().acquire_events_from_rendering_time();
 }
 
+void hypersomnia_world::perform_logic_step() {
+	get_system<input_system>().post_input_intents_for_logic_step();
+	get_system<input_system>().post_rendering_time_events_for_logic_step();
+
+	get_system<render_system>().set_current_transforms_as_previous_for_interpolation();
+
+	get_system<camera_system>().react_to_input_intents();
+	get_system<movement_system>().set_movement_flags_from_input();
+
+	get_system<movement_system>().apply_movement_forces();
+	get_system<physics_system>().step_and_set_new_transforms();
+
+	get_system<destroy_system>().delete_queued_entities();
+}
