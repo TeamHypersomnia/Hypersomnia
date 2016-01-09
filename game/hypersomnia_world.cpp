@@ -12,7 +12,7 @@ hypersomnia_world::hypersomnia_world(augs::overworld& overworld) : world(overwor
 }
 
 void hypersomnia_world::register_messages_components_systems() {
-	register_component<animate>();
+	register_component<animation>();
 	register_component<behaviour_tree>();
 	register_component<camera>();
 	register_component<chase>();
@@ -57,7 +57,7 @@ void hypersomnia_world::register_messages_components_systems() {
 	register_message_queue<intent_message>();
 	register_message_queue<damage_message>();
 	register_message_queue<destroy_message>();
-	register_message_queue<animate_message>();
+	register_message_queue<animation_message>();
 	register_message_queue<collision_message>();
 	register_message_queue<particle_burst_message>();
 	register_message_queue<shot_message>();
