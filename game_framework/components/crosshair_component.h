@@ -10,6 +10,8 @@ namespace components {
 		augs::value_animation blink;
 		bool should_blink = false;
 
+		augs::entity_id parent_camera;
+
 		vec2 base_offset;
 
 		float rotation_offset = 0.f;

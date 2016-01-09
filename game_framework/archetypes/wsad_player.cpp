@@ -20,7 +20,9 @@ namespace archetypes {
 
 		sprite.set(assets::texture_id::TEST_CROSSHAIR, pixel_32(255, 0, 0, 255));
 
-		input.add(messages::intent_message::AIM);
+		input.add(messages::intent_message::MOVE_CROSSHAIR);
+		input.add(messages::intent_message::CROSSHAIR_PRIMARY_ACTION);
+		input.add(messages::intent_message::CROSSHAIR_SECONDARY_ACTION);
 
 		render.layer = 0;
 		render.interpolate = false;
@@ -63,8 +65,6 @@ namespace archetypes {
 		e->add(movement);
 		e->add(lookat);
 		
-		camera_entity->get<components::camera>().player = e;
-		camera_entity->get<components::camera>().crosshair = crosshair_entity;
-		camera_entity->get<components::chase>().set_target(e);
+		components::camera::configure_camera_player_crosshair(camera_entity, e, crosshair_entity);
 	}
 }

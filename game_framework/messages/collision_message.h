@@ -8,6 +8,5 @@ namespace messages {
 		vec2 collider_impact_velocity, subject_impact_velocity, point;
 
 		bool sensor_end_contact = false;
-		collision_message() { send_to_scripts = true; }
 	};
 }

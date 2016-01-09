@@ -11,6 +11,12 @@
 
 using namespace augs::window;
 
+input_system::input_system(world& parent_world) : processing_system_templated(parent_world),
+	raw_window_input_player(parent_world),
+	crosshair_intent_player(parent_world)
+{
+}
+
 input_system::context::context() : enabled(true) {
 }
 
@@ -36,21 +42,23 @@ void input_system::clear_contexts() {
 	active_contexts.clear();
 }
 
-void input_system::inputs_per_step::serialize(std::ofstream& f) {
-	augs::serialize_vector(f, events);
-}
+//void input_system::inputs_per_step::serialize(std::ofstream& f) {
+//	augs::serialize_vector(f, events);
+//}
+//
+//bool input_system::inputs_per_step::should_serialize() {
+//	return !events.empty();
+//}
+//
+//void input_system::inputs_per_step::deserialize(std::ifstream& f) {
+//	augs::deserialize_vector(f, events);
+//}
 
-bool input_system::inputs_per_step::should_serialize() {
-	return !events.empty();
-}
-
-void input_system::inputs_per_step::deserialize(std::ifstream& f) {
-	augs::deserialize_vector(f, events);
-}
-
-void input_system::post_intents_from_inputs(const inputs_per_step& inputs_for_this_step) {
+void input_system::post_intents_from_inputs(const std::vector<messages::raw_window_input_message>& inputs_for_this_step) {
 	if (!active_contexts.empty()) {
-		for (auto& state : inputs_for_this_step.events) {
+		for (auto& it : inputs_for_this_step) {
+			auto& state = it.raw_window_input;
+
 			for (auto it : active_contexts) {
 				if (!it.enabled) continue;
 
@@ -96,39 +104,45 @@ void input_system::post_intents_from_inputs(const inputs_per_step& inputs_for_th
 			}
 		}
 	}
-
 }
 
-void input_system::acquire_inputs_from_rendering_time() {
-	inputs_from_last_rendering_time.events.clear();
-
-	for (auto& m : parent_world.get_message_queue<messages::raw_window_input_message>()) {
-		buffered_inputs_for_next_step.events.push_back(m.raw_window_input);
-		inputs_from_last_rendering_time.events.push_back(m.raw_window_input);
-	}
-
-	parent_world.get_message_queue<messages::raw_window_input_message>().clear();
+void input_system::acquire_raw_window_inputs() {
+	raw_window_input_player.acquire_events_from_rendering_time();
 }
 
-void input_system::generate_input_intents_for_rendering_time() {
-	/* if we are replaying, let's pass some mouse strokes registered during logic step time
-		just that some of the original mouse movements appear in the recordings
-	*/
-	if (player.get_state() != augs::input_player<inputs_per_step>::player_state::REPLAYING) {
-		parent_world.get_message_queue<messages::unmapped_intent_message>().clear();
-		parent_world.get_message_queue<messages::intent_message>().clear();
-	}
+void input_system::acquire_events_from_rendering_time() {
+	crosshair_intent_player.acquire_events_from_rendering_time();
+}
 
-	post_intents_from_inputs(inputs_from_last_rendering_time);
+void input_system::replay_rendering_time_events_passed_to_last_logic_step() {
+	crosshair_intent_player.pass_last_unpacked_logic_events_for_rendering_time_approximation();
+}
+
+void input_system::post_input_intents_for_rendering_time() {
+	///* if we are replaying, let's pass some mouse strokes registered during logic step time
+	//	just that some of the original mouse movements appear in the recordings
+	//*/
+	//if (!raw_window_input_player.player.is_replaying()) {
+	//}
+
+	parent_world.get_message_queue<messages::unmapped_intent_message>().clear();
+	parent_world.get_message_queue<messages::intent_message>().clear();
+
+	post_intents_from_inputs(raw_window_input_player.inputs_from_last_rendering_time.events);
 }
 	
-void input_system::generate_input_intents_for_logic_step() {
+void input_system::post_input_intents_for_logic_step() {
 	parent_world.get_message_queue<messages::unmapped_intent_message>().clear();
 	parent_world.get_message_queue<messages::intent_message>().clear();
 
 	// record/replay total entropia
-	player.biserialize(buffered_inputs_for_next_step);
-	post_intents_from_inputs(buffered_inputs_for_next_step);
+	raw_window_input_player.biserialize();
 
-	buffered_inputs_for_next_step.events.clear();
+	post_intents_from_inputs(raw_window_input_player.buffered_inputs_for_next_step.events);
+
+	raw_window_input_player.clear_step();
+}
+
+void input_system::post_rendering_time_events_for_logic_step() {
+	crosshair_intent_player.generate_events_for_logic_step();
 }

@@ -16,6 +16,8 @@ class gun_system;
 
 namespace components {
 	struct camera : public augs::component {
+		static void configure_camera_player_crosshair(augs::entity_id camera, augs::entity_id player, augs::entity_id crosshair);
+
 		augs::rects::xywh<int> screen_rect;
 		vec2 size;
 
@@ -49,6 +51,14 @@ namespace components {
 		augs::smooth_value_field smoothing_player_pos;
 
 		camera() { smooth_timer.reset(); }
+
+		struct constraint_output {
+			vec2i camera_crosshair_offset;
+			vec2 constrained_crosshair_pos;
+			vec2 constrained_crosshair_base_offset;
+
+		} get_constrained_crosshair_and_camera_offset(augs::entity_id self);
+		
 
 		/* arguments: subject, renderer, mask */
 		typedef std::function<void(augs::entity_id, shared::drawing_state, int)> drawing_procedure;

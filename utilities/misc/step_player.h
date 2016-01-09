@@ -6,7 +6,7 @@
 
 namespace augs {
 	template <typename entry_internal_type>
-	class input_player {
+	class step_player {
 	public:
 		enum class player_state {
 			DISABLED,
@@ -65,6 +65,10 @@ namespace augs {
 
 		player_state get_state() {
 			return current_player_state;
+		}
+
+		bool is_replaying() {
+			return current_player_state == player_state::REPLAYING;
 		}
 
 		void biserialize(entry_internal_type& currently_processed_entry) {

@@ -449,6 +449,7 @@
     <ClCompile Include="utilities\misc\memory_pool.cpp" />
     <ClCompile Include="utilities\misc\object_pool.cpp" />
     <ClCompile Include="utilities\misc\randval.cpp" />
+    <ClCompile Include="utilities\misc\simple_pool.cpp" />
     <ClCompile Include="utilities\misc\smooth_value_field.cpp" />
     <ClCompile Include="utilities\misc\timer.cpp" />
     <ClCompile Include="utilities\misc\unsafe_type_collection.cpp" />
@@ -966,6 +967,7 @@
     <ClInclude Include="game_framework\game_framework.h" />
     <ClInclude Include="game_framework\messages\animate_message.h" />
     <ClInclude Include="game_framework\messages\collision_message.h" />
+    <ClInclude Include="game_framework\messages\crosshair_intent_message.h" />
     <ClInclude Include="game_framework\messages\damage_message.h" />
     <ClInclude Include="game_framework\messages\destroy_message.h" />
     <ClInclude Include="game_framework\messages\intent_message.h" />

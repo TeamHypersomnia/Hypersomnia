@@ -4,7 +4,33 @@
 #include <cassert>
 
 namespace augs {
-	memory_pool::memory_pool(int slot_count, int slot_size) { initialize(slot_count, slot_size);  }
+	simple_pool<memory_pool*> memory_pool::pool_locations;
+
+	void memory_pool::pool_id::unset() {
+		pointer_id = -1;
+	}
+
+	memory_pool* memory_pool::pool_id::operator->() const {
+		return pool_locations.get(pointer_id);
+	}
+
+	memory_pool& memory_pool::pool_id::operator*() const {
+		return *pool_locations.get(pointer_id);
+	}
+
+	memory_pool::pool_id::operator bool() const {
+		return pointer_id != -1;
+	}
+
+	memory_pool::memory_pool(int slot_count, int slot_size) { 
+		initialize(slot_count, slot_size);  
+		this_pool_pointer_location.pointer_id = pool_locations.allocate(this);
+	}
+
+	memory_pool::~memory_pool() {
+		free_all();
+		pool_locations.destroy(this_pool_pointer_location.pointer_id);
+	}
 	
 	memory_pool::id::id() {}
 
@@ -43,12 +69,12 @@ namespace augs {
 		id found_id;
 
 		if (address < pool.data() || address >= pool.data() + size() * slot_size)
-			found_id.owner = nullptr;
+			found_id.owner.unset();
 		else {
 			int slot_index = (address - &*pool.begin()) / slot_size;
 			int indirector_index = slots[slot_index].pointing_indirector;
 
-			found_id.owner = this;
+			found_id.owner = this_pool_pointer_location;
 			found_id.indirection_index = indirector_index;
 			found_id.version = indirectors[indirector_index].version;
 		}
@@ -83,7 +109,7 @@ namespace augs {
 		indirector.real_index = new_slot_index;
 
 		id allocated_id;
-		allocated_id.owner = this;
+		allocated_id.owner = this_pool_pointer_location;
 		allocated_id.version = indirector.version;
 		allocated_id.indirection_index = next_free_indirection;
 

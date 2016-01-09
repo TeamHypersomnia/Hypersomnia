@@ -3,8 +3,11 @@
 #include "../components/input_component.h"
 #include "../messages/intent_message.h"
 
+#include "../messages/crosshair_intent_message.h"
+#include "../messages/raw_window_input_message.h"
+
 #include "window_framework/event.h"
-#include "misc/input_player.h"
+#include "misc/step_player.h"
 
 using namespace augs;
 
@@ -19,31 +22,91 @@ struct input_system : public processing_system_templated<components::input> {
 		void map_event_to_intent(window::event::message, messages::intent_message::intent_type);
 	};
 
-	struct inputs_per_step {
-		std::vector<augs::window::event::state> events;
+	void acquire_events_from_rendering_time();
+	void acquire_raw_window_inputs();
 
-		bool should_serialize();
-		void serialize(std::ofstream&);
-		void deserialize(std::ifstream&);
-	};
+	void post_input_intents_for_logic_step();
+	void post_rendering_time_events_for_logic_step();
 
-	using processing_system_templated::processing_system_templated;
-	
-	void acquire_inputs_from_rendering_time();
-	void generate_input_intents_for_rendering_time();
-	void generate_input_intents_for_logic_step();
-	
+	void post_input_intents_for_rendering_time();
+
+	void replay_rendering_time_events_passed_to_last_logic_step();
+
+
 	void add_context(context);
 	void clear_contexts();
 
 	void clear() override;
 
 	std::vector<context> active_contexts;
-	input_player<inputs_per_step> player;
+
+	input_system::input_system(world& parent_world);
+
+	template <class event_type>
+	struct event_unpacker_and_recorder {
+		world& parent_world;
+		event_unpacker_and_recorder(world& parent_world) : parent_world(parent_world) {}
+
+		struct events_per_step {
+			std::vector<event_type> events;
+
+			void serialize(std::ofstream& f) {
+				augs::serialize_vector(f, events);
+			}
+
+			bool should_serialize() {
+				return !events.empty();
+			}
+
+			void deserialize(std::ifstream& f) {
+				augs::deserialize_vector(f, events);
+			}
+		};
+
+		step_player<events_per_step> player;
+
+		events_per_step inputs_from_last_step;
+
+		events_per_step buffered_inputs_for_next_step;
+		events_per_step inputs_from_last_rendering_time;
+
+		void acquire_events_from_rendering_time() {
+			inputs_from_last_rendering_time.events = parent_world.get_message_queue<event_type>();
+
+			for (auto& m : inputs_from_last_rendering_time.events)
+				buffered_inputs_for_next_step.events.push_back(m);
+
+			parent_world.get_message_queue<event_type>().clear();
+		}
+		
+		void pass_last_unpacked_logic_events_for_rendering_time_approximation() {
+			if (player.is_replaying()) {
+				parent_world.get_message_queue<event_type>() = inputs_from_last_step.events;
+				// we do it only once
+				inputs_from_last_step.events.clear();
+			}
+		}
+
+		void clear_step() {
+			buffered_inputs_for_next_step.events.clear();
+		}
+
+		void biserialize() {
+			player.biserialize(buffered_inputs_for_next_step);
+		}
+
+		void generate_events_for_logic_step() {
+			biserialize();
+			parent_world.get_message_queue<event_type>() = buffered_inputs_for_next_step.events;
+			inputs_from_last_step = buffered_inputs_for_next_step;
+			clear_step();
+		}
+	};
+
+
+	event_unpacker_and_recorder<messages::raw_window_input_message> raw_window_input_player;
+	event_unpacker_and_recorder<messages::crosshair_intent_message> crosshair_intent_player;
 
 private:
-	inputs_per_step buffered_inputs_for_next_step;
-	inputs_per_step inputs_from_last_rendering_time;
-
-	void post_intents_from_inputs(const inputs_per_step&);
+	void post_intents_from_inputs(const std::vector<messages::raw_window_input_message>&);
 };

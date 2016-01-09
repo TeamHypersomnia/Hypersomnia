@@ -10,18 +10,21 @@ using namespace augs;
 namespace messages {
 	struct unmapped_intent_message {
 		enum intent_type {
+			NONE,
 			MOVE_FORWARD,
 			MOVE_BACKWARD,
 			MOVE_LEFT,
 			MOVE_RIGHT,
 			SHOOT,
-			AIM,
+			MOVE_CROSSHAIR,
+			CROSSHAIR_PRIMARY_ACTION,
+			CROSSHAIR_SECONDARY_ACTION,
 			SWITCH_LOOK,
 			ZOOM_CAMERA,
 			SWITCH_WEAPON
 		};
 
-		unsigned intent = 0;
+		intent_type intent = intent_type::NONE;
 		bool pressed_flag = false;
 
 		augs::window::event::state state;

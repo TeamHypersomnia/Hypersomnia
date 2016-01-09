@@ -5,9 +5,7 @@
 
 namespace scene_builders {
 	struct testbed : public scene_builder {
-		augs::entity_id crosshair;
 		bool keep_drawing = false;
-
 
 		void initialize(augs::world& world) override;
 		void perform_logic_step(augs::world& world) override;

@@ -8,3 +8,4 @@
 #include "messages/shot_message.h"
 #include "messages/raw_window_input_message.h"
 #include "messages/unmapped_intent_message.h"
+#include "messages/crosshair_intent_message.h"

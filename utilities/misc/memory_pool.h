@@ -1,12 +1,26 @@
 #pragma once
 #include <vector>
+#include "simple_pool.h"
 
 namespace augs {
 	template<class T> class object_pool;
 
 	class memory_pool {
+		static simple_pool<memory_pool*> pool_locations;
+
 	protected:
 		typedef char byte;
+
+		struct pool_id {
+			int pointer_id = -1;
+			void unset();
+
+			memory_pool* operator->() const;
+			memory_pool& operator*() const;
+			operator bool() const;
+		};
+
+		pool_id this_pool_pointer_location;
 
 		int slot_size;
 		int count = 0;
@@ -40,7 +54,8 @@ namespace augs {
 		protected:
 			friend class memory_pool;
 
-			memory_pool* owner = nullptr;
+			//memory_pool* owner = nullptr;
+			pool_id owner;
 			int version = 0xdeadbeef;
 			int indirection_index = 0xdeadbeef;
 			
@@ -85,6 +100,7 @@ namespace augs {
 		};
 
 		memory_pool(int slot_count = 0, int slot_size = 0);
+		~memory_pool();
 		void initialize(int slot_count, int slot_size);
 		
 		id allocate();

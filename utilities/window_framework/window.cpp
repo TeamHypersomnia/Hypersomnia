@@ -211,8 +211,8 @@ namespace augs {
 					raw = reinterpret_cast<RAWINPUT*>(lpb);
 
 					if (raw->header.dwType == RIM_TYPEMOUSE) {
-						events.mouse.raw_rel.x = raw->data.mouse.lLastX;
-						events.mouse.raw_rel.y = raw->data.mouse.lLastY;
+						events.mouse.rel.x = raw->data.mouse.lLastX;
+						events.mouse.rel.y = raw->data.mouse.lLastY;
 
 						m = events.msg = raw_mousemotion;
 					}

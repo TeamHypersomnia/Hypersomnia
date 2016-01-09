@@ -7,6 +7,5 @@ namespace messages {
 		float amount;
 		vec2 impact_velocity;
 
-		damage_message() { send_to_scripts = true; }
 	};
 }
