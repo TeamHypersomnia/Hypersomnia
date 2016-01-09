@@ -1,6 +1,6 @@
 #pragma once
 #include "game_framework/shared/drawing_state.h"
-#include "game_framework/resources/animate_info.h"
+#include "game_framework/resources/animation.h"
 #include "game_framework/components/tile_layer_component.h"
 
 #include "misc/vector_wrapper.h"
