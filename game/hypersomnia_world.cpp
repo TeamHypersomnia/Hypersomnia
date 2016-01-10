@@ -13,6 +13,7 @@ hypersomnia_world::hypersomnia_world(augs::overworld& overworld) : world(overwor
 
 void hypersomnia_world::register_messages_components_systems() {
 	register_component<animation>();
+	register_component<animation_response>();
 	register_component<behaviour_tree>();
 	register_component<camera>();
 	register_component<chase>();
@@ -58,6 +59,7 @@ void hypersomnia_world::register_messages_components_systems() {
 	register_message_queue<damage_message>();
 	register_message_queue<destroy_message>();
 	register_message_queue<animation_message>();
+	register_message_queue<animation_response_message>();
 	register_message_queue<collision_message>();
 	register_message_queue<particle_burst_message>();
 	register_message_queue<shot_message>();
@@ -71,6 +73,8 @@ void hypersomnia_world::draw() {
 	
 	/* read-only message generation */
 
+	get_system<animation_system>().response_requests_to_animation_messages();
+
 	get_system<input_system>().acquire_raw_window_inputs();
 	get_system<input_system>().post_input_intents_for_rendering_time();
 
@@ -80,6 +84,8 @@ void hypersomnia_world::draw() {
 	get_system<input_system>().replay_rendering_time_events_passed_to_last_logic_step();
 
 	/* application of messages */
+	get_system<animation_system>().handle_animation_messages();
+	get_system<animation_system>().progress_animation_states();
 
 	get_system<crosshair_system>().reapply_crosshair_intents();
 
