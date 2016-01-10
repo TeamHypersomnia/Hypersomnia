@@ -1,7 +1,7 @@
 #pragma once
 
 namespace assets {
-	enum animation_set_id {
+	enum animation_response_id {
 		PLAYER_SET,
 	};
 }

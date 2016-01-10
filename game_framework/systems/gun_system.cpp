@@ -1,7 +1,7 @@
 #include "gun_system.h"
 #include "entity_system/world.h"
 #include "../messages/intent_message.h"
-#include "../messages/animation_message.h"
+#include "../messages/animation_response_message.h"
 #include "../messages/particle_burst_message.h"
 #include "../messages/damage_message.h"
 #include "../messages/destroy_message.h"
@@ -108,7 +108,7 @@ void gun_system::process_entities() {
 			parent_world.post_message(shot_msg);
 
 			messages::animation_message msg;
-			msg.animation_type = messages::animation_message::response::SHOT;
+			msg.animation_type = messages::animation_response_message::SHOT;
 			msg.preserve_state_if_animation_changes = false;
 			msg.change_animation = true;
 			msg.change_speed = true;
@@ -182,7 +182,7 @@ void gun_system::process_entities() {
 
 		auto begin_swinging_routine = [&]() {
 			messages::animation_message msg;
-			msg.animation_type = gun.current_swing_direction ? messages::animation_message::response::SWING_CW : messages::animation_message::response::SWING_CCW;
+			msg.animation_type = gun.current_swing_direction ? messages::animation_response_message::SWING_CW : messages::animation_response_message::SWING_CCW;
 			msg.preserve_state_if_animation_changes = false;
 			msg.change_animation = true;
 			msg.change_speed = true;

@@ -1,33 +1,48 @@
 #include "animation_system.h"
 #include "entity_system/world.h"
+#include "../components/animation_response_component.h"
+#include "../messages/animation_response_message.h"
 #include "../messages/animation_message.h"
+
+#include "../resources/manager.h"
+
 #include <iostream>
 
 using namespace messages;
 using namespace resources;
 
-void animation_system::consume_events() {
+void animation_system::response_requests_to_animation_messages() {
+	auto events = parent_world.get_message_queue<animation_response_message>();
+
+	for (auto it : events) {
+		auto& animation = it.subject->get<components::animation>();
+		auto& responses = it.subject->get<components::animation_response>();
+
+		animation_message msg;
+		msg.change_animation_state::operator=(it);
+
+		auto response_map = *resource_manager.find(responses.response);
+
+		msg.set_animation = response_map[it.response_type];
+
+		parent_world.post_message(msg);
+	}
+}
+
+void animation_system::handle_animation_messages() {
 	auto events = parent_world.get_message_queue<animation_message>();
 
 	for (auto it : events) {
 		auto ptr = it.subject->find<components::animation>();
 		if (!ptr) continue; auto& animation = *ptr;
 
-		if (it.animation_priority >= animation.current_priority || animation.current_state == components::animation::state::PAUSED) {
+		if (it.animation_priority >= animation.priority || animation.state == components::animation::playing_state::PAUSED) {
 			if (it.change_speed)
 				animation.speed_factor = it.speed_factor;
 
 			//if (it.change_animation) {
-				resources::animation* new_instance = nullptr;
-				if (it.set_animation)
-					new_instance = it.set_animation;
-				else {
-					auto found_animation = animation.available_animations->get_raw().find(it.animation_type);
-					if (found_animation != animation.available_animations->get_raw().end()) {
-						new_instance = (*found_animation).second;
-					}
-				}
-
+				assets::animation_id new_instance = it.set_animation;
+				
 				if (new_instance != animation.current_animation) {
 					animation.current_animation = new_instance;
 
@@ -35,39 +50,39 @@ void animation_system::consume_events() {
 						it.message_type = animation_message::action::START;
 					}
 					//if (!it.preserve_state_if_animation_changes) {
-					//	animation.set_current_frame(0, it.subject);
-					//	animation.current_ms = 0.f;
+					//	animation.set_frame_num(0, it.subject);
+					//	animation.player_position_ms = 0.f;
 					//}
 					//else {
 						/* update callback */
-						//animation.set_current_frame(animation.get_current_frame(), it.subject);
+						//animation.set_frame_num(animation.get_frame_num(), it.subject);
 					//}
 				}
 			//}
 			
-			animation.current_priority = it.animation_priority;
+			animation.priority = it.animation_priority;
 
 			switch (it.message_type) {
 			case animation_message::action::PAUSE:
-				if (animation.current_state != components::animation::state::PAUSED) {
-					animation.paused_state = animation.current_state;
-					animation.current_state = components::animation::state::PAUSED;
+				if (animation.state != components::animation::playing_state::PAUSED) {
+					animation.paused_state = animation.state;
+					animation.state = components::animation::playing_state::PAUSED;
 				}
 				break;
 			case animation_message::action::STOP:
-				animation.paused_state = components::animation::state::INCREASING;
-				animation.current_state = components::animation::state::PAUSED;
-				animation.set_current_frame(0, it.subject, false);
-				animation.current_ms = 0.f;
+				animation.paused_state = components::animation::playing_state::INCREASING;
+				animation.state = components::animation::playing_state::PAUSED;
+				animation.set_frame_num(0, it.subject, false);
+				animation.player_position_ms = 0.f;
 				break;
 			case animation_message::action::START:
-				animation.current_state = components::animation::state::INCREASING;
-				animation.set_current_frame(0, it.subject);
-				animation.current_ms = 0.f;
+				animation.state = components::animation::playing_state::INCREASING;
+				animation.set_frame_num(0, it.subject);
+				animation.player_position_ms = 0.f;
 				break;
 			case animation_message::action::CONTINUE:
-				if (animation.current_state == components::animation::state::PAUSED) {
-					animation.current_state = animation.paused_state;
+				if (animation.state == components::animation::playing_state::PAUSED) {
+					animation.state = animation.paused_state;
 				}
 				break;
 			default: break;
@@ -81,99 +96,96 @@ void call(animation_callback func, augs::entity_id subject) {
 		func(subject);
 }
 
-void components::animation::set_current_frame(unsigned number, augs::entity_id subject, bool do_callback) {
+void components::animation::set_frame_num(unsigned number, augs::entity_id subject, bool do_callback) {
 	if (saved_callback_out)
 		call(saved_callback_out, subject);
 	
-	current_frame = number;
-	if (current_animation) {
-		if (do_callback) {
-			call(current_animation->frames[current_frame].callback, subject);
-			saved_callback_out = current_animation->frames[current_frame].callback_out;
-		}
+	frame_num = number;
 
-		subject->get<components::sprite>() = current_animation->frames[get_current_frame()].sprite;
-	} 
-	else
-		saved_callback_out = nullptr;
-}
+	const auto& animation_resource = *resource_manager.find(current_animation);
 
-void components::animation::set_current_animation_set(resources::animation_info* set, augs::entity_id subject) {
-	if (saved_callback_out) {
-		call(saved_callback_out, subject);
+	if (do_callback) {
+		call(animation_resource.frames[frame_num].callback, subject);
+		saved_callback_out = animation_resource.frames[frame_num].callback_out;
 	}
-	available_animations = set;
-	current_frame = 0;
-	saved_callback_out = nullptr;
 
-	paused_state = components::animation::state::INCREASING;
-	current_state = components::animation::state::PAUSED;
-	current_ms = 0.f;
-	current_animation = nullptr;
-
-	set_current_frame(0, subject);
+	subject->get<components::sprite>() = animation_resource.frames[get_frame_num()].sprite;
 }
 
-void animation_system::process_entities() {
+//void components::animation::set_current_animation_set(resources::animation_info* set, augs::entity_id subject) {
+//	if (saved_callback_out) {
+//		call(saved_callback_out, subject);
+//	}
+//	available_animations = set;
+//	current_frame = 0;
+//	saved_callback_out = nullptr;
+//
+//	paused_state = components::animation::state::INCREASING;
+//	current_state = components::animation::state::PAUSED;
+//	player_position_ms = 0.f;
+//	current_animation = nullptr;
+//
+//	set_frame_num(0, subject);
+//}
+
+void animation_system::progress_animation_states() {
 	float delta = static_cast<float>(animation_timer.extract<std::chrono::milliseconds>());
 
 	for (auto it : targets) {
-		auto& animation_state = it->get<components::animation>();
+		auto& current = it->get<components::animation>();
+		auto& animation = *resource_manager.find(current.current_animation);
 
-		if (animation_state.current_animation == nullptr) continue;
-
-		auto& animation = *animation_state.current_animation;
 		if (animation.frames.empty()) continue;
 
-		if (animation_state.current_state != components::animation::state::PAUSED) {
-			animation_state.current_ms += delta * animation_state.speed_factor;
+		if (current.state != components::animation::playing_state::PAUSED) {
+			current.player_position_ms += delta * current.speed_factor;
 
 			while (true) {
-				float frame_duration = animation.frames[animation_state.get_current_frame()].duration_milliseconds;
+				float frame_duration = animation.frames[current.get_frame_num()].duration_milliseconds;
 
-				if (animation_state.current_ms > frame_duration) {
-					animation_state.current_ms -= frame_duration;
+				if (current.player_position_ms > frame_duration) {
+					current.player_position_ms -= frame_duration;
 
 					if (animation.loop_mode == animation::loop_type::INVERSE) {
 
-						if (animation_state.current_state == components::animation::state::INCREASING) {
-							if (animation_state.get_current_frame() < animation.frames.size() - 1) animation_state.increase_frame(it);
+						if (current.state == components::animation::playing_state::INCREASING) {
+							if (current.get_frame_num() < animation.frames.size() - 1) current.increase_frame(it);
 							else {
-								animation_state.decrease_frame(it);
-								animation_state.current_state = components::animation::state::DECREASING;
+								current.decrease_frame(it);
+								current.state = components::animation::playing_state::DECREASING;
 							}
 						}
 
-						else if (animation_state.current_state == components::animation::state::DECREASING) {
-							if (animation_state.get_current_frame() > 0) animation_state.decrease_frame(it);
+						else if (current.state == components::animation::playing_state::DECREASING) {
+							if (current.get_frame_num() > 0) current.decrease_frame(it);
 							else {
-								animation_state.increase_frame(it);
-								animation_state.current_state = components::animation::state::INCREASING;
+								current.increase_frame(it);
+								current.state = components::animation::playing_state::INCREASING;
 							}
 						}
 					}
 
 					else if (animation.loop_mode == animation::loop_type::REPEAT) {
-						if (animation_state.current_state == components::animation::state::INCREASING) {
-							if (animation_state.get_current_frame() < animation.frames.size() - 1)
-								animation_state.increase_frame(it);
-							else animation_state.set_current_frame(0, it);
+						if (current.state == components::animation::playing_state::INCREASING) {
+							if (current.get_frame_num() < animation.frames.size() - 1)
+								current.increase_frame(it);
+							else current.set_frame_num(0, it);
 						}
-						else if (animation_state.current_state == components::animation::state::DECREASING) {
-							if (animation_state.get_current_frame() > 0) animation_state.decrease_frame(it);
-							else animation_state.set_current_frame(animation.frames.size() - 1, it);
+						else if (current.state == components::animation::playing_state::DECREASING) {
+							if (current.get_frame_num() > 0) current.decrease_frame(it);
+							else current.set_frame_num(animation.frames.size() - 1, it);
 						}
 					}
 
 					else if (animation.loop_mode == animation::loop_type::NONE) {
-						if (animation_state.current_state == components::animation::state::INCREASING) {
-							if (animation_state.get_current_frame() < animation.frames.size() - 1)
-								animation_state.increase_frame(it);
-							else animation_state.current_state = components::animation::state::PAUSED;
+						if (current.state == components::animation::playing_state::INCREASING) {
+							if (current.get_frame_num() < animation.frames.size() - 1)
+								current.increase_frame(it);
+							else current.state = components::animation::playing_state::PAUSED;
 						}
-						else if (animation_state.current_state == components::animation::state::DECREASING) {
-							if (animation_state.get_current_frame() > 0) animation_state.decrease_frame(it);
-							else animation_state.current_state = components::animation::state::PAUSED;
+						else if (current.state == components::animation::playing_state::DECREASING) {
+							if (current.get_frame_num() > 0) current.decrease_frame(it);
+							else current.state = components::animation::playing_state::PAUSED;
 						}
 					}
 				}
@@ -182,6 +194,6 @@ void animation_system::process_entities() {
 		}
 
 		auto& sprite = it->get<components::sprite>();
-		sprite = animation.frames[animation_state.get_current_frame()].sprite;
+		sprite = animation.frames[current.get_frame_num()].sprite;
 	}
 }

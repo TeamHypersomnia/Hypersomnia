@@ -37,6 +37,20 @@ namespace resources {
 		return &(*it).second;
 	}
 
+	animation* manager::find(assets::animation_id id) {
+		auto it = animations.find(id);
+		if (it == animations.end()) return nullptr;
+
+		return &(*it).second;
+	}
+
+	animation_response* manager::find(assets::animation_response_id id) {
+		auto it = animation_responses.find(id);
+		if (it == animation_responses.end()) return nullptr;
+
+		return &(*it).second;
+	}
+
 	//template<> texture* manager::find(int id) {
 	//	return &find_texture(assets::texture_id(id))->tex;
 	//}
@@ -68,6 +82,20 @@ namespace resources {
 		tex.set(img);
 
 		return tex;
+	}
+
+	animation& manager::create(assets::animation_id id) {
+		animations.insert(std::make_pair(id, animation()));
+
+		animation& anim = animations[id];
+		return anim;
+	}
+
+	animation_response& manager::create(assets::animation_response_id id) {
+		animation_responses.insert(std::make_pair(id, animation_response()));
+
+		animation_response& resp = animation_responses[id];
+		return resp;
 	}
 
 	manager::texture& manager::create(assets::texture_id id, std::wstring filename) {

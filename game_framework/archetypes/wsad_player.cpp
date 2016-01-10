@@ -10,6 +10,7 @@
 #include "game_framework/components/movement_component.h"
 #include "game_framework/components/lookat_component.h"
 #include "game_framework/components/animation_component.h"
+#include "game_framework/components/animation_response_component.h"
 
 namespace archetypes {
 	void wsad_player_legs(augs::entity_id e) {

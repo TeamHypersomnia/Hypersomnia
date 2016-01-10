@@ -2780,9 +2780,6 @@
     <ClInclude Include="utilities\misc\time.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\assets\animation_set.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\resources\animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2790,6 +2787,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\messages\animation_message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\assets\animation_response.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\components\animation_response_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\resources\animation_response.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\messages\animation_response_message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

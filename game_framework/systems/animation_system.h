@@ -14,6 +14,9 @@ public:
 	using processing_system_templated::processing_system_templated;
 
 	timer animation_timer;
-	void consume_events();
-	void process_entities();
+
+	void response_requests_to_animation_messages();
+
+	void handle_animation_messages();
+	void progress_animation_states();
 };

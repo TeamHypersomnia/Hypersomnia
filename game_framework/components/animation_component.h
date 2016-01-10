@@ -5,51 +5,40 @@
 #include "misc/map_wrapper.h"
 
 #include "../resources/animation.h"
-
-#include "../assets/animation_set.h"
-
-class animation_system;
-namespace resources {
-	typedef augs::map_wrapper<int, animation*> animation_info;
-}
+#include "../assets/animation.h"
 
 namespace components {
 	struct animation {
-		resources::animation_info* available_animations = nullptr;
+		assets::animation_id current_animation;
 
-		void set_current_frame(unsigned number, augs::entity_id, bool do_callback = true);
+		void set_frame_num(unsigned number, augs::entity_id, bool do_callback = true);
 
-		unsigned get_current_frame() const {
-			return current_frame;
+		unsigned get_frame_num() const {
+			return frame_num;
 		}
 
 		void increase_frame(augs::entity_id sub) {
-			set_current_frame(current_frame + 1, sub);
+			set_frame_num(frame_num + 1, sub);
 		}
 
 		void decrease_frame(augs::entity_id sub) {
-			set_current_frame(current_frame - 1, sub);
+			set_frame_num(frame_num - 1, sub);
 		}
 
-		void set_current_animation_set(resources::animation_info*, augs::entity_id subject);
-	private:
-		friend class animation_system;
-
 		resources::animation_callback saved_callback_out;
-		resources::animation* current_animation = nullptr;
 
-		int current_priority = 0;
-		unsigned current_frame = 0;
-		float current_ms = 0.f;
+		int priority = 0;
+		unsigned frame_num = 0;
+		float player_position_ms = 0.f;
 		float speed_factor = 1.f;
 
-		enum class state {
+		enum class playing_state {
 			INCREASING,
 			DECREASING,
 			PAUSED
 		};
 
-		state current_state = state::INCREASING;
-		state paused_state = state::INCREASING;
+		playing_state state = playing_state::INCREASING;
+		playing_state paused_state = playing_state::INCREASING;
 	};
 }
