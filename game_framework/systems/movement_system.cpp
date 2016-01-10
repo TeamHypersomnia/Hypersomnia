@@ -124,15 +124,20 @@ void movement_system::animate_movement() {
 		auto& movement = it->get<components::movement>();
 		auto* maybe_physics = it->find<components::physics>();
 		
-		if (maybe_physics == nullptr)
-			continue;
+		float32 speed = 0.0f;
 
-		auto& physics = *maybe_physics;
+		if (maybe_physics == nullptr) {
+			if (it->get<components::render>().interpolation_direction().non_zero()) 
+				speed = movement.max_speed_animation;
+		}
+		else {
+			auto& physics = *maybe_physics;
 
-		b2Vec2 vel = physics.body->GetLinearVelocity();
-		float32 speed = vel.Normalize() * METERS_TO_PIXELSf;
+			b2Vec2 vel = physics.body->GetLinearVelocity();
+			speed = vel.Normalize() * METERS_TO_PIXELSf;
+		}
 
-		animation_message msg;
+		animation_response_message msg;
 
 		msg.change_speed = true;
 		
@@ -141,17 +146,17 @@ void movement_system::animate_movement() {
 		
 		msg.change_animation = true;
 		msg.preserve_state_if_animation_changes = false;
-		msg.message_type = ((speed <= 1.f) ? animation_message::action::STOP : animation_message::action::CONTINUE);
+		msg.action = ((speed <= 1.f) ? animation_message::STOP : animation_message::CONTINUE);
 		msg.animation_priority = 0;
+		msg.response = messages::animation_response_message::response_type::MOVE;
 
 		for (auto receiver : movement.animation_receivers) {
-			animation_message copy(msg);
-			copy.animation_type = movement.animation_message;
+			animation_response_message copy(msg);
 
 			copy.subject = receiver.target;
 
 			if (!receiver.stop_at_zero_movement)
-				copy.message_type = animation_message::action::CONTINUE;
+				copy.action = animation_message::CONTINUE;
 
 			parent_world.post_message(copy);
 		}

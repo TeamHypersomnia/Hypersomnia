@@ -13,6 +13,8 @@
 
 #include "game_framework/messages/crosshair_intent_message.h"
 
+#include "game_framework/messages/animation_response_message.h"
+
 #include "utilities/file.h"
 #include "misc/time.h"
 
@@ -30,11 +32,24 @@ namespace scene_builders {
 		resource_manager.create(assets::texture_id::BLANK, L"hypersomnia/data/gfx/blank.png");
 		resource_manager.create(assets::texture_id::TEST_BACKGROUND, L"hypersomnia/data/maps/snow_textures/snow3.png");
 		
+		resource_manager.create_sprites_indexed(
+			assets::texture_id::TORSO_MOVING_FIRST,
+			assets::texture_id::TORSO_MOVING_LAST,
+			L"hypersomnia/data/gfx/walk");
+
 		resource_manager.create(assets::atlas_id::GAME_WORLD_ATLAS, resources::manager::atlas_creation_mode::FROM_ALL_TEXTURES);
 
 		resource_manager.create(assets::shader_id::DEFAULT_VERTEX, L"hypersomnia/data/shaders/default.vsh", graphics::shader::type::VERTEX);
 		resource_manager.create(assets::shader_id::DEFAULT_FRAGMENT, L"hypersomnia/data/shaders/default.fsh", graphics::shader::type::FRAGMENT);
 		resource_manager.create(assets::program_id::DEFAULT, assets::shader_id::DEFAULT_VERTEX, assets::shader_id::DEFAULT_FRAGMENT);
+
+		resource_manager.create(assets::animation_id::TORSO_MOVE,
+			assets::texture_id::TORSO_MOVING_FIRST,
+			assets::texture_id::TORSO_MOVING_LAST,
+			20.0f);
+
+		auto& player_response = resource_manager.create(assets::animation_response_id::TORSO_SET);
+		player_response[messages::animation_response_message::MOVE] = assets::animation_id::TORSO_MOVE;
 
 		auto background = world.create_entity();
 		auto camera = world.create_entity();

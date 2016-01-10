@@ -51,12 +51,17 @@ namespace archetypes {
 	void wsad_player(augs::entity_id e, augs::entity_id crosshair_entity, augs::entity_id camera_entity) {
 		components::sprite sprite;
 		components::render render;
+		components::animation animation;
+		components::animation_response animation_response;
 		components::transform transform;
 		components::input input;
 		components::movement movement;
 		components::lookat lookat;
 
+		animation_response.response = assets::animation_response_id::TORSO_SET;
+
 		movement.input_acceleration.set(400, 400);
+		movement.add_animation_receiver(e, false);
 
 		sprite.set(assets::texture_id::TEST_PLAYER, pixel_32(255, 255, 255, 255));
 
@@ -73,6 +78,8 @@ namespace archetypes {
 		e->add(transform);
 		e->add(input);
 		e->add(render);
+		e->add(animation);
+		e->add(animation_response);
 		e->add(sprite);
 		e->add(movement);
 		e->add(lookat);

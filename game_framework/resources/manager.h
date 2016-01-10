@@ -44,6 +44,12 @@ namespace resources {
 		texture& create(assets::texture_id, std::wstring filename);
 		texture& create(assets::texture_id, augs::image img);
 
+		void create_sprites_indexed(assets::texture_id first, assets::texture_id last, std::wstring filename_preffix);
+
+		animation& create(assets::animation_id, assets::texture_id first_frame, assets::texture_id last_frame, float frame_duration_ms,
+			resources::animation::loop_type = resources::animation::INVERSE
+			);
+
 		animation& create(assets::animation_id);
 		resources::animation_response& create(assets::animation_response_id);
 

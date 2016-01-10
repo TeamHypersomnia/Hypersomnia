@@ -20,7 +20,7 @@ namespace components {
 
 		sprite(assets::texture_id = assets::BLANK, augs::pixel_32 = augs::pixel_32());
 
-		void set(assets::texture_id, augs::pixel_32);
+		void set(assets::texture_id, augs::pixel_32 = augs::pixel_32());
 		void update_size();
 
 		std::vector<vec2> get_vertices();

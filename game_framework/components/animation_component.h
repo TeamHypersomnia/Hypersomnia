@@ -38,7 +38,7 @@ namespace components {
 			PAUSED
 		};
 
-		playing_state state = playing_state::INCREASING;
-		playing_state paused_state = playing_state::INCREASING;
+		playing_state state = playing_state::PAUSED;
+		playing_state paused_state = playing_state::PAUSED;
 	};
 }

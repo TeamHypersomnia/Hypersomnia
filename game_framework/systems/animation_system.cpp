@@ -23,10 +23,12 @@ void animation_system::response_requests_to_animation_messages() {
 
 		auto response_map = *resource_manager.find(responses.response);
 
-		msg.set_animation = response_map[it.response_type];
+		msg.set_animation = response_map[it.response];
 
 		parent_world.post_message(msg);
 	}
+
+	parent_world.get_message_queue<animation_response_message>().clear();
 }
 
 void animation_system::handle_animation_messages() {
@@ -46,8 +48,8 @@ void animation_system::handle_animation_messages() {
 				if (new_instance != animation.current_animation) {
 					animation.current_animation = new_instance;
 
-					if (it.message_type == animation_message::action::CONTINUE) {
-						it.message_type = animation_message::action::START;
+					if (it.action == animation_message::CONTINUE) {
+						it.action = animation_message::START;
 					}
 					//if (!it.preserve_state_if_animation_changes) {
 					//	animation.set_frame_num(0, it.subject);
@@ -62,25 +64,25 @@ void animation_system::handle_animation_messages() {
 			
 			animation.priority = it.animation_priority;
 
-			switch (it.message_type) {
-			case animation_message::action::PAUSE:
+			switch (it.action) {
+			case animation_message::PAUSE:
 				if (animation.state != components::animation::playing_state::PAUSED) {
 					animation.paused_state = animation.state;
 					animation.state = components::animation::playing_state::PAUSED;
 				}
 				break;
-			case animation_message::action::STOP:
+			case animation_message::STOP:
 				animation.paused_state = components::animation::playing_state::INCREASING;
 				animation.state = components::animation::playing_state::PAUSED;
 				animation.set_frame_num(0, it.subject, false);
 				animation.player_position_ms = 0.f;
 				break;
-			case animation_message::action::START:
+			case animation_message::START:
 				animation.state = components::animation::playing_state::INCREASING;
 				animation.set_frame_num(0, it.subject);
 				animation.player_position_ms = 0.f;
 				break;
-			case animation_message::action::CONTINUE:
+			case animation_message::CONTINUE:
 				if (animation.state == components::animation::playing_state::PAUSED) {
 					animation.state = animation.paused_state;
 				}
@@ -89,6 +91,8 @@ void animation_system::handle_animation_messages() {
 			}
 		}
 	}
+
+	parent_world.get_message_queue<animation_message>().clear();
 }
 
 void call(animation_callback func, augs::entity_id subject) {
@@ -133,11 +137,12 @@ void animation_system::progress_animation_states() {
 
 	for (auto it : targets) {
 		auto& current = it->get<components::animation>();
-		auto& animation = *resource_manager.find(current.current_animation);
-
-		if (animation.frames.empty()) continue;
 
 		if (current.state != components::animation::playing_state::PAUSED) {
+			auto& animation = *resource_manager.find(current.current_animation);
+
+			if (animation.frames.empty()) continue;
+
 			current.player_position_ms += delta * current.speed_factor;
 
 			while (true) {
@@ -191,9 +196,9 @@ void animation_system::progress_animation_states() {
 				}
 				else break;
 			}
-		}
 
-		auto& sprite = it->get<components::sprite>();
-		sprite = animation.frames[current.get_frame_num()].sprite;
+			auto& sprite = it->get<components::sprite>();
+			sprite = animation.frames[current.get_frame_num()].sprite;
+		}
 	}
 }

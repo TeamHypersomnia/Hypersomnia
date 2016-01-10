@@ -2,6 +2,6 @@
 
 namespace assets {
 	enum animation_response_id {
-		PLAYER_SET,
+		TORSO_SET,
 	};
 }

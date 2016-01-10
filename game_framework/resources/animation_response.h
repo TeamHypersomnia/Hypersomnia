@@ -4,5 +4,5 @@
 #include "../messages/animation_response_message.h"
 
 namespace resources {
-	typedef std::unordered_map<messages::animation_response_message::response, assets::animation_id> animation_response;
+	typedef std::unordered_map<messages::animation_response_message::response_type, assets::animation_id> animation_response;
 }

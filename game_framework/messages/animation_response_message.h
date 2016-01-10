@@ -4,7 +4,7 @@
 
 namespace messages {
 	struct animation_response_message : change_animation_state {
-		enum response {
+		enum response_type {
 			MOVE,
 			SHOT,
 			SWING_CW,
@@ -13,6 +13,6 @@ namespace messages {
 			MOVE_CCW
 		};
 
-		response response_type;
+		response_type response;
 	};
 }

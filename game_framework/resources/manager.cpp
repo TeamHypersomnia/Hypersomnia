@@ -1,6 +1,7 @@
 #include "manager.h"
 #include <string>
 #include "utilities/file.h"
+#include <sstream>
 
 using namespace augs;
 
@@ -84,10 +85,36 @@ namespace resources {
 		return tex;
 	}
 
+	void manager::create_sprites_indexed(assets::texture_id first, assets::texture_id last, std::wstring filename_preffix) {
+		for (assets::texture_id i = first; i < last; i = assets::texture_id(i + 1)) {
+			std::wostringstream filename;
+			filename << filename_preffix << L"_" << int(i - first + 1) << L".png";
+
+			create(i, filename.str());
+		}
+	}
+
 	animation& manager::create(assets::animation_id id) {
 		animations.insert(std::make_pair(id, animation()));
 
 		animation& anim = animations[id];
+		return anim;
+	}
+
+	animation& manager::create(assets::animation_id id, assets::texture_id first_frame, assets::texture_id last_frame, float frame_duration_ms, 
+		resources::animation::loop_type loop_mode) {
+		
+		animation& anim = create(id);
+		anim.loop_mode = loop_mode;
+
+		for (assets::texture_id i = first_frame; i < last_frame; i = assets::texture_id(i+1)) {
+			animation::frame frame;
+			frame.duration_milliseconds = frame_duration_ms;
+			frame.sprite.set(i);
+
+			anim.frames.push_back(frame);
+		}
+
 		return anim;
 	}
 

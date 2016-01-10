@@ -107,14 +107,14 @@ void gun_system::process_entities() {
 
 			parent_world.post_message(shot_msg);
 
-			messages::animation_message msg;
-			msg.animation_type = messages::animation_response_message::SHOT;
+			messages::animation_response_message msg;
+			msg.response = messages::animation_response_message::SHOT;
 			msg.preserve_state_if_animation_changes = false;
 			msg.change_animation = true;
 			msg.change_speed = true;
 			msg.speed_factor = 1.f;
 			msg.subject = it;
-			msg.message_type = messages::animation_message::action::START;
+			msg.action = messages::animation_message::START;
 			msg.animation_priority = 1;
 
 			parent_world.post_message(msg);
@@ -181,14 +181,14 @@ void gun_system::process_entities() {
 		/********************************************************************************************************/
 
 		auto begin_swinging_routine = [&]() {
-			messages::animation_message msg;
-			msg.animation_type = gun.current_swing_direction ? messages::animation_response_message::SWING_CW : messages::animation_response_message::SWING_CCW;
+			messages::animation_response_message msg;
+			msg.response = gun.current_swing_direction ? messages::animation_response_message::SWING_CW : messages::animation_response_message::SWING_CCW;
 			msg.preserve_state_if_animation_changes = false;
 			msg.change_animation = true;
 			msg.change_speed = true;
 			msg.speed_factor = 1.f;
 			msg.subject = it;
-			msg.message_type = messages::animation_message::action::START;
+			msg.action = messages::animation_message::START;
 			msg.animation_priority = 1;
 
 			parent_world.post_message(msg);

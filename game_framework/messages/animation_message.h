@@ -4,15 +4,15 @@
 
 namespace messages {
 	struct change_animation_state : message {
-		enum action {
+		enum action_type {
+			INVALID,
 			CONTINUE,
 			START,
 			PAUSE,
 			STOP
 		};
 
-		int message_type = 0;
-		int animation_type = 0;
+		action_type action = INVALID;
 
 		bool preserve_state_if_animation_changes = false;
 		bool change_animation = false;

@@ -17,14 +17,11 @@ namespace components {
 			animation_receivers.push_back(subscribtion(e, stop_at_zero_movement));
 		}
 
-		/* default message that gets sent when entity moves */
-		int animation_message = messages::animation_response_message::MOVE;
-
 		/* entities whom the animation_message will be sent to, including information about subject entity's movement speed */
 		std::vector<subscribtion> animation_receivers;
 
 		/* levers controlled by intent messages to induce movement */
-		int moving_left, moving_right, moving_forward, moving_backward;
+		int moving_left = 0, moving_right = 0, moving_forward = 0, moving_backward = 0;
 		
 		/* default acceleration vector used for movement requested by input */
 		vec2 input_acceleration;
@@ -43,35 +40,29 @@ namespace components {
 		vec2 inverse_thrust_brake;
 
 		/* a physically realistic alternative to max_speed variable, the bigger the value is, the lesser the maximum speed */
-		float air_resistance;
+		float air_resistance = 0.f;
 
-		float max_speed;
+		float max_speed = -1.f;
 
 		/* used for all environments; apply general damping value when no movement is requested */
-		float braking_damping;
+		float braking_damping = -1.f;
 
 		/* speed at which the receivers' animation speed multiplier reaches 1.0 */
-		float max_speed_animation;
+		float max_speed_animation = 1.f;
 
 		/* angular offset for all forces
 		used only for side-scrolling environments */
-		float axis_rotation_degrees;
+		float axis_rotation_degrees = 0.f;
 
-		bool sidescroller_setup;
+		bool sidescroller_setup = false;
 
 		/* if this is non-zero, a ray of length of this variable is cast under the player to determine the ground angle and rotate the movement forces
 		to be applied for slopes accordingly
 		used only for side-scrolling environments
 		*/
-		float thrust_parallel_to_ground_length;
+		float thrust_parallel_to_ground_length = 0.f;
 
 		/* filter for the aforementioned ray cast */
 		b2Filter ground_filter;
-
-		movement(vec2 acceleration = vec2(), float air_resistance = 0.f) 
-			: input_acceleration(input_acceleration), air_resistance(air_resistance), braking_damping(-1.f), max_speed(-1.f), max_speed_animation(0.f), 
-			axis_rotation_degrees(0.f), thrust_parallel_to_ground_length(0.f), sidescroller_setup(false) {
-			moving_left = moving_right = moving_forward = moving_backward = 0;
-		}
 	};
 }
