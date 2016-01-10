@@ -420,10 +420,5 @@ void physics_system::reset_states() {
 			transform.rotation = b->GetAngle();
 			transform.rotation *= 180.0f / 3.141592653589793238462f;
 		}
-		
-		auto* render = static_cast<entity_id>(b->GetUserData())->find<components::render>();
-
-		if(render)
-			render->previous_transform = transform;
 	}
 }

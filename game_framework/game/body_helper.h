@@ -13,24 +13,31 @@ namespace helpers {
 			RECT,
 			POLYGON,
 			CIRCLE
-		} type;
+		} type = RECT;
 		
 		std::vector<std::vector<vec2>> convex_polys;
 		std::vector<vec2> original_model;
+		
 		vec2 rect_size;
 		b2Filter filter;
 
-		int body_type;
+		int body_type = b2_dynamicBody;
 
-		float density, friction, restitution, angular_damping, linear_damping, radius, max_speed, gravity_scale;
-		bool fixed_rotation, sensor, bullet, angled_damping;
+		float density = 1.f, 
+			friction = 0.f, 
+			restitution = 0.f, 
+			angular_damping = 0.f, 
+			linear_damping = 0.f, 
+			radius = 0.f, 
+			max_speed = -1.f, 
+			gravity_scale = 0.f;
+
+		bool fixed_rotation = false, sensor = false, bullet = false, angled_damping = false;
 
 		void add_convex(const std::vector<vec2> &);
 		void add_concave(const std::vector<vec2> &);
 
-		void from_renderable(const components::polygon&);
-
-		physics_info();
+		void from_renderable(augs::entity_id);
 	};
 
 	//extern void create_physics_component(augs::entity_id subject, b2Filter filter, int = b2_dynamicBody);

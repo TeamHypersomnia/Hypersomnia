@@ -7,11 +7,12 @@
 #include "../components/crosshair_component.h"
 #include "../components/chase_component.h"
 #include "../components/crosshair_component.h"
+#include "../components/physics_component.h"
 #include "../messages/intent_message.h"
 #include "../shared/drawing_state.h"
 #include "entity_system/world.h"
 
-#include <iostream>
+#include "utilities/print.h"
 
 void camera_system::react_to_input_intents() {
 	auto events = parent_world.get_message_queue<messages::intent_message>();
@@ -156,17 +157,25 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 				}
 			}
 
-			vec2 target_value = camera.player->get<components::render>().interpolation_direction();
-			target_value.set_length(100);
+			vec2 target_value;
+			auto maybe_physics = camera.player->find<components::physics>();
 
-			//if (target_value.length() > 100)
-			//	target_value.set_length(100);
+			if (maybe_physics) {
+				target_value = maybe_physics->velocity();
+				
+				if (target_value.length() > 20)
+					target_value.set_length(20);
 
-			//if (target_value.length() < camera.smoothing_player_pos.value.length())
-			//	camera.smoothing_player_pos.averages_per_sec = 8;
-			//else
+				if (target_value.length() < camera.smoothing_player_pos.value.length())
+					camera.smoothing_player_pos.averages_per_sec = 8;
+				else
+					camera.smoothing_player_pos.averages_per_sec = 5;
+			}
+			else {
+				target_value = camera.player->get<components::render>().interpolation_direction();
+				target_value.set_length(100);
 				camera.smoothing_player_pos.averages_per_sec = 5;
-
+			}
 
 			camera.smoothing_player_pos.target_value = target_value * (-1);
 			camera.smoothing_player_pos.tick();

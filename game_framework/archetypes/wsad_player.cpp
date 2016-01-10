@@ -11,16 +11,39 @@
 #include "game_framework/components/lookat_component.h"
 #include "game_framework/components/animation_component.h"
 #include "game_framework/components/animation_response_component.h"
+#include "game_framework/components/physics_component.h"
+
+#include "game_framework/game/body_helper.h"
+
+#include "game_framework/globals/filters.h"
 
 namespace archetypes {
-	void wsad_player_legs(augs::entity_id e) {
+	void wsad_player_physics(augs::entity_id e) {
+		helpers::physics_info info;
+		info.from_renderable(e);
+
+		info.filter = filters::controlled_character();
+		info.density = 0.1;
+		info.fixed_rotation = true;
+		info.angular_damping = 5;
+		info.angled_damping = true;
+
+		helpers::create_physics_component(info, e, b2_dynamicBody);
+
+		components::movement& movement = e->get<components::movement>();
+
+		movement.input_acceleration.set(5000, 5000);
+		movement.max_accel_len = 5000;
+		movement.max_speed_animation = 1000;
+		movement.air_resistance = 0.6;
+		movement.braking_damping = 18;
+	}
+
+	void wsad_player_legs(augs::entity_id legs, augs::entity_id player) {
 		components::sprite sprite;
 		components::render render;
 		components::animation animation;
 		components::transform transform;
-
-
-
 	}
 
 	void wsad_player_crosshair(augs::entity_id e) {

@@ -6,6 +6,7 @@
 #include "../components/physics_component.h"
 #include "../components/polygon_component.h"
 #include "../components/render_component.h"
+#include "../components/sprite_component.h"
 #include "../shared/drawing_state.h"
 
 #include "../systems/physics_system.h"
@@ -15,15 +16,6 @@
 #include "3rdparty/polypartition/polypartition.h"
 
 namespace helpers {
-	physics_info::physics_info() 
-		: rect_size(vec2()), type(RECT), 
-		density(1.f), 
-		angular_damping(0.f), 
-		linear_damping(0.f), fixed_rotation(false), sensor(false), restitution(0.f), friction(0.f),
-		body_type(b2_dynamicBody), radius(0.f), gravity_scale(0.f), max_speed(-1), bullet(false), angled_damping(false)
-		{
-	}
-
 	b2World* current_b2world = nullptr;
 
 	void physics_info::add_convex(const std::vector <vec2>& verts) {
@@ -31,35 +23,47 @@ namespace helpers {
 		convex_polys.push_back(verts);
 	}
 
-	void physics_info::from_renderable(const components::polygon& p) {
-		list<TPPLPoly> inpolys, outpolys;
-		TPPLPoly subject_poly;
-		subject_poly.Init(p.original_model.size());
-		subject_poly.SetHole(false);
+	void physics_info::from_renderable(augs::entity_id e) {
+		auto* sprite = e->find<components::sprite>();
+		auto* polygon = e->find<components::polygon>();
 
-		original_model.insert(original_model.end(), p.original_model.begin(), p.original_model.end());
-		
-		for (size_t i = 0; i < p.original_model.size(); ++i) {
-			vec2 p(p.original_model[i]);
-			subject_poly[i].x = p.x;
-			subject_poly[i].y = -p.y;
+		if (sprite) {
+			type = RECT;
+			rect_size = sprite->size;
 		}
+		else if (polygon) {
+			type = POLYGON;
+			auto& p = *polygon;
+			
+			list<TPPLPoly> inpolys, outpolys;
+			TPPLPoly subject_poly;
+			subject_poly.Init(p.original_model.size());
+			subject_poly.SetHole(false);
 
-		inpolys.push_back(subject_poly);
+			original_model.insert(original_model.end(), p.original_model.begin(), p.original_model.end());
 
-		TPPLPartition partition;
-		partition.ConvexPartition_HM(&inpolys, &outpolys);
-
-		for (auto& out : outpolys) {
-			std::vector <vec2> new_convex;
-
-			for (long j = 0; j < out.GetNumPoints(); ++j) {
-				new_convex.push_back(vec2(static_cast<float>(out[j].x), static_cast<float>(-out[j].y)));
+			for (size_t i = 0; i < p.original_model.size(); ++i) {
+				vec2 p(p.original_model[i]);
+				subject_poly[i].x = p.x;
+				subject_poly[i].y = -p.y;
 			}
 
-			std::reverse(new_convex.begin(), new_convex.end());
+			inpolys.push_back(subject_poly);
 
-			convex_polys.push_back(new_convex);
+			TPPLPartition partition;
+			partition.ConvexPartition_HM(&inpolys, &outpolys);
+
+			for (auto& out : outpolys) {
+				std::vector <vec2> new_convex;
+
+				for (long j = 0; j < out.GetNumPoints(); ++j) {
+					new_convex.push_back(vec2(static_cast<float>(out[j].x), static_cast<float>(-out[j].y)));
+				}
+
+				std::reverse(new_convex.begin(), new_convex.end());
+
+				convex_polys.push_back(new_convex);
+			}
 		}
 	}
 
@@ -113,7 +117,9 @@ namespace helpers {
 		fixdef.shape = &shape;
 
 		b2Body* body = physics.b2world.CreateBody(&def);
-		auto physics_component = components::physics(body);
+		
+		components::physics physics_component;
+		physics_component.body = body;
 
 		if (body_data.type == physics_info::RECT) {
 			shape.SetAsBox(static_cast<float>(body_data.rect_size.x) / 2.f * PIXELS_TO_METERSf, static_cast<float>(body_data.rect_size.y) / 2.f * PIXELS_TO_METERSf);

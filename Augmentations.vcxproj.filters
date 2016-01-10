@@ -1011,6 +1011,12 @@
     <ClCompile Include="game_framework\resources\animation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game_framework\globals\filters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\components\physics_component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -2799,6 +2805,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\messages\animation_response_message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\globals\filters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\globals\render_layers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities\print.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

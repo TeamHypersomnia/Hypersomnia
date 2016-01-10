@@ -58,8 +58,11 @@ namespace scene_builders {
 
 		archetypes::camera(camera, window_rect.w, window_rect.h);
 		archetypes::sprite(background, vec2(0, 0), assets::texture_id::TEST_BACKGROUND);
+		
 		archetypes::wsad_player_crosshair(crosshair);
 		archetypes::wsad_player(player, crosshair, camera);
+
+		archetypes::wsad_player_physics(player);
 
 		input_system::context active_context;
 		active_context.map_event_to_intent(window::event::raw_mousemotion, messages::intent_message::MOVE_CROSSHAIR);
@@ -74,23 +77,20 @@ namespace scene_builders {
 		world.get_system<input_system>().add_context(active_context);
 
 		world.parent_overworld.configure_stepping(60.0, 5);
-
-		world.get_system<input_system>().raw_window_input_player.player.record("recordings/" + augs::get_timestamp() + " recorded.inputs");
-		world.get_system<input_system>().crosshair_intent_player.player.record("recordings/" + augs::get_timestamp() + " recorded_crosshair.inputs");
 		
-		//if (augs::file_exists(L"recordings/recorded.inputs")) {
-		//	world.get_system<input_system>().raw_window_input_player.player.load_recording("recordings/recorded.inputs");
-		//	world.get_system<input_system>().raw_window_input_player.player.replay();
-		//
-		//	world.get_system<input_system>().crosshair_intent_player.player.load_recording("recordings/recorded_crosshair.inputs");
-		//	world.get_system<input_system>().crosshair_intent_player.player.replay();
-		//	
-		//	//world.parent_overworld.accumulator.set_time_multiplier(6.0);
-		//}
-		//else {
-		//	world.get_system<input_system>().raw_window_input_player.player.record("recordings/recorded.inputs");
-		//	world.get_system<input_system>().crosshair_intent_player.player.record("recordings/recorded_crosshair.inputs");
-		//}
+		if (augs::file_exists(L"recorded.inputs")) {
+			world.get_system<input_system>().raw_window_input_player.player.load_recording("recorded.inputs");
+			world.get_system<input_system>().raw_window_input_player.player.replay();
+		
+			world.get_system<input_system>().crosshair_intent_player.player.load_recording("recorded_crosshair.inputs");
+			world.get_system<input_system>().crosshair_intent_player.player.replay();
+			
+			//world.parent_overworld.accumulator.set_time_multiplier(6.0);
+		}
+		else {
+			world.get_system<input_system>().raw_window_input_player.player.record("recordings/" + augs::get_timestamp() + " recorded.inputs");
+			world.get_system<input_system>().crosshair_intent_player.player.record("recordings/" + augs::get_timestamp() + " recorded_crosshair.inputs");
+		}
 	}
 
 	void testbed::perform_logic_step(world& world) {

@@ -9,13 +9,14 @@ extern float PIXELS_TO_METERSf;
 class b2Body;
 namespace components {
 	struct physics : public augs::component {
-		b2Body* body;
+		b2Body* body = nullptr;
 		std::vector <vec2> original_model;
 
 		bool enable_angle_motor = false;
 		float target_angle = 0.f;
 		float angle_motor_force_multiplier = 1.f;
 
-		physics(b2Body* body = nullptr) : body(body) {}
+		vec2 velocity();
+		void set_velocity(vec2);
 	};
 }
