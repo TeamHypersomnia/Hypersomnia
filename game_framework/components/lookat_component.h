@@ -32,5 +32,7 @@ namespace components {
 
 		float last_value = 0.0f;
 		bool update_value = true;
+
+		bool use_physical_motor = false;
 	};
 }

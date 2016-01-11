@@ -42,4 +42,11 @@ namespace augs {
 		return deterministic_timer(this);
 	}
 
+	void overworld::update_frame_timer() {
+		frame_time = frame_timer.extract<std::chrono::seconds>();
+	}
+
+	double overworld::get_frame_time() {
+		return frame_time;
+	}
 }

@@ -29,6 +29,10 @@ namespace augs {
 	double processing_system::per_second() {
 		return parent_overworld.accumulator.per_second();
 	}
+	
+	double processing_system::frame_time() {
+		return parent_overworld.get_frame_time();
+	}
 
 	double processing_system::view_interpolation_ratio() {
 		return parent_overworld.accumulator.get_ratio();

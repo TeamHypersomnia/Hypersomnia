@@ -22,6 +22,7 @@ namespace augs {
 		processing_system(world& parent_world);
 
 		double per_second();
+		double frame_time();
 		double view_interpolation_ratio();
 		augs::renderer& get_renderer();
 

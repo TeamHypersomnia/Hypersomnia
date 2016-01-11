@@ -16,7 +16,7 @@ public:
 	void generate_crosshair_intents();
 	
 	/* for replayers*/
-	void reapply_crosshair_intents();
+	void apply_crosshair_intents_to_crosshair_transforms();
 
 	void animate_crosshair_sizes();
 };

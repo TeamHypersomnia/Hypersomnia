@@ -94,11 +94,13 @@ namespace scene_builders {
 			world.get_system<input_system>().crosshair_intent_player.player.load_recording("recorded_crosshair.inputs");
 			world.get_system<input_system>().crosshair_intent_player.player.replay();
 			
-			//world.parent_overworld.accumulator.set_time_multiplier(6.0);
+			world.parent_overworld.accumulator.set_time_multiplier(6.0);
 		}
 		else {
-			world.get_system<input_system>().raw_window_input_player.player.record("recordings/" + augs::get_timestamp() + " recorded.inputs");
-			world.get_system<input_system>().crosshair_intent_player.player.record("recordings/" + augs::get_timestamp() + " recorded_crosshair.inputs");
+			augs::create_directory("sessions/" + augs::get_timestamp());
+
+			world.get_system<input_system>().raw_window_input_player.player.record("sessions/" + augs::get_timestamp() + "/recorded.inputs");
+			world.get_system<input_system>().crosshair_intent_player.player.record("sessions/" + augs::get_timestamp() + "/recorded_crosshair.inputs");
 		}
 	}
 

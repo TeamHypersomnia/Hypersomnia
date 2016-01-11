@@ -28,7 +28,7 @@ public:
 
 	int ray_casts_per_frame = 0;
 
-	bool enable_motors = false;
+	bool enable_motors = true;
 	void enable_listener(bool flag);
 
 	b2World b2world;

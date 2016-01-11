@@ -7,7 +7,6 @@
 #include "../components/sprite_component.h"
 #include "../components/camera_component.h"
 #include "texture_baker/texture_baker.h"
-#include <iostream>
 
 void crosshair_system::generate_crosshair_intents() {
 	parent_world.get_message_queue<messages::crosshair_intent_message>().clear();
@@ -53,17 +52,27 @@ void crosshair_system::generate_crosshair_intents() {
 			if (it.intent != messages::intent_message::intent_type::MOVE_CROSSHAIR 
 				|| crosshair_intent.crosshair_base_offset_rel.non_zero()) {
 				parent_world.post_message(crosshair_intent);
-				//std::cout << "posting " << it.state.mouse.rel.x << " "<< it.state.mouse.rel.y;
 			}
 		}
 	}
 }
 
-void crosshair_system::reapply_crosshair_intents() {
+void crosshair_system::apply_crosshair_intents_to_crosshair_transforms() {
 	auto& events = parent_world.get_message_queue<messages::crosshair_intent_message>();
 
 	for (auto& it : events)
 		it.subject->get<components::crosshair>().base_offset = it.crosshair_base_offset;
+
+
+	for (auto it : targets) {
+		auto& crosshair = it->get<components::crosshair>();
+	
+		auto player_id = crosshair.parent_camera->get<components::camera>().player;
+
+		if (player_id.alive()) {
+			it->get<components::transform>().pos = crosshair.base_offset + player_id->get<components::transform>().pos;
+		}
+	}
 }
 
 void crosshair_system::animate_crosshair_sizes() {

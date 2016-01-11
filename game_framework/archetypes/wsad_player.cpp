@@ -24,7 +24,7 @@ namespace archetypes {
 
 		info.filter = filters::controlled_character();
 		info.density = 0.1;
-		info.fixed_rotation = true;
+		info.fixed_rotation = false;
 		info.angular_damping = 5;
 		info.angled_damping = true;
 
@@ -97,6 +97,7 @@ namespace archetypes {
 
 		lookat.target = crosshair_entity;
 		lookat.look_mode = components::lookat::look_type::POSITION;
+		lookat.use_physical_motor = true;
 
 		e->add(transform);
 		e->add(input);

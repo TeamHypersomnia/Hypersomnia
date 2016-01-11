@@ -6,6 +6,9 @@ namespace augs {
 	class renderer;
 
 	class overworld {
+		timer frame_timer;
+		double frame_time;
+
 	public:
 		struct deterministic_timer {
 			overworld* overworld;
@@ -23,11 +26,15 @@ namespace augs {
 
 		std::vector<std::pair<unsigned long long, double>> timestep_alterations_at_steps;
 
+
 		delta_accumulator accumulator;
 
 		unsigned long long current_step_number = 0;
 
 		overworld();
+
+		void update_frame_timer();
+		double get_frame_time();
 
 		void configure_stepping(float fps, int max_updates_per_step);
 

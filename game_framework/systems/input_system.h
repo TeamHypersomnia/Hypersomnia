@@ -82,7 +82,7 @@ struct input_system : public processing_system_templated<components::input> {
 		void pass_last_unpacked_logic_events_for_rendering_time_approximation() {
 			if (player.is_replaying()) {
 				parent_world.get_message_queue<event_type>() = inputs_from_last_step.events;
-				// we do it only once
+				// we do it only once per step
 				inputs_from_last_step.events.clear();
 			}
 		}

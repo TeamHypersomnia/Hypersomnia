@@ -2,8 +2,17 @@
 #include "dirent.h"
 #include <cassert>
 #include <fstream>
+#include <direct.h>
 
 namespace augs {
+	void create_directory(std::wstring filename) {
+		_wmkdir(filename.c_str());
+	}
+
+	void create_directory(std::string filename) {
+		_mkdir(filename.c_str());
+	}
+
 	bool file_exists(std::wstring filename) {
 		std::ifstream infile(filename);
 		return infile.good();
