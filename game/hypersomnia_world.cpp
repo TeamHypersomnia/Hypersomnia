@@ -35,6 +35,8 @@ void hypersomnia_world::register_messages_components_systems() {
 	register_component<sprite>();
 	register_component<polygon>();
 	register_component<tile_layer>();
+	register_component<car>();
+	register_component<driver>();
 
 	register_system<input_system>();
 	register_system<steering_system>();
@@ -54,6 +56,8 @@ void hypersomnia_world::register_messages_components_systems() {
 	register_system<damage_system>();
 	register_system<destroy_system>();
 	register_system<behaviour_tree_system>();
+	register_system<car_system>();
+	register_system<driver_system>();
 
 	register_message_queue<intent_message>();
 	register_message_queue<damage_message>();
@@ -111,6 +115,13 @@ void hypersomnia_world::perform_logic_step() {
 	get_system<crosshair_system>().apply_crosshair_intents_to_crosshair_transforms();
 
 	get_system<camera_system>().react_to_input_intents();
+
+	get_system<driver_system>().process_vehicle_ownership();
+	get_system<driver_system>().issue_commands_to_steered_vehicles();
+
+	get_system<car_system>().react_to_drivers_intents();
+	get_system<car_system>().apply_movement_forces();
+
 	get_system<movement_system>().set_movement_flags_from_input();
 
 	get_system<movement_system>().apply_movement_forces();
