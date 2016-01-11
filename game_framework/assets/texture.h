@@ -10,6 +10,8 @@ namespace assets {
 	enum texture_id {
 		BLANK,
 
+		CRATE,
+
 		TEST_CROSSHAIR,
 		TEST_PLAYER,
 

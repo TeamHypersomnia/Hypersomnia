@@ -72,7 +72,7 @@ void animation_system::handle_animation_messages() {
 				}
 				break;
 			case animation_message::STOP:
-				animation.paused_state = components::animation::playing_state::INCREASING;
+				animation.paused_state = components::animation::playing_state::PAUSED;
 				animation.state = components::animation::playing_state::PAUSED;
 				animation.set_frame_num(0, it.subject, false);
 				animation.player_position_ms = 0.f;
@@ -84,6 +84,9 @@ void animation_system::handle_animation_messages() {
 				break;
 			case animation_message::CONTINUE:
 				if (animation.state == components::animation::playing_state::PAUSED) {
+					if (animation.paused_state == components::animation::playing_state::PAUSED)
+						animation.paused_state = components::animation::playing_state::INCREASING;
+
 					animation.state = animation.paused_state;
 				}
 				break;

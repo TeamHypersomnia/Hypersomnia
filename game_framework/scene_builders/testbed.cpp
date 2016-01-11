@@ -31,6 +31,7 @@ namespace scene_builders {
 		resource_manager.create(assets::texture_id::TEST_PLAYER, L"hypersomnia/data/gfx/walk_1.png");
 		resource_manager.create(assets::texture_id::BLANK, L"hypersomnia/data/gfx/blank.png");
 		resource_manager.create(assets::texture_id::TEST_BACKGROUND, L"hypersomnia/data/maps/snow_textures/snow3.png");
+		resource_manager.create(assets::texture_id::CRATE, L"hypersomnia/data/gfx/crate.png");
 		
 		resource_manager.create_sprites_indexed(
 			assets::texture_id::TORSO_MOVING_FIRST,
@@ -55,6 +56,8 @@ namespace scene_builders {
 		auto camera = world.create_entity();
 		auto crosshair = world.create_entity();
 		auto player = world.create_entity();
+		auto crate = world.create_entity();
+		auto crate2 = world.create_entity();
 
 		archetypes::camera(camera, window_rect.w, window_rect.h);
 		archetypes::sprite(background, vec2(0, 0), assets::texture_id::TEST_BACKGROUND);
@@ -63,6 +66,12 @@ namespace scene_builders {
 		archetypes::wsad_player(player, crosshair, camera);
 
 		archetypes::wsad_player_physics(player);
+
+		archetypes::sprite_scalled(crate, vec2(100, 0), vec2i(100, 100), assets::texture_id::CRATE);
+		archetypes::crate_physics(crate);
+
+		archetypes::sprite_scalled(crate2, vec2(200, 0), vec2i(100, 100), assets::texture_id::CRATE);
+		archetypes::crate_physics(crate2);
 
 		input_system::context active_context;
 		active_context.map_event_to_intent(window::event::raw_mousemotion, messages::intent_message::MOVE_CROSSHAIR);

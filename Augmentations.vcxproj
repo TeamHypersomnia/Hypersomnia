@@ -368,6 +368,7 @@
     <ClCompile Include="depthbase\gui\text\text_rect.cpp" />
     <ClCompile Include="depthbase\gui\text\ui.cpp" />
     <ClCompile Include="depthbase\gui\text\word_separator.cpp" />
+    <ClCompile Include="game_framework\archetypes\box_physics.cpp" />
     <ClCompile Include="game_framework\archetypes\sprite.cpp" />
     <ClCompile Include="game_framework\archetypes\camera.cpp" />
     <ClCompile Include="game_framework\archetypes\wsad_player.cpp" />
