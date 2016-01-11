@@ -70,6 +70,7 @@ void hypersomnia_overworld::simulate() {
 
 		game_window.clear();
 
+		update_frame_timer();
 		game_world.draw();
 		current_scene_builder->draw(game_world);
 

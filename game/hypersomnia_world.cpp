@@ -81,13 +81,13 @@ void hypersomnia_world::draw() {
 	// supposed to be read-only
 	get_system<crosshair_system>().generate_crosshair_intents();
 
-	get_system<input_system>().replay_rendering_time_events_passed_to_last_logic_step();
+	// the need for this disappears once the virtue of rendering-time systems is reading, and reading only. (also posting entropic messages
+	// that the logic systems deterministically get ahold of)
+	// get_system<input_system>().replay_rendering_time_events_passed_to_last_logic_step();
 
 	/* application of messages */
 	get_system<animation_system>().handle_animation_messages();
 	get_system<animation_system>().progress_animation_states();
-
-	get_system<crosshair_system>().reapply_crosshair_intents();
 
 	get_system<crosshair_system>().animate_crosshair_sizes();
 	get_system<movement_system>().animate_movement();
@@ -108,10 +108,13 @@ void hypersomnia_world::perform_logic_step() {
 
 	get_system<render_system>().set_current_transforms_as_previous_for_interpolation();
 
+	get_system<crosshair_system>().apply_crosshair_intents_to_crosshair_transforms();
+
 	get_system<camera_system>().react_to_input_intents();
 	get_system<movement_system>().set_movement_flags_from_input();
 
 	get_system<movement_system>().apply_movement_forces();
+	get_system<lookat_system>().update_physical_motors();
 	get_system<physics_system>().step_and_set_new_transforms();
 
 	get_system<destroy_system>().delete_queued_entities();
