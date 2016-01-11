@@ -9,39 +9,45 @@
 
 void destroy_system::delete_queued_entities() {
 	auto events = parent_world.get_message_queue<messages::destroy_message>();
-	std::vector <std::pair<entity_id, entity_id>> to_destroy;
+	std::vector <entity_id> entities_to_destroy;
 
-	std::function < void (entity_id subject, entity_id redirection) > push_destroyed;
+	std::function < void (entity_id) > push_destroyed;
 
-	push_destroyed = [&to_destroy, &push_destroyed](entity_id subject, entity_id redirection){
-		to_destroy.push_back(std::make_pair(subject, redirection));
+	push_destroyed = [&entities_to_destroy, &push_destroyed](entity_id subject){
+		entities_to_destroy.push_back(subject);
 		auto children = subject->find<components::children>();
 		
-		if (children != nullptr)
-			for (auto child : children->children_entities)
-				if (child.alive()) push_destroyed(child, redirection);
+		if (children != nullptr) {
+			for (auto child : children->sub_entities)
+				push_destroyed(child);
+
+			for (auto child : children->sub_entities_by_name)
+				push_destroyed(child.second);
+		}
 	};
 
 	for (auto it : events) {
 		if (it.only_children) {
 			auto children = it.subject->find<components::children>();
-			if (children) {
-				for (auto child : children->children_entities) 
-					push_destroyed(child, it.redirection);
+			
+			if (children != nullptr) {
+				for (auto child : children->sub_entities)
+					push_destroyed(child);
+
+				for (auto child : children->sub_entities_by_name)
+					push_destroyed(child.second);
 			}
 		}
 		else {
-			push_destroyed(it.subject, it.redirection);
+			push_destroyed(it.subject);
 		}
 	}
 
-	/* we remove duplicate to-be-destroyed entities */
-	std::sort(to_destroy.begin(), to_destroy.end());
-	to_destroy.resize(std::distance(to_destroy.begin(), std::unique(to_destroy.begin(), to_destroy.end())));
-
 	parent_world.get_message_queue<messages::destroy_message>().clear();
 
-	for (size_t i = 0; i < to_destroy.size(); ++i) {
-		parent_world.delete_entity(to_destroy[i].first);// , to_destroy[i].second);
+	// destroy in reverse order; children first
+	for (int i = entities_to_destroy.size()-1; i >= 0; --i) {
+		if(entities_to_destroy[i].alive())
+			parent_world.delete_entity(entities_to_destroy[i]);
 	}
 }

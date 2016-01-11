@@ -32,7 +32,9 @@ namespace scene_builders {
 		resource_manager.create(assets::texture_id::BLANK, L"hypersomnia/data/gfx/blank.png");
 		resource_manager.create(assets::texture_id::TEST_BACKGROUND, L"hypersomnia/data/maps/snow_textures/snow3.png");
 		resource_manager.create(assets::texture_id::CRATE, L"hypersomnia/data/gfx/crate.png");
-		
+		resource_manager.create(assets::texture_id::CAR_INSIDE, L"hypersomnia/data/gfx/crate2.png");
+		resource_manager.create(assets::texture_id::CAR_FRONT, L"hypersomnia/data/gfx/crate2.png");
+
 		resource_manager.create_sprites_indexed(
 			assets::texture_id::TORSO_MOVING_FIRST,
 			assets::texture_id::TORSO_MOVING_LAST,
@@ -58,6 +60,8 @@ namespace scene_builders {
 		auto player = world.create_entity();
 		auto crate = world.create_entity();
 		auto crate2 = world.create_entity();
+
+		auto car = prefabs::create_car(world, vec2(-200, 0));
 
 		archetypes::camera(camera, window_rect.w, window_rect.h);
 		archetypes::sprite(background, vec2(0, 0), assets::texture_id::TEST_BACKGROUND);

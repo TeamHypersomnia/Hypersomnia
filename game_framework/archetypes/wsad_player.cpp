@@ -59,7 +59,7 @@ namespace archetypes {
 		input.add(messages::intent_message::CROSSHAIR_PRIMARY_ACTION);
 		input.add(messages::intent_message::CROSSHAIR_SECONDARY_ACTION);
 
-		render.layer = 0;
+		render.layer = components::render::render_layer::CROSSHAIR;
 		render.interpolate = false;
 
 		crosshair.sensitivity.set(3, 3);
@@ -93,7 +93,7 @@ namespace archetypes {
 		input.add(messages::intent_message::MOVE_LEFT);
 		input.add(messages::intent_message::MOVE_RIGHT);
 
-		render.layer = 1;
+		render.layer = components::render::render_layer::CHARACTER;
 
 		lookat.target = crosshair_entity;
 		lookat.look_mode = components::lookat::look_type::POSITION;

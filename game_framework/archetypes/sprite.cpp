@@ -7,7 +7,7 @@ namespace archetypes {
 		components::render render;
 		components::transform transform;
 
-		render.layer = 2;
+		render.layer = components::render::render_layer::GROUND;
 		transform.pos = pos;
 		sprite.set(id, col);
 

@@ -6,6 +6,8 @@
 #include "image.h"
 #include "lodepng.h"
 
+#include <cassert>
+
 namespace augs {
 	using namespace Gdiplus;
 
@@ -28,9 +30,6 @@ namespace augs {
 	}
 
 	bool image::from_file(const std::wstring& filename, unsigned force_channels) {
-		std::string errstr("Coudn't load ");
-		errstr += std::string(filename.begin(), filename.end());
-
 		channels = 4;
 
 		std::string lodepngfname(filename.begin(), filename.end());
@@ -39,6 +38,7 @@ namespace augs {
 		unsigned height;
 
 		if (lodepng::decode(v, width, height, lodepngfname)) {
+			assert(0);
 			return false;
 		}
 

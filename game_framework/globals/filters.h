@@ -13,7 +13,7 @@ namespace filters {
 		DYNAMIC_OBJECT = 1 << 6,
 	};
 
-
+	b2Filter none();
 	b2Filter controlled_character();
 	b2Filter dynamic_object();
 	b2Filter static_object();

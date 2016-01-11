@@ -11,6 +11,8 @@ namespace assets {
 		BLANK,
 
 		CRATE,
+		CAR_INSIDE,
+		CAR_FRONT,
 
 		TEST_CROSSHAIR,
 		TEST_PLAYER,

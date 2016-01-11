@@ -22,3 +22,5 @@
 #include "components/sprite_component.h"
 #include "components/polygon_component.h"
 #include "components/tile_layer_component.h"
+#include "components/car_component.h"
+#include "components/driver_component.h"

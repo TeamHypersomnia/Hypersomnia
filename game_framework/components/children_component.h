@@ -1,15 +1,27 @@
 #pragma once
-#include <vector>
+#include <unordered_map>
 #include "entity_system/component.h"
 #include "entity_system/entity.h"
 
 namespace components {
 	/* synchronizes death of multiple entities */
 	struct children : public augs::component {
-		std::vector<augs::entity_id> children_entities;
+		enum sub_entity_name {
+			CAR_WHEEL,
+			CAR_DOOR,
+			CAR_FRONT,
+			CAR_INSIDE,
+		};
+		
+		std::unordered_map<sub_entity_name, augs::entity_id> sub_entities_by_name;
+		std::vector<augs::entity_id> sub_entities;
 
-		void add(const augs::entity_id& p) {
-			children_entities.push_back(p);
+		void add_sub_entity(augs::entity_id p) {
+			sub_entities.push_back(p);
+		}
+
+		void map_sub_entity(augs::entity_id p, sub_entity_name name) {
+			sub_entities_by_name[name] = p;
 		}
 	};
 }

@@ -20,10 +20,22 @@ namespace components {
 
 		enum mask_type {
 			WORLD,
-			GUI
 		};
 
-		unsigned layer = 0;
+		enum render_layer {
+			CROSSHAIR,
+			GUI,
+			HAT,
+			CHARACTER,
+			HELD_ITEM,
+			DYNAMIC_BODY,
+			DROPPED_ITEM,
+			CAR_INTERIOR,
+			GROUND,
+			BOTTOM,
+		};
+
+		render_layer layer = render_layer::BOTTOM;
 		unsigned mask = mask_type::WORLD;
 
 		bool flip_horizontally = false;

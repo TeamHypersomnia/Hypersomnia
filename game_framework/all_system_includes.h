@@ -17,3 +17,5 @@
 #include "systems/particle_group_system.h"
 #include "systems/particle_emitter_system.h"
 #include "systems/behaviour_tree_system.h"
+#include "systems/car_system.h"
+#include "systems/driver_system.h"
