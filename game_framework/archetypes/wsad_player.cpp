@@ -12,10 +12,14 @@
 #include "game_framework/components/animation_component.h"
 #include "game_framework/components/animation_response_component.h"
 #include "game_framework/components/physics_component.h"
+#include "game_framework/components/children_component.h"
+#include "game_framework/components/trigger_detector_component.h"
+#include "game_framework/components/driver_component.h"
 
 #include "game_framework/game/body_helper.h"
 
 #include "game_framework/globals/filters.h"
+#include "game_framework/globals/input_profiles.h"
 
 namespace archetypes {
 	void wsad_player_physics(augs::entity_id e) {
@@ -27,6 +31,7 @@ namespace archetypes {
 		info.fixed_rotation = false;
 		info.angular_damping = 5;
 		info.angled_damping = true;
+		info.air_resistance = 0.6;
 
 		helpers::create_physics_component(info, e, b2_dynamicBody);
 
@@ -35,7 +40,6 @@ namespace archetypes {
 		movement.input_acceleration.set(5000, 5000);
 		movement.max_accel_len = 5000;
 		movement.max_speed_animation = 1000;
-		movement.air_resistance = 0.6;
 		movement.braking_damping = 18;
 	}
 
@@ -50,14 +54,9 @@ namespace archetypes {
 		components::sprite sprite;
 		components::render render;
 		components::transform transform;
-		components::input input;
 		components::crosshair crosshair;
 
 		sprite.set(assets::texture_id::TEST_CROSSHAIR, pixel_32(255, 0, 0, 255));
-
-		input.add(messages::intent_message::MOVE_CROSSHAIR);
-		input.add(messages::intent_message::CROSSHAIR_PRIMARY_ACTION);
-		input.add(messages::intent_message::CROSSHAIR_SECONDARY_ACTION);
 
 		render.layer = components::render::render_layer::CROSSHAIR;
 		render.interpolate = false;
@@ -67,7 +66,7 @@ namespace archetypes {
 		e->add(render);
 		e->add(sprite);
 		e->add(transform);
-		e->add(input);
+		e->add(input_profiles::crosshair());
 		e->add(crosshair);
 	}
 
@@ -77,9 +76,13 @@ namespace archetypes {
 		components::animation animation;
 		components::animation_response animation_response;
 		components::transform transform;
-		components::input input;
 		components::movement movement;
 		components::lookat lookat;
+		components::children children;
+		components::trigger_detector detector;
+		components::driver driver;
+
+		children.map_sub_entity(crosshair_entity, components::children::CHARACTER_CROSSHAIR);
 
 		animation_response.response = assets::animation_response_id::TORSO_SET;
 
@@ -88,11 +91,6 @@ namespace archetypes {
 
 		sprite.set(assets::texture_id::TEST_PLAYER, pixel_32(255, 255, 255, 255));
 
-		input.add(messages::intent_message::MOVE_BACKWARD);
-		input.add(messages::intent_message::MOVE_FORWARD);
-		input.add(messages::intent_message::MOVE_LEFT);
-		input.add(messages::intent_message::MOVE_RIGHT);
-
 		render.layer = components::render::render_layer::CHARACTER;
 
 		lookat.target = crosshair_entity;
@@ -100,13 +98,15 @@ namespace archetypes {
 		lookat.use_physical_motor = true;
 
 		e->add(transform);
-		e->add(input);
+		e->add(input_profiles::character());
 		e->add(render);
 		e->add(animation);
 		e->add(animation_response);
 		e->add(sprite);
 		e->add(movement);
 		e->add(lookat);
+		e->add(detector);
+		e->add(driver);
 		
 		components::camera::configure_camera_player_crosshair(camera_entity, e, crosshair_entity);
 	}

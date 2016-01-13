@@ -1029,6 +1029,12 @@
     <ClCompile Include="game_framework\archetypes\car.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game_framework\globals\input_profiles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\systems\trigger_detector_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -2822,9 +2828,6 @@
     <ClInclude Include="game_framework\globals\filters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\globals\render_layers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="utilities\print.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2838,6 +2841,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\systems\driver_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\components\trigger_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\globals\input_profiles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\components\trigger_detector_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\systems\trigger_detector_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\messages\trigger_hit_confirmation_message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\messages\trigger_hit_request_message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\messages\car_ownership_change_message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -7,10 +7,8 @@ namespace components {
 	/* synchronizes death of multiple entities */
 	struct children : public augs::component {
 		enum sub_entity_name {
-			CAR_WHEEL,
-			CAR_DOOR,
-			CAR_FRONT,
-			CAR_INSIDE,
+			CHARACTER_CROSSHAIR,
+			CHARACTER_LEGS
 		};
 		
 		std::unordered_map<sub_entity_name, augs::entity_id> sub_entities_by_name;

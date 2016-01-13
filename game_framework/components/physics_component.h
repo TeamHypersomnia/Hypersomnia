@@ -16,7 +16,13 @@ namespace components {
 		float target_angle = 0.f;
 		float angle_motor_force_multiplier = 1.f;
 
+		/* a physically realistic alternative to max_speed variable, the bigger the value is, the lesser the maximum speed */
+		float air_resistance = 0.f;
+
 		vec2 velocity();
 		void set_velocity(vec2);
+		void set_linear_damping_vec(vec2);
+		void apply_force(vec2);
+		float get_mass();
 	};
 }

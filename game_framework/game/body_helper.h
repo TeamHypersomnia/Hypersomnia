@@ -30,7 +30,8 @@ namespace helpers {
 			linear_damping = 0.f, 
 			radius = 0.f, 
 			max_speed = -1.f, 
-			gravity_scale = 0.f;
+			gravity_scale = 0.f,
+			air_resistance = 0.f;
 
 		bool fixed_rotation = false, sensor = false, bullet = false, angled_damping = false;
 
@@ -44,6 +45,8 @@ namespace helpers {
 	extern void create_physics_component(const physics_info&, augs::entity_id subject, int = b2_dynamicBody);
 	extern std::vector<b2Vec2> get_transformed_shape_verts(augs::entity_id subject, bool meters = true);
 	
+	void create_weld_joint(augs::entity_id chased, augs::entity_id chaser, vec2 orbit_offset);
+
 	//template <typename T, typename TDef>
 	//T* create_joint(world* owner, TDef* joint_def) {
 	//	return static_cast<T*>(owner->get_system<physics_system>().b2world.CreateJoint(joint_def));

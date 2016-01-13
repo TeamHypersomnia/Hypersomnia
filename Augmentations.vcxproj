@@ -398,6 +398,7 @@
     <ClCompile Include="game_framework\game\sound_effects.cpp" />
     <ClCompile Include="game_framework\game_framework.cpp" />
     <ClCompile Include="game_framework\globals\filters.cpp" />
+    <ClCompile Include="game_framework\globals\input_profiles.cpp" />
     <ClCompile Include="game_framework\resources\animation.cpp" />
     <ClCompile Include="game_framework\resources\manager.cpp" />
     <ClCompile Include="game_framework\scene_builders\scene_builder.cpp" />
@@ -422,6 +423,7 @@
     <ClCompile Include="game_framework\systems\physics_system.cpp" />
     <ClCompile Include="game_framework\systems\render_system.cpp" />
     <ClCompile Include="game_framework\systems\steering_system.cpp" />
+    <ClCompile Include="game_framework\systems\trigger_detector_system.cpp" />
     <ClCompile Include="game_framework\systems\visibility_system.cpp" />
     <ClCompile Include="game_framework\whole_engine_binding.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
@@ -968,6 +970,8 @@
     <ClInclude Include="game_framework\components\steering_component.h" />
     <ClInclude Include="game_framework\components\tile_layer_component.h" />
     <ClInclude Include="game_framework\components\transform_component.h" />
+    <ClInclude Include="game_framework\components\trigger_component.h" />
+    <ClInclude Include="game_framework\components\trigger_detector_component.h" />
     <ClInclude Include="game_framework\components\visibility_component.h" />
     <ClInclude Include="game_framework\assets\animation.h" />
     <ClInclude Include="game_framework\assets\texture.h" />
@@ -975,7 +979,7 @@
     <ClInclude Include="game_framework\game\sound_effects.h" />
     <ClInclude Include="game_framework\game_framework.h" />
     <ClInclude Include="game_framework\globals\filters.h" />
-    <ClInclude Include="game_framework\globals\render_layers.h" />
+    <ClInclude Include="game_framework\globals\input_profiles.h" />
     <ClInclude Include="game_framework\messages\animation_message.h" />
     <ClInclude Include="game_framework\components\animation_response_component.h" />
     <ClInclude Include="game_framework\messages\animation_response_message.h" />
@@ -988,7 +992,10 @@
     <ClInclude Include="game_framework\messages\particle_burst_message.h" />
     <ClInclude Include="game_framework\messages\raw_window_input_message.h" />
     <ClInclude Include="game_framework\messages\shot_message.h" />
+    <ClInclude Include="game_framework\messages\trigger_hit_confirmation_message.h" />
+    <ClInclude Include="game_framework\messages\trigger_hit_request_message.h" />
     <ClInclude Include="game_framework\messages\unmapped_intent_message.h" />
+    <ClInclude Include="game_framework\messages\car_ownership_change_message.h" />
     <ClInclude Include="game_framework\resources\animation.h" />
     <ClInclude Include="game_framework\resources\animation_response.h" />
     <ClInclude Include="game_framework\resources\manager.h" />
@@ -1017,6 +1024,7 @@
     <ClInclude Include="game_framework\systems\physics_system.h" />
     <ClInclude Include="game_framework\systems\render_system.h" />
     <ClInclude Include="game_framework\systems\steering_system.h" />
+    <ClInclude Include="game_framework\systems\trigger_detector_system.h" />
     <ClInclude Include="game_framework\systems\visibility_system.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="utilities\augmentations.h" />

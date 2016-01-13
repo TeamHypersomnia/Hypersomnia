@@ -19,3 +19,5 @@
 #include "systems/behaviour_tree_system.h"
 #include "systems/car_system.h"
 #include "systems/driver_system.h"
+#include "systems/trigger_detector_system.h"
+

@@ -27,11 +27,11 @@ void input_system::clear() {
 
 
 void input_system::context::map_key_to_intent(window::event::keys::key id, messages::intent_message::intent_type intent) {
-	key_to_intent[id] = intent;
+	key_to_intent[id].push_back(intent);
 }
 
 void input_system::context::map_event_to_intent(window::event::message id, messages::intent_message::intent_type intent) {
-	event_to_intent[id] = intent;
+	event_to_intent[id].push_back(intent);
 }
 
 void input_system::add_context(context c) {
@@ -62,40 +62,45 @@ void input_system::post_intents_from_inputs(const std::vector<messages::raw_wind
 			for (auto it : active_contexts) {
 				if (!it.enabled) continue;
 
-				messages::unmapped_intent_message intent;
-				intent.state = state;
+				messages::unmapped_intent_message unmapped_intent;
+				unmapped_intent.state = state;
+
+				std::vector<messages::intent_message::intent_type> intents;
 
 				bool found_context_entry = false;
 
 				if (state.key_event == event::NONE) {
-					intent.pressed_flag = true;
+					unmapped_intent.pressed_flag = true;
 
 					auto found_intent = it.event_to_intent.find(state.msg);
 					if (found_intent != it.event_to_intent.end()) {
-						intent.intent = (*found_intent).second;
+						intents = (*found_intent).second;
 						found_context_entry = true;
 					}
 				}
 				else if (state.key_event == event::PRESSED || state.key_event == event::RELEASED) {
-					intent.pressed_flag = state.key_event == event::PRESSED;
+					unmapped_intent.pressed_flag = state.key_event == event::PRESSED;
 
 					auto found_intent = it.key_to_intent.find(state.key);
 					if (found_intent != it.key_to_intent.end()) {
-						intent.intent = (*found_intent).second;
+						intents = (*found_intent).second;
 						found_context_entry = true;
 					}
 				}
 
 				if (found_context_entry) {
-					parent_world.post_message(intent);
+					for (auto& in : intents) {
+						unmapped_intent.intent = in;
+						parent_world.post_message(unmapped_intent);
 
-					messages::intent_message mapped_intent;
-					mapped_intent.unmapped_intent_message::operator=(intent);
+						messages::intent_message entity_mapped_intent;
+						entity_mapped_intent.unmapped_intent_message::operator=(unmapped_intent);
 
-					for (auto it = targets.begin(); it != targets.end(); ++it) {
-						if ((*it)->get<components::input>().intents.find(intent.intent)) {
-							mapped_intent.subject = *it;
-							parent_world.post_message(mapped_intent);
+						for (auto it = targets.begin(); it != targets.end(); ++it) {
+							if ((*it)->get<components::input>().intents.find(unmapped_intent.intent)) {
+								entity_mapped_intent.subject = *it;
+								parent_world.post_message(entity_mapped_intent);
+							}
 						}
 					}
 

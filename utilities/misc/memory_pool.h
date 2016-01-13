@@ -73,6 +73,8 @@ namespace augs {
 
 			bool alive() const;
 			bool dead() const;
+
+			void unset();
 		};
 
 		template <typename T>
@@ -97,6 +99,8 @@ namespace augs {
 
 			bool alive() const { return id::alive(); }
 			bool dead() const { return id::dead(); }
+
+			using id::unset;
 		};
 
 		memory_pool(int slot_count = 0, int slot_size = 0);

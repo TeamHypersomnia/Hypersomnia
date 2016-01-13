@@ -4,10 +4,9 @@
 
 using namespace augs;
 
-
-class destroy_system : public processing_system_templated<components::children> {
+class destroy_system : public event_only_system {
 public:
-	using processing_system_templated::processing_system_templated;
+	using event_only_system::event_only_system;
 
 	void add(entity_id) override {}
 	void remove(entity_id) override {}

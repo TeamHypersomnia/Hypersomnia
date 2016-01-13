@@ -10,3 +10,6 @@
 #include "messages/raw_window_input_message.h"
 #include "messages/unmapped_intent_message.h"
 #include "messages/crosshair_intent_message.h"
+#include "messages/trigger_hit_confirmation_message.h"
+#include "messages/trigger_hit_request_message.h"
+#include "messages/car_ownership_change_message.h"

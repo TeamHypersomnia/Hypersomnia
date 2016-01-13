@@ -8,6 +8,7 @@ class car_system : public augs::processing_system_templated<components::car, com
 public:
 	using processing_system_templated::processing_system_templated;
 
-	void react_to_drivers_intents();
+	void set_steering_flags_from_intents();
+
 	void apply_movement_forces();
 };

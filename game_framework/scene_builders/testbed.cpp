@@ -86,6 +86,8 @@ namespace scene_builders {
 		active_context.map_key_to_intent(window::event::keys::D, messages::intent_message::MOVE_RIGHT);
 		active_context.map_key_to_intent(window::event::keys::LMOUSE, messages::intent_message::CROSSHAIR_PRIMARY_ACTION);
 		active_context.map_key_to_intent(window::event::keys::RMOUSE, messages::intent_message::CROSSHAIR_SECONDARY_ACTION);
+		active_context.map_key_to_intent(window::event::keys::E, messages::intent_message::RELEASE_CAR);
+		active_context.map_key_to_intent(window::event::keys::E, messages::intent_message::PRESS_TRIGGER);
 
 		world.get_system<input_system>().add_context(active_context);
 

@@ -11,6 +11,10 @@ namespace messages {
 	struct unmapped_intent_message {
 		enum intent_type {
 			NONE,
+			
+			PRESS_TRIGGER,
+			RELEASE_CAR,
+
 			MOVE_FORWARD,
 			MOVE_BACKWARD,
 			MOVE_LEFT,

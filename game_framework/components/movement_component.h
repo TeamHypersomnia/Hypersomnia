@@ -17,6 +17,12 @@ namespace components {
 			animation_receivers.push_back(subscribtion(e, stop_at_zero_movement));
 		}
 
+		void reset_movement_flags() {
+			moving_left = moving_right = moving_forward = moving_backward = 0;
+		}
+
+		bool apply_movement_forces = true;
+
 		/* entities whom the animation_message will be sent to, including information about subject entity's movement speed */
 		std::vector<subscribtion> animation_receivers;
 
@@ -38,9 +44,6 @@ namespace components {
 		/* two-dimensional damping value (though you're most likely interested in only X axis) 
 		applied when the character is not moving in the side-scrolling environment */
 		vec2 inverse_thrust_brake;
-
-		/* a physically realistic alternative to max_speed variable, the bigger the value is, the lesser the maximum speed */
-		float air_resistance = 0.f;
 
 		float max_speed = -1.f;
 

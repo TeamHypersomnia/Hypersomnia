@@ -81,20 +81,20 @@ public:
 		std::vector<queried_result> details;
 	};
 
-	query_output query_square(vec2 p1_meters, float side_meters, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
-	query_output query_square_px(vec2 p1, float side, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
-	query_output query_aabb(vec2 p1_meters, vec2 p2_meters, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
-	query_output query_aabb_px(vec2 p1, vec2 p2, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
+	query_output query_square(vec2 p1_meters, float side_meters, b2Filter filter, entity_id ignore_entity = entity_id());
+	query_output query_square_px(vec2 p1, float side, b2Filter filter, entity_id ignore_entity = entity_id());
+	query_output query_aabb(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity = entity_id());
+	query_output query_aabb_px(vec2 p1, vec2 p2, b2Filter filter, entity_id ignore_entity = entity_id());
 
-	query_output query_body(augs::entity_id, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
+	query_output query_body(augs::entity_id, b2Filter filter, entity_id ignore_entity = entity_id());
 
-	query_output query_polygon(const std::vector<vec2>& vertices, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
-	query_output query_shape(b2Shape*, b2Filter* filter = nullptr, entity_id ignore_entity = entity_id());
+	query_output query_polygon(const std::vector<vec2>& vertices, b2Filter filter, entity_id ignore_entity = entity_id());
+	query_output query_shape(b2Shape*, b2Filter filter, entity_id ignore_entity = entity_id());
 private:
 	/* callback structure used in QueryAABB function to get all shapes near-by */
 	struct query_aabb_input : b2QueryCallback {
 		entity_id ignore_entity;
-		b2Filter* filter = nullptr;
+		b2Filter filter;
 		std::set<b2Body*> output;
 		std::vector<b2Fixture*> out_fixtures;
 
@@ -103,7 +103,7 @@ private:
 
 	struct raycast_input : public b2RayCastCallback {
 		entity_id subject;
-		b2Filter* subject_filter = nullptr;
+		b2Filter subject_filter;
 		
 		bool save_all = false;
 		raycast_output output;

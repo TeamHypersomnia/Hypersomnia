@@ -18,7 +18,7 @@ bool physics_system::raycast_input::ShouldRaycast(b2Fixture* fixture) {
 	entity_id fixture_entity = fixture->GetBody()->GetUserData();
 	return
 		(!subject || fixture_entity != subject) &&
-		(b2ContactFilter::ShouldCollide(subject_filter, &fixture->GetFilterData()));
+		(b2ContactFilter::ShouldCollide(&subject_filter, &fixture->GetFilterData()));
 }
 
 float32 physics_system::raycast_input::ReportFixture(b2Fixture* fixture, const b2Vec2& point,
@@ -50,7 +50,7 @@ std::vector<physics_system::raycast_output> physics_system::ray_cast_all_interse
 	++ray_casts_per_frame;
 
 	raycast_input callback;
-	callback.subject_filter = &filter;
+	callback.subject_filter = filter;
 	callback.subject = ignore_entity;
 	callback.save_all = true;
 
@@ -130,7 +130,7 @@ physics_system::raycast_output physics_system::ray_cast(vec2 p1_meters, vec2 p2_
 	++ray_casts_per_frame;
 
 	raycast_input callback;
-	callback.subject_filter = &filter;
+	callback.subject_filter = filter;
 	callback.subject = ignore_entity;
 
 	if (!((p1_meters - p2_meters).length_sq() > 0.f)) {
@@ -152,7 +152,7 @@ physics_system::raycast_output physics_system::ray_cast_px (vec2 p1, vec2 p2, b2
 }
 
 bool physics_system::query_aabb_input::ReportFixture(b2Fixture* fixture) {
-	if ((b2ContactFilter::ShouldCollide(filter, &fixture->GetFilterData()))
+	if ((b2ContactFilter::ShouldCollide(&filter, &fixture->GetFilterData()))
 		&& fixture->GetBody()->GetUserData() != ignore_entity) {
 		output.insert(fixture->GetBody());
 		out_fixtures.push_back(fixture);
@@ -161,18 +161,18 @@ bool physics_system::query_aabb_input::ReportFixture(b2Fixture* fixture) {
 	return true;
 }
 
-physics_system::query_output physics_system::query_square(vec2 p1_meters, float side_meters, b2Filter* filter, entity_id ignore_entity) {
+physics_system::query_output physics_system::query_square(vec2 p1_meters, float side_meters, b2Filter filter, entity_id ignore_entity) {
 	b2AABB aabb;
 	aabb.lowerBound = p1_meters - side_meters / 2;
 	aabb.upperBound = p1_meters + side_meters / 2;
 	return query_aabb(aabb.lowerBound, aabb.upperBound, filter, ignore_entity);
 }
 
-physics_system::query_output physics_system::query_square_px(vec2 p1, float side, b2Filter* filter, entity_id ignore_entity) {
+physics_system::query_output physics_system::query_square_px(vec2 p1, float side, b2Filter filter, entity_id ignore_entity) {
 	return query_square(p1 * PIXELS_TO_METERSf, side * PIXELS_TO_METERSf, filter, ignore_entity);
 }
 
-physics_system::query_output physics_system::query_aabb(vec2 p1_meters, vec2 p2_meters, b2Filter* filter, entity_id ignore_entity) {
+physics_system::query_output physics_system::query_aabb(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity) {
 	query_aabb_input callback;
 	callback.filter = filter;
 	callback.ignore_entity = ignore_entity;
@@ -187,7 +187,7 @@ physics_system::query_output physics_system::query_aabb(vec2 p1_meters, vec2 p2_
 	return out;
 }
 
-physics_system::query_output physics_system::query_body(augs::entity_id subject, b2Filter* filter, entity_id ignore_entity) {
+physics_system::query_output physics_system::query_body(augs::entity_id subject, b2Filter filter, entity_id ignore_entity) {
 	query_output total_output;
 	
 	for (b2Fixture* f = subject->get<components::physics>().body->GetFixtureList(); f != nullptr; f = f->GetNext()) {
@@ -203,7 +203,7 @@ physics_system::query_output physics_system::query_body(augs::entity_id subject,
 	return total_output;
 }
 
-physics_system::query_output physics_system::query_polygon(const std::vector<vec2>& vertices, b2Filter* filter, entity_id ignore_entity) {
+physics_system::query_output physics_system::query_polygon(const std::vector<vec2>& vertices, b2Filter filter, entity_id ignore_entity) {
 	b2PolygonShape poly_shape;
 	std::vector<b2Vec2> verts;
 
@@ -214,7 +214,7 @@ physics_system::query_output physics_system::query_polygon(const std::vector<vec
 	return query_shape(&poly_shape, filter, ignore_entity);
 }
 
-physics_system::query_output physics_system::query_shape(b2Shape* shape, b2Filter* filter, entity_id ignore_entity) {
+physics_system::query_output physics_system::query_shape(b2Shape* shape, b2Filter filter, entity_id ignore_entity) {
 	b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
 	
 	query_aabb_input callback;
@@ -246,7 +246,7 @@ physics_system::query_output physics_system::query_shape(b2Shape* shape, b2Filte
 	return out;
 }
 
-physics_system::query_output physics_system::query_aabb_px(vec2 p1, vec2 p2, b2Filter* filter, entity_id ignore_entity) {
+physics_system::query_output physics_system::query_aabb_px(vec2 p1, vec2 p2, b2Filter filter, entity_id ignore_entity) {
 	return query_aabb(p1 * PIXELS_TO_METERSf, p2 * PIXELS_TO_METERSf, filter, ignore_entity);
 }
 

@@ -224,7 +224,7 @@ void gun_system::process_entities() {
 			b2PolygonShape swing_query;
 			swing_query.Set(query_vertices.data(), query_vertices.size());
 
-			auto hit_bodies = physics_sys.query_shape(&swing_query, &gun.melee_filter, it).bodies;
+			auto hit_bodies = physics_sys.query_shape(&swing_query, gun.melee_filter, it).bodies;
 
 			for (auto hit_body : hit_bodies) {
 				auto target_entity = hit_body->GetUserData();

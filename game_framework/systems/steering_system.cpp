@@ -530,7 +530,7 @@ vec2 steering::wander::steer(scene in) {
 vec2 steering::separation::steer(scene in) {
 	auto& renderer = augs::renderer::get_current();
 
-	auto bodies = in.physics->query_square_px(in.subject.position, square_side, &group, in.subject_entity).bodies;
+	auto bodies = in.physics->query_square_px(in.subject.position, square_side, group, in.subject_entity).bodies;
 
 	/* debug drawing */
 	if (renderer.draw_avoidance_info) {

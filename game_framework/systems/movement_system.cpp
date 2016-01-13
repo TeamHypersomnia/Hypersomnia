@@ -41,6 +41,9 @@ void movement_system::apply_movement_forces() {
 
 	for (auto it : targets) {
 		auto& movement = it->get<components::movement>();
+
+		if (!movement.apply_movement_forces) continue;
+
 		auto* maybe_physics = it->find<components::physics>();
 
 		vec2 resultant;
@@ -114,8 +117,8 @@ void movement_system::apply_movement_forces() {
 
 		float32 speed = vel.Normalize();
 
-		if ((vel.x != 0.f || vel.y != 0.f) && movement.air_resistance > 0.f) 
-			physics.body->ApplyForce(movement.air_resistance * speed * -vel, physics.body->GetWorldCenter(), true);
+		if ((vel.x != 0.f || vel.y != 0.f) && physics.air_resistance > 0.f) 
+			physics.body->ApplyForce(physics.air_resistance * speed * -vel, physics.body->GetWorldCenter(), true);
 	}
 }
 

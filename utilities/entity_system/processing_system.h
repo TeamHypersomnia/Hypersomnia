@@ -54,9 +54,10 @@ namespace augs {
 		}
 	};
 
-	template<typename... needed_components>
-	class event_only_system_templated : public processing_system_templated<needed_components...> {
+	class event_only_system : public processing_system {
 	public:
+		using processing_system::processing_system;
+
 		virtual void add(entity_id) {
 
 		}

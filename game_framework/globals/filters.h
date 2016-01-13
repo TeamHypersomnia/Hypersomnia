@@ -11,10 +11,13 @@ namespace filters {
 		BULLET			= 1 << 4,
 		REMOTE_BULLET = 1 << 5,
 		DYNAMIC_OBJECT = 1 << 6,
+		TRIGGER = 1 << 7,
 	};
 
 	b2Filter none();
 	b2Filter controlled_character();
 	b2Filter dynamic_object();
 	b2Filter static_object();
+
+	b2Filter trigger();
 }

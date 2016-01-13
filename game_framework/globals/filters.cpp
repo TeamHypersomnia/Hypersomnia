@@ -1,6 +1,6 @@
 #include "filters.h"
 
-auto all = std::numeric_limits<decltype(b2Filter::categoryBits)>::max();;
+auto all = std::numeric_limits<decltype(b2Filter::categoryBits)>::max() & (~filters::TRIGGER);
 
 namespace filters {
 	b2Filter none() {
@@ -28,6 +28,13 @@ namespace filters {
 		b2Filter out;
 		out.categoryBits = all;
 		out.maskBits = all;
+		return out;
+	}
+
+	b2Filter trigger() {
+		b2Filter out;
+		out.categoryBits = all | TRIGGER;
+		out.maskBits = TRIGGER;
 		return out;
 	}
 }

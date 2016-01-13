@@ -47,6 +47,8 @@ namespace augs {
 	bool memory_pool::id::alive() const { return owner && owner->alive(*this); }
 	bool memory_pool::id::dead() const { return !alive(); }
 
+	void memory_pool::id::unset() { owner.unset(); }
+
 	void memory_pool::initialize(int slot_count, int slot_size) {
 		this->slot_size = slot_size;
 

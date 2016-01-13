@@ -86,6 +86,19 @@ namespace helpers {
 		//	convex_polys.push_back(std::vector <vec2> (convex.begin(), convex.end()));
 	}
 
+	void create_weld_joint(augs::entity_id a, augs::entity_id b, vec2 orbit_offset) {
+		physics_system& physics = a->owner_world.get_system<physics_system>();
+
+		b2WeldJointDef def;
+		def.bodyA = a->get<components::physics>().body;
+		def.bodyB = b->get<components::physics>().body;
+		def.collideConnected = false;
+		def.localAnchorB = orbit_offset*PIXELS_TO_METERSf;
+		def.localAnchorB.y *= -1;
+
+		physics.b2world.CreateJoint(&def);
+	}
+
 	void create_physics_component(const physics_info& body_data, augs::entity_id subject, int body_type) {
 		physics_system& physics = subject->owner_world.get_system<physics_system>();
 
@@ -119,6 +132,7 @@ namespace helpers {
 		b2Body* body = physics.b2world.CreateBody(&def);
 		
 		components::physics physics_component;
+		physics_component.air_resistance = body_data.air_resistance;
 		physics_component.body = body;
 
 		if (body_data.type == physics_info::RECT) {

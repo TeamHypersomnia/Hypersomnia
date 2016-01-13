@@ -158,7 +158,7 @@ void pathfinding_system::process_entities() {
 							//render.non_cleared_lines.push_back(renderer(sensor_polygon[2], sensor_polygon[3], pixel_32(255, 255, 255, 255)));
 							//render.non_cleared_lines.push_back(renderer(sensor_polygon[3], sensor_polygon[0], pixel_32(255, 255, 255, 255)));
 
-							auto out = physics.query_polygon(sensor_polygon, &vision.filter, it);
+							auto out = physics.query_polygon(sensor_polygon, vision.filter, it);
 
 							if (out.bodies.empty()) {
 								vert.sensor = physics.push_away_from_walls(vert.sensor, pathfinding.target_offset, 50, vision.filter, it);
