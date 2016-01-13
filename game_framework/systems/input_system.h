@@ -71,6 +71,11 @@ struct input_system : public processing_system_templated<components::input> {
 		events_per_step inputs_from_last_rendering_time;
 
 		void acquire_events_from_rendering_time() {
+			if (player.is_replaying()) {
+				parent_world.get_message_queue<event_type>().clear();
+				return;
+			}
+
 			inputs_from_last_rendering_time.events = parent_world.get_message_queue<event_type>();
 
 			for (auto& m : inputs_from_last_rendering_time.events)
