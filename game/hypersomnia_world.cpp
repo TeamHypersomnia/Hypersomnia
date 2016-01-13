@@ -37,6 +37,8 @@ void hypersomnia_world::register_messages_components_systems() {
 	register_component<tile_layer>();
 	register_component<car>();
 	register_component<driver>();
+	register_component<trigger>();
+	register_component<trigger_detector>();
 
 	register_system<input_system>();
 	register_system<steering_system>();
@@ -58,6 +60,7 @@ void hypersomnia_world::register_messages_components_systems() {
 	register_system<behaviour_tree_system>();
 	register_system<car_system>();
 	register_system<driver_system>();
+	register_system<trigger_detector_system>();
 
 	register_message_queue<intent_message>();
 	register_message_queue<damage_message>();
@@ -70,6 +73,9 @@ void hypersomnia_world::register_messages_components_systems() {
 	register_message_queue<raw_window_input_message>();
 	register_message_queue<unmapped_intent_message>();
 	register_message_queue<crosshair_intent_message>();
+	register_message_queue<trigger_hit_confirmation_message>();
+	register_message_queue<trigger_hit_request_message>();
+	register_message_queue<car_ownership_change_message>();
 }
 
 void hypersomnia_world::draw() {
@@ -110,23 +116,33 @@ void hypersomnia_world::perform_logic_step() {
 	get_system<input_system>().post_input_intents_for_logic_step();
 	get_system<input_system>().post_rendering_time_events_for_logic_step();
 
+	/* intent delegation stage (various ownership relations) */
+
+	get_system<driver_system>().delegate_movement_intents_from_drivers_to_steering_intents_of_owned_vehicles();
+
+	/* end of intent delegation stage */
+
 	get_system<render_system>().set_current_transforms_as_previous_for_interpolation();
-
 	get_system<crosshair_system>().apply_crosshair_intents_to_crosshair_transforms();
-
 	get_system<camera_system>().react_to_input_intents();
+	get_system<trigger_detector_system>().find_trigger_collisions_and_send_confirmations();
 
-	get_system<driver_system>().process_vehicle_ownership();
-	get_system<driver_system>().issue_commands_to_steered_vehicles();
+	get_system<driver_system>().assign_drivers_from_triggers();
 
-	get_system<car_system>().react_to_drivers_intents();
+	get_system<driver_system>().release_drivers_due_to_requests();
+	get_system<driver_system>().release_drivers_due_to_distance();
+	
+	get_system<driver_system>().affect_drivers_due_to_car_ownership_changes();
+
+	get_system<car_system>().set_steering_flags_from_intents();
 	get_system<car_system>().apply_movement_forces();
 
 	get_system<movement_system>().set_movement_flags_from_input();
-
 	get_system<movement_system>().apply_movement_forces();
+
 	get_system<lookat_system>().update_physical_motors();
 	get_system<physics_system>().step_and_set_new_transforms();
+	get_system<chase_system>().update_transforms();
 
 	get_system<destroy_system>().delete_queued_entities();
 }
