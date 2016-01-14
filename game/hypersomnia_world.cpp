@@ -39,7 +39,8 @@ void hypersomnia_world::register_messages_components_systems() {
 	register_component<driver>();
 	register_component<trigger>();
 	register_component<trigger_detector>();
-
+	register_component<fixtures>();
+	
 	register_system<input_system>();
 	register_system<steering_system>();
 	register_system<movement_system>();
@@ -144,5 +145,6 @@ void hypersomnia_world::perform_logic_step() {
 	get_system<physics_system>().step_and_set_new_transforms();
 	get_system<chase_system>().update_transforms();
 
+	get_system<physics_system>().destroy_fixtures_and_bodies();
 	get_system<destroy_system>().delete_queued_entities();
 }

@@ -28,6 +28,7 @@ void hypersomnia_overworld::set_scene_builder(std::unique_ptr<scene_builder> bui
 
 void hypersomnia_overworld::initialize_scene() {
 	current_scene_builder->initialize(game_world);
+	clear_window_inputs_once = true;
 }
 
 void hypersomnia_overworld::call_window_script(std::string filename) {
@@ -54,6 +55,11 @@ void hypersomnia_overworld::simulate() {
 
 	while (!quit_flag) {
 		auto raw_inputs = game_window.poll_events();
+
+		if (clear_window_inputs_once) {
+			raw_inputs.clear();
+			clear_window_inputs_once = false;
+		}
 
 		for (auto& raw_input : raw_inputs) {
 			if (raw_input.key_event == window::event::PRESSED &&

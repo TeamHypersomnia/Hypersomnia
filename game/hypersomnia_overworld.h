@@ -16,6 +16,7 @@ public:
 
 	window::glwindow game_window;
 
+	bool clear_window_inputs_once = true;
 
 	hypersomnia_world game_world;
 	augs::lua_state_wrapper lua;
