@@ -465,6 +465,7 @@
     <ClCompile Include="utilities\misc\vector_wrapper.cpp" />
     <ClCompile Include="utilities\network\network_interface.cpp" />
     <ClCompile Include="utilities\network\reliable_channel.cpp" />
+    <ClCompile Include="utilities\print.cpp" />
     <ClCompile Include="utilities\script.cpp" />
     <ClCompile Include="utilities\texture_baker\font.cpp" />
     <ClCompile Include="utilities\texture_baker\image.cpp" />
@@ -956,6 +957,7 @@
     <ClInclude Include="game_framework\components\crosshair_component.h" />
     <ClInclude Include="game_framework\components\damage_component.h" />
     <ClInclude Include="game_framework\components\driver_component.h" />
+    <ClInclude Include="game_framework\components\friction_ground_component.h" />
     <ClInclude Include="game_framework\components\gun_component.h" />
     <ClInclude Include="game_framework\components\input_component.h" />
     <ClInclude Include="game_framework\components\lookat_component.h" />
@@ -980,6 +982,7 @@
     <ClInclude Include="game_framework\game_framework.h" />
     <ClInclude Include="game_framework\globals\filters.h" />
     <ClInclude Include="game_framework\globals\input_profiles.h" />
+    <ClInclude Include="game_framework\globals\joints.h" />
     <ClInclude Include="game_framework\messages\animation_message.h" />
     <ClInclude Include="game_framework\components\animation_response_component.h" />
     <ClInclude Include="game_framework\messages\animation_response_message.h" />

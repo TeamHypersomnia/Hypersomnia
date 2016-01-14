@@ -48,16 +48,8 @@ void movement_system::apply_movement_forces() {
 
 		vec2 resultant;
 
-		if (movement.requested_movement.non_zero()) {
-			/* rotate to our frame of reference */
-			//resultant.x = sgn(vec2(movement.requested_movement).rotate(-movement.axis_rotation_degrees, vec2()).x) * movement.input_acceleration.x;
-			resultant.x = vec2(movement.requested_movement).rotate(-movement.axis_rotation_degrees, vec2()).x;
-			clamp(resultant.x, -movement.input_acceleration.x, movement.input_acceleration.x);
-		}
-		else {
-			resultant.x = movement.moving_right * movement.input_acceleration.x - movement.moving_left * movement.input_acceleration.x;
-			resultant.y = movement.moving_backward * movement.input_acceleration.y - movement.moving_forward * movement.input_acceleration.y;
-		}
+		resultant.x = movement.moving_right * movement.input_acceleration_axes.x - movement.moving_left * movement.input_acceleration_axes.x;
+		resultant.y = movement.moving_backward * movement.input_acceleration_axes.y - movement.moving_forward * movement.input_acceleration_axes.y;
 
 		if (maybe_physics == nullptr) {
 			it->get<components::transform>().pos += resultant * per_second();
@@ -66,59 +58,20 @@ void movement_system::apply_movement_forces() {
 
 		auto& physics = *maybe_physics;
 
-		b2Vec2 vel = physics.body->GetLinearVelocity();
-
-		float ground_angle = 0.f;
-		bool was_ground_hit = false;
-
-		if (movement.sidescroller_setup) {
-			if (movement.thrust_parallel_to_ground_length > 0.f) {
-				auto out = physics_sys.ray_cast(
-					physics.body->GetPosition(),
-					physics.body->GetPosition() + vec2::from_degrees(movement.axis_rotation_degrees + 90) * movement.thrust_parallel_to_ground_length * PIXELS_TO_METERSf,
-					movement.ground_filter, it);
-
-				was_ground_hit = out.hit;
-				if (was_ground_hit)
-					ground_angle = out.normal.degrees() + 90;
-			}
-
-			if (std::abs(resultant.x) < b2_epsilon && vel.LengthSquared() > 0) {
-				physics.body->SetLinearDampingVec(movement.inverse_thrust_brake * PIXELS_TO_METERSf);
-				physics.body->SetLinearDampingAngle(was_ground_hit ? ground_angle : movement.axis_rotation_degrees);
-			}
-			else {
-				physics.body->SetLinearDampingVec(b2Vec2(0, 0));
-			}
-		}
-		else {
-			physics.body->SetLinearDampingVec(b2Vec2(0, 0));
-			physics.body->SetLinearDampingAngle(0.f);
-		}
-		
 		if (resultant.non_zero()) {
-			resultant.rotate(was_ground_hit ? ground_angle : movement.axis_rotation_degrees, vec2());
+			if (movement.acceleration_length > 0)
+				resultant.set_length(movement.acceleration_length);
 
-			auto len = resultant.length();
-
-			if (movement.max_accel_len > 0 && len > movement.max_accel_len) {
-				resultant.set_length(movement.max_accel_len);
-			}
-
-			physics.body->ApplyForce(resultant * PIXELS_TO_METERSf * physics.body->GetMass(), physics.body->GetWorldCenter() + (movement.force_offset * PIXELS_TO_METERSf), true);
+			physics.apply_force(resultant * physics.body->GetMass(), movement.applied_force_offset, true);
 		}
 
-		if (movement.braking_damping >= 0.f) {
-			physics.body->SetLinearDampingVec(b2Vec2(
+		/* the player feels less like a physical projectile if we brake per-axis */
+		if (movement.enable_braking_damping)
+			physics.set_linear_damping_vec(vec2(
 				resultant.x_non_zero() ? 0.f : movement.braking_damping,
 				resultant.y_non_zero() ? 0.f : movement.braking_damping));
-		}
-
-
-		float32 speed = vel.Normalize();
-
-		if ((vel.x != 0.f || vel.y != 0.f) && physics.air_resistance > 0.f) 
-			physics.body->ApplyForce(physics.air_resistance * speed * -vel, physics.body->GetWorldCenter(), true);
+		else
+			physics.set_linear_damping_vec(vec2(0,0));
 	}
 }
 

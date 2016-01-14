@@ -3,7 +3,7 @@
 #include <utility>
 #include <type_traits>
 
-void typesafe_formatting(size_t, std::string&) {}
+void typesafe_formatting(size_t, std::string&);
 
 template<typename T, typename... A>
 void typesafe_formatting(size_t starting_pos, std::string& target_str, T&& val, A&& ...a) {

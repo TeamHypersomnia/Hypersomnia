@@ -18,11 +18,13 @@ class physics_system : public augs::processing_system_templated<components::phys
 		void EndContact(b2Contact* contact) override;
 		void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override;
 		void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) override;
-
+		
+		std::vector<std::function<void()>> after_step_callbacks;
 		augs::world* world_ptr;
 	};
 
 	contact_listener listener;
+
 public:
 	using processing_system_templated::processing_system_templated;
 

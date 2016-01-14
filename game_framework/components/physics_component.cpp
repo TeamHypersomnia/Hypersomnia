@@ -6,13 +6,22 @@ namespace components {
 		body->SetLinearVelocity(pixels * PIXELS_TO_METERSf);
 	}	
 	
+	void physics::set_linear_damping(float damping) {
+		body->SetLinearDamping(damping);
+	}
+
 	void physics::set_linear_damping_vec(vec2 pixels) {
-		body->SetLinearDampingVec(pixels * PIXELS_TO_METERSf);
+		body->SetLinearDampingVec(pixels);
 	}
 
 	void physics::apply_force(vec2 pixels) {
-		body->ApplyForce(pixels * PIXELS_TO_METERSf, body->GetWorldCenter(), true);
+		apply_force(pixels, vec2(0,0), true);
 	}
+	
+	void physics::apply_force(vec2 pixels, vec2 center_offset, bool wake) {
+		body->ApplyForce(pixels * PIXELS_TO_METERSf, body->GetWorldCenter() + (center_offset * PIXELS_TO_METERSf), wake);
+	}
+
 
 	float physics::get_mass() {
 		return body->GetMass();

@@ -23,49 +23,18 @@ namespace components {
 
 		bool apply_movement_forces = true;
 
-		/* entities whom the animation_message will be sent to, including information about subject entity's movement speed */
 		std::vector<subscribtion> animation_receivers;
-
-		/* levers controlled by intent messages to induce movement */
 		int moving_left = 0, moving_right = 0, moving_forward = 0, moving_backward = 0;
 		
-		/* default acceleration vector used for movement requested by input */
-		vec2 input_acceleration;
-	
-		/* used to truncate acceleration vector if for example both up and right buttons are pressed */
-		float max_accel_len = -1.f;
+		vec2 input_acceleration_axes;
+		float acceleration_length = -1.f;
 
-		/* if this is non-zero, the movement vector will be mapped to XY axis based on this vector and not on the inputs */
-		vec2 requested_movement;
-			
-		/* force is applied to the body's center by default, you can offset this position by changing this value */
-		vec2 force_offset;
-		
-		/* two-dimensional damping value (though you're most likely interested in only X axis) 
-		applied when the character is not moving in the side-scrolling environment */
-		vec2 inverse_thrust_brake;
+		vec2 applied_force_offset;
 
-		float max_speed = -1.f;
-
-		/* used for all environments; apply general damping value when no movement is requested */
-		float braking_damping = -1.f;
+		float braking_damping = 0.f;
+		bool enable_braking_damping = false;
 
 		/* speed at which the receivers' animation speed multiplier reaches 1.0 */
 		float max_speed_animation = 1.f;
-
-		/* angular offset for all forces
-		used only for side-scrolling environments */
-		float axis_rotation_degrees = 0.f;
-
-		bool sidescroller_setup = false;
-
-		/* if this is non-zero, a ray of length of this variable is cast under the player to determine the ground angle and rotate the movement forces
-		to be applied for slopes accordingly
-		used only for side-scrolling environments
-		*/
-		float thrust_parallel_to_ground_length = 0.f;
-
-		/* filter for the aforementioned ray cast */
-		b2Filter ground_filter;
 	};
 }

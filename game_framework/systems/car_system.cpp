@@ -52,15 +52,11 @@ void car_system::apply_movement_forces() {
 		}
 
 		if (car.braking_damping >= 0.f) {
-			physics.set_linear_damping_vec(vec2(
-				resultant.x_non_zero() ? 0.f : car.braking_damping,
-				resultant.y_non_zero() ? 0.f : car.braking_damping));
+			//physics.set_linear_damping_vec(vec2(
+			//	resultant.x_non_zero() ? 0.f : car.braking_damping,
+			//	resultant.y_non_zero() ? 0.f : car.braking_damping));
+
+			physics.set_linear_damping(resultant.non_zero() ? 0.f : car.braking_damping);
 		}
-
-		float speed = vel.length();
-		vel.normalize_hint(speed);
-
-		if ((vel.x != 0.f || vel.y != 0.f) && physics.air_resistance > 0.f)
-			physics.apply_force(-vel * physics.air_resistance * speed);
 	}
 }

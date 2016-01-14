@@ -64,21 +64,6 @@ void trigger_detector_system::find_trigger_collisions_and_send_confirmations() {
 			parent_world.post_message(confirmation);
 			break;
 		}
-
-		//auto found_triggers = parent_world.get_system<physics_system>().query_body(e.detector, filters::trigger());
-		//
-		//for (auto& t : found_triggers.bodies) {
-		//	auto found_trigger = t->GetUserData();
-		//	auto* maybe_trigger = found_trigger->find<components::trigger>();
-		//
-		//	if (maybe_trigger) {
-		//		messages::trigger_hit_confirmation_message confirmation;
-		//		confirmation.trigger = found_trigger;
-		//		confirmation.detector = e.detector;
-		//		parent_world.post_message(confirmation);
-		//		break;
-		//	}
-		//}
 	}
 
 	requests.clear();

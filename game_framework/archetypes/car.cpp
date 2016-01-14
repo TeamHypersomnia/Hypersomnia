@@ -57,13 +57,14 @@ namespace prefabs {
 
 			info.filter = filters::dynamic_object();
 			info.density = 0.6f;
-			info.angular_damping = 5;
-			info.angled_damping = true;
-			info.linear_damping = 10;
-			info.sensor = false;
-			info.air_resistance = 0.6;
+			//info.angular_damping = 1;
+			//info.angled_damping = true;
+			//info.linear_damping = 10;
 
-			helpers::create_physics_component(info, front, b2_dynamicBody);
+			auto& physics = helpers::create_physics_component(info, front, b2_dynamicBody);
+			physics.angular_air_resistance = 3;
+			physics.angular_air_resistance = 8;
+			//physics.air_resistance = 0.1;
 		}
 
 
@@ -72,23 +73,35 @@ namespace prefabs {
 			components::sprite sprite;
 			components::render render;
 			components::transform transform;
-			components::chase chase;
-			
+			transform.pos = pos;
+
 			render.layer = components::render::render_layer::CAR_INTERIOR;
 
 			sprite.set(assets::texture_id::CAR_INSIDE, augs::pixel_32(122, 0, 122, 255));
 			sprite.size.x = 150;
-			sprite.size.y = 70;
-
-			chase.set_target(front);
-			chase.chase_type = chase.ORBIT;
-			chase.chase_rotation = true;
-			chase.rotation_orbit_offset.set(0, front->get<components::sprite>().size.y / 2 + sprite.size.y / 2);
+			sprite.size.y = 250;
 
 			interior->add(sprite);
 			interior->add(render);
 			interior->add(transform);
-			interior->add(chase);
+
+			helpers::physics_info info;
+			info.from_renderable(interior);
+			info.density = 0.6f;
+			//info.angular_damping = 1;
+			//info.angled_damping = true;
+			//info.linear_damping = 10;
+			
+			info.sensor = true;
+
+			info.filter = filters::dynamic_object();
+			auto& physics = helpers::create_physics_component(info, interior, b2_dynamicBody);
+			physics.is_friction_ground = true;
+			physics.angular_air_resistance = 3;
+			physics.angular_air_resistance = 8;
+
+			vec2 offset(0, front->get<components::sprite>().size.y / 2 + sprite.size.y / 2);
+			helpers::create_weld_joint(front, interior, offset);
 		}
 
 
@@ -97,6 +110,7 @@ namespace prefabs {
 			components::render render;
 			components::transform transform;
 			components::trigger trigger;
+			transform.pos = pos;
 			trigger.entity_to_be_notified = front;
 
 			render.layer = components::render::render_layer::CAR_INTERIOR;
@@ -112,11 +126,14 @@ namespace prefabs {
 
 			helpers::physics_info info;
 			info.from_renderable(left_wheel);
-			info.density = 0.000001f;
+			info.density = 0.6f;
 			info.filter = filters::trigger();
-			helpers::create_physics_component(info, left_wheel, b2_dynamicBody);
+			info.sensor = true;
+			
+			auto& physics = helpers::create_physics_component(info, left_wheel, b2_dynamicBody);
+			physics.angular_air_resistance = 8;
 
-			vec2 offset(0, left_wheel->get<components::sprite>().size.y / 2 + sprite.size.y / 2);
+			vec2 offset(0, front->get<components::sprite>().size.y / 2 + sprite.size.y / 2);
 			helpers::create_weld_joint(front, left_wheel, offset);
 		}
 

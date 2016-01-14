@@ -17,12 +17,18 @@ namespace components {
 		float angle_motor_force_multiplier = 1.f;
 
 		/* a physically realistic alternative to max_speed variable, the bigger the value is, the lesser the maximum speed */
-		float air_resistance = 0.f;
+		float air_resistance = 1.6f;
+		// -1.f - the same as the air resistance
+		float angular_air_resistance = 1.6;
+
+		bool is_friction_ground = false;
 
 		vec2 velocity();
 		void set_velocity(vec2);
+		void set_linear_damping(float);
 		void set_linear_damping_vec(vec2);
 		void apply_force(vec2);
+		void apply_force(vec2, vec2 center_offset, bool wake = true);
 		float get_mass();
 	};
 }

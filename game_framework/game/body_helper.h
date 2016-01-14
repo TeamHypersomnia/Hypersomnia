@@ -2,6 +2,7 @@
 #include <string>
 #include "../systems/physics_system.h"
 #include "entity_system/entity_id.h"
+#include "../globals/joints.h"
 
 namespace components {
 	struct polygon;
@@ -29,9 +30,7 @@ namespace helpers {
 			angular_damping = 0.f, 
 			linear_damping = 0.f, 
 			radius = 0.f, 
-			max_speed = -1.f, 
-			gravity_scale = 0.f,
-			air_resistance = 0.f;
+			gravity_scale = 0.f;
 
 		bool fixed_rotation = false, sensor = false, bullet = false, angled_damping = false;
 
@@ -42,10 +41,13 @@ namespace helpers {
 	};
 
 	//extern void create_physics_component(augs::entity_id subject, b2Filter filter, int = b2_dynamicBody);
-	extern void create_physics_component(const physics_info&, augs::entity_id subject, int = b2_dynamicBody);
+	extern components::physics& create_physics_component(const physics_info&, augs::entity_id subject, int = b2_dynamicBody);
 	extern std::vector<b2Vec2> get_transformed_shape_verts(augs::entity_id subject, bool meters = true);
 	
-	void create_weld_joint(augs::entity_id chased, augs::entity_id chaser, vec2 orbit_offset);
+	void create_weld_joint(augs::entity_id chased, augs::entity_id chaser, vec2 orbit_offset, joint_name name = joint_name::JOINT);
+	void create_friction_joint(augs::entity_id inside_object, augs::entity_id friction_field, joint_name name = joint_name::JOINT);
+	void remove_joints(augs::entity_id, joint_name);
+	bool joint_exists(augs::entity_id, joint_name);
 
 	//template <typename T, typename TDef>
 	//T* create_joint(world* owner, TDef* joint_def) {

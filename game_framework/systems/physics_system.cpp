@@ -9,6 +9,7 @@ float PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 
 #include "../messages/collision_message.h"
 #include "../game/body_helper.h"
+#include "utilities/print.h"
 
 #include <iostream>
 
@@ -250,6 +251,8 @@ physics_system::query_output physics_system::query_aabb_px(vec2 p1, vec2 p2, b2F
 	return query_aabb(p1 * PIXELS_TO_METERSf, p2 * PIXELS_TO_METERSf, filter, ignore_entity);
 }
 
+#include "game_framework/components/movement_component.h"
+
 void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 	auto fix_a = contact->GetFixtureA();
 	auto fix_b = contact->GetFixtureB();
@@ -257,14 +260,35 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 	/* collision messaging happens only for sensors here
 		PreSolve is the counterpart for regular bodies
 	*/
+
+	auto body_a = fix_a->GetBody();
+	auto body_b = fix_b->GetBody();
+
+	messages::collision_message msg;
+
+	msg.subject = static_cast<entity_id>(body_a->GetUserData());
+	msg.collider = static_cast<entity_id>(body_b->GetUserData());
+
+	auto& subject_physics = msg.subject->get<components::physics>();
+	auto& collider_physics = msg.subject->get<components::physics>();
+
+	auto* maybe_movement = msg.collider.get().find<components::movement>();
+
+	if (maybe_movement) {
+		maybe_movement->enable_braking_damping = false;
+	}
+
+	if (subject_physics.is_friction_ground) {
+		after_step_callbacks.push_back(
+			[msg](){
+
+				helpers::create_friction_joint(msg.collider, msg.subject, joint_name::FRICTION_GROUND_JOINT);
+			}
+			);
+		tcout("BeginContact with friction ground");
+	}
+
 	if (fix_a->IsSensor() || fix_b->IsSensor()) {
-		auto body_a = fix_a->GetBody();
-		auto body_b = fix_b->GetBody();
-
-		messages::collision_message msg;
-
-		msg.subject = static_cast<entity_id>(body_a->GetUserData());
-		msg.collider = static_cast<entity_id>(body_b->GetUserData());
 
 		if (fix_a->IsSensor()) {
 			msg.subject_impact_velocity = (body_a->GetLinearVelocity());
@@ -286,14 +310,34 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 	auto fix_a = contact->GetFixtureA();
 	auto fix_b = contact->GetFixtureB();
 
+	auto body_a = fix_a->GetBody();
+	auto body_b = fix_b->GetBody();
+
+	messages::collision_message msg;
+
+	msg.subject = static_cast<entity_id>(body_a->GetUserData());
+	msg.collider = static_cast<entity_id>(body_b->GetUserData());
+
+	auto& subject_physics = msg.subject->get<components::physics>();
+	auto& collider_physics = msg.subject->get<components::physics>();
+
+	auto* maybe_movement = msg.collider->find<components::movement>();
+
+	if (maybe_movement) {
+		maybe_movement->enable_braking_damping = true;
+	}
+
+	if (subject_physics.is_friction_ground) {
+		after_step_callbacks.push_back(
+			[msg]() {				
+			helpers::remove_joints(msg.collider, joint_name::FRICTION_GROUND_JOINT);
+		}
+		);
+
+		tcout("EndContact with friction ground");
+	}
+
 	if (fix_a->IsSensor() || fix_b->IsSensor()) {
-		auto body_a = fix_a->GetBody();
-		auto body_b = fix_b->GetBody();
-
-		messages::collision_message msg;
-
-		msg.subject = static_cast<entity_id>(body_a->GetUserData());
-		msg.collider = static_cast<entity_id>(body_b->GetUserData());
 
 		msg.sensor_end_contact = true;
 		
@@ -361,28 +405,44 @@ void physics_system::step_and_set_new_transforms() {
 	int32 velocityIterations = 8;
 	int32 positionIterations = 3;
 
-	if (enable_motors) {
-		for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
-			if (b->GetType() == b2_staticBody) continue;
-			auto& physics = static_cast<entity_id>(b->GetUserData())->get<components::physics>();
+	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
+		if (b->GetType() == b2_staticBody) continue;
 
-			if (physics.enable_angle_motor) {
-				float nextAngle = static_cast<float>(b->GetAngle() + b->GetAngularVelocity() / parent_overworld.accumulator.get_hz());
-				float totalRotation = (constrainAngle(physics.target_angle) * 0.01745329251994329576923690768489f) - nextAngle;
-				while (totalRotation < -180 * 0.01745329251994329576923690768489f) totalRotation += 360 * 0.01745329251994329576923690768489f;
-				while (totalRotation >  180 * 0.01745329251994329576923690768489f) totalRotation -= 360 * 0.01745329251994329576923690768489f;
-				float desiredAngularVelocity = totalRotation * static_cast<float>(parent_overworld.accumulator.get_hz());
-				float impulse = b->GetInertia() * desiredAngularVelocity;// disregard time factor
-				b->ApplyAngularImpulse(impulse*physics.angle_motor_force_multiplier, true);
-			}
+		auto& physics = static_cast<entity_id>(b->GetUserData())->get<components::physics>();
+
+		b2Vec2 vel(b->GetLinearVelocity());
+		float32 speed = vel.Normalize();
+		float32 angular_speed = b->GetAngularVelocity();
+
+		if ((vel.x != 0.f || vel.y != 0.f) && physics.air_resistance > 0.f)
+			physics.body->ApplyForce(physics.get_mass() * physics.air_resistance * speed * -vel, physics.body->GetWorldCenter(), true);
+
+		auto angular_resistance = physics.angular_air_resistance;
+		if (angular_resistance < 0.f) angular_resistance = physics.air_resistance;
+
+		if (angular_resistance > 0.f) {
+			physics.body->ApplyTorque(angular_resistance * -angular_speed * b->GetInertia(), true);
+		}
+
+		if (physics.enable_angle_motor) {
+			float nextAngle = static_cast<float>(b->GetAngle() + b->GetAngularVelocity() / parent_overworld.accumulator.get_hz());
+			float totalRotation = (constrainAngle(physics.target_angle) * 0.01745329251994329576923690768489f) - nextAngle;
+			while (totalRotation < -180 * 0.01745329251994329576923690768489f) totalRotation += 360 * 0.01745329251994329576923690768489f;
+			while (totalRotation >  180 * 0.01745329251994329576923690768489f) totalRotation -= 360 * 0.01745329251994329576923690768489f;
+			float desiredAngularVelocity = totalRotation * static_cast<float>(parent_overworld.accumulator.get_hz());
+			float impulse = b->GetInertia() * desiredAngularVelocity;// disregard time factor
+			b->ApplyAngularImpulse(impulse*physics.angle_motor_force_multiplier, true);
 		}
 	}
 
+	listener.after_step_callbacks.clear();
+	
 	b2world.Step(static_cast<float32>(per_second()), velocityIterations, positionIterations);
 	b2world.ClearForces();
-
-	b2world.ClearForces();
 	
+	for (auto& c : listener.after_step_callbacks)
+		c();
+
 	reset_states();
 }
 

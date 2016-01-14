@@ -86,7 +86,7 @@ namespace helpers {
 		//	convex_polys.push_back(std::vector <vec2> (convex.begin(), convex.end()));
 	}
 
-	void create_weld_joint(augs::entity_id a, augs::entity_id b, vec2 orbit_offset) {
+	void create_weld_joint(augs::entity_id a, augs::entity_id b, vec2 orbit_offset, joint_name name) {
 		physics_system& physics = a->owner_world.get_system<physics_system>();
 
 		b2WeldJointDef def;
@@ -95,11 +95,53 @@ namespace helpers {
 		def.collideConnected = false;
 		def.localAnchorB = orbit_offset*PIXELS_TO_METERSf;
 		def.localAnchorB.y *= -1;
+		def.userData = name;
 
 		physics.b2world.CreateJoint(&def);
 	}
 
-	void create_physics_component(const physics_info& body_data, augs::entity_id subject, int body_type) {
+	void create_friction_joint(augs::entity_id inside_object, augs::entity_id friction_field, joint_name name) {
+		physics_system& physics = inside_object->owner_world.get_system<physics_system>();
+
+		b2FrictionJointDef def;
+		def.bodyA = inside_object->get<components::physics>().body;
+		def.bodyB = friction_field->get<components::physics>().body;
+		def.collideConnected = false;
+		def.userData = name;
+		def.maxForce = 500000.5;
+		def.maxTorque = 10000000;
+
+		//def.localAnchorB = orbit_offset*PIXELS_TO_METERSf;
+		//def.localAnchorB.y *= -1;
+
+		physics.b2world.CreateJoint(&def);
+	}
+
+	void remove_joints(augs::entity_id e, joint_name name) {
+		physics_system& physics = e->owner_world.get_system<physics_system>();
+
+		auto* body = e->get<components::physics>().body;
+		auto* je = e->get<components::physics>().body->GetJointList();
+
+		std::vector<b2Joint*> to_remove;
+
+		while (je) {
+			if (je->joint->GetUserData() == name) {
+				to_remove.push_back(je->joint);
+			}
+			je = je->next;
+		}
+
+		for (auto j : to_remove)
+			physics.b2world.DestroyJoint(j);
+	}
+
+	bool joint_exists(augs::entity_id e, joint_name name) {
+		assert(0);
+		return false;
+	}
+
+	components::physics& create_physics_component(const physics_info& body_data, augs::entity_id subject, int body_type) {
 		physics_system& physics = subject->owner_world.get_system<physics_system>();
 
 		auto& transform = subject->get<components::transform>();
@@ -132,7 +174,6 @@ namespace helpers {
 		b2Body* body = physics.b2world.CreateBody(&def);
 		
 		components::physics physics_component;
-		physics_component.air_resistance = body_data.air_resistance;
 		physics_component.body = body;
 
 		if (body_data.type == physics_info::RECT) {
@@ -173,9 +214,8 @@ namespace helpers {
 		//shape.Set(v, 4);
 
 		body->SetAngledDampingEnabled(body_data.angled_damping);
-		body->SetMaximumLinearVelocity(body_data.max_speed * PIXELS_TO_METERSf);
 
-		subject->add(physics_component);
+		return subject->add(physics_component);
 	}
 
 	std::vector<b2Vec2> get_transformed_shape_verts(augs::entity_id subject, bool meters) {

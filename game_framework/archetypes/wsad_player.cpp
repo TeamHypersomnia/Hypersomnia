@@ -22,25 +22,36 @@
 #include "game_framework/globals/input_profiles.h"
 
 namespace archetypes {
+	void wsad_player_setup_movement(augs::entity_id e) {
+		components::movement& movement = e->get<components::movement>();
+
+		movement.add_animation_receiver(e, false);
+
+		movement.input_acceleration_axes.set(1, 1);
+		movement.acceleration_length = 8000;
+		
+		movement.input_acceleration_axes.set(5000, 5000);
+		movement.acceleration_length = -1;
+
+		movement.max_speed_animation = 1000;
+		movement.braking_damping = 18;
+		movement.enable_braking_damping = true;
+	}
+
 	void wsad_player_physics(augs::entity_id e) {
 		helpers::physics_info info;
 		info.from_renderable(e);
 
 		info.filter = filters::controlled_character();
-		info.density = 0.1;
+		info.density = 0.6;
 		info.fixed_rotation = false;
-		info.angular_damping = 5;
+		//info.angular_damping = 1;
 		info.angled_damping = true;
-		info.air_resistance = 0.6;
 
-		helpers::create_physics_component(info, e, b2_dynamicBody);
+		auto& physics = helpers::create_physics_component(info, e, b2_dynamicBody);
+		physics.air_resistance = 8.6;
 
-		components::movement& movement = e->get<components::movement>();
-
-		movement.input_acceleration.set(5000, 5000);
-		movement.max_accel_len = 5000;
-		movement.max_speed_animation = 1000;
-		movement.braking_damping = 18;
+		wsad_player_setup_movement(e);
 	}
 
 	void wsad_player_legs(augs::entity_id legs, augs::entity_id player) {
@@ -86,9 +97,6 @@ namespace archetypes {
 
 		animation_response.response = assets::animation_response_id::TORSO_SET;
 
-		movement.input_acceleration.set(400, 400);
-		movement.add_animation_receiver(e, false);
-
 		sprite.set(assets::texture_id::TEST_PLAYER, pixel_32(255, 255, 255, 255));
 
 		render.layer = components::render::render_layer::CHARACTER;
@@ -108,6 +116,8 @@ namespace archetypes {
 		e->add(detector);
 		e->add(driver);
 		
+		wsad_player_setup_movement(e);
+
 		components::camera::configure_camera_player_crosshair(camera_entity, e, crosshair_entity);
 	}
 }

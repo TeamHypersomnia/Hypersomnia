@@ -2,12 +2,12 @@
 #include "renderable_includes.h"
 
 namespace archetypes {
-	void sprite(augs::entity_id e, vec2 pos, assets::texture_id id, augs::pixel_32 col) {
+	void sprite(augs::entity_id e, vec2 pos, assets::texture_id id, augs::pixel_32 col, components::render::render_layer layer) {
 		components::sprite sprite;
 		components::render render;
 		components::transform transform;
 
-		render.layer = components::render::render_layer::GROUND;
+		render.layer = layer;
 		transform.pos = pos;
 		sprite.set(id, col);
 
@@ -16,8 +16,8 @@ namespace archetypes {
 		e->add(transform);
 	}
 
-	void sprite_scalled(augs::entity_id e, vec2 pos, vec2i size, assets::texture_id id, augs::pixel_32 col) {
-		sprite(e, pos, id, col);
+	void sprite_scalled(augs::entity_id e, vec2 pos, vec2i size, assets::texture_id id, augs::pixel_32 col, components::render::render_layer layer) {
+		sprite(e, pos, id, col, layer);
 		e->get<components::sprite>().size = size;
 	}
 }

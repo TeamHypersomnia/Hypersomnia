@@ -20,6 +20,6 @@ namespace components {
 		
 		float braking_damping = -1.f;
 
-		vec2 input_acceleration = vec2(1500, 1500);
+		vec2 input_acceleration = vec2(3500, 3500);
 	};
 }
