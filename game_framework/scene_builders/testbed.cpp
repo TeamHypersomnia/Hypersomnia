@@ -63,7 +63,7 @@ namespace scene_builders {
 		auto crate3 = world.create_entity();
 		auto crate4 = world.create_entity();
 
-		auto car = prefabs::create_car(world, vec2(-800, 0));
+		auto car = prefabs::create_car(world, vec2(-300, 0));
 
 		archetypes::camera(camera, window_rect.w, window_rect.h);
 		archetypes::sprite(background, vec2(0, 0), assets::texture_id::TEST_BACKGROUND);
@@ -73,17 +73,17 @@ namespace scene_builders {
 
 		archetypes::wsad_player_physics(player);
 
-		archetypes::sprite_scalled(crate, vec2(100, 0), vec2i(100, 100)/3, assets::texture_id::CRATE, augs::colors::white, components::render::render_layer::DYNAMIC_BODY);
+		archetypes::sprite_scalled(crate, vec2(200, 300), vec2i(100, 100)/3, assets::texture_id::CRATE, augs::colors::white, components::render::render_layer::DYNAMIC_BODY);
 		archetypes::crate_physics(crate);
-
-		archetypes::sprite_scalled(crate2, vec2(200, 0), vec2i(100, 100) / 4, assets::texture_id::CRATE, augs::colors::white, components::render::render_layer::DYNAMIC_BODY);
+		
+		archetypes::sprite_scalled(crate2, vec2(400, 400), vec2i(100, 100), assets::texture_id::CRATE, augs::colors::white, components::render::render_layer::DYNAMIC_BODY);
 		archetypes::crate_physics(crate2);
-
-		archetypes::sprite_scalled(crate4, vec2(400, 0), vec2i(100, 100), assets::texture_id::CRATE, augs::colors::white, components::render::render_layer::DYNAMIC_BODY);
+		
+		archetypes::sprite_scalled(crate4, vec2(500, 0), vec2i(100, 100), assets::texture_id::CRATE, augs::colors::white, components::render::render_layer::DYNAMIC_BODY);
 		archetypes::crate_physics(crate4);
-
+		
 		archetypes::sprite_scalled(crate3, vec2(-500, -3050), vec2i(5000, 30), assets::texture_id::CRATE, augs::colors::white, components::render::render_layer::DYNAMIC_BODY);
-		archetypes::crate_physics(crate3);
+		archetypes::static_crate_physics(crate3);
 
 		input_system::context active_context;
 		active_context.map_event_to_intent(window::event::raw_mousemotion, messages::intent_message::MOVE_CROSSHAIR);

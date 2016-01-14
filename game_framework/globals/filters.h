@@ -12,6 +12,7 @@ namespace filters {
 		REMOTE_BULLET = 1 << 5,
 		DYNAMIC_OBJECT = 1 << 6,
 		TRIGGER = 1 << 7,
+		FRICTION_GROUND = 1 << 8,
 	};
 
 	b2Filter none();

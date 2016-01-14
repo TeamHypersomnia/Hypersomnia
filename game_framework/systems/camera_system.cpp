@@ -167,6 +167,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 					target_value.set_length(20);
 
 				if (target_value.length() < camera.smoothing_player_pos.value.length())
+					// braking
 					camera.smoothing_player_pos.averages_per_sec = 8;
 				else
 					camera.smoothing_player_pos.averages_per_sec = 5;

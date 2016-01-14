@@ -20,12 +20,6 @@ input_system::input_system(world& parent_world) : processing_system_templated(pa
 input_system::context::context() : enabled(true) {
 }
 
-void input_system::clear() {
-	active_contexts.clear();
-	processing_system::clear();
-}
-
-
 void input_system::context::map_key_to_intent(window::event::keys::key id, messages::intent_message::intent_type intent) {
 	key_to_intent[id].push_back(intent);
 }

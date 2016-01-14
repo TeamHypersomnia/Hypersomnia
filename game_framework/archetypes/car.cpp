@@ -38,11 +38,11 @@ namespace prefabs {
 			components::transform transform;
 			components::car car;
 			car.left_wheel_trigger = left_wheel;
-
+			//car.input_acceleration.set(10000, 10000);
 			transform.pos = pos;
 
 			sprite.set(assets::texture_id::CAR_FRONT, augs::pixel_32(0, 255, 255));
-			sprite.size.x = 100;
+			sprite.size.x = 150;
 			sprite.size.y = 50;
 
 			render.layer = components::render::render_layer::DYNAMIC_BODY;
@@ -52,22 +52,24 @@ namespace prefabs {
 			front->add(transform);
 			front->add(car);
 
+			helpers::body_info body;
 			helpers::physics_info info;
 			info.from_renderable(front);
 
 			info.filter = filters::dynamic_object();
 			info.density = 0.6f;
-			//info.angular_damping = 1;
-			//info.angled_damping = true;
-			//info.linear_damping = 10;
 
-			auto& physics = helpers::create_physics_component(info, front, b2_dynamicBody);
-			physics.angular_air_resistance = 3;
-			physics.angular_air_resistance = 8;
+			auto& physics = helpers::create_physics_component(body, front);
+			helpers::add_fixtures(info, front);
+
+			//info.sensor = true;
+			//
+			//info.filter = filters::dynamic_object();
+			//auto& physics = helpers::create_physics_component(info, front, b2_dynamicBody);
+			//physics.is_friction_ground = true;
+
 			//physics.air_resistance = 0.1;
 		}
-
-
 
 		{
 			components::sprite sprite;
@@ -78,8 +80,8 @@ namespace prefabs {
 			render.layer = components::render::render_layer::CAR_INTERIOR;
 
 			sprite.set(assets::texture_id::CAR_INSIDE, augs::pixel_32(122, 0, 122, 255));
-			sprite.size.x = 150;
-			sprite.size.y = 250;
+			sprite.size.x = 250;
+			sprite.size.y = 550;
 
 			interior->add(sprite);
 			interior->add(render);
@@ -88,22 +90,14 @@ namespace prefabs {
 			helpers::physics_info info;
 			info.from_renderable(interior);
 			info.density = 0.6f;
-			//info.angular_damping = 1;
-			//info.angled_damping = true;
-			//info.linear_damping = 10;
-			
 			info.sensor = true;
-
 			info.filter = filters::dynamic_object();
-			auto& physics = helpers::create_physics_component(info, interior, b2_dynamicBody);
-			physics.is_friction_ground = true;
-			physics.angular_air_resistance = 3;
-			physics.angular_air_resistance = 8;
-
 			vec2 offset(0, front->get<components::sprite>().size.y / 2 + sprite.size.y / 2);
-			helpers::create_weld_joint(front, interior, offset);
-		}
+			info.transform_vertices.pos = offset;
 
+			auto& fixtures = helpers::add_fixtures_to_other_body(info, interior, front);
+			fixtures.is_friction_ground = true;
+		}
 
 		{
 			components::sprite sprite;
@@ -129,12 +123,10 @@ namespace prefabs {
 			info.density = 0.6f;
 			info.filter = filters::trigger();
 			info.sensor = true;
-			
-			auto& physics = helpers::create_physics_component(info, left_wheel, b2_dynamicBody);
-			physics.angular_air_resistance = 8;
-
 			vec2 offset(0, front->get<components::sprite>().size.y / 2 + sprite.size.y / 2);
-			helpers::create_weld_joint(front, left_wheel, offset);
+			info.transform_vertices.pos = offset;
+			
+			auto& physics = helpers::add_fixtures_to_other_body(info, left_wheel, front);
 		}
 
 		return front;

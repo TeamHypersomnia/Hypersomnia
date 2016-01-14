@@ -7,31 +7,38 @@
 
 namespace archetypes {
 	void crate_physics(augs::entity_id e) {
+		helpers::body_info body;
+		body.fixed_rotation = false;
+
 		helpers::physics_info info;
 		info.from_renderable(e);
 
 		info.filter = filters::dynamic_object();
 		info.density = 1;
-		info.fixed_rotation = false;
 		//info.angular_damping = 5;
 		//info.linear_damping = 5;
 		//info.angled_damping = false;
 
-		helpers::create_physics_component(info, e, b2_dynamicBody).air_resistance = 1.6;
+		helpers::create_physics_component(body, e);
+		helpers::add_fixtures(info, e);
 	}
 
 	void static_crate_physics(augs::entity_id e) {
+		helpers::body_info body;
+		body.fixed_rotation = false;
+		body.body_type = b2_staticBody;
+
 		helpers::physics_info info;
 		info.from_renderable(e);
 
 		info.filter = filters::dynamic_object();
 		info.density = 1;
-		info.fixed_rotation = false;
 		//info.angular_damping = 5;
 		//info.linear_damping = 5;
 		//info.angled_damping = false;
 
-		helpers::create_physics_component(info, e, b2_staticBody).air_resistance = 1.6;
+		helpers::create_physics_component(body, e);
+		helpers::add_fixtures(info, e);
 	}
 	
 }

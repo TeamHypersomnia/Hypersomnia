@@ -26,5 +26,7 @@
 #include "components/driver_component.h"
 #include "components/trigger_component.h"
 #include "components/trigger_detector_component.h"
+#include "components/fixtures_component.h"
+
 
 

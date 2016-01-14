@@ -36,8 +36,6 @@ struct input_system : public processing_system_templated<components::input> {
 	void add_context(context);
 	void clear_contexts();
 
-	void clear() override;
-
 	std::vector<context> active_contexts;
 
 	input_system::input_system(world& parent_world);

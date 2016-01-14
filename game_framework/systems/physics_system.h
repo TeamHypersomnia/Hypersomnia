@@ -10,7 +10,7 @@
 
 using namespace augs;
 
-class physics_system : public augs::processing_system_templated<components::physics, components::transform> {
+class physics_system : public augs::event_only_system {
 	void reset_states();
 
 	struct contact_listener : public b2ContactListener {
@@ -26,7 +26,7 @@ class physics_system : public augs::processing_system_templated<components::phys
 	contact_listener listener;
 
 public:
-	using processing_system_templated::processing_system_templated;
+	using event_only_system::event_only_system;
 
 	int ray_casts_per_frame = 0;
 
@@ -38,9 +38,8 @@ public:
 
 	void step_and_set_new_transforms();
 
-	void add(entity_id) override;
-	void remove(entity_id) override;
-	void clear() override;
+	void destroy_fixtures_and_bodies();
+	void destroy_whole_world();
 
 	struct raycast_output {
 		vec2 intersection, normal;
@@ -68,25 +67,36 @@ public:
 
 	struct query_output {
 		struct queried_result {
-			b2Body* body;
+			b2Fixture* fixture;
 			b2Vec2 location;
 
-			bool operator<(const queried_result& b) const {
-				return body < b.body;
-			}
-			bool operator==(const queried_result& b) const {
-				return body == b.body;
-			}
+			bool operator<(const queried_result& b) const { return fixture < b.fixture; }
 		};
 
-		std::vector<b2Body*> bodies;
-		std::vector<queried_result> details;
+		std::set<b2Body*> bodies;
+		std::set<augs::entity_id> entities;
+		std::set<queried_result> details;
+
+		query_output& operator+=(const query_output& b) {
+			bodies.insert(b.bodies.begin(), b.bodies.end());
+			entities.insert(b.entities.begin(), b.entities.end());
+			details.insert(b.details.begin(), b.details.end());
+
+			return *this;
+		}
 	};
 
-	query_output query_square(vec2 p1_meters, float side_meters, b2Filter filter, entity_id ignore_entity = entity_id());
-	query_output query_square_px(vec2 p1, float side, b2Filter filter, entity_id ignore_entity = entity_id());
-	query_output query_aabb(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity = entity_id());
-	query_output query_aabb_px(vec2 p1, vec2 p2, b2Filter filter, entity_id ignore_entity = entity_id());
+	struct query_aabb_output {
+		std::set<b2Body*> bodies;
+		std::set<augs::entity_id> entities;
+		std::vector<b2Fixture*> fixtures;
+	};
+
+	query_aabb_output query_square(vec2 p1_meters, float side_meters, b2Filter filter, entity_id ignore_entity = entity_id());
+	query_aabb_output query_square_px(vec2 p1, float side, b2Filter filter, entity_id ignore_entity = entity_id());
+
+	query_aabb_output query_aabb(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity = entity_id());
+	query_aabb_output query_aabb_px(vec2 p1, vec2 p2, b2Filter filter, entity_id ignore_entity = entity_id());
 
 	query_output query_body(augs::entity_id, b2Filter filter, entity_id ignore_entity = entity_id());
 
@@ -97,8 +107,8 @@ private:
 	struct query_aabb_input : b2QueryCallback {
 		entity_id ignore_entity;
 		b2Filter filter;
-		std::set<b2Body*> output;
-		std::vector<b2Fixture*> out_fixtures;
+		
+		query_aabb_output out;
 
 		bool ReportFixture(b2Fixture* fixture) override;
 	};

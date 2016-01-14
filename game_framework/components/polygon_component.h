@@ -8,8 +8,6 @@
 
 namespace augs {
 	class texture;
-
-	typedef std::vector<vec2> basic_polygon;
 }
 
 namespace shared {
@@ -37,7 +35,7 @@ namespace components {
 		/* the "model" is already triangulated so we need to preserve original model vertex data if for example
 		we want to form a physics body from this object
 		*/
-		augs::basic_polygon original_model;
+		std::vector<vec2> original_model;
 
 		std::vector<int> indices;
 

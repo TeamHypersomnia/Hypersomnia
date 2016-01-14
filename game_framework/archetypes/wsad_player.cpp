@@ -30,7 +30,7 @@ namespace archetypes {
 		movement.input_acceleration_axes.set(1, 1);
 		movement.acceleration_length = 8000;
 		
-		movement.input_acceleration_axes.set(5000, 5000);
+		movement.input_acceleration_axes.set(8000, 8000);
 		movement.acceleration_length = -1;
 
 		movement.max_speed_animation = 1000;
@@ -39,17 +39,19 @@ namespace archetypes {
 	}
 
 	void wsad_player_physics(augs::entity_id e) {
+		helpers::body_info body;
 		helpers::physics_info info;
 		info.from_renderable(e);
 
 		info.filter = filters::controlled_character();
-		info.density = 0.6;
-		info.fixed_rotation = false;
-		//info.angular_damping = 1;
-		info.angled_damping = true;
+		info.density = 1.0;
+		body.fixed_rotation = false;
+		body.angled_damping = true;
 
-		auto& physics = helpers::create_physics_component(info, e, b2_dynamicBody);
-		physics.air_resistance = 8.6;
+		auto& physics = helpers::create_physics_component(body, e);
+		helpers::add_fixtures(info, e);
+
+		physics.air_resistance = 10.6;
 
 		wsad_player_setup_movement(e);
 	}

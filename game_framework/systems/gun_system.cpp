@@ -47,25 +47,6 @@ void components::gun::transfer_barrel_smoke(augs::entity_id another, bool overwr
 	}
 }
 
-void gun_system::add(entity_id e) {
-	auto& gun = e->get<components::gun>();
-	gun.get_barrel_smoke() = e->owner_world.create_entity_named("barrel smoke group");
-
-	gun.get_barrel_smoke()->add(components::transform());
-	gun.get_barrel_smoke()->add(components::particle_group()).stream_slots[0].destroy_when_empty = false;
-	gun.get_barrel_smoke()->add(components::chase());
-	gun.get_barrel_smoke()->add(components::render());
-
-	return processing_system::add(e);
-}
-
-void gun_system::remove(entity_id e) {
-	if (e->get<components::gun>().get_barrel_smoke().alive()) 
-		e->owner_world.delete_entity(e->get<components::gun>().get_barrel_smoke());
-
-	return processing_system::remove(e);
-}
-
 void gun_system::consume_events() {
 	auto events = parent_world.get_message_queue<messages::intent_message>();
 
@@ -168,7 +149,8 @@ void gun_system::process_entities() {
 				new_bullet->add(damage);
 				new_bullet->add(gun.bullet_render);
 				new_bullet->name = "bullet";
-				helpers::create_physics_component(gun.bullet_body, new_bullet, b2_dynamicBody);
+				assert(0);
+				//helpers::create_physics_component(gun.bullet_body, new_bullet, b2_dynamicBody);
 
 				/* bullet's physics settings */
 				auto body = new_bullet->get<components::physics>().body;

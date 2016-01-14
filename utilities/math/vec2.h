@@ -78,11 +78,22 @@ namespace augs {
 	template <class type>
 	struct vec2t {
 		type x, y;
-		
+
+		friend std::ostream& operator<< (std::ostream& stream, const vec2t& v) {
+			return stream << v.x << "|" << v.y;
+		}
+
 		template <class t>
 		static vec2t from_degrees(t degrees) {
 			vec2t out;
 			out.set_from_degrees(degrees);
+			return out;
+		}		
+		
+		template <class t>
+			static vec2t from_radians(t radians) {
+			vec2t out;
+			out.set_from_degrees(radians/0.01745329251994329576923690768489f);
 			return out;
 		}
 

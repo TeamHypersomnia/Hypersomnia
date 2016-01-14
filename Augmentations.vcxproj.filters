@@ -1038,6 +1038,9 @@
     <ClCompile Include="utilities\print.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game_framework\components\fixtures_component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -2867,10 +2870,10 @@
     <ClInclude Include="game_framework\messages\car_ownership_change_message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\components\friction_ground_component.h">
+    <ClInclude Include="game_framework\globals\joints.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\globals\joints.h">
+    <ClInclude Include="game_framework\components\fixtures_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

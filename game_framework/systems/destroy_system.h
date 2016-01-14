@@ -8,8 +8,5 @@ class destroy_system : public event_only_system {
 public:
 	using event_only_system::event_only_system;
 
-	void add(entity_id) override {}
-	void remove(entity_id) override {}
-
 	void delete_queued_entities();
 };

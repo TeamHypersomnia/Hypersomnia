@@ -4,6 +4,7 @@
 
 #include "body_helper.h"
 #include "../components/physics_component.h"
+#include "../components/fixtures_component.h"
 #include "../components/polygon_component.h"
 #include "../components/render_component.h"
 #include "../components/sprite_component.h"
@@ -19,8 +20,16 @@ namespace helpers {
 	b2World* current_b2world = nullptr;
 
 	void physics_info::add_convex(const std::vector <vec2>& verts) {
-		original_model.insert(original_model.end(), verts.begin(), verts.end());
 		convex_polys.push_back(verts);
+	}
+
+	void physics_info::offset_vertices() {
+		for (auto& c : convex_polys) {
+			for (auto& v : c) {
+				v.rotate(transform_vertices.rotation, vec2(0, 0));
+				v += transform_vertices.pos;
+			}
+		}
 	}
 
 	void physics_info::from_renderable(augs::entity_id e) {
@@ -30,6 +39,14 @@ namespace helpers {
 		if (sprite) {
 			type = RECT;
 			rect_size = sprite->size;
+
+			b2PolygonShape shape;
+			shape.SetAsBox(static_cast<float>(rect_size.x) / 2.f * PIXELS_TO_METERSf, static_cast<float>(rect_size.y) / 2.f * PIXELS_TO_METERSf);
+
+			convex_polys.resize(1);
+
+			for (int i = 0; i < shape.GetVertexCount(); ++i)
+				convex_polys[0].push_back(vec2(shape.GetVertex(i))*METERS_TO_PIXELSf);
 		}
 		else if (polygon) {
 			type = POLYGON;
@@ -39,8 +56,6 @@ namespace helpers {
 			TPPLPoly subject_poly;
 			subject_poly.Init(p.original_model.size());
 			subject_poly.SetHole(false);
-
-			original_model.insert(original_model.end(), p.original_model.begin(), p.original_model.end());
 
 			for (size_t i = 0; i < p.original_model.size(); ++i) {
 				vec2 p(p.original_model[i]);
@@ -141,7 +156,48 @@ namespace helpers {
 		return false;
 	}
 
-	components::physics& create_physics_component(const physics_info& body_data, augs::entity_id subject, int body_type) {
+	components::fixtures& add_fixtures(physics_info fixture_data, augs::entity_id subject) {
+		return add_fixtures_to_other_body(fixture_data, subject, subject);
+	}
+
+	components::fixtures& add_fixtures_to_other_body(physics_info fixture_data, augs::entity_id subject, augs::entity_id existing_body) {
+		physics_system& physics = subject->owner_world.get_system<physics_system>();
+
+		b2PolygonShape shape;
+		b2CircleShape circle_shape;
+
+		b2FixtureDef fixdef;
+		fixdef.density = fixture_data.density;
+		fixdef.friction = fixture_data.friction;
+		fixdef.isSensor = fixture_data.sensor;
+		fixdef.filter = fixture_data.filter;
+		fixdef.restitution = fixture_data.restitution;
+		fixdef.shape = &shape;
+		fixdef.userData = subject;
+		
+		auto& physics_component = existing_body->get<components::physics>();
+		auto body = physics_component.body;
+		physics_component.fixture_entities.push_back(subject);
+
+		fixture_data.offset_vertices();
+		auto& fixtures = subject->add<components::fixtures>();
+		fixtures.convex_polys = fixture_data.convex_polys;
+		fixtures.shape_offset = fixture_data.transform_vertices;
+
+		for (auto convex : fixture_data.convex_polys) {
+			std::vector<b2Vec2> b2verts(convex.begin(), convex.end());
+
+			for (auto& v : b2verts)
+				v *= PIXELS_TO_METERSf;
+
+			shape.Set(b2verts.data(), b2verts.size());
+			fixtures.list_of_fixtures.push_back({ body->CreateFixture(&fixdef) });
+		}
+
+		return fixtures;
+	}
+
+	components::physics& create_physics_component(body_info body_data, augs::entity_id subject) {
 		physics_system& physics = subject->owner_world.get_system<physics_system>();
 
 		auto& transform = subject->get<components::transform>();
@@ -149,7 +205,7 @@ namespace helpers {
 			subject->get<components::render>().previous_transform = subject->get<components::transform>();
 
 		b2BodyDef def;
-		def.type = b2BodyType(body_type);
+		def.type = b2BodyType(body_data.body_type);
 		def.angle = 0;
 		def.userData = subject;
 		def.bullet = body_data.bullet;
@@ -160,70 +216,19 @@ namespace helpers {
 		def.fixedRotation = body_data.fixed_rotation;
 		def.gravityScale = body_data.gravity_scale;
 
-		b2PolygonShape shape;
-		b2CircleShape circle_shape;
+		auto& physics_component = subject->add<components::physics>();
+		physics_component.body = physics.b2world.CreateBody(&def);
+		physics_component.body->SetAngledDampingEnabled(body_data.angled_damping);
 
-		b2FixtureDef fixdef;
-		fixdef.density = body_data.density;
-		fixdef.friction = body_data.friction;
-		fixdef.isSensor = body_data.sensor;
-		fixdef.filter = body_data.filter;
-		fixdef.restitution = body_data.restitution;
-		fixdef.shape = &shape;
-
-		b2Body* body = physics.b2world.CreateBody(&def);
-		
-		components::physics physics_component;
-		physics_component.body = body;
-
-		if (body_data.type == physics_info::RECT) {
-			shape.SetAsBox(static_cast<float>(body_data.rect_size.x) / 2.f * PIXELS_TO_METERSf, static_cast<float>(body_data.rect_size.y) / 2.f * PIXELS_TO_METERSf);
-			
-			for (int i = 0; i < shape.GetVertexCount(); ++i) 
-				physics_component.original_model.push_back(vec2(shape.GetVertex(i))*METERS_TO_PIXELSf);
-
-			body->CreateFixture(&fixdef);
-		}
-		else if (body_data.type == physics_info::POLYGON) {
-			physics_component.original_model = body_data.original_model;
-
-			for (auto convex : body_data.convex_polys) {
-				std::vector<b2Vec2> b2verts(convex.begin(), convex.end());
-				
-				for (auto& v : b2verts)
-					v *= PIXELS_TO_METERSf;
-
-				shape.Set(b2verts.data(), b2verts.size());
-				body->CreateFixture(&fixdef);
-			}
-		}
-		else if (body_data.type == physics_info::CIRCLE) {
-			/* approximate somehow the original_model */
-
-			circle_shape.m_radius = body_data.radius * PIXELS_TO_METERSf;
-			fixdef.shape = &circle_shape;
-			body->CreateFixture(&fixdef);
-		}
-		//b2Vec2 v[4] = {
-		//	vec2(0.f, 0.f),
-		//	vec2(size.w*PIXELS_TO_METERS, 0.f),
-		//	vec2(size.w*PIXELS_TO_METERS, size.h*PIXELS_TO_METERS),
-		//	vec2(0.f, size.h*PIXELS_TO_METERS)
-		//};
-
-		//shape.Set(v, 4);
-
-		body->SetAngledDampingEnabled(body_data.angled_damping);
-
-		return subject->add(physics_component);
+		return physics_component;
 	}
 
-	std::vector<b2Vec2> get_transformed_shape_verts(augs::entity_id subject, bool meters) {
+	std::vector<b2Vec2> get_world_vertices(augs::entity_id subject, bool meters, int fixture_num) {
 		std::vector<b2Vec2> output;
 
 		auto b = subject->get<components::physics>().body;
 
-		auto& verts = b->GetUserData()->get<components::physics>().original_model;
+		auto& verts = subject->get<components::fixtures>().convex_polys[fixture_num];
 		/* for every vertex in given fixture's shape */
 		for (auto& v : verts) {
 			auto position = METERS_TO_PIXELSf * b->GetPosition();

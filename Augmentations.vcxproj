@@ -389,6 +389,7 @@
     <ClCompile Include="game_framework\bindings\value_animator_binding.cpp" />
     <ClCompile Include="game_framework\bindings\vec2_binding.cpp" />
     <ClCompile Include="game_framework\bindings\world_binding.cpp" />
+    <ClCompile Include="game_framework\components\fixtures_component.cpp" />
     <ClCompile Include="game_framework\components\particle_group_component.cpp" />
     <ClCompile Include="game_framework\components\physics_component.cpp" />
     <ClCompile Include="game_framework\components\polygon_component.cpp" />
@@ -957,7 +958,7 @@
     <ClInclude Include="game_framework\components\crosshair_component.h" />
     <ClInclude Include="game_framework\components\damage_component.h" />
     <ClInclude Include="game_framework\components\driver_component.h" />
-    <ClInclude Include="game_framework\components\friction_ground_component.h" />
+    <ClInclude Include="game_framework\components\fixtures_component.h" />
     <ClInclude Include="game_framework\components\gun_component.h" />
     <ClInclude Include="game_framework\components\input_component.h" />
     <ClInclude Include="game_framework\components\lookat_component.h" />

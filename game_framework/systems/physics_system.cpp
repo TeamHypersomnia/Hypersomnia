@@ -8,8 +8,11 @@ float PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 #include "entity_system/world.h"
 
 #include "../messages/collision_message.h"
+#include "../messages/destroy_message.h"
 #include "../game/body_helper.h"
 #include "utilities/print.h"
+
+#include "../components/fixtures_component.h"
 
 #include <iostream>
 
@@ -24,30 +27,30 @@ bool physics_system::raycast_input::ShouldRaycast(b2Fixture* fixture) {
 
 float32 physics_system::raycast_input::ReportFixture(b2Fixture* fixture, const b2Vec2& point,
 	const b2Vec2& normal, float32 fraction) {
-		output.intersection = point;
+	output.intersection = point;
 
-		output.hit = true;
-		output.what_fixture = fixture;
-		output.what_entity = fixture->GetBody()->GetUserData();
-		output.normal = normal;
+	output.hit = true;
+	output.what_fixture = fixture;
+	output.what_entity = fixture->GetBody()->GetUserData();
+	output.normal = normal;
 
-		if (save_all) {
-			outputs.push_back(output);
-			return 1.f;
-		}
-		
-		return fraction;
+	if (save_all) {
+		outputs.push_back(output);
+		return 1.f;
+	}
+
+	return fraction;
 }
 
-physics_system::physics_system(world& parent_world) : processing_system_templated(parent_world),
+physics_system::physics_system(world& parent_world) : event_only_system(parent_world),
 b2world(b2Vec2(0.f, 0.f)), ray_casts_per_frame(0) {
-		b2world.SetAllowSleeping(false);
-		b2world.SetAutoClearForces(false);
-		enable_listener(true);
+	b2world.SetAllowSleeping(false);
+	b2world.SetAutoClearForces(false);
+	enable_listener(true);
 }
 
 std::vector<physics_system::raycast_output> physics_system::ray_cast_all_intersections
-	(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity) {
+(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity) {
 	++ray_casts_per_frame;
 
 	raycast_input callback;
@@ -107,7 +110,7 @@ float physics_system::get_closest_wall_intersection(vec2 position, float radius,
 
 vec2 physics_system::push_away_from_walls(vec2 position, float radius, int ray_amount, b2Filter filter, entity_id ignore_entity) {
 	vec2 resultant;
-	
+
 	float worst_distance = radius;
 
 	for (int i = 0; i < ray_amount; ++i) {
@@ -116,7 +119,7 @@ vec2 physics_system::push_away_from_walls(vec2 position, float radius, int ray_a
 		if (out.hit) {
 			auto diff = (out.intersection - position);
 			auto distance = diff.length();
-			
+
 			if (distance < worst_distance) worst_distance = distance;
 			resultant += diff;
 		}
@@ -145,35 +148,36 @@ physics_system::raycast_output physics_system::ray_cast(vec2 p1_meters, vec2 p2_
 	return callback.output;
 }
 
-physics_system::raycast_output physics_system::ray_cast_px (vec2 p1, vec2 p2, b2Filter filter, entity_id ignore_entity) {
+physics_system::raycast_output physics_system::ray_cast_px(vec2 p1, vec2 p2, b2Filter filter, entity_id ignore_entity) {
 	auto out = ray_cast(p1 * PIXELS_TO_METERSf, p2 * PIXELS_TO_METERSf, filter, ignore_entity);
 	out.intersection *= METERS_TO_PIXELSf;
-	
+
 	return out;
 }
 
 bool physics_system::query_aabb_input::ReportFixture(b2Fixture* fixture) {
 	if ((b2ContactFilter::ShouldCollide(&filter, &fixture->GetFilterData()))
 		&& fixture->GetBody()->GetUserData() != ignore_entity) {
-		output.insert(fixture->GetBody());
-		out_fixtures.push_back(fixture);
+		out.bodies.insert(fixture->GetBody());
+		out.fixtures.push_back(fixture);
+		out.entities.insert(fixture->GetUserData());
 	}
 
 	return true;
 }
 
-physics_system::query_output physics_system::query_square(vec2 p1_meters, float side_meters, b2Filter filter, entity_id ignore_entity) {
+physics_system::query_aabb_output physics_system::query_square(vec2 p1_meters, float side_meters, b2Filter filter, entity_id ignore_entity) {
 	b2AABB aabb;
 	aabb.lowerBound = p1_meters - side_meters / 2;
 	aabb.upperBound = p1_meters + side_meters / 2;
 	return query_aabb(aabb.lowerBound, aabb.upperBound, filter, ignore_entity);
 }
 
-physics_system::query_output physics_system::query_square_px(vec2 p1, float side, b2Filter filter, entity_id ignore_entity) {
+physics_system::query_aabb_output physics_system::query_square_px(vec2 p1, float side, b2Filter filter, entity_id ignore_entity) {
 	return query_square(p1 * PIXELS_TO_METERSf, side * PIXELS_TO_METERSf, filter, ignore_entity);
 }
 
-physics_system::query_output physics_system::query_aabb(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity) {
+physics_system::query_aabb_output physics_system::query_aabb(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity) {
 	query_aabb_input callback;
 	callback.filter = filter;
 	callback.ignore_entity = ignore_entity;
@@ -183,22 +187,19 @@ physics_system::query_output physics_system::query_aabb(vec2 p1_meters, vec2 p2_
 
 	b2world.QueryAABB(&callback, aabb);
 
-	physics_system::query_output out;
-	out.bodies = std::move(std::vector<b2Body*>(callback.output.begin(), callback.output.end()));
-	return out;
+	return callback.out;
 }
 
 physics_system::query_output physics_system::query_body(augs::entity_id subject, b2Filter filter, entity_id ignore_entity) {
 	query_output total_output;
-	
-	for (b2Fixture* f = subject->get<components::physics>().body->GetFixtureList(); f != nullptr; f = f->GetNext()) {
-		auto transformed = helpers::get_transformed_shape_verts(subject, true);
-		
-		b2PolygonShape shape;
-		shape.Set(transformed.data(), transformed.size());
 
-		auto this_result = query_shape(&shape, filter, ignore_entity);
-		total_output.bodies.insert(total_output.bodies.end(), this_result.bodies.begin(), this_result.bodies.end());
+	for (b2Fixture* f = subject->get<components::physics>().body->GetFixtureList(); f != nullptr; f = f->GetNext()) {
+		auto world_vertices = helpers::get_world_vertices(subject, true);
+
+		b2PolygonShape shape;
+		shape.Set(world_vertices.data(), world_vertices.size());
+
+		total_output += query_shape(&shape, filter, ignore_entity);
 	}
 
 	return total_output;
@@ -210,44 +211,37 @@ physics_system::query_output physics_system::query_polygon(const std::vector<vec
 
 	for (auto& v : vertices)
 		verts.push_back(PIXELS_TO_METERSf * b2Vec2(v.x, v.y));
-	
+
 	poly_shape.Set(verts.data(), verts.size());
 	return query_shape(&poly_shape, filter, ignore_entity);
 }
 
 physics_system::query_output physics_system::query_shape(b2Shape* shape, b2Filter filter, entity_id ignore_entity) {
 	b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
-	
+
 	query_aabb_input callback;
 	callback.filter = filter;
 	callback.ignore_entity = ignore_entity;
-	
+
 	b2AABB shape_aabb;
 	shape->ComputeAABB(&shape_aabb, null_transform, 0);
 	b2world.QueryAABB(&callback, shape_aabb);
-	
-	std::set<b2Body*> bodies;
-	std::set<physics_system::query_output::queried_result> details;
-
-	for (auto fixture : callback.out_fixtures) {
-		auto result = b2TestOverlapInfo(shape, 0, fixture->GetShape(), 0, null_transform, fixture->GetBody()->GetTransform());
-		if (result.overlap) {
-			bodies.insert(fixture->GetBody());
-			details.insert({
-				fixture->GetBody(),
-				result.pointA
-			});
-		}
-	}
 
 	physics_system::query_output out;
-	out.bodies = std::vector<b2Body*>(bodies.begin(), bodies.end());
-	out.details = std::vector<physics_system::query_output::queried_result>(details.begin(), details.end());
+
+	for (auto fixture : callback.out.fixtures) {
+		auto result = b2TestOverlapInfo(shape, 0, fixture->GetShape(), 0, null_transform, fixture->GetBody()->GetTransform());
+		if (result.overlap) {
+			out.bodies.insert(fixture->GetBody());
+			out.entities.insert(fixture->GetUserData());
+			out.details.insert({ fixture, result.pointA });
+		}
+	}
 
 	return out;
 }
 
-physics_system::query_output physics_system::query_aabb_px(vec2 p1, vec2 p2, b2Filter filter, entity_id ignore_entity) {
+physics_system::query_aabb_output physics_system::query_aabb_px(vec2 p1, vec2 p2, b2Filter filter, entity_id ignore_entity) {
 	return query_aabb(p1 * PIXELS_TO_METERSf, p2 * PIXELS_TO_METERSf, filter, ignore_entity);
 }
 
@@ -266,30 +260,18 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 
 	messages::collision_message msg;
 
-	msg.subject = static_cast<entity_id>(body_a->GetUserData());
-	msg.collider = static_cast<entity_id>(body_b->GetUserData());
+	msg.subject = static_cast<entity_id>(fix_a->GetUserData());
+	msg.collider = static_cast<entity_id>(fix_b->GetUserData());
 
-	auto& subject_physics = msg.subject->get<components::physics>();
-	auto& collider_physics = msg.subject->get<components::physics>();
+	auto& subject_fixtures = msg.subject->get<components::fixtures>();
+	auto& collider_fixtures = msg.collider->get<components::fixtures>();
 
-	auto* maybe_movement = msg.collider.get().find<components::movement>();
-
-	if (maybe_movement) {
-		maybe_movement->enable_braking_damping = false;
-	}
-
-	if (subject_physics.is_friction_ground) {
-		after_step_callbacks.push_back(
-			[msg](){
-
-				helpers::create_friction_joint(msg.collider, msg.subject, joint_name::FRICTION_GROUND_JOINT);
-			}
-			);
-		tcout("BeginContact with friction ground");
+	if (subject_fixtures.is_friction_ground) {
+		if (collider_fixtures.find_fixture(fix_b)->owner_friction_ground.dead() && !collider_fixtures.is_friction_ground)
+			collider_fixtures.find_fixture(fix_b)->owner_friction_ground = msg.subject;
 	}
 
 	if (fix_a->IsSensor() || fix_b->IsSensor()) {
-
 		if (fix_a->IsSensor()) {
 			msg.subject_impact_velocity = (body_a->GetLinearVelocity());
 			msg.collider_impact_velocity = (body_b->GetLinearVelocity());
@@ -315,32 +297,21 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 
 	messages::collision_message msg;
 
-	msg.subject = static_cast<entity_id>(body_a->GetUserData());
-	msg.collider = static_cast<entity_id>(body_b->GetUserData());
+	msg.subject = static_cast<entity_id>(fix_a->GetUserData());
+	msg.collider = static_cast<entity_id>(fix_b->GetUserData());
 
-	auto& subject_physics = msg.subject->get<components::physics>();
-	auto& collider_physics = msg.subject->get<components::physics>();
+	auto& subject_fixtures = msg.subject->get<components::fixtures>();
+	auto& collider_fixtures = msg.collider->get<components::fixtures>();
 
-	auto* maybe_movement = msg.collider->find<components::movement>();
-
-	if (maybe_movement) {
-		maybe_movement->enable_braking_damping = true;
-	}
-
-	if (subject_physics.is_friction_ground) {
-		after_step_callbacks.push_back(
-			[msg]() {				
-			helpers::remove_joints(msg.collider, joint_name::FRICTION_GROUND_JOINT);
-		}
-		);
-
-		tcout("EndContact with friction ground");
+	if (subject_fixtures.is_friction_ground) {
+		if (collider_fixtures.find_fixture(fix_b)->owner_friction_ground == msg.subject)
+			collider_fixtures.find_fixture(fix_b)->owner_friction_ground.unset();
 	}
 
 	if (fix_a->IsSensor() || fix_b->IsSensor()) {
 
 		msg.sensor_end_contact = true;
-		
+
 		if (fix_a->IsSensor()) {
 			msg.subject_impact_velocity = -body_a->GetLinearVelocity();
 			msg.collider_impact_velocity = -body_b->GetLinearVelocity();
@@ -385,7 +356,7 @@ void physics_system::contact_listener::PostSolve(b2Contact* contact, const b2Con
 }
 
 template <class T>
-T constrainAngle(T x){
+T constrainAngle(T x) {
 	x = static_cast<T>(fmod(x + 180, 360));
 	if (x < 0)
 		x += 360;
@@ -427,8 +398,20 @@ void physics_system::step_and_set_new_transforms() {
 		if (physics.enable_angle_motor) {
 			float nextAngle = static_cast<float>(b->GetAngle() + b->GetAngularVelocity() / parent_overworld.accumulator.get_hz());
 			float totalRotation = (constrainAngle(physics.target_angle) * 0.01745329251994329576923690768489f) - nextAngle;
-			while (totalRotation < -180 * 0.01745329251994329576923690768489f) totalRotation += 360 * 0.01745329251994329576923690768489f;
-			while (totalRotation >  180 * 0.01745329251994329576923690768489f) totalRotation -= 360 * 0.01745329251994329576923690768489f;
+
+			totalRotation /= 0.01745329251994329576923690768489f;
+
+			totalRotation = constrainAngle(totalRotation);
+			//if (totalRotation > 180) {
+			//	totalRotation = std::fmod(totalRotation + 180, 360) - 180;
+			//}
+			//
+			//if (totalRotation < -180) {
+			//	totalRotation = std::fmod(-(totalRotation + 180), 360) - 180;
+			//}
+
+			totalRotation *= 0.01745329251994329576923690768489f;
+
 			float desiredAngularVelocity = totalRotation * static_cast<float>(parent_overworld.accumulator.get_hz());
 			float impulse = b->GetInertia() * desiredAngularVelocity;// disregard time factor
 			b->ApplyAngularImpulse(impulse*physics.angle_motor_force_multiplier, true);
@@ -436,34 +419,90 @@ void physics_system::step_and_set_new_transforms() {
 	}
 
 	listener.after_step_callbacks.clear();
-	
+
 	b2world.Step(static_cast<float32>(per_second()), velocityIterations, positionIterations);
 	b2world.ClearForces();
-	
+
 	for (auto& c : listener.after_step_callbacks)
 		c();
+
+	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
+		if (b->GetType() == b2_staticBody) continue;
+		auto& physics = static_cast<entity_id>(b->GetUserData())->get<components::physics>();
+		auto& fixture_entities = physics.fixture_entities;
+
+		bool found_friction_ground = false;
+
+		for (auto& fixture_entity : fixture_entities) {
+			for(auto& fixture : fixture_entity->get<components::fixtures>().list_of_fixtures)
+
+			if (fixture.owner_friction_ground.alive()) {
+				auto& friction_physics = fixture.owner_friction_ground->get<components::fixtures>();
+
+				auto friction_body = friction_physics.get_body();
+
+				auto friction_vel = friction_body->GetLinearVelocity();
+				auto friction_ang_vel = friction_body->GetAngularVelocity();
+				auto friction_center = friction_body->GetWorldCenter();
+
+				auto rotation_offset = friction_center - physics.body->GetPosition();
+				b2Vec2 rotational_velocity = (-vec2(rotation_offset).perpendicular_cw()).set_length(
+					rotation_offset.Length()*friction_ang_vel
+					);
+
+				friction_vel = friction_vel + rotational_velocity;
+
+				physics.body->SetTransform(physics.body->GetPosition() + per_second()*friction_vel,
+					physics.body->GetAngle()
+					+ per_second()*friction_ang_vel
+					);
+
+				found_friction_ground = true;
+				break;
+			}
+
+			if (found_friction_ground)
+				break;
+		}
+	}
 
 	reset_states();
 }
 
-void physics_system::add(entity_id) {
-
-}
-
-void physics_system::clear() {
+void physics_system::destroy_whole_world() {
 	std::vector<b2Body*> to_destroy;
 
-	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) 
+	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext())
 		to_destroy.push_back(b);
 
 	for (auto& just_die : to_destroy)
 		b2world.DestroyBody(just_die);
-
-	processing_system::clear();
 }
 
-void physics_system::remove(entity_id e) {
-	b2world.DestroyBody(e->get<components::physics>().body);
+void physics_system::destroy_fixtures_and_bodies() {
+	auto& to_destroy = parent_world.get_message_queue<messages::destroy_message>();
+
+	for (auto& m : to_destroy) {
+		auto* maybe_physics = m.subject->find<components::physics>();
+
+		if (maybe_physics) {
+			b2world.DestroyBody(maybe_physics->body);
+
+			for (auto fe : maybe_physics->fixture_entities) {
+				fe->remove<components::fixtures>();
+			}
+		}
+	}
+
+	for (auto& m : to_destroy) {
+		auto* maybe_fixtures = m.subject->find<components::fixtures>();
+
+		if (maybe_fixtures) {
+			for (auto f : maybe_fixtures->list_of_fixtures) {
+				f.fixture->GetBody()->DestroyFixture(f.fixture);
+			}
+		}
+	}
 }
 
 #include "../components/render_component.h"
@@ -472,13 +511,28 @@ void physics_system::reset_states() {
 		if (b->GetType() == b2_staticBody) continue;
 		auto& transform = static_cast<entity_id>(b->GetUserData())->get<components::transform>();
 		auto& physics = static_cast<entity_id>(b->GetUserData())->get<components::physics>();
-		
-		transform.pos = b->GetPosition();
-		transform.pos *= METERS_TO_PIXELSf;
-		
-		if (!b->IsFixedRotation()) {
-			transform.rotation = b->GetAngle();
-			transform.rotation *= 180.0f / 3.141592653589793238462f;
+
+		auto body_pos = METERS_TO_PIXELSf * b->GetPosition();
+		auto body_angle = b->GetAngle() * 180.0f / 3.141592653589793238462f;
+
+		for (auto& fe : physics.fixture_entities) {
+			auto& fixtures = fe->get<components::fixtures>();
+
+			auto& transform = fe->get<components::transform>();
+			transform.pos = body_pos;
+
+			if (!b->IsFixedRotation())
+				transform.rotation = body_angle;
+
+			transform.pos += fixtures.shape_offset.pos;
+			transform.rotation += fixtures.shape_offset.rotation;
+
+			transform.pos.rotate(body_angle, body_pos);
 		}
+
+		transform.pos = body_pos;
+
+		if (!b->IsFixedRotation())
+			transform.rotation = body_angle;
 	}
 }

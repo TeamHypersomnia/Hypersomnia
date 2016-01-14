@@ -127,6 +127,7 @@ struct b2BodyDef
 class b2Body
 {
 public:
+	b2Body* m_copyForce = nullptr;
 	/// Creates a fixture and attach it to this body. Use this function if you need
 	/// to set some fixture parameters, like friction. Otherwise you can create the
 	/// fixture directly from a shape.
@@ -182,6 +183,7 @@ public:
 	/// Set the linear velocity of the center of mass.
 	/// @param v the new linear velocity of the center of mass.
 	void SetLinearVelocity(const b2Vec2& v);
+	void SetBaseLinearVelocity(const b2Vec2& v);
 	void SetMaximumLinearVelocity(float32 length);
 
 	/// Get the linear velocity of the center of mass.
@@ -191,7 +193,8 @@ public:
 	/// Set the angular velocity.
 	/// @param omega the new angular velocity in radians/second.
 	void SetAngularVelocity(float32 omega);
-
+	void SetBaseAngularVelocity(float32 omega);
+	float32 m_baseAngularVelocity;
 	/// Get the angular velocity.
 	/// @return the angular velocity in radians/second.
 	float32 GetAngularVelocity() const;
@@ -448,6 +451,7 @@ public:
 	b2Sweep m_sweep;		// the swept motion for CCD
 
 	b2Vec2 m_linearVelocity;
+	b2Vec2 m_baseLinearVelocity;
 	float32 m_angularVelocity;
 
 	b2Vec2 m_force, m_last_force;
@@ -527,6 +531,19 @@ inline void b2Body::SetLinearVelocity(const b2Vec2& v)
 	m_linearVelocity = v;
 }
 
+inline void b2Body::SetBaseLinearVelocity(const b2Vec2& v)
+{
+	if (m_type == b2_staticBody)
+	{
+		return;
+	}
+
+	SetAwake(true);
+
+	m_baseLinearVelocity = v;
+}
+
+
 inline void b2Body::SetMaximumLinearVelocity(float32 length) {
 	m_max_speed = length;
 }
@@ -550,6 +567,19 @@ inline void b2Body::SetAngularVelocity(float32 w)
 
 	m_angularVelocity = w;
 }
+
+inline void b2Body::SetBaseAngularVelocity(float32 w)
+{
+	if (m_type == b2_staticBody)
+	{
+		return;
+	}
+
+		SetAwake(true);
+
+	m_baseAngularVelocity = w;
+}
+
 
 inline float32 b2Body::GetAngularVelocity() const
 {

@@ -45,8 +45,7 @@ void trigger_detector_system::find_trigger_collisions_and_send_confirmations() {
 		if (trigger_detector.use_physics_of_detector) {
 			auto found_physical_triggers = parent_world.get_system<physics_system>().query_body(e.detector, filters::trigger());
 
-			for (auto& t : found_physical_triggers.bodies) {
-				auto found_trigger = t->GetUserData();
+			for (auto found_trigger : found_physical_triggers.entities) {
 				auto* maybe_trigger = found_trigger->find<components::trigger>();
 				
 				if (maybe_trigger)
