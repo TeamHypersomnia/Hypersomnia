@@ -85,6 +85,8 @@ void hypersomnia_overworld::simulate() {
 		auto steps_to_do = accumulator.update_and_extract_steps();
 
 		while (steps_to_do--) {
+			renderer::get_current().clear_logic_lines();
+
 			game_world.perform_logic_step();
 			current_scene_builder->perform_logic_step(game_world);
 		}
