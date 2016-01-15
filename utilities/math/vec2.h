@@ -4,6 +4,10 @@
 #include "misc/randval.h"
 #include "vec2declare.h"
 
+template <typename T> int sgn(T val) {
+	return (T(0) < val) - (val < T(0));
+}
+
 namespace augs {
 	template <class type_val>
 	void damp(type_val& val, type_val len) {

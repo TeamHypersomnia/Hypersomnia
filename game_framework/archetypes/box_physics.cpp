@@ -15,9 +15,6 @@ namespace archetypes {
 
 		info.filter = filters::dynamic_object();
 		info.density = 1;
-		//info.angular_damping = 5;
-		//info.linear_damping = 5;
-		//info.angled_damping = false;
 
 		helpers::create_physics_component(body, e);
 		helpers::add_fixtures(info, e);
@@ -33,9 +30,6 @@ namespace archetypes {
 
 		info.filter = filters::dynamic_object();
 		info.density = 1;
-		//info.angular_damping = 5;
-		//info.linear_damping = 5;
-		//info.angled_damping = false;
 
 		helpers::create_physics_component(body, e);
 		helpers::add_fixtures(info, e);

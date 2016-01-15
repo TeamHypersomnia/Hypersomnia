@@ -32,10 +32,6 @@ void movement_system::set_movement_flags_from_input() {
 	}
 }
 
-template <typename T> int sgn(T val) {
-	return (T(0) < val) - (val < T(0));
-}
-
 void movement_system::apply_movement_forces() {
 	auto& physics_sys = parent_world.get_system<physics_system>();
 

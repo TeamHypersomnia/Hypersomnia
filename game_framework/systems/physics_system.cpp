@@ -386,13 +386,13 @@ void physics_system::step_and_set_new_transforms() {
 		float32 angular_speed = b->GetAngularVelocity();
 
 		if ((vel.x != 0.f || vel.y != 0.f) && physics.air_resistance > 0.f)
-			physics.body->ApplyForce(physics.get_mass() * physics.air_resistance * speed * -vel, physics.body->GetWorldCenter(), true);
+			physics.body->ApplyForce(physics.get_mass() *( physics.air_resistance * sqrt(sqrt(speed * speed)) + (0.2 * speed * speed) )* -vel, physics.body->GetWorldCenter(), true);
 
 		auto angular_resistance = physics.angular_air_resistance;
 		if (angular_resistance < 0.f) angular_resistance = physics.air_resistance;
 
 		if (angular_resistance > 0.f) {
-			physics.body->ApplyTorque(angular_resistance * -angular_speed * b->GetInertia(), true);
+			physics.body->ApplyTorque((angular_resistance * sqrt(sqrt(angular_speed * angular_speed))  + 0.2 * angular_speed * angular_speed )* -sgn(angular_speed) * b->GetInertia(), true);
 		}
 
 		if (physics.enable_angle_motor) {

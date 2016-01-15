@@ -162,7 +162,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 
 			if (maybe_physics) {
 				target_value = maybe_physics->velocity();
-				
+				std::cout << target_value << std::endl;
 				if (target_value.length() > 20)
 					target_value.set_length(20);
 

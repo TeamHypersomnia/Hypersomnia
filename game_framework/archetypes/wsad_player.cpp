@@ -28,10 +28,10 @@ namespace archetypes {
 		movement.add_animation_receiver(e, false);
 
 		movement.input_acceleration_axes.set(1, 1);
-		movement.acceleration_length = 8000;
+		movement.acceleration_length = 15000;
 		
-		movement.input_acceleration_axes.set(8000, 8000);
-		movement.acceleration_length = -1;
+		//movement.input_acceleration_axes.set(8000, 8000);
+		//movement.acceleration_length = -1;
 
 		movement.max_speed_animation = 1000;
 		movement.braking_damping = 18;
@@ -51,7 +51,7 @@ namespace archetypes {
 		auto& physics = helpers::create_physics_component(body, e);
 		helpers::add_fixtures(info, e);
 
-		physics.air_resistance = 10.6;
+		physics.air_resistance = 65;
 
 		wsad_player_setup_movement(e);
 	}

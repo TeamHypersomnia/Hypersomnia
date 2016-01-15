@@ -17,9 +17,9 @@ namespace components {
 		float angle_motor_force_multiplier = 1.f;
 
 		/* a physically realistic alternative to max_speed variable, the bigger the value is, the lesser the maximum speed */
-		float air_resistance = 2.0;
+		float air_resistance = 25.0;
 		// -1.f - the same as the air resistance
-		float angular_air_resistance = 1.6;
+		float angular_air_resistance = 7;
 
 		std::vector<augs::entity_id> fixture_entities;
 
