@@ -43,6 +43,7 @@ void render_system::set_current_transforms_as_previous_for_interpolation() {
 }
 
 void render_system::calculate_and_set_interpolated_transforms() {
+	if (!enable_interpolation) return;
 	auto ratio = view_interpolation_ratio();
 
 	for (auto e : targets) {
@@ -66,6 +67,8 @@ void render_system::calculate_and_set_interpolated_transforms() {
 }
 
 void render_system::restore_actual_transforms() {
+	if (!enable_interpolation) return;
+
 	for (auto it : targets) {
 		auto& render = it->get<components::render>();
 

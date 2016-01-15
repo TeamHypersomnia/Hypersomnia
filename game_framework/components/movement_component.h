@@ -31,6 +31,7 @@ namespace components {
 
 		vec2 applied_force_offset;
 
+		float non_braking_damping = 0.f;
 		float braking_damping = 0.f;
 		bool enable_braking_damping = false;
 

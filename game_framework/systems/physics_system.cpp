@@ -366,7 +366,7 @@ T constrainAngle(T x) {
 void physics_system::enable_listener(bool flag) {
 	b2world.SetContactListener(flag ? &listener : nullptr);
 }
-
+#include "graphics/renderer.h"
 
 void physics_system::step_and_set_new_transforms() {
 	parent_world.get_message_queue<messages::collision_message>().clear();
@@ -385,15 +385,15 @@ void physics_system::step_and_set_new_transforms() {
 		float32 speed = vel.Normalize();
 		float32 angular_speed = b->GetAngularVelocity();
 
-		if (physics.air_resistance > 0.f) {
-			auto force_dir = physics.get_mass() * -vel;
-			auto force_components = (2.0f * speed * speed);
-
-			//if (speed > 1.0)
-			//	force_components += (0.5f * sqrt(std::abs(speed)));
-			
-			physics.body->ApplyForce(force_components * force_dir, physics.body->GetWorldCenter(), true);
-		}
+		//if (physics.air_resistance > 0.f) {
+		//	auto force_dir = physics.get_mass() * -vel;
+		//	auto force_components = (physics.air_resistance  * speed * speed);
+		//
+		//	//if (speed > 1.0)
+		//	//	force_components += (0.5f * sqrt(std::abs(speed)));
+		//	
+		//	physics.body->ApplyForce(force_components * force_dir, physics.body->GetWorldCenter(), true);
+		//}
 
 		// auto angular_resistance = physics.angular_air_resistance;
 		// if (angular_resistance < 0.f) angular_resistance = physics.air_resistance;
@@ -452,15 +452,19 @@ void physics_system::step_and_set_new_transforms() {
 				auto friction_vel = friction_body->GetLinearVelocity();
 				auto friction_ang_vel = friction_body->GetAngularVelocity();
 				auto friction_center = friction_body->GetWorldCenter();
+				
+				auto fricted_pos = physics.body->GetPosition() + per_second() * friction_vel;
 
-				auto rotation_offset = friction_center - physics.body->GetPosition();
+				auto rotation_offset = friction_center - fricted_pos;
 				b2Vec2 rotational_velocity = (-vec2(rotation_offset).perpendicular_cw()).set_length(
 					rotation_offset.Length()*friction_ang_vel
 					);
+				//rotational_velocity.y *= -1;
 
-				friction_vel = friction_vel + rotational_velocity;
+				fricted_pos += per_second() * rotational_velocity ;
+				//renderer::get_current().logic_lines.draw_cyan(physics.get_position(), physics.get_position() + METERS_TO_PIXELSf*friction_vel);
 
-				physics.body->SetTransform(physics.body->GetPosition() + per_second()*friction_vel,
+				physics.body->SetTransform(fricted_pos,
 					physics.body->GetAngle()
 					+ per_second()*friction_ang_vel
 					);

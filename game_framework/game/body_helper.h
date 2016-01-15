@@ -13,8 +13,8 @@ namespace helpers {
 	struct body_info {
 		int body_type = b2_dynamicBody;
 
-		float angular_damping = 0.f,
-			linear_damping = 0.f,
+		float angular_damping = 6.5f,
+			linear_damping = 6.5f,
 		gravity_scale = 0.f;
 
 		bool fixed_rotation = false, bullet = false, angled_damping = false;

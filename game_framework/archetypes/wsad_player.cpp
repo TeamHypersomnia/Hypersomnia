@@ -34,7 +34,8 @@ namespace archetypes {
 		//movement.acceleration_length = -1;
 
 		movement.max_speed_animation = 1000;
-		movement.braking_damping = 18;
+		movement.braking_damping = 24.5f;
+		
 		movement.enable_braking_damping = true;
 	}
 
@@ -51,7 +52,8 @@ namespace archetypes {
 		auto& physics = helpers::create_physics_component(body, e);
 		helpers::add_fixtures(info, e);
 
-		physics.air_resistance = 65;
+		physics.air_resistance = 5.f;
+		physics.set_linear_damping(20);
 
 		wsad_player_setup_movement(e);
 	}

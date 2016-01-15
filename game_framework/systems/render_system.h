@@ -22,6 +22,8 @@ public:
 
 	std::vector<std::vector<entity_id>> layers;
 
+	bool enable_interpolation = true;
+
 	void generate_layers(int mask);
 	void draw_layer(shared::drawing_state& in, int layer);
 	void generate_and_draw_all_layers(shared::drawing_state& in, int mask);

@@ -17,7 +17,7 @@ namespace components {
 		float angle_motor_force_multiplier = 1.f;
 
 		/* a physically realistic alternative to max_speed variable, the bigger the value is, the lesser the maximum speed */
-		float air_resistance = 25.0;
+		float air_resistance = 2.0f;
 		// -1.f - the same as the air resistance
 		float angular_air_resistance = 20;
 
@@ -29,7 +29,10 @@ namespace components {
 		void set_linear_damping_vec(vec2);
 		void apply_force(vec2);
 		void apply_force(vec2, vec2 center_offset, bool wake = true);
+		void apply_impulse(vec2);
+		void apply_impulse(vec2, vec2 center_offset, bool wake);
 		float get_mass();
 		vec2 get_position();
+		vec2 get_world_center();
 	};
 }

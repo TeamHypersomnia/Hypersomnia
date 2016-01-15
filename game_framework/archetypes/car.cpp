@@ -37,16 +37,20 @@ namespace prefabs {
 			auto& car = *front += components::car();
 
 			car.left_wheel_trigger = left_wheel;
-			car.input_acceleration.set(10000, 10000);
+			car.input_acceleration.set(2500, 4500)/=3;
+			car.acceleration_length = 4500/5;
 			transform.pos = pos;
 
 			sprite.set(assets::texture_id::CAR_FRONT, augs::pixel_32(0, 255, 255));
-			sprite.size.x = 150;
-			sprite.size.y = 50;
+			sprite.size.x = 200;
+			sprite.size.y = 100;
 
 			render.layer = components::render::render_layer::DYNAMIC_BODY;
 
 			helpers::body_info body;
+			body.linear_damping = 0.4f;
+			body.angular_damping = 2.f;
+
 			helpers::physics_info info;
 			info.from_renderable(front);
 
@@ -55,6 +59,8 @@ namespace prefabs {
 
 			auto& physics = helpers::create_physics_component(body, front);
 			helpers::add_fixtures(info, front);
+
+			//physics.air_resistance = 0.2f;
 		}
 
 		{
@@ -95,7 +101,7 @@ namespace prefabs {
 
 			sprite.set(assets::texture_id::CAR_INSIDE, augs::pixel_32(255, 0, 0, 255));
 			sprite.size.x = 30;
-			sprite.size.y = 30;
+			sprite.size.y = 90;
 
 			helpers::physics_info info;
 			info.from_renderable(left_wheel);

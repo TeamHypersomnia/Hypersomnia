@@ -6,6 +6,8 @@
 //	class texture;
 //}
 
+#include "math/vec2.h"
+
 namespace assets {
 	enum texture_id {
 		BLANK,
@@ -25,5 +27,6 @@ namespace assets {
 		CUSTOM = 10000
 	};
 	
+	vec2i get_size(texture_id);
 	//typedef asset<texture_ids, augs::texture> texture_id;
 }

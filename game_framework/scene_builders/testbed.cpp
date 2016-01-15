@@ -54,7 +54,6 @@ namespace scene_builders {
 		auto& player_response = resource_manager.create(assets::animation_response_id::TORSO_SET);
 		player_response[messages::animation_response_message::MOVE] = assets::animation_id::TORSO_MOVE;
 
-		auto background = world.create_entity();
 		auto camera = world.create_entity();
 		auto crosshair = world.create_entity();
 		auto player = world.create_entity();
@@ -66,7 +65,15 @@ namespace scene_builders {
 		auto car = prefabs::create_car(world, vec2(-300, 0));
 
 		archetypes::camera(camera, window_rect.w, window_rect.h);
-		archetypes::sprite(background, vec2(0, 0), assets::texture_id::TEST_BACKGROUND);
+
+		auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
+
+		for (int x = -4; x < 4; ++x)
+			for (int y = -4; y < 4; ++y)
+			{
+				auto background = world.create_entity();
+				archetypes::sprite(background, vec2(x, y) * bg_size, assets::texture_id::TEST_BACKGROUND);
+			}
 		
 		archetypes::wsad_player_crosshair(crosshair);
 		archetypes::wsad_player(player, crosshair, camera);
@@ -100,7 +107,8 @@ namespace scene_builders {
 		world.get_system<input_system>().add_context(active_context);
 
 		world.parent_overworld.configure_stepping(60.0, 5);
-		
+		world.parent_overworld.accumulator.set_time_multiplier(1.0);
+
 		if (augs::file_exists(L"recorded.inputs")) {
 			world.get_system<input_system>().raw_window_input_player.player.load_recording("recorded.inputs");
 			world.get_system<input_system>().raw_window_input_player.player.replay();
