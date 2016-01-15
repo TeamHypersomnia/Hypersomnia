@@ -4,6 +4,8 @@
 #include "misc/randval.h"
 #include "vec2declare.h"
 
+#define AUGS_EPSILON 0.0001f
+
 template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
@@ -288,28 +290,28 @@ namespace augs {
 			return *this;
 		}
 
-		bool x_non_zero() const {
-			return std::abs(x) > std::numeric_limits<type>::epsilon();
+		bool x_non_zero(float eps = AUGS_EPSILON) const {
+			return std::abs(x) > eps;
 		}
 
-		bool y_non_zero() const {
-			return std::abs(y) > std::numeric_limits<type>::epsilon();
+		bool y_non_zero(float eps = AUGS_EPSILON) const {
+			return std::abs(y) > eps;
 		}
 
-		bool non_zero() const {
-			return x_non_zero() || y_non_zero();
+		bool non_zero(float eps = AUGS_EPSILON) const {
+			return x_non_zero(eps) || y_non_zero();
 		}
 		
 		vec2t operator-() { return vec2t(x * -1, y * -1); }
 
-		bool compare_abs(const vec2t& b, const float epsilon = 0.00001f) {
+		bool compare_abs(const vec2t& b, const float epsilon = AUGS_EPSILON) {
 			if (std::abs(x - b.x) < epsilon && std::abs(y - b.y) < epsilon)
 				return true;
 
 			return false;
 		}
 
-		bool compare(const vec2t& b, const float epsilon = 0.00001f) {
+		bool compare(const vec2t& b, const float epsilon = AUGS_EPSILON) {
 			if ((*this - b).length_sq() <= epsilon*epsilon)
 				return true;
 

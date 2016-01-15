@@ -28,7 +28,7 @@ namespace archetypes {
 		movement.add_animation_receiver(e, false);
 
 		movement.input_acceleration_axes.set(1, 1);
-		movement.acceleration_length = 15000;
+		movement.acceleration_length = 10000;
 		
 		//movement.input_acceleration_axes.set(8000, 8000);
 		//movement.acceleration_length = -1;

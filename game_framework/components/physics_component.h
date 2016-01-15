@@ -19,7 +19,7 @@ namespace components {
 		/* a physically realistic alternative to max_speed variable, the bigger the value is, the lesser the maximum speed */
 		float air_resistance = 25.0;
 		// -1.f - the same as the air resistance
-		float angular_air_resistance = 7;
+		float angular_air_resistance = 20;
 
 		std::vector<augs::entity_id> fixture_entities;
 
@@ -30,5 +30,6 @@ namespace components {
 		void apply_force(vec2);
 		void apply_force(vec2, vec2 center_offset, bool wake = true);
 		float get_mass();
+		vec2 get_position();
 	};
 }

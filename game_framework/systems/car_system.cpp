@@ -6,6 +6,7 @@
 #include "entity_system/world.h"
 
 #include "../components/trigger_component.h"
+#include <Box2D\Box2D.h>
 
 void car_system::set_steering_flags_from_intents() {
 	auto& intents = parent_world.get_message_queue<messages::intent_message>();
@@ -58,5 +59,10 @@ void car_system::apply_movement_forces() {
 
 			physics.set_linear_damping(resultant.non_zero() ? 0.f : car.braking_damping);
 		}
+
+		vec2 lateral = physics.body->GetWorldVector(b2Vec2(1,0));
+		lateral.set_length(1000);
+
+	//	physics.apply_force(lateral);
 	}
 }

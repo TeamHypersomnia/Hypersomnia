@@ -47,6 +47,8 @@ namespace components {
 		vec2 max_look_expand = vec2(600.f, 300.f);
 
 		augs::entity_id player, crosshair;
+		vec2 previous_seen_player_position;
+		vec2 previous_step_player_position;
 
 		augs::smooth_value_field smoothing_player_pos;
 

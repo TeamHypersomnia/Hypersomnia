@@ -213,7 +213,7 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 			// v2 = exp(-c * dt) * v1
 			// Pade approximation:
 			// v2 = v1 * 1 / (1 + c * dt)
-			v *= 1.0f / (1.0f + h * (b->m_linearDamping + 0.2f));
+			v *= 1.0f / (1.0f + h * (b->m_linearDamping + 6.5f));
 			
 			if (b->enable_angled_damping) {
 				vec2 temp_vel = v;
@@ -227,7 +227,7 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 				v = b2Vec2(temp_vel.x, temp_vel.y);
 			}
 
-			w *= 1.0f / (1.0f + h * b->m_angularDamping);
+			w *= 1.0f / (1.0f + h * (b->m_angularDamping + 6.5f));
 		}
 
 		m_positions[i].c = c;

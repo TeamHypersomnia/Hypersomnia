@@ -385,15 +385,23 @@ void physics_system::step_and_set_new_transforms() {
 		float32 speed = vel.Normalize();
 		float32 angular_speed = b->GetAngularVelocity();
 
-		if ((vel.x != 0.f || vel.y != 0.f) && physics.air_resistance > 0.f)
-			physics.body->ApplyForce(physics.get_mass() *( physics.air_resistance * sqrt(sqrt(speed * speed)) + (0.2 * speed * speed) )* -vel, physics.body->GetWorldCenter(), true);
+		if (physics.air_resistance > 0.f) {
+			auto force_dir = physics.get_mass() * -vel;
+			auto force_components = (2.0f * speed * speed);
 
-		auto angular_resistance = physics.angular_air_resistance;
-		if (angular_resistance < 0.f) angular_resistance = physics.air_resistance;
-
-		if (angular_resistance > 0.f) {
-			physics.body->ApplyTorque((angular_resistance * sqrt(sqrt(angular_speed * angular_speed))  + 0.2 * angular_speed * angular_speed )* -sgn(angular_speed) * b->GetInertia(), true);
+			//if (speed > 1.0)
+			//	force_components += (0.5f * sqrt(std::abs(speed)));
+			
+			physics.body->ApplyForce(force_components * force_dir, physics.body->GetWorldCenter(), true);
 		}
+
+		// auto angular_resistance = physics.angular_air_resistance;
+		// if (angular_resistance < 0.f) angular_resistance = physics.air_resistance;
+		// 
+		// if (angular_resistance > 0.f) {
+		// 	//physics.body->ApplyTorque((angular_resistance * sqrt(sqrt(angular_speed * angular_speed)) + 0.2 * angular_speed * angular_speed)* -sgn(angular_speed) * b->GetInertia(), true);
+		// 	physics.body->ApplyTorque(( 1.2 * angular_speed * angular_speed )* -sgn(angular_speed) * b->GetInertia(), true);
+		// }
 
 		if (physics.enable_angle_motor) {
 			float nextAngle = static_cast<float>(b->GetAngle() + b->GetAngularVelocity() / parent_overworld.accumulator.get_hz());

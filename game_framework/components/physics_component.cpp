@@ -27,6 +27,10 @@ namespace components {
 		return body->GetMass();
 	}
 
+	vec2 physics::get_position() {
+		return METERS_TO_PIXELSf * body->GetPosition();
+	}
+
 	vec2 physics::velocity() {
 		return vec2(body->GetLinearVelocity()) * METERS_TO_PIXELSf;
 	}

@@ -26,19 +26,18 @@ namespace prefabs {
 		auto interior = world.create_entity();
 		auto left_wheel = world.create_entity();
 
-		components::children car_children;
-
+		auto& car_children = *front += components::children();
 		car_children.add_sub_entity(interior);
 		car_children.add_sub_entity(left_wheel);
-		front->add(car_children);
 
 		{
-			components::sprite sprite;
-			components::render render;
-			components::transform transform;
-			components::car car;
+			auto& sprite = *front += components::sprite();
+			auto& render = *front += components::render();
+			auto& transform = *front += components::transform();
+			auto& car = *front += components::car();
+
 			car.left_wheel_trigger = left_wheel;
-			//car.input_acceleration.set(10000, 10000);
+			car.input_acceleration.set(10000, 10000);
 			transform.pos = pos;
 
 			sprite.set(assets::texture_id::CAR_FRONT, augs::pixel_32(0, 255, 255));
@@ -46,11 +45,6 @@ namespace prefabs {
 			sprite.size.y = 50;
 
 			render.layer = components::render::render_layer::DYNAMIC_BODY;
-
-			front->add(sprite);
-			front->add(render);
-			front->add(transform);
-			front->add(car);
 
 			helpers::body_info body;
 			helpers::physics_info info;
@@ -61,20 +55,13 @@ namespace prefabs {
 
 			auto& physics = helpers::create_physics_component(body, front);
 			helpers::add_fixtures(info, front);
-
-			//info.sensor = true;
-			//
-			//info.filter = filters::dynamic_object();
-			//auto& physics = helpers::create_physics_component(info, front, b2_dynamicBody);
-			//physics.is_friction_ground = true;
-
-			//physics.air_resistance = 0.1;
 		}
 
 		{
-			components::sprite sprite;
-			components::render render;
-			components::transform transform;
+			auto& sprite = *interior += components::sprite();
+			auto& render = *interior += components::render();
+			auto& transform = *interior += components::transform();
+
 			transform.pos = pos;
 
 			render.layer = components::render::render_layer::CAR_INTERIOR;
@@ -82,10 +69,6 @@ namespace prefabs {
 			sprite.set(assets::texture_id::CAR_INSIDE, augs::pixel_32(122, 0, 122, 255));
 			sprite.size.x = 250;
 			sprite.size.y = 550;
-
-			interior->add(sprite);
-			interior->add(render);
-			interior->add(transform);
 
 			helpers::physics_info info;
 			info.from_renderable(interior);
@@ -100,10 +83,11 @@ namespace prefabs {
 		}
 
 		{
-			components::sprite sprite;
-			components::render render;
-			components::transform transform;
-			components::trigger trigger;
+			auto& sprite = *left_wheel += components::sprite();
+			auto& render = *left_wheel += components::render();
+			auto& transform = *left_wheel += components::transform();
+			auto& trigger = *left_wheel += components::trigger();
+
 			transform.pos = pos;
 			trigger.entity_to_be_notified = front;
 
@@ -112,11 +96,6 @@ namespace prefabs {
 			sprite.set(assets::texture_id::CAR_INSIDE, augs::pixel_32(255, 0, 0, 255));
 			sprite.size.x = 30;
 			sprite.size.y = 30;
-
-			left_wheel->add(sprite);
-			left_wheel->add(render);
-			left_wheel->add(transform);
-			left_wheel->add(trigger);
 
 			helpers::physics_info info;
 			info.from_renderable(left_wheel);

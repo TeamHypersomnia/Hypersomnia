@@ -101,6 +101,11 @@ namespace augs {
 
 			return component_ptr.get();
 		}
+		
+		template <typename component_type>
+		component_type& operator+= (const component_type& object) {
+			return add(object);
+		}
 
 		template <typename component_type>
 		void remove() {

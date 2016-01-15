@@ -161,7 +161,16 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 			auto maybe_physics = camera.player->find<components::physics>();
 
 			if (maybe_physics) {
-				target_value = maybe_physics->velocity();
+				auto player_pos = maybe_physics->get_position();
+				
+				if (player_pos != camera.previous_step_player_position) {
+					camera.previous_seen_player_position = camera.previous_step_player_position;
+					camera.previous_step_player_position = player_pos;
+				}
+
+				target_value = (player_pos - camera.previous_seen_player_position) / per_second();
+
+				//maybe_physics->velocity();
 				std::cout << target_value << std::endl;
 				if (target_value.length() > 20)
 					target_value.set_length(20);
