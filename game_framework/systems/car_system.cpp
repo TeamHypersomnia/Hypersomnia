@@ -8,6 +8,8 @@
 #include "../components/trigger_component.h"
 #include <Box2D\Box2D.h>
 
+#include "render_system.h"
+
 void car_system::set_steering_flags_from_intents() {
 	auto& intents = parent_world.get_message_queue<messages::intent_message>();
 
@@ -36,20 +38,30 @@ void car_system::set_steering_flags_from_intents() {
 }
 
 void car_system::apply_movement_forces() {
+	//auto& renderer = parent_world.get_system<render_system>();
+	auto& lines = renderer::get_current().logic_lines;
+
 	for (auto it : targets) {
 		auto& car = it->get<components::car>();
 		auto& physics = it->get<components::physics>();
 
 		vec2 resultant;
 
+		vec2 forward_dir = physics.body->GetWorldVector(b2Vec2(0, 0));
+		vec2 right_normal = physics.body->GetWorldVector(b2Vec2(1, 0));
+
+		forward_dir.set_from_radians(physics.body->GetAngle());
+		forward_dir = forward_dir.perpendicular_cw();
+		right_normal.normalize();
+
 		resultant.x = car.turning_right * car.input_acceleration.x - car.turning_left * car.input_acceleration.x;
 		resultant.y = car.deccelerating * car.input_acceleration.y - car.accelerating * car.input_acceleration.y;
 
-		auto vel = physics.velocity();
-
 		if (resultant.non_zero()) {
 			auto len = resultant.length();
-			physics.apply_force(resultant * physics.get_mass());
+			vec2 force = resultant.y * forward_dir + right_normal * -resultant.x;
+
+			physics.apply_force(force * physics.get_mass(), forward_dir * 100);
 		}
 
 		if (car.braking_damping >= 0.f) {
@@ -60,9 +72,15 @@ void car_system::apply_movement_forces() {
 			physics.set_linear_damping(resultant.non_zero() ? 0.f : car.braking_damping);
 		}
 
-		vec2 lateral = physics.body->GetWorldVector(b2Vec2(1,0));
-		lateral.set_length(1000);
+		vec2 vel = physics.velocity();
+		auto speed = vel.length();
+	
+		auto lateral = right_normal * right_normal.dot(vel);
 
-	//	physics.apply_force(lateral);
+		//lateral.set_length(0.2f*speed);
+
+		physics.apply_force(lateral * 0.8f);
+
+		lines.draw(physics.get_position(), physics.get_position() + forward_dir*100);
 	}
 }

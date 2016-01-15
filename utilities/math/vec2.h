@@ -90,22 +90,8 @@ namespace augs {
 		}
 
 		template <class t>
-		static vec2t from_degrees(t degrees) {
-			vec2t out;
-			out.set_from_degrees(degrees);
-			return out;
-		}		
-		
-		template <class t>
-			static vec2t from_radians(t radians) {
-			vec2t out;
-			out.set_from_degrees(radians/0.01745329251994329576923690768489f);
-			return out;
-		}
-
-		template <class t>
 		static vec2t random_on_circle(t radius) {
-			return vec2t::from_degrees(randval(0.f, 360.f)) * radius;
+			return vec2t().set_from_degrees(randval(0.f, 360.f)) * radius;
 		}
 
 		static bool segment_in_segment(vec2t smaller_p1, vec2t smaller_p2, vec2t bigger_p1, vec2t bigger_p2,
@@ -215,6 +201,11 @@ namespace augs {
 			float radians = degrees * 0.01745329251994329576923690768489f;
 			set(cos(radians), sin(radians));
 			normalize();
+			return *this;
+		}
+
+		vec2t& set_from_radians(float radians) {
+			return set_from_degrees(radians / 0.01745329251994329576923690768489f);
 			return *this;
 		}
 

@@ -95,7 +95,7 @@ float physics_system::get_closest_wall_intersection(vec2 position, float radius,
 	float worst_distance = radius;
 
 	for (int i = 0; i < ray_amount; ++i) {
-		auto out = ray_cast_px(position, position + vec2::from_degrees((360.f / ray_amount) * i) * radius, filter, ignore_entity);
+		auto out = ray_cast_px(position, position + vec2().set_from_degrees((360.f / ray_amount) * i) * radius, filter, ignore_entity);
 
 		if (out.hit) {
 			auto diff = (out.intersection - position);
@@ -114,7 +114,7 @@ vec2 physics_system::push_away_from_walls(vec2 position, float radius, int ray_a
 	float worst_distance = radius;
 
 	for (int i = 0; i < ray_amount; ++i) {
-		auto out = ray_cast_px(position, position + vec2::from_degrees((360.f / ray_amount) * i) * radius, filter, ignore_entity);
+		auto out = ray_cast_px(position, position + vec2().set_from_degrees((360.f / ray_amount) * i) * radius, filter, ignore_entity);
 
 		if (out.hit) {
 			auto diff = (out.intersection - position);

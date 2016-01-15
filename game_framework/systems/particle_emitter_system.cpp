@@ -26,7 +26,7 @@ entity_id particle_emitter_system::create_refreshable_particle_group(world& pare
 void particle_emitter_system::spawn_particle(
 	components::particle_group::stream& group, const vec2& position, float rotation, float spread, const resources::emission& emission) {
 	auto new_particle = emission.particle_templates[randval(0u, emission.particle_templates.size() - 1)];
-	new_particle.vel = vec2::from_degrees(
+	new_particle.vel = vec2().set_from_degrees(
 		randval(rotation - spread, rotation + spread)) *
 		randval(emission.velocity);
 
@@ -56,7 +56,7 @@ void particle_emitter_system::spawn_particle(
 	new_particle.max_lifetime_ms = randval(truncated_lifetime);
 
 	if (emission.randomize_acceleration) {
-		new_particle.acc += vec2::from_degrees(
+		new_particle.acc += vec2().set_from_degrees(
 			randval(rotation - spread, rotation + spread)) *
 			randval(emission.acceleration);
 	}

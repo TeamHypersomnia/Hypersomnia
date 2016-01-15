@@ -147,5 +147,8 @@ namespace augs {
 		const pixel_32 gray4(180, 180, 180, 255);
 		const pixel_32 white(255, 255, 255, 255);
 		const pixel_32 darkblue(6, 5, 20, 255);
+
+		const pixel_32 cyan(0, 255, 255, 255);
+		const pixel_32 yellow(255, 255, 0, 255);
 	}
 }

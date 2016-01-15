@@ -126,7 +126,7 @@ void gun_system::process_entities() {
 				entity_id new_bullet = parent_world.create_entity();
 
 				/* randomize bullet direction taking spread into account */
-				vec2 vel(vec2::from_degrees(
+				vec2 vel(vec2().set_from_degrees(
 					randval(
 					gun_transform.rotation - gun.spread_degrees,
 					gun_transform.rotation + gun.spread_degrees)));
@@ -186,7 +186,7 @@ void gun_system::process_entities() {
 			query_vertices[gun.query_vertices] = gun_transform.pos;
 
 			for (int i = 0; i < gun.query_vertices; ++i) {
-				query_vertices[i] = gun_transform.pos + vec2::from_degrees(
+				query_vertices[i] = gun_transform.pos + vec2().set_from_degrees(
 					gun_transform.rotation + gun.swing_angular_offset - (gun.swing_angle / 2)
 					+ i * (gun.swing_angle / (gun.query_vertices - 1))
 					) * gun.swing_radius;
@@ -197,7 +197,7 @@ void gun_system::process_entities() {
 			auto& renderer = get_renderer();
 			if (renderer.draw_weapon_info)
 			for (size_t i = 0; i < query_vertices.size(); ++i) {
-				renderer.lines.push_back(renderer::debug_line(query_vertices[i], query_vertices[(i + 1) % query_vertices.size()]));
+				//renderer.lines.push_back(renderer::debug_line(query_vertices[i], query_vertices[(i + 1) % query_vertices.size()]));
 			}
 
 			for (auto& v : query_vertices)

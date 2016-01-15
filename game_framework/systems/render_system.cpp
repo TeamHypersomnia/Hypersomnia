@@ -54,7 +54,7 @@ void render_system::calculate_and_set_interpolated_transforms() {
 
 			components::transform interpolated_transform;
 			interpolated_transform.pos = actual_transform.pos * ratio + render.previous_transform.pos * (1.0f - ratio);
-			interpolated_transform.rotation = vec2::from_degrees(render.previous_transform.rotation).lerp(vec2::from_degrees(actual_transform.rotation), ratio).degrees();
+			interpolated_transform.rotation = vec2().set_from_degrees(render.previous_transform.rotation).lerp(vec2().set_from_degrees(actual_transform.rotation), ratio).degrees();
 
 			if ((actual_transform.pos - interpolated_transform.pos).length_sq() > 1.f)
 				actual_transform.pos = interpolated_transform.pos;

@@ -224,12 +224,12 @@ void camera_system::render_all_cameras() {
 			else {
 				parent_world.get_system<render_system>().generate_and_draw_all_layers(in, camera.mask);
 				renderer.default_render(camera.rendered_size);
+			}
 
-				if (renderer.debug_drawing) {
-					glDisable(GL_TEXTURE_2D);
-					renderer.draw_debug_info(camera.rendered_size, drawn_transform, assets::texture_id::BLANK, parent_world.get_system<render_system>().targets);
-					glEnable(GL_TEXTURE_2D);
-				}
+			if (renderer.debug_drawing) {
+				glDisable(GL_TEXTURE_2D);
+				renderer.draw_debug_info(camera.rendered_size, drawn_transform, assets::texture_id::BLANK, parent_world.get_system<render_system>().targets);
+				glEnable(GL_TEXTURE_2D);
 			}
 		}
 	}

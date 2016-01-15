@@ -45,5 +45,9 @@ namespace augs {
 		extern const pixel_32 gray4;
 		extern const pixel_32 white;
 		extern const pixel_32 darkblue;
+
+		extern const pixel_32 cyan;
+		extern const pixel_32 yellow;
+
 	}
 }

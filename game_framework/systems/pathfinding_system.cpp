@@ -20,6 +20,9 @@ void pathfinding_system::process_entities() {
 	/* we'll need a reference to physics system for raycasting */
 	physics_system& physics = parent_world.get_system<physics_system>();
 
+	auto& renderer = augs::renderer::get_current();
+	auto& lines = augs::renderer::get_current().logic_lines;
+
 	for (auto it : targets) {
 		/* get necessary components */
 		auto& visibility = it->get<components::visibility>();
@@ -300,11 +303,11 @@ void pathfinding_system::process_entities() {
 
 			if (draw_undiscovered) {
 				for (auto& disc : vertices)
-					get_renderer().lines.push_back(renderer::debug_line(disc.location, disc.sensor, pixel_32(0, 127, 255, 255)));
+					lines.draw(disc.location, disc.sensor, pixel_32(0, 127, 255, 255));
 
 				for (auto& disc : pathfinding.session().discovered_vertices)
 					//if(disc.sensor.non_zero())
-					get_renderer().lines.push_back(renderer::debug_line(disc.location, disc.location + vec2(0, pathfinding.target_offset), pixel_32(0, 255, 0, 255)));
+					lines.draw(disc.location, disc.location + vec2(0, pathfinding.target_offset), pixel_32(0, 255, 0, 255));
 			}
 
 			if (!vertices.empty()) {
@@ -404,8 +407,8 @@ void pathfinding_system::process_entities() {
 
 
 				if (draw_undiscovered) {
-					get_renderer().lines.push_back(renderer::debug_line(transform.pos, current_target.sensor, pixel_32(255, 255, 0, 255)));
-					get_renderer().lines.push_back(renderer::debug_line(transform.pos, pathfinding.session().target, pixel_32(255, 0, 0, 255)));
+					lines.draw(transform.pos, current_target.sensor, pixel_32(255, 255, 0, 255));
+					lines.draw(transform.pos, pathfinding.session().target, pixel_32(255, 0, 0, 255));
 				}
 
 				bool rays_hit = false;

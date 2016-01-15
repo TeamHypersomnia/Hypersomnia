@@ -95,6 +95,24 @@ namespace augs {
 		glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(augs::vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr;
 	}
 
+	void renderer::clear_logic_lines() {
+		logic_lines.lines.clear();
+	}
+
+	void renderer::clear_frame_lines() {
+		frame_lines.lines.clear();
+	}
+
+	void renderer::line_channel::draw(vec2 a, vec2 b, augs::pixel_32 col) {
+		lines.push_back(debug_line(a, b, col));
+	}
+
+	void renderer::line_channel::draw_red(vec2 a, vec2 b) { draw(a, b, colors::red); }
+	void renderer::line_channel::draw_green(vec2 a, vec2 b) { draw(a, b, colors::green); }
+	void renderer::line_channel::draw_blue(vec2 a, vec2 b) { draw(a, b, colors::blue); }
+	void renderer::line_channel::draw_yellow(vec2 a, vec2 b) { draw(a, b, colors::yellow); }
+	void renderer::line_channel::draw_cyan(vec2 a, vec2 b) { draw(a, b, colors::cyan); }
+
 	void renderer::draw_debug_info(vec2 visible_area, components::transform camera_transform, assets::texture_id tex_id, std::vector<entity_id> target_entities) {
 		auto& tex = resource_manager.find(tex_id)->tex;
 		
@@ -161,20 +179,15 @@ namespace augs {
 			glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.b.x, line.b.y); glerr;
 		};
 
-		std::for_each(lines.begin(), lines.end(), line_lambda);
-
-		for (int i = 0; i < 20; ++i) {
-			std::for_each(lines_channels[i].begin(), lines_channels[i].end(), line_lambda);
-		}
-
-		std::for_each(manually_cleared_lines.begin(), manually_cleared_lines.end(), line_lambda);
-		std::for_each(non_cleared_lines.begin(), non_cleared_lines.end(), line_lambda);
+		std::for_each(logic_lines.lines.begin(), logic_lines.lines.end(), line_lambda);
+		std::for_each(frame_lines.lines.begin(), frame_lines.lines.end(), line_lambda);
+		
+		clear_frame_lines();
 
 		glEnd(); glerr;
 	}
 
 	void renderer::clear_geometry() {
-		lines.clear();
 		triangles.clear();
 	}
 

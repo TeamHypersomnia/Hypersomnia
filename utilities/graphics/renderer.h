@@ -34,32 +34,25 @@ namespace augs {
 		unsigned int position_buffer, texcoord_buffer, color_buffer;
 		unsigned int triangle_buffer;
 
-		std::vector<debug_line> lines;
-		std::vector<debug_line> lines_channels[20];
-		std::vector<debug_line> manually_cleared_lines;
-		std::vector<debug_line> non_cleared_lines;
+		struct line_channel {
+			std::vector<debug_line> lines;
 
-		void push_line(debug_line l) {
-			lines.push_back(l);
-		}
+			void draw(vec2 a, vec2 b, augs::pixel_32 = augs::colors::white);
+			
+			void draw_red(vec2 a, vec2 b);
+			void draw_green(vec2 a, vec2 b);
+			void draw_blue(vec2 a, vec2 b);
+			void draw_yellow(vec2 a, vec2 b);
+			void draw_cyan(vec2 a, vec2 b);
+		};
 
-		void push_line_channel(debug_line l, int i) {
-			lines_channels[i].push_back(l);
-		}
-
-		void clear_channel(int i) {
-			lines_channels[i].clear();
-		}
-
-		void push_non_cleared_line(debug_line l) {
-			non_cleared_lines.push_back(l);
-		}
-
-		void clear_non_cleared_lines() {
-			non_cleared_lines.clear();
-		}
+		line_channel logic_lines;
+		line_channel frame_lines;
 
 		void fullscreen_quad();
+		
+		void clear_logic_lines();
+		void clear_frame_lines();
 		void draw_debug_info(vec2 visible_area, components::transform, assets::texture_id tex, std::vector<entity_id> target_entities);
 
 		void clear();
@@ -76,7 +69,7 @@ namespace augs {
 
 		float visibility_expansion = 1.0f;
 		float max_visibility_expansion_distance = 1000.0f;
-		int debug_drawing = 0;
+		int debug_drawing = 1;
 
 		int draw_visibility = 0;
 

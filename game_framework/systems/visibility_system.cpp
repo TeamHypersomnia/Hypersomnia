@@ -78,6 +78,7 @@ augs::timer interval;
 
 void visibility_system::process_entities() {
 	auto& renderer = get_renderer();
+	auto& lines = get_renderer().logic_lines;
 
 	/* prepare epsilons to be used later, just to make the notation more clear */
 	float epsilon_distance_vertex_hit_sq = epsilon_distance_vertex_hit * PIXELS_TO_METERSf;
@@ -199,10 +200,10 @@ void visibility_system::process_entities() {
 
 			/* debug drawing of the visibility square */
 			if (draw_cast_rays || draw_triangle_edges) {
-				renderer.lines.push_back(renderer::debug_line((vec2(whole_vision[0]) + vec2(-moving_epsilon, 0.f))*METERS_TO_PIXELSf, (vec2(whole_vision[1]) + vec2(moving_epsilon, 0.f))*METERS_TO_PIXELSf));
-				renderer.lines.push_back(renderer::debug_line((vec2(whole_vision[1]) + vec2(0.f, -moving_epsilon))*METERS_TO_PIXELSf, (vec2(whole_vision[2]) + vec2(0.f, moving_epsilon))*METERS_TO_PIXELSf));
-				renderer.lines.push_back(renderer::debug_line((vec2(whole_vision[2]) + vec2(moving_epsilon, 0.f))*METERS_TO_PIXELSf, (vec2(whole_vision[3]) + vec2(-moving_epsilon, 0.f))*METERS_TO_PIXELSf));
-				renderer.lines.push_back(renderer::debug_line((vec2(whole_vision[3]) + vec2(0.f, moving_epsilon))*METERS_TO_PIXELSf, (vec2(whole_vision[0]) + vec2(0.f, -moving_epsilon))*METERS_TO_PIXELSf));
+				lines.draw((vec2(whole_vision[0]) + vec2(-moving_epsilon, 0.f))*METERS_TO_PIXELSf, (vec2(whole_vision[1]) + vec2(moving_epsilon, 0.f))*METERS_TO_PIXELSf);
+				lines.draw((vec2(whole_vision[1]) + vec2(0.f, -moving_epsilon))*METERS_TO_PIXELSf, (vec2(whole_vision[2]) + vec2(0.f, moving_epsilon))*METERS_TO_PIXELSf);
+				lines.draw((vec2(whole_vision[2]) + vec2(moving_epsilon, 0.f))*METERS_TO_PIXELSf, (vec2(whole_vision[3]) + vec2(-moving_epsilon, 0.f))*METERS_TO_PIXELSf);
+				lines.draw((vec2(whole_vision[3]) + vec2(0.f, moving_epsilon))*METERS_TO_PIXELSf, (vec2(whole_vision[0]) + vec2(0.f, -moving_epsilon))*METERS_TO_PIXELSf);
 			}
 
 			/* raycast through the bounds to add another vertices where the shapes go beyond visibility square */
@@ -233,7 +234,7 @@ void visibility_system::process_entities() {
 				}
 
 				if (draw_cast_rays) 
-					renderer.lines.push_back(renderer::debug_line(METERS_TO_PIXELSf * bound.m_vertex1, METERS_TO_PIXELSf * bound.m_vertex2, pixel_32(255, 0, 0, 255)));
+					lines.draw(METERS_TO_PIXELSf * bound.m_vertex1, METERS_TO_PIXELSf * bound.m_vertex2, pixel_32(255, 0, 0, 255));
 
 				for (auto& v : output)
 					push_vertex(v, false);
@@ -298,8 +299,8 @@ void visibility_system::process_entities() {
 
 
 			/* helper debugging lambda */
-			auto draw_line = [&position_meters, &renderer](vec2 point, pixel_32 col) {
-				renderer.lines.push_back(renderer::debug_line(position_meters * METERS_TO_PIXELSf, point * METERS_TO_PIXELSf, col));
+			auto draw_line = [&position_meters, &lines](vec2 point, pixel_32 col) {
+				lines.draw(position_meters * METERS_TO_PIXELSf, point * METERS_TO_PIXELSf, col);
 			};
 
 			/* clear per-frame visibility information */
@@ -550,7 +551,7 @@ void visibility_system::process_entities() {
 				if (draw_triangle_edges) {
 					draw_line(p1 * PIXELS_TO_METERSf, request.color);
 					draw_line(p2 * PIXELS_TO_METERSf, request.color);
-					renderer.lines.push_back(renderer::debug_line(p1, p2, request.color));
+					lines.draw(p1, p2, request.color);
 				}
 
 				request.edges.push_back(std::make_pair(p1, p2));
@@ -587,7 +588,7 @@ void visibility_system::process_entities() {
 
 				/* for every discontinuity, remove if there exists any edge that is too close to the discontinuity's vertex */
 				discs_copy.erase(std::remove_if(discs_copy.begin(), discs_copy.end(),
-					[&request, edges_num, &transform, &wrap, &renderer, &marked_holes, this]
+					[&request, edges_num, &transform, &wrap, &lines, &marked_holes, this]
 				(const components::visibility::discontinuity& d){
 						std::vector<vec2> points_too_close;
 
@@ -636,7 +637,7 @@ void visibility_system::process_entities() {
 							marked_holes.push_back(components::visibility::edge(closest_point, d.points.first));
 							
 							if (draw_discontinuities)
-								renderer.lines.push_back(renderer::debug_line(closest_point, d.points.first, pixel_32(255, 255, 255, 255)));
+								lines.draw(closest_point, d.points.first);
 							
 							/* remove this discontinuity */
 							return true;
@@ -685,7 +686,7 @@ void visibility_system::process_entities() {
 
 			if (draw_discontinuities)
 				for (auto& disc : request.discontinuities)
-					renderer.lines.push_back(renderer::debug_line(disc.points.first, disc.points.second, pixel_32(0, 127, 255, 255)));
+					lines.draw(disc.points.first, disc.points.second, pixel_32(0, 127, 255, 255));
 		}
 	}
 }
