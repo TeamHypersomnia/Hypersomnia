@@ -80,11 +80,13 @@ void hypersomnia_world::register_messages_components_systems() {
 }
 
 void hypersomnia_world::draw() {
+	get_system<render_system>().determine_visible_entities_from_camera_states();
+
 	get_system<render_system>().calculate_and_set_interpolated_transforms();
 	
 	/* read-only message generation */
 
-	get_system<animation_system>().response_requests_to_animation_messages();
+	get_system<animation_system>().transform_response_requests_to_animation_messages();
 
 	get_system<input_system>().acquire_raw_window_inputs();
 	get_system<input_system>().post_input_intents_for_rendering_time();
@@ -117,11 +119,7 @@ void hypersomnia_world::perform_logic_step() {
 	get_system<input_system>().post_input_intents_for_logic_step();
 	get_system<input_system>().post_rendering_time_events_for_logic_step();
 
-	/* intent delegation stage (various ownership relations) */
 
-	get_system<driver_system>().delegate_movement_intents_from_drivers_to_steering_intents_of_owned_vehicles();
-
-	/* end of intent delegation stage */
 
 	get_system<render_system>().set_current_transforms_as_previous_for_interpolation();
 	get_system<crosshair_system>().apply_crosshair_intents_to_crosshair_transforms();
@@ -134,6 +132,12 @@ void hypersomnia_world::perform_logic_step() {
 	get_system<driver_system>().release_drivers_due_to_distance();
 	
 	get_system<driver_system>().affect_drivers_due_to_car_ownership_changes();
+
+	/* intent delegation stage (various ownership relations) */
+
+	get_system<driver_system>().delegate_movement_intents_from_drivers_to_steering_intents_of_owned_vehicles();
+
+	/* end of intent delegation stage */
 
 	get_system<car_system>().set_steering_flags_from_intents();
 	get_system<car_system>().apply_movement_forces();

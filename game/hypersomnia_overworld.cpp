@@ -20,6 +20,7 @@ void SignalHandler(int signal) { throw "Access violation!"; }
 
 hypersomnia_overworld::hypersomnia_overworld() 
 	: game_world(*this) {
+	game_world.initialize_entity_component_pools(200000);
 }
 
 void hypersomnia_overworld::set_scene_builder(std::unique_ptr<scene_builder> builder) {
