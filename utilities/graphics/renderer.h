@@ -23,7 +23,7 @@ namespace augs {
 		};
 
 		struct debug_line {
-			debug_line(vec2 a, vec2 b, augs::pixel_32 col = augs::pixel_32(255, 255, 255, 255)) : col(col), a(a), b(b) {}
+			debug_line(vec2 a = vec2(), vec2 b = vec2(), augs::pixel_32 col = augs::pixel_32(255, 255, 255, 255)) : col(col), a(a), b(b) {}
 
 			augs::pixel_32 col;
 			vec2 a, b;
@@ -46,14 +46,14 @@ namespace augs {
 			void draw_cyan(vec2 a, vec2 b);
 		};
 
-		line_channel logic_lines;
+		line_channel logic_lines, prev_logic_lines;
 		line_channel frame_lines;
 
 		void fullscreen_quad();
 		
 		void clear_logic_lines();
 		void clear_frame_lines();
-		void draw_debug_info(vec2 visible_area, components::transform, assets::texture_id tex, std::vector<entity_id> target_entities);
+		void draw_debug_info(vec2 visible_area, components::transform, assets::texture_id tex, std::vector<entity_id> target_entities, double interpolation_ratio);
 
 		void clear();
 		void call_triangles();

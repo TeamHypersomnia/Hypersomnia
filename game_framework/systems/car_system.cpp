@@ -32,6 +32,9 @@ void car_system::set_steering_flags_from_intents() {
 		case messages::intent_message::intent_type::MOVE_RIGHT:
 			car.turning_right = it.pressed_flag;
 			break;
+		case messages::intent_message::intent_type::HAND_BRAKE:
+			car.hand_brake = it.pressed_flag;
+			break;
 		default: break;
 		}
 	}
@@ -94,15 +97,19 @@ void car_system::apply_movement_forces() {
 		auto forwardal_speed = forwardal.length();
 		forwardal.normalize_hint(forwardal_speed);
 
-		physics.apply_force(-forwardal * 0.00006 * forwardal_speed * forwardal_speed);
+			physics.apply_force(-forwardal * 0.00006 * forwardal_speed * forwardal_speed);
 
-		//std::cout << lateral.length() << std::endl;
 		//lateral.set_length(0.2f*speed);
 		
 		if (lateral.length() > 20)
 			lateral.set_length(20);
 			
-		physics.apply_impulse(-lateral * physics.get_mass() * 0.75);
+		if (!car.hand_brake) {
+			physics.body->SetAngularDamping(2.f);
+			physics.apply_impulse(-lateral * physics.get_mass() * 0.75);
+		}
+		else
+			physics.body->SetAngularDamping(0.8f);
 		//physics.apply_impulse(-lateral * physics.get_mass() * 0.75 / 30, forward_dir * 200 + vec2(right_normal).set_length(125), true);
 		//physics.apply_impulse(-lateral * physics.get_mass() * 0.75 / 30, forward_dir * 200 - vec2(right_normal).set_length(125), true);
 		
@@ -113,11 +120,12 @@ void car_system::apply_movement_forces() {
 
 		auto ang_impulse = 0.06f * body->GetInertia() * -body->GetAngularVelocity();
 		
-		if (ang_impulse > 0.3)
-			ang_impulse = 0.3; 
-		if (ang_impulse < -0.3)
-			ang_impulse = -0.3;
+		//if (ang_impulse > 0.3)
+		//	ang_impulse = 0.3; 
+		//if (ang_impulse < -0.3)
+		//	ang_impulse = -0.3;
 
-		body->ApplyAngularImpulse(ang_impulse, true);
+		if(forwardal_speed > 500)
+			body->ApplyAngularImpulse(ang_impulse * (forwardal_speed-499.0)/4000.0, true);
 	}
 }

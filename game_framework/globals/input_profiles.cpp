@@ -17,6 +17,7 @@ namespace input_profiles {
 		out.add(messages::intent_message::MOVE_LEFT);
 		out.add(messages::intent_message::MOVE_RIGHT);
 		out.add(messages::intent_message::RELEASE_CAR);
+		out.add(messages::intent_message::HAND_BRAKE);
 		return out;
 	}
 }

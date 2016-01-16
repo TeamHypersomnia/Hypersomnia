@@ -13,9 +13,10 @@ namespace components {
 		bool deccelerating = false;
 		bool turning_right = false;
 		bool turning_left = false;
+		bool hand_brake = false;
 
 		void reset_movement_flags() {
-			accelerating = deccelerating = turning_left = turning_right = false;
+			accelerating = deccelerating = turning_left = turning_right = hand_brake = false;
 		}
 		
 		float braking_damping = -1.f;

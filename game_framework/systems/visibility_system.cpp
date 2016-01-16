@@ -57,8 +57,6 @@ std::vector<vec2> components::visibility::layer::get_polygon(float distance_epsi
 			std::isnan(edges[i].second.y)
 			)
 		{
-			int found_nan = 24;
-			std::cout << found_nan << std::endl;
 			break;
 		}
 

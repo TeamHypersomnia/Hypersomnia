@@ -53,8 +53,8 @@ void input_system::post_intents_from_inputs(const std::vector<messages::raw_wind
 		for (auto& it : inputs_for_this_step) {
 			auto& state = it.raw_window_input;
 
-			for (auto it : active_contexts) {
-				if (!it.enabled) continue;
+			for (auto& context : active_contexts) {
+				if (!context.enabled) continue;
 
 				messages::unmapped_intent_message unmapped_intent;
 				unmapped_intent.state = state;
@@ -66,8 +66,8 @@ void input_system::post_intents_from_inputs(const std::vector<messages::raw_wind
 				if (state.key_event == event::NONE) {
 					unmapped_intent.pressed_flag = true;
 
-					auto found_intent = it.event_to_intent.find(state.msg);
-					if (found_intent != it.event_to_intent.end()) {
+					auto found_intent = context.event_to_intent.find(state.msg);
+					if (found_intent != context.event_to_intent.end()) {
 						intents = (*found_intent).second;
 						found_context_entry = true;
 					}
@@ -75,8 +75,8 @@ void input_system::post_intents_from_inputs(const std::vector<messages::raw_wind
 				else if (state.key_event == event::PRESSED || state.key_event == event::RELEASED) {
 					unmapped_intent.pressed_flag = state.key_event == event::PRESSED;
 
-					auto found_intent = it.key_to_intent.find(state.key);
-					if (found_intent != it.key_to_intent.end()) {
+					auto found_intent = context.key_to_intent.find(state.key);
+					if (found_intent != context.key_to_intent.end()) {
 						intents = (*found_intent).second;
 						found_context_entry = true;
 					}

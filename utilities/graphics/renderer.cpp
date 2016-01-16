@@ -49,7 +49,6 @@ namespace augs {
 		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer); glerr;
 
 		glBufferData(GL_ARRAY_BUFFER, sizeof(augs::vertex_triangle) * triangles.size(), triangles.data(), GL_STREAM_DRAW); glerr;
-		//std::cout << "triangles:" << triangles.size() << std::endl;
 		glDrawArrays(GL_TRIANGLES, 0, triangles.size() * 3); glerr;
 	}
 
@@ -96,6 +95,7 @@ namespace augs {
 	}
 
 	void renderer::clear_logic_lines() {
+		prev_logic_lines = logic_lines;
 		logic_lines.lines.clear();
 	}
 
@@ -113,7 +113,7 @@ namespace augs {
 	void renderer::line_channel::draw_yellow(vec2 a, vec2 b) { draw(a, b, colors::yellow); }
 	void renderer::line_channel::draw_cyan(vec2 a, vec2 b) { draw(a, b, colors::cyan); }
 
-	void renderer::draw_debug_info(vec2 visible_area, components::transform camera_transform, assets::texture_id tex_id, std::vector<entity_id> target_entities) {
+	void renderer::draw_debug_info(vec2 visible_area, components::transform camera_transform, assets::texture_id tex_id, std::vector<entity_id> target_entities, double ratio) {
 		auto& tex = resource_manager.find(tex_id)->tex;
 		
 		vec2 center = visible_area / 2;
@@ -179,7 +179,21 @@ namespace augs {
 			glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.b.x, line.b.y); glerr;
 		};
 
-		std::for_each(logic_lines.lines.begin(), logic_lines.lines.end(), line_lambda);
+		if (logic_lines.lines.size() == prev_logic_lines.lines.size()) {
+			std::vector<debug_line> interpolated_logic_lines;
+			interpolated_logic_lines.resize(logic_lines.lines.size());
+
+			for (int i = 0; i < logic_lines.lines.size(); ++i) {
+				interpolated_logic_lines[i].a = prev_logic_lines.lines[i].a.lerp(logic_lines.lines[i].a, ratio);
+				interpolated_logic_lines[i].b = prev_logic_lines.lines[i].b.lerp(logic_lines.lines[i].b, ratio);
+				interpolated_logic_lines[i].col = logic_lines.lines[i].col;
+			}
+
+			std::for_each(interpolated_logic_lines.begin(), interpolated_logic_lines.end(), line_lambda);
+		}
+		else
+			std::for_each(logic_lines.lines.begin(), logic_lines.lines.end(), line_lambda);
+
 		std::for_each(frame_lines.lines.begin(), frame_lines.lines.end(), line_lambda);
 		
 		clear_frame_lines();

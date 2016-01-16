@@ -9,6 +9,7 @@
 #include "game_framework/assets/atlas.h"
 
 #include "game_framework/systems/input_system.h"
+#include "game_framework/systems/render_system.h"
 #include "game_framework/components/chase_component.h"
 
 #include "game_framework/messages/crosshair_intent_message.h"
@@ -68,8 +69,8 @@ namespace scene_builders {
 
 		auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
 
-		for (int x = -4; x < 4; ++x)
-			for (int y = -4; y < 4; ++y)
+		for (int x = -40; x < 40; ++x)
+			for (int y = -40; y < 40; ++y)
 			{
 				auto background = world.create_entity();
 				archetypes::sprite(background, vec2(x, y) * bg_size, assets::texture_id::TEST_BACKGROUND);
@@ -103,22 +104,27 @@ namespace scene_builders {
 		active_context.map_key_to_intent(window::event::keys::RMOUSE, messages::intent_message::CROSSHAIR_SECONDARY_ACTION);
 		active_context.map_key_to_intent(window::event::keys::E, messages::intent_message::RELEASE_CAR);
 		active_context.map_key_to_intent(window::event::keys::E, messages::intent_message::PRESS_TRIGGER);
+		active_context.map_key_to_intent(window::event::keys::SPACE, messages::intent_message::HAND_BRAKE);
 
 		world.get_system<input_system>().add_context(active_context);
 
-		world.parent_overworld.configure_stepping(60.0, 5);
-		world.parent_overworld.accumulator.set_time_multiplier(1.0);
 
 		if (augs::file_exists(L"recorded.inputs")) {
+			world.parent_overworld.configure_stepping(60.0, 500);
+			world.parent_overworld.accumulator.set_time_multiplier(6.00);
+
 			world.get_system<input_system>().raw_window_input_player.player.load_recording("recorded.inputs");
 			world.get_system<input_system>().raw_window_input_player.player.replay();
 		
 			world.get_system<input_system>().crosshair_intent_player.player.load_recording("recorded_crosshair.inputs");
 			world.get_system<input_system>().crosshair_intent_player.player.replay();
-			
-			world.parent_overworld.accumulator.set_time_multiplier(2.00);
+
+			world.get_system<render_system>().enable_interpolation = false;
 		}
 		else {
+			world.parent_overworld.configure_stepping(60.0, 5);
+			world.parent_overworld.accumulator.set_time_multiplier(1.0);
+
 			augs::create_directory("sessions/" + augs::get_timestamp());
 
 			world.get_system<input_system>().raw_window_input_player.player.record("sessions/" + augs::get_timestamp() + "/recorded.inputs");

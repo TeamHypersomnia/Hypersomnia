@@ -171,7 +171,6 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 				target_value = (player_pos - camera.previous_seen_player_position) / per_second();
 
 				//maybe_physics->velocity();
-				std::cout << target_value << std::endl;
 				if (target_value.length() > 20)
 					target_value.set_length(20);
 
@@ -228,7 +227,7 @@ void camera_system::render_all_cameras() {
 
 			if (renderer.debug_drawing) {
 				glDisable(GL_TEXTURE_2D);
-				renderer.draw_debug_info(camera.rendered_size, drawn_transform, assets::texture_id::BLANK, parent_world.get_system<render_system>().targets);
+				renderer.draw_debug_info(camera.rendered_size, drawn_transform, assets::texture_id::BLANK, parent_world.get_system<render_system>().targets, view_interpolation_ratio());
 				glEnable(GL_TEXTURE_2D);
 			}
 		}
