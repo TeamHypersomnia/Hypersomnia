@@ -56,7 +56,7 @@ namespace augs {
 		}
 
 		T* data() { 
-			return static_cast<T*>(memory_pool::data()); 
+			return reinterpret_cast<T*>(memory_pool::data());
 		}
 
 		T& operator[](int index) {

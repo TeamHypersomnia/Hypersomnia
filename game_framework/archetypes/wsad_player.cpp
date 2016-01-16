@@ -16,6 +16,7 @@
 #include "game_framework/components/trigger_detector_component.h"
 #include "game_framework/components/driver_component.h"
 
+
 #include "game_framework/game/body_helper.h"
 
 #include "game_framework/globals/filters.h"
@@ -83,6 +84,8 @@ namespace archetypes {
 		e->add(transform);
 		e->add(input_profiles::crosshair());
 		e->add(crosshair);
+
+		archetypes::always_visible(e);
 	}
 
 	void wsad_player(augs::entity_id e, augs::entity_id crosshair_entity, augs::entity_id camera_entity) {

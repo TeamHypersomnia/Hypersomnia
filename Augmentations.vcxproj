@@ -370,6 +370,7 @@
     <ClCompile Include="depthbase\gui\text\text_rect.cpp" />
     <ClCompile Include="depthbase\gui\text\ui.cpp" />
     <ClCompile Include="depthbase\gui\text\word_separator.cpp" />
+    <ClCompile Include="game_framework\archetypes\archetypes.cpp" />
     <ClCompile Include="game_framework\archetypes\box_physics.cpp" />
     <ClCompile Include="game_framework\archetypes\car.cpp" />
     <ClCompile Include="game_framework\archetypes\sprite.cpp" />
@@ -404,6 +405,7 @@
     <ClCompile Include="game_framework\globals\input_profiles.cpp" />
     <ClCompile Include="game_framework\resources\animation.cpp" />
     <ClCompile Include="game_framework\resources\manager.cpp" />
+    <ClCompile Include="game_framework\scene_builders\one_entity.cpp" />
     <ClCompile Include="game_framework\scene_builders\scene_builder.cpp" />
     <ClCompile Include="game_framework\scene_builders\scripts\testbed_rendering.cpp" />
     <ClCompile Include="game_framework\scene_builders\testbed.cpp" />
@@ -1006,6 +1008,7 @@
     <ClInclude Include="game_framework\resources\animation_response.h" />
     <ClInclude Include="game_framework\resources\manager.h" />
     <ClInclude Include="game_framework\resources\particle_emitter_info.h" />
+    <ClInclude Include="game_framework\scene_builders\one_entity.h" />
     <ClInclude Include="game_framework\scene_builders\scene_builder.h" />
     <ClInclude Include="game_framework\scene_builders\scripts\rendering_procedures.h" />
     <ClInclude Include="game_framework\scene_builders\all_builders.h" />

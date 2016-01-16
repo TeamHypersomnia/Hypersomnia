@@ -51,8 +51,17 @@ namespace augs {
 
 	void memory_pool::initialize(int slot_count, int slot_size) {
 		this->slot_size = slot_size;
+		resize(slot_count);
+	}
+	
+	void memory_pool::resize(int slot_count) {
+		// TODO: actually do the resizing instead of reinitialization
 
 		pool.clear();
+		indirectors.clear();
+		slots.clear();
+		free_indirectors.clear();
+
 		pool.resize(slot_count * slot_size);
 		slots.resize(slot_count);
 
@@ -172,7 +181,7 @@ namespace augs {
 	}
 
 	memory_pool::id memory_pool::allocate_with_default_construct(size_t type_hash) {
-		// TODO typed memory allocation but only if needed
+		// TODO: typed memory allocation but only if needed
 		assert(0);
 		return memory_pool::id();
 	}

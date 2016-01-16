@@ -53,7 +53,7 @@ namespace components {
 
 		render.was_drawn = false;
 
-		vec2 v[4];
+		static thread_local vec2 v[4];
 		vec2i transform_pos = in.drawn_transform.pos;
 		make_rect(transform_pos, vec2(size), in.drawn_transform.rotation, v);
 		if (!in.always_visible && !rects::ltrb<float>::get_aabb(v).hover(in.rotated_camera_aabb)) return;
@@ -64,7 +64,7 @@ namespace components {
 		make_rect(target_position, vec2(size), in.drawn_transform.rotation + rotation_offset, v);
 
 		/* rotate around the center of the screen */
-		if (std::abs(in.camera_transform.rotation) > 0)
+		if (in.camera_transform.rotation != 0.f)
 			for (auto& vert : v)
 				vert.rotate(in.camera_transform.rotation, center);
 

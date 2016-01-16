@@ -20,8 +20,7 @@ namespace augs {
 }
 
 namespace components {
-	class tile_layer {
-	public:
+	struct tile_layer {
 		struct tile {
 			unsigned type_id = 0;
 

@@ -97,7 +97,7 @@ namespace prefabs {
 			transform.pos = pos;
 			trigger.entity_to_be_notified = front;
 
-			render.layer = components::render::render_layer::CAR_INTERIOR;
+			render.layer = components::render::render_layer::CAR_WHEEL;
 
 			sprite.set(assets::texture_id::CAR_INSIDE, augs::pixel_32(255, 0, 0, 255));
 			sprite.size.x = 30;
@@ -112,6 +112,7 @@ namespace prefabs {
 			info.transform_vertices.pos = offset;
 			
 			auto& physics = helpers::add_fixtures_to_other_body(info, left_wheel, front);
+			//archetypes::always_visible(left_wheel);
 		}
 
 		return front;

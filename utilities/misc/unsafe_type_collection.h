@@ -87,6 +87,10 @@ namespace augs {
 		size_t size() const {
 			return raw_map.size();
 		}
+
+		std::unordered_map<size_t, void*>& get_raw() {
+			return raw_map;
+		}
 	};
 
 	template <template<typename...> class Container>
@@ -141,6 +145,7 @@ namespace augs {
 		}
 
 		using unsafe_type_collection::size;
+		using unsafe_type_collection::get_raw;
 		using unsafe_type_collection::~unsafe_type_collection;
 	};
 }

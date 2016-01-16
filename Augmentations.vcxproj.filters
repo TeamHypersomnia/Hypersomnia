@@ -1041,6 +1041,12 @@
     <ClCompile Include="game_framework\components\fixtures_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game_framework\archetypes\archetypes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\scene_builders\one_entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -2874,6 +2880,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\components\fixtures_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\scene_builders\one_entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

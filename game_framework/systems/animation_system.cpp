@@ -11,7 +11,7 @@
 using namespace messages;
 using namespace resources;
 
-void animation_system::response_requests_to_animation_messages() {
+void animation_system::transform_response_requests_to_animation_messages() {
 	auto events = parent_world.get_message_queue<animation_response_message>();
 
 	for (auto it : events) {

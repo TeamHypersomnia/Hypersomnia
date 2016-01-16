@@ -94,6 +94,14 @@ namespace augs {
 			ltrb(T l, T t, T r, T b) : l(l), t(t), r(r), b(b) {}
 			void set(T l, T t, T r, T b) { *this = ltrb(l, t, r, b); }
 
+			vec2t<T> left_top() {
+				return vec2t<T>(l, t);
+			}
+
+			vec2t<T> right_bottom() {
+				return vec2t<T>(r, b);
+			}
+
 			T perimeter() const {
 				return 2 * w() + 2 * h();
 			}

@@ -1,4 +1,4 @@
-#include "testbed.h"
+#include "one_entity.h"
 #include "../archetypes/archetypes.h"
 
 #include "entity_system/world.h"
@@ -22,7 +22,7 @@
 using namespace augs;
 
 namespace scene_builders {
-	void testbed::initialize(world& world) {
+	void one_entity::initialize(world& world) {
 		auto window_rect = window::glwindow::get_current()->get_screen_rect();
 
 		resource_manager.destroy_everything();
@@ -56,43 +56,14 @@ namespace scene_builders {
 		player_response[messages::animation_response_message::MOVE] = assets::animation_id::TORSO_MOVE;
 
 		auto camera = world.create_entity();
-		auto crosshair = world.create_entity();
-		auto player = world.create_entity();
-		auto crate = world.create_entity();
-		auto crate2 = world.create_entity();
-		auto crate3 = world.create_entity();
-		auto crate4 = world.create_entity();
-
-		auto car = prefabs::create_car(world, vec2(-300, 0));
 
 		archetypes::camera(camera, window_rect.w, window_rect.h);
 
 		auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
 
-		for (int x = -4*20; x < 4 * 20; ++x)
-			for (int y = -4 * 20; y < 4 * 20; ++y)
-			{
-				auto background = world.create_entity();
-				archetypes::static_sprite(background, vec2(x, y) * bg_size, assets::texture_id::TEST_BACKGROUND);
-			}
+		auto background = world.create_entity();
+		archetypes::static_sprite(background, vec2(500, 0), assets::texture_id::TEST_BACKGROUND);
 		
-		archetypes::wsad_player_crosshair(crosshair);
-		archetypes::wsad_player(player, crosshair, camera);
-
-		archetypes::wsad_player_physics(player);
-
-		archetypes::sprite_scalled(crate, vec2(200, 300), vec2i(100, 100)/3, assets::texture_id::CRATE, augs::colors::white, components::render::render_layer::DYNAMIC_BODY);
-		archetypes::crate_physics(crate);
-		
-		archetypes::sprite_scalled(crate2, vec2(400, 400), vec2i(100, 100), assets::texture_id::CRATE, augs::colors::white, components::render::render_layer::DYNAMIC_BODY);
-		archetypes::crate_physics(crate2);
-		
-		archetypes::sprite_scalled(crate4, vec2(500, 0), vec2i(100, 100), assets::texture_id::CRATE, augs::colors::white, components::render::render_layer::DYNAMIC_BODY);
-		archetypes::crate_physics(crate4);
-		
-		archetypes::sprite_scalled(crate3, vec2(-500, -3050), vec2i(5000, 30), assets::texture_id::CRATE, augs::colors::white, components::render::render_layer::DYNAMIC_BODY);
-		archetypes::static_crate_physics(crate3);
-
 		input_system::context active_context;
 		active_context.map_event_to_intent(window::event::raw_mousemotion, messages::intent_message::MOVE_CROSSHAIR);
 		active_context.map_key_to_intent(window::event::keys::LSHIFT, messages::intent_message::SWITCH_LOOK);
@@ -107,7 +78,6 @@ namespace scene_builders {
 		active_context.map_key_to_intent(window::event::keys::SPACE, messages::intent_message::HAND_BRAKE);
 
 		world.get_system<input_system>().add_context(active_context);
-
 
 		if (augs::file_exists(L"recorded.inputs")) {
 			world.parent_overworld.configure_stepping(60.0, 500);
@@ -132,24 +102,11 @@ namespace scene_builders {
 		}
 	}
 
-	void testbed::perform_logic_step(world& world) {
-		auto inputs = world.get_message_queue<messages::crosshair_intent_message>();
-
-		for (auto& it : inputs) {
-			if (it.intent == messages::intent_message::CROSSHAIR_PRIMARY_ACTION) {
-				keep_drawing = it.pressed_flag;
-				it.intent = messages::intent_message::MOVE_CROSSHAIR;
-			}
-
-			if (it.intent == messages::intent_message::MOVE_CROSSHAIR && keep_drawing) {
-				auto ent = world.create_entity();
-				archetypes::static_sprite_scalled(ent, it.crosshair_world_pos, vec2(10, 10), assets::texture_id::BLANK);
-			}
-		}
+	void one_entity::perform_logic_step(world& world) {
 
 	}
 
-	void testbed::draw(world& world) {
+	void one_entity::draw(world& world) {
 
 	}
 }

@@ -16,15 +16,22 @@ namespace shared {
 	class drawing_state;
 }
 
-class render_system : public processing_system_templated<components::transform, components::render> {
+class render_system : public event_only_system {
 public:
-	using processing_system_templated::processing_system_templated;
+	using event_only_system::event_only_system;
 
 	std::vector<std::vector<entity_id>> layers;
+	
+	std::vector<entity_id> always_visible_entities;
+	std::vector<entity_id> visible_entities;
+
+	void set_visibility_persistence(entity_id, bool);
 
 	bool enable_interpolation = true;
 
-	void generate_layers(int mask);
+	void determine_visible_entities_from_camera_states();
+
+	void generate_layers(shared::drawing_state& in, int mask);
 	void draw_layer(shared::drawing_state& in, int layer);
 	void generate_and_draw_all_layers(shared::drawing_state& in, int mask);
 

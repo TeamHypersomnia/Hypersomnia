@@ -46,20 +46,17 @@ namespace augs {
 
 	template <class vec, class d>
 	vec& rotate(vec& v, const vec& origin, d angle) {
-		if (std::abs(angle) > 0) {
-			angle *= static_cast<d>(0.01745329251994329576923690768489);
-			auto s = sin(angle);
-			auto c = cos(angle);
-			vec rotated;
+		angle *= static_cast<d>(0.01745329251994329576923690768489);
+		auto s = sin(angle);
+		auto c = cos(angle);
+		vec rotated;
 
-			v -= origin;
+		v -= origin;
 
-			rotated.x = v.x * c - v.y * s;
-			rotated.y = v.x * s + v.y * c;
+		rotated.x = v.x * c - v.y * s;
+		rotated.y = v.x * s + v.y * c;
 
-			return v = (rotated + origin);
-		}
-		return v;
+		return v = (rotated + origin);
 	}
 
 	template <class vec, class d>

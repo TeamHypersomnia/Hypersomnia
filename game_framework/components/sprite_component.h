@@ -9,8 +9,7 @@ namespace shared {
 }
 
 namespace components {
-	class sprite {
-	public:
+	struct sprite {
 		static void make_rect(vec2 pos, vec2 size, float rotation_degrees, vec2 out[4]);
 
 		assets::texture_id tex = assets::BLANK;

@@ -105,8 +105,10 @@ namespace augs {
 
 		memory_pool(int slot_count = 0, int slot_size = 0);
 		~memory_pool();
+
 		void initialize(int slot_count, int slot_size);
-		
+		void resize(int slot_count);
+
 		id allocate();
 		bool free(id);
 		void free_all();

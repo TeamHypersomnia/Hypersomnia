@@ -2,8 +2,14 @@
 #include "processing_system.h"
 
 namespace augs {
-	world::world(overworld& parent_overworld) : parent_overworld(parent_overworld) {
-		entities.initialize(10000);
+	world::world(overworld& parent_overworld) : parent_overworld(parent_overworld) {}
+
+	void world::initialize_entity_component_pools(int maximum_elements) {
+		maximum_entities = maximum_elements;
+		entities.initialize(maximum_entities);
+
+		for (auto& cont : component_containers.get_raw())
+			((memory_pool*)cont.second)->resize(maximum_entities);
 	}
 
 	world::~world() {

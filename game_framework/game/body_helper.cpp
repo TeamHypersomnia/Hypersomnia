@@ -80,6 +80,8 @@ namespace helpers {
 				convex_polys.push_back(new_convex);
 			}
 		}
+
+		// TODO: remove the visual components server-side
 	}
 
 	void physics_info::add_concave(const std::vector <vec2> &verts) {

@@ -11,6 +11,9 @@ namespace augs {
 	}
 
 	component_bitset_matcher entity::get_component_signature() {
+#if USE_POINTER_TUPLE
+		return signature;
+#else
 		std::vector<unsigned> indices;
 
 		for (auto& raw : type_to_component.raw) {
@@ -19,6 +22,7 @@ namespace augs {
 		}
 
 		return indices;
+#endif
 	}
 
 	entity_id entity::get_id() {
@@ -26,13 +30,45 @@ namespace augs {
 	}
 
 	void entity::clear() {
+#if USE_POINTER_TUPLE
+		remove<components::animation>();
+		remove<components::animation_response>();
+		remove<components::behaviour_tree>();
+		remove<components::camera>();
+		remove<components::chase>();
+		remove<components::children>();
+		remove<components::crosshair>();
+		remove<components::damage>();
+		remove<components::gun>();
+		remove<components::input>();
+		remove<components::lookat>();
+		remove<components::movement>();
+		remove<components::particle_emitter>();
+		remove<components::particle_group>();
+		remove<components::pathfinding>();
+		remove<components::physics>();
+		remove<components::render>();
+		remove<components::steering>();
+		remove<components::transform>();
+		remove<components::visibility>();
+		remove<components::sprite>();
+		remove<components::polygon>();
+		remove<components::tile_layer>();
+		remove<components::car>();
+		remove<components::driver>();
+		remove<components::trigger>();
+		remove<components::trigger_detector>();
+		remove<components::fixtures>();
+#else
 		auto ids_to_remove = type_to_component.raw;
 
 		for (auto c : ids_to_remove)
 			remove(c.key);
+#endif
 	}
 
 	void entity::remove(size_t component_type_hash) {
+#if !USE_POINTER_TUPLE
 		component_bitset_matcher old_signature(get_component_signature());
 
 		component_bitset_matcher new_signature(old_signature);
@@ -61,6 +97,9 @@ namespace augs {
 
 #ifdef INCLUDE_COMPONENT_NAMES
 		typestrs.remove(component_type_hash);
+#endif
+#else
+		assert(0);
 #endif
 	}
 }

@@ -79,8 +79,6 @@ components::camera::constraint_output components::camera::get_constrained_crossh
 }
 
 void camera_system::resolve_cameras_transforms_and_smoothing() {
-	double delta = smooth_timer.extract<std::chrono::seconds>();
-
 	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
 	std::sort(targets.begin(), targets.end(), [](entity_id a, entity_id b) {
 		return a->get<components::camera>().layer > b->get<components::camera>().layer;
@@ -95,8 +93,13 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 			transform.pos = vec2i(transform.pos);
 			
 			auto constraints = camera.get_constrained_crosshair_and_camera_offset(e);
-			vec2i camera_crosshair_offset = constraints.camera_crosshair_offset;
-			camera.crosshair->get<components::transform>().pos = constraints.constrained_crosshair_pos;
+
+			vec2i camera_crosshair_offset;
+			
+			if (camera.crosshair.alive()) {
+				camera_crosshair_offset = constraints.camera_crosshair_offset;
+				camera.crosshair->get<components::transform>().pos = constraints.constrained_crosshair_pos;
+			}
 
 			components::transform drawn_transform;
 			vec2 drawn_size;
@@ -109,7 +112,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 			if (camera.enable_smoothing) {
 				/* variable time step camera smoothing by averaging last position with the current */
 				float averaging_constant =
-					pow(camera.smoothing_average_factor, camera.averages_per_sec * delta);
+					pow(camera.smoothing_average_factor, camera.averages_per_sec * frame_time());
 				
 				if (camera.dont_smooth_once)
 					averaging_constant = 0.0f;
@@ -157,37 +160,39 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 				}
 			}
 
-			vec2 target_value;
-			auto maybe_physics = camera.player->find<components::physics>();
+			if (camera.player.alive()) {
+				vec2 target_value;
+				auto maybe_physics = camera.player->find<components::physics>();
 
-			if (maybe_physics) {
-				auto player_pos = maybe_physics->get_position();
-				
-				if (player_pos != camera.previous_step_player_position) {
-					camera.previous_seen_player_position = camera.previous_step_player_position;
-					camera.previous_step_player_position = player_pos;
+				if (maybe_physics) {
+					auto player_pos = maybe_physics->get_position();
+
+					if (player_pos != camera.previous_step_player_position) {
+						camera.previous_seen_player_position = camera.previous_step_player_position;
+						camera.previous_step_player_position = player_pos;
+					}
+
+					target_value = (player_pos - camera.previous_seen_player_position) / per_second();
+
+					//maybe_physics->velocity();
+					if (target_value.length() > 20)
+						target_value.set_length(20);
+
+					if (target_value.length() < camera.smoothing_player_pos.value.length())
+						// braking
+						camera.smoothing_player_pos.averages_per_sec = 8;
+					else
+						camera.smoothing_player_pos.averages_per_sec = 5;
+				}
+				else {
+					target_value = camera.player->get<components::render>().interpolation_direction();
+					target_value.set_length(100);
+					camera.smoothing_player_pos.averages_per_sec = 5;
 				}
 
-				target_value = (player_pos - camera.previous_seen_player_position) / per_second();
-
-				//maybe_physics->velocity();
-				if (target_value.length() > 20)
-					target_value.set_length(20);
-
-				if (target_value.length() < camera.smoothing_player_pos.value.length())
-					// braking
-					camera.smoothing_player_pos.averages_per_sec = 8;
-				else
-					camera.smoothing_player_pos.averages_per_sec = 5;
+				camera.smoothing_player_pos.target_value = target_value * (-1);
+				camera.smoothing_player_pos.tick();
 			}
-			else {
-				target_value = camera.player->get<components::render>().interpolation_direction();
-				target_value.set_length(100);
-				camera.smoothing_player_pos.averages_per_sec = 5;
-			}
-
-			camera.smoothing_player_pos.target_value = target_value * (-1);
-			camera.smoothing_player_pos.tick();
 
 			drawn_transform.pos = vec2i(drawn_transform.pos + camera.smoothing_player_pos.value);
 			drawn_size = vec2i(drawn_size);
@@ -196,6 +201,14 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 
 			camera.previously_drawn_at = drawn_transform;
 			camera.rendered_size = drawn_size;
+
+			shared::drawing_state in;
+			in.rotated_camera_aabb = rects::ltrb<float>::get_aabb_rotated(camera.rendered_size, drawn_transform.rotation) + drawn_transform.pos - camera.rendered_size / 2;
+			in.camera_transform = drawn_transform;
+			in.output = &get_renderer();
+			in.visible_area = camera.rendered_size;
+
+			camera.how_camera_will_render = in;
 		}
 	}
 }
@@ -209,15 +222,8 @@ void camera_system::render_all_cameras() {
 		if (camera.enabled) {
 			glViewport(camera.screen_rect.x, camera.screen_rect.y, camera.screen_rect.w, camera.screen_rect.h);
 			
-			auto drawn_transform = camera.previously_drawn_at;
-
-			shared::drawing_state in;
-			in.rotated_camera_aabb =
-				rects::ltrb<float>::get_aabb_rotated(camera.rendered_size, drawn_transform.rotation) + drawn_transform.pos - camera.rendered_size / 2;
-			in.camera_transform = drawn_transform;
-			in.output = &renderer;
-			in.visible_area = camera.rendered_size;
-
+			auto& in = camera.how_camera_will_render;
+			
 			if (camera.drawing_callback)
 				camera.drawing_callback(e, in, camera.mask);
 			else {
@@ -227,7 +233,7 @@ void camera_system::render_all_cameras() {
 
 			if (renderer.debug_drawing) {
 				glDisable(GL_TEXTURE_2D);
-				renderer.draw_debug_info(camera.rendered_size, drawn_transform, assets::texture_id::BLANK, parent_world.get_system<render_system>().targets, view_interpolation_ratio());
+				renderer.draw_debug_info(camera.rendered_size, in.camera_transform, assets::texture_id::BLANK, parent_world.get_system<render_system>().targets, view_interpolation_ratio());
 				glEnable(GL_TEXTURE_2D);
 			}
 		}

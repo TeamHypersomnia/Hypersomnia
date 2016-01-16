@@ -66,6 +66,8 @@ namespace components {
 		typedef std::function<void(augs::entity_id, shared::drawing_state, int)> drawing_procedure;
 		drawing_procedure drawing_callback;
 
+		shared::drawing_state how_camera_will_render;
+
 	private:
 		friend class camera_system;
 		friend class gun_system;

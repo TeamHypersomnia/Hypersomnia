@@ -15,8 +15,7 @@ namespace shared {
 }
 
 namespace components {
-	class polygon {
-	public:
+	struct polygon {
 		enum uv_mapping_mode {
 			OVERLAY,
 			STRETCH
