@@ -2888,5 +2888,8 @@
     <ClInclude Include="game_framework\messages\new_entity_message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game_framework\globals\layers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -988,6 +988,7 @@
     <ClInclude Include="game_framework\globals\filters.h" />
     <ClInclude Include="game_framework\globals\input_profiles.h" />
     <ClInclude Include="game_framework\globals\joints.h" />
+    <ClInclude Include="game_framework\globals\layers.h" />
     <ClInclude Include="game_framework\messages\animation_message.h" />
     <ClInclude Include="game_framework\components\animation_response_component.h" />
     <ClInclude Include="game_framework\messages\animation_response_message.h" />

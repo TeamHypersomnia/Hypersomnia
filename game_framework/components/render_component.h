@@ -3,6 +3,7 @@
 #include "transform_component.h"
 
 #include "math/vec2.h"
+#include "../globals/layers.h"
 
 namespace components {
 	struct render : public augs::component {
@@ -20,20 +21,6 @@ namespace components {
 
 		enum mask_type {
 			WORLD,
-		};
-
-		enum render_layer {
-			CROSSHAIR,
-			GUI,
-			HAT,
-			CHARACTER,
-			HELD_ITEM,
-			DYNAMIC_BODY,
-			DROPPED_ITEM,
-			CAR_WHEEL,
-			CAR_INTERIOR,
-			GROUND,
-			BOTTOM,
 		};
 
 		render_layer layer = render_layer::BOTTOM;

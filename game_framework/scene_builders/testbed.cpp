@@ -73,27 +73,25 @@ namespace scene_builders {
 			for (int y = -4 * 20; y < 4 * 20; ++y)
 			{
 				auto background = world.create_entity();
-				archetypes::sprite(background, vec2(x, y) * bg_size, assets::texture_id::TEST_BACKGROUND);
+				archetypes::sprite(background, vec2(x, y) * (bg_size+vec2(300, 300)), assets::texture_id::TEST_BACKGROUND);
 			}
 
-		//auto background = world.create_entity();
-		//archetypes::sprite(background, vec2(0, 0) * bg_size, assets::texture_id::TEST_BACKGROUND);
 
 		archetypes::wsad_player_crosshair(crosshair);
 		archetypes::wsad_player(player, crosshair, camera);
 
 		archetypes::wsad_player_physics(player);
 
-		archetypes::sprite_scalled(crate, vec2(200, 300), vec2i(100, 100)/3, assets::texture_id::CRATE, augs::colors::white, components::render::render_layer::DYNAMIC_BODY);
+		archetypes::sprite_scalled(crate, vec2(200, 300), vec2i(100, 100)/3, assets::texture_id::CRATE, augs::colors::white, render_layer::DYNAMIC_BODY);
 		archetypes::crate_physics(crate);
 		
-		archetypes::sprite_scalled(crate2, vec2(400, 400), vec2i(100, 100), assets::texture_id::CRATE, augs::colors::white, components::render::render_layer::DYNAMIC_BODY);
+		archetypes::sprite_scalled(crate2, vec2(400, 400), vec2i(100, 100), assets::texture_id::CRATE, augs::colors::white, render_layer::DYNAMIC_BODY);
 		archetypes::crate_physics(crate2);
 		
-		archetypes::sprite_scalled(crate4, vec2(500, 0), vec2i(100, 100), assets::texture_id::CRATE, augs::colors::white, components::render::render_layer::DYNAMIC_BODY);
+		archetypes::sprite_scalled(crate4, vec2(500, 0), vec2i(100, 100), assets::texture_id::CRATE, augs::colors::white, render_layer::DYNAMIC_BODY);
 		archetypes::crate_physics(crate4);
 		
-		archetypes::sprite_scalled(crate3, vec2(-500, -3050), vec2i(5000, 30), assets::texture_id::CRATE, augs::colors::white, components::render::render_layer::DYNAMIC_BODY);
+		archetypes::sprite_scalled(crate3, vec2(-500, -3050), vec2i(5000, 30), assets::texture_id::CRATE, augs::colors::white, render_layer::DYNAMIC_BODY);
 		archetypes::static_crate_physics(crate3);
 
 		input_system::context active_context;

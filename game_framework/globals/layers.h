@@ -1,0 +1,15 @@
+#pragma once
+
+enum render_layer {
+	CROSSHAIR,
+	GUI,
+	HAT,
+	CHARACTER,
+	HELD_ITEM,
+	DYNAMIC_BODY,
+	DROPPED_ITEM,
+	CAR_WHEEL,
+	CAR_INTERIOR,
+	GROUND,
+	BOTTOM,
+};

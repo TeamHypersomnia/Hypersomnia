@@ -74,7 +74,7 @@ namespace archetypes {
 
 		sprite.set(assets::texture_id::TEST_CROSSHAIR, pixel_32(255, 0, 0, 255));
 
-		render.layer = components::render::render_layer::CROSSHAIR;
+		render.layer = render_layer::CROSSHAIR;
 		render.interpolate = false;
 
 		crosshair.sensitivity.set(3, 3);
@@ -106,7 +106,7 @@ namespace archetypes {
 
 		sprite.set(assets::texture_id::TEST_PLAYER, pixel_32(255, 255, 255, 255));
 
-		render.layer = components::render::render_layer::CHARACTER;
+		render.layer = render_layer::CHARACTER;
 
 		lookat.target = crosshair_entity;
 		lookat.look_mode = components::lookat::look_type::POSITION;

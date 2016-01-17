@@ -45,7 +45,7 @@ namespace prefabs {
 			sprite.size.x = 200;
 			sprite.size.y = 100;
 
-			render.layer = components::render::render_layer::DYNAMIC_BODY;
+			render.layer = render_layer::DYNAMIC_BODY;
 
 			helpers::body_info body;
 			body.linear_damping = 0.4f;
@@ -70,7 +70,7 @@ namespace prefabs {
 
 			transform.pos = pos;
 
-			render.layer = components::render::render_layer::CAR_INTERIOR;
+			render.layer = render_layer::CAR_INTERIOR;
 
 			sprite.set(assets::texture_id::CAR_INSIDE, augs::pixel_32(122, 0, 122, 255));
 			sprite.size.x = 250;
@@ -97,7 +97,7 @@ namespace prefabs {
 			transform.pos = pos;
 			trigger.entity_to_be_notified = front;
 
-			render.layer = components::render::render_layer::CAR_WHEEL;
+			render.layer = render_layer::CAR_WHEEL;
 
 			sprite.set(assets::texture_id::CAR_INSIDE, augs::pixel_32(255, 0, 0, 255));
 			sprite.size.x = 30;

@@ -39,6 +39,8 @@ void render_system::add_entities_to_rendering_tree() {
 
 			auto transform = e->get<components::transform>();
 
+			render->previous_transform = transform;
+
 			rects::ltrb<float> aabb;
 
 			if (sprite) aabb = sprite->get_aabb(transform);
@@ -99,8 +101,8 @@ void render_system::determine_visible_entities_from_camera_states() {
 		aabb_listener.visible_entities = &visible_entities;
 
 		b2AABB input;
-		input.lowerBound = in.rotated_camera_aabb.left_top();
-		input.upperBound = in.rotated_camera_aabb.right_bottom();
+		input.lowerBound = in.rotated_camera_aabb.left_top() - vec2(400, 400);
+		input.upperBound = in.rotated_camera_aabb.right_bottom() + vec2(400, 400);
 
 		non_physical_objects_tree.Query(&aabb_listener, input);
 	}
