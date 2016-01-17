@@ -13,3 +13,4 @@
 #include "messages/trigger_hit_confirmation_message.h"
 #include "messages/trigger_hit_request_message.h"
 #include "messages/car_ownership_change_message.h"
+#include "messages/new_entity_message.h"

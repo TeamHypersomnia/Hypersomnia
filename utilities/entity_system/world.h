@@ -106,8 +106,7 @@ namespace augs {
 			return all_systems;
 		}
 
-		entity_id create_entity_named(std::string name);
-		entity_id create_entity();
+		entity_id create_entity(std::string name = "unknown");
 		void delete_entity(entity_id);
 
 		entity_id get_id(entity*);

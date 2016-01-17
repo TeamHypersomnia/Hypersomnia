@@ -62,7 +62,7 @@ namespace scene_builders {
 		auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
 
 		auto background = world.create_entity();
-		archetypes::static_sprite(background, vec2(500, 0), assets::texture_id::TEST_BACKGROUND);
+		archetypes::sprite(background, vec2(500, 0), assets::texture_id::TEST_BACKGROUND);
 		
 		input_system::context active_context;
 		active_context.map_event_to_intent(window::event::raw_mousemotion, messages::intent_message::MOVE_CROSSHAIR);

@@ -1,5 +1,6 @@
 #include "world.h"
 #include "processing_system.h"
+#include "../../game_framework/messages/new_entity_message.h"
 
 namespace augs {
 	world::world(overworld& parent_overworld) : parent_overworld(parent_overworld) {}
@@ -16,13 +17,17 @@ namespace augs {
 		delete_all_entities();
 	}
 
-	entity_id world::create_entity() {
-		return create_entity_named("unknown");
-	}
-
-	entity_id world::create_entity_named(std::string name) {
+	entity_id world::create_entity(std::string name) {
 		entity_id res = entities.allocate(std::ref(*this));
 		res->name = name;
+
+		messages::new_entity_message msg;
+		msg.subject = res;
+		post_message(msg);
+
+#ifdef USE_NAMES_FOR_IDS
+		res.name = name;
+#endif
 		return res;
 	}
 

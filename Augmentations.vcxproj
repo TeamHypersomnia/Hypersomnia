@@ -992,6 +992,7 @@
     <ClInclude Include="game_framework\components\animation_response_component.h" />
     <ClInclude Include="game_framework\messages\animation_response_message.h" />
     <ClInclude Include="game_framework\messages\collision_message.h" />
+    <ClInclude Include="game_framework\messages\new_entity_message.h" />
     <ClInclude Include="game_framework\messages\crosshair_intent_message.h" />
     <ClInclude Include="game_framework\messages\damage_message.h" />
     <ClInclude Include="game_framework\messages\destroy_message.h" />

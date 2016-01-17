@@ -501,7 +501,7 @@ void physics_system::destroy_fixtures_and_bodies() {
 			b2world.DestroyBody(maybe_physics->body);
 
 			for (auto fe : maybe_physics->fixture_entities) {
-				fe->remove<components::fixtures>();
+				parent_world.post_message(messages::destroy_message(fe));
 			}
 		}
 	}

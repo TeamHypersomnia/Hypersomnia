@@ -55,13 +55,13 @@ namespace scene_builders {
 		auto& player_response = resource_manager.create(assets::animation_response_id::TORSO_SET);
 		player_response[messages::animation_response_message::MOVE] = assets::animation_id::TORSO_MOVE;
 
-		auto camera = world.create_entity();
-		auto crosshair = world.create_entity();
-		auto player = world.create_entity();
-		auto crate = world.create_entity();
-		auto crate2 = world.create_entity();
-		auto crate3 = world.create_entity();
-		auto crate4 = world.create_entity();
+		auto camera = world.create_entity("camera");
+		auto crosshair = world.create_entity("crosshair");
+		auto player = world.create_entity("player");
+		auto crate = world.create_entity("crate");
+		auto crate2 = world.create_entity("crate2");
+		auto crate3 = world.create_entity("crate3");
+		auto crate4 = world.create_entity("crate4");
 
 		auto car = prefabs::create_car(world, vec2(-300, 0));
 
@@ -73,9 +73,12 @@ namespace scene_builders {
 			for (int y = -4 * 20; y < 4 * 20; ++y)
 			{
 				auto background = world.create_entity();
-				archetypes::static_sprite(background, vec2(x, y) * bg_size, assets::texture_id::TEST_BACKGROUND);
+				archetypes::sprite(background, vec2(x, y) * bg_size, assets::texture_id::TEST_BACKGROUND);
 			}
-		
+
+		//auto background = world.create_entity();
+		//archetypes::sprite(background, vec2(0, 0) * bg_size, assets::texture_id::TEST_BACKGROUND);
+
 		archetypes::wsad_player_crosshair(crosshair);
 		archetypes::wsad_player(player, crosshair, camera);
 
@@ -142,8 +145,8 @@ namespace scene_builders {
 			}
 
 			if (it.intent == messages::intent_message::MOVE_CROSSHAIR && keep_drawing) {
-				auto ent = world.create_entity();
-				archetypes::static_sprite_scalled(ent, it.crosshair_world_pos, vec2(10, 10), assets::texture_id::BLANK);
+				auto ent = world.create_entity("drawn_sprite");
+				archetypes::sprite_scalled(ent, it.crosshair_world_pos, vec2(10, 10), assets::texture_id::BLANK);
 			}
 		}
 

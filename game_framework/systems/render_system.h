@@ -10,6 +10,8 @@
 #include "graphics/vertex.h"
 #include "texture_baker/texture_baker.h"
 
+#include <Box2D/Collision/b2DynamicTree.h>
+
 using namespace augs;
 
 namespace shared {
@@ -19,6 +21,11 @@ namespace shared {
 class render_system : public event_only_system {
 public:
 	using event_only_system::event_only_system;
+
+	b2DynamicTree non_physical_objects_tree;
+
+	void add_entities_to_rendering_tree();
+	void remove_entities_from_rendering_tree();
 
 	std::vector<std::vector<entity_id>> layers;
 	

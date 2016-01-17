@@ -190,6 +190,7 @@ namespace augs {
 			return add(object);
 		}
 
+	private:
 		template <typename component_type>
 		void remove() {
 #if USE_POINTER_TUPLE
@@ -223,7 +224,6 @@ namespace augs {
 #endif
 		}
 
-	private:
 		void remove(size_t component_type_hash);
 
 #if USE_POINTER_TUPLE 

@@ -10,6 +10,8 @@
 
 using namespace augs;
 
+#include <cassert>
+
 namespace components {
 	void polygon::set_color(pixel_32 col) {
 		for (auto& v : model)
@@ -204,5 +206,12 @@ namespace components {
 
 			in.output->push_triangle(new_tri);
 		}
+	}
+	
+	rects::ltrb<float> polygon::get_aabb(components::transform transform) {
+		assert(0);
+
+		return rects::ltrb<float>();
+		// TODO: calc aabb
 	}
 }

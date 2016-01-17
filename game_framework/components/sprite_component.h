@@ -1,8 +1,10 @@
 #pragma once
 #include "math/vec2.h"
+#include "math/rects.h"
 
 #include "graphics/pixel.h"
 #include "../assets/texture.h"
+#include "transform_component.h"
 
 namespace shared {
 	class drawing_state;
@@ -23,6 +25,8 @@ namespace components {
 		void update_size();
 
 		std::vector<vec2> get_vertices();
+		augs::rects::ltrb<float> get_aabb(components::transform);
+
 		void draw(shared::drawing_state&);
 	};
 }

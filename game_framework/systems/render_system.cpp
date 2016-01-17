@@ -10,6 +10,9 @@
 #include "game_framework/components/sprite_component.h"
 #include "game_framework/components/tile_layer_component.h"
 
+#include "game_framework/messages/new_entity_message.h"
+#include "game_framework/messages/destroy_message.h"
+
 #include "physics_system.h"
 #include "camera_system.h"
 
@@ -17,6 +20,57 @@
 #include "../globals/filters.h"
 
 using namespace shared;
+
+void render_system::add_entities_to_rendering_tree() {
+	auto& events = parent_world.get_message_queue<messages::new_entity_message>();
+
+	for (auto& it : events) {
+		auto& e = it.subject;
+
+		auto* physics = e->find<components::physics>();
+		auto* fixtures = e->find<components::fixtures>();
+		auto* render = e->find<components::render>();
+
+		if (!fixtures && !physics && render) {
+			auto* sprite = e->find<components::sprite>();
+			auto* polygon = e->find<components::polygon>();
+			auto* tile_layer = e->find<components::tile_layer>();
+			auto* particle_group = e->find<components::particle_group>();
+
+			auto transform = e->get<components::transform>();
+
+			rects::ltrb<float> aabb;
+
+			if (sprite) aabb = sprite->get_aabb(transform);
+			if (polygon) aabb = polygon->get_aabb(transform);
+			if (tile_layer) aabb = tile_layer->get_aabb(transform);
+			// if (particle_group) aabb = particle_group->get_aabb(transform);
+
+			b2AABB input;
+			input.lowerBound = aabb.left_top();
+			input.upperBound = aabb.right_bottom();
+
+			render->rendering_proxy = non_physical_objects_tree.CreateProxy(input, new entity_id(e));
+		}
+	}
+}
+
+void render_system::remove_entities_from_rendering_tree() {
+	auto& events = parent_world.get_message_queue<messages::destroy_message>();
+
+	for (auto& it : events) {
+		auto& e = it.subject;
+
+		auto* physics = e->find<components::physics>();
+		auto* render = e->find<components::render>();
+		auto* fixtures = e->find<components::fixtures>();
+
+		if (!fixtures && !physics && render) {
+			delete ((entity_id*)non_physical_objects_tree.GetUserData(render->rendering_proxy));
+			non_physical_objects_tree.DestroyProxy(render->rendering_proxy);
+		}
+	}
+}
 
 void render_system::determine_visible_entities_from_camera_states() {
 	auto& cameras = parent_world.get_system<camera_system>().targets;
@@ -29,6 +83,26 @@ void render_system::determine_visible_entities_from_camera_states() {
 
 		auto& result = physics.query_aabb_px(in.rotated_camera_aabb.left_top(), in.rotated_camera_aabb.right_bottom(), filters::renderable_query());
 		visible_entities.insert(visible_entities.end(), result.entities.begin(), result.entities.end());
+
+		struct render_listener {
+			b2DynamicTree* tree;
+			std::vector<entity_id>* visible_entities;
+			bool QueryCallback(int32 node) {
+				visible_entities->push_back(*((entity_id*)tree->GetUserData(node)));
+				return true;
+			}
+		};
+		
+		render_listener aabb_listener;
+
+		aabb_listener.tree = &non_physical_objects_tree;
+		aabb_listener.visible_entities = &visible_entities;
+
+		b2AABB input;
+		input.lowerBound = in.rotated_camera_aabb.left_top();
+		input.upperBound = in.rotated_camera_aabb.right_bottom();
+
+		non_physical_objects_tree.Query(&aabb_listener, input);
 	}
 
 	always_visible_entities.erase(std::remove_if(always_visible_entities.begin(), always_visible_entities.end(), [this](entity_id id) {
@@ -38,7 +112,6 @@ void render_system::determine_visible_entities_from_camera_states() {
 		}
 		return true;
 	}), always_visible_entities.end());
-
 }
 
 void render_system::generate_layers(shared::drawing_state& in, int mask) {

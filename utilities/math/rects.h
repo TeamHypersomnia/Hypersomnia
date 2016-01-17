@@ -174,21 +174,26 @@ namespace augs {
 			}
 
 			template <class T>
-			static ltrb get_aabb(vec2t<T>* v) {
+			static ltrb get_aabb(vec2t<T>* v, int verts = 4) {
 				auto x_pred = [](vec2t<T> a, vec2t<T> b){ return a.x < b.x; };
 				auto y_pred = [](vec2t<T> a, vec2t<T> b){ return a.y < b.y; };
 
 				vec2t<T> lower(
-					static_cast<T>(std::min_element(v, v + 4, x_pred)->x),
-					static_cast<T>(std::min_element(v, v + 4, y_pred)->y)
+					static_cast<T>(std::min_element(v, v + verts, x_pred)->x),
+					static_cast<T>(std::min_element(v, v + verts, y_pred)->y)
 					);
 
 				vec2t<T> upper(
-					static_cast<T>(std::max_element(v, v + 4, x_pred)->x),
-					static_cast<T>(std::max_element(v, v + 4, y_pred)->y)
+					static_cast<T>(std::max_element(v, v + verts, x_pred)->x),
+					static_cast<T>(std::max_element(v, v + verts, y_pred)->y)
 					);
 
 				return rects::ltrb<T>(lower.x, lower.y, upper.x, upper.y);
+			}
+
+			template <class T>
+			static ltrb get_aabb(std::vector<vec2t<T>> v) {
+				return get_aabb(v.data(), v.size());
 			}
 
 			template <class T>

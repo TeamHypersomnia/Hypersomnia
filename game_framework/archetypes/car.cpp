@@ -22,9 +22,9 @@
 
 namespace prefabs {
 	augs::entity_id create_car(augs::world& world, vec2 pos) {
-		auto front = world.create_entity();
-		auto interior = world.create_entity();
-		auto left_wheel = world.create_entity();
+		auto front = world.create_entity("front");
+		auto interior = world.create_entity("interior");
+		auto left_wheel = world.create_entity("left_wheel");
 
 		auto& car_children = *front += components::children();
 		car_children.add_sub_entity(interior);
@@ -112,7 +112,6 @@ namespace prefabs {
 			info.transform_vertices.pos = offset;
 			
 			auto& physics = helpers::add_fixtures_to_other_body(info, left_wheel, front);
-			//archetypes::always_visible(left_wheel);
 		}
 
 		return front;

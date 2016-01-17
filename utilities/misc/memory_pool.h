@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "simple_pool.h"
+#define USE_NAMES_FOR_IDS
 
 namespace augs {
 	template<class T> class object_pool;
@@ -75,6 +76,9 @@ namespace augs {
 			bool dead() const;
 
 			void unset();
+#ifdef USE_NAMES_FOR_IDS
+			std::string name;
+#endif
 		};
 
 		template <typename T>
@@ -101,6 +105,9 @@ namespace augs {
 			bool dead() const { return id::dead(); }
 
 			using id::unset;
+#ifdef USE_NAMES_FOR_IDS
+			using id::name;
+#endif
 		};
 
 		memory_pool(int slot_count = 0, int slot_size = 0);

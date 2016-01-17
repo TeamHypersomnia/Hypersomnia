@@ -5,6 +5,7 @@
 #include "graphics/pixel.h"
 #include "graphics/vertex.h"
 #include "../assets/texture.h"
+#include "transform_component.h"
 
 namespace augs {
 	class texture;
@@ -56,5 +57,6 @@ namespace components {
 		void draw(shared::drawing_state&);
 
 		std::vector<vec2> get_vertices();
+		rects::ltrb<float> get_aabb(components::transform);
 	};
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "math/vec2.h"
 #include "game_framework/assets/texture.h"
+#include "transform_component.h"
 
 namespace shared {
 	class drawing_state;
@@ -32,6 +33,7 @@ namespace components {
 		void generate_indices_by_type(augs::rects::ltrb<int>);
 
 		void draw(shared::drawing_state&);
+		augs::rects::ltrb<float> get_aabb(components::transform transform);
 
 		augs::rects::ltrb<int> get_visible_tiles(shared::drawing_state&);
 

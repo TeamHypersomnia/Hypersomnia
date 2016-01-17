@@ -42,5 +42,7 @@ namespace components {
 		bool flip_horizontally = false;
 		bool flip_vertically = false;
 		bool absolute_transform = false;
+
+		int rendering_proxy;
 	};
 }
