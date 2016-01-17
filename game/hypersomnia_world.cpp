@@ -77,6 +77,7 @@ void hypersomnia_world::register_messages_components_systems() {
 	register_message_queue<trigger_hit_confirmation_message>();
 	register_message_queue<trigger_hit_request_message>();
 	register_message_queue<car_ownership_change_message>();
+	register_message_queue<new_entity_message>();
 }
 
 void hypersomnia_world::draw() {
@@ -119,9 +120,15 @@ void hypersomnia_world::perform_logic_step() {
 	get_system<input_system>().post_input_intents_for_logic_step();
 	get_system<input_system>().post_rendering_time_events_for_logic_step();
 
+	/* begin receivers of new_entity messages changes */
 
+	get_system<render_system>().add_entities_to_rendering_tree();
+	get_message_queue<new_entity_message>().clear();
+	/* end receivers of new_entity messages */
 
 	get_system<render_system>().set_current_transforms_as_previous_for_interpolation();
+
+
 	get_system<crosshair_system>().apply_crosshair_intents_to_crosshair_transforms();
 	get_system<camera_system>().react_to_input_intents();
 	get_system<trigger_detector_system>().find_trigger_collisions_and_send_confirmations();
@@ -149,6 +156,7 @@ void hypersomnia_world::perform_logic_step() {
 	get_system<physics_system>().step_and_set_new_transforms();
 	get_system<chase_system>().update_transforms();
 
+	get_system<render_system>().remove_entities_from_rendering_tree();
 	get_system<physics_system>().destroy_fixtures_and_bodies();
 	get_system<destroy_system>().delete_queued_entities();
 }
