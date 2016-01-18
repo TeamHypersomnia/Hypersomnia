@@ -26,7 +26,7 @@ void driver_system::assign_drivers_from_triggers() {
 					messages::car_ownership_change_message msg;
 					msg.car = subject_car;
 					msg.driver = e.detector;
-					parent_world.post_message(msg);
+					affect_drivers_due_to_car_ownership_changes(msg);
 				}
 			}
 		}
@@ -53,57 +53,53 @@ void driver_system::release_drivers_due_to_requests() {
 					msg.car = car;
 					msg.driver = e.subject;
 					msg.lost_ownership = true;
-					parent_world.post_message(msg);
+					affect_drivers_due_to_car_ownership_changes(msg);
+					
+					e.clear();
 				}
 			}
 		}
 	}
 }
 
-void driver_system::affect_drivers_due_to_car_ownership_changes() {
-	auto& ownership_changes = parent_world.get_message_queue<messages::car_ownership_change_message>();
+void driver_system::affect_drivers_due_to_car_ownership_changes(messages::car_ownership_change_message& e) {
+	auto& car = e.car->get<components::car>();
+	auto& driver = e.driver->get<components::driver>();
 
-	for (auto& e : ownership_changes) {
-		auto& car = e.car->get<components::car>();
-		auto& driver = e.driver->get<components::driver>();
+	if (!e.lost_ownership) {
+		driver.owned_vehicle = e.car;
+		car.current_driver = e.driver;
 
-		if (!e.lost_ownership) {
-			driver.owned_vehicle = e.car;
-			car.current_driver = e.driver;
+		auto* maybe_movement = e.driver->find<components::movement>();
 
-			auto* maybe_movement = e.driver->find<components::movement>();
+		if (maybe_movement)
+			maybe_movement->reset_movement_flags();
 
-			if (maybe_movement)
-				maybe_movement->reset_movement_flags();
+		auto* maybe_children = e.driver->find<components::children>();
 
-			auto* maybe_children = e.driver->find<components::children>();
+		if (maybe_children) {
+			auto& children = maybe_children->sub_entities_by_name;
 
-			if (maybe_children) {
-				auto& children = maybe_children->sub_entities_by_name;
-
-				if (children[components::children::sub_entity_name::CHARACTER_CROSSHAIR].alive()) {
-					//children[components::children::sub_entity_name::CHARACTER_CROSSHAIR]->get<components::input>() = input_profiles::crosshair_driving();
-				}
-			}
-		}
-		else {
-			driver.owned_vehicle.unset();
-			car.current_driver.unset();
-			car.reset_movement_flags();
-
-			auto* maybe_children = e.driver->find<components::children>();
-
-			if (maybe_children) {
-				auto& children = maybe_children->sub_entities_by_name;
-
-				if (children[components::children::sub_entity_name::CHARACTER_CROSSHAIR].alive()) {
-					//children[components::children::sub_entity_name::CHARACTER_CROSSHAIR]->get<components::input>() = input_profiles::crosshair();
-				}
+			if (children[components::children::sub_entity_name::CHARACTER_CROSSHAIR].alive()) {
+				//children[components::children::sub_entity_name::CHARACTER_CROSSHAIR]->get<components::input>() = input_profiles::crosshair_driving();
 			}
 		}
 	}
+	else {
+		driver.owned_vehicle.unset();
+		car.current_driver.unset();
+		car.reset_movement_flags();
 
-	ownership_changes.clear();
+		auto* maybe_children = e.driver->find<components::children>();
+
+		if (maybe_children) {
+			auto& children = maybe_children->sub_entities_by_name;
+
+			if (children[components::children::sub_entity_name::CHARACTER_CROSSHAIR].alive()) {
+				//children[components::children::sub_entity_name::CHARACTER_CROSSHAIR]->get<components::input>() = input_profiles::crosshair();
+			}
+		}
+	}
 }
 
 void driver_system::delegate_movement_intents_from_drivers_to_steering_intents_of_owned_vehicles() {

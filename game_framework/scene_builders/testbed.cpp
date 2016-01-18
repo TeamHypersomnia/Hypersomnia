@@ -158,12 +158,13 @@ namespace scene_builders {
 		auto inputs = world.get_message_queue<messages::crosshair_intent_message>();
 
 		for (auto& it : inputs) {
+			bool draw = false;
 			if (it.intent == messages::intent_message::CROSSHAIR_PRIMARY_ACTION) {
 				keep_drawing = it.pressed_flag;
-				it.intent = messages::intent_message::MOVE_CROSSHAIR;
+				draw = true;
 			}
 
-			if (it.intent == messages::intent_message::MOVE_CROSSHAIR && keep_drawing) {
+			if (draw || (it.intent == messages::intent_message::MOVE_CROSSHAIR && keep_drawing)) {
 				auto ent = world.create_entity("drawn_sprite");
 				archetypes::sprite_scalled(ent, it.crosshair_world_pos, vec2(10, 10), assets::texture_id::BLANK);
 			}

@@ -83,19 +83,17 @@ void input_system::post_intents_from_inputs(const std::vector<messages::raw_wind
 				}
 
 				if (found_context_entry) {
-					for (auto& in : intents) {
-						unmapped_intent.intent = in;
-						parent_world.post_message(unmapped_intent);
+					unmapped_intent.intent.intents = intents;
+					parent_world.post_message(unmapped_intent);
 
-						messages::intent_message entity_mapped_intent;
-						entity_mapped_intent.unmapped_intent_message::operator=(unmapped_intent);
+					messages::intent_message entity_mapped_intent;
+					entity_mapped_intent.unmapped_intent_message::operator=(unmapped_intent);
 
-						for (auto it = targets.begin(); it != targets.end(); ++it) {
-							if ((*it)->get<components::input>().intents.find(unmapped_intent.intent)) {
-								entity_mapped_intent.subject = *it;
-								parent_world.post_message(entity_mapped_intent);
-							}
-						}
+					for (auto it = targets.begin(); it != targets.end(); ++it) {
+						//if ((*it)->get<components::input>().intents.find(unmapped_intent.intent)) {
+							entity_mapped_intent.subject = *it;
+							parent_world.post_message(entity_mapped_intent);
+						//}
 					}
 
 					break;

@@ -29,7 +29,23 @@ namespace messages {
 			SWITCH_WEAPON
 		};
 
-		intent_type intent = intent_type::NONE;
+		struct intent_set {
+			std::vector<intent_type> intents;
+
+			bool operator==(intent_type it) const {
+				return std::find(intents.begin(), intents.end(), it) != intents.end();
+			}			
+			
+			bool operator!=(intent_type it) const {
+				return std::find(intents.begin(), intents.end(), it) == intents.end();
+			}
+		};
+
+		void clear() {
+			intent.intents.clear();
+		}
+
+		intent_set intent;
 		bool pressed_flag = false;
 
 		augs::window::event::state state;

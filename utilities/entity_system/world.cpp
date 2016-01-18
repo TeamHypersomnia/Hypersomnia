@@ -28,6 +28,8 @@ namespace augs {
 #ifdef USE_NAMES_FOR_IDS
 		res.name = name;
 #endif
+		assert(res.name != "");
+
 		return res;
 	}
 
@@ -40,6 +42,12 @@ namespace augs {
 	}
 
 	entity_id world::get_id(entity* e) {
-		return entities.get_id(e);
+		auto new_id = entities.get_id(e);
+
+#ifdef USE_NAMES_FOR_IDS
+		new_id.name = e->name;
+#endif
+
+		return new_id;
 	}
 }

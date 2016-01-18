@@ -273,8 +273,20 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 		auto& collider_physics = collider_fixtures.get_body_entity()->get<components::physics>();
 
 		if (subject_fixtures.is_friction_ground) {
-			if (!collider_fixtures.is_friction_ground)
-				collider_physics.owner_friction_grounds.push_back(msg.subject);
+			auto& subject_physics = subject_fixtures.get_body_entity()->get<components::physics>();
+			
+			bool would_result_in_feedback = false;
+			
+			// see if the collider doesn't own the subject itself
+			for (auto& subject_owner : subject_physics.owner_friction_grounds) {
+				if (subject_owner == collider_fixtures.get_body_entity()) {
+					would_result_in_feedback = true;
+					break;
+				}
+			}
+
+			if (!would_result_in_feedback && !collider_fixtures.is_friction_ground)
+				collider_physics.owner_friction_grounds.push_back(subject_fixtures.get_body_entity());
 		}
 
 		if (fix_a->IsSensor()) {
@@ -308,7 +320,7 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 
 		if (subject_fixtures.is_friction_ground) {
 			for (auto it = collider_physics.owner_friction_grounds.begin(); it != collider_physics.owner_friction_grounds.end(); ++it)
-				if (*it == msg.subject)
+				if (*it == subject_fixtures.get_body_entity())
 				{
 					collider_physics.owner_friction_grounds.erase(it);
 					break;
@@ -377,6 +389,7 @@ void physics_system::step_and_set_new_transforms() {
 		if (b->GetType() == b2_staticBody) continue;
 
 		auto& physics = static_cast<entity_id>(b->GetUserData())->get<components::physics>();
+		physics.measured_carried_mass = 0.f;
 
 		b2Vec2 vel(b->GetLinearVelocity());
 		float32 speed = vel.Normalize();
@@ -475,6 +488,8 @@ void physics_system::recurential_friction_handler(entity_id entity, entity_id fr
 		physics.body->GetAngle()
 		+ per_second()*friction_ang_vel
 		);
+
+	friction_entity->get<components::physics>().measured_carried_mass += physics.get_mass() + physics.measured_carried_mass;
 }
 
 void physics_system::destroy_whole_world() {

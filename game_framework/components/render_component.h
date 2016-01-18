@@ -31,5 +31,7 @@ namespace components {
 		bool absolute_transform = false;
 
 		int rendering_proxy;
+
+		int layer_priority = 0;
 	};
 }

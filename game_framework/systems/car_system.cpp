@@ -19,23 +19,25 @@ void car_system::set_steering_flags_from_intents() {
 
 		auto& car = *maybe_car;
 
-		switch (it.intent) {
-		case messages::intent_message::intent_type::MOVE_FORWARD:
-			car.accelerating = it.pressed_flag;
-			break;
-		case messages::intent_message::intent_type::MOVE_BACKWARD:
-			car.deccelerating = it.pressed_flag;
-			break;
-		case messages::intent_message::intent_type::MOVE_LEFT:
-			car.turning_left = it.pressed_flag;
-			break;
-		case messages::intent_message::intent_type::MOVE_RIGHT:
-			car.turning_right = it.pressed_flag;
-			break;
-		case messages::intent_message::intent_type::HAND_BRAKE:
-			car.hand_brake = it.pressed_flag;
-			break;
-		default: break;
+		for (auto& ie : it.intent.intents) {
+			switch (ie) {
+			case messages::intent_message::intent_type::MOVE_FORWARD:
+				car.accelerating = it.pressed_flag;
+				break;
+			case messages::intent_message::intent_type::MOVE_BACKWARD:
+				car.deccelerating = it.pressed_flag;
+				break;
+			case messages::intent_message::intent_type::MOVE_LEFT:
+				car.turning_left = it.pressed_flag;
+				break;
+			case messages::intent_message::intent_type::MOVE_RIGHT:
+				car.turning_right = it.pressed_flag;
+				break;
+			case messages::intent_message::intent_type::HAND_BRAKE:
+				car.hand_brake = it.pressed_flag;
+				break;
+			default: break;
+			}
 		}
 	}
 }

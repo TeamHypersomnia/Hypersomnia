@@ -18,11 +18,11 @@
 #include "../components/trigger_detector_component.h"
 
 void trigger_detector_system::find_trigger_collisions_and_send_confirmations() {
-	auto& intents = parent_world.get_message_queue<messages::intent_message>();
 	auto& requests = parent_world.get_message_queue<messages::trigger_hit_request_message>();
 	auto& confirmations = parent_world.get_message_queue<messages::trigger_hit_confirmation_message>();
 
-	for (auto& e : intents) {
+	parent_world.iterate_with_remove<messages::intent_message>(
+		[this](messages::intent_message& e) {
 		if (e.intent == messages::intent_message::PRESS_TRIGGER && e.pressed_flag) {
 			auto* maybe_detector = e.subject->find<components::trigger_detector>();
 
@@ -32,8 +32,10 @@ void trigger_detector_system::find_trigger_collisions_and_send_confirmations() {
 				request.pressed_flag = e.pressed_flag;
 				parent_world.post_message(request);
 			}
+
+			return true;
 		}
-	}
+	});
 
 	confirmations.clear();
 

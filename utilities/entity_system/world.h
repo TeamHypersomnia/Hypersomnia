@@ -97,6 +97,12 @@ namespace augs {
 			return message_queues.get<T>();
 		}
 
+		template <typename T>
+		void iterate_with_remove(std::function<bool(T&)> cb) {
+			auto& q = get_message_queue<T>();
+			q.erase(std::remove_if(q.begin(), q.end(), cb), q.end());
+		}
+
 		template<class T>
 		T& get_system() {
 			return all_systems_map.get<T>();

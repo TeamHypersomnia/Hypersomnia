@@ -21,7 +21,7 @@ void crosshair_system::generate_crosshair_intents() {
 			auto crosshair = subject->find<components::crosshair>();
 
 			if (!crosshair)
-				return;
+				continue;
 
 			auto& transform = subject->get<components::transform>();
 
