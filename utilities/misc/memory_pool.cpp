@@ -44,7 +44,7 @@ namespace augs {
 	bool memory_pool::id::operator==(const id& b) const { 
 		bool result = owner == b.owner && indirection_index == b.indirection_index && version == b.version; 
 #ifdef USE_NAMES_FOR_IDS
-		if(result) assert(name == b.name);
+		if(result) assert(std::string(name) == std::string(b.name));
 #endif
 		return result;
 	}

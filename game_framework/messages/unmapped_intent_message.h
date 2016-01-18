@@ -3,6 +3,7 @@
 #include "math/vec2.h"
 
 #include "window_framework/event.h"
+#include "utilities/misc/constant_vector.h"
 
 /* everything is a state since for actions we can just ignore states with flag set to false */
 using namespace augs;
@@ -30,7 +31,7 @@ namespace messages {
 		};
 
 		struct intent_set {
-			std::vector<intent_type> intents;
+			augs::constant_vector<intent_type, 5> intents;
 
 			bool operator==(intent_type it) const {
 				return std::find(intents.begin(), intents.end(), it) != intents.end();

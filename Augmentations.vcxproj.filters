@@ -2891,5 +2891,8 @@
     <ClInclude Include="game_framework\globals\layers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="utilities\misc\constant_vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

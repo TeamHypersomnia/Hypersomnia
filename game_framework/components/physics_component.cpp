@@ -2,8 +2,27 @@
 #include <Box2D\Box2D.h>
 
 #include "graphics/renderer.h"
+#include "fixtures_component.h"
 
 namespace components {
+	physics& physics::get_owner_body(augs::entity_id id) {
+		auto* physics = id->find<components::physics>();
+		if (physics) return *physics;
+
+		return id->get<components::fixtures>().get_body_entity()->get<components::physics>();
+	}
+	
+	augs::entity_id physics::get_owner_body_entity(augs::entity_id id) {
+		auto* physics = id->find<components::physics>();
+		if (physics) return id;
+
+		return id->get<components::fixtures>().get_body_entity();
+	}
+
+	bool physics::is_physical(augs::entity_id id) {
+		return id->find<components::fixtures>() || id->find<components::physics>();
+	}
+
 	void physics::set_velocity(vec2 pixels) {
 		body->SetLinearVelocity(pixels * PIXELS_TO_METERSf);
 	}	
@@ -63,4 +82,11 @@ namespace components {
 	vec2 physics::get_world_center() {
 		return METERS_TO_PIXELSf * body->GetWorldCenter();
 	}
+
+	entity_id physics::get_owner_friction_ground() {
+		if (owner_friction_grounds.empty()) return entity_id();
+
+		return owner_friction_grounds[0];
+	}
+
 }

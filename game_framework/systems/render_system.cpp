@@ -8,6 +8,7 @@
 
 #include "game_framework/components/polygon_component.h"
 #include "game_framework/components/sprite_component.h"
+#include "game_framework/components/fixtures_component.h"
 #include "game_framework/components/tile_layer_component.h"
 
 #include "game_framework/messages/new_entity_message.h"
@@ -18,6 +19,8 @@
 
 #include "entity_system/world.h"
 #include "../globals/filters.h"
+
+#include <algorithm>
 
 using namespace shared;
 
@@ -116,6 +119,8 @@ void render_system::determine_visible_entities_from_camera_states() {
 	}), always_visible_entities.end());
 }
 
+#include "../components/physics_component.h"
+
 void render_system::generate_layers(shared::drawing_state& in, int mask) {
 	layers.clear();
 
@@ -137,6 +142,35 @@ void render_system::generate_layers(shared::drawing_state& in, int mask) {
 			layers.resize(layer+1);
 
 		layers[layer].push_back(it);
+	}
+
+	for (auto& sortable : sortable_layers) {
+		if (sortable < layers.size()) {
+			if (layers[sortable].size() > 1) {
+				std::sort(layers[sortable].begin(), layers[sortable].end(), [](entity_id b, entity_id a) {
+					if (components::physics::is_physical(a) && components::physics::is_physical(b)) {
+						bool matched_owner = false;
+
+						entity_id owner_b = components::physics::get_owner_body_entity(b);
+						entity_id owner = components::physics::get_owner_body(a).get_owner_friction_ground();
+
+						while (owner.alive()) {
+							if (owner == owner_b) {
+								matched_owner = true;
+								break;
+							}
+
+							owner = owner->get<components::physics>().get_owner_friction_ground();
+						}
+
+						if(matched_owner)
+							return true;
+					}
+
+					return false;
+				});
+			}
+		}
 	}
 }
 

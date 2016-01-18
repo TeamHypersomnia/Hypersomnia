@@ -26,7 +26,7 @@ namespace augs {
 		post_message(msg);
 
 #ifdef USE_NAMES_FOR_IDS
-		res.name = name;
+		strcpy(res.name, name.c_str());
 #endif
 		assert(res.name != "");
 
@@ -45,7 +45,7 @@ namespace augs {
 		auto new_id = entities.get_id(e);
 
 #ifdef USE_NAMES_FOR_IDS
-		new_id.name = e->name;
+		strcpy(new_id.name, e->name.c_str());
 #endif
 
 		return new_id;

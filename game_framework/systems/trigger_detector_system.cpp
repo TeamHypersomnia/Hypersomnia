@@ -31,10 +31,12 @@ void trigger_detector_system::find_trigger_collisions_and_send_confirmations() {
 				request.detector = e.subject;
 				request.pressed_flag = e.pressed_flag;
 				parent_world.post_message(request);
-			}
 
-			return true;
+				return true;
+			}
 		}
+
+		return false;
 	});
 
 	confirmations.clear();

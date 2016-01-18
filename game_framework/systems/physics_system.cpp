@@ -278,11 +278,16 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 			bool would_result_in_feedback = false;
 			
 			// see if the collider doesn't own the subject itself
-			for (auto& subject_owner : subject_physics.owner_friction_grounds) {
-				if (subject_owner == collider_fixtures.get_body_entity()) {
+			entity_id subject_owner = subject_physics.get_owner_friction_ground();
+			auto collider_owner = collider_fixtures.get_body_entity();
+
+			while (subject_owner.alive()) {
+				if (subject_owner == collider_owner) {
 					would_result_in_feedback = true;
 					break;
 				}
+
+				subject_owner = subject_owner->get<components::physics>().get_owner_friction_ground();
 			}
 
 			if (!would_result_in_feedback && !collider_fixtures.is_friction_ground)
@@ -449,23 +454,21 @@ void physics_system::step_and_set_new_transforms() {
 		auto entity = b->GetUserData();
 		auto& physics = entity->get<components::physics>();
 		
-		if (!physics.owner_friction_grounds.empty()) {
-			recurential_friction_handler(b->GetUserData(), physics.owner_friction_grounds[0]);
-		}
+		recurential_friction_handler(b->GetUserData(), physics.get_owner_friction_ground());
 	}
 
 	reset_states();
 }
 
 void physics_system::recurential_friction_handler(entity_id entity, entity_id friction_owner) {
+	if (friction_owner.dead()) return;
+
 	auto& physics = entity->get<components::physics>();
 	
 	auto& friction_physics = friction_owner->get<components::fixtures>();
 	auto& friction_entity = friction_physics.get_body_entity();
 
-	if (!friction_entity->get<components::physics>().owner_friction_grounds.empty()) {
-		recurential_friction_handler(entity, friction_entity->get<components::physics>().owner_friction_grounds[0]);
-	}
+	recurential_friction_handler(entity, friction_entity->get<components::physics>().get_owner_friction_ground());
 
 	auto friction_body = friction_physics.get_body();
 

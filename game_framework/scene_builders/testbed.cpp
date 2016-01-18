@@ -74,6 +74,7 @@ namespace scene_builders {
 
 		auto car = prefabs::create_car(world, vec2(-300, 0));
 		auto car2 = prefabs::create_car(world, vec2(-800, 0));
+		auto car3 = prefabs::create_car(world, vec2(-1300, 0));
 
 		//auto motor = world.create_entity("motor");
 		//archetypes::sprite(motor, vec2(-100, -100), assets::texture_id::MOTOR, augs::colors::white, render_layer::DYNAMIC_BODY);

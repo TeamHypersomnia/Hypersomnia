@@ -18,6 +18,9 @@ void camera_system::react_to_input_intents() {
 	auto events = parent_world.get_message_queue<messages::intent_message>();
 
 	for (auto it : events) {
+		if (it.subject->find<components::camera>() == nullptr)
+			continue;
+
 		if (it.intent == messages::intent_message::intent_type::SWITCH_LOOK && it.pressed_flag) {
 			auto& mode = it.subject->get<components::camera>().orbit_mode;
 			if (mode == components::camera::LOOK)

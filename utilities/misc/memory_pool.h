@@ -77,7 +77,7 @@ namespace augs {
 
 			void unset();
 #ifdef USE_NAMES_FOR_IDS
-			std::string name;
+			char name[30];
 #endif
 		};
 

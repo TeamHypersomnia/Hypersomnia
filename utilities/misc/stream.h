@@ -20,20 +20,20 @@ namespace augs {
 		size_t size = t.size();
 		f.write((const char*)&size, sizeof(size));
 
-		for (auto& p : t)
-			f.write((const char*)&p, sizeof(p));
+		for (size_t i = 0; i < size; ++i)
+			f.write((const char*)&t[i], sizeof(T));
 	}
 
 	template <typename T>
 	void deserialize_vector(std::ifstream& f, std::vector<T>& t) {
-		size_t size;
+		size_t size = 0;
 		f.read((char*)&size, sizeof(size));
 
-		t.resize(size);
-
-		if(size)
-			for (auto& p : t)
-				f.read((char*)&p, sizeof(p));
+		for (size_t i = 0; i < size; ++i) {
+			T obj;
+			f.read((char*)&obj, sizeof(T));
+			t.emplace_back(obj);
+		}
 	}
 
 	namespace misc {

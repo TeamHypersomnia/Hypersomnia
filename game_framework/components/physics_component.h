@@ -12,9 +12,14 @@ class b2Body;
 
 namespace components {
 	struct physics : public augs::component {
+		static physics& get_owner_body(augs::entity_id);
+		static augs::entity_id get_owner_body_entity(augs::entity_id);
+		static bool is_physical(augs::entity_id);
+
 		b2Body* body = nullptr;
 		
 		std::vector<augs::entity_id> owner_friction_grounds;
+		augs::entity_id get_owner_friction_ground();
 
 		bool enable_angle_motor = false;
 		float target_angle = 0.f;

@@ -54,7 +54,7 @@ namespace augs {
 				deserialize(source, entry.step_occurred);
 				entry.internal_data.deserialize(source);
 
-				loaded_recording.push_back(entry);
+				loaded_recording.emplace_back(entry);
 			}
 		}
 

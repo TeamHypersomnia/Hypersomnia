@@ -10,7 +10,11 @@
 #include "graphics/vertex.h"
 #include "texture_baker/texture_baker.h"
 
+#include "../globals/layers.h"
+
 #include <Box2D/Collision/b2DynamicTree.h>
+
+#include <vector>
 
 using namespace augs;
 
@@ -45,4 +49,6 @@ public:
 	void set_current_transforms_as_previous_for_interpolation();
 	void calculate_and_set_interpolated_transforms();
 	void restore_actual_transforms();
+	
+	std::vector<render_layer> sortable_layers;
 };

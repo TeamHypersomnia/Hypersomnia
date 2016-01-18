@@ -1061,6 +1061,7 @@
     <ClInclude Include="utilities\math\rects.h" />
     <ClInclude Include="utilities\math\vec2.h" />
     <ClInclude Include="utilities\math\vec2declare.h" />
+    <ClInclude Include="utilities\misc\constant_vector.h" />
     <ClInclude Include="utilities\misc\delta_accumulator.h" />
     <ClInclude Include="utilities\misc\file_watcher.h" />
     <ClInclude Include="utilities\misc\id_generator.h" />
