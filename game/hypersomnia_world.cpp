@@ -4,6 +4,8 @@
 #include "game_framework/all_system_includes.h"
 #include "game_framework/all_message_includes.h"
 
+#include "game_framework/globals/layers.h"
+
 using namespace components;
 using namespace messages;
 
@@ -78,6 +80,8 @@ void hypersomnia_world::register_messages_components_systems() {
 	register_message_queue<trigger_hit_request_message>();
 	register_message_queue<car_ownership_change_message>();
 	register_message_queue<new_entity_message>();
+
+	get_system<render_system>().sortable_layers.push_back(render_layer::CAR_INTERIOR);
 }
 
 void hypersomnia_world::draw() {
@@ -131,15 +135,13 @@ void hypersomnia_world::perform_logic_step() {
 
 	get_system<crosshair_system>().apply_crosshair_intents_to_crosshair_transforms();
 	get_system<camera_system>().react_to_input_intents();
+
+	get_system<driver_system>().release_drivers_due_to_requests();
 	get_system<trigger_detector_system>().find_trigger_collisions_and_send_confirmations();
 
 	get_system<driver_system>().assign_drivers_from_triggers();
-
-	get_system<driver_system>().release_drivers_due_to_requests();
 	get_system<driver_system>().release_drivers_due_to_distance();
 	
-	get_system<driver_system>().affect_drivers_due_to_car_ownership_changes();
-
 	/* intent delegation stage (various ownership relations) */
 
 	get_system<driver_system>().delegate_movement_intents_from_drivers_to_steering_intents_of_owned_vehicles();
