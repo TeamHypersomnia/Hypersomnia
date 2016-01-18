@@ -11,5 +11,6 @@ enum render_layer {
 	CAR_WHEEL,
 	CAR_INTERIOR,
 	GROUND,
+	UNDER_GROUND,
 	BOTTOM,
 };

@@ -35,6 +35,8 @@ namespace scene_builders {
 		resource_manager.create(assets::texture_id::CRATE, L"hypersomnia/data/gfx/crate.png");
 		resource_manager.create(assets::texture_id::CAR_INSIDE, L"hypersomnia/data/gfx/crate2.png");
 		resource_manager.create(assets::texture_id::CAR_FRONT, L"hypersomnia/data/gfx/crate2.png");
+		resource_manager.create(assets::texture_id::TEST_SPRITE, L"hypersomnia/data/gfx/frog.png");
+		resource_manager.create(assets::texture_id::MOTOR, L"hypersomnia/data/gfx/motor.png");
 
 		resource_manager.create_sprites_indexed(
 			assets::texture_id::TORSO_MOVING_FIRST,
@@ -63,17 +65,33 @@ namespace scene_builders {
 		auto crate3 = world.create_entity("crate3");
 		auto crate4 = world.create_entity("crate4");
 
+		auto motor = world.create_entity("motor");
+		archetypes::sprite(motor, vec2(-100, -100), assets::texture_id::MOTOR, augs::colors::white, render_layer::DYNAMIC_BODY);
+		archetypes::crate_physics(motor);
+
+		for (int x = -4 * 1; x < 4 * 1; ++x)
+		{
+			auto frog = world.create_entity("frog");
+			archetypes::sprite(frog, vec2(100 + x * 40, 400), assets::texture_id::TEST_SPRITE, augs::colors::white, render_layer::DYNAMIC_BODY);
+			archetypes::crate_physics(frog);
+		}
+
 		auto car = prefabs::create_car(world, vec2(-300, 0));
+		auto car2 = prefabs::create_car(world, vec2(-800, 0));
 
 		archetypes::camera(camera, window_rect.w, window_rect.h);
 
 		auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
 
-		for (int x = -4*20; x < 4 * 20; ++x)
-			for (int y = -4 * 20; y < 4 * 20; ++y)
+		for (int x = -4*10; x < 4 * 10; ++x)
+			for (int y = -4 * 10; y < 4 * 10; ++y)
 			{
 				auto background = world.create_entity();
-				archetypes::sprite(background, vec2(x, y) * (bg_size+vec2(300, 300)), assets::texture_id::TEST_BACKGROUND);
+				archetypes::sprite(background, vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, augs::colors::white, render_layer::GROUND);
+				auto street = world.create_entity();
+				archetypes::sprite_scalled(street, vec2(x, y) * (bg_size + vec2(1500, 700)) - vec2(1500, 700), 
+					vec2(3000, 3000),
+					assets::texture_id::TEST_BACKGROUND, augs::colors::gray1, render_layer::UNDER_GROUND);
 			}
 
 
@@ -90,6 +108,8 @@ namespace scene_builders {
 		
 		archetypes::sprite_scalled(crate4, vec2(500, 0), vec2i(100, 100), assets::texture_id::CRATE, augs::colors::white, render_layer::DYNAMIC_BODY);
 		archetypes::crate_physics(crate4);
+
+
 		
 		archetypes::sprite_scalled(crate3, vec2(-500, -3050), vec2i(5000, 30), assets::texture_id::CRATE, augs::colors::white, render_layer::DYNAMIC_BODY);
 		archetypes::static_crate_physics(crate3);

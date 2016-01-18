@@ -23,6 +23,8 @@ namespace assets {
 		TORSO_MOVING_LAST = TORSO_MOVING_FIRST + 5,
 
 		TEST_BACKGROUND,
+		TEST_SPRITE,
+		MOTOR,
 
 		CUSTOM = 10000
 	};

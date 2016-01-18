@@ -80,13 +80,7 @@ void car_system::apply_movement_forces() {
 			physics.apply_force(forward_tire_force * physics.get_mass()/4, forward_dir * -200 - vec2(right_normal).set_length(125));
 		}
 
-		if (car.braking_damping >= 0.f) {
-			//physics.set_linear_damping_vec(vec2(
-			//	resultant.x_non_zero() ? 0.f : car.braking_damping,
-			//	resultant.y_non_zero() ? 0.f : car.braking_damping));
 
-			physics.set_linear_damping(resultant.non_zero() ? 0.f : car.braking_damping);
-		}
 
 		vec2 vel = physics.velocity();
 		auto speed = vel.length();
@@ -97,7 +91,24 @@ void car_system::apply_movement_forces() {
 		auto forwardal_speed = forwardal.length();
 		forwardal.normalize_hint(forwardal_speed);
 
+		if (forwardal_speed < 500) {
+			physics.apply_force(-forwardal * 0.009 * forwardal_speed * forwardal_speed);
+		}
+		else
 			physics.apply_force(-forwardal * 0.00006 * forwardal_speed * forwardal_speed);
+		
+		auto base_damping = (forwardal_speed < 150 ? 4.6 : 0.4f);
+
+		if (car.braking_damping >= 0.f) {
+			//physics.set_linear_damping_vec(vec2(
+			//	resultant.x_non_zero() ? 0.f : car.braking_damping,
+			//	resultant.y_non_zero() ? 0.f : car.braking_damping));
+
+			base_damping += resultant.non_zero() ? 0.0 : car.braking_damping;
+		}
+		
+		physics.set_linear_damping(base_damping);
+
 
 		//lateral.set_length(0.2f*speed);
 		
