@@ -15,6 +15,7 @@ namespace components {
 		static physics& get_owner_body(augs::entity_id);
 		static augs::entity_id get_owner_body_entity(augs::entity_id);
 		static bool is_physical(augs::entity_id);
+		static bool are_connected_by_friction(augs::entity_id child, augs::entity_id parent);
 
 		b2Body* body = nullptr;
 		

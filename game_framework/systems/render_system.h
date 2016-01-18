@@ -50,5 +50,5 @@ public:
 	void calculate_and_set_interpolated_transforms();
 	void restore_actual_transforms();
 	
-	std::vector<render_layer> sortable_layers;
+	std::vector<render_layer> layers_with_custom_drawing_order;
 };

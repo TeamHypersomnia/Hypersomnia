@@ -23,6 +23,29 @@ namespace components {
 		return id->find<components::fixtures>() || id->find<components::physics>();
 	}
 
+	bool physics::are_connected_by_friction(augs::entity_id child, augs::entity_id parent) {
+		if (components::physics::is_physical(child) && components::physics::is_physical(parent)) {
+			bool matched_ancestor = false;
+
+			entity_id parent_body_entity = components::physics::get_owner_body_entity(parent);
+			entity_id childs_ancestor_entity = components::physics::get_owner_body(child).get_owner_friction_ground();
+
+			while (childs_ancestor_entity.alive()) {
+				if (childs_ancestor_entity == parent_body_entity) {
+					matched_ancestor = true;
+					break;
+				}
+
+				childs_ancestor_entity = childs_ancestor_entity->get<components::physics>().get_owner_friction_ground();
+			}
+
+			if (matched_ancestor)
+				return true;
+		}
+
+		return false;
+	}
+
 	void physics::set_velocity(vec2 pixels) {
 		body->SetLinearVelocity(pixels * PIXELS_TO_METERSf);
 	}	

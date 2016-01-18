@@ -144,30 +144,11 @@ void render_system::generate_layers(shared::drawing_state& in, int mask) {
 		layers[layer].push_back(it);
 	}
 
-	for (auto& sortable : sortable_layers) {
-		if (sortable < layers.size()) {
-			if (layers[sortable].size() > 1) {
-				std::sort(layers[sortable].begin(), layers[sortable].end(), [](entity_id b, entity_id a) {
-					if (components::physics::is_physical(a) && components::physics::is_physical(b)) {
-						bool matched_owner = false;
-
-						entity_id owner_b = components::physics::get_owner_body_entity(b);
-						entity_id owner = components::physics::get_owner_body(a).get_owner_friction_ground();
-
-						while (owner.alive()) {
-							if (owner == owner_b) {
-								matched_owner = true;
-								break;
-							}
-
-							owner = owner->get<components::physics>().get_owner_friction_ground();
-						}
-
-						if(matched_owner)
-							return true;
-					}
-
-					return false;
+	for (auto& sortable_layer : layers_with_custom_drawing_order) {
+		if (sortable_layer < layers.size()) {
+			if (layers[sortable_layer].size() > 1) {
+				std::sort(layers[sortable_layer].begin(), layers[sortable_layer].end(), [](entity_id b, entity_id a) {
+					return components::physics::are_connected_by_friction(a, b);
 				});
 			}
 		}

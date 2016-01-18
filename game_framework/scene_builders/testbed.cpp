@@ -41,7 +41,7 @@ namespace scene_builders {
 		resource_manager.create_sprites_indexed(
 			assets::texture_id::TORSO_MOVING_FIRST,
 			assets::texture_id::TORSO_MOVING_LAST,
-			L"hypersomnia/data/gfx/walk");
+			L"hypersomnia/data/gfx/sprite");
 
 		resource_manager.create(assets::atlas_id::GAME_WORLD_ATLAS, resources::manager::atlas_creation_mode::FROM_ALL_TEXTURES);
 

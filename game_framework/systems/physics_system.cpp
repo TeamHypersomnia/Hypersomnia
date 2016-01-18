@@ -270,28 +270,15 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 		auto& subject_fixtures = msg.subject->get<components::fixtures>();
 		auto& collider_fixtures = msg.collider->get<components::fixtures>();
 
-		auto& collider_physics = collider_fixtures.get_body_entity()->get<components::physics>();
-
 		if (subject_fixtures.is_friction_ground) {
-			auto& subject_physics = subject_fixtures.get_body_entity()->get<components::physics>();
-			
-			bool would_result_in_feedback = false;
-			
-			// see if the collider doesn't own the subject itself
-			entity_id subject_owner = subject_physics.get_owner_friction_ground();
-			auto collider_owner = collider_fixtures.get_body_entity();
-
-			while (subject_owner.alive()) {
-				if (subject_owner == collider_owner) {
-					would_result_in_feedback = true;
-					break;
-				}
-
-				subject_owner = subject_owner->get<components::physics>().get_owner_friction_ground();
-			}
-
-			if (!would_result_in_feedback && !collider_fixtures.is_friction_ground)
+			if (
+				//!components::physics::are_connected_by_friction(msg.collider, msg.subject) &&
+				!components::physics::are_connected_by_friction(msg.subject, msg.collider) &&
+				!collider_fixtures.is_friction_ground)
+			{
+				auto& collider_physics = collider_fixtures.get_body_entity()->get<components::physics>();
 				collider_physics.owner_friction_grounds.push_back(subject_fixtures.get_body_entity());
+			}
 		}
 
 		if (fix_a->IsSensor()) {
@@ -327,6 +314,8 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 			for (auto it = collider_physics.owner_friction_grounds.begin(); it != collider_physics.owner_friction_grounds.end(); ++it)
 				if (*it == subject_fixtures.get_body_entity())
 				{
+					// TODO: see if the new friction field fulfills the same constraints as in BeginContact
+
 					collider_physics.owner_friction_grounds.erase(it);
 					break;
 				}
