@@ -25,6 +25,8 @@ class physics_system : public augs::event_only_system {
 
 	contact_listener listener;
 
+	void recurential_friction_handler(entity_id entity, entity_id friction_owner);
+
 public:
 	using event_only_system::event_only_system;
 

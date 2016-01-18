@@ -248,80 +248,77 @@ physics_system::query_aabb_output physics_system::query_aabb_px(vec2 p1, vec2 p2
 #include "game_framework/components/movement_component.h"
 
 void physics_system::contact_listener::BeginContact(b2Contact* contact) {
-	auto fix_a = contact->GetFixtureA();
-	auto fix_b = contact->GetFixtureB();
+	for (int i = 0; i < 2; ++i) {
+		auto fix_a = contact->GetFixtureA();
+		auto fix_b = contact->GetFixtureB();
 
-	/* collision messaging happens only for sensors here
-		PreSolve is the counterpart for regular bodies
-	*/
+		if (i == 1)
+			std::swap(fix_a, fix_b);
 
-	auto body_a = fix_a->GetBody();
-	auto body_b = fix_b->GetBody();
+		/* collision messaging happens only for sensors here
+			PreSolve is the counterpart for regular bodies
+		*/
 
-	messages::collision_message msg;
+		auto body_a = fix_a->GetBody();
+		auto body_b = fix_b->GetBody();
 
-	msg.subject = static_cast<entity_id>(fix_a->GetUserData());
-	msg.collider = static_cast<entity_id>(fix_b->GetUserData());
+		messages::collision_message msg;
 
-	auto& subject_fixtures = msg.subject->get<components::fixtures>();
-	auto& collider_fixtures = msg.collider->get<components::fixtures>();
+		msg.subject = static_cast<entity_id>(fix_a->GetUserData());
+		msg.collider = static_cast<entity_id>(fix_b->GetUserData());
 
-	if (subject_fixtures.is_friction_ground) {
-		if (collider_fixtures.find_fixture(fix_b)->owner_friction_ground.dead() && !collider_fixtures.is_friction_ground)
-			collider_fixtures.find_fixture(fix_b)->owner_friction_ground = msg.subject;
-	}
+		auto& subject_fixtures = msg.subject->get<components::fixtures>();
+		auto& collider_fixtures = msg.collider->get<components::fixtures>();
 
-	if (fix_a->IsSensor() || fix_b->IsSensor()) {
+		auto& collider_physics = collider_fixtures.get_body_entity()->get<components::physics>();
+
+		if (subject_fixtures.is_friction_ground) {
+			if (!collider_fixtures.is_friction_ground)
+				collider_physics.owner_friction_grounds.push_back(msg.subject);
+		}
+
 		if (fix_a->IsSensor()) {
 			msg.subject_impact_velocity = (body_a->GetLinearVelocity());
 			msg.collider_impact_velocity = (body_b->GetLinearVelocity());
-			world_ptr->post_message(msg);
-		}
-
-		if (fix_b->IsSensor()) {
-			msg.subject_impact_velocity = (body_b->GetLinearVelocity());
-			msg.collider_impact_velocity = (body_a->GetLinearVelocity());
-
-			std::swap(msg.collider, msg.subject);
 			world_ptr->post_message(msg);
 		}
 	}
 }
 
 void physics_system::contact_listener::EndContact(b2Contact* contact) {
-	auto fix_a = contact->GetFixtureA();
-	auto fix_b = contact->GetFixtureB();
+	for (int i = 0; i < 2; ++i) {
+		auto fix_a = contact->GetFixtureA();
+		auto fix_b = contact->GetFixtureB();
 
-	auto body_a = fix_a->GetBody();
-	auto body_b = fix_b->GetBody();
+		if (i == 1)
+			std::swap(fix_a, fix_b);
 
-	messages::collision_message msg;
+		auto body_a = fix_a->GetBody();
+		auto body_b = fix_b->GetBody();
 
-	msg.subject = static_cast<entity_id>(fix_a->GetUserData());
-	msg.collider = static_cast<entity_id>(fix_b->GetUserData());
+		messages::collision_message msg;
 
-	auto& subject_fixtures = msg.subject->get<components::fixtures>();
-	auto& collider_fixtures = msg.collider->get<components::fixtures>();
+		msg.subject = static_cast<entity_id>(fix_a->GetUserData());
+		msg.collider = static_cast<entity_id>(fix_b->GetUserData());
 
-	if (subject_fixtures.is_friction_ground) {
-		if (collider_fixtures.find_fixture(fix_b)->owner_friction_ground == msg.subject)
-			collider_fixtures.find_fixture(fix_b)->owner_friction_ground.unset();
-	}
+		auto& subject_fixtures = msg.subject->get<components::fixtures>();
+		auto& collider_fixtures = msg.collider->get<components::fixtures>();
+		
+		auto& collider_physics = collider_fixtures.get_body_entity()->get<components::physics>();
 
-	if (fix_a->IsSensor() || fix_b->IsSensor()) {
-
-		msg.sensor_end_contact = true;
-
-		if (fix_a->IsSensor()) {
-			msg.subject_impact_velocity = -body_a->GetLinearVelocity();
-			msg.collider_impact_velocity = -body_b->GetLinearVelocity();
-			world_ptr->post_message(msg);
+		if (subject_fixtures.is_friction_ground) {
+			for (auto it = collider_physics.owner_friction_grounds.begin(); it != collider_physics.owner_friction_grounds.end(); ++it)
+				if (*it == msg.subject)
+				{
+					collider_physics.owner_friction_grounds.erase(it);
+					break;
+				}
 		}
 
-		if (fix_b->IsSensor()) {
-			std::swap(msg.collider, msg.subject);
-			msg.subject_impact_velocity = -body_b->GetLinearVelocity();
-			msg.collider_impact_velocity = -body_a->GetLinearVelocity();
+		if (fix_a->IsSensor()) {
+			msg.sensor_end_contact = true;
+			msg.subject_impact_velocity = -body_a->GetLinearVelocity();
+			msg.collider_impact_velocity = -body_b->GetLinearVelocity();
 			world_ptr->post_message(msg);
 		}
 	}
@@ -436,49 +433,48 @@ void physics_system::step_and_set_new_transforms() {
 
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
-		auto& physics = static_cast<entity_id>(b->GetUserData())->get<components::physics>();
-		auto& fixture_entities = physics.fixture_entities;
-
-		bool found_friction_ground = false;
-
-		for (auto& fixture_entity : fixture_entities) {
-			for(auto& fixture : fixture_entity->get<components::fixtures>().list_of_fixtures)
-
-			if (fixture.owner_friction_ground.alive()) {
-				auto& friction_physics = fixture.owner_friction_ground->get<components::fixtures>();
-
-				auto friction_body = friction_physics.get_body();
-
-				auto friction_vel = friction_body->GetLinearVelocity();
-				auto friction_ang_vel = friction_body->GetAngularVelocity();
-				auto friction_center = friction_body->GetWorldCenter();
-				
-				auto fricted_pos = physics.body->GetPosition() + per_second() * friction_vel;
-
-				auto rotation_offset = friction_center - fricted_pos;
-				b2Vec2 rotational_velocity = (-vec2(rotation_offset).perpendicular_cw()).set_length(
-					rotation_offset.Length()*friction_ang_vel
-					);
-				//rotational_velocity.y *= -1;
-
-				fricted_pos += per_second() * rotational_velocity ;
-				//renderer::get_current().logic_lines.draw_cyan(physics.get_position(), physics.get_position() + METERS_TO_PIXELSf*friction_vel);
-
-				physics.body->SetTransform(fricted_pos,
-					physics.body->GetAngle()
-					+ per_second()*friction_ang_vel
-					);
-
-				found_friction_ground = true;
-				break;
-			}
-
-			if (found_friction_ground)
-				break;
+		auto entity = b->GetUserData();
+		auto& physics = entity->get<components::physics>();
+		
+		if (!physics.owner_friction_grounds.empty()) {
+			recurential_friction_handler(b->GetUserData(), physics.owner_friction_grounds[0]);
 		}
 	}
 
 	reset_states();
+}
+
+void physics_system::recurential_friction_handler(entity_id entity, entity_id friction_owner) {
+	auto& physics = entity->get<components::physics>();
+	
+	auto& friction_physics = friction_owner->get<components::fixtures>();
+	auto& friction_entity = friction_physics.get_body_entity();
+
+	if (!friction_entity->get<components::physics>().owner_friction_grounds.empty()) {
+		recurential_friction_handler(entity, friction_entity->get<components::physics>().owner_friction_grounds[0]);
+	}
+
+	auto friction_body = friction_physics.get_body();
+
+	auto friction_vel = friction_body->GetLinearVelocity();
+	auto friction_ang_vel = friction_body->GetAngularVelocity();
+	auto friction_center = friction_body->GetWorldCenter();
+
+	auto fricted_pos = physics.body->GetPosition() + per_second() * friction_vel;
+
+	auto rotation_offset = friction_center - fricted_pos;
+	b2Vec2 rotational_velocity = (-vec2(rotation_offset).perpendicular_cw()).set_length(
+		rotation_offset.Length()*friction_ang_vel
+		);
+	//rotational_velocity.y *= -1;
+
+	fricted_pos += per_second() * rotational_velocity;
+	//renderer::get_current().logic_lines.draw_cyan(physics.get_position(), physics.get_position() + METERS_TO_PIXELSf*friction_vel);
+
+	physics.body->SetTransform(fricted_pos,
+		physics.body->GetAngle()
+		+ per_second()*friction_ang_vel
+		);
 }
 
 void physics_system::destroy_whole_world() {

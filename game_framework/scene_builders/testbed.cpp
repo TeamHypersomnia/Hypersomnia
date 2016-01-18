@@ -65,10 +65,6 @@ namespace scene_builders {
 		auto crate3 = world.create_entity("crate3");
 		auto crate4 = world.create_entity("crate4");
 
-		auto motor = world.create_entity("motor");
-		archetypes::sprite(motor, vec2(-100, -100), assets::texture_id::MOTOR, augs::colors::white, render_layer::DYNAMIC_BODY);
-		archetypes::crate_physics(motor);
-
 		for (int x = -4 * 1; x < 4 * 1; ++x)
 		{
 			auto frog = world.create_entity("frog");
@@ -78,6 +74,11 @@ namespace scene_builders {
 
 		auto car = prefabs::create_car(world, vec2(-300, 0));
 		auto car2 = prefabs::create_car(world, vec2(-800, 0));
+
+		//auto motor = world.create_entity("motor");
+		//archetypes::sprite(motor, vec2(-100, -100), assets::texture_id::MOTOR, augs::colors::white, render_layer::DYNAMIC_BODY);
+		//archetypes::crate_physics(motor);
+
 
 		archetypes::camera(camera, window_rect.w, window_rect.h);
 
@@ -145,7 +146,7 @@ namespace scene_builders {
 		else {
 			world.parent_overworld.configure_stepping(60.0, 5);
 			world.parent_overworld.accumulator.set_time_multiplier(1.0);
-
+			augs::create_directory("sessions/");
 			augs::create_directory("sessions/" + augs::get_timestamp());
 
 			world.get_system<input_system>().raw_window_input_player.player.record("sessions/" + augs::get_timestamp() + "/recorded.inputs");

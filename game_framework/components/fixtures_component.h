@@ -11,7 +11,7 @@ namespace components {
 	struct fixtures {
 		struct fixture_state {
 			b2Fixture* fixture;
-			augs::entity_id owner_friction_ground;
+			//augs::entity_id owner_friction_ground;
 		};
 
 		fixture_state* find_fixture(b2Fixture*);

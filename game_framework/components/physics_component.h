@@ -8,10 +8,14 @@ extern float METERS_TO_PIXELSf;
 extern float PIXELS_TO_METERSf;
 
 class b2Body;
+#include <vector>
+
 namespace components {
 	struct physics : public augs::component {
 		b2Body* body = nullptr;
 		
+		std::vector<augs::entity_id> owner_friction_grounds;
+
 		bool enable_angle_motor = false;
 		float target_angle = 0.f;
 		float angle_motor_force_multiplier = 1.f;
