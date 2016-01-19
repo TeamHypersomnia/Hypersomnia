@@ -373,6 +373,7 @@
     <ClCompile Include="game_framework\archetypes\archetypes.cpp" />
     <ClCompile Include="game_framework\archetypes\box_physics.cpp" />
     <ClCompile Include="game_framework\archetypes\car.cpp" />
+    <ClCompile Include="game_framework\archetypes\motorcycle.cpp" />
     <ClCompile Include="game_framework\archetypes\sprite.cpp" />
     <ClCompile Include="game_framework\archetypes\camera.cpp" />
     <ClCompile Include="game_framework\archetypes\wsad_player.cpp" />

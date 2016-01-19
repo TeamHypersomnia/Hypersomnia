@@ -26,8 +26,6 @@ namespace components {
 		render_layer layer = render_layer::BOTTOM;
 		unsigned mask = mask_type::WORLD;
 
-		bool flip_horizontally = false;
-		bool flip_vertically = false;
 		bool absolute_transform = false;
 
 		int rendering_proxy;

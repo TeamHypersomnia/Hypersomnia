@@ -124,6 +124,47 @@ namespace resources {
 		return anim;
 	}
 
+	animation& manager::create_inverse_with_flip(assets::animation_id id, assets::texture_id first_frame, assets::texture_id last_frame, float frame_duration_ms) {
+		animation& anim = create(id);
+		anim.loop_mode = animation::loop_type::REPEAT;
+
+		for (assets::texture_id i = first_frame; i < last_frame; i = assets::texture_id(i + 1)) {
+			animation::frame frame;
+			frame.duration_milliseconds = frame_duration_ms;
+			frame.sprite.set(i);
+
+			anim.frames.push_back(frame);
+		}
+
+		for (assets::texture_id i = assets::texture_id(last_frame - 1); i >= first_frame; i = assets::texture_id(i - 1)) {
+			animation::frame frame;
+			frame.duration_milliseconds = frame_duration_ms;
+			frame.sprite.set(i);
+
+			anim.frames.push_back(frame);
+		}
+
+		for (assets::texture_id i = first_frame; i < last_frame; i = assets::texture_id(i + 1)) {
+			animation::frame frame;
+			frame.duration_milliseconds = frame_duration_ms;
+			frame.sprite.set(i);
+			frame.sprite.flip_vertically = true;
+
+			anim.frames.push_back(frame);
+		}
+
+		for (assets::texture_id i = assets::texture_id(last_frame - 1); i >= first_frame; i = assets::texture_id(i - 1)) {
+			animation::frame frame;
+			frame.duration_milliseconds = frame_duration_ms;
+			frame.sprite.set(i);
+			frame.sprite.flip_vertically = true;
+
+			anim.frames.push_back(frame);
+		}
+
+		return anim;
+	}
+
 	animation_response& manager::create(assets::animation_response_id id) {
 		animation_responses.insert(std::make_pair(id, animation_response()));
 

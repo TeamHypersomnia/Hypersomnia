@@ -19,6 +19,9 @@ namespace components {
 		vec2 size;
 		float rotation_offset;
 
+		bool flip_horizontally = false;
+		bool flip_vertically = false;
+
 		sprite(assets::texture_id = assets::BLANK, augs::pixel_32 = augs::pixel_32());
 
 		void set(assets::texture_id, augs::pixel_32 = augs::pixel_32());

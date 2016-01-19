@@ -107,9 +107,11 @@ namespace components {
 	}
 
 	entity_id physics::get_owner_friction_ground() {
-		if (owner_friction_grounds.empty()) return entity_id();
+		return owner_friction_ground;
 
-		return owner_friction_grounds[0];
+		//if (owner_friction_grounds.empty()) return entity_id();
+		//
+		//return owner_friction_grounds[0];
 	}
 
 }

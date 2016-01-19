@@ -50,6 +50,8 @@ namespace resources {
 			resources::animation::loop_type = resources::animation::INVERSE
 			);
 
+		animation& create_inverse_with_flip(assets::animation_id, assets::texture_id first_frame, assets::texture_id last_frame, float frame_duration_ms);
+
 		animation& create(assets::animation_id);
 		resources::animation_response& create(assets::animation_response_id);
 

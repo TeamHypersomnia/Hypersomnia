@@ -80,10 +80,10 @@ namespace components {
 			vec2(0.f, 1.f)
 		};
 
-		if (render.flip_horizontally)
+		if (flip_horizontally)
 			for (auto& v : texcoords)
 				v.x = 1.f - v.x;
-		if (render.flip_vertically)
+		if (flip_vertically)
 			for (auto& v : texcoords)
 				v.y = 1.f - v.y;
 

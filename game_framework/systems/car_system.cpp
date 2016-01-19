@@ -44,7 +44,6 @@ void car_system::set_steering_flags_from_intents() {
 
 #include <iostream>
 void car_system::apply_movement_forces() {
-	//auto& renderer = parent_world.get_system<render_system>();
 	auto& lines = renderer::get_current().logic_lines;
 
 	for (auto it : targets) {
@@ -62,13 +61,8 @@ void car_system::apply_movement_forces() {
 		resultant.x = car.turning_right * car.input_acceleration.x - car.turning_left * car.input_acceleration.x;
 		resultant.y = car.accelerating * car.input_acceleration.y  - car.deccelerating * car.input_acceleration.y;
 		
-		//if (car.deccelerating && !car.accelerating)
-		//	resultant.x *= -1;
-
 		if (car.acceleration_length > 0.f) {
-			if (resultant.length() > car.acceleration_length) {
-				resultant.set_length(car.acceleration_length);
-			}
+			resultant.set_length(car.acceleration_length);
 		}
 
 		if (resultant.non_zero()) {
@@ -76,13 +70,13 @@ void car_system::apply_movement_forces() {
 			
 			vec2 forward_tire_force = vec2(forward_dir).set_length(force.length()) * sgn(resultant.y);
 
-			physics.apply_force(force * physics.get_mass()/4, forward_dir * 200 + vec2(right_normal).set_length(125));
-			physics.apply_force(force * physics.get_mass()/4, forward_dir * 200 - vec2(right_normal).set_length(125));
-			physics.apply_force(forward_tire_force * physics.get_mass()/4, forward_dir * -200 + vec2(right_normal).set_length(125));
-			physics.apply_force(forward_tire_force * physics.get_mass()/4, forward_dir * -200 - vec2(right_normal).set_length(125));
+			auto& off = car.wheel_offset;
+
+			physics.apply_force(force * physics.get_mass()/4, forward_dir * off.x + vec2(right_normal).set_length(off.y));
+			physics.apply_force(force * physics.get_mass()/4, forward_dir * off.x - vec2(right_normal).set_length(off.y));
+			physics.apply_force(forward_tire_force * physics.get_mass()/4, forward_dir * -off.x + vec2(right_normal).set_length(off.y));
+			physics.apply_force(forward_tire_force * physics.get_mass()/4, forward_dir * -off.x - vec2(right_normal).set_length(off.y));
 		}
-
-
 
 		vec2 vel = physics.velocity();
 		auto speed = vel.length();
@@ -93,52 +87,54 @@ void car_system::apply_movement_forces() {
 		auto forwardal_speed = forwardal.length();
 		forwardal.normalize_hint(forwardal_speed);
 
-		if (forwardal_speed < 500) {
-			physics.apply_force(-forwardal * 0.009 * forwardal_speed * forwardal_speed);
+		if (forwardal_speed < car.maximum_speed_with_static_air_resistance) {
+			physics.apply_force(-forwardal * car.static_air_resistance * forwardal_speed * forwardal_speed);
 		}
 		else
-			physics.apply_force(-forwardal * 0.00006 * forwardal_speed * forwardal_speed);
+			physics.apply_force(-forwardal * car.dynamic_air_resistance * forwardal_speed * forwardal_speed);
 		
-		auto base_damping = (forwardal_speed < 150 ? 4.6 : 0.4f);
+		auto base_damping = (forwardal_speed < car.maximum_speed_with_static_damping ? car.static_damping : car.dynamic_damping);
 
 		if (car.braking_damping >= 0.f) {
-			//physics.set_linear_damping_vec(vec2(
-			//	resultant.x_non_zero() ? 0.f : car.braking_damping,
-			//	resultant.y_non_zero() ? 0.f : car.braking_damping));
+			base_damping += resultant.y > 0 ? 0.0 : car.braking_damping;
 
-			base_damping += resultant.non_zero() ? 0.0 : car.braking_damping;
 		}
-		
+
+		float base_angular_damping = 0.f;
+
+		if (car.braking_angular_damping >= 0.f) {
+
+
+			if (physics.body->GetAngularVelocity() < 0 && resultant.x > 0) {
+				base_angular_damping += car.braking_angular_damping;
+			}
+			else if (physics.body->GetAngularVelocity() > 0 && resultant.x < 0) {
+				base_angular_damping += car.braking_angular_damping;
+			}
+			else if (resultant.x == 0) {
+				base_angular_damping += car.braking_angular_damping;
+			}
+		}
+
 		physics.set_linear_damping(base_damping);
 
-
-		//lateral.set_length(0.2f*speed);
-		
-		if (lateral.length() > 20)
-			lateral.set_length(20);
+		if (lateral.length() > car.maximum_lateral_cancellation_impulse)
+			lateral.set_length(car.maximum_lateral_cancellation_impulse);
 			
 		if (!car.hand_brake) {
-			physics.body->SetAngularDamping(2.f);
-			physics.apply_impulse(-lateral * physics.get_mass() * 0.75);
+			physics.body->SetAngularDamping(base_angular_damping + car.angular_damping);
+			physics.apply_impulse(-lateral * physics.get_mass() * car.lateral_impulse_multiplier);
+			physics.angular_air_resistance = car.angular_air_resistance;
 		}
-		else
-			physics.body->SetAngularDamping(0.8f);
-		//physics.apply_impulse(-lateral * physics.get_mass() * 0.75 / 30, forward_dir * 200 + vec2(right_normal).set_length(125), true);
-		//physics.apply_impulse(-lateral * physics.get_mass() * 0.75 / 30, forward_dir * 200 - vec2(right_normal).set_length(125), true);
-		
-		//lines.draw_red(physics.get_world_center(), physics.get_world_center() + forward_dir * 100);
-		//lines.draw_blue(physics.get_world_center(), physics.get_world_center() + right_normal *100);
+		else {
+			physics.angular_air_resistance = car.angular_air_resistance_while_hand_braking;
+			physics.body->SetAngularDamping(base_angular_damping + car.angular_damping_while_hand_braking);
+		}
 
 		auto body = physics.body;
 
-		auto ang_impulse = 0.06f * body->GetInertia() * -body->GetAngularVelocity();
-		
-		//if (ang_impulse > 0.3)
-		//	ang_impulse = 0.3; 
-		//if (ang_impulse < -0.3)
-		//	ang_impulse = -0.3;
-
-		if(forwardal_speed > 500)
-			body->ApplyAngularImpulse(ang_impulse * (forwardal_speed-499.0)/4000.0, true);
+		if(forwardal_speed > car.minimum_speed_for_maneuverability_decrease)
+			body->ApplyAngularImpulse(body->GetInertia() * -body->GetAngularVelocity() * 
+				(forwardal_speed-car.minimum_speed_for_maneuverability_decrease)*car.maneuverability_decrease_multiplier, true);
 	}
 }

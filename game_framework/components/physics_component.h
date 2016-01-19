@@ -19,7 +19,9 @@ namespace components {
 
 		b2Body* body = nullptr;
 		
+		augs::entity_id owner_friction_ground;
 		std::vector<augs::entity_id> owner_friction_grounds;
+
 		augs::entity_id get_owner_friction_ground();
 
 		bool enable_angle_motor = false;
@@ -31,7 +33,7 @@ namespace components {
 		/* a physically realistic alternative to max_speed variable, the bigger the value is, the lesser the maximum speed */
 		float air_resistance = 2.0f;
 		// -1.f - the same as the air resistance
-		float angular_air_resistance = 20;
+		float angular_air_resistance = 0;
 
 		std::vector<augs::entity_id> fixture_entities;
 

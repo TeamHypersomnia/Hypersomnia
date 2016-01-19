@@ -35,6 +35,10 @@ namespace scene_builders {
 		resource_manager.create(assets::texture_id::CRATE, L"hypersomnia/data/gfx/crate.png");
 		resource_manager.create(assets::texture_id::CAR_INSIDE, L"hypersomnia/data/gfx/crate2.png");
 		resource_manager.create(assets::texture_id::CAR_FRONT, L"hypersomnia/data/gfx/crate2.png");
+
+		resource_manager.create(assets::texture_id::MOTORCYCLE_FRONT, L"hypersomnia/data/gfx/motorcycle_front.png");
+		resource_manager.create(assets::texture_id::MOTORCYCLE_INSIDE, L"hypersomnia/data/gfx/motorcycle_inside.png");
+
 		resource_manager.create(assets::texture_id::TEST_SPRITE, L"hypersomnia/data/gfx/frog.png");
 		resource_manager.create(assets::texture_id::MOTOR, L"hypersomnia/data/gfx/motor.png");
 
@@ -49,7 +53,7 @@ namespace scene_builders {
 		resource_manager.create(assets::shader_id::DEFAULT_FRAGMENT, L"hypersomnia/data/shaders/default.fsh", graphics::shader::type::FRAGMENT);
 		resource_manager.create(assets::program_id::DEFAULT, assets::shader_id::DEFAULT_VERTEX, assets::shader_id::DEFAULT_FRAGMENT);
 
-		resource_manager.create(assets::animation_id::TORSO_MOVE,
+		resource_manager.create_inverse_with_flip(assets::animation_id::TORSO_MOVE,
 			assets::texture_id::TORSO_MOVING_FIRST,
 			assets::texture_id::TORSO_MOVING_LAST,
 			20.0f);
@@ -76,10 +80,8 @@ namespace scene_builders {
 		auto car2 = prefabs::create_car(world, vec2(-800, 0));
 		auto car3 = prefabs::create_car(world, vec2(-1300, 0));
 
-		//auto motor = world.create_entity("motor");
-		//archetypes::sprite(motor, vec2(-100, -100), assets::texture_id::MOTOR, augs::colors::white, render_layer::DYNAMIC_BODY);
-		//archetypes::crate_physics(motor);
 
+		auto motorcycle = prefabs::create_motorcycle(world, vec2(0, -600));
 
 		archetypes::camera(camera, window_rect.w, window_rect.h);
 

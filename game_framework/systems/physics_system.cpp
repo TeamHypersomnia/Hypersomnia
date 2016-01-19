@@ -271,13 +271,20 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 		auto& collider_fixtures = msg.collider->get<components::fixtures>();
 
 		if (subject_fixtures.is_friction_ground) {
+			// if the collider is from the ancestor line of the friction subject, 
+
+			// if we do not share ancestor line, consider the collider only if it has no parent friction
+			
+			
 			if (
 				//!components::physics::are_connected_by_friction(msg.collider, msg.subject) &&
-				!components::physics::are_connected_by_friction(msg.subject, msg.collider) &&
-				!collider_fixtures.is_friction_ground)
+				// cycle guard
+				!collider_fixtures.is_friction_ground
+				)
 			{
 				auto& collider_physics = collider_fixtures.get_body_entity()->get<components::physics>();
 				collider_physics.owner_friction_grounds.push_back(subject_fixtures.get_body_entity());
+				//collider_physics.owner_friction_grounds.insert(collider_physics.owner_friction_grounds.begin(), subject_fixtures.get_body_entity());
 			}
 		}
 
@@ -399,13 +406,13 @@ void physics_system::step_and_set_new_transforms() {
 		//	physics.body->ApplyForce(force_components * force_dir, physics.body->GetWorldCenter(), true);
 		//}
 
-		// auto angular_resistance = physics.angular_air_resistance;
-		// if (angular_resistance < 0.f) angular_resistance = physics.air_resistance;
-		// 
-		// if (angular_resistance > 0.f) {
-		// 	//physics.body->ApplyTorque((angular_resistance * sqrt(sqrt(angular_speed * angular_speed)) + 0.2 * angular_speed * angular_speed)* -sgn(angular_speed) * b->GetInertia(), true);
-		// 	physics.body->ApplyTorque(( 1.2 * angular_speed * angular_speed )* -sgn(angular_speed) * b->GetInertia(), true);
-		// }
+		auto angular_resistance = physics.angular_air_resistance;
+		if (angular_resistance < 0.f) angular_resistance = physics.air_resistance;
+		
+		if (angular_resistance > 0.f) {
+			//physics.body->ApplyTorque((angular_resistance * sqrt(sqrt(angular_speed * angular_speed)) + 0.2 * angular_speed * angular_speed)* -sgn(angular_speed) * b->GetInertia(), true);
+			physics.body->ApplyTorque((angular_resistance * angular_speed * angular_speed )* -sgn(angular_speed) * b->GetInertia(), true);
+		}
 
 		if (physics.enable_angle_motor) {
 			float nextAngle = static_cast<float>(b->GetAngle() + b->GetAngularVelocity() / parent_overworld.accumulator.get_hz());
@@ -437,6 +444,45 @@ void physics_system::step_and_set_new_transforms() {
 
 	for (auto& c : listener.after_step_callbacks)
 		c();
+
+
+
+	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
+		if (b->GetType() == b2_staticBody) continue;
+		auto entity = b->GetUserData();
+		auto& physics = entity->get<components::physics>();
+
+		auto feasible_grounds = physics.owner_friction_grounds;
+
+		if (!feasible_grounds.empty()) {
+			// cycle guard
+			// remove friction grounds whom do I own myself
+
+			feasible_grounds.erase(std::remove_if(feasible_grounds.begin(), feasible_grounds.end(), [entity](entity_id subject) {
+				return components::physics::are_connected_by_friction(subject, entity);
+			}), feasible_grounds.end());
+		}
+
+		if (!feasible_grounds.empty()) {
+			std::stable_sort(feasible_grounds.begin(), feasible_grounds.end(), [](entity_id a, entity_id b) {
+				return components::physics::are_connected_by_friction(a, b);
+			});
+			
+			physics.owner_friction_ground = feasible_grounds[0];
+
+			/// consider friction grounds ONLY from the same ancestor line, and only the descendants
+			
+			/// if the current one is not found within contacting friction grounds,
+			/// prioritize like this:
+			/// firstly, the lowest descendant of the ancestor line of the lost friction ground
+			/// descendant of any other tree with the biggest height, stable-sorted in order of entrance
+
+		}
+		else {
+			physics.owner_friction_ground.unset();
+		}
+
+	}
 
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;

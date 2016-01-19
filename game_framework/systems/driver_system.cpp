@@ -7,6 +7,8 @@
 #include "../components/input_component.h"
 #include "../components/children_component.h"
 #include "../components/movement_component.h"
+#include "../components/lookat_component.h"
+#include "../components/physics_component.h"
 
 #include "../globals/input_profiles.h"
 
@@ -76,6 +78,8 @@ void driver_system::affect_drivers_due_to_car_ownership_changes(messages::car_ow
 			maybe_movement->reset_movement_flags();
 
 		auto* maybe_children = e.driver->find<components::children>();
+		auto* maybe_lookat = e.driver->find<components::lookat>();
+		auto* maybe_physics = e.driver->find<components::physics>();
 
 		if (maybe_children) {
 			auto& children = maybe_children->sub_entities_by_name;
@@ -84,6 +88,11 @@ void driver_system::affect_drivers_due_to_car_ownership_changes(messages::car_ow
 				//children[components::children::sub_entity_name::CHARACTER_CROSSHAIR]->get<components::input>() = input_profiles::crosshair_driving();
 			}
 		}
+
+		if (maybe_lookat && maybe_physics) {
+			maybe_lookat->update_value = false;
+			maybe_physics->enable_angle_motor = false;
+		}
 	}
 	else {
 		driver.owned_vehicle.unset();
@@ -91,6 +100,13 @@ void driver_system::affect_drivers_due_to_car_ownership_changes(messages::car_ow
 		car.reset_movement_flags();
 
 		auto* maybe_children = e.driver->find<components::children>();
+		auto* maybe_physics = e.driver->find<components::physics>();
+		auto* maybe_lookat = e.driver->find<components::lookat>();
+
+		if (maybe_lookat && maybe_physics) {
+			maybe_lookat->update_value = true;
+			maybe_physics->enable_angle_motor = true;
+		}
 
 		if (maybe_children) {
 			auto& children = maybe_children->sub_entities_by_name;
