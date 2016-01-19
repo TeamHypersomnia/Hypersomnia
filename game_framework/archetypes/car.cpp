@@ -41,9 +41,10 @@ namespace prefabs {
 			car.acceleration_length = 4500/5;
 			transform.pos = pos;
 
-			sprite.set(assets::texture_id::CAR_FRONT, augs::pixel_32(0, 255, 255));
-			sprite.size.x = 200;
-			sprite.size.y = 100;
+			sprite.set(assets::texture_id::TRUCK_FRONT);
+			//sprite.set(assets::texture_id::TRUCK_FRONT, augs::pixel_32(0, 255, 255));
+			//sprite.size.x = 200;
+			//sprite.size.y = 100;
 
 			render.layer = render_layer::DYNAMIC_BODY;
 
@@ -72,9 +73,10 @@ namespace prefabs {
 
 			render.layer = render_layer::CAR_INTERIOR;
 
-			sprite.set(assets::texture_id::CAR_INSIDE, augs::pixel_32(122, 0, 122, 255));
-			sprite.size.x = 250;
-			sprite.size.y = 550;
+			sprite.set(assets::texture_id::TRUCK_INSIDE);
+			//sprite.set(assets::texture_id::TRUCK_INSIDE, augs::pixel_32(122, 0, 122, 255));
+			//sprite.size.x = 250;
+			//sprite.size.y = 550;
 
 			helpers::physics_info info;
 			info.from_renderable(interior);
@@ -99,16 +101,16 @@ namespace prefabs {
 
 			render.layer = render_layer::CAR_WHEEL;
 
-			sprite.set(assets::texture_id::CAR_INSIDE, augs::pixel_32(255, 0, 0, 255));
+			sprite.set(assets::texture_id::CAR_INSIDE, augs::pixel_32(29, 0, 0, 255));
 			sprite.size.x = 30;
-			sprite.size.y = 90;
+			sprite.size.y = 60;
 
 			helpers::physics_info info;
 			info.from_renderable(left_wheel);
 			info.density = 0.6f;
 			info.filter = filters::trigger();
 			info.sensor = true;
-			vec2 offset(0, front->get<components::sprite>().size.y / 2 + sprite.size.y / 2);
+			vec2 offset(0, front->get<components::sprite>().size.y / 2 + sprite.size.y / 2 + 20);
 			info.transform_vertices.pos = offset;
 			
 			auto& physics = helpers::add_fixtures_to_other_body(info, left_wheel, front);

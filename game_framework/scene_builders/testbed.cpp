@@ -39,6 +39,9 @@ namespace scene_builders {
 		resource_manager.create(assets::texture_id::MOTORCYCLE_FRONT, L"hypersomnia/data/gfx/motorcycle_front.png");
 		resource_manager.create(assets::texture_id::MOTORCYCLE_INSIDE, L"hypersomnia/data/gfx/motorcycle_inside.png");
 
+		resource_manager.create(assets::texture_id::TRUCK_FRONT, L"hypersomnia/data/gfx/truck_front.png");
+		resource_manager.create(assets::texture_id::TRUCK_INSIDE, L"hypersomnia/data/gfx/truck_inside.png");
+
 		resource_manager.create(assets::texture_id::TEST_SPRITE, L"hypersomnia/data/gfx/frog.png");
 		resource_manager.create(assets::texture_id::MOTOR, L"hypersomnia/data/gfx/motor.png");
 

@@ -470,6 +470,14 @@ void physics_system::step_and_set_new_transforms() {
 			
 			physics.owner_friction_ground = feasible_grounds[0];
 
+			// make the new owner first in order in case it is later compared to the same ancestor-level parents
+
+			for (auto& it = physics.owner_friction_grounds.begin(); it != physics.owner_friction_grounds.end(); ++it) {
+				if (*it == physics.owner_friction_ground) {
+					std::swap(physics.owner_friction_grounds[0], *it);
+				}
+			}
+
 			/// consider friction grounds ONLY from the same ancestor line, and only the descendants
 			
 			/// if the current one is not found within contacting friction grounds,
