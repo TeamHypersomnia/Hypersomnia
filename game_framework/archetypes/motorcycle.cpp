@@ -72,6 +72,7 @@ namespace prefabs {
 
 			info.filter = filters::dynamic_object();
 			info.density = 0.6f;
+			info.restitution = 0.3;
 
 			auto& physics = helpers::create_physics_component(body, front);
 			helpers::add_fixtures(info, front);

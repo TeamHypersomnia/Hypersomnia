@@ -53,7 +53,7 @@ namespace archetypes {
 		auto& physics = helpers::create_physics_component(body, e);
 		helpers::add_fixtures(info, e);
 
-		physics.air_resistance = 5.f;
+		//physics.air_resistance = 5.f;
 		physics.set_linear_damping(20);
 
 		wsad_player_setup_movement(e);
@@ -100,7 +100,13 @@ namespace archetypes {
 		components::trigger_detector detector;
 		components::driver driver;
 		driver.force_towards_owned_wheel = 85000.f;
-		driver.distance_when_force_easing_starts = 30.f;
+		driver.distance_when_force_easing_starts = 20.f;
+		driver.density_while_driving = 0.02f;
+		driver.standard_density = 0.6f;
+
+		// driver.standard_linear_damping = 20.f;
+		// driver.linear_damping_while_driving = 4.f;
+		driver.power_of_force_easing_multiplier = 1.f;
 
 		children.map_sub_entity(crosshair_entity, components::children::CHARACTER_CROSSHAIR);
 

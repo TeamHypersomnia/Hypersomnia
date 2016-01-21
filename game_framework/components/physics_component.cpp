@@ -56,6 +56,17 @@ namespace components {
 		body->SetLinearDamping(damping);
 	}
 
+	void physics::set_density(float density) {
+		b2Fixture* f = body->GetFixtureList();
+
+		while (f) {
+			f->SetDensity(density);
+			f = f->GetNext();
+		}
+
+		body->ResetMassData();
+	}
+	
 	void physics::set_linear_damping_vec(vec2 pixels) {
 		body->SetLinearDampingVec(pixels);
 	}

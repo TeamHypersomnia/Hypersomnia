@@ -28,6 +28,7 @@ namespace components {
 		augs::entity_id get_owner_friction_ground();
 
 		bool enable_angle_motor = false;
+		
 		float target_angle = 0.f;
 		float angle_motor_force_multiplier = 1.f;
 
@@ -43,6 +44,7 @@ namespace components {
 		vec2 velocity();
 		void set_velocity(vec2);
 		void set_linear_damping(float);
+		void set_density(float);
 		void set_linear_damping_vec(vec2);
 		void apply_force(vec2);
 		void apply_force(vec2, vec2 center_offset, bool wake = true);

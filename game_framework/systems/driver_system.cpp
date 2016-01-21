@@ -115,8 +115,13 @@ void driver_system::affect_drivers_due_to_car_ownership_changes(messages::car_ow
 			//maybe_physics->enable_angle_motor = false;
 		}
 
-		if(maybe_physics)
+		if (maybe_physics) {
 			maybe_physics->set_transform(car.left_wheel_trigger);
+			maybe_physics->set_velocity(vec2(0, 0));
+			maybe_physics->set_density(driver.density_while_driving);
+
+			//maybe_physics->set_linear_damping(driver.linear_damping_while_driving);
+		}
 	}
 	else {
 		driver.owned_vehicle.unset();
@@ -132,6 +137,11 @@ void driver_system::affect_drivers_due_to_car_ownership_changes(messages::car_ow
 		if (maybe_lookat && maybe_physics) {
 			maybe_lookat->update_value = true;
 			//maybe_physics->enable_angle_motor = true;
+		}
+
+		if (maybe_physics) {
+			maybe_physics->set_density(driver.standard_density);
+			// maybe_physics->set_linear_damping(driver.standard_linear_damping);
 		}
 
 		if (maybe_children) {
@@ -180,7 +190,7 @@ void driver_system::apply_forces_towards_wheels() {
 
 			if (distance < driver.distance_when_force_easing_starts) {
 				auto mult = distance / driver.distance_when_force_easing_starts;
-				force_length *= mult;
+				force_length *= pow(mult, driver.power_of_force_easing_multiplier);
 			}
 
 			auto force = vec2(direction).set_length(force_length);
