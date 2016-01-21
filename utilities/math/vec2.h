@@ -5,6 +5,8 @@
 #include "vec2declare.h"
 
 #define AUGS_EPSILON 0.0001f
+#define DEG_TO_RAD 0.01745329251994329576923690768489
+#define RAD_TO_DEG (1.0/0.01745329251994329576923690768489)
 
 template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
@@ -46,7 +48,7 @@ namespace augs {
 
 	template <class vec, class d>
 	vec& rotate(vec& v, const vec& origin, d angle) {
-		angle *= static_cast<d>(0.01745329251994329576923690768489);
+		angle *= static_cast<d>(DEG_TO_RAD);
 		auto s = sin(angle);
 		auto c = cos(angle);
 		vec rotated;
@@ -175,7 +177,7 @@ namespace augs {
 		}
 
 		float degrees() const {
-			return radians()*180.0f/3.141592653589793238462f;
+			return radians()*RAD_TO_DEG;
 		}
 
 		float angle_between(const vec2t<>& v) {
@@ -195,15 +197,14 @@ namespace augs {
 		}
 
 		vec2t& set_from_degrees(float degrees) {
-			float radians = degrees * 0.01745329251994329576923690768489f;
+			float radians = degrees * DEG_TO_RAD;
 			set(cos(radians), sin(radians));
 			normalize();
 			return *this;
 		}
 
 		vec2t& set_from_radians(float radians) {
-			return set_from_degrees(radians / 0.01745329251994329576923690768489f);
-			return *this;
+			return set_from_degrees(radians * RAD_TO_DEG);
 		}
 
 		template <typename v>

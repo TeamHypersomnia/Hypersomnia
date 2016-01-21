@@ -35,6 +35,8 @@ namespace components {
 		float braking_damping = 0.f;
 		bool enable_braking_damping = false;
 
+		bool enable_animation = true;
+
 		/* speed at which the receivers' animation speed multiplier reaches 1.0 */
 		float max_speed_animation = 1.f;
 	};

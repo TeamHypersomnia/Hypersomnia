@@ -236,7 +236,7 @@ void render_system::draw_layer(drawing_state& in, int layer) {
 
 			in.drawn_transform = e->get<components::transform>();
 			in.drawn_transform.pos = vec2i(in.drawn_transform.pos);
-			in.drawn_transform.rotation = int(in.drawn_transform.rotation);
+			in.drawn_transform.rotation = in.drawn_transform.rotation;
 
 			in.subject = e;
 

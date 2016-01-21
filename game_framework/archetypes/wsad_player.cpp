@@ -99,6 +99,8 @@ namespace archetypes {
 		components::children children;
 		components::trigger_detector detector;
 		components::driver driver;
+		driver.force_towards_owned_wheel = 85000.f;
+		driver.distance_when_force_easing_starts = 30.f;
 
 		children.map_sub_entity(crosshair_entity, components::children::CHARACTER_CROSSHAIR);
 

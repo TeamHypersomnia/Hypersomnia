@@ -18,4 +18,6 @@ public:
 	void release_drivers_due_to_distance();
 
 	void delegate_movement_intents_from_drivers_to_steering_intents_of_owned_vehicles();
+
+	void apply_forces_towards_wheels();
 };

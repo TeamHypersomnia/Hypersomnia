@@ -4,6 +4,8 @@
 #include "graphics/renderer.h"
 #include "fixtures_component.h"
 
+#include "math/vec2.h"
+
 namespace components {
 	physics& physics::get_owner_body(augs::entity_id id) {
 		auto* physics = id->find<components::physics>();
@@ -114,4 +116,11 @@ namespace components {
 		//return owner_friction_grounds[0];
 	}
 
+	void physics::set_transform(augs::entity_id id) {
+		set_transform(id->get<components::transform>());
+	}
+
+	void physics::set_transform(components::transform transform) {
+		body->SetTransform(transform.pos * PIXELS_TO_METERSf, transform.rotation * RAD_TO_DEG);
+	}
 }

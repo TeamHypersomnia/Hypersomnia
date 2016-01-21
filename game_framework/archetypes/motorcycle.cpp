@@ -41,7 +41,6 @@ namespace prefabs {
 			car.acceleration_length = 2500;
 			
 			car.wheel_offset = vec2(35, 0);
-			car.angular_damping = 10;
 			car.maximum_lateral_cancellation_impulse = 50;
 			car.static_air_resistance = 0.0006;
 			car.dynamic_air_resistance = 0.00009;
@@ -102,7 +101,7 @@ namespace prefabs {
 			info.transform_vertices.pos = offset;
 
 			auto& fixtures = helpers::add_fixtures_to_other_body(info, interior, front);
-			fixtures.is_friction_ground = true;
+			fixtures.is_friction_ground = false;
 		}
 
 		{
@@ -118,14 +117,14 @@ namespace prefabs {
 
 			sprite.set(assets::texture_id::CAR_INSIDE, augs::pixel_32(255, 0, 0, 255));
 			sprite.size.x = 10;
-			sprite.size.y = 10;
+			sprite.size.y = 20;
 
 			helpers::physics_info info;
 			info.from_renderable(left_wheel);
 			info.density = 0.6f;
 			info.filter = filters::trigger();
 			info.sensor = true;
-			vec2 offset(0, front->get<components::sprite>().size.y / 2 + sprite.size.y / 2);
+			vec2 offset(0, front->get<components::sprite>().size.y / 2 + sprite.size.y / 2 + 0);
 			info.transform_vertices.pos = offset;
 
 			auto& physics = helpers::add_fixtures_to_other_body(info, left_wheel, front);

@@ -34,7 +34,7 @@ namespace filters {
 	b2Filter controlled_character() {
 		b2Filter out;
 		out.categoryBits = RENDERABLE | CONTROLLED_CHARACTER | DYNAMIC_OBJECT;
-		out.maskBits = RENDERABLE_QUERY | CONTROLLED_CHARACTER | STATIC_OBJECT | DYNAMIC_OBJECT | REMOTE_CHARACTER | FRICTION_GROUND;
+		out.maskBits = RENDERABLE_QUERY | CONTROLLED_CHARACTER | STATIC_OBJECT | DYNAMIC_OBJECT | REMOTE_CHARACTER | FRICTION_GROUND | TRIGGER;
 		return out;
 	}
 
@@ -55,7 +55,7 @@ namespace filters {
 	b2Filter trigger() {
 		b2Filter out;
 		out.categoryBits = RENDERABLE | TRIGGER;
-		out.maskBits = RENDERABLE_QUERY | TRIGGER;
+		out.maskBits = RENDERABLE_QUERY | TRIGGER | CONTROLLED_CHARACTER;
 		return out;
 	}
 }

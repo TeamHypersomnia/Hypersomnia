@@ -76,19 +76,22 @@ void movement_system::apply_movement_forces() {
 void movement_system::animate_movement() {
 	for (auto it : targets) {
 		auto& movement = it->get<components::movement>();
+
 		auto* maybe_physics = it->find<components::physics>();
 		
 		float32 speed = 0.0f;
 
-		if (maybe_physics == nullptr) {
-			if (it->get<components::render>().interpolation_direction().non_zero()) 
-				speed = movement.max_speed_animation;
-		}
-		else {
-			auto& physics = *maybe_physics;
+		if (movement.enable_animation) {
+			if (maybe_physics == nullptr) {
+				if (it->get<components::render>().interpolation_direction().non_zero()) 
+					speed = movement.max_speed_animation;
+			}
+			else {
+				auto& physics = *maybe_physics;
 
-			b2Vec2 vel = physics.body->GetLinearVelocity();
-			speed = vel.Normalize() * METERS_TO_PIXELSf;
+				b2Vec2 vel = physics.body->GetLinearVelocity();
+				speed = vel.Normalize() * METERS_TO_PIXELSf;
+			}
 		}
 
 		animation_response_message msg;

@@ -1,6 +1,9 @@
 #pragma once
 #include "entity_system/component.h"
 #include "entity_system/entity_id.h"
+
+#include "transform_component.h"
+
 #include "math/vec2.h"
 extern double METERS_TO_PIXELS;
 extern double PIXELS_TO_METERS;
@@ -44,9 +47,12 @@ namespace components {
 		void apply_force(vec2);
 		void apply_force(vec2, vec2 center_offset, bool wake = true);
 		void apply_impulse(vec2);
-		void apply_impulse(vec2, vec2 center_offset, bool wake);
+		void apply_impulse(vec2, vec2 center_offset, bool wake = true);
 		float get_mass();
 		vec2 get_position();
 		vec2 get_world_center();
+
+		void set_transform(components::transform);
+		void set_transform(augs::entity_id);
 	};
 }

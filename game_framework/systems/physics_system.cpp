@@ -288,7 +288,7 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 			}
 		}
 
-		if (fix_a->IsSensor()) {
+		if (fix_a->IsSensor() || fix_b->IsSensor()) {
 			msg.subject_impact_velocity = (body_a->GetLinearVelocity());
 			msg.collider_impact_velocity = (body_b->GetLinearVelocity());
 			world_ptr->post_message(msg);
@@ -328,7 +328,7 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 				}
 		}
 
-		if (fix_a->IsSensor()) {
+		if (fix_a->IsSensor() || fix_b->IsSensor()) {
 			msg.sensor_end_contact = true;
 			msg.subject_impact_velocity = -body_a->GetLinearVelocity();
 			msg.collider_impact_velocity = -body_b->GetLinearVelocity();
@@ -337,28 +337,47 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 	}
 }
 
+#include "../components/driver_component.h"
+
 void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold) {
-	b2WorldManifold manifold;
-	contact->GetWorldManifold(&manifold);
+	messages::collision_message msgs[2];
+	
+	for (int i = 0; i < 2; ++i) {
+		auto fix_a = contact->GetFixtureA();
+		auto fix_b = contact->GetFixtureB();
 
-	auto body_a = contact->GetFixtureA()->GetBody();
-	auto body_b = contact->GetFixtureB()->GetBody();
+		if (i == 1)
+			std::swap(fix_a, fix_b);
 
-	messages::collision_message msg;
+		b2WorldManifold manifold;
+		contact->GetWorldManifold(&manifold);
 
-	msg.subject = static_cast<entity_id>(body_a->GetUserData());
-	msg.collider = static_cast<entity_id>(body_b->GetUserData());
+		auto body_a = fix_a->GetBody();
+		auto body_b = fix_b->GetBody();
 
-	msg.point = manifold.points[0];
-	msg.point *= METERS_TO_PIXELSf;
+		auto& msg = msgs[i];
 
-	msg.subject_impact_velocity = body_a->GetLinearVelocityFromWorldPoint(manifold.points[0]);
-	msg.collider_impact_velocity = body_b->GetLinearVelocityFromWorldPoint(manifold.points[0]);
-	world_ptr->post_message(msg);
+		msg.subject = static_cast<entity_id>(fix_a->GetUserData());
+		msg.collider = static_cast<entity_id>(fix_b->GetUserData());
 
-	std::swap(msg.collider, msg.subject);
-	std::swap(msg.subject_impact_velocity, msg.collider_impact_velocity);
-	world_ptr->post_message(msg);
+		auto* maybe_driver = components::physics::get_owner_body_entity(msg.subject)->find<components::driver>();
+
+		if (maybe_driver) {
+			/* do not collide with the car I currently ride to avoid strange artifacts */
+			if (maybe_driver->owned_vehicle == components::physics::get_owner_body_entity(msg.collider)) {
+				contact->SetEnabled(false);
+			}
+		}
+
+		msg.point = manifold.points[0];
+		msg.point *= METERS_TO_PIXELSf;
+
+		msg.subject_impact_velocity = body_a->GetLinearVelocityFromWorldPoint(manifold.points[0]);
+		msg.collider_impact_velocity = body_b->GetLinearVelocityFromWorldPoint(manifold.points[0]);
+	}
+
+	world_ptr->post_message(msgs[0]);
+	world_ptr->post_message(msgs[1]);
 }
 
 void physics_system::contact_listener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) {
@@ -416,9 +435,9 @@ void physics_system::step_and_set_new_transforms() {
 
 		if (physics.enable_angle_motor) {
 			float nextAngle = static_cast<float>(b->GetAngle() + b->GetAngularVelocity() / parent_overworld.accumulator.get_hz());
-			float totalRotation = (constrainAngle(physics.target_angle) * 0.01745329251994329576923690768489f) - nextAngle;
+			float totalRotation = (constrainAngle(physics.target_angle) * DEG_TO_RAD) - nextAngle;
 
-			totalRotation /= 0.01745329251994329576923690768489f;
+			totalRotation *= RAD_TO_DEG;
 
 			totalRotation = constrainAngle(totalRotation);
 			//if (totalRotation > 180) {
@@ -429,7 +448,7 @@ void physics_system::step_and_set_new_transforms() {
 			//	totalRotation = std::fmod(-(totalRotation + 180), 360) - 180;
 			//}
 
-			totalRotation *= 0.01745329251994329576923690768489f;
+			totalRotation *= DEG_TO_RAD;
 
 			float desiredAngularVelocity = totalRotation * static_cast<float>(parent_overworld.accumulator.get_hz());
 			float impulse = b->GetInertia() * desiredAngularVelocity;// disregard time factor
@@ -582,7 +601,7 @@ void physics_system::reset_states() {
 		auto& physics = static_cast<entity_id>(b->GetUserData())->get<components::physics>();
 
 		auto body_pos = METERS_TO_PIXELSf * b->GetPosition();
-		auto body_angle = b->GetAngle() * 180.0f / 3.141592653589793238462f;
+		auto body_angle = b->GetAngle() * RAD_TO_DEG;
 
 		for (auto& fe : physics.fixture_entities) {
 			auto& fixtures = fe->get<components::fixtures>();
