@@ -81,7 +81,7 @@ void hypersomnia_world::register_messages_components_systems() {
 	register_message_queue<car_ownership_change_message>();
 	register_message_queue<new_entity_message>();
 
-	get_system<render_system>().sortable_layers.push_back(render_layer::CAR_INTERIOR);
+	get_system<render_system>().layers_with_custom_drawing_order.push_back(render_layer::CAR_INTERIOR);
 }
 
 void hypersomnia_world::draw() {
@@ -147,6 +147,8 @@ void hypersomnia_world::perform_logic_step() {
 	get_system<driver_system>().delegate_movement_intents_from_drivers_to_steering_intents_of_owned_vehicles();
 
 	/* end of intent delegation stage */
+	
+	get_system<driver_system>().apply_forces_towards_wheels();
 
 	get_system<car_system>().set_steering_flags_from_intents();
 	get_system<car_system>().apply_movement_forces();
