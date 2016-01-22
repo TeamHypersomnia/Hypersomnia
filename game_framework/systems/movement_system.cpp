@@ -55,16 +55,26 @@ void movement_system::apply_movement_forces() {
 		}
 
 		auto& physics = *maybe_physics;
+		
+		if (movement.make_inert_for_ms > 0.f) {
+			movement.make_inert_for_ms -= per_second()*1000.0;
+			physics.set_linear_damping(2);
+		}
+		else
+			physics.set_linear_damping(movement.standard_linear_damping);
 
 		if (resultant.non_zero()) {
 			if (movement.acceleration_length > 0)
 				resultant.set_length(movement.acceleration_length);
+			
+			if (movement.make_inert_for_ms > 0.f)
+				resultant /= 10.f;
 
 			physics.apply_force(resultant * physics.body->GetMass(), movement.applied_force_offset, true);
 		}
 
 		/* the player feels less like a physical projectile if we brake per-axis */
-		if (movement.enable_braking_damping)
+		if (movement.enable_braking_damping && !(movement.make_inert_for_ms > 0.f))
 			physics.set_linear_damping_vec(vec2(
 				resultant.x_non_zero() ? 0.f : movement.braking_damping,
 				resultant.y_non_zero() ? 0.f : movement.braking_damping));

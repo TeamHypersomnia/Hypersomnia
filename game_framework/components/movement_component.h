@@ -33,9 +33,14 @@ namespace components {
 
 		float non_braking_damping = 0.f;
 		float braking_damping = 0.f;
+
+		float standard_linear_damping = 0.f;
+		
 		bool enable_braking_damping = false;
 
 		bool enable_animation = true;
+
+		float make_inert_for_ms = 0.f;
 
 		/* speed at which the receivers' animation speed multiplier reaches 1.0 */
 		float max_speed_animation = 1.f;

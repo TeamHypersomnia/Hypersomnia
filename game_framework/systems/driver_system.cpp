@@ -53,6 +53,8 @@ void driver_system::release_drivers_due_to_distance() {
 					msg.driver = driver;
 					msg.lost_ownership = true;
 					affect_drivers_due_to_car_ownership_changes(msg);
+
+					msg.driver->get<components::movement>().make_inert_for_ms = 500.f;
 				}
 			}
 		}
@@ -126,13 +128,19 @@ void driver_system::affect_drivers_due_to_car_ownership_changes(messages::car_ow
 	else {
 		driver.owned_vehicle.unset();
 		car.current_driver.unset();
-		car.reset_movement_flags();
 
 		if (maybe_movement) {
 			maybe_movement->reset_movement_flags();
 			maybe_movement->enable_braking_damping = true;
 			maybe_movement->enable_animation = true;
+
+			maybe_movement->moving_left = car.turning_left;
+			maybe_movement->moving_right = car.turning_right;
+			maybe_movement->moving_forward = car.accelerating;
+			maybe_movement->moving_backward = car.deccelerating;
 		}
+		
+		car.reset_movement_flags();
 
 		if (maybe_lookat && maybe_physics) {
 			maybe_lookat->update_value = true;

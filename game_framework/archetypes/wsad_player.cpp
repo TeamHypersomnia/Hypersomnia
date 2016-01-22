@@ -104,7 +104,7 @@ namespace archetypes {
 		driver.density_while_driving = 0.02f;
 		driver.standard_density = 0.6f;
 
-		// driver.standard_linear_damping = 20.f;
+		movement.standard_linear_damping = 20.f;
 		// driver.linear_damping_while_driving = 4.f;
 		driver.power_of_force_easing_multiplier = 1.f;
 

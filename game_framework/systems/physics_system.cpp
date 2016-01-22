@@ -248,6 +248,8 @@ physics_system::query_aabb_output physics_system::query_aabb_px(vec2 p1, vec2 p2
 #include "game_framework/components/movement_component.h"
 #include "graphics/renderer.h"
 
+#define FRICTION_FIELDS_COLLIDE 0
+
 void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 	for (int i = 0; i < 2; ++i) {
 		auto fix_a = contact->GetFixtureA();
@@ -282,7 +284,9 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 		auto& collider_fixtures = msg.collider->get<components::fixtures>();
 
 		if (subject_fixtures.is_friction_ground) {
-			//if (!collider_fixtures.is_friction_ground)
+#if FRICTION_FIELDS_COLLIDE
+			if (!collider_fixtures.is_friction_ground)
+#endif
 			{
 				auto& collider_physics = collider_fixtures.get_body_entity()->get<components::physics>();
 
@@ -347,7 +351,9 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 		auto& collider_physics = collider_fixtures.get_body_entity()->get<components::physics>();
 
 		if (subject_fixtures.is_friction_ground) {
-			//if (!collider_fixtures.is_friction_ground) 
+#if FRICTION_FIELDS_COLLIDE
+			if (!collider_fixtures.is_friction_ground) 
+#endif
 			{
 				for (auto it = collider_physics.owner_friction_grounds.begin(); it != collider_physics.owner_friction_grounds.end(); ++it)
 				if (*it == subject_fixtures.get_body_entity())
@@ -391,23 +397,10 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 		msg.subject = static_cast<entity_id>(fix_a->GetUserData());
 		msg.collider = static_cast<entity_id>(fix_b->GetUserData());
 
-		//if (components::physics::get_owner_friction_field(msg.subject) !=
-		//	components::physics::get_owner_friction_field(msg.collider)) {
-		//	contact->SetEnabled(false);
-		//	return;
-		//}
-
 		auto& subject_fixtures = msg.subject->get<components::fixtures>();
 		auto& collider_fixtures = msg.collider->get<components::fixtures>();
 
 		if (subject_fixtures.is_friction_ground) {
-			// friction fields do not collide with friction fields
-			//if(collider_fixtures.is_friction_ground)
-			//{
-			//	contact->SetEnabled(false);
-			//	return;
-			//}
-			
 			// friction fields do not collide with their children
 			if (components::physics::are_connected_by_friction(msg.collider, msg.subject)) {
 				contact->SetEnabled(false);
