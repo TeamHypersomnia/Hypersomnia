@@ -51,6 +51,8 @@ void hypersomnia_overworld::call_window_script(std::string filename) {
 	game_window.initial_gl_calls();
 }
 
+#define DETERMINISTIC_RENDERING 0
+
 void hypersomnia_overworld::simulate() {
 	bool quit_flag = false;
 
@@ -75,6 +77,12 @@ void hypersomnia_overworld::simulate() {
 			game_world.post_message(msg);
 		}
 
+#if DETERMINISTIC_RENDERING
+		auto steps_to_do = accumulator.update_and_extract_steps();
+
+		while (steps_to_do--) {
+#endif
+
 		game_window.clear();
 
 		update_frame_timer();
@@ -83,9 +91,11 @@ void hypersomnia_overworld::simulate() {
 
 		game_window.swap_buffers();
 
+#if !DETERMINISTIC_RENDERING
 		auto steps_to_do = accumulator.update_and_extract_steps();
 
 		while (steps_to_do--) {
+#endif
 			renderer::get_current().clear_logic_lines();
 
 			game_world.perform_logic_step();
