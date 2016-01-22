@@ -55,7 +55,6 @@ namespace augs {
 		protected:
 			friend class memory_pool;
 
-			//memory_pool* owner = nullptr;
 			pool_id owner;
 			int version = 0xdeadbeef;
 			int indirection_index = 0xdeadbeef;

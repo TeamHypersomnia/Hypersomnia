@@ -8,6 +8,7 @@
 #include "utilities/entity_system/entity_id.h"
 
 #include "game_framework/assets/texture.h"
+#include "utilities/misc/timer.h"
 
 namespace augs {
 	class renderer {
@@ -48,6 +49,8 @@ namespace augs {
 
 		line_channel logic_lines, prev_logic_lines;
 		line_channel frame_lines;
+		line_channel blink_lines;
+		augs::timer line_timer;
 
 		void fullscreen_quad();
 		

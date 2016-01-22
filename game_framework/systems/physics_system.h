@@ -38,6 +38,7 @@ public:
 	b2World b2world;
 	physics_system(world&);
 
+	static void rechoose_owner_friction_body(augs::entity_id);
 	void step_and_set_new_transforms();
 
 	void destroy_fixtures_and_bodies();

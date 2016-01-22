@@ -14,6 +14,11 @@ namespace components {
 		return id->get<components::fixtures>().get_body_entity()->get<components::physics>();
 	}
 	
+	augs::entity_id physics::get_owner_friction_field(augs::entity_id id) {
+		return get_owner_body_entity(id)->get<components::physics>().owner_friction_ground;
+	}
+
+	
 	augs::entity_id physics::get_owner_body_entity(augs::entity_id id) {
 		auto* physics = id->find<components::physics>();
 		if (physics) return id;

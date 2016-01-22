@@ -195,7 +195,16 @@ namespace augs {
 			std::for_each(logic_lines.lines.begin(), logic_lines.lines.end(), line_lambda);
 
 		std::for_each(frame_lines.lines.begin(), frame_lines.lines.end(), line_lambda);
+		std::for_each(blink_lines.lines.begin(), blink_lines.lines.end(), line_lambda);
 		
+		if (blink_lines.lines.empty()) {
+			line_timer.reset();
+		}
+		else if(line_timer.get<std::chrono::seconds>() > 0.4) {
+			blink_lines.lines.erase(blink_lines.lines.begin());
+			line_timer.reset();
+		}
+
 		clear_frame_lines();
 
 		glEnd(); glerr;

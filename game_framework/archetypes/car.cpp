@@ -81,7 +81,6 @@ namespace prefabs {
 			helpers::physics_info info;
 			info.from_renderable(interior);
 			info.density = 0.6f;
-			info.sensor = true;
 			info.filter = filters::dynamic_object();
 			vec2 offset(0, front->get<components::sprite>().size.y / 2 + sprite.size.y / 2);
 			info.transform_vertices.pos = offset;

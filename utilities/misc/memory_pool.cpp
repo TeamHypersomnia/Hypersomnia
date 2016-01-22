@@ -32,7 +32,9 @@ namespace augs {
 		pool_locations.destroy(this_pool_pointer_location.pointer_id);
 	}
 	
-	memory_pool::id::id() {}
+	memory_pool::id::id() {
+		unset();
+	}
 
 	memory_pool::byte* memory_pool::id::ptr() { return owner->get(*this); }
 	const memory_pool::byte* memory_pool::id::ptr() const { return owner->get(*this); }
@@ -42,7 +44,7 @@ namespace augs {
 	bool memory_pool::id::operator<(const id& b) const { return ptr() < b.ptr(); }
 	bool memory_pool::id::operator!() const { return !alive(); }
 	bool memory_pool::id::operator==(const id& b) const { 
-		bool result = owner == b.owner && indirection_index == b.indirection_index && version == b.version; 
+		bool result = owner == b.owner && (!owner || (indirection_index == b.indirection_index && version == b.version)); 
 #ifdef USE_NAMES_FOR_IDS
 		if(result) assert(std::string(name) == std::string(b.name));
 #endif
@@ -53,7 +55,12 @@ namespace augs {
 	bool memory_pool::id::alive() const { return owner && owner->alive(*this); }
 	bool memory_pool::id::dead() const { return !alive(); }
 
-	void memory_pool::id::unset() { owner.unset(); }
+	void memory_pool::id::unset() { 
+		owner.unset(); 
+#ifdef USE_NAMES_FOR_IDS
+		name[0] = 0;
+#endif
+	}
 
 	void memory_pool::initialize(int slot_count, int slot_size) {
 		this->slot_size = slot_size;

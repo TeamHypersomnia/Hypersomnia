@@ -246,14 +246,25 @@ physics_system::query_aabb_output physics_system::query_aabb_px(vec2 p1, vec2 p2
 }
 
 #include "game_framework/components/movement_component.h"
+#include "graphics/renderer.h"
 
 void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 	for (int i = 0; i < 2; ++i) {
 		auto fix_a = contact->GetFixtureA();
 		auto fix_b = contact->GetFixtureB();
 
-		if (i == 1)
+		int numPoints = contact->GetManifold()->pointCount;
+		b2WorldManifold worldManifold;
+		contact->GetWorldManifold(&worldManifold);
+
+		if (i == 1) {
 			std::swap(fix_a, fix_b);
+			if (numPoints > 1) {
+				std::swap(worldManifold.points[0], worldManifold.points[1]);
+				std::swap(worldManifold.separations[0], worldManifold.separations[1]);
+			}
+			worldManifold.normal *= -1;
+		}
 
 		/* collision messaging happens only for sensors here
 			PreSolve is the counterpart for regular bodies
@@ -271,20 +282,38 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 		auto& collider_fixtures = msg.collider->get<components::fixtures>();
 
 		if (subject_fixtures.is_friction_ground) {
-			// if the collider is from the ancestor line of the friction subject, 
-
-			// if we do not share ancestor line, consider the collider only if it has no parent friction
-			
-			
-			if (
-				//!components::physics::are_connected_by_friction(msg.collider, msg.subject) &&
-				// cycle guard
-				!collider_fixtures.is_friction_ground
-				)
+			//if (!collider_fixtures.is_friction_ground)
 			{
 				auto& collider_physics = collider_fixtures.get_body_entity()->get<components::physics>();
-				collider_physics.owner_friction_grounds.push_back(subject_fixtures.get_body_entity());
-				//collider_physics.owner_friction_grounds.insert(collider_physics.owner_friction_grounds.begin(), subject_fixtures.get_body_entity());
+
+				bool found_suitable = false;
+
+				// always accept my own children
+				if (components::physics::are_connected_by_friction(msg.collider, msg.subject)) {
+					found_suitable = true;
+				}
+				else {
+					for (int i = 0; i < 1; i++) {
+						b2Vec2 pointVelOther = body_b->GetLinearVelocityFromWorldPoint(worldManifold.points[i]);
+						auto velOtherPixels = vec2(pointVelOther) * METERS_TO_PIXELSf;
+
+						if (velOtherPixels.length() > 1) {
+							auto angle = vec2(worldManifold.normal).angle_between(velOtherPixels);
+							std::cout << angle << std::endl;
+							if (std::abs(angle) > 90) {
+								found_suitable = true;
+							}
+						}
+
+						renderer::get_current().blink_lines.draw_yellow(METERS_TO_PIXELSf*worldManifold.points[i], METERS_TO_PIXELSf* worldManifold.points[i] + vec2(worldManifold.normal).set_length(150));
+						renderer::get_current().blink_lines.draw_red(METERS_TO_PIXELSf*worldManifold.points[i], METERS_TO_PIXELSf* worldManifold.points[i] + velOtherPixels);
+					}
+				}
+
+				if (found_suitable) {
+					collider_physics.owner_friction_grounds.push_back(subject_fixtures.get_body_entity());
+					physics_system::rechoose_owner_friction_body(collider_fixtures.get_body_entity());
+				}
 			}
 		}
 
@@ -318,14 +347,16 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 		auto& collider_physics = collider_fixtures.get_body_entity()->get<components::physics>();
 
 		if (subject_fixtures.is_friction_ground) {
-			for (auto it = collider_physics.owner_friction_grounds.begin(); it != collider_physics.owner_friction_grounds.end(); ++it)
+			//if (!collider_fixtures.is_friction_ground) 
+			{
+				for (auto it = collider_physics.owner_friction_grounds.begin(); it != collider_physics.owner_friction_grounds.end(); ++it)
 				if (*it == subject_fixtures.get_body_entity())
 				{
-					// TODO: see if the new friction field fulfills the same constraints as in BeginContact
-
 					collider_physics.owner_friction_grounds.erase(it);
+					physics_system::rechoose_owner_friction_body(collider_fixtures.get_body_entity());
 					break;
 				}
+			}
 		}
 
 		if (fix_a->IsSensor() || fix_b->IsSensor()) {
@@ -360,12 +391,46 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 		msg.subject = static_cast<entity_id>(fix_a->GetUserData());
 		msg.collider = static_cast<entity_id>(fix_b->GetUserData());
 
+		//if (components::physics::get_owner_friction_field(msg.subject) !=
+		//	components::physics::get_owner_friction_field(msg.collider)) {
+		//	contact->SetEnabled(false);
+		//	return;
+		//}
+
+		auto& subject_fixtures = msg.subject->get<components::fixtures>();
+		auto& collider_fixtures = msg.collider->get<components::fixtures>();
+
+		if (subject_fixtures.is_friction_ground) {
+			// friction fields do not collide with friction fields
+			//if(collider_fixtures.is_friction_ground)
+			//{
+			//	contact->SetEnabled(false);
+			//	return;
+			//}
+			
+			// friction fields do not collide with their children
+			if (components::physics::are_connected_by_friction(msg.collider, msg.subject)) {
+				contact->SetEnabled(false);
+				return;
+			}
+
+			auto& collider_physics = collider_fixtures.get_body_entity()->get<components::physics>();
+
+			for (auto it = collider_physics.owner_friction_grounds.begin(); it != collider_physics.owner_friction_grounds.end(); ++it)
+				if (*it == subject_fixtures.get_body_entity())
+				{
+					contact->SetEnabled(false);
+					return;
+				}
+		}
+
 		auto* maybe_driver = components::physics::get_owner_body_entity(msg.subject)->find<components::driver>();
 
 		if (maybe_driver) {
 			/* do not collide with the car I currently ride to avoid strange artifacts */
 			if (maybe_driver->owned_vehicle == components::physics::get_owner_body_entity(msg.collider)) {
 				contact->SetEnabled(false);
+				return;
 			}
 		}
 
@@ -464,53 +529,6 @@ void physics_system::step_and_set_new_transforms() {
 	for (auto& c : listener.after_step_callbacks)
 		c();
 
-
-
-	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
-		if (b->GetType() == b2_staticBody) continue;
-		auto entity = b->GetUserData();
-		auto& physics = entity->get<components::physics>();
-
-		auto feasible_grounds = physics.owner_friction_grounds;
-
-		if (!feasible_grounds.empty()) {
-			// cycle guard
-			// remove friction grounds whom do I own myself
-
-			feasible_grounds.erase(std::remove_if(feasible_grounds.begin(), feasible_grounds.end(), [entity](entity_id subject) {
-				return components::physics::are_connected_by_friction(subject, entity);
-			}), feasible_grounds.end());
-		}
-
-		if (!feasible_grounds.empty()) {
-			std::stable_sort(feasible_grounds.begin(), feasible_grounds.end(), [](entity_id a, entity_id b) {
-				return components::physics::are_connected_by_friction(a, b);
-			});
-			
-			physics.owner_friction_ground = feasible_grounds[0];
-
-			// make the new owner first in order in case it is later compared to the same ancestor-level parents
-
-			for (auto& it = physics.owner_friction_grounds.begin(); it != physics.owner_friction_grounds.end(); ++it) {
-				if (*it == physics.owner_friction_ground) {
-					std::swap(physics.owner_friction_grounds[0], *it);
-				}
-			}
-
-			/// consider friction grounds ONLY from the same ancestor line, and only the descendants
-			
-			/// if the current one is not found within contacting friction grounds,
-			/// prioritize like this:
-			/// firstly, the lowest descendant of the ancestor line of the lost friction ground
-			/// descendant of any other tree with the biggest height, stable-sorted in order of entrance
-
-		}
-		else {
-			physics.owner_friction_ground.unset();
-		}
-
-	}
-
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
 		auto entity = b->GetUserData();
@@ -520,6 +538,48 @@ void physics_system::step_and_set_new_transforms() {
 	}
 
 	reset_states();
+}
+
+void physics_system::rechoose_owner_friction_body(augs::entity_id entity) {
+	auto& physics = entity->get<components::physics>();
+
+	auto feasible_grounds = physics.owner_friction_grounds;
+
+	if (!feasible_grounds.empty()) {
+		// cycle guard
+		// remove friction grounds whom do I own myself
+
+		feasible_grounds.erase(std::remove_if(feasible_grounds.begin(), feasible_grounds.end(), [entity](entity_id subject) {
+			return components::physics::are_connected_by_friction(subject, entity);
+		}), feasible_grounds.end());
+	}
+
+	if (!feasible_grounds.empty()) {
+		std::stable_sort(feasible_grounds.begin(), feasible_grounds.end(), [](entity_id a, entity_id b) {
+			return components::physics::are_connected_by_friction(a, b);
+		});
+
+		physics.owner_friction_ground = feasible_grounds[0];
+
+		// make the new owner first in order in case it is later compared to the same ancestor-level parents
+
+		for (auto& it = physics.owner_friction_grounds.begin(); it != physics.owner_friction_grounds.end(); ++it) {
+			if (*it == physics.owner_friction_ground) {
+				std::swap(physics.owner_friction_grounds[0], *it);
+			}
+		}
+
+		/// consider friction grounds ONLY from the same ancestor line, and only the descendants
+
+		/// if the current one is not found within contacting friction grounds,
+		/// prioritize like this:
+		/// firstly, the lowest descendant of the ancestor line of the lost friction ground
+		/// descendant of any other tree with the biggest height, stable-sorted in order of entrance
+
+	}
+	else {
+		physics.owner_friction_ground.unset();
+	}
 }
 
 void physics_system::recurential_friction_handler(entity_id entity, entity_id friction_owner) {
