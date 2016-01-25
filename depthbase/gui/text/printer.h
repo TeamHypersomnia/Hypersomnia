@@ -1,5 +1,5 @@
 #pragma once
-#include "../system.h"
+#include "../gui_world.h"
 // got to revise gui systems in terms of rectangle update'ing
 namespace augs {
 	namespace graphics {

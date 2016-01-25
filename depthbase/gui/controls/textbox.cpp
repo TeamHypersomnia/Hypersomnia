@@ -100,13 +100,13 @@ namespace augs {
 				void textbox::on_pagedown()				{ scroll.y += get_rect_absolute().h();														}
 				void textbox::on_pageup()				{ scroll.y -= get_rect_absolute().h();														}
 				void textbox::on_character(wchar_t c)	{ editor.character(c);								view_caret = true; blink_reset = true;	}	
-				void textbox::on_cut(system& sys)		{ editor.cut(sys);									view_caret = true;						}	  
+				void textbox::on_cut(gui_world& sys)	{ editor.cut(sys);									view_caret = true;						}	  
 				void textbox::on_bold()					{ editor.bold();									view_caret = true;						}	  
 				void textbox::on_italics()				{ editor.italics();									view_caret = true;						}	  
-				void textbox::on_copy(system& sys)		{ editor.copy(sys);									view_caret = true;						}	    
+				void textbox::on_copy(gui_world& sys)	{ editor.copy(sys);									view_caret = true;						}	    
 				void textbox::on_undo()					{ editor.undo();									view_caret = true;						}	  	
 				void textbox::on_redo()					{ editor.redo();									view_caret = true;						}	  	
-				void textbox::on_paste(system& sys)		{ editor.paste(sys);								view_caret = true; blink_reset = true;	}	  	
+				void textbox::on_paste(gui_world& sys)	{ editor.paste(sys);								view_caret = true; blink_reset = true;	}	  	
 				void textbox::on_backspace(bool c)		{ editor.backspace(c);								view_caret = true; blink_reset = true;	}
 				void textbox::on_del(bool c)			{ editor.del(c);									view_caret = true; blink_reset = true;	}
 				

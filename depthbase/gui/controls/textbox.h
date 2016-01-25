@@ -30,11 +30,11 @@ namespace augs {
 					virtual void on_pagedown();
 					virtual void on_pageup();
 					virtual void on_character(wchar_t);
-					virtual void on_cut(system&);
+					virtual void on_cut(gui_world&);
 					virtual void on_bold();
 					virtual void on_italics();
-					virtual void on_copy(system&);
-					virtual void on_paste(system&);
+					virtual void on_copy(gui_world&);
+					virtual void on_paste(gui_world&);
 					virtual void on_undo();
 					virtual void on_redo();
 					virtual void on_backspace(bool);

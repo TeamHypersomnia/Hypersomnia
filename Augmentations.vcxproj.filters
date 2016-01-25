@@ -732,9 +732,6 @@
     <ClCompile Include="depthbase\gui\stylesheet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="depthbase\gui\system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\game\body_helper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1048,6 +1045,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game_framework\archetypes\motorcycle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="depthbase\gui\gui_world.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2423,9 +2423,6 @@
     <ClInclude Include="depthbase\gui\stylesheet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="depthbase\gui\system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\components\behaviour_tree_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2895,6 +2892,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="utilities\misc\constant_vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="depthbase\gui\gui_world.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

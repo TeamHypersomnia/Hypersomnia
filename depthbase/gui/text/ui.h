@@ -82,9 +82,9 @@ namespace augs {
 						remove_line(),
 						/* needs reference to system to manage application's local, formatted clipboard
 						*/
-						cut(system&),
-						copy(system&),
-						paste(system&),
+						cut(gui_world&),
+						copy(gui_world&),
+						paste(gui_world&),
 
 						insert(fstr&),
 						character(const wchar_t&),

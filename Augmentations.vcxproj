@@ -362,7 +362,7 @@
     <ClCompile Include="depthbase\gui\rect.cpp" />
     <ClCompile Include="depthbase\gui\stroke.cpp" />
     <ClCompile Include="depthbase\gui\stylesheet.cpp" />
-    <ClCompile Include="depthbase\gui\system.cpp" />
+    <ClCompile Include="depthbase\gui\gui_world.cpp" />
     <ClCompile Include="depthbase\gui\text\caret.cpp" />
     <ClCompile Include="depthbase\gui\text\drafter.cpp" />
     <ClCompile Include="depthbase\gui\text\draft_interface.cpp" />
@@ -933,7 +933,7 @@
     <ClInclude Include="depthbase\gui\rect.h" />
     <ClInclude Include="depthbase\gui\stroke.h" />
     <ClInclude Include="depthbase\gui\stylesheet.h" />
-    <ClInclude Include="depthbase\gui\system.h" />
+    <ClInclude Include="depthbase\gui\gui_world.h" />
     <ClInclude Include="depthbase\gui\text\caret.h" />
     <ClInclude Include="depthbase\gui\text\drafter.h" />
     <ClInclude Include="depthbase\gui\text\draft_interface.h" />

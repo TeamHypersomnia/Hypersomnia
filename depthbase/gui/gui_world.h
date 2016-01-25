@@ -32,7 +32,7 @@ namespace augs {
 				typedef std::basic_string<formatted_char> fstr;
 			}
 
-			class system {
+			class gui_world {
 				bool 
 					/* own_copy indicates whether the clipboard_change event comes from manual "copy_clipboard" or from external source */
 					own_copy, 
@@ -41,7 +41,7 @@ namespace augs {
 				augs::window::event::state& events;
 				text::fstr clipboard;
 
-				system(augs::window::event::state& subscribe_events);
+				gui_world(augs::window::event::state& subscribe_events);
 
 				void change_clipboard();
 				void copy_clipboard(text::fstr&);
@@ -59,14 +59,14 @@ namespace augs {
 					float speed_mult = 1.f;
 				} middlescroll;
 				
-				system& owner;
+				gui_world& owner;
 				rect *rect_held_by_lmb = nullptr;
 				rect *rect_held_by_rmb = nullptr;
 
 				rect root;
-				std::vector<augs::vertex_triangle> quad_array;
+				std::vector<augs::vertex_triangle> triangle_buffer;
 
-				group(system& owner);
+				group(gui_world& owner);
 
 				void set_focus(rect*);
 				rect* get_rect_in_focus() const;
@@ -74,9 +74,8 @@ namespace augs {
 				void update_rectangles();
 				void poll_events      ();
 				void call_updaters    ();
-				void update_array     ();
+				void draw_triangles   ();
 				void default_update   ();
-				void draw_gl_fixed();
 			};
 				
 			

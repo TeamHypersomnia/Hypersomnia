@@ -1,8 +1,7 @@
 #pragma once
-#include "system.h"
+#include "gui_world.h"
 #include "rect.h"
 #include "window_framework/window.h"
-#include <GL/OpenGL.h>
 #undef max
 namespace augs {
 	namespace misc {
@@ -99,14 +98,14 @@ namespace augs {
 				}
 			}
 
-			system::system(augs::window::event::state& events) : events(events), own_copy(false), own_clip(false), fetch_clipboard(true) {
+			gui_world::gui_world(augs::window::event::state& events) : events(events), own_copy(false), own_clip(false), fetch_clipboard(true) {
 			}
 
-			bool system::is_clipboard_own() {
+			bool gui_world::is_clipboard_own() {
 				return own_clip;
 			}
 				
-			group::group(system& owner) : owner(owner), rect_in_focus(&root) {
+			group::group(gui_world& owner) : owner(owner), rect_in_focus(&root) {
 				root.clip = false;
 				root.focusable = false;
 				root.scrollable = false;
@@ -130,30 +129,23 @@ namespace augs {
 				return rect_in_focus;
 			}
 
-			void group::draw_gl_fixed() {
-				glVertexPointer(2, GL_FLOAT, sizeof(augs::vertex_triangle), quad_array.data());
-				glTexCoordPointer(2, GL_FLOAT, sizeof(augs::vertex_triangle), (char*) (quad_array.data()) + sizeof(int) * 2);
-				glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(augs::vertex_triangle), (char*) (quad_array.data()) + sizeof(int) * 2 + sizeof(float) * 2);
-				glDrawArrays(GL_QUADS, 0, quad_array.size() * 4);
-			}
-			
 			void group::default_update() {
 				update_rectangles();
 				call_updaters();
 				update_rectangles();
-				update_array();
+				draw_triangles();
 			}
 
-			void group::update_array() {
-				quad_array.clear();
-				rect::draw_info in(*this, quad_array);
+			void group::draw_triangles() {
+				triangle_buffer.clear();
+				rect::draw_info in(*this, triangle_buffer);
 
 				root.draw_children(in);
 				
 				if(middlescroll.subject) {
 					rects::ltrb<float> scroller = rects::wh<float>(middlescroll.size);
 					scroller.center(middlescroll.pos);
-					rect::draw_clipped_rectangle(middlescroll.mat, scroller, &root, quad_array); 
+					rect::draw_clipped_rectangle(middlescroll.mat, scroller, &root, triangle_buffer); 
 				}
 			}
 			
@@ -182,14 +174,14 @@ namespace augs {
 				}
 			}
 
-			void system::copy_clipboard(text::fstr& s) {
+			void gui_world::copy_clipboard(text::fstr& s) {
 				clipboard = s;
 				own_copy = true;
 				own_clip = true;
 				window::copy_clipboard(misc::wstr(s));
 			}
 
-			void system::change_clipboard() {
+			void gui_world::change_clipboard() {
 				if(!own_copy && fetch_clipboard) {
 					text::formatted_char ch;
 					ch.set(0, 0, rgba(0, 0, 0, 255));

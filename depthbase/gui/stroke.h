@@ -1,5 +1,5 @@
 #pragma once
-#include "system.h"
+#include "gui_world.h"
 
 namespace augs {
 	namespace graphics {

@@ -1,7 +1,7 @@
 #pragma once
 #include "button.h"
 #include "window_framework/event.h"
-#include "../system.h"
+#include "../gui_world.h"
 
 namespace augs {
 	namespace graphics {
