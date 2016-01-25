@@ -106,32 +106,28 @@ namespace augs {
 				return own_clip;
 			}
 				
-			group::group(system& owner) : owner(owner), focus(&root), lholded(nullptr), rholded(nullptr) {
-			/* default middlescroll setup */
-				middlescroll.subject = 0;
-				middlescroll.speed_mult = 1.f;
-				middlescroll.size = rects::wh<float>(25, 25);
+			group::group(system& owner) : owner(owner), rect_in_focus(&root) {
 				root.clip = false;
 				root.focusable = false;
 				root.scrollable = false;
 			}
 			
 			void group::set_focus(rect* f) {
-				if(f == focus) return;
+				if(f == rect_in_focus) return;
 				update_rectangles();
 
-				if(focus) 
-					focus->event_proc(rect::event_info(*this, rect::event::blur));
+				if(rect_in_focus)
+					rect_in_focus->event_proc(rect::event_info(*this, rect::event::blur));
 				
-				focus = f;
+				rect_in_focus = f;
 				if(f) {
 					f->event_proc(rect::event_info(*this, rect::event::focus));
 					//f->scroll_to_view();
 				}
 			}
 			
-			rect* group::get_focus() const {
-				return focus;
+			rect* group::get_rect_in_focus() const {
+				return rect_in_focus;
 			}
 
 			void group::draw_gl_fixed() {
@@ -221,33 +217,33 @@ namespace augs {
 				rect::event_info e(*this, rect::event::unknown);
 
 				if(gl.msg == event::lup) {
-					if(lholded) {
-						if(lholded->get_clipped_rect().hover(gl.mouse.pos)) {
-							lholded->event_proc(e = rect::event::lup);
-							lholded->event_proc(e = rect::event::lclick);
+					if(rect_held_by_lmb) {
+						if(rect_held_by_lmb->get_clipped_rect().hover(gl.mouse.pos)) {
+							rect_held_by_lmb->event_proc(e = rect::event::lup);
+							rect_held_by_lmb->event_proc(e = rect::event::lclick);
 							pass = false;
 						}
 						else
-							lholded->event_proc(e = rect::event::loutup);
-						lholded = 0;
+							rect_held_by_lmb->event_proc(e = rect::event::loutup);
+						rect_held_by_lmb = 0;
 					}
 				} 
 				
 				if(gl.msg == event::rup) {
-					if(rholded) {
-						if(rholded->get_clipped_rect().hover(gl.mouse.pos)) {
-							rholded->event_proc(e = rect::event::rup);
-							rholded->event_proc(e = rect::event::rclick);
+					if(rect_held_by_rmb) {
+						if(rect_held_by_rmb->get_clipped_rect().hover(gl.mouse.pos)) {
+							rect_held_by_rmb->event_proc(e = rect::event::rup);
+							rect_held_by_rmb->event_proc(e = rect::event::rclick);
 							pass = false;
 						}
 						else
-							rholded->event_proc(e = rect::event::routup);
-						rholded = 0;
+							rect_held_by_rmb->event_proc(e = rect::event::routup);
+						rect_held_by_rmb = 0;
 					}
 				} 
 
-				if(focus && focus->fetch_wheel && gl.msg == event::wheel) {
-					   if(focus->draw) focus->poll_message(in);
+				if(rect_in_focus && rect_in_focus->fetch_wheel && gl.msg == event::wheel) {
+					   if(rect_in_focus->enable_drawing) rect_in_focus->poll_message(in);
 					   pass = false;
 				}
 /*
@@ -258,11 +254,11 @@ namespace augs {
 
 					pass = false;
 				}*/
-				if(focus) {
+				if(rect_in_focus) {
 					switch(gl.msg) {
-					case event::keydown:   if(focus->draw) focus->event_proc(e = rect::event::keydown); pass = false; break;
-					case event::keyup:	   if(focus->draw) focus->event_proc(e = rect::event::keyup); pass = false; break;
-					case event::character: if(focus->draw) focus->event_proc(e = rect::event::character); pass = false; break;
+					case event::keydown:   if(rect_in_focus->enable_drawing) rect_in_focus->event_proc(e = rect::event::keydown); pass = false; break;
+					case event::keyup:	   if(rect_in_focus->enable_drawing) rect_in_focus->event_proc(e = rect::event::keyup); pass = false; break;
+					case event::character: if(rect_in_focus->enable_drawing) rect_in_focus->event_proc(e = rect::event::character); pass = false; break;
 					default: break; 
 					}
 				}

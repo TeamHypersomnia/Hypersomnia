@@ -34,7 +34,7 @@ namespace augs {
 				auto children_all = children;
 				get_member_children(children_all);
 				for(size_t i = 0; i < children_all.size(); ++i)
-					if(children_all[i]->draw)
+					if(children_all[i]->enable_drawing)
 				 		content.contain_positive(children_all[i]->rc);
 				
 				return content;
@@ -74,7 +74,7 @@ namespace augs {
 				get_member_children(children_all);
 				for(size_t i = 0; i < children_all.size(); ++i) {
 					children_all[i]->parent = this;
-					if(children_all[i]->draw)
+					if(children_all[i]->enable_drawing)
 					   children_all[i]->update_rectangles();
 				}
 			}
@@ -98,7 +98,7 @@ namespace augs {
 				get_member_children(children_all);
 				for(size_t i = 0; i < children_all.size(); ++i) { 
 					children_all[i]->parent = this;
-					if(children_all[i]->draw)
+					if(children_all[i]->enable_drawing)
 					   children_all[i]->draw_proc(in);
 				}
 			}
@@ -172,8 +172,8 @@ namespace augs {
 					e == event::rdoubleclick ||
 					e == event::rdown
 					) {
-						if(sys.get_focus()) {
-							if(preserve_focus || !sys.get_focus()->preserve_focus)
+						if(sys.get_rect_in_focus()) {
+							if(preserve_focus || !sys.get_rect_in_focus()->preserve_focus)
 								sys.set_focus(this);
 						}
 						else sys.set_focus(this);
@@ -226,7 +226,7 @@ namespace augs {
 			}
 			
 			rect* rect::seek_focusable(rect* f, bool prev) {
-				rect* rect::*fn = prev ? &rect::focus_prev : &rect::focus_next; 
+				rect* rect::*fn = prev ? &rect::prev_focusable : &rect::next_focusable; 
 				rect* it = f;
 				if(f->preserve_focus) return nullptr;
 				while(true) {
@@ -251,11 +251,11 @@ namespace augs {
 				unsigned msg = inf.msg;
 				event_info e(gr, event::unknown);
 
-				if(draw) {
+				if(enable_drawing) {
 					auto children_all = children;
 					get_member_children(children_all);
 					for(int i = children_all.size()-1; i >= 0; --i) {
-						if(!children_all[i]->draw) continue;
+						if(!children_all[i]->enable_drawing) continue;
 						children_all[i]->parent = this;
 						children_all[i]->poll_message(inf);
 					}
@@ -276,7 +276,7 @@ namespace augs {
 								event_proc(e = event::lup);	
 							}
 							if(msg == ldown) {
-								gr.lholded = this;
+								gr.rect_held_by_lmb = this;
 								event_proc(e = event::ldown);	
 							}
 							if(msg == mdown) {
@@ -286,19 +286,19 @@ namespace augs {
 								event_proc(e = event::mdoubleclick);	
 							}
 							if(msg == ldoubleclick) {
-								gr.lholded = this;
+								gr.rect_held_by_lmb = this;
 								event_proc(e = event::ldoubleclick);	
 							}
 							if(msg == ltripleclick) {
-								gr.lholded = this;
+								gr.rect_held_by_lmb = this;
 								event_proc(e = event::ltripleclick);	
 							}
 							if(msg == rdown) {
-								gr.rholded = this;
+								gr.rect_held_by_rmb = this;
 								event_proc(e = event::rdown);
 							}
 							if(msg == rdoubleclick) {
-								gr.rholded = this;
+								gr.rect_held_by_rmb = this;
 								event_proc(e = event::rdoubleclick);
 							}
 
@@ -306,12 +306,12 @@ namespace augs {
 								event_proc(e = event::wheel);
 							}
 
-							if(gr.lholded == this && msg == mousemotion && m.state[0] && rc_clipped.hover(m.ldrag)) {
-								gr.lholded = this;
+							if(gr.rect_held_by_lmb == this && msg == mousemotion && m.state[0] && rc_clipped.hover(m.ldrag)) {
+								gr.rect_held_by_lmb = this;
 								event_proc(e = event::lpressed);
 							}
-							if(gr.rholded == this && msg == mousemotion && m.state[1] && rc_clipped.hover(m.rdrag)) {
-								gr.rholded = this;
+							if(gr.rect_held_by_rmb == this && msg == mousemotion && m.state[1] && rc_clipped.hover(m.rdrag)) {
+								gr.rect_held_by_rmb = this;
 								event_proc(e = event::rpressed);
 							}
 						}
@@ -324,16 +324,16 @@ namespace augs {
 									event_proc(e = event::hout);
 									was_hovered = false;
 								}
-								if(gr.lholded == this) {
+								if(gr.rect_held_by_lmb == this) {
 									event_proc(e = event::loutdrag);
 								}
 							}
 						}
-						if(gr.lholded == this && msg == mousemotion) {
+						if(gr.rect_held_by_lmb == this && msg == mousemotion) {
 							event_proc(e = event::ldrag);
 						}
 					//}
-					if(gr.lholded != this) drag_origin = vec2i(rc.l, rc.t);
+					if(gr.rect_held_by_lmb != this) drag_origin = vec2i(rc.l, rc.t);
 				}
 			}
 
@@ -374,7 +374,7 @@ namespace augs {
 				auto children_all = children;
 				get_member_children(children_all);
 				if(children_all.empty()) {
-					//if(next) focus_next = next;
+					//if(next) next_focusable = next;
 					return;
 				}
 				
@@ -398,12 +398,12 @@ namespace augs {
  					//next = focusable ? this : order[0];
 
 
-				focus_next = order[0];
-				focus_prev = *order.rbegin();
+				next_focusable = order[0];
+				prev_focusable = *order.rbegin();
 
 				for(unsigned i = 0; i < order.size(); ++i) {
-					order[i]->focus_next = (i == order.size() - 1) ? this : order[i+1];
-					order[i]->focus_prev = (i == 0               ) ? this : order[i-1];
+					order[i]->next_focusable = (i == order.size() - 1) ? this : order[i+1];
+					order[i]->prev_focusable = (i == 0               ) ? this : order[i-1];
 				}
 			}
 
@@ -415,7 +415,7 @@ namespace augs {
 					next = this;
 
 				if(children_all.empty()) {
-					focus_next = next;
+					next_focusable = next;
 				}
 
 				auto order = children_all;
@@ -428,7 +428,7 @@ namespace augs {
 				});
 
 				if(!children_all.empty()) 
-					focus_next = order[0];
+					next_focusable = order[0];
 
 				for(unsigned i = 0; i < order.size(); ++i) {
 					order[i]->gen_focus_links_depth((i == order.size() - 1) ? next : order[i+1]);

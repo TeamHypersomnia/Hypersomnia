@@ -49,18 +49,19 @@ namespace augs {
 			};
 
 			class group {
-				rect* focus;
+				rect* rect_in_focus;
 			public:
 				struct {
 					material mat;
-					rects::wh<float> size;
+					rects::wh<float> size = rects::wh<float>(25, 25);
 					vec2i pos;
-					rect* subject;
-					float speed_mult;
+					rect* subject = nullptr;
+					float speed_mult = 1.f;
 				} middlescroll;
 				
 				system& owner;
-				rect *lholded, *rholded;
+				rect *rect_held_by_lmb = nullptr;
+				rect *rect_held_by_rmb = nullptr;
 
 				rect root;
 				std::vector<augs::vertex_triangle> quad_array;
@@ -68,7 +69,7 @@ namespace augs {
 				group(system& owner);
 
 				void set_focus(rect*);
-				rect* get_focus() const;
+				rect* get_rect_in_focus() const;
 
 				void update_rectangles();
 				void poll_events      ();

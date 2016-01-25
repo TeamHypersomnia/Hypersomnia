@@ -67,10 +67,10 @@ namespace augs {
 					event_info& operator=(event);
 				};
 
-				rect* focus_next = nullptr;
-				rect* focus_prev = nullptr;
+				rect* next_focusable = nullptr;
+				rect* prev_focusable = nullptr;
 
-				bool draw = true;
+				bool enable_drawing = true;
 				bool clip = true;
 				bool fetch_wheel = false;
 				bool scrollable = true;

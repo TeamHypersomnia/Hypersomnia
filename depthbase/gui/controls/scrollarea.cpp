@@ -34,7 +34,7 @@ namespace augs {
 
 				void scrollarea::update_proc(group& inf) {
 					bool n = is_needed();
-					box->draw = draw = !(disappear_if_fits && !n);
+					box->enable_drawing = enable_drawing = !(disappear_if_fits && !n);
 					rects::ltrb<float>& sl = box->rc;
 
 					if(flags & orientation::HORIZONTAL) {
@@ -88,7 +88,7 @@ namespace augs {
 					auto& gr = e.owner;
 					auto& wnd = gr.owner.events;
 					if(e == event::ldown && box) {
-						gr.lholded = box;
+						gr.rect_held_by_lmb = box;
 						if(flags & orientation::HORIZONTAL) {
 							box->rc.center_x(wnd.mouse.pos.x - get_rect_absolute().l);
 							update_scroll_x();
