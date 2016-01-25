@@ -24,16 +24,11 @@ namespace augs {
 					print.draw_text(in.v, editor, *this);
 				}
 				
-				//void textbox::update_rectangles() {
-				//	rect::update_rectangles();
-				//	guarded_redraw();
-				//}
-		
-				void textbox::update_proc(group& owner) {
-					drag.move(scroll);
+				void textbox::perform_logic_step(gui_world& owner) {
+					drag.move(scroll, owner.delta_milliseconds);
 
 					if(drag.vel[0] != 0.f || drag.vel[1] != 0.f)
-						on_drag(owner.owner.events.mouse.pos);
+						on_drag(owner.state.mouse.pos);
 
 					print.blink.update();
 				}
@@ -100,13 +95,13 @@ namespace augs {
 				void textbox::on_pagedown()				{ scroll.y += get_rect_absolute().h();														}
 				void textbox::on_pageup()				{ scroll.y -= get_rect_absolute().h();														}
 				void textbox::on_character(wchar_t c)	{ editor.character(c);								view_caret = true; blink_reset = true;	}	
-				void textbox::on_cut(gui_world& sys)	{ editor.cut(sys);									view_caret = true;						}	  
+				void textbox::on_cut(gui_world& sys)	{ editor.cut(sys.global_clipboard);					view_caret = true;						}	  
 				void textbox::on_bold()					{ editor.bold();									view_caret = true;						}	  
 				void textbox::on_italics()				{ editor.italics();									view_caret = true;						}	  
-				void textbox::on_copy(gui_world& sys)	{ editor.copy(sys);									view_caret = true;						}	    
+				void textbox::on_copy(gui_world& sys)	{ editor.copy(sys.global_clipboard);				view_caret = true;						}
 				void textbox::on_undo()					{ editor.undo();									view_caret = true;						}	  	
 				void textbox::on_redo()					{ editor.redo();									view_caret = true;						}	  	
-				void textbox::on_paste(gui_world& sys)	{ editor.paste(sys);								view_caret = true; blink_reset = true;	}	  	
+				void textbox::on_paste(gui_world& sys)	{ editor.paste(sys.global_clipboard);				view_caret = true; blink_reset = true;	}
 				void textbox::on_backspace(bool c)		{ editor.backspace(c);								view_caret = true; blink_reset = true;	}
 				void textbox::on_del(bool c)			{ editor.del(c);									view_caret = true; blink_reset = true;	}
 				
@@ -121,9 +116,9 @@ namespace augs {
 					return editor.get_draft().get_bbox();
 				}
 
-				void textbox::handle_interface(event_info e) {
+				void textbox::pass_gui_event_to_text_editor(event_info e) {
 					using namespace augs::window::event::keys;
-					auto& w = e.owner.owner.events;
+					auto& w = e.owner.state;
 					auto& k = w.keys;
 					vec2i mouse = w.mouse.pos;
 					bool s = k[SHIFT], c = k[CTRL];
@@ -159,11 +154,11 @@ namespace augs {
 								case A: on_select_all(); break;
 								case B: if (editable) on_bold();		 break;
 								case I: if (editable) on_italics();	 break;
-								case C: on_copy(e.owner.owner);		 break;
+								case C: on_copy(e.owner);		 break;
 								case Z: if (editable) k[LSHIFT] ? on_redo() : on_undo(); break;
 								case Y: if (editable) on_redo();		 break;
-								case X: if (editable) on_cut(e.owner.owner);		 break;
-								case V: if (editable) on_paste(e.owner.owner);		 break;
+								case X: if (editable) on_cut(e.owner);		 break;
+								case V: if (editable) on_paste(e.owner);		 break;
 								default: break;
 							}
 							break;
@@ -202,11 +197,11 @@ namespace augs {
 					}
 				}
 
-				void textbox::event_proc(event_info e) {
-					handle_interface(e);
-					handle_middleclick(e);
-					handle_focus(e);
-					handle_scroll(e);
+				void textbox::consume_gui_event(event_info e) {
+					pass_gui_event_to_text_editor(e);
+					try_to_enable_middlescrolling(e);
+					try_to_make_this_rect_focused(e);
+					scroll_content_with_wheel(e);
 				}
 
 				
@@ -218,7 +213,7 @@ namespace augs {
 					return misc::wstr(editor.get_str());
 				}
 
-				void property_textbox::event_proc(event_info e) {
+				void property_textbox::consume_gui_event(event_info e) {
 					if(e.msg == rect::event::blur) {
 						std::wstring ws = misc::wstr(editor.get_str());
 						if(property_guard) property_guard(ws);
@@ -228,12 +223,12 @@ namespace augs {
 					
 
 					/* if e belongs neither to tab nor enter, handle interface */
-					if(!handle_tab(e) && !handle_enter(e))
-						handle_interface(e);
+					if(!focus_next_rect_by_tab(e) && !focus_next_rect_by_enter(e))
+						pass_gui_event_to_text_editor(e);
 
-					handle_middleclick(e);
-					handle_focus(e);
-					handle_scroll(e);
+					try_to_enable_middlescrolling(e);
+					try_to_make_this_rect_focused(e);
+					scroll_content_with_wheel(e);
 				}
 					
 				void property_textbox::on_character(wchar_t c) {

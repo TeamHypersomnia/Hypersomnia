@@ -42,11 +42,11 @@ namespace augs {
 					virtual void on_drag(vec2i mouse);
 
 					virtual rects::wh<float> get_content_size() override;
-					virtual void event_proc(event_info) override;
-					virtual void update_proc(group&) override;
+					virtual void consume_gui_event(event_info) override;
+					virtual void perform_logic_step(gui_world&) override;
 
 					void draw_text_ui(draw_info);
-					void handle_interface(event_info);
+					void pass_gui_event_to_text_editor(event_info);
 
 					bool view_caret, blink_reset, editable = true;
 					dragger drag;
@@ -60,7 +60,7 @@ namespace augs {
 
 				/* one-line textbox */
 				struct property_textbox : public textbox {
-					virtual void event_proc(event_info) override;
+					virtual void consume_gui_event(event_info) override;
 					
 					/* we should not pass newlines through */
 					virtual void on_character(wchar_t) override;

@@ -4,15 +4,13 @@
 
 namespace augs {
 	namespace graphics {
-		augs::fpstimer fps;
-
 		namespace gui {
 			dragger::dragger() : vel_mult(1.f) {
 				stop();
 			}
 
-			void dragger::move(vec2& p) {
-				p -= vec2(float(vel[0] * fps.frame_speed()), float(vel[1] * fps.frame_speed()));
+			void dragger::move(vec2& p, float delta) {
+				p -= vec2(float(vel[0] * delta), float(vel[1] * delta));
 			}
 
 			void dragger::drag(const vec2i& m, const rects::ltrb<float>& rc) {

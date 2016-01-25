@@ -90,50 +90,50 @@ namespace augs {
 						: styles_active(styles_active), styles_inactive(styles_inactive), checkbox(c) {}
 
 					
-					void crect::event_proc(event_info m) {
-						rect::event_proc(m);
+					void crect::consume_gui_event(event_info m) {
+						rect::consume_gui_event(m);
 						styles.update_appearance(m);
 					}
 					
-					void cbutton::event_proc(event_info m) {
-						button::event_proc(m);
+					void cbutton::consume_gui_event(event_info m) {
+						button::consume_gui_event(m);
 						styles.update_appearance(m);
 					}
 
-					void ctext_button::event_proc(event_info m) {
-						text_button::event_proc(m);
+					void ctext_button::consume_gui_event(event_info m) {
+						text_button::consume_gui_event(m);
 						styles.update_appearance(m);
 					}
 
-					void ccheckbox::event_proc(event_info m) {
-						checkbox::event_proc(m);
+					void ccheckbox::consume_gui_event(event_info m) {
+						checkbox::consume_gui_event(m);
 						styles_active  .update_appearance(m);
 						styles_inactive.update_appearance(m);
 					}
 
-					void cchecklabel::event_proc(event_info m) {
-						checklabel::event_proc(m);
+					void cchecklabel::consume_gui_event(event_info m) {
+						checklabel::consume_gui_event(m);
 						styles_active  .update_appearance(m);
 						styles_inactive.update_appearance(m);
 					}
 
-					void cslider::event_proc(event_info m) {
-						slider::event_proc(m);
+					void cslider::consume_gui_event(event_info m) {
+						slider::consume_gui_event(m);
 						styles.update_appearance(m);
 					}
 
-					void cscrollarea::event_proc(event_info m) {
-						scrollarea::event_proc(m);
+					void cscrollarea::consume_gui_event(event_info m) {
+						scrollarea::consume_gui_event(m);
 						styles.update_appearance(m);
 					}
 					
-					void ctextbox::event_proc(event_info m) {
-						textbox::event_proc(m);
+					void ctextbox::consume_gui_event(event_info m) {
+						textbox::consume_gui_event(m);
 						styles.update_appearance(m);
 					}
 					
-					void cproperty_textbox::event_proc(event_info m) {
-						property_textbox::event_proc(m);
+					void cproperty_textbox::consume_gui_event(event_info m) {
+						property_textbox::consume_gui_event(m);
 						styles.update_appearance(m);
 					}
 					

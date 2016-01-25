@@ -27,15 +27,15 @@ namespace augs {
 					return get_state();
 				}
 
-				void checkbox::event_proc(event_info e) {
+				void checkbox::consume_gui_event(event_info e) {
 					if(e == rect::event::lclick ||
-					   e == rect::event::keydown && (e.owner.owner.events.key == augs::window::event::keys::ENTER)) {
+					   e == rect::event::keydown && (e.owner.state.key == augs::window::event::keys::ENTER)) {
 						set_state(!get_state());
 						if(callback) callback(get_state());
 					}
-					handle_focus(e);
-					handle_tab(e);
-					handle_arrows(e);
+					try_to_make_this_rect_focused(e);
+					focus_next_rect_by_tab(e);
+					focus_next_rect_by_arrows(e);
 				}
 					
 				checklabel::checklabel(const checkbox& r, const std::wstring& label, const text::style& style_active, const text::style& style_inactive)

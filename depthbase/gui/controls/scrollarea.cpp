@@ -32,7 +32,7 @@ namespace augs {
 						(flags == orientation::OMNI       && (need[0]  || need[1]));
 				}
 
-				void scrollarea::update_proc(group& inf) {
+				void scrollarea::perform_logic_step(gui_world& inf) {
 					bool n = is_needed();
 					box->enable_drawing = enable_drawing = !(disappear_if_fits && !n);
 					rects::ltrb<float>& sl = box->rc;
@@ -71,7 +71,7 @@ namespace augs {
 						sl.w   (rc.w());
 					}
 
-					rect::update_proc(inf);
+					rect::perform_logic_step(inf);
 				}
 
 
@@ -83,10 +83,10 @@ namespace augs {
 					origin->scroll.y = float(box->rc.t * (origin->content_size.h - origin->rc.h()) / (rc.h() - box->rc.h()));
 				}
 
-				void scrollarea::event_proc(event_info e) {
+				void scrollarea::consume_gui_event(event_info e) {
 					if(!is_needed()) return;
 					auto& gr = e.owner;
-					auto& wnd = gr.owner.events;
+					auto& wnd = gr.state;
 					if(e == event::ldown && box) {
 						gr.rect_held_by_lmb = box;
 						if(flags & orientation::HORIZONTAL) {
@@ -97,21 +97,21 @@ namespace augs {
 							box->rc.center_y(wnd.mouse.pos.y - get_rect_absolute().t);
 							update_scroll_y();
 						}
-						box->drag_origin = vec2i(box->rc.l, box->rc.t);
+						box->where_dragging_started = vec2i(box->rc.l, box->rc.t);
 					}
 				}
 
-				void scrollarea::slider::event_proc(event_info e) {
-					auto& ms = e.owner.owner.events.mouse;
+				void scrollarea::slider::consume_gui_event(event_info e) {
+					auto& ms = e.owner.state.mouse;
 					scrollarea* pp = (scrollarea*)parent;
 					if(!pp->is_needed()) return;
 					if(e == event::ldrag) {
 						if(pp->flags & orientation::HORIZONTAL) {
-							rc.x(drag_origin.x + ms.pos.x - ms.ldrag.x);
+							rc.x(where_dragging_started.x + ms.pos.x - ms.ldrag.x);
 							pp->update_scroll_x();
 						}
 						if(pp->flags & orientation::VERTICAL  ) {
-							rc.y(drag_origin.y + ms.pos.y - ms.ldrag.y);
+							rc.y(where_dragging_started.y + ms.pos.y - ms.ldrag.y);
 							pp->update_scroll_y();
 						}
 					}

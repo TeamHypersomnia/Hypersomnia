@@ -10,7 +10,6 @@
 
 namespace augs {
 	namespace graphics {
-		extern fpstimer fps;
 		namespace gui {
 			namespace text {
 				struct formatted_char {
@@ -33,49 +32,58 @@ namespace augs {
 			}
 
 			class gui_world {
-				bool 
-					/* own_copy indicates whether the clipboard_change event comes from manual "copy_clipboard" or from external source */
-					own_copy, 
-					own_clip;
 			public:
-				augs::window::event::state& events;
-				text::fstr clipboard;
+				class clipboard {
+					bool
+						/* own_copy indicates whether the clipboard_change event comes from manual "copy_clipboard" or from external source */
+						own_copy = false,
+						own_clip = false;
+				
+				public:
+					bool fetch_clipboard = true;
 
-				gui_world(augs::window::event::state& subscribe_events);
+					text::fstr contents;
 
-				void change_clipboard();
-				void copy_clipboard(text::fstr&);
-				bool fetch_clipboard, is_clipboard_own();
-			};
+					void change_clipboard();
+					void copy_clipboard(text::fstr&);
+					
+					bool is_clipboard_own() const;
+				};
 
-			class group {
-				rect* rect_in_focus;
-			public:
-				struct {
+				struct middlescroll_data {
 					material mat;
 					rects::wh<float> size = rects::wh<float>(25, 25);
 					vec2i pos;
 					rect* subject = nullptr;
 					float speed_mult = 1.f;
-				} middlescroll;
-				
-				gui_world& owner;
+				};
+
+				static clipboard global_clipboard;
+
+				rect* rect_in_focus;
+
+				middlescroll_data middlescroll;
+
+				augs::window::event::state state;
+
+				float delta_milliseconds = 1000 / 60.f;
+
 				rect *rect_held_by_lmb = nullptr;
 				rect *rect_held_by_rmb = nullptr;
 
 				rect root;
 				std::vector<augs::vertex_triangle> triangle_buffer;
 
-				group(gui_world& owner);
+				gui_world();
+
+				void set_delta_milliseconds(float);
 
 				void set_focus(rect*);
 				rect* get_rect_in_focus() const;
 
-				void update_rectangles();
-				void poll_events      ();
-				void call_updaters    ();
-				void draw_triangles   ();
-				void default_update   ();
+				void consume_raw_input_and_generate_gui_events(augs::window::event::state);
+				void perform_logic_step();
+				void draw_triangles();
 			};
 				
 			

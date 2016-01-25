@@ -29,7 +29,7 @@ namespace augs {
 						crect(const rects::xywh<float>& r = rects::xywh<float>(), const stylesheet& styles = rect_style);
 
 						virtual void draw_proc(draw_info in) override;
-						virtual void event_proc(event_info) override;
+						virtual void consume_gui_event(event_info) override;
 					};
 					
 					struct cbutton : public button {
@@ -37,7 +37,7 @@ namespace augs {
 						cbutton(const button& r = button(), const stylesheet& styles = button_style);
 
 						virtual void draw_proc(draw_info in) override;
-						virtual void event_proc(event_info) override;
+						virtual void consume_gui_event(event_info) override;
 					};
 
 					struct ctext_button : public text_button {
@@ -45,7 +45,7 @@ namespace augs {
 						ctext_button(const text_button& r, const stylesheet& styles = text_button_style);
 
 						virtual void draw_proc(draw_info in) override;
-						virtual void event_proc(event_info) override;
+						virtual void consume_gui_event(event_info) override;
 					};
 
 					struct ccheckbox : public checkbox {
@@ -54,7 +54,7 @@ namespace augs {
 						ccheckbox(const checkbox& = checkbox(), const stylesheet& styles_active = checkbox_active, const stylesheet& styles_inactive = checkbox_inactive);
 
 						virtual void draw_proc(draw_info in) override;
-						virtual void event_proc(event_info) override;
+						virtual void consume_gui_event(event_info) override;
 					};
 
 					struct cchecklabel : public controls::checklabel {
@@ -63,7 +63,7 @@ namespace augs {
 						cchecklabel(const checklabel&, const stylesheet& styles_active = checklabel_active, const stylesheet& styles_inactive = checklabel_inactive);
 
 						virtual void draw_proc(draw_info in) override;
-						virtual void event_proc(event_info) override;
+						virtual void consume_gui_event(event_info) override;
 					};
 					
 					struct ctextbox : public textbox {
@@ -71,7 +71,7 @@ namespace augs {
 						ctextbox(const textbox& r = textbox(), const stylesheet& = textbox_style);
 
 						virtual void draw_proc(draw_info in) override;
-						virtual void event_proc(event_info) override;
+						virtual void consume_gui_event(event_info) override;
 					};
 
 					struct cproperty_textbox : public property_textbox {
@@ -79,7 +79,7 @@ namespace augs {
 						cproperty_textbox(const property_textbox& r, const stylesheet& = property_textbox_style);
 
 						virtual void draw_proc(draw_info in) override;
-						virtual void event_proc(event_info) override;
+						virtual void consume_gui_event(event_info) override;
 					};
 
 					struct cslider : public scrollarea::slider {
@@ -88,7 +88,7 @@ namespace augs {
 						cslider(const scrollarea::slider& r, const stylesheet& = slider_style);
 
 						virtual void draw_proc(draw_info in) override;
-						virtual void event_proc(event_info m) override;
+						virtual void consume_gui_event(event_info m) override;
 					};
 
 					struct cscrollarea : public scrollarea {
@@ -97,7 +97,7 @@ namespace augs {
 						cscrollarea(const scrollarea& r, const stylesheet& = scrollarea_style);
 
 						virtual void draw_proc(draw_info in) override;
-						virtual void event_proc(event_info m) override;
+						virtual void consume_gui_event(event_info m) override;
 					};
 				}
 			}

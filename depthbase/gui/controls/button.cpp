@@ -22,18 +22,18 @@ namespace augs {
 					on_lmousedown(on_lmousedown),
 					on_lmouseup(on_lmouseup) {}
 
-				void button::event_proc(event_info m) {
+				void button::consume_gui_event(event_info m) {
 					switch(m) {
 					case event::lclick: if(on_click) on_click(); break;
 					case event::hover: if(on_hover) on_hover(); break;
 					case event::ldown: if(on_lmousedown) on_mousedown(); break;
 					case event::lup: if(on_lmouseup) on_mouseup(); break;
-					case event::keydown: if(m.owner.owner.events.key == augs::window::event::keys::ENTER) on_click(); break;
+					case event::keydown: if(m.owner.state.key == augs::window::event::keys::ENTER) on_click(); break;
 					default: break;
 					}
-					handle_focus(m);
-					handle_tab(m);
-					handle_arrows(m);
+					try_to_make_this_rect_focused(m);
+					focus_next_rect_by_tab(m);
+					focus_next_rect_by_arrows(m);
 				}
 
 				

@@ -146,7 +146,7 @@ namespace augs {
 					}
 				}
 				
-				void ui::cut(gui_world& sys) {
+				void ui::cut(gui_world::clipboard& sys) {
 					if(caret.selection_offset) {
 						copy(sys);
 						backspace();
@@ -160,7 +160,7 @@ namespace augs {
 					}
 				}
 
-				void ui::copy(gui_world& sys) {
+				void ui::copy(gui_world::clipboard& sys) {
 					if(caret.selection_offset)
 						sys.copy_clipboard(get_str().substr(get_left_selection(), std::abs(caret.selection_offset)));
 					else {
@@ -171,9 +171,9 @@ namespace augs {
 
 				}
 
-				void ui::paste(gui_world& sys) {
-					if(sys.is_clipboard_own())
-						insert(sys.clipboard);
+				void ui::paste(gui_world::clipboard& clip) {
+					if(clip.is_clipboard_own())
+						insert(clip.contents);
 					else {
 						fstr out;
 						paste_clipboard(out, get_current_style());

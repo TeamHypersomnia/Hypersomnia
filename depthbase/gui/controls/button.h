@@ -20,7 +20,7 @@ namespace augs {
 						   const std::function<void()>& on_lmousedown = nullptr,
 						   const std::function<void()>& on_lmouseup = nullptr);
 
-					void event_proc(event_info m) override;
+					void consume_gui_event(event_info m) override;
 				};
 
 				struct text_button : public button {

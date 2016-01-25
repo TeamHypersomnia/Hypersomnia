@@ -7,7 +7,7 @@ namespace augs {
 	namespace graphics {
 		namespace gui {
 			struct stylesheet;
-			class group;
+			class gui_world;
 			struct rect {
 				enum class event {
 					unknown,
@@ -43,26 +43,26 @@ namespace augs {
 				};
 				
 				struct draw_info {
-					group& owner;
+					gui_world& owner;
 					std::vector<augs::vertex_triangle>& v;
 
-					draw_info(group&, std::vector<augs::vertex_triangle>&); 
+					draw_info(gui_world&, std::vector<augs::vertex_triangle>&);
 				};
 
 				struct poll_info {
-					group& owner;
+					gui_world& owner;
 					const unsigned msg;
 
 					bool mouse_fetched;
 					bool scroll_fetched;
-					poll_info(group&, unsigned); 
+					poll_info(gui_world&, unsigned);
 				};
 
 				struct event_info {
-					group& owner;
+					gui_world& owner;
 					event msg;
 
-					event_info(group&, event);
+					event_info(gui_world&, event);
 					operator event();
 					event_info& operator=(event);
 				};
@@ -78,36 +78,36 @@ namespace augs {
 				bool preserve_focus = false;
 				bool focusable = true;
 
-				vec2i drag_origin;
+				vec2i where_dragging_started;
 				rects::ltrb<float> rc; /* actual rectangle */ 
 				rects::wh<float> content_size; /* content's (children's) bounding box */
 				vec2 scroll; /* scrolls content */
 				
 				std::vector<rect*> children;
 				
-				rect(const rects::xywh<float>& rc = rects::xywh<float>());
+				rect(rects::xywh<float> rc = rects::xywh<float>());
 				
 				virtual rects::wh<float> get_content_size();
 				
-				void update_rectangles();
-				virtual void update_proc(group&);
+				void calculate_clipped_rectangle_layout();
 
-				virtual void poll_message(poll_info&); /* event generator */
-				virtual void event_proc(event_info); /* event listener */
+				void consume_raw_input_and_generate_gui_events(poll_info&); /* event generator */
+				
+				virtual void consume_gui_event(event_info); /* event listener */
 				virtual void draw_proc(draw_info);
 
-				/* event_proc default subroutines */
-				void handle_scroll(event_info);
-				void handle_middleclick(event_info);
-				void handle_focus(event_info);
+				/* consume_gui_event default subroutines */
+				void scroll_content_with_wheel(event_info);
+				void try_to_enable_middlescrolling(event_info);
+				void try_to_make_this_rect_focused(event_info);
 
 				/* focus switching routines */
 				/* if this handler returns true, tab should not later be processed as a keydown event (used in textbox, for example) */
-				bool handle_tab(event_info);
+				bool focus_next_rect_by_tab(event_info);
 				/* if this handler returns true, arrows should not later be processed as a keydown event (used in textbox, for example) */
-				bool handle_arrows(event_info);
+				bool focus_next_rect_by_arrows(event_info);
 				/* if this handler returns true, enter should not later be processed as a keydown event (used in textbox, for example) */
-				bool handle_enter(event_info);
+				bool focus_next_rect_by_enter(event_info);
 
 				/* draw_proc default subroutines */
 				void draw_rect		(draw_info in, const material& = material()), 
@@ -118,9 +118,6 @@ namespace augs {
 
 				/* passes 0 or clipper's rc_clipped as clipper depending on clipper's clip flag */
 				static rects::ltrb<float> draw_clipped_rectangle (const material&, const rects::ltrb<float>& global, const rect* clipper, std::vector<augs::vertex_triangle>& v);
-				
-				/* simpler routine for more complex draws like text, origin is shifted to be local */
-				rects::ltrb<float>		 local_add(const material&, const rects::ltrb<float>& local, std::vector<augs::vertex_triangle>& v) const;
 				
 				/*  does scroll not exceed the content */
 				bool is_scroll_clamped_to_right_down_corner();
@@ -144,8 +141,12 @@ namespace augs {
 
 				static rect* seek_focusable(rect*, bool);
 			protected:
-				friend class group;
+				friend class gui_world;
+
 				rect* parent = nullptr;
+				gui_world* parent_group = nullptr;
+
+				virtual void perform_logic_step(gui_world&);
 			private:
 				rects::ltrb<float> rc_clipped;
 				rects::ltrb<float> clipping_rect = rects::ltrb<float>(0, 0, std::numeric_limits<int>::max() / 2, std::numeric_limits<int>::max() / 2);

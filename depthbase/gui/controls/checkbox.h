@@ -23,7 +23,7 @@ namespace augs {
 					checkbox(const rect& = rect(), bool set = false, 
 						const std::function<void (bool)>& callback = nullptr); 
 
-					virtual void event_proc(event_info e) override;
+					virtual void consume_gui_event(event_info e) override;
 				};
 				
 				class checklabel : public checkbox {

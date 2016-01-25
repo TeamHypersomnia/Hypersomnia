@@ -13,8 +13,8 @@ namespace augs {
 				public:
 					bool disappear_if_fits;
 
-					virtual void event_proc(event_info) override;
-					virtual void update_proc(group&) override;
+					virtual void consume_gui_event(event_info) override;
+					virtual void perform_logic_step(gui_world&) override;
 
 					rect* origin;
 					void align();
@@ -26,7 +26,7 @@ namespace augs {
 						vec2 val;
 						friend class scrollarea;
 					public:
-						virtual void event_proc(event_info) override;
+						virtual void consume_gui_event(event_info) override;
 						
 						int min_side;
 						slider(int min_side);
