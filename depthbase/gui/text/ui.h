@@ -55,7 +55,7 @@ namespace augs {
 					const wchar_t* whitelist, *blacklist; 
 					/* 0 - unlimited */
 					unsigned max_characters; 
-					pixel_32 global_color;
+					rgba global_color;
 					augs::misc::undoredo<action> edit;
 
 					bool allow_unknown_characters_as_default;

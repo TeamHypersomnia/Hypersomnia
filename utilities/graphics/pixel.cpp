@@ -2,11 +2,13 @@
 #include <limits>
 
 namespace augs {
-	typedef struct {
-		double r;       // percent
-		double g;       // percent
-		double b;       // percent
-	} rgb;
+	namespace {
+		typedef struct {
+			double r;       // percent
+			double g;       // percent
+			double b;       // percent
+		} rgb;
+	}
 
 	static hsv      rgb2hsv(rgb in);
 	static rgb      hsv2rgb(hsv in);
@@ -109,46 +111,41 @@ namespace augs {
 		return out;
 	}
 
-	pixel_8::pixel_8(color brightness) : r(brightness) {}
-	pixel_8::operator unsigned char() { return r; }
-	pixel_8& pixel_8::operator=(color brightness) { r = brightness; return *this; }
-
-	pixel_24::pixel_24(color red, color green, color blue) : r(red), g(green), b(blue) {}
-	pixel_32::pixel_32(color red, color green, color blue, color alpha) : r(red), g(green), b(blue), a(alpha) {}
+	rgba::rgba(rgba_channel red, rgba_channel green, rgba_channel blue, rgba_channel alpha) : r(red), g(green), b(blue), a(alpha) {}
 
 	hsv::hsv(double h, double s, double v) : h(h), s(s), v(v) {}
 	
-	void pixel_32::set(color red, color green, color blue, color alpha) {
-		*this = pixel_32(red, green, blue, alpha);
+	void rgba::set(rgba_channel red, rgba_channel green, rgba_channel blue, rgba_channel alpha) {
+		*this = rgba(red, green, blue, alpha);
 	}
 
-	hsv pixel_32::get_hsv() const {
+	hsv rgba::get_hsv() const {
 		auto res = rgb2hsv({ r / 255.0, g / 255.0, b / 255.0 });
 		return{ res.h / 360.0, res.s, res.v };
 	}
 
-	pixel_32& pixel_32::set_hsv(hsv hsv) {
+	rgba& rgba::set_hsv(hsv hsv) {
 		auto res = hsv2rgb({ hsv.h * 360, hsv.s, hsv.v });
-		return (*this = pixel_32{ color(res.r * 255), color(res.g * 255), color(res.b * 255), a });
+		return (*this = rgba{ rgba_channel(res.r * 255), rgba_channel(res.g * 255), rgba_channel(res.b * 255), a });
 	}
 
 	namespace colors {
-		const pixel_32 ltblue(0, 122, 204, 255);
-		const pixel_32 blue(0, 61, 102, 255);
-		const pixel_32 red(255, 0, 0, 255);
-		const pixel_32 green(0, 144, 66, 255);
-		const pixel_32 violet(164, 68, 195, 255);
-		const pixel_32 darkred(122, 0, 0, 255);
-		const pixel_32 black(0, 0, 0, 255);
-		const pixel_32 darkgray(30, 30, 30, 255);
-		const pixel_32 gray1(50, 50, 50, 255);
-		const pixel_32 gray2(62, 62, 62, 255);
-		const pixel_32 gray3(104, 104, 104, 255);
-		const pixel_32 gray4(180, 180, 180, 255);
-		const pixel_32 white(255, 255, 255, 255);
-		const pixel_32 darkblue(6, 5, 20, 255);
+		const rgba ltblue(0, 122, 204, 255);
+		const rgba blue(0, 61, 102, 255);
+		const rgba red(255, 0, 0, 255);
+		const rgba green(0, 144, 66, 255);
+		const rgba violet(164, 68, 195, 255);
+		const rgba darkred(122, 0, 0, 255);
+		const rgba black(0, 0, 0, 255);
+		const rgba darkgray(30, 30, 30, 255);
+		const rgba gray1(50, 50, 50, 255);
+		const rgba gray2(62, 62, 62, 255);
+		const rgba gray3(104, 104, 104, 255);
+		const rgba gray4(180, 180, 180, 255);
+		const rgba white(255, 255, 255, 255);
+		const rgba darkblue(6, 5, 20, 255);
 
-		const pixel_32 cyan(0, 255, 255, 255);
-		const pixel_32 yellow(255, 255, 0, 255);
+		const rgba cyan(0, 255, 255, 255);
+		const rgba yellow(255, 255, 0, 255);
 	}
 }

@@ -16,14 +16,14 @@ namespace augs {
 		namespace gui {
 			namespace text {
 				printer::printer() :
-					caret_mat(material(null_texture, pixel_32(255, 255, 255, 255))),
+					caret_mat(material(null_texture, rgba(255, 255, 255, 255))),
 					align_caret_height(true), caret_width(1),
 					highlight_current_line(false),
 					highlight_during_selection(true), 
 					active(false), 
-					selection_bg_mat(pixel_32(128, 255, 255, 120)),
-					selection_inactive_bg_mat(pixel_32(128, 255, 255, 40)),
-					highlight_mat(pixel_32(15, 15, 15, 255))
+					selection_bg_mat(rgba(128, 255, 255, 120)),
+					selection_inactive_bg_mat(rgba(128, 255, 255, 40)),
+					highlight_mat(rgba(15, 15, 15, 255))
 				{
 					quad_indices.first_character = 
 					quad_indices.last_character =  
@@ -172,7 +172,7 @@ namespace augs {
 
 								/* if it's not a whitespace */
 								if(g.tex.get_rect().good()) {
-									pixel_32 charcolor = style(colors[i]).color;
+									rgba charcolor = style(colors[i]).color;
 									
 									/* if a character is between selection bounds, we change its color to the one specified in selected_text_color 
 									if there's no caret, this is never true

@@ -6,10 +6,10 @@ namespace augs {
 	namespace graphics {
 		namespace gui {
 			stylesheet::style::style() 
-				: color(pixel_32()), background_image(gui::null_texture), border(solid_stroke(0)) {
+				: color(rgba()), background_image(gui::null_texture), border(solid_stroke(0)) {
 			}
 
-			stylesheet::style::style(const attribute<pixel_32>& c, 
+			stylesheet::style::style(const attribute<rgba>& c, 
 				const attribute<augs::texture*>& b, 
 				const attribute<solid_stroke>& br) 
 				: color(c), background_image(b), border(br) {
@@ -17,7 +17,7 @@ namespace augs {
 			}
 
 			stylesheet::style::operator material() const {
-				return material(background_image.active ? background_image : null_texture, color.active ? color : pixel_32(255, 255, 255, 255));
+				return material(background_image.active ? background_image : null_texture, color.active ? color : rgba(255, 255, 255, 255));
 			}
 
 			stylesheet::stylesheet(const style& released, const style& hovered, const style& pushed, const style& focused) 

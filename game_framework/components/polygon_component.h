@@ -39,7 +39,7 @@ namespace components {
 
 		std::vector<int> indices;
 
-		void set_color(pixel_32 col);
+		void set_color(rgba col);
 
 		int get_vertex_count() const {
 			return model.size();

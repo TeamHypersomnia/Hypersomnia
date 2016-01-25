@@ -156,10 +156,10 @@ void pathfinding_system::process_entities() {
 								sensor_direction * 10 + vert.location + sensor_direction.perpendicular_cw() * 4
 							};
 
-							//render.non_cleared_lines.push_back(renderer(sensor_polygon[0], sensor_polygon[1], pixel_32(255, 255, 255, 255)));
-							//render.non_cleared_lines.push_back(renderer(sensor_polygon[1], sensor_polygon[2], pixel_32(255, 255, 255, 255)));
-							//render.non_cleared_lines.push_back(renderer(sensor_polygon[2], sensor_polygon[3], pixel_32(255, 255, 255, 255)));
-							//render.non_cleared_lines.push_back(renderer(sensor_polygon[3], sensor_polygon[0], pixel_32(255, 255, 255, 255)));
+							//render.non_cleared_lines.push_back(renderer(sensor_polygon[0], sensor_polygon[1], rgba(255, 255, 255, 255)));
+							//render.non_cleared_lines.push_back(renderer(sensor_polygon[1], sensor_polygon[2], rgba(255, 255, 255, 255)));
+							//render.non_cleared_lines.push_back(renderer(sensor_polygon[2], sensor_polygon[3], rgba(255, 255, 255, 255)));
+							//render.non_cleared_lines.push_back(renderer(sensor_polygon[3], sensor_polygon[0], rgba(255, 255, 255, 255)));
 
 							auto out = physics.query_polygon(sensor_polygon, vision.filter, it);
 
@@ -303,11 +303,11 @@ void pathfinding_system::process_entities() {
 
 			if (draw_undiscovered) {
 				for (auto& disc : vertices)
-					lines.draw(disc.location, disc.sensor, pixel_32(0, 127, 255, 255));
+					lines.draw(disc.location, disc.sensor, rgba(0, 127, 255, 255));
 
 				for (auto& disc : pathfinding.session().discovered_vertices)
 					//if(disc.sensor.non_zero())
-					lines.draw(disc.location, disc.location + vec2(0, pathfinding.target_offset), pixel_32(0, 255, 0, 255));
+					lines.draw(disc.location, disc.location + vec2(0, pathfinding.target_offset), rgba(0, 255, 0, 255));
 			}
 
 			if (!vertices.empty()) {
@@ -407,8 +407,8 @@ void pathfinding_system::process_entities() {
 
 
 				if (draw_undiscovered) {
-					lines.draw(transform.pos, current_target.sensor, pixel_32(255, 255, 0, 255));
-					lines.draw(transform.pos, pathfinding.session().target, pixel_32(255, 0, 0, 255));
+					lines.draw(transform.pos, current_target.sensor, rgba(255, 255, 0, 255));
+					lines.draw(transform.pos, pathfinding.session().target, rgba(255, 0, 0, 255));
 				}
 
 				bool rays_hit = false;

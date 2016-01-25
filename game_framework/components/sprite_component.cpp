@@ -33,11 +33,11 @@ namespace components {
 		v[3] -= size / 2.f;
 	}
 
-	sprite::sprite(assets::texture_id tex, pixel_32 color) : tex(tex), color(color), rotation_offset(0.f) {
+	sprite::sprite(assets::texture_id tex, rgba color) : tex(tex), color(color), rotation_offset(0.f) {
 		set(tex, color);
 	}
 
-	void sprite::set(assets::texture_id _tex, pixel_32 _color) {
+	void sprite::set(assets::texture_id _tex, rgba _color) {
 		tex = _tex;
 		color = _color;
 

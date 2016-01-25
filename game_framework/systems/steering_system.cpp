@@ -448,7 +448,7 @@ vec2 steering::obstacle_avoidance::steer(scene in) {
 				}
 	}
 
-	auto draw_avoidance = [&avoidance, &renderer, &lines, this](pixel_32 col) {
+	auto draw_avoidance = [&avoidance, &renderer, &lines, this](rgba col) {
 		if (renderer.draw_avoidance_info) {
 			lines.draw(avoidance.avoidance[0], avoidance.avoidance[1], force_color);
 			lines.draw(avoidance.avoidance[1], avoidance.avoidance[2], force_color);
@@ -457,7 +457,7 @@ vec2 steering::obstacle_avoidance::steer(scene in) {
 		}
 	};
 
-	draw_avoidance(pixel_32());
+	draw_avoidance(rgba());
 
 	/* if we have specified a single candidate for navigation,
 	which means there is an obstacle on the way */
@@ -482,7 +482,7 @@ vec2 steering::obstacle_avoidance::steer(scene in) {
 
 			lines.draw_cyan(in.subject.position, best_candidate);
 
-			draw_avoidance(pixel_32());
+			draw_avoidance(rgba());
 		}
 
 		behaviour_state new_state(navigation_correction);
@@ -616,7 +616,7 @@ void steering_system::substep() {
 			false means we want pixels
 		*/
 		auto shape_verts = helpers::get_world_vertices(it, false);
-		auto draw_vector = [&position, &renderer, &lines](vec2 v, pixel_32 col){
+		auto draw_vector = [&position, &renderer, &lines](vec2 v, rgba col){
 			if (v.non_zero())
 				lines.draw(position, position + v, col);
 		};
@@ -671,10 +671,10 @@ void steering_system::substep() {
 			body->ApplyForce(resultant_force*PIXELS_TO_METERSf * body->GetMass(), body->GetWorldCenter(), true);
 
 		if (renderer.draw_steering_forces)
-			draw_vector(resultant_force, pixel_32(255, 255, 255, 122));
+			draw_vector(resultant_force, rgba(255, 255, 255, 122));
 
 		if (renderer.draw_velocities)
-			draw_vector(METERS_TO_PIXELSf * body->GetLinearVelocity(), pixel_32(0, 255, 0, 255));
+			draw_vector(METERS_TO_PIXELSf * body->GetLinearVelocity(), rgba(0, 255, 0, 255));
 	}
 }
 

@@ -103,7 +103,7 @@ namespace augs {
 		frame_lines.lines.clear();
 	}
 
-	void renderer::line_channel::draw(vec2 a, vec2 b, augs::pixel_32 col) {
+	void renderer::line_channel::draw(vec2 a, vec2 b, augs::rgba col) {
 		lines.push_back(debug_line(a, b, col));
 	}
 

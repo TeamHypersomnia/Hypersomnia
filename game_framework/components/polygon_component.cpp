@@ -13,7 +13,7 @@ using namespace augs;
 #include <cassert>
 
 namespace components {
-	void polygon::set_color(pixel_32 col) {
+	void polygon::set_color(rgba col) {
 		for (auto& v : model)
 			v.color = col;
 	}

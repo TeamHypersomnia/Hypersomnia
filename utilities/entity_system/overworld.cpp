@@ -6,16 +6,16 @@ namespace augs {
 	}
 
 	overworld::deterministic_timer::deterministic_timer(augs::overworld* overworld) 
-		: overworld(overworld), step_recorded(0) {
+		: parent_overworld(overworld), step_recorded(0) {
 		reset();
 	}
 
 	void overworld::deterministic_timer::reset() {
-		step_recorded = overworld->current_step_number;
+		step_recorded = parent_overworld->current_step_number;
 	}
 
 	float overworld::deterministic_timer::get_milliseconds() const {
-		return get_steps() * static_cast<float>(overworld->accumulator.delta_milliseconds());
+		return get_steps() * static_cast<float>(parent_overworld->accumulator.delta_milliseconds());
 	}
 
 	float overworld::deterministic_timer::extract_milliseconds() {
@@ -25,7 +25,7 @@ namespace augs {
 	}
 
 	unsigned overworld::deterministic_timer::get_steps() const {
-		return overworld->current_step_number - step_recorded;
+		return parent_overworld->current_step_number - step_recorded;
 	}
 
 	unsigned overworld::deterministic_timer::extract_steps() {

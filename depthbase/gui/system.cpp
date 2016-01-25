@@ -77,20 +77,20 @@ namespace augs {
 
 
 			namespace text {
-				void formatted_char::set(wchar_t ch, font* f, const pixel_32& p) {
+				void formatted_char::set(wchar_t ch, font* f, const rgba& p) {
 					font_used = f;
 					c = ch;
-					memcpy(&r, &p, sizeof(pixel_32));
+					memcpy(&r, &p, sizeof(rgba));
 				}
 
-				void formatted_char::set(font* f, const pixel_32& p) {
+				void formatted_char::set(font* f, const rgba& p) {
 					font_used = f;
-					memcpy(&r, &p, sizeof(pixel_32));
+					memcpy(&r, &p, sizeof(rgba));
 				}
 
-				style::style(font* f, pixel_32 c) : f(f), color(c) {}
+				style::style(font* f, rgba c) : f(f), color(c) {}
 
-				style::style(const formatted_char& c) : f(c.font_used), color(pixel_32(c.r, c.g, c.b, c.a)) {}
+				style::style(const formatted_char& c) : f(c.font_used), color(rgba(c.r, c.g, c.b, c.a)) {}
 
 				style::operator formatted_char() {
 					formatted_char c;
@@ -196,7 +196,7 @@ namespace augs {
 			void system::change_clipboard() {
 				if(!own_copy && fetch_clipboard) {
 					text::formatted_char ch;
-					ch.set(0, 0, pixel_32(0, 0, 0, 255));
+					ch.set(0, 0, rgba(0, 0, 0, 255));
 					paste_clipboard(clipboard, ch);
 					own_clip = false;
 				}

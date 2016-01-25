@@ -10,11 +10,11 @@ namespace augs {
 	struct vertex {
 		vec2 pos;
 		vec2 texcoord;
-		pixel_32 color;
+		rgba color;
 
 		vertex() {}
 		vertex(vec2 pos) : pos(pos) {}
-		vertex(vec2 pos, vec2 texcoord, pixel_32 color, augs::texture& tex);
+		vertex(vec2 pos, vec2 texcoord, rgba color, augs::texture& tex);
 
 		void set_texcoord(vec2, augs::texture& tex);
 	};

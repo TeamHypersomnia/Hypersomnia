@@ -17,14 +17,14 @@ namespace augs {
 					augs::font* font_used;
 					wchar_t c;
 					unsigned char r, g, b, a;
-					void set(wchar_t, augs::font* = 0, const pixel_32& = pixel_32());
-					void set(augs::font* = 0, const pixel_32& = pixel_32());
+					void set(wchar_t, augs::font* = 0, const rgba& = rgba());
+					void set(augs::font* = 0, const rgba& = rgba());
 				};
 
 				struct style {
 					augs::font* f;
-					pixel_32 color;
-					style(augs::font* = nullptr, pixel_32 = pixel_32());
+					rgba color;
+					style(augs::font* = nullptr, rgba = rgba());
 					style(const formatted_char&);
 					operator formatted_char();
 				};

@@ -2,7 +2,7 @@
 #include "texture_baker/texture_baker.h"
 
 namespace augs {
-	vertex::vertex(vec2 pos, vec2 texcoord, pixel_32 color, augs::texture& tex) :
+	vertex::vertex(vec2 pos, vec2 texcoord, rgba color, augs::texture& tex) :
 		pos(pos), texcoord(texcoord), color(color) {
 			tex.get_uv(this->texcoord);
 	}

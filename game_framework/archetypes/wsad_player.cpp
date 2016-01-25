@@ -72,7 +72,7 @@ namespace archetypes {
 		components::transform transform;
 		components::crosshair crosshair;
 
-		sprite.set(assets::texture_id::TEST_CROSSHAIR, pixel_32(255, 0, 0, 255));
+		sprite.set(assets::texture_id::TEST_CROSSHAIR, rgba(255, 0, 0, 255));
 
 		render.layer = render_layer::CROSSHAIR;
 		render.interpolate = false;
@@ -112,7 +112,7 @@ namespace archetypes {
 
 		animation_response.response = assets::animation_response_id::TORSO_SET;
 
-		sprite.set(assets::texture_id::TEST_PLAYER, pixel_32(255, 255, 255, 255));
+		sprite.set(assets::texture_id::TEST_PLAYER, rgba(255, 255, 255, 255));
 
 		render.layer = render_layer::CHARACTER;
 

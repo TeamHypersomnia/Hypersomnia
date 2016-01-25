@@ -35,7 +35,7 @@ namespace augs {
 					};
 
 					blinker blink;
-					pixel_32 selected_text_color;
+					rgba selected_text_color;
 					
 					unsigned caret_width; 
 					

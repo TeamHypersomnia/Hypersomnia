@@ -18,9 +18,9 @@ namespace augs {
 			//	}
 			//}
 
-			material::material(augs::texture* tex, const pixel_32& color) : tex(tex), color(color) {}
+			material::material(augs::texture* tex, const rgba& color) : tex(tex), color(color) {}
 
-			material::material(const pixel_32& color) : tex(gui::null_texture), color(color) {}
+			material::material(const rgba& color) : tex(gui::null_texture), color(color) {}
 
 			//quad::quad() {}
 			//quad::quad(const rects::ltrb<float>& rc, const material& mat, const rects::texture<float>& t) {

@@ -116,7 +116,7 @@ namespace prefabs {
 
 			render.layer = render_layer::CAR_WHEEL;
 
-			sprite.set(assets::texture_id::CAR_INSIDE, augs::pixel_32(255, 0, 0, 255));
+			sprite.set(assets::texture_id::CAR_INSIDE, augs::rgba(255, 0, 0, 255));
 			sprite.size.x = 10;
 			sprite.size.y = 20;
 

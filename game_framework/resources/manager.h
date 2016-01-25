@@ -17,7 +17,7 @@
 namespace resources {
 	class manager {
 	public:
-		class texture {
+		class texture_with_image {
 			/* warning! might get destroyed once some atlas finishes processing bitmaps */
 			augs::image img;
 			friend class augs::atlas;
@@ -28,7 +28,7 @@ namespace resources {
 			void set(std::wstring filename);
 		};
 
-		texture* find(assets::texture_id);
+		texture_with_image* find(assets::texture_id);
 		augs::atlas* find(assets::atlas_id);
 		augs::graphics::shader_program* find(assets::program_id);
 
@@ -41,8 +41,8 @@ namespace resources {
 		};
 
 		augs::atlas& create(assets::atlas_id, atlas_creation_mode);
-		texture& create(assets::texture_id, std::wstring filename);
-		texture& create(assets::texture_id, augs::image img);
+		texture_with_image& create(assets::texture_id, std::wstring filename);
+		texture_with_image& create(assets::texture_id, augs::image img);
 
 		void create_sprites_indexed(assets::texture_id first, assets::texture_id last, std::wstring filename_preffix);
 
@@ -64,7 +64,7 @@ namespace resources {
 		std::unordered_map<assets::animation_response_id, animation_response> animation_responses;
 		std::unordered_map<assets::animation_id, animation> animations;
 
-		std::unordered_map<assets::texture_id, texture> textures;
+		std::unordered_map<assets::texture_id, texture_with_image> textures;
 		std::unordered_map<assets::atlas_id, augs::atlas> atlases;
 		std::unordered_map<assets::shader_id, augs::graphics::shader> shaders;
 		std::unordered_map<assets::program_id, augs::graphics::shader_program> programs;

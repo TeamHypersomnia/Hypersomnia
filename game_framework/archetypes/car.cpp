@@ -42,7 +42,7 @@ namespace prefabs {
 			transform.pos = pos;
 
 			sprite.set(assets::texture_id::TRUCK_FRONT);
-			//sprite.set(assets::texture_id::TRUCK_FRONT, augs::pixel_32(0, 255, 255));
+			//sprite.set(assets::texture_id::TRUCK_FRONT, augs::rgba(0, 255, 255));
 			//sprite.size.x = 200;
 			//sprite.size.y = 100;
 
@@ -74,7 +74,7 @@ namespace prefabs {
 			render.layer = render_layer::CAR_INTERIOR;
 
 			sprite.set(assets::texture_id::TRUCK_INSIDE);
-			//sprite.set(assets::texture_id::TRUCK_INSIDE, augs::pixel_32(122, 0, 122, 255));
+			//sprite.set(assets::texture_id::TRUCK_INSIDE, augs::rgba(122, 0, 122, 255));
 			//sprite.size.x = 250;
 			//sprite.size.y = 550;
 
@@ -100,7 +100,7 @@ namespace prefabs {
 
 			render.layer = render_layer::CAR_WHEEL;
 
-			sprite.set(assets::texture_id::CAR_INSIDE, augs::pixel_32(29, 0, 0, 255));
+			sprite.set(assets::texture_id::CAR_INSIDE, augs::rgba(29, 0, 0, 255));
 			sprite.size.x = 30;
 			sprite.size.y = 60;
 

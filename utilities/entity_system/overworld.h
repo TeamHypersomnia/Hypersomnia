@@ -11,7 +11,7 @@ namespace augs {
 
 	public:
 		struct deterministic_timer {
-			overworld* overworld;
+			overworld* parent_overworld;
 			unsigned long long step_recorded = 0;
 
 			deterministic_timer(augs::overworld* owner);

@@ -53,7 +53,7 @@ namespace augs {
 						checkbox_inactive = stylesheet(checkbox_active);
 						checkbox_inactive.released.color = white;
 
-						rect_style = stylesheet(stylesheet::style(pixel_32(darkblue.r, darkblue.g, darkblue.b, 0), gui::null_texture, solid_stroke(0)));
+						rect_style = stylesheet(stylesheet::style(rgba(darkblue.r, darkblue.g, darkblue.b, 0), gui::null_texture, solid_stroke(0)));
 						textbox_style = stylesheet(stylesheet::style(darkblue, gui::null_texture, solid_stroke(1, gray2)));
 						textbox_style.focused.border = solid_stroke(1, ltblue);
 

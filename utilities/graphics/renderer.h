@@ -24,9 +24,9 @@ namespace augs {
 		};
 
 		struct debug_line {
-			debug_line(vec2 a = vec2(), vec2 b = vec2(), augs::pixel_32 col = augs::pixel_32(255, 255, 255, 255)) : col(col), a(a), b(b) {}
+			debug_line(vec2 a = vec2(), vec2 b = vec2(), augs::rgba col = augs::rgba(255, 255, 255, 255)) : col(col), a(a), b(b) {}
 
-			augs::pixel_32 col;
+			augs::rgba col;
 			vec2 a, b;
 		};
 
@@ -38,7 +38,7 @@ namespace augs {
 		struct line_channel {
 			std::vector<debug_line> lines;
 
-			void draw(vec2 a, vec2 b, augs::pixel_32 = augs::colors::white);
+			void draw(vec2 a, vec2 b, augs::rgba = augs::colors::white);
 			
 			void draw_red(vec2 a, vec2 b);
 			void draw_green(vec2 a, vec2 b);

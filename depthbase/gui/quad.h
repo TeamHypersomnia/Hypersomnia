@@ -10,15 +10,15 @@ namespace augs {
 
 			struct material {
 				augs::texture* tex;
-				pixel_32 color;
-				material(augs::texture* = null_texture, const pixel_32& = pixel_32()); 
-				material(const pixel_32&); 
+				rgba color;
+				material(augs::texture* = null_texture, const rgba& = rgba()); 
+				material(const rgba&); 
 			};
 
 			//struct vertex {
 			//	float x, y;
 			//	float u, v;
-			//	pixel_32 col;
+			//	rgba col;
 			//};
 			//
 			//struct quad {
