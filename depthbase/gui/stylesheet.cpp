@@ -21,17 +21,17 @@ namespace augs {
 			}
 
 			stylesheet::stylesheet(const style& released, const style& hovered, const style& pushed, const style& focused) 
-				: released(released), hovered(hovered), pushed(pushed), focused(focused), focus_flag(false), current_appearance(rect::appearance::released) {}
+				: released(released), hovered(hovered), pushed(pushed), focused(focused), focus_flag(false), current_appearance(appearance::released) {}
 
 			void stylesheet::update_appearance(rect::event m) {
-				auto app = rect::get_appearance(m);
+				auto app = map_event_to_appearance_type(m);
 				
 				if(m == rect::event::focus)
 					focus_flag = true;
 				if(m == rect::event::blur)
 					focus_flag = false;
 
-				if(app != rect::appearance::unknown) 
+				if(app != appearance::unknown) 
 					current_appearance = app;
 			}
 
@@ -40,12 +40,30 @@ namespace augs {
 
 				/* operator='s take care of copying only with active members */
 				switch(current_appearance) {
-				case rect::appearance::released: return base; break;
-				case rect::appearance::hovered: return style(base) = hovered;  break;
-				case rect::appearance::pushed: return (style(base) = hovered) = pushed;   break;
+				case appearance::released: return base; break;
+				case appearance::hovered: return style(base) = hovered;  break;
+				case appearance::pushed: return (style(base) = hovered) = pushed;   break;
 				default: return base;
 				}
 
+			}
+
+			stylesheet::appearance stylesheet::map_event_to_appearance_type(rect::event m) {
+				if (m == rect::event::hout
+					|| m == rect::event::lup
+					|| m == rect::event::loutup)
+					return appearance::released;
+
+				if (m == rect::event::hover)
+					return appearance::hovered;
+
+				if (m == rect::event::lpressed
+					|| m == rect::event::ldown
+					|| m == rect::event::ldoubleclick
+					|| m == rect::event::ltripleclick)
+					return appearance::pushed;
+
+				return appearance::unknown;
 			}
 		}
 	}

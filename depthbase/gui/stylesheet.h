@@ -6,6 +6,15 @@ namespace augs {
 	namespace graphics {
 		namespace gui {
 			struct stylesheet {
+				enum class appearance {
+					released,
+					hovered,
+					pushed,
+					unknown
+				};
+
+				/* how should rect look like depending on incoming event */
+				static appearance map_event_to_appearance_type(rect::event m);
 
 				template <class T>
 				struct attribute {
@@ -56,7 +65,7 @@ namespace augs {
 						   const style& pushed = style(),
 						   const style& focused = style());
 
-				rect::appearance current_appearance;
+				appearance current_appearance;
 
 				void update_appearance(rect::event);
 				style get_style() const;

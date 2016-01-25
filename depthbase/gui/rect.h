@@ -79,13 +79,6 @@ namespace augs {
 					event_info& operator=(event);
 				};
 
-				enum class appearance {
-					released,
-					hovered,
-					pushed,
-					unknown
-				};
-
 				rect* focus_next, *focus_prev;
 
 				bool draw, clip, fetch_wheel, scrollable, snap_scroll_to_content, preserve_focus, focusable;
@@ -132,9 +125,6 @@ namespace augs {
 				
 				/* simpler routine for more complex draws like text, origin is shifted to be local */
 				rects::ltrb<float>		 local_add(const material&, const rects::ltrb<float>& local, std::vector<augs::vertex_triangle>& v) const;
-				
-				/* how should rect look like depending on incoming event */
-				static appearance get_appearance(event m); 
 				
 				/*  does scroll not exceed the content */
 				bool is_scroll_aligned();

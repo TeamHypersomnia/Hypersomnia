@@ -344,24 +344,6 @@ namespace augs {
 				}
 			}
 
-			rect::appearance rect::get_appearance(rect::event m) {
-				if(		m == rect::event::hout 
-					||	m == rect::event::lup 
-					||	m == rect::event::loutup)
-					return appearance::released;
-
-				if(		m == rect::event::hover)
-					return appearance::hovered;
-
-				if(		m == rect::event::lpressed 
-					||	m == rect::event::ldown 
-					||	m == rect::event::ldoubleclick 
-					||	m == rect::event::ltripleclick )
-					return appearance::pushed;
-
-				return appearance::unknown;
-			}
-
 			bool rect::is_scroll_aligned() {
 				return rects::wh<float>(rc).is_sticked(content_size, scroll);
 			}

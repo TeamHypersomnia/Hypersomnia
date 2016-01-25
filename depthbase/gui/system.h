@@ -5,6 +5,7 @@
 #include "misc/timer.h"
 #include "graphics/pixel.h"
 #include "texture_baker/texture_baker.h"
+#include "texture_baker/font.h"
 #include "rect.h"
 
 namespace augs {
