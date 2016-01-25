@@ -18,7 +18,7 @@ hypersomnia_gui::hypersomnia_gui(glwindow& gl, texture* blank_texture) : sys(gl.
 
 	ltblue_theme();
 
-	//main_window.middlescroll.mat = material(textures + 4, pixel_32(255, 255, 255, 180));
+	//main_window.middlescroll.mat = material(textures + 4, rgba(255, 255, 255, 180));
 }
 
 void hypersomnia_gui::update() {

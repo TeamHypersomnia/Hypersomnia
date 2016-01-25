@@ -30,7 +30,7 @@ void callback_textbox::set_wrapping_width(unsigned w) {
 void callback_textbox::setup(augs::rects::xywh<float> area, bool is_input_textbox, font* default_font)
 {
 	//background = crect(rect_xywh(0, 0, 1000, 1000));
-	textbox_object = textbox_wrapper(ctextbox(textbox(area, augs::graphics::gui::text::style(default_font, augs::pixel_32(255, 255, 255, 255)))));
+	textbox_object = textbox_wrapper(ctextbox(textbox(area, augs::graphics::gui::text::style(default_font, augs::rgba(255, 255, 255, 255)))));
 	textbox_object.is_input_textbox = is_input_textbox;
 	textbox_object.sl = &myscrtx;
 	textbox_object.slh = &myscrhtx;
@@ -51,10 +51,10 @@ void callback_textbox::setup(augs::rects::xywh<float> area, bool is_input_textbo
 	/* visual settings */
 	textbox_object.print.blink.blink = true;
 	textbox_object.print.blink.interval_ms = 500;
-	textbox_object.print.selection_bg_mat = pixel_32(128, 255, 255, 120);
-	textbox_object.print.selection_inactive_bg_mat = pixel_32(128, 255, 255, 40);
-	textbox_object.print.highlight_mat = pixel_32(15, 15, 15, 150);
-	textbox_object.print.caret_mat = pixel_32(255, 255, 255, 255);
+	textbox_object.print.selection_bg_mat = rgba(128, 255, 255, 120);
+	textbox_object.print.selection_inactive_bg_mat = rgba(128, 255, 255, 40);
+	textbox_object.print.highlight_mat = rgba(15, 15, 15, 150);
+	textbox_object.print.caret_mat = rgba(255, 255, 255, 255);
 	textbox_object.print.highlight_current_line = true;
 	textbox_object.print.highlight_during_selection = true;
 	textbox_object.print.align_caret_height = true;
