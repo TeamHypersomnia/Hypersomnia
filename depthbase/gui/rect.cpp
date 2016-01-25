@@ -66,7 +66,7 @@ namespace augs {
 				content_size = this->get_content_size();
 				
 				/* align scroll only to be positive and not to exceed content size */
-				if(snap_scroll_to_content)
+				if(snap_scroll_to_content_size)
 					clamp_scroll_to_right_down_corner();
 
 				/* do the same for every child */
@@ -80,8 +80,8 @@ namespace augs {
 			}
 			
 			void rect::draw_rect(draw_info in, const material& mat) {
-				add_quad(mat, get_rect_absolute(), parent, in.v).good();
-				// rc_clipped = add_quad(mat, rc_clipped, parent, in.v);
+				draw_clipped_rectangle(mat, get_rect_absolute(), parent, in.v).good();
+				// rc_clipped = draw_clipped_rectangle(mat, rc_clipped, parent, in.v);
 			}
 			
 			void rect::draw_rect(draw_info in, const stylesheet& styles) {
@@ -358,16 +358,16 @@ namespace augs {
 			}
 
 			rects::ltrb<float> rect::local_add(const material& mat, const rects::ltrb<float>& origin, std::vector<augs::vertex_triangle>& v) const {
-				return add_quad(mat, origin+get_absolute_xy()-scroll, this, v);
+				return draw_clipped_rectangle(mat, origin+get_absolute_xy()-scroll, this, v);
 			}
 			
-			rects::ltrb<float> rect::add_quad(const material& mat, const rects::ltrb<float>& origin, const rect* p, std::vector<augs::vertex_triangle>& v) {
+			rects::ltrb<float> rect::draw_clipped_rectangle(const material& mat, const rects::ltrb<float>& origin, const rect* p, std::vector<augs::vertex_triangle>& v) {
 				/* if p is null, we don't clip at all
 				   if p is not null and p->clip is true, we take p->rc_clipped as clipper
 				   if p is not null and p->clip is false, we search for the first clipping parent's rc_clipped
 				*/
 
-				return gui::add_quad(mat, origin, &p->get_clipping_rect(), v); 
+				return gui::draw_clipped_rectangle(mat, origin, &p->get_clipping_rect(), v); 
 			}
 			
 			void rect::gen_focus_links() {

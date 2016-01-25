@@ -46,10 +46,10 @@ namespace augs {
 					lines[2].b -= top.width;
 				}
 
-				add_quad(left.  mat, lines[0], clipper, out);
-				add_quad(top.   mat, lines[1], clipper, out);
-				add_quad(right. mat, lines[2], clipper, out);
-				add_quad(bottom.mat, lines[3], clipper, out);
+				draw_clipped_rectangle(left.  mat, lines[0], clipper, out);
+				draw_clipped_rectangle(top.   mat, lines[1], clipper, out);
+				draw_clipped_rectangle(right. mat, lines[2], clipper, out);
+				draw_clipped_rectangle(bottom.mat, lines[3], clipper, out);
 			}
 			
 		}

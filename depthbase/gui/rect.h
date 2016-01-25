@@ -74,7 +74,7 @@ namespace augs {
 				bool clip = true;
 				bool fetch_wheel = false;
 				bool scrollable = true;
-				bool snap_scroll_to_content = true;
+				bool snap_scroll_to_content_size = true;
 				bool preserve_focus = false;
 				bool focusable = true;
 
@@ -117,7 +117,7 @@ namespace augs {
 				virtual void get_member_children(std::vector<rect*>& children);
 
 				/* passes 0 or clipper's rc_clipped as clipper depending on clipper's clip flag */
-				static rects::ltrb<float> add_quad (const material&, const rects::ltrb<float>& global, const rect* clipper, std::vector<augs::vertex_triangle>& v);
+				static rects::ltrb<float> draw_clipped_rectangle (const material&, const rects::ltrb<float>& global, const rect* clipper, std::vector<augs::vertex_triangle>& v);
 				
 				/* simpler routine for more complex draws like text, origin is shifted to be local */
 				rects::ltrb<float>		 local_add(const material&, const rects::ltrb<float>& local, std::vector<augs::vertex_triangle>& v) const;
