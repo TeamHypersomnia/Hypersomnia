@@ -113,11 +113,11 @@ namespace augs {
 				root.calculate_clipped_rectangle_layout();
 
 				if(rect_in_focus)
-					rect_in_focus->consume_gui_event(rect::event_info(*this, rect::event::blur));
+					rect_in_focus->consume_gui_event(rect::event_info(*this, rect::gui_event::blur));
 				
 				rect_in_focus = f;
 				if(f) {
-					f->consume_gui_event(rect::event_info(*this, rect::event::focus));
+					f->consume_gui_event(rect::event_info(*this, rect::gui_event::focus));
 					//f->scroll_to_view();
 				}
 			}
@@ -200,17 +200,17 @@ namespace augs {
 					return;
 				}
 
-				rect::event_info e(*this, rect::event::unknown);
+				rect::event_info e(*this, rect::gui_event::unknown);
 
 				if(gl.msg == event::lup) {
 					if(rect_held_by_lmb) {
 						if(rect_held_by_lmb->get_clipped_rect().hover(gl.mouse.pos)) {
-							rect_held_by_lmb->consume_gui_event(e = rect::event::lup);
-							rect_held_by_lmb->consume_gui_event(e = rect::event::lclick);
+							rect_held_by_lmb->consume_gui_event(e = rect::gui_event::lup);
+							rect_held_by_lmb->consume_gui_event(e = rect::gui_event::lclick);
 							pass = false;
 						}
 						else
-							rect_held_by_lmb->consume_gui_event(e = rect::event::loutup);
+							rect_held_by_lmb->consume_gui_event(e = rect::gui_event::loutup);
 						rect_held_by_lmb = 0;
 					}
 				} 
@@ -218,12 +218,12 @@ namespace augs {
 				if(gl.msg == event::rup) {
 					if(rect_held_by_rmb) {
 						if(rect_held_by_rmb->get_clipped_rect().hover(gl.mouse.pos)) {
-							rect_held_by_rmb->consume_gui_event(e = rect::event::rup);
-							rect_held_by_rmb->consume_gui_event(e = rect::event::rclick);
+							rect_held_by_rmb->consume_gui_event(e = rect::gui_event::rup);
+							rect_held_by_rmb->consume_gui_event(e = rect::gui_event::rclick);
 							pass = false;
 						}
 						else
-							rect_held_by_rmb->consume_gui_event(e = rect::event::routup);
+							rect_held_by_rmb->consume_gui_event(e = rect::gui_event::routup);
 						rect_held_by_rmb = 0;
 					}
 				} 
@@ -242,9 +242,9 @@ namespace augs {
 				}*/
 				if(rect_in_focus) {
 					switch(gl.msg) {
-					case event::keydown:   if(rect_in_focus->enable_drawing) rect_in_focus->consume_gui_event(e = rect::event::keydown); pass = false; break;
-					case event::keyup:	   if(rect_in_focus->enable_drawing) rect_in_focus->consume_gui_event(e = rect::event::keyup); pass = false; break;
-					case event::character: if(rect_in_focus->enable_drawing) rect_in_focus->consume_gui_event(e = rect::event::character); pass = false; break;
+					case event::keydown:   if(rect_in_focus->enable_drawing) rect_in_focus->consume_gui_event(e = rect::gui_event::keydown); pass = false; break;
+					case event::keyup:	   if(rect_in_focus->enable_drawing) rect_in_focus->consume_gui_event(e = rect::gui_event::keyup); pass = false; break;
+					case event::character: if(rect_in_focus->enable_drawing) rect_in_focus->consume_gui_event(e = rect::gui_event::character); pass = false; break;
 					default: break; 
 					}
 				}

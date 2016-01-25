@@ -124,7 +124,7 @@ namespace augs {
 					bool s = k[SHIFT], c = k[CTRL];
 
 					switch(e.msg) {
-					case rect::event::keydown:
+					case rect::gui_event::keydown:
 						switch(w.key) {
 						case LEFT:	
 							if(c) on_caret_left_word(s); 
@@ -165,24 +165,24 @@ namespace augs {
 						}
 						break;
 
-					case rect::event::character:
+					case rect::gui_event::character:
 						if (editable && w.key != BACKSPACE && !c) on_character(w.utf16);
 						
 						break;
 
-					case rect::event::ldown: on_place_caret(mouse, false); break;
-					case rect::event::rdown: break;
-					case rect::event::lpressed: on_place_caret(mouse, true); break;
-					case rect::event::loutdrag: on_drag(mouse); break;
-					case rect::event::ldoubleclick: on_select_word(mouse); break;
-					case rect::event::ltripleclick: on_select_line(mouse); break;
+					case rect::gui_event::ldown: on_place_caret(mouse, false); break;
+					case rect::gui_event::rdown: break;
+					case rect::gui_event::lpressed: on_place_caret(mouse, true); break;
+					case rect::gui_event::loutdrag: on_drag(mouse); break;
+					case rect::gui_event::ldoubleclick: on_select_word(mouse); break;
+					case rect::gui_event::ltripleclick: on_select_line(mouse); break;
 
-					case rect::event::lup:		drag.stop(); break;
-					case rect::event::hover:	drag.stop(); break;
-					case rect::event::loutup:	drag.stop(); break;
+					case rect::gui_event::lup:		drag.stop(); break;
+					case rect::gui_event::hover:	drag.stop(); break;
+					case rect::gui_event::loutup:	drag.stop(); break;
 
-					case rect::event::focus: print.active = true;   blink_reset = true; break;
-					case rect::event::blur: print.active = false;  break;
+					case rect::gui_event::focus: print.active = true;   blink_reset = true; break;
+					case rect::gui_event::blur: print.active = false;  break;
 
 					default: break;
 					}
@@ -214,7 +214,7 @@ namespace augs {
 				}
 
 				void property_textbox::consume_gui_event(event_info e) {
-					if(e.msg == rect::event::blur) {
+					if(e.msg == rect::gui_event::blur) {
 						std::wstring ws = misc::wstr(editor.get_str());
 						if(property_guard) property_guard(ws);
 						editor.select_all(); 

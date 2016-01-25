@@ -87,7 +87,7 @@ namespace augs {
 					if(!is_needed()) return;
 					auto& gr = e.owner;
 					auto& wnd = gr.state;
-					if(e == event::ldown && box) {
+					if(e == gui_event::ldown && box) {
 						gr.rect_held_by_lmb = box;
 						if(flags & orientation::HORIZONTAL) {
 							box->rc.center_x(wnd.mouse.pos.x - get_rect_absolute().l);
@@ -105,7 +105,7 @@ namespace augs {
 					auto& ms = e.owner.state.mouse;
 					scrollarea* pp = (scrollarea*)parent;
 					if(!pp->is_needed()) return;
-					if(e == event::ldrag) {
+					if(e == gui_event::ldrag) {
 						if(pp->flags & orientation::HORIZONTAL) {
 							rc.x(where_dragging_started.x + ms.pos.x - ms.ldrag.x);
 							pp->update_scroll_x();

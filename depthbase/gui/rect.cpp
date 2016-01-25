@@ -12,13 +12,13 @@ namespace augs {
 		namespace gui {
 			rect::draw_info::draw_info(gui_world& owner, std::vector<augs::vertex_triangle>& v) : owner(owner), v(v) {}
 			rect::poll_info::poll_info(gui_world& owner, unsigned msg) : owner(owner), msg(msg), mouse_fetched(false), scroll_fetched(false) {}
-			rect::event_info::event_info(gui_world& owner, rect::event msg) : owner(owner), msg(msg) {}
+			rect::event_info::event_info(gui_world& owner, rect::gui_event msg) : owner(owner), msg(msg) {}
 			
-			rect::event_info::operator rect::event() {
+			rect::event_info::operator rect::gui_event() {
 				return msg;
 			}
 					
-			rect::event_info& rect::event_info::operator=(event m) {
+			rect::event_info& rect::event_info::operator=(gui_event m) {
 				msg = m;
 				return *this;
 			}
@@ -125,7 +125,7 @@ namespace augs {
 			void rect::scroll_content_with_wheel(event_info e) {
 				auto& sys =	e.owner;
 				auto& wnd = sys.state;
-				if(e == event::wheel) {
+				if(e == gui_event::wheel) {
 					if(window::glwindow::get_current()->events.keys[augs::window::event::keys::SHIFT]) {
 						int temp(int(scroll.x));
 						if(scrollable) {
@@ -133,7 +133,7 @@ namespace augs {
 							clamp_scroll_to_right_down_corner();
 						}
 						if((!scrollable || temp == scroll.x) && parent) {
-							parent->consume_gui_event(e = event::wheel);
+							parent->consume_gui_event(e = gui_event::wheel);
 						}
 					}
 					else {
@@ -143,7 +143,7 @@ namespace augs {
 							clamp_scroll_to_right_down_corner();
 						}
 						if((!scrollable || temp == scroll.y) && parent) {
-							parent->consume_gui_event(e = event::wheel);
+							parent->consume_gui_event(e = gui_event::wheel);
 						}
 					}
 				}
@@ -152,7 +152,7 @@ namespace augs {
 			void rect::try_to_enable_middlescrolling(event_info e) {
 				auto& gr = e.owner;
 				auto& wnd = gr.state;
-				if(e == event::mdown || e == event::mdoubleclick) {
+				if(e == gui_event::mdown || e == gui_event::mdoubleclick) {
 					if(scrollable && !content_size.inside(rects::wh<float>(rc))) {
 						gr.middlescroll.subject = this;
 						gr.middlescroll.pos = wnd.mouse.pos;
@@ -166,11 +166,11 @@ namespace augs {
 			void rect::try_to_make_this_rect_focused(event_info e) {
 				if(!focusable) return;
 				auto& sys =	 e.owner;
-				if(e == event::ldown ||
-					e == event::ldoubleclick ||
-					e == event::ltripleclick ||
-					e == event::rdoubleclick ||
-					e == event::rdown
+				if(e == gui_event::ldown ||
+					e == gui_event::ldoubleclick ||
+					e == gui_event::ltripleclick ||
+					e == gui_event::rdoubleclick ||
+					e == gui_event::rdown
 					) {
 						if(sys.get_rect_in_focus() != nullptr) {
 							if(preserve_focus || !sys.get_rect_in_focus()->preserve_focus)
@@ -182,19 +182,19 @@ namespace augs {
 			
 			bool rect::focus_next_rect_by_tab(event_info e) {
 				using namespace augs::window::event::keys;
-				if(e == event::keydown && e.owner.state.key == TAB) {
+				if(e == gui_event::keydown && e.owner.state.key == TAB) {
 					rect* f = seek_focusable(this, window::glwindow::get_current()->events.keys[LSHIFT]);
 					if(f) e.owner.set_focus(f);
 					return true;
 				}
 				/* in case it's character event */
-				if(e == event::character && e.owner.state.key == TAB) return true;
+				if(e == gui_event::character && e.owner.state.key == TAB) return true;
 				return false;
 			}
 
 			bool rect::focus_next_rect_by_arrows(event_info e) {
 				using namespace augs::window::event::keys;
-				if(e == event::keydown) {
+				if(e == gui_event::keydown) {
 					rect* f = nullptr;
 					switch(e.owner.state.key) {
 					case DOWN: f = seek_focusable(this, false); break;
@@ -215,13 +215,13 @@ namespace augs {
 
 			bool rect::focus_next_rect_by_enter(event_info e) {
 				using namespace augs::window::event::keys;
-				if(e == event::keydown && e.owner.state.key == ENTER) {
+				if(e == gui_event::keydown && e.owner.state.key == ENTER) {
 					rect* f = seek_focusable(this, window::glwindow::get_current()->events.keys[LSHIFT]);
 					if(f) e.owner.set_focus(f);
 					return true;
 				}
 				/* in case it's character event */
-				if(e == event::character && e.owner.state.key == ENTER) return true;
+				if(e == gui_event::character && e.owner.state.key == ENTER) return true;
 				return false;
 			}
 			
@@ -249,7 +249,7 @@ namespace augs {
 				auto& gr = inf.owner;
 				auto& m = gr.state.mouse;
 				unsigned msg = inf.msg;
-				event_info e(gr, event::unknown);
+				event_info e(gr, gui_event::unknown);
 
 				if(enable_drawing) {
 					auto children_all = children;
@@ -260,59 +260,59 @@ namespace augs {
 						children_all[i]->consume_raw_input_and_generate_gui_events(inf);
 					}
 
-					//if(msg == key::down) consume_gui_event(e = event::keydown); 
-					//else if(msg == key::up) consume_gui_event(e = event::keyup); 
-					//else if(msg == key::character) consume_gui_event(e = event::character); 
-					//else if(msg == key::unichar) consume_gui_event(e = event::unichar); 
+					//if(msg == key::down) consume_gui_event(e = gui_event::keydown); 
+					//else if(msg == key::up) consume_gui_event(e = gui_event::keyup); 
+					//else if(msg == key::character) consume_gui_event(e = gui_event::character); 
+					//else if(msg == key::unichar) consume_gui_event(e = gui_event::unichar); 
 					//else {
 						bool hover = rc_clipped.hover(m.pos);
 
 						if(hover && !inf.mouse_fetched) {
 							if(!was_hovered) 
-								consume_gui_event(e = event::hover);
+								consume_gui_event(e = gui_event::hover);
 							
 							inf.mouse_fetched = was_hovered = true;
 							if(msg == lup) {
-								consume_gui_event(e = event::lup);	
+								consume_gui_event(e = gui_event::lup);	
 							}
 							if(msg == ldown) {
 								gr.rect_held_by_lmb = this;
-								consume_gui_event(e = event::ldown);	
+								consume_gui_event(e = gui_event::ldown);	
 							}
 							if(msg == mdown) {
-								consume_gui_event(e = event::mdown);	
+								consume_gui_event(e = gui_event::mdown);	
 							}
 							if(msg == mdoubleclick) {
-								consume_gui_event(e = event::mdoubleclick);	
+								consume_gui_event(e = gui_event::mdoubleclick);	
 							}
 							if(msg == ldoubleclick) {
 								gr.rect_held_by_lmb = this;
-								consume_gui_event(e = event::ldoubleclick);	
+								consume_gui_event(e = gui_event::ldoubleclick);	
 							}
 							if(msg == ltripleclick) {
 								gr.rect_held_by_lmb = this;
-								consume_gui_event(e = event::ltripleclick);	
+								consume_gui_event(e = gui_event::ltripleclick);	
 							}
 							if(msg == rdown) {
 								gr.rect_held_by_rmb = this;
-								consume_gui_event(e = event::rdown);
+								consume_gui_event(e = gui_event::rdown);
 							}
 							if(msg == rdoubleclick) {
 								gr.rect_held_by_rmb = this;
-								consume_gui_event(e = event::rdoubleclick);
+								consume_gui_event(e = gui_event::rdoubleclick);
 							}
 
 							if(msg == wheel) {
-								consume_gui_event(e = event::wheel);
+								consume_gui_event(e = gui_event::wheel);
 							}
 
 							if(gr.rect_held_by_lmb == this && msg == mousemotion && m.state[0] && rc_clipped.hover(m.ldrag)) {
 								gr.rect_held_by_lmb = this;
-								consume_gui_event(e = event::lpressed);
+								consume_gui_event(e = gui_event::lpressed);
 							}
 							if(gr.rect_held_by_rmb == this && msg == mousemotion && m.state[1] && rc_clipped.hover(m.rdrag)) {
 								gr.rect_held_by_rmb = this;
-								consume_gui_event(e = event::rpressed);
+								consume_gui_event(e = gui_event::rpressed);
 							}
 						}
 						else if(hover) {
@@ -321,16 +321,16 @@ namespace augs {
 						else if(!hover) {
 							if(msg == mousemotion) {
 								if(was_hovered) {
-									consume_gui_event(e = event::hout);
+									consume_gui_event(e = gui_event::hout);
 									was_hovered = false;
 								}
 								if(gr.rect_held_by_lmb == this) {
-									consume_gui_event(e = event::loutdrag);
+									consume_gui_event(e = gui_event::loutdrag);
 								}
 							}
 						}
 						if(gr.rect_held_by_lmb == this && msg == mousemotion) {
-							consume_gui_event(e = event::ldrag);
+							consume_gui_event(e = gui_event::ldrag);
 						}
 					//}
 					if(gr.rect_held_by_lmb != this) where_dragging_started = vec2i(rc.l, rc.t);

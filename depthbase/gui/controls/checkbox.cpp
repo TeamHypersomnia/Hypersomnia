@@ -28,8 +28,8 @@ namespace augs {
 				}
 
 				void checkbox::consume_gui_event(event_info e) {
-					if(e == rect::event::lclick ||
-					   e == rect::event::keydown && (e.owner.state.key == augs::window::event::keys::ENTER)) {
+					if(e == rect::gui_event::lclick ||
+					   e == rect::gui_event::keydown && (e.owner.state.key == augs::window::event::keys::ENTER)) {
 						set_state(!get_state());
 						if(callback) callback(get_state());
 					}

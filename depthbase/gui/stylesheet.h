@@ -14,7 +14,7 @@ namespace augs {
 				};
 
 				/* how should rect look like depending on incoming event */
-				static appearance map_event_to_appearance_type(rect::event m);
+				static appearance map_event_to_appearance_type(rect::gui_event m);
 
 				template <class T>
 				struct attribute {
@@ -67,7 +67,7 @@ namespace augs {
 
 				appearance current_appearance;
 
-				void update_appearance(rect::event);
+				void update_appearance(rect::gui_event);
 				style get_style() const;
 
 			private:

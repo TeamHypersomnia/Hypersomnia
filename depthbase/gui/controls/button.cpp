@@ -24,11 +24,11 @@ namespace augs {
 
 				void button::consume_gui_event(event_info m) {
 					switch(m) {
-					case event::lclick: if(on_click) on_click(); break;
-					case event::hover: if(on_hover) on_hover(); break;
-					case event::ldown: if(on_lmousedown) on_mousedown(); break;
-					case event::lup: if(on_lmouseup) on_mouseup(); break;
-					case event::keydown: if(m.owner.state.key == augs::window::event::keys::ENTER) on_click(); break;
+					case gui_event::lclick: if(on_click) on_click(); break;
+					case gui_event::hover: if(on_hover) on_hover(); break;
+					case gui_event::ldown: if(on_lmousedown) on_mousedown(); break;
+					case gui_event::lup: if(on_lmouseup) on_mouseup(); break;
+					case gui_event::keydown: if(m.owner.state.key == augs::window::event::keys::ENTER) on_click(); break;
 					default: break;
 					}
 					try_to_make_this_rect_focused(m);

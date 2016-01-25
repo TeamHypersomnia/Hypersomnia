@@ -9,7 +9,7 @@ namespace augs {
 			struct stylesheet;
 			class gui_world;
 			struct rect {
-				enum class event {
+				enum class gui_event {
 					unknown,
 					keydown,
 					keyup,
@@ -60,11 +60,11 @@ namespace augs {
 
 				struct event_info {
 					gui_world& owner;
-					event msg;
+					gui_event msg;
 
-					event_info(gui_world&, event);
-					operator event();
-					event_info& operator=(event);
+					event_info(gui_world&, gui_event);
+					operator gui_event();
+					event_info& operator=(gui_event);
 				};
 
 				rect* next_focusable = nullptr;
@@ -142,6 +142,10 @@ namespace augs {
 				static rect* seek_focusable(rect*, bool);
 			protected:
 				friend class gui_world;
+
+				struct traversal_state {
+
+				};
 
 				rect* parent = nullptr;
 				gui_world* parent_group = nullptr;
