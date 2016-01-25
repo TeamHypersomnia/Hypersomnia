@@ -33,6 +33,10 @@ namespace augs {
 					print.blink.update();
 				}
 				
+				void textbox::draw_triangles(draw_info in) {
+					draw_text_ui(in);
+				}
+
 				vec2i textbox::local_mouse(vec2i global_mouse) {
 					return global_mouse + scroll - get_absolute_xy();
 				}

@@ -40,8 +40,6 @@ namespace augs {
 					} flags;
 
 					scrollarea(const rects::xywh<float>& rc, rect* origin, slider* box, orientation flags);
-
-					void draw_slider(draw_info);
 				};
 			}
 		}

@@ -18,7 +18,6 @@ namespace augs {
 					operator bool()  const;
 
 					void set_state(bool);
-					void update_dynamic_state();
 
 					checkbox(const rect& = rect(), bool set = false, 
 						const std::function<void (bool)>& callback = nullptr); 

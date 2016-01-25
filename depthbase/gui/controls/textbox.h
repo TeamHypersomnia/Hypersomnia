@@ -44,6 +44,7 @@ namespace augs {
 					virtual rects::wh<float> get_content_size() override;
 					virtual void consume_gui_event(event_info) override;
 					virtual void perform_logic_step(gui_world&) override;
+					virtual void draw_triangles(draw_info) override;
 
 					void draw_text_ui(draw_info);
 					void pass_gui_event_to_text_editor(event_info);

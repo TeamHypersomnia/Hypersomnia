@@ -139,27 +139,27 @@ namespace augs {
 					
 					void crect::draw_triangles(draw_info in) {
 						draw_rectangle_stylesheeted(in, styles);
-						draw_children(in);
+						rect::draw_triangles(in);
 					}
 					
 					void cbutton::draw_triangles(draw_info in) {
 						draw_rectangle_stylesheeted(in, styles);
-						draw_children(in);
+						button::draw_triangles(in);
 					}
 
 					void ctext_button::draw_triangles(draw_info in) {
 						draw_rectangle_stylesheeted(in, styles);
-						draw_children(in);
+						text_button::draw_triangles(in);
 					}
 
 					void ccheckbox::draw_triangles(draw_info in) {
 						draw_rectangle_stylesheeted(in, get_state() ? styles_active : styles_inactive);
-						draw_children(in);
+						checkbox::draw_triangles(in);
 					}
 
 					void cchecklabel::draw_triangles(draw_info in) {
 						draw_rectangle_stylesheeted(in, get_state() ? styles_active : styles_inactive);
-						draw_children(in);
+						checklabel::draw_triangles(in);
 					}
 					
 					void cslider::draw_triangles(draw_info in) {
@@ -168,17 +168,17 @@ namespace augs {
 
 					void cscrollarea::draw_triangles(draw_info in) {
 						draw_rectangle_stylesheeted(in, styles);
-						draw_slider(in);
+						scrollarea::draw_triangles(in);
 					}
 					
 					void ctextbox::draw_triangles(draw_info in) {					
 						draw_rectangle_stylesheeted(in, styles);
-						draw_text_ui(in);
+						textbox::draw_triangles(in);
 					}
 
 					void cproperty_textbox::draw_triangles(draw_info in) {					
 						draw_rectangle_stylesheeted(in, styles);
-						draw_text_ui(in);
+						property_textbox::draw_triangles(in);
 					}
 				}
 			}

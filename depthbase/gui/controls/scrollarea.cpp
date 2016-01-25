@@ -13,10 +13,6 @@ namespace augs {
 						children.push_back(box);
 				}
 					
-				void scrollarea::draw_slider(draw_info in) {
-					draw_children(in);
-				}
-
 				scrollarea::slider::slider(int min_side) : min_side(min_side) {}
 
 				bool scrollarea::is_needed() {
