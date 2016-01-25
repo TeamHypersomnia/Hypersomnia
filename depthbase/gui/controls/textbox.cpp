@@ -25,7 +25,7 @@ namespace augs {
 				}
 				
 				void textbox::perform_logic_step(gui_world& owner) {
-					drag.move(scroll, owner.delta_milliseconds);
+					drag.move(scroll, owner.delta_milliseconds());
 
 					if(drag.vel[0] != 0.f || drag.vel[1] != 0.f)
 						on_drag(owner.state.mouse.pos);

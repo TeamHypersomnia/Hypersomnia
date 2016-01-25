@@ -32,6 +32,8 @@ namespace augs {
 			}
 
 			class gui_world {
+				float delta_ms = 1000 / 60.f;
+
 			public:
 				class clipboard {
 					bool
@@ -66,8 +68,6 @@ namespace augs {
 
 				augs::window::event::state state;
 
-				float delta_milliseconds = 1000 / 60.f;
-
 				rect *rect_held_by_lmb = nullptr;
 				rect *rect_held_by_rmb = nullptr;
 
@@ -77,6 +77,7 @@ namespace augs {
 				gui_world();
 
 				void set_delta_milliseconds(float);
+				float delta_milliseconds();
 
 				void set_focus(rect*);
 				rect* get_rect_in_focus() const;

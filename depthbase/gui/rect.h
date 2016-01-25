@@ -94,7 +94,7 @@ namespace augs {
 				void consume_raw_input_and_generate_gui_events(poll_info&); /* event generator */
 				
 				virtual void consume_gui_event(event_info); /* event listener */
-				virtual void draw_proc(draw_info);
+				virtual void draw_triangles(draw_info);
 
 				/* consume_gui_event default subroutines */
 				void scroll_content_with_wheel(event_info);
@@ -109,9 +109,9 @@ namespace augs {
 				/* if this handler returns true, enter should not later be processed as a keydown event (used in textbox, for example) */
 				bool focus_next_rect_by_enter(event_info);
 
-				/* draw_proc default subroutines */
-				void draw_rect		(draw_info in, const material& = material()), 
-					 draw_rect		(draw_info in, const stylesheet&),
+				/* draw_triangles default subroutines */
+				void draw_rectangle_with_material(draw_info in, const material& = material()),
+					 draw_rectangle_stylesheeted(draw_info in, const stylesheet&),
 					 draw_children	(draw_info in);
 
 				virtual void get_member_children(std::vector<rect*>& children);

@@ -145,7 +145,7 @@ namespace augs {
 
 				if(middlescroll.subject) {
 					vec2i tempp = middlescroll.subject->scroll; 
-					middlescroll.subject->scroll += (state.mouse.pos - middlescroll.pos) * float(middlescroll.speed_mult*delta_milliseconds);
+					middlescroll.subject->scroll += (state.mouse.pos - middlescroll.pos) * float(middlescroll.speed_mult*delta_milliseconds());
 				}
 			}
 
@@ -169,8 +169,13 @@ namespace augs {
 			}
 
 			void gui_world::set_delta_milliseconds(float delta) {
-				delta_milliseconds = delta;
+				delta_ms = delta;
 			}
+			
+			float gui_world::delta_milliseconds() {
+				return delta_ms;
+			}
+
 
 			void gui_world::clipboard::change_clipboard() {
 				if(!own_copy && fetch_clipboard) {

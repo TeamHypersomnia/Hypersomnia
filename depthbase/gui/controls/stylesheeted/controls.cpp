@@ -137,47 +137,47 @@ namespace augs {
 						styles.update_appearance(m);
 					}
 					
-					void crect::draw_proc(draw_info in) {
-						draw_rect(in, styles);
+					void crect::draw_triangles(draw_info in) {
+						draw_rectangle_stylesheeted(in, styles);
 						draw_children(in);
 					}
 					
-					void cbutton::draw_proc(draw_info in) {
-						draw_rect(in, styles);
+					void cbutton::draw_triangles(draw_info in) {
+						draw_rectangle_stylesheeted(in, styles);
 						draw_children(in);
 					}
 
-					void ctext_button::draw_proc(draw_info in) {
-						draw_rect(in, styles);
+					void ctext_button::draw_triangles(draw_info in) {
+						draw_rectangle_stylesheeted(in, styles);
 						draw_children(in);
 					}
 
-					void ccheckbox::draw_proc(draw_info in) {
-						draw_rect(in, get_state() ? styles_active : styles_inactive);
+					void ccheckbox::draw_triangles(draw_info in) {
+						draw_rectangle_stylesheeted(in, get_state() ? styles_active : styles_inactive);
 						draw_children(in);
 					}
 
-					void cchecklabel::draw_proc(draw_info in) {
-						draw_rect(in, get_state() ? styles_active : styles_inactive);
+					void cchecklabel::draw_triangles(draw_info in) {
+						draw_rectangle_stylesheeted(in, get_state() ? styles_active : styles_inactive);
 						draw_children(in);
 					}
 					
-					void cslider::draw_proc(draw_info in) {
-						draw_rect(in, styles);
+					void cslider::draw_triangles(draw_info in) {
+						draw_rectangle_stylesheeted(in, styles);
 					}
 
-					void cscrollarea::draw_proc(draw_info in) {
-						draw_rect(in, styles);
+					void cscrollarea::draw_triangles(draw_info in) {
+						draw_rectangle_stylesheeted(in, styles);
 						draw_slider(in);
 					}
 					
-					void ctextbox::draw_proc(draw_info in) {					
-						draw_rect(in, styles);
+					void ctextbox::draw_triangles(draw_info in) {					
+						draw_rectangle_stylesheeted(in, styles);
 						draw_text_ui(in);
 					}
 
-					void cproperty_textbox::draw_proc(draw_info in) {					
-						draw_rect(in, styles);
+					void cproperty_textbox::draw_triangles(draw_info in) {					
+						draw_rectangle_stylesheeted(in, styles);
 						draw_text_ui(in);
 					}
 				}

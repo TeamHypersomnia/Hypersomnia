@@ -28,7 +28,7 @@ namespace augs {
 						stylesheet styles;
 						crect(const rects::xywh<float>& r = rects::xywh<float>(), const stylesheet& styles = rect_style);
 
-						virtual void draw_proc(draw_info in) override;
+						virtual void draw_triangles(draw_info in) override;
 						virtual void consume_gui_event(event_info) override;
 					};
 					
@@ -36,7 +36,7 @@ namespace augs {
 						stylesheet styles;
 						cbutton(const button& r = button(), const stylesheet& styles = button_style);
 
-						virtual void draw_proc(draw_info in) override;
+						virtual void draw_triangles(draw_info in) override;
 						virtual void consume_gui_event(event_info) override;
 					};
 
@@ -44,7 +44,7 @@ namespace augs {
 						stylesheet styles;
 						ctext_button(const text_button& r, const stylesheet& styles = text_button_style);
 
-						virtual void draw_proc(draw_info in) override;
+						virtual void draw_triangles(draw_info in) override;
 						virtual void consume_gui_event(event_info) override;
 					};
 
@@ -53,7 +53,7 @@ namespace augs {
 
 						ccheckbox(const checkbox& = checkbox(), const stylesheet& styles_active = checkbox_active, const stylesheet& styles_inactive = checkbox_inactive);
 
-						virtual void draw_proc(draw_info in) override;
+						virtual void draw_triangles(draw_info in) override;
 						virtual void consume_gui_event(event_info) override;
 					};
 
@@ -62,7 +62,7 @@ namespace augs {
 
 						cchecklabel(const checklabel&, const stylesheet& styles_active = checklabel_active, const stylesheet& styles_inactive = checklabel_inactive);
 
-						virtual void draw_proc(draw_info in) override;
+						virtual void draw_triangles(draw_info in) override;
 						virtual void consume_gui_event(event_info) override;
 					};
 					
@@ -70,7 +70,7 @@ namespace augs {
 						stylesheet styles;
 						ctextbox(const textbox& r = textbox(), const stylesheet& = textbox_style);
 
-						virtual void draw_proc(draw_info in) override;
+						virtual void draw_triangles(draw_info in) override;
 						virtual void consume_gui_event(event_info) override;
 					};
 
@@ -78,7 +78,7 @@ namespace augs {
 						stylesheet styles;
 						cproperty_textbox(const property_textbox& r, const stylesheet& = property_textbox_style);
 
-						virtual void draw_proc(draw_info in) override;
+						virtual void draw_triangles(draw_info in) override;
 						virtual void consume_gui_event(event_info) override;
 					};
 
@@ -87,7 +87,7 @@ namespace augs {
 
 						cslider(const scrollarea::slider& r, const stylesheet& = slider_style);
 
-						virtual void draw_proc(draw_info in) override;
+						virtual void draw_triangles(draw_info in) override;
 						virtual void consume_gui_event(event_info m) override;
 					};
 
@@ -96,7 +96,7 @@ namespace augs {
 
 						cscrollarea(const scrollarea& r, const stylesheet& = scrollarea_style);
 
-						virtual void draw_proc(draw_info in) override;
+						virtual void draw_triangles(draw_info in) override;
 						virtual void consume_gui_event(event_info m) override;
 					};
 				}

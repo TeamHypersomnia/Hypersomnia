@@ -7,14 +7,10 @@ namespace augs {
 				text_rect::text_rect(const rect& r, const fstr& _str) : rect(r), draft(_str) {
 					clip = focusable = false;
 				}
-					
-				void text_rect::draw(draw_info in, rect& subject) {
-					draft.guarded_redraw();
-					print.draw_text(in.v, draft.get_draft(), draft.get_str(), 0, subject);
-				}
 
-				void text_rect::draw_proc(draw_info in) {
-					draw(in, *this);
+				void text_rect::draw_triangles(draw_info in) {
+					draft.guarded_redraw();
+					print.draw_text(in.v, draft.get_draft(), draft.get_str(), 0, *this);
 				}
 
 				void text_rect::center(rects::ltrb<float> r) {

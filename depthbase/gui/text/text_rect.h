@@ -11,8 +11,7 @@ namespace augs {
 					text::printer print;
 					text_rect(const rect& = rect(), const fstr& = fstr());
 					
-					void draw(draw_info, rect& subject);
-					virtual void draw_proc(draw_info) override;
+					virtual void draw_triangles(draw_info) override;
 
 					void center(rects::ltrb<float>);
 				};

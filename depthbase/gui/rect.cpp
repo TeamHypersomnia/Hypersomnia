@@ -79,16 +79,16 @@ namespace augs {
 				}
 			}
 			
-			void rect::draw_rect(draw_info in, const material& mat) {
+			void rect::draw_rectangle_with_material(draw_info in, const material& mat) {
 				draw_clipped_rectangle(mat, get_rect_absolute(), parent, in.v).good();
 				// rc_clipped = draw_clipped_rectangle(mat, rc_clipped, parent, in.v);
 			}
 			
-			void rect::draw_rect(draw_info in, const stylesheet& styles) {
+			void rect::draw_rectangle_stylesheeted(draw_info in, const stylesheet& styles) {
 				auto st = styles.get_style();
 
 				if(st.color.active || st.background_image.active)
-					draw_rect(in, material(st));
+					draw_rectangle_with_material(in, material(st));
 				
 				if(st.border.active) st.border.value.draw(in.v, *this);
 			}
@@ -99,7 +99,7 @@ namespace augs {
 				for(size_t i = 0; i < children_all.size(); ++i) { 
 					children_all[i]->parent = this;
 					if(children_all[i]->enable_drawing)
-					   children_all[i]->draw_proc(in);
+					   children_all[i]->draw_triangles(in);
 				}
 			}
 			 
@@ -116,7 +116,7 @@ namespace augs {
 				}
 			}
 			
-			void rect::draw_proc(draw_info in) {
+			void rect::draw_triangles(draw_info in) {
 				draw_children(in);
 			}
 
