@@ -25,8 +25,8 @@ namespace augs {
 		void remove(augs::entity_id);
 		void clear();
 
-		double per_second();
-		double frame_time();
+		double delta_seconds();
+		double delta_milliseconds();
 		double view_interpolation_ratio();
 		augs::renderer& get_renderer();
 

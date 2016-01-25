@@ -95,6 +95,8 @@ namespace scene_builders {
 			{
 				auto background = world.create_entity();
 				archetypes::sprite(background, vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, augs::colors::white, render_layer::GROUND);
+				//archetypes::static_crate_physics(background);
+
 				auto street = world.create_entity();
 				archetypes::sprite_scalled(street, vec2(x, y) * (bg_size + vec2(1500, 700)) - vec2(1500, 700), 
 					vec2(3000, 3000),

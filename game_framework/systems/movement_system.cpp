@@ -50,14 +50,14 @@ void movement_system::apply_movement_forces() {
 		resultant.y = movement.moving_backward * movement.input_acceleration_axes.y - movement.moving_forward * movement.input_acceleration_axes.y;
 
 		if (maybe_physics == nullptr) {
-			it->get<components::transform>().pos += resultant * per_second();
+			it->get<components::transform>().pos += resultant * delta_seconds();
 			continue;
 		}
 
 		auto& physics = *maybe_physics;
 		
 		if (movement.make_inert_for_ms > 0.f) {
-			movement.make_inert_for_ms -= per_second()*1000.0;
+			movement.make_inert_for_ms -= delta_milliseconds();
 			physics.set_linear_damping(2);
 		}
 		else

@@ -37,7 +37,7 @@ void lookat_system::resolve_lookat_value(augs::entity_id it) {
 
 	if (lookat.easing_mode == lookat.EXPONENTIAL) {
 		float averaging_constant = static_cast<float>(
-			pow(lookat.smoothing_average_factor, lookat.averages_per_sec * frame_time())
+			pow(lookat.smoothing_average_factor, lookat.averages_per_sec * delta_seconds())
 			);
 
 		lookat.last_rotation_interpolant = (lookat.last_rotation_interpolant * averaging_constant + new_rotation * (1.0f - averaging_constant)).normalize();

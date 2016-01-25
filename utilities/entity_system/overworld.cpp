@@ -15,7 +15,7 @@ namespace augs {
 	}
 
 	float overworld::deterministic_timer::get_milliseconds() const {
-		return get_steps() * static_cast<float>(overworld->accumulator.get_timestep());
+		return get_steps() * static_cast<float>(overworld->accumulator.delta_milliseconds());
 	}
 
 	float overworld::deterministic_timer::extract_milliseconds() {
@@ -42,11 +42,19 @@ namespace augs {
 		return deterministic_timer(this);
 	}
 
-	void overworld::update_frame_timer() {
-		frame_time = frame_timer.extract<std::chrono::seconds>();
+	double overworld::delta_seconds() {
+		return delta_ms / 1000.0;
 	}
 
-	double overworld::get_frame_time() {
-		return frame_time;
+	double overworld::delta_milliseconds() {
+		return delta_ms;
+	}
+
+	void overworld::assign_frame_time_to_delta() {
+		delta_ms = frame_timer.extract<std::chrono::milliseconds>();
+	}
+
+	void overworld::restore_fixed_delta() {
+		delta_ms = accumulator.delta_milliseconds();
 	}
 }

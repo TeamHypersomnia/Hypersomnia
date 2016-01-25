@@ -26,10 +26,10 @@ namespace augs {
 		double get_ratio() const;
 
 		/* a scalar that you should multiply your numbers by to get speed per second */
-		double per_second() const;
+		double delta_seconds() const;
 
 		/* get fixed_dt_milliseconds */
-		double get_timestep() const;
+		double delta_milliseconds() const;
 
 		double get_hz() const;
 

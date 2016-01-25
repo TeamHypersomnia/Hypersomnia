@@ -44,7 +44,7 @@ namespace augs {
 		reset_timer();
 	}
 
-	double delta_accumulator::per_second() const {
+	double delta_accumulator::delta_seconds() const {
 		/* it's 1/fps */
 		return fixed_dt_milliseconds / 1000.0;
 	}
@@ -53,7 +53,7 @@ namespace augs {
 		return fps;
 	}
 
-	double delta_accumulator::get_timestep() const {
+	double delta_accumulator::delta_milliseconds() const {
 		return fixed_dt_milliseconds;
 	}
 

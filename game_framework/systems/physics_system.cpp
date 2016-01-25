@@ -516,7 +516,7 @@ void physics_system::step_and_set_new_transforms() {
 
 	listener.after_step_callbacks.clear();
 
-	b2world.Step(static_cast<float32>(per_second()), velocityIterations, positionIterations);
+	b2world.Step(static_cast<float32>(delta_seconds()), velocityIterations, positionIterations);
 	b2world.ClearForces();
 
 	for (auto& c : listener.after_step_callbacks)
@@ -586,26 +586,9 @@ void physics_system::recurential_friction_handler(entity_id entity, entity_id fr
 	recurential_friction_handler(entity, friction_entity->get<components::physics>().get_owner_friction_ground());
 
 	auto friction_body = friction_physics.get_body();
+	auto fricted_pos = physics.body->GetPosition() + delta_seconds() * friction_body->GetLinearVelocityFromWorldPoint(physics.body->GetPosition());
 
-	auto friction_vel = friction_body->GetLinearVelocity();
-	auto friction_ang_vel = friction_body->GetAngularVelocity();
-	auto friction_center = friction_body->GetWorldCenter();
-
-	auto fricted_pos = physics.body->GetPosition() + per_second() * friction_vel;
-
-	auto rotation_offset = friction_center - fricted_pos;
-	b2Vec2 rotational_velocity = (-vec2(rotation_offset).perpendicular_cw()).set_length(
-		rotation_offset.Length()*friction_ang_vel
-		);
-	//rotational_velocity.y *= -1;
-
-	fricted_pos += per_second() * rotational_velocity;
-	//renderer::get_current().logic_lines.draw_cyan(physics.get_position(), physics.get_position() + METERS_TO_PIXELSf*friction_vel);
-
-	physics.body->SetTransform(fricted_pos,
-		physics.body->GetAngle()
-		+ per_second()*friction_ang_vel
-		);
+	physics.body->SetTransform(fricted_pos, physics.body->GetAngle() + delta_seconds()*friction_body->GetAngularVelocity());
 
 	friction_entity->get<components::physics>().measured_carried_mass += physics.get_mass() + physics.measured_carried_mass;
 }
