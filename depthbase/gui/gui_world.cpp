@@ -135,7 +135,7 @@ namespace augs {
 				if(middlescroll.subject) {
 					rects::ltrb<float> scroller = rects::wh<float>(middlescroll.size);
 					scroller.center(middlescroll.pos);
-					rect::draw_clipped_rectangle(middlescroll.mat, scroller, &root, triangle_buffer); 
+					gui::draw_clipped_rectangle(middlescroll.mat, scroller, &root, triangle_buffer); 
 				}
 			}
 			

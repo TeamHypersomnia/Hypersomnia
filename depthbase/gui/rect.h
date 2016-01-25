@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "quad.h"
+#include "material.h"
 #include <limits>
 
 namespace augs {
@@ -53,8 +53,8 @@ namespace augs {
 					gui_world& owner;
 					const unsigned msg;
 
-					bool mouse_fetched;
-					bool scroll_fetched;
+					bool mouse_fetched = false;
+					bool scroll_fetched = false;
 					poll_info(gui_world&, unsigned);
 				};
 
@@ -115,9 +115,6 @@ namespace augs {
 					 draw_children	(draw_info in);
 
 				virtual void get_member_children(std::vector<rect*>& children);
-
-				/* passes 0 or clipper's rc_clipped as clipper depending on clipper's clip flag */
-				static rects::ltrb<float> draw_clipped_rectangle (const material&, const rects::ltrb<float>& global, const rect* clipper, std::vector<augs::vertex_triangle>& v);
 				
 				/*  does scroll not exceed the content */
 				bool is_scroll_clamped_to_right_down_corner();
@@ -143,12 +140,7 @@ namespace augs {
 			protected:
 				friend class gui_world;
 
-				struct traversal_state {
-
-				};
-
 				rect* parent = nullptr;
-				gui_world* parent_group = nullptr;
 
 				virtual void perform_logic_step(gui_world&);
 			private:

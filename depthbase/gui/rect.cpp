@@ -183,7 +183,7 @@ namespace augs {
 			bool rect::focus_next_rect_by_tab(event_info e) {
 				using namespace augs::window::event::keys;
 				if(e == gui_event::keydown && e.owner.state.key == TAB) {
-					rect* f = seek_focusable(this, window::glwindow::get_current()->events.keys[LSHIFT]);
+					rect* f = seek_focusable(this, e.owner.state.keys[LSHIFT]);
 					if(f) e.owner.set_focus(f);
 					return true;
 				}
@@ -216,7 +216,7 @@ namespace augs {
 			bool rect::focus_next_rect_by_enter(event_info e) {
 				using namespace augs::window::event::keys;
 				if(e == gui_event::keydown && e.owner.state.key == ENTER) {
-					rect* f = seek_focusable(this, window::glwindow::get_current()->events.keys[LSHIFT]);
+					rect* f = seek_focusable(this, e.owner.state.keys[LSHIFT]);
 					if(f) e.owner.set_focus(f);
 					return true;
 				}
@@ -357,15 +357,6 @@ namespace augs {
 				}
 			}
 
-			rects::ltrb<float> rect::draw_clipped_rectangle(const material& mat, const rects::ltrb<float>& origin, const rect* p, std::vector<augs::vertex_triangle>& v) {
-				/* if p is null, we don't clip at all
-				   if p is not null and p->clip is true, we take p->rc_clipped as clipper
-				   if p is not null and p->clip is false, we search for the first clipping parent's rc_clipped
-				*/
-
-				return gui::draw_clipped_rectangle(mat, origin, &p->get_clipping_rect(), v); 
-			}
-			
 			void rect::gen_focus_links() {
 				auto children_all = children;
 				get_member_children(children_all);

@@ -720,9 +720,6 @@
     <ClCompile Include="depthbase\gui\dragger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="depthbase\gui\quad.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="depthbase\gui\rect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1048,6 +1045,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="depthbase\gui\gui_world.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="depthbase\gui\material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2411,9 +2411,6 @@
     <ClInclude Include="depthbase\gui\dragger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="depthbase\gui\quad.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="depthbase\gui\rect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2895,6 +2892,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="depthbase\gui\gui_world.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="depthbase\gui\material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

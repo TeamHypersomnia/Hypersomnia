@@ -358,7 +358,7 @@
     <ClCompile Include="depthbase\gui\controls\stylesheeted\controls.cpp" />
     <ClCompile Include="depthbase\gui\controls\textbox.cpp" />
     <ClCompile Include="depthbase\gui\dragger.cpp" />
-    <ClCompile Include="depthbase\gui\quad.cpp" />
+    <ClCompile Include="depthbase\gui\material.cpp" />
     <ClCompile Include="depthbase\gui\rect.cpp" />
     <ClCompile Include="depthbase\gui\stroke.cpp" />
     <ClCompile Include="depthbase\gui\stylesheet.cpp" />
@@ -929,7 +929,7 @@
     <ClInclude Include="depthbase\gui\controls\stylesheeted\controls.h" />
     <ClInclude Include="depthbase\gui\controls\textbox.h" />
     <ClInclude Include="depthbase\gui\dragger.h" />
-    <ClInclude Include="depthbase\gui\quad.h" />
+    <ClInclude Include="depthbase\gui\material.h" />
     <ClInclude Include="depthbase\gui\rect.h" />
     <ClInclude Include="depthbase\gui\stroke.h" />
     <ClInclude Include="depthbase\gui\stylesheet.h" />

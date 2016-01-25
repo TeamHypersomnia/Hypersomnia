@@ -1,5 +1,6 @@
 #pragma once
-#include "quad.h"
+#include "material.h"
+#include "rect.h"
 
 namespace augs {
 	namespace graphics {
@@ -8,7 +9,16 @@ namespace augs {
 
 			material::material(const rgba& color) : tex(gui::null_texture), color(color) {}
 
-			rects::ltrb<float> gui::draw_clipped_rectangle(const material& mat, const rects::ltrb<float>& origin, const rects::ltrb<float>* parent, std::vector<augs::vertex_triangle>& v) {
+			rects::ltrb<float> draw_clipped_rectangle(material mat, rects::ltrb<float> origin, const rect* p, std::vector<augs::vertex_triangle>& v) {
+				/* if p is null, we don't clip at all
+				if p is not null and p->clip is true, we take p->rc_clipped as clipper
+				if p is not null and p->clip is false, we search for the first clipping parent's rc_clipped
+				*/
+
+				return gui::draw_clipped_rectangle(mat, origin, &p->get_clipping_rect(), v);
+			}
+
+			rects::ltrb<float> gui::draw_clipped_rectangle(material mat, rects::ltrb<float> origin, const rects::ltrb<float>* parent, std::vector<augs::vertex_triangle>& v) {
 				rects::ltrb<float> rc = origin;
 				if ((parent && !rc.clip_by(*parent)) || !rc.good()) return rc;
 
