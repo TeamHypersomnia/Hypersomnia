@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "quad.h"
+#include <limits>
 
 namespace augs {
 	namespace graphics {
@@ -41,19 +42,6 @@ namespace augs {
 					blur
 				};
 				
-				/* 
-				index_info structure tells the index of a particular rectangle in the quad vector.
-
-				If any child class overrides draw_proc to draw additional content, 
-				it should derive index_info and quad_indices at the same names and add its own members.
-				
-				-1 means "not drawn" and "not in the vector"
-				*/
-
-				struct index_info {
-					int background;
-				} quad_indices;
-
 				struct draw_info {
 					group& owner;
 					std::vector<augs::vertex_triangle>& v;
@@ -79,9 +67,17 @@ namespace augs {
 					event_info& operator=(event);
 				};
 
-				rect* focus_next, *focus_prev;
+				rect* focus_next = nullptr;
+				rect* focus_prev = nullptr;
 
-				bool draw, clip, fetch_wheel, scrollable, snap_scroll_to_content, preserve_focus, focusable;
+				bool draw = true;
+				bool clip = true;
+				bool fetch_wheel = false;
+				bool scrollable = true;
+				bool snap_scroll_to_content = true;
+				bool preserve_focus = false;
+				bool focusable = true;
+
 				vec2i drag_origin;
 				rects::ltrb<float> rc; /* actual rectangle */ 
 				rects::wh<float> content_size; /* content's (children's) bounding box */
@@ -110,7 +106,7 @@ namespace augs {
 				bool handle_tab(event_info);
 				/* if this handler returns true, arrows should not later be processed as a keydown event (used in textbox, for example) */
 				bool handle_arrows(event_info);
-				/* if this handler returns true, arrows should not later be processed as a keydown event (used in textbox, for example) */
+				/* if this handler returns true, enter should not later be processed as a keydown event (used in textbox, for example) */
 				bool handle_enter(event_info);
 
 				/* draw_proc default subroutines */
@@ -127,13 +123,12 @@ namespace augs {
 				rects::ltrb<float>		 local_add(const material&, const rects::ltrb<float>& local, std::vector<augs::vertex_triangle>& v) const;
 				
 				/*  does scroll not exceed the content */
-				bool is_scroll_aligned();
+				bool is_scroll_clamped_to_right_down_corner();
 
 				/* align scroll to not exceed the content */
-				void align_scroll(), 
+				void clamp_scroll_to_right_down_corner(), 
 				/* try to scroll to view whole content */    
 					scroll_to_view();  
-
 
 				/* if last is nullptr, focus will be cycled on this rect (next = this) */
 				/* not implemented */
@@ -150,12 +145,14 @@ namespace augs {
 				static rect* seek_focusable(rect*, bool);
 			protected:
 				friend class group;
-				rect* parent; 
+				rect* parent = nullptr;
 			private:
-				rects::ltrb<float> rc_clipped, clipping_rect;
+				rects::ltrb<float> rc_clipped;
+				rects::ltrb<float> clipping_rect = rects::ltrb<float>(0, 0, std::numeric_limits<int>::max() / 2, std::numeric_limits<int>::max() / 2);
+				
 				vec2i absolute_xy;
 
-				bool was_hovered;
+				bool was_hovered = false;
 			};
 		}
 	}

@@ -25,12 +25,6 @@ namespace augs {
 					selection_inactive_bg_mat(rgba(128, 255, 255, 40)),
 					highlight_mat(rgba(15, 15, 15, 255))
 				{
-					quad_indices.first_character = 
-					quad_indices.last_character =  
-					quad_indices.selections_first = 
-					quad_indices.selections_last = 
-					quad_indices.highlight = 
-					quad_indices.caret = -1;
 				}
 
 				printer::blinker::blinker() : caret_visible(true), blink(true), interval_ms(250)//, blink_func(regular_blink) 

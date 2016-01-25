@@ -44,19 +44,19 @@ namespace augs {
 
 			T w, h;
 			
-			void stick_relative(const wh& content, vec2t<T>& scroll) const {
-				scroll.x = std::min(scroll.x, T(content.w - w));
-				scroll.x = std::max(scroll.x, 0.f);
-				scroll.y = std::min(scroll.y, T(content.h - h));
-				scroll.y = std::max(scroll.y, 0.f);
+			void clamp_offset_to_right_down_corner_of(const wh& bigger, vec2t<T>& offset) const {
+				offset.x = std::min(offset.x, T(bigger.w - w));
+				offset.x = std::max(offset.x, 0.f);
+				offset.y = std::min(offset.y, T(bigger.h - h));
+				offset.y = std::max(offset.y, 0.f);
 			}
 
 			bool inside(const wh& rc) const {
 				return w <= rc.w && h <= rc.h;
 			}
 
-			bool is_sticked(const wh& content, vec2t<T>& scroll) const {
-				return scroll.x >= 0.f && scroll.x <= content.w - w && scroll.y >= 0 && scroll.y <= content.h - h;
+			bool can_contain(const wh& another_rect, vec2t<T>& offset) const {
+				return offset.x >= 0.f && offset.x <= another_rect.w - w && offset.y >= 0 && offset.y <= another_rect.h - h;
 			}
 
 			bool good() const {
@@ -121,7 +121,7 @@ namespace augs {
 				b = std::max(b, rc.b);
 			}
 
-			bool clip(const ltrb& rc) {
+			bool clip_by(const ltrb& rc) {
 				if (l >= rc.r || t >= rc.b || r <= rc.l || b <= rc.t) {
 					*this = ltrb();
 					return false;

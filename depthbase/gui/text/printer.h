@@ -9,17 +9,6 @@ namespace augs {
 				class ui;
 				struct drafter;
 				struct printer {
-					/* these integers hold information at what index particular quads are pushed to the resulting vector
-					may be useful for further processing
-					still needs implementing
-					*/
-					struct index_info {
-						int first_character, last_character, 
-							selections_first, selections_last,
-							highlight,
-							caret;
-					} quad_indices;
-
 					/* defines how the caret should blink and whether should blink at all */
 					struct blinker {
 						bool blink, caret_visible;

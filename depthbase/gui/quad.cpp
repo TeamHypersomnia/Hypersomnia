@@ -65,7 +65,7 @@ namespace augs {
 
 			rects::ltrb<float> gui::add_quad(const material& mat, const rects::ltrb<float>& origin, const rects::ltrb<float>* parent, std::vector<augs::vertex_triangle>& v) {
 				rects::ltrb<float> rc = origin;
-				if ((parent && !rc.clip(*parent)) || !rc.good()) return rc;
+				if ((parent && !rc.clip_by(*parent)) || !rc.good()) return rc;
 
 				augs::vertex p[4];
 

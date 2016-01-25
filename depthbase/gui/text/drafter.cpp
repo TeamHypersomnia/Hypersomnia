@@ -299,7 +299,7 @@ namespace augs {
 
 				rects::wh<float> drafter::get_bbox() const {
 					if(sectors.empty() || lines.empty()) return rects::wh<float>(0,0);
-					/* plus 1 for caret, so the view caret is not canceled by align_scroll */
+					/* plus 1 for caret, so the view caret is not canceled by clamp_scroll_to_right_down_corner */
 					return rects::wh<float>(max_x+1, lines[lines.size()-1].bottom());
 				}
 

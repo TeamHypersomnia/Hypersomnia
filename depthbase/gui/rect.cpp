@@ -24,13 +24,7 @@ namespace augs {
 			}
 
 
-			rect::rect(const rects::xywh<float>& rc) 
-				: rc(rc), parent(nullptr), snap_scroll_to_content(true),
-				draw(true), was_hovered(false), fetch_wheel(false), clip(true), scrollable(true), content_size(rects::wh<float>()), rc_clipped(rc), preserve_focus(false), focusable(true),
-				focus_next(nullptr), focus_prev(nullptr), clipping_rect(0, 0, std::numeric_limits<int>::max()/2, std::numeric_limits<int>::max()/2) 
-			{
-				quad_indices.background = -1;
-			}
+			rect::rect(const rects::xywh<float>& rc) : rc(rc) {}
 			
 			rects::wh<float> rect::get_content_size() {
 				/* init on zero */
@@ -60,20 +54,20 @@ namespace augs {
 					/* and we have to clip by first clipping parent's rc_clipped */
 					//auto* clipping = get_clipping_parent(); 
 					//if(clipping) 
-					rc_clipped.clip(parent->clipping_rect);
+					rc_clipped.clip_by(parent->clipping_rect);
 					
 					clipping_rect = parent->clipping_rect;
 				}
 
 				if(clip)
-					clipping_rect.clip(rc_clipped);
+					clipping_rect.clip_by(rc_clipped);
 					
 				/* update content size */
 				content_size = this->get_content_size();
 				
 				/* align scroll only to be positive and not to exceed content size */
 				if(snap_scroll_to_content)
-					align_scroll();
+					clamp_scroll_to_right_down_corner();
 
 				/* do the same for every child */
 				auto children_all = children;
@@ -86,8 +80,7 @@ namespace augs {
 			}
 			
 			void rect::draw_rect(draw_info in, const material& mat) {
-				quad_indices.background = in.v.size();
-				if(!add_quad(mat, get_rect_absolute(), parent, in.v).good()) quad_indices.background = -1;
+				add_quad(mat, get_rect_absolute(), parent, in.v).good();
 				// rc_clipped = add_quad(mat, rc_clipped, parent, in.v);
 			}
 			
@@ -137,7 +130,7 @@ namespace augs {
 						int temp(int(scroll.x));
 						if(scrollable) {
 							scroll.x -= wnd.mouse.scroll;
-							align_scroll();
+							clamp_scroll_to_right_down_corner();
 						}
 						if((!scrollable || temp == scroll.x) && parent) {
 							parent->event_proc(e = event::wheel);
@@ -147,7 +140,7 @@ namespace augs {
 						int temp(int(scroll.y));
 						if(scrollable) {
 							scroll.y -= wnd.mouse.scroll;
-							align_scroll();
+							clamp_scroll_to_right_down_corner();
 						}
 						if((!scrollable || temp == scroll.y) && parent) {
 							parent->event_proc(e = event::wheel);
@@ -344,12 +337,12 @@ namespace augs {
 				}
 			}
 
-			bool rect::is_scroll_aligned() {
-				return rects::wh<float>(rc).is_sticked(content_size, scroll);
+			bool rect::is_scroll_clamped_to_right_down_corner() {
+				return rects::wh<float>(rc).can_contain(content_size, scroll);
 			}
 			
-			void rect::align_scroll() {
-				rects::wh<float>(rc).stick_relative(content_size, scroll);
+			void rect::clamp_scroll_to_right_down_corner() {
+				rects::wh<float>(rc).clamp_offset_to_right_down_corner_of(content_size, scroll);
 			}
 
 			void rect::scroll_to_view() {
