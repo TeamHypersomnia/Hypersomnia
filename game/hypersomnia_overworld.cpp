@@ -85,9 +85,10 @@ void hypersomnia_overworld::simulate() {
 
 		game_window.clear();
 
-		update_frame_timer();
+		assign_frame_time_to_delta();
 		game_world.draw();
 		current_scene_builder->draw(game_world);
+		restore_fixed_delta();
 
 		game_window.swap_buffers();
 
