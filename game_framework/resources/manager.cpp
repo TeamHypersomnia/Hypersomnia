@@ -29,18 +29,7 @@ bool operator!(const assets::texture_id& id) {
 }
 
 namespace resources {
-	void manager::texture_with_image::set(image img) {
-		this->img = img;
-		tex.set(&this->img);
-	}
-
-	void manager::texture_with_image::set(std::wstring filename) {
-		img = image();
-		img.from_file(filename);
-		tex.set(&img);
-	}
-
-	manager::texture_with_image* manager::find(assets::texture_id id) {
+	texture_with_image* manager::find(assets::texture_id id) {
 		auto it = textures.find(id);
 		if (it == textures.end()) return nullptr;
 
@@ -112,11 +101,11 @@ namespace resources {
 		return font;
 	}
 
-	manager::texture_with_image& manager::create(assets::texture_id id, image img) {
-		textures.insert(std::make_pair(id, manager::texture_with_image()));
+	texture_with_image& manager::create(assets::texture_id id, image img) {
+		textures.insert(std::make_pair(id, texture_with_image()));
 
-		manager::texture_with_image& tex = textures[id];
-		tex.set(img);
+		texture_with_image& tex = textures[id];
+		tex.set_from_image(img);
 
 		return tex;
 	}
@@ -202,11 +191,11 @@ namespace resources {
 		return resp;
 	}
 
-	manager::texture_with_image& manager::create(assets::texture_id id, std::wstring filename) {
-		textures.insert(std::make_pair(id, manager::texture_with_image()));
+	texture_with_image& manager::create(assets::texture_id id, std::wstring filename) {
+		textures.insert(std::make_pair(id, texture_with_image()));
 
-		manager::texture_with_image& tex = textures[id];
-		tex.set(filename);
+		texture_with_image& tex = textures[id];
+		tex.set_from_image_file(filename);
 
 		return tex;
 	}
@@ -237,6 +226,9 @@ namespace resources {
 		textures.clear();
 		programs.clear();
 		shaders.clear();
+		animations.clear();
+		animation_responses.clear();
+		fonts.clear();
 	}
 }
 

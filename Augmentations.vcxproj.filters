@@ -621,9 +621,6 @@
     <ClCompile Include="game_framework\game\body_helper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\game\sound_effects.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\systems\animation_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1048,6 +1045,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utilities\gui\stylesheet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\resources\texture_with_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2429,9 +2429,6 @@
     <ClInclude Include="game_framework\game\body_helper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\game\sound_effects.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\messages\collision_message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2711,9 +2708,6 @@
     <ClInclude Include="game_framework\assets\animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\assets\asset.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\bindings\bindings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2901,6 +2895,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="utilities\gui\stylesheet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\resources\texture_with_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
