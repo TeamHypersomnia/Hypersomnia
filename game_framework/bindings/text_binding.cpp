@@ -2,8 +2,8 @@
 #include "stdafx.h"
 #include "bindings.h"
 
-#include "depthbase/gui/text/printer.h"
-#include "depthbase/gui/text/drafter.h"
+#include "gui/text/printer.h"
+#include "gui/text/drafter.h"
 
 #include "game_framework/shared/drawing_state.h"
 #include "game_framework/systems/render_system.h"

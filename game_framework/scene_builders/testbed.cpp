@@ -23,7 +23,7 @@
 
 #include "texture_baker/font.h"
 
-#include "depthbase/gui/text/printer.h"
+#include "gui/text/printer.h"
 
 using namespace augs;
 

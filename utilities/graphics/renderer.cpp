@@ -14,7 +14,7 @@
 #include "../window_framework/window.h"
 
 #include "game_framework/resources/manager.h"
-#include "depthbase/gui/gui_world.h"
+#include "gui/gui_world.h"
 
 namespace augs {
 	renderer& renderer::get_current() {
