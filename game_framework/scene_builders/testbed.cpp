@@ -21,6 +21,8 @@
 
 #include "game_framework/scene_builders/scripts/rendering_procedures.h"
 
+#include "texture_baker/font.h"
+
 using namespace augs;
 
 namespace scene_builders {

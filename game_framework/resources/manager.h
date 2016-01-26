@@ -11,10 +11,13 @@
 #include "../resources/animation_response.h"
 
 #include "texture_baker/texture_baker.h"
-#include "texture_baker/font.h"
 #include "graphics/shader.h"
 
 #include <unordered_map>
+
+namespace augs {
+	class font;
+}
 
 namespace resources {
 	class manager {

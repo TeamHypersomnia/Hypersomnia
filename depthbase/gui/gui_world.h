@@ -8,22 +8,24 @@
 #include "texture_baker/font.h"
 #include "rect.h"
 
+#include "game_framework/assets/font.h"
+
 namespace augs {
 	namespace graphics {
 		namespace gui {
 			namespace text {
 				struct formatted_char {
-					augs::font* font_used;
+					assets::font_id font_used;
 					wchar_t c;
 					unsigned char r, g, b, a;
-					void set(wchar_t, augs::font* = 0, const rgba& = rgba());
-					void set(augs::font* = 0, const rgba& = rgba());
+					void set(wchar_t, assets::font_id = assets::font_id::GUI_FONT, const rgba& = rgba());
+					void set(assets::font_id = assets::font_id::GUI_FONT, const rgba& = rgba());
 				};
 
 				struct style {
-					augs::font* f;
+					assets::font_id f;
 					rgba color;
-					style(augs::font* = nullptr, rgba = rgba());
+					style(assets::font_id = assets::font_id::GUI_FONT, rgba = rgba());
 					style(const formatted_char&);
 					operator formatted_char();
 				};

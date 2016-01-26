@@ -21,7 +21,7 @@ namespace augs {
 						bool wrapped;
 						line();
 						void set(int y, int asc, int desc);
-						void adjust(augs::font*);
+						void adjust(augs::font&);
 						bool empty() const;
 					};
 
@@ -68,7 +68,7 @@ namespace augs {
 					void find_ascdesc(const fstr& source, int i, int j, int&, int&) const;
 					int get_kern(const fstr& source, unsigned code1, unsigned code2) const;
 					const augs::font::glyph& get_cached(int i) const;
-					augs::font* getf(const fstr& source, unsigned i) const;
+					augs::font& getf(const fstr& source, unsigned i) const;
 				};
 			}
 		}

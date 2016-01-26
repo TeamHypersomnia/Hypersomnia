@@ -132,54 +132,58 @@ namespace augs {
 		}
 	}
 
-	void font::set_styles(font* b, font* i, font* bi) {
-		b->regular = i->regular = bi->regular = this;
-		b->bold = i->bold = bi->bold = b;
-		b->italics = i->italics = bi->italics = i;
-		b->bi = i->bi = bi->bi = bi;
-		bold = b; italics = i; bi = bi;
-	}
-
-	bool font::can_be_bolded() {
-		return (regular == this && bold) || (italics == this && bi) || this == bold || this == bi;
-	}
-
-	bool font::can_be_italicsed() {
-		return (regular == this && italics) || (bold == this && bi) || this == italics || this == bi;
-	}
-
-	bool font::is_bolded() {
-		return this == bold || this == bi;
-	}
-
-	bool font::is_italicsed() {
-		return this == italics || this == bi;
-	}
-
-	font* font::get_bold(bool flag) {
-		if (flag) {
-			if (this == regular || this == bold) return bold ? bold : regular;
-			if (this == italics || this == bi)   return bi ? bi : italics;
-		}
-		else {
-			if (this == regular || this == bold) return regular;
-			if (this == italics || this == bi)   return italics ? italics : bi;
-		}
-		return 0;
-	}
-
-	font* font::get_italics(bool flag) {
-		if (flag) {
-			if (this == regular || this == italics) return italics ? italics : regular;
-			if (this == bold || this == bi)      return bi ? bi : bold;
-		}
-		else {
-			if (this == regular || this == italics) return regular;
-			if (this == bold || this == bi)      return bold ? bold : bi;
-		}
-		return 0;
-	}
-
+	//void font::set_styles(assets::font_id regular, assets::font_id b, assets::font_id i, assets::font_id bi) {
+	//	(*b)->regular = (*i)->regular = (*bi)->regular = regular;
+	//	(*b)->bold = (*i)->bold = (*bi)->bold = b;
+	//	(*b)->italics = (*i)->italics = (*bi)->italics = i;
+	//	(*b)->bi = (*i)->bi = (*bi)->bi = bi;
+	//
+	//	(*regular)->regular = regular;
+	//	(*regular)->bold = b;
+	//	(*regular)->italics = i; 
+	//	(*regular)->bi = bi;
+	//}
+	//
+	//bool font::can_be_bolded(assets::font_id regular) {
+	//	return (regular == this && bold) || (italics == this && bi) || this == bold || this == bi;
+	//}
+	//
+	//bool font::can_be_italicsed(assets::font_id regular) {
+	//	return (regular == this && italics) || (bold == this && bi) || this == italics || this == bi;
+	//}
+	//
+	//bool font::is_bolded(assets::font_id regular) {
+	//	return this == bold || this == bi;
+	//}
+	//
+	//bool font::is_italicsed(assets::font_id regular) {
+	//	return this == italics || this == bi;
+	//}
+	//
+	//font* font::get_bold(bool flag) {
+	//	if (flag) {
+	//		if (this == regular || this == bold) return bold ? bold : regular;
+	//		if (this == italics || this == bi)   return bi ? bi : italics;
+	//	}
+	//	else {
+	//		if (this == regular || this == bold) return regular;
+	//		if (this == italics || this == bi)   return italics ? italics : bi;
+	//	}
+	//	return 0;
+	//}
+	//
+	//font* font::get_italics(bool flag) {
+	//	if (flag) {
+	//		if (this == regular || this == italics) return italics ? italics : regular;
+	//		if (this == bold || this == bi)      return bi ? bi : bold;
+	//	}
+	//	else {
+	//		if (this == regular || this == italics) return regular;
+	//		if (this == bold || this == bi)      return bold ? bold : bi;
+	//	}
+	//	return 0;
+	//}
+	//
 	font::glyph* font::get_glyph(unsigned unicode_id) {
 		auto it = unicode.find(unicode_id);
 		if (it == unicode.end()) return nullptr;

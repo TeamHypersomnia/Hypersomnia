@@ -14,13 +14,13 @@ namespace augs {
 					return (i == 0x000A || i == 0x000D);
 				}
 				
-				font* drafter::getf(const gui::text::fstr& source, unsigned i) const {
+				font& drafter::getf(const gui::text::fstr& source, unsigned i) const {
 					//return (i < source.length() && source[i].font_used) ? source[i].font_used : target_caret->default_style.f;
-					return source[i].font_used;
+					return *source[i].font_used;
 				}
 				
 				int drafter::get_kern(const gui::text::fstr& source, unsigned i, unsigned l) const {
-					if(kerning && i > lines[l].begin && getf(source, i) == getf(source, i-1)) {
+					if(kerning && i > lines[l].begin && &getf(source, i) == &getf(source, i-1)) {
 						auto& vk = get_cached(i).kerning;
 						for(unsigned k = 0; k < vk.size(); ++k)
 							if(vk[k].first == source[i-1].c)
@@ -36,20 +36,20 @@ namespace augs {
 				void drafter::find_ascdesc(const gui::text::fstr& in, int l, int r, int& asc, int& desc) const {
 					if(l == r) {
 						if(l > 0) {
-							asc =  getf(in, l-1)->ascender;
-							desc = getf(in, l-1)->descender;
+							asc =  getf(in, l-1).ascender;
+							desc = getf(in, l-1).descender;
 						}
 						else {
-							asc =  getf(in, l)->ascender;
-							desc = getf(in, l)->descender;
+							asc =  getf(in, l).ascender;
+							desc = getf(in, l).descender;
 						}
 					}
 					else {
-						asc = getf(in, l)->ascender, desc = getf(in, l)->descender;
+						asc = getf(in, l).ascender, desc = getf(in, l).descender;
 
 						for(int j = l; j < r; ++j) {
-							asc =  std::max(asc, getf(in, j)->ascender);
-							desc = std::min(desc, getf(in, j)->descender);
+							asc =  std::max(asc, getf(in, j).ascender);
+							desc = std::min(desc, getf(in, j).descender);
 						}
 					}
 				}
@@ -74,9 +74,9 @@ namespace augs {
 					desc = _desc;
 				}
 				
-				void drafter::line::adjust(font* f) {
-					asc =  std::max(asc, f->ascender);
-					desc = std::min(desc, f->descender);
+				void drafter::line::adjust(font& f) {
+					asc =  std::max(asc, f.ascender);
+					desc = std::min(desc, f.descender);
 				}
 
 				bool drafter::line::empty() const {
@@ -190,10 +190,10 @@ namespace augs {
 
 					/* update glyph data so each glyph object corresponds to a string character */
 					for(unsigned i = 0; i < source.size(); ++i) {
-						auto g = getf(source, i)->get_glyph(password_mode ? password_character : source[i].c);
+						auto g = getf(source, i).get_glyph(password_mode ? password_character : source[i].c);
 
 						/* if we allowed a null glyph in string, it must be newline */
-						cached.push_back(g ? g : getf(source, i)->get_glyph(L' '));
+						cached.push_back(g ? g : getf(source, i).get_glyph(L' '));
 
 					}
 

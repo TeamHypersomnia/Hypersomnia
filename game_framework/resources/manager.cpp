@@ -2,6 +2,7 @@
 #include <string>
 #include "utilities/file.h"
 #include <sstream>
+#include "texture_baker/font.h"
 
 using namespace augs;
 
@@ -9,6 +10,14 @@ namespace assets {
 	vec2i get_size(texture_id id) {
 		return resource_manager.find(id)->tex.get_size();
 	}
+}
+
+augs::font& operator*(const assets::font_id& id) {
+	return *resource_manager.find(id);
+}
+
+bool operator!(const assets::font_id& id) {
+	return resource_manager.find(id) == nullptr;
 }
 
 namespace resources {

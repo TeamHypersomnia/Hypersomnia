@@ -16,8 +16,8 @@ namespace augs {
 					forced_bold(false),
 					redraw(true),
 					forced_italics(false), max_characters(0), whitelist(nullptr), blacklist(nullptr), allow_unknown_characters_as_default(false) {}
-				augs::font* ui::getf(unsigned i) const {
-					return (i < get_str().length() && get_str()[i].font_used) ? get_str()[i].font_used : caret.default_style.f;
+				augs::font& ui::getf(unsigned i) const {
+					return *((i < get_str().length() && get_str()[i].font_used) ? get_str()[i].font_used : caret.default_style.f);
 				}
 
 				void ui::anchor() {
@@ -319,7 +319,7 @@ namespace augs {
 						int l = get_left_selection(), r = get_right_selection();
 						edit.action(action(*this, l, r, 0, std::vector<bool>(), action::BOLDEN));
 						for(int i = l; i < r; ++i) {
-							if(getf(i)->can_be_bolded() && !getf(i)->is_bolded()) {
+							if(getf(i).can_be_bolded() && !getf(i).is_bolded()) {
 								bold_all = true;
 								break;
 							}
@@ -328,12 +328,12 @@ namespace augs {
 						edit.front().set_redo();
 
 						for(int i = l; i < r; ++i) {
-							font* f = getf(i);
-							edit.front().states.push_back(f->is_bolded());
-							str()[i].font_used = f->get_bold(bold_all);
+							font& f = getf(i);
+							edit.front().states.push_back(f.is_bolded());
+							str()[i].font_used = f.get_bold(bold_all);
 						}
 					} else if(forced_bold = !forced_bold)
-						bold_bound = !get_neighbor_style().f->is_bolded();
+						bold_bound = !(*(get_neighbor_style().f)).is_bolded();
 					need_redraw();
 				}
 
@@ -343,7 +343,7 @@ namespace augs {
 						int l = get_left_selection(), r = get_right_selection();
 						edit.action(action(*this, l, r, 0, std::vector<bool>(), action::ITALICSEN));
 						for(int i = l; i < r; ++i) {
-							if(getf(i)->can_be_italicsed() && !getf(i)->is_italicsed()) {
+							if(getf(i).can_be_italicsed() && !getf(i).is_italicsed()) {
 								it_all = true;
 								break;
 							}
@@ -352,12 +352,12 @@ namespace augs {
 						edit.front().set_redo();
 
 						for(int i = l; i < r; ++i) {
-							font* f = getf(i);
-							edit.front().states.push_back(f->is_italicsed());
-							str()[i].font_used = f->get_italics(it_all);
+							font& f = getf(i);
+							edit.front().states.push_back(f.is_italicsed());
+							str()[i].font_used = f.get_italics(it_all);
 						}
 					} else if(forced_italics = !forced_italics)
-						italics_bound = !get_neighbor_style().f->is_italicsed();
+						italics_bound = !(*get_neighbor_style().f).is_italicsed();
 				}
 
 				bool ui::undo() {
@@ -478,9 +478,9 @@ namespace augs {
 
 					if(flag == action::BOLDEN || flag == action::ITALICSEN) {
 						for(int i = where; i < right; ++i) {
-							font*& f = subject->str()[i].font_used;
-							f = flag == action::BOLDEN ?	subject->getf(i)->get_bold   (undo ? (unapply ? true : states[i-where]) : !unapply):
-								subject->getf(i)->get_italics(undo ? (unapply ? true : states[i-where]) : !unapply);
+							assets::font_id& f = subject->str()[i].font_used;
+							f = flag == action::BOLDEN ?	subject->getf(i).get_bold   (undo ? (unapply ? true : states[i-where]) : !unapply):
+								subject->getf(i).get_italics(undo ? (unapply ? true : states[i-where]) : !unapply);
 						}
 					}
 				} 
@@ -509,8 +509,8 @@ namespace augs {
 
 				style ui::get_current_style() const {
 					style ch = get_neighbor_style();
-					if(forced_bold)    ch.f = ch.f->get_bold(bold_bound);
-					if(forced_italics) ch.f = ch.f->get_italics(italics_bound);
+					if(forced_bold)    ch.f = (*ch.f).get_bold(bold_bound);
+					if(forced_italics) ch.f = (*ch.f).get_italics(italics_bound);
 					return ch;
 				}
 					
@@ -527,22 +527,22 @@ namespace augs {
 					if(caret.selection_offset) {
 						int l = get_left_selection(), r = get_right_selection();
 						for(int i = l; i < r; ++i)
-							if(!getf(i)->is_bolded())
+							if(!getf(i).is_bolded())
 								return false;
 						return true;
 					} 
-					else return forced_bold ? bold_bound : get_neighbor_style().f->is_bolded(); 
+					else return forced_bold ? bold_bound : (*get_neighbor_style().f).is_bolded();
 				}
 
 				bool ui::get_italics_status() const {
 					if(caret.selection_offset) {
 						int l = get_left_selection(), r = get_right_selection();
 						for(int i = l; i < r; ++i)
-							if(!getf(i)->is_italicsed())
+							if(!getf(i).is_italicsed())
 								return false;
 						return true;
 					} 
-					else return forced_italics ? italics_bound : get_neighbor_style().f->is_italicsed(); 
+					else return forced_italics ? italics_bound : (*get_neighbor_style().f).is_italicsed();
 				}
 				
 				bool ui::is_valid_glyph(const formatted_char& c) {
@@ -550,8 +550,8 @@ namespace augs {
 						/* if we want to have newlines, we need a whitespace glyph added to the end of every line
 							similiarly with tabs, we want to replace them with spaces
 						*/
-						(iswspace(c.c) && c.font_used->get_glyph(L' ') != nullptr) 
-						|| allow_unknown_characters_as_default || c.font_used->get_glyph(c.c) != nullptr;
+						(iswspace(c.c) && (*c.font_used).get_glyph(L' ') != nullptr)
+						|| allow_unknown_characters_as_default || (*c.font_used).get_glyph(c.c) != nullptr;
 				}
 
 				bool ui::is_whitelisted(wchar_t c) const {

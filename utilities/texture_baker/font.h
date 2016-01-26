@@ -3,11 +3,14 @@
 #include <memory>
 #include "texture_baker.h"
 
+#include "game_framework/assets/font.h"
+
 struct FT_Glyph_Metrics_;
 typedef FT_Glyph_Metrics_ FT_Glyph_Metrics;
 
 namespace augs {
-	struct font {
+	class font {
+	public:
 		struct glyph {
 			image img;
 			texture tex;
@@ -41,18 +44,31 @@ namespace augs {
 
 		void free_images();
 
-		font* get_bold(bool flag);
-		font* get_italics(bool flag);
-
-		font *bold = nullptr, *italics = nullptr, *bi = nullptr, *regular = nullptr;
-
 		void add_to_atlas(atlas&);
 
-		void set_styles(font* bold, font* italics, font* bi);
+		// TODO: Remove placeholders
 
-		bool can_be_bolded();
-		bool can_be_italicsed();
-		bool is_bolded();
-		bool is_italicsed();
+		bool can_be_bolded() { return false; }
+		bool can_be_italicsed() { return false; }
+		bool is_bolded() { return false; }
+		bool is_italicsed() { return false;  }
+
+		assets::font_id get_bold(bool flag) { return assets::font_id::INVALID; }
+		assets::font_id get_italics(bool flag) { return assets::font_id::INVALID; }
+
+		//assets::font_id get_bold(bool flag);
+		//assets::font_id get_italics(bool flag);
+		//
+		//assets::font_id bold = assets::font_id::INVALID;
+		//assets::font_id italics = assets::font_id::INVALID;
+		//assets::font_id bi = assets::font_id::INVALID;
+		//assets::font_id regular = assets::font_id::INVALID;
+		//
+		//
+		//static void set_styles(assets::font_id regular, assets::font_id bold, assets::font_id italics, assets::font_id bi);
+		//static bool can_be_bolded(assets::font_id);
+		//static bool can_be_italicsed(assets::font_id);
+		//static bool is_bolded(assets::font_id);
+		//static bool is_italicsed(assets::font_id);
 	};
 }

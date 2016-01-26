@@ -96,7 +96,7 @@ namespace augs {
 						gui::draw_clipped_rectangle(highlight_mat, rects::xywh<float>(0, highlighted.top, clipper ? d.get_bbox().w + clipper->w() : d.get_bbox().w,
 
 							/* snap to default style's height */
-							highlighted.empty() ? caret->default_style.f->get_height() 
+							highlighted.empty() ? (*(caret->default_style.f)).get_height() 
 							: highlighted.height()) + pos, clipper, v);
 					}
 
@@ -196,13 +196,13 @@ namespace augs {
 							}
 							/* otherwise set caret's height to default style's height to avoid strange situations */
 							else
-								caret_rect = rects::xywh<float>(0, d.lines[caret_line].top, caret_width, caret->default_style.f->get_height());
+								caret_rect = rects::xywh<float>(0, d.lines[caret_line].top, caret_width, (*caret->default_style.f).get_height());
 
 						}
 					} 
 					/* there is nothing to draw, but we are still active so we want to draw caret anyway */
 					else if(active && caret)
-						caret_rect = rects::xywh<float>(0, 0, caret_width, caret->default_style.f->get_height());
+						caret_rect = rects::xywh<float>(0, 0, caret_width, (*caret->default_style.f).get_height());
 					
 //					this->quad_indices.caret = v.size();
 					if(blink.caret_visible) gui::draw_clipped_rectangle(caret_mat, caret_rect + pos, clipper, v); 

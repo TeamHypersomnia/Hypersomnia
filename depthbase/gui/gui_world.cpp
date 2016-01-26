@@ -76,18 +76,18 @@ namespace augs {
 
 
 			namespace text {
-				void formatted_char::set(wchar_t ch, font* f, const rgba& p) {
+				void formatted_char::set(wchar_t ch, assets::font_id f, const rgba& p) {
 					font_used = f;
 					c = ch;
 					memcpy(&r, &p, sizeof(rgba));
 				}
 
-				void formatted_char::set(font* f, const rgba& p) {
+				void formatted_char::set(assets::font_id f, const rgba& p) {
 					font_used = f;
 					memcpy(&r, &p, sizeof(rgba));
 				}
 
-				style::style(font* f, rgba c) : f(f), color(c) {}
+				style::style(assets::font_id, rgba c) : f(f), color(c) {}
 
 				style::style(const formatted_char& c) : f(c.font_used), color(rgba(c.r, c.g, c.b, c.a)) {}
 
@@ -180,7 +180,7 @@ namespace augs {
 			void gui_world::clipboard::change_clipboard() {
 				if(!own_copy && fetch_clipboard) {
 					text::formatted_char ch;
-					ch.set(0, 0, rgba(0, 0, 0, 255));
+					ch.set(0, assets::font_id::GUI_FONT, rgba(0, 0, 0, 255));
 					paste_clipboard(contents, ch);
 					own_clip = false;
 				}
