@@ -135,9 +135,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="game\all_component_includes.h" />
-    <ClInclude Include="game\all_message_includes.h" />
-    <ClInclude Include="game\all_system_includes.h" />
     <ClInclude Include="game\bindings.h" />
     <ClInclude Include="game\hypersomnia_overworld.h" />
     <ClInclude Include="game\hypersomnia_world.h" />
