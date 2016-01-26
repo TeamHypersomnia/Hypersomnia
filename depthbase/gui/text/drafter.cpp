@@ -21,7 +21,7 @@ namespace augs {
 				
 				int drafter::get_kern(const gui::text::fstr& source, unsigned i, unsigned l) const {
 					if(kerning && i > lines[l].begin && getf(source, i) == getf(source, i-1)) {
-						auto& vk = get_cached(i).info->kerning;
+						auto& vk = get_cached(i).kerning;
 						for(unsigned k = 0; k < vk.size(); ++k)
 							if(vk[k].first == source[i-1].c)
 								return vk[k].second;
@@ -36,20 +36,20 @@ namespace augs {
 				void drafter::find_ascdesc(const gui::text::fstr& in, int l, int r, int& asc, int& desc) const {
 					if(l == r) {
 						if(l > 0) {
-							asc =  getf(in, l-1)->parent->ascender;
-							desc = getf(in, l-1)->parent->descender;
+							asc =  getf(in, l-1)->ascender;
+							desc = getf(in, l-1)->descender;
 						}
 						else {
-							asc =  getf(in, l)->parent->ascender;
-							desc = getf(in, l)->parent->descender;
+							asc =  getf(in, l)->ascender;
+							desc = getf(in, l)->descender;
 						}
 					}
 					else {
-						asc = getf(in, l)->parent->ascender, desc = getf(in, l)->parent->descender;
+						asc = getf(in, l)->ascender, desc = getf(in, l)->descender;
 
 						for(int j = l; j < r; ++j) {
-							asc =  std::max(asc, getf(in, j)->parent->ascender);
-							desc = std::min(desc, getf(in, j)->parent->descender);
+							asc =  std::max(asc, getf(in, j)->ascender);
+							desc = std::min(desc, getf(in, j)->descender);
 						}
 					}
 				}
@@ -75,8 +75,8 @@ namespace augs {
 				}
 				
 				void drafter::line::adjust(font* f) {
-					asc =  std::max(asc, f->parent->ascender);
-					desc = std::min(desc, f->parent->descender);
+					asc =  std::max(asc, f->ascender);
+					desc = std::min(desc, f->descender);
 				}
 
 				bool drafter::line::empty() const {
@@ -125,7 +125,7 @@ namespace augs {
 					:  wrap_width(0), 
 					kerning(true), max_x(0), password_mode(false), password_character(L'*')
 				{
-					default_glyph.info = &default_info;
+					default_glyph = default_info;
 					lines.push_back(line());
 				}
 
@@ -206,9 +206,9 @@ namespace augs {
 						const auto& g = get_cached(i);
 
 						/* advance pen taking kerning into consideration */
-						pen.x += get_kern(source, i, l) + g.info->adv;
+						pen.x += get_kern(source, i, l) + g.adv;
 						/* at this vec2i "pen.x" means "where would caret be AFTER placing this character" */
-						bool wrap = (wrap_width > 0 && pen.x + g.info->bear_x >= int(wrap_width));
+						bool wrap = (wrap_width > 0 && pen.x + g.bear_x >= int(wrap_width));
 
 						/* if we have just encountered a newline character or there is need to wrap, we have to break the current line and 
 						create another */
@@ -240,7 +240,7 @@ namespace augs {
 
 									/* update pen so it's in front of the moved word */
 									for(unsigned k = lines[l+1].begin; k < lines[l+1].begin+left; ++k) {
-										int advance = get_cached(k).info->adv + get_kern(source, k, l+1);
+										int advance = get_cached(k).adv + get_kern(source, k, l+1);
 										pen.x += advance;
 										/* also update current line's right coordinate as we're taking characters away */
 										lines[l].right -= advance;
@@ -250,7 +250,7 @@ namespace augs {
 									note there's no kerning because it's always first character in line
 								*/
 								else {
-									int advance = g.info->adv;
+									int advance = g.adv;
 									lines[l].right -= advance;
 									--lines[l].end;
 									--lines[l+1].begin;
@@ -289,7 +289,7 @@ namespace augs {
 							pen.x += get_kern(source, i, l);
 							sectors.push_back(pen.x);
 
-							pen.x += get_cached(i).info->adv;
+							pen.x += get_cached(i).adv;
 						}
 						pen.y += lines[l].height();
 					}

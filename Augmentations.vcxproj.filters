@@ -2897,5 +2897,11 @@
     <ClInclude Include="depthbase\gui\material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game_framework\messages\camera_render_request_message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\assets\font.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

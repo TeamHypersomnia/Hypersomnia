@@ -6,8 +6,6 @@
 #include "game_framework/components/camera_component.h"
 #include "game_framework/components/input_component.h"
 
-#include "game_framework/scene_builders/scripts/rendering_procedures.h"
-
 namespace archetypes {
 	void camera(augs::entity_id e, int w, int h) {
 		components::transform transform;
@@ -29,8 +27,6 @@ namespace archetypes {
 
 		camera.screen_rect.set(0, 0, w, h);
 		camera.size.set(w, h);
-
-		camera.drawing_callback = scripts::testbed_rendering;
 
 		chase.relative = false;
 

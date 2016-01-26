@@ -40,7 +40,7 @@ namespace augs {
 					wchar_t password_character;
 					
 					/* default glyph placed instead null characters */
-					augs::font_file::glyph default_info;
+					augs::font::glyph default_info;
 					augs::font::glyph default_glyph;
 
 					drafter();

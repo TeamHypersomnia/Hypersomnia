@@ -14,6 +14,7 @@
 #include "../window_framework/window.h"
 
 #include "game_framework/resources/manager.h"
+#include "depthbase/gui/gui_world.h"
 
 namespace augs {
 	renderer& renderer::get_current() {
@@ -33,9 +34,9 @@ namespace augs {
 		glEnableVertexAttribArray(VERTEX_ATTRIBUTES::TEXCOORD); glerr;
 		glEnableVertexAttribArray(VERTEX_ATTRIBUTES::COLOR); glerr;
 
-		glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(augs::vertex), 0); glerr;
-		glVertexAttribPointer(VERTEX_ATTRIBUTES::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(augs::vertex), (char*)(sizeof(float) * 2)); glerr;
-		glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(augs::vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr;
+		glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), 0); glerr;
+		glVertexAttribPointer(VERTEX_ATTRIBUTES::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), (char*)(sizeof(float) * 2)); glerr;
+		glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr;
 	}
 
 	void renderer::clear() {
@@ -48,12 +49,20 @@ namespace augs {
 
 		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer); glerr;
 
-		glBufferData(GL_ARRAY_BUFFER, sizeof(augs::vertex_triangle) * triangles.size(), triangles.data(), GL_STREAM_DRAW); glerr;
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_triangle) * triangles.size(), triangles.data(), GL_STREAM_DRAW); glerr;
 		glDrawArrays(GL_TRIANGLES, 0, triangles.size() * 3); glerr;
 	}
 
-	void renderer::push_triangle(const augs::vertex_triangle& tri) {
+	void renderer::push_triangle(const vertex_triangle& tri) {
 		triangles.push_back(tri);
+	}
+
+	void renderer::viewport(rects::xywh<int> xywh) {
+		glViewport(xywh.x, xywh.y, xywh.w, xywh.h);
+	}
+	
+	void renderer::push_triangles_from_gui_world(graphics::gui::gui_world& gui) {
+		triangles.insert(triangles.end(), gui.triangle_buffer.begin(), gui.triangle_buffer.end());
 	}
 
 	void renderer::clear_triangles() {
@@ -64,7 +73,7 @@ namespace augs {
 		return triangles.size();
 	}
 
-	augs::vertex_triangle& renderer::get_triangle(int i) {
+	vertex_triangle& renderer::get_triangle(int i) {
 		return triangles[i];
 	}
 
@@ -89,9 +98,9 @@ namespace augs {
 		glEnableVertexAttribArray(VERTEX_ATTRIBUTES::TEXCOORD); glerr;
 		glEnableVertexAttribArray(VERTEX_ATTRIBUTES::COLOR); glerr;
 
-		glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(augs::vertex), 0); glerr;
-		glVertexAttribPointer(VERTEX_ATTRIBUTES::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(augs::vertex), (char*)(sizeof(float) * 2)); glerr;
-		glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(augs::vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr;
+		glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), 0); glerr;
+		glVertexAttribPointer(VERTEX_ATTRIBUTES::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), (char*)(sizeof(float) * 2)); glerr;
+		glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr;
 	}
 
 	void renderer::clear_logic_lines() {
@@ -103,7 +112,7 @@ namespace augs {
 		frame_lines.lines.clear();
 	}
 
-	void renderer::line_channel::draw(vec2 a, vec2 b, augs::rgba col) {
+	void renderer::line_channel::draw(vec2 a, vec2 b, rgba col) {
 		lines.push_back(debug_line(a, b, col));
 	}
 
@@ -114,6 +123,8 @@ namespace augs {
 	void renderer::line_channel::draw_cyan(vec2 a, vec2 b) { draw(a, b, colors::cyan); }
 
 	void renderer::draw_debug_info(vec2 visible_area, components::transform camera_transform, assets::texture_id tex_id, std::vector<entity_id> target_entities, double ratio) {
+		if (!debug_drawing) return;
+		
 		auto& tex = resource_manager.find(tex_id)->tex;
 		
 		vec2 center = visible_area / 2;
@@ -145,7 +156,7 @@ namespace augs {
 								p *= std::min(visibility_expansion, expansion);
 							}
 
-							augs::vertex_triangle verts;
+							vertex_triangle verts;
 
 							for (int i = 0; i < 3; ++i) {
 
@@ -215,7 +226,7 @@ namespace augs {
 	}
 
 	void renderer::default_render(vec2 visible_area) {
-		augs::graphics::fbo::use_default();
+		graphics::fbo::use_default();
 		glClear(GL_COLOR_BUFFER_BIT); glerr;
 		
 		resource_manager.find(assets::atlas_id::GAME_WORLD_ATLAS)->bind();

@@ -34,6 +34,7 @@ namespace augs {
 
 		double delta_milliseconds();
 		double delta_seconds();
+		double view_interpolation_ratio();
 
 		void assign_frame_time_to_delta();
 		void restore_fixed_delta();

@@ -19,6 +19,8 @@
 #include "utilities/file.h"
 #include "misc/time.h"
 
+#include "game_framework/scene_builders/scripts/rendering_procedures.h"
+
 using namespace augs;
 
 namespace scene_builders {
@@ -45,12 +47,17 @@ namespace scene_builders {
 		resource_manager.create(assets::texture_id::TEST_SPRITE, L"hypersomnia/data/gfx/frog.png");
 		resource_manager.create(assets::texture_id::MOTOR, L"hypersomnia/data/gfx/motor.png");
 
+		auto& font = resource_manager.create(assets::font_id::GUI_FONT);
+		font.open("hypersomnia/data/Kubasta.ttf", 13, L"ABC");
+
 		resource_manager.create_sprites_indexed(
 			assets::texture_id::TORSO_MOVING_FIRST,
 			assets::texture_id::TORSO_MOVING_LAST,
 			L"hypersomnia/data/gfx/sprite");
 
-		resource_manager.create(assets::atlas_id::GAME_WORLD_ATLAS, resources::manager::atlas_creation_mode::FROM_ALL_TEXTURES);
+		resource_manager.create(assets::atlas_id::GAME_WORLD_ATLAS,
+			resources::manager::atlas_creation_mode::FROM_ALL_TEXTURES
+			| resources::manager::atlas_creation_mode::FROM_ALL_FONTS);
 
 		resource_manager.create(assets::shader_id::DEFAULT_VERTEX, L"hypersomnia/data/shaders/default.vsh", graphics::shader::type::VERTEX);
 		resource_manager.create(assets::shader_id::DEFAULT_FRAGMENT, L"hypersomnia/data/shaders/default.fsh", graphics::shader::type::FRAGMENT);
@@ -175,7 +182,11 @@ namespace scene_builders {
 
 	}
 
-	void testbed::draw(world& world) {
+	void testbed::custom_drawcalls(world& world) {
 
+	}
+
+	void testbed::execute_drawcall_script(messages::camera_render_request_message msg) {
+		scripts::testbed_rendering(msg);
 	}
 }

@@ -1,6 +1,6 @@
 #pragma once
-
 #include "math/vec2.h"
+#include "math/rects.h"
 #include "../components/transform_component.h"
 
 #include "utilities/entity_system/entity_id.h"
@@ -14,6 +14,8 @@ namespace shared {
 		augs::renderer* output;
 		components::transform drawn_transform, camera_transform;
 		vec2 visible_area;
+		augs::rects::xywh<int> viewport;
+
 		bool always_visible;
 
 		augs::entity_id subject;

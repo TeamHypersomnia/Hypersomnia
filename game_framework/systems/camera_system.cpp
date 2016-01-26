@@ -1,7 +1,6 @@
 #include "math/vec2.h"
 #include "camera_system.h"
 
-#include <GL/OpenGL.h>
 #include "entity_system/entity.h"
 #include "../components/physics_component.h"
 #include "../components/crosshair_component.h"
@@ -9,6 +8,7 @@
 #include "../components/crosshair_component.h"
 #include "../components/physics_component.h"
 #include "../messages/intent_message.h"
+#include "../messages/camera_render_request_message.h"
 #include "../shared/drawing_state.h"
 #include "entity_system/world.h"
 
@@ -210,6 +210,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 			in.camera_transform = drawn_transform;
 			in.output = &get_renderer();
 			in.visible_area = camera.rendered_size;
+			in.viewport = camera.screen_rect;
 
 			camera.how_camera_will_render = in;
 		}
@@ -217,30 +218,20 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 }
 
 void camera_system::render_all_cameras() {
-	auto& renderer = get_renderer();
+	parent_world.get_message_queue<messages::camera_render_request_message>().clear();
 
 	for (auto e : targets) {
 		auto& camera = e->get<components::camera>();
 
 		if (camera.enabled) {
-			glViewport(camera.screen_rect.x, camera.screen_rect.y, camera.screen_rect.w, camera.screen_rect.h);
-			
 			auto& in = camera.how_camera_will_render;
-			
-			if (camera.drawing_callback)
-				camera.drawing_callback(e, in, camera.mask);
-			else {
-				parent_world.get_system<render_system>().generate_and_draw_all_layers(in, camera.mask);
-				renderer.default_render(camera.rendered_size);
-			}
 
-			if (renderer.debug_drawing) {
-				glDisable(GL_TEXTURE_2D);
-				renderer.draw_debug_info(camera.rendered_size, in.camera_transform, assets::texture_id::BLANK, parent_world.get_system<render_system>().targets, view_interpolation_ratio());
-				glEnable(GL_TEXTURE_2D);
-			}
+			messages::camera_render_request_message msg;
+			msg.camera = e;
+			msg.state = in;
+			msg.mask = camera.mask;
+
+			parent_world.post_message(msg);
 		}
 	}
-
-	renderer.clear_geometry();
 }

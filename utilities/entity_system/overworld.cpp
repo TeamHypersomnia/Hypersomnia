@@ -50,6 +50,10 @@ namespace augs {
 		return delta_ms;
 	}
 
+	double overworld::view_interpolation_ratio() {
+		return accumulator.get_ratio();
+	}
+
 	void overworld::assign_frame_time_to_delta() {
 		delta_ms = frame_timer.extract<std::chrono::milliseconds>();
 	}

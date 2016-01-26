@@ -105,8 +105,4 @@ namespace scene_builders {
 	void one_entity::perform_logic_step(world& world) {
 
 	}
-
-	void one_entity::draw(world& world) {
-
-	}
 }

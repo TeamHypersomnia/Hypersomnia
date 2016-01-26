@@ -35,7 +35,7 @@ namespace augs {
 	}
 	
 	double processing_system::view_interpolation_ratio() {
-		return parent_overworld.accumulator.get_ratio();
+		return parent_overworld.view_interpolation_ratio();
 	}
 
 	augs::renderer& processing_system::get_renderer() {

@@ -9,6 +9,8 @@ namespace scene_builders {
 
 		void initialize(augs::world& world) override;
 		void perform_logic_step(augs::world& world) override;
-		void draw(augs::world& world) override;
+		void custom_drawcalls(augs::world& world) override;
+
+		void execute_drawcall_script(messages::camera_render_request_message) override;
 	};
 }

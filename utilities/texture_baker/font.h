@@ -7,61 +7,46 @@ struct FT_Glyph_Metrics_;
 typedef FT_Glyph_Metrics_ FT_Glyph_Metrics;
 
 namespace augs {
-	struct font_file {
+	struct font {
 		struct glyph {
 			image img;
-			int adv, bear_x, bear_y;
-			rects::wh<int> size;
+			texture tex;
+
+			int adv = 0, bear_x = 0, bear_y = 0;
+			unsigned int index = 0, unicode = 0;
+
+			rects::wh<int> size = rects::wh<int>(0, 0);
 
 			std::vector<std::pair<unsigned, int> > kerning;
 
-			glyph();
-			glyph(int adv, int bear_x, int bear_y, rects::wh<int> size);
+			glyph() = default;
 			glyph(const FT_Glyph_Metrics&);
-		private:
-			friend struct font_file;
-			unsigned int index, unicode;
 		};
 
 		std::vector<glyph> glyphs;
 		std::unordered_map<unsigned, unsigned> unicode;
 
-		font_file();
-
 		typedef std::vector<std::pair<wchar_t, wchar_t> > charset;
-		void create(std::pair<wchar_t, wchar_t> range);
-		void create(const charset& ranges);
-		void create(const std::wstring& characters);
 
 		bool open(const char* filename, unsigned pt, std::pair<wchar_t, wchar_t> range);
 		bool open(const char* filename, unsigned pt, const charset& ranges);
-
 		bool open(const char* filename, unsigned _pt, const std::wstring& characters);
 
 		glyph* get_glyphs(), *get_glyph(unsigned unicode);
-		unsigned get_count() const, get_pt() const, get_height() const;
+		unsigned get_pt() const, get_height() const;
 
-		void free_images(), destroy();
-		//				font_file(const font_file&) = delete;
 		charset to_charset(const std::wstring&);
-		friend struct font;
-		int ascender, descender;
-		unsigned pt;
-	};
+		int ascender = 0, descender = 0;
+		unsigned pt = 0;
 
-	struct font {
-		struct glyph {
-			font_file::glyph* info;
-			texture tex;
-			glyph();
-		};
-		font *bold, *italics, *bi, *regular;
+		void free_images();
 
-		font(); ~font();
-		void build(font_file*), add_to_atlas(atlas&), destroy();
+		font* get_bold(bool flag);
+		font* get_italics(bool flag);
 
-		glyph* get_glyph(unsigned unicode);
-		font_file* get_font();
+		font *bold = nullptr, *italics = nullptr, *bi = nullptr, *regular = nullptr;
+
+		void add_to_atlas(atlas&);
 
 		void set_styles(font* bold, font* italics, font* bi);
 
@@ -69,16 +54,5 @@ namespace augs {
 		bool can_be_italicsed();
 		bool is_bolded();
 		bool is_italicsed();
-
-		/* shortcut to get_parent()->get_height()*/
-		unsigned get_height();
-
-		font_file* get_parent();
-
-		font* get_bold(bool flag);
-		font* get_italics(bool flag);
-
-		glyph *glyphs;
-		font_file* parent;
 	};
 }

@@ -96,7 +96,7 @@ namespace augs {
 						gui::draw_clipped_rectangle(highlight_mat, rects::xywh<float>(0, highlighted.top, clipper ? d.get_bbox().w + clipper->w() : d.get_bbox().w,
 
 							/* snap to default style's height */
-							highlighted.empty() ? caret->default_style.f->parent->get_height() 
+							highlighted.empty() ? caret->default_style.f->get_height() 
 							: highlighted.height()) + pos, clipper, v);
 					}
 
@@ -176,7 +176,7 @@ namespace augs {
 									
 									/* add the resulting character taking bearings into account */
 									gui::draw_clipped_rectangle(material(&g.tex, charcolor), 
-									rects::xywh<float> (sectors[i] + g.info->bear_x, lines[l].top + lines[l].asc - g.info->bear_y, g.info->size.w, g.info->size.h) + pos, clipper, 
+									rects::xywh<float> (sectors[i] + g.bear_x, lines[l].top + lines[l].asc - g.bear_y, g.size.w, g.size.h) + pos, clipper, 
 									v);
 								}
 							}
@@ -189,20 +189,20 @@ namespace augs {
 									caret_rect = rects::xywh<float>(sectors[caret->pos], lines[caret_line].top, caret_width, lines[caret_line].height());
 								else {
 									int pos = std::max(1u, caret->pos);
-									auto& glyph_font = *colors[pos-1].font_used->parent;
+									auto& glyph_font = *colors[pos-1].font_used;
 									caret_rect = rects::xywh<float>(sectors[caret->pos], lines[caret_line].top + lines[caret_line].asc - glyph_font.ascender, 
 										caret_width, glyph_font.get_height());
 								}
 							}
 							/* otherwise set caret's height to default style's height to avoid strange situations */
 							else
-								caret_rect = rects::xywh<float>(0, d.lines[caret_line].top, caret_width, caret->default_style.f->parent->get_height());
+								caret_rect = rects::xywh<float>(0, d.lines[caret_line].top, caret_width, caret->default_style.f->get_height());
 
 						}
 					} 
 					/* there is nothing to draw, but we are still active so we want to draw caret anyway */
 					else if(active && caret)
-						caret_rect = rects::xywh<float>(0, 0, caret_width, caret->default_style.f->parent->get_height());
+						caret_rect = rects::xywh<float>(0, 0, caret_width, caret->default_style.f->get_height());
 					
 //					this->quad_indices.caret = v.size();
 					if(blink.caret_visible) gui::draw_clipped_rectangle(caret_mat, caret_rect + pos, clipper, v); 

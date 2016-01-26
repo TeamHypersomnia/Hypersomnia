@@ -3,6 +3,7 @@
 #include "../assets/atlas.h"
 #include "../assets/shader.h"
 #include "../assets/program.h"
+#include "../assets/font.h"
 #include "../assets/animation.h"
 #include "../assets/animation_response.h"
 
@@ -10,6 +11,7 @@
 #include "../resources/animation_response.h"
 
 #include "texture_baker/texture_baker.h"
+#include "texture_baker/font.h"
 #include "graphics/shader.h"
 
 #include <unordered_map>
@@ -29,18 +31,21 @@ namespace resources {
 		};
 
 		texture_with_image* find(assets::texture_id);
+		augs::font* find(assets::font_id);
 		augs::atlas* find(assets::atlas_id);
 		augs::graphics::shader_program* find(assets::program_id);
 
 		animation* find(assets::animation_id);
 		animation_response* find(assets::animation_response_id);
 
-		enum class atlas_creation_mode {
-			EMPTY,
-			FROM_ALL_TEXTURES
+		enum atlas_creation_mode {
+			EMPTY = 0,
+			FROM_ALL_TEXTURES = 1,
+			FROM_ALL_FONTS = 2
 		};
 
-		augs::atlas& create(assets::atlas_id, atlas_creation_mode);
+		augs::atlas& create(assets::atlas_id, unsigned atlas_creation_mode_flags);
+		augs::font& create(assets::font_id);
 		texture_with_image& create(assets::texture_id, std::wstring filename);
 		texture_with_image& create(assets::texture_id, augs::image img);
 
@@ -65,6 +70,7 @@ namespace resources {
 		std::unordered_map<assets::animation_id, animation> animations;
 
 		std::unordered_map<assets::texture_id, texture_with_image> textures;
+		std::unordered_map<assets::font_id, augs::font> fonts;
 		std::unordered_map<assets::atlas_id, augs::atlas> atlases;
 		std::unordered_map<assets::shader_id, augs::graphics::shader> shaders;
 		std::unordered_map<assets::program_id, augs::graphics::shader_program> programs;

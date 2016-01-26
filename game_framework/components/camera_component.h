@@ -61,11 +61,6 @@ namespace components {
 
 		} get_constrained_crosshair_and_camera_offset(augs::entity_id self);
 		
-
-		/* arguments: subject, renderer, mask */
-		typedef std::function<void(augs::entity_id, shared::drawing_state, int)> drawing_procedure;
-		drawing_procedure drawing_callback;
-
 		shared::drawing_state how_camera_will_render;
 
 	private:

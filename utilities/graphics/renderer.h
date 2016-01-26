@@ -11,6 +11,12 @@
 #include "utilities/misc/timer.h"
 
 namespace augs {
+	namespace graphics {
+		namespace gui {
+			class gui_world;
+		}
+	}
+
 	class renderer {
 	public:
 		static renderer& get_current();
@@ -24,13 +30,13 @@ namespace augs {
 		};
 
 		struct debug_line {
-			debug_line(vec2 a = vec2(), vec2 b = vec2(), augs::rgba col = augs::rgba(255, 255, 255, 255)) : col(col), a(a), b(b) {}
+			debug_line(vec2 a = vec2(), vec2 b = vec2(), rgba col = rgba(255, 255, 255, 255)) : col(col), a(a), b(b) {}
 
-			augs::rgba col;
+			rgba col;
 			vec2 a, b;
 		};
 
-		augs::vertex_triangle_buffer triangles;
+		vertex_triangle_buffer triangles;
 
 		unsigned int position_buffer, texcoord_buffer, color_buffer;
 		unsigned int triangle_buffer;
@@ -38,7 +44,7 @@ namespace augs {
 		struct line_channel {
 			std::vector<debug_line> lines;
 
-			void draw(vec2 a, vec2 b, augs::rgba = augs::colors::white);
+			void draw(vec2 a, vec2 b, rgba = colors::white);
 			
 			void draw_red(vec2 a, vec2 b);
 			void draw_green(vec2 a, vec2 b);
@@ -50,7 +56,7 @@ namespace augs {
 		line_channel logic_lines, prev_logic_lines;
 		line_channel frame_lines;
 		line_channel blink_lines;
-		augs::timer line_timer;
+		timer line_timer;
 
 		void fullscreen_quad();
 		
@@ -60,13 +66,16 @@ namespace augs {
 
 		void clear();
 		void call_triangles();
-		void push_triangle(const augs::vertex_triangle&);
+		void viewport(rects::xywh<int>);
+		void push_triangle(const vertex_triangle&);
+		void push_triangles_from_gui_world(graphics::gui::gui_world&);
+
 		void clear_triangles();
 
 		void default_render(vec2 visible_area);
 
 		int get_triangle_count();
-		augs::vertex_triangle& get_triangle(int i);
+		vertex_triangle& get_triangle(int i);
 
 		void clear_geometry();
 

@@ -37,6 +37,13 @@ namespace resources {
 		return &(*it).second;
 	}
 
+	font* manager::find(assets::font_id id) {
+		auto it = fonts.find(id);
+		if (it == fonts.end()) return nullptr;
+
+		return &(*it).second;
+	}
+
 	graphics::shader_program* manager::find(assets::program_id id) {
 		auto it = programs.find(id);
 		if (it == programs.end()) return nullptr;
@@ -66,20 +73,34 @@ namespace resources {
 	//	return find_atlas(assets::atlas_id(id));
 	//}
 
-	atlas& manager::create(assets::atlas_id id, atlas_creation_mode mode) {
+	atlas& manager::create(assets::atlas_id id, unsigned atlas_creation_mode_flags) {
 		atlases.insert(std::make_pair(id, atlas()));
 
 		atlas& atl = atlases[id];
 
-		if (mode == atlas_creation_mode::FROM_ALL_TEXTURES) {
+		if (atlas_creation_mode_flags & atlas_creation_mode::FROM_ALL_TEXTURES) {
 			for (auto& tex : textures) {
 				atl.textures.push_back(&tex.second.tex);
+			}
+		}
+
+		if (atlas_creation_mode_flags & atlas_creation_mode::FROM_ALL_FONTS) {
+			for (auto& fnt : fonts) {
+				fnt.second.add_to_atlas(atl);
 			}
 		}
 
 		atl.default_build();
 
 		return atl;
+	}
+
+	augs::font& manager::create(assets::font_id id) {
+		fonts.insert(std::make_pair(id, augs::font()));
+
+		augs::font& font = fonts[id];
+
+		return font;
 	}
 
 	manager::texture_with_image& manager::create(assets::texture_id id, image img) {

@@ -9,7 +9,11 @@
 #include "math/matrix.h"
 
 namespace scripts {
-	void testbed_rendering(augs::entity_id camera, shared::drawing_state state, int mask) {
+	void testbed_rendering(messages::camera_render_request_message msg) {
+		auto& state = msg.state;
+		auto mask = msg.mask;
+		auto camera = msg.camera;
+
 		auto& world = camera->get_owner_world();
 		auto& drawing = world.get_system<render_system>();
 

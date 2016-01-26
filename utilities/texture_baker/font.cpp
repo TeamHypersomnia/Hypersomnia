@@ -10,9 +10,7 @@
 #include "../augmentations.h"
 
 namespace augs {
-	font_file::font_file() : pt(0) {}
-
-	font_file::charset font_file::to_charset(const std::wstring& str) {
+	font::charset font::to_charset(const std::wstring& str) {
 		charset ranges;
 		ranges.reserve(str.size());
 
@@ -26,53 +24,21 @@ namespace augs {
 		return ranges;
 	}
 
-	void font_file::create(std::pair<wchar_t, wchar_t> range) {
-		charset ranges;
-		ranges.push_back(range);
-		return create(ranges);
-	}
-
-	void font_file::create(const std::wstring& str) {
-		return create(to_charset(str));
-	}
-
-	void font_file::create(const charset& ranges) {
-		for (unsigned i = 0; i < ranges.size(); ++i) {
-			for (unsigned j = ranges[i].first; j < ranges[i].second; ++j) {
-				glyphs.push_back(glyph());
-				glyph& g = *glyphs.rbegin();
-				g.unicode = j;
-
-				unicode[j] = glyphs.size() - 1;
-			}
-		}
-
-		glyphs.shrink_to_fit();
-	}
-
-	bool font_file::open(const char* filename, unsigned pt, std::pair<wchar_t, wchar_t> range) {
+	bool font::open(const char* filename, unsigned pt, std::pair<wchar_t, wchar_t> range) {
 		charset ranges;
 		ranges.push_back(range);
 		return open(filename, pt, ranges);
 	}
 
-	bool font_file::open(const char* filename, unsigned pt, const std::wstring& str) {
+	bool font::open(const char* filename, unsigned pt, const std::wstring& str) {
 		return open(filename, pt, to_charset(str));
 	}
 
-	font::glyph::glyph() : info(nullptr) {}
-
-	font_file::glyph::glyph()
-		: adv(0), bear_x(0), bear_y(0) {}
-
-	font_file::glyph::glyph(int adv, int bear_x, int bear_y, rects::wh<int> size)
-		: adv(adv), bear_x(bear_x), bear_y(bear_y), size(size) {}
-
-	font_file::glyph::glyph(const FT_Glyph_Metrics& m)
+	font::glyph::glyph(const FT_Glyph_Metrics& m)
 		: adv(m.horiAdvance >> 6), bear_x(m.horiBearingX >> 6), bear_y(m.horiBearingY >> 6), size(m.width >> 6, m.height >> 6) {
 	}
 
-	bool font_file::open(const char* filename, unsigned _pt, const charset& ranges) {
+	bool font::open(const char* filename, unsigned _pt, const charset& ranges) {
 		pt = _pt;
 		FT_Face face;
 		int f = 1, error = FT_New_Face(*freetype_library.get(), filename, 0, &face);
@@ -93,6 +59,13 @@ namespace augs {
 
 		FT_UInt g_index;
 
+		size_t reservation = 0;
+
+		for (unsigned i = 0; i < ranges.size(); ++i)
+			reservation += ranges[i].second - ranges[i].first;
+
+		glyphs.reserve(reservation);
+
 		for (unsigned i = 0; i < ranges.size(); ++i) {
 			for (unsigned j = ranges[i].first; j < ranges[i].second; ++j) {
 				g_index = FT_Get_Char_Index(face, j);
@@ -107,8 +80,9 @@ namespace augs {
 					g.index = g_index;
 					g.unicode = j;
 
-					if (face->glyph->bitmap.width)
+					if (face->glyph->bitmap.width) {
 						g.img.copy(face->glyph->bitmap.buffer, 1, face->glyph->bitmap.pitch, rects::wh<int>(face->glyph->bitmap.width, face->glyph->bitmap.rows));
+					}
 
 					unicode[j] = glyphs.size() - 1;
 				}
@@ -132,57 +106,28 @@ namespace augs {
 		return f != 0;
 	}
 
-	font_file::glyph* font_file::get_glyphs() {
+	font::glyph* font::get_glyphs() {
 		return glyphs.data();
 	}
 
-	font_file::glyph* font_file::get_glyph(unsigned _unicode) {
-		return glyphs.data() + unicode[_unicode];
-	}
-
-	unsigned font_file::get_count() const {
-		return glyphs.size();
-	}
-
-	unsigned font_file::get_pt() const {
+	unsigned font::get_pt() const {
 		return pt;
 	}
 
-	unsigned font_file::get_height() const {
+	unsigned font::get_height() const {
 		return ascender - descender;
 	}
 
-	void font_file::free_images() {
+	void font::free_images() {
 		for (unsigned i = 0; i < glyphs.size(); ++i)
 			glyphs[i].img.destroy();
 	}
 
-	void font_file::destroy() {
-		glyphs.clear();
-		glyphs.shrink_to_fit();
-	}
-
-	font::font() : glyphs(0), parent(0), bold(nullptr), italics(nullptr), regular(this) {}
-
-	font::~font() {
-		destroy();
-	}
-
-	void font::build(font_file* _parent) {
-		destroy();
-		parent = _parent;
-		glyphs = new glyph[parent->get_count()];
-		for (unsigned i = 0; i < parent->get_count(); ++i) {
-			glyphs[i].info = parent->glyphs.data() + i;
-			glyphs[i].tex.set(&glyphs[i].info->img);
-			glyphs[i].tex.luminosity_to_alpha(true);
-		}
-	}
-
 	void font::add_to_atlas(atlas& atl) {
-		for (unsigned i = 0; i < parent->get_count(); ++i) {
-			if (glyphs[i].tex.get_rect().w) {
-				atl.textures.push_back(&glyphs[i].tex);
+		for (auto& g : glyphs) {
+			if (g.tex.get_rect().w) {
+				g.tex.set(&g.img);
+				atl.textures.push_back(&g.tex);
 			}
 		}
 	}
@@ -211,14 +156,6 @@ namespace augs {
 		return this == italics || this == bi;
 	}
 
-	unsigned font::get_height() {
-		return get_parent()->get_height();
-	}
-
-	font_file* font::get_parent() {
-		return parent;
-	}
-
 	font* font::get_bold(bool flag) {
 		if (flag) {
 			if (this == regular || this == bold) return bold ? bold : regular;
@@ -243,22 +180,10 @@ namespace augs {
 		return 0;
 	}
 
-	void font::destroy() {
-		if (glyphs) {
-			delete[] glyphs;
-			glyphs = 0;
-		}
-	}
-
-	font::glyph* font::get_glyph(unsigned unicode) {
-		if (parent == nullptr) return nullptr;
-		auto it = parent->unicode.find(unicode);
-		if (it == parent->unicode.end()) return nullptr;
-		else return glyphs + (*it).second;
+	font::glyph* font::get_glyph(unsigned unicode_id) {
+		auto it = unicode.find(unicode_id);
+		if (it == unicode.end()) return nullptr;
+		else return &glyphs[(*it).second];
 		//return glyphs[parent->unicode[unicode]];
-	}
-
-	font_file* font::get_font() {
-		return parent;
 	}
 }
