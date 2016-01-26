@@ -26,7 +26,7 @@ namespace components {
 		int current_state, trigger_mode;
 
 		components::render bullet_render;
-		helpers::physics_info bullet_body;
+		helpers::fixture_definition bullet_body;
 		b2Filter melee_filter;
 		b2Filter melee_obstruction_filter;
 

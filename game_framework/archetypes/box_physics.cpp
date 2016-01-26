@@ -7,10 +7,10 @@
 
 namespace archetypes {
 	void crate_physics(augs::entity_id e) {
-		helpers::body_info body;
+		helpers::body_definition body;
 		body.fixed_rotation = false;
 
-		helpers::physics_info info;
+		helpers::fixture_definition info;
 		info.from_renderable(e);
 
 		info.filter = filters::dynamic_object();
@@ -21,11 +21,11 @@ namespace archetypes {
 	}
 
 	void static_crate_physics(augs::entity_id e) {
-		helpers::body_info body;
+		helpers::body_definition body;
 		body.fixed_rotation = false;
 		body.body_type = b2_staticBody;
 
-		helpers::physics_info info;
+		helpers::fixture_definition info;
 		info.from_renderable(e);
 
 		info.filter = filters::dynamic_object();

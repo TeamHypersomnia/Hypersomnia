@@ -19,11 +19,11 @@
 namespace helpers {
 	b2World* current_b2world = nullptr;
 
-	void physics_info::add_convex(const std::vector <vec2>& verts) {
+	void fixture_definition::add_convex(const std::vector <vec2>& verts) {
 		convex_polys.push_back(verts);
 	}
 
-	void physics_info::offset_vertices() {
+	void fixture_definition::offset_vertices() {
 		for (auto& c : convex_polys) {
 			for (auto& v : c) {
 				v.rotate(transform_vertices.rotation, vec2(0, 0));
@@ -32,7 +32,7 @@ namespace helpers {
 		}
 	}
 
-	void physics_info::from_renderable(augs::entity_id e) {
+	void fixture_definition::from_renderable(augs::entity_id e) {
 		auto* sprite = e->find<components::sprite>();
 		auto* polygon = e->find<components::polygon>();
 
@@ -84,7 +84,7 @@ namespace helpers {
 		// TODO: remove the visual components server-side
 	}
 
-	void physics_info::add_concave(const std::vector <vec2> &verts) {
+	void fixture_definition::add_concave(const std::vector <vec2> &verts) {
 		//original_model.insert(original_model.end(), verts.begin(), verts.end());
 		//
 		//b2Separator separator;
@@ -158,11 +158,11 @@ namespace helpers {
 		return false;
 	}
 
-	components::fixtures& add_fixtures(physics_info fixture_data, augs::entity_id subject) {
+	components::fixtures& add_fixtures(fixture_definition fixture_data, augs::entity_id subject) {
 		return add_fixtures_to_other_body(fixture_data, subject, subject);
 	}
 
-	components::fixtures& add_fixtures_to_other_body(physics_info fixture_data, augs::entity_id subject, augs::entity_id existing_body) {
+	components::fixtures& add_fixtures_to_other_body(fixture_definition fixture_data, augs::entity_id subject, augs::entity_id existing_body) {
 		physics_system& physics = subject->owner_world.get_system<physics_system>();
 
 		b2PolygonShape shape;
@@ -199,7 +199,7 @@ namespace helpers {
 		return fixtures;
 	}
 
-	components::physics& create_physics_component(body_info body_data, augs::entity_id subject) {
+	components::physics& create_physics_component(body_definition body_data, augs::entity_id subject) {
 		physics_system& physics = subject->owner_world.get_system<physics_system>();
 
 		auto& transform = subject->get<components::transform>();

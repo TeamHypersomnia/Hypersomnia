@@ -3,13 +3,6 @@
 auto all = std::numeric_limits<decltype(b2Filter::categoryBits)>::max() & (~filters::TRIGGER);
 
 namespace filters {
-	b2Filter none() {
-		b2Filter out;
-		out.categoryBits = all;
-		out.maskBits = 0;
-		return out;
-	}
-
 	b2Filter renderable() {
 		b2Filter out;
 		out.categoryBits = RENDERABLE;
@@ -24,13 +17,6 @@ namespace filters {
 		return out;
 	}
 	
-	//b2Filter everything() {
-	//	b2Filter out;
-	//	out.categoryBits = all;
-	//	out.maskBits = all;
-	//	return out;
-	//}
-
 	b2Filter controlled_character() {
 		b2Filter out;
 		out.categoryBits = RENDERABLE | CONTROLLED_CHARACTER | DYNAMIC_OBJECT;

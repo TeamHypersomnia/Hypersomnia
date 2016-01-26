@@ -41,8 +41,8 @@ namespace archetypes {
 	}
 
 	void wsad_player_physics(augs::entity_id e) {
-		helpers::body_info body;
-		helpers::physics_info info;
+		helpers::body_definition body;
+		helpers::fixture_definition info;
 		info.from_renderable(e);
 
 		info.filter = filters::controlled_character();

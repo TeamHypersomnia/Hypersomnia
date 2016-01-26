@@ -48,11 +48,11 @@ namespace prefabs {
 
 			render.layer = render_layer::DYNAMIC_BODY;
 
-			helpers::body_info body;
+			helpers::body_definition body;
 			body.linear_damping = 0.4f;
 			body.angular_damping = 2.f;
 
-			helpers::physics_info info;
+			helpers::fixture_definition info;
 			info.from_renderable(front);
 
 			info.filter = filters::dynamic_object();
@@ -78,7 +78,7 @@ namespace prefabs {
 			//sprite.size.x = 250;
 			//sprite.size.y = 550;
 
-			helpers::physics_info info;
+			helpers::fixture_definition info;
 			info.from_renderable(interior);
 			info.density = 0.6f;
 			info.filter = filters::dynamic_object();
@@ -104,7 +104,7 @@ namespace prefabs {
 			sprite.size.x = 30;
 			sprite.size.y = 60;
 
-			helpers::physics_info info;
+			helpers::fixture_definition info;
 			info.from_renderable(left_wheel);
 			info.density = 0.6f;
 			info.filter = filters::trigger();

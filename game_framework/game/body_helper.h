@@ -10,7 +10,7 @@ namespace components {
 }
 
 namespace helpers {
-	struct body_info {
+	struct body_definition {
 		int body_type = b2_dynamicBody;
 
 		float angular_damping = 6.5f,
@@ -20,7 +20,7 @@ namespace helpers {
 		bool fixed_rotation = false, bullet = false, angled_damping = false;
 	};
 
-	struct physics_info {
+	struct fixture_definition {
 		void offset_vertices();
 
 		enum {
@@ -50,10 +50,10 @@ namespace helpers {
 
 	//extern void create_physics_component(augs::entity_id subject, b2Filter filter, int = b2_dynamicBody);
 
-	extern components::physics& create_physics_component(body_info, augs::entity_id subject);
+	extern components::physics& create_physics_component(body_definition, augs::entity_id subject);
 	
-	extern components::fixtures& add_fixtures(physics_info, augs::entity_id subject);
-	extern components::fixtures& add_fixtures_to_other_body(physics_info, augs::entity_id fixtures_entity, augs::entity_id existing_body);
+	extern components::fixtures& add_fixtures(fixture_definition, augs::entity_id subject);
+	extern components::fixtures& add_fixtures_to_other_body(fixture_definition, augs::entity_id fixtures_entity, augs::entity_id existing_body);
 
 	extern std::vector<b2Vec2> get_world_vertices(augs::entity_id subject, bool meters = true, int fixture_num = 0);
 	

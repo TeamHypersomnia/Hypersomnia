@@ -26,12 +26,12 @@ namespace components {
 		return id->get<components::fixtures>().get_body_entity();
 	}
 
-	bool physics::is_physical(augs::entity_id id) {
+	bool physics::is_entity_physical(augs::entity_id id) {
 		return id->find<components::fixtures>() || id->find<components::physics>();
 	}
 
 	bool physics::are_connected_by_friction(augs::entity_id child, augs::entity_id parent) {
-		if (components::physics::is_physical(child) && components::physics::is_physical(parent)) {
+		if (components::physics::is_entity_physical(child) && components::physics::is_entity_physical(parent)) {
 			bool matched_ancestor = false;
 
 			entity_id parent_body_entity = components::physics::get_owner_body_entity(parent);
@@ -126,10 +126,6 @@ namespace components {
 
 	entity_id physics::get_owner_friction_ground() {
 		return owner_friction_ground;
-
-		//if (owner_friction_grounds.empty()) return entity_id();
-		//
-		//return owner_friction_grounds[0];
 	}
 
 	void physics::set_transform(augs::entity_id id) {

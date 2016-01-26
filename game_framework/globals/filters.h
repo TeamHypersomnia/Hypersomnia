@@ -17,10 +17,8 @@ namespace filters {
 		RENDERABLE_QUERY = 1 << 10,
 	};
 
-	b2Filter none();
 	b2Filter renderable_query();
 	b2Filter renderable();
-	// b2Filter everything();
 	b2Filter controlled_character();
 	b2Filter dynamic_object();
 	b2Filter static_object();
