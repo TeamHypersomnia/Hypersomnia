@@ -80,6 +80,7 @@ void hypersomnia_world::register_messages_components_systems() {
 	register_message_queue<trigger_hit_request_message>();
 	register_message_queue<car_ownership_change_message>();
 	register_message_queue<new_entity_message>();
+	register_message_queue<camera_render_request_message>();
 
 	get_system<render_system>().layers_with_custom_drawing_order.push_back(render_layer::CAR_INTERIOR);
 }
@@ -115,9 +116,11 @@ void hypersomnia_world::draw() {
 	get_system<lookat_system>().update_rotations();
 
 	get_system<camera_system>().render_all_cameras();
-	get_system<render_system>().restore_actual_transforms();
-
 	get_system<input_system>().acquire_events_from_rendering_time();
+}
+
+void hypersomnia_world::restore_transforms_after_rendering() {
+	get_system<render_system>().restore_actual_transforms();
 }
 
 void hypersomnia_world::perform_logic_step() {

@@ -8,6 +8,9 @@
 
 #include "game_framework/game_framework.h"
 #include "game_framework/messages/raw_window_input_message.h"
+#include "game_framework/messages/camera_render_request_message.h"
+
+#include "game_framework/systems/render_system.h"
 
 #include "bindings.h"
 
@@ -87,10 +90,12 @@ void hypersomnia_overworld::simulate() {
 
 		assign_frame_time_to_delta();
 		game_world.draw();
-		current_scene_builder->draw(game_world);
-		restore_fixed_delta();
 
-		game_window.swap_buffers();
+		consume_camera_render_requests();
+
+		game_world.restore_transforms_after_rendering();
+
+		restore_fixed_delta();
 
 #if !DETERMINISTIC_RENDERING
 		auto steps_to_do = accumulator.update_and_extract_steps();
@@ -103,6 +108,22 @@ void hypersomnia_overworld::simulate() {
 			current_scene_builder->perform_logic_step(game_world);
 		}
 	}
+}
+
+void hypersomnia_overworld::consume_camera_render_requests() {
+	auto& requests = game_world.get_message_queue<messages::camera_render_request_message>();
+	auto& target = renderer::get_current();
+
+	for (auto& r : requests) {
+		target.viewport(r.state.viewport);
+		current_scene_builder->execute_drawcall_script(r);
+		target.draw_debug_info(r.state.visible_area, r.state.camera_transform, assets::texture_id::BLANK, game_world.get_system<render_system>().targets, view_interpolation_ratio());
+	}
+	
+	current_scene_builder->custom_drawcalls(game_world);
+
+	game_window.swap_buffers();
+	target.clear_geometry();
 }
 
 void hypersomnia_overworld::configure_scripting() {

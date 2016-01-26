@@ -81,7 +81,7 @@ void callback_rect::focus() {
 }
 
 bool callback_textbox::is_focused() {
-	return owner->main_window.get_focus() == &textbox_object;
+	return owner->main_window.get_rect_in_focus() == &textbox_object;
 }
 
 void callback_textbox::set_caret(unsigned pos, bool select) {
@@ -113,7 +113,7 @@ vec2 callback_textbox::get_text_bbox() {
 
 
 void callback_textbox::draw(bool flag) {
-	textbox_object.draw = flag;
+	textbox_object.enable_drawing = flag;
 }
 
 void callback_textbox::focus() {

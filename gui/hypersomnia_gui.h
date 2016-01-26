@@ -1,6 +1,6 @@
 #pragma once
 #include <functional>
-#include "depthbase/gui/system.h"
+#include "depthbase/gui/gui_world.h"
 #include "depthbase/gui/controls/stylesheeted/controls.h"
 #include "misc/timer.h"
 #include "math/vec2.h"
@@ -86,7 +86,7 @@ struct hypersomnia_gui {
 
 	augs::window::glwindow& gl;
 
-	augs::graphics::gui::system sys;
+	augs::graphics::gui::gui_world sys;
 
 	hypersomnia_gui(augs::window::glwindow& gl, texture* blank_texture);
 

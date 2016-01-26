@@ -29,4 +29,6 @@ public:
 	void configure_scripting();
 
 	void simulate();
+
+	void consume_camera_render_requests();
 };

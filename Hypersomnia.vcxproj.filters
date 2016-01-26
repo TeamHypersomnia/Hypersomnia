@@ -24,9 +24,6 @@
     <ClInclude Include="game\utilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="gui\hypersomnia_gui.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\hypersomnia_world.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -51,15 +48,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\draw_tile_highlights.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gui\binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gui\controls_setup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gui\hypersomnia_gui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">

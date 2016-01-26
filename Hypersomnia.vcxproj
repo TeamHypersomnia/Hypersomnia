@@ -142,7 +142,6 @@
     <ClInclude Include="game\hypersomnia_overworld.h" />
     <ClInclude Include="game\hypersomnia_world.h" />
     <ClInclude Include="game\utilities.h" />
-    <ClInclude Include="gui\hypersomnia_gui.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -150,12 +149,6 @@
     <ClCompile Include="game\draw_tile_highlights.cpp" />
     <ClCompile Include="game\hypersomnia_overworld.cpp" />
     <ClCompile Include="game\hypersomnia_world.cpp" />
-    <ClCompile Include="gui\binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="gui\controls_setup.cpp" />
-    <ClCompile Include="gui\hypersomnia_gui.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
