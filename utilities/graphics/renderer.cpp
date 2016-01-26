@@ -27,8 +27,8 @@ namespace augs {
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE); glerr;
 		glClearColor(0.0, 0.0, 0.0, 1.0); glerr;
 
-		glGenBuffers(1, &triangle_buffer); glerr;
-		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer); glerr;
+		glGenBuffers(1, &triangle_buffer_id); glerr;
+		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
 
 		glEnableVertexAttribArray(VERTEX_ATTRIBUTES::POSITION); glerr;
 		glEnableVertexAttribArray(VERTEX_ATTRIBUTES::TEXCOORD); glerr;
@@ -47,7 +47,7 @@ namespace augs {
 	void renderer::call_triangles() {
 		if (triangles.empty()) return;
 
-		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer); glerr;
+		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
 
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_triangle) * triangles.size(), triangles.data(), GL_STREAM_DRAW); glerr;
 		glDrawArrays(GL_TRIANGLES, 0, triangles.size() * 3); glerr;
@@ -92,7 +92,7 @@ namespace augs {
 
 		glDrawArrays(GL_QUADS, 0, 4); glerr;
 
-		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer); glerr;
+		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
 
 		glEnableVertexAttribArray(VERTEX_ATTRIBUTES::POSITION); glerr;
 		glEnableVertexAttribArray(VERTEX_ATTRIBUTES::TEXCOORD); glerr;

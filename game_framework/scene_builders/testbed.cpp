@@ -23,6 +23,8 @@
 
 #include "texture_baker/font.h"
 
+#include "depthbase/gui/text/printer.h"
+
 using namespace augs;
 
 namespace scene_builders {
@@ -50,7 +52,7 @@ namespace scene_builders {
 		resource_manager.create(assets::texture_id::MOTOR, L"hypersomnia/data/gfx/motor.png");
 
 		auto& font = resource_manager.create(assets::font_id::GUI_FONT);
-		font.open("hypersomnia/data/Kubasta.ttf", 13, L"ABC");
+		font.open("hypersomnia/data/Kubasta.ttf", 16, L" ABCDEFGHIJKLMNOPRSTUVWXYZQabcdefghijklmnoprstuvwxyzq0123456789.!@#$%^&*()_+-=[];'\\,./{}:\"|<>?");
 
 		resource_manager.create_sprites_indexed(
 			assets::texture_id::TORSO_MOVING_FIRST,
@@ -185,7 +187,15 @@ namespace scene_builders {
 	}
 
 	void testbed::custom_drawcalls(world& world) {
+		auto& target = renderer::get_current();
+		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(assets::font_id::GUI_FONT, augs::colors::violet), vec2i(200-1, 200), 0, nullptr);
+		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(assets::font_id::GUI_FONT, augs::colors::violet), vec2i(200+1, 200), 0, nullptr);
+		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(assets::font_id::GUI_FONT, augs::colors::violet), vec2i(200, 200 - 1), 0, nullptr);
+		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(assets::font_id::GUI_FONT, augs::colors::violet), vec2i(200, 200+1), 0, nullptr);
 
+
+		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(), vec2i(200, 200), 0, nullptr);
+		target.call_triangles();
 	}
 
 	void testbed::execute_drawcall_script(messages::camera_render_request_message msg) {

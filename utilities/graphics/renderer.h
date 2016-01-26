@@ -38,8 +38,8 @@ namespace augs {
 
 		vertex_triangle_buffer triangles;
 
-		unsigned int position_buffer, texcoord_buffer, color_buffer;
-		unsigned int triangle_buffer;
+		unsigned int position_buffer_id, texcoord_buffer_id, color_buffer_id;
+		unsigned int triangle_buffer_id;
 
 		struct line_channel {
 			std::vector<debug_line> lines;

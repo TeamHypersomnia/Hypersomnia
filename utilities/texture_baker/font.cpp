@@ -125,8 +125,9 @@ namespace augs {
 
 	void font::add_to_atlas(atlas& atl) {
 		for (auto& g : glyphs) {
-			if (g.tex.get_rect().w) {
+			if (g.img.get_size().w) {
 				g.tex.set(&g.img);
+				g.tex.luminosity_to_alpha(true);
 				atl.textures.push_back(&g.tex);
 			}
 		}
