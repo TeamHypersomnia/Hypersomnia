@@ -1,1 +1,0 @@
-print "Calling commands.lua..."        

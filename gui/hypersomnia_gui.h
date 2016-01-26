@@ -1,7 +1,7 @@
 #pragma once
 #include <functional>
-#include "depthbase/gui/gui_world.h"
-#include "depthbase/gui/controls/stylesheeted/controls.h"
+#include "gui/gui_world.h"
+#include "gui/controls/stylesheeted/controls.h"
 #include "misc/timer.h"
 #include "math/vec2.h"
 #include "graphics/pixel.h"
