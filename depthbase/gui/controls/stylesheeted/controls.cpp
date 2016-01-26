@@ -46,15 +46,15 @@ namespace augs {
 						// checklabel_active.focused.border = solid_stroke(1, gray3);
 						// checklabel_inactive.focused.border = solid_stroke(1, gray3);
 
-						checkbox_active = stylesheet(stylesheet::style(ltblue, gui::null_texture, solid_stroke(0)));
+						checkbox_active = stylesheet(stylesheet::style(ltblue, assets::texture_id::BLANK, solid_stroke(0)));
 						checkbox_active.hovered.border = solid_stroke(1, ltblue);
 						checkbox_active.pushed.border = solid_stroke (2, ltblue);
 						
 						checkbox_inactive = stylesheet(checkbox_active);
 						checkbox_inactive.released.color = white;
 
-						rect_style = stylesheet(stylesheet::style(rgba(darkblue.r, darkblue.g, darkblue.b, 0), gui::null_texture, solid_stroke(0)));
-						textbox_style = stylesheet(stylesheet::style(darkblue, gui::null_texture, solid_stroke(1, gray2)));
+						rect_style = stylesheet(stylesheet::style(rgba(darkblue.r, darkblue.g, darkblue.b, 0), assets::texture_id::BLANK, solid_stroke(0)));
+						textbox_style = stylesheet(stylesheet::style(darkblue, assets::texture_id::BLANK, solid_stroke(1, gray2)));
 						textbox_style.focused.border = solid_stroke(1, ltblue);
 
 						property_textbox_style = stylesheet();

@@ -16,7 +16,7 @@ namespace augs {
 		namespace gui {
 			namespace text {
 				printer::printer() :
-					caret_mat(material(null_texture, rgba(255, 255, 255, 255))),
+					caret_mat(material(assets::texture_id::BLANK, rgba(255, 255, 255, 255))),
 					align_caret_height(true), caret_width(1),
 					highlight_current_line(false),
 					highlight_during_selection(true), 
@@ -175,7 +175,7 @@ namespace augs {
 										charcolor = selected_text_color;
 									
 									/* add the resulting character taking bearings into account */
-									gui::draw_clipped_rectangle(material(&g.tex, charcolor), 
+									gui::draw_clipped_rectangle(g.tex, charcolor, 
 									rects::xywh<float> (sectors[i] + g.bear_x, lines[l].top + lines[l].asc - g.bear_y, g.size.w, g.size.h) + pos, clipper, 
 									v);
 								}

@@ -18,8 +18,6 @@ namespace augs {
 
 	namespace graphics {
 		namespace gui {
-			augs::texture* null_texture = 0;
-
 			namespace text {
 				void format(const wchar_t* _str, style s, fstr& out) {
 					out.clear();

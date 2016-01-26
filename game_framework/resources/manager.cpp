@@ -20,6 +20,14 @@ bool operator!(const assets::font_id& id) {
 	return resource_manager.find(id) == nullptr;
 }
 
+augs::texture& operator*(const assets::texture_id& id) {
+	return resource_manager.find(id)->tex;
+}
+
+bool operator!(const assets::texture_id& id) {
+	return resource_manager.find(id) == nullptr;
+}
+
 namespace resources {
 	void manager::texture_with_image::set(image img) {
 		this->img = img;
@@ -73,14 +81,6 @@ namespace resources {
 
 		return &(*it).second;
 	}
-
-	//template<> texture* manager::find(int id) {
-	//	return &find_texture(assets::texture_id(id))->tex;
-	//}
-	//
-	//template<> atlas* manager::find(int id) {
-	//	return find_atlas(assets::atlas_id(id));
-	//}
 
 	atlas& manager::create(assets::atlas_id id, unsigned atlas_creation_mode_flags) {
 		atlases.insert(std::make_pair(id, atlas()));
