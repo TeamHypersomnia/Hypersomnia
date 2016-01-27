@@ -50,7 +50,7 @@ namespace bindings {
 			.property("particle_emitter_system", &world::get_system<particle_emitter_system>)
 			.property("render_system", &world::get_system<render_system>)
 			.property("camera_system", &world::get_system<camera_system>)
-			.property("chase_system", &world::get_system<chase_system>)
+			.property("position_copying_system", &world::get_system<position_copying_system>)
 			.property("damage_system", &world::get_system<damage_system>)
 			.property("destroy_system", &world::get_system<destroy_system>)
 			.property("behaviour_tree_system", &world::get_system<behaviour_tree_system>)

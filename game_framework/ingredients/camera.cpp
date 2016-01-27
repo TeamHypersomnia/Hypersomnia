@@ -2,7 +2,7 @@
 #include "entity_system/entity.h"
 #include "entity_system/world.h"
 
-#include "game_framework/components/chase_component.h"
+#include "game_framework/components/position_copying_component.h"
 #include "game_framework/components/camera_component.h"
 #include "game_framework/components/input_component.h"
 
@@ -11,7 +11,7 @@ namespace ingredients {
 		components::transform transform;
 		components::input input;
 		components::camera camera;
-		components::chase chase;
+		components::position_copying position_copying;
 
 		input.add(messages::intent_message::SWITCH_LOOK);
 		input.add(messages::intent_message::ZOOM_CAMERA);
@@ -28,11 +28,11 @@ namespace ingredients {
 		camera.viewport.set(0, 0, w, h);
 		camera.visible_world_area.set(w, h);
 
-		chase.relative = false;
+		position_copying.relative = false;
 
 		e->add(transform);
 		e->add(input);
 		e->add(camera);
-		e->add(chase);
+		e->add(position_copying);
 	}
 }

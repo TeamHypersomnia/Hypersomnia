@@ -4,7 +4,7 @@
 #include "entity_system/entity.h"
 #include "../components/physics_component.h"
 #include "../components/crosshair_component.h"
-#include "../components/chase_component.h"
+#include "../components/position_copying_component.h"
 #include "../components/crosshair_component.h"
 #include "../components/physics_component.h"
 #include "../messages/intent_message.h"
@@ -33,7 +33,7 @@ void camera_system::react_to_input_intents() {
 void components::camera::configure_camera_player_crosshair(augs::entity_id camera, augs::entity_id player, augs::entity_id crosshair) {
 	camera->get<components::camera>().player = player;
 	camera->get<components::camera>().crosshair = crosshair;
-	camera->get<components::chase>().set_target(player);
+	camera->get<components::position_copying>().set_target(player);
 
 	crosshair->get<components::crosshair>().parent_camera = camera;
 }

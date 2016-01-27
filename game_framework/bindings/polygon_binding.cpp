@@ -17,7 +17,7 @@ namespace bindings {
 			(
 
 			luabind::class_<dummy_uv_mapping_mode>("uv_mapping_mode")
-			.enum_("chase_type")[
+			.enum_("position_copying_type")[
 				luabind::value("STRETCH", polygon::uv_mapping_mode::STRETCH),
 					luabind::value("OVERLAY", polygon::uv_mapping_mode::OVERLAY)
 			],

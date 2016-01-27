@@ -16,7 +16,7 @@ namespace components {
 	struct animation_response;
 	struct behaviour_tree;
 	struct camera;
-	struct chase;
+	struct position_copying;
 	struct children;
 	struct crosshair;
 	struct damage;
@@ -63,7 +63,7 @@ namespace augs {
 			std::pair<memory_pool::id, components::animation_response*>,
 			std::pair<memory_pool::id, components::behaviour_tree*>,
 			std::pair<memory_pool::id, components::camera*>,
-			std::pair<memory_pool::id, components::chase*>,
+			std::pair<memory_pool::id, components::position_copying*>,
 			std::pair<memory_pool::id, components::children*>,
 			std::pair<memory_pool::id, components::crosshair*>,
 			std::pair<memory_pool::id, components::damage*>,

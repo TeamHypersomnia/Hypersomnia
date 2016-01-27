@@ -11,7 +11,7 @@
 #include "systems/gun_system.h"
 #include "systems/crosshair_system.h"
 #include "systems/rotation_copying_system.h"
-#include "systems/chase_system.h"
+#include "systems/position_copying_system.h"
 #include "systems/damage_system.h"
 #include "systems/destroy_system.h"
 #include "systems/particle_group_system.h"

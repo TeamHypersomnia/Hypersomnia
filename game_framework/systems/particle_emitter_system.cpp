@@ -5,7 +5,7 @@
 #include "../resources/particle_emitter_info.h"
 
 #include "../components/render_component.h"
-#include "../components/chase_component.h"
+#include "../components/position_copying_component.h"
 #include "../components/particle_group_component.h"
 
 #include "../messages/particle_burst_message.h"
@@ -17,7 +17,7 @@ entity_id particle_emitter_system::create_refreshable_particle_group(world& pare
 	
 	ent->add(components::transform());
 	ent->add(components::particle_group()).stream_slots[0].destroy_when_empty = false;
-	ent->add(components::chase());
+	ent->add(components::position_copying());
 	ent->add(components::render());
 
 	return ent;
@@ -122,13 +122,13 @@ void particle_emitter_system::consume_events() {
 		size_t stream_index = 0;
 
 		components::particle_group* target_group = nullptr;
-		components::chase* target_chase = nullptr;
+		components::position_copying* target_position_copying = nullptr;
 		components::render* target_render = nullptr;
 		components::transform* target_transform = nullptr;
 
 		if (it.target_group_to_refresh.alive()) {
 			target_group = it.target_group_to_refresh->find<components::particle_group>();
-			target_chase = it.target_group_to_refresh->find<components::chase>();
+			target_position_copying = it.target_group_to_refresh->find<components::position_copying>();
 			target_render = it.target_group_to_refresh->find<components::render>();
 			target_transform = it.target_group_to_refresh->find<components::transform>();
 
@@ -143,7 +143,7 @@ void particle_emitter_system::consume_events() {
 				target_render = &new_stream_entity->add(components::render());
 
 				if (it.subject.alive())
-					target_chase = &new_stream_entity->add(components::chase(it.subject));
+					target_position_copying = &new_stream_entity->add(components::position_copying(it.subject));
 			}
 
 			float target_rotation = it.rotation + randval(stream->angular_offset);
@@ -176,12 +176,12 @@ void particle_emitter_system::consume_events() {
 
 			*target_render = stream->particle_render_template;
 
-			if (target_chase) {
+			if (target_position_copying) {
 				auto& subject_transform = it.subject->get<components::transform>();
-				*target_chase = components::chase(it.subject);
-				target_chase->chase_type = components::chase::chase_type::ORBIT;
-				target_chase->rotation_offset = target_rotation - subject_transform.rotation;
-				target_chase->rotation_orbit_offset = (it.pos - subject_transform.pos).rotate(-subject_transform.rotation, vec2(0.f, 0.f));
+				*target_position_copying = components::position_copying(it.subject);
+				target_position_copying->position_copying_type = components::position_copying::position_copying_type::ORBIT;
+				target_position_copying->rotation_offset = target_rotation - subject_transform.rotation;
+				target_position_copying->rotation_orbit_offset = (it.pos - subject_transform.pos).rotate(-subject_transform.rotation, vec2(0.f, 0.f));
 			}
 
 			if (it.target_group_to_refresh.alive()) {

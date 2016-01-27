@@ -18,7 +18,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_component<animation_response>();
 	register_component<behaviour_tree>();
 	register_component<camera>();
-	register_component<chase>();
+	register_component<position_copying>();
 	register_component<children>();
 	register_component<crosshair>();
 	register_component<damage>();
@@ -57,7 +57,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_system<particle_emitter_system>();
 	register_system<render_system>();
 	register_system<camera_system>();
-	register_system<chase_system>();
+	register_system<position_copying_system>();
 	register_system<damage_system>();
 	register_system<destroy_system>();
 	register_system<behaviour_tree_system>();
@@ -109,7 +109,7 @@ void game_world::call_drawing_time_systems() {
 	get_system<crosshair_system>().animate_crosshair_sizes();
 	get_system<movement_system>().animate_movement();
 
-	get_system<chase_system>().update_transforms();
+	get_system<position_copying_system>().update_transforms();
 	get_system<camera_system>().resolve_cameras_transforms_and_smoothing();
 	get_system<rotation_copying_system>().update_rotations();
 
@@ -160,7 +160,7 @@ void game_world::perform_logic_step() {
 
 	get_system<rotation_copying_system>().update_physical_motors();
 	get_system<physics_system>().step_and_set_new_transforms();
-	get_system<chase_system>().update_transforms();
+	get_system<position_copying_system>().update_transforms();
 
 	get_system<render_system>().remove_entities_from_rendering_tree();
 	get_system<physics_system>().destroy_fixtures_and_bodies();

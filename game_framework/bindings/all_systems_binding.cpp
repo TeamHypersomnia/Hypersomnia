@@ -103,8 +103,8 @@ namespace bindings {
 			.def("process_entities", &crosshair_system::process_entities),
 			luabind::class_<rotation_copying_system>("_rotation_copying_system")
 			.def("process_entities", &rotation_copying_system::process_entities),
-			luabind::class_<chase_system>("_chase_system")
-			.def("process_entities", &chase_system::process_entities),
+			luabind::class_<position_copying_system>("_position_copying_system")
+			.def("process_entities", &position_copying_system::process_entities),
 			luabind::class_<damage_system>("_damage_system")
 			.def("process_events", &damage_system::process_events)
 			.def("process_entities", &damage_system::process_entities),

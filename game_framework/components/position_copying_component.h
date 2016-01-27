@@ -3,17 +3,17 @@
 #include "entity_system/entity.h"
 #include "math/vec2.h"
 
-class chase_system;
+class position_copying_system;
 
 namespace components {
-	struct chase  {
+	struct position_copying  {
 		augs::entity_id target;
 		
-		enum chase_type {
+		enum position_copying_type {
 			OFFSET,
 			ORBIT,
 			PARALLAX
-		} chase_type = chase_type::OFFSET;
+		} position_copying_type = position_copying_type::OFFSET;
 
 		vec2 offset;
 		vec2 rotation_orbit_offset;
@@ -27,20 +27,20 @@ namespace components {
 		float rotation_multiplier = 1.0f;
 
 		bool relative = false;
-		bool chase_rotation = false;
+		bool position_copying_rotation = false;
 		bool track_origin = false;
 
 		bool target_newly_set = true;
 		bool subscribe_to_previous = false;
 
-		chase(augs::entity_id id = augs::entity_id()) {
+		position_copying(augs::entity_id id = augs::entity_id()) {
 			set_target(id);
 		}
 
 		void set_target(augs::entity_id);
 
 	private:
-		friend class chase_system;
+		friend class position_copying_system;
 
 		vec2 previous;
 		float rotation_previous = 0.0f;

@@ -217,8 +217,8 @@ vec2 steering::directed::predict_interception(const object_info& subject, const 
 
 	float time_factor = 1.f;
 	
-	/* if we are fleeing and our chaser is right behind our back, there's no point in predicting far positions 
-		as it would turn as towards the chaser */
+	/* if we are fleeing and our position_copyingr is right behind our back, there's no point in predicting far positions 
+		as it would turn as towards the position_copyingr */
 	if (flee_prediction && forwardness < -0.707f && parallelness > 0.707f)
 		time_factor = 0.2f;
 	/* if we are chasing the target and it is dead ahead running towards us, there's no point in predicting far positions

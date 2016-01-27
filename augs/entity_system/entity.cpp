@@ -35,7 +35,7 @@ namespace augs {
 		remove<components::animation_response>();
 		remove<components::behaviour_tree>();
 		remove<components::camera>();
-		remove<components::chase>();
+		remove<components::position_copying>();
 		remove<components::children>();
 		remove<components::crosshair>();
 		remove<components::damage>();

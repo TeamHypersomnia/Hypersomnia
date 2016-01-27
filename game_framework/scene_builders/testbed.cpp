@@ -10,7 +10,7 @@
 
 #include "game_framework/systems/input_system.h"
 #include "game_framework/systems/render_system.h"
-#include "game_framework/components/chase_component.h"
+#include "game_framework/components/position_copying_component.h"
 
 #include "game_framework/messages/crosshair_intent_message.h"
 

@@ -134,26 +134,26 @@ namespace bindings {
 					luabind::value("LOOK", camera::orbit_type::LOOK)
 			],
 
-			luabind::class_<chase>("chase_component")
+			luabind::class_<position_copying>("position_copying_component")
 					.def(luabind::constructor<>())
-					.def("set_target", &chase::set_target)
-					.def_readwrite("target", &chase::target)
-					.def_readwrite("chase_type", &chase::chase_type)
-					.def_readwrite("reference_position", &chase::reference_position)
-					.def_readwrite("target_reference_position", &chase::target_reference_position)
-					.def_readwrite("scrolling_speed", &chase::scrolling_speed)
-					.def_readwrite("offset", &chase::offset)
-					.def_readwrite("rotation_orbit_offset", &chase::rotation_orbit_offset)
-					.def_readwrite("rotation_offset", &chase::rotation_offset)
-					.def_readwrite("relative", &chase::relative)
-					.def_readwrite("chase_rotation", &chase::chase_rotation)
-					.def_readwrite("track_origin", &chase::track_origin)
-					.def_readwrite("rotation_multiplier", &chase::rotation_multiplier)
-					.def_readwrite("subscribe_to_previous", &chase::subscribe_to_previous)
-					.enum_("chase_type")[
-						luabind::value("OFFSET", chase::chase_type::OFFSET),
-							luabind::value("PARALLAX", chase::chase_type::PARALLAX),
-							luabind::value("ORBIT", chase::chase_type::ORBIT)
+					.def("set_target", &position_copying::set_target)
+					.def_readwrite("target", &position_copying::target)
+					.def_readwrite("position_copying_type", &position_copying::position_copying_type)
+					.def_readwrite("reference_position", &position_copying::reference_position)
+					.def_readwrite("target_reference_position", &position_copying::target_reference_position)
+					.def_readwrite("scrolling_speed", &position_copying::scrolling_speed)
+					.def_readwrite("offset", &position_copying::offset)
+					.def_readwrite("rotation_orbit_offset", &position_copying::rotation_orbit_offset)
+					.def_readwrite("rotation_offset", &position_copying::rotation_offset)
+					.def_readwrite("relative", &position_copying::relative)
+					.def_readwrite("position_copying_rotation", &position_copying::position_copying_rotation)
+					.def_readwrite("track_origin", &position_copying::track_origin)
+					.def_readwrite("rotation_multiplier", &position_copying::rotation_multiplier)
+					.def_readwrite("subscribe_to_previous", &position_copying::subscribe_to_previous)
+					.enum_("position_copying_type")[
+						luabind::value("OFFSET", position_copying::position_copying_type::OFFSET),
+							luabind::value("PARALLAX", position_copying::position_copying_type::PARALLAX),
+							luabind::value("ORBIT", position_copying::position_copying_type::ORBIT)
 					],
 
 					luabind::class_<children>("children_component")
@@ -386,7 +386,7 @@ namespace bindings {
 									.def_readwrite("averages_per_sec", &rotation_copying::averages_per_sec)
 									.def_readwrite("update_value", &rotation_copying::update_value)
 									.def_readwrite("last_value", &rotation_copying::last_value)
-									.enum_("chase_type")[
+									.enum_("position_copying_type")[
 										luabind::value("POSITION", rotation_copying::look_type::POSITION),
 											luabind::value("VELOCITY", rotation_copying::look_type::VELOCITY),
 											luabind::value("ACCELEARATION", rotation_copying::look_type::ACCELEARATION),

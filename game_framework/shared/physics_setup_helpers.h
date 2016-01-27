@@ -50,7 +50,7 @@ components::fixtures& add_fixtures_to_other_body(fixture_definition, augs::entit
 
 std::vector<b2Vec2> get_world_vertices(augs::entity_id subject, bool meters = true, int fixture_num = 0);
 
-void create_weld_joint(augs::entity_id chased, augs::entity_id chaser, vec2 orbit_offset, joint_name name = joint_name::JOINT);
+void create_weld_joint(augs::entity_id position_copyingd, augs::entity_id position_copyingr, vec2 orbit_offset, joint_name name = joint_name::JOINT);
 void create_friction_joint(augs::entity_id inside_object, augs::entity_id friction_field, joint_name name = joint_name::JOINT);
 void remove_joints_by_name(augs::entity_id, joint_name);
 bool joint_exists(augs::entity_id, joint_name);

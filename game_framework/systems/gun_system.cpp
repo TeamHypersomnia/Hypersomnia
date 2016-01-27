@@ -12,7 +12,7 @@
 #include "../components/camera_component.h"
 #include "../components/damage_component.h"
 #include "../components/particle_group_component.h"
-#include "../components/chase_component.h"
+#include "../components/position_copying_component.h"
 
 #include "../systems/physics_system.h"
 #include "../systems/render_system.h"
@@ -29,12 +29,12 @@ void components::gun::transfer_barrel_smoke(augs::entity_id another, bool overwr
 
 	if (overwrite_components) {
 		another_entity->set(this_entity->get<components::transform>());
-		another_entity->set(this_entity->get<components::chase>());
+		another_entity->set(this_entity->get<components::position_copying>());
 	}
 	
 	another_entity->set(this_entity->get<components::render>());
-	another_entity->get<components::chase>().set_target(another);
-	//another_entity->get<components::chase>().rotation_orbit_offset = new_orbit_offset;
+	another_entity->get<components::position_copying>().set_target(another);
+	//another_entity->get<components::position_copying>().rotation_orbit_offset = new_orbit_offset;
 
 	auto& this_group =	     this_entity->get<components::particle_group>().stream_slots;
 	auto& another_group = another_entity->get<components::particle_group>().stream_slots;

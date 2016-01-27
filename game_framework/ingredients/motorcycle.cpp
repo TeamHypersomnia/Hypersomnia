@@ -2,7 +2,7 @@
 #include "entity_system/entity.h"
 #include "entity_system/world.h"
 
-#include "game_framework/components/chase_component.h"
+#include "game_framework/components/position_copying_component.h"
 #include "game_framework/components/camera_component.h"
 #include "game_framework/components/input_component.h"
 #include "game_framework/components/crosshair_component.h"
