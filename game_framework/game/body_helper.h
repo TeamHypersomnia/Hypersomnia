@@ -42,8 +42,8 @@ namespace helpers {
 
 		bool sensor = false;
 
-		void add_convex(const std::vector<vec2> &);
-		void add_concave(const std::vector<vec2> &);
+		void add_convex_polygon(const std::vector<vec2>&);
+		void add_concave_polygon(const std::vector<vec2>&);
 
 		void from_renderable(augs::entity_id);
 	};

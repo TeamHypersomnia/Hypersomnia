@@ -33,7 +33,7 @@ namespace components {
 		v[3] -= size / 2.f;
 	}
 
-	sprite::sprite(assets::texture_id tex, rgba color) : tex(tex), color(color), rotation_offset(0.f) {
+	sprite::sprite(assets::texture_id tex, rgba color) {
 		set(tex, color);
 	}
 
@@ -54,14 +54,13 @@ namespace components {
 		render.was_drawn = false;
 
 		static thread_local vec2 v[4];
-		vec2i transform_pos = in.drawn_transform.pos;
-		make_rect(transform_pos, vec2(size), in.drawn_transform.rotation, v);
-		if (!in.always_visible && !rects::ltrb<float>::get_aabb(v).hover(in.rotated_camera_aabb)) return;
+		vec2i transform_pos = in.object_transform.pos;
+		make_rect(transform_pos, vec2(size), in.object_transform.rotation, v);
 
 		auto center = in.visible_area / 2;
 
 		auto target_position = transform_pos - in.camera_transform.pos + center;
-		make_rect(target_position, vec2(size), in.drawn_transform.rotation + rotation_offset, v);
+		make_rect(target_position, vec2(size), in.object_transform.rotation + rotation_offset, v);
 
 		/* rotate around the center of the screen */
 		if (in.camera_transform.rotation != 0.f)
@@ -112,7 +111,7 @@ namespace components {
 		in.output->push_triangle(t2);
 	}
 
-	std::vector<vec2> sprite::get_vertices() {
+	std::vector<vec2> sprite::get_vertices() const {
 		std::vector<vec2> out;
 		out.push_back(size / -2.f);
 		out.push_back(size / -2.f + vec2(size.x, 0.f));
@@ -121,7 +120,7 @@ namespace components {
 		return std::move(out);
 	}
 	
-	augs::rects::ltrb<float> sprite::get_aabb(components::transform transform) {
+	augs::rects::ltrb<float> sprite::get_aabb(components::transform transform) const {
 		static thread_local vec2 v[4];
 		make_rect(transform.pos, vec2(size), transform.rotation, v);
 		return augs::rects::ltrb<float>::get_aabb(v);

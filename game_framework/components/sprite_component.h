@@ -17,7 +17,7 @@ namespace components {
 		assets::texture_id tex = assets::BLANK;
 		augs::rgba color;
 		vec2 size;
-		float rotation_offset;
+		float rotation_offset = 0.f;
 
 		bool flip_horizontally = false;
 		bool flip_vertically = false;
@@ -27,9 +27,9 @@ namespace components {
 		void set(assets::texture_id, augs::rgba = augs::rgba());
 		void update_size();
 
-		std::vector<vec2> get_vertices();
-		augs::rects::ltrb<float> get_aabb(components::transform);
-
 		void draw(shared::drawing_state&);
+
+		std::vector<vec2> get_vertices() const;
+		augs::rects::ltrb<float> get_aabb(components::transform) const;
 	};
 }

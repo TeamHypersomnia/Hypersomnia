@@ -19,7 +19,7 @@ namespace components {
 					}
 				}
 
-				in.drawn_transform = it.ignore_rotation ? components::transform(it.pos, 0) : components::transform({ it.pos, it.rotation });
+				in.object_transform = it.ignore_rotation ? components::transform(it.pos, 0) : components::transform({ it.pos, it.rotation });
 				it.face.draw(in);
 				it.face.color.a = temp_alpha;
 			}

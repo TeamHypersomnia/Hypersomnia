@@ -27,10 +27,10 @@ namespace components {
 	rects::ltrb<int> tile_layer::get_visible_tiles(drawing_state& in) {
 		rects::ltrb<int> visible_tiles;
 		
-		visible_tiles.l = int((in.rotated_camera_aabb.l - in.drawn_transform.pos.x) / 32.f);
-		visible_tiles.t = int((in.rotated_camera_aabb.t - in.drawn_transform.pos.y) / 32.f);
-		visible_tiles.r = int((in.rotated_camera_aabb.r - in.drawn_transform.pos.x) / 32.f) + 1;
-		visible_tiles.b = int((in.rotated_camera_aabb.b - in.drawn_transform.pos.y) / 32.f) + 1;
+		visible_tiles.l = int((in.rotated_camera_aabb.l - in.object_transform.pos.x) / 32.f);
+		visible_tiles.t = int((in.rotated_camera_aabb.t - in.object_transform.pos.y) / 32.f);
+		visible_tiles.r = int((in.rotated_camera_aabb.r - in.object_transform.pos.x) / 32.f) + 1;
+		visible_tiles.b = int((in.rotated_camera_aabb.b - in.object_transform.pos.y) / 32.f) + 1;
 		visible_tiles.l = std::max(0, visible_tiles.l);
 		visible_tiles.t = std::max(0, visible_tiles.t);
 		visible_tiles.r = std::min(size.w, visible_tiles.r);
@@ -41,7 +41,7 @@ namespace components {
 
 	void tile_layer::draw(drawing_state& in) {
 		/* if it is not visible, return */
-		if (!in.rotated_camera_aabb.hover(rects::xywh<float>(in.drawn_transform.pos.x, in.drawn_transform.pos.y, size.w*square_size, size.h*square_size))) return;
+		if (!in.rotated_camera_aabb.hover(rects::xywh<float>(in.object_transform.pos.x, in.object_transform.pos.y, size.w*square_size, size.h*square_size))) return;
 
 		auto visible_tiles = get_visible_tiles(in);
 
@@ -62,7 +62,7 @@ namespace components {
 				static thread_local sprite tile_sprite;
 				tile_sprite.tex = type.tile_texture;
 
-				draw_input_copy.drawn_transform.pos = vec2i(in.drawn_transform.pos) + tile_offset + vec2(square_size / 2, square_size / 2);
+				draw_input_copy.object_transform.pos = vec2i(in.object_transform.pos) + tile_offset + vec2(square_size / 2, square_size / 2);
 
 				tile_sprite.draw(draw_input_copy);
 			}

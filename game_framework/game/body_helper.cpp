@@ -19,7 +19,7 @@
 namespace helpers {
 	b2World* current_b2world = nullptr;
 
-	void fixture_definition::add_convex(const std::vector <vec2>& verts) {
+	void fixture_definition::add_convex_polygon(const std::vector <vec2>& verts) {
 		convex_polys.push_back(verts);
 	}
 
@@ -43,64 +43,51 @@ namespace helpers {
 			b2PolygonShape shape;
 			shape.SetAsBox(static_cast<float>(rect_size.x) / 2.f * PIXELS_TO_METERSf, static_cast<float>(rect_size.y) / 2.f * PIXELS_TO_METERSf);
 
-			convex_polys.resize(1);
+			std::vector<vec2> new_convex_polygon;
 
 			for (int i = 0; i < shape.GetVertexCount(); ++i)
-				convex_polys[0].push_back(vec2(shape.GetVertex(i))*METERS_TO_PIXELSf);
+				new_convex_polygon.push_back(vec2(shape.GetVertex(i))*METERS_TO_PIXELSf);
+
+			add_convex_polygon(new_convex_polygon);
 		}
 		else if (polygon) {
 			type = POLYGON;
 			auto& p = *polygon;
 			
-			list<TPPLPoly> inpolys, outpolys;
-			TPPLPoly subject_poly;
-			subject_poly.Init(p.original_model.size());
-			subject_poly.SetHole(false);
-
-			for (size_t i = 0; i < p.original_model.size(); ++i) {
-				vec2 p(p.original_model[i]);
-				subject_poly[i].x = p.x;
-				subject_poly[i].y = -p.y;
-			}
-
-			inpolys.push_back(subject_poly);
-
-			TPPLPartition partition;
-			partition.ConvexPartition_HM(&inpolys, &outpolys);
-
-			for (auto& out : outpolys) {
-				std::vector <vec2> new_convex;
-
-				for (long j = 0; j < out.GetNumPoints(); ++j) {
-					new_convex.push_back(vec2(static_cast<float>(out[j].x), static_cast<float>(-out[j].y)));
-				}
-
-				std::reverse(new_convex.begin(), new_convex.end());
-
-				convex_polys.push_back(new_convex);
-			}
+			add_concave_polygon(p.original_polygon);
 		}
 
 		// TODO: remove the visual components server-side
 	}
 
-	void fixture_definition::add_concave(const std::vector <vec2> &verts) {
-		//original_model.insert(original_model.end(), verts.begin(), verts.end());
-		//
-		//b2Separator separator;
-		//std::vector<std::vector<b2Vec2>> output;
-		//auto& input = reinterpret_cast<const std::vector<b2Vec2>&>(verts);
-		//int res = separator.Validate(input);
-		//
-		//if (res != 0) {
-		//	auto reversed_input = input;
-		//	std::reverse(reversed_input.begin(), reversed_input.end());
-		//	separator.calcShapes(reversed_input, output);
-		//}
-		//else separator.calcShapes(input, output);
-		//
-		//for (auto& convex : output)
-		//	convex_polys.push_back(std::vector <vec2> (convex.begin(), convex.end()));
+	void fixture_definition::add_concave_polygon(const std::vector <vec2> &verts) {
+		list<TPPLPoly> inpolys, outpolys;
+		TPPLPoly subject_poly;
+		subject_poly.Init(verts.size());
+		subject_poly.SetHole(false);
+
+		for (size_t i = 0; i < verts.size(); ++i) {
+			vec2 p(verts[i]);
+			subject_poly[i].x = p.x;
+			subject_poly[i].y = -p.y;
+		}
+
+		inpolys.push_back(subject_poly);
+
+		TPPLPartition partition;
+		partition.ConvexPartition_HM(&inpolys, &outpolys);
+
+		for (auto& out : outpolys) {
+			std::vector <vec2> new_convex;
+
+			for (long j = 0; j < out.GetNumPoints(); ++j) {
+				new_convex.push_back(vec2(static_cast<float>(out[j].x), static_cast<float>(-out[j].y)));
+			}
+
+			std::reverse(new_convex.begin(), new_convex.end());
+
+			convex_polys.push_back(new_convex);
+		}
 	}
 
 	void create_weld_joint(augs::entity_id a, augs::entity_id b, vec2 orbit_offset, joint_name name) {
@@ -127,9 +114,6 @@ namespace helpers {
 		def.userData = name;
 		def.maxForce = 500000.5;
 		def.maxTorque = 10000000;
-
-		//def.localAnchorB = orbit_offset*PIXELS_TO_METERSf;
-		//def.localAnchorB.y *= -1;
 
 		physics.b2world.CreateJoint(&def);
 	}

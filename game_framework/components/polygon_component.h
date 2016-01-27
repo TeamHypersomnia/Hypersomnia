@@ -24,35 +24,28 @@ namespace components {
 
 		void automatically_map_uv(assets::texture_id, unsigned uv_mapping_mode);
 
-		/* binding facility */
-		struct concave {
-			std::vector<vertex> vertices;
-			void add_vertex(const vertex& v);
-		};
+		/* the polygon as it was originally, so possibly concave
+		it is later triangulated for rendering and divided into convex polygons for physics */
+		std::vector<vec2> original_polygon;
 
-		std::vector<vertex> model;
+		/* triangulated version of original_polygon, ready to be rendered triangle-by-triangle */
+		std::vector<vertex> triangulated_polygon;
 
-		/* the "model" is already triangulated so we need to preserve original model vertex data if for example
-		we want to form a physics body from this object
-		*/
-		std::vector<vec2> original_model;
-
+		/* indices used in glDrawElements */
 		std::vector<int> indices;
+
+		/* construct a set of convex polygons from a potentially concave polygon */
+		void add_polygon_vertices(std::vector<vertex>);
 
 		void set_color(rgba col);
 
 		int get_vertex_count() const {
-			return model.size();
+			return triangulated_polygon.size();
 		}
 
 		vertex& get_vertex(int i) {
-			return model[i];
+			return triangulated_polygon[i];
 		}
-
-		/* construct a set of convex polygons from a potentially concave polygon */
-		void add_concave(const concave&);
-		//void add_concave_coords(const std::vector<vec2>&);
-		//void add_convex(const std::vector<vec2>&);
 
 		void draw(shared::drawing_state&);
 

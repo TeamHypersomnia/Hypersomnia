@@ -228,20 +228,18 @@ void render_system::restore_actual_transforms() {
 
 void render_system::draw_layer(drawing_state& in, int layer) {
 	auto in_camera_transform = in.camera_transform;
-	auto in_always_visible = in.always_visible;
 	
 	if (layer < layers.size() && !layers[layer].empty()) {
 		for (auto e : layers[layer]) {
 			auto& render = e->get<components::render>();
 
-			in.drawn_transform = e->get<components::transform>();
-			in.drawn_transform.pos = vec2i(in.drawn_transform.pos);
-			in.drawn_transform.rotation = in.drawn_transform.rotation;
+			in.object_transform = e->get<components::transform>();
+			in.object_transform.pos = vec2i(in.object_transform.pos);
+			in.object_transform.rotation = in.object_transform.rotation;
 
 			in.subject = e;
 
 			in.camera_transform = render.absolute_transform ? components::transform() : in_camera_transform;
-			in.always_visible = render.absolute_transform ? true : in_always_visible;
 
 			auto* polygon = e->find<components::polygon>();
 			auto* sprite = e->find<components::sprite>();
@@ -254,7 +252,6 @@ void render_system::draw_layer(drawing_state& in, int layer) {
 	}
 
 	in.camera_transform = in_camera_transform;
-	in.always_visible = in_always_visible;
 }
 
 void render_system::generate_and_draw_all_layers(drawing_state& in, int mask) {

@@ -104,13 +104,13 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 				camera.crosshair->get<components::transform>().pos = constraints.constrained_crosshair_pos;
 			}
 
-			components::transform drawn_transform;
+			components::transform smoothed_camera_transform;
 			vec2 drawn_size;
 
-			drawn_transform = transform;
+			smoothed_camera_transform = transform;
 			drawn_size = camera.size;
 
-			drawn_transform.pos += camera_crosshair_offset;
+			smoothed_camera_transform.pos += camera_crosshair_offset;
 
 			if (camera.enable_smoothing) {
 				/* variable time step camera smoothing by averaging last position with the current */
@@ -137,22 +137,22 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 				interp(camera.last_ortho_interpolant.y, camera.size.y, averaging_constant);
 
 				/* save smoothing result */
-				//if ((drawn_transform.pos - camera.last_interpolant.pos).length() > 5)
+				//if ((smoothed_camera_transform.pos - camera.last_interpolant.pos).length() > 5)
 				vec2 calculated_smoothed_pos = target - smoothed_part + camera.last_interpolant.pos;
 				int calculated_smoothed_rotation = camera.last_interpolant.rotation;
 
-				//if (vec2i(calculated_smoothed_pos) == vec2i(drawn_transform.pos))
+				//if (vec2i(calculated_smoothed_pos) == vec2i(smoothed_camera_transform.pos))
 				//	camera.last_interpolant.pos = smoothed_part;
-				//if (int(calculated_smoothed_rotation) == int(drawn_transform.rotation))
-				//	camera.last_interpolant.rotation = drawn_transform.rotation;
+				//if (int(calculated_smoothed_rotation) == int(smoothed_camera_transform.rotation))
+				//	camera.last_interpolant.rotation = smoothed_camera_transform.rotation;
 				
-				if (calculated_smoothed_pos.compare_abs(drawn_transform.pos, 1.f))
+				if (calculated_smoothed_pos.compare_abs(smoothed_camera_transform.pos, 1.f))
 					camera.last_interpolant.pos = smoothed_part;
-				if (std::abs(calculated_smoothed_rotation - drawn_transform.rotation) < 1.f)
-					camera.last_interpolant.rotation = drawn_transform.rotation;
+				if (std::abs(calculated_smoothed_rotation - smoothed_camera_transform.rotation) < 1.f)
+					camera.last_interpolant.rotation = smoothed_camera_transform.rotation;
 
-				drawn_transform.pos = calculated_smoothed_pos;
-				drawn_transform.rotation = calculated_smoothed_rotation;
+				smoothed_camera_transform.pos = calculated_smoothed_pos;
+				smoothed_camera_transform.rotation = calculated_smoothed_rotation;
 
 				//smoothing_player_pos
 
@@ -197,17 +197,17 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 				camera.smoothing_player_pos.tick();
 			}
 
-			drawn_transform.pos = vec2i(drawn_transform.pos + camera.smoothing_player_pos.value);
+			smoothed_camera_transform.pos = vec2i(smoothed_camera_transform.pos + camera.smoothing_player_pos.value);
 			drawn_size = vec2i(drawn_size);
 
 			camera.dont_smooth_once = false;
 
-			camera.previously_drawn_at = drawn_transform;
+			camera.previously_drawn_at = smoothed_camera_transform;
 			camera.rendered_size = drawn_size;
 
 			shared::drawing_state in;
-			in.rotated_camera_aabb = rects::ltrb<float>::get_aabb_rotated(camera.rendered_size, drawn_transform.rotation) + drawn_transform.pos - camera.rendered_size / 2;
-			in.camera_transform = drawn_transform;
+			in.rotated_camera_aabb = rects::ltrb<float>::get_aabb_rotated(camera.rendered_size, smoothed_camera_transform.rotation) + smoothed_camera_transform.pos - camera.rendered_size / 2;
+			in.camera_transform = smoothed_camera_transform;
 			in.output = &get_renderer();
 			in.visible_area = camera.rendered_size;
 			in.viewport = camera.screen_rect;
