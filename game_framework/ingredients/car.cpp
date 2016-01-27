@@ -8,7 +8,7 @@
 #include "game_framework/components/crosshair_component.h"
 #include "game_framework/components/sprite_component.h"
 #include "game_framework/components/movement_component.h"
-#include "game_framework/components/lookat_component.h"
+#include "game_framework/components/rotation_copying_component.h"
 #include "game_framework/components/animation_component.h"
 #include "game_framework/components/animation_response_component.h"
 #include "game_framework/components/physics_component.h"

@@ -22,7 +22,7 @@ namespace components {
 	struct damage;
 	struct gun;
 	struct input;
-	struct lookat;
+	struct rotation_copying;
 	struct movement;
 	struct particle_emitter;
 	struct particle_group;
@@ -69,7 +69,7 @@ namespace augs {
 			std::pair<memory_pool::id, components::damage*>,
 			std::pair<memory_pool::id, components::gun*>,
 			std::pair<memory_pool::id, components::input*>,
-			std::pair<memory_pool::id, components::lookat*>,
+			std::pair<memory_pool::id, components::rotation_copying*>,
 			std::pair<memory_pool::id, components::movement*>,
 			std::pair<memory_pool::id, components::particle_emitter*>,
 			std::pair<memory_pool::id, components::particle_group*>,

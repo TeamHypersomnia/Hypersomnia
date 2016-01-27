@@ -41,7 +41,7 @@ namespace bindings {
 			.property("movement_system", &world::get_system<movement_system>)
 			.property("animation_system", &world::get_system<animation_system>)
 			.property("crosshair_system", &world::get_system<crosshair_system>)
-			.property("lookat_system", &world::get_system<lookat_system>)
+			.property("rotation_copying_system", &world::get_system<rotation_copying_system>)
 			.property("physics_system", &world::get_system<physics_system>)
 			.property("visibility_system", &world::get_system<visibility_system>)
 			.property("pathfinding_system", &world::get_system<pathfinding_system>)

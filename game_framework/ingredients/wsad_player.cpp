@@ -8,7 +8,7 @@
 #include "game_framework/components/crosshair_component.h"
 #include "game_framework/components/sprite_component.h"
 #include "game_framework/components/movement_component.h"
-#include "game_framework/components/lookat_component.h"
+#include "game_framework/components/rotation_copying_component.h"
 #include "game_framework/components/animation_component.h"
 #include "game_framework/components/animation_response_component.h"
 #include "game_framework/components/physics_component.h"
@@ -95,7 +95,7 @@ namespace ingredients {
 		components::animation_response animation_response;
 		components::transform transform;
 		components::movement movement;
-		components::lookat lookat;
+		components::rotation_copying rotation_copying;
 		components::children children;
 		components::trigger_detector detector;
 		components::driver driver;
@@ -116,9 +116,9 @@ namespace ingredients {
 
 		render.layer = render_layer::CHARACTER;
 
-		lookat.target = crosshair_entity;
-		lookat.look_mode = components::lookat::look_type::POSITION;
-		lookat.use_physical_motor = true;
+		rotation_copying.target = crosshair_entity;
+		rotation_copying.look_mode = components::rotation_copying::look_type::POSITION;
+		rotation_copying.use_physical_motor = true;
 
 		e->add(transform);
 		e->add(input_profiles::character());
@@ -127,7 +127,7 @@ namespace ingredients {
 		e->add(animation_response);
 		e->add(sprite);
 		e->add(movement);
-		e->add(lookat);
+		e->add(rotation_copying);
 		e->add(detector);
 		e->add(driver);
 		

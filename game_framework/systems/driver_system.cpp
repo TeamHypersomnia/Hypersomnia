@@ -8,7 +8,7 @@
 #include "../components/input_component.h"
 #include "../components/children_component.h"
 #include "../components/movement_component.h"
-#include "../components/lookat_component.h"
+#include "../components/rotation_copying_component.h"
 #include "../components/physics_component.h"
 
 #include "../globals/input_profiles.h"
@@ -90,7 +90,7 @@ void driver_system::affect_drivers_due_to_car_ownership_changes(messages::car_ow
 	auto& driver = e.driver->get<components::driver>();
 
 	auto* maybe_children = e.driver->find<components::children>();
-	auto* maybe_lookat = e.driver->find<components::lookat>();
+	auto* maybe_rotation_copying = e.driver->find<components::rotation_copying>();
 	auto* maybe_physics = e.driver->find<components::physics>();
 	auto* maybe_movement = e.driver->find<components::movement>();
 
@@ -112,8 +112,8 @@ void driver_system::affect_drivers_due_to_car_ownership_changes(messages::car_ow
 			}
 		}
 
-		if (maybe_lookat && maybe_physics) {
-			maybe_lookat->update_value = false;
+		if (maybe_rotation_copying && maybe_physics) {
+			maybe_rotation_copying->update_value = false;
 			//maybe_physics->enable_angle_motor = false;
 		}
 
@@ -142,8 +142,8 @@ void driver_system::affect_drivers_due_to_car_ownership_changes(messages::car_ow
 		
 		car.reset_movement_flags();
 
-		if (maybe_lookat && maybe_physics) {
-			maybe_lookat->update_value = true;
+		if (maybe_rotation_copying && maybe_physics) {
+			maybe_rotation_copying->update_value = true;
 			//maybe_physics->enable_angle_motor = true;
 		}
 

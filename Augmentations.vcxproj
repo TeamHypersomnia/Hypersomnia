@@ -405,7 +405,7 @@
     <ClCompile Include="game_framework\systems\driver_system.cpp" />
     <ClCompile Include="game_framework\systems\gun_system.cpp" />
     <ClCompile Include="game_framework\systems\input_system.cpp" />
-    <ClCompile Include="game_framework\systems\lookat_system.cpp" />
+    <ClCompile Include="game_framework\systems\rotation_copying_system.cpp" />
     <ClCompile Include="game_framework\systems\movement_system.cpp" />
     <ClCompile Include="game_framework\systems\particle_emitter_system.cpp" />
     <ClCompile Include="game_framework\systems\particle_group_system.cpp" />
@@ -944,7 +944,7 @@
     <ClInclude Include="game_framework\components\fixtures_component.h" />
     <ClInclude Include="game_framework\components\gun_component.h" />
     <ClInclude Include="game_framework\components\input_component.h" />
-    <ClInclude Include="game_framework\components\lookat_component.h" />
+    <ClInclude Include="game_framework\components\rotation_copying_component.h" />
     <ClInclude Include="game_framework\components\movement_component.h" />
     <ClInclude Include="game_framework\components\particle_emitter_component.h" />
     <ClInclude Include="game_framework\components\particle_group_component.h" />
@@ -1009,7 +1009,7 @@
     <ClInclude Include="game_framework\systems\driver_system.h" />
     <ClInclude Include="game_framework\systems\gun_system.h" />
     <ClInclude Include="game_framework\systems\input_system.h" />
-    <ClInclude Include="game_framework\systems\lookat_system.h" />
+    <ClInclude Include="game_framework\systems\rotation_copying_system.h" />
     <ClInclude Include="game_framework\systems\movement_system.h" />
     <ClInclude Include="game_framework\systems\particle_emitter_system.h" />
     <ClInclude Include="game_framework\systems\particle_group_system.h" />

@@ -24,7 +24,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_component<damage>();
 	register_component<gun>();
 	register_component<input>();
-	register_component<lookat>();
+	register_component<rotation_copying>();
 	register_component<movement>();
 	register_component<particle_emitter>();
 	register_component<particle_group>();
@@ -48,7 +48,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_system<movement_system>();
 	register_system<animation_system>();
 	register_system<crosshair_system>();
-	register_system<lookat_system>();
+	register_system<rotation_copying_system>();
 	register_system<physics_system>();
 	register_system<visibility_system>();
 	register_system<pathfinding_system>();
@@ -111,7 +111,7 @@ void game_world::call_drawing_time_systems() {
 
 	get_system<chase_system>().update_transforms();
 	get_system<camera_system>().resolve_cameras_transforms_and_smoothing();
-	get_system<lookat_system>().update_rotations();
+	get_system<rotation_copying_system>().update_rotations();
 
 	get_system<camera_system>().post_render_requests_for_all_cameras();
 
@@ -158,7 +158,7 @@ void game_world::perform_logic_step() {
 	get_system<movement_system>().set_movement_flags_from_input();
 	get_system<movement_system>().apply_movement_forces();
 
-	get_system<lookat_system>().update_physical_motors();
+	get_system<rotation_copying_system>().update_physical_motors();
 	get_system<physics_system>().step_and_set_new_transforms();
 	get_system<chase_system>().update_transforms();
 

@@ -41,7 +41,7 @@ namespace augs {
 		remove<components::damage>();
 		remove<components::gun>();
 		remove<components::input>();
-		remove<components::lookat>();
+		remove<components::rotation_copying>();
 		remove<components::movement>();
 		remove<components::particle_emitter>();
 		remove<components::particle_group>();

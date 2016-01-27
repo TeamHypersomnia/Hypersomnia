@@ -4,14 +4,14 @@
 #include "math/vec2.h"
 
 namespace components {
-	struct lookat  {
+	struct rotation_copying  {
 		enum look_type {
 			POSITION,
 			VELOCITY,
 			ACCELEARATION
 		};
 
-		enum lookat_easing {
+		enum rotation_copying_easing {
 			NONE,
 			LINEAR,
 			EXPONENTIAL

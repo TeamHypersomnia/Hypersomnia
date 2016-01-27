@@ -645,7 +645,7 @@
     <ClCompile Include="game_framework\systems\input_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\systems\lookat_system.cpp">
+    <ClCompile Include="game_framework\systems\rotation_copying_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game_framework\systems\movement_system.cpp">
@@ -2396,7 +2396,7 @@
     <ClInclude Include="game_framework\components\input_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\components\lookat_component.h">
+    <ClInclude Include="game_framework\components\rotation_copying_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\components\movement_component.h">
@@ -2477,7 +2477,7 @@
     <ClInclude Include="game_framework\systems\input_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\systems\lookat_system.h">
+    <ClInclude Include="game_framework\systems\rotation_copying_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\systems\movement_system.h">

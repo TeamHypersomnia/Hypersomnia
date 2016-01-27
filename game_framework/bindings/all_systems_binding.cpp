@@ -101,8 +101,8 @@ namespace bindings {
 			luabind::class_<crosshair_system>("_crosshair_system")
 			.def("consume_events", &crosshair_system::consume_events)
 			.def("process_entities", &crosshair_system::process_entities),
-			luabind::class_<lookat_system>("_lookat_system")
-			.def("process_entities", &lookat_system::process_entities),
+			luabind::class_<rotation_copying_system>("_rotation_copying_system")
+			.def("process_entities", &rotation_copying_system::process_entities),
 			luabind::class_<chase_system>("_chase_system")
 			.def("process_entities", &chase_system::process_entities),
 			luabind::class_<damage_system>("_damage_system")

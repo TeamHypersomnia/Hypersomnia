@@ -10,7 +10,7 @@
 #include "systems/input_system.h"
 #include "systems/gun_system.h"
 #include "systems/crosshair_system.h"
-#include "systems/lookat_system.h"
+#include "systems/rotation_copying_system.h"
 #include "systems/chase_system.h"
 #include "systems/damage_system.h"
 #include "systems/destroy_system.h"
