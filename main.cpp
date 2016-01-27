@@ -5,7 +5,7 @@
 
 using namespace augs;
 
-#include "game_framework/scene_builders/all_builders.h"
+#include "game_framework/scene_builders/testbed.h"
 
 int main(int argc, char** argv) {
 	augs::init();
