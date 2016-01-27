@@ -117,7 +117,7 @@ void hypersomnia_overworld::consume_camera_render_requests() {
 	for (auto& r : requests) {
 		target.viewport(r.state.viewport);
 		current_scene_builder->execute_drawcall_script(r);
-		target.draw_debug_info(r.state.visible_area, r.state.camera_transform, assets::texture_id::BLANK, game_world.get_system<render_system>().targets, view_interpolation_ratio());
+		target.draw_debug_info(r.state.visible_world_area, r.state.camera_transform, assets::texture_id::BLANK, game_world.get_system<render_system>().targets, view_interpolation_ratio());
 	}
 	
 	current_scene_builder->custom_drawcalls(game_world);

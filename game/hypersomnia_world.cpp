@@ -86,7 +86,7 @@ void hypersomnia_world::register_messages_components_systems() {
 }
 
 void hypersomnia_world::draw() {
-	get_system<render_system>().determine_visible_entities_from_camera_states();
+	get_system<render_system>().determine_visible_entities_from_every_camera();
 
 	get_system<render_system>().calculate_and_set_interpolated_transforms();
 	

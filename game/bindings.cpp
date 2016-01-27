@@ -16,9 +16,5 @@ void bind_whole_hypersomnia(augs::lua_state_wrapper& wrapper) {
 		luabind::class_<hypersomnia_world, augs::world>("hypersomnia_world")
 		.def(luabind::constructor<overworld&>())
 			,
-
-		// bottlenecks
-		luabind::def("draw_tile_highlights", draw_tile_highlights),
-		luabind::def("get_random_coordinate_on_a_special_tile", get_random_coordinate_on_a_special_tile)
 	];
 }
