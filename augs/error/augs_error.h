@@ -1,4 +1,5 @@
 #pragma once
+// legacy functionality kept to conformance with old code. Do not use anymore.
 #include <fstream>
 #include "../options.h"
 

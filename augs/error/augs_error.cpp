@@ -1,4 +1,5 @@
 ﻿#pragma once
+// legacy functionality kept to conformance with old code. Do not use anymore.
 #include "augs_error.h"
 #include <Windows.h>
 #undef min
