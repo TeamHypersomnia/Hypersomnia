@@ -28,7 +28,7 @@ class render_system : public event_only_system {
 
 	b2DynamicTree non_physical_objects_tree;
 public:
-	using event_only_system::event_only_system;
+	render_system(world& parent_world);
 
 	void add_entities_to_rendering_tree();
 	void remove_entities_from_rendering_tree();

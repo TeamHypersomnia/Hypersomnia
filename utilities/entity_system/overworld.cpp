@@ -54,7 +54,7 @@ namespace augs {
 		return delta_timer.fraction_of_time_until_the_next_logic_step();
 	}
 
-	void overworld::assign_frame_time_to_delta() {
+	void overworld::assign_frame_time_to_delta_for_drawing_time_systems() {
 		delta_ms = frame_timer.extract<std::chrono::milliseconds>();
 	}
 

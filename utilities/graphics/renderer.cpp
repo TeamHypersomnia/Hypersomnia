@@ -57,7 +57,7 @@ namespace augs {
 		triangles.push_back(tri);
 	}
 
-	void renderer::viewport(rects::xywh<int> xywh) {
+	void renderer::set_viewport(rects::xywh<int> xywh) {
 		glViewport(xywh.x, xywh.y, xywh.w, xywh.h);
 	}
 	

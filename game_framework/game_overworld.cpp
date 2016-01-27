@@ -52,20 +52,20 @@ void game_overworld::call_window_script(std::string filename) {
 	game_window.initial_gl_calls();
 }
 
-#define DETERMINISTIC_RENDERING 0
+#define RENDERING_STEPS_DETERMINISTICALLY_LIKE_LOGIC 0
 
-void game_overworld::simulate() {
+void game_overworld::main_game_loop() {
 	bool quit_flag = false;
 
 	while (!quit_flag) {
-		auto raw_inputs = game_window.poll_events();
+		auto raw_window_inputs = game_window.poll_events();
 
 		if (clear_window_inputs_once) {
-			raw_inputs.clear();
+			raw_window_inputs.clear();
 			clear_window_inputs_once = false;
 		}
 
-		for (auto& raw_input : raw_inputs) {
+		for (auto& raw_input : raw_window_inputs) {
 			if (raw_input.key_event == window::event::PRESSED &&
 				raw_input.key == window::event::keys::ESC) {
 				quit_flag = true;
@@ -78,24 +78,24 @@ void game_overworld::simulate() {
 			main_game_world.post_message(msg);
 		}
 
-#if DETERMINISTIC_RENDERING
-		auto steps_to_perform = accumulator.count_logic_steps_to_perform();
+#if RENDERING_STEPS_DETERMINISTICALLY_LIKE_LOGIC
+		auto steps_to_perform = delta_timer.count_logic_steps_to_perform();
 
 		while (steps_to_perform--) {
 #endif
 
 		game_window.clear();
 
-		assign_frame_time_to_delta();
-		main_game_world.draw();
+		assign_frame_time_to_delta_for_drawing_time_systems();
+		main_game_world.call_drawing_time_systems();
 
 		consume_camera_render_requests();
 
-		main_game_world.restore_transforms_after_rendering();
+		main_game_world.restore_transforms_after_drawing();
 
 		restore_fixed_delta();
 
-#if !DETERMINISTIC_RENDERING
+#if !RENDERING_STEPS_DETERMINISTICALLY_LIKE_LOGIC
 		auto steps_to_perform = delta_timer.count_logic_steps_to_perform();
 
 		while (steps_to_perform--) {
@@ -113,8 +113,8 @@ void game_overworld::consume_camera_render_requests() {
 	auto& target = renderer::get_current();
 
 	for (auto& r : requests) {
-		target.viewport(r.state.viewport);
-		current_scene_builder->execute_drawcall_script(r);
+		target.set_viewport(r.state.viewport);
+		current_scene_builder->execute_drawcalls(r);
 		target.draw_debug_info(r.state.visible_world_area, r.state.camera_transform, assets::texture_id::BLANK, main_game_world.get_system<render_system>().targets, view_interpolation_ratio());
 	}
 	

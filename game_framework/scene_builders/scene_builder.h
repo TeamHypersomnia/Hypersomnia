@@ -18,7 +18,7 @@ A scene builder cannot or need not be composed with other scene builders.
 struct scene_builder {
 	virtual void initialize(augs::world& world);
 	virtual void perform_logic_step(augs::world& world);
-	virtual void custom_drawcalls(augs::world& world);
+	virtual void drawcalls_after_all_cameras(augs::world& world);
 
-	virtual void execute_drawcall_script(messages::camera_render_request_message);
+	virtual void execute_drawcalls(messages::camera_render_request_message);
 };

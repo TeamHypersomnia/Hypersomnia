@@ -215,7 +215,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 	}
 }
 
-void camera_system::render_all_cameras() {
+void camera_system::post_render_requests_for_all_cameras() {
 	parent_world.get_message_queue<messages::camera_render_request_message>().clear();
 
 	for (auto e : targets) {

@@ -10,10 +10,10 @@ using namespace components;
 using namespace messages;
 
 game_world::game_world(augs::overworld& overworld) : world(overworld) {
-	register_messages_components_systems();
+	register_types_of_messages_components_systems();
 }
 
-void game_world::register_messages_components_systems() {
+void game_world::register_types_of_messages_components_systems() {
 	register_component<animation>();
 	register_component<animation_response>();
 	register_component<behaviour_tree>();
@@ -81,11 +81,9 @@ void game_world::register_messages_components_systems() {
 	register_message_queue<car_ownership_change_message>();
 	register_message_queue<new_entity_message>();
 	register_message_queue<camera_render_request_message>();
-
-	get_system<render_system>().layers_with_custom_drawing_order.push_back(render_layer::CAR_INTERIOR);
 }
 
-void game_world::draw() {
+void game_world::call_drawing_time_systems() {
 	get_system<render_system>().determine_visible_entities_from_every_camera();
 
 	get_system<render_system>().calculate_and_set_interpolated_transforms();
@@ -115,11 +113,12 @@ void game_world::draw() {
 	get_system<camera_system>().resolve_cameras_transforms_and_smoothing();
 	get_system<lookat_system>().update_rotations();
 
-	get_system<camera_system>().render_all_cameras();
 	get_system<input_system>().acquire_events_from_rendering_time();
+
+	get_system<camera_system>().post_render_requests_for_all_cameras();
 }
 
-void game_world::restore_transforms_after_rendering() {
+void game_world::restore_transforms_after_drawing() {
 	get_system<render_system>().restore_actual_transforms();
 }
 

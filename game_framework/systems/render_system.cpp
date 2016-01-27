@@ -24,6 +24,10 @@
 
 using namespace shared;
 
+render_system::render_system(world& parent_world) : event_only_system(parent_world) {
+	layers_with_custom_drawing_order.push_back(render_layer::CAR_INTERIOR);
+}
+
 void render_system::add_entities_to_rendering_tree() {
 	auto& events = parent_world.get_message_queue<messages::new_entity_message>();
 

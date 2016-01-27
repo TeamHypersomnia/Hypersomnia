@@ -28,7 +28,7 @@ public:
 
 	void configure_scripting();
 
-	void simulate();
+	void main_game_loop();
 
 	void consume_camera_render_requests();
 };

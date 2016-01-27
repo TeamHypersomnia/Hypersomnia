@@ -8,10 +8,10 @@ void scene_builder::perform_logic_step(augs::world&) {
 
 }
 
-void scene_builder::custom_drawcalls(augs::world&) {
+void scene_builder::drawcalls_after_all_cameras(augs::world&) {
 
 }
 
-void scene_builder::execute_drawcall_script(messages::camera_render_request_message msg) {
+void scene_builder::execute_drawcalls(messages::camera_render_request_message msg) {
 
 }
