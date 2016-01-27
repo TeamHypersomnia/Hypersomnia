@@ -6,11 +6,11 @@ namespace augs {
 
 /* 
 A scene builder is that which was inconvenient to put into system,
-so a dummy testbed script for example, some traffic meters, whatever thing that does not deserve its component+system pair.
+so a dummy testbed setup for example.
 
-A scene builder is that which cannot or need not be composed.
+In these classes you will find some traffic meters, whatever thing that does not deserve its component+system pair.
 
-Avoid usage of perform_logic_step + draw whenever possible.
+A scene builder cannot or need not be composed with other scene builders.
 
 */
 #include "../messages/camera_render_request_message.h"

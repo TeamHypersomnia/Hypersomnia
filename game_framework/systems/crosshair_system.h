@@ -18,5 +18,7 @@ public:
 	/* for replayers*/
 	void apply_crosshair_intents_to_crosshair_transforms();
 
+	void set_world_crosshair_transforms_from_base_offsets();
+
 	void animate_crosshair_sizes();
 };
