@@ -18,7 +18,10 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\utilities.h">
+    <ClInclude Include="game\augs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="client\utilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -26,10 +29,10 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\draw_tile_highlights.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="client\draw_tile_highlights.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
