@@ -1,5 +1,6 @@
 #pragma once
-#include "game_framework/game_framework.h"
+#include "game_framework/bind_game_framework_and_augs.h"
+#include "augs/augmentations.h"
 #include "game_framework/game_overworld.h"
 
 using namespace augs;
@@ -7,8 +8,8 @@ using namespace augs;
 #include "game_framework/scene_builders/all_builders.h"
 
 int main(int argc, char** argv) {
-	framework::init();
-	//framework::run_tests();
+	augs::init();
+	//augs::run_tests();
 
 	game_overworld hypersomnia_overworld;
 	hypersomnia_overworld.configure_scripting();
@@ -17,8 +18,8 @@ int main(int argc, char** argv) {
 	hypersomnia_overworld.set_scene_builder(std::unique_ptr<scene_builder>(new scene_builders::testbed));
 	hypersomnia_overworld.initialize_scene();
 
-	hypersomnia_overworld.simulate();
+	hypersomnia_overworld.main_game_loop();
 
-	framework::deinit();
+	augs::deinit();
 	return 0;
 }

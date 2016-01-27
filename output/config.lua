@@ -52,5 +52,4 @@ global_gl_window:create(
 global_gl_window:vsync(0)
 
 --set_cursor_visible(0)
-framework_set_current_window(global_gl_window)
-
+global_gl_window:current()
