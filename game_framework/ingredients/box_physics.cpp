@@ -5,7 +5,7 @@
 
 #include "game_framework/globals/filters.h"
 
-namespace archetypes {
+namespace ingredients {
 	void crate_physics(augs::entity_id e) {
 		helpers::body_definition body;
 		body.fixed_rotation = false;

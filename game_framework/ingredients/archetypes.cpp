@@ -1,10 +1,10 @@
-#include "archetypes.h"
+#include "ingredients.h"
 #include "game_framework/systems/render_system.h"
 
 #include "entity_system/world.h"
 #include "entity_system/entity.h"
 
-namespace archetypes {
+namespace ingredients {
 	void always_visible(augs::entity_id e) {
 		e->get_owner_world().get_system<render_system>().set_visibility_persistence(e, true);
 	}

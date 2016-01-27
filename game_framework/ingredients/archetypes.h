@@ -10,7 +10,7 @@ namespace augs {
 	class world;
 }
 
-namespace archetypes {
+namespace ingredients {
 	void camera(augs::entity_id, int w, int h);
 	
 	void sprite(augs::entity_id, vec2 pos, assets::texture_id = assets::texture_id::BLANK, augs::rgba col = augs::rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);

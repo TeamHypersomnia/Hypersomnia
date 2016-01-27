@@ -1,4 +1,4 @@
-#include "archetypes.h"
+#include "ingredients.h"
 #include "entity_system/entity.h"
 #include "entity_system/world.h"
 
@@ -6,7 +6,7 @@
 #include "game_framework/components/camera_component.h"
 #include "game_framework/components/input_component.h"
 
-namespace archetypes {
+namespace ingredients {
 	void camera(augs::entity_id e, int w, int h) {
 		components::transform transform;
 		components::input input;

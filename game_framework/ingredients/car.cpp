@@ -1,4 +1,4 @@
-#include "archetypes.h"
+#include "ingredients.h"
 #include "entity_system/entity.h"
 #include "entity_system/world.h"
 
@@ -21,7 +21,7 @@
 #include "game_framework/globals/filters.h"
 
 namespace prefabs {
-	augs::entity_id create_motorcycle(augs::world& world, vec2 pos) {
+	augs::entity_id create_car(augs::world& world, vec2 pos) {
 		auto front = world.create_entity("front");
 		auto interior = world.create_entity("interior");
 		auto left_wheel = world.create_entity("left_wheel");
@@ -37,30 +37,15 @@ namespace prefabs {
 			auto& car = *front += components::car();
 
 			car.left_wheel_trigger = left_wheel;
-			car.input_acceleration.set(1000, 1000);
-			car.acceleration_length = 2500;
-			
-			car.wheel_offset = vec2(35, 0);
-			car.maximum_lateral_cancellation_impulse = 50;
-			car.static_air_resistance = 0.0006;
-			car.dynamic_air_resistance = 0.00009;
-			car.static_damping = 2;
-			car.dynamic_damping = 0.2;
-			car.angular_damping_while_hand_braking = 0.0;
-			car.angular_damping = 0.0;
-			car.maximum_speed_with_static_air_resistance = 1000;
-			car.maximum_speed_with_static_damping = 0;
-			car.braking_damping = 2.f;
-			
-			car.minimum_speed_for_maneuverability_decrease = -1;
-			car.maneuverability_decrease_multiplier = 0.00006f;
-
-			car.lateral_impulse_multiplier = 0.3;
-			car.braking_angular_damping = 16.f;
-
+			car.input_acceleration.set(2500, 4500)/=3;
+			car.acceleration_length = 4500/5;
 			transform.pos = pos;
 
-			sprite.set(assets::texture_id::MOTORCYCLE_FRONT);
+			sprite.set(assets::texture_id::TRUCK_FRONT);
+			//sprite.set(assets::texture_id::TRUCK_FRONT, augs::rgba(0, 255, 255));
+			//sprite.size.x = 200;
+			//sprite.size.y = 100;
+
 			render.layer = render_layer::DYNAMIC_BODY;
 
 			helpers::body_definition body;
@@ -72,14 +57,11 @@ namespace prefabs {
 
 			info.filter = filters::dynamic_object();
 			info.density = 0.6f;
-			info.restitution = 0.3;
 
 			auto& physics = helpers::create_physics_component(body, front);
 			helpers::add_fixtures(info, front);
 
-			physics.angular_air_resistance = 0.55f;
-			car.angular_air_resistance = 0.55f;
-			car.angular_air_resistance_while_hand_braking = 0.05f;
+			//physics.air_resistance = 0.2f;
 		}
 
 		{
@@ -91,18 +73,20 @@ namespace prefabs {
 
 			render.layer = render_layer::CAR_INTERIOR;
 
-			sprite.set(assets::texture_id::MOTORCYCLE_INSIDE);
+			sprite.set(assets::texture_id::TRUCK_INSIDE);
+			//sprite.set(assets::texture_id::TRUCK_INSIDE, augs::rgba(122, 0, 122, 255));
+			//sprite.size.x = 250;
+			//sprite.size.y = 550;
 
 			helpers::fixture_definition info;
 			info.from_renderable(interior);
 			info.density = 0.6f;
-			info.sensor = true;
 			info.filter = filters::dynamic_object();
-			vec2 offset(0, front->get<components::sprite>().size.y / 2 + sprite.size.y / 2 - 1);
+			vec2 offset(0, front->get<components::sprite>().size.y / 2 + sprite.size.y / 2);
 			info.transform_vertices.pos = offset;
 
 			auto& fixtures = helpers::add_fixtures_to_other_body(info, interior, front);
-			fixtures.is_friction_ground = false;
+			fixtures.is_friction_ground = true;
 		}
 
 		{
@@ -116,18 +100,18 @@ namespace prefabs {
 
 			render.layer = render_layer::CAR_WHEEL;
 
-			sprite.set(assets::texture_id::CAR_INSIDE, augs::rgba(255, 0, 0, 255));
-			sprite.size.x = 10;
-			sprite.size.y = 20;
+			sprite.set(assets::texture_id::CAR_INSIDE, augs::rgba(29, 0, 0, 255));
+			sprite.size.x = 30;
+			sprite.size.y = 60;
 
 			helpers::fixture_definition info;
 			info.from_renderable(left_wheel);
 			info.density = 0.6f;
 			info.filter = filters::trigger();
 			info.sensor = true;
-			vec2 offset(0, front->get<components::sprite>().size.y / 2 + sprite.size.y / 2 + 0);
+			vec2 offset(0, front->get<components::sprite>().size.y / 2 + sprite.size.y / 2 + 20);
 			info.transform_vertices.pos = offset;
-
+			
 			auto& physics = helpers::add_fixtures_to_other_body(info, left_wheel, front);
 		}
 

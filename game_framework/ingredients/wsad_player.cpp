@@ -1,4 +1,4 @@
-#include "archetypes.h"
+#include "ingredients.h"
 #include "entity_system/entity.h"
 #include "entity_system/world.h"
 
@@ -22,7 +22,7 @@
 #include "game_framework/globals/filters.h"
 #include "game_framework/globals/input_profiles.h"
 
-namespace archetypes {
+namespace ingredients {
 	void wsad_player_setup_movement(augs::entity_id e) {
 		components::movement& movement = e->get<components::movement>();
 
@@ -85,7 +85,7 @@ namespace archetypes {
 		e->add(input_profiles::crosshair());
 		e->add(crosshair);
 
-		archetypes::always_visible(e);
+		ingredients::always_visible(e);
 	}
 
 	void wsad_player(augs::entity_id e, augs::entity_id crosshair_entity, augs::entity_id camera_entity) {

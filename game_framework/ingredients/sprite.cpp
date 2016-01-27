@@ -1,10 +1,10 @@
-#include "archetypes.h"
+#include "ingredients.h"
 #include "renderable_includes.h"
 
 #include "../game/body_helper.h"
 #include "../globals/filters.h"
 
-namespace archetypes {
+namespace ingredients {
 	void sprite(augs::entity_id e, vec2 pos, assets::texture_id id, augs::rgba col, render_layer layer) {
 		auto& sprite = *e += components::sprite();
 		auto& render = *e += components::render();

@@ -1,5 +1,5 @@
 #include "testbed.h"
-#include "../archetypes/archetypes.h"
+#include "../ingredients/ingredients.h"
 
 #include "entity_system/world.h"
 #include "window_framework/window.h"
@@ -86,8 +86,8 @@ namespace scene_builders {
 		for (int x = -4 * 1; x < 4 * 1; ++x)
 		{
 			auto frog = world.create_entity("frog");
-			archetypes::sprite(frog, vec2(100 + x * 40, 400), assets::texture_id::TEST_SPRITE, augs::colors::white, render_layer::DYNAMIC_BODY);
-			archetypes::crate_physics(frog);
+			ingredients::sprite(frog, vec2(100 + x * 40, 400), assets::texture_id::TEST_SPRITE, augs::colors::white, render_layer::DYNAMIC_BODY);
+			ingredients::crate_physics(frog);
 		}
 
 		auto car = prefabs::create_car(world, vec2(-300, 0));
@@ -97,7 +97,7 @@ namespace scene_builders {
 
 		auto motorcycle = prefabs::create_motorcycle(world, vec2(0, -600));
 
-		archetypes::camera(camera, window_rect.w, window_rect.h);
+		ingredients::camera(camera, window_rect.w, window_rect.h);
 
 		auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
 
@@ -105,29 +105,29 @@ namespace scene_builders {
 			for (int y = -4 * 10; y < 4 * 10; ++y)
 			{
 				auto background = world.create_entity();
-				archetypes::sprite(background, vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, augs::colors::white, render_layer::GROUND);
-				//archetypes::static_crate_physics(background);
+				ingredients::sprite(background, vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, augs::colors::white, render_layer::GROUND);
+				//ingredients::static_crate_physics(background);
 
 				auto street = world.create_entity();
-				archetypes::sprite_scalled(street, vec2(x, y) * (bg_size + vec2(1500, 700)) - vec2(1500, 700), 
+				ingredients::sprite_scalled(street, vec2(x, y) * (bg_size + vec2(1500, 700)) - vec2(1500, 700), 
 					vec2(3000, 3000),
 					assets::texture_id::TEST_BACKGROUND, augs::colors::gray1, render_layer::UNDER_GROUND);
 			}
 
 
-		archetypes::wsad_player_crosshair(crosshair);
-		archetypes::wsad_player(player, crosshair, camera);
+		ingredients::wsad_player_crosshair(crosshair);
+		ingredients::wsad_player(player, crosshair, camera);
 
-		archetypes::wsad_player_physics(player);
+		ingredients::wsad_player_physics(player);
 
-		archetypes::sprite_scalled(crate, vec2(200, 300), vec2i(100, 100)/3, assets::texture_id::CRATE, augs::colors::white, render_layer::DYNAMIC_BODY);
-		archetypes::crate_physics(crate);
+		ingredients::sprite_scalled(crate, vec2(200, 300), vec2i(100, 100)/3, assets::texture_id::CRATE, augs::colors::white, render_layer::DYNAMIC_BODY);
+		ingredients::crate_physics(crate);
 		
-		archetypes::sprite_scalled(crate2, vec2(400, 400), vec2i(100, 100), assets::texture_id::CRATE, augs::colors::white, render_layer::DYNAMIC_BODY);
-		archetypes::crate_physics(crate2);
+		ingredients::sprite_scalled(crate2, vec2(400, 400), vec2i(100, 100), assets::texture_id::CRATE, augs::colors::white, render_layer::DYNAMIC_BODY);
+		ingredients::crate_physics(crate2);
 		
-		archetypes::sprite_scalled(crate4, vec2(500, 0), vec2i(100, 100), assets::texture_id::CRATE, augs::colors::white, render_layer::DYNAMIC_BODY);
-		archetypes::crate_physics(crate4);
+		ingredients::sprite_scalled(crate4, vec2(500, 0), vec2i(100, 100), assets::texture_id::CRATE, augs::colors::white, render_layer::DYNAMIC_BODY);
+		ingredients::crate_physics(crate4);
 
 		input_system::context active_context;
 		active_context.map_event_to_intent(window::event::raw_mousemotion, messages::intent_message::MOVE_CROSSHAIR);
@@ -180,7 +180,7 @@ namespace scene_builders {
 
 			if (draw || (it.intent == messages::intent_message::MOVE_CROSSHAIR && keep_drawing)) {
 				auto ent = world.create_entity("drawn_sprite");
-				archetypes::sprite_scalled(ent, it.crosshair_world_pos, vec2(10, 10), assets::texture_id::BLANK);
+				ingredients::sprite_scalled(ent, it.crosshair_world_pos, vec2(10, 10), assets::texture_id::BLANK);
 			}
 		}
 
