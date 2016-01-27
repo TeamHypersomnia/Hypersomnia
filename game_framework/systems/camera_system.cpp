@@ -12,7 +12,7 @@
 #include "../shared/drawing_state.h"
 #include "entity_system/world.h"
 
-#include "utilities/print.h"
+#include "augs/print.h"
 
 void camera_system::react_to_input_intents() {
 	auto events = parent_world.get_message_queue<messages::intent_message>();
@@ -178,14 +178,15 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 					target_value = (player_pos - camera.previous_seen_player_position) / delta_seconds();
 
 					//maybe_physics->velocity();
-					if (target_value.length() > 20)
-						target_value.set_length(20);
-
+					
 					if (target_value.length() < camera.smoothing_player_pos.value.length())
 						// braking
-						camera.smoothing_player_pos.averages_per_sec = 8;
+						camera.smoothing_player_pos.averages_per_sec = 3.5;
 					else
-						camera.smoothing_player_pos.averages_per_sec = 5;
+						camera.smoothing_player_pos.averages_per_sec = 1.5;
+					
+					if (target_value.length() > 50)
+						target_value.set_length(50);
 				}
 				else {
 					target_value = camera.player->get<components::render>().interpolation_direction();

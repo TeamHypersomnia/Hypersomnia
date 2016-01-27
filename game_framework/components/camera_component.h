@@ -9,7 +9,7 @@
 #include "../components/transform_component.h"
 #include "../shared/drawing_state.h"
 
-#include "utilities/misc/smooth_value_field.h"
+#include "augs/misc/smooth_value_field.h"
 
 class camera_system;
 class gun_system;

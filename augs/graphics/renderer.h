@@ -5,10 +5,10 @@
 #include "graphics/vertex.h"
 
 #include "game_framework/components/transform_component.h"
-#include "utilities/entity_system/entity_id.h"
+#include "augs/entity_system/entity_id.h"
 
 #include "game_framework/assets/texture.h"
-#include "utilities/misc/timer.h"
+#include "augs/misc/timer.h"
 
 namespace augs {
 	namespace graphics {

@@ -1,8 +1,8 @@
 #pragma once
 #include "game_world.h"
-#include "utilities/lua_state_wrapper.h"
+#include "augs/lua_state_wrapper.h"
 
-#include "utilities/entity_system/overworld.h"
+#include "augs/entity_system/overworld.h"
 
 #include <memory>
 

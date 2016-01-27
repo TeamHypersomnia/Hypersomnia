@@ -1,5 +1,5 @@
 #pragma once
-#include "utilities/entity_system/entity_id.h"
+#include "augs/entity_system/entity_id.h"
 #include "math/vec2.h"
 
 #include "game_framework/assets/texture.h"

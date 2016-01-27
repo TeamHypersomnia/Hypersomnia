@@ -4,7 +4,7 @@
 #include "entity_system/entity.h"
 #include "../shared/drawing_state.h"
 
-#include "utilities/entity_system/overworld.h"
+#include "augs/entity_system/overworld.h"
 
 #include "game_framework/components/polygon_component.h"
 #include "game_framework/components/sprite_component.h"

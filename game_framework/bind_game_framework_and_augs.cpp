@@ -5,11 +5,11 @@
 #include "misc/vector_wrapper.h"
 
 #include "bind_game_framework_and_augs.h"
-#include "utilities/script.h"
+#include "augs/script.h"
 #include "components/physics_component.h"
 
 #include "entity_system/entity_id.h"
-#include "utilities/lua_state_wrapper.h"
+#include "augs/lua_state_wrapper.h"
 
 #include <fstream>
 #include <iostream>

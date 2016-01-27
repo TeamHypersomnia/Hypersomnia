@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "bindings.h"
 
-#include "utilities/misc/value_animator.h"
+#include "augs/misc/value_animator.h"
 
 namespace bindings {
 	luabind::scope _value_animator() {

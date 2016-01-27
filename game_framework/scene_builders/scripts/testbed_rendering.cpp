@@ -1,7 +1,7 @@
 #include "rendering_procedures.h"
 
-#include "utilities/entity_system/entity.h"
-#include "utilities/entity_system/world.h"
+#include "augs/entity_system/entity.h"
+#include "augs/entity_system/world.h"
 
 #include "game_framework/systems/render_system.h"
 #include "game_framework/resources/manager.h"

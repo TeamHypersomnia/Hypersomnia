@@ -3,7 +3,7 @@
 #include "math/vec2.h"
 
 #include "window_framework/event.h"
-#include "utilities/misc/constant_vector.h"
+#include "augs/misc/constant_vector.h"
 
 /* everything is a state since for actions we can just ignore states with flag set to false */
 using namespace augs;

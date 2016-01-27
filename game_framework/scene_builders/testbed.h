@@ -1,7 +1,7 @@
 #pragma once
 
 #include "scene_builder.h"
-#include "utilities/entity_system/entity_id.h"
+#include "augs/entity_system/entity_id.h"
 
 namespace scene_builders {
 	struct testbed : public scene_builder {

@@ -7,7 +7,7 @@
 #include "input_system.h"
 #include <iostream>
 
-#include "utilities/misc/stream.h"
+#include "augs/misc/stream.h"
 
 using namespace augs::window;
 

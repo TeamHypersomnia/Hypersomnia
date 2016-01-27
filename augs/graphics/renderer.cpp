@@ -7,7 +7,7 @@
 #include "game_framework/components/visibility_component.h"
 #include "game_framework/components/physics_component.h"
 
-#include "utilities/entity_system/entity.h"
+#include "augs/entity_system/entity.h"
 
 #include "fbo.h"
 

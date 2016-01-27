@@ -3,7 +3,7 @@
 #include "math/rects.h"
 #include "../components/transform_component.h"
 
-#include "utilities/entity_system/entity_id.h"
+#include "augs/entity_system/entity_id.h"
 
 namespace augs {
 	class renderer;
