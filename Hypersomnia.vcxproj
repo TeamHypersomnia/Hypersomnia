@@ -137,17 +137,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="game\bindings.h" />
-    <ClInclude Include="game\hypersomnia_overworld.h" />
-    <ClInclude Include="game\hypersomnia_world.h" />
     <ClInclude Include="game\utilities.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="game\bindings.cpp" />
     <ClCompile Include="game\draw_tile_highlights.cpp" />
-    <ClCompile Include="game\hypersomnia_overworld.cpp" />
-    <ClCompile Include="game\hypersomnia_world.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

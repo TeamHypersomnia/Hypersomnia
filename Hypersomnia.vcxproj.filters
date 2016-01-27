@@ -18,16 +18,7 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\bindings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\utilities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\hypersomnia_world.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\hypersomnia_overworld.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,19 +26,10 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\bindings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\draw_tile_highlights.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\hypersomnia_world.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\hypersomnia_overworld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

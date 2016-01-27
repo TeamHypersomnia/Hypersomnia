@@ -1,6 +1,6 @@
 #pragma once
 #include "game_framework/game_framework.h"
-#include "game/hypersomnia_overworld.h"
+#include "game_framework/game_overworld.h"
 
 using namespace augs;
 
