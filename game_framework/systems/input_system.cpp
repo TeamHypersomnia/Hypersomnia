@@ -103,32 +103,26 @@ void input_system::post_intents_from_inputs(const std::vector<messages::raw_wind
 	}
 }
 
-void input_system::acquire_raw_window_inputs() {
-	raw_window_input_player.acquire_events_from_rendering_time();
+void input_system::acquire_new_raw_window_inputs() {
+	raw_window_input_player.acquire_new_events_posted_by_drawing_time_systems();
 }
 
-void input_system::acquire_events_from_rendering_time() {
-	crosshair_intent_player.acquire_events_from_rendering_time();
+void input_system::acquire_new_events_posted_by_drawing_time_systems() {
+	crosshair_intent_player.acquire_new_events_posted_by_drawing_time_systems();
 }
 
-void input_system::replay_rendering_time_events_passed_to_last_logic_step() {
-	crosshair_intent_player.pass_last_unpacked_logic_events_for_rendering_time_approximation();
+void input_system::replay_drawing_time_events_passed_to_last_logic_step() {
+	crosshair_intent_player.pass_last_unpacked_logic_events_for_drawing_time_approximation();
 }
 
-void input_system::post_input_intents_for_rendering_time() {
-	///* if we are replaying, let's pass some mouse strokes registered during logic step time
-	//	just that some of the original mouse movements appear in the recordings
-	//*/
-	//if (!raw_window_input_player.player.is_replaying()) {
-	//}
-
+void input_system::post_input_intents_from_new_raw_window_inputs() {
 	parent_world.get_message_queue<messages::unmapped_intent_message>().clear();
 	parent_world.get_message_queue<messages::intent_message>().clear();
 
-	post_intents_from_inputs(raw_window_input_player.inputs_from_last_rendering_time.events);
+	post_intents_from_inputs(raw_window_input_player.inputs_from_last_drawing_time.events);
 }
 	
-void input_system::post_input_intents_for_logic_step() {
+void input_system::post_input_intents_from_all_raw_window_inputs_since_last_step() {
 	parent_world.get_message_queue<messages::unmapped_intent_message>().clear();
 	parent_world.get_message_queue<messages::intent_message>().clear();
 
@@ -140,6 +134,6 @@ void input_system::post_input_intents_for_logic_step() {
 	raw_window_input_player.clear_step();
 }
 
-void input_system::post_rendering_time_events_for_logic_step() {
+void input_system::post_all_events_posted_by_drawing_time_systems_since_last_step() {
 	crosshair_intent_player.generate_events_for_logic_step();
 }

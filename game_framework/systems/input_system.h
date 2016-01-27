@@ -22,15 +22,14 @@ struct input_system : public processing_system_templated<components::input> {
 		void map_event_to_intent(window::event::message, messages::intent_message::intent_type);
 	};
 
-	void acquire_events_from_rendering_time();
-	void acquire_raw_window_inputs();
+	void acquire_new_events_posted_by_drawing_time_systems();
+	void acquire_new_raw_window_inputs();
+	void post_input_intents_from_new_raw_window_inputs();
 
-	void post_input_intents_for_logic_step();
-	void post_rendering_time_events_for_logic_step();
+	void post_input_intents_from_all_raw_window_inputs_since_last_step();
+	void post_all_events_posted_by_drawing_time_systems_since_last_step();
 
-	void post_input_intents_for_rendering_time();
-
-	void replay_rendering_time_events_passed_to_last_logic_step();
+	void replay_drawing_time_events_passed_to_last_logic_step();
 
 
 	void add_context(context);
@@ -66,23 +65,23 @@ struct input_system : public processing_system_templated<components::input> {
 		events_per_step inputs_from_last_step;
 
 		events_per_step buffered_inputs_for_next_step;
-		events_per_step inputs_from_last_rendering_time;
+		events_per_step inputs_from_last_drawing_time;
 
-		void acquire_events_from_rendering_time() {
+		void acquire_new_events_posted_by_drawing_time_systems() {
 			if (player.is_replaying()) {
 				parent_world.get_message_queue<event_type>().clear();
 				return;
 			}
 
-			inputs_from_last_rendering_time.events = parent_world.get_message_queue<event_type>();
+			inputs_from_last_drawing_time.events = parent_world.get_message_queue<event_type>();
 
-			for (auto& m : inputs_from_last_rendering_time.events)
+			for (auto& m : inputs_from_last_drawing_time.events)
 				buffered_inputs_for_next_step.events.push_back(m);
 
 			parent_world.get_message_queue<event_type>().clear();
 		}
 		
-		void pass_last_unpacked_logic_events_for_rendering_time_approximation() {
+		void pass_last_unpacked_logic_events_for_drawing_time_approximation() {
 			if (player.is_replaying()) {
 				parent_world.get_message_queue<event_type>() = inputs_from_last_step.events;
 				// we do it only once per step

@@ -92,15 +92,15 @@ void game_world::call_drawing_time_systems() {
 
 	get_system<animation_system>().transform_response_requests_to_animation_messages();
 
-	get_system<input_system>().acquire_raw_window_inputs();
-	get_system<input_system>().post_input_intents_for_rendering_time();
+	get_system<input_system>().acquire_new_raw_window_inputs();
+	get_system<input_system>().post_input_intents_from_new_raw_window_inputs();
 
 	// supposed to be read-only
 	get_system<crosshair_system>().generate_crosshair_intents();
 
 	// the need for this disappears once the virtue of rendering-time systems is reading, and reading only. (also posting entropic messages
 	// that the logic systems deterministically get ahold of)
-	// get_system<input_system>().replay_rendering_time_events_passed_to_last_logic_step();
+	// get_system<input_system>().replay_drawing_time_events_passed_to_last_logic_step();
 
 	/* application of messages */
 	get_system<animation_system>().handle_animation_messages();
@@ -113,9 +113,9 @@ void game_world::call_drawing_time_systems() {
 	get_system<camera_system>().resolve_cameras_transforms_and_smoothing();
 	get_system<lookat_system>().update_rotations();
 
-	get_system<input_system>().acquire_events_from_rendering_time();
-
 	get_system<camera_system>().post_render_requests_for_all_cameras();
+
+	get_system<input_system>().acquire_new_events_posted_by_drawing_time_systems();
 }
 
 void game_world::restore_transforms_after_drawing() {
@@ -123,8 +123,8 @@ void game_world::restore_transforms_after_drawing() {
 }
 
 void game_world::perform_logic_step() {
-	get_system<input_system>().post_input_intents_for_logic_step();
-	get_system<input_system>().post_rendering_time_events_for_logic_step();
+	get_system<input_system>().post_input_intents_from_all_raw_window_inputs_since_last_step();
+	get_system<input_system>().post_all_events_posted_by_drawing_time_systems_since_last_step();
 
 	/* begin receivers of new_entity messages changes */
 
