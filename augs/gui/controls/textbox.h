@@ -72,7 +72,7 @@ namespace augs {
 					
 					template <class T>
 					void set(T val) {
-						auto s = misc::wstr(val);
+						auto s = formatted_string_to_wstring(val);
 						if(property_guard) property_guard(s);
 
 						editor.select_all();

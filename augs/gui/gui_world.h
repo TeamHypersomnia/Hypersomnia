@@ -31,6 +31,12 @@ namespace augs {
 				};
 
 				typedef std::basic_string<formatted_char> fstr;
+
+				std::wstring formatted_string_to_wstring(const fstr& f);
+				fstr format(const std::wstring&, style);
+				void format(const std::wstring&, style, fstr&);
+				void format(const wchar_t*, style, fstr&);
+				fstr format(const wchar_t*, style);
 			}
 
 			class gui_world {
@@ -89,27 +95,8 @@ namespace augs {
 				void draw_triangles();
 			};
 				
-			
-			namespace text {
-				extern fstr format(const std::wstring&, style);
-				extern void format(const std::wstring&, style, fstr&);
-				extern void format(const wchar_t*, style, fstr&);
-				extern fstr format(const wchar_t*, style);
-			}
-
-			extern void paste_clipboard(text::fstr& out, text::formatted_char = text::formatted_char());
+			void paste_clipboard_formatted(text::fstr& out, text::formatted_char = text::formatted_char());
 		}
-	}
-	namespace misc {
-		extern std::wstring wstr(const graphics::gui::text::fstr& f);
-		template <class T>
-		T wnum(const graphics::gui::text::fstr& f) {
-			std::wistringstream ss(wstr(f));
-			T v;
-			ss >> v;
-			return v;
-		}
-		
 	}
 }
 

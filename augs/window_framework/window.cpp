@@ -562,7 +562,7 @@ namespace augs {
 		}
 
 		void imbx(int title, int content) { 
-			MessageBox(0, misc::wstr(content).c_str(), misc::wstr(title).c_str(), MB_OK); 
+			MessageBox(0, to_wstring(content).c_str(), to_wstring(title).c_str(), MB_OK); 
 		}
 
 		void smbx(std::wstring title, std::wstring content) { 

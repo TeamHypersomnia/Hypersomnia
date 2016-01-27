@@ -4,21 +4,19 @@
 #include "window_framework/window.h"
 #undef max
 namespace augs {
-	namespace misc {
-		std::wstring wstr(const graphics::gui::text::fstr& f) {
-			size_t l = f.size();
-			std::wstring ww;
-			ww.reserve(l);
-			for(size_t i = 0; i < l; ++i)
-				ww += f[i].c;
-
-			return ww;
-		}
-	}
-
 	namespace graphics {
 		namespace gui {
 			namespace text {
+				std::wstring formatted_string_to_wstring(const fstr& f) {
+					size_t l = f.size();
+					std::wstring ww;
+					ww.reserve(l);
+					for (size_t i = 0; i < l; ++i)
+						ww += f[i].c;
+
+					return ww;
+				}
+
 				void format(const wchar_t* _str, style s, fstr& out) {
 					out.clear();
 					formatted_char ch;
@@ -147,7 +145,7 @@ namespace augs {
 				}
 			}
 
-			void paste_clipboard(text::fstr& out, text::formatted_char f) {
+			void paste_clipboard_formatted(text::fstr& out, text::formatted_char f) {
 				std::wstring w;
 				window::paste_clipboard(w);
 				size_t len = w.length();
@@ -163,7 +161,7 @@ namespace augs {
 				contents = s;
 				own_copy = true;
 				own_clip = true;
-				window::copy_clipboard(misc::wstr(s));
+				window::copy_clipboard(formatted_string_to_wstring(s));
 			}
 
 			void gui_world::set_delta_milliseconds(float delta) {
@@ -179,7 +177,7 @@ namespace augs {
 				if(!own_copy && fetch_clipboard) {
 					text::formatted_char ch;
 					ch.set(0, assets::font_id::GUI_FONT, rgba(0, 0, 0, 255));
-					paste_clipboard(contents, ch);
+					paste_clipboard_formatted(contents, ch);
 					own_clip = false;
 				}
 

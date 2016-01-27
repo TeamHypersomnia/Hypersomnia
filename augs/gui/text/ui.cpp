@@ -176,7 +176,7 @@ namespace augs {
 						insert(clip.contents);
 					else {
 						fstr out;
-						paste_clipboard(out, get_current_style());
+						paste_clipboard_formatted(out, get_current_style());
 						insert(out);
 					}
 				}

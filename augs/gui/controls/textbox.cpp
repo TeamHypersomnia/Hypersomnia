@@ -214,12 +214,12 @@ namespace augs {
 				}
 				
 				std::wstring property_textbox::get_str() const {
-					return misc::wstr(editor.get_str());
+					return formatted_string_to_wstring(editor.get_str());
 				}
 
 				void property_textbox::consume_gui_event(event_info e) {
 					if(e.msg == rect::gui_event::blur) {
-						std::wstring ws = misc::wstr(editor.get_str());
+						std::wstring ws = formatted_string_to_wstring(editor.get_str());
 						if(property_guard) property_guard(ws);
 						editor.select_all(); 
 						editor.insert(text::format(ws, editor.get_default_style()));

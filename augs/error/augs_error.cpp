@@ -54,7 +54,7 @@ namespace augs {
 		}
 
 		void module::gl_last_error(wchar_t* msgbuf) {
-			wcscpy(msgbuf, misc::wstr(glGetError()).c_str());
+			wcscpy(msgbuf, to_wstring(glGetError()).c_str());
 		}
 		
 		void module::glew_last_error(wchar_t* msgbuf) {
