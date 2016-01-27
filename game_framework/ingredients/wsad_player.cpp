@@ -17,7 +17,7 @@
 #include "game_framework/components/driver_component.h"
 
 
-#include "game_framework/game/body_helper.h"
+#include "game_framework/game/physics_setup_helpers.h"
 
 #include "game_framework/globals/filters.h"
 #include "game_framework/globals/input_profiles.h"
@@ -41,8 +41,8 @@ namespace ingredients {
 	}
 
 	void wsad_player_physics(augs::entity_id e) {
-		helpers::body_definition body;
-		helpers::fixture_definition info;
+		body_definition body;
+		fixture_definition info;
 		info.from_renderable(e);
 
 		info.filter = filters::controlled_character();
@@ -50,8 +50,8 @@ namespace ingredients {
 		body.fixed_rotation = false;
 		body.angled_damping = true;
 
-		auto& physics = helpers::create_physics_component(body, e);
-		helpers::add_fixtures(info, e);
+		auto& physics = create_physics_component(body, e);
+		add_fixtures(info, e);
 
 		//physics.air_resistance = 5.f;
 		physics.set_linear_damping(20);

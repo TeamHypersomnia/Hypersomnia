@@ -1,7 +1,7 @@
 #include "ingredients.h"
 #include "renderable_includes.h"
 
-#include "../game/body_helper.h"
+#include "../game/physics_setup_helpers.h"
 #include "../globals/filters.h"
 
 namespace ingredients {

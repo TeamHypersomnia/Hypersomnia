@@ -6,7 +6,7 @@
 #include "render_system.h"
 #include "physics_system.h"
 
-#include "../game/body_helper.h"
+#include "../game/physics_setup_helpers.h"
 
 #include <iostream>
 
@@ -183,7 +183,7 @@ void pathfinding_system::process_entities() {
 
 			/* prepare body polygon to test for overlaps */
 			b2PolygonShape body_poly;
-			auto verts = helpers::get_world_vertices(body->GetUserData());
+			auto verts = get_world_vertices(body->GetUserData());
 			body_poly.Set(verts.data(), verts.size());
 
 			/* for every undiscovered navigation point */
@@ -413,7 +413,7 @@ void pathfinding_system::process_entities() {
 
 				bool rays_hit = false;
 				/* extract all transformed vertices of the subject's original model, false means we want pixels */
-				auto& subject_verts = helpers::get_world_vertices(it, false);
+				auto& subject_verts = get_world_vertices(it, false);
 				subject_verts.clear();
 				subject_verts.push_back(transform.pos);
 

@@ -16,7 +16,7 @@
 #include "game_framework/components/car_component.h"
 #include "game_framework/components/trigger_component.h"
 
-#include "game_framework/game/body_helper.h"
+#include "game_framework/game/physics_setup_helpers.h"
 
 #include "game_framework/globals/filters.h"
 
@@ -63,19 +63,19 @@ namespace prefabs {
 			sprite.set(assets::texture_id::MOTORCYCLE_FRONT);
 			render.layer = render_layer::DYNAMIC_BODY;
 
-			helpers::body_definition body;
+			body_definition body;
 			body.linear_damping = 0.4f;
 			body.angular_damping = 2.f;
 
-			helpers::fixture_definition info;
+			fixture_definition info;
 			info.from_renderable(front);
 
 			info.filter = filters::dynamic_object();
 			info.density = 0.6f;
 			info.restitution = 0.3;
 
-			auto& physics = helpers::create_physics_component(body, front);
-			helpers::add_fixtures(info, front);
+			auto& physics = create_physics_component(body, front);
+			add_fixtures(info, front);
 
 			physics.angular_air_resistance = 0.55f;
 			car.angular_air_resistance = 0.55f;
@@ -93,7 +93,7 @@ namespace prefabs {
 
 			sprite.set(assets::texture_id::MOTORCYCLE_INSIDE);
 
-			helpers::fixture_definition info;
+			fixture_definition info;
 			info.from_renderable(interior);
 			info.density = 0.6f;
 			info.sensor = true;
@@ -101,7 +101,7 @@ namespace prefabs {
 			vec2 offset(0, front->get<components::sprite>().size.y / 2 + sprite.size.y / 2 - 1);
 			info.transform_vertices.pos = offset;
 
-			auto& fixtures = helpers::add_fixtures_to_other_body(info, interior, front);
+			auto& fixtures = add_fixtures_to_other_body(info, interior, front);
 			fixtures.is_friction_ground = false;
 		}
 
@@ -120,7 +120,7 @@ namespace prefabs {
 			sprite.size.x = 10;
 			sprite.size.y = 20;
 
-			helpers::fixture_definition info;
+			fixture_definition info;
 			info.from_renderable(left_wheel);
 			info.density = 0.6f;
 			info.filter = filters::trigger();
@@ -128,7 +128,7 @@ namespace prefabs {
 			vec2 offset(0, front->get<components::sprite>().size.y / 2 + sprite.size.y / 2 + 0);
 			info.transform_vertices.pos = offset;
 
-			auto& physics = helpers::add_fixtures_to_other_body(info, left_wheel, front);
+			auto& physics = add_fixtures_to_other_body(info, left_wheel, front);
 		}
 
 		return front;

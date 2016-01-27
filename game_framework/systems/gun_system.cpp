@@ -17,7 +17,7 @@
 #include "../systems/physics_system.h"
 #include "../systems/render_system.h"
 
-#include "../game/body_helper.h"
+#include "../game/physics_setup_helpers.h"
 
 #include "misc/randval.h"
 #include <iostream>
@@ -150,7 +150,7 @@ void gun_system::process_entities() {
 				new_bullet->add(gun.bullet_render);
 				new_bullet->name = "bullet";
 				assert(0);
-				//helpers::create_physics_component(gun.bullet_body, new_bullet, b2_dynamicBody);
+				//create_physics_component(gun.bullet_body, new_bullet, b2_dynamicBody);
 
 				/* bullet's physics settings */
 				auto body = new_bullet->get<components::physics>().body;

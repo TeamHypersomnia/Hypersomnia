@@ -9,7 +9,7 @@ float PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 
 #include "../messages/collision_message.h"
 #include "../messages/destroy_message.h"
-#include "../game/body_helper.h"
+#include "../game/physics_setup_helpers.h"
 #include "augs/print.h"
 
 #include "../components/fixtures_component.h"
@@ -194,7 +194,7 @@ physics_system::query_output physics_system::query_body(augs::entity_id subject,
 	query_output total_output;
 
 	for (b2Fixture* f = subject->get<components::physics>().body->GetFixtureList(); f != nullptr; f = f->GetNext()) {
-		auto world_vertices = helpers::get_world_vertices(subject, true);
+		auto world_vertices = get_world_vertices(subject, true);
 
 		b2PolygonShape shape;
 		shape.Set(world_vertices.data(), world_vertices.size());

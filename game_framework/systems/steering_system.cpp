@@ -7,7 +7,7 @@
 
 #include "../components/visibility_component.h"
 
-#include "../game/body_helper.h"
+#include "../game/physics_setup_helpers.h"
 
 #include "steering_system.h"
 #include "render_system.h"
@@ -615,7 +615,7 @@ void steering_system::substep() {
 		/* extract ALL the vertices from the physics body, it will be then used by obstacle avoidance routines to calculate avoidance quad,
 			false means we want pixels
 		*/
-		auto shape_verts = helpers::get_world_vertices(it, false);
+		auto shape_verts = get_world_vertices(it, false);
 		auto draw_vector = [&position, &renderer, &lines](vec2 v, rgba col){
 			if (v.non_zero())
 				lines.draw(position, position + v, col);

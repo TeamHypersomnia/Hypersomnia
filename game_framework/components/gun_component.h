@@ -5,7 +5,7 @@
 #include "entity_system/entity.h"
 
 #include "render_component.h"
-#include "../game/body_helper.h"
+#include "../game/physics_setup_helpers.h"
 
 class gun_system;
 namespace components {
@@ -26,7 +26,7 @@ namespace components {
 		int current_state, trigger_mode;
 
 		components::render bullet_render;
-		helpers::fixture_definition bullet_body;
+		fixture_definition bullet_body;
 		b2Filter melee_filter;
 		b2Filter melee_obstruction_filter;
 
