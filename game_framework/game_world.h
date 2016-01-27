@@ -8,7 +8,7 @@ namespace augs {
 
 class game_world : public augs::world {
 public:
-	game_world(augs::overworld&);
+	game_world(augs::overworld& parent_overworld);
 
 	void register_types_of_messages_components_systems();
 	
