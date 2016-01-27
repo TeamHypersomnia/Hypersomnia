@@ -352,13 +352,6 @@
     <ClCompile Include="3rdparty\RakNet\Source\VitaIncludes.cpp" />
     <ClCompile Include="3rdparty\RakNet\Source\WSAStartupSingleton.cpp" />
     <ClCompile Include="3rdparty\RakNet\Source\_FindFirst.cpp" />
-    <ClCompile Include="game_framework\archetypes\archetypes.cpp" />
-    <ClCompile Include="game_framework\archetypes\box_physics.cpp" />
-    <ClCompile Include="game_framework\archetypes\car.cpp" />
-    <ClCompile Include="game_framework\archetypes\motorcycle.cpp" />
-    <ClCompile Include="game_framework\archetypes\sprite.cpp" />
-    <ClCompile Include="game_framework\archetypes\camera.cpp" />
-    <ClCompile Include="game_framework\archetypes\wsad_player.cpp" />
     <ClCompile Include="game_framework\bindings\file_watcher_binding.cpp" />
     <ClCompile Include="game_framework\bindings\glwindow_binding.cpp" />
     <ClCompile Include="game_framework\bindings\id_generator_binding.cpp" />
@@ -387,6 +380,13 @@
     <ClCompile Include="game_framework\game_world.cpp" />
     <ClCompile Include="game_framework\globals\filters.cpp" />
     <ClCompile Include="game_framework\globals\input_profiles.cpp" />
+    <ClCompile Include="game_framework\ingredients\box_physics.cpp" />
+    <ClCompile Include="game_framework\ingredients\camera.cpp" />
+    <ClCompile Include="game_framework\ingredients\car.cpp" />
+    <ClCompile Include="game_framework\ingredients\ingredients.cpp" />
+    <ClCompile Include="game_framework\ingredients\motorcycle.cpp" />
+    <ClCompile Include="game_framework\ingredients\sprite.cpp" />
+    <ClCompile Include="game_framework\ingredients\wsad_player.cpp" />
     <ClCompile Include="game_framework\resources\animation.cpp" />
     <ClCompile Include="game_framework\resources\manager.cpp" />
     <ClCompile Include="game_framework\resources\texture_with_image.cpp" />
@@ -928,8 +928,6 @@
     <ClInclude Include="game_framework\all_component_includes.h" />
     <ClInclude Include="game_framework\all_message_includes.h" />
     <ClInclude Include="game_framework\all_system_includes.h" />
-    <ClInclude Include="game_framework\archetypes\archetypes.h" />
-    <ClInclude Include="game_framework\archetypes\renderable_includes.h" />
     <ClInclude Include="game_framework\assets\animation_response.h" />
     <ClInclude Include="game_framework\assets\atlas.h" />
     <ClInclude Include="game_framework\assets\callback.h" />
@@ -975,6 +973,8 @@
     <ClInclude Include="game_framework\globals\input_profiles.h" />
     <ClInclude Include="game_framework\globals\joints.h" />
     <ClInclude Include="game_framework\globals\layers.h" />
+    <ClInclude Include="game_framework\ingredients\ingredients.h" />
+    <ClInclude Include="game_framework\ingredients\renderable_includes.h" />
     <ClInclude Include="game_framework\messages\animation_message.h" />
     <ClInclude Include="game_framework\components\animation_response_component.h" />
     <ClInclude Include="game_framework\messages\animation_response_message.h" />

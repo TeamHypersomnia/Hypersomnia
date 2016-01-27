@@ -1,5 +1,5 @@
 #include "one_entity.h"
-#include "../archetypes/archetypes.h"
+#include "../ingredients/ingredients.h"
 
 #include "entity_system/world.h"
 #include "window_framework/window.h"
@@ -57,12 +57,12 @@ namespace scene_builders {
 
 		auto camera = world.create_entity();
 
-		archetypes::camera(camera, window_rect.w, window_rect.h);
+		ingredients::camera(camera, window_rect.w, window_rect.h);
 
 		auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
 
 		auto background = world.create_entity();
-		archetypes::sprite(background, vec2(500, 0), assets::texture_id::TEST_BACKGROUND);
+		ingredients::sprite(background, vec2(500, 0), assets::texture_id::TEST_BACKGROUND);
 		
 		input_system::context active_context;
 		active_context.map_event_to_intent(window::event::raw_mousemotion, messages::intent_message::MOVE_CROSSHAIR);
