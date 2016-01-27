@@ -1,7 +1,7 @@
 #pragma once
 #include "textbox.h"
 #include "../text\drafter.h"
-#include "misc/stream.h"
+#include "stream.h"
 
 namespace augs {
 	namespace graphics {

@@ -5,7 +5,7 @@
 #undef min
 #undef max
 #include <GL/OpenGL.h>
-#include "../misc/stream.h"
+#include "../stream.h"
 #include "log.h"
 
 namespace augs {

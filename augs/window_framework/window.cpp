@@ -2,7 +2,7 @@
 #include "../options.h"
 
 #include "window.h"
-#include "../misc/stream.h"
+#include "../stream.h"
 #include <algorithm>
 #include <Shlwapi.h>
 
