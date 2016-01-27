@@ -1,5 +1,5 @@
 #pragma once
-#include "entity_system/component.h"
+
 #include "math/vec2.h"
 #include "render_component.h"
 #include "misc/fixed_delta_timer.h"
@@ -15,7 +15,7 @@ class camera_system;
 class gun_system;
 
 namespace components {
-	struct camera : public augs::component {
+	struct camera  {
 		static void configure_camera_player_crosshair(augs::entity_id camera, augs::entity_id player, augs::entity_id crosshair);
 
 		augs::rects::xywh<int> viewport;

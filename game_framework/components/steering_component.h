@@ -1,5 +1,5 @@
 #pragma once
-#include "entity_system/component.h"
+
 #include "entity_system/entity.h"
 #include "math/vec2.h"
 #include "graphics/pixel.h"
@@ -13,7 +13,7 @@ class physics_system;
 namespace components {
 	struct visibility;
 
-	struct steering : public augs::component {
+	struct steering  {
 		struct behaviour_state;
 
 		struct object_info {

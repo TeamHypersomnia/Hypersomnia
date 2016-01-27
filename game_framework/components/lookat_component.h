@@ -1,10 +1,10 @@
 #pragma once
-#include "entity_system/component.h"
+
 #include "entity_system/entity_id.h"
 #include "math/vec2.h"
 
 namespace components {
-	struct lookat : public augs::component {
+	struct lookat  {
 		enum look_type {
 			POSITION,
 			VELOCITY,

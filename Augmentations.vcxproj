@@ -424,7 +424,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="utilities\augmentations.cpp" />
-    <ClCompile Include="utilities\entity_system\component.cpp" />
     <ClCompile Include="utilities\entity_system\entity.cpp" />
     <ClCompile Include="utilities\entity_system\overworld.cpp" />
     <ClCompile Include="utilities\entity_system\processing_system.cpp" />
@@ -1028,7 +1027,6 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="utilities\augmentations.h" />
     <ClInclude Include="utilities\dirent.h" />
-    <ClInclude Include="utilities\entity_system\component.h" />
     <ClInclude Include="utilities\entity_system\entity.h" />
     <ClInclude Include="utilities\entity_system\entity_id.h" />
     <ClInclude Include="utilities\entity_system\entity_system.h" />

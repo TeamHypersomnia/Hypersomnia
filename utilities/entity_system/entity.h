@@ -1,6 +1,5 @@
 #pragma once
 #include "processing_system.h"
-#include "component.h"
 #include "component_bitset_matcher.h"
 
 #include "misc/sorted_vector.h"

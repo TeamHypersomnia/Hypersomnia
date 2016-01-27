@@ -1,12 +1,12 @@
 #pragma once
 #include <vector>
 #include <unordered_map>
-#include "entity_system/component.h"
+
 #include "entity_system/entity.h"
 #include "misc/timer.h"
 
 namespace components {
-	struct behaviour_tree : public augs::component {
+	struct behaviour_tree  {
 		struct task;
 		struct decorator;
 

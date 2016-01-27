@@ -1,11 +1,11 @@
 #pragma once
 #include <Box2D/Dynamics/b2Fixture.h>
-#include "entity_system/component.h"
+
 #include "../messages/animation_response_message.h"
 #include "math/vec2.h"
 
 namespace components {
-	struct movement : public augs::component {
+	struct movement  {
 		struct subscribtion {
 			augs::entity_id target;
 			bool stop_at_zero_movement;

@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_map>
-#include "entity_system/component.h"
+
 #include "../messages/animation_message.h"
 #include "misc/map_wrapper.h"
 

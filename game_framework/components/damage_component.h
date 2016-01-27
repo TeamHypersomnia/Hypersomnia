@@ -1,13 +1,13 @@
 #pragma once
 #include "math/vec2.h"
-#include "entity_system/component.h"
+
 #include "entity_system/entity.h"
 
 #include "misc/timer.h"
 
 
 namespace components {
-	struct damage : public augs::component {
+	struct damage  {
 		float amount;
 		augs::entity_id sender;
 

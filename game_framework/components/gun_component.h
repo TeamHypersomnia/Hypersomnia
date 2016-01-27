@@ -1,7 +1,7 @@
 #pragma once
 
 #include "misc/timer.h"
-#include "entity_system/component.h"
+
 #include "entity_system/entity.h"
 
 #include "render_component.h"
@@ -9,7 +9,7 @@
 
 class gun_system;
 namespace components {
-	struct gun : public augs::component {
+	struct gun  {
 		enum state {
 			READY,
 			SWINGING,

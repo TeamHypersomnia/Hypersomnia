@@ -5,7 +5,7 @@
 #include "../resources/particle_emitter_info.h"
 
 namespace components {
-	struct particle_emitter : public augs::component {
+	struct particle_emitter  {
 		resources::particle_emitter_info* available_particle_effects;
 
 		resources::particle_effect* get_effect(int eff) {

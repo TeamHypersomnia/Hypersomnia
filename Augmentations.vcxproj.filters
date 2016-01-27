@@ -681,9 +681,6 @@
     <ClCompile Include="game_framework\whole_engine_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="utilities\entity_system\component.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="utilities\entity_system\entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -795,13 +792,7 @@
     <ClCompile Include="utilities\graphics\renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\archetypes\camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\scene_builders\testbed.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\archetypes\wsad_player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game_framework\components\sprite_component.cpp">
@@ -873,9 +864,6 @@
     <ClCompile Include="game_framework\scene_builders\scripts\testbed_rendering.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\archetypes\sprite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="utilities\texture_baker\lodepng.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -894,16 +882,10 @@
     <ClCompile Include="game_framework\components\physics_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\archetypes\box_physics.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\systems\car_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game_framework\systems\driver_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\archetypes\car.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game_framework\globals\input_profiles.cpp">
@@ -918,13 +900,7 @@
     <ClCompile Include="game_framework\components\fixtures_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\archetypes\archetypes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\scene_builders\one_entity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\archetypes\motorcycle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\luabind\src\class.cpp">
@@ -2537,9 +2513,6 @@
     <ClInclude Include="game_framework\game_framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utilities\entity_system\component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="utilities\entity_system\entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2705,9 +2678,6 @@
     <ClInclude Include="utilities\graphics\renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\archetypes\archetypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\components\sprite_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2751,9 +2721,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="utilities\math\matrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game_framework\archetypes\renderable_includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="utilities\texture_baker\lodepng.h">

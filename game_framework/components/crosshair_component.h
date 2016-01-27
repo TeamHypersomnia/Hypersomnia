@@ -1,11 +1,11 @@
 #pragma once
-#include "entity_system/component.h"
+
 #include "math/vec2.h"
 #include "math/rects.h"
 #include "misc/value_animator.h"
 
 namespace components {
-	struct crosshair : public augs::component {
+	struct crosshair  {
 		//augs::rects::ltrb bounds;
 		augs::value_animation blink;
 		bool should_blink = false;

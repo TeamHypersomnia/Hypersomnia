@@ -1,11 +1,11 @@
 #pragma once
 #include <unordered_map>
-#include "entity_system/component.h"
+
 #include "entity_system/entity.h"
 
 namespace components {
 	/* synchronizes death of multiple entities */
-	struct children : public augs::component {
+	struct children  {
 		enum sub_entity_name {
 			CHARACTER_CROSSHAIR,
 			CHARACTER_LEGS

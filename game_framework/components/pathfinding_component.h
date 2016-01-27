@@ -1,11 +1,11 @@
 #pragma once
-#include "entity_system/component.h"
+
 #include "math/vec2.h"
 
 #include "visibility_component.h"
 
 namespace components {
-	struct pathfinding : public augs::component {
+	struct pathfinding  {
 		typedef std::pair<vec2, vec2> edge;
 
 		pathfinding() : force_touch_sensors(false), enable_session_rollbacks(true), mark_touched_as_discovered(false), force_persistent_navpoints(false), favor_velocity_parallellness(false), enable_backtracking(true), target_offset(0.f), distance_navpoint_hit(0.f), is_exploring(false), rotate_navpoints(0.f) {}

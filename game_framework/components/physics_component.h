@@ -1,5 +1,4 @@
 #pragma once
-#include "entity_system/component.h"
 #include "entity_system/entity_id.h"
 
 #include "transform_component.h"
@@ -14,7 +13,7 @@ class b2Body;
 #include <vector>
 
 namespace components {
-	struct physics : public augs::component {
+	struct physics {
 		static physics& get_owner_body(augs::entity_id);
 		static augs::entity_id get_owner_friction_field(augs::entity_id);
 		static augs::entity_id get_owner_body_entity(augs::entity_id sub_entity);

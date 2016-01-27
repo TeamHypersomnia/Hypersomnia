@@ -2,13 +2,13 @@
 #include <vector>
 #include "math/vec2.h"
 #include <Box2D\Dynamics\b2Fixture.h>
-#include "entity_system/component.h"
+
 #include "graphics/pixel.h"
 #include "misc/sorted_vector.h"
 #include "misc/timer.h"
 
 namespace components {
-	struct visibility : public augs::component {
+	struct visibility  {
 		typedef std::pair<vec2, vec2> edge;
 
 		struct triangle {

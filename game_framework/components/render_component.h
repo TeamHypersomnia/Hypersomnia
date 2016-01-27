@@ -1,12 +1,11 @@
 #pragma once
-#include "entity_system/component.h"
 #include "transform_component.h"
 
 #include "math/vec2.h"
 #include "../globals/layers.h"
 
 namespace components {
-	struct render : public augs::component {
+	struct render {
 		vec2 last_screen_pos;
 		bool was_drawn = false;
 

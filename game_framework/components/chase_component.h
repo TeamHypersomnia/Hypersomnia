@@ -1,12 +1,12 @@
 #pragma once
-#include "entity_system/component.h"
+
 #include "entity_system/entity.h"
 #include "math/vec2.h"
 
 class chase_system;
 
 namespace components {
-	struct chase : public augs::component {
+	struct chase  {
 		augs::entity_id target;
 		
 		enum chase_type {
