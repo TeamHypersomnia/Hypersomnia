@@ -205,17 +205,25 @@ void render_system::calculate_and_set_interpolated_transforms() {
 			auto& actual_transform = e->get<components::transform>();
 			render.saved_actual_transform = actual_transform;
 
-			components::transform interpolated_transform;
-			interpolated_transform.pos = actual_transform.pos * ratio + render.previous_transform.pos * (1.0f - ratio);
-			interpolated_transform.rotation = vec2().set_from_degrees(render.previous_transform.rotation).lerp(vec2().set_from_degrees(actual_transform.rotation), ratio).degrees();
+			if (render.last_step_when_visible == current_step - 1) {
+				components::transform interpolated_transform;
+				interpolated_transform.pos = actual_transform.pos * ratio + render.previous_transform.pos * (1.0f - ratio);
+				interpolated_transform.rotation = vec2().set_from_degrees(render.previous_transform.rotation).lerp(vec2().set_from_degrees(actual_transform.rotation), ratio).degrees();
 
-			if ((actual_transform.pos - interpolated_transform.pos).length_sq() > 1.f)
-				actual_transform.pos = interpolated_transform.pos;
-			if (tabs(actual_transform.rotation - interpolated_transform.rotation) > 1.f)
-				actual_transform.rotation = interpolated_transform.rotation;
+				if ((actual_transform.pos - interpolated_transform.pos).length_sq() > 1.f)
+					actual_transform.pos = interpolated_transform.pos;
+				if (tabs(actual_transform.rotation - interpolated_transform.rotation) > 1.f)
+					actual_transform.rotation = interpolated_transform.rotation;
+			}
+			else {
+				render.previous_transform = actual_transform;
+			}
 
+			render.last_step_when_visible = current_step;
 		}
 	}
+
+	++current_step;
 }
 
 void render_system::restore_actual_transforms() {

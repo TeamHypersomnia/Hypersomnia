@@ -920,6 +920,7 @@
     <ClInclude Include="3rdparty\RakNet\Source\WSAStartupSingleton.h" />
     <ClInclude Include="3rdparty\RakNet\Source\XBox360Includes.h" />
     <ClInclude Include="3rdparty\RakNet\Source\_FindFirst.h" />
+    <ClInclude Include="augs\stream.h" />
     <ClInclude Include="game_framework\all_component_includes.h" />
     <ClInclude Include="game_framework\all_message_includes.h" />
     <ClInclude Include="game_framework\all_system_includes.h" />

@@ -27,6 +27,7 @@ class render_system : public event_only_system {
 	std::vector<entity_id> visible_entities;
 
 	b2DynamicTree non_physical_objects_tree;
+	unsigned current_step = 0;
 public:
 	render_system(world& parent_world);
 
