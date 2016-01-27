@@ -95,14 +95,13 @@ void game_world::call_drawing_time_systems() {
 	get_system<input_system>().acquire_new_raw_window_inputs();
 	get_system<input_system>().post_input_intents_from_new_raw_window_inputs();
 
-	// supposed to be read-only
 	get_system<crosshair_system>().generate_crosshair_intents();
+	
+	/* we do not wait for the the logic step with applying crosshair's base offset because we want an instant visual feedback. 
+		the logic will resimulate these crosshair intents deterministically. See perform_logic_step, the same two calls are made.
+	*/
 	get_system<crosshair_system>().apply_crosshair_intents_to_base_offsets();
 	get_system<crosshair_system>().apply_base_offsets_to_crosshair_transforms();
-
-	// the need for this disappears once the virtue of rendering-time systems is reading, and reading only. (also posting entropic messages
-	// that the logic systems deterministically get ahold of)
-	// get_system<input_system>().replay_drawing_time_events_passed_to_last_logic_step();
 
 	/* application of messages */
 	get_system<animation_system>().handle_animation_messages();
