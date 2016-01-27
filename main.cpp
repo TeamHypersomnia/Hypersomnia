@@ -9,7 +9,7 @@ using namespace augs;
 
 int main(int argc, char** argv) {
 	augs::init();
-	//augs::run_tests();
+	augs::run_tests();
 
 	game_overworld hypersomnia_overworld;
 	hypersomnia_overworld.configure_scripting();
