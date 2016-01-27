@@ -9,7 +9,7 @@
 using namespace components;
 using namespace messages;
 
-game_world::game_world(augs::overworld& overworld) : world(overworld) {
+game_world::game_world(augs::overworld& parent_overworld) : world(parent_overworld) {
 	register_types_of_messages_components_systems();
 }
 
