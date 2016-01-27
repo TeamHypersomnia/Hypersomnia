@@ -383,6 +383,8 @@
     <ClCompile Include="game_framework\components\tile_layer_component.cpp" />
     <ClCompile Include="game_framework\game\body_helper.cpp" />
     <ClCompile Include="game_framework\game_framework.cpp" />
+    <ClCompile Include="game_framework\game_overworld.cpp" />
+    <ClCompile Include="game_framework\game_world.cpp" />
     <ClCompile Include="game_framework\globals\filters.cpp" />
     <ClCompile Include="game_framework\globals\input_profiles.cpp" />
     <ClCompile Include="game_framework\resources\animation.cpp" />
@@ -967,6 +969,8 @@
     <ClInclude Include="game_framework\assets\texture.h" />
     <ClInclude Include="game_framework\game\body_helper.h" />
     <ClInclude Include="game_framework\game_framework.h" />
+    <ClInclude Include="game_framework\game_overworld.h" />
+    <ClInclude Include="game_framework\game_world.h" />
     <ClInclude Include="game_framework\globals\filters.h" />
     <ClInclude Include="game_framework\globals\input_profiles.h" />
     <ClInclude Include="game_framework\globals\joints.h" />

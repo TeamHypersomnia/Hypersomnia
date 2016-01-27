@@ -1050,6 +1050,12 @@
     <ClCompile Include="game_framework\resources\texture_with_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game_framework\game_overworld.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\game_world.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -2898,6 +2904,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\resources\texture_with_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\game_overworld.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\game_world.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

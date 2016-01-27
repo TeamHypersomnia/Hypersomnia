@@ -1,4 +1,4 @@
-#include "hypersomnia_world.h"
+#include "game_world.h"
 
 #include "game_framework/all_component_includes.h"
 #include "game_framework/all_system_includes.h"

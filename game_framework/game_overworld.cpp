@@ -1,4 +1,4 @@
-#include "hypersomnia_overworld.h"
+#include "game_overworld.h"
 
 #include <signal.h>
 #include <iostream>
@@ -11,8 +11,6 @@
 #include "game_framework/messages/camera_render_request_message.h"
 
 #include "game_framework/systems/render_system.h"
-
-#include "bindings.h"
 
 #include <luabind/luabind.hpp>
 
@@ -81,9 +79,9 @@ void game_overworld::simulate() {
 		}
 
 #if DETERMINISTIC_RENDERING
-		auto steps_to_do = accumulator.update_and_extract_steps();
+		auto steps_to_perform = accumulator.count_logic_steps_to_perform();
 
-		while (steps_to_do--) {
+		while (steps_to_perform--) {
 #endif
 
 		game_window.clear();
@@ -98,9 +96,9 @@ void game_overworld::simulate() {
 		restore_fixed_delta();
 
 #if !DETERMINISTIC_RENDERING
-		auto steps_to_do = accumulator.update_and_extract_steps();
+		auto steps_to_perform = accumulator.count_logic_steps_to_perform();
 
-		while (steps_to_do--) {
+		while (steps_to_perform--) {
 #endif
 			renderer::get_current().clear_logic_lines();
 
@@ -128,8 +126,6 @@ void game_overworld::consume_camera_render_requests() {
 
 void game_overworld::configure_scripting() {
 	framework::bind_whole_engine(lua);
-	bind_whole_hypersomnia(lua);
-
 	main_game_world.bind_this_to_lua_global(lua, "WORLD");
 
 	signal(SIGSEGV, SignalHandler);

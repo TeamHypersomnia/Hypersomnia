@@ -51,7 +51,7 @@ namespace augs {
 	}
 
 	double overworld::view_interpolation_ratio() {
-		return accumulator.get_ratio();
+		return accumulator.fraction_of_time_until_the_next_logic_step();
 	}
 
 	void overworld::assign_frame_time_to_delta() {

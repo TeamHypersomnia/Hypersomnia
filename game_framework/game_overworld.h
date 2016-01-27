@@ -1,5 +1,5 @@
 #pragma once
-#include "hypersomnia_world.h"
+#include "game_world.h"
 #include "utilities/lua_state_wrapper.h"
 
 #include "utilities/entity_system/overworld.h"

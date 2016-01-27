@@ -5,7 +5,7 @@ namespace augs {
 	class delta_accumulator {
 		timer ticks;
 
-		double fps;
+		double steps_per_second;
 		double accumulator;
 		double ratio;
 		double fixed_dt_milliseconds;
@@ -15,23 +15,21 @@ namespace augs {
 		/* maximum steps taken to avoid spiral of death */
 		unsigned max_steps;
 	public:
-		delta_accumulator(double fps, unsigned max_steps);
+		delta_accumulator(double steps_per_second, unsigned max_steps);
 
 		/* resets the timer and sets accumulator to 0 */
 		void reset();
-		/* resets only timer leaving accumulator itself unchanged */
-		void reset_timer();
 
-		unsigned update_and_extract_steps();
-		double get_ratio() const;
+		unsigned count_logic_steps_to_perform();
+		double fraction_of_time_until_the_next_logic_step() const;
 
 		/* a scalar that you should multiply your numbers by to get speed per second */
 		double delta_seconds() const;
 
-		/* get fixed_dt_milliseconds */
+		/* a scalar that you should multiply your numbers by to get speed per millisecond */
 		double delta_milliseconds() const;
 
-		double get_hz() const;
+		double get_steps_per_second() const;
 
 		void set_time_multiplier(double);
 	};

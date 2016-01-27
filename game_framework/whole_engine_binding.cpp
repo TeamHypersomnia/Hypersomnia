@@ -77,6 +77,12 @@ void set_meters_to_pixels(double val) {
 	PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 }
 
+#include "game_world.h"
+
+void game_world::bind_this_to_lua_global(lua_state_wrapper& lua, std::string global) {
+	lua.global_ptr(global, this);
+}
+
 void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper, std::function<void()> custom_world_binding) {
 	using namespace resources;
 	using namespace helpers;
@@ -108,6 +114,10 @@ void framework::bind_whole_engine(augs::lua_state_wrapper& wrapper, std::functio
 			//bindings::_texture(),
 			//bindings::_animation(),
 			bindings::_world(),
+
+			luabind::class_<game_world, augs::world>("game_world")
+			.def(luabind::constructor<overworld&>()),
+
 			//bindings::_sprite(),
 			//bindings::_polygon(),
 			//
