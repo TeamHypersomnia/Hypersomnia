@@ -25,7 +25,7 @@ namespace ingredients {
 	void wsad_player_crosshair(augs::entity_id);
 	void wsad_player(augs::entity_id, augs::entity_id crosshair_entity, augs::entity_id camera_entity);
 
-	void always_visible(augs::entity_id);
+	void make_always_visible(augs::entity_id);
 	void cancel_always_visible(augs::entity_id);
 }
 

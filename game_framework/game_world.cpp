@@ -97,6 +97,8 @@ void game_world::call_drawing_time_systems() {
 
 	// supposed to be read-only
 	get_system<crosshair_system>().generate_crosshair_intents();
+	get_system<crosshair_system>().apply_crosshair_intents_to_base_offsets();
+	get_system<crosshair_system>().apply_base_offsets_to_crosshair_transforms();
 
 	// the need for this disappears once the virtue of rendering-time systems is reading, and reading only. (also posting entropic messages
 	// that the logic systems deterministically get ahold of)
@@ -134,8 +136,9 @@ void game_world::perform_logic_step() {
 
 	get_system<render_system>().set_current_transforms_as_previous_for_interpolation();
 
+	get_system<crosshair_system>().apply_crosshair_intents_to_base_offsets();
+	get_system<crosshair_system>().apply_base_offsets_to_crosshair_transforms();
 
-	get_system<crosshair_system>().apply_crosshair_intents_to_crosshair_transforms();
 	get_system<camera_system>().react_to_input_intents();
 
 	get_system<driver_system>().release_drivers_due_to_requests();

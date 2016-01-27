@@ -85,7 +85,7 @@ namespace ingredients {
 		e->add(input_profiles::crosshair());
 		e->add(crosshair);
 
-		ingredients::always_visible(e);
+		ingredients::make_always_visible(e);
 	}
 
 	void wsad_player(augs::entity_id e, augs::entity_id crosshair_entity, augs::entity_id camera_entity) {
@@ -130,9 +130,10 @@ namespace ingredients {
 		e->add(rotation_copying);
 		e->add(detector);
 		e->add(driver);
+		e->add(children);
 		
 		wsad_player_setup_movement(e);
 
-		components::camera::configure_camera_player_crosshair(camera_entity, e, crosshair_entity);
+		components::camera::configure_camera_and_character_with_crosshair(camera_entity, e, crosshair_entity);
 	}
 }

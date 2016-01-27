@@ -9,10 +9,10 @@ namespace components {
 		//augs::rects::ltrb bounds;
 		augs::value_animation blink;
 		bool should_blink = false;
-
-		augs::entity_id parent_camera;
-
+		
+		augs::entity_id character_entity_to_chase;
 		vec2 base_offset;
+		vec2 bounds_for_base_offset;
 
 		float rotation_offset = 0.f;
 		vec2 size_multiplier = vec2(1.0f, 1.0f);

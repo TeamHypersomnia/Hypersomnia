@@ -9,12 +9,9 @@ using namespace augs;
 
 namespace messages {
 	struct crosshair_intent_message : public intent_message {
-		vec2 crosshair_world_pos;
-		vec2 crosshair_world_rel;
-		
 		vec2 crosshair_base_offset;
 		vec2 crosshair_base_offset_rel;
 
-		vec2 crosshair_absolute_pos;
+		vec2 crosshair_world_pos;
 	};
 }

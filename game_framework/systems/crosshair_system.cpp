@@ -13,6 +13,9 @@ void crosshair_system::generate_crosshair_intents() {
 	auto events = parent_world.get_message_queue<messages::intent_message>();
 
 	for (auto& it : events) {
+		messages::crosshair_intent_message crosshair_intent;
+		crosshair_intent.messages::intent_message::operator=(it);
+
 		if (it.intent == messages::intent_message::intent_type::MOVE_CROSSHAIR ||
 			it.intent == messages::intent_message::intent_type::CROSSHAIR_PRIMARY_ACTION ||
 			it.intent == messages::intent_message::intent_type::CROSSHAIR_SECONDARY_ACTION
@@ -32,46 +35,32 @@ void crosshair_system::generate_crosshair_intents() {
 			vec2 old_pos = transform.pos;
 
 			base_offset += delta;
+			base_offset.clamp_rotated(crosshair->bounds_for_base_offset, crosshair->rotation_offset);
 
-			auto constraints = crosshair->parent_camera->get<components::camera>()
-				.get_constrained_crosshair_and_camera_offset(crosshair->parent_camera);
-
-			base_offset = constraints.constrained_crosshair_base_offset;
-			transform.pos = constraints.constrained_crosshair_pos;
-
-			messages::crosshair_intent_message crosshair_intent;
-			crosshair_intent.messages::intent_message::operator=(it);
-
-			crosshair_intent.crosshair_world_pos = transform.pos;
-			crosshair_intent.crosshair_world_rel = transform.pos - old_pos;
 			crosshair_intent.crosshair_base_offset_rel = base_offset - old_base_offset;
 			crosshair_intent.crosshair_base_offset = base_offset;
+			crosshair_intent.crosshair_world_pos = base_offset + crosshair->character_entity_to_chase->get<components::transform>().pos;
 
-			/* we only care about crosshair movement resulting from the controller's movement,
-			and not from camera's movement */
-			if (it.intent != messages::intent_message::intent_type::MOVE_CROSSHAIR 
-				|| crosshair_intent.crosshair_base_offset_rel.non_zero()) {
-				parent_world.post_message(crosshair_intent);
-			}
+			parent_world.post_message(crosshair_intent);
 		}
 	}
 }
-
-void crosshair_system::apply_crosshair_intents_to_crosshair_transforms() {
+void crosshair_system::apply_crosshair_intents_to_base_offsets() {
 	auto& events = parent_world.get_message_queue<messages::crosshair_intent_message>();
 
 	for (auto& it : events)
 		it.subject->get<components::crosshair>().base_offset = it.crosshair_base_offset;
 
+}
 
+void crosshair_system::apply_base_offsets_to_crosshair_transforms() {
 	for (auto it : targets) {
 		auto& crosshair = it->get<components::crosshair>();
 	
-		auto player_id = crosshair.parent_camera->get<components::camera>().player;
+		auto player_id = crosshair.character_entity_to_chase;
 
-		if (player_id.alive()) {
+		if (player_id.alive())
 			it->get<components::transform>().pos = crosshair.base_offset + player_id->get<components::transform>().pos;
-		}
 	}
 }
 

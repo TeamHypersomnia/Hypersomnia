@@ -6,6 +6,7 @@
 #include "../components/crosshair_component.h"
 #include "../components/position_copying_component.h"
 #include "../components/crosshair_component.h"
+#include "../components/children_component.h"
 #include "../components/physics_component.h"
 #include "../messages/intent_message.h"
 #include "../messages/camera_render_request_message.h"
@@ -13,6 +14,27 @@
 #include "entity_system/world.h"
 
 #include "augs/print.h"
+
+components::crosshair* components::camera::get_crosshair() {
+	if (entity_to_chase.alive()) {
+		auto* maybe_children = entity_to_chase->find<components::children>();
+
+		if (maybe_children) {
+			if (maybe_children->sub_entities_by_name[components::children::CHARACTER_CROSSHAIR].alive()) {
+				return maybe_children->sub_entities_by_name[components::children::CHARACTER_CROSSHAIR]->find<components::crosshair>();
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+void update_bounds_for_crosshair(components::camera& camera, components::crosshair& crosshair) {
+	if (camera.orbit_mode == components::camera::ANGLED)
+		crosshair.bounds_for_base_offset = camera.visible_world_area / 2.f;
+	if (camera.orbit_mode == components::camera::LOOK)
+		crosshair.bounds_for_base_offset = camera.max_look_expand + camera.visible_world_area / 2.f;
+}
 
 void camera_system::react_to_input_intents() {
 	auto events = parent_world.get_message_queue<messages::intent_message>();
@@ -22,63 +44,50 @@ void camera_system::react_to_input_intents() {
 			continue;
 
 		if (it.intent == messages::intent_message::intent_type::SWITCH_LOOK && it.pressed_flag) {
-			auto& mode = it.subject->get<components::camera>().orbit_mode;
+			auto& camera = it.subject->get<components::camera>();
+			auto& mode = camera.orbit_mode;
+
 			if (mode == components::camera::LOOK)
 				mode = components::camera::ANGLED;
 			else mode = components::camera::LOOK;
+
+			auto* maybe_crosshair = camera.get_crosshair();
+
+			if (maybe_crosshair) 
+				update_bounds_for_crosshair(camera, *maybe_crosshair);
 		}
 	}
 }
 
-void components::camera::configure_camera_player_crosshair(augs::entity_id camera, augs::entity_id player, augs::entity_id crosshair) {
-	camera->get<components::camera>().player = player;
-	camera->get<components::camera>().crosshair = crosshair;
-	camera->get<components::position_copying>().set_target(player);
+void components::camera::configure_camera_and_character_with_crosshair(augs::entity_id camera, augs::entity_id character, augs::entity_id crosshair) {
+	camera->get<components::camera>().entity_to_chase = character;
+	camera->get<components::position_copying>().set_target(character);
+	crosshair->get<components::crosshair>().character_entity_to_chase = character;
 
-	crosshair->get<components::crosshair>().parent_camera = camera;
+	update_bounds_for_crosshair(camera->get<components::camera>(), crosshair->get<components::crosshair>());
 }
 
-components::camera::constraint_output components::camera::get_constrained_crosshair_and_camera_offset(augs::entity_id self) {
-	components::camera::constraint_output out;
-
-	auto transform = self->get<components::transform>();
+vec2i components::camera::get_camera_offset_due_to_character_crosshair(augs::entity_id self) {
+	vec2 camera_crosshair_offset;
+	auto* crosshair = get_crosshair();
 
 	/* if we set player and crosshair entity targets */
-	if (player.alive() && crosshair.alive()) {
-		/* skip calculations if no orbit_mode is specified */
-		if (orbit_mode != NONE) {
-			/* shortcuts */
-			vec2i player_pos = player->get<components::transform>().pos;
-			vec2i crosshair_pos = crosshair->get<components::crosshair>().base_offset + player_pos;
-			out.constrained_crosshair_pos = (crosshair_pos - player_pos);
+	/* skip calculations if no orbit_mode is specified */
+	if (crosshair != nullptr && orbit_mode != NONE) {
+		camera_crosshair_offset = crosshair->base_offset;
 
-			out.constrained_crosshair_pos.rotate(transform.rotation, vec2());
+		if (orbit_mode == ANGLED)
+			camera_crosshair_offset.set_length(angled_look_length);
 
-			if (orbit_mode == ANGLED) {
-				vec2 bound = visible_world_area / 2.f;
-				/* save by copy */
-				vec2 normalized = out.constrained_crosshair_pos.clamp(bound);
-				out.camera_crosshair_offset = normalized.normalize() * angled_look_length;
-			}
-
-			if (orbit_mode == LOOK) {
-				vec2 bound = max_look_expand + visible_world_area / 2.f;
-
-				/* simple proportion in local frame of reference */
-				vec2 camera_offset = (out.constrained_crosshair_pos.clamp(bound) / bound) * max_look_expand;
-
-				out.camera_crosshair_offset = camera_offset.rotate(-transform.rotation, vec2());
-			}
-
-			/* rotate dir back */
-			out.constrained_crosshair_pos.rotate(-transform.rotation, vec2());
-			/* update crosshair so it is snapped to visible area */
-			out.constrained_crosshair_base_offset = out.constrained_crosshair_pos;
-			out.constrained_crosshair_pos += player_pos;
+		if (orbit_mode == LOOK) {
+			/* simple proportion */
+			camera_crosshair_offset /= crosshair->bounds_for_base_offset;
+			camera_crosshair_offset *= max_look_expand;
 		}
+
 	}
 
-	return out;
+	return camera_crosshair_offset;
 }
 
 void camera_system::resolve_cameras_transforms_and_smoothing() {
@@ -94,15 +103,8 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 			/* we obtain transform as a copy because we'll be now offsetting it by crosshair position */
 			auto transform = e->get<components::transform>();
 			transform.pos = vec2i(transform.pos);
-			
-			auto constraints = camera.get_constrained_crosshair_and_camera_offset(e);
 
-			vec2i camera_crosshair_offset;
-			
-			if (camera.crosshair.alive()) {
-				camera_crosshair_offset = constraints.camera_crosshair_offset;
-				camera.crosshair->get<components::transform>().pos = constraints.constrained_crosshair_pos;
-			}
+			vec2i camera_crosshair_offset = camera.get_camera_offset_due_to_character_crosshair(e);
 
 			components::transform smoothed_camera_transform;
 			vec2 smoothed_visible_world_area;
@@ -157,15 +159,11 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 				//smoothing_player_pos
 
 				smoothed_visible_world_area = camera.last_ortho_interpolant;
-
-				if (camera.crosshair_follows_interpolant) {
-					camera.crosshair->get<components::transform>().pos -= transform.pos - camera.last_interpolant.pos;
-				}
 			}
 
-			if (camera.player.alive()) {
+			if (camera.entity_to_chase.alive()) {
 				vec2 target_value;
-				auto maybe_physics = camera.player->find<components::physics>();
+				auto maybe_physics = camera.entity_to_chase->find<components::physics>();
 
 				if (maybe_physics) {
 					auto player_pos = maybe_physics->get_position();
@@ -189,7 +187,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 						target_value.set_length(50);
 				}
 				else {
-					target_value = camera.player->get<components::render>().interpolation_direction();
+					target_value = camera.entity_to_chase->get<components::render>().interpolation_direction();
 					target_value.set_length(100);
 					camera.smoothing_player_pos.averages_per_sec = 5;
 				}

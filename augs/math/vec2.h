@@ -265,6 +265,22 @@ namespace augs {
 			return *this;
 		}
 
+		template<class t>
+		vec2t& clamp_rotated(vec2t<t> rect, t current_angle) {
+			rect.rotate(-current_angle, vec2(0, 0));
+			auto unrotated_this = vec2(*this).rotate(-current_angle, vec2(0, 0));
+
+			if (unrotated_this.x > rect.x) unrotated_this.x = rect.x;
+			if (unrotated_this.y > rect.y) unrotated_this.y = rect.y;
+			if (unrotated_this.x < -rect.x) unrotated_this.x = -rect.x;
+			if (unrotated_this.y < -rect.y) unrotated_this.y = -rect.y;
+			
+			*this = unrotated_this;
+			rotate(current_angle, vec2(0, 0));
+
+			return *this;
+		}
+
 		vec2t& clamp(float max_length) {
 			if (length_sq() > max_length*max_length) {
 				normalize();

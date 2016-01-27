@@ -5,7 +5,7 @@
 #include "entity_system/entity.h"
 
 namespace ingredients {
-	void always_visible(augs::entity_id e) {
+	void make_always_visible(augs::entity_id e) {
 		e->get_owner_world().get_system<render_system>().set_visibility_persistence(e, true);
 	}
 

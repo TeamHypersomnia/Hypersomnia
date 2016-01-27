@@ -16,7 +16,7 @@ class gun_system;
 
 namespace components {
 	struct camera  {
-		static void configure_camera_player_crosshair(augs::entity_id camera, augs::entity_id player, augs::entity_id crosshair);
+		static void configure_camera_and_character_with_crosshair(augs::entity_id camera, augs::entity_id character, augs::entity_id crosshair);
 
 		augs::rects::xywh<int> viewport;
 		vec2 visible_world_area;
@@ -34,7 +34,6 @@ namespace components {
 		float angled_look_length = 100.f;
 		bool enable_smoothing = true;
 		bool dont_smooth_once = false;
-		bool crosshair_follows_interpolant = false;
 
 		float smoothing_average_factor = 0.004f;
 		float averages_per_sec = 60.0f;
@@ -45,18 +44,15 @@ namespace components {
 
 		vec2 max_look_expand = vec2(600.f, 300.f);
 
-		augs::entity_id player, crosshair;
+		augs::entity_id entity_to_chase;
+		components::crosshair* get_crosshair();
+
 		vec2 previous_seen_player_position;
 		vec2 previous_step_player_position;
 
 		augs::smooth_value_field smoothing_player_pos;
-
-		struct constraint_output {
-			vec2i camera_crosshair_offset;
-			vec2 constrained_crosshair_pos;
-			vec2 constrained_crosshair_base_offset;
-
-		} get_constrained_crosshair_and_camera_offset(augs::entity_id self);
+		
+		vec2i get_camera_offset_due_to_character_crosshair(augs::entity_id self);
 		
 		shared::drawing_state how_camera_will_render;
 
