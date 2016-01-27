@@ -1,5 +1,5 @@
 #pragma once
-#include "misc/delta_accumulator.h"
+#include "misc/fixed_delta_timer.h"
 #include <vector>
 
 namespace augs {
@@ -26,7 +26,7 @@ namespace augs {
 
 		std::vector<std::pair<unsigned long long, double>> timestep_alterations_at_steps;
 
-		delta_accumulator accumulator;
+		fixed_delta_timer delta_timer;
 
 		unsigned long long current_step_number = 0;
 

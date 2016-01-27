@@ -96,7 +96,7 @@ void game_overworld::simulate() {
 		restore_fixed_delta();
 
 #if !DETERMINISTIC_RENDERING
-		auto steps_to_perform = accumulator.count_logic_steps_to_perform();
+		auto steps_to_perform = delta_timer.count_logic_steps_to_perform();
 
 		while (steps_to_perform--) {
 #endif

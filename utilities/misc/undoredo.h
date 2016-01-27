@@ -42,11 +42,12 @@ namespace augs {
 				/* For example, typing a letter is an action. 
 				   You may want to have all the typed letters (until backspace) undoed by once,
 				   so you have to implement bool command::include(command&) which decides whether the two commands can be merged into one bigger.
-				   You want to merge "type 'a'" and "type 'b'" commands, 
+				   
+				   For example: you want to merge "type 'a'" and "type 'b'" commands, 
 				   and then command::include makes it "type 'ab'" command, but you don't want to merge "type 'a'" and "backspace" commands. 
 				   */
 
-				if(actions.empty() || !front().include(c)) /* if it didn't succeed to merge, create new command */
+				if(actions.empty() || !front().include(c)) /* if it didn't merge successfully, create new command */
 					actions.push_back(c);
 
 				level = 0;

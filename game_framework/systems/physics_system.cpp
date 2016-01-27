@@ -492,7 +492,7 @@ void physics_system::step_and_set_new_transforms() {
 		}
 
 		if (physics.enable_angle_motor) {
-			float nextAngle = static_cast<float>(b->GetAngle() + b->GetAngularVelocity() / parent_overworld.accumulator.get_steps_per_second());
+			float nextAngle = static_cast<float>(b->GetAngle() + b->GetAngularVelocity() / parent_overworld.delta_timer.get_steps_per_second());
 			float totalRotation = (constrainAngle(physics.target_angle) * DEG_TO_RAD) - nextAngle;
 
 			totalRotation *= RAD_TO_DEG;
@@ -508,7 +508,7 @@ void physics_system::step_and_set_new_transforms() {
 
 			totalRotation *= DEG_TO_RAD;
 
-			float desiredAngularVelocity = totalRotation / static_cast<float>(parent_overworld.accumulator.delta_seconds());
+			float desiredAngularVelocity = totalRotation / static_cast<float>(parent_overworld.delta_timer.delta_seconds());
 			float impulse = b->GetInertia() * desiredAngularVelocity;// disregard time factor
 			b->ApplyAngularImpulse(impulse*physics.angle_motor_force_multiplier, true);
 		}

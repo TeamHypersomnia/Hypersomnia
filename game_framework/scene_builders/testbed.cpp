@@ -147,7 +147,7 @@ namespace scene_builders {
 
 		if (augs::file_exists(L"recorded.inputs")) {
 			world.parent_overworld.configure_stepping(60.0, 500);
-			world.parent_overworld.accumulator.set_time_multiplier(6.00);
+			world.parent_overworld.delta_timer.set_stepping_speed_multiplier(6.00);
 
 			world.get_system<input_system>().raw_window_input_player.player.load_recording("recorded.inputs");
 			world.get_system<input_system>().raw_window_input_player.player.replay();
@@ -159,7 +159,7 @@ namespace scene_builders {
 		}
 		else {
 			world.parent_overworld.configure_stepping(60.0, 5);
-			world.parent_overworld.accumulator.set_time_multiplier(1.0);
+			world.parent_overworld.delta_timer.set_stepping_speed_multiplier(1.0);
 			augs::create_directory("sessions/");
 			augs::create_directory("sessions/" + augs::get_timestamp());
 

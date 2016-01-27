@@ -714,9 +714,6 @@
     <ClCompile Include="utilities\math\vec2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="utilities\misc\delta_accumulator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="utilities\misc\file_watcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1054,6 +1051,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game_framework\game_world.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utilities\misc\fixed_delta_timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2558,9 +2558,6 @@
     <ClInclude Include="utilities\math\vec2declare.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utilities\misc\delta_accumulator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="utilities\misc\file_watcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2910,6 +2907,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\game_world.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities\misc\fixed_delta_timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities\dirent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

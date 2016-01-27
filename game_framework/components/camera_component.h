@@ -2,7 +2,7 @@
 #include "entity_system/component.h"
 #include "math/vec2.h"
 #include "render_component.h"
-#include "misc/delta_accumulator.h"
+#include "misc/fixed_delta_timer.h"
 
 #include "entity_system/entity.h"
 

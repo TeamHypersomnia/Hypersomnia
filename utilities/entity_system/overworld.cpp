@@ -1,7 +1,7 @@
 #include "overworld.h"
 
 namespace augs {
-	overworld::overworld() : accumulator(60.0, 5) {
+	overworld::overworld() : delta_timer(60.0, 5) {
 
 	}
 
@@ -15,7 +15,7 @@ namespace augs {
 	}
 
 	float overworld::deterministic_timer::get_milliseconds() const {
-		return get_steps() * static_cast<float>(parent_overworld->accumulator.delta_milliseconds());
+		return get_steps() * static_cast<float>(parent_overworld->delta_timer.delta_milliseconds());
 	}
 
 	float overworld::deterministic_timer::extract_milliseconds() {
@@ -35,7 +35,7 @@ namespace augs {
 	}
 
 	void overworld::configure_stepping(float fps, int max_updates_per_step) {
-		accumulator = augs::delta_accumulator(fps, max_updates_per_step);
+		delta_timer = augs::fixed_delta_timer(fps, max_updates_per_step);
 	}
 	
 	overworld::deterministic_timer overworld::create_deterministic_timer() {
@@ -51,7 +51,7 @@ namespace augs {
 	}
 
 	double overworld::view_interpolation_ratio() {
-		return accumulator.fraction_of_time_until_the_next_logic_step();
+		return delta_timer.fraction_of_time_until_the_next_logic_step();
 	}
 
 	void overworld::assign_frame_time_to_delta() {
@@ -59,6 +59,6 @@ namespace augs {
 	}
 
 	void overworld::restore_fixed_delta() {
-		delta_ms = accumulator.delta_milliseconds();
+		delta_ms = delta_timer.delta_milliseconds();
 	}
 }

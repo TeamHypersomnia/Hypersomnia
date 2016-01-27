@@ -3,7 +3,7 @@
 #include "ptr_wrapper.h"
 
 namespace augs {
-	/* vector wrapper that is used to faciliate binding to lua */
+	/* vector wrapper that is used to facilitate binding to lua */
 	template<class value>
 	struct vector_wrapper {
 		std::vector<value> raw;
