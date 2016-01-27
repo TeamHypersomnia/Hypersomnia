@@ -150,7 +150,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Augmentations\Augmentations.vcxproj">
+    <ProjectReference Include="$(AUGMENTATIONS)\Augmentations.vcxproj">
       <Project>{48cccfdb-76b5-4d4d-bb13-99c19c38d21d}</Project>
     </ProjectReference>
   </ItemGroup>
