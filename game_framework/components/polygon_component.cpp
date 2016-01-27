@@ -136,7 +136,7 @@ namespace components {
 
 		/* further rotation of the polygon to fit the camera transform */
 		for (auto& v : model_transformed) {
-			auto center = in.visible_area / 2;
+			auto center = in.visible_world_area / 2;
 			v.pos += in.object_transform.pos - camera_pos + center;
 
 			/* rotate around the center of the screen */

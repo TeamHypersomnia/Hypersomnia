@@ -25,8 +25,8 @@ namespace archetypes {
 		camera.max_look_expand.set(w / 2, h / 2);
 		camera.angled_look_length = 10;
 
-		camera.screen_rect.set(0, 0, w, h);
-		camera.size.set(w, h);
+		camera.viewport.set(0, 0, w, h);
+		camera.visible_world_area.set(w, h);
 
 		chase.relative = false;
 

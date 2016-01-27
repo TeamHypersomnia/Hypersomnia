@@ -18,8 +18,8 @@ namespace components {
 	struct camera : public augs::component {
 		static void configure_camera_player_crosshair(augs::entity_id camera, augs::entity_id player, augs::entity_id crosshair);
 
-		augs::rects::xywh<int> screen_rect;
-		vec2 size;
+		augs::rects::xywh<int> viewport;
+		vec2 visible_world_area;
 
 		unsigned layer = 0;
 		unsigned mask = 0;
@@ -40,7 +40,6 @@ namespace components {
 		float averages_per_sec = 60.0f;
 
 		components::transform last_interpolant;
-		components::transform previously_drawn_at;
 
 		vec2 rendered_size;
 
@@ -51,8 +50,6 @@ namespace components {
 		vec2 previous_step_player_position;
 
 		augs::smooth_value_field smoothing_player_pos;
-
-		camera() { smooth_timer.reset(); }
 
 		struct constraint_output {
 			vec2i camera_crosshair_offset;

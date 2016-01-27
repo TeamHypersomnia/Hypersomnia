@@ -24,9 +24,9 @@ namespace scripts {
 		auto projection_matrix_uniform = glGetUniformLocation(default_shader.id, "projection_matrix");
 
 		glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, 
-			augs::orthographic_projection<float>(0, state.visible_area.x, state.visible_area.y, 0, 0, 1).data());
+			augs::orthographic_projection<float>(0, state.visible_world_area.x, state.visible_world_area.y, 0, 0, 1).data());
 
-		drawing.generate_and_draw_all_layers(state, mask);
+		drawing.draw_all_visible_entities(state, mask);
 
 		resource_manager.find(assets::atlas_id::GAME_WORLD_ATLAS)->bind();
 

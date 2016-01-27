@@ -16,11 +16,14 @@ namespace shared {
 		components::transform object_transform;
 		components::transform camera_transform;
 		
-		vec2 visible_area;
+		vec2 visible_world_area;
+
+		// used for visibility queries
+		augs::rects::ltrb<float> transformed_visible_world_area_aabb;
+
 		augs::rects::xywh<int> viewport;
 
 		augs::entity_id subject;
 
-		augs::rects::ltrb<float> rotated_camera_aabb;
 	};
 }

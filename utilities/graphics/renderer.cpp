@@ -122,12 +122,12 @@ namespace augs {
 	void renderer::line_channel::draw_yellow(vec2 a, vec2 b) { draw(a, b, colors::yellow); }
 	void renderer::line_channel::draw_cyan(vec2 a, vec2 b) { draw(a, b, colors::cyan); }
 
-	void renderer::draw_debug_info(vec2 visible_area, components::transform camera_transform, assets::texture_id tex_id, std::vector<entity_id> target_entities, double ratio) {
+	void renderer::draw_debug_info(vec2 visible_world_area, components::transform camera_transform, assets::texture_id tex_id, std::vector<entity_id> target_entities, double ratio) {
 		if (!debug_drawing) return;
 		
 		auto& tex = resource_manager.find(tex_id)->tex;
 		
-		vec2 center = visible_area / 2;
+		vec2 center = visible_world_area / 2;
 
 		if (draw_visibility) {
 			glBegin(GL_TRIANGLES); glerr;
@@ -177,7 +177,7 @@ namespace augs {
 
 		glBegin(GL_LINES); glerr;
 
-		auto line_lambda = [camera_transform, visible_area, center, tex](debug_line line) {
+		auto line_lambda = [camera_transform, visible_world_area, center, tex](debug_line line) {
 			line.a += center - camera_transform.pos;
 			line.b += center - camera_transform.pos;
 
@@ -225,7 +225,7 @@ namespace augs {
 		triangles.clear();
 	}
 
-	void renderer::default_render(vec2 visible_area) {
+	void renderer::default_render(vec2 visible_world_area) {
 		graphics::fbo::use_default();
 		glClear(GL_COLOR_BUFFER_BIT); glerr;
 		

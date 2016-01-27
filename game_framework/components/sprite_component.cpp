@@ -57,7 +57,7 @@ namespace components {
 		vec2i transform_pos = in.object_transform.pos;
 		make_rect(transform_pos, vec2(size), in.object_transform.rotation, v);
 
-		auto center = in.visible_area / 2;
+		auto center = in.visible_world_area / 2;
 
 		auto target_position = transform_pos - in.camera_transform.pos + center;
 		make_rect(target_position, vec2(size), in.object_transform.rotation + rotation_offset, v);

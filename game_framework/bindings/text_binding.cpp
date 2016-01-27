@@ -66,7 +66,7 @@ namespace bindings {
 
 			//.def(luabind::constructor<>())
 			//.def_readwrite("camera_transform", &drawing_state::camera_transform)
-			//.def_readwrite("visible_area", &drawing_state::visible_area)
+			//.def_readwrite("visible_world_area", &drawing_state::visible_world_area)
 			//.def_readwrite("additional_info", &drawing_state::additional_info)
 			//.def_readwrite("output", &drawing_state::output)
 			//.def_readwrite("transform", &drawing_state::transform)

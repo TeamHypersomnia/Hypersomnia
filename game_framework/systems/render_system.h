@@ -23,32 +23,29 @@ namespace shared {
 }
 
 class render_system : public event_only_system {
-public:
-	using event_only_system::event_only_system;
+	std::vector<std::vector<entity_id>> layers;
+	std::vector<entity_id> visible_entities;
 
 	b2DynamicTree non_physical_objects_tree;
+public:
+	using event_only_system::event_only_system;
 
 	void add_entities_to_rendering_tree();
 	void remove_entities_from_rendering_tree();
 
-	std::vector<std::vector<entity_id>> layers;
-	
-	std::vector<entity_id> always_visible_entities;
-	std::vector<entity_id> visible_entities;
-
 	void set_visibility_persistence(entity_id, bool);
 
-	bool enable_interpolation = true;
-
-	void determine_visible_entities_from_camera_states();
-
-	void generate_layers(shared::drawing_state& in, int mask);
-	void draw_layer(shared::drawing_state& in, int layer);
-	void generate_and_draw_all_layers(shared::drawing_state& in, int mask);
+	void determine_visible_entities_from_every_camera();
 
 	void set_current_transforms_as_previous_for_interpolation();
 	void calculate_and_set_interpolated_transforms();
 	void restore_actual_transforms();
-	
+
+	void generate_layers_from_visible_entities(shared::drawing_state& in, int mask);
+	void draw_layer(shared::drawing_state& in, int layer);
+	void draw_all_visible_entities(shared::drawing_state& in, int mask);
+
+	bool enable_interpolation = true;
+	std::vector<entity_id> always_visible_entities;
 	std::vector<render_layer> layers_with_custom_drawing_order;
 };

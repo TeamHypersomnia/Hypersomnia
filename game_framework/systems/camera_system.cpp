@@ -55,14 +55,14 @@ components::camera::constraint_output components::camera::get_constrained_crossh
 			out.constrained_crosshair_pos.rotate(transform.rotation, vec2());
 
 			if (orbit_mode == ANGLED) {
-				vec2 bound = size / 2.f;
+				vec2 bound = visible_world_area / 2.f;
 				/* save by copy */
 				vec2 normalized = out.constrained_crosshair_pos.clamp(bound);
 				out.camera_crosshair_offset = normalized.normalize() * angled_look_length;
 			}
 
 			if (orbit_mode == LOOK) {
-				vec2 bound = max_look_expand + size / 2.f;
+				vec2 bound = max_look_expand + visible_world_area / 2.f;
 
 				/* simple proportion in local frame of reference */
 				vec2 camera_offset = (out.constrained_crosshair_pos.clamp(bound) / bound) * max_look_expand;
@@ -105,10 +105,10 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 			}
 
 			components::transform smoothed_camera_transform;
-			vec2 drawn_size;
+			vec2 smoothed_visible_world_area;
 
 			smoothed_camera_transform = transform;
-			drawn_size = camera.size;
+			smoothed_visible_world_area = camera.visible_world_area;
 
 			smoothed_camera_transform.pos += camera_crosshair_offset;
 
@@ -133,8 +133,8 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 					a = a * averaging_constant + b * (1.0f - averaging_constant);
 				};
 
-				interp(camera.last_ortho_interpolant.x, camera.size.x, averaging_constant);
-				interp(camera.last_ortho_interpolant.y, camera.size.y, averaging_constant);
+				interp(camera.last_ortho_interpolant.x, camera.visible_world_area.x, averaging_constant);
+				interp(camera.last_ortho_interpolant.y, camera.visible_world_area.y, averaging_constant);
 
 				/* save smoothing result */
 				//if ((smoothed_camera_transform.pos - camera.last_interpolant.pos).length() > 5)
@@ -156,7 +156,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 
 				//smoothing_player_pos
 
-				drawn_size = camera.last_ortho_interpolant;
+				smoothed_visible_world_area = camera.last_ortho_interpolant;
 
 				if (camera.crosshair_follows_interpolant) {
 					camera.crosshair->get<components::transform>().pos -= transform.pos - camera.last_interpolant.pos;
@@ -198,19 +198,17 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 			}
 
 			smoothed_camera_transform.pos = vec2i(smoothed_camera_transform.pos + camera.smoothing_player_pos.value);
-			drawn_size = vec2i(drawn_size);
+			smoothed_visible_world_area = vec2i(smoothed_visible_world_area);
 
 			camera.dont_smooth_once = false;
 
-			camera.previously_drawn_at = smoothed_camera_transform;
-			camera.rendered_size = drawn_size;
-
 			shared::drawing_state in;
-			in.rotated_camera_aabb = rects::ltrb<float>::get_aabb_rotated(camera.rendered_size, smoothed_camera_transform.rotation) + smoothed_camera_transform.pos - camera.rendered_size / 2;
+			in.transformed_visible_world_area_aabb = rects::ltrb<float>::get_aabb_rotated(smoothed_visible_world_area, smoothed_camera_transform.rotation) 
+				+ smoothed_camera_transform.pos - smoothed_visible_world_area / 2;
 			in.camera_transform = smoothed_camera_transform;
 			in.output = &get_renderer();
-			in.visible_area = camera.rendered_size;
-			in.viewport = camera.screen_rect;
+			in.visible_world_area = smoothed_visible_world_area;
+			in.viewport = camera.viewport;
 
 			camera.how_camera_will_render = in;
 		}

@@ -77,7 +77,7 @@ void render_system::remove_entities_from_rendering_tree() {
 	}
 }
 
-void render_system::determine_visible_entities_from_camera_states() {
+void render_system::determine_visible_entities_from_every_camera() {
 	auto& cameras = parent_world.get_system<camera_system>().targets;
 	auto& physics = parent_world.get_system<physics_system>();
 
@@ -86,7 +86,7 @@ void render_system::determine_visible_entities_from_camera_states() {
 	for (auto& camera : cameras) {
 		auto& in = camera->get<components::camera>().how_camera_will_render;
 
-		auto& result = physics.query_aabb_px(in.rotated_camera_aabb.left_top(), in.rotated_camera_aabb.right_bottom(), filters::renderable_query());
+		auto& result = physics.query_aabb_px(in.transformed_visible_world_area_aabb.left_top(), in.transformed_visible_world_area_aabb.right_bottom(), filters::renderable_query());
 		visible_entities.insert(visible_entities.end(), result.entities.begin(), result.entities.end());
 
 		struct render_listener {
@@ -104,8 +104,8 @@ void render_system::determine_visible_entities_from_camera_states() {
 		aabb_listener.visible_entities = &visible_entities;
 
 		b2AABB input;
-		input.lowerBound = in.rotated_camera_aabb.left_top() - vec2(400, 400);
-		input.upperBound = in.rotated_camera_aabb.right_bottom() + vec2(400, 400);
+		input.lowerBound = in.transformed_visible_world_area_aabb.left_top() - vec2(400, 400);
+		input.upperBound = in.transformed_visible_world_area_aabb.right_bottom() + vec2(400, 400);
 
 		non_physical_objects_tree.Query(&aabb_listener, input);
 	}
@@ -121,7 +121,7 @@ void render_system::determine_visible_entities_from_camera_states() {
 
 #include "../components/physics_component.h"
 
-void render_system::generate_layers(shared::drawing_state& in, int mask) {
+void render_system::generate_layers_from_visible_entities(shared::drawing_state& in, int mask) {
 	layers.clear();
 
 	/* shortcut */
@@ -254,8 +254,8 @@ void render_system::draw_layer(drawing_state& in, int layer) {
 	in.camera_transform = in_camera_transform;
 }
 
-void render_system::generate_and_draw_all_layers(drawing_state& in, int mask) {
-	generate_layers(in, mask);
+void render_system::draw_all_visible_entities(drawing_state& in, int mask) {
+	generate_layers_from_visible_entities(in, mask);
 
 	for (size_t i = 0; i < layers.size(); ++i)
 		draw_layer(in, layers.size()-i-1);
