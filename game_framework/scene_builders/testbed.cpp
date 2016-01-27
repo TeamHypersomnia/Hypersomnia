@@ -19,7 +19,7 @@
 #include "augs/file.h"
 #include "misc/time.h"
 
-#include "game_framework/scene_builders/scripts/rendering_procedures.h"
+#include "rendering_scripts/testbed_rendering.h"
 
 #include "texture_baker/font.h"
 
@@ -199,6 +199,6 @@ namespace scene_builders {
 	}
 
 	void testbed::execute_drawcalls(messages::camera_render_request_message msg) {
-		scripts::testbed_rendering(msg);
+		rendering_scripts::testbed_rendering(msg);
 	}
 }

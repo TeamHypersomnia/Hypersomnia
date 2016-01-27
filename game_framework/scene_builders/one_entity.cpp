@@ -16,6 +16,8 @@
 
 #include "game_framework/messages/animation_response_message.h"
 
+#include "rendering_scripts/testbed_rendering.h"
+
 #include "augs/file.h"
 #include "misc/time.h"
 
@@ -104,5 +106,9 @@ namespace scene_builders {
 
 	void one_entity::perform_logic_step(world& world) {
 
+	}
+
+	void one_entity::execute_drawcalls(messages::camera_render_request_message msg) {
+		rendering_scripts::testbed_rendering(msg);
 	}
 }

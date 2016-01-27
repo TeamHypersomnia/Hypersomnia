@@ -1,4 +1,4 @@
-#include "rendering_procedures.h"
+#include "testbed_rendering.h"
 
 #include "augs/entity_system/entity.h"
 #include "augs/entity_system/world.h"
@@ -8,7 +8,7 @@
 
 #include "math/matrix.h"
 
-namespace scripts {
+namespace rendering_scripts {
 	void testbed_rendering(messages::camera_render_request_message msg) {
 		auto& state = msg.state;
 		auto mask = msg.mask;
