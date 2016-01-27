@@ -30,7 +30,6 @@
 #include <luabind/detail/debug.hpp>
 
 #include <cstring>
-#include <iostream>
 
 namespace luabind
 {

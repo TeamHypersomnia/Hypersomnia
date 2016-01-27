@@ -37,7 +37,6 @@ namespace assets {
 	};
 	
 	vec2i get_size(texture_id);
-	//typedef asset<texture_ids, augs::texture> texture_id;
 }
 
 augs::texture& operator*(const assets::texture_id& id);

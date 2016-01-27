@@ -34,7 +34,7 @@ namespace augs {
 		// returns lines opened by the editor
 		static std::string open_editor(std::string errors);
 		std::string get_error_and_stack();
-		void save_verbose_log();
+		void call_traceback_that_saves_verbose_log();
 
 		void debug_response();
 	};

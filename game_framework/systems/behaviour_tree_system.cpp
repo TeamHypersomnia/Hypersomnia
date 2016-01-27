@@ -2,21 +2,13 @@
 
 #include "entity_system/world.h"
 #include "entity_system/entity.h"
-
-#include <iostream>
+#include "log.h"
 
 class NullStream {
 public:
 	NullStream() { }
 	template<typename T> NullStream& operator<<(const T &) { return *this; }
 };
-
-//#define NDEBUG
-#ifdef NDEBUG
-	#define COUT std::cout
-#else
-	#define COUT NullStream()
-#endif
 
 using namespace components;
 
@@ -127,7 +119,8 @@ std::string behaviour_tree::composite::get_result_str(int result) const {
 }
 
 void behaviour_tree::composite::on_enter(task& current_task) {
-	COUT << "entering " << name << " which is " << get_type_str() << '\n';
+	DEBUG_LOG("entering %x which is $x", name, get_type_str());
+
 	if (enter_callback)
 		enter_callback(current_task.subject, current_task);
 }
@@ -136,24 +129,24 @@ void behaviour_tree::composite::on_exit(task& current_task, int exit_code) {
 	if (exit_callback)
 		exit_callback(current_task.subject, exit_code);
 
-	COUT << "quitting " << name << " which was " << get_type_str() << " and resulted in " << get_result_str(exit_code) << '\n';
+	DEBUG_LOG("quitting %x which was %x and resulted in %x", name, get_type_str(), get_result_str(exit_code));
 }
 
 int behaviour_tree::composite::on_update(task& current_task) {
 	if (update_callback) {
 		int result = update_callback(current_task.subject, current_task);
-		COUT << "updating " << name << " which is " << get_type_str() << " results in " << get_result_str(result) << '\n';
+		DEBUG_LOG("updating %x which is %x results in %x", name, get_type_str(), get_result_str(result));
 		return result;
 	}
 
-	COUT << "updating " << name << " which is " << get_type_str() << " returns by default " << get_result_str(default_return) << '\n';
+	DEBUG_LOG("updating %x which is %x returns by default %x", name, get_type_str(), get_result_str(default_return));
 	return default_return;
 }
 
 void behaviour_tree::composite::set_running(update_input in, int exit_code) {
 	in.current_task->interrupt_runner(exit_code);
 
-	COUT << "setting " << in.parent->children[in.child_index]->name << "as currently RUNNING" << '\n';
+	DEBUG_LOG("setting %x as currently RUNNING", in.parent->children[in.child_index]->name);
 	in.current_task->running_index = in.child_index;
 	in.current_task->running_parent_node = in.parent;
 	in.current_task->running_node_parent_chain = in.current_task->parent_chain;
@@ -167,7 +160,7 @@ void behaviour_tree::task::interrupt_other_runner(int exit_code) {
 
 void behaviour_tree::task::interrupt_runner(int exit_code) {
 	if (running_parent_node) {
-		COUT << "interrupting " << running_parent_node->children[running_index]->name << '\n';
+		DEBUG_LOG("interrupting %x", running_parent_node->children[running_index]->name);
 		running_parent_node->children[running_index]->on_exit(*this, exit_code);
 	}
 	
@@ -258,7 +251,7 @@ void behaviour_tree_system::substep() {
 			*/
 			tree.starting_node->begin_traversal(tree.task_instance);
 
-			COUT << "\n\n::::::::::::::ANOTHER TREE::::::::::::::\n\n";
+			DEBUG_LOG("\n\n::::::::::::::ANOTHER TREE::::::::::::::\n\n");
 		}
 	}
 }

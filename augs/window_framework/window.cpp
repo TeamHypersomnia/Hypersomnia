@@ -6,8 +6,6 @@
 #include <algorithm>
 #include <Shlwapi.h>
 
-#include <iostream>
-
 namespace augs {
 	extern HINSTANCE hinst;
 

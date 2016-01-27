@@ -1,25 +1,8 @@
 #pragma once
 // legacy functionality kept to conformance with old code. Do not use anymore.
-#include <fstream>
 #include "../options.h"
 
 namespace augs {
-	namespace error_logging {
-		class log_file {
-			void* dummy, enter(), leave();
-			friend class module;
-		public:
-			std::wofstream logs;
-
-			log_file();
-			~log_file();
-			void open(const wchar_t* fname);
-			void close();
-		};
-	}
-
-	extern error_logging::log_file global_log;
-
 	namespace error_logging {
 		extern unsigned glew_last_errorcode;
 
@@ -40,21 +23,11 @@ namespace augs {
 			int _errs(int expression, long lin, const char* fil,  const char* fun, const char* strr);
 			int _errs(int expression, long lin, const char* fil,  const char* fun, const wchar_t* strr);
 
-			log_file* parent;
-
-			module(void (*error_func)(wchar_t*), int(*errorid_func)() = last_error, log_file* parent = &global_log);
+			module(void (*error_func)(wchar_t*), int(*errorid_func)() = last_error);
 
 			void (*error_func)(wchar_t*);
 			int (*errorid_func)();
-			bool enabled, logsucc;
-			void enable(bool = true);
-			void log_successful(bool = false);
-			void set_parent(log_file*);
-
-			template<typename T>
-			std::wofstream& operator<<(const T& t) {
-				return parent.logs << t;
-			}
+			bool enabled = true;
 		};
 	}
 

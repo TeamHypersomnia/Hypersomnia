@@ -20,7 +20,6 @@
 #include "../shared/physics_setup_helpers.h"
 
 #include "misc/randval.h"
-#include <iostream>
 
 /* hacky methods to aid transferring barrel smoke to dropped gun */
 void components::gun::transfer_barrel_smoke(augs::entity_id another, bool overwrite_components) {

@@ -42,7 +42,6 @@ void car_system::set_steering_flags_from_intents() {
 	}
 }
 
-#include <iostream>
 void car_system::apply_movement_forces() {
 	auto& lines = renderer::get_current().logic_lines;
 

@@ -57,6 +57,18 @@ namespace augs {
 		triangles.push_back(tri);
 	}
 
+	void renderer::call_lines() {
+		if (lines.empty()) return;
+
+		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_line) * lines.size(), lines.data(), GL_STREAM_DRAW); glerr;
+		glDrawArrays(GL_LINES, 0, lines.size() * 2); glerr;
+	}
+
+	void renderer::push_line(const vertex_line& line) {
+		lines.push_back(line);
+	}
+
 	void renderer::set_viewport(rects::xywh<int> xywh) {
 		glViewport(xywh.x, xywh.y, xywh.w, xywh.h);
 	}
@@ -67,6 +79,10 @@ namespace augs {
 
 	void renderer::clear_triangles() {
 		triangles.clear();
+	}
+
+	void renderer::clear_lines() {
+		lines.clear();
 	}
 
 	int renderer::get_triangle_count() {
@@ -128,18 +144,17 @@ namespace augs {
 		auto& tex = resource_manager.find(tex_id)->tex;
 		
 		vec2 center = visible_world_area / 2;
+		
+		clear_triangles();
 
 		if (draw_visibility) {
-			glBegin(GL_TRIANGLES); glerr;
-
 			for (auto it : target_entities) {
 				auto* visibility = it->find<components::visibility>();
 				if (visibility) {
 					for (auto& entry : visibility->visibility_layers.raw) {
 						/* shortcut */
 						auto& request = entry.val;
-
-						glVertexAttrib4f(VERTEX_ATTRIBUTES::COLOR, request.color.r / 255.f, request.color.g / 255.f, request.color.b / 255.f, request.color.a / 2 / 255.f); glerr;
+						
 						auto origin = it->get<components::transform>().pos;
 
 						for (int i = 0; i < request.get_num_triangles(); ++i) {
@@ -163,31 +178,41 @@ namespace augs {
 								auto pos = tri.points[i] - camera_transform.pos + center + origin;
 
 								pos.rotate(camera_transform.rotation, center);
-
-								glVertexAttrib2f(VERTEX_ATTRIBUTES::TEXCOORD, tex.get_u(i), tex.get_v(i)); glerr;
-
-								glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, pos.x, pos.y); glerr;
+								
+								vertex new_vertex;
+								new_vertex.texcoord.set(tex.get_u(i), tex.get_v(i));
+								new_vertex.pos = pos;
+								new_vertex.color = request.color;
+								verts.vertices[i] = new_vertex;
 							}
 						}
 					}
 				}
 			}
-			glEnd(); glerr;
 		}
 
-		glBegin(GL_LINES); glerr;
+		call_triangles();
+		clear_triangles();
 
-		auto line_lambda = [camera_transform, visible_world_area, center, tex](debug_line line) {
+		clear_lines();
+
+		auto line_lambda = [this, camera_transform, visible_world_area, center, tex](debug_line line) {
 			line.a += center - camera_transform.pos;
 			line.b += center - camera_transform.pos;
 
 			line.a.rotate(camera_transform.rotation, center);
 			line.b.rotate(camera_transform.rotation, center);
-			glVertexAttrib4f(VERTEX_ATTRIBUTES::COLOR, line.col.r / 255.f, line.col.g / 255.f, line.col.b / 255.f, line.col.a / 255.f); glerr;
-			glVertexAttrib2f(VERTEX_ATTRIBUTES::TEXCOORD, tex.get_u(0), tex.get_v(0)); glerr;
-			glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.a.x, line.a.y); glerr;
-			glVertexAttrib2f(VERTEX_ATTRIBUTES::TEXCOORD, tex.get_u(2), tex.get_v(2)); glerr;
-			glVertexAttrib2f(VERTEX_ATTRIBUTES::POSITION, line.b.x, line.b.y); glerr;
+
+			vertex_line new_line;
+
+			new_line.vertices[0].color = line.col;
+			new_line.vertices[0].texcoord.set(tex.get_u(0), tex.get_v(0));
+			new_line.vertices[0].pos.set(line.a.x, line.a.y);
+			new_line.vertices[1].color = line.col;
+			new_line.vertices[1].texcoord.set(tex.get_u(2), tex.get_v(2));
+			new_line.vertices[1].pos.set(line.b.x, line.b.y);
+
+			push_line(new_line);
 		};
 
 		if (logic_lines.lines.size() == prev_logic_lines.lines.size()) {
@@ -216,9 +241,10 @@ namespace augs {
 			line_timer.reset();
 		}
 
-		clear_frame_lines();
+		call_lines();
+		clear_lines();
 
-		glEnd(); glerr;
+		clear_frame_lines();
 	}
 
 	void renderer::clear_geometry() {

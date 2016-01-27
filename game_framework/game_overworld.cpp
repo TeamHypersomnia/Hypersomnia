@@ -1,7 +1,6 @@
 #include "game_overworld.h"
 
 #include <signal.h>
-#include <iostream>
 
 #include "window_framework/window.h"
 #include "script.h"
@@ -13,6 +12,8 @@
 #include "game_framework/systems/render_system.h"
 
 #include <luabind/luabind.hpp>
+
+#include "log.h"
 
 using namespace std;
 using namespace augs;
@@ -41,11 +42,11 @@ void game_overworld::call_window_script(std::string filename) {
 			lua.debug_response();
 	}
 	catch (char* e) {
-		cout << "Exception thrown! " << e << "\n";
+		LOG("Exception thrown! %x", e);
 		lua.debug_response();
 	}
 	catch (...) {
-		cout << "Exception thrown! " << "\n";
+		LOG("Exception thrown!");
 		lua.debug_response();
 	}
 

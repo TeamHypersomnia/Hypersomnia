@@ -10,11 +10,10 @@ float PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 #include "../messages/collision_message.h"
 #include "../messages/destroy_message.h"
 #include "../shared/physics_setup_helpers.h"
-#include "augs/print.h"
 
 #include "../components/fixtures_component.h"
 
-#include <iostream>
+#include "log.h"
 
 using namespace augs;
 
@@ -59,8 +58,7 @@ std::vector<physics_system::raycast_output> physics_system::ray_cast_all_interse
 	callback.save_all = true;
 
 	if (!((p1_meters - p2_meters).length_sq() > 0.f)) {
-		printf("ray_cast: X: %f, Y: %f\nX: %f, Y: %f\n", p1_meters.x, p1_meters.y, p2_meters.x, p2_meters.y);
-		std::cout << "error" << std::endl;
+		LOG("Ray casting error: X: %x %x", p1_meters, p2_meters);
 	}
 
 	b2world.RayCast(&callback, p1_meters, p2_meters);
@@ -138,9 +136,7 @@ physics_system::raycast_output physics_system::ray_cast(vec2 p1_meters, vec2 p2_
 	callback.subject = ignore_entity;
 
 	if (!((p1_meters - p2_meters).length_sq() > 0.f)) {
-		printf("ray_cast: X: %f, Y: %f\nX: %f, Y: %f\n", p1_meters.x, p1_meters.y, p2_meters.x, p2_meters.y);
-		std::cout << "error" << std::endl;
-
+		LOG("Ray casting error: X: %x %x", p1_meters, p2_meters);
 		return callback.output;
 	}
 
@@ -303,10 +299,9 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 
 						if (velOtherPixels.length() > 1) {
 							auto angle = vec2(worldManifold.normal).angle_between(velOtherPixels);
-							std::cout << angle << std::endl;
-							if (std::abs(angle) > 90) {
+
+							if (std::abs(angle) > 90)
 								found_suitable = true;
-							}
 						}
 
 						renderer::get_current().blink_lines.draw_yellow(METERS_TO_PIXELSf*worldManifold.points[i], METERS_TO_PIXELSf* worldManifold.points[i] + vec2(worldManifold.normal).set_length(150));

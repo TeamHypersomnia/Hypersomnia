@@ -11,6 +11,7 @@
 #include "window_framework\window.h"
 
 #include <gtest/gtest.h>
+#include "log.h"
 
 namespace augs {
 	Gdiplus::GdiplusStartupInput gdi;

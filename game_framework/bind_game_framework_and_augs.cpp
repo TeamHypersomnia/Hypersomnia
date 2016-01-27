@@ -11,9 +11,6 @@
 #include "entity_system/entity_id.h"
 #include "augs/lua_state_wrapper.h"
 
-#include <fstream>
-#include <iostream>
-
 int bitflag(lua_State* L) {
 	int result = 1 << luabind::object_cast<int>(luabind::object(luabind::from_stack(L, 1)));
 	lua_pushinteger(L, result);

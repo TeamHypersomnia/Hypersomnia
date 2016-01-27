@@ -30,10 +30,6 @@
 #include <luabind/lua_argument_proxy.hpp>
 #include <luabind/lua_iterator_proxy.hpp>
 
-/*
-#include <iostream>
-#define VERBOSE(X) std::cout << __FILE__ << ":" << __LINE__ << ": " << X << std::endl
-*/
 #define VERBOSE(X)
 
 namespace luabind

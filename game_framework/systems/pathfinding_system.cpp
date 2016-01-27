@@ -7,8 +7,7 @@
 #include "physics_system.h"
 
 #include "../shared/physics_setup_helpers.h"
-
-#include <iostream>
+#include "log.h"
 
 pathfinding_system::pathfinding_system(world& parent_world) : processing_system_templated(parent_world), draw_memorised_walls(false), draw_undiscovered(false),
 	epsilon_distance_the_same_vertex(3.f) {}
@@ -379,7 +378,7 @@ void pathfinding_system::process_entities() {
 								}
 							}
 							catch (std::exception compilation_error) {
-								std::cout << compilation_error.what() << '\n';
+								LOG(compilation_error.what());
 							}
 						}
 

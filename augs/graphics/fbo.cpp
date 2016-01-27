@@ -1,6 +1,6 @@
 #include <GL/OpenGL.h>
-#include <iostream>
 #include "fbo.h"
+#include "log.h"
 
 namespace augs {
 	namespace graphics {
@@ -42,15 +42,12 @@ namespace augs {
 				textureId,             // 4. tex ID
 				0);                    // 5. mipmap level: 0(base)
 			glerr
+			
 			// check FBO status
-			while (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-				int waiting = 24;
-				std::cout << glGetError() << std::endl;
-			} 
+			GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
-			//GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-			//if (status == GL_FRAMEBUFFER_COMPLETE)
-			//	std::cout << "an error occured during FBO creation" << std::endl;
+			if (status != GL_FRAMEBUFFER_COMPLETE)
+				LOG("An error occured during FBO creation!");
 		}
 
 		void fbo::use() {

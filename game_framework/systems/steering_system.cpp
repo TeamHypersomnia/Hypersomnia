@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "misc/randval.h"
 
 #include "entity_system/entity.h"

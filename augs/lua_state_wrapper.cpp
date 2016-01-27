@@ -5,7 +5,7 @@
 #include "script.h"
 #include "window_framework/window.h"
 
-#include <iostream>
+#include "log.h"
 
 // called by luabind internals whenever an error occurs
 void luabind_error_callback(lua_State *L) {
@@ -57,7 +57,7 @@ namespace augs {
 		return error_message;
 	}
 
-	void lua_state_wrapper::save_verbose_log() {
+	void lua_state_wrapper::call_traceback_that_saves_verbose_log() {
 		lua_State* L = raw;
 		lua_getglobal(L, "debug");
 		lua_getfield(L, -1, "post_traceback");
@@ -100,11 +100,8 @@ namespace augs {
 			}
 		}
 
-		//full_command += " --new-window";
-		//std::cout << full_command << std::endl;
-
 		if(lines_found > 0)
-			system(full_command.c_str());
+			CALL_SHELL(full_command);
 
 		return lines;
 	}
@@ -112,11 +109,8 @@ namespace augs {
 	void lua_state_wrapper::debug_response() {
 		std::string error_and_stack = get_error_and_stack();
 		std::string lines = open_editor(error_and_stack);
-		save_verbose_log();
+		call_traceback_that_saves_verbose_log();
 
-		std::cout << error_and_stack << std::endl << lines << std::endl;
-
-		int stop;
-		std::cin >> stop;
+		LOG("%x\n%x", error_and_stack, lines);
 	}
 }

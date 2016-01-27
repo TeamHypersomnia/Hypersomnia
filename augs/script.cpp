@@ -3,7 +3,6 @@
 #include "lua_state_wrapper.h"
 
 #include <fstream>
-#include <iostream>
 
 #include "window_framework/window.h"
 #include "file.h"

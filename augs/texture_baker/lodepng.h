@@ -1514,24 +1514,6 @@ namespace lodepng
   10.1. decoder C++ example
   -------------------------
 
-  #include "lodepng.h"
-  #include <iostream>
-
-  int main(int argc, char *argv[])
-  {
-  const char* filename = argc > 1 ? argv[1] : "test.png";
-
-  //load and decode
-  std::vector<unsigned char> image;
-  unsigned width, height;
-  unsigned error = lodepng::decode(image, width, height, filename);
-
-  //if there's an error, display it
-  if(error) std::cout << "decoder error " << error << ": " << lodepng_error_text(error) << std::endl;
-
-  //the pixels are now in the vector "image", 4 bytes per pixel, ordered RGBARGBA..., use it as texture, draw it, ...
-  }
-
   10.2. decoder C example
   -----------------------
 

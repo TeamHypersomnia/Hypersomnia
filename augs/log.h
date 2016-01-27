@@ -1,12 +1,15 @@
 #pragma once
 #include <string>
+#include <sstream>
 #include <utility>
 #include <type_traits>
 
-void typesafe_formatting(size_t, std::string&);
+#define ENABLE_DEBUG_LOG 1
+
+void typesafe_sprintf_detail(size_t, std::string&);
 
 template<typename T, typename... A>
-void typesafe_formatting(size_t starting_pos, std::string& target_str, T&& val, A&& ...a) {
+void typesafe_sprintf_detail(size_t starting_pos, std::string& target_str, T&& val, A&& ...a) {
 	starting_pos = target_str.find('%', starting_pos);
 
 	if (starting_pos != std::string::npos) {
@@ -19,16 +22,27 @@ void typesafe_formatting(size_t starting_pos, std::string& target_str, T&& val, 
 		target_str.replace(starting_pos, 2, replacement.str());
 	}
 
-	typesafe_formatting(starting_pos, target_str, std::forward<A>(a)...);
+	typesafe_sprintf_detail(starting_pos, target_str, std::forward<A>(a)...);
 }
 
 template<typename... A>
 std::string typesafe_sprintf(std::string f, A&&... a) {
-	typesafe_formatting(0, f, std::forward<A>(a)...);
+	typesafe_sprintf_detail(0, f, std::forward<A>(a)...);
 	return f;
 }
 
-#include <iostream>
-
 template < typename... A >
-void tcout(std::string f, A&&... a) { std::cout << typesafe_sprintf(f, 0, std::forward<A>(a)...) << std::endl; }
+void LOG(std::string f, A&&... a) { 
+	LOG(typesafe_sprintf(f, std::forward<A>(a)...));
+}
+
+template <>
+void LOG(std::string f);
+
+void CALL_SHELL(std::string);
+
+#if ENABLE_DEBUG_LOG
+#define DEBUG_LOG LOG
+#else
+#define DEBUG_LOG(...)
+#endif

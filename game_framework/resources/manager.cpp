@@ -8,7 +8,7 @@ using namespace augs;
 
 namespace assets {
 	vec2i get_size(texture_id id) {
-		return resource_manager.find(id)->tex.get_size();
+		return (*id).get_size();
 	}
 }
 

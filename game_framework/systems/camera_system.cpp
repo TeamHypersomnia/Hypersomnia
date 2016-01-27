@@ -13,8 +13,6 @@
 #include "../shared/drawing_state.h"
 #include "entity_system/world.h"
 
-#include "augs/print.h"
-
 components::crosshair* components::camera::get_crosshair() {
 	if (entity_to_chase.alive()) {
 		auto* maybe_children = entity_to_chase->find<components::children>();

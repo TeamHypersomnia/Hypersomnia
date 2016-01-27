@@ -3,7 +3,6 @@
 #include <cassert>
 
 #include "texture_baker.h"
-#include <iostream>
 
 namespace augs {
 	void texture::set_uv_unit(double u, double v) {

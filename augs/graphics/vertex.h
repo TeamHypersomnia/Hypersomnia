@@ -25,5 +25,12 @@ namespace augs {
 		vertex& get_vert(int i) { return vertices[i]; }
 	};
 
+	struct vertex_line {
+		vertex vertices[2];
+
+		vertex& get_vert(int i) { return vertices[i]; }
+	};
+
 	typedef std::vector<vertex_triangle> vertex_triangle_buffer;
+	typedef std::vector<vertex_line> vertex_line_buffer;
 }

@@ -627,9 +627,6 @@
     <ClCompile Include="game_framework\systems\camera_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\systems\chase_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\systems\crosshair_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1017,9 +1014,6 @@
     <ClCompile Include="augs\network\reliable_channel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="augs\print.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="augs\script.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1048,6 +1042,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game_framework\scene_builders\rendering_scripts\testbed_rendering.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\systems\position_copying_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2378,9 +2378,6 @@
     <ClInclude Include="game_framework\components\camera_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\components\chase_component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\components\children_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2457,9 +2454,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\systems\camera_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game_framework\systems\chase_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\systems\crosshair_system.h">
@@ -2870,9 +2864,6 @@
     <ClInclude Include="augs\options.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\print.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\script.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2901,6 +2892,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\scene_builders\rendering_scripts\testbed_rendering.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\components\position_copying_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\systems\position_copying_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

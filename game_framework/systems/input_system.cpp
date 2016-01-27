@@ -5,7 +5,6 @@
 #include "../messages/raw_window_input_message.h"
 
 #include "input_system.h"
-#include <iostream>
 
 #include "augs/misc/stream.h"
 

@@ -6,8 +6,6 @@
 
 #include "../resources/manager.h"
 
-#include <iostream>
-
 using namespace messages;
 using namespace resources;
 

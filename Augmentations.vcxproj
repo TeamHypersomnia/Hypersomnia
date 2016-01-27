@@ -468,7 +468,7 @@
     <ClCompile Include="augs\misc\vector_wrapper.cpp" />
     <ClCompile Include="augs\network\network_interface.cpp" />
     <ClCompile Include="augs\network\reliable_channel.cpp" />
-    <ClCompile Include="augs\print.cpp" />
+    <ClCompile Include="augs\log.cpp" />
     <ClCompile Include="augs\script.cpp" />
     <ClCompile Include="augs\texture_baker\font.cpp" />
     <ClCompile Include="augs\texture_baker\image.cpp" />
@@ -1087,7 +1087,7 @@
     <ClInclude Include="augs\network\reliable_channel.h" />
     <ClInclude Include="augs\network\reliable_channel_tests.h" />
     <ClInclude Include="augs\options.h" />
-    <ClInclude Include="augs\print.h" />
+    <ClInclude Include="augs\log.h" />
     <ClInclude Include="augs\script.h" />
     <ClInclude Include="augs\texture_baker\font.h" />
     <ClInclude Include="augs\texture_baker\image.h" />

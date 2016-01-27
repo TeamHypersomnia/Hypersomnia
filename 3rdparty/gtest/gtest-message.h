@@ -56,32 +56,6 @@ void operator<<(const testing::internal::Secret&, int);
 
 namespace testing {
 
-// The Message class works like an ostream repeater.
-//
-// Typical usage:
-//
-//   1. You stream a bunch of values to a Message object.
-//      It will remember the text in a stringstream.
-//   2. Then you stream the Message object to an ostream.
-//      This causes the text in the Message to be streamed
-//      to the ostream.
-//
-// For example;
-//
-//   testing::Message foo;
-//   foo << 1 << " != " << 2;
-//   std::cout << foo;
-//
-// will print "1 != 2".
-//
-// Message is not intended to be inherited from.  In particular, its
-// destructor is not virtual.
-//
-// Note that stringstream behaves differently in gcc and in MSVC.  You
-// can stream a NULL char pointer to it in the former, but not in the
-// latter (it causes an access violation if you do).  The Message
-// class hides this difference by treating a NULL char pointer as
-// "(null)".
 class GTEST_API_ Message {
  private:
   // The type of basic IO manipulators (endl, ends, and flush) for

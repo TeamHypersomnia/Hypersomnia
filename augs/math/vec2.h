@@ -85,7 +85,7 @@ namespace augs {
 		type x, y;
 
 		friend std::ostream& operator<< (std::ostream& stream, const vec2t& v) {
-			return stream << v.x << "|" << v.y;
+			return stream << "(" << v.x << "," << v.y << ")";
 		}
 
 		template <class t>

@@ -37,6 +37,7 @@ namespace augs {
 		};
 
 		vertex_triangle_buffer triangles;
+		vertex_line_buffer lines;
 
 		unsigned int position_buffer_id, texcoord_buffer_id, color_buffer_id;
 		unsigned int triangle_buffer_id;
@@ -66,11 +67,14 @@ namespace augs {
 
 		void clear();
 		void call_triangles();
+		void call_lines();
 		void set_viewport(rects::xywh<int>);
+		void push_line(const vertex_line&);
 		void push_triangle(const vertex_triangle&);
 		void push_triangles_from_gui_world(graphics::gui::gui_world&);
 
 		void clear_triangles();
+		void clear_lines();
 
 		void default_render(vec2 visible_world_area);
 
