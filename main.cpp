@@ -10,14 +10,14 @@ int main(int argc, char** argv) {
 	framework::init();
 	//framework::run_tests();
 
-	hypersomnia_overworld overworld;
-	overworld.configure_scripting();
-	overworld.call_window_script("config.lua");
+	game_overworld hypersomnia_overworld;
+	hypersomnia_overworld.configure_scripting();
+	hypersomnia_overworld.call_window_script("config.lua");
 
-	overworld.set_scene_builder(std::unique_ptr<scene_builder>(new scene_builders::testbed));
-	overworld.initialize_scene();
+	hypersomnia_overworld.set_scene_builder(std::unique_ptr<scene_builder>(new scene_builders::testbed));
+	hypersomnia_overworld.initialize_scene();
 
-	overworld.simulate();
+	hypersomnia_overworld.simulate();
 
 	framework::deinit();
 	return 0;

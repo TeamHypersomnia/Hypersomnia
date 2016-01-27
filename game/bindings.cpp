@@ -7,14 +7,13 @@
 #include "bindings.h"
 #include "utilities.h"
 
-void hypersomnia_world::bind_this_to_lua_global(lua_state_wrapper& lua, std::string global) {
+void game_world::bind_this_to_lua_global(lua_state_wrapper& lua, std::string global) {
 	lua.global_ptr(global, this);
 }
 
 void bind_whole_hypersomnia(augs::lua_state_wrapper& wrapper) {
 	luabind::module(wrapper.raw)[
-		luabind::class_<hypersomnia_world, augs::world>("hypersomnia_world")
+		luabind::class_<game_world, augs::world>("hypersomnia_world")
 		.def(luabind::constructor<overworld&>())
-			,
 	];
 }

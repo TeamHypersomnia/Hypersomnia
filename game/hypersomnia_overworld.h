@@ -8,17 +8,17 @@
 
 #include "game_framework/scene_builders/scene_builder.h"
 
-class hypersomnia_overworld : public augs::overworld {
+class game_overworld : public augs::overworld {
 	std::unique_ptr<scene_builder> current_scene_builder;
 
 public:
-	hypersomnia_overworld();
+	game_overworld();
 
 	window::glwindow game_window;
 
 	bool clear_window_inputs_once = true;
 
-	hypersomnia_world game_world;
+	game_world main_game_world;
 	augs::lua_state_wrapper lua;
 
 	void set_scene_builder(std::unique_ptr<scene_builder> builder);

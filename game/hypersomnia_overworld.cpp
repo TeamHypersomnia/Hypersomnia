@@ -21,21 +21,21 @@ using namespace augs;
 
 void SignalHandler(int signal) { throw "Access violation!"; }
 
-hypersomnia_overworld::hypersomnia_overworld() 
-	: game_world(*this) {
-	game_world.initialize_entity_component_pools(50000);
+game_overworld::game_overworld() 
+	: main_game_world(*this) {
+	main_game_world.initialize_entity_component_pools(50000);
 }
 
-void hypersomnia_overworld::set_scene_builder(std::unique_ptr<scene_builder> builder) {
+void game_overworld::set_scene_builder(std::unique_ptr<scene_builder> builder) {
 	current_scene_builder = std::move(builder);
 }
 
-void hypersomnia_overworld::initialize_scene() {
-	current_scene_builder->initialize(game_world);
+void game_overworld::initialize_scene() {
+	current_scene_builder->initialize(main_game_world);
 	clear_window_inputs_once = true;
 }
 
-void hypersomnia_overworld::call_window_script(std::string filename) {
+void game_overworld::call_window_script(std::string filename) {
 	lua.global_ptr("global_gl_window", &game_window);
 
 	try {
@@ -56,7 +56,7 @@ void hypersomnia_overworld::call_window_script(std::string filename) {
 
 #define DETERMINISTIC_RENDERING 0
 
-void hypersomnia_overworld::simulate() {
+void game_overworld::simulate() {
 	bool quit_flag = false;
 
 	while (!quit_flag) {
@@ -77,7 +77,7 @@ void hypersomnia_overworld::simulate() {
 			messages::raw_window_input_message msg;
 			msg.raw_window_input = raw_input;
 
-			game_world.post_message(msg);
+			main_game_world.post_message(msg);
 		}
 
 #if DETERMINISTIC_RENDERING
@@ -89,11 +89,11 @@ void hypersomnia_overworld::simulate() {
 		game_window.clear();
 
 		assign_frame_time_to_delta();
-		game_world.draw();
+		main_game_world.draw();
 
 		consume_camera_render_requests();
 
-		game_world.restore_transforms_after_rendering();
+		main_game_world.restore_transforms_after_rendering();
 
 		restore_fixed_delta();
 
@@ -104,33 +104,33 @@ void hypersomnia_overworld::simulate() {
 #endif
 			renderer::get_current().clear_logic_lines();
 
-			game_world.perform_logic_step();
-			current_scene_builder->perform_logic_step(game_world);
+			main_game_world.perform_logic_step();
+			current_scene_builder->perform_logic_step(main_game_world);
 		}
 	}
 }
 
-void hypersomnia_overworld::consume_camera_render_requests() {
-	auto& requests = game_world.get_message_queue<messages::camera_render_request_message>();
+void game_overworld::consume_camera_render_requests() {
+	auto& requests = main_game_world.get_message_queue<messages::camera_render_request_message>();
 	auto& target = renderer::get_current();
 
 	for (auto& r : requests) {
 		target.viewport(r.state.viewport);
 		current_scene_builder->execute_drawcall_script(r);
-		target.draw_debug_info(r.state.visible_world_area, r.state.camera_transform, assets::texture_id::BLANK, game_world.get_system<render_system>().targets, view_interpolation_ratio());
+		target.draw_debug_info(r.state.visible_world_area, r.state.camera_transform, assets::texture_id::BLANK, main_game_world.get_system<render_system>().targets, view_interpolation_ratio());
 	}
 	
-	current_scene_builder->custom_drawcalls(game_world);
+	current_scene_builder->custom_drawcalls(main_game_world);
 
 	game_window.swap_buffers();
 	target.clear_geometry();
 }
 
-void hypersomnia_overworld::configure_scripting() {
+void game_overworld::configure_scripting() {
 	framework::bind_whole_engine(lua);
 	bind_whole_hypersomnia(lua);
 
-	game_world.bind_this_to_lua_global(lua, "WORLD");
+	main_game_world.bind_this_to_lua_global(lua, "WORLD");
 
 	signal(SIGSEGV, SignalHandler);
 }

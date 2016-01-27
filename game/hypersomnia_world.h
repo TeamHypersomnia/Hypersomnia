@@ -6,9 +6,9 @@ namespace augs {
 	struct lua_state_wrapper;
 }
 
-class hypersomnia_world : public augs::world {
+class game_world : public augs::world {
 public:
-	hypersomnia_world(augs::overworld&);
+	game_world(augs::overworld&);
 	
 	void bind_this_to_lua_global(augs::lua_state_wrapper&, std::string global);
 
