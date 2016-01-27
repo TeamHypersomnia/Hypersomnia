@@ -5,7 +5,7 @@
 #include "entity_system/entity.h"
 
 #include "render_component.h"
-#include "../game/physics_setup_helpers.h"
+#include "../shared/physics_setup_helpers.h"
 
 class gun_system;
 namespace components {

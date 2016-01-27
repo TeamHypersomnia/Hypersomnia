@@ -375,7 +375,6 @@
     <ClCompile Include="game_framework\components\polygon_component.cpp" />
     <ClCompile Include="game_framework\components\sprite_component.cpp" />
     <ClCompile Include="game_framework\components\tile_layer_component.cpp" />
-    <ClCompile Include="game_framework\game\physics_setup_helpers.cpp" />
     <ClCompile Include="game_framework\game_overworld.cpp" />
     <ClCompile Include="game_framework\game_world.cpp" />
     <ClCompile Include="game_framework\globals\filters.cpp" />
@@ -394,6 +393,7 @@
     <ClCompile Include="game_framework\scene_builders\scene_builder.cpp" />
     <ClCompile Include="game_framework\scene_builders\scripts\testbed_rendering.cpp" />
     <ClCompile Include="game_framework\scene_builders\testbed.cpp" />
+    <ClCompile Include="game_framework\shared\physics_setup_helpers.cpp" />
     <ClCompile Include="game_framework\systems\animation_system.cpp" />
     <ClCompile Include="game_framework\systems\behaviour_tree_system.cpp" />
     <ClCompile Include="game_framework\systems\camera_system.cpp" />
@@ -961,7 +961,6 @@
     <ClInclude Include="game_framework\components\visibility_component.h" />
     <ClInclude Include="game_framework\assets\animation.h" />
     <ClInclude Include="game_framework\assets\texture.h" />
-    <ClInclude Include="game_framework\game\physics_setup_helpers.h" />
     <ClInclude Include="game_framework\game_overworld.h" />
     <ClInclude Include="game_framework\game_world.h" />
     <ClInclude Include="game_framework\globals\filters.h" />
@@ -999,6 +998,7 @@
     <ClInclude Include="game_framework\scene_builders\all_builders.h" />
     <ClInclude Include="game_framework\scene_builders\testbed.h" />
     <ClInclude Include="game_framework\shared\drawing_state.h" />
+    <ClInclude Include="game_framework\shared\physics_setup_helpers.h" />
     <ClInclude Include="game_framework\systems\animation_system.h" />
     <ClInclude Include="game_framework\systems\behaviour_tree_system.h" />
     <ClInclude Include="game_framework\systems\camera_system.h" />

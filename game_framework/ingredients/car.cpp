@@ -16,7 +16,7 @@
 #include "game_framework/components/car_component.h"
 #include "game_framework/components/trigger_component.h"
 
-#include "game_framework/game/physics_setup_helpers.h"
+#include "game_framework/shared/physics_setup_helpers.h"
 
 #include "game_framework/globals/filters.h"
 

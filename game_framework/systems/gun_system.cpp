@@ -17,7 +17,7 @@
 #include "../systems/physics_system.h"
 #include "../systems/render_system.h"
 
-#include "../game/physics_setup_helpers.h"
+#include "../shared/physics_setup_helpers.h"
 
 #include "misc/randval.h"
 #include <iostream>

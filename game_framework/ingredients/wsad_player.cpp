@@ -17,7 +17,7 @@
 #include "game_framework/components/driver_component.h"
 
 
-#include "game_framework/game/physics_setup_helpers.h"
+#include "game_framework/shared/physics_setup_helpers.h"
 
 #include "game_framework/globals/filters.h"
 #include "game_framework/globals/input_profiles.h"

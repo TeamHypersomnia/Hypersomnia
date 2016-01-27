@@ -9,7 +9,7 @@ float PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 
 #include "../messages/collision_message.h"
 #include "../messages/destroy_message.h"
-#include "../game/physics_setup_helpers.h"
+#include "../shared/physics_setup_helpers.h"
 #include "augs/print.h"
 
 #include "../components/fixtures_component.h"

@@ -6,7 +6,7 @@
 #include "render_system.h"
 #include "physics_system.h"
 
-#include "../game/physics_setup_helpers.h"
+#include "../shared/physics_setup_helpers.h"
 
 #include <iostream>
 

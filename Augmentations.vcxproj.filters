@@ -1047,7 +1047,7 @@
     <ClCompile Include="augs\window_framework\window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\game\physics_setup_helpers.cpp">
+    <ClCompile Include="game_framework\shared\physics_setup_helpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2903,7 +2903,7 @@
     <ClInclude Include="augs\window_framework\window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\game\physics_setup_helpers.h">
+    <ClInclude Include="game_framework\shared\physics_setup_helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
