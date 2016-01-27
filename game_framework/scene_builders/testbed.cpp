@@ -186,7 +186,7 @@ namespace scene_builders {
 
 	}
 
-	void testbed::custom_drawcalls(world& world) {
+	void testbed::drawcalls_after_all_cameras(world& world) {
 		auto& target = renderer::get_current();
 		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(assets::font_id::GUI_FONT, augs::colors::violet), vec2i(200-1, 200), 0, nullptr);
 		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(assets::font_id::GUI_FONT, augs::colors::violet), vec2i(200+1, 200), 0, nullptr);
@@ -198,7 +198,7 @@ namespace scene_builders {
 		target.call_triangles();
 	}
 
-	void testbed::execute_drawcall_script(messages::camera_render_request_message msg) {
+	void testbed::execute_drawcalls(messages::camera_render_request_message msg) {
 		scripts::testbed_rendering(msg);
 	}
 }

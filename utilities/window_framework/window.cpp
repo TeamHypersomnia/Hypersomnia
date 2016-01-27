@@ -341,6 +341,9 @@ namespace augs {
 				ret = err(wglMakeCurrent(hdc, hglrc)) != FALSE; glerr
 				context = this;
 			}
+			
+			set_show(SHOW);
+
 			return ret;
 		}
 		 

@@ -17,7 +17,8 @@ namespace augs {
 	extern unsigned initialized;
 
 	extern std::unique_ptr<FT_Library> freetype_library;
-
+	
+	extern void run_tests();
 	extern void init(unsigned which_augs = ALL);
 	extern void deinit();
 };

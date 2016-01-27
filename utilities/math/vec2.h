@@ -115,12 +115,6 @@ namespace augs {
 		}
 
 		vec2t(type x = 0, type y = 0) : x(x), y(y) {}
-		vec2t(const augs::rects::wh<type>& r) : x(r.w), y(r.h) {
-			x = static_cast<type>(r.w);
-			y = static_cast<type>(r.h);
-		}
-		vec2t(const augs::rects::ltrb<type>& r) : x(r.l), y(r.t) {}
-		vec2t(const augs::rects::xywh<type>& r) : x(r.x), y(r.y) {}
 
 		/* from http://stackoverflow.com/a/1501725 */
 		type distance_from_segment_sq(vec2t v, vec2t w) const {

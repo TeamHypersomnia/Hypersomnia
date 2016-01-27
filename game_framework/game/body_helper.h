@@ -48,8 +48,6 @@ namespace helpers {
 		void from_renderable(augs::entity_id);
 	};
 
-	//extern void create_physics_component(augs::entity_id subject, b2Filter filter, int = b2_dynamicBody);
-
 	extern components::physics& create_physics_component(body_definition, augs::entity_id subject);
 	
 	extern components::fixtures& add_fixtures(fixture_definition, augs::entity_id subject);
@@ -61,11 +59,6 @@ namespace helpers {
 	void create_friction_joint(augs::entity_id inside_object, augs::entity_id friction_field, joint_name name = joint_name::JOINT);
 	void remove_joints(augs::entity_id, joint_name);
 	bool joint_exists(augs::entity_id, joint_name);
-
-	//template <typename T, typename TDef>
-	//T* create_joint(world* owner, TDef* joint_def) {
-	//	return static_cast<T*>(owner->get_system<physics_system>().b2world.CreateJoint(joint_def));
-	//}
 
 	extern augs::entity_id body_to_entity(b2Body*);
 }

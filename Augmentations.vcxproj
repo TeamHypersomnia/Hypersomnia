@@ -368,6 +368,7 @@
     <ClCompile Include="game_framework\bindings\value_animator_binding.cpp" />
     <ClCompile Include="game_framework\bindings\vec2_binding.cpp" />
     <ClCompile Include="game_framework\bindings\world_binding.cpp" />
+    <ClCompile Include="game_framework\bind_game_framework_and_augs.cpp" />
     <ClCompile Include="game_framework\components\fixtures_component.cpp" />
     <ClCompile Include="game_framework\components\particle_group_component.cpp" />
     <ClCompile Include="game_framework\components\physics_component.cpp" />
@@ -375,7 +376,6 @@
     <ClCompile Include="game_framework\components\sprite_component.cpp" />
     <ClCompile Include="game_framework\components\tile_layer_component.cpp" />
     <ClCompile Include="game_framework\game\body_helper.cpp" />
-    <ClCompile Include="game_framework\game_framework.cpp" />
     <ClCompile Include="game_framework\game_overworld.cpp" />
     <ClCompile Include="game_framework\game_world.cpp" />
     <ClCompile Include="game_framework\globals\filters.cpp" />
@@ -415,10 +415,6 @@
     <ClCompile Include="game_framework\systems\steering_system.cpp" />
     <ClCompile Include="game_framework\systems\trigger_detector_system.cpp" />
     <ClCompile Include="game_framework\systems\visibility_system.cpp" />
-    <ClCompile Include="game_framework\whole_engine_binding.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -935,6 +931,7 @@
     <ClInclude Include="game_framework\assets\shader.h" />
     <ClInclude Include="game_framework\bindings\bindings.h" />
     <ClInclude Include="game_framework\bindings\bind_callbacks.h" />
+    <ClInclude Include="game_framework\bind_game_framework_and_augs.h" />
     <ClInclude Include="game_framework\components\animation_component.h" />
     <ClInclude Include="game_framework\components\behaviour_tree_component.h" />
     <ClInclude Include="game_framework\components\camera_component.h" />
@@ -965,7 +962,6 @@
     <ClInclude Include="game_framework\assets\animation.h" />
     <ClInclude Include="game_framework\assets\texture.h" />
     <ClInclude Include="game_framework\game\body_helper.h" />
-    <ClInclude Include="game_framework\game_framework.h" />
     <ClInclude Include="game_framework\game_overworld.h" />
     <ClInclude Include="game_framework\game_world.h" />
     <ClInclude Include="game_framework\globals\filters.h" />

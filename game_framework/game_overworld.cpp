@@ -6,7 +6,7 @@
 #include "window_framework/window.h"
 #include "script.h"
 
-#include "game_framework/game_framework.h"
+#include "game_framework/bind_game_framework_and_augs.h"
 #include "game_framework/messages/raw_window_input_message.h"
 #include "game_framework/messages/camera_render_request_message.h"
 
@@ -118,14 +118,14 @@ void game_overworld::consume_camera_render_requests() {
 		target.draw_debug_info(r.state.visible_world_area, r.state.camera_transform, assets::texture_id::BLANK, main_game_world.get_system<render_system>().targets, view_interpolation_ratio());
 	}
 	
-	current_scene_builder->custom_drawcalls(main_game_world);
+	current_scene_builder->drawcalls_after_all_cameras(main_game_world);
 
 	game_window.swap_buffers();
 	target.clear_geometry();
 }
 
 void game_overworld::configure_scripting() {
-	framework::bind_whole_engine(lua);
+	bind_game_framework_and_augs(lua);
 	main_game_world.bind_this_to_lua_global(lua, "WORLD");
 
 	signal(SIGSEGV, SignalHandler);

@@ -66,7 +66,7 @@ namespace augs {
 
 		void clear();
 		void call_triangles();
-		void viewport(rects::xywh<int>);
+		void set_viewport(rects::xywh<int>);
 		void push_triangle(const vertex_triangle&);
 		void push_triangles_from_gui_world(graphics::gui::gui_world&);
 

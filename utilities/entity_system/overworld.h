@@ -36,7 +36,7 @@ namespace augs {
 		double delta_seconds();
 		double view_interpolation_ratio();
 
-		void assign_frame_time_to_delta();
+		void assign_frame_time_to_delta_for_drawing_time_systems();
 		void restore_fixed_delta();
 
 		void configure_stepping(float fps, int max_updates_per_step);

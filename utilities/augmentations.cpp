@@ -10,6 +10,8 @@
 #include "options.h"
 #include "window_framework\window.h"
 
+#include <gtest/gtest.h>
+
 namespace augs {
 	Gdiplus::GdiplusStartupInput gdi;
 	ULONG_PTR           gdit;
@@ -54,6 +56,15 @@ namespace augs {
 		}
 
 		initialized |= to_initialize;
+	}
+
+	void run_tests() {
+		int argc = 0;
+		::testing::InitGoogleTest(&argc, (wchar_t**)nullptr);
+
+		::testing::FLAGS_gtest_catch_exceptions = false;
+		::testing::FLAGS_gtest_break_on_failure = false;
+		auto result = RUN_ALL_TESTS();
 	}
 
 	void deinit() {

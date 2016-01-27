@@ -675,12 +675,6 @@
     <ClCompile Include="game_framework\systems\visibility_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\game_framework.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\whole_engine_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="utilities\entity_system\entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1051,6 +1045,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game_framework\ingredients\wsad_player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\bind_game_framework_and_augs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2510,9 +2507,6 @@
     <ClInclude Include="game_framework\systems\visibility_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\game_framework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="utilities\entity_system\entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2907,6 +2901,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\ingredients\renderable_includes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\bind_game_framework_and_augs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

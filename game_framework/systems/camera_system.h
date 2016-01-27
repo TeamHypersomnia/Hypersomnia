@@ -14,5 +14,5 @@ public:
 
 	void crosshair_positioning_within_bounds();
 	void resolve_cameras_transforms_and_smoothing();
-	void render_all_cameras();
+	void post_render_requests_for_all_cameras();
 };
