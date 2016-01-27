@@ -9,7 +9,6 @@ bin/
 tmp/
 *.tmp
 *.dll
-*.lib
 *.exe
 *.bmp
 *.bak

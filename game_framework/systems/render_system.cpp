@@ -10,6 +10,7 @@
 #include "game_framework/components/sprite_component.h"
 #include "game_framework/components/fixtures_component.h"
 #include "game_framework/components/tile_layer_component.h"
+#include "game_framework/components/physics_component.h"
 
 #include "game_framework/messages/new_entity_message.h"
 #include "game_framework/messages/destroy_message.h"
@@ -122,8 +123,6 @@ void render_system::determine_visible_entities_from_every_camera() {
 		return true;
 	}), always_visible_entities.end());
 }
-
-#include "../components/physics_component.h"
 
 void render_system::generate_layers_from_visible_entities(shared::drawing_state& in, int mask) {
 	layers.clear();

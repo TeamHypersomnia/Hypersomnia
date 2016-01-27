@@ -1,5 +1,5 @@
 #pragma once
-// legacy functionality kept to conformance with old code. Do not use anymore.
+// legacy functionality kept for conformance with old code. Do not use anymore.
 #include "../options.h"
 
 namespace augs {
