@@ -57,7 +57,7 @@ namespace scene_builders {
 		resource_manager.create_sprites_indexed(
 			assets::texture_id::TORSO_MOVING_FIRST,
 			assets::texture_id::TORSO_MOVING_LAST,
-			L"hypersomnia/gfx/sprite");
+			L"hypersomnia/gfx/torso_white_walk_rifle");
 
 		resource_manager.create(assets::atlas_id::GAME_WORLD_ATLAS,
 			resources::manager::atlas_creation_mode::FROM_ALL_TEXTURES
@@ -67,7 +67,7 @@ namespace scene_builders {
 		resource_manager.create(assets::shader_id::DEFAULT_FRAGMENT, L"hypersomnia/shaders/default.fsh", graphics::shader::type::FRAGMENT);
 		resource_manager.create(assets::program_id::DEFAULT, assets::shader_id::DEFAULT_VERTEX, assets::shader_id::DEFAULT_FRAGMENT);
 
-		resource_manager.create_inverse_with_flip(assets::animation_id::TORSO_MOVE,
+		resource_manager.create_inverse(assets::animation_id::TORSO_MOVE,
 			assets::texture_id::TORSO_MOVING_FIRST,
 			assets::texture_id::TORSO_MOVING_LAST,
 			20.0f);

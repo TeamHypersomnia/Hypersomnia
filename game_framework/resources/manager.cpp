@@ -142,6 +142,21 @@ namespace resources {
 
 		return anim;
 	}
+	
+	animation& manager::create_inverse(assets::animation_id id, assets::texture_id first_frame, assets::texture_id last_frame, float frame_duration_ms) {
+		animation& anim = create(id);
+		anim.loop_mode = animation::loop_type::INVERSE;
+
+		for (assets::texture_id i = first_frame; i < last_frame; i = assets::texture_id(i + 1)) {
+			animation::frame frame;
+			frame.duration_milliseconds = frame_duration_ms;
+			frame.sprite.set(i);
+
+			anim.frames.push_back(frame);
+		}
+
+		return anim;
+	}
 
 	animation& manager::create_inverse_with_flip(assets::animation_id id, assets::texture_id first_frame, assets::texture_id last_frame, float frame_duration_ms) {
 		animation& anim = create(id);
