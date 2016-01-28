@@ -26,7 +26,7 @@ namespace augs {
 	}
 
 	entity_id entity::get_id() {
-		return owner_world.get_id(this);
+		return owner_world.get_id_from_raw_pointer(this);
 	}
 
 	void entity::clear() {

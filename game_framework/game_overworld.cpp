@@ -22,7 +22,7 @@ void SignalHandler(int signal) { throw "Access violation!"; }
 
 game_overworld::game_overworld() 
 	: main_game_world(*this) {
-	main_game_world.initialize_entity_component_pools(50000);
+	main_game_world.initialize_entity_and_component_pools(50000);
 }
 
 void game_overworld::set_scene_builder(std::unique_ptr<scene_builder> builder) {
