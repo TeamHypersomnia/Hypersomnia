@@ -108,7 +108,7 @@ namespace scene_builders {
 
 	}
 
-	void one_entity::execute_drawcalls(messages::camera_render_request_message msg) {
+	void one_entity::execute_drawcalls_for_camera(messages::camera_render_request_message msg) {
 		rendering_scripts::testbed_rendering(msg);
 	}
 }

@@ -198,7 +198,7 @@ namespace scene_builders {
 		target.call_triangles();
 	}
 
-	void testbed::execute_drawcalls(messages::camera_render_request_message msg) {
+	void testbed::execute_drawcalls_for_camera(messages::camera_render_request_message msg) {
 		rendering_scripts::testbed_rendering(msg);
 	}
 }

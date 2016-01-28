@@ -7,7 +7,7 @@
 #include "entity_system/entity.h"
 
 #include "../components/transform_component.h"
-#include "../shared/drawing_state.h"
+#include "../shared/state_for_drawing.h"
 
 #include "augs/misc/smooth_value_field.h"
 
@@ -54,7 +54,7 @@ namespace components {
 		
 		vec2i get_camera_offset_due_to_character_crosshair(augs::entity_id self);
 		
-		shared::drawing_state how_camera_will_render;
+		shared::state_for_drawing_camera how_camera_will_render;
 
 	private:
 		friend class camera_system;

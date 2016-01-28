@@ -2,7 +2,7 @@
 
 #include "render_system.h"
 #include "entity_system/entity.h"
-#include "../shared/drawing_state.h"
+#include "../shared/state_for_drawing.h"
 
 #include "augs/entity_system/overworld.h"
 
@@ -124,7 +124,7 @@ void render_system::determine_visible_entities_from_every_camera() {
 	}), always_visible_entities.end());
 }
 
-void render_system::generate_layers_from_visible_entities(shared::drawing_state& in, int mask) {
+void render_system::generate_layers_from_visible_entities(int mask) {
 	layers.clear();
 
 	/* shortcut */
@@ -237,20 +237,21 @@ void render_system::restore_actual_transforms() {
 	}
 }
 
-void render_system::draw_layer(drawing_state& in, int layer) {
-	auto in_camera_transform = in.camera_transform;
-	
+void render_system::draw_layer(state_for_drawing_camera in_camera, int layer) {
+	state_for_drawing_renderable in;
+	in.state_for_drawing_camera::operator=(in_camera);
+
 	if (layer < layers.size() && !layers[layer].empty()) {
 		for (auto e : layers[layer]) {
 			auto& render = e->get<components::render>();
 
-			in.object_transform = e->get<components::transform>();
-			in.object_transform.pos = vec2i(in.object_transform.pos);
-			in.object_transform.rotation = in.object_transform.rotation;
+			in.renderable_transform = e->get<components::transform>();
+			in.renderable_transform.pos = vec2i(in.renderable_transform.pos);
+			in.renderable_transform.rotation = in.renderable_transform.rotation;
 
-			in.subject = e;
+			in.renderable = e;
 
-			in.camera_transform = render.absolute_transform ? components::transform() : in_camera_transform;
+			in.camera_transform = render.absolute_transform ? components::transform() : in_camera.camera_transform;
 
 			auto* polygon = e->find<components::polygon>();
 			auto* sprite = e->find<components::sprite>();
@@ -261,12 +262,10 @@ void render_system::draw_layer(drawing_state& in, int layer) {
 			if (tile_layer) tile_layer->draw(in);
 		}
 	}
-
-	in.camera_transform = in_camera_transform;
 }
 
-void render_system::draw_all_visible_entities(drawing_state& in, int mask) {
-	generate_layers_from_visible_entities(in, mask);
+void render_system::draw_all_visible_entities(state_for_drawing_camera in, int mask) {
+	generate_layers_from_visible_entities(mask);
 
 	for (size_t i = 0; i < layers.size(); ++i)
 		draw_layer(in, layers.size()-i-1);

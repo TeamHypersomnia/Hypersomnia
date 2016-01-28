@@ -12,7 +12,7 @@ namespace augs {
 }
 
 namespace shared {
-	class drawing_state;
+	struct state_for_drawing_renderable;
 }
 
 namespace components {
@@ -47,7 +47,7 @@ namespace components {
 			return triangulated_polygon[i];
 		}
 
-		void draw(shared::drawing_state&);
+		void draw(const shared::state_for_drawing_renderable&) const;
 
 		std::vector<vec2> get_vertices();
 		rects::ltrb<float> get_aabb(components::transform);

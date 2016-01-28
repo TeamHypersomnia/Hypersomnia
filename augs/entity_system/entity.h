@@ -97,7 +97,7 @@ namespace augs {
 #ifdef INCLUDE_COMPONENT_NAMES
 		sorted_associative_vector<size_t, std::string> typestrs;
 #endif
-		std::string name;
+		std::string debug_name;
 
 		entity_id get_id();
 

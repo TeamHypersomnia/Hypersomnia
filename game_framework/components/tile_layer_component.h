@@ -4,7 +4,7 @@
 #include "transform_component.h"
 
 namespace shared {
-	class drawing_state;
+	struct state_for_drawing_renderable;
 }
 
 namespace augs {
@@ -32,10 +32,10 @@ namespace components {
 
 		void generate_indices_by_type(augs::rects::ltrb<int>);
 
-		void draw(shared::drawing_state&);
+		void draw(const shared::state_for_drawing_renderable&) const;
 		augs::rects::ltrb<float> get_aabb(components::transform transform);
 
-		augs::rects::ltrb<int> get_visible_tiles(shared::drawing_state&);
+		augs::rects::ltrb<int> get_visible_tiles(const shared::state_for_drawing_renderable&) const;
 
 		augs::rects::ltrb<int> indices_by_type_visibility;
 		std::vector<std::vector<vec2i>> indices_by_type;

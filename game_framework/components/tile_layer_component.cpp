@@ -2,7 +2,7 @@
 
 #include "sprite_component.h"
 
-#include "../shared/drawing_state.h"
+#include "../shared/state_for_drawing.h"
 
 #include "graphics/vertex.h"
 
@@ -24,13 +24,13 @@ namespace components {
 	tile_layer::tile::tile(unsigned type) : type_id(type) {}
 
 
-	rects::ltrb<int> tile_layer::get_visible_tiles(drawing_state& in) {
+	rects::ltrb<int> tile_layer::get_visible_tiles(const state_for_drawing_renderable& in) const {
 		rects::ltrb<int> visible_tiles;
 		
-		visible_tiles.l = int((in.transformed_visible_world_area_aabb.l - in.object_transform.pos.x) / 32.f);
-		visible_tiles.t = int((in.transformed_visible_world_area_aabb.t - in.object_transform.pos.y) / 32.f);
-		visible_tiles.r = int((in.transformed_visible_world_area_aabb.r - in.object_transform.pos.x) / 32.f) + 1;
-		visible_tiles.b = int((in.transformed_visible_world_area_aabb.b - in.object_transform.pos.y) / 32.f) + 1;
+		visible_tiles.l = int((in.transformed_visible_world_area_aabb.l - in.renderable_transform.pos.x) / 32.f);
+		visible_tiles.t = int((in.transformed_visible_world_area_aabb.t - in.renderable_transform.pos.y) / 32.f);
+		visible_tiles.r = int((in.transformed_visible_world_area_aabb.r - in.renderable_transform.pos.x) / 32.f) + 1;
+		visible_tiles.b = int((in.transformed_visible_world_area_aabb.b - in.renderable_transform.pos.y) / 32.f) + 1;
 		visible_tiles.l = std::max(0, visible_tiles.l);
 		visible_tiles.t = std::max(0, visible_tiles.t);
 		visible_tiles.r = std::min(size.w, visible_tiles.r);
@@ -39,13 +39,14 @@ namespace components {
 		return visible_tiles;
 	}
 
-	void tile_layer::draw(drawing_state& in) {
+	void tile_layer::draw(const state_for_drawing_renderable& in) const {
 		/* if it is not visible, return */
-		if (!in.transformed_visible_world_area_aabb.hover(rects::xywh<float>(in.object_transform.pos.x, in.object_transform.pos.y, size.w*square_size, size.h*square_size))) return;
+		// abc
+		if (!in.transformed_visible_world_area_aabb.hover(rects::xywh<float>(in.renderable_transform.pos.x, in.renderable_transform.pos.y, size.w*square_size, size.h*square_size))) return;
 
 		auto visible_tiles = get_visible_tiles(in);
 
-		drawing_state draw_input_copy = in;
+		state_for_drawing_renderable draw_input_copy = in;
 
 		for (int y = visible_tiles.t; y < visible_tiles.b; ++y) {
 			for (int x = visible_tiles.l; x < visible_tiles.r; ++x) {
@@ -62,7 +63,7 @@ namespace components {
 				static thread_local sprite tile_sprite;
 				tile_sprite.tex = type.tile_texture;
 
-				draw_input_copy.object_transform.pos = vec2i(in.object_transform.pos) + tile_offset + vec2(square_size / 2, square_size / 2);
+				draw_input_copy.renderable_transform.pos = vec2i(in.renderable_transform.pos) + tile_offset + vec2(square_size / 2, square_size / 2);
 
 				tile_sprite.draw(draw_input_copy);
 			}

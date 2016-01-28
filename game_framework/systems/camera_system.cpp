@@ -10,7 +10,7 @@
 #include "../components/physics_component.h"
 #include "../messages/intent_message.h"
 #include "../messages/camera_render_request_message.h"
-#include "../shared/drawing_state.h"
+#include "../shared/state_for_drawing.h"
 #include "entity_system/world.h"
 
 components::crosshair* components::camera::get_crosshair() {
@@ -199,7 +199,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 
 			camera.dont_smooth_once = false;
 
-			shared::drawing_state in;
+			shared::state_for_drawing_camera in;
 			in.transformed_visible_world_area_aabb = rects::ltrb<float>::get_aabb_rotated(smoothed_visible_world_area, smoothed_camera_transform.rotation) 
 				+ smoothed_camera_transform.pos - smoothed_visible_world_area / 2;
 			in.camera_transform = smoothed_camera_transform;

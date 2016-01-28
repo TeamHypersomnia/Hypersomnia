@@ -17,18 +17,18 @@ namespace augs {
 		delete_all_entities();
 	}
 
-	entity_id world::create_entity(std::string name) {
+	entity_id world::create_entity(std::string debug_name) {
 		entity_id res = entities.allocate(std::ref(*this));
-		res->name = name;
+		res->debug_name = debug_name;
 
 		messages::new_entity_message msg;
 		msg.subject = res;
 		post_message(msg);
 
 #ifdef USE_NAMES_FOR_IDS
-		strcpy(res.name, name.c_str());
+		strcpy(res.debug_name, debug_name.c_str());
 #endif
-		assert(res.name != "");
+		assert(res.debug_name != "");
 
 		return res;
 	}
@@ -45,7 +45,7 @@ namespace augs {
 		auto new_id = entities.get_id(e);
 
 #ifdef USE_NAMES_FOR_IDS
-		strcpy(new_id.name, e->name.c_str());
+		strcpy(new_id.debug_name, e->debug_name.c_str());
 #endif
 
 		return new_id;

@@ -998,8 +998,8 @@
     <ClInclude Include="game_framework\scene_builders\rendering_scripts\testbed_rendering.h" />
     <ClInclude Include="game_framework\scene_builders\scene_builder.h" />
     <ClInclude Include="game_framework\scene_builders\testbed.h" />
-    <ClInclude Include="game_framework\shared\drawing_state.h" />
     <ClInclude Include="game_framework\shared\physics_setup_helpers.h" />
+    <ClInclude Include="game_framework\shared\state_for_drawing.h" />
     <ClInclude Include="game_framework\systems\animation_system.h" />
     <ClInclude Include="game_framework\systems\behaviour_tree_system.h" />
     <ClInclude Include="game_framework\systems\camera_system.h" />

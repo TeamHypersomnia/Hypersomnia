@@ -7,7 +7,7 @@
 #include "transform_component.h"
 
 namespace shared {
-	class drawing_state;
+	struct state_for_drawing_renderable;
 }
 
 namespace components {
@@ -27,7 +27,7 @@ namespace components {
 		void set(assets::texture_id, augs::rgba = augs::rgba());
 		void update_size();
 
-		void draw(shared::drawing_state&);
+		void draw(const shared::state_for_drawing_renderable&) const;
 
 		std::vector<vec2> get_vertices() const;
 		augs::rects::ltrb<float> get_aabb(components::transform) const;

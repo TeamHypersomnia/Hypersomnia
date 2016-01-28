@@ -2525,9 +2525,6 @@
     <ClInclude Include="game_framework\components\tile_layer_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\shared\drawing_state.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\resources\manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2904,6 +2901,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\constant_size_vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\shared\state_for_drawing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

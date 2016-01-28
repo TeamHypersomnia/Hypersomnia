@@ -4,7 +4,7 @@
 #include "3rdparty/polypartition/polypartition.h"
 
 #include "graphics/renderer.h"
-#include "../shared/drawing_state.h"
+#include "../shared/state_for_drawing.h"
 
 #include "game_framework/resources/manager.h"
 
@@ -123,21 +123,21 @@ namespace components {
 		return std::move(out);
 	}
 
-	void polygon::draw(shared::drawing_state& in) {
+	void polygon::draw(const shared::state_for_drawing_renderable& in) const {
 		vertex_triangle new_tri;
 		auto camera_pos = in.camera_transform.pos;
 
 		auto model_transformed = triangulated_polygon;
 
 		/* initial transformation for visibility checks */
-		if (std::abs(in.object_transform.rotation) > 0.f)
+		if (std::abs(in.renderable_transform.rotation) > 0.f)
 			for (auto& v : model_transformed)
-				v.pos.rotate(in.object_transform.rotation, vec2(0, 0));
+				v.pos.rotate(in.renderable_transform.rotation, vec2(0, 0));
 
 		/* further rotation of the polygon to fit the camera transform */
 		for (auto& v : model_transformed) {
 			auto center = in.visible_world_area / 2;
-			v.pos += in.object_transform.pos - camera_pos + center;
+			v.pos += in.renderable_transform.pos - camera_pos + center;
 
 			/* rotate around the center of the screen */
 			if (std::abs(in.camera_transform.rotation) > 0.f)

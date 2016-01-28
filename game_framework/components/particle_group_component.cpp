@@ -1,10 +1,10 @@
 #include "particle_group_component.h"
-#include "../shared/drawing_state.h"
+#include "../shared/state_for_drawing.h"
 
 using namespace augs;
 
 namespace components {
-	void particle_group::draw(shared::drawing_state& in) {
+	void particle_group::draw(shared::state_for_drawing_renderable in) {
 		for (auto& s : stream_slots)
 			for (auto& it : s.particles.particles) {
 				auto temp_alpha = it.face.color.a;
@@ -19,7 +19,7 @@ namespace components {
 					}
 				}
 
-				in.object_transform = it.ignore_rotation ? components::transform(it.pos, 0) : components::transform({ it.pos, it.rotation });
+				in.renderable_transform = it.ignore_rotation ? components::transform(it.pos, 0) : components::transform({ it.pos, it.rotation });
 				it.face.draw(in);
 				it.face.color.a = temp_alpha;
 			}

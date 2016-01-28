@@ -13,7 +13,7 @@ namespace resources {
 }
 
 namespace shared {
-	class drawing_state;
+	struct state_for_drawing_renderable;
 }
 
 namespace components {
@@ -57,7 +57,7 @@ namespace components {
 		std::vector<stream> stream_slots;
 		particle_group() { stream_slots.resize(1); }
 
-		void draw(shared::drawing_state&);
+		void draw(shared::state_for_drawing_renderable);
 	private:
 		friend class particle_group_system;
 		friend class particle_emitter_system;

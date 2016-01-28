@@ -76,7 +76,7 @@ namespace augs {
 
 			void unset();
 #ifdef USE_NAMES_FOR_IDS
-			char name[30];
+			char debug_name[30];
 #endif
 		};
 
@@ -105,7 +105,7 @@ namespace augs {
 
 			using id::unset;
 #ifdef USE_NAMES_FOR_IDS
-			using id::name;
+			using id::debug_name;
 #endif
 		};
 

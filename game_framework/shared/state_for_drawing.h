@@ -10,20 +10,20 @@ namespace augs {
 }
 
 namespace shared {
-	struct drawing_state {
+	struct state_for_drawing_camera {
 		augs::renderer* output = nullptr;
 
-		components::transform object_transform;
 		components::transform camera_transform;
-		
+
 		vec2 visible_world_area;
 
 		// used for visibility queries
 		augs::rects::ltrb<float> transformed_visible_world_area_aabb;
-
 		augs::rects::xywh<int> viewport;
+	};
 
-		augs::entity_id subject;
-
+	struct state_for_drawing_renderable : state_for_drawing_camera {
+		components::transform renderable_transform;
+		augs::entity_id renderable;
 	};
 }

@@ -19,7 +19,7 @@
 using namespace augs;
 
 namespace shared {
-	class drawing_state;
+	struct state_for_drawing_camera;
 }
 
 class render_system : public event_only_system {
@@ -42,9 +42,9 @@ public:
 	void calculate_and_set_interpolated_transforms();
 	void restore_actual_transforms();
 
-	void generate_layers_from_visible_entities(shared::drawing_state& in, int mask);
-	void draw_layer(shared::drawing_state& in, int layer);
-	void draw_all_visible_entities(shared::drawing_state& in, int mask);
+	void generate_layers_from_visible_entities(int mask);
+	void draw_layer(shared::state_for_drawing_camera in, int layer);
+	void draw_all_visible_entities(shared::state_for_drawing_camera in, int mask);
 
 	bool enable_interpolation = true;
 	std::vector<entity_id> always_visible_entities;

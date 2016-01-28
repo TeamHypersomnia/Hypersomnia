@@ -5,7 +5,7 @@
 #include "gui/text/printer.h"
 #include "gui/text/drafter.h"
 
-#include "game_framework/shared/drawing_state.h"
+#include "game_framework/shared/state_for_drawing.h"
 #include "game_framework/systems/render_system.h"
 
 #include "misc/vector_wrapper.h"
@@ -22,7 +22,7 @@ std::string wchar_vec_to_str(vector_wrapper<wchar_t> str) {
 	return std::string(out_w.begin(), out_w.end());
 }
 
-rects::wh<float> quick_print_wrapper(shared::drawing_state v,
+rects::wh<float> quick_print_wrapper(shared::state_for_drawing_renderable v,
 	const fstr& str,
 	vec2 pos,
 	unsigned wrapping_width,
@@ -65,11 +65,11 @@ namespace bindings {
 
 
 			//.def(luabind::constructor<>())
-			//.def_readwrite("camera_transform", &drawing_state::camera_transform)
-			//.def_readwrite("visible_world_area", &drawing_state::visible_world_area)
-			//.def_readwrite("additional_info", &drawing_state::additional_info)
-			//.def_readwrite("output", &drawing_state::output)
-			//.def_readwrite("transform", &drawing_state::transform)
+			//.def_readwrite("camera_transform", &state_for_drawing_renderable::camera_transform)
+			//.def_readwrite("visible_world_area", &state_for_drawing_renderable::visible_world_area)
+			//.def_readwrite("additional_info", &state_for_drawing_renderable::additional_info)
+			//.def_readwrite("output", &state_for_drawing_renderable::output)
+			//.def_readwrite("transform", &state_for_drawing_renderable::transform)
 			//,
 
 			;

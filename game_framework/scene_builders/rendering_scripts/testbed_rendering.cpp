@@ -10,7 +10,7 @@
 
 namespace rendering_scripts {
 	void testbed_rendering(messages::camera_render_request_message msg) {
-		auto& state = msg.state;
+		auto state = msg.state;
 		auto mask = msg.mask;
 		auto camera = msg.camera;
 

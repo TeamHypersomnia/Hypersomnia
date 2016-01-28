@@ -1,7 +1,7 @@
 #include "sprite_component.h"
 #include "texture_baker/texture_baker.h"
 
-#include "../shared/drawing_state.h"
+#include "../shared/state_for_drawing.h"
 #include "../components/render_component.h"
 
 #include "entity_system/entity.h"
@@ -48,19 +48,20 @@ namespace components {
 		size = vec2i(resource_manager.find(tex)->tex.get_size());
 	}
 
-	void sprite::draw(drawing_state& in) {
-		auto& render = in.subject->get<components::render>();
+	void sprite::draw(const state_for_drawing_renderable& in) const {
+		auto renderable = in.renderable;
+		auto render = renderable->get<components::render>();
 
 		render.was_drawn = false;
 
 		static thread_local vec2 v[4];
-		vec2i transform_pos = in.object_transform.pos;
-		make_rect(transform_pos, vec2(size), in.object_transform.rotation, v);
+		vec2i transform_pos = in.renderable_transform.pos;
+		make_rect(transform_pos, vec2(size), in.renderable_transform.rotation, v);
 
 		auto center = in.visible_world_area / 2;
 
 		auto target_position = transform_pos - in.camera_transform.pos + center;
-		make_rect(target_position, vec2(size), in.object_transform.rotation + rotation_offset, v);
+		make_rect(target_position, vec2(size), in.renderable_transform.rotation + rotation_offset, v);
 
 		/* rotate around the center of the screen */
 		if (in.camera_transform.rotation != 0.f)

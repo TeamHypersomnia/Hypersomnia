@@ -80,7 +80,7 @@ void game_world::bind_this_to_lua_global(lua_state_wrapper& lua, std::string glo
 	lua.global_ptr(global, this);
 }
 
-void bind_game_framework_and_augs(augs::lua_state_wrapper& wrapper, std::function<void()> custom_world_binding) {
+void bind_game_framework_and_augs(augs::lua_state_wrapper& wrapper) {
 	using namespace resources;
 	using namespace helpers;
 

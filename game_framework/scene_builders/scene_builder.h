@@ -20,5 +20,5 @@ struct scene_builder {
 	virtual void perform_logic_step(augs::world& world);
 	virtual void drawcalls_after_all_cameras(augs::world& world);
 
-	virtual void execute_drawcalls(messages::camera_render_request_message);
+	virtual void execute_drawcalls_for_camera(messages::camera_render_request_message);
 };
