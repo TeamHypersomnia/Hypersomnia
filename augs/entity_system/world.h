@@ -74,9 +74,15 @@ namespace augs {
 		}
 
 		template <typename T>
-		void iterate_with_remove(std::function<bool(T&)> cb) {
-			auto& q = get_message_queue<T>();
-			q.erase(std::remove_if(q.begin(), q.end(), cb), q.end());
+		void delete_marked_messages(std::vector<T>& messages) {
+			messages.erase(std::remove_if(messages.begin(), messages.end(), [](const T& msg) { 
+				return msg.delete_this_message; 
+			}), messages.end());
+		}
+
+		template <typename T>
+		void delete_marked_messages() {
+			delete_marked_messages(get_message_queue<T>());
 		}
 
 		template<class T>

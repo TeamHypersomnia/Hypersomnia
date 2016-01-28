@@ -7,6 +7,8 @@ namespace messages {
 	*/
 	struct message {
 		augs::entity_id subject;
+		bool delete_this_message = false;
+
 		message(augs::entity_id subject = augs::entity_id()) : subject(subject) {}
 	};
 }
