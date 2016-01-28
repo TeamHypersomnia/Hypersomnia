@@ -3,20 +3,20 @@
 
 namespace augs  {
 	template<class T, int const_count>
-	class constant_vector {
+	class constant_size_vector {
 		typedef std::array<T, const_count> arr_type;
 
-		constant_vector(constant_vector&&) = delete;
+		constant_size_vector(constant_size_vector&&) = delete;
 
 		size_t count = 0;
 	public:
-		constant_vector(const constant_vector&) = default;
-		constant_vector& operator=(constant_vector&&) = delete;
+		constant_size_vector(const constant_size_vector&) = default;
+		constant_size_vector& operator=(constant_size_vector&&) = delete;
 		
-		constant_vector() = default;
-		constant_vector& operator=(const constant_vector&) = default;
+		constant_size_vector() = default;
+		constant_size_vector& operator=(const constant_size_vector&) = default;
 
-		constant_vector& operator=(const std::vector<T>& t) {
+		constant_size_vector& operator=(const std::vector<T>& t) {
 			count = 0;
 			for (size_t i = 0; i < t.size(); ++i) {
 				push_back(t[i]);
