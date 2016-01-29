@@ -1,6 +1,6 @@
 #pragma once
 #include "entity_system/processing_system.h"
-#include "../components/input_component.h"
+#include "../components/input_receiver_component.h"
 #include "../messages/intent_message.h"
 
 #include "../messages/crosshair_intent_message.h"
@@ -11,7 +11,7 @@
 
 using namespace augs;
 
-struct input_system : public processing_system_templated<components::input> {
+struct input_system : public processing_system_templated<components::input_receiver> {
 	struct context {
 		std::unordered_map<window::event::keys::key, std::vector<messages::intent_message::intent_type>> key_to_intent;
 		std::unordered_map<window::event::message,	 std::vector<messages::intent_message::intent_type>> event_to_intent;

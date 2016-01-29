@@ -938,6 +938,8 @@
     <ClInclude Include="game_framework\components\behaviour_tree_component.h" />
     <ClInclude Include="game_framework\components\camera_component.h" />
     <ClInclude Include="game_framework\components\car_component.h" />
+    <ClInclude Include="game_framework\components\gui_input_receiver_component.h" />
+    <ClInclude Include="game_framework\components\input_receiver_component.h" />
     <ClInclude Include="game_framework\components\position_copying_component.h" />
     <ClInclude Include="game_framework\components\children_component.h" />
     <ClInclude Include="game_framework\components\crosshair_component.h" />
@@ -945,7 +947,6 @@
     <ClInclude Include="game_framework\components\driver_component.h" />
     <ClInclude Include="game_framework\components\fixtures_component.h" />
     <ClInclude Include="game_framework\components\gun_component.h" />
-    <ClInclude Include="game_framework\components\input_component.h" />
     <ClInclude Include="game_framework\components\rotation_copying_component.h" />
     <ClInclude Include="game_framework\components\movement_component.h" />
     <ClInclude Include="game_framework\components\particle_emitter_component.h" />

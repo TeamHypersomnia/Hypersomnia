@@ -23,7 +23,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_component<crosshair>();
 	register_component<damage>();
 	register_component<gun>();
-	register_component<input>();
+	register_component<input_receiver>();
 	register_component<rotation_copying>();
 	register_component<movement>();
 	register_component<particle_emitter>();

@@ -1,16 +1,16 @@
 #include "input_profiles.h"
 
 namespace input_profiles {
-	components::input crosshair() {
-		components::input out;
+	components::input_receiver crosshair() {
+		components::input_receiver out;
 		out.add(messages::intent_message::MOVE_CROSSHAIR);
 		out.add(messages::intent_message::CROSSHAIR_PRIMARY_ACTION);
 		out.add(messages::intent_message::CROSSHAIR_SECONDARY_ACTION);
 		return out;
 	}
 
-	components::input character() {
-		components::input out;
+	components::input_receiver character() {
+		components::input_receiver out;
 		out.add(messages::intent_message::PRESS_TRIGGER);
 		out.add(messages::intent_message::MOVE_BACKWARD);
 		out.add(messages::intent_message::MOVE_FORWARD);

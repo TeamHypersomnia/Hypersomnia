@@ -2390,9 +2390,6 @@
     <ClInclude Include="game_framework\components\gun_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\components\input_component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\components\rotation_copying_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2904,6 +2901,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\shared\state_for_drawing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\components\gui_input_receiver_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\components\input_receiver_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

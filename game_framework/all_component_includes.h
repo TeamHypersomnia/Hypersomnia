@@ -10,7 +10,7 @@
 #include "components/crosshair_component.h"
 #include "components/damage_component.h"
 #include "components/gun_component.h"
-#include "components/input_component.h"
+#include "components/input_receiver_component.h"
 #include "components/rotation_copying_component.h"
 #include "components/movement_component.h"
 #include "components/particle_emitter_component.h"

@@ -40,7 +40,7 @@ namespace augs {
 		remove<components::crosshair>();
 		remove<components::damage>();
 		remove<components::gun>();
-		remove<components::input>();
+		remove<components::input_receiver>();
 		remove<components::rotation_copying>();
 		remove<components::movement>();
 		remove<components::particle_emitter>();

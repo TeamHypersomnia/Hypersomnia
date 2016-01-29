@@ -4,12 +4,12 @@
 
 #include "game_framework/components/position_copying_component.h"
 #include "game_framework/components/camera_component.h"
-#include "game_framework/components/input_component.h"
+#include "game_framework/components/input_receiver_component.h"
 
 namespace ingredients {
 	void camera(augs::entity_id e, int w, int h) {
 		components::transform transform;
-		components::input input;
+		components::input_receiver input;
 		components::camera camera;
 		components::position_copying position_copying;
 

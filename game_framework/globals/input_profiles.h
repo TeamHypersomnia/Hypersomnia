@@ -1,7 +1,7 @@
 #pragma once
-#include "../components/input_component.h"
+#include "../components/input_receiver_component.h"
 
 namespace input_profiles {
-	components::input crosshair();
-	components::input character();
+	components::input_receiver crosshair();
+	components::input_receiver character();
 }

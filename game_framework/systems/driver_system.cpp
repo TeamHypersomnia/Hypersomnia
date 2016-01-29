@@ -5,7 +5,7 @@
 
 #include "../components/trigger_component.h"
 #include "../components/car_component.h"
-#include "../components/input_component.h"
+#include "../components/input_receiver_component.h"
 #include "../components/children_component.h"
 #include "../components/movement_component.h"
 #include "../components/rotation_copying_component.h"

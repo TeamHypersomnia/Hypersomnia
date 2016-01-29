@@ -4,7 +4,7 @@
 
 #include "game_framework/components/position_copying_component.h"
 #include "game_framework/components/camera_component.h"
-#include "game_framework/components/input_component.h"
+#include "game_framework/components/input_receiver_component.h"
 #include "game_framework/components/crosshair_component.h"
 #include "game_framework/components/sprite_component.h"
 #include "game_framework/components/movement_component.h"
