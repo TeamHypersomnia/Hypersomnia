@@ -54,6 +54,8 @@ namespace components {
 		vec2 get_position();
 		vec2 get_world_center();
 
+		void set_active(bool);
+
 		void set_transform(components::transform);
 		void set_transform(augs::entity_id);
 	};

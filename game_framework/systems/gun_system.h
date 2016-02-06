@@ -7,7 +7,6 @@
 
 using namespace augs;
 
-
 class physics_system;
 
 class gun_system : public processing_system_templated<components::transform, components::gun> {

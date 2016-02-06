@@ -8,5 +8,11 @@ namespace components {
 		float rotation = 0.0f;
 
 		transform(vec2 pos = vec2(), float rotation = 0.0f) : pos(pos), rotation(rotation) {}
+		transform operator+(const transform& b) const {
+			transform out;
+			out.pos = pos + b.pos;
+			out.rotation = rotation + b.rotation;
+			return out;
+		}
 	};
 }

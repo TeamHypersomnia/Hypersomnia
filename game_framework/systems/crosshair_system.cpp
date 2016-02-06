@@ -16,9 +16,9 @@ void crosshair_system::generate_crosshair_intents() {
 		messages::crosshair_intent_message crosshair_intent;
 		crosshair_intent.messages::intent_message::operator=(it);
 
-		if (it.intent == messages::intent_message::intent_type::MOVE_CROSSHAIR ||
-			it.intent == messages::intent_message::intent_type::CROSSHAIR_PRIMARY_ACTION ||
-			it.intent == messages::intent_message::intent_type::CROSSHAIR_SECONDARY_ACTION
+		if (it.intent == intent_type::MOVE_CROSSHAIR ||
+			it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION ||
+			it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION
 			) {
 			auto& subject = it.subject;
 			auto crosshair = subject->find<components::crosshair>();

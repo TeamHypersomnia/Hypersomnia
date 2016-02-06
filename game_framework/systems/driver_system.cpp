@@ -65,7 +65,7 @@ void driver_system::release_drivers_due_to_requests() {
 	auto& intents = parent_world.get_message_queue<messages::intent_message>();
 
 	for (auto& e : intents) {
-		if (e.intent == messages::intent_message::RELEASE_CAR && e.pressed_flag) {
+		if (e.intent == intent_type::RELEASE_CAR && e.pressed_flag) {
 			auto* maybe_driver = e.subject->find<components::driver>();
 
 			if (maybe_driver) {
@@ -166,11 +166,11 @@ void driver_system::delegate_movement_intents_from_drivers_to_steering_intents_o
 	auto& intents = parent_world.get_message_queue<messages::intent_message>();
 
 	for (auto& e : intents) {
-		if (e.intent == messages::intent_message::MOVE_FORWARD
-			|| e.intent == messages::intent_message::MOVE_BACKWARD
-			|| e.intent == messages::intent_message::MOVE_LEFT
-			|| e.intent == messages::intent_message::MOVE_RIGHT
-			|| e.intent == messages::intent_message::HAND_BRAKE
+		if (e.intent == intent_type::MOVE_FORWARD
+			|| e.intent == intent_type::MOVE_BACKWARD
+			|| e.intent == intent_type::MOVE_LEFT
+			|| e.intent == intent_type::MOVE_RIGHT
+			|| e.intent == intent_type::HAND_BRAKE
 			) {
 			auto* maybe_driver = e.subject->find<components::driver>();
 

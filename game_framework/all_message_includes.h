@@ -15,3 +15,5 @@
 #include "messages/car_ownership_change_message.h"
 #include "messages/new_entity_message.h"
 #include "messages/camera_render_request_message.h"
+#include "messages/item_slot_transfer_request.h"
+

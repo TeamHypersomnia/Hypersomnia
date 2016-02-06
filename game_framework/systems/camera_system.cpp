@@ -41,7 +41,7 @@ void camera_system::react_to_input_intents() {
 		if (it.subject->find<components::camera>() == nullptr)
 			continue;
 
-		if (it.intent == messages::intent_message::intent_type::SWITCH_LOOK && it.pressed_flag) {
+		if (it.intent == intent_type::SWITCH_LOOK && it.pressed_flag) {
 			auto& camera = it.subject->get<components::camera>();
 			auto& mode = camera.orbit_mode;
 

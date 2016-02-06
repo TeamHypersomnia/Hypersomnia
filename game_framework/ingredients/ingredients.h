@@ -27,6 +27,9 @@ namespace ingredients {
 
 	void make_always_visible(augs::entity_id);
 	void cancel_always_visible(augs::entity_id);
+
+	void character_inventory(augs::entity_id);
+	void backpack(augs::entity_id);
 }
 
 namespace prefabs {

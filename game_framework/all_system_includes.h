@@ -20,4 +20,6 @@
 #include "systems/car_system.h"
 #include "systems/driver_system.h"
 #include "systems/trigger_detector_system.h"
+#include "systems/item_system.h"
+
 

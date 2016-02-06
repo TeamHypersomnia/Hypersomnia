@@ -50,7 +50,7 @@ void gun_system::consume_events() {
 	auto events = parent_world.get_message_queue<messages::intent_message>();
 
 	for (auto it : events) {
-		if (it.intent == messages::intent_message::intent_type::SHOOT) {
+		if (it.intent == intent_type::SHOOT) {
 			auto* gun = it.subject->find<components::gun>();
 			if (gun)
 				gun->trigger_mode = it.pressed_flag ? (gun->current_rounds > 0 ? gun->SHOOT : gun->MELEE) : gun->NONE;

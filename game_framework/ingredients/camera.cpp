@@ -13,8 +13,8 @@ namespace ingredients {
 		components::camera camera;
 		components::position_copying position_copying;
 
-		input.add(messages::intent_message::SWITCH_LOOK);
-		input.add(messages::intent_message::ZOOM_CAMERA);
+		input.add(intent_type::SWITCH_LOOK);
+		input.add(intent_type::ZOOM_CAMERA);
 
 		camera.enable_smoothing = true;
 		camera.mask = components::render::WORLD;

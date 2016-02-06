@@ -57,7 +57,7 @@ namespace scene_builders {
 		resource_manager.create_sprites_indexed(
 			assets::texture_id::TORSO_MOVING_FIRST,
 			assets::texture_id::TORSO_MOVING_LAST,
-			L"hypersomnia/gfx/torso_white_walk_rifle");
+			L"hypersomnia/gfx/sprite");
 
 		resource_manager.create(assets::atlas_id::GAME_WORLD_ATLAS,
 			resources::manager::atlas_creation_mode::FROM_ALL_TEXTURES
@@ -67,7 +67,7 @@ namespace scene_builders {
 		resource_manager.create(assets::shader_id::DEFAULT_FRAGMENT, L"hypersomnia/shaders/default.fsh", graphics::shader::type::FRAGMENT);
 		resource_manager.create(assets::program_id::DEFAULT, assets::shader_id::DEFAULT_VERTEX, assets::shader_id::DEFAULT_FRAGMENT);
 
-		resource_manager.create_inverse(assets::animation_id::TORSO_MOVE,
+		resource_manager.create_inverse_with_flip(assets::animation_id::TORSO_MOVE,
 			assets::texture_id::TORSO_MOVING_FIRST,
 			assets::texture_id::TORSO_MOVING_LAST,
 			20.0f);
@@ -120,6 +120,8 @@ namespace scene_builders {
 
 		ingredients::wsad_player_physics(player);
 
+		ingredients::character_inventory(player);
+
 		ingredients::sprite_scalled(crate, vec2(200, 300), vec2i(100, 100)/3, assets::texture_id::CRATE, augs::colors::white, render_layer::DYNAMIC_BODY);
 		ingredients::crate_physics(crate);
 		
@@ -130,17 +132,19 @@ namespace scene_builders {
 		ingredients::crate_physics(crate4);
 
 		input_system::context active_context;
-		active_context.map_event_to_intent(window::event::raw_mousemotion, messages::intent_message::MOVE_CROSSHAIR);
-		active_context.map_key_to_intent(window::event::keys::LSHIFT, messages::intent_message::SWITCH_LOOK);
-		active_context.map_key_to_intent(window::event::keys::W, messages::intent_message::MOVE_FORWARD);
-		active_context.map_key_to_intent(window::event::keys::S, messages::intent_message::MOVE_BACKWARD);
-		active_context.map_key_to_intent(window::event::keys::A, messages::intent_message::MOVE_LEFT);
-		active_context.map_key_to_intent(window::event::keys::D, messages::intent_message::MOVE_RIGHT);
-		active_context.map_key_to_intent(window::event::keys::LMOUSE, messages::intent_message::CROSSHAIR_PRIMARY_ACTION);
-		active_context.map_key_to_intent(window::event::keys::RMOUSE, messages::intent_message::CROSSHAIR_SECONDARY_ACTION);
-		active_context.map_key_to_intent(window::event::keys::E, messages::intent_message::RELEASE_CAR);
-		active_context.map_key_to_intent(window::event::keys::E, messages::intent_message::PRESS_TRIGGER);
-		active_context.map_key_to_intent(window::event::keys::SPACE, messages::intent_message::HAND_BRAKE);
+		active_context.map_event_to_intent(window::event::raw_mousemotion, intent_type::MOVE_CROSSHAIR);
+		active_context.map_key_to_intent(window::event::keys::LSHIFT, intent_type::SWITCH_LOOK);
+		active_context.map_key_to_intent(window::event::keys::W, intent_type::MOVE_FORWARD);
+		active_context.map_key_to_intent(window::event::keys::S, intent_type::MOVE_BACKWARD);
+		active_context.map_key_to_intent(window::event::keys::A, intent_type::MOVE_LEFT);
+		active_context.map_key_to_intent(window::event::keys::D, intent_type::MOVE_RIGHT);
+		active_context.map_key_to_intent(window::event::keys::LMOUSE, intent_type::CROSSHAIR_PRIMARY_ACTION);
+		active_context.map_key_to_intent(window::event::keys::RMOUSE, intent_type::CROSSHAIR_SECONDARY_ACTION);
+		active_context.map_key_to_intent(window::event::keys::E, intent_type::RELEASE_CAR);
+		active_context.map_key_to_intent(window::event::keys::E, intent_type::PRESS_TRIGGER);
+		active_context.map_key_to_intent(window::event::keys::G, intent_type::DROP_PRIMARY_ITEM);
+		active_context.map_key_to_intent(window::event::keys::H, intent_type::DROP_SECONDARY_ITEM);
+		active_context.map_key_to_intent(window::event::keys::SPACE, intent_type::HAND_BRAKE);
 
 		world.get_system<input_system>().add_context(active_context);
 
@@ -173,12 +177,12 @@ namespace scene_builders {
 
 		for (auto& it : inputs) {
 			bool draw = false;
-			if (it.intent == messages::intent_message::CROSSHAIR_PRIMARY_ACTION) {
+			if (it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION) {
 				keep_drawing = it.pressed_flag;
 				draw = true;
 			}
 
-			if (draw || (it.intent == messages::intent_message::MOVE_CROSSHAIR && keep_drawing)) {
+			if (draw || (it.intent == intent_type::MOVE_CROSSHAIR && keep_drawing)) {
 				auto ent = world.create_entity("drawn_sprite");
 				ingredients::sprite_scalled(ent, it.crosshair_world_pos, vec2(10, 10), assets::texture_id::BLANK);
 			}

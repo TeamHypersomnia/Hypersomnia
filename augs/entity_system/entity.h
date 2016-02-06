@@ -40,6 +40,8 @@ namespace components {
 	struct trigger;
 	struct trigger_detector;
 	struct fixtures;
+	struct container;
+	struct item;
 }
 #endif
 
@@ -86,7 +88,9 @@ namespace augs {
 			std::pair<memory_pool::id, components::driver*>,
 			std::pair<memory_pool::id, components::trigger*>,
 			std::pair<memory_pool::id, components::trigger_detector*>,
-			std::pair<memory_pool::id, components::fixtures*>
+			std::pair<memory_pool::id, components::fixtures*>,
+			std::pair<memory_pool::id, components::container*>,
+			std::pair<memory_pool::id, components::item*>
 		> type_to_component;
 
 		component_bitset_matcher signature;

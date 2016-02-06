@@ -42,6 +42,8 @@ void game_world::register_types_of_messages_components_systems() {
 	register_component<trigger>();
 	register_component<trigger_detector>();
 	register_component<fixtures>();
+	register_component<item>();
+	register_component<container>();
 	
 	register_system<input_system>();
 	register_system<steering_system>();
@@ -64,6 +66,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_system<car_system>();
 	register_system<driver_system>();
 	register_system<trigger_detector_system>();
+	register_system<item_system>();
 
 	register_message_queue<intent_message>();
 	register_message_queue<damage_message>();
@@ -81,6 +84,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_message_queue<car_ownership_change_message>();
 	register_message_queue<new_entity_message>();
 	register_message_queue<camera_render_request_message>();
+	register_message_queue<item_slot_transfer_request>();
 }
 
 void game_world::call_drawing_time_systems() {
@@ -141,6 +145,8 @@ void game_world::perform_logic_step() {
 	get_system<camera_system>().react_to_input_intents();
 
 	get_system<driver_system>().release_drivers_due_to_requests();
+
+	get_system<trigger_detector_system>().consume_trigger_detector_presses();
 	get_system<trigger_detector_system>().find_trigger_collisions_and_send_confirmations();
 
 	get_system<driver_system>().assign_drivers_from_triggers();

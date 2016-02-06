@@ -13,13 +13,13 @@ using namespace augs;
 
 struct input_system : public processing_system_templated<components::input_receiver> {
 	struct context {
-		std::unordered_map<window::event::keys::key, std::vector<messages::intent_message::intent_type>> key_to_intent;
-		std::unordered_map<window::event::message,	 std::vector<messages::intent_message::intent_type>> event_to_intent;
+		std::unordered_map<window::event::keys::key, std::vector<intent_type>> key_to_intent;
+		std::unordered_map<window::event::message,	 std::vector<intent_type>> event_to_intent;
 		bool enabled;
 		context();
 
-		void map_key_to_intent(window::event::keys::key, messages::intent_message::intent_type);
-		void map_event_to_intent(window::event::message, messages::intent_message::intent_type);
+		void map_key_to_intent(window::event::keys::key, intent_type);
+		void map_event_to_intent(window::event::message, intent_type);
 	};
 
 	void acquire_new_events_posted_by_drawing_time_systems();

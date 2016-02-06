@@ -11,9 +11,10 @@ namespace augs {
 
 	public:
 		struct deterministic_timer {
-			overworld* parent_overworld;
+			overworld* parent_overworld = nullptr;
 			unsigned long long step_recorded = 0;
 
+			deterministic_timer() = default;
 			deterministic_timer(augs::overworld* owner);
 
 			void reset();

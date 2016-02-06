@@ -59,6 +59,8 @@ namespace augs {
 		remove<components::trigger>();
 		remove<components::trigger_detector>();
 		remove<components::fixtures>();
+		remove<components::container>();
+		remove<components::item>();
 #else
 		auto ids_to_remove = type_to_component.raw;
 

@@ -16,16 +16,16 @@ void movement_system::set_movement_flags_from_input() {
 
 		for (auto& ie : it.intent.intents) {
 			switch (ie) {
-			case intent_message::intent_type::MOVE_FORWARD:
+			case intent_type::MOVE_FORWARD:
 				movement->moving_forward = it.pressed_flag;
 				break;
-			case intent_message::intent_type::MOVE_BACKWARD:
+			case intent_type::MOVE_BACKWARD:
 				movement->moving_backward = it.pressed_flag;
 				break;
-			case intent_message::intent_type::MOVE_LEFT:
+			case intent_type::MOVE_LEFT:
 				movement->moving_left = it.pressed_flag;
 				break;
-			case intent_message::intent_type::MOVE_RIGHT:
+			case intent_type::MOVE_RIGHT:
 				movement->moving_right = it.pressed_flag;
 				break;
 			default: break;

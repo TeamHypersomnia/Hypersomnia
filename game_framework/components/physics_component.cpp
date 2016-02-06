@@ -124,6 +124,10 @@ namespace components {
 		return METERS_TO_PIXELSf * body->GetWorldCenter();
 	}
 
+	void physics::set_active(bool active) {
+		body->SetActive(active);
+	}
+
 	entity_id physics::get_owner_friction_ground() {
 		return owner_friction_ground;
 	}

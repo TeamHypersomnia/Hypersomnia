@@ -8,7 +8,7 @@ namespace components {
 	struct input_receiver {
 		augs::sorted_vector<unsigned> intents;
 
-		void add(messages::intent_message::intent_type _intent) {
+		void add(intent_type _intent) {
 			intents.add(_intent);
 		}
 	};

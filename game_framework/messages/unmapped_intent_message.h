@@ -5,30 +5,13 @@
 #include "window_framework/event.h"
 #include "augs/misc/constant_size_vector.h"
 
+#include "../globals/intents.h"
+
 /* everything is a state since for actions we can just ignore states with flag set to false */
 using namespace augs;
 
 namespace messages {
 	struct unmapped_intent_message {
-		enum intent_type {
-			NONE,
-			
-			PRESS_TRIGGER,
-			RELEASE_CAR,
-
-			MOVE_FORWARD,
-			MOVE_BACKWARD,
-			MOVE_LEFT,
-			MOVE_RIGHT,
-			HAND_BRAKE,
-			SHOOT,
-			MOVE_CROSSHAIR,
-			CROSSHAIR_PRIMARY_ACTION,
-			CROSSHAIR_SECONDARY_ACTION,
-			SWITCH_LOOK,
-			ZOOM_CAMERA,
-			SWITCH_WEAPON
-		};
 
 		struct intent_set {
 			augs::constant_size_vector<intent_type, 5> intents;

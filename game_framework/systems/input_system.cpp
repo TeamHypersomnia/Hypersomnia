@@ -19,11 +19,11 @@ input_system::input_system(world& parent_world) : processing_system_templated(pa
 input_system::context::context() : enabled(true) {
 }
 
-void input_system::context::map_key_to_intent(window::event::keys::key id, messages::intent_message::intent_type intent) {
+void input_system::context::map_key_to_intent(window::event::keys::key id, intent_type intent) {
 	key_to_intent[id].push_back(intent);
 }
 
-void input_system::context::map_event_to_intent(window::event::message id, messages::intent_message::intent_type intent) {
+void input_system::context::map_event_to_intent(window::event::message id, intent_type intent) {
 	event_to_intent[id].push_back(intent);
 }
 
@@ -58,7 +58,7 @@ void input_system::post_intents_from_inputs(const std::vector<messages::raw_wind
 				messages::unmapped_intent_message unmapped_intent;
 				unmapped_intent.state = state;
 
-				std::vector<messages::intent_message::intent_type> intents;
+				std::vector<intent_type> intents;
 
 				bool found_context_entry = false;
 
