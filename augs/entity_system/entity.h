@@ -42,6 +42,7 @@ namespace components {
 	struct fixtures;
 	struct container;
 	struct item;
+	struct force_joint;
 }
 #endif
 
@@ -90,6 +91,7 @@ namespace augs {
 			std::pair<memory_pool::id, components::trigger_detector*>,
 			std::pair<memory_pool::id, components::fixtures*>,
 			std::pair<memory_pool::id, components::container*>,
+			std::pair<memory_pool::id, components::force_joint*>,
 			std::pair<memory_pool::id, components::item*>
 		> type_to_component;
 

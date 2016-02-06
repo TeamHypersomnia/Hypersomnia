@@ -10,6 +10,7 @@
 #include "../components/movement_component.h"
 #include "../components/rotation_copying_component.h"
 #include "../components/physics_component.h"
+#include "../components/force_joint_component.h"
 
 #include "../globals/input_profiles.h"
 
@@ -36,7 +37,7 @@ void driver_system::assign_drivers_from_triggers() {
 	}
 }
 
-void driver_system::release_drivers_due_to_distance() {
+void driver_system::release_drivers_due_to_ending_contact_with_wheel() {
 	auto& contacts = parent_world.get_message_queue<messages::collision_message>();
 
 	for (auto& c : contacts) {
@@ -93,10 +94,12 @@ void driver_system::affect_drivers_due_to_car_ownership_changes(messages::car_ow
 	auto* maybe_rotation_copying = e.driver->find<components::rotation_copying>();
 	auto* maybe_physics = e.driver->find<components::physics>();
 	auto* maybe_movement = e.driver->find<components::movement>();
+	auto& force_joint = e.driver->get<components::force_joint>();
 
 	if (!e.lost_ownership) {
 		driver.owned_vehicle = e.car;
 		car.current_driver = e.driver;
+		force_joint.chased_entity = car.left_wheel_trigger;
 
 		if (maybe_movement) {
 			maybe_movement->reset_movement_flags();
@@ -128,6 +131,7 @@ void driver_system::affect_drivers_due_to_car_ownership_changes(messages::car_ow
 	else {
 		driver.owned_vehicle.unset();
 		car.current_driver.unset();
+		force_joint.chased_entity.unset();
 
 		if (maybe_movement) {
 			maybe_movement->reset_movement_flags();
@@ -179,32 +183,6 @@ void driver_system::delegate_movement_intents_from_drivers_to_steering_intents_o
 					e.subject = maybe_driver->owned_vehicle;
 				}
 			}
-		}
-	}
-}
-
-void driver_system::apply_forces_towards_wheels() {
-	for (auto& it : targets) {
-		auto& physics = it->get<components::physics>();
-		auto& driver = it->get<components::driver>();
-
-		if (driver.owned_vehicle.alive()) {
-			auto& car = driver.owned_vehicle->get<components::car>();
-			auto direction = car.left_wheel_trigger->get<components::transform>().pos - physics.get_position();
-			auto distance = direction.length();
-			direction.normalize_hint(distance);
-
-			float force_length = driver.force_towards_owned_wheel;
-
-			if (distance < driver.distance_when_force_easing_starts) {
-				auto mult = distance / driver.distance_when_force_easing_starts;
-				force_length *= pow(mult, driver.power_of_force_easing_multiplier);
-			}
-
-			auto force = vec2(direction).set_length(force_length);
-
-			physics.apply_force(force * physics.get_mass());
-			physics.target_angle = car.left_wheel_trigger->get<components::transform>().rotation - 90;
 		}
 	}
 }

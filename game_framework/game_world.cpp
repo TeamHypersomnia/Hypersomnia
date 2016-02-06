@@ -44,6 +44,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_component<fixtures>();
 	register_component<item>();
 	register_component<container>();
+	register_component<force_joint>();
 	
 	register_system<input_system>();
 	register_system<steering_system>();
@@ -67,6 +68,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_system<driver_system>();
 	register_system<trigger_detector_system>();
 	register_system<item_system>();
+	register_system<force_joint_system>();
 
 	register_message_queue<intent_message>();
 	register_message_queue<damage_message>();
@@ -150,7 +152,7 @@ void game_world::perform_logic_step() {
 	get_system<trigger_detector_system>().find_trigger_collisions_and_send_confirmations();
 
 	get_system<driver_system>().assign_drivers_from_triggers();
-	get_system<driver_system>().release_drivers_due_to_distance();
+	get_system<driver_system>().release_drivers_due_to_ending_contact_with_wheel();
 	
 	/* intent delegation stage (various ownership relations) */
 
@@ -158,7 +160,7 @@ void game_world::perform_logic_step() {
 
 	/* end of intent delegation stage */
 	
-	get_system<driver_system>().apply_forces_towards_wheels();
+	get_system<force_joint_system>().apply_forces_towards_target_entities();
 
 	get_system<car_system>().set_steering_flags_from_intents();
 	get_system<car_system>().apply_movement_forces();

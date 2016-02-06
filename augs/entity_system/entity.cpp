@@ -61,6 +61,7 @@ namespace augs {
 		remove<components::fixtures>();
 		remove<components::container>();
 		remove<components::item>();
+		remove<components::force_joint>();
 #else
 		auto ids_to_remove = type_to_component.raw;
 

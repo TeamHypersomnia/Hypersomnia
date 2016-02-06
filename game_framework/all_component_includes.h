@@ -29,6 +29,8 @@
 #include "components/fixtures_component.h"
 #include "components/container_component.h"
 #include "components/item_component.h"
+#include "components/force_joint_component.h"
+
 
 
 

@@ -15,6 +15,7 @@
 #include "game_framework/components/children_component.h"
 #include "game_framework/components/trigger_detector_component.h"
 #include "game_framework/components/driver_component.h"
+#include "game_framework/components/force_joint_component.h"
 
 
 #include "game_framework/shared/physics_setup_helpers.h"
@@ -99,14 +100,17 @@ namespace ingredients {
 		components::children children;
 		components::trigger_detector detector;
 		components::driver driver;
-		driver.force_towards_owned_wheel = 85000.f;
-		driver.distance_when_force_easing_starts = 20.f;
+		components::force_joint force_joint;
+
+		force_joint.force_towards_chased_entity = 85000.f;
+		force_joint.distance_when_force_easing_starts = 20.f;
+		force_joint.power_of_force_easing_multiplier = 1.f;
+
 		driver.density_while_driving = 0.02f;
 		driver.standard_density = 0.6f;
 
 		movement.standard_linear_damping = 20.f;
 		// driver.linear_damping_while_driving = 4.f;
-		driver.power_of_force_easing_multiplier = 1.f;
 
 		children.map_sub_entity(crosshair_entity, components::children::CHARACTER_CROSSHAIR);
 
@@ -131,6 +135,7 @@ namespace ingredients {
 		e->add(detector);
 		e->add(driver);
 		e->add(children);
+		e->add(force_joint);
 		
 		wsad_player_setup_movement(e);
 

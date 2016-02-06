@@ -1062,6 +1062,9 @@
     <ClCompile Include="game_framework\components\tile_layer_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game_framework\systems\force_joint_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -2940,6 +2943,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\components\force_joint_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\systems\force_joint_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

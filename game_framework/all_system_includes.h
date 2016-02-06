@@ -21,5 +21,7 @@
 #include "systems/driver_system.h"
 #include "systems/trigger_detector_system.h"
 #include "systems/item_system.h"
+#include "systems/force_joint_system.h"
+
 
 

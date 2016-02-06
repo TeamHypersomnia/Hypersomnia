@@ -15,9 +15,7 @@ public:
 	void assign_drivers_from_triggers();
 
 	void release_drivers_due_to_requests();
-	void release_drivers_due_to_distance();
+	void release_drivers_due_to_ending_contact_with_wheel();
 
 	void delegate_movement_intents_from_drivers_to_steering_intents_of_owned_vehicles();
-
-	void apply_forces_towards_wheels();
 };
