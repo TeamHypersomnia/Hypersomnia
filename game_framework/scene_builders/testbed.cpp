@@ -143,7 +143,7 @@ namespace scene_builders {
 		active_context.map_key_to_intent(window::event::keys::E, intent_type::RELEASE_CAR);
 		active_context.map_key_to_intent(window::event::keys::E, intent_type::PRESS_TRIGGER);
 		active_context.map_key_to_intent(window::event::keys::G, intent_type::DROP_PRIMARY_ITEM);
-		active_context.map_key_to_intent(window::event::keys::H, intent_type::DROP_SECONDARY_ITEM);
+		active_context.map_key_to_intent(window::event::keys::H, intent_type::HOLSTER_PRIMARY_ITEM);
 		active_context.map_key_to_intent(window::event::keys::SPACE, intent_type::HAND_BRAKE);
 
 		world.get_system<input_system>().add_context(active_context);

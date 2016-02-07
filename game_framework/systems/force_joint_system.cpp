@@ -6,7 +6,11 @@ void force_joint_system::apply_forces_towards_target_entities() {
 		auto& physics = it->get<components::physics>();
 		auto& force_joint = it->get<components::force_joint>();
 
-		auto direction = force_joint.chased_entity->get<components::transform>().pos - physics.get_position();
+		if (force_joint.chased_entity.dead()) continue;
+
+		auto chased_transform = force_joint.chased_entity->get<components::transform>() + force_joint.chased_entity_offset;
+
+		auto direction = chased_transform.pos - physics.get_position();
 		auto distance = direction.length();
 		direction.normalize_hint(distance);
 
@@ -19,7 +23,15 @@ void force_joint_system::apply_forces_towards_target_entities() {
 
 		auto force = vec2(direction).set_length(force_length);
 
-		physics.apply_force(force * physics.get_mass());
-		physics.target_angle = force_joint.chased_entity->get<components::transform>().rotation - 90;
+		int offset_num = force_joint.force_offsets.size();
+		
+		if (offset_num > 0)
+			for (auto& force_offset : force_joint.force_offsets)
+				physics.apply_force(force * physics.get_mass() / offset_num, force_offset);
+		else
+			physics.apply_force(force * physics.get_mass());
+
+		if(force_joint.consider_rotation)
+			physics.target_angle = chased_transform.rotation - 90;
 	}
 }

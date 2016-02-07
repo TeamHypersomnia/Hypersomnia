@@ -124,6 +124,21 @@ namespace components {
 		return METERS_TO_PIXELSf * body->GetWorldCenter();
 	}
 
+	vec2 physics::get_aabb_size() {
+		b2AABB aabb;
+		aabb.lowerBound.Set(FLT_MAX, FLT_MAX);
+		aabb.upperBound.Set(-FLT_MAX, -FLT_MAX);
+
+		b2Fixture* fixture = body->GetFixtureList();
+		
+		while (fixture != nullptr) {
+			aabb.Combine(aabb, fixture->GetAABB(0));
+			fixture = fixture->GetNext();
+		}
+
+		return vec2(aabb.upperBound.x - aabb.lowerBound.x, aabb.upperBound.y - aabb.lowerBound.y);
+	}
+
 	void physics::set_active(bool active) {
 		body->SetActive(active);
 	}

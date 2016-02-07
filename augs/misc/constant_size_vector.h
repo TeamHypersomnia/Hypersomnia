@@ -31,6 +31,10 @@ namespace augs  {
 			raw[count++] = obj;
 		}
 
+		T& operator[](size_t i) {
+			return raw[i];
+		}
+
 		typename arr_type::iterator begin() {
 			return raw.begin();
 		}

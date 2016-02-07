@@ -88,6 +88,26 @@ namespace augs {
 			return stream << "(" << v.x << "," << v.y << ")";
 		}
 
+		enum sticking {
+			LEFT,
+			RIGHT,
+			TOP,
+			BOTTOM
+		};
+
+		vec2t get_sticking_offset(sticking mode) {
+			vec2 res;
+			switch (mode) {
+			case sticking::LEFT: res = vec2(x / 2, 0);	break;
+			case sticking::RIGHT: res = vec2(-x / 2, 0);	break;
+			case sticking::TOP: res = vec2(0, y / 2);		break;
+			case sticking::BOTTOM: res = vec2(0, -y / 2);	break;
+			default: res = vec2(0, 0);			break;
+			}
+
+			return res;
+		}
+
 		template <class t>
 		static vec2t random_on_circle(t radius) {
 			return vec2t().set_from_degrees(randval(0.f, 360.f)) * radius;

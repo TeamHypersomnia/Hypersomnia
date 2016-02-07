@@ -5,6 +5,7 @@
 #include "../globals/inventory.h"
 
 #include "transform_component.h"
+#include "force_joint_component.h"
 
 namespace components {
 	struct container {
@@ -34,6 +35,7 @@ namespace components {
 		};
 
 		struct slot {
+
 			bool holsterable = true;
 
 			bool for_categorized_items_only = false;
@@ -43,8 +45,9 @@ namespace components {
 			unsigned space_available = 7;
 
 			bool disregard_space_and_allow_one_entity = false;
-
-			components::transform attachment_local_offset;
+			
+			vec2::sticking attachment_sticking_mode;
+			components::force_joint attachment_force_joint_def;
 
 			std::vector<augs::entity_id> items_inside;
 

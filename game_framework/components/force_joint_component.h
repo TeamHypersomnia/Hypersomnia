@@ -1,4 +1,6 @@
 #pragma once
+#include "misc/constant_size_vector.h"
+#include "transform_component.h"
 
 namespace components {
 	struct force_joint {
@@ -7,5 +9,10 @@ namespace components {
 		float force_towards_chased_entity = 8000.f;
 		float distance_when_force_easing_starts = 10.f;
 		float power_of_force_easing_multiplier = 2.f;
+
+		bool consider_rotation = true;
+		components::transform chased_entity_offset;
+
+		augs::constant_size_vector<vec2, 2> force_offsets;
 	};
 }

@@ -54,6 +54,8 @@ namespace components {
 		vec2 get_position();
 		vec2 get_world_center();
 
+		vec2 get_aabb_size();
+
 		void set_active(bool);
 
 		void set_transform(components::transform);
