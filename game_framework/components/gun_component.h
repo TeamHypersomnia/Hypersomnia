@@ -25,7 +25,10 @@ namespace components {
 
 		int current_state, trigger_mode;
 
+		bool load_magazine_through_slot_item_transfer(augs::entity_id magazine);
+
 		components::render bullet_render;
+		components::sprite bullet_sprite;
 		fixture_definition bullet_body;
 		b2Filter melee_filter;
 		b2Filter melee_obstruction_filter;

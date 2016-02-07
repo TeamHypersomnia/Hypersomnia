@@ -51,6 +51,9 @@ namespace scene_builders {
 		resource_manager.create(assets::texture_id::TEST_SPRITE, L"hypersomnia/gfx/frog.png");
 		resource_manager.create(assets::texture_id::MOTOR, L"hypersomnia/gfx/motor.png");
 
+		resource_manager.create(assets::texture_id::ASSAULT_RIFLE, L"hypersomnia/gfx/assault_rifle.png");
+		resource_manager.create(assets::texture_id::SHOTGUN, L"hypersomnia/gfx/shotgun.png");
+
 		auto& font = resource_manager.create(assets::font_id::GUI_FONT);
 		font.open("hypersomnia/Kubasta.ttf", 16, L" ABCDEFGHIJKLMNOPRSTUVWXYZQabcdefghijklmnoprstuvwxyzq0123456789.!@#$%^&*()_+-=[];'\\,./{}:\"|<>?");
 

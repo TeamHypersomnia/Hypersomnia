@@ -30,6 +30,8 @@ namespace ingredients {
 
 	void character_inventory(augs::entity_id);
 	void backpack(augs::entity_id);
+
+	void assault_rifle(augs::entity_id);
 }
 
 namespace prefabs {
