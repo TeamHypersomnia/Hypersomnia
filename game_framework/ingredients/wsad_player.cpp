@@ -136,6 +136,7 @@ namespace ingredients {
 		e->add(driver);
 		e->add(children);
 		e->add(force_joint);
+		e->disable(force_joint);
 		
 		wsad_player_setup_movement(e);
 

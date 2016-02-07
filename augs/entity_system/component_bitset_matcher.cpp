@@ -9,6 +9,10 @@ namespace augs {
 		add(types_with_ids);
 	}
 
+	bool component_bitset_matcher::is_set(unsigned index) {
+		return signature[index];
+	}
+
 	void component_bitset_matcher::add(unsigned index) {
 		signature.set(index, true);
 	}

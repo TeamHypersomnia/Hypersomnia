@@ -5,12 +5,14 @@
 #include "game_framework/components/container_component.h"
 #include "game_framework/components/item_component.h"
 #include "game_framework/components/trigger_component.h"
+#include "game_framework/components/force_joint_component.h"
 
 namespace ingredients {
 	void backpack(augs::entity_id e) {
 		components::transform transform;
 		components::container container;
 		components::item item;
+		components::force_joint force_joint;
 		components::trigger trigger;
 		
 		components::container::slot slot_def;
@@ -32,5 +34,7 @@ namespace ingredients {
 		e->add(container);
 		e->add(item);
 		e->add(trigger);
+		e->add(force_joint);
+		e->disable(force_joint);
 	}
 }

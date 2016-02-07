@@ -13,7 +13,8 @@ namespace augs {
 		std::bitset<MAXIMUM_COMPONENTS> signature;
 	public:
 		component_bitset_matcher(std::vector<unsigned> indices = std::vector<unsigned>());
-
+		
+		bool is_set(unsigned);
 		void add(unsigned);
 		void add(std::vector<unsigned>);
 		void remove(unsigned);

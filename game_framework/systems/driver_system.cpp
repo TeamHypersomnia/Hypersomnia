@@ -100,6 +100,7 @@ void driver_system::affect_drivers_due_to_car_ownership_changes(messages::car_ow
 		driver.owned_vehicle = e.car;
 		car.current_driver = e.driver;
 		force_joint.chased_entity = car.left_wheel_trigger;
+		e.driver->enable(force_joint);
 
 		if (maybe_movement) {
 			maybe_movement->reset_movement_flags();
@@ -131,7 +132,7 @@ void driver_system::affect_drivers_due_to_car_ownership_changes(messages::car_ow
 	else {
 		driver.owned_vehicle.unset();
 		car.current_driver.unset();
-		force_joint.chased_entity.unset();
+		e.driver->disable(force_joint);
 
 		if (maybe_movement) {
 			maybe_movement->reset_movement_flags();

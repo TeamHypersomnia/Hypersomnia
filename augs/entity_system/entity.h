@@ -149,21 +149,32 @@ namespace augs {
 		component_bitset_matcher get_component_signature();
 
 		template <typename component_type>
+		void enable(const component_type& object = component_type()) {
+			add_to_compatible_systems(typeid(component_type).hash_code());
+		}
+
+		template <typename component_type>
+		void disable(const component_type& object = component_type()) {
+			unplug_component_from_systems(typeid(component_type).hash_code());
+		}
+
+		template <typename component_type>
+		bool is_enabled(const component_type& object = component_type()) {
+			return signature.is_set(typeid(component_type).hash_code());
+		}
+
+		template <typename component_type>
 		component_type& add(const component_type& object = component_type()) {
-			auto hash = typeid(component_type).hash_code();
-
-			component_bitset_matcher old_signature(get_component_signature());
-
 			if (find<component_type>() != nullptr)
 				throw std::exception("component already exists!");
 
+			auto hash = typeid(component_type).hash_code();
 
 #ifdef INCLUDE_COMPONENT_NAMES
 			typestrs.add(hash, typeid(component_type).name());
 #endif
 #if USE_POINTER_TUPLE 
 			auto& component_ptr = *reinterpret_cast<object_pool<component_type>::id*>(&_find<component_type>());
-			signature.add(owner_world.component_library.get_index(hash));
 #else
 			type_to_component.add(hash, memory_pool::id());
 
@@ -171,21 +182,8 @@ namespace augs {
 #endif
 			/* allocate new component in a corresponding pool */
 			component_ptr = owner_world.get_components_by_type<component_type>().allocate(object);
-
-			/* get new signature */
-			component_bitset_matcher new_signature(old_signature);
-			/* will trigger an exception on debug if the component type was not registered within any existing system */
-			new_signature.add(owner_world.component_library.get_index(hash));
-
-			entity_id this_id = get_id();
-			for (auto sys : owner_world.get_all_systems())
-			{
-				bool matches_new = sys->components_signature.matches(new_signature);
-				bool doesnt_match_old = !sys->components_signature.matches(old_signature);
-
-				if (matches_new && doesnt_match_old)
-					sys->add(this_id);
-			}
+			
+			add_to_compatible_systems(hash);
 
 			return component_ptr.get();
 		}
@@ -196,28 +194,14 @@ namespace augs {
 		}
 
 	private:
+		bool unplug_component_from_systems(size_t);
+		void add_to_compatible_systems(size_t);
+
 		template <typename component_type>
 		void remove() {
 #if USE_POINTER_TUPLE
-			auto component_type_hash = typeid(component_type).hash_code();
-
-			component_bitset_matcher old_signature(get_component_signature());
-
-			component_bitset_matcher& new_signature = signature;
-			signature.remove(owner_world.component_library.get_index(component_type_hash));
-
-			bool is_already_removed = old_signature == new_signature;
-
-			if (is_already_removed)
+			if (!unplug_component_from_systems(typeid(component_type).hash_code()))
 				return;
-
-			entity_id this_id = get_id();
-
-			for (auto sys : owner_world.get_all_systems())
-				/* if a processing_system does not match with the new signature and does with the old one */
-				if (!sys->components_signature.matches(new_signature) && sys->components_signature.matches(old_signature))
-					/* we should remove this entity from there */
-					sys->remove(this_id);
 
 			/* delete component from the corresponding pool, use hash to identify the proper destructor */
 			owner_world.get_components_by_hash(typeid(component_type).hash_code()).free_with_destructor(_find<component_type>(), typeid(component_type).hash_code());
@@ -225,7 +209,6 @@ namespace augs {
 
 #else
 			remove(typeid(component_type).hash_code());
-
 #endif
 		}
 
