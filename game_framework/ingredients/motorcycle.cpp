@@ -86,7 +86,7 @@ namespace prefabs {
 
 			transform.pos = pos;
 
-			render.layer = render_layer::CAR_INTERIOR;
+			render.layer = render_layer::DROPPED_ITEM;
 
 			sprite.set(assets::texture_id::MOTORCYCLE_INSIDE);
 

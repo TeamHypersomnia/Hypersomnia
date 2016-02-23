@@ -170,7 +170,7 @@ namespace scene_builders {
 			world.get_system<render_system>().enable_interpolation = false;
 		}
 		else {
-			world.parent_overworld.configure_stepping(60.0, 5);
+			world.parent_overworld.configure_stepping(60.0, 500);
 			world.parent_overworld.delta_timer.set_stepping_speed_multiplier(1.0);
 			augs::create_directory("sessions/");
 			augs::create_directory("sessions/" + augs::get_timestamp());

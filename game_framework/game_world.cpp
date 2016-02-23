@@ -148,8 +148,6 @@ void game_world::perform_logic_step() {
 	get_message_queue<new_entity_message>().clear();
 	/* end receivers of new_entity messages */
 
-	get_system<render_system>().set_current_transforms_as_previous_for_interpolation();
-
 	get_system<crosshair_system>().apply_crosshair_intents_to_base_offsets();
 	get_system<crosshair_system>().apply_base_offsets_to_crosshair_transforms();
 
@@ -184,6 +182,8 @@ void game_world::perform_logic_step() {
 	get_system<rotation_copying_system>().update_physical_motors();
 	get_system<physics_system>().step_and_set_new_transforms();
 	get_system<position_copying_system>().update_transforms();
+
+	get_system<render_system>().set_current_transforms_as_previous_for_interpolation();
 
 	++current_step_number;
 }

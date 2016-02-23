@@ -112,6 +112,10 @@ namespace components {
 		return body->GetMass();
 	}
 
+	float physics::get_angle() {
+		return body->GetAngle() * RAD_TO_DEG;
+	}
+
 	vec2 physics::get_position() {
 		return METERS_TO_PIXELSf * body->GetPosition();
 	}

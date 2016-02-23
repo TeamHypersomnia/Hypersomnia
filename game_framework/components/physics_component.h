@@ -51,6 +51,7 @@ namespace components {
 		void apply_impulse(vec2);
 		void apply_impulse(vec2, vec2 center_offset, bool wake = true);
 		float get_mass();
+		float get_angle();
 		vec2 get_position();
 		vec2 get_world_center();
 

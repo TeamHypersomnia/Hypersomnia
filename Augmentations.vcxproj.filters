@@ -1068,9 +1068,6 @@
     <ClCompile Include="game_framework\ingredients\guns.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\event_processing\contextualize_use_button_presses.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\systems\intent_contextualization_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
