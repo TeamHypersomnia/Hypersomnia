@@ -20,11 +20,11 @@ input_system::context::context() : enabled(true) {
 }
 
 void input_system::context::map_key_to_intent(window::event::keys::key id, intent_type intent) {
-	key_to_intent[id].push_back(intent);
+	key_to_intent[id] = intent;
 }
 
 void input_system::context::map_event_to_intent(window::event::message id, intent_type intent) {
-	event_to_intent[id].push_back(intent);
+	event_to_intent[id] = intent;
 }
 
 void input_system::add_context(context c) {
@@ -58,7 +58,7 @@ void input_system::post_intents_from_inputs(const std::vector<messages::raw_wind
 				messages::unmapped_intent_message unmapped_intent;
 				unmapped_intent.state = state;
 
-				std::vector<intent_type> intents;
+				intent_type intent;
 
 				bool found_context_entry = false;
 
@@ -67,7 +67,7 @@ void input_system::post_intents_from_inputs(const std::vector<messages::raw_wind
 
 					auto found_intent = context.event_to_intent.find(state.msg);
 					if (found_intent != context.event_to_intent.end()) {
-						intents = (*found_intent).second;
+						intent = (*found_intent).second;
 						found_context_entry = true;
 					}
 				}
@@ -76,13 +76,13 @@ void input_system::post_intents_from_inputs(const std::vector<messages::raw_wind
 
 					auto found_intent = context.key_to_intent.find(state.key);
 					if (found_intent != context.key_to_intent.end()) {
-						intents = (*found_intent).second;
+						intent = (*found_intent).second;
 						found_context_entry = true;
 					}
 				}
 
 				if (found_context_entry) {
-					unmapped_intent.intent.intents = intents;
+					unmapped_intent.intent = intent;
 					parent_world.post_message(unmapped_intent);
 
 					messages::intent_message entity_mapped_intent;

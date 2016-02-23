@@ -37,4 +37,8 @@ namespace ingredients {
 namespace prefabs {
 	augs::entity_id create_car(augs::world&, vec2 pos);
 	augs::entity_id create_motorcycle(augs::world&, vec2 pos);
+
+	augs::entity_id create_sample_magazine(augs::world&, vec2 pos);
+	
+	augs::entity_id create_assault_catridge(augs::world&, vec2 pos);
 }

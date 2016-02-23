@@ -352,6 +352,8 @@
     <ClCompile Include="3rdparty\RakNet\Source\VitaIncludes.cpp" />
     <ClCompile Include="3rdparty\RakNet\Source\WSAStartupSingleton.cpp" />
     <ClCompile Include="3rdparty\RakNet\Source\_FindFirst.cpp" />
+    <ClCompile Include="augs\entity_system\entity_id.cpp" />
+    <ClCompile Include="augs\misc\deterministic_timing.cpp" />
     <ClCompile Include="game_framework\bindings\file_watcher_binding.cpp" />
     <ClCompile Include="game_framework\bindings\glwindow_binding.cpp" />
     <ClCompile Include="game_framework\bindings\id_generator_binding.cpp" />
@@ -371,11 +373,14 @@
     <ClCompile Include="game_framework\bind_game_framework_and_augs.cpp" />
     <ClCompile Include="game_framework\components\container_component.cpp" />
     <ClCompile Include="game_framework\components\fixtures_component.cpp" />
+    <ClCompile Include="game_framework\components\item_component.cpp" />
+    <ClCompile Include="game_framework\components\item_slot_transfers_component.cpp" />
     <ClCompile Include="game_framework\components\particle_group_component.cpp" />
     <ClCompile Include="game_framework\components\physics_component.cpp" />
     <ClCompile Include="game_framework\components\polygon_component.cpp" />
     <ClCompile Include="game_framework\components\sprite_component.cpp" />
     <ClCompile Include="game_framework\components\tile_layer_component.cpp" />
+    <ClCompile Include="game_framework\event_processing\contextualize_use_button_presses.cpp" />
     <ClCompile Include="game_framework\game_overworld.cpp" />
     <ClCompile Include="game_framework\game_world.cpp" />
     <ClCompile Include="game_framework\globals\filters.cpp" />
@@ -385,6 +390,7 @@
     <ClCompile Include="game_framework\ingredients\camera.cpp" />
     <ClCompile Include="game_framework\ingredients\car.cpp" />
     <ClCompile Include="game_framework\ingredients\character_inventory.cpp" />
+    <ClCompile Include="game_framework\ingredients\guns.cpp" />
     <ClCompile Include="game_framework\ingredients\ingredients.cpp" />
     <ClCompile Include="game_framework\ingredients\motorcycle.cpp" />
     <ClCompile Include="game_framework\ingredients\sprite.cpp" />
@@ -396,13 +402,16 @@
     <ClCompile Include="game_framework\scene_builders\rendering_scripts\testbed_rendering.cpp" />
     <ClCompile Include="game_framework\scene_builders\scene_builder.cpp" />
     <ClCompile Include="game_framework\scene_builders\testbed.cpp" />
+    <ClCompile Include="game_framework\shared\inventory_slot.cpp" />
     <ClCompile Include="game_framework\shared\physics_setup_helpers.cpp" />
     <ClCompile Include="game_framework\systems\animation_system.cpp" />
     <ClCompile Include="game_framework\systems\behaviour_tree_system.cpp" />
     <ClCompile Include="game_framework\systems\camera_system.cpp" />
     <ClCompile Include="game_framework\systems\car_system.cpp" />
     <ClCompile Include="game_framework\systems\force_joint_system.cpp" />
+    <ClCompile Include="game_framework\systems\intent_contextualization_system.cpp" />
     <ClCompile Include="game_framework\systems\item_system.cpp" />
+    <ClCompile Include="game_framework\systems\melee_system.cpp" />
     <ClCompile Include="game_framework\systems\position_copying_system.cpp" />
     <ClCompile Include="game_framework\systems\crosshair_system.cpp" />
     <ClCompile Include="game_framework\systems\damage_system.cpp" />
@@ -926,6 +935,7 @@
     <ClInclude Include="3rdparty\RakNet\Source\XBox360Includes.h" />
     <ClInclude Include="3rdparty\RakNet\Source\_FindFirst.h" />
     <ClInclude Include="augs\misc\constant_size_vector.h" />
+    <ClInclude Include="augs\misc\deterministic_timing.h" />
     <ClInclude Include="augs\stream.h" />
     <ClInclude Include="game_framework\all_component_includes.h" />
     <ClInclude Include="game_framework\all_message_includes.h" />
@@ -946,8 +956,11 @@
     <ClInclude Include="game_framework\components\container_component.h" />
     <ClInclude Include="game_framework\components\force_joint_component.h" />
     <ClInclude Include="game_framework\components\gui_input_receiver_component.h" />
+    <ClInclude Include="game_framework\components\item_slot_transfers_component.h" />
     <ClInclude Include="game_framework\components\input_receiver_component.h" />
     <ClInclude Include="game_framework\components\item_component.h" />
+    <ClInclude Include="game_framework\components\melee_component.h" />
+    <ClInclude Include="game_framework\components\physics_definition_component.h" />
     <ClInclude Include="game_framework\components\position_copying_component.h" />
     <ClInclude Include="game_framework\components\children_component.h" />
     <ClInclude Include="game_framework\components\crosshair_component.h" />
@@ -974,6 +987,8 @@
     <ClInclude Include="game_framework\assets\texture.h" />
     <ClInclude Include="game_framework\game_overworld.h" />
     <ClInclude Include="game_framework\game_world.h" />
+    <ClInclude Include="game_framework\globals\associated_entities.h" />
+    <ClInclude Include="game_framework\globals\detector_domains.h" />
     <ClInclude Include="game_framework\globals\filters.h" />
     <ClInclude Include="game_framework\globals\input_profiles.h" />
     <ClInclude Include="game_framework\globals\intents.h" />
@@ -1000,7 +1015,6 @@
     <ClInclude Include="game_framework\messages\trigger_hit_confirmation_message.h" />
     <ClInclude Include="game_framework\messages\trigger_hit_request_message.h" />
     <ClInclude Include="game_framework\messages\unmapped_intent_message.h" />
-    <ClInclude Include="game_framework\messages\car_ownership_change_message.h" />
     <ClInclude Include="game_framework\resources\animation.h" />
     <ClInclude Include="game_framework\resources\animation_response.h" />
     <ClInclude Include="game_framework\resources\manager.h" />
@@ -1010,6 +1024,9 @@
     <ClInclude Include="game_framework\scene_builders\rendering_scripts\testbed_rendering.h" />
     <ClInclude Include="game_framework\scene_builders\scene_builder.h" />
     <ClInclude Include="game_framework\scene_builders\testbed.h" />
+    <ClInclude Include="game_framework\shared\inventory_slot.h" />
+    <ClInclude Include="game_framework\shared\inventory_slot_id.h" />
+    <ClInclude Include="game_framework\shared\inventory_utils.h" />
     <ClInclude Include="game_framework\shared\physics_setup_helpers.h" />
     <ClInclude Include="game_framework\shared\state_for_drawing.h" />
     <ClInclude Include="game_framework\systems\animation_system.h" />
@@ -1017,7 +1034,9 @@
     <ClInclude Include="game_framework\systems\camera_system.h" />
     <ClInclude Include="game_framework\systems\car_system.h" />
     <ClInclude Include="game_framework\systems\force_joint_system.h" />
+    <ClInclude Include="game_framework\systems\intent_contextualization_system.h" />
     <ClInclude Include="game_framework\systems\item_system.h" />
+    <ClInclude Include="game_framework\systems\melee_system.h" />
     <ClInclude Include="game_framework\systems\position_copying_system.h" />
     <ClInclude Include="game_framework\systems\crosshair_system.h" />
     <ClInclude Include="game_framework\systems\damage_system.h" />

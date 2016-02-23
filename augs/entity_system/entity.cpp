@@ -2,12 +2,21 @@
 #include "entity.h"
 #include "world.h"
 #include "component_bitset_matcher.h"
+#include "game_framework/all_component_includes.h"
 
 namespace augs {
 	entity::entity(world& owner_world) : owner_world(owner_world) {}
 
 	entity::~entity() {
 		clear();
+	}
+
+	void entity::clone(augs::entity_id b) {
+#if USE_POINTER_TUPLE
+		clone_component_tuple(b->type_to_component);
+#else
+		assert(0);
+#endif
 	}
 
 	component_bitset_matcher entity::get_component_signature() {
@@ -62,6 +71,9 @@ namespace augs {
 		remove<components::container>();
 		remove<components::item>();
 		remove<components::force_joint>();
+		remove<components::physics_definition>();
+		remove<components::item_slot_transfers>();
+		remove<components::melee>();
 #else
 		auto ids_to_remove = type_to_component.raw;
 

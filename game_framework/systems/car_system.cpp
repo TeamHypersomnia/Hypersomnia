@@ -1,6 +1,4 @@
 #include "car_system.h"
-#include "../messages/trigger_hit_confirmation_message.h"
-#include "../messages/car_ownership_change_message.h"
 #include "../messages/intent_message.h"
 
 #include "entity_system/world.h"
@@ -19,25 +17,23 @@ void car_system::set_steering_flags_from_intents() {
 
 		auto& car = *maybe_car;
 
-		for (auto& ie : it.intent.intents) {
-			switch (ie) {
-			case intent_type::MOVE_FORWARD:
-				car.accelerating = it.pressed_flag;
-				break;
-			case intent_type::MOVE_BACKWARD:
-				car.deccelerating = it.pressed_flag;
-				break;
-			case intent_type::MOVE_LEFT:
-				car.turning_left = it.pressed_flag;
-				break;
-			case intent_type::MOVE_RIGHT:
-				car.turning_right = it.pressed_flag;
-				break;
-			case intent_type::HAND_BRAKE:
-				car.hand_brake = it.pressed_flag;
-				break;
-			default: break;
-			}
+		switch (it.intent) {
+		case intent_type::MOVE_FORWARD:
+			car.accelerating = it.pressed_flag;
+			break;
+		case intent_type::MOVE_BACKWARD:
+			car.deccelerating = it.pressed_flag;
+			break;
+		case intent_type::MOVE_LEFT:
+			car.turning_left = it.pressed_flag;
+			break;
+		case intent_type::MOVE_RIGHT:
+			car.turning_right = it.pressed_flag;
+			break;
+		case intent_type::HAND_BRAKE:
+			car.hand_brake = it.pressed_flag;
+			break;
+		default: break;
 		}
 	}
 }

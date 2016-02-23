@@ -132,11 +132,11 @@ namespace augs {
 		lines.push_back(debug_line(a, b, col));
 	}
 
-	void renderer::line_channel::draw_red(vec2 a, vec2 b) { draw(a, b, colors::red); }
-	void renderer::line_channel::draw_green(vec2 a, vec2 b) { draw(a, b, colors::green); }
-	void renderer::line_channel::draw_blue(vec2 a, vec2 b) { draw(a, b, colors::blue); }
-	void renderer::line_channel::draw_yellow(vec2 a, vec2 b) { draw(a, b, colors::yellow); }
-	void renderer::line_channel::draw_cyan(vec2 a, vec2 b) { draw(a, b, colors::cyan); }
+	void renderer::line_channel::draw_red(vec2 a, vec2 b) { draw(a, b, red); }
+	void renderer::line_channel::draw_green(vec2 a, vec2 b) { draw(a, b, green); }
+	void renderer::line_channel::draw_blue(vec2 a, vec2 b) { draw(a, b, blue); }
+	void renderer::line_channel::draw_yellow(vec2 a, vec2 b) { draw(a, b, yellow); }
+	void renderer::line_channel::draw_cyan(vec2 a, vec2 b) { draw(a, b, cyan); }
 
 	void renderer::draw_debug_info(vec2 visible_world_area, components::transform camera_transform, assets::texture_id tex_id, std::vector<entity_id> target_entities, double ratio) {
 		if (!debug_drawing) return;

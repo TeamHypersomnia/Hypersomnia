@@ -19,8 +19,6 @@ namespace augs {
 					stylesheet scrollarea_style;
 
 					void ltblue_theme() {
-						using namespace colors;
-
 						slider_style = stylesheet();
 						slider_style.released.color = gray3;
 						slider_style.hovered.color = gray4;

@@ -129,23 +129,21 @@ namespace augs {
 		return (*this = rgba{ rgba_channel(res.r * 255), rgba_channel(res.g * 255), rgba_channel(res.b * 255), a });
 	}
 
-	namespace colors {
-		const rgba ltblue(0, 122, 204, 255);
-		const rgba blue(0, 61, 102, 255);
-		const rgba red(255, 0, 0, 255);
-		const rgba green(0, 144, 66, 255);
-		const rgba violet(164, 68, 195, 255);
-		const rgba darkred(122, 0, 0, 255);
-		const rgba black(0, 0, 0, 255);
-		const rgba darkgray(30, 30, 30, 255);
-		const rgba gray1(50, 50, 50, 255);
-		const rgba gray2(62, 62, 62, 255);
-		const rgba gray3(104, 104, 104, 255);
-		const rgba gray4(180, 180, 180, 255);
-		const rgba white(255, 255, 255, 255);
-		const rgba darkblue(6, 5, 20, 255);
+	const rgba ltblue(0, 122, 204, 255);
+	const rgba blue(0, 61, 102, 255);
+	const rgba red(255, 0, 0, 255);
+	const rgba green(0, 144, 66, 255);
+	const rgba violet(164, 68, 195, 255);
+	const rgba darkred(122, 0, 0, 255);
+	const rgba black(0, 0, 0, 255);
+	const rgba darkgray(30, 30, 30, 255);
+	const rgba gray1(50, 50, 50, 255);
+	const rgba gray2(62, 62, 62, 255);
+	const rgba gray3(104, 104, 104, 255);
+	const rgba gray4(180, 180, 180, 255);
+	const rgba white(255, 255, 255, 255);
+	const rgba darkblue(6, 5, 20, 255);
 
-		const rgba cyan(0, 255, 255, 255);
-		const rgba yellow(255, 255, 0, 255);
-	}
+	const rgba cyan(0, 255, 255, 255);
+	const rgba yellow(255, 255, 0, 255);
 }

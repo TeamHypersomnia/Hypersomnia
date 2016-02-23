@@ -4,6 +4,8 @@
 #include <cassert>
 #include "component_bitset_matcher.h"
 
+#include "misc/deterministic_timing.h"
+
 namespace augs {
 	class renderer;
 
@@ -21,15 +23,25 @@ namespace augs {
 
 		processing_system(world& parent_world);
 		
-		void add(augs::entity_id);
-		void remove(augs::entity_id);
+		virtual void add(augs::entity_id);
+		virtual void remove(augs::entity_id);
+		
 		void clear();
 
-		double delta_seconds();
-		double delta_milliseconds();
-		double view_interpolation_ratio();
+		double delta_seconds() const;
+		double delta_milliseconds() const;
+		double view_interpolation_ratio() const;
 		augs::renderer& get_renderer();
 
+		bool passed(augs::deterministic_timeout&) const;
+
+		bool check_timeout_and_reset(augs::deterministic_timeout&);
+
+		float get_milliseconds_left(augs::deterministic_timeout&) const;
+		float get_percentage_left(augs::deterministic_timeout&) const;
+
+		void reset(augs::deterministic_timeout&);
+		
 		/* you are required to override this function to specify components that this system needs to processing */
 		virtual type_hash_vector get_needed_components() const;
 	};

@@ -203,6 +203,9 @@ components::physics& create_physics_component(body_definition body_data, augs::e
 	physics_component.body = physics.b2world.CreateBody(&def);
 	physics_component.body->SetAngledDampingEnabled(body_data.angled_damping);
 
+	physics_component.set_velocity(body_data.velocity);
+	physics_component.angular_air_resistance = body_data.angular_air_resistance;
+
 	return physics_component;
 }
 

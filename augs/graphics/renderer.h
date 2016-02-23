@@ -45,7 +45,7 @@ namespace augs {
 		struct line_channel {
 			std::vector<debug_line> lines;
 
-			void draw(vec2 a, vec2 b, rgba = colors::white);
+			void draw(vec2 a, vec2 b, rgba = white);
 			
 			void draw_red(vec2 a, vec2 b);
 			void draw_green(vec2 a, vec2 b);

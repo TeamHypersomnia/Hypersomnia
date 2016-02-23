@@ -1,4 +1,7 @@
 #pragma once
+#pragma warning(disable : 4503)
+#include <type_traits>
+
 #include "processing_system.h"
 #include "component_bitset_matcher.h"
 
@@ -43,6 +46,9 @@ namespace components {
 	struct container;
 	struct item;
 	struct force_joint;
+	struct physics_definition;
+	struct item_slot_transfers;
+	struct melee;
 }
 #endif
 
@@ -92,7 +98,10 @@ namespace augs {
 			std::pair<memory_pool::id, components::fixtures*>,
 			std::pair<memory_pool::id, components::container*>,
 			std::pair<memory_pool::id, components::force_joint*>,
-			std::pair<memory_pool::id, components::item*>
+			std::pair<memory_pool::id, components::item*>,
+			std::pair<memory_pool::id, components::physics_definition*>,
+			std::pair<memory_pool::id, components::item_slot_transfers*>,
+			std::pair<memory_pool::id, components::melee*>
 		> type_to_component;
 
 		component_bitset_matcher signature;
@@ -150,12 +159,12 @@ namespace augs {
 
 		template <typename component_type>
 		void enable(const component_type& object = component_type()) {
-			add_to_compatible_systems(typeid(component_type).hash_code());
+			add_to_compatible_systems(typeid(std::remove_pointer<std::decay<component_type>::type>::type).hash_code());
 		}
 
 		template <typename component_type>
 		void disable(const component_type& object = component_type()) {
-			unplug_component_from_systems(typeid(component_type).hash_code());
+			unplug_component_from_systems(typeid(std::remove_pointer<std::decay<component_type>::type>::type).hash_code());
 		}
 
 		template <typename component_type>
@@ -187,15 +196,25 @@ namespace augs {
 
 			return component_ptr.get();
 		}
-		
+
+		template<typename Tuple, typename T, typename... Tp>
+		inline void clone_component_tuple(Tuple& t)
+		{
+			typedef std::decay <T::second_type>::type component_type;
+			add<component_type>(*(component_type*)(std::get<T>(t).first.ptr()));
+			clone_component_tuple<Tuple, Tp...>(t);
+		}
+
+		template<typename Tuple>
+		void clone_component_tuple(Tuple& t)
+		{ }
+
+		void clone(augs::entity_id);
+
 		template <typename component_type>
 		component_type& operator+= (const component_type& object) {
 			return add(object);
 		}
-
-	private:
-		bool unplug_component_from_systems(size_t);
-		void add_to_compatible_systems(size_t);
 
 		template <typename component_type>
 		void remove() {
@@ -213,6 +232,10 @@ namespace augs {
 		}
 
 		void remove(size_t component_type_hash);
+
+	private:
+		bool unplug_component_from_systems(size_t);
+		void add_to_compatible_systems(size_t);
 
 #if USE_POINTER_TUPLE 
 		template <typename component_class>

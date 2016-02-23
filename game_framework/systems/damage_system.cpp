@@ -41,9 +41,8 @@ void damage_system::process_entities() {
 		auto& transform = it->get<components::transform>();
 		auto& damage = it->get<components::damage>();
 	
-		if ((damage.max_lifetime_ms >= 0.f && damage.lifetime.get<std::chrono::milliseconds>() >= damage.max_lifetime_ms)
-			||
-			(damage.max_distance >= 0.f && (damage.starting_point - transform.pos).length() >= damage.max_distance))
+		if ((damage.constrain_lifetime && damage.lifetime_ms >= damage.max_lifetime_ms) ||
+			(damage.constrain_distance && (damage.starting_point - transform.pos).length() >= damage.max_distance))
 			parent_world.post_message(messages::destroy_message(it));
 	}
 }

@@ -11,7 +11,7 @@ namespace input_profiles {
 
 	components::input_receiver character() {
 		components::input_receiver out;
-		out.add(intent_type::PRESS_TRIGGER);
+		out.add(intent_type::PRESS_WORLD_TRIGGER);
 		out.add(intent_type::MOVE_BACKWARD);
 		out.add(intent_type::MOVE_FORWARD);
 		out.add(intent_type::MOVE_LEFT);

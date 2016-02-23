@@ -105,6 +105,8 @@ public:
 
 	query_output query_polygon(const std::vector<vec2>& vertices, b2Filter filter, entity_id ignore_entity = entity_id());
 	query_output query_shape(b2Shape*, b2Filter filter, entity_id ignore_entity = entity_id());
+
+	void create_bodies_and_fixtures_from_physics_definitions();
 private:
 	/* callback structure used in QueryAABB function to get all shapes near-by */
 	struct query_aabb_input : b2QueryCallback {

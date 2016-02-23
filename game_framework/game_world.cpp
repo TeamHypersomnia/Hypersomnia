@@ -6,6 +6,8 @@
 
 #include "game_framework/globals/layers.h"
 
+#include <functional>
+
 using namespace components;
 using namespace messages;
 
@@ -45,6 +47,9 @@ void game_world::register_types_of_messages_components_systems() {
 	register_component<item>();
 	register_component<container>();
 	register_component<force_joint>();
+	register_component<physics_definition>();
+	register_component<item_slot_transfers>();
+	register_component<melee>();
 	
 	register_system<input_system>();
 	register_system<steering_system>();
@@ -69,6 +74,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_system<trigger_detector_system>();
 	register_system<item_system>();
 	register_system<force_joint_system>();
+	register_system<intent_contextualization_system>();
 
 	register_message_queue<intent_message>();
 	register_message_queue<damage_message>();
@@ -83,10 +89,11 @@ void game_world::register_types_of_messages_components_systems() {
 	register_message_queue<crosshair_intent_message>();
 	register_message_queue<trigger_hit_confirmation_message>();
 	register_message_queue<trigger_hit_request_message>();
-	register_message_queue<car_ownership_change_message>();
 	register_message_queue<new_entity_message>();
 	register_message_queue<camera_render_request_message>();
 	register_message_queue<item_slot_transfer_request>();
+
+	register_message_callback<item_slot_transfer_request>(std::bind(&item_system::consume_item_slot_transfer_requests, &get_system<item_system>()));
 }
 
 void game_world::call_drawing_time_systems() {
@@ -136,6 +143,8 @@ void game_world::perform_logic_step() {
 	/* begin receivers of new_entity messages changes */
 
 	get_system<render_system>().add_entities_to_rendering_tree();
+	get_system<physics_system>().create_bodies_and_fixtures_from_physics_definitions();
+
 	get_message_queue<new_entity_message>().clear();
 	/* end receivers of new_entity messages */
 
@@ -146,6 +155,12 @@ void game_world::perform_logic_step() {
 
 	get_system<camera_system>().react_to_input_intents();
 
+	/* intent delegation stage (various ownership relations) */
+	get_system<intent_contextualization_system>().contextualize_use_button_intents();
+	get_system<intent_contextualization_system>().contextualize_crosshair_action_intents();
+	get_system<intent_contextualization_system>().contextualize_movement_intents();
+	/* end of intent delegation stage */
+
 	get_system<driver_system>().release_drivers_due_to_requests();
 
 	get_system<trigger_detector_system>().consume_trigger_detector_presses();
@@ -154,12 +169,10 @@ void game_world::perform_logic_step() {
 	get_system<driver_system>().assign_drivers_from_triggers();
 	get_system<driver_system>().release_drivers_due_to_ending_contact_with_wheel();
 	
-	/* intent delegation stage (various ownership relations) */
+	get_system<render_system>().remove_entities_from_rendering_tree();
+	get_system<physics_system>().destroy_fixtures_and_bodies();
+	get_system<destroy_system>().delete_queued_entities();
 
-	get_system<driver_system>().delegate_movement_intents_from_drivers_to_steering_intents_of_owned_vehicles();
-
-	/* end of intent delegation stage */
-	
 	get_system<force_joint_system>().apply_forces_towards_target_entities();
 
 	get_system<car_system>().set_steering_flags_from_intents();
@@ -172,7 +185,5 @@ void game_world::perform_logic_step() {
 	get_system<physics_system>().step_and_set_new_transforms();
 	get_system<position_copying_system>().update_transforms();
 
-	get_system<render_system>().remove_entities_from_rendering_tree();
-	get_system<physics_system>().destroy_fixtures_and_bodies();
-	get_system<destroy_system>().delete_queued_entities();
+	++current_step_number;
 }

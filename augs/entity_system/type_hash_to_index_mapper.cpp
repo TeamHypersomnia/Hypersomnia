@@ -29,4 +29,9 @@ namespace augs {
 		/* we don't want to create new value, so we use at instead of operator[] */
 		return library.at(hash);
 	}
+
+	bool type_hash_to_index_mapper::has_index(size_t hash) const {
+		/* we don't want to create new value, so we use at instead of operator[] */
+		return library.find(hash) != library.end();
+	}
 }

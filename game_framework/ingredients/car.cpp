@@ -15,8 +15,7 @@
 #include "game_framework/components/children_component.h"
 #include "game_framework/components/car_component.h"
 #include "game_framework/components/trigger_component.h"
-
-#include "game_framework/shared/physics_setup_helpers.h"
+#include "game_framework/components/physics_definition_component.h"
 
 #include "game_framework/globals/filters.h"
 
@@ -35,6 +34,7 @@ namespace prefabs {
 			auto& render = *front += components::render();
 			auto& transform = *front += components::transform();
 			auto& car = *front += components::car();
+			auto& physics_definition = *front += components::physics_definition();
 
 			car.left_wheel_trigger = left_wheel;
 			car.input_acceleration.set(2500, 4500)/=3;
@@ -48,19 +48,15 @@ namespace prefabs {
 
 			render.layer = render_layer::DYNAMIC_BODY;
 
-			body_definition body;
-			body.linear_damping = 0.4f;
-			body.angular_damping = 2.f;
+			physics_definition.body.linear_damping = 0.4f;
+			physics_definition.body.angular_damping = 2.f;
 
-			fixture_definition info;
-			info.from_renderable(front);
+			auto& fixture = physics_definition.new_fixture();
+			fixture.from_renderable(front);
 
-			info.filter = filters::dynamic_object();
-			info.density = 0.6f;
-
-			auto& physics = create_physics_component(body, front);
-			add_fixtures(info, front);
-
+			fixture.filter = filters::dynamic_object();
+			fixture.density = 0.6f;
+			
 			//physics.air_resistance = 0.2f;
 		}
 
@@ -68,6 +64,7 @@ namespace prefabs {
 			auto& sprite = *interior += components::sprite();
 			auto& render = *interior += components::render();
 			auto& transform = *interior += components::transform();
+			auto& physics_definition = *interior += components::physics_definition();
 
 			transform.pos = pos;
 
@@ -78,15 +75,14 @@ namespace prefabs {
 			//sprite.size.x = 250;
 			//sprite.size.y = 550;
 
-			fixture_definition info;
-			info.from_renderable(interior);
-			info.density = 0.6f;
-			info.filter = filters::dynamic_object();
+			auto& fixture = physics_definition.new_fixture(front);
+			fixture.from_renderable(interior);
+			fixture.density = 0.6f;
+			fixture.filter = filters::dynamic_object();
+			
 			vec2 offset(0, front->get<components::sprite>().size.y / 2 + sprite.size.y / 2);
-			info.transform_vertices.pos = offset;
-
-			auto& fixtures = add_fixtures_to_other_body(info, interior, front);
-			fixtures.is_friction_ground = true;
+			fixture.transform_vertices.pos = offset;
+			fixture.is_friction_ground = true;
 		}
 
 		{
@@ -94,6 +90,7 @@ namespace prefabs {
 			auto& render = *left_wheel += components::render();
 			auto& transform = *left_wheel += components::transform();
 			auto& trigger = *left_wheel += components::trigger();
+			auto& physics_definition = *left_wheel += components::physics_definition();
 
 			transform.pos = pos;
 			trigger.entity_to_be_notified = front;
@@ -104,15 +101,15 @@ namespace prefabs {
 			sprite.size.x = 30;
 			sprite.size.y = 60;
 
-			fixture_definition info;
-			info.from_renderable(left_wheel);
-			info.density = 0.6f;
-			info.filter = filters::trigger();
-			info.sensor = true;
+			auto& fixture = physics_definition.new_fixture(front);
+
+			fixture.from_renderable(left_wheel);
+			fixture.density = 0.6f;
+			fixture.filter = filters::trigger();
+			fixture.sensor = true;
+
 			vec2 offset(0, front->get<components::sprite>().size.y / 2 + sprite.size.y / 2 + 20);
-			info.transform_vertices.pos = offset;
-			
-			auto& physics = add_fixtures_to_other_body(info, left_wheel, front);
+			fixture.transform_vertices.pos = offset;
 		}
 
 		return front;

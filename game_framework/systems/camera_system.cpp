@@ -18,8 +18,8 @@ components::crosshair* components::camera::get_crosshair() {
 		auto* maybe_children = entity_to_chase->find<components::children>();
 
 		if (maybe_children) {
-			if (maybe_children->sub_entities_by_name[components::children::CHARACTER_CROSSHAIR].alive()) {
-				return maybe_children->sub_entities_by_name[components::children::CHARACTER_CROSSHAIR]->find<components::crosshair>();
+			if (maybe_children->sub_entities_by_name[sub_entity_name::CHARACTER_CROSSHAIR].alive()) {
+				return maybe_children->sub_entities_by_name[sub_entity_name::CHARACTER_CROSSHAIR]->find<components::crosshair>();
 			}
 		}
 	}

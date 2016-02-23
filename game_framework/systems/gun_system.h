@@ -13,6 +13,6 @@ class gun_system : public processing_system_templated<components::transform, com
 public:
 	using processing_system_templated::processing_system_templated;
 	
-	void consume_events();
-	void process_entities();
+	void consume_gun_intents();
+	void launch_shots_due_to_pressed_triggers();
 };

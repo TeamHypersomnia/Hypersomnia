@@ -19,16 +19,17 @@ namespace augs {
 
 	entity_id world::create_entity(std::string debug_name) {
 		entity_id res = entities.allocate(std::ref(*this));
-		res->debug_name = debug_name;
 
-		messages::new_entity_message msg;
-		msg.subject = res;
-		post_message(msg);
+		res->debug_name = debug_name;
 
 #ifdef USE_NAMES_FOR_IDS
 		strcpy(res.debug_name, debug_name.c_str());
 #endif
 		assert(res.debug_name != "");
+
+		messages::new_entity_message msg;
+		msg.subject = res;
+		post_message(msg);
 
 		return res;
 	}

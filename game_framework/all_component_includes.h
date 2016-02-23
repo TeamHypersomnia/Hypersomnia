@@ -30,7 +30,9 @@
 #include "components/container_component.h"
 #include "components/item_component.h"
 #include "components/force_joint_component.h"
-
+#include "components/physics_definition_component.h"
+#include "components/item_slot_transfers_component.h"
+#include "components/melee_component.h"
 
 
 

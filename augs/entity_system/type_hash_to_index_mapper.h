@@ -17,5 +17,6 @@ namespace augs {
 
 		/* get single type information from its hash */
 		unsigned get_index(size_t hash) const;
+		bool has_index(size_t hash) const;
 	};
 }

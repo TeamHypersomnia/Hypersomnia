@@ -18,24 +18,21 @@ namespace augs {
 		rgba& set_hsv(hsv);
 	};
 
-	namespace colors {
-		extern const rgba ltblue;
-		extern const rgba blue;
-		extern const rgba red;
-		extern const rgba green;
-		extern const rgba violet;
-		extern const rgba darkred;
-		extern const rgba black;
-		extern const rgba darkgray;
-		extern const rgba gray1;
-		extern const rgba gray2;
-		extern const rgba gray3;
-		extern const rgba gray4;
-		extern const rgba white;
-		extern const rgba darkblue;
+	extern const rgba ltblue;
+	extern const rgba blue;
+	extern const rgba red;
+	extern const rgba green;
+	extern const rgba violet;
+	extern const rgba darkred;
+	extern const rgba black;
+	extern const rgba darkgray;
+	extern const rgba gray1;
+	extern const rgba gray2;
+	extern const rgba gray3;
+	extern const rgba gray4;
+	extern const rgba white;
+	extern const rgba darkblue;
 
-		extern const rgba cyan;
-		extern const rgba yellow;
-
-	}
+	extern const rgba cyan;
+	extern const rgba yellow;
 }

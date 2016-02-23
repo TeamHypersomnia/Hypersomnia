@@ -13,8 +13,8 @@ using namespace augs;
 
 struct input_system : public processing_system_templated<components::input_receiver> {
 	struct context {
-		std::unordered_map<window::event::keys::key, std::vector<intent_type>> key_to_intent;
-		std::unordered_map<window::event::message,	 std::vector<intent_type>> event_to_intent;
+		std::unordered_map<window::event::keys::key, intent_type> key_to_intent;
+		std::unordered_map<window::event::message,	 intent_type> event_to_intent;
 		bool enabled;
 		context();
 

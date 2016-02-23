@@ -36,6 +36,11 @@ namespace assets {
 		TEST_SPRITE,
 		MOTOR,
 
+		SAMPLE_MAGAZINE,
+		BACKPACK,
+		RIGHT_HAND_ICON,
+		LEFT_HAND_ICON,
+
 		CUSTOM = 10000
 	};
 	

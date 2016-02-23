@@ -1,5 +1,4 @@
 #include "driver_system.h"
-#include "../messages/car_ownership_change_message.h"
 #include "../messages/trigger_hit_confirmation_message.h"
 #include "../messages/collision_message.h"
 
@@ -23,17 +22,8 @@ void driver_system::assign_drivers_from_triggers() {
 		auto subject_car = e.trigger->get<components::trigger>().entity_to_be_notified;
 		auto* maybe_car = subject_car->find<components::car>();
 
-		if (maybe_car) {
-			auto& car = *maybe_car;
-			if (e.trigger == car.left_wheel_trigger) {
-				if (car.current_driver.dead()) {
-					messages::car_ownership_change_message msg;
-					msg.car = subject_car;
-					msg.driver = e.detector;
-					affect_drivers_due_to_car_ownership_changes(msg);
-				}
-			}
-		}
+		if (maybe_car && e.trigger == maybe_car->left_wheel_trigger && e.domain == detection_domain::TRIGGER_SWITCHING)
+			assign_car_ownership(e.detector_body, subject_car);
 	}
 }
 
@@ -49,58 +39,47 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel() {
 
 			if (maybe_driver) {
 				if (maybe_driver->owned_vehicle == car) {
-					messages::car_ownership_change_message msg;
-					msg.car = car;
-					msg.driver = driver;
-					msg.lost_ownership = true;
-					affect_drivers_due_to_car_ownership_changes(msg);
-
-					msg.driver->get<components::movement>().make_inert_for_ms = 500.f;
+					release_car_ownership(driver);
+					driver->get<components::movement>().make_inert_for_ms = 500.f;
 				}
 			}
 		}
 	}
 }
-
 void driver_system::release_drivers_due_to_requests() {
 	auto& intents = parent_world.get_message_queue<messages::intent_message>();
 
-	for (auto& e : intents) {
-		if (e.intent == intent_type::RELEASE_CAR && e.pressed_flag) {
-			auto* maybe_driver = e.subject->find<components::driver>();
-
-			if (maybe_driver) {
-				auto car = maybe_driver->owned_vehicle;
-
-				if (car.alive() && car->get<components::car>().current_driver == e.subject) {
-					messages::car_ownership_change_message msg;
-					msg.car = car;
-					msg.driver = e.subject;
-					msg.lost_ownership = true;
-					affect_drivers_due_to_car_ownership_changes(msg);
-					
-					e.clear();
-				}
-			}
-		}
-	}
+	for (auto& e : intents)
+		if (e.intent == intent_type::RELEASE_CAR && e.pressed_flag)
+			release_car_ownership(e.subject);
 }
 
-void driver_system::affect_drivers_due_to_car_ownership_changes(messages::car_ownership_change_message& e) {
-	auto& car = e.car->get<components::car>();
-	auto& driver = e.driver->get<components::driver>();
+bool driver_system::release_car_ownership(augs::entity_id driver) {
+	return change_car_ownership(driver, augs::entity_id(), true);
+}
 
-	auto* maybe_children = e.driver->find<components::children>();
-	auto* maybe_rotation_copying = e.driver->find<components::rotation_copying>();
-	auto* maybe_physics = e.driver->find<components::physics>();
-	auto* maybe_movement = e.driver->find<components::movement>();
-	auto& force_joint = e.driver->get<components::force_joint>();
+bool driver_system::assign_car_ownership(augs::entity_id driver, augs::entity_id car) {
+	return change_car_ownership(driver, car, false);
+}
 
-	if (!e.lost_ownership) {
-		driver.owned_vehicle = e.car;
-		car.current_driver = e.driver;
+bool driver_system::change_car_ownership(augs::entity_id driver_entity, augs::entity_id car_entity, bool lost_ownership) {
+	auto& driver = driver_entity->get<components::driver>();
+
+	auto* maybe_rotation_copying = driver_entity->find<components::rotation_copying>();
+	auto* maybe_physics = driver_entity->find<components::physics>();
+	auto* maybe_movement = driver_entity->find<components::movement>();
+	auto& force_joint = driver_entity->get<components::force_joint>();
+
+	if (!lost_ownership) {
+		auto& car = car_entity->get<components::car>();
+
+		if (car.current_driver.alive())
+			return false;
+
+		driver.owned_vehicle = car_entity;
+		car.current_driver = driver_entity;
 		force_joint.chased_entity = car.left_wheel_trigger;
-		e.driver->enable(force_joint);
+		driver_entity->enable(force_joint);
 
 		if (maybe_movement) {
 			maybe_movement->reset_movement_flags();
@@ -108,31 +87,22 @@ void driver_system::affect_drivers_due_to_car_ownership_changes(messages::car_ow
 			maybe_movement->enable_animation = false;
 		}
 
-		if (maybe_children) {
-			auto& children = maybe_children->sub_entities_by_name;
-
-			if (children[components::children::sub_entity_name::CHARACTER_CROSSHAIR].alive()) {
-				//children[components::children::sub_entity_name::CHARACTER_CROSSHAIR]->get<components::input>() = input_profiles::crosshair_driving();
-			}
-		}
-
 		if (maybe_rotation_copying && maybe_physics) {
 			maybe_rotation_copying->update_value = false;
-			//maybe_physics->enable_angle_motor = false;
 		}
 
 		if (maybe_physics) {
 			maybe_physics->set_transform(car.left_wheel_trigger);
 			maybe_physics->set_velocity(vec2(0, 0));
 			maybe_physics->set_density(driver.density_while_driving);
-
-			//maybe_physics->set_linear_damping(driver.linear_damping_while_driving);
 		}
 	}
 	else {
+		auto& car = driver.owned_vehicle->get<components::car>();
+
 		driver.owned_vehicle.unset();
 		car.current_driver.unset();
-		e.driver->disable(force_joint);
+		driver_entity->disable(force_joint);
 
 		if (maybe_movement) {
 			maybe_movement->reset_movement_flags();
@@ -149,41 +119,14 @@ void driver_system::affect_drivers_due_to_car_ownership_changes(messages::car_ow
 
 		if (maybe_rotation_copying && maybe_physics) {
 			maybe_rotation_copying->update_value = true;
-			//maybe_physics->enable_angle_motor = true;
 		}
 
 		if (maybe_physics) {
 			maybe_physics->set_density(driver.standard_density);
-			// maybe_physics->set_linear_damping(driver.standard_linear_damping);
-		}
-
-		if (maybe_children) {
-			auto& children = maybe_children->sub_entities_by_name;
-
-			if (children[components::children::sub_entity_name::CHARACTER_CROSSHAIR].alive()) {
-				//children[components::children::sub_entity_name::CHARACTER_CROSSHAIR]->get<components::input>() = input_profiles::crosshair();
-			}
 		}
 	}
-}
 
-void driver_system::delegate_movement_intents_from_drivers_to_steering_intents_of_owned_vehicles() {
-	auto& intents = parent_world.get_message_queue<messages::intent_message>();
+	// networking the message, since it was successful
 
-	for (auto& e : intents) {
-		if (e.intent == intent_type::MOVE_FORWARD
-			|| e.intent == intent_type::MOVE_BACKWARD
-			|| e.intent == intent_type::MOVE_LEFT
-			|| e.intent == intent_type::MOVE_RIGHT
-			|| e.intent == intent_type::HAND_BRAKE
-			) {
-			auto* maybe_driver = e.subject->find<components::driver>();
-
-			if (maybe_driver) {
-				if (maybe_driver->owned_vehicle.alive()) {
-					e.subject = maybe_driver->owned_vehicle;
-				}
-			}
-		}
-	}
+	return true;
 }

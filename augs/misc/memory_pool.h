@@ -81,9 +81,9 @@ namespace augs {
 		};
 
 		template <typename T>
-		class typed_id : private id {
+		class typed_id_interface : private id {
 		public:
-			typed_id() {}
+			using id::id;
 
 			const T& get() const { return *reinterpret_cast<T*>(id::ptr()); }
 			const T* ptr() const { return  reinterpret_cast<T*>(id::ptr()); }
@@ -96,9 +96,9 @@ namespace augs {
 			T* operator->() { return &get(); }
 
 			using id::operator!;
-			bool operator< (const typed_id& b) const { return id::operator< (reinterpret_cast<const id&>(b)); }
-			bool operator==(const typed_id& b) const { return id::operator==(reinterpret_cast<const id&>(b)); }
-			bool operator!=(const typed_id& b) const { return id::operator!=(reinterpret_cast<const id&>(b)); }
+			bool operator< (const typed_id_interface& b) const { return id::operator< (reinterpret_cast<const id&>(b)); }
+			bool operator==(const typed_id_interface& b) const { return id::operator==(reinterpret_cast<const id&>(b)); }
+			bool operator!=(const typed_id_interface& b) const { return id::operator!=(reinterpret_cast<const id&>(b)); }
 
 			bool alive() const { return id::alive(); }
 			bool dead() const { return id::dead(); }
@@ -107,6 +107,11 @@ namespace augs {
 #ifdef USE_NAMES_FOR_IDS
 			using id::debug_name;
 #endif
+		};
+
+		template <typename T>
+		class typed_id : public typed_id_interface<T> {
+
 		};
 
 		memory_pool(int slot_count = 0, int slot_size = 0);

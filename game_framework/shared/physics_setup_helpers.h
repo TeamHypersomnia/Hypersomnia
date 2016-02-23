@@ -10,9 +10,12 @@ struct body_definition {
 
 	float angular_damping = 6.5f,
 		linear_damping = 6.5f,
-		gravity_scale = 0.f;
+		gravity_scale = 0.f,
+		angular_air_resistance = 0.f;
 
 	bool fixed_rotation = false, bullet = false, angled_damping = false;
+
+	vec2 velocity;
 };
 
 struct fixture_definition {
@@ -36,6 +39,7 @@ struct fixture_definition {
 		radius = 0.f;
 
 	bool sensor = false;
+	bool is_friction_ground = false;
 
 	void add_convex_polygon(const std::vector<vec2>&);
 	void add_concave_polygon(const std::vector<vec2>&);

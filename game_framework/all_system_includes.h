@@ -22,6 +22,8 @@
 #include "systems/trigger_detector_system.h"
 #include "systems/item_system.h"
 #include "systems/force_joint_system.h"
+#include "systems/intent_contextualization_system.h"
+
 
 
 

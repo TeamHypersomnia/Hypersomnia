@@ -26,19 +26,48 @@ namespace augs {
 		targets.clear();
 	}
 
-	double processing_system::delta_seconds() {
+	double processing_system::delta_seconds() const {
 		return parent_overworld.delta_seconds();
 	}
 
-	double processing_system::delta_milliseconds() {
+	double processing_system::delta_milliseconds() const {
 		return parent_overworld.delta_milliseconds();
 	}
 	
-	double processing_system::view_interpolation_ratio() {
+	double processing_system::view_interpolation_ratio() const {
 		return parent_overworld.view_interpolation_ratio();
 	}
 
 	augs::renderer& processing_system::get_renderer() {
 		return augs::renderer::get_current();
+	}
+
+	bool processing_system::passed(augs::deterministic_timeout& t) const {
+		return !t.was_set || (parent_world.current_step_number - t.step_recorded) * delta_milliseconds() >= t.timeout_ms;
+	}
+
+	bool processing_system::check_timeout_and_reset(augs::deterministic_timeout& t) {
+		if (passed(t)) {
+			reset(t);
+			return true;
+		}
+
+		return false;
+	}
+
+	float processing_system::get_milliseconds_left(augs::deterministic_timeout& t) const {
+		if (!t.was_set) 
+			return 0.f;
+
+		return std::max(0.0, t.timeout_ms - (parent_world.current_step_number - t.step_recorded) * delta_milliseconds());
+	}
+
+	float processing_system::get_percentage_left(augs::deterministic_timeout& t) const {
+		return get_milliseconds_left(t) / t.timeout_ms;
+	}
+
+	void processing_system::reset(augs::deterministic_timeout& t) {
+		t.step_recorded = parent_world.current_step_number;
+		t.was_set = true;
 	}
 }

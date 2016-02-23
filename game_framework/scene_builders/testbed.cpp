@@ -89,7 +89,7 @@ namespace scene_builders {
 		for (int x = -4 * 1; x < 4 * 1; ++x)
 		{
 			auto frog = world.create_entity("frog");
-			ingredients::sprite(frog, vec2(100 + x * 40, 400), assets::texture_id::TEST_SPRITE, augs::colors::white, render_layer::DYNAMIC_BODY);
+			ingredients::sprite(frog, vec2(100 + x * 40, 400), assets::texture_id::TEST_SPRITE, augs::white, render_layer::DYNAMIC_BODY);
 			ingredients::crate_physics(frog);
 		}
 
@@ -108,13 +108,13 @@ namespace scene_builders {
 			for (int y = -4 * 10; y < 4 * 10; ++y)
 			{
 				auto background = world.create_entity();
-				ingredients::sprite(background, vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, augs::colors::white, render_layer::GROUND);
+				ingredients::sprite(background, vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, augs::white, render_layer::GROUND);
 				//ingredients::static_crate_physics(background);
 
 				auto street = world.create_entity();
 				ingredients::sprite_scalled(street, vec2(x, y) * (bg_size + vec2(1500, 700)) - vec2(1500, 700), 
 					vec2(3000, 3000),
-					assets::texture_id::TEST_BACKGROUND, augs::colors::gray1, render_layer::UNDER_GROUND);
+					assets::texture_id::TEST_BACKGROUND, augs::gray1, render_layer::UNDER_GROUND);
 			}
 
 
@@ -125,29 +125,34 @@ namespace scene_builders {
 
 		ingredients::character_inventory(player);
 
-		ingredients::sprite_scalled(crate, vec2(200, 300), vec2i(100, 100)/3, assets::texture_id::CRATE, augs::colors::white, render_layer::DYNAMIC_BODY);
+		ingredients::sprite_scalled(crate, vec2(200, 300), vec2i(100, 100)/3, assets::texture_id::CRATE, augs::white, render_layer::DYNAMIC_BODY);
 		ingredients::crate_physics(crate);
 		
-		ingredients::sprite_scalled(crate2, vec2(400, 400), vec2i(100, 100), assets::texture_id::CRATE, augs::colors::white, render_layer::DYNAMIC_BODY);
+		ingredients::sprite_scalled(crate2, vec2(400, 400), vec2i(100, 100), assets::texture_id::CRATE, augs::white, render_layer::DYNAMIC_BODY);
 		ingredients::crate_physics(crate2);
 		
-		ingredients::sprite_scalled(crate4, vec2(500, 0), vec2i(100, 100), assets::texture_id::CRATE, augs::colors::white, render_layer::DYNAMIC_BODY);
+		ingredients::sprite_scalled(crate4, vec2(500, 0), vec2i(100, 100), assets::texture_id::CRATE, augs::white, render_layer::DYNAMIC_BODY);
 		ingredients::crate_physics(crate4);
 
 		input_system::context active_context;
-		active_context.map_event_to_intent(window::event::raw_mousemotion, intent_type::MOVE_CROSSHAIR);
-		active_context.map_key_to_intent(window::event::keys::LSHIFT, intent_type::SWITCH_LOOK);
 		active_context.map_key_to_intent(window::event::keys::W, intent_type::MOVE_FORWARD);
 		active_context.map_key_to_intent(window::event::keys::S, intent_type::MOVE_BACKWARD);
 		active_context.map_key_to_intent(window::event::keys::A, intent_type::MOVE_LEFT);
 		active_context.map_key_to_intent(window::event::keys::D, intent_type::MOVE_RIGHT);
+
+		active_context.map_event_to_intent(window::event::raw_mousemotion, intent_type::MOVE_CROSSHAIR);
 		active_context.map_key_to_intent(window::event::keys::LMOUSE, intent_type::CROSSHAIR_PRIMARY_ACTION);
 		active_context.map_key_to_intent(window::event::keys::RMOUSE, intent_type::CROSSHAIR_SECONDARY_ACTION);
-		active_context.map_key_to_intent(window::event::keys::E, intent_type::RELEASE_CAR);
-		active_context.map_key_to_intent(window::event::keys::E, intent_type::PRESS_TRIGGER);
-		active_context.map_key_to_intent(window::event::keys::G, intent_type::DROP_PRIMARY_ITEM);
+		
+		active_context.map_key_to_intent(window::event::keys::E, intent_type::USE_BUTTON);
+		active_context.map_key_to_intent(window::event::keys::SPACE, intent_type::SPACE_BUTTON);
+		
+		active_context.map_key_to_intent(window::event::keys::G, intent_type::THROW_PRIMARY_ITEM);
 		active_context.map_key_to_intent(window::event::keys::H, intent_type::HOLSTER_PRIMARY_ITEM);
-		active_context.map_key_to_intent(window::event::keys::SPACE, intent_type::HAND_BRAKE);
+		
+		active_context.map_key_to_intent(window::event::keys::LSHIFT, intent_type::SWITCH_LOOK);
+
+		active_context.map_key_to_intent(window::event::keys::Z, intent_type::START_PICKING_UP_ITEMS);
 
 		world.get_system<input_system>().add_context(active_context);
 
@@ -195,10 +200,10 @@ namespace scene_builders {
 
 	void testbed::drawcalls_after_all_cameras(world& world) {
 		auto& target = renderer::get_current();
-		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(assets::font_id::GUI_FONT, augs::colors::violet), vec2i(200-1, 200), 0, nullptr);
-		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(assets::font_id::GUI_FONT, augs::colors::violet), vec2i(200+1, 200), 0, nullptr);
-		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(assets::font_id::GUI_FONT, augs::colors::violet), vec2i(200, 200 - 1), 0, nullptr);
-		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(assets::font_id::GUI_FONT, augs::colors::violet), vec2i(200, 200+1), 0, nullptr);
+		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(assets::font_id::GUI_FONT, augs::violet), vec2i(200-1, 200), 0, nullptr);
+		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(assets::font_id::GUI_FONT, augs::violet), vec2i(200+1, 200), 0, nullptr);
+		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(assets::font_id::GUI_FONT, augs::violet), vec2i(200, 200 - 1), 0, nullptr);
+		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(assets::font_id::GUI_FONT, augs::violet), vec2i(200, 200+1), 0, nullptr);
 
 
 		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(), vec2i(200, 200), 0, nullptr);

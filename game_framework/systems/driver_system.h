@@ -4,11 +4,8 @@
 #include "../components/physics_component.h"
 #include "../components/transform_component.h"
 
-#include "../messages/car_ownership_change_message.h"
-
 class driver_system : public augs::processing_system_templated<components::driver, components::transform, components::physics> {
-	void affect_drivers_due_to_car_ownership_changes(messages::car_ownership_change_message&);
-
+	bool change_car_ownership(augs::entity_id driver, augs::entity_id car, bool lost);
 public:
 	using processing_system_templated::processing_system_templated;
 
@@ -17,5 +14,6 @@ public:
 	void release_drivers_due_to_requests();
 	void release_drivers_due_to_ending_contact_with_wheel();
 
-	void delegate_movement_intents_from_drivers_to_steering_intents_of_owned_vehicles();
+	bool release_car_ownership(augs::entity_id driver);
+	bool assign_car_ownership(augs::entity_id driver, augs::entity_id car);
 };

@@ -16,9 +16,7 @@
 #include "game_framework/components/trigger_detector_component.h"
 #include "game_framework/components/driver_component.h"
 #include "game_framework/components/force_joint_component.h"
-
-
-#include "game_framework/shared/physics_setup_helpers.h"
+#include "game_framework/components/physics_definition_component.h"
 
 #include "game_framework/globals/filters.h"
 #include "game_framework/globals/input_profiles.h"
@@ -42,8 +40,11 @@ namespace ingredients {
 	}
 
 	void wsad_player_physics(augs::entity_id e) {
-		body_definition body;
-		fixture_definition info;
+		auto& physics_definition = *e += components::physics_definition();
+
+		auto& body = physics_definition.body;
+		auto& info = physics_definition.new_fixture();
+
 		info.from_renderable(e);
 
 		info.filter = filters::controlled_character();
@@ -51,11 +52,7 @@ namespace ingredients {
 		body.fixed_rotation = false;
 		body.angled_damping = true;
 
-		auto& physics = create_physics_component(body, e);
-		add_fixtures(info, e);
-
-		//physics.air_resistance = 5.f;
-		physics.set_linear_damping(20);
+		body.linear_damping = 20;
 
 		wsad_player_setup_movement(e);
 	}
@@ -90,17 +87,20 @@ namespace ingredients {
 	}
 
 	void wsad_player(augs::entity_id e, augs::entity_id crosshair_entity, augs::entity_id camera_entity) {
-		components::sprite sprite;
-		components::render render;
-		components::animation animation;
-		components::animation_response animation_response;
-		components::transform transform;
-		components::movement movement;
-		components::rotation_copying rotation_copying;
-		components::children children;
-		components::trigger_detector detector;
-		components::driver driver;
-		components::force_joint force_joint;
+		auto& sprite = *e += components::sprite();
+		auto& render = *e += components::render();
+		auto& animation = *e += components::animation();
+		auto& animation_response = *e += components::animation_response();
+		auto& transform = *e += components::transform();
+		auto& movement = *e += components::movement();
+		auto& rotation_copying = *e += components::rotation_copying();
+		auto& children = *e += components::children();
+		auto& detector = *e += components::trigger_detector();
+		auto& driver = *e += components::driver();
+		auto& force_joint = *e += components::force_joint();
+		e->disable(force_joint);
+
+		e->add(input_profiles::character());
 
 		force_joint.force_towards_chased_entity = 85000.f;
 		force_joint.distance_when_force_easing_starts = 20.f;
@@ -112,8 +112,9 @@ namespace ingredients {
 		movement.standard_linear_damping = 20.f;
 		// driver.linear_damping_while_driving = 4.f;
 
-		children.map_sub_entity(crosshair_entity, components::children::CHARACTER_CROSSHAIR);
-
+		children.map_sub_entity(crosshair_entity, sub_entity_name::CHARACTER_CROSSHAIR);
+		children.associate_entity(camera_entity, associated_entity_name::WATCHING_CAMERA);
+		
 		animation_response.response = assets::animation_response_id::TORSO_SET;
 
 		sprite.set(assets::texture_id::TEST_PLAYER, rgba(255, 255, 255, 255));
@@ -123,20 +124,6 @@ namespace ingredients {
 		rotation_copying.target = crosshair_entity;
 		rotation_copying.look_mode = components::rotation_copying::look_type::POSITION;
 		rotation_copying.use_physical_motor = true;
-
-		e->add(transform);
-		e->add(input_profiles::character());
-		e->add(render);
-		e->add(animation);
-		e->add(animation_response);
-		e->add(sprite);
-		e->add(movement);
-		e->add(rotation_copying);
-		e->add(detector);
-		e->add(driver);
-		e->add(children);
-		e->add(force_joint);
-		e->disable(force_joint);
 		
 		wsad_player_setup_movement(e);
 

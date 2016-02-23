@@ -9,7 +9,10 @@ float PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 
 #include "../messages/collision_message.h"
 #include "../messages/destroy_message.h"
+#include "../messages/new_entity_message.h"
+
 #include "../shared/physics_setup_helpers.h"
+#include "../components/physics_definition_component.h"
 
 #include "../components/fixtures_component.h"
 
@@ -653,5 +656,33 @@ void physics_system::reset_states() {
 
 		if (!b->IsFixedRotation())
 			transform.rotation = body_angle;
+	}
+}
+
+void physics_system::create_bodies_and_fixtures_from_physics_definitions() {
+	auto& events = parent_world.get_message_queue<messages::new_entity_message>();
+
+	for (auto& it : events) {
+		auto& e = it.subject;
+		/* remove dead components that are remnants of cloning or mistakenly added */
+		e->remove<components::physics>();
+		e->remove<components::fixtures>();
+
+		auto* physics_definition = e->find<components::physics_definition>();
+
+		if (physics_definition) {
+			if (!physics_definition->dont_create_fixtures_and_body) {
+				create_physics_component(physics_definition->body, e);
+
+				for (auto& fixture : physics_definition->fixtures)
+					add_fixtures(fixture, e);
+
+				for (auto& fixture : physics_definition->fixtures_linked_to_other_bodies)
+					add_fixtures_to_other_body(fixture.first, e, fixture.second);
+			}
+
+			if (!physics_definition->preserve_definition_for_cloning)
+				e->remove<components::physics_definition>();
+		}
 	}
 }

@@ -5,52 +5,19 @@ namespace augs {
 
 	}
 
-	overworld::deterministic_timer::deterministic_timer(augs::overworld* overworld) 
-		: parent_overworld(overworld), step_recorded(0) {
-		reset();
-	}
-
-	void overworld::deterministic_timer::reset() {
-		step_recorded = parent_overworld->current_step_number;
-	}
-
-	float overworld::deterministic_timer::get_milliseconds() const {
-		return get_steps() * static_cast<float>(parent_overworld->delta_timer.delta_milliseconds());
-	}
-
-	float overworld::deterministic_timer::extract_milliseconds() {
-		float result = get_milliseconds();
-		reset();
-		return result;
-	}
-
-	unsigned overworld::deterministic_timer::get_steps() const {
-		return parent_overworld->current_step_number - step_recorded;
-	}
-
-	unsigned overworld::deterministic_timer::extract_steps() {
-		unsigned result = get_steps();
-		reset();
-		return result;
-	}
-
 	void overworld::configure_stepping(float fps, int max_updates_per_step) {
 		delta_timer = augs::fixed_delta_timer(fps, max_updates_per_step);
 	}
 	
-	overworld::deterministic_timer overworld::create_deterministic_timer() {
-		return deterministic_timer(this);
-	}
-
-	double overworld::delta_seconds() {
+	double overworld::delta_seconds() const {
 		return delta_ms / 1000.0;
 	}
 
-	double overworld::delta_milliseconds() {
+	double overworld::delta_milliseconds() const {
 		return delta_ms;
 	}
 
-	double overworld::view_interpolation_ratio() {
+	double overworld::view_interpolation_ratio() const {
 		return delta_timer.fraction_of_time_until_the_next_logic_step();
 	}
 

@@ -58,7 +58,10 @@ namespace augs {
 
 		template <typename T>
 		void post_message(const T& message_object) {
-			return get_message_queue<T>().push_back(message_object);
+			get_message_queue<T>().push_back(message_object);
+
+			for (auto& callback : message_callbacks[typeid(T).hash_code()])
+				callback();
 		}
 
 		template<class T>
@@ -90,6 +93,11 @@ namespace augs {
 			return all_systems_map.get<T>();
 		}
 
+		template<class T>
+		void register_message_callback(std::function<void()> callback) {
+			message_callbacks[typeid(T).hash_code()].push_back(callback);
+		}
+
 		std::vector<processing_system*>& get_all_systems();
 
 		entity_id create_entity(std::string debug_name = "unknown");
@@ -104,9 +112,12 @@ namespace augs {
 
 		overworld& parent_overworld;
 		int entity_pool_capacity = 0;
+		unsigned long long current_step_number = 0;
 
 	private:
 		friend class entity;
+
+		std::unordered_map<size_t, std::vector<std::function<void()>>> message_callbacks;
 
 		object_pool<entity> entities;
 		unsafe_container_collection<object_pool> component_containers;
