@@ -8,17 +8,12 @@ namespace components {
 
 		body_definition body;
 		std::vector<fixture_definition> fixtures;
-		std::vector<std::pair<fixture_definition, augs::entity_id>> fixtures_linked_to_other_bodies;
+		augs::entity_id attach_fixtures_to_entity;
 
 		fixture_definition& new_fixture(augs::entity_id attached_to_entity = augs::entity_id()) {
-			if (attached_to_entity.alive()) {
-				fixtures_linked_to_other_bodies.push_back(std::make_pair(fixture_definition(), attached_to_entity));
-				return (*fixtures_linked_to_other_bodies.rbegin()).first;
-			}
-			else {
-				fixtures.push_back(fixture_definition());
-				return *fixtures.rbegin();
-			}
+			attach_fixtures_to_entity = attached_to_entity;
+			fixtures.push_back(fixture_definition());
+			return *fixtures.rbegin();
 		}
 	};
 }

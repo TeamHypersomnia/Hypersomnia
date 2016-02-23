@@ -21,7 +21,6 @@ void game_world::register_types_of_messages_components_systems() {
 	register_component<behaviour_tree>();
 	register_component<camera>();
 	register_component<position_copying>();
-	register_component<children>();
 	register_component<crosshair>();
 	register_component<damage>();
 	register_component<gun>();

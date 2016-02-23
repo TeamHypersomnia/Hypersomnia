@@ -45,7 +45,6 @@ namespace components {
 		vec2 max_look_expand = vec2(600.f, 300.f);
 
 		augs::entity_id entity_to_chase;
-		components::crosshair* get_crosshair();
 
 		vec2 previous_seen_player_position;
 		vec2 previous_step_player_position;

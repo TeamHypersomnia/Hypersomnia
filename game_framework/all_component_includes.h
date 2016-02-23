@@ -6,7 +6,6 @@
 #include "components/animation_component.h"
 #include "components/camera_component.h"
 #include "components/position_copying_component.h"
-#include "components/children_component.h"
 #include "components/crosshair_component.h"
 #include "components/damage_component.h"
 #include "components/gun_component.h"

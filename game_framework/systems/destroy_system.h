@@ -1,6 +1,5 @@
 #pragma once
 #include "entity_system/processing_system.h"
-#include "../components/children_component.h"
 
 using namespace augs;
 

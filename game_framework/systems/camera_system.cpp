@@ -6,26 +6,11 @@
 #include "../components/crosshair_component.h"
 #include "../components/position_copying_component.h"
 #include "../components/crosshair_component.h"
-#include "../components/children_component.h"
 #include "../components/physics_component.h"
 #include "../messages/intent_message.h"
 #include "../messages/camera_render_request_message.h"
 #include "../shared/state_for_drawing.h"
 #include "entity_system/world.h"
-
-components::crosshair* components::camera::get_crosshair() {
-	if (entity_to_chase.alive()) {
-		auto* maybe_children = entity_to_chase->find<components::children>();
-
-		if (maybe_children) {
-			if (maybe_children->sub_entities_by_name[sub_entity_name::CHARACTER_CROSSHAIR].alive()) {
-				return maybe_children->sub_entities_by_name[sub_entity_name::CHARACTER_CROSSHAIR]->find<components::crosshair>();
-			}
-		}
-	}
-
-	return nullptr;
-}
 
 void update_bounds_for_crosshair(components::camera& camera, components::crosshair& crosshair) {
 	if (camera.orbit_mode == components::camera::ANGLED)
@@ -49,10 +34,10 @@ void camera_system::react_to_input_intents() {
 				mode = components::camera::ANGLED;
 			else mode = components::camera::LOOK;
 
-			auto* maybe_crosshair = camera.get_crosshair();
+			auto crosshair = camera.entity_to_chase[sub_entity_name::CHARACTER_CROSSHAIR];
 
-			if (maybe_crosshair) 
-				update_bounds_for_crosshair(camera, *maybe_crosshair);
+			if (crosshair.alive())
+				update_bounds_for_crosshair(camera, crosshair->get<components::crosshair>());
 		}
 	}
 }
@@ -67,19 +52,25 @@ void components::camera::configure_camera_and_character_with_crosshair(augs::ent
 
 vec2i components::camera::get_camera_offset_due_to_character_crosshair(augs::entity_id self) {
 	vec2 camera_crosshair_offset;
-	auto* crosshair = get_crosshair();
+
+	if (entity_to_chase.dead())
+		return vec2i(0, 0);
+
+	auto crosshair_entity = entity_to_chase[sub_entity_name::CHARACTER_CROSSHAIR];
 
 	/* if we set player and crosshair entity targets */
 	/* skip calculations if no orbit_mode is specified */
-	if (crosshair != nullptr && orbit_mode != NONE) {
-		camera_crosshair_offset = crosshair->base_offset;
+	if (crosshair_entity.alive() && orbit_mode != NONE) {
+		auto& crosshair = crosshair_entity->get<components::crosshair>();
+
+		camera_crosshair_offset = crosshair.base_offset;
 
 		if (orbit_mode == ANGLED)
 			camera_crosshair_offset.set_length(angled_look_length);
 
 		if (orbit_mode == LOOK) {
 			/* simple proportion */
-			camera_crosshair_offset /= crosshair->bounds_for_base_offset;
+			camera_crosshair_offset /= crosshair.bounds_for_base_offset;
 			camera_crosshair_offset *= max_look_expand;
 		}
 

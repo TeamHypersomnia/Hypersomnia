@@ -961,7 +961,6 @@
     <ClInclude Include="game_framework\components\melee_component.h" />
     <ClInclude Include="game_framework\components\physics_definition_component.h" />
     <ClInclude Include="game_framework\components\position_copying_component.h" />
-    <ClInclude Include="game_framework\components\children_component.h" />
     <ClInclude Include="game_framework\components\crosshair_component.h" />
     <ClInclude Include="game_framework\components\damage_component.h" />
     <ClInclude Include="game_framework\components\driver_component.h" />

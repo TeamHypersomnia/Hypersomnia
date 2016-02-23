@@ -672,13 +672,16 @@ void physics_system::create_bodies_and_fixtures_from_physics_definitions() {
 
 		if (physics_definition) {
 			if (!physics_definition->dont_create_fixtures_and_body) {
-				create_physics_component(physics_definition->body, e);
+				auto other_body_entity = physics_definition->attach_fixtures_to_entity;
+
+				if (other_body_entity.dead())
+					create_physics_component(physics_definition->body, e);
 
 				for (auto& fixture : physics_definition->fixtures)
-					add_fixtures(fixture, e);
-
-				for (auto& fixture : physics_definition->fixtures_linked_to_other_bodies)
-					add_fixtures_to_other_body(fixture.first, e, fixture.second);
+					if (other_body_entity.alive())
+						add_fixtures_to_other_body(fixture, e, physics_definition->attach_fixtures_to_entity);
+					else
+						add_fixtures(fixture, e);
 			}
 
 			if (!physics_definition->preserve_definition_for_cloning)

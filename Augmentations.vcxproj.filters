@@ -2879,9 +2879,6 @@
     <ClInclude Include="game_framework\components\car_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\components\children_component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\components\container_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>

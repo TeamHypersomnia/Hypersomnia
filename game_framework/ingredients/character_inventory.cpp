@@ -7,7 +7,6 @@
 #include "game_framework/components/item_slot_transfers_component.h"
 #include "game_framework/components/trigger_component.h"
 #include "game_framework/components/trigger_detector_component.h"
-#include "game_framework/components/children_component.h"
 
 #include "../globals/detector_domains.h"
 
@@ -35,7 +34,7 @@ namespace ingredients {
 			detector.domain = detection_domain::WORLD_ITEMS;
 			detector.entity_whose_body_is_sampled = e;
 
-			e->get<components::children>().add_sub_entity(item_detector_entity);
+			e->add_sub_entity(item_detector_entity);
 		}
 	}
 }

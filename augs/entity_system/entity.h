@@ -20,7 +20,6 @@ namespace components {
 	struct behaviour_tree;
 	struct camera;
 	struct position_copying;
-	struct children;
 	struct crosshair;
 	struct damage;
 	struct gun;
@@ -52,18 +51,29 @@ namespace components {
 }
 #endif
 
+class destroy_system;
 namespace augs {
 	class world;
 
 	class entity {
 		/* only world class is allowed to instantiate an entity and it has to do it inside object pool */
 		friend class type_hash_to_index_mapper;
+		friend class ::destroy_system;
+		friend class memory_pool::typed_id<entity>;
 
+		std::unordered_map<sub_entity_name, augs::entity_id> sub_entities_by_name;
+		std::unordered_map<associated_entity_name, augs::entity_id> associated_entities_by_name;
+
+		std::vector<augs::entity_id> sub_entities;
 	public:
 		char script_data[sizeof(int) + sizeof(int*)];
 
 		entity(world& owner_world);
 		~entity();
+
+		void add_sub_entity(augs::entity_id p) {
+			sub_entities.push_back(p);
+		}
 
 		/* maps type hashes into components */
 #if USE_POINTER_TUPLE 
@@ -73,7 +83,6 @@ namespace augs {
 			std::pair<memory_pool::id, components::behaviour_tree*>,
 			std::pair<memory_pool::id, components::camera*>,
 			std::pair<memory_pool::id, components::position_copying*>,
-			std::pair<memory_pool::id, components::children*>,
 			std::pair<memory_pool::id, components::crosshair*>,
 			std::pair<memory_pool::id, components::damage*>,
 			std::pair<memory_pool::id, components::gun*>,

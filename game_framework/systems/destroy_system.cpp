@@ -15,28 +15,21 @@ void destroy_system::delete_queued_entities() {
 
 	push_destroyed = [&entities_to_destroy, &push_destroyed](entity_id subject){
 		entities_to_destroy.push_back(subject);
-		auto children = subject->find<components::children>();
 		
-		if (children != nullptr) {
-			for (auto child : children->sub_entities)
-				push_destroyed(child);
+		for (auto child : subject->sub_entities)
+			push_destroyed(child);
 
-			for (auto child : children->sub_entities_by_name)
-				push_destroyed(child.second);
-		}
+		for (auto child : subject->sub_entities_by_name)
+			push_destroyed(child.second);
 	};
 
 	for (auto it : events) {
 		if (it.only_children) {
-			auto children = it.subject->find<components::children>();
-			
-			if (children != nullptr) {
-				for (auto child : children->sub_entities)
-					push_destroyed(child);
+			for (auto child : it.subject->sub_entities)
+				push_destroyed(child);
 
-				for (auto child : children->sub_entities_by_name)
-					push_destroyed(child.second);
-			}
+			for (auto child : it.subject->sub_entities_by_name)
+				push_destroyed(child.second);
 		}
 		else {
 			push_destroyed(it.subject);

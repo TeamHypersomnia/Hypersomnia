@@ -14,7 +14,6 @@
 #include "../components/particle_group_component.h"
 #include "../components/position_copying_component.h"
 #include "../components/container_component.h"
-#include "../components/children_component.h"
 #include "../components/physics_definition_component.h"
 #include "../components/item_component.h"
 

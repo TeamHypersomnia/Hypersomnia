@@ -12,7 +12,6 @@
 #include "game_framework/components/animation_component.h"
 #include "game_framework/components/animation_response_component.h"
 #include "game_framework/components/physics_definition_component.h"
-#include "game_framework/components/children_component.h"
 #include "game_framework/components/car_component.h"
 #include "game_framework/components/trigger_component.h"
 
@@ -24,9 +23,8 @@ namespace prefabs {
 		auto interior = world.create_entity("interior");
 		auto left_wheel = world.create_entity("left_wheel");
 
-		auto& car_children = *front += components::children();
-		car_children.add_sub_entity(interior);
-		car_children.add_sub_entity(left_wheel);
+		front->add_sub_entity(interior);
+		front->add_sub_entity(left_wheel);
 
 		{
 			auto& sprite = *front += components::sprite();

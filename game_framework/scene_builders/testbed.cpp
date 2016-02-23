@@ -78,9 +78,7 @@ namespace scene_builders {
 		auto& player_response = resource_manager.create(assets::animation_response_id::TORSO_SET);
 		player_response[messages::animation_response_message::MOVE] = assets::animation_id::TORSO_MOVE;
 
-		auto camera = world.create_entity("camera");
-		auto crosshair = world.create_entity("crosshair");
-		auto player = world.create_entity("player");
+		world_camera = world.create_entity("camera");
 		auto crate = world.create_entity("crate");
 		auto crate2 = world.create_entity("crate2");
 		auto crate3 = world.create_entity("crate3");
@@ -97,10 +95,9 @@ namespace scene_builders {
 		auto car2 = prefabs::create_car(world, vec2(-800, 0));
 		auto car3 = prefabs::create_car(world, vec2(-1300, 0));
 
-
 		auto motorcycle = prefabs::create_motorcycle(world, vec2(0, -600));
 
-		ingredients::camera(camera, window_rect.w, window_rect.h);
+		ingredients::camera(world_camera, window_rect.w, window_rect.h);
 
 		auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
 
@@ -117,13 +114,23 @@ namespace scene_builders {
 					assets::texture_id::TEST_BACKGROUND, augs::gray1, render_layer::UNDER_GROUND);
 			}
 
+		const int num_characters = 5;
 
-		ingredients::wsad_player_crosshair(crosshair);
-		ingredients::wsad_player(player, crosshair, camera);
+		for (int i = 0; i < num_characters; ++i) {
+			auto crosshair = world.create_entity("crosshair");
+			auto character = world.create_entity("player");
 
-		ingredients::wsad_player_physics(player);
+			ingredients::wsad_character_crosshair(crosshair);
+			ingredients::wsad_character(character, crosshair);
 
-		ingredients::character_inventory(player);
+			ingredients::wsad_character_physics(character);
+
+			ingredients::character_inventory(character);
+
+			characters.push_back(character);
+		}
+
+		ingredients::inject_window_input_to_character(characters[current_character], world_camera);
 
 		ingredients::sprite_scalled(crate, vec2(200, 300), vec2i(100, 100)/3, assets::texture_id::CRATE, augs::white, render_layer::DYNAMIC_BODY);
 		ingredients::crate_physics(crate);
@@ -153,6 +160,7 @@ namespace scene_builders {
 		active_context.map_key_to_intent(window::event::keys::LSHIFT, intent_type::SWITCH_LOOK);
 
 		active_context.map_key_to_intent(window::event::keys::Z, intent_type::START_PICKING_UP_ITEMS);
+		active_context.map_key_to_intent(window::event::keys::TAB, intent_type::SWITCH_CHARACTER);
 
 		world.get_system<input_system>().add_context(active_context);
 
@@ -196,17 +204,29 @@ namespace scene_builders {
 			}
 		}
 
+
+		auto key_inputs = world.get_message_queue<messages::unmapped_intent_message>();
+
+		for (auto& it : key_inputs) {
+			if (it.intent == intent_type::SWITCH_CHARACTER && it.pressed_flag) {
+				++current_character;
+				current_character %= characters.size();
+				
+				ingredients::inject_window_input_to_character(characters[current_character], world_camera);
+			}
+		}
 	}
 
 	void testbed::drawcalls_after_all_cameras(world& world) {
 		auto& target = renderer::get_current();
-		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(assets::font_id::GUI_FONT, augs::violet), vec2i(200-1, 200), 0, nullptr);
-		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(assets::font_id::GUI_FONT, augs::violet), vec2i(200+1, 200), 0, nullptr);
-		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(assets::font_id::GUI_FONT, augs::violet), vec2i(200, 200 - 1), 0, nullptr);
-		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(assets::font_id::GUI_FONT, augs::violet), vec2i(200, 200+1), 0, nullptr);
+		using namespace graphics::gui::text;
 
+		quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", style(assets::font_id::GUI_FONT, violet), vec2i(200-1, 200), 0, nullptr);
+		quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", style(assets::font_id::GUI_FONT, violet), vec2i(200+1, 200), 0, nullptr);
+		quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", style(assets::font_id::GUI_FONT, violet), vec2i(200, 200 - 1), 0, nullptr);
+		quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", style(assets::font_id::GUI_FONT, violet), vec2i(200, 200+1), 0, nullptr);
 
-		graphics::gui::text::quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", graphics::gui::text::style(), vec2i(200, 200), 0, nullptr);
+		quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", style(), vec2i(200, 200), 0, nullptr);
 		target.call_triangles();
 	}
 
