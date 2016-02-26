@@ -14,10 +14,6 @@
 
 #include "../assets/texture.h"
 
-//gui_system::gui_system() {
-//
-//}
-
 void gui_system::draw_gui_overlays_for_camera_rendering_request(messages::camera_render_request_message r) {
 	if (!is_gui_look_enabled)
 		return;
