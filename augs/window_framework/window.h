@@ -45,6 +45,8 @@ namespace augs {
 
 			renderer glrenderer;
 
+			bool raw_mouse_input = true;
+
 			enum mode {
 				MINIMIZE = SW_MINIMIZE,
 				MAXIMIZE = SW_MAXIMIZE,

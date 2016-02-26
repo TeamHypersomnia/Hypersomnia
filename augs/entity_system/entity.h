@@ -60,7 +60,7 @@ namespace augs {
 		/* only world class is allowed to instantiate an entity and it has to do it inside object pool */
 		friend class type_hash_to_index_mapper;
 		friend class ::destroy_system;
-		friend class memory_pool::typed_id<entity>;
+		friend class memory_pool::typed_id_template<entity>;
 
 		std::unordered_map<sub_entity_name, augs::entity_id> sub_entities_by_name;
 		std::unordered_map<associated_entity_name, augs::entity_id> associated_entities_by_name;
@@ -194,11 +194,11 @@ namespace augs {
 			typestrs.add(hash, typeid(component_type).name());
 #endif
 #if USE_POINTER_TUPLE 
-			auto& component_ptr = *reinterpret_cast<object_pool<component_type>::id*>(&_find<component_type>());
+			auto& component_ptr = *reinterpret_cast<object_pool<component_type>::typed_id*>(&_find<component_type>());
 #else
 			type_to_component.add(hash, memory_pool::id());
 
-			auto& component_ptr = *reinterpret_cast<object_pool<component_type>::id*>(type_to_component.get(hash));
+			auto& component_ptr = *reinterpret_cast<object_pool<component_type>::typed_id*>(type_to_component.get(hash));
 #endif
 			/* allocate new component in a corresponding pool */
 			component_ptr = owner_world.get_components_by_type<component_type>().allocate(object);

@@ -181,38 +181,41 @@ namespace augs {
 					events.key = MMOUSE;
 					events.mouse.state[2] = events.keys[MMOUSE] = false; break;
 				case mousemotion:
-					p = MAKEPOINTS(lParam);
-					events.mouse.rel.x = p.x - events.mouse.pos.x;
-					events.mouse.rel.y = p.y - events.mouse.pos.y;
-					if(events.mouse.rel.x || events.mouse.rel.y) doubled = false;
-					events.mouse.pos.x = p.x;
-					events.mouse.pos.y = p.y;
+					if (!raw_mouse_input) {
+						p = MAKEPOINTS(lParam);
+						events.mouse.rel.x = p.x - events.mouse.pos.x;
+						events.mouse.rel.y = p.y - events.mouse.pos.y;
+						if (events.mouse.rel.x || events.mouse.rel.y) doubled = false;
+						events.mouse.pos.x = p.x;
+						events.mouse.pos.y = p.y;
 
-					if(!events.mouse.state[0]) {
-						events.mouse.ldrag.x = events.mouse.pos.x;
-						events.mouse.ldrag.y = events.mouse.pos.y;
+						if (!events.mouse.state[0]) {
+							events.mouse.ldrag.x = events.mouse.pos.x;
+							events.mouse.ldrag.y = events.mouse.pos.y;
+						}
+
+						if (!events.mouse.state[1]) {
+							events.mouse.rdrag.x = events.mouse.pos.x;
+							events.mouse.rdrag.y = events.mouse.pos.y;
+						}
+
+						m = events.msg = mousemotion;
 					}
-
-					if(!events.mouse.state[1]) {
-						events.mouse.rdrag.x = events.mouse.pos.x;
-						events.mouse.rdrag.y = events.mouse.pos.y;
-					}
-					
-					m = events.msg = mousemotion;
-
 					break;
 
 				case WM_INPUT:
-					GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT,
-						lpb, &dwSize, sizeof(RAWINPUTHEADER));
+					if (raw_mouse_input) {
+						GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT,
+							lpb, &dwSize, sizeof(RAWINPUTHEADER));
 
-					raw = reinterpret_cast<RAWINPUT*>(lpb);
+						raw = reinterpret_cast<RAWINPUT*>(lpb);
 
-					if (raw->header.dwType == RIM_TYPEMOUSE) {
-						events.mouse.rel.x = raw->data.mouse.lLastX;
-						events.mouse.rel.y = raw->data.mouse.lLastY;
+						if (raw->header.dwType == RIM_TYPEMOUSE) {
+							events.mouse.rel.x = raw->data.mouse.lLastX;
+							events.mouse.rel.y = raw->data.mouse.lLastY;
 
-						m = events.msg = raw_mousemotion;
+							m = events.msg = mousemotion;
+						}
 					}
 
 					break;

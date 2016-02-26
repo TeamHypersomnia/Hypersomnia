@@ -26,6 +26,9 @@ namespace augs {
 		int slot_size;
 		int count = 0;
 		
+		size_t associated_type_hash = 0;
+		bool associated_type_hash_set = false;
+
 		std::vector<byte> pool;
 
 		struct metadata {
@@ -110,21 +113,37 @@ namespace augs {
 		};
 
 		template <typename T>
-		class typed_id : public typed_id_interface<T> {
+		class typed_id_template : public typed_id_interface<T> {
 
 		};
 
 		memory_pool(int slot_count = 0, int slot_size = 0);
 		~memory_pool();
 
+		template<class T>
+		void associate_type_for_typed_operations() {
+			associated_type_hash = typeid(T).hash_code();
+			associated_type_hash_set = true;
+		}
+
 		void initialize(int slot_count, int slot_size);
 		void resize(int slot_count);
 
 		id allocate();
+
 		bool free(id);
 		void free_all();
 
-		id allocate_with_default_construct(size_t type_hash);
+		template<typename T, typename... Args>
+		id allocate_with_constructor(Args... args) {
+			auto raw = memory_pool::allocate();
+			new (raw.ptr()) T(args...);
+			return *reinterpret_cast<id*>(&raw);
+		}
+
+		bool free_with_destructor(id);
+		void destruct_all();
+
 		bool free_with_destructor(id, size_t type_hash);
 		void destruct_all(size_t type_hash);
 

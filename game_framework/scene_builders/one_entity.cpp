@@ -67,7 +67,7 @@ namespace scene_builders {
 		ingredients::sprite(background, vec2(500, 0), assets::texture_id::TEST_BACKGROUND);
 		
 		input_system::context active_context;
-		active_context.map_event_to_intent(window::event::raw_mousemotion, intent_type::MOVE_CROSSHAIR);
+		active_context.map_event_to_intent(window::event::mousemotion, intent_type::MOVE_CROSSHAIR);
 		active_context.map_key_to_intent(window::event::keys::LSHIFT, intent_type::SWITCH_LOOK);
 		active_context.map_key_to_intent(window::event::keys::W, intent_type::MOVE_FORWARD);
 		active_context.map_key_to_intent(window::event::keys::S, intent_type::MOVE_BACKWARD);

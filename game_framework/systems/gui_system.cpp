@@ -14,6 +14,10 @@
 
 #include "../assets/texture.h"
 
+//gui_system::gui_system() {
+//
+//}
+
 void gui_system::draw_gui_overlays_for_camera_rendering_request(messages::camera_render_request_message r) {
 	if (!is_gui_look_enabled)
 		return;
@@ -69,10 +73,12 @@ void gui_system::translate_raw_window_inputs_to_gui_events() {
 	auto& window_inputs = parent_world.get_message_queue<messages::raw_window_input_message>();
 
 	for (auto w : window_inputs) {
-		gui_crosshair_position += w.raw_window_input.mouse.rel;
-		gui_crosshair_position.clamp_from_zero_to(vec2(size.x - 1, size.y - 1));
+		if (w.raw_window_input.msg == window::event::mousemotion) {
+			gui_crosshair_position += w.raw_window_input.mouse.rel;
+			gui_crosshair_position.clamp_from_zero_to(vec2(size.x - 1, size.y - 1));
 
-		w.raw_window_input.mouse.pos = gui_crosshair_position;
+			w.raw_window_input.mouse.pos = gui_crosshair_position;
+		}
 
 		gui.consume_raw_input_and_generate_gui_events(w.raw_window_input);
 	}

@@ -16,7 +16,6 @@ namespace augs {
 
 			enum message {
 				ltripleclick,
-				raw_mousemotion,
 				close = SC_CLOSE,
 				move = WM_MOVE,
 				activate = WM_ACTIVATE,
@@ -169,7 +168,7 @@ namespace augs {
 
 			struct state {
 				struct mouse_info {
-					vec2i pos, rel, raw_rel, ldrag, rdrag;
+					vec2i pos, rel, ldrag, rdrag;
 					bool state[3] = { false, false, false };
 					int scroll = 0;
 				} mouse;

@@ -11,7 +11,7 @@ namespace augs {
 		}
 
 	public:
-		typedef typed_id<T> id;
+		typedef typed_id_template<T> typed_id;
 
 		object_pool(int slot_count = 0) {
 			initialize(slot_count);
@@ -22,16 +22,15 @@ namespace augs {
 		}
 
 		template<typename... Args>
-		id allocate(Args... args) {
-			auto raw = memory_pool::allocate();
-			new (raw.ptr()) T(args...);
-			return *reinterpret_cast<id*>(&raw);
+		typed_id allocate(Args... args) {
+			auto raw_id = allocate_with_constructor<T>(args...);
+			return *reinterpret_cast<typed_id*>(&raw_id);
 		}
 
-		bool free(id object) {
+		bool free(typed_id object) {
 			object.get().~T();
 
-			auto swap_elements = memory_pool::internal_free(*reinterpret_cast<memory_pool::id*>(&object));
+			auto swap_elements = memory_pool::internal_free(*reinterpret_cast<id*>(&object));
 
 			if (swap_elements.first == -1 && swap_elements.second == -1)
 				return false;
@@ -47,11 +46,11 @@ namespace augs {
 			return true;
 		}
 
-		T& get(id object) { 
+		T& get(typed_id object) {
 			return *reinterpret_cast<T*>(memory_pool::get(object)); 
 		}
 		
-		bool alive(id object) const { 
+		bool alive(typed_id object) const {
 			return memory_pool::alive(object); 
 		}
 
@@ -63,8 +62,8 @@ namespace augs {
 			return *reinterpret_cast<T*>(memory_pool::operator[](index));
 		}
 
-		id get_id(T* address) {
-			return *reinterpret_cast<id*>(&memory_pool::get_id(reinterpret_cast<byte*>(address)));
+		typed_id get_id(T* address) {
+			return *reinterpret_cast<typed_id*>(&memory_pool::get_id(reinterpret_cast<byte*>(address)));
 		}
 
 		void free_all() {

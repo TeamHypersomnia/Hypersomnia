@@ -9,6 +9,7 @@
 #include "rect.h"
 
 #include "game_framework/assets/font.h"
+#include "misc/unsafe_type_collection.h"
 
 namespace augs {
 	namespace graphics {
@@ -41,6 +42,7 @@ namespace augs {
 
 			class gui_world {
 				float delta_ms = 1000 / 60.f;
+				// unsafe_container_collection<object_pool> controls_containers;
 
 			public:
 				class clipboard {
@@ -83,6 +85,21 @@ namespace augs {
 				std::vector<augs::vertex_triangle> triangle_buffer;
 
 				gui_world();
+
+				// template <class T>
+				// void register_control_type() {
+				// 	unsafe_type_collection::register_type<T>();
+				// 	controls_containers.register_destructor<T>();
+				// 	controls_containers.add<T>(1000);
+				// }
+				// 
+				// template <class T, class... Args>
+				// rect_id allocate(Args... args) {
+				// 	auto typed_id = controls_containers.get<T>().allocate(args...);
+				// 
+				// 	rect_id result;
+				// 	return *reinterpret_cast<rect_id*>(&typed_id);
+				// }
 
 				void set_delta_milliseconds(float);
 				float delta_milliseconds();

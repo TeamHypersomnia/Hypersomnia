@@ -193,12 +193,16 @@ namespace augs {
 		return true;
 	}
 
-	memory_pool::id memory_pool::allocate_with_default_construct(size_t type_hash) {
-		// TODO: typed memory allocation but only if needed
-		assert(0);
-		return memory_pool::id();
+	bool memory_pool::free_with_destructor(id object) {
+		assert(associated_type_hash_set);
+		return free_with_destructor(object, associated_type_hash);
 	}
-	
+
+	void memory_pool::destruct_all() {
+		assert(associated_type_hash_set);
+		return destruct_all(associated_type_hash);
+	}
+
 	bool memory_pool::free_with_destructor(id object, size_t type_hash) {
 		unsafe_type_collection::destructors[type_hash](object.ptr());
 
