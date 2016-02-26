@@ -103,7 +103,7 @@ namespace augs {
 				}
 			}
 			 
-			void rect::get_member_children(std::vector<rect*>& children) {
+			void rect::get_member_children(std::vector<rect_id>& children) {
 
 			}
 			
@@ -183,7 +183,7 @@ namespace augs {
 			bool rect::focus_next_rect_by_tab(event_info e) {
 				using namespace augs::window::event::keys;
 				if(e == gui_event::keydown && e.owner.state.key == TAB) {
-					rect* f = seek_focusable(this, e.owner.state.keys[LSHIFT]);
+					rect_id f = seek_focusable(this, e.owner.state.keys[LSHIFT]);
 					if(f) e.owner.set_focus(f);
 					return true;
 				}
@@ -195,7 +195,7 @@ namespace augs {
 			bool rect::focus_next_rect_by_arrows(event_info e) {
 				using namespace augs::window::event::keys;
 				if(e == gui_event::keydown) {
-					rect* f = nullptr;
+					rect_id f = nullptr;
 					switch(e.owner.state.key) {
 					case DOWN: f = seek_focusable(this, false); break;
 					case UP: f = seek_focusable(this, true); break;
@@ -216,7 +216,7 @@ namespace augs {
 			bool rect::focus_next_rect_by_enter(event_info e) {
 				using namespace augs::window::event::keys;
 				if(e == gui_event::keydown && e.owner.state.key == ENTER) {
-					rect* f = seek_focusable(this, e.owner.state.keys[LSHIFT]);
+					rect_id f = seek_focusable(this, e.owner.state.keys[LSHIFT]);
 					if(f) e.owner.set_focus(f);
 					return true;
 				}
@@ -225,9 +225,9 @@ namespace augs {
 				return false;
 			}
 			
-			rect* rect::seek_focusable(rect* f, bool prev) {
-				rect* rect::*fn = prev ? &rect::prev_focusable : &rect::next_focusable; 
-				rect* it = f;
+			rect_id rect::seek_focusable(rect_id f, bool prev) {
+				rect_id rect::*fn = prev ? &rect::prev_focusable : &rect::next_focusable; 
+				rect_id it = f;
 				if(f->preserve_focus) return nullptr;
 				while(true) {
 					it = it->*fn;
@@ -375,7 +375,7 @@ namespace augs {
 				//}
 
 				/* operations on order, sort by vertical distance */
-				sort(order.begin(), order.end(), [](rect* a, rect* b){ 
+				sort(order.begin(), order.end(), [](rect_id a, rect_id b){ 
 					auto& r1 = a->rc;
 					auto& r2 = b->rc;
 					return (r1.t == r2.t) ? (r1.l < r2.l) : (r1.t < r2.t);
@@ -394,7 +394,7 @@ namespace augs {
 				}
 			}
 
-			void rect::gen_focus_links_depth(rect* next) {
+			void rect::gen_focus_links_depth(rect_id next) {
 				auto children_all = children;
 				get_member_children(children_all);
 
@@ -408,7 +408,7 @@ namespace augs {
 				auto order = children_all;
 
 				/* operations on order, sort by vertical distance */
-				sort(order.begin(), order.end(), [](rect* a, rect* b){ 
+				sort(order.begin(), order.end(), [](rect_id a, rect_id b){ 
 					auto& r1 = a->rc;
 					auto& r2 = b->rc;
 					return (r1.t == r2.t) ? (r1.l < r2.l) : (r1.t < r2.t);
@@ -434,7 +434,7 @@ namespace augs {
 				return clipping_rect;
 			}
 				
-			rect* rect::get_parent() const {
+			rect_id rect::get_parent() const {
 				return parent;
 			}
 				

@@ -44,7 +44,7 @@ namespace augs {
 				text_button::text_button(const button& b, vec2i p, const text::fstr& f) : button(b), label(rects::xywh<float>(p.x, p.y, 0, 0), f) {
 				}
 
-				void text_button::get_member_children(std::vector<rect*>& v) {
+				void text_button::get_member_children(std::vector<rect_id>& v) {
 					v.push_back(&label);
 				}
 				

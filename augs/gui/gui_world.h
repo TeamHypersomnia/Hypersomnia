@@ -64,13 +64,13 @@ namespace augs {
 					material mat;
 					rects::wh<float> size = rects::wh<float>(25, 25);
 					vec2i pos;
-					rect* subject = nullptr;
+					rect_id subject = nullptr;
 					float speed_mult = 1.f;
 				};
 
 				static clipboard global_clipboard;
 
-				rect* rect_in_focus;
+				rect_id rect_in_focus;
 
 				middlescroll_data middlescroll;
 
@@ -87,8 +87,8 @@ namespace augs {
 				void set_delta_milliseconds(float);
 				float delta_milliseconds();
 
-				void set_focus(rect*);
-				rect* get_rect_in_focus() const;
+				void set_focus(rect_id);
+				rect_id get_rect_in_focus() const;
 
 				void consume_raw_input_and_generate_gui_events(augs::window::event::state);
 				void perform_logic_step();

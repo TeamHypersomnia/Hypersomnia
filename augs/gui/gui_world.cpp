@@ -104,7 +104,7 @@ namespace augs {
 				root.scrollable = false;
 			}
 			
-			void gui_world::set_focus(rect* f) {
+			void gui_world::set_focus(rect_id f) {
 				if(f == rect_in_focus) return;
 				root.calculate_clipped_rectangle_layout();
 
@@ -118,7 +118,7 @@ namespace augs {
 				}
 			}
 			
-			rect* gui_world::get_rect_in_focus() const {
+			rect_id gui_world::get_rect_in_focus() const {
 				return rect_in_focus;
 			}
 
@@ -235,7 +235,7 @@ namespace augs {
 				}
 /*
 				if(gl.msg == down && gl.key == event::keys::TAB) {
-					rect* f;
+					rect_id f;
 					if(f = seek_focusable(focus ? focus : &root, gl.keys[event::keys::LSHIFT])) 
 						set_focus(f);
 

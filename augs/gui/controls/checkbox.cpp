@@ -48,7 +48,7 @@ namespace augs {
 					stretch_rc();
 				}
 					
-				void checklabel::get_member_children(std::vector<rect*>& c) {
+				void checklabel::get_member_children(std::vector<rect_id>& c) {
 					c.push_back(&active_label());
 				}
 

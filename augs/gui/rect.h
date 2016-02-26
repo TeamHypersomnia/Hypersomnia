@@ -2,12 +2,14 @@
 #include <vector>
 #include "material.h"
 #include <limits>
+#include "rect_id.h"
 
 namespace augs {
 	namespace graphics {
 		namespace gui {
 			struct stylesheet;
 			class gui_world;
+
 			struct rect {
 				enum class gui_event {
 					unknown,
@@ -67,8 +69,8 @@ namespace augs {
 					event_info& operator=(gui_event);
 				};
 
-				rect* next_focusable = nullptr;
-				rect* prev_focusable = nullptr;
+				rect_id next_focusable = nullptr;
+				rect_id prev_focusable = nullptr;
 
 				bool enable_drawing = true;
 				bool clip = true;
@@ -83,7 +85,7 @@ namespace augs {
 				rects::wh<float> content_size; /* content's (children's) bounding box */
 				vec2 scroll; /* scrolls content */
 				
-				std::vector<rect*> children;
+				std::vector<rect_id> children;
 				
 				rect(rects::xywh<float> rc = rects::xywh<float>());
 				
@@ -114,7 +116,7 @@ namespace augs {
 					 draw_rectangle_stylesheeted(draw_info in, const stylesheet&),
 					 draw_children	(draw_info in);
 
-				virtual void get_member_children(std::vector<rect*>& children);
+				virtual void get_member_children(std::vector<rect_id>& children);
 				
 				/*  does scroll not exceed the content */
 				bool is_scroll_clamped_to_right_down_corner();
@@ -126,7 +128,7 @@ namespace augs {
 
 				/* if last is nullptr, focus will be cycled on this rect (next = this) */
 				/* not implemented */
-				void gen_focus_links_depth(rect* next = nullptr);
+				void gen_focus_links_depth(rect_id next = nullptr);
 				void gen_focus_links	  ();
 				
 				const rects::ltrb<float>& get_clipped_rect() const;
@@ -134,13 +136,13 @@ namespace augs {
 				const vec2i& get_absolute_xy() const;
 				rects::ltrb<float> get_local_clipper() const;
 				rects::ltrb<float> get_clipping_rect() const;
-				rect* get_parent() const;
+				rect_id get_parent() const;
 
-				static rect* seek_focusable(rect*, bool);
+				static rect_id seek_focusable(rect_id, bool);
 			protected:
 				friend class gui_world;
 
-				rect* parent = nullptr;
+				rect_id parent = nullptr;
 
 				virtual void perform_logic_step(gui_world&);
 			private:

@@ -16,7 +16,7 @@ namespace augs {
 					virtual void consume_gui_event(event_info) override;
 					virtual void perform_logic_step(gui_world&) override;
 
-					rect* origin;
+					rect_id origin;
 					void align();
 
 					bool enabled = true;
@@ -39,7 +39,7 @@ namespace augs {
 						OMNI = (HORIZONTAL | VERTICAL)
 					} flags;
 
-					scrollarea(const rects::xywh<float>& rc, rect* origin, slider* box, orientation flags);
+					scrollarea(const rects::xywh<float>& rc, rect_id origin, slider* box, orientation flags);
 				};
 			}
 		}
