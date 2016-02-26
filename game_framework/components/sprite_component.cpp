@@ -49,24 +49,24 @@ namespace components {
 	}
 
 	void sprite::draw(const state_for_drawing_renderable& in) const {
-		auto renderable = in.renderable;
-		auto render = renderable->get<components::render>();
-
-		render.was_drawn = false;
-
 		static thread_local vec2 v[4];
 		vec2i transform_pos = in.renderable_transform.pos;
 		make_rect(transform_pos, vec2(size), in.renderable_transform.rotation, v);
 
-		auto center = in.visible_world_area / 2;
+		if (in.screen_space_mode) {
+			make_rect(transform_pos + vec2(size)/2, vec2(size), in.renderable_transform.rotation + rotation_offset, v);
+		}
+		else {
+			auto center = in.visible_world_area / 2;
 
-		auto target_position = transform_pos - in.camera_transform.pos + center;
-		make_rect(target_position, vec2(size), in.renderable_transform.rotation + rotation_offset, v);
+			auto target_position = transform_pos - in.camera_transform.pos + center;
+			make_rect(target_position, vec2(size), in.renderable_transform.rotation + rotation_offset, v);
 
-		/* rotate around the center of the screen */
-		if (in.camera_transform.rotation != 0.f)
-			for (auto& vert : v)
-				vert.rotate(in.camera_transform.rotation, center);
+			/* rotate around the center of the screen */
+			if (in.camera_transform.rotation != 0.f)
+				for (auto& vert : v)
+					vert.rotate(in.camera_transform.rotation, center);
+		}
 
 		vertex_triangle t1, t2;
 		t1.vertices[0].color = t2.vertices[0].color = color;
@@ -104,9 +104,16 @@ namespace components {
 		t1.vertices[1].pos = t2.vertices[2].pos = vec2i(v[2]);
 		t1.vertices[2].pos = vec2i(v[3]);
 
-		/* compute average */
-		render.last_screen_pos = (vec2(v[0]) + vec2(v[1]) + vec2(v[2]) + vec2(v[3])) / 4;
-		render.was_drawn = true;
+		if (in.renderable.alive()) {
+			auto renderable = in.renderable;
+			auto* render = renderable->find<components::render>();
+			
+			if (render != nullptr) {
+				/* compute average */
+				render->last_screen_pos = (vec2(v[0]) + vec2(v[1]) + vec2(v[2]) + vec2(v[3])) / 4;
+				render->was_drawn = true;
+			}
+		}
 
 		in.output->push_triangle(t1);
 		in.output->push_triangle(t2);

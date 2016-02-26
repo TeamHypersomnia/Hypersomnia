@@ -50,7 +50,6 @@ void crosshair_system::apply_crosshair_intents_to_base_offsets() {
 
 	for (auto& it : events)
 		it.subject->get<components::crosshair>().base_offset = it.crosshair_base_offset;
-
 }
 
 void crosshair_system::apply_base_offsets_to_crosshair_transforms() {

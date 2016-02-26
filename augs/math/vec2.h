@@ -84,6 +84,11 @@ namespace augs {
 	struct vec2t {
 		type x, y;
 
+		void reset() {
+			x = static_cast<type>(0);
+			y = static_cast<type>(0);
+		}
+
 		friend std::ostream& operator<< (std::ostream& stream, const vec2t& v) {
 			return stream << "(" << v.x << "," << v.y << ")";
 		}
@@ -282,6 +287,15 @@ namespace augs {
 			if (y > rect.y) y = rect.y;
 			if (x < -rect.x) x = -rect.x;
 			if (y < -rect.y) y = -rect.y;
+			return *this;
+		}
+
+		template<class t>
+		vec2t& clamp_from_zero_to(vec2t<t> rect) {
+			if (x > rect.x) x = rect.x;
+			if (y > rect.y) y = rect.y;
+			if (x < static_cast<type>(0)) x = static_cast<type>(0);
+			if (y < static_cast<type>(0)) y = static_cast<type>(0);
 			return *this;
 		}
 

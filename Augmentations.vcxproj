@@ -408,6 +408,7 @@
     <ClCompile Include="game_framework\systems\camera_system.cpp" />
     <ClCompile Include="game_framework\systems\car_system.cpp" />
     <ClCompile Include="game_framework\systems\force_joint_system.cpp" />
+    <ClCompile Include="game_framework\systems\gui_system.cpp" />
     <ClCompile Include="game_framework\systems\intent_contextualization_system.cpp" />
     <ClCompile Include="game_framework\systems\item_system.cpp" />
     <ClCompile Include="game_framework\systems\melee_system.cpp" />
@@ -954,7 +955,7 @@
     <ClInclude Include="game_framework\components\car_component.h" />
     <ClInclude Include="game_framework\components\container_component.h" />
     <ClInclude Include="game_framework\components\force_joint_component.h" />
-    <ClInclude Include="game_framework\components\gui_input_receiver_component.h" />
+    <ClInclude Include="game_framework\components\gui_element_component.h" />
     <ClInclude Include="game_framework\components\item_slot_transfers_component.h" />
     <ClInclude Include="game_framework\components\input_receiver_component.h" />
     <ClInclude Include="game_framework\components\item_component.h" />
@@ -1032,6 +1033,7 @@
     <ClInclude Include="game_framework\systems\camera_system.h" />
     <ClInclude Include="game_framework\systems\car_system.h" />
     <ClInclude Include="game_framework\systems\force_joint_system.h" />
+    <ClInclude Include="game_framework\systems\gui_system.h" />
     <ClInclude Include="game_framework\systems\intent_contextualization_system.h" />
     <ClInclude Include="game_framework\systems\item_system.h" />
     <ClInclude Include="game_framework\systems\melee_system.h" />

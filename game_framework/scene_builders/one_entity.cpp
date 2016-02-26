@@ -77,28 +77,22 @@ namespace scene_builders {
 		active_context.map_key_to_intent(window::event::keys::RMOUSE, intent_type::CROSSHAIR_SECONDARY_ACTION);
 		active_context.map_key_to_intent(window::event::keys::SPACE, intent_type::HAND_BRAKE);
 
-		world.get_system<input_system>().add_context(active_context);
+		auto& input = world.get_system<input_system>();
+		input.add_context(active_context);
 
-		if (augs::file_exists(L"recorded.inputs")) {
+		if (input.found_recording()) {
 			world.parent_overworld.configure_stepping(60.0, 500);
 			world.parent_overworld.delta_timer.set_stepping_speed_multiplier(6.00);
 
-			world.get_system<input_system>().raw_window_input_player.player.load_recording("recorded.inputs");
-			world.get_system<input_system>().raw_window_input_player.player.replay();
+			input.replay_found_recording();
 		
-			world.get_system<input_system>().crosshair_intent_player.player.load_recording("recorded_crosshair.inputs");
-			world.get_system<input_system>().crosshair_intent_player.player.replay();
-
 			world.get_system<render_system>().enable_interpolation = false;
 		}
 		else {
 			world.parent_overworld.configure_stepping(60.0, 5);
 			world.parent_overworld.delta_timer.set_stepping_speed_multiplier(1.0);
 
-			augs::create_directory("sessions/" + augs::get_timestamp());
-
-			world.get_system<input_system>().raw_window_input_player.player.record("sessions/" + augs::get_timestamp() + "/recorded.inputs");
-			world.get_system<input_system>().crosshair_intent_player.player.record("sessions/" + augs::get_timestamp() + "/recorded_crosshair.inputs");
+			input.record_and_save_this_session();
 		}
 	}
 

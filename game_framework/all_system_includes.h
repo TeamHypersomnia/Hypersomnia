@@ -23,6 +23,7 @@
 #include "systems/item_system.h"
 #include "systems/force_joint_system.h"
 #include "systems/intent_contextualization_system.h"
+#include "systems/gui_system.h"
 
 
 

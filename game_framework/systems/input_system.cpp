@@ -8,12 +8,45 @@
 
 #include "augs/stream.h"
 
+#include "augs/file.h"
+#include "augs/misc/time.h"
+
 using namespace augs::window;
 
+bool input_system::found_recording() {
+	return augs::file_exists(L"recorded.inputs");
+}
+
+void input_system::replay_found_recording() {
+	unmapped_intent_player.player.load_recording("recorded.inputs");
+	unmapped_intent_player.player.replay();
+
+	crosshair_intent_player.player.load_recording("recorded_crosshair.inputs");
+	crosshair_intent_player.player.replay();
+}
+
+void input_system::record_and_save_this_session() {
+	augs::create_directory("sessions/");
+	augs::create_directory("sessions/" + augs::get_timestamp());
+
+	unmapped_intent_player.player.record("sessions/" + augs::get_timestamp() + "/recorded.inputs");
+	crosshair_intent_player.player.record("sessions/" + augs::get_timestamp() + "/recorded_crosshair.inputs");
+}
+
 input_system::input_system(world& parent_world) : processing_system_templated(parent_world),
-	raw_window_input_player(parent_world),
-	crosshair_intent_player(parent_world)
+	unmapped_intent_player(parent_world)
+	, crosshair_intent_player(parent_world)
 {
+}
+
+void input_system::acquire_new_events_posted_by_drawing_time_systems() {
+	unmapped_intent_player.acquire_new_events_posted_by_drawing_time_systems();
+	crosshair_intent_player.acquire_new_events_posted_by_drawing_time_systems();
+}
+
+void input_system::post_all_events_posted_by_drawing_time_systems_since_last_step() {
+	unmapped_intent_player.generate_events_for_logic_step();
+	crosshair_intent_player.generate_events_for_logic_step();
 }
 
 input_system::context::context() : enabled(true) {
@@ -35,21 +68,13 @@ void input_system::clear_contexts() {
 	active_contexts.clear();
 }
 
-//void input_system::inputs_per_step::serialize(std::ofstream& f) {
-//	augs::serialize_vector(f, events);
-//}
-//
-//bool input_system::inputs_per_step::should_serialize() {
-//	return !events.empty();
-//}
-//
-//void input_system::inputs_per_step::deserialize(std::ifstream& f) {
-//	augs::deserialize_vector(f, events);
-//}
+void input_system::post_unmapped_intents_from_raw_window_inputs() {
+	parent_world.get_message_queue<messages::unmapped_intent_message>().clear();
 
-void input_system::post_intents_from_inputs(const std::vector<messages::raw_window_input_message>& inputs_for_this_step) {
+	auto& raw_inputs = parent_world.get_message_queue<messages::raw_window_input_message>();
+
 	if (!active_contexts.empty()) {
-		for (auto& it : inputs_for_this_step) {
+		for (auto& it : raw_inputs) {
 			auto& state = it.raw_window_input;
 
 			for (auto& context : active_contexts) {
@@ -85,16 +110,6 @@ void input_system::post_intents_from_inputs(const std::vector<messages::raw_wind
 					unmapped_intent.intent = intent;
 					parent_world.post_message(unmapped_intent);
 
-					messages::intent_message entity_mapped_intent;
-					entity_mapped_intent.unmapped_intent_message::operator=(unmapped_intent);
-
-					for (auto it = targets.begin(); it != targets.end(); ++it) {
-						//if ((*it)->get<components::input>().intents.find(unmapped_intent.intent)) {
-							entity_mapped_intent.subject = *it;
-							parent_world.post_message(entity_mapped_intent);
-						//}
-					}
-
 					break;
 				}
 			}
@@ -102,37 +117,20 @@ void input_system::post_intents_from_inputs(const std::vector<messages::raw_wind
 	}
 }
 
-void input_system::acquire_new_raw_window_inputs() {
-	raw_window_input_player.acquire_new_events_posted_by_drawing_time_systems();
-}
 
-void input_system::acquire_new_events_posted_by_drawing_time_systems() {
-	crosshair_intent_player.acquire_new_events_posted_by_drawing_time_systems();
-}
-
-void input_system::replay_drawing_time_events_passed_to_last_logic_step() {
-	crosshair_intent_player.pass_last_unpacked_logic_events_for_drawing_time_approximation();
-}
-
-void input_system::post_input_intents_from_new_raw_window_inputs() {
-	parent_world.get_message_queue<messages::unmapped_intent_message>().clear();
+void input_system::map_unmapped_intents_to_entities() {
 	parent_world.get_message_queue<messages::intent_message>().clear();
 
-	post_intents_from_inputs(raw_window_input_player.inputs_from_last_drawing_time.events);
-}
-	
-void input_system::post_input_intents_from_all_raw_window_inputs_since_last_step() {
-	parent_world.get_message_queue<messages::unmapped_intent_message>().clear();
-	parent_world.get_message_queue<messages::intent_message>().clear();
+	for (auto& unmapped_intent : parent_world.get_message_queue<messages::unmapped_intent_message>()) {
+		messages::intent_message entity_mapped_intent;
+		entity_mapped_intent.unmapped_intent_message::operator=(unmapped_intent);
 
-	// record/replay total entropia
-	raw_window_input_player.biserialize();
-
-	post_intents_from_inputs(raw_window_input_player.buffered_inputs_for_next_step.events);
-
-	raw_window_input_player.clear_step();
+		for (auto it = targets.begin(); it != targets.end(); ++it) {
+			//if ((*it)->get<components::input>().intents.find(unmapped_intent.intent)) {
+			entity_mapped_intent.subject = *it;
+			parent_world.post_message(entity_mapped_intent);
+			//}
+		}
+	}
 }
 
-void input_system::post_all_events_posted_by_drawing_time_systems_since_last_step() {
-	crosshair_intent_player.generate_events_for_logic_step();
-}

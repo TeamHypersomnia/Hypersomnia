@@ -40,39 +40,7 @@ namespace augs {
 
 	void entity::clear() {
 #if USE_POINTER_TUPLE
-		remove<components::animation>();
-		remove<components::animation_response>();
-		remove<components::behaviour_tree>();
-		remove<components::camera>();
-		remove<components::position_copying>();
-		remove<components::crosshair>();
-		remove<components::damage>();
-		remove<components::gun>();
-		remove<components::input_receiver>();
-		remove<components::rotation_copying>();
-		remove<components::movement>();
-		remove<components::particle_emitter>();
-		remove<components::particle_group>();
-		remove<components::pathfinding>();
-		remove<components::physics>();
-		remove<components::render>();
-		remove<components::steering>();
-		remove<components::transform>();
-		remove<components::visibility>();
-		remove<components::sprite>();
-		remove<components::polygon>();
-		remove<components::tile_layer>();
-		remove<components::car>();
-		remove<components::driver>();
-		remove<components::trigger>();
-		remove<components::trigger_detector>();
-		remove<components::fixtures>();
-		remove<components::container>();
-		remove<components::item>();
-		remove<components::force_joint>();
-		remove<components::physics_definition>();
-		remove<components::item_slot_transfers>();
-		remove<components::melee>();
+		remove_all(type_to_component);
 #else
 		auto ids_to_remove = type_to_component.raw;
 

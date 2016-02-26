@@ -10,6 +10,7 @@
 
 #include "game_framework/systems/input_system.h"
 #include "game_framework/systems/render_system.h"
+#include "game_framework/systems/gui_system.h"
 #include "game_framework/components/position_copying_component.h"
 
 #include "game_framework/messages/crosshair_intent_message.h"
@@ -30,6 +31,7 @@ using namespace augs;
 namespace scene_builders {
 	void testbed::initialize(world& world) {
 		auto window_rect = window::glwindow::get_current()->get_screen_rect();
+		world.get_system<gui_system>().resize(vec2i(window_rect.w, window_rect.h));
 
 		resource_manager.destroy_everything();
 		world.delete_all_entities();
@@ -53,6 +55,8 @@ namespace scene_builders {
 
 		resource_manager.create(assets::texture_id::ASSAULT_RIFLE, L"hypersomnia/gfx/assault_rifle.png");
 		resource_manager.create(assets::texture_id::SHOTGUN, L"hypersomnia/gfx/shotgun.png");
+
+		resource_manager.create(assets::texture_id::GUI_CURSOR, L"hypersomnia/gfx/gui_cursor.png");
 
 		auto& font = resource_manager.create(assets::font_id::GUI_FONT);
 		font.open("hypersomnia/Kubasta.ttf", 16, L" ABCDEFGHIJKLMNOPRSTUVWXYZQabcdefghijklmnoprstuvwxyzq0123456789.!@#$%^&*()_+-=[];'\\,./{}:\"|<>?");
@@ -123,6 +127,8 @@ namespace scene_builders {
 			ingredients::wsad_character_crosshair(crosshair);
 			ingredients::wsad_character(character, crosshair);
 
+			character->get<components::transform>().pos = vec2(i * 100, 0);
+
 			ingredients::wsad_character_physics(character);
 
 			ingredients::character_inventory(character);
@@ -162,29 +168,24 @@ namespace scene_builders {
 		active_context.map_key_to_intent(window::event::keys::Z, intent_type::START_PICKING_UP_ITEMS);
 		active_context.map_key_to_intent(window::event::keys::TAB, intent_type::SWITCH_CHARACTER);
 
-		world.get_system<input_system>().add_context(active_context);
+		active_context.map_key_to_intent(window::event::keys::CAPSLOCK, intent_type::SWITCH_TO_GUI);
 
+		auto& input = world.get_system<input_system>();
+		input.add_context(active_context);
 
-		if (augs::file_exists(L"recorded.inputs")) {
+		if (input.found_recording()) {
 			world.parent_overworld.configure_stepping(60.0, 500);
 			world.parent_overworld.delta_timer.set_stepping_speed_multiplier(6.00);
 
-			world.get_system<input_system>().raw_window_input_player.player.load_recording("recorded.inputs");
-			world.get_system<input_system>().raw_window_input_player.player.replay();
-		
-			world.get_system<input_system>().crosshair_intent_player.player.load_recording("recorded_crosshair.inputs");
-			world.get_system<input_system>().crosshair_intent_player.player.replay();
+			input.replay_found_recording();
 
 			world.get_system<render_system>().enable_interpolation = false;
 		}
 		else {
 			world.parent_overworld.configure_stepping(60.0, 500);
 			world.parent_overworld.delta_timer.set_stepping_speed_multiplier(1.0);
-			augs::create_directory("sessions/");
-			augs::create_directory("sessions/" + augs::get_timestamp());
 
-			world.get_system<input_system>().raw_window_input_player.player.record("sessions/" + augs::get_timestamp() + "/recorded.inputs");
-			world.get_system<input_system>().crosshair_intent_player.player.record("sessions/" + augs::get_timestamp() + "/recorded_crosshair.inputs");
+			input.record_and_save_this_session();
 		}
 	}
 

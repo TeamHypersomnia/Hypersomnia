@@ -14,5 +14,10 @@ namespace components {
 			out.rotation = rotation + b.rotation;
 			return out;
 		}
+
+		void reset() {
+			pos.reset();
+			rotation = 0.f;
+		}
 	};
 }

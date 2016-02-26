@@ -239,7 +239,7 @@ void render_system::restore_actual_transforms() {
 
 void render_system::draw_layer(state_for_drawing_camera in_camera, int layer) {
 	state_for_drawing_renderable in;
-	in.state_for_drawing_camera::operator=(in_camera);
+	in.setup_camera_state(in_camera);
 
 	if (layer < layers.size() && !layers[layer].empty()) {
 		for (auto e : layers[layer]) {

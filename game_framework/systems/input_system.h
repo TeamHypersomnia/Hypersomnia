@@ -22,15 +22,13 @@ struct input_system : public processing_system_templated<components::input_recei
 		void map_event_to_intent(window::event::message, intent_type);
 	};
 
+	void post_unmapped_intents_from_raw_window_inputs();
+	void map_unmapped_intents_to_entities();
 	void acquire_new_events_posted_by_drawing_time_systems();
-	void acquire_new_raw_window_inputs();
-	void post_input_intents_from_new_raw_window_inputs();
 
-	void post_input_intents_from_all_raw_window_inputs_since_last_step();
 	void post_all_events_posted_by_drawing_time_systems_since_last_step();
 
 	void replay_drawing_time_events_passed_to_last_logic_step();
-
 
 	void add_context(context);
 	void clear_contexts();
@@ -62,8 +60,6 @@ struct input_system : public processing_system_templated<components::input_recei
 
 		step_player<events_per_step> player;
 
-		events_per_step inputs_from_last_step;
-
 		events_per_step buffered_inputs_for_next_step;
 		events_per_step inputs_from_last_drawing_time;
 
@@ -80,18 +76,6 @@ struct input_system : public processing_system_templated<components::input_recei
 
 			parent_world.get_message_queue<event_type>().clear();
 		}
-		
-		void pass_last_unpacked_logic_events_for_drawing_time_approximation() {
-			if (player.is_replaying()) {
-				parent_world.get_message_queue<event_type>() = inputs_from_last_step.events;
-				// we do it only once per step
-				inputs_from_last_step.events.clear();
-			}
-		}
-
-		void clear_step() {
-			buffered_inputs_for_next_step.events.clear();
-		}
 
 		void biserialize() {
 			player.biserialize(buffered_inputs_for_next_step);
@@ -100,15 +84,16 @@ struct input_system : public processing_system_templated<components::input_recei
 		void generate_events_for_logic_step() {
 			biserialize();
 			parent_world.get_message_queue<event_type>() = buffered_inputs_for_next_step.events;
-			inputs_from_last_step = buffered_inputs_for_next_step;
-			clear_step();
+			buffered_inputs_for_next_step.events.clear();
 		}
 	};
 
 
-	event_unpacker_and_recorder<messages::raw_window_input_message> raw_window_input_player;
 	event_unpacker_and_recorder<messages::crosshair_intent_message> crosshair_intent_player;
+	event_unpacker_and_recorder<messages::unmapped_intent_message> unmapped_intent_player;
 
-private:
-	void post_intents_from_inputs(const std::vector<messages::raw_window_input_message>&);
+	bool found_recording();
+
+	void replay_found_recording();
+	void record_and_save_this_session();
 };

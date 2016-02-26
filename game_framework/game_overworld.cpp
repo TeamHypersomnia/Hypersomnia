@@ -10,6 +10,7 @@
 #include "game_framework/messages/camera_render_request_message.h"
 
 #include "game_framework/systems/render_system.h"
+#include "game_framework/systems/gui_system.h"
 
 #include <luabind/luabind.hpp>
 
@@ -59,6 +60,8 @@ void game_overworld::main_game_loop() {
 	bool quit_flag = false;
 
 	while (!quit_flag) {
+		main_game_world.get_message_queue<messages::raw_window_input_message>().clear();
+
 		auto raw_window_inputs = game_window.poll_events();
 
 		if (clear_window_inputs_once) {
@@ -117,6 +120,8 @@ void game_overworld::consume_camera_render_requests() {
 		target.set_viewport(r.state.viewport);
 		current_scene_builder->execute_drawcalls_for_camera(r);
 		target.draw_debug_info(r.state.visible_world_area, r.state.camera_transform, assets::texture_id::BLANK, main_game_world.get_system<render_system>().targets, view_interpolation_ratio());
+		
+		main_game_world.get_system<gui_system>().draw_gui_overlays_for_camera_rendering_request(r);
 	}
 	
 	current_scene_builder->drawcalls_after_all_cameras(main_game_world);

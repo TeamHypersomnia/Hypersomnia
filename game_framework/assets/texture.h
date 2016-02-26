@@ -41,6 +41,8 @@ namespace assets {
 		RIGHT_HAND_ICON,
 		LEFT_HAND_ICON,
 
+		GUI_CURSOR,
+
 		CUSTOM = 10000
 	};
 	

@@ -32,6 +32,7 @@
 #include "components/physics_definition_component.h"
 #include "components/item_slot_transfers_component.h"
 #include "components/melee_component.h"
+#include "components/gui_element_component.h"
 
 
 

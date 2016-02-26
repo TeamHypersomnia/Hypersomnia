@@ -25,5 +25,10 @@ namespace shared {
 	struct state_for_drawing_renderable : state_for_drawing_camera {
 		components::transform renderable_transform;
 		augs::entity_id renderable;
+		bool screen_space_mode = false;
+
+		void setup_camera_state(state_for_drawing_camera b) {
+			state_for_drawing_camera::operator=(b);
+		}
 	};
 }

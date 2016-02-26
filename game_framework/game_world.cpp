@@ -74,6 +74,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_system<item_system>();
 	register_system<force_joint_system>();
 	register_system<intent_contextualization_system>();
+	register_system<gui_system>();
 
 	register_message_queue<intent_message>();
 	register_message_queue<damage_message>();
@@ -103,15 +104,20 @@ void game_world::call_drawing_time_systems() {
 	/* read-only message generation */
 
 	get_system<animation_system>().transform_response_requests_to_animation_messages();
-
-	get_system<input_system>().acquire_new_raw_window_inputs();
-	get_system<input_system>().post_input_intents_from_new_raw_window_inputs();
-
-	get_system<crosshair_system>().generate_crosshair_intents();
 	
-	/* we do not wait for the the logic step with applying crosshair's base offset because we want an instant visual feedback. 
-		the logic will resimulate these crosshair intents deterministically. See perform_logic_step, the same two calls are made.
+	get_system<gui_system>().translate_raw_window_inputs_to_gui_events();
+	
+	get_system<input_system>().post_unmapped_intents_from_raw_window_inputs();
+	get_system<gui_system>().suppress_inputs_meant_for_gui();
+	get_system<input_system>().map_unmapped_intents_to_entities();
+
+	/* note that this call cannot be resimulated for it is an incremental operation */
+	get_system<crosshair_system>().generate_crosshair_intents();
+
+	/* we do not wait for the the logic step with applying crosshair's base offset because we want an instant visual feedback.
+	the logic will resimulate these crosshair intents deterministically. See perform_logic_step, the same two calls are made.
 	*/
+
 	get_system<crosshair_system>().apply_crosshair_intents_to_base_offsets();
 	get_system<crosshair_system>().apply_base_offsets_to_crosshair_transforms();
 
@@ -136,8 +142,11 @@ void game_world::restore_transforms_after_drawing() {
 }
 
 void game_world::perform_logic_step() {
-	get_system<input_system>().post_input_intents_from_all_raw_window_inputs_since_last_step();
 	get_system<input_system>().post_all_events_posted_by_drawing_time_systems_since_last_step();
+	
+	get_system<gui_system>().switch_to_gui_mode_and_back();
+
+	get_system<input_system>().map_unmapped_intents_to_entities();
 
 	/* begin receivers of new_entity messages changes */
 

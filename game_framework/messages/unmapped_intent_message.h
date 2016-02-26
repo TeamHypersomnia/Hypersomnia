@@ -13,6 +13,7 @@ namespace messages {
 	struct unmapped_intent_message {
 		intent_type intent;
 		bool pressed_flag = false;
+		bool delete_this_message = false;
 
 		augs::window::event::state state;
 	};

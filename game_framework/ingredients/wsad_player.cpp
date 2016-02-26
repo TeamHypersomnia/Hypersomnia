@@ -122,7 +122,7 @@ namespace ingredients {
 		wsad_character_setup_movement(e);
 	}
 
-	void inject_window_input_to_character(augs::entity_id e, augs::entity_id camera) {
+	void inject_window_input_to_character(augs::entity_id next_character, augs::entity_id camera) {
 		auto previously_controlled_character = camera->get<components::camera>().entity_to_chase;
 
 		if (previously_controlled_character.alive()) {
@@ -132,19 +132,19 @@ namespace ingredients {
 			previously_controlled_character[associated_entity_name::WATCHING_CAMERA].unset();
 		}
 
-		auto crosshair = e[sub_entity_name::CHARACTER_CROSSHAIR];
+		auto crosshair = next_character[sub_entity_name::CHARACTER_CROSSHAIR];
 
-		e[associated_entity_name::WATCHING_CAMERA] = camera;
+		next_character[associated_entity_name::WATCHING_CAMERA] = camera;
 
-		if (e->find<components::input_receiver>() == nullptr)
-			e->add(input_profiles::character());
+		if (next_character->find<components::input_receiver>() == nullptr)
+			next_character->add(input_profiles::character());
 
 		if (crosshair->find<components::input_receiver>() == nullptr)
 			crosshair->add(input_profiles::crosshair());
 
-		e->enable<components::input_receiver>();
+		next_character->enable<components::input_receiver>();
 		crosshair->enable<components::input_receiver>();
 
-		components::camera::configure_camera_and_character_with_crosshair(camera, e, crosshair);
+		components::camera::configure_camera_and_character_with_crosshair(camera, next_character, crosshair);
 	}
 }

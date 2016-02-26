@@ -33,6 +33,7 @@ enum intent_type {
 	RELOAD,
 
 	SWITCH_LOOK,
+	SWITCH_TO_GUI,
 	SWITCH_CHARACTER,
 	ZOOM_CAMERA,
 };

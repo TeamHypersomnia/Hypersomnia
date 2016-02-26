@@ -48,6 +48,7 @@ namespace components {
 	struct physics_definition;
 	struct item_slot_transfers;
 	struct melee;
+	struct gui_element;
 }
 #endif
 
@@ -110,7 +111,8 @@ namespace augs {
 			std::pair<memory_pool::id, components::item*>,
 			std::pair<memory_pool::id, components::physics_definition*>,
 			std::pair<memory_pool::id, components::item_slot_transfers*>,
-			std::pair<memory_pool::id, components::melee*>
+			std::pair<memory_pool::id, components::melee*>,
+			std::pair<memory_pool::id, components::gui_element*>
 		> type_to_component;
 
 		component_bitset_matcher signature;
@@ -243,6 +245,18 @@ namespace augs {
 		void remove(size_t component_type_hash);
 
 	private:
+		template<typename Tuple, typename T, typename... Tp>
+		inline void remove_all(Tuple& t)
+		{
+			typedef std::decay <T::second_type>::type component_type;
+			remove<component_type>();
+			remove_all<Tuple, Tp...>(t);
+		}
+
+		template<typename Tuple>
+		void remove_all(Tuple& t)
+		{ }
+
 		bool unplug_component_from_systems(size_t);
 		void add_to_compatible_systems(size_t);
 

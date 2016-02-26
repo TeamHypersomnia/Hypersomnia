@@ -74,16 +74,19 @@ void intent_contextualization_system::contextualize_movement_intents() {
 	auto& intents = parent_world.get_message_queue<messages::intent_message>();
 
 	for (auto& e : intents) {
-		if (e.intent == intent_type::MOVE_FORWARD
-			|| e.intent == intent_type::MOVE_BACKWARD
-			|| e.intent == intent_type::MOVE_LEFT
-			|| e.intent == intent_type::MOVE_RIGHT
-			|| e.intent == intent_type::HAND_BRAKE
-			) {
-			auto* maybe_driver = e.subject->find<components::driver>();
+		auto* maybe_driver = e.subject->find<components::driver>();
 
-			if (maybe_driver && maybe_driver->owned_vehicle.alive())
+		if (maybe_driver && maybe_driver->owned_vehicle.alive()) {
+			if (e.intent == intent_type::MOVE_FORWARD
+				|| e.intent == intent_type::MOVE_BACKWARD
+				|| e.intent == intent_type::MOVE_LEFT
+				|| e.intent == intent_type::MOVE_RIGHT) {
 				e.subject = maybe_driver->owned_vehicle;
+			}
+			else if (e.intent == intent_type::SPACE_BUTTON) {
+				e.subject = maybe_driver->owned_vehicle;
+				e.intent = intent_type::HAND_BRAKE;
+			}
 		}
 	}
 }
