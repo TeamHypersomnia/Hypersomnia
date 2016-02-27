@@ -81,9 +81,12 @@ namespace augs {
 				rect *rect_held_by_rmb = nullptr;
 
 				rect root;
+
 				std::vector<augs::vertex_triangle> triangle_buffer;
 
 				gui_world();
+				
+				void reassign_children_and_unset_invalid_handles(rect_id parent, std::vector<rect_id> new_children);
 
 				void set_delta_milliseconds(float);
 				float delta_milliseconds();

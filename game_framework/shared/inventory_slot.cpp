@@ -10,6 +10,13 @@ bool inventory_slot_id::operator==(inventory_slot_id b) const {
 	return b.type == type && b.container_entity == b.container_entity;
 }
 
+bool inventory_slot_id::operator<(const inventory_slot_id& b) const {
+	if (container_entity == b.container_entity)
+		return type < b.type;
+
+	return container_entity < b.container_entity;
+}
+
 bool inventory_slot_id::operator!=(inventory_slot_id b) const {
 	return !(*this == b);
 }

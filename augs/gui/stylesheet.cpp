@@ -21,19 +21,7 @@ namespace augs {
 			}
 
 			stylesheet::stylesheet(const style& released, const style& hovered, const style& pushed, const style& focused) 
-				: released(released), hovered(hovered), pushed(pushed), focused(focused), focus_flag(false), current_appearance(appearance::released) {}
-
-			void stylesheet::update_appearance(rect::gui_event m) {
-				auto app = map_event_to_appearance_type(m);
-				
-				if(m == rect::gui_event::focus)
-					focus_flag = true;
-				if(m == rect::gui_event::blur)
-					focus_flag = false;
-
-				if(app != appearance::unknown) 
-					current_appearance = app;
-			}
+				: released(released), hovered(hovered), pushed(pushed), focused(focused) {}
 
 			stylesheet::style stylesheet::get_style() const {
 				style base(focus_flag ? (style(released) = focused) : released);
@@ -45,25 +33,6 @@ namespace augs {
 				case appearance::pushed: return (style(base) = hovered) = pushed;   break;
 				default: return base;
 				}
-
-			}
-
-			stylesheet::appearance stylesheet::map_event_to_appearance_type(rect::gui_event m) {
-				if (m == rect::gui_event::hout
-					|| m == rect::gui_event::lup
-					|| m == rect::gui_event::loutup)
-					return appearance::released;
-
-				if (m == rect::gui_event::hover)
-					return appearance::hovered;
-
-				if (m == rect::gui_event::lpressed
-					|| m == rect::gui_event::ldown
-					|| m == rect::gui_event::ldoubleclick
-					|| m == rect::gui_event::ltripleclick)
-					return appearance::pushed;
-
-				return appearance::unknown;
 			}
 		}
 	}

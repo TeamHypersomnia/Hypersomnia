@@ -22,6 +22,7 @@ namespace augs {
 	extern const rgba blue;
 	extern const rgba red;
 	extern const rgba green;
+	extern const rgba orange;
 	extern const rgba violet;
 	extern const rgba darkred;
 	extern const rgba black;

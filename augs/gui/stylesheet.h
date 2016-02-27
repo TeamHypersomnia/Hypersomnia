@@ -1,21 +1,12 @@
 #pragma once
 #include "stroke.h"
 #include "rect.h"
+#include "appearance_detector.h"
 
 namespace augs {
 	namespace graphics {
 		namespace gui {
-			struct stylesheet {
-				enum class appearance {
-					released,
-					hovered,
-					pushed,
-					unknown
-				};
-
-				/* how should rect look like depending on incoming event */
-				static appearance map_event_to_appearance_type(rect::gui_event m);
-
+			struct stylesheet : appearance_detector {
 				template <class T>
 				struct attribute {
 					bool active;
@@ -65,13 +56,7 @@ namespace augs {
 						   const style& pushed = style(),
 						   const style& focused = style());
 
-				appearance current_appearance;
-
-				void update_appearance(rect::gui_event);
 				style get_style() const;
-
-			private:
-				bool focus_flag;
 			};
 		}
 	}

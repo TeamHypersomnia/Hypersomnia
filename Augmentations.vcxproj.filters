@@ -1092,6 +1092,9 @@
     <ClCompile Include="game_framework\systems\gui_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="augs\gui\appearance_detector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3003,6 +3006,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\components\gui_element_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\gui\appearance_detector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

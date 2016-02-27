@@ -158,17 +158,17 @@ namespace scene_builders {
 		active_context.map_key_to_intent(window::event::keys::RMOUSE, intent_type::CROSSHAIR_SECONDARY_ACTION);
 		
 		active_context.map_key_to_intent(window::event::keys::E, intent_type::USE_BUTTON);
-		active_context.map_key_to_intent(window::event::keys::SPACE, intent_type::SPACE_BUTTON);
+		active_context.map_key_to_intent(window::event::keys::LSHIFT, intent_type::SPACE_BUTTON);
 		
 		active_context.map_key_to_intent(window::event::keys::G, intent_type::THROW_PRIMARY_ITEM);
 		active_context.map_key_to_intent(window::event::keys::H, intent_type::HOLSTER_PRIMARY_ITEM);
 		
-		active_context.map_key_to_intent(window::event::keys::LSHIFT, intent_type::SWITCH_LOOK);
+	    active_context.map_key_to_intent(window::event::keys::BACKSPACE, intent_type::SWITCH_LOOK);
 
 		active_context.map_key_to_intent(window::event::keys::Z, intent_type::START_PICKING_UP_ITEMS);
 		active_context.map_key_to_intent(window::event::keys::TAB, intent_type::SWITCH_CHARACTER);
 
-		active_context.map_key_to_intent(window::event::keys::CAPSLOCK, intent_type::SWITCH_TO_GUI);
+		active_context.map_key_to_intent(window::event::keys::SPACE, intent_type::SWITCH_TO_GUI);
 
 		auto& input = world.get_system<input_system>();
 		input.add_context(active_context);

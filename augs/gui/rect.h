@@ -118,6 +118,8 @@ namespace augs {
 
 				virtual void get_member_children(std::vector<rect_id>& children);
 				
+				void get_all_descendants(std::vector<rect_id>&);
+
 				/*  does scroll not exceed the content */
 				bool is_scroll_clamped_to_right_down_corner();
 

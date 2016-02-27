@@ -26,6 +26,8 @@ struct inventory_slot_id {
 	bool is_hand_slot();
 	bool should_item_inside_keep_physical_body();
 
+	bool operator<(const inventory_slot_id& b) const;
+
 	inventory_slot& operator*();
 	inventory_slot* operator->();
 	bool operator==(inventory_slot_id b) const;

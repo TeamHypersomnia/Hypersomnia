@@ -172,6 +172,45 @@ namespace augs {
 				return delta_ms;
 			}
 
+			void rect::get_all_descendants(std::vector<rect_id>& sum) {
+				auto all = children;
+				get_member_children(all);
+
+				sum.insert(sum.begin(), all.begin(), all.end());
+
+				for (auto c : all)
+					c->get_all_descendants(sum);
+			}
+
+			void gui_world::reassign_children_and_unset_invalid_handles(rect_id parent, std::vector<rect_id> rects) {
+				std::vector<rect_id> old_descendants;
+				std::vector<rect_id> new_descendants;
+				std::vector<rect_id> dead_handles;
+
+				parent->get_all_descendants(old_descendants);
+				parent->children = rects;
+				parent->get_all_descendants(new_descendants);
+
+				std::sort(old_descendants.begin(), old_descendants.end());
+				std::sort(new_descendants.begin(), new_descendants.end());
+
+				dead_handles.resize(old_descendants.size());
+				auto it = std::set_difference(old_descendants.begin(), old_descendants.end(), new_descendants.begin(), new_descendants.end(), dead_handles.begin());
+				dead_handles.resize(it - dead_handles.begin());
+
+				auto found = [&dead_handles](rect_id candidate) { return std::find(dead_handles.begin(), dead_handles.end(), candidate) != dead_handles.end(); };
+				
+				if (found(middlescroll.subject))
+					middlescroll.subject = nullptr;
+
+				if (found(rect_held_by_lmb))
+					rect_held_by_lmb = nullptr;
+
+				if (found(rect_held_by_rmb))
+					rect_held_by_rmb = nullptr;
+
+				// TODO: rebuild focus links
+			}
 
 			void gui_world::clipboard::change_clipboard() {
 				if(!own_copy && fetch_clipboard) {
@@ -196,7 +235,7 @@ namespace augs {
 				if(middlescroll.subject) {
 					if (gl.msg == event::mdown || gl.msg == event::mdoubleclick) {
 						pass = false;
-						middlescroll.subject = 0;
+						middlescroll.subject = nullptr;
 					}
 					return;
 				}

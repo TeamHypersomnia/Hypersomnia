@@ -49,6 +49,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_component<physics_definition>();
 	register_component<item_slot_transfers>();
 	register_component<melee>();
+	register_component<gui_element>();
 	
 	register_system<input_system>();
 	register_system<steering_system>();
@@ -135,6 +136,8 @@ void game_world::call_drawing_time_systems() {
 	get_system<camera_system>().post_render_requests_for_all_cameras();
 
 	get_system<input_system>().acquire_new_events_posted_by_drawing_time_systems();
+
+	get_system<gui_system>().rebuild_gui_tree_based_on_game_state();
 }
 
 void game_world::restore_transforms_after_drawing() {
@@ -164,7 +167,6 @@ void game_world::perform_logic_step() {
 	/* intent delegation stage (various ownership relations) */
 	get_system<intent_contextualization_system>().contextualize_use_button_intents();
 	get_system<intent_contextualization_system>().contextualize_crosshair_action_intents();
-	get_system<intent_contextualization_system>().contextualize_movement_intents();
 	/* end of intent delegation stage */
 
 	get_system<driver_system>().release_drivers_due_to_requests();
@@ -174,7 +176,9 @@ void game_world::perform_logic_step() {
 
 	get_system<driver_system>().assign_drivers_from_triggers();
 	get_system<driver_system>().release_drivers_due_to_ending_contact_with_wheel();
-	
+
+	get_system<intent_contextualization_system>().contextualize_movement_intents();
+
 	get_system<render_system>().remove_entities_from_rendering_tree();
 	get_system<physics_system>().destroy_fixtures_and_bodies();
 	get_system<destroy_system>().delete_queued_entities();

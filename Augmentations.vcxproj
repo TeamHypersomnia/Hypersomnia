@@ -353,6 +353,7 @@
     <ClCompile Include="3rdparty\RakNet\Source\WSAStartupSingleton.cpp" />
     <ClCompile Include="3rdparty\RakNet\Source\_FindFirst.cpp" />
     <ClCompile Include="augs\entity_system\entity_id.cpp" />
+    <ClCompile Include="augs\gui\appearance_detector.cpp" />
     <ClCompile Include="augs\misc\deterministic_timing.cpp" />
     <ClCompile Include="game_framework\bindings\file_watcher_binding.cpp" />
     <ClCompile Include="game_framework\bindings\glwindow_binding.cpp" />
@@ -934,6 +935,7 @@
     <ClInclude Include="3rdparty\RakNet\Source\WSAStartupSingleton.h" />
     <ClInclude Include="3rdparty\RakNet\Source\XBox360Includes.h" />
     <ClInclude Include="3rdparty\RakNet\Source\_FindFirst.h" />
+    <ClInclude Include="augs\gui\appearance_detector.h" />
     <ClInclude Include="augs\misc\constant_size_vector.h" />
     <ClInclude Include="augs\misc\deterministic_timing.h" />
     <ClInclude Include="augs\stream.h" />

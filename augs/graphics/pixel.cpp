@@ -133,6 +133,7 @@ namespace augs {
 	const rgba blue(0, 61, 102, 255);
 	const rgba red(255, 0, 0, 255);
 	const rgba green(0, 144, 66, 255);
+	const rgba orange(255, 165, 0, 255);
 	const rgba violet(164, 68, 195, 255);
 	const rgba darkred(122, 0, 0, 255);
 	const rgba black(0, 0, 0, 255);

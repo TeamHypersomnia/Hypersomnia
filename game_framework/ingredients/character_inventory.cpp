@@ -7,6 +7,7 @@
 #include "game_framework/components/item_slot_transfers_component.h"
 #include "game_framework/components/trigger_component.h"
 #include "game_framework/components/trigger_detector_component.h"
+#include "game_framework/components/gui_element_component.h"
 
 #include "../globals/detector_domains.h"
 
@@ -14,7 +15,8 @@ namespace ingredients {
 	void character_inventory(augs::entity_id e) {
 		auto& container = *e += components::container();
 		auto& item_slot_transfers = *e += components::item_slot_transfers();
-		
+		auto& gui_element = *e += components::gui_element();
+
 		inventory_slot slot_def;
 		slot_def.is_attachment_slot = true;
 
