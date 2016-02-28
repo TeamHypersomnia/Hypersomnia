@@ -163,7 +163,17 @@ namespace augs {
 					events.key_event = event::PRESSED;
 					events.key = MMOUSE;
 					events.mouse.state[2] = events.keys[MMOUSE] = true;  break;
-
+				case WM_XBUTTONDBLCLK:
+				case WM_XBUTTONDOWN:
+					events.key_event = event::PRESSED;
+					events.key = MOUSE4;
+					events.keys[MOUSE4] = true;
+					break;
+				case WM_XBUTTONUP:
+					events.key_event = event::RELEASED;
+					events.key = MOUSE4;
+					events.keys[MOUSE4] = false;
+					break;
 				case rdoubleclick:			    
 					events.key = RMOUSE;
 					events.mouse.state[1] = events.keys[RMOUSE] = true;  break;

@@ -169,7 +169,7 @@ namespace scene_builders {
 		active_context.map_key_to_intent(window::event::keys::TAB, intent_type::SWITCH_CHARACTER);
 
 		active_context.map_key_to_intent(window::event::keys::SPACE, intent_type::SPACE_BUTTON);
-		active_context.map_key_to_intent(window::event::keys::LALT, intent_type::SWITCH_TO_GUI);
+		active_context.map_key_to_intent(window::event::keys::MOUSE4, intent_type::SWITCH_TO_GUI);
 
 		auto& input = world.get_system<input_system>();
 		input.add_context(active_context);
