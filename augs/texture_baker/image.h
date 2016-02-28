@@ -1,10 +1,11 @@
 #pragma once
 #include <vector>
 #include "../math/vec2.h"
+#include "../graphics/pixel.h"
 
 namespace augs {
 	class image {
-		std::vector<unsigned char> v;
+		std::vector<augs::rgba_channel> v;
 		rects::wh<int> size;
 		int channels;
 
@@ -12,6 +13,9 @@ namespace augs {
 		image();
 		image(const image&);
 		image& operator=(const image&);
+
+		void create_circle(int radius, int border_width = 1, augs::rgba filling = white);
+		void create_filled_circle(int radius, augs::rgba filling = white);
 
 		void create(int w, int h, int channels);
 		bool from_file(const std::wstring& filename, unsigned channels = 0),
@@ -30,6 +34,8 @@ namespace augs {
 		unsigned char* operator()(int x, int y, int channel = 0); // get pixel
 		unsigned char* ptr(int x = 0, int y = 0, int channel = 0);
 		unsigned char  pix(int x = 0, int y = 0, int channel = 0) const;
+
+		rgba& pixel(int x, int y);
 
 		int get_channels() const, get_bytes() const, get_num_pixels() const;
 		const rects::wh<int>& get_size() const;

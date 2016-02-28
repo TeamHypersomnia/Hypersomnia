@@ -29,6 +29,54 @@ namespace augs {
 		//v.shrink_to_fit();
 	}
 
+	void image::create_circle(int radius, int border_width, augs::rgba filling) {
+		create(radius * 2 + 1, radius * 2 + 1, 4);
+
+		for (int x = 0; x < size.w; ++x) {
+			for (int y = 0; y < size.h; ++y) {
+				int x_center = x - size.w / 2;
+				int y_center = y - size.h / 2;
+
+				if (
+					x_center*x_center + y_center*y_center <= radius*radius
+					&&
+					x_center*x_center + y_center*y_center >= (radius-border_width)*(radius-border_width)
+					) {
+					pixel(x, y) = filling;
+				}
+				else
+					pixel(x, y) = rgba(0, 0, 0, 0);
+			}
+		}
+
+		pixel(size.w / 2, 0) = rgba(0, 0, 0, 0);
+		pixel(size.w / 2, size.h - 1) = rgba(0, 0, 0, 0);
+		pixel(0, size.h / 2) = rgba(0, 0, 0, 0);
+		pixel(size.w - 1, size.h / 2) = rgba(0, 0, 0, 0);
+	}
+
+	void image::create_filled_circle(int radius, augs::rgba filling) {
+		create(radius * 2 + 1, radius * 2 + 1, 4);
+
+		for (int x = 0; x < size.w; ++x) {
+			for (int y = 0; y < size.h; ++y) {
+				int x_center = x - size.w / 2;
+				int y_center = y - size.h / 2;
+
+				if (x_center*x_center + y_center*y_center <= radius*radius) {
+					pixel(x, y) = filling;
+				}
+				else
+					pixel(x, y) = rgba(0, 0, 0, 0);
+			}
+		}
+
+		pixel(size.w / 2, 0) = rgba(0, 0, 0, 0);
+		pixel(size.w / 2, size.h-1) = rgba(0, 0, 0, 0);
+		pixel(0, size.h/2) = rgba(0, 0, 0, 0);
+		pixel(size.w-1, size.h/2) = rgba(0, 0, 0, 0);
+	}
+
 	bool image::from_file(const std::wstring& filename, unsigned force_channels) {
 		channels = 4;
 
@@ -205,6 +253,9 @@ namespace augs {
 		return v[(static_cast<int>(size.w) * y + x) * channels + channel];
 	}
 
+	rgba& image::pixel(int x, int y) {
+		return *(rgba*)ptr(x, y, 0);
+	}
 
 	int image::get_bytes() const {
 		return sizeof(unsigned char) * static_cast<int>(size.w) * static_cast<int>(size.h) * channels;

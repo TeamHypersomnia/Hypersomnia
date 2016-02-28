@@ -9,8 +9,8 @@ void slot_button::draw_triangles(draw_info info) {
 	rgba inside_attachment_col = orange;
 	inside_attachment_col.a = 12;
 
-	rgba attachment_border_col = violet;
-	attachment_border_col.a = 16;
+	rgba attachment_border_col = orange;
+	attachment_border_col.a = 255;
 
 	rgba inside_deposit_col = cyan;
 	inside_attachment_col.a = 12;
@@ -26,19 +26,36 @@ void slot_button::draw_triangles(draw_info info) {
 	}
 
 	augs::gui::material inside_deposit_mat(assets::texture_id::BLANK, inside_deposit_col);
-	augs::gui::material inside_attachment_mat(assets::texture_id::BLANK, inside_attachment_col);
-	augs::gui::material attachment_border_mat(assets::texture_id::BLANK, attachment_border_col);
 	augs::gui::material deposit_border_mat(assets::texture_id::BLANK, deposit_border_col);
+	augs::gui::material inside_attachment_mat(assets::texture_id::ATTACHMENT_CIRCLE_FILLED, inside_attachment_col);
+	augs::gui::material attachment_border_mat(assets::texture_id::ATTACHMENT_CIRCLE_BORDER, attachment_border_col);
 
 	if (slot_id->is_attachment_slot) {
 		if (slot_id.has_items()) {
 			return;
 		}
 		else {
-			draw_rectangle_with_material(info, inside_attachment_mat);
+			draw_centered_texture(info, inside_attachment_mat);
+			draw_centered_texture(info, attachment_border_mat);
 
-			augs::gui::solid_stroke border(1, attachment_border_mat);
-			border.draw(info.v, *this);
+			if (slot_id.type == slot_function::PRIMARY_HAND) {
+				draw_centered_texture(info, augs::gui::material(assets::texture_id::PRIMARY_HAND_ICON, deposit_border_col), vec2i(1, 0));
+			}
+
+			if (slot_id.type == slot_function::SECONDARY_HAND) {
+				draw_centered_texture(info, augs::gui::material(assets::texture_id::SECONDARY_HAND_ICON, deposit_border_col));
+			}
+
+			if (slot_id.type == slot_function::SHOULDER_SLOT) {
+				draw_centered_texture(info, augs::gui::material(assets::texture_id::SHOULDER_SLOT_ICON, attachment_border_col));
+			}
+
+			if (slot_id.type == slot_function::TORSO_ARMOR_SLOT) {
+				draw_centered_texture(info, augs::gui::material(assets::texture_id::ARMOR_SLOT_ICON, attachment_border_col));
+			}
+
+			//augs::gui::solid_stroke border(1, attachment_border_mat);
+			//border.draw(info.v, *this);
 		}
 	}
 	else {

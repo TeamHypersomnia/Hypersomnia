@@ -111,7 +111,8 @@ namespace augs {
 			bool focus_next_rect_by_enter(event_info);
 
 			/* draw_triangles default subroutines */
-			void draw_rectangle_with_material(draw_info in, const material& = material()),
+			void draw_stretched_texture(draw_info in, const material& = material()),
+				draw_centered_texture(draw_info in, const material& = material(), vec2i offset = vec2i()),
 				draw_rectangle_stylesheeted(draw_info in, const stylesheet&),
 				draw_children(draw_info in);
 

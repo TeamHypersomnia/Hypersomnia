@@ -38,7 +38,6 @@ namespace scene_builders {
 
 		resource_manager.create(assets::texture_id::TEST_CROSSHAIR, std::wstring(L"hypersomnia/gfx/crosshair.png"));
 		resource_manager.create(assets::texture_id::TEST_PLAYER, L"hypersomnia/gfx/walk_1.png");
-		resource_manager.create(assets::texture_id::BLANK, L"hypersomnia/gfx/blank.png");
 		resource_manager.create(assets::texture_id::TEST_BACKGROUND, L"hypersomnia/gfx/snow_textures/snow3.png");
 		resource_manager.create(assets::texture_id::CRATE, L"hypersomnia/gfx/crate.png");
 		resource_manager.create(assets::texture_id::CAR_INSIDE, L"hypersomnia/gfx/crate2.png");
@@ -56,7 +55,20 @@ namespace scene_builders {
 		resource_manager.create(assets::texture_id::ASSAULT_RIFLE, L"hypersomnia/gfx/assault_rifle.png");
 		resource_manager.create(assets::texture_id::SHOTGUN, L"hypersomnia/gfx/shotgun.png");
 
+		augs::image attachment_circle_filled;
+		attachment_circle_filled.create_filled_circle(16);
+
+		augs::image attachment_circle_border;
+		attachment_circle_border.create_circle(16);
+
+		resource_manager.create(assets::texture_id::ATTACHMENT_CIRCLE_FILLED, attachment_circle_filled);
+		resource_manager.create(assets::texture_id::ATTACHMENT_CIRCLE_BORDER, attachment_circle_border);
 		resource_manager.create(assets::texture_id::GUI_CURSOR, L"hypersomnia/gfx/gui_cursor.png");
+		resource_manager.create(assets::texture_id::BLANK, L"hypersomnia/gfx/blank.png");
+		resource_manager.create(assets::texture_id::SECONDARY_HAND_ICON, L"hypersomnia/gfx/secondary_hand_icon.png");
+		resource_manager.create(assets::texture_id::PRIMARY_HAND_ICON, L"hypersomnia/gfx/primary_hand_icon.png");
+		resource_manager.create(assets::texture_id::SHOULDER_SLOT_ICON, L"hypersomnia/gfx/shoulder_slot_icon.png");
+		resource_manager.create(assets::texture_id::ARMOR_SLOT_ICON, L"hypersomnia/gfx/armor_slot_icon.png");
 
 		auto& font = resource_manager.create(assets::font_id::GUI_FONT);
 		font.open("hypersomnia/Kubasta.ttf", 16, L" ABCDEFGHIJKLMNOPRSTUVWXYZQabcdefghijklmnoprstuvwxyzq0123456789.!@#$%^&*()_+-=[];'\\,./{}:\"|<>?");
