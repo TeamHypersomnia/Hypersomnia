@@ -67,7 +67,11 @@ void slot_button::perform_logic_step(augs::gui::gui_world& gr) {
 
 	}
 
-	rc.set_position(parent_position + slot_relative_pos + user_drag_offset);
+	auto gridded_offset = user_drag_offset;
+	gridded_offset /= 10;
+	gridded_offset *= 10;
+
+	rc.set_position(parent_position + slot_relative_pos + gridded_offset);
 }
 
 void slot_button::consume_gui_event(event_info info) {
