@@ -5,11 +5,11 @@
 
 #include "augs/gui/gui_world.h"
 
-struct game_gui_root : public augs::graphics::gui::rect {
-	augs::graphics::gui::rect inventory_root;
-	augs::graphics::gui::rect game_windows_root;
+struct game_gui_root : public augs::gui::rect {
+	augs::gui::rect inventory_root;
+	augs::gui::rect game_windows_root;
 
-	void get_member_children(std::vector<augs::graphics::gui::rect_id>& children) final;
+	void get_member_children(std::vector<augs::gui::rect_id>& children) final;
 };
 
 class gui_system : public augs::processing_system_templated<components::gui_element> {
@@ -21,7 +21,7 @@ public:
 		this->size = size;
 	}
 
-	augs::graphics::gui::gui_world gui;
+	augs::gui::gui_world gui;
 	game_gui_root game_gui_root;
 
 	gui_system(world& parent_world);

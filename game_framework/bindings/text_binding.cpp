@@ -10,7 +10,7 @@
 
 #include "misc/vector_wrapper.h"
 
-using namespace graphics::gui::text;
+using namespace gui::text;
 
 wchar_t towchar(const std::wstring& s) {
 	return s[0];
@@ -59,7 +59,7 @@ namespace bindings {
 			luabind::def("get_text_bbox", get_text_bbox_wrapper),
 			luabind::def("quick_print_text", quick_print_wrapper)
 			
-			//.def("append", &graphics::gui::text::fstr::append)
+			//.def("append", &gui::text::fstr::append)
 
 			//,
 

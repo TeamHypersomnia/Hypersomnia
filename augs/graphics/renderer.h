@@ -11,10 +11,8 @@
 #include "augs/misc/timer.h"
 
 namespace augs {
-	namespace graphics {
-		namespace gui {
-			class gui_world;
-		}
+	namespace gui {
+		class gui_world;
 	}
 
 	class renderer {
@@ -71,7 +69,7 @@ namespace augs {
 		void set_viewport(rects::xywh<int>);
 		void push_line(const vertex_line&);
 		void push_triangle(const vertex_triangle&);
-		void push_triangles_from_gui_world(graphics::gui::gui_world&);
+		void push_triangles_from_gui_world(gui::gui_world&);
 
 		void clear_triangles();
 		void clear_lines();

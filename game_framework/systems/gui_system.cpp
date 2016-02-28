@@ -17,7 +17,7 @@
 
 #include "gui/stroke.h"
 
-void game_gui_root::get_member_children(std::vector<augs::graphics::gui::rect_id>& children) {
+void game_gui_root::get_member_children(std::vector<augs::gui::rect_id>& children) {
 	children.push_back(&inventory_root);
 	children.push_back(&game_windows_root);
 }
@@ -80,10 +80,10 @@ void slot_rect::draw_triangles(draw_info info) {
 		attachment_border_col.a = 255;
 	}
 
-	augs::graphics::gui::material inside_deposit_mat(assets::texture_id::BLANK, inside_deposit_col);
-	augs::graphics::gui::material inside_attachment_mat(assets::texture_id::BLANK, inside_attachment_col);
-	augs::graphics::gui::material attachment_border_mat(assets::texture_id::BLANK, attachment_border_col);
-	augs::graphics::gui::material deposit_border_mat(assets::texture_id::BLANK, deposit_border_col);
+	augs::gui::material inside_deposit_mat(assets::texture_id::BLANK, inside_deposit_col);
+	augs::gui::material inside_attachment_mat(assets::texture_id::BLANK, inside_attachment_col);
+	augs::gui::material attachment_border_mat(assets::texture_id::BLANK, attachment_border_col);
+	augs::gui::material deposit_border_mat(assets::texture_id::BLANK, deposit_border_col);
 
 	if (slot_id->is_attachment_slot) {
 		if (slot_id.has_items()) {
@@ -92,7 +92,7 @@ void slot_rect::draw_triangles(draw_info info) {
 		else {
 			draw_rectangle_with_material(info, inside_attachment_mat);
 
-			augs::graphics::gui::solid_stroke border(1, attachment_border_mat);
+			augs::gui::solid_stroke border(1, attachment_border_mat);
 			border.draw(info.v, *this);
 		}
 	}
@@ -106,7 +106,7 @@ void slot_rect::consume_gui_event(event_info info) {
 }
 
 void gui_system::rebuild_gui_tree_based_on_game_state() {
-	std::vector<augs::graphics::gui::rect_id> new_inventory_elements;
+	std::vector<augs::gui::rect_id> new_inventory_elements;
 
 	for (auto& t : targets) {
 		auto* item_slot_transfers = t->find<components::item_slot_transfers>();

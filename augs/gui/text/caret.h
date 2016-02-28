@@ -1,19 +1,17 @@
 #include "../gui_world.h"
 
 namespace augs {
-	namespace graphics {
-		namespace gui {
-			namespace text {
-				struct caret_info {
-					unsigned pos;
-					int selection_offset;
-					style default_style;
+	namespace gui {
+		namespace text {
+			struct caret_info {
+				unsigned pos;
+				int selection_offset;
+				style default_style;
 
-					unsigned get_left_selection() const;
-					unsigned get_right_selection() const;
-					caret_info(style);
-				};
-			}
+				unsigned get_left_selection() const;
+				unsigned get_right_selection() const;
+				caret_info(style);
+			};
 		}
 	}
 }

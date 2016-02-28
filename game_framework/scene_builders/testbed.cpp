@@ -220,7 +220,7 @@ namespace scene_builders {
 
 	void testbed::drawcalls_after_all_cameras(world& world) {
 		auto& target = renderer::get_current();
-		using namespace graphics::gui::text;
+		using namespace gui::text;
 
 		quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", style(assets::font_id::GUI_FONT, violet), vec2i(200-1, 200), 0, nullptr);
 		quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", style(assets::font_id::GUI_FONT, violet), vec2i(200+1, 200), 0, nullptr);

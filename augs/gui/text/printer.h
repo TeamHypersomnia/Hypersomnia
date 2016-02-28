@@ -2,86 +2,84 @@
 #include "../gui_world.h"
 // got to revise gui systems in terms of rectangle update'ing
 namespace augs {
-	namespace graphics {
-		namespace gui {
-			namespace text {
-				struct caret_info;
-				class ui;
-				struct drafter;
-				struct printer {
-					/* defines how the caret should blink and whether should blink at all */
-					struct blinker {
-						bool blink, caret_visible;
-						int interval_ms;
+	namespace gui {
+		namespace text {
+			struct caret_info;
+			class ui;
+			struct drafter;
+			struct printer {
+				/* defines how the caret should blink and whether should blink at all */
+				struct blinker {
+					bool blink, caret_visible;
+					int interval_ms;
 
-						//static void regular_blink(blinker&, quad& caret);
-						//void (*blink_func)(blinker&, quad&);
+					//static void regular_blink(blinker&, quad& caret);
+					//void (*blink_func)(blinker&, quad&);
 
-						timer timer;
-						blinker();
-						void update();
-						void reset();
-					};
+					timer timer;
+					blinker();
+					void update();
+					void reset();
+				};
 
-					blinker blink;
-					rgba selected_text_color;
-					
-					unsigned caret_width; 
-					
-					bool active, 
-						align_caret_height, /* whether caret should be always of line height */
-						highlight_current_line, 
-						highlight_during_selection;
-					
-					material caret_mat, 
-						highlight_mat, 
-						selection_bg_mat,
-						selection_inactive_bg_mat; /* material for line highlighting */
-					
-					printer();
+				blinker blink;
+				rgba selected_text_color;
 
-					void draw_text(std::vector<augs::vertex_triangle>& out, ui&, const rect& parent) const;
-					
-					void draw_text(
-						std::vector<augs::vertex_triangle>& out, 
-						const drafter&, 
-						const fstr& colors, 
-						/* if caret is 0, draw no caret */
-						const caret_info* caret,
-						const rect& parent
-						) const;
-					
-					void draw_text(
-						std::vector<augs::vertex_triangle>& out, 
-						const drafter&, 
-						const fstr& colors,
-						/* if caret is 0, draw no caret */
-						const caret_info* caret,
-						vec2i scroll,
-						const rects::ltrb<float>* parent = 0) const;
-		 		};
-				
-				/* 
-				parent shifts position and clips the text
-				wrapping_width = 0 means no wrapping
-				 parent = 0 means no clipping/shifting
-				returns text's bounding box (without clipping)
-				*/
-				extern vec2i get_text_bbox(const std::basic_string<formatted_char>& str, unsigned wrapping_width);
+				unsigned caret_width;
 
-				extern rects::wh<float> quick_print(std::vector<augs::vertex_triangle>& v,
-										const fstr& str, 
-										vec2i pos, 
-										unsigned wrapping_width = 0,
-										const rects::ltrb<float>* parent = 0);
+				bool active,
+					align_caret_height, /* whether caret should be always of line height */
+					highlight_current_line,
+					highlight_during_selection;
 
-				extern rects::wh<float> quick_print_format(std::vector<augs::vertex_triangle>& v,
-										const std::wstring& wstr,
-										style style,
-										vec2i pos, 
-										unsigned wrapping_width = 0,
-										const rects::ltrb<float>* parent = 0);
-			}
+				material caret_mat,
+					highlight_mat,
+					selection_bg_mat,
+					selection_inactive_bg_mat; /* material for line highlighting */
+
+				printer();
+
+				void draw_text(std::vector<augs::vertex_triangle>& out, ui&, const rect& parent) const;
+
+				void draw_text(
+					std::vector<augs::vertex_triangle>& out,
+					const drafter&,
+					const fstr& colors,
+					/* if caret is 0, draw no caret */
+					const caret_info* caret,
+					const rect& parent
+					) const;
+
+				void draw_text(
+					std::vector<augs::vertex_triangle>& out,
+					const drafter&,
+					const fstr& colors,
+					/* if caret is 0, draw no caret */
+					const caret_info* caret,
+					vec2i scroll,
+					const rects::ltrb<float>* parent = 0) const;
+			};
+
+			/*
+			parent shifts position and clips the text
+			wrapping_width = 0 means no wrapping
+			 parent = 0 means no clipping/shifting
+			returns text's bounding box (without clipping)
+			*/
+			extern vec2i get_text_bbox(const std::basic_string<formatted_char>& str, unsigned wrapping_width);
+
+			extern rects::wh<float> quick_print(std::vector<augs::vertex_triangle>& v,
+				const fstr& str,
+				vec2i pos,
+				unsigned wrapping_width = 0,
+				const rects::ltrb<float>* parent = 0);
+
+			extern rects::wh<float> quick_print_format(std::vector<augs::vertex_triangle>& v,
+				const std::wstring& wstr,
+				style style,
+				vec2i pos,
+				unsigned wrapping_width = 0,
+				const rects::ltrb<float>* parent = 0);
 		}
 	}
 }

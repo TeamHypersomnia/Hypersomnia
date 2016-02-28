@@ -4,44 +4,42 @@
 #include <functional>
 
 namespace augs {
-	namespace graphics {
-		namespace gui {
-			namespace controls {
-				class checkbox : public rect {
-					bool set;
-				public:
-					std::function<void (bool)> callback;
+	namespace gui {
+		namespace controls {
+			class checkbox : public rect {
+				bool set;
+			public:
+				std::function<void(bool)> callback;
 
-					virtual void on_change(bool set);
+				virtual void on_change(bool set);
 
-					bool get_state() const;
-					operator bool()  const;
+				bool get_state() const;
+				operator bool()  const;
 
-					void set_state(bool);
+				void set_state(bool);
 
-					checkbox(const rect& = rect(), bool set = false, 
-						const std::function<void (bool)>& callback = nullptr); 
+				checkbox(const rect& = rect(), bool set = false,
+					const std::function<void(bool)>& callback = nullptr);
 
-					virtual void consume_gui_event(event_info e) override;
-				};
-				
-				class checklabel : public checkbox {
-					void stretch_rc();
+				virtual void consume_gui_event(event_info e) override;
+			};
 
-				public:
-					text::text_rect active_text;
-					text::text_rect inactive_text;
+			class checklabel : public checkbox {
+				void stretch_rc();
 
-					checklabel(const checkbox&, const std::wstring& label, const text::style& style_active, const text::style& style_inactive);
-					checklabel(const checkbox&, const text::fstr& active_str, const text::fstr& inactive_str);
+			public:
+				text::text_rect active_text;
+				text::text_rect inactive_text;
 
-					virtual void on_change(bool set) override;
-					
-					void get_member_children(std::vector<rect_id>&) override;
+				checklabel(const checkbox&, const std::wstring& label, const text::style& style_active, const text::style& style_inactive);
+				checklabel(const checkbox&, const text::fstr& active_str, const text::fstr& inactive_str);
 
-					text::text_rect& active_label();
-				};
-			}
+				virtual void on_change(bool set) override;
+
+				void get_member_children(std::vector<rect_id>&) override;
+
+				text::text_rect& active_label();
+			};
 		}
 	}
 }

@@ -73,7 +73,7 @@ namespace augs {
 		glViewport(xywh.x, xywh.y, xywh.w, xywh.h);
 	}
 	
-	void renderer::push_triangles_from_gui_world(graphics::gui::gui_world& gui) {
+	void renderer::push_triangles_from_gui_world(gui::gui_world& gui) {
 		triangles.insert(triangles.end(), gui.triangle_buffer.begin(), gui.triangle_buffer.end());
 	}
 

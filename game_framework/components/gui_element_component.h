@@ -6,16 +6,16 @@
 #include "../shared/inventory_slot_id.h"
 #include "augs/gui/appearance_detector.h"
 
-struct slot_rect : augs::graphics::gui::rect {
+struct slot_rect : augs::gui::rect {
 	inventory_slot_id slot_id;
 
-	augs::graphics::gui::appearance_detector detector;
+	augs::gui::appearance_detector detector;
 
 	void draw_triangles(draw_info) final;
 	void consume_gui_event(event_info) final;
 };
 
-struct item_rect : augs::graphics::gui::rect {
+struct item_rect : augs::gui::rect {
 	bool is_container_open = false;
 	inventory_slot_id slot_id;
 	augs::entity_id item;

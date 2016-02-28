@@ -1,37 +1,35 @@
 #pragma once
 #include "drafter.h"
 namespace augs {
-	namespace graphics {
-		namespace gui {
-			namespace text {
-				class abstract_draft {
-					bool update_str;
-				
-				public:
-					abstract_draft();
+	namespace gui {
+		namespace text {
+			class abstract_draft {
+				bool update_str;
 
-					void need_redraw();
-					void guarded_redraw();
+			public:
+				abstract_draft();
 
-					virtual 	  fstr& str() = 0;
-					virtual const fstr& get_str() const = 0;
-					virtual 	  drafter& draft() = 0;
-					virtual const drafter& get_draft() = 0;
-				};
+				void need_redraw();
+				void guarded_redraw();
 
-				class draft_redrawer : public abstract_draft {
-					fstr _str;
-					drafter _draft;
-				public:
+				virtual 	  fstr& str() = 0;
+				virtual const fstr& get_str() const = 0;
+				virtual 	  drafter& draft() = 0;
+				virtual const drafter& get_draft() = 0;
+			};
 
-					draft_redrawer(const fstr& = fstr(), const drafter& = drafter());
+			class draft_redrawer : public abstract_draft {
+				fstr _str;
+				drafter _draft;
+			public:
 
-						  fstr& str() override;
-					const fstr& get_str() const override;
-						  drafter& draft() override;
-					const drafter& get_draft() override;
-				};
-			}
+				draft_redrawer(const fstr& = fstr(), const drafter& = drafter());
+
+				fstr& str() override;
+				const fstr& get_str() const override;
+				drafter& draft() override;
+				const drafter& get_draft() override;
+			};
 		}
 	}
 }
