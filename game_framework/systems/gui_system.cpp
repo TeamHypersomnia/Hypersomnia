@@ -10,6 +10,7 @@
 
 #include "../components/sprite_component.h"
 #include "../components/input_receiver_component.h"
+#include "../components/container_component.h"
 
 #include "crosshair_system.h"
 
@@ -66,43 +67,21 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 			auto& slot_meta = element.slot_metadata;
 			auto& item_meta = element.item_metadata;
 
+			auto& container = t->get<components::container>();
+
 			/* create new if not found */
+			for (auto& s : container.slots) {
+				auto id = t[s.first];
 
-			if (slot_meta.find(t[slot_function::PRIMARY_HAND]) == slot_meta.end()) {
-				slot_button primary_hand_rect;
-				primary_hand_rect.slot_id = t[slot_function::PRIMARY_HAND];
-				primary_hand_rect.rc = rects::xywh<float>(size.x - 100, size.y - 100, 33, 33);
-				primary_hand_rect.slot_relative_pos = primary_hand_rect.rc.get_position();
+				if (slot_meta.find(id) == slot_meta.end()) {
+					slot_button new_rect;
+					new_rect.slot_id = id;
 
+					new_rect.rc = get_rectangle_for_slot_function(s.first);
+					new_rect.slot_relative_pos =  new_rect.rc.get_position();
 
-				slot_meta[t[slot_function::PRIMARY_HAND]] = primary_hand_rect;
-			}
-
-			if (slot_meta.find(t[slot_function::SECONDARY_HAND]) == slot_meta.end()) {
-				slot_button secondary_hand_rect;
-				secondary_hand_rect.slot_id = t[slot_function::SECONDARY_HAND];
-				secondary_hand_rect.rc = rects::xywh<float>(size.x - 300, size.y - 100, 33, 33);
-				secondary_hand_rect.slot_relative_pos = secondary_hand_rect.rc.get_position();
-
-				slot_meta[t[slot_function::SECONDARY_HAND]] = secondary_hand_rect;
-			}
-
-			if (slot_meta.find(t[slot_function::SHOULDER_SLOT]) == slot_meta.end()) {
-				slot_button shoulder_rect;
-				shoulder_rect.slot_id = t[slot_function::SHOULDER_SLOT];
-				shoulder_rect.rc = rects::xywh<float>(size.x - 100, size.y - 200, 33, 33);
-				shoulder_rect.slot_relative_pos = shoulder_rect.rc.get_position();
-
-				slot_meta[t[slot_function::SHOULDER_SLOT]] = shoulder_rect;
-			}			
-			
-			if (slot_meta.find(t[slot_function::TORSO_ARMOR_SLOT]) == slot_meta.end()) {
-				slot_button armor_rect;
-				armor_rect.slot_id = t[slot_function::TORSO_ARMOR_SLOT];
-				armor_rect.rc = rects::xywh<float>(size.x - 200, size.y - 100, 33, 33);
-				armor_rect.slot_relative_pos = armor_rect.rc.get_position();
-
-				slot_meta[t[slot_function::TORSO_ARMOR_SLOT]] = armor_rect;
+					slot_meta[id] = new_rect;
+				}
 			}
 
 			for (auto& entry : slot_meta)

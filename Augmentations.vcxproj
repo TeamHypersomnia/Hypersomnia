@@ -403,6 +403,7 @@
     <ClCompile Include="game_framework\scene_builders\scene_builder.cpp" />
     <ClCompile Include="game_framework\scene_builders\testbed.cpp" />
     <ClCompile Include="game_framework\shared\gui\item_button.cpp" />
+    <ClCompile Include="game_framework\shared\gui\positioning.cpp" />
     <ClCompile Include="game_framework\shared\gui\slot_button.cpp" />
     <ClCompile Include="game_framework\shared\inventory_slot.cpp" />
     <ClCompile Include="game_framework\shared\physics_setup_helpers.cpp" />

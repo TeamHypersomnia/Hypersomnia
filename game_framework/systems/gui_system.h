@@ -39,4 +39,6 @@ public:
 	augs::entity_id get_game_world_crosshair();
 
 	void draw_gui_overlays_for_camera_rendering_request(messages::camera_render_request_message);
+
+	rects::xywh<float> get_rectangle_for_slot_function(slot_function);
 };
