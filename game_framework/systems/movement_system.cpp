@@ -6,7 +6,7 @@
 #include "../components/gun_component.h"
 
 using namespace messages;
-
+#include "log.h"
 void movement_system::set_movement_flags_from_input() {
 	auto events = parent_world.get_message_queue<messages::intent_message>();
 
@@ -26,6 +26,10 @@ void movement_system::set_movement_flags_from_input() {
 			break;
 		case intent_type::MOVE_RIGHT:
 			movement->moving_right = it.pressed_flag;
+			break;
+		case intent_type::WALK:
+			movement->walking_enabled = it.pressed_flag;
+			LOG("%x", it.pressed_flag);
 			break;
 		default: break;
 		}
@@ -67,6 +71,9 @@ void movement_system::apply_movement_forces() {
 			
 			if (movement.make_inert_for_ms > 0.f)
 				resultant /= 10.f;
+
+			if (movement.walking_enabled)
+				resultant /= 2.f;
 
 			physics.apply_force(resultant * physics.body->GetMass(), movement.applied_force_offset, true);
 		}

@@ -106,7 +106,7 @@ namespace augs {
 					m = events.msg = keydown;
 				case keydown:
 					//if (!((lParam & (1 << 30)) != 0)) {
-						events.keys[wParam] = true;
+						// events.keys[wParam] = true;
 						switch(wParam) {
 						case CTRL: wParam = (lParam & 0x1000000) ? RCTRL : LCTRL; break;
 						case SHIFT: wParam = (lParam & 0x1000000) ? RSHIFT : LSHIFT; break;
@@ -120,12 +120,14 @@ namespace augs {
 					break;								
 
 				case keyup:							
-					events.keys[wParam] = false;
-					switch(wParam) {
-					case CTRL:	   events.keys[RCTRL] = events.keys[LCTRL] = false; break;
-					case SHIFT:	   events.keys[RSHIFT] =	events.keys[LSHIFT] = false; break;
-					case ALT:	   events.keys[RALT] =		events.keys[LALT] = events.keys[LCTRL] = events.keys[CTRL] = false; break;
+					//events.keys[wParam] = false;
+					switch (wParam) {
+					case CTRL: wParam = (lParam & 0x1000000) ? RCTRL : LCTRL; break;
+					case SHIFT: wParam = (lParam & 0x1000000) ? RSHIFT : LSHIFT; break;
+					case ALT: wParam = (lParam & 0x1000000) ? RALT : LALT; break;
 					}
+
+					events.keys[wParam] = false;
 					events.key = key(wParam);
 					events.key_event = event::RELEASED;
 

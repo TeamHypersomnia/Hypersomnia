@@ -1,21 +1,17 @@
 #include "gui_system.h"
+#include "graphics/renderer.h"
+#include "../assets/texture.h"
+
 #include "entity_system/entity.h"
 #include "entity_system/world.h"
 
 #include "../messages/intent_message.h"
 #include "../messages/raw_window_input_message.h"
 
-#include "crosshair_system.h"
-
-#include "graphics/renderer.h"
-
 #include "../components/sprite_component.h"
 #include "../components/input_receiver_component.h"
 
-#include "../assets/texture.h"
-#include "../shared/inventory_slot.h"
-
-#include "gui/stroke.h"
+#include "crosshair_system.h"
 
 void game_gui_root::get_member_children(std::vector<augs::gui::rect_id>& children) {
 	children.push_back(&inventory_root);
@@ -58,53 +54,6 @@ augs::entity_id gui_system::get_game_world_crosshair() {
 	}
 }
 
-void slot_rect::draw_triangles(draw_info info) {
-	auto is_hand_slot = slot_id.is_hand_slot();
-
-	rgba inside_attachment_col = orange;
-	inside_attachment_col.a = 12;
-
-	rgba attachment_border_col = violet;
-	attachment_border_col.a = 16;
-
-	rgba inside_deposit_col = cyan;
-	inside_attachment_col.a = 12;
-
-	rgba deposit_border_col = cyan;
-	attachment_border_col.a = 255;
-
-	if (is_hand_slot) {
-		inside_attachment_col = cyan;
-		inside_attachment_col.a = 12;
-		attachment_border_col = cyan;
-		attachment_border_col.a = 255;
-	}
-
-	augs::gui::material inside_deposit_mat(assets::texture_id::BLANK, inside_deposit_col);
-	augs::gui::material inside_attachment_mat(assets::texture_id::BLANK, inside_attachment_col);
-	augs::gui::material attachment_border_mat(assets::texture_id::BLANK, attachment_border_col);
-	augs::gui::material deposit_border_mat(assets::texture_id::BLANK, deposit_border_col);
-
-	if (slot_id->is_attachment_slot) {
-		if (slot_id.has_items()) {
-			return;
-		}
-		else {
-			draw_rectangle_with_material(info, inside_attachment_mat);
-
-			augs::gui::solid_stroke border(1, attachment_border_mat);
-			border.draw(info.v, *this);
-		}
-	}
-	else {
-
-	}
-}
-
-void slot_rect::consume_gui_event(event_info info) {
-	detector.update_appearance(info);
-}
-
 void gui_system::rebuild_gui_tree_based_on_game_state() {
 	std::vector<augs::gui::rect_id> new_inventory_elements;
 
@@ -119,7 +68,7 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 			/* create new if not found */
 
 			if (slot_meta.find(t[slot_function::PRIMARY_HAND]) == slot_meta.end()) {
-				slot_rect primary_hand_rect;
+				slot_button primary_hand_rect;
 				primary_hand_rect.slot_id = t[slot_function::PRIMARY_HAND];
 				primary_hand_rect.rc = rects::xywh<float>(size.x - 100, size.y - 100, 32, 32);
 

@@ -18,13 +18,15 @@ namespace components {
 		}
 
 		void reset_movement_flags() {
-			moving_left = moving_right = moving_forward = moving_backward = 0;
+			moving_left = moving_right = moving_forward = moving_backward = walking_enabled = 0;
 		}
 
 		bool apply_movement_forces = true;
 
 		std::vector<subscribtion> animation_receivers;
+		
 		int moving_left = 0, moving_right = 0, moving_forward = 0, moving_backward = 0;
+		int walking_enabled = 0;
 		
 		vec2 input_acceleration_axes;
 		float acceleration_length = -1.f;

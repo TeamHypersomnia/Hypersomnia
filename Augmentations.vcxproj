@@ -402,6 +402,8 @@
     <ClCompile Include="game_framework\scene_builders\rendering_scripts\testbed_rendering.cpp" />
     <ClCompile Include="game_framework\scene_builders\scene_builder.cpp" />
     <ClCompile Include="game_framework\scene_builders\testbed.cpp" />
+    <ClCompile Include="game_framework\shared\gui\item_button.cpp" />
+    <ClCompile Include="game_framework\shared\gui\slot_button.cpp" />
     <ClCompile Include="game_framework\shared\inventory_slot.cpp" />
     <ClCompile Include="game_framework\shared\physics_setup_helpers.cpp" />
     <ClCompile Include="game_framework\systems\animation_system.cpp" />
@@ -936,6 +938,7 @@
     <ClInclude Include="3rdparty\RakNet\Source\XBox360Includes.h" />
     <ClInclude Include="3rdparty\RakNet\Source\_FindFirst.h" />
     <ClInclude Include="augs\gui\appearance_detector.h" />
+    <ClInclude Include="augs\gui\rect_id.h" />
     <ClInclude Include="augs\misc\constant_size_vector.h" />
     <ClInclude Include="augs\misc\deterministic_timing.h" />
     <ClInclude Include="augs\stream.h" />
@@ -1025,6 +1028,8 @@
     <ClInclude Include="game_framework\scene_builders\rendering_scripts\testbed_rendering.h" />
     <ClInclude Include="game_framework\scene_builders\scene_builder.h" />
     <ClInclude Include="game_framework\scene_builders\testbed.h" />
+    <ClInclude Include="game_framework\shared\gui\item_button.h" />
+    <ClInclude Include="game_framework\shared\gui\slot_button.h" />
     <ClInclude Include="game_framework\shared\inventory_slot.h" />
     <ClInclude Include="game_framework\shared\inventory_slot_id.h" />
     <ClInclude Include="game_framework\shared\inventory_utils.h" />
