@@ -5,10 +5,10 @@ namespace augs {
 	namespace gui {
 		struct appearance_detector {
 			enum class appearance {
+				unknown,
 				released,
 				hovered,
-				pushed,
-				unknown
+				pushed
 			};
 
 			appearance current_appearance = appearance::released;

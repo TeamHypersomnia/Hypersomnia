@@ -279,7 +279,7 @@ namespace augs {
 				//else if(msg == key::character) consume_gui_event(e = gui_event::character); 
 				//else if(msg == key::unichar) consume_gui_event(e = gui_event::unichar); 
 				//else {
-				bool hover = rc_clipped.hover(m.pos);
+				bool hover = rc_clipped.good() && rc_clipped.hover(m.pos);
 
 				if (hover && !inf.mouse_fetched) {
 					if (!was_hovered)
@@ -291,6 +291,8 @@ namespace augs {
 					}
 					if (msg == ldown) {
 						gr.rect_held_by_lmb = this;
+						gr.ldrag_relative_anchor = m.pos - rc.get_position();
+						gr.last_ldown_position = m.pos;
 						consume_gui_event(e = gui_event::ldown);
 					}
 					if (msg == mdown) {
@@ -301,10 +303,14 @@ namespace augs {
 					}
 					if (msg == ldoubleclick) {
 						gr.rect_held_by_lmb = this;
+						gr.ldrag_relative_anchor = m.pos - rc.get_position();
+						gr.last_ldown_position = m.pos;
 						consume_gui_event(e = gui_event::ldoubleclick);
 					}
 					if (msg == ltripleclick) {
 						gr.rect_held_by_lmb = this;
+						gr.ldrag_relative_anchor = m.pos - rc.get_position();
+						gr.last_ldown_position = m.pos;
 						consume_gui_event(e = gui_event::ltripleclick);
 					}
 					if (msg == rdown) {
@@ -347,7 +353,8 @@ namespace augs {
 					consume_gui_event(e = gui_event::ldrag);
 				}
 				//}
-				if (gr.rect_held_by_lmb != this) where_dragging_started = vec2i(rc.l, rc.t);
+				if (gr.rect_held_by_lmb != this) 
+					rc_pos_before_dragging = vec2i(rc.l, rc.t);
 			}
 		}
 

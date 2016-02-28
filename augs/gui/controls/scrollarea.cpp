@@ -92,7 +92,7 @@ namespace augs {
 						box->rc.center_y(wnd.mouse.pos.y - get_rect_absolute().t);
 						update_scroll_y();
 					}
-					box->where_dragging_started = vec2i(box->rc.l, box->rc.t);
+					box->rc_pos_before_dragging = vec2i(box->rc.l, box->rc.t);
 				}
 			}
 
@@ -102,11 +102,11 @@ namespace augs {
 				if (!pp->is_needed()) return;
 				if (e == gui_event::ldrag) {
 					if (pp->flags & orientation::HORIZONTAL) {
-						rc.x(where_dragging_started.x + ms.pos.x - ms.ldrag.x);
+						rc.x(rc_pos_before_dragging.x + ms.pos.x - ms.ldrag.x);
 						pp->update_scroll_x();
 					}
 					if (pp->flags & orientation::VERTICAL) {
-						rc.y(where_dragging_started.y + ms.pos.y - ms.ldrag.y);
+						rc.y(rc_pos_before_dragging.y + ms.pos.y - ms.ldrag.y);
 						pp->update_scroll_y();
 					}
 				}

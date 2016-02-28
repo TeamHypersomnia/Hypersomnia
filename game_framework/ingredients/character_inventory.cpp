@@ -15,7 +15,6 @@ namespace ingredients {
 	void character_inventory(augs::entity_id e) {
 		auto& container = *e += components::container();
 		auto& item_slot_transfers = *e += components::item_slot_transfers();
-		auto& gui_element = *e += components::gui_element();
 
 		inventory_slot slot_def;
 		slot_def.is_attachment_slot = true;

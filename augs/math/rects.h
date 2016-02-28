@@ -274,6 +274,20 @@ namespace augs {
 				return w() > 0 && h() > 0;
 			}
 
+			vec2t<T> get_position() {
+				return vec2t<T>(l, t);
+			}
+
+			void set_position(vec2t<T> v) {
+				auto old_w = w();
+				auto old_h = h();
+
+				l = v.x;
+				t = v.y;
+				w(old_w);
+				h(old_h);
+			}
+
 			template <class P>
 			ltrb& operator+=(const P& p) {
 				l += T(p.x);

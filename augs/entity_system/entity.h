@@ -58,7 +58,6 @@ namespace augs {
 
 	class entity {
 		/* only world class is allowed to instantiate an entity and it has to do it inside object pool */
-		friend class type_hash_to_index_mapper;
 		friend class ::destroy_system;
 		friend class memory_pool::typed_id_template<entity>;
 
@@ -67,8 +66,6 @@ namespace augs {
 
 		std::vector<augs::entity_id> sub_entities;
 	public:
-		char script_data[sizeof(int) + sizeof(int*)];
-
 		entity(world& owner_world);
 		~entity();
 

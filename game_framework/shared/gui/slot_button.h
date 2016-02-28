@@ -6,8 +6,12 @@
 
 struct slot_button : augs::gui::rect {
 	inventory_slot_id slot_id;
+	vec2i slot_relative_pos;
+	vec2i user_drag_offset;
 
 	augs::gui::appearance_detector detector;
+	
+	void perform_logic_step(augs::gui::gui_world&) final;
 
 	void draw_triangles(draw_info) final;
 	void consume_gui_event(event_info) final;

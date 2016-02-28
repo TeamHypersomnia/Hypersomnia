@@ -79,7 +79,8 @@ namespace augs {
 			bool preserve_focus = false;
 			bool focusable = true;
 
-			vec2i where_dragging_started;
+			vec2i rc_pos_before_dragging;
+
 			rects::ltrb<float> rc; /* actual rectangle */
 			rects::wh<float> content_size; /* content's (children's) bounding box */
 			vec2 scroll; /* scrolls content */

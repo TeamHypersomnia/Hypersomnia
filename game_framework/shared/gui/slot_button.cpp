@@ -1,4 +1,5 @@
 #include "slot_button.h"
+#include "entity_system/entity.h"
 
 #include "game_framework/shared/inventory_slot.h"
 #include "augs/gui/stroke.h"
@@ -6,56 +7,52 @@
 void slot_button::draw_triangles(draw_info info) {
 	auto is_hand_slot = slot_id.is_hand_slot();
 
-	rgba inside_attachment_col = orange;
-	inside_attachment_col.a = 12;
+	rgba inside_col, border_col;
+	
+	if (slot_id->for_categorized_items_only) {
+		inside_col = orange;
+	}
+	else
+		inside_col = cyan;
 
-	rgba attachment_border_col = orange;
-	attachment_border_col.a = 255;
+	border_col = inside_col;
+	inside_col.a = 12*5;
+	border_col.a = 255;
 
-	rgba inside_deposit_col = cyan;
-	inside_attachment_col.a = 12;
-
-	rgba deposit_border_col = cyan;
-	attachment_border_col.a = 255;
-
-	if (is_hand_slot) {
-		inside_attachment_col = cyan;
-		inside_attachment_col.a = 12;
-		attachment_border_col = cyan;
-		attachment_border_col.a = 255;
+	if (detector.current_appearance == augs::gui::appearance_detector::appearance::released) {
+		inside_col.a = 4 * 5;
+		border_col.a = 220;
 	}
 
-	augs::gui::material inside_deposit_mat(assets::texture_id::BLANK, inside_deposit_col);
-	augs::gui::material deposit_border_mat(assets::texture_id::BLANK, deposit_border_col);
-	augs::gui::material inside_attachment_mat(assets::texture_id::ATTACHMENT_CIRCLE_FILLED, inside_attachment_col);
-	augs::gui::material attachment_border_mat(assets::texture_id::ATTACHMENT_CIRCLE_BORDER, attachment_border_col);
+	auto inside_tex = slot_id->is_attachment_slot ? assets::texture_id::ATTACHMENT_CIRCLE_FILLED : assets::texture_id::BLANK;
+	auto border_tex = slot_id->is_attachment_slot ? assets::texture_id::ATTACHMENT_CIRCLE_BORDER : assets::texture_id::BLANK;
+
+	augs::gui::material inside_mat(inside_tex, inside_col);
+	augs::gui::material border_mat(border_tex, border_col);
 
 	if (slot_id->is_attachment_slot) {
 		if (slot_id.has_items()) {
 			return;
 		}
 		else {
-			draw_centered_texture(info, inside_attachment_mat);
-			draw_centered_texture(info, attachment_border_mat);
+			draw_centered_texture(info, inside_mat);
+			draw_centered_texture(info, border_mat);
 
 			if (slot_id.type == slot_function::PRIMARY_HAND) {
-				draw_centered_texture(info, augs::gui::material(assets::texture_id::PRIMARY_HAND_ICON, deposit_border_col), vec2i(1, 0));
+				draw_centered_texture(info, augs::gui::material(assets::texture_id::PRIMARY_HAND_ICON, border_col), vec2i(1, 0));
 			}
 
 			if (slot_id.type == slot_function::SECONDARY_HAND) {
-				draw_centered_texture(info, augs::gui::material(assets::texture_id::SECONDARY_HAND_ICON, deposit_border_col));
+				draw_centered_texture(info, augs::gui::material(assets::texture_id::SECONDARY_HAND_ICON, border_col));
 			}
 
 			if (slot_id.type == slot_function::SHOULDER_SLOT) {
-				draw_centered_texture(info, augs::gui::material(assets::texture_id::SHOULDER_SLOT_ICON, attachment_border_col));
+				draw_centered_texture(info, augs::gui::material(assets::texture_id::SHOULDER_SLOT_ICON, border_col));
 			}
 
 			if (slot_id.type == slot_function::TORSO_ARMOR_SLOT) {
-				draw_centered_texture(info, augs::gui::material(assets::texture_id::ARMOR_SLOT_ICON, attachment_border_col));
+				draw_centered_texture(info, augs::gui::material(assets::texture_id::ARMOR_SLOT_ICON, border_col));
 			}
-
-			//augs::gui::solid_stroke border(1, attachment_border_mat);
-			//border.draw(info.v, *this);
 		}
 	}
 	else {
@@ -63,6 +60,20 @@ void slot_button::draw_triangles(draw_info info) {
 	}
 }
 
+void slot_button::perform_logic_step(augs::gui::gui_world& gr) {
+	vec2i parent_position;
+	
+	if (slot_id.container_entity->find<components::item>()) {
+
+	}
+
+	rc.set_position(parent_position + slot_relative_pos + user_drag_offset);
+}
+
 void slot_button::consume_gui_event(event_info info) {
 	detector.update_appearance(info);
+	
+	if (info == rect::gui_event::ldrag) {
+		user_drag_offset = (info.owner.state.mouse.pos - slot_relative_pos - info.owner.ldrag_relative_anchor);
+	}
 }

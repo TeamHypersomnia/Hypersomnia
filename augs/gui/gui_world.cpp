@@ -293,6 +293,11 @@ namespace augs {
 				pass = false;
 			}
 
+			if (gl.msg == event::ldown) {
+				bool abc = false;
+				abc = true;
+			}
+
 			if (pass) root.consume_raw_input_and_generate_gui_events(in);
 		}
 	}

@@ -16,6 +16,7 @@
 #include "game_framework/components/driver_component.h"
 #include "game_framework/components/force_joint_component.h"
 #include "game_framework/components/physics_definition_component.h"
+#include "game_framework/components/gui_element_component.h"
 
 #include "game_framework/globals/filters.h"
 #include "game_framework/globals/input_profiles.h"
@@ -127,6 +128,8 @@ namespace ingredients {
 
 		if (previously_controlled_character.alive()) {
 			previously_controlled_character->disable<components::input_receiver>();
+			previously_controlled_character->disable<components::gui_element>();
+
 			previously_controlled_character[sub_entity_name::CHARACTER_CROSSHAIR]->disable<components::input_receiver>();
 
 			previously_controlled_character[associated_entity_name::WATCHING_CAMERA].unset();
@@ -136,6 +139,9 @@ namespace ingredients {
 
 		next_character[associated_entity_name::WATCHING_CAMERA] = camera;
 
+		if (next_character->find<components::gui_element>() == nullptr)
+			next_character->add(components::gui_element());
+
 		if (next_character->find<components::input_receiver>() == nullptr)
 			next_character->add(input_profiles::character());
 
@@ -143,6 +149,7 @@ namespace ingredients {
 			crosshair->add(input_profiles::crosshair());
 
 		next_character->enable<components::input_receiver>();
+		next_character->enable<components::gui_element>();
 		crosshair->enable<components::input_receiver>();
 
 		components::camera::configure_camera_and_character_with_crosshair(camera, next_character, crosshair);
