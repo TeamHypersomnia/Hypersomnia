@@ -118,7 +118,7 @@ void fixture_definition::add_concave_polygon(const std::vector <vec2> &verts) {
 		if (new_convex.size() > max_vertices) {
 			int first = 1;
 
-			while (first + max_vertices - 2 < new_convex.size()) {
+			while (first + max_vertices - 2 < new_convex.size() - 1) {
 				std::vector<vec2> new_poly;
 				new_poly.push_back(new_convex[0]);
 				new_poly.insert(new_poly.end(), new_convex.begin() + first, new_convex.begin() + first + max_vertices - 2 + 1);
