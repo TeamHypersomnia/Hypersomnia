@@ -355,6 +355,7 @@
     <ClCompile Include="augs\entity_system\entity_id.cpp" />
     <ClCompile Include="augs\gui\appearance_detector.cpp" />
     <ClCompile Include="augs\misc\deterministic_timing.cpp" />
+    <ClCompile Include="augs\texture_baker\polygonize_sprite.cpp" />
     <ClCompile Include="game_framework\bindings\file_watcher_binding.cpp" />
     <ClCompile Include="game_framework\bindings\glwindow_binding.cpp" />
     <ClCompile Include="game_framework\bindings\id_generator_binding.cpp" />

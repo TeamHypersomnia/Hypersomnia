@@ -11,7 +11,9 @@ struct item_button : augs::gui::rect {
 	inventory_slot_id slot_id;
 	augs::entity_id item;
 
-	vec2 drag_offset;
+	vec2 user_drag_offset;
+
+	void perform_logic_step(augs::gui::gui_world&) final;
 
 	void draw_triangles(draw_info) final;
 	void consume_gui_event(event_info) final;

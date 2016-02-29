@@ -29,23 +29,50 @@ void fixture_definition::offset_vertices() {
 	}
 }
 
-void fixture_definition::from_renderable(augs::entity_id e) {
+#include "texture_baker/texture_baker.h"
+#include "../resources/manager.h"
+
+void fixture_definition::from_renderable(augs::entity_id e, bool polygonize_sprite) {
 	auto* sprite = e->find<components::sprite>();
 	auto* polygon = e->find<components::polygon>();
 
 	if (sprite) {
-		type = RECT;
-		rect_size = sprite->size;
+		if (polygonize_sprite) {
+			type = POLYGON;
+			auto& image_to_polygonize = resource_manager.find(sprite->tex)->img;
+			auto polygonized_sprite = image_to_polygonize.get_polygonized(8);
 
-		b2PolygonShape shape;
-		shape.SetAsBox(static_cast<float>(rect_size.x) / 2.f * PIXELS_TO_METERSf, static_cast<float>(rect_size.y) / 2.f * PIXELS_TO_METERSf);
+			std::vector<vec2> new_concave;
 
-		std::vector<vec2> new_convex_polygon;
+			for (auto v : polygonized_sprite) {
+				auto polygonized_size = vec2(image_to_polygonize.get_size().w, image_to_polygonize.get_size().h);
 
-		for (int i = 0; i < shape.GetVertexCount(); ++i)
-			new_convex_polygon.push_back(vec2(shape.GetVertex(i))*METERS_TO_PIXELSf);
+				auto new_v = vec2(v) - polygonized_size / 2;
+				vec2 scale = sprite->size / polygonized_size;
+				
+				new_v *= scale;
 
-		add_convex_polygon(new_convex_polygon);
+				new_v.y = -new_v.y;
+				new_concave.push_back(new_v);
+			}
+
+			debug_original = new_concave;
+			add_concave_polygon(new_concave);
+		}
+		else {
+			type = RECT;
+			rect_size = sprite->size;
+
+			b2PolygonShape shape;
+			shape.SetAsBox(static_cast<float>(rect_size.x) / 2.f * PIXELS_TO_METERSf, static_cast<float>(rect_size.y) / 2.f * PIXELS_TO_METERSf);
+
+			std::vector<vec2> new_convex_polygon;
+
+			for (int i = 0; i < shape.GetVertexCount(); ++i)
+				new_convex_polygon.push_back(vec2(shape.GetVertex(i))*METERS_TO_PIXELSf);
+
+			add_convex_polygon(new_convex_polygon);
+		}
 	}
 	else if (polygon) {
 		type = POLYGON;

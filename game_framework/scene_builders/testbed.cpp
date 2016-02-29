@@ -12,6 +12,7 @@
 #include "game_framework/systems/render_system.h"
 #include "game_framework/systems/gui_system.h"
 #include "game_framework/components/position_copying_component.h"
+#include "game_framework/components/physics_definition_component.h"
 
 #include "game_framework/messages/crosshair_intent_message.h"
 
@@ -200,6 +201,9 @@ namespace scene_builders {
 
 			input.record_and_save_this_session();
 		}
+
+		draw_bodies.push_back(crate2);
+		draw_bodies.push_back(characters[0]);
 	}
 
 	void testbed::perform_logic_step(world& world) {
@@ -227,6 +231,21 @@ namespace scene_builders {
 				current_character %= characters.size();
 				
 				ingredients::inject_window_input_to_character(characters[current_character], world_camera);
+			}
+		}
+
+		for (auto& tested : draw_bodies) {
+			auto& s = tested->get<components::physics_definition>();
+
+			auto& lines = renderer::get_current().logic_lines;
+
+			auto vv = s.fixtures[0].debug_original;
+
+			for (int i = 0; i < vv.size(); ++i) {
+				auto& tt = tested->get<components::transform>();
+				auto pos = tt.pos;
+
+				lines.draw_green((pos + vv[i]).rotate(tt.rotation, pos), (pos + vv[(i + 1) % vv.size()]).rotate(tt.rotation, pos));
 			}
 		}
 	}

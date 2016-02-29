@@ -28,6 +28,7 @@ struct fixture_definition {
 	} type = RECT;
 
 	std::vector<std::vector<vec2>> convex_polys;
+	std::vector<vec2> debug_original;
 	components::transform transform_vertices;
 
 	vec2 rect_size;
@@ -44,7 +45,7 @@ struct fixture_definition {
 	void add_convex_polygon(const std::vector<vec2>&);
 	void add_concave_polygon(const std::vector<vec2>&);
 
-	void from_renderable(augs::entity_id);
+	void from_renderable(augs::entity_id, bool polygonize_sprite = true);
 };
 
 components::physics& create_physics_component(body_definition, augs::entity_id subject);

@@ -39,8 +39,6 @@ void car_system::set_steering_flags_from_intents() {
 }
 
 void car_system::apply_movement_forces() {
-	auto& lines = renderer::get_current().logic_lines;
-
 	for (auto it : targets) {
 		auto& car = it->get<components::car>();
 		auto& physics = it->get<components::physics>();

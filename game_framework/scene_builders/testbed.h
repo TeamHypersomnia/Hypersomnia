@@ -9,6 +9,8 @@ namespace scene_builders {
 		unsigned current_character = 0;
 		augs::entity_id world_camera;
 
+		std::vector<augs::entity_id> draw_bodies;
+
 		bool keep_drawing = false;
 
 		void initialize(augs::world& world) override;

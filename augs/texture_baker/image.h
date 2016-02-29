@@ -37,6 +37,8 @@ namespace augs {
 
 		rgba& pixel(int x, int y);
 
+		std::vector<vec2i> get_polygonized(int max_vertices) const;
+
 		int get_channels() const, get_bytes() const, get_num_pixels() const;
 		const rects::wh<int>& get_size() const;
 

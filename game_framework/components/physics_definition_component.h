@@ -4,7 +4,7 @@
 namespace components {
 	struct physics_definition {
 		bool dont_create_fixtures_and_body = false;
-		bool preserve_definition_for_cloning = false;
+		bool preserve_definition_for_cloning = true;
 
 		body_definition body;
 		std::vector<fixture_definition> fixtures;

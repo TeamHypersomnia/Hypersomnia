@@ -10,6 +10,8 @@ namespace ingredients {
 		auto& physics_definition = *e += components::physics_definition();
 
 		physics_definition.body.fixed_rotation = false;
+		physics_definition.preserve_definition_for_cloning = true;
+		physics_definition.dont_create_fixtures_and_body = false;
 
 		auto& info = physics_definition.new_fixture();
 		info.from_renderable(e);
