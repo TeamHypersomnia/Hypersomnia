@@ -29,6 +29,20 @@ void fixture_definition::offset_vertices() {
 	}
 }
 
+void fixture_definition::mult_vertices(vec2 mult) {
+	for (auto& c : convex_polys) {
+		for (auto& v : c) { 
+			v *= mult;
+		}
+
+		std::reverse(c.begin(), c.end());
+	}
+
+	for (auto& v : debug_original) {
+		v *= mult;
+	}
+}
+
 #include "texture_baker/texture_baker.h"
 #include "../resources/manager.h"
 
@@ -42,23 +56,25 @@ void fixture_definition::from_renderable(augs::entity_id e, bool polygonize_spri
 
 		if (poly_info.size() > 0 && polygonize_sprite) {
 			type = POLYGON;
-
+			
 			std::vector<vec2> new_concave;
-
+			
 			for (auto v : poly_info) {
 				auto polygonized_size = vec2(image_to_polygonize.get_size().w, image_to_polygonize.get_size().h);
-
+			
 				auto new_v = vec2(v) - polygonized_size / 2;
 				vec2 scale = sprite->size / polygonized_size;
 				
 				new_v *= scale;
-
+			
 				new_v.y = -new_v.y;
 				new_concave.push_back(new_v);
 			}
-
+			
 			debug_original = new_concave;
 			add_concave_polygon(new_concave);
+			
+			mult_vertices(vec2(1, -1));
 		}
 		else {
 			type = RECT;

@@ -20,6 +20,7 @@ struct body_definition {
 
 struct fixture_definition {
 	void offset_vertices();
+	void mult_vertices(vec2);
 
 	enum {
 		RECT,
