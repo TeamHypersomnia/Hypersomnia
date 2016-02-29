@@ -18,7 +18,7 @@ namespace augs {
 		void create_filled_circle(int radius, augs::rgba filling = white);
 
 		void create(int w, int h, int channels);
-		bool from_file(const std::wstring& filename, unsigned channels = 0),
+		bool from_file(const std::wstring& filename, bool swap_red_and_blue = true, unsigned channels = 0),
 			from_clipboard();
 
 		void fill(unsigned char val),

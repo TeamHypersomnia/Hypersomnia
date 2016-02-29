@@ -20,7 +20,7 @@ namespace resources {
 	
 	void texture_with_image::polygonize_from_file(std::wstring filename) {
 		auto polygonization_info = augs::image();
-		polygonization_info.from_file(filename);
+		polygonization_info.from_file(filename, false);
 		polygonized = polygonization_info.get_polygonized();
 	}
 }

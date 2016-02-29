@@ -55,6 +55,7 @@ namespace scene_builders {
 
 		resource_manager.create(assets::texture_id::ASSAULT_RIFLE, L"hypersomnia/gfx/assault_rifle.png");
 		resource_manager.create(assets::texture_id::SHOTGUN, L"hypersomnia/gfx/shotgun.png");
+		//resource_manager.create(assets::texture_id::SAMPLE_MAGAZINE, L"hypersomnia/gfx/magazine.png");
 
 		augs::image attachment_circle_filled;
 		attachment_circle_filled.create_filled_circle(16);
