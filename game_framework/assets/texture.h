@@ -37,6 +37,7 @@ namespace assets {
 		MOTOR,
 
 		SAMPLE_MAGAZINE,
+		PINK_CHARGE,
 		BACKPACK,
 		RIGHT_HAND_ICON,
 		LEFT_HAND_ICON,

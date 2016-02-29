@@ -33,6 +33,10 @@ void input_system::record_and_save_this_session() {
 	crosshair_intent_player.player.record("sessions/" + augs::get_timestamp() + "/recorded_crosshair.inputs");
 }
 
+bool input_system::is_replaying() {
+	return unmapped_intent_player.player.is_replaying();
+}
+
 input_system::input_system(world& parent_world) : processing_system_templated(parent_world),
 	unmapped_intent_player(parent_world)
 	, crosshair_intent_player(parent_world)

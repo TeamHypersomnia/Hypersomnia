@@ -9,6 +9,7 @@
 #include "game_framework/messages/raw_window_input_message.h"
 #include "game_framework/messages/camera_render_request_message.h"
 
+#include "game_framework/systems/input_system.h"
 #include "game_framework/systems/render_system.h"
 #include "game_framework/systems/gui_system.h"
 
@@ -79,7 +80,8 @@ void game_overworld::main_game_loop() {
 			messages::raw_window_input_message msg;
 			msg.raw_window_input = raw_input;
 
-			main_game_world.post_message(msg);
+			if(!main_game_world.get_system<input_system>().is_replaying())
+				main_game_world.post_message(msg);
 		}
 
 #if RENDERING_STEPS_DETERMINISTICALLY_LIKE_LOGIC

@@ -6,7 +6,7 @@
 #include "../components/physics_definition_component.h"
 
 namespace ingredients {
-	void crate_physics(augs::entity_id e) {
+	components::physics_definition& crate_physics(augs::entity_id e) {
 		auto& physics_definition = *e += components::physics_definition();
 
 		physics_definition.body.fixed_rotation = false;
@@ -18,9 +18,11 @@ namespace ingredients {
 
 		info.filter = filters::dynamic_object();
 		info.density = 1;
+
+		return physics_definition;
 	}
 
-	void static_crate_physics(augs::entity_id e) {
+	components::physics_definition& static_crate_physics(augs::entity_id e) {
 		auto& physics_definition = *e += components::physics_definition();
 
 		physics_definition.body.fixed_rotation = false;
@@ -31,6 +33,8 @@ namespace ingredients {
 
 		info.filter = filters::dynamic_object();
 		info.density = 1;
+
+		return physics_definition;
 	}
 	
 }

@@ -8,7 +8,7 @@
 
 namespace components {
 	struct damage {
-		float amount = 0.f;
+		float amount = 12.f;
 		
 		augs::entity_id sender;
 		bool destroy_upon_hit = true;
@@ -16,11 +16,11 @@ namespace components {
 		/* used to destroy bullets */
 		vec2 starting_point;
 
-		bool constrain_lifetime = false;
+		bool constrain_lifetime = true;
 		bool constrain_distance = false;
 
 		float max_distance = 0.f;
-		float max_lifetime_ms = 0.f;
+		float max_lifetime_ms = 2000.f;
 		
 		float lifetime_ms = 0.f;
 	};

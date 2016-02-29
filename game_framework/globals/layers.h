@@ -5,6 +5,7 @@ enum render_layer {
 	GUI,
 	HAT,
 	CHARACTER,
+	FLYING_BULLETS,
 	HELD_ITEM,
 	DYNAMIC_BODY,
 	DROPPED_ITEM,

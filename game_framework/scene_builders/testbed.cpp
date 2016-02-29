@@ -55,7 +55,9 @@ namespace scene_builders {
 
 		resource_manager.create(assets::texture_id::ASSAULT_RIFLE, L"hypersomnia/gfx/assault_rifle.png");
 		resource_manager.create(assets::texture_id::SHOTGUN, L"hypersomnia/gfx/shotgun.png");
-		//resource_manager.create(assets::texture_id::SAMPLE_MAGAZINE, L"hypersomnia/gfx/magazine.png");
+		resource_manager.create(assets::texture_id::SAMPLE_MAGAZINE, L"hypersomnia/gfx/magazine.png");
+		resource_manager.create(assets::texture_id::PINK_CHARGE, L"hypersomnia/gfx/pink_charge.png");
+		resource_manager.create(assets::texture_id::BACKPACK, L"hypersomnia/gfx/backpack.png");
 
 		augs::image attachment_circle_filled;
 		attachment_circle_filled.create_filled_circle(16);
@@ -160,6 +162,11 @@ namespace scene_builders {
 		
 		ingredients::sprite_scalled(crate4, vec2(500, 0), vec2i(100, 100), assets::texture_id::CRATE, augs::white, render_layer::DYNAMIC_BODY);
 		ingredients::crate_physics(crate4);
+
+		prefabs::create_sample_rifle(world, vec2(100, -500));
+		prefabs::create_sample_magazine(world, vec2(100, -650));
+
+		prefabs::create_sample_backpack(world, vec2(200, -650));
 
 		input_system::context active_context;
 		active_context.map_key_to_intent(window::event::keys::W, intent_type::MOVE_FORWARD);

@@ -96,4 +96,6 @@ struct input_system : public processing_system_templated<components::input_recei
 
 	void replay_found_recording();
 	void record_and_save_this_session();
+
+	bool is_replaying();
 };

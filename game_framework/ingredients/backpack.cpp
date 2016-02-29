@@ -9,11 +9,9 @@
 
 namespace ingredients {
 	void backpack(augs::entity_id e) {
-		components::transform transform;
-		components::container container;
-		components::item item;
+		auto& container = *e += components::container();
+		auto item = make_item(e);
 		components::force_joint force_joint;
-		components::trigger trigger;
 		
 		inventory_slot slot_def;
 		slot_def.space_available = 7;
@@ -25,13 +23,20 @@ namespace ingredients {
 		item.space_occupied_per_charge = 1;
 		item.categories_for_slot_compatibility = item_category::SHOULDER_CONTAINER;
 
-		// trigger.entity_to_be_notified = e;
-
-		e->add(transform);
-		e->add(container);
-		e->add(item);
-		e->add(trigger);
 		e->add(force_joint);
 		e->disable(force_joint);
+	}
+}
+
+namespace prefabs {
+	augs::entity_id create_sample_backpack(augs::world& world, vec2 pos) {
+		auto sample_backpack = world.create_entity("sample_backpack");
+		
+		ingredients::backpack(sample_backpack);
+
+		ingredients::sprite(sample_backpack, pos, assets::texture_id::BACKPACK, augs::white, render_layer::DROPPED_ITEM);
+		ingredients::crate_physics(sample_backpack);
+
+		return sample_backpack;
 	}
 }
