@@ -33,9 +33,11 @@ namespace augs {
 
 		unsigned char* operator()(int x, int y, int channel = 0); // get pixel
 		unsigned char* ptr(int x = 0, int y = 0, int channel = 0);
+		const unsigned char* ptr(int x = 0, int y = 0, int channel = 0) const;
 		unsigned char  pix(int x = 0, int y = 0, int channel = 0) const;
 
 		rgba& pixel(int x, int y);
+		const rgba& pixel(int x, int y) const;
 
 		std::vector<vec2i> get_polygonized(int max_vertices) const;
 

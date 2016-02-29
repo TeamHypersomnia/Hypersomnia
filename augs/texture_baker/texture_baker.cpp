@@ -209,7 +209,7 @@ namespace augs {
 
 	void atlas::default_build() {
 		pack();
-		create_image(4, true);
+		create_image(4, false);
 		build(false, false);
 		/* destroy the raw image as it is already uploaded to GPU */
 		img.destroy();

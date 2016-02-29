@@ -248,12 +248,20 @@ namespace augs {
 	unsigned char* image::ptr(int x, int y, int channel) {
 		return v.data() + (static_cast<int>(size.w) * y + x) * channels + channel;
 	}
+	
+	const unsigned char* image::ptr(int x, int y, int channel) const {
+		return v.data() + (static_cast<int>(size.w) * y + x) * channels + channel;
+	}
 
 	unsigned char image::pix(int x, int y, int channel) const {
 		return v[(static_cast<int>(size.w) * y + x) * channels + channel];
 	}
 
 	rgba& image::pixel(int x, int y) {
+		return *(rgba*)ptr(x, y, 0);
+	}
+
+	const rgba& image::pixel(int x, int y) const {
 		return *(rgba*)ptr(x, y, 0);
 	}
 
