@@ -6,8 +6,10 @@ namespace resources {
 	public:
 		augs::image img;
 		augs::texture tex;
+		std::vector<vec2i> polygonized;
 
 		void set_from_image(augs::image img);
 		void set_from_image_file(std::wstring filename);
+		void polygonize_from_file(std::wstring filename);
 	};
 }

@@ -11,6 +11,8 @@ namespace augs {
 				pushed
 			};
 
+			bool is_hovered = false;
+
 			appearance current_appearance = appearance::released;
 
 			/* how should rect look like depending on incoming event */

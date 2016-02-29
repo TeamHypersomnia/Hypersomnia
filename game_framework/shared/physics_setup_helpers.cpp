@@ -37,14 +37,15 @@ void fixture_definition::from_renderable(augs::entity_id e, bool polygonize_spri
 	auto* polygon = e->find<components::polygon>();
 
 	if (sprite) {
-		if (polygonize_sprite) {
+		auto& poly_info = resource_manager.find(sprite->tex)->polygonized;
+		auto& image_to_polygonize = resource_manager.find(sprite->tex)->img;
+
+		if (poly_info.size() > 0 && polygonize_sprite) {
 			type = POLYGON;
-			auto& image_to_polygonize = resource_manager.find(sprite->tex)->img;
-			auto polygonized_sprite = image_to_polygonize.get_polygonized(8);
 
 			std::vector<vec2> new_concave;
 
-			for (auto v : polygonized_sprite) {
+			for (auto v : poly_info) {
 				auto polygonized_size = vec2(image_to_polygonize.get_size().w, image_to_polygonize.get_size().h);
 
 				auto new_v = vec2(v) - polygonized_size / 2;
@@ -109,8 +110,31 @@ void fixture_definition::add_concave_polygon(const std::vector <vec2> &verts) {
 		}
 
 		std::reverse(new_convex.begin(), new_convex.end());
+		
+		auto first_v = new_convex[0];
 
-		convex_polys.push_back(new_convex);
+		const int max_vertices = 8;
+
+		if (new_convex.size() > max_vertices) {
+			int first = 1;
+
+			while (first + max_vertices - 2 < new_convex.size()) {
+				std::vector<vec2> new_poly;
+				new_poly.push_back(new_convex[0]);
+				new_poly.insert(new_poly.end(), new_convex.begin() + first, new_convex.begin() + first + max_vertices - 2 + 1);
+				convex_polys.push_back(new_poly);
+				first += max_vertices - 2;
+			}
+
+			std::vector<vec2> last_poly;
+			last_poly.push_back(new_convex[0]);
+			last_poly.push_back(new_convex[first]);
+			last_poly.insert(last_poly.end(), new_convex.begin() + first, new_convex.end());
+
+			convex_polys.push_back(last_poly);
+		}
+		else
+			convex_polys.push_back(new_convex);
 	}
 }
 

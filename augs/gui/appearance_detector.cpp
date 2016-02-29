@@ -10,6 +10,11 @@ namespace augs {
 			if (m == rect::gui_event::blur)
 				focus_flag = false;
 
+			if (m == rect::gui_event::hover)
+				is_hovered = true;
+			if (m == rect::gui_event::hout)
+				is_hovered = false;
+
 			if (app != appearance::unknown)
 				current_appearance = app;
 		}

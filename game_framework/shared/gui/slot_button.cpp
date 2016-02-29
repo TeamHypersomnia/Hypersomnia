@@ -19,7 +19,7 @@ void slot_button::draw_triangles(draw_info info) {
 	inside_col.a = 12*5;
 	border_col.a = 255;
 
-	if (detector.current_appearance == augs::gui::appearance_detector::appearance::released) {
+	if (!detector.is_hovered) {
 		inside_col.a = 4 * 5;
 		border_col.a = 220;
 	}

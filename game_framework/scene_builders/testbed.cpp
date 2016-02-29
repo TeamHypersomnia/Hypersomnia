@@ -40,7 +40,7 @@ namespace scene_builders {
 		resource_manager.create(assets::texture_id::TEST_CROSSHAIR, std::wstring(L"hypersomnia/gfx/crosshair.png"));
 		resource_manager.create(assets::texture_id::TEST_PLAYER, L"hypersomnia/gfx/walk_1.png");
 		resource_manager.create(assets::texture_id::TEST_BACKGROUND, L"hypersomnia/gfx/snow_textures/snow3.png");
-		resource_manager.create(assets::texture_id::CRATE, L"hypersomnia/gfx/crate.png");
+		resource_manager.create(assets::texture_id::CRATE, L"hypersomnia/gfx/crate2_destroyed.png");
 		resource_manager.create(assets::texture_id::CAR_INSIDE, L"hypersomnia/gfx/crate2.png");
 		resource_manager.create(assets::texture_id::CAR_FRONT, L"hypersomnia/gfx/crate2.png");
 
@@ -154,7 +154,7 @@ namespace scene_builders {
 		ingredients::sprite_scalled(crate, vec2(200, 300), vec2i(100, 100)/3, assets::texture_id::CRATE, augs::white, render_layer::DYNAMIC_BODY);
 		ingredients::crate_physics(crate);
 		
-		ingredients::sprite_scalled(crate2, vec2(400, 400), vec2i(100, 100), assets::texture_id::CRATE, augs::white, render_layer::DYNAMIC_BODY);
+		ingredients::sprite_scalled(crate2, vec2(400, 400), vec2i(300, 300), assets::texture_id::CRATE, augs::white, render_layer::DYNAMIC_BODY);
 		ingredients::crate_physics(crate2);
 		
 		ingredients::sprite_scalled(crate4, vec2(500, 0), vec2i(100, 100), assets::texture_id::CRATE, augs::white, render_layer::DYNAMIC_BODY);
