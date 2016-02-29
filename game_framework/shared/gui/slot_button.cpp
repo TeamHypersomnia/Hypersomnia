@@ -16,12 +16,12 @@ void slot_button::draw_triangles(draw_info info) {
 		inside_col = cyan;
 
 	border_col = inside_col;
-	inside_col.a = 12*5;
-	border_col.a = 255;
+	inside_col.a = 4 * 5;
+	border_col.a = 220;
 
-	if (!detector.is_hovered) {
-		inside_col.a = 4 * 5;
-		border_col.a = 220;
+	if (detector.is_hovered || detector.current_appearance == decltype(detector)::appearance::pushed) {
+		inside_col.a = 12 * 5;
+		border_col.a = 255;
 	}
 
 	auto inside_tex = slot_id->is_attachment_slot ? assets::texture_id::ATTACHMENT_CIRCLE_FILLED : assets::texture_id::BLANK;

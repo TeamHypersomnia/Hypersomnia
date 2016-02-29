@@ -28,7 +28,7 @@ namespace augs {
 			/* operator='s take care of copying only with active members */
 			switch (current_appearance) {
 			case appearance::released: return base; break;
-			case appearance::hovered: return style(base) = hovered;  break;
+				// TODO: handle hovered
 			case appearance::pushed: return (style(base) = hovered) = pushed;   break;
 			default: return base;
 			}

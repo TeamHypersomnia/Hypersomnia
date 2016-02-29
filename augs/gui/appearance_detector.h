@@ -7,16 +7,13 @@ namespace augs {
 			enum class appearance {
 				unknown,
 				released,
-				hovered,
 				pushed
 			};
 
 			bool is_hovered = false;
+			bool remain_pushed_if_mouse_leaves = true;
 
 			appearance current_appearance = appearance::released;
-
-			/* how should rect look like depending on incoming event */
-			static appearance map_event_to_appearance_type(rect::gui_event m);
 
 			void update_appearance(rect::gui_event);
 
