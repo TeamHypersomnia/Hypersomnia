@@ -19,10 +19,10 @@ namespace augs {
 		{
 			for (int j = 0;j < size.w;++j)
 			{
-				rgba p = pixel(i, j);
+				rgba p = pixel(j, i);
 				if (p == red)
 				{
-					vertices.push_back(vec2i(i, j));
+					vertices.push_back(vec2i(j, i));
 					break;
 				}
 			}
@@ -36,11 +36,11 @@ namespace augs {
 		pixelFields[vertices.back().y * size.w + vertices.back().x] = true;
 		vec2i field;
 		field = vertices[0];
-		vec2i offsets[8] = { vec2i(1,0),vec2i(0,1),vec2i(-1,0),vec2i(0,-1),vec2i(1,-1),vec2i(1,1),vec2i(-1,1),vec2i(-1,-1) }; //CLOCKWISE, PRIORITAL
+		vec2i offsets[4] = { vec2i(1,0),vec2i(0,1),vec2i(-1,0),vec2i(0,-1) }; //CLOCKWISE, PRIORITAL
 		bool quit = false;
 		do
 		{
-			for (int i = 0;i < 8;++i)
+			for (int i = 0;i < 4;++i)
 			{
 				posrgba current;
 				current.pos = field + offsets[i];

@@ -166,7 +166,7 @@ namespace scene_builders {
 		prefabs::create_sample_rifle(world, vec2(100, -500));
 		prefabs::create_sample_magazine(world, vec2(100, -650));
 
-		prefabs::create_sample_backpack(world, vec2(200, -650));
+		auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 
 		input_system::context active_context;
 		active_context.map_key_to_intent(window::event::keys::W, intent_type::MOVE_FORWARD);
@@ -212,6 +212,7 @@ namespace scene_builders {
 
 		draw_bodies.push_back(crate2);
 		draw_bodies.push_back(characters[0]);
+		draw_bodies.push_back(backpack);
 	}
 
 	void testbed::perform_logic_step(world& world) {

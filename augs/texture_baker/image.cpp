@@ -265,6 +265,10 @@ namespace augs {
 		return *(rgba*)ptr(x, y, 0);
 	}
 
+	const rgba& image::pixel(vec2i p) const {
+		return *(rgba*)ptr(p.x, p.y, 0);
+	}
+
 	int image::get_bytes() const {
 		return sizeof(unsigned char) * static_cast<int>(size.w) * static_cast<int>(size.h) * channels;
 	}
