@@ -1,6 +1,7 @@
 #include "image.h"
 #include "log.h"
 
+#define OFFSET_COUNT 8
 
 namespace augs {
 
@@ -9,6 +10,7 @@ namespace augs {
 		vec2i pos;
 		rgba col;
 	};
+
 
 	std::vector<vec2i> image::get_polygonized() const {
 
@@ -36,26 +38,24 @@ namespace augs {
 		pixelFields[vertices.back().y * size.w + vertices.back().x] = true;
 		vec2i field;
 		field = vertices[0];
-		vec2i offsets[4] = { vec2i(1,0),vec2i(0,1),vec2i(-1,0),vec2i(0,-1) }; //CLOCKWISE, PRIORITAL
+		vec2i offsets[OFFSET_COUNT] = { vec2i(1,0),vec2i(0,1),vec2i(-1,0),vec2i(0,-1),vec2i(1,-1),vec2i(1,1),vec2i(-1,1),vec2i(-1,-1) }; //CLOCKWISE
 		bool quit = false;
 		do
 		{
-			for (int i = 0;i < 4;++i)
+			for (int i = 0;i < OFFSET_COUNT;++i)
 			{
 				posrgba current;
 				current.pos = field + offsets[i];
-				if (current.pos.x >= size.h || current.pos.x < 0 || current.pos.y >= size.w
+				if (current.pos.x >= size.w || current.pos.x < 0 || current.pos.y >= size.h
 					|| current.pos.y < 0)
 					continue;
-				if (vertices.size() > 2 && current.pos == vertices[0])
+				if (vertices.size() > 1 && current.pos == vertices[0])
 				{
 					quit = true;
-					continue;
+					break;
 				}
 				if (pixelFields[current.pos.y * size.w + current.pos.x])
-				{
 					continue;
-				}
 				current.col = pixel(current.pos);
 				if (current.col == black)
 				{
@@ -71,8 +71,6 @@ namespace augs {
 					break;
 				}
 				pixelFields[current.pos.y * size.w + current.pos.x] = true;
-				if (current.pos == vec2i(0, 0))
-					quit = true;
 			}	
 		}while (!quit);
 		
