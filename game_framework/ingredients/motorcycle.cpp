@@ -18,7 +18,7 @@
 #include "game_framework/globals/filters.h"
 
 namespace prefabs {
-	augs::entity_id create_motorcycle(augs::world& world, vec2 pos) {
+	augs::entity_id create_motorcycle(augs::world& world, components::transform spawn_transform) {
 		auto front = world.create_entity("front");
 		auto interior = world.create_entity("interior");
 		auto left_wheel = world.create_entity("left_wheel");
@@ -29,7 +29,7 @@ namespace prefabs {
 		{
 			auto& sprite = *front += components::sprite();
 			auto& render = *front += components::render();
-			auto& transform = *front += components::transform();
+			auto& transform = *front += spawn_transform;
 			auto& car = *front += components::car();
 			auto& physics_definition = *front += components::physics_definition();
 
@@ -55,8 +55,6 @@ namespace prefabs {
 			car.lateral_impulse_multiplier = 0.3;
 			car.braking_angular_damping = 16.f;
 
-			transform.pos = pos;
-
 			sprite.set(assets::texture_id::MOTORCYCLE_FRONT);
 			render.layer = render_layer::DYNAMIC_BODY;
 
@@ -79,10 +77,8 @@ namespace prefabs {
 		{
 			auto& sprite = *interior += components::sprite();
 			auto& render = *interior += components::render();
-			auto& transform = *interior += components::transform();
+			auto& transform = *interior += spawn_transform;
 			auto& physics_definition = *interior += components::physics_definition();
-
-			transform.pos = pos;
 
 			render.layer = render_layer::DROPPED_ITEM;
 
@@ -93,18 +89,17 @@ namespace prefabs {
 			info.density = 0.6f;
 			info.sensor = true;
 			info.filter = filters::dynamic_object();
-			vec2 offset(0, front->get<components::sprite>().size.y / 2 + sprite.size.y / 2 - 1);
+			vec2 offset((front->get<components::sprite>().size.x / 2 + sprite.size.x / 2 - 1) * -1, 0);
 			info.transform_vertices.pos = offset;
 		}
 
 		{
 			auto& sprite = *left_wheel += components::sprite();
 			auto& render = *left_wheel += components::render();
-			auto& transform = *left_wheel += components::transform();
+			auto& transform = *left_wheel += spawn_transform;
 			auto& trigger = *left_wheel += components::trigger();
 			auto& physics_definition = *left_wheel += components::physics_definition();
 
-			transform.pos = pos;
 			trigger.entity_to_be_notified = front;
 			trigger.react_to_collision_detectors = false;
 			trigger.react_to_query_detectors = true;
@@ -112,15 +107,14 @@ namespace prefabs {
 			render.layer = render_layer::CAR_WHEEL;
 
 			sprite.set(assets::texture_id::CAR_INSIDE, augs::rgba(255, 0, 0, 255));
-			sprite.size.x = 10;
-			sprite.size.y = 20;
+			sprite.size.set(20, 10);
 
 			auto& info = physics_definition.new_fixture(front);
 			info.from_renderable(left_wheel);
 			info.density = 0.6f;
 			info.filter = filters::trigger();
 			info.sensor = true;
-			vec2 offset(0, front->get<components::sprite>().size.y / 2 + sprite.size.y / 2 + 0);
+			vec2 offset((front->get<components::sprite>().size.x / 2 + sprite.size.x / 2) * -1, 0);
 			info.transform_vertices.pos = offset;
 		}
 

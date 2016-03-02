@@ -51,7 +51,6 @@ namespace scene_builders {
 		resource_manager.create(assets::texture_id::TRUCK_INSIDE, L"hypersomnia/gfx/truck_inside.png");
 
 		resource_manager.create(assets::texture_id::TEST_SPRITE, L"hypersomnia/gfx/frog.png");
-		resource_manager.create(assets::texture_id::MOTOR, L"hypersomnia/gfx/motor.png");
 
 		resource_manager.create(assets::texture_id::ASSAULT_RIFLE, L"hypersomnia/gfx/assault_rifle.png");
 		resource_manager.create(assets::texture_id::SHOTGUN, L"hypersomnia/gfx/shotgun.png");
@@ -112,11 +111,11 @@ namespace scene_builders {
 			ingredients::crate_physics(frog);
 		}
 
-		auto car = prefabs::create_car(world, vec2(-300, 0));
-		auto car2 = prefabs::create_car(world, vec2(-800, 0));
-		auto car3 = prefabs::create_car(world, vec2(-1300, 0));
+		auto car = prefabs::create_car(world, components::transform(-300, 0, -90));
+		auto car2 = prefabs::create_car(world, components::transform(-800, 0, -90));
+		auto car3 = prefabs::create_car(world, components::transform(-1300, 0, -90));
 
-		auto motorcycle = prefabs::create_motorcycle(world, vec2(0, -600));
+		auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, -600, -90));
 
 		ingredients::camera(world_camera, window_rect.w, window_rect.h);
 
@@ -157,7 +156,6 @@ namespace scene_builders {
 
 		ingredients::sprite_scalled(crate, vec2(200, 300), vec2i(100, 100)/3, assets::texture_id::CRATE, augs::white, render_layer::DYNAMIC_BODY);
 		ingredients::crate_physics(crate);
-
 		
 		ingredients::sprite_scalled(crate2, vec2(400, 400), vec2i(300, 300), assets::texture_id::CRATE, augs::white, render_layer::DYNAMIC_BODY);
 		ingredients::crate_physics(crate2);

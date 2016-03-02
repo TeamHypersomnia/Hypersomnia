@@ -48,20 +48,20 @@ void car_system::apply_movement_forces() {
 		vec2 forward_dir;
 		vec2 right_normal;
 
-		forward_dir = -forward_dir.set_from_radians(physics.body->GetAngle()).perpendicular_cw();
+		forward_dir = forward_dir.set_from_radians(physics.body->GetAngle());
 		right_normal = forward_dir.perpendicular_cw();
 
-		resultant.x = car.turning_right * car.input_acceleration.x - car.turning_left * car.input_acceleration.x;
-		resultant.y = car.accelerating * car.input_acceleration.y  - car.deccelerating * car.input_acceleration.y;
+		resultant.x = car.accelerating * car.input_acceleration.x - car.deccelerating * car.input_acceleration.x;
+		resultant.y = car.turning_right * car.input_acceleration.y - car.turning_left * car.input_acceleration.y;
 		
 		if (car.acceleration_length > 0.f) {
 			resultant.set_length(car.acceleration_length);
 		}
 
 		if (resultant.non_zero()) {
-			vec2 force = resultant.y * forward_dir + right_normal * resultant.x;
+			vec2 force = resultant.x * forward_dir + right_normal * resultant.y;
 			
-			vec2 forward_tire_force = vec2(forward_dir).set_length(force.length()) * sgn(resultant.y);
+			vec2 forward_tire_force = vec2(forward_dir).set_length(force.length()) * sgn(resultant.x);
 
 			auto& off = car.wheel_offset;
 
@@ -89,22 +89,20 @@ void car_system::apply_movement_forces() {
 		auto base_damping = (forwardal_speed < car.maximum_speed_with_static_damping ? car.static_damping : car.dynamic_damping);
 
 		if (car.braking_damping >= 0.f) {
-			base_damping += resultant.y > 0 ? 0.0 : car.braking_damping;
+			base_damping += resultant.x > 0 ? 0.0 : car.braking_damping;
 
 		}
 
 		float base_angular_damping = 0.f;
 
 		if (car.braking_angular_damping >= 0.f) {
-
-
-			if (physics.body->GetAngularVelocity() < 0 && resultant.x > 0) {
+			if (physics.body->GetAngularVelocity() < 0 && resultant.y > 0) {
 				base_angular_damping += car.braking_angular_damping;
 			}
-			else if (physics.body->GetAngularVelocity() > 0 && resultant.x < 0) {
+			else if (physics.body->GetAngularVelocity() > 0 && resultant.y < 0) {
 				base_angular_damping += car.braking_angular_damping;
 			}
-			else if (resultant.x == 0) {
+			else if (resultant.y == 0) {
 				base_angular_damping += car.braking_angular_damping;
 			}
 		}

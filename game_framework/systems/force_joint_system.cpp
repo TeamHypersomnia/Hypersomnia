@@ -38,6 +38,6 @@ void force_joint_system::apply_forces_towards_target_entities() {
 		}
 
 		if(force_joint.consider_rotation)
-			physics.target_angle = chased_transform.rotation - 90;
+			physics.target_angle = chased_transform.rotation;
 	}
 }
