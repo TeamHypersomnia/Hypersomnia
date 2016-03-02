@@ -140,7 +140,7 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 				auto* maybe_item = it->find<components::item>();
 
 				if (maybe_item) 
-					gun.shake_camera(get_root_container(it)[associated_entity_name::WATCHING_CAMERA], gun_transform.rotation);
+					gun.shake_camera(get_owning_transfer_capability(it)[associated_entity_name::WATCHING_CAMERA], gun_transform.rotation);
 
 				messages::particle_burst_message burst;
 				burst.pos = barrel_transform.pos;

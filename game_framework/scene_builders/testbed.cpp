@@ -188,7 +188,7 @@ namespace scene_builders {
 		
 	    active_context.map_key_to_intent(window::event::keys::BACKSPACE, intent_type::SWITCH_LOOK);
 
-		active_context.map_key_to_intent(window::event::keys::Z, intent_type::START_PICKING_UP_ITEMS);
+		active_context.map_key_to_intent(window::event::keys::LCTRL, intent_type::START_PICKING_UP_ITEMS);
 		active_context.map_key_to_intent(window::event::keys::TAB, intent_type::SWITCH_CHARACTER);
 
 		active_context.map_key_to_intent(window::event::keys::SPACE, intent_type::SPACE_BUTTON);

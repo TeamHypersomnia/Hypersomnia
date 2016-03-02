@@ -14,6 +14,7 @@ struct body_definition {
 		angular_air_resistance = 0.f;
 
 	bool fixed_rotation = false, bullet = false, angled_damping = false;
+	bool active = true;
 
 	vec2 velocity;
 };

@@ -2,7 +2,7 @@
 #include "inventory_slot_id.h"
 
 float calculate_space_occupied_with_children(augs::entity_id item);
-augs::entity_id get_root_container(augs::entity_id);
+augs::entity_id get_owning_transfer_capability(augs::entity_id);
 
 inventory_slot_id determine_hand_holstering_slot(augs::entity_id item, augs::entity_id searched_root_container);
 inventory_slot_id determine_pickup_target_slot(augs::entity_id item, augs::entity_id searched_root_container);

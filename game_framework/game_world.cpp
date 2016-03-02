@@ -93,8 +93,10 @@ void game_world::register_types_of_messages_components_systems() {
 	register_message_queue<trigger_hit_request_message>();
 	register_message_queue<new_entity_message>();
 	register_message_queue<camera_render_request_message>();
+	register_message_queue<item_slot_transfer_intent>();
 	register_message_queue<item_slot_transfer_request>();
 
+	register_message_callback<item_slot_transfer_intent>(std::bind(&item_system::consume_item_slot_transfer_requests, &get_system<item_system>()));
 	register_message_callback<item_slot_transfer_request>(std::bind(&item_system::consume_item_slot_transfer_requests, &get_system<item_system>()));
 }
 
@@ -175,6 +177,8 @@ void game_world::perform_logic_step() {
 	get_system<trigger_detector_system>().consume_trigger_detector_presses();
 	get_system<trigger_detector_system>().post_trigger_requests_from_continuous_detectors();
 	get_system<trigger_detector_system>().send_trigger_confirmations();
+
+	get_system<item_system>().handle_trigger_confirmations_as_pick_requests();
 
 	get_system<driver_system>().assign_drivers_from_triggers();
 	get_system<driver_system>().release_drivers_due_to_ending_contact_with_wheel();

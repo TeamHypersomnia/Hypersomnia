@@ -7,7 +7,7 @@ inventory_slot& inventory_slot_id::operator*() {
 }
 
 bool inventory_slot_id::operator==(inventory_slot_id b) const {
-	return b.type == type && b.container_entity == b.container_entity;
+	return type == b.type && container_entity == b.container_entity;
 }
 
 bool inventory_slot_id::operator<(const inventory_slot_id& b) const {
@@ -139,15 +139,18 @@ bool inventory_slot_id::can_contain(augs::entity_id id) {
 	return calculate_free_space_with_parent_containers() >= item.get_space_occupied();
 }
 
-augs::entity_id get_root_container(augs::entity_id entity) {
+augs::entity_id get_owning_transfer_capability(augs::entity_id entity) {
+	auto* maybe_transfer_capability = entity->find<components::item_slot_transfers>();
+	
+	if (maybe_transfer_capability)
+		return entity;
+
 	auto* maybe_item = entity->find<components::item>();
 
 	if (!maybe_item || maybe_item->current_slot.dead())
-		return entity;
+		return augs::entity_id();
 
-	else {
-		return get_root_container(maybe_item->current_slot.container_entity);
-	}
+	return get_owning_transfer_capability(maybe_item->current_slot.container_entity);
 }
 
 inventory_slot_id first_free_hand(augs::entity_id root_container) {

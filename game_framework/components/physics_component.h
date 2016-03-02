@@ -19,6 +19,7 @@ namespace components {
 		static augs::entity_id get_owner_body_entity(augs::entity_id sub_entity);
 		static bool is_entity_physical(augs::entity_id);
 		static bool are_connected_by_friction(augs::entity_id child, augs::entity_id parent);
+		static void set_active(augs::entity_id id, bool);
 
 		b2Body* body = nullptr;
 		
@@ -56,8 +57,6 @@ namespace components {
 		vec2 get_world_center();
 
 		vec2 get_aabb_size();
-
-		void set_active(bool);
 
 		void set_transform(components::transform);
 		void set_transform(augs::entity_id);

@@ -8,6 +8,8 @@
 
 #include "entity_system/world.h"
 
+#include "game_framework/messages/item_slot_transfer_request.h"
+
 #include "ingredients.h"
 
 namespace ingredients {
@@ -71,7 +73,11 @@ namespace prefabs {
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
 		}
 
-		sample_magazine[slot_function::ITEM_DEPOSIT].add_item(create_pink_charge(world, vec2(0,0)));
+		messages::item_slot_transfer_request load_charge;
+		load_charge.item = create_pink_charge(world, vec2(0, 0));
+		load_charge.target_slot = sample_magazine[slot_function::ITEM_DEPOSIT];
+
+		world.post_message(load_charge);
 
 		return sample_magazine;
 	}

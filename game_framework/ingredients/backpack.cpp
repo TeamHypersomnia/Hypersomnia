@@ -11,7 +11,6 @@ namespace ingredients {
 	void backpack(augs::entity_id e) {
 		auto& container = *e += components::container();
 		auto item = make_item(e);
-		components::force_joint force_joint;
 		
 		inventory_slot slot_def;
 		slot_def.space_available = 7;
@@ -22,9 +21,6 @@ namespace ingredients {
 		item.dual_wield_accuracy_loss_percentage = 50;
 		item.space_occupied_per_charge = 1;
 		item.categories_for_slot_compatibility = item_category::SHOULDER_CONTAINER;
-
-		e->add(force_joint);
-		e->disable(force_joint);
 	}
 }
 

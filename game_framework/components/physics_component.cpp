@@ -3,6 +3,7 @@
 
 #include "graphics/renderer.h"
 #include "fixtures_component.h"
+#include "physics_definition_component.h"
 
 #include "math/vec2.h"
 
@@ -143,8 +144,11 @@ namespace components {
 		return vec2(aabb.upperBound.x - aabb.lowerBound.x, aabb.upperBound.y - aabb.lowerBound.y);
 	}
 
-	void physics::set_active(bool active) {
-		body->SetActive(active);
+	void physics::set_active(augs::entity_id id, bool active) {
+		if (id->find<components::physics>() == nullptr)
+			id->get<components::physics_definition>().body.active = active;
+		else	
+			id->get<components::physics>().body->SetActive(active);
 	}
 
 	entity_id physics::get_owner_friction_ground() {

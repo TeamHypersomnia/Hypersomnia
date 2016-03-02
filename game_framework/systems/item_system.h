@@ -16,6 +16,7 @@ public:
 	void handle_throw_item_intents();
 	void handle_holster_item_intents();
 
+	void constrain_item_slot_transfer_intents();
 	void consume_item_slot_transfer_requests();
 
 	void process_mounting_and_unmounting();

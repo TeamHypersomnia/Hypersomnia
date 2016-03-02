@@ -19,6 +19,10 @@ void driver_system::assign_drivers_from_triggers() {
 
 	for (auto& e : confirmations) {
 		auto subject_car = e.trigger->get<components::trigger>().entity_to_be_notified;
+
+		if (subject_car.dead())
+			continue;
+
 		auto* maybe_car = subject_car->find<components::car>();
 
 		if (maybe_car && e.trigger == maybe_car->left_wheel_trigger)

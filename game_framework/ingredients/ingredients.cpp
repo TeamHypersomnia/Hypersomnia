@@ -19,11 +19,12 @@ namespace ingredients {
 	components::item& make_item(augs::entity_id e) {
 		auto& item = *e += components::item();
 
-		if (e->find<components::trigger>() == nullptr) {
-			e->add<components::trigger>();
-			e->get<components::trigger>().react_to_collision_detectors = true;
-			e->get<components::trigger>().react_to_query_detectors = false;
-		}
+		e->add<components::trigger>();
+		e->get<components::trigger>().react_to_collision_detectors = true;
+		e->get<components::trigger>().react_to_query_detectors = false;
+
+		auto& force_joint = e->add<components::force_joint>();
+		e->disable(force_joint);
 
 		return item;
 	}

@@ -266,6 +266,7 @@ components::physics& create_physics_component(body_definition body_data, augs::e
 	def.linearDamping = body_data.linear_damping;
 	def.fixedRotation = body_data.fixed_rotation;
 	def.gravityScale = body_data.gravity_scale;
+	def.active = body_data.active;
 
 	auto& physics_component = subject->add<components::physics>();
 	physics_component.body = physics.b2world.CreateBody(&def);
