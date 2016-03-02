@@ -986,8 +986,9 @@
     <ClInclude Include="game_framework\components\steering_component.h" />
     <ClInclude Include="game_framework\components\tile_layer_component.h" />
     <ClInclude Include="game_framework\components\transform_component.h" />
+    <ClInclude Include="game_framework\components\trigger_collision_detector_component.h" />
     <ClInclude Include="game_framework\components\trigger_component.h" />
-    <ClInclude Include="game_framework\components\trigger_detector_component.h" />
+    <ClInclude Include="game_framework\components\trigger_query_detector_component.h" />
     <ClInclude Include="game_framework\components\visibility_component.h" />
     <ClInclude Include="game_framework\assets\animation.h" />
     <ClInclude Include="game_framework\assets\texture.h" />

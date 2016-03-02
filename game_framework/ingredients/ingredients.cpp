@@ -21,6 +21,8 @@ namespace ingredients {
 
 		if (e->find<components::trigger>() == nullptr) {
 			e->add<components::trigger>();
+			e->get<components::trigger>().react_to_collision_detectors = true;
+			e->get<components::trigger>().react_to_query_detectors = false;
 		}
 
 		return item;

@@ -35,11 +35,10 @@ void render_system::add_entities_to_rendering_tree() {
 	for (auto& it : events) {
 		auto& e = it.subject;
 
-		auto* physics = e->find<components::physics>();
-		auto* fixtures = e->find<components::fixtures>();
+		auto* physics_definition = e->find<components::physics_definition>();
 		auto* render = e->find<components::render>();
 
-		if (!fixtures && !physics && render) {
+		if (!physics_definition && render) {
 			auto* sprite = e->find<components::sprite>();
 			auto* polygon = e->find<components::polygon>();
 			auto* tile_layer = e->find<components::tile_layer>();

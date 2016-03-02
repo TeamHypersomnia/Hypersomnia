@@ -57,6 +57,7 @@ namespace scene_builders {
 		resource_manager.create(assets::texture_id::SHOTGUN, L"hypersomnia/gfx/shotgun.png");
 		resource_manager.create(assets::texture_id::SAMPLE_MAGAZINE, L"hypersomnia/gfx/magazine.png");
 		resource_manager.create(assets::texture_id::PINK_CHARGE, L"hypersomnia/gfx/pink_charge.png");
+		resource_manager.create(assets::texture_id::PINK_SHELL, L"hypersomnia/gfx/pink_shell.png");
 		resource_manager.create(assets::texture_id::BACKPACK, L"hypersomnia/gfx/backpack.png");
 
 		augs::image attachment_circle_filled;
@@ -156,6 +157,7 @@ namespace scene_builders {
 
 		ingredients::sprite_scalled(crate, vec2(200, 300), vec2i(100, 100)/3, assets::texture_id::CRATE, augs::white, render_layer::DYNAMIC_BODY);
 		ingredients::crate_physics(crate);
+
 		
 		ingredients::sprite_scalled(crate2, vec2(400, 400), vec2i(300, 300), assets::texture_id::CRATE, augs::white, render_layer::DYNAMIC_BODY);
 		ingredients::crate_physics(crate2);
@@ -254,7 +256,7 @@ namespace scene_builders {
 				auto& tt = tested->get<components::transform>();
 				auto pos = tt.pos;
 
-				lines.draw_green((pos + vv[i]).rotate(tt.rotation, pos), (pos + vv[(i + 1) % vv.size()]).rotate(tt.rotation, pos));
+				lines.draw_cyan((pos + vv[i]).rotate(tt.rotation, pos), (pos + vv[(i + 1) % vv.size()]).rotate(tt.rotation, pos));
 			}
 		}
 	}

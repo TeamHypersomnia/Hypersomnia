@@ -59,7 +59,7 @@ namespace components {
 		else {
 			auto center = in.visible_world_area / 2;
 
-			auto target_position = transform_pos - in.camera_transform.pos + center;
+			auto target_position = transform_pos - in.camera_transform.pos + center + center_offset;
 			make_rect(target_position, vec2(size), in.renderable_transform.rotation + rotation_offset, v);
 
 			/* rotate around the center of the screen */

@@ -21,7 +21,7 @@ void driver_system::assign_drivers_from_triggers() {
 		auto subject_car = e.trigger->get<components::trigger>().entity_to_be_notified;
 		auto* maybe_car = subject_car->find<components::car>();
 
-		if (maybe_car && e.trigger == maybe_car->left_wheel_trigger && e.domain == detection_domain::TRIGGER_SWITCHING)
+		if (maybe_car && e.trigger == maybe_car->left_wheel_trigger)
 			assign_car_ownership(e.detector_body, subject_car);
 	}
 }

@@ -12,7 +12,7 @@
 #include "game_framework/components/animation_component.h"
 #include "game_framework/components/animation_response_component.h"
 #include "game_framework/components/physics_component.h"
-#include "game_framework/components/trigger_detector_component.h"
+#include "game_framework/components/trigger_query_detector_component.h"
 #include "game_framework/components/driver_component.h"
 #include "game_framework/components/force_joint_component.h"
 #include "game_framework/components/physics_definition_component.h"
@@ -93,10 +93,12 @@ namespace ingredients {
 		auto& transform = *e += components::transform();
 		auto& movement = *e += components::movement();
 		auto& rotation_copying = *e += components::rotation_copying();
-		auto& detector = *e += components::trigger_detector();
+		auto& detector = *e += components::trigger_query_detector();
 		auto& driver = *e += components::driver();
 		auto& force_joint = *e += components::force_joint();
 		e->disable(force_joint);
+
+		detector.spam_trigger_requests_when_detection_intented = true;
 
 		force_joint.force_towards_chased_entity = 85000.f;
 		force_joint.distance_when_force_easing_starts = 20.f;

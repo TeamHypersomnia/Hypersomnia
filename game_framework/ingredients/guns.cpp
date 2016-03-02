@@ -95,12 +95,12 @@ namespace prefabs {
 			ingredients::sprite(round_definition, pos, assets::texture_id::PINK_CHARGE, augs::white, render_layer::FLYING_BULLETS);
 			auto& def = ingredients::crate_physics(round_definition);
 			def.dont_create_fixtures_and_body = true;
-
+			
 			auto& damage = *round_definition += components::damage();
 		}
 
 		{
-			ingredients::sprite(shell_definition, pos, assets::texture_id::PINK_CHARGE, augs::white, render_layer::FLYING_BULLETS);
+			ingredients::sprite(shell_definition, pos, assets::texture_id::PINK_SHELL, augs::white, render_layer::FLYING_BULLETS);
 			auto& def = ingredients::crate_physics(shell_definition);
 			def.dont_create_fixtures_and_body = true;
 		}

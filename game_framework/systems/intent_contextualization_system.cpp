@@ -5,7 +5,8 @@
 #include "../components/driver_component.h"
 #include "../components/gun_component.h"
 #include "../components/container_component.h"
-#include "../components/trigger_detector_component.h"
+#include "../components/trigger_query_detector_component.h"
+#include "../components/trigger_collision_detector_component.h"
 
 #include "entity_system/world.h"
 #include "entity_system/entity.h"
@@ -16,7 +17,8 @@ void intent_contextualization_system::contextualize_use_button_intents() {
 	auto& intents = parent_world.get_message_queue<messages::intent_message>();
 	
 	for (auto& e : intents) {
-		auto* maybe_detector = e.subject->find<components::trigger_detector>();
+		auto* query_detector = e.subject->find<components::trigger_query_detector>();
+		auto* collision_detector = e.subject->find<components::trigger_collision_detector>();
 		
 		if (e.intent == intent_type::USE_BUTTON) {
 			auto* maybe_driver = e.subject->find<components::driver>();
@@ -30,14 +32,14 @@ void intent_contextualization_system::contextualize_use_button_intents() {
 				}
 			}
 
-			if (maybe_detector && maybe_detector->domain == detection_domain::TRIGGER_SWITCHING) {
-				e.intent = intent_type::PRESS_WORLD_TRIGGER;
+			if (query_detector) {
+				e.intent = intent_type::QUERY_TOUCHING_TRIGGERS;
 				continue;
 			}
 		}
 		else if (e.intent == intent_type::START_PICKING_UP_ITEMS) {
-			if (maybe_detector && maybe_detector->domain == detection_domain::WORLD_ITEMS) {
-				e.intent = intent_type::PRESS_WORLD_TRIGGER;
+			if (collision_detector) {
+				e.intent = intent_type::DETECT_TRIGGER_COLLISIONS;
 				continue;
 			}
 		}

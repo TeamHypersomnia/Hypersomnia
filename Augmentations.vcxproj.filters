@@ -2963,9 +2963,6 @@
     <ClInclude Include="game_framework\components\trigger_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\components\trigger_detector_component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\components\visibility_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3030,6 +3027,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\shared\gui\slot_button.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\components\trigger_query_detector_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\components\trigger_collision_detector_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

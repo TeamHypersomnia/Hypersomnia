@@ -40,7 +40,7 @@ namespace components {
 	struct car;
 	struct driver;
 	struct trigger;
-	struct trigger_detector;
+	struct trigger_query_detector;
 	struct fixtures;
 	struct container;
 	struct item;
@@ -49,6 +49,7 @@ namespace components {
 	struct item_slot_transfers;
 	struct melee;
 	struct gui_element;
+	struct trigger_collision_detector;
 }
 #endif
 
@@ -101,7 +102,7 @@ namespace augs {
 			std::pair<memory_pool::id, components::car*>,
 			std::pair<memory_pool::id, components::driver*>,
 			std::pair<memory_pool::id, components::trigger*>,
-			std::pair<memory_pool::id, components::trigger_detector*>,
+			std::pair<memory_pool::id, components::trigger_query_detector*>,
 			std::pair<memory_pool::id, components::fixtures*>,
 			std::pair<memory_pool::id, components::container*>,
 			std::pair<memory_pool::id, components::force_joint*>,
@@ -109,7 +110,8 @@ namespace augs {
 			std::pair<memory_pool::id, components::physics_definition*>,
 			std::pair<memory_pool::id, components::item_slot_transfers*>,
 			std::pair<memory_pool::id, components::melee*>,
-			std::pair<memory_pool::id, components::gui_element*>
+			std::pair<memory_pool::id, components::gui_element*>,
+			std::pair<memory_pool::id, components::trigger_collision_detector*>
 		> type_to_component;
 
 		component_bitset_matcher signature;

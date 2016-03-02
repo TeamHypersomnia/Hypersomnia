@@ -92,6 +92,8 @@ namespace prefabs {
 
 			transform.pos = pos;
 			trigger.entity_to_be_notified = front;
+			trigger.react_to_collision_detectors = false;
+			trigger.react_to_query_detectors = true;
 
 			render.layer = render_layer::CAR_WHEEL;
 

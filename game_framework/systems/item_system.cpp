@@ -23,7 +23,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests() {
 		auto* item_slot_transfers = e.detector_body->find<components::item_slot_transfers>();
 		auto* item = e.trigger->find<components::item>();
 
-		if (item_slot_transfers && item && e.domain == detection_domain::WORLD_ITEMS) {
+		if (item_slot_transfers && item) {
 			messages::item_slot_transfer_request request;
 			request.item = e.trigger;
 			request.target_slot = determine_pickup_target_slot(e.trigger, e.detector_body);

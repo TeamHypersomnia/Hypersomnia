@@ -41,7 +41,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_component<car>();
 	register_component<driver>();
 	register_component<trigger>();
-	register_component<trigger_detector>();
+	register_component<trigger_query_detector>();
 	register_component<fixtures>();
 	register_component<item>();
 	register_component<container>();
@@ -50,6 +50,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_component<item_slot_transfers>();
 	register_component<melee>();
 	register_component<gui_element>();
+	register_component<trigger_collision_detector>();
 	
 	register_system<input_system>();
 	register_system<steering_system>();
@@ -172,7 +173,8 @@ void game_world::perform_logic_step() {
 	get_system<driver_system>().release_drivers_due_to_requests();
 
 	get_system<trigger_detector_system>().consume_trigger_detector_presses();
-	get_system<trigger_detector_system>().find_trigger_collisions_and_send_confirmations();
+	get_system<trigger_detector_system>().post_trigger_requests_from_continuous_detectors();
+	get_system<trigger_detector_system>().send_trigger_confirmations();
 
 	get_system<driver_system>().assign_drivers_from_triggers();
 	get_system<driver_system>().release_drivers_due_to_ending_contact_with_wheel();

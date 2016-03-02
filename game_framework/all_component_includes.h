@@ -24,7 +24,7 @@
 #include "components/car_component.h"
 #include "components/driver_component.h"
 #include "components/trigger_component.h"
-#include "components/trigger_detector_component.h"
+#include "components/trigger_query_detector_component.h"
 #include "components/fixtures_component.h"
 #include "components/container_component.h"
 #include "components/item_component.h"
@@ -33,6 +33,7 @@
 #include "components/item_slot_transfers_component.h"
 #include "components/melee_component.h"
 #include "components/gui_element_component.h"
+#include "components/trigger_collision_detector_component.h"
 
 
 
