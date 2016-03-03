@@ -4,6 +4,7 @@
 #include "graphics/renderer.h"
 #include "fixtures_component.h"
 #include "physics_definition_component.h"
+#include "../messages/collision_message.h"
 
 #include "math/vec2.h"
 #include "entity_system/world.h"
@@ -159,7 +160,16 @@ namespace components {
 
 	void physics::destroy_physics_of_entity(augs::entity_id id) {
 		id->get<components::physics_definition>().dont_create_fixtures_and_body = true;
-		id->get_owner_world().get_system<physics_system>().destroy_physics_of_entity(id);
+		auto& physics = id->get_owner_world().get_system<physics_system>();
+		physics.destroy_physics_of_entity(id);
+
+		for (auto& c : physics.parent_world.get_message_queue<messages::collision_message>()) {
+			if (c.subject == id || c.collider == id) {
+				c.delete_this_message = true;
+			}
+		}
+
+		physics.parent_world.delete_marked_messages<messages::collision_message>();
 	}
 
 	entity_id physics::get_owner_friction_ground() {
