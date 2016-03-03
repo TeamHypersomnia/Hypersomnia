@@ -210,9 +210,9 @@ namespace scene_builders {
 			input.record_and_save_this_session();
 		}
 
-		draw_bodies.push_back(crate2);
-		draw_bodies.push_back(characters[0]);
-		draw_bodies.push_back(backpack);
+		//draw_bodies.push_back(crate2);
+		//draw_bodies.push_back(characters[0]);
+		//draw_bodies.push_back(backpack);
 	}
 
 	void testbed::perform_logic_step(world& world) {

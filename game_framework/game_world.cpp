@@ -179,6 +179,8 @@ void game_world::perform_logic_step() {
 	get_system<trigger_detector_system>().send_trigger_confirmations();
 
 	get_system<item_system>().handle_trigger_confirmations_as_pick_requests();
+	get_system<item_system>().handle_holster_item_intents();
+	get_system<item_system>().handle_throw_item_intents();
 
 	get_system<driver_system>().assign_drivers_from_triggers();
 	get_system<driver_system>().release_drivers_due_to_ending_contact_with_wheel();

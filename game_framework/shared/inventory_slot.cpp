@@ -190,7 +190,7 @@ inventory_slot_id determine_hand_holstering_slot(augs::entity_id item_entity, au
 
 	auto maybe_shoulder = searched_root_container[slot_function::SHOULDER_SLOT];
 
-	if (maybe_shoulder.alive() && maybe_shoulder->is_holsterable()) {
+	if (maybe_shoulder.alive()) {
 		if (maybe_shoulder.can_contain(item_entity))
 			return maybe_shoulder;
 		else if (maybe_shoulder->items_inside.size() > 0) {
@@ -203,7 +203,7 @@ inventory_slot_id determine_hand_holstering_slot(augs::entity_id item_entity, au
 	else {
 		auto maybe_armor = searched_root_container[slot_function::TORSO_ARMOR_SLOT];
 		
-		if (maybe_armor.alive() && maybe_armor->is_holsterable())
+		if (maybe_armor.alive())
 			if (maybe_armor.can_contain(item_entity))
 				return maybe_armor;
 	}

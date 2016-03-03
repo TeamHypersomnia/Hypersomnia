@@ -122,7 +122,7 @@ namespace prefabs {
 
 		ingredients::sprite(sample_rifle, pos, assets::texture_id::ASSAULT_RIFLE, augs::white, render_layer::DROPPED_ITEM);
 		auto& def = ingredients::crate_physics(sample_rifle);
-
+		//def.fixtures[0].density = 20;
 		ingredients::assault_rifle(sample_rifle);
 
 		return sample_rifle;

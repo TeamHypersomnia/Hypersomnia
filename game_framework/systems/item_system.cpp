@@ -45,8 +45,9 @@ void item_system::handle_throw_item_intents() {
 	auto& requests = parent_world.get_message_queue<messages::intent_message>();
 
 	for (auto& r : requests) {
-		if (r.intent == intent_type::THROW_PRIMARY_ITEM
-			|| r.intent == intent_type::THROW_SECONDARY_ITEM
+		if (r.pressed_flag && 
+			(r.intent == intent_type::THROW_PRIMARY_ITEM
+			|| r.intent == intent_type::THROW_SECONDARY_ITEM)
 			) {
 			if (r.subject->find<components::item_slot_transfers>()) {
 				auto hand = map_primary_action_to_secondary_hand_if_primary_empty(r.subject, intent_type::THROW_SECONDARY_ITEM == r.intent);
@@ -65,8 +66,9 @@ void item_system::handle_holster_item_intents() {
 	auto& requests = parent_world.get_message_queue<messages::intent_message>();
 
 	for (auto& r : requests) {
-		if (r.intent == intent_type::HOLSTER_PRIMARY_ITEM
-			|| r.intent == intent_type::HOLSTER_SECONDARY_ITEM
+		if (r.pressed_flag && 
+			(r.intent == intent_type::HOLSTER_PRIMARY_ITEM
+			|| r.intent == intent_type::HOLSTER_SECONDARY_ITEM)
 			) {
 			if (r.subject->find<components::item_slot_transfers>()) {
 				auto hand = map_primary_action_to_secondary_hand_if_primary_empty(r.subject, intent_type::HOLSTER_SECONDARY_ITEM == r.intent);
@@ -75,7 +77,9 @@ void item_system::handle_holster_item_intents() {
 					messages::item_slot_transfer_request request;
 					request.item = hand->items_inside[0];
 					request.target_slot = determine_hand_holstering_slot(hand->items_inside[0], r.subject);
-					parent_world.post_message(request);
+					
+					if(request.target_slot.alive())
+						parent_world.post_message(request);
 				}
 			}
 		}
@@ -178,8 +182,6 @@ void item_system::consume_item_slot_transfer_requests() {
 			previous_slot.remove_item(r.item);
 		if(is_pickup_or_transfer)
 			r.target_slot.add_item(r.item);
-
-		auto& container_transform = r.target_slot.container_entity->get<components::transform>();
 		
 		if(is_pickup_or_transfer) {
 			if (r.target_slot.should_item_inside_keep_physical_body()) {
@@ -201,8 +203,10 @@ void item_system::consume_item_slot_transfer_requests() {
 			components::physics::recreate_fixtures_and_attach_to(r.item, r.item);
 
 			auto& item_physics = r.item->get<components::physics>();
-			item_physics.set_transform(previous_slot.container_entity);
-			item_physics.apply_impulse(vec2().set_from_degrees(container_transform.rotation).set_length(10), vec2().random_on_circle(20));
+			auto previous_container_transform = previous_slot.container_entity->get<components::transform>();
+
+			item_physics.set_transform(previous_container_transform);
+			item_physics.apply_impulse(vec2().set_from_degrees(previous_container_transform.rotation).set_length(10), vec2().random_on_circle(20));
 		}
 	}
 

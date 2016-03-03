@@ -10,7 +10,7 @@
 namespace ingredients {
 	void backpack(augs::entity_id e) {
 		auto& container = *e += components::container();
-		auto item = make_item(e);
+		auto& item = make_item(e);
 		
 		inventory_slot slot_def;
 		slot_def.space_available = 7;

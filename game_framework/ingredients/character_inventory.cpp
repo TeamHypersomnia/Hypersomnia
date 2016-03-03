@@ -28,11 +28,13 @@ namespace ingredients {
 
 		slot_def.for_categorized_items_only = true;
 		slot_def.category_allowed = item_category::SHOULDER_CONTAINER;
-		slot_def.attachment_offset.pos = vec2(-40, 0);
+		slot_def.attachment_offset.pos = vec2(-30, 0);
+		slot_def.attachment_offset.rotation = -180;
 		container.slots[slot_function::SHOULDER_SLOT] = slot_def;
 
 		slot_def.for_categorized_items_only = true;
 		slot_def.category_allowed = item_category::TORSO_ARMOR;
+		slot_def.attachment_offset = vec2(0, 0);
 
 		container.slots[slot_function::TORSO_ARMOR_SLOT] = slot_def;
 
