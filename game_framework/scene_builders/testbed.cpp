@@ -26,7 +26,7 @@
 #include "texture_baker/font.h"
 
 #include "gui/text/printer.h"
-
+#include "log.h"
 using namespace augs;
 
 namespace scene_builders {
@@ -138,7 +138,7 @@ namespace scene_builders {
 
 		for (int i = 0; i < num_characters; ++i) {
 			auto crosshair = world.create_entity("crosshair");
-			auto character = world.create_entity("player");
+			auto character = world.create_entity(typesafe_sprintf("player%x", i));
 
 			ingredients::wsad_character_crosshair(crosshair);
 			ingredients::wsad_character(character, crosshair);

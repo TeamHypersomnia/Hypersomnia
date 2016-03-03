@@ -23,8 +23,8 @@ void item_system::handle_trigger_confirmations_as_pick_requests() {
 		auto* item_slot_transfers = e.detector_body->find<components::item_slot_transfers>();
 		auto* item = e.trigger->find<components::item>();
 
-		if (item_slot_transfers && item) {
-			messages::item_slot_transfer_request request;
+		if (item_slot_transfers && item && get_owning_transfer_capability(e.trigger).dead()) {
+			messages::item_slot_transfer_intent request;
 			request.item = e.trigger;
 			request.target_slot = determine_pickup_target_slot(e.trigger, e.detector_body);
 			
@@ -150,7 +150,9 @@ void item_system::constrain_item_slot_transfer_intents() {
 		request.target_slot = r.target_slot;
 		parent_world.post_message(request);
 	}
-}
+
+	requests.clear();
+};
 
 void item_system::consume_item_slot_transfer_requests() {
 	auto& requests = parent_world.get_message_queue<messages::item_slot_transfer_request>();
