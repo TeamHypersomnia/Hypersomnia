@@ -21,7 +21,7 @@ namespace components {
 		unsigned dual_wield_accuracy_loss_percentage = 50;
 		unsigned dual_wield_accuracy_loss_multiplier = 1;
 
-		vec2 attachment_offsets_per_sticking_mode[4];
+		components::transform attachment_offsets_per_sticking_mode[4];
 
 		inventory_slot_id current_slot;
 		inventory_slot_id target_slot_after_unmount;

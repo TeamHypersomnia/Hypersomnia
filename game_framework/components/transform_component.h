@@ -17,6 +17,11 @@ namespace components {
 			return out;
 		}
 
+		transform& operator+=(const transform& b) {
+			(*this) = (*this) + b;
+			return *this;
+		}
+
 		void reset() {
 			pos.reset();
 			rotation = 0.f;

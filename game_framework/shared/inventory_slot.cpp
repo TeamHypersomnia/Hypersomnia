@@ -64,6 +64,24 @@ bool inventory_slot_id::should_item_inside_keep_physical_body() {
 	return should_item_here_keep_physical_body;
 }
 
+//components::transform inventory_slot_id::sum_attachment_offsets_of_parents() {
+//	auto* maybe_item = container_entity->find<components::item>();
+//
+//	if (maybe_item && maybe_item->current_slot.alive())
+//		return maybe_item->current_slot.get_root_container();
+//
+//	return (*this)->att;
+//}
+
+augs::entity_id inventory_slot_id::get_root_container() {
+	auto* maybe_item = container_entity->find<components::item>();
+
+	if (maybe_item && maybe_item->current_slot.alive())
+		return maybe_item->current_slot.get_root_container();
+
+	return container_entity;
+}
+
 void inventory_slot_id::add_item(augs::entity_id id) {
 	(*this)->items_inside.push_back(id);
 	id->get<components::item>().current_slot = *this;

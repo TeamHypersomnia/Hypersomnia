@@ -18,13 +18,17 @@ namespace ingredients {
 
 		inventory_slot slot_def;
 		slot_def.is_attachment_slot = true;
+		slot_def.attachment_sticking_mode = vec2::sticking::RIGHT;
+		slot_def.attachment_offset.pos = vec2(40, 20);
 
 		container.slots[slot_function::PRIMARY_HAND] = slot_def;
+		
+		slot_def.attachment_offset.pos = vec2(40, -20);
 		container.slots[slot_function::SECONDARY_HAND] = slot_def;
 
 		slot_def.for_categorized_items_only = true;
 		slot_def.category_allowed = item_category::SHOULDER_CONTAINER;
-
+		slot_def.attachment_offset.pos = vec2(-40, 0);
 		container.slots[slot_function::SHOULDER_SLOT] = slot_def;
 
 		slot_def.for_categorized_items_only = true;

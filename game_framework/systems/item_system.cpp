@@ -12,6 +12,7 @@
 #include "../components/physics_component.h"
 #include "../components/force_joint_component.h"
 #include "../components/item_slot_transfers_component.h"
+#include "../components/fixtures_component.h"
 
 #include "../shared/inventory_utils.h"
 #include "../shared/inventory_slot.h"
@@ -178,48 +179,30 @@ void item_system::consume_item_slot_transfer_requests() {
 		if(is_pickup_or_transfer)
 			r.target_slot.add_item(r.item);
 
-		auto& item_physics = r.item->get<components::physics>();
 		auto& container_transform = r.target_slot.container_entity->get<components::transform>();
-		auto& force_joint = r.item->get<components::force_joint>();
 		
 		if(is_pickup_or_transfer) {
 			if (r.target_slot.should_item_inside_keep_physical_body()) {
-				components::physics::set_active(r.item, true);
+				auto target_attachment_offset_from_container = r.target_slot->attachment_offset;
+				
+				auto sticking = r.target_slot->attachment_sticking_mode;
+				target_attachment_offset_from_container.pos += r.item->get<components::fixtures>().get_aabb_size().get_sticking_offset(sticking);
+				target_attachment_offset_from_container += item.attachment_offsets_per_sticking_mode[sticking];
 
-				auto& item_joint_def = force_joint;
-				auto& attachment_joint_def = r.target_slot->attachment_force_joint_def;
-
-				item_joint_def.distance_when_force_easing_starts = attachment_joint_def.distance_when_force_easing_starts;
-				item_joint_def.force_towards_chased_entity = attachment_joint_def.force_towards_chased_entity;
-				item_joint_def.power_of_force_easing_multiplier = attachment_joint_def.power_of_force_easing_multiplier;
-
-				item_joint_def.chased_entity = r.target_slot.container_entity;
-
-				auto target_attachment_offset_from_container = attachment_joint_def.chased_entity_offset;
-				target_attachment_offset_from_container.pos += item_physics.get_aabb_size().get_sticking_offset(r.target_slot->attachment_sticking_mode);
-				unsigned sticking = r.target_slot->attachment_sticking_mode;
-				target_attachment_offset_from_container.pos += item.attachment_offsets_per_sticking_mode[sticking];
-
-				item_joint_def.chased_entity_offset = target_attachment_offset_from_container;
-
-				r.item->enable(item_joint_def);
-
-				item_physics.set_transform(r.target_slot.container_entity->get<components::transform>() + target_attachment_offset_from_container);
+				components::physics::recreate_fixtures_and_attach_to(r.item, r.target_slot.get_root_container(), target_attachment_offset_from_container);
 			}
-			else {
-				components::physics::set_active(r.item, false);
-				r.item->disable(force_joint);
-			}
+			else
+				components::physics::destroy_physics_of_entity(r.item);
 
-			if (r.target_slot->items_need_mounting) {
+			if (r.target_slot->items_need_mounting)
 				item.intended_mounting = components::item::MOUNTED;
-			}
 		}
 		else if (is_drop_request) {
-			components::physics::set_active(r.item, true);
+			components::physics::recreate_fixtures_and_attach_to(r.item, r.item);
+
+			auto& item_physics = r.item->get<components::physics>();
 			item_physics.set_transform(previous_slot.container_entity);
 			item_physics.apply_impulse(vec2().set_from_degrees(container_transform.rotation).set_length(10), vec2().random_on_circle(20));
-			r.item->disable(force_joint);
 		}
 	}
 

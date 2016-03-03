@@ -1,5 +1,6 @@
 #pragma once
 #include "../globals/inventory.h"
+#include "../components/transform_component.h"
 #include "entity_system/entity_id.h"
 
 struct inventory_slot;
@@ -25,6 +26,9 @@ struct inventory_slot_id {
 
 	bool is_hand_slot();
 	bool should_item_inside_keep_physical_body();
+	components::transform sum_attachment_offsets_of_parents();
+
+	augs::entity_id get_root_container();
 
 	bool operator<(const inventory_slot_id& b) const;
 

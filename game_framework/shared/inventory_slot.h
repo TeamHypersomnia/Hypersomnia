@@ -26,7 +26,7 @@ struct inventory_slot {
 	}
 
 	vec2::sticking attachment_sticking_mode = vec2::sticking::LEFT;
-	components::force_joint attachment_force_joint_def;
+	components::transform attachment_offset;
 
 	std::vector<augs::entity_id> items_inside;
 

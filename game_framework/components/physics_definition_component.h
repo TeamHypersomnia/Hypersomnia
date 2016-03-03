@@ -10,6 +10,8 @@ namespace components {
 		std::vector<fixture_definition> fixtures;
 		augs::entity_id attach_fixtures_to_entity;
 
+		components::transform offset_all_shapes;
+
 		fixture_definition& new_fixture(augs::entity_id attached_to_entity = augs::entity_id()) {
 			attach_fixtures_to_entity = attached_to_entity;
 			fixtures.push_back(fixture_definition());

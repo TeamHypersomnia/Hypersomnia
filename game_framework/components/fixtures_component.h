@@ -26,5 +26,6 @@ namespace components {
 
 		b2Body* get_body();
 		augs::entity_id get_body_entity();
+		vec2 get_aabb_size();
 	};
 }

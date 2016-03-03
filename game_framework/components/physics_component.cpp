@@ -6,25 +6,19 @@
 #include "physics_definition_component.h"
 
 #include "math/vec2.h"
+#include "entity_system/world.h"
 
 namespace components {
-	physics& physics::get_owner_body(augs::entity_id id) {
-		auto* physics = id->find<components::physics>();
-		if (physics) return *physics;
-
-		return id->get<components::fixtures>().get_body_entity()->get<components::physics>();
-	}
-	
 	augs::entity_id physics::get_owner_friction_field(augs::entity_id id) {
 		return get_owner_body_entity(id)->get<components::physics>().owner_friction_ground;
 	}
-
 	
 	augs::entity_id physics::get_owner_body_entity(augs::entity_id id) {
-		auto* physics = id->find<components::physics>();
-		if (physics) return id;
-
-		return id->get<components::fixtures>().get_body_entity();
+		auto* fixtures = id->find<components::fixtures>();
+		if (fixtures) return fixtures->get_body_entity();
+		else if (id->find<components::physics>()) return id;
+		assert(0);
+		return augs::entity_id();
 	}
 
 	bool physics::is_entity_physical(augs::entity_id id) {
@@ -36,7 +30,7 @@ namespace components {
 			bool matched_ancestor = false;
 
 			entity_id parent_body_entity = components::physics::get_owner_body_entity(parent);
-			entity_id childs_ancestor_entity = components::physics::get_owner_body(child).get_owner_friction_ground();
+			entity_id childs_ancestor_entity = components::physics::get_owner_body_entity(child)->get<components::physics>().get_owner_friction_ground();
 
 			while (childs_ancestor_entity.alive()) {
 				if (childs_ancestor_entity == parent_body_entity) {
@@ -149,6 +143,23 @@ namespace components {
 			id->get<components::physics_definition>().body.active = active;
 		else	
 			id->get<components::physics>().body->SetActive(active);
+	}
+
+	void physics::recreate_fixtures_and_attach_to(augs::entity_id from_fixture_entity, augs::entity_id to_body_entity, components::transform offset_shapes) {
+		destroy_physics_of_entity(from_fixture_entity);
+		auto& def = from_fixture_entity->get<components::physics_definition>();
+
+		def.attach_fixtures_to_entity = to_body_entity;
+		def.offset_all_shapes = offset_shapes;
+
+		auto& physics = from_fixture_entity->get_owner_world().get_system<physics_system>();
+		from_fixture_entity->get<components::physics_definition>().dont_create_fixtures_and_body = false;
+		physics.create_physics_for_entity(from_fixture_entity);
+	}
+
+	void physics::destroy_physics_of_entity(augs::entity_id id) {
+		id->get<components::physics_definition>().dont_create_fixtures_and_body = true;
+		id->get_owner_world().get_system<physics_system>().destroy_physics_of_entity(id);
 	}
 
 	entity_id physics::get_owner_friction_ground() {

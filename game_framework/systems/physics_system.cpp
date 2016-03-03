@@ -601,31 +601,6 @@ void physics_system::destroy_whole_world() {
 		b2world.DestroyBody(just_die);
 }
 
-void physics_system::destroy_fixtures_and_bodies() {
-	auto& to_destroy = parent_world.get_message_queue<messages::destroy_message>();
-
-	for (auto& m : to_destroy) {
-		auto* maybe_physics = m.subject->find<components::physics>();
-
-		if (maybe_physics) {
-			b2world.DestroyBody(maybe_physics->body);
-
-			for (auto fe : maybe_physics->fixture_entities) {
-				parent_world.post_message(messages::destroy_message(fe));
-			}
-		}
-	}
-
-	for (auto& m : to_destroy) {
-		auto* maybe_fixtures = m.subject->find<components::fixtures>();
-
-		if (maybe_fixtures) {
-			for (auto f : maybe_fixtures->list_of_fixtures) {
-				f.fixture->GetBody()->DestroyFixture(f.fixture);
-			}
-		}
-	}
-}
 
 #include "../components/render_component.h"
 void physics_system::reset_states() {
@@ -659,33 +634,71 @@ void physics_system::reset_states() {
 	}
 }
 
+void physics_system::create_physics_for_entity(augs::entity_id e) {
+	/* remove dead components that are remnants of cloning or mistakenly added */
+	e->remove<components::physics>();
+	e->remove<components::fixtures>();
+
+	auto* physics_definition = e->find<components::physics_definition>();
+
+	if (physics_definition) {
+		if (!physics_definition->dont_create_fixtures_and_body) {
+			auto other_body_entity = physics_definition->attach_fixtures_to_entity;
+
+			if (other_body_entity.dead() || other_body_entity == e)
+				create_physics_component(physics_definition->body, e);
+
+			for (auto fixture : physics_definition->fixtures) {
+				fixture.transform_vertices += physics_definition->offset_all_shapes;
+
+				if (other_body_entity.alive())
+					add_fixtures_to_other_body(fixture, e, physics_definition->attach_fixtures_to_entity);
+				else
+					add_fixtures(fixture, e);
+			}
+		}
+
+		if (!physics_definition->preserve_definition_for_cloning)
+			e->remove<components::physics_definition>();
+	}
+}
+
+void physics_system::destroy_physics_of_entity(augs::entity_id subject) {
+	auto* maybe_physics = subject->find<components::physics>();
+
+	if (maybe_physics) {
+		b2world.DestroyBody(maybe_physics->body);
+
+		for (auto fe : maybe_physics->fixture_entities) {
+			fe->remove<components::fixtures>();
+		}
+
+		subject->remove<components::physics>();
+	}
+
+	auto* maybe_fixtures = subject->find<components::fixtures>();
+
+	if (maybe_fixtures) {
+		auto& fixture_list = maybe_fixtures->get_body_entity()->get<components::physics>().fixture_entities;
+		fixture_list.erase(std::remove(fixture_list.begin(), fixture_list.end(), subject), fixture_list.end());
+
+		for (auto f : maybe_fixtures->list_of_fixtures)
+			f.fixture->GetBody()->DestroyFixture(f.fixture);
+
+		subject->remove<components::fixtures>();
+	}
+}
+
 void physics_system::create_bodies_and_fixtures_from_physics_definitions() {
 	auto& events = parent_world.get_message_queue<messages::new_entity_message>();
 
-	for (auto& it : events) {
-		auto& e = it.subject;
-		/* remove dead components that are remnants of cloning or mistakenly added */
-		e->remove<components::physics>();
-		e->remove<components::fixtures>();
+	for (auto& it : events)
+		create_physics_for_entity(it.subject);
+}
 
-		auto* physics_definition = e->find<components::physics_definition>();
+void physics_system::destroy_fixtures_and_bodies() {
+	auto& to_destroy = parent_world.get_message_queue<messages::destroy_message>();
 
-		if (physics_definition) {
-			if (!physics_definition->dont_create_fixtures_and_body) {
-				auto other_body_entity = physics_definition->attach_fixtures_to_entity;
-
-				if (other_body_entity.dead())
-					create_physics_component(physics_definition->body, e);
-
-				for (auto& fixture : physics_definition->fixtures)
-					if (other_body_entity.alive())
-						add_fixtures_to_other_body(fixture, e, physics_definition->attach_fixtures_to_entity);
-					else
-						add_fixtures(fixture, e);
-			}
-
-			if (!physics_definition->preserve_definition_for_cloning)
-				e->remove<components::physics_definition>();
-		}
-	}
+	for (auto& m : to_destroy)
+		destroy_physics_of_entity(m.subject);
 }
