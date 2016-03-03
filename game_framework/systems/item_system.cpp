@@ -206,7 +206,7 @@ void item_system::consume_item_slot_transfer_requests() {
 			auto previous_container_transform = previous_slot.container_entity->get<components::transform>();
 
 			item_physics.set_transform(previous_container_transform);
-			item_physics.apply_impulse(vec2().set_from_degrees(previous_container_transform.rotation).set_length(10), vec2().random_on_circle(20));
+			item_physics.apply_impulse(vec2().set_from_degrees(previous_container_transform.rotation).set_length(100), vec2().random_on_circle(20));
 		}
 	}
 

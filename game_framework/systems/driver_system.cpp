@@ -35,7 +35,7 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel() {
 
 	for (auto& c : contacts) {
 		if (c.sensor_end_contact) {
-			auto driver = components::physics::get_owner_body_entity(c.subject);
+			auto driver = c.subject;
 			auto car = components::physics::get_owner_body_entity(c.collider);
 
 			auto* maybe_driver = driver->find<components::driver>();
