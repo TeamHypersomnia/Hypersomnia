@@ -288,6 +288,20 @@ namespace augs {
 				h(old_h);
 			}
 
+			void set_size(vec2t<T> v) {
+				w(v.x);
+				h(v.y);
+			}
+
+			void set_size(T x, T y) {
+				w(x);
+				h(y);
+			}
+
+			vec2t<T> get_size() const {
+				return vec2t<T>(w(), h());
+			}
+
 			template <class P>
 			ltrb& operator+=(const P& p) {
 				l += T(p.x);

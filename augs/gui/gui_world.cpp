@@ -182,11 +182,10 @@ namespace augs {
 		}
 
 		void gui_world::reassign_children_and_unset_invalid_handles(rect_id parent, std::vector<rect_id> rects) {
-			std::vector<rect_id> old_descendants;
+			std::vector<rect_id> old_descendants = parent->cached_descendants;
 			std::vector<rect_id> new_descendants;
 			std::vector<rect_id> dead_handles;
 
-			parent->get_all_descendants(old_descendants);
 			parent->children = rects;
 			parent->get_all_descendants(new_descendants);
 

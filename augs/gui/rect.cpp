@@ -249,6 +249,11 @@ namespace augs {
 				if (it->focusable) return it;
 			}
 		}
+		
+		void rect::cache_descendants_before_children_reassignment() {
+			cached_descendants.clear();
+			get_all_descendants(cached_descendants);
+		}
 
 		void rect::consume_gui_event(event_info e) {
 			try_to_enable_middlescrolling(e);

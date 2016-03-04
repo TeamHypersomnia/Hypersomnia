@@ -142,10 +142,13 @@ namespace augs {
 			rect_id get_parent() const;
 
 			static rect_id seek_focusable(rect_id, bool);
+
+			void cache_descendants_before_children_reassignment();
 		protected:
 			friend class gui_world;
 
 			rect_id parent = nullptr;
+			std::vector<rect_id> cached_descendants;
 
 			virtual void perform_logic_step(gui_world&);
 		private:
