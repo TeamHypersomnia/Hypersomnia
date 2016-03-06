@@ -3,6 +3,7 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include <iomanip>
 
 namespace augs {
 	template <typename T>
@@ -48,8 +49,12 @@ namespace augs {
 	/* number to wide string conversion */
 
 	template <class T>
-	std::wstring to_wstring(T val) {
+	std::wstring to_wstring(T val, int precision = -1) {
 		std::wostringstream ss;
+
+		if (precision > -1)
+			ss << std::fixed << std::setprecision(precision);
+
 		ss << val;
 		return ss.str();
 	}

@@ -1,4 +1,5 @@
 #include "text_rect.h"
+#include <algorithm>
 
 namespace augs {
 	namespace gui {
@@ -10,6 +11,13 @@ namespace augs {
 			void text_rect::draw_triangles(draw_info in) {
 				draft.guarded_redraw();
 				print.draw_text(in.v, draft.get_draft(), draft.get_str(), 0, *this);
+			}
+
+			void text_rect::set_text(const fstr& f) {
+				if (draft.get_str().size() == f.size() && !memcmp(draft.get_str().data(), f.data(), f.size() * sizeof(formatted_char)))
+					return;
+				
+				draft.str() = f;
 			}
 
 			void text_rect::center(rects::ltrb<float> r) {

@@ -7,6 +7,16 @@
 #include "game_framework/shared/inventory_utils.h"
 #include "game_framework/components/gui_element_component.h"
 
+#include "augs/stream.h"
+
+slot_button::slot_button() {
+	clip = false;
+}
+
+void slot_button::get_member_children(std::vector<augs::gui::rect_id>& children) {
+	children.push_back(&space_caption);
+}
+
 void slot_button::draw_triangles(draw_info info) {
 	auto is_hand_slot = slot_id.is_hand_slot();
 
@@ -56,6 +66,14 @@ void slot_button::draw_triangles(draw_info info) {
 	else {
 		draw_centered_texture(info, inside_mat);
 		draw_centered_texture(info, border_mat);
+
+		auto space_available_text = augs::gui::text::format(augs::to_wstring(slot_id.calculate_free_space_with_parent_containers(), 2)
+			, augs::gui::text::style(assets::font_id::GUI_FONT, border_col));
+
+		space_caption.set_text(space_available_text);
+		space_caption.center(rc);
+
+		draw_children(info);
 	}
 }
 

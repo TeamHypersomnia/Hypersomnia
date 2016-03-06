@@ -1,11 +1,17 @@
 #pragma once
 #include "augs/gui/rect.h"
 #include "augs/gui/appearance_detector.h"
+#include "augs/gui/text/text_rect.h"
 
 #include "game_framework/shared/inventory_slot_id.h"
 
 struct slot_button : augs::gui::rect {
+	slot_button();
+
 	augs::entity_id gui_element_entity;
+
+	augs::gui::text::text_rect space_caption;
+	void get_member_children(std::vector<augs::gui::rect_id>&) final;
 
 	inventory_slot_id slot_id;
 	vec2i slot_relative_pos;

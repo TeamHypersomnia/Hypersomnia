@@ -61,7 +61,12 @@ namespace augs {
 				) const
 			{
 				/* note that parent's scroll is already taken into account by absolute_xy */
-				draw_text(out, d, colors, caret, subject.get_absolute_xy() - subject.scroll, subject.clip ? &subject.get_clipping_rect() : &subject.get_parent()->get_clipping_rect());
+				if (subject.get_parent() == nullptr) 
+					draw_text(out, d, colors, caret, subject.get_absolute_xy() - subject.scroll, nullptr);
+				else {
+					auto clipping_rect = subject.clip ? subject.get_clipping_rect() : subject.get_parent()->get_clipping_rect();
+					draw_text(out, d, colors, caret, subject.get_absolute_xy() - subject.scroll, &clipping_rect);
+				}
 			}
 			void printer::draw_text(std::vector<augs::vertex_triangle>& out,
 				const drafter& d,
