@@ -94,7 +94,7 @@ namespace prefabs {
 			auto& item = ingredients::make_item(pink_charge);
 			item.space_occupied_per_charge = 0.01f;
 			item.categories_for_slot_compatibility = item_category::SHOT_CHARGE;
-			item.charges = 30;
+			item.charges = 23;
 		}
 
 		{

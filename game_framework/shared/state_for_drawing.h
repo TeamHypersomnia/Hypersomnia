@@ -4,6 +4,7 @@
 #include "../components/transform_component.h"
 
 #include "augs/entity_system/entity_id.h"
+#include "augs/graphics/vertex.h"
 
 namespace augs {
 	class renderer;
@@ -23,6 +24,8 @@ namespace shared {
 	};
 
 	struct state_for_drawing_renderable : state_for_drawing_camera {
+		std::vector<augs::vertex_triangle>* overridden_target_buffer = nullptr;
+
 		components::transform renderable_transform;
 		augs::entity_id renderable;
 		bool screen_space_mode = false;

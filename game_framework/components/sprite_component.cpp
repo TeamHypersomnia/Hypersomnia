@@ -33,10 +33,6 @@ namespace components {
 		v[3] -= size / 2.f;
 	}
 
-	sprite::sprite(assets::texture_id tex, rgba color) {
-		set(tex, color);
-	}
-
 	void sprite::set(assets::texture_id _tex, rgba _color) {
 		tex = _tex;
 		color = _color;
@@ -50,6 +46,8 @@ namespace components {
 
 	void sprite::draw(const state_for_drawing_renderable& in) const {
 		static thread_local vec2 v[4];
+		assert(tex != assets::texture_id::INVALID_TEXTURE);
+
 		vec2i transform_pos = in.renderable_transform.pos;
 		make_rect(transform_pos, vec2(size), in.renderable_transform.rotation, v);
 
@@ -114,9 +112,15 @@ namespace components {
 				render->was_drawn = true;
 			}
 		}
-
-		in.output->push_triangle(t1);
-		in.output->push_triangle(t2);
+	
+		if (in.overridden_target_buffer) {
+			in.overridden_target_buffer->push_back(t1);
+			in.overridden_target_buffer->push_back(t2);
+		}
+		else {
+			in.output->push_triangle(t1);
+			in.output->push_triangle(t2);
+		}
 	}
 
 	std::vector<vec2> sprite::get_vertices() const {

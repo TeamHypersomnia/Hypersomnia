@@ -10,6 +10,7 @@ namespace augs {
 
 namespace assets {
 	enum texture_id {
+		INVALID_TEXTURE,
 		BLANK,
 
 		CRATE,

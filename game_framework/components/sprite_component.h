@@ -14,7 +14,7 @@ namespace components {
 	struct sprite {
 		static void make_rect(vec2 pos, vec2 size, float rotation_degrees, vec2 out[4]);
 
-		assets::texture_id tex = assets::BLANK;
+		assets::texture_id tex = assets::texture_id::INVALID_TEXTURE;
 		augs::rgba color;
 		vec2 size;
 		vec2 center_offset;
@@ -22,8 +22,6 @@ namespace components {
 
 		bool flip_horizontally = false;
 		bool flip_vertically = false;
-
-		sprite(assets::texture_id = assets::BLANK, augs::rgba = augs::rgba());
 
 		void set(assets::texture_id, augs::rgba = augs::rgba());
 		void update_size();

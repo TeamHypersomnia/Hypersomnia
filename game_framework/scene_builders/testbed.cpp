@@ -53,6 +53,10 @@ namespace scene_builders {
 		resource_manager.create(assets::texture_id::TEST_SPRITE, L"hypersomnia/gfx/frog.png");
 
 		resource_manager.create(assets::texture_id::ASSAULT_RIFLE, L"hypersomnia/gfx/assault_rifle.png");
+
+		auto& assault_rifle_gui = resource_manager.find(assets::texture_id::ASSAULT_RIFLE)->gui_sprite_def;
+		assault_rifle_gui.flip_horizontally = true;
+
 		resource_manager.create(assets::texture_id::SHOTGUN, L"hypersomnia/gfx/shotgun.png");
 		resource_manager.create(assets::texture_id::SAMPLE_MAGAZINE, L"hypersomnia/gfx/magazine.png");
 		resource_manager.create(assets::texture_id::PINK_CHARGE, L"hypersomnia/gfx/pink_charge.png");
