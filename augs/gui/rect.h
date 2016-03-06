@@ -72,6 +72,7 @@ namespace augs {
 			rect_id prev_focusable = nullptr;
 
 			bool enable_drawing = true;
+			bool enable_drawing_of_children = true;
 			bool clip = true;
 			bool fetch_wheel = false;
 			bool scrollable = true;

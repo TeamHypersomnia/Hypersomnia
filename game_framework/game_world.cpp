@@ -109,6 +109,7 @@ void game_world::call_drawing_time_systems() {
 
 	get_system<animation_system>().transform_response_requests_to_animation_messages();
 	
+	get_system<gui_system>().rebuild_gui_tree_based_on_game_state();
 	get_system<gui_system>().translate_raw_window_inputs_to_gui_events();
 	
 	get_system<input_system>().post_unmapped_intents_from_raw_window_inputs();
@@ -139,8 +140,6 @@ void game_world::call_drawing_time_systems() {
 	get_system<camera_system>().post_render_requests_for_all_cameras();
 
 	get_system<input_system>().acquire_new_events_posted_by_drawing_time_systems();
-
-	get_system<gui_system>().rebuild_gui_tree_based_on_game_state();
 }
 
 void game_world::restore_transforms_after_drawing() {

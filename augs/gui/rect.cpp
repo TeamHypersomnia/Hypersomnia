@@ -271,12 +271,14 @@ namespace augs {
 			event_info e(gr, gui_event::unknown);
 
 			if (enable_drawing) {
-				auto children_all = children;
-				get_member_children(children_all);
-				for (int i = children_all.size() - 1; i >= 0; --i) {
-					if (!children_all[i]->enable_drawing) continue;
-					children_all[i]->parent = this;
-					children_all[i]->consume_raw_input_and_generate_gui_events(inf);
+				if (enable_drawing_of_children) {
+					auto children_all = children;
+					get_member_children(children_all);
+					for (int i = children_all.size() - 1; i >= 0; --i) {
+						if (!children_all[i]->enable_drawing) continue;
+						children_all[i]->parent = this;
+						children_all[i]->consume_raw_input_and_generate_gui_events(inf);
+					}
 				}
 
 				//if(msg == key::down) consume_gui_event(e = gui_event::keydown); 

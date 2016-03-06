@@ -6,7 +6,7 @@
 #include "augs/gui/gui_world.h"
 
 struct game_gui_root : public augs::gui::rect {
-	augs::gui::rect inventory_root;
+	augs::gui::rect inventory_overroot;
 	augs::gui::rect game_windows_root;
 
 	void get_member_children(std::vector<augs::gui::rect_id>& children) final;
@@ -41,4 +41,5 @@ public:
 	void draw_gui_overlays_for_camera_rendering_request(messages::camera_render_request_message);
 
 	rects::xywh<float> get_rectangle_for_slot_function(slot_function);
+	vec2 initial_inventory_root_position();
 };

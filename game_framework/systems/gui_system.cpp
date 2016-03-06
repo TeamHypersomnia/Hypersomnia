@@ -16,7 +16,7 @@
 #include "crosshair_system.h"
 
 void game_gui_root::get_member_children(std::vector<augs::gui::rect_id>& children) {
-	children.push_back(&inventory_root);
+	children.push_back(&inventory_overroot);
 	children.push_back(&game_windows_root);
 }
 
@@ -24,7 +24,7 @@ gui_system::gui_system(world& parent_world) : processing_system_templated(parent
 	gui.root.children.push_back(&game_gui_root);
 	gui.root.clip = false;
 	game_gui_root.clip = false;
-	game_gui_root.inventory_root.clip = false;
+	game_gui_root.inventory_overroot.clip = false;
 	game_gui_root.game_windows_root.clip = false;
 }
 
@@ -58,17 +58,19 @@ augs::entity_id gui_system::get_game_world_crosshair() {
 }
 
 void gui_system::rebuild_gui_tree_based_on_game_state() {
-	game_gui_root.inventory_root.cache_descendants_before_children_reassignment();
+	game_gui_root.inventory_overroot.cache_descendants_before_children_reassignment();
 
-	std::vector<augs::gui::rect_id> new_inventory_elements;
+	std::vector<augs::gui::rect_id> inventory_roots;
 
-	for (auto& t : targets) {
-		auto* item_slot_transfers = t->find<components::item_slot_transfers>();
-		auto& element = t->get<components::gui_element>();
+	for (auto& root : targets) {
+		auto* item_slot_transfers = root->find<components::item_slot_transfers>();
+		auto& element = root->get<components::gui_element>();
 
 		if (item_slot_transfers) {
 			decltype(element.slot_metadata) new_slot_meta;
 			decltype(element.item_metadata) new_item_meta;
+
+			// construct metadata tree to know the already unneeded entries and to see the new ones
 
 			std::function<void(augs::entity_id)> iterate_inventory_tree 
 				= [&new_slot_meta, &new_item_meta, &iterate_inventory_tree](augs::entity_id container) {
@@ -87,72 +89,97 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 				}
 			};
 
-			iterate_inventory_tree(t);
+			new_item_meta[root] = item_button();
+			iterate_inventory_tree(root);
 
-			auto& slot_meta = element.slot_metadata;
-			auto& item_meta = element.item_metadata;
+			auto& previous_slot_meta = element.slot_metadata;
+			auto& previous_item_meta = element.item_metadata;
+
+			// destroy unneeded metadata entries (possibly save elsewhere to preserve drag positions?)
 
 			std::vector<inventory_slot_id> slots_to_erase;
 			std::vector<augs::entity_id> items_to_erase;
 
-			for (auto& entry : slot_meta) {
-				bool element_was_destroyed = new_slot_meta.find(entry.first) == new_slot_meta.end();
+			for (auto& old_entry : previous_slot_meta) {
+				old_entry.second.children.clear();
+
+				bool element_was_destroyed = new_slot_meta.find(old_entry.first) == new_slot_meta.end();
 
 				if (element_was_destroyed)
-					slots_to_erase.push_back(entry.first);
+					slots_to_erase.push_back(old_entry.first);
 			}
 			
-			for (auto& entry : item_meta) {
-				bool element_was_destroyed = new_item_meta.find(entry.first) == new_item_meta.end();
+			for (auto& old_entry : previous_item_meta) {
+				old_entry.second.children.clear();
+
+				bool element_was_destroyed = new_item_meta.find(old_entry.first) == new_item_meta.end();
 
 				if (element_was_destroyed)
-					items_to_erase.push_back(entry.first);
+					items_to_erase.push_back(old_entry.first);
 			}
 
-			for (auto& s : slots_to_erase) slot_meta.erase(s);
-			for (auto& i : items_to_erase) item_meta.erase(i);
+			for (auto& s : slots_to_erase) previous_slot_meta.erase(s);
+			for (auto& i : items_to_erase) previous_item_meta.erase(i);
 
-			for (auto& entry : new_slot_meta) {
-				bool new_slot_appeared = slot_meta.find(entry.first) == slot_meta.end();
+			// construct new metadata entries
+
+			for (auto& new_entry : new_slot_meta) {
+				bool new_slot_appeared = previous_slot_meta.find(new_entry.first) == previous_slot_meta.end();
 
 				if (new_slot_appeared) {
-					auto& new_slot = entry.second;
-					new_slot.slot_id = entry.first;
-					new_slot.rc = get_rectangle_for_slot_function(entry.first.type);
+					auto& new_slot = new_entry.second;
+					new_slot.gui_element_entity = root;
+					new_slot.slot_id = new_entry.first;
+					new_slot.rc = get_rectangle_for_slot_function(new_entry.first.type);
 					new_slot.slot_relative_pos = new_slot.rc.get_position();
 
-					slot_meta.insert(entry);
+					previous_slot_meta.insert(new_entry);
 				}
 			}
 
-			for (auto& entry : new_item_meta) {
-				bool new_item_appeared = item_meta.find(entry.first) == item_meta.end();
+			for (auto& new_entry : new_item_meta) {
+				bool new_item_appeared = previous_item_meta.find(new_entry.first) == previous_item_meta.end();
 
 				if (new_item_appeared) {
-					auto& new_item = entry.second;
-					new_item.item = entry.first;
-					new_item.rc.set_position(slot_meta[new_item.item->get<components::item>().current_slot].rc.get_position());
-					new_item.rc.set_size(64, 64);
+					auto& new_item = new_entry.second;
+					new_item.gui_element_entity = root;
+					new_item.item = new_entry.first;
 
-					item_meta.insert(entry);
+					if (new_item.is_inventory_root()) {
+						new_item.rc.set_position(initial_inventory_root_position());
+						new_item.rc.set_size(0, 0);
+					}
+					else {
+						new_item.rc.set_position(previous_slot_meta[new_item.item->get<components::item>().current_slot].rc.get_position());
+						new_item.rc.set_size(64, 64);
+					}
+
+					previous_item_meta.insert(new_entry);
 				}
 			}
 
-			for (auto& entry : item_meta)
-				new_inventory_elements.push_back(&entry.second);
+			// construct raw gui rectangle tree from metadata of items and slot 
 
-			for (auto& entry : slot_meta)
-				new_inventory_elements.push_back(&entry.second);
-		}
-		
-		auto* crosshair = t->find<components::crosshair>();
-		
-		if (crosshair) {
-		
+			for (auto& entry : previous_item_meta) {
+				bool is_it_root = entry.first == root;
+
+				if (!is_it_root) {
+					auto item_parent = entry.second.item->get<components::item>().current_slot.container_entity;
+					get_meta(item_parent).children.push_back(&entry.second);
+				}
+			}
+
+			for (auto& entry : previous_slot_meta) {
+				auto parent = entry.second.slot_id.container_entity;
+				auto& meta = get_meta(parent);
+				meta.children.push_back(&entry.second);
+			}
+
+			inventory_roots.push_back(&previous_item_meta[root]);
 		}
 	}
 	
-	gui.reassign_children_and_unset_invalid_handles(&game_gui_root.inventory_root, new_inventory_elements);
+	gui.reassign_children_and_unset_invalid_handles(&game_gui_root.inventory_overroot, inventory_roots);
 	gui.perform_logic_step();
 }
 
@@ -171,6 +198,7 @@ void gui_system::translate_raw_window_inputs_to_gui_events() {
 		w.raw_window_input.mouse.pos = gui_crosshair_position;
 
 		gui.consume_raw_input_and_generate_gui_events(w.raw_window_input);
+		gui.perform_logic_step();
 	}
 }
 
