@@ -8,6 +8,7 @@
 #include "game_framework/components/item_component.h"
 
 #include "game_framework/shared/state_for_drawing.h"
+#include "game_framework/settings.h"
 
 #include "augs/graphics/renderer.h"
 #include "game_framework/resources/manager.h"
@@ -102,13 +103,24 @@ void item_button::draw_proc(draw_info in, bool dragged_ghost) {
 
 	auto& item_data = item->get<components::item>();
 
-	if (draw_inside && item_data.charges > 1) {
-		auto charges_text = augs::gui::text::format(augs::to_wstring(item_data.charges)
-			, augs::gui::text::style(assets::font_id::GUI_FONT, border_col));
+	if (draw_inside) {
+		float bottom_number_val = -1.f;
+		auto* container = item->find<components::container>();
 
-		charges_caption.set_text(charges_text);
-		charges_caption.bottom_right(get_rect_absolute());
-		charges_caption.draw(in);
+		if (item_data.charges > 1)
+			bottom_number_val = item_data.charges;
+		else if (DRAW_FREE_SPACE_INSIDE_CONTAINER_ICONS && item[slot_function::ITEM_DEPOSIT].alive()) {
+			bottom_number_val = item[slot_function::ITEM_DEPOSIT].calculate_free_space_with_parent_containers();
+		}
+
+		if (bottom_number_val > -1.f) {
+			auto bottom_number = augs::gui::text::format(augs::to_wstring(bottom_number_val)
+				, augs::gui::text::style(assets::font_id::GUI_FONT, border_col));
+
+			charges_caption.set_text(bottom_number);
+			charges_caption.bottom_right(get_rect_absolute());
+			charges_caption.draw(in);
+		}
 	}
 
 	auto parent_slot = item->get<components::item>().current_slot;

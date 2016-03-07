@@ -93,9 +93,10 @@ void slot_button::draw_triangles(draw_info info) {
 
 void slot_button::perform_logic_step(augs::gui::gui_world& gr) {
 	rect::perform_logic_step(gr);
-	enable_drawing = true;
 
 	if (slot_id->is_attachment_slot) {
+		enable_drawing = true;
+
 		if (slot_id.has_items()) {
 			if (get_meta(slot_id->items_inside[0]).is_being_dragged(gr))
 				enable_drawing = true;

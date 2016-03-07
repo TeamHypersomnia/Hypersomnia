@@ -14,6 +14,7 @@
 #include "../components/container_component.h"
 
 #include "crosshair_system.h"
+#include "game_framework/settings.h"
 
 void game_gui_root::get_member_children(std::vector<augs::gui::rect_id>& children) {
 	children.push_back(&inventory_overroot);
@@ -128,10 +129,16 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 
 				if (new_slot_appeared) {
 					auto& new_slot = new_entry.second;
+
 					new_slot.gui_element_entity = root;
 					new_slot.slot_id = new_entry.first;
 					new_slot.rc = get_rectangle_for_slot_function(new_entry.first.type);
 					new_slot.slot_relative_pos = new_slot.rc.get_position();
+					
+					if ((DRAW_FREE_SPACE_INSIDE_CONTAINER_ICONS && new_entry.first.type == slot_function::ITEM_DEPOSIT)) {
+						new_slot.enable_drawing = false;
+						new_slot.enable_drawing_of_children = false;
+					}
 
 					previous_slot_meta.insert(new_entry);
 				}
@@ -158,7 +165,7 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 				}
 			}
 
-			// construct raw gui rectangle tree from metadata of items and slot 
+			// construct raw gui rectangle tree from metadata of items and slots 
 
 			for (auto& entry : previous_item_meta) {
 				bool is_it_root = entry.first == root;
