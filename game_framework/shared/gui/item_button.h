@@ -20,7 +20,7 @@ struct item_button : augs::gui::rect {
 	bool is_container_open = false;
 	augs::entity_id item;
 
-	vec2 user_drag_offset;
+	vec2i drag_offset_in_item_deposit;
 
 	void perform_logic_step(augs::gui::gui_world&) final;
 
