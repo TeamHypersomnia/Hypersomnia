@@ -24,7 +24,7 @@ void slot_button::draw_triangles(draw_info info) {
 	rgba inside_col, border_col;
 	
 	if (slot_id->for_categorized_items_only) {
-		inside_col = orange;
+		inside_col = violet;
 	}
 	else
 		inside_col = cyan;
