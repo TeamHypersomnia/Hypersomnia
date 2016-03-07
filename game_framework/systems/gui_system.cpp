@@ -238,7 +238,7 @@ void gui_system::switch_to_gui_mode_and_back() {
 		}
 
 		if (i.intent == intent_type::START_PICKING_UP_ITEMS) {
-			preview_due_to_item_picking_request = i.pressed_flag;
+			//preview_due_to_item_picking_request = i.pressed_flag;
 		}
 	}
 }

@@ -55,13 +55,16 @@ namespace augs {
 
 	public:
 		class id {
+#ifdef USE_NAMES_FOR_IDS
+			char debug_name[30];
+#endif
 		protected:
 			friend class memory_pool;
 
 			pool_id owner;
 			int version = 0xdeadbeef;
 			int indirection_index = 0xdeadbeef;
-			
+
 		public:
 			id();
 
@@ -78,9 +81,9 @@ namespace augs {
 			bool dead() const;
 
 			void unset();
-#ifdef USE_NAMES_FOR_IDS
-			char debug_name[30];
-#endif
+
+			void set_debug_name(std::string);
+			std::string get_debug_name();
 		};
 
 		template <typename T>
@@ -107,9 +110,8 @@ namespace augs {
 			bool dead() const { return id::dead(); }
 
 			using id::unset;
-#ifdef USE_NAMES_FOR_IDS
-			using id::debug_name;
-#endif
+			using id::get_debug_name;
+			using id::set_debug_name;
 		};
 
 		template <typename T>

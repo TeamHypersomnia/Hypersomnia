@@ -62,6 +62,21 @@ namespace augs {
 #endif
 	}
 
+	void memory_pool::id::set_debug_name(std::string s) {
+#ifdef USE_NAMES_FOR_IDS
+		assert(s.size() < sizeof(debug_name) / sizeof(char));
+		strcpy(debug_name, s.c_str());
+#endif
+	}
+
+	std::string memory_pool::id::get_debug_name() {
+#ifdef USE_NAMES_FOR_IDS
+		return debug_name;
+#else
+		assert(0);
+#endif
+	}
+
 	void memory_pool::initialize(int slot_count, int slot_size) {
 		this->slot_size = slot_size;
 		resize(slot_count);

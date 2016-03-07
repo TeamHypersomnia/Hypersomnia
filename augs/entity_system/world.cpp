@@ -23,9 +23,9 @@ namespace augs {
 		res->debug_name = debug_name;
 
 #ifdef USE_NAMES_FOR_IDS
-		strcpy(res.debug_name, debug_name.c_str());
+		res.set_debug_name(debug_name);
+		assert(res.get_debug_name() != "");
 #endif
-		assert(res.debug_name != "");
 
 		messages::new_entity_message msg;
 		msg.subject = res;
@@ -46,7 +46,7 @@ namespace augs {
 		auto new_id = entities.get_id(e);
 
 #ifdef USE_NAMES_FOR_IDS
-		strcpy(new_id.debug_name, e->debug_name.c_str());
+		new_id.set_debug_name(e->debug_name);
 #endif
 
 		return new_id;

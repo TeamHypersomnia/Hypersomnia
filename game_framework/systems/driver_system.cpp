@@ -14,7 +14,7 @@
 
 #include "entity_system/world.h"
 
-void driver_system::assign_drivers_from_triggers() {
+void driver_system::assign_drivers_from_successful_trigger_hits() {
 	auto& confirmations = parent_world.get_message_queue<messages::trigger_hit_confirmation_message>();
 
 	for (auto& e : confirmations) {
