@@ -29,6 +29,8 @@ public:
 	augs::entity_id gui_crosshair;
 
 	bool is_gui_look_enabled = false;
+	bool preview_due_to_item_picking_request = false;
+	
 	vec2 gui_crosshair_position;
 
 	void rebuild_gui_tree_based_on_game_state();

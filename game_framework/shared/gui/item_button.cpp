@@ -118,11 +118,14 @@ void item_button::draw_proc(draw_info in, bool dragged_ghost) {
 	if (draw_inside) {
 		float bottom_number_val = -1.f;
 		auto* container = item->find<components::container>();
+		bool append_x = false;
 
 		auto label_color = border_col;
 
-		if (item_data.charges > 1)
+		if (item_data.charges > 1) {
 			bottom_number_val = item_data.charges;
+			append_x = true;
+		}
 		else if (DRAW_FREE_SPACE_INSIDE_CONTAINER_ICONS && item[slot_function::ITEM_DEPOSIT].alive()) {
 			bottom_number_val = item[slot_function::ITEM_DEPOSIT].calculate_free_space_with_parent_containers();
 
@@ -133,8 +136,11 @@ void item_button::draw_proc(draw_info in, bool dragged_ghost) {
 		}
 
 		if (bottom_number_val > -1.f) {
-			auto bottom_number = augs::gui::text::format(augs::to_wstring(bottom_number_val)
-				, augs::gui::text::style(assets::font_id::GUI_FONT, label_color));
+			auto label_wstr = augs::to_wstring(bottom_number_val);
+			if (append_x) label_wstr = L'x' + label_wstr;
+			// else label_wstr = L'{' + label_wstr + L'}';
+
+			auto bottom_number = augs::gui::text::format(label_wstr, augs::gui::text::style(assets::font_id::GUI_FONT, label_color));
 
 			charges_caption.set_text(bottom_number);
 			charges_caption.bottom_right(get_rect_absolute());

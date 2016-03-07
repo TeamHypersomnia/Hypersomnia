@@ -30,22 +30,24 @@ gui_system::gui_system(world& parent_world) : processing_system_templated(parent
 }
 
 void gui_system::draw_gui_overlays_for_camera_rendering_request(messages::camera_render_request_message r) {
-	if (!is_gui_look_enabled)
+	if (!is_gui_look_enabled && !preview_due_to_item_picking_request)
 		return;
 
 	gui.draw_triangles();
 	r.state.output->push_triangles_from_gui_world(gui);
 
-	components::sprite cursor_sprite;
-	cursor_sprite.set(assets::texture_id::GUI_CURSOR);
-	cursor_sprite.color = cyan;
+	if (is_gui_look_enabled) {
+		components::sprite cursor_sprite;
+		cursor_sprite.set(assets::texture_id::GUI_CURSOR);
+		cursor_sprite.color = cyan;
 
-	shared::state_for_drawing_renderable state;
-	state.setup_camera_state(r.state);
-	state.screen_space_mode = true;
-	state.renderable_transform.pos = gui_crosshair_position;
+		shared::state_for_drawing_renderable state;
+		state.setup_camera_state(r.state);
+		state.screen_space_mode = true;
+		state.renderable_transform.pos = gui_crosshair_position;
 
-	cursor_sprite.draw(state);
+		cursor_sprite.draw(state);
+	}
 }
 
 augs::entity_id gui_system::get_game_world_crosshair() {
@@ -233,6 +235,10 @@ void gui_system::switch_to_gui_mode_and_back() {
 	for (auto& i : intents) {
 		if (i.intent == intent_type::SWITCH_TO_GUI && i.pressed_flag) {
 			is_gui_look_enabled = !is_gui_look_enabled;
+		}
+
+		if (i.intent == intent_type::START_PICKING_UP_ITEMS) {
+			preview_due_to_item_picking_request = i.pressed_flag;
 		}
 	}
 }
