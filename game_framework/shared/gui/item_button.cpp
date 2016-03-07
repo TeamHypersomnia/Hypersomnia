@@ -128,6 +128,15 @@ void item_button::perform_logic_step(augs::gui::gui_world& gr) {
 		rc.set_size(rounded_size);
 	}
 
+	if (is_inventory_root())
+		return;
+
+	auto parent_slot = item->get<components::item>().current_slot;
+	
+	if (parent_slot->is_attachment_slot) {
+		rc.set_position(get_meta(parent_slot).rc.get_position());
+	}
+
 	//if (slot_id.container_entity->find<components::item>()) {
 	//
 	//}
@@ -146,10 +155,10 @@ void item_button::consume_gui_event(event_info info) {
 	detector.update_appearance(info);
 	auto parent_slot = item->get<components::item>().current_slot;
 
-	//if (info == rect::gui_event::ldrag) {
-	//	if(parent_slot->is_attachment_slot)
-	//		user_drag_offset = (info.owner.state.mouse.pos - get_meta(parent_slot).get_rect_absolute().get_position() - info.owner.ldrag_relative_anchor);
-	//}
+	if (info == rect::gui_event::lfinisheddrag) {
+		if(parent_slot->is_attachment_slot)
+			get_meta(parent_slot).user_drag_offset += info.owner.current_drag_amount;
+	}
 
 	// if(being_dragged && inf == rect::gui_event::lup)
 }
