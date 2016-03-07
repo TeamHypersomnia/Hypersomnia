@@ -14,6 +14,8 @@
 
 #include "augs/stream.h"
 
+#include "pixel_line_connector.h"
+
 void item_button::get_member_children(std::vector<augs::gui::rect_id>& children) {
 	// children.push_back(&charges_caption);
 }
@@ -107,6 +109,12 @@ void item_button::draw_proc(draw_info in, bool dragged_ghost) {
 		charges_caption.set_text(charges_text);
 		charges_caption.bottom_right(get_rect_absolute());
 		charges_caption.draw(in);
+	}
+
+	auto parent_slot = item->get<components::item>().current_slot;
+
+	if (!dragged_ghost && get_meta(parent_slot).gui_element_entity != parent_slot.container_entity) {
+		draw_pixel_line_connector(get_rect_absolute(), get_meta(parent_slot.container_entity).get_rect_absolute(), in, border_col);
 	}
 }
 

@@ -10,8 +10,8 @@ rects::xywh<float> gui_system::get_rectangle_for_slot_function(slot_function f) 
 
 	case slot_function::ITEM_DEPOSIT: return rects::xywh<float>(0, -100, 33, 33);
 
-	case slot_function::GUN_DETACHABLE_MAGAZINE: return rects::xywh<float>(0, -50, 33, 33);
-	case slot_function::GUN_CHAMBER: return rects::xywh<float>(0, 50, 33, 33);
+	case slot_function::GUN_DETACHABLE_MAGAZINE: return rects::xywh<float>(0, 50, 33, 33);
+	case slot_function::GUN_CHAMBER: return rects::xywh<float>(0, -50, 33, 33);
 	default: assert(0);
 	}
 	assert(0);

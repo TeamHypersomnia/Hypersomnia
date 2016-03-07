@@ -77,6 +77,8 @@ namespace scene_builders {
 		resource_manager.create(assets::texture_id::PRIMARY_HAND_ICON, L"hypersomnia/gfx/primary_hand_icon.png");
 		resource_manager.create(assets::texture_id::SHOULDER_SLOT_ICON, L"hypersomnia/gfx/shoulder_slot_icon.png");
 		resource_manager.create(assets::texture_id::ARMOR_SLOT_ICON, L"hypersomnia/gfx/armor_slot_icon.png");
+		resource_manager.create(assets::texture_id::CHAMBER_SLOT_ICON, L"hypersomnia/gfx/chamber_slot_icon.png");
+		resource_manager.create(assets::texture_id::DETACHABLE_MAGAZINE_ICON, L"hypersomnia/gfx/detachable_magazine_slot_icon.png");
 
 		auto& font = resource_manager.create(assets::font_id::GUI_FONT);
 		font.open("hypersomnia/Kubasta.ttf", 16, L" ABCDEFGHIJKLMNOPRSTUVWXYZQabcdefghijklmnoprstuvwxyzq0123456789.!@#$%^&*()_+-=[];'\\,./{}:\"|<>?");
@@ -115,9 +117,9 @@ namespace scene_builders {
 			ingredients::crate_physics(frog);
 		}
 
-		auto car = prefabs::create_car(world, components::transform(-300, 0, -90));
-		auto car2 = prefabs::create_car(world, components::transform(-800, 0, -90));
-		auto car3 = prefabs::create_car(world, components::transform(-1300, 0, -90));
+		auto car = prefabs::create_car(world, components::transform(-300, -600, -90));
+		auto car2 = prefabs::create_car(world, components::transform(-800, -600, -90));
+		auto car3 = prefabs::create_car(world, components::transform(-1300, -600, -90));
 
 		auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, -600, -90));
 
@@ -168,10 +170,18 @@ namespace scene_builders {
 		ingredients::crate_physics(crate4);
 
 		prefabs::create_sample_rifle(world, vec2(100, -500));
+		prefabs::create_sample_rifle(world, vec2(100, -500 + 50));
+		prefabs::create_sample_rifle(world, vec2(100, -500 + 100));
 		prefabs::create_sample_magazine(world, vec2(100, -650));
+		prefabs::create_sample_magazine(world, vec2(100 - 50, -650));
+		prefabs::create_sample_magazine(world, vec2(100 - 100, -650));
 		prefabs::create_pink_charge(world, vec2(100, 100));
+		prefabs::create_pink_charge(world, vec2(100, -400));
+		prefabs::create_pink_charge(world, vec2(150, -400));
+		prefabs::create_pink_charge(world, vec2(200, -400));
 
 		auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
+		prefabs::create_sample_backpack(world, vec2(200, -750));
 
 		input_system::context active_context;
 		active_context.map_key_to_intent(window::event::keys::W, intent_type::MOVE_FORWARD);

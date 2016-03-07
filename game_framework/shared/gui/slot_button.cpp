@@ -8,6 +8,7 @@
 #include "game_framework/components/gui_element_component.h"
 
 #include "augs/stream.h"
+#include "pixel_line_connector.h"
 
 slot_button::slot_button() {
 	clip = false;
@@ -62,6 +63,14 @@ void slot_button::draw_triangles(draw_info info) {
 		if (slot_id.type == slot_function::TORSO_ARMOR_SLOT) {
 			draw_centered_texture(info, augs::gui::material(assets::texture_id::ARMOR_SLOT_ICON, border_col));
 		}
+
+		if (slot_id.type == slot_function::GUN_CHAMBER) {
+			draw_centered_texture(info, augs::gui::material(assets::texture_id::CHAMBER_SLOT_ICON, border_col));
+		}
+
+		if (slot_id.type == slot_function::GUN_DETACHABLE_MAGAZINE) {
+			draw_centered_texture(info, augs::gui::material(assets::texture_id::DETACHABLE_MAGAZINE_ICON, border_col));
+		}
 	}
 	else {
 		draw_centered_texture(info, inside_mat);
@@ -75,6 +84,10 @@ void slot_button::draw_triangles(draw_info info) {
 		space_caption.draw(info);
 
 		draw_children(info);
+	}
+
+	if (gui_element_entity != slot_id.container_entity) {
+		draw_pixel_line_connector(get_rect_absolute(), get_meta(slot_id.container_entity).get_rect_absolute(), info, border_col);
 	}
 }
 
