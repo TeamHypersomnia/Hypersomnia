@@ -128,6 +128,14 @@ namespace augs {
 		return{ res.h / 360.0, res.s, res.v };
 	}
 
+	std::array<rgba_channel, 3>& rgba::rgb() {
+		return *(std::array<rgba_channel, 3>*)this;
+	}
+
+	const std::array<rgba_channel, 3>& rgba::rgb() const {
+		return *(std::array<rgba_channel, 3>*)this;
+	}
+
 	rgba& rgba::set_hsv(hsv hsv) {
 		auto res = hsv2rgb({ hsv.h * 360, hsv.s, hsv.v });
 		return (*this = rgba{ rgba_channel(res.r * 255), rgba_channel(res.g * 255), rgba_channel(res.b * 255), a });
@@ -138,6 +146,7 @@ namespace augs {
 	const rgba red(255, 0, 0, 255);
 	const rgba green(0, 144, 66, 255);
 	const rgba orange(255, 165, 0, 255);
+	const rgba pink(255, 0, 255, 255);
 	const rgba violet(164, 68, 195, 255);
 	const rgba darkred(122, 0, 0, 255);
 	const rgba black(0, 0, 0, 255);

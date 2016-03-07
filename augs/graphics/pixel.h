@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 namespace augs {
 	typedef unsigned char rgba_channel;
 
@@ -16,6 +17,8 @@ namespace augs {
 
 		bool operator==(const rgba& b) const;
 		hsv get_hsv() const;
+		std::array<rgba_channel, 3>& rgb();
+		const std::array<rgba_channel, 3>& rgb() const;
 		rgba& set_hsv(hsv);
 	};
 
@@ -25,6 +28,7 @@ namespace augs {
 	extern const rgba green;
 	extern const rgba orange;
 	extern const rgba violet;
+	extern const rgba pink;
 	extern const rgba darkred;
 	extern const rgba black;
 	extern const rgba darkgray;

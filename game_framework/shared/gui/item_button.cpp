@@ -54,15 +54,27 @@ void item_button::draw_triangles(draw_info in) {
 void item_button::draw_proc(draw_info in, bool dragged_ghost) {
 	if (is_inventory_root())
 		return;
+	
+	auto parent_slot = item->get<components::item>().current_slot;
 
 	rgba inside_col = cyan;
 	rgba border_col = cyan;
 
-	inside_col.a = 20;
-	border_col.a = 220;
+	if (parent_slot->for_categorized_items_only) {
+		border_col = pink;
+		inside_col = violet;
+	}
 
-	if (detector.is_hovered || detector.current_appearance == decltype(detector)::appearance::pushed) {
-		inside_col.a = 40;
+	inside_col.a = 20;
+	border_col.a = 190;
+
+	if (detector.is_hovered) {
+		inside_col.a = 30;
+		border_col.a = 220;
+	}
+
+	if (detector.current_appearance == decltype(detector)::appearance::pushed) {
+		inside_col.a = 60;
 		border_col.a = 255;
 	}
 
@@ -107,23 +119,28 @@ void item_button::draw_proc(draw_info in, bool dragged_ghost) {
 		float bottom_number_val = -1.f;
 		auto* container = item->find<components::container>();
 
+		auto label_color = border_col;
+
 		if (item_data.charges > 1)
 			bottom_number_val = item_data.charges;
 		else if (DRAW_FREE_SPACE_INSIDE_CONTAINER_ICONS && item[slot_function::ITEM_DEPOSIT].alive()) {
 			bottom_number_val = item[slot_function::ITEM_DEPOSIT].calculate_free_space_with_parent_containers();
+
+			if (item[slot_function::ITEM_DEPOSIT]->for_categorized_items_only)
+				label_color.rgb() = pink.rgb();
+			else
+				label_color.rgb() = cyan.rgb();
 		}
 
 		if (bottom_number_val > -1.f) {
 			auto bottom_number = augs::gui::text::format(augs::to_wstring(bottom_number_val)
-				, augs::gui::text::style(assets::font_id::GUI_FONT, border_col));
+				, augs::gui::text::style(assets::font_id::GUI_FONT, label_color));
 
 			charges_caption.set_text(bottom_number);
 			charges_caption.bottom_right(get_rect_absolute());
 			charges_caption.draw(in);
 		}
 	}
-
-	auto parent_slot = item->get<components::item>().current_slot;
 
 	if (!dragged_ghost && get_meta(parent_slot).gui_element_entity != parent_slot.container_entity) {
 		draw_pixel_line_connector(get_rect_absolute(), get_meta(parent_slot.container_entity).get_rect_absolute(), in, border_col);
