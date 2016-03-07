@@ -14,7 +14,7 @@ slot_button::slot_button() {
 }
 
 void slot_button::get_member_children(std::vector<augs::gui::rect_id>& children) {
-	children.push_back(&space_caption);
+
 }
 
 void slot_button::draw_triangles(draw_info info) {
@@ -71,7 +71,8 @@ void slot_button::draw_triangles(draw_info info) {
 			, augs::gui::text::style(assets::font_id::GUI_FONT, border_col));
 
 		space_caption.set_text(space_available_text);
-		space_caption.center(rc);
+		space_caption.center(get_rect_absolute());
+		space_caption.draw(info);
 
 		draw_children(info);
 	}
@@ -83,16 +84,18 @@ void slot_button::perform_logic_step(augs::gui::gui_world& gr) {
 
 	if (slot_id->is_attachment_slot) {
 		if (slot_id.has_items()) {
-			if (get_meta(slot_id->items_inside[0]).being_dragged)
+			if (get_meta(slot_id->items_inside[0]).is_being_dragged(gr))
 				enable_drawing = true;
 			else
 				enable_drawing = false;
 		}
 	}
 
-	vec2i parent_position;
+	auto gridded_absolute_pos = slot_relative_pos + user_drag_offset;
 	
-	auto gridded_absolute_pos = parent_position + slot_relative_pos + user_drag_offset;
+	if (is_being_dragged(gr))
+		gridded_absolute_pos += gr.current_drag_amount;
+
 	gridded_absolute_pos /= 11;
 	gridded_absolute_pos *= 11;
 	rc.set_position(gridded_absolute_pos);
@@ -101,9 +104,8 @@ void slot_button::perform_logic_step(augs::gui::gui_world& gr) {
 void slot_button::consume_gui_event(event_info info) {
 	detector.update_appearance(info);
 	
-	if (info == rect::gui_event::ldrag) {
-		user_drag_offset = (info.owner.state.mouse.pos - slot_relative_pos - info.owner.ldrag_relative_anchor);
-	}
+	if (info == rect::gui_event::lfinisheddrag)
+		user_drag_offset += info.owner.current_drag_amount;
 }
 
 slot_button& get_meta(inventory_slot_id id) {

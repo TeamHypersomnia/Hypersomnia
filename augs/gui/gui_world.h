@@ -80,11 +80,13 @@ namespace augs {
 
 			augs::window::event::state state;
 
+			bool held_rect_is_dragged = false;
 			rect *rect_held_by_lmb = nullptr;
 			rect *rect_held_by_rmb = nullptr;
 			
 			vec2i ldrag_relative_anchor;
 			vec2i last_ldown_position;
+			vec2i current_drag_amount;
 
 			rect root;
 

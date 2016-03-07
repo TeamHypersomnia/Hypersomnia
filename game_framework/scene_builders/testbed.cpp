@@ -52,16 +52,16 @@ namespace scene_builders {
 
 		resource_manager.create(assets::texture_id::TEST_SPRITE, L"hypersomnia/gfx/frog.png");
 
-		resource_manager.create(assets::texture_id::ASSAULT_RIFLE, L"hypersomnia/gfx/assault_rifle.png");
-
-		auto& assault_rifle_gui = resource_manager.find(assets::texture_id::ASSAULT_RIFLE)->gui_sprite_def;
+		auto& assault_rifle_gui = resource_manager.create(assets::texture_id::ASSAULT_RIFLE, L"hypersomnia/gfx/assault_rifle.png").gui_sprite_def;
 		assault_rifle_gui.flip_horizontally = true;
 
 		resource_manager.create(assets::texture_id::SHOTGUN, L"hypersomnia/gfx/shotgun.png");
 		resource_manager.create(assets::texture_id::SAMPLE_MAGAZINE, L"hypersomnia/gfx/magazine.png");
 		resource_manager.create(assets::texture_id::PINK_CHARGE, L"hypersomnia/gfx/pink_charge.png");
 		resource_manager.create(assets::texture_id::PINK_SHELL, L"hypersomnia/gfx/pink_shell.png");
-		resource_manager.create(assets::texture_id::BACKPACK, L"hypersomnia/gfx/backpack.png");
+
+		auto& backpack_gui = resource_manager.create(assets::texture_id::BACKPACK, L"hypersomnia/gfx/backpack.png").gui_sprite_def;
+		backpack_gui.rotation_offset = -90.f;
 
 		augs::image attachment_circle_filled;
 		attachment_circle_filled.create_filled_circle(16);
@@ -169,6 +169,7 @@ namespace scene_builders {
 
 		prefabs::create_sample_rifle(world, vec2(100, -500));
 		prefabs::create_sample_magazine(world, vec2(100, -650));
+		prefabs::create_pink_charge(world, vec2(100, 100));
 
 		auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 

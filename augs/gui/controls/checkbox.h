@@ -1,6 +1,6 @@
 #pragma once
 #include "../rect.h"
-#include "../text/text_rect.h"
+#include "../text_drawer.h"
 #include <functional>
 
 namespace augs {
@@ -28,8 +28,8 @@ namespace augs {
 				void stretch_rc();
 
 			public:
-				text::text_rect active_text;
-				text::text_rect inactive_text;
+				text_drawer active_text;
+				text_drawer inactive_text;
 
 				checklabel(const checkbox&, const std::wstring& label, const text::style& style_active, const text::style& style_inactive);
 				checklabel(const checkbox&, const text::fstr& active_str, const text::fstr& inactive_str);
@@ -38,7 +38,7 @@ namespace augs {
 
 				void get_member_children(std::vector<rect_id>&) override;
 
-				text::text_rect& active_label();
+				text_drawer& active_label();
 			};
 		}
 	}

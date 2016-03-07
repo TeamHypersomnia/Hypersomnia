@@ -107,6 +107,9 @@ namespace augs {
 		}
 
 		void rect::draw_children(draw_info in) {
+			if (!enable_drawing_of_children) 
+				return;
+
 			auto children_all = children;
 			get_member_children(children_all);
 			for (size_t i = 0; i < children_all.size(); ++i) {
@@ -357,6 +360,8 @@ namespace augs {
 					}
 				}
 				if (gr.rect_held_by_lmb == this && msg == mousemotion) {
+					gr.held_rect_is_dragged = true;
+					gr.current_drag_amount = m.pos - gr.last_ldown_position;
 					consume_gui_event(e = gui_event::ldrag);
 				}
 				//}
@@ -448,6 +453,10 @@ namespace augs {
 			for (unsigned i = 0; i < order.size(); ++i) {
 				order[i]->gen_focus_links_depth((i == order.size() - 1) ? next : order[i + 1]);
 			}
+		}
+		
+		bool rect::is_being_dragged(gui_world& g) {
+			return g.rect_held_by_lmb == this && g.held_rect_is_dragged;
 		}
 
 		const rects::ltrb<float>& rect::get_clipped_rect() const {

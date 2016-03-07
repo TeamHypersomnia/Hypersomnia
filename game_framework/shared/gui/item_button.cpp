@@ -5,11 +5,18 @@
 #include "game_framework/shared/inventory_utils.h"
 #include "game_framework/components/gui_element_component.h"
 #include "game_framework/components/sprite_component.h"
+#include "game_framework/components/item_component.h"
 
 #include "game_framework/shared/state_for_drawing.h"
 
 #include "augs/graphics/renderer.h"
 #include "game_framework/resources/manager.h"
+
+#include "augs/stream.h"
+
+void item_button::get_member_children(std::vector<augs::gui::rect_id>& children) {
+	// children.push_back(&charges_caption);
+}
 
 item_button::item_button(rects::xywh<float> rc) : rect(rc) {
 	clip = false;
@@ -20,6 +27,28 @@ item_button::item_button(rects::xywh<float> rc) : rect(rc) {
 void item_button::draw_triangles(draw_info in) {
 	draw_children(in);
 
+	draw_proc(in, false);
+
+	if (is_being_dragged(in.owner)) {
+		auto old_rc = rc;
+		rc = get_rect_absolute();
+
+		auto parent_slot = item->get<components::item>().current_slot;
+
+		//if (parent_slot->is_attachment_slot) {
+			//auto gridded_absolute_pos =	get_meta(parent_slot).get_rect_absolute().get_position() + user_drag_offset;
+			// gridded_absolute_pos /= 11;
+			// gridded_absolute_pos *= 11;
+			absolute_xy += in.owner.current_drag_amount;
+		//}
+
+		draw_proc(in, true);
+	
+		rc = old_rc;
+	}
+}
+
+void item_button::draw_proc(draw_info in, bool dragged_ghost) {
 	if (is_inventory_root())
 		return;
 
@@ -28,20 +57,31 @@ void item_button::draw_triangles(draw_info in) {
 
 	inside_col.a = 20;
 	border_col.a = 220;
-	
+
 	if (detector.is_hovered || detector.current_appearance == decltype(detector)::appearance::pushed) {
 		inside_col.a = 40;
 		border_col.a = 255;
 	}
 
-	draw_stretched_texture(in, augs::gui::material(assets::texture_id::BLANK, inside_col));
-	augs::gui::solid_stroke stroke;
-	stroke.set_material(augs::gui::material(assets::texture_id::BLANK, border_col));
-	stroke.draw(in.v, *this);
+	if (dragged_ghost) {
+		inside_col.a -= 10;
+	}
+
+	bool draw_border = !dragged_ghost;
+	bool draw_inside = dragged_ghost || !is_being_dragged(in.owner);
+
+	if(draw_inside)
+		draw_stretched_texture(in, augs::gui::material(assets::texture_id::BLANK, inside_col));
+
+	if (draw_border) {
+		augs::gui::solid_stroke stroke;
+		stroke.set_material(augs::gui::material(assets::texture_id::BLANK, border_col));
+		stroke.draw(in.v, *this);
+	}
 
 	auto* sprite = item->find<components::sprite>();
 
-	if (sprite) {
+	if (draw_inside && sprite) {
 		auto transparent_sprite = *sprite;
 		const auto& gui_def = resource_manager.find(sprite->tex)->gui_sprite_def;
 
@@ -56,6 +96,17 @@ void item_button::draw_triangles(draw_info in) {
 		state.overridden_target_buffer = &in.v;
 		state.renderable_transform.pos = get_absolute_xy() + rc.get_size()/2 - sprite->size/2;
 		transparent_sprite.draw(state);
+	}
+
+	auto& item_data = item->get<components::item>();
+
+	if (draw_inside && item_data.charges > 1) {
+		auto charges_text = augs::gui::text::format(augs::to_wstring(item_data.charges)
+			, augs::gui::text::style(assets::font_id::GUI_FONT, border_col));
+
+		charges_caption.set_text(charges_text);
+		charges_caption.bottom_right(get_rect_absolute());
+		charges_caption.draw(in);
 	}
 }
 
@@ -89,11 +140,18 @@ void item_button::perform_logic_step(augs::gui::gui_world& gr) {
 }
 
 void item_button::consume_gui_event(event_info info) {
-	detector.update_appearance(info);
+	if (is_inventory_root())
+		return;
 
-	if (info == rect::gui_event::ldrag) {
-		//user_drag_offset = (info.owner.state.mouse.pos - slot_relative_pos - info.owner.ldrag_relative_anchor);
-	}
+	detector.update_appearance(info);
+	auto parent_slot = item->get<components::item>().current_slot;
+
+	//if (info == rect::gui_event::ldrag) {
+	//	if(parent_slot->is_attachment_slot)
+	//		user_drag_offset = (info.owner.state.mouse.pos - get_meta(parent_slot).get_rect_absolute().get_position() - info.owner.ldrag_relative_anchor);
+	//}
+
+	// if(being_dragged && inf == rect::gui_event::lup)
 }
 
 

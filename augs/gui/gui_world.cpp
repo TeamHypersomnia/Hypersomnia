@@ -249,7 +249,13 @@ namespace augs {
 					}
 					else
 						rect_held_by_lmb->consume_gui_event(e = rect::gui_event::loutup);
-					rect_held_by_lmb = 0;
+
+					if (held_rect_is_dragged) 
+						rect_held_by_lmb->consume_gui_event(e = rect::gui_event::lfinisheddrag);
+
+					current_drag_amount.set(0, 0);
+					rect_held_by_lmb = nullptr;
+					held_rect_is_dragged = false;
 				}
 			}
 

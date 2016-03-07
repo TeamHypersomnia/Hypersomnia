@@ -1,7 +1,7 @@
 #pragma once
 #include "../rect.h"
 #include <functional>
-#include "../text/text_rect.h"
+#include "../text_drawer.h"
 
 namespace augs {
 	namespace gui {
@@ -23,7 +23,7 @@ namespace augs {
 			};
 
 			struct text_button : public button {
-				text::text_rect label;
+				text_drawer label;
 
 				/* centers label */
 				text_button(const button&, const text::fstr&);

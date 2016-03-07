@@ -404,6 +404,7 @@
     <ClCompile Include="game_framework\scene_builders\scene_builder.cpp" />
     <ClCompile Include="game_framework\scene_builders\testbed.cpp" />
     <ClCompile Include="game_framework\shared\gui\item_button.cpp" />
+    <ClCompile Include="game_framework\shared\gui\pixel_line_connector.cpp" />
     <ClCompile Include="game_framework\shared\gui\positioning.cpp" />
     <ClCompile Include="game_framework\shared\gui\slot_button.cpp" />
     <ClCompile Include="game_framework\shared\inventory_slot.cpp" />
@@ -468,7 +469,7 @@
     <ClCompile Include="augs\gui\text\drafter.cpp" />
     <ClCompile Include="augs\gui\text\draft_interface.cpp" />
     <ClCompile Include="augs\gui\text\printer.cpp" />
-    <ClCompile Include="augs\gui\text\text_rect.cpp" />
+    <ClCompile Include="augs\gui\text_drawer.cpp" />
     <ClCompile Include="augs\gui\text\ui.cpp" />
     <ClCompile Include="augs\gui\text\word_separator.cpp" />
     <ClCompile Include="augs\lua_state_wrapper.cpp" />
@@ -1032,6 +1033,7 @@
     <ClInclude Include="game_framework\scene_builders\scene_builder.h" />
     <ClInclude Include="game_framework\scene_builders\testbed.h" />
     <ClInclude Include="game_framework\shared\gui\item_button.h" />
+    <ClInclude Include="game_framework\shared\gui\pixel_line_connector.h" />
     <ClInclude Include="game_framework\shared\gui\slot_button.h" />
     <ClInclude Include="game_framework\shared\inventory_slot.h" />
     <ClInclude Include="game_framework\shared\inventory_slot_id.h" />
@@ -1098,7 +1100,6 @@
     <ClInclude Include="augs\gui\text\drafter.h" />
     <ClInclude Include="augs\gui\text\draft_interface.h" />
     <ClInclude Include="augs\gui\text\printer.h" />
-    <ClInclude Include="augs\gui\text\text_rect.h" />
     <ClInclude Include="augs\gui\text\ui.h" />
     <ClInclude Include="augs\gui\text\word_separator.h" />
     <ClInclude Include="augs\lua_state_wrapper.h" />

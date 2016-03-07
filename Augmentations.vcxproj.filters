@@ -939,9 +939,6 @@
     <ClCompile Include="augs\gui\text\printer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="augs\gui\text\text_rect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="augs\gui\text\ui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1105,6 +1102,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="augs\texture_baker\polygonize_sprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\shared\gui\pixel_line_connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\gui\text_drawer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2732,9 +2735,6 @@
     <ClInclude Include="augs\gui\text\printer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\gui\text\text_rect.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\gui\text\ui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3033,6 +3033,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\components\trigger_collision_detector_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\shared\gui\pixel_line_connector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

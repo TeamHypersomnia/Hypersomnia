@@ -38,17 +38,21 @@ namespace augs {
 			}
 
 			checklabel::checklabel(const checkbox& r, const std::wstring& label, const text::style& style_active, const text::style& style_inactive)
-				: checkbox(r), active_text(rects::xywh<float>(), text::format(label, style_active)), inactive_text(rects::xywh<float>(), text::format(label, style_inactive)) {
+				: checkbox(r) {
 				stretch_rc();
+				active_text.set_text(text::format(label, style_active));
+				inactive_text.set_text(text::format(label, style_inactive));
 			}
 
 			checklabel::checklabel(const checkbox& r, const text::fstr& active_str, const text::fstr& inactive_str)
-				: checkbox(r), active_text(rects::xywh<float>(), active_str), inactive_text(rects::xywh<float>(), inactive_str) {
+				: checkbox(r) {
 				stretch_rc();
+				active_text.set_text(active_str);
+				inactive_text.set_text(inactive_str);
 			}
 
 			void checklabel::get_member_children(std::vector<rect_id>& c) {
-				c.push_back(&active_label());
+				// c.push_back(&active_label());
 			}
 
 			void checklabel::on_change(bool set) {
@@ -62,7 +66,7 @@ namespace augs {
 				rc.h(size.h);
 			}
 
-			text::text_rect& checklabel::active_label() {
+			text_drawer& checklabel::active_label() {
 				return get_state() ? active_text : inactive_text;
 			}
 		}

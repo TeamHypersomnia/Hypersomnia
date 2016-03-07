@@ -38,6 +38,7 @@ namespace augs {
 				hout,
 				ldrag,
 				loutdrag,
+				lfinisheddrag,
 
 				focus,
 				blur
@@ -135,6 +136,8 @@ namespace augs {
 			void gen_focus_links_depth(rect_id next = nullptr);
 			void gen_focus_links();
 
+			bool is_being_dragged(gui_world&);
+
 			const rects::ltrb<float>& get_clipped_rect() const;
 			rects::ltrb<float> get_rect_absolute() const;
 			const vec2i& get_absolute_xy() const;
@@ -152,7 +155,7 @@ namespace augs {
 			std::vector<rect_id> cached_descendants;
 
 			virtual void perform_logic_step(gui_world&);
-		private:
+		public:
 			rects::ltrb<float> rc_clipped;
 			rects::ltrb<float> clipping_rect = rects::ltrb<float>(0, 0, std::numeric_limits<int>::max() / 2, std::numeric_limits<int>::max() / 2);
 
