@@ -26,6 +26,8 @@ struct inventory_slot_id {
 
 	bool is_hand_slot();
 	bool should_item_inside_keep_physical_body();
+	float calculate_density_multiplier_due_to_being_attached();
+
 	components::transform sum_attachment_offsets_of_parents();
 
 	augs::entity_id get_root_container();

@@ -10,12 +10,11 @@ class b2Body;
 namespace components {
 	struct fixtures {
 		struct fixture_state {
-			b2Fixture* fixture;
-			//augs::entity_id owner_friction_ground;
+			b2Fixture* fixture = nullptr;
+			int index_in_fixture_definitions = -1;
 		};
 
-		fixture_state* find_fixture(b2Fixture*);
-
+		int added_fixture_definitions = 0;
 		std::vector<fixture_state> list_of_fixtures;
 
 		bool is_friction_ground = false;

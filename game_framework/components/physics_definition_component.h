@@ -15,7 +15,7 @@ namespace components {
 		fixture_definition& new_fixture(augs::entity_id attached_to_entity = augs::entity_id()) {
 			attach_fixtures_to_entity = attached_to_entity;
 			fixtures.push_back(fixture_definition());
-			return *fixtures.rbegin();
+			return *fixtures.rbegin(); 
 		}
 	};
 }

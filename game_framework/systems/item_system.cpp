@@ -192,6 +192,7 @@ void item_system::consume_item_slot_transfer_requests() {
 				target_attachment_offset_from_container += item.attachment_offsets_per_sticking_mode[sticking];
 
 				components::physics::recreate_fixtures_and_attach_to(r.item, r.target_slot.get_root_container(), target_attachment_offset_from_container);
+				components::physics::resolve_density_of_entity(r.item);
 			}
 			else
 				components::physics::destroy_physics_of_entity(r.item);
@@ -201,6 +202,7 @@ void item_system::consume_item_slot_transfer_requests() {
 		}
 		else if (is_drop_request) {
 			components::physics::recreate_fixtures_and_attach_to(r.item, r.item);
+			components::physics::resolve_density_of_entity(r.item);
 
 			auto& item_physics = r.item->get<components::physics>();
 			auto previous_container_transform = previous_slot.container_entity->get<components::transform>();

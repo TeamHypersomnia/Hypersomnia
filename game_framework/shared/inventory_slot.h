@@ -20,6 +20,7 @@ struct inventory_slot {
 	- putting item inside does not deactivate its physics component; it is attached to the container entity instead
 	*/
 	bool is_attachment_slot = false;
+	float attachment_density_multiplier = 1.f;
 
 	bool is_holsterable() const {
 		return !is_attachment_slot;

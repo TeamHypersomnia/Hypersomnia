@@ -242,8 +242,15 @@ components::fixtures& add_fixtures_to_other_body(fixture_definition fixture_data
 			v *= PIXELS_TO_METERSf;
 
 		shape.Set(b2verts.data(), b2verts.size());
-		fixtures.list_of_fixtures.push_back({ body->CreateFixture(&fixdef) });
+		
+		components::fixtures::fixture_state new_convex_part;
+		new_convex_part.fixture = body->CreateFixture(&fixdef);
+		new_convex_part.index_in_fixture_definitions = fixtures.added_fixture_definitions;
+
+		fixtures.list_of_fixtures.push_back(new_convex_part);
 	}
+
+	++fixtures.added_fixture_definitions;
 
 	return fixtures;
 }

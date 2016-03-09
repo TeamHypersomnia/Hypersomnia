@@ -1,4 +1,7 @@
 #include "physics_component.h"
+#include "item_component.h"
+#include "driver_component.h"
+
 #include <Box2D\Box2D.h>
 
 #include "graphics/renderer.h"
@@ -170,6 +173,43 @@ namespace components {
 		}
 
 		physics.parent_world.delete_marked_messages<messages::collision_message>();
+	}
+
+	void physics::resolve_density_of_entity(augs::entity_id id) {
+		auto* maybe_physics = id->find<components::physics>();
+
+		if (maybe_physics) {
+			for (auto& f : maybe_physics->fixture_entities) {
+				if(f != id)
+					resolve_density_of_entity(f);
+			}
+		}
+
+		auto& fixtures = id->get<components::fixtures>();
+		auto& definition = id->get<components::physics_definition>();
+
+		float density_multiplier = 1.f;
+
+		auto* item = id->find<components::item>();
+
+		if (item != nullptr && item->current_slot.alive())
+			density_multiplier *= item->current_slot.calculate_density_multiplier_due_to_being_attached();
+
+		auto owner_body = get_owner_body_entity(id);
+		auto* driver = owner_body->find<components::driver>();
+
+		if (driver) {
+			if (driver->owned_vehicle.alive()) {
+				density_multiplier *= driver->density_multiplier_while_driving;
+			}
+		}
+
+		for (auto& f : fixtures.list_of_fixtures) {
+			auto& fixdef = definition.fixtures[f.index_in_fixture_definitions];
+			f.fixture->SetDensity(fixdef.density * density_multiplier);
+		}
+
+		fixtures.get_body()->ResetMassData();
 	}
 
 	entity_id physics::get_owner_friction_ground() {

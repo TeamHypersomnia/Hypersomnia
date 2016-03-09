@@ -97,7 +97,7 @@ bool driver_system::change_car_ownership(augs::entity_id driver_entity, augs::en
 		if (maybe_physics) {
 			maybe_physics->set_transform(car.left_wheel_trigger);
 			maybe_physics->set_velocity(vec2(0, 0));
-			maybe_physics->set_density(driver.density_while_driving);
+			components::physics::resolve_density_of_entity(driver_entity);
 		}
 	}
 	else {
@@ -125,7 +125,7 @@ bool driver_system::change_car_ownership(augs::entity_id driver_entity, augs::en
 		}
 
 		if (maybe_physics) {
-			maybe_physics->set_density(driver.standard_density);
+			components::physics::resolve_density_of_entity(driver_entity);
 		}
 	}
 

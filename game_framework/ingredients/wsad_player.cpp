@@ -104,8 +104,7 @@ namespace ingredients {
 		force_joint.distance_when_force_easing_starts = 20.f;
 		force_joint.power_of_force_easing_multiplier = 1.f;
 
-		driver.density_while_driving = 0.02f;
-		driver.standard_density = 0.6f;
+		driver.density_multiplier_while_driving = 0.02f;
 
 		movement.standard_linear_damping = 20.f;
 		// driver.linear_damping_while_driving = 4.f;
