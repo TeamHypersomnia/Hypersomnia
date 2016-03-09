@@ -16,6 +16,11 @@
 #include "crosshair_system.h"
 #include "game_framework/settings.h"
 
+#include "../shared/inventory_utils.h"
+
+using namespace augs;
+using namespace gui;
+
 void game_gui_root::get_member_children(std::vector<augs::gui::rect_id>& children) {
 	children.push_back(&inventory_overroot);
 	children.push_back(&game_windows_root);
@@ -39,6 +44,8 @@ void gui_system::draw_gui_overlays_for_camera_rendering_request(messages::camera
 	auto gui_cursor = assets::GUI_CURSOR;
 	auto gui_cursor_color = cyan;
 
+	std::wstring tooltip_text = L"";
+	
 	if (gui.held_rect_is_dragged) {
 		item_button* dragged_item = dynamic_cast<item_button*>(gui.rect_held_by_lmb);
 		
@@ -49,6 +56,7 @@ void gui_system::draw_gui_overlays_for_camera_rendering_request(messages::camera
 			if (target_slot || target_item && (target_item != dragged_item)) {
 				gui_cursor = assets::GUI_CURSOR_ADD;
 				gui_cursor_color = green;
+				tooltip_text = L"Insert";
 			}
 		}
 	}
@@ -64,6 +72,17 @@ void gui_system::draw_gui_overlays_for_camera_rendering_request(messages::camera
 		state.renderable_transform.pos = gui_crosshair_position;
 
 		cursor_sprite.draw(state);
+
+		if (tooltip_text.size() > 0) {
+			tooltip_drawer.set_text(text::format(tooltip_text, text::style()));
+
+			tooltip_drawer.above_left_to_right(gui_crosshair_position);
+			
+			auto& out = state.output->get_triangle_buffer();
+
+			tooltip_drawer.draw_stroke(out, black);
+			tooltip_drawer.draw(out);
+		}
 	}
 }
 

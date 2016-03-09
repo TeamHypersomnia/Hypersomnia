@@ -3,9 +3,28 @@
 
 namespace augs {
 	namespace gui {
-		void text_drawer::draw(rect::draw_info in) {
+		void text_drawer::draw_stroke(buf& v, rgba col) {
 			draft.guarded_redraw();
-			print.draw_text(in.v, draft.get_draft(), draft.get_str(), nullptr, pos, nullptr);
+
+			auto coloured_str = draft.get_str();
+			
+			for (auto& c : coloured_str)
+				c.set(c.font_used, col);
+
+			print.draw_text(v, draft.get_draft(), coloured_str, nullptr, pos + vec2(-1, 0), nullptr);
+			print.draw_text(v, draft.get_draft(), coloured_str, nullptr, pos + vec2(1, 0), nullptr);
+			print.draw_text(v, draft.get_draft(), coloured_str, nullptr, pos + vec2(0, -1), nullptr);
+			print.draw_text(v, draft.get_draft(), coloured_str, nullptr, pos + vec2(0, 1), nullptr);
+
+		}
+		
+		void text_drawer::draw(buf& v) {
+			draft.guarded_redraw();
+			print.draw_text(v, draft.get_draft(), draft.get_str(), nullptr, pos, nullptr);
+		}
+
+		void text_drawer::draw(rect::draw_info in) {
+			draw(in.v);
 		}
 
 		void text_drawer::set_text(const text::fstr& f) {
@@ -27,6 +46,13 @@ namespace augs {
 			auto bbox = draft.get_draft().get_bbox();
 
 			pos = vec2i(r.r - bbox.w, r.b - bbox.h);
+		}
+
+		void text_drawer::above_left_to_right(vec2i p) {
+			draft.guarded_redraw();
+			auto bbox = draft.get_draft().get_bbox();
+
+			pos = vec2i(p.x, p.y - bbox.h);
 		}
 	}
 }

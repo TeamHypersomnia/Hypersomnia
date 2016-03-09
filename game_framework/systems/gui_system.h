@@ -4,6 +4,7 @@
 #include "../messages/camera_render_request_message.h"
 
 #include "augs/gui/gui_world.h"
+#include "gui/text_drawer.h"
 
 struct game_gui_root : public augs::gui::rect {
 	augs::gui::rect inventory_overroot;
@@ -32,6 +33,7 @@ public:
 	bool preview_due_to_item_picking_request = false;
 	
 	vec2 gui_crosshair_position;
+	augs::gui::text_drawer tooltip_drawer;
 
 	void rebuild_gui_tree_based_on_game_state();
 	void translate_raw_window_inputs_to_gui_events();

@@ -93,6 +93,10 @@ namespace augs {
 		return triangles[i];
 	}
 
+	std::vector<vertex_triangle>& renderer::get_triangle_buffer() {
+		return triangles;
+	}
+
 	void renderer::fullscreen_quad() {
 		static float vertices[] = {
 			1.f, 1.f,

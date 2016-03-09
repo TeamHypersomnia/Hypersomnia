@@ -410,6 +410,7 @@
     <ClCompile Include="game_framework\shared\gui\positioning.cpp" />
     <ClCompile Include="game_framework\shared\gui\slot_button.cpp" />
     <ClCompile Include="game_framework\shared\inventory_slot.cpp" />
+    <ClCompile Include="game_framework\shared\inventory_utils.cpp" />
     <ClCompile Include="game_framework\shared\physics_setup_helpers.cpp" />
     <ClCompile Include="game_framework\systems\animation_system.cpp" />
     <ClCompile Include="game_framework\systems\behaviour_tree_system.cpp" />

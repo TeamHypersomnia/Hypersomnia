@@ -78,6 +78,7 @@ namespace augs {
 
 		int get_triangle_count();
 		vertex_triangle& get_triangle(int i);
+		std::vector<vertex_triangle>& get_triangle_buffer();
 
 		void clear_geometry();
 

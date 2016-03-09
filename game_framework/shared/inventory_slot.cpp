@@ -150,105 +150,28 @@ float inventory_slot_id::calculate_free_space_with_parent_containers() {
 	return maximum_space;
 }
 
-bool inventory_slot_id::can_contain(augs::entity_id id) {
-	if (dead())
-		return false;
-
+item_transfer_result inventory_slot_id::containment_result(augs::entity_id id) {
 	auto& item = id->get<components::item>();
 	auto& slot = **this;
 
 	if (item.current_slot == *this)
-		return false;
+		return item_transfer_result::THE_SAME_SLOT;
 
 	if (slot.is_attachment_slot && slot.items_inside.size() > 0)
-		return false;
+		return item_transfer_result::NO_SLOT_AVAILABLE;
 
 	if (slot.for_categorized_items_only && (slot.category_allowed & item.categories_for_slot_compatibility) == 0)
+		return item_transfer_result::INCOMPATIBLE_CATEGORIES;
+
+	if(calculate_free_space_with_parent_containers() < item.get_space_occupied())
+		return item_transfer_result::INSUFFICIENT_SPACE;
+
+	return item_transfer_result::SUCCESSFUL_TRANSFER;
+}
+
+bool inventory_slot_id::can_contain(augs::entity_id id) {
+	if (dead())
 		return false;
 
-	return calculate_free_space_with_parent_containers() >= item.get_space_occupied();
-}
-
-augs::entity_id get_owning_transfer_capability(augs::entity_id entity) {
-	auto* maybe_transfer_capability = entity->find<components::item_slot_transfers>();
-	
-	if (maybe_transfer_capability)
-		return entity;
-
-	auto* maybe_item = entity->find<components::item>();
-
-	if (!maybe_item || maybe_item->current_slot.dead())
-		return augs::entity_id();
-
-	return get_owning_transfer_capability(maybe_item->current_slot.container_entity);
-}
-
-inventory_slot_id first_free_hand(augs::entity_id root_container) {
-	auto maybe_primary = root_container[slot_function::PRIMARY_HAND];
-	auto maybe_secondary = root_container[slot_function::SECONDARY_HAND];
-
-	if (maybe_primary.is_empty_slot())
-		return maybe_primary;
-
-	if (maybe_secondary.is_empty_slot())
-		return maybe_secondary;
-
-	return inventory_slot_id();
-}
-
-inventory_slot_id determine_hand_holstering_slot(augs::entity_id item_entity, augs::entity_id searched_root_container) {
-	assert(item_entity.alive());
-	assert(searched_root_container.alive());
-
-	auto maybe_shoulder = searched_root_container[slot_function::SHOULDER_SLOT];
-
-	if (maybe_shoulder.alive()) {
-		if (maybe_shoulder.can_contain(item_entity))
-			return maybe_shoulder;
-		else if (maybe_shoulder->items_inside.size() > 0) {
-			auto maybe_item_deposit = maybe_shoulder->items_inside[0][slot_function::ITEM_DEPOSIT];
-
-			if (maybe_item_deposit.alive() && maybe_item_deposit.can_contain(item_entity))
-				return maybe_item_deposit;
-		}
-	}
-	else {
-		auto maybe_armor = searched_root_container[slot_function::TORSO_ARMOR_SLOT];
-		
-		if (maybe_armor.alive())
-			if (maybe_armor.can_contain(item_entity))
-				return maybe_armor;
-	}
-
-	return inventory_slot_id();
-}
-
-inventory_slot_id determine_pickup_target_slot(augs::entity_id item_entity, augs::entity_id searched_root_container) {
-	assert(item_entity.alive());
-	assert(searched_root_container.alive());
-
-	auto hidden_slot = determine_hand_holstering_slot(item_entity, searched_root_container);;
-
-	if (hidden_slot.alive())
-		return hidden_slot;
-
-	auto hand = first_free_hand(searched_root_container);
-	
-	if (hand.can_contain(item_entity))
-		return hand;
-
-	return inventory_slot_id();
-}
-
-inventory_slot_id map_primary_action_to_secondary_hand_if_primary_empty(augs::entity_id root_container, int is_action_secondary) {
-	inventory_slot_id subject_hand;
-	subject_hand.container_entity = root_container;
-
-	auto primary = root_container[slot_function::PRIMARY_HAND];
-	auto secondary = root_container[slot_function::SECONDARY_HAND];
-
-	if (primary.is_empty_slot())
-		return secondary;
-	else
-		return is_action_secondary ? secondary : primary;
+	return containment_result(id) == SUCCESSFUL_TRANSFER;
 }

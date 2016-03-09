@@ -19,6 +19,8 @@ struct inventory_slot_id {
 	void remove_item(augs::entity_id);
 
 	float calculate_free_space_with_parent_containers();
+	item_transfer_result containment_result(augs::entity_id);
+
 	bool can_contain(augs::entity_id);
 
 	bool has_items();

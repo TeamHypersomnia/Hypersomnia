@@ -132,28 +132,18 @@ void item_system::constrain_item_slot_transfer_intents() {
 	auto& requests = parent_world.get_message_queue<messages::item_slot_transfer_intent>();
 
 	for (auto& r : requests) {
-		auto& item = r.item->get<components::item>();
+		auto result = query_transfer_result(r);
 
-		auto item_owning_capability = get_owning_transfer_capability(r.item);
-		auto target_slot_owning_capability = get_owning_transfer_capability(r.target_slot.container_entity);
-
-		bool transfer_attempt_to_unowned_root =
-			item_owning_capability.alive() && target_slot_owning_capability.alive() &&
-			item_owning_capability != target_slot_owning_capability;
-			
-		bool transfer_attempt_to_the_same_slot = r.target_slot == item.current_slot;
-
-		bool insufficient_space_in_target = r.target_slot.alive() && !r.target_slot.can_contain(r.item);
-
-		if (transfer_attempt_to_unowned_root || transfer_attempt_to_the_same_slot || insufficient_space_in_target) {
-			assert(0);
-			continue;
+		if (result >= item_transfer_result::SUCCESSFUL_TRANSFER) {
+			messages::item_slot_transfer_request request;
+			request.intent_result = result;
+			request.item = r.item;
+			request.target_slot = r.target_slot;
+			parent_world.post_message(request);
 		}
-
-		messages::item_slot_transfer_request request;
-		request.item = r.item;
-		request.target_slot = r.target_slot;
-		parent_world.post_message(request);
+		else {
+			/* post gui message, probably with successful transfer too */
+		}
 	}
 
 	requests.clear();
@@ -166,7 +156,9 @@ void item_system::consume_item_slot_transfer_requests() {
 		auto& item = r.item->get<components::item>();
 		auto previous_slot = item.current_slot;
 
-		if (item.current_mounting == components::item::MOUNTED) {
+		assert(r.intent_result >= item_transfer_result::SUCCESSFUL_TRANSFER);
+
+		if (r.intent_result == item_transfer_result::UNMOUNT_BEFOREHAND) {
 			assert(previous_slot.alive());
 
 			item.request_unmount(r.target_slot);

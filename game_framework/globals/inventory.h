@@ -24,3 +24,16 @@ enum class slot_function {
 	SHOULDER_SLOT,
 	TORSO_ARMOR_SLOT
 };
+
+enum item_transfer_result {
+	INVALID_SLOT_OR_UNOWNED_ROOT,
+
+	/* returned by containment_result */
+	THE_SAME_SLOT,
+	INCOMPATIBLE_CATEGORIES,
+	INSUFFICIENT_SPACE,
+	NO_SLOT_AVAILABLE,
+
+	SUCCESSFUL_TRANSFER,
+	UNMOUNT_BEFOREHAND,
+};
