@@ -27,7 +27,7 @@ struct item_button : augs::gui::rect {
 	void draw_triangles(draw_info) final;
 	void consume_gui_event(event_info) final;
 
-	void draw_proc(draw_info, bool dragged_ghost);
+	void draw_proc(draw_info, bool draw_inside, bool draw_border, bool draw_connector, bool decrease_alpha, bool decrease_border_alpha = false);
 };
 
 item_button& get_meta(augs::entity_id);

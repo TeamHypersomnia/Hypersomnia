@@ -1,0 +1,32 @@
+#include "grid.h"
+
+#define GRID_WIDTH 11
+
+vec2i griddify(vec2 v) {
+	vec2i vi = v;
+	return griddify(vi);
+}
+
+vec2i griddify(vec2i vi) {
+	int prev = vi.x / GRID_WIDTH;
+	int next = prev + 1;
+	prev *= GRID_WIDTH;
+	next *= GRID_WIDTH;
+
+	if (vi.x - prev < next - vi.x) {
+		vi.x = prev;
+	}
+	else vi.x = next;
+
+	prev = vi.y / GRID_WIDTH;
+	next = prev + 1;
+	prev *= GRID_WIDTH;
+	next *= GRID_WIDTH;
+
+	if (vi.y - prev < next - vi.y) {
+		vi.y = prev;
+	}
+	else vi.y = next;
+
+	return vi;
+}

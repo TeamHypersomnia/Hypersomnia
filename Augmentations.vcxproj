@@ -404,6 +404,7 @@
     <ClCompile Include="game_framework\scene_builders\scene_builder.cpp" />
     <ClCompile Include="game_framework\scene_builders\testbed.cpp" />
     <ClCompile Include="game_framework\settings.cpp" />
+    <ClCompile Include="game_framework\shared\gui\grid.cpp" />
     <ClCompile Include="game_framework\shared\gui\item_button.cpp" />
     <ClCompile Include="game_framework\shared\gui\pixel_line_connector.cpp" />
     <ClCompile Include="game_framework\shared\gui\positioning.cpp" />
@@ -1034,6 +1035,7 @@
     <ClInclude Include="game_framework\scene_builders\scene_builder.h" />
     <ClInclude Include="game_framework\scene_builders\testbed.h" />
     <ClInclude Include="game_framework\settings.h" />
+    <ClInclude Include="game_framework\shared\gui\grid.h" />
     <ClInclude Include="game_framework\shared\gui\item_button.h" />
     <ClInclude Include="game_framework\shared\gui\pixel_line_connector.h" />
     <ClInclude Include="game_framework\shared\gui\slot_button.h" />

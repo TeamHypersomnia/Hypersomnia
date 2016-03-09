@@ -14,8 +14,10 @@ namespace resources {
 		filename.resize(filename.size() - 4);
 		filename += L"_polygonized.png";
 
+#if !(_DEBUG || NDEBUG)
 		if (augs::file_exists(filename))
 			polygonize_from_file(filename);
+#endif
 	}
 	
 	void texture_with_image::polygonize_from_file(std::wstring filename) {

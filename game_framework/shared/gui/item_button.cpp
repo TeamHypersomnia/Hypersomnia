@@ -16,6 +16,7 @@
 #include "augs/stream.h"
 
 #include "pixel_line_connector.h"
+#include "grid.h"
 
 void item_button::get_member_children(std::vector<augs::gui::rect_id>& children) {
 	// children.push_back(&charges_caption);
@@ -28,30 +29,25 @@ item_button::item_button(rects::xywh<float> rc) : rect(rc) {
 }
 
 void item_button::draw_triangles(draw_info in) {
-	draw_children(in);
-
-	draw_proc(in, false);
-
 	if (is_being_dragged(in.owner)) {
-		auto old_rc = rc;
-		rc = get_rect_absolute();
-
 		auto parent_slot = item->get<components::item>().current_slot;
 
-		//if (parent_slot->is_attachment_slot) {
-			//auto gridded_absolute_pos =	get_meta(parent_slot).get_rect_absolute().get_position() + user_drag_offset;
-			// gridded_absolute_pos /= 11;
-			// gridded_absolute_pos *= 11;
-			absolute_xy += in.owner.current_drag_amount;
-		//}
+		auto prev_abs = absolute_xy;
+		absolute_xy += in.owner.current_drag_amount;
 
-		draw_proc(in, true);
-	
-		rc = old_rc;
+		draw_proc(in, true, false, false, false);
+
+		absolute_xy = prev_abs + griddify(in.owner.current_drag_amount);
+
+		draw_proc(in, false, true, false, true, true);
+	}
+	else {
+		draw_children(in);
+		draw_proc(in, true, true, true, false);
 	}
 }
 
-void item_button::draw_proc(draw_info in, bool dragged_ghost) {
+void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bool draw_connector, bool decrease_alpha, bool decrease_border_alpha) {
 	if (is_inventory_root())
 		return;
 	
@@ -78,44 +74,38 @@ void item_button::draw_proc(draw_info in, bool dragged_ghost) {
 		border_col.a = 255;
 	}
 
-	if (dragged_ghost) {
+	if (decrease_alpha) {
 		inside_col.a -= 10;
 	}
 
-	bool draw_border = !dragged_ghost;
-	bool draw_inside = dragged_ghost || !is_being_dragged(in.owner);
-
-	if(draw_inside)
-		draw_stretched_texture(in, augs::gui::material(assets::texture_id::BLANK, inside_col));
-
-	if (draw_border) {
-		augs::gui::solid_stroke stroke;
-		stroke.set_material(augs::gui::material(assets::texture_id::BLANK, border_col));
-		stroke.draw(in.v, *this);
+	if (decrease_border_alpha) {
+		border_col.a -= 200;
 	}
-
-	auto* sprite = item->find<components::sprite>();
-
-	if (draw_inside && sprite) {
-		auto transparent_sprite = *sprite;
-		const auto& gui_def = resource_manager.find(sprite->tex)->gui_sprite_def;
-
-		transparent_sprite.flip_horizontally = gui_def.flip_horizontally;
-		transparent_sprite.flip_vertically = gui_def.flip_vertically;
-		transparent_sprite.rotation_offset = gui_def.rotation_offset;
-
-		transparent_sprite.color.a = border_col.a;
-
-		shared::state_for_drawing_renderable state;
-		state.screen_space_mode = true;
-		state.overridden_target_buffer = &in.v;
-		state.renderable_transform.pos = get_absolute_xy() + rc.get_size()/2 - sprite->size/2;
-		transparent_sprite.draw(state);
-	}
-
-	auto& item_data = item->get<components::item>();
 
 	if (draw_inside) {
+		draw_stretched_texture(in, augs::gui::material(assets::texture_id::BLANK, inside_col));
+
+		auto* sprite = item->find<components::sprite>();
+
+		if (sprite) {
+			auto transparent_sprite = *sprite;
+			const auto& gui_def = resource_manager.find(sprite->tex)->gui_sprite_def;
+
+			transparent_sprite.flip_horizontally = gui_def.flip_horizontally;
+			transparent_sprite.flip_vertically = gui_def.flip_vertically;
+			transparent_sprite.rotation_offset = gui_def.rotation_offset;
+
+			transparent_sprite.color.a = border_col.a;
+
+			shared::state_for_drawing_renderable state;
+			state.screen_space_mode = true;
+			state.overridden_target_buffer = &in.v;
+			state.renderable_transform.pos = get_absolute_xy() + rc.get_size() / 2 - sprite->size / 2;
+			transparent_sprite.draw(state);
+		}
+
+		auto& item_data = item->get<components::item>();
+
 		float bottom_number_val = -1.f;
 		auto* container = item->find<components::container>();
 		bool append_x = false;
@@ -148,7 +138,13 @@ void item_button::draw_proc(draw_info in, bool dragged_ghost) {
 		}
 	}
 
-	if (!dragged_ghost && get_meta(parent_slot).gui_element_entity != parent_slot.container_entity) {
+	if (draw_border) {
+		augs::gui::solid_stroke stroke;
+		stroke.set_material(augs::gui::material(assets::texture_id::BLANK, border_col));
+		stroke.draw(in.v, *this);
+	}
+
+	if (draw_connector && get_meta(parent_slot).gui_element_entity != parent_slot.container_entity) {
 		draw_pixel_line_connector(get_rect_absolute(), get_meta(parent_slot.container_entity).get_rect_absolute(), in, border_col);
 	}
 }
@@ -180,10 +176,7 @@ void item_button::perform_logic_step(augs::gui::gui_world& gr) {
 		rc.set_position(get_meta(parent_slot).rc.get_position());
 	}
 	else {
-		auto gridded_absolute_pos = drag_offset_in_item_deposit;
-		gridded_absolute_pos /= 11;
-		gridded_absolute_pos *= 11;
-		rc.set_position(gridded_absolute_pos);
+		rc.set_position(drag_offset_in_item_deposit);
 	}
 }
 
@@ -195,10 +188,13 @@ void item_button::consume_gui_event(event_info info) {
 	auto parent_slot = item->get<components::item>().current_slot;
 
 	if (info == rect::gui_event::lfinisheddrag) {
+		vec2i griddified = griddify(info.owner.current_drag_amount);
+
 		if (parent_slot->is_attachment_slot)
-			get_meta(parent_slot).user_drag_offset += info.owner.current_drag_amount;
-		else
-			drag_offset_in_item_deposit += info.owner.current_drag_amount;
+			get_meta(parent_slot).user_drag_offset += griddified;
+		else {
+			drag_offset_in_item_deposit += griddified;
+		}
 	}
 
 	// if(being_dragged && inf == rect::gui_event::lup)

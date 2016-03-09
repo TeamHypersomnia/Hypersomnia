@@ -10,6 +10,8 @@
 #include "augs/stream.h"
 #include "pixel_line_connector.h"
 
+#include "grid.h"
+
 slot_button::slot_button() {
 	clip = false;
 }
@@ -105,21 +107,23 @@ void slot_button::perform_logic_step(augs::gui::gui_world& gr) {
 		}
 	}
 
-	auto gridded_absolute_pos = slot_relative_pos + user_drag_offset;
+	slot_relative_pos = griddify(slot_relative_pos);
+	user_drag_offset = griddify(user_drag_offset);
 	
-	if (is_being_dragged(gr))
-		gridded_absolute_pos += gr.current_drag_amount;
+	vec2i absolute_pos = slot_relative_pos + user_drag_offset;
 
-	gridded_absolute_pos /= 11;
-	gridded_absolute_pos *= 11;
-	rc.set_position(gridded_absolute_pos);
+	if (is_being_dragged(gr))
+		absolute_pos += griddify(gr.current_drag_amount);
+	
+	rc.set_position(absolute_pos);
 }
 
 void slot_button::consume_gui_event(event_info info) {
 	detector.update_appearance(info);
 	
-	if (info == rect::gui_event::lfinisheddrag)
-		user_drag_offset += info.owner.current_drag_amount;
+	if (info == rect::gui_event::lfinisheddrag) {
+		user_drag_offset += griddify(info.owner.current_drag_amount);
+	}
 }
 
 slot_button& get_meta(inventory_slot_id id) {
