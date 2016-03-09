@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <cassert>
 #undef max
 #undef min
 namespace augs {
@@ -284,90 +285,92 @@ namespace augs {
 					}
 				}
 
-				//if(msg == key::down) consume_gui_event(e = gui_event::keydown); 
-				//else if(msg == key::up) consume_gui_event(e = gui_event::keyup); 
-				//else if(msg == key::character) consume_gui_event(e = gui_event::character); 
-				//else if(msg == key::unichar) consume_gui_event(e = gui_event::unichar); 
-				//else {
-				bool hover = rc_clipped.good() && rc_clipped.hover(m.pos);
-
-				if (hover && !inf.mouse_fetched) {
-					if (!was_hovered)
+				if (gr.rect_hovered == nullptr) {
+					bool hover = rc_clipped.good() && rc_clipped.hover(m.pos);
+					
+					if (hover) {
 						consume_gui_event(e = gui_event::hover);
-
-					inf.mouse_fetched = was_hovered = true;
-					if (msg == lup) {
-						consume_gui_event(e = gui_event::lup);
-					}
-					if (msg == ldown) {
-						gr.rect_held_by_lmb = this;
-						gr.ldrag_relative_anchor = m.pos - rc.get_position();
-						gr.last_ldown_position = m.pos;
-						consume_gui_event(e = gui_event::ldown);
-					}
-					if (msg == mdown) {
-						consume_gui_event(e = gui_event::mdown);
-					}
-					if (msg == mdoubleclick) {
-						consume_gui_event(e = gui_event::mdoubleclick);
-					}
-					if (msg == ldoubleclick) {
-						gr.rect_held_by_lmb = this;
-						gr.ldrag_relative_anchor = m.pos - rc.get_position();
-						gr.last_ldown_position = m.pos;
-						consume_gui_event(e = gui_event::ldoubleclick);
-					}
-					if (msg == ltripleclick) {
-						gr.rect_held_by_lmb = this;
-						gr.ldrag_relative_anchor = m.pos - rc.get_position();
-						gr.last_ldown_position = m.pos;
-						consume_gui_event(e = gui_event::ltripleclick);
-					}
-					if (msg == rdown) {
-						gr.rect_held_by_rmb = this;
-						consume_gui_event(e = gui_event::rdown);
-					}
-					if (msg == rdoubleclick) {
-						gr.rect_held_by_rmb = this;
-						consume_gui_event(e = gui_event::rdoubleclick);
-					}
-
-					if (msg == wheel) {
-						consume_gui_event(e = gui_event::wheel);
-					}
-
-					if (gr.rect_held_by_lmb == this && msg == mousemotion && m.state[0] && rc_clipped.hover(m.ldrag)) {
-						gr.rect_held_by_lmb = this;
-						consume_gui_event(e = gui_event::lpressed);
-					}
-					if (gr.rect_held_by_rmb == this && msg == mousemotion && m.state[1] && rc_clipped.hover(m.rdrag)) {
-						gr.rect_held_by_rmb = this;
-						consume_gui_event(e = gui_event::rpressed);
+						gr.rect_hovered = this;
+						gr.was_hovered_rect_visited = true;
 					}
 				}
-				else if (hover) {
+				else if (gr.rect_hovered == this) {
+					bool still_hover = rc_clipped.good() && rc_clipped.hover(m.pos);
 
-				}
-				else if (!hover) {
-					if (msg == mousemotion) {
-						if (was_hovered) {
-							consume_gui_event(e = gui_event::hout);
-							was_hovered = false;
+					if (still_hover) {
+						if (msg == lup) {
+							consume_gui_event(e = gui_event::lup);
 						}
-						if (gr.rect_held_by_lmb == this) {
-							consume_gui_event(e = gui_event::loutdrag);
+						if (msg == ldown) {
+							gr.rect_held_by_lmb = this;
+							gr.ldrag_relative_anchor = m.pos - rc.get_position();
+							gr.last_ldown_position = m.pos;
+							rc_pos_before_dragging = vec2i(rc.l, rc.t);
+							consume_gui_event(e = gui_event::ldown);
+						}
+						if (msg == mdown) {
+							consume_gui_event(e = gui_event::mdown);
+						}
+						if (msg == mdoubleclick) {
+							consume_gui_event(e = gui_event::mdoubleclick);
+						}
+						if (msg == ldoubleclick) {
+							gr.rect_held_by_lmb = this;
+							gr.ldrag_relative_anchor = m.pos - rc.get_position();
+							gr.last_ldown_position = m.pos;
+							consume_gui_event(e = gui_event::ldoubleclick);
+						}
+						if (msg == ltripleclick) {
+							gr.rect_held_by_lmb = this;
+							gr.ldrag_relative_anchor = m.pos - rc.get_position();
+							gr.last_ldown_position = m.pos;
+							consume_gui_event(e = gui_event::ltripleclick);
+						}
+						if (msg == rdown) {
+							gr.rect_held_by_rmb = this;
+							consume_gui_event(e = gui_event::rdown);
+						}
+						if (msg == rdoubleclick) {
+							gr.rect_held_by_rmb = this;
+							consume_gui_event(e = gui_event::rdoubleclick);
+						}
+
+						if (msg == wheel) {
+							consume_gui_event(e = gui_event::wheel);
+						}
+
+						if (gr.rect_held_by_lmb == this && msg == mousemotion && m.state[0] && rc_clipped.hover(m.ldrag)) {
+							consume_gui_event(e = gui_event::lpressed);
+						}
+						if (gr.rect_held_by_rmb == this && msg == mousemotion && m.state[1] && rc_clipped.hover(m.rdrag)) {
+							consume_gui_event(e = gui_event::rpressed);
 						}
 					}
+					else {
+						// assert(msg == mousemotion);
+						unhover(inf);
+					}
+
+					gr.was_hovered_rect_visited = true;
 				}
+
 				if (gr.rect_held_by_lmb == this && msg == mousemotion) {
 					gr.held_rect_is_dragged = true;
 					gr.current_drag_amount = m.pos - gr.last_ldown_position;
 					consume_gui_event(e = gui_event::ldrag);
 				}
-				//}
-				if (gr.rect_held_by_lmb != this) 
-					rc_pos_before_dragging = vec2i(rc.l, rc.t);
 			}
+		}
+
+		void rect::unhover(poll_info& inf) {
+			event_info e(inf.owner, gui_event::unknown);
+
+			consume_gui_event(e = gui_event::hout);
+
+			if (inf.owner.rect_held_by_lmb == this)
+				consume_gui_event(e = gui_event::loutdrag);
+
+			inf.owner.rect_hovered = nullptr;
 		}
 
 		bool rect::is_scroll_clamped_to_right_down_corner() {

@@ -29,6 +29,11 @@ item_button::item_button(rects::xywh<float> rc) : rect(rc) {
 }
 
 void item_button::draw_triangles(draw_info in) {
+	if (is_inventory_root()) {
+		draw_children(in);
+		return;
+	}
+
 	if (is_being_dragged(in.owner)) {
 		auto parent_slot = item->get<components::item>().current_slot;
 
@@ -79,7 +84,8 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 	}
 
 	if (decrease_border_alpha) {
-		border_col.a -= 200;
+		border_col = white;
+		border_col.a -= 220;
 	}
 
 	if (draw_inside) {

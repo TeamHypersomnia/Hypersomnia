@@ -207,6 +207,9 @@ namespace augs {
 			if (found(rect_held_by_rmb))
 				rect_held_by_rmb = nullptr;
 
+			if (found(rect_hovered))
+				rect_hovered = nullptr;
+
 			// TODO: rebuild focus links
 		}
 
@@ -229,6 +232,8 @@ namespace augs {
 			using namespace augs::window;
 			rect::poll_info in(*this, gl.msg);
 			bool pass = true;
+
+			was_hovered_rect_visited = false;
 
 			if (middlescroll.subject) {
 				if (gl.msg == event::mdown || gl.msg == event::mdoubleclick) {
@@ -298,12 +303,12 @@ namespace augs {
 				pass = false;
 			}
 
-			if (gl.msg == event::ldown) {
-				bool abc = false;
-				abc = true;
+			if (pass) {
+				root.consume_raw_input_and_generate_gui_events(in);
+				
+				if (!was_hovered_rect_visited && rect_hovered != nullptr)
+					rect_hovered->unhover(in);
 			}
-
-			if (pass) root.consume_raw_input_and_generate_gui_events(in);
 		}
 	}
 }

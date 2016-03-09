@@ -133,7 +133,7 @@ namespace augs {
 	}
 
 	void renderer::line_channel::draw_red(vec2 a, vec2 b) { draw(a, b, red); }
-	void renderer::line_channel::draw_green(vec2 a, vec2 b) { draw(a, b, green); }
+	void renderer::line_channel::draw_green(vec2 a, vec2 b) { draw(a, b, dark_green); }
 	void renderer::line_channel::draw_blue(vec2 a, vec2 b) { draw(a, b, blue); }
 	void renderer::line_channel::draw_yellow(vec2 a, vec2 b) { draw(a, b, yellow); }
 	void renderer::line_channel::draw_cyan(vec2 a, vec2 b) { draw(a, b, cyan); }

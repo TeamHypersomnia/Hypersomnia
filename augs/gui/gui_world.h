@@ -80,7 +80,9 @@ namespace augs {
 
 			augs::window::event::state state;
 
+			bool was_hovered_rect_visited = false;
 			bool held_rect_is_dragged = false;
+			rect *rect_hovered = nullptr;
 			rect *rect_held_by_lmb = nullptr;
 			rect *rect_held_by_rmb = nullptr;
 			

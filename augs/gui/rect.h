@@ -96,6 +96,7 @@ namespace augs {
 			void calculate_clipped_rectangle_layout();
 
 			void consume_raw_input_and_generate_gui_events(poll_info&); /* event generator */
+			void unhover(poll_info& inf);
 
 			virtual void consume_gui_event(event_info); /* event listener */
 			virtual void draw_triangles(draw_info);
@@ -160,8 +161,6 @@ namespace augs {
 			rects::ltrb<float> clipping_rect = rects::ltrb<float>(0, 0, std::numeric_limits<int>::max() / 2, std::numeric_limits<int>::max() / 2);
 
 			vec2i absolute_xy;
-
-			bool was_hovered = false;
 		};
 	}
 }

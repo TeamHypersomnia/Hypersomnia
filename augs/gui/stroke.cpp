@@ -18,7 +18,10 @@ namespace augs {
 		}
 
 		void solid_stroke::draw(std::vector<augs::vertex_triangle>& out, const rect& r) const {
-			draw(out, r.get_rect_absolute(), &r.get_parent()->get_clipping_rect());
+			auto drawn_rect = r.get_rect_absolute();
+			drawn_rect.l++;
+			drawn_rect.t++;
+			draw(out, drawn_rect, &r.get_parent()->get_clipping_rect());
 		}
 
 		void solid_stroke::draw(std::vector<augs::vertex_triangle>& out, rects::ltrb<float> g, const rects::ltrb<float>* clipper) const {

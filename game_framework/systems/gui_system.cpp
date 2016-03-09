@@ -36,10 +36,27 @@ void gui_system::draw_gui_overlays_for_camera_rendering_request(messages::camera
 	gui.draw_triangles();
 	r.state.output->push_triangles_from_gui_world(gui);
 
+	auto gui_cursor = assets::GUI_CURSOR;
+	auto gui_cursor_color = cyan;
+
+	if (gui.held_rect_is_dragged) {
+		item_button* dragged_item = dynamic_cast<item_button*>(gui.rect_held_by_lmb);
+		
+		if (dragged_item) {
+			slot_button* target_slot = dynamic_cast<slot_button*>(gui.rect_hovered);
+			item_button* target_item = dynamic_cast<item_button*>(gui.rect_hovered);
+
+			if (target_slot || target_item && (target_item != dragged_item)) {
+				gui_cursor = assets::GUI_CURSOR_ADD;
+				gui_cursor_color = green;
+			}
+		}
+	}
+
 	if (is_gui_look_enabled) {
 		components::sprite cursor_sprite;
-		cursor_sprite.set(assets::texture_id::GUI_CURSOR);
-		cursor_sprite.color = cyan;
+		cursor_sprite.set(gui_cursor);
+		cursor_sprite.color = gui_cursor_color;
 
 		shared::state_for_drawing_renderable state;
 		state.setup_camera_state(r.state);
