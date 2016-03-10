@@ -6,6 +6,11 @@
 #include "game_framework/detail/inventory_slot_id.h"
 
 struct item_button : augs::gui::rect {
+private:
+	void draw_dragged_ghost(draw_info in);
+	void draw_complete_with_children(draw_info in);
+	void draw_grid_border_ghost(draw_info in);
+public:
 	item_button(rects::xywh<float> rc = rects::xywh<float>());
 
 	augs::gui::text_drawer charges_caption;
@@ -18,6 +23,8 @@ struct item_button : augs::gui::rect {
 	augs::gui::appearance_detector detector;
 
 	bool is_container_open = false;
+	bool has_target_under_dragged_ghost = false;
+
 	augs::entity_id item;
 
 	vec2i drag_offset_in_item_deposit;

@@ -28,6 +28,19 @@ item_button::item_button(rects::xywh<float> rc) : rect(rc) {
 	focusable = false;
 }
 
+void item_button::draw_dragged_ghost(draw_info in) {
+	draw_proc(in, true, false, false, true);
+}
+
+void item_button::draw_complete_with_children(draw_info in) {
+	draw_children(in);
+	draw_proc(in, true, true, true, false);
+}
+
+void item_button::draw_grid_border_ghost(draw_info in) {
+	draw_proc(in, false, true, false, true, true);
+}
+
 void item_button::draw_triangles(draw_info in) {
 	if (is_inventory_root()) {
 		draw_children(in);
@@ -40,16 +53,15 @@ void item_button::draw_triangles(draw_info in) {
 		auto prev_abs = absolute_xy;
 		absolute_xy += in.owner.current_drag_amount;
 
-		draw_proc(in, true, false, false, true);
+		draw_dragged_ghost(in);
 
 		absolute_xy = prev_abs + griddify(in.owner.current_drag_amount);
 
-		draw_proc(in, false, true, false, true, true);
+		if(!has_target_under_dragged_ghost)
+			draw_grid_border_ghost(in);
 	}
-	else {
-		draw_children(in);
-		draw_proc(in, true, true, true, false);
-	}
+	else
+		draw_complete_with_children(in);
 }
 
 void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bool draw_connector, bool decrease_alpha, bool decrease_border_alpha) {

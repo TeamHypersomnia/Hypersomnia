@@ -16,6 +16,9 @@ void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message
 	if (gui.held_rect_is_dragged) {
 		item_button* dragged_item = dynamic_cast<item_button*>(gui.rect_held_by_lmb);
 
+		if (dragged_item)
+			dragged_item->has_target_under_dragged_ghost = false;
+
 		if (dragged_item && gui.rect_hovered) {
 			slot_button* target_slot = dynamic_cast<slot_button*>(gui.rect_hovered);
 			item_button* target_item = dynamic_cast<item_button*>(gui.rect_hovered);
@@ -30,6 +33,8 @@ void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message
 				predicted_result = query_transfer_result(dragged_item->item, target_item->item);
 			else
 				queried = false;
+
+			dragged_item->has_target_under_dragged_ghost = queried;
 
 			if (queried) {
 				if (predicted_result.first == item_transfer_result::THE_SAME_SLOT) {
@@ -51,8 +56,8 @@ void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message
 					case slot_function::GUN_RAIL: tooltip_text = L"Install"; break;
 					case slot_function::TORSO_ARMOR_SLOT: tooltip_text = L"Wear"; break;
 					case slot_function::SHOULDER_SLOT: tooltip_text = L"Wear"; break;
-					case slot_function::PRIMARY_HAND: tooltip_text = L"Pull out"; break;
-					case slot_function::SECONDARY_HAND: tooltip_text = L"Pull out"; break;
+					case slot_function::PRIMARY_HAND: tooltip_text = L"Wield"; break;
+					case slot_function::SECONDARY_HAND: tooltip_text = L"Wield"; break;
 					case slot_function::GUN_BARREL: tooltip_text = L"Install"; break;
 					default: assert(0); break;
 					}
