@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "entity_system/entity_id.h"
-#include "../shared/inventory_slot_id.h"
+#include "../detail/inventory_slot_id.h"
 
 #include "misc/deterministic_timing.h"
 

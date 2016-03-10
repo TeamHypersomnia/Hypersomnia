@@ -5,7 +5,7 @@
 
 #include "../components/visibility_component.h"
 
-#include "../shared/physics_setup_helpers.h"
+#include "../detail/physics_setup_helpers.h"
 
 #include "steering_system.h"
 #include "render_system.h"

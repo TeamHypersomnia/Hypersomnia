@@ -3,11 +3,11 @@
 #include "entity_system/entity.h"
 #include <map>
 
-#include "../shared/inventory_slot_id.h"
+#include "../detail/inventory_slot_id.h"
 #include "augs/gui/appearance_detector.h"
 
-#include "../shared/gui/item_button.h"
-#include "../shared/gui/slot_button.h"
+#include "../detail/gui/item_button.h"
+#include "../detail/gui/slot_button.h"
 
 namespace components {
 	struct gui_element {

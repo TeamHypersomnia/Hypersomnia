@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_map>
-#include "../shared/inventory_slot.h"
+#include "../detail/inventory_slot.h"
 
 namespace components {
 	struct container {

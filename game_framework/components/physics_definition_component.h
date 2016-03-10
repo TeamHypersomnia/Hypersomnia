@@ -1,5 +1,5 @@
 #pragma once
-#include "../shared/physics_setup_helpers.h"
+#include "../detail/physics_setup_helpers.h"
 
 namespace components {
 	struct physics_definition {

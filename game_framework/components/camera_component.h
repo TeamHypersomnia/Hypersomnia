@@ -7,7 +7,7 @@
 #include "entity_system/entity.h"
 
 #include "../components/transform_component.h"
-#include "../shared/state_for_drawing.h"
+#include "../detail/state_for_drawing.h"
 
 #include "augs/misc/smooth_value_field.h"
 

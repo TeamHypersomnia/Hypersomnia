@@ -9,7 +9,7 @@
 #include "../components/physics_component.h"
 #include "../messages/intent_message.h"
 #include "../messages/camera_render_request_message.h"
-#include "../shared/state_for_drawing.h"
+#include "../detail/state_for_drawing.h"
 #include "entity_system/world.h"
 
 void update_bounds_for_crosshair(components::camera& camera, components::crosshair& crosshair) {

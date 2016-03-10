@@ -2,7 +2,7 @@
 
 #include "render_system.h"
 #include "entity_system/entity.h"
-#include "../shared/state_for_drawing.h"
+#include "../detail/state_for_drawing.h"
 
 #include "augs/entity_system/overworld.h"
 

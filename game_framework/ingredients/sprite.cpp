@@ -1,7 +1,7 @@
 #include "ingredients.h"
 #include "renderable_includes.h"
 
-#include "../shared/physics_setup_helpers.h"
+#include "../detail/physics_setup_helpers.h"
 #include "../globals/filters.h"
 
 namespace ingredients {

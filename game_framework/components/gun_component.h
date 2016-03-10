@@ -4,7 +4,7 @@
 #include "entity_system/entity.h"
 
 #include "render_component.h"
-#include "../shared/physics_setup_helpers.h"
+#include "../detail/physics_setup_helpers.h"
 
 #include "misc/deterministic_timing.h"
 

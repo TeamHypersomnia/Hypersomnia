@@ -11,7 +11,7 @@
 #include "entity_system/world.h"
 #include "entity_system/entity.h"
 
-#include "../shared/inventory_slot_id.h"
+#include "../detail/inventory_slot_id.h"
 
 void intent_contextualization_system::contextualize_use_button_intents() {
 	auto& intents = parent_world.get_message_queue<messages::intent_message>();

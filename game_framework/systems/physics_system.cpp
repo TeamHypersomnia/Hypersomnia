@@ -11,7 +11,7 @@ float PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 #include "../messages/destroy_message.h"
 #include "../messages/new_entity_message.h"
 
-#include "../shared/physics_setup_helpers.h"
+#include "../detail/physics_setup_helpers.h"
 #include "../components/physics_definition_component.h"
 
 #include "../components/fixtures_component.h"

@@ -1,6 +1,6 @@
 #include "entity_id.h"
 #include "entity.h"
-#include "game_framework/shared/inventory_slot_id.h"
+#include "game_framework/detail/inventory_slot_id.h"
 
 namespace augs {
 	inventory_slot_id entity_id::operator[](slot_function type) {

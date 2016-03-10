@@ -4,7 +4,7 @@
 #include "3rdparty/polypartition/polypartition.h"
 
 #include "graphics/renderer.h"
-#include "../shared/state_for_drawing.h"
+#include "../detail/state_for_drawing.h"
 
 #include "game_framework/resources/manager.h"
 

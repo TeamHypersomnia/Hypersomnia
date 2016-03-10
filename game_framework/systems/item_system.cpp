@@ -14,8 +14,8 @@
 #include "../components/item_slot_transfers_component.h"
 #include "../components/fixtures_component.h"
 
-#include "../shared/inventory_utils.h"
-#include "../shared/inventory_slot.h"
+#include "../detail/inventory_utils.h"
+#include "../detail/inventory_slot.h"
 
 void item_system::handle_trigger_confirmations_as_pick_requests() {
 	auto& confirmations = parent_world.get_message_queue<messages::trigger_hit_confirmation_message>();

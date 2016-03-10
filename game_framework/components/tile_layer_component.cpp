@@ -2,7 +2,7 @@
 
 #include "sprite_component.h"
 
-#include "../shared/state_for_drawing.h"
+#include "../detail/state_for_drawing.h"
 
 #include "graphics/vertex.h"
 

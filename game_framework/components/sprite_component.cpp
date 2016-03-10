@@ -1,7 +1,7 @@
 #include "sprite_component.h"
 #include "texture_baker/texture_baker.h"
 
-#include "../shared/state_for_drawing.h"
+#include "../detail/state_for_drawing.h"
 #include "../components/render_component.h"
 
 #include "entity_system/entity.h"

@@ -5,7 +5,7 @@
 #include "gui/text/printer.h"
 #include "gui/text/drafter.h"
 
-#include "game_framework/shared/state_for_drawing.h"
+#include "game_framework/detail/state_for_drawing.h"
 #include "game_framework/systems/render_system.h"
 
 #include "misc/vector_wrapper.h"

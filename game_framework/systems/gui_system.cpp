@@ -16,7 +16,7 @@
 #include "crosshair_system.h"
 #include "game_framework/settings.h"
 
-#include "../shared/inventory_utils.h"
+#include "../detail/inventory_utils.h"
 
 using namespace augs;
 using namespace gui;

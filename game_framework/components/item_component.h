@@ -1,7 +1,7 @@
 #pragma once
 #include "container_component.h"
 #include "transform_component.h"
-#include "../shared/inventory_slot_id.h"
+#include "../detail/inventory_slot_id.h"
 
 namespace components {
 	struct item {

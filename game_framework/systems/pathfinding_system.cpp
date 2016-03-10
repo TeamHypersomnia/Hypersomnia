@@ -6,7 +6,7 @@
 #include "render_system.h"
 #include "physics_system.h"
 
-#include "../shared/physics_setup_helpers.h"
+#include "../detail/physics_setup_helpers.h"
 #include "log.h"
 
 pathfinding_system::pathfinding_system(world& parent_world) : processing_system_templated(parent_world), draw_memorised_walls(false), draw_undiscovered(false),

@@ -7,7 +7,7 @@
 #include "physics_system.h"
 #include "render_system.h"
 
-#include "../shared/physics_setup_helpers.h"
+#include "../detail/physics_setup_helpers.h"
 
 #include <limits>
 #include <set>

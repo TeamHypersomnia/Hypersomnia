@@ -1017,9 +1017,6 @@
     <ClCompile Include="augs\window_framework\window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\shared\physics_setup_helpers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\scene_builders\rendering_scripts\testbed_rendering.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1080,9 +1077,6 @@
     <ClCompile Include="game_framework\components\item_slot_transfers_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\shared\inventory_slot.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="augs\misc\deterministic_timing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1092,19 +1086,7 @@
     <ClCompile Include="augs\gui\appearance_detector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\shared\gui\item_button.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\shared\gui\slot_button.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\shared\gui\positioning.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="augs\texture_baker\polygonize_sprite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\shared\gui\pixel_line_connector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="augs\gui\text_drawer.cpp">
@@ -1113,10 +1095,28 @@
     <ClCompile Include="game_framework\settings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\shared\gui\grid.cpp">
+    <ClCompile Include="game_framework\detail\gui\grid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\shared\inventory_utils.cpp">
+    <ClCompile Include="game_framework\detail\gui\item_button.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\detail\gui\pixel_line_connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\detail\gui\positioning.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\detail\gui\slot_button.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\detail\inventory_slot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\detail\inventory_utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\detail\physics_setup_helpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2864,9 +2864,6 @@
     <ClInclude Include="augs\window_framework\window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\shared\physics_setup_helpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\scene_builders\rendering_scripts\testbed_rendering.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2880,9 +2877,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\constant_size_vector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game_framework\shared\state_for_drawing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\systems\item_system.h">
@@ -3002,9 +2996,6 @@
     <ClInclude Include="game_framework\components\item_slot_transfers_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\shared\inventory_slot.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\misc\deterministic_timing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3012,12 +3003,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\globals\associated_entities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game_framework\shared\inventory_slot_id.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game_framework\shared\inventory_utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\systems\gui_system.h">
@@ -3032,25 +3017,40 @@
     <ClInclude Include="augs\gui\rect_id.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\shared\gui\item_button.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game_framework\shared\gui\slot_button.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\components\trigger_query_detector_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\components\trigger_collision_detector_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\shared\gui\pixel_line_connector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\shared\gui\grid.h">
+    <ClInclude Include="game_framework\detail\gui\grid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\detail\gui\item_button.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\detail\gui\pixel_line_connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\detail\gui\slot_button.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\detail\inventory_slot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\detail\inventory_slot_id.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\detail\inventory_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\detail\physics_setup_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\detail\state_for_drawing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

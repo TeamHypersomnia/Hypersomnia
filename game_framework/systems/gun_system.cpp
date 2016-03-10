@@ -20,8 +20,8 @@
 #include "../systems/physics_system.h"
 #include "../systems/render_system.h"
 
-#include "../shared/physics_setup_helpers.h"
-#include "../shared/inventory_utils.h"
+#include "../detail/physics_setup_helpers.h"
+#include "../detail/inventory_utils.h"
 
 #include "misc/randval.h"
 
