@@ -1014,6 +1014,7 @@
     <ClInclude Include="game_framework\messages\animation_response_message.h" />
     <ClInclude Include="game_framework\messages\camera_render_request_message.h" />
     <ClInclude Include="game_framework\messages\collision_message.h" />
+    <ClInclude Include="game_framework\messages\gui_intents.h" />
     <ClInclude Include="game_framework\messages\item_slot_transfer_request.h" />
     <ClInclude Include="game_framework\messages\new_entity_message.h" />
     <ClInclude Include="game_framework\messages\crosshair_intent_message.h" />

@@ -35,6 +35,7 @@ namespace augs {
 				loutup,
 				routup,
 				hover,
+				hoverlost,
 				hout,
 				ldrag,
 				loutdrag,
@@ -72,6 +73,7 @@ namespace augs {
 			rect_id next_focusable = nullptr;
 			rect_id prev_focusable = nullptr;
 
+			bool disable_hovering = false;
 			bool enable_drawing = true;
 			bool enable_drawing_of_children = true;
 			bool clip = true;

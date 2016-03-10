@@ -33,7 +33,7 @@ void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message
 
 			possible_target_under_cursor = true;
 
-			if (target_slot)
+			if (target_slot && target_slot->houted_after_drag_started)
 				predicted_result = { query_transfer_result({ dragged_item->item, target_slot->slot_id }), target_slot->slot_id.type };
 			else if (target_item && target_item != dragged_item)
 				predicted_result = query_transfer_result(dragged_item->item, target_item->item);

@@ -3056,5 +3056,8 @@
     <ClInclude Include="game_framework\detail\state_for_drawing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game_framework\messages\gui_intents.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

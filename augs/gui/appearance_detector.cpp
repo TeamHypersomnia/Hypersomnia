@@ -7,7 +7,7 @@ namespace augs {
 			appearance app = appearance::unknown;
 
 			if (!remain_pushed_if_mouse_leaves) {
-				if (m == rect::gui_event::hout
+				if (m == rect::gui_event::hoverlost
 					|| m == rect::gui_event::lup
 					|| m == rect::gui_event::loutup)
 					app = appearance::released;
@@ -31,7 +31,7 @@ namespace augs {
 				focus_flag = true;
 			if (m == rect::gui_event::blur)
 				focus_flag = false;
-			if (m == rect::gui_event::hout)
+			if (m == rect::gui_event::hoverlost)
 				is_hovered = false;
 
 			if (app != appearance::unknown)

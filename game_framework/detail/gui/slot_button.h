@@ -13,6 +13,8 @@ struct slot_button : augs::gui::rect {
 	augs::gui::text_drawer space_caption;
 	void get_member_children(std::vector<augs::gui::rect_id>&) final;
 
+	bool houted_after_drag_started = true;
+
 	inventory_slot_id slot_id;
 	vec2i slot_relative_pos;
 	vec2i user_drag_offset;

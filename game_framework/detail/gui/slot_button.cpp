@@ -124,6 +124,10 @@ void slot_button::consume_gui_event(event_info info) {
 	if (info == rect::gui_event::lfinisheddrag) {
 		user_drag_offset += griddify(info.owner.current_drag_amount);
 	}
+
+	if (info == rect::gui_event::hout) {
+		houted_after_drag_started = true;
+	}
 }
 
 slot_button& get_meta(inventory_slot_id id) {

@@ -23,6 +23,8 @@ public:
 
 	bool is_container_open = false;
 
+	bool started_drag = false;
+
 	augs::entity_id item;
 
 	vec2i drag_offset_in_item_deposit;

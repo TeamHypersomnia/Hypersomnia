@@ -74,7 +74,7 @@ namespace augs {
 			get_member_children(children_all);
 			for (size_t i = 0; i < children_all.size(); ++i) {
 				children_all[i]->parent = this;
-				if (children_all[i]->enable_drawing)
+				//if (children_all[i]->enable_drawing)
 					children_all[i]->calculate_clipped_rectangle_layout();
 			}
 		}
@@ -285,73 +285,76 @@ namespace augs {
 					}
 				}
 
-				if (gr.rect_hovered == nullptr) {
-					bool hover = rc_clipped.good() && rc_clipped.hover(m.pos);
-					
-					if (hover) {
-						consume_gui_event(e = gui_event::hover);
-						gr.rect_hovered = this;
+				if (!disable_hovering) {
+					if (gr.rect_hovered == nullptr) {
+						bool hover = rc_clipped.good() && rc_clipped.hover(m.pos);
+
+						if (hover) {
+							consume_gui_event(e = gui_event::hover);
+							gr.rect_hovered = this;
+							gr.was_hovered_rect_visited = true;
+						}
+					}
+					else if (gr.rect_hovered == this) {
+						bool still_hover = rc_clipped.good() && rc_clipped.hover(m.pos);
+
+						if (still_hover) {
+							if (msg == lup) {
+								consume_gui_event(e = gui_event::lup);
+							}
+							if (msg == ldown) {
+								gr.rect_held_by_lmb = this;
+								gr.ldrag_relative_anchor = m.pos - rc.get_position();
+								gr.last_ldown_position = m.pos;
+								rc_pos_before_dragging = vec2i(rc.l, rc.t);
+								consume_gui_event(e = gui_event::ldown);
+							}
+							if (msg == mdown) {
+								consume_gui_event(e = gui_event::mdown);
+							}
+							if (msg == mdoubleclick) {
+								consume_gui_event(e = gui_event::mdoubleclick);
+							}
+							if (msg == ldoubleclick) {
+								gr.rect_held_by_lmb = this;
+								gr.ldrag_relative_anchor = m.pos - rc.get_position();
+								gr.last_ldown_position = m.pos;
+								consume_gui_event(e = gui_event::ldoubleclick);
+							}
+							if (msg == ltripleclick) {
+								gr.rect_held_by_lmb = this;
+								gr.ldrag_relative_anchor = m.pos - rc.get_position();
+								gr.last_ldown_position = m.pos;
+								consume_gui_event(e = gui_event::ltripleclick);
+							}
+							if (msg == rdown) {
+								gr.rect_held_by_rmb = this;
+								consume_gui_event(e = gui_event::rdown);
+							}
+							if (msg == rdoubleclick) {
+								gr.rect_held_by_rmb = this;
+								consume_gui_event(e = gui_event::rdoubleclick);
+							}
+
+							if (msg == wheel) {
+								consume_gui_event(e = gui_event::wheel);
+							}
+
+							if (gr.rect_held_by_lmb == this && msg == mousemotion && m.state[0] && rc_clipped.hover(m.ldrag)) {
+								consume_gui_event(e = gui_event::lpressed);
+							}
+							if (gr.rect_held_by_rmb == this && msg == mousemotion && m.state[1] && rc_clipped.hover(m.rdrag)) {
+								consume_gui_event(e = gui_event::rpressed);
+							}
+						}
+						else {
+							// assert(msg == mousemotion);
+							consume_gui_event(e = gui_event::hout);
+							unhover(inf);
+						}
+
 						gr.was_hovered_rect_visited = true;
 					}
-				}
-				else if (gr.rect_hovered == this) {
-					bool still_hover = rc_clipped.good() && rc_clipped.hover(m.pos);
-
-					if (still_hover) {
-						if (msg == lup) {
-							consume_gui_event(e = gui_event::lup);
-						}
-						if (msg == ldown) {
-							gr.rect_held_by_lmb = this;
-							gr.ldrag_relative_anchor = m.pos - rc.get_position();
-							gr.last_ldown_position = m.pos;
-							rc_pos_before_dragging = vec2i(rc.l, rc.t);
-							consume_gui_event(e = gui_event::ldown);
-						}
-						if (msg == mdown) {
-							consume_gui_event(e = gui_event::mdown);
-						}
-						if (msg == mdoubleclick) {
-							consume_gui_event(e = gui_event::mdoubleclick);
-						}
-						if (msg == ldoubleclick) {
-							gr.rect_held_by_lmb = this;
-							gr.ldrag_relative_anchor = m.pos - rc.get_position();
-							gr.last_ldown_position = m.pos;
-							consume_gui_event(e = gui_event::ldoubleclick);
-						}
-						if (msg == ltripleclick) {
-							gr.rect_held_by_lmb = this;
-							gr.ldrag_relative_anchor = m.pos - rc.get_position();
-							gr.last_ldown_position = m.pos;
-							consume_gui_event(e = gui_event::ltripleclick);
-						}
-						if (msg == rdown) {
-							gr.rect_held_by_rmb = this;
-							consume_gui_event(e = gui_event::rdown);
-						}
-						if (msg == rdoubleclick) {
-							gr.rect_held_by_rmb = this;
-							consume_gui_event(e = gui_event::rdoubleclick);
-						}
-
-						if (msg == wheel) {
-							consume_gui_event(e = gui_event::wheel);
-						}
-
-						if (gr.rect_held_by_lmb == this && msg == mousemotion && m.state[0] && rc_clipped.hover(m.ldrag)) {
-							consume_gui_event(e = gui_event::lpressed);
-						}
-						if (gr.rect_held_by_rmb == this && msg == mousemotion && m.state[1] && rc_clipped.hover(m.rdrag)) {
-							consume_gui_event(e = gui_event::rpressed);
-						}
-					}
-					else {
-						// assert(msg == mousemotion);
-						unhover(inf);
-					}
-
-					gr.was_hovered_rect_visited = true;
 				}
 
 				if (gr.rect_held_by_lmb == this && msg == mousemotion) {
@@ -365,7 +368,7 @@ namespace augs {
 		void rect::unhover(poll_info& inf) {
 			event_info e(inf.owner, gui_event::unknown);
 
-			consume_gui_event(e = gui_event::hout);
+			consume_gui_event(e = gui_event::hoverlost);
 
 			if (inf.owner.rect_held_by_lmb == this)
 				consume_gui_event(e = gui_event::loutdrag);

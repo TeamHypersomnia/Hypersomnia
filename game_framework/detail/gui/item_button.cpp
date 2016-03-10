@@ -177,6 +177,7 @@ bool item_button::is_inventory_root() {
 
 void item_button::perform_logic_step(augs::gui::gui_world& gr) {
 	enable_drawing_of_children = !is_being_dragged(gr);
+	disable_hovering = is_being_dragged(gr);
 	rect::perform_logic_step(gr);
 
 	if (is_inventory_root())
@@ -211,11 +212,25 @@ void item_button::consume_gui_event(event_info info) {
 	detector.update_appearance(info);
 	auto parent_slot = item->get<components::item>().current_slot;
 
+	if (info == rect::gui_event::ldrag) {
+		if (!started_drag) {
+			started_drag = true;
+
+			if (parent_slot->is_attachment_slot)
+				if (get_meta(parent_slot).get_rect_absolute().hover(info.owner.state.mouse.pos)) {
+					get_meta(parent_slot).houted_after_drag_started = false;
+				}
+		}
+	}
+
 	if (info == rect::gui_event::lfinisheddrag) {
+		started_drag = false;
 		vec2i griddified = griddify(info.owner.current_drag_amount);
 
-		if (parent_slot->is_attachment_slot)
+		if (parent_slot->is_attachment_slot) {
 			get_meta(parent_slot).user_drag_offset += griddified;
+			get_meta(parent_slot).houted_after_drag_started = true;
+		}
 		else {
 			drag_offset_in_item_deposit += griddified;
 		}
