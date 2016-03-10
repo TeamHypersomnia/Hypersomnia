@@ -78,7 +78,7 @@ void slot_button::draw_triangles(draw_info info) {
 		draw_centered_texture(info, inside_mat);
 		draw_centered_texture(info, border_mat);
 
-		auto space_available_text = augs::gui::text::format(augs::to_wstring(slot_id.calculate_free_space_with_parent_containers(), 2)
+		auto space_available_text = augs::gui::text::format(augs::to_wstring(slot_id.calculate_free_space_with_parent_containers(), 2, true)
 			, augs::gui::text::style(assets::font_id::GUI_FONT, border_col));
 
 		space_caption.set_text(space_available_text);

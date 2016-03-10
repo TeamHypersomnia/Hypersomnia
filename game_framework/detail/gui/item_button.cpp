@@ -141,8 +141,15 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 		}
 
 		if (bottom_number_val > -1.f) {
-			auto label_wstr = augs::to_wstring(bottom_number_val);
-			if (append_x) label_wstr = L'x' + label_wstr;
+			std::wstring label_wstr;
+			
+			if (append_x) {
+				label_wstr = L'x';
+				label_wstr += augs::to_wstring(bottom_number_val);
+			}
+			else
+				label_wstr = augs::to_wstring(bottom_number_val, 2);
+
 			// else label_wstr = L'{' + label_wstr + L'}';
 
 			auto bottom_number = augs::gui::text::format(label_wstr, augs::gui::text::style(assets::font_id::GUI_FONT, label_color));

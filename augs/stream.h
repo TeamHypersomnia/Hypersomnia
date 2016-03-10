@@ -49,11 +49,16 @@ namespace augs {
 	/* number to wide string conversion */
 
 	template <class T>
-	std::wstring to_wstring(T val, int precision = -1) {
+	std::wstring to_wstring(T val, int precision = -1, bool fixed = false) {
 		std::wostringstream ss;
 
-		if (precision > -1)
-			ss << std::fixed << std::setprecision(precision);
+		if (precision > -1) {
+			if (fixed) {
+				ss << std::fixed;
+			}
+
+			ss << std::setprecision(precision);
+		}
 
 		ss << val;
 		return ss.str();

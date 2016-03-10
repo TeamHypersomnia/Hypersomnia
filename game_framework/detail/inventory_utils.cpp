@@ -115,7 +115,9 @@ item_transfer_result query_transfer_result(messages::item_slot_transfer_intent r
 
 std::pair<item_transfer_result, slot_function> query_transfer_result(augs::entity_id from, augs::entity_id to) {
 	auto* container = to->find<components::container>();
-	
+
+	auto most_meaningful_error = item_transfer_result::NO_SLOT_AVAILABLE;
+
 	if (container) {
 		if (to[slot_function::ITEM_DEPOSIT].alive())
 			return{ query_transfer_result({ from, to[slot_function::ITEM_DEPOSIT] }), slot_function::ITEM_DEPOSIT };
@@ -126,8 +128,10 @@ std::pair<item_transfer_result, slot_function> query_transfer_result(augs::entit
 			if (res >= item_transfer_result::SUCCESSFUL_TRANSFER) {
 				return{ res, s.first };
 			}
+			else
+				most_meaningful_error = std::max(most_meaningful_error, res);
 		}
 	}
 
-	return{ item_transfer_result::NO_SLOT_AVAILABLE, slot_function::INVALID };
+	return{ most_meaningful_error, slot_function::INVALID };
 }
