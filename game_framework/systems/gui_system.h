@@ -15,33 +15,34 @@ struct game_gui_root : public augs::gui::rect {
 
 class gui_system : public augs::processing_system_templated<components::gui_element> {
 	vec2i size;
-public:
-	using processing_system_templated::processing_system_templated;
 
-	void resize(vec2i size) {
-		this->size = size;
-	}
+	bool is_gui_look_enabled = false;
+	bool preview_due_to_item_picking_request = false;
+
+	vec2 gui_crosshair_position;
+	augs::gui::text_drawer tooltip_drawer;
+
+	void draw_cursor_and_tooltip(messages::camera_render_request_message);
 
 	augs::gui::gui_world gui;
 	game_gui_root game_gui_root;
 
+	rects::xywh<float> get_rectangle_for_slot_function(slot_function);
+	vec2 initial_inventory_root_position();
+	augs::entity_id get_game_world_crosshair();
+
+public:
 	gui_system(world& parent_world);
 
-	bool is_gui_look_enabled = false;
-	bool preview_due_to_item_picking_request = false;
-	
-	vec2 gui_crosshair_position;
-	augs::gui::text_drawer tooltip_drawer;
+	void resize(vec2i size) {
+		this->size = size;
+	}
 
 	void rebuild_gui_tree_based_on_game_state();
 	void translate_raw_window_inputs_to_gui_events();
 	void suppress_inputs_meant_for_gui();
 
 	void switch_to_gui_mode_and_back();
-	augs::entity_id get_game_world_crosshair();
 
 	void draw_gui_overlays_for_camera_rendering_request(messages::camera_render_request_message);
-
-	rects::xywh<float> get_rectangle_for_slot_function(slot_function);
-	vec2 initial_inventory_root_position();
 };

@@ -41,14 +41,19 @@ void gui_system::draw_gui_overlays_for_camera_rendering_request(messages::camera
 	gui.draw_triangles();
 	r.state.output->push_triangles_from_gui_world(gui);
 
+	if (is_gui_look_enabled)
+		draw_cursor_and_tooltip(r);
+}
+
+void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message r) {
 	auto gui_cursor = assets::GUI_CURSOR;
 	auto gui_cursor_color = cyan;
 
 	std::wstring tooltip_text = L"";
-	
+
 	if (gui.held_rect_is_dragged) {
 		item_button* dragged_item = dynamic_cast<item_button*>(gui.rect_held_by_lmb);
-		
+
 		if (dragged_item && gui.rect_hovered) {
 			slot_button* target_slot = dynamic_cast<slot_button*>(gui.rect_hovered);
 			item_button* target_item = dynamic_cast<item_button*>(gui.rect_hovered);
@@ -107,28 +112,26 @@ void gui_system::draw_gui_overlays_for_camera_rendering_request(messages::camera
 		}
 	}
 
-	if (is_gui_look_enabled) {
-		components::sprite cursor_sprite;
-		cursor_sprite.set(gui_cursor);
-		cursor_sprite.color = gui_cursor_color;
+	components::sprite cursor_sprite;
+	cursor_sprite.set(gui_cursor);
+	cursor_sprite.color = gui_cursor_color;
 
-		shared::state_for_drawing_renderable state;
-		state.setup_camera_state(r.state);
-		state.screen_space_mode = true;
-		state.renderable_transform.pos = gui_crosshair_position;
+	shared::state_for_drawing_renderable state;
+	state.setup_camera_state(r.state);
+	state.screen_space_mode = true;
+	state.renderable_transform.pos = gui_crosshair_position;
 
-		cursor_sprite.draw(state);
+	cursor_sprite.draw(state);
 
-		if (tooltip_text.size() > 0) {
-			tooltip_drawer.set_text(text::format(tooltip_text, text::style()));
+	if (tooltip_text.size() > 0) {
+		tooltip_drawer.set_text(text::format(tooltip_text, text::style()));
 
-			tooltip_drawer.above_left_to_right(gui_crosshair_position);
-			
-			auto& out = state.output->get_triangle_buffer();
+		tooltip_drawer.above_left_to_right(gui_crosshair_position);
 
-			tooltip_drawer.draw_stroke(out, black);
-			tooltip_drawer.draw(out);
-		}
+		auto& out = state.output->get_triangle_buffer();
+
+		tooltip_drawer.draw_stroke(out, black);
+		tooltip_drawer.draw(out);
 	}
 }
 

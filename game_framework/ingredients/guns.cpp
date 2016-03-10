@@ -58,7 +58,7 @@ namespace prefabs {
 			ingredients::sprite(sample_magazine, pos, assets::texture_id::SAMPLE_MAGAZINE, augs::white, render_layer::DROPPED_ITEM);
 			ingredients::crate_physics(sample_magazine);
 
-			auto item = ingredients::make_item(sample_magazine);
+			auto& item = ingredients::make_item(sample_magazine);
 			auto& container = *sample_magazine += components::container();
 			
 			item.categories_for_slot_compatibility = item_category::MAGAZINE;

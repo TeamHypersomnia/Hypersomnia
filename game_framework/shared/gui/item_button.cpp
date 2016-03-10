@@ -40,7 +40,7 @@ void item_button::draw_triangles(draw_info in) {
 		auto prev_abs = absolute_xy;
 		absolute_xy += in.owner.current_drag_amount;
 
-		draw_proc(in, true, false, false, false);
+		draw_proc(in, true, false, false, true);
 
 		absolute_xy = prev_abs + griddify(in.owner.current_drag_amount);
 
@@ -80,7 +80,7 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 	}
 
 	if (decrease_alpha) {
-		inside_col.a -= 10;
+		inside_col.a = 15;
 	}
 
 	if (decrease_border_alpha) {
