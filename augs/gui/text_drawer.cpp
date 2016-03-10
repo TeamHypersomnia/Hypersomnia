@@ -53,5 +53,9 @@ namespace augs {
 		void text_drawer::above_left_to_right(vec2i p) {
 			pos = vec2i(p.x, p.y - get_bbox().y);
 		}
+
+		void text_drawer::below_left_to_right(vec2i p) {
+			pos = vec2i(p.x, p.y + get_bbox().y);
+		}
 	}
 }

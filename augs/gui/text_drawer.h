@@ -24,6 +24,7 @@ namespace augs {
 			void center(rects::ltrb<float>);
 			void bottom_right(rects::ltrb<float>);
 			void above_left_to_right(vec2i pos);
+			void below_left_to_right(vec2i pos);
 		};
 	}
 }

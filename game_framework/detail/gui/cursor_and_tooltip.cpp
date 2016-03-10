@@ -87,13 +87,15 @@ void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message
 	bool draw_tooltip = tooltip_text.size() > 0;
 
 	if (draw_tooltip) {
-		tooltip_drawer.set_text(text::format(tooltip_text, text::style()));
-		tooltip_drawer.above_left_to_right(gui_crosshair_position);
+		vec2i left_top_corner = gui_crosshair_position;
 
-		state.renderable_transform.pos = tooltip_drawer.pos;
+		tooltip_drawer.set_text(text::format(tooltip_text, text::style()));
+		tooltip_drawer.pos = gui_crosshair_position + vec2i(cursor_sprite.size.x + 2, 0);
+
+		state.renderable_transform.pos = left_top_corner;
 		bg_sprite.size.set(tooltip_drawer.get_bbox());
-		bg_sprite.size.y += cursor_sprite.size.y;
-		bg_sprite.size.x = std::max(bg_sprite.size.x, cursor_sprite.size.x);
+		bg_sprite.size.y = std::max(int(cursor_sprite.size.y), tooltip_drawer.get_bbox().y);
+		bg_sprite.size.x += cursor_sprite.size.x;
 		bg_sprite.draw(state);
 
 		gui::solid_stroke stroke;
@@ -101,7 +103,7 @@ void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message
 
 		auto& out = state.output->get_triangle_buffer();
 		
-		stroke.draw(out, rects::ltrb<float>(tooltip_drawer.pos, bg_sprite.size));
+		stroke.draw(out, rects::ltrb<float>(gui_crosshair_position, bg_sprite.size));
 
 		tooltip_drawer.draw_stroke(out, black);
 		tooltip_drawer.draw(out);
