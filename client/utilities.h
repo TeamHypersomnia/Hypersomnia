@@ -1,5 +1,5 @@
 #pragma once
-#include "game_framework/shared/state_for_drawing.h"
+#include "game_framework/detail/state_for_drawing.h"
 #include "game_framework/resources/animation.h"
 #include "game_framework/components/tile_layer_component.h"
 
