@@ -34,7 +34,7 @@ namespace ingredients {
 
 		gun.action_mode = components::gun::AUTOMATIC;
 		
-		container.slots[slot_function::GUN_CHAMBER] = magazine_slot_def;
+		container.slots[slot_function::GUN_CHAMBER] = chamber_slot_def;
 
 		gun.muzzle_velocity = std::make_pair(500, 1000);
 		gun.timeout_between_shots.set(100);

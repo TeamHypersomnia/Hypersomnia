@@ -162,6 +162,10 @@ bool item_button::is_inventory_root() {
 void item_button::perform_logic_step(augs::gui::gui_world& gr) {
 	enable_drawing_of_children = !is_being_dragged(gr);
 	rect::perform_logic_step(gr);
+
+	if (is_inventory_root())
+		return;
+
 	vec2i parent_position;
 
 	auto* sprite = item->find<components::sprite>();
@@ -173,9 +177,6 @@ void item_button::perform_logic_step(augs::gui::gui_world& gr) {
 		rounded_size *= 11;
 		rc.set_size(rounded_size);
 	}
-
-	if (is_inventory_root())
-		return;
 
 	auto parent_slot = item->get<components::item>().current_slot;
 	
