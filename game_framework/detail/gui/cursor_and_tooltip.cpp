@@ -1,7 +1,7 @@
 #include "game_framework/systems/gui_system.h"
 #include "game_framework/components/sprite_component.h"
 #include "graphics/renderer.h"
-
+#include "gui/stroke.h"
 #include "../inventory_utils.h"
 
 using namespace augs;
@@ -21,7 +21,6 @@ void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message
 			item_button* target_item = dynamic_cast<item_button*>(gui.rect_hovered);
 
 			std::pair<item_transfer_result, slot_function> predicted_result;
-			predicted_result.second = slot_function::INVALID;
 
 			bool queried = true;
 
@@ -74,25 +73,40 @@ void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message
 		}
 	}
 
+	components::sprite bg_sprite;
+	bg_sprite.set(assets::BLANK, black);
+	bg_sprite.color.a = 120;	
+
 	components::sprite cursor_sprite;
-	cursor_sprite.set(gui_cursor);
-	cursor_sprite.color = gui_cursor_color;
+	cursor_sprite.set(gui_cursor, gui_cursor_color);
 
 	shared::state_for_drawing_renderable state;
 	state.setup_camera_state(r.state);
 	state.screen_space_mode = true;
-	state.renderable_transform.pos = gui_crosshair_position;
 
-	cursor_sprite.draw(state);
+	bool draw_tooltip = tooltip_text.size() > 0;
 
-	if (tooltip_text.size() > 0) {
+	if (draw_tooltip) {
 		tooltip_drawer.set_text(text::format(tooltip_text, text::style()));
-
 		tooltip_drawer.above_left_to_right(gui_crosshair_position);
 
+		state.renderable_transform.pos = tooltip_drawer.pos;
+		bg_sprite.size.set(tooltip_drawer.get_bbox());
+		bg_sprite.size.y += cursor_sprite.size.y;
+		bg_sprite.size.x = std::max(bg_sprite.size.x, cursor_sprite.size.x);
+		bg_sprite.draw(state);
+
+		gui::solid_stroke stroke;
+		stroke.set_material(gui::material(assets::BLANK, slightly_visible_white));
+
 		auto& out = state.output->get_triangle_buffer();
+		
+		stroke.draw(out, rects::ltrb<float>(tooltip_drawer.pos, bg_sprite.size));
 
 		tooltip_drawer.draw_stroke(out, black);
 		tooltip_drawer.draw(out);
 	}
+
+	state.renderable_transform.pos = gui_crosshair_position;
+	cursor_sprite.draw(state);
 }

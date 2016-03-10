@@ -84,8 +84,7 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 	}
 
 	if (decrease_border_alpha) {
-		border_col = white;
-		border_col.a -= 220;
+		border_col = slightly_visible_white;
 	}
 
 	if (draw_inside) {

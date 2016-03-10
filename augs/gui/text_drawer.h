@@ -12,6 +12,8 @@ namespace augs {
 			text::draft_redrawer draft;
 			text::printer print;
 			vec2i pos;
+			
+			vec2i get_bbox();
 
 			void set_text(const text::fstr&);
 

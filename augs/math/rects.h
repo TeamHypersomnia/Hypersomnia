@@ -92,6 +92,7 @@ namespace augs {
 			ltrb(const wh<T>& rr) : l(0), t(0), r(rr.w), b(rr.h) {}
 			ltrb(const xywh<T>& rr) : l(rr.x), t(rr.y), r(rr.x + rr.w), b(rr.y + rr.h) {}
 			ltrb(T l, T t, T r, T b) : l(l), t(t), r(r), b(b) {}
+			ltrb(vec2t<T> pos, vec2t<T> size) : l(pos.x), t(pos.y), r(pos.x + size.x), b(pos.y + size.y) {}
 			void set(T l, T t, T r, T b) { *this = ltrb(l, t, r, b); }
 
 			vec2t<T> left_top() {

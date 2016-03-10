@@ -34,25 +34,24 @@ namespace augs {
 			draft.str() = f;
 		}
 
-		void text_drawer::center(rects::ltrb<float> r) {
+		vec2i text_drawer::get_bbox() {
 			draft.guarded_redraw();
 			auto bbox = draft.get_draft().get_bbox();
+			return vec2i( bbox.w, bbox.h );
+		}
 
-			pos = vec2i(r.l + r.w() / 2 - bbox.w / 2, r.t + r.h() / 2 - bbox.h / 2);
+		void text_drawer::center(rects::ltrb<float> r) {
+			auto bbox = get_bbox();
+			pos = vec2i(r.l + r.w() / 2 - bbox.x / 2, r.t + r.h() / 2 - bbox.y / 2);
 		}
 
 		void text_drawer::bottom_right(rects::ltrb<float> r) {
-			draft.guarded_redraw();
-			auto bbox = draft.get_draft().get_bbox();
-
-			pos = vec2i(r.r - bbox.w, r.b - bbox.h);
+			auto bbox = get_bbox();
+			pos = vec2i(r.r - bbox.x, r.b - bbox.y);
 		}
 
 		void text_drawer::above_left_to_right(vec2i p) {
-			draft.guarded_redraw();
-			auto bbox = draft.get_draft().get_bbox();
-
-			pos = vec2i(p.x, p.y - bbox.h);
+			pos = vec2i(p.x, p.y - get_bbox().y);
 		}
 	}
 }

@@ -157,6 +157,7 @@ namespace augs {
 	const rgba gray3(104, 104, 104, 255);
 	const rgba gray4(180, 180, 180, 255);
 	const rgba white(255, 255, 255, 255);
+	const rgba slightly_visible_white(255, 255, 255, 15);
 	const rgba darkblue(6, 5, 20, 255);
 
 	const rgba cyan(0, 255, 255, 255);
