@@ -13,11 +13,17 @@ void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message
 
 	std::wstring tooltip_text = L"";
 
+	shared::state_for_drawing_renderable state;
+	state.setup_camera_state(r.state);
+	state.screen_space_mode = true;
+
+	auto& out = state.output->get_triangle_buffer();
+	gui::rect::draw_info in(gui, out);
+
 	if (gui.held_rect_is_dragged) {
 		item_button* dragged_item = dynamic_cast<item_button*>(gui.rect_held_by_lmb);
 
-		if (dragged_item)
-			dragged_item->has_target_under_dragged_ghost = false;
+		bool possible_target_under_cursor = false;
 
 		if (dragged_item && gui.rect_hovered) {
 			slot_button* target_slot = dynamic_cast<slot_button*>(gui.rect_hovered);
@@ -25,18 +31,16 @@ void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message
 
 			std::pair<item_transfer_result, slot_function> predicted_result;
 
-			bool queried = true;
+			possible_target_under_cursor = true;
 
 			if (target_slot)
 				predicted_result = { query_transfer_result({ dragged_item->item, target_slot->slot_id }), target_slot->slot_id.type };
 			else if (target_item && target_item != dragged_item)
 				predicted_result = query_transfer_result(dragged_item->item, target_item->item);
 			else
-				queried = false;
+				possible_target_under_cursor = false;
 
-			dragged_item->has_target_under_dragged_ghost = queried;
-
-			if (queried) {
+			if (possible_target_under_cursor) {
 				if (predicted_result.first == item_transfer_result::THE_SAME_SLOT) {
 					tooltip_text = L"Current slot";
 				}
@@ -76,6 +80,13 @@ void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message
 				}
 			}
 		}
+
+		if (dragged_item) {
+			dragged_item->draw_complete_dragged_ghost(in);
+
+			if (!possible_target_under_cursor)
+				dragged_item->draw_grid_border_ghost(in);
+		}
 	}
 
 	components::sprite bg_sprite;
@@ -84,10 +95,6 @@ void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message
 
 	components::sprite cursor_sprite;
 	cursor_sprite.set(gui_cursor, gui_cursor_color);
-
-	shared::state_for_drawing_renderable state;
-	state.setup_camera_state(r.state);
-	state.screen_space_mode = true;
 
 	bool draw_tooltip = tooltip_text.size() > 0;
 
@@ -106,7 +113,6 @@ void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message
 		gui::solid_stroke stroke;
 		stroke.set_material(gui::material(assets::BLANK, slightly_visible_white));
 
-		auto& out = state.output->get_triangle_buffer();
 		
 		stroke.draw(out, rects::ltrb<float>(gui_crosshair_position, bg_sprite.size));
 

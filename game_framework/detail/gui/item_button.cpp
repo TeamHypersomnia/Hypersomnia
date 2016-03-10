@@ -28,7 +28,7 @@ item_button::item_button(rects::xywh<float> rc) : rect(rc) {
 	focusable = false;
 }
 
-void item_button::draw_dragged_ghost(draw_info in) {
+void item_button::draw_dragged_ghost_inside(draw_info in) {
 	draw_proc(in, true, false, false, true);
 }
 
@@ -47,21 +47,19 @@ void item_button::draw_triangles(draw_info in) {
 		return;
 	}
 
-	if (is_being_dragged(in.owner)) {
-		auto parent_slot = item->get<components::item>().current_slot;
-
-		auto prev_abs = absolute_xy;
-		absolute_xy += in.owner.current_drag_amount;
-
-		draw_dragged_ghost(in);
-
-		absolute_xy = prev_abs + griddify(in.owner.current_drag_amount);
-
-		if(!has_target_under_dragged_ghost)
-			draw_grid_border_ghost(in);
-	}
-	else
+	if (!is_being_dragged(in.owner)) 
 		draw_complete_with_children(in);
+}
+
+void item_button::draw_complete_dragged_ghost(draw_info in) {
+	auto parent_slot = item->get<components::item>().current_slot;
+
+	auto prev_abs = absolute_xy;
+	absolute_xy += in.owner.current_drag_amount;
+
+	draw_dragged_ghost_inside(in);
+
+	absolute_xy = prev_abs + griddify(in.owner.current_drag_amount);
 }
 
 void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bool draw_connector, bool decrease_alpha, bool decrease_border_alpha) {

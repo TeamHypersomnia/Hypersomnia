@@ -7,9 +7,8 @@
 
 struct item_button : augs::gui::rect {
 private:
-	void draw_dragged_ghost(draw_info in);
+	void draw_dragged_ghost_inside(draw_info in);
 	void draw_complete_with_children(draw_info in);
-	void draw_grid_border_ghost(draw_info in);
 public:
 	item_button(rects::xywh<float> rc = rects::xywh<float>());
 
@@ -23,7 +22,6 @@ public:
 	augs::gui::appearance_detector detector;
 
 	bool is_container_open = false;
-	bool has_target_under_dragged_ghost = false;
 
 	augs::entity_id item;
 
@@ -32,6 +30,10 @@ public:
 	void perform_logic_step(augs::gui::gui_world&) final;
 
 	void draw_triangles(draw_info) final;
+
+	void draw_grid_border_ghost(draw_info in);
+	void draw_complete_dragged_ghost(draw_info);
+
 	void consume_gui_event(event_info) final;
 
 	void draw_proc(draw_info, bool draw_inside, bool draw_border, bool draw_connector, bool decrease_alpha, bool decrease_border_alpha = false);
