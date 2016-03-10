@@ -12,7 +12,7 @@ std::vector<std::array<vec2i, 2>> get_connecting_pixel_lines(rects::ltrb<float> 
 	vec2i bw2(b.w() / 2, 0);
 	vec2i bh2(0, b.h() / 2);
 
-	if (a.l > b.r) {
+	if (ac.x >= b.r) {
 		bool can_a_to_b = ac.y >= b.t && ac.y <= b.b;
 		bool can_b_to_a = bc.y >= a.t && bc.y <= a.b;
 
@@ -38,7 +38,7 @@ std::vector<std::array<vec2i, 2>> get_connecting_pixel_lines(rects::ltrb<float> 
 		}
 	}
 
-	if (a.r < b.l) {
+	if (ac.x <= b.l) {
 		bool can_a_to_b = ac.y >= b.t && ac.y <= b.b;
 		bool can_b_to_a = bc.y >= a.t && bc.y <= a.b;
 
@@ -81,6 +81,13 @@ std::vector<std::array<vec2i, 2>> get_connecting_pixel_lines(rects::ltrb<float> 
 		else if (can_b_to_a) {
 			return{ { bc - bh2, vec2(bc.x, a.b) } };
 		}
+
+		if (a.l >= bc.x) {
+			return{ { bc - bh2, vec2(bc.x, ac.y) },{ vec2(bc.x, ac.y), vec2(a.l, ac.y) } };
+		}
+		else if (a.r <= bc.x) {
+			return{ { bc - bh2, vec2(bc.x, ac.y) },{ vec2(bc.x, ac.y), vec2(a.r, ac.y) } };
+		}
 	}
 
 	if (a.t > b.b) {
@@ -99,6 +106,13 @@ std::vector<std::array<vec2i, 2>> get_connecting_pixel_lines(rects::ltrb<float> 
 		}
 		else if (can_b_to_a) {
 			return{ { bc + bh2, vec2(bc.x, a.t) } };
+		}
+
+		if (a.l >= bc.x) {
+			return{ { bc + bh2, vec2(bc.x, ac.y) },{ vec2(bc.x, ac.y), vec2(a.l, ac.y) } };
+		}
+		else if (a.r <= bc.x) {
+			return{ { bc + bh2, vec2(bc.x, ac.y) },{ vec2(bc.x, ac.y), vec2(a.r, ac.y) } };
 		}
 	}
 
