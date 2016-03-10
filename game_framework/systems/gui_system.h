@@ -27,8 +27,6 @@ public:
 
 	gui_system(world& parent_world);
 
-	augs::entity_id gui_crosshair;
-
 	bool is_gui_look_enabled = false;
 	bool preview_due_to_item_picking_request = false;
 	

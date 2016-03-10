@@ -160,6 +160,7 @@ bool item_button::is_inventory_root() {
 }
 
 void item_button::perform_logic_step(augs::gui::gui_world& gr) {
+	enable_drawing_of_children = !is_being_dragged(gr);
 	rect::perform_logic_step(gr);
 	vec2i parent_position;
 

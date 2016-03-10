@@ -15,3 +15,4 @@ inventory_slot_id map_primary_action_to_secondary_hand_if_primary_empty(augs::en
 inventory_slot_id find_first_non_attachment_slot_for_item(augs::entity_id);
 
 item_transfer_result query_transfer_result(messages::item_slot_transfer_intent);
+std::pair<item_transfer_result, slot_function> query_transfer_result(augs::entity_id from, augs::entity_id to);

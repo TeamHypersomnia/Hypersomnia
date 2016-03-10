@@ -49,14 +49,60 @@ void gui_system::draw_gui_overlays_for_camera_rendering_request(messages::camera
 	if (gui.held_rect_is_dragged) {
 		item_button* dragged_item = dynamic_cast<item_button*>(gui.rect_held_by_lmb);
 		
-		if (dragged_item) {
+		if (dragged_item && gui.rect_hovered) {
 			slot_button* target_slot = dynamic_cast<slot_button*>(gui.rect_hovered);
 			item_button* target_item = dynamic_cast<item_button*>(gui.rect_hovered);
 
-			if (target_slot || target_item && (target_item != dragged_item)) {
-				gui_cursor = assets::GUI_CURSOR_ADD;
-				gui_cursor_color = green;
-				tooltip_text = L"Insert";
+			std::pair<item_transfer_result, slot_function> predicted_result;
+			predicted_result.second = slot_function::INVALID;
+
+			bool queried = true;
+
+			if (target_slot)
+				predicted_result = { query_transfer_result({ dragged_item->item, target_slot->slot_id }), target_slot->slot_id.type };
+			else if (target_item && target_item != dragged_item)
+				predicted_result = query_transfer_result(dragged_item->item, target_item->item);
+			else
+				queried = false;
+
+			if (queried) {
+				if (predicted_result.first == item_transfer_result::THE_SAME_SLOT) {
+					tooltip_text = L"Current slot";
+				}
+				else if (predicted_result.first >= item_transfer_result::SUCCESSFUL_TRANSFER) {
+					gui_cursor = assets::GUI_CURSOR_ADD;
+					gui_cursor_color = green;
+
+					if (predicted_result.first == item_transfer_result::UNMOUNT_BEFOREHAND) {
+						tooltip_text += L"Unmount & ";
+					}
+
+					switch (predicted_result.second) {
+					case slot_function::ITEM_DEPOSIT: tooltip_text = L"Insert"; break;
+					case slot_function::GUN_CHAMBER: tooltip_text = L"Place"; break;
+					case slot_function::GUN_CHAMBER_MAGAZINE: tooltip_text = L"Place"; break;
+					case slot_function::GUN_DETACHABLE_MAGAZINE: tooltip_text = L"Reload"; break;
+					case slot_function::GUN_RAIL: tooltip_text = L"Install"; break;
+					case slot_function::TORSO_ARMOR_SLOT: tooltip_text = L"Wear"; break;
+					case slot_function::SHOULDER_SLOT: tooltip_text = L"Wear"; break;
+					case slot_function::PRIMARY_HAND: tooltip_text = L"Pull out"; break;
+					case slot_function::SECONDARY_HAND: tooltip_text = L"Pull out"; break;
+					case slot_function::GUN_BARREL: tooltip_text = L"Install"; break;
+					default: assert(0); break;
+					}
+				}
+				else if (predicted_result.first < item_transfer_result::SUCCESSFUL_TRANSFER) {
+					gui_cursor = assets::GUI_CURSOR_ERROR;
+					gui_cursor_color = red;
+
+					switch (predicted_result.first) {
+					case item_transfer_result::INSUFFICIENT_SPACE: tooltip_text = L"No space"; break;
+					case item_transfer_result::INVALID_SLOT_OR_UNOWNED_ROOT: tooltip_text = L"Impossible"; break;
+					case item_transfer_result::INCOMPATIBLE_CATEGORIES: tooltip_text = L"Incompatible item"; break;
+					case item_transfer_result::NO_SLOT_AVAILABLE: tooltip_text = L"No slot available"; break;
+					default: assert(0); break;
+					}
+				}
 			}
 		}
 	}

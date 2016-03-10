@@ -11,12 +11,15 @@ enum item_category {
 };
 
 enum class slot_function {
+	INVALID,
+
 	ITEM_DEPOSIT,
 
 	GUN_CHAMBER,
 	GUN_DETACHABLE_MAGAZINE,
 	GUN_CHAMBER_MAGAZINE,
 	GUN_RAIL,
+	GUN_BARREL,
 
 	PRIMARY_HAND,
 	SECONDARY_HAND,

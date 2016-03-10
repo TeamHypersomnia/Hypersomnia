@@ -26,7 +26,12 @@ inventory_slot* inventory_slot_id::operator->() {
 }
 
 bool inventory_slot_id::alive() {
-	return container_entity.alive() && container_entity->get<components::container>().slots.find(type) != container_entity->get<components::container>().slots.end();
+	if (container_entity.dead())
+		return false;
+
+	auto* container = container_entity->find<components::container>();
+
+	return container && container->slots.find(type) != container->slots.end();
 }
 
 bool inventory_slot_id::functional() {

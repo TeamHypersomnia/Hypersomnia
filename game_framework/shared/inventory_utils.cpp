@@ -112,3 +112,22 @@ item_transfer_result query_transfer_result(messages::item_slot_transfer_intent r
 
 	return predicted_result;
 }
+
+std::pair<item_transfer_result, slot_function> query_transfer_result(augs::entity_id from, augs::entity_id to) {
+	auto* container = to->find<components::container>();
+	
+	if (container) {
+		if (to[slot_function::ITEM_DEPOSIT].alive())
+			return{ query_transfer_result({ from, to[slot_function::ITEM_DEPOSIT] }), slot_function::ITEM_DEPOSIT };
+
+		for (auto& s : container->slots) {
+			auto res = query_transfer_result({ from, to[s.first] });
+			
+			if (res >= item_transfer_result::SUCCESSFUL_TRANSFER) {
+				return{ res, s.first };
+			}
+		}
+	}
+
+	return{ item_transfer_result::NO_SLOT_AVAILABLE, slot_function::INVALID };
+}
