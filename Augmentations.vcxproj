@@ -382,6 +382,7 @@
     <ClCompile Include="game_framework\components\polygon_component.cpp" />
     <ClCompile Include="game_framework\components\sprite_component.cpp" />
     <ClCompile Include="game_framework\components\tile_layer_component.cpp" />
+    <ClCompile Include="game_framework\detail\gui\cursor_and_tooltip.cpp" />
     <ClCompile Include="game_framework\game_overworld.cpp" />
     <ClCompile Include="game_framework\game_world.cpp" />
     <ClCompile Include="game_framework\globals\filters.cpp" />
