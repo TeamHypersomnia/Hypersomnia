@@ -149,12 +149,12 @@ namespace components {
 			id->get<components::physics>().body->SetActive(active);
 	}
 
-	void physics::recreate_fixtures_and_attach_to(augs::entity_id from_fixture_entity, augs::entity_id to_body_entity, components::transform offset_shapes) {
+	void physics::recreate_fixtures_and_attach_to(augs::entity_id from_fixture_entity, augs::entity_id to_body_entity, components::transform offset_created_shapes) {
 		destroy_physics_of_entity(from_fixture_entity);
 		auto& def = from_fixture_entity->get<components::physics_definition>();
 
 		def.attach_fixtures_to_entity = to_body_entity;
-		def.offset_all_shapes = offset_shapes;
+		def.offset_created_shapes = offset_created_shapes;
 
 		auto& physics = from_fixture_entity->get_owner_world().get_system<physics_system>();
 		from_fixture_entity->get<components::physics_definition>().dont_create_fixtures_and_body = false;
