@@ -232,7 +232,7 @@ void item_button::consume_gui_event(event_info info) {
 		auto& gui = gui_element_entity->get_owner_world().get_system<gui_system>();
 		auto& drag_result = gui.prepare_drag_and_drop_result();
 
-		if (drag_result.possible_target_hovered && drag_result.will_drop_be_successful) {
+		if (drag_result.possible_target_hovered && drag_result.will_drop_be_successful()) {
 			gui.parent_world.post_message(drag_result.intent);
 		}
 		else if (!drag_result.possible_target_hovered) {

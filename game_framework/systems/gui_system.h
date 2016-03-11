@@ -20,7 +20,9 @@ class gui_system : public augs::processing_system_templated<components::gui_elem
 		messages::gui_item_transfer_intent intent;
 		item_button* dragged_item = nullptr;
 		bool possible_target_hovered = false;
-		bool will_drop_be_successful = false;
+		item_transfer_result result;
+
+		bool will_drop_be_successful();
 		std::wstring tooltip_text;
 	};
 

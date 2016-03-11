@@ -7,6 +7,10 @@
 using namespace augs;
 using namespace gui;
 
+bool gui_system::drag_and_drop_result::will_drop_be_successful() {
+	return result >= item_transfer_result::SUCCESSFUL_TRANSFER;
+}
+
 gui_system::drag_and_drop_result gui_system::prepare_drag_and_drop_result() {
 	drag_and_drop_result out;
 	auto& tooltip_text = out.tooltip_text;
@@ -38,12 +42,12 @@ gui_system::drag_and_drop_result gui_system::prepare_drag_and_drop_result() {
 				out.possible_target_hovered = false;
 
 			if (out.possible_target_hovered) {
+				out.result = predicted_result.first;
+
 				if (predicted_result.first == item_transfer_result::THE_SAME_SLOT) {
 					out.tooltip_text = L"Current slot";
 				}
 				else if (predicted_result.first >= item_transfer_result::SUCCESSFUL_TRANSFER) {
-					out.will_drop_be_successful = true;
-
 					if (predicted_result.first == item_transfer_result::UNMOUNT_BEFOREHAND) {
 						tooltip_text += L"Unmount & ";
 					}
@@ -103,11 +107,11 @@ void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message
 	auto gui_cursor_color = cyan;
 
 	if (drag_result.possible_target_hovered) {
-		if (drag_result.will_drop_be_successful) {
+		if (drag_result.will_drop_be_successful()) {
 			gui_cursor = assets::GUI_CURSOR_ADD;
 			gui_cursor_color = green;
 		}
-		else {
+		else if(drag_result.result != item_transfer_result::THE_SAME_SLOT) {
 			gui_cursor = assets::GUI_CURSOR_ERROR;
 			gui_cursor_color = red;
 		}
