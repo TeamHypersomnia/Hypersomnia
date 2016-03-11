@@ -20,7 +20,7 @@ struct body_definition {
 };
 
 struct fixture_definition {
-	void offset_vertices();
+	void offset_vertices(components::transform);
 	void mult_vertices(vec2);
 
 	enum {

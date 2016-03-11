@@ -23,6 +23,9 @@ namespace ingredients {
 		magazine_slot_def.is_attachment_slot = true;
 		magazine_slot_def.for_categorized_items_only = true;
 		magazine_slot_def.category_allowed = item_category::MAGAZINE;
+		magazine_slot_def.attachment_sticking_mode = augs::rects::sticking::TOP;
+		magazine_slot_def.attachment_offset.pos.set(10, 5);
+		magazine_slot_def.attachment_offset.rotation = -90;
 
 		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE] = magazine_slot_def;
 
@@ -32,10 +35,17 @@ namespace ingredients {
 		chamber_slot_def.category_allowed = item_category::SHOT_CHARGE;
 		chamber_slot_def.space_available = 0.01f;
 
-		gun.action_mode = components::gun::AUTOMATIC;
-		
 		container.slots[slot_function::GUN_CHAMBER] = chamber_slot_def;
 
+		inventory_slot barrel_slot_def;
+		barrel_slot_def.is_attachment_slot = true;
+		barrel_slot_def.for_categorized_items_only = true;
+		barrel_slot_def.category_allowed = item_category::BARREL_ATTACHMENT;
+		barrel_slot_def.attachment_sticking_mode = augs::rects::sticking::RIGHT;
+
+		container.slots[slot_function::GUN_BARREL] = barrel_slot_def;
+
+		gun.action_mode = components::gun::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(500, 1000);
 		gun.timeout_between_shots.set(100);
 		gun.bullet_spawn_offset.set(100, 0);
@@ -80,6 +90,20 @@ namespace prefabs {
 		world.post_message(load_charge);
 
 		return sample_magazine;
+	}
+
+	augs::entity_id create_sample_suppressor(augs::world& world, vec2 pos) {
+		auto sample_suppressor = world.create_entity("sample_suppressor");
+
+		ingredients::sprite(sample_suppressor, pos, assets::texture_id::SAMPLE_SUPPRESSOR, augs::white, render_layer::DROPPED_ITEM);
+		ingredients::crate_physics(sample_suppressor);
+
+		auto& item = ingredients::make_item(sample_suppressor);
+
+		item.categories_for_slot_compatibility = item_category::BARREL_ATTACHMENT;
+		item.space_occupied_per_charge = 0.2f;
+
+		return sample_suppressor;
 	}
 
 	augs::entity_id create_pink_charge(augs::world& world, vec2 pos) {

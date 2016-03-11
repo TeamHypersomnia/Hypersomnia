@@ -135,6 +135,6 @@ namespace components {
 	augs::rects::ltrb<float> sprite::get_aabb(components::transform transform) const {
 		static thread_local vec2 v[4];
 		make_rect(transform.pos, vec2(size), transform.rotation, v);
-		return augs::rects::ltrb<float>::get_aabb(v);
+		return augs::get_aabb(v);
 	}
 }

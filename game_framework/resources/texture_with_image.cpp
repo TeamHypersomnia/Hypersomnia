@@ -1,5 +1,6 @@
 #include "texture_with_image.h"
 #include "file.h"
+#define ENABLE_POLYGONIZATION_IN_DEBUG 1
 
 namespace resources {
 	void texture_with_image::set_from_image(augs::image img) {
@@ -14,7 +15,7 @@ namespace resources {
 		filename.resize(filename.size() - 4);
 		filename += L"_polygonized.png";
 
-#if !(_DEBUG || NDEBUG)
+#if ENABLE_POLYGONIZATION_IN_DEBUG || !(_DEBUG || NDEBUG)
 		if (augs::file_exists(filename))
 			polygonize_from_file(filename);
 #endif

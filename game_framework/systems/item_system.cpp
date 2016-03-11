@@ -13,6 +13,7 @@
 #include "../components/physics_component.h"
 #include "../components/force_joint_component.h"
 #include "../components/item_slot_transfers_component.h"
+#include "../components/physics_definition_component.h"
 #include "../components/fixtures_component.h"
 
 #include "../detail/inventory_utils.h"
@@ -191,12 +192,8 @@ void item_system::consume_item_slot_transfer_requests() {
 		
 		if(is_pickup_or_transfer) {
 			if (r.target_slot.should_item_inside_keep_physical_body()) {
-				auto target_attachment_offset_from_container = r.target_slot->attachment_offset;
+				auto target_attachment_offset_from_container = r.target_slot.sum_attachment_offsets_of_parents(r.item);
 				
-				auto sticking = r.target_slot->attachment_sticking_mode;
-				target_attachment_offset_from_container.pos += r.item->get<components::fixtures>().get_aabb_size().get_sticking_offset(sticking);
-				target_attachment_offset_from_container += item.attachment_offsets_per_sticking_mode[sticking];
-
 				components::physics::recreate_fixtures_and_attach_to(r.item, r.target_slot.get_root_container(), target_attachment_offset_from_container);
 				components::physics::resolve_density_of_entity(r.item);
 			}

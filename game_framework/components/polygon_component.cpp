@@ -157,6 +157,6 @@ namespace components {
 	}
 	
 	rects::ltrb<float> polygon::get_aabb(components::transform transform) {
-		return rects::ltrb<float>::get_aabb(original_polygon);
+		return augs::get_aabb(original_polygon);
 	}
 }

@@ -20,11 +20,11 @@ void fixture_definition::add_convex_polygon(const std::vector <vec2>& verts) {
 	convex_polys.push_back(verts);
 }
 
-void fixture_definition::offset_vertices() {
+void fixture_definition::offset_vertices(components::transform transform) {
 	for (auto& c : convex_polys) {
 		for (auto& v : c) {
-			v.rotate(transform_vertices.rotation, vec2(0, 0));
-			v += transform_vertices.pos;
+			v.rotate(transform.rotation, vec2(0, 0));
+			v += transform.pos;
 		}
 	}
 }
@@ -51,29 +51,34 @@ void fixture_definition::from_renderable(augs::entity_id e, bool polygonize_spri
 	auto* polygon = e->find<components::polygon>();
 
 	if (sprite) {
-		auto& poly_info = resource_manager.find(sprite->tex)->polygonized;
+		auto& polygonized_sprite_verts = resource_manager.find(sprite->tex)->polygonized;
 		auto& image_to_polygonize = resource_manager.find(sprite->tex)->img;
 
-		if (poly_info.size() > 0 && polygonize_sprite) {
+		if (polygonized_sprite_verts.size() > 0 && polygonize_sprite) {
 			type = POLYGON;
-			
+
+			auto image_size = image_to_polygonize.get_size();
+			vec2 polygonized_size(image_size.w, image_size.h);  
+
 			std::vector<vec2> new_concave;
-			
-			for (auto v : poly_info) {
-				auto polygonized_size = vec2(image_to_polygonize.get_size().w, image_to_polygonize.get_size().h);
-			
-				auto new_v = vec2(v) - polygonized_size / 2;
+
+			for (auto v : polygonized_sprite_verts) {
+				vec2 new_v = v;
 				vec2 scale = sprite->size / polygonized_size;
 				
 				new_v *= scale;
-			
 				new_v.y = -new_v.y;
 				new_concave.push_back(new_v);
 			}
+
+			auto origin = augs::get_aabb(new_concave).center();
 			
+			for (auto& v : new_concave)
+				v -= origin;
+
 			debug_original = new_concave;
 			add_concave_polygon(new_concave);
-			
+
 			mult_vertices(vec2(1, -1));
 		}
 		else {
@@ -229,7 +234,7 @@ components::fixtures& add_fixtures_to_other_body(fixture_definition fixture_data
 	auto body = physics_component.body;
 	physics_component.fixture_entities.push_back(subject);
 
-	fixture_data.offset_vertices();
+	fixture_data.offset_vertices(fixture_data.transform_vertices);
 	auto& fixtures = subject->add<components::fixtures>();
 	fixtures.convex_polys = fixture_data.convex_polys;
 	fixtures.shape_offset = fixture_data.transform_vertices;

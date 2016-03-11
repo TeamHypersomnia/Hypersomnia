@@ -47,6 +47,7 @@ namespace prefabs {
 	augs::entity_id create_motorcycle(augs::world&, components::transform);
 
 	augs::entity_id create_sample_magazine(augs::world&, vec2 pos);
+	augs::entity_id create_sample_suppressor(augs::world& world, vec2 pos);
 	augs::entity_id create_sample_rifle(augs::world&, vec2 pos);
 	
 	augs::entity_id create_pink_charge(augs::world&, vec2 pos);

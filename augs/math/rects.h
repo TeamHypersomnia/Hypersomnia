@@ -14,6 +14,13 @@ namespace augs {
 
 	/* faciliates operations on rectangles and points */
 	namespace rects {
+		enum sticking {
+			LEFT,
+			RIGHT,
+			TOP,
+			BOTTOM
+		};
+
 		template <class T> struct wh;
 		template <class T> struct ltrb;
 		template <class T> struct xywh;
@@ -164,6 +171,19 @@ namespace augs {
 				return offset.y == 0;
 			}
 
+			vec2t<T> get_sticking_offset(sticking mode) {
+				vec2t<T> res;
+				switch (mode) {
+				case sticking::LEFT: res = vec2t<T>(-r, 0);	break;
+				case sticking::RIGHT: res = vec2t<T>(-l, 0);	break;
+				case sticking::TOP: res = vec2t<T>(0, -b);	break;
+				case sticking::BOTTOM: res = vec2t<T>(0, -t);	break;
+				default: res = vec2(0, 0); break;
+				}
+
+				return res;
+			}
+
 			vec2t<T> center() const {
 				return vec2t<T>(l + w() / 2.f, t + h() / 2.f);
 			}
@@ -172,40 +192,6 @@ namespace augs {
 			template <typename T>
 			bool hover(const vec2t<T>& m) const {
 				return m.x >= l && m.y >= t && m.x <= r && m.y <= b;
-			}
-
-			template <class T>
-			static ltrb get_aabb(vec2t<T>* v, int verts = 4) {
-				auto x_pred = [](vec2t<T> a, vec2t<T> b){ return a.x < b.x; };
-				auto y_pred = [](vec2t<T> a, vec2t<T> b){ return a.y < b.y; };
-
-				vec2t<T> lower(
-					static_cast<T>(std::min_element(v, v + verts, x_pred)->x),
-					static_cast<T>(std::min_element(v, v + verts, y_pred)->y)
-					);
-
-				vec2t<T> upper(
-					static_cast<T>(std::max_element(v, v + verts, x_pred)->x),
-					static_cast<T>(std::max_element(v, v + verts, y_pred)->y)
-					);
-
-				return rects::ltrb<T>(lower.x, lower.y, upper.x, upper.y);
-			}
-
-			template <class T>
-			static ltrb get_aabb(std::vector<vec2t<T>> v) {
-				return get_aabb(v.data(), v.size());
-			}
-
-			template <class T>
-			static ltrb get_aabb_rotated(vec2t<T> initial_size, T rotation) {
-				auto verts = rects::ltrb<T>(0, 0, initial_size.x, initial_size.y).get_vertices<T>();
-
-				for (auto& v : verts)
-					v.rotate(rotation, initial_size / 2);
-
-				/* expanded aabb that takes rotation into consideration */
-				return get_aabb<T>(verts.data());
 			}
 
 			template <class T>

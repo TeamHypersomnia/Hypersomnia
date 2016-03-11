@@ -118,7 +118,7 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 			shared::state_for_drawing_renderable state;
 			state.screen_space_mode = true;
 			state.overridden_target_buffer = &in.v;
-			state.renderable_transform.pos = get_absolute_xy() + rc.get_size() / 2 - sprite->size / 2;
+			state.renderable_transform.pos = get_absolute_xy() + rc.get_size() / 2 - sprite->size / 2  +vec2(1, 1);
 			transparent_sprite.draw(state);
 		}
 
@@ -195,6 +195,8 @@ void item_button::perform_logic_step(augs::gui::gui_world& gr) {
 		rounded_size += 22;
 		rounded_size /= 11;
 		rounded_size *= 11;
+		//rounded_size.x = std::max(rounded_size.x, 33);
+		//rounded_size.y = std::max(rounded_size.y, 33);
 		rc.set_size(rounded_size);
 	}
 

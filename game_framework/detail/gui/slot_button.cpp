@@ -70,6 +70,10 @@ void slot_button::draw_triangles(draw_info info) {
 			draw_centered_texture(info, augs::gui::material(assets::texture_id::CHAMBER_SLOT_ICON, border_col));
 		}
 
+		if (slot_id.type == slot_function::GUN_BARREL) {
+			draw_centered_texture(info, augs::gui::material(assets::texture_id::GUN_BARREL_SLOT_ICON, border_col));
+		}
+
 		if (slot_id.type == slot_function::GUN_DETACHABLE_MAGAZINE) {
 			draw_centered_texture(info, augs::gui::material(assets::texture_id::DETACHABLE_MAGAZINE_ICON, border_col));
 		}

@@ -59,6 +59,9 @@ namespace scene_builders {
 		auto& magazine_gui = resource_manager.create(assets::texture_id::SAMPLE_MAGAZINE, L"hypersomnia/gfx/magazine.png").gui_sprite_def;
 		magazine_gui.rotation_offset = -270;
 
+		auto& suppressor_gui =  resource_manager.create(assets::texture_id::SAMPLE_SUPPRESSOR, L"hypersomnia/gfx/suppressor.png").gui_sprite_def;
+		suppressor_gui.flip_horizontally = true;
+
 		resource_manager.create(assets::texture_id::PINK_CHARGE, L"hypersomnia/gfx/pink_charge.png");
 		resource_manager.create(assets::texture_id::PINK_SHELL, L"hypersomnia/gfx/pink_shell.png");
 
@@ -83,6 +86,9 @@ namespace scene_builders {
 		resource_manager.create(assets::texture_id::ARMOR_SLOT_ICON, L"hypersomnia/gfx/armor_slot_icon.png");
 		resource_manager.create(assets::texture_id::CHAMBER_SLOT_ICON, L"hypersomnia/gfx/chamber_slot_icon.png");
 		resource_manager.create(assets::texture_id::DETACHABLE_MAGAZINE_ICON, L"hypersomnia/gfx/detachable_magazine_slot_icon.png");
+		resource_manager.create(assets::texture_id::GUN_BARREL_SLOT_ICON, L"hypersomnia/gfx/gun_barrel_slot_icon.png");
+
+		
 
 		auto& font = resource_manager.create(assets::font_id::GUI_FONT);
 		font.open("hypersomnia/Kubasta.ttf", 16, L" ABCDEFGHIJKLMNOPRSTUVWXYZQabcdefghijklmnoprstuvwxyzq0123456789.!@#$%^&*()_+-=[];'\\,./{}:\"|<>?");
@@ -173,6 +179,8 @@ namespace scene_builders {
 		ingredients::sprite_scalled(crate4, vec2(500, 0), vec2i(100, 100), assets::texture_id::CRATE, augs::white, render_layer::DYNAMIC_BODY);
 		ingredients::crate_physics(crate4);
 
+		prefabs::create_sample_suppressor(world, vec2(300, -500));
+
 		prefabs::create_sample_rifle(world, vec2(100, -500));
 		prefabs::create_sample_rifle(world, vec2(100, -500 + 50));
 		prefabs::create_sample_rifle(world, vec2(100, -500 + 100));
@@ -230,9 +238,9 @@ namespace scene_builders {
 			input.record_and_save_this_session();
 		}
 
-		//draw_bodies.push_back(crate2);
+		draw_bodies.push_back(crate2);
 		//draw_bodies.push_back(characters[0]);
-		//draw_bodies.push_back(backpack);
+		draw_bodies.push_back(backpack);
 	}
 
 	void testbed::perform_logic_step(world& world) {

@@ -87,8 +87,8 @@ namespace augs {
 		void rect::draw_centered_texture(draw_info in, const material& mat, vec2i offset) {
 			auto absolute_centered = get_rect_absolute();
 			auto tex_size = (*mat.tex).get_size();
-			absolute_centered.l += absolute_centered.w() / 2 - tex_size.x / 2;
-			absolute_centered.t += absolute_centered.h() / 2 - tex_size.y / 2;
+			absolute_centered.l += absolute_centered.w() / 2 - float(tex_size.x) / 2;
+			absolute_centered.t += absolute_centered.h() / 2 - float(tex_size.y) / 2;
 			absolute_centered.l = int(absolute_centered.l) + offset.x;
 			absolute_centered.t = int(absolute_centered.t) + offset.y;
 			absolute_centered.w(tex_size.x);

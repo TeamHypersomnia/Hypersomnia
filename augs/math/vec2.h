@@ -13,6 +13,40 @@ template <typename T> int sgn(T val) {
 }
 
 namespace augs {
+	template <class T>
+	rects::ltrb<T> get_aabb(vec2t<T>* v, int verts = 4) {
+		auto x_pred = [](vec2t<T> a, vec2t<T> b) { return a.x < b.x; };
+		auto y_pred = [](vec2t<T> a, vec2t<T> b) { return a.y < b.y; };
+
+		vec2t<T> lower(
+			static_cast<T>(std::min_element(v, v + verts, x_pred)->x),
+			static_cast<T>(std::min_element(v, v + verts, y_pred)->y)
+			);
+
+		vec2t<T> upper(
+			static_cast<T>(std::max_element(v, v + verts, x_pred)->x),
+			static_cast<T>(std::max_element(v, v + verts, y_pred)->y)
+			);
+
+		return rects::ltrb<T>(lower.x, lower.y, upper.x, upper.y);
+	}
+
+	template <class T>
+	rects::ltrb<T> get_aabb(std::vector<vec2t<T>> v) {
+		return get_aabb(v.data(), v.size());
+	}
+
+	template <class T>
+	rects::ltrb<T> get_aabb_rotated(vec2t<T> initial_size, T rotation) {
+		auto verts = rects::ltrb<T>(0, 0, initial_size.x, initial_size.y).get_vertices<T>();
+
+		for (auto& v : verts)
+			v.rotate(rotation, initial_size / 2);
+
+		/* expanded aabb that takes rotation into consideration */
+		return get_aabb<T>(verts.data());
+	}
+
 	template <class type_val>
 	void damp(type_val& val, type_val len) {
 		type_val zero = static_cast<type_val>(0);
@@ -93,20 +127,13 @@ namespace augs {
 			return stream << "(" << v.x << "," << v.y << ")";
 		}
 
-		enum sticking {
-			LEFT,
-			RIGHT,
-			TOP,
-			BOTTOM
-		};
-
-		vec2t get_sticking_offset(sticking mode) {
+		vec2t get_sticking_offset(augs::rects::sticking mode) {
 			vec2 res;
 			switch (mode) {
-			case sticking::LEFT: res = vec2(-x / 2, 0);	break;
-			case sticking::RIGHT: res = vec2(x / 2, 0);	break;
-			case sticking::TOP: res = vec2(0, -y / 2);		break;
-			case sticking::BOTTOM: res = vec2(0, y / 2);	break;
+			case rects::sticking::LEFT: res = vec2(-x / 2, 0);	break;
+			case rects::sticking::RIGHT: res = vec2(x / 2, 0);	break;
+			case rects::sticking::TOP: res = vec2(0, -y / 2);	break;
+			case rects::sticking::BOTTOM: res = vec2(0, y / 2);	break;
 			default: res = vec2(0, 0);			break;
 			}
 

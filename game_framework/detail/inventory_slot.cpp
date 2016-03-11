@@ -1,5 +1,6 @@
 #include "inventory_slot.h"
 #include "../components/item_component.h"
+#include "../components/physics_definition_component.h"
 #include "entity_system/world.h"
 
 inventory_slot& inventory_slot_id::operator*() {
@@ -81,14 +82,23 @@ float inventory_slot_id::calculate_density_multiplier_due_to_being_attached() {
 	return density_multiplier;
 }
 
-//components::transform inventory_slot_id::sum_attachment_offsets_of_parents() {
-//	auto* maybe_item = container_entity->find<components::item>();
-//
-//	if (maybe_item && maybe_item->current_slot.alive())
-//		return maybe_item->current_slot.get_root_container();
-//
-//	return (*this)->att;
-//}
+components::transform inventory_slot_id::sum_attachment_offsets_of_parents(augs::entity_id attached_item) {
+	auto offset = (*this)->attachment_offset;
+	
+	auto sticking = (*this)->attachment_sticking_mode;
+
+	offset.pos += attached_item->get<components::physics_definition>().get_aabb_size().get_sticking_offset(sticking);
+	offset.pos += container_entity->get<components::physics_definition>().get_aabb_size().get_sticking_offset(sticking);
+
+	offset += attached_item->get<components::item>().attachment_offsets_per_sticking_mode[sticking];
+
+	auto* maybe_item = container_entity->find<components::item>();
+
+	if (maybe_item && maybe_item->current_slot.alive())
+		return offset + maybe_item->current_slot.sum_attachment_offsets_of_parents(container_entity);
+
+	return offset;
+}
 
 augs::entity_id inventory_slot_id::get_root_container() {
 	auto* maybe_item = container_entity->find<components::item>();
