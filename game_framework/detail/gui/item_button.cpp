@@ -1,6 +1,9 @@
 #include "item_button.h"
 #include "gui/stroke.h"
 
+#include "entity_system/world.h"
+#include "game_framework/systems/gui_system.h"
+
 #include "game_framework/detail/inventory_slot.h"
 #include "game_framework/detail/inventory_utils.h"
 #include "game_framework/components/gui_element_component.h"
@@ -225,14 +228,23 @@ void item_button::consume_gui_event(event_info info) {
 
 	if (info == rect::gui_event::lfinisheddrag) {
 		started_drag = false;
-		vec2i griddified = griddify(info.owner.current_drag_amount);
 
-		if (parent_slot->is_attachment_slot) {
-			get_meta(parent_slot).user_drag_offset += griddified;
-			get_meta(parent_slot).houted_after_drag_started = true;
+		auto& gui = gui_element_entity->get_owner_world().get_system<gui_system>();
+		auto& drag_result = gui.prepare_drag_and_drop_result();
+
+		if (drag_result.possible_target_hovered && drag_result.will_drop_be_successful) {
+			gui.parent_world.post_message(drag_result.intent);
 		}
-		else {
-			drag_offset_in_item_deposit += griddified;
+		else if (!drag_result.possible_target_hovered) {
+			vec2i griddified = griddify(info.owner.current_drag_amount);
+
+			if (parent_slot->is_attachment_slot) {
+				get_meta(parent_slot).user_drag_offset += griddified;
+				get_meta(parent_slot).houted_after_drag_started = true;
+			}
+			else {
+				drag_offset_in_item_deposit += griddified;
+			}
 		}
 	}
 

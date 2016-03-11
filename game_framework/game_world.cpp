@@ -95,6 +95,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_message_queue<camera_render_request_message>();
 	register_message_queue<item_slot_transfer_intent>();
 	register_message_queue<item_slot_transfer_request>();
+	register_message_queue<gui_item_transfer_intent>();
 
 	register_message_callback<item_slot_transfer_intent>(std::bind(&item_system::constrain_item_slot_transfer_intents, &get_system<item_system>()));
 	register_message_callback<item_slot_transfer_request>(std::bind(&item_system::consume_item_slot_transfer_requests, &get_system<item_system>()));
@@ -177,6 +178,7 @@ void game_world::perform_logic_step() {
 	get_system<trigger_detector_system>().post_trigger_requests_from_continuous_detectors();
 	get_system<trigger_detector_system>().send_trigger_confirmations();
 
+	get_system<item_system>().translate_gui_intents_to_transfer_requests();
 	get_system<item_system>().handle_trigger_confirmations_as_pick_requests();
 	get_system<item_system>().handle_holster_item_intents();
 	get_system<item_system>().handle_throw_item_intents();

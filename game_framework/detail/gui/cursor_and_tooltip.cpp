@@ -7,23 +7,14 @@
 using namespace augs;
 using namespace gui;
 
-void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message r) {
-	auto gui_cursor = assets::GUI_CURSOR;
-	auto gui_cursor_color = cyan;
-
-	std::wstring tooltip_text = L"";
-
-	shared::state_for_drawing_renderable state;
-	state.setup_camera_state(r.state);
-	state.screen_space_mode = true;
-
-	auto& out = state.output->get_triangle_buffer();
-	gui::rect::draw_info in(gui, out);
+gui_system::drag_and_drop_result gui_system::prepare_drag_and_drop_result() {
+	drag_and_drop_result out;
+	auto& tooltip_text = out.tooltip_text;
 
 	if (gui.held_rect_is_dragged) {
-		item_button* dragged_item = dynamic_cast<item_button*>(gui.rect_held_by_lmb);
+		auto*& dragged_item = out.dragged_item;
 
-		bool possible_target_under_cursor = false;
+		dragged_item = dynamic_cast<item_button*>(gui.rect_held_by_lmb);
 
 		if (dragged_item && gui.rect_hovered) {
 			slot_button* target_slot = dynamic_cast<slot_button*>(gui.rect_hovered);
@@ -31,22 +22,27 @@ void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message
 
 			std::pair<item_transfer_result, slot_function> predicted_result;
 
-			possible_target_under_cursor = true;
+			out.possible_target_hovered = true;
 
-			if (target_slot && target_slot->houted_after_drag_started)
+			out.intent.item = dragged_item->item;
+
+			if (target_slot && target_slot->houted_after_drag_started) {
 				predicted_result = { query_transfer_result({ dragged_item->item, target_slot->slot_id }), target_slot->slot_id.type };
-			else if (target_item && target_item != dragged_item)
+				out.intent.target_slot = target_slot->slot_id;
+			}
+			else if (target_item && target_item != dragged_item) {
 				predicted_result = query_transfer_result(dragged_item->item, target_item->item);
+				out.intent.target_slot = target_item->item[predicted_result.second];
+			}
 			else
-				possible_target_under_cursor = false;
+				out.possible_target_hovered = false;
 
-			if (possible_target_under_cursor) {
+			if (out.possible_target_hovered) {
 				if (predicted_result.first == item_transfer_result::THE_SAME_SLOT) {
-					tooltip_text = L"Current slot";
+					out.tooltip_text = L"Current slot";
 				}
 				else if (predicted_result.first >= item_transfer_result::SUCCESSFUL_TRANSFER) {
-					gui_cursor = assets::GUI_CURSOR_ADD;
-					gui_cursor_color = green;
+					out.will_drop_be_successful = true;
 
 					if (predicted_result.first == item_transfer_result::UNMOUNT_BEFOREHAND) {
 						tooltip_text += L"Unmount & ";
@@ -67,9 +63,6 @@ void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message
 					}
 				}
 				else if (predicted_result.first < item_transfer_result::SUCCESSFUL_TRANSFER) {
-					gui_cursor = assets::GUI_CURSOR_ERROR;
-					gui_cursor_color = red;
-
 					switch (predicted_result.first) {
 					case item_transfer_result::INSUFFICIENT_SPACE: tooltip_text = L"No space"; break;
 					case item_transfer_result::INVALID_SLOT_OR_UNOWNED_ROOT: tooltip_text = L"Impossible"; break;
@@ -80,28 +73,54 @@ void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message
 				}
 			}
 		}
+	}
 
-		if (dragged_item) {
-			dragged_item->draw_complete_dragged_ghost(in);
+	return out;
+}
 
-			if (!possible_target_under_cursor)
-				dragged_item->draw_grid_border_ghost(in);
-		}
+void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message r) {
+	auto& drag_result = prepare_drag_and_drop_result();
+
+	shared::state_for_drawing_renderable state;
+	state.setup_camera_state(r.state);
+	state.screen_space_mode = true;
+
+	auto& out = state.output->get_triangle_buffer();
+	gui::rect::draw_info in(gui, out);
+
+	if (drag_result.dragged_item) {
+		drag_result.dragged_item->draw_complete_dragged_ghost(in);
+
+		if (!drag_result.possible_target_hovered)
+			drag_result.dragged_item->draw_grid_border_ghost(in);
 	}
 
 	components::sprite bg_sprite;
 	bg_sprite.set(assets::BLANK, black);
 	bg_sprite.color.a = 120;	
 
+	auto gui_cursor = assets::GUI_CURSOR;
+	auto gui_cursor_color = cyan;
+
+	if (drag_result.possible_target_hovered) {
+		if (drag_result.will_drop_be_successful) {
+			gui_cursor = assets::GUI_CURSOR_ADD;
+			gui_cursor_color = green;
+		}
+		else {
+			gui_cursor = assets::GUI_CURSOR_ERROR;
+			gui_cursor_color = red;
+		}
+	}
+
 	components::sprite cursor_sprite;
 	cursor_sprite.set(gui_cursor, gui_cursor_color);
 
-	bool draw_tooltip = tooltip_text.size() > 0;
-
+	bool draw_tooltip = drag_result.possible_target_hovered;
 	if (draw_tooltip) {
 		vec2i left_top_corner = gui_crosshair_position;
 
-		tooltip_drawer.set_text(text::format(tooltip_text, text::style()));
+		tooltip_drawer.set_text(text::format(drag_result.tooltip_text, text::style()));
 		tooltip_drawer.pos = gui_crosshair_position + vec2i(cursor_sprite.size.x + 2, 0);
 
 		state.renderable_transform.pos = left_top_corner;
@@ -112,7 +131,6 @@ void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message
 
 		gui::solid_stroke stroke;
 		stroke.set_material(gui::material(assets::BLANK, slightly_visible_white));
-
 		
 		stroke.draw(out, rects::ltrb<float>(gui_crosshair_position, bg_sprite.size));
 

@@ -5,8 +5,7 @@
 
 #include "game_framework/detail/inventory_slot_id.h"
 
-struct item_button : augs::gui::rect {
-private:
+class item_button : public augs::gui::rect{
 	void draw_dragged_ghost_inside(draw_info in);
 	void draw_complete_with_children(draw_info in);
 public:

@@ -26,6 +26,10 @@ gui_system::gui_system(world& parent_world) : processing_system_templated(parent
 	game_gui_root.game_windows_root.clip = false;
 }
 
+bool gui_system::freeze_gui_model() {
+	return parent_world.get_message_queue<messages::gui_item_transfer_intent>().size() > 0;
+}
+
 void gui_system::draw_gui_overlays_for_camera_rendering_request(messages::camera_render_request_message r) {
 	if (!is_gui_look_enabled && !preview_due_to_item_picking_request)
 		return;
@@ -48,6 +52,9 @@ augs::entity_id gui_system::get_game_world_crosshair() {
 }
 
 void gui_system::rebuild_gui_tree_based_on_game_state() {
+	if (freeze_gui_model())
+		return;
+
 	game_gui_root.inventory_overroot.cache_descendants_before_children_reassignment();
 
 	std::vector<augs::gui::rect_id> inventory_roots;
@@ -183,7 +190,15 @@ void gui_system::translate_raw_window_inputs_to_gui_events() {
 	if (!is_gui_look_enabled)
 		return;
 	
-	auto& window_inputs = parent_world.get_message_queue<messages::raw_window_input_message>();
+	auto window_inputs = parent_world.get_message_queue<messages::raw_window_input_message>();
+
+	if (freeze_gui_model()) {
+		buffered_inputs_during_freeze.insert(buffered_inputs_during_freeze.end(), window_inputs.begin(), window_inputs.end());
+		return;
+	}
+
+	window_inputs.insert(window_inputs.begin(), buffered_inputs_during_freeze.begin(), buffered_inputs_during_freeze.end());
+	buffered_inputs_during_freeze.clear();
 
 	for (auto w : window_inputs) {
 		if (w.raw_window_input.msg == window::event::mousemotion) {

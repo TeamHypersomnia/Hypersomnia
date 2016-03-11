@@ -5,6 +5,7 @@
 #include "../messages/trigger_hit_request_message.h"
 
 #include "../messages/item_slot_transfer_request.h"
+#include "../messages/gui_intents.h"
 
 #include "entity_system/world.h"
 
@@ -126,6 +127,19 @@ void item_system::process_mounting_and_unmounting() {
 			item_slot_transfers.mounting = components::item_slot_transfers::find_suitable_montage_operation(e);
 		}
 	}
+}
+
+void item_system::translate_gui_intents_to_transfer_requests() {
+	auto& intents = parent_world.get_message_queue<messages::gui_item_transfer_intent>();
+
+	for (auto& i : intents) {
+		messages::item_slot_transfer_intent logic_intent;
+		logic_intent.item = i.item;
+		logic_intent.target_slot = i.target_slot;
+		parent_world.post_message(logic_intent);
+	}
+
+	intents.clear();
 }
 
 void item_system::constrain_item_slot_transfer_intents() {
