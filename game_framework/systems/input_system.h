@@ -5,6 +5,7 @@
 
 #include "../messages/crosshair_intent_message.h"
 #include "../messages/raw_window_input_message.h"
+#include "../messages/gui_intents.h"
 
 #include "window_framework/event.h"
 #include "misc/step_player.h"
@@ -91,6 +92,7 @@ struct input_system : public processing_system_templated<components::input_recei
 
 	event_unpacker_and_recorder<messages::crosshair_intent_message> crosshair_intent_player;
 	event_unpacker_and_recorder<messages::unmapped_intent_message> unmapped_intent_player;
+	event_unpacker_and_recorder<messages::gui_item_transfer_intent> gui_item_transfer_intent_player;
 
 	bool found_recording();
 

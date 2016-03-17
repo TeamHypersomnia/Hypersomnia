@@ -23,6 +23,9 @@ void input_system::replay_found_recording() {
 
 	crosshair_intent_player.player.load_recording("recorded_crosshair.inputs");
 	crosshair_intent_player.player.replay();
+
+	gui_item_transfer_intent_player.player.load_recording("gui_transfers.inputs");
+	gui_item_transfer_intent_player.player.replay();
 }
 
 void input_system::record_and_save_this_session() {
@@ -31,6 +34,7 @@ void input_system::record_and_save_this_session() {
 
 	unmapped_intent_player.player.record("sessions/" + augs::get_timestamp() + "/recorded.inputs");
 	crosshair_intent_player.player.record("sessions/" + augs::get_timestamp() + "/recorded_crosshair.inputs");
+	gui_item_transfer_intent_player.player.record("sessions/" + augs::get_timestamp() + "/gui_transfers.inputs");
 }
 
 bool input_system::is_replaying() {
@@ -40,17 +44,20 @@ bool input_system::is_replaying() {
 input_system::input_system(world& parent_world) : processing_system_templated(parent_world),
 	unmapped_intent_player(parent_world)
 	, crosshair_intent_player(parent_world)
+	, gui_item_transfer_intent_player(parent_world)
 {
 }
 
 void input_system::acquire_new_events_posted_by_drawing_time_systems() {
 	unmapped_intent_player.acquire_new_events_posted_by_drawing_time_systems();
 	crosshair_intent_player.acquire_new_events_posted_by_drawing_time_systems();
+	gui_item_transfer_intent_player.acquire_new_events_posted_by_drawing_time_systems();
 }
 
 void input_system::post_all_events_posted_by_drawing_time_systems_since_last_step() {
 	unmapped_intent_player.generate_events_for_logic_step();
 	crosshair_intent_player.generate_events_for_logic_step();
+	gui_item_transfer_intent_player.generate_events_for_logic_step();
 }
 
 input_system::context::context() : enabled(true) {
