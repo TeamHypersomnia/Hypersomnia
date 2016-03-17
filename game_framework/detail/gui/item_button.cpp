@@ -246,10 +246,11 @@ void item_button::perform_logic_step(augs::gui::gui_world& gr) {
 		with_attachments_bbox = iterate_children_attachments();
 		vec2i rounded_size = with_attachments_bbox.get_size();
 		rounded_size += 22;
+		rounded_size += resource_manager.find(sprite->tex)->gui_sprite_def.gui_bbox_expander;
 		rounded_size /= 11;
 		rounded_size *= 11;
-		rounded_size.x = std::max(rounded_size.x, 33);
-		rounded_size.y = std::max(rounded_size.y, 33);
+		//rounded_size.x = std::max(rounded_size.x, 33);
+		//rounded_size.y = std::max(rounded_size.y, 33);
 		rc.set_size(rounded_size);
 	}
 

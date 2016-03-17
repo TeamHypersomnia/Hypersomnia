@@ -17,6 +17,7 @@ namespace components {
 		assets::texture_id tex = assets::texture_id::INVALID_TEXTURE;
 		augs::rgba color;
 		vec2 size;
+		vec2 gui_bbox_expander;
 		vec2 center_offset;
 		float rotation_offset = 0.f;
 

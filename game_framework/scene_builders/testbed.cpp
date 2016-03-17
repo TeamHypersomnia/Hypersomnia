@@ -68,6 +68,7 @@ namespace scene_builders {
 
 		auto& backpack_gui = resource_manager.create(assets::texture_id::BACKPACK, L"hypersomnia/gfx/backpack.png").gui_sprite_def;
 		backpack_gui.rotation_offset = -90.f;
+		backpack_gui.gui_bbox_expander = vec2(0, 2);
 
 		augs::image attachment_circle_filled;
 		attachment_circle_filled.create_filled_circle(16);

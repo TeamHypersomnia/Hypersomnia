@@ -4,13 +4,13 @@
 std::vector<std::array<vec2i, 2>> get_connecting_pixel_lines(rects::ltrb<float> a, rects::ltrb<float> b) {
 	using namespace augs::gui;
 
-	vec2i ac = a.center();
-	vec2i bc = b.center();
+	vec2 ac = a.center();
+	vec2 bc = b.center();
 
-	vec2i aw2(a.w() / 2, 0);
-	vec2i ah2(0, a.h() / 2);
-	vec2i bw2(b.w() / 2, 0);
-	vec2i bh2(0, b.h() / 2);
+	vec2 aw2(a.w() / 2, 0);
+	vec2 ah2(0, a.h() / 2);
+	vec2 bw2(b.w() / 2, 0);
+	vec2 bh2(0, b.h() / 2);
 
 	if (ac.x >= b.r) {
 		bool can_a_to_b = ac.y >= b.t && ac.y <= b.b;
