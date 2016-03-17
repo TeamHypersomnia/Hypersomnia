@@ -1,6 +1,6 @@
 #include "texture_with_image.h"
 #include "file.h"
-#define ENABLE_POLYGONIZATION_IN_DEBUG 1
+#define ENABLE_POLYGONIZATION_IN_DEBUG 0
 
 namespace resources {
 	void texture_with_image::set_from_image(augs::image img) {

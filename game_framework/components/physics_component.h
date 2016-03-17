@@ -21,7 +21,7 @@ namespace components {
 		static void set_active(augs::entity_id id, bool);
 		static void recreate_fixtures_and_attach_to(augs::entity_id from_fixture_entity, augs::entity_id to_body_entity, components::transform shapes_offset = components::transform());
 		static void destroy_physics_of_entity(augs::entity_id);
-		static void resolve_density_of_entity(augs::entity_id);
+		static void resolve_density_of_associated_fixtures(augs::entity_id);
 
 		b2Body* body = nullptr;
 		

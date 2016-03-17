@@ -135,3 +135,13 @@ std::pair<item_transfer_result, slot_function> query_transfer_result(augs::entit
 
 	return{ most_meaningful_error, slot_function::INVALID };
 }
+
+void for_each_descendant(augs::entity_id item, std::function<void(augs::entity_id item)> f) {
+	f(item);
+
+	if (item->find<components::container>()) {
+		for (auto& s : item->get<components::container>().slots) {
+			item[s.first].for_each_descendant(f);
+		}
+	}
+}

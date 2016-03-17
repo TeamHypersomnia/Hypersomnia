@@ -184,6 +184,18 @@ item_transfer_result inventory_slot_id::containment_result(augs::entity_id id) {
 	return item_transfer_result::SUCCESSFUL_TRANSFER;
 }
 
+void inventory_slot_id::for_each_descendant(std::function<void(augs::entity_id item)> f) {
+	for (auto& i : (*this)->items_inside) {
+		f(i);
+		
+		auto* container = i->find<components::container>();
+		
+		if (container)
+			for (auto& s : container->slots) 
+				i[s.first].for_each_descendant(f);
+	}
+}
+
 bool inventory_slot_id::can_contain(augs::entity_id id) {
 	if (dead())
 		return false;

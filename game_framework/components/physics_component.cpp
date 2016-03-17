@@ -157,12 +157,12 @@ namespace components {
 		def.offset_created_shapes = offset_created_shapes;
 
 		auto& physics = from_fixture_entity->get_owner_world().get_system<physics_system>();
-		from_fixture_entity->get<components::physics_definition>().dont_create_fixtures_and_body = false;
+		//from_fixture_entity->get<components::physics_definition>().dont_create_fixtures_and_body = false;
 		physics.create_physics_for_entity(from_fixture_entity);
 	}
 
 	void physics::destroy_physics_of_entity(augs::entity_id id) {
-		id->get<components::physics_definition>().dont_create_fixtures_and_body = true;
+		//id->get<components::physics_definition>().dont_create_fixtures_and_body = true;
 		auto& physics = id->get_owner_world().get_system<physics_system>();
 		physics.destroy_physics_of_entity(id);
 
@@ -175,13 +175,13 @@ namespace components {
 		physics.parent_world.delete_marked_messages<messages::collision_message>();
 	}
 
-	void physics::resolve_density_of_entity(augs::entity_id id) {
+	void physics::resolve_density_of_associated_fixtures(augs::entity_id id) {
 		auto* maybe_physics = id->find<components::physics>();
 
 		if (maybe_physics) {
 			for (auto& f : maybe_physics->fixture_entities) {
 				if(f != id)
-					resolve_density_of_entity(f);
+					resolve_density_of_associated_fixtures(f);
 			}
 		}
 

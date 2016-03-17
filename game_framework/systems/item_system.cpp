@@ -30,7 +30,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests() {
 			messages::item_slot_transfer_intent request;
 			request.item = e.trigger;
 			request.target_slot = determine_pickup_target_slot(e.trigger, e.detector_body);
-			
+
 			if (request.target_slot.alive()) {
 				if (check_timeout_and_reset(item_slot_transfers->pickup_timeout)) {
 					parent_world.post_message(request);
@@ -47,9 +47,9 @@ void item_system::handle_throw_item_intents() {
 	auto& requests = parent_world.get_message_queue<messages::intent_message>();
 
 	for (auto& r : requests) {
-		if (r.pressed_flag && 
+		if (r.pressed_flag &&
 			(r.intent == intent_type::THROW_PRIMARY_ITEM
-			|| r.intent == intent_type::THROW_SECONDARY_ITEM)
+				|| r.intent == intent_type::THROW_SECONDARY_ITEM)
 			) {
 			if (r.subject->find<components::item_slot_transfers>()) {
 				auto hand = map_primary_action_to_secondary_hand_if_primary_empty(r.subject, intent_type::THROW_SECONDARY_ITEM == r.intent);
@@ -68,9 +68,9 @@ void item_system::handle_holster_item_intents() {
 	auto& requests = parent_world.get_message_queue<messages::intent_message>();
 
 	for (auto& r : requests) {
-		if (r.pressed_flag && 
+		if (r.pressed_flag &&
 			(r.intent == intent_type::HOLSTER_PRIMARY_ITEM
-			|| r.intent == intent_type::HOLSTER_SECONDARY_ITEM)
+				|| r.intent == intent_type::HOLSTER_SECONDARY_ITEM)
 			) {
 			if (r.subject->find<components::item_slot_transfers>()) {
 				auto hand = map_primary_action_to_secondary_hand_if_primary_empty(r.subject, intent_type::HOLSTER_SECONDARY_ITEM == r.intent);
@@ -79,8 +79,8 @@ void item_system::handle_holster_item_intents() {
 					messages::item_slot_transfer_request request;
 					request.item = hand->items_inside[0];
 					request.target_slot = determine_hand_holstering_slot(hand->items_inside[0], r.subject);
-					
-					if(request.target_slot.alive())
+
+					if (request.target_slot.alive())
 						parent_world.post_message(request);
 				}
 			}
@@ -113,7 +113,7 @@ void item_system::process_mounting_and_unmounting() {
 				}
 				else {
 					item.current_mounting = item.intended_mounting;
-					
+
 					if (item.current_mounting == components::item::UNMOUNTED) {
 						messages::item_slot_transfer_request after_unmount_transfer;
 						after_unmount_transfer.item = currently_mounted_item;
@@ -123,7 +123,7 @@ void item_system::process_mounting_and_unmounting() {
 				}
 			}
 		}
-		
+
 		if (currently_mounted_item.dead()) {
 			item_slot_transfers.mounting = components::item_slot_transfers::find_suitable_montage_operation(e);
 		}
@@ -184,29 +184,38 @@ void item_system::consume_item_slot_transfer_requests() {
 
 		bool is_pickup_or_transfer = r.target_slot.alive();
 		bool is_drop_request = !is_pickup_or_transfer;
-		
-		if(previous_slot.alive())
-			previous_slot.remove_item(r.item);
-		if(is_pickup_or_transfer)
-			r.target_slot.add_item(r.item);
-		
-		if(is_pickup_or_transfer) {
-			if (r.target_slot.should_item_inside_keep_physical_body()) {
-				auto target_attachment_offset_from_container = r.target_slot.sum_attachment_offsets_of_parents(r.item);
-				
-				components::physics::recreate_fixtures_and_attach_to(r.item, r.target_slot.get_root_container(), target_attachment_offset_from_container);
-				components::physics::resolve_density_of_entity(r.item);
-			}
-			else
-				components::physics::destroy_physics_of_entity(r.item);
 
+		if (previous_slot.alive())
+			previous_slot.remove_item(r.item);
+		if (is_pickup_or_transfer)
+			r.target_slot.add_item(r.item);
+
+		for_each_descendant(r.item, [](augs::entity_id descendant) {
+			auto parent_slot = descendant->get<components::item>().current_slot;
+
+			if (parent_slot.alive()) {
+				if (parent_slot.should_item_inside_keep_physical_body()) {
+					auto target_attachment_offset_from_container = parent_slot.sum_attachment_offsets_of_parents(descendant);
+
+					components::physics::recreate_fixtures_and_attach_to(descendant, parent_slot.get_root_container(), target_attachment_offset_from_container);
+					components::physics::resolve_density_of_associated_fixtures(descendant);
+				}
+				else {
+					components::physics::destroy_physics_of_entity(descendant);
+				}
+			}
+			else {
+				components::physics::recreate_fixtures_and_attach_to(descendant, descendant);
+				components::physics::resolve_density_of_associated_fixtures(descendant);
+			}
+		});
+
+		if (is_pickup_or_transfer) {
 			if (r.target_slot->items_need_mounting)
 				item.intended_mounting = components::item::MOUNTED;
 		}
-		else if (is_drop_request) {
-			components::physics::recreate_fixtures_and_attach_to(r.item, r.item);
-			components::physics::resolve_density_of_entity(r.item);
 
+		if (is_drop_request) {
 			auto& item_physics = r.item->get<components::physics>();
 			auto previous_container_transform = previous_slot.container_entity->get<components::transform>();
 

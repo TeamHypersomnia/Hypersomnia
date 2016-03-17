@@ -1,7 +1,11 @@
 #pragma once
+#include <functional>
+
 #include "../globals/inventory.h"
 #include "../components/transform_component.h"
 #include "entity_system/entity_id.h"
+
+void for_each_descendant(augs::entity_id, std::function<void(augs::entity_id item)>);
 
 struct inventory_slot;
 struct inventory_slot_id {
@@ -20,6 +24,8 @@ struct inventory_slot_id {
 
 	float calculate_free_space_with_parent_containers();
 	item_transfer_result containment_result(augs::entity_id);
+
+	void for_each_descendant(std::function<void(augs::entity_id item)>);
 
 	bool can_contain(augs::entity_id);
 
