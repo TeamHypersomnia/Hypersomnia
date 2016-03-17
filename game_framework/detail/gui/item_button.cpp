@@ -37,7 +37,7 @@ void item_button::draw_dragged_ghost_inside(draw_info in) {
 
 void item_button::draw_complete_with_children(draw_info in) {
 	draw_children(in);
-	draw_proc(in, true, true, true, false);
+	draw_proc(in, true, true, true, false, false, true);
 }
 
 void item_button::draw_grid_border_ghost(draw_info in) {
@@ -134,7 +134,7 @@ rects::ltrb<float> item_button::iterate_children_attachments(bool draw, std::vec
 	return button_bbox;
 }
 
-void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bool draw_connector, bool decrease_alpha, bool decrease_border_alpha) {
+void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bool draw_connector, bool decrease_alpha, bool decrease_border_alpha, bool draw_container_opened_mark) {
 	if (is_inventory_root())
 		return;
 	
@@ -223,6 +223,24 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 
 	if (draw_connector && get_meta(parent_slot).gui_element_entity != parent_slot.container_entity) {
 		draw_pixel_line_connector(get_rect_absolute(), get_meta(parent_slot.container_entity).get_rect_absolute(), in, border_col);
+	}
+
+	if (draw_container_opened_mark) {
+		if (item->find<components::container>()) {
+			components::sprite container_status_sprite;
+			if(is_container_open)
+				container_status_sprite.set(assets::CONTAINER_OPEN_ICON, border_col);
+			else
+				container_status_sprite.set(assets::CONTAINER_CLOSED_ICON, border_col);
+
+			shared::state_for_drawing_renderable state;
+			state.screen_space_mode = true;
+			state.overridden_target_buffer = &in.v;
+			state.renderable_transform.pos.set(get_rect_absolute().r - container_status_sprite.size.x + 2, get_rect_absolute().t + 1
+				//- container_status_sprite.size.y + 2
+				);
+			container_status_sprite.draw(state);
+		}
 	}
 }
 

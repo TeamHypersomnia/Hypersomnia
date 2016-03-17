@@ -78,6 +78,10 @@ namespace scene_builders {
 
 		resource_manager.create(assets::texture_id::ATTACHMENT_CIRCLE_FILLED, attachment_circle_filled);
 		resource_manager.create(assets::texture_id::ATTACHMENT_CIRCLE_BORDER, attachment_circle_border);
+
+		resource_manager.create(assets::texture_id::CONTAINER_OPEN_ICON, L"hypersomnia/gfx/container_open_icon.png");
+		resource_manager.create(assets::texture_id::CONTAINER_CLOSED_ICON, L"hypersomnia/gfx/container_closed_icon.png");
+
 		resource_manager.create(assets::texture_id::GUI_CURSOR, L"hypersomnia/gfx/gui_cursor.png");
 		resource_manager.create(assets::texture_id::GUI_CURSOR_ADD, L"hypersomnia/gfx/gui_cursor_add.png");
 		resource_manager.create(assets::texture_id::GUI_CURSOR_ERROR, L"hypersomnia/gfx/gui_cursor_error.png");
