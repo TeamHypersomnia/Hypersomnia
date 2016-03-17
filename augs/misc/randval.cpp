@@ -1,17 +1,17 @@
 #include "randval.h"
 
 int randval(int min, int max) {
-	static std::mt19937 generator = std::mt19937(std::random_device()());
+	static std::mt19937 generator = std::mt19937(0);
 	return randval(min, max, generator);
 }
 
 unsigned randval(unsigned min, unsigned max) {
-	static std::mt19937 generator = std::mt19937(std::random_device()());
+	static std::mt19937 generator = std::mt19937(0);
 	return randval(min, max, generator);
 }
 
 float randval(float min, float max) {
-	static std::mt19937 generator = std::mt19937(std::random_device()());	
+	static std::mt19937 generator = std::mt19937(0);	
 	return randval(min, max, generator);
 }
 

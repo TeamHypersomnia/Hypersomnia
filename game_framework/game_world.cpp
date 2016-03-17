@@ -151,6 +151,7 @@ void game_world::perform_logic_step() {
 	get_system<input_system>().post_all_events_posted_by_drawing_time_systems_since_last_step();
 	
 	get_system<gui_system>().switch_to_gui_mode_and_back();
+	get_system<gui_system>().suppress_inputs_meant_for_gui();
 
 	get_system<input_system>().map_unmapped_intents_to_entities();
 
