@@ -45,6 +45,7 @@ bool inventory_slot_id::dead() {
 
 void inventory_slot_id::unset() {
 	container_entity.unset();
+	type = slot_function::INVALID;
 }
 
 bool inventory_slot_id::is_hand_slot() {

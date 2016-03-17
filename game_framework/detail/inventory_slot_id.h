@@ -9,7 +9,7 @@ void for_each_descendant(augs::entity_id, std::function<void(augs::entity_id ite
 
 struct inventory_slot;
 struct inventory_slot_id {
-	slot_function type = slot_function::ITEM_DEPOSIT;
+	slot_function type = slot_function::INVALID;
 	augs::entity_id container_entity;
 
 	bool functional();

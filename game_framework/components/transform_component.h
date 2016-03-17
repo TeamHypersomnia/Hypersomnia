@@ -15,6 +15,13 @@ namespace components {
 			out.pos = pos + b.pos;
 			out.rotation = rotation + b.rotation;
 			return out;
+		}		
+		
+		transform operator-(const transform& b) const {
+			transform out;
+			out.pos = pos - b.pos;
+			out.rotation = rotation - b.rotation;
+			return out;
 		}
 
 		transform& operator+=(const transform& b) {

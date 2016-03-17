@@ -24,12 +24,14 @@ void item_system::handle_trigger_confirmations_as_pick_requests() {
 
 	for (auto& e : confirmations) {
 		auto* item_slot_transfers = e.detector_body->find<components::item_slot_transfers>();
-		auto* item = e.trigger->find<components::item>();
+		auto item_entity = components::physics::get_owner_body_entity(e.trigger);
 
-		if (item_slot_transfers && item && get_owning_transfer_capability(e.trigger).dead()) {
+		auto* item = item_entity->find<components::item>();
+
+		if (item_slot_transfers && item && get_owning_transfer_capability(item_entity).dead()) {
 			messages::item_slot_transfer_intent request;
-			request.item = e.trigger;
-			request.target_slot = determine_pickup_target_slot(e.trigger, e.detector_body);
+			request.item = item_entity;
+			request.target_slot = determine_pickup_target_slot(item_entity, e.detector_body);
 
 			if (request.target_slot.alive()) {
 				if (check_timeout_and_reset(item_slot_transfers->pickup_timeout)) {
