@@ -179,7 +179,7 @@ bool item_button::is_inventory_root() {
 }
 
 void item_button::perform_logic_step(augs::gui::gui_world& gr) {
-	enable_drawing_of_children = !is_being_dragged(gr);
+	enable_drawing_of_children = is_container_open && !is_being_dragged(gr);
 	disable_hovering = is_being_dragged(gr);
 	rect::perform_logic_step(gr);
 
@@ -226,6 +226,10 @@ void item_button::consume_gui_event(event_info info) {
 					get_meta(parent_slot).houted_after_drag_started = false;
 				}
 		}
+	}
+
+	if (info == rect::gui_event::rclick) {
+		is_container_open = !is_container_open;
 	}
 
 	if (info == rect::gui_event::lfinisheddrag) {

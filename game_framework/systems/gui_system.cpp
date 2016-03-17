@@ -151,6 +151,7 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 					if (new_item.is_inventory_root()) {
 						new_item.rc.set_position(initial_inventory_root_position());
 						new_item.rc.set_size(0, 0);
+						new_item.is_container_open = true;
 					}
 					else {
 						new_item.rc.set_position(previous_slot_meta[new_item.item->get<components::item>().current_slot].rc.get_position());
