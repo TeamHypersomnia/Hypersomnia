@@ -54,6 +54,7 @@ namespace scene_builders {
 
 		auto& assault_rifle_gui = resource_manager.create(assets::texture_id::ASSAULT_RIFLE, L"hypersomnia/gfx/assault_rifle.png").gui_sprite_def;
 		assault_rifle_gui.flip_horizontally = true;
+		assault_rifle_gui.flip_vertically = true;
 
 		resource_manager.create(assets::texture_id::SHOTGUN, L"hypersomnia/gfx/shotgun.png");
 		auto& magazine_gui = resource_manager.create(assets::texture_id::SAMPLE_MAGAZINE, L"hypersomnia/gfx/magazine.png").gui_sprite_def;

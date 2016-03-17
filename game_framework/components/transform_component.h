@@ -29,6 +29,10 @@ namespace components {
 			return *this;
 		}
 
+		void flip_rotation() {
+			rotation = -rotation;
+		}
+
 		void reset() {
 			pos.reset();
 			rotation = 0.f;

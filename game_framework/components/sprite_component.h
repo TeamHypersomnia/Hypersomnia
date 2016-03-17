@@ -29,6 +29,6 @@ namespace components {
 		void draw(const shared::state_for_drawing_renderable&) const;
 
 		std::vector<vec2> get_vertices() const;
-		augs::rects::ltrb<float> get_aabb(components::transform) const;
+		augs::rects::ltrb<float> get_aabb(components::transform, bool screen_space_mode = false) const;
 	};
 }

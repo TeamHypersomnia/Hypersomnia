@@ -8,6 +8,9 @@
 class item_button : public augs::gui::rect{
 	void draw_dragged_ghost_inside(draw_info in);
 	void draw_complete_with_children(draw_info in);
+
+	rects::ltrb<float> iterate_children_attachments(bool draw = false, std::vector<vertex_triangle>* target = nullptr, augs::rgba col = augs::white);
+	rects::ltrb<float> with_attachments_bbox;
 public:
 	item_button(rects::xywh<float> rc = rects::xywh<float>());
 

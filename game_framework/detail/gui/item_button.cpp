@@ -65,6 +65,75 @@ void item_button::draw_complete_dragged_ghost(draw_info in) {
 	absolute_xy = prev_abs + griddify(in.owner.current_drag_amount);
 }
 
+rects::ltrb<float> item_button::iterate_children_attachments(bool draw, std::vector<vertex_triangle>* target, augs::rgba border_col) {
+	auto item_sprite = item->get<components::sprite>();
+
+	const auto& gui_def = resource_manager.find(item_sprite.tex)->gui_sprite_def;
+
+	item_sprite.flip_horizontally = gui_def.flip_horizontally;
+	item_sprite.flip_vertically = gui_def.flip_vertically;
+	item_sprite.rotation_offset = gui_def.rotation_offset;
+
+	item_sprite.color.a = border_col.a;
+
+	shared::state_for_drawing_renderable state;
+	state.screen_space_mode = true;
+	state.overridden_target_buffer = target;
+	
+	auto expanded_size = rc.get_size() - with_attachments_bbox.get_size();
+
+	state.renderable_transform.pos = get_absolute_xy() - with_attachments_bbox.get_position() + expanded_size/2 + vec2(1, 1);
+
+	rects::ltrb<float> button_bbox = item_sprite.get_aabb(components::transform(), true);
+
+	if (!is_container_open) {
+		for_each_descendant(item, [this, draw, &item_sprite, &state, &button_bbox](augs::entity_id desc) {
+			if (desc == item)
+				return;
+
+			auto parent_slot = desc->get<components::item>().current_slot;
+
+			if (parent_slot.should_item_inside_keep_physical_body()) {
+				auto attachment_sprite = desc->get<components::sprite>();
+
+				attachment_sprite.flip_horizontally = item_sprite.flip_horizontally;
+				attachment_sprite.flip_vertically = item_sprite.flip_vertically;
+				attachment_sprite.rotation_offset = item_sprite.rotation_offset;
+
+				attachment_sprite.color.a = item_sprite.color.a;
+				shared::state_for_drawing_renderable attachment_state = state;
+				auto offset = parent_slot.sum_attachment_offsets_of_parents(desc) - item->get<components::item>().current_slot.sum_attachment_offsets_of_parents(item);
+				
+				if (attachment_sprite.flip_horizontally) {
+					offset.pos.x = -offset.pos.x;
+					offset.flip_rotation();
+				}
+
+				if (attachment_sprite.flip_vertically) {
+					offset.pos.y = -offset.pos.y;
+					offset.flip_rotation();
+				}
+
+				offset += item_sprite.size / 2;
+				offset += -attachment_sprite.size / 2;
+
+				attachment_state.renderable_transform += offset;
+
+				if (draw)
+					attachment_sprite.draw(attachment_state);
+
+				rects::ltrb<float> attachment_bbox = attachment_sprite.get_aabb(offset, true);
+				button_bbox.contain(attachment_bbox);
+			}
+		});
+	}
+
+	if(draw)
+		item_sprite.draw(state);
+
+	return button_bbox;
+}
+
 void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bool draw_connector, bool decrease_alpha, bool decrease_border_alpha) {
 	if (is_inventory_root())
 		return;
@@ -103,24 +172,7 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 	if (draw_inside) {
 		draw_stretched_texture(in, augs::gui::material(assets::texture_id::BLANK, inside_col));
 
-		auto* sprite = item->find<components::sprite>();
-
-		if (sprite) {
-			auto transparent_sprite = *sprite;
-			const auto& gui_def = resource_manager.find(sprite->tex)->gui_sprite_def;
-
-			transparent_sprite.flip_horizontally = gui_def.flip_horizontally;
-			transparent_sprite.flip_vertically = gui_def.flip_vertically;
-			transparent_sprite.rotation_offset = gui_def.rotation_offset;
-
-			transparent_sprite.color.a = border_col.a;
-
-			shared::state_for_drawing_renderable state;
-			state.screen_space_mode = true;
-			state.overridden_target_buffer = &in.v;
-			state.renderable_transform.pos = get_absolute_xy() + rc.get_size() / 2 - sprite->size / 2  +vec2(1, 1);
-			transparent_sprite.draw(state);
-		}
+		iterate_children_attachments(true, &in.v, border_col);
 
 		auto& item_data = item->get<components::item>();
 
@@ -191,12 +243,13 @@ void item_button::perform_logic_step(augs::gui::gui_world& gr) {
 	auto* sprite = item->find<components::sprite>();
 	
 	if (sprite) {
-		vec2i rounded_size = sprite->size;
+		with_attachments_bbox = iterate_children_attachments();
+		vec2i rounded_size = with_attachments_bbox.get_size();
 		rounded_size += 22;
 		rounded_size /= 11;
 		rounded_size *= 11;
-		//rounded_size.x = std::max(rounded_size.x, 33);
-		//rounded_size.y = std::max(rounded_size.y, 33);
+		rounded_size.x = std::max(rounded_size.x, 33);
+		rounded_size.y = std::max(rounded_size.y, 33);
 		rc.set_size(rounded_size);
 	}
 

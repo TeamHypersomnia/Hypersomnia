@@ -49,7 +49,6 @@ namespace components {
 		assert(tex != assets::texture_id::INVALID_TEXTURE);
 
 		vec2i transform_pos = in.renderable_transform.pos;
-		make_rect(transform_pos, vec2(size), in.renderable_transform.rotation, v);
 
 		if (in.screen_space_mode) {
 			make_rect(transform_pos + vec2(size)/2, vec2(size), in.renderable_transform.rotation + rotation_offset, v);
@@ -132,9 +131,13 @@ namespace components {
 		return std::move(out);
 	}
 	
-	augs::rects::ltrb<float> sprite::get_aabb(components::transform transform) const {
+	augs::rects::ltrb<float> sprite::get_aabb(components::transform transform, bool screen_space_mode) const {
 		static thread_local vec2 v[4];
-		make_rect(transform.pos, vec2(size), transform.rotation, v);
+		if(screen_space_mode)
+			make_rect(transform.pos + vec2(size) / 2, vec2(size), transform.rotation + rotation_offset, v);
+		else
+			make_rect(transform.pos,                  vec2(size), transform.rotation + rotation_offset, v);
+
 		return augs::get_aabb(v);
 	}
 }
