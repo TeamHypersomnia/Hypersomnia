@@ -93,7 +93,7 @@ rects::ltrb<float> item_button::iterate_children_attachments(bool draw, std::vec
 
 			auto parent_slot = desc->get<components::item>().current_slot;
 
-			if (parent_slot.should_item_inside_keep_physical_body()) {
+			if (parent_slot.should_item_inside_keep_physical_body(item)) {
 				auto attachment_sprite = desc->get<components::sprite>();
 
 				attachment_sprite.flip_horizontally = item_sprite.flip_horizontally;

@@ -84,6 +84,9 @@ void game_overworld::main_game_loop() {
 				main_game_world.post_message(msg);
 		}
 
+		if (!main_game_world.get_system<input_system>().is_replaying())
+			delta_timer.set_stepping_speed_multiplier(1.00);
+
 #if RENDERING_STEPS_DETERMINISTICALLY_LIKE_LOGIC
 		auto steps_to_perform = delta_timer.count_logic_steps_to_perform();
 

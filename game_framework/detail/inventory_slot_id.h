@@ -33,7 +33,7 @@ struct inventory_slot_id {
 	bool is_empty_slot();
 
 	bool is_hand_slot();
-	bool should_item_inside_keep_physical_body();
+	bool should_item_inside_keep_physical_body(augs::entity_id until_parent = augs::entity_id());
 	float calculate_density_multiplier_due_to_being_attached();
 
 	components::transform sum_attachment_offsets_of_parents(augs::entity_id attached_item);

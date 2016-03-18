@@ -187,13 +187,22 @@ void item_system::consume_item_slot_transfer_requests() {
 		bool is_pickup_or_transfer = r.target_slot.alive();
 		bool is_drop_request = !is_pickup_or_transfer;
 
-		if (previous_slot.alive())
+		components::transform previous_container_transform; 
+
+		if (previous_slot.alive()) {
+			previous_container_transform = previous_slot.container_entity->get<components::transform>();
 			previous_slot.remove_item(r.item);
+		}
 		if (is_pickup_or_transfer)
 			r.target_slot.add_item(r.item);
-
-		for_each_descendant(r.item, [](augs::entity_id descendant) {
+		if (is_drop_request) {
+			bool abc = false;
+			abc = true;
+		}
+		for_each_descendant(r.item, [previous_container_transform](augs::entity_id descendant) {
 			auto parent_slot = descendant->get<components::item>().current_slot;
+
+			descendant->get<components::transform>() = previous_container_transform;
 
 			if (parent_slot.alive()) {
 				if (parent_slot.should_item_inside_keep_physical_body()) {
@@ -219,9 +228,7 @@ void item_system::consume_item_slot_transfer_requests() {
 
 		if (is_drop_request) {
 			auto& item_physics = r.item->get<components::physics>();
-			auto previous_container_transform = previous_slot.container_entity->get<components::transform>();
 
-			item_physics.set_transform(previous_container_transform);
 			item_physics.apply_impulse(vec2().set_from_degrees(previous_container_transform.rotation).set_length(100), vec2().random_on_circle(20));
 		}
 	}

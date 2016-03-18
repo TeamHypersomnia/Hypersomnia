@@ -60,13 +60,22 @@ bool inventory_slot_id::is_empty_slot() {
 	return alive() && (*this)->items_inside.size() == 0;
 }
 
-bool inventory_slot_id::should_item_inside_keep_physical_body() {
+bool inventory_slot_id::should_item_inside_keep_physical_body(augs::entity_id until_parent) {
 	bool should_item_here_keep_physical_body = (*this)->is_attachment_slot;
+
+	if (container_entity == until_parent) {
+		return should_item_here_keep_physical_body;
+	}
 
 	auto* maybe_item = container_entity->find<components::item>();
 
-	if (maybe_item && maybe_item->current_slot.alive())
-		return std::min(should_item_here_keep_physical_body, maybe_item->current_slot.should_item_inside_keep_physical_body());
+	if (maybe_item) {
+		//if (maybe_item->current_slot.container_entity.alive() && maybe_item->current_slot.container_entity == until_parent)
+		//	return should_item_here_keep_physical_body;
+		//else 
+			if (maybe_item->current_slot.alive())
+			return std::min(should_item_here_keep_physical_body, maybe_item->current_slot.should_item_inside_keep_physical_body(until_parent));
+	}
 
 	return should_item_here_keep_physical_body;
 }
@@ -179,7 +188,7 @@ item_transfer_result inventory_slot_id::containment_result(augs::entity_id id) {
 	if (slot.for_categorized_items_only && (slot.category_allowed & item.categories_for_slot_compatibility) == 0)
 		return item_transfer_result::INCOMPATIBLE_CATEGORIES;
 
-	if(calculate_free_space_with_parent_containers() < item.get_space_occupied())
+	if (calculate_free_space_with_parent_containers() < calculate_space_occupied_with_children(id))
 		return item_transfer_result::INSUFFICIENT_SPACE;
 
 	return item_transfer_result::SUCCESSFUL_TRANSFER;
