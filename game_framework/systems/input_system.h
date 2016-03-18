@@ -82,6 +82,13 @@ struct input_system : public processing_system_templated<components::input_recei
 			player.biserialize(buffered_inputs_for_next_step);
 		}
 
+		std::vector<event_type> get_pending_inputs_for_logic() {
+			auto res = buffered_inputs_for_next_step.events;
+			auto& world_msgs = parent_world.get_message_queue<event_type>();
+			res.insert(res.end(), world_msgs.begin(), world_msgs.end());
+			return res;
+		}
+
 		void generate_events_for_logic_step() {
 			biserialize();
 			parent_world.get_message_queue<event_type>() = buffered_inputs_for_next_step.events;

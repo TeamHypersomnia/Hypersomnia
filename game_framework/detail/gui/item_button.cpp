@@ -13,6 +13,8 @@
 #include "game_framework/detail/state_for_drawing.h"
 #include "game_framework/settings.h"
 
+#include "game_framework/systems/input_system.h"
+
 #include "augs/graphics/renderer.h"
 #include "game_framework/resources/manager.h"
 
@@ -20,9 +22,24 @@
 
 #include "pixel_line_connector.h"
 #include "grid.h"
-
+#include "log.h"
 void item_button::get_member_children(std::vector<augs::gui::rect_id>& children) {
 	// children.push_back(&charges_caption);
+}
+
+bool item_button::is_being_dragged_or_pending_finish(augs::gui::gui_world& gr) {
+	if (is_being_dragged(gr))
+		return true;
+
+	auto& gui_intents = gui_element_entity->get_owner_world().get_system<input_system>().gui_item_transfer_intent_player.get_pending_inputs_for_logic();
+	
+	for (auto& g : gui_intents) {
+		if (g.item == item) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 item_button::item_button(rects::xywh<float> rc) : rect(rc) {
@@ -44,15 +61,7 @@ void item_button::draw_grid_border_ghost(draw_info in) {
 	draw_proc(in, false, true, false, true, true);
 }
 
-void item_button::draw_triangles(draw_info in) {
-	if (is_inventory_root()) {
-		draw_children(in);
-		return;
-	}
 
-	if (!is_being_dragged(in.owner)) 
-		draw_complete_with_children(in);
-}
 
 void item_button::draw_complete_dragged_ghost(draw_info in) {
 	auto parent_slot = item->get<components::item>().current_slot;
@@ -249,8 +258,8 @@ bool item_button::is_inventory_root() {
 }
 
 void item_button::perform_logic_step(augs::gui::gui_world& gr) {
-	enable_drawing_of_children = is_container_open && !is_being_dragged(gr);
-	disable_hovering = is_being_dragged(gr);
+	enable_drawing_of_children = is_container_open && !is_being_dragged_or_pending_finish(gr);
+	disable_hovering = is_being_dragged_or_pending_finish(gr);
 	rect::perform_logic_step(gr);
 
 	if (is_inventory_root())
@@ -281,7 +290,7 @@ void item_button::perform_logic_step(augs::gui::gui_world& gr) {
 		rc.set_position(drag_offset_in_item_deposit);
 	}
 }
-
+int dragcnt = 0;
 void item_button::consume_gui_event(event_info info) {
 	if (is_inventory_root())
 		return;
@@ -305,6 +314,7 @@ void item_button::consume_gui_event(event_info info) {
 	}
 
 	if (info == rect::gui_event::lfinisheddrag) {
+		dragcnt++;
 		started_drag = false;
 
 		auto& gui = gui_element_entity->get_owner_world().get_system<gui_system>();
@@ -312,6 +322,7 @@ void item_button::consume_gui_event(event_info info) {
 
 		if (drag_result.possible_target_hovered && drag_result.will_drop_be_successful()) {
 			gui.parent_world.post_message(drag_result.intent);
+			LOG("finished drag");
 		}
 		else if (!drag_result.possible_target_hovered) {
 			vec2i griddified = griddify(info.owner.current_drag_amount);
@@ -329,6 +340,19 @@ void item_button::consume_gui_event(event_info info) {
 	// if(being_dragged && inf == rect::gui_event::lup)
 }
 
+void item_button::draw_triangles(draw_info in) {
+	if (is_inventory_root()) {
+		draw_children(in);
+		return;
+	}
+
+	if (!is_being_dragged_or_pending_finish(in.owner)) {
+		draw_complete_with_children(in);
+		if (dragcnt == 2 && item->get<components::item>().current_slot.alive() && item->get<components::item>().current_slot.type == slot_function::SECONDARY_HAND) {
+			LOG("in secondary");
+		}
+	}
+}
 
 item_button& get_meta(augs::entity_id id) {
 	return get_owning_transfer_capability(id)->get<components::gui_element>().item_metadata[id];

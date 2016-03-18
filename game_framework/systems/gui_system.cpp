@@ -9,6 +9,7 @@
 
 #include "../components/item_component.h"
 #include "../components/input_receiver_component.h"
+#include "../systems/input_system.h"
 
 #include "crosshair_system.h"
 #include "game_framework/settings.h"
@@ -27,13 +28,12 @@ gui_system::gui_system(world& parent_world) : processing_system_templated(parent
 }
 
 bool gui_system::freeze_gui_model() {
-	return parent_world.get_message_queue<messages::gui_item_transfer_intent>().size() > 0;
+	return parent_world.get_system<input_system>().gui_item_transfer_intent_player.get_pending_inputs_for_logic().size() > 0;
 }
 
 void gui_system::draw_gui_overlays_for_camera_rendering_request(messages::camera_render_request_message r) {
 	if (!is_gui_look_enabled && !preview_due_to_item_picking_request)
 		return;
-
 	gui.draw_triangles();
 	r.state.output->push_triangles_from_gui_world(gui);
 

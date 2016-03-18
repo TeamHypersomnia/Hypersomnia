@@ -165,7 +165,7 @@ void item_system::constrain_item_slot_transfer_intents() {
 
 	requests.clear();
 };
-
+#include "log.h"
 void item_system::consume_item_slot_transfer_requests() {
 	auto& requests = parent_world.get_message_queue<messages::item_slot_transfer_request>();
 
@@ -199,6 +199,9 @@ void item_system::consume_item_slot_transfer_requests() {
 			bool abc = false;
 			abc = true;
 		}
+
+		LOG("processed transfer");
+
 		for_each_descendant(r.item, [previous_container_transform](augs::entity_id descendant) {
 			auto parent_slot = descendant->get<components::item>().current_slot;
 
@@ -229,7 +232,7 @@ void item_system::consume_item_slot_transfer_requests() {
 		if (is_drop_request) {
 			auto& item_physics = r.item->get<components::physics>();
 
-			item_physics.apply_impulse(vec2().set_from_degrees(previous_container_transform.rotation).set_length(100), vec2().random_on_circle(20));
+			item_physics.apply_force(vec2().set_from_degrees(previous_container_transform.rotation).set_length(10), vec2().random_on_circle(20));
 		}
 	}
 
