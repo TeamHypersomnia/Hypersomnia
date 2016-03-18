@@ -19,5 +19,8 @@ namespace components {
 
 		std::map<inventory_slot_id, slot_button> slot_metadata;
 		std::map<augs::entity_id, item_button> item_metadata;
+
+		std::map<inventory_slot_id, slot_button> removed_slot_metadata;
+		std::map<augs::entity_id, item_button> removed_item_metadata;
 	};
 }

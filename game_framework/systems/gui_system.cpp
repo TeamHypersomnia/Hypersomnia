@@ -114,9 +114,36 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 				if (element_was_destroyed)
 					items_to_erase.push_back(old_entry.first);
 			}
+			
+			auto& cached_slot_meta = element.removed_slot_metadata;
+			auto& cached_item_meta = element.removed_item_metadata;
 
-			for (auto& s : slots_to_erase) previous_slot_meta.erase(s);
-			for (auto& i : items_to_erase) previous_item_meta.erase(i);
+			for (auto& s : slots_to_erase) {
+				cached_slot_meta[s] = previous_slot_meta[s];
+				previous_slot_meta.erase(s);
+			}
+
+			for (auto& i : items_to_erase) {
+				cached_item_meta[i] = previous_item_meta[i];
+				previous_item_meta.erase(i);
+			}
+
+			// purge removed metadata from entries with dead entities
+
+
+			for (auto& s : cached_slot_meta) {
+				auto id = s.first;
+				
+				if (id.dead())
+					cached_slot_meta.erase(id);
+			}
+
+			for (auto& i : cached_item_meta) {
+				auto id = i.first;
+
+				if (id.dead())
+					cached_item_meta.erase(id);
+			}
 
 			// construct new metadata entries
 
@@ -131,6 +158,9 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 					new_slot.rc = get_rectangle_for_slot_function(new_entry.first.type);
 					new_slot.slot_relative_pos = new_slot.rc.get_position();
 					
+					if (cached_slot_meta.find(new_entry.first) != cached_slot_meta.end())
+						new_slot.user_drag_offset = cached_slot_meta[new_entry.first].user_drag_offset;
+
 					if ((DRAW_FREE_SPACE_INSIDE_CONTAINER_ICONS && new_entry.first.type == slot_function::ITEM_DEPOSIT)) {
 						new_slot.enable_drawing = false;
 						new_slot.enable_drawing_of_children = false;
@@ -157,6 +187,9 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 						new_item.rc.set_position(previous_slot_meta[new_item.item->get<components::item>().current_slot].rc.get_position());
 						new_item.rc.set_size(64, 64);
 					}
+
+					if (cached_item_meta.find(new_entry.first) != cached_item_meta.end())
+						new_item.drag_offset_in_item_deposit = cached_item_meta[new_entry.first].drag_offset_in_item_deposit;
 
 					previous_item_meta.insert(new_entry);
 				}
