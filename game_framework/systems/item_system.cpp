@@ -188,19 +188,16 @@ void item_system::consume_item_slot_transfer_requests() {
 		bool is_drop_request = !is_pickup_or_transfer;
 
 		components::transform previous_container_transform; 
+		augs::entity_id previous_friction_field;
 
 		if (previous_slot.alive()) {
 			previous_container_transform = previous_slot.container_entity->get<components::transform>();
+			previous_friction_field = components::physics::get_owner_friction_field(previous_slot.container_entity);
+
 			previous_slot.remove_item(r.item);
 		}
 		if (is_pickup_or_transfer)
 			r.target_slot.add_item(r.item);
-		if (is_drop_request) {
-			bool abc = false;
-			abc = true;
-		}
-
-		LOG("processed transfer");
 
 		for_each_descendant(r.item, [previous_container_transform](augs::entity_id descendant) {
 			auto parent_slot = descendant->get<components::item>().current_slot;
@@ -233,6 +230,10 @@ void item_system::consume_item_slot_transfer_requests() {
 			auto& item_physics = r.item->get<components::physics>();
 
 			item_physics.apply_force(vec2().set_from_degrees(previous_container_transform.rotation).set_length(10), vec2().random_on_circle(20));
+			
+			item_physics.since_dropped.set(200);
+			reset(item_physics.since_dropped);
+			//physics_system::rechoose_owner_friction_body(r.item);
 		}
 	}
 

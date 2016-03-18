@@ -43,11 +43,19 @@ namespace augs {
 	}
 
 	bool processing_system::passed(augs::deterministic_timeout& t) const {
-		return !t.was_set || (parent_world.current_step_number - t.step_recorded) * delta_milliseconds() >= t.timeout_ms;
+		return (parent_world.current_step_number - t.step_recorded) * delta_milliseconds() >= t.timeout_ms;
+	}
+
+	bool processing_system::unset_or_passed(augs::deterministic_timeout& t) const {
+		return !t.was_set || passed(t);
+	}
+
+	bool processing_system::was_set_and_passed(augs::deterministic_timeout& t) const {
+		return t.was_set && passed(t);
 	}
 
 	bool processing_system::check_timeout_and_reset(augs::deterministic_timeout& t) {
-		if (passed(t)) {
+		if (unset_or_passed(t)) {
 			reset(t);
 			return true;
 		}

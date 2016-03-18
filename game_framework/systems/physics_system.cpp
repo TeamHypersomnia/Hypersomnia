@@ -250,6 +250,8 @@ physics_system::query_aabb_output physics_system::query_aabb_px(vec2 p1, vec2 p2
 #define FRICTION_FIELDS_COLLIDE 0
 
 void physics_system::contact_listener::BeginContact(b2Contact* contact) {
+	auto& sys = this->world_ptr->get_system<physics_system>();
+
 	for (int i = 0; i < 2; ++i) {
 		auto fix_a = contact->GetFixtureA();
 		auto fix_b = contact->GetFixtureB();
@@ -293,6 +295,10 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 
 				// always accept my own children
 				if (components::physics::are_connected_by_friction(msg.collider, msg.subject)) {
+					found_suitable = true;
+				}
+				else if (collider_physics.since_dropped.was_set && !sys.passed(collider_physics.since_dropped)) {
+					collider_physics.since_dropped.unset();
 					found_suitable = true;
 				}
 				else {
@@ -533,6 +539,12 @@ void physics_system::step_and_set_new_transforms() {
 
 void physics_system::rechoose_owner_friction_body(augs::entity_id entity) {
 	auto& physics = entity->get<components::physics>();
+	
+	// purge of dead entities
+
+	physics.owner_friction_grounds.erase(std::remove_if(physics.owner_friction_grounds.begin(), physics.owner_friction_grounds.end(), [entity](entity_id subject) {
+		return subject.dead();
+	}), physics.owner_friction_grounds.end());
 
 	auto feasible_grounds = physics.owner_friction_grounds;
 

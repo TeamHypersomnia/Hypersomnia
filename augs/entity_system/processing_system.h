@@ -33,6 +33,8 @@ namespace augs {
 		double view_interpolation_ratio() const;
 		augs::renderer& get_renderer();
 
+		bool unset_or_passed(augs::deterministic_timeout&) const;
+		bool was_set_and_passed(augs::deterministic_timeout&) const;
 		bool passed(augs::deterministic_timeout&) const;
 
 		bool check_timeout_and_reset(augs::deterministic_timeout&);

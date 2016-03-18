@@ -11,6 +11,7 @@ extern float PIXELS_TO_METERSf;
 
 class b2Body;
 #include <vector>
+#include "misc/deterministic_timing.h"
 
 namespace components {
 	struct physics {
@@ -27,6 +28,8 @@ namespace components {
 		
 		augs::entity_id owner_friction_ground;
 		std::vector<augs::entity_id> owner_friction_grounds;
+
+		augs::deterministic_timeout since_dropped = augs::deterministic_timeout(0);
 
 		augs::entity_id get_owner_friction_ground();
 
