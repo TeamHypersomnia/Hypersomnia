@@ -5,7 +5,7 @@
 #include "../stream.h"
 #include <algorithm>
 #include <Shlwapi.h>
-
+#include "log.h"
 namespace augs {
 	extern HINSTANCE hinst;
 
@@ -233,7 +233,7 @@ namespace augs {
 					break;
 
 				case event::activate:	
-					active = (bool)(!HIWORD(wParam));
+					active = LOWORD(wParam) == WA_ACTIVE;
 					break;
 
 				case WM_GETMINMAXINFO:
@@ -410,7 +410,10 @@ namespace augs {
 				if (!state.repeated)
 					output.push_back(state);
 			}
-
+			
+			if(GetFocus() == hwnd && output.size() > 0)
+				warp_cursor(get_window_rect().center().x, get_window_rect().center().y);
+			
 			return output;
 		}
 		

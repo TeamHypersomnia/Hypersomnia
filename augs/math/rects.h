@@ -323,6 +323,10 @@ namespace augs {
 			xywh(const vec2t<T>& p, const wh& r) : x(p.x), y(p.y), wh(r) {}
 
 			void set(T x, T y, T w, T h) { *this = xywh(x, y, w, h); }
+			
+			vec2t<T> center() {
+				return{ x + w/2, y + h/2 };
+			}
 
 			bool clip(const xywh& rc) {
 				if (x >= rc.r() || y >= rc.b() || r() <= rc.x || b() <= rc.y) {

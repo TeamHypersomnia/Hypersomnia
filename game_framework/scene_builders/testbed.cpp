@@ -31,7 +31,9 @@ using namespace augs;
 
 namespace scene_builders {
 	void testbed::initialize(world& world) {
-		auto window_rect = window::glwindow::get_current()->get_screen_rect();
+		auto& window = *window::glwindow::get_current();
+		auto window_rect = window.get_screen_rect();
+
 		world.get_system<gui_system>().resize(vec2i(window_rect.w, window_rect.h));
 
 		resource_manager.destroy_everything();
@@ -220,11 +222,10 @@ namespace scene_builders {
 	    active_context.map_key_to_intent(window::event::keys::BACKSPACE, intent_type::SWITCH_LOOK);
 
 		active_context.map_key_to_intent(window::event::keys::LCTRL, intent_type::START_PICKING_UP_ITEMS);
-		active_context.map_key_to_intent(window::event::keys::TAB, intent_type::SWITCH_CHARACTER);
+		active_context.map_key_to_intent(window::event::keys::CAPSLOCK, intent_type::SWITCH_CHARACTER);
 
 		active_context.map_key_to_intent(window::event::keys::SPACE, intent_type::SPACE_BUTTON);
 		active_context.map_key_to_intent(window::event::keys::MOUSE4, intent_type::SWITCH_TO_GUI);
-		active_context.map_key_to_intent(window::event::keys::LALT, intent_type::SWITCH_TO_GUI);
 
 		auto& input = world.get_system<input_system>();
 		input.add_context(active_context);
