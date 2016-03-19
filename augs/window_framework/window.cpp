@@ -411,8 +411,17 @@ namespace augs {
 					output.push_back(state);
 			}
 			
-			if(GetFocus() == hwnd && output.size() > 0)
-				warp_cursor(get_window_rect().center().x, get_window_rect().center().y);
+			if (GetFocus() == hwnd) {
+				static thread_local RECT r;
+				rects::ltrb<int> lt = get_window_rect();
+				r.bottom = lt.b;
+				r.left = lt.l;
+				r.right = lt.r;
+				r.top = lt.t;
+				ClipCursor(&r);
+			}
+			else
+				ClipCursor(NULL);
 			
 			return output;
 		}
