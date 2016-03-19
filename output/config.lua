@@ -27,11 +27,12 @@ config_table = {
 	jitter = 0
 }
 
+set_cursor_visible(0)
+
 if config_table.fullscreen == 1 then
 	config_table.resolution_w = get_display().w
 	config_table.resolution_h = get_display().h
 	set_display(config_table.resolution_w, config_table.resolution_h, 32)
-	set_cursor_visible(0)
 end
 
 local borders_type = glwindow.ALL_WINDOW_ELEMENTS
