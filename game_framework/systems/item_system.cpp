@@ -188,11 +188,9 @@ void item_system::consume_item_slot_transfer_requests() {
 		bool is_drop_request = !is_pickup_or_transfer;
 
 		components::transform previous_container_transform; 
-		augs::entity_id previous_friction_field;
 
 		if (previous_slot.alive()) {
 			previous_container_transform = previous_slot.container_entity->get<components::transform>();
-			previous_friction_field = components::physics::get_owner_friction_field(previous_slot.container_entity);
 
 			previous_slot.remove_item(r.item);
 		}
