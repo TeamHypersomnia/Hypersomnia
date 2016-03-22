@@ -12,8 +12,6 @@ struct inventory_slot_id {
 	slot_function type = slot_function::INVALID;
 	augs::entity_id container_entity;
 
-	bool functional();
-
 	bool alive();
 	bool dead();
 
@@ -23,7 +21,6 @@ struct inventory_slot_id {
 	void remove_item(augs::entity_id);
 
 	float calculate_free_space_with_parent_containers();
-	item_transfer_result containment_result(augs::entity_id);
 
 	void for_each_descendant(std::function<void(augs::entity_id item)>);
 

@@ -21,6 +21,6 @@ rects::xywh<float> gui_system::get_rectangle_for_slot_function(slot_function f) 
 }
 
 vec2 gui_system::initial_inventory_root_position() {
-	return vec2(size.x - 250, size.y - 100);
+	return vec2(size.x - 250, size.y - 200);
 }
 

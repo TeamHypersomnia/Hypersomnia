@@ -374,6 +374,7 @@
     <ClCompile Include="game_framework\bindings\world_binding.cpp" />
     <ClCompile Include="game_framework\bind_game_framework_and_augs.cpp" />
     <ClCompile Include="game_framework\components\container_component.cpp" />
+    <ClCompile Include="game_framework\components\damage_component.cpp" />
     <ClCompile Include="game_framework\components\fixtures_component.cpp" />
     <ClCompile Include="game_framework\components\item_component.cpp" />
     <ClCompile Include="game_framework\components\item_slot_transfers_component.cpp" />
@@ -398,6 +399,7 @@
     <ClCompile Include="game_framework\ingredients\motorcycle.cpp" />
     <ClCompile Include="game_framework\ingredients\sprite.cpp" />
     <ClCompile Include="game_framework\ingredients\wsad_player.cpp" />
+    <ClCompile Include="game_framework\messages\gui_intents.cpp" />
     <ClCompile Include="game_framework\resources\animation.cpp" />
     <ClCompile Include="game_framework\resources\manager.cpp" />
     <ClCompile Include="game_framework\resources\texture_with_image.cpp" />

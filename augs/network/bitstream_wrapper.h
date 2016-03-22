@@ -2,10 +2,7 @@
 #include <string>
 #include <sstream>
 
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
 #include "BitStream.h"
-#include "RakNetTypes.h"
 #include <Box2D\Common\b2Math.h>
 
 namespace augs {

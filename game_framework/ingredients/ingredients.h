@@ -51,6 +51,7 @@ namespace prefabs {
 	augs::entity_id create_sample_rifle(augs::world&, vec2 pos);
 	
 	augs::entity_id create_pink_charge(augs::world&, vec2 pos);
+	augs::entity_id create_cyan_charge(augs::world&, vec2 pos);
 
 	augs::entity_id create_sample_backpack(augs::world&, vec2 pos);
 }

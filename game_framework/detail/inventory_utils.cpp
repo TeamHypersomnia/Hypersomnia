@@ -89,52 +89,114 @@ inventory_slot_id map_primary_action_to_secondary_hand_if_primary_empty(augs::en
 		return is_action_secondary ? secondary : primary;
 }
 
-item_transfer_result query_transfer_result(messages::item_slot_transfer_intent r) {
-	item_transfer_result predicted_result;
+item_transfer_result query_transfer_result(messages::item_slot_transfer_request r) {
+	item_transfer_result output;
+	auto& predicted_result = output.result;
 
 	auto& item = r.item->get<components::item>();
+
+	assert(r.specified_quantity != 0);
+	assert(r.specified_quantity == -1 || item.stackable);
+	assert(r.specified_quantity <= int(item.charges));
 
 	auto item_owning_capability = get_owning_transfer_capability(r.item);
 	auto target_slot_owning_capability = get_owning_transfer_capability(r.target_slot.container_entity);
 
-	assert(item_owning_capability.alive() || target_slot_owning_capability.alive());
+	//assert(item_owning_capability.alive() || target_slot_owning_capability.alive());
 
 	if (item_owning_capability.alive() && target_slot_owning_capability.alive() &&
 		item_owning_capability != target_slot_owning_capability)
-		predicted_result = INVALID_SLOT_OR_UNOWNED_ROOT;
+		predicted_result = item_transfer_result_type::INVALID_SLOT_OR_UNOWNED_ROOT;
 	else if (r.target_slot.alive())
-		predicted_result = r.target_slot.containment_result(r.item);
-
-	if (predicted_result == item_transfer_result::SUCCESSFUL_TRANSFER) {
-		if (item.current_mounting == components::item::MOUNTED)
-			predicted_result = item_transfer_result::UNMOUNT_BEFOREHAND;
+		output = containment_result(r);
+	else {
+		output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER;
+		output.transferred_charges = item.charges;
 	}
 
-	return predicted_result;
+	if (predicted_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
+		if (item.current_mounting == components::item::MOUNTED)
+			predicted_result = item_transfer_result_type::UNMOUNT_BEFOREHAND;
+	}
+
+	return output;
 }
 
-std::pair<item_transfer_result, slot_function> query_transfer_result(augs::entity_id from, augs::entity_id to) {
-	auto* container = to->find<components::container>();
-
-	auto most_meaningful_error = item_transfer_result::NO_SLOT_AVAILABLE;
+slot_function detect_compatible_slot(augs::entity_id item, augs::entity_id container_entity) {
+	auto* container = container_entity->find<components::container>();
 
 	if (container) {
-		if (to[slot_function::ITEM_DEPOSIT].alive())
-			return{ query_transfer_result({ from, to[slot_function::ITEM_DEPOSIT] }), slot_function::ITEM_DEPOSIT };
+		if (container_entity[slot_function::ITEM_DEPOSIT].alive())
+			return slot_function::ITEM_DEPOSIT;
 
-		for (auto& s : container->slots) {
-			auto res = query_transfer_result({ from, to[s.first] });
-			
-			if (res >= item_transfer_result::SUCCESSFUL_TRANSFER) {
-				return{ res, s.first };
-			}
-			else
-				most_meaningful_error = std::max(most_meaningful_error, res);
-		}
+		for (auto& s : container->slots)
+			if (s.second.is_category_compatible_with(item))
+				return s.first;
 	}
 
-	return{ most_meaningful_error, slot_function::INVALID };
+	return slot_function::INVALID;
 }
+
+item_transfer_result containment_result(messages::item_slot_transfer_request r, bool allow_replacement) {
+	item_transfer_result output;
+	output.transferred_charges = 0;
+	output.result = item_transfer_result_type::NO_SLOT_AVAILABLE;
+
+	auto& item = r.item->get<components::item>();
+	auto& slot = *r.target_slot;
+	auto& result = output.result;
+
+	if (item.current_slot == r.target_slot)
+		result = item_transfer_result_type::THE_SAME_SLOT;
+	else if (slot.always_allow_exactly_one_item && slot.items_inside.size() == 1 && !can_merge_entities(slot.items_inside[0], r.item)) {
+		//if (allow_replacement) {
+		//
+		//}
+		//auto& item_to_replace = slot.items_inside[0];
+		//
+		//auto& current_slot_of_replacer = item.current_slot;
+		//auto replace_request = r;
+		//
+		//replace_request.item = slot.items_inside[0];
+		//replace_request.target_slot = current_slot_of_replacer;
+		//
+		//if (containment_result.)
+		//
+		//	if (current_slot_of_replacer.alive())
+
+		result = item_transfer_result_type::NO_SLOT_AVAILABLE;
+	}
+	else if (!slot.is_category_compatible_with(r.item))
+		result = item_transfer_result_type::INCOMPATIBLE_CATEGORIES;
+	else {
+		auto space_available = r.target_slot.calculate_free_space_with_parent_containers();
+
+		if (space_available > 0) {
+			bool item_indivisible = item.charges == 1 || !item.stackable;
+
+			if (item_indivisible) {
+				if (space_available >= calculate_space_occupied_with_children(r.item)) {
+					output.transferred_charges = 1;
+				}
+			}
+			else {
+				unsigned maximum_charges_fitting_inside = space_available / item.space_occupied_per_charge;
+				output.transferred_charges = std::min(item.charges, maximum_charges_fitting_inside);
+
+				if (r.specified_quantity > -1)
+					output.transferred_charges = std::min(output.transferred_charges, unsigned(r.specified_quantity));
+			}
+		}
+
+		if (output.transferred_charges == 0)
+			output.result = item_transfer_result_type::INSUFFICIENT_SPACE;
+		else
+			output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER;
+	}
+		
+	return output;
+}
+
 
 void for_each_descendant(augs::entity_id item, std::function<void(augs::entity_id item)> f) {
 	f(item);
@@ -144,4 +206,12 @@ void for_each_descendant(augs::entity_id item, std::function<void(augs::entity_i
 			item[s.first].for_each_descendant(f);
 		}
 	}
+}
+
+#include "../components/damage_component.h"
+
+bool can_merge_entities(augs::entity_id a, augs::entity_id b) {
+	return 
+		components::item::can_merge_entities(a, b) &&
+		components::damage::can_merge_entities(a, b);
 }

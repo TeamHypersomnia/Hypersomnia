@@ -23,5 +23,7 @@ namespace components {
 		float max_lifetime_ms = 2000.f;
 		
 		float lifetime_ms = 0.f;
+
+		static bool can_merge_entities(augs::entity_id a, augs::entity_id b);
 	};
 }

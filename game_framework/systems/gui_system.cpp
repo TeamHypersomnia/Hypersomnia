@@ -129,21 +129,25 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 			}
 
 			// purge removed metadata from entries with dead entities
-
+			std::vector<inventory_slot_id> dead_slots;
+			std::vector<augs::entity_id> dead_items;
 
 			for (auto& s : cached_slot_meta) {
 				auto id = s.first;
 				
-				if (id.dead())
-					cached_slot_meta.erase(id);
+				if (id.dead()) 
+					dead_slots.push_back(id);
 			}
 
 			for (auto& i : cached_item_meta) {
 				auto id = i.first;
 
 				if (id.dead())
-					cached_item_meta.erase(id);
+					dead_items.push_back(id);
 			}
+
+			for (auto& s : dead_slots) cached_slot_meta.erase(s);
+			for (auto& i : dead_items) cached_item_meta.erase(i);
 
 			// construct new metadata entries
 

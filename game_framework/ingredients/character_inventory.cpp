@@ -17,7 +17,8 @@ namespace ingredients {
 		auto& detector = *e += components::trigger_collision_detector();
 
 		inventory_slot slot_def;
-		slot_def.is_attachment_slot = true;
+		slot_def.is_physical_attachment_slot = true;
+		slot_def.always_allow_exactly_one_item = true;
 		slot_def.attachment_sticking_mode = augs::rects::sticking::RIGHT;
 		slot_def.attachment_offset.pos = vec2(0, 20);
 		slot_def.attachment_density_multiplier = 0.02f;

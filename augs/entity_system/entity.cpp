@@ -4,6 +4,27 @@
 #include "component_bitset_matcher.h"
 #include "game_framework/all_component_includes.h"
 
+#include <tuple>
+#include <utility> 
+
+template<std::size_t I = 0, typename... Tp>
+inline typename std::enable_if<I == sizeof...(Tp), void>::type
+clone_components (std::tuple<Tp...>& t, entity& e)
+{ }
+
+template<std::size_t I = 0, typename... Tp>
+inline typename std::enable_if<I < sizeof...(Tp), void>::type
+	clone_components(std::tuple<Tp...>& t, entity& e)
+{
+	typedef decltype(std::get<I>(t).second) comptypeptr;
+	typedef std::remove_pointer<comptypeptr>::type component_type;
+	
+	if(std::get<I>(t).first.alive())
+		e.add<component_type>(*(component_type*)(std::get<I>(t).first.ptr()));
+	
+	clone_components<I + 1, Tp...>(t, e);
+}
+
 namespace augs {
 	entity::entity(world& owner_world) : owner_world(owner_world) {}
 
@@ -13,7 +34,21 @@ namespace augs {
 
 	void entity::clone(augs::entity_id b) {
 #if USE_POINTER_TUPLE
-		clone_component_tuple(b->type_to_component);
+		clone_components(b->type_to_component, *this);
+
+		associated_entities_by_name = b->associated_entities_by_name;
+
+		for (auto& s : b->sub_entities) {
+			auto new_sub_entity = owner_world.create_entity();
+			new_sub_entity->clone(s);
+			sub_entities.push_back(new_sub_entity);
+		}
+
+		for (auto& s : b->sub_entities_by_name) {
+			auto new_sub_entity = owner_world.create_entity();
+			new_sub_entity->clone(s.second);
+			sub_entities_by_name[s.first] = new_sub_entity;
+		}
 #else
 		assert(0);
 #endif

@@ -19,31 +19,40 @@ namespace ingredients {
 		auto& container = *e += components::container();
 		item.space_occupied_per_charge = 3.5;
 
-		inventory_slot magazine_slot_def;
-		magazine_slot_def.is_attachment_slot = true;
-		magazine_slot_def.for_categorized_items_only = true;
-		magazine_slot_def.category_allowed = item_category::MAGAZINE;
-		magazine_slot_def.attachment_sticking_mode = augs::rects::sticking::TOP;
-		magazine_slot_def.attachment_offset.pos.set(10, 5);
-		magazine_slot_def.attachment_offset.rotation = -90;
+		{
+			inventory_slot slot_def;
+			slot_def.is_physical_attachment_slot = true;
+			slot_def.always_allow_exactly_one_item = true;
+			slot_def.for_categorized_items_only = true;
+			slot_def.category_allowed = item_category::MAGAZINE;
+			slot_def.attachment_sticking_mode = augs::rects::sticking::TOP;
+			slot_def.attachment_offset.pos.set(10, 5);
+			slot_def.attachment_offset.rotation = -90;
 
-		container.slots[slot_function::GUN_DETACHABLE_MAGAZINE] = magazine_slot_def;
+			container.slots[slot_function::GUN_DETACHABLE_MAGAZINE] = slot_def;
+		}
 
-		inventory_slot chamber_slot_def;
-		chamber_slot_def.is_attachment_slot = false;
-		chamber_slot_def.for_categorized_items_only = true;
-		chamber_slot_def.category_allowed = item_category::SHOT_CHARGE;
-		chamber_slot_def.space_available = 0.01f;
+		{
+			inventory_slot slot_def;
+			slot_def.is_physical_attachment_slot = false;
+			slot_def.always_allow_exactly_one_item = true;
+			slot_def.for_categorized_items_only = true;
+			slot_def.category_allowed = item_category::SHOT_CHARGE;
+			slot_def.space_available = 0.01f;
 
-		container.slots[slot_function::GUN_CHAMBER] = chamber_slot_def;
+			container.slots[slot_function::GUN_CHAMBER] = slot_def;
+		}
 
-		inventory_slot barrel_slot_def;
-		barrel_slot_def.is_attachment_slot = true;
-		barrel_slot_def.for_categorized_items_only = true;
-		barrel_slot_def.category_allowed = item_category::BARREL_ATTACHMENT;
-		barrel_slot_def.attachment_sticking_mode = augs::rects::sticking::RIGHT;
+		{
+			inventory_slot slot_def;
+			slot_def.is_physical_attachment_slot = true;
+			slot_def.always_allow_exactly_one_item = true;
+			slot_def.for_categorized_items_only = true;
+			slot_def.category_allowed = item_category::BARREL_ATTACHMENT;
+			slot_def.attachment_sticking_mode = augs::rects::sticking::RIGHT;
 
-		container.slots[slot_function::GUN_BARREL] = barrel_slot_def;
+			container.slots[slot_function::GUN_BARREL] = slot_def;
+		}
 
 		gun.action_mode = components::gun::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(500, 1000);
@@ -75,7 +84,6 @@ namespace prefabs {
 			item.space_occupied_per_charge = 0.5f;
 
 			inventory_slot charge_deposit_def;
-			charge_deposit_def.is_attachment_slot = false;
 			charge_deposit_def.for_categorized_items_only = true;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
 			charge_deposit_def.space_available = 0.30f;
@@ -119,6 +127,7 @@ namespace prefabs {
 			item.space_occupied_per_charge = 0.01f;
 			item.categories_for_slot_compatibility = item_category::SHOT_CHARGE;
 			item.charges = 23;
+			item.stackable = true;
 		}
 
 		{
@@ -131,6 +140,42 @@ namespace prefabs {
 
 		{
 			ingredients::sprite(shell_definition, pos, assets::texture_id::PINK_SHELL, augs::white, render_layer::FLYING_BULLETS);
+			auto& def = ingredients::crate_physics(shell_definition);
+			def.dont_create_fixtures_and_body = true;
+		}
+
+		pink_charge[sub_entity_name::BULLET_ROUND_DEFINITION] = round_definition;
+		pink_charge[sub_entity_name::BULLET_SHELL_DEFINITION] = shell_definition;
+
+		return pink_charge;
+	}
+
+	augs::entity_id create_cyan_charge(augs::world& world, vec2 pos) {
+		auto pink_charge = world.create_entity("pink_charge");
+		auto round_definition = world.create_entity("round_definition");
+		auto shell_definition = world.create_entity("shell_definition");
+
+		{
+			ingredients::sprite(pink_charge, pos, assets::texture_id::CYAN_CHARGE, augs::white, render_layer::DROPPED_ITEM);
+			ingredients::crate_physics(pink_charge);
+
+			auto& item = ingredients::make_item(pink_charge);
+			item.space_occupied_per_charge = 0.007f;
+			item.categories_for_slot_compatibility = item_category::SHOT_CHARGE;
+			item.charges = 30;
+			item.stackable = true;
+		}
+
+		{
+			ingredients::sprite(round_definition, pos, assets::texture_id::CYAN_CHARGE, augs::white, render_layer::FLYING_BULLETS);
+			auto& def = ingredients::crate_physics(round_definition);
+			def.dont_create_fixtures_and_body = true;
+
+			auto& damage = *round_definition += components::damage();
+		}
+
+		{
+			ingredients::sprite(shell_definition, pos, assets::texture_id::CYAN_SHELL, augs::white, render_layer::FLYING_BULLETS);
 			auto& def = ingredients::crate_physics(shell_definition);
 			def.dont_create_fixtures_and_body = true;
 		}

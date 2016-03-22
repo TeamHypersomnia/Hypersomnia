@@ -67,6 +67,8 @@ namespace scene_builders {
 
 		resource_manager.create(assets::texture_id::PINK_CHARGE, L"hypersomnia/gfx/pink_charge.png");
 		resource_manager.create(assets::texture_id::PINK_SHELL, L"hypersomnia/gfx/pink_shell.png");
+		resource_manager.create(assets::texture_id::CYAN_CHARGE, L"hypersomnia/gfx/cyan_charge.png");
+		resource_manager.create(assets::texture_id::CYAN_SHELL, L"hypersomnia/gfx/cyan_shell.png");
 
 		auto& backpack_gui = resource_manager.create(assets::texture_id::BACKPACK, L"hypersomnia/gfx/backpack.png").gui_sprite_def;
 		backpack_gui.rotation_offset = -90.f;
@@ -199,6 +201,8 @@ namespace scene_builders {
 		prefabs::create_pink_charge(world, vec2(100, -400));
 		prefabs::create_pink_charge(world, vec2(150, -400));
 		prefabs::create_pink_charge(world, vec2(200, -400));
+		prefabs::create_cyan_charge(world, vec2(150, -500));
+		prefabs::create_cyan_charge(world, vec2(200, -500));
 
 		auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 		prefabs::create_sample_backpack(world, vec2(200, -750));
@@ -247,7 +251,7 @@ namespace scene_builders {
 
 		draw_bodies.push_back(crate2);
 		//draw_bodies.push_back(characters[0]);
-		draw_bodies.push_back(backpack);
+		//draw_bodies.push_back(backpack);
 	}
 
 	void testbed::perform_logic_step(world& world) {
@@ -261,8 +265,8 @@ namespace scene_builders {
 			}
 
 			if (draw || (it.intent == intent_type::MOVE_CROSSHAIR && keep_drawing)) {
-				auto ent = world.create_entity("drawn_sprite");
-				ingredients::sprite_scalled(ent, it.crosshair_world_pos, vec2(10, 10), assets::texture_id::BLANK);
+				//auto ent = world.create_entity("drawn_sprite");
+				//ingredients::sprite_scalled(ent, it.crosshair_world_pos, vec2(10, 10), assets::texture_id::BLANK);
 			}
 		}
 

@@ -46,7 +46,7 @@ void slot_button::draw_triangles(draw_info info) {
 	augs::gui::material inside_mat(inside_tex, inside_col);
 	augs::gui::material border_mat(border_tex, border_col);
 
-	if (slot_id->is_attachment_slot) {
+	if (slot_id->always_allow_exactly_one_item) {
 		draw_centered_texture(info, inside_mat);
 		draw_centered_texture(info, border_mat);
 
@@ -100,7 +100,7 @@ void slot_button::draw_triangles(draw_info info) {
 void slot_button::perform_logic_step(augs::gui::gui_world& gr) {
 	rect::perform_logic_step(gr);
 
-	if (slot_id->is_attachment_slot) {
+	if (slot_id->always_allow_exactly_one_item) {
 		enable_drawing = true;
 
 		if (slot_id.has_items()) {

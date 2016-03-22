@@ -28,7 +28,7 @@ enum class slot_function {
 	TORSO_ARMOR_SLOT
 };
 
-enum item_transfer_result {
+enum item_transfer_result_type {
 	INVALID_SLOT_OR_UNOWNED_ROOT,
 
 	/* returned by containment_result */
@@ -40,4 +40,9 @@ enum item_transfer_result {
 
 	SUCCESSFUL_TRANSFER,
 	UNMOUNT_BEFOREHAND,
+};
+
+struct item_transfer_result {
+	item_transfer_result_type result = item_transfer_result_type::SUCCESSFUL_TRANSFER;
+	unsigned transferred_charges = 1;
 };

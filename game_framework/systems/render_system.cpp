@@ -179,6 +179,9 @@ void render_system::set_current_transforms_as_previous_for_interpolation() {
 	if (!enable_interpolation) return;
 
 	for (auto it : visible_entities) {
+		if (it.dead())
+			continue;
+
 		auto& render = it->get<components::render>();
 
 		if (render.interpolate) {

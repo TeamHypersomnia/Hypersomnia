@@ -1,5 +1,6 @@
 #include "game_framework/systems/gui_system.h"
 #include "game_framework/components/sprite_component.h"
+#include "game_framework/components/item_component.h"
 #include "graphics/renderer.h"
 #include "gui/stroke.h"
 #include "../inventory_utils.h"
@@ -8,7 +9,7 @@ using namespace augs;
 using namespace gui;
 
 bool gui_system::drag_and_drop_result::will_drop_be_successful() {
-	return result >= item_transfer_result::SUCCESSFUL_TRANSFER;
+	return result.result >= item_transfer_result_type::SUCCESSFUL_TRANSFER;
 }
 
 gui_system::drag_and_drop_result gui_system::prepare_drag_and_drop_result() {
@@ -28,50 +29,63 @@ gui_system::drag_and_drop_result gui_system::prepare_drag_and_drop_result() {
 
 			out.possible_target_hovered = true;
 
-			out.intent.item = dragged_item->item;
+			messages::item_slot_transfer_request simulated_request;
+			simulated_request.item = dragged_item->item;
 
-			if (target_slot && target_slot->houted_after_drag_started) {
-				predicted_result = { query_transfer_result({ dragged_item->item, target_slot->slot_id }), target_slot->slot_id.type };
-				out.intent.target_slot = target_slot->slot_id;
-			}
+			bool was_pointing_to_a_stack_target = false;
+
+			if (target_slot && target_slot->houted_after_drag_started)
+				simulated_request.target_slot = target_slot->slot_id;
 			else if (target_item && target_item != dragged_item) {
-				predicted_result = query_transfer_result(dragged_item->item, target_item->item);
-				out.intent.target_slot = target_item->item[predicted_result.second];
+				if (target_item->item->find<components::container>())
+					simulated_request.target_slot = target_item->item[detect_compatible_slot(dragged_item->item, target_item->item)];
+				else if(can_merge_entities(target_item->item, dragged_item->item)) {
+					simulated_request.target_slot = target_item->item->get<components::item>().current_slot;
+					was_pointing_to_a_stack_target = true;
+				}
 			}
 			else
 				out.possible_target_hovered = false;
 
 			if (out.possible_target_hovered) {
-				out.result = predicted_result.first;
+				predicted_result = { query_transfer_result(simulated_request), simulated_request.target_slot.type };
 
-				if (predicted_result.first == item_transfer_result::THE_SAME_SLOT) {
-					out.tooltip_text = L"Current slot";
+				out.result = predicted_result.first;
+				out.intent = simulated_request;
+
+				if (predicted_result.first.result == item_transfer_result_type::THE_SAME_SLOT) {
+					tooltip_text = L"Current slot";
 				}
-				else if (predicted_result.first >= item_transfer_result::SUCCESSFUL_TRANSFER) {
-					if (predicted_result.first == item_transfer_result::UNMOUNT_BEFOREHAND) {
+				else if (predicted_result.first.result >= item_transfer_result_type::SUCCESSFUL_TRANSFER) {
+					if (predicted_result.first.result == item_transfer_result_type::UNMOUNT_BEFOREHAND) {
 						tooltip_text += L"Unmount & ";
 					}
 
-					switch (predicted_result.second) {
-					case slot_function::ITEM_DEPOSIT: tooltip_text = L"Insert"; break;
-					case slot_function::GUN_CHAMBER: tooltip_text = L"Place"; break;
-					case slot_function::GUN_CHAMBER_MAGAZINE: tooltip_text = L"Place"; break;
-					case slot_function::GUN_DETACHABLE_MAGAZINE: tooltip_text = L"Reload"; break;
-					case slot_function::GUN_RAIL: tooltip_text = L"Install"; break;
-					case slot_function::TORSO_ARMOR_SLOT: tooltip_text = L"Wear"; break;
-					case slot_function::SHOULDER_SLOT: tooltip_text = L"Wear"; break;
-					case slot_function::PRIMARY_HAND: tooltip_text = L"Wield"; break;
-					case slot_function::SECONDARY_HAND: tooltip_text = L"Wield"; break;
-					case slot_function::GUN_BARREL: tooltip_text = L"Install"; break;
-					default: assert(0); break;
+					if (was_pointing_to_a_stack_target) {
+						tooltip_text += L"Stack";
+					}
+					else {
+						switch (predicted_result.second) {
+						case slot_function::ITEM_DEPOSIT: tooltip_text += L"Insert"; break;
+						case slot_function::GUN_CHAMBER: tooltip_text += L"Place"; break;
+						case slot_function::GUN_CHAMBER_MAGAZINE: tooltip_text += L"Place"; break;
+						case slot_function::GUN_DETACHABLE_MAGAZINE: tooltip_text += L"Reload"; break;
+						case slot_function::GUN_RAIL: tooltip_text += L"Install"; break;
+						case slot_function::TORSO_ARMOR_SLOT: tooltip_text += L"Wear"; break;
+						case slot_function::SHOULDER_SLOT: tooltip_text += L"Wear"; break;
+						case slot_function::PRIMARY_HAND: tooltip_text += L"Wield"; break;
+						case slot_function::SECONDARY_HAND: tooltip_text += L"Wield"; break;
+						case slot_function::GUN_BARREL: tooltip_text += L"Install"; break;
+						default: assert(0); break;
+						}
 					}
 				}
-				else if (predicted_result.first < item_transfer_result::SUCCESSFUL_TRANSFER) {
-					switch (predicted_result.first) {
-					case item_transfer_result::INSUFFICIENT_SPACE: tooltip_text = L"No space"; break;
-					case item_transfer_result::INVALID_SLOT_OR_UNOWNED_ROOT: tooltip_text = L"Impossible"; break;
-					case item_transfer_result::INCOMPATIBLE_CATEGORIES: tooltip_text = L"Incompatible item"; break;
-					case item_transfer_result::NO_SLOT_AVAILABLE: tooltip_text = L"No slot available"; break;
+				else if (predicted_result.first.result < item_transfer_result_type::SUCCESSFUL_TRANSFER) {
+					switch (predicted_result.first.result) {
+					case item_transfer_result_type::INSUFFICIENT_SPACE: tooltip_text = L"No space"; break;
+					case item_transfer_result_type::INVALID_SLOT_OR_UNOWNED_ROOT: tooltip_text = L"Impossible"; break;
+					case item_transfer_result_type::INCOMPATIBLE_CATEGORIES: tooltip_text = L"Incompatible item"; break;
+					case item_transfer_result_type::NO_SLOT_AVAILABLE: tooltip_text = L"No slot available"; break;
 					default: assert(0); break;
 					}
 				}
@@ -111,7 +125,7 @@ void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message
 			gui_cursor = assets::GUI_CURSOR_ADD;
 			gui_cursor_color = green;
 		}
-		else if(drag_result.result != item_transfer_result::THE_SAME_SLOT) {
+		else if(drag_result.result.result != item_transfer_result_type::THE_SAME_SLOT) {
 			gui_cursor = assets::GUI_CURSOR_ERROR;
 			gui_cursor_color = red;
 		}

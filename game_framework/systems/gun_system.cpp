@@ -74,25 +74,25 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 				auto barrel_transform = gun_transform;
 				barrel_transform.pos += vec2(gun.bullet_spawn_offset).rotate(gun_transform.rotation, vec2());
 				
-				auto catridge = chamber_slot->get_mounted_items()[0];
+				auto item_in_chamber = chamber_slot->get_mounted_items()[0];
 
 				static thread_local std::vector<augs::entity_id> bullet_entities;
 				bullet_entities.clear();
 
-				auto pellets_slot = catridge[slot_function::ITEM_DEPOSIT];
+				auto pellets_slot = item_in_chamber[slot_function::ITEM_DEPOSIT];
 
 				if (pellets_slot.alive())
 					bullet_entities = pellets_slot->get_mounted_items();
 				else
-					bullet_entities.push_back(catridge);
+					bullet_entities.push_back(item_in_chamber);
 
-				for(auto& charge_stack : bullet_entities) {
-					size_t charges = charge_stack->get<components::item>().charges;
+				for(auto& catridge_or_pellet_stack : bullet_entities) {
+					size_t charges = catridge_or_pellet_stack->get<components::item>().charges;
 
 					while (charges--) {
 						{
 							auto round_entity = parent_world.create_entity();
-							round_entity->clone(charge_stack[sub_entity_name::BULLET_ROUND_DEFINITION]);
+							round_entity->clone(catridge_or_pellet_stack[sub_entity_name::BULLET_ROUND_DEFINITION]);
 
 							round_entity->get<components::damage>().amount *= gun.damage_multiplier;
 
@@ -103,7 +103,7 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 							round_entity->get<components::transform>() = barrel_transform;
 						}
 
-						auto shell_definition = charge_stack[sub_entity_name::BULLET_SHELL_DEFINITION];
+						auto shell_definition = catridge_or_pellet_stack[sub_entity_name::BULLET_SHELL_DEFINITION];
 
 						if (shell_definition.alive()) {
 							auto shell_entity = parent_world.create_entity();
@@ -122,7 +122,7 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 						}
 					}
 
-					parent_world.post_message(messages::destroy_message(charge_stack));
+					parent_world.post_message(messages::destroy_message(catridge_or_pellet_stack));
 				}
 
 				messages::animation_response_message msg;

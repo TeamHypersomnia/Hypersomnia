@@ -29,6 +29,10 @@ namespace components {
 			return *this;
 		}
 
+		bool operator==(const transform& b) const {
+			return pos == b.pos && rotation == b.rotation;
+		}
+
 		void flip_rotation() {
 			rotation = -rotation;
 		}

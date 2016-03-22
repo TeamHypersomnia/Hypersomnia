@@ -20,7 +20,10 @@
 using namespace std;
 using namespace augs;
 
-void SignalHandler(int signal) { throw "Access violation!"; }
+void SignalHandler(int signal) { 
+	ClipCursor(NULL);
+	throw "Access violation!"; 
+}
 
 game_overworld::game_overworld() 
 	: main_game_world(*this) {

@@ -93,11 +93,9 @@ void game_world::register_types_of_messages_components_systems() {
 	register_message_queue<trigger_hit_request_message>();
 	register_message_queue<new_entity_message>();
 	register_message_queue<camera_render_request_message>();
-	register_message_queue<item_slot_transfer_intent>();
 	register_message_queue<item_slot_transfer_request>();
 	register_message_queue<gui_item_transfer_intent>();
 
-	register_message_callback<item_slot_transfer_intent>(std::bind(&item_system::constrain_item_slot_transfer_intents, &get_system<item_system>()));
 	register_message_callback<item_slot_transfer_request>(std::bind(&item_system::consume_item_slot_transfer_requests, &get_system<item_system>()));
 }
 

@@ -2,6 +2,7 @@
 #include "../components/item_component.h"
 #include "../components/physics_definition_component.h"
 #include "entity_system/world.h"
+#include "inventory_utils.h"
 
 inventory_slot& inventory_slot_id::operator*() {
 	return container_entity->get<components::container>().slots[type];
@@ -35,10 +36,6 @@ bool inventory_slot_id::alive() {
 	return container && container->slots.find(type) != container->slots.end();
 }
 
-bool inventory_slot_id::functional() {
-	return alive();
-}
-
 bool inventory_slot_id::dead() {
 	return !alive();
 }
@@ -61,7 +58,7 @@ bool inventory_slot_id::is_empty_slot() {
 }
 
 bool inventory_slot_id::should_item_inside_keep_physical_body(augs::entity_id until_parent) {
-	bool should_item_here_keep_physical_body = (*this)->is_attachment_slot;
+	bool should_item_here_keep_physical_body = (*this)->is_physical_attachment_slot;
 
 	if (container_entity == until_parent) {
 		return should_item_here_keep_physical_body;
@@ -81,7 +78,7 @@ bool inventory_slot_id::should_item_inside_keep_physical_body(augs::entity_id un
 }
 
 float inventory_slot_id::calculate_density_multiplier_due_to_being_attached() {
-	assert((*this)->is_attachment_slot);
+	assert((*this)->is_physical_attachment_slot);
 	float density_multiplier = (*this)->attachment_density_multiplier;
 
 	auto* maybe_item = container_entity->find<components::item>();
@@ -133,10 +130,13 @@ void inventory_slot_id::remove_item(augs::entity_id id) {
 float calculate_space_occupied_with_children(augs::entity_id item) {
 	auto space_occupied = item->get<components::item>().get_space_occupied();
 
-	if (item->find<components::container>())
+	if (item->find<components::container>()) {
+		assert(item->get<components::item>().charges == 1);
+		
 		for (auto& slot : item->get<components::container>().slots)
 			for (auto& entity_in_slot : slot.second.items_inside)
 				space_occupied += calculate_space_occupied_with_children(entity_in_slot);
+	}
 
 	return space_occupied;
 }
@@ -144,6 +144,8 @@ float calculate_space_occupied_with_children(augs::entity_id item) {
 std::vector<augs::entity_id> inventory_slot::get_mounted_items() {
 	static thread_local std::vector<augs::entity_id> output;
 	output.clear();
+	// TODO: actually implement mounted items
+	return items_inside;
 
 	for (auto& i : items_inside) 
 		if (i->get<components::item>().is_mounted()) 
@@ -152,9 +154,13 @@ std::vector<augs::entity_id> inventory_slot::get_mounted_items() {
 	return output;
 }
 
+bool inventory_slot::has_unlimited_space() {
+	return is_physical_attachment_slot;// || always_allow_exactly_one_item;
+}
+
 float inventory_slot::calculate_free_space_with_children() {
-	if (is_attachment_slot)
-		return std::numeric_limits<unsigned>::max();
+	if (has_unlimited_space())
+		return 1000000.f;
 
 	float space = space_available;
 
@@ -175,23 +181,13 @@ float inventory_slot_id::calculate_free_space_with_parent_containers() {
 	return maximum_space;
 }
 
-item_transfer_result inventory_slot_id::containment_result(augs::entity_id id) {
+bool inventory_slot::is_category_compatible_with(augs::entity_id id) {
 	auto& item = id->get<components::item>();
-	auto& slot = **this;
-
-	if (item.current_slot == *this)
-		return item_transfer_result::THE_SAME_SLOT;
-
-	if (slot.is_attachment_slot && slot.items_inside.size() > 0)
-		return item_transfer_result::NO_SLOT_AVAILABLE;
-
-	if (slot.for_categorized_items_only && (slot.category_allowed & item.categories_for_slot_compatibility) == 0)
-		return item_transfer_result::INCOMPATIBLE_CATEGORIES;
-
-	if (calculate_free_space_with_parent_containers() < calculate_space_occupied_with_children(id))
-		return item_transfer_result::INSUFFICIENT_SPACE;
-
-	return item_transfer_result::SUCCESSFUL_TRANSFER;
+	
+	if (for_categorized_items_only && (category_allowed & item.categories_for_slot_compatibility) == 0)
+		return false;
+	
+	return true;
 }
 
 void inventory_slot_id::for_each_descendant(std::function<void(augs::entity_id item)> f) {
@@ -210,5 +206,9 @@ bool inventory_slot_id::can_contain(augs::entity_id id) {
 	if (dead())
 		return false;
 
-	return containment_result(id) == SUCCESSFUL_TRANSFER;
+	messages::item_slot_transfer_request r;
+	r.target_slot = *this;
+	r.item = id;
+
+	return containment_result(r).transferred_charges > 0;
 }

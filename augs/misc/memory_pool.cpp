@@ -2,6 +2,7 @@
 #include "memory_pool.h"
 #include "unsafe_type_collection.h"
 #include <cassert>
+#include <tuple>
 
 namespace augs {
 	simple_pool<memory_pool*> memory_pool::pool_locations;
@@ -41,10 +42,14 @@ namespace augs {
 
 	memory_pool& memory_pool::id::get_pool() { return *owner; }
 
-	bool memory_pool::id::operator<(const id& b) const { return ptr() < b.ptr(); }
+	bool memory_pool::id::operator<(const id& b) const { 
+		auto& a = *this;
+		return std::make_tuple(a.owner, a.indirection_index, a.version) < 
+			   std::make_tuple(b.owner, b.indirection_index, b.version);
+	}
 	bool memory_pool::id::operator!() const { return !alive(); }
 	bool memory_pool::id::operator==(const id& b) const { 
-		bool result = owner == b.owner && (!owner || (indirection_index == b.indirection_index && version == b.version)); 
+		bool result = owner == b.owner && (indirection_index == b.indirection_index && version == b.version); 
 #ifdef USE_NAMES_FOR_IDS
 		if(result) assert(std::string(debug_name) == std::string(b.debug_name));
 #endif

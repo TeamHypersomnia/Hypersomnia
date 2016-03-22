@@ -17,11 +17,12 @@ namespace components {
 
 		unsigned charges = 1;
 		float space_occupied_per_charge = 1;
+		bool stackable = false;
 
 		unsigned dual_wield_accuracy_loss_percentage = 50;
 		unsigned dual_wield_accuracy_loss_multiplier = 1;
 
-		components::transform attachment_offsets_per_sticking_mode[4];
+		std::array<components::transform, 4> attachment_offsets_per_sticking_mode;
 
 		inventory_slot_id current_slot;
 		inventory_slot_id target_slot_after_unmount;
@@ -70,5 +71,6 @@ namespace components {
 		void mark_parent_enclosing_containers_for_unmount();
 
 		bool are_parents_last_in_lifo_slots();
+		static bool can_merge_entities(augs::entity_id e1, augs::entity_id e2);
 	};
 }

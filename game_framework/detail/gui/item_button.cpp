@@ -283,7 +283,7 @@ void item_button::perform_logic_step(augs::gui::gui_world& gr) {
 
 	auto parent_slot = item->get<components::item>().current_slot;
 	
-	if (parent_slot->is_attachment_slot) {
+	if (parent_slot->always_allow_exactly_one_item) {
 		rc.set_position(get_meta(parent_slot).rc.get_position());
 	}
 	else {
@@ -302,7 +302,7 @@ void item_button::consume_gui_event(event_info info) {
 		if (!started_drag) {
 			started_drag = true;
 
-			if (parent_slot->is_attachment_slot)
+			if (parent_slot->always_allow_exactly_one_item)
 				if (get_meta(parent_slot).get_rect_absolute().hover(info.owner.state.mouse.pos)) {
 					get_meta(parent_slot).houted_after_drag_started = false;
 				}
@@ -327,7 +327,7 @@ void item_button::consume_gui_event(event_info info) {
 		else if (!drag_result.possible_target_hovered) {
 			vec2i griddified = griddify(info.owner.current_drag_amount);
 
-			if (parent_slot->is_attachment_slot) {
+			if (parent_slot->always_allow_exactly_one_item) {
 				get_meta(parent_slot).user_drag_offset += griddified;
 				get_meta(parent_slot).houted_after_drag_started = true;
 			}

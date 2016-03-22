@@ -19,12 +19,12 @@ struct inventory_slot {
 	- there may be only one item
 	- putting item inside does not deactivate its physics component; it is attached to the container entity instead
 	*/
-	bool is_attachment_slot = false;
+	bool is_physical_attachment_slot = false;
+	bool always_allow_exactly_one_item = false;
 	float attachment_density_multiplier = 1.f;
-
-	bool is_holsterable() const {
-		return !is_attachment_slot;
-	}
+	
+	bool has_unlimited_space();
+	bool is_category_compatible_with(augs::entity_id item);
 
 	augs::rects::sticking attachment_sticking_mode = augs::rects::sticking::LEFT;
 	components::transform attachment_offset;
