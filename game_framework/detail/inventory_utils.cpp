@@ -68,10 +68,11 @@ inventory_slot_id determine_pickup_target_slot(augs::entity_id item_entity, augs
 	if (hidden_slot.alive())
 		return hidden_slot;
 
-	auto hand = first_free_hand(searched_root_container);
+	if (searched_root_container[slot_function::PRIMARY_HAND].can_contain(item_entity))
+		return searched_root_container[slot_function::PRIMARY_HAND];
 
-	if (hand.can_contain(item_entity))
-		return hand;
+	if (searched_root_container[slot_function::SECONDARY_HAND].can_contain(item_entity))
+		return searched_root_container[slot_function::SECONDARY_HAND];
 
 	return inventory_slot_id();
 }
@@ -214,4 +215,20 @@ bool can_merge_entities(augs::entity_id a, augs::entity_id b) {
 	return 
 		components::item::can_merge_entities(a, b) &&
 		components::damage::can_merge_entities(a, b);
+}
+
+unsigned to_space_units(std::string s) {
+	unsigned sum = 0;
+	unsigned mult = SPACE_ATOMS_PER_UNIT;
+
+	for (auto& c : s) {
+		assert(mult > 0);
+		if (c == '.')
+			continue;
+
+		sum += (c - '0') * mult;
+		mult /= 10;
+	}
+
+	return sum;
 }

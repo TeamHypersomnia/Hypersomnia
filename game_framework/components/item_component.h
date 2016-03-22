@@ -16,7 +16,7 @@ namespace components {
 		unsigned categories_for_slot_compatibility = 0;
 
 		unsigned charges = 1;
-		float space_occupied_per_charge = 1;
+		unsigned space_occupied_per_charge = 1;
 		bool stackable = false;
 
 		unsigned dual_wield_accuracy_loss_percentage = 50;
@@ -27,7 +27,7 @@ namespace components {
 		inventory_slot_id current_slot;
 		inventory_slot_id target_slot_after_unmount;
 
-		float get_space_occupied() const {
+		unsigned get_space_occupied() const {
 			return charges * space_occupied_per_charge;
 		}
 

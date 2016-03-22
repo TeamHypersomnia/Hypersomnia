@@ -20,7 +20,7 @@ struct inventory_slot_id {
 	void add_item(augs::entity_id);
 	void remove_item(augs::entity_id);
 
-	float calculate_free_space_with_parent_containers();
+	unsigned calculate_free_space_with_parent_containers();
 
 	void for_each_descendant(std::function<void(augs::entity_id item)>);
 

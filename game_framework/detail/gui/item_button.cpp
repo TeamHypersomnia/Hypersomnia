@@ -185,7 +185,7 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 
 		auto& item_data = item->get<components::item>();
 
-		float bottom_number_val = -1.f;
+		long double bottom_number_val = -1.f;
 		auto* container = item->find<components::container>();
 		bool append_x = false;
 
@@ -196,7 +196,7 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 			append_x = true;
 		}
 		else if (DRAW_FREE_SPACE_INSIDE_CONTAINER_ICONS && item[slot_function::ITEM_DEPOSIT].alive()) {
-			bottom_number_val = item[slot_function::ITEM_DEPOSIT].calculate_free_space_with_parent_containers();
+			bottom_number_val = item[slot_function::ITEM_DEPOSIT].calculate_free_space_with_parent_containers() / long double(SPACE_ATOMS_PER_UNIT);
 
 			if (item[slot_function::ITEM_DEPOSIT]->for_categorized_items_only)
 				label_color.rgb() = pink.rgb();

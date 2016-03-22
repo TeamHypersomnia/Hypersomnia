@@ -127,7 +127,7 @@ void inventory_slot_id::remove_item(augs::entity_id id) {
 	id->get<components::item>().current_slot.unset();
 }
 
-float calculate_space_occupied_with_children(augs::entity_id item) {
+unsigned calculate_space_occupied_with_children(augs::entity_id item) {
 	auto space_occupied = item->get<components::item>().get_space_occupied();
 
 	if (item->find<components::container>()) {
@@ -158,19 +158,22 @@ bool inventory_slot::has_unlimited_space() {
 	return is_physical_attachment_slot;// || always_allow_exactly_one_item;
 }
 
-float inventory_slot::calculate_free_space_with_children() {
+unsigned inventory_slot::calculate_free_space_with_children() {
 	if (has_unlimited_space())
-		return 1000000.f;
+		return 1000000;
 
-	float space = space_available;
+	unsigned space = space_available;
 
-	for (auto& e : items_inside)
-		space -= calculate_space_occupied_with_children(e);
+	for (auto& e : items_inside) {
+		auto occupied = calculate_space_occupied_with_children(e);
+		assert(occupied <= space);
+		space -= occupied;
+	}
 
 	return space;
 }
 
-float inventory_slot_id::calculate_free_space_with_parent_containers() {
+unsigned inventory_slot_id::calculate_free_space_with_parent_containers() {
 	auto maximum_space = (*this)->calculate_free_space_with_children();
 
 	auto* maybe_item = container_entity->find<components::item>();

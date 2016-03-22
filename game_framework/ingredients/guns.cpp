@@ -11,13 +11,14 @@
 #include "game_framework/messages/item_slot_transfer_request.h"
 
 #include "ingredients.h"
+#include "game_framework/detail/inventory_utils.h"
 
 namespace ingredients {
 	void assault_rifle(augs::entity_id e) {
 		auto& gun = *e += components::gun();
 		auto& item = make_item(e);
 		auto& container = *e += components::container();
-		item.space_occupied_per_charge = 3.5;
+		item.space_occupied_per_charge = to_space_units("3.5");
 
 		{
 			inventory_slot slot_def;
@@ -38,7 +39,7 @@ namespace ingredients {
 			slot_def.always_allow_exactly_one_item = true;
 			slot_def.for_categorized_items_only = true;
 			slot_def.category_allowed = item_category::SHOT_CHARGE;
-			slot_def.space_available = 0.01f;
+			slot_def.space_available = to_space_units("0.01");
 
 			container.slots[slot_function::GUN_CHAMBER] = slot_def;
 		}
@@ -81,12 +82,12 @@ namespace prefabs {
 			auto& container = *sample_magazine += components::container();
 			
 			item.categories_for_slot_compatibility = item_category::MAGAZINE;
-			item.space_occupied_per_charge = 0.5f;
+			item.space_occupied_per_charge = to_space_units("0.5");
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.for_categorized_items_only = true;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = 0.30f;
+			charge_deposit_def.space_available = to_space_units("0.30");
 
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
 		}
@@ -109,7 +110,7 @@ namespace prefabs {
 		auto& item = ingredients::make_item(sample_suppressor);
 
 		item.categories_for_slot_compatibility = item_category::BARREL_ATTACHMENT;
-		item.space_occupied_per_charge = 0.2f;
+		item.space_occupied_per_charge = to_space_units("0.2");
 
 		return sample_suppressor;
 	}
@@ -124,7 +125,7 @@ namespace prefabs {
 			ingredients::crate_physics(pink_charge);
 
 			auto& item = ingredients::make_item(pink_charge);
-			item.space_occupied_per_charge = 0.01f;
+			item.space_occupied_per_charge = to_space_units("0.01");
 			item.categories_for_slot_compatibility = item_category::SHOT_CHARGE;
 			item.charges = 23;
 			item.stackable = true;
@@ -160,7 +161,7 @@ namespace prefabs {
 			ingredients::crate_physics(pink_charge);
 
 			auto& item = ingredients::make_item(pink_charge);
-			item.space_occupied_per_charge = 0.007f;
+			item.space_occupied_per_charge = to_space_units("0.007");
 			item.categories_for_slot_compatibility = item_category::SHOT_CHARGE;
 			item.charges = 30;
 			item.stackable = true;

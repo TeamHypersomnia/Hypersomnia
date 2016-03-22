@@ -2,7 +2,9 @@
 #include "inventory_slot_id.h"
 #include "../messages/item_slot_transfer_request.h"
 
-float calculate_space_occupied_with_children(augs::entity_id item);
+#define SPACE_ATOMS_PER_UNIT 1000
+
+unsigned calculate_space_occupied_with_children(augs::entity_id item);
 augs::entity_id get_owning_transfer_capability(augs::entity_id);
 
 inventory_slot_id determine_hand_holstering_slot(augs::entity_id item, augs::entity_id searched_root_container);
@@ -19,3 +21,5 @@ item_transfer_result query_transfer_result(messages::item_slot_transfer_request)
 slot_function detect_compatible_slot(augs::entity_id item, augs::entity_id container);
 
 bool can_merge_entities(augs::entity_id, augs::entity_id);
+
+unsigned to_space_units(std::string s);
