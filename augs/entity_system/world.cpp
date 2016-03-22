@@ -18,7 +18,13 @@ namespace augs {
 	}
 
 	entity_id world::clone_entity(entity_id id) {
-		auto new_entity = create_entity("cloned_" + id.get_debug_name());
+		std::string cloned_name = id.get_debug_name();
+
+		if (cloned_name.substr(0, 7) != "cloned_") {
+			cloned_name = "cloned_" + cloned_name;
+		}
+
+		auto new_entity = create_entity(cloned_name);
 		new_entity->clone(id);
 		return new_entity;
 	}
