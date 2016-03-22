@@ -34,21 +34,20 @@ namespace augs {
 
 	void entity::clone(augs::entity_id b) {
 #if USE_POINTER_TUPLE
+		debug_name = b->debug_name;
+		
 		clone_components(b->type_to_component, *this);
 
 		associated_entities_by_name = b->associated_entities_by_name;
 
-		for (auto& s : b->sub_entities) {
-			auto new_sub_entity = owner_world.create_entity();
-			new_sub_entity->clone(s);
-			sub_entities.push_back(new_sub_entity);
-		}
+		for (auto& s : b->sub_entities)
+			sub_entities.push_back(owner_world.clone_entity(s));
 
-		for (auto& s : b->sub_entities_by_name) {
-			auto new_sub_entity = owner_world.create_entity();
-			new_sub_entity->clone(s.second);
-			sub_entities_by_name[s.first] = new_sub_entity;
-		}
+		for (auto& s : b->sub_entities_by_name)
+			sub_entities_by_name[s.first] = owner_world.clone_entity(s.second);
+
+		remove<components::fixtures>();
+		remove<components::physics>();
 #else
 		assert(0);
 #endif

@@ -13,7 +13,7 @@
 #include "misc/randval.h"
 
 entity_id particle_emitter_system::create_refreshable_particle_group(world& parent_world) {
-	entity_id ent = parent_world.create_entity();
+	entity_id ent = parent_world.create_entity("refreshable_particle_group");
 	
 	ent->add(components::transform());
 	ent->add(components::particle_group()).stream_slots[0].destroy_when_empty = false;
@@ -102,7 +102,7 @@ void particle_emitter_system::consume_events() {
 			if (emission.type == resources::emission::type::BURST) {
 				int burst_amount = randval(emission.particles_per_burst);
 
-				entity_id new_burst_entity = parent_world.create_entity();
+				entity_id new_burst_entity = parent_world.create_entity("particle_burst");
 				new_burst_entity->add(components::particle_group());
 				new_burst_entity->add(components::transform());
 				new_burst_entity->add(emission.particle_render_template);
@@ -137,7 +137,7 @@ void particle_emitter_system::consume_events() {
 
 		for (auto& stream : only_streams) {
 			if (!it.target_group_to_refresh) {
-				entity_id new_stream_entity = parent_world.create_entity();
+				entity_id new_stream_entity = parent_world.create_entity("particle_stream");
 				target_group = &new_stream_entity->add(components::particle_group());
 				target_transform = &new_stream_entity->add(components::transform());
 				target_render = &new_stream_entity->add(components::render());

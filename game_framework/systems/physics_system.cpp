@@ -10,6 +10,8 @@ float PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 #include "../messages/collision_message.h"
 #include "../messages/destroy_message.h"
 #include "../messages/new_entity_message.h"
+#include "../messages/rebuild_physics_message.h"
+#include "../messages/physics_operation.h"
 
 #include "../detail/physics_setup_helpers.h"
 #include "../components/physics_definition_component.h"
@@ -654,7 +656,7 @@ void physics_system::create_physics_for_entity(augs::entity_id e) {
 	auto* physics_definition = e->find<components::physics_definition>();
 
 	if (physics_definition) {
-		if (!physics_definition->dont_create_fixtures_and_body) {
+		if (physics_definition->create_fixtures_and_body && !physics_definition->is_definition_entity) {
 			auto other_body_entity = physics_definition->attach_fixtures_to_entity;
 
 			if (other_body_entity.dead() || other_body_entity == e)
@@ -668,26 +670,13 @@ void physics_system::create_physics_for_entity(augs::entity_id e) {
 				else
 					add_fixtures(fixture, e);
 			}
-		}
 
-		if (!physics_definition->preserve_definition_for_cloning)
-			e->remove<components::physics_definition>();
+			components::physics::resolve_density_of_associated_fixtures(e);
+		}
 	}
 }
 
-void physics_system::destroy_physics_of_entity(augs::entity_id subject) {
-	auto* maybe_physics = subject->find<components::physics>();
-
-	if (maybe_physics) {
-		b2world.DestroyBody(maybe_physics->body);
-
-		for (auto fe : maybe_physics->fixture_entities) {
-			fe->remove<components::fixtures>();
-		}
-
-		subject->remove<components::physics>();
-	}
-
+void physics_system::destroy_fixtures_of_entity(augs::entity_id subject) {
 	auto* maybe_fixtures = subject->find<components::fixtures>();
 
 	if (maybe_fixtures) {
@@ -699,6 +688,57 @@ void physics_system::destroy_physics_of_entity(augs::entity_id subject) {
 
 		subject->remove<components::fixtures>();
 	}
+}
+
+void physics_system::destroy_physics_of_entity(augs::entity_id subject) {
+	destroy_fixtures_of_entity(subject);
+
+	auto* maybe_physics = subject->find<components::physics>();
+
+	if (maybe_physics) {
+		auto all_fixture_entities = maybe_physics->fixture_entities;
+		
+		for (auto fe : all_fixture_entities)
+			destroy_fixtures_of_entity(fe);
+
+		b2world.DestroyBody(maybe_physics->body);
+
+		subject->remove<components::physics>();
+	}
+}
+
+void physics_system::consume_rebuild_physics_messages_and_save_new_definitions() {
+	auto& events = parent_world.get_message_queue<messages::rebuild_physics_message>();
+
+	for (auto& it : events) {
+		if (it.subject->find<components::physics_definition>() == nullptr)
+			it.subject->add(it.new_definition);
+		else
+			it.subject->get<components::physics_definition>() = it.new_definition;
+
+		destroy_physics_of_entity(it.subject);
+		create_physics_for_entity(it.subject);
+	}
+
+	events.clear();
+}
+
+void physics_system::execute_delayed_physics_ops() {
+	auto& events = parent_world.get_message_queue<messages::physics_operation>();
+
+	for (auto& e : events) {
+		auto& physics = e.subject->get<components::physics>();
+
+		if (e.apply_force.non_zero())
+			physics.apply_force(e.apply_force, e.force_offset);
+
+		if (e.reset_drop_timeout) {
+			physics.since_dropped.set(e.timeout_ms);
+			reset(physics.since_dropped);
+		}
+	}
+
+	events.clear();
 }
 
 void physics_system::create_bodies_and_fixtures_from_physics_definitions() {

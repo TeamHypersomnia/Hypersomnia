@@ -6,6 +6,7 @@
 #include "../messages/damage_message.h"
 #include "../messages/destroy_message.h"
 #include "../messages/shot_message.h"
+#include "../messages/item_slot_transfer_request.h"
 
 #include "../components/render_component.h"
 #include "../components/physics_component.h"
@@ -91,13 +92,11 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 
 					while (charges--) {
 						{
-							auto round_entity = parent_world.create_entity();
-							round_entity->clone(catridge_or_pellet_stack[sub_entity_name::BULLET_ROUND_DEFINITION]);
-
+							auto round_entity = parent_world.clone_entity(catridge_or_pellet_stack[sub_entity_name::BULLET_ROUND_DEFINITION]);
 							round_entity->get<components::damage>().amount *= gun.damage_multiplier;
 
 							auto& physics_definition = round_entity->get<components::physics_definition>();
-							physics_definition.dont_create_fixtures_and_body = false;
+							physics_definition.create_fixtures_and_body = true;
 							physics_definition.body.velocity.set_from_degrees(barrel_transform.rotation).set_length(randval(gun.muzzle_velocity));
 
 							round_entity->get<components::transform>() = barrel_transform;
@@ -106,14 +105,13 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 						auto shell_definition = catridge_or_pellet_stack[sub_entity_name::BULLET_SHELL_DEFINITION];
 
 						if (shell_definition.alive()) {
-							auto shell_entity = parent_world.create_entity();
-							shell_entity->clone(shell_definition);
+							auto shell_entity = parent_world.clone_entity(shell_definition);
 
 							auto shell_transform = gun_transform;
 							shell_transform.pos += vec2(gun.shell_spawn_offset).rotate(gun_transform.rotation, vec2());
 
 							auto& physics_definition = shell_entity->get<components::physics_definition>();
-							physics_definition.dont_create_fixtures_and_body = false;
+							physics_definition.create_fixtures_and_body = true;
 							physics_definition.body.velocity.set_from_degrees(
 								barrel_transform.rotation)
 								.set_length(randval(gun.shell_velocity));
@@ -169,16 +167,13 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 						}
 					}
 
-					auto new_singular_charge = parent_world.create_entity();
+					messages::item_slot_transfer_request into_chamber_transfer;
+					into_chamber_transfer.item = *source_catridge_store.rbegin();
+					into_chamber_transfer.target_slot = chamber_slot;
+					into_chamber_transfer.specified_quantity = 1;
+					into_chamber_transfer.force_immediate_mount = true;
 
-					auto source_charge_stack = *source_catridge_store.rbegin();
-
-					new_singular_charge->clone(source_charge_stack);
-					new_singular_charge->get<components::item>().charges = 1;
-					source_charge_stack->get<components::item>().charges--;
-
-					chamber_slot.add_item(new_singular_charge);
-					new_singular_charge->get<components::item>().set_mounted();
+					parent_world.post_message(into_chamber_transfer);
 				}
 			}
 		}

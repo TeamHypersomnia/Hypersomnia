@@ -134,7 +134,7 @@ namespace prefabs {
 		{
 			ingredients::sprite(round_definition, pos, assets::texture_id::PINK_CHARGE, augs::white, render_layer::FLYING_BULLETS);
 			auto& def = ingredients::crate_physics(round_definition);
-			def.dont_create_fixtures_and_body = true;
+			def.is_definition_entity = true;
 			
 			auto& damage = *round_definition += components::damage();
 		}
@@ -142,7 +142,7 @@ namespace prefabs {
 		{
 			ingredients::sprite(shell_definition, pos, assets::texture_id::PINK_SHELL, augs::white, render_layer::FLYING_BULLETS);
 			auto& def = ingredients::crate_physics(shell_definition);
-			def.dont_create_fixtures_and_body = true;
+			def.is_definition_entity = true;
 		}
 
 		pink_charge[sub_entity_name::BULLET_ROUND_DEFINITION] = round_definition;
@@ -170,7 +170,7 @@ namespace prefabs {
 		{
 			ingredients::sprite(round_definition, pos, assets::texture_id::CYAN_CHARGE, augs::white, render_layer::FLYING_BULLETS);
 			auto& def = ingredients::crate_physics(round_definition);
-			def.dont_create_fixtures_and_body = true;
+			def.is_definition_entity = true;
 
 			auto& damage = *round_definition += components::damage();
 		}
@@ -178,7 +178,7 @@ namespace prefabs {
 		{
 			ingredients::sprite(shell_definition, pos, assets::texture_id::CYAN_SHELL, augs::white, render_layer::FLYING_BULLETS);
 			auto& def = ingredients::crate_physics(shell_definition);
-			def.dont_create_fixtures_and_body = true;
+			def.is_definition_entity = true;
 		}
 
 		pink_charge[sub_entity_name::BULLET_ROUND_DEFINITION] = round_definition;

@@ -1026,7 +1026,9 @@
     <ClInclude Include="game_framework\messages\intent_message.h" />
     <ClInclude Include="game_framework\messages\message.h" />
     <ClInclude Include="game_framework\messages\particle_burst_message.h" />
+    <ClInclude Include="game_framework\messages\physics_operation.h" />
     <ClInclude Include="game_framework\messages\raw_window_input_message.h" />
+    <ClInclude Include="game_framework\messages\rebuild_physics_message.h" />
     <ClInclude Include="game_framework\messages\shot_message.h" />
     <ClInclude Include="game_framework\messages\trigger_hit_confirmation_message.h" />
     <ClInclude Include="game_framework\messages\trigger_hit_request_message.h" />

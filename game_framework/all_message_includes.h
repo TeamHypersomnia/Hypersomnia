@@ -16,4 +16,8 @@
 #include "messages/camera_render_request_message.h"
 #include "messages/item_slot_transfer_request.h"
 #include "messages/gui_intents.h"
+#include "messages/rebuild_physics_message.h"
+#include "messages/physics_operation.h"
+
+
 

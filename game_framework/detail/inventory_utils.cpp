@@ -116,7 +116,7 @@ item_transfer_result query_transfer_result(messages::item_slot_transfer_request 
 	}
 
 	if (predicted_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-		if (item.current_mounting == components::item::MOUNTED)
+		if (item.current_mounting == components::item::MOUNTED && !r.force_immediate_mount)
 			predicted_result = item_transfer_result_type::UNMOUNT_BEFOREHAND;
 	}
 

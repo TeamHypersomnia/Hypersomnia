@@ -17,6 +17,12 @@ namespace augs {
 		delete_all_entities();
 	}
 
+	entity_id world::clone_entity(entity_id id) {
+		auto new_entity = create_entity("cloned_" + id.get_debug_name());
+		new_entity->clone(id);
+		return new_entity;
+	}
+
 	entity_id world::create_entity(std::string debug_name) {
 		entity_id res = entities.allocate(std::ref(*this));
 
@@ -25,6 +31,7 @@ namespace augs {
 #ifdef USE_NAMES_FOR_IDS
 		res.set_debug_name(debug_name);
 		assert(res.get_debug_name() != "");
+		assert(res.get_debug_name() != "unknown");
 #endif
 
 		messages::new_entity_message msg;

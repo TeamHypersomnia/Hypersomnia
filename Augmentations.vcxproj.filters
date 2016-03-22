@@ -3068,5 +3068,11 @@
     <ClInclude Include="game_framework\messages\gui_intents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game_framework\messages\rebuild_physics_message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\messages\physics_operation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -155,14 +155,14 @@ namespace components {
 
 		def.attach_fixtures_to_entity = to_body_entity;
 		def.offset_created_shapes = offset_created_shapes;
+		def.create_fixtures_and_body = true;
 
 		auto& physics = from_fixture_entity->get_owner_world().get_system<physics_system>();
-		//from_fixture_entity->get<components::physics_definition>().dont_create_fixtures_and_body = false;
 		physics.create_physics_for_entity(from_fixture_entity);
 	}
 
 	void physics::destroy_physics_of_entity(augs::entity_id id) {
-		//id->get<components::physics_definition>().dont_create_fixtures_and_body = true;
+		id->get<components::physics_definition>().create_fixtures_and_body = false;
 		auto& physics = id->get_owner_world().get_system<physics_system>();
 		physics.destroy_physics_of_entity(id);
 
@@ -192,7 +192,7 @@ namespace components {
 
 		auto* item = id->find<components::item>();
 
-		if (item != nullptr && item->current_slot.alive())
+		if (item != nullptr && item->current_slot.alive() && item->current_slot.should_item_inside_keep_physical_body())
 			density_multiplier *= item->current_slot.calculate_density_multiplier_due_to_being_attached();
 
 		auto owner_body = get_owner_body_entity(id);

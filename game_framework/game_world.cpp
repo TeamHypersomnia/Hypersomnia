@@ -95,6 +95,8 @@ void game_world::register_types_of_messages_components_systems() {
 	register_message_queue<camera_render_request_message>();
 	register_message_queue<item_slot_transfer_request>();
 	register_message_queue<gui_item_transfer_intent>();
+	register_message_queue<rebuild_physics_message>();
+	register_message_queue<physics_operation>();
 
 	register_message_callback<item_slot_transfer_request>(std::bind(&item_system::consume_item_slot_transfer_requests, &get_system<item_system>()));
 }
@@ -200,6 +202,8 @@ void game_world::perform_logic_step() {
 	get_system<movement_system>().apply_movement_forces();
 
 	get_system<rotation_copying_system>().update_physical_motors();
+	get_system<physics_system>().consume_rebuild_physics_messages_and_save_new_definitions();
+	get_system<physics_system>().execute_delayed_physics_ops();
 	get_system<physics_system>().step_and_set_new_transforms();
 	get_system<position_copying_system>().update_transforms();
 

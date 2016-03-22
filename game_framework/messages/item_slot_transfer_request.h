@@ -7,5 +7,6 @@ namespace messages {
 		augs::entity_id item;
 		inventory_slot_id target_slot;
 		int specified_quantity = -1;
+		bool force_immediate_mount = false;
 	};
 }

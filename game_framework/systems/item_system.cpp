@@ -7,6 +7,8 @@
 #include "../messages/item_slot_transfer_request.h"
 #include "../messages/destroy_message.h"
 #include "../messages/gui_intents.h"
+#include "../messages/rebuild_physics_message.h"
+#include "../messages/physics_operation.h"
 
 #include "entity_system/world.h"
 
@@ -201,12 +203,12 @@ void item_system::consume_item_slot_transfer_requests() {
 			}
 			
 			augs::entity_id grabbed_item_part;
+			augs::entity_id new_charge_stack;
 
 			if (whole_item_grabbed)
 				grabbed_item_part = r.item;
 			else {
-				auto new_charge_stack = parent_world.create_entity();
-				new_charge_stack->clone(r.item);
+				new_charge_stack = parent_world.clone_entity(r.item);
 				item.charges -= result.transferred_charges;
 				new_charge_stack->get<components::item>().charges = result.transferred_charges;
 
@@ -216,42 +218,57 @@ void item_system::consume_item_slot_transfer_requests() {
 			if (is_pickup_or_transfer)
 				r.target_slot.add_item(grabbed_item_part);
 
-			for_each_descendant(grabbed_item_part, [previous_container_transform](augs::entity_id descendant) {
+			for_each_descendant(grabbed_item_part, [this, previous_container_transform, new_charge_stack](augs::entity_id descendant) {
 				auto parent_slot = descendant->get<components::item>().current_slot;
+				auto current_def = descendant->get<components::physics_definition>();
 
-				descendant->get<components::transform>() = previous_container_transform;
+				//bool remove_definition_for_new_entity_because_will_rebuild_anyway = descendant == new_charge_stack;
+				//
+				//if (remove_definition_for_new_entity_because_will_rebuild_anyway)
+				//	descendant->remove<components::physics_definition>();
+
+				messages::rebuild_physics_message rebuild;
+				rebuild.subject = descendant;
+
+				auto& def = rebuild.new_definition;
+				def = current_def;
 
 				if (parent_slot.alive()) {
-					if (parent_slot.should_item_inside_keep_physical_body()) {
-						auto target_attachment_offset_from_container = parent_slot.sum_attachment_offsets_of_parents(descendant);
-
-						components::physics::recreate_fixtures_and_attach_to(descendant, parent_slot.get_root_container(), target_attachment_offset_from_container);
-						components::physics::resolve_density_of_associated_fixtures(descendant);
-					}
-					else {
-						components::physics::destroy_physics_of_entity(descendant);
-					}
+					def.create_fixtures_and_body = parent_slot.should_item_inside_keep_physical_body();
+					def.attach_fixtures_to_entity = parent_slot.get_root_container();
+					def.offset_created_shapes = parent_slot.sum_attachment_offsets_of_parents(descendant);
 				}
 				else {
-					components::physics::recreate_fixtures_and_attach_to(descendant, descendant);
-					components::physics::resolve_density_of_associated_fixtures(descendant);
+					def.create_fixtures_and_body = true;
+					def.attach_fixtures_to_entity = descendant;
+					def.offset_created_shapes.reset();
 				}
+
+				parent_world.post_message(rebuild);
+
+				descendant->get<components::transform>() = previous_container_transform;
 			});
 
 			auto& grabbed_item = grabbed_item_part->get<components::item>();
 
 			if (is_pickup_or_transfer) {
-				if (r.target_slot->items_need_mounting)
+				if (r.target_slot->items_need_mounting) {
 					grabbed_item.intended_mounting = components::item::MOUNTED;
+
+					if (r.force_immediate_mount) {
+						grabbed_item.current_mounting = components::item::MOUNTED;
+					}
+				}
 			}
 
 			if (is_drop_request) {
-				auto& item_physics = grabbed_item_part->get<components::physics>();
-
-				item_physics.apply_force(vec2().set_from_degrees(previous_container_transform.rotation).set_length(10), vec2().random_on_circle(20));
-
-				item_physics.since_dropped.set(200);
-				reset(item_physics.since_dropped);
+				messages::physics_operation op;
+				op.subject = grabbed_item_part;
+				op.apply_force = vec2().set_from_degrees(previous_container_transform.rotation).set_length(10);
+				op.force_offset = vec2().random_on_circle(20);
+				op.reset_drop_timeout = true;
+				op.timeout_ms = 200;
+				parent_world.post_message(op);
 			}
 		}
 		else {
