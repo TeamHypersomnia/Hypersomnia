@@ -25,39 +25,46 @@ gui_system::drag_and_drop_result gui_system::prepare_drag_and_drop_result() {
 			slot_button* target_slot = dynamic_cast<slot_button*>(gui.rect_hovered);
 			item_button* target_item = dynamic_cast<item_button*>(gui.rect_hovered);
 
-			std::pair<item_transfer_result, slot_function> predicted_result;
-
 			out.possible_target_hovered = true;
 
 			messages::item_slot_transfer_request simulated_request;
 			simulated_request.item = dragged_item->item;
 
 			bool was_pointing_to_a_stack_target = false;
+			bool no_slot_in_targeted_item = false;
 
 			if (target_slot && target_slot->houted_after_drag_started)
 				simulated_request.target_slot = target_slot->slot_id;
 			else if (target_item && target_item != dragged_item) {
 				if (target_item->item->find<components::container>())
 					simulated_request.target_slot = target_item->item[detect_compatible_slot(dragged_item->item, target_item->item)];
-				else if(can_merge_entities(target_item->item, dragged_item->item)) {
+				else if (can_merge_entities(target_item->item, dragged_item->item)) {
 					simulated_request.target_slot = target_item->item->get<components::item>().current_slot;
 					was_pointing_to_a_stack_target = true;
 				}
+				else
+					no_slot_in_targeted_item = true;
 			}
 			else
 				out.possible_target_hovered = false;
 
 			if (out.possible_target_hovered) {
-				predicted_result = { query_transfer_result(simulated_request), simulated_request.target_slot.type };
-
-				out.result = predicted_result.first;
+				if (no_slot_in_targeted_item) {
+					out.result.result = item_transfer_result_type::NO_SLOT_AVAILABLE;
+					out.result.transferred_charges = 0;
+				}
+				else
+					out.result = query_transfer_result(simulated_request);
+				
 				out.intent = simulated_request;
 
-				if (predicted_result.first.result == item_transfer_result_type::THE_SAME_SLOT) {
+				auto predicted_result = out.result.result;
+
+				if (predicted_result == item_transfer_result_type::THE_SAME_SLOT) {
 					tooltip_text = L"Current slot";
 				}
-				else if (predicted_result.first.result >= item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-					if (predicted_result.first.result == item_transfer_result_type::UNMOUNT_BEFOREHAND) {
+				else if (predicted_result >= item_transfer_result_type::SUCCESSFUL_TRANSFER) {
+					if (predicted_result == item_transfer_result_type::UNMOUNT_BEFOREHAND) {
 						tooltip_text += L"Unmount & ";
 					}
 
@@ -65,7 +72,7 @@ gui_system::drag_and_drop_result gui_system::prepare_drag_and_drop_result() {
 						tooltip_text += L"Stack";
 					}
 					else {
-						switch (predicted_result.second) {
+						switch (simulated_request.target_slot.type) {
 						case slot_function::ITEM_DEPOSIT: tooltip_text += L"Insert"; break;
 						case slot_function::GUN_CHAMBER: tooltip_text += L"Place"; break;
 						case slot_function::GUN_CHAMBER_MAGAZINE: tooltip_text += L"Place"; break;
@@ -80,8 +87,8 @@ gui_system::drag_and_drop_result gui_system::prepare_drag_and_drop_result() {
 						}
 					}
 				}
-				else if (predicted_result.first.result < item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-					switch (predicted_result.first.result) {
+				else if (predicted_result < item_transfer_result_type::SUCCESSFUL_TRANSFER) {
+					switch (predicted_result) {
 					case item_transfer_result_type::INSUFFICIENT_SPACE: tooltip_text = L"No space"; break;
 					case item_transfer_result_type::INVALID_SLOT_OR_UNOWNED_ROOT: tooltip_text = L"Impossible"; break;
 					case item_transfer_result_type::INCOMPATIBLE_CATEGORIES: tooltip_text = L"Incompatible item"; break;
