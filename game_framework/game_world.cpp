@@ -154,6 +154,11 @@ void game_world::perform_logic_step() {
 
 	get_system<input_system>().map_unmapped_intents_to_entities();
 
+	get_system<intent_contextualization_system>().contextualize_crosshair_action_intents();
+
+	get_system<gun_system>().consume_gun_intents();
+	get_system<gun_system>().launch_shots_due_to_pressed_triggers();
+
 	/* begin receivers of new_entity messages changes */
 
 	get_system<render_system>().add_entities_to_rendering_tree();
@@ -169,8 +174,10 @@ void game_world::perform_logic_step() {
 
 	/* intent delegation stage (various ownership relations) */
 	get_system<intent_contextualization_system>().contextualize_use_button_intents();
-	get_system<intent_contextualization_system>().contextualize_crosshair_action_intents();
 	/* end of intent delegation stage */
+
+	get_system<damage_system>().destroy_colliding_bullets_and_apply_damage();
+	get_system<damage_system>().destroy_outdated_bullets();
 
 	get_system<driver_system>().release_drivers_due_to_requests();
 

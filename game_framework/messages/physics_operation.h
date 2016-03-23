@@ -10,5 +10,8 @@ namespace messages {
 
 		bool reset_drop_timeout = false;
 		float timeout_ms = 0.f;
+
+		bool set_velocity = false;
+		vec2 velocity;
 	};
 }

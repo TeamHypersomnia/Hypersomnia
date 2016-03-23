@@ -15,6 +15,10 @@ float randval(float min, float max) {
 	return randval(min, max, generator);
 }
 
+float randval(float minmax) {
+	return randval(-minmax, minmax);
+}
+
 unsigned randval(std::pair<unsigned, unsigned> p) {
 	return randval(p.first, p.second);
 }

@@ -23,6 +23,7 @@ namespace ingredients {
 	void sprite(augs::entity_id, vec2 pos, assets::texture_id = assets::texture_id::BLANK, augs::rgba col = augs::rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
 	void sprite_scalled(augs::entity_id, vec2 pos, vec2i size, assets::texture_id = assets::texture_id::BLANK, augs::rgba col = augs::rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
 	
+	components::physics_definition& bullet_round_physics(augs::entity_id);
 	components::physics_definition& crate_physics(augs::entity_id);
 	components::physics_definition& static_crate_physics(augs::entity_id);
 

@@ -7,7 +7,7 @@
 #include "../messages/destroy_message.h"
 #include "../messages/damage_message.h"
 
-void damage_system::process_events() {
+void damage_system::destroy_colliding_bullets_and_apply_damage() {
 	auto events = parent_world.get_message_queue<messages::collision_message>();
 
 	for (auto it : events) {
@@ -36,7 +36,7 @@ void damage_system::process_events() {
 	}
 }
 
-void damage_system::process_entities() {
+void damage_system::destroy_outdated_bullets() {
 	for (auto it : targets) {
 		auto& transform = it->get<components::transform>();
 		auto& damage = it->get<components::damage>();

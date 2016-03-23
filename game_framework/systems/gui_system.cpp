@@ -32,8 +32,6 @@ bool gui_system::freeze_gui_model() {
 }
 
 void gui_system::draw_gui_overlays_for_camera_rendering_request(messages::camera_render_request_message r) {
-	if (!is_gui_look_enabled && !preview_due_to_item_picking_request)
-		return;
 	gui.draw_triangles();
 	r.state.output->push_triangles_from_gui_world(gui);
 

@@ -65,6 +65,7 @@ namespace scene_builders {
 		auto& suppressor_gui =  resource_manager.create(assets::texture_id::SAMPLE_SUPPRESSOR, L"hypersomnia/gfx/suppressor.png").gui_sprite_def;
 		suppressor_gui.flip_horizontally = true;
 
+		resource_manager.create(assets::texture_id::ROUND_TRACE, L"hypersomnia/gfx/round_trace.png");
 		resource_manager.create(assets::texture_id::PINK_CHARGE, L"hypersomnia/gfx/pink_charge.png");
 		resource_manager.create(assets::texture_id::PINK_SHELL, L"hypersomnia/gfx/pink_shell.png");
 		resource_manager.create(assets::texture_id::CYAN_CHARGE, L"hypersomnia/gfx/cyan_charge.png");

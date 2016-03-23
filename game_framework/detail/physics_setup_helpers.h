@@ -15,8 +15,6 @@ struct body_definition {
 
 	bool fixed_rotation = false, bullet = false, angled_damping = false;
 	bool active = true;
-
-	vec2 velocity;
 };
 
 struct fixture_definition {

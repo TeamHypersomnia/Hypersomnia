@@ -35,4 +35,24 @@ namespace ingredients {
 		return physics_definition;
 	}
 	
+	components::physics_definition& bullet_round_physics(augs::entity_id e) {
+		auto& physics_definition = *e += components::physics_definition();
+
+		auto& body = physics_definition.body;
+		body.bullet = true;
+		body.angular_damping = 0.f,
+		body.linear_damping = 0.f,
+		body.gravity_scale = 0.f;
+		body.angular_air_resistance = 0.f;
+		body.fixed_rotation = false;
+		body.angled_damping = false;
+		
+		auto& info = physics_definition.new_fixture();
+		info.from_renderable(e);
+
+		info.filter = filters::dynamic_object();
+		info.density = 1;
+
+		return physics_definition;
+	}
 }

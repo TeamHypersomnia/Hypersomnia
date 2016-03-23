@@ -47,26 +47,34 @@ void intent_contextualization_system::contextualize_use_button_intents() {
 }
 
 void intent_contextualization_system::contextualize_crosshair_action_intents() {
-	auto events = parent_world.get_message_queue<messages::intent_message>();
+	auto& events = parent_world.get_message_queue<messages::intent_message>();
 
-	for (auto it : events) {
-		if (it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION) {
-			auto* maybe_container = it.subject->find<components::container>();
+	for (auto& it : events) {
+		augs::entity_id callee;
 
-			if (maybe_container) {
-				inventory_slot_id maybe_hand;
-				maybe_hand.container_entity = it.subject;
-				maybe_hand.type = slot_function::PRIMARY_HAND;
+		auto* maybe_container = it.subject->find<components::container>();
 
-				if (maybe_hand.alive() && maybe_hand->items_inside.size() > 0) {
-					auto wielded = maybe_hand->items_inside[0];
+		if (maybe_container) {
+			if (it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION) {
+				auto hand = it.subject[slot_function::PRIMARY_HAND];
 
-					if (wielded->find<components::gun>()) {
-						it.intent = intent_type::PRESS_GUN_TRIGGER;
-						it.subject = wielded;
-						continue;
-					}
-				}
+				if (hand.alive() && hand->items_inside.size() > 0)
+					callee = hand->items_inside[0];
+			}
+
+			if (it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION) {
+				auto hand = it.subject[slot_function::SECONDARY_HAND];
+
+				if (hand.alive() && hand->items_inside.size() > 0)
+					callee = hand->items_inside[0];
+			}
+		}
+
+		if (callee.alive()) {
+			if (callee->find<components::gun>()) {
+				it.intent = intent_type::PRESS_GUN_TRIGGER;
+				it.subject = callee;
+				continue;
 			}
 		}
 	}

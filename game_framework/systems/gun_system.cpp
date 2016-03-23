@@ -7,6 +7,7 @@
 #include "../messages/destroy_message.h"
 #include "../messages/shot_message.h"
 #include "../messages/item_slot_transfer_request.h"
+#include "../messages/physics_operation.h"
 
 #include "../components/render_component.h"
 #include "../components/physics_component.h"
@@ -90,16 +91,23 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 				for(auto& catridge_or_pellet_stack : bullet_entities) {
 					size_t charges = catridge_or_pellet_stack->get<components::item>().charges;
 
+					messages::physics_operation op;
+					op.set_velocity = true;
+
 					while (charges--) {
 						{
 							auto round_entity = parent_world.clone_entity(catridge_or_pellet_stack[sub_entity_name::BULLET_ROUND_DEFINITION]);
 							round_entity->get<components::damage>().amount *= gun.damage_multiplier;
 
 							auto& physics_definition = round_entity->get<components::physics_definition>();
-							physics_definition.create_fixtures_and_body = true;
-							physics_definition.body.velocity.set_from_degrees(barrel_transform.rotation).set_length(randval(gun.muzzle_velocity));
-
+							physics_definition.is_definition_entity = false;
+							
 							round_entity->get<components::transform>() = barrel_transform;
+
+							op.velocity.set_from_degrees(barrel_transform.rotation).set_length(randval(gun.muzzle_velocity));
+							op.subject = round_entity;
+							
+							parent_world.post_message(op);
 						}
 
 						auto shell_definition = catridge_or_pellet_stack[sub_entity_name::BULLET_SHELL_DEFINITION];
@@ -107,16 +115,21 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 						if (shell_definition.alive()) {
 							auto shell_entity = parent_world.clone_entity(shell_definition);
 
+							auto spread_component = randval(gun.shell_spread_degrees);
+
 							auto shell_transform = gun_transform;
 							shell_transform.pos += vec2(gun.shell_spawn_offset).rotate(gun_transform.rotation, vec2());
+							shell_transform.rotation += spread_component;
 
 							auto& physics_definition = shell_entity->get<components::physics_definition>();
-							physics_definition.create_fixtures_and_body = true;
-							physics_definition.body.velocity.set_from_degrees(
-								barrel_transform.rotation)
-								.set_length(randval(gun.shell_velocity));
+							physics_definition.is_definition_entity = false;
 
 							shell_entity->get<components::transform>() = shell_transform;
+
+							op.velocity.set_from_degrees(barrel_transform.rotation + spread_component).set_length(randval(gun.shell_velocity));
+							op.subject = shell_entity;
+
+							parent_world.post_message(op);
 						}
 					}
 
@@ -152,28 +165,28 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 				chamber_slot->items_inside.clear();
 
 				if (gun.action_mode >= components::gun::action_type::SEMI_AUTOMATIC) {
-					std::vector<augs::entity_id> source_catridge_store;
+					std::vector<augs::entity_id> source_store_for_chamber;
 
 					auto chamber_magazine_slot = it[slot_function::GUN_CHAMBER_MAGAZINE];
 
-					if (chamber_magazine_slot.alive()) {
-						source_catridge_store = chamber_magazine_slot->items_inside;
-					}
+					if (chamber_magazine_slot.alive())
+						source_store_for_chamber = chamber_magazine_slot->items_inside;
 					else {
 						auto detachable_magazine_slot = it[slot_function::GUN_DETACHABLE_MAGAZINE];
 
-						if (detachable_magazine_slot.has_items()) {
-							source_catridge_store = detachable_magazine_slot->items_inside[0][slot_function::ITEM_DEPOSIT]->items_inside;
-						}
+						if (detachable_magazine_slot.alive() && detachable_magazine_slot.has_items())
+							source_store_for_chamber = detachable_magazine_slot->items_inside[0][slot_function::ITEM_DEPOSIT]->items_inside;
 					}
 
-					messages::item_slot_transfer_request into_chamber_transfer;
-					into_chamber_transfer.item = *source_catridge_store.rbegin();
-					into_chamber_transfer.target_slot = chamber_slot;
-					into_chamber_transfer.specified_quantity = 1;
-					into_chamber_transfer.force_immediate_mount = true;
+					if (source_store_for_chamber.size() > 0) {
+						messages::item_slot_transfer_request into_chamber_transfer;
+						into_chamber_transfer.item = *source_store_for_chamber.rbegin();
+						into_chamber_transfer.target_slot = chamber_slot;
+						into_chamber_transfer.specified_quantity = 1;
+						into_chamber_transfer.force_immediate_mount = true;
 
-					parent_world.post_message(into_chamber_transfer);
+						parent_world.post_message(into_chamber_transfer);
+					}
 				}
 			}
 		}

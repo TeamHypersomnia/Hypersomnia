@@ -12,6 +12,6 @@ class damage_system : public processing_system_templated<components::damage, com
 public:
 	using processing_system_templated::processing_system_templated;
 
-	void process_events();
-	void process_entities();
+	void destroy_colliding_bullets_and_apply_damage();
+	void destroy_outdated_bullets();
 };

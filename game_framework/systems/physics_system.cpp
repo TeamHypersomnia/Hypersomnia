@@ -736,6 +736,9 @@ void physics_system::execute_delayed_physics_ops() {
 			physics.since_dropped.set(e.timeout_ms);
 			reset(physics.since_dropped);
 		}
+
+		if (e.set_velocity)
+			physics.set_velocity(e.velocity);
 	}
 
 	events.clear();

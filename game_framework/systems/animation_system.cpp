@@ -13,13 +13,16 @@ void animation_system::transform_response_requests_to_animation_messages() {
 	auto events = parent_world.get_message_queue<animation_response_message>();
 
 	for (auto it : events) {
-		auto& animation = it.subject->get<components::animation>();
-		auto& responses = it.subject->get<components::animation_response>();
+		auto* animation = it.subject->find<components::animation>();
+		auto* responses = it.subject->find<components::animation_response>();
+
+		if (!animation || !responses)
+			continue;
 
 		animation_message msg;
 		msg.change_animation_state::operator=(it);
 
-		auto response_map = *resource_manager.find(responses.response);
+		auto response_map = *resource_manager.find(responses->response);
 
 		msg.set_animation = response_map[it.response];
 
