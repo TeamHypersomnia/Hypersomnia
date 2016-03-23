@@ -247,8 +247,9 @@ void gui_system::translate_raw_window_inputs_to_gui_events() {
 		w.raw_window_input.mouse.pos = gui_crosshair_position;
 
 		gui.consume_raw_input_and_generate_gui_events(w.raw_window_input);
-		gui.perform_logic_step();
 	}
+
+	gui.perform_logic_step();
 }
 
 void gui_system::suppress_inputs_meant_for_gui() {
