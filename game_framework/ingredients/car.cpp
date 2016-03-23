@@ -76,7 +76,7 @@ namespace prefabs {
 			auto& fixture = physics_definition.new_fixture(front);
 			fixture.from_renderable(interior);
 			fixture.density = 0.6f;
-			fixture.filter = filters::dynamic_object();
+			fixture.filter = filters::friction_ground();
 			
 			vec2 offset((front->get<components::sprite>().size.x / 2 + sprite.size.x / 2) * -1, 0);
 			fixture.transform_vertices.pos = offset;

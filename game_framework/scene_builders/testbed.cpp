@@ -13,10 +13,13 @@
 #include "game_framework/systems/gui_system.h"
 #include "game_framework/components/position_copying_component.h"
 #include "game_framework/components/physics_definition_component.h"
+#include "game_framework/components/item_component.h"
 
 #include "game_framework/messages/crosshair_intent_message.h"
 
 #include "game_framework/messages/animation_response_message.h"
+#include "../detail/inventory_slot.h"
+#include "../detail/inventory_utils.h"
 
 #include "augs/file.h"
 #include "misc/time.h"
@@ -195,7 +198,10 @@ namespace scene_builders {
 		prefabs::create_sample_rifle(world, vec2(100, -500));
 		prefabs::create_sample_rifle(world, vec2(100, -500 + 50));
 		prefabs::create_sample_rifle(world, vec2(100, -500 + 100));
-		prefabs::create_sample_magazine(world, vec2(100, -650));
+		auto mag = prefabs::create_sample_magazine(world, vec2(100, -650));
+		mag[slot_function::ITEM_DEPOSIT]->space_available = to_space_units("100000");
+		mag[slot_function::ITEM_DEPOSIT]->items_inside[0]->get<components::item>().charges = 1000;
+		
 		prefabs::create_sample_magazine(world, vec2(100 - 50, -650));
 		prefabs::create_sample_magazine(world, vec2(100 - 100, -650));
 		//prefabs::create_pink_charge(world, vec2(100, 100));
@@ -204,6 +210,8 @@ namespace scene_builders {
 		//prefabs::create_pink_charge(world, vec2(200, -400));
 		prefabs::create_cyan_charge(world, vec2(150, -500));
 		prefabs::create_cyan_charge(world, vec2(200, -500));
+
+
 
 		auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 		prefabs::create_sample_backpack(world, vec2(200, -750));

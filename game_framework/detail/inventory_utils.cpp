@@ -223,6 +223,19 @@ unsigned to_space_units(std::string s) {
 	unsigned sum = 0;
 	unsigned mult = SPACE_ATOMS_PER_UNIT;
 
+	if (s.find(".") == std::string::npos) {
+		int l = s.length() - 1;
+		
+		while(l--)
+			mult *= 10;
+	}
+	else {
+		int l = s.find(".") - 1;
+
+		while (l--)
+			mult *= 10;
+	}
+
 	for (auto& c : s) {
 		ensure(mult > 0);
 		if (c == '.')

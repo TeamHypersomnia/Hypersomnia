@@ -161,7 +161,7 @@ bool inventory_slot::has_unlimited_space() {
 
 unsigned inventory_slot::calculate_free_space_with_children() {
 	if (has_unlimited_space())
-		return 1000000;
+		return 1000000 * SPACE_ATOMS_PER_UNIT;
 
 	unsigned space = space_available;
 

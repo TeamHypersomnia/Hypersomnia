@@ -50,7 +50,7 @@ namespace ingredients {
 		auto& info = physics_definition.new_fixture();
 		info.from_renderable(e);
 
-		info.filter = filters::dynamic_object();
+		info.filter = filters::bullet();
 		info.density = 1;
 
 		return physics_definition;

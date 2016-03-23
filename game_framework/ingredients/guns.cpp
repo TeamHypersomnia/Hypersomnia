@@ -56,16 +56,16 @@ namespace ingredients {
 		}
 
 		gun.action_mode = components::gun::AUTOMATIC;
-		gun.muzzle_velocity = std::make_pair(2500, 4000);
+		gun.muzzle_velocity = std::make_pair(3500, 4000);
 		gun.timeout_between_shots.set(100);
 		gun.bullet_spawn_offset.set(70, 0);
-		gun.camera_shake_radius = 3.f;
+		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
 		
 		gun.shell_spawn_offset.set(0, 10);
 		gun.shell_angular_velocity = std::make_pair(2.f, 14.f);
-		gun.shell_spread_degrees = 45.f;
-		gun.shell_velocity = std::make_pair(300, 900);
+		gun.shell_spread_degrees = 80.f;
+		gun.shell_velocity = std::make_pair(300, 1700);
 		gun.damage_multiplier = 1.f;
 	}
 }
@@ -142,7 +142,9 @@ namespace prefabs {
 		{
 			ingredients::sprite(shell_definition, pos, assets::texture_id::PINK_SHELL, augs::white, render_layer::FLYING_BULLETS);
 			auto& def = ingredients::crate_physics(shell_definition);
-			def.fixtures[0].restitution = 0.7;
+			def.fixtures[0].restitution = 1.4;
+			def.fixtures[0].density = 0.001f;
+			def.fixtures[0].filter = filters::shell();
 			def.is_definition_entity = true;
 		}
 
@@ -179,7 +181,9 @@ namespace prefabs {
 		{
 			ingredients::sprite(shell_definition, pos, assets::texture_id::CYAN_SHELL, augs::white, render_layer::FLYING_BULLETS);
 			auto& def = ingredients::crate_physics(shell_definition);
-			def.fixtures[0].restitution = 0.7;
+			def.fixtures[0].restitution = 1.4;
+			def.fixtures[0].density = 0.001f;
+			def.fixtures[0].filter = filters::shell();
 			def.is_definition_entity = true;
 		}
 

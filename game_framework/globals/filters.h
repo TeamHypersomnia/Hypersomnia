@@ -15,13 +15,17 @@ namespace filters {
 		FRICTION_GROUND = 1 << 8,
 		RENDERABLE = 1 << 9,
 		RENDERABLE_QUERY = 1 << 10,
+		SHELL = 1 << 11,
 	};
 
 	b2Filter renderable_query();
 	b2Filter renderable();
 	b2Filter controlled_character();
+	b2Filter friction_ground();
 	b2Filter dynamic_object();
 	b2Filter static_object();
+	b2Filter shell();
+	b2Filter bullet();
 
 	b2Filter trigger();
 }
