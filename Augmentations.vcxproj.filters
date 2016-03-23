@@ -1131,6 +1131,9 @@
     <ClCompile Include="game_framework\messages\gui_intents.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="augs\ensure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3072,6 +3075,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\messages\physics_operation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\ensure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,6 +3,7 @@
 #include "../components/physics_definition_component.h"
 #include "entity_system/world.h"
 #include "inventory_utils.h"
+#include "ensure.h"
 
 inventory_slot& inventory_slot_id::operator*() {
 	return container_entity->get<components::container>().slots[type];
@@ -78,7 +79,7 @@ bool inventory_slot_id::should_item_inside_keep_physical_body(augs::entity_id un
 }
 
 float inventory_slot_id::calculate_density_multiplier_due_to_being_attached() {
-	assert((*this)->is_physical_attachment_slot);
+	ensure((*this)->is_physical_attachment_slot);
 	float density_multiplier = (*this)->attachment_density_multiplier;
 
 	auto* maybe_item = container_entity->find<components::item>();

@@ -352,6 +352,7 @@
     <ClCompile Include="3rdparty\RakNet\Source\VitaIncludes.cpp" />
     <ClCompile Include="3rdparty\RakNet\Source\WSAStartupSingleton.cpp" />
     <ClCompile Include="3rdparty\RakNet\Source\_FindFirst.cpp" />
+    <ClCompile Include="augs\ensure.cpp" />
     <ClCompile Include="augs\entity_system\entity_id.cpp" />
     <ClCompile Include="augs\gui\appearance_detector.cpp" />
     <ClCompile Include="augs\misc\deterministic_timing.cpp" />
@@ -1000,6 +1001,7 @@
     <ClInclude Include="game_framework\components\visibility_component.h" />
     <ClInclude Include="game_framework\assets\animation.h" />
     <ClInclude Include="game_framework\assets\texture.h" />
+    <ClInclude Include="augs\ensure.h" />
     <ClInclude Include="game_framework\game_overworld.h" />
     <ClInclude Include="game_framework\game_world.h" />
     <ClInclude Include="game_framework\globals\associated_entities.h" />

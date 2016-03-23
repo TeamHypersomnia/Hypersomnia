@@ -21,6 +21,7 @@
 
 #include "../detail/inventory_utils.h"
 #include "../detail/inventory_slot.h"
+#include "ensure.h"
 
 void item_system::handle_trigger_confirmations_as_pick_requests() {
 	auto& confirmations = parent_world.get_message_queue<messages::trigger_hit_confirmation_message>();
