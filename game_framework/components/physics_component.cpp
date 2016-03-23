@@ -149,32 +149,6 @@ namespace components {
 			id->get<components::physics>().body->SetActive(active);
 	}
 
-	void physics::recreate_fixtures_and_attach_to(augs::entity_id from_fixture_entity, augs::entity_id to_body_entity, components::transform offset_created_shapes) {
-		destroy_physics_of_entity(from_fixture_entity);
-		auto& def = from_fixture_entity->get<components::physics_definition>();
-
-		def.attach_fixtures_to_entity = to_body_entity;
-		def.offset_created_shapes = offset_created_shapes;
-		def.create_fixtures_and_body = true;
-
-		auto& physics = from_fixture_entity->get_owner_world().get_system<physics_system>();
-		physics.create_physics_for_entity(from_fixture_entity);
-	}
-
-	void physics::destroy_physics_of_entity(augs::entity_id id) {
-		id->get<components::physics_definition>().create_fixtures_and_body = false;
-		auto& physics = id->get_owner_world().get_system<physics_system>();
-		physics.destroy_physics_of_entity(id);
-
-		for (auto& c : physics.parent_world.get_message_queue<messages::collision_message>()) {
-			if (c.subject == id || c.collider == id) {
-				c.delete_this_message = true;
-			}
-		}
-
-		physics.parent_world.delete_marked_messages<messages::collision_message>();
-	}
-
 	void physics::resolve_density_of_associated_fixtures(augs::entity_id id) {
 		auto* maybe_physics = id->find<components::physics>();
 
