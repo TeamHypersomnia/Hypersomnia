@@ -4,6 +4,8 @@
 #include <fstream>
 #include <direct.h>
 
+#include "ensure.h"
+
 namespace augs {
 	void create_directory(std::wstring filename) {
 		_wmkdir(filename.c_str());
@@ -35,7 +37,7 @@ namespace augs {
 			closedir(dir);
 		}
 		else 
-			assert(0);
+			ensure(0);
 
 		return out;
 	}

@@ -132,7 +132,7 @@ unsigned calculate_space_occupied_with_children(augs::entity_id item) {
 	auto space_occupied = item->get<components::item>().get_space_occupied();
 
 	if (item->find<components::container>()) {
-		assert(item->get<components::item>().charges == 1);
+		ensure(item->get<components::item>().charges == 1);
 		
 		for (auto& slot : item->get<components::container>().slots)
 			for (auto& entity_in_slot : slot.second.items_inside)
@@ -167,7 +167,7 @@ unsigned inventory_slot::calculate_free_space_with_children() {
 
 	for (auto& e : items_inside) {
 		auto occupied = calculate_space_occupied_with_children(e);
-		assert(occupied <= space);
+		ensure(occupied <= space);
 		space -= occupied;
 	}
 

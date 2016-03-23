@@ -1,6 +1,7 @@
 #include <GL/OpenGL.h>
 #include <cassert>
 #include "shader.h"
+#include "ensure.h"
 
 namespace augs {
 	namespace graphics {
@@ -93,7 +94,7 @@ namespace augs {
 		}
 		
 		void shader_program::build() {
-			assert(created && !built);
+			ensure(created && !built);
 			
 			built = true;
 			glLinkProgram(id); glerr

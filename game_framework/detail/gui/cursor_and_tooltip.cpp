@@ -5,6 +5,8 @@
 #include "gui/stroke.h"
 #include "../inventory_utils.h"
 
+#include "ensure.h"
+
 using namespace augs;
 using namespace gui;
 
@@ -83,7 +85,7 @@ gui_system::drag_and_drop_result gui_system::prepare_drag_and_drop_result() {
 						case slot_function::PRIMARY_HAND: tooltip_text += L"Wield"; break;
 						case slot_function::SECONDARY_HAND: tooltip_text += L"Wield"; break;
 						case slot_function::GUN_BARREL: tooltip_text += L"Install"; break;
-						default: assert(0); break;
+						default: ensure(0); break;
 						}
 					}
 				}
@@ -93,7 +95,7 @@ gui_system::drag_and_drop_result gui_system::prepare_drag_and_drop_result() {
 					case item_transfer_result_type::INVALID_SLOT_OR_UNOWNED_ROOT: tooltip_text = L"Impossible"; break;
 					case item_transfer_result_type::INCOMPATIBLE_CATEGORIES: tooltip_text = L"Incompatible item"; break;
 					case item_transfer_result_type::NO_SLOT_AVAILABLE: tooltip_text = L"No slot available"; break;
-					default: assert(0); break;
+					default: ensure(0); break;
 					}
 				}
 			}

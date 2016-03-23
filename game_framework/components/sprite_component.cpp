@@ -10,6 +10,7 @@
 
 #include "game_framework/resources/manager.h"
 
+#include "ensure.h"
 using namespace augs;
 using namespace shared;
 
@@ -46,7 +47,7 @@ namespace components {
 
 	void sprite::draw(const state_for_drawing_renderable& in) const {
 		static thread_local vec2 v[4];
-		assert(tex != assets::texture_id::INVALID_TEXTURE);
+		ensure(tex != assets::texture_id::INVALID_TEXTURE);
 
 		vec2i transform_pos = in.renderable_transform.pos;
 

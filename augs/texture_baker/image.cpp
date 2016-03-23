@@ -6,7 +6,7 @@
 #include "image.h"
 #include "lodepng.h"
 
-#include <cassert>
+#include "ensure.h"
 
 namespace augs {
 	using namespace Gdiplus;
@@ -86,7 +86,7 @@ namespace augs {
 		unsigned height;
 
 		if (lodepng::decode(v, width, height, lodepngfname)) {
-			assert(0);
+			ensure(0);
 			return false;
 		}
 

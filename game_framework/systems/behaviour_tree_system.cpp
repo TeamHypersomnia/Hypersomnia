@@ -2,7 +2,7 @@
 
 #include "entity_system/world.h"
 #include "entity_system/entity.h"
-#include "log.h"
+#include "ensure.h"
 
 class NullStream {
 public:
@@ -215,7 +215,7 @@ int behaviour_tree::composite::traverse(task& current_task) {
 		return concurrent_return;
 	}
 
-	assert(0);
+	ensure(0);
 	return status::FAILURE;
 }
 

@@ -7,6 +7,8 @@
 #include <tuple>
 #include <utility> 
 
+#include "ensure.h"
+
 template<std::size_t I = 0, typename... Tp>
 inline typename std::enable_if<I == sizeof...(Tp), void>::type
 clone_components (std::tuple<Tp...>& t, entity& e)
@@ -49,7 +51,7 @@ namespace augs {
 		remove<components::fixtures>();
 		remove<components::physics>();
 #else
-		assert(0);
+		ensure(0);
 #endif
 	}
 
@@ -136,7 +138,7 @@ namespace augs {
 		typestrs.remove(component_type_hash);
 #endif
 #else
-		assert(0);
+		ensure(0);
 #endif
 	}
 }

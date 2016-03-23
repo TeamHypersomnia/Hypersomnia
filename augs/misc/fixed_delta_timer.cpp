@@ -1,7 +1,7 @@
 #pragma once
 #include "fixed_delta_timer.h"
 #include <algorithm>
-#include <cassert>
+#include "ensure.h"
 #undef min
 /* credits goes to http://www.unagames.com/blog/daniele/2010/06/fixed-time-step-implementation-box2d */
 
@@ -18,7 +18,7 @@ namespace augs {
 		if (steps > 0) 
 			accumulator -= steps * fixed_dt_milliseconds;
 
-		assert(
+		ensure(
 			"Accumulator must have a value lesser than the fixed time step" &&
 			accumulator < fixed_dt_milliseconds + FLT_EPSILON
 			);

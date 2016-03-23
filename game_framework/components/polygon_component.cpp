@@ -10,8 +10,6 @@
 
 using namespace augs;
 
-#include <cassert>
-
 namespace components {
 	void polygon::set_color(rgba col) {
 		for (auto& v : triangulated_polygon)

@@ -1,6 +1,6 @@
 #pragma once
 #include <GL/OpenGL.h>
-#include <cassert>
+#include "ensure.h"
 
 #include "texture_baker.h"
 
@@ -194,7 +194,7 @@ namespace augs {
 		case 2: format = GL_LUMINANCE_ALPHA; break;
 		case 3: format = GL_BGR; break;
 		case 4: format = GL_BGRA; break;
-		default: assert(0);
+		default: ensure(0);
 		}
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, im.get_size().w, im.get_size().h, 0, format, GL_UNSIGNED_BYTE, im.ptr()); glerr

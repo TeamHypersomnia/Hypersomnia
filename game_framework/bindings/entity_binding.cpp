@@ -7,7 +7,7 @@
 #include "bindings.h"
 
 #include "game_framework/all_component_includes.h"
-
+#include "ensure.h"
 using namespace components;
 
 template <class T>
@@ -18,8 +18,8 @@ T& add(entity_id* _this, const T& c) {
 template<>
 components::visibility& add<components::visibility>(entity_id* _this, const components::visibility& c) {
 	components::visibility& vis = _this->get().add<components::visibility>(c);
-	assert(&_this->get().get<components::visibility>() == &vis);
-	assert(_this->get().find<components::visibility>() == &vis);
+	ensure(&_this->get().get<components::visibility>() == &vis);
+	ensure(_this->get().find<components::visibility>() == &vis);
 	return vis;
 }
 

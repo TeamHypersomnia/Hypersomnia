@@ -1,7 +1,7 @@
 #pragma once
 #include "memory_pool.h"
 #include "unsafe_type_collection.h"
-#include <cassert>
+#include "ensure.h"
 #include <tuple>
 
 namespace augs {
@@ -51,7 +51,7 @@ namespace augs {
 	bool memory_pool::id::operator==(const id& b) const { 
 		bool result = owner == b.owner && (indirection_index == b.indirection_index && version == b.version); 
 #ifdef USE_NAMES_FOR_IDS
-		//if(result) assert(std::string(debug_name) == std::string(b.debug_name));
+		//if(result) ensure(std::string(debug_name) == std::string(b.debug_name));
 #endif
 		return result;
 	}
@@ -69,7 +69,7 @@ namespace augs {
 
 	void memory_pool::id::set_debug_name(std::string s) {
 #ifdef USE_NAMES_FOR_IDS
-		assert(s.size() < sizeof(debug_name) / sizeof(char));
+		ensure(s.size() < sizeof(debug_name) / sizeof(char));
 		strcpy(debug_name, s.c_str());
 #endif
 	}
@@ -78,7 +78,7 @@ namespace augs {
 #ifdef USE_NAMES_FOR_IDS
 		return debug_name;
 #else
-		assert(0);
+		ensure(0);
 #endif
 	}
 
@@ -214,12 +214,12 @@ namespace augs {
 	}
 
 	bool memory_pool::free_with_destructor(id object) {
-		assert(associated_type_hash_set);
+		ensure(associated_type_hash_set);
 		return free_with_destructor(object, associated_type_hash);
 	}
 
 	void memory_pool::destruct_all() {
-		assert(associated_type_hash_set);
+		ensure(associated_type_hash_set);
 		return destruct_all(associated_type_hash);
 	}
 

@@ -112,7 +112,7 @@ void item_system::process_mounting_and_unmounting() {
 				item_slot_transfers.interrupt_mounting();
 			}
 			else {
-				assert(item.intended_mounting != item.current_mounting);
+				ensure(item.intended_mounting != item.current_mounting);
 
 				if (item.montage_time_left_ms > 0) {
 					item.montage_time_left_ms -= delta_milliseconds();
@@ -149,7 +149,6 @@ void item_system::translate_gui_intents_to_transfer_requests() {
 	intents.clear();
 }
 
-#include "log.h"
 void item_system::consume_item_slot_transfer_requests() {
 	auto& requests = parent_world.get_message_queue<messages::item_slot_transfer_request>();
 
@@ -160,7 +159,7 @@ void item_system::consume_item_slot_transfer_requests() {
 		auto result = query_transfer_result(r);
 
 		if (result.result == item_transfer_result_type::UNMOUNT_BEFOREHAND) {
-			assert(previous_slot.alive());
+			ensure(previous_slot.alive());
 
 			item.request_unmount(r.target_slot);
 			item.mark_parent_enclosing_containers_for_unmount();

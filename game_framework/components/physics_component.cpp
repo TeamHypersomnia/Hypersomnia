@@ -11,7 +11,7 @@
 
 #include "math/vec2.h"
 #include "entity_system/world.h"
-
+#include "ensure.h"
 namespace components {
 	augs::entity_id physics::get_owner_friction_field(augs::entity_id id) {
 		return get_owner_body_entity(id)->get<components::physics>().owner_friction_ground;
@@ -21,7 +21,7 @@ namespace components {
 		auto* fixtures = id->find<components::fixtures>();
 		if (fixtures) return fixtures->get_body_entity();
 		else if (id->find<components::physics>()) return id;
-		assert(0);
+		ensure(0);
 		return augs::entity_id();
 	}
 

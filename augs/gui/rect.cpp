@@ -5,7 +5,7 @@
 
 #include <algorithm>
 #include <functional>
-#include <cassert>
+#include "ensure.h"
 #undef max
 #undef min
 namespace augs {
@@ -348,7 +348,7 @@ namespace augs {
 							}
 						}
 						else {
-							// assert(msg == mousemotion);
+							// ensure(msg == mousemotion);
 							consume_gui_event(e = gui_event::hout);
 							unhover(inf);
 						}

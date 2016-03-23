@@ -2,6 +2,8 @@
 #include "entity_system/entity.h"
 #include "game_framework/components/item_component.h"
 
+#include "ensure.h"
+
 augs::entity_id get_owning_transfer_capability(augs::entity_id entity) {
 	if (entity.dead())
 		return augs::entity_id();
@@ -33,8 +35,8 @@ inventory_slot_id first_free_hand(augs::entity_id root_container) {
 }
 
 inventory_slot_id determine_hand_holstering_slot(augs::entity_id item_entity, augs::entity_id searched_root_container) {
-	assert(item_entity.alive());
-	assert(searched_root_container.alive());
+	ensure(item_entity.alive());
+	ensure(searched_root_container.alive());
 
 	auto maybe_shoulder = searched_root_container[slot_function::SHOULDER_SLOT];
 
@@ -60,8 +62,8 @@ inventory_slot_id determine_hand_holstering_slot(augs::entity_id item_entity, au
 }
 
 inventory_slot_id determine_pickup_target_slot(augs::entity_id item_entity, augs::entity_id searched_root_container) {
-	assert(item_entity.alive());
-	assert(searched_root_container.alive());
+	ensure(item_entity.alive());
+	ensure(searched_root_container.alive());
 
 	auto hidden_slot = determine_hand_holstering_slot(item_entity, searched_root_container);;
 
@@ -96,14 +98,14 @@ item_transfer_result query_transfer_result(messages::item_slot_transfer_request 
 
 	auto& item = r.item->get<components::item>();
 
-	assert(r.specified_quantity != 0);
-	assert(r.specified_quantity == -1 || item.stackable);
-	assert(r.specified_quantity <= int(item.charges));
+	ensure(r.specified_quantity != 0);
+	ensure(r.specified_quantity == -1 || item.stackable);
+	ensure(r.specified_quantity <= int(item.charges));
 
 	auto item_owning_capability = get_owning_transfer_capability(r.item);
 	auto target_slot_owning_capability = get_owning_transfer_capability(r.target_slot.container_entity);
 
-	//assert(item_owning_capability.alive() || target_slot_owning_capability.alive());
+	//ensure(item_owning_capability.alive() || target_slot_owning_capability.alive());
 
 	if (item_owning_capability.alive() && target_slot_owning_capability.alive() &&
 		item_owning_capability != target_slot_owning_capability)
@@ -222,7 +224,7 @@ unsigned to_space_units(std::string s) {
 	unsigned mult = SPACE_ATOMS_PER_UNIT;
 
 	for (auto& c : s) {
-		assert(mult > 0);
+		ensure(mult > 0);
 		if (c == '.')
 			continue;
 

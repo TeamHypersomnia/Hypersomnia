@@ -2,6 +2,8 @@
 #include "processing_system.h"
 #include "../../game_framework/messages/new_entity_message.h"
 
+#include "ensure.h"
+
 namespace augs {
 	world::world(overworld& parent_overworld) : parent_overworld(parent_overworld) {}
 
@@ -36,8 +38,8 @@ namespace augs {
 
 #ifdef USE_NAMES_FOR_IDS
 		res.set_debug_name(debug_name);
-		assert(res.get_debug_name() != "");
-		assert(res.get_debug_name() != "unknown");
+		ensure(res.get_debug_name() != "");
+		ensure(res.get_debug_name() != "unknown");
 #endif
 
 		messages::new_entity_message msg;

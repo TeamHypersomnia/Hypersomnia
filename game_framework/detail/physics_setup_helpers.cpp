@@ -16,6 +16,8 @@
 
 #include "3rdparty/polypartition/polypartition.h"
 
+#include "ensure.h"
+
 void fixture_definition::add_convex_polygon(const std::vector <vec2>& verts) {
 	convex_polys.push_back(verts);
 }
@@ -207,7 +209,7 @@ void remove_joints_by_name(augs::entity_id e, joint_name name) {
 }
 
 bool joint_exists(augs::entity_id e, joint_name name) {
-	assert(0);
+	ensure(0);
 	return false;
 }
 
