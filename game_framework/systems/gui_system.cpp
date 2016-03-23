@@ -256,18 +256,18 @@ void gui_system::suppress_inputs_meant_for_gui() {
 	if (!is_gui_look_enabled)
 		return;
 	
-	auto& intents = parent_world.get_message_queue<messages::unmapped_intent_message>();
+	auto& inputs = parent_world.get_message_queue<messages::raw_window_input_message>();
 
-	for (auto& it : intents) {
-		if (it.intent == intent_type::MOVE_CROSSHAIR ||
-			it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION ||
-			it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION
+	for (auto& it : inputs) {
+		if (it.raw_window_input.msg == window::event::mousemotion ||
+			it.raw_window_input.msg == window::event::ldown ||
+			it.raw_window_input.msg == window::event::rdown
 			) {
 			it.delete_this_message = true;
 		}
 	}
 
-	parent_world.delete_marked_messages(intents);
+	parent_world.delete_marked_messages(inputs);
 }
 
 void gui_system::switch_to_gui_mode_and_back() {

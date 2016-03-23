@@ -307,6 +307,10 @@ void item_button::consume_gui_event(event_info info) {
 		}
 	}
 
+	if (info == rect::gui_event::wheel) {
+		LOG("%x", info.owner.state.mouse.get_unit_scroll());
+	}
+
 	if (info == rect::gui_event::rclick) {
 		is_container_open = !is_container_open;
 	}

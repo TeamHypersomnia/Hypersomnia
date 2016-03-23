@@ -112,9 +112,9 @@ void game_world::call_drawing_time_systems() {
 	
 	get_system<gui_system>().rebuild_gui_tree_based_on_game_state();
 	get_system<gui_system>().translate_raw_window_inputs_to_gui_events();
+	get_system<gui_system>().suppress_inputs_meant_for_gui();
 	
 	get_system<input_system>().post_unmapped_intents_from_raw_window_inputs();
-	get_system<gui_system>().suppress_inputs_meant_for_gui();
 	get_system<input_system>().map_unmapped_intents_to_entities();
 
 	/* note that this call cannot be resimulated for it is an incremental operation */
@@ -151,7 +151,6 @@ void game_world::perform_logic_step() {
 	get_system<input_system>().post_all_events_posted_by_drawing_time_systems_since_last_step();
 	
 	get_system<gui_system>().switch_to_gui_mode_and_back();
-	get_system<gui_system>().suppress_inputs_meant_for_gui();
 
 	get_system<input_system>().map_unmapped_intents_to_entities();
 
