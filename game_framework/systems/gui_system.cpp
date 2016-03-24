@@ -257,10 +257,8 @@ void gui_system::suppress_inputs_meant_for_gui() {
 	auto& inputs = parent_world.get_message_queue<messages::raw_window_input_message>();
 
 	for (auto& it : inputs) {
-		if (it.raw_window_input.msg == window::event::mousemotion ||
-			it.raw_window_input.msg == window::event::ldown ||
-			it.raw_window_input.msg == window::event::rdown
-			) {
+		if (it.raw_window_input.msg != window::event::keydown &&
+			it.raw_window_input.msg != window::event::keyup) {
 			it.delete_this_message = true;
 		}
 	}

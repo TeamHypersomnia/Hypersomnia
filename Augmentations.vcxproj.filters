@@ -1134,6 +1134,9 @@
     <ClCompile Include="augs\ensure.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game_framework\detail\gui\special_drag_and_drop_target.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3078,6 +3081,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\ensure.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\detail\gui\special_drag_and_drop_target.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

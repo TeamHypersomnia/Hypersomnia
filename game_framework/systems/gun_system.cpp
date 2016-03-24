@@ -26,6 +26,7 @@
 #include "../detail/inventory_utils.h"
 
 #include "misc/randval.h"
+#include "log.h"
 
 void gun_system::consume_gun_intents() {
 	auto events = parent_world.get_message_queue<messages::intent_message>();
@@ -38,6 +39,7 @@ void gun_system::consume_gun_intents() {
 
 		if (it.intent == intent_type::PRESS_GUN_TRIGGER) {
 			gun.trigger_pressed = it.pressed_flag;
+			LOG("triggerpress: %x", it.pressed_flag);
 		}
 
 		if (it.intent == intent_type::RELOAD && it.pressed_flag) {
@@ -67,6 +69,8 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 		auto& container = it->get<components::container>();
 
 		if (gun.trigger_pressed && check_timeout_and_reset(gun.timeout_between_shots)) {
+			LOG("triggerreacted");
+
 			if (gun.action_mode != components::gun::action_type::AUTOMATIC)
 				gun.trigger_pressed = false;
 
