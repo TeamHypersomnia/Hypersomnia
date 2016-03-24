@@ -5,7 +5,7 @@
 #include "../globals/filters.h"
 
 namespace ingredients {
-	void sprite(augs::entity_id e, vec2 pos, assets::texture_id id, augs::rgba col, render_layer layer) {
+	components::sprite&  sprite(augs::entity_id e, vec2 pos, assets::texture_id id, augs::rgba col, render_layer layer) {
 		auto& sprite = *e += components::sprite();
 		auto& render = *e += components::render();
 		auto& transform = *e += components::transform();
@@ -13,10 +13,13 @@ namespace ingredients {
 		render.layer = layer;
 		transform.pos = pos;
 		sprite.set(id, col);
+
+		return sprite;
 	}
 
-	void sprite_scalled(augs::entity_id e, vec2 pos, vec2i size, assets::texture_id id, augs::rgba col, render_layer layer) {
+	components::sprite&  sprite_scalled(augs::entity_id e, vec2 pos, vec2i size, assets::texture_id id, augs::rgba col, render_layer layer) {
 		sprite(e, pos, id, col, layer);
 		e->get<components::sprite>().size = size;
+		return e->get<components::sprite>();
 	}
 }

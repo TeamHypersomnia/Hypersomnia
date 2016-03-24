@@ -185,32 +185,61 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 
 		long double bottom_number_val = -1.f;
 		auto* container = item->find<components::container>();
-		bool append_x = false;
+		bool printing_charge_count = false;
+		bool trim_zero = false;
 
 		auto label_color = border_col;
 
 		if (item_data.charges > 1) {
 			bottom_number_val = item_data.charges;
-			append_x = true;
+			printing_charge_count = true;
 		}
 		else if (DRAW_FREE_SPACE_INSIDE_CONTAINER_ICONS && item[slot_function::ITEM_DEPOSIT].alive()) {
-			bottom_number_val = item[slot_function::ITEM_DEPOSIT].calculate_free_space_with_parent_containers() / long double(SPACE_ATOMS_PER_UNIT);
+			if (item->get<components::item>().categories_for_slot_compatibility & item_category::MAGAZINE) {
+				if (!is_container_open) {
+					printing_charge_count = true;
+				}
+			}
 
-			if (item[slot_function::ITEM_DEPOSIT]->for_categorized_items_only)
-				label_color.rgb() = pink.rgb();
-			else
+			if (printing_charge_count) {
+				int charges = 0;
+
+				for (auto& i : item[slot_function::ITEM_DEPOSIT]->items_inside) {
+					charges += i->get<components::item>().charges;
+				}
+
+				bottom_number_val = charges;
+			}
+			else {
+				bottom_number_val = item[slot_function::ITEM_DEPOSIT].calculate_free_space_with_parent_containers() / long double(SPACE_ATOMS_PER_UNIT);
+
+				if (bottom_number_val < 1.0 && bottom_number_val > 0.0) {
+					trim_zero = true;
+				}
+
 				label_color.rgb() = cyan.rgb();
+			}
+			
+			//if (item[slot_function::ITEM_DEPOSIT]->for_categorized_items_only)
+			//	label_color.rgb() = pink.rgb();
+			//else
+			//	label_color.rgb() = cyan.rgb();
 		}
 
 		if (bottom_number_val > -1.f) {
 			std::wstring label_wstr;
 			
-			if (append_x) {
-				label_wstr = L'x';
+			if (printing_charge_count) {
+				//label_wstr = L'x';
+				label_color.rgb() = white.rgb();
 				label_wstr += augs::to_wstring(bottom_number_val);
 			}
 			else
 				label_wstr = augs::to_wstring(bottom_number_val, 2);
+
+			if (trim_zero && label_wstr[0] == L'0') {
+				label_wstr.erase(label_wstr.begin());
+			}
 
 			// else label_wstr = L'{' + label_wstr + L'}';
 

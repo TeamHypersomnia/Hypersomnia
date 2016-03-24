@@ -3,6 +3,7 @@
 #include "game_framework/components/item_component.h"
 #include "game_framework/components/physics_definition_component.h"
 #include "game_framework/components/damage_component.h"
+#include "game_framework/components/sprite_component.h"
 
 #include "game_framework/globals/filters.h"
 
@@ -132,7 +133,8 @@ namespace prefabs {
 		}
 
 		{
-			ingredients::sprite(round_definition, pos, assets::texture_id::ROUND_TRACE, augs::pink, render_layer::FLYING_BULLETS);
+			auto& s = ingredients::sprite(round_definition, pos, assets::texture_id::ROUND_TRACE, augs::pink, render_layer::FLYING_BULLETS);
+			s.size *= vec2(2, 0.5);
 			auto& def = ingredients::bullet_round_physics(round_definition);
 			def.is_definition_entity = true;
 			

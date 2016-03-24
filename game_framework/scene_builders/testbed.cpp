@@ -146,6 +146,7 @@ namespace scene_builders {
 		auto car3 = prefabs::create_car(world, components::transform(-1300, -600, -90));
 
 		auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, -600, -90));
+		prefabs::create_motorcycle(world, components::transform(100, -600, -90));
 
 		ingredients::camera(world_camera, window_rect.w, window_rect.h);
 
