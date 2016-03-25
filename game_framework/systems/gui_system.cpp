@@ -223,7 +223,7 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 	gui.reassign_children_and_unset_invalid_handles(&game_gui_root.parent_of_inventory_controls, inventory_roots);
 	gui.perform_logic_step();
 }
-
+#include "log.h"
 void gui_system::translate_raw_window_inputs_to_gui_events() {
 	if (!is_gui_look_enabled)
 		return;
@@ -237,16 +237,36 @@ void gui_system::translate_raw_window_inputs_to_gui_events() {
 
 	window_inputs.insert(window_inputs.begin(), buffered_inputs_during_freeze.begin(), buffered_inputs_during_freeze.end());
 	buffered_inputs_during_freeze.clear();
+	
+	if (gui.held_rect_is_dragged) {
+		LOG("held rect is dragged");
+	}
 
 	for (auto w : window_inputs) {
 		if (w.raw_window_input.msg == window::event::mousemotion) {
 			gui_crosshair_position += w.raw_window_input.mouse.rel;
 			gui_crosshair_position.clamp_from_zero_to(vec2(size.x - 1, size.y - 1));
+			LOG("mmotion");
 		}
 
 		w.raw_window_input.mouse.pos = gui_crosshair_position;
 
-		gui.consume_raw_input_and_generate_gui_events(w.raw_window_input);
+		bool fetched = false;
+
+		if (w.raw_window_input.msg == window::event::rdown) {
+			auto* dragged_item = dynamic_cast<item_button*>(gui.rect_held_by_lmb);
+
+			if (dragged_item && dragged_item->is_being_dragged(gui)) {
+				messages::gui_item_transfer_intent intent;
+				intent.item = dragged_item->item;
+				intent.target_slot.unset();
+				parent_world.post_message(intent);
+				fetched = true;
+			}
+		}
+
+		if(!fetched)
+			gui.consume_raw_input_and_generate_gui_events(w.raw_window_input);
 	}
 
 	gui.perform_logic_step();

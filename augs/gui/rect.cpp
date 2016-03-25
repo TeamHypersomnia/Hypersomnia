@@ -360,7 +360,7 @@ namespace augs {
 					}
 				}
 
-				if (gr.rect_held_by_lmb == this && msg == mousemotion) {
+				if (gr.rect_held_by_lmb == this && msg == mousemotion && m.pos != gr.last_ldown_position) {
 					gr.held_rect_is_dragged = true;
 					gr.current_drag_amount = m.pos - gr.last_ldown_position;
 					consume_gui_event(e = gui_event::ldrag);

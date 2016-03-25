@@ -201,8 +201,11 @@ namespace augs {
 			if (found(middlescroll.subject))
 				middlescroll.subject = nullptr;
 
-			if (found(rect_held_by_lmb))
+			if (found(rect_held_by_lmb)) {
+				current_drag_amount.set(0, 0);
 				rect_held_by_lmb = nullptr;
+				held_rect_is_dragged = false;
+			}
 
 			if (found(rect_held_by_rmb))
 				rect_held_by_rmb = nullptr;

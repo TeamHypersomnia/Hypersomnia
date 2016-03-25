@@ -25,9 +25,9 @@ void special_drag_and_drop_target::consume_gui_event(event_info info) {
 void special_drag_and_drop_target::perform_logic_step(augs::gui::gui_world& gui) {
 	game_gui_world& game_gui = (game_gui_world&)gui;
 
-	auto dragged_item = dynamic_cast<item_button*>(gui.rect_held_by_lmb);
+	auto dragged_item = dynamic_cast<item_button*>(gui.rect_held_by_lmb) ;
 
-	enable_drawing = dragged_item != nullptr;
+	enable_drawing = dragged_item != nullptr && gui.held_rect_is_dragged;
 	rc.set_position(game_gui.gui_system->get_initial_position_for_special_control(type));
 	rc.set_size((*mat.tex).get_size());
 }
