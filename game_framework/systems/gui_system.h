@@ -8,11 +8,19 @@
 #include "augs/gui/gui_world.h"
 #include "gui/text_drawer.h"
 
+#include "../detail/gui/special_drag_and_drop_target.h"
+
 struct game_gui_root : public augs::gui::rect {
-	augs::gui::rect inventory_overroot;
-	augs::gui::rect game_windows_root;
+	augs::gui::rect parent_of_inventory_controls;
+	augs::gui::rect parent_of_game_windows;
+	special_drag_and_drop_target drop_item_icon = special_drag_and_drop_target(augs::gui::material(assets::texture_id::DROP_HAND_ICON, red));
 
 	void get_member_children(std::vector<augs::gui::rect_id>& children) final;
+};
+
+class gui_system;
+struct game_gui_world : public augs::gui::gui_world {
+	gui_system* gui_system = nullptr;
 };
 
 class gui_system : public augs::processing_system_templated<components::gui_element> {
@@ -22,6 +30,7 @@ class gui_system : public augs::processing_system_templated<components::gui_elem
 		bool possible_target_hovered = false;
 		item_transfer_result result;
 
+		bool will_item_be_disposed();
 		bool will_drop_be_successful();
 		std::wstring tooltip_text;
 	};
@@ -40,10 +49,9 @@ class gui_system : public augs::processing_system_templated<components::gui_elem
 
 	void draw_cursor_and_tooltip(messages::camera_render_request_message);
 
-	augs::gui::gui_world gui;
+	game_gui_world gui;
 	game_gui_root game_gui_root;
 
-	rects::xywh<float> get_rectangle_for_slot_function(slot_function);
 	vec2 initial_inventory_root_position();
 	augs::entity_id get_game_world_crosshair();
 
@@ -63,4 +71,7 @@ public:
 	void switch_to_gui_mode_and_back();
 
 	void draw_gui_overlays_for_camera_rendering_request(messages::camera_render_request_message);
+
+	rects::xywh<float> get_rectangle_for_slot_function(slot_function);
+	vec2i get_initial_position_for_special_control(special_control);
 };

@@ -5,6 +5,8 @@
 #include "gui/stroke.h"
 #include "../inventory_utils.h"
 
+#include "special_drag_and_drop_target.h"
+
 #include "ensure.h"
 
 using namespace augs;
@@ -12,6 +14,10 @@ using namespace gui;
 
 bool gui_system::drag_and_drop_result::will_drop_be_successful() {
 	return result.result >= item_transfer_result_type::SUCCESSFUL_TRANSFER;
+}
+
+bool gui_system::drag_and_drop_result::will_item_be_disposed() {
+	return intent.target_slot.dead();
 }
 
 gui_system::drag_and_drop_result gui_system::prepare_drag_and_drop_result() {
@@ -26,6 +32,7 @@ gui_system::drag_and_drop_result gui_system::prepare_drag_and_drop_result() {
 		if (dragged_item && gui.rect_hovered) {
 			slot_button* target_slot = dynamic_cast<slot_button*>(gui.rect_hovered);
 			item_button* target_item = dynamic_cast<item_button*>(gui.rect_hovered);
+			special_drag_and_drop_target* target_special = dynamic_cast<special_drag_and_drop_target*>(gui.rect_hovered);
 
 			out.possible_target_hovered = true;
 
@@ -46,6 +53,10 @@ gui_system::drag_and_drop_result gui_system::prepare_drag_and_drop_result() {
 				}
 				else
 					no_slot_in_targeted_item = true;
+			}
+			else if (target_special) {
+				if(target_special->type == special_control::DROP_ITEM)
+					simulated_request.target_slot.unset();
 			}
 			else
 				out.possible_target_hovered = false;
@@ -70,7 +81,12 @@ gui_system::drag_and_drop_result gui_system::prepare_drag_and_drop_result() {
 						tooltip_text += L"Unmount & ";
 					}
 
-					if (was_pointing_to_a_stack_target) {
+					if (target_special) {
+						if (target_special->type == special_control::DROP_ITEM) {
+							tooltip_text += L"Drop to ground";
+						}
+					}
+					else if (was_pointing_to_a_stack_target) {
 						tooltip_text += L"Stack";
 					}
 					else {
@@ -130,7 +146,11 @@ void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message
 	auto gui_cursor_color = cyan;
 
 	if (drag_result.possible_target_hovered) {
-		if (drag_result.will_drop_be_successful()) {
+		if (drag_result.will_item_be_disposed()) {
+			gui_cursor = assets::GUI_CURSOR_MINUS;
+			gui_cursor_color = red;
+		}
+		else if (drag_result.will_drop_be_successful()) {
 			gui_cursor = assets::GUI_CURSOR_ADD;
 			gui_cursor_color = green;
 		}

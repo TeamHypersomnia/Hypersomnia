@@ -3086,5 +3086,8 @@
     <ClInclude Include="game_framework\detail\gui\special_drag_and_drop_target.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game_framework\detail\gui\special_controls.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -15,16 +15,18 @@
 #include "game_framework/settings.h"
 
 void game_gui_root::get_member_children(std::vector<augs::gui::rect_id>& children) {
-	children.push_back(&inventory_overroot);
-	children.push_back(&game_windows_root);
+	children.push_back(&parent_of_inventory_controls);
+	children.push_back(&drop_item_icon);
+	children.push_back(&parent_of_game_windows);
 }
 
 gui_system::gui_system(world& parent_world) : processing_system_templated(parent_world) {
+	gui.gui_system = this;
 	gui.root.children.push_back(&game_gui_root);
 	gui.root.clip = false;
 	game_gui_root.clip = false;
-	game_gui_root.inventory_overroot.clip = false;
-	game_gui_root.game_windows_root.clip = false;
+	game_gui_root.parent_of_inventory_controls.clip = false;
+	game_gui_root.parent_of_game_windows.clip = false;
 }
 
 bool gui_system::freeze_gui_model() {
@@ -53,7 +55,7 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 	if (freeze_gui_model())
 		return;
 
-	game_gui_root.inventory_overroot.cache_descendants_before_children_reassignment();
+	game_gui_root.parent_of_inventory_controls.cache_descendants_before_children_reassignment();
 
 	std::vector<augs::gui::rect_id> inventory_roots;
 
@@ -218,7 +220,7 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 		}
 	}
 	
-	gui.reassign_children_and_unset_invalid_handles(&game_gui_root.inventory_overroot, inventory_roots);
+	gui.reassign_children_and_unset_invalid_handles(&game_gui_root.parent_of_inventory_controls, inventory_roots);
 	gui.perform_logic_step();
 }
 

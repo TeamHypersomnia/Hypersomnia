@@ -25,6 +25,9 @@ namespace augs {
 
 
 		rect::rect(rects::xywh<float> rc) : rc(rc) {}
+		rect::rect(assets::texture_id id) {
+			rc.set_size((*id).get_size());
+		 }
 
 		rects::wh<float> rect::get_content_size() {
 			/* init on zero */

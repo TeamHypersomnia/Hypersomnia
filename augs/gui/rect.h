@@ -92,6 +92,7 @@ namespace augs {
 			std::vector<rect_id> children;
 
 			rect(rects::xywh<float> rc = rects::xywh<float>());
+			rect(assets::texture_id);
 
 			virtual rects::wh<float> get_content_size();
 

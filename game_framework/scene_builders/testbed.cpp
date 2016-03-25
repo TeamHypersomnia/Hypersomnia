@@ -93,7 +93,10 @@ namespace scene_builders {
 		resource_manager.create(assets::texture_id::GUI_CURSOR, L"hypersomnia/gfx/gui_cursor.png");
 		resource_manager.create(assets::texture_id::GUI_CURSOR_ADD, L"hypersomnia/gfx/gui_cursor_add.png");
 		resource_manager.create(assets::texture_id::GUI_CURSOR_ERROR, L"hypersomnia/gfx/gui_cursor_error.png");
+		resource_manager.create(assets::texture_id::GUI_CURSOR_MINUS, L"hypersomnia/gfx/gui_cursor_minus.png");
+
 		resource_manager.create(assets::texture_id::BLANK, L"hypersomnia/gfx/blank.png");
+		resource_manager.create(assets::texture_id::DROP_HAND_ICON, L"hypersomnia/gfx/drop_hand_icon.png");
 		resource_manager.create(assets::texture_id::SECONDARY_HAND_ICON, L"hypersomnia/gfx/secondary_hand_icon.png");
 		resource_manager.create(assets::texture_id::PRIMARY_HAND_ICON, L"hypersomnia/gfx/primary_hand_icon.png");
 		resource_manager.create(assets::texture_id::SHOULDER_SLOT_ICON, L"hypersomnia/gfx/shoulder_slot_icon.png");

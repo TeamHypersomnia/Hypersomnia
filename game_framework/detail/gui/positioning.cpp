@@ -22,6 +22,12 @@ rects::xywh<float> gui_system::get_rectangle_for_slot_function(slot_function f) 
 	return rects::xywh<float>(0, 0, 0, 0);
 }
 
+vec2i gui_system::get_initial_position_for_special_control(special_control s) {
+	switch (s) {
+	case special_control::DROP_ITEM: return vec2i(size.x - 150, 30);
+	}
+}
+
 vec2 gui_system::initial_inventory_root_position() {
 	return vec2(size.x - 250, size.y - 200);
 }

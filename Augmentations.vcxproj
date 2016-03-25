@@ -1003,6 +1003,7 @@
     <ClInclude Include="game_framework\assets\animation.h" />
     <ClInclude Include="game_framework\assets\texture.h" />
     <ClInclude Include="augs\ensure.h" />
+    <ClInclude Include="game_framework\detail\gui\special_controls.h" />
     <ClInclude Include="game_framework\detail\gui\special_drag_and_drop_target.h" />
     <ClInclude Include="game_framework\game_overworld.h" />
     <ClInclude Include="game_framework\game_world.h" />
