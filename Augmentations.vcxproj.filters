@@ -1137,6 +1137,15 @@
     <ClCompile Include="game_framework\detail\gui\special_drag_and_drop_target.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game_framework\detail\gui\game_gui_root.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\detail\gui\drag_and_drop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\detail\gui\metadata_tree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3087,6 +3096,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\detail\gui\special_controls.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\detail\gui\game_gui_root.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\detail\gui\drag_and_drop.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
