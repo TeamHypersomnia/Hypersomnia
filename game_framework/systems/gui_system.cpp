@@ -29,7 +29,7 @@ void gui_system::draw_gui_overlays_for_camera_rendering_request(messages::camera
 	r.state.output->push_triangles_from_gui_world(gui);
 
 	if (is_gui_look_enabled)
-		draw_cursor_and_tooltip(r);
+		gui.draw_cursor_and_tooltip(r);
 }
 
 augs::entity_id gui_system::get_game_world_crosshair() {
@@ -56,31 +56,8 @@ void gui_system::translate_raw_window_inputs_to_gui_events() {
 	window_inputs.insert(window_inputs.begin(), buffered_inputs_during_freeze.begin(), buffered_inputs_during_freeze.end());
 	buffered_inputs_during_freeze.clear();
 	
-	for (auto w : window_inputs) {
-		if (w.raw_window_input.msg == window::event::mousemotion) {
-			gui_crosshair_position += w.raw_window_input.mouse.rel;
-			gui_crosshair_position.clamp_from_zero_to(vec2(size.x - 1, size.y - 1));
-		}
-
-		w.raw_window_input.mouse.pos = gui_crosshair_position;
-
-		bool fetched = false;
-
-		if (w.raw_window_input.msg == window::event::rdown) {
-			auto* dragged_item = dynamic_cast<item_button*>(gui.rect_held_by_lmb);
-
-			if (dragged_item && dragged_item->is_being_dragged(gui)) {
-				messages::gui_item_transfer_intent intent;
-				intent.item = dragged_item->item;
-				intent.target_slot.unset();
-				parent_world.post_message(intent);
-				fetched = true;
-			}
-		}
-
-		if(!fetched)
-			gui.consume_raw_input_and_generate_gui_events(w.raw_window_input);
-	}
+	for (auto w : window_inputs)
+		gui.consume_raw_input(w);
 
 	gui.perform_logic_step();
 }

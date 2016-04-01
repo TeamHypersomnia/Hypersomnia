@@ -1,4 +1,5 @@
 #include "game_framework/systems/gui_system.h"
+#include "game_gui_root.h"
 #include "game_framework/components/sprite_component.h"
 #include "game_framework/components/item_component.h"
 #include "graphics/renderer.h"
@@ -12,16 +13,15 @@
 using namespace augs;
 using namespace gui;
 
-
-void gui_system::draw_cursor_and_tooltip(messages::camera_render_request_message r) {
-	auto& drag_result = gui.prepare_drag_and_drop_result();
+void game_gui_world::draw_cursor_and_tooltip(messages::camera_render_request_message r) {
+	auto& drag_result = prepare_drag_and_drop_result();
 
 	shared::state_for_drawing_renderable state;
 	state.setup_camera_state(r.state);
 	state.screen_space_mode = true;
 
 	auto& out = state.output->get_triangle_buffer();
-	gui::rect::draw_info in(gui, out);
+	gui::rect::draw_info in(*this, out);
 
 	if (drag_result.dragged_item) {
 		drag_result.dragged_item->draw_complete_dragged_ghost(in);

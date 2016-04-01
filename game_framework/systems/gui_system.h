@@ -6,21 +6,13 @@
 #include "../messages/raw_window_input_message.h"
 
 #include "augs/gui/gui_world.h"
-#include "gui/text_drawer.h"
 #include "../detail/gui/game_gui_root.h"
 
 class gui_system : public augs::processing_system_templated<components::gui_element> {
 	friend class item_button;
 
-	vec2i size;
-
 	bool is_gui_look_enabled = false;
 	bool preview_due_to_item_picking_request = false;
-
-	vec2 gui_crosshair_position;
-	augs::gui::text_drawer tooltip_drawer;
-
-	void draw_cursor_and_tooltip(messages::camera_render_request_message);
 
 	game_gui_world gui;
 	game_gui_root game_gui_root;
@@ -33,9 +25,7 @@ class gui_system : public augs::processing_system_templated<components::gui_elem
 public:
 	gui_system(world& parent_world);
 
-	void resize(vec2i size) {
-		this->size = size;
-	}
+	void resize(vec2i size) { gui.resize(size); }
 
 	void rebuild_gui_tree_based_on_game_state();
 	void translate_raw_window_inputs_to_gui_events();
