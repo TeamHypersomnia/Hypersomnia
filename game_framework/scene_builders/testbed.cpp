@@ -16,6 +16,7 @@
 #include "game_framework/components/item_component.h"
 
 #include "game_framework/messages/crosshair_intent_message.h"
+#include "game_framework/messages/item_slot_transfer_request.h"
 
 #include "game_framework/messages/animation_response_message.h"
 #include "../detail/inventory_slot.h"
@@ -199,7 +200,7 @@ namespace scene_builders {
 
 		prefabs::create_sample_suppressor(world, vec2(300, -500));
 
-		prefabs::create_sample_rifle(world, vec2(100, -500));
+		auto rifle = prefabs::create_sample_rifle(world, vec2(100, -500));
 		prefabs::create_sample_rifle(world, vec2(100, -500 + 50));
 		prefabs::create_sample_rifle(world, vec2(100, -500 + 100));
 		auto mag = prefabs::create_sample_magazine(world, vec2(100, -650));
@@ -219,6 +220,28 @@ namespace scene_builders {
 
 		auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 		prefabs::create_sample_backpack(world, vec2(200, -750));
+
+		messages::item_slot_transfer_request r;
+		r.item = backpack;
+		r.target_slot = characters[0][slot_function::SHOULDER_SLOT];
+
+		world.post_message(r);
+
+		r.item = mag;
+		r.target_slot = rifle[slot_function::GUN_DETACHABLE_MAGAZINE];
+
+		world.post_message(r);
+
+		r.item = rifle;
+		r.target_slot = characters[0][slot_function::PRIMARY_HAND];
+		
+		world.post_message(r);
+
+		r.item = mag[slot_function::ITEM_DEPOSIT]->items_inside[0];
+		r.specified_quantity = 1;
+		r.target_slot = rifle[slot_function::GUN_CHAMBER];
+
+		world.post_message(r);
 
 		input_system::context active_context;
 		active_context.map_key_to_intent(window::event::keys::W, intent_type::MOVE_FORWARD);
