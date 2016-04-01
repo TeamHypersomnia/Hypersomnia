@@ -222,11 +222,6 @@ void item_system::consume_item_slot_transfer_requests() {
 				auto parent_slot = descendant->get<components::item>().current_slot;
 				auto current_def = descendant->get<components::physics_definition>();
 
-				//bool remove_definition_for_new_entity_because_will_rebuild_anyway = descendant == new_charge_stack;
-				//
-				//if (remove_definition_for_new_entity_because_will_rebuild_anyway)
-				//	descendant->remove<components::physics_definition>();
-
 				messages::rebuild_physics_message rebuild;
 				rebuild.subject = descendant;
 

@@ -13,7 +13,7 @@ bool drag_and_drop_result::will_drop_be_successful() {
 }
 
 bool drag_and_drop_result::will_item_be_disposed() {
-	return intent.target_slot.dead();
+	return result.result >= item_transfer_result_type::SUCCESSFUL_TRANSFER && intent.target_slot.dead();
 }
 
 drag_and_drop_result game_gui_world::prepare_drag_and_drop_result() {
@@ -41,8 +41,14 @@ drag_and_drop_result game_gui_world::prepare_drag_and_drop_result() {
 			if (target_slot && target_slot->houted_after_drag_started)
 				simulated_request.target_slot = target_slot->slot_id;
 			else if (target_item && target_item != dragged_item) {
-				if (target_item->item->find<components::container>())
-					simulated_request.target_slot = target_item->item[detect_compatible_slot(dragged_item->item, target_item->item)];
+				if (target_item->item->find<components::container>()) {
+					auto compatible_slot = detect_compatible_slot(dragged_item->item, target_item->item);
+					
+					if (compatible_slot != slot_function::INVALID)
+						simulated_request.target_slot = target_item->item[compatible_slot];
+					else
+						no_slot_in_targeted_item = true;
+				}
 				else if (can_merge_entities(target_item->item, dragged_item->item)) {
 					simulated_request.target_slot = target_item->item->get<components::item>().current_slot;
 					was_pointing_to_a_stack_target = true;
