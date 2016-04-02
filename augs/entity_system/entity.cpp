@@ -50,6 +50,11 @@ namespace augs {
 
 		remove<components::fixtures>();
 		remove<components::physics>();
+
+		if(find<components::item>())
+			get<components::item>().current_slot.unset();
+
+		// the same should be done with other sensitive pointers
 #else
 		ensure(0);
 #endif

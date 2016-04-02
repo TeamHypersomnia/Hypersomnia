@@ -99,7 +99,6 @@ item_transfer_result query_transfer_result(messages::item_slot_transfer_request 
 	auto& item = r.item->get<components::item>();
 
 	ensure(r.specified_quantity != 0);
-	ensure(r.specified_quantity <= int(item.charges));
 
 	auto item_owning_capability = get_owning_transfer_capability(r.item);
 	auto target_slot_owning_capability = get_owning_transfer_capability(r.target_slot.container_entity);
@@ -113,7 +112,7 @@ item_transfer_result query_transfer_result(messages::item_slot_transfer_request 
 		output = containment_result(r);
 	else {
 		output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER;
-		output.transferred_charges = item.charges;
+		output.transferred_charges = r.specified_quantity == -1 ? item.charges : std::min(r.specified_quantity, item.charges);
 	}
 
 	if (predicted_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
@@ -182,7 +181,7 @@ item_transfer_result containment_result(messages::item_slot_transfer_request r, 
 				}
 			}
 			else {
-				unsigned maximum_charges_fitting_inside = space_available / item.space_occupied_per_charge;
+				int maximum_charges_fitting_inside = space_available / item.space_occupied_per_charge;
 				output.transferred_charges = std::min(item.charges, maximum_charges_fitting_inside);
 
 				if (r.specified_quantity > -1)

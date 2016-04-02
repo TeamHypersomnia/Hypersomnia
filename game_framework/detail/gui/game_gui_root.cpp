@@ -33,6 +33,7 @@ void game_gui_world::consume_raw_input(messages::raw_window_input_message& w) {
 			messages::gui_item_transfer_intent intent;
 			intent.item = dragged_item->item;
 			intent.target_slot.unset();
+			intent.specified_quantity = dragged_charges;
 			gui_system->parent_world.post_message(intent);
 			fetched = true;
 		}

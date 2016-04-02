@@ -93,7 +93,7 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 					bullet_entities.push_back(item_in_chamber);
 
 				for(auto& catridge_or_pellet_stack : bullet_entities) {
-					size_t charges = catridge_or_pellet_stack->get<components::item>().charges;
+					int charges = catridge_or_pellet_stack->get<components::item>().charges;
 
 					messages::physics_operation op;
 					op.set_velocity = true;

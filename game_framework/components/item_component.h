@@ -15,7 +15,7 @@ namespace components {
 
 		unsigned categories_for_slot_compatibility = 0;
 
-		unsigned charges = 1;
+		int charges = 1;
 		unsigned space_occupied_per_charge = 1;
 		bool stackable = false;
 
