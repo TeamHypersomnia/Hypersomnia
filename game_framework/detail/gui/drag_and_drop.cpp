@@ -7,6 +7,7 @@
 #include "../inventory_utils.h"
 #include "entity_system/entity.h"
 #include "ensure.h"
+#include "stream.h"
 
 bool drag_and_drop_result::will_drop_be_successful() {
 	return result.result >= item_transfer_result_type::SUCCESSFUL_TRANSFER;
@@ -84,13 +85,23 @@ drag_and_drop_result game_gui_world::prepare_drag_and_drop_result() {
 						tooltip_text += L"Unmount & ";
 					}
 
+					std::wstring charges_text;
+					auto item_charges = dragged_item->item->get<components::item>().charges;
+
+					if (item_charges > 1) {
+						if (simulated_request.specified_quantity == out.result.transferred_charges)
+							charges_text = L" all";
+						else
+							charges_text = L" " + augs::to_wstring(out.result.transferred_charges);
+					}
+
 					if (target_special) {
 						if (target_special->type == special_control::DROP_ITEM) {
-							tooltip_text += L"Drop to ground";
+							tooltip_text += L"Drop" + charges_text + L" to ground";
 						}
 					}
 					else if (was_pointing_to_a_stack_target) {
-						tooltip_text += L"Stack";
+						tooltip_text += L"Stack" + charges_text;
 					}
 					else {
 						switch (simulated_request.target_slot.type) {
@@ -106,6 +117,8 @@ drag_and_drop_result game_gui_world::prepare_drag_and_drop_result() {
 						case slot_function::GUN_BARREL: tooltip_text += L"Install"; break;
 						default: ensure(0); break;
 						}
+
+						tooltip_text += charges_text;
 					}
 
 

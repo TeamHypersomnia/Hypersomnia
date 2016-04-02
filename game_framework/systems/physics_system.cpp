@@ -650,9 +650,8 @@ void physics_system::reset_states() {
 }
 
 void physics_system::create_physics_for_entity(augs::entity_id e) {
-	/* remove dead components that are remnants of cloning or mistakenly added */
-	e->remove<components::physics>();
-	e->remove<components::fixtures>();
+	ensure(e->find<components::physics>() == nullptr);
+	ensure(e->find<components::fixtures>() == nullptr);
 
 	auto* physics_definition = e->find<components::physics_definition>();
 
