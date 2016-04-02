@@ -49,7 +49,7 @@ item_button::item_button(rects::xywh<float> rc) : rect(rc) {
 }
 
 void item_button::draw_dragged_ghost_inside(draw_info in) {
-	draw_proc(in, true, false, false, true);
+	draw_proc(in, true, false, false, true, false, false, false);
 }
 
 void item_button::draw_complete_with_children(draw_info in) {
@@ -141,7 +141,7 @@ rects::ltrb<float> item_button::iterate_children_attachments(bool draw, std::vec
 	return button_bbox;
 }
 
-void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bool draw_connector, bool decrease_alpha, bool decrease_border_alpha, bool draw_container_opened_mark) {
+void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bool draw_connector, bool decrease_alpha, bool decrease_border_alpha, bool draw_container_opened_mark, bool draw_charges) {
 	if (is_inventory_root())
 		return;
 	
@@ -181,73 +181,75 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 
 		iterate_children_attachments(true, &in.v, border_col);
 
-		auto& item_data = item->get<components::item>();
+		if (draw_charges) {
+			auto& item_data = item->get<components::item>();
 
-		long double bottom_number_val = -1.f;
-		auto* container = item->find<components::container>();
-		bool printing_charge_count = false;
-		bool trim_zero = false;
+			long double bottom_number_val = -1.f;
+			auto* container = item->find<components::container>();
+			bool printing_charge_count = false;
+			bool trim_zero = false;
 
-		auto label_color = border_col;
+			auto label_color = border_col;
 
-		if (item_data.charges > 1) {
-			bottom_number_val = item_data.charges;
-			printing_charge_count = true;
-		}
-		else if (DRAW_FREE_SPACE_INSIDE_CONTAINER_ICONS && item[slot_function::ITEM_DEPOSIT].alive()) {
-			if (item->get<components::item>().categories_for_slot_compatibility & item_category::MAGAZINE) {
-				if (!is_container_open) {
-					printing_charge_count = true;
-				}
+			if (item_data.charges > 1) {
+				bottom_number_val = item_data.charges;
+				printing_charge_count = true;
 			}
-
-			if (printing_charge_count) {
-				int charges = 0;
-
-				for (auto& i : item[slot_function::ITEM_DEPOSIT]->items_inside) {
-					charges += i->get<components::item>().charges;
+			else if (DRAW_FREE_SPACE_INSIDE_CONTAINER_ICONS && item[slot_function::ITEM_DEPOSIT].alive()) {
+				if (item->get<components::item>().categories_for_slot_compatibility & item_category::MAGAZINE) {
+					if (!is_container_open) {
+						printing_charge_count = true;
+					}
 				}
 
-				bottom_number_val = charges;
-			}
-			else {
-				bottom_number_val = item[slot_function::ITEM_DEPOSIT].calculate_free_space_with_parent_containers() / long double(SPACE_ATOMS_PER_UNIT);
+				if (printing_charge_count) {
+					int charges = 0;
 
-				if (bottom_number_val < 1.0 && bottom_number_val > 0.0) {
-					trim_zero = true;
+					for (auto& i : item[slot_function::ITEM_DEPOSIT]->items_inside) {
+						charges += i->get<components::item>().charges;
+					}
+
+					bottom_number_val = charges;
+				}
+				else {
+					bottom_number_val = item[slot_function::ITEM_DEPOSIT].calculate_free_space_with_parent_containers() / long double(SPACE_ATOMS_PER_UNIT);
+
+					if (bottom_number_val < 1.0 && bottom_number_val > 0.0) {
+						trim_zero = true;
+					}
+
+					label_color.rgb() = cyan.rgb();
 				}
 
-				label_color.rgb() = cyan.rgb();
-			}
-			
-			//if (item[slot_function::ITEM_DEPOSIT]->for_categorized_items_only)
-			//	label_color.rgb() = pink.rgb();
-			//else
-			//	label_color.rgb() = cyan.rgb();
-		}
-
-		if (bottom_number_val > -1.f) {
-			std::wstring label_wstr;
-			
-			if (printing_charge_count) {
-				//label_wstr = L'x';
-				label_color.rgb() = white.rgb();
-				label_wstr += augs::to_wstring(bottom_number_val);
-			}
-			else
-				label_wstr = augs::to_wstring(bottom_number_val, 2);
-
-			if (trim_zero && label_wstr[0] == L'0') {
-				label_wstr.erase(label_wstr.begin());
+				//if (item[slot_function::ITEM_DEPOSIT]->for_categorized_items_only)
+				//	label_color.rgb() = pink.rgb();
+				//else
+				//	label_color.rgb() = cyan.rgb();
 			}
 
-			// else label_wstr = L'{' + label_wstr + L'}';
+			if (bottom_number_val > -1.f) {
+				std::wstring label_wstr;
 
-			auto bottom_number = augs::gui::text::format(label_wstr, augs::gui::text::style(assets::font_id::GUI_FONT, label_color));
+				if (printing_charge_count) {
+					//label_wstr = L'x';
+					label_color.rgb() = white.rgb();
+					label_wstr += augs::to_wstring(bottom_number_val);
+				}
+				else
+					label_wstr = augs::to_wstring(bottom_number_val, 2);
 
-			charges_caption.set_text(bottom_number);
-			charges_caption.bottom_right(get_rect_absolute());
-			charges_caption.draw(in);
+				if (trim_zero && label_wstr[0] == L'0') {
+					label_wstr.erase(label_wstr.begin());
+				}
+
+				// else label_wstr = L'{' + label_wstr + L'}';
+
+				auto bottom_number = augs::gui::text::format(label_wstr, augs::gui::text::style(assets::font_id::GUI_FONT, label_color));
+
+				charges_caption.set_text(bottom_number);
+				charges_caption.bottom_right(get_rect_absolute());
+				charges_caption.draw(in);
+			}
 		}
 	}
 
@@ -322,12 +324,16 @@ void item_button::consume_gui_event(event_info info) {
 	if (is_inventory_root())
 		return;
 
+	auto& gui = (game_gui_world&)info.owner;
+
 	detector.update_appearance(info);
 	auto parent_slot = item->get<components::item>().current_slot;
 
 	if (info == rect::gui_event::ldrag) {
 		if (!started_drag) {
 			started_drag = true;
+
+			gui.dragged_charges = item->get<components::item>().charges;
 
 			if (parent_slot->always_allow_exactly_one_item)
 				if (get_meta(parent_slot).get_rect_absolute().hover(info.owner.state.mouse.pos)) {
@@ -347,11 +353,11 @@ void item_button::consume_gui_event(event_info info) {
 	if (info == rect::gui_event::lfinisheddrag) {
 		started_drag = false;
 
-		auto& gui = gui_element_entity->get_owner_world().get_system<gui_system>();
-		auto& drag_result = gui.gui.prepare_drag_and_drop_result();
+		auto& parent_world = item->get_owner_world();
+		auto& drag_result = gui.prepare_drag_and_drop_result();
 
 		if (drag_result.possible_target_hovered && drag_result.will_drop_be_successful()) {
-			gui.parent_world.post_message(drag_result.intent);
+			parent_world.post_message(drag_result.intent);
 		}
 		else if (!drag_result.possible_target_hovered) {
 			vec2i griddified = griddify(info.owner.current_drag_amount);

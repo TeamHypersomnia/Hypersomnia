@@ -21,6 +21,9 @@ struct game_gui_world : public augs::gui::gui_world {
 	vec2 gui_crosshair_position;
 
 	augs::gui::text_drawer tooltip_drawer;
+	augs::gui::text_drawer dragged_charges_drawer;
+	int dragged_charges = 0;
+
 	vec2i size;
 
 	void resize(vec2i size) {

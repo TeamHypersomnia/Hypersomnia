@@ -34,6 +34,7 @@ drag_and_drop_result game_gui_world::prepare_drag_and_drop_result() {
 
 			messages::item_slot_transfer_request simulated_request;
 			simulated_request.item = dragged_item->item;
+			simulated_request.specified_quantity = dragged_charges;
 
 			bool was_pointing_to_a_stack_target = false;
 			bool no_slot_in_targeted_item = false;
@@ -106,6 +107,8 @@ drag_and_drop_result game_gui_world::prepare_drag_and_drop_result() {
 						default: ensure(0); break;
 						}
 					}
+
+
 				}
 				else if (predicted_result < item_transfer_result_type::SUCCESSFUL_TRANSFER) {
 					switch (predicted_result) {

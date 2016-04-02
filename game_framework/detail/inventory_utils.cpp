@@ -99,7 +99,6 @@ item_transfer_result query_transfer_result(messages::item_slot_transfer_request 
 	auto& item = r.item->get<components::item>();
 
 	ensure(r.specified_quantity != 0);
-	ensure(r.specified_quantity == -1 || item.stackable);
 	ensure(r.specified_quantity <= int(item.charges));
 
 	auto item_owning_capability = get_owning_transfer_capability(r.item);

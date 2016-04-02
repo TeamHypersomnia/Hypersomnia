@@ -1,5 +1,6 @@
 #include "game_gui_root.h"
 #include "game_framework/systems/gui_system.h"
+#include "game_framework/components/item_component.h"
 #include "item_button.h"
 #include "entity_system/world.h"
 
@@ -24,10 +25,10 @@ void game_gui_world::consume_raw_input(messages::raw_window_input_message& w) {
 	w.raw_window_input.mouse.pos = gui_crosshair_position;
 
 	bool fetched = false;
+	
+	auto* dragged_item = dynamic_cast<item_button*>(rect_held_by_lmb);
 
 	if (w.raw_window_input.msg == window::event::rdown) {
-		auto* dragged_item = dynamic_cast<item_button*>(rect_held_by_lmb);
-
 		if (dragged_item && dragged_item->is_being_dragged(*this)) {
 			messages::gui_item_transfer_intent intent;
 			intent.item = dragged_item->item;
@@ -38,7 +39,20 @@ void game_gui_world::consume_raw_input(messages::raw_window_input_message& w) {
 	}
 
 	if (w.raw_window_input.msg == window::event::wheel) {
+		if (dragged_item) {
+			auto& item = dragged_item->item->get<components::item>();
 
+			auto delta = w.raw_window_input.mouse.get_unit_scroll();
+
+			dragged_charges += delta;
+
+			if (dragged_charges <= 0)
+				dragged_charges = item.charges + dragged_charges;
+			if (dragged_charges > item.charges)
+				dragged_charges = dragged_charges - item.charges;
+
+		}
+		
 	}
 
 	if (!fetched)

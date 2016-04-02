@@ -155,13 +155,14 @@ physics_system::raycast_output physics_system::ray_cast_px(vec2 p1, vec2 p2, b2F
 
 	return out;
 }
-
+#include "ensure.h"
 bool physics_system::query_aabb_input::ReportFixture(b2Fixture* fixture) {
 	if ((b2ContactFilter::ShouldCollide(&filter, &fixture->GetFilterData()))
 		&& fixture->GetBody()->GetUserData() != ignore_entity) {
 		out.bodies.insert(fixture->GetBody());
 		out.fixtures.push_back(fixture);
 		out.entities.insert(fixture->GetUserData());
+		ensure(fixture->GetUserData().alive());
 	}
 
 	return true;
@@ -747,8 +748,10 @@ void physics_system::execute_delayed_physics_ops() {
 void physics_system::create_bodies_and_fixtures_from_physics_definitions() {
 	auto& events = parent_world.get_message_queue<messages::new_entity_message>();
 
-	for (auto& it : events)
+	for (auto& it : events) {
+		destroy_physics_of_entity(it.subject);
 		create_physics_for_entity(it.subject);
+	}
 }
 
 void physics_system::destroy_fixtures_and_bodies() {

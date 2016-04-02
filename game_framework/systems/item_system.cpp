@@ -143,6 +143,7 @@ void item_system::translate_gui_intents_to_transfer_requests() {
 		messages::item_slot_transfer_request request;
 		request.item = i.item;
 		request.target_slot = i.target_slot;
+		request.specified_quantity = i.specified_quantity;
 		parent_world.post_message(request);
 	}
 

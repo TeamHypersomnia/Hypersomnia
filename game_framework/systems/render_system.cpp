@@ -73,9 +73,13 @@ void render_system::remove_entities_from_rendering_tree() {
 		auto* physics_definition = e->find<components::physics_definition>();
 		auto* render = e->find<components::render>();
 
-		if (!physics_definition && render) {
-			delete ((entity_id*)non_physical_objects_tree.GetUserData(render->rendering_proxy));
-			non_physical_objects_tree.DestroyProxy(render->rendering_proxy);
+		if (render && render->rendering_proxy >= 0) {
+			auto* userdata = non_physical_objects_tree.GetUserData(render->rendering_proxy);
+			
+			if (userdata) {
+				delete ((entity_id*)userdata);
+				non_physical_objects_tree.DestroyProxy(render->rendering_proxy);
+			}
 		}
 	}
 }

@@ -42,7 +42,7 @@ public:
 
 	void consume_gui_event(event_info) final;
 
-	void draw_proc(draw_info, bool draw_inside, bool draw_border, bool draw_connector, bool decrease_alpha, bool decrease_border_alpha = false, bool draw_container_opened_mark = false);
+	void draw_proc(draw_info, bool draw_inside, bool draw_border, bool draw_connector, bool decrease_alpha, bool decrease_border_alpha = false, bool draw_container_opened_mark = false, bool draw_charges = true);
 };
 
 item_button& get_meta(augs::entity_id);

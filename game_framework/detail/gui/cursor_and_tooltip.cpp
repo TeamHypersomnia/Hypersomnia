@@ -9,6 +9,7 @@
 #include "special_drag_and_drop_target.h"
 
 #include "ensure.h"
+#include "stream.h"
 
 using namespace augs;
 using namespace gui;
@@ -75,6 +76,20 @@ void game_gui_world::draw_cursor_and_tooltip(messages::camera_render_request_mes
 
 		tooltip_drawer.draw_stroke(out, black);
 		tooltip_drawer.draw(out);
+	}
+
+	if (drag_result.dragged_item) {
+		auto& item = drag_result.dragged_item->item->get<components::item>();
+
+		if (item.charges > 1) {
+			auto charges_text = augs::to_wstring(dragged_charges);
+
+			dragged_charges_drawer.set_text(text::format(charges_text, text::style()));
+			dragged_charges_drawer.pos = gui_crosshair_position + vec2i(0, cursor_sprite.size.y);
+
+			dragged_charges_drawer.draw_stroke(out, black);
+			dragged_charges_drawer.draw(out);
+		}
 	}
 
 	state.renderable_transform.pos = gui_crosshair_position;
