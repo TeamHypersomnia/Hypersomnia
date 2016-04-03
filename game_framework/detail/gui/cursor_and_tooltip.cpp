@@ -81,8 +81,9 @@ void game_gui_world::draw_cursor_and_tooltip(messages::camera_render_request_mes
 	if (drag_result.dragged_item) {
 		auto& item = drag_result.dragged_item->item->get<components::item>();
 
+		dragged_charges = std::min(dragged_charges, item.charges);
+
 		if (item.charges > 1) {
-			dragged_charges = std::min(dragged_charges, item.charges);
 			auto charges_text = augs::to_wstring(dragged_charges);
 
 			dragged_charges_drawer.set_text(text::format(charges_text, text::style()));

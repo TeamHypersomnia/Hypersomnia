@@ -29,7 +29,7 @@ void item_button::get_member_children(std::vector<augs::gui::rect_id>& children)
 }
 
 bool item_button::is_being_dragged_or_pending_finish(augs::gui::gui_world& gr) {
-	if (is_being_dragged(gr))
+	if (is_being_dragged(gr) && ((game_gui_world&)gr).dragged_charges >= item->get<components::item>().charges)
 		return true;
 
 	auto& gui_intents = gui_element_entity->get_owner_world().get_system<input_system>().gui_item_transfer_intent_player.get_pending_inputs_for_logic();
@@ -187,6 +187,12 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 		if (draw_charges) {
 			auto& item_data = item->get<components::item>();
 
+			int considered_charges = item_data.charges;
+
+			if (is_being_dragged(in.owner)) {
+				considered_charges = item_data.charges - ((game_gui_world&)in.owner).dragged_charges;
+			}
+
 			long double bottom_number_val = -1.f;
 			auto* container = item->find<components::container>();
 			bool printing_charge_count = false;
@@ -194,8 +200,8 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 
 			auto label_color = border_col;
 
-			if (item_data.charges > 1) {
-				bottom_number_val = item_data.charges;
+			if (considered_charges > 1) {
+				bottom_number_val = considered_charges;
 				printing_charge_count = true;
 			}
 			else if (DRAW_FREE_SPACE_INSIDE_CONTAINER_ICONS && item[slot_function::ITEM_DEPOSIT].alive()) {
