@@ -381,6 +381,7 @@ void item_button::consume_gui_event(event_info info) {
 			if (parent_slot->always_allow_exactly_one_item) {
 				get_meta(parent_slot).user_drag_offset += griddified;
 				get_meta(parent_slot).houted_after_drag_started = true;
+				get_meta(parent_slot).perform_logic_step(info.owner);
 			}
 			else {
 				drag_offset_in_item_deposit += griddified;
