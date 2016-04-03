@@ -676,6 +676,10 @@ void physics_system::create_physics_for_entity(augs::entity_id e) {
 	}
 }
 
+bool physics_system::has_entity_any_physics(augs::entity_id subject) {
+	return subject->find<components::physics>() || subject->find<components::fixtures>();
+}
+
 void physics_system::destroy_fixtures_of_entity(augs::entity_id subject) {
 	auto* maybe_fixtures = subject->find<components::fixtures>();
 
@@ -748,8 +752,8 @@ void physics_system::create_bodies_and_fixtures_from_physics_definitions() {
 	auto& events = parent_world.get_message_queue<messages::new_entity_message>();
 
 	for (auto& it : events) {
-		destroy_physics_of_entity(it.subject);
-		create_physics_for_entity(it.subject);
+		if(!has_entity_any_physics(it.subject))
+			create_physics_for_entity(it.subject);
 	}
 }
 

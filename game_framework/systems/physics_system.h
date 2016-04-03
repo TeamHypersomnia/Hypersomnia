@@ -84,6 +84,7 @@ public:
 
 	static void rechoose_owner_friction_body(augs::entity_id);
 
+	bool has_entity_any_physics(entity_id);
 	void destroy_fixtures_of_entity(augs::entity_id);
 	void destroy_physics_of_entity(augs::entity_id);
 	void create_physics_for_entity(augs::entity_id);
