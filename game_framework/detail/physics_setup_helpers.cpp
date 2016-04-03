@@ -266,8 +266,10 @@ components::physics& create_physics_component(body_definition body_data, augs::e
 	physics_system& physics = subject->owner_world.get_system<physics_system>();
 
 	auto& transform = subject->get<components::transform>();
-	if (subject->find<components::render>())
-		subject->get<components::render>().previous_transform = subject->get<components::transform>();
+	auto maybe_render = subject->find<components::render>();
+	
+	if (maybe_render)
+		maybe_render->previous_transform = transform;
 
 	b2BodyDef def;
 	def.type = b2BodyType(body_data.body_type);

@@ -28,7 +28,9 @@ void game_gui_world::consume_raw_input(messages::raw_window_input_message& w) {
 	
 	auto* dragged_item = dynamic_cast<item_button*>(rect_held_by_lmb);
 
-	if (w.raw_window_input.msg == window::event::rdown) {
+	if (w.raw_window_input.msg == window::event::rdown
+		|| w.raw_window_input.msg == window::event::rdoubleclick
+		) {
 		if (dragged_item && dragged_item->is_being_dragged(*this)) {
 			messages::gui_item_transfer_intent intent;
 			intent.item = dragged_item->item;

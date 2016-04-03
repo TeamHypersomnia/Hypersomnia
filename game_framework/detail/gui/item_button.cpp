@@ -22,7 +22,8 @@
 
 #include "pixel_line_connector.h"
 #include "grid.h"
-#include "log.h"
+#include "ensure.h"
+
 void item_button::get_member_children(std::vector<augs::gui::rect_id>& children) {
 	// children.push_back(&charges_caption);
 }
@@ -58,18 +59,20 @@ void item_button::draw_complete_with_children(draw_info in) {
 }
 
 void item_button::draw_grid_border_ghost(draw_info in) {
+	auto prev_abs = absolute_xy;
+	absolute_xy = prev_abs + griddify(in.owner.current_drag_amount);
 	draw_proc(in, false, true, false, true, true);
+	absolute_xy = prev_abs;
 }
 
 void item_button::draw_complete_dragged_ghost(draw_info in) {
 	auto parent_slot = item->get<components::item>().current_slot;
-
+	ensure(parent_slot.alive());
 	auto prev_abs = absolute_xy;
 	absolute_xy += in.owner.current_drag_amount;
-
 	draw_dragged_ghost_inside(in);
 
-	absolute_xy = prev_abs + griddify(in.owner.current_drag_amount);
+	absolute_xy = prev_abs;
 }
 
 rects::ltrb<float> item_button::iterate_children_attachments(bool draw, std::vector<vertex_triangle>* target, augs::rgba border_col) {
