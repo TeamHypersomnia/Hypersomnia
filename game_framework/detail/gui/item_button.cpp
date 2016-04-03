@@ -28,18 +28,18 @@ void item_button::get_member_children(std::vector<augs::gui::rect_id>& children)
 	// children.push_back(&charges_caption);
 }
 
-bool item_button::is_being_dragged_or_pending_finish(augs::gui::gui_world& gr) {
-	if (((game_gui_world&)gr).dragged_charges < item->get<components::item>().charges)
-		return false;
-
-	if (is_being_dragged(gr))
-		return true;
+bool item_button::is_being_wholely_dragged_or_pending_finish(augs::gui::gui_world& gr) {
+	if (is_being_dragged(gr)) {
+		bool is_drag_partial = ((game_gui_world&)gr).dragged_charges < item->get<components::item>().charges;
+		return !is_drag_partial;
+	}
 
 	auto& gui_intents = gui_element_entity->get_owner_world().get_system<input_system>().gui_item_transfer_intent_player.get_pending_inputs_for_logic();
 	
 	for (auto& g : gui_intents) {
 		if (g.item == item) {
-			return true;
+			bool is_pending_drag_partial = g.specified_quantity < item->get<components::item>().charges;
+			return !is_pending_drag_partial;
 		}
 	}
 
@@ -307,8 +307,8 @@ void item_button::perform_logic_step(augs::gui::gui_world& gr) {
 		return;
 	}
 
-	enable_drawing_of_children = is_container_open && !is_being_dragged_or_pending_finish(gr);
-	disable_hovering = is_being_dragged_or_pending_finish(gr);
+	enable_drawing_of_children = is_container_open && !is_being_wholely_dragged_or_pending_finish(gr);
+	disable_hovering = is_being_wholely_dragged_or_pending_finish(gr);
 
 	vec2i parent_position;
 
@@ -397,7 +397,7 @@ void item_button::draw_triangles(draw_info in) {
 		return;
 	}
 
-	if (!is_being_dragged_or_pending_finish(in.owner)) {
+	if (!is_being_wholely_dragged_or_pending_finish(in.owner)) {
 		draw_complete_with_children(in);
 	}
 }

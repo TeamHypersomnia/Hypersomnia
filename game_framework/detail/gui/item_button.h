@@ -14,7 +14,7 @@ class item_button : public augs::gui::rect{
 public:
 	item_button(rects::xywh<float> rc = rects::xywh<float>());
 
-	bool is_being_dragged_or_pending_finish(augs::gui::gui_world& gr);
+	bool is_being_wholely_dragged_or_pending_finish(augs::gui::gui_world& gr);
 
 	augs::gui::text_drawer charges_caption;
 	void get_member_children(std::vector<augs::gui::rect_id>&) final;

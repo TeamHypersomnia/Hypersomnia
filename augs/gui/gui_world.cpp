@@ -2,6 +2,7 @@
 #include "gui_world.h"
 #include "rect.h"
 #include "window_framework/window.h"
+#include "log.h"
 #undef max
 namespace augs {
 	namespace gui {
@@ -141,6 +142,15 @@ namespace augs {
 			if (middlescroll.subject) {
 				vec2i tempp = middlescroll.subject->scroll;
 				middlescroll.subject->scroll += (state.mouse.pos - middlescroll.pos) * float(middlescroll.speed_mult*delta_milliseconds());
+			}
+
+			was_hovered_rect_visited = false;
+
+			rect::poll_info mousemotion_updater(*this, window::event::mousemotion);
+			root.consume_raw_input_and_generate_gui_events(mousemotion_updater);
+
+			if (!was_hovered_rect_visited && rect_hovered != nullptr) {
+				rect_hovered->unhover(mousemotion_updater);
 			}
 		}
 
@@ -309,8 +319,9 @@ namespace augs {
 			if (pass) {
 				root.consume_raw_input_and_generate_gui_events(in);
 				
-				if (!was_hovered_rect_visited && rect_hovered != nullptr)
+				if (!was_hovered_rect_visited && rect_hovered != nullptr) {
 					rect_hovered->unhover(in);
+				}
 			}
 		}
 	}
