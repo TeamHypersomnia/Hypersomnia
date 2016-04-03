@@ -29,7 +29,10 @@ void item_button::get_member_children(std::vector<augs::gui::rect_id>& children)
 }
 
 bool item_button::is_being_dragged_or_pending_finish(augs::gui::gui_world& gr) {
-	if (is_being_dragged(gr) && ((game_gui_world&)gr).dragged_charges >= item->get<components::item>().charges)
+	if (((game_gui_world&)gr).dragged_charges < item->get<components::item>().charges)
+		return false;
+
+	if (is_being_dragged(gr))
 		return true;
 
 	auto& gui_intents = gui_element_entity->get_owner_world().get_system<input_system>().gui_item_transfer_intent_player.get_pending_inputs_for_logic();
@@ -296,12 +299,16 @@ bool item_button::is_inventory_root() {
 }
 
 void item_button::perform_logic_step(augs::gui::gui_world& gr) {
-	enable_drawing_of_children = is_container_open && !is_being_dragged_or_pending_finish(gr);
-	disable_hovering = is_being_dragged_or_pending_finish(gr);
 	rect::perform_logic_step(gr);
 
-	if (is_inventory_root())
+	if (is_inventory_root()) {
+		enable_drawing_of_children = true;
+		disable_hovering = true;
 		return;
+	}
+
+	enable_drawing_of_children = is_container_open && !is_being_dragged_or_pending_finish(gr);
+	disable_hovering = is_being_dragged_or_pending_finish(gr);
 
 	vec2i parent_position;
 
