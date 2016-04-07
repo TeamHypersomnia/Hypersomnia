@@ -104,6 +104,9 @@ namespace augs {
 					if (argument == L"vscyan") {
 						newstyle.color = vscyan;
 					}
+					if (argument == L"vsgreen") {
+						newstyle.color = vsgreen;
+					}
 
 					for (size_t c = closing_bracket_of_first+1; c < opening_bracket_of_second; ++c)
 						out[c].set(newstyle.f, newstyle.color);

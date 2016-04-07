@@ -23,3 +23,4 @@ slot_function detect_compatible_slot(augs::entity_id item, augs::entity_id conta
 bool can_merge_entities(augs::entity_id, augs::entity_id);
 
 unsigned to_space_units(std::string s);
+std::wstring format_space_units(unsigned);

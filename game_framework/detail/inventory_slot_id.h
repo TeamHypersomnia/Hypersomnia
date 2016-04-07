@@ -4,7 +4,6 @@
 #include "../globals/inventory.h"
 #include "../components/transform_component.h"
 #include "entity_system/entity_id.h"
-
 void for_each_descendant(augs::entity_id, std::function<void(augs::entity_id item)>);
 
 struct inventory_slot;

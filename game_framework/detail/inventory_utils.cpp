@@ -2,6 +2,7 @@
 #include "entity_system/entity.h"
 #include "game_framework/components/item_component.h"
 
+#include "stream.h"
 #include "ensure.h"
 
 augs::entity_id get_owning_transfer_capability(augs::entity_id entity) {
@@ -244,4 +245,11 @@ unsigned to_space_units(std::string s) {
 	}
 
 	return sum;
+}
+
+std::wstring format_space_units(unsigned u) {
+	if (!u)
+		return L"0";
+
+	return augs::to_wstring(u / long double(SPACE_ATOMS_PER_UNIT), 2);
 }
