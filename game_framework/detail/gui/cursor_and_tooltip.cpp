@@ -99,30 +99,32 @@ void game_gui_world::draw_cursor_and_tooltip(messages::camera_render_request_mes
 	state.renderable_transform.pos = gui_crosshair_position;
 	cursor_sprite.draw(state);
 
-	if (!drag_result.dragged_item && rect_hovered != nullptr) {
+	if (!(rect_held_by_lmb && held_rect_is_dragged) && rect_hovered != nullptr) {
 		auto* maybe_hovered_item = dynamic_cast<item_button*>(rect_hovered);
 		auto* maybe_hovered_slot = dynamic_cast<slot_button*>(rect_hovered);
+
+		gui::text::fstr full;
 
 		if (maybe_hovered_item) {
 			auto desc = description_of_entity(maybe_hovered_item->item);
 			auto properties = describe_properties(maybe_hovered_item->item);
 			if (!properties.empty()) properties += L"\n";
 
-			auto full = text::format(desc.name + L"\n", text::style());
+			full = text::format(desc.name + L"\n", text::style());
 			full += text::simple_bbcode(properties, text::style(assets::GUI_FONT, vslightgray));
 			full += text::format(desc.details, text::style(assets::GUI_FONT, vsdarkgray));
-
-			state.renderable_transform.pos = bottom_right_corner;
-			bg_sprite.size.set(description_drawer.get_bbox());
-			bg_sprite.draw(state);
-
-			description_drawer.set_text(full);
-			description_drawer.pos = bottom_right_corner;
-
-			description_drawer.draw(out);
 		}
 		else if (maybe_hovered_slot) {
-
+			full = text::simple_bbcode(describe_slot(maybe_hovered_slot->slot_id), text::style());
 		}
+
+		state.renderable_transform.pos = bottom_right_corner;
+		bg_sprite.size.set(description_drawer.get_bbox());
+		bg_sprite.draw(state);
+
+		description_drawer.set_text(full);
+		description_drawer.pos = bottom_right_corner;
+
+		description_drawer.draw(out);
 	}
 }
