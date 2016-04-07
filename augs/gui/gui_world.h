@@ -37,6 +37,7 @@ namespace augs {
 			typedef std::basic_string<formatted_char> fstr;
 
 			std::wstring formatted_string_to_wstring(const fstr& f);
+			fstr simple_bbcode(std::wstring, style);
 			fstr format(const std::wstring&, style);
 			void format(const std::wstring&, style, fstr&);
 			void format(const wchar_t*, style, fstr&);

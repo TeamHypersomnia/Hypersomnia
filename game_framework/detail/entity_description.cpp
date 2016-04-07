@@ -19,18 +19,19 @@ std::wstring describe_properties(augs::entity_id id) {
 	auto* gun = id->find<components::gun>();
 	auto* damage = id->find<components::damage>();
 
+
 	if (gun) {
-		result << L"Muzzle velocity: " << (gun->muzzle_velocity.first + gun->muzzle_velocity.second) / 2 
-			<< L"\nDamage multiplier: " << std::fixed << std::setprecision(1) << gun->damage_multiplier;
+		result << L"Muzzle velocity: [color=vscyan]" << (gun->muzzle_velocity.first + gun->muzzle_velocity.second) / 2 
+			<< L"[/color]\nDamage multiplier: [color=vscyan]" << std::fixed << std::setprecision(1) << gun->damage_multiplier << L"[/color]";
 	}
 
 	if (damage) {
-		result << L"Base damage: " << damage->amount;
+		result << L"Base damage: [color=vscyan]" << damage->amount << L"[/color]";
 
 		if (damage->constrain_distance)
-			result << L"\nMax distance: " << damage->max_distance;
+			result << L"\nMax distance: [color=vscyan]" << damage->max_distance << L"[/color]";
 		if (damage->constrain_lifetime)
-			result << L"\nMax lifetime: " << damage->max_lifetime_ms << L" ms";
+			result << L"\nMax lifetime: [color=vscyan]" << damage->max_lifetime_ms << L" ms[/color]";
 	}
 
 	return result.str();

@@ -109,8 +109,8 @@ void game_gui_world::draw_cursor_and_tooltip(messages::camera_render_request_mes
 			if (!properties.empty()) properties += L"\n";
 
 			auto full = text::format(desc.name + L"\n", text::style());
-			full += text::format(properties, text::style(assets::GUI_FONT, rgba(220, 220, 220, 255)));
-			full += text::format(desc.details, text::style(assets::GUI_FONT, rgba(127, 127, 127, 255)));
+			full += text::simple_bbcode(properties, text::style(assets::GUI_FONT, vslightgray));
+			full += text::format(desc.details, text::style(assets::GUI_FONT, vsdarkgray));
 
 			state.renderable_transform.pos = bottom_right_corner;
 			bg_sprite.size.set(description_drawer.get_bbox());
