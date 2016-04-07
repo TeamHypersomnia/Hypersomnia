@@ -105,7 +105,11 @@ void game_gui_world::draw_cursor_and_tooltip(messages::camera_render_request_mes
 
 		if (maybe_hovered_item) {
 			auto desc = description_of_entity(maybe_hovered_item->item);
+			auto properties = describe_properties(maybe_hovered_item->item);
+			if (!properties.empty()) properties += L"\n";
+
 			auto full = text::format(desc.name + L"\n", text::style());
+			full += text::format(properties, text::style(assets::GUI_FONT, rgba(220, 220, 220, 255)));
 			full += text::format(desc.details, text::style(assets::GUI_FONT, rgba(127, 127, 127, 255)));
 
 			state.renderable_transform.pos = bottom_right_corner;

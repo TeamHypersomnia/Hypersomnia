@@ -58,7 +58,7 @@ namespace ingredients {
 		}
 
 		gun.action_mode = components::gun::AUTOMATIC;
-		gun.muzzle_velocity = std::make_pair(3500, 4000);
+		gun.muzzle_velocity = std::make_pair(4000, 4000);
 		gun.timeout_between_shots.set(100);
 		gun.bullet_spawn_offset.set(70, 0);
 		gun.camera_shake_radius = 5.f;
@@ -106,6 +106,7 @@ namespace prefabs {
 
 	augs::entity_id create_sample_suppressor(augs::world& world, vec2 pos) {
 		auto sample_suppressor = world.create_entity("sample_suppressor");
+		name_entity(sample_suppressor, entity_name::SUPPRESSOR);
 
 		ingredients::sprite(sample_suppressor, pos, assets::texture_id::SAMPLE_SUPPRESSOR, augs::white, render_layer::DROPPED_ITEM);
 		ingredients::crate_physics(sample_suppressor);

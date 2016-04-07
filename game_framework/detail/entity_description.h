@@ -9,3 +9,5 @@ struct entity_description {
 } description_by_entity_name(entity_name),
 description_of_entity(augs::entity_id)
 ;
+
+std::wstring describe_properties(augs::entity_id);
