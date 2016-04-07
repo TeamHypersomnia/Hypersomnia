@@ -14,6 +14,7 @@
 #include "game_framework/components/physics_definition_component.h"
 #include "game_framework/components/car_component.h"
 #include "game_framework/components/trigger_component.h"
+#include "game_framework/components/name_component.h"
 
 #include "game_framework/globals/filters.h"
 
@@ -25,6 +26,7 @@ namespace prefabs {
 
 		front->add_sub_entity(interior);
 		front->add_sub_entity(left_wheel);
+		name_entity(front, entity_name::MOTORCYCLE);
 
 		{
 			auto& sprite = *front += components::sprite();

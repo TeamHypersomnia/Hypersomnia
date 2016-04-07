@@ -51,6 +51,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_component<melee>();
 	register_component<gui_element>();
 	register_component<trigger_collision_detector>();
+	register_component<name>();
 	
 	register_system<input_system>();
 	register_system<steering_system>();

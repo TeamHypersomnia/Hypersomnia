@@ -50,6 +50,7 @@ namespace components {
 	struct melee;
 	struct gui_element;
 	struct trigger_collision_detector;
+	struct name;
 }
 #endif
 
@@ -111,7 +112,8 @@ namespace augs {
 			std::pair<memory_pool::id, components::item_slot_transfers*>,
 			std::pair<memory_pool::id, components::melee*>,
 			std::pair<memory_pool::id, components::gui_element*>,
-			std::pair<memory_pool::id, components::trigger_collision_detector*>
+			std::pair<memory_pool::id, components::trigger_collision_detector*>,
+			std::pair<memory_pool::id, components::name*>
 		> type_to_component;
 
 		component_bitset_matcher signature;

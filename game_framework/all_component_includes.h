@@ -34,6 +34,7 @@
 #include "components/melee_component.h"
 #include "components/gui_element_component.h"
 #include "components/trigger_collision_detector_component.h"
+#include "components/name_component.h"
 
 
 

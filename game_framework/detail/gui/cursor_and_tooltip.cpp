@@ -5,6 +5,7 @@
 #include "graphics/renderer.h"
 #include "gui/stroke.h"
 #include "../inventory_utils.h"
+#include "../entity_description.h"
 
 #include "special_drag_and_drop_target.h"
 
@@ -55,10 +56,11 @@ void game_gui_world::draw_cursor_and_tooltip(messages::camera_render_request_mes
 
 	components::sprite cursor_sprite;
 	cursor_sprite.set(gui_cursor, gui_cursor_color);
+	vec2i left_top_corner = gui_crosshair_position;
+	vec2i bottom_right_corner = gui_crosshair_position + cursor_sprite.size;
 
 	bool draw_tooltip = drag_result.possible_target_hovered;
 	if (draw_tooltip) {
-		vec2i left_top_corner = gui_crosshair_position;
 
 		tooltip_drawer.set_text(text::format(drag_result.tooltip_text, text::style()));
 		tooltip_drawer.pos = gui_crosshair_position + vec2i(cursor_sprite.size.x + 2, 0);
@@ -96,4 +98,27 @@ void game_gui_world::draw_cursor_and_tooltip(messages::camera_render_request_mes
 
 	state.renderable_transform.pos = gui_crosshair_position;
 	cursor_sprite.draw(state);
+
+	if (!drag_result.dragged_item && rect_hovered != nullptr) {
+		auto* maybe_hovered_item = dynamic_cast<item_button*>(rect_hovered);
+		auto* maybe_hovered_slot = dynamic_cast<slot_button*>(rect_hovered);
+
+		if (maybe_hovered_item) {
+			auto desc = description_of_entity(maybe_hovered_item->item);
+			auto full = text::format(desc.name + L"\n", text::style());
+			full += text::format(desc.details, text::style(assets::GUI_FONT, rgba(127, 127, 127, 255)));
+
+			state.renderable_transform.pos = bottom_right_corner;
+			bg_sprite.size.set(description_drawer.get_bbox());
+			bg_sprite.draw(state);
+
+			description_drawer.set_text(full);
+			description_drawer.pos = bottom_right_corner;
+
+			description_drawer.draw(out);
+		}
+		else if (maybe_hovered_slot) {
+
+		}
+	}
 }

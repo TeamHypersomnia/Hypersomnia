@@ -379,17 +379,20 @@
     <ClCompile Include="game_framework\components\fixtures_component.cpp" />
     <ClCompile Include="game_framework\components\item_component.cpp" />
     <ClCompile Include="game_framework\components\item_slot_transfers_component.cpp" />
+    <ClCompile Include="game_framework\components\name_component.cpp" />
     <ClCompile Include="game_framework\components\particle_group_component.cpp" />
     <ClCompile Include="game_framework\components\physics_component.cpp" />
     <ClCompile Include="game_framework\components\physics_definition_component.cpp" />
     <ClCompile Include="game_framework\components\polygon_component.cpp" />
     <ClCompile Include="game_framework\components\sprite_component.cpp" />
     <ClCompile Include="game_framework\components\tile_layer_component.cpp" />
+    <ClCompile Include="game_framework\detail\entity_description.cpp" />
     <ClCompile Include="game_framework\detail\gui\cursor_and_tooltip.cpp" />
     <ClCompile Include="game_framework\detail\gui\drag_and_drop.cpp" />
     <ClCompile Include="game_framework\detail\gui\game_gui_root.cpp" />
     <ClCompile Include="game_framework\detail\gui\metadata_tree.cpp" />
     <ClCompile Include="game_framework\detail\gui\special_drag_and_drop_target.cpp" />
+    <ClCompile Include="game_framework\detail\names_and_details.cpp" />
     <ClCompile Include="game_framework\game_overworld.cpp" />
     <ClCompile Include="game_framework\game_world.cpp" />
     <ClCompile Include="game_framework\globals\filters.cpp" />
@@ -980,6 +983,7 @@
     <ClInclude Include="game_framework\components\input_receiver_component.h" />
     <ClInclude Include="game_framework\components\item_component.h" />
     <ClInclude Include="game_framework\components\melee_component.h" />
+    <ClInclude Include="game_framework\components\name_component.h" />
     <ClInclude Include="game_framework\components\physics_definition_component.h" />
     <ClInclude Include="game_framework\components\position_copying_component.h" />
     <ClInclude Include="game_framework\components\crosshair_component.h" />
@@ -1006,6 +1010,7 @@
     <ClInclude Include="game_framework\assets\animation.h" />
     <ClInclude Include="game_framework\assets\texture.h" />
     <ClInclude Include="augs\ensure.h" />
+    <ClInclude Include="game_framework\detail\entity_description.h" />
     <ClInclude Include="game_framework\detail\gui\drag_and_drop.h" />
     <ClInclude Include="game_framework\detail\gui\game_gui_root.h" />
     <ClInclude Include="game_framework\detail\gui\special_controls.h" />
@@ -1014,6 +1019,7 @@
     <ClInclude Include="game_framework\game_world.h" />
     <ClInclude Include="game_framework\globals\associated_entities.h" />
     <ClInclude Include="game_framework\globals\detector_domains.h" />
+    <ClInclude Include="game_framework\globals\entity_name.h" />
     <ClInclude Include="game_framework\globals\filters.h" />
     <ClInclude Include="game_framework\globals\input_profiles.h" />
     <ClInclude Include="game_framework\globals\intents.h" />

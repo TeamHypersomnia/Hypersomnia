@@ -6,6 +6,7 @@
 #include "game_framework/components/item_component.h"
 #include "game_framework/components/trigger_component.h"
 #include "game_framework/components/force_joint_component.h"
+#include "game_framework/components/name_component.h"
 
 #include "game_framework/detail/inventory_utils.h"
 
@@ -29,7 +30,8 @@ namespace ingredients {
 namespace prefabs {
 	augs::entity_id create_sample_backpack(augs::world& world, vec2 pos) {
 		auto sample_backpack = world.create_entity("sample_backpack");
-		
+		name_entity(sample_backpack, entity_name::VIOLET_BACKPACK);
+
 		ingredients::backpack(sample_backpack);
 
 		ingredients::sprite(sample_backpack, pos, assets::texture_id::BACKPACK, augs::white, render_layer::DROPPED_ITEM);

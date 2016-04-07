@@ -4,6 +4,7 @@
 #include "game_framework/components/physics_definition_component.h"
 #include "game_framework/components/damage_component.h"
 #include "game_framework/components/sprite_component.h"
+#include "game_framework/components/name_component.h"
 
 #include "game_framework/globals/filters.h"
 
@@ -74,6 +75,7 @@ namespace ingredients {
 namespace prefabs {
 	augs::entity_id create_sample_magazine(augs::world& world, vec2 pos) {
 		auto sample_magazine = world.create_entity("sample_magazine");
+		name_entity(sample_magazine, entity_name::MAGAZINE);
 
 		{
 			ingredients::sprite(sample_magazine, pos, assets::texture_id::SAMPLE_MAGAZINE, augs::white, render_layer::DROPPED_ITEM);
@@ -120,7 +122,8 @@ namespace prefabs {
 		auto pink_charge = world.create_entity("pink_charge");
 		auto round_definition = world.create_entity("round_definition");
 		auto shell_definition = world.create_entity("shell_definition");
-		
+		name_entity(pink_charge, entity_name::PINK_CHARGE);
+
 		{
 			ingredients::sprite(pink_charge, pos, assets::texture_id::PINK_CHARGE, augs::white, render_layer::DROPPED_ITEM);
 			ingredients::crate_physics(pink_charge);
@@ -160,6 +163,7 @@ namespace prefabs {
 		auto cyan_charge = world.create_entity("cyan_charge");
 		auto round_definition = world.create_entity("round_definition");
 		auto shell_definition = world.create_entity("shell_definition");
+		name_entity(cyan_charge, entity_name::CYAN_CHARGE);
 
 		{
 			ingredients::sprite(cyan_charge, pos, assets::texture_id::CYAN_CHARGE, augs::white, render_layer::DROPPED_ITEM);
@@ -197,6 +201,7 @@ namespace prefabs {
 
 	augs::entity_id create_sample_rifle(augs::world& world, vec2 pos) {
 		auto sample_rifle = world.create_entity("sample_rifle");
+		name_entity(sample_rifle, entity_name::ASSAULT_RIFLE);
 
 		ingredients::sprite(sample_rifle, pos, assets::texture_id::ASSAULT_RIFLE, augs::white, render_layer::DROPPED_ITEM);
 		auto& def = ingredients::crate_physics(sample_rifle);
