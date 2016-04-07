@@ -23,8 +23,16 @@ std::wstring describe_properties(augs::entity_id id) {
 	auto* container = id->find<components::container>();
 	auto* item = id->find<components::item>();
 
-	if (item && item->categories_for_slot_compatibility != 0) {
-		result << L"[color=vsblue]" << describe_item_compatibility_categories(item->categories_for_slot_compatibility) << "[/color]\n";
+	if (item) {
+		if (item->categories_for_slot_compatibility != 0)
+			result << L"[color=vsblue]" << describe_item_compatibility_categories(item->categories_for_slot_compatibility) << L"[/color]\n";
+			
+		result << "Occupies: [color=vscyan]" << format_space_units(calculate_space_occupied_with_children(id)) << " [/color]";
+		
+		if (item->charges > 1)
+			result << "[color=vsdarkgray](" << format_space_units(item->space_occupied_per_charge) << L" each)[/color]";
+
+		result << L"\n";
 	}
 
 	if (gun) {
