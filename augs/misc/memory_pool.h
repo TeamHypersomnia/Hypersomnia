@@ -91,8 +91,8 @@ namespace augs {
 		public:
 			using id::id;
 
-			const T& get() const { return *reinterpret_cast<T*>(id::ptr()); }
-			const T* ptr() const { return  reinterpret_cast<T*>(id::ptr()); }
+			const T& get() const { return *reinterpret_cast<const T*>(id::ptr()); }
+			const T* ptr() const { return  reinterpret_cast<const T*>(id::ptr()); }
 
 			T* ptr() { return  reinterpret_cast<T*>(id::ptr()); }
 			T& get() { return *reinterpret_cast<T*>(id::ptr()); }

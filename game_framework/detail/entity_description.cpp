@@ -11,6 +11,9 @@ entity_description description_of_entity(augs::entity_id id) {
 }
 
 std::wstring describe_properties(augs::entity_id id) {
+	if (id.has(sub_entity_name::BULLET_ROUND_DEFINITION))
+		return describe_properties(id[sub_entity_name::BULLET_ROUND_DEFINITION]);
+
 	std::wostringstream result;
 
 	auto* gun = id->find<components::gun>();
@@ -22,8 +25,12 @@ std::wstring describe_properties(augs::entity_id id) {
 	}
 
 	if (damage) {
-		result << L"Base damage: " << damage->amount 
-			<< L"\nMax distance: " << damage->max_distance;
+		result << L"Base damage: " << damage->amount;
+
+		if (damage->constrain_distance)
+			result << L"\nMax distance: " << damage->max_distance;
+		if (damage->constrain_lifetime)
+			result << L"\nMax lifetime: " << damage->max_lifetime_ms << L" ms";
 	}
 
 	return result.str();

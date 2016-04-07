@@ -20,6 +20,8 @@ namespace augs {
 	}
 
 	entity_id world::clone_entity(entity_id id) {
+		ensure(id.alive());
+
 		std::string cloned_name = id.get_debug_name();
 
 		if (cloned_name.substr(0, 7) != "cloned_") {

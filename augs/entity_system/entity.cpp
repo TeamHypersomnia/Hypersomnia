@@ -35,6 +35,7 @@ namespace augs {
 	}
 
 	void entity::clone(augs::entity_id b) {
+		ensure(b.alive());
 #if USE_POINTER_TUPLE
 		debug_name = b->debug_name;
 		

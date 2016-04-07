@@ -162,4 +162,13 @@ namespace augs {
 
 	const rgba cyan(0, 255, 255, 255);
 	const rgba yellow(255, 255, 0, 255);
+
+	const rgba vsgreen(87, 166, 74, 255);
+	const rgba vsdarkgreen(0, 100, 0, 255);
+	const rgba vscyan(78, 201, 176, 255);
+	const rgba vsblue(86, 156, 214, 255);
+	
+	const rgba vsyellow(181, 206, 168, 255);
+	const rgba vslightgray(220, 220, 220, 255);
+	const rgba vsdarkgray(127, 127, 127, 255);
 }

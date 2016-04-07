@@ -14,6 +14,10 @@ namespace augs {
 		inventory_slot_id operator[](slot_function);
 		typed_id_template& operator[](sub_entity_name);
 		typed_id_template& operator[](associated_entity_name);
+
+		bool has(sub_entity_name) const;
+		bool has(associated_entity_name) const;
+		bool has(slot_function) const;
 	};
 
 	typedef memory_pool::typed_id_template<entity> entity_id;
