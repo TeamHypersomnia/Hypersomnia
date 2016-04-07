@@ -26,11 +26,16 @@ std::wstring describe_properties(augs::entity_id id) {
 	if (item) {
 		if (item->categories_for_slot_compatibility != 0)
 			result << L"[color=vsblue]" << describe_item_compatibility_categories(item->categories_for_slot_compatibility) << L"[/color]\n";
-			
-		result << "Occupies: [color=vscyan]" << format_space_units(calculate_space_occupied_with_children(id)) << " [/color]";
+		
+		auto total_occupied = format_space_units(calculate_space_occupied_with_children(id));
+		auto per_charge = format_space_units(item->space_occupied_per_charge);
+
+		result << "Occupies: [color=vscyan]" << total_occupied << " [/color]";
 		
 		if (item->charges > 1)
-			result << "[color=vsdarkgray](" << format_space_units(item->space_occupied_per_charge) << L" each)[/color]";
+			result << "[color=vsdarkgray](" << per_charge << L" each)[/color]";
+		else if(container && total_occupied != per_charge)
+			result << "[color=vsdarkgray](" << per_charge << L" if empty)[/color]";
 
 		result << L"\n";
 	}
