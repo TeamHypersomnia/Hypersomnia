@@ -72,6 +72,10 @@ namespace augs {
 		entity(world& owner_world);
 		~entity();
 
+		augs::entity_id get_parent() {
+			return parent;
+		}
+
 		void add_sub_entity(augs::entity_id p) {
 			p->parent = get_id();
 			sub_entities.push_back(p);
@@ -188,7 +192,7 @@ namespace augs {
 
 		template <typename component_type>
 		bool is_enabled(const component_type& object = component_type()) {
-			return signature.is_set(typeid(component_type).hash_code());
+			return signature.is_set(owner_world.component_library.get_index(typeid(component_type).hash_code()));
 		}
 
 		template <typename component_type>

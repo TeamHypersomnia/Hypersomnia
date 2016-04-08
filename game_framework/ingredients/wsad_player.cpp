@@ -131,7 +131,8 @@ namespace ingredients {
 			previously_controlled_character->disable<components::input_receiver>();
 			previously_controlled_character->disable<components::gui_element>();
 
-			previously_controlled_character[sub_entity_name::CHARACTER_CROSSHAIR]->disable<components::input_receiver>();
+			auto crosshair = previously_controlled_character[sub_entity_name::CHARACTER_CROSSHAIR];
+			crosshair->disable<components::input_receiver>();
 
 			previously_controlled_character[associated_entity_name::WATCHING_CAMERA].unset();
 		}

@@ -166,7 +166,9 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 				burst.rotation = barrel_transform.rotation;
 				burst.subject = it;
 				burst.type = messages::particle_burst_message::burst_type::WEAPON_SHOT;
-				burst.target_group_to_refresh = it[sub_entity_name::BARREL_SMOKE];
+				
+				if (it.has(sub_entity_name::BARREL_SMOKE))
+					burst.target_group_to_refresh = it[sub_entity_name::BARREL_SMOKE];
 
 				parent_world.post_message(burst);
 				parent_world.post_message(messages::destroy_message(chamber_slot->items_inside[0]));

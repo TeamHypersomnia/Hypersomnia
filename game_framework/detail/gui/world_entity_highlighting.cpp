@@ -7,11 +7,13 @@
 #include "game_framework/globals/filters.h"
 #include "game_framework/components/name_component.h"
 
-augs::entity_id game_gui_world::get_hovered_world_entity() {
+augs::entity_id game_gui_world::get_hovered_world_entity(vec2 camera_pos) {
 	auto& physics = gui_system->parent_world.get_system<physics_system>();
 
+	auto cursor_pointing_at = camera_pos + gui_crosshair_position - size / 2;
 
-	auto hovered = physics.query_aabb_px(gui_crosshair_position, gui_crosshair_position + vec2i(1, 1), filters::renderable_query());
+	std::vector<vec2> v{ cursor_pointing_at, cursor_pointing_at + vec2(1, 0), cursor_pointing_at + vec2(1, 1) , cursor_pointing_at + vec2(0, 1) };
+	auto hovered = physics.query_polygon(v, filters::renderable_query());
 
 	if(hovered.entities.size() > 0) {
 		std::vector<augs::entity_id> hovered_and_named;
