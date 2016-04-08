@@ -81,7 +81,7 @@ static b2Vec2 ComputeCentroid(const b2Vec2* vs, int32 count)
 	// pRef is the reference point for forming triangles.
 	// It's location doesn't change the result (except for rounding error).
 	b2Vec2 pRef(0.0f, 0.0f);
-#if 0
+#if 1
 	// This code would put the reference point inside the polygon.
 	for (int32 i = 0; i < count; ++i)
 	{
