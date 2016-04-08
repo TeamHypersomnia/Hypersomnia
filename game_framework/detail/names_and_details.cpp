@@ -44,6 +44,21 @@ textual_description description_by_entity_name(entity_name n) {
 			L"Suppressor",
 			L"Limits range at which\ngunshot can be detected.\nReduces recoil and damage."
 		};
+	case entity_name::SENTIENCE:
+		return{
+			L"Sentience",
+			L"Living entity."
+		};
+	case entity_name::PERSON:
+		return{
+			L"Person",
+			L"Living entity."
+		};
+	case entity_name::CRATE:
+		return{
+			L"Crate",
+			L"Good cover.\nOtherwise useless."
+		};
 	default:
 		ensure(false);
 		return{

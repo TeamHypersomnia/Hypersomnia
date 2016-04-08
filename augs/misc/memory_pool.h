@@ -100,6 +100,8 @@ namespace augs {
 			object_pool<T>& get_pool() { return reinterpret_cast<object_pool<T>&>(id::get_pool()); }
 			T& operator*() { return get(); }
 			T* operator->() { return &get(); }
+			const T& operator*() const { return get(); }
+			const T* operator->() const { return &get(); }
 
 			using id::operator!;
 			bool operator< (const typed_id_interface& b) const { return id::operator< (reinterpret_cast<const id&>(b)); }

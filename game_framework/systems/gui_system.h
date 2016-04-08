@@ -10,6 +10,7 @@
 
 class gui_system : public augs::processing_system_templated<components::gui_element> {
 	friend class item_button;
+	friend struct game_gui_world;
 
 	bool is_gui_look_enabled = false;
 	bool preview_due_to_item_picking_request = false;

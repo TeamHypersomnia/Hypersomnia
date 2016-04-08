@@ -88,3 +88,11 @@ std::wstring describe_slot(inventory_slot_id id) {
 	return text.name + L"\n[color=vslightgray]Allows: [/color][color=" + catcolor + L"]" + describe_item_compatibility_categories(id->category_allowed) + L"[/color][color=vsdarkgray]\n" +
 		text.details + L"[/color]";
 }
+
+std::wstring describe_entity(augs::entity_id id) {
+	auto desc = description_of_entity(id);
+	auto properties = describe_properties(id);
+	if (!properties.empty()) properties += L"\n";
+
+	return L"[color=white]" + desc.name + L"[/color]\n" + properties + L"[color=vsdarkgray]" + desc.details + L"[/color]";
+}

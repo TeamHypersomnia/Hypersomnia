@@ -14,6 +14,7 @@
 #include "game_framework/components/position_copying_component.h"
 #include "game_framework/components/physics_definition_component.h"
 #include "game_framework/components/item_component.h"
+#include "game_framework/components/name_component.h"
 
 #include "game_framework/messages/crosshair_intent_message.h"
 #include "game_framework/messages/item_slot_transfer_request.h"
@@ -138,6 +139,11 @@ namespace scene_builders {
 		auto crate3 = world.create_entity("crate3");
 		auto crate4 = world.create_entity("crate4");
 
+		name_entity(crate, entity_name::CRATE);
+		name_entity(crate2, entity_name::CRATE);
+		name_entity(crate3, entity_name::CRATE);
+		name_entity(crate4, entity_name::CRATE);
+
 		for (int x = -4 * 1; x < 4 * 1; ++x)
 		{
 			auto frog = world.create_entity("frog");
@@ -174,6 +180,7 @@ namespace scene_builders {
 		for (int i = 0; i < num_characters; ++i) {
 			auto crosshair = world.create_entity("crosshair");
 			auto character = world.create_entity(typesafe_sprintf("player%x", i));
+			name_entity(character, entity_name::PERSON);
 
 			ingredients::wsad_character_crosshair(crosshair);
 			ingredients::wsad_character(character, crosshair);

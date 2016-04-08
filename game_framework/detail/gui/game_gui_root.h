@@ -33,5 +33,7 @@ struct game_gui_world : public augs::gui::gui_world {
 
 	void consume_raw_input(messages::raw_window_input_message&);
 	void draw_cursor_and_tooltip(messages::camera_render_request_message);
+
+	augs::entity_id get_hovered_world_entity();
 	drag_and_drop_result prepare_drag_and_drop_result();
 };

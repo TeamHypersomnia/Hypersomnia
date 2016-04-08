@@ -67,12 +67,19 @@ namespace augs {
 		std::unordered_map<associated_entity_name, augs::entity_id> associated_entities_by_name;
 
 		std::vector<augs::entity_id> sub_entities;
+		augs::entity_id parent;
 	public:
 		entity(world& owner_world);
 		~entity();
 
 		void add_sub_entity(augs::entity_id p) {
+			p->parent = get_id();
 			sub_entities.push_back(p);
+		}
+
+		void map_sub_entity(sub_entity_name n, augs::entity_id p) {
+			p->parent = get_id();
+			sub_entities_by_name[n] = p;
 		}
 
 		/* maps type hashes into components */

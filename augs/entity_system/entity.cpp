@@ -44,10 +44,10 @@ namespace augs {
 		associated_entities_by_name = b->associated_entities_by_name;
 
 		for (auto& s : b->sub_entities)
-			sub_entities.push_back(owner_world.clone_entity(s));
+			add_sub_entity(owner_world.clone_entity(s));
 
 		for (auto& s : b->sub_entities_by_name)
-			sub_entities_by_name[s.first] = owner_world.clone_entity(s.second);
+			map_sub_entity(s.first, owner_world.clone_entity(s.second));
 
 		remove<components::fixtures>();
 		remove<components::physics>();

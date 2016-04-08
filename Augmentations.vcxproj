@@ -392,6 +392,7 @@
     <ClCompile Include="game_framework\detail\gui\game_gui_root.cpp" />
     <ClCompile Include="game_framework\detail\gui\metadata_tree.cpp" />
     <ClCompile Include="game_framework\detail\gui\special_drag_and_drop_target.cpp" />
+    <ClCompile Include="game_framework\detail\gui\world_entity_highlighting.cpp" />
     <ClCompile Include="game_framework\detail\names_and_details.cpp" />
     <ClCompile Include="game_framework\game_overworld.cpp" />
     <ClCompile Include="game_framework\game_world.cpp" />

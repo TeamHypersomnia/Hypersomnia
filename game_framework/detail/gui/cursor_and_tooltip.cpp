@@ -99,32 +99,36 @@ void game_gui_world::draw_cursor_and_tooltip(messages::camera_render_request_mes
 	state.renderable_transform.pos = gui_crosshair_position;
 	cursor_sprite.draw(state);
 
-	if (!(rect_held_by_lmb && held_rect_is_dragged) && rect_hovered != nullptr) {
-		auto* maybe_hovered_item = dynamic_cast<item_button*>(rect_hovered);
-		auto* maybe_hovered_slot = dynamic_cast<slot_button*>(rect_hovered);
+	auto* maybe_hovered_item = dynamic_cast<item_button*>(rect_hovered);
+	auto* maybe_hovered_slot = dynamic_cast<slot_button*>(rect_hovered);
+	bool is_dragging = rect_held_by_lmb && held_rect_is_dragged;
 
-		gui::text::fstr full;
+	if (!is_dragging) {
+		gui::text::fstr tooltip_text;
 
 		if (maybe_hovered_item) {
-			auto desc = description_of_entity(maybe_hovered_item->item);
-			auto properties = describe_properties(maybe_hovered_item->item);
-			if (!properties.empty()) properties += L"\n";
-
-			full = text::format(desc.name + L"\n", text::style());
-			full += text::simple_bbcode(properties, text::style(assets::GUI_FONT, vslightgray));
-			full += text::format(desc.details, text::style(assets::GUI_FONT, vsdarkgray));
+			tooltip_text = text::simple_bbcode(describe_entity(maybe_hovered_item->item), text::style(assets::GUI_FONT, vslightgray));
 		}
 		else if (maybe_hovered_slot) {
-			full = text::simple_bbcode(describe_slot(maybe_hovered_slot->slot_id), text::style());
+			tooltip_text = text::simple_bbcode(describe_slot(maybe_hovered_slot->slot_id), text::style());
+		}
+		else {
+			auto hovered = get_hovered_world_entity();
+
+			if (hovered.alive()) {
+				tooltip_text = text::simple_bbcode(describe_entity(hovered), text::style(assets::GUI_FONT, vslightgray));
+			}
 		}
 
-		state.renderable_transform.pos = bottom_right_corner;
-		bg_sprite.size.set(description_drawer.get_bbox());
-		bg_sprite.draw(state);
+		if (tooltip_text.size() > 0) {
+			state.renderable_transform.pos = bottom_right_corner;
+			bg_sprite.size.set(description_drawer.get_bbox());
+			bg_sprite.draw(state);
 
-		description_drawer.set_text(full);
-		description_drawer.pos = bottom_right_corner;
+			description_drawer.set_text(tooltip_text);
+			description_drawer.pos = bottom_right_corner;
 
-		description_drawer.draw(out);
+			description_drawer.draw(out);
+		}
 	}
 }

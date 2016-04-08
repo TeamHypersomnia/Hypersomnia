@@ -9,7 +9,10 @@ enum class entity_name {
 	TRUCK,
 	MOTORCYCLE,
 	VIOLET_BACKPACK,
-	SUPPRESSOR
+	SUPPRESSOR,
+	CRATE,
+	SENTIENCE,
+	PERSON,
 };
 
 void name_entity(augs::entity_id, entity_name);

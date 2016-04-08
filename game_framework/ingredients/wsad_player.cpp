@@ -109,7 +109,7 @@ namespace ingredients {
 		movement.standard_linear_damping = 20.f;
 		// driver.linear_damping_while_driving = 4.f;
 
-		e[sub_entity_name::CHARACTER_CROSSHAIR] = crosshair_entity;
+		e->map_sub_entity(sub_entity_name::CHARACTER_CROSSHAIR, crosshair_entity);
 		
 		animation_response.response = assets::animation_response_id::TORSO_SET;
 

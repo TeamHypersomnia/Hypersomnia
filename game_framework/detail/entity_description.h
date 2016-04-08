@@ -16,3 +16,4 @@ std::wstring describe_item_compatibility_categories(unsigned flags);
 textual_description describe_slot_function(slot_function);
 
 std::wstring describe_slot(inventory_slot_id);
+std::wstring describe_entity(augs::entity_id);

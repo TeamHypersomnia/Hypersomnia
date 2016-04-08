@@ -154,8 +154,8 @@ namespace prefabs {
 			def.is_definition_entity = true;
 		}
 
-		pink_charge[sub_entity_name::BULLET_ROUND_DEFINITION] = round_definition;
-		pink_charge[sub_entity_name::BULLET_SHELL_DEFINITION] = shell_definition;
+		pink_charge->map_sub_entity(sub_entity_name::BULLET_ROUND_DEFINITION, round_definition);
+		pink_charge->map_sub_entity(sub_entity_name::BULLET_SHELL_DEFINITION, shell_definition);
 
 		return pink_charge;
 	}
@@ -194,8 +194,8 @@ namespace prefabs {
 			def.is_definition_entity = true;
 		}
 
-		cyan_charge[sub_entity_name::BULLET_ROUND_DEFINITION] = round_definition;
-		cyan_charge[sub_entity_name::BULLET_SHELL_DEFINITION] = shell_definition;
+		cyan_charge->map_sub_entity(sub_entity_name::BULLET_ROUND_DEFINITION, round_definition);
+		cyan_charge->map_sub_entity(sub_entity_name::BULLET_SHELL_DEFINITION, shell_definition);
 
 		return cyan_charge;
 	}
