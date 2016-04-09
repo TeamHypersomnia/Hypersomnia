@@ -34,6 +34,38 @@ namespace augs {
 		clear();
 	}
 
+	augs::entity_id entity::get_parent() {
+		return parent;
+	}
+
+	void entity::add_sub_entity(augs::entity_id p, sub_entity_name optional_name) {
+		ensure(p->parent.dead());
+		p->parent = get_id();
+		p->name_as_subentity = optional_name;
+		sub_entities.push_back(p);
+	}
+
+	sub_entity_name entity::get_name_as_subentity() {
+		return name_as_subentity;
+	}
+
+	void entity::map_sub_entity(sub_entity_name n, augs::entity_id p) {
+		ensure(p->parent.dead());
+		p->parent = get_id();
+		p->name_as_subentity = n;
+		sub_entities_by_name[n] = p;
+	}
+
+	void entity::for_each_subentity(std::function<void(augs::entity_id)> f) {
+		f(get_id());
+
+		for (auto& e : sub_entities)
+			e->for_each_subentity(f);
+
+		for (auto& e : sub_entities_by_name)
+			e.second->for_each_subentity(f);
+	}
+
 	void entity::clone(augs::entity_id b) {
 		ensure(b.alive());
 #if USE_POINTER_TUPLE
@@ -77,7 +109,7 @@ namespace augs {
 	}
 
 	entity_id entity::get_id() {
-		return owner_world.get_id_from_raw_pointer(this);
+		return self_id;// owner_world.get_id_from_raw_pointer(this);
 	}
 
 	void entity::clear() {

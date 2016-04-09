@@ -23,5 +23,3 @@ namespace augs {
 
 	typedef memory_pool::typed_id_template<entity> entity_id;
 }
-
-void for_each_subentity(augs::entity_id e, std::function<void(augs::entity_id)>);

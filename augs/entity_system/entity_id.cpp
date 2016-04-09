@@ -33,7 +33,3 @@ namespace augs {
 		return result.alive();
 	}
 }
-
-void for_each_subentity(augs::entity_id e, std::function<void(augs::entity_id)> f) {
-
-}

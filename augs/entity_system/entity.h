@@ -59,7 +59,7 @@ namespace augs {
 	class world;
 
 	class entity {
-		/* only world class is allowed to instantiate an entity and it has to do it inside object pool */
+		friend class world;
 		friend class ::destroy_system;
 		friend class memory_pool::typed_id_template<entity>;
 
@@ -68,23 +68,17 @@ namespace augs {
 
 		std::vector<augs::entity_id> sub_entities;
 		augs::entity_id parent;
+		augs::entity_id self_id;
+		sub_entity_name name_as_subentity = sub_entity_name::INVALID;
 	public:
 		entity(world& owner_world);
 		~entity();
 
-		augs::entity_id get_parent() {
-			return parent;
-		}
-
-		void add_sub_entity(augs::entity_id p) {
-			p->parent = get_id();
-			sub_entities.push_back(p);
-		}
-
-		void map_sub_entity(sub_entity_name n, augs::entity_id p) {
-			p->parent = get_id();
-			sub_entities_by_name[n] = p;
-		}
+		sub_entity_name get_name_as_subentity();
+		augs::entity_id get_parent();
+		void add_sub_entity(augs::entity_id p, sub_entity_name optional_name = sub_entity_name::INVALID);
+		void map_sub_entity(sub_entity_name n, augs::entity_id p);
+		void for_each_subentity(std::function<void(augs::entity_id)>);
 
 		/* maps type hashes into components */
 #if USE_POINTER_TUPLE 

@@ -1,6 +1,7 @@
 #pragma once
 
 enum class sub_entity_name {
+	INVALID,
 	CHARACTER_CROSSHAIR,
 	CHARACTER_LEGS,
 

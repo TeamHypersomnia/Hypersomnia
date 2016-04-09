@@ -47,7 +47,7 @@ namespace scene_builders {
 		resource_manager.create(assets::texture_id::TEST_CROSSHAIR, std::wstring(L"hypersomnia/gfx/crosshair.png"));
 		resource_manager.create(assets::texture_id::TEST_PLAYER, L"hypersomnia/gfx/walk_1.png");
 		resource_manager.create(assets::texture_id::TEST_BACKGROUND, L"hypersomnia/gfx/snow_textures/snow3.png");
-		resource_manager.create(assets::texture_id::CRATE, L"hypersomnia/gfx/crate2.png");
+		resource_manager.create(assets::texture_id::CRATE, L"hypersomnia/gfx/crate2_destroyed.png");
 		resource_manager.create(assets::texture_id::CAR_INSIDE, L"hypersomnia/gfx/crate2.png");
 		resource_manager.create(assets::texture_id::CAR_FRONT, L"hypersomnia/gfx/crate2.png");
 
@@ -292,7 +292,7 @@ namespace scene_builders {
 			input.record_and_save_this_session();
 		}
 
-		draw_bodies.push_back(crate2);
+		//draw_bodies.push_back(crate2);
 		//draw_bodies.push_back(characters[0]);
 		//draw_bodies.push_back(backpack);
 	}
