@@ -28,6 +28,7 @@ class render_system : public event_only_system {
 
 	b2DynamicTree non_physical_objects_tree;
 	unsigned current_step = 0;
+	int current_visibility_index = 0;
 public:
 	render_system(world& parent_world);
 

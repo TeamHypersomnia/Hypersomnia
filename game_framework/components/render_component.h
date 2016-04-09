@@ -31,5 +31,6 @@ namespace components {
 
 		int layer_priority = 0;
 		unsigned last_step_when_visible = 0;
+		int last_visibility_index = -1;
 	};
 }

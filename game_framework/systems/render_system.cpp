@@ -149,10 +149,10 @@ void render_system::generate_layers_from_visible_entities(int mask) {
 		layers[layer].push_back(it);
 	}
 
-	for (auto& sortable_layer : layers_with_custom_drawing_order) {
-		if (sortable_layer < layers.size()) {
-			if (layers[sortable_layer].size() > 1) {
-				std::sort(layers[sortable_layer].begin(), layers[sortable_layer].end(), [](entity_id b, entity_id a) {
+	for (auto& custom_order_layer : layers_with_custom_drawing_order) {
+		if (custom_order_layer < layers.size()) {
+			if (layers[custom_order_layer].size() > 1) {
+				std::sort(layers[custom_order_layer].begin(), layers[custom_order_layer].end(), [](entity_id b, entity_id a) {
 					return components::physics::are_connected_by_friction(a, b);
 				});
 			}
@@ -228,6 +228,7 @@ void render_system::calculate_and_set_interpolated_transforms() {
 	}
 
 	++current_step;
+	current_visibility_index = 0;
 }
 
 void render_system::restore_actual_transforms() {
@@ -265,6 +266,8 @@ void render_system::draw_layer(state_for_drawing_camera in_camera, int layer) {
 			if (polygon) polygon->draw(in);
 			if (sprite) sprite->draw(in);
 			if (tile_layer) tile_layer->draw(in);
+
+			render.last_visibility_index = current_visibility_index++;
 		}
 	}
 }
