@@ -18,9 +18,12 @@ augs::entity_id game_gui_world::get_hovered_world_entity(vec2 camera_pos) {
 	if(hovered.entities.size() > 0) {
 		std::vector<augs::entity_id> hovered_and_named;
 
-		for (auto h : hovered.entities)
-			if (h->find<components::name>() != nullptr)
-				hovered_and_named.push_back(h);
+		for (auto h : hovered.entities) {
+			auto named = get_first_named_ancestor(h);
+			
+			if (named.alive())
+				hovered_and_named.push_back(named);
+		}
 
 		if (hovered_and_named.size() > 0)
 			return *hovered_and_named.begin();

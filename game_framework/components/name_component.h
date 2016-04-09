@@ -6,3 +6,5 @@ namespace components {
 		entity_name id;
 	};
 }
+
+augs::entity_id get_first_named_ancestor(augs::entity_id);

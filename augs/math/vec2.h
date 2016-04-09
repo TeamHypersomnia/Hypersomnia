@@ -13,6 +13,11 @@ template <typename T> int sgn(T val) {
 }
 
 namespace augs {
+	template <class T, class A>
+	T interp(T a, T b, A alpha) {
+		return a * alpha + b * (static_cast<A>(1.0) - alpha);
+	}
+
 	template <class T>
 	rects::ltrb<T> get_aabb(vec2t<T>* v, int verts = 4) {
 		auto x_pred = [](vec2t<T> a, vec2t<T> b) { return a.x < b.x; };

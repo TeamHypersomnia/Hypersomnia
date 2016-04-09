@@ -120,12 +120,8 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 				camera.last_interpolant.pos = camera.last_interpolant.pos * averaging_constant + vec2d(smoothed_part) * (1.0f - averaging_constant);
 				camera.last_interpolant.rotation = camera.last_interpolant.rotation * averaging_constant + transform.rotation * (1.0f - averaging_constant);
 					
-				auto interp = [](float& a, float& b, float averaging_constant){
-					a = a * averaging_constant + b * (1.0f - averaging_constant);
-				};
-
-				interp(camera.last_ortho_interpolant.x, camera.visible_world_area.x, averaging_constant);
-				interp(camera.last_ortho_interpolant.y, camera.visible_world_area.y, averaging_constant);
+				camera.last_ortho_interpolant.x = augs::interp(camera.last_ortho_interpolant.x, camera.visible_world_area.x, averaging_constant);
+				camera.last_ortho_interpolant.y = augs::interp(camera.last_ortho_interpolant.y, camera.visible_world_area.y, averaging_constant);
 
 				/* save smoothing result */
 				//if ((smoothed_camera_transform.pos - camera.last_interpolant.pos).length() > 5)
