@@ -4,6 +4,8 @@
 #include "game_framework/components/container_component.h"
 
 void gui_system::rebuild_gui_tree_based_on_game_state() {
+	gui.set_delta_milliseconds(delta_milliseconds());
+
 	if (freeze_gui_model())
 		return;
 

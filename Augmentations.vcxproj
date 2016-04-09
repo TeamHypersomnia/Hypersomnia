@@ -387,6 +387,7 @@
     <ClCompile Include="game_framework\components\sprite_component.cpp" />
     <ClCompile Include="game_framework\components\tile_layer_component.cpp" />
     <ClCompile Include="game_framework\detail\entity_description.cpp" />
+    <ClCompile Include="game_framework\detail\gui\aabb_highlighter.cpp" />
     <ClCompile Include="game_framework\detail\gui\cursor_and_tooltip.cpp" />
     <ClCompile Include="game_framework\detail\gui\drag_and_drop.cpp" />
     <ClCompile Include="game_framework\detail\gui\game_gui_root.cpp" />
@@ -1012,6 +1013,7 @@
     <ClInclude Include="game_framework\assets\texture.h" />
     <ClInclude Include="augs\ensure.h" />
     <ClInclude Include="game_framework\detail\entity_description.h" />
+    <ClInclude Include="game_framework\detail\gui\aabb_highlighter.h" />
     <ClInclude Include="game_framework\detail\gui\drag_and_drop.h" />
     <ClInclude Include="game_framework\detail\gui\game_gui_root.h" />
     <ClInclude Include="game_framework\detail\gui\special_controls.h" />

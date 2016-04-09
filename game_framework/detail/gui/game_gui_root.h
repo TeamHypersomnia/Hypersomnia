@@ -5,6 +5,7 @@
 #include "gui/text_drawer.h"
 #include "gui/gui_world.h"
 #include "drag_and_drop.h"
+#include "aabb_highlighter.h"
 
 struct game_gui_root : public augs::gui::rect {
 	augs::gui::rect parent_of_inventory_controls;
@@ -19,6 +20,8 @@ class gui_system;
 struct game_gui_world : public augs::gui::gui_world {
 	gui_system* gui_system = nullptr;
 	vec2 gui_crosshair_position;
+
+	aabb_highlighter world_hover_highlighter;
 
 	augs::gui::text_drawer tooltip_drawer;
 	augs::gui::text_drawer description_drawer;

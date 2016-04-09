@@ -116,6 +116,9 @@ void game_gui_world::draw_cursor_and_tooltip(messages::camera_render_request_mes
 			auto hovered = get_hovered_world_entity(r.state.camera_transform.pos);
 
 			if (hovered.alive()) {
+				world_hover_highlighter.update(delta_milliseconds());
+				world_hover_highlighter.draw(r.state, hovered);
+
 				tooltip_text = text::simple_bbcode(describe_entity(hovered), text::style(assets::GUI_FONT, vslightgray));
 			}
 		}

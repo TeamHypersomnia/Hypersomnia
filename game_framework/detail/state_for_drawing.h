@@ -29,6 +29,7 @@ namespace shared {
 		components::transform renderable_transform;
 		augs::entity_id renderable;
 		bool screen_space_mode = false;
+		bool position_is_left_top_corner = false;
 
 		void setup_camera_state(state_for_drawing_camera b) {
 			state_for_drawing_camera::operator=(b);

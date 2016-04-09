@@ -15,8 +15,11 @@ using namespace augs;
 using namespace shared;
 
 namespace components {
-	void sprite::make_rect(vec2 pos, vec2 size, float angle, vec2 v[4]) {
-		vec2 origin(pos + (size / 2.f));
+	void sprite::make_rect(vec2 pos, vec2 size, float angle, vec2 v[4], bool pos_at_center) {
+		vec2 origin = pos;
+		
+		if(pos_at_center)
+			origin += size / 2.f;
 
 		v[0] = pos;
 		v[1] = pos + vec2(size.x, 0.f);
@@ -28,10 +31,12 @@ namespace components {
 		v[2].rotate(angle, origin);
 		v[3].rotate(angle, origin);
 
-		v[0] -= size / 2.f;
-		v[1] -= size / 2.f;
-		v[2] -= size / 2.f;
-		v[3] -= size / 2.f;
+		if (pos_at_center) {
+			v[0] -= size / 2.f;
+			v[1] -= size / 2.f;
+			v[2] -= size / 2.f;
+			v[3] -= size / 2.f;
+		}
 	}
 
 	void sprite::set(assets::texture_id _tex, rgba _color) {
@@ -52,13 +57,14 @@ namespace components {
 		vec2i transform_pos = in.renderable_transform.pos;
 
 		if (in.screen_space_mode) {
-			make_rect(transform_pos + vec2(size)/2, vec2(size), in.renderable_transform.rotation + rotation_offset, v);
+			make_rect(transform_pos, vec2(size), in.renderable_transform.rotation + rotation_offset, v, false);
 		}
 		else {
 			auto center = in.visible_world_area / 2;
 
 			auto target_position = transform_pos - in.camera_transform.pos + center + center_offset;
-			make_rect(target_position, vec2(size), in.renderable_transform.rotation + rotation_offset, v);
+			
+			make_rect(target_position, vec2(size), in.renderable_transform.rotation + rotation_offset, v, !in.position_is_left_top_corner);
 
 			/* rotate around the center of the screen */
 			if (in.camera_transform.rotation != 0.f)
@@ -134,11 +140,7 @@ namespace components {
 	
 	augs::rects::ltrb<float> sprite::get_aabb(components::transform transform, bool screen_space_mode) const {
 		static thread_local vec2 v[4];
-		if(screen_space_mode)
-			make_rect(transform.pos + vec2(size) / 2, vec2(size), transform.rotation + rotation_offset, v);
-		else
-			make_rect(transform.pos,                  vec2(size), transform.rotation + rotation_offset, v);
-
+		make_rect(transform.pos, vec2(size), transform.rotation + rotation_offset, v, !screen_space_mode);
 		return augs::get_aabb(v);
 	}
 }
