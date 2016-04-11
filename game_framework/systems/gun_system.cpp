@@ -39,7 +39,6 @@ void gun_system::consume_gun_intents() {
 
 		if (it.intent == intent_type::PRESS_GUN_TRIGGER) {
 			gun.trigger_pressed = it.pressed_flag;
-			LOG("triggerpress: %x", it.pressed_flag);
 		}
 
 		if (it.intent == intent_type::RELOAD && it.pressed_flag) {
