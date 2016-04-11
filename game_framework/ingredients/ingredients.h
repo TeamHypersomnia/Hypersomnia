@@ -40,7 +40,8 @@ namespace ingredients {
 	void character_inventory(augs::entity_id);
 	void backpack(augs::entity_id);
 
-	void assault_rifle(augs::entity_id);
+	void default_gun_container(augs::entity_id);
+	void default_gun(augs::entity_id);
 }
 
 namespace prefabs {
@@ -50,6 +51,8 @@ namespace prefabs {
 	augs::entity_id create_sample_magazine(augs::world&, vec2 pos);
 	augs::entity_id create_sample_suppressor(augs::world& world, vec2 pos);
 	augs::entity_id create_sample_rifle(augs::world&, vec2 pos);
+	augs::entity_id create_pistol(augs::world&, vec2 pos);
+	augs::entity_id create_submachine(augs::world&, vec2 pos);
 	
 	augs::entity_id create_pink_charge(augs::world&, vec2 pos);
 	augs::entity_id create_cyan_charge(augs::world&, vec2 pos);

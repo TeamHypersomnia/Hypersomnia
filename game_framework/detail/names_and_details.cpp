@@ -59,6 +59,16 @@ textual_description description_by_entity_name(entity_name n) {
 			L"Crate",
 			L"Good cover.\nOtherwise useless."
 		};
+	case entity_name::PISTOL:
+		return{
+			L"Cezeta na krotko",
+			L"jpr."
+		};
+	case entity_name::SUBMACHINE:
+		return{
+			L"Submachine",
+			L"Low recoil and damage,\nfast fire rate."
+		};
 	default:
 		ensure(false);
 		return{

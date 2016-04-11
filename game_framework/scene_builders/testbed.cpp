@@ -59,11 +59,31 @@ namespace scene_builders {
 
 		resource_manager.create(assets::texture_id::TEST_SPRITE, L"hypersomnia/gfx/frog.png");
 
-		auto& assault_rifle_gui = resource_manager.create(assets::texture_id::ASSAULT_RIFLE, L"hypersomnia/gfx/assault_rifle.png").gui_sprite_def;
-		assault_rifle_gui.flip_horizontally = true;
-		assault_rifle_gui.flip_vertically = true;
+		{
+			auto& gui = resource_manager.create(assets::texture_id::ASSAULT_RIFLE, L"hypersomnia/gfx/assault_rifle.png").gui_sprite_def;
+			gui.flip_horizontally = true;
+			gui.flip_vertically = true;
+		}
 
-		resource_manager.create(assets::texture_id::SHOTGUN, L"hypersomnia/gfx/shotgun.png");
+		{
+			auto& gui = resource_manager.create(assets::texture_id::SHOTGUN, L"hypersomnia/gfx/shotgun.png").gui_sprite_def;
+			gui.flip_horizontally = true;
+			gui.flip_vertically = true;
+		}
+
+		{
+			auto& gui = resource_manager.create(assets::texture_id::SUBMACHINE, L"hypersomnia/gfx/submachine.png").gui_sprite_def;
+			gui.flip_horizontally = true;
+			gui.flip_vertically = true;
+		}
+
+		{
+			auto& gui = resource_manager.create(assets::texture_id::PISTOL, L"hypersomnia/gfx/pistol.png").gui_sprite_def;
+			gui.flip_horizontally = true;
+			gui.flip_vertically = true;
+		}
+		
+
 		auto& magazine_gui = resource_manager.create(assets::texture_id::SAMPLE_MAGAZINE, L"hypersomnia/gfx/magazine.png").gui_sprite_def;
 		magazine_gui.rotation_offset = -270;
 
@@ -185,6 +205,11 @@ namespace scene_builders {
 		auto rifle = prefabs::create_sample_rifle(world, vec2(100, -500));
 		prefabs::create_sample_rifle(world, vec2(100, -500 + 50));
 		prefabs::create_sample_rifle(world, vec2(100, -500 + 100));
+
+		prefabs::create_pistol(world, vec2(300, -500 + 50));
+		prefabs::create_submachine(world, vec2(500, -500 + 50));
+
+
 		auto mag = prefabs::create_sample_magazine(world, vec2(100, -650));
 		mag[slot_function::ITEM_DEPOSIT]->space_available = to_space_units("100000");
 		mag[slot_function::ITEM_DEPOSIT]->items_inside[0]->get<components::item>().charges = 1000;

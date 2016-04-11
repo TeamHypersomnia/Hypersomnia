@@ -13,6 +13,8 @@ enum class entity_name {
 	CRATE,
 	SENTIENCE,
 	PERSON,
+	PISTOL,
+	SUBMACHINE
 };
 
 void name_entity(augs::entity_id, entity_name);

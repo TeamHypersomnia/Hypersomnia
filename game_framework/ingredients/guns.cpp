@@ -16,8 +16,7 @@
 #include "game_framework/detail/inventory_utils.h"
 
 namespace ingredients {
-	void assault_rifle(augs::entity_id e) {
-		auto& gun = *e += components::gun();
+	void default_gun_container(augs::entity_id e) {
 		auto& item = make_item(e);
 		auto& container = *e += components::container();
 		item.space_occupied_per_charge = to_space_units("3.5");
@@ -56,19 +55,6 @@ namespace ingredients {
 
 			container.slots[slot_function::GUN_BARREL] = slot_def;
 		}
-
-		gun.action_mode = components::gun::AUTOMATIC;
-		gun.muzzle_velocity = std::make_pair(4000, 4000);
-		gun.timeout_between_shots.set(100);
-		gun.bullet_spawn_offset.set(70, 0);
-		gun.camera_shake_radius = 5.f;
-		gun.camera_shake_spread_degrees = 45.f;
-		
-		gun.shell_spawn_offset.set(0, 10);
-		gun.shell_angular_velocity = std::make_pair(2.f, 14.f);
-		gun.shell_spread_degrees = 80.f;
-		gun.shell_velocity = std::make_pair(300, 1700);
-		gun.damage_multiplier = 1.f;
 	}
 }
 
@@ -206,9 +192,75 @@ namespace prefabs {
 
 		ingredients::sprite(sample_rifle, pos, assets::texture_id::ASSAULT_RIFLE, augs::white, render_layer::DROPPED_ITEM);
 		auto& def = ingredients::crate_physics(sample_rifle);
-		//def.fixtures[0].density = 20;
-		ingredients::assault_rifle(sample_rifle);
+		ingredients::default_gun_container(sample_rifle);
+
+		auto& gun = *sample_rifle += components::gun();
+
+		gun.action_mode = components::gun::AUTOMATIC;
+		gun.muzzle_velocity = std::make_pair(4000, 4000);
+		gun.timeout_between_shots.set(100);
+		gun.bullet_spawn_offset.set(70, 0);
+		gun.camera_shake_radius = 5.f;
+		gun.camera_shake_spread_degrees = 45.f;
+
+		gun.shell_spawn_offset.set(0, 10);
+		gun.shell_angular_velocity = std::make_pair(2.f, 14.f);
+		gun.shell_spread_degrees = 80.f;
+		gun.shell_velocity = std::make_pair(300, 1700);
+		gun.damage_multiplier = 1.f;
 
 		return sample_rifle;
+	}
+
+	augs::entity_id create_submachine(augs::world& world, vec2 pos) {
+		auto weapon = world.create_entity("submachine");
+		name_entity(weapon, entity_name::SUBMACHINE);
+
+		ingredients::sprite(weapon, pos, assets::texture_id::SUBMACHINE, augs::white, render_layer::DROPPED_ITEM);
+		auto& def = ingredients::crate_physics(weapon);
+		ingredients::default_gun_container(weapon);
+
+		auto& gun = *weapon += components::gun();
+
+		gun.action_mode = components::gun::AUTOMATIC;
+		gun.muzzle_velocity = std::make_pair(3000, 3000);
+		gun.timeout_between_shots.set(50);
+		gun.bullet_spawn_offset.set(70, 0);
+		gun.camera_shake_radius = 5.f;
+		gun.camera_shake_spread_degrees = 45.f;
+
+		gun.shell_spawn_offset.set(0, 10);
+		gun.shell_angular_velocity = std::make_pair(2.f, 14.f);
+		gun.shell_spread_degrees = 80.f;
+		gun.shell_velocity = std::make_pair(300, 1700);
+		gun.damage_multiplier = 1.f;
+
+		return weapon;
+	}
+
+	augs::entity_id create_pistol(augs::world& world, vec2 pos) {
+		auto weapon = world.create_entity("pistol");
+		name_entity(weapon, entity_name::PISTOL);
+
+		ingredients::sprite(weapon, pos, assets::texture_id::PISTOL, augs::white, render_layer::DROPPED_ITEM);
+		auto& def = ingredients::crate_physics(weapon);
+		ingredients::default_gun_container(weapon);
+
+		auto& gun = *weapon += components::gun();
+
+		gun.action_mode = components::gun::SEMI_AUTOMATIC;
+		gun.muzzle_velocity = std::make_pair(2500, 2500);
+		gun.timeout_between_shots.set(150);
+		gun.bullet_spawn_offset.set(70, 0);
+		gun.camera_shake_radius = 5.f;
+		gun.camera_shake_spread_degrees = 45.f;
+
+		gun.shell_spawn_offset.set(0, 10);
+		gun.shell_angular_velocity = std::make_pair(2.f, 14.f);
+		gun.shell_spread_degrees = 80.f;
+		gun.shell_velocity = std::make_pair(300, 1700);
+		gun.damage_multiplier = 1.f;
+
+		return weapon;
 	}
 }
