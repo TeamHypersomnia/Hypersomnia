@@ -32,4 +32,10 @@ namespace augs {
 		result.container_entity = *this;
 		return result.alive();
 	}
+
+	void entity_id::set_debug_name(std::string s) {
+		typed_id_interface::set_debug_name(s);
+		(*this)->debug_name = s;
+	}
+
 }

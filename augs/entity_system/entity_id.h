@@ -19,6 +19,7 @@ namespace augs {
 		bool has(sub_entity_name) const;
 		bool has(associated_entity_name) const;
 		bool has(slot_function) const;
+		void set_debug_name(std::string);
 	};
 
 	typedef memory_pool::typed_id_template<entity> entity_id;

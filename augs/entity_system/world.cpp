@@ -36,7 +36,6 @@ namespace augs {
 	entity_id world::create_entity(std::string debug_name) {
 		entity_id res = entities.allocate(std::ref(*this));
 		res->self_id = res;
-		res->debug_name = debug_name;
 
 #ifdef USE_NAMES_FOR_IDS
 		res.set_debug_name(debug_name);

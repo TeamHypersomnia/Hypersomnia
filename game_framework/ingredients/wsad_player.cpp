@@ -17,6 +17,7 @@
 #include "game_framework/components/force_joint_component.h"
 #include "game_framework/components/physics_definition_component.h"
 #include "game_framework/components/gui_element_component.h"
+#include "game_framework/components/name_component.h"
 
 #include "game_framework/globals/filters.h"
 #include "game_framework/globals/input_profiles.h"
@@ -63,27 +64,6 @@ namespace ingredients {
 		components::render render;
 		components::animation animation;
 		components::transform transform;
-	}
-
-	void wsad_character_crosshair(augs::entity_id e) {
-		components::sprite sprite;
-		components::render render;
-		components::transform transform;
-		components::crosshair crosshair;
-
-		sprite.set(assets::texture_id::TEST_CROSSHAIR, rgba(255, 0, 0, 255));
-
-		render.layer = render_layer::CROSSHAIR;
-		render.interpolate = false;
-
-		crosshair.sensitivity.set(3, 3);
-
-		e->add(render);
-		e->add(sprite);
-		e->add(transform);
-		e->add(crosshair);
-
-		ingredients::make_always_visible(e);
 	}
 
 	void wsad_character(augs::entity_id e, augs::entity_id crosshair_entity) {
@@ -156,5 +136,49 @@ namespace ingredients {
 		crosshair->enable<components::input_receiver>();
 
 		components::camera::configure_camera_and_character_with_crosshair(camera, next_character, crosshair);
+	}
+}
+
+namespace prefabs {
+	augs::entity_id create_character(augs::world& world, vec2 pos) {
+		auto character = world.create_entity("player_unnamed");
+		name_entity(character, entity_name::PERSON);
+
+		ingredients::wsad_character(character, create_character_crosshair(world));
+
+		character->get<components::transform>().pos = pos;
+
+		ingredients::wsad_character_physics(character);
+
+		ingredients::character_inventory(character);
+
+		return character;
+	}
+
+	augs::entity_id create_character_crosshair(augs::world& world) {
+		auto root = world.create_entity("crosshair");
+		auto recoil = world.create_entity("crosshair_recoil_body");
+
+		{
+			auto& sprite = *root += components::sprite();
+			auto& render = *root += components::render();
+			auto& transform = *root += components::transform();
+			auto& crosshair = *root += components::crosshair();
+
+			sprite.set(assets::texture_id::TEST_CROSSHAIR, rgba(255, 0, 0, 255));
+
+			render.layer = render_layer::CROSSHAIR;
+			render.interpolate = false;
+
+			crosshair.sensitivity.set(3, 3);
+
+			ingredients::make_always_visible(root);
+		}
+
+		{
+
+		}
+
+		return root;
 	}
 }

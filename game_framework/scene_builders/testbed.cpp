@@ -133,16 +133,9 @@ namespace scene_builders {
 		auto& player_response = resource_manager.create(assets::animation_response_id::TORSO_SET);
 		player_response[messages::animation_response_message::MOVE] = assets::animation_id::TORSO_MOVE;
 
-		world_camera = world.create_entity("camera");
-		auto crate = world.create_entity("crate");
-		auto crate2 = world.create_entity("crate2");
-		auto crate3 = world.create_entity("crate3");
-		auto crate4 = world.create_entity("crate4");
-
-		name_entity(crate, entity_name::CRATE);
-		name_entity(crate2, entity_name::CRATE);
-		name_entity(crate3, entity_name::CRATE);
-		name_entity(crate4, entity_name::CRATE);
+		auto crate = prefabs::create_crate(world, vec2(200, 300), vec2i(100, 100) / 3);
+		auto crate2 = prefabs::create_crate(world, vec2(400, 400), vec2i(300, 300));
+		auto crate4 = prefabs::create_crate(world, vec2(500, 0), vec2i(100, 100));
 
 		for (int x = -4 * 1; x < 4 * 1; ++x)
 		{
@@ -158,6 +151,7 @@ namespace scene_builders {
 		auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, -600, -90));
 		prefabs::create_motorcycle(world, components::transform(100, -600, -90));
 
+		world_camera = world.create_entity("camera");
 		ingredients::camera(world_camera, window_rect.w, window_rect.h);
 
 		auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
@@ -178,32 +172,13 @@ namespace scene_builders {
 		const int num_characters = 5;
 
 		for (int i = 0; i < num_characters; ++i) {
-			auto crosshair = world.create_entity("crosshair");
-			auto character = world.create_entity(typesafe_sprintf("player%x", i));
-			name_entity(character, entity_name::PERSON);
-
-			ingredients::wsad_character_crosshair(crosshair);
-			ingredients::wsad_character(character, crosshair);
-
-			character->get<components::transform>().pos = vec2(i * 100, 0);
-
-			ingredients::wsad_character_physics(character);
-
-			ingredients::character_inventory(character);
-
-			characters.push_back(character);
+			auto new_character = prefabs::create_character(world, vec2(i * 100, 0));
+			new_character.set_debug_name(typesafe_sprintf("player%x", i));
+			
+			characters.push_back(new_character);
 		}
 
 		ingredients::inject_window_input_to_character(characters[current_character], world_camera);
-
-		ingredients::sprite_scalled(crate, vec2(200, 300), vec2i(100, 100)/3, assets::texture_id::CRATE, augs::white, render_layer::DYNAMIC_BODY);
-		ingredients::crate_physics(crate);
-		
-		ingredients::sprite_scalled(crate2, vec2(400, 400), vec2i(300, 300), assets::texture_id::CRATE, augs::white, render_layer::DYNAMIC_BODY);
-		ingredients::crate_physics(crate2);
-		
-		ingredients::sprite_scalled(crate4, vec2(500, 0), vec2i(100, 100), assets::texture_id::CRATE, augs::white, render_layer::DYNAMIC_BODY);
-		ingredients::crate_physics(crate4);
 
 		prefabs::create_sample_suppressor(world, vec2(300, -500));
 

@@ -407,6 +407,7 @@
     <ClCompile Include="game_framework\ingredients\guns.cpp" />
     <ClCompile Include="game_framework\ingredients\ingredients.cpp" />
     <ClCompile Include="game_framework\ingredients\motorcycle.cpp" />
+    <ClCompile Include="game_framework\ingredients\obstacles.cpp" />
     <ClCompile Include="game_framework\ingredients\sprite.cpp" />
     <ClCompile Include="game_framework\ingredients\wsad_player.cpp" />
     <ClCompile Include="game_framework\messages\gui_intents.cpp" />

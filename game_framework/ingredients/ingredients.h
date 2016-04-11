@@ -29,10 +29,9 @@ namespace ingredients {
 	components::physics_definition& static_crate_physics(augs::entity_id);
 
 	void wsad_character_physics(augs::entity_id);
-
 	void wsad_character_legs(augs::entity_id legs, augs::entity_id player);
-	void wsad_character_crosshair(augs::entity_id);
 	void wsad_character(augs::entity_id, augs::entity_id crosshair_entity);
+
 	void inject_window_input_to_character(augs::entity_id target_character, augs::entity_id camera_entity);
 
 	void make_always_visible(augs::entity_id);
@@ -56,4 +55,8 @@ namespace prefabs {
 	augs::entity_id create_cyan_charge(augs::world&, vec2 pos);
 
 	augs::entity_id create_sample_backpack(augs::world&, vec2 pos);
+
+	augs::entity_id create_character_crosshair(augs::world&);
+	augs::entity_id create_character(augs::world&, vec2 pos);
+	augs::entity_id create_crate(augs::world&, vec2 pos, vec2 size);
 }
