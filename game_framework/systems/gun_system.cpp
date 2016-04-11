@@ -69,8 +69,6 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 		auto& container = it->get<components::container>();
 
 		if (gun.trigger_pressed && check_timeout_and_reset(gun.timeout_between_shots)) {
-			LOG("triggerreacted");
-
 			if (gun.action_mode != components::gun::action_type::AUTOMATIC)
 				gun.trigger_pressed = false;
 
@@ -157,8 +155,8 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 				if (maybe_item) {
 					auto owning_capability = get_owning_transfer_capability(it);
 					
-					if (owning_capability.alive())
-						gun.shake_camera(owning_capability[associated_entity_name::WATCHING_CAMERA], gun_transform.rotation);
+					//if (owning_capability.alive())
+					//	gun.shake_camera(owning_capability[associated_entity_name::WATCHING_CAMERA], gun_transform.rotation);
 				}
 
 				messages::particle_burst_message burst;
@@ -171,6 +169,9 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 					burst.target_group_to_refresh = it[sub_entity_name::BARREL_SMOKE];
 
 				parent_world.post_message(burst);
+
+				//components::physics::get_owner_body_entity(it)->get<components::physics>().body->ApplyAngularImpulse(randval(10.f, 20.f), true);
+
 				parent_world.post_message(messages::destroy_message(chamber_slot->items_inside[0]));
 				chamber_slot->items_inside.clear();
 

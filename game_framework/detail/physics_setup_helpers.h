@@ -15,6 +15,8 @@ struct body_definition {
 
 	bool fixed_rotation = false, bullet = false, angled_damping = false;
 	bool active = true;
+
+	float angle_motor_force_multiplier = 1.f;
 };
 
 struct fixture_definition {
