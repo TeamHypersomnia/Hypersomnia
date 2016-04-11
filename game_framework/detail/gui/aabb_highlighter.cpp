@@ -23,7 +23,8 @@ void aabb_highlighter::draw(shared::state_for_drawing_camera camera, augs::entit
 		auto* sprite = e->find<components::sprite>();
 		auto* physics = e->find<components::physics_definition>();
 
-		if (e->get_name_as_subentity() == sub_entity_name::CHARACTER_CROSSHAIR 
+		if (e->get_name_as_subentity() == sub_entity_name::CHARACTER_CROSSHAIR
+			|| e->get_name_as_subentity() == sub_entity_name::CROSSHAIR_RECOIL_BODY
 			||
 			(physics && physics->is_definition_entity))
 			return;
@@ -46,7 +47,7 @@ void aabb_highlighter::draw(shared::state_for_drawing_camera camera, augs::entit
 	auto adjusted_biggest_length = biggest_length - length_decrease;
 	auto adjusted_smallest = smallest_length - length_decrease;
 
-	int current_length = augs::interp(adjusted_smallest, adjusted_biggest_length, timer / cycle_duration_ms);
+	int current_length = augs::interp(adjusted_biggest_length, adjusted_smallest, timer / cycle_duration_ms);
 	int gap_animated_expansion = current_length - adjusted_smallest;
 	gap_x += gap_animated_expansion+length_decrease;
 	gap_y += gap_animated_expansion+length_decrease;
