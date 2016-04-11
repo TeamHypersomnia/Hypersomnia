@@ -62,8 +62,9 @@ vec2i components::camera::get_camera_offset_due_to_character_crosshair(augs::ent
 	/* skip calculations if no orbit_mode is specified */
 	if (crosshair_entity.alive() && orbit_mode != NONE) {
 		auto& crosshair = crosshair_entity->get<components::crosshair>();
+		auto recoil_entity = crosshair_entity[sub_entity_name::CROSSHAIR_RECOIL_BODY];
 
-		camera_crosshair_offset = crosshair.base_offset;
+		camera_crosshair_offset = crosshair.base_offset + recoil_entity->get<components::transform>().pos;
 
 		if (orbit_mode == ANGLED)
 			camera_crosshair_offset.set_length(angled_look_length);
@@ -105,8 +106,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 
 			if (camera.enable_smoothing) {
 				/* variable time step camera smoothing by averaging last position with the current */
-				float averaging_constant =
-					pow(camera.smoothing_average_factor, camera.averages_per_sec * delta_seconds());
+				float averaging_constant = 1.0f - pow(camera.smoothing_average_factor, camera.averages_per_sec * delta_seconds());
 				
 				if (camera.dont_smooth_once)
 					averaging_constant = 0.0f;
@@ -117,8 +117,8 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 				vec2i target = transform.pos + camera_crosshair_offset;
 				vec2i smoothed_part = camera_crosshair_offset;
 
-				camera.last_interpolant.pos = camera.last_interpolant.pos * averaging_constant + vec2d(smoothed_part) * (1.0f - averaging_constant);
-				camera.last_interpolant.rotation = camera.last_interpolant.rotation * averaging_constant + transform.rotation * (1.0f - averaging_constant);
+				camera.last_interpolant.pos = augs::interp(vec2d(camera.last_interpolant.pos), vec2d(smoothed_part), averaging_constant);
+				camera.last_interpolant.rotation = augs::interp(camera.last_interpolant.rotation, transform.rotation, averaging_constant);
 					
 				camera.last_ortho_interpolant.x = augs::interp(camera.last_ortho_interpolant.x, camera.visible_world_area.x, averaging_constant);
 				camera.last_ortho_interpolant.y = augs::interp(camera.last_ortho_interpolant.y, camera.visible_world_area.y, averaging_constant);

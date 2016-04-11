@@ -158,6 +158,7 @@ namespace prefabs {
 	augs::entity_id create_character_crosshair(augs::world& world) {
 		auto root = world.create_entity("crosshair");
 		auto recoil = world.create_entity("crosshair_recoil_body");
+		auto zero_target = world.create_entity("zero_target");
 
 		{
 			auto& sprite = *root += components::sprite();
@@ -176,8 +177,40 @@ namespace prefabs {
 		}
 
 		{
+			auto& sprite = *recoil += components::sprite();
+			auto& render = *recoil += components::render();
+			auto& transform = *recoil += components::transform();
+			auto& physics_definition = *recoil += components::physics_definition();
+			auto& force_joint = *recoil += components::force_joint();
+			*zero_target += components::transform();
+			
+			sprite.set(assets::texture_id::TEST_CROSSHAIR, rgba(0, 255, 0, 255));
 
+			render.layer = render_layer::OVER_CROSSHAIR;
+			render.interpolate = true;
+
+			auto& body = physics_definition.body;
+			auto& info = physics_definition.new_fixture();
+
+			info.from_renderable(recoil);
+
+			info.filter = filters::renderable();
+			//info.filter.categoryBits = 0;
+			info.density = 0.1;
+			info.sensor = true;
+			body.fixed_rotation = true;
+
+			body.linear_damping = 5;
+
+			force_joint.chased_entity = zero_target;
+			//force_joint.consider_rotation = false;
+			//force_joint.distance_when_force_easing_starts = 10.f;
+			//force_joint.force_towards_chased_entity = 1000.f;
+			//force_joint.power_of_force_easing_multiplier = 1.f;
+			force_joint.divide_transform_mode = true;
 		}
+
+		root->map_sub_entity(sub_entity_name::CROSSHAIR_RECOIL_BODY, recoil);
 
 		return root;
 	}

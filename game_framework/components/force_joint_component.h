@@ -14,6 +14,7 @@ namespace components {
 
 		float percent_applied_to_chased_entity = 0.f;
 
+		bool divide_transform_mode = false;
 		bool consider_rotation = true;
 		components::transform chased_entity_offset;
 

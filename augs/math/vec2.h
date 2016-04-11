@@ -15,7 +15,7 @@ template <typename T> int sgn(T val) {
 namespace augs {
 	template <class T, class A>
 	T interp(T a, T b, A alpha) {
-		return a * alpha + b * (static_cast<A>(1.0) - alpha);
+		return a * (static_cast<A>(1.0) - alpha) + b * (alpha);
 	}
 
 	template <class T>

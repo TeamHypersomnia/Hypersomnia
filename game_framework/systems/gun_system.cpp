@@ -150,10 +150,11 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 
 				parent_world.post_message(msg);
 
+				auto owning_capability = get_owning_transfer_capability(it);
+
 				auto* maybe_item = it->find<components::item>();
 
 				if (maybe_item) {
-					auto owning_capability = get_owning_transfer_capability(it);
 					
 					//if (owning_capability.alive())
 					//	gun.shake_camera(owning_capability[associated_entity_name::WATCHING_CAMERA], gun_transform.rotation);
@@ -170,7 +171,10 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 
 				parent_world.post_message(burst);
 
-				//components::physics::get_owner_body_entity(it)->get<components::physics>().body->ApplyAngularImpulse(randval(10.f, 20.f), true);
+				auto owning_crosshair_recoil = owning_capability[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
+				owning_crosshair_recoil->get<components::physics>().apply_impulse(
+					vec2().set_from_degrees(barrel_transform.rotation + randval(-40.f, 40.f)).set_length(randval(22, 26))
+					);
 
 				parent_world.post_message(messages::destroy_message(chamber_slot->items_inside[0]));
 				chamber_slot->items_inside.clear();

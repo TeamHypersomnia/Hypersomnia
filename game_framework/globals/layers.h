@@ -1,6 +1,7 @@
 #pragma once
 
 enum render_layer {
+	OVER_CROSSHAIR,
 	CROSSHAIR,
 	GUI,
 	HAT,
