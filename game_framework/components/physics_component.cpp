@@ -119,6 +119,10 @@ namespace components {
 		return METERS_TO_PIXELSf * body->GetPosition();
 	}
 
+	vec2 physics::get_mass_position() {
+		return METERS_TO_PIXELSf * body->GetWorldCenter();
+	}
+
 	vec2 physics::velocity() {
 		return vec2(body->GetLinearVelocity()) * METERS_TO_PIXELSf;
 	}

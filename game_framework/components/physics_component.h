@@ -57,6 +57,7 @@ namespace components {
 		float get_mass();
 		float get_angle();
 		vec2 get_position();
+		vec2 get_mass_position();
 		vec2 get_world_center();
 
 		vec2 get_aabb_size();
