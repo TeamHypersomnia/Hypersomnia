@@ -52,7 +52,7 @@ namespace ingredients {
 		info.density = 1.0;
 		body.fixed_rotation = false;
 		body.angled_damping = true;
-		body.angle_motor_force_multiplier = 0.5;
+		body.angle_motor_force_multiplier = 1.0;
 
 		body.linear_damping = 20;
 
@@ -82,8 +82,8 @@ namespace ingredients {
 		detector.spam_trigger_requests_when_detection_intented = true;
 
 		force_joint.force_towards_chased_entity = 85000.f;
-		force_joint.distance_when_force_easing_starts = 20.f;
-		force_joint.power_of_force_easing_multiplier = 1.f;
+		force_joint.distance_when_force_easing_starts = 10.f;
+		force_joint.power_of_force_easing_multiplier = 2.f;
 
 		driver.density_multiplier_while_driving = 0.02f;
 
@@ -166,7 +166,7 @@ namespace prefabs {
 			auto& transform = *root += components::transform();
 			auto& crosshair = *root += components::crosshair();
 
-			sprite.set(assets::texture_id::TEST_CROSSHAIR, rgba(255, 0, 0, 255));
+			sprite.set(assets::texture_id::TEST_CROSSHAIR, rgba(0, 255, 0, 255));
 
 			render.layer = render_layer::CROSSHAIR;
 			render.interpolate = false;

@@ -16,7 +16,7 @@ namespace ingredients {
 		auto& item = make_item(e);
 		
 		inventory_slot slot_def;
-		slot_def.space_available = to_space_units("7");
+		slot_def.space_available = to_space_units("200");
 
 		container.slots[slot_function::ITEM_DEPOSIT] = slot_def;
 
