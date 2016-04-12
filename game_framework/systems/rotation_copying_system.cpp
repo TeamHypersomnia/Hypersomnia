@@ -8,11 +8,56 @@
 #include "../detail/inventory_utils.h"
 #include "ensure.h"
 #include <Box2D\Dynamics\b2Body.h>
+#include "graphics/renderer.h"
 
-float colinearize_AB(vec2 center_of_rotation, vec2 A_inside, vec2 B_circumferential, vec2 crosshair_outside) {
-	vec2 radius = (B_circumferential - center_of_rotation).length();
+#include "game_framework/settings.h"
 
-	return 90.f;
+float colinearize_AB(vec2 O_center_of_rotation, vec2 A_inside, vec2 B_circumferential, vec2 C_crosshair_outside) {
+	auto crosshair_vector = C_crosshair_outside - O_center_of_rotation;
+	auto barrel_vector = B_circumferential - O_center_of_rotation;
+
+	if (crosshair_vector.is_epsilon())
+		crosshair_vector = barrel_vector;
+
+	if (crosshair_vector.length() < barrel_vector.length() + 1.f)
+		crosshair_vector.set_length(barrel_vector.length() + 1.f);
+	
+	C_crosshair_outside = O_center_of_rotation + crosshair_vector;
+
+	float oc_radius = crosshair_vector.length();
+	
+	auto intersection = circle_ray_intersection(B_circumferential, A_inside, O_center_of_rotation, oc_radius);
+	bool has_intersection = intersection.first;
+	
+	ensure(has_intersection);
+
+	auto G = intersection.second;
+	auto CG = C_crosshair_outside - G;
+	auto AG = A_inside - G;
+
+	auto final_angle = 2 * CG.angle_between(AG);
+	
+	if (DEBUG_DRAW_COLINEARIZATION) {
+		auto& ln = augs::renderer::get_current().logic_lines;
+
+		ln.draw_cyan(O_center_of_rotation, C_crosshair_outside);
+		ln.draw_red(O_center_of_rotation, A_inside);
+		ln.draw_red(O_center_of_rotation, B_circumferential);
+		ln.draw_yellow(O_center_of_rotation, G);
+		
+		ln.draw_green(G, A_inside);
+		ln.draw_green(G, C_crosshair_outside);
+
+		A_inside.rotate(final_angle, O_center_of_rotation);
+		B_circumferential.rotate(final_angle, O_center_of_rotation);
+
+		ln.draw_red(O_center_of_rotation, A_inside);
+		ln.draw_red(O_center_of_rotation, B_circumferential);
+
+		ln.draw(A_inside - (B_circumferential - A_inside) * 100, B_circumferential + (B_circumferential - A_inside)*100);
+	}
+
+	return final_angle;
 }
 
 void rotation_copying_system::resolve_rotation_copying_value(augs::entity_id it) {
@@ -40,9 +85,11 @@ void rotation_copying_system::resolve_rotation_copying_value(augs::entity_id it)
 
 					if (maybe_gun) {
 						auto gun_transform = subject_item->get<components::transform>();
-						gun_transform.rotation = 0;
+						auto mc = it->get<components::physics>().get_mass_position();
 
-						new_angle = colinearize_AB(transform.pos, gun_transform.pos, maybe_gun->calculate_barrel_transform(gun_transform).pos, target_transform->pos);
+						new_angle =
+							transform.rotation +
+							colinearize_AB(mc, gun_transform.pos, maybe_gun->calculate_barrel_transform(gun_transform).pos, target_transform->pos);
 					}
 				}
 			}
