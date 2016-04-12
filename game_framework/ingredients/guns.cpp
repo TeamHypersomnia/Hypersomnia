@@ -203,9 +203,10 @@ namespace prefabs {
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
 
-		gun.shell_spawn_offset.set(0, 10);
+		gun.shell_spawn_offset.pos.set(0, 10);
+		gun.shell_spawn_offset.rotation = 45;
 		gun.shell_angular_velocity = std::make_pair(2.f, 14.f);
-		gun.shell_spread_degrees = 80.f;
+		gun.shell_spread_degrees = 20.f;
 		gun.shell_velocity = std::make_pair(300, 1700);
 		gun.damage_multiplier = 1.f;
 
@@ -229,9 +230,10 @@ namespace prefabs {
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
 
-		gun.shell_spawn_offset.set(0, 10);
+		gun.shell_spawn_offset.pos.set(0, 10);
+		gun.shell_spawn_offset.rotation = 45;
 		gun.shell_angular_velocity = std::make_pair(2.f, 14.f);
-		gun.shell_spread_degrees = 80.f;
+		gun.shell_spread_degrees = 20.f;
 		gun.shell_velocity = std::make_pair(300, 1700);
 		gun.damage_multiplier = 1.f;
 
@@ -255,9 +257,10 @@ namespace prefabs {
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
 
-		gun.shell_spawn_offset.set(0, 10);
+		gun.shell_spawn_offset.pos.set(0, 10);
+		gun.shell_spawn_offset.rotation = 45;
 		gun.shell_angular_velocity = std::make_pair(2.f, 14.f);
-		gun.shell_spread_degrees = 80.f;
+		gun.shell_spread_degrees = 20.f;
 		gun.shell_velocity = std::make_pair(300, 1700);
 		gun.damage_multiplier = 1.f;
 

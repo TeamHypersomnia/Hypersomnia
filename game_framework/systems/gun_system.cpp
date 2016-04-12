@@ -116,10 +116,10 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 						if (shell_definition.alive()) {
 							auto shell_entity = parent_world.clone_entity(shell_definition);
 
-							auto spread_component = randval(gun.shell_spread_degrees);
+							auto spread_component = randval(gun.shell_spread_degrees) + gun.shell_spawn_offset.rotation;
 
 							auto shell_transform = gun_transform;
-							shell_transform.pos += vec2(gun.shell_spawn_offset).rotate(gun_transform.rotation, vec2());
+							shell_transform.pos += vec2(gun.shell_spawn_offset.pos).rotate(gun_transform.rotation, vec2());
 							shell_transform.rotation += spread_component;
 
 							auto& physics_definition = shell_entity->get<components::physics_definition>();

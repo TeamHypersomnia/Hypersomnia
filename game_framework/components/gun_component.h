@@ -40,6 +40,6 @@ namespace components {
 
 		float shell_spread_degrees = 20.f;
 
-		vec2 shell_spawn_offset;
+		components::transform shell_spawn_offset;
 	};
 }
