@@ -7,6 +7,7 @@
 #include <Box2D\Box2D.h>
 
 #include "render_system.h"
+#include "log.h"
 
 void car_system::set_steering_flags_from_intents() {
 	auto& intents = parent_world.get_message_queue<messages::intent_message>();
@@ -127,5 +128,8 @@ void car_system::apply_movement_forces() {
 		if(forwardal_speed > car.minimum_speed_for_maneuverability_decrease)
 			body->ApplyAngularImpulse(body->GetInertia() * -body->GetAngularVelocity() * 
 				(forwardal_speed-car.minimum_speed_for_maneuverability_decrease)*car.maneuverability_decrease_multiplier, true);
+
+		//float angle = physics.get_angle();
+		//LOG("F: %x, %x, %x", AS_INTV physics.get_position(), AS_INT angle, AS_INTV physics.velocity());
 	}
 }
