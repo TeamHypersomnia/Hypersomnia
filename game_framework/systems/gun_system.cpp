@@ -58,6 +58,14 @@ void components::gun::shake_camera(augs::entity_id target_camera_to_shake, float
 	}
 }
 
+components::transform components::gun::calculate_barrel_transform(components::transform gun_transform) {
+	auto barrel_transform = gun_transform;
+	barrel_transform.pos += vec2(bullet_spawn_offset).rotate(gun_transform.rotation, vec2());
+
+	return barrel_transform;
+}
+
+
 void gun_system::launch_shots_due_to_pressed_triggers() {
 	auto& physics_sys = parent_world.get_system<physics_system>();
 	auto& render = parent_world.get_system<render_system>();
@@ -74,8 +82,7 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 			auto chamber_slot = it[slot_function::GUN_CHAMBER];
 
 			if (chamber_slot->get_mounted_items().size() == 1) {
-				auto barrel_transform = gun_transform;
-				barrel_transform.pos += vec2(gun.bullet_spawn_offset).rotate(gun_transform.rotation, vec2());
+				auto barrel_transform = gun.calculate_barrel_transform(gun_transform);
 				
 				auto item_in_chamber = chamber_slot->get_mounted_items()[0];
 

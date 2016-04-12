@@ -31,6 +31,8 @@ namespace components {
 
 		void shake_camera(augs::entity_id, float direction);
 
+		components::transform calculate_barrel_transform(components::transform gun_transform);
+
 		// state
 		
 		bool trigger_pressed = false;

@@ -18,6 +18,7 @@ namespace components {
 		};
 		
 		int easing_mode = NONE;
+		bool colinearize_item_in_hand = false;
 		
 		/* for exponential smoothing */
 		double smoothing_average_factor = 0.5;
