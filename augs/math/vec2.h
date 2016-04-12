@@ -376,6 +376,13 @@ namespace augs {
 			return false;
 		}
 
+		bool is_epsilon(const float epsilon = AUGS_EPSILON) {
+			if (std::abs(x) < epsilon && std::abs(y) < epsilon)
+				return true;
+
+			return false;
+		}
+
 		bool compare(const vec2t& b, const float epsilon = AUGS_EPSILON) {
 			if ((*this - b).length_sq() <= epsilon*epsilon)
 				return true;

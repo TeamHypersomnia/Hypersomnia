@@ -80,6 +80,9 @@ namespace components {
 	}
 	
 	void physics::apply_force(vec2 pixels, vec2 center_offset, bool wake) {
+		if (pixels.is_epsilon(2.f))
+			return;
+
 		vec2 force = pixels * PIXELS_TO_METERSf;
 		vec2 location = body->GetWorldCenter() + (center_offset * PIXELS_TO_METERSf);
 
@@ -96,6 +99,9 @@ namespace components {
 	}
 
 	void physics::apply_impulse(vec2 pixels, vec2 center_offset, bool wake) {
+		if (pixels.is_epsilon(2.f))
+			return;
+
 		vec2 force = pixels * PIXELS_TO_METERSf;
 		vec2 location = body->GetWorldCenter() + (center_offset * PIXELS_TO_METERSf);
 

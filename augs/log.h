@@ -5,6 +5,8 @@
 #include <type_traits>
 
 #define ENABLE_DEBUG_LOG 1
+#define AS_INTV *(vec2i*)&
+#define AS_INT *(int*)&
 
 void typesafe_sprintf_detail(size_t, std::string&);
 

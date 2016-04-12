@@ -64,7 +64,10 @@ vec2i components::camera::get_camera_offset_due_to_character_crosshair(augs::ent
 		auto& crosshair = crosshair_entity->get<components::crosshair>();
 		auto recoil_entity = crosshair_entity[sub_entity_name::CROSSHAIR_RECOIL_BODY];
 
-		camera_crosshair_offset = crosshair.base_offset + recoil_entity->get<components::transform>().pos;
+		camera_crosshair_offset = crosshair.base_offset; 
+		
+		if (vec2i(recoil_entity->get<components::transform>().pos).length_sq() > 4)
+			camera_crosshair_offset += vec2i(recoil_entity->get<components::transform>().pos);
 
 		if (orbit_mode == ANGLED)
 			camera_crosshair_offset.set_length(angled_look_length);
@@ -79,6 +82,7 @@ vec2i components::camera::get_camera_offset_due_to_character_crosshair(augs::ent
 
 	return camera_crosshair_offset;
 }
+#include "log.h"
 
 void camera_system::resolve_cameras_transforms_and_smoothing() {
 	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
@@ -120,8 +124,8 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 				camera.last_interpolant.pos = augs::interp(vec2d(camera.last_interpolant.pos), vec2d(smoothed_part), averaging_constant);
 				camera.last_interpolant.rotation = augs::interp(camera.last_interpolant.rotation, transform.rotation, averaging_constant);
 					
-				camera.last_ortho_interpolant.x = augs::interp(camera.last_ortho_interpolant.x, camera.visible_world_area.x, averaging_constant);
-				camera.last_ortho_interpolant.y = augs::interp(camera.last_ortho_interpolant.y, camera.visible_world_area.y, averaging_constant);
+				camera.last_ortho_interpolant.x = camera.visible_world_area.x; //augs::interp(camera.last_ortho_interpolant.x, camera.visible_world_area.x, averaging_constant);
+				camera.last_ortho_interpolant.y = camera.visible_world_area.y; //augs::interp(camera.last_ortho_interpolant.y, camera.visible_world_area.y, averaging_constant);
 
 				/* save smoothing result */
 				//if ((smoothed_camera_transform.pos - camera.last_interpolant.pos).length() > 5)
@@ -151,16 +155,15 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 				auto maybe_physics = camera.entity_to_chase->find<components::physics>();
 
 				if (maybe_physics) {
-					auto player_pos = maybe_physics->get_position();
+					auto player_pos = maybe_physics->get_mass_position();
 
 					if (player_pos != camera.previous_step_player_position) {
 						camera.previous_seen_player_position = camera.previous_step_player_position;
 						camera.previous_step_player_position = player_pos;
 					}
 
-					target_value = (player_pos - camera.previous_seen_player_position) / delta_seconds();
-
-					//maybe_physics->velocity();
+					target_value = (player_pos - camera.previous_seen_player_position) * fixed_delta_milliseconds();
+					auto vel = maybe_physics->velocity();
 					
 					if (target_value.length() < camera.smoothing_player_pos.value.length())
 						// braking
@@ -170,6 +173,8 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 					
 					if (target_value.length() > 50)
 						target_value.set_length(50);
+
+					// LOG("%x, %x, %x", *(vec2i*)&player_pos, *(vec2i*)&camera.previous_step_player_position, *(vec2i*)&target_value);
 				}
 				else {
 					target_value = camera.entity_to_chase->get<components::render>().interpolation_direction();
