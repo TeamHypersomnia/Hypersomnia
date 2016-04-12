@@ -44,7 +44,7 @@ void force_joint_system::apply_forces_towards_target_entities() {
 				else
 					physics.apply_force(force_for_chaser * physics.get_mass());
 
-				LOG("F: %x, %x, %x", force_for_chaser, physics.velocity(), AS_INTV physics.get_position());
+				//LOG("F: %x, %x, %x", force_for_chaser, physics.velocity(), AS_INTV physics.get_position());
 			}
 			//else if (is_force_epsilon && physics.velocity().is_epsilon(1.f)) {
 			//	physics.set_velocity(vec2(0, 0));
