@@ -12,6 +12,8 @@ template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
 
+std::pair<bool, vec2> circle_ray_intersection(vec2 a, vec2 b, vec2 circle, float radius);
+
 namespace augs {
 	template <class T, class A>
 	T interp(T a, T b, A alpha) {
