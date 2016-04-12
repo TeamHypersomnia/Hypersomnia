@@ -33,6 +33,10 @@ namespace augs {
 	double processing_system::delta_milliseconds() const {
 		return parent_overworld.delta_milliseconds();
 	}
+
+	double processing_system::fixed_delta_milliseconds() const {
+		return parent_overworld.fixed_delta_milliseconds();
+	}
 	
 	double processing_system::view_interpolation_ratio() const {
 		return parent_overworld.view_interpolation_ratio();

@@ -30,6 +30,7 @@ namespace augs {
 
 		double delta_seconds() const;
 		double delta_milliseconds() const;
+		double fixed_delta_milliseconds() const;
 		double view_interpolation_ratio() const;
 		augs::renderer& get_renderer();
 

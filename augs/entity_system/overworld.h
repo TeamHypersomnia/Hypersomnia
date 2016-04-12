@@ -17,6 +17,7 @@ namespace augs {
 		overworld();
 
 		double delta_milliseconds() const;
+		double fixed_delta_milliseconds() const;
 		double delta_seconds() const;
 		double view_interpolation_ratio() const;
 

@@ -17,6 +17,10 @@ namespace augs {
 		return delta_ms;
 	}
 
+	double overworld::fixed_delta_milliseconds() const {
+		return delta_timer.delta_milliseconds();
+	}
+
 	double overworld::view_interpolation_ratio() const {
 		return delta_timer.fraction_of_time_until_the_next_logic_step();
 	}
@@ -26,6 +30,6 @@ namespace augs {
 	}
 
 	void overworld::restore_fixed_delta() {
-		delta_ms = delta_timer.delta_milliseconds();
+		delta_ms = fixed_delta_milliseconds();
 	}
 }
