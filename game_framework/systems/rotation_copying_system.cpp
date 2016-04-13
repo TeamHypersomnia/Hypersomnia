@@ -12,9 +12,9 @@
 
 #include "game_framework/settings.h"
 
-float colinearize_AB(vec2 O_center_of_rotation, vec2 A_inside, vec2 B_circumferential, vec2 C_crosshair_outside) {
-	auto crosshair_vector = C_crosshair_outside - O_center_of_rotation;
-	auto barrel_vector = B_circumferential - O_center_of_rotation;
+float colinearize_AB(vec2 O_center_of_rotation, vec2 A_rifle_center, vec2 B_barrel, vec2 C_crosshair) {
+	auto crosshair_vector = C_crosshair - O_center_of_rotation;
+	auto barrel_vector = B_barrel - O_center_of_rotation;
 	
 	if (crosshair_vector.is_epsilon(1.f))
 		crosshair_vector.set(1, 0);
@@ -22,39 +22,39 @@ float colinearize_AB(vec2 O_center_of_rotation, vec2 A_inside, vec2 B_circumfere
 	if (crosshair_vector.length() < barrel_vector.length() + 1.f)
 		crosshair_vector.set_length(barrel_vector.length() + 1.f);
 	
-	C_crosshair_outside = O_center_of_rotation + crosshair_vector;
+	C_crosshair = O_center_of_rotation + crosshair_vector;
 
 	float oc_radius = crosshair_vector.length();
 	
-	auto intersection = circle_ray_intersection(B_circumferential, A_inside, O_center_of_rotation, oc_radius);
+	auto intersection = circle_ray_intersection(B_barrel, A_rifle_center, O_center_of_rotation, oc_radius);
 	bool has_intersection = intersection.first;
 	
 	ensure(has_intersection);
 
 	auto G = intersection.second;
-	auto CG = C_crosshair_outside - G;
-	auto AG = A_inside - G;
+	auto CG = C_crosshair - G;
+	auto AG = A_rifle_center - G;
 
 	auto final_angle = 2 * CG.angle_between(AG);
 	
 	if (DEBUG_DRAW_COLINEARIZATION) {
 		auto& ln = augs::renderer::get_current().logic_lines;
 
-		ln.draw_cyan(O_center_of_rotation, C_crosshair_outside);
-		ln.draw_red(O_center_of_rotation, A_inside);
-		ln.draw_red(O_center_of_rotation, B_circumferential);
+		ln.draw_cyan(O_center_of_rotation, C_crosshair);
+		ln.draw_red(O_center_of_rotation, A_rifle_center);
+		ln.draw_red(O_center_of_rotation, B_barrel);
 		ln.draw_yellow(O_center_of_rotation, G);
 		
-		ln.draw_green(G, A_inside);
-		ln.draw_green(G, C_crosshair_outside);
+		ln.draw_green(G, A_rifle_center);
+		ln.draw_green(G, C_crosshair);
 
-		A_inside.rotate(final_angle, O_center_of_rotation);
-		B_circumferential.rotate(final_angle, O_center_of_rotation);
+		A_rifle_center.rotate(final_angle, O_center_of_rotation);
+		B_barrel.rotate(final_angle, O_center_of_rotation);
 
-		ln.draw_red(O_center_of_rotation, A_inside);
-		ln.draw_red(O_center_of_rotation, B_circumferential);
+		ln.draw_red(O_center_of_rotation, A_rifle_center);
+		ln.draw_red(O_center_of_rotation, B_barrel);
 
-		ln.draw(A_inside - (B_circumferential - A_inside) * 100, B_circumferential + (B_circumferential - A_inside)*100);
+		ln.draw(A_rifle_center - (B_barrel - A_rifle_center) * 100, B_barrel + (B_barrel - A_rifle_center)*100);
 	}
 
 	return final_angle;
