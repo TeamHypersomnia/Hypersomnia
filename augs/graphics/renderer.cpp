@@ -15,6 +15,7 @@
 
 #include "game_framework/resources/manager.h"
 #include "gui/gui_world.h"
+#include "options.h"
 
 namespace augs {
 	renderer& renderer::get_current() {
@@ -219,7 +220,7 @@ namespace augs {
 			push_line(new_line);
 		};
 
-		if (logic_lines.lines.size() == prev_logic_lines.lines.size()) {
+		if (INTERPOLATE_DEBUG_LINES && logic_lines.lines.size() == prev_logic_lines.lines.size()) {
 			std::vector<debug_line> interpolated_logic_lines;
 			interpolated_logic_lines.resize(logic_lines.lines.size());
 

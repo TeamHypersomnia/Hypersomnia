@@ -8,9 +8,13 @@
 
 void typesafe_sprintf_detail(size_t, std::string&) {}
 
+#include <fstream>
+
 template<>
 void LOG(std::string f) {
 	std::cout << f << std::endl;
+	std::ofstream recording_file("live_debug.txt", std::ios::out | std::ios::app);
+	recording_file << f << std::endl;
 }
 
 void CALL_SHELL(std::string s) {

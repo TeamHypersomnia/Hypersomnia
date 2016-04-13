@@ -1164,6 +1164,9 @@
     <ClCompile Include="game_framework\ingredients\obstacles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="augs\options.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">

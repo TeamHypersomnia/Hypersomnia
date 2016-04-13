@@ -15,9 +15,9 @@
 float colinearize_AB(vec2 O_center_of_rotation, vec2 A_inside, vec2 B_circumferential, vec2 C_crosshair_outside) {
 	auto crosshair_vector = C_crosshair_outside - O_center_of_rotation;
 	auto barrel_vector = B_circumferential - O_center_of_rotation;
-
-	if (crosshair_vector.is_epsilon())
-		crosshair_vector = barrel_vector;
+	
+	if (crosshair_vector.is_epsilon(1.f))
+		crosshair_vector.set(1, 0);
 
 	if (crosshair_vector.length() < barrel_vector.length() + 1.f)
 		crosshair_vector.set_length(barrel_vector.length() + 1.f);

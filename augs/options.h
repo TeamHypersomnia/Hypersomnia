@@ -12,3 +12,5 @@
 #else
 #include "error\augs_error.h"
 #endif
+
+extern bool INTERPOLATE_DEBUG_LINES;
