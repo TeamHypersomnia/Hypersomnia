@@ -212,5 +212,8 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 				}
 			}
 		}
+		else if (unset_or_passed(gun.timeout_between_shots)) {
+			gun.recoil.cooldown(delta_milliseconds());
+		}
 	}
 }
