@@ -106,6 +106,7 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 						{
 							auto round_entity = parent_world.clone_entity(catridge_or_pellet_stack[sub_entity_name::BULLET_ROUND_DEFINITION]);
 							round_entity->get<components::damage>().amount *= gun.damage_multiplier;
+							round_entity->get<components::damage>().sender = it;
 
 							auto& physics_definition = round_entity->get<components::physics_definition>();
 							physics_definition.is_definition_entity = false;

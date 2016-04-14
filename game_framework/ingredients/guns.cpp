@@ -199,7 +199,7 @@ namespace prefabs {
 		gun.action_mode = components::gun::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(4000, 4000);
 		gun.timeout_between_shots.set(100);
-		gun.bullet_spawn_offset.set(70, 0);
+		gun.bullet_spawn_offset.set(2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
 
@@ -223,6 +223,20 @@ namespace prefabs {
 			{ vec2().set_from_degrees(21) },
 			{ vec2().set_from_degrees(0) },
 			{ vec2().set_from_degrees(53) },
+			{ vec2().set_from_degrees(10) },
+			{ vec2().set_from_degrees(-30) },
+			{ vec2().set_from_degrees(-60) },
+			{ vec2().set_from_degrees(-70) },
+			{ vec2().set_from_degrees(-80) },
+			{ vec2().set_from_degrees(-20) },
+			{ vec2().set_from_degrees(50) },
+			{ vec2().set_from_degrees(80) },
+			{ vec2().set_from_degrees(120) },
+			{ vec2().set_from_degrees(60) },
+			{ vec2().set_from_degrees(20) },
+			{ vec2().set_from_degrees(40) },
+			{ vec2().set_from_degrees(20) },
+			{ vec2().set_from_degrees(-40) },
 		};
 		
 		gun.recoil.scale = 30.0;
@@ -243,7 +257,7 @@ namespace prefabs {
 		gun.action_mode = components::gun::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(3000, 3000);
 		gun.timeout_between_shots.set(50);
-		gun.bullet_spawn_offset.set(70, 0);
+		gun.bullet_spawn_offset.set(2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
 
@@ -256,30 +270,33 @@ namespace prefabs {
 
 		gun.recoil.offsets = {
 			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(6) },
+			{ vec2().set_from_degrees(-11) },
+			{ vec2().set_from_degrees(7) },
+			{ vec2().set_from_degrees(14) },
+			{ vec2().set_from_degrees(-18) },
+			{ vec2().set_from_degrees(24) },
+			{ vec2().set_from_degrees(-33) },
+			{ vec2().set_from_degrees(-4) },
+			{ vec2().set_from_degrees(21) },
 			{ vec2().set_from_degrees(0) },
-			{ vec2().set_from_degrees(0) },
-			{ vec2().set_from_degrees(0) },
-			{ vec2().set_from_degrees(0) },
-
-			{ vec2().set_from_degrees(90) },
-			{ vec2().set_from_degrees(90) },
-			{ vec2().set_from_degrees(90) },
-			{ vec2().set_from_degrees(90) },
-			{ vec2().set_from_degrees(90) },
-
-			{ vec2().set_from_degrees(180) },
-			{ vec2().set_from_degrees(180) },
-			{ vec2().set_from_degrees(180) },
-			{ vec2().set_from_degrees(180) },
-			{ vec2().set_from_degrees(180) },
-
-			{ vec2().set_from_degrees(270) },
-			{ vec2().set_from_degrees(270) },
-			{ vec2().set_from_degrees(270) },
-			{ vec2().set_from_degrees(270) },
-			{ vec2().set_from_degrees(270) },
+			{ vec2().set_from_degrees(53) },
+			{ vec2().set_from_degrees(10) },
+			{ vec2().set_from_degrees(-30) },
+			{ vec2().set_from_degrees(-60) },
+			{ vec2().set_from_degrees(-70) },
+			{ vec2().set_from_degrees(-80) },
+			{ vec2().set_from_degrees(-20) },
+			{ vec2().set_from_degrees(50) },
+			{ vec2().set_from_degrees(80) },
+			{ vec2().set_from_degrees(120) },
+			{ vec2().set_from_degrees(60) },
+			{ vec2().set_from_degrees(20) },
+			{ vec2().set_from_degrees(40) },
+			{ vec2().set_from_degrees(20) },
+			{ vec2().set_from_degrees(-40) },
 		};
-		
+
 		gun.recoil.scale = 30.0;
 
 		return weapon;
@@ -298,7 +315,7 @@ namespace prefabs {
 		gun.action_mode = components::gun::SEMI_AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(2500, 2500);
 		gun.timeout_between_shots.set(150);
-		gun.bullet_spawn_offset.set(70, 0);
+		gun.bullet_spawn_offset.set(2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
 
@@ -311,29 +328,33 @@ namespace prefabs {
 
 		gun.recoil.offsets = {
 			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(6) },
+			{ vec2().set_from_degrees(-11) },
+			{ vec2().set_from_degrees(7) },
+			{ vec2().set_from_degrees(14) },
+			{ vec2().set_from_degrees(-18) },
+			{ vec2().set_from_degrees(24) },
+			{ vec2().set_from_degrees(-33) },
+			{ vec2().set_from_degrees(-4) },
+			{ vec2().set_from_degrees(21) },
 			{ vec2().set_from_degrees(0) },
-			{ vec2().set_from_degrees(0) },
-			{ vec2().set_from_degrees(0) },
-			{ vec2().set_from_degrees(0) },
-
-			{ vec2().set_from_degrees(90) },
-			{ vec2().set_from_degrees(90) },
-			{ vec2().set_from_degrees(90) },
-			{ vec2().set_from_degrees(90) },
-			{ vec2().set_from_degrees(90) },
-
-			{ vec2().set_from_degrees(180) },
-			{ vec2().set_from_degrees(180) },
-			{ vec2().set_from_degrees(180) },
-			{ vec2().set_from_degrees(180) },
-			{ vec2().set_from_degrees(180) },
-
-			{ vec2().set_from_degrees(270) },
-			{ vec2().set_from_degrees(270) },
-			{ vec2().set_from_degrees(270) },
-			{ vec2().set_from_degrees(270) },
-			{ vec2().set_from_degrees(270) },
+			{ vec2().set_from_degrees(53) },
+			{ vec2().set_from_degrees(10) },
+			{ vec2().set_from_degrees(-30) },
+			{ vec2().set_from_degrees(-60) },
+			{ vec2().set_from_degrees(-70) },
+			{ vec2().set_from_degrees(-80) },
+			{ vec2().set_from_degrees(-20) },
+			{ vec2().set_from_degrees(50) },
+			{ vec2().set_from_degrees(80) },
+			{ vec2().set_from_degrees(120) },
+			{ vec2().set_from_degrees(60) },
+			{ vec2().set_from_degrees(20) },
+			{ vec2().set_from_degrees(40) },
+			{ vec2().set_from_degrees(20) },
+			{ vec2().set_from_degrees(-40) },
 		};
+
 
 		gun.recoil.scale = 30.0;
 

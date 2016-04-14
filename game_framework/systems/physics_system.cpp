@@ -15,6 +15,7 @@ float PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 
 #include "../detail/physics_setup_helpers.h"
 #include "../components/physics_definition_component.h"
+#include "../components/damage_component.h"
 
 #include "../components/fixtures_component.h"
 
@@ -424,15 +425,15 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 				}
 		}
 
-		auto* maybe_driver = components::physics::get_owner_body_entity(msg.subject)->find<components::driver>();
-		auto* maybe_damage = msg.subject->find<components::damage>();
+		auto* driver = components::physics::get_owner_body_entity(msg.subject)->find<components::driver>();
+		auto* damage = msg.subject->find<components::damage>();
 
-		if (maybe_driver) {
-			/* do not collide with the car I currently ride to avoid strange artifacts */
-			if (maybe_driver->owned_vehicle == components::physics::get_owner_body_entity(msg.collider)) {
-				contact->SetEnabled(false);
-				return;
-			}
+		bool colliding_with_owning_car = driver && driver->owned_vehicle == components::physics::get_owner_body_entity(msg.collider);
+		bool bullet_colliding_with_sender = damage && components::physics::get_owner_body_entity(damage->sender) == components::physics::get_owner_body_entity(msg.collider);
+
+		if (colliding_with_owning_car || bullet_colliding_with_sender) {
+			contact->SetEnabled(false);
+			return;
 		}
 
 		msg.point = manifold.points[0];
