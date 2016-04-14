@@ -217,4 +217,5 @@ void game_world::perform_logic_step() {
 	get_system<render_system>().set_current_transforms_as_previous_for_interpolation();
 
 	++current_step_number;
+	seconds_passed += parent_overworld.delta_seconds();
 }

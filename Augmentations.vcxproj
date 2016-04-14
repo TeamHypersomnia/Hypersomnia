@@ -356,6 +356,7 @@
     <ClCompile Include="augs\entity_system\entity_id.cpp" />
     <ClCompile Include="augs\gui\appearance_detector.cpp" />
     <ClCompile Include="augs\misc\deterministic_timing.cpp" />
+    <ClCompile Include="augs\misc\recoil_player.cpp" />
     <ClCompile Include="augs\options.cpp" />
     <ClCompile Include="augs\texture_baker\polygonize_sprite.cpp" />
     <ClCompile Include="game_framework\bindings\file_watcher_binding.cpp" />
@@ -963,6 +964,7 @@
     <ClInclude Include="augs\gui\rect_id.h" />
     <ClInclude Include="augs\misc\constant_size_vector.h" />
     <ClInclude Include="augs\misc\deterministic_timing.h" />
+    <ClInclude Include="augs\misc\recoil_player.h" />
     <ClInclude Include="augs\stream.h" />
     <ClInclude Include="game_framework\all_component_includes.h" />
     <ClInclude Include="game_framework\all_message_includes.h" />

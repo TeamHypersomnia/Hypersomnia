@@ -26,6 +26,10 @@ namespace augs {
 		targets.clear();
 	}
 
+	deterministic_timestamp processing_system::get_current_timestamp() const {
+		return parent_world.get_current_timestamp();
+	}
+
 	double processing_system::delta_seconds() const {
 		return parent_overworld.delta_seconds();
 	}

@@ -15,6 +15,12 @@ namespace augs {
 			((memory_pool*)cont.second)->resize(entity_pool_capacity);
 	}
 
+	deterministic_timestamp world::get_current_timestamp() const {
+		deterministic_timestamp result;
+		result.seconds_passed = seconds_passed;
+		return result;
+	}
+
 	world::~world() {
 		delete_all_entities();
 	}

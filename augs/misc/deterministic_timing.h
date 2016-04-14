@@ -1,4 +1,5 @@
 #pragma once
+#include "ensure.h"
 
 namespace augs {
 	class world;
@@ -11,5 +12,16 @@ namespace augs {
 		void unset();
 		void set(float timeout_ms);
 		deterministic_timeout(float timeout_ms);
+	};
+
+	struct deterministic_timestamp {
+		double seconds_passed = -1;
+
+		deterministic_timestamp operator-(deterministic_timestamp b) const;
+
+		operator double() const;
+
+		double get_milliseconds() const;
+		double get_seconds() const;
 	};
 }

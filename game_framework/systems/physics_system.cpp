@@ -425,6 +425,7 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 		}
 
 		auto* maybe_driver = components::physics::get_owner_body_entity(msg.subject)->find<components::driver>();
+		auto* maybe_damage = msg.subject->find<components::damage>();
 
 		if (maybe_driver) {
 			/* do not collide with the car I currently ride to avoid strange artifacts */

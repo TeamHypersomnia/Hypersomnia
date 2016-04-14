@@ -7,6 +7,7 @@
 #include "../detail/physics_setup_helpers.h"
 
 #include "misc/deterministic_timing.h"
+#include "misc/recoil_player.h"
 
 class gun_system;
 namespace components {
@@ -41,6 +42,8 @@ namespace components {
 		std::pair<float, float> shell_angular_velocity;
 
 		float shell_spread_degrees = 20.f;
+
+		recoil_player recoil;
 
 		components::transform shell_spawn_offset;
 	};

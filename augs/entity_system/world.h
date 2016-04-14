@@ -111,9 +111,12 @@ namespace augs {
 
 		void delete_all_entities();
 
+		deterministic_timestamp get_current_timestamp() const;
+
 		overworld& parent_overworld;
 		int entity_pool_capacity = 0;
 		unsigned long long current_step_number = 0;
+		double seconds_passed = 0.0;
 
 	private:
 		friend class entity;

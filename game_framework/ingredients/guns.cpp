@@ -210,6 +210,35 @@ namespace prefabs {
 		gun.shell_velocity = std::make_pair(300, 1700);
 		gun.damage_multiplier = 1.f;
 
+		gun.recoil.offsets = {
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(20) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(70) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(20) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(70) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(20) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(70) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(20) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(70) },
+		};
+		
+		gun.recoil.scale = 30.0;
+
 		return sample_rifle;
 	}
 
@@ -237,6 +266,34 @@ namespace prefabs {
 		gun.shell_velocity = std::make_pair(300, 1700);
 		gun.damage_multiplier = 1.f;
 
+		gun.recoil.offsets = {
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(0) },
+
+			{ vec2().set_from_degrees(90) },
+			{ vec2().set_from_degrees(90) },
+			{ vec2().set_from_degrees(90) },
+			{ vec2().set_from_degrees(90) },
+			{ vec2().set_from_degrees(90) },
+
+			{ vec2().set_from_degrees(180) },
+			{ vec2().set_from_degrees(180) },
+			{ vec2().set_from_degrees(180) },
+			{ vec2().set_from_degrees(180) },
+			{ vec2().set_from_degrees(180) },
+
+			{ vec2().set_from_degrees(270) },
+			{ vec2().set_from_degrees(270) },
+			{ vec2().set_from_degrees(270) },
+			{ vec2().set_from_degrees(270) },
+			{ vec2().set_from_degrees(270) },
+		};
+		
+		gun.recoil.scale = 30.0;
+
 		return weapon;
 	}
 
@@ -263,6 +320,34 @@ namespace prefabs {
 		gun.shell_spread_degrees = 20.f;
 		gun.shell_velocity = std::make_pair(300, 1700);
 		gun.damage_multiplier = 1.f;
+
+		gun.recoil.offsets = {
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(0) },
+			{ vec2().set_from_degrees(0) },
+
+			{ vec2().set_from_degrees(90) },
+			{ vec2().set_from_degrees(90) },
+			{ vec2().set_from_degrees(90) },
+			{ vec2().set_from_degrees(90) },
+			{ vec2().set_from_degrees(90) },
+
+			{ vec2().set_from_degrees(180) },
+			{ vec2().set_from_degrees(180) },
+			{ vec2().set_from_degrees(180) },
+			{ vec2().set_from_degrees(180) },
+			{ vec2().set_from_degrees(180) },
+
+			{ vec2().set_from_degrees(270) },
+			{ vec2().set_from_degrees(270) },
+			{ vec2().set_from_degrees(270) },
+			{ vec2().set_from_degrees(270) },
+			{ vec2().set_from_degrees(270) },
+		};
+
+		gun.recoil.scale = 30.0;
 
 		return weapon;
 	}

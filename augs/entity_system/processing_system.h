@@ -28,6 +28,8 @@ namespace augs {
 		
 		void clear();
 
+		deterministic_timestamp get_current_timestamp() const;
+
 		double delta_seconds() const;
 		double delta_milliseconds() const;
 		double fixed_delta_milliseconds() const;

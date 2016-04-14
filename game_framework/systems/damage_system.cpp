@@ -44,5 +44,7 @@ void damage_system::destroy_outdated_bullets() {
 		if ((damage.constrain_lifetime && damage.lifetime_ms >= damage.max_lifetime_ms) ||
 			(damage.constrain_distance && (damage.starting_point - transform.pos).length() >= damage.max_distance))
 			parent_world.post_message(messages::destroy_message(it));
+
+		damage.lifetime_ms += delta_milliseconds();
 	}
 }
