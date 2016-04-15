@@ -161,6 +161,8 @@ void game_world::destruction_callbacks() {
 }
 
 void game_world::perform_logic_step() {
+	get_system<render_system>().set_current_transforms_as_previous_for_interpolation();
+
 	get_system<input_system>().post_all_events_posted_by_drawing_time_systems_since_last_step();
 	
 	get_system<gui_system>().switch_to_gui_mode_and_back();
@@ -223,8 +225,6 @@ void game_world::perform_logic_step() {
 	get_system<damage_system>().destroy_colliding_bullets_and_apply_damage();
 	destruction_callbacks();
 	get_system<destroy_system>().purge_message_queues_of_dead_entities();
-
-	get_system<render_system>().set_current_transforms_as_previous_for_interpolation();
 
 	++current_step_number;
 	seconds_passed += parent_overworld.delta_seconds();
