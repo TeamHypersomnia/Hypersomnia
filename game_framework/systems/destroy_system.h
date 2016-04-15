@@ -8,4 +8,5 @@ public:
 	using event_only_system::event_only_system;
 
 	void delete_queued_entities();
+	void purge_message_queues_of_dead_entities();
 };

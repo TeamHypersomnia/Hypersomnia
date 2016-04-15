@@ -148,6 +148,12 @@ void game_world::restore_transforms_after_drawing() {
 	get_system<render_system>().restore_actual_transforms();
 }
 
+void game_world::destruction_callbacks() {
+	get_system<render_system>().remove_entities_from_rendering_tree();
+	get_system<physics_system>().destroy_fixtures_and_bodies();
+	get_system<destroy_system>().delete_queued_entities();
+}
+
 void game_world::perform_logic_step() {
 	get_system<input_system>().post_all_events_posted_by_drawing_time_systems_since_last_step();
 	
@@ -177,9 +183,6 @@ void game_world::perform_logic_step() {
 	get_system<intent_contextualization_system>().contextualize_use_button_intents();
 	/* end of intent delegation stage */
 
-	get_system<damage_system>().destroy_colliding_bullets_and_apply_damage();
-	get_system<damage_system>().destroy_outdated_bullets();
-
 	get_system<driver_system>().release_drivers_due_to_requests();
 
 	get_system<trigger_detector_system>().consume_trigger_detector_presses();
@@ -196,10 +199,6 @@ void game_world::perform_logic_step() {
 
 	get_system<intent_contextualization_system>().contextualize_movement_intents();
 
-	get_system<render_system>().remove_entities_from_rendering_tree();
-	get_system<physics_system>().destroy_fixtures_and_bodies();
-	get_system<destroy_system>().delete_queued_entities();
-
 	get_system<force_joint_system>().apply_forces_towards_target_entities();
 
 	get_system<car_system>().set_steering_flags_from_intents();
@@ -213,6 +212,11 @@ void game_world::perform_logic_step() {
 	get_system<physics_system>().execute_delayed_physics_ops();
 	get_system<physics_system>().step_and_set_new_transforms();
 	get_system<position_copying_system>().update_transforms();
+
+	get_system<damage_system>().destroy_outdated_bullets();
+	get_system<damage_system>().destroy_colliding_bullets_and_apply_damage();
+	destruction_callbacks();
+	get_system<destroy_system>().purge_message_queues_of_dead_entities();
 
 	get_system<render_system>().set_current_transforms_as_previous_for_interpolation();
 

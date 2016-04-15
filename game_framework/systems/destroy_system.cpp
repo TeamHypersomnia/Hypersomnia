@@ -5,6 +5,7 @@
 #include "entity_system/world.h"
 #include "entity_system/entity.h"
 
+#include "../messages/collision_message.h"
 #include "../messages/destroy_message.h"
 
 void destroy_system::delete_queued_entities() {
@@ -27,4 +28,15 @@ void destroy_system::delete_queued_entities() {
 		if(entities_to_destroy[i].alive())
 			parent_world.delete_entity(entities_to_destroy[i]);
 	}
+}
+
+void destroy_system::purge_message_queues_of_dead_entities() {
+	auto& collisions = parent_world.get_message_queue<messages::collision_message>();
+	
+	for (auto& c : collisions) {
+		if (c.subject.dead() || c.collider.dead())
+			c.delete_this_message = true;
+	}
+
+	parent_world.delete_marked_messages(collisions);
 }
