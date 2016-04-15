@@ -14,12 +14,20 @@ namespace augs {
 		return (*this)->sub_entities_by_name.at(child);
 	}
 
+	const entity_id& entity_id::operator[](sub_definition_name child) const {
+		return (*this)->sub_definitions.at(child);
+	}
+
 	entity_id& entity_id::operator[](associated_entity_name associated) {
 		return (*this)->associated_entities_by_name[associated];
 	}
 
 	bool entity_id::has(sub_entity_name n) const {
 		return (*this)->sub_entities_by_name.find(n) != ptr()->sub_entities_by_name.end();
+	}
+
+	bool entity_id::has(sub_definition_name n) const {
+		return (*this)->sub_definitions.find(n) != ptr()->sub_definitions.end();
 	}
 
 	bool entity_id::has(associated_entity_name n) const {

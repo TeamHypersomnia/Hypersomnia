@@ -104,12 +104,11 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 
 					while (charges--) {
 						{
-							auto round_entity = parent_world.clone_entity(catridge_or_pellet_stack[sub_entity_name::BULLET_ROUND_DEFINITION]);
+							auto round_entity = parent_world.create_entity_from_definition(catridge_or_pellet_stack[sub_definition_name::BULLET_ROUND]);
 							round_entity->get<components::damage>().amount *= gun.damage_multiplier;
 							round_entity->get<components::damage>().sender = it;
 
 							auto& physics_definition = round_entity->get<components::physics_definition>();
-							physics_definition.is_definition_entity = false;
 							
 							round_entity->get<components::transform>() = barrel_transform;
 
@@ -119,10 +118,10 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 							parent_world.post_message(op);
 						}
 
-						auto shell_definition = catridge_or_pellet_stack[sub_entity_name::BULLET_SHELL_DEFINITION];
+						auto shell_definition = catridge_or_pellet_stack[sub_definition_name::BULLET_SHELL];
 
 						if (shell_definition.alive()) {
-							auto shell_entity = parent_world.clone_entity(shell_definition);
+							auto shell_entity = parent_world.create_entity_from_definition(shell_definition);
 
 							auto spread_component = randval(gun.shell_spread_degrees) + gun.shell_spawn_offset.rotation;
 
@@ -131,7 +130,6 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 							shell_transform.rotation += spread_component;
 
 							auto& physics_definition = shell_entity->get<components::physics_definition>();
-							physics_definition.is_definition_entity = false;
 
 							shell_entity->get<components::transform>() = shell_transform;
 

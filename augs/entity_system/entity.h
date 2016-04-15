@@ -51,6 +51,7 @@ namespace components {
 	struct gui_element;
 	struct trigger_collision_detector;
 	struct name;
+	struct trace;
 }
 #endif
 
@@ -63,22 +64,31 @@ namespace augs {
 		friend class ::destroy_system;
 		friend class memory_pool::typed_id_template<entity>;
 
+		std::unordered_map<sub_definition_name, augs::entity_id> sub_definitions;
 		std::unordered_map<sub_entity_name, augs::entity_id> sub_entities_by_name;
 		std::unordered_map<associated_entity_name, augs::entity_id> associated_entities_by_name;
 
 		std::vector<augs::entity_id> sub_entities;
 		augs::entity_id parent;
 		augs::entity_id self_id;
-		sub_entity_name name_as_subentity = sub_entity_name::INVALID;
+		sub_entity_name name_as_sub_entity = sub_entity_name::INVALID;
+		sub_definition_name name_as_sub_definition = sub_definition_name::INVALID;
+
+		bool born_as_definition_entity = false;
 	public:
 		entity(world& owner_world);
 		~entity();
 
-		sub_entity_name get_name_as_subentity();
+		bool is_definition_entity();
+		sub_entity_name get_name_as_sub_entity();
+		sub_definition_name get_name_as_sub_definition();
+
 		augs::entity_id get_parent();
 		void add_sub_entity(augs::entity_id p, sub_entity_name optional_name = sub_entity_name::INVALID);
 		void map_sub_entity(sub_entity_name n, augs::entity_id p);
-		void for_each_subentity(std::function<void(augs::entity_id)>);
+		void map_sub_definition(sub_definition_name n, augs::entity_id p);
+		void for_each_sub_entity(std::function<void(augs::entity_id)>);
+		void for_each_sub_definition(std::function<void(augs::entity_id)>);
 
 		/* maps type hashes into components */
 #if USE_POINTER_TUPLE 
@@ -118,7 +128,8 @@ namespace augs {
 			std::pair<memory_pool::id, components::melee*>,
 			std::pair<memory_pool::id, components::gui_element*>,
 			std::pair<memory_pool::id, components::trigger_collision_detector*>,
-			std::pair<memory_pool::id, components::name*>
+			std::pair<memory_pool::id, components::name*>,
+			std::pair<memory_pool::id, components::trace*>
 		> type_to_component;
 
 		component_bitset_matcher signature;
@@ -214,20 +225,6 @@ namespace augs {
 			return component_ptr.get();
 		}
 
-		template<typename Tuple, typename T, typename... Tp>
-		inline void clone_component_tuple(Tuple& t)
-		{
-			typedef std::decay <T::second_type>::type component_type;
-			add<component_type>(*(component_type*)(std::get<T>(t).first.ptr()));
-			clone_component_tuple<Tuple, Tp...>(t);
-		}
-
-		template<typename Tuple>
-		void clone_component_tuple(Tuple& t)
-		{ }
-
-		void clone(augs::entity_id);
-
 		template <typename component_type>
 		component_type& operator+= (const component_type& object) {
 			return add(object);
@@ -251,17 +248,7 @@ namespace augs {
 		void remove(size_t component_type_hash);
 
 	private:
-		template<typename Tuple, typename T, typename... Tp>
-		inline void remove_all(Tuple& t)
-		{
-			typedef std::decay <T::second_type>::type component_type;
-			remove<component_type>();
-			remove_all<Tuple, Tp...>(t);
-		}
-
-		template<typename Tuple>
-		void remove_all(Tuple& t)
-		{ }
+		void clone(augs::entity_id);
 
 		bool unplug_component_from_systems(size_t);
 		void add_to_compatible_systems(size_t);

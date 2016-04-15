@@ -453,6 +453,7 @@
     <ClCompile Include="game_framework\systems\physics_system.cpp" />
     <ClCompile Include="game_framework\systems\render_system.cpp" />
     <ClCompile Include="game_framework\systems\steering_system.cpp" />
+    <ClCompile Include="game_framework\systems\trace_system.cpp" />
     <ClCompile Include="game_framework\systems\trigger_detector_system.cpp" />
     <ClCompile Include="game_framework\systems\visibility_system.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -1008,6 +1009,7 @@
     <ClInclude Include="game_framework\components\sprite_component.h" />
     <ClInclude Include="game_framework\components\steering_component.h" />
     <ClInclude Include="game_framework\components\tile_layer_component.h" />
+    <ClInclude Include="game_framework\components\trace_component.h" />
     <ClInclude Include="game_framework\components\transform_component.h" />
     <ClInclude Include="game_framework\components\trigger_collision_detector_component.h" />
     <ClInclude Include="game_framework\components\trigger_component.h" />
@@ -1099,6 +1101,7 @@
     <ClInclude Include="game_framework\systems\physics_system.h" />
     <ClInclude Include="game_framework\systems\render_system.h" />
     <ClInclude Include="game_framework\systems\steering_system.h" />
+    <ClInclude Include="game_framework\systems\trace_system.h" />
     <ClInclude Include="game_framework\systems\trigger_detector_system.h" />
     <ClInclude Include="game_framework\systems\visibility_system.h" />
     <ClInclude Include="stdafx.h" />

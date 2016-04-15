@@ -19,14 +19,13 @@ void aabb_highlighter::draw(shared::state_for_drawing_camera camera, augs::entit
 
 	rects::ltrb<float> aabb;
 
-	subject->for_each_subentity([&aabb](augs::entity_id e) {
+	subject->for_each_sub_entity([&aabb](augs::entity_id e) {
 		auto* sprite = e->find<components::sprite>();
 		auto* physics = e->find<components::physics_definition>();
 
-		if (e->get_name_as_subentity() == sub_entity_name::CHARACTER_CROSSHAIR
-			|| e->get_name_as_subentity() == sub_entity_name::CROSSHAIR_RECOIL_BODY
-			||
-			(physics && physics->is_definition_entity))
+		if (e->get_name_as_sub_entity() == sub_entity_name::CHARACTER_CROSSHAIR
+			|| e->get_name_as_sub_entity() == sub_entity_name::CROSSHAIR_RECOIL_BODY
+			|| e->is_definition_entity())
 			return;
 
 		if (sprite) {

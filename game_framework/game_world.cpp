@@ -52,6 +52,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_component<gui_element>();
 	register_component<trigger_collision_detector>();
 	register_component<name>();
+	register_component<trace>();
 	
 	register_system<input_system>();
 	register_system<steering_system>();
@@ -78,6 +79,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_system<force_joint_system>();
 	register_system<intent_contextualization_system>();
 	register_system<gui_system>();
+	register_system<trace_system>();
 
 	register_message_queue<intent_message>();
 	register_message_queue<damage_message>();
@@ -107,6 +109,8 @@ void game_world::call_drawing_time_systems() {
 
 	get_system<render_system>().calculate_and_set_interpolated_transforms();
 	
+	get_system<trace_system>().lengthen_sprites_of_traces();
+
 	/* read-only message generation */
 
 	get_system<animation_system>().transform_response_requests_to_animation_messages();

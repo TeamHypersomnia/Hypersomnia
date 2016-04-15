@@ -70,8 +70,8 @@ std::wstring describe_properties(augs::entity_id id) {
 
 	std::wstring out;
 
-	if (id.has(sub_entity_name::BULLET_ROUND_DEFINITION)) {
-		out = result.str() + describe_properties(id[sub_entity_name::BULLET_ROUND_DEFINITION]);
+	if (id.has(sub_definition_name::BULLET_ROUND)) {
+		out = result.str() + describe_properties(id[sub_definition_name::BULLET_ROUND]);
 		return out;
 	}
 	else {

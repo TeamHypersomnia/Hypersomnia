@@ -6,10 +6,14 @@ enum class sub_entity_name {
 	CROSSHAIR_RECOIL_BODY,
 	CHARACTER_LEGS,
 
-	BULLET_SHELL_DEFINITION,
-	BULLET_ROUND_DEFINITION,
-
 	BARREL_SMOKE
+};
+
+enum class sub_definition_name {
+	INVALID,
+
+	BULLET_SHELL,
+	BULLET_ROUND,
 };
 
 enum class associated_entity_name {

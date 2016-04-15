@@ -30,13 +30,45 @@ namespace augs {
 
 		std::string cloned_name = id.get_debug_name();
 
-		if (cloned_name.substr(0, 7) != "cloned_") {
+		if (cloned_name.substr(0, 7) != "cloned_")
 			cloned_name = "cloned_" + cloned_name;
-		}
 
-		auto new_entity = create_entity(cloned_name);
+		entity_id new_entity;
+		
+		if (id->is_definition_entity())
+			new_entity = create_definition_entity(cloned_name);
+		else
+			new_entity = create_entity(cloned_name);
+		
 		new_entity->clone(id);
 		return new_entity;
+	}
+
+	entity_id world::create_entity_from_definition(entity_id id) {
+		ensure(id.alive());
+		ensure(id->is_definition_entity());
+
+		std::string instantiated_name = id.get_debug_name();
+		instantiated_name = "definst_" + instantiated_name;
+
+		entity_id new_entity = create_entity(instantiated_name);
+		new_entity->clone(id);
+		ensure(!new_entity->is_definition_entity());
+		return new_entity;
+	}
+
+	entity_id world::create_definition_entity(std::string debug_name) {
+		entity_id res = entities.allocate(std::ref(*this));
+		res->self_id = res;
+		res->born_as_definition_entity = true;
+
+#ifdef USE_NAMES_FOR_IDS
+		res.set_debug_name(debug_name);
+		ensure(res.get_debug_name() != "");
+		ensure(res.get_debug_name() != "unknown");
+#endif
+
+		return res;
 	}
 
 	entity_id world::create_entity(std::string debug_name) {

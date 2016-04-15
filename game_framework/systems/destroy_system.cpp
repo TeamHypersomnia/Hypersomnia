@@ -13,7 +13,7 @@ void destroy_system::delete_queued_entities() {
 	std::vector <entity_id> entities_to_destroy;
 
 	for (auto it : events) {
-		it.subject->for_each_subentity([&entities_to_destroy, &it](augs::entity_id descendant) {
+		it.subject->for_each_sub_entity([&entities_to_destroy, &it](augs::entity_id descendant) {
 			if (it.only_children && descendant == it.subject)
 				return;
 

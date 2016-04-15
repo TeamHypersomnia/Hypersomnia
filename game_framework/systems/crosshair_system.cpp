@@ -78,7 +78,7 @@ void crosshair_system::animate_crosshair_sizes() {
 			auto* crosshair_sprite = it->find<components::sprite>();
 
 			if (crosshair_sprite) {
-				crosshair_sprite->update_size();
+				crosshair_sprite->update_size_from_texture_dimensions();
 				crosshair_sprite->size *= crosshair.size_multiplier*ratio;
 			}
 		}

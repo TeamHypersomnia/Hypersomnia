@@ -39,14 +39,18 @@ namespace components {
 		}
 	}
 
+	vec2 sprite::get_size() const {
+		return size * size_multiplier;
+	}
+
 	void sprite::set(assets::texture_id _tex, rgba _color) {
 		tex = _tex;
 		color = _color;
 
-		update_size();
+		update_size_from_texture_dimensions();
 	}
 
-	void sprite::update_size() {
+	void sprite::update_size_from_texture_dimensions() {
 		size = vec2i(resource_manager.find(tex)->tex.get_size());
 	}
 
@@ -56,15 +60,20 @@ namespace components {
 
 		vec2i transform_pos = in.renderable_transform.pos;
 
+		float final_rotation = in.renderable_transform.rotation + rotation_offset;
+
 		if (in.screen_space_mode) {
-			make_rect(transform_pos + vec2(size)/2, vec2(size), in.renderable_transform.rotation + rotation_offset, v, true);
+			make_rect(transform_pos + get_size()/2, get_size(), final_rotation, v, true);
 		}
 		else {
 			auto center = in.visible_world_area / 2;
 
-			auto target_position = transform_pos - in.camera_transform.pos + center + center_offset;
+			auto target_position = transform_pos - in.camera_transform.pos + center;
 			
-			make_rect(target_position, vec2(size), in.renderable_transform.rotation + rotation_offset, v, !in.position_is_left_top_corner);
+			if (center_offset.non_zero())
+				target_position -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
+
+			make_rect(target_position, get_size(), final_rotation, v, !in.position_is_left_top_corner);
 
 			/* rotate around the center of the screen */
 			if (in.camera_transform.rotation != 0.f)
@@ -131,10 +140,10 @@ namespace components {
 
 	std::vector<vec2> sprite::get_vertices() const {
 		std::vector<vec2> out;
-		out.push_back(size / -2.f);
-		out.push_back(size / -2.f + vec2(size.x, 0.f));
-		out.push_back(size / -2.f + size);
-		out.push_back(size / -2.f + vec2(0.f, size.y));
+		out.push_back(get_size() / -2.f);
+		out.push_back(get_size() / -2.f + vec2(get_size().x, 0.f));
+		out.push_back(get_size() / -2.f + get_size());
+		out.push_back(get_size() / -2.f + vec2(0.f, get_size().y));
 		return std::move(out);
 	}
 	
@@ -142,9 +151,9 @@ namespace components {
 		static thread_local vec2 v[4];		
 		
 		if (screen_space_mode)
-			make_rect(transform.pos + vec2(size) / 2, vec2(size), transform.rotation + rotation_offset, v, true);
+			make_rect(transform.pos + get_size() / 2, get_size(), transform.rotation + rotation_offset, v, true);
 		else
-			make_rect(transform.pos, vec2(size), transform.rotation + rotation_offset, v, true);
+			make_rect(transform.pos, get_size(), transform.rotation + rotation_offset, v, true);
 
 		return augs::get_aabb(v);
 	}

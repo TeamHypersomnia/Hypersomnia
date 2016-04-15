@@ -56,7 +56,7 @@ namespace augs {
 	public:
 		class id {
 #ifdef USE_NAMES_FOR_IDS
-			char debug_name[30];
+			char debug_name[40];
 #endif
 		protected:
 			friend class memory_pool;

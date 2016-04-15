@@ -14,9 +14,11 @@ namespace augs {
 	public:
 		inventory_slot_id operator[](slot_function);
 		const typed_id_template& operator[](sub_entity_name) const;
+		const typed_id_template& operator[](sub_definition_name) const;
 		typed_id_template& operator[](associated_entity_name);
 
 		bool has(sub_entity_name) const;
+		bool has(sub_definition_name) const;
 		bool has(associated_entity_name) const;
 		bool has(slot_function) const;
 		void set_debug_name(std::string);

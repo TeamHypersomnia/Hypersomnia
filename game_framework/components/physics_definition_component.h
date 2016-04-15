@@ -4,7 +4,6 @@
 namespace components {
 	struct physics_definition {
 		bool create_fixtures_and_body = true;
-		bool is_definition_entity = false;
 
 		body_definition body;
 		std::vector<fixture_definition> fixtures;

@@ -1170,6 +1170,9 @@
     <ClCompile Include="augs\misc\recoil_player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game_framework\systems\trace_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3141,6 +3144,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\recoil_player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\components\trace_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\systems\trace_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

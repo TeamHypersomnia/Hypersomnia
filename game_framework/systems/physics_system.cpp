@@ -662,7 +662,7 @@ void physics_system::create_physics_for_entity(augs::entity_id e) {
 	auto* physics_definition = e->find<components::physics_definition>();
 
 	if (physics_definition) {
-		if (physics_definition->create_fixtures_and_body && !physics_definition->is_definition_entity) {
+		if (physics_definition->create_fixtures_and_body) {
 			auto other_body_entity = physics_definition->attach_fixtures_to_entity;
 
 			if (other_body_entity.dead() || other_body_entity == e)

@@ -100,7 +100,9 @@ namespace augs {
 
 		std::vector<processing_system*>& get_all_systems();
 
+		entity_id create_definition_entity(std::string debug_name = "unknown");
 		entity_id create_entity(std::string debug_name = "unknown");
+		entity_id create_entity_from_definition(entity_id);
 		entity_id clone_entity(entity_id);
 		void delete_entity(entity_id);
 

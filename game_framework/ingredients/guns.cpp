@@ -5,6 +5,7 @@
 #include "game_framework/components/damage_component.h"
 #include "game_framework/components/sprite_component.h"
 #include "game_framework/components/name_component.h"
+#include "game_framework/components/trace_component.h"
 
 #include "game_framework/globals/filters.h"
 
@@ -107,8 +108,8 @@ namespace prefabs {
 
 	augs::entity_id create_pink_charge(augs::world& world, vec2 pos) {
 		auto pink_charge = world.create_entity("pink_charge");
-		auto round_definition = world.create_entity("round_definition");
-		auto shell_definition = world.create_entity("shell_definition");
+		auto round_definition = world.create_definition_entity("round_definition");
+		auto shell_definition = world.create_definition_entity("shell_definition");
 		name_entity(pink_charge, entity_name::PINK_CHARGE);
 
 		{
@@ -126,10 +127,14 @@ namespace prefabs {
 			auto& s = ingredients::sprite(round_definition, pos, assets::texture_id::ROUND_TRACE, augs::pink, render_layer::FLYING_BULLETS);
 			s.size *= vec2(2, 0.5);
 			auto& def = ingredients::bullet_round_physics(round_definition);
-			def.is_definition_entity = true;
 			
 			auto& damage = *round_definition += components::damage();
 			damage.impulse_upon_hit = 1000.f;
+
+			auto& trace = *round_definition += components::trace();
+			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
+			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
+			trace.lengthening_duration_ms = std::make_pair(200.f, 250.f);
 		}
 
 		{
@@ -138,19 +143,18 @@ namespace prefabs {
 			def.fixtures[0].restitution = 1.4;
 			def.fixtures[0].density = 0.001f;
 			def.fixtures[0].filter = filters::shell();
-			def.is_definition_entity = true;
 		}
 
-		pink_charge->map_sub_entity(sub_entity_name::BULLET_ROUND_DEFINITION, round_definition);
-		pink_charge->map_sub_entity(sub_entity_name::BULLET_SHELL_DEFINITION, shell_definition);
+		pink_charge->map_sub_definition(sub_definition_name::BULLET_ROUND, round_definition);
+		pink_charge->map_sub_definition(sub_definition_name::BULLET_SHELL, shell_definition);
 
 		return pink_charge;
 	}
 
 	augs::entity_id create_cyan_charge(augs::world& world, vec2 pos) {
 		auto cyan_charge = world.create_entity("cyan_charge");
-		auto round_definition = world.create_entity("round_definition");
-		auto shell_definition = world.create_entity("shell_definition");
+		auto round_definition = world.create_definition_entity("round_definition");
+		auto shell_definition = world.create_definition_entity("shell_definition");
 		name_entity(cyan_charge, entity_name::CYAN_CHARGE);
 
 		{
@@ -167,7 +171,6 @@ namespace prefabs {
 		{
 			ingredients::sprite(round_definition, pos, assets::texture_id::ROUND_TRACE, augs::cyan, render_layer::FLYING_BULLETS);
 			auto& def = ingredients::bullet_round_physics(round_definition);
-			def.is_definition_entity = true;
 
 			auto& damage = *round_definition += components::damage();
 		}
@@ -178,11 +181,10 @@ namespace prefabs {
 			def.fixtures[0].restitution = 1.4;
 			def.fixtures[0].density = 0.001f;
 			def.fixtures[0].filter = filters::shell();
-			def.is_definition_entity = true;
 		}
 
-		cyan_charge->map_sub_entity(sub_entity_name::BULLET_ROUND_DEFINITION, round_definition);
-		cyan_charge->map_sub_entity(sub_entity_name::BULLET_SHELL_DEFINITION, shell_definition);
+		cyan_charge->map_sub_definition(sub_definition_name::BULLET_ROUND, round_definition);
+		cyan_charge->map_sub_definition(sub_definition_name::BULLET_SHELL, shell_definition);
 
 		return cyan_charge;
 	}
