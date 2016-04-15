@@ -35,6 +35,8 @@ void damage_system::destroy_colliding_bullets_and_apply_damage() {
 
 			parent_world.post_message(burst_msg);
 
+			damage->saved_point_of_impact_before_death = it.point;
+
 			if (damage->destroy_upon_hit) 
 				parent_world.post_message(messages::destroy_message(it.collider));
 		}

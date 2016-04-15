@@ -12,5 +12,13 @@ namespace components {
 		std::pair<float, float> lengthening_duration_ms = std::pair<float, float>(200.f, 400.f);
 		float chosen_lengthening_duration_ms = -1.f;
 		float lengthening_time_passed_ms = 0.f;
+
+		bool is_it_finishing_trace = false;
+
+		void reset() {
+			lengthening_time_passed_ms = 0.f;
+			chosen_multiplier.set(randval(max_multiplier_x), randval(max_multiplier_y));
+			chosen_lengthening_duration_ms = randval(lengthening_duration_ms);
+		}
 	};
 }

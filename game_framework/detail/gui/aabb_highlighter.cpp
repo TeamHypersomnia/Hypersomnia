@@ -24,8 +24,7 @@ void aabb_highlighter::draw(shared::state_for_drawing_camera camera, augs::entit
 		auto* physics = e->find<components::physics_definition>();
 
 		if (e->get_name_as_sub_entity() == sub_entity_name::CHARACTER_CROSSHAIR
-			|| e->get_name_as_sub_entity() == sub_entity_name::CROSSHAIR_RECOIL_BODY
-			|| e->is_definition_entity())
+			|| e->get_name_as_sub_entity() == sub_entity_name::CROSSHAIR_RECOIL_BODY)
 			return;
 
 		if (sprite) {

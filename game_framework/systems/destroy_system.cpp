@@ -8,25 +8,34 @@
 #include "../messages/collision_message.h"
 #include "../messages/destroy_message.h"
 
+void destroy_system::purge_queue_of_duplicates() {
+	auto& events = parent_world.get_message_queue<messages::destroy_message>();
+	std::sort(events.begin(), events.end());
+	events.erase(std::unique(events.begin(), events.end()), events.end());
+}
+
 void destroy_system::delete_queued_entities() {
-	auto events = parent_world.get_message_queue<messages::destroy_message>();
+	auto& events = parent_world.get_message_queue<messages::destroy_message>();
 	std::vector <entity_id> entities_to_destroy;
 
 	for (auto it : events) {
-		it.subject->for_each_sub_entity([&entities_to_destroy, &it](augs::entity_id descendant) {
+		auto deletion_adder = [&entities_to_destroy, &it](augs::entity_id descendant) {
 			if (it.only_children && descendant == it.subject)
 				return;
 
 			entities_to_destroy.push_back(descendant);
-		});
+		};
+
+		it.subject->for_each_sub_entity(deletion_adder);
+		it.subject->for_each_sub_definition(deletion_adder);
 	}
 
-	parent_world.get_message_queue<messages::destroy_message>().clear();
+	events.clear();
 
 	// destroy in reverse order; children first
 	for (int i = entities_to_destroy.size()-1; i >= 0; --i) {
-		if(entities_to_destroy[i].alive())
-			parent_world.delete_entity(entities_to_destroy[i]);
+		ensure(entities_to_destroy[i].alive());
+		parent_world.delete_entity(entities_to_destroy[i]);
 	}
 }
 

@@ -1,17 +1,19 @@
 #include "recoil_player.h"
 
 vec2 recoil_player::shoot_and_get_offset(augs::deterministic_timestamp current_time) {
-	if (current_offset > int(offsets.size() - 1))
-		reversed = true;
-	if (current_offset == int(offsets.size() ) - delta_offset_maximum) {
-		reversed = false;
-		delta_offset = 0;
-	}
-
-	if (reversed) {
-		delta_offset++;
-		current_offset = int(offsets.size() - 1) - delta_offset;
-	}
+	//if (current_offset > int(offsets.size() - 1))
+	//	reversed = true;
+	//if (current_offset == int(offsets.size() ) - delta_offset_maximum) {
+	//	reversed = false;
+	//	delta_offset = 0;
+	//}
+	//
+	//if (reversed) {
+	//	delta_offset++;
+	//	current_offset = int(offsets.size() - 1) - delta_offset;
+	//}
+	current_offset = std::max(current_offset, 0);
+	current_offset = std::min(current_offset, int(offsets.size() - 1));
 	LOG("C: %c", current_offset);
 	return offsets[current_offset++] * scale;
 }

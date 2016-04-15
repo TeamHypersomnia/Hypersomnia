@@ -153,6 +153,8 @@ void game_world::restore_transforms_after_drawing() {
 }
 
 void game_world::destruction_callbacks() {
+	get_system<destroy_system>().purge_queue_of_duplicates();
+	get_system<trace_system>().spawn_finishing_traces_for_destroyed_objects();
 	get_system<render_system>().remove_entities_from_rendering_tree();
 	get_system<physics_system>().destroy_fixtures_and_bodies();
 	get_system<destroy_system>().delete_queued_entities();
