@@ -129,6 +129,7 @@ namespace prefabs {
 			def.is_definition_entity = true;
 			
 			auto& damage = *round_definition += components::damage();
+			damage.impulse_upon_hit = 1000.f;
 		}
 
 		{

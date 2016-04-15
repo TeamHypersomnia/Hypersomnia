@@ -16,6 +16,11 @@ void damage_system::destroy_colliding_bullets_and_apply_damage() {
 		auto* damage = it.collider->find<components::damage>();
 
 		if (damage) {
+			auto& subject_of_impact = components::physics::get_owner_body_entity(it.subject)->get<components::physics>();
+
+			subject_of_impact.apply_force
+				(it.collider->get<components::physics>().velocity().set_length(damage->impulse_upon_hit), it.point - subject_of_impact.get_mass_position());
+
 			messages::damage_message damage_msg;
 			damage_msg.subject = it.subject;
 			damage_msg.amount = damage->amount;

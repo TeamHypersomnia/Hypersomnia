@@ -10,6 +10,8 @@ namespace components {
 	struct damage {
 		float amount = 12.f;
 		
+		float impulse_upon_hit = 100.f;
+
 		augs::entity_id sender;
 		bool destroy_upon_hit = true;
 
