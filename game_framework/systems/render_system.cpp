@@ -96,6 +96,12 @@ void render_system::determine_visible_entities_from_every_camera() {
 		auto& result = physics.query_aabb_px(in.transformed_visible_world_area_aabb.left_top(), in.transformed_visible_world_area_aabb.right_bottom(), filters::renderable_query());
 		visible_entities.insert(visible_entities.end(), result.entities.begin(), result.entities.end());
 
+		visible_entities.erase(
+			std::remove_if(visible_entities.begin(), visible_entities.end(), 
+				[](augs::entity_id id) { 
+			return id->find<components::render>() == nullptr;  
+		}), visible_entities.end());
+
 		struct render_listener {
 			b2DynamicTree* tree;
 			std::vector<entity_id>* visible_entities;

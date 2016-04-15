@@ -21,6 +21,7 @@
 
 #include "game_framework/globals/filters.h"
 #include "game_framework/globals/input_profiles.h"
+#include "game_framework/settings.h"
 
 namespace ingredients {
 	void wsad_character_setup_movement(augs::entity_id e) {
@@ -178,17 +179,20 @@ namespace prefabs {
 		}
 
 		{
-			auto& sprite = *recoil += components::sprite();
-			auto& render = *recoil += components::render();
 			auto& transform = *recoil += components::transform();
 			auto& physics_definition = *recoil += components::physics_definition();
 			auto& force_joint = *recoil += components::force_joint();
 			*zero_target += components::transform();
-			
+
+			auto& sprite = *recoil += components::sprite();
+
 			sprite.set(assets::texture_id::TEST_CROSSHAIR, rgba(0, 255, 0, 255));
 
-			render.layer = render_layer::OVER_CROSSHAIR;
-			render.interpolate = true;
+			if (DEBUG_DRAW_RECOIL_CROSSHAIR) {
+				auto& render = *recoil += components::render();
+				render.layer = render_layer::OVER_CROSSHAIR;
+				render.interpolate = true;
+			}
 
 			auto& body = physics_definition.body;
 			auto& info = physics_definition.new_fixture();
