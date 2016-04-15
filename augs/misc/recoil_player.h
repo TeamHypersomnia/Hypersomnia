@@ -9,6 +9,7 @@ public:
 	int current_offset = 0;
 	bool reversed = false;
 	int delta_offset = 0;
+	int delta_offset_maximum = 0;
 	// augs::deterministic_timestamp since_last_shot;
 
 	double single_cooldown_duration_ms = 50.0;
