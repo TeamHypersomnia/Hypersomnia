@@ -161,11 +161,13 @@ void game_world::destruction_callbacks() {
 	get_system<destroy_system>().purge_message_queues_of_dead_entities();
 }
 
-void game_world::creation_callbacks() {
+void game_world::rendering_time_creation_callbacks() {
 	get_system<render_system>().add_entities_to_rendering_tree();
-	get_system<physics_system>().create_bodies_and_fixtures_from_physics_definitions();
+}
 
-	get_message_queue<new_entity_message>().clear();
+void game_world::creation_callbacks() {
+	rendering_time_creation_callbacks();
+	get_system<physics_system>().create_bodies_and_fixtures_from_physics_definitions();
 }
 
 void game_world::perform_logic_step() {
@@ -183,6 +185,7 @@ void game_world::perform_logic_step() {
 	get_system<gun_system>().launch_shots_due_to_pressed_triggers();
 
 	creation_callbacks();
+	get_message_queue<new_entity_message>().clear();
 
 	get_system<crosshair_system>().apply_crosshair_intents_to_base_offsets();
 	get_system<crosshair_system>().apply_base_offsets_to_crosshair_transforms();
@@ -228,6 +231,7 @@ void game_world::perform_logic_step() {
 	destruction_callbacks();
 
 	creation_callbacks();
+	get_message_queue<new_entity_message>().clear();
 
 	++current_step_number;
 	seconds_passed += parent_overworld.delta_seconds();
