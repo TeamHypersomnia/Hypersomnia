@@ -278,7 +278,7 @@ namespace scene_builders {
 		input.add_context(active_context);
 
 		if (input.found_recording()) {
-			world.parent_overworld.configure_stepping(128.0, 500);
+			world.parent_overworld.configure_stepping(60, 500);
 			world.parent_overworld.delta_timer.set_stepping_speed_multiplier(6.00);
 
 			input.replay_found_recording();
@@ -286,7 +286,7 @@ namespace scene_builders {
 			world.get_system<render_system>().enable_interpolation = false;
 		}
 		else {
-			world.parent_overworld.configure_stepping(128, 50000);
+			world.parent_overworld.configure_stepping(60, 500);
 			world.parent_overworld.delta_timer.set_stepping_speed_multiplier(1.0);
 
 			world.get_system<render_system>().enable_interpolation = true;
