@@ -60,6 +60,7 @@ void game_overworld::call_window_script(std::string filename) {
 
 #define RENDERING_STEPS_DETERMINISTICALLY_LIKE_LOGIC 0
 
+float stepping_speed = 1.f;
 void game_overworld::main_game_loop() {
 	bool quit_flag = false;
 
@@ -74,11 +75,28 @@ void game_overworld::main_game_loop() {
 		}
 
 		for (auto& raw_input : raw_window_inputs) {
-			if (raw_input.key_event == window::event::PRESSED &&
-				raw_input.key == window::event::keys::ESC) {
-				quit_flag = true;
-				break;
+			if (raw_input.key_event == window::event::PRESSED) {
+				if (raw_input.key == window::event::keys::ESC) {
+					quit_flag = true;
+					break;
+				}
+				if (raw_input.key == window::event::keys::_1) {
+					configure_stepping(60, 500000);
+				}
+				if (raw_input.key == window::event::keys::_2) {
+					configure_stepping(128, 500000);
+				}
+				if (raw_input.key == window::event::keys::_3) {
+					configure_stepping(400, 500000);
+				}
+				if (raw_input.key == window::event::keys::_4) {
+					stepping_speed = 0.1f;
+				}
+				if (raw_input.key == window::event::keys::_5) {
+					stepping_speed = 1.f;
+				}
 			}
+
 
 			messages::raw_window_input_message msg;
 			msg.raw_window_input = raw_input;
@@ -88,7 +106,7 @@ void game_overworld::main_game_loop() {
 		}
 
 		if (!main_game_world.get_system<input_system>().is_replaying())
-			delta_timer.set_stepping_speed_multiplier(1.00);
+			delta_timer.set_stepping_speed_multiplier(stepping_speed);
 
 #if RENDERING_STEPS_DETERMINISTICALLY_LIKE_LOGIC
 		auto steps_to_perform = delta_timer.count_logic_steps_to_perform();
