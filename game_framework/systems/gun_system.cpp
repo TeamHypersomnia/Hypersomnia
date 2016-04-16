@@ -177,7 +177,9 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 				parent_world.post_message(burst);
 
 				auto owning_crosshair_recoil = owning_capability[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
-				owning_crosshair_recoil->get<components::physics>().apply_impulse(
+				
+				auto& recoil_physics = owning_crosshair_recoil->get<components::physics>();
+				recoil_physics.apply_impulse(
 					//vec2().set_from_degrees(barrel_transform.rotation + randval(-40.f, 40.f)).set_length(randval(22, 26))
 					gun.recoil.shoot_and_get_offset(get_current_timestamp()).rotate(barrel_transform.rotation, vec2())
 					);

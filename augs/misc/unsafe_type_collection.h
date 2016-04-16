@@ -146,7 +146,6 @@ namespace augs {
 
 		using unsafe_type_collection::size;
 		using unsafe_type_collection::get_raw;
-		using unsafe_type_collection::~unsafe_type_collection;
 	};
 }
 

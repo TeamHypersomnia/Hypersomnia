@@ -189,7 +189,7 @@ namespace scene_builders {
 					assets::texture_id::TEST_BACKGROUND, augs::gray1, render_layer::UNDER_GROUND);
 			}
 
-		const int num_characters = 5;
+		const int num_characters = 1;
 
 		for (int i = 0; i < num_characters; ++i) {
 			auto new_character = prefabs::create_character(world, vec2(i * 100, 0));
@@ -286,7 +286,7 @@ namespace scene_builders {
 			world.get_system<render_system>().enable_interpolation = false;
 		}
 		else {
-			world.parent_overworld.configure_stepping(128.0, 500);
+			world.parent_overworld.configure_stepping(128, 50000);
 			world.parent_overworld.delta_timer.set_stepping_speed_multiplier(1.0);
 
 			world.get_system<render_system>().enable_interpolation = true;
