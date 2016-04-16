@@ -57,7 +57,9 @@ void trace_system::spawn_finishing_traces_for_destroyed_objects() {
 			*finishing_trace += e->get<components::render>();
 
 			if (e->find<components::damage>()) {
-				finishing_trace->get<components::transform>().pos = e->get<components::damage>().saved_point_of_impact_before_death;
+				finishing_trace->get<components::transform>().pos = e->get<components::damage>().saved_point_of_impact_before_death - 
+					(e->get<components::sprite>().size/2).rotate(finishing_trace->get<components::transform>().rotation, vec2(0,0))
+					;
 			}
 		}
 	}

@@ -23,6 +23,7 @@ namespace augs {
 		unsigned count_logic_steps_to_perform();
 		double fraction_of_time_until_the_next_logic_step() const;
 		void set_stepping_speed_multiplier(double);
+		double get_stepping_speed_multiplier();
 
 		/* a scalar that you should multiply your numbers by to get speed per second */
 		double delta_seconds() const;

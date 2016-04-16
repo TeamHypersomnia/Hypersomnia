@@ -26,7 +26,7 @@ namespace augs {
 	}
 
 	void overworld::assign_frame_time_to_delta_for_drawing_time_systems() {
-		delta_ms = frame_timer.extract<std::chrono::milliseconds>();
+		delta_ms = frame_timer.extract<std::chrono::milliseconds>() * delta_timer.get_stepping_speed_multiplier();
 	}
 
 	void overworld::restore_fixed_delta() {

@@ -50,4 +50,8 @@ namespace augs {
 	void fixed_delta_timer::set_stepping_speed_multiplier(double tm) {
 		time_multiplier = tm;
 	}
+
+	double fixed_delta_timer::get_stepping_speed_multiplier() {
+		return time_multiplier;
+	}
 }

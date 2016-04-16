@@ -6,7 +6,7 @@
 #include "../messages/collision_message.h"
 #include "../messages/destroy_message.h"
 #include "../messages/damage_message.h"
-
+#include "graphics/renderer.h"
 void damage_system::destroy_colliding_bullets_and_apply_damage() {
 	auto events = parent_world.get_message_queue<messages::collision_message>();
 
@@ -36,6 +36,7 @@ void damage_system::destroy_colliding_bullets_and_apply_damage() {
 			parent_world.post_message(burst_msg);
 
 			damage->saved_point_of_impact_before_death = it.point;
+			//augs::renderer::get_current().blink_lines.draw_yellow(it.point, it.point + it.collider_impact_velocity.set_length(100));
 
 			if (damage->destroy_upon_hit) 
 				parent_world.post_message(messages::destroy_message(it.collider));
