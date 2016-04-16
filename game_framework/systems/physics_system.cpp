@@ -281,6 +281,7 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 		auto body_b = fix_b->GetBody();
 
 		messages::collision_message msg;
+		msg.type = messages::collision_message::event_type::BEGIN_CONTACT;
 
 		msg.subject = static_cast<entity_id>(fix_a->GetUserData());
 		msg.collider = static_cast<entity_id>(fix_b->GetUserData());
@@ -349,6 +350,7 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 		auto body_b = fix_b->GetBody();
 
 		messages::collision_message msg;
+		msg.type = messages::collision_message::event_type::END_CONTACT;
 
 		msg.subject = static_cast<entity_id>(fix_a->GetUserData());
 		msg.collider = static_cast<entity_id>(fix_b->GetUserData());
@@ -374,7 +376,6 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 		}
 
 		if (fix_a->IsSensor() || fix_b->IsSensor()) {
-			msg.sensor_end_contact = true;
 			msg.subject_impact_velocity = -body_a->GetLinearVelocity();
 			msg.collider_impact_velocity = -body_b->GetLinearVelocity();
 			world_ptr->post_message(msg);
@@ -402,6 +403,7 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 
 		auto& msg = msgs[i];
 
+		msg.type = messages::collision_message::event_type::PRE_SOLVE;
 		msg.subject = static_cast<entity_id>(fix_a->GetUserData());
 		msg.collider = static_cast<entity_id>(fix_b->GetUserData());
 

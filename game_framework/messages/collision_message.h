@@ -7,6 +7,10 @@ namespace messages {
 		augs::entity_id collider;
 		vec2 collider_impact_velocity, subject_impact_velocity, point;
 
-		bool sensor_end_contact = false;
+		enum class event_type {
+			BEGIN_CONTACT,
+			PRE_SOLVE,
+			END_CONTACT
+		} type;
 	};
 }

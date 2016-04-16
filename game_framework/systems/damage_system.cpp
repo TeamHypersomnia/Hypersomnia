@@ -11,7 +11,8 @@ void damage_system::destroy_colliding_bullets_and_apply_damage() {
 	auto events = parent_world.get_message_queue<messages::collision_message>();
 
 	for (auto it : events) {
-		if (it.sensor_end_contact) continue;
+		if (it.type != messages::collision_message::event_type::PRE_SOLVE) 
+			continue;
 
 		auto* damage = it.collider->find<components::damage>();
 

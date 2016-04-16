@@ -34,7 +34,7 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel() {
 	auto& contacts = parent_world.get_message_queue<messages::collision_message>();
 
 	for (auto& c : contacts) {
-		if (c.sensor_end_contact) {
+		if (c.type == messages::collision_message::event_type::END_CONTACT) {
 			auto driver = c.subject;
 			auto car = components::physics::get_owner_body_entity(c.collider);
 

@@ -289,6 +289,7 @@ namespace scene_builders {
 			world.parent_overworld.configure_stepping(128.0, 500);
 			world.parent_overworld.delta_timer.set_stepping_speed_multiplier(1.0);
 
+			world.get_system<render_system>().enable_interpolation = true;
 			input.record_and_save_this_session();
 		}
 
