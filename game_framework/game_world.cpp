@@ -158,6 +158,14 @@ void game_world::destruction_callbacks() {
 	get_system<render_system>().remove_entities_from_rendering_tree();
 	get_system<physics_system>().destroy_fixtures_and_bodies();
 	get_system<destroy_system>().delete_queued_entities();
+	get_system<destroy_system>().purge_message_queues_of_dead_entities();
+}
+
+void game_world::creation_callbacks() {
+	get_system<render_system>().add_entities_to_rendering_tree();
+	get_system<physics_system>().create_bodies_and_fixtures_from_physics_definitions();
+
+	get_message_queue<new_entity_message>().clear();
 }
 
 void game_world::perform_logic_step() {
@@ -174,13 +182,7 @@ void game_world::perform_logic_step() {
 	get_system<gun_system>().consume_gun_intents();
 	get_system<gun_system>().launch_shots_due_to_pressed_triggers();
 
-	/* begin receivers of new_entity messages changes */
-
-	get_system<render_system>().add_entities_to_rendering_tree();
-	get_system<physics_system>().create_bodies_and_fixtures_from_physics_definitions();
-
-	get_message_queue<new_entity_message>().clear();
-	/* end receivers of new_entity messages */
+	creation_callbacks();
 
 	get_system<crosshair_system>().apply_crosshair_intents_to_base_offsets();
 	get_system<crosshair_system>().apply_base_offsets_to_crosshair_transforms();
@@ -224,7 +226,8 @@ void game_world::perform_logic_step() {
 	get_system<damage_system>().destroy_outdated_bullets();
 	get_system<damage_system>().destroy_colliding_bullets_and_apply_damage();
 	destruction_callbacks();
-	get_system<destroy_system>().purge_message_queues_of_dead_entities();
+
+	creation_callbacks();
 
 	++current_step_number;
 	seconds_passed += parent_overworld.delta_seconds();

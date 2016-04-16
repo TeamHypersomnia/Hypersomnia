@@ -14,6 +14,7 @@ public:
 	
 	void call_drawing_time_systems();
 	void perform_logic_step();
+	void creation_callbacks();
 	void destruction_callbacks();
 	void restore_transforms_after_drawing();
 

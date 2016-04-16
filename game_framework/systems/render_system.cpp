@@ -46,7 +46,8 @@ void render_system::add_entities_to_rendering_tree() {
 
 			auto transform = e->get<components::transform>();
 
-			render->previous_transform = transform;
+			if(!render->was_drawn)
+				render->previous_transform = transform;
 
 			rects::ltrb<float> aabb;
 
