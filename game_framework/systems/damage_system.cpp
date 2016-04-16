@@ -50,8 +50,10 @@ void damage_system::destroy_outdated_bullets() {
 		auto& damage = it->get<components::damage>();
 	
 		if ((damage.constrain_lifetime && damage.lifetime_ms >= damage.max_lifetime_ms) ||
-			(damage.constrain_distance && (damage.starting_point - transform.pos).length() >= damage.max_distance))
+			(damage.constrain_distance && (damage.starting_point - transform.pos).length() >= damage.max_distance)) {
+			damage.saved_point_of_impact_before_death = transform.pos;
 			parent_world.post_message(messages::destroy_message(it));
+		}
 
 		damage.lifetime_ms += delta_milliseconds();
 	}
