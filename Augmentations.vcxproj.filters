@@ -2639,9 +2639,6 @@
     <ClInclude Include="game_framework\resources\animation_response.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\messages\animation_response_message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\systems\car_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3150,6 +3147,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\systems\trace_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\globals\particles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\messages\movement_response.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\globals\animations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

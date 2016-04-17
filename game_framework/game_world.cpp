@@ -85,7 +85,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_message_queue<damage_message>();
 	register_message_queue<destroy_message>();
 	register_message_queue<animation_message>();
-	register_message_queue<animation_response_message>();
+	register_message_queue<movement_response>();
 	register_message_queue<collision_message>();
 	register_message_queue<particle_burst_message>();
 	register_message_queue<shot_message>();
@@ -113,8 +113,6 @@ void game_world::call_drawing_time_systems() {
 
 	/* read-only message generation */
 
-	get_system<animation_system>().transform_response_requests_to_animation_messages();
-	
 	get_system<gui_system>().rebuild_gui_tree_based_on_game_state();
 	get_system<gui_system>().translate_raw_window_inputs_to_gui_events();
 	get_system<gui_system>().suppress_inputs_meant_for_gui();
@@ -132,12 +130,14 @@ void game_world::call_drawing_time_systems() {
 	get_system<crosshair_system>().apply_crosshair_intents_to_base_offsets();
 	get_system<crosshair_system>().apply_base_offsets_to_crosshair_transforms();
 
-	/* application of messages */
+	get_system<movement_system>().generate_movement_responses();
+
+	get_system<animation_system>().game_responses_to_animation_messages();
+
 	get_system<animation_system>().handle_animation_messages();
 	get_system<animation_system>().progress_animation_states();
 
 	get_system<crosshair_system>().animate_crosshair_sizes();
-	get_system<movement_system>().animate_movement();
 
 	get_system<position_copying_system>().update_transforms();
 	get_system<camera_system>().resolve_cameras_transforms_and_smoothing();

@@ -19,7 +19,6 @@
 #include "game_framework/messages/crosshair_intent_message.h"
 #include "game_framework/messages/item_slot_transfer_request.h"
 
-#include "game_framework/messages/animation_response_message.h"
 #include "../detail/inventory_slot.h"
 #include "../detail/inventory_utils.h"
 
@@ -151,7 +150,7 @@ namespace scene_builders {
 			20.0f);
 
 		auto& player_response = resource_manager.create(assets::animation_response_id::TORSO_SET);
-		player_response[messages::animation_response_message::MOVE] = assets::animation_id::TORSO_MOVE;
+		player_response[animation_response_type::MOVE] = assets::animation_id::TORSO_MOVE;
 
 		auto crate = prefabs::create_crate(world, vec2(200, 300), vec2i(100, 100) / 3);
 		auto crate2 = prefabs::create_crate(world, vec2(400, 400), vec2i(300, 300));

@@ -1026,6 +1026,7 @@
     <ClInclude Include="game_framework\detail\gui\special_drag_and_drop_target.h" />
     <ClInclude Include="game_framework\game_overworld.h" />
     <ClInclude Include="game_framework\game_world.h" />
+    <ClInclude Include="game_framework\globals\animations.h" />
     <ClInclude Include="game_framework\globals\associated_entities.h" />
     <ClInclude Include="game_framework\globals\detector_domains.h" />
     <ClInclude Include="game_framework\globals\entity_name.h" />
@@ -1035,15 +1036,16 @@
     <ClInclude Include="game_framework\globals\inventory.h" />
     <ClInclude Include="game_framework\globals\joints.h" />
     <ClInclude Include="game_framework\globals\layers.h" />
+    <ClInclude Include="game_framework\globals\particles.h" />
     <ClInclude Include="game_framework\ingredients\ingredients.h" />
     <ClInclude Include="game_framework\ingredients\renderable_includes.h" />
     <ClInclude Include="game_framework\messages\animation_message.h" />
     <ClInclude Include="game_framework\components\animation_response_component.h" />
-    <ClInclude Include="game_framework\messages\animation_response_message.h" />
     <ClInclude Include="game_framework\messages\camera_render_request_message.h" />
     <ClInclude Include="game_framework\messages\collision_message.h" />
     <ClInclude Include="game_framework\messages\gui_intents.h" />
     <ClInclude Include="game_framework\messages\item_slot_transfer_request.h" />
+    <ClInclude Include="game_framework\messages\movement_response.h" />
     <ClInclude Include="game_framework\messages\new_entity_message.h" />
     <ClInclude Include="game_framework\messages\crosshair_intent_message.h" />
     <ClInclude Include="game_framework\messages\damage_message.h" />

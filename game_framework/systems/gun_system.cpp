@@ -1,7 +1,6 @@
 #include "gun_system.h"
 #include "entity_system/world.h"
 #include "../messages/intent_message.h"
-#include "../messages/animation_response_message.h"
 #include "../messages/particle_burst_message.h"
 #include "../messages/damage_message.h"
 #include "../messages/destroy_message.h"
@@ -143,38 +142,37 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 					parent_world.post_message(messages::destroy_message(catridge_or_pellet_stack));
 				}
 
-				messages::animation_response_message msg;
-				msg.response = messages::animation_response_message::SHOT;
-				msg.preserve_state_if_animation_changes = false;
-				msg.change_animation = true;
-				msg.change_speed = true;
-				msg.speed_factor = 1.f;
-				msg.subject = it;
-				msg.action = messages::animation_message::START;
-				msg.animation_priority = 1;
-
-				parent_world.post_message(msg);
+				//messages::animation_response_message msg;
+				//msg.response = messages::animation_response_message::SHOT;
+				//msg.preserve_state_if_animation_changes = false;
+				//msg.change_animation = true;
+				//msg.change_speed = true;
+				//msg.speed_factor = 1.f;
+				//msg.subject = it;
+				//msg.action = messages::animation_message::START;
+				//msg.animation_priority = 1;
+				//
+				//parent_world.post_message(msg);
 
 				auto owning_capability = get_owning_transfer_capability(it);
 
 				auto* maybe_item = it->find<components::item>();
 
 				if (maybe_item) {
-					
 					//if (owning_capability.alive())
 					//	gun.shake_camera(owning_capability[associated_entity_name::WATCHING_CAMERA], gun_transform.rotation);
 				}
 
-				messages::particle_burst_message burst;
-				burst.pos = barrel_transform.pos;
-				burst.rotation = barrel_transform.rotation;
-				burst.subject = it;
-				burst.type = messages::particle_burst_message::burst_type::WEAPON_SHOT;
-				
-				if (it.has(sub_entity_name::BARREL_SMOKE))
-					burst.target_group_to_refresh = it[sub_entity_name::BARREL_SMOKE];
-
-				parent_world.post_message(burst);
+				//messages::particle_burst_message burst;
+				//burst.pos = barrel_transform.pos;
+				//burst.rotation = barrel_transform.rotation;
+				//burst.subject = it;
+				//burst.type = messages::particle_burst_message::burst_type::WEAPON_SHOT;
+				//
+				//if (it.has(sub_entity_name::BARREL_SMOKE))
+				//	burst.target_group_to_refresh = it[sub_entity_name::BARREL_SMOKE];
+				//
+				//parent_world.post_message(burst);
 
 				auto owning_crosshair_recoil = owning_capability[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
 				

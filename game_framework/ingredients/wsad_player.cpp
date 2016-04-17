@@ -35,7 +35,7 @@ namespace ingredients {
 		//movement.input_acceleration_axes.set(8000, 8000);
 		//movement.acceleration_length = -1;
 
-		movement.max_speed_animation = 1000;
+		movement.max_speed_for_movement_response = 1000;
 		movement.braking_damping = 24.5f;
 		
 		movement.enable_braking_damping = true;

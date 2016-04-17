@@ -14,8 +14,6 @@
 
 #include "game_framework/messages/crosshair_intent_message.h"
 
-#include "game_framework/messages/animation_response_message.h"
-
 #include "rendering_scripts/testbed_rendering.h"
 
 #include "augs/file.h"
@@ -55,7 +53,7 @@ namespace scene_builders {
 			20.0f);
 
 		auto& player_response = resource_manager.create(assets::animation_response_id::TORSO_SET);
-		player_response[messages::animation_response_message::MOVE] = assets::animation_id::TORSO_MOVE;
+		player_response[animation_response_type::MOVE] = assets::animation_id::TORSO_MOVE;
 
 		auto camera = world.create_entity();
 

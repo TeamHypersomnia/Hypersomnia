@@ -1,7 +1,7 @@
 #include "animation_system.h"
 #include "entity_system/world.h"
 #include "../components/animation_response_component.h"
-#include "../messages/animation_response_message.h"
+#include "../messages/movement_response.h"
 #include "../messages/animation_message.h"
 
 #include "../resources/manager.h"
@@ -9,27 +9,30 @@
 using namespace messages;
 using namespace resources;
 
-void animation_system::transform_response_requests_to_animation_messages() {
-	auto events = parent_world.get_message_queue<animation_response_message>();
+void animation_system::game_responses_to_animation_messages() {
+	auto& movements = parent_world.get_message_queue<movement_response>();
+	// auto& gunshots = parent_world.get_message_queue<movement_response>();
 
-	for (auto it : events) {
-		auto* animation = it.subject->find<components::animation>();
-		auto* responses = it.subject->find<components::animation_response>();
-
-		if (!animation || !responses)
-			continue;
-
+	for (auto it : movements) {
 		animation_message msg;
-		msg.change_animation_state::operator=(it);
 
-		auto response_map = *resource_manager.find(responses->response);
+		msg.subject = it.subject;
+		msg.change_speed = true;
 
-		msg.set_animation = response_map[it.response];
+		msg.change_animation = true;
+		msg.preserve_state_if_animation_changes = false;
+		msg.action = ((it.speed <= 1.f) ? animation_message::STOP : animation_message::CONTINUE);
+
+		if (!it.stop_response_at_zero_speed)
+			msg.action = animation_message::CONTINUE;
+
+		msg.animation_priority = 0;
+
+		msg.set_animation = (*(it.subject->get<components::animation_response>().response))[animation_response_type::MOVE];
+		msg.speed_factor = it.speed;
 
 		parent_world.post_message(msg);
 	}
-
-	parent_world.get_message_queue<animation_response_message>().clear();
 }
 
 void animation_system::handle_animation_messages() {

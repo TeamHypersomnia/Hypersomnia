@@ -11,5 +11,5 @@ public:
 
 	void set_movement_flags_from_input();
 	void apply_movement_forces();
-	void animate_movement();
+	void generate_movement_responses();
 };

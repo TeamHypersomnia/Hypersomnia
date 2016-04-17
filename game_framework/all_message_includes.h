@@ -3,7 +3,7 @@
 #include "messages/collision_message.h"
 #include "messages/intent_message.h"
 #include "messages/animation_message.h"
-#include "messages/animation_response_message.h"
+#include "messages/movement_response.h"
 #include "messages/particle_burst_message.h"
 #include "messages/damage_message.h"
 #include "messages/shot_message.h"

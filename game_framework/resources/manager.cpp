@@ -24,6 +24,10 @@ augs::texture& operator*(const assets::texture_id& id) {
 	return resource_manager.find(id)->tex;
 }
 
+resources::animation_response& operator*(const assets::animation_response_id& id) {
+	return *resource_manager.find(id);
+}
+
 bool operator!(const assets::texture_id& id) {
 	return resource_manager.find(id) == nullptr;
 }

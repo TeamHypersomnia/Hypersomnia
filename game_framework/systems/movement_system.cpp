@@ -2,6 +2,7 @@
 #include "movement_system.h"
 #include "entity_system/world.h"
 #include "../messages/intent_message.h"
+#include "../messages/movement_response.h"
 
 #include "../components/gun_component.h"
 
@@ -29,7 +30,6 @@ void movement_system::set_movement_flags_from_input() {
 			break;
 		case intent_type::WALK:
 			movement->walking_enabled = it.pressed_flag;
-			LOG("%x", it.pressed_flag);
 			break;
 		default: break;
 		}
@@ -88,7 +88,9 @@ void movement_system::apply_movement_forces() {
 	}
 }
 
-void movement_system::animate_movement() {
+void movement_system::generate_movement_responses() {
+	parent_world.get_message_queue<movement_response>().clear();
+
 	for (auto it : targets) {
 		auto& movement = it->get<components::movement>();
 
@@ -98,38 +100,22 @@ void movement_system::animate_movement() {
 
 		if (movement.enable_animation) {
 			if (maybe_physics == nullptr) {
-				if (it->get<components::render>().interpolation_direction().non_zero()) 
-					speed = movement.max_speed_animation;
+				if (it->get<components::render>().interpolation_direction().non_zero())
+					speed = movement.max_speed_for_movement_response;
 			}
-			else {
-				auto& physics = *maybe_physics;
-
-				b2Vec2 vel = physics.body->GetLinearVelocity();
-				speed = vel.Normalize() * METERS_TO_PIXELSf;
-			}
+			else
+				speed = maybe_physics->velocity().length();
 		}
 
-		animation_response_message msg;
+		movement_response msg;
 
-		msg.change_speed = true;
+		if (movement.max_speed_for_movement_response == 0.f) msg.speed = 0.f;
+		else msg.speed = speed / movement.max_speed_for_movement_response;
 		
-		if (movement.max_speed_animation == 0.f) msg.speed_factor = 0.f;
-		else msg.speed_factor = speed / movement.max_speed_animation;
-		
-		msg.change_animation = true;
-		msg.preserve_state_if_animation_changes = false;
-		msg.action = ((speed <= 1.f) ? animation_message::STOP : animation_message::CONTINUE);
-		msg.animation_priority = 0;
-		msg.response = messages::animation_response_message::response_type::MOVE;
-
-		for (auto receiver : movement.animation_receivers) {
-			animation_response_message copy(msg);
-
+		for (auto receiver : movement.response_receivers) {
+			movement_response copy(msg);
+			copy.stop_response_at_zero_speed = receiver.stop_response_at_zero_speed;
 			copy.subject = receiver.target;
-
-			if (!receiver.stop_at_zero_movement)
-				copy.action = animation_message::CONTINUE;
-
 			parent_world.post_message(copy);
 		}
 	}

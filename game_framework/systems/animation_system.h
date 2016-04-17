@@ -15,7 +15,7 @@ public:
 
 	timer animation_timer;
 
-	void transform_response_requests_to_animation_messages();
+	void game_responses_to_animation_messages();
 
 	void handle_animation_messages();
 	void progress_animation_states();

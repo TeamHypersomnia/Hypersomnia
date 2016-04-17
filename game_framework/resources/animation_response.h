@@ -1,8 +1,8 @@
 #pragma once
 #include <unordered_map>
 #include "../assets/animation.h"
-#include "../messages/animation_response_message.h"
+#include "../globals/animations.h"
 
 namespace resources {
-	typedef std::unordered_map<messages::animation_response_message::response_type, assets::animation_id> animation_response;
+	typedef std::unordered_map<animation_response_type, assets::animation_id> animation_response;
 }
