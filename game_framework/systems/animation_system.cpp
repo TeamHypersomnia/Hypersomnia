@@ -3,6 +3,7 @@
 #include "../components/animation_response_component.h"
 #include "../messages/movement_response.h"
 #include "../messages/animation_message.h"
+#include "../messages/gunshot_response.h"
 
 #include "../resources/manager.h"
 
@@ -11,7 +12,7 @@ using namespace resources;
 
 void animation_system::game_responses_to_animation_messages() {
 	auto& movements = parent_world.get_message_queue<movement_response>();
-	// auto& gunshots = parent_world.get_message_queue<movement_response>();
+	auto& gunshots = parent_world.get_message_queue<gunshot_response>();
 
 	for (auto it : movements) {
 		animation_message msg;
@@ -32,6 +33,20 @@ void animation_system::game_responses_to_animation_messages() {
 		msg.speed_factor = it.speed;
 
 		parent_world.post_message(msg);
+	}
+
+	for (auto it : gunshots) {
+		// animation_message msg;
+		// msg.preserve_state_if_animation_changes = false;
+		// msg.change_animation = true;
+		// msg.change_speed = true;
+		// msg.speed_factor = 1.f;
+		// msg.subject = it.subject;
+		// msg.action = messages::animation_message::START;
+		// msg.animation_priority = 1;
+		// msg.set_animation = (*(it.subject->get<components::animation_response>().response))[animation_response_type::SHOT];
+		// 
+		// parent_world.post_message(msg);
 	}
 }
 

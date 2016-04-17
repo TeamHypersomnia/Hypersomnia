@@ -23,7 +23,7 @@ namespace bindings {
 			bind_stdvector<collision_message>("collision_message_vector"),
 			bind_stdvector<damage_message>("damage_message_vector"),
 			bind_stdvector<intent_message>("intent_message_vector"),
-			bind_stdvector<shot_message>("shot_message_vector"),
+			bind_stdvector<gunshot_response>("gunshot_response_vector"),
 
 
 			luabind::class_<world>("_world")
@@ -62,6 +62,6 @@ namespace bindings {
 			luabind::def("get_intent_message_queue", get_message_queue_for_scripts<intent_message>),
 			luabind::def("get_particle_burst_message_queue", get_message_queue_for_scripts<particle_burst_message>),
 			luabind::def("get_animation_message_queue", get_message_queue_for_scripts<animation_message>),
-			luabind::def("get_shot_message_queue", get_message_queue_for_scripts<shot_message>);
+			luabind::def("get_gunshot_response_queue", get_message_queue_for_scripts<gunshot_response>);
 	}
 }

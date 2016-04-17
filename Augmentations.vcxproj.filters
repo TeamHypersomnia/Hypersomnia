@@ -2513,9 +2513,6 @@
     <ClInclude Include="game_framework\messages\particle_burst_message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\messages\shot_message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\resources\particle_emitter_info.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3156,6 +3153,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\globals\animations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\messages\gunshot_response.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

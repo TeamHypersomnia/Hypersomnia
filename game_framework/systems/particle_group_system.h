@@ -12,5 +12,5 @@ class particle_group_system : public processing_system_templated<components::par
 public:
 	using processing_system_templated::processing_system_templated;
 
-	void process_entities();
+	void step_streams_and_particles_and_destroy_dead();
 };

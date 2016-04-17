@@ -18,7 +18,7 @@ void update_particle(resources::particle& p, float dt) {
 	p.lifetime_ms += dt;
 }
 
-void particle_group_system::process_entities() {
+void particle_group_system::step_streams_and_particles_and_destroy_dead() {
 	float delta = static_cast<float>(timer.extract<std::chrono::milliseconds>());
 
 	for (auto it : targets) {

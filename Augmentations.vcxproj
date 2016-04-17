@@ -1044,6 +1044,7 @@
     <ClInclude Include="game_framework\messages\camera_render_request_message.h" />
     <ClInclude Include="game_framework\messages\collision_message.h" />
     <ClInclude Include="game_framework\messages\gui_intents.h" />
+    <ClInclude Include="game_framework\messages\gunshot_response.h" />
     <ClInclude Include="game_framework\messages\item_slot_transfer_request.h" />
     <ClInclude Include="game_framework\messages\movement_response.h" />
     <ClInclude Include="game_framework\messages\new_entity_message.h" />
@@ -1056,7 +1057,6 @@
     <ClInclude Include="game_framework\messages\physics_operation.h" />
     <ClInclude Include="game_framework\messages\raw_window_input_message.h" />
     <ClInclude Include="game_framework\messages\rebuild_physics_message.h" />
-    <ClInclude Include="game_framework\messages\shot_message.h" />
     <ClInclude Include="game_framework\messages\trigger_hit_confirmation_message.h" />
     <ClInclude Include="game_framework\messages\trigger_hit_request_message.h" />
     <ClInclude Include="game_framework\messages\unmapped_intent_message.h" />

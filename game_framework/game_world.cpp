@@ -88,7 +88,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_message_queue<movement_response>();
 	register_message_queue<collision_message>();
 	register_message_queue<particle_burst_message>();
-	register_message_queue<shot_message>();
+	register_message_queue<gunshot_response>();
 	register_message_queue<raw_window_input_message>();
 	register_message_queue<unmapped_intent_message>();
 	register_message_queue<crosshair_intent_message>();

@@ -6,7 +6,7 @@
 #include "messages/movement_response.h"
 #include "messages/particle_burst_message.h"
 #include "messages/damage_message.h"
-#include "messages/shot_message.h"
+#include "messages/gunshot_response.h"
 #include "messages/raw_window_input_message.h"
 #include "messages/unmapped_intent_message.h"
 #include "messages/crosshair_intent_message.h"

@@ -4,8 +4,8 @@
 vec2 recoil_player::shoot_and_get_offset(augs::deterministic_timestamp current_time) {
 	if (current_offset > int(offsets.size() - 1))
 		reversed = true;
-	ensure(delta_offset_maximum > 0 && delta_offset_maximum < offsets.size());
-	if (current_offset <= int(offsets.size()) - delta_offset_maximum) {
+	ensure(repeat_last_n_offsets > 0 && repeat_last_n_offsets < offsets.size());
+	if (current_offset <= int(offsets.size()) - repeat_last_n_offsets) {
 		reversed = false;
 		delta_offset = 0;
 	}

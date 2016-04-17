@@ -1,10 +1,9 @@
 #include "gun_system.h"
 #include "entity_system/world.h"
 #include "../messages/intent_message.h"
-#include "../messages/particle_burst_message.h"
 #include "../messages/damage_message.h"
 #include "../messages/destroy_message.h"
-#include "../messages/shot_message.h"
+#include "../messages/gunshot_response.h"
 #include "../messages/item_slot_transfer_request.h"
 #include "../messages/physics_operation.h"
 
@@ -64,8 +63,9 @@ components::transform components::gun::calculate_barrel_transform(components::tr
 	return barrel_transform;
 }
 
-
 void gun_system::launch_shots_due_to_pressed_triggers() {
+	parent_world.get_message_queue<messages::gunshot_response>().clear();
+
 	auto& physics_sys = parent_world.get_system<physics_system>();
 	auto& render = parent_world.get_system<render_system>();
 
@@ -81,6 +81,8 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 			auto chamber_slot = it[slot_function::GUN_CHAMBER];
 
 			if (chamber_slot->get_mounted_items().size() == 1) {
+				messages::gunshot_response response;
+
 				auto barrel_transform = gun.calculate_barrel_transform(gun_transform);
 				
 				auto item_in_chamber = chamber_slot->get_mounted_items()[0];
@@ -113,7 +115,8 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 
 							op.velocity.set_from_degrees(barrel_transform.rotation).set_length(randval(gun.muzzle_velocity));
 							op.subject = round_entity;
-							
+							response.spawned_rounds.push_back(round_entity);
+
 							parent_world.post_message(op);
 						}
 
@@ -139,20 +142,14 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 						}
 					}
 
+					response.barrel_transform = barrel_transform;
+					response.subject = it;
+					
+					parent_world.post_message(response);
+
 					parent_world.post_message(messages::destroy_message(catridge_or_pellet_stack));
 				}
 
-				//messages::animation_response_message msg;
-				//msg.response = messages::animation_response_message::SHOT;
-				//msg.preserve_state_if_animation_changes = false;
-				//msg.change_animation = true;
-				//msg.change_speed = true;
-				//msg.speed_factor = 1.f;
-				//msg.subject = it;
-				//msg.action = messages::animation_message::START;
-				//msg.animation_priority = 1;
-				//
-				//parent_world.post_message(msg);
 
 				auto owning_capability = get_owning_transfer_capability(it);
 

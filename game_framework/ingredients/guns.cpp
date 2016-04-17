@@ -217,7 +217,7 @@ namespace prefabs {
 		gun.shell_velocity = std::make_pair(300, 1700);
 		gun.damage_multiplier = 1.f;
 
-		gun.recoil.delta_offset
+		gun.recoil.repeat_last_n_offsets = 20;
 
 		gun.recoil.offsets = {
 			{ vec2().set_from_degrees(0) },
@@ -276,6 +276,8 @@ namespace prefabs {
 		gun.shell_spread_degrees = 20.f;
 		gun.shell_velocity = std::make_pair(300, 1700);
 		gun.damage_multiplier = 1.f;
+		
+		gun.recoil.repeat_last_n_offsets = 20;
 
 		gun.recoil.offsets = {
 			{ vec2().set_from_degrees(0) },
@@ -334,6 +336,8 @@ namespace prefabs {
 		gun.shell_spread_degrees = 20.f;
 		gun.shell_velocity = std::make_pair(300, 1700);
 		gun.damage_multiplier = 1.f;
+		
+		gun.recoil.repeat_last_n_offsets = 20;
 
 		gun.recoil.offsets = {
 			{ vec2().set_from_degrees(0) },
