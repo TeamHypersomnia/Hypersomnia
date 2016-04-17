@@ -1,9 +1,11 @@
+#include "ensure.h"
 #include "recoil_player.h"
 
 vec2 recoil_player::shoot_and_get_offset(augs::deterministic_timestamp current_time) {
 	if (current_offset > int(offsets.size() - 1))
 		reversed = true;
-	if (delta_offset > delta_offset_maximum - 1 || delta_offset >= offsets.size() || delta_offset < 1) {
+	ensure(delta_offset_maximum > 0 && delta_offset_maximum < offsets.size())
+	if (delta_offset > delta_offset_maximum - 1){
 		reversed = false;
 		delta_offset = 0;
 	}
