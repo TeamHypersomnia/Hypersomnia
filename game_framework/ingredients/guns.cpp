@@ -217,6 +217,8 @@ namespace prefabs {
 		gun.shell_velocity = std::make_pair(300, 1700);
 		gun.damage_multiplier = 1.f;
 
+		gun.recoil.delta_offset
+
 		gun.recoil.offsets = {
 			{ vec2().set_from_degrees(0) },
 			{ vec2().set_from_degrees(6) },
