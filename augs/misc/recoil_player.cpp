@@ -9,7 +9,7 @@ vec2 recoil_player::shoot_and_get_offset(augs::deterministic_timestamp current_t
 			reversed = false;
 			delta_offset = 0;
 		}
-
+	
 	if (reversed) {
 		delta_offset++;
 		current_offset = int(offsets.size() - 1) - delta_offset;
@@ -28,3 +28,4 @@ void recoil_player::cooldown(double amount_ms) {
 
 	current_offset = std::max(current_offset, 0);
 }
+ 
