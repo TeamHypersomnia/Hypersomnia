@@ -28,6 +28,10 @@ resources::animation_response& operator*(const assets::animation_response_id& id
 	return *resource_manager.find(id);
 }
 
+resources::particle_effect_response& operator*(const assets::particle_effect_response_id& id) {
+	return *resource_manager.find(id);
+}
+
 bool operator!(const assets::texture_id& id) {
 	return resource_manager.find(id) == nullptr;
 }
@@ -71,6 +75,20 @@ namespace resources {
 	animation_response* manager::find(assets::animation_response_id id) {
 		auto it = animation_responses.find(id);
 		if (it == animation_responses.end()) return nullptr;
+
+		return &(*it).second;
+	}
+
+	particle_effect_response* manager::find(assets::particle_effect_response_id id) {
+		auto it = particle_effect_responses.find(id);
+		if (it == particle_effect_responses.end()) return nullptr;
+
+		return &(*it).second;
+	}
+
+	particle_effect* manager::find(assets::particle_effect_id id) {
+		auto it = particle_effects.find(id);
+		if (it == particle_effects.end()) return nullptr;
 
 		return &(*it).second;
 	}
@@ -207,6 +225,21 @@ namespace resources {
 		animation_responses.insert(std::make_pair(id, animation_response()));
 
 		animation_response& resp = animation_responses[id];
+		return resp;
+	}
+
+
+	particle_effect_response& manager::create(assets::particle_effect_response_id id) {
+		particle_effect_responses.insert(std::make_pair(id, particle_effect_response()));
+
+		auto& resp = particle_effect_responses[id];
+		return resp;
+	}
+
+	particle_effect& manager::create(assets::particle_effect_id id) {
+		particle_effects.insert(std::make_pair(id, particle_effect()));
+
+		auto& resp = particle_effects[id];
 		return resp;
 	}
 

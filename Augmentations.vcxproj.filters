@@ -648,12 +648,6 @@
     <ClCompile Include="game_framework\systems\movement_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\systems\particle_emitter_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game_framework\systems\particle_group_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\systems\pathfinding_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1171,6 +1165,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game_framework\systems\trace_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\systems\particles_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2510,12 +2507,6 @@
     <ClInclude Include="game_framework\messages\message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\messages\particle_burst_message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game_framework\resources\particle_emitter_info.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\systems\animation_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2544,12 +2535,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\systems\movement_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game_framework\systems\particle_emitter_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game_framework\systems\particle_group_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\systems\pathfinding_system.h">
@@ -2963,9 +2948,6 @@
     <ClInclude Include="game_framework\components\movement_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\components\particle_emitter_component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\components\particle_group_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3156,6 +3138,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\messages\gunshot_response.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\resources\particle_effect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\resources\particle_effect_response.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\assets\particle_effect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\assets\particle_effect_response.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\systems\particles_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\messages\create_particle_effect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\components\particle_effect_response_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

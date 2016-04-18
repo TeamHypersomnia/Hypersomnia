@@ -27,7 +27,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_component<input_receiver>();
 	register_component<rotation_copying>();
 	register_component<movement>();
-	register_component<particle_emitter>();
+	register_component<particle_effect_response>();
 	register_component<particle_group>();
 	register_component<pathfinding>();
 	register_component<physics>();
@@ -64,8 +64,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_system<visibility_system>();
 	register_system<pathfinding_system>();
 	register_system<gun_system>();
-	register_system<particle_group_system>();
-	register_system<particle_emitter_system>();
+	register_system<particles_system>();
 	register_system<render_system>();
 	register_system<camera_system>();
 	register_system<position_copying_system>();
@@ -87,7 +86,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_message_queue<animation_message>();
 	register_message_queue<movement_response>();
 	register_message_queue<collision_message>();
-	register_message_queue<particle_burst_message>();
+	register_message_queue<create_particle_effect>();
 	register_message_queue<gunshot_response>();
 	register_message_queue<raw_window_input_message>();
 	register_message_queue<unmapped_intent_message>();

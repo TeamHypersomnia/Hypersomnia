@@ -6,10 +6,14 @@
 #include "../assets/font.h"
 #include "../assets/animation.h"
 #include "../assets/animation_response.h"
+#include "../assets/particle_effect.h"
+#include "../assets/particle_effect_response.h"
 
 #include "../resources/animation.h"
 #include "../resources/animation_response.h"
 #include "../resources/texture_with_image.h"
+#include "../resources/particle_effect.h"
+#include "../resources/particle_effect_response.h"
 
 #include "texture_baker/texture_baker.h"
 #include "texture_baker/font.h"
@@ -43,6 +47,9 @@ namespace resources {
 		animation& create(assets::animation_id);
 		resources::animation_response& create(assets::animation_response_id);
 
+		particle_effect& create(assets::particle_effect_id);
+		particle_effect_response& create(assets::particle_effect_response_id);
+
 		augs::graphics::shader& create(assets::shader_id, std::wstring filename, augs::graphics::shader::type);
 		augs::graphics::shader_program& create(assets::program_id, assets::shader_id vertex, assets::shader_id fragment);
 
@@ -52,11 +59,15 @@ namespace resources {
 		augs::graphics::shader_program* find(assets::program_id);
 		animation* find(assets::animation_id);
 		animation_response* find(assets::animation_response_id);
+		particle_effect* find(assets::particle_effect_id);
+		particle_effect_response* find(assets::particle_effect_response_id);
 
 		void destroy_everything();
 
 	private:
-		
+
+		std::unordered_map<assets::particle_effect_id, particle_effect> particle_effects;
+		std::unordered_map<assets::particle_effect_response_id, particle_effect_response> particle_effect_responses;
 		std::unordered_map<assets::animation_response_id, animation_response> animation_responses;
 		std::unordered_map<assets::animation_id, animation> animations;
 		std::unordered_map<assets::texture_id, texture_with_image> textures;

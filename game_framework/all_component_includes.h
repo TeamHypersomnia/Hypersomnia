@@ -12,7 +12,7 @@
 #include "components/input_receiver_component.h"
 #include "components/rotation_copying_component.h"
 #include "components/movement_component.h"
-#include "components/particle_emitter_component.h"
+#include "components/particle_effect_response_component.h"
 #include "components/particle_group_component.h"
 #include "components/physics_component.h"
 #include "components/steering_component.h"

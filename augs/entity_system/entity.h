@@ -26,7 +26,7 @@ namespace components {
 	struct input_receiver;
 	struct rotation_copying;
 	struct movement;
-	struct particle_emitter;
+	struct particle_effect_response;
 	struct particle_group;
 	struct pathfinding;
 	struct physics;
@@ -104,7 +104,7 @@ namespace augs {
 			std::pair<memory_pool::id, components::input_receiver*>,
 			std::pair<memory_pool::id, components::rotation_copying*>,
 			std::pair<memory_pool::id, components::movement*>,
-			std::pair<memory_pool::id, components::particle_emitter*>,
+			std::pair<memory_pool::id, components::particle_effect_response*>,
 			std::pair<memory_pool::id, components::particle_group*>,
 			std::pair<memory_pool::id, components::pathfinding*>,
 			std::pair<memory_pool::id, components::physics*>,

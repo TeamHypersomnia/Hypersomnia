@@ -447,8 +447,7 @@
     <ClCompile Include="game_framework\systems\input_system.cpp" />
     <ClCompile Include="game_framework\systems\rotation_copying_system.cpp" />
     <ClCompile Include="game_framework\systems\movement_system.cpp" />
-    <ClCompile Include="game_framework\systems\particle_emitter_system.cpp" />
-    <ClCompile Include="game_framework\systems\particle_group_system.cpp" />
+    <ClCompile Include="game_framework\systems\particles_system.cpp" />
     <ClCompile Include="game_framework\systems\pathfinding_system.cpp" />
     <ClCompile Include="game_framework\systems\physics_system.cpp" />
     <ClCompile Include="game_framework\systems\render_system.cpp" />
@@ -974,6 +973,8 @@
     <ClInclude Include="game_framework\assets\atlas.h" />
     <ClInclude Include="game_framework\assets\callback.h" />
     <ClInclude Include="game_framework\assets\font.h" />
+    <ClInclude Include="game_framework\assets\particle_effect.h" />
+    <ClInclude Include="game_framework\assets\particle_effect_response.h" />
     <ClInclude Include="game_framework\assets\program.h" />
     <ClInclude Include="game_framework\assets\shader.h" />
     <ClInclude Include="game_framework\bindings\bindings.h" />
@@ -1000,7 +1001,7 @@
     <ClInclude Include="game_framework\components\gun_component.h" />
     <ClInclude Include="game_framework\components\rotation_copying_component.h" />
     <ClInclude Include="game_framework\components\movement_component.h" />
-    <ClInclude Include="game_framework\components\particle_emitter_component.h" />
+    <ClInclude Include="game_framework\components\particle_effect_response_component.h" />
     <ClInclude Include="game_framework\components\particle_group_component.h" />
     <ClInclude Include="game_framework\components\pathfinding_component.h" />
     <ClInclude Include="game_framework\components\physics_component.h" />
@@ -1053,7 +1054,7 @@
     <ClInclude Include="game_framework\messages\destroy_message.h" />
     <ClInclude Include="game_framework\messages\intent_message.h" />
     <ClInclude Include="game_framework\messages\message.h" />
-    <ClInclude Include="game_framework\messages\particle_burst_message.h" />
+    <ClInclude Include="game_framework\messages\create_particle_effect.h" />
     <ClInclude Include="game_framework\messages\physics_operation.h" />
     <ClInclude Include="game_framework\messages\raw_window_input_message.h" />
     <ClInclude Include="game_framework\messages\rebuild_physics_message.h" />
@@ -1063,7 +1064,8 @@
     <ClInclude Include="game_framework\resources\animation.h" />
     <ClInclude Include="game_framework\resources\animation_response.h" />
     <ClInclude Include="game_framework\resources\manager.h" />
-    <ClInclude Include="game_framework\resources\particle_emitter_info.h" />
+    <ClInclude Include="game_framework\resources\particle_effect.h" />
+    <ClInclude Include="game_framework\resources\particle_effect_response.h" />
     <ClInclude Include="game_framework\resources\texture_with_image.h" />
     <ClInclude Include="game_framework\scene_builders\one_entity.h" />
     <ClInclude Include="game_framework\scene_builders\rendering_scripts\testbed_rendering.h" />
@@ -1097,8 +1099,7 @@
     <ClInclude Include="game_framework\systems\input_system.h" />
     <ClInclude Include="game_framework\systems\rotation_copying_system.h" />
     <ClInclude Include="game_framework\systems\movement_system.h" />
-    <ClInclude Include="game_framework\systems\particle_emitter_system.h" />
-    <ClInclude Include="game_framework\systems\particle_group_system.h" />
+    <ClInclude Include="game_framework\systems\particles_system.h" />
     <ClInclude Include="game_framework\systems\pathfinding_system.h" />
     <ClInclude Include="game_framework\systems\physics_system.h" />
     <ClInclude Include="game_framework\systems\render_system.h" />

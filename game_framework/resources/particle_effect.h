@@ -1,6 +1,4 @@
 #pragma once
-#include "misc/map_wrapper.h"
-#include "../messages/particle_burst_message.h"
 #include "../components/render_component.h"
 #include "../components/sprite_component.h"
 
@@ -63,7 +61,4 @@ namespace resources {
 	};
 
 	typedef std::vector<emission> particle_effect;
-	typedef augs::map_wrapper <
-		int, particle_effect
-	> particle_emitter_info;
 }

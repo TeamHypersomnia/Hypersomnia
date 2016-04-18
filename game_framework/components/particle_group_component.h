@@ -1,12 +1,12 @@
 #pragma once
 #include <vector>
 #include "math/vec2.h"
-#include "particle_emitter_component.h"
+#include "particle_effect_response_component.h"
+#include "../resources/particle_effect.h"
 #include "transform_component.h"
 
 class physics_system;
-class particle_group_system;
-class particle_emitter_system;
+class particles_system;
 
 namespace resources {
 	struct emission;
@@ -29,8 +29,8 @@ namespace components {
 			/* only used by subject stream to indicate that it will no longer emit particles */
 			bool destroy_when_empty = true;
 
-			float stream_lifetime_ms = 0.f;
-			float stream_max_lifetime_ms = 0.f;
+			double stream_lifetime_ms = 0.0;
+			double stream_max_lifetime_ms = 0.0;
 			float stream_particles_to_spawn = 0.f;
 
 			float target_spread = 0.f;
@@ -59,7 +59,6 @@ namespace components {
 
 		void draw(shared::state_for_drawing_renderable);
 	private:
-		friend class particle_group_system;
-		friend class particle_emitter_system;
+		friend class particles_system;
 	};
 }

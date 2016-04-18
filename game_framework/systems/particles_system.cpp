@@ -1,18 +1,19 @@
-#include "particle_emitter_system.h"
+#include "particles_system.h"
 #include "entity_system/world.h"
 #include "entity_system/entity.h"
 
-#include "../resources/particle_emitter_info.h"
+#include "../resources/particle_effect.h"
 
 #include "../components/render_component.h"
 #include "../components/position_copying_component.h"
 #include "../components/particle_group_component.h"
 
-#include "../messages/particle_burst_message.h"
+#include "../messages/create_particle_effect.h"
+#include "../messages/destroy_message.h"
 
 #include "misc/randval.h"
 
-entity_id particle_emitter_system::create_refreshable_particle_group(world& parent_world) {
+entity_id particles_system::create_refreshable_particle_group(world& parent_world) {
 	entity_id ent = parent_world.create_entity("refreshable_particle_group");
 	
 	ent->add(components::transform());
@@ -23,7 +24,7 @@ entity_id particle_emitter_system::create_refreshable_particle_group(world& pare
 	return ent;
 }
 
-void particle_emitter_system::spawn_particle(
+void particles_system::spawn_particle(
 	components::particle_group::stream& group, const vec2& position, float rotation, float spread, const resources::emission& emission) {
 	auto new_particle = emission.particle_templates[randval(0u, emission.particle_templates.size() - 1)];
 	new_particle.vel = vec2().set_from_degrees(
@@ -64,39 +65,24 @@ void particle_emitter_system::spawn_particle(
 	group.particles.particles.push_back(new_particle);
 }
 
-void particle_emitter_system::consume_events() {
+void particles_system::consume_events() {
 	using namespace components;
 	using namespace messages;
 
-	auto events = parent_world.get_message_queue<particle_burst_message>();
+	auto events = parent_world.get_message_queue<create_particle_effect>();
 
 	for (auto it : events) {
-		resources::particle_effect* emissions = nullptr;
-
-		if (it.type == it.CUSTOM)
-			emissions = &it.effect;
-		else {
-			if (it.subject.alive()) {
-				auto* emitter = it.subject->find<particle_emitter>();
-				if (emitter && emitter->available_particle_effects) {
-					auto emissions_found = emitter->available_particle_effects->get_raw().find(it.type);
-
-					if (emissions_found == emitter->available_particle_effects->get_raw().end()) continue;
-					emissions = &(*emissions_found).second;
-				}
-				else continue;
-			}
-		}
+		auto& emissions = it.effect;
 
 		if (it.local_transform && it.subject.alive()) {
-			it.pos += it.subject->get<components::transform>().pos;
-			it.rotation += it.subject->get<components::transform>().rotation;
+			it.transform.pos += it.subject->get<components::transform>().pos;
+			it.transform.rotation += it.subject->get<components::transform>().rotation;
 		}
 
 		std::vector<resources::emission*> only_streams;
 		
-		for (auto& emission : *emissions) {
-			float target_rotation = it.rotation + randval(emission.angular_offset);
+		for (auto& emission : emissions) {
+			float target_rotation = it.transform.rotation + randval(emission.angular_offset);
 			float target_spread = randval(emission.spread_degrees);
 
 			if (emission.type == resources::emission::type::BURST) {
@@ -108,7 +94,7 @@ void particle_emitter_system::consume_events() {
 				new_burst_entity->add(emission.particle_render_template);
 
 				for (int i = 0; i < burst_amount; ++i)
-					spawn_particle(new_burst_entity->get<components::particle_group>().stream_slots[0], it.pos, target_rotation, target_spread, emission);
+					spawn_particle(new_burst_entity->get<components::particle_group>().stream_slots[0], it.transform.pos, target_rotation, target_spread, emission);
 
 			}
 
@@ -146,7 +132,7 @@ void particle_emitter_system::consume_events() {
 					target_position_copying = &new_stream_entity->add(components::position_copying(it.subject));
 			}
 
-			float target_rotation = it.rotation + randval(stream->angular_offset);
+			float target_rotation = it.transform.rotation + randval(stream->angular_offset);
 
 			//*target_group = components::particle_group();
 			auto& target_stream = target_group->stream_slots[stream_index];
@@ -171,7 +157,7 @@ void particle_emitter_system::consume_events() {
 
 			target_stream.fade_when_ms_remaining = randval(stream->fade_when_ms_remaining);
 
-			*target_transform = components::transform(it.pos, target_rotation);
+			*target_transform = components::transform(it.transform.pos, target_rotation);
 			target_group->previous_transform = *target_transform;
 
 			*target_render = stream->particle_render_template;
@@ -181,7 +167,7 @@ void particle_emitter_system::consume_events() {
 				*target_position_copying = components::position_copying(it.subject);
 				target_position_copying->position_copying_type = components::position_copying::position_copying_type::ORBIT;
 				target_position_copying->rotation_offset = target_rotation - subject_transform.rotation;
-				target_position_copying->rotation_orbit_offset = (it.pos - subject_transform.pos).rotate(-subject_transform.rotation, vec2(0.f, 0.f));
+				target_position_copying->rotation_orbit_offset = (it.transform.pos - subject_transform.pos).rotate(-subject_transform.rotation, vec2(0.f, 0.f));
 			}
 
 			if (it.target_group_to_refresh.alive()) {
@@ -189,5 +175,88 @@ void particle_emitter_system::consume_events() {
 				target_stream.destroy_when_empty = false;
 			}
 		}
+	}
+}
+
+void update_particle(resources::particle& p, float dt) {
+	p.vel += p.acc * dt / 1000.0;
+	p.pos += p.vel * dt / 1000.0;
+	p.rotation += p.rotation_speed * dt;
+
+	p.vel.damp(p.linear_damping * dt / 1000.f);
+	damp(p.rotation_speed, p.angular_damping * dt / 1000.f);
+
+	p.lifetime_ms += dt;
+}
+
+void particles_system::step_streams_and_particles_and_destroy_dead() {
+	auto delta = delta_milliseconds();
+
+	for (auto it : targets) {
+		auto& group = it->get<components::particle_group>();
+		auto& transform = it->get<components::transform>();
+
+		bool should_destroy = true;
+
+		for (auto& stream_slot : group.stream_slots) {
+			auto& particles = stream_slot.particles.particles;
+
+			for (auto& particle : particles)
+				update_particle(particle, delta);
+
+			if (stream_slot.is_streaming) {
+				auto& stream_info = stream_slot.stream_info;
+				float stream_delta = std::min(delta, stream_slot.stream_max_lifetime_ms - stream_slot.stream_lifetime_ms);
+				stream_slot.stream_lifetime_ms += stream_delta;
+				stream_slot.stream_lifetime_ms = std::min(stream_slot.stream_lifetime_ms, stream_slot.stream_max_lifetime_ms);
+
+				stream_slot.stream_particles_to_spawn += randval(stream_info.particles_per_sec.first, stream_info.particles_per_sec.second) * (stream_delta / 1000.f);
+
+				stream_slot.swings_per_sec += randval(-stream_slot.swing_speed_change, stream_slot.swing_speed_change);
+				stream_slot.swing_spread += randval(-stream_slot.swing_spread_change, stream_slot.swing_spread_change);
+
+				if (stream_slot.max_swing_spread > 0)
+					augs::clamp(stream_slot.swing_spread, stream_slot.min_swing_spread, stream_slot.max_swing_spread);
+				if (stream_slot.max_swings_per_sec > 0)
+					augs::clamp(stream_slot.swings_per_sec, stream_slot.min_swings_per_sec, stream_slot.max_swings_per_sec);
+
+				int to_spawn = static_cast<int>(std::floor(stream_slot.stream_particles_to_spawn));
+
+				if (!group.pause_emission) {
+					for (int i = 0; i < to_spawn; ++i) {
+						float t = (static_cast<float>(i) / to_spawn);
+						float time_elapsed = (1.f - t) * delta;
+
+						components::transform current_transform(lerp(group.previous_transform.pos, transform.pos, vec2(t, t)),
+							lerp(group.previous_transform.rotation, transform.rotation, t));
+
+						particles_system::spawn_particle(stream_slot, current_transform.pos, current_transform.rotation +
+							stream_slot.swing_spread * sin((stream_slot.stream_lifetime_ms / 1000.f) * 2 * 3.1415926535897932384626433832795f * stream_slot.swings_per_sec)
+							, stream_slot.target_spread, stream_info);
+
+						update_particle(*stream_slot.particles.particles.rbegin(), time_elapsed);
+						stream_slot.stream_particles_to_spawn -= 1.f;
+					}
+				}
+				else {
+					stream_slot.stream_particles_to_spawn -= to_spawn;
+				}
+			}
+
+			particles.erase(std::remove_if(particles.begin(), particles.end(),
+				[](const resources::particle& a) { return a.should_disappear && a.lifetime_ms >= a.max_lifetime_ms;  }
+			), particles.end());
+
+			if (!
+				(particles.empty() &&
+					stream_slot.destroy_when_empty &&
+					(!stream_slot.is_streaming || stream_slot.stream_lifetime_ms >= stream_slot.stream_max_lifetime_ms)))
+				should_destroy = false;
+		}
+
+		if (should_destroy)
+			parent_world.post_message(messages::destroy_message(it));
+
+		group.previous_transform = transform;
 	}
 }

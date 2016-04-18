@@ -3,7 +3,7 @@
 #include "math/vec2.h"
 
 #include "entity_system/entity.h"
-#include "../resources/particle_emitter_info.h"
+#include "../components/transform_component.h"
 
 namespace resources {
 	struct emission;
@@ -15,27 +15,12 @@ namespace components {
 }
 
 namespace messages {
-	struct particle_burst_message : public message {
-		enum burst_type {
-			BULLET_IMPACT,
-			WEAPON_SHOT,
-
-			CUSTOM
-		};
-
-		int type = CUSTOM;
-
+	struct create_particle_effect : public message {
 		resources::particle_effect effect;
-
-		void set_effect(resources::particle_effect* eff) {
-			effect = *eff;
-		}
 
 		augs::entity_id target_group_to_refresh;
 
 		bool local_transform = false;
-
-		vec2 pos;
-		float rotation = 0.f;
+		components::transform transform;
 	};
 }

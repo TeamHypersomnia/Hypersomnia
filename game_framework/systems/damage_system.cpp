@@ -2,7 +2,7 @@
 #include "entity_system/world.h"
 #include "entity_system/entity.h"
 
-#include "../messages/particle_burst_message.h"
+#include "../messages/create_particle_effect.h"
 #include "../messages/collision_message.h"
 #include "../messages/destroy_message.h"
 #include "../messages/damage_message.h"
@@ -28,13 +28,13 @@ void damage_system::destroy_colliding_bullets_and_apply_damage() {
 			// damage_msg.impact_velocity = it.impact_velocity;
 			parent_world.post_message(damage_msg);
 
-			messages::particle_burst_message burst_msg;
-			burst_msg.subject = it.subject;
-			burst_msg.pos = it.point;
-		//	burst_msg.rotation = (-it.impact_velocity).degrees();
-			burst_msg.type = messages::particle_burst_message::burst_type::BULLET_IMPACT;
+//			messages::create_particle_effect burst_msg;
+//			burst_msg.subject = it.subject;
+//			burst_msg.pos = it.point;
+//		//	burst_msg.rotation = (-it.impact_velocity).degrees();
+//			burst_msg.type = messages::create_particle_effect::burst_type::BULLET_IMPACT;
 
-			parent_world.post_message(burst_msg);
+	//		parent_world.post_message(burst_msg);
 
 			damage->saved_point_of_impact_before_death = it.point;
 			//augs::renderer::get_current().blink_lines.draw_yellow(it.point, it.point + it.collider_impact_velocity.set_length(100));

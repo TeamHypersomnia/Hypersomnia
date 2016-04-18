@@ -19,7 +19,7 @@ namespace bindings {
 		return
 			bind_stdvector<destroy_message>("destroy_message_vector"),
 			bind_stdvector<animation_message>("animation_message_vector"),
-			bind_stdvector<particle_burst_message>("particle_burst_message_vector"),
+			bind_stdvector<create_particle_effect>("particle_burst_message_vector"),
 			bind_stdvector<collision_message>("collision_message_vector"),
 			bind_stdvector<damage_message>("damage_message_vector"),
 			bind_stdvector<intent_message>("intent_message_vector"),
@@ -34,7 +34,7 @@ namespace bindings {
 			.def("post_message", &world::post_message<animation_message>)
 			.def("post_message", &world::post_message<intent_message>)
 			.def("post_message", &world::post_message<destroy_message>)
-			.def("post_message", &world::post_message<particle_burst_message>)
+			.def("post_message", &world::post_message<create_particle_effect>)
 			
 			.property("input_system", &world::get_system<input_system>)
 			.property("steering_system", &world::get_system<steering_system>)
@@ -46,8 +46,7 @@ namespace bindings {
 			.property("visibility_system", &world::get_system<visibility_system>)
 			.property("pathfinding_system", &world::get_system<pathfinding_system>)
 			.property("gun_system", &world::get_system<gun_system>)
-			.property("particle_group_system", &world::get_system<particle_group_system>)
-			.property("particle_emitter_system", &world::get_system<particle_emitter_system>)
+			.property("particles_system", &world::get_system<particles_system>)
 			.property("render_system", &world::get_system<render_system>)
 			.property("camera_system", &world::get_system<camera_system>)
 			.property("position_copying_system", &world::get_system<position_copying_system>)
@@ -60,7 +59,7 @@ namespace bindings {
 			luabind::def("get_collision_message_queue", get_message_queue_for_scripts<collision_message>),
 			luabind::def("get_damage_message_queue", get_message_queue_for_scripts<damage_message>),
 			luabind::def("get_intent_message_queue", get_message_queue_for_scripts<intent_message>),
-			luabind::def("get_particle_burst_message_queue", get_message_queue_for_scripts<particle_burst_message>),
+			luabind::def("get_particle_burst_message_queue", get_message_queue_for_scripts<create_particle_effect>),
 			luabind::def("get_animation_message_queue", get_message_queue_for_scripts<animation_message>),
 			luabind::def("get_gunshot_response_queue", get_message_queue_for_scripts<gunshot_response>);
 	}
