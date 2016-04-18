@@ -1,11 +1,11 @@
 #pragma once
-#include "game_framework/bind_game_framework_and_augs.h"
+#include "game/bind_game_and_augs.h"
 #include "augs/augmentations.h"
-#include "game_framework/game_overworld.h"
+#include "game/game_overworld.h"
 
 using namespace augs;
 
-#include "game_framework/scene_builders/testbed.h"
+#include "game/scene_builders/testbed.h"
 
 int main(int argc, char** argv) {
 	augs::init();

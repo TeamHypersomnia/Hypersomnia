@@ -1,7 +1,7 @@
 #pragma once
-#include "game_framework/detail/state_for_drawing.h"
-#include "game_framework/resources/animation.h"
-#include "game_framework/components/tile_layer_component.h"
+#include "game/detail/state_for_drawing.h"
+#include "game/resources/animation.h"
+#include "game/components/tile_layer_component.h"
 
 #include "misc/vector_wrapper.h"
 
