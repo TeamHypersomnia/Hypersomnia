@@ -24,7 +24,7 @@ namespace resource_setups {
 				particle_template.angular_damping = 0;
 				particle_template.linear_damping = 5000;
 				particle_template.should_disappear = true;
-				particle_template.face.set(assets::texture_id(assets::PIXEL_THUNDER_FIRST + i), augs::rgba(0, 254, 254, 255));
+				particle_template.face.set(assets::texture_id(assets::PIXEL_THUNDER_FIRST + i), augs::rgba(100, 254, 254, 255));
 				particle_template.alpha_levels = 1;
 
 				em.particle_templates.push_back(particle_template);

@@ -61,7 +61,7 @@ namespace ingredients {
 }
 
 namespace prefabs {
-	augs::entity_id create_sample_magazine(augs::world& world, vec2 pos) {
+	augs::entity_id create_sample_magazine(augs::world& world, vec2 pos, std::string space, augs::entity_id charge_inside) {
 		auto sample_magazine = world.create_entity("sample_magazine");
 		name_entity(sample_magazine, entity_name::MAGAZINE);
 
@@ -78,13 +78,17 @@ namespace prefabs {
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.for_categorized_items_only = true;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("0.30");
+			charge_deposit_def.space_available = to_space_units(space);
 
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
 		}
 
+		if (charge_inside.dead()) {
+			charge_inside = create_cyan_charge(world, vec2(0, 0), 30);
+		}
+
 		messages::item_slot_transfer_request load_charge;
-		load_charge.item = create_cyan_charge(world, vec2(0, 0));
+		load_charge.item = charge_inside;
 		load_charge.target_slot = sample_magazine[slot_function::ITEM_DEPOSIT];
 
 		world.post_message(load_charge);
@@ -107,7 +111,7 @@ namespace prefabs {
 		return sample_suppressor;
 	}
 
-	augs::entity_id create_pink_charge(augs::world& world, vec2 pos) {
+	augs::entity_id create_pink_charge(augs::world& world, vec2 pos, int charges) {
 		auto pink_charge = world.create_entity("pink_charge");
 		auto round_definition = world.create_definition_entity("round_definition");
 		auto shell_definition = world.create_definition_entity("shell_definition");
@@ -120,7 +124,7 @@ namespace prefabs {
 			auto& item = ingredients::make_item(pink_charge);
 			item.space_occupied_per_charge = to_space_units("0.01");
 			item.categories_for_slot_compatibility = item_category::SHOT_CHARGE;
-			item.charges = 23;
+			item.charges = charges;
 			item.stackable = true;
 		}
 
@@ -156,7 +160,7 @@ namespace prefabs {
 		return pink_charge;
 	}
 
-	augs::entity_id create_cyan_charge(augs::world& world, vec2 pos) {
+	augs::entity_id create_cyan_charge(augs::world& world, vec2 pos, int charges) {
 		auto cyan_charge = world.create_entity("cyan_charge");
 		auto round_definition = world.create_definition_entity("round_definition");
 		auto shell_definition = world.create_definition_entity("shell_definition");
@@ -169,7 +173,7 @@ namespace prefabs {
 			auto& item = ingredients::make_item(cyan_charge);
 			item.space_occupied_per_charge = to_space_units("0.007");
 			item.categories_for_slot_compatibility = item_category::SHOT_CHARGE;
-			item.charges = 30;
+			item.charges = charges;
 			item.stackable = true;
 		}
 

@@ -48,6 +48,10 @@ void particles_system::game_responses_to_particle_effects() {
 		//parent_world.post_message(burst);
 	}
 
+	for (auto& d : damages) {
+
+
+	}
 
 
 	//			messages::create_particle_effect burst_msg;

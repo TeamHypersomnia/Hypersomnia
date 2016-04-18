@@ -48,14 +48,14 @@ namespace prefabs {
 	augs::entity_id create_car(augs::world&, components::transform);
 	augs::entity_id create_motorcycle(augs::world&, components::transform);
 
-	augs::entity_id create_sample_magazine(augs::world&, vec2 pos);
+	augs::entity_id create_sample_magazine(augs::world&, vec2 pos, std::string space = "0.30", augs::entity_id charge_inside = augs::entity_id());
 	augs::entity_id create_sample_suppressor(augs::world& world, vec2 pos);
 	augs::entity_id create_sample_rifle(augs::world&, vec2 pos);
 	augs::entity_id create_pistol(augs::world&, vec2 pos);
 	augs::entity_id create_submachine(augs::world&, vec2 pos);
 	
-	augs::entity_id create_pink_charge(augs::world&, vec2 pos);
-	augs::entity_id create_cyan_charge(augs::world&, vec2 pos);
+	augs::entity_id create_pink_charge(augs::world&, vec2 pos, int charges = 23);
+	augs::entity_id create_cyan_charge(augs::world&, vec2 pos, int charges = 30);
 
 	augs::entity_id create_sample_backpack(augs::world&, vec2 pos);
 

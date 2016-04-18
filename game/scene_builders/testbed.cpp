@@ -100,8 +100,7 @@ namespace scene_builders {
 		prefabs::create_sample_rifle(world, vec2(100, -500 + 100));
 
 		prefabs::create_pistol(world, vec2(300, -500 + 50));
-		prefabs::create_submachine(world, vec2(500, -500 + 50));
-
+		auto submachine = prefabs::create_submachine(world, vec2(500, -500 + 50));
 
 		auto mag = prefabs::create_sample_magazine(world, vec2(100, -650));
 		mag[slot_function::ITEM_DEPOSIT]->space_available = to_space_units("100000");
@@ -115,6 +114,8 @@ namespace scene_builders {
 		//prefabs::create_pink_charge(world, vec2(200, -400));
 		prefabs::create_cyan_charge(world, vec2(150, -500));
 		prefabs::create_cyan_charge(world, vec2(200, -500));
+
+		auto pink_mag = prefabs::create_sample_magazine(world, vec2(100 - 50, -650), "100000", prefabs::create_pink_charge(world, vec2(0, 0), 500));
 
 		auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 		prefabs::create_sample_backpack(world, vec2(200, -750));
@@ -130,14 +131,30 @@ namespace scene_builders {
 
 		world.post_message(r);
 
-		r.item = rifle;
+		r.item = pink_mag;
+		r.target_slot = submachine[slot_function::GUN_DETACHABLE_MAGAZINE];
+
+		world.post_message(r);
+
+		r.item = submachine;
 		r.target_slot = characters[0][slot_function::PRIMARY_HAND];
-		
+
+		world.post_message(r);
+
+		r.item = rifle;
+		r.target_slot = characters[0][slot_function::SECONDARY_HAND];
+
 		world.post_message(r);
 
 		r.item = mag[slot_function::ITEM_DEPOSIT]->items_inside[0];
 		r.specified_quantity = 1;
 		r.target_slot = rifle[slot_function::GUN_CHAMBER];
+
+		world.post_message(r);
+
+		r.item = pink_mag[slot_function::ITEM_DEPOSIT]->items_inside[0];
+		r.specified_quantity = 1;
+		r.target_slot = submachine[slot_function::GUN_CHAMBER];
 
 		world.post_message(r);
 
