@@ -1,5 +1,4 @@
 #pragma once
-
 #include "scene_builder.h"
 #include "augs/entity_system/entity_id.h"
 

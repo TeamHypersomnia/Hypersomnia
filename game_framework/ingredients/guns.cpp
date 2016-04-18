@@ -83,7 +83,7 @@ namespace prefabs {
 		}
 
 		messages::item_slot_transfer_request load_charge;
-		load_charge.item = create_pink_charge(world, vec2(0, 0));
+		load_charge.item = create_cyan_charge(world, vec2(0, 0));
 		load_charge.target_slot = sample_magazine[slot_function::ITEM_DEPOSIT];
 
 		world.post_message(load_charge);
@@ -170,7 +170,8 @@ namespace prefabs {
 		}
 
 		{
-			ingredients::sprite(round_definition, pos, assets::texture_id::ROUND_TRACE, augs::cyan, render_layer::FLYING_BULLETS);
+			auto& s = ingredients::sprite(round_definition, pos, assets::texture_id::ROUND_TRACE, augs::cyan, render_layer::FLYING_BULLETS);
+			s.size *= vec2(2, 0.5);
 			auto& def = ingredients::bullet_round_physics(round_definition);
 
 			auto& damage = *round_definition += components::damage();

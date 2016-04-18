@@ -14,7 +14,7 @@
 
 #include "game_framework/messages/crosshair_intent_message.h"
 
-#include "rendering_scripts/testbed_rendering.h"
+#include "rendering_scripts/all.h"
 
 #include "augs/file.h"
 #include "misc/time.h"
@@ -98,6 +98,6 @@ namespace scene_builders {
 	}
 
 	void one_entity::execute_drawcalls_for_camera(messages::camera_render_request_message msg) {
-		rendering_scripts::testbed_rendering(msg);
+		rendering_scripts::standard_rendering(msg);
 	}
 }

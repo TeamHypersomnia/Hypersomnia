@@ -1005,9 +1005,6 @@
     <ClCompile Include="augs\window_framework\window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game_framework\scene_builders\rendering_scripts\testbed_rendering.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game_framework\systems\position_copying_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1174,6 +1171,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game_framework\resources\particle_effect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\scene_builders\resource_setups\standard_atlas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\scene_builders\resource_setups\standard_particle_effects.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game_framework\scene_builders\rendering_scripts\standard_rendering.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2891,9 +2897,6 @@
     <ClInclude Include="augs\window_framework\window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_framework\scene_builders\rendering_scripts\testbed_rendering.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game_framework\systems\position_copying_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3165,6 +3168,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_framework\components\particle_effect_response_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\scene_builders\rendering_scripts\all.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game_framework\scene_builders\resource_setups\all.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,5 +3,5 @@
 #include "game_framework/messages/camera_render_request_message.h"
 
 namespace rendering_scripts {
-	void testbed_rendering(messages::camera_render_request_message msg);
+	void standard_rendering(messages::camera_render_request_message msg);
 }
