@@ -110,6 +110,7 @@ namespace augs {
 
 		entity* entities_begin();
 		entity* entities_end();
+		size_t entities_count();
 
 		void delete_all_entities();
 

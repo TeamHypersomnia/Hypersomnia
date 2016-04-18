@@ -358,6 +358,7 @@
     <ClCompile Include="augs\misc\deterministic_timing.cpp" />
     <ClCompile Include="augs\misc\recoil_player.cpp" />
     <ClCompile Include="augs\options.cpp" />
+    <ClCompile Include="augs\stream.cpp" />
     <ClCompile Include="augs\texture_baker\polygonize_sprite.cpp" />
     <ClCompile Include="game_framework\bindings\file_watcher_binding.cpp" />
     <ClCompile Include="game_framework\bindings\glwindow_binding.cpp" />

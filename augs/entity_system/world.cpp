@@ -121,4 +121,9 @@ namespace augs {
 	entity* world::entities_end() {
 		return entities.data() + entities.size();
 	}
+
+	size_t world::entities_count() {
+		return entities.size();
+	}
+
 }

@@ -46,6 +46,9 @@ namespace augs {
 		return ss.str();
 	}
 
+	template <>
+	std::string to_string(std::wstring val);
+
 	/* number to wide string conversion */
 
 	template <class T>
@@ -63,6 +66,8 @@ namespace augs {
 		ss << val;
 		return ss.str();
 	}
+
+	std::wstring to_wstring(std::string val);
 
 	template <class T>
 	T to_value(std::wstring& s) {

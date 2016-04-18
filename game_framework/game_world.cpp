@@ -142,6 +142,9 @@ void game_world::call_drawing_time_systems() {
 	get_system<camera_system>().resolve_cameras_transforms_and_smoothing();
 	get_system<rotation_copying_system>().update_rotations();
 
+	get_system<particles_system>().create_particle_effects();
+	get_system<particles_system>().step_streams_and_particles_and_destroy_dead();
+
 	get_system<camera_system>().post_render_requests_for_all_cameras();
 
 	get_system<input_system>().acquire_new_events_posted_by_drawing_time_systems();
@@ -224,9 +227,12 @@ void game_world::perform_logic_step() {
 	get_system<physics_system>().execute_delayed_physics_ops();
 	get_system<physics_system>().step_and_set_new_transforms();
 	get_system<position_copying_system>().update_transforms();
-
+	
 	get_system<damage_system>().destroy_outdated_bullets();
-	get_system<damage_system>().destroy_colliding_bullets_and_apply_damage();
+	get_system<damage_system>().destroy_colliding_bullets_and_send_damage();
+	
+	get_system<particles_system>().game_responses_to_particle_effects();
+
 	destruction_callbacks();
 
 	creation_callbacks();

@@ -1170,6 +1170,9 @@
     <ClCompile Include="game_framework\systems\particles_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="augs\stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">

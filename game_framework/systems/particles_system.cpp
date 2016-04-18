@@ -8,6 +8,7 @@
 #include "../components/position_copying_component.h"
 #include "../components/particle_group_component.h"
 
+#include "../messages/gunshot_response.h"
 #include "../messages/create_particle_effect.h"
 #include "../messages/destroy_message.h"
 
@@ -22,6 +23,19 @@ entity_id particles_system::create_refreshable_particle_group(world& parent_worl
 	ent->add(components::render());
 
 	return ent;
+}
+
+void particles_system::game_responses_to_particle_effects() {
+	auto& gunshots = parent_world.get_message_queue<messages::gunshot_response>();
+
+
+	//			messages::create_particle_effect burst_msg;
+	//			burst_msg.subject = it.subject;
+	//			burst_msg.pos = it.point;
+	//		//	burst_msg.rotation = (-it.impact_velocity).degrees();
+	//			burst_msg.type = messages::create_particle_effect::burst_type::BULLET_IMPACT;
+
+	//		parent_world.post_message(burst_msg);
 }
 
 void particles_system::create_particle_effects() {
