@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
 	hypersomnia_overworld.call_window_script("config.lua");
 
 	hypersomnia_overworld.set_scene_builder(std::unique_ptr<scene_builder>(new scene_builders::testbed));
-	hypersomnia_overworld.initialize_scene();
+	hypersomnia_overworld.build_scene();
 
 	hypersomnia_overworld.main_game_loop();
 
