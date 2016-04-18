@@ -4,7 +4,7 @@
 namespace assets {
 	enum particle_effect_response_id {
 		FIREARM_RESPONSE,
-		ROUND_RESPONSE,
+		ELECTRIC_CHARGE_RESPONSE,
 	};
 }
 

@@ -104,6 +104,11 @@ void game_world::register_types_of_messages_components_systems() {
 }
 
 void game_world::call_drawing_time_systems() {
+	get_system<particles_system>().create_particle_effects();
+	get_system<particles_system>().step_streams_and_particles_and_destroy_dead();
+
+	destruction_callbacks();
+
 	get_system<render_system>().determine_visible_entities_from_every_camera();
 
 	get_system<render_system>().calculate_and_set_interpolated_transforms();
@@ -141,9 +146,6 @@ void game_world::call_drawing_time_systems() {
 	get_system<position_copying_system>().update_transforms();
 	get_system<camera_system>().resolve_cameras_transforms_and_smoothing();
 	get_system<rotation_copying_system>().update_rotations();
-
-	get_system<particles_system>().create_particle_effects();
-	get_system<particles_system>().step_streams_and_particles_and_destroy_dead();
 
 	get_system<camera_system>().post_render_requests_for_all_cameras();
 

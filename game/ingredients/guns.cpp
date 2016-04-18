@@ -6,6 +6,7 @@
 #include "game/components/sprite_component.h"
 #include "game/components/name_component.h"
 #include "game/components/trace_component.h"
+#include "game/components/particle_effect_response_component.h"
 
 #include "game/globals/filters.h"
 
@@ -132,6 +133,9 @@ namespace prefabs {
 			damage.impulse_upon_hit = 1000.f;
 			damage.effects_color = pink;
 
+			auto& response = *round_definition += components::particle_effect_response();
+			response.response = assets::particle_effect_response_id::ELECTRIC_CHARGE_RESPONSE;
+
 			auto& trace = *round_definition += components::trace();
 			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
 			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
@@ -174,6 +178,9 @@ namespace prefabs {
 			s.size *= vec2(2, 0.5);
 			auto& def = ingredients::bullet_round_physics(round_definition);
 
+			auto& response = *round_definition += components::particle_effect_response();
+			response.response = assets::particle_effect_response_id::ELECTRIC_CHARGE_RESPONSE;
+
 			auto& damage = *round_definition += components::damage();
 			damage.effects_color = cyan;
 			auto& trace = *round_definition += components::trace();
@@ -200,7 +207,7 @@ namespace prefabs {
 		auto sample_rifle = world.create_entity("sample_rifle");
 		name_entity(sample_rifle, entity_name::ASSAULT_RIFLE);
 
-		ingredients::sprite(sample_rifle, pos, assets::texture_id::ASSAULT_RIFLE, augs::white, render_layer::DROPPED_ITEM);
+		auto& sprite = ingredients::sprite(sample_rifle, pos, assets::texture_id::ASSAULT_RIFLE, augs::white, render_layer::DROPPED_ITEM);
 		auto& def = ingredients::crate_physics(sample_rifle);
 		ingredients::default_gun_container(sample_rifle);
 
@@ -209,7 +216,7 @@ namespace prefabs {
 		gun.action_mode = components::gun::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(4000, 4000);
 		gun.timeout_between_shots.set(100);
-		gun.bullet_spawn_offset.set(2, 0);
+		gun.bullet_spawn_offset.set(sprite.size.x/2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
 
@@ -260,7 +267,7 @@ namespace prefabs {
 		auto weapon = world.create_entity("submachine");
 		name_entity(weapon, entity_name::SUBMACHINE);
 
-		ingredients::sprite(weapon, pos, assets::texture_id::SUBMACHINE, augs::white, render_layer::DROPPED_ITEM);
+		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::SUBMACHINE, augs::white, render_layer::DROPPED_ITEM);
 		auto& def = ingredients::crate_physics(weapon);
 		ingredients::default_gun_container(weapon);
 
@@ -269,7 +276,7 @@ namespace prefabs {
 		gun.action_mode = components::gun::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(3000, 3000);
 		gun.timeout_between_shots.set(50);
-		gun.bullet_spawn_offset.set(2, 0);
+		gun.bullet_spawn_offset.set(sprite.size.x/2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
 
@@ -320,7 +327,7 @@ namespace prefabs {
 		auto weapon = world.create_entity("pistol");
 		name_entity(weapon, entity_name::PISTOL);
 
-		ingredients::sprite(weapon, pos, assets::texture_id::PISTOL, augs::white, render_layer::DROPPED_ITEM);
+		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::PISTOL, augs::white, render_layer::DROPPED_ITEM);
 		auto& def = ingredients::crate_physics(weapon);
 		ingredients::default_gun_container(weapon);
 
@@ -329,7 +336,7 @@ namespace prefabs {
 		gun.action_mode = components::gun::SEMI_AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(2500, 2500);
 		gun.timeout_between_shots.set(150);
-		gun.bullet_spawn_offset.set(2, 0);
+		gun.bullet_spawn_offset.set(sprite.size.x / 2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
 

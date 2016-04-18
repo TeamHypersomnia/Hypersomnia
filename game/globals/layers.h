@@ -4,6 +4,7 @@ enum render_layer {
 	OVER_CROSSHAIR,
 	CROSSHAIR,
 	GUI,
+	EFFECTS,
 	HAT,
 	FLYING_BULLETS,
 	CHARACTER,

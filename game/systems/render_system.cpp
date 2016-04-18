@@ -11,6 +11,7 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/tile_layer_component.h"
 #include "game/components/physics_component.h"
+#include "game/components/particle_group_component.h"
 
 #include "game/messages/new_entity_message.h"
 #include "game/messages/destroy_message.h"
@@ -54,13 +55,19 @@ void render_system::add_entities_to_rendering_tree() {
 			if (sprite) aabb = sprite->get_aabb(transform);
 			if (polygon) aabb = polygon->get_aabb(transform);
 			if (tile_layer) aabb = tile_layer->get_aabb(transform);
-			// if (particle_group) aabb = particle_group->get_aabb(transform);
 
-			b2AABB input;
-			input.lowerBound = aabb.left_top();
-			input.upperBound = aabb.right_bottom();
+			if (aabb.good()) {
+				b2AABB input;
+				input.lowerBound = aabb.left_top();
+				input.upperBound = aabb.right_bottom();
 
-			render->rendering_proxy = non_physical_objects_tree.CreateProxy(input, new entity_id(e));
+				render->rendering_proxy = non_physical_objects_tree.CreateProxy(input, new entity_id(e));
+			}
+			else {
+				if (particle_group) {
+					set_visibility_persistence(e, true);
+				}
+			}
 		}
 	}
 }
@@ -269,10 +276,12 @@ void render_system::draw_layer(state_for_drawing_camera in_camera, int layer) {
 			auto* polygon = e->find<components::polygon>();
 			auto* sprite = e->find<components::sprite>();
 			auto* tile_layer = e->find<components::tile_layer>();
+			auto* particle_group = e->find<components::particle_group>();
 
 			if (polygon) polygon->draw(in);
 			if (sprite) sprite->draw(in);
 			if (tile_layer) tile_layer->draw(in);
+			if (particle_group) particle_group->draw(in);
 
 			render.last_visibility_index = current_visibility_index++;
 		}

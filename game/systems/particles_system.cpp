@@ -4,6 +4,7 @@
 
 #include "../resources/particle_effect.h"
 
+#include "../components/damage_component.h"
 #include "../components/render_component.h"
 #include "../components/position_copying_component.h"
 #include "../components/particle_group_component.h"
@@ -11,6 +12,7 @@
 #include "../messages/gunshot_response.h"
 #include "../messages/create_particle_effect.h"
 #include "../messages/destroy_message.h"
+#include "../messages/damage_message.h"
 
 #include "misc/randval.h"
 
@@ -27,12 +29,18 @@ entity_id particles_system::create_refreshable_particle_group(world& parent_worl
 
 void particles_system::game_responses_to_particle_effects() {
 	auto& gunshots = parent_world.get_message_queue<messages::gunshot_response>();
+	auto& damages = parent_world.get_message_queue<messages::damage_message>();
 
 	for (auto& g : gunshots) {
-		//messages::create_particle_effect burst;
-		//burst.transform = g.barrel_transform;
-		//burst.subject = g.subject;
-		//burst.effect = (*g.subject->get<components::particle_effect_response>().response)[particle_effect_response_type::BARREL_EXPLOSION];
+		for (auto& r : g.spawned_rounds) {
+			messages::create_particle_effect burst;
+			burst.transform = g.barrel_transform;
+			burst.subject = g.subject;
+			burst.effect = (*r->get<components::particle_effect_response>().response)[particle_effect_response_type::BARREL_LEAVE_EXPLOSION];
+			burst.modifier.colorize = r->get<components::damage>().effects_color;
+
+			parent_world.post_message(burst);
+		}
 		//
 		//if (g.subject.has(sub_entity_name::BARREL_SMOKE))
 		//	burst.target_group_to_refresh = g.subject[sub_entity_name::BARREL_SMOKE];
@@ -55,7 +63,7 @@ void particles_system::create_particle_effects() {
 	using namespace components;
 	using namespace messages;
 
-	auto events = parent_world.get_message_queue<create_particle_effect>();
+	auto& events = parent_world.get_message_queue<create_particle_effect>();
 
 	for (auto it : events) {
 		auto emissions = *it.effect;
@@ -111,7 +119,7 @@ void particles_system::create_particle_effects() {
 		}
 
 		for (auto& stream : only_streams) {
-			if (!it.target_group_to_refresh) {
+			if (it.target_group_to_refresh.dead()) {
 				entity_id new_stream_entity = parent_world.create_entity("particle_stream");
 				target_group = &new_stream_entity->add(components::particle_group());
 				target_transform = &new_stream_entity->add(components::transform());
@@ -165,6 +173,8 @@ void particles_system::create_particle_effects() {
 			}
 		}
 	}
+
+	events.clear();
 }
 
 void particles_system::spawn_particle(
@@ -216,7 +226,7 @@ void integrate_particle(resources::particle& p, float dt) {
 	p.vel.damp(p.linear_damping * dt);
 	damp(p.rotation_speed, p.angular_damping * dt);
 
-	p.lifetime_ms += dt;
+	p.lifetime_ms += dt * 1000.0;
 }
 
 void particles_system::step_streams_and_particles_and_destroy_dead() {

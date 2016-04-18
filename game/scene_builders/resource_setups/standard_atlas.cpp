@@ -100,6 +100,11 @@ namespace resource_setups {
 			assets::texture_id::SMOKE_PARTICLE_LAST,
 			L"hypersomnia/gfx/smoke");
 
+		resource_manager.create_sprites_indexed(
+			assets::texture_id::PIXEL_THUNDER_FIRST,
+			assets::texture_id::PIXEL_THUNDER_LAST,
+			L"hypersomnia/gfx/pixel_thunder");
+
 		resource_manager.create(assets::atlas_id::GAME_WORLD_ATLAS,
 			resources::manager::atlas_creation_mode::FROM_ALL_TEXTURES
 			| resources::manager::atlas_creation_mode::FROM_ALL_FONTS);

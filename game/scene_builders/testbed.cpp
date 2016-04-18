@@ -37,6 +37,7 @@ using namespace augs;
 namespace scene_builders {
 	void testbed::load_resources() {
 		resource_setups::load_standard_atlas();
+		resource_setups::load_standard_particle_effects();
 	}
 
 	void testbed::populate_world_with_entities(world& world) {
