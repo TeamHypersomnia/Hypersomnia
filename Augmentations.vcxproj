@@ -416,6 +416,7 @@
     <ClCompile Include="game_framework\messages\gui_intents.cpp" />
     <ClCompile Include="game_framework\resources\animation.cpp" />
     <ClCompile Include="game_framework\resources\manager.cpp" />
+    <ClCompile Include="game_framework\resources\particle_effect.cpp" />
     <ClCompile Include="game_framework\resources\texture_with_image.cpp" />
     <ClCompile Include="game_framework\scene_builders\one_entity.cpp" />
     <ClCompile Include="game_framework\scene_builders\rendering_scripts\testbed_rendering.cpp" />

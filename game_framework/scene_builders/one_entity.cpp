@@ -22,12 +22,7 @@
 using namespace augs;
 
 namespace scene_builders {
-	void one_entity::initialize(world& world) {
-		auto window_rect = window::glwindow::get_current()->get_screen_rect();
-
-		resource_manager.destroy_everything();
-		world.delete_all_entities();
-
+	void one_entity::load_resources() {
 		resource_manager.create(assets::texture_id::TEST_CROSSHAIR, std::wstring(L"hypersomnia/gfx/crosshair.png"));
 		resource_manager.create(assets::texture_id::TEST_PLAYER, L"hypersomnia/gfx/walk_1.png");
 		resource_manager.create(assets::texture_id::BLANK, L"hypersomnia/gfx/blank.png");
@@ -51,6 +46,10 @@ namespace scene_builders {
 			assets::texture_id::TORSO_MOVING_FIRST,
 			assets::texture_id::TORSO_MOVING_LAST,
 			20.0f);
+	}
+
+	void one_entity::populate_world_with_entities(world& world) {
+		auto window_rect = window::glwindow::get_current()->get_screen_rect();
 
 		auto& player_response = resource_manager.create(assets::animation_response_id::TORSO_SET);
 		player_response[animation_response_type::MOVE] = assets::animation_id::TORSO_MOVE;

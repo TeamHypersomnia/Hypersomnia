@@ -1,6 +1,10 @@
 #include "scene_builder.h"
 
-void scene_builder::initialize(augs::world&) {
+void scene_builder::load_resources() {
+
+}
+
+void scene_builder::populate_world_with_entities(augs::world&) {
 
 }
 

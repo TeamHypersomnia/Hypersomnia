@@ -22,7 +22,7 @@ public:
 	augs::lua_state_wrapper lua;
 
 	void set_scene_builder(std::unique_ptr<scene_builder> builder);
-	void initialize_scene();
+	void build_scene();
 
 	void call_window_script(std::string filename);
 

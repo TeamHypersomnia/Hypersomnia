@@ -34,15 +34,7 @@
 using namespace augs;
 
 namespace scene_builders {
-	void testbed::initialize(world& world) {
-		auto& window = *window::glwindow::get_current();
-		auto window_rect = window.get_screen_rect();
-
-		world.get_system<gui_system>().resize(vec2i(window_rect.w, window_rect.h));
-
-		resource_manager.destroy_everything();
-		world.delete_all_entities();
-
+	void testbed::load_resources() {
 		resource_manager.create(assets::texture_id::TEST_CROSSHAIR, std::wstring(L"hypersomnia/gfx/crosshair.png"));
 		resource_manager.create(assets::texture_id::TEST_PLAYER, L"hypersomnia/gfx/walk_1.png");
 		resource_manager.create(assets::texture_id::TEST_BACKGROUND, L"hypersomnia/gfx/snow_textures/snow3.png");
@@ -81,12 +73,11 @@ namespace scene_builders {
 			gui.flip_horizontally = true;
 			gui.flip_vertically = true;
 		}
-		
 
 		auto& magazine_gui = resource_manager.create(assets::texture_id::SAMPLE_MAGAZINE, L"hypersomnia/gfx/magazine.png").gui_sprite_def;
 		magazine_gui.rotation_offset = -270;
 
-		auto& suppressor_gui =  resource_manager.create(assets::texture_id::SAMPLE_SUPPRESSOR, L"hypersomnia/gfx/suppressor.png").gui_sprite_def;
+		auto& suppressor_gui = resource_manager.create(assets::texture_id::SAMPLE_SUPPRESSOR, L"hypersomnia/gfx/suppressor.png").gui_sprite_def;
 		suppressor_gui.flip_horizontally = true;
 
 		resource_manager.create(assets::texture_id::ROUND_TRACE, L"hypersomnia/gfx/round_trace.png");
@@ -126,8 +117,6 @@ namespace scene_builders {
 		resource_manager.create(assets::texture_id::DETACHABLE_MAGAZINE_ICON, L"hypersomnia/gfx/detachable_magazine_slot_icon.png");
 		resource_manager.create(assets::texture_id::GUN_BARREL_SLOT_ICON, L"hypersomnia/gfx/gun_barrel_slot_icon.png");
 
-		
-
 		auto& font = resource_manager.create(assets::font_id::GUI_FONT);
 		font.open("hypersomnia/Kubasta.ttf", 16, L" ABCDEFGHIJKLMNOPRSTUVWXYZQabcdefghijklmnoprstuvwxyzq0123456789.!@#$%^&*()_+-=[];'\\,./{}:\"|<>?");
 
@@ -151,6 +140,13 @@ namespace scene_builders {
 
 		auto& player_response = resource_manager.create(assets::animation_response_id::TORSO_SET);
 		player_response[animation_response_type::MOVE] = assets::animation_id::TORSO_MOVE;
+	}
+
+	void testbed::populate_world_with_entities(world& world) {
+		auto& window = *window::glwindow::get_current();
+		auto window_rect = window.get_screen_rect();
+
+		world.get_system<gui_system>().resize(vec2i(window_rect.w, window_rect.h));
 
 		auto crate = prefabs::create_crate(world, vec2(200, 300), vec2i(100, 100) / 3);
 		auto crate2 = prefabs::create_crate(world, vec2(400, 400), vec2i(300, 300));
@@ -221,8 +217,6 @@ namespace scene_builders {
 		//prefabs::create_pink_charge(world, vec2(200, -400));
 		prefabs::create_cyan_charge(world, vec2(150, -500));
 		prefabs::create_cyan_charge(world, vec2(200, -500));
-
-
 
 		auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 		prefabs::create_sample_backpack(world, vec2(200, -750));

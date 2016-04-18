@@ -16,7 +16,8 @@ A scene builder cannot or need not be composed with other scene builders.
 #include "../messages/camera_render_request_message.h"
 
 struct scene_builder {
-	virtual void initialize(augs::world& world);
+	virtual void load_resources();
+	virtual void populate_world_with_entities(augs::world& world);
 	virtual void perform_logic_step(augs::world& world);
 	virtual void drawcalls_after_all_cameras(augs::world& world);
 

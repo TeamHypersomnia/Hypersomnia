@@ -12,6 +12,7 @@
 #include "game_framework/systems/input_system.h"
 #include "game_framework/systems/render_system.h"
 #include "game_framework/systems/gui_system.h"
+#include "game_framework/resources/manager.h"
 
 #include <luabind/luabind.hpp>
 
@@ -30,13 +31,11 @@ game_overworld::game_overworld()
 	main_game_world.initialize_entity_and_component_pools(50000);
 }
 
-void game_overworld::set_scene_builder(std::unique_ptr<scene_builder> builder) {
-	current_scene_builder = std::move(builder);
-}
+void game_overworld::configure_scripting() {
+	bind_game_framework_and_augs(lua);
+	main_game_world.bind_this_to_lua_global(lua, "WORLD");
 
-void game_overworld::initialize_scene() {
-	current_scene_builder->initialize(main_game_world);
-	clear_window_inputs_once = true;
+	signal(SIGSEGV, SignalHandler);
 }
 
 void game_overworld::call_window_script(std::string filename) {
@@ -56,6 +55,20 @@ void game_overworld::call_window_script(std::string filename) {
 	}
 
 	game_window.initial_gl_calls();
+}
+
+void game_overworld::set_scene_builder(std::unique_ptr<scene_builder> builder) {
+	current_scene_builder = std::move(builder);
+}
+
+void game_overworld::build_scene() {
+	resource_manager.destroy_everything();
+	current_scene_builder->load_resources();
+	
+	main_game_world.delete_all_entities();
+	current_scene_builder->populate_world_with_entities(main_game_world);
+	
+	clear_window_inputs_once = true;
 }
 
 #define RENDERING_STEPS_DETERMINISTICALLY_LIKE_LOGIC 0
@@ -96,7 +109,6 @@ void game_overworld::main_game_loop() {
 					stepping_speed = 1.f;
 				}
 			}
-
 
 			messages::raw_window_input_message msg;
 			msg.raw_window_input = raw_input;
@@ -155,11 +167,3 @@ void game_overworld::consume_camera_render_requests() {
 	game_window.swap_buffers();
 	target.clear_geometry();
 }
-
-void game_overworld::configure_scripting() {
-	bind_game_framework_and_augs(lua);
-	main_game_world.bind_this_to_lua_global(lua, "WORLD");
-
-	signal(SIGSEGV, SignalHandler);
-}
-

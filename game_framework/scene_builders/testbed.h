@@ -13,7 +13,8 @@ namespace scene_builders {
 
 		bool keep_drawing = false;
 
-		void initialize(augs::world& world) override;
+		void load_resources() override;
+		void populate_world_with_entities(augs::world& world) override;
 		void perform_logic_step(augs::world& world) override;
 		void drawcalls_after_all_cameras(augs::world& world) override;
 
