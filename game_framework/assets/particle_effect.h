@@ -1,4 +1,5 @@
 #pragma once
+#include "../resources/particle_effect.h"
 
 namespace assets {
 	enum particle_effect_id {
@@ -8,3 +9,5 @@ namespace assets {
 		PIXEL_METAL_SPARKLES
 	};
 }
+
+resources::particle_effect& operator*(const assets::particle_effect_id& id);

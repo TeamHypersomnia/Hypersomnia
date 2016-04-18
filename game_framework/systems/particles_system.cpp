@@ -28,6 +28,19 @@ entity_id particles_system::create_refreshable_particle_group(world& parent_worl
 void particles_system::game_responses_to_particle_effects() {
 	auto& gunshots = parent_world.get_message_queue<messages::gunshot_response>();
 
+	for (auto& g : gunshots) {
+		//messages::create_particle_effect burst;
+		//burst.transform = g.barrel_transform;
+		//burst.subject = g.subject;
+		//burst.effect = (*g.subject->get<components::particle_effect_response>().response)[particle_effect_response_type::BARREL_EXPLOSION];
+		//
+		//if (g.subject.has(sub_entity_name::BARREL_SMOKE))
+		//	burst.target_group_to_refresh = g.subject[sub_entity_name::BARREL_SMOKE];
+		//
+		//parent_world.post_message(burst);
+	}
+
+
 
 	//			messages::create_particle_effect burst_msg;
 	//			burst_msg.subject = it.subject;
@@ -45,7 +58,10 @@ void particles_system::create_particle_effects() {
 	auto events = parent_world.get_message_queue<create_particle_effect>();
 
 	for (auto it : events) {
-		auto& emissions = it.effect;
+		auto emissions = *it.effect;
+		
+		for (auto& e : emissions)
+			e.apply_modifier(it.modifier);
 
 		if (it.local_transform && it.subject.alive()) {
 			it.transform.pos += it.subject->get<components::transform>().pos;

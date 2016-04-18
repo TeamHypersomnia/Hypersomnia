@@ -6,6 +6,6 @@
 
 namespace components {
 	struct particle_effect_response {
-		assets::particle_effect_response_id available_particle_effects;
+		assets::particle_effect_response_id response;
 	};
 }

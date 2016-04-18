@@ -15,6 +15,9 @@ namespace augs {
 		rgba(rgba_channel red = 255, rgba_channel green = 255, rgba_channel blue = 255, rgba_channel alpha = 255);
 		void set(rgba_channel red = 255, rgba_channel green = 255, rgba_channel blue = 255, rgba_channel alpha = 255);
 
+		rgba operator*(rgba b) const;
+		rgba& operator*=(rgba b);
+
 		bool operator==(const rgba& b) const;
 		hsv get_hsv() const;
 		std::array<rgba_channel, 3>& rgb();

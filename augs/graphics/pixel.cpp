@@ -119,6 +119,18 @@ namespace augs {
 		*this = rgba(red, green, blue, alpha);
 	}
 
+	rgba rgba::operator*(rgba s) const {
+		return rgba(
+			(s.r / 255.*r / 255.) * 255,
+			(s.g / 255.*g / 255.) * 255,
+			(s.b / 255.*b / 255.) * 255,
+			(s.a / 255.*a / 255.) * 255);
+	}
+
+	rgba& rgba::operator*=(rgba b) {
+		return (*this = *this * b);
+	}
+
 	bool rgba::operator==(const rgba& v) const {
 		return r == v.r && g == v.g && b == v.b && a == v.a;
 	}

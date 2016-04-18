@@ -4,7 +4,7 @@
 #include "entity_system/entity.h"
 
 #include "misc/timer.h"
-
+#include "graphics/pixel.h"
 
 namespace components {
 	struct damage {
@@ -27,6 +27,8 @@ namespace components {
 		float lifetime_ms = 0.f;
 
 		vec2 saved_point_of_impact_before_death;
+
+		augs::rgba effects_color;
 
 		static bool can_merge_entities(augs::entity_id a, augs::entity_id b);
 	};

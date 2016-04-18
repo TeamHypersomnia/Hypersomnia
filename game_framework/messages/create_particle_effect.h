@@ -4,19 +4,12 @@
 
 #include "entity_system/entity.h"
 #include "../components/transform_component.h"
-
-namespace resources {
-	struct emission;
-	typedef std::vector<emission> particle_effect;
-}
-
-namespace components {
-	struct particle_group;
-}
+#include "../assets/particle_effect.h"
 
 namespace messages {
 	struct create_particle_effect : public message {
-		resources::particle_effect effect;
+		assets::particle_effect_id effect;
+		resources::particle_effect_modifier modifier;
 
 		augs::entity_id target_group_to_refresh;
 

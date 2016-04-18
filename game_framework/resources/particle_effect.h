@@ -16,6 +16,10 @@ namespace resources {
 		int alpha_levels = -1;
 	};
 
+	struct particle_effect_modifier {
+		augs::rgba colorize;
+	};
+
 	struct emission {
 		enum type {
 			BURST,
@@ -44,8 +48,7 @@ namespace resources {
 			num_of_particles_to_spawn_initially = std::make_pair(0.f, 0.f)
 			;
 
-		std::pair<unsigned, unsigned>
-			particles_per_burst = std::make_pair(0u, 0u);
+		std::pair<unsigned, unsigned> particles_per_burst = std::make_pair(0u, 0u);
 
 		float initial_rotation_variation = 0.f;
 		bool randomize_acceleration = false;
@@ -55,9 +58,7 @@ namespace resources {
 		std::vector<particle> particle_templates;
 		components::render particle_render_template;
 
-		void add_particle_template(const particle& p) {
-			particle_templates.push_back(p);
-		}
+		void apply_modifier(particle_effect_modifier m);
 	};
 
 	typedef std::vector<emission> particle_effect;

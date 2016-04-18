@@ -130,6 +130,7 @@ namespace prefabs {
 			
 			auto& damage = *round_definition += components::damage();
 			damage.impulse_upon_hit = 1000.f;
+			damage.effects_color = pink;
 
 			auto& trace = *round_definition += components::trace();
 			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
@@ -173,6 +174,7 @@ namespace prefabs {
 			auto& def = ingredients::bullet_round_physics(round_definition);
 
 			auto& damage = *round_definition += components::damage();
+			damage.effects_color = cyan;
 			auto& trace = *round_definition += components::trace();
 			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
 			trace.max_multiplier_y = std::make_pair(0.f, 0.f);

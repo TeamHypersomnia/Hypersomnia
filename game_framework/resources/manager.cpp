@@ -32,6 +32,10 @@ resources::particle_effect_response& operator*(const assets::particle_effect_res
 	return *resource_manager.find(id);
 }
 
+resources::particle_effect& operator*(const assets::particle_effect_id& id) {
+	return *resource_manager.find(id);
+}
+
 bool operator!(const assets::texture_id& id) {
 	return resource_manager.find(id) == nullptr;
 }
