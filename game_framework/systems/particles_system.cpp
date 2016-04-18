@@ -24,48 +24,7 @@ entity_id particles_system::create_refreshable_particle_group(world& parent_worl
 	return ent;
 }
 
-void particles_system::spawn_particle(
-	components::particle_group::stream& group, const vec2& position, float rotation, float spread, const resources::emission& emission) {
-	auto new_particle = emission.particle_templates[randval(0u, emission.particle_templates.size() - 1)];
-	new_particle.vel = vec2().set_from_degrees(
-		randval(rotation - spread, rotation + spread)) *
-		randval(emission.velocity);
-
-	rotation = new_particle.vel.degrees();
-
-	new_particle.pos = position + emission.offset;
-	new_particle.lifetime_ms = 0.f;
-	new_particle.face.size *= randval(emission.size_multiplier);
-	new_particle.rotation = randval(rotation - emission.initial_rotation_variation, rotation + emission.initial_rotation_variation);
-	new_particle.rotation_speed = randval(emission.angular_velocity);
-
-	auto truncated_lifetime = emission.particle_lifetime_ms;
-
-	if (emission.type == emission.STREAM) {
-		float remaining_time = group.stream_max_lifetime_ms - group.stream_lifetime_ms;
-
-		/* if remaining time is less than fade_when_ms_remaining */
-		if (group.fade_when_ms_remaining > 0.f && remaining_time < group.fade_when_ms_remaining) {
-			/* truncate particle's lifetime to create fading effect */
-			float multiplier = remaining_time / group.fade_when_ms_remaining;
-
-			truncated_lifetime.first *= multiplier;
-			truncated_lifetime.second *= multiplier;
-		}
-	}
-
-	new_particle.max_lifetime_ms = randval(truncated_lifetime);
-
-	if (emission.randomize_acceleration) {
-		new_particle.acc += vec2().set_from_degrees(
-			randval(rotation - spread, rotation + spread)) *
-			randval(emission.acceleration);
-	}
-
-	group.particles.particles.push_back(new_particle);
-}
-
-void particles_system::consume_events() {
+void particles_system::create_particle_effects() {
 	using namespace components;
 	using namespace messages;
 
@@ -178,20 +137,59 @@ void particles_system::consume_events() {
 	}
 }
 
-void update_particle(resources::particle& p, float dt) {
-	p.vel += p.acc * dt / 1000.0;
-	p.pos += p.vel * dt / 1000.0;
+void particles_system::spawn_particle(
+	components::particle_group::stream& group, const vec2& position, float rotation, float spread, const resources::emission& emission) {
+	auto new_particle = emission.particle_templates[randval(0u, emission.particle_templates.size() - 1)];
+	new_particle.vel = vec2().set_from_degrees(
+		randval(rotation - spread, rotation + spread)) *
+		randval(emission.velocity);
+
+	rotation = new_particle.vel.degrees();
+
+	new_particle.pos = position + emission.offset;
+	new_particle.lifetime_ms = 0.f;
+	new_particle.face.size *= randval(emission.size_multiplier);
+	new_particle.rotation = randval(rotation - emission.initial_rotation_variation, rotation + emission.initial_rotation_variation);
+	new_particle.rotation_speed = randval(emission.angular_velocity);
+
+	auto truncated_lifetime = emission.particle_lifetime_ms;
+
+	if (emission.type == emission.STREAM) {
+		float remaining_time = group.stream_max_lifetime_ms - group.stream_lifetime_ms;
+
+		/* if remaining time is less than fade_when_ms_remaining */
+		if (group.fade_when_ms_remaining > 0.f && remaining_time < group.fade_when_ms_remaining) {
+			/* truncate particle's lifetime to create fading effect */
+			float multiplier = remaining_time / group.fade_when_ms_remaining;
+
+			truncated_lifetime.first *= multiplier;
+			truncated_lifetime.second *= multiplier;
+		}
+	}
+
+	new_particle.max_lifetime_ms = randval(truncated_lifetime);
+
+	if (emission.randomize_acceleration) {
+		new_particle.acc += vec2().set_from_degrees(
+			randval(rotation - spread, rotation + spread)) *
+			randval(emission.acceleration);
+	}
+
+	group.particles.particles.push_back(new_particle);
+}
+
+void integrate_particle(resources::particle& p, float dt) {
+	p.vel += p.acc * dt;
+	p.pos += p.vel * dt;
 	p.rotation += p.rotation_speed * dt;
 
-	p.vel.damp(p.linear_damping * dt / 1000.f);
-	damp(p.rotation_speed, p.angular_damping * dt / 1000.f);
+	p.vel.damp(p.linear_damping * dt);
+	damp(p.rotation_speed, p.angular_damping * dt);
 
 	p.lifetime_ms += dt;
 }
 
 void particles_system::step_streams_and_particles_and_destroy_dead() {
-	auto delta = delta_milliseconds();
-
 	for (auto it : targets) {
 		auto& group = it->get<components::particle_group>();
 		auto& transform = it->get<components::transform>();
@@ -202,11 +200,11 @@ void particles_system::step_streams_and_particles_and_destroy_dead() {
 			auto& particles = stream_slot.particles.particles;
 
 			for (auto& particle : particles)
-				update_particle(particle, delta);
+				integrate_particle(particle, delta_seconds());
 
 			if (stream_slot.is_streaming) {
 				auto& stream_info = stream_slot.stream_info;
-				float stream_delta = std::min(delta, stream_slot.stream_max_lifetime_ms - stream_slot.stream_lifetime_ms);
+				float stream_delta = std::min(delta_milliseconds(), stream_slot.stream_max_lifetime_ms - stream_slot.stream_lifetime_ms);
 				stream_slot.stream_lifetime_ms += stream_delta;
 				stream_slot.stream_lifetime_ms = std::min(stream_slot.stream_lifetime_ms, stream_slot.stream_max_lifetime_ms);
 
@@ -225,16 +223,16 @@ void particles_system::step_streams_and_particles_and_destroy_dead() {
 				if (!group.pause_emission) {
 					for (int i = 0; i < to_spawn; ++i) {
 						float t = (static_cast<float>(i) / to_spawn);
-						float time_elapsed = (1.f - t) * delta;
+						auto time_elapsed = (1.0 - t) * delta_seconds();
 
 						components::transform current_transform(lerp(group.previous_transform.pos, transform.pos, vec2(t, t)),
 							lerp(group.previous_transform.rotation, transform.rotation, t));
 
-						particles_system::spawn_particle(stream_slot, current_transform.pos, current_transform.rotation +
-							stream_slot.swing_spread * sin((stream_slot.stream_lifetime_ms / 1000.f) * 2 * 3.1415926535897932384626433832795f * stream_slot.swings_per_sec)
+						spawn_particle(stream_slot, current_transform.pos, current_transform.rotation +
+							stream_slot.swing_spread * sin((stream_slot.stream_lifetime_ms / 1000.f) * 2 * PI_f * stream_slot.swings_per_sec)
 							, stream_slot.target_spread, stream_info);
 
-						update_particle(*stream_slot.particles.particles.rbegin(), time_elapsed);
+						integrate_particle(*stream_slot.particles.particles.rbegin(), time_elapsed);
 						stream_slot.stream_particles_to_spawn -= 1.f;
 					}
 				}

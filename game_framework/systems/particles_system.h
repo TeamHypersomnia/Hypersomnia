@@ -16,5 +16,7 @@ public:
 	static entity_id create_refreshable_particle_group(world&);
 	static void spawn_particle(components::particle_group::stream&, const vec2&, float, float spread, const resources::emission&);
 	void step_streams_and_particles_and_destroy_dead();
-	void consume_events();
+
+	void game_responses_to_particle_effects();
+	void create_particle_effects();
 };
