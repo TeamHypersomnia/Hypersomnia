@@ -81,9 +81,17 @@ namespace augs {
 		ensure(res.get_debug_name() != "unknown");
 #endif
 
-		messages::new_entity_message msg;
-		msg.subject = res;
-		post_message(msg);
+		{
+			messages::new_entity_message msg;
+			msg.subject = res;
+			post_message(msg);
+		}
+
+		{
+			messages::new_entity_for_rendering_message msg;
+			msg.subject = res;
+			post_message(msg);
+		}
 
 		return res;
 	}

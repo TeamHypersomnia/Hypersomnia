@@ -93,6 +93,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_message_queue<crosshair_intent_message>();
 	register_message_queue<trigger_hit_confirmation_message>();
 	register_message_queue<trigger_hit_request_message>();
+	register_message_queue<new_entity_for_rendering_message>();
 	register_message_queue<new_entity_message>();
 	register_message_queue<camera_render_request_message>();
 	register_message_queue<item_slot_transfer_request>();
@@ -105,6 +106,9 @@ void game_world::register_types_of_messages_components_systems() {
 
 void game_world::call_drawing_time_systems() {
 	get_system<particles_system>().create_particle_effects();
+	rendering_time_creation_callbacks();
+	get_message_queue<new_entity_for_rendering_message>().clear();
+
 	get_system<particles_system>().step_streams_and_particles_and_destroy_dead();
 
 	destruction_callbacks();
@@ -170,7 +174,6 @@ void game_world::rendering_time_creation_callbacks() {
 }
 
 void game_world::creation_callbacks() {
-	rendering_time_creation_callbacks();
 	get_system<physics_system>().create_bodies_and_fixtures_from_physics_definitions();
 }
 

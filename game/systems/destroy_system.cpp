@@ -7,6 +7,7 @@
 
 #include "../messages/collision_message.h"
 #include "../messages/destroy_message.h"
+#include "../messages/new_entity_message.h"
 
 void destroy_system::purge_queue_of_duplicates() {
 	auto& events = parent_world.get_message_queue<messages::destroy_message>();
@@ -41,11 +42,25 @@ void destroy_system::delete_queued_entities() {
 
 void destroy_system::purge_message_queues_of_dead_entities() {
 	auto& collisions = parent_world.get_message_queue<messages::collision_message>();
-	
+	auto& new_entities = parent_world.get_message_queue<messages::new_entity_message>();
+	auto& new_entities_rendering = parent_world.get_message_queue<messages::new_entity_for_rendering_message>();
+
 	for (auto& c : collisions) {
 		if (c.subject.dead() || c.collider.dead())
 			c.delete_this_message = true;
 	}
 
+	for (auto& c : new_entities) {
+		if (c.subject.dead())
+			c.delete_this_message = true;
+	}
+
+	for (auto& c : new_entities_rendering) {
+		if (c.subject.dead())
+			c.delete_this_message = true;
+	}
+
 	parent_world.delete_marked_messages(collisions);
+	parent_world.delete_marked_messages(new_entities);
+	parent_world.delete_marked_messages(new_entities_rendering);
 }

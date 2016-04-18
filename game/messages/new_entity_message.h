@@ -4,6 +4,12 @@
 
 namespace messages {
 	struct new_entity_message {
+		bool delete_this_message = false;
+		augs::entity_id subject;
+	};
+
+	struct new_entity_for_rendering_message {
+		bool delete_this_message = false;
 		augs::entity_id subject;
 	};
 }

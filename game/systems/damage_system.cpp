@@ -25,6 +25,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage() {
 			subject_of_impact.apply_force(vec2(bullet_vel).set_length(damage->impulse_upon_hit), it.point - subject_of_impact.get_mass_position());
 
 			messages::damage_message damage_msg;
+			damage_msg.inflictor = it.collider;
 			damage_msg.subject = it.subject;
 			damage_msg.amount = damage->amount;
 			damage_msg.impact_velocity = bullet_vel;
