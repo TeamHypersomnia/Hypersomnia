@@ -6,7 +6,7 @@
 #include "graphics/renderer.h"
 #include "../detail/state_for_drawing.h"
 
-#include "game_framework/resources/manager.h"
+#include "game/resources/manager.h"
 
 using namespace augs;
 

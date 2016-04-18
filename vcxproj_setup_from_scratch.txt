@@ -25,7 +25,7 @@ _WINSOCK_DEPRECATED_NO_WARNINGS
 6. Include into project:
 3rdparty
 depthbase
-game_framework
+game
 utilities
 stdafx.h/cpp
 exclude main.cpp if your project provides one

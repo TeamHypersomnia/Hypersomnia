@@ -1,6 +1,6 @@
 #include "inventory_utils.h"
 #include "entity_system/entity.h"
-#include "game_framework/components/item_component.h"
+#include "game/components/item_component.h"
 
 #include "stream.h"
 #include "ensure.h"

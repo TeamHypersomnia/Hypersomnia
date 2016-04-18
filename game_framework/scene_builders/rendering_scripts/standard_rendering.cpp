@@ -3,8 +3,8 @@
 #include "augs/entity_system/entity.h"
 #include "augs/entity_system/world.h"
 
-#include "game_framework/systems/render_system.h"
-#include "game_framework/resources/manager.h"
+#include "game/systems/render_system.h"
+#include "game/resources/manager.h"
 
 #include "math/matrix.h"
 

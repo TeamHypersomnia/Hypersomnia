@@ -1,6 +1,6 @@
 #include "texture_with_image.h"
 #include "file.h"
-#include "game_framework/settings.h"
+#include "game/settings.h"
 
 namespace resources {
 	void texture_with_image::set_from_image(augs::image img) {

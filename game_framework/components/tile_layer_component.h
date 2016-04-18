@@ -1,6 +1,6 @@
 #pragma once
 #include "math/vec2.h"
-#include "game_framework/assets/texture.h"
+#include "game/assets/texture.h"
 #include "transform_component.h"
 
 namespace shared {

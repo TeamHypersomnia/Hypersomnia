@@ -1,7 +1,7 @@
-#include "game_framework/systems/gui_system.h"
-#include "game_framework/settings.h"
-#include "game_framework/components/item_component.h"
-#include "game_framework/components/container_component.h"
+#include "game/systems/gui_system.h"
+#include "game/settings.h"
+#include "game/components/item_component.h"
+#include "game/components/container_component.h"
 
 void gui_system::rebuild_gui_tree_based_on_game_state() {
 	gui.set_delta_milliseconds(delta_milliseconds());

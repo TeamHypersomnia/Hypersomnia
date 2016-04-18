@@ -1,6 +1,6 @@
 #include "world.h"
 #include "processing_system.h"
-#include "../../game_framework/messages/new_entity_message.h"
+#include "../../game/messages/new_entity_message.h"
 
 #include "ensure.h"
 

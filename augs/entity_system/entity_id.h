@@ -1,7 +1,7 @@
 #pragma once
 #include "misc/memory_pool.h"
-#include "game_framework/globals/inventory.h"
-#include "game_framework/globals/associated_entities.h"
+#include "game/globals/inventory.h"
+#include "game/globals/associated_entities.h"
 #include <functional>
 
 struct inventory_slot_id;

@@ -4,8 +4,8 @@
 
 #include "renderer.h"
 
-#include "game_framework/components/visibility_component.h"
-#include "game_framework/components/physics_component.h"
+#include "game/components/visibility_component.h"
+#include "game/components/physics_component.h"
 
 #include "augs/entity_system/entity.h"
 
@@ -13,7 +13,7 @@
 
 #include "../window_framework/window.h"
 
-#include "game_framework/resources/manager.h"
+#include "game/resources/manager.h"
 #include "gui/gui_world.h"
 #include "options.h"
 

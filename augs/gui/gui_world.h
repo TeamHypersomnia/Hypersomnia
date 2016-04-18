@@ -8,7 +8,7 @@
 #include "texture_baker/font.h"
 #include "rect.h"
 
-#include "game_framework/assets/font.h"
+#include "game/assets/font.h"
 #include "misc/unsafe_type_collection.h"
 
 namespace augs {

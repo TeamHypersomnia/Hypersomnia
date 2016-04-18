@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <functional>
-#include "game_framework/components/sprite_component.h"
+#include "game/components/sprite_component.h"
 #include "entity_system/entity_id.h"
 
 namespace resources {

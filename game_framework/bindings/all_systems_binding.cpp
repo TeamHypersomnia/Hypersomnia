@@ -4,7 +4,7 @@
 #include "bindings.h"
 #include "bind_callbacks.h"
 
-#include "game_framework/all_system_includes.h"
+#include "game/all_system_includes.h"
 
 #include "misc/vector_wrapper.h"
 

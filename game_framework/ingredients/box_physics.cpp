@@ -1,7 +1,7 @@
 #include "augs/entity_system/world.h"
-#include "game_framework/components/physics_component.h"
+#include "game/components/physics_component.h"
 
-#include "game_framework/globals/filters.h"
+#include "game/globals/filters.h"
 
 #include "../components/physics_definition_component.h"
 

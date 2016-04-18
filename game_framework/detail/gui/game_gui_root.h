@@ -1,6 +1,6 @@
 #pragma once
-#include "game_framework/messages/raw_window_input_message.h"
-#include "game_framework/messages/camera_render_request_message.h"
+#include "game/messages/raw_window_input_message.h"
+#include "game/messages/camera_render_request_message.h"
 #include "special_drag_and_drop_target.h"
 #include "gui/text_drawer.h"
 #include "gui/gui_world.h"

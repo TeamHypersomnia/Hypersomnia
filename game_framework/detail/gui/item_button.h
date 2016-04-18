@@ -3,7 +3,7 @@
 #include "augs/gui/text_drawer.h"
 #include "augs/gui/appearance_detector.h"
 
-#include "game_framework/detail/inventory_slot_id.h"
+#include "game/detail/inventory_slot_id.h"
 
 class item_button : public augs::gui::rect{
 	void draw_dragged_ghost_inside(draw_info in);

@@ -21,7 +21,7 @@
 
 #include <Box2D/Common/b2Math.h>
 
-#include "game_framework/globals/joints.h"
+#include "game/globals/joints.h"
 
 class b2Body;
 class b2Joint;

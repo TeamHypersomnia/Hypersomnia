@@ -8,7 +8,7 @@
 
 #include "graphics/renderer.h"
 
-#include "game_framework/resources/manager.h"
+#include "game/resources/manager.h"
 
 #include "ensure.h"
 using namespace augs;

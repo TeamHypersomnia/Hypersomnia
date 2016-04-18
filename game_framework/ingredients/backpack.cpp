@@ -2,13 +2,13 @@
 #include "entity_system/entity.h"
 #include "entity_system/world.h"
 
-#include "game_framework/components/container_component.h"
-#include "game_framework/components/item_component.h"
-#include "game_framework/components/trigger_component.h"
-#include "game_framework/components/force_joint_component.h"
-#include "game_framework/components/name_component.h"
+#include "game/components/container_component.h"
+#include "game/components/item_component.h"
+#include "game/components/trigger_component.h"
+#include "game/components/force_joint_component.h"
+#include "game/components/name_component.h"
 
-#include "game_framework/detail/inventory_utils.h"
+#include "game/detail/inventory_utils.h"
 
 namespace ingredients {
 	void backpack(augs::entity_id e) {

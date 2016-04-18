@@ -2,7 +2,7 @@
 #include "stdafx.h"
 //#include "bindings.h"
 
-//#include "game_framework/game/sound_effects.h"
+//#include "game/game/sound_effects.h"
 //
 //bool has_sound_stopped_playing(sf::Sound* s) {
 //	return s->getStatus() == sf::Sound::Status::Stopped;

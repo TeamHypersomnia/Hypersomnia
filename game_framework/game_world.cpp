@@ -1,10 +1,10 @@
 #include "game_world.h"
 
-#include "game_framework/all_component_includes.h"
-#include "game_framework/all_system_includes.h"
-#include "game_framework/all_message_includes.h"
+#include "game/all_component_includes.h"
+#include "game/all_system_includes.h"
+#include "game/all_message_includes.h"
 
-#include "game_framework/globals/layers.h"
+#include "game/globals/layers.h"
 
 #include <functional>
 

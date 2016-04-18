@@ -6,7 +6,7 @@
 
 #include "bindings.h"
 
-#include "game_framework/all_component_includes.h"
+#include "game/all_component_includes.h"
 #include "ensure.h"
 using namespace components;
 

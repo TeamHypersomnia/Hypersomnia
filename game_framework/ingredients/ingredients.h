@@ -2,8 +2,8 @@
 #include "augs/entity_system/entity_id.h"
 #include "math/vec2.h"
 
-#include "game_framework/assets/texture.h"
-#include "game_framework/components/render_component.h"
+#include "game/assets/texture.h"
+#include "game/components/render_component.h"
 #include "graphics/pixel.h"
 
 namespace augs {

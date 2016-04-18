@@ -3,7 +3,7 @@
 #include "bindings.h"
 
 #include "window_framework/window.h"
-#include "../bind_game_framework_and_augs.h"
+#include "../bind_game_and_augs.h"
 
 namespace bindings {
 	luabind::scope _glwindow() {

@@ -6,14 +6,14 @@
 
 #include "augs/entity_system/overworld.h"
 
-#include "game_framework/components/polygon_component.h"
-#include "game_framework/components/sprite_component.h"
-#include "game_framework/components/fixtures_component.h"
-#include "game_framework/components/tile_layer_component.h"
-#include "game_framework/components/physics_component.h"
+#include "game/components/polygon_component.h"
+#include "game/components/sprite_component.h"
+#include "game/components/fixtures_component.h"
+#include "game/components/tile_layer_component.h"
+#include "game/components/physics_component.h"
 
-#include "game_framework/messages/new_entity_message.h"
-#include "game_framework/messages/destroy_message.h"
+#include "game/messages/new_entity_message.h"
+#include "game/messages/destroy_message.h"
 
 #include "physics_system.h"
 #include "camera_system.h"

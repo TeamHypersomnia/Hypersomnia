@@ -248,7 +248,7 @@ physics_system::query_aabb_output physics_system::query_aabb_px(vec2 p1, vec2 p2
 	return query_aabb(p1 * PIXELS_TO_METERSf, p2 * PIXELS_TO_METERSf, filter, ignore_entity);
 }
 
-#include "game_framework/components/movement_component.h"
+#include "game/components/movement_component.h"
 #include "graphics/renderer.h"
 
 #define FRICTION_FIELDS_COLLIDE 0

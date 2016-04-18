@@ -2,7 +2,7 @@
 #include "entity.h"
 #include "world.h"
 #include "component_bitset_matcher.h"
-#include "game_framework/all_component_includes.h"
+#include "game/all_component_includes.h"
 
 #include <tuple>
 #include <utility> 

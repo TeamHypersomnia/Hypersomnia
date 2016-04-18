@@ -1,6 +1,6 @@
 #include "aabb_highlighter.h"
-#include "game_framework/components/sprite_component.h"
-#include "game_framework/components/physics_definition_component.h"
+#include "game/components/sprite_component.h"
+#include "game/components/physics_definition_component.h"
 #include "entity_system/entity.h"
 
 void aabb_highlighter::update(float delta) {

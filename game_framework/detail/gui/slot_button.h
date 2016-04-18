@@ -3,7 +3,7 @@
 #include "augs/gui/appearance_detector.h"
 #include "augs/gui/text_drawer.h"
 
-#include "game_framework/detail/inventory_slot_id.h"
+#include "game/detail/inventory_slot_id.h"
 
 struct slot_button : augs::gui::rect {
 	slot_button();

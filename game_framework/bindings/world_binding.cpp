@@ -3,8 +3,8 @@
 #include "entity_system/world.h"
 #include "bindings.h"
 
-#include "game_framework/all_message_includes.h"
-#include "game_framework/all_system_includes.h"
+#include "game/all_message_includes.h"
+#include "game/all_system_includes.h"
 
 #include "misc/vector_wrapper.h"
 

@@ -3,9 +3,9 @@
 
 #include "augs/gui/stroke.h"
 #include "item_button.h"
-#include "game_framework/detail/inventory_slot.h"
-#include "game_framework/detail/inventory_utils.h"
-#include "game_framework/components/gui_element_component.h"
+#include "game/detail/inventory_slot.h"
+#include "game/detail/inventory_utils.h"
+#include "game/components/gui_element_component.h"
 
 #include "augs/stream.h"
 #include "pixel_line_connector.h"

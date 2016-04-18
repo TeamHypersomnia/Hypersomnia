@@ -1,12 +1,12 @@
 #pragma once
 #include "game_gui_root.h"
-#include "game_framework/systems/gui_system.h"
-#include "game_framework/systems/physics_system.h"
+#include "game/systems/gui_system.h"
+#include "game/systems/physics_system.h"
 #include "entity_system/world.h"
 #include "entity_system/entity.h"
-#include "game_framework/globals/filters.h"
-#include "game_framework/components/name_component.h"
-#include "game_framework/components/render_component.h"
+#include "game/globals/filters.h"
+#include "game/components/name_component.h"
+#include "game/components/render_component.h"
 #include <algorithm>
 
 augs::entity_id game_gui_world::get_hovered_world_entity(vec2 camera_pos) {

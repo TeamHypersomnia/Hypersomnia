@@ -4,10 +4,10 @@
 #include "graphics/pixel.h"
 #include "graphics/vertex.h"
 
-#include "game_framework/components/transform_component.h"
+#include "game/components/transform_component.h"
 #include "augs/entity_system/entity_id.h"
 
-#include "game_framework/assets/texture.h"
+#include "game/assets/texture.h"
 #include "augs/misc/timer.h"
 
 namespace augs {

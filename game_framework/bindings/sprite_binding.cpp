@@ -7,10 +7,10 @@
 
 #include "misc/vector_wrapper.h"
 
-#include "game_framework/components/sprite_component.h"
-#include "game_framework/components/tile_layer_component.h"
+#include "game/components/sprite_component.h"
+#include "game/components/tile_layer_component.h"
 
-#include "game_framework/shared/drawing_state.h"
+#include "game/shared/drawing_state.h"
 
 namespace bindings {
 	luabind::scope _sprite() {

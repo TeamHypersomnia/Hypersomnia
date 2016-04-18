@@ -10,7 +10,7 @@
 #include <Box2D\Dynamics\b2Body.h>
 #include "graphics/renderer.h"
 
-#include "game_framework/settings.h"
+#include "game/settings.h"
 
 float colinearize_AB(vec2 O_center_of_rotation, vec2 A_rifle_center, vec2 B_barrel, vec2 C_crosshair) {
 	auto crosshair_vector = C_crosshair - O_center_of_rotation;

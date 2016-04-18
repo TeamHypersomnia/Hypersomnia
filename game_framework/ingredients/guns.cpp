@@ -1,20 +1,20 @@
 #include "entity_system/world.h"
-#include "game_framework/components/gun_component.h"
-#include "game_framework/components/item_component.h"
-#include "game_framework/components/physics_definition_component.h"
-#include "game_framework/components/damage_component.h"
-#include "game_framework/components/sprite_component.h"
-#include "game_framework/components/name_component.h"
-#include "game_framework/components/trace_component.h"
+#include "game/components/gun_component.h"
+#include "game/components/item_component.h"
+#include "game/components/physics_definition_component.h"
+#include "game/components/damage_component.h"
+#include "game/components/sprite_component.h"
+#include "game/components/name_component.h"
+#include "game/components/trace_component.h"
 
-#include "game_framework/globals/filters.h"
+#include "game/globals/filters.h"
 
 #include "entity_system/world.h"
 
-#include "game_framework/messages/item_slot_transfer_request.h"
+#include "game/messages/item_slot_transfer_request.h"
 
 #include "ingredients.h"
-#include "game_framework/detail/inventory_utils.h"
+#include "game/detail/inventory_utils.h"
 
 namespace ingredients {
 	void default_gun_container(augs::entity_id e) {

@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "game_framework/globals/entity_name.h"
+#include "game/globals/entity_name.h"
 #include "entity_system/entity_id.h"
 
 struct textual_description {

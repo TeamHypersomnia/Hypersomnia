@@ -5,14 +5,14 @@
 #include "window_framework/window.h"
 #include "script.h"
 
-#include "game_framework/bind_game_framework_and_augs.h"
-#include "game_framework/messages/raw_window_input_message.h"
-#include "game_framework/messages/camera_render_request_message.h"
+#include "game/bind_game_and_augs.h"
+#include "game/messages/raw_window_input_message.h"
+#include "game/messages/camera_render_request_message.h"
 
-#include "game_framework/systems/input_system.h"
-#include "game_framework/systems/render_system.h"
-#include "game_framework/systems/gui_system.h"
-#include "game_framework/resources/manager.h"
+#include "game/systems/input_system.h"
+#include "game/systems/render_system.h"
+#include "game/systems/gui_system.h"
+#include "game/resources/manager.h"
 
 #include <luabind/luabind.hpp>
 
@@ -32,7 +32,7 @@ game_overworld::game_overworld()
 }
 
 void game_overworld::configure_scripting() {
-	bind_game_framework_and_augs(lua);
+	bind_game_and_augs(lua);
 	main_game_world.bind_this_to_lua_global(lua, "WORLD");
 
 	signal(SIGSEGV, SignalHandler);

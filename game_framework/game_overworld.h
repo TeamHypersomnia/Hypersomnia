@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include "game_framework/scene_builders/scene_builder.h"
+#include "game/scene_builders/scene_builder.h"
 
 class game_overworld : public augs::overworld {
 	std::unique_ptr<scene_builder> current_scene_builder;

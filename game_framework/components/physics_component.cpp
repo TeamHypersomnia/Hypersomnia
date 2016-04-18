@@ -12,7 +12,7 @@
 #include "math/vec2.h"
 #include "entity_system/world.h"
 #include "ensure.h"
-#include "game_framework/settings.h"
+#include "game/settings.h"
 namespace components {
 	augs::entity_id physics::get_owner_friction_field(augs::entity_id id) {
 		return get_owner_body_entity(id)->get<components::physics>().owner_friction_ground;

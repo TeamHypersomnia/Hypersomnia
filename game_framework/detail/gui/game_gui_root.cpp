@@ -1,6 +1,6 @@
 #include "game_gui_root.h"
-#include "game_framework/systems/gui_system.h"
-#include "game_framework/components/item_component.h"
+#include "game/systems/gui_system.h"
+#include "game/components/item_component.h"
 #include "item_button.h"
 #include "entity_system/world.h"
 

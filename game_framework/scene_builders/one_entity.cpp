@@ -4,15 +4,15 @@
 #include "entity_system/world.h"
 #include "window_framework/window.h"
 
-#include "game_framework/resources/manager.h"
-#include "game_framework/assets/texture.h"
-#include "game_framework/assets/atlas.h"
+#include "game/resources/manager.h"
+#include "game/assets/texture.h"
+#include "game/assets/atlas.h"
 
-#include "game_framework/systems/input_system.h"
-#include "game_framework/systems/render_system.h"
-#include "game_framework/components/position_copying_component.h"
+#include "game/systems/input_system.h"
+#include "game/systems/render_system.h"
+#include "game/components/position_copying_component.h"
 
-#include "game_framework/messages/crosshair_intent_message.h"
+#include "game/messages/crosshair_intent_message.h"
 
 #include "rendering_scripts/all.h"
 
