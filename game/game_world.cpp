@@ -52,6 +52,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_component<trigger_collision_detector>();
 	register_component<name>();
 	register_component<trace>();
+	register_component<melee>();
 	
 	register_system<input_system>();
 	register_system<steering_system>();
@@ -78,6 +79,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_system<intent_contextualization_system>();
 	register_system<gui_system>();
 	register_system<trace_system>();
+	register_system<melee_system>();
 
 	register_message_queue<intent_message>();
 	register_message_queue<damage_message>();
@@ -99,6 +101,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_message_queue<gui_item_transfer_intent>();
 	register_message_queue<rebuild_physics_message>();
 	register_message_queue<physics_operation>();
+	register_message_queue<melee_swing_response>();
 
 	register_message_callback<item_slot_transfer_request>(std::bind(&item_system::consume_item_slot_transfer_requests, &get_system<item_system>()));
 }
@@ -218,6 +221,7 @@ void game_world::perform_logic_step() {
 
 	get_system<intent_contextualization_system>().contextualize_movement_intents();
 
+	get_system<melee_system>().consume_melee_intents();
 	get_system<force_joint_system>().apply_forces_towards_target_entities();
 
 	get_system<car_system>().set_steering_flags_from_intents();
@@ -232,6 +236,8 @@ void game_world::perform_logic_step() {
 	get_system<physics_system>().step_and_set_new_transforms();
 	get_system<position_copying_system>().update_transforms();
 	
+	get_system<melee_system>().initiate_and_update_moves();
+
 	get_system<damage_system>().destroy_outdated_bullets();
 	get_system<damage_system>().destroy_colliding_bullets_and_send_damage();
 	

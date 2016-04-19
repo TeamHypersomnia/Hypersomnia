@@ -1,6 +1,7 @@
 #include "entity_description.h"
 #include "entity_system/entity.h"
 #include "../components/name_component.h"
+#include "../components/melee_component.h"
 #include "../components/gun_component.h"
 #include "../components/damage_component.h"
 #include "../components/container_component.h"
@@ -18,6 +19,7 @@ textual_description description_of_entity(augs::entity_id id) {
 std::wstring describe_properties(augs::entity_id id) {
 	std::wostringstream result;
 
+	auto* melee = id->find<components::melee>();
 	auto* gun = id->find<components::gun>();
 	auto* damage = id->find<components::damage>();
 	auto* container = id->find<components::container>();
@@ -52,6 +54,11 @@ std::wstring describe_properties(augs::entity_id id) {
 			result << L"Max distance: [color=vscyan]" << damage->max_distance << L"[/color]\n";
 		if (damage->constrain_lifetime)
 			result << L"Max lifetime: [color=vscyan]" << damage->max_lifetime_ms << L" ms[/color]\n";
+	}
+
+	if (melee) {
+		result << L"Swing duration: [color=vscyan]" << melee->swing_duration_ms << L" ms[/color]\n";
+		result << L"Swing cooldown: [color=vscyan]" << melee->swing_cooldown_ms << L" ms[/color]\n";
 	}
 
 	if (id.has(slot_function::ITEM_DEPOSIT)) {

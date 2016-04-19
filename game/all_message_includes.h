@@ -18,6 +18,7 @@
 #include "messages/gui_intents.h"
 #include "messages/rebuild_physics_message.h"
 #include "messages/physics_operation.h"
+#include "messages/melee_swing_response.h"
 
 
 

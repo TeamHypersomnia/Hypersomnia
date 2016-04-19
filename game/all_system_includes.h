@@ -24,6 +24,7 @@
 #include "systems/intent_contextualization_system.h"
 #include "systems/gui_system.h"
 #include "systems/trace_system.h"
+#include "systems/melee_system.h"
 
 
 

@@ -72,7 +72,7 @@ namespace resource_setups {
 
 			resources::emission em;
 			em.spread_degrees = std::make_pair(150, 360);
-			em.particles_per_burst = std::make_pair(30, 120);
+			em.particles_per_sec = std::make_pair(3, 10);
 			em.stream_duration_ms = std::make_pair(200, 400);
 			em.type = resources::emission::STREAM;
 			em.velocity = std::make_pair(10, 800);
@@ -105,6 +105,13 @@ namespace resource_setups {
 			response[particle_effect_response_type::BARREL_LEAVE_EXPLOSION] = assets::particle_effect_id::PIXEL_BARREL_LEAVE_EXPLOSION;
 			response[particle_effect_response_type::DESTRUCTION_EXPLOSION] = assets::particle_effect_id::PIXEL_BURST;
 			response[particle_effect_response_type::PROJECTILE_TRACE] = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+		}
+
+		{
+			auto& response = resource_manager.create(assets::particle_effect_response_id::SWINGING_MELEE_WEAPON_RESPONSE);
+
+			response[particle_effect_response_type::PARTICLES_WHILE_SWINGING] = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+			response[particle_effect_response_type::DESTRUCTION_EXPLOSION] = assets::particle_effect_id::PIXEL_BURST;
 		}
 	}
 }

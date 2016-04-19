@@ -69,6 +69,11 @@ textual_description description_by_entity_name(entity_name n) {
 			L"Submachine",
 			L"Low recoil and damage,\nfast fire rate."
 		};
+	case entity_name::URBAN_CYAN_MACHETE:
+		return{
+			L"Urban cyan machete",
+			L"Delivers solid slash."
+		};
 	default:
 		ensure(false);
 		return{

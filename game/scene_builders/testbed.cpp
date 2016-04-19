@@ -115,6 +115,8 @@ namespace scene_builders {
 		prefabs::create_cyan_charge(world, vec2(150, -500));
 		prefabs::create_cyan_charge(world, vec2(200, -500));
 
+		prefabs::create_cyan_urban_machete(world, vec2(100, 100));
+
 		auto pink_mag = prefabs::create_sample_magazine(world, vec2(100 - 50, -650), "100000", prefabs::create_pink_charge(world, vec2(0, 0), 500));
 
 		auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));

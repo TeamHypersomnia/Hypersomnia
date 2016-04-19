@@ -35,6 +35,7 @@
 #include "components/trigger_collision_detector_component.h"
 #include "components/name_component.h"
 #include "components/trace_component.h"
+#include "components/melee_component.h"
 
 
 

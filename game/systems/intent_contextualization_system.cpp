@@ -67,12 +67,27 @@ void intent_contextualization_system::contextualize_crosshair_action_intents() {
 
 				if (hand.alive() && hand->items_inside.size() > 0)
 					callee = hand->items_inside[0];
+				else {
+					hand = it.subject[slot_function::PRIMARY_HAND];
+
+					if (hand.alive() && hand->items_inside.size() > 0)
+						callee = hand->items_inside[0];
+				}
 			}
 		}
 
 		if (callee.alive()) {
 			if (callee->find<components::gun>()) {
 				it.intent = intent_type::PRESS_GUN_TRIGGER;
+				it.subject = callee;
+				continue;
+			}
+			if (callee->find<components::melee>()) {
+				if (it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION)
+					it.intent = intent_type::MELEE_PRIMARY_MOVE;
+				else if (it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION)
+					it.intent = intent_type::MELEE_SECONDARY_MOVE;
+
 				it.subject = callee;
 				continue;
 			}
@@ -84,19 +99,36 @@ void intent_contextualization_system::contextualize_movement_intents() {
 	auto& intents = parent_world.get_message_queue<messages::intent_message>();
 
 	for (auto& e : intents) {
+		augs::entity_id callee;
+
 		auto* maybe_driver = e.subject->find<components::driver>();
+		auto* maybe_container = e.subject->find<components::container>();
 
 		if (maybe_driver && maybe_driver->owned_vehicle.alive()) {
 			if (e.intent == intent_type::MOVE_FORWARD
 				|| e.intent == intent_type::MOVE_BACKWARD
 				|| e.intent == intent_type::MOVE_LEFT
 				|| e.intent == intent_type::MOVE_RIGHT) {
-				e.subject = maybe_driver->owned_vehicle;
+				callee = maybe_driver->owned_vehicle;
 			}
 			else if (e.intent == intent_type::SPACE_BUTTON) {
-				e.subject = maybe_driver->owned_vehicle;
+				callee = maybe_driver->owned_vehicle;
 				e.intent = intent_type::HAND_BRAKE;
 			}
 		}
+		
+		if (callee.dead()) {
+			if (maybe_container) {
+				if (e.intent == intent_type::SPACE_BUTTON) {
+					auto hand = e.subject[slot_function::PRIMARY_HAND];
+
+					if (hand.alive() && hand->items_inside.size() > 0)
+						callee = hand->items_inside[0];
+				}
+			}
+		}
+
+		if(callee.alive())
+			e.subject = callee;
 	}
 }

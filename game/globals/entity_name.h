@@ -14,7 +14,8 @@ enum class entity_name {
 	SENTIENCE,
 	PERSON,
 	PISTOL,
-	SUBMACHINE
+	SUBMACHINE,
+	URBAN_CYAN_MACHETE,
 };
 
 void name_entity(augs::entity_id, entity_name);

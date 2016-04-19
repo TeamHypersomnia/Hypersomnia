@@ -62,4 +62,6 @@ namespace prefabs {
 	augs::entity_id create_character_crosshair(augs::world&);
 	augs::entity_id create_character(augs::world&, vec2 pos);
 	augs::entity_id create_crate(augs::world&, vec2 pos, vec2 size);
+
+	augs::entity_id create_cyan_urban_machete(augs::world&, vec2 pos);
 }

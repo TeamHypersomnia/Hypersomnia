@@ -11,7 +11,7 @@ namespace components {
 		auto& b = *pb;
 		
 		return
-		std::make_tuple(a.amount, a.destroy_upon_hit, a.constrain_lifetime, a.constrain_distance, a.max_distance, a.max_lifetime_ms) ==
-		std::make_tuple(b.amount, b.destroy_upon_hit, b.constrain_lifetime, b.constrain_distance, b.max_distance, b.max_lifetime_ms);
+		std::make_tuple(a.amount, a.damage_upon_collision, a.destroy_upon_damage, a.constrain_lifetime, a.constrain_distance, a.max_distance, a.max_lifetime_ms) ==
+		std::make_tuple(b.amount, b.damage_upon_collision, b.destroy_upon_damage, b.constrain_lifetime, b.constrain_distance, b.max_distance, b.max_lifetime_ms);
 	}
 }

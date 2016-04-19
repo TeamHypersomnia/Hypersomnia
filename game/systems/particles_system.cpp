@@ -13,6 +13,7 @@
 #include "../messages/create_particle_effect.h"
 #include "../messages/destroy_message.h"
 #include "../messages/damage_message.h"
+#include "../messages/melee_swing_response.h"
 
 #include "misc/randval.h"
 
@@ -30,6 +31,7 @@ entity_id particles_system::create_refreshable_particle_group(world& parent_worl
 void particles_system::game_responses_to_particle_effects() {
 	auto& gunshots = parent_world.get_message_queue<messages::gunshot_response>();
 	auto& damages = parent_world.get_message_queue<messages::damage_message>();
+	auto& swings = parent_world.get_message_queue<messages::melee_swing_response>();
 
 	for (auto& g : gunshots) {
 		for (auto& r : g.spawned_rounds) {
@@ -55,6 +57,16 @@ void particles_system::game_responses_to_particle_effects() {
 		burst.transform.rotation = (-d.impact_velocity).degrees();
 		burst.effect = (*d.inflictor->get<components::particle_effect_response>().response)[particle_effect_response_type::DESTRUCTION_EXPLOSION];
 		burst.modifier.colorize = d.inflictor->get<components::damage>().effects_color;
+
+		parent_world.post_message(burst);
+	}
+
+	for (auto& s : swings) {
+		messages::create_particle_effect burst;
+		burst.subject = s.subject;
+		burst.transform = s.origin_transform;
+		burst.effect = (*s.subject->get<components::particle_effect_response>().response)[particle_effect_response_type::PARTICLES_WHILE_SWINGING];
+		burst.modifier.colorize = s.subject->get<components::damage>().effects_color;
 
 		parent_world.post_message(burst);
 	}

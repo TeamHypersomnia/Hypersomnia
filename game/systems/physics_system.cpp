@@ -438,10 +438,6 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 			return;
 		}
 
-		if (damage || msg.collider->find<components::damage>()) {
-			contact->SetEnabled(false);
-		}
-
 		msg.point = manifold.points[0];
 		msg.point *= METERS_TO_PIXELSf;
 

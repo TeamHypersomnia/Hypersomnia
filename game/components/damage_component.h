@@ -13,7 +13,8 @@ namespace components {
 		float impulse_upon_hit = 100.f;
 
 		augs::entity_id sender;
-		bool destroy_upon_hit = true;
+		bool damage_upon_collision = true;
+		bool destroy_upon_damage = true;
 
 		/* used to destroy bullets */
 		vec2 starting_point;

@@ -18,9 +18,9 @@ void damage_system::destroy_colliding_bullets_and_send_damage() {
 
 		auto* damage = it.collider->find<components::damage>();
 
-		if (damage) {
+		if (damage && damage->damage_upon_collision) {
 			auto& subject_of_impact = components::physics::get_owner_body_entity(it.subject)->get<components::physics>();
-			auto bullet_vel = it.collider->get<components::physics>().velocity();
+			auto bullet_vel = components::physics::get_owner_body_entity(it.collider)->get<components::physics>().velocity();
 
 			subject_of_impact.apply_force(vec2(bullet_vel).set_length(damage->impulse_upon_hit), it.point - subject_of_impact.get_mass_position());
 
@@ -34,7 +34,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage() {
 
 			damage->saved_point_of_impact_before_death = it.point;
 
-			if (damage->destroy_upon_hit) 
+			if (damage->destroy_upon_damage) 
 				parent_world.post_message(messages::destroy_message(it.collider));
 		}
 	}

@@ -1179,6 +1179,12 @@
     <ClCompile Include="game\scene_builders\rendering_scripts\standard_rendering.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\systems\melee_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\ingredients\melee_weapons.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3165,6 +3171,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\scene_builders\resource_setups\all.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\systems\melee_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\components\melee_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\messages\melee_swing_response.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -44,6 +44,12 @@ namespace resource_setups {
 			gui.flip_vertically = true;
 		}
 
+		{
+			auto& gui = resource_manager.create(assets::texture_id::URBAN_CYAN_MACHETE, L"hypersomnia/gfx/urban_cyan_machete.png").gui_sprite_def;
+			gui.flip_horizontally = true;
+			gui.flip_vertically = true;
+		}
+
 		auto& magazine_gui = resource_manager.create(assets::texture_id::SAMPLE_MAGAZINE, L"hypersomnia/gfx/magazine.png").gui_sprite_def;
 		magazine_gui.rotation_offset = -270;
 
