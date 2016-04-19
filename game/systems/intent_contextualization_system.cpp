@@ -122,8 +122,10 @@ void intent_contextualization_system::contextualize_movement_intents() {
 				if (e.intent == intent_type::SPACE_BUTTON) {
 					auto hand = e.subject[slot_function::PRIMARY_HAND];
 
-					if (hand.alive() && hand->items_inside.size() > 0)
+					if (hand.alive() && hand->items_inside.size() > 0) {
+						e.intent = intent_type::MELEE_TERTIARY_MOVE;
 						callee = hand->items_inside[0];
+					}
 				}
 			}
 		}
