@@ -14,7 +14,7 @@ vec2 recoil_player::shoot_and_get_offset(augs::deterministic_timestamp current_t
 		delta_offset++;
 		current_offset = int(offsets.size() - 1) - delta_offset;
 	}
-	LOG("C: %c", current_offset);
+
 	return offsets[current_offset++] * scale;
 }
 
