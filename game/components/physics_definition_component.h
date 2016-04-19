@@ -11,7 +11,12 @@ namespace components {
 
 		rects::ltrb<float> get_aabb_size();
 
-		components::transform offset_created_shapes;
+		enum offset_type {
+			ITEM_ATTACHMENT_DISPLACEMENT,
+			SPECIAL_MOVE_DISPLACEMENT
+		};
+
+		components::transform offsets_for_created_shapes[2];
 
 		fixture_definition& new_fixture(augs::entity_id attached_to_entity = augs::entity_id()) {
 			attach_fixtures_to_entity = attached_to_entity;

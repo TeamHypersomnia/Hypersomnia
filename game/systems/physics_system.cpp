@@ -675,7 +675,8 @@ void physics_system::create_physics_for_entity(augs::entity_id e) {
 				create_physics_component(physics_definition->body, e);
 
 			for (auto fixture : physics_definition->fixtures) {
-				fixture.transform_vertices += physics_definition->offset_created_shapes;
+				for(auto& offset : physics_definition->offsets_for_created_shapes)
+					fixture.transform_vertices += offset;
 
 				if (other_body_entity.alive())
 					add_fixtures_to_other_body(fixture, e, physics_definition->attach_fixtures_to_entity);

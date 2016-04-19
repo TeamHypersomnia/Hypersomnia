@@ -232,12 +232,13 @@ void item_system::consume_item_slot_transfer_requests() {
 				if (parent_slot.alive()) {
 					def.create_fixtures_and_body = parent_slot.should_item_inside_keep_physical_body();
 					def.attach_fixtures_to_entity = parent_slot.get_root_container();
-					def.offset_created_shapes = parent_slot.sum_attachment_offsets_of_parents(descendant);
+					def.offsets_for_created_shapes[components::physics_definition::ITEM_ATTACHMENT_DISPLACEMENT]
+						= parent_slot.sum_attachment_offsets_of_parents(descendant);
 				}
 				else {
 					def.create_fixtures_and_body = true;
 					def.attach_fixtures_to_entity = descendant;
-					def.offset_created_shapes.reset();
+					def.offsets_for_created_shapes[components::physics_definition::ITEM_ATTACHMENT_DISPLACEMENT].reset();
 				}
 
 				parent_world.post_message(rebuild);
