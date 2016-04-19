@@ -53,7 +53,7 @@ void melee_system::initiate_and_update_moves() {
 		auto& melee = t->get<components::melee>();
 		auto& damage = t->get<components::damage>();
 
-		LOG("P: %x, S: %x, T: %x", melee.primary_move_flag, melee.secondary_move_flag, melee.tertiary_move_flag);
+		// LOG("P: %x, S: %x, T: %x", melee.primary_move_flag, melee.secondary_move_flag, melee.tertiary_move_flag);
 
 		damage.damage_upon_collision = melee.primary_move_flag;
 
