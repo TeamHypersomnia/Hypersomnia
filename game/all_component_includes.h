@@ -31,7 +31,6 @@
 #include "components/force_joint_component.h"
 #include "components/physics_definition_component.h"
 #include "components/item_slot_transfers_component.h"
-#include "components/melee_component.h"
 #include "components/gui_element_component.h"
 #include "components/trigger_collision_detector_component.h"
 #include "components/name_component.h"

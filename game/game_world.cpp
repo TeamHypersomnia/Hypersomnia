@@ -48,7 +48,6 @@ void game_world::register_types_of_messages_components_systems() {
 	register_component<force_joint>();
 	register_component<physics_definition>();
 	register_component<item_slot_transfers>();
-	register_component<melee>();
 	register_component<gui_element>();
 	register_component<trigger_collision_detector>();
 	register_component<name>();

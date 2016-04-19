@@ -1053,9 +1053,6 @@
     <ClCompile Include="augs\entity_system\entity_id.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\systems\melee_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\components\item_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -3005,13 +3002,7 @@
     <ClInclude Include="game\systems\intent_contextualization_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\components\melee_component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\components\physics_definition_component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\systems\melee_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\components\item_slot_transfers_component.h">

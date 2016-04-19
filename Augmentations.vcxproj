@@ -441,7 +441,6 @@
     <ClCompile Include="game\systems\gui_system.cpp" />
     <ClCompile Include="game\systems\intent_contextualization_system.cpp" />
     <ClCompile Include="game\systems\item_system.cpp" />
-    <ClCompile Include="game\systems\melee_system.cpp" />
     <ClCompile Include="game\systems\position_copying_system.cpp" />
     <ClCompile Include="game\systems\crosshair_system.cpp" />
     <ClCompile Include="game\systems\damage_system.cpp" />
@@ -994,7 +993,6 @@
     <ClInclude Include="game\components\item_slot_transfers_component.h" />
     <ClInclude Include="game\components\input_receiver_component.h" />
     <ClInclude Include="game\components\item_component.h" />
-    <ClInclude Include="game\components\melee_component.h" />
     <ClInclude Include="game\components\name_component.h" />
     <ClInclude Include="game\components\physics_definition_component.h" />
     <ClInclude Include="game\components\position_copying_component.h" />
@@ -1094,7 +1092,6 @@
     <ClInclude Include="game\systems\gui_system.h" />
     <ClInclude Include="game\systems\intent_contextualization_system.h" />
     <ClInclude Include="game\systems\item_system.h" />
-    <ClInclude Include="game\systems\melee_system.h" />
     <ClInclude Include="game\systems\position_copying_system.h" />
     <ClInclude Include="game\systems\crosshair_system.h" />
     <ClInclude Include="game\systems\damage_system.h" />

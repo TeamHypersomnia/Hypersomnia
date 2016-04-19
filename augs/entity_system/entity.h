@@ -47,7 +47,6 @@ namespace components {
 	struct force_joint;
 	struct physics_definition;
 	struct item_slot_transfers;
-	struct melee;
 	struct gui_element;
 	struct trigger_collision_detector;
 	struct name;
@@ -125,7 +124,6 @@ namespace augs {
 			std::pair<memory_pool::id, components::item*>,
 			std::pair<memory_pool::id, components::physics_definition*>,
 			std::pair<memory_pool::id, components::item_slot_transfers*>,
-			std::pair<memory_pool::id, components::melee*>,
 			std::pair<memory_pool::id, components::gui_element*>,
 			std::pair<memory_pool::id, components::trigger_collision_detector*>,
 			std::pair<memory_pool::id, components::name*>,
