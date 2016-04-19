@@ -21,6 +21,8 @@ float PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 
 #include "log.h"
 
+#include "game/settings.h"
+
 using namespace augs;
 
 bool physics_system::raycast_input::ShouldRaycast(b2Fixture* fixture) {
@@ -318,8 +320,10 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 								found_suitable = true;
 						}
 
-						renderer::get_current().blink_lines.draw_yellow(METERS_TO_PIXELSf*worldManifold.points[i], METERS_TO_PIXELSf* worldManifold.points[i] + vec2(worldManifold.normal).set_length(150));
-						renderer::get_current().blink_lines.draw_red(METERS_TO_PIXELSf*worldManifold.points[i], METERS_TO_PIXELSf* worldManifold.points[i] + velOtherPixels);
+						if (DEBUG_DRAW_FRICTION_FIELD_COLLISIONS_OF_ENTERING) {
+							renderer::get_current().blink_lines.draw_yellow(METERS_TO_PIXELSf*worldManifold.points[i], METERS_TO_PIXELSf* worldManifold.points[i] + vec2(worldManifold.normal).set_length(150));
+							renderer::get_current().blink_lines.draw_red(METERS_TO_PIXELSf*worldManifold.points[i], METERS_TO_PIXELSf* worldManifold.points[i] + velOtherPixels);
+						}
 					}
 				}
 
