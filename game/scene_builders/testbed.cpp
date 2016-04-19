@@ -82,10 +82,10 @@ namespace scene_builders {
 					assets::texture_id::TEST_BACKGROUND, augs::gray1, render_layer::UNDER_GROUND);
 			}
 
-		const int num_characters = 1;
+		const int num_characters = 2;
 
 		for (int i = 0; i < num_characters; ++i) {
-			auto new_character = prefabs::create_character(world, vec2(i * 100, 0));
+			auto new_character = prefabs::create_character(world, vec2(i * 300, 0));
 			new_character.set_debug_name(typesafe_sprintf("player%x", i));
 			
 			characters.push_back(new_character);
@@ -116,6 +116,7 @@ namespace scene_builders {
 		prefabs::create_cyan_charge(world, vec2(200, -500));
 
 		prefabs::create_cyan_urban_machete(world, vec2(100, 100));
+		auto second_machete = prefabs::create_cyan_urban_machete(world, vec2(0, 0));
 
 		auto pink_mag = prefabs::create_sample_magazine(world, vec2(100 - 50, -650), "100000", prefabs::create_pink_charge(world, vec2(0, 0), 500));
 
@@ -140,6 +141,11 @@ namespace scene_builders {
 
 		r.item = submachine;
 		r.target_slot = characters[0][slot_function::PRIMARY_HAND];
+
+		world.post_message(r);
+
+		r.item = second_machete;
+		r.target_slot = characters[1][slot_function::PRIMARY_HAND];
 
 		world.post_message(r);
 
