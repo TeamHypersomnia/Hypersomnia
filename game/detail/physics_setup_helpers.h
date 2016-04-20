@@ -43,6 +43,7 @@ struct fixture_definition {
 
 	bool sensor = false;
 	bool is_friction_ground = false;
+	bool disable_standard_collision_resolution = false;
 
 	void add_convex_polygon(const std::vector<vec2>&);
 	void add_concave_polygon(const std::vector<vec2>&);

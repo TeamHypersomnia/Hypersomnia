@@ -18,6 +18,7 @@ namespace components {
 		std::vector<fixture_state> list_of_fixtures;
 
 		bool is_friction_ground = false;
+		bool disable_standard_collision_resolution = false;
 
 		components::transform shape_offset;
 

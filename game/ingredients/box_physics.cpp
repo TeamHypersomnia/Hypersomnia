@@ -52,6 +52,7 @@ namespace ingredients {
 
 		info.filter = filters::bullet();
 		info.density = 1;
+		info.disable_standard_collision_resolution = true;
 
 		return physics_definition;
 	}

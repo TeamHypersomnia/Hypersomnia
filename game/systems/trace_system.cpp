@@ -4,6 +4,7 @@
 
 #include "../components/sprite_component.h"
 #include "../components/damage_component.h"
+#include "../components/physics_component.h"
 #include "../messages/destroy_message.h"
 
 void trace_system::lengthen_sprites_of_traces() {
@@ -55,6 +56,8 @@ void trace_system::spawn_finishing_traces_for_destroyed_objects() {
 			*finishing_trace += e->get<components::sprite>();
 			*finishing_trace += e->get<components::transform>();
 			*finishing_trace += e->get<components::render>();
+
+			//finishing_trace->get<components::transform>().rotation = 90;// e->get<components::physics>().velocity().degrees();
 
 			if (e->find<components::damage>()) {
 				finishing_trace->get<components::transform>().pos = e->get<components::damage>().saved_point_of_impact_before_death - 

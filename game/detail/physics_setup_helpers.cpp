@@ -241,6 +241,7 @@ components::fixtures& add_fixtures_to_other_body(fixture_definition fixture_data
 	fixtures.convex_polys = fixture_data.convex_polys;
 	fixtures.shape_offset = fixture_data.transform_vertices;
 	fixtures.is_friction_ground = fixture_data.is_friction_ground;
+	fixtures.disable_standard_collision_resolution = fixture_data.disable_standard_collision_resolution;
 
 	for (auto convex : fixture_data.convex_polys) {
 		std::vector<b2Vec2> b2verts(convex.begin(), convex.end());

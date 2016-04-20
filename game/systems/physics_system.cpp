@@ -441,6 +441,10 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 			contact->SetEnabled(false);
 			return;
 		}
+		
+		if (subject_fixtures.disable_standard_collision_resolution || collider_fixtures.disable_standard_collision_resolution) {
+			contact->SetEnabled(false);
+		}
 
 		msg.point = manifold.points[0];
 		msg.point *= METERS_TO_PIXELSf;
