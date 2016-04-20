@@ -27,7 +27,9 @@ namespace prefabs {
 
 		auto& melee = *machete += components::melee();
 		melee.swing_cooldown_ms = 100.f;
-		melee.swing_duration_ms = 200.f;
+		melee.swing_duration_ms = 500.f;
+		melee.primary_swing_range = 50;
+		melee.primary_swing_acceleration = 10.0f;
 
 		auto& damage = *machete += components::damage();
 		damage.destroy_upon_damage = false;

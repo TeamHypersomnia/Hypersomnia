@@ -11,4 +11,5 @@ public:
 
 	void consume_melee_intents();
 	void initiate_and_update_moves();
+
 };
