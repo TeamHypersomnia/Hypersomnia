@@ -107,7 +107,7 @@ namespace resource_setups {
 			em.particles_per_sec = std::make_pair(50, 60);
 			em.stream_duration_ms = std::make_pair(450, 800);
 			em.type = resources::emission::STREAM;
-			em.velocity = std::make_pair(4, 70);
+			em.velocity = std::make_pair(4, 30);
 			em.angular_velocity = std::make_pair(0, 0);
 			em.particle_lifetime_ms = std::make_pair(300, 400);
 
