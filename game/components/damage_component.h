@@ -9,12 +9,13 @@
 namespace components {
 	struct damage {
 		float amount = 12.f;
-		
+
 		float impulse_upon_hit = 100.f;
 
 		augs::entity_id sender;
 		bool damage_upon_collision = true;
 		bool destroy_upon_damage = true;
+		int damage_charges_before_destruction = 1;
 
 		/* used to destroy bullets */
 		vec2 starting_point;
