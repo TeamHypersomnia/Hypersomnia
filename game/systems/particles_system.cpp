@@ -35,21 +35,37 @@ void particles_system::game_responses_to_particle_effects() {
 
 	for (auto& g : gunshots) {
 		for (auto& r : g.spawned_rounds) {
-			auto& round_response = *r->get<components::particle_effect_response>().response;
+			const auto& round_response = r->get<components::particle_effect_response>();
+			const auto& round_response_map = *round_response.response;
 
 			messages::create_particle_effect burst;
 			burst.transform = g.barrel_transform;
 			burst.subject = g.subject;
-			burst.effect = round_response[particle_effect_response_type::BARREL_LEAVE_EXPLOSION];
-			burst.modifier.colorize = r->get<components::damage>().effects_color;
+			burst.effect = round_response_map.at(particle_effect_response_type::BARREL_LEAVE_EXPLOSION);
+			burst.modifier = round_response.modifier;
 
 			parent_world.post_message(burst);
 
 			burst.transform.reset();
 			burst.transform.rotation = 180;
 			burst.subject = r;
-			burst.effect = round_response[particle_effect_response_type::PROJECTILE_TRACE];
-			burst.modifier.colorize = r->get<components::damage>().effects_color;
+			burst.effect = round_response_map.at(particle_effect_response_type::PROJECTILE_TRACE);
+			burst.modifier = round_response.modifier;
+			burst.local_transform = true;
+
+			parent_world.post_message(burst);
+		}
+
+		for (auto& s : g.spawned_shells) {
+			const auto& shell_response = s->get<components::particle_effect_response>();
+			const auto& shell_response_map = *shell_response.response;
+
+			messages::create_particle_effect burst;
+			burst.transform.reset();
+			burst.transform.rotation = 180;
+			burst.subject = s;
+			burst.effect = shell_response_map.at(particle_effect_response_type::PROJECTILE_TRACE);
+			burst.modifier = shell_response.modifier;
 			burst.local_transform = true;
 
 			parent_world.post_message(burst);
@@ -62,22 +78,28 @@ void particles_system::game_responses_to_particle_effects() {
 	}
 
 	for (auto& d : damages) {
+		const auto& response = d.inflictor->get<components::particle_effect_response>();
+		const auto& response_map = *response.response;
+
 		messages::create_particle_effect burst;
 		burst.subject = d.subject;
 		burst.transform.pos = d.point_of_impact;
 		burst.transform.rotation = (-d.impact_velocity).degrees();
-		burst.effect = (*d.inflictor->get<components::particle_effect_response>().response)[particle_effect_response_type::DESTRUCTION_EXPLOSION];
-		burst.modifier.colorize = d.inflictor->get<components::damage>().effects_color;
+		burst.effect = response_map.at(particle_effect_response_type::DESTRUCTION_EXPLOSION);
+		burst.modifier = response.modifier;
 
 		parent_world.post_message(burst);
 	}
 
 	for (auto& s : swings) {
+		const auto& response = s.subject->get<components::particle_effect_response>();
+		const auto& response_map = *response.response;
+
 		messages::create_particle_effect burst;
 		burst.subject = s.subject;
 		burst.transform = s.origin_transform;
-		burst.effect = (*s.subject->get<components::particle_effect_response>().response)[particle_effect_response_type::PARTICLES_WHILE_SWINGING];
-		burst.modifier.colorize = s.subject->get<components::damage>().effects_color;
+		burst.effect = response_map.at(particle_effect_response_type::PARTICLES_WHILE_SWINGING);
+		burst.modifier = response.modifier;
 
 		parent_world.post_message(burst);
 	}

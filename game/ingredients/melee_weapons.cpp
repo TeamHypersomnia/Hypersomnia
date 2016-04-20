@@ -36,14 +36,13 @@ namespace prefabs {
 		damage.damage_upon_collision = false;
 		damage.amount = 50.f;
 		damage.impulse_upon_hit = 1000.f;
-		damage.effects_color = augs::cyan;
 		damage.sender = machete;
 		damage.constrain_distance = false;
 		damage.constrain_lifetime = false;
 
-		auto& response = *machete += components::particle_effect_response();
-		response.response = assets::particle_effect_response_id::SWINGING_MELEE_WEAPON_RESPONSE;
-
+		auto& response = *machete += components::particle_effect_response{ assets::particle_effect_response_id::SWINGING_MELEE_WEAPON_RESPONSE };
+		response.modifier.colorize = augs::cyan;
+		
 		return machete;
 	}
 }
