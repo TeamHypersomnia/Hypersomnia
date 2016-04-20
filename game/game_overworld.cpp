@@ -108,6 +108,9 @@ void game_overworld::main_game_loop() {
 				if (raw_input.key == window::event::keys::_5) {
 					stepping_speed = 1.f;
 				}
+				if (raw_input.key == window::event::keys::F4) {
+					LOG_COLOR(console_color::YELLOW, "Separator");
+				}
 			}
 
 			messages::raw_window_input_message msg;

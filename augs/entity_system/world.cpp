@@ -3,6 +3,7 @@
 #include "../../game/messages/new_entity_message.h"
 
 #include "ensure.h"
+#include "../options.h"
 
 namespace augs {
 	world::world(overworld& parent_overworld) : parent_overworld(parent_overworld) {}
@@ -67,6 +68,10 @@ namespace augs {
 		ensure(res.get_debug_name() != "");
 		ensure(res.get_debug_name() != "unknown");
 #endif
+		auto name = res.get_debug_name();
+
+		if (DEBUG_LOG_CREATED_AND_DELETED_ENTITIES && name.find("[-]") == std::string::npos)
+			LOG_COLOR(console_color::GREEN, "Created entity: %x", name);
 
 		return res;
 	}
@@ -83,7 +88,7 @@ namespace augs {
 
 		auto name = res.get_debug_name();
 
-		if (name.find("[-]") == std::string::npos)
+		if (DEBUG_LOG_CREATED_AND_DELETED_ENTITIES && name.find("[-]") == std::string::npos)
 			LOG_COLOR(console_color::GREEN, "Created entity: %x", name);
 
 		{
@@ -109,7 +114,7 @@ namespace augs {
 	void world::delete_entity(entity_id e) {
 		auto name = e.get_debug_name();
 		
-		if(name.find("[-]") == std::string::npos)
+		if(DEBUG_LOG_CREATED_AND_DELETED_ENTITIES && name.find("[-]") == std::string::npos)
 			LOG_COLOR(console_color::RED, "Deleted entity: %x", name);
 		
 		entities.free(e);

@@ -322,8 +322,7 @@ void particles_system::step_streams_and_particles_and_destroy_dead() {
 		}
 
 		slots.erase(std::remove_if(slots.begin(), slots.end(), [](const components::particle_group::stream& s) {
-			return s.enable_streaming && 
-				s.particles.particles.empty() &&
+			return s.particles.particles.empty() &&
 				s.destroy_after_lifetime_passed &&
 				s.stream_lifetime_ms >= s.stream_max_lifetime_ms;
 		}), slots.end());
