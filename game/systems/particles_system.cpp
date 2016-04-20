@@ -21,7 +21,7 @@ entity_id particles_system::create_refreshable_particle_group(world& parent_worl
 	entity_id ent = parent_world.create_entity("refreshable_particle_group");
 	
 	ent->add(components::transform());
-	ent->add(components::particle_group()).stream_slots[0].destroy_when_empty = false;
+	ent->add(components::particle_group()).stream_slots[0].destroy_after_lifetime_passed = false;
 	ent->add(components::position_copying());
 	ent->add(components::render());
 
@@ -159,7 +159,7 @@ void particles_system::create_particle_effects() {
 			auto& target_stream = target_group->stream_slots[stream_index];
 
 			target_stream.stream_info = *stream;
-			target_stream.is_streaming = true;
+			target_stream.enable_streaming = true;
 			target_stream.stream_lifetime_ms = 0.f;
 			target_stream.target_spread = randval(stream->spread_degrees);
 			target_stream.swing_spread = randval(stream->swing_spread);
@@ -191,9 +191,13 @@ void particles_system::create_particle_effects() {
 				target_position_copying->rotation_orbit_offset = (it.transform.pos - subject_transform.pos).rotate(-subject_transform.rotation, vec2(0.f, 0.f));
 			}
 
+			if (it.subject.dead()) {
+				target_stream.stop_spawning_particles_if_chased_entity_dead = false;
+			}
+
 			if (it.target_group_to_refresh.alive()) {
 				++stream_index;
-				target_stream.destroy_when_empty = false;
+				target_stream.destroy_after_lifetime_passed = false;
 			}
 		}
 	}
@@ -260,19 +264,26 @@ void particles_system::step_streams_and_particles_and_destroy_dead() {
 
 		bool should_destroy = true;
 
-		for (auto& stream_slot : group.stream_slots) {
+		auto& slots = group.stream_slots;
+
+		for (auto& stream_slot : slots) {
 			auto& particles = stream_slot.particles.particles;
 
 			for (auto& particle : particles)
 				integrate_particle(particle, delta_seconds());
 
-			if (stream_slot.is_streaming) {
+			if (stream_slot.enable_streaming) {
 				auto& stream_info = stream_slot.stream_info;
 				float stream_delta = std::min(delta_milliseconds(), stream_slot.stream_max_lifetime_ms - stream_slot.stream_lifetime_ms);
 				stream_slot.stream_lifetime_ms += stream_delta;
 				stream_slot.stream_lifetime_ms = std::min(stream_slot.stream_lifetime_ms, stream_slot.stream_max_lifetime_ms);
 
-				stream_slot.stream_particles_to_spawn += randval(stream_info.particles_per_sec.first, stream_info.particles_per_sec.second) * (stream_delta / 1000.f);
+				auto new_particles_to_spawn_by_time = randval(stream_info.particles_per_sec.first, stream_info.particles_per_sec.second) * (stream_delta / 1000.f);
+				
+				if (stream_slot.stop_spawning_particles_if_chased_entity_dead && it->get<components::position_copying>().target.dead())
+					new_particles_to_spawn_by_time = 0;
+
+				stream_slot.stream_particles_to_spawn += new_particles_to_spawn_by_time;
 
 				stream_slot.swings_per_sec += randval(-stream_slot.swing_speed_change, stream_slot.swing_speed_change);
 				stream_slot.swing_spread += randval(-stream_slot.swing_spread_change, stream_slot.swing_spread_change);
@@ -308,15 +319,16 @@ void particles_system::step_streams_and_particles_and_destroy_dead() {
 			particles.erase(std::remove_if(particles.begin(), particles.end(),
 				[](const resources::particle& a) { return a.should_disappear && a.lifetime_ms >= a.max_lifetime_ms;  }
 			), particles.end());
-
-			if (!
-				(particles.empty() &&
-					stream_slot.destroy_when_empty &&
-					(!stream_slot.is_streaming || stream_slot.stream_lifetime_ms >= stream_slot.stream_max_lifetime_ms)))
-				should_destroy = false;
 		}
 
-		if (should_destroy)
+		slots.erase(std::remove_if(slots.begin(), slots.end(), [](const components::particle_group::stream& s) {
+			return s.enable_streaming && 
+				s.particles.particles.empty() &&
+				s.destroy_after_lifetime_passed &&
+				s.stream_lifetime_ms >= s.stream_max_lifetime_ms;
+		}), slots.end());
+
+		if (slots.empty())
 			parent_world.post_message(messages::destroy_message(it));
 
 		group.previous_transform = transform;

@@ -75,7 +75,7 @@ namespace resource_setups {
 			em.particles_per_sec = std::make_pair(70, 80);
 			em.stream_duration_ms = std::make_pair(300, 500);
 			em.type = resources::emission::STREAM;
-			em.velocity = std::make_pair(50, 250);
+			em.velocity = std::make_pair(30, 250);
 			em.angular_velocity = std::make_pair(0, 0);
 			em.particle_lifetime_ms = std::make_pair(200, 700);
 
@@ -92,7 +92,7 @@ namespace resource_setups {
 				em.particle_templates.push_back(particle_template);
 			}
 
-			em.size_multiplier = std::make_pair(1, 1);
+			em.size_multiplier = std::make_pair(1, 1.5);
 			em.particle_render_template.layer = render_layer::EFFECTS;
 			em.initial_rotation_variation = 0;
 

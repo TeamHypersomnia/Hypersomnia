@@ -26,8 +26,8 @@ namespace components {
 				std::vector<resources::particle> particles;
 			} particles;
 
-			/* only used by subject stream to indicate that it will no longer emit particles */
-			bool destroy_when_empty = true;
+			bool destroy_after_lifetime_passed = true;
+			bool stop_spawning_particles_if_chased_entity_dead = true;
 
 			double stream_lifetime_ms = 0.0;
 			double stream_max_lifetime_ms = 0.0;
@@ -43,10 +43,10 @@ namespace components {
 			float fade_when_ms_remaining = 0.f;
 
 			resources::emission stream_info;
-			bool is_streaming = false;
+			bool enable_streaming = false;
 
 			void stop_streaming() {
-				is_streaming = false;
+				enable_streaming = false;
 			}
 		};
 		

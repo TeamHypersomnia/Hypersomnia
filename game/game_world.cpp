@@ -242,6 +242,7 @@ void game_world::perform_logic_step() {
 	get_system<damage_system>().destroy_colliding_bullets_and_send_damage();
 	
 	get_system<particles_system>().game_responses_to_particle_effects();
+	get_system<particles_system>().create_particle_effects();
 
 	destruction_callbacks();
 
