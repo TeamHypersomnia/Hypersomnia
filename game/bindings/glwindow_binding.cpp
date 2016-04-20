@@ -13,7 +13,7 @@ namespace bindings {
 			luabind::def("set_display", window::set_display),
 			
 			luabind::def("set_cursor_visible", window::set_cursor_visible),
-			luabind::def("colored_print", window::glwindow::colored_print),
+			luabind::def("colored_print", augs::colored_print),
 			
 			luabind::class_<window::glwindow>("glwindow")
 			.def(luabind::constructor<>())

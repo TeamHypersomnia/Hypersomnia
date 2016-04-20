@@ -360,6 +360,7 @@
     <ClCompile Include="augs\options.cpp" />
     <ClCompile Include="augs\stream.cpp" />
     <ClCompile Include="augs\texture_baker\polygonize_sprite.cpp" />
+    <ClCompile Include="augs\window_framework\console_colors.cpp" />
     <ClCompile Include="game\bindings\file_watcher_binding.cpp" />
     <ClCompile Include="game\bindings\glwindow_binding.cpp" />
     <ClCompile Include="game\bindings\id_generator_binding.cpp" />
@@ -971,6 +972,7 @@
     <ClInclude Include="augs\misc\deterministic_timing.h" />
     <ClInclude Include="augs\misc\recoil_player.h" />
     <ClInclude Include="augs\stream.h" />
+    <ClInclude Include="augs\window_framework\console_colors.h" />
     <ClInclude Include="game\all_component_includes.h" />
     <ClInclude Include="game\all_message_includes.h" />
     <ClInclude Include="game\all_system_includes.h" />

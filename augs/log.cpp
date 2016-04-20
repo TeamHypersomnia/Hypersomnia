@@ -17,6 +17,13 @@ void LOG(std::string f) {
 	recording_file << f << std::endl;
 }
 
+template<>
+void LOG_COLOR(console_color c, std::string f) {
+	augs::colored_print(c, f.c_str());
+	std::ofstream recording_file("live_debug.txt", std::ios::out | std::ios::app);
+	recording_file << f << std::endl;
+}
+
 void CALL_SHELL(std::string s) {
 	system(s.c_str());
 }

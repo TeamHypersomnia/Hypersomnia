@@ -81,6 +81,11 @@ namespace augs {
 		ensure(res.get_debug_name() != "unknown");
 #endif
 
+		auto name = res.get_debug_name();
+
+		if (name.find("[-]") == std::string::npos)
+			LOG_COLOR(console_color::GREEN, "Created entity: %x", name);
+
 		{
 			messages::new_entity_message msg;
 			msg.subject = res;
@@ -97,10 +102,16 @@ namespace augs {
 	}
 
 	void world::delete_all_entities() {
+		LOG_COLOR(console_color::RED, "Destroyed all entities.");
 		entities.free_all();
 	}
 
 	void world::delete_entity(entity_id e) {
+		auto name = e.get_debug_name();
+		
+		if(name.find("[-]") == std::string::npos)
+			LOG_COLOR(console_color::RED, "Deleted entity: %x", name);
+		
 		entities.free(e);
 	}
 

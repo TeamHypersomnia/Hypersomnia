@@ -72,11 +72,11 @@ namespace scene_builders {
 		for (int x = -4*10; x < 4 * 10; ++x)
 			for (int y = -4 * 10; y < 4 * 10; ++y)
 			{
-				auto background = world.create_entity("bg");
+				auto background = world.create_entity("bg[-]");
 				ingredients::sprite(background, vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, augs::white, render_layer::GROUND);
 				//ingredients::static_crate_physics(background);
 
-				auto street = world.create_entity("street");
+				auto street = world.create_entity("street[-]");
 				ingredients::sprite_scalled(street, vec2(x, y) * (bg_size + vec2(1500, 700)) - vec2(1500, 700), 
 					vec2(3000, 3000),
 					assets::texture_id::TEST_BACKGROUND, augs::gray1, render_layer::UNDER_GROUND);

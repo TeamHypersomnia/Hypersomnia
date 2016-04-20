@@ -38,37 +38,6 @@ namespace augs {
 			return DefWindowProc(hwnd, umsg, wParam, lParam);
 		}
 
-		WORD GetColorAttribute(int color) {
-			switch (color) {
-			case 1:    return FOREGROUND_RED;
-			case 2:  return FOREGROUND_GREEN;
-			case 3: return FOREGROUND_RED | FOREGROUND_GREEN;
-			default:           return 0;
-			}
-		}
-
-		void glwindow::colored_print(int color, const char* text) {
-			const HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-
-			// Gets the current text color.
-			CONSOLE_SCREEN_BUFFER_INFO buffer_info;
-			GetConsoleScreenBufferInfo(stdout_handle, &buffer_info);
-			const WORD old_color_attrs = buffer_info.wAttributes;
-
-			// We need to flush the stream buffers into the console before each
-			// SetConsoleTextAttribute call lest it affect the text that is already
-			// printed but has not yet reached the console.
-			fflush(stdout);
-			SetConsoleTextAttribute(stdout_handle,
-				GetColorAttribute(color) | FOREGROUND_INTENSITY);
-
-			fflush(stdout);
-			printf(text);
-			printf("\n");
-			// Restores the text color.
-			SetConsoleTextAttribute(stdout_handle, old_color_attrs);
-		}
-
 		void glwindow::_poll(event::message& m, WPARAM wParam, LPARAM lParam) {
 				using namespace event::keys;
 				using namespace event;

@@ -3,6 +3,7 @@
 #include <sstream>
 #include <utility>
 #include <type_traits>
+#include "augs/window_framework/console_colors.h"
 
 #define ENABLE_DEBUG_LOG 1
 #define AS_INTV *(vec2i*)&
@@ -34,12 +35,20 @@ std::string typesafe_sprintf(std::string f, A&&... a) {
 }
 
 template < typename... A >
-void LOG(std::string f, A&&... a) { 
+void LOG(std::string f, A&&... a) {
 	LOG(typesafe_sprintf(f, std::forward<A>(a)...));
+}
+
+template < typename... A >
+void LOG_COLOR(console_color color, std::string f, A&&... a) {
+	LOG_COLOR(color, typesafe_sprintf(f, std::forward<A>(a)...));
 }
 
 template <>
 void LOG(std::string f);
+
+template <>
+void LOG_COLOR(console_color color, std::string f);
 
 void CALL_SHELL(std::string);
 

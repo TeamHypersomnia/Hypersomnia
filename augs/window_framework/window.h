@@ -6,6 +6,7 @@
 #include <functional>
 
 #include "../graphics/renderer.h"
+#include "console_colors.h"
 
 struct lua_State;
 
@@ -40,7 +41,6 @@ namespace augs {
 			timer triple_timer;
 			bool doubled = false;
 		public:
-			static void colored_print(int, const char* text);
 			static glwindow* get_current();
 
 			renderer glrenderer;

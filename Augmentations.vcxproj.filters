@@ -1185,6 +1185,9 @@
     <ClCompile Include="game\ingredients\melee_weapons.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="augs\window_framework\console_colors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3180,6 +3183,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\messages\melee_swing_response.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\window_framework\console_colors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
