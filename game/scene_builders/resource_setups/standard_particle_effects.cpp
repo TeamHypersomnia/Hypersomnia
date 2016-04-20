@@ -71,13 +71,13 @@ namespace resource_setups {
 			auto& effect = resource_manager.create(assets::particle_effect_id::WANDERING_PIXELS_DIRECTED);
 
 			resources::emission em;
-			em.spread_degrees = std::make_pair(150, 360);
-			em.particles_per_sec = std::make_pair(3, 10);
-			em.stream_duration_ms = std::make_pair(200, 400);
+			em.spread_degrees = std::make_pair(0, 1);
+			em.particles_per_sec = std::make_pair(70, 80);
+			em.stream_duration_ms = std::make_pair(300, 500);
 			em.type = resources::emission::STREAM;
-			em.velocity = std::make_pair(10, 800);
+			em.velocity = std::make_pair(50, 250);
 			em.angular_velocity = std::make_pair(0, 0);
-			em.particle_lifetime_ms = std::make_pair(1, 120);
+			em.particle_lifetime_ms = std::make_pair(200, 700);
 
 			for (int i = 0; i < 5; ++i) {
 				resources::particle particle_template;
@@ -92,7 +92,7 @@ namespace resource_setups {
 				em.particle_templates.push_back(particle_template);
 			}
 
-			em.size_multiplier = std::make_pair(0.5, 1);
+			em.size_multiplier = std::make_pair(1, 1);
 			em.particle_render_template.layer = render_layer::EFFECTS;
 			em.initial_rotation_variation = 0;
 

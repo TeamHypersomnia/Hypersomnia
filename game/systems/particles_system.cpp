@@ -35,11 +35,22 @@ void particles_system::game_responses_to_particle_effects() {
 
 	for (auto& g : gunshots) {
 		for (auto& r : g.spawned_rounds) {
+			auto& round_response = *r->get<components::particle_effect_response>().response;
+
 			messages::create_particle_effect burst;
 			burst.transform = g.barrel_transform;
 			burst.subject = g.subject;
-			burst.effect = (*r->get<components::particle_effect_response>().response)[particle_effect_response_type::BARREL_LEAVE_EXPLOSION];
+			burst.effect = round_response[particle_effect_response_type::BARREL_LEAVE_EXPLOSION];
 			burst.modifier.colorize = r->get<components::damage>().effects_color;
+
+			parent_world.post_message(burst);
+
+			burst.transform.reset();
+			burst.transform.rotation = 180;
+			burst.subject = r;
+			burst.effect = round_response[particle_effect_response_type::PROJECTILE_TRACE];
+			burst.modifier.colorize = r->get<components::damage>().effects_color;
+			burst.local_transform = true;
 
 			parent_world.post_message(burst);
 		}
