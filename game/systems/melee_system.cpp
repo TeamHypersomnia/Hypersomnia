@@ -82,7 +82,7 @@ void melee_system::initiate_and_update_moves() {
 			parent_world.post_message(response);
 		}
 		else if (melee.state == components::MELEE_ONCOOLDOWN) {
-			LOG("ON CD (LEFT: %x )",melee.swing_cooldown_ms - melee.swing_current_cooldown_time);
+//			LOG("ON CD (LEFT: %x )",melee.swing_cooldown_ms - melee.swing_current_cooldown_time);
 			melee.swing_current_cooldown_time += dt;
 
 			if (melee.swing_current_cooldown_time >= melee.swing_cooldown_ms) {
@@ -91,7 +91,7 @@ void melee_system::initiate_and_update_moves() {
 			}
 		}
 		else if (melee.state == components::MELEE_PRIMARY) {
-			LOG("MELEE PRIMARY (LEFT: %x)", melee.swing_duration_ms - melee.swing_current_time);
+//			LOG("MELEE PRIMARY (LEFT: %x)", melee.swing_duration_ms - melee.swing_current_time);
 
 			melee.swing_current_time += dt;
 
@@ -106,7 +106,7 @@ void melee_system::initiate_and_update_moves() {
 			parent_world.post_message(pos_response);
 		}
 		else if (melee.state == components::MELEE_BACKSWING_PRIMARY) {
-			LOG("MELEE BACKSWING PRIMARY (LEFT: %x)", melee.swing_duration_ms - melee.swing_current_time);
+//			LOG("MELEE BACKSWING PRIMARY (LEFT: %x)", melee.swing_duration_ms - melee.swing_current_time);
 			melee.swing_current_time += dt;
 			if (melee.swing_current_time >= melee.swing_duration_ms) {
 				melee.state = components::MELEE_ONCOOLDOWN;
