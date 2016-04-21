@@ -15,6 +15,7 @@ template <typename T> int sgn(T val) {
 }
 
 std::pair<bool, vec2> circle_ray_intersection(vec2 a, vec2 b, vec2 circle, float radius);
+std::vector<vec2> generate_circle_points(float radius, float last_angle_in_degrees, float starting_angle_in_degrees, unsigned int number_of_points);
 
 namespace augs {
 	template <class T, class A>
