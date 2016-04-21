@@ -28,8 +28,11 @@ namespace prefabs {
 		auto& melee = *machete += components::melee();
 		melee.swing_cooldown_ms = 100.f;
 		melee.swing_duration_ms = 500.f;
-		melee.primary_swing_range = 50;
-		melee.primary_swing_acceleration = 30.0f;
+		melee.swing_acceleration = 1.5f;
+		melee.offset_positions = generate_circle_points(200, 90, 0, 20);
+		for (int i = 0;i < 20;++i) {
+			melee.offset_positions[i].y -= 200;
+		}
 
 		auto& damage = *machete += components::damage();
 		damage.destroy_upon_damage = false;

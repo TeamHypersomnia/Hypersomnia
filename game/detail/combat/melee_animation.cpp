@@ -21,7 +21,7 @@ vec2 melee_animation::update(double factor) {
 			return result;
 		}
 		else {
-			distance -= distance_vector[i];
+			position -= distance_vector[i];
 		}
 	}
 	return result;

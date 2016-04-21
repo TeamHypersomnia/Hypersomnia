@@ -6,13 +6,7 @@
 #include "game/messages/melee_swing_response.h"
 #include "game/messages/rebuild_physics_message.h"
 
-vec2 swing_offset_calculation(double current, double max, int primary_swing_range, double acceleration) {
-	return vec2(sin(current / max) * primary_swing_range * 0.5f * acceleration * pow(current / 1000,2), cos(1 - (current / max)) * primary_swing_range * 0.5f * acceleration * pow(current / 1000, 2));
-}
-
-vec2  backswing_offset_calculation(double current, double max, int primary_swing_range, double acceleration) {
-	return vec2(sin( ( max - current) / max) * primary_swing_range * 0.5f * acceleration * pow( (max - current) / 1000, 2), cos(1 - ( (max - current) / max)) * primary_swing_range * 0.5f * acceleration * pow( (max - current) / 1000, 2));
-}
+#include "game/detail/combat/melee_animation.h"
 
 void melee_system::consume_melee_intents() {
 	auto& events = parent_world.get_message_queue<messages::intent_message>();
@@ -91,31 +85,36 @@ void melee_system::initiate_and_update_moves() {
 			}
 		}
 		else if (melee.state == components::MELEE_PRIMARY) {
-//			LOG("MELEE PRIMARY (LEFT: %x)", melee.swing_duration_ms - melee.swing_current_time);
+			LOG("MELEE PRIMARY (LEFT: %x)", melee.swing_duration_ms - melee.swing_current_time);
 
-			melee.swing_current_time += dt;
+			std::vector<vec2> swing = melee.offset_positions;
+			std::reverse(std::begin(swing),std::end(swing));
+
+			melee_animation animation(swing);
 
 			if (melee.swing_current_time >= melee.swing_duration_ms) {
 				melee.state = components::MELEE_BACKSWING_PRIMARY;
 				melee.swing_current_time = 0;
 			}
 			else
-				new_definition.offsets_for_created_shapes[components::physics_definition::SPECIAL_MOVE_DISPLACEMENT] = swing_offset_calculation(melee.swing_current_time, melee.swing_duration_ms, melee.primary_swing_range,melee.primary_swing_acceleration);
+				new_definition.offsets_for_created_shapes[components::physics_definition::SPECIAL_MOVE_DISPLACEMENT] = animation.update(melee.swing_current_time / melee.swing_duration_ms);
 			
 			pos_response.new_definition = new_definition;
 			parent_world.post_message(pos_response);
+			melee.swing_current_time += dt * melee.swing_acceleration;
 		}
 		else if (melee.state == components::MELEE_BACKSWING_PRIMARY) {
-//			LOG("MELEE BACKSWING PRIMARY (LEFT: %x)", melee.swing_duration_ms - melee.swing_current_time);
-			melee.swing_current_time += dt;
+			LOG("MELEE BACKSWING PRIMARY (LEFT: %x)", melee.swing_duration_ms - melee.swing_current_time);
+			melee_animation animation(melee.offset_positions);
 			if (melee.swing_current_time >= melee.swing_duration_ms) {
 				melee.state = components::MELEE_ONCOOLDOWN;
 				melee.swing_current_time = 0;
 			}
 			else
-				new_definition.offsets_for_created_shapes[components::physics_definition::SPECIAL_MOVE_DISPLACEMENT] = backswing_offset_calculation(melee.swing_current_time, melee.swing_duration_ms, melee.primary_swing_range, melee.primary_swing_acceleration);
+				new_definition.offsets_for_created_shapes[components::physics_definition::SPECIAL_MOVE_DISPLACEMENT] = animation.update(melee.swing_current_time / melee.swing_duration_ms);
 			pos_response.new_definition = new_definition;
 			parent_world.post_message(pos_response);
+			melee.swing_current_time += dt * melee.swing_acceleration;
 		}
 	}
 }
