@@ -1194,6 +1194,9 @@
     <ClCompile Include="game\detail\gui\immediate_hud.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\detail\combat\melee_animation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3201,6 +3204,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\detail\gui\immediate_hud.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\combat\melee_animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
