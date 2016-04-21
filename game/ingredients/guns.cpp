@@ -135,10 +135,10 @@ namespace prefabs {
 			
 			auto& damage = *round_definition += components::damage();
 			damage.impulse_upon_hit = 1000.f;
-			damage.effects_color = pink;
 
 			auto& response = *round_definition += components::particle_effect_response();
 			response.response = assets::particle_effect_response_id::ELECTRIC_CHARGE_RESPONSE;
+			response.modifier.colorize = pink;
 
 			auto& trace = *round_definition += components::trace();
 			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
@@ -152,6 +152,9 @@ namespace prefabs {
 			def.fixtures[0].restitution = 1.4;
 			def.fixtures[0].density = 0.001f;
 			def.fixtures[0].filter = filters::shell();
+
+			auto& response = *shell_definition += components::particle_effect_response{ assets::particle_effect_response_id::SHELL_RESPONSE };
+			response.modifier.colorize = pink;
 		}
 
 		pink_charge->map_sub_definition(sub_definition_name::BULLET_ROUND, round_definition);
@@ -182,11 +185,10 @@ namespace prefabs {
 			s.size *= vec2(2, 0.5);
 			auto& def = ingredients::bullet_round_physics(round_definition);
 
-			auto& response = *round_definition += components::particle_effect_response();
-			response.response = assets::particle_effect_response_id::ELECTRIC_CHARGE_RESPONSE;
+			auto& response = *round_definition += components::particle_effect_response { assets::particle_effect_response_id::ELECTRIC_CHARGE_RESPONSE };
+			response.modifier.colorize = cyan;
 
 			auto& damage = *round_definition += components::damage();
-			damage.effects_color = cyan;
 			auto& trace = *round_definition += components::trace();
 			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
 			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
@@ -199,6 +201,9 @@ namespace prefabs {
 			def.fixtures[0].restitution = 1.4;
 			def.fixtures[0].density = 0.001f;
 			def.fixtures[0].filter = filters::shell();
+
+			auto& response = *shell_definition += components::particle_effect_response{ assets::particle_effect_response_id::SHELL_RESPONSE };
+			response.modifier.colorize = cyan;
 		}
 
 		cyan_charge->map_sub_definition(sub_definition_name::BULLET_ROUND, round_definition);

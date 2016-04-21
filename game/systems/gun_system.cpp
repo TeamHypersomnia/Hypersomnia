@@ -137,6 +137,7 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 
 							op.velocity.set_from_degrees(barrel_transform.rotation + spread_component).set_length(randval(gun.shell_velocity));
 							op.subject = shell_entity;
+							response.spawned_shells.push_back(shell_entity);
 
 							parent_world.post_message(op);
 						}
