@@ -25,6 +25,7 @@
 #include "systems/gui_system.h"
 #include "systems/trace_system.h"
 #include "systems/melee_system.h"
+#include "systems/sentience_system.h"
 
 
 

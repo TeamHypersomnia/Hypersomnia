@@ -162,7 +162,7 @@ void game_overworld::consume_camera_render_requests() {
 		current_scene_builder->execute_drawcalls_for_camera(r);
 		target.draw_debug_info(r.state.visible_world_area, r.state.camera_transform, assets::texture_id::BLANK, main_game_world.get_system<render_system>().targets, view_interpolation_ratio());
 		
-		main_game_world.get_system<gui_system>().draw_gui_overlays_for_camera_rendering_request(r);
+		main_game_world.get_system<gui_system>().draw_complete_gui_for_camera_rendering_request(r);
 	}
 	
 	current_scene_builder->drawcalls_after_all_cameras(main_game_world);

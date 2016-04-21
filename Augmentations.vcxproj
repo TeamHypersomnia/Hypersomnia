@@ -395,6 +395,7 @@
     <ClCompile Include="game\detail\gui\cursor_and_tooltip.cpp" />
     <ClCompile Include="game\detail\gui\drag_and_drop.cpp" />
     <ClCompile Include="game\detail\gui\game_gui_root.cpp" />
+    <ClCompile Include="game\detail\gui\immediate_hud.cpp" />
     <ClCompile Include="game\detail\gui\metadata_tree.cpp" />
     <ClCompile Include="game\detail\gui\special_drag_and_drop_target.cpp" />
     <ClCompile Include="game\detail\gui\world_entity_highlighting.cpp" />
@@ -457,6 +458,7 @@
     <ClCompile Include="game\systems\pathfinding_system.cpp" />
     <ClCompile Include="game\systems\physics_system.cpp" />
     <ClCompile Include="game\systems\render_system.cpp" />
+    <ClCompile Include="game\systems\sentience_system.cpp" />
     <ClCompile Include="game\systems\steering_system.cpp" />
     <ClCompile Include="game\systems\trace_system.cpp" />
     <ClCompile Include="game\systems\trigger_detector_system.cpp" />
@@ -1014,6 +1016,7 @@
     <ClInclude Include="game\components\physics_component.h" />
     <ClInclude Include="game\components\polygon_component.h" />
     <ClInclude Include="game\components\render_component.h" />
+    <ClInclude Include="game\components\sentience_component.h" />
     <ClInclude Include="game\components\sprite_component.h" />
     <ClInclude Include="game\components\steering_component.h" />
     <ClInclude Include="game\components\tile_layer_component.h" />
@@ -1030,6 +1033,7 @@
     <ClInclude Include="game\detail\gui\aabb_highlighter.h" />
     <ClInclude Include="game\detail\gui\drag_and_drop.h" />
     <ClInclude Include="game\detail\gui\game_gui_root.h" />
+    <ClInclude Include="game\detail\gui\immediate_hud.h" />
     <ClInclude Include="game\detail\gui\special_controls.h" />
     <ClInclude Include="game\detail\gui\special_drag_and_drop_target.h" />
     <ClInclude Include="game\game_overworld.h" />
@@ -1112,6 +1116,7 @@
     <ClInclude Include="game\systems\pathfinding_system.h" />
     <ClInclude Include="game\systems\physics_system.h" />
     <ClInclude Include="game\systems\render_system.h" />
+    <ClInclude Include="game\systems\sentience_system.h" />
     <ClInclude Include="game\systems\steering_system.h" />
     <ClInclude Include="game\systems\trace_system.h" />
     <ClInclude Include="game\systems\trigger_detector_system.h" />

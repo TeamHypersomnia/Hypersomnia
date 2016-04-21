@@ -24,7 +24,9 @@ bool gui_system::freeze_gui_model() {
 	return parent_world.get_system<input_system>().gui_item_transfer_intent_player.get_pending_inputs_for_logic().size() > 0;
 }
 
-void gui_system::draw_gui_overlays_for_camera_rendering_request(messages::camera_render_request_message r) {
+void gui_system::draw_complete_gui_for_camera_rendering_request(messages::camera_render_request_message r) {
+	hud.draw_circular_bars_and_nicknames(r);
+	
 	gui.draw_triangles();
 	r.state.output->push_triangles_from_gui_world(gui);
 

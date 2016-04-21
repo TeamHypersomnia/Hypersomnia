@@ -1188,6 +1188,12 @@
     <ClCompile Include="augs\window_framework\console_colors.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\systems\sentience_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\gui\immediate_hud.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3186,6 +3192,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\window_framework\console_colors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\components\sentience_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\systems\sentience_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\gui\immediate_hud.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

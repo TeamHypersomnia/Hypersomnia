@@ -52,6 +52,7 @@ namespace components {
 	struct name;
 	struct trace;
 	struct melee;
+	struct sentience;
 }
 #endif
 
@@ -129,6 +130,7 @@ namespace augs {
 			std::pair<memory_pool::id, components::trigger_collision_detector*>,
 			std::pair<memory_pool::id, components::name*>,
 			std::pair<memory_pool::id, components::trace*>,
+			std::pair<memory_pool::id, components::sentience*>,
 			std::pair<memory_pool::id, components::melee*>
 		> type_to_component;
 

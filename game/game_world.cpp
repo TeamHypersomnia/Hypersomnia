@@ -53,6 +53,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_component<name>();
 	register_component<trace>();
 	register_component<melee>();
+	register_component<sentience>();
 	
 	register_system<input_system>();
 	register_system<steering_system>();
@@ -80,6 +81,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_system<gui_system>();
 	register_system<trace_system>();
 	register_system<melee_system>();
+	register_system<sentience_system>();
 
 	register_message_queue<intent_message>();
 	register_message_queue<damage_message>();
@@ -240,6 +242,8 @@ void game_world::perform_logic_step() {
 
 	get_system<damage_system>().destroy_outdated_bullets();
 	get_system<damage_system>().destroy_colliding_bullets_and_send_damage();
+
+	get_system<sentience_system>().apply_damage_and_initiate_deaths();
 	
 	get_system<particles_system>().game_responses_to_particle_effects();
 	get_system<particles_system>().create_particle_effects();

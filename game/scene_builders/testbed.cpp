@@ -46,14 +46,14 @@ namespace scene_builders {
 
 		world.get_system<gui_system>().resize(vec2i(window_rect.w, window_rect.h));
 
-		auto crate = prefabs::create_crate(world, vec2(200, 300), vec2i(100, 100) / 3);
-		auto crate2 = prefabs::create_crate(world, vec2(400, 400), vec2i(300, 300));
-		auto crate4 = prefabs::create_crate(world, vec2(500, 0), vec2i(100, 100));
+		auto crate = prefabs::create_crate(world, vec2(200, 200 + 300), vec2i(100, 100) / 3);
+		auto crate2 = prefabs::create_crate(world, vec2(400, 200 + 400), vec2i(300, 300));
+		auto crate4 = prefabs::create_crate(world, vec2(500, 200 + 0), vec2i(100, 100));
 
 		for (int x = -4 * 1; x < 4 * 1; ++x)
 		{
 			auto frog = world.create_entity("frog");
-			ingredients::sprite(frog, vec2(100 + x * 40, 400), assets::texture_id::TEST_SPRITE, augs::white, render_layer::DYNAMIC_BODY);
+			ingredients::sprite(frog, vec2(100 + x * 40, 200 + 400), assets::texture_id::TEST_SPRITE, augs::white, render_layer::DYNAMIC_BODY);
 			ingredients::crate_physics(frog);
 		}
 
@@ -73,16 +73,16 @@ namespace scene_builders {
 			for (int y = -4 * 10; y < 4 * 10; ++y)
 			{
 				auto background = world.create_entity("bg[-]");
-				ingredients::sprite(background, vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, augs::white, render_layer::GROUND);
+				ingredients::sprite(background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, augs::white, render_layer::GROUND);
 				//ingredients::static_crate_physics(background);
 
 				auto street = world.create_entity("street[-]");
-				ingredients::sprite_scalled(street, vec2(x, y) * (bg_size + vec2(1500, 700)) - vec2(1500, 700), 
+				ingredients::sprite_scalled(street, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 700)) - vec2(1500, 700),
 					vec2(3000, 3000),
 					assets::texture_id::TEST_BACKGROUND, augs::gray1, render_layer::UNDER_GROUND);
 			}
 
-		const int num_characters = 2;
+		const int num_characters = 3;
 
 		for (int i = 0; i < num_characters; ++i) {
 			auto new_character = prefabs::create_character(world, vec2(i * 300, 0));
@@ -96,15 +96,17 @@ namespace scene_builders {
 		prefabs::create_sample_suppressor(world, vec2(300, -500));
 
 		auto rifle = prefabs::create_sample_rifle(world, vec2(100, -500));
-		prefabs::create_sample_rifle(world, vec2(100, -500 + 50));
+		auto rifle2 = prefabs::create_sample_rifle(world, vec2(100, -500 + 50));
 		prefabs::create_sample_rifle(world, vec2(100, -500 + 100));
 
 		prefabs::create_pistol(world, vec2(300, -500 + 50));
 		auto submachine = prefabs::create_submachine(world, vec2(500, -500 + 50));
 
-		auto mag = prefabs::create_sample_magazine(world, vec2(100, -650));
-		mag[slot_function::ITEM_DEPOSIT]->space_available = to_space_units("100000");
+		auto mag = prefabs::create_sample_magazine(world, vec2(100, -650), "100000");
 		mag[slot_function::ITEM_DEPOSIT]->items_inside[0]->get<components::item>().charges = 1000;
+
+		auto mag2 = prefabs::create_sample_magazine(world, vec2(100, -650), "100000");
+		mag2[slot_function::ITEM_DEPOSIT]->items_inside[0]->get<components::item>().charges = 1000;
 		
 		prefabs::create_sample_magazine(world, vec2(100 - 50, -650));
 		prefabs::create_sample_magazine(world, vec2(100 - 100, -650));
@@ -139,6 +141,11 @@ namespace scene_builders {
 
 		world.post_message(r);
 
+		r.item = mag2;
+		r.target_slot = rifle2[slot_function::GUN_DETACHABLE_MAGAZINE];
+
+		world.post_message(r);
+
 		r.item = submachine;
 		r.target_slot = characters[0][slot_function::PRIMARY_HAND];
 
@@ -146,6 +153,11 @@ namespace scene_builders {
 
 		r.item = second_machete;
 		r.target_slot = characters[1][slot_function::PRIMARY_HAND];
+
+		world.post_message(r);
+
+		r.item = rifle2;
+		r.target_slot = characters[2][slot_function::PRIMARY_HAND];
 
 		world.post_message(r);
 
@@ -157,6 +169,12 @@ namespace scene_builders {
 		r.item = mag[slot_function::ITEM_DEPOSIT]->items_inside[0];
 		r.specified_quantity = 1;
 		r.target_slot = rifle[slot_function::GUN_CHAMBER];
+
+		world.post_message(r);
+
+		r.item = mag2[slot_function::ITEM_DEPOSIT]->items_inside[0];
+		r.specified_quantity = 1;
+		r.target_slot = rifle2[slot_function::GUN_CHAMBER];
 
 		world.post_message(r);
 
@@ -199,7 +217,7 @@ namespace scene_builders {
 
 			input.replay_found_recording();
 
-			world.get_system<render_system>().enable_interpolation = false;
+			world.get_system<render_system>().enable_interpolation = true;
 		}
 		else {
 			world.parent_overworld.configure_stepping(60, 500);
