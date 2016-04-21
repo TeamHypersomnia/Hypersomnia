@@ -28,7 +28,7 @@ namespace prefabs {
 		auto& melee = *machete += components::melee();
 		melee.swing_cooldown_ms = 100.f;
 		melee.swing_duration_ms = 500.f;
-		melee.swing_acceleration = 1.5f;
+		melee.swing_acceleration = 5.f;
 		melee.offset_positions = generate_circle_points(200, 90, 0, 20);
 		for (int i = 0;i < 20;++i) {
 			melee.offset_positions[i].y -= 200;

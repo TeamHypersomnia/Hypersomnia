@@ -58,7 +58,7 @@ void melee_system::initiate_and_update_moves() {
 
 //		 LOG("P: %x, S: %x, T: %x CDT: %x MVT: %x STATE: %x", melee.primary_move_flag, melee.secondary_move_flag, melee.tertiary_move_flag,melee.swing_current_cooldown_time,melee.swing_current_time,melee.state);
 
-		damage.damage_upon_collision = melee.primary_move_flag;
+		damage.damage_upon_collision = melee.state;
 
 		messages::rebuild_physics_message pos_response;
 		pos_response.subject = t;
@@ -70,10 +70,6 @@ void melee_system::initiate_and_update_moves() {
 			to apply each their own effects.
 			*/
 			melee.state = components::MELEE_PRIMARY;
-			messages::melee_swing_response response;
-			response.subject = t;
-			response.origin_transform = t->get<components::transform>();
-			parent_world.post_message(response);
 		}
 		else if (melee.state == components::MELEE_ONCOOLDOWN) {
 //			LOG("ON CD (LEFT: %x )",melee.swing_cooldown_ms - melee.swing_current_cooldown_time);
@@ -99,6 +95,10 @@ void melee_system::initiate_and_update_moves() {
 			else
 				new_definition.offsets_for_created_shapes[components::physics_definition::SPECIAL_MOVE_DISPLACEMENT] = animation.update(melee.swing_current_time / melee.swing_duration_ms);
 			
+			messages::melee_swing_response response;
+			response.subject = t;
+			response.origin_transform = t->get<components::transform>();
+			parent_world.post_message(response);
 			pos_response.new_definition = new_definition;
 			parent_world.post_message(pos_response);
 			melee.swing_current_time += dt * melee.swing_acceleration;
