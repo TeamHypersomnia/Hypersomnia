@@ -18,6 +18,7 @@
 #include "game/components/physics_definition_component.h"
 #include "game/components/gui_element_component.h"
 #include "game/components/name_component.h"
+#include "game/components/sentience_component.h"
 
 #include "game/globals/filters.h"
 #include "game/globals/input_profiles.h"
@@ -78,6 +79,7 @@ namespace ingredients {
 		auto& detector = *e += components::trigger_query_detector();
 		auto& driver = *e += components::driver();
 		auto& force_joint = *e += components::force_joint();
+		auto& sentience = *e += components::sentience();
 		e->disable(force_joint);
 
 		detector.spam_trigger_requests_when_detection_intented = true;

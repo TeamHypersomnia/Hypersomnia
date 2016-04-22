@@ -76,7 +76,7 @@ namespace resource_setups {
 		resource_manager.create(assets::texture_id::ATTACHMENT_CIRCLE_BORDER, attachment_circle_border);
 
 		augs::image hud_circular_hud_medium;
-		hud_circular_hud_medium.create_circle(32, 1);
+		hud_circular_hud_medium.create_circle(50, 1);
 
 		resource_manager.create(assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM, hud_circular_hud_medium);
 
