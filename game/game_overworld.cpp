@@ -160,13 +160,9 @@ void game_overworld::consume_camera_render_requests() {
 	for (auto& r : requests) {
 		target.set_viewport(r.state.viewport);
 		current_scene_builder->execute_drawcalls_for_camera(r);
-		target.draw_debug_info(r.state.visible_world_area, r.state.camera_transform, assets::texture_id::BLANK, main_game_world.get_system<render_system>().targets, view_interpolation_ratio());
-		
-		main_game_world.get_system<gui_system>().draw_complete_gui_for_camera_rendering_request(r);
 	}
-	
+
 	current_scene_builder->drawcalls_after_all_cameras(main_game_world);
 
 	game_window.swap_buffers();
-	target.clear_geometry();
 }

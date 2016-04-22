@@ -287,6 +287,7 @@ namespace scene_builders {
 		//
 		quick_print_format(target.triangles, augs::to_wstring(typesafe_sprintf("Entities: %x", world.entities_count())), style(assets::GUI_FONT, rgba(255, 255, 255, 50)), vec2i(0, 0), 0, nullptr);
 		target.call_triangles();
+		target.clear_triangles();
 	}
 
 	void testbed::execute_drawcalls_for_camera(messages::camera_render_request_message msg) {

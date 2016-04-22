@@ -5,6 +5,8 @@
 #include "game/systems/render_system.h"
 #include "game/components/sprite_component.h"
 
+#include "graphics/renderer.h"
+
 void immediate_hud::draw_circular_bars_and_nicknames(messages::camera_render_request_message r) {
 	auto& render = r.camera->get_owner_world().get_system<render_system>();
 	const auto& visible_entities = render.get_all_visible_entities();
@@ -20,12 +22,12 @@ void immediate_hud::draw_circular_bars_and_nicknames(messages::camera_render_req
 
 			components::sprite border;
 			border.set(assets::HUD_CIRCULAR_BAR_MEDIUM, cyan);
-			// border.color.a = 100;
+			border.color.a = 160;
 			border.draw(state);
 
 			state.renderable_transform.rotation = 90;
 			border.color = orange;
-			// border.color.a = 100;
+			border.color.a = 160;
 			border.draw(state);
 		}
 	}
