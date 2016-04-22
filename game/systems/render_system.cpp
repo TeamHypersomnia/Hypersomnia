@@ -295,3 +295,7 @@ void render_system::draw_all_visible_entities(state_for_drawing_camera in, int m
 		draw_layer(in, layers.size()-i-1);
 }
 
+const std::vector<entity_id>& render_system::get_all_visible_entities() const {
+	return visible_entities;
+}
+

@@ -47,6 +47,8 @@ public:
 	void draw_layer(shared::state_for_drawing_camera in, int layer);
 	void draw_all_visible_entities(shared::state_for_drawing_camera in, int mask);
 
+	const std::vector<entity_id>& get_all_visible_entities() const;
+
 	bool enable_interpolation = true;
 	std::vector<entity_id> always_visible_entities;
 	std::vector<render_layer> layers_with_custom_drawing_order;

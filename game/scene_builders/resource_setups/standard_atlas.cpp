@@ -75,6 +75,11 @@ namespace resource_setups {
 		resource_manager.create(assets::texture_id::ATTACHMENT_CIRCLE_FILLED, attachment_circle_filled);
 		resource_manager.create(assets::texture_id::ATTACHMENT_CIRCLE_BORDER, attachment_circle_border);
 
+		augs::image hud_circular_hud_medium;
+		hud_circular_hud_medium.create_circle(32, 1);
+
+		resource_manager.create(assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM, hud_circular_hud_medium);
+
 		resource_manager.create(assets::texture_id::CONTAINER_OPEN_ICON, L"hypersomnia/gfx/container_open_icon.png");
 		resource_manager.create(assets::texture_id::CONTAINER_CLOSED_ICON, L"hypersomnia/gfx/container_closed_icon.png");
 
