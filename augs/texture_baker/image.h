@@ -14,12 +14,16 @@ namespace augs {
 		image(const image&);
 		image& operator=(const image&);
 
-		void create_circle(int radius, int border_width = 1, augs::rgba filling = white);
-		void create_filled_circle(int radius, augs::rgba filling = white);
+		void paint_circle(int radius, int border_width = 1, augs::rgba filling = white, bool scale_alpha = false);
+		void paint_circle_midpoint(int radius, augs::rgba filling = white, bool constrain_angle = false, 
+			float angle_start = -1, float angle_end = -1, bool scale_alpha = false);
+		void paint_filled_circle(int radius, augs::rgba filling = white);
 
 		void create(int w, int h, int channels);
 		bool from_file(const std::wstring& filename, bool swap_red_and_blue = true, unsigned channels = 0),
 			from_clipboard();
+
+		void save(const std::wstring& filename);
 
 		void fill(unsigned char val),
 			fill(unsigned char* channel_vals),

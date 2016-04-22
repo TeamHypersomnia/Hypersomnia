@@ -25,38 +25,127 @@ namespace augs {
 	void image::create(int w, int h, int ch) {
 		size = vec2i(w, h);
 		channels = ch;
-		v.resize(get_bytes());
+		v.resize(get_bytes(), 0);
 		//v.shrink_to_fit();
 	}
 
-	void image::create_circle(int radius, int border_width, augs::rgba filling) {
-		create(radius * 2 + 1, radius * 2 + 1, 4);
+	void image::paint_circle_midpoint(int radius, augs::rgba filling, bool constrain_angle, float angle_start, float angle_end, bool scale_alpha) {
+		auto side = radius * 2 + 1;
 
-		for (int x = 0; x < size.w; ++x) {
-			for (int y = 0; y < size.h; ++y) {
-				int x_center = x - size.w / 2;
-				int y_center = y - size.h / 2;
-
-				if (
-					x_center*x_center + y_center*y_center <= radius*radius
-					&&
-					x_center*x_center + y_center*y_center >= (radius-border_width)*(radius-border_width)
-					) {
-					pixel(x, y) = filling;
-				}
-				else
-					pixel(x, y) = rgba(0, 0, 0, 0);
-			}
+		if (v.empty()) {
+			create(side, side, 4);
+		}
+		else {
+			ensure(size.w >= side);
+			ensure(size.h >= side);
 		}
 
-		pixel(size.w / 2, 0) = rgba(0, 0, 0, 0);
-		pixel(size.w / 2, size.h - 1) = rgba(0, 0, 0, 0);
-		pixel(0, size.h / 2) = rgba(0, 0, 0, 0);
-		pixel(size.w - 1, size.h / 2) = rgba(0, 0, 0, 0);
+		int x = radius;
+		int y = 0;
+		int decisionOver2 = 1 - x;   // Decision criterion divided by 2 evaluated at x=r, y=0
+		int x0 = size.w / 2;
+		int y0 = size.h / 2;
+		
+		auto pp = [&](int x, int y){
+			int x_center = x - size.w / 2;
+			int y_center = y - size.h / 2;
+
+			auto angle = vec2(x_center, y_center).degrees();
+
+			if (!constrain_angle || (angle >= angle_start && angle <= angle_end)) {
+				auto col = filling;
+				if (scale_alpha)
+					col.a = (angle - angle_start) / (angle_end - angle_start) * 255;
+
+				pixel(x, y) = col;
+			}
+		};
+
+		while (y <= x)
+		{
+			pp(x + x0, y + y0); // Octant 1
+			pp(y + x0, x + y0); // Octant 2
+			pp(-x + x0, y + y0); // Octant 4
+			pp(-y + x0, x + y0); // Octant 3
+			pp(-x + x0, -y + y0); // Octant 5
+			pp(-y + x0, -x + y0); // Octant 6
+			pp(x + x0, -y + y0); // Octant 7
+			pp(y + x0, -x + y0); // Octant 8
+			y++;
+			if (decisionOver2 <= 0)
+			{
+				decisionOver2 += 2 * y + 1;   // Change in decision criterion for y -> y+1
+			}
+			else
+			{
+				decisionOver2 += 2 * (y - (--x)) + 1;   // Change for y -> y+1, x -> x-1
+			}
+		}
 	}
 
-	void image::create_filled_circle(int radius, augs::rgba filling) {
-		create(radius * 2 + 1, radius * 2 + 1, 4);
+	void image::paint_circle(int radius, int border_width, augs::rgba filling, bool scale_alpha) {
+		auto side = radius * 2 + 1;
+
+		if (v.empty()) {
+			create(side, side, 4);
+		}
+		else {
+			ensure(size.w >= side);
+			ensure(size.h >= side);
+		}
+
+		if (scale_alpha) {
+			for (int x = 0; x < size.w; ++x) {
+				for (int y = 0; y < size.h; ++y) {
+					int x_center = x - size.w / 2;
+					int y_center = y - size.h / 2;
+
+					auto angle = vec2(x_center, y_center).degrees();
+
+					if (angle >= -45 && angle <= 45 &&
+						x_center*x_center + y_center*y_center <= radius*radius
+						&&
+						x_center*x_center + y_center*y_center >= (radius - border_width)*(radius - border_width)
+						) {
+						pixel(x, y) = filling;
+						pixel(x, y).a = (angle + 45) / 90.f * 255;
+					}
+				}
+			}
+		}
+		else {
+
+			for (int x = 0; x < size.w; ++x) {
+				for (int y = 0; y < size.h; ++y) {
+					int x_center = x - size.w / 2;
+					int y_center = y - size.h / 2;
+
+					if (
+						x_center*x_center + y_center*y_center <= radius*radius
+						&&
+						x_center*x_center + y_center*y_center >= (radius - border_width)*(radius - border_width)
+						) {
+						pixel(x, y) = filling;
+					}
+				}
+			}
+		}
+		//pixel(side / 2, 0) = rgba(0, 0, 0, 0);
+		//pixel(side / 2, side - 1) = rgba(0, 0, 0, 0);
+		//pixel(0, side / 2) = rgba(0, 0, 0, 0);
+		//pixel(side - 1, side / 2) = rgba(0, 0, 0, 0);
+	}
+
+	void image::paint_filled_circle(int radius, augs::rgba filling) {
+		auto side = radius * 2 + 1;
+
+		if (v.empty()) {
+			create(side, side, 4);
+		}
+		else {
+			ensure(size.w >= side);
+			ensure(size.h >= side);
+		}
 
 		for (int x = 0; x < size.w; ++x) {
 			for (int y = 0; y < size.h; ++y) {
@@ -66,15 +155,13 @@ namespace augs {
 				if (x_center*x_center + y_center*y_center <= radius*radius) {
 					pixel(x, y) = filling;
 				}
-				else
-					pixel(x, y) = rgba(0, 0, 0, 0);
 			}
 		}
 
-		pixel(size.w / 2, 0) = rgba(0, 0, 0, 0);
-		pixel(size.w / 2, size.h-1) = rgba(0, 0, 0, 0);
-		pixel(0, size.h/2) = rgba(0, 0, 0, 0);
-		pixel(size.w-1, size.h/2) = rgba(0, 0, 0, 0);
+		//pixel(side / 2, 0) = rgba(0, 0, 0, 0);
+		//pixel(side / 2, side -1) = rgba(0, 0, 0, 0);
+		//pixel(0, side /2) = rgba(0, 0, 0, 0);
+		//pixel(side -1, side /2) = rgba(0, 0, 0, 0);
 	}
 
 	bool image::from_file(const std::wstring& filename, bool swap_red_and_blue, unsigned force_channels) {
@@ -98,6 +185,13 @@ namespace augs {
 				std::swap(v[i * 4 + 0], v[i * 4 + 2]);
 
 		return true;
+	}
+
+	void image::save(const std::wstring& filename) {
+		std::string lodepngfname(filename.begin(), filename.end());
+
+		if (lodepng::encode(lodepngfname, v, size.w, size.h))
+			ensure(0);
 	}
 
 	bool image::from_clipboard() {

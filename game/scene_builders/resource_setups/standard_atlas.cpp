@@ -67,16 +67,42 @@ namespace resource_setups {
 		backpack_gui.gui_bbox_expander = vec2(0, 2);
 
 		augs::image attachment_circle_filled;
-		attachment_circle_filled.create_filled_circle(16);
+		attachment_circle_filled.paint_filled_circle(16);
 
 		augs::image attachment_circle_border;
-		attachment_circle_border.create_circle(16);
+		attachment_circle_border.paint_circle_midpoint(16);
 
 		resource_manager.create(assets::texture_id::ATTACHMENT_CIRCLE_FILLED, attachment_circle_filled);
 		resource_manager.create(assets::texture_id::ATTACHMENT_CIRCLE_BORDER, attachment_circle_border);
 
 		augs::image hud_circular_hud_medium;
-		hud_circular_hud_medium.create_circle(50, 1);
+		//hud_circular_hud_medium.paint_circle(60, 10, augs::white, true);
+		//hud_circular_hud_medium.paint_circle_midpoint(58, augs::rgba(0, 0, 0, 0));
+		//hud_circular_hud_medium.paint_circle_midpoint(52, augs::rgba(0, 0, 0, 0));
+		hud_circular_hud_medium.paint_circle_midpoint(69, augs::white, true, -45, 45, false);
+		hud_circular_hud_medium.paint_circle_midpoint(68, augs::white, true, -45, 45, false);
+		hud_circular_hud_medium.paint_circle_midpoint(67, augs::white, true, -45, 45, false);
+		hud_circular_hud_medium.paint_circle_midpoint(66, augs::white, true, -45, 45, false);
+		hud_circular_hud_medium.paint_circle_midpoint(65, augs::white, true, -45, 45, false);
+		hud_circular_hud_medium.paint_circle_midpoint(64, augs::white, true, -45, 45, false);
+		hud_circular_hud_medium.paint_circle_midpoint(63, augs::white, true, -45, 45, false);
+		hud_circular_hud_medium.paint_circle_midpoint(62, augs::white, true, -45, 45, false);
+		hud_circular_hud_medium.paint_circle_midpoint(61, augs::white, true, -45, 45, false);
+		hud_circular_hud_medium.paint_circle_midpoint(60, augs::white, true, -45, 45, false);
+		hud_circular_hud_medium.paint_circle_midpoint(59, augs::white, true, -45, 45, false);
+		hud_circular_hud_medium.paint_circle_midpoint(58, augs::white, true, -45, 45, false);
+		hud_circular_hud_medium.paint_circle_midpoint(56, augs::white, true, -45, 45, true);
+		hud_circular_hud_medium.paint_circle_midpoint(55, augs::white, true, -45, 45, true);
+		hud_circular_hud_medium.paint_circle_midpoint(54, augs::white, true, -45, 45, true);
+		hud_circular_hud_medium.paint_circle_midpoint(53, augs::white, true, -45, 45, true);
+		hud_circular_hud_medium.paint_circle_midpoint(52, augs::white, true, -45, 45, true);
+		hud_circular_hud_medium.paint_circle_midpoint(51, augs::white, true, -45, 45, true);
+		hud_circular_hud_medium.paint_circle_midpoint(50, augs::white, true, -45, 45, true);
+		hud_circular_hud_medium.paint_circle_midpoint(48, augs::white, true, -45, 45, false);
+
+		hud_circular_hud_medium.save(L"saved.png");
+		//hud_circular_hud_medium.paint_circle(48+5, 5);
+		//hud_circular_hud_medium.paint_circle_midpoint(40);
 
 		resource_manager.create(assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM, hud_circular_hud_medium);
 
