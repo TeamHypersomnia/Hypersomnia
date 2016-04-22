@@ -29,23 +29,17 @@ namespace augs {
 		//v.shrink_to_fit();
 	}
 
-	void image::paint_circle_midpoint(int radius, augs::rgba filling, bool constrain_angle, float angle_start, float angle_end, bool scale_alpha) {
+	void image::paint_circle_midpoint(int radius, int border_width, augs::rgba filling, bool constrain_angle, float angle_start, float angle_end, bool scale_alpha) {
 		auto side = radius * 2 + 1;
 
-		if (v.empty()) {
-			create(side, side, 4);
-		}
-		else {
-			ensure(size.w >= side);
-			ensure(size.h >= side);
-		}
-
-		int x = radius;
-		int y = 0;
-		int decisionOver2 = 1 - x;   // Decision criterion divided by 2 evaluated at x=r, y=0
-		int x0 = size.w / 2;
-		int y0 = size.h / 2;
+		image new_surface;
+		auto& surface = v.empty() ? *this : new_surface;
 		
+		surface.create(max(size.w, side), max(size.h, side), 4);
+
+		ensure(size.w >= side);
+		ensure(size.h >= side);
+
 		auto pp = [&](int x, int y){
 			int x_center = x - size.w / 2;
 			int y_center = y - size.h / 2;
@@ -57,29 +51,56 @@ namespace augs {
 				if (scale_alpha)
 					col.a = (angle - angle_start) / (angle_end - angle_start) * 255;
 
-				pixel(x, y) = col;
+				surface.pixel(x, y) = col;
 			}
 		};
 
-		while (y <= x)
-		{
-			pp(x + x0, y + y0); // Octant 1
-			pp(y + x0, x + y0); // Octant 2
-			pp(-x + x0, y + y0); // Octant 4
-			pp(-y + x0, x + y0); // Octant 3
-			pp(-x + x0, -y + y0); // Octant 5
-			pp(-y + x0, -x + y0); // Octant 6
-			pp(x + x0, -y + y0); // Octant 7
-			pp(y + x0, -x + y0); // Octant 8
-			y++;
-			if (decisionOver2 <= 0)
+		for (int i = 0; i < border_width; ++i) {
+			int x = radius - i;
+			int y = 0;
+			int decisionOver2 = 1 - x;   // Decision criterion divided by 2 evaluated at x=r, y=0
+			int x0 = size.w / 2;
+			int y0 = size.h / 2;
+
+			while (y <= x)
 			{
-				decisionOver2 += 2 * y + 1;   // Change in decision criterion for y -> y+1
+				pp(x + x0, y + y0); // Octant 1
+				pp(y + x0, x + y0); // Octant 2
+				pp(-x + x0, y + y0); // Octant 4
+				pp(-y + x0, x + y0); // Octant 3
+				pp(-x + x0, -y + y0); // Octant 5
+				pp(-y + x0, -x + y0); // Octant 6
+				pp(x + x0, -y + y0); // Octant 7
+				pp(y + x0, -x + y0); // Octant 8
+				y++;
+				if (decisionOver2 <= 0)
+				{
+					decisionOver2 += 2 * y + 1;   // Change in decision criterion for y -> y+1
+				}
+				else
+				{
+					decisionOver2 += 2 * (y - (--x)) + 1;   // Change for y -> y+1, x -> x-1
+				}
 			}
-			else
-			{
-				decisionOver2 += 2 * (y - (--x)) + 1;   // Change for y -> y+1, x -> x-1
+		}
+
+		if (border_width > 1) {
+			for (int x = 0; x < surface.size.w; ++x) {
+				for (int y = 0; y < surface.size.w; ++y) {
+					if (x > 0 && y > 0 && x < surface.size.w - 1 && y < surface.size.h - 1) {
+						if (surface.pixel(x, y).a == 0 &&
+							surface.pixel(x + 1, y).a > 0 &&
+							surface.pixel(x - 1, y).a > 0 &&
+							surface.pixel(x, y + 1).a > 0 &&
+							surface.pixel(x, y - 1).a > 0)
+							pp(x, y);
+					}
+				}
 			}
+		}
+
+		if (&surface != this) {
+			blit(surface, 0, 0, rects::xywhf<int>(0, 0, surface.size.w, surface.size.h, false), false, true);
 		}
 	}
 
@@ -261,15 +282,23 @@ namespace augs {
 #define SLOOP for(int s_y = src_rc.y, d_y = dest_rc.y; (s_y < src_rc.b() && d_y < dest_rc.b()); ++s_y, ++d_y) \
 	for(int s_x = src_rc.x, d_x = dest_rc.x; (s_x < src_rc.r() && d_x < dest_rc.r()); ++s_x, ++d_x) 
 #define BCH(ch, src_ch) *ptr(d_x, d_y, ch) = src.flipped ? (img.pix(s_y, s_x, src_ch)) : (img.pix(s_x, s_y, src_ch))
+#define BCH_ADD(ch, src_ch) *ptr(d_x, d_y, ch) += src.flipped ? (img.pix(s_y, s_x, src_ch)) : (img.pix(s_x, s_y, src_ch))
 #define DCH(ch) (ptr(d_x, d_y, ch))
 #define SCH(src_ch) (src.flipped ? (img.pix(s_y, s_x, src_ch)) : (img.pix(s_x, s_y, src_ch)))
 
 
-	void image::blit(const image& img, int x, int y, const rects::xywhf<int>& src, bool luminance_to_alpha) {
+	void image::blit(const image& img, int x, int y, const rects::xywhf<int>& src, bool luminance_to_alpha, bool add) {
 		int c;
 		if (channels == img.channels) {
-			LOOP{
-				for (c = 0; c < channels; ++c) BCH(c, c);
+			if (!add) {
+				LOOP{
+					for (c = 0; c < channels; ++c) BCH(c, c);
+				}
+			}
+			else {
+				LOOP{
+					for (c = 0; c < channels; ++c) BCH_ADD(c, c);
+				}
 			}
 		}
 		else {
