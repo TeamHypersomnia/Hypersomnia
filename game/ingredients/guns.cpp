@@ -237,6 +237,7 @@ namespace prefabs {
 		gun.damage_multiplier = 1.f;
 
 		gun.recoil.repeat_last_n_offsets = 20;
+		gun.recoil.scale = 30.0;
 
 		gun.recoil.offsets = {
 			{ vec2().set_from_degrees(0) },
@@ -267,7 +268,6 @@ namespace prefabs {
 			{ vec2().set_from_degrees(-40) },
 		};
 		
-		gun.recoil.scale = 30.0;
 
 		return sample_rifle;
 	}

@@ -80,6 +80,40 @@ namespace ingredients {
 		auto& driver = *e += components::driver();
 		auto& force_joint = *e += components::force_joint();
 		auto& sentience = *e += components::sentience();
+
+		sentience.aimpunch.offsets = {
+				{ vec2().set_from_degrees(0) },
+				{ vec2().set_from_degrees(6) },
+				{ vec2().set_from_degrees(-6) },
+				{ vec2().set_from_degrees(7) },
+				{ vec2().set_from_degrees(-7) },
+				{ vec2().set_from_degrees(-9) },
+				{ vec2().set_from_degrees(11) },
+				{ vec2().set_from_degrees(-12) },
+				{ vec2().set_from_degrees(-4) },
+				{ vec2().set_from_degrees(11) },
+				{ vec2().set_from_degrees(23) },
+				{ vec2().set_from_degrees(53) },
+				{ vec2().set_from_degrees(10) },
+				{ vec2().set_from_degrees(-30) },
+				{ vec2().set_from_degrees(-60) },
+				{ vec2().set_from_degrees(-70) },
+				{ vec2().set_from_degrees(-80) },
+				{ vec2().set_from_degrees(-20) },
+				{ vec2().set_from_degrees(50) },
+				{ vec2().set_from_degrees(80) },
+				{ vec2().set_from_degrees(120) },
+				{ vec2().set_from_degrees(60) },
+				{ vec2().set_from_degrees(20) },
+				{ vec2().set_from_degrees(40) },
+				{ vec2().set_from_degrees(20) },
+				{ vec2().set_from_degrees(-40) },
+		};
+
+		sentience.aimpunch.repeat_last_n_offsets = 20;
+		sentience.aimpunch.scale = 150.0;
+		sentience.aimpunch.single_cooldown_duration_ms= 200.0;
+
 		e->disable(force_joint);
 
 		detector.spam_trigger_requests_when_detection_intented = true;
@@ -148,7 +182,10 @@ namespace prefabs {
 		auto character = world.create_entity("player_unnamed");
 		name_entity(character, entity_name::PERSON);
 
-		ingredients::wsad_character(character, create_character_crosshair(world));
+		auto crosshair = create_character_crosshair(world);
+		crosshair->get<components::crosshair>().character_entity_to_chase = character;
+
+		ingredients::wsad_character(character, crosshair);
 
 		character->get<components::transform>().pos = pos;
 
@@ -169,7 +206,7 @@ namespace prefabs {
 			auto& render = *root += components::render();
 			auto& transform = *root += components::transform();
 			auto& crosshair = *root += components::crosshair();
-
+			
 			sprite.set(assets::texture_id::TEST_CROSSHAIR, rgba(0, 255, 0, 255));
 
 			render.layer = render_layer::CROSSHAIR;

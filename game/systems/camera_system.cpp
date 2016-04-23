@@ -45,7 +45,6 @@ void camera_system::react_to_input_intents() {
 void components::camera::configure_camera_and_character_with_crosshair(augs::entity_id camera, augs::entity_id character, augs::entity_id crosshair) {
 	camera->get<components::camera>().entity_to_chase = character;
 	camera->get<components::position_copying>().set_target(character);
-	crosshair->get<components::crosshair>().character_entity_to_chase = character;
 
 	update_bounds_for_crosshair(camera->get<components::camera>(), crosshair->get<components::crosshair>());
 }

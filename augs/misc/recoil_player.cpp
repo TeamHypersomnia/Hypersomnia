@@ -1,7 +1,7 @@
 #include "ensure.h"
 #include "recoil_player.h"
 
-vec2 recoil_player::shoot_and_get_offset(augs::deterministic_timestamp current_time) {
+vec2 recoil_player::shoot_and_get_offset() {
 	if (current_offset > int(offsets.size() - 1))
 		reversed = true;
 	ensure(repeat_last_n_offsets > 0 && repeat_last_n_offsets < offsets.size());

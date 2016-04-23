@@ -1,5 +1,6 @@
 #pragma once
 #include "entity_system/entity.h"
+#include "misc/recoil_player.h"
 
 namespace components {
 	struct sentience {
@@ -8,5 +9,7 @@ namespace components {
 
 		float health = 100.f;
 		float consciousness = 100.f;
+
+		recoil_player aimpunch;
 	};
 }

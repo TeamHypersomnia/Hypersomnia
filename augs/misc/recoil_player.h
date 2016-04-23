@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include "math/vec2.h"
-#include "deterministic_timing.h"
 
 class recoil_player {
 	int delta_offset = 0;
@@ -16,6 +15,6 @@ public:
 	double remaining_cooldown_duration = -1.0;
 	double scale = 1.0;
 
-	vec2 shoot_and_get_offset(augs::deterministic_timestamp current_time);
+	vec2 shoot_and_get_offset();
 	void cooldown(double amount_ms);
 };

@@ -9,4 +9,5 @@ public:
 	using processing_system_templated::processing_system_templated;
 
 	void apply_damage_and_initiate_deaths();
+	void cooldown_aimpunches();
 };
