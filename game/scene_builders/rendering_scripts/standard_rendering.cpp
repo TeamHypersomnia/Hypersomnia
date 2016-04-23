@@ -40,6 +40,11 @@ namespace rendering_scripts {
 			render.targets, 
 			render.view_interpolation_ratio());
 
+		gui.hud.draw_circular_bars(msg);
+		state.output->clear_special_vertex_data();
+
+		gui.hud.draw_circular_bars_information(msg);
+
 		gui.draw_complete_gui_for_camera_rendering_request(msg);
 
 		resource_manager.find(assets::atlas_id::GAME_WORLD_ATLAS)->bind();

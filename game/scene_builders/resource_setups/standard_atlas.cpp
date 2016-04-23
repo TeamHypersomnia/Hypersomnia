@@ -79,7 +79,7 @@ namespace resource_setups {
 		//hud_circular_hud_medium.paint_circle(60, 10, augs::white, true);
 		//hud_circular_hud_medium.paint_circle_midpoint(58, augs::rgba(0, 0, 0, 0));
 		hud_circular_hud_medium.paint_circle_midpoint(71, 1, augs::white, false, -45, 45, false);
-		hud_circular_hud_medium.paint_circle_midpoint(69, 8, augs::cyan, false, -45, 45, false);
+		hud_circular_hud_medium.paint_circle_midpoint(69, 8, augs::red, false, -180, 180, true);
 		hud_circular_hud_medium.paint_circle_midpoint(60, 1, augs::white, false, -45, 45, false);
 		//hud_circular_hud_medium.paint_circle_midpoint(68, 1, augs::white, true, -45, 45, false);
 		//hud_circular_hud_medium.paint_circle_midpoint(67, 1, augs::white, true, -45, 45, false);

@@ -75,7 +75,9 @@ namespace augs {
 		void push_line(const vertex_line&);
 		void push_triangle(const vertex_triangle&);
 		void push_triangles_from_gui_world(gui::gui_world&);
+		void push_special_vertex_triangle(augs::special, augs::special, augs::special);
 
+		void clear_special_vertex_data();
 		void clear_triangles();
 		void clear_lines();
 
