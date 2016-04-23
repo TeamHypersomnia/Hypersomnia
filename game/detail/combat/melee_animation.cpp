@@ -1,15 +1,15 @@
 #include "melee_animation.h"
 
-melee_animation::melee_animation(std::vector<vec2> pattern) {
+melee_animation::melee_animation(std::vector<components::transform> pattern) {
 	offset_pattern = pattern;
 }
 
-vec2 melee_animation::update(double factor) {
-	vec2 result = offset_pattern[offset_pattern.size() - 1];
+components::transform melee_animation::update(double factor) {
+	components::transform result = offset_pattern[offset_pattern.size() - 1];
 	double distance = 0;
 	std::vector<double> distance_vector;
 	for (int i = 1; i < offset_pattern.size(); ++i) {
-		distance_vector.push_back(vec2(offset_pattern[i] - offset_pattern[i - 1]).length());
+		distance_vector.push_back(vec2(offset_pattern[i].pos - offset_pattern[i - 1].pos).length());
 		distance += distance_vector[distance_vector.size() - 1];
 	}
 	double position = distance * factor;

@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "math/vec2.h" 
+#include "game/components/transform_component.h"
 
 namespace components {
 	enum melee_state {
@@ -26,6 +27,6 @@ namespace components {
 
 		melee_state state = MELEE_FREE; 
 
-		std::vector<vec2> offset_positions;
+		std::vector<components::transform> offset_positions;
 	};
 }

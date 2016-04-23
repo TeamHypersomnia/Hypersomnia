@@ -109,7 +109,7 @@ components::melee_state melee_system::primary_action(double dt, augs::entity_id&
 
 	}
 
-	std::vector<vec2> swing = melee_component.offset_positions;
+	std::vector<components::transform> swing = melee_component.offset_positions;
 	if(action_stage == FIRST_STAGE)
 		std::reverse(std::begin(swing), std::end(swing));
 
