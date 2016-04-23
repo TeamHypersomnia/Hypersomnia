@@ -5,6 +5,7 @@
 #include "game/messages/intent_message.h"
 #include "game/messages/melee_swing_response.h"
 #include "game/messages/rebuild_physics_message.h"
+#include "game/detail/inventory_utils.h"
 
 #include "game/detail/combat/melee_animation.h"
 
@@ -116,7 +117,8 @@ components::melee_state melee_system::primary_action(double dt, augs::entity_id&
 
 	melee_animation animation(swing);
 	new_definition.offsets_for_created_shapes[components::physics_definition::SPECIAL_MOVE_DISPLACEMENT] = animation.update(melee_component.swing_current_time / melee_component.swing_duration_ms);
-	damage.custom_impact_velocity = -(new_definition.offsets_for_created_shapes[components::physics_definition::SPECIAL_MOVE_DISPLACEMENT].pos);
+	auto player = get_owning_transfer_capability(target);
+	damage.custom_impact_velocity = new_definition.offsets_for_created_shapes[components::physics_definition::SPECIAL_MOVE_DISPLACEMENT].pos - player->get<components::transform>().pos;
 
 	response.subject = target;
 	response.origin_transform = target->get<components::transform>();
