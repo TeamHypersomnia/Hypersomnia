@@ -77,8 +77,7 @@ void melee_system::initiate_and_update_moves() {
 			}
 			break;
 		case components::MELEE_PRIMARY:
-			damage.damage_upon_collision = true;
-			melee.state = primary_action(dt,t,melee);
+			melee.state = primary_action(dt,t,melee,damage);
 			break;
 		 default:
 			LOG("Uknown action in melee_system.cpp");
@@ -86,8 +85,10 @@ void melee_system::initiate_and_update_moves() {
 	}
 }
 
-components::melee_state melee_system::primary_action(double dt, augs::entity_id& target, components::melee& melee_component)
+components::melee_state melee_system::primary_action(double dt, augs::entity_id& target, components::melee& melee_component, components::damage& damage)
 {
+	damage.damage_upon_collision = true;
+
 	messages::rebuild_physics_message pos_response;
 	messages::melee_swing_response response;
 
@@ -115,6 +116,7 @@ components::melee_state melee_system::primary_action(double dt, augs::entity_id&
 
 	melee_animation animation(swing);
 	new_definition.offsets_for_created_shapes[components::physics_definition::SPECIAL_MOVE_DISPLACEMENT] = animation.update(melee_component.swing_current_time / melee_component.swing_duration_ms);
+	damage.custom_impact_velocity = -(new_definition.offsets_for_created_shapes[components::physics_definition::SPECIAL_MOVE_DISPLACEMENT].pos);
 
 	response.subject = target;
 	response.origin_transform = target->get<components::transform>();
