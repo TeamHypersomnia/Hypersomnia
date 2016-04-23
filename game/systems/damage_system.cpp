@@ -20,15 +20,19 @@ void damage_system::destroy_colliding_bullets_and_send_damage() {
 
 		if (damage && damage->damage_upon_collision && damage->damage_charges_before_destruction > 0) {
 			auto& subject_of_impact = components::physics::get_owner_body_entity(it.subject)->get<components::physics>();
-			auto bullet_vel = components::physics::get_owner_body_entity(it.collider)->get<components::physics>().velocity();
+			
+			vec2 impact_velocity = damage->custom_impact_velocity;
+			
+			if(!impact_velocity.non_zero())
+				impact_velocity = components::physics::get_owner_body_entity(it.collider)->get<components::physics>().velocity();
 
-			subject_of_impact.apply_force(vec2(bullet_vel).set_length(damage->impulse_upon_hit), it.point - subject_of_impact.get_mass_position());
+			subject_of_impact.apply_force(vec2(impact_velocity).set_length(damage->impulse_upon_hit), it.point - subject_of_impact.get_mass_position());
 
 			messages::damage_message damage_msg;
 			damage_msg.inflictor = it.collider;
 			damage_msg.subject = it.subject;
 			damage_msg.amount = damage->amount;
-			damage_msg.impact_velocity = bullet_vel;
+			damage_msg.impact_velocity = impact_velocity;
 			damage_msg.point_of_impact = it.point;
 			parent_world.post_message(damage_msg);
 

@@ -20,6 +20,8 @@ namespace components {
 		/* used to destroy bullets */
 		vec2 starting_point;
 
+		vec2 custom_impact_velocity;
+
 		bool constrain_lifetime = true;
 		bool constrain_distance = false;
 
