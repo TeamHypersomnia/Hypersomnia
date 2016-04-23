@@ -43,3 +43,13 @@ namespace components {
 		}
 	};
 }
+
+namespace augs {
+	template <class A>
+	components::transform interp(components::transform a, components::transform b, A alpha) {
+		components::transform res;
+		res.pos = augs::interp(a.pos, b.pos, alpha);
+		res.rotation = augs::interp(vec2().set_from_degrees(a.rotation), vec2().set_from_degrees(b.rotation), alpha).degrees();
+		return res;
+	}
+}

@@ -1197,6 +1197,9 @@
     <ClCompile Include="game\detail\combat\melee_animation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\components\transform_component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
