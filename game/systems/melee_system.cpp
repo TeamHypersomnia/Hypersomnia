@@ -56,65 +56,72 @@ void melee_system::initiate_and_update_moves() {
 		auto& melee = t->get<components::melee>();
 		auto& damage = t->get<components::damage>();
 
-//		 LOG("P: %x, S: %x, T: %x CDT: %x MVT: %x STATE: %x", melee.primary_move_flag, melee.secondary_move_flag, melee.tertiary_move_flag,melee.swing_current_cooldown_time,melee.swing_current_time,melee.state);
+		//		 LOG("P: %x, S: %x, T: %x CDT: %x MVT: %x STATE: %x", melee.primary_move_flag, melee.secondary_move_flag, melee.tertiary_move_flag,melee.swing_current_cooldown_time,melee.swing_current_time,melee.state);
 
-		damage.damage_upon_collision = melee.state;
+		damage.damage_upon_collision = false;
 
-		messages::rebuild_physics_message pos_response;
-		pos_response.subject = t;
-		auto new_definition = t->get<components::physics_definition>();
-
-		if (melee.primary_move_flag && melee.state == components::MELEE_FREE) {
+		switch (melee.state) {
+		case components::MELEE_FREE:
+			if (melee.primary_move_flag)
+				melee.state = components::MELEE_PRIMARY;
 			/* send a response message so that the rest of the game knows that a swing has occured;
 			the message could be read by particles system, audio system and possibly animation system
 			to apply each their own effects.
 			*/
-			melee.state = components::MELEE_PRIMARY;
-		}
-		else if (melee.state == components::MELEE_ONCOOLDOWN) {
-//			LOG("ON CD (LEFT: %x )",melee.swing_cooldown_ms - melee.swing_current_cooldown_time);
+			break;
+		case components::MELEE_ONCOOLDOWN:
 			melee.swing_current_cooldown_time += dt;
-
 			if (melee.swing_current_cooldown_time >= melee.swing_cooldown_ms) {
 				melee.swing_current_cooldown_time = 0;
 				melee.state = components::MELEE_FREE;
 			}
-		}
-		else if (melee.state == components::MELEE_PRIMARY) {
-			LOG("MELEE PRIMARY (LEFT: %x)", melee.swing_duration_ms - melee.swing_current_time);
-
-			std::vector<vec2> swing = melee.offset_positions;
-			std::reverse(std::begin(swing),std::end(swing));
-
-			melee_animation animation(swing);
-
-			if (melee.swing_current_time >= melee.swing_duration_ms) {
-				melee.state = components::MELEE_BACKSWING_PRIMARY;
-				melee.swing_current_time = 0;
-			}
-			else
-				new_definition.offsets_for_created_shapes[components::physics_definition::SPECIAL_MOVE_DISPLACEMENT] = animation.update(melee.swing_current_time / melee.swing_duration_ms);
-			
-			messages::melee_swing_response response;
-			response.subject = t;
-			response.origin_transform = t->get<components::transform>();
-			parent_world.post_message(response);
-			pos_response.new_definition = new_definition;
-			parent_world.post_message(pos_response);
-			melee.swing_current_time += dt * melee.swing_acceleration;
-		}
-		else if (melee.state == components::MELEE_BACKSWING_PRIMARY) {
-			LOG("MELEE BACKSWING PRIMARY (LEFT: %x)", melee.swing_duration_ms - melee.swing_current_time);
-			melee_animation animation(melee.offset_positions);
-			if (melee.swing_current_time >= melee.swing_duration_ms) {
-				melee.state = components::MELEE_ONCOOLDOWN;
-				melee.swing_current_time = 0;
-			}
-			else
-				new_definition.offsets_for_created_shapes[components::physics_definition::SPECIAL_MOVE_DISPLACEMENT] = animation.update(melee.swing_current_time / melee.swing_duration_ms);
-			pos_response.new_definition = new_definition;
-			parent_world.post_message(pos_response);
-			melee.swing_current_time += dt * melee.swing_acceleration;
+			break;
+		case components::MELEE_PRIMARY:
+			damage.damage_upon_collision = true;
+			melee.state = primary_action(dt,t,melee);
+			break;
+		 default:
+			LOG("Uknown action in melee_system.cpp");
 		}
 	}
+}
+
+components::melee_state melee_system::primary_action(double dt, augs::entity_id& target, components::melee& melee_component)
+{
+	messages::rebuild_physics_message pos_response;
+	messages::melee_swing_response response;
+
+	pos_response.subject = target;
+	auto new_definition = target->get<components::physics_definition>();
+
+	melee_component.swing_current_time += dt * melee_component.swing_acceleration;
+
+	if (melee_component.swing_current_time >= melee_component.swing_duration_ms) {
+		if (action_stage == FIRST_STAGE) {
+			action_stage = SECOND_STAGE;
+			melee_component.swing_current_time = 0;
+		}
+		else {
+			action_stage = FIRST_STAGE;
+			melee_component.swing_current_time = 0;
+			return components::MELEE_ONCOOLDOWN;
+		}
+
+	}
+
+	std::vector<vec2> swing = melee_component.offset_positions;
+	if(action_stage == FIRST_STAGE)
+		std::reverse(std::begin(swing), std::end(swing));
+
+	melee_animation animation(swing);
+	new_definition.offsets_for_created_shapes[components::physics_definition::SPECIAL_MOVE_DISPLACEMENT] = animation.update(melee_component.swing_current_time / melee_component.swing_duration_ms);
+
+	response.subject = target;
+	response.origin_transform = target->get<components::transform>();
+	parent_world.post_message(response);
+
+	pos_response.new_definition = new_definition;
+	parent_world.post_message(pos_response);
+
+	return components::MELEE_PRIMARY;
 }
