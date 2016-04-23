@@ -163,6 +163,8 @@ namespace augs {
 			if (destroy_images)
 				textures[i]->img->destroy();
 		}
+
+		img.swap_red_and_blue();
 	}
 
 	bool atlas::is_mipmapped() const {

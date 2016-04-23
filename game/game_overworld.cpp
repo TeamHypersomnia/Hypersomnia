@@ -129,8 +129,6 @@ void game_overworld::main_game_loop() {
 		while (steps_to_perform--) {
 #endif
 
-		game_window.clear();
-
 		assign_frame_time_to_delta_for_drawing_time_systems();
 		main_game_world.call_drawing_time_systems();
 
@@ -156,6 +154,8 @@ void game_overworld::main_game_loop() {
 void game_overworld::consume_camera_render_requests() {
 	auto& requests = main_game_world.get_message_queue<messages::camera_render_request_message>();
 	auto& target = renderer::get_current();
+
+	target.clear_current_fbo();
 
 	for (auto& r : requests) {
 		target.set_viewport(r.state.viewport);

@@ -57,8 +57,7 @@ namespace augs {
 		glDisableVertexAttribArray(VERTEX_ATTRIBUTES::SPECIAL); glerr;
 	}
 
-	void renderer::clear() {
-		graphics::fbo::use_default();
+	void renderer::clear_current_fbo() {
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
 

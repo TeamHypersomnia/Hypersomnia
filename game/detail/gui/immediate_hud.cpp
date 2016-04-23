@@ -21,14 +21,14 @@ void immediate_hud::draw_circular_bars_and_nicknames(messages::camera_render_req
 			state.renderable_transform.rotation = 0;
 
 			components::sprite border;
-			border.set(assets::HUD_CIRCULAR_BAR_MEDIUM, cyan);
-			border.color.a = 160;
+			border.set(assets::HUD_CIRCULAR_BAR_MEDIUM, white);
+			//border.color.a = 160;
 			border.draw(state);
 
-			state.renderable_transform.rotation = 90;
-			border.color = orange;
-			border.color.a = 160;
-			border.draw(state);
+			//state.renderable_transform.rotation = 90;
+			//border.color = orange;
+			//border.color.a = 160;
+			//border.draw(state);
 		}
 	}
 }

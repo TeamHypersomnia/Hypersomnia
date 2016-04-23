@@ -185,7 +185,7 @@ namespace augs {
 		//pixel(side -1, side /2) = rgba(0, 0, 0, 0);
 	}
 
-	bool image::from_file(const std::wstring& filename, bool swap_red_and_blue, unsigned force_channels) {
+	bool image::from_file(const std::wstring& filename, unsigned force_channels) {
 		channels = 4;
 
 		std::string lodepngfname(filename.begin(), filename.end());
@@ -201,11 +201,12 @@ namespace augs {
 		size.w = width;
 		size.h = height;
 
-		if(swap_red_and_blue)
-			for (int i = 0; i < size.area(); ++i)
-				std::swap(v[i * 4 + 0], v[i * 4 + 2]);
-
 		return true;
+	}
+
+	void image::swap_red_and_blue() {
+		for (int i = 0; i < size.area(); ++i)
+			std::swap(v[i * 4 + 0], v[i * 4 + 2]);
 	}
 
 	void image::save(const std::wstring& filename) {

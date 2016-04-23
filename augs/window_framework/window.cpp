@@ -302,10 +302,6 @@ namespace augs {
 			glrenderer.initialize();
 		}
 
-		void glwindow::clear() {
-			glrenderer.clear();
-		}
-
 		bool glwindow::swap_buffers() {
 			if(this != context) current();
 			return err(SwapBuffers(hdc)) != FALSE;
