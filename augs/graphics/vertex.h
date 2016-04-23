@@ -31,6 +31,12 @@ namespace augs {
 		vertex& get_vert(int i) { return vertices[i]; }
 	};
 
+	struct special {
+		vec2 v1;
+		float v2;
+	};
+
 	typedef std::vector<vertex_triangle> vertex_triangle_buffer;
 	typedef std::vector<vertex_line> vertex_line_buffer;
+	typedef std::vector<special> special_buffer;
 }

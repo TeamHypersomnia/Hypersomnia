@@ -38,6 +38,23 @@ namespace augs {
 		glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), 0); glerr;
 		glVertexAttribPointer(VERTEX_ATTRIBUTES::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), (char*)(sizeof(float) * 2)); glerr;
 		glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr;
+
+		glGenBuffers(1, &special_buffer_id); glerr;
+		glBindBuffer(GL_ARRAY_BUFFER, special_buffer_id); glerr;
+
+		enable_special_vertex_attribute();
+		glVertexAttribPointer(VERTEX_ATTRIBUTES::SPECIAL, 3, GL_FLOAT, GL_FALSE, sizeof(special), 0); glerr;
+		disable_special_vertex_attribute();
+
+		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
+	}
+
+	void renderer::enable_special_vertex_attribute() {
+		glEnableVertexAttribArray(VERTEX_ATTRIBUTES::SPECIAL); glerr;
+	}
+
+	void renderer::disable_special_vertex_attribute() {
+		glDisableVertexAttribArray(VERTEX_ATTRIBUTES::SPECIAL); glerr;
 	}
 
 	void renderer::clear() {
@@ -48,10 +65,19 @@ namespace augs {
 	void renderer::call_triangles() {
 		if (triangles.empty()) return;
 
+		if (!specials.empty()) {
+			enable_special_vertex_attribute();
+			glBindBuffer(GL_ARRAY_BUFFER, special_buffer_id); glerr;
+			glBufferData(GL_ARRAY_BUFFER, sizeof(special) * specials.size(), specials.data(), GL_STREAM_DRAW); glerr;
+		}
+
 		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
 
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_triangle) * triangles.size(), triangles.data(), GL_STREAM_DRAW); glerr;
 		glDrawArrays(GL_TRIANGLES, 0, triangles.size() * 3); glerr;
+
+		if (!specials.empty()) 
+			disable_special_vertex_attribute();
 	}
 
 	void renderer::push_triangle(const vertex_triangle& tri) {

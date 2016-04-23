@@ -24,7 +24,8 @@ namespace augs {
 		enum VERTEX_ATTRIBUTES {
 			POSITION,
 			TEXCOORD,
-			COLOR
+			COLOR,
+			SPECIAL
 		};
 
 		struct debug_line {
@@ -36,9 +37,11 @@ namespace augs {
 
 		vertex_triangle_buffer triangles;
 		vertex_line_buffer lines;
+		special_buffer specials;
 
 		unsigned int position_buffer_id, texcoord_buffer_id, color_buffer_id;
 		unsigned int triangle_buffer_id;
+		unsigned int special_buffer_id;
 
 		struct line_channel {
 			std::vector<debug_line> lines;
@@ -64,6 +67,8 @@ namespace augs {
 		void draw_debug_info(vec2 visible_world_area, components::transform, assets::texture_id tex, std::vector<entity_id> target_entities, double interpolation_ratio);
 
 		void clear();
+		void enable_special_vertex_attribute();
+		void disable_special_vertex_attribute();
 		void call_triangles();
 		void call_lines();
 		void set_viewport(rects::xywh<int>);
