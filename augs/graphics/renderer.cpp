@@ -103,6 +103,16 @@ namespace augs {
 		triangles.insert(triangles.end(), gui.triangle_buffer.begin(), gui.triangle_buffer.end());
 	}
 
+	void renderer::push_special_vertex_triangle(augs::special s1, augs::special s2, augs::special s3) {
+		specials.push_back(s1);
+		specials.push_back(s2);
+		specials.push_back(s3);
+	}
+	
+	void renderer::clear_special_vertex_data() {
+		specials.clear();
+	}
+
 	void renderer::clear_triangles() {
 		triangles.clear();
 	}

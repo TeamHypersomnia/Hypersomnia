@@ -25,8 +25,6 @@ bool gui_system::freeze_gui_model() {
 }
 
 void gui_system::draw_complete_gui_for_camera_rendering_request(messages::camera_render_request_message r) {
-	hud.draw_circular_bars_and_nicknames(r);
-	
 	gui.draw_triangles();
 	r.state.output->push_triangles_from_gui_world(gui);
 

@@ -151,22 +151,16 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 					parent_world.post_message(messages::destroy_message(catridge_or_pellet_stack));
 				}
 
-
 				auto owning_capability = get_owning_transfer_capability(it);
-
-				auto* maybe_item = it->find<components::item>();
-
-				if (maybe_item) {
-					//if (owning_capability.alive())
-					//	gun.shake_camera(owning_capability[associated_entity_name::WATCHING_CAMERA], gun_transform.rotation);
-				}
-
 				auto owning_crosshair_recoil = owning_capability[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
 				
 				auto& recoil_physics = owning_crosshair_recoil->get<components::physics>();
 				recoil_physics.apply_impulse(
 					gun.recoil.shoot_and_get_offset(get_current_timestamp()).rotate(barrel_transform.rotation, vec2())
 					);
+
+				//	//if (owning_capability.alive())
+				//	//	gun.shake_camera(owning_capability[associated_entity_name::WATCHING_CAMERA], gun_transform.rotation);
 
 				parent_world.post_message(messages::destroy_message(chamber_slot->items_inside[0]));
 				chamber_slot->items_inside.clear();
