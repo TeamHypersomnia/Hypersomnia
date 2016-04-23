@@ -89,6 +89,7 @@ void melee_system::initiate_and_update_moves() {
 components::melee_state melee_system::primary_action(double dt, augs::entity_id target, components::melee& melee_component, components::damage& damage)
 {
 	damage.damage_upon_collision = true;
+	melee_component.swing_current_time += dt * melee_component.swing_acceleration;
 
 	messages::rebuild_physics_message pos_response;
 	messages::melee_swing_response response;
@@ -96,23 +97,8 @@ components::melee_state melee_system::primary_action(double dt, augs::entity_id 
 	pos_response.subject = target;
 	auto new_definition = target->get<components::physics_definition>();
 
-	melee_component.swing_current_time += dt * melee_component.swing_acceleration;
-
-	if (melee_component.swing_current_time >= melee_component.swing_duration_ms) {
-		if (action_stage == FIRST_STAGE) {
-			action_stage = SECOND_STAGE;
-			melee_component.swing_current_time = 0;
-		}
-		else {
-			action_stage = FIRST_STAGE;
-			melee_component.swing_current_time = 0;
-			return components::MELEE_ONCOOLDOWN;
-		}
-
-	}
-
 	std::vector<components::transform> swing = melee_component.offset_positions;
-	if(action_stage == FIRST_STAGE)
+	if(action_stage == SECOND_STAGE)
 		std::reverse(std::begin(swing), std::end(swing));
 
 	melee_animation animation(swing);
@@ -126,6 +112,19 @@ components::melee_state melee_system::primary_action(double dt, augs::entity_id 
 
 	pos_response.new_definition = new_definition;
 	parent_world.post_message(pos_response);
+
+	if (melee_component.swing_current_time >= melee_component.swing_duration_ms) {
+		if (action_stage == FIRST_STAGE) {
+			action_stage = SECOND_STAGE;
+			melee_component.swing_current_time = 0;
+		}
+		else {
+			action_stage = FIRST_STAGE;
+			melee_component.swing_current_time = 0;
+			return components::MELEE_ONCOOLDOWN;
+		}
+
+	}
 
 	return components::MELEE_PRIMARY;
 }

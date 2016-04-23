@@ -26,19 +26,30 @@ namespace prefabs {
 		item.space_occupied_per_charge = to_space_units("2.5");
 
 		auto& melee = *machete += components::melee();
-		melee.swing_cooldown_ms = 100.f;
-		melee.swing_duration_ms = 500.f;
+		melee.swing_cooldown_ms = 50.f;
+		melee.swing_duration_ms = 200.f;
 		melee.swing_acceleration = 5.f;
-		std::vector<vec2> circle = generate_circle_points(100, 90, 0, 20);
-		double angle = 0;
-		for (int i = 0;i < circle.size();++i) {
-			circle[i].y -= 100;
-			components::transform current;
-			current.pos = circle[i];
-			current.rotation = angle;
-			melee.offset_positions.push_back(current);
-			angle += 4.5;
-		}
+		//std::vector<vec2> circle = generate_circle_points(50, 90, 0, 50);
+		//double angle = 0;
+		//for (int i = 0;i < circle.size();++i) {
+		//	//circle[i].y -= 100;
+		//	components::transform current;
+		//	current.pos = circle[i];
+		//	current.rotation = angle;
+		//	melee.offset_positions.push_back(current);
+		//	angle += 4.5;
+		//}
+
+		melee.offset_positions = {
+			{ vec2(0, 0), 0 },
+			{ vec2(10, 0), -2 },
+			{ vec2(20, 0), -10 },
+			{ vec2(30, -10), -14 },
+			{ vec2(40, -20), -16 },
+			{ vec2(50, -25), -20 },
+			{ vec2(64, -34), -30 },
+			{ vec2(120, -54), -45 },
+		};
 
 		auto& damage = *machete += components::damage();
 		damage.destroy_upon_damage = false;

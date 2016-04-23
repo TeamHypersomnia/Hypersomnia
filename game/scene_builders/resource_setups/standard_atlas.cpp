@@ -79,7 +79,7 @@ namespace resource_setups {
 		//hud_circular_hud_medium.paint_circle(60, 10, augs::white, true);
 		//hud_circular_hud_medium.paint_circle_midpoint(58, augs::rgba(0, 0, 0, 0));
 		hud_circular_hud_medium.paint_circle_midpoint(71, 1, augs::white, false, -45, 45, false);
-		hud_circular_hud_medium.paint_circle_midpoint(69, 8, augs::red, false, -180, 180, true);
+		hud_circular_hud_medium.paint_circle_midpoint(69, 8, augs::red, false, -180, 180, false);
 		hud_circular_hud_medium.paint_circle_midpoint(60, 1, augs::white, false, -45, 45, false);
 		//hud_circular_hud_medium.paint_circle_midpoint(68, 1, augs::white, true, -45, 45, false);
 		//hud_circular_hud_medium.paint_circle_midpoint(67, 1, augs::white, true, -45, 45, false);
@@ -146,10 +146,6 @@ namespace resource_setups {
 		resource_manager.create(assets::atlas_id::GAME_WORLD_ATLAS,
 			resources::manager::atlas_creation_mode::FROM_ALL_TEXTURES
 			| resources::manager::atlas_creation_mode::FROM_ALL_FONTS);
-
-		resource_manager.create(assets::shader_id::DEFAULT_VERTEX, L"hypersomnia/shaders/default.vsh", augs::graphics::shader::type::VERTEX);
-		resource_manager.create(assets::shader_id::DEFAULT_FRAGMENT, L"hypersomnia/shaders/default.fsh", augs::graphics::shader::type::FRAGMENT);
-		resource_manager.create(assets::program_id::DEFAULT, assets::shader_id::DEFAULT_VERTEX, assets::shader_id::DEFAULT_FRAGMENT);
 
 		resource_manager.create_inverse_with_flip(assets::animation_id::TORSO_MOVE,
 			assets::texture_id::TORSO_MOVING_FIRST,
