@@ -48,7 +48,10 @@ void sentience_system::apply_damage_and_initiate_deaths() {
 				auto owning_crosshair_recoil = aimpunch_subject[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
 
 				auto& recoil_physics = owning_crosshair_recoil->get<components::physics>();
-				auto impulse = aimpunched_sentience->aimpunch.shoot_and_get_offset().rotate(aimpunch_subject->get<components::transform>().rotation, vec2());
+				auto impulse = aimpunched_sentience->aimpunch.shoot_and_get_offset().rotate(
+					// aimpunch_subject->get<components::transform>().rotation 
+					d.impact_velocity.degrees()
+					, vec2());
 				recoil_physics.apply_impulse(impulse);
 			}
 		}
