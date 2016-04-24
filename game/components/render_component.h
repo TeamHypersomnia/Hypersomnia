@@ -23,7 +23,7 @@ namespace components {
 			WORLD,
 		};
 
-		render_layer layer = render_layer::BOTTOM;
+		render_layer layer = render_layer::INVALID;
 		unsigned mask = mask_type::WORLD;
 
 		bool absolute_transform = false;

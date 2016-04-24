@@ -66,7 +66,7 @@ namespace prefabs {
 		name_entity(sample_magazine, entity_name::MAGAZINE);
 
 		{
-			ingredients::sprite(sample_magazine, pos, assets::texture_id::SAMPLE_MAGAZINE, augs::white, render_layer::DROPPED_ITEM);
+			ingredients::sprite(sample_magazine, pos, assets::texture_id::SAMPLE_MAGAZINE, augs::white, render_layer::DYNAMIC_BODY);
 			ingredients::crate_physics(sample_magazine);
 
 			auto& item = ingredients::make_item(sample_magazine);
@@ -100,7 +100,7 @@ namespace prefabs {
 		auto sample_suppressor = world.create_entity("sample_suppressor");
 		name_entity(sample_suppressor, entity_name::SUPPRESSOR);
 
-		ingredients::sprite(sample_suppressor, pos, assets::texture_id::SAMPLE_SUPPRESSOR, augs::white, render_layer::DROPPED_ITEM);
+		ingredients::sprite(sample_suppressor, pos, assets::texture_id::SAMPLE_SUPPRESSOR, augs::white, render_layer::DYNAMIC_BODY);
 		ingredients::crate_physics(sample_suppressor);
 
 		auto& item = ingredients::make_item(sample_suppressor);
@@ -118,7 +118,7 @@ namespace prefabs {
 		name_entity(pink_charge, entity_name::PINK_CHARGE);
 
 		{
-			ingredients::sprite(pink_charge, pos, assets::texture_id::PINK_CHARGE, augs::white, render_layer::DROPPED_ITEM);
+			ingredients::sprite(pink_charge, pos, assets::texture_id::PINK_CHARGE, augs::white, render_layer::DYNAMIC_BODY);
 			ingredients::crate_physics(pink_charge);
 
 			auto& item = ingredients::make_item(pink_charge);
@@ -170,7 +170,7 @@ namespace prefabs {
 		name_entity(cyan_charge, entity_name::CYAN_CHARGE);
 
 		{
-			ingredients::sprite(cyan_charge, pos, assets::texture_id::CYAN_CHARGE, augs::white, render_layer::DROPPED_ITEM);
+			ingredients::sprite(cyan_charge, pos, assets::texture_id::CYAN_CHARGE, augs::white, render_layer::DYNAMIC_BODY);
 			ingredients::crate_physics(cyan_charge);
 
 			auto& item = ingredients::make_item(cyan_charge);
@@ -219,7 +219,7 @@ namespace prefabs {
 		name_entity(green_charge, entity_name::GREEN_CHARGE);
 
 		{
-			ingredients::sprite(green_charge, pos, assets::texture_id::GREEN_CHARGE, augs::white, render_layer::DROPPED_ITEM);
+			ingredients::sprite(green_charge, pos, assets::texture_id::GREEN_CHARGE, augs::white, render_layer::DYNAMIC_BODY);
 			ingredients::crate_physics(green_charge);
 
 			auto& item = ingredients::make_item(green_charge);
@@ -268,7 +268,7 @@ namespace prefabs {
 		auto weapon = world.create_entity("sample_rifle");
 		name_entity(weapon, entity_name::ASSAULT_RIFLE);
 
-		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::ASSAULT_RIFLE, augs::white, render_layer::DROPPED_ITEM);
+		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::ASSAULT_RIFLE, augs::white, render_layer::DYNAMIC_BODY);
 		auto& def = ingredients::crate_physics(weapon);
 		ingredients::default_gun_container(weapon);
 
@@ -342,7 +342,7 @@ namespace prefabs {
 		auto weapon = world.create_entity("submachine");
 		name_entity(weapon, entity_name::SUBMACHINE);
 
-		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::SUBMACHINE, augs::white, render_layer::DROPPED_ITEM);
+		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::SUBMACHINE, augs::white, render_layer::DYNAMIC_BODY);
 		auto& def = ingredients::crate_physics(weapon);
 		ingredients::default_gun_container(weapon);
 
@@ -417,7 +417,7 @@ namespace prefabs {
 		auto weapon = world.create_entity("pistol");
 		name_entity(weapon, entity_name::PISTOL);
 
-		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::PISTOL, augs::white, render_layer::DROPPED_ITEM);
+		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::PISTOL, augs::white, render_layer::DYNAMIC_BODY);
 		auto& def = ingredients::crate_physics(weapon);
 		ingredients::default_gun_container(weapon);
 

@@ -5,7 +5,7 @@
 namespace filters {
 	enum categories {
 		STATIC_OBJECT		= 1 << 0,
-		DROPPED_ITEM		= 1 << 1,
+		DYNAMIC_BODY		= 1 << 1,
 		CONTROLLED_CHARACTER = 1 << 2,
 		REMOTE_CHARACTER = 1 << 3,
 		BULLET			= 1 << 4,

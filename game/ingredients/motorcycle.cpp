@@ -82,7 +82,7 @@ namespace prefabs {
 			auto& transform = *interior += spawn_transform;
 			auto& physics_definition = *interior += components::physics_definition();
 
-			render.layer = render_layer::DROPPED_ITEM;
+			render.layer = render_layer::DYNAMIC_BODY;
 
 			sprite.set(assets::texture_id::MOTORCYCLE_INSIDE);
 
