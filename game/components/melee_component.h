@@ -15,11 +15,14 @@ namespace components {
 	};
 	struct melee {
 
-		float swing_duration_ms = 200.f;
-		float swing_cooldown_ms = 100.f;
+		float swing_duration_ms[5];
+		float swing_acceleration[4];
+		float swing_cooldown_ms[4];
 		float swing_current_time = 0.f;
 		float swing_current_cooldown_time = 0.f;
-		float swing_acceleration = 5.0f;
+
+		float window_time = 1000.0f; //
+		float window_current_time = 0.f;
 
 		bool primary_move_flag = false;
 		bool secondary_move_flag = false;
@@ -27,6 +30,6 @@ namespace components {
 
 		melee_state state = MELEE_FREE; 
 
-		std::vector<components::transform> offset_positions;
+		std::vector<components::transform> offset_positions[4];
 	};
 }

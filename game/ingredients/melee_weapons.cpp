@@ -26,30 +26,54 @@ namespace prefabs {
 		item.space_occupied_per_charge = to_space_units("2.5");
 
 		auto& melee = *machete += components::melee();
-		melee.swing_cooldown_ms = 50.f;
-		melee.swing_duration_ms = 200.f;
-		melee.swing_acceleration = 5.f;
-		//std::vector<vec2> circle = generate_circle_points(50, 90, 0, 50);
-		//double angle = 0;
-		//for (int i = 0;i < circle.size();++i) {
-		//	//circle[i].y -= 100;
-		//	components::transform current;
-		//	current.pos = circle[i];
-		//	current.rotation = angle;
-		//	melee.offset_positions.push_back(current);
-		//	angle += 4.5;
-		//}
 
-		melee.offset_positions = {
+		melee.swing_cooldown_ms[0] = 100.f;
+		melee.swing_duration_ms[0] = 400.f;
+		melee.swing_acceleration[0] = 5.f;
+
+		melee.swing_cooldown_ms[1] = 100.f;
+		melee.swing_duration_ms[1] = 600.f;
+		melee.swing_acceleration[1] = 4.f;
+
+		melee.swing_cooldown_ms[2] = 100.f;
+		melee.swing_duration_ms[2] = 400.f;
+		melee.swing_acceleration[2] = 5.f;
+
+		melee.swing_cooldown_ms[3] = 100.f;
+		melee.swing_duration_ms[3] = 400.f;
+		melee.swing_acceleration[3] = 5.f;
+
+		melee.swing_duration_ms[4] = -1.f;
+
+		std::vector<vec2> circle = generate_circle_points(100, 90, 0, 20);
+		double angle = -90;
+		for (int i = 0;i < circle.size();++i) {
+			circle[i].y -= 100;
+			components::transform current;
+			current.pos = circle[i];
+			current.rotation = angle;
+			melee.offset_positions[1].push_back(current);
+			angle += 4.5;
+		}
+
+		melee.offset_positions[0] = melee.offset_positions[1];
+		std::reverse(std::begin(melee.offset_positions[0]), std::end(melee.offset_positions[0]));
+
+		melee.offset_positions[2] = {
 			{ vec2(0, 0), 0 },
-			{ vec2(10, 0), -2 },
-			{ vec2(20, 0), -10 },
-			{ vec2(30, -10), -14 },
-			{ vec2(40, -20), -16 },
-			{ vec2(50, -25), -20 },
-			{ vec2(64, -34), -30 },
-			{ vec2(120, -54), -45 },
+			{ vec2(10, 0), 0 },
+			{ vec2(20, 0), 0 },
+			{ vec2(30, 0), 0 },
+			{ vec2(40, 0), 0 },
+			{ vec2(50, 0), 0 },
+			{ vec2(64, 0), 0 },
+			{ vec2(120, 0), 0 },
+			{ vec2(150, 0), 0 },
+			{ vec2(180, 0), 0 },
 		};
+
+		melee.offset_positions[3] = melee.offset_positions[2];
+		std::reverse(std::begin(melee.offset_positions[3]), std::end(melee.offset_positions[3]));
 
 		auto& damage = *machete += components::damage();
 		damage.destroy_upon_damage = false;

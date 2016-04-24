@@ -6,8 +6,11 @@
 using namespace augs;
 
 enum stage {
-	FIRST_STAGE,
-	SECOND_STAGE
+	FIRST_STAGE, 
+	SECOND_STAGE, 
+	THIRD_STAGE, 
+	FOURTH_STAGE, 
+	WINDOW_STAGE //During the window stage the player can perform the second swing or an other melee action.
 };
 
 class melee_system : public processing_system_templated<components::melee, components::damage> {
@@ -20,5 +23,5 @@ public:
 	components::melee_state secondary_action(double dt, augs::entity_id target, components::melee& melee_component, components::damage& damage);
 	components::melee_state tertiary_action(double dt, augs::entity_id target, components::melee& melee_component, components::damage& damage);
 private:
-	stage action_stage;
+	stage action_stage = FIRST_STAGE;
 };
