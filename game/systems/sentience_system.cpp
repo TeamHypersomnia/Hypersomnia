@@ -45,7 +45,7 @@ void sentience_system::apply_damage_and_initiate_deaths() {
 			}
 		}
 
-		if (aimpunch_subject.alive()) {
+		if (aimpunch_subject.alive() && d.amount > 0) {
 			auto* aimpunched_sentience = aimpunch_subject->find<components::sentience>();
 
 			if (aimpunched_sentience

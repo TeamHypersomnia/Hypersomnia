@@ -26,7 +26,8 @@ void damage_system::destroy_colliding_bullets_and_send_damage() {
 			if(!impact_velocity.non_zero())
 				impact_velocity = components::physics::get_owner_body_entity(it.collider)->get<components::physics>().velocity();
 
-			subject_of_impact.apply_force(vec2(impact_velocity).set_length(damage->impulse_upon_hit), it.point - subject_of_impact.get_mass_position());
+			if(damage->impulse_upon_hit > 0.f)
+				subject_of_impact.apply_force(vec2(impact_velocity).set_length(damage->impulse_upon_hit), it.point - subject_of_impact.get_mass_position());
 
 			messages::damage_message damage_msg;
 			damage_msg.inflictor = it.collider;

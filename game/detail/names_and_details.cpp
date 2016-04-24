@@ -19,6 +19,11 @@ textual_description description_by_entity_name(entity_name n) {
 			L"Cyan charge",
 			L"Effective against personnel."
 		};
+	case entity_name::GREEN_CHARGE:
+		return{
+			L"Green charge",
+			L"Stabilizes functions of body."
+		};
 	case entity_name::MAGAZINE:
 		return{
 			L"Magazine",

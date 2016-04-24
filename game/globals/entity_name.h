@@ -4,6 +4,7 @@
 enum class entity_name {
 	ASSAULT_RIFLE,
 	MAGAZINE,
+	GREEN_CHARGE,
 	PINK_CHARGE,
 	CYAN_CHARGE,
 	TRUCK,

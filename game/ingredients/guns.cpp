@@ -189,7 +189,6 @@ namespace prefabs {
 			response.modifier.colorize = cyan;
 
 			auto& damage = *round_definition += components::damage();
-			damage.amount *= -1;
 			auto& trace = *round_definition += components::trace();
 			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
 			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
@@ -213,15 +212,67 @@ namespace prefabs {
 		return cyan_charge;
 	}
 
-	augs::entity_id create_sample_rifle(augs::world& world, vec2 pos) {
-		auto sample_rifle = world.create_entity("sample_rifle");
-		name_entity(sample_rifle, entity_name::ASSAULT_RIFLE);
+	augs::entity_id create_green_charge(augs::world& world, vec2 pos, int charges) {
+		auto green_charge = world.create_entity("green_charge");
+		auto round_definition = world.create_definition_entity("round_definition");
+		auto shell_definition = world.create_definition_entity("shell_definition");
+		name_entity(green_charge, entity_name::GREEN_CHARGE);
 
-		auto& sprite = ingredients::sprite(sample_rifle, pos, assets::texture_id::ASSAULT_RIFLE, augs::white, render_layer::DROPPED_ITEM);
-		auto& def = ingredients::crate_physics(sample_rifle);
-		ingredients::default_gun_container(sample_rifle);
+		{
+			ingredients::sprite(green_charge, pos, assets::texture_id::GREEN_CHARGE, augs::white, render_layer::DROPPED_ITEM);
+			ingredients::crate_physics(green_charge);
 
-		auto& gun = *sample_rifle += components::gun();
+			auto& item = ingredients::make_item(green_charge);
+			item.space_occupied_per_charge = to_space_units("0.01");
+			item.categories_for_slot_compatibility = item_category::SHOT_CHARGE;
+			item.charges = charges;
+			item.stackable = true;
+		}
+
+		{
+			auto& s = ingredients::sprite(round_definition, pos, assets::texture_id::ROUND_TRACE, augs::green, render_layer::FLYING_BULLETS);
+			s.size *= vec2(2, 0.5);
+			auto& def = ingredients::bullet_round_physics(round_definition);
+
+			auto& response = *round_definition += components::particle_effect_response { assets::particle_effect_response_id::ELECTRIC_CHARGE_RESPONSE };
+			response.modifier.colorize = green;
+
+			auto& damage = *round_definition += components::damage();
+			damage.amount *= -1;
+			damage.impulse_upon_hit = 0.f;
+			damage.recoil_multiplier = 0.1f;
+			auto& trace = *round_definition += components::trace();
+			trace.max_multiplier_x = std::make_pair(0.0f, 3.5f);
+			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
+			trace.lengthening_duration_ms = std::make_pair(200.f, 250.f);
+		}
+
+		{
+			ingredients::sprite(shell_definition, pos, assets::texture_id::GREEN_SHELL, augs::white, render_layer::FLYING_BULLETS);
+			auto& def = ingredients::crate_physics(shell_definition);
+			def.fixtures[0].restitution = 1.4;
+			def.fixtures[0].density = 0.001f;
+			def.fixtures[0].filter = filters::shell();
+
+			auto& response = *shell_definition += components::particle_effect_response{ assets::particle_effect_response_id::SHELL_RESPONSE };
+			response.modifier.colorize = green;
+		}
+
+		green_charge->map_sub_definition(sub_definition_name::BULLET_ROUND, round_definition);
+		green_charge->map_sub_definition(sub_definition_name::BULLET_SHELL, shell_definition);
+
+		return green_charge;
+	}
+
+	augs::entity_id create_sample_rifle(augs::world& world, vec2 pos, augs::entity_id load_mag) {
+		auto weapon = world.create_entity("sample_rifle");
+		name_entity(weapon, entity_name::ASSAULT_RIFLE);
+
+		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::ASSAULT_RIFLE, augs::white, render_layer::DROPPED_ITEM);
+		auto& def = ingredients::crate_physics(weapon);
+		ingredients::default_gun_container(weapon);
+
+		auto& gun = *weapon += components::gun();
 
 		gun.action_mode = components::gun::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(4000, 4000);
@@ -268,12 +319,26 @@ namespace prefabs {
 			{ vec2().set_from_degrees(20) },
 			{ vec2().set_from_degrees(-40) },
 		};
-		
 
-		return sample_rifle;
+		if (load_mag.alive()) {
+			messages::item_slot_transfer_request r;
+
+			r.item = load_mag;
+			r.target_slot = weapon[slot_function::GUN_DETACHABLE_MAGAZINE];
+
+			world.post_message(r);
+
+			r.item = load_mag[slot_function::ITEM_DEPOSIT]->items_inside[0];
+			r.specified_quantity = 1;
+			r.target_slot = weapon[slot_function::GUN_CHAMBER];
+
+			world.post_message(r);
+		}
+
+		return weapon;
 	}
 
-	augs::entity_id create_submachine(augs::world& world, vec2 pos) {
+	augs::entity_id create_submachine(augs::world& world, vec2 pos, augs::entity_id load_mag) {
 		auto weapon = world.create_entity("submachine");
 		name_entity(weapon, entity_name::SUBMACHINE);
 
@@ -330,10 +395,25 @@ namespace prefabs {
 
 		gun.recoil.scale = 30.0;
 
+		if (load_mag.alive()) {
+			messages::item_slot_transfer_request r;
+
+			r.item = load_mag;
+			r.target_slot = weapon[slot_function::GUN_DETACHABLE_MAGAZINE];
+
+			world.post_message(r);
+
+			r.item = load_mag[slot_function::ITEM_DEPOSIT]->items_inside[0];
+			r.specified_quantity = 1;
+			r.target_slot = weapon[slot_function::GUN_CHAMBER];
+
+			world.post_message(r);
+		}
+
 		return weapon;
 	}
 
-	augs::entity_id create_pistol(augs::world& world, vec2 pos) {
+	augs::entity_id create_pistol(augs::world& world, vec2 pos, augs::entity_id load_mag) {
 		auto weapon = world.create_entity("pistol");
 		name_entity(weapon, entity_name::PISTOL);
 
@@ -388,8 +468,22 @@ namespace prefabs {
 			{ vec2().set_from_degrees(-40) },
 		};
 
-
 		gun.recoil.scale = 30.0;
+
+		if (load_mag.alive()) {
+			messages::item_slot_transfer_request r;
+
+			r.item = load_mag;
+			r.target_slot = weapon[slot_function::GUN_DETACHABLE_MAGAZINE];
+
+			world.post_message(r);
+
+			r.item = load_mag[slot_function::ITEM_DEPOSIT]->items_inside[0];
+			r.specified_quantity = 1;
+			r.target_slot = weapon[slot_function::GUN_CHAMBER];
+
+			world.post_message(r);
+		}
 
 		return weapon;
 	}

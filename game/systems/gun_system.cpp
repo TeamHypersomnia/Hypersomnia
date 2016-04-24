@@ -97,6 +97,8 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 				else
 					bullet_entities.push_back(item_in_chamber);
 
+				float total_recoil_multiplier = 1.f;
+
 				for(auto& catridge_or_pellet_stack : bullet_entities) {
 					int charges = catridge_or_pellet_stack->get<components::item>().charges;
 
@@ -106,8 +108,10 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 					while (charges--) {
 						{
 							auto round_entity = parent_world.create_entity_from_definition(catridge_or_pellet_stack[sub_definition_name::BULLET_ROUND]);
-							round_entity->get<components::damage>().amount *= gun.damage_multiplier;
-							round_entity->get<components::damage>().sender = it;
+							auto& damage = round_entity->get<components::damage>();
+							damage.amount *= gun.damage_multiplier;
+							damage.sender = it;
+							total_recoil_multiplier *= damage.recoil_multiplier;
 
 							auto& physics_definition = round_entity->get<components::physics_definition>();
 							
@@ -151,11 +155,13 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 					parent_world.post_message(messages::destroy_message(catridge_or_pellet_stack));
 				}
 
-				auto owning_capability = get_owning_transfer_capability(it);
-				auto owning_crosshair_recoil = owning_capability[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
-				
-				auto& recoil_physics = owning_crosshair_recoil->get<components::physics>();
-				recoil_physics.apply_impulse(gun.recoil.shoot_and_get_offset().rotate(barrel_transform.rotation, vec2()));
+				if (total_recoil_multiplier > 0.f) {
+					auto owning_capability = get_owning_transfer_capability(it);
+					auto owning_crosshair_recoil = owning_capability[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
+
+					auto& recoil_physics = owning_crosshair_recoil->get<components::physics>();
+					recoil_physics.apply_impulse(total_recoil_multiplier * gun.recoil.shoot_and_get_offset().rotate(barrel_transform.rotation, vec2()));
+				}
 
 				//	//if (owning_capability.alive())
 				//	//	gun.shake_camera(owning_capability[associated_entity_name::WATCHING_CAMERA], gun_transform.rotation);

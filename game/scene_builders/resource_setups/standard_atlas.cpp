@@ -61,6 +61,8 @@ namespace resource_setups {
 		resource_manager.create(assets::texture_id::PINK_SHELL, L"hypersomnia/gfx/pink_shell.png");
 		resource_manager.create(assets::texture_id::CYAN_CHARGE, L"hypersomnia/gfx/cyan_charge.png");
 		resource_manager.create(assets::texture_id::CYAN_SHELL, L"hypersomnia/gfx/cyan_shell.png");
+		resource_manager.create(assets::texture_id::GREEN_CHARGE, L"hypersomnia/gfx/green_charge.png");
+		resource_manager.create(assets::texture_id::GREEN_SHELL, L"hypersomnia/gfx/green_shell.png");
 
 		auto& backpack_gui = resource_manager.create(assets::texture_id::BACKPACK, L"hypersomnia/gfx/backpack.png").gui_sprite_def;
 		backpack_gui.rotation_offset = -90.f;

@@ -27,7 +27,8 @@ namespace components {
 
 		float max_distance = 0.f;
 		float max_lifetime_ms = 2000.f;
-		
+		float recoil_multiplier = 1.f;
+
 		float lifetime_ms = 0.f;
 
 		vec2 saved_point_of_impact_before_death;
