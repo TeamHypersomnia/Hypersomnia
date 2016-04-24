@@ -32,7 +32,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 			state.renderable_transform.rotation = 0;
 
 			components::sprite circle_hud;
-			circle_hud.set(assets::HUD_CIRCULAR_BAR_MEDIUM, cyan);
+			circle_hud.set(assets::HUD_CIRCULAR_BAR_MEDIUM, green);
 			circle_hud.color.a = 150;
 			circle_hud.draw(state);
 			

@@ -110,10 +110,10 @@ namespace scene_builders {
 		prefabs::create_pistol(world, vec2(300, -500 + 50));
 		auto submachine = prefabs::create_submachine(world, vec2(500, -500 + 50));
 
-		auto mag = prefabs::create_sample_magazine(world, vec2(100, -650), "100000");
+		auto mag = prefabs::create_sample_magazine(world, vec2(100, -650), "10");
 		mag[slot_function::ITEM_DEPOSIT]->items_inside[0]->get<components::item>().charges = 1000;
 
-		auto mag2 = prefabs::create_sample_magazine(world, vec2(100, -650), "100000");
+		auto mag2 = prefabs::create_sample_magazine(world, vec2(100, -650), "10");
 		mag2[slot_function::ITEM_DEPOSIT]->items_inside[0]->get<components::item>().charges = 1000;
 		
 		prefabs::create_sample_magazine(world, vec2(100 - 50, -650));
@@ -128,7 +128,7 @@ namespace scene_builders {
 		prefabs::create_cyan_urban_machete(world, vec2(100, 100));
 		auto second_machete = prefabs::create_cyan_urban_machete(world, vec2(0, 0));
 
-		auto pink_mag = prefabs::create_sample_magazine(world, vec2(100 - 50, -650), "100000", prefabs::create_pink_charge(world, vec2(0, 0), 500));
+		auto pink_mag = prefabs::create_sample_magazine(world, vec2(100 - 50, -650), "10", prefabs::create_pink_charge(world, vec2(0, 0), 500));
 
 		auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 		prefabs::create_sample_backpack(world, vec2(200, -750));
