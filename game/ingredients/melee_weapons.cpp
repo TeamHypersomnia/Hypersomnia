@@ -60,16 +60,20 @@ namespace prefabs {
 		std::reverse(std::begin(melee.offset_positions[0]), std::end(melee.offset_positions[0]));
 
 		melee.offset_positions[2] = {
-			{ vec2(0, 0), 0 },
-			{ vec2(10, 0), 0 },
-			{ vec2(20, 0), 0 },
-			{ vec2(30, 0), 0 },
-			{ vec2(40, 0), 0 },
-			{ vec2(50, 0), 0 },
-			{ vec2(64, 0), 0 },
-			{ vec2(120, 0), 0 },
-			{ vec2(150, 0), 0 },
-			{ vec2(180, 0), 0 },
+			{ vec2(-20, 0) + vec2(0, 0), 0 },
+			{ vec2(-20, 0) + vec2(0, 10), 10 },
+			{ vec2(-20, 0) + vec2(10, 30), 30 },
+			{ vec2(-20, 0) + vec2(-30, 50), 60 },
+			{ vec2(-20, 0) + vec2(10, -10), 0 },
+			{ vec2(-20, 0) + vec2(15, -25), 0 },
+			{ vec2(-20, 0) + vec2(20, -45), 0 },
+			{ vec2(-20, 0) + vec2(10, -60), 0 },
+			{ vec2(-20, 0) + vec2(-10, -70), -30 },
+			{ vec2(-20, 0) + vec2(-20, -75), -60 },
+			{ vec2(-20, 0) + vec2(-30, -80), -70 },
+			{ vec2(-20, 0) + vec2(-40, -97), -90 },
+			{ vec2(-20, 0) + vec2(-50, -104), -100 },
+			{ vec2(-20, 0) + vec2(-80, -119), -120 },
 		};
 
 		melee.offset_positions[3] = melee.offset_positions[2];
