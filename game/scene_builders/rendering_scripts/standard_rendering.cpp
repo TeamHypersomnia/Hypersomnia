@@ -19,15 +19,17 @@ namespace rendering_scripts {
 		auto& render = world.get_system<render_system>();
 		auto& gui = world.get_system<gui_system>();
 
+		auto matrix = augs::orthographic_projection<float>(0, state.visible_world_area.x, state.visible_world_area.y, 0, 0, 1);
+
 		auto& default_shader = *resource_manager.find(assets::program_id::DEFAULT);
-
-		default_shader.use();
+		auto& circular_bars_shader = *resource_manager.find(assets::program_id::CIRCULAR_BARS);
 		
-		auto projection_matrix_uniform = glGetUniformLocation(default_shader.id, "projection_matrix");
-
-		glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, 
-			augs::orthographic_projection<float>(0, state.visible_world_area.x, state.visible_world_area.y, 0, 0, 1).data());
-
+		default_shader.use();
+		{
+			auto projection_matrix_uniform = glGetUniformLocation(default_shader.id, "projection_matrix");
+			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
+		}
+		
 		render.draw_all_visible_entities(state, mask);
 
 		state.output->call_triangles();
@@ -40,8 +42,26 @@ namespace rendering_scripts {
 			render.targets, 
 			render.view_interpolation_ratio());
 
+		circular_bars_shader.use();
+		{
+			auto projection_matrix_uniform = glGetUniformLocation(circular_bars_shader.id, "projection_matrix");
+			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
+			
+			vec2 upper(0.0f, 0.0f);
+			vec2 lower(1.0f, 1.0f);
+			(*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_uv(upper);
+			(*assets::texture_id::HUD_CIRCULAR_BAR_MEDIUM).get_uv(lower);
+			auto center = (upper + lower) / 2;
+
+			glUniform2f(glGetUniformLocation(circular_bars_shader.id, "texture_center"), center.x, center.y);
+		}
+
 		gui.hud.draw_circular_bars(msg);
-		state.output->clear_special_vertex_data();
+
+		state.output->call_triangles();
+		state.output->clear_triangles();
+		
+		default_shader.use();
 
 		gui.hud.draw_circular_bars_information(msg);
 

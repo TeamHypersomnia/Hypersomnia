@@ -440,3 +440,10 @@ namespace augs {
 		vec2t& operator/=(int d) { x /= d; y /= d; return *this; }
 	};
 
+
+namespace augs {
+	template<class T>
+	T normalize_degrees(T degrees) {
+		return vec2t<T>().set_from_degrees(degrees).degrees();
+	}
+}

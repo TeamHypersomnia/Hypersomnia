@@ -29,7 +29,7 @@ namespace augs {
 		//v.shrink_to_fit();
 	}
 
-	void image::paint_circle_midpoint(int radius, int border_width, augs::rgba filling, bool constrain_angle, float angle_start, float angle_end, bool scale_alpha) {
+	void image::paint_circle_midpoint(int radius, int border_width, augs::rgba filling, bool scale_alpha, bool constrain_angle, vec2 angle_start, vec2 angle_end) {
 		auto side = radius * 2 + 1;
 
 		image new_surface;
@@ -44,12 +44,12 @@ namespace augs {
 			int x_center = x - size.w / 2;
 			int y_center = y - size.h / 2;
 
-			auto angle = vec2(x_center, y_center).degrees();
+			auto angle = vec2(x_center, y_center);// .degrees();
 
-			if (!constrain_angle || (angle >= angle_start && angle <= angle_end)) {
+			if (!constrain_angle || (angle_start.cross(angle) >= 0.f && angle_end.cross(angle) <= 0.f)) {
 				auto col = filling;
-				if (scale_alpha)
-					col.a = (angle - angle_start) / (angle_end - angle_start) * 255;
+				//if (scale_alpha)
+				//	col.a = (angle - angle_start) / (angle_end - angle_start) * 255;
 
 				surface.pixel(x, y) = col;
 			}

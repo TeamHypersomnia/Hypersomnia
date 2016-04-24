@@ -8,7 +8,17 @@ namespace components {
 		bool enable_consciousness = false;
 
 		float health = 100.f;
+		float maximum_health = 100.f;
 		float consciousness = 100.f;
+		float maximum_consciousness = 100.f;
+
+		float health_ratio() const {
+			return health / maximum_health;
+		}
+
+		float consciousness_ratio() const {
+			return consciousness / maximum_consciousness;
+		}
 
 		recoil_player aimpunch;
 	};

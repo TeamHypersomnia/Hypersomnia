@@ -33,7 +33,7 @@ namespace augs {
 
 	struct special {
 		vec2 v1;
-		float v2;
+		// float v2;
 	};
 
 	typedef std::vector<vertex_triangle> vertex_triangle_buffer;
