@@ -25,13 +25,20 @@ void sentience_system::apply_damage_and_initiate_deaths() {
 				if (sentience->health < 0) {
 					sentience->health = 0;
 				}
+				if (sentience->health > sentience->maximum_health) {
+					sentience->health = sentience->maximum_health;
+				}
 			}
 
 			if (sentience->enable_consciousness) {
 				sentience->consciousness -= d.amount;
 
 				if (sentience->consciousness < 0) {
-					sentience->health = 0;
+					sentience->consciousness = 0;
+				}
+
+				if (sentience->consciousness > sentience->maximum_consciousness) {
+					sentience->consciousness = sentience->maximum_consciousness;
 				}
 				
 				sentience->consciousness = std::min(sentience->health, sentience->consciousness);
