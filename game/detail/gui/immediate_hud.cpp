@@ -6,6 +6,7 @@
 #include "game/components/sprite_component.h"
 #include "game/components/camera_component.h"
 #include "game/components/sentience_component.h"
+#include "game/components/render_component.h"
 
 #include "game/detail/inventory_utils.h"
 #include "game/detail/inventory_slot.h"
@@ -37,6 +38,19 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 			//auto hsv_r = rgba(225, 50, 56, 255).get_hsv();
 			auto hsv_r = red.get_hsv();
 			auto hr = sentience->health_ratio();
+
+			auto* render = v->find<components::render>();
+			
+			if (render) {
+				//render->partial_overlay_color = red;
+				//render->partial_overlay_height_ratio = 1 - hr;
+				if (hr < 1.f) {
+					render->draw_border = true;
+					render->border_color = rgba(255, 0, 0, (1 - hr) * 255);
+				}
+				else
+					render->draw_border = false;
+			}
 
 			hsv_c.h = augs::interp(hsv_c.h, hsv_r.h, (1 - hr)*(1 - hr)/*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*/);
 			hsv_c.s = augs::interp(hsv_c.s, hsv_r.s, (1 - hr)*(1 - hr)/*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*/);

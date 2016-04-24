@@ -31,6 +31,8 @@ namespace shared {
 		bool screen_space_mode = false;
 		bool position_is_left_top_corner = false;
 
+		augs::rgba colorize = augs::white;
+
 		void setup_camera_state(state_for_drawing_camera b) {
 			state_for_drawing_camera::operator=(b);
 		}

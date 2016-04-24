@@ -276,6 +276,24 @@ void render_system::draw_layer(state_for_drawing_camera in_camera, int layer) {
 			auto* tile_layer = e->find<components::tile_layer>();
 			auto* particle_group = e->find<components::particle_group>();
 
+			if (render.draw_border) {
+				static vec2i offsets[4] = { vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1) };
+				auto original_pos = in.renderable_transform.pos;
+
+				in.colorize = render.border_color;
+
+				for (auto& o : offsets) {
+					in.renderable_transform.pos = original_pos + o;
+
+					if (polygon) polygon->draw(in);
+					if (sprite) sprite->draw(in);
+					if (particle_group) particle_group->draw(in);
+				}
+
+				in.renderable_transform.pos = original_pos;
+				in.colorize = white;
+			}
+
 			if (polygon) polygon->draw(in);
 			if (sprite) sprite->draw(in);
 			if (tile_layer) tile_layer->draw(in);

@@ -3,6 +3,7 @@
 
 #include "math/vec2.h"
 #include "../globals/layers.h"
+#include "graphics/pixel.h"
 
 namespace components {
 	struct render {
@@ -26,6 +27,12 @@ namespace components {
 		unsigned mask = mask_type::WORLD;
 
 		bool absolute_transform = false;
+
+		bool draw_border = false;
+		augs::rgba border_color;
+
+		float partial_overlay_height_ratio = 0.f;
+		augs::rgba partial_overlay_color;
 
 		int rendering_proxy = -1;
 
