@@ -58,7 +58,7 @@ namespace prefabs {
 			car.braking_angular_damping = 16.f;
 
 			sprite.set(assets::texture_id::MOTORCYCLE_FRONT);
-			render.layer = render_layer::DYNAMIC_BODY;
+			render.layer = render_layer::CAR_WHEEL;
 
 			auto& body = physics_definition.body;
 			body.linear_damping = 0.4f;
@@ -82,7 +82,7 @@ namespace prefabs {
 			auto& transform = *interior += spawn_transform;
 			auto& physics_definition = *interior += components::physics_definition();
 
-			render.layer = render_layer::DYNAMIC_BODY;
+			render.layer = render_layer::CAR_WHEEL;
 
 			sprite.set(assets::texture_id::MOTORCYCLE_INSIDE);
 
@@ -110,6 +110,7 @@ namespace prefabs {
 
 			sprite.set(assets::texture_id::CAR_INSIDE, augs::rgba(255, 0, 0, 255));
 			sprite.size.set(20, 10);
+			sprite.color.a = 0;
 
 			auto& info = physics_definition.new_fixture(front);
 			info.from_renderable(left_wheel);
