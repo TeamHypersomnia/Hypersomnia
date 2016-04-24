@@ -215,13 +215,7 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 				}
 
 				if (printing_charge_count) {
-					int charges = 0;
-
-					for (auto& i : item[slot_function::ITEM_DEPOSIT]->items_inside) {
-						charges += i->get<components::item>().charges;
-					}
-
-					bottom_number_val = charges;
+					bottom_number_val = count_charges_in_deposit(item);
 				}
 				else {
 					bottom_number_val = item[slot_function::ITEM_DEPOSIT].calculate_free_space_with_parent_containers() / long double(SPACE_ATOMS_PER_UNIT);

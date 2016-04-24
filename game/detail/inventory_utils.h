@@ -24,3 +24,5 @@ bool can_merge_entities(augs::entity_id, augs::entity_id);
 
 unsigned to_space_units(std::string s);
 std::wstring format_space_units(unsigned);
+
+int count_charges_in_deposit(augs::entity_id item);

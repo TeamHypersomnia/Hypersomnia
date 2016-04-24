@@ -117,7 +117,7 @@ namespace scene_builders {
 		mag2[slot_function::ITEM_DEPOSIT]->items_inside[0]->get<components::item>().charges = 1000;
 		
 		prefabs::create_sample_magazine(world, vec2(100 - 50, -650));
-		prefabs::create_sample_magazine(world, vec2(100 - 100, -650));
+		prefabs::create_sample_magazine(world, vec2(100 - 100, -650), "0.15");
 		//prefabs::create_pink_charge(world, vec2(100, 100));
 		//prefabs::create_pink_charge(world, vec2(100, -400));
 		//prefabs::create_pink_charge(world, vec2(150, -400));

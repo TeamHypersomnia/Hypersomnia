@@ -114,6 +114,9 @@ namespace ingredients {
 		sentience.aimpunch.scale = 150.0;
 		sentience.aimpunch.single_cooldown_duration_ms= 200.0;
 
+		sentience.health = 300.0;
+		sentience.maximum_health = 300.0;
+
 		e->disable(force_joint);
 
 		detector.spam_trigger_requests_when_detection_intented = true;
