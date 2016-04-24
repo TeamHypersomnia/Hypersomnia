@@ -19,6 +19,7 @@ namespace augs {
 		rgba& operator*=(rgba b);
 
 		bool operator==(const rgba& b) const;
+		bool operator!=(const rgba& b) const;
 		hsv get_hsv() const;
 		std::array<rgba_channel, 3>& rgb();
 		const std::array<rgba_channel, 3>& rgb() const;

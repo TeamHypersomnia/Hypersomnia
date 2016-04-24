@@ -135,6 +135,10 @@ namespace augs {
 		return r == v.r && g == v.g && b == v.b && a == v.a;
 	}
 
+	bool rgba::operator!=(const rgba& v) const {
+		return !operator==(v);
+	}
+
 	hsv rgba::get_hsv() const {
 		auto res = rgb2hsv({ r / 255.0, g / 255.0, b / 255.0 });
 		return{ res.h / 360.0, res.s, res.v };
