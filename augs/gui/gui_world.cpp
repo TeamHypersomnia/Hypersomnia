@@ -107,6 +107,9 @@ namespace augs {
 					if (argument == L"vsgreen") {
 						newstyle.color = vsgreen;
 					}
+					if (argument == L"green") {
+						newstyle.color = green;
+					}
 					if (argument == L"vsdarkgray") {
 						newstyle.color = vsdarkgray;
 					}

@@ -51,7 +51,7 @@ std::wstring describe_properties(augs::entity_id id) {
 		if(damage->amount > 0)
 			result << L"Base damage: [color=vscyan]" << damage->amount << L"[/color]\n";
 		else if(damage->amount < 0)
-			result << L"Restores health: [color=vscyan]" << damage->amount << L"[/color]\n";
+			result << L"Restores health: [color=vscyan]" << -damage->amount << L"[/color]\n";
 
 		if (damage->constrain_distance)
 			result << L"Max distance: [color=vscyan]" << damage->max_distance << L"[/color]\n";
