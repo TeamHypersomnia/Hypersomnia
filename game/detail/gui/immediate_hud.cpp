@@ -34,15 +34,17 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 			components::sprite circle_hud;
 			circle_hud.set(assets::HUD_CIRCULAR_BAR_MEDIUM, cyan);
 			auto hsv_c = cyan.get_hsv();
-			auto hsv_r = rgba(225, 50, 56, 255).get_hsv();
+			//auto hsv_r = rgba(225, 50, 56, 255).get_hsv();
+			auto hsv_r = red.get_hsv();
 			auto hr = sentience->health_ratio();
 
-			hsv_c.h = augs::interp(hsv_c.h, hsv_r.h, (1 - hr)/*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*/);
-			hsv_c.s = augs::interp(hsv_c.s, hsv_r.s, (1 - hr)/*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*/);
-			hsv_c.v = augs::interp(hsv_c.v, hsv_r.v, (1 - hr)/*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*/);
+			hsv_c.h = augs::interp(hsv_c.h, hsv_r.h, (1 - hr)*(1 - hr)/*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*/);
+			hsv_c.s = augs::interp(hsv_c.s, hsv_r.s, (1 - hr)*(1 - hr)/*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*/);
+			hsv_c.v = augs::interp(hsv_c.v, hsv_r.v, (1 - hr)*(1 - hr)/*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*/);
 			circle_hud.color.set_hsv(hsv_c);
 			circle_hud.color.a = 220;
-
+			circle_hud.color.b = std::min(circle_hud.color.b + 120, 255);
+			circle_hud.color.g = std::min(int(circle_hud.color.g), circle_hud.color.b+40);
 			circle_hud.draw(state);
 			
 			augs::special special_vertex_data;
