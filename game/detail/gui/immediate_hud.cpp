@@ -44,7 +44,9 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 			circle_hud.color.set_hsv(hsv_c);
 			circle_hud.color.a = 220;
 			circle_hud.color.b = std::min(circle_hud.color.b + 120, 255);
-			circle_hud.color.g = std::min(int(circle_hud.color.g), circle_hud.color.b+40);
+			auto last_g = circle_hud.color.g;
+			circle_hud.color.g = std::min(int(circle_hud.color.g), circle_hud.color.b+45);
+			circle_hud.color.r = std::min(255, circle_hud.color.r + last_g - circle_hud.color.g + 10);
 			circle_hud.draw(state);
 			
 			augs::special special_vertex_data;
