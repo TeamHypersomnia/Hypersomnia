@@ -79,6 +79,11 @@ namespace prefabs {
 		melee.offset_positions[3] = melee.offset_positions[2];
 		std::reverse(std::begin(melee.offset_positions[3]), std::end(melee.offset_positions[3]));
 
+		melee.offset_positions[0][0] = vec2(-20, 0);
+		melee.offset_positions[1][0] = vec2(-20, 0);
+		melee.offset_positions[2][0] = vec2(-20, 0);
+		melee.offset_positions[3][0] = vec2(-20, 0);
+
 		auto& damage = *machete += components::damage();
 		damage.destroy_upon_damage = false;
 		damage.damage_upon_collision = false;
