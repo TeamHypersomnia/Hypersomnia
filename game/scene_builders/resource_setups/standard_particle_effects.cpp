@@ -97,6 +97,41 @@ namespace resource_setups {
 			em.initial_rotation_variation = 0;
 
 			effect.push_back(em);
+		} 
+		
+		{
+			auto& effect = resource_manager.create(assets::particle_effect_id::WANDERING_PIXELS_SPREAD);
+
+			resources::emission em;
+			em.spread_degrees = std::make_pair(0, 10);
+			em.particles_per_burst = std::make_pair(30, 40);
+			em.type = resources::emission::BURST;
+			em.velocity = std::make_pair(350, 550);
+			em.angular_velocity = std::make_pair(0, 0);
+			em.particle_lifetime_ms = std::make_pair(200, 400);
+
+			for (int i = 0; i < 5; ++i) {
+				resources::particle particle_template;
+
+				particle_template.angular_damping = 0;
+				particle_template.linear_damping = 1000;
+				particle_template.should_disappear = true;
+				particle_template.face.set(assets::texture_id(assets::BLANK), augs::rgba(255, 255, 255, 255));
+				particle_template.face.size.set(1, 1);
+				particle_template.alpha_levels = 1;
+
+				em.particle_templates.push_back(particle_template);
+			}
+
+			em.size_multiplier = std::make_pair(1, 1.5);
+			em.particle_render_template.layer = render_layer::EFFECTS;
+			em.initial_rotation_variation = 0;
+
+			effect.push_back(em);
+			auto wandering = (*assets::particle_effect_id::WANDERING_PIXELS_DIRECTED)[0];
+			wandering.spread_degrees = std::make_pair(10, 30);
+			wandering.velocity = std::make_pair(160, 330);
+			effect.push_back(wandering);
 		}
 
 		{
@@ -129,6 +164,14 @@ namespace resource_setups {
 			em.initial_rotation_variation = 0;
 
 			effect.push_back(em);
+		}
+
+		{
+			auto& response = resource_manager.create(assets::particle_effect_response_id::HEALING_CHARGE_RESPONSE);
+
+			response[particle_effect_response_type::BARREL_LEAVE_EXPLOSION] = assets::particle_effect_id::WANDERING_PIXELS_SPREAD;
+			response[particle_effect_response_type::DESTRUCTION_EXPLOSION] = assets::particle_effect_id::WANDERING_PIXELS_SPREAD;
+			response[particle_effect_response_type::PROJECTILE_TRACE] = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
 		}
 
 		{

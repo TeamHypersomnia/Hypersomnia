@@ -84,7 +84,12 @@ void particles_system::game_responses_to_particle_effects() {
 		messages::create_particle_effect burst;
 		burst.subject = d.subject;
 		burst.transform.pos = d.point_of_impact;
-		burst.transform.rotation = (-d.impact_velocity).degrees();
+		
+		if(d.amount > 0)
+			burst.transform.rotation = (-d.impact_velocity).degrees();
+		else
+			burst.transform.rotation = (d.impact_velocity).degrees();
+
 		burst.effect = response_map.at(particle_effect_response_type::DESTRUCTION_EXPLOSION);
 		burst.modifier = response.modifier;
 

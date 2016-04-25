@@ -234,7 +234,7 @@ namespace prefabs {
 			s.size *= vec2(2, 0.5);
 			auto& def = ingredients::bullet_round_physics(round_definition);
 
-			auto& response = *round_definition += components::particle_effect_response { assets::particle_effect_response_id::ELECTRIC_CHARGE_RESPONSE };
+			auto& response = *round_definition += components::particle_effect_response { assets::particle_effect_response_id::HEALING_CHARGE_RESPONSE };
 			response.modifier.colorize = green;
 
 			auto& damage = *round_definition += components::damage();
