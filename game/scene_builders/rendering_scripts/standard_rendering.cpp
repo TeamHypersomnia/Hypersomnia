@@ -22,6 +22,7 @@ namespace rendering_scripts {
 		auto matrix = augs::orthographic_projection<float>(0, state.visible_world_area.x, state.visible_world_area.y, 0, 0, 1);
 
 		auto& default_shader = *resource_manager.find(assets::program_id::DEFAULT);
+		auto& default_highlight_shader = *resource_manager.find(assets::program_id::DEFAULT_HIGHLIGHT);
 		auto& circular_bars_shader = *resource_manager.find(assets::program_id::CIRCULAR_BARS);
 		
 		default_shader.use();
@@ -30,7 +31,31 @@ namespace rendering_scripts {
 			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
 		}
 		
-		render.draw_all_visible_entities(state, mask);
+		render.generate_layers_from_visible_entities(mask);
+
+		for (int i = render_layer::UNDER_GROUND; i > render_layer::DYNAMIC_BODY; --i) {
+			render.draw_layer(state, i);
+		}
+
+		state.output->call_triangles();
+		state.output->clear_triangles();
+
+		default_highlight_shader.use();
+		{
+			auto projection_matrix_uniform = glGetUniformLocation(default_highlight_shader.id, "projection_matrix");
+			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
+		}
+		
+		render.draw_layer(state, render_layer::DYNAMIC_BODY, true);
+
+		state.output->call_triangles();
+		state.output->clear_triangles();
+
+		default_shader.use();
+
+		for (int i = render_layer::DYNAMIC_BODY; i >= 0; --i) {
+			render.draw_layer(state, i);
+		}
 
 		state.output->call_triangles();
 		state.output->clear_triangles();

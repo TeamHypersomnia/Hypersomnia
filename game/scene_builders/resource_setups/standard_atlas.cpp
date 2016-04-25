@@ -103,7 +103,7 @@ namespace resource_setups {
 //		hud_circular_hud_medium.paint_circle_midpoint(50, 1, augs::white, true, -45, 45, false);
 //		hud_circular_hud_medium.paint_circle_midpoint(48, 1, augs::white, true, -45, 45, false);
 
-		hud_circular_hud_medium.save(L"saved.png");
+		//hud_circular_hud_medium.save(L"saved.png");
 		//hud_circular_hud_medium.paint_circle(48+5, 5);
 		//hud_circular_hud_medium.paint_circle_midpoint(40);
 

@@ -255,7 +255,7 @@ void render_system::restore_actual_transforms() {
 	}
 }
 
-void render_system::draw_layer(state_for_drawing_camera in_camera, int layer) {
+void render_system::draw_layer(state_for_drawing_camera in_camera, int layer, bool only_border_highlights) {
 	state_for_drawing_renderable in;
 	in.setup_camera_state(in_camera);
 
@@ -276,30 +276,37 @@ void render_system::draw_layer(state_for_drawing_camera in_camera, int layer) {
 			auto* tile_layer = e->find<components::tile_layer>();
 			auto* particle_group = e->find<components::particle_group>();
 
-			if (render.draw_border) {
-				static vec2i offsets[4] = { vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1) };
-				auto original_pos = in.renderable_transform.pos;
+			if (only_border_highlights) {
+				if (render.draw_border) {
+					static vec2i offsets[4] = {
+						vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1)
+						//vec2i(-1, -1), vec2i(1, 1), vec2i(-1, 1), vec2i(1, -1)
+					};
 
-				in.colorize = render.border_color;
+					auto original_pos = in.renderable_transform.pos;
 
-				for (auto& o : offsets) {
-					in.renderable_transform.pos = original_pos + o;
+					in.colorize = render.border_color;
 
-					if (polygon) polygon->draw(in);
-					if (sprite) sprite->draw(in);
-					if (particle_group) particle_group->draw(in);
+					for (auto& o : offsets) {
+						in.renderable_transform.pos = original_pos + o;
+
+						if (polygon) polygon->draw(in);
+						if (sprite) sprite->draw(in);
+						if (particle_group) particle_group->draw(in);
+					}
+
+					in.renderable_transform.pos = original_pos;
+					in.colorize = white;
 				}
-
-				in.renderable_transform.pos = original_pos;
-				in.colorize = white;
 			}
+			else {
+				if (polygon) polygon->draw(in);
+				if (sprite) sprite->draw(in);
+				if (tile_layer) tile_layer->draw(in);
+				if (particle_group) particle_group->draw(in);
 
-			if (polygon) polygon->draw(in);
-			if (sprite) sprite->draw(in);
-			if (tile_layer) tile_layer->draw(in);
-			if (particle_group) particle_group->draw(in);
-
-			render.last_visibility_index = current_visibility_index++;
+				render.last_visibility_index = current_visibility_index++;
+			}
 		}
 	}
 }

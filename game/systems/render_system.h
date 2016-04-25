@@ -44,7 +44,7 @@ public:
 	void restore_actual_transforms();
 
 	void generate_layers_from_visible_entities(int mask);
-	void draw_layer(shared::state_for_drawing_camera in, int layer);
+	void draw_layer(shared::state_for_drawing_camera in, int layer, bool only_border_highlights = false);
 	void draw_all_visible_entities(shared::state_for_drawing_camera in, int mask);
 
 	const std::vector<entity_id>& get_all_visible_entities() const;
