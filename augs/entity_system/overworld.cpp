@@ -25,7 +25,12 @@ namespace augs {
 		return delta_timer.fraction_of_time_until_the_next_logic_step();
 	}
 
+	double overworld::frame_timestamp_seconds() const {
+		return last_frame_timestamp_seconds;
+	}
+
 	void overworld::assign_frame_time_to_delta_for_drawing_time_systems() {
+		last_frame_timestamp_seconds = frame_timestamper.get<std::chrono::seconds>();
 		delta_ms = frame_timer.extract<std::chrono::milliseconds>() * delta_timer.get_stepping_speed_multiplier();
 	}
 

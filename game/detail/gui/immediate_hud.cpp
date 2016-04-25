@@ -23,6 +23,9 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 	auto camera = r.camera;
 	auto watched_character = camera->get<components::camera>().entity_to_chase;
 
+	int timestamp_ms = render.frame_timestamp_seconds() * 1000;
+	float time_pulse_ratio = (timestamp_ms % 500) / 500.f;
+
 	for (auto v : render.get_all_visible_entities()) {
 		auto* sentience = v->find<components::sentience>();
 
@@ -38,6 +41,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 			//auto hsv_r = rgba(225, 50, 56, 255).get_hsv();
 			auto hsv_r = red.get_hsv();
 			auto hr = sentience->health_ratio();
+			hr *= 1.f - (0.2f * time_pulse_ratio);
 
 			auto* render = v->find<components::render>();
 			
@@ -46,7 +50,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 				//render->partial_overlay_height_ratio = 1 - hr;
 				if (hr < 1.f) {
 					render->draw_border = true;
-					render->border_color = rgba(255, 0, 0, (1 - hr) * 255);
+					render->border_color = rgba(255, 0, 0, (1 - hr) *(1 - hr) *(1 - hr) *(1 - hr) * 255 * time_pulse_ratio);
 				}
 				else
 					render->draw_border = false;

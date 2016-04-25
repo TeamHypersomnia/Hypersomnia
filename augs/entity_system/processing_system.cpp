@@ -34,6 +34,10 @@ namespace augs {
 		return parent_overworld.delta_seconds();
 	}
 
+	double processing_system::frame_timestamp_seconds() const {
+		return parent_overworld.frame_timestamp_seconds();
+	}
+
 	double processing_system::delta_milliseconds() const {
 		return parent_overworld.delta_milliseconds();
 	}
