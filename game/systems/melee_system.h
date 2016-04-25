@@ -3,6 +3,8 @@
 #include "game/components/melee_component.h"
 #include "game/components/damage_component.h"
 
+#include "game/detail/combat/melee_animation.h"
+
 using namespace augs;
 
 enum stage {
@@ -22,6 +24,8 @@ public:
 	components::melee_state primary_action(double dt, augs::entity_id target, components::melee& melee_component, components::damage& damage);
 	components::melee_state secondary_action(double dt, augs::entity_id target, components::melee& melee_component, components::damage& damage);
 	components::melee_state tertiary_action(double dt, augs::entity_id target, components::melee& melee_component, components::damage& damage);
+
+	melee_animation animation;
 private:
 	stage action_stage = FIRST_STAGE;
 };

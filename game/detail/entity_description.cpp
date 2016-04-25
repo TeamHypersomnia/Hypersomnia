@@ -60,8 +60,8 @@ std::wstring describe_properties(augs::entity_id id) {
 	}
 
 	if (melee) {
-		result << L"Swing duration: [color=vscyan]" << melee->swing_duration_ms << L" ms[/color]\n";
-		result << L"Swing cooldown: [color=vscyan]" << melee->swing_cooldown_ms << L" ms[/color]\n";
+		result << L"Swing duration: [color=vscyan]" << melee->swings[0].duration_ms << L" ms[/color]\n";
+		result << L"Swing cooldown: [color=vscyan]" << melee->swings[0].cooldown_ms << L" ms[/color]\n";
 	}
 
 	if (id.has(slot_function::ITEM_DEPOSIT)) {

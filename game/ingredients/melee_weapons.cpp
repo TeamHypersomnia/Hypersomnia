@@ -27,23 +27,25 @@ namespace prefabs {
 
 		auto& melee = *machete += components::melee();
 
-		melee.swing_cooldown_ms[0] = 100.f;
-		melee.swing_duration_ms[0] = 400.f;
-		melee.swing_acceleration[0] = 5.f;
+		melee.swings[0].cooldown_ms = 100.f;
+		melee.swings[0].duration_ms = 600.f; 
+		melee.swings[0].acceleration = 5.f;
 
-		melee.swing_cooldown_ms[1] = 100.f;
-		melee.swing_duration_ms[1] = 600.f;
-		melee.swing_acceleration[1] = 4.f;
+		melee.swings[1].cooldown_ms = 100.f;
+		melee.swings[1].duration_ms = 600.f;
+		melee.swings[1].acceleration = 4.f;
 
-		melee.swing_cooldown_ms[2] = 100.f;
-		melee.swing_duration_ms[2] = 400.f;
-		melee.swing_acceleration[2] = 5.f;
+		melee.swings[2].cooldown_ms = 100.f;
+		melee.swings[2].duration_ms = 400.f;
+		melee.swings[2].acceleration = 5.f;
 
-		melee.swing_cooldown_ms[3] = 100.f;
-		melee.swing_duration_ms[3] = 400.f;
-		melee.swing_acceleration[3] = 5.f;
+		melee.swings[3].cooldown_ms = 100.f;
+		melee.swings[3].duration_ms = 400.f;
+		melee.swings[3].acceleration = 5.f;
 
-		melee.swing_duration_ms[4] = -1.f;
+		melee.swings[4].duration_ms = -1.f;
+		melee.swings[4].acceleration = 1.f;
+		melee.swings[4].cooldown_ms = -1.f;
 
 		std::vector<vec2> circle = generate_circle_points(100, 90, 0, 20);
 		double angle = -90;
@@ -60,29 +62,20 @@ namespace prefabs {
 		std::reverse(std::begin(melee.offset_positions[0]), std::end(melee.offset_positions[0]));
 
 		melee.offset_positions[2] = {
-			{ vec2(-20, 0) + vec2(0, 0), 0 },
-			{ vec2(-20, 0) + vec2(0, 10), 10 },
-			{ vec2(-20, 0) + vec2(10, 30), 30 },
-			{ vec2(-20, 0) + vec2(-30, 50), 60 },
-			{ vec2(-20, 0) + vec2(10, -10), 0 },
-			{ vec2(-20, 0) + vec2(15, -25), 0 },
-			{ vec2(-20, 0) + vec2(20, -45), 0 },
-			{ vec2(-20, 0) + vec2(10, -60), 0 },
-			{ vec2(-20, 0) + vec2(-10, -70), -30 },
-			{ vec2(-20, 0) + vec2(-20, -75), -60 },
-			{ vec2(-20, 0) + vec2(-30, -80), -70 },
-			{ vec2(-20, 0) + vec2(-40, -97), -90 },
-			{ vec2(-20, 0) + vec2(-50, -104), -100 },
-			{ vec2(-20, 0) + vec2(-80, -119), -120 },
+			{ vec2(0, 0), 0 },
+			{ vec2(10, 0), 0 },
+			{ vec2(20, 0), 0 },
+			{ vec2(30, 0), 0 },
+			{ vec2(40, 0), 0 },
+			{ vec2(50, 0), 0 },
+			{ vec2(64, 0), 0 },
+			{ vec2(120, 0), 0 },
+			{ vec2(150, 0), 0 },
+			{ vec2(180, 0), 0 },
 		};
 
 		melee.offset_positions[3] = melee.offset_positions[2];
 		std::reverse(std::begin(melee.offset_positions[3]), std::end(melee.offset_positions[3]));
-
-		melee.offset_positions[0][0] = vec2(-20, 0);
-		melee.offset_positions[1][0] = vec2(-20, 0);
-		melee.offset_positions[2][0] = vec2(-20, 0);
-		melee.offset_positions[3][0] = vec2(-20, 0);
 
 		auto& damage = *machete += components::damage();
 		damage.destroy_upon_damage = false;

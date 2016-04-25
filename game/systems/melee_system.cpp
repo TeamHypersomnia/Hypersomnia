@@ -7,8 +7,6 @@
 #include "game/messages/rebuild_physics_message.h"
 #include "game/detail/inventory_utils.h"
 
-#include "game/detail/combat/melee_animation.h"
-
 void melee_system::consume_melee_intents() {
 	auto& events = parent_world.get_message_queue<messages::intent_message>();
 
@@ -61,8 +59,9 @@ void melee_system::initiate_and_update_moves() {
 
 		switch (melee.state) {
 		case components::MELEE_FREE:
-			if (melee.primary_move_flag)
-				melee.state = components::MELEE_PRIMARY;
+			if (melee.primary_move_flag) {
+				melee.state = primary_action(dt, t, melee, damage);
+			}
 			/* send a response message so that the rest of the game knows that a swing has occured;
 			the message could be read by particles system, audio system and possibly animation system
 			to apply each their own effects.
@@ -70,7 +69,7 @@ void melee_system::initiate_and_update_moves() {
 			break;
 		case components::MELEE_ONCOOLDOWN:
 			melee.swing_current_cooldown_time += dt;
-			if (melee.swing_current_cooldown_time >= melee.swing_cooldown_ms[0]) {
+			if (melee.swing_current_cooldown_time >= melee.swings[0].cooldown_ms) {
 				melee.swing_current_cooldown_time = 0;
 				melee.state = components::MELEE_FREE;
 			}
@@ -88,7 +87,7 @@ components::melee_state melee_system::primary_action(double dt, augs::entity_id 
 {
 	damage.damage_upon_collision = true;
 
-	if (melee_component.swing_current_time > melee_component.swing_duration_ms[action_stage]) {
+	if (melee_component.swing_current_time > melee_component.swings[action_stage].duration_ms) {
 		switch (action_stage)
 		{
 		case FIRST_STAGE:
@@ -117,15 +116,15 @@ components::melee_state melee_system::primary_action(double dt, augs::entity_id 
 				melee_component.window_current_time = 0;
 				return components::MELEE_ONCOOLDOWN;
 			}
-			else if (melee_component.primary_move_flag && melee_component.window_current_time >= melee_component.swing_cooldown_ms[0]) {
+			else if (melee_component.primary_move_flag && melee_component.window_current_time >= melee_component.swings[0].cooldown_ms) {
 				action_stage = THIRD_STAGE;
 				return components::MELEE_PRIMARY;
 			}
-			else if (melee_component.secondary_move_flag && melee_component.window_current_time >= melee_component.swing_cooldown_ms[0]) {
+			else if (melee_component.secondary_move_flag && melee_component.window_current_time >= melee_component.swings[0].cooldown_ms) {
 				action_stage = FIRST_STAGE;
 				return components::MELEE_SECONDARY;
 			}
-			else if (melee_component.tertiary_move_flag && melee_component.window_current_time >= melee_component.swing_cooldown_ms[0]) {
+			else if (melee_component.tertiary_move_flag && melee_component.window_current_time >= melee_component.swings[0].cooldown_ms) {
 				action_stage = FIRST_STAGE;
 				return components::MELEE_TERTIARY;
 			}
@@ -140,7 +139,7 @@ components::melee_state melee_system::primary_action(double dt, augs::entity_id 
 		}
 	}
 
-	melee_component.swing_current_time += dt * melee_component.swing_acceleration[action_stage];
+	melee_component.swing_current_time += dt * melee_component.swings[action_stage].acceleration;
 
 	messages::rebuild_physics_message pos_response;
 	messages::melee_swing_response response;
@@ -148,8 +147,8 @@ components::melee_state melee_system::primary_action(double dt, augs::entity_id 
 	pos_response.subject = target;
 	auto new_definition = target->get<components::physics_definition>();
 
-	melee_animation animation(melee_component.offset_positions[action_stage]);
-	new_definition.offsets_for_created_shapes[components::physics_definition::SPECIAL_MOVE_DISPLACEMENT] = animation.update(melee_component.swing_current_time / melee_component.swing_duration_ms[action_stage]);
+	animation.offset_pattern = melee_component.offset_positions[action_stage];
+	new_definition.offsets_for_created_shapes[components::physics_definition::SPECIAL_MOVE_DISPLACEMENT] = animation.calculate_intermediate_transform(melee_component.swing_current_time / melee_component.swings[action_stage].duration_ms);
 	auto player = get_owning_transfer_capability(target);
 	damage.custom_impact_velocity = target->get<components::transform>().pos - player->get<components::transform>().pos;
 

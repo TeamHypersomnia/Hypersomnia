@@ -9,7 +9,6 @@
 
 class melee_animation {
 public:
-	melee_animation(std::vector<components::transform>);
-	components::transform update(double factor);
+	components::transform calculate_intermediate_transform(double factor) const;
 	std::vector<components::transform> offset_pattern;
 };
