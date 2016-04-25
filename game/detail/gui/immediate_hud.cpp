@@ -24,7 +24,6 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 	auto watched_character = camera->get<components::camera>().entity_to_chase;
 
 	int timestamp_ms = render.frame_timestamp_seconds() * 1000;
-	float time_pulse_ratio = (timestamp_ms % 500) / 500.f;
 
 	for (auto v : render.get_all_visible_entities()) {
 		auto* sentience = v->find<components::sentience>();
@@ -41,6 +40,10 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 			//auto hsv_r = rgba(225, 50, 56, 255).get_hsv();
 			auto hsv_r = red.get_hsv();
 			auto hr = sentience->health_ratio();
+
+			int pulse_duration = 1250 - 1000 * (1 - hr);
+			float time_pulse_ratio = (timestamp_ms % pulse_duration) / float(pulse_duration);
+
 			hr *= 1.f - (0.2f * time_pulse_ratio);
 
 			auto* render = v->find<components::render>();
@@ -65,8 +68,15 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 			auto last_g = circle_hud.color.g;
 			circle_hud.color.g = std::min(int(circle_hud.color.g), circle_hud.color.b+45);
 			circle_hud.color.r = std::min(255, circle_hud.color.r + last_g - circle_hud.color.g + 10);
-			circle_hud.draw(state);
 			
+			augs::rgba pulse_target(150, 0, 0, 255);
+			float pulse_redness_multiplier = (circle_hud.color.r / 255.f) *(circle_hud.color.r / 255.f) *(circle_hud.color.r / 255.f)*(circle_hud.color.r / 255.f) * (1-time_pulse_ratio);
+			circle_hud.color.r = augs::interp(circle_hud.color.r, pulse_target.r, pulse_redness_multiplier);
+			circle_hud.color.g = augs::interp(circle_hud.color.g, pulse_target.g, pulse_redness_multiplier);
+			circle_hud.color.b = augs::interp(circle_hud.color.b, pulse_target.b, pulse_redness_multiplier);
+			
+			circle_hud.draw(state);
+
 			augs::special special_vertex_data;
 			
 			auto watched_character_transform = watched_character->get<components::transform>();
