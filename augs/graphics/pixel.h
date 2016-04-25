@@ -15,6 +15,8 @@ namespace augs {
 		rgba(rgba_channel red = 255, rgba_channel green = 255, rgba_channel blue = 255, rgba_channel alpha = 255);
 		void set(rgba_channel red = 255, rgba_channel green = 255, rgba_channel blue = 255, rgba_channel alpha = 255);
 
+		rgba operator*(float) const;
+		rgba operator+(rgba b) const;
 		rgba operator*(rgba b) const;
 		rgba& operator*=(rgba b);
 

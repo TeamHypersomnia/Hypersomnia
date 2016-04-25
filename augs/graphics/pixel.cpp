@@ -127,6 +127,22 @@ namespace augs {
 			(s.a / 255.*a / 255.) * 255);
 	}
 
+	rgba rgba::operator*(float s) const {
+		return rgba(
+			s * r,
+			s * g,
+			s * b,
+			s * a);
+	}
+
+	rgba rgba::operator+(rgba s) const {
+		return rgba(
+			std::min(255u, static_cast<unsigned>(s.r) + r),
+			std::min(255u, static_cast<unsigned>(s.g) + g),
+			std::min(255u, static_cast<unsigned>(s.b) + b),
+			std::min(255u, static_cast<unsigned>(s.a) + a));
+	}
+
 	rgba& rgba::operator*=(rgba b) {
 		return (*this = *this * b);
 	}

@@ -71,10 +71,12 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 			
 			augs::rgba pulse_target(150, 0, 0, 255);
 			float pulse_redness_multiplier = (circle_hud.color.r / 255.f) *(circle_hud.color.r / 255.f) *(circle_hud.color.r / 255.f)*(circle_hud.color.r / 255.f) * (1-time_pulse_ratio);
-			circle_hud.color.r = augs::interp(circle_hud.color.r, pulse_target.r, pulse_redness_multiplier);
-			circle_hud.color.g = augs::interp(circle_hud.color.g, pulse_target.g, pulse_redness_multiplier);
-			circle_hud.color.b = augs::interp(circle_hud.color.b, pulse_target.b, pulse_redness_multiplier);
+			//circle_hud.color.r = augs::interp(circle_hud.color.r, pulse_target.r, pulse_redness_multiplier);
+			//circle_hud.color.g = augs::interp(circle_hud.color.g, pulse_target.g, pulse_redness_multiplier);
+			//circle_hud.color.b = augs::interp(circle_hud.color.b, pulse_target.b, pulse_redness_multiplier);
 			
+			circle_hud.color = augs::interp(circle_hud.color, pulse_target, pulse_redness_multiplier);
+
 			circle_hud.draw(state);
 
 			augs::special special_vertex_data;
@@ -120,8 +122,10 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 							ammo_ratio = 1 - (ammo_depo->calculate_free_space_with_children() / float(ammo_depo->space_available));
 						}
 
-						circle_hud.color = augs::white;
-						circle_hud.color.a = 150;
+						auto redviolet = augs::violet;
+						redviolet.r = 200;
+						circle_hud.color = augs::interp(augs::white, redviolet, (1 - ammo_ratio)* (1 - ammo_ratio));
+						circle_hud.color.a = 200;
 						circle_hud.draw(state);
 
 						push_angles(starting_health_angle + 90, starting_health_angle + 90 + ammo_ratio * 90.f);
