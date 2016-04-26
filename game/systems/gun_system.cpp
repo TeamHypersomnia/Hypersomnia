@@ -158,9 +158,7 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 				if (total_recoil_multiplier > 0.f) {
 					auto owning_capability = get_owning_transfer_capability(it);
 					auto owning_crosshair_recoil = owning_capability[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
-
-					auto& recoil_physics = owning_crosshair_recoil->get<components::physics>();
-					recoil_physics.apply_impulse(total_recoil_multiplier * gun.recoil.shoot_and_get_offset().rotate(barrel_transform.rotation, vec2()));
+					gun.recoil.shoot_and_apply_impulse(owning_crosshair_recoil, total_recoil_multiplier/100.f, true);
 				}
 
 				//	//if (owning_capability.alive())

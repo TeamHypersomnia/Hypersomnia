@@ -54,15 +54,11 @@ void crosshair_system::apply_crosshair_intents_to_base_offsets() {
 
 void crosshair_system::apply_base_offsets_to_crosshair_transforms() {
 	for (auto it : targets) {
-		auto& crosshair = it->get<components::crosshair>();
-	
-		auto player_id = crosshair.character_entity_to_chase;
+		auto player_id = it->get<components::crosshair>().character_entity_to_chase;
 
 		if (player_id.alive()) {
-			auto recoil_body = it[sub_entity_name::CROSSHAIR_RECOIL_BODY];
-
-			it->get<components::transform>().pos = crosshair.base_offset + player_id->get<components::transform>().pos
-				+ recoil_body->get<components::transform>().pos;
+			it->get<components::transform>().pos = 
+				components::crosshair::calculate_aiming_displacement(it, true) + player_id->get<components::transform>().pos;
 		}
 	}
 }

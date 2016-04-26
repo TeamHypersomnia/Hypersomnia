@@ -1,5 +1,7 @@
 #include "ensure.h"
 #include "recoil_player.h"
+#include "game/components/physics_component.h"
+#include "entity_system/entity.h"
 
 vec2 recoil_player::shoot_and_get_offset() {
 	if (current_offset > int(offsets.size() - 1))
@@ -16,6 +18,21 @@ vec2 recoil_player::shoot_and_get_offset() {
 	}
 
 	return offsets[current_offset++] * scale;
+}
+
+void recoil_player::shoot_and_apply_impulse(augs::entity_id recoil_body, float additional_scale, bool angular_impulse,
+	bool positional_impulse, float positional_rotation) {
+	auto& recoil_physics = recoil_body->get<components::physics>();
+
+	auto offset = shoot_and_get_offset();
+
+	if (angular_impulse) {
+		recoil_physics.apply_angular_impulse(offset.radians() * additional_scale);
+	}
+
+	if (positional_impulse) {
+		recoil_physics.apply_impulse((offset * additional_scale).rotate(positional_rotation, vec2()));
+	}
 }
 
 void recoil_player::cooldown(double amount_ms) {

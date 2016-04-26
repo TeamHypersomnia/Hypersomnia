@@ -1,12 +1,14 @@
 #pragma once
-
 #include "math/vec2.h"
 #include "math/rects.h"
 #include "misc/value_animator.h"
+#include "entity_system/entity_id.h"
 
 namespace components {
 	struct crosshair  {
 		//augs::rects::ltrb bounds;
+		static vec2 calculate_aiming_displacement(augs::entity_id subject_crosshair, bool snap_epsilon_base_offset = false);
+
 		augs::value_animation blink;
 		bool should_blink = false;
 		

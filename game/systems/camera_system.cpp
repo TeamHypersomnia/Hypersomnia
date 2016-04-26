@@ -61,13 +61,8 @@ vec2i components::camera::get_camera_offset_due_to_character_crosshair(augs::ent
 	/* skip calculations if no orbit_mode is specified */
 	if (crosshair_entity.alive() && orbit_mode != NONE) {
 		auto& crosshair = crosshair_entity->get<components::crosshair>();
-		auto recoil_entity = crosshair_entity[sub_entity_name::CROSSHAIR_RECOIL_BODY];
-
-		camera_crosshair_offset = crosshair.base_offset; 
+		camera_crosshair_offset = components::crosshair::calculate_aiming_displacement(crosshair_entity, false);
 		
-		if (vec2i(recoil_entity->get<components::transform>().pos).length_sq() > 4)
-			camera_crosshair_offset += vec2i(recoil_entity->get<components::transform>().pos);
-
 		if (orbit_mode == ANGLED)
 			camera_crosshair_offset.set_length(angled_look_length);
 

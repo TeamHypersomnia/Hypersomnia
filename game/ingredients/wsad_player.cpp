@@ -110,6 +110,35 @@ namespace ingredients {
 				{ vec2().set_from_degrees(-40) },
 		};
 
+		sentience.aimpunch.offsets = {
+			{ vec2().set_from_degrees(1) },
+			{ vec2().set_from_degrees(1) },
+			{ vec2().set_from_degrees(2) },
+			{ vec2().set_from_degrees(2) },
+			{ vec2().set_from_degrees(3) },
+			{ vec2().set_from_degrees(-1) },
+			{ vec2().set_from_degrees(1) },
+			{ vec2().set_from_degrees(-1) },
+			{ vec2().set_from_degrees(-2) },
+			{ vec2().set_from_degrees(-1) },
+			{ vec2().set_from_degrees(-1) },
+			{ vec2().set_from_degrees(-2) },
+			{ vec2().set_from_degrees(-3) },
+			{ vec2().set_from_degrees(-4) },
+			{ vec2().set_from_degrees(-5) },
+			{ vec2().set_from_degrees(-3) },
+			{ vec2().set_from_degrees(-2) },
+			{ vec2().set_from_degrees(-2) },
+			{ vec2().set_from_degrees(-1) },
+			{ vec2().set_from_degrees(1) },
+			{ vec2().set_from_degrees(2) },
+			{ vec2().set_from_degrees(3) },
+			{ vec2().set_from_degrees(2) },
+			{ vec2().set_from_degrees(3) },
+			{ vec2().set_from_degrees(4) },
+			{ vec2().set_from_degrees(5) },
+		};
+
 		sentience.aimpunch.repeat_last_n_offsets = 20;
 		sentience.aimpunch.scale = 150.0;
 		sentience.aimpunch.single_cooldown_duration_ms= 200.0;
@@ -228,13 +257,15 @@ namespace prefabs {
 
 			auto& sprite = *recoil += components::sprite();
 
-			sprite.set(assets::texture_id::TEST_CROSSHAIR, rgba(0, 255, 0, 255));
+			sprite.set(assets::texture_id::TEST_CROSSHAIR, rgba(0, 255, 0, 0));
 
-			if (DEBUG_DRAW_RECOIL_CROSSHAIR) {
+			//if (DEBUG_DRAW_RECOIL_CROSSHAIR) {
 				auto& render = *recoil += components::render();
 				render.layer = render_layer::OVER_CROSSHAIR;
 				render.interpolate = true;
-			}
+				render.snap_interpolation_when_close = false;
+				ingredients::make_always_visible(recoil);
+				//}
 
 			auto& body = physics_definition.body;
 			auto& info = physics_definition.new_fixture();
@@ -245,9 +276,9 @@ namespace prefabs {
 			//info.filter.categoryBits = 0;
 			info.density = 0.1;
 			info.sensor = true;
-			body.fixed_rotation = true;
 
 			body.linear_damping = 5;
+			body.angular_damping = 5;
 
 			force_joint.chased_entity = zero_target;
 			//force_joint.consider_rotation = false;
