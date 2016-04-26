@@ -19,6 +19,7 @@
 #include "messages/rebuild_physics_message.h"
 #include "messages/physics_operation.h"
 #include "messages/melee_swing_response.h"
+#include "messages/health_event.h"
 
 
 

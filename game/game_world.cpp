@@ -104,6 +104,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_message_queue<rebuild_physics_message>();
 	register_message_queue<physics_operation>();
 	register_message_queue<melee_swing_response>();
+	register_message_queue<health_event>();
 
 	register_message_callback<item_slot_transfer_request>(std::bind(&item_system::consume_item_slot_transfer_requests, &get_system<item_system>()));
 }
@@ -243,11 +244,13 @@ void game_world::perform_logic_step() {
 	get_system<damage_system>().destroy_outdated_bullets();
 	get_system<damage_system>().destroy_colliding_bullets_and_send_damage();
 
-	get_system<sentience_system>().apply_damage_and_initiate_deaths();
+	get_system<sentience_system>().apply_damage_and_generate_health_events();
 	get_system<sentience_system>().cooldown_aimpunches();
 	
 	get_system<particles_system>().game_responses_to_particle_effects();
 	get_system<particles_system>().create_particle_effects();
+
+	get_system<gui_system>().translate_game_events_for_hud();
 
 	destruction_callbacks();
 

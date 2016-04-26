@@ -8,6 +8,6 @@ class sentience_system : public processing_system_templated<components::sentienc
 public:
 	using processing_system_templated::processing_system_templated;
 
-	void apply_damage_and_initiate_deaths();
+	void apply_damage_and_generate_health_events();
 	void cooldown_aimpunches();
 };

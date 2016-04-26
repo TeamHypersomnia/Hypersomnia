@@ -1061,6 +1061,7 @@
     <ClInclude Include="game\messages\collision_message.h" />
     <ClInclude Include="game\messages\gui_intents.h" />
     <ClInclude Include="game\messages\gunshot_response.h" />
+    <ClInclude Include="game\messages\health_event.h" />
     <ClInclude Include="game\messages\item_slot_transfer_request.h" />
     <ClInclude Include="game\messages\melee_swing_response.h" />
     <ClInclude Include="game\messages\movement_response.h" />

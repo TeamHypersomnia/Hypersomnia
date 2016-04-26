@@ -3215,5 +3215,8 @@
     <ClInclude Include="game\detail\combat\melee_animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\messages\health_event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
