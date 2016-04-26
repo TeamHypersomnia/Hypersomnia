@@ -17,9 +17,8 @@ void force_joint_system::apply_forces_towards_target_entities() {
 		direction.normalize_hint(distance);
 
 		if (force_joint.divide_transform_mode) {
-			vec2 interpolated = physics.get_position();
-			interpolated = augs::interp(physics.get_position(), chased_transform.pos, 1.0 - 1.0 / (1.0 + delta_seconds() * (60.0)));
-			//LOG("I: %x, %x, %x, %x:", physics.get_position(), chased_transform.pos, averaging_factor, interpolated);
+			auto current_transform = it->get<components::transform>();
+			auto interpolated = augs::interp(current_transform, chased_transform, 1.0 - 1.0 / (1.0 + delta_seconds() * (60.0)));
 			physics.set_transform(interpolated);
 		}
 		else {
