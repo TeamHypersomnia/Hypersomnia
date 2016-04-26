@@ -73,7 +73,12 @@ void rotation_copying_system::resolve_rotation_copying_value(augs::entity_id it)
 		auto target_transform = rotation_copying.target->find<components::transform>();
 		
 		if (target_transform != nullptr) {
-			new_angle = (vec2(vec2i(target_transform->pos) - vec2i(transform.pos))).degrees();
+			auto diff = target_transform->pos - transform.pos;
+			
+			if (diff.is_epsilon(1.f))
+				new_angle = 0.f;
+			else
+				new_angle = diff.degrees();
 
 			if (rotation_copying.colinearize_item_in_hand) {
 				auto hand = map_primary_action_to_secondary_hand_if_primary_empty(it, 0);
