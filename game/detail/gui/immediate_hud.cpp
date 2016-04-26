@@ -3,10 +3,13 @@
 #include "entity_system/world.h"
 
 #include "game/systems/render_system.h"
+#include "game/systems/gui_system.h"
 #include "game/components/sprite_component.h"
 #include "game/components/camera_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/render_component.h"
+
+#include "game/messages/health_event.h"
 
 #include "game/detail/inventory_utils.h"
 #include "game/detail/inventory_slot.h"
@@ -14,6 +17,7 @@
 
 #include "graphics/renderer.h"
 #include "graphics/vertex.h"
+#include "stream.h"
 
 void immediate_hud::draw_circular_bars(messages::camera_render_request_message r) {
 	auto& render = r.camera->get_owner_world().get_system<render_system>();
@@ -142,6 +146,60 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 	}
 }
 
-void immediate_hud::draw_circular_bars_information(messages::camera_render_request_message) {
+void immediate_hud::draw_circular_bars_information(messages::camera_render_request_message r) {
 
+}
+
+void immediate_hud::acquire_game_events(augs::world& w) {
+	auto& healths = w.get_message_queue<messages::health_event>();
+
+	for (auto& h : healths) {
+		game_event_visualization new_event;
+		new_event.time_of_occurence = w.get_current_timestamp();
+		new_event.type = game_event_visualization::VERTICALLY_FLYING_NUMBER;
+		new_event.value = h.effective_amount;
+		new_event.maximum_duration_seconds = 0.7;
+
+		augs::rgba col;
+
+		if (h.target == messages::health_event::HEALTH) {
+			if (h.effective_amount > 0) {
+				col = red;
+			}
+			else col = green;
+		}
+		else
+			continue;
+
+		new_event.text.set_text(augs::gui::text::format(augs::to_wstring(std::abs(new_event.value)), augs::gui::text::style(assets::GUI_FONT, col)));
+		new_event.transform.pos = h.point_of_impact;
+
+		recent_game_events.push_back(new_event);
+	}
+}
+
+void immediate_hud::visualize_recent_game_events(messages::camera_render_request_message msg) {
+	auto& world = msg.camera->get_owner_world();
+	auto& target = renderer::get_current();
+
+	auto current_time = world.get_current_timestamp() + world.parent_overworld.fixed_delta_milliseconds()/1000 * world.parent_overworld.view_interpolation_ratio();
+	
+	for (auto& r : recent_game_events) { 
+		auto passed = current_time - r.time_of_occurence;
+		auto ratio =  passed / r.maximum_duration_seconds;
+		
+		if (r.type == game_event_visualization::VERTICALLY_FLYING_NUMBER) {
+
+			r.text.pos = 
+				(r.transform.pos - vec2(0, sqrt(passed) * 150.f))
+				- msg.state.transformed_visible_world_area_aabb.get_position();
+			
+			r.text.draw_stroke(msg.state.output->triangles);
+			r.text.draw(msg.state.output->triangles);
+		}
+	}
+
+	recent_game_events.erase(std::remove_if(recent_game_events.begin(), recent_game_events.end(), [current_time](const game_event_visualization& v) {
+		return (current_time - v.time_of_occurence) > v.maximum_duration_seconds;
+	}), recent_game_events.end());
 }

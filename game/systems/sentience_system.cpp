@@ -31,7 +31,7 @@ void sentience_system::apply_damage_and_generate_health_events() {
 		else
 			aimpunch_event.subject = get_owning_transfer_capability(d.subject);
 
-		if (aimpunch_event.subject.alive())
+		if (d.amount > 0 && aimpunch_event.subject.alive())
 			parent_world.post_message(aimpunch_event);
 
 		if (sentience) {
@@ -54,7 +54,8 @@ void sentience_system::apply_damage_and_generate_health_events() {
 					}
 				}
 
-				parent_world.post_message(event);
+				if(event.effective_amount != 0)
+					parent_world.post_message(event);
 			}
 
 			if (sentience->enable_consciousness) {
@@ -73,7 +74,8 @@ void sentience_system::apply_damage_and_generate_health_events() {
 					}
 				}
 
-				parent_world.post_message(event);
+				if (event.effective_amount != 0)
+					parent_world.post_message(event);
 			}
 		}
 	}

@@ -3218,5 +3218,8 @@
     <ClInclude Include="game\messages\health_event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="augs\gui\text_drawer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -91,3 +91,7 @@ void gui_system::switch_to_gui_mode_and_back() {
 		}
 	}
 }
+
+void gui_system::translate_game_events_for_hud() {
+	hud.acquire_game_events(parent_world);
+}

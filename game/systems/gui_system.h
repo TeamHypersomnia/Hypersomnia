@@ -29,6 +29,8 @@ public:
 
 	immediate_hud hud;
 
+	void translate_game_events_for_hud();
+
 	void resize(vec2i size) { gui.resize(size); }
 
 	void rebuild_gui_tree_based_on_game_state();

@@ -89,6 +89,7 @@ namespace rendering_scripts {
 		default_shader.use();
 
 		gui.hud.draw_circular_bars_information(msg);
+		gui.hud.visualize_recent_game_events(msg);
 
 		gui.draw_complete_gui_for_camera_rendering_request(msg);
 

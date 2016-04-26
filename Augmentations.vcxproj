@@ -973,6 +973,7 @@
     <ClInclude Include="3rdparty\RakNet\Source\_FindFirst.h" />
     <ClInclude Include="augs\gui\appearance_detector.h" />
     <ClInclude Include="augs\gui\rect_id.h" />
+    <ClInclude Include="augs\gui\text_drawer.h" />
     <ClInclude Include="augs\misc\constant_size_vector.h" />
     <ClInclude Include="augs\misc\deterministic_timing.h" />
     <ClInclude Include="augs\misc\recoil_player.h" />
