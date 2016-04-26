@@ -54,6 +54,7 @@ namespace components {
 		void apply_force(vec2, vec2 center_offset, bool wake = true);
 		void apply_impulse(vec2);
 		void apply_impulse(vec2, vec2 center_offset, bool wake = true);
+		void apply_angular_impulse(float);
 		float get_mass();
 		float get_angle();
 		vec2 get_position();

@@ -114,6 +114,10 @@ namespace components {
 		}
 	}
 
+	void physics::apply_angular_impulse(float imp) {
+		body->ApplyAngularImpulse(imp, true);
+	}
+
 	float physics::get_mass() {
 		return body->GetMass();
 	}
@@ -206,6 +210,6 @@ namespace components {
 	}
 
 	void physics::set_transform(components::transform transform) {
-		body->SetTransform(transform.pos * PIXELS_TO_METERSf, transform.rotation * RAD_TO_DEG);
+		body->SetTransform(transform.pos * PIXELS_TO_METERSf, transform.rotation * DEG_TO_RAD);
 	}
 }
