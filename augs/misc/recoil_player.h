@@ -18,7 +18,7 @@ public:
 
 	vec2 shoot_and_get_offset();
 	
-	void shoot_and_apply_impulse(augs::entity_id recoil_body, float scale, bool angular_impulse = false,
+	void shoot_and_apply_impulse(augs::entity_id recoil_body, float scale, bool angular_impulse = false, float additional_angle = 0.f,
 		bool positional_impulse = false, float positional_rotation = 0.f);
 	
 	void cooldown(double amount_ms);

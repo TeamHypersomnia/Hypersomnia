@@ -54,7 +54,9 @@ void sentience_system::apply_damage_and_initiate_deaths() {
 				) {
 				auto owning_crosshair_recoil = aimpunch_subject[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
 
-				aimpunched_sentience->aimpunch.shoot_and_apply_impulse(owning_crosshair_recoil, 1 / 10.f, true);
+				aimpunched_sentience->aimpunch.shoot_and_apply_impulse(owning_crosshair_recoil, 1/100.f, true,
+					 (d.point_of_impact - aimpunch_subject->get<components::transform>().pos).cross(d.impact_velocity) / 100000000.f
+					);
 			}
 		}
 	}

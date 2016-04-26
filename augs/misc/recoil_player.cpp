@@ -20,14 +20,14 @@ vec2 recoil_player::shoot_and_get_offset() {
 	return offsets[current_offset++] * scale;
 }
 
-void recoil_player::shoot_and_apply_impulse(augs::entity_id recoil_body, float additional_scale, bool angular_impulse,
-	bool positional_impulse, float positional_rotation) {
+void recoil_player::shoot_and_apply_impulse(augs::entity_id recoil_body, float additional_scale, bool angular_impulse, 
+	float additional_angle, bool positional_impulse, float positional_rotation) {
 	auto& recoil_physics = recoil_body->get<components::physics>();
 
 	auto offset = shoot_and_get_offset();
 
 	if (angular_impulse) {
-		recoil_physics.apply_angular_impulse(offset.radians() * additional_scale);
+		recoil_physics.apply_angular_impulse(offset.radians() * additional_scale + additional_angle);
 	}
 
 	if (positional_impulse) {
