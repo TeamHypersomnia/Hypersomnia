@@ -18,6 +18,7 @@ namespace components {
 		}
 
 		bool interpolate = true;
+		bool snap_interpolation_when_close = true;
 
 		enum mask_type {
 			WORLD,

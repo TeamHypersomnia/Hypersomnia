@@ -138,6 +138,9 @@ void render_system::determine_visible_entities_from_every_camera() {
 		}
 		return true;
 	}), always_visible_entities.end());
+
+	std::sort(visible_entities.begin(), visible_entities.end());
+	visible_entities.erase(std::unique(visible_entities.begin(), visible_entities.end()), visible_entities.end());
 }
 
 void render_system::generate_layers_from_visible_entities(int mask) {
@@ -226,9 +229,9 @@ void render_system::calculate_and_set_interpolated_transforms() {
 			if (render.last_step_when_visible == current_step - 1) {
 				components::transform interpolated_transform = augs::interp(render.previous_transform, actual_transform, ratio);
 
-				if ((actual_transform.pos - interpolated_transform.pos).length_sq() > 1.f)
+				if (!render.snap_interpolation_when_close || (actual_transform.pos - interpolated_transform.pos).length_sq() > 1.f)
 					actual_transform.pos = interpolated_transform.pos;
-				if (tabs(actual_transform.rotation - interpolated_transform.rotation) > 1.f)
+				if (!render.snap_interpolation_when_close || tabs(actual_transform.rotation - interpolated_transform.rotation) > 1.f)
 					actual_transform.rotation = interpolated_transform.rotation;
 			}
 			else {
