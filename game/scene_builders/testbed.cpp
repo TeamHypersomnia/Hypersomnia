@@ -152,25 +152,27 @@ namespace scene_builders {
 
 		world.post_message(r);
 
-		r.item = second_machete;
-		r.target_slot = characters[1][slot_function::PRIMARY_HAND];
-
-		world.post_message(r);
-
-		r.item = rifle2;
-		r.target_slot = characters[2][slot_function::PRIMARY_HAND];
-
-		world.post_message(r);
-
-		r.item = pis2;
-		r.target_slot = characters[3][slot_function::PRIMARY_HAND];
-
-		world.post_message(r);
-
 		r.item = rifle;
 		r.target_slot = characters[0][slot_function::SECONDARY_HAND];
 
 		world.post_message(r);
+
+		if (num_characters > 1) {
+			r.item = second_machete;
+			r.target_slot = characters[1][slot_function::PRIMARY_HAND];
+
+			world.post_message(r);
+
+			r.item = rifle2;
+			r.target_slot = characters[2][slot_function::PRIMARY_HAND];
+
+			world.post_message(r);
+
+			r.item = pis2;
+			r.target_slot = characters[3][slot_function::PRIMARY_HAND];
+
+			world.post_message(r);
+		}
 
 		input_system::context active_context;
 		active_context.map_key_to_intent(window::event::keys::W, intent_type::MOVE_FORWARD);
