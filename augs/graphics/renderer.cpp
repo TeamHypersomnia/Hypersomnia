@@ -43,7 +43,7 @@ namespace augs {
 		glBindBuffer(GL_ARRAY_BUFFER, special_buffer_id); glerr;
 
 		enable_special_vertex_attribute();
-		glVertexAttribPointer(VERTEX_ATTRIBUTES::SPECIAL, 2, GL_FLOAT, GL_FALSE, sizeof(special), 0); glerr;
+		glVertexAttribPointer(VERTEX_ATTRIBUTES::SPECIAL, sizeof(special)/sizeof(float), GL_FLOAT, GL_FALSE, sizeof(special), 0); glerr;
 		disable_special_vertex_attribute();
 
 		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;

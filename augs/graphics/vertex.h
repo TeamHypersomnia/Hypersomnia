@@ -33,6 +33,7 @@ namespace augs {
 
 	struct special {
 		vec2 v1;
+		vec2 v2;
 		// float v2;
 	};
 

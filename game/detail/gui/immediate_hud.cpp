@@ -73,7 +73,6 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 			circle_hud.set(assets::HUD_CIRCULAR_BAR_MEDIUM, health_col);
 			circle_hud.draw(state);
 
-			augs::special special_vertex_data;
 			
 			auto watched_character_transform = watched_character->get<components::transform>();
 			float starting_health_angle = 0.f;
@@ -88,17 +87,17 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 				ending_health_angle = starting_health_angle + sentience->health_ratio() * 90.f;
 			}
 
-			auto push_angles = [&special_vertex_data, &target](float first, float second) {
-				float first_angle = normalize_degrees(first);
-				float second_angle = normalize_degrees(second);
+			auto push_angles = [&target](float lower_outside, float upper_outside, float lower_inside, float upper_inside) {
+				augs::special s;
 
-				special_vertex_data.v1.set(first_angle / 180, second_angle / 180);
+				s.v1.set(normalize_degrees(lower_outside) / 180, normalize_degrees(upper_outside) / 180);
+				s.v2.set(normalize_degrees(lower_inside) / 180, normalize_degrees(upper_inside) / 180);
 
-				target.push_special_vertex_triangle(special_vertex_data, special_vertex_data, special_vertex_data);
-				target.push_special_vertex_triangle(special_vertex_data, special_vertex_data, special_vertex_data);
+				target.push_special_vertex_triangle(s, s, s);
+				target.push_special_vertex_triangle(s, s, s);
 			};
 			
-			push_angles(starting_health_angle, ending_health_angle);
+			push_angles(starting_health_angle, starting_health_angle + 90, starting_health_angle, ending_health_angle);
 
 			struct circle_info {
 				float angle;
@@ -109,7 +108,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 			std::vector<circle_info> textual_infos;
 
 			if (v == watched_character) {
-				auto examine_item_slot = [&textual_infos, &push_angles, &circle_hud, &state](inventory_slot_id id, float starting_angle, float max_angular_length) {
+				auto examine_item_slot = [&textual_infos, &push_angles, &circle_hud, &state](inventory_slot_id id, float lower_outside, float max_angular_length, bool ccw) {
 					if (id.alive() && id.has_items()) {
 						auto item = id->items_inside[0];
 
@@ -146,10 +145,19 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 							circle_hud.color.a = 200;
 							circle_hud.draw(state);
 
-							push_angles(starting_angle, starting_angle + ammo_ratio * max_angular_length);
-
 							circle_info new_info;
-							new_info.angle = starting_angle + max_angular_length;
+
+							auto upper_outside = lower_outside + max_angular_length;
+
+							if (!ccw) {
+								push_angles(lower_outside, upper_outside, lower_outside, lower_outside + ammo_ratio * max_angular_length);
+								new_info.angle = upper_outside;
+							}
+							else {
+								push_angles(lower_outside, upper_outside, upper_outside - ammo_ratio * max_angular_length, upper_outside);
+								new_info.angle = lower_outside;
+							}
+
 							new_info.text = augs::to_wstring(charges);
 							new_info.color = circle_hud.color;
 
@@ -158,8 +166,8 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 					}
 				};
 
-				examine_item_slot(v[slot_function::SECONDARY_HAND], starting_health_angle + 90, 90);
-				examine_item_slot(v[slot_function::PRIMARY_HAND], starting_health_angle - 90, -90);
+				examine_item_slot(v[slot_function::SECONDARY_HAND], starting_health_angle + 90, 90, false);
+				examine_item_slot(v[slot_function::PRIMARY_HAND], starting_health_angle - 90, 90, true);
 			}
 
 			int radius = (*assets::HUD_CIRCULAR_BAR_MEDIUM).get_size().x / 2;
