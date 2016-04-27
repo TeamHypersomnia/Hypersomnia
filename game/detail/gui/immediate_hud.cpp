@@ -8,16 +8,19 @@
 #include "game/components/camera_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/render_component.h"
+#include "game/components/name_component.h"
 
 #include "game/messages/health_event.h"
 
 #include "game/detail/inventory_utils.h"
 #include "game/detail/inventory_slot.h"
 #include "game/detail/inventory_slot_id.h"
+#include "game/detail/entity_description.h"
 
 #include "graphics/renderer.h"
 #include "graphics/vertex.h"
 #include "stream.h"
+#include "augs/gui/text_drawer.h"
 
 void immediate_hud::draw_circular_bars(messages::camera_render_request_message r) {
 	auto& render = r.camera->get_owner_world().get_system<render_system>();
@@ -29,13 +32,16 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 
 	int timestamp_ms = render.frame_timestamp_seconds() * 1000;
 
+	circular_bars_information.clear();
+	
 	for (auto v : render.get_all_visible_entities()) {
 		auto* sentience = v->find<components::sentience>();
 
 		if (sentience) {
+			auto& transform = v->get<components::transform>();;
 			shared::state_for_drawing_renderable state;
 			state.setup_camera_state(r.state);
-			state.renderable_transform = v->get<components::transform>();
+			state.renderable_transform = transform;
 			state.renderable_transform.rotation = 0;
 
 			components::sprite circle_hud;
@@ -79,7 +85,8 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 			//circle_hud.color.g = augs::interp(circle_hud.color.g, pulse_target.g, pulse_redness_multiplier);
 			//circle_hud.color.b = augs::interp(circle_hud.color.b, pulse_target.b, pulse_redness_multiplier);
 			
-			circle_hud.color = augs::interp(circle_hud.color, pulse_target, pulse_redness_multiplier);
+			auto final_health_color = augs::interp(circle_hud.color, pulse_target, pulse_redness_multiplier);
+			circle_hud.color = final_health_color;
 
 			circle_hud.draw(state);
 
@@ -137,6 +144,29 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 				}
 			}
 
+			auto radius = (*assets::HUD_CIRCULAR_BAR_MEDIUM).get_size().x / 2.f;
+
+			struct circle_info {
+				float angle;
+				std::wstring text;
+				rgba color;
+			} infos[2];
+
+			infos[0] = { starting_health_angle + 90, augs::to_wstring(sentience->health), final_health_color };
+			infos[1] = { starting_health_angle, description_of_entity(v).name, final_health_color };
+
+			for (auto& in : infos) {
+				augs::gui::text_drawer health_points;
+				health_points.set_text(augs::gui::text::format(in.text, augs::gui::text::style(assets::GUI_FONT, in.color)));
+
+				auto circle_displacement_length = health_points.get_bbox().bigger_side() + radius;
+				auto screen_space_circle_center = r.get_screen_space(transform.pos);
+
+				health_points.pos = screen_space_circle_center + vec2().set_from_degrees(in.angle).set_length(circle_displacement_length);
+
+				health_points.draw_stroke(circular_bars_information);
+				health_points.draw(circular_bars_information);
+			}
 
 			//state.renderable_transform.rotation = 90;
 			//border.color = orange;
@@ -147,7 +177,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 }
 
 void immediate_hud::draw_circular_bars_information(messages::camera_render_request_message r) {
-
+	r.state.output->triangles.insert(r.state.output->triangles.begin(), circular_bars_information.begin(), circular_bars_information.end());
 }
 
 void immediate_hud::acquire_game_events(augs::world& w) {
@@ -190,9 +220,7 @@ void immediate_hud::visualize_recent_game_events(messages::camera_render_request
 		
 		if (r.type == game_event_visualization::VERTICALLY_FLYING_NUMBER) {
 
-			r.text.pos = 
-				(r.transform.pos - vec2(0, sqrt(passed) * 150.f))
-				- msg.state.transformed_visible_world_area_aabb.get_position();
+			r.text.pos = msg.get_screen_space((r.transform.pos - vec2(0, sqrt(passed) * 150.f)));
 			
 			r.text.draw_stroke(msg.state.output->triangles);
 			r.text.draw(msg.state.output->triangles);

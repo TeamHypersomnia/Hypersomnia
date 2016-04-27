@@ -20,6 +20,7 @@ struct immediate_hud {
 	};
 
 	std::vector<game_event_visualization> recent_game_events;
+	vertex_triangle_buffer circular_bars_information;
 
 	void draw_circular_bars(messages::camera_render_request_message);
 	void draw_circular_bars_information(messages::camera_render_request_message);

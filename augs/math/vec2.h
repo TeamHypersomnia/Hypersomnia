@@ -133,6 +133,10 @@ namespace augs {
 			y = static_cast<type>(0);
 		}
 
+		type bigger_side() const {
+			return std::max(x, y);
+		}
+
 		friend std::ostream& operator<< (std::ostream& stream, const vec2t& v) {
 			return stream << "(" << v.x << "," << v.y << ")";
 		}
