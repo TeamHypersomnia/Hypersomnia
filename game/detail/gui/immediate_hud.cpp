@@ -88,7 +88,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 				ending_health_angle = starting_health_angle + sentience->health_ratio() * 90.f;
 			}
 
-			auto push_angles = [&](float first, float second) {
+			auto push_angles = [&special_vertex_data, &target](float first, float second) {
 				float first_angle = normalize_degrees(first);
 				float second_angle = normalize_degrees(second);
 
@@ -104,60 +104,68 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 				float angle;
 				std::wstring text;
 				rgba color;
-			} infos[4];
+			};
+
+			std::vector<circle_info> textual_infos;
 
 			if (v == watched_character) {
-				auto primary = v[slot_function::PRIMARY_HAND];
-				auto secondary = v[slot_function::SECONDARY_HAND];
+				auto examine_item_slot = [&textual_infos, &push_angles, &circle_hud, &state](inventory_slot_id id, float starting_angle, float max_angle_length) {
+					if (id.alive() && id.has_items()) {
+						auto item = id->items_inside[0];
 
-				if (secondary.alive() && secondary.has_items()) {
-					auto item = secondary->items_inside[0];
+						auto maybe_magazine_slot = item[slot_function::GUN_DETACHABLE_MAGAZINE];
+						auto chamber_slot = item[slot_function::GUN_CHAMBER];
 
-					auto maybe_magazine_slot = item[slot_function::GUN_DETACHABLE_MAGAZINE];
-					auto chamber_slot = item[slot_function::GUN_CHAMBER];
+						float ammo_ratio = 0.f;
+						int charges = 0;
+						float total_space_available = 0.f;
+						float total_actual_free_space = 0.f;
 
-					float ammo_ratio = 0.f;
-					int charges = 0;
-					float total_space_available = 0.f;
-					float total_actual_free_space = 0.f;
+						if (maybe_magazine_slot.alive() && maybe_magazine_slot.has_items()) {
+							auto mag = maybe_magazine_slot->items_inside[0];
+							auto ammo_depo = mag[slot_function::ITEM_DEPOSIT];
+							charges += count_charges_in_deposit(mag);
 
-					if (maybe_magazine_slot.alive() && maybe_magazine_slot.has_items()) {
-						auto mag = maybe_magazine_slot->items_inside[0];
-						auto ammo_depo = mag[slot_function::ITEM_DEPOSIT];
-						charges += count_charges_in_deposit(mag);
+							total_space_available += ammo_depo->space_available;
+							total_actual_free_space += ammo_depo->calculate_free_space_with_children();
+						}
 
-						total_space_available += ammo_depo->space_available;
-						total_actual_free_space += ammo_depo->calculate_free_space_with_children();
+						if (chamber_slot.alive()) {
+							charges += count_charges_inside(chamber_slot);
+
+							total_space_available += chamber_slot->space_available;
+							total_actual_free_space += chamber_slot->calculate_free_space_with_children();
+						}
+
+						ammo_ratio = 1 - (total_actual_free_space / total_space_available);
+
+						auto redviolet = augs::violet;
+						redviolet.r = 200;
+						circle_hud.color = augs::interp(augs::white, redviolet, (1 - ammo_ratio)* (1 - ammo_ratio));
+						circle_hud.color.a = 200;
+						circle_hud.draw(state);
+
+						push_angles(starting_angle, starting_angle + ammo_ratio * max_angle_length);
+						
+						circle_info new_info;
+						new_info.angle = starting_angle + max_angle_length;
+						new_info.text = augs::to_wstring(charges);
+						new_info.color = circle_hud.color;
+
+						textual_infos.push_back(new_info);
 					}
+				};
 
-					if (chamber_slot.alive()) {
-						charges += count_charges_inside(chamber_slot);
-
-						total_space_available += chamber_slot->space_available;
-						total_actual_free_space += chamber_slot->calculate_free_space_with_children();
-					}
-
-					ammo_ratio = 1 - (total_actual_free_space / total_space_available);
-
-					auto redviolet = augs::violet;
-					redviolet.r = 200;
-					circle_hud.color = augs::interp(augs::white, redviolet, (1 - ammo_ratio)* (1 - ammo_ratio));
-					circle_hud.color.a = 200;
-					circle_hud.draw(state);
-
-					push_angles(starting_health_angle + 90, starting_health_angle + 90 + ammo_ratio * 90.f);
-					infos[3].angle = starting_health_angle + 90 + 90;
-					infos[3].text = augs::to_wstring(charges);
-					infos[3].color = circle_hud.color;
-				}
+				examine_item_slot(v[slot_function::SECONDARY_HAND], starting_health_angle + 90, 90);
+				examine_item_slot(v[slot_function::PRIMARY_HAND], starting_health_angle - 90, 90);
 			}
 
 			int radius = (*assets::HUD_CIRCULAR_BAR_MEDIUM).get_size().x / 2;
 
-			infos[0] = { starting_health_angle + 90, augs::to_wstring(sentience->health), health_col };
-			infos[1] = { starting_health_angle, description_of_entity(v).name, health_col };
+			textual_infos.push_back({ starting_health_angle + 90, augs::to_wstring(sentience->health), health_col });
+			textual_infos.push_back({ starting_health_angle, description_of_entity(v).name, health_col });
 
-			for (auto& in : infos) {
+			for (auto& in : textual_infos) {
 				if (in.text.empty()) continue;
 
 				augs::gui::text_drawer health_points;
