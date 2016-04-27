@@ -83,6 +83,7 @@ namespace ingredients {
 		auto& force_joint = *e += components::force_joint();
 		auto& sentience = *e += components::sentience();
 		auto& particle_response = *e += components::particle_effect_response({ assets::particle_effect_response_id::CHARACTER_RESPONSE });
+		particle_response.modifier.colorize = augs::red;
 
 		sentience.aimpunch.offsets = {
 				{ vec2().set_from_degrees(0) },

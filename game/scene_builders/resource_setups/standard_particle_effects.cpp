@@ -239,7 +239,7 @@ namespace resource_setups {
 		{
 			auto& response = resource_manager.create(assets::particle_effect_response_id::CHARACTER_RESPONSE);
 
-			response[particle_effect_response_type::DAMAGE_RECEIVED] = assets::particle_effect_id::ROUND_ROTATING_BLOOD_STREAM;
+			response[particle_effect_response_type::DAMAGE_RECEIVED] = assets::particle_effect_id::PIXEL_BURST;
 		}
 	}
 }

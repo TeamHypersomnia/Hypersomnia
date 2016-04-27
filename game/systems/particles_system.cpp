@@ -105,14 +105,21 @@ void particles_system::game_responses_to_particle_effects() {
 		messages::create_particle_effect burst;
 		burst.subject = h.subject;
 		burst.transform.pos = h.point_of_impact;
+		burst.transform.pos = h.subject->get<components::transform>().pos;
 		burst.transform.rotation = (h.impact_velocity).degrees();
 		burst.modifier = response.modifier;
 
 		if (h.target == messages::health_event::HEALTH) {
 			if (h.effective_amount > 0) {
 				burst.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
-				burst.modifier.scale_amounts = h.ratio_to_maximum_value;
+				burst.modifier.scale_amounts += h.ratio_to_maximum_value;
 				parent_world.post_message(burst);
+			}
+			else {
+				// burst.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
+				// burst.modifier.scale_amounts += h.ratio_to_maximum_value;
+				// burst.modifier.colorize = green;
+				// parent_world.post_message(burst);
 			}
 		}
 	}
