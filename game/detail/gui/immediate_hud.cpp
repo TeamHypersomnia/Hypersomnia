@@ -40,18 +40,13 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 		auto* sentience = v->find<components::sentience>();
 
 		if (sentience) {
-			auto& transform = v->get<components::transform>();
-			shared::state_for_drawing_renderable state;
-			state.setup_camera_state(r.state);
-			state.renderable_transform = transform;
-			state.renderable_transform.rotation = 0;
-
 			auto hr = sentience->health_ratio();
 
 			int pulse_duration = 1250 - 1000 * (1 - hr);
 			float time_pulse_ratio = (timestamp_ms % pulse_duration) / float(pulse_duration);
 
 			hr *= 1.f - (0.2f * time_pulse_ratio);
+			auto one_less_hr = 1 - hr;
 
 			auto* render = v->find<components::render>();
 			
@@ -60,28 +55,35 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 				//render->partial_overlay_height_ratio = 1 - hr;
 				if (hr < 1.f) {
 					render->draw_border = true;
-					render->border_color = rgba(255, 0, 0, (1 - hr) *(1 - hr) *(1 - hr) *(1 - hr) * 255 * time_pulse_ratio);
+					render->border_color = rgba(255, 0, 0, one_less_hr * one_less_hr * one_less_hr * one_less_hr * 255 * time_pulse_ratio);
 				}
 				else
 					render->draw_border = false;
 			}
 
-			components::sprite circle_hud;
-			circle_hud.set(assets::HUD_CIRCULAR_BAR_MEDIUM, cyan);
+			rgba health_col;
 
-			circle_hud.color.set_hsv(augs::interp(cyan.get_hsv(), red.get_hsv(), (1 - hr)*(1 - hr)));
-			circle_hud.color.a = 220;
-			circle_hud.color.b = std::min(circle_hud.color.b + 120, 255);
-			auto last_g = circle_hud.color.g;
-			circle_hud.color.g = std::min(int(circle_hud.color.g), circle_hud.color.b+45);
-			circle_hud.color.r = std::min(255, circle_hud.color.r + last_g - circle_hud.color.g + 10);
+			health_col.set_hsv(augs::interp(cyan.get_hsv(), red.get_hsv(), (1 - hr)*(1 - hr)));
+			health_col.a = 220;
+			health_col.b = std::min(health_col.b + 120, 255);
+			auto last_g = health_col.g;
+			health_col.g = std::min(int(health_col.g), health_col.b+45);
+			health_col.r = std::min(255, health_col.r + last_g - health_col.g + 10);
 			
 			augs::rgba pulse_target(150, 0, 0, 255);
-			float pulse_redness_multiplier = (circle_hud.color.r / 255.f) *(circle_hud.color.r / 255.f) *(circle_hud.color.r / 255.f)*(circle_hud.color.r / 255.f) * (1-time_pulse_ratio);
+			auto red_unit = (health_col.r / 255.f);
+			float pulse_redness_multiplier = red_unit * red_unit * red_unit * red_unit * (1-time_pulse_ratio);
 			
-			auto final_health_color = augs::interp(circle_hud.color, pulse_target, pulse_redness_multiplier);
-			circle_hud.color = final_health_color;
+			health_col = augs::interp(health_col, pulse_target, pulse_redness_multiplier);
 
+			auto& transform = v->get<components::transform>();
+			shared::state_for_drawing_renderable state;
+			state.setup_camera_state(r.state);
+			state.renderable_transform = transform;
+			state.renderable_transform.rotation = 0;
+
+			components::sprite circle_hud;
+			circle_hud.set(assets::HUD_CIRCULAR_BAR_MEDIUM, health_col);
 			circle_hud.draw(state);
 
 			augs::special special_vertex_data;
@@ -165,8 +167,8 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 
 			int radius = (*assets::HUD_CIRCULAR_BAR_MEDIUM).get_size().x / 2;
 
-			infos[0] = { starting_health_angle + 90, augs::to_wstring(sentience->health), final_health_color };
-			infos[1] = { starting_health_angle, description_of_entity(v).name, final_health_color };
+			infos[0] = { starting_health_angle + 90, augs::to_wstring(sentience->health), health_col };
+			infos[1] = { starting_health_angle, description_of_entity(v).name, health_col };
 
 			for (auto& in : infos) {
 				if (in.text.empty()) continue;
