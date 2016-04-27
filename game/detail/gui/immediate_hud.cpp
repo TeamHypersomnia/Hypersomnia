@@ -109,7 +109,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 			std::vector<circle_info> textual_infos;
 
 			if (v == watched_character) {
-				auto examine_item_slot = [&textual_infos, &push_angles, &circle_hud, &state](inventory_slot_id id, float starting_angle, float max_angle_length) {
+				auto examine_item_slot = [&textual_infos, &push_angles, &circle_hud, &state](inventory_slot_id id, float starting_angle, float max_angular_length) {
 					if (id.alive() && id.has_items()) {
 						auto item = id->items_inside[0];
 
@@ -137,27 +137,29 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 							total_actual_free_space += chamber_slot->calculate_free_space_with_children();
 						}
 
-						ammo_ratio = 1 - (total_actual_free_space / total_space_available);
+						if (total_space_available > 0) {
+							ammo_ratio = 1 - (total_actual_free_space / total_space_available);
 
-						auto redviolet = augs::violet;
-						redviolet.r = 200;
-						circle_hud.color = augs::interp(augs::white, redviolet, (1 - ammo_ratio)* (1 - ammo_ratio));
-						circle_hud.color.a = 200;
-						circle_hud.draw(state);
+							auto redviolet = augs::violet;
+							redviolet.r = 200;
+							circle_hud.color = augs::interp(augs::white, redviolet, (1 - ammo_ratio)* (1 - ammo_ratio));
+							circle_hud.color.a = 200;
+							circle_hud.draw(state);
 
-						push_angles(starting_angle, starting_angle + ammo_ratio * max_angle_length);
-						
-						circle_info new_info;
-						new_info.angle = starting_angle + max_angle_length;
-						new_info.text = augs::to_wstring(charges);
-						new_info.color = circle_hud.color;
+							push_angles(starting_angle, starting_angle + ammo_ratio * max_angular_length);
 
-						textual_infos.push_back(new_info);
+							circle_info new_info;
+							new_info.angle = starting_angle + max_angular_length;
+							new_info.text = augs::to_wstring(charges);
+							new_info.color = circle_hud.color;
+
+							textual_infos.push_back(new_info);
+						}
 					}
 				};
 
 				examine_item_slot(v[slot_function::SECONDARY_HAND], starting_health_angle + 90, 90);
-				examine_item_slot(v[slot_function::PRIMARY_HAND], starting_health_angle - 90, 90);
+				examine_item_slot(v[slot_function::PRIMARY_HAND], starting_health_angle - 90, -90);
 			}
 
 			int radius = (*assets::HUD_CIRCULAR_BAR_MEDIUM).get_size().x / 2;
