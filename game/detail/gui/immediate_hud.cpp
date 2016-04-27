@@ -150,13 +150,15 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 
 							auto upper_outside = lower_outside + max_angular_length;
 
+							auto empty_amount = (1 - ammo_ratio) * max_angular_length;
+
 							if (!ccw) {
 								push_angles(lower_outside, upper_outside, lower_outside, lower_outside + ammo_ratio * max_angular_length);
-								new_info.angle = upper_outside;
+								new_info.angle = upper_outside - empty_amount/2;
 							}
 							else {
 								push_angles(lower_outside, upper_outside, upper_outside - ammo_ratio * max_angular_length, upper_outside);
-								new_info.angle = lower_outside;
+								new_info.angle = lower_outside + empty_amount / 2;
 							}
 
 							new_info.text = augs::to_wstring(charges);
@@ -167,13 +169,15 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 					}
 				};
 
-				examine_item_slot(v[slot_function::SECONDARY_HAND], starting_health_angle + 90, 90, false);
-				examine_item_slot(v[slot_function::PRIMARY_HAND], starting_health_angle - 90, 90, true);
+				examine_item_slot(v[slot_function::SECONDARY_HAND], starting_health_angle + 90 + 22.5, 90, false);
+				examine_item_slot(v[slot_function::PRIMARY_HAND], starting_health_angle - 90 - 22.5, 90, true);
 			}
 
 			int radius = (*assets::HUD_CIRCULAR_BAR_MEDIUM).get_size().x / 2;
 
-			textual_infos.push_back({ starting_health_angle + 90, augs::to_wstring(sentience->health), health_col });
+			int empty_health_amount = (1 - sentience->health_ratio()) * 90;
+
+			textual_infos.push_back({ starting_health_angle + 90 - empty_health_amount/2, augs::to_wstring(sentience->health), health_col });
 			textual_infos.push_back({ starting_health_angle, description_of_entity(v).name, health_col });
 
 			for (auto& in : textual_infos) {
