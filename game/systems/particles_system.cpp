@@ -14,6 +14,7 @@
 #include "../messages/destroy_message.h"
 #include "../messages/damage_message.h"
 #include "../messages/melee_swing_response.h"
+#include "../messages/health_event.h"
 
 #include "misc/randval.h"
 
@@ -32,6 +33,7 @@ void particles_system::game_responses_to_particle_effects() {
 	auto& gunshots = parent_world.get_message_queue<messages::gunshot_response>();
 	auto& damages = parent_world.get_message_queue<messages::damage_message>();
 	auto& swings = parent_world.get_message_queue<messages::melee_swing_response>();
+	auto& healths = parent_world.get_message_queue<messages::health_event>();
 
 	for (auto& g : gunshots) {
 		for (auto& r : g.spawned_rounds) {
@@ -94,6 +96,25 @@ void particles_system::game_responses_to_particle_effects() {
 		burst.modifier = response.modifier;
 
 		parent_world.post_message(burst);
+	}
+
+	for (auto& h : healths) {
+		const auto& response = h.subject->get<components::particle_effect_response>();
+		const auto& response_map = *response.response;
+
+		messages::create_particle_effect burst;
+		burst.subject = h.subject;
+		burst.transform.pos = h.point_of_impact;
+		burst.transform.rotation = (h.impact_velocity).degrees();
+		burst.modifier = response.modifier;
+
+		if (h.target == messages::health_event::HEALTH) {
+			if (h.effective_amount > 0) {
+				burst.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
+				burst.modifier.scale_amounts = h.ratio_to_maximum_value;
+				parent_world.post_message(burst);
+			}
+		}
 	}
 
 	for (auto& s : swings) {

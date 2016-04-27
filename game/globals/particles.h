@@ -5,5 +5,6 @@ enum particle_effect_response_type {
 	PROJECTILE_TRACE,
 	BARREL_LEAVE_EXPLOSION,
 	PARTICLES_WHILE_SWINGING,
+	DAMAGE_RECEIVED
 };
 

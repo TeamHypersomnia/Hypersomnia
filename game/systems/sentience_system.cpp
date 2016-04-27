@@ -50,9 +50,11 @@ void sentience_system::apply_damage_and_generate_health_events() {
 				}
 				else {
 					if (sentience->health - d.amount > sentience->maximum_health) {
-						event.effective_amount = sentience->maximum_health - sentience->health;
+						event.effective_amount = -(sentience->maximum_health - sentience->health);
 					}
 				}
+
+				event.ratio_to_maximum_value = std::abs(event.effective_amount) / sentience->maximum_health;
 
 				if(event.effective_amount != 0)
 					parent_world.post_message(event);
@@ -70,9 +72,11 @@ void sentience_system::apply_damage_and_generate_health_events() {
 				}
 				else {
 					if (sentience->consciousness - d.amount > sentience->maximum_consciousness) {
-						event.effective_amount = sentience->maximum_consciousness - sentience->consciousness;
+						event.effective_amount = -(sentience->maximum_consciousness - sentience->consciousness);
 					}
 				}
+
+				event.ratio_to_maximum_value = std::abs(event.effective_amount) / sentience->maximum_consciousness;
 
 				if (event.effective_amount != 0)
 					parent_world.post_message(event);

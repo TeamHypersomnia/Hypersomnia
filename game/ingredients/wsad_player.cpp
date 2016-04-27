@@ -19,6 +19,8 @@
 #include "game/components/gui_element_component.h"
 #include "game/components/name_component.h"
 #include "game/components/sentience_component.h"
+#include "game/components/particle_effect_response_component.h"
+#include "game/assets/particle_effect_response.h"
 
 #include "game/globals/filters.h"
 #include "game/globals/input_profiles.h"
@@ -80,6 +82,7 @@ namespace ingredients {
 		auto& driver = *e += components::driver();
 		auto& force_joint = *e += components::force_joint();
 		auto& sentience = *e += components::sentience();
+		auto& particle_response = *e += components::particle_effect_response({ assets::particle_effect_response_id::CHARACTER_RESPONSE });
 
 		sentience.aimpunch.offsets = {
 				{ vec2().set_from_degrees(0) },

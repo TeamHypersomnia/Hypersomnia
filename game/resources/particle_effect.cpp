@@ -5,5 +5,16 @@ namespace resources {
 		for (auto& p : particle_templates) {
 			p.face.color *= m.colorize;
 		}
+
+		if (m.scale_amounts != 1.f) {
+			particles_per_burst.first *= m.scale_amounts;
+			particles_per_burst.second *= m.scale_amounts;
+
+			particles_per_sec.first *= m.scale_amounts;
+			particles_per_sec.second *= m.scale_amounts;
+
+			num_of_particles_to_spawn_initially.first *= m.scale_amounts;
+			num_of_particles_to_spawn_initially.second *= m.scale_amounts;
+		}
 	}
 }
