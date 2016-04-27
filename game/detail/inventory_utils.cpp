@@ -248,16 +248,18 @@ unsigned to_space_units(std::string s) {
 }
 
 int count_charges_in_deposit(augs::entity_id item) {
+	return count_charges_inside(item[slot_function::ITEM_DEPOSIT]);
+}
+
+int count_charges_inside(inventory_slot_id id) {
 	int charges = 0;
 
-	for (auto& i : item[slot_function::ITEM_DEPOSIT]->items_inside) {
+	for (auto& i : id->items_inside) {
 		charges += i->get<components::item>().charges;
 	}
 
 	return charges;
 }
-
-
 
 std::wstring format_space_units(unsigned u) {
 	if (!u)

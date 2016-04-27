@@ -21,9 +21,11 @@ struct immediate_hud {
 
 	std::vector<game_event_visualization> recent_game_events;
 	vertex_triangle_buffer circular_bars_information;
+	vertex_triangle_buffer pure_color_highlights;
 
 	void draw_circular_bars(messages::camera_render_request_message);
 	void draw_circular_bars_information(messages::camera_render_request_message);
+	void draw_pure_color_highlights(messages::camera_render_request_message);
 
 	void acquire_game_events(augs::world&);
 	void visualize_recent_game_events(messages::camera_render_request_message);

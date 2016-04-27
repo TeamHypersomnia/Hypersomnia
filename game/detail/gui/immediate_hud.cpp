@@ -33,7 +33,8 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 	int timestamp_ms = render.frame_timestamp_seconds() * 1000;
 
 	circular_bars_information.clear();
-	
+	pure_color_highlights.clear();
+
 	for (auto v : render.get_all_visible_entities()) {
 		auto* sentience = v->find<components::sentience>();
 
@@ -117,45 +118,66 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 			
 			push_angles(starting_health_angle, ending_health_angle);
 
+			struct circle_info {
+				float angle;
+				std::wstring text;
+				rgba color;
+			} infos[4];
+
 			if (v == watched_character) {
 				auto primary = v[slot_function::PRIMARY_HAND];
 				auto secondary = v[slot_function::SECONDARY_HAND];
 
 				if (secondary.alive() && secondary.has_items()) {
-					auto maybe_magazine_slot = secondary->items_inside[0][slot_function::GUN_DETACHABLE_MAGAZINE];
+					auto item = secondary->items_inside[0];
 
-					if (maybe_magazine_slot.alive()) {
-						float ammo_ratio = 0.f;
+					auto maybe_magazine_slot = item[slot_function::GUN_DETACHABLE_MAGAZINE];
+					auto chamber_slot = item[slot_function::GUN_CHAMBER];
 
-						if (maybe_magazine_slot.has_items()) {
-							auto ammo_depo = maybe_magazine_slot->items_inside[0][slot_function::ITEM_DEPOSIT];
+					float ammo_ratio = 0.f;
+					int charges = 0;
+					float total_space_available = 0.f;
+					float total_actual_free_space = 0.f;
 
-							ammo_ratio = 1 - (ammo_depo->calculate_free_space_with_children() / float(ammo_depo->space_available));
-						}
+					if (maybe_magazine_slot.alive() && maybe_magazine_slot.has_items()) {
+						auto mag = maybe_magazine_slot->items_inside[0];
+						auto ammo_depo = mag[slot_function::ITEM_DEPOSIT];
+						charges += count_charges_in_deposit(mag);
 
-						auto redviolet = augs::violet;
-						redviolet.r = 200;
-						circle_hud.color = augs::interp(augs::white, redviolet, (1 - ammo_ratio)* (1 - ammo_ratio));
-						circle_hud.color.a = 200;
-						circle_hud.draw(state);
-
-						push_angles(starting_health_angle + 90, starting_health_angle + 90 + ammo_ratio * 90.f);
+						total_space_available += ammo_depo->space_available;
+						total_actual_free_space += ammo_depo->calculate_free_space_with_children();
 					}
+
+					if (chamber_slot.alive()) {
+						charges += count_charges_inside(chamber_slot);
+
+						total_space_available += chamber_slot->space_available;
+						total_actual_free_space += chamber_slot->calculate_free_space_with_children();
+					}
+
+					ammo_ratio = 1 - (total_actual_free_space / total_space_available);
+
+					auto redviolet = augs::violet;
+					redviolet.r = 200;
+					circle_hud.color = augs::interp(augs::white, redviolet, (1 - ammo_ratio)* (1 - ammo_ratio));
+					circle_hud.color.a = 200;
+					circle_hud.draw(state);
+
+					push_angles(starting_health_angle + 90, starting_health_angle + 90 + ammo_ratio * 90.f);
+					infos[3].angle = starting_health_angle + 90 + 90;
+					infos[3].text = augs::to_wstring(charges);
+					infos[3].color = circle_hud.color;
 				}
 			}
 
 			auto radius = (*assets::HUD_CIRCULAR_BAR_MEDIUM).get_size().x / 2.f;
 
-			struct circle_info {
-				float angle;
-				std::wstring text;
-				rgba color;
-			} infos[2];
-
 			infos[0] = { starting_health_angle + 90, augs::to_wstring(sentience->health), final_health_color };
 			infos[1] = { starting_health_angle, description_of_entity(v).name, final_health_color };
 
 			for (auto& in : infos) {
+				if (in.text.empty()) continue;
+
 				augs::gui::text_drawer health_points;
 				health_points.set_text(augs::gui::text::format(in.text, augs::gui::text::style(assets::GUI_FONT, in.color)));
 
@@ -178,6 +200,10 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 
 void immediate_hud::draw_circular_bars_information(messages::camera_render_request_message r) {
 	r.state.output->triangles.insert(r.state.output->triangles.begin(), circular_bars_information.begin(), circular_bars_information.end());
+}
+
+void immediate_hud::draw_pure_color_highlights(messages::camera_render_request_message r) {
+	r.state.output->triangles.insert(r.state.output->triangles.begin(), pure_color_highlights.begin(), pure_color_highlights.end());
 }
 
 void immediate_hud::acquire_game_events(augs::world& w) {
