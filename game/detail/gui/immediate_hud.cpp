@@ -8,6 +8,7 @@
 #include "game/components/camera_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/render_component.h"
+#include "game/components/physics_component.h"
 #include "game/components/name_component.h"
 
 #include "game/messages/health_event.h"
@@ -39,7 +40,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 		auto* sentience = v->find<components::sentience>();
 
 		if (sentience) {
-			auto& transform = v->get<components::transform>();;
+			auto& transform = v->get<components::transform>();
 			shared::state_for_drawing_renderable state;
 			state.setup_camera_state(r.state);
 			state.renderable_transform = transform;
@@ -170,7 +171,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 				}
 			}
 
-			auto radius = (*assets::HUD_CIRCULAR_BAR_MEDIUM).get_size().x / 2.f;
+			int radius = (*assets::HUD_CIRCULAR_BAR_MEDIUM).get_size().x / 2;
 
 			infos[0] = { starting_health_angle + 90, augs::to_wstring(sentience->health), final_health_color };
 			infos[1] = { starting_health_angle, description_of_entity(v).name, final_health_color };
@@ -182,7 +183,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 				health_points.set_text(augs::gui::text::format(in.text, augs::gui::text::style(assets::GUI_FONT, in.color)));
 
 				auto circle_displacement_length = health_points.get_bbox().bigger_side() + radius;
-				auto screen_space_circle_center = r.get_screen_space(transform.pos);
+				vec2i screen_space_circle_center = r.get_screen_space(transform.pos);
 
 				health_points.pos = screen_space_circle_center + vec2().set_from_degrees(in.angle).set_length(circle_displacement_length);
 
