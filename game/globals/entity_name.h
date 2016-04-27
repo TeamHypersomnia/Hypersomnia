@@ -20,3 +20,4 @@ enum class entity_name {
 };
 
 void name_entity(augs::entity_id, entity_name);
+void name_entity(augs::entity_id, entity_name, std::wstring custom_nickname);

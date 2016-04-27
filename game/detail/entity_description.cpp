@@ -13,7 +13,14 @@
 #include "stream.h"
 
 textual_description description_of_entity(augs::entity_id id) {
-	return description_by_entity_name(id->get<components::name>().id);
+	auto& name = id->get<components::name>();
+	
+	auto result = description_by_entity_name(name.id);
+
+	if(name.custom_nickname)
+		result.name = name.nickname;
+
+	return result;
 }
 
 std::wstring describe_properties(augs::entity_id id) {

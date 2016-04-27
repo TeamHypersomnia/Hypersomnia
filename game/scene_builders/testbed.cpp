@@ -103,6 +103,8 @@ namespace scene_builders {
 			characters.push_back(new_character);
 		}
 
+		name_entity(characters[0], entity_name::PERSON, L"Attacker");
+
 		ingredients::inject_window_input_to_character(characters[current_character], world_camera);
 
 		prefabs::create_sample_suppressor(world, vec2(300, -500));
@@ -158,6 +160,10 @@ namespace scene_builders {
 		world.post_message(r);
 
 		if (num_characters > 1) {
+			name_entity(characters[1], entity_name::PERSON, L"Swordsman");
+			name_entity(characters[2], entity_name::PERSON, L"Support");
+			name_entity(characters[3], entity_name::PERSON, L"Medic");
+
 			r.item = second_machete;
 			r.target_slot = characters[1][slot_function::PRIMARY_HAND];
 

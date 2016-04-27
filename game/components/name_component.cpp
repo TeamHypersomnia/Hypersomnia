@@ -5,7 +5,23 @@
 void name_entity(augs::entity_id id, entity_name n) {
 	components::name name;
 	name.id = n;
-	id->add(name);
+
+	if (id->find<components::name>() == nullptr)
+		id->add(name);
+	else
+		id->get<components::name>() = name;
+}
+
+void name_entity(augs::entity_id id, entity_name n, std::wstring nick) {
+	components::name name;
+	name.id = n;
+	name.custom_nickname = true;
+	name.nickname = nick;
+
+	if (id->find<components::name>() == nullptr)
+		id->add(name);
+	else
+		id->get<components::name>() = name;
 }
 
 augs::entity_id get_first_named_ancestor(augs::entity_id p) {

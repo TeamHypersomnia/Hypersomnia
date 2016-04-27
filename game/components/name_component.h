@@ -4,6 +4,9 @@
 namespace components {
 	struct name {
 		entity_name id;
+
+		bool custom_nickname = false;
+		std::wstring nickname;
 	};
 }
 
