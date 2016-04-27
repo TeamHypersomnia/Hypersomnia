@@ -30,6 +30,8 @@ class render_system : public event_only_system {
 	unsigned current_step = 0;
 	int current_visibility_index = 0;
 public:
+	static void standard_draw_entity(augs::entity_id, shared::state_for_drawing_camera in, bool only_border_highlights = false, int visibility_index = -1);
+
 	render_system(world& parent_world);
 
 	void add_entities_to_rendering_tree();

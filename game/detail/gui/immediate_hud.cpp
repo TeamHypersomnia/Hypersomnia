@@ -21,6 +21,7 @@
 #include "graphics/renderer.h"
 #include "graphics/vertex.h"
 #include "stream.h"
+#include "stlutil.h"
 #include "augs/gui/text_drawer.h"
 
 void immediate_hud::draw_circular_bars(messages::camera_render_request_message r) {
@@ -197,19 +198,14 @@ void immediate_hud::draw_circular_bars_information(messages::camera_render_reque
 	r.state.output->triangles.insert(r.state.output->triangles.begin(), circular_bars_information.begin(), circular_bars_information.end());
 }
 
-void immediate_hud::draw_pure_color_highlights(messages::camera_render_request_message r) {
-	r.state.output->triangles.insert(r.state.output->triangles.begin(), pure_color_highlights.begin(), pure_color_highlights.end());
-}
-
 void immediate_hud::acquire_game_events(augs::world& w) {
 	auto& healths = w.get_message_queue<messages::health_event>();
 
 	for (auto& h : healths) {
-		game_event_visualization new_event;
-		new_event.time_of_occurence = w.get_current_timestamp();
-		new_event.type = game_event_visualization::VERTICALLY_FLYING_NUMBER;
-		new_event.value = h.effective_amount;
-		new_event.maximum_duration_seconds = 0.7;
+		vertically_flying_number vn;
+		vn.time_of_occurence = w.get_current_timestamp();
+		vn.value = h.effective_amount;
+		vn.maximum_duration_seconds = 0.7;
 
 		augs::rgba col;
 
@@ -222,33 +218,66 @@ void immediate_hud::acquire_game_events(augs::world& w) {
 		else
 			continue;
 
-		new_event.text.set_text(augs::gui::text::format(augs::to_wstring(std::abs(new_event.value)), augs::gui::text::style(assets::GUI_FONT, col)));
-		new_event.transform.pos = h.point_of_impact;
+		vn.text.set_text(augs::gui::text::format(augs::to_wstring(std::abs(vn.value)), augs::gui::text::style(assets::GUI_FONT, col)));
+		vn.transform.pos = h.point_of_impact;
 
-		recent_game_events.push_back(new_event);
+		recent_vertically_flying_numbers.push_back(vn);
+
+		pure_color_highlight ph;
+		ph.time_of_occurence = w.get_current_timestamp();
+		ph.target = h.subject;
+		ph.starting_alpha_ratio = std::min(1.f, h.ratio_to_maximum_value * 15);
+		ph.maximum_duration_seconds = 0.3;
+		ph.color = col;
+
+		erase_remove(recent_pure_color_highlights, [&ph](const pure_color_highlight& h) { return h.target == ph.target; });
+		recent_pure_color_highlights.push_back(ph);
 	}
 }
 
-void immediate_hud::visualize_recent_game_events(messages::camera_render_request_message msg) {
+double immediate_hud::get_current_time(messages::camera_render_request_message msg) const {
 	auto& world = msg.camera->get_owner_world();
-	auto& target = renderer::get_current();
+	return world.get_current_timestamp() + world.parent_overworld.fixed_delta_milliseconds() / 1000 * world.parent_overworld.view_interpolation_ratio();
+}
 
-	auto current_time = world.get_current_timestamp() + world.parent_overworld.fixed_delta_milliseconds()/1000 * world.parent_overworld.view_interpolation_ratio();
+void immediate_hud::draw_vertically_flying_numbers(messages::camera_render_request_message msg) {
+	auto& target = renderer::get_current();
 	
-	for (auto& r : recent_game_events) { 
+	auto current_time = get_current_time(msg);
+
+	for (auto& r : recent_vertically_flying_numbers) { 
 		auto passed = current_time - r.time_of_occurence;
 		auto ratio =  passed / r.maximum_duration_seconds;
-		
-		if (r.type == game_event_visualization::VERTICALLY_FLYING_NUMBER) {
 
-			r.text.pos = msg.get_screen_space((r.transform.pos - vec2(0, sqrt(passed) * 150.f)));
-			
-			r.text.draw_stroke(msg.state.output->triangles);
-			r.text.draw(msg.state.output->triangles);
-		}
+		r.text.pos = msg.get_screen_space((r.transform.pos - vec2(0, sqrt(passed) * 150.f)));
+		
+		r.text.draw_stroke(msg.state.output->triangles);
+		r.text.draw(msg.state.output->triangles);
 	}
 
-	recent_game_events.erase(std::remove_if(recent_game_events.begin(), recent_game_events.end(), [current_time](const game_event_visualization& v) {
+	auto timeout_lambda = [current_time](const game_event_visualization& v) {
 		return (current_time - v.time_of_occurence) > v.maximum_duration_seconds;
-	}), recent_game_events.end());
+	};
+
+	erase_remove(recent_vertically_flying_numbers, timeout_lambda);
+	erase_remove(recent_pure_color_highlights, timeout_lambda);
+}
+
+void immediate_hud::draw_pure_color_highlights(messages::camera_render_request_message msg) {
+	auto current_time = get_current_time(msg);
+
+	for (auto& r : recent_pure_color_highlights) {
+		auto& col = r.target->get<components::sprite>().color;
+		auto prevcol = col;
+		col = r.color;
+
+		auto passed = current_time - r.time_of_occurence;
+		auto ratio = passed / r.maximum_duration_seconds;
+
+		col.a = 255 * (1-ratio) * r.starting_alpha_ratio;
+		render_system::standard_draw_entity(r.target, msg.state);
+		col = prevcol;
+	}
+
+	//msg.state.output->triangles.insert(msg.state.output->triangles.begin(), pure_color_highlights.begin(), pure_color_highlights.end());
 }

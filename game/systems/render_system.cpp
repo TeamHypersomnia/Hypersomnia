@@ -258,58 +258,69 @@ void render_system::restore_actual_transforms() {
 	}
 }
 
+void render_system::standard_draw_entity(augs::entity_id e, shared::state_for_drawing_camera in_camera, bool only_border_highlights, int visibility_index) {
+	static thread_local state_for_drawing_renderable in;
+	in.setup_camera_state(in_camera);
+
+	auto& render = e->get<components::render>();
+
+	in.renderable_transform = e->get<components::transform>();
+	in.renderable_transform.pos = vec2i(in.renderable_transform.pos);
+	in.renderable_transform.rotation = in.renderable_transform.rotation;
+
+	in.renderable = e;
+
+	in.camera_transform = render.absolute_transform ? components::transform() : in_camera.camera_transform;
+
+	auto* polygon = e->find<components::polygon>();
+	auto* sprite = e->find<components::sprite>();
+	auto* tile_layer = e->find<components::tile_layer>();
+	auto* particle_group = e->find<components::particle_group>();
+
+	if (only_border_highlights) {
+		if (render.draw_border) {
+			static vec2i offsets[4] = {
+				vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1)
+				//vec2i(-1, -1), vec2i(1, 1), vec2i(-1, 1), vec2i(1, -1)
+			};
+
+			auto original_pos = in.renderable_transform.pos;
+
+			in.colorize = render.border_color;
+
+			for (auto& o : offsets) {
+				in.renderable_transform.pos = original_pos + o;
+
+				if (polygon) polygon->draw(in);
+				if (sprite) sprite->draw(in);
+				if (particle_group) particle_group->draw(in);
+			}
+
+			in.renderable_transform.pos = original_pos;
+			in.colorize = white;
+		}
+	}
+	else {
+		if (polygon) polygon->draw(in);
+		if (sprite) sprite->draw(in);
+		if (tile_layer) tile_layer->draw(in);
+		if (particle_group) particle_group->draw(in);
+		
+		if(visibility_index > -1)
+			render.last_visibility_index = visibility_index;
+	}
+}
+
 void render_system::draw_layer(state_for_drawing_camera in_camera, int layer, bool only_border_highlights) {
 	state_for_drawing_renderable in;
 	in.setup_camera_state(in_camera);
 
 	if (layer < layers.size() && !layers[layer].empty()) {
 		for (auto e : layers[layer]) {
-			auto& render = e->get<components::render>();
+			standard_draw_entity(e, in_camera, only_border_highlights, current_visibility_index);
 
-			in.renderable_transform = e->get<components::transform>();
-			in.renderable_transform.pos = vec2i(in.renderable_transform.pos);
-			in.renderable_transform.rotation = in.renderable_transform.rotation;
-
-			in.renderable = e;
-
-			in.camera_transform = render.absolute_transform ? components::transform() : in_camera.camera_transform;
-
-			auto* polygon = e->find<components::polygon>();
-			auto* sprite = e->find<components::sprite>();
-			auto* tile_layer = e->find<components::tile_layer>();
-			auto* particle_group = e->find<components::particle_group>();
-
-			if (only_border_highlights) {
-				if (render.draw_border) {
-					static vec2i offsets[4] = {
-						vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1)
-						//vec2i(-1, -1), vec2i(1, 1), vec2i(-1, 1), vec2i(1, -1)
-					};
-
-					auto original_pos = in.renderable_transform.pos;
-
-					in.colorize = render.border_color;
-
-					for (auto& o : offsets) {
-						in.renderable_transform.pos = original_pos + o;
-
-						if (polygon) polygon->draw(in);
-						if (sprite) sprite->draw(in);
-						if (particle_group) particle_group->draw(in);
-					}
-
-					in.renderable_transform.pos = original_pos;
-					in.colorize = white;
-				}
-			}
-			else {
-				if (polygon) polygon->draw(in);
-				if (sprite) sprite->draw(in);
-				if (tile_layer) tile_layer->draw(in);
-				if (particle_group) particle_group->draw(in);
-
-				render.last_visibility_index = current_visibility_index++;
-			}
+			if (!only_border_highlights)
+				++current_visibility_index;
 		}
 	}
 }

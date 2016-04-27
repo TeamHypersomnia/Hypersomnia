@@ -3224,5 +3224,8 @@
     <ClInclude Include="augs\gui\text_drawer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="augs\stlutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

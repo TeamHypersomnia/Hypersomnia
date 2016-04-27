@@ -99,7 +99,7 @@ namespace rendering_scripts {
 
 		default_shader.use();
 
-		gui.hud.visualize_recent_game_events(msg);
+		gui.hud.draw_vertically_flying_numbers(msg);
 
 		gui.draw_complete_gui_for_camera_rendering_request(msg);
 

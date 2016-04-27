@@ -6,20 +6,26 @@
 
 struct immediate_hud {
 	struct game_event_visualization {
-		enum event_type {
-			VERTICALLY_FLYING_NUMBER,
-			ENTITY_TEMPORAL_GHOST
-		} type;
-
-		float value = 0.f;
-		components::transform transform;
-
-		augs::gui::text_drawer text;
 		double maximum_duration_seconds = 0.0;
 		augs::deterministic_timestamp time_of_occurence;
 	};
 
-	std::vector<game_event_visualization> recent_game_events;
+	struct vertically_flying_number : game_event_visualization {
+		float value = 0.f;
+		components::transform transform;
+
+		augs::gui::text_drawer text;
+	};
+
+	struct pure_color_highlight : game_event_visualization {
+		float starting_alpha_ratio = 0.f;
+		augs::entity_id target;
+		augs::rgba color;
+	};
+
+	std::vector<vertically_flying_number> recent_vertically_flying_numbers;
+	std::vector<pure_color_highlight> recent_pure_color_highlights;
+
 	vertex_triangle_buffer circular_bars_information;
 	vertex_triangle_buffer pure_color_highlights;
 
@@ -28,5 +34,7 @@ struct immediate_hud {
 	void draw_pure_color_highlights(messages::camera_render_request_message);
 
 	void acquire_game_events(augs::world&);
-	void visualize_recent_game_events(messages::camera_render_request_message);
+	void draw_vertically_flying_numbers(messages::camera_render_request_message);
+private:
+	double get_current_time(messages::camera_render_request_message) const;
 };

@@ -978,6 +978,7 @@
     <ClInclude Include="augs\misc\constant_size_vector.h" />
     <ClInclude Include="augs\misc\deterministic_timing.h" />
     <ClInclude Include="augs\misc\recoil_player.h" />
+    <ClInclude Include="augs\stlutil.h" />
     <ClInclude Include="augs\stream.h" />
     <ClInclude Include="augs\window_framework\console_colors.h" />
     <ClInclude Include="game\all_component_includes.h" />
