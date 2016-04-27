@@ -16,5 +16,10 @@ namespace resources {
 			num_of_particles_to_spawn_initially.first *= m.scale_amounts;
 			num_of_particles_to_spawn_initially.second *= m.scale_amounts;
 		}
+
+		if (m.scale_lifetimes != 1.f) {
+			particle_lifetime_ms.first *= m.scale_lifetimes;
+			particle_lifetime_ms.second *= m.scale_lifetimes;
+		}
 	}
 }

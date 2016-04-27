@@ -84,6 +84,7 @@ namespace ingredients {
 		auto& sentience = *e += components::sentience();
 		auto& particle_response = *e += components::particle_effect_response({ assets::particle_effect_response_id::CHARACTER_RESPONSE });
 		particle_response.modifier.colorize = augs::red;
+		particle_response.modifier.scale_lifetimes = 1.5f;
 
 		sentience.aimpunch.offsets = {
 				{ vec2().set_from_degrees(0) },
