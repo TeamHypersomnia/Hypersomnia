@@ -46,11 +46,6 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 			state.renderable_transform = transform;
 			state.renderable_transform.rotation = 0;
 
-			components::sprite circle_hud;
-			circle_hud.set(assets::HUD_CIRCULAR_BAR_MEDIUM, cyan);
-			auto hsv_c = cyan.get_hsv();
-			//auto hsv_r = rgba(225, 50, 56, 255).get_hsv();
-			auto hsv_r = red.get_hsv();
 			auto hr = sentience->health_ratio();
 
 			int pulse_duration = 1250 - 1000 * (1 - hr);
@@ -71,10 +66,10 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 					render->draw_border = false;
 			}
 
-			hsv_c.h = augs::interp(hsv_c.h, hsv_r.h, (1 - hr)*(1 - hr)/*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*/);
-			hsv_c.s = augs::interp(hsv_c.s, hsv_r.s, (1 - hr)*(1 - hr)/*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*/);
-			hsv_c.v = augs::interp(hsv_c.v, hsv_r.v, (1 - hr)*(1 - hr)/*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*(1 - hr)*/);
-			circle_hud.color.set_hsv(hsv_c);
+			components::sprite circle_hud;
+			circle_hud.set(assets::HUD_CIRCULAR_BAR_MEDIUM, cyan);
+
+			circle_hud.color.set_hsv(augs::interp(cyan.get_hsv(), red.get_hsv(), (1 - hr)*(1 - hr)));
 			circle_hud.color.a = 220;
 			circle_hud.color.b = std::min(circle_hud.color.b + 120, 255);
 			auto last_g = circle_hud.color.g;
@@ -83,9 +78,6 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 			
 			augs::rgba pulse_target(150, 0, 0, 255);
 			float pulse_redness_multiplier = (circle_hud.color.r / 255.f) *(circle_hud.color.r / 255.f) *(circle_hud.color.r / 255.f)*(circle_hud.color.r / 255.f) * (1-time_pulse_ratio);
-			//circle_hud.color.r = augs::interp(circle_hud.color.r, pulse_target.r, pulse_redness_multiplier);
-			//circle_hud.color.g = augs::interp(circle_hud.color.g, pulse_target.g, pulse_redness_multiplier);
-			//circle_hud.color.b = augs::interp(circle_hud.color.b, pulse_target.b, pulse_redness_multiplier);
 			
 			auto final_health_color = augs::interp(circle_hud.color, pulse_target, pulse_redness_multiplier);
 			circle_hud.color = final_health_color;
@@ -190,11 +182,6 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 				health_points.draw_stroke(circular_bars_information);
 				health_points.draw(circular_bars_information);
 			}
-
-			//state.renderable_transform.rotation = 90;
-			//border.color = orange;
-			//border.color.a = 160;
-			//border.draw(state);
 		}
 	}
 }

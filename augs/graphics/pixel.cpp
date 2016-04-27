@@ -115,6 +115,14 @@ namespace augs {
 
 	hsv::hsv(double h, double s, double v) : h(h), s(s), v(v) {}
 	
+	hsv hsv::operator*(float x) const {
+		return hsv(h * x, s * x, v * x);
+	}
+
+	hsv hsv::operator+(hsv b) const {
+		return hsv(h + b.h, s + b.s, v + b.v);
+	}
+
 	void rgba::set(rgba_channel red, rgba_channel green, rgba_channel blue, rgba_channel alpha) {
 		*this = rgba(red, green, blue, alpha);
 	}

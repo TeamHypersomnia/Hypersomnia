@@ -8,6 +8,8 @@ namespace augs {
 		double s;       // percent
 		double v;       // percent
 		hsv(double = 0.0, double = 0.0, double = 0.0);
+		hsv operator*(float) const;
+		hsv operator+(hsv b) const;
 	};
 
 	struct rgba {
