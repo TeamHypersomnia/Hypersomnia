@@ -389,6 +389,7 @@
     <ClCompile Include="game\components\physics_component.cpp" />
     <ClCompile Include="game\components\physics_definition_component.cpp" />
     <ClCompile Include="game\components\polygon_component.cpp" />
+    <ClCompile Include="game\components\sentience_component.cpp" />
     <ClCompile Include="game\components\sprite_component.cpp" />
     <ClCompile Include="game\components\tile_layer_component.cpp" />
     <ClCompile Include="game\components\transform_component.cpp" />

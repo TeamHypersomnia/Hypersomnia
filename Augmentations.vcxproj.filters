@@ -1203,6 +1203,9 @@
     <ClCompile Include="game\components\crosshair_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\components\sentience_component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">

@@ -41,12 +41,12 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 
 		if (sentience) {
 			auto hr = sentience->health_ratio();
+			auto one_less_hr = 1 - hr;
 
 			int pulse_duration = 1250 - 1000 * (1 - hr);
 			float time_pulse_ratio = (timestamp_ms % pulse_duration) / float(pulse_duration);
 
 			hr *= 1.f - (0.2f * time_pulse_ratio);
-			auto one_less_hr = 1 - hr;
 
 			auto* render = v->find<components::render>();
 			
@@ -61,20 +61,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 					render->draw_border = false;
 			}
 
-			rgba health_col;
-
-			health_col.set_hsv(augs::interp(cyan.get_hsv(), red.get_hsv(), (1 - hr)*(1 - hr)));
-			health_col.a = 220;
-			health_col.b = std::min(health_col.b + 120, 255);
-			auto last_g = health_col.g;
-			health_col.g = std::min(int(health_col.g), health_col.b+45);
-			health_col.r = std::min(255, health_col.r + last_g - health_col.g + 10);
-			
-			augs::rgba pulse_target(150, 0, 0, 255);
-			auto red_unit = (health_col.r / 255.f);
-			float pulse_redness_multiplier = red_unit * red_unit * red_unit * red_unit * (1-time_pulse_ratio);
-			
-			health_col = augs::interp(health_col, pulse_target, pulse_redness_multiplier);
+			auto health_col = sentience->calculate_health_color(time_pulse_ratio);
 
 			auto& transform = v->get<components::transform>();
 			shared::state_for_drawing_renderable state;
