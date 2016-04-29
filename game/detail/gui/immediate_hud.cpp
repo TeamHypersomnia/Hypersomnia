@@ -24,6 +24,51 @@
 #include "stlutil.h"
 #include "augs/gui/text_drawer.h"
 
+vec2 position_caption_around_a_circle(float radius, vec2 r, float alpha) {
+	vec2 top_bounds[2] =  { vec2(-r.x / 2, -radius - r.y / 2), vec2(r.x / 2, -radius - r.y / 2) };
+	vec2 left_bounds[2] = { vec2(-radius - r.x / 2, r.y / 2), vec2(-radius - r.x / 2, -r.y / 2) };
+	vec2 bottom_bounds[2] = { top_bounds[1] * vec2(1, -1), top_bounds[0] * vec2(1, -1) };
+	vec2 right_bounds[2] = { left_bounds[1] * vec2(-1, 1), left_bounds[0] * vec2(-1, 1) };
+
+	vec2 all_bounds[4][2] = { 
+		{ left_bounds[0], left_bounds[1] }, 
+		{ top_bounds[0], top_bounds[1] }, 
+		{ right_bounds[0], right_bounds[1] }, 
+		{ bottom_bounds[0], bottom_bounds[1] }  
+	};
+
+	vec2 angle_norm = vec2().set_from_degrees(alpha);
+	vec2 angle = angle_norm * radius;
+
+	static vec2 quadrant_multipliers[4] = { vec2(-1, -1), vec2(1, -1), vec2(1, 1), vec2(-1, 1), };
+	static vec2 quadrants_on_circle[4] = { vec2(-1, 0), vec2(0, -1), vec2(1, 0), vec2(0, 1), };
+
+	for (int i = 0; i < 4; ++i) {
+		vec2 a = vec2(all_bounds[i][0]).normalize(), 
+			b = vec2(all_bounds[i][1]).normalize(),
+			c = vec2(all_bounds[(i+1)%4][0]).normalize(),
+			v = angle_norm;
+
+		float bound_angular_distance = a.cross(b);
+		float target_angular_distance = a.cross(v);
+
+		if (target_angular_distance >= 0 && b.cross(v) <= 0) {
+			return augs::interp(all_bounds[i][0], all_bounds[i][1], target_angular_distance / bound_angular_distance);
+		}
+		else {
+			bound_angular_distance = b.cross(c);
+			target_angular_distance = b.cross(v);
+
+			if (target_angular_distance >= 0.0 && c.cross(v) <= 0.0) {
+				return vec2(quadrants_on_circle[i]).rotate((target_angular_distance / bound_angular_distance) * 90, vec2(0, 0)) * radius + quadrant_multipliers[i] * r / 2;
+			}
+		}
+	}
+	
+	ensure(false);
+	return vec2(0, 0);
+}
+
 void immediate_hud::draw_circular_bars(messages::camera_render_request_message r) {
 	auto& render = r.camera->get_owner_world().get_system<render_system>();
 	const auto& visible_entities = render.get_all_visible_entities();
@@ -189,7 +234,9 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 				auto circle_displacement_length = health_points.get_bbox().bigger_side() + radius;
 				vec2i screen_space_circle_center = r.get_screen_space(transform.pos);
 
-				health_points.pos = screen_space_circle_center + vec2().set_from_degrees(in.angle).set_length(circle_displacement_length);
+
+				health_points.pos = screen_space_circle_center + position_caption_around_a_circle(radius+5, health_points.get_bbox(), in.angle) - health_points.get_bbox()/2;
+				//health_points.pos = screen_space_circle_center + vec2().set_from_degrees(in.angle).set_length(circle_displacement_length);
 
 				health_points.draw_stroke(circular_bars_information);
 				health_points.draw(circular_bars_information);
