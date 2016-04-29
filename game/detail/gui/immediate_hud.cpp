@@ -235,7 +235,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 				vec2i screen_space_circle_center = r.get_screen_space(transform.pos);
 
 
-				health_points.pos = screen_space_circle_center + position_caption_around_a_circle(radius+5, health_points.get_bbox(), in.angle) - health_points.get_bbox()/2;
+				health_points.pos = screen_space_circle_center + position_caption_around_a_circle(radius+6, health_points.get_bbox(), in.angle) - health_points.get_bbox()/2;
 				//health_points.pos = screen_space_circle_center + vec2().set_from_degrees(in.angle).set_length(circle_displacement_length);
 
 				health_points.draw_stroke(circular_bars_information);

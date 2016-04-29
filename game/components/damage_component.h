@@ -24,6 +24,10 @@ namespace components {
 
 		bool constrain_lifetime = true;
 		bool constrain_distance = false;
+		bool damage_falloff = false;
+
+		float damage_falloff_starting_distance = 500.f;
+		float minimum_amount_after_falloff = 5.f;
 
 		float max_distance = 0.f;
 		float max_lifetime_ms = 2000.f;
