@@ -6,7 +6,13 @@
 #include "entity_system/entity.h"
 
 #include "game/components/physics_component.h"
+#include "game/components/container_component.h"
 
+#include "game/components/animation_component.h"
+#include "game/components/movement_component.h"
+
+#include "game/detail/inventory_slot.h"
+#include "game/detail/inventory_slot_id.h"
 #include "game/detail/inventory_utils.h"
 
 void sentience_system::apply_damage_and_generate_health_events() {
@@ -104,6 +110,32 @@ void sentience_system::apply_damage_and_generate_health_events() {
 			}
 
 			break;
+		}
+
+		if (h.special_result == messages::health_event::DEATH) {
+			auto* movement = h.subject->find<components::movement>();
+			auto* animation = h.subject->find<components::animation>();
+
+			if (movement) {
+				movement->reset_movement_flags();
+			}
+
+			if(animation) {
+				h.subject->disable(animation);
+			}
+
+			auto* container = h.subject->find<components::container>();
+
+			if (container) {
+				messages::item_slot_transfer_request request;
+
+				for (auto& s : container->slots) {
+					for (auto& i : s.second.items_inside) {
+						request.item = i;
+						parent_world.post_message(request);
+					}
+				}
+			}
 		}
 	}
 }
