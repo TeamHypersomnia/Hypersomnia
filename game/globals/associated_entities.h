@@ -18,5 +18,6 @@ enum class sub_definition_name {
 };
 
 enum class associated_entity_name {
+	ASTRAL_BODY,
 	WATCHING_CAMERA
 };

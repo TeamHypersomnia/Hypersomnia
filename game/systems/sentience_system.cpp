@@ -153,6 +153,7 @@ void sentience_system::apply_damage_and_generate_health_events() {
 			parent_world.post_message(op);
 
 			h.spawned_remnants = corpse;
+			corpse[associated_entity_name::ASTRAL_BODY] = astral_body_now_without_physical_prison;
 		}
 	}
 }

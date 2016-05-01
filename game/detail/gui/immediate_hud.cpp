@@ -288,7 +288,7 @@ void immediate_hud::acquire_game_events(augs::world& w) {
 		ph.maximum_duration_seconds = 0.3;
 		ph.color = col;
 
-		erase_remove(recent_pure_color_highlights, [&ph](const pure_color_highlight& h) { return h.target == ph.target; });
+		erase_remove(recent_pure_color_highlights, [&ph](const pure_color_highlight& h) { return h.target == ph.target || h.target == ph.target[associated_entity_name::ASTRAL_BODY]; });
 		recent_pure_color_highlights.push_back(ph);
 	}
 }
