@@ -18,6 +18,8 @@ namespace messages {
 			HEALTH
 		} target = target_type::INVALID;
 
+		augs::entity_id spawned_remnants;
+
 		vec2 point_of_impact;
 		vec2 impact_velocity;
 

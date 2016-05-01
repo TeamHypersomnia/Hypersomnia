@@ -222,7 +222,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 
 			int empty_health_amount = (1 - sentience->health_ratio()) * 90;
 
-			textual_infos.push_back({ starting_health_angle + 90 - empty_health_amount/2, augs::to_wstring(sentience->health), health_col });
+			textual_infos.push_back({ starting_health_angle + 90 - empty_health_amount/2, augs::to_wstring(int(sentience->health)), health_col });
 			textual_infos.push_back({ starting_health_angle, description_of_entity(v).name, health_col });
 
 			for (auto& in : textual_infos) {
@@ -269,15 +269,22 @@ void immediate_hud::acquire_game_events(augs::world& w) {
 		else
 			continue;
 
-		vn.text.set_text(augs::gui::text::format(augs::to_wstring(std::abs(vn.value)), augs::gui::text::style(assets::GUI_FONT, col)));
+		vn.text.set_text(augs::gui::text::format(augs::to_wstring(std::abs(int(vn.value))), augs::gui::text::style(assets::GUI_FONT, col)));
 		vn.transform.pos = h.point_of_impact;
 
 		recent_vertically_flying_numbers.push_back(vn);
 
 		pure_color_highlight ph;
 		ph.time_of_occurence = w.get_current_timestamp();
+		
 		ph.target = h.subject;
-		ph.starting_alpha_ratio = std::min(1.f, h.ratio_to_maximum_value * 15);
+		ph.starting_alpha_ratio = std::min(1.f, h.ratio_to_maximum_value * 5);
+		
+		if (h.spawned_remnants.alive()) {
+			ph.target = h.spawned_remnants;
+			ph.starting_alpha_ratio = 0.7;
+		}
+
 		ph.maximum_duration_seconds = 0.3;
 		ph.color = col;
 

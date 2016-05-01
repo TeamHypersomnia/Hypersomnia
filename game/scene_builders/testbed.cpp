@@ -109,13 +109,15 @@ namespace scene_builders {
 
 		prefabs::create_sample_suppressor(world, vec2(300, -500));
 
+		bool many_charges = false;
+
 		auto rifle = prefabs::create_sample_rifle(world, vec2(100, -500), 
-			prefabs::create_sample_magazine(world, vec2(100, -650), "10", 
-				prefabs::create_cyan_charge(world, vec2(0, 0), 1000)));
+			prefabs::create_sample_magazine(world, vec2(100, -650), many_charges ? "10" : "0.3",
+				prefabs::create_cyan_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
 
 		auto rifle2 = prefabs::create_sample_rifle(world, vec2(100, -500 + 50), 
-			prefabs::create_sample_magazine(world, vec2(100, -650), "10", 
-				prefabs::create_cyan_charge(world, vec2(0, 0), 1000)));
+			prefabs::create_sample_magazine(world, vec2(100, -650), many_charges ? "10" : "0.3",
+				prefabs::create_cyan_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
 
 		prefabs::create_sample_rifle(world, vec2(100, -500 + 100));
 
@@ -126,7 +128,7 @@ namespace scene_builders {
 				prefabs::create_green_charge(world, vec2(0, 0), 40)));
 		
 		auto submachine = prefabs::create_submachine(world, vec2(500, -500 + 50), 
-			prefabs::create_sample_magazine(world, vec2(100 - 50, -650), "10", prefabs::create_pink_charge(world, vec2(0, 0), 500)));
+			prefabs::create_sample_magazine(world, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
 
 		prefabs::create_sample_magazine(world, vec2(100 - 50, -650));
 		prefabs::create_sample_magazine(world, vec2(100 - 100, -650), "0.15");

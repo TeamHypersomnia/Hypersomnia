@@ -149,8 +149,8 @@ namespace ingredients {
 		sentience.aimpunch.scale = 150.0;
 		sentience.aimpunch.single_cooldown_duration_ms= 200.0;
 
-		sentience.health = 200.0;
-		sentience.maximum_health = 200.0;
+		sentience.health = 100.0;
+		sentience.maximum_health = 100.0;
 
 		e->disable(force_joint);
 
@@ -200,7 +200,7 @@ namespace ingredients {
 		info.filter = filters::corpse();
 		info.density = 1.0;
 
-		body.linear_damping = 10;
+		body.linear_damping = 6.5;
 	}
 
 	void inject_window_input_to_character(augs::entity_id next_character, augs::entity_id camera) {

@@ -174,7 +174,7 @@ namespace prefabs {
 			ingredients::crate_physics(cyan_charge);
 
 			auto& item = ingredients::make_item(cyan_charge);
-			item.space_occupied_per_charge = to_space_units("0.007");
+			item.space_occupied_per_charge = to_space_units("0.01");
 			item.categories_for_slot_compatibility = item_category::SHOT_CHARGE;
 			item.charges = charges;
 			item.stackable = true;
@@ -286,7 +286,7 @@ namespace prefabs {
 		gun.shell_angular_velocity = std::make_pair(2.f, 14.f);
 		gun.shell_spread_degrees = 20.f;
 		gun.shell_velocity = std::make_pair(300, 1700);
-		gun.damage_multiplier = 1.f;
+		gun.damage_multiplier = 2.2f;
 
 		gun.recoil.repeat_last_n_offsets = 20;
 		gun.recoil.scale = 30.0;

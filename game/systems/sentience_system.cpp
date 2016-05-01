@@ -44,7 +44,7 @@ void sentience_system::apply_damage_and_generate_health_events() {
 			parent_world.post_message(aimpunch_event);
 
 		if (sentience) {
-			event.effective_amount = d.amount;
+			event.effective_amount = 0;
 			event.objective_amount = d.amount;
 
 			if (sentience->enable_health) {
@@ -52,15 +52,22 @@ void sentience_system::apply_damage_and_generate_health_events() {
 				event.special_result = messages::health_event::NONE;
 
 				if (d.amount > 0) {
-					if (sentience->health <= d.amount) {
-						event.special_result = messages::health_event::DEATH;
-						event.effective_amount = sentience->health;
+					if (sentience->health > 0){
+						if (sentience->health <= d.amount) {
+							event.special_result = messages::health_event::DEATH;
+							event.effective_amount = sentience->health;
+						}
+						else {
+							event.effective_amount = d.amount;
+						}
 					}
 				}
 				else {
 					if (sentience->health - d.amount > sentience->maximum_health) {
 						event.effective_amount = -(sentience->maximum_health - sentience->health);
 					}
+					else
+						event.effective_amount = -d.amount;
 				}
 
 				event.ratio_to_maximum_value = std::abs(event.effective_amount) / sentience->maximum_health;
@@ -141,9 +148,11 @@ void sentience_system::apply_damage_and_generate_health_events() {
 
 			messages::physics_operation op;
 			op.subject = corpse;
-			op.apply_force.set_from_degrees(place_of_death.rotation).set_length(27850 * 3);
+			op.apply_force.set_from_degrees(place_of_death.rotation).set_length(27850*2);
 
 			parent_world.post_message(op);
+
+			h.spawned_remnants = corpse;
 		}
 	}
 }
