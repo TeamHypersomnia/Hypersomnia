@@ -234,6 +234,7 @@ void game_world::perform_logic_step() {
 	get_system<movement_system>().apply_movement_forces();
 
 	get_system<rotation_copying_system>().update_physical_motors();
+	get_system<physics_system>().clear_collision_messages();
 	get_system<physics_system>().consume_rebuild_physics_messages_and_save_new_definitions();
 	get_system<physics_system>().execute_delayed_physics_ops();
 	get_system<physics_system>().step_and_set_new_transforms();

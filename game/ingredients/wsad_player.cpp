@@ -149,8 +149,8 @@ namespace ingredients {
 		sentience.aimpunch.scale = 150.0;
 		sentience.aimpunch.single_cooldown_duration_ms= 200.0;
 
-		sentience.health = 50.0;
-		sentience.maximum_health = 100.0;
+		sentience.health = 200.0;
+		sentience.maximum_health = 200.0;
 
 		e->disable(force_joint);
 
@@ -184,21 +184,10 @@ namespace ingredients {
 	void wsad_character_corpse(augs::entity_id e) {
 		auto& sprite = *e += components::sprite();
 		auto& render = *e += components::render();
-		//auto& animation = *e += components::animation();
-		//auto& animation_response = *e += components::animation_response();
 		auto& transform = *e += components::transform();
-		//auto& movement = *e += components::movement();
-		//auto& rotation_copying = *e += components::rotation_copying();
-		//auto& detector = *e += components::trigger_query_detector();
-		//auto& driver = *e += components::driver();
-		//auto& force_joint = *e += components::force_joint();
-		//auto& sentience = *e += components::sentience();
-		auto& particle_response = *e += components::particle_effect_response({ assets::particle_effect_response_id::CHARACTER_RESPONSE });
-		particle_response.modifier.colorize = augs::red;
-		particle_response.modifier.scale_lifetimes = 1.5f;
 
 		sprite.set(assets::texture_id::DEAD_TORSO, rgba(255, 255, 255, 255));
-		render.layer = render_layer::OVER_CROSSHAIR;
+		render.layer = render_layer::CORPSES;
 
 		auto& physics_definition = *e += components::physics_definition();
 		physics_definition.create_fixtures_and_body = false;

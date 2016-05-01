@@ -22,7 +22,6 @@ namespace components {
 		auto* fixtures = id->find<components::fixtures>();
 		if (fixtures) return fixtures->get_body_entity();
 		else if (id->find<components::physics>()) return id;
-		ensure(0);
 		return augs::entity_id();
 	}
 

@@ -475,9 +475,6 @@ void physics_system::enable_listener(bool flag) {
 #include "graphics/renderer.h"
 
 void physics_system::step_and_set_new_transforms() {
-	auto& collisions = parent_world.get_message_queue<messages::collision_message>();
-	collisions.clear();
-
 	listener.world_ptr = &parent_world;
 
 	int32 velocityIterations = 8;
@@ -538,7 +535,8 @@ void physics_system::step_and_set_new_transforms() {
 
 	b2world.Step(static_cast<float32>(delta_seconds()), velocityIterations, positionIterations);
 	b2world.ClearForces();
-
+	
+	auto& collisions = parent_world.get_message_queue<messages::collision_message>();
 	std::sort(collisions.begin(), collisions.end());
 	collisions.erase(std::unique(collisions.begin(), collisions.end()), collisions.end());
 
@@ -695,6 +693,11 @@ void physics_system::create_physics_for_entity(augs::entity_id e) {
 
 bool physics_system::has_entity_any_physics(augs::entity_id subject) {
 	return subject->find<components::physics>() || subject->find<components::fixtures>();
+}
+
+void physics_system::clear_collision_messages() {
+	auto& collisions = parent_world.get_message_queue<messages::collision_message>();
+	collisions.clear();
 }
 
 void physics_system::destroy_fixtures_of_entity(augs::entity_id subject) {
