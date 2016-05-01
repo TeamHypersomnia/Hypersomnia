@@ -126,6 +126,8 @@ namespace resource_setups {
 		resource_manager.create(assets::texture_id::CHAMBER_SLOT_ICON, L"hypersomnia/gfx/chamber_slot_icon.png");
 		resource_manager.create(assets::texture_id::DETACHABLE_MAGAZINE_ICON, L"hypersomnia/gfx/detachable_magazine_slot_icon.png");
 		resource_manager.create(assets::texture_id::GUN_BARREL_SLOT_ICON, L"hypersomnia/gfx/gun_barrel_slot_icon.png");
+		
+		resource_manager.create(assets::texture_id::DEAD_TORSO, L"hypersomnia/gfx/dead_torso.png");
 
 		auto& font = resource_manager.create(assets::font_id::GUI_FONT);
 		font.open("hypersomnia/Kubasta.ttf", 16, L" ABCDEFGHIJKLMNOPRSTUVWXYZQabcdefghijklmnoprstuvwxyzq0123456789.!@#$%^&*()_+-=[];'\\,./{}:\"|<>?");

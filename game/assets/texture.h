@@ -22,6 +22,8 @@ namespace assets {
 
 		MOTORCYCLE_FRONT,
 		MOTORCYCLE_INSIDE,
+		
+		DEAD_TORSO,
 
 		TEST_CROSSHAIR,
 		TEST_PLAYER,

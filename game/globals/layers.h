@@ -9,6 +9,7 @@ enum render_layer {
 	HAT,
 	FLYING_BULLETS,
 	DYNAMIC_BODY,
+	CORPSES,
 	CAR_WHEEL,
 	CAR_INTERIOR,
 	GROUND,

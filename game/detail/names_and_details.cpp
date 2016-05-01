@@ -57,7 +57,7 @@ textual_description description_by_entity_name(entity_name n) {
 	case entity_name::PERSON:
 		return{
 			L"Person",
-			L"Living entity."
+			L"Member of Atlantic Nations."
 		};
 	case entity_name::CRATE:
 		return{
@@ -78,6 +78,11 @@ textual_description description_by_entity_name(entity_name n) {
 		return{
 			L"Urban cyan machete",
 			L"Delivers solid slash."
+		};
+	case entity_name::CORPSE:
+		return{
+			L"Corpse",
+			L"Dead Citizen of Atlantis.\nCannot be revived by now."
 		};
 	default:
 		ensure(false);

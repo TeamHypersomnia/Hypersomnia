@@ -27,3 +27,5 @@ std::wstring format_space_units(unsigned);
 
 int count_charges_in_deposit(augs::entity_id item);
 int count_charges_inside(inventory_slot_id);
+
+void drop_from_all_slots(augs::entity_id container);

@@ -14,6 +14,7 @@ enum class sub_definition_name {
 
 	BULLET_SHELL,
 	BULLET_ROUND,
+	CORPSE_OF_SENTIENCE
 };
 
 enum class associated_entity_name {

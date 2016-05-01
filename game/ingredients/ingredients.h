@@ -31,6 +31,7 @@ namespace ingredients {
 	void wsad_character_physics(augs::entity_id);
 	void wsad_character_legs(augs::entity_id legs, augs::entity_id player);
 	void wsad_character(augs::entity_id, augs::entity_id crosshair_entity);
+	void wsad_character_corpse(augs::entity_id);
 
 	void inject_window_input_to_character(augs::entity_id target_character, augs::entity_id camera_entity);
 

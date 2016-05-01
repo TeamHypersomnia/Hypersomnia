@@ -136,7 +136,7 @@ void rotation_copying_system::update_physical_motors() {
 		auto& rotation_copying = it->get<components::rotation_copying>();
 
 		if (rotation_copying.update_value) {
-			if (rotation_copying.use_physical_motor) {
+			if (rotation_copying.use_physical_motor && it->find<components::physics>() != nullptr) {
 				resolve_rotation_copying_value(it);
 
 				auto& physics = it->get<components::physics>();

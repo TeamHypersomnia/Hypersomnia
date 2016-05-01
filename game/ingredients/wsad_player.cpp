@@ -82,6 +82,7 @@ namespace ingredients {
 		auto& driver = *e += components::driver();
 		auto& force_joint = *e += components::force_joint();
 		auto& sentience = *e += components::sentience();
+		*e += components::position_copying(); // used when it is an astral body
 		auto& particle_response = *e += components::particle_effect_response({ assets::particle_effect_response_id::CHARACTER_RESPONSE });
 		particle_response.modifier.colorize = augs::red;
 		particle_response.modifier.scale_lifetimes = 1.5f;
@@ -148,8 +149,8 @@ namespace ingredients {
 		sentience.aimpunch.scale = 150.0;
 		sentience.aimpunch.single_cooldown_duration_ms= 200.0;
 
-		sentience.health = 300.0;
-		sentience.maximum_health = 300.0;
+		sentience.health = 50.0;
+		sentience.maximum_health = 100.0;
 
 		e->disable(force_joint);
 
@@ -178,6 +179,39 @@ namespace ingredients {
 		rotation_copying.colinearize_item_in_hand = true;
 
 		wsad_character_setup_movement(e);
+	}
+
+	void wsad_character_corpse(augs::entity_id e) {
+		auto& sprite = *e += components::sprite();
+		auto& render = *e += components::render();
+		//auto& animation = *e += components::animation();
+		//auto& animation_response = *e += components::animation_response();
+		auto& transform = *e += components::transform();
+		//auto& movement = *e += components::movement();
+		//auto& rotation_copying = *e += components::rotation_copying();
+		//auto& detector = *e += components::trigger_query_detector();
+		//auto& driver = *e += components::driver();
+		//auto& force_joint = *e += components::force_joint();
+		//auto& sentience = *e += components::sentience();
+		auto& particle_response = *e += components::particle_effect_response({ assets::particle_effect_response_id::CHARACTER_RESPONSE });
+		particle_response.modifier.colorize = augs::red;
+		particle_response.modifier.scale_lifetimes = 1.5f;
+
+		sprite.set(assets::texture_id::DEAD_TORSO, rgba(255, 255, 255, 255));
+		render.layer = render_layer::OVER_CROSSHAIR;
+
+		auto& physics_definition = *e += components::physics_definition();
+		physics_definition.create_fixtures_and_body = false;
+
+		auto& body = physics_definition.body;
+		auto& info = physics_definition.new_fixture();
+
+		info.from_renderable(e);
+
+		info.filter = filters::corpse();
+		info.density = 1.0;
+
+		body.linear_damping = 10;
 	}
 
 	void inject_window_input_to_character(augs::entity_id next_character, augs::entity_id camera) {
@@ -217,6 +251,7 @@ namespace ingredients {
 namespace prefabs {
 	augs::entity_id create_character(augs::world& world, vec2 pos) {
 		auto character = world.create_entity("player_unnamed");
+
 		name_entity(character, entity_name::PERSON);
 
 		auto crosshair = create_character_crosshair(world);
@@ -229,6 +264,12 @@ namespace prefabs {
 		ingredients::wsad_character_physics(character);
 
 		ingredients::character_inventory(character);
+
+		auto corpse_of_sentience = world.create_definition_entity("corpse_of_sentience");
+		name_entity(corpse_of_sentience, entity_name::CORPSE);
+		ingredients::wsad_character_corpse(corpse_of_sentience);
+
+		character->map_sub_definition(sub_definition_name::CORPSE_OF_SENTIENCE, corpse_of_sentience);
 
 		return character;
 	}

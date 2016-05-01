@@ -2,11 +2,14 @@
 
 #include "game/messages/damage_message.h"
 #include "game/messages/health_event.h"
+#include "game/messages/rebuild_physics_message.h"
+#include "game/messages/physics_operation.h"
 #include "entity_system/world.h"
 #include "entity_system/entity.h"
 
 #include "game/components/physics_component.h"
 #include "game/components/container_component.h"
+#include "game/components/position_copying_component.h"
 
 #include "game/components/animation_component.h"
 #include "game/components/movement_component.h"
@@ -113,29 +116,34 @@ void sentience_system::apply_damage_and_generate_health_events() {
 		}
 
 		if (h.special_result == messages::health_event::DEATH) {
-			auto* movement = h.subject->find<components::movement>();
-			auto* animation = h.subject->find<components::animation>();
-
-			if (movement) {
-				movement->reset_movement_flags();
-			}
-
-			if(animation) {
-				h.subject->disable(animation);
-			}
-
 			auto* container = h.subject->find<components::container>();
 
-			if (container) {
-				messages::item_slot_transfer_request request;
+			if (container)
+				drop_from_all_slots(h.subject);
 
-				for (auto& s : container->slots) {
-					for (auto& i : s.second.items_inside) {
-						request.item = i;
-						parent_world.post_message(request);
-					}
-				}
-			}
+			auto corpse = parent_world.create_entity_from_definition(h.subject[sub_definition_name::CORPSE_OF_SENTIENCE]);
+
+			auto place_of_death = h.subject->get<components::transform>();
+			place_of_death.rotation = h.impact_velocity.degrees();
+
+			corpse->get<components::physics_definition>().create_fixtures_and_body = true;
+			corpse->get<components::transform>() = place_of_death;
+
+			messages::rebuild_physics_message remove_from_physical_plane_of_existence;
+			remove_from_physical_plane_of_existence.subject = h.subject;
+			remove_from_physical_plane_of_existence.new_definition = h.subject->get<components::physics_definition>();
+			remove_from_physical_plane_of_existence.new_definition.create_fixtures_and_body = false;
+			
+			parent_world.post_message(remove_from_physical_plane_of_existence);
+			
+			auto astral_body_now_without_physical_prison = h.subject;
+			astral_body_now_without_physical_prison->get<components::position_copying>().set_target(corpse);
+
+			messages::physics_operation op;
+			op.subject = corpse;
+			op.apply_force.set_from_degrees(place_of_death.rotation).set_length(27850 * 3);
+
+			parent_world.post_message(op);
 		}
 	}
 }

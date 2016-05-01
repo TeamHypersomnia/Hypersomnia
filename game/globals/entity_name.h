@@ -16,6 +16,7 @@ enum class entity_name {
 	PERSON,
 	PISTOL,
 	SUBMACHINE,
+	CORPSE,
 	URBAN_CYAN_MACHETE,
 };
 

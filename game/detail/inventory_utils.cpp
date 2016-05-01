@@ -1,5 +1,6 @@
 #include "inventory_utils.h"
 #include "entity_system/entity.h"
+#include "entity_system/world.h"
 #include "game/components/item_component.h"
 
 #include "stream.h"
@@ -266,4 +267,19 @@ std::wstring format_space_units(unsigned u) {
 		return L"0";
 
 	return augs::to_wstring(u / long double(SPACE_ATOMS_PER_UNIT), 2);
+}
+
+void drop_from_all_slots(augs::entity_id c) {
+	auto& container = c->get<components::container>();
+
+	messages::item_slot_transfer_request request;
+
+	for (auto& s : container.slots) {
+		auto items_uninvalidated = s.second.items_inside;
+
+		for (auto& i : items_uninvalidated) {
+			request.item = i;
+			c->get_owner_world().post_message(request);
+		}
+	}
 }
