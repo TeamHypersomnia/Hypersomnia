@@ -13,8 +13,6 @@ class animation_system : public processing_system_templated<components::animatio
 public:
 	using processing_system_templated::processing_system_templated;
 
-	timer animation_timer;
-
 	void game_responses_to_animation_messages();
 
 	void handle_animation_messages();

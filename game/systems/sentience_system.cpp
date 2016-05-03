@@ -67,7 +67,7 @@ void sentience_system::apply_damage_and_generate_health_events() {
 						event.effective_amount = -(sentience->maximum_health - sentience->health);
 					}
 					else
-						event.effective_amount = -d.amount;
+						event.effective_amount = d.amount;
 				}
 
 				event.ratio_to_maximum_value = std::abs(event.effective_amount) / sentience->maximum_health;

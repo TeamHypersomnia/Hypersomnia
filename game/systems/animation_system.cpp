@@ -155,7 +155,7 @@ void components::animation::set_frame_num(unsigned number, augs::entity_id subje
 //}
 
 void animation_system::progress_animation_states() {
-	float delta = static_cast<float>(animation_timer.extract<std::chrono::milliseconds>());
+	auto delta = delta_milliseconds();
 
 	for (auto it : targets) {
 		auto& current = it->get<components::animation>();
