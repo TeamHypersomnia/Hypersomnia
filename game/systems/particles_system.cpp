@@ -112,12 +112,12 @@ void particles_system::game_responses_to_particle_effects() {
 		if (h.target == messages::health_event::HEALTH) {
 			if (h.effective_amount > 0) {
 				burst.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
-				burst.modifier.scale_amounts += h.ratio_to_maximum_value;
+				burst.modifier.scale_amounts += h.ratio_effective_to_maximum;
 				parent_world.post_message(burst);
 			}
 			else {
 				// burst.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
-				// burst.modifier.scale_amounts += h.ratio_to_maximum_value;
+				// burst.modifier.scale_amounts += h.ratio_effective_to_maximum;
 				// burst.modifier.colorize = green;
 				// parent_world.post_message(burst);
 			}

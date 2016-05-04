@@ -1,17 +1,17 @@
 #include "sentience_component.h"
 
 namespace components {
-	float sentience::health_ratio() const {
-		return health / maximum_health;
+	sentience::sentience() {
+		health.enabled = true;
 	}
 
-	float sentience::consciousness_ratio() const {
-		return consciousness / maximum_consciousness;
+	float sentience::meter::ratio() const {
+		return value / maximum;
 	}
-
+	
 	augs::rgba sentience::calculate_health_color(float time_pulse_multiplier) const {
 		using namespace augs;
-		auto hr = health_ratio();
+		auto hr = health.ratio();
 		hr *= 1.f - (0.2f * time_pulse_multiplier);
 
 		rgba health_col;

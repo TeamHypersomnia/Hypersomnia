@@ -5,16 +5,29 @@
 
 namespace components {
 	struct sentience {
-		bool enable_health = true;
-		bool enable_consciousness = false;
+		sentience();
 
-		float health = 100.f;
-		float maximum_health = 100.f;
-		float consciousness = 100.f;
-		float maximum_consciousness = 100.f;
+		struct meter {
+			bool enabled = false;
 
-		float health_ratio() const;
-		float consciousness_ratio() const;
+			float value = 100.f;
+			float maximum = 100.f;
+
+			struct damage_result {
+				float effective = 0.f;
+				float ratio_effective_to_maximum = 0.f;
+				bool dropped_to_zero = false;
+			};
+
+			damage_result calculate_damage_result(float amount) const;
+
+			float ratio() const;
+		};
+
+		meter health;
+		meter consciousness;
+		meter shield;
+
 		augs::rgba calculate_health_color(float time_pulse_multiplier) const;
 
 		recoil_player aimpunch;

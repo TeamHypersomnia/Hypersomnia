@@ -19,6 +19,8 @@ namespace augs {
 			vec2 angle_start = vec2(), vec2 angle_end = vec2());
 		void paint_filled_circle(int radius, augs::rgba filling = white);
 
+		void paint_button_with_cuts(int width, int height, int left_bottom_cut_length, int top_right_cut_length, augs::rgba border, augs::rgba filling);
+
 		void create(int w, int h, int channels);
 		bool from_file(const std::wstring& filename, unsigned channels = 0),
 			from_clipboard();

@@ -10,4 +10,5 @@ public:
 
 	void apply_damage_and_generate_health_events();
 	void cooldown_aimpunches();
+	void regenerate_values();
 };

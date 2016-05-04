@@ -86,7 +86,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 		auto* sentience = v->find<components::sentience>();
 
 		if (sentience) {
-			auto hr = sentience->health_ratio();
+			auto hr = sentience->health.ratio();
 			auto one_less_hr = 1 - hr;
 
 			int pulse_duration = 1250 - 1000 * (1 - hr);
@@ -126,11 +126,11 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 
 			if (v == watched_character) {
 				starting_health_angle = watched_character_transform.rotation + 135;
-				ending_health_angle = starting_health_angle + sentience->health_ratio() * 90.f;
+				ending_health_angle = starting_health_angle + sentience->health.ratio() * 90.f;
 			}
 			else {
 				starting_health_angle = (v->get<components::transform>().pos - watched_character_transform.pos).degrees() - 45;
-				ending_health_angle = starting_health_angle + sentience->health_ratio() * 90.f;
+				ending_health_angle = starting_health_angle + sentience->health.ratio() * 90.f;
 			}
 
 			auto push_angles = [&target](float lower_outside, float upper_outside, float lower_inside, float upper_inside) {
@@ -220,9 +220,9 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 
 			int radius = (*assets::HUD_CIRCULAR_BAR_MEDIUM).get_size().x / 2;
 
-			int empty_health_amount = (1 - sentience->health_ratio()) * 90;
+			int empty_health_amount = (1 - sentience->health.ratio()) * 90;
 
-			textual_infos.push_back({ starting_health_angle + 90 - empty_health_amount/2, augs::to_wstring(int(sentience->health)), health_col });
+			textual_infos.push_back({ starting_health_angle + 90 - empty_health_amount/2, augs::to_wstring(int(sentience->health.value)), health_col });
 			textual_infos.push_back({ starting_health_angle, description_of_entity(v).name, health_col });
 
 			for (auto& in : textual_infos) {
@@ -278,7 +278,7 @@ void immediate_hud::acquire_game_events(augs::world& w) {
 		ph.time_of_occurence = w.get_current_timestamp();
 		
 		ph.target = h.subject;
-		ph.starting_alpha_ratio = std::min(1.f, h.ratio_to_maximum_value * 5);
+		ph.starting_alpha_ratio = std::min(1.f, h.ratio_effective_to_maximum * 5);
 		
 		if (h.spawned_remnants.alive()) {
 			ph.target = h.spawned_remnants;

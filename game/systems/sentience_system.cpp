@@ -18,6 +18,33 @@
 #include "game/detail/inventory_slot_id.h"
 #include "game/detail/inventory_utils.h"
 
+components::sentience::meter::damage_result components::sentience::meter::calculate_damage_result(float amount) const {
+	components::sentience::meter::damage_result result;
+
+	if (amount > 0) {
+		if (value > 0) {
+			if (value <= amount) {
+				result.dropped_to_zero = true;
+				result.effective = value;
+			}
+			else {
+				result.effective = amount;
+			}
+		}
+	}
+	else {
+		if (value - amount > maximum) {
+			result.effective = -(maximum - value);
+		}
+		else
+			result.effective = amount;
+	}
+
+	result.ratio_effective_to_maximum = std::abs(result.effective) / maximum;
+
+	return result;
+}
+
 void sentience_system::apply_damage_and_generate_health_events() {
 	auto& damages = parent_world.get_message_queue<messages::damage_message>();
 	auto& healths = parent_world.get_message_queue<messages::health_event>();
@@ -44,55 +71,37 @@ void sentience_system::apply_damage_and_generate_health_events() {
 			parent_world.post_message(aimpunch_event);
 
 		if (sentience) {
+			auto& s = *sentience;
+
 			event.effective_amount = 0;
 			event.objective_amount = d.amount;
+			event.special_result = messages::health_event::NONE;
 
-			if (sentience->enable_health) {
+			if (s.health.enabled) {
 				event.target = messages::health_event::HEALTH;
-				event.special_result = messages::health_event::NONE;
 
-				if (d.amount > 0) {
-					if (sentience->health > 0){
-						if (sentience->health <= d.amount) {
-							event.special_result = messages::health_event::DEATH;
-							event.effective_amount = sentience->health;
-						}
-						else {
-							event.effective_amount = d.amount;
-						}
-					}
-				}
-				else {
-					if (sentience->health - d.amount > sentience->maximum_health) {
-						event.effective_amount = -(sentience->maximum_health - sentience->health);
-					}
-					else
-						event.effective_amount = d.amount;
-				}
+				auto damaged = s.health.calculate_damage_result(d.amount);
+				event.effective_amount = damaged.effective;
+				event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
 
-				event.ratio_to_maximum_value = std::abs(event.effective_amount) / sentience->maximum_health;
+				if (damaged.dropped_to_zero) {
+					event.special_result = messages::health_event::DEATH;
+				}
 
 				if(event.effective_amount != 0)
 					parent_world.post_message(event);
 			}
 
-			if (sentience->enable_consciousness) {
+			if (s.consciousness.enabled) {
 				event.target = messages::health_event::CONSCIOUSNESS;
-				event.special_result = messages::health_event::NONE;
 
-				if (d.amount > 0) {
-					if (sentience->consciousness <= d.amount) {
-						event.special_result = messages::health_event::LOSS_OF_CONSCIOUSNESS;
-						event.effective_amount = sentience->consciousness;
-					}
-				}
-				else {
-					if (sentience->consciousness - d.amount > sentience->maximum_consciousness) {
-						event.effective_amount = -(sentience->maximum_consciousness - sentience->consciousness);
-					}
-				}
+				auto damaged = s.consciousness.calculate_damage_result(d.amount);
+				event.effective_amount = damaged.effective;
+				event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
 
-				event.ratio_to_maximum_value = std::abs(event.effective_amount) / sentience->maximum_consciousness;
+				if (damaged.dropped_to_zero) {
+					event.special_result = messages::health_event::LOSS_OF_CONSCIOUSNESS;
+				}
 
 				if (event.effective_amount != 0)
 					parent_world.post_message(event);
@@ -105,8 +114,8 @@ void sentience_system::apply_damage_and_generate_health_events() {
 		auto& sentience = h.subject->get<components::sentience>();
 
 		switch (h.target) {
-		case messages::health_event::HEALTH: sentience.health -= h.effective_amount; break;
-		case messages::health_event::CONSCIOUSNESS: sentience.consciousness -= h.effective_amount; break;
+		case messages::health_event::HEALTH: sentience.health.value -= h.effective_amount; break;
+		case messages::health_event::CONSCIOUSNESS: sentience.consciousness.value -= h.effective_amount; break;
 		case messages::health_event::SHIELD: ensure(0); break;
 		case messages::health_event::AIM:
 			auto punched = h.subject;
@@ -159,6 +168,12 @@ void sentience_system::apply_damage_and_generate_health_events() {
 }
 
 void sentience_system::cooldown_aimpunches() {
+	for (auto& t : targets) {
+		t->get<components::sentience>().aimpunch.cooldown(delta_milliseconds());
+	}
+}
+
+void sentience_system::regenerate_values() {
 	for (auto& t : targets) {
 		t->get<components::sentience>().aimpunch.cooldown(delta_milliseconds());
 	}

@@ -23,7 +23,7 @@ namespace messages {
 		vec2 point_of_impact;
 		vec2 impact_velocity;
 
-		float ratio_to_maximum_value = 1.f;
+		float ratio_effective_to_maximum = 1.f;
 		float objective_amount = 0.f;
 		float effective_amount = 0.f;
 	};

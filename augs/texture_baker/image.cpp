@@ -185,6 +185,19 @@ namespace augs {
 		//pixel(side -1, side /2) = rgba(0, 0, 0, 0);
 	}
 
+	void image::paint_button_with_cuts(int width, int height, int left_bottom_cut_length, int top_right_cut_length, augs::rgba border, augs::rgba filling) {
+		create(width, height, 4);
+
+		for (int x = 0; x < size.w; ++x) {
+			for (int y = 0; y < size.h; ++y) {
+				if (!x || !y || x == size.w - 1 || y == size.h - 1)
+					pixel(x, y) = border;
+				else
+					pixel(x, y) = filling;
+			}
+		}
+	}
+
 	bool image::from_file(const std::wstring& filename, unsigned force_channels) {
 		channels = 4;
 

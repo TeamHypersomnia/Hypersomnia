@@ -149,8 +149,8 @@ namespace ingredients {
 		sentience.aimpunch.scale = 150.0;
 		sentience.aimpunch.single_cooldown_duration_ms= 200.0;
 
-		sentience.health = 100.0;
-		sentience.maximum_health = 100.0;
+		sentience.health.value = 100.0;
+		sentience.health.maximum = 100.0;
 
 		e->disable(force_joint);
 
