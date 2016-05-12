@@ -193,6 +193,8 @@ void game_world::perform_logic_step() {
 
 	get_system<intent_contextualization_system>().contextualize_crosshair_action_intents();
 
+	get_system<behaviour_tree_system>().evaluate_trees();
+
 	get_system<gun_system>().consume_gun_intents();
 	get_system<gun_system>().launch_shots_due_to_pressed_triggers();
 

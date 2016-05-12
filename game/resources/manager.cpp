@@ -36,6 +36,10 @@ resources::particle_effect& operator*(const assets::particle_effect_id& id) {
 	return *resource_manager.find(id);
 }
 
+resources::behaviour_tree& operator*(const assets::behaviour_tree_id& id) {
+	return *resource_manager.find(id);
+}
+
 bool operator!(const assets::texture_id& id) {
 	return resource_manager.find(id) == nullptr;
 }
@@ -86,6 +90,13 @@ namespace resources {
 	particle_effect_response* manager::find(assets::particle_effect_response_id id) {
 		auto it = particle_effect_responses.find(id);
 		if (it == particle_effect_responses.end()) return nullptr;
+
+		return &(*it).second;
+	}
+
+	behaviour_tree* manager::find(assets::behaviour_tree_id id) {
+		auto it = behaviour_trees.find(id);
+		if (it == behaviour_trees.end()) return nullptr;
 
 		return &(*it).second;
 	}
@@ -275,6 +286,13 @@ namespace resources {
 		p.build();
 
 		return p;
+	}
+	
+	behaviour_tree& manager::create(assets::behaviour_tree_id id) {
+		behaviour_trees.insert(std::make_pair(id, behaviour_tree()));
+
+		auto& tree = behaviour_trees[id];
+		return tree;
 	}
 
 	void manager::destroy_everything() {

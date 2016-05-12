@@ -1206,6 +1206,9 @@
     <ClCompile Include="game\components\sentience_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\resources\behaviour_tree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3225,6 +3228,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\stlutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\resources\behaviour_tree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\assets\behaviour_tree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

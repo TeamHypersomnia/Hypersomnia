@@ -8,12 +8,14 @@
 #include "../assets/animation_response.h"
 #include "../assets/particle_effect.h"
 #include "../assets/particle_effect_response.h"
+#include "../assets/behaviour_tree.h"
 
 #include "../resources/animation.h"
 #include "../resources/animation_response.h"
 #include "../resources/texture_with_image.h"
 #include "../resources/particle_effect.h"
 #include "../resources/particle_effect_response.h"
+#include "../resources/behaviour_tree.h"
 
 #include "texture_baker/texture_baker.h"
 #include "texture_baker/font.h"
@@ -53,6 +55,8 @@ namespace resources {
 		augs::graphics::shader& create(assets::shader_id, std::wstring filename, augs::graphics::shader::type);
 		augs::graphics::shader_program& create(assets::program_id, assets::shader_id vertex, assets::shader_id fragment);
 
+		behaviour_tree& create(assets::behaviour_tree_id);
+
 		texture_with_image* find(assets::texture_id);
 		augs::font* find(assets::font_id);
 		augs::atlas* find(assets::atlas_id);
@@ -61,6 +65,7 @@ namespace resources {
 		animation_response* find(assets::animation_response_id);
 		particle_effect* find(assets::particle_effect_id);
 		particle_effect_response* find(assets::particle_effect_response_id);
+		behaviour_tree* find(assets::behaviour_tree_id);
 
 		void destroy_everything();
 
@@ -75,6 +80,7 @@ namespace resources {
 		std::unordered_map<assets::atlas_id, augs::atlas> atlases;
 		std::unordered_map<assets::shader_id, augs::graphics::shader> shaders;
 		std::unordered_map<assets::program_id, augs::graphics::shader_program> programs;
+		std::unordered_map<assets::behaviour_tree_id, behaviour_tree> behaviour_trees;
 	};
 }
 

@@ -1,10 +1,8 @@
 #pragma once
 #include "entity_system/processing_system.h"
-
 #include "../components/behaviour_tree_component.h"
 
 using namespace augs;
-
 
 class physics_system;
 
@@ -12,6 +10,5 @@ class behaviour_tree_system : public processing_system_templated<components::beh
 public:
 	using processing_system_templated::processing_system_templated;
 
-	void substep();
-	void process_entities();
+	void evaluate_trees();
 };
