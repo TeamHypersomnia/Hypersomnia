@@ -66,9 +66,9 @@ namespace resources {
 		void build_tree();
 		void evaluate_instance_of_tree(state_of_tree_instance&) const;
 
-		node& get_node_by_id(int) const;
+		const node& get_node_by_id(int) const;
 	private:
-		std::vector<node*> node_pointers;
+		std::vector<const node*> node_pointers;
 
 		void dfs(node& p, std::function<void(node&)>);
 		void dfs_all(std::function<void(node&)>);

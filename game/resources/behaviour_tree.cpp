@@ -2,7 +2,7 @@
 #include "ensure.h"
 
 namespace resources {
-	behaviour_tree::node& behaviour_tree::get_node_by_id(int i) const {
+	const behaviour_tree::node& behaviour_tree::get_node_by_id(int i) const {
 		return *node_pointers[i];
 	}
 
