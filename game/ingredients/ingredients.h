@@ -43,6 +43,9 @@ namespace ingredients {
 
 	void default_gun_container(augs::entity_id);
 	void default_gun(augs::entity_id);
+
+	void standard_pathfinding_capability(augs::entity_id);
+	void enemy_intelligence(augs::entity_id);
 }
 
 namespace prefabs {

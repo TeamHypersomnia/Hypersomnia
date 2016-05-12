@@ -16,6 +16,13 @@ namespace filters {
 		out.maskBits = RENDERABLE;
 		return out;
 	}
+
+	b2Filter pathfinding_query() {
+		b2Filter out;
+		out.categoryBits = PATHFINDING_QUERY;
+		out.maskBits = PATHFINDING_OBSTRUCTION;
+		return out;
+	}
 	
 	b2Filter controlled_character() {
 		b2Filter out;
@@ -40,15 +47,15 @@ namespace filters {
 
 	b2Filter dynamic_object() {
 		b2Filter out;
-		out.categoryBits = RENDERABLE | DYNAMIC_OBJECT;
-		out.maskBits = RENDERABLE_QUERY | CONTROLLED_CHARACTER | STATIC_OBJECT | DYNAMIC_OBJECT | REMOTE_CHARACTER | FRICTION_GROUND | BULLET | SHELL | CORPSE;
+		out.categoryBits = PATHFINDING_OBSTRUCTION | RENDERABLE | DYNAMIC_OBJECT;
+		out.maskBits = PATHFINDING_QUERY | RENDERABLE_QUERY | CONTROLLED_CHARACTER | STATIC_OBJECT | DYNAMIC_OBJECT | REMOTE_CHARACTER | FRICTION_GROUND | BULLET | SHELL | CORPSE;
 		return out;
 	}
 
 	b2Filter static_object() {
 		b2Filter out;
-		out.categoryBits = RENDERABLE | STATIC_OBJECT;
-		out.maskBits = RENDERABLE_QUERY | CONTROLLED_CHARACTER | DYNAMIC_OBJECT | REMOTE_CHARACTER | FRICTION_GROUND | BULLET | SHELL | CORPSE;
+		out.categoryBits = PATHFINDING_OBSTRUCTION | RENDERABLE | STATIC_OBJECT;
+		out.maskBits = PATHFINDING_QUERY | RENDERABLE_QUERY | CONTROLLED_CHARACTER | DYNAMIC_OBJECT | REMOTE_CHARACTER | FRICTION_GROUND | BULLET | SHELL | CORPSE;
 		return out;
 	}
 
@@ -72,4 +79,5 @@ namespace filters {
 		out.maskBits = RENDERABLE_QUERY | TRIGGER | CONTROLLED_CHARACTER;
 		return out;
 	}
+
 }

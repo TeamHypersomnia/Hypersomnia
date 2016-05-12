@@ -17,6 +17,8 @@ namespace filters {
 		RENDERABLE_QUERY = 1 << 10,
 		SHELL = 1 << 11,
 		CORPSE = 1 << 12,
+		PATHFINDING_OBSTRUCTION = 1 << 13,
+		PATHFINDING_QUERY = 1 << 14,
 	};
 
 	b2Filter renderable_query();
@@ -28,6 +30,7 @@ namespace filters {
 	b2Filter static_object();
 	b2Filter shell();
 	b2Filter bullet();
+	b2Filter pathfinding_query();
 
 	b2Filter trigger();
 }

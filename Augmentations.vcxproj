@@ -393,6 +393,7 @@
     <ClCompile Include="game\components\sprite_component.cpp" />
     <ClCompile Include="game\components\tile_layer_component.cpp" />
     <ClCompile Include="game\components\transform_component.cpp" />
+    <ClCompile Include="game\ingredients\artificial_life.cpp" />
     <ClCompile Include="game\resources\behaviour_tree.cpp" />
     <ClCompile Include="game\detail\combat\melee_animation.cpp" />
     <ClCompile Include="game\detail\entity_description.cpp" />

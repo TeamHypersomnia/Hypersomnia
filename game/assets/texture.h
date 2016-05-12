@@ -14,6 +14,7 @@ namespace assets {
 		BLANK,
 
 		CRATE,
+		CRATE_DESTROYED,
 		CAR_INSIDE,
 		CAR_FRONT,
 

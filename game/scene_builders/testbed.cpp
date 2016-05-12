@@ -62,6 +62,12 @@ namespace scene_builders {
 		auto crate2 = prefabs::create_crate(world, vec2(400, 200 + 400), vec2i(300, 300));
 		auto crate4 = prefabs::create_crate(world, vec2(500, 200 + 0), vec2i(100, 100));
 
+		for (int x = -4; x < 4; ++x) {
+			for (int y = -4; y < 4; ++y) {
+				auto obstacle = prefabs::create_crate(world, vec2(2000 + x * 300, 2000 + y * 300), vec2i(100, 100));
+			}
+		}
+
 		for (int x = -4 * 1; x < 4 * 1; ++x)
 		{
 			auto frog = world.create_entity("frog");
