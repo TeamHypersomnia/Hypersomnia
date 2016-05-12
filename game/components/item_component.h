@@ -44,7 +44,7 @@ namespace components {
 			target_slot_after_unmount.unset();
 		}
 
-		bool is_mounted() {
+		bool is_mounted() const {
 			return current_mounting == MOUNTED;
 		}
 

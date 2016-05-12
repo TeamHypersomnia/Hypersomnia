@@ -21,7 +21,6 @@ namespace components {
 	};
 
 	struct melee {
-
 		melee_info swings[5];
 		float swing_current_time = 0.f;
 		float swing_current_cooldown_time = 0.f;
@@ -32,6 +31,10 @@ namespace components {
 		bool primary_move_flag = false;
 		bool secondary_move_flag = false;
 		bool tertiary_move_flag = false;
+
+		void reset_move_flags() {
+			primary_move_flag = secondary_move_flag = tertiary_move_flag = false;
+		}
 
 		melee_state state = MELEE_FREE;
 

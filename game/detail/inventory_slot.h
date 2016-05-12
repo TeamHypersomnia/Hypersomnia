@@ -22,16 +22,16 @@ struct inventory_slot {
 	bool always_allow_exactly_one_item = false;
 	float attachment_density_multiplier = 1.f;
 	
-	bool has_unlimited_space();
-	bool is_category_compatible_with(augs::entity_id item);
+	bool has_unlimited_space() const;
+	bool is_category_compatible_with(augs::entity_id item) const;
 
 	augs::rects::sticking attachment_sticking_mode = augs::rects::sticking::LEFT;
 	components::transform attachment_offset;
 
 	std::vector<augs::entity_id> items_inside;
 
-	std::vector<augs::entity_id> get_mounted_items();
+	std::vector<augs::entity_id> get_mounted_items() const;
 
-	unsigned calculate_free_space_with_children();
+	unsigned calculate_free_space_with_children() const;
 };
 

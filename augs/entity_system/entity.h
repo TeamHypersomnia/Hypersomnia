@@ -161,8 +161,27 @@ namespace augs {
 			return *find<component_class>();
 		}
 
+		template<class component_class>
+		const component_class& get() const {
+			return *find<component_class>();
+		}
+
 		template <typename component_class>
 		component_class* find() {
+#if USE_POINTER_TUPLE
+			auto& found = _find<component_class>();
+			if (found.alive())
+				return (component_class*)found.ptr();
+#else
+			auto found = type_to_component.get(typeid(component_class).hash_code());
+			if (found)
+				return reinterpret_cast<component_class*>(found->ptr());
+#endif
+			return nullptr;
+		}
+
+		template <typename component_class>
+		const component_class* find() const {
 #if USE_POINTER_TUPLE
 			auto& found = _find<component_class>();
 			if (found.alive())
@@ -258,6 +277,11 @@ namespace augs {
 #if USE_POINTER_TUPLE 
 		template <typename component_class>
 		memory_pool::id& _find() {
+			return std::get<std::pair<memory_pool::id, component_class*>>(type_to_component).first;
+		}
+
+		template <typename component_class>
+		const memory_pool::id& _find() const {
 			return std::get<std::pair<memory_pool::id, component_class*>>(type_to_component).first;
 		}
 #endif

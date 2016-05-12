@@ -11,35 +11,39 @@ struct inventory_slot_id {
 	slot_function type = slot_function::INVALID;
 	augs::entity_id container_entity;
 
-	bool alive();
-	bool dead();
+	bool alive() const;
+	bool dead() const;
 
 	void unset();
 
 	void add_item(augs::entity_id);
 	void remove_item(augs::entity_id);
 
-	unsigned calculate_free_space_with_parent_containers();
+	unsigned calculate_free_space_with_parent_containers() const;
 
 	void for_each_descendant(std::function<void(augs::entity_id item)>);
 
-	bool can_contain(augs::entity_id);
+	bool can_contain(augs::entity_id) const;
 
-	bool has_items();
-	bool is_empty_slot();
+	bool has_items() const;
+	bool is_empty_slot() const;
 
-	bool is_hand_slot();
-	bool should_item_inside_keep_physical_body(augs::entity_id until_parent = augs::entity_id());
-	float calculate_density_multiplier_due_to_being_attached();
+	bool is_hand_slot() const;
+	bool is_input_enabling_slot() const;
 
-	components::transform sum_attachment_offsets_of_parents(augs::entity_id attached_item);
+	bool should_item_inside_keep_physical_body(augs::entity_id until_parent = augs::entity_id()) const;
+	float calculate_density_multiplier_due_to_being_attached() const;
 
-	augs::entity_id get_root_container();
+	components::transform sum_attachment_offsets_of_parents(augs::entity_id attached_item) const;
+
+	augs::entity_id get_root_container() const;
 
 	bool operator<(const inventory_slot_id& b) const;
 
 	inventory_slot& operator*();
 	inventory_slot* operator->();
+	const inventory_slot& operator*() const;
+	const inventory_slot* operator->() const;
 	bool operator==(inventory_slot_id b) const;
 	bool operator!=(inventory_slot_id b) const;
 };

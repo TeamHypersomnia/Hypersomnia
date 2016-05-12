@@ -102,11 +102,11 @@ namespace augs {
 			ltrb(vec2t<T> pos, vec2t<T> size) : l(pos.x), t(pos.y), r(pos.x + size.x), b(pos.y + size.y) {}
 			void set(T l, T t, T r, T b) { *this = ltrb(l, t, r, b); }
 
-			vec2t<T> left_top() {
+			vec2t<T> left_top() const {
 				return vec2t<T>(l, t);
 			}
 
-			vec2t<T> right_bottom() {
+			vec2t<T> right_bottom() const {
 				return vec2t<T>(r, b);
 			}
 
@@ -171,7 +171,7 @@ namespace augs {
 				return offset.y == 0;
 			}
 
-			vec2t<T> get_sticking_offset(sticking mode) {
+			vec2t<T> get_sticking_offset(sticking mode) const {
 				vec2t<T> res;
 				switch (mode) {
 				case sticking::LEFT: res = vec2t<T>(-r, 0);	break;
@@ -187,7 +187,6 @@ namespace augs {
 			vec2t<T> center() const {
 				return vec2t<T>(l + w() / 2.f, t + h() / 2.f);
 			}
-
 
 			template <typename T>
 			bool hover(const vec2t<T>& m) const {
@@ -261,7 +260,7 @@ namespace augs {
 				return w() > 0 && h() > 0;
 			}
 
-			vec2t<T> get_position() {
+			vec2t<T> get_position() const {
 				return vec2t<T>(l, t);
 			}
 
@@ -340,15 +339,15 @@ namespace augs {
 				return true;
 			}
 
-			bool hover(const vec2t<T>& m) {
+			bool hover(const vec2t<T>& m) const {
 				return m.x >= x && m.y >= y && m.x <= r() && m.y <= b();
 			}
 
-			bool hover(const ltrb<T>& rc) {
+			bool hover(const ltrb<T>& rc) const {
 				return rc.hover(*this);
 			}
 
-			bool hover(const xywh& rc) {
+			bool hover(const xywh& rc) const {
 				return ltrb(rc).hover(*this);
 			}
 

@@ -21,6 +21,7 @@
 
 #include "../detail/inventory_utils.h"
 #include "../detail/inventory_slot.h"
+#include "../detail/entity_scripts.h"
 #include "ensure.h"
 
 void item_system::handle_trigger_confirmations_as_pick_requests() {
@@ -190,6 +191,10 @@ void item_system::consume_item_slot_transfer_requests() {
 				
 				if(whole_item_grabbed)
 					previous_slot.remove_item(r.item);
+
+				if (previous_slot.is_input_enabling_slot()) {
+					unset_input_flags_of_entity(r.item);
+				}
 			}
 
 			if (target_item_to_stack_with.alive()) {

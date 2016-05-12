@@ -29,7 +29,7 @@ namespace bindings {
 			.def_readwrite("y", &rects::xywh<float>::y)
 			.def_readwrite("w", &rects::xywh<float>::w)
 			.def_readwrite("h", &rects::xywh<float>::h)
-			.def("hover", (bool (rects::xywh<float>::*)(const vec2& m)) &rects::xywh<float>::hover)
+			.def("hover", (bool (rects::xywh<float>::*)(const vec2& m) const) &rects::xywh<float>::hover)
 			.property("r", (float (rects::xywh<float>::*)() const)&rects::xywh<float>::r, (void (rects::xywh<float>::*)(float)) &rects::xywh<float>::r)
 			.property("b", (float (rects::xywh<float>::*)() const)&rects::xywh<float>::b, (void (rects::xywh<float>::*)(float)) &rects::xywh<float>::b),
 

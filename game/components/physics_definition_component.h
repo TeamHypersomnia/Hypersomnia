@@ -9,7 +9,7 @@ namespace components {
 		std::vector<fixture_definition> fixtures;
 		augs::entity_id attach_fixtures_to_entity;
 
-		rects::ltrb<float> get_aabb_size();
+		rects::ltrb<float> get_aabb_size() const;
 
 		enum offset_type {
 			ITEM_ATTACHMENT_DISPLACEMENT,

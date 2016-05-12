@@ -5,8 +5,20 @@
 #include "inventory_utils.h"
 #include "ensure.h"
 
+inventory_slot* inventory_slot_id::operator->() {
+	return &container_entity->get<components::container>().slots[type];
+}
+
 inventory_slot& inventory_slot_id::operator*() {
 	return container_entity->get<components::container>().slots[type];
+}
+
+const inventory_slot* inventory_slot_id::operator->() const {
+	return &container_entity->get<components::container>().slots.at(type);
+}
+
+const inventory_slot& inventory_slot_id::operator*() const {
+	return container_entity->get<components::container>().slots.at(type);
 }
 
 bool inventory_slot_id::operator==(inventory_slot_id b) const {
@@ -24,20 +36,17 @@ bool inventory_slot_id::operator!=(inventory_slot_id b) const {
 	return !(*this == b);
 }
 
-inventory_slot* inventory_slot_id::operator->() {
-	return &container_entity->get<components::container>().slots[type];
-}
 
-bool inventory_slot_id::alive() {
+bool inventory_slot_id::alive() const {
 	if (container_entity.dead())
 		return false;
 
-	auto* container = container_entity->find<components::container>();
+	const auto* container = container_entity->find<components::container>();
 
 	return container && container->slots.find(type) != container->slots.end();
 }
 
-bool inventory_slot_id::dead() {
+bool inventory_slot_id::dead() const {
 	return !alive();
 }
 
@@ -46,19 +55,23 @@ void inventory_slot_id::unset() {
 	type = slot_function::INVALID;
 }
 
-bool inventory_slot_id::is_hand_slot() {
+bool inventory_slot_id::is_hand_slot() const {
 	return type == slot_function::PRIMARY_HAND || type == slot_function::SECONDARY_HAND;
 }
 
-bool inventory_slot_id::has_items() {
+bool inventory_slot_id::is_input_enabling_slot() const {
+	return is_hand_slot();
+}
+
+bool inventory_slot_id::has_items() const {
 	return alive() && (*this)->items_inside.size() > 0;
 }
 
-bool inventory_slot_id::is_empty_slot() {
+bool inventory_slot_id::is_empty_slot() const {
 	return alive() && (*this)->items_inside.size() == 0;
 }
 
-bool inventory_slot_id::should_item_inside_keep_physical_body(augs::entity_id until_parent) {
+bool inventory_slot_id::should_item_inside_keep_physical_body(augs::entity_id until_parent) const {
 	bool should_item_here_keep_physical_body = (*this)->is_physical_attachment_slot;
 
 	if (container_entity == until_parent) {
@@ -78,7 +91,7 @@ bool inventory_slot_id::should_item_inside_keep_physical_body(augs::entity_id un
 	return should_item_here_keep_physical_body;
 }
 
-float inventory_slot_id::calculate_density_multiplier_due_to_being_attached() {
+float inventory_slot_id::calculate_density_multiplier_due_to_being_attached() const {
 	ensure((*this)->is_physical_attachment_slot);
 	float density_multiplier = (*this)->attachment_density_multiplier;
 
@@ -90,7 +103,7 @@ float inventory_slot_id::calculate_density_multiplier_due_to_being_attached() {
 	return density_multiplier;
 }
 
-components::transform inventory_slot_id::sum_attachment_offsets_of_parents(augs::entity_id attached_item) {
+components::transform inventory_slot_id::sum_attachment_offsets_of_parents(augs::entity_id attached_item) const {
 	auto offset = (*this)->attachment_offset;
 	
 	auto sticking = (*this)->attachment_sticking_mode;
@@ -108,7 +121,7 @@ components::transform inventory_slot_id::sum_attachment_offsets_of_parents(augs:
 	return offset;
 }
 
-augs::entity_id inventory_slot_id::get_root_container() {
+augs::entity_id inventory_slot_id::get_root_container() const {
 	auto* maybe_item = container_entity->find<components::item>();
 
 	if (maybe_item && maybe_item->current_slot.alive())
@@ -142,7 +155,7 @@ unsigned calculate_space_occupied_with_children(augs::entity_id item) {
 	return space_occupied;
 }
 
-std::vector<augs::entity_id> inventory_slot::get_mounted_items() {
+std::vector<augs::entity_id> inventory_slot::get_mounted_items() const {
 	static thread_local std::vector<augs::entity_id> output;
 	output.clear();
 	// TODO: actually implement mounted items
@@ -155,11 +168,11 @@ std::vector<augs::entity_id> inventory_slot::get_mounted_items() {
 	return output;
 }
 
-bool inventory_slot::has_unlimited_space() {
+bool inventory_slot::has_unlimited_space() const {
 	return is_physical_attachment_slot;// || always_allow_exactly_one_item;
 }
 
-unsigned inventory_slot::calculate_free_space_with_children() {
+unsigned inventory_slot::calculate_free_space_with_children() const {
 	if (has_unlimited_space())
 		return 1000000 * SPACE_ATOMS_PER_UNIT;
 
@@ -174,7 +187,7 @@ unsigned inventory_slot::calculate_free_space_with_children() {
 	return space;
 }
 
-unsigned inventory_slot_id::calculate_free_space_with_parent_containers() {
+unsigned inventory_slot_id::calculate_free_space_with_parent_containers() const {
 	auto maximum_space = (*this)->calculate_free_space_with_children();
 
 	auto* maybe_item = container_entity->find<components::item>();
@@ -185,7 +198,7 @@ unsigned inventory_slot_id::calculate_free_space_with_parent_containers() {
 	return maximum_space;
 }
 
-bool inventory_slot::is_category_compatible_with(augs::entity_id id) {
+bool inventory_slot::is_category_compatible_with(augs::entity_id id) const {
 	auto& item = id->get<components::item>();
 	
 	if (for_categorized_items_only && (category_allowed & item.categories_for_slot_compatibility) == 0)
@@ -206,7 +219,7 @@ void inventory_slot_id::for_each_descendant(std::function<void(augs::entity_id i
 	}
 }
 
-bool inventory_slot_id::can_contain(augs::entity_id id) {
+bool inventory_slot_id::can_contain(augs::entity_id id) const {
 	if (dead())
 		return false;
 

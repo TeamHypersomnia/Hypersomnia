@@ -100,13 +100,17 @@ namespace scene_builders {
 					assets::texture_id::TEST_BACKGROUND, augs::gray1, render_layer::UNDER_GROUND);
 			}
 
-		const int num_characters = 4;
+		const int num_characters = 5;
 
 		for (int i = 0; i < num_characters; ++i) {
 			auto new_character = prefabs::create_character(world, vec2(i * 300, 0));
 			new_character.set_debug_name(typesafe_sprintf("player%x", i));
 			
 			characters.push_back(new_character);
+
+			if (i == 1) {
+				new_character->get<components::transform>().pos.set(3700, 3700);
+			}
 		}
 
 		name_entity(characters[0], entity_name::PERSON, L"Attacker");
@@ -168,16 +172,16 @@ namespace scene_builders {
 		world.post_message(r);
 
 		if (num_characters > 1) {
-			name_entity(characters[1], entity_name::PERSON, L"Swordsman");
-			name_entity(characters[2], entity_name::PERSON, L"Support");
+			name_entity(characters[1], entity_name::PERSON, L"Enemy");
+			name_entity(characters[2], entity_name::PERSON, L"Swordsman");
 			name_entity(characters[3], entity_name::PERSON, L"Medic");
 
-			r.item = second_machete;
+			r.item = rifle2;
 			r.target_slot = characters[1][slot_function::PRIMARY_HAND];
 
 			world.post_message(r);
 
-			r.item = rifle2;
+			r.item = second_machete;
 			r.target_slot = characters[2][slot_function::PRIMARY_HAND];
 
 			world.post_message(r);

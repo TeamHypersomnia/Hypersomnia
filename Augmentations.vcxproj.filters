@@ -1212,6 +1212,12 @@
     <ClCompile Include="game\ingredients\artificial_life.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\scene_builders\resource_setups\standard_behaviour_trees.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\entity_scripts.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3237,6 +3243,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\assets\behaviour_tree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\entity_scripts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

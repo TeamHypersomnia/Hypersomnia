@@ -89,18 +89,18 @@ namespace resources {
 			else {
 				int previously_executed_id = traversal.instance.previously_executed_leaf_id;
 
-				bool is_repeated_execution = previously_executed_id == id_in_tree;
-				bool notify_previous_and_perform_first_occurence = !is_repeated_execution;
+				bool is_execution_repeated = previously_executed_id == id_in_tree;
+				bool notify_previous_and_perform_first_occurence = !is_execution_repeated;
 
-				auto& newly_executed = traversal.original_tree.get_node_by_id(id_in_tree);
+				auto& next_executed = traversal.original_tree.get_node_by_id(id_in_tree);
 
 				if (notify_previous_and_perform_first_occurence) {
 					auto& previously_executed = traversal.original_tree.get_node_by_id(previously_executed_id);
 					previously_executed.execute_leaf_goal_callback(execution_occurence::LAST, nullptr, traversal);
-					newly_executed.execute_leaf_goal_callback(execution_occurence::FIRST, std::move(goal.data), traversal);
+					next_executed.execute_leaf_goal_callback(execution_occurence::FIRST, std::move(goal.data), traversal);
 				}
 				else {
-					newly_executed.execute_leaf_goal_callback(execution_occurence::REPEATED, std::move(goal.data), traversal);
+					next_executed.execute_leaf_goal_callback(execution_occurence::REPEATED, std::move(goal.data), traversal);
 				}
 				
 				traversal.instance.previously_executed_leaf_id = id_in_tree;
