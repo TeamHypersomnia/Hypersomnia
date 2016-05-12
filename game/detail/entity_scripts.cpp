@@ -4,11 +4,12 @@
 #include "game/components/melee_component.h"
 #include "game/components/car_component.h"
 
-void unset_input_flags_of_entity(augs::entity_id e) {
+void unset_input_flags_of_orphaned_entity(augs::entity_id e) {
 	auto* gun = e->find<components::gun>();
 	auto* melee = e->find<components::melee>();
 	auto* car = e->find<components::car>();
 	auto* movement = e->find<components::movement>();
+	auto* damage = e->find<components::damage>();
 
 	if (car)
 		car->reset_movement_flags();
@@ -19,6 +20,7 @@ void unset_input_flags_of_entity(augs::entity_id e) {
 	if (gun)
 		gun->trigger_pressed = false;
 
-	if (melee)
-		melee->reset_move_flags();
+	if (melee) {
+		melee->reset_weapon(e);
+	}
 }

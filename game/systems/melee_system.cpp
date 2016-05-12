@@ -7,6 +7,15 @@
 #include "game/messages/rebuild_physics_message.h"
 #include "game/detail/inventory_utils.h"
 
+void components::melee::reset_weapon(augs::entity_id e) {
+	auto& m = e->get<components::melee>();
+	m.reset_move_flags();
+	m.state = components::melee_state::MELEE_FREE;
+
+	auto& d = e->get<components::damage>();
+	d.damage_upon_collision = false;
+}
+
 void melee_system::consume_melee_intents() {
 	auto& events = parent_world.get_message_queue<messages::intent_message>();
 

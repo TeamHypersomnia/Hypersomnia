@@ -193,7 +193,7 @@ void item_system::consume_item_slot_transfer_requests() {
 					previous_slot.remove_item(r.item);
 
 				if (previous_slot.is_input_enabling_slot()) {
-					unset_input_flags_of_entity(r.item);
+					unset_input_flags_of_orphaned_entity(r.item);
 				}
 			}
 
@@ -239,11 +239,13 @@ void item_system::consume_item_slot_transfer_requests() {
 					def.attach_fixtures_to_entity = parent_slot.get_root_container();
 					def.offsets_for_created_shapes[components::physics_definition::ITEM_ATTACHMENT_DISPLACEMENT]
 						= parent_slot.sum_attachment_offsets_of_parents(descendant);
+					def.offsets_for_created_shapes[components::physics_definition::SPECIAL_MOVE_DISPLACEMENT].reset();
 				}
 				else {
 					def.create_fixtures_and_body = true;
 					def.attach_fixtures_to_entity = descendant;
 					def.offsets_for_created_shapes[components::physics_definition::ITEM_ATTACHMENT_DISPLACEMENT].reset();
+					def.offsets_for_created_shapes[components::physics_definition::SPECIAL_MOVE_DISPLACEMENT].reset();
 				}
 
 				parent_world.post_message(rebuild);

@@ -36,6 +36,8 @@ namespace components {
 			primary_move_flag = secondary_move_flag = tertiary_move_flag = false;
 		}
 
+		void reset_weapon(augs::entity_id e);
+
 		melee_state state = MELEE_FREE;
 
 		std::vector<components::transform> offset_positions[4];
