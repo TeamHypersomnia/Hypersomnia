@@ -52,7 +52,7 @@ Retreat2[shape=octagon, label="Retreat"]
 
 subgraph clusterinventory {
 Inventory--enemyvisible2
-enemyvisible2[label="Enemy visible?"]
+enemyvisible2[label="Enemy visible or a noise heard?"]
 enemyvisible2--"Clustered area and short range?"
 enemyvisible2--"Wield best ranged"
 "Clustered area and short range?"--"Wield best melee"

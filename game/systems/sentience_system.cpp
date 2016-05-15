@@ -45,6 +45,66 @@ components::sentience::meter::damage_result components::sentience::meter::calcul
 	return result;
 }
 
+void sentience_system::consume_health_events() {
+	auto& healths = parent_world.get_message_queue<messages::health_event>();
+
+	for (auto& h : healths) {
+		auto& sentience = h.subject->get<components::sentience>();
+
+		switch (h.target) {
+		case messages::health_event::HEALTH: sentience.health.value -= h.effective_amount; break;
+		case messages::health_event::CONSCIOUSNESS: sentience.consciousness.value -= h.effective_amount; break;
+		case messages::health_event::SHIELD: ensure(0); break;
+		case messages::health_event::AIM:
+			auto punched = h.subject;
+
+			if (punched.has(sub_entity_name::CHARACTER_CROSSHAIR) && punched[sub_entity_name::CHARACTER_CROSSHAIR].has(sub_entity_name::CROSSHAIR_RECOIL_BODY)) {
+				auto owning_crosshair_recoil = punched[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
+
+				sentience.aimpunch.shoot_and_apply_impulse(owning_crosshair_recoil, 1 / 5.f, true,
+					(h.point_of_impact - punched->get<components::transform>().pos).cross(h.impact_velocity) / 100000000.f * 3.f
+				);
+			}
+
+			break;
+		}
+
+		if (h.special_result == messages::health_event::DEATH) {
+			auto* container = h.subject->find<components::container>();
+
+			if (container)
+				drop_from_all_slots(h.subject);
+
+			auto corpse = parent_world.create_entity_from_definition(h.subject[sub_definition_name::CORPSE_OF_SENTIENCE]);
+
+			auto place_of_death = h.subject->get<components::transform>();
+			place_of_death.rotation = h.impact_velocity.degrees();
+
+			corpse->get<components::physics_definition>().create_fixtures_and_body = true;
+			corpse->get<components::transform>() = place_of_death;
+
+			messages::rebuild_physics_message remove_from_physical_plane_of_existence;
+			remove_from_physical_plane_of_existence.subject = h.subject;
+			remove_from_physical_plane_of_existence.new_definition = h.subject->get<components::physics_definition>();
+			remove_from_physical_plane_of_existence.new_definition.create_fixtures_and_body = false;
+
+			parent_world.post_message(remove_from_physical_plane_of_existence);
+
+			auto astral_body_now_without_physical_prison = h.subject;
+			astral_body_now_without_physical_prison->get<components::position_copying>().set_target(corpse);
+
+			messages::physics_operation op;
+			op.subject = corpse;
+			op.apply_force.set_from_degrees(place_of_death.rotation).set_length(27850 * 2);
+
+			parent_world.post_message(op);
+
+			h.spawned_remnants = corpse;
+			corpse[associated_entity_name::ASTRAL_BODY] = astral_body_now_without_physical_prison;
+		}
+	}
+}
+
 void sentience_system::apply_damage_and_generate_health_events() {
 	auto& damages = parent_world.get_message_queue<messages::damage_message>();
 	auto& healths = parent_world.get_message_queue<messages::health_event>();
@@ -88,7 +148,7 @@ void sentience_system::apply_damage_and_generate_health_events() {
 					event.special_result = messages::health_event::DEATH;
 				}
 
-				if(event.effective_amount != 0)
+				if (event.effective_amount != 0)
 					parent_world.post_message(event);
 			}
 
@@ -106,63 +166,6 @@ void sentience_system::apply_damage_and_generate_health_events() {
 				if (event.effective_amount != 0)
 					parent_world.post_message(event);
 			}
-		}
-	}
-
-
-	for (auto& h : healths) {
-		auto& sentience = h.subject->get<components::sentience>();
-
-		switch (h.target) {
-		case messages::health_event::HEALTH: sentience.health.value -= h.effective_amount; break;
-		case messages::health_event::CONSCIOUSNESS: sentience.consciousness.value -= h.effective_amount; break;
-		case messages::health_event::SHIELD: ensure(0); break;
-		case messages::health_event::AIM:
-			auto punched = h.subject;
-
-			if (punched.has(sub_entity_name::CHARACTER_CROSSHAIR) && punched[sub_entity_name::CHARACTER_CROSSHAIR].has(sub_entity_name::CROSSHAIR_RECOIL_BODY)) {
-				auto owning_crosshair_recoil = punched[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
-
-				sentience.aimpunch.shoot_and_apply_impulse(owning_crosshair_recoil, 1 / 5.f, true,
-					(h.point_of_impact - punched->get<components::transform>().pos).cross(h.impact_velocity) / 100000000.f * 3.f
-				);
-			}
-
-			break;
-		}
-
-		if (h.special_result == messages::health_event::DEATH) {
-			auto* container = h.subject->find<components::container>();
-
-			if (container)
-				drop_from_all_slots(h.subject);
-
-			auto corpse = parent_world.create_entity_from_definition(h.subject[sub_definition_name::CORPSE_OF_SENTIENCE]);
-
-			auto place_of_death = h.subject->get<components::transform>();
-			place_of_death.rotation = h.impact_velocity.degrees();
-
-			corpse->get<components::physics_definition>().create_fixtures_and_body = true;
-			corpse->get<components::transform>() = place_of_death;
-
-			messages::rebuild_physics_message remove_from_physical_plane_of_existence;
-			remove_from_physical_plane_of_existence.subject = h.subject;
-			remove_from_physical_plane_of_existence.new_definition = h.subject->get<components::physics_definition>();
-			remove_from_physical_plane_of_existence.new_definition.create_fixtures_and_body = false;
-			
-			parent_world.post_message(remove_from_physical_plane_of_existence);
-			
-			auto astral_body_now_without_physical_prison = h.subject;
-			astral_body_now_without_physical_prison->get<components::position_copying>().set_target(corpse);
-
-			messages::physics_operation op;
-			op.subject = corpse;
-			op.apply_force.set_from_degrees(place_of_death.rotation).set_length(27850*2);
-
-			parent_world.post_message(op);
-
-			h.spawned_remnants = corpse;
-			corpse[associated_entity_name::ASTRAL_BODY] = astral_body_now_without_physical_prison;
 		}
 	}
 }

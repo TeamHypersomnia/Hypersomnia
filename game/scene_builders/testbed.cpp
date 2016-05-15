@@ -13,6 +13,7 @@
 #include "game/systems/gui_system.h"
 #include "game/components/position_copying_component.h"
 #include "game/components/physics_definition_component.h"
+#include "game/components/sentience_component.h"
 #include "game/components/item_component.h"
 #include "game/components/name_component.h"
 
@@ -110,6 +111,9 @@ namespace scene_builders {
 
 			if (i == 1) {
 				new_character->get<components::transform>().pos.set(3700, 3700);
+			}
+			if (i == 2) {
+				new_character->get<components::sentience>().health.value = 38;
 			}
 		}
 
