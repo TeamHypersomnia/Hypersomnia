@@ -3248,5 +3248,8 @@
     <ClInclude Include="game\detail\entity_scripts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\detail\ai\behaviours.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

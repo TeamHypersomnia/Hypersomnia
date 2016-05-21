@@ -32,8 +32,17 @@ namespace ingredients {
 
 	void enemy_intelligence(augs::entity_id e) {
 		auto& behaviour_tree = *e += components::behaviour_tree();
+		auto& trees = behaviour_tree.concurrent_trees;
 
-		behaviour_tree.tree_id = assets::behaviour_tree_id::SOLDIER_TREE;
-		behaviour_tree.state.user_input = e;
+		trees.resize(4);
+		
+		trees[0].state.user_input = e;
+		trees[0].tree_id = assets::behaviour_tree_id::HANDS_ACTOR;
+		trees[1].state.user_input = e;
+		trees[1].tree_id = assets::behaviour_tree_id::INVENTORY_ACTOR;
+		trees[2].state.user_input = e;
+		trees[2].tree_id = assets::behaviour_tree_id::ITEM_PICKER;
+		trees[3].state.user_input = e;
+		trees[3].tree_id = assets::behaviour_tree_id::SOLDIER_MOVEMENT;
 	}
 }

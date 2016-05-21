@@ -6,7 +6,10 @@ namespace resources {
 
 namespace assets {
 	enum behaviour_tree_id {
-		SOLDIER_TREE,
+		SOLDIER_MOVEMENT,
+		ITEM_PICKER,
+		HANDS_ACTOR,
+		INVENTORY_ACTOR
 	};
 }
 

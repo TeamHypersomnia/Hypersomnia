@@ -1040,6 +1040,7 @@
     <ClInclude Include="game\assets\animation.h" />
     <ClInclude Include="game\assets\texture.h" />
     <ClInclude Include="augs\ensure.h" />
+    <ClInclude Include="game\detail\ai\behaviours.h" />
     <ClInclude Include="game\detail\entity_scripts.h" />
     <ClInclude Include="game\resources\behaviour_tree.h" />
     <ClInclude Include="game\detail\combat\melee_animation.h" />

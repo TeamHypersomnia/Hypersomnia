@@ -6,12 +6,14 @@ Selector
 Sequencer[shape=box];
 Action[shape=octagon];
 
+subgraph clusteritempicker {
+"Visible item usable?"--"Mark as pick target"
+}
+
 subgraph clusterlegs {
 Legs--"Danger in the immediate vicinity?"
 "Danger in the immediate vicinity?"--"Not a melee-targeted danger?"
 "Not a melee-targeted danger?"--"Immediate evasion"
-Legs--"Item underfoot usable?"
-"Item underfoot usable?"--"Pick"
 "Pick"[shape=octagon]
 Legs--"Useful item visible?"
 "Useful item visible?"--"Navigate"

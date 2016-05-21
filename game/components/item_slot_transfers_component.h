@@ -4,6 +4,7 @@
 #include "../detail/inventory_slot_id.h"
 
 #include "misc/deterministic_timing.h"
+#include <set>
 
 namespace components {
 	struct item_slot_transfers {
@@ -15,6 +16,9 @@ namespace components {
 				return current_item.alive(); 
 			}
 		} mounting;
+
+		std::set<augs::entity_id> only_pick_these_items;
+		bool pick_all_touched_items_if_list_to_pick_empty = true;
 
 		augs::deterministic_timeout pickup_timeout = augs::deterministic_timeout(200);
 

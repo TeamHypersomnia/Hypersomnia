@@ -8,7 +8,9 @@ void behaviour_tree_system::evaluate_trees() {
 	for (auto t : targets) {
 		auto& behaviour_tree = t->get<components::behaviour_tree>();
 		
-		auto& tree = *behaviour_tree.tree_id;
-		
+		for (auto& t : behaviour_tree.concurrent_trees) {
+			auto& tree = *t.tree_id;
+			tree.evaluate_instance_of_tree(t.state);
+		}
 	}
 }

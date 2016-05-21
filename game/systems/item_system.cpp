@@ -34,17 +34,25 @@ void item_system::handle_trigger_confirmations_as_pick_requests() {
 		auto* item = item_entity->find<components::item>();
 
 		if (item_slot_transfers && item && get_owning_transfer_capability(item_entity).dead()) {
-			messages::item_slot_transfer_request request;
-			request.item = item_entity;
-			request.target_slot = determine_pickup_target_slot(item_entity, e.detector_body);
+			auto& pick_list = item_slot_transfers->only_pick_these_items;
+			bool found_on_subscription_list = pick_list.find(item_entity) != pick_list.end();
 
-			if (request.target_slot.alive()) {
-				if (check_timeout_and_reset(item_slot_transfers->pickup_timeout)) {
-					parent_world.post_message(request);
+			bool item_subscribed = (pick_list.empty() && item_slot_transfers->pick_all_touched_items_if_list_to_pick_empty)
+				|| item_slot_transfers->only_pick_these_items.find(item_entity) != item_slot_transfers->only_pick_these_items.end();
+			
+			if (item_subscribed) {
+				messages::item_slot_transfer_request request;
+				request.item = item_entity;
+				request.target_slot = determine_pickup_target_slot(item_entity, e.detector_body);
+
+				if (request.target_slot.alive()) {
+					if (check_timeout_and_reset(item_slot_transfers->pickup_timeout)) {
+						parent_world.post_message(request);
+					}
 				}
-			}
-			else {
-				// TODO: post gui message
+				else {
+					// TODO: post gui message
+				}
 			}
 		}
 	}
