@@ -10,6 +10,9 @@ class game_world : public augs::world {
 public:
 	game_world(augs::overworld& parent_overworld);
 
+	augs::measurements raycasts = augs::measurements(L"Raycasts", false);
+	augs::measurements triangles = augs::measurements(L"Triangles", false);
+
 	void register_types_of_messages_components_systems();
 	
 	void call_drawing_time_systems();

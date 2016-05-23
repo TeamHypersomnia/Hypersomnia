@@ -12,8 +12,9 @@ namespace augs {
 		double last_measurement;
 
 		bool measured = false;
+		bool measurements_are_time = false;
 	public:
-		measurements(std::wstring title = L"Untitled");
+		measurements(std::wstring title = L"Untitled", bool measurements_are_time = true);
 
 		std::wstring title;
 

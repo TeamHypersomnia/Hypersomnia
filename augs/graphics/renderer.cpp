@@ -74,6 +74,7 @@ namespace augs {
 
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_triangle) * triangles.size(), triangles.data(), GL_STREAM_DRAW); glerr;
 		glDrawArrays(GL_TRIANGLES, 0, triangles.size() * 3); glerr;
+		triangles_drawn_total += triangles.size();
 
 		if (!specials.empty()) 
 			disable_special_vertex_attribute();

@@ -39,6 +39,8 @@ namespace augs {
 		vertex_line_buffer lines;
 		special_buffer specials;
 
+		unsigned long long triangles_drawn_total = 0;
+
 		unsigned int position_buffer_id, texcoord_buffer_id, color_buffer_id;
 		unsigned int triangle_buffer_id;
 		unsigned int special_buffer_id;

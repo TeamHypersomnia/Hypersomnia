@@ -167,6 +167,9 @@ void game_overworld::consume_camera_render_requests() {
 	}
 
 	current_scene_builder->drawcalls_after_all_cameras(main_game_world);
+	
+	main_game_world.triangles.measure(target.triangles_drawn_total);
+	target.triangles_drawn_total = 0;
 
 	game_window.swap_buffers();
 }

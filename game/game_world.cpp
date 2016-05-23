@@ -177,8 +177,13 @@ void game_world::restore_transforms_after_drawing() {
 	get_system<render_system>().restore_actual_transforms();
 }
 
-std::wstring game_world::world_summary(bool p) const {
-	return world::world_summary(p);
+std::wstring game_world::world_summary(bool detailed) const {
+	auto result = triangles.summary() + world::world_summary(detailed);
+	
+	if (detailed)
+		result = raycasts.summary() + result;
+
+	return result;
 }
 
 void game_world::destruction_callbacks() {
@@ -259,6 +264,9 @@ void game_world::perform_logic_step() {
 	get_system<physics_system>().clear_collision_messages();
 	get_system<physics_system>().consume_rebuild_physics_messages_and_save_new_definitions();
 	get_system<physics_system>().execute_delayed_physics_ops();
+
+	raycasts.measure(get_system<physics_system>().ray_casts_since_last_step);
+
 	get_system<physics_system>().step_and_set_new_transforms();
 	profile.stop(meter_type::PHYSICS);
 	get_system<position_copying_system>().update_transforms();

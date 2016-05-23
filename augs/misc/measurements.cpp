@@ -3,7 +3,7 @@
 #include "log.h"
 
 namespace augs {
-	measurements::measurements(std::wstring title) : title(title) {
+	measurements::measurements(std::wstring title, bool measurements_are_time) : title(title), measurements_are_time(measurements_are_time) {
 		tracked.resize(20, 0);
 	}
 
@@ -41,10 +41,13 @@ namespace augs {
 			get_maximum_seconds() * scale);
 		else {
 			scale = 1000;
-
-			return typesafe_sprintf(L"%x: %f2 ms (%f2 FPS)\n", title,
-				get_average_seconds() * scale,
-				1 / get_average_seconds());
+			if (measurements_are_time) {
+				return typesafe_sprintf(L"%x: %f2 ms (%f2 FPS)\n", title,
+					get_average_seconds() * scale,
+					1 / get_average_seconds());
+			}
+			else
+				return typesafe_sprintf(L"%x: %f2\n", title, get_average_seconds());
 		}
 	}
 

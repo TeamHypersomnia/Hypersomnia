@@ -50,7 +50,7 @@ float32 physics_system::raycast_input::ReportFixture(b2Fixture* fixture, const b
 }
 
 physics_system::physics_system(world& parent_world) : event_only_system(parent_world),
-b2world(b2Vec2(0.f, 0.f)), ray_casts_per_step(0) {
+b2world(b2Vec2(0.f, 0.f)), ray_casts_since_last_step(0) {
 	b2world.SetAllowSleeping(false);
 	b2world.SetAutoClearForces(false);
 	enable_listener(true);
@@ -58,7 +58,7 @@ b2world(b2Vec2(0.f, 0.f)), ray_casts_per_step(0) {
 
 std::vector<physics_system::raycast_output> physics_system::ray_cast_all_intersections
 (vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity) {
-	++ray_casts_per_step;
+	++ray_casts_since_last_step;
 
 	raycast_input callback;
 	callback.subject_filter = filter;
@@ -137,7 +137,7 @@ vec2 physics_system::push_away_from_walls(vec2 position, float radius, int ray_a
 }
 
 physics_system::raycast_output physics_system::ray_cast(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity) {
-	++ray_casts_per_step;
+	++ray_casts_since_last_step;
 
 	raycast_input callback;
 	callback.subject_filter = filter;
@@ -533,6 +533,7 @@ void physics_system::step_and_set_new_transforms() {
 
 	listener.after_step_callbacks.clear();
 
+	ray_casts_since_last_step = 0;
 	b2world.Step(static_cast<float32>(delta_seconds()), velocityIterations, positionIterations);
 	b2world.ClearForces();
 	

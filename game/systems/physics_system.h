@@ -101,7 +101,7 @@ public:
 	void step_and_set_new_transforms();
 	void destroy_fixtures_and_bodies();
 
-	int ray_casts_per_step = 0;
+	int ray_casts_since_last_step = 0;
 
 	bool enable_motors = true;
 
