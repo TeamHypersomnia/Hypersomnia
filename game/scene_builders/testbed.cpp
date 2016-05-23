@@ -310,7 +310,17 @@ namespace scene_builders {
 		//quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", style(assets::font_id::GUI_FONT, violet), vec2i(200, 200 - 1), 0, nullptr);
 		//quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", style(assets::font_id::GUI_FONT, violet), vec2i(200, 200+1), 0, nullptr);
 		//
-		quick_print_format(target.triangles, world.world_summary(), style(assets::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0, nullptr);
+		auto& raw_window_inputs = world.get_message_queue<messages::raw_window_input_message>();
+
+		for (auto& raw_input : raw_window_inputs) {
+			if (raw_input.raw_window_input.key_event == window::event::PRESSED) {
+				if (raw_input.raw_window_input.key == window::event::keys::DASH) {
+					show_profile_details = !show_profile_details;
+				}
+			}
+		}
+
+		quick_print_format(target.triangles, world.world_summary(show_profile_details), style(assets::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0, nullptr);
 		target.call_triangles();
 		target.clear_triangles();
 	}

@@ -19,7 +19,7 @@ public:
 	void destruction_callbacks();
 	void restore_transforms_after_drawing();
 
-	std::wstring world_summary() const final;
+	std::wstring world_summary(bool) const final;
 
 	void bind_this_to_lua_global(augs::lua_state_wrapper&, std::string global);
 };

@@ -115,7 +115,7 @@ namespace augs {
 		size_t entities_count() const;
 
 		void delete_all_entities();
-		virtual std::wstring world_summary(bool ) const;
+		virtual std::wstring world_summary(bool profile_details) const;
 
 		deterministic_timestamp get_current_timestamp() const;
 

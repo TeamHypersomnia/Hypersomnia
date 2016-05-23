@@ -177,8 +177,8 @@ void game_world::restore_transforms_after_drawing() {
 	get_system<render_system>().restore_actual_transforms();
 }
 
-std::wstring game_world::world_summary() const {
-	return world::world_summary();
+std::wstring game_world::world_summary(bool p) const {
+	return world::world_summary(p);
 }
 
 void game_world::destruction_callbacks() {

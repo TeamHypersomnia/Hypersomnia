@@ -11,6 +11,7 @@ namespace scene_builders {
 
 		std::vector<augs::entity_id> draw_bodies;
 
+		bool show_profile_details = false;
 		bool keep_drawing = false;
 
 		void load_resources() override;

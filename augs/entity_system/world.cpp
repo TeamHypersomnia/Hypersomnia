@@ -111,8 +111,13 @@ namespace augs {
 		entities.free_all();
 	}
 
-	std::wstring world::world_summary() const {
-		return typesafe_sprintf(L"Entities: %x\n", entities_count()) + fps_counter.summary() + profile.sorted_summary();
+	std::wstring world::world_summary(bool profile_details) const {
+		auto result = typesafe_sprintf(L"Entities: %x\n", entities_count()) + fps_counter.summary();
+
+		if (profile_details)
+			result += profile.sorted_summary();
+
+		return result;
 	}
 
 	void world::delete_entity(entity_id e) {
