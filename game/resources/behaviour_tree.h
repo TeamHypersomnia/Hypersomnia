@@ -1,8 +1,14 @@
 #pragma once
 #include <vector>
-#include <functional>
 #include <memory>
+#include <tuple>
+#include <array>
+
 #include "entity_system/entity_id.h"
+#include "game/detail/ai/goals.h"
+
+#include "augs/stlutil.h"
+#include "ensure.h"
 
 namespace resources {
 	class behaviour_tree {
@@ -30,19 +36,25 @@ namespace resources {
 		};
 
 		struct state_of_traversal {
+			state_of_traversal(state_of_tree_instance&, const behaviour_tree&);
+
 			state_of_tree_instance& instance;
 			const behaviour_tree& original_tree;
-		};
+			
+			behaviours::goal_tuple resolved_goals;
+			std::array<bool, std::tuple_size<decltype(resolved_goals)>::value> goals_set;
 
-		struct goal_data {
+			template<class T>
+			void set_goal(const T& g) {
+				std::get<T>(resolved_goals) = g;
+				goals_set.at(Index<T, decltype(resolved_goals)>::value) = true;
+			}
 
-		};
-
-		typedef std::unique_ptr<goal_data> goal_ptr;
-
-		struct determined_goal {
-			goal_availability availability;
-			goal_ptr data;
+			template<class T>
+			T& get_goal() {
+				ensure(goals_set.at(Index<T, decltype(resolved_goals)>::value));
+				return std::get<T>(resolved_goals);
+			}
 		};
 
 		class node {
@@ -58,8 +70,16 @@ namespace resources {
 
 			std::vector<std::unique_ptr<node>> children;
 
-			virtual determined_goal determine_goal_availability(state_of_traversal&) const;
-			virtual void execute_leaf_goal_callback(execution_occurence, goal_ptr, state_of_traversal&) const;
+			node* branch();
+
+			template<typename Branch, typename... Branches>
+			node* branch(Branch b, Branches... branches) {
+				children.emplace_back(b);
+				return branch(branches...);
+			}
+
+			virtual goal_availability goal_resolution(state_of_traversal&) const;
+			virtual void execute_leaf_goal_callback(execution_occurence, state_of_traversal&) const;
 		};
 
 		node root;

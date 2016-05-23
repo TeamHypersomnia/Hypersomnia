@@ -67,7 +67,7 @@ namespace prefabs {
 
 		{
 			ingredients::sprite(sample_magazine, pos, assets::texture_id::SAMPLE_MAGAZINE, augs::white, render_layer::DYNAMIC_BODY);
-			ingredients::crate_physics(sample_magazine);
+			ingredients::see_through_dynamic_body(sample_magazine);
 
 			auto& item = ingredients::make_item(sample_magazine);
 			auto& container = *sample_magazine += components::container();
@@ -101,7 +101,7 @@ namespace prefabs {
 		name_entity(sample_suppressor, entity_name::SUPPRESSOR);
 
 		ingredients::sprite(sample_suppressor, pos, assets::texture_id::SAMPLE_SUPPRESSOR, augs::white, render_layer::DYNAMIC_BODY);
-		ingredients::crate_physics(sample_suppressor);
+		ingredients::see_through_dynamic_body(sample_suppressor);
 
 		auto& item = ingredients::make_item(sample_suppressor);
 
@@ -119,7 +119,7 @@ namespace prefabs {
 
 		{
 			ingredients::sprite(pink_charge, pos, assets::texture_id::PINK_CHARGE, augs::white, render_layer::DYNAMIC_BODY);
-			ingredients::crate_physics(pink_charge);
+			ingredients::see_through_dynamic_body(pink_charge);
 
 			auto& item = ingredients::make_item(pink_charge);
 			item.space_occupied_per_charge = to_space_units("0.01");
@@ -148,7 +148,7 @@ namespace prefabs {
 
 		{
 			ingredients::sprite(shell_definition, pos, assets::texture_id::PINK_SHELL, augs::white, render_layer::FLYING_BULLETS);
-			auto& def = ingredients::crate_physics(shell_definition);
+			auto& def = ingredients::see_through_dynamic_body(shell_definition);
 			def.fixtures[0].restitution = 1.4;
 			def.fixtures[0].density = 0.001f;
 			def.fixtures[0].filter = filters::shell();
@@ -171,7 +171,7 @@ namespace prefabs {
 
 		{
 			ingredients::sprite(cyan_charge, pos, assets::texture_id::CYAN_CHARGE, augs::white, render_layer::DYNAMIC_BODY);
-			ingredients::crate_physics(cyan_charge);
+			ingredients::see_through_dynamic_body(cyan_charge);
 
 			auto& item = ingredients::make_item(cyan_charge);
 			item.space_occupied_per_charge = to_space_units("0.01");
@@ -197,7 +197,7 @@ namespace prefabs {
 
 		{
 			ingredients::sprite(shell_definition, pos, assets::texture_id::CYAN_SHELL, augs::white, render_layer::FLYING_BULLETS);
-			auto& def = ingredients::crate_physics(shell_definition);
+			auto& def = ingredients::see_through_dynamic_body(shell_definition);
 			def.fixtures[0].restitution = 1.4;
 			def.fixtures[0].density = 0.001f;
 			def.fixtures[0].filter = filters::shell();
@@ -220,7 +220,7 @@ namespace prefabs {
 
 		{
 			ingredients::sprite(green_charge, pos, assets::texture_id::GREEN_CHARGE, augs::white, render_layer::DYNAMIC_BODY);
-			ingredients::crate_physics(green_charge);
+			ingredients::see_through_dynamic_body(green_charge);
 
 			auto& item = ingredients::make_item(green_charge);
 			item.space_occupied_per_charge = to_space_units("0.01");
@@ -249,7 +249,7 @@ namespace prefabs {
 
 		{
 			ingredients::sprite(shell_definition, pos, assets::texture_id::GREEN_SHELL, augs::white, render_layer::FLYING_BULLETS);
-			auto& def = ingredients::crate_physics(shell_definition);
+			auto& def = ingredients::see_through_dynamic_body(shell_definition);
 			def.fixtures[0].restitution = 1.4;
 			def.fixtures[0].density = 0.001f;
 			def.fixtures[0].filter = filters::shell();
@@ -269,7 +269,7 @@ namespace prefabs {
 		name_entity(weapon, entity_name::ASSAULT_RIFLE);
 
 		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::ASSAULT_RIFLE, augs::white, render_layer::DYNAMIC_BODY);
-		auto& def = ingredients::crate_physics(weapon);
+		auto& def = ingredients::see_through_dynamic_body(weapon);
 		ingredients::default_gun_container(weapon);
 
 		auto& gun = *weapon += components::gun();
@@ -343,7 +343,7 @@ namespace prefabs {
 		name_entity(weapon, entity_name::SUBMACHINE);
 
 		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::SUBMACHINE, augs::white, render_layer::DYNAMIC_BODY);
-		auto& def = ingredients::crate_physics(weapon);
+		auto& def = ingredients::see_through_dynamic_body(weapon);
 		ingredients::default_gun_container(weapon);
 
 		auto& gun = *weapon += components::gun();
@@ -418,7 +418,7 @@ namespace prefabs {
 		name_entity(weapon, entity_name::PISTOL);
 
 		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::PISTOL, augs::white, render_layer::DYNAMIC_BODY);
-		auto& def = ingredients::crate_physics(weapon);
+		auto& def = ingredients::see_through_dynamic_body(weapon);
 		ingredients::default_gun_container(weapon);
 
 		auto& gun = *weapon += components::gun();

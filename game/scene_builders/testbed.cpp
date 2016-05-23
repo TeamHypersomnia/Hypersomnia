@@ -11,11 +11,13 @@
 #include "game/systems/input_system.h"
 #include "game/systems/render_system.h"
 #include "game/systems/gui_system.h"
+#include "game/systems/visibility_system.h"
 #include "game/components/position_copying_component.h"
 #include "game/components/physics_definition_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/item_component.h"
 #include "game/components/name_component.h"
+#include "game/components/attitude_component.h"
 
 #include "game/messages/crosshair_intent_message.h"
 #include "game/messages/item_slot_transfer_request.h"
@@ -39,6 +41,7 @@ namespace scene_builders {
 	void testbed::load_resources() {
 		resource_setups::load_standard_atlas();
 		resource_setups::load_standard_particle_effects();
+		resource_setups::load_standard_behaviour_trees();
 
 		resource_manager.create(assets::shader_id::DEFAULT_VERTEX, L"hypersomnia/shaders/default.vsh", augs::graphics::shader::type::VERTEX);
 		resource_manager.create(assets::shader_id::DEFAULT_FRAGMENT, L"hypersomnia/shaders/default.fsh", augs::graphics::shader::type::FRAGMENT);
@@ -73,7 +76,7 @@ namespace scene_builders {
 		{
 			auto frog = world.create_entity("frog");
 			ingredients::sprite(frog, vec2(100 + x * 40, 200 + 400), assets::texture_id::TEST_SPRITE, augs::white, render_layer::DYNAMIC_BODY);
-			ingredients::crate_physics(frog);
+			ingredients::see_through_dynamic_body(frog);
 		}
 
 		auto car = prefabs::create_car(world, components::transform(-300, -600, -90));
@@ -93,7 +96,7 @@ namespace scene_builders {
 			{
 				auto background = world.create_entity("bg[-]");
 				ingredients::sprite(background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::texture_id::TEST_BACKGROUND, augs::white, render_layer::GROUND);
-				//ingredients::static_crate_physics(background);
+				//ingredients::standard_static_body(background);
 
 				auto street = world.create_entity("street[-]");
 				ingredients::sprite_scalled(street, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 700)) - vec2(1500, 700),
@@ -110,7 +113,11 @@ namespace scene_builders {
 			characters.push_back(new_character);
 
 			if (i == 1) {
-				new_character->get<components::transform>().pos.set(3700, 3700);
+				//new_character->get<components::transform>().pos.set(3700, 3700);
+				new_character->get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
+				new_character->get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
+				ingredients::standard_pathfinding_capability(new_character);
+				ingredients::soldier_intelligence(new_character);
 			}
 			if (i == 2) {
 				new_character->get<components::sentience>().health.value = 38;
@@ -242,6 +249,12 @@ namespace scene_builders {
 		//draw_bodies.push_back(crate2);
 		//draw_bodies.push_back(characters[0]);
 		//draw_bodies.push_back(backpack);
+
+		auto& visibility = world.get_system<visibility_system>();
+
+		visibility.epsilon_ray_distance_variation = 0.001;
+		visibility.epsilon_threshold_obstacle_hit = 2;
+		visibility.epsilon_distance_vertex_hit = 1;
 	}
 
 	void testbed::perform_logic_step(world& world) {

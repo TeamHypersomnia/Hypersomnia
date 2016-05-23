@@ -24,6 +24,20 @@ namespace filters {
 		return out;
 	}
 	
+	b2Filter line_of_sight_query() {
+		b2Filter out;
+		out.categoryBits = SIGHT_QUERY;
+		out.maskBits = SIGHT_OBSTRUCTION;
+		return out;
+	}
+
+	b2Filter line_of_sight_candidates() {
+		b2Filter out;
+		out.categoryBits = RENDERABLE_QUERY;
+		out.maskBits = DYNAMIC_OBJECT;
+		return out;
+	}
+
 	b2Filter controlled_character() {
 		b2Filter out;
 		out.categoryBits = RENDERABLE | CONTROLLED_CHARACTER | DYNAMIC_OBJECT;
@@ -47,15 +61,22 @@ namespace filters {
 
 	b2Filter dynamic_object() {
 		b2Filter out;
-		out.categoryBits = PATHFINDING_OBSTRUCTION | RENDERABLE | DYNAMIC_OBJECT;
-		out.maskBits = PATHFINDING_QUERY | RENDERABLE_QUERY | CONTROLLED_CHARACTER | STATIC_OBJECT | DYNAMIC_OBJECT | REMOTE_CHARACTER | FRICTION_GROUND | BULLET | SHELL | CORPSE;
+		out.categoryBits = SIGHT_OBSTRUCTION | PATHFINDING_OBSTRUCTION | RENDERABLE | DYNAMIC_OBJECT;
+		out.maskBits = SIGHT_QUERY | PATHFINDING_QUERY | RENDERABLE_QUERY | CONTROLLED_CHARACTER | STATIC_OBJECT | DYNAMIC_OBJECT | REMOTE_CHARACTER | FRICTION_GROUND | BULLET | SHELL | CORPSE;
+		return out;
+	}
+
+	b2Filter see_through_dynamic_object() {
+		b2Filter out;
+		out.categoryBits = RENDERABLE | DYNAMIC_OBJECT;
+		out.maskBits = RENDERABLE_QUERY | CONTROLLED_CHARACTER | STATIC_OBJECT | DYNAMIC_OBJECT | REMOTE_CHARACTER | FRICTION_GROUND | BULLET | SHELL | CORPSE;
 		return out;
 	}
 
 	b2Filter static_object() {
 		b2Filter out;
-		out.categoryBits = PATHFINDING_OBSTRUCTION | RENDERABLE | STATIC_OBJECT;
-		out.maskBits = PATHFINDING_QUERY | RENDERABLE_QUERY | CONTROLLED_CHARACTER | DYNAMIC_OBJECT | REMOTE_CHARACTER | FRICTION_GROUND | BULLET | SHELL | CORPSE;
+		out.categoryBits = SIGHT_OBSTRUCTION | PATHFINDING_OBSTRUCTION | RENDERABLE | STATIC_OBJECT;
+		out.maskBits = SIGHT_QUERY | PATHFINDING_QUERY | RENDERABLE_QUERY | CONTROLLED_CHARACTER | DYNAMIC_OBJECT | REMOTE_CHARACTER | FRICTION_GROUND | BULLET | SHELL | CORPSE;
 		return out;
 	}
 

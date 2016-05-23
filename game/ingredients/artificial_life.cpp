@@ -22,27 +22,32 @@ namespace ingredients {
 		pathfinding.distance_navpoint_hit = 2;
 		pathfinding.favor_velocity_parallellness = true;
 
-		components::visibility::layer layer;
-		layer.square_side = 5000;
-		layer.color.set(0, 255, 255, 120);
-		layer.filter = filters::pathfinding_query();
-
-		visibility.add_layer(components::visibility::DYNAMIC_PATHFINDING, layer);
+		//auto& layer = visibility.full_visibility_layers[components::visibility::DYNAMIC_PATHFINDING];
+		//layer.square_side = 5000;
+		//layer.color.set(0, 255, 255, 120);
+		//layer.filter = filters::pathfinding_query();
 	}
 
-	void enemy_intelligence(augs::entity_id e) {
+	void soldier_intelligence(augs::entity_id e) {
 		auto& behaviour_tree = *e += components::behaviour_tree();
 		auto& trees = behaviour_tree.concurrent_trees;
 
-		trees.resize(4);
+		trees.resize(1);
 		
+		auto& los = e->get<components::visibility>().line_of_sight_layers[components::visibility::LINE_OF_SIGHT];
+		los.test_attitudes = true;
+		los.test_items = true;
+		los.maximum_distance = 1000.0;
+		los.obstruction_filter = filters::line_of_sight_query();
+		los.candidate_filter = filters::line_of_sight_candidates();
+
 		trees[0].state.user_input = e;
-		trees[0].tree_id = assets::behaviour_tree_id::HANDS_ACTOR;
-		trees[1].state.user_input = e;
-		trees[1].tree_id = assets::behaviour_tree_id::INVENTORY_ACTOR;
-		trees[2].state.user_input = e;
-		trees[2].tree_id = assets::behaviour_tree_id::ITEM_PICKER;
-		trees[3].state.user_input = e;
-		trees[3].tree_id = assets::behaviour_tree_id::SOLDIER_MOVEMENT;
+		trees[0].tree_id = assets::behaviour_tree_id::SOLDIER_MOVEMENT;
+		//trees[1].state.user_input = e;
+		//trees[1].tree_id = assets::behaviour_tree_id::INVENTORY_ACTOR;
+		//trees[2].state.user_input = e;
+		//trees[2].tree_id = assets::behaviour_tree_id::ITEM_PICKER;
+		//trees[3].state.user_input = e;
+		//trees[3].tree_id = assets::behaviour_tree_id::HANDS_ACTOR;
 	}
 }

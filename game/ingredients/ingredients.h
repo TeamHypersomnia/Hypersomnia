@@ -25,8 +25,9 @@ namespace ingredients {
 	components::sprite& sprite_scalled(augs::entity_id, vec2 pos, vec2i size, assets::texture_id = assets::texture_id::BLANK, augs::rgba col = augs::rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
 	
 	components::physics_definition& bullet_round_physics(augs::entity_id);
-	components::physics_definition& crate_physics(augs::entity_id);
-	components::physics_definition& static_crate_physics(augs::entity_id);
+	components::physics_definition& see_through_dynamic_body(augs::entity_id);
+	components::physics_definition& standard_dynamic_body(augs::entity_id);
+	components::physics_definition& standard_static_body(augs::entity_id);
 
 	void wsad_character_physics(augs::entity_id);
 	void wsad_character_legs(augs::entity_id legs, augs::entity_id player);
@@ -45,7 +46,7 @@ namespace ingredients {
 	void default_gun(augs::entity_id);
 
 	void standard_pathfinding_capability(augs::entity_id);
-	void enemy_intelligence(augs::entity_id);
+	void soldier_intelligence(augs::entity_id);
 }
 
 namespace prefabs {

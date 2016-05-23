@@ -2,6 +2,12 @@
 #include "ensure.h"
 
 namespace resources {
+	behaviour_tree::state_of_traversal::state_of_traversal(state_of_tree_instance& in, const behaviour_tree& bt) 
+		: instance(in), original_tree(bt) {
+		std::fill(goals_set.begin(), goals_set.end(), false);
+	}
+
+
 	const behaviour_tree::node& behaviour_tree::get_node_by_id(int i) const {
 		return *node_pointers[i];
 	}
@@ -35,23 +41,35 @@ namespace resources {
 
 	void behaviour_tree::evaluate_instance_of_tree(state_of_tree_instance& inst) const {
 		state_of_traversal traversal = { inst, *this };
-		root.evaluate_node(traversal);
+		auto result = root.evaluate_node(traversal);
+
+		int previous_id = inst.previously_executed_leaf_id;
+		bool terminate_maybe_previously_running_node = (result != goal_availability::SHOULD_EXECUTE) && previous_id != -1;
+
+		if (terminate_maybe_previously_running_node) {
+			auto& previously_executed = traversal.original_tree.get_node_by_id(previous_id);
+			previously_executed.execute_leaf_goal_callback(execution_occurence::LAST, traversal);
+		}
 	}
 
-	behaviour_tree::determined_goal behaviour_tree::node::determine_goal_availability(behaviour_tree::state_of_traversal&) const {
-		return{ goal_availability::SHOULD_EXECUTE, nullptr };
+	behaviour_tree::node* behaviour_tree::node::branch() {
+		return this;
 	}
 
-	void behaviour_tree::node::execute_leaf_goal_callback(execution_occurence, goal_ptr, state_of_traversal&) const {
+	behaviour_tree::goal_availability behaviour_tree::node::goal_resolution(behaviour_tree::state_of_traversal&) const {
+		return goal_availability::SHOULD_EXECUTE;
+	}
+
+	void behaviour_tree::node::execute_leaf_goal_callback(execution_occurence, state_of_traversal&) const {
 		ensure(false && "Undefined action callback! Perhaps root has no children?");
 	}
 
 	behaviour_tree::goal_availability behaviour_tree::node::evaluate_node(state_of_traversal& traversal) const {
 		ensure(id_in_tree != -1);
 
-		auto goal = determine_goal_availability(traversal);
+		auto availability = goal_resolution(traversal);
 
-		if (goal.availability == goal_availability::SHOULD_EXECUTE) {
+		if (availability == goal_availability::SHOULD_EXECUTE) {
 			bool traverse_further_to_determine_status = !children.empty();
 
 			if (traverse_further_to_determine_status) {
@@ -95,17 +113,22 @@ namespace resources {
 				auto& next_executed = traversal.original_tree.get_node_by_id(id_in_tree);
 
 				if (notify_previous_and_perform_first_occurence) {
-					auto& previously_executed = traversal.original_tree.get_node_by_id(previously_executed_id);
-					previously_executed.execute_leaf_goal_callback(execution_occurence::LAST, nullptr, traversal);
-					next_executed.execute_leaf_goal_callback(execution_occurence::FIRST, std::move(goal.data), traversal);
+					if (previously_executed_id != -1) {
+						auto& previously_executed = traversal.original_tree.get_node_by_id(previously_executed_id);
+						previously_executed.execute_leaf_goal_callback(execution_occurence::LAST, traversal);
+					}
+
+					next_executed.execute_leaf_goal_callback(execution_occurence::FIRST, traversal);
 				}
 				else {
-					next_executed.execute_leaf_goal_callback(execution_occurence::REPEATED, std::move(goal.data), traversal);
+					next_executed.execute_leaf_goal_callback(execution_occurence::REPEATED, traversal);
 				}
 				
 				traversal.instance.previously_executed_leaf_id = id_in_tree;
 			}
 		}
+
+		return availability;
 	}
 }
 

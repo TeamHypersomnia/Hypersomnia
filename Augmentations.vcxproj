@@ -393,6 +393,7 @@
     <ClCompile Include="game\components\sprite_component.cpp" />
     <ClCompile Include="game\components\tile_layer_component.cpp" />
     <ClCompile Include="game\components\transform_component.cpp" />
+    <ClCompile Include="game\detail\ai\behaviours.cpp" />
     <ClCompile Include="game\detail\entity_scripts.cpp" />
     <ClCompile Include="game\ingredients\artificial_life.cpp" />
     <ClCompile Include="game\resources\behaviour_tree.cpp" />
@@ -1030,6 +1031,7 @@
     <ClInclude Include="game\components\sentience_component.h" />
     <ClInclude Include="game\components\sprite_component.h" />
     <ClInclude Include="game\components\steering_component.h" />
+    <ClInclude Include="game\components\attitude_component.h" />
     <ClInclude Include="game\components\tile_layer_component.h" />
     <ClInclude Include="game\components\trace_component.h" />
     <ClInclude Include="game\components\transform_component.h" />
@@ -1041,7 +1043,9 @@
     <ClInclude Include="game\assets\texture.h" />
     <ClInclude Include="augs\ensure.h" />
     <ClInclude Include="game\detail\ai\behaviours.h" />
+    <ClInclude Include="game\detail\ai\goals.h" />
     <ClInclude Include="game\detail\entity_scripts.h" />
+    <ClInclude Include="game\globals\relations.h" />
     <ClInclude Include="game\resources\behaviour_tree.h" />
     <ClInclude Include="game\detail\combat\melee_animation.h" />
     <ClInclude Include="game\detail\entity_description.h" />

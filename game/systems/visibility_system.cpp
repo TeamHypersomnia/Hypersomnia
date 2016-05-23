@@ -22,13 +22,12 @@ float comparable_angle(vec2 diff) {
 		);
 }
 
-visibility_system::visibility_system(world& parent_world) : processing_system_templated(parent_world), draw_cast_rays(false), draw_triangle_edges(true), draw_discontinuities(false), draw_visible_walls(false) {}
 
-int components::visibility::layer::get_num_triangles() {
+int components::visibility::full_visibility_info::get_num_triangles() {
 	return edges.size();
 }
 
-components::visibility::discontinuity* components::visibility::layer::get_discontinuity_for_edge(int n) {
+components::visibility::discontinuity* components::visibility::full_visibility_info::get_discontinuity_for_edge(int n) {
 	for (auto& disc : discontinuities)
 		if (disc.edge_index == n)
 			return &disc;
@@ -36,16 +35,16 @@ components::visibility::discontinuity* components::visibility::layer::get_discon
 	return nullptr;
 }
 
-components::visibility::discontinuity* components::visibility::layer::get_discontinuity(int n) {
+components::visibility::discontinuity* components::visibility::full_visibility_info::get_discontinuity(int n) {
 	return &discontinuities[n];
 }
 
-components::visibility::triangle components::visibility::layer::get_triangle(int i, vec2 origin) {
+components::visibility::triangle components::visibility::full_visibility_info::get_triangle(int i, vec2 origin) {
 	components::visibility::triangle tri = { origin + offset, edges[i].first, edges[i].second };
 	return tri;
 }
 
-std::vector<vec2> components::visibility::layer::get_polygon(float distance_epsilon, vec2 expand_origin, float expand_mult) {
+std::vector<vec2> components::visibility::full_visibility_info::get_polygon(float distance_epsilon, vec2 expand_origin, float expand_mult) {
 	std::vector<vec2> output;
 
 	for (size_t i = 0; i < edges.size(); ++i) {
@@ -71,9 +70,18 @@ std::vector<vec2> components::visibility::layer::get_polygon(float distance_epsi
 	return output;
 }
 
-augs::timer interval;
+bool components::visibility::line_of_sight_info::sees(augs::entity_id id) const {
+	return visible_items.find(id) != visible_items.end() 
+		|| visible_sentiences.find(id) != visible_sentiences.end()
+		|| visible_attitudes.find(id) != visible_attitudes.end()
+		;
+}
 
-void visibility_system::process_entities() {
+void visibility_system::generate_visibility_and_sight_information() {
+	ensure(epsilon_distance_vertex_hit > 0.f);
+	ensure(epsilon_ray_distance_variation > 0.f);
+	ensure(epsilon_threshold_obstacle_hit > 0.f);
+	
 	auto& renderer = get_renderer();
 	auto& lines = get_renderer().logic_lines;
 
@@ -95,18 +103,55 @@ void visibility_system::process_entities() {
 	std::vector<ray_input> all_ray_inputs;
 
 	for (auto it : targets) {
-		/* get AI data and position of the entity */
 		auto& visibility = it->get<components::visibility>();
-
-		if (visibility.interval_ms > 0.f && visibility.interval_timer.get<std::chrono::milliseconds>() < visibility.interval_ms) {
-			continue;
-		}
-		visibility.interval_timer.reset();
-
 		auto& transform = it->get<components::transform>();
 
+		for (auto& entry : visibility.line_of_sight_layers) {
+			auto& request = entry.second;
+
+			request.visible_items.clear();
+			request.visible_sentiences.clear();
+			request.visible_attitudes.clear();
+
+			float d = request.maximum_distance;
+			auto in_aabb = physics.query_aabb_px(transform.pos - vec2(d, d), transform.pos + vec2(d, d), request.candidate_filter, it);
+
+			for (const auto& candidate : in_aabb.entities) {
+				auto target_pos = candidate->get<components::transform>().pos;
+				if ((target_pos - transform.pos).length_sq() <= d*d) {
+					std::set<augs::entity_id>* target_set = nullptr;
+
+					if (request.test_items) {
+						if (candidate->find<components::item>() != nullptr) {
+							target_set = &request.visible_items;
+						}
+					}
+
+					if (request.test_sentiences) {
+						if (candidate->find<components::sentience>() != nullptr) {
+							target_set = &request.visible_sentiences;
+						}
+					}
+
+					if (request.test_attitudes) {
+						if (candidate->find<components::attitude>() != nullptr) {
+							target_set = &request.visible_attitudes;
+						}
+					}
+
+					if (target_set) {
+						auto out = physics.ray_cast_px(transform.pos, target_pos, request.obstruction_filter, it);
+
+						if (!out.hit) {
+							target_set->insert(candidate);
+						}
+					}
+				}
+			}
+		}
+
 		/* for every visibility type requested for given entity */
-		for (auto& entry : visibility.visibility_layers.raw) {
+		for (auto& entry : visibility.full_visibility_layers) {
 
 			/* prepare container for all the vertices that we will cast the ray to */
 			struct target_vertex {
@@ -127,7 +172,7 @@ void visibility_system::process_entities() {
 			all_vertices_transformed.clear();
 
 			/* shortcut */
-			auto& request = entry.val;
+			auto& request = entry.second;
 
 			/* transform entity position to Box2D coordinates and take offset into account */
 			vec2 position_meters = (transform.pos + request.offset) * PIXELS_TO_METERSf;

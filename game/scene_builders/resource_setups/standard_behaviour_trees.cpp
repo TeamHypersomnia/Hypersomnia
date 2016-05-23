@@ -4,12 +4,16 @@
 #include "game/resources/manager.h"
 #include "graphics/shader.h"
 
+#include "game/detail/ai/behaviours.h"
+
 namespace resource_setups {
 	void load_standard_behaviour_trees() {
 		auto& soldier_movement = resource_manager.create(assets::behaviour_tree_id::SOLDIER_MOVEMENT);
 
+		soldier_movement.root.mode = resources::behaviour_tree::node::type::SELECTOR;
 
-		soldier_movement.root;
+		soldier_movement.root.branch(new behaviours::immediate_evasion);
+
 		soldier_movement.build_tree();
 
 
@@ -23,7 +27,7 @@ namespace resource_setups {
 		auto& item_picker = resource_manager.create(assets::behaviour_tree_id::ITEM_PICKER);
 
 
-		item_picker.root;
+		//item_picker.root.branch(new behaviours::usable_item_marker);
 		item_picker.build_tree();
 
 

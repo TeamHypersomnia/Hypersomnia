@@ -37,3 +37,4 @@
 #include "components/trace_component.h"
 #include "components/melee_component.h"
 #include "components/sentience_component.h"
+#include "components/attitude_component.h"

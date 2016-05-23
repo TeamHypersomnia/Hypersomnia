@@ -33,7 +33,7 @@ void pathfinding_system::process_entities() {
 		/* check if we request pathfinding at the moment */
 		if (!pathfinding.session_stack.empty()) {
 			/* get visibility information */
-			auto vision = visibility.get_layer(components::visibility::DYNAMIC_PATHFINDING);
+			auto& vision = visibility.full_visibility_layers[components::visibility::DYNAMIC_PATHFINDING];
 			
 			std::vector<components::pathfinding::pathfinding_session::navigation_vertex> undiscovered_visible;
 

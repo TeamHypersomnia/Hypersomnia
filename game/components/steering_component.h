@@ -26,14 +26,12 @@ namespace components {
 
 		struct scene {
 			object_info subject; 
-			behaviour_state* state;
-			physics_system* physics;
-			visibility* vision;
-			std::vector<b2Vec2>* shape_verts;
+			behaviour_state* state = nullptr;
+			physics_system* physics = nullptr;
+			visibility* vision = nullptr;
+			std::vector<b2Vec2>* shape_verts = nullptr;
 
 			augs::entity_id subject_entity;
-			
-			scene();
 		};
 
 		struct target_info {
@@ -140,13 +138,12 @@ namespace components {
 		};
 
 		struct obstacle_avoidance : avoidance {
-			containment* navigation_correction;
-			seek* navigation_seek;
+			containment* navigation_correction = nullptr;
+			seek* navigation_seek = nullptr;
 
-			int visibility_type;
-			float ignore_discontinuities_narrower_than;
+			components::visibility::layer_type visibility_type;
+			float ignore_discontinuities_narrower_than = 1.f;
 
-			obstacle_avoidance();
 			virtual vec2 steer(scene) override;
 		};
 

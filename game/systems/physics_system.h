@@ -16,11 +16,13 @@ public:
 
 	struct raycast_output {
 		vec2 intersection, normal;
-		bool hit;
-		b2Fixture* what_fixture = nullptr;
+		bool hit = false;
+		int fixture_index = -1;
 		entity_id what_entity;
 
-		raycast_output() : hit(false), what_fixture(nullptr) {}
+		bool operator<(const raycast_output& b) const {
+			return what_entity < b.what_entity;
+		}
 	};
 
 	struct edge_edge_output {

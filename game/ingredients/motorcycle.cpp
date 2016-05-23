@@ -68,7 +68,7 @@ namespace prefabs {
 			auto& info = physics_definition.new_fixture();
 			info.from_renderable(front);
 
-			info.filter = filters::dynamic_object();
+			info.filter = filters::see_through_dynamic_object();
 			info.density = 0.6f;
 			info.restitution = 0.3;
 
@@ -90,7 +90,7 @@ namespace prefabs {
 			info.from_renderable(interior);
 			info.density = 0.6f;
 			info.sensor = true;
-			info.filter = filters::dynamic_object();
+			info.filter = filters::see_through_dynamic_object();
 			vec2 offset((front->get<components::sprite>().size.x / 2 + sprite.size.x / 2 - 1) * -1, 0);
 			info.transform_vertices.pos = offset;
 		}

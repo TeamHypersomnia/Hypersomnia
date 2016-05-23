@@ -20,6 +20,7 @@
 #include "game/components/name_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/particle_effect_response_component.h"
+#include "game/components/attitude_component.h"
 #include "game/assets/particle_effect_response.h"
 
 #include "game/globals/filters.h"
@@ -84,6 +85,11 @@ namespace ingredients {
 		auto& sentience = *e += components::sentience();
 		*e += components::position_copying(); // used when it is an astral body
 		auto& particle_response = *e += components::particle_effect_response({ assets::particle_effect_response_id::CHARACTER_RESPONSE });
+		auto& attitude = *e += components::attitude();
+
+		attitude.parties = party_category::METROPOLIS_CITIZEN;
+		attitude.hostile_parties = party_category::RESISTANCE_CITIZEN;
+
 		particle_response.modifier.colorize = augs::red;
 		particle_response.modifier.scale_lifetimes = 1.5f;
 

@@ -18,6 +18,14 @@ namespace components {
 			moving_left = moving_right = moving_forward = moving_backward = walking_enabled = 0;
 		}
 
+		void set_flags_from_target_direction(vec2 d) {
+			reset_movement_flags();
+			if (d.x > 0) moving_right = true;
+			if (d.y > 0) moving_backward = true;
+			if (d.x < 0) moving_left = true;
+			if (d.y < 0) moving_forward = true;
+		}
+
 		bool apply_movement_forces = true;
 
 		std::vector<subscribtion> response_receivers;

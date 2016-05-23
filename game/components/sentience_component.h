@@ -28,6 +28,10 @@ namespace components {
 		meter consciousness;
 		meter shield;
 
+		float comfort_zone = 500.f;
+		float minimum_danger_amount_to_evade = 5.f;
+		float danger_amount_from_hostile_attitude = 100.f;
+
 		augs::rgba calculate_health_color(float time_pulse_multiplier) const;
 
 		recoil_player aimpunch;

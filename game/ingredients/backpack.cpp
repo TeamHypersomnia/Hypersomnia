@@ -35,7 +35,7 @@ namespace prefabs {
 		ingredients::backpack(sample_backpack);
 
 		ingredients::sprite(sample_backpack, pos, assets::texture_id::BACKPACK, augs::white, render_layer::DYNAMIC_BODY);
-		ingredients::crate_physics(sample_backpack);
+		ingredients::see_through_dynamic_body(sample_backpack);
 
 		return sample_backpack;
 	}

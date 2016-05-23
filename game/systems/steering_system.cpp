@@ -13,17 +13,12 @@
 
 using namespace components;
 
-steering::scene::scene()
-	: physics(nullptr), vision(nullptr), shape_verts(nullptr), state(nullptr) {
-}
-
 steering::behaviour::behaviour() : max_force_applied(-1.f), weight(1.f) {}
 steering::directed::directed() : radius_of_effect(-1.f), max_target_future_prediction_ms(-1.f)  {}
 steering::avoidance::avoidance() 
 	: avoidance_rectangle_width(0.f), intervention_time_ms(0.f), max_intervention_length(-1.f) {}
 steering::wander::wander() : circle_radius(0.f), circle_distance(0.f), displacement_degrees(0.f) {}
 steering::containment::containment() : ray_count(0), randomize_rays(false), only_threats_in_OBB(false) {}
-steering::obstacle_avoidance::obstacle_avoidance() : ignore_discontinuities_narrower_than(1.f), navigation_correction(nullptr), navigation_seek(nullptr), visibility_type(0) {}
 steering::flocking::flocking() : field_of_vision_degrees(360.f), square_side(0.f) {}
 
 steering::object_info::object_info() : speed(0.f), max_speed(0.f) {}
@@ -358,8 +353,8 @@ vec2 steering::obstacle_avoidance::steer(scene in) {
 	std::vector<navigation_candidate> candidates;
 
 	/* shortcuts */
-	auto& visibility_edges = in.vision->get_layer(visibility_type).edges;
-	auto& discontinuities = in.vision->get_layer(visibility_type).discontinuities;
+	auto& visibility_edges = in.vision->full_visibility_layers[visibility_type].edges;
+	auto& discontinuities = in.vision->full_visibility_layers[visibility_type].discontinuities;
 
 	auto check_navigation_candidate = [&candidates, &in](vec2 v, bool cw) {
 		/* vector pointing from entity to navigation candidate */
@@ -388,7 +383,7 @@ vec2 steering::obstacle_avoidance::steer(scene in) {
 	std::vector<int> intersections;
 
 	if (in.vision) 
-		intersections = check_for_intersections(avoidance, in.vision->get_layer(visibility_type).edges);
+		intersections = check_for_intersections(avoidance, in.vision->full_visibility_layers[visibility_type].edges);
 
 	for (auto& i : intersections) {
 		/* navigate to the left end of the edge*/

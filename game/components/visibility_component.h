@@ -1,11 +1,13 @@
 #pragma once
 #include <vector>
+#include <unordered_map>
 #include "math/vec2.h"
 #include <Box2D\Dynamics\b2Fixture.h>
 
 #include "graphics/pixel.h"
 #include "misc/sorted_vector.h"
 #include "misc/timer.h"
+#include "game/systems/physics_system.h"
 
 namespace components {
 	struct visibility  {
@@ -34,14 +36,13 @@ namespace components {
 				last_undiscovered_wall(last_undiscovered_wall), edge_index(0), is_boundary(false) {}
 		};
 
-		struct layer {
+		struct full_visibility_info {
 			/* input */
-			bool postprocessing_subject;
 			augs::rgba color;
 			
 			b2Filter filter;
-			float square_side;
-			float ignore_discontinuities_shorter_than;
+			float square_side = 0.f;
+			float ignore_discontinuities_shorter_than = -1.f;
 
 			vec2 offset;
 
@@ -65,28 +66,32 @@ namespace components {
 			int get_num_triangles();
 			triangle get_triangle(int index, vec2 origin);
 			std::vector<vec2> get_polygon(float distance_epsilon, vec2 expand_origin, float expand_mult);
+		};
 
-			layer() : square_side(0.f), postprocessing_subject(false), ignore_discontinuities_shorter_than(-1.f) {}
+		struct line_of_sight_info {
+			augs::rgba color;
+
+			b2Filter obstruction_filter;
+			b2Filter candidate_filter;
+			float maximum_distance = 0.f;
+
+			bool test_items = false;
+			bool test_sentiences = false;
+			bool test_attitudes = false;
+
+			std::set<augs::entity_id> visible_items;
+			std::set<augs::entity_id> visible_sentiences;
+			std::set<augs::entity_id> visible_attitudes;
+			
+			bool sees(augs::entity_id) const;
 		};
 
 		enum layer_type {
-			OBSTACLE_AVOIDANCE,
 			DYNAMIC_PATHFINDING,
-			CONTAINMENT
+			LINE_OF_SIGHT
 		};
 
-		augs::sorted_associative_vector<int, layer> visibility_layers;
-
-		void add_layer(int key, const layer& val) {
-			visibility_layers.add(key, val);
-		}
-
-		layer& get_layer(int key) {
-			return *visibility_layers.get(key);
-		}
-
-		augs::timer interval_timer;
-		float interval_ms;
-		visibility() : interval_ms(-1.f) {}
+		std::unordered_map<layer_type, full_visibility_info> full_visibility_layers;
+		std::unordered_map<layer_type, line_of_sight_info> line_of_sight_layers;
 	};
 }

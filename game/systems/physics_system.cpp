@@ -37,7 +37,7 @@ float32 physics_system::raycast_input::ReportFixture(b2Fixture* fixture, const b
 	output.intersection = point;
 
 	output.hit = true;
-	output.what_fixture = fixture;
+	output.fixture_index = fixture->GetUserData()->get<components::fixtures>().get_fixture_index(fixture);
 	output.what_entity = fixture->GetBody()->GetUserData();
 	output.normal = normal;
 

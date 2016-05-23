@@ -24,8 +24,9 @@ namespace components {
 
 		std::vector<std::vector <vec2>> convex_polys;
 
-		b2Body* get_body();
-		augs::entity_id get_body_entity();
-		vec2 get_aabb_size();
+		b2Body* get_body() const;
+		augs::entity_id get_body_entity() const;
+		vec2 get_aabb_size() const;
+		int get_fixture_index(b2Fixture*) const;
 	};
 }

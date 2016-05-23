@@ -54,6 +54,7 @@ void game_world::register_types_of_messages_components_systems() {
 	register_component<trace>();
 	register_component<melee>();
 	register_component<sentience>();
+	register_component<attitude>();
 	
 	register_system<input_system>();
 	register_system<steering_system>();
@@ -243,6 +244,8 @@ void game_world::perform_logic_step() {
 	get_system<physics_system>().step_and_set_new_transforms();
 	get_system<position_copying_system>().update_transforms();
 	
+	get_system<visibility_system>().generate_visibility_and_sight_information();
+
 	get_system<melee_system>().initiate_and_update_moves();
 
 	get_system<damage_system>().destroy_outdated_bullets();

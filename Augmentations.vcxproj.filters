@@ -1218,6 +1218,9 @@
     <ClCompile Include="game\detail\entity_scripts.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\detail\ai\behaviours.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3249,6 +3252,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\detail\ai\behaviours.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\globals\relations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\components\attitude_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\ai\goals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

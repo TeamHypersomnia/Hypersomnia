@@ -9,16 +9,16 @@ using namespace augs;
 
 class visibility_system : public processing_system_templated<components::transform, components::visibility> {
 public:
-	visibility_system(world&);
+	using processing_system_templated::processing_system_templated;
 
-	void process_entities();
+	void generate_visibility_and_sight_information();
 
-	int draw_triangle_edges;
-	int draw_cast_rays;
-	int draw_discontinuities;
-	int draw_visible_walls;
+	bool draw_triangle_edges = true;
+	bool draw_cast_rays = false;
+	bool draw_discontinuities = false;
+	bool draw_visible_walls = false;
 
-	float epsilon_ray_distance_variation;
-	float epsilon_distance_vertex_hit;
-	float epsilon_threshold_obstacle_hit;
+	float epsilon_ray_distance_variation = 0.f;
+	float epsilon_distance_vertex_hit = 0.f;
+	float epsilon_threshold_obstacle_hit = 0.f;
 };
