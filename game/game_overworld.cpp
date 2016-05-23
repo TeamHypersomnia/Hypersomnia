@@ -78,6 +78,8 @@ void game_overworld::main_game_loop() {
 	bool quit_flag = false;
 
 	while (!quit_flag) {
+		main_game_world.fps_counter.new_measurement();
+
 		main_game_world.get_message_queue<messages::raw_window_input_message>().clear();
 
 		auto raw_window_inputs = game_window.poll_events();
@@ -148,6 +150,8 @@ void game_overworld::main_game_loop() {
 			main_game_world.perform_logic_step();
 			current_scene_builder->perform_logic_step(main_game_world);
 		}
+
+		main_game_world.fps_counter.end_measurement();
 	}
 }
 

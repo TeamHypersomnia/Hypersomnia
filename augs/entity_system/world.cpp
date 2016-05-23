@@ -111,6 +111,10 @@ namespace augs {
 		entities.free_all();
 	}
 
+	std::wstring world::world_summary() const {
+		return typesafe_sprintf(L"Entities: %x\n", entities_count()) + fps_counter.summary() + profile.sorted_summary();
+	}
+
 	void world::delete_entity(entity_id e) {
 		auto name = e.get_debug_name();
 		
@@ -146,7 +150,7 @@ namespace augs {
 		return entities.data() + entities.size();
 	}
 
-	size_t world::entities_count() {
+	size_t world::entities_count() const {
 		return entities.size();
 	}
 

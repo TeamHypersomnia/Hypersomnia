@@ -1221,6 +1221,12 @@
     <ClCompile Include="game\detail\ai\behaviours.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="augs\misc\performance_timer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\misc\measurements.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3261,6 +3267,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\detail\ai\goals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\measurements.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\performance_timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

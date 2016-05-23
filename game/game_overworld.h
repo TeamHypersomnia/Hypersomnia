@@ -7,11 +7,14 @@
 #include <memory>
 
 #include "game/scene_builders/scene_builder.h"
+#include "misc/performance_timer.h"
 
 class game_overworld : public augs::overworld {
 	std::unique_ptr<scene_builder> current_scene_builder;
 
 public:
+	augs::performance_timer profile;
+
 	game_overworld();
 
 	window::glwindow game_window;

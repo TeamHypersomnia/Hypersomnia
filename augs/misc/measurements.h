@@ -1,0 +1,39 @@
+#pragma once
+#include "timer.h"
+
+namespace augs {
+	class measurements {
+		size_t measurement_index = 0;
+		timer tm;
+
+		double last_average;
+		double last_minimum;
+		double last_maximum;
+		double last_measurement;
+
+		bool measured = false;
+	public:
+		measurements(std::wstring title = L"Untitled");
+
+		std::wstring title;
+
+		std::vector<double> tracked;
+
+		std::wstring summary() const;
+
+		bool operator<(const measurements& b) const {
+			return !(get_average_seconds() < b.get_average_seconds());
+		}
+
+		double get_average_seconds() const;
+		double get_maximum_seconds() const;
+		double get_minimum_seconds() const;
+		double get_last_measurement_seconds() const;
+
+		bool was_measured() const;
+
+		void measure(double);
+		void new_measurement();
+		void end_measurement();
+	};
+}

@@ -7,6 +7,7 @@
 #include "math/vec2.h"
 
 void typesafe_sprintf_detail(size_t, std::string&) {}
+void typesafe_sprintf_detail(size_t, std::wstring&) {}
 
 #include <fstream>
 

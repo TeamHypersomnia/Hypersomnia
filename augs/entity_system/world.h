@@ -13,6 +13,8 @@
 #include "misc/unsafe_type_collection.h"
 #include "overworld.h"
 
+#include "misc/performance_timer.h"
+
 namespace augs {
 	class processing_system;
 	class world {
@@ -110,9 +112,10 @@ namespace augs {
 
 		entity* entities_begin();
 		entity* entities_end();
-		size_t entities_count();
+		size_t entities_count() const;
 
 		void delete_all_entities();
+		virtual std::wstring world_summary(bool ) const;
 
 		deterministic_timestamp get_current_timestamp() const;
 
@@ -120,6 +123,9 @@ namespace augs {
 		int entity_pool_capacity = 0;
 		unsigned long long current_step_number = 0;
 		double seconds_passed = 0.0;
+
+		performance_timer profile;
+		measurements fps_counter = measurements(L"Frame");
 
 	private:
 		friend class entity;
