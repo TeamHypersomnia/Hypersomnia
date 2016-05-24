@@ -320,7 +320,9 @@ namespace scene_builders {
 			}
 		}
 
-		quick_print_format(target.triangles, world.world_summary(show_profile_details), style(assets::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0, nullptr);
+		auto coords = characters[current_character]->get<components::transform>().pos;
+
+		quick_print_format(target.triangles, typesafe_sprintf(L"X: %f2\nY: %f2\n", coords.x, coords.y) + world.world_summary(show_profile_details), style(assets::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0, nullptr);
 		target.call_triangles();
 		target.clear_triangles();
 	}
