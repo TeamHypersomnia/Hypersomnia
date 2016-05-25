@@ -271,10 +271,6 @@ void game_world::perform_logic_step() {
 	profile.stop(meter_type::PHYSICS);
 	get_system<position_copying_system>().update_transforms();
 	
-	profile.start(meter_type::VISIBILITY);
-	get_system<visibility_system>().generate_visibility_and_sight_information();
-	profile.stop(meter_type::VISIBILITY);
-
 	get_system<melee_system>().initiate_and_update_moves();
 
 	get_system<damage_system>().destroy_outdated_bullets();
@@ -292,6 +288,10 @@ void game_world::perform_logic_step() {
 
 	creation_callbacks();
 	get_message_queue<new_entity_message>().clear();
+
+	profile.start(meter_type::VISIBILITY);
+	get_system<visibility_system>().generate_visibility_and_sight_information();
+	profile.stop(meter_type::VISIBILITY);
 
 	++current_step_number;
 	seconds_passed += parent_overworld.delta_seconds();

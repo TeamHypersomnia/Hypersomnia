@@ -29,20 +29,24 @@ namespace ingredients {
 	}
 
 	void soldier_intelligence(augs::entity_id e) {
-		auto& behaviour_tree = *e += components::behaviour_tree();
-		auto& trees = behaviour_tree.concurrent_trees;
-
-		trees.resize(1);
-		
 		auto& los = e->get<components::visibility>().line_of_sight_layers[components::visibility::LINE_OF_SIGHT];
 		los.test_attitudes = true;
 		los.test_items = true;
+		los.test_dangers = true;
 		los.maximum_distance = 1000.0;
 		los.obstruction_filter = filters::line_of_sight_query();
 		los.candidate_filter = filters::line_of_sight_candidates();
 
+		auto& behaviour_tree = *e += components::behaviour_tree();
+		auto& trees = behaviour_tree.concurrent_trees;
+
+		trees.resize(2);
+		
 		trees[0].state.user_input = e;
-		trees[0].tree_id = assets::behaviour_tree_id::SOLDIER_MOVEMENT;
+		trees[0].tree_id = assets::behaviour_tree_id::HOSTILE_TARGET_PRIORITIZATION;
+		trees[1].state.user_input = e;
+		trees[1].tree_id = assets::behaviour_tree_id::SOLDIER_MOVEMENT;
+		
 		//trees[1].state.user_input = e;
 		//trees[1].tree_id = assets::behaviour_tree_id::INVENTORY_ACTOR;
 		//trees[2].state.user_input = e;

@@ -7,7 +7,8 @@
 #include "physics_system.h"
 #include "render_system.h"
 
-#include "../detail/physics_setup_helpers.h"
+#include "game/detail/physics_setup_helpers.h"
+#include "game/detail/entity_scripts.h"
 
 #include <limits>
 #include <set>
@@ -112,6 +113,7 @@ void visibility_system::generate_visibility_and_sight_information() {
 			request.visible_items.clear();
 			request.visible_sentiences.clear();
 			request.visible_attitudes.clear();
+			request.visible_dangers.clear();
 
 			float d = request.maximum_distance;
 			auto in_aabb = physics.query_aabb_px(transform.pos - vec2(d, d), transform.pos + vec2(d, d), request.candidate_filter, it);
@@ -119,31 +121,39 @@ void visibility_system::generate_visibility_and_sight_information() {
 			for (const auto& candidate : in_aabb.entities) {
 				auto target_pos = candidate->get<components::transform>().pos;
 				if ((target_pos - transform.pos).length_sq() <= d*d) {
-					std::set<augs::entity_id>* target_set = nullptr;
+					static thread_local std::vector<std::set<augs::entity_id>*> target_sets;
+					target_sets.clear();
 
 					if (request.test_items) {
 						if (candidate->find<components::item>() != nullptr) {
-							target_set = &request.visible_items;
+							target_sets.push_back(&request.visible_items);
 						}
 					}
 
 					if (request.test_sentiences) {
 						if (candidate->find<components::sentience>() != nullptr) {
-							target_set = &request.visible_sentiences;
+							target_sets.push_back(&request.visible_sentiences);
 						}
 					}
 
 					if (request.test_attitudes) {
 						if (candidate->find<components::attitude>() != nullptr) {
-							target_set = &request.visible_attitudes;
+							target_sets.push_back(&request.visible_attitudes);
 						}
 					}
 
-					if (target_set) {
+					if (request.test_dangers) {
+						if (assess_danger(it, candidate).amount > 0) {
+							target_sets.push_back(&request.visible_dangers);
+						}
+					}
+
+					if (target_sets.size() > 0) {
 						auto out = physics.ray_cast_px(transform.pos, target_pos, request.obstruction_filter, it);
 
 						if (!out.hit) {
-							target_set->insert(candidate);
+							for(auto& t : target_sets)
+								t->insert(candidate);
 						}
 					}
 				}

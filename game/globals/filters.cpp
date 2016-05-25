@@ -34,7 +34,7 @@ namespace filters {
 	b2Filter line_of_sight_candidates() {
 		b2Filter out;
 		out.categoryBits = RENDERABLE_QUERY;
-		out.maskBits = DYNAMIC_OBJECT;
+		out.maskBits = DYNAMIC_OBJECT | BULLET;
 		return out;
 	}
 

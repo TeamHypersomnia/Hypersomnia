@@ -41,6 +41,9 @@ identified_danger assess_danger(augs::entity_id victim, augs::entity_id danger) 
 	auto* damage = danger->find<components::damage>();
 	auto* attitude = danger->find<components::attitude>();
 
+	if (!damage && !attitude)
+		return result;
+
 	auto victim_pos = victim->get<components::transform>().pos;
 	auto danger_pos = danger->get<components::transform>().pos;
 	auto danger_dir = (danger_pos - victim_pos);

@@ -52,8 +52,8 @@ void sentience_system::consume_health_events() {
 		auto& sentience = h.subject->get<components::sentience>();
 
 		switch (h.target) {
-		case messages::health_event::HEALTH: sentience.health.value -= h.effective_amount; break;
-		case messages::health_event::CONSCIOUSNESS: sentience.consciousness.value -= h.effective_amount; break;
+		case messages::health_event::HEALTH: sentience.health.value -= h.effective_amount; ensure(sentience.health.value >= 0) break;;
+		case messages::health_event::CONSCIOUSNESS: sentience.consciousness.value -= h.effective_amount; ensure(sentience.health.value >= 0); break;
 		case messages::health_event::SHIELD: ensure(0); break;
 		case messages::health_event::AIM:
 			auto punched = h.subject;
@@ -103,13 +103,13 @@ void sentience_system::consume_health_events() {
 			corpse[associated_entity_name::ASTRAL_BODY] = astral_body_now_without_physical_prison;
 		}
 	}
+	
+	healths.clear();
 }
 
 void sentience_system::apply_damage_and_generate_health_events() {
 	auto& damages = parent_world.get_message_queue<messages::damage_message>();
 	auto& healths = parent_world.get_message_queue<messages::health_event>();
-
-	healths.clear();
 
 	for (auto& d : damages) {
 		auto* sentience = d.subject->find<components::sentience>();

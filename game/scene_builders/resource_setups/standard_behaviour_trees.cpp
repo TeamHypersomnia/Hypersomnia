@@ -36,5 +36,10 @@ namespace resource_setups {
 
 		inventory_actor.root;
 		inventory_actor.build_tree();
+
+		auto& hostile_target_prioritization = resource_manager.create(assets::behaviour_tree_id::HOSTILE_TARGET_PRIORITIZATION);
+
+		hostile_target_prioritization.root.branch(new behaviours::target_closest_enemy);
+		hostile_target_prioritization.build_tree();
 	}
 }

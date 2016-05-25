@@ -7,6 +7,7 @@ namespace resources {
 namespace assets {
 	enum behaviour_tree_id {
 		SOLDIER_MOVEMENT,
+		HOSTILE_TARGET_PRIORITIZATION,
 		ITEM_PICKER,
 		HANDS_ACTOR,
 		INVENTORY_ACTOR
