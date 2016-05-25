@@ -152,7 +152,7 @@ namespace scene_builders {
 			prefabs::create_sample_magazine(world, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
 
 		prefabs::create_sample_magazine(world, vec2(100 - 50, -650));
-		prefabs::create_sample_magazine(world, vec2(100 - 100, -650), "0.15");
+		prefabs::create_sample_magazine(world, vec2(100 - 100, -650), "0.30");
 		//prefabs::create_pink_charge(world, vec2(100, 100));
 		//prefabs::create_pink_charge(world, vec2(100, -400));
 		//prefabs::create_pink_charge(world, vec2(150, -400));
@@ -272,7 +272,6 @@ namespace scene_builders {
 				//ingredients::sprite_scalled(ent, it.crosshair_world_pos, vec2(10, 10), assets::texture_id::BLANK);
 			}
 		}
-
 
 		auto key_inputs = world.get_message_queue<messages::unmapped_intent_message>();
 
