@@ -6,6 +6,7 @@
 using namespace augs;
 
 class sentience_system : public processing_system_templated<components::sentience> {
+	void consume_health_event(messages::health_event);
 
 public:
 	using processing_system_templated::processing_system_templated;
@@ -13,5 +14,4 @@ public:
 	void apply_damage_and_generate_health_events();
 	void cooldown_aimpunches();
 	void regenerate_values();
-	void consume_health_events();
 };

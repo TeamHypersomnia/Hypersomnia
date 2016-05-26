@@ -108,7 +108,6 @@ void game_world::register_types_of_messages_components_systems() {
 	register_message_queue<health_event>();
 
 	register_message_callback<item_slot_transfer_request>(std::bind(&item_system::consume_item_slot_transfer_requests, &get_system<item_system>()));
-	register_message_callback<health_event>(std::bind(&sentience_system::consume_health_events, &get_system<sentience_system>()));
 }
 
 void game_world::call_drawing_time_systems() {
