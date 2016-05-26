@@ -28,6 +28,10 @@ void unset_input_flags_of_orphaned_entity(augs::entity_id e) {
 	}
 }
 
+bool isLeft(vec2 a, vec2 b, vec2 c) {
+	return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
+}
+
 identified_danger assess_danger(augs::entity_id victim, augs::entity_id danger) {
 	identified_danger result;
 
@@ -46,11 +50,21 @@ identified_danger assess_danger(augs::entity_id victim, augs::entity_id danger) 
 
 	auto victim_pos = victim->get<components::transform>().pos;
 	auto danger_pos = danger->get<components::transform>().pos;
+	auto danger_vel = components::physics::get_owner_body_entity(danger)->get<components::physics>().velocity();
+	auto danger_speed = danger_vel.length();
 	auto danger_dir = (danger_pos - victim_pos);
 	float danger_distance = danger_dir.length();
 
-	result.recommended_evasion = -danger_dir/danger_distance;
-	
+	if (danger_speed > 10) {
+		result.recommended_evasion = isLeft(danger_pos, danger_pos + danger_vel, victim_pos) ? danger_vel.perpendicular_cw() : -danger_vel.perpendicular_cw();
+	}
+	else
+		result.recommended_evasion = -danger_dir;
+
+	result.recommended_evasion.normalize();
+
+	//-danger_dir / danger_distance;
+
 	float comfort_zone_disturbance_ratio = (s.comfort_zone - danger_distance)/s.comfort_zone;
 
 	if (comfort_zone_disturbance_ratio < 0)

@@ -55,11 +55,32 @@ namespace behaviours {
 	}
 
 
-	tree::goal_availability target_closest_enemy::goal_resolution(tree::state_of_traversal&) const {
+	tree::goal_availability target_closest_enemy::goal_resolution(tree::state_of_traversal& t) const {
 		return tree::goal_availability::SHOULD_EXECUTE;
 	}
 
-	void target_closest_enemy::execute_leaf_goal_callback(tree::execution_occurence, tree::state_of_traversal&) const {
+	void target_closest_enemy::execute_leaf_goal_callback(tree::execution_occurence occ, tree::state_of_traversal& t) const {
+		if (occ == tree::execution_occurence::LAST)
+			return;
+		
+		auto subject = t.instance.user_input;
+		auto& visibility = subject->get<components::visibility>();
+		auto& los = visibility.line_of_sight_layers[components::visibility::LINE_OF_SIGHT];
 
+		augs::entity_id closest_hostile;
+
+		float min_distance = std::numeric_limits<float>::max();
+
+		for (auto& s : los.visible_sentiences) {
+			auto att = calculate_attitude(s, subject);
+
+			if (att == attitude_type::WANTS_TO_KILL || att == attitude_type::WANTS_TO_KNOCK_UNCONSCIOUS) {
+				if ((s->get<components::transform>().pos - subject->get<components::transform>().pos).length_sq() < min_distance) {
+					closest_hostile = s;
+				}
+			}
+		}
+
+		subject->get<components::attitude>().chosen_target = closest_hostile;
 	}
 }
