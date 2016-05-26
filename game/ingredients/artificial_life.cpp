@@ -30,6 +30,7 @@ namespace ingredients {
 
 	void soldier_intelligence(augs::entity_id e) {
 		auto& los = e->get<components::visibility>().line_of_sight_layers[components::visibility::LINE_OF_SIGHT];
+		los.test_sentiences = true;
 		los.test_attitudes = true;
 		los.test_items = true;
 		los.test_dangers = true;

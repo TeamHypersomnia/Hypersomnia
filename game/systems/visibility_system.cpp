@@ -75,6 +75,7 @@ bool components::visibility::line_of_sight_info::sees(augs::entity_id id) const 
 	return visible_items.find(id) != visible_items.end() 
 		|| visible_sentiences.find(id) != visible_sentiences.end()
 		|| visible_attitudes.find(id) != visible_attitudes.end()
+		|| visible_dangers.find(id) != visible_dangers.end()
 		;
 }
 

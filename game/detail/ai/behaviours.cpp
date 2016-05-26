@@ -3,6 +3,7 @@
 #include "game/components/visibility_component.h"
 #include "game/components/movement_component.h"
 #include "game/components/sentience_component.h"
+#include "game/components/crosshair_component.h"
 #include "entity_system/entity.h"
 
 #include "game/detail/entity_scripts.h"
@@ -64,6 +65,7 @@ namespace behaviours {
 			return;
 		
 		auto subject = t.instance.user_input;
+		auto pos = subject->get<components::transform>().pos;
 		auto& visibility = subject->get<components::visibility>();
 		auto& los = visibility.line_of_sight_layers[components::visibility::LINE_OF_SIGHT];
 
@@ -75,12 +77,27 @@ namespace behaviours {
 			auto att = calculate_attitude(s, subject);
 
 			if (att == attitude_type::WANTS_TO_KILL || att == attitude_type::WANTS_TO_KNOCK_UNCONSCIOUS) {
-				if ((s->get<components::transform>().pos - subject->get<components::transform>().pos).length_sq() < min_distance) {
+				auto dist = (s->get<components::transform>().pos - pos).length_sq();
+				
+				if (dist < min_distance) {
 					closest_hostile = s;
+					min_distance = dist;
 				}
 			}
 		}
 
 		subject->get<components::attitude>().chosen_target = closest_hostile;
+
+		if (subject.has(sub_entity_name::CHARACTER_CROSSHAIR)) {
+			auto crosshair = subject[sub_entity_name::CHARACTER_CROSSHAIR];
+			auto& crosshair_offset = crosshair->get<components::crosshair>().base_offset;
+			
+			if (closest_hostile.alive()) {
+				crosshair_offset = closest_hostile->get<components::transform>().pos - pos;
+			}
+			else {
+				crosshair_offset = components::physics::get_owner_body_entity(subject)->get<components::physics>().velocity();
+			}
+		}
 	}
 }

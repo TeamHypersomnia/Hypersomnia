@@ -214,15 +214,15 @@ void game_world::perform_logic_step() {
 
 	get_system<intent_contextualization_system>().contextualize_crosshair_action_intents();
 
-	profile.start(meter_type::AI);
-	get_system<behaviour_tree_system>().evaluate_trees();
-	profile.stop(meter_type::AI);
-
 	get_system<gun_system>().consume_gun_intents();
 	get_system<gun_system>().launch_shots_due_to_pressed_triggers();
 
 	creation_callbacks();
 	get_message_queue<new_entity_message>().clear();
+
+	profile.start(meter_type::AI);
+	get_system<behaviour_tree_system>().evaluate_trees();
+	profile.stop(meter_type::AI);
 
 	get_system<crosshair_system>().apply_crosshair_intents_to_base_offsets();
 	get_system<crosshair_system>().apply_base_offsets_to_crosshair_transforms();
