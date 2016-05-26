@@ -6,6 +6,7 @@
 #include "game/components/sentience_component.h"
 #include "game/components/damage_component.h"
 #include "game/components/attitude_component.h"
+#include "inventory_utils.h"
 
 void unset_input_flags_of_orphaned_entity(augs::entity_id e) {
 	auto* gun = e->find<components::gun>();
@@ -45,7 +46,7 @@ identified_danger assess_danger(augs::entity_id victim, augs::entity_id danger) 
 	auto* damage = danger->find<components::damage>();
 	auto* attitude = danger->find<components::attitude>();
 
-	if (!damage && !attitude)
+	if ((!damage && !attitude) || (damage && get_owning_transfer_capability(damage->sender) == victim))
 		return result;
 
 	auto victim_pos = victim->get<components::transform>().pos;
