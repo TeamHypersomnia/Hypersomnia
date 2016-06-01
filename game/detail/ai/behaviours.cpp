@@ -106,12 +106,13 @@ namespace behaviours {
 
 	tree::goal_availability pull_trigger::goal_resolution(tree::state_of_traversal& t) const {
 		auto subject = t.instance.user_input;
-		auto chosen_target = subject->get<components::attitude>().chosen_target;
+		auto& attitude = subject->get<components::attitude>();
+		auto chosen_target = attitude.chosen_target;
 
 		if (chosen_target.alive() && guns_wielded(subject).size() > 0) {
-
-
-			return tree::goal_availability::SHOULD_EXECUTE;
+			if (direction(chosen_target, subject).degrees_between(orientation(subject)) < attitude.maximum_divergence_angle_before_shooting) {
+				return tree::goal_availability::SHOULD_EXECUTE;
+			}
 		}
 		
 		return tree::goal_availability::CANT_EXECUTE;
@@ -132,13 +133,14 @@ namespace behaviours {
 	tree::goal_availability minimize_recoil_through_movement::goal_resolution(tree::state_of_traversal& t) const {
 		auto subject = t.instance.user_input;
 		auto crosshair = subject[sub_entity_name::CHARACTER_CROSSHAIR];
+		auto& attitude = subject->get<components::attitude>();
+		auto chosen_target = attitude.chosen_target;
 
-		if (crosshair.alive()) {
+		if (chosen_target.alive() && crosshair.alive()) {
 			auto recoil = crosshair[sub_entity_name::CROSSHAIR_RECOIL_BODY];
 			auto& c = crosshair->get<components::crosshair>();
 
 			minimize_recoil_through_movement_goal goal;
-			
 
 			goal.movement_direction = (c.base_offset - orientation(subject).set_length(c.base_offset.length()));
 				// vec2(c.base_offset).rotate(rotation(recoil), vec2()));

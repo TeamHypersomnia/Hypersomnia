@@ -468,7 +468,7 @@ vec2 steering::obstacle_avoidance::steer(scene in) {
 			lines.draw_green(in.subject.position, best_candidate);
 
 			/* angle the entity has to turn by to face the navigation candidate */
-			float angle = (best_candidate - in.subject.position).angle_between(in.subject.unit_vel);
+			float angle = (best_candidate - in.subject.position).degrees() - (in.subject.unit_vel).degrees();
 
 			for (auto& p : avoidance.avoidance)
 				p = vec2(p).rotate(angle, in.subject.position);

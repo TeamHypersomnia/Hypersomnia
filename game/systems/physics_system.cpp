@@ -314,9 +314,9 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 						auto velOtherPixels = vec2(pointVelOther) * METERS_TO_PIXELSf;
 
 						if (velOtherPixels.length() > 1) {
-							auto angle = vec2(worldManifold.normal).angle_between(velOtherPixels);
+							auto angle = vec2(worldManifold.normal).degrees_between(velOtherPixels);
 
-							if (std::abs(angle) > 90)
+							if (angle > 90)
 								found_suitable = true;
 						}
 

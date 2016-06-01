@@ -11,5 +11,7 @@ namespace components {
 		
 		augs::entity_id chosen_target;
 		attitude_type target_attitude = attitude_type::NEUTRAL;
+
+		double maximum_divergence_angle_before_shooting = 10.0;
 	};
 }

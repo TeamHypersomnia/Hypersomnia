@@ -35,7 +35,7 @@ float colinearize_AB(vec2 O_center_of_rotation, vec2 A_rifle_center, vec2 B_barr
 	auto CG = C_crosshair - G;
 	auto AG = A_rifle_center - G;
 
-	auto final_angle = 2 * CG.angle_between(AG);
+	auto final_angle = 2 * (CG.degrees() - AG.degrees());
 	
 	if (DEBUG_DRAW_COLINEARIZATION) {
 		auto& ln = augs::renderer::get_current().logic_lines;

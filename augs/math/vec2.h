@@ -240,8 +240,12 @@ namespace augs {
 			return radians()*RAD_TO_DEG;
 		}
 
-		float angle_between(const vec2t<>& v) {
-			return degrees() - v.degrees();
+		float radians_between(const vec2t<>& v) const {
+			return acos(vec2(v).normalize().dot(vec2(*this).normalize()));
+		}
+
+		float degrees_between(const vec2t<>& v) const {
+			return radians_between(v) * RAD_TO_DEG;
 		}
 
 		template<class A, class B>
