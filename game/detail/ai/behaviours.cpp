@@ -112,6 +112,8 @@ namespace behaviours {
 		auto chosen_target = subject->get<components::attitude>().chosen_target;
 
 		if (chosen_target.alive() && guns_wielded(subject).size() > 0) {
+
+
 			return tree::goal_availability::SHOULD_EXECUTE;
 		}
 		

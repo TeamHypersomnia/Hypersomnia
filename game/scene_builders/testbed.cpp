@@ -117,7 +117,7 @@ namespace scene_builders {
 				new_character->get<components::sentience>().health.maximum = 800;
 			}
 			if (i == 1) {
-				//new_character->get<components::transform>().pos.set(3700, 3700);
+				new_character->get<components::transform>().pos.set(800, 0);
 				new_character->get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
 				new_character->get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
 				ingredients::standard_pathfinding_capability(new_character);

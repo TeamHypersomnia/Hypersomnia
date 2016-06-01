@@ -45,7 +45,8 @@ namespace behaviours {
 		void execute_leaf_goal_callback(tree::execution_occurence, tree::state_of_traversal&) const final;
 	};
 
-	struct stand_still_with_cyclic_twists {
-
+	struct minimize_recoil_through_movement : behaviour {
+		tree::goal_availability goal_resolution(tree::state_of_traversal&) const final;
+		void execute_leaf_goal_callback(tree::execution_occurence, tree::state_of_traversal&) const final;
 	};
 }
