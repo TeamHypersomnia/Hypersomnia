@@ -62,6 +62,32 @@ namespace behaviours {
 	tree::goal_availability target_closest_enemy::goal_resolution(tree::state_of_traversal& t) const {
 		return tree::goal_availability::SHOULD_EXECUTE;
 	}
+	// a*x^2 + b*x + c = 0
+	float first_positive_solution_of_quadratic_equation(float a, float b, float c) {
+		float discriminant = b*b - 4.0f*a*c;
+		if (discriminant < 0.0f)
+			return -1.0f; // Indicate there is no solution                                                                      
+		float s = std::sqrt(discriminant);
+		float x1 = (-b - s) / (2.0f*a);
+		if (x1 > 0.0f)
+			return x1;
+		float x2 = (-b + s) / (2.0f*a);
+		if (x2 > 0.0f)
+			return x2;
+		return -1.0f; // Indicate there is no positive solution                                                               
+	}
+
+	vec2 direct_solution(vec2 target_position, vec2 target_velocity, float projectile_speed) {
+		float a = target_velocity.dot(target_velocity) - projectile_speed * projectile_speed;
+		float b = 2.0f * target_position.dot(target_velocity);
+		float c = target_position.dot(target_position);
+
+		float t = first_positive_solution_of_quadratic_equation(a, b, c);
+		if (t <= 0.0f)
+			return vec2(); // Indicate we failed to find a solution
+
+		return target_position + t * target_velocity;
+	}
 
 	void target_closest_enemy::execute_leaf_goal_callback(tree::execution_occurence occ, tree::state_of_traversal& t) const {
 		if (occ == tree::execution_occurence::LAST)
@@ -94,9 +120,13 @@ namespace behaviours {
 		if (subject.has(sub_entity_name::CHARACTER_CROSSHAIR)) {
 			auto crosshair = subject[sub_entity_name::CHARACTER_CROSSHAIR];
 			auto& crosshair_offset = crosshair->get<components::crosshair>().base_offset;
-			
+
 			if (closest_hostile.alive()) {
-				crosshair_offset = direction(closest_hostile, subject);
+				float vel1 = assess_projectile_velocity_of_weapon(subject[slot_function::PRIMARY_HAND].try_get_item());
+				float vel2 = assess_projectile_velocity_of_weapon(subject[slot_function::SECONDARY_HAND].try_get_item());
+				float vel = std::max(vel1, vel2);
+
+				crosshair_offset = direct_solution(position(closest_hostile), velocity(closest_hostile), vel) - position(subject);
 			}
 			else if (is_physical(subject)) {
 				crosshair_offset = velocity(subject);

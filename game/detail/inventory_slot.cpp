@@ -67,6 +67,10 @@ bool inventory_slot_id::has_items() const {
 	return alive() && (*this)->items_inside.size() > 0;
 }
 
+augs::entity_id inventory_slot_id::try_get_item() const {
+	return has_items() ? (*this)->items_inside[0] : augs::entity_id();
+}
+
 bool inventory_slot_id::is_empty_slot() const {
 	return alive() && (*this)->items_inside.size() == 0;
 }

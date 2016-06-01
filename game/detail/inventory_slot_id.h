@@ -25,6 +25,7 @@ struct inventory_slot_id {
 
 	bool can_contain(augs::entity_id) const;
 
+	augs::entity_id try_get_item() const;
 	bool has_items() const;
 	bool is_empty_slot() const;
 

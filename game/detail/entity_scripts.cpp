@@ -128,3 +128,22 @@ std::vector<augs::entity_id> guns_wielded(augs::entity_id subject) {
 
 	return result;
 }
+
+float assess_projectile_velocity_of_weapon(augs::entity_id weapon) {
+	if (weapon.dead())
+		return 0.f;
+
+	// auto ch = weapon[slot_function::GUN_CHAMBER];
+	// 
+	// if (ch.has_items()) {
+	// 	ch->items_inside[0][sub_definition_name::BULLET_ROUND]->get<components::damage>();
+	// }
+
+	auto* maybe_gun = weapon->find<components::gun>();
+
+	if (maybe_gun) {
+		return (maybe_gun->muzzle_velocity.first + maybe_gun->muzzle_velocity.second) / 2;
+	}
+
+	return 0.f;
+}
