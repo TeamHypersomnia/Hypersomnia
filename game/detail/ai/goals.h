@@ -8,5 +8,12 @@ namespace behaviours {
 		std::vector<identified_danger> dangers;
 	};
 
-	typedef std::tuple<behaviours::immediate_evasion_goal> goal_tuple;
+	struct minimize_recoil_through_movement_goal {
+		vec2 movement_direction;
+	};
+
+	typedef std::tuple<
+		behaviours::immediate_evasion_goal,
+	behaviours::minimize_recoil_through_movement_goal
+	> goal_tuple;
 }

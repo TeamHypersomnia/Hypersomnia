@@ -120,6 +120,7 @@ namespace scene_builders {
 				new_character->get<components::transform>().pos.set(800, 0);
 				new_character->get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
 				new_character->get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
+				new_character->get<components::sentience>().minimum_danger_amount_to_evade = 20;
 				ingredients::standard_pathfinding_capability(new_character);
 				ingredients::soldier_intelligence(new_character);
 			}
@@ -141,8 +142,8 @@ namespace scene_builders {
 				prefabs::create_cyan_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
 
 		auto rifle2 = prefabs::create_sample_rifle(world, vec2(100, -500 + 50), 
-			prefabs::create_sample_magazine(world, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
+			prefabs::create_sample_magazine(world, vec2(100, -650), true ? "10" : "0.3",
+				prefabs::create_cyan_charge(world, vec2(0, 0), true ? 1000 : 30)));
 
 		prefabs::create_sample_rifle(world, vec2(100, -500 + 100));
 

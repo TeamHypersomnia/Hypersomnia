@@ -26,13 +26,11 @@ void crosshair_system::generate_crosshair_intents() {
 			if (!crosshair)
 				continue;
 
-			auto& transform = subject->get<components::transform>();
-
 			vec2 delta = vec2(vec2(it.state.mouse.rel) * crosshair->sensitivity).rotate(crosshair->rotation_offset, vec2());
 
 			vec2& base_offset = crosshair->base_offset;
 			vec2 old_base_offset = base_offset;
-			vec2 old_pos = transform.pos;
+			vec2 old_pos = position(subject);
 
 			base_offset += delta;
 			base_offset.clamp_rotated(crosshair->bounds_for_base_offset, crosshair->rotation_offset);
@@ -58,7 +56,7 @@ void crosshair_system::apply_base_offsets_to_crosshair_transforms() {
 
 		if (player_id.alive()) {
 			it->get<components::transform>().pos = 
-				components::crosshair::calculate_aiming_displacement(it, true) + player_id->get<components::transform>().pos;
+				components::crosshair::calculate_aiming_displacement(it, true) + position(player_id);
 		}
 	}
 }

@@ -68,7 +68,7 @@ namespace behaviours {
 			return;
 		
 		auto subject = t.instance.user_input;
-		auto pos = subject->get<components::transform>().pos;
+		auto pos = position(subject);
 		auto& visibility = subject->get<components::visibility>();
 		auto& los = visibility.line_of_sight_layers[components::visibility::LINE_OF_SIGHT];
 
@@ -80,7 +80,7 @@ namespace behaviours {
 			auto att = calculate_attitude(s, subject);
 
 			if (att == attitude_type::WANTS_TO_KILL || att == attitude_type::WANTS_TO_KNOCK_UNCONSCIOUS) {
-				auto dist = (s->get<components::transform>().pos - pos).length_sq();
+				auto dist = distance_sq(s, subject);
 				
 				if (dist < min_distance) {
 					closest_hostile = s;
@@ -96,13 +96,10 @@ namespace behaviours {
 			auto& crosshair_offset = crosshair->get<components::crosshair>().base_offset;
 			
 			if (closest_hostile.alive()) {
-				crosshair_offset = closest_hostile->get<components::transform>().pos - pos;
+				crosshair_offset = direction(closest_hostile, subject);
 			}
-			else {
-				auto owner_body = components::physics::get_owner_body_entity(subject);
-				
-				if(owner_body.alive())
-					crosshair_offset = owner_body->get<components::physics>().velocity();
+			else if (is_physical(subject)) {
+				crosshair_offset = velocity(subject);
 			}
 		}
 	}
@@ -130,5 +127,36 @@ namespace behaviours {
 			else
 				w->get<components::gun>().trigger_pressed = true;
 		}
+	}
+
+	tree::goal_availability minimize_recoil_through_movement::goal_resolution(tree::state_of_traversal& t) const {
+		auto subject = t.instance.user_input;
+		auto crosshair = subject[sub_entity_name::CHARACTER_CROSSHAIR];
+
+		if (crosshair.alive()) {
+			auto recoil = crosshair[sub_entity_name::CROSSHAIR_RECOIL_BODY];
+			auto& c = crosshair->get<components::crosshair>();
+
+			minimize_recoil_through_movement_goal goal;
+			
+
+			goal.movement_direction = (c.base_offset - orientation(subject).set_length(c.base_offset.length()));
+				// vec2(c.base_offset).rotate(rotation(recoil), vec2()));
+			// orientation(subject).rotate(rotation(recoil), vec2());
+			t.set_goal(goal);
+			return tree::goal_availability::SHOULD_EXECUTE;
+		}
+		
+		return tree::goal_availability::ALREADY_ACHIEVED;
+	}
+
+	void minimize_recoil_through_movement::execute_leaf_goal_callback(tree::execution_occurence o, tree::state_of_traversal& t) const {
+		auto subject = t.instance.user_input;
+		auto& movement = subject->get<components::movement>();
+
+		if (o == tree::execution_occurence::LAST)
+			movement.reset_movement_flags();
+		else
+			movement.set_flags_from_target_direction(t.get_goal<minimize_recoil_through_movement_goal>().movement_direction);
 	}
 }

@@ -73,7 +73,7 @@ identified_danger assess_danger(augs::entity_id victim, augs::entity_id danger) 
 		return result;
 
 	if (damage) {
-		result.amount += comfort_zone_disturbance_ratio * damage->amount*2;
+		result.amount += comfort_zone_disturbance_ratio * damage->amount*4;
 	}
 
 	if (attitude) {
