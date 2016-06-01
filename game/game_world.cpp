@@ -220,10 +220,6 @@ void game_world::perform_logic_step() {
 	creation_callbacks();
 	get_message_queue<new_entity_message>().clear();
 
-	profile.start(meter_type::AI);
-	get_system<behaviour_tree_system>().evaluate_trees();
-	profile.stop(meter_type::AI);
-
 	get_system<crosshair_system>().apply_crosshair_intents_to_base_offsets();
 	get_system<crosshair_system>().apply_base_offsets_to_crosshair_transforms();
 
@@ -291,6 +287,10 @@ void game_world::perform_logic_step() {
 	profile.start(meter_type::VISIBILITY);
 	get_system<visibility_system>().generate_visibility_and_sight_information();
 	profile.stop(meter_type::VISIBILITY);
+
+	profile.start(meter_type::AI);
+	get_system<behaviour_tree_system>().evaluate_trees();
+	profile.stop(meter_type::AI);
 
 	++current_step_number;
 	seconds_passed += parent_overworld.delta_seconds();

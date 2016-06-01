@@ -96,7 +96,10 @@ namespace behaviours {
 				crosshair_offset = closest_hostile->get<components::transform>().pos - pos;
 			}
 			else {
-				crosshair_offset = components::physics::get_owner_body_entity(subject)->get<components::physics>().velocity();
+				auto owner_body = components::physics::get_owner_body_entity(subject);
+				
+				if(owner_body.alive())
+					crosshair_offset = owner_body->get<components::physics>().velocity();
 			}
 		}
 	}
