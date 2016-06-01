@@ -397,6 +397,7 @@
     <ClCompile Include="game\components\transform_component.cpp" />
     <ClCompile Include="game\detail\ai\behaviours.cpp" />
     <ClCompile Include="game\detail\entity_scripts.cpp" />
+    <ClCompile Include="game\detail\position_scripts.cpp" />
     <ClCompile Include="game\ingredients\artificial_life.cpp" />
     <ClCompile Include="game\resources\behaviour_tree.cpp" />
     <ClCompile Include="game\detail\combat\melee_animation.cpp" />
@@ -1049,6 +1050,7 @@
     <ClInclude Include="game\detail\ai\behaviours.h" />
     <ClInclude Include="game\detail\ai\goals.h" />
     <ClInclude Include="game\detail\entity_scripts.h" />
+    <ClInclude Include="game\detail\position_scripts.h" />
     <ClInclude Include="game\globals\relations.h" />
     <ClInclude Include="game\resources\behaviour_tree.h" />
     <ClInclude Include="game\detail\combat\melee_animation.h" />

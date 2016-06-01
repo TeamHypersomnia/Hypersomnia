@@ -7,6 +7,7 @@
 #include "game/components/damage_component.h"
 #include "game/components/attitude_component.h"
 #include "inventory_utils.h"
+#include "inventory_slot.h"
 
 void unset_input_flags_of_orphaned_entity(augs::entity_id e) {
 	auto* gun = e->find<components::gun>();
@@ -49,8 +50,8 @@ identified_danger assess_danger(augs::entity_id victim, augs::entity_id danger) 
 	if ((!damage && !attitude) || (damage && get_owning_transfer_capability(damage->sender) == victim))
 		return result;
 
-	auto victim_pos = victim->get<components::transform>().pos;
-	auto danger_pos = danger->get<components::transform>().pos;
+	auto victim_pos = position(victim);
+	auto danger_pos = position(danger);
 	auto danger_vel = components::physics::get_owner_body_entity(danger)->get<components::physics>().velocity();
 	auto danger_speed = danger_vel.length();
 	auto danger_dir = (danger_pos - victim_pos);
@@ -101,4 +102,29 @@ attitude_type calculate_attitude(augs::entity_id targeter, augs::entity_id targe
 	}
 
 	return attitude_type::NEUTRAL;
+}
+
+std::vector<augs::entity_id> guns_wielded(augs::entity_id subject) {
+	std::vector<augs::entity_id> result;
+
+	auto hand = subject[slot_function::PRIMARY_HAND];
+
+	if (hand.has_items()) {
+		auto wielded = hand->items_inside[0];
+		if (wielded->find<components::gun>()) {
+			result.push_back(wielded);
+		}
+	}
+
+	hand = subject[slot_function::SECONDARY_HAND];
+
+	if (hand.has_items()) {
+		auto wielded = hand->items_inside[0];
+
+		if (wielded->find<components::gun>()) {
+			result.push_back(wielded);
+		}
+	}
+
+	return result;
 }

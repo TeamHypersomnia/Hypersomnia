@@ -53,3 +53,5 @@ namespace augs {
 		return res;
 	}
 }
+
+#include "game/detail/position_scripts.h"

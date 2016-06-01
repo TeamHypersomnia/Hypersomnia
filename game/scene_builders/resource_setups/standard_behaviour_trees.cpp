@@ -19,6 +19,7 @@ namespace resource_setups {
 
 		auto& hands_actor = resource_manager.create(assets::behaviour_tree_id::HANDS_ACTOR);
 
+		hands_actor.root.branch(new behaviours::pull_trigger);
 
 		hands_actor.root;
 		hands_actor.build_tree();

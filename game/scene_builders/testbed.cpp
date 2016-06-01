@@ -112,6 +112,10 @@ namespace scene_builders {
 			
 			characters.push_back(new_character);
 
+			if (i == 0) {
+				new_character->get<components::sentience>().health.value = 800;
+				new_character->get<components::sentience>().health.maximum = 800;
+			}
 			if (i == 1) {
 				//new_character->get<components::transform>().pos.set(3700, 3700);
 				new_character->get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
@@ -151,6 +155,19 @@ namespace scene_builders {
 		auto submachine = prefabs::create_submachine(world, vec2(500, -500 + 50), 
 			prefabs::create_sample_magazine(world, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
 
+		prefabs::create_submachine(world, vec2(0, -1000),
+			prefabs::create_sample_magazine(world, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
+
+		prefabs::create_submachine(world, vec2(150, -1000 + 150),
+			prefabs::create_sample_magazine(world, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
+
+		prefabs::create_submachine(world, vec2(300, -1000 + 300),
+			prefabs::create_sample_magazine(world, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
+
+		prefabs::create_submachine(world, vec2(450, -1000 + 450),
+			prefabs::create_sample_magazine(world, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
+
+
 		prefabs::create_sample_magazine(world, vec2(100 - 50, -650));
 		prefabs::create_sample_magazine(world, vec2(100 - 100, -650), "0.30");
 		//prefabs::create_pink_charge(world, vec2(100, 100));
@@ -170,7 +187,7 @@ namespace scene_builders {
 		r.item = backpack;
 		r.target_slot = characters[0][slot_function::SHOULDER_SLOT];
 
-		world.post_message(r);
+		// world.post_message(r);
 
 		r.item = submachine;
 		r.target_slot = characters[0][slot_function::PRIMARY_HAND];

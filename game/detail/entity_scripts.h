@@ -3,6 +3,8 @@
 #include "game/globals/relations.h"
 #include "math/vec2.h"
 
+std::vector<augs::entity_id> guns_wielded(augs::entity_id);
+
 void unset_input_flags_of_orphaned_entity(augs::entity_id);
 
 struct identified_danger {
