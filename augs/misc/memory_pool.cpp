@@ -49,7 +49,8 @@ namespace augs {
 	}
 	bool memory_pool::id::operator!() const { return !alive(); }
 	bool memory_pool::id::operator==(const id& b) const { 
-		bool result = owner == b.owner && (indirection_index == b.indirection_index && version == b.version); 
+		//ensure(alive() && b.alive());
+		bool result = alive() && b.alive() && owner == b.owner && (indirection_index == b.indirection_index && version == b.version); 
 #ifdef USE_NAMES_FOR_IDS
 		//if(result) ensure(std::string(debug_name) == std::string(b.debug_name));
 #endif

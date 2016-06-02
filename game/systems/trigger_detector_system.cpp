@@ -77,6 +77,9 @@ void trigger_detector_system::send_trigger_confirmations() {
 	auto& collisions = parent_world.get_message_queue<messages::collision_message>();
 
 	for (auto& c : collisions) {
+		if (c.type != messages::collision_message::event_type::BEGIN_CONTACT)
+			continue;
+
 		auto* collision_detector = c.subject->find<components::trigger_collision_detector>();
 		auto* trigger = c.collider->find<components::trigger>();
 
