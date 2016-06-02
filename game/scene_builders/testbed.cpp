@@ -274,6 +274,8 @@ namespace scene_builders {
 		visibility.epsilon_ray_distance_variation = 0.001;
 		visibility.epsilon_threshold_obstacle_hit = 2;
 		visibility.epsilon_distance_vertex_hit = 1;
+
+		show_profile_details = true;
 	}
 
 	void testbed::perform_logic_step(world& world) {
