@@ -534,10 +534,6 @@ void physics_system::step_and_set_new_transforms() {
 	b2world.Step(static_cast<float32>(delta_seconds()), velocityIterations, positionIterations);
 	b2world.ClearForces();
 	
-	auto& collisions = parent_world.get_message_queue<messages::collision_message>();
-	std::sort(collisions.begin(), collisions.end());
-	collisions.erase(std::unique(collisions.begin(), collisions.end()), collisions.end());
-
 	for (auto& c : listener.after_step_callbacks)
 		c();
 

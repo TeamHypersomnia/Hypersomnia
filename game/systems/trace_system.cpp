@@ -13,7 +13,7 @@ void trace_system::lengthen_sprites_of_traces() {
 		auto& sprite = t->get<components::sprite>();
 
 		if (trace.chosen_lengthening_duration_ms < 0.f)
-			trace.reset();
+			trace.reset(*this);
 
 		vec2 surplus_multiplier;
 		
@@ -27,10 +27,16 @@ void trace_system::lengthen_sprites_of_traces() {
 		sprite.center_offset = sprite.size * (surplus_multiplier / 2.f);
 
 		trace.lengthening_time_passed_ms += delta_milliseconds();
+	}
+}
+
+void trace_system::destroy_outdated_traces() {
+	for (auto& t : targets) {
+		auto& trace = t->get<components::trace>();
 
 		if (trace.lengthening_time_passed_ms > trace.chosen_lengthening_duration_ms - 0.01f) {
 			trace.lengthening_time_passed_ms = trace.chosen_lengthening_duration_ms - 0.01f;
-			
+
 			if (trace.is_it_finishing_trace)
 				parent_world.post_message(messages::destroy_message(t));
 		}

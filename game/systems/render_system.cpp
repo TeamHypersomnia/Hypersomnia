@@ -31,7 +31,7 @@ render_system::render_system(world& parent_world) : event_only_system(parent_wor
 }
 
 void render_system::add_entities_to_rendering_tree() {
-	auto& events = parent_world.get_message_queue<messages::new_entity_for_rendering_message>();
+	auto& events = parent_world.get_message_queue<messages::new_entity_message>();
 
 	for (auto& it : events) {
 		auto& e = it.subject;

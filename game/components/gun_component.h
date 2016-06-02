@@ -30,7 +30,7 @@ namespace components {
 		float camera_shake_radius = 0.f;
 		float camera_shake_spread_degrees = 0.f;
 
-		void shake_camera(augs::entity_id, float direction);
+		void shake_camera(augs::entity_id, float direction, augs::processing_system&);
 
 		components::transform calculate_barrel_transform(components::transform gun_transform);
 

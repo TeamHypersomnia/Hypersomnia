@@ -267,10 +267,11 @@ vec2 steering::containment::steer(scene in) {
 		/* this is where the ray line emerges from */
 		vec2 ray_location = avoidance.avoidance[0];
 
-		if (randomize_rays)
-			ray_location += rayline * avoidance_width * randval(0.f, 1.f);
-		else
-			ray_location += rayline * (avoidance_width / (ray_count - 1)) * i;
+		ensure(!randomize_rays);
+		//if (randomize_rays)
+		//	ray_location += rayline * avoidance_width * randval(0.f, 1.f);
+		//else
+		//	ray_location += rayline * (avoidance_width / (ray_count - 1)) * i;
 
 
 		/* prepare the ray to be cast */
@@ -503,8 +504,9 @@ vec2 steering::wander::steer(scene in) {
 	auto& renderer = augs::renderer::get_current();
 	auto& lines = augs::renderer::get_current().logic_lines;
 
+	ensure(0);
 	/* rotate the current displacement angle by a random offset */
-	in.state->current_wander_angle += randval(-displacement_degrees, displacement_degrees);
+	//in.state->current_wander_angle += randval(-displacement_degrees, displacement_degrees);
 
 	/* these are self-explanatory */
 	vec2 circle_center = in.subject.position + circle_distance * in.subject.unit_vel;

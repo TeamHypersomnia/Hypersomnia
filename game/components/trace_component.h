@@ -1,6 +1,6 @@
 #pragma once
-#include "misc/randval.h"
 #include "math/vec2.h"
+#include "entity_system/processing_system.h"
 
 namespace components {
 	struct trace {
@@ -15,10 +15,10 @@ namespace components {
 
 		bool is_it_finishing_trace = false;
 
-		void reset() {
+		void reset(augs::processing_system& p) {
 			lengthening_time_passed_ms = 0.f;
-			chosen_multiplier.set(randval(max_multiplier_x), randval(max_multiplier_y));
-			chosen_lengthening_duration_ms = randval(lengthening_duration_ms);
+			chosen_multiplier.set(p.randval(max_multiplier_x), p.randval(max_multiplier_y));
+			chosen_lengthening_duration_ms = p.randval(lengthening_duration_ms);
 		}
 	};
 }

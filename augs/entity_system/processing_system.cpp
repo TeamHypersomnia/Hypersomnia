@@ -38,6 +38,30 @@ namespace augs {
 		return parent_overworld.frame_timestamp_seconds();
 	}
 
+	int processing_system::randval(int min, int max) {
+		return ::randval(min, max, parent_overworld.get_current_generator());
+	}
+
+	unsigned processing_system::randval(unsigned min, unsigned max) {
+		return ::randval(min, max, parent_overworld.get_current_generator());
+	}
+
+	float processing_system::randval(float min, float max) {
+		return ::randval(min, max, parent_overworld.get_current_generator());
+	}
+
+	float processing_system::randval(float minmax) {
+		return randval(-minmax, minmax);
+	}
+
+	unsigned processing_system::randval(std::pair<unsigned, unsigned> p) {
+		return randval(p.first, p.second);
+	}
+
+	float processing_system::randval(std::pair<float, float> p) {
+		return randval(p.first, p.second);
+	}
+
 	double processing_system::delta_milliseconds() const {
 		return parent_overworld.delta_milliseconds();
 	}

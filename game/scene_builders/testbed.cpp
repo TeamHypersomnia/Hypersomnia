@@ -251,7 +251,7 @@ namespace scene_builders {
 
 		if (input.found_recording()) {
 			world.parent_overworld.configure_stepping(60, 500);
-			world.parent_overworld.delta_timer.set_stepping_speed_multiplier(6.00);
+			world.parent_overworld.delta_timer.set_stepping_speed_multiplier(1.00);
 
 			input.replay_found_recording();
 

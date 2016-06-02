@@ -31,19 +31,18 @@ void destroy_system::delete_queued_entities() {
 		it.subject->for_each_sub_definition(deletion_adder);
 	}
 
-	events.clear();
-
 	// destroy in reverse order; children first
 	for (int i = entities_to_destroy.size()-1; i >= 0; --i) {
 		ensure(entities_to_destroy[i].alive());
 		parent_world.delete_entity(entities_to_destroy[i]);
 	}
+
+	events.clear();
 }
 
 void destroy_system::purge_message_queues_of_dead_entities() {
 	auto& collisions = parent_world.get_message_queue<messages::collision_message>();
 	auto& new_entities = parent_world.get_message_queue<messages::new_entity_message>();
-	auto& new_entities_rendering = parent_world.get_message_queue<messages::new_entity_for_rendering_message>();
 
 	for (auto& c : collisions) {
 		if (c.subject.dead() || c.collider.dead())
@@ -55,12 +54,6 @@ void destroy_system::purge_message_queues_of_dead_entities() {
 			c.delete_this_message = true;
 	}
 
-	for (auto& c : new_entities_rendering) {
-		if (c.subject.dead())
-			c.delete_this_message = true;
-	}
-
 	parent_world.delete_marked_messages(collisions);
 	parent_world.delete_marked_messages(new_entities);
-	parent_world.delete_marked_messages(new_entities_rendering);
 }

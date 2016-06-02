@@ -312,7 +312,17 @@ void integrate_particle(resources::particle& p, float dt) {
 	p.lifetime_ms += dt * 1000.0;
 }
 
-void particles_system::step_streams_and_particles_and_destroy_dead() {
+void particles_system::destroy_dead_streams() {
+	for (auto it : targets) {
+		auto& group = it->get<components::particle_group>();
+		auto& slots = group.stream_slots;
+
+		if (slots.empty())
+			parent_world.post_message(messages::destroy_message(it));
+	}
+}
+
+void particles_system::step_streams_and_particles() {
 	for (auto it : targets) {
 		auto& group = it->get<components::particle_group>();
 		auto& transform = it->get<components::transform>();
@@ -381,9 +391,6 @@ void particles_system::step_streams_and_particles_and_destroy_dead() {
 				s.destroy_after_lifetime_passed &&
 				s.stream_lifetime_ms >= s.stream_max_lifetime_ms;
 		}), slots.end());
-
-		if (slots.empty())
-			parent_world.post_message(messages::destroy_message(it));
 
 		group.previous_transform = transform;
 	}

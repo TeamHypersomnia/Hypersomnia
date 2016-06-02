@@ -30,6 +30,15 @@ namespace augs {
 
 		deterministic_timestamp get_current_timestamp() const;
 
+		int randval(int min, int max);
+		unsigned randval(unsigned min, unsigned max);
+		float randval(float min, float max);
+
+		float randval(float minmax);
+
+		unsigned randval(std::pair<unsigned, unsigned>);
+		float randval(std::pair<float, float>);
+
 		double frame_timestamp_seconds() const;
 		double delta_seconds() const;
 		double delta_milliseconds() const;

@@ -45,10 +45,10 @@ void gun_system::consume_gun_intents() {
 	}
 }
 
-void components::gun::shake_camera(augs::entity_id target_camera_to_shake, float rotation) {
+void components::gun::shake_camera(augs::entity_id target_camera_to_shake, float rotation, augs::processing_system& p) {
 	if (target_camera_to_shake.alive()) {
 		vec2 shake_dir;
-		shake_dir.set_from_degrees(randval(
+		shake_dir.set_from_degrees(p.randval(
 			rotation - camera_shake_spread_degrees,
 			rotation + camera_shake_spread_degrees));
 
@@ -92,8 +92,12 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 
 				auto pellets_slot = item_in_chamber[slot_function::ITEM_DEPOSIT];
 
-				if (pellets_slot.alive())
+				bool destroy_pellets_container = false;
+
+				if (pellets_slot.alive()) {
+					destroy_pellets_container = true;
 					bullet_entities = pellets_slot->get_mounted_items();
+				}
 				else
 					bullet_entities.push_back(item_in_chamber);
 
@@ -162,9 +166,11 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 				}
 
 				//	//if (owning_capability.alive())
-				//	//	gun.shake_camera(owning_capability[associated_entity_name::WATCHING_CAMERA], gun_transform.rotation);
+				//	//	gun.shake_camera(owning_capability[associated_entity_name::WATCHING_CAMERA], gun_transform.rotation, *this);
 
-				parent_world.post_message(messages::destroy_message(chamber_slot->items_inside[0]));
+				if (destroy_pellets_container)
+					parent_world.post_message(messages::destroy_message(chamber_slot->items_inside[0]));
+				
 				chamber_slot->items_inside.clear();
 
 				if (gun.action_mode >= components::gun::action_type::SEMI_AUTOMATIC) {

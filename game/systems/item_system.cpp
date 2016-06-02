@@ -277,7 +277,7 @@ void item_system::consume_item_slot_transfer_requests() {
 				messages::physics_operation op;
 				op.subject = grabbed_item_part;
 				op.apply_force = vec2().set_from_degrees(previous_container_transform.rotation).set_length(60);
-				op.force_offset = vec2().random_on_circle(20);
+				op.force_offset = vec2().random_on_circle(20, parent_overworld.get_current_generator());
 				op.reset_drop_timeout = true;
 				op.timeout_ms = 200;
 				parent_world.post_message(op);

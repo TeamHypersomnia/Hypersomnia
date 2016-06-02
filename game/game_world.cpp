@@ -97,7 +97,6 @@ void game_world::register_types_of_messages_components_systems() {
 	register_message_queue<crosshair_intent_message>();
 	register_message_queue<trigger_hit_confirmation_message>();
 	register_message_queue<trigger_hit_request_message>();
-	register_message_queue<new_entity_for_rendering_message>();
 	register_message_queue<new_entity_message>();
 	register_message_queue<camera_render_request_message>();
 	register_message_queue<item_slot_transfer_request>();
@@ -113,16 +112,6 @@ void game_world::register_types_of_messages_components_systems() {
 void game_world::call_drawing_time_systems() {
 	profile.start(meter_type::RENDERING);
 
-	get_system<particles_system>().create_particle_effects();
-	rendering_time_creation_callbacks();
-	get_message_queue<new_entity_for_rendering_message>().clear();
-
-	profile.start(meter_type::PARTICLES);
-	get_system<particles_system>().step_streams_and_particles_and_destroy_dead();
-	profile.stop(meter_type::PARTICLES);
-
-	destruction_callbacks();
-
 	profile.start(meter_type::CAMERA_QUERY);
 	get_system<render_system>().determine_visible_entities_from_every_camera();
 	profile.stop(meter_type::CAMERA_QUERY);
@@ -130,8 +119,6 @@ void game_world::call_drawing_time_systems() {
 	profile.start(meter_type::INTERPOLATION);
 	get_system<render_system>().calculate_and_set_interpolated_transforms();
 	profile.stop(meter_type::INTERPOLATION);
-
-	get_system<trace_system>().lengthen_sprites_of_traces();
 
 	/* read-only message generation */
 
@@ -186,7 +173,6 @@ std::wstring game_world::world_summary(bool detailed) const {
 }
 
 void game_world::destruction_callbacks() {
-	get_system<destroy_system>().purge_queue_of_duplicates();
 	get_system<trace_system>().spawn_finishing_traces_for_destroyed_objects();
 	get_system<render_system>().remove_entities_from_rendering_tree();
 	get_system<physics_system>().destroy_fixtures_and_bodies();
@@ -217,8 +203,13 @@ void game_world::perform_logic_step() {
 	get_system<gun_system>().consume_gun_intents();
 	get_system<gun_system>().launch_shots_due_to_pressed_triggers();
 
+	get_system<particles_system>().create_particle_effects();
+
+	rendering_time_creation_callbacks();
 	creation_callbacks();
 	get_message_queue<new_entity_message>().clear();
+
+	get_system<trace_system>().lengthen_sprites_of_traces();
 
 	get_system<crosshair_system>().apply_crosshair_intents_to_base_offsets();
 	get_system<crosshair_system>().apply_base_offsets_to_crosshair_transforms();
@@ -279,11 +270,6 @@ void game_world::perform_logic_step() {
 
 	get_system<gui_system>().translate_game_events_for_hud();
 
-	destruction_callbacks();
-
-	creation_callbacks();
-	get_message_queue<new_entity_message>().clear();
-
 	profile.start(meter_type::VISIBILITY);
 	get_system<visibility_system>().generate_visibility_and_sight_information();
 	profile.stop(meter_type::VISIBILITY);
@@ -291,6 +277,12 @@ void game_world::perform_logic_step() {
 	profile.start(meter_type::AI);
 	get_system<behaviour_tree_system>().evaluate_trees();
 	profile.stop(meter_type::AI);
+
+	get_system<particles_system>().step_streams_and_particles();
+	get_system<particles_system>().destroy_dead_streams();
+	get_system<trace_system>().destroy_outdated_traces();
+
+	destruction_callbacks();
 
 	++current_step_number;
 	seconds_passed += parent_overworld.delta_seconds();

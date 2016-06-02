@@ -110,6 +110,9 @@ void game_overworld::main_game_loop() {
 				if (raw_input.key == window::event::keys::_5) {
 					stepping_speed = 1.f;
 				}
+				if (raw_input.key == window::event::keys::_6) {
+					stepping_speed = 6.f;
+				}
 				if (raw_input.key == window::event::keys::F4) {
 					LOG_COLOR(console_color::YELLOW, "Separator");
 				}
@@ -122,8 +125,7 @@ void game_overworld::main_game_loop() {
 				main_game_world.post_message(msg);
 		}
 
-		if (!main_game_world.get_system<input_system>().is_replaying())
-			delta_timer.set_stepping_speed_multiplier(stepping_speed);
+		delta_timer.set_stepping_speed_multiplier(stepping_speed);
 
 #if RENDERING_STEPS_DETERMINISTICALLY_LIKE_LOGIC
 		auto steps_to_perform = delta_timer.count_logic_steps_to_perform();
