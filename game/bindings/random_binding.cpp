@@ -18,10 +18,6 @@ namespace bindings {
 
 			luabind::def("std_random_device", std_random_device),
 
-			luabind::def("randval", (float(*)(std::pair<float, float>))&randval),
-			luabind::def("randval", (float(*)(float, float))&randval),
-			luabind::def("randval_i", (int(*)(int, int))&randval),
-
 			luabind::def("randval", (float(*)(std::pair<float, float>, std::mt19937&))&randval),
 			luabind::def("randval", (float(*)(float, float, std::mt19937&))&randval),
 			luabind::def("randval_i", (int(*)(int, int, std::mt19937&))&randval);

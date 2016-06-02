@@ -36,7 +36,6 @@ luabind::scope get_scope(const char* name) {
 
 		.scope
 		[
-			luabind::def("random_on_circle", &vec2t<T>::random_on_circle<T>),
 			luabind::def("rotated", &augs::from_rotation<vec2t<T>, T>)
 		];
 }
