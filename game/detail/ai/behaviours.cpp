@@ -134,7 +134,7 @@ namespace behaviours {
 				else
 					leaded = position(closest_hostile);
 
-				crosshair_offset = leaded - -position(subject);;
+				crosshair_offset = leaded - position(subject);;
 			}
 			else if (is_physical(subject)) {
 				crosshair_offset = velocity(subject).length() > 3.0 ? velocity(subject) : vec2(10, 0);
