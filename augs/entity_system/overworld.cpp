@@ -2,7 +2,8 @@
 
 namespace augs {
 	overworld::overworld() : delta_timer(60.0, 5) {
-
+		deterministic_generator.seed(0);
+		drawing_time_generator.seed(0);
 	}
 
 	void overworld::configure_stepping(float fps, int max_updates_per_step) {
@@ -15,6 +16,18 @@ namespace augs {
 
 	double overworld::delta_milliseconds() const {
 		return delta_ms;
+	}
+
+	void overworld::enable_drawing_time_random_generator() {
+		current_generator = &drawing_time_generator;
+	}
+
+	void overworld::enable_deterministic_random_generator() {
+		current_generator = &deterministic_generator;
+	}
+
+	std::mt19937& overworld::get_current_generator() {
+		return *current_generator;
 	}
 
 	double overworld::fixed_delta_milliseconds() const {

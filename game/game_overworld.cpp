@@ -132,6 +132,8 @@ void game_overworld::main_game_loop() {
 #endif
 
 		assign_frame_time_to_delta_for_drawing_time_systems();
+
+		enable_drawing_time_random_generator();
 		main_game_world.call_drawing_time_systems();
 
 		consume_camera_render_requests();
@@ -139,6 +141,7 @@ void game_overworld::main_game_loop() {
 		main_game_world.restore_transforms_after_drawing();
 
 		restore_fixed_delta();
+		enable_deterministic_random_generator();
 
 #if !RENDERING_STEPS_DETERMINISTICALLY_LIKE_LOGIC
 		auto steps_to_perform = delta_timer.count_logic_steps_to_perform();
