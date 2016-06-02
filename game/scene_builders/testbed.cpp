@@ -104,7 +104,7 @@ namespace scene_builders {
 					assets::texture_id::TEST_BACKGROUND, augs::gray1, render_layer::UNDER_GROUND);
 			}
 
-		const int num_characters = 5;
+		const int num_characters = 6;
 
 		for (int i = 0; i < num_characters; ++i) {
 			auto new_character = prefabs::create_character(world, vec2(i * 300, 0));
@@ -122,11 +122,23 @@ namespace scene_builders {
 				new_character->get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
 				new_character->get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
 				new_character->get<components::sentience>().minimum_danger_amount_to_evade = 20;
+				new_character->get<components::sentience>().health.value = 300;
+				new_character->get<components::sentience>().health.maximum = 300;
 				ingredients::standard_pathfinding_capability(new_character);
 				ingredients::soldier_intelligence(new_character);
 			}
 			if (i == 2) {
 				new_character->get<components::sentience>().health.value = 38;
+			}
+			if (i == 5) {
+				new_character->get<components::attitude>().parties = party_category::METROPOLIS_CITIZEN;
+				new_character->get<components::attitude>().hostile_parties = party_category::RESISTANCE_CITIZEN;
+				new_character->get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
+				new_character->get<components::sentience>().minimum_danger_amount_to_evade = 20;
+				new_character->get<components::sentience>().health.value = 300;
+				new_character->get<components::sentience>().health.maximum = 300;
+				ingredients::standard_pathfinding_capability(new_character);
+				ingredients::soldier_intelligence(new_character);
 			}
 		}
 
@@ -218,6 +230,12 @@ namespace scene_builders {
 
 			r.item = pis2;
 			r.target_slot = characters[3][slot_function::PRIMARY_HAND];
+
+			world.post_message(r);
+
+			r.item = prefabs::create_submachine(world, vec2(0, -1000),
+				prefabs::create_sample_magazine(world, vec2(100 - 50, -650), true ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), true ? 500 : 50)));
+			r.target_slot = characters[5][slot_function::PRIMARY_HAND];
 
 			world.post_message(r);
 		}
