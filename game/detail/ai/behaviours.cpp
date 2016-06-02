@@ -5,6 +5,7 @@
 #include "game/components/sentience_component.h"
 #include "game/components/crosshair_component.h"
 #include "game/components/gun_component.h"
+#include "game/components/rotation_copying_component.h"
 #include "entity_system/entity.h"
 
 #include "game/detail/entity_scripts.h"
@@ -138,11 +139,13 @@ namespace behaviours {
 		auto subject = t.instance.user_input;
 		auto& attitude = subject->get<components::attitude>();
 		auto chosen_target = attitude.chosen_target;
+		auto crosshair = subject[sub_entity_name::CHARACTER_CROSSHAIR];
+		auto& crosshair_offset = crosshair->get<components::crosshair>().base_offset;
 
 		if (chosen_target.alive() && guns_wielded(subject).size() > 0) {
-			if (direction(chosen_target, subject).degrees_between(orientation(subject)) < attitude.maximum_divergence_angle_before_shooting) {
+			//if (crosshair_offset.degrees_between(orientation(subject)) < attitude.maximum_divergence_angle_before_shooting) {
 				return tree::goal_availability::SHOULD_EXECUTE;
-			}
+			//}
 		}
 		
 		return tree::goal_availability::CANT_EXECUTE;

@@ -120,7 +120,7 @@ namespace scene_builders {
 				new_character->get<components::transform>().pos.set(800, 0);
 				new_character->get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
 				new_character->get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
-				new_character->get<components::attitude>().maximum_divergence_angle_before_shooting = 20;
+				new_character->get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
 				new_character->get<components::sentience>().minimum_danger_amount_to_evade = 20;
 				ingredients::standard_pathfinding_capability(new_character);
 				ingredients::soldier_intelligence(new_character);
