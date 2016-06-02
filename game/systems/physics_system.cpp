@@ -334,11 +334,12 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 			}
 		}
 
-		if (fix_a->IsSensor() || fix_b->IsSensor()) {
-			msg.subject_impact_velocity = (body_a->GetLinearVelocity());
-			msg.collider_impact_velocity = (body_b->GetLinearVelocity());
-			world_ptr->post_message(msg);
-		}
+		msg.point = worldManifold.points[0];
+		msg.point *= METERS_TO_PIXELSf;
+
+		msg.subject_impact_velocity = body_a->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
+		msg.collider_impact_velocity = body_b->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
+		world_ptr->post_message(msg);
 	}
 }
 
@@ -379,11 +380,9 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 			}
 		}
 
-		if (fix_a->IsSensor() || fix_b->IsSensor()) {
-			msg.subject_impact_velocity = -body_a->GetLinearVelocity();
-			msg.collider_impact_velocity = -body_b->GetLinearVelocity();
-			world_ptr->post_message(msg);
-		}
+		msg.subject_impact_velocity = -body_a->GetLinearVelocity();
+		msg.collider_impact_velocity = -body_b->GetLinearVelocity();
+		world_ptr->post_message(msg);
 	}
 }
 
@@ -432,12 +431,10 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 		}
 
 		auto* driver = components::physics::get_owner_body_entity(msg.subject)->find<components::driver>();
-		auto* damage = msg.subject->find<components::damage>();
 
 		bool colliding_with_owning_car = driver && driver->owned_vehicle == components::physics::get_owner_body_entity(msg.collider);
-		bool bullet_colliding_with_sender = damage && components::physics::get_owner_body_entity(damage->sender) == components::physics::get_owner_body_entity(msg.collider);
 
-		if (colliding_with_owning_car || bullet_colliding_with_sender) {
+		if (colliding_with_owning_car) {
 			contact->SetEnabled(false);
 			return;
 		}

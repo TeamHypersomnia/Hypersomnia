@@ -8,17 +8,22 @@
 #include "../messages/damage_message.h"
 #include "graphics/renderer.h"
 
+#include "game/detail/inventory_utils.h"
+
 void damage_system::destroy_colliding_bullets_and_send_damage() {
 	auto events = parent_world.get_message_queue<messages::collision_message>();
 	parent_world.get_message_queue<messages::damage_message>().clear();
 
 	for (auto it : events) {
-		if (it.type != messages::collision_message::event_type::PRE_SOLVE) 
+		if (it.type != messages::collision_message::event_type::BEGIN_CONTACT) 
 			continue;
 
 		auto* damage = it.collider->find<components::damage>();
 
-		if (damage && damage->damage_upon_collision && damage->damage_charges_before_destruction > 0) {
+		bool bullet_colliding_with_sender =
+			damage && components::physics::get_owner_body_entity(damage->sender) == components::physics::get_owner_body_entity(it.subject);
+
+		if (!bullet_colliding_with_sender && damage && damage->damage_upon_collision && damage->damage_charges_before_destruction > 0) {
 			auto& subject_of_impact = components::physics::get_owner_body_entity(it.subject)->get<components::physics>();
 			
 			vec2 impact_velocity = damage->custom_impact_velocity;
@@ -39,7 +44,11 @@ void damage_system::destroy_colliding_bullets_and_send_damage() {
 
 			damage->saved_point_of_impact_before_death = it.point;
 
-			if (damage->destroy_upon_damage) {
+			auto owning_capability = get_owning_transfer_capability(it.subject);
+
+			bool is_victim_a_held_item = owning_capability.alive() && owning_capability != it.subject;
+
+			if (!is_victim_a_held_item && damage->destroy_upon_damage) {
 				damage->damage_charges_before_destruction--;
 				
 				// delete only once
