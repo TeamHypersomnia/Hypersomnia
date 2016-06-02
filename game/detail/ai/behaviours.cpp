@@ -122,16 +122,25 @@ namespace behaviours {
 			auto crosshair = subject[sub_entity_name::CHARACTER_CROSSHAIR];
 			auto& crosshair_offset = crosshair->get<components::crosshair>().base_offset;
 
-			if (closest_hostile.alive()) {
-				float vel1 = assess_projectile_velocity_of_weapon(subject[slot_function::PRIMARY_HAND].try_get_item());
-				float vel2 = assess_projectile_velocity_of_weapon(subject[slot_function::SECONDARY_HAND].try_get_item());
-				float vel = std::max(vel1, vel2);
+			float vel1 = assess_projectile_velocity_of_weapon(subject[slot_function::PRIMARY_HAND].try_get_item());
+			float vel2 = assess_projectile_velocity_of_weapon(subject[slot_function::SECONDARY_HAND].try_get_item());
+			float vel = std::max(vel1, vel2);
 
-				crosshair_offset = direct_solution(position(closest_hostile), velocity(closest_hostile), vel) - position(subject);
+			if (vel > 1.0 && closest_hostile.alive()) {
+				vec2 leaded;
+
+				if (velocity(closest_hostile).length_sq() > 1)
+					leaded = direct_solution(position(closest_hostile), velocity(closest_hostile), vel);
+				else
+					leaded = position(closest_hostile);
+
+				crosshair_offset = leaded - -position(subject);;
 			}
 			else if (is_physical(subject)) {
-				crosshair_offset = velocity(subject);
+				crosshair_offset = velocity(subject).length() > 3.0 ? velocity(subject) : vec2(10, 0);
 			}
+			else
+				crosshair_offset = vec2(10, 0);
 		}
 	}
 

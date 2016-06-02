@@ -251,7 +251,7 @@ namespace scene_builders {
 
 		if (input.found_recording()) {
 			world.parent_overworld.configure_stepping(60, 500);
-			world.parent_overworld.delta_timer.set_stepping_speed_multiplier(1.00);
+			world.parent_overworld.delta_timer.set_stepping_speed_multiplier(6.00);
 
 			input.replay_found_recording();
 
@@ -276,6 +276,8 @@ namespace scene_builders {
 		visibility.epsilon_distance_vertex_hit = 1;
 
 		show_profile_details = true;
+
+		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}
 
 	void testbed::perform_logic_step(world& world) {

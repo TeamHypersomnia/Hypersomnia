@@ -61,7 +61,7 @@ namespace resources {
 	}
 
 	void behaviour_tree::node::execute_leaf_goal_callback(execution_occurence, state_of_traversal&) const {
-		ensure(false && "Undefined action callback! Perhaps root has no children?");
+		// ensure(false && "Undefined action callback! Perhaps root has no children?");
 	}
 
 	behaviour_tree::goal_availability behaviour_tree::node::evaluate_node(state_of_traversal& traversal) const {

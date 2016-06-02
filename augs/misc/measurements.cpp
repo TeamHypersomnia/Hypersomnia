@@ -4,6 +4,10 @@
 
 namespace augs {
 	measurements::measurements(std::wstring title, bool measurements_are_time) : title(title), measurements_are_time(measurements_are_time) {
+		last_average = 1.0;
+		last_maximum = 1.0;
+		last_minimum = 1.0;
+		last_measurement = 1.0;
 		tracked.resize(20, 0);
 	}
 
