@@ -23,14 +23,6 @@ b2world(b2Vec2(0.f, 0.f)), ray_casts_since_last_step(0) {
 	enable_listener(true);
 }
 
-template <class T>
-T constrain_degrees(T x) {
-	x = static_cast<T>(fmod(x + 180, 360));
-	if (x < 0)
-		x += 360;
-	return x - 180;
-}
-
 void physics_system::enable_listener(bool flag) {
 	b2world.SetContactListener(flag ? &listener : nullptr);
 }
@@ -70,16 +62,19 @@ void physics_system::step_and_set_new_transforms() {
 		}
 
 		if (physics.enable_angle_motor) {
-			float nextAngle = static_cast<float>(b->GetAngle() + b->GetAngularVelocity() / parent_overworld.delta_timer.get_steps_per_second());
-			float totalRotation = (constrain_degrees(physics.target_angle) * DEG_TO_RAD) - nextAngle;
+			float next_angle = b->GetAngle() + b->GetAngularVelocity() / static_cast<float>(parent_overworld.delta_timer.get_steps_per_second());
+			
+			auto target_orientation = vec2().set_from_degrees(physics.target_angle);
+			auto next_orientation = vec2().set_from_radians(next_angle);
 
-			totalRotation *= RAD_TO_DEG;
-			totalRotation = constrain_degrees(totalRotation);
-			totalRotation *= DEG_TO_RAD;
+			float total_rotation = target_orientation.radians_between(next_orientation);
 
-			float desiredAngularVelocity = totalRotation / static_cast<float>(parent_overworld.delta_timer.delta_seconds());
-			float impulse = b->GetInertia() * desiredAngularVelocity;// disregard time factor
-			b->ApplyAngularImpulse(impulse*physics.angle_motor_force_multiplier, true);
+			if (target_orientation.cross(next_orientation) > 0)
+				total_rotation *= -1;
+
+			float desired_angular_velocity = total_rotation / static_cast<float>(parent_overworld.delta_timer.delta_seconds());
+			float impulse = b->GetInertia() * desired_angular_velocity;// disregard time factor
+			b->ApplyAngularImpulse(impulse * physics.angle_motor_force_multiplier, true);
 		}
 	}
 

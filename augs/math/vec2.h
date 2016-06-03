@@ -241,7 +241,16 @@ namespace augs {
 		}
 
 		float radians_between(const vec2t<>& v) const {
-			return acos(vec2(v).normalize().dot(vec2(*this).normalize()));
+			auto a_norm = vec2(v).normalize();
+			auto b_norm = vec2(*this).normalize();
+			auto dotted = a_norm.dot(b_norm);
+
+			if (dotted > 1) dotted = 1;
+			if (dotted < -1) dotted = -1;
+
+			auto result = acos(dotted);
+
+			return result;
 		}
 
 		float degrees_between(const vec2t<>& v) const {

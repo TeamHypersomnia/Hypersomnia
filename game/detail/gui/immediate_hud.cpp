@@ -65,7 +65,7 @@ vec2 position_caption_around_a_circle(float radius, vec2 r, float alpha) {
 		}
 	}
 	
-	ensure(false);
+	//ensure(false);
 	return vec2(0, 0);
 }
 
