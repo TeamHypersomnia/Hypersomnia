@@ -12,12 +12,14 @@
 #include "game/systems/render_system.h"
 #include "game/systems/gui_system.h"
 #include "game/systems/visibility_system.h"
+#include "game/systems/pathfinding_system.h"
 #include "game/components/position_copying_component.h"
 #include "game/components/physics_definition_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/item_component.h"
 #include "game/components/name_component.h"
 #include "game/components/attitude_component.h"
+#include "game/components/pathfinding_component.h"
 
 #include "game/messages/crosshair_intent_message.h"
 #include "game/messages/item_slot_transfer_request.h"
@@ -117,7 +119,7 @@ namespace scene_builders {
 				new_character->get<components::sentience>().health.maximum = 800;
 			}
 			if (i == 1) {
-				new_character->get<components::transform>().pos.set(2800, 0);
+				new_character->get<components::transform>().pos.set(2800, 700);
 				new_character->get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
 				new_character->get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
 				new_character->get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
@@ -298,11 +300,14 @@ namespace scene_builders {
 		auto& visibility = world.get_system<visibility_system>();
 
 		visibility.epsilon_ray_distance_variation = 0.001;
-		visibility.epsilon_threshold_obstacle_hit = 2;
+		visibility.epsilon_threshold_obstacle_hit = 10;
 		visibility.epsilon_distance_vertex_hit = 1;
 
 		show_profile_details = true;
 
+		//characters[1]->get<components::pathfinding>().start_exploring();
+		world.get_system<pathfinding_system>().draw_memorised_walls = 1;
+		world.get_system<pathfinding_system>().draw_undiscovered = 1;
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}
 
@@ -347,6 +352,11 @@ namespace scene_builders {
 				lines.draw_cyan((pos + vv[i]).rotate(tt.rotation, pos), (pos + vv[(i + 1) % vv.size()]).rotate(tt.rotation, pos));
 			}
 		}
+
+		//auto ff = (characters[1]->get<components::pathfinding>().get_current_navigation_point() - position(characters[1])).set_length(15000);
+		//characters[1]->get<components::physics>().apply_force(ff);
+
+		// LOG("F: %x", ff);
 	}
 
 	void testbed::drawcalls_after_all_cameras(world& world) {

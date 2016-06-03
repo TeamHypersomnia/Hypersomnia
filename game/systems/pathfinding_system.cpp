@@ -10,7 +10,7 @@
 #include "log.h"
 
 pathfinding_system::pathfinding_system(world& parent_world) : processing_system_templated(parent_world), draw_memorised_walls(false), draw_undiscovered(false),
-	epsilon_distance_the_same_vertex(3.f) {}
+	epsilon_distance_the_same_vertex(50.f), epsilon_distance_visible_point(2) {}
 
 void pathfinding_system::advance_pathfinding_sessions() {
 	/* prepare epsilons to be used later, just to make the notation more clear */
