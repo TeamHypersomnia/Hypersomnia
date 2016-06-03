@@ -20,7 +20,7 @@ namespace behaviours {
 		void execute_leaf_goal_callback(tree::execution_occurence, tree::state_of_traversal&) const final;
 	};
 
-	struct pursue_lost_target : behaviour {
+	struct navigate_to_last_seen_position_of_target : behaviour {
 		tree::goal_availability goal_resolution(tree::state_of_traversal&) const final;
 		void execute_leaf_goal_callback(tree::execution_occurence, tree::state_of_traversal&) const final;
 	};

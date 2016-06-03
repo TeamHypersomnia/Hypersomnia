@@ -5,6 +5,7 @@
 #include "game/components/sentience_component.h"
 #include "game/components/crosshair_component.h"
 #include "game/components/gun_component.h"
+#include "game/components/pathfinding_component.h"
 #include "game/components/rotation_copying_component.h"
 #include "entity_system/entity.h"
 
@@ -204,11 +205,20 @@ namespace behaviours {
 			movement.set_flags_from_target_direction(t.get_goal<minimize_recoil_through_movement_goal>().movement_direction);
 	}
 
-	tree::goal_availability pursue_lost_target::goal_resolution(tree::state_of_traversal&) const {
+	tree::goal_availability navigate_to_last_seen_position_of_target::goal_resolution(tree::state_of_traversal& t) const {
 
 	}
 
-	void pursue_lost_target::execute_leaf_goal_callback(tree::execution_occurence, tree::state_of_traversal&) const {
+	void navigate_to_last_seen_position_of_target::execute_leaf_goal_callback(tree::execution_occurence o, tree::state_of_traversal& t) const {
+		auto subject = t.instance.user_input;
+		auto& movement = subject->get<components::movement>();
+		auto& pathfinding = subject->get<components::pathfinding>();
 
+		if (o == tree::execution_occurence::LAST) {
+			movement.reset_movement_flags();
+			pathfinding.clear_pathfinding_info();
+		}
+		else
+			movement.set_flags_from_target_direction(t.get_goal<minimize_recoil_through_movement_goal>().movement_direction);
 	}
 }

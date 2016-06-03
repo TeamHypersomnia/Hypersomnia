@@ -12,6 +12,12 @@ namespace components {
 		augs::entity_id chosen_target;
 		attitude_type target_attitude = attitude_type::NEUTRAL;
 
+		bool is_alert = false;
+
+		vec2 last_seen_target_position;
+		vec2 last_seen_target_velocity;
+		bool last_seen_target_position_inspected = false;
+
 		double maximum_divergence_angle_before_shooting = 10.0;
 	};
 }
