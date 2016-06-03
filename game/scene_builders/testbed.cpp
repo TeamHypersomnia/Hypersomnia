@@ -221,7 +221,7 @@ namespace scene_builders {
 			r.item = rifle2;
 			r.target_slot = characters[1][slot_function::PRIMARY_HAND];
 
-			//world.post_message(r);
+			world.post_message(r);
 		}
 
 		if (num_characters > 2) {
