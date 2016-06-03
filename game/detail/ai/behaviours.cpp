@@ -203,4 +203,12 @@ namespace behaviours {
 		else
 			movement.set_flags_from_target_direction(t.get_goal<minimize_recoil_through_movement_goal>().movement_direction);
 	}
+
+	tree::goal_availability pursue_lost_target::goal_resolution(tree::state_of_traversal&) const {
+
+	}
+
+	void pursue_lost_target::execute_leaf_goal_callback(tree::execution_occurence, tree::state_of_traversal&) const {
+
+	}
 }

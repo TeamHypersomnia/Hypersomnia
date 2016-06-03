@@ -8,7 +8,7 @@ namespace resource_setups {
 		resource_manager.create(assets::texture_id::TEST_CROSSHAIR, std::wstring(L"hypersomnia/gfx/crosshair.png"));
 		resource_manager.create(assets::texture_id::TEST_PLAYER, L"hypersomnia/gfx/walk_1.png");
 		resource_manager.create(assets::texture_id::TEST_BACKGROUND, L"hypersomnia/gfx/snow_textures/snow3.png");
-		resource_manager.create(assets::texture_id::CRATE, L"hypersomnia/gfx/crate.png");
+		resource_manager.create(assets::texture_id::CRATE, L"hypersomnia/gfx/crate2.png");
 		resource_manager.create(assets::texture_id::CRATE_DESTROYED, L"hypersomnia/gfx/crate2_destroyed.png");
 		resource_manager.create(assets::texture_id::CAR_INSIDE, L"hypersomnia/gfx/crate2.png");
 		resource_manager.create(assets::texture_id::CAR_FRONT, L"hypersomnia/gfx/crate2.png");

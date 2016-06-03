@@ -20,17 +20,7 @@ namespace behaviours {
 		void execute_leaf_goal_callback(tree::execution_occurence, tree::state_of_traversal&) const final;
 	};
 
-	struct retreat_due_to_low_capabilities : behaviour {
-		tree::goal_availability goal_resolution(tree::state_of_traversal&) const final;
-		void execute_leaf_goal_callback(tree::execution_occurence, tree::state_of_traversal&) const final;
-	};
-
-	struct head_back_due_to_deficient_capabilities : behaviour {
-		tree::goal_availability goal_resolution(tree::state_of_traversal&) const final;
-		void execute_leaf_goal_callback(tree::execution_occurence, tree::state_of_traversal&) const final;
-	};
-
-	struct pursue_enemy : behaviour {
+	struct pursue_lost_target : behaviour {
 		tree::goal_availability goal_resolution(tree::state_of_traversal&) const final;
 		void execute_leaf_goal_callback(tree::execution_occurence, tree::state_of_traversal&) const final;
 	};
