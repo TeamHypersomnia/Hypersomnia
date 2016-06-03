@@ -57,7 +57,7 @@ namespace behaviours {
 			resultant_evasion += goal.dangers[i].recommended_evasion * goal.dangers[i].amount;
 		}
 
-		movement.set_flags_from_target_direction(resultant_evasion);
+		movement.set_flags_from_closest_direction(resultant_evasion);
 	}
 
 
@@ -208,7 +208,7 @@ namespace behaviours {
 		if (o == tree::execution_occurence::LAST)
 			movement.reset_movement_flags();
 		else
-			movement.set_flags_from_target_direction(t.get_goal<minimize_recoil_through_movement_goal>().movement_direction);
+			movement.set_flags_from_closest_direction(t.get_goal<minimize_recoil_through_movement_goal>().movement_direction);
 	}
 
 	tree::goal_availability navigate_to_last_seen_position_of_target::goal_resolution(tree::state_of_traversal& t) const {
@@ -241,7 +241,7 @@ namespace behaviours {
 				attitude.last_seen_target_position_inspected = true;
 			}
 			else
-				movement.set_flags_from_target_direction(pathfinding.get_current_navigation_point() - position(subject));
+				movement.set_flags_from_closest_direction(pathfinding.get_current_navigation_point() - position(subject));
 		}
 	}
 
@@ -278,7 +278,7 @@ namespace behaviours {
 				ensure(0);
 			}
 			else
-				movement.set_flags_from_target_direction(pathfinding.get_current_navigation_point() - position(subject));
+				movement.set_flags_from_closest_direction(pathfinding.get_current_navigation_point() - position(subject));
 		}
 	}
 	

@@ -1,5 +1,6 @@
 #pragma once
 #include "math/vec2.h"
+#include "entity_system/entity_id.h"
 
 namespace components {
 	struct movement  {
@@ -10,21 +11,10 @@ namespace components {
 				target(target), stop_response_at_zero_speed(stop_at_zero_movement) {}
 		};
 
-		void add_animation_receiver(augs::entity_id e, bool stop_at_zero_movement) {
-			response_receivers.push_back(subscribtion(e, stop_at_zero_movement));
-		}
-
-		void reset_movement_flags() {
-			moving_left = moving_right = moving_forward = moving_backward = walking_enabled = 0;
-		}
-
-		void set_flags_from_target_direction(vec2 d) {
-			reset_movement_flags();
-			if (d.x > 0) moving_right = true;
-			if (d.y > 0) moving_backward = true;
-			if (d.x < 0) moving_left = true;
-			if (d.y < 0) moving_forward = true;
-		}
+		void add_animation_receiver(augs::entity_id e, bool stop_at_zero_movement);
+		void reset_movement_flags();
+		void set_flags_from_target_direction(vec2 d);
+		void set_flags_from_closest_direction(vec2 d);
 
 		bool apply_movement_forces = true;
 
