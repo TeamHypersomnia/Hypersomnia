@@ -388,6 +388,7 @@
     <ClCompile Include="game\components\item_slot_transfers_component.cpp" />
     <ClCompile Include="game\components\name_component.cpp" />
     <ClCompile Include="game\components\particle_group_component.cpp" />
+    <ClCompile Include="game\components\pathfinding_component.cpp" />
     <ClCompile Include="game\components\physics_component.cpp" />
     <ClCompile Include="game\components\physics_definition_component.cpp" />
     <ClCompile Include="game\components\polygon_component.cpp" />

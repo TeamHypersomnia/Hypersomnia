@@ -270,7 +270,7 @@ void pathfinding_system::process_entities() {
 				/* if the target is inside body, it's already found */
 				if (body->TestPoint(pathfinding.session().target * PIXELS_TO_METERSf)) {
 					/* done, target found */
-					pathfinding.clear_pathfinding_info();
+					pathfinding.stop_and_clear_pathfinding();
 					continue;
 				}
 
