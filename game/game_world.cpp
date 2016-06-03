@@ -278,6 +278,10 @@ void game_world::perform_logic_step() {
 	get_system<behaviour_tree_system>().evaluate_trees();
 	profile.stop(meter_type::AI);
 
+	profile.start(meter_type::PATHFINDING);
+	get_system<pathfinding_system>().advance_pathfinding_sessions();
+	profile.stop(meter_type::PATHFINDING);
+
 	get_system<particles_system>().step_streams_and_particles();
 	get_system<particles_system>().destroy_dead_streams();
 	get_system<trace_system>().destroy_outdated_traces();

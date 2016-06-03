@@ -22,10 +22,10 @@ namespace ingredients {
 		pathfinding.distance_navpoint_hit = 2;
 		pathfinding.favor_velocity_parallellness = true;
 
-		//auto& layer = visibility.full_visibility_layers[components::visibility::DYNAMIC_PATHFINDING];
-		//layer.square_side = 5000;
-		//layer.color.set(0, 255, 255, 120);
-		//layer.filter = filters::pathfinding_query();
+		auto& layer = visibility.full_visibility_layers[components::visibility::DYNAMIC_PATHFINDING];
+		layer.square_side = 1000;
+		layer.color.set(0, 255, 255, 120);
+		layer.filter = filters::pathfinding_query();
 	}
 
 	void soldier_intelligence(augs::entity_id e) {

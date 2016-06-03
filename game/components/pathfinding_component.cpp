@@ -26,6 +26,7 @@ namespace components {
 	void pathfinding::stop_and_clear_pathfinding() {
 		session_stack.clear();
 		is_exploring = false;
+		custom_exploration_hint.enabled = false;
 	}
 
 	void pathfinding::restart_pathfinding() {
@@ -48,12 +49,12 @@ namespace components {
 		return session().target;
 	}
 
-	bool pathfinding::is_still_pathfinding() const {
-		return !session_stack.empty();
+	bool pathfinding::has_pathfinding_finished() const {
+		return session_stack.empty();
 	}
 
-	bool pathfinding::is_still_exploring() const {
-		return is_exploring;
+	bool pathfinding::has_exploring_finished() const {
+		return !is_exploring;
 	}
 
 	bool pathfinding::exists_through_undiscovered_visible(vec2 navpoint, float max_distance) const {

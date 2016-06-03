@@ -9,7 +9,7 @@ namespace components {
 		unsigned hostile_parties = 0;
 		std::set<augs::entity_id> specific_hostile_entities;
 		
-		augs::entity_id chosen_target;
+		augs::entity_id currently_attacked_visible_entity;
 		attitude_type target_attitude = attitude_type::NEUTRAL;
 
 		bool is_alert = false;

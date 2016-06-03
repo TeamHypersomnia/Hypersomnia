@@ -99,6 +99,7 @@ namespace behaviours {
 		auto pos = position(subject);
 		auto& visibility = subject->get<components::visibility>();
 		auto& los = visibility.line_of_sight_layers[components::visibility::LINE_OF_SIGHT];
+		auto& attitude = subject->get<components::attitude>();
 
 		augs::entity_id closest_hostile;
 
@@ -117,7 +118,14 @@ namespace behaviours {
 			}
 		}
 
-		subject->get<components::attitude>().chosen_target = closest_hostile;
+		attitude.currently_attacked_visible_entity = closest_hostile;
+
+		if (closest_hostile.alive()) {
+			attitude.is_alert = true;
+			attitude.last_seen_target_position_inspected = false;
+			attitude.last_seen_target_position = position(closest_hostile);
+			attitude.last_seen_target_velocity = velocity(closest_hostile);
+		}
 
 		if (subject.has(sub_entity_name::CHARACTER_CROSSHAIR)) {
 			auto crosshair = subject[sub_entity_name::CHARACTER_CROSSHAIR];
@@ -148,11 +156,11 @@ namespace behaviours {
 	tree::goal_availability pull_trigger::goal_resolution(tree::state_of_traversal& t) const {
 		auto subject = t.instance.user_input;
 		auto& attitude = subject->get<components::attitude>();
-		auto chosen_target = attitude.chosen_target;
+		auto currently_attacked_visible_entity = attitude.currently_attacked_visible_entity;
 		auto crosshair = subject[sub_entity_name::CHARACTER_CROSSHAIR];
 		auto& crosshair_offset = crosshair->get<components::crosshair>().base_offset;
 
-		if (chosen_target.alive() && guns_wielded(subject).size() > 0) {
+		if (currently_attacked_visible_entity.alive() && guns_wielded(subject).size() > 0) {
 			//if (crosshair_offset.degrees_between(orientation(subject)) < attitude.maximum_divergence_angle_before_shooting) {
 				return tree::goal_availability::SHOULD_EXECUTE;
 			//}
@@ -177,17 +185,15 @@ namespace behaviours {
 		auto subject = t.instance.user_input;
 		auto crosshair = subject[sub_entity_name::CHARACTER_CROSSHAIR];
 		auto& attitude = subject->get<components::attitude>();
-		auto chosen_target = attitude.chosen_target;
+		auto currently_attacked_visible_entity = attitude.currently_attacked_visible_entity;
 
-		if (chosen_target.alive() && crosshair.alive()) {
+		if (currently_attacked_visible_entity.alive() && crosshair.alive()) {
 			auto recoil = crosshair[sub_entity_name::CROSSHAIR_RECOIL_BODY];
 			auto& c = crosshair->get<components::crosshair>();
 
 			minimize_recoil_through_movement_goal goal;
 
 			goal.movement_direction = (c.base_offset - orientation(subject).set_length(c.base_offset.length()));
-				// vec2(c.base_offset).rotate(rotation(recoil), vec2()));
-			// orientation(subject).rotate(rotation(recoil), vec2());
 			t.set_goal(goal);
 			return tree::goal_availability::SHOULD_EXECUTE;
 		}
@@ -206,19 +212,74 @@ namespace behaviours {
 	}
 
 	tree::goal_availability navigate_to_last_seen_position_of_target::goal_resolution(tree::state_of_traversal& t) const {
+		auto subject = t.instance.user_input;
+		auto& attitude = subject->get<components::attitude>();
+		auto currently_attacked_visible_entity = attitude.currently_attacked_visible_entity;
 
+		if (currently_attacked_visible_entity.dead() && attitude.is_alert && !attitude.last_seen_target_position_inspected) {
+			return tree::goal_availability::SHOULD_EXECUTE;
+		}
+
+		return tree::goal_availability::ALREADY_ACHIEVED;
 	}
 
 	void navigate_to_last_seen_position_of_target::execute_leaf_goal_callback(tree::execution_occurence o, tree::state_of_traversal& t) const {
 		auto subject = t.instance.user_input;
+		auto& attitude = subject->get<components::attitude>();
 		auto& movement = subject->get<components::movement>();
 		auto& pathfinding = subject->get<components::pathfinding>();
 
-		if (o == tree::execution_occurence::LAST) {
+		if (o == tree::execution_occurence::FIRST) {
+			pathfinding.start_pathfinding(attitude.last_seen_target_position);
+		}
+		else if (o == tree::execution_occurence::LAST) {
 			movement.reset_movement_flags();
 			pathfinding.stop_and_clear_pathfinding();
 		}
-		else
-			movement.set_flags_from_target_direction(t.get_goal<minimize_recoil_through_movement_goal>().movement_direction);
+		else {
+			if (pathfinding.has_pathfinding_finished()) {
+				attitude.last_seen_target_position_inspected = true;
+			}
+			else
+				movement.set_flags_from_target_direction(pathfinding.get_current_navigation_point() - position(subject));
+		}
 	}
+
+	tree::goal_availability explore_in_search_for_last_seen_target::goal_resolution(tree::state_of_traversal& t) const {
+		auto subject = t.instance.user_input;
+		auto& attitude = subject->get<components::attitude>();
+		auto currently_attacked_visible_entity = attitude.currently_attacked_visible_entity;
+
+		if (currently_attacked_visible_entity.dead() && attitude.is_alert && attitude.last_seen_target_position_inspected) {
+			return tree::goal_availability::SHOULD_EXECUTE;
+		}
+
+		return tree::goal_availability::ALREADY_ACHIEVED;
+	}
+
+	void explore_in_search_for_last_seen_target::execute_leaf_goal_callback(tree::execution_occurence o, tree::state_of_traversal& t) const {
+		auto subject = t.instance.user_input;
+		auto& attitude = subject->get<components::attitude>();
+		auto& movement = subject->get<components::movement>();
+		auto& pathfinding = subject->get<components::pathfinding>();
+
+		if (o == tree::execution_occurence::FIRST) {
+			pathfinding.start_exploring();
+			pathfinding.custom_exploration_hint.enabled = true;
+			pathfinding.custom_exploration_hint.origin = attitude.last_seen_target_position;
+			pathfinding.custom_exploration_hint.target = attitude.last_seen_target_position + attitude.last_seen_target_velocity;
+		}
+		else if (o == tree::execution_occurence::LAST) {
+			movement.reset_movement_flags();
+			pathfinding.stop_and_clear_pathfinding();
+		}
+		else {
+			if (pathfinding.has_exploring_finished()) {
+				ensure(0);
+			}
+			else
+				movement.set_flags_from_target_direction(pathfinding.get_current_navigation_point() - position(subject));
+		}
+	}
+	
 }

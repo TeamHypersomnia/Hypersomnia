@@ -13,8 +13,10 @@ namespace resource_setups {
 		soldier_movement.root.mode = resources::behaviour_tree::node::type::SELECTOR;
 
 		soldier_movement.root.branch(
-			new behaviours::immediate_evasion, 
-			new behaviours::minimize_recoil_through_movement
+			new behaviours::immediate_evasion,
+			new behaviours::minimize_recoil_through_movement,
+			new behaviours::navigate_to_last_seen_position_of_target,
+			new behaviours::explore_in_search_for_last_seen_target
 		);
 
 		soldier_movement.build_tree();

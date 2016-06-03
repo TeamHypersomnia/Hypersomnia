@@ -104,7 +104,7 @@ namespace scene_builders {
 					assets::texture_id::TEST_BACKGROUND, augs::gray1, render_layer::UNDER_GROUND);
 			}
 
-		const int num_characters = 6;
+		const int num_characters = 2;
 
 		for (int i = 0; i < num_characters; ++i) {
 			auto new_character = prefabs::create_character(world, vec2(i * 300, 0));
@@ -117,7 +117,7 @@ namespace scene_builders {
 				new_character->get<components::sentience>().health.maximum = 800;
 			}
 			if (i == 1) {
-				new_character->get<components::transform>().pos.set(800, 0);
+				new_character->get<components::transform>().pos.set(2800, 0);
 				new_character->get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
 				new_character->get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
 				new_character->get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
@@ -215,24 +215,32 @@ namespace scene_builders {
 
 		if (num_characters > 1) {
 			name_entity(characters[1], entity_name::PERSON, L"Enemy");
-			name_entity(characters[2], entity_name::PERSON, L"Swordsman");
-			name_entity(characters[3], entity_name::PERSON, L"Medic");
 
 			r.item = rifle2;
 			r.target_slot = characters[1][slot_function::PRIMARY_HAND];
 
-			world.post_message(r);
+			//world.post_message(r);
+		}
+
+		if (num_characters > 2) {
+			name_entity(characters[2], entity_name::PERSON, L"Swordsman");
 
 			r.item = second_machete;
 			r.target_slot = characters[2][slot_function::PRIMARY_HAND];
 
 			world.post_message(r);
+		}
+
+		if (num_characters > 3) {
+			name_entity(characters[3], entity_name::PERSON, L"Medic");
 
 			r.item = pis2;
 			r.target_slot = characters[3][slot_function::PRIMARY_HAND];
 
 			world.post_message(r);
+		}
 
+		if (num_characters > 5) {
 			r.item = prefabs::create_submachine(world, vec2(0, -1000),
 				prefabs::create_sample_magazine(world, vec2(100 - 50, -650), true ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), true ? 500 : 50)));
 			r.target_slot = characters[5][slot_function::PRIMARY_HAND];

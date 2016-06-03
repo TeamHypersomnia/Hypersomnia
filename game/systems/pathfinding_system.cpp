@@ -12,7 +12,7 @@
 pathfinding_system::pathfinding_system(world& parent_world) : processing_system_templated(parent_world), draw_memorised_walls(false), draw_undiscovered(false),
 	epsilon_distance_the_same_vertex(3.f) {}
 
-void pathfinding_system::process_entities() {
+void pathfinding_system::advance_pathfinding_sessions() {
 	/* prepare epsilons to be used later, just to make the notation more clear */
 	const float epsilon_distance_visible_point_sq = epsilon_distance_visible_point * epsilon_distance_visible_point;
 	

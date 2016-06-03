@@ -60,8 +60,8 @@ namespace components {
 		const pathfinding_session& session() const;
 		vec2 get_current_navigation_point() const;
 		vec2 get_current_target() const;
-		bool is_still_pathfinding() const;
-		bool is_still_exploring() const;
+		bool has_pathfinding_finished() const;
+		bool has_exploring_finished() const;
 		bool exists_through_undiscovered_visible(vec2 navpoint, float max_distance) const;
 
 	private:
