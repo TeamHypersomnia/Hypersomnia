@@ -12,7 +12,6 @@
 #include "../systems/input_system.h"
 
 #include "crosshair_system.h"
-#include "game/settings.h"
 
 gui_system::gui_system(world& parent_world) : processing_system_templated(parent_world) {
 	gui.gui_system = this;

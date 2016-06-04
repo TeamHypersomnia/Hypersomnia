@@ -1,6 +1,8 @@
 ﻿#pragma once
 // legacy functionality kept for conformance with old code. Do not use anymore.
 #include "augs_error.h"
+
+#if ENABLE_LEGACY_ERROR_REPORTING
 #include <Windows.h>
 #undef min
 #undef max
@@ -109,3 +111,4 @@ namespace augs {
 		module::module(void (*errf)(wchar_t*), int(*errid)()) : error_func(errf), errorid_func(errid) { }
 	}
 }
+#endif

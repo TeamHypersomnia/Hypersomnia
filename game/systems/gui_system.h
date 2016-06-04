@@ -26,6 +26,8 @@ class gui_system : public augs::processing_system_templated<components::gui_elem
 	std::vector<messages::raw_window_input_message> buffered_inputs_during_freeze;
 	bool freeze_gui_model();
 public:
+	bool draw_free_space_inside_container_icons = true;
+
 	gui_system(world& parent_world);
 
 	immediate_hud hud;

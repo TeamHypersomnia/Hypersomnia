@@ -9,8 +9,6 @@
 #include "../messages/rebuild_physics_message.h"
 #include "../messages/physics_operation.h"
 
-#include "game/settings.h"
-
 double METERS_TO_PIXELS = 100.0;
 double PIXELS_TO_METERS = 1.0 / METERS_TO_PIXELS;
 float METERS_TO_PIXELSf = 100.f;

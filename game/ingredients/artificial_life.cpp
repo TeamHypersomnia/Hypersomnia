@@ -7,7 +7,6 @@
 #include "game/components/visibility_component.h"
 
 #include "game/globals/filters.h"
-#include "game/settings.h"
 
 namespace ingredients {
 	void standard_pathfinding_capability(augs::entity_id e) {

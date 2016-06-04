@@ -1,6 +1,16 @@
 #pragma once
 // legacy functionality kept for conformance with old code. Do not use anymore.
-#include "../options.h"
+#include "build_settings.h"
+
+#if !ENABLE_LEGACY_ERROR_REPORTING
+
+#define err(expression) expression
+#define errf(expression, retflag) retflag = retflag ? int(expression) : 0;
+#define errl(expression, errlog) expression
+#define errs(expression, str) expression
+#define errsf(expression, str, retflag) retflag = retflag ? int(expression) : 0;
+
+#else
 
 namespace augs {
 	namespace error_logging {
@@ -53,3 +63,5 @@ namespace augs {
 #define errsl(expression, errors, str) errors._errs(int(expression), __LINE__, __FILE__, __FUNCTION__, str)
 #define errf(expression, retflag) retflag = retflag ? errors._err(int(expression), __LINE__, __FILE__, __FUNCTION__) : 0;
 #define errsf(expression, str, retflag) retflag = retflag ? errors._errs(int(expression), __LINE__, __FILE__, __FUNCTION__, str) : 0;
+
+#endif

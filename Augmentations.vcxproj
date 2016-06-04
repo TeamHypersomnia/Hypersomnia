@@ -359,7 +359,7 @@
     <ClCompile Include="augs\misc\measurements.cpp" />
     <ClCompile Include="augs\misc\performance_timer.cpp" />
     <ClCompile Include="augs\misc\recoil_player.cpp" />
-    <ClCompile Include="augs\options.cpp" />
+    <ClCompile Include="augs\misc\typesafe_sprintf.cpp" />
     <ClCompile Include="augs\stream.cpp" />
     <ClCompile Include="augs\texture_baker\polygonize_sprite.cpp" />
     <ClCompile Include="augs\window_framework\console_colors.cpp" />
@@ -451,7 +451,6 @@
     <ClCompile Include="game\scene_builders\resource_setups\standard_particle_effects.cpp" />
     <ClCompile Include="game\scene_builders\scene_builder.cpp" />
     <ClCompile Include="game\scene_builders\testbed.cpp" />
-    <ClCompile Include="game\settings.cpp" />
     <ClCompile Include="game\detail\gui\grid.cpp" />
     <ClCompile Include="game\detail\gui\item_button.cpp" />
     <ClCompile Include="game\detail\gui\pixel_line_connector.cpp" />
@@ -992,6 +991,7 @@
     <ClInclude Include="3rdparty\RakNet\Source\WSAStartupSingleton.h" />
     <ClInclude Include="3rdparty\RakNet\Source\XBox360Includes.h" />
     <ClInclude Include="3rdparty\RakNet\Source\_FindFirst.h" />
+    <ClInclude Include="augs\build_settings.h" />
     <ClInclude Include="augs\gui\appearance_detector.h" />
     <ClInclude Include="augs\gui\rect_id.h" />
     <ClInclude Include="augs\gui\text_drawer.h" />
@@ -1000,6 +1000,7 @@
     <ClInclude Include="augs\misc\measurements.h" />
     <ClInclude Include="augs\misc\performance_timer.h" />
     <ClInclude Include="augs\misc\recoil_player.h" />
+    <ClInclude Include="augs\misc\typesafe_sprintf.h" />
     <ClInclude Include="augs\stlutil.h" />
     <ClInclude Include="augs\stream.h" />
     <ClInclude Include="augs\window_framework\console_colors.h" />
@@ -1019,6 +1020,7 @@
     <ClInclude Include="game\bindings\bindings.h" />
     <ClInclude Include="game\bindings\bind_callbacks.h" />
     <ClInclude Include="game\bind_game_and_augs.h" />
+    <ClInclude Include="game\build_settings.h" />
     <ClInclude Include="game\components\animation_component.h" />
     <ClInclude Include="game\components\behaviour_tree_component.h" />
     <ClInclude Include="game\components\camera_component.h" />
@@ -1132,7 +1134,6 @@
     <ClInclude Include="game\scene_builders\resource_setups\all.h" />
     <ClInclude Include="game\scene_builders\scene_builder.h" />
     <ClInclude Include="game\scene_builders\testbed.h" />
-    <ClInclude Include="game\settings.h" />
     <ClInclude Include="game\detail\gui\grid.h" />
     <ClInclude Include="game\detail\gui\item_button.h" />
     <ClInclude Include="game\detail\gui\pixel_line_connector.h" />
@@ -1234,7 +1235,6 @@
     <ClInclude Include="augs\network\network_interface.h" />
     <ClInclude Include="augs\network\reliable_channel.h" />
     <ClInclude Include="augs\network\reliable_channel_tests.h" />
-    <ClInclude Include="augs\options.h" />
     <ClInclude Include="augs\log.h" />
     <ClInclude Include="augs\script.h" />
     <ClInclude Include="augs\texture_baker\font.h" />

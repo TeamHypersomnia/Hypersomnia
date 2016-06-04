@@ -25,7 +25,6 @@
 
 #include "game/globals/filters.h"
 #include "game/globals/party_category.h"
-#include "game/settings.h"
 
 namespace ingredients {
 	void wsad_character_setup_movement(augs::entity_id e) {
@@ -300,13 +299,11 @@ namespace prefabs {
 
 			sprite.set(assets::texture_id::TEST_CROSSHAIR, rgba(0, 255, 0, 0));
 
-			//if (DEBUG_DRAW_RECOIL_CROSSHAIR) {
-				auto& render = *recoil += components::render();
-				render.layer = render_layer::OVER_CROSSHAIR;
-				render.interpolate = true;
-				render.snap_interpolation_when_close = false;
-				ingredients::make_always_visible(recoil);
-				//}
+			auto& render = *recoil += components::render();
+			render.layer = render_layer::OVER_CROSSHAIR;
+			render.interpolate = true;
+			render.snap_interpolation_when_close = false;
+			ingredients::make_always_visible(recoil);
 
 			auto& body = physics_definition.body;
 			auto& info = physics_definition.new_fixture();

@@ -12,7 +12,7 @@
 #include "math/vec2.h"
 #include "entity_system/world.h"
 #include "ensure.h"
-#include "game/settings.h"
+
 namespace components {
 	augs::entity_id physics::get_owner_friction_field(augs::entity_id id) {
 		return get_owner_body_entity(id)->get<components::physics>().owner_friction_ground;
@@ -88,7 +88,7 @@ namespace components {
 
 		body->ApplyForce(force, location, wake);
 
-		if (DEBUG_DRAW_FORCES && force.non_zero()) {
+		if (renderer::get_current().debug_draw_forces && force.non_zero()) {
 			auto& lines = renderer::get_current().logic_lines;
 			lines.draw_green(location * METERS_TO_PIXELSf + force * METERS_TO_PIXELSf, location * METERS_TO_PIXELSf);
 		}
@@ -107,7 +107,7 @@ namespace components {
 
 		body->ApplyLinearImpulse(force, location, true);
 
-		if (DEBUG_DRAW_FORCES && force.non_zero()) {
+		if (renderer::get_current().debug_draw_forces && force.non_zero()) {
 			auto& lines = renderer::get_current().logic_lines;
 			lines.draw_green(location * METERS_TO_PIXELSf + force * METERS_TO_PIXELSf, location * METERS_TO_PIXELSf);
 		}

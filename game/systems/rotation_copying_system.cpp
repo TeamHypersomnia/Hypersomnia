@@ -1,16 +1,16 @@
 #include "rotation_copying_system.h"
-#include "entity_system/entity.h"
-
-#include "../components/physics_component.h"
-#include "../components/gun_component.h"
-#include "../detail/inventory_slot_id.h"
-#include "../detail/inventory_slot.h"
-#include "../detail/inventory_utils.h"
-#include "ensure.h"
 #include <Box2D\Dynamics\b2Body.h>
+
+#include "entity_system/entity.h"
 #include "graphics/renderer.h"
 
-#include "game/settings.h"
+#include "game/components/physics_component.h"
+#include "game/components/gun_component.h"
+#include "game/detail/inventory_slot_id.h"
+#include "game/detail/inventory_slot.h"
+#include "game/detail/inventory_utils.h"
+
+#include "ensure.h"
 
 float colinearize_AB(vec2 O_center_of_rotation, vec2 A_rifle_center, vec2 B_barrel, vec2 C_crosshair) {
 	auto crosshair_vector = C_crosshair - O_center_of_rotation;
@@ -37,7 +37,7 @@ float colinearize_AB(vec2 O_center_of_rotation, vec2 A_rifle_center, vec2 B_barr
 
 	auto final_angle = 2 * (CG.degrees() - AG.degrees());
 	
-	if (DEBUG_DRAW_COLINEARIZATION) {
+	if (augs::renderer::get_current().debug_draw_colinearization) {
 		auto& ln = augs::renderer::get_current().logic_lines;
 
 		ln.draw_cyan(O_center_of_rotation, C_crosshair);

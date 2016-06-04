@@ -6,7 +6,6 @@
 #include "entity_system/world.h"
 
 #include "graphics/renderer.h"
-#include "game/settings.h"
 
 #define FRICTION_FIELDS_COLLIDE 0
 
@@ -75,7 +74,7 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 								found_suitable = true;
 						}
 
-						if (DEBUG_DRAW_FRICTION_FIELD_COLLISIONS_OF_ENTERING) {
+						if (renderer::get_current().debug_draw_friction_field_collisions_of_entering) {
 							renderer::get_current().blink_lines.draw_yellow(METERS_TO_PIXELSf*worldManifold.points[i], METERS_TO_PIXELSf* worldManifold.points[i] + vec2(worldManifold.normal).set_length(150));
 							renderer::get_current().blink_lines.draw_red(METERS_TO_PIXELSf*worldManifold.points[i], METERS_TO_PIXELSf* worldManifold.points[i] + velOtherPixels);
 						}

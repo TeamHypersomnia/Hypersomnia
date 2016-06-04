@@ -1,13 +1,12 @@
 #pragma once
+#include "font.h"
+#include <set>
+
 #include <freetype\ft2build.h> 
 #include FT_FREETYPE_H
 
-#include <set>
-
-#include "../options.h"
-#include "font.h"
-
 #include "../augmentations.h"
+#include "augs/error/augs_error.h"
 
 namespace augs {
 	font::charset font::to_charset(const std::wstring& str) {

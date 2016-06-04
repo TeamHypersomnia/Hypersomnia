@@ -1,5 +1,5 @@
 #include <GL/OpenGL.h>
-#include "../options.h"
+#include "augs/error/augs_error.h"
 
 #include "window.h"
 #include "../stream.h"

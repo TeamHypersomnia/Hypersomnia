@@ -8,7 +8,6 @@
 
 #include "gui/stroke.h"
 
-#include "game/settings.h"
 #include "game/globals/item_category.h"
 #include "game/detail/state_for_drawing.h"
 #include "game/detail/inventory_slot.h"
@@ -205,7 +204,7 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 				bottom_number_val = considered_charges;
 				printing_charge_count = true;
 			}
-			else if (DRAW_FREE_SPACE_INSIDE_CONTAINER_ICONS && item[slot_function::ITEM_DEPOSIT].alive()) {
+			else if (item->get_owner_world().get_system<gui_system>().draw_free_space_inside_container_icons && item[slot_function::ITEM_DEPOSIT].alive()) {
 				if (item->get<components::item>().categories_for_slot_compatibility & item_category::MAGAZINE) {
 					if (!is_container_open) {
 						printing_charge_count = true;

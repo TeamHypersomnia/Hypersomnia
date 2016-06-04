@@ -1,5 +1,4 @@
 #include "game/systems/gui_system.h"
-#include "game/settings.h"
 #include "game/components/item_component.h"
 #include "game/components/container_component.h"
 
@@ -119,7 +118,7 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 					if (cached_slot_meta.find(new_entry.first) != cached_slot_meta.end())
 						new_slot.user_drag_offset = cached_slot_meta[new_entry.first].user_drag_offset;
 
-					if ((DRAW_FREE_SPACE_INSIDE_CONTAINER_ICONS && new_entry.first.type == slot_function::ITEM_DEPOSIT)) {
+					if ((draw_free_space_inside_container_icons && new_entry.first.type == slot_function::ITEM_DEPOSIT)) {
 						new_slot.enable_drawing = false;
 						new_slot.enable_drawing_of_children = false;
 					}

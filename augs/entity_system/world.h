@@ -123,6 +123,7 @@ namespace augs {
 		int entity_pool_capacity = 0;
 		unsigned long long current_step_number = 0;
 		double seconds_passed = 0.0;
+		bool debug_log_created_and_deleted_entities = false;
 
 		performance_timer profile;
 		measurements fps_counter = measurements(L"Frame");

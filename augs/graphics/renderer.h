@@ -91,6 +91,12 @@ namespace augs {
 
 		void clear_geometry();
 
+		bool should_interpolate_debug_lines = false;
+
+		bool debug_draw_colinearization = false;
+		bool debug_draw_forces = false;
+		bool debug_draw_friction_field_collisions_of_entering = false;
+
 		float visibility_expansion = 1.0f;
 		float max_visibility_expansion_distance = 1000.0f;
 		int debug_drawing = 1;

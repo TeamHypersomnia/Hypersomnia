@@ -7,10 +7,10 @@
 #include FT_FREETYPE_H
 
 #include "augmentations.h"
-#include "options.h"
 #include "window_framework\window.h"
 
 #include <gtest/gtest.h>
+#include "error/augs_error.h"
 #include "log.h"
 
 namespace augs {
@@ -53,7 +53,7 @@ namespace augs {
 			dummy.create(rects::xywh<int>(10, 10, 200, 200));
 			
 			glewExperimental = FALSE;
-			errsl((error_logging::glew_last_errorcode = glewInit()) == GLEW_OK, glew_errors, L"Failed to initialize GLEW");
+			errs(glewInit() == GLEW_OK, L"Failed to initialize GLEW");
 		}
 
 		initialized |= to_initialize;
