@@ -6,22 +6,30 @@
 #include "game/components/transform_component.h"
 
 namespace components {
-	enum melee_state {
-		MELEE_FREE,
-		MELEE_ONCOOLDOWN,
-		MELEE_PRIMARY,
-		MELEE_SECONDARY,
-		MELEE_TERTIARY,
-	};
-
-	struct melee_info {
-		float duration_ms;
-		float acceleration;
-		float cooldown_ms;
-	};
-
 	struct melee {
-		melee_info swings[5];
+		enum class state {
+			FREE,
+			ONCOOLDOWN,
+			PRIMARY,
+			SECONDARY,
+			TERTIARY,
+		};
+
+		enum class stage {
+			FIRST_STAGE,
+			SECOND_STAGE,
+			THIRD_STAGE,
+			FOURTH_STAGE,
+			WINDOW_STAGE //During the window stage the player can perform the second swing or an other melee action.
+		};
+
+		struct swing {
+			float duration_ms;
+			float acceleration;
+			float cooldown_ms;
+		};
+
+		swing swings[5];
 		float swing_current_time = 0.f;
 		float swing_current_cooldown_time = 0.f;
 
@@ -38,7 +46,7 @@ namespace components {
 
 		void reset_weapon(augs::entity_id e);
 
-		melee_state state = MELEE_FREE;
+		state current_state = state::FREE;
 
 		std::vector<components::transform> offset_positions[4];
 	};
