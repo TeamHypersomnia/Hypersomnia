@@ -1,6 +1,6 @@
 #pragma once
 #include "game/bind_game_and_augs.h"
-#include "augs/augmentations.h"
+#include "augs/global_libraries.h"
 #include "game/game_overworld.h"
 
 using namespace augs;
@@ -8,8 +8,8 @@ using namespace augs;
 #include "game/scene_builders/testbed.h"
 
 int main(int argc, char** argv) {
-	augs::init();
-	augs::run_tests();
+	augs::global_libraries::init();
+	augs::global_libraries::run_googletest();
 
 	game_overworld hypersomnia_overworld;
 	hypersomnia_overworld.configure_scripting();
@@ -20,6 +20,6 @@ int main(int argc, char** argv) {
 
 	hypersomnia_overworld.main_game_loop();
 
-	augs::deinit();
+	augs::global_libraries::deinit();
 	return 0;
 }
