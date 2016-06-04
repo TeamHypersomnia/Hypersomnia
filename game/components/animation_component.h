@@ -9,36 +9,27 @@
 
 namespace components {
 	struct animation {
-		assets::animation_id current_animation;
-
-		void set_frame_num(unsigned number, augs::entity_id, bool do_callback = true);
-
-		unsigned get_frame_num() const {
-			return frame_num;
-		}
-
-		void increase_frame(augs::entity_id sub) {
-			set_frame_num(frame_num + 1, sub);
-		}
-
-		void decrease_frame(augs::entity_id sub) {
-			set_frame_num(frame_num - 1, sub);
-		}
-
-		resources::animation_callback saved_callback_out;
-
-		int priority = 0;
-		unsigned frame_num = 0;
-		float player_position_ms = 0.f;
-		float speed_factor = 1.f;
-
 		enum class playing_state {
 			INCREASING,
 			DECREASING,
 			PAUSED
 		};
 
+		assets::animation_id current_animation;
+
+		int priority = 0;
+		unsigned frame_num = 0;
+		float player_position_ms = 0.f;
+		float speed_factor = 1.f;
+
 		playing_state state = playing_state::PAUSED;
 		playing_state paused_state = playing_state::PAUSED;
+
+		void set_current_frame(unsigned number);
+
+		void increase_frame(augs::entity_id);
+		void decrease_frame(augs::entity_id);
+
+		unsigned get_current_frame() const;
 	};
 }

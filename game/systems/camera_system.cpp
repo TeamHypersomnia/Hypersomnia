@@ -49,7 +49,7 @@ void components::camera::configure_camera_and_character_with_crosshair(augs::ent
 	update_bounds_for_crosshair(camera->get<components::camera>(), crosshair->get<components::crosshair>());
 }
 
-vec2i components::camera::get_camera_offset_due_to_character_crosshair(augs::entity_id self) {
+vec2i components::camera::get_camera_offset_due_to_character_crosshair(augs::entity_id self) const {
 	vec2 camera_crosshair_offset;
 
 	if (entity_to_chase.dead())
@@ -76,7 +76,6 @@ vec2i components::camera::get_camera_offset_due_to_character_crosshair(augs::ent
 
 	return camera_crosshair_offset;
 }
-#include "log.h"
 
 void camera_system::resolve_cameras_transforms_and_smoothing() {
 	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */

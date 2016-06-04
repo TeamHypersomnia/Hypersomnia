@@ -16,6 +16,12 @@ class gun_system;
 
 namespace components {
 	struct camera  {
+		enum orbit_type {
+			NONE,
+			ANGLED,
+			LOOK
+		} orbit_mode = NONE;
+
 		static void configure_camera_and_character_with_crosshair(augs::entity_id camera, augs::entity_id character, augs::entity_id crosshair);
 
 		augs::rects::xywh<int> viewport;
@@ -24,12 +30,6 @@ namespace components {
 		unsigned layer = 0;
 		unsigned mask = 0;
 		bool enabled = true;
-
-		enum orbit_type {
-			NONE,
-			ANGLED,
-			LOOK
-		} orbit_mode = NONE;
 
 		float angled_look_length = 100.f;
 		bool enable_smoothing = true;
@@ -51,7 +51,7 @@ namespace components {
 
 		augs::smooth_value_field smoothing_player_pos;
 		
-		vec2i get_camera_offset_due_to_character_crosshair(augs::entity_id self);
+		vec2i get_camera_offset_due_to_character_crosshair(augs::entity_id self) const;
 		
 		shared::state_for_drawing_camera how_camera_will_render;
 

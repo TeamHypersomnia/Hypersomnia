@@ -5,15 +5,8 @@
 #include "entity_system/entity_id.h"
 
 namespace resources {
-	typedef std::function<void(augs::entity_id)> animation_callback;
-
 	struct animation {
 		struct frame {
-			/* function that is called once this frame enters */
-			animation_callback callback;
-			/* function that is called once this frame quits */
-			animation_callback callback_out;
-
 			components::sprite sprite;
 			float duration_milliseconds = 0.f;
 		};

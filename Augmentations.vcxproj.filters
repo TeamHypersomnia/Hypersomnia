@@ -1260,6 +1260,9 @@
     <ClCompile Include="game\detail\ai\behaviours\explore_in_search_for_last_seen_target.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\components\animation_component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
