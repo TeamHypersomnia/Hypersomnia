@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "bindings.h"
 
-#include "augs/script.h"
+#include "augs/scripting/script.h"
 
 namespace bindings {
 	luabind::scope _script() {

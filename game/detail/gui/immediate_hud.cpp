@@ -20,8 +20,8 @@
 
 #include "graphics/renderer.h"
 #include "graphics/vertex.h"
-#include "stream.h"
-#include "stlutil.h"
+#include "templates.h"
+#include "templates.h"
 #include "augs/gui/text_drawer.h"
 
 vec2 position_caption_around_a_circle(float radius, vec2 r, float alpha) {
@@ -206,7 +206,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 								new_info.angle = lower_outside + empty_amount / 2;
 							}
 
-							new_info.text = augs::to_wstring(charges);
+							new_info.text = to_wstring(charges);
 							new_info.color = circle_hud.color;
 
 							textual_infos.push_back(new_info);
@@ -222,7 +222,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 
 			int empty_health_amount = (1 - sentience->health.ratio()) * 90;
 
-			textual_infos.push_back({ starting_health_angle + 90 - empty_health_amount/2, augs::to_wstring(int(sentience->health.value)), health_col });
+			textual_infos.push_back({ starting_health_angle + 90 - empty_health_amount/2, to_wstring(int(sentience->health.value)), health_col });
 			textual_infos.push_back({ starting_health_angle, description_of_entity(v).name, health_col });
 
 			for (auto& in : textual_infos) {
@@ -269,7 +269,7 @@ void immediate_hud::acquire_game_events(augs::world& w) {
 		else
 			continue;
 
-		vn.text.set_text(augs::gui::text::format(augs::to_wstring(std::abs(int(vn.value))), augs::gui::text::style(assets::GUI_FONT, col)));
+		vn.text.set_text(augs::gui::text::format(to_wstring(std::abs(int(vn.value))), augs::gui::text::style(assets::GUI_FONT, col)));
 		vn.transform.pos = h.point_of_impact;
 
 		recent_vertically_flying_numbers.push_back(vn);

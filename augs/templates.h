@@ -1,0 +1,136 @@
+#pragma once
+#include <string>
+#include <sstream>
+#include <fstream>
+#include <vector>
+#include <iomanip>
+
+template <class T, class Tuple>
+struct index_in_tuple;
+
+template <class T, class... Types>
+struct index_in_tuple<T, std::tuple<T, Types...>> {
+	static const std::size_t value = 0;
+};
+
+template <class T, class U, class... Types>
+struct index_in_tuple<T, std::tuple<U, Types...>> {
+	static const std::size_t value = 1 + index_in_tuple<T, std::tuple<Types...>>::value;
+};
+
+template<class T, class L>
+void erase_remove(std::vector<T>& v, const L& l) {
+	v.erase(std::remove_if(v.begin(), v.end(), l), v.end());
+}
+
+template<class It> It uniquify(It begin, It const end) {
+	struct target_less {
+		template<class It>
+		bool operator()(It const &a, It const &b) const { return *a < *b; }
+	};
+
+	struct target_equal {
+		template<class It>
+		bool operator()(It const &a, It const &b) const { return *a == *b; }
+	};
+
+	std::vector<It> v;
+	v.reserve(static_cast<size_t>(std::distance(begin, end)));
+	for (It i = begin; i != end; ++i)
+	{
+		v.push_back(i);
+	}
+	std::sort(v.begin(), v.end(), target_less());
+	v.erase(std::unique(v.begin(), v.end(), target_equal()), v.end());
+	std::sort(v.begin(), v.end());
+	size_t j = 0;
+	for (It i = begin; i != end && j != v.size(); ++i)
+	{
+		if (i == v[j])
+		{
+			using std::iter_swap; iter_swap(i, begin);
+			++j;
+			++begin;
+		}
+	}
+	return begin;
+}
+
+template <typename T>
+void serialize(std::ofstream& f, const T& t) {
+	f.write((const char*)&t, sizeof(T));
+}
+
+template <typename T>
+void deserialize(std::ifstream& f, T& t) {
+	f.read((char*)&t, sizeof(T));
+}
+
+template <typename T>
+void serialize_vector(std::ofstream& f, const std::vector<T>& t) {
+	size_t size = t.size();
+	f.write((const char*)&size, sizeof(size));
+
+	for (size_t i = 0; i < size; ++i)
+		f.write((const char*)&t[i], sizeof(T));
+}
+
+template <typename T>
+void deserialize_vector(std::ifstream& f, std::vector<T>& t) {
+	size_t size = 0;
+	f.read((char*)&size, sizeof(size));
+
+	for (size_t i = 0; i < size; ++i) {
+		T obj;
+		f.read((char*)&obj, sizeof(T));
+		t.emplace_back(obj);
+	}
+}
+
+/* number to string conversion */
+
+template <class T>
+std::string to_string(T val) {
+	std::ostringstream ss;
+	ss << val;
+	return ss.str();
+}
+
+template <>
+std::string to_string(std::wstring val);
+
+/* number to wide string conversion */
+
+template <class T>
+std::wstring to_wstring(T val, int precision = -1, bool fixed = false) {
+	std::wostringstream ss;
+
+	if (precision > -1) {
+		if (fixed) {
+			ss << std::fixed;
+		}
+
+		ss << std::setprecision(precision);
+	}
+
+	ss << val;
+	return ss.str();
+}
+
+std::wstring to_wstring(std::string val);
+
+template <class T>
+T to_value(std::wstring& s) {
+	std::wistringstream ss(s);
+	T v;
+	ss >> v;
+	return v;
+}
+
+template <class T>
+T to_value(std::string& s) {
+	std::istringstream ss(s);
+	T v;
+	ss >> v;
+	return v;
+}

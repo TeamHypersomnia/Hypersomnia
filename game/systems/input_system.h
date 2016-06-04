@@ -29,8 +29,6 @@ struct input_system : public processing_system_templated<components::input_recei
 
 	void post_all_events_posted_by_drawing_time_systems_since_last_step();
 
-	void replay_drawing_time_events_passed_to_last_logic_step();
-
 	void add_context(context);
 	void clear_contexts();
 
@@ -47,7 +45,7 @@ struct input_system : public processing_system_templated<components::input_recei
 			std::vector<event_type> events;
 
 			void serialize(std::ofstream& f) {
-				augs::serialize_vector(f, events);
+				serialize_vector(f, events);
 			}
 
 			bool should_serialize() {
@@ -55,7 +53,7 @@ struct input_system : public processing_system_templated<components::input_recei
 			}
 
 			void deserialize(std::ifstream& f) {
-				augs::deserialize_vector(f, events);
+				deserialize_vector(f, events);
 			}
 		};
 

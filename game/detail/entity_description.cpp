@@ -10,7 +10,7 @@
 #include "../detail/inventory_slot.h"
 #include "../detail/inventory_slot_id.h"
 #include "log.h"
-#include "stream.h"
+#include "templates.h"
 
 textual_description description_of_entity(augs::entity_id id) {
 	auto& name = id->get<components::name>();

@@ -7,7 +7,7 @@
 #include "entity_system/entity_id.h"
 #include "game/detail/ai/goals.h"
 
-#include "augs/stlutil.h"
+#include "augs/templates.h"
 #include "ensure.h"
 
 namespace resources {

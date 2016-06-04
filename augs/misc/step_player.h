@@ -2,7 +2,7 @@
 
 #include <fstream>
 
-#include "stream.h"
+#include "templates.h"
 
 namespace augs {
 	template <typename entry_internal_type>

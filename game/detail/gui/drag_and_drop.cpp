@@ -7,7 +7,7 @@
 #include "../inventory_utils.h"
 #include "entity_system/entity.h"
 #include "ensure.h"
-#include "stream.h"
+#include "templates.h"
 
 bool drag_and_drop_result::will_drop_be_successful() {
 	return result.result >= item_transfer_result_type::SUCCESSFUL_TRANSFER;
@@ -92,7 +92,7 @@ drag_and_drop_result game_gui_world::prepare_drag_and_drop_result() {
 						if (simulated_request.specified_quantity == out.result.transferred_charges)
 							charges_text = L" all";
 						else
-							charges_text = L" " + augs::to_wstring(out.result.transferred_charges);
+							charges_text = L" " + to_wstring(out.result.transferred_charges);
 					}
 
 					if (target_special) {

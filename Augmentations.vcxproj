@@ -361,7 +361,7 @@
     <ClCompile Include="augs\misc\performance_timer.cpp" />
     <ClCompile Include="augs\misc\recoil_player.cpp" />
     <ClCompile Include="augs\misc\typesafe_sprintf.cpp" />
-    <ClCompile Include="augs\stream.cpp" />
+    <ClCompile Include="augs\templates.cpp" />
     <ClCompile Include="augs\texture_baker\polygonize_sprite.cpp" />
     <ClCompile Include="augs\window_framework\colored_print.cpp" />
     <ClCompile Include="game\bindings\file_watcher_binding.cpp" />
@@ -523,7 +523,7 @@
     <ClCompile Include="augs\gui\text_drawer.cpp" />
     <ClCompile Include="augs\gui\text\ui.cpp" />
     <ClCompile Include="augs\gui\text\word_separator.cpp" />
-    <ClCompile Include="augs\lua_state_wrapper.cpp" />
+    <ClCompile Include="augs\scripting\lua_state_wrapper.cpp" />
     <ClCompile Include="augs\math\rects.cpp" />
     <ClCompile Include="augs\math\vec2.cpp" />
     <ClCompile Include="augs\misc\file_watcher.cpp" />
@@ -540,7 +540,7 @@
     <ClCompile Include="augs\network\network_interface.cpp" />
     <ClCompile Include="augs\network\reliable_channel.cpp" />
     <ClCompile Include="augs\log.cpp" />
-    <ClCompile Include="augs\script.cpp" />
+    <ClCompile Include="augs\scripting\script.cpp" />
     <ClCompile Include="augs\texture_baker\font.cpp" />
     <ClCompile Include="augs\texture_baker\image.cpp" />
     <ClCompile Include="augs\texture_baker\lodepng.cpp" />
@@ -1002,8 +1002,7 @@
     <ClInclude Include="augs\misc\performance_timer.h" />
     <ClInclude Include="augs\misc\recoil_player.h" />
     <ClInclude Include="augs\misc\typesafe_sprintf.h" />
-    <ClInclude Include="augs\stlutil.h" />
-    <ClInclude Include="augs\stream.h" />
+    <ClInclude Include="augs\templates.h" />
     <ClInclude Include="augs\window_framework\colored_print.h" />
     <ClInclude Include="game\all_component_includes.h" />
     <ClInclude Include="game\all_message_includes.h" />
@@ -1207,7 +1206,7 @@
     <ClInclude Include="augs\gui\text\printer.h" />
     <ClInclude Include="augs\gui\text\ui.h" />
     <ClInclude Include="augs\gui\text\word_separator.h" />
-    <ClInclude Include="augs\lua_state_wrapper.h" />
+    <ClInclude Include="augs\scripting\lua_state_wrapper.h" />
     <ClInclude Include="augs\math\matrix.h" />
     <ClInclude Include="augs\math\rects.h" />
     <ClInclude Include="augs\math\vec2.h" />
@@ -1237,7 +1236,7 @@
     <ClInclude Include="augs\network\reliable_channel.h" />
     <ClInclude Include="augs\network\reliable_channel_tests.h" />
     <ClInclude Include="augs\log.h" />
-    <ClInclude Include="augs\script.h" />
+    <ClInclude Include="augs\scripting\script.h" />
     <ClInclude Include="augs\texture_baker\font.h" />
     <ClInclude Include="augs\texture_baker\image.h" />
     <ClInclude Include="augs\texture_baker\lodepng.h" />

@@ -7,7 +7,7 @@
 #include "game/detail/inventory_utils.h"
 #include "game/components/gui_element_component.h"
 
-#include "augs/stream.h"
+#include "augs/templates.h"
 #include "pixel_line_connector.h"
 
 #include "grid.h"
@@ -82,7 +82,7 @@ void slot_button::draw_triangles(draw_info info) {
 		draw_centered_texture(info, inside_mat);
 		draw_centered_texture(info, border_mat);
 
-		auto space_available_text = augs::gui::text::format(augs::to_wstring(slot_id.calculate_free_space_with_parent_containers() / long double(SPACE_ATOMS_PER_UNIT), 2, true)
+		auto space_available_text = augs::gui::text::format(to_wstring(slot_id.calculate_free_space_with_parent_containers() / long double(SPACE_ATOMS_PER_UNIT), 2, true)
 			, augs::gui::text::style(assets::font_id::GUI_FONT, border_col));
 
 		space_caption.set_text(space_available_text);

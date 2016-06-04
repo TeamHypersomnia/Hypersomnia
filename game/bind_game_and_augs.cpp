@@ -5,11 +5,11 @@
 #include "misc/vector_wrapper.h"
 
 #include "bind_game_and_augs.h"
-#include "augs/script.h"
+#include "augs/scripting/script.h"
 #include "components/physics_component.h"
 
 #include "entity_system/entity_id.h"
-#include "augs/lua_state_wrapper.h"
+#include "augs/scripting/lua_state_wrapper.h"
 
 int bitflag(lua_State* L) {
 	int result = 1 << luabind::object_cast<int>(luabind::object(luabind::from_stack(L, 1)));

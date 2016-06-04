@@ -2,7 +2,7 @@
 #include "augs/error/augs_error.h"
 
 #include "window.h"
-#include "../stream.h"
+#include "../templates.h"
 #include <algorithm>
 #include <Shlwapi.h>
 #include "log.h"

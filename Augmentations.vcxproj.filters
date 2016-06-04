@@ -924,9 +924,6 @@
     <ClCompile Include="augs\gui\text\word_separator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="augs\lua_state_wrapper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="augs\math\rects.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -970,9 +967,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="augs\network\reliable_channel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="augs\script.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="augs\texture_baker\font.cpp">
@@ -1146,9 +1140,6 @@
     <ClCompile Include="game\systems\particles_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="augs\stream.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\resources\particle_effect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1261,6 +1252,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="augs\filesystem\file.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\scripting\lua_state_wrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\scripting\script.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\templates.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2831,9 +2831,6 @@
     <ClInclude Include="augs\gui\text\word_separator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\lua_state_wrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\math\matrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2918,9 +2915,6 @@
     <ClInclude Include="augs\network\reliable_channel_tests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\script.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\texture_baker\font.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2946,9 +2940,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\log.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\stream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\constant_size_vector.h">
@@ -3227,9 +3218,6 @@
     <ClInclude Include="augs\gui\text_drawer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\stlutil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\resources\behaviour_tree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3348,6 +3336,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\filesystem\file.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\scripting\lua_state_wrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\scripting\script.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\templates.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

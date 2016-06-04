@@ -3,7 +3,7 @@
 #include "entity_system/world.h"
 #include "game/components/item_component.h"
 
-#include "stream.h"
+#include "templates.h"
 #include "ensure.h"
 
 augs::entity_id get_owning_transfer_capability(augs::entity_id entity) {
@@ -266,7 +266,7 @@ std::wstring format_space_units(unsigned u) {
 	if (!u)
 		return L"0";
 
-	return augs::to_wstring(u / long double(SPACE_ATOMS_PER_UNIT), 2);
+	return to_wstring(u / long double(SPACE_ATOMS_PER_UNIT), 2);
 }
 
 void drop_from_all_slots(augs::entity_id c) {

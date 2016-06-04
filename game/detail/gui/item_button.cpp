@@ -4,7 +4,7 @@
 
 #include "entity_system/world.h"
 #include "augs/graphics/renderer.h"
-#include "augs/stream.h"
+#include "augs/templates.h"
 
 #include "gui/stroke.h"
 
@@ -236,10 +236,10 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 				if (printing_charge_count) {
 					//label_wstr = L'x';
 					label_color.rgb() = white.rgb();
-					label_wstr += augs::to_wstring(bottom_number_val);
+					label_wstr += to_wstring(bottom_number_val);
 				}
 				else
-					label_wstr = augs::to_wstring(bottom_number_val, 2);
+					label_wstr = to_wstring(bottom_number_val, 2);
 
 				if (trim_zero && label_wstr[0] == L'0') {
 					label_wstr.erase(label_wstr.begin());

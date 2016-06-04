@@ -3,7 +3,7 @@
 #include <signal.h>
 
 #include "window_framework/window.h"
-#include "script.h"
+#include "scripting/script.h"
 
 #include "game/bind_game_and_augs.h"
 #include "game/messages/raw_window_input_message.h"

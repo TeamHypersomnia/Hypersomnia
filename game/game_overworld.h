@@ -1,6 +1,6 @@
 #pragma once
 #include "game_world.h"
-#include "augs/lua_state_wrapper.h"
+#include "augs/scripting/lua_state_wrapper.h"
 
 #include "augs/entity_system/overworld.h"
 

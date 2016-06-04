@@ -6,7 +6,7 @@
 
 #include "input_system.h"
 
-#include "augs/stream.h"
+#include "augs/templates.h"
 
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
