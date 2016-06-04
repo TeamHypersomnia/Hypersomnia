@@ -2,7 +2,7 @@
 #include "all.h"
 #include "game/resources/manager.h"
 #include "game/resources/particle_effect.h"
-#include "game/assets/particle_effect.h"
+#include "game/assets/particle_effect_id.h"
 #include "graphics/shader.h"
 
 namespace resource_setups {

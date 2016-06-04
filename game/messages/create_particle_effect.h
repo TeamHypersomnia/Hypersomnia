@@ -4,7 +4,7 @@
 
 #include "entity_system/entity.h"
 #include "../components/transform_component.h"
-#include "../assets/particle_effect.h"
+#include "../assets/particle_effect_id.h"
 
 namespace messages {
 	struct create_particle_effect : public message {

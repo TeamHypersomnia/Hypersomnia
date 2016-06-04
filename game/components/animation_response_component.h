@@ -1,5 +1,5 @@
 #pragma once
-#include "../assets/animation_response.h"
+#include "../assets/animation_response_id.h"
 
 namespace components {
 	struct animation_response {

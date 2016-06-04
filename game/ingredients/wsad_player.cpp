@@ -21,7 +21,7 @@
 #include "game/components/sentience_component.h"
 #include "game/components/particle_effect_response_component.h"
 #include "game/components/attitude_component.h"
-#include "game/assets/particle_effect_response.h"
+#include "game/assets/particle_effect_response_id.h"
 
 #include "game/globals/filters.h"
 #include "game/settings.h"

@@ -5,8 +5,8 @@
 #include "window_framework/window.h"
 
 #include "game/resources/manager.h"
-#include "game/assets/texture.h"
-#include "game/assets/atlas.h"
+#include "game/assets/texture_id.h"
+#include "game/assets/atlas_id.h"
 
 #include "game/systems/input_system.h"
 #include "game/systems/render_system.h"

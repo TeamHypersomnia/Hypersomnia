@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_map>
-#include "../assets/animation.h"
+#include "../assets/animation_id.h"
 #include "../globals/animations.h"
 
 namespace resources {

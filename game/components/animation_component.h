@@ -5,7 +5,7 @@
 #include "misc/map_wrapper.h"
 
 #include "../resources/animation.h"
-#include "../assets/animation.h"
+#include "../assets/animation_id.h"
 
 namespace components {
 	struct animation {

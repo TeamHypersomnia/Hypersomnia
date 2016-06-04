@@ -2,8 +2,8 @@
 #include "entity_system/world.h"
 #include "entity_system/entity.h"
 
-#include "game/assets/particle_effect.h"
-#include "game/assets/particle_effect_response.h"
+#include "game/assets/particle_effect_id.h"
+#include "game/assets/particle_effect_response_id.h"
 
 #include "game/components/damage_component.h"
 #include "game/components/item_component.h"

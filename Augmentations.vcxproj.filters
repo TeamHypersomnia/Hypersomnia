@@ -2663,28 +2663,10 @@
     <ClInclude Include="game\resources\manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\assets\texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\assets\atlas.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\assets\animation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\bindings\bindings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\bindings\bind_callbacks.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\assets\shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\assets\program.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\assets\callback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\scene_builders\scene_builder.h">
@@ -2703,9 +2685,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\messages\animation_message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\assets\animation_response.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\resources\animation_response.h">
@@ -2733,9 +2712,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\messages\camera_render_request_message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\assets\font.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\resources\texture_with_image.h">
@@ -3224,12 +3200,6 @@
     <ClInclude Include="game\resources\particle_effect_response.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\assets\particle_effect.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\assets\particle_effect_response.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\systems\particles_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3281,9 +3251,6 @@
     <ClInclude Include="game\resources\behaviour_tree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\assets\behaviour_tree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\detail\entity_scripts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3306,6 +3273,36 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\detail\position_scripts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\assets\texture_id.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\assets\shader_id.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\assets\program_id.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\assets\particle_effect_response_id.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\assets\particle_effect_id.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\assets\font_id.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\assets\behaviour_tree_id.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\assets\atlas_id.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\assets\animation_response_id.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\assets\animation_id.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

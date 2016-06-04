@@ -6,7 +6,7 @@
 #include "misc/timer.h"
 
 #include "game/resources/behaviour_tree.h"
-#include "game/assets/behaviour_tree.h"
+#include "game/assets/behaviour_tree_id.h"
 
 namespace components {
 	struct behaviour_tree {

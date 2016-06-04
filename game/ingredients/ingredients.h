@@ -2,7 +2,7 @@
 #include "augs/entity_system/entity_id.h"
 #include "math/vec2.h"
 
-#include "game/assets/texture.h"
+#include "game/assets/texture_id.h"
 #include "game/components/render_component.h"
 #include "graphics/pixel.h"
 

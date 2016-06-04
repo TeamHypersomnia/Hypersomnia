@@ -3,7 +3,7 @@
 #include "math/rects.h"
 
 #include "graphics/pixel.h"
-#include "../assets/texture.h"
+#include "../assets/texture_id.h"
 #include "transform_component.h"
 
 namespace shared {
