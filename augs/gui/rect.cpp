@@ -146,7 +146,7 @@ namespace augs {
 			auto& sys = e.owner;
 			auto& wnd = sys.state;
 			if (e == gui_event::wheel) {
-				if (window::glwindow::get_current()->events.keys[augs::window::event::keys::SHIFT]) {
+				if (wnd.keys[augs::window::event::keys::SHIFT]) {
 					int temp(int(scroll.x));
 					if (scrollable) {
 						scroll.x -= wnd.mouse.scroll;

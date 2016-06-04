@@ -54,7 +54,7 @@ void game_overworld::call_window_script(std::string filename) {
 		lua.debug_response();
 	}
 
-	game_window.initial_gl_calls();
+	game_window.gl.initialize();
 }
 
 void game_overworld::set_scene_builder(std::unique_ptr<scene_builder> builder) {

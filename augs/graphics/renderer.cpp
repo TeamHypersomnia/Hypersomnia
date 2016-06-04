@@ -18,7 +18,7 @@
 
 namespace augs {
 	renderer& renderer::get_current() {
-		return window::glwindow::get_current()->glrenderer;
+		return window::glwindow::get_current()->gl;
 	}
 
 	void renderer::initialize() {

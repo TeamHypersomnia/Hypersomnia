@@ -300,10 +300,6 @@ namespace augs {
 			return f != 0;
 		}
 
-		void glwindow::initial_gl_calls() {
-			glrenderer.initialize();
-		}
-
 		bool glwindow::swap_buffers() {
 			if(this != context) set_as_current();
 			return err(SwapBuffers(hdc)) != FALSE;

@@ -236,7 +236,7 @@ namespace augs {
 			}
 
 			void property_textbox::on_character(wchar_t c) {
-				if (!augs::window::is_newline(c)) textbox::on_character(c);
+				if (!augs::window::is_character_newline(c)) textbox::on_character(c);
 			}
 		}
 	}

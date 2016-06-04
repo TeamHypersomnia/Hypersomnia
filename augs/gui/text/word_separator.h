@@ -9,7 +9,7 @@ namespace augs {
 				static bool default_is_newline(wchar_t);
 
 				int(*word_type)(wchar_t);
-				bool(*is_newline)(wchar_t);
+				bool(*is_character_newline)(wchar_t);
 
 				word_separator(int(*is_word)(wchar_t) = 0); /* 0 - default comparator */
 

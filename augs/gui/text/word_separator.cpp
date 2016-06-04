@@ -17,7 +17,7 @@ namespace augs {
 
 			void word_separator::set_default() {
 				word_type = default_word_type;
-				is_newline = default_is_newline;
+				is_character_newline = default_is_newline;
 			}
 
 			word_separator::word_separator(int(*word_type)(wchar_t)) : word_type(word_type) {
@@ -58,7 +58,7 @@ namespace augs {
 
 				unsigned offset = 0;
 				while (at > max_left) {
-					if (!is_newline(_str[at ? at - 1 : 0].c) && word_type(_str[at ? at - 1 : 0].c) == wordtype) {
+					if (!is_character_newline(_str[at ? at - 1 : 0].c) && word_type(_str[at ? at - 1 : 0].c) == wordtype) {
 						++offset;
 						--at;
 					}
@@ -74,7 +74,7 @@ namespace augs {
 
 				unsigned offset = 0;
 				while (at < max_right) {
-					if (!is_newline(_str[at].c) && word_type(_str[at].c) == wordtype) {
+					if (!is_character_newline(_str[at].c) && word_type(_str[at].c) == wordtype) {
 						++offset;
 						++at;
 					}

@@ -26,7 +26,7 @@ namespace augs {
 			}
 		}
 
-		bool is_newline(unsigned i) {
+		bool is_character_newline(unsigned i) {
 			return (i == 0x000A || i == 0x000D);
 		}
 
@@ -49,7 +49,7 @@ namespace augs {
 
 						for (size_t i = 0; i < len; ++i) {
 							result += p[i];
-							if (is_newline(p[i]) && i < len - 1 && is_newline(p[i + 1])) ++i;
+							if (is_character_newline(p[i]) && i < len - 1 && is_character_newline(p[i + 1])) ++i;
 						}
 					}
 					GlobalUnlock(clip0);
@@ -98,19 +98,6 @@ namespace augs {
 			static RECT rc;
 			GetWindowRect(GetDesktopWindow(), &rc);
 			return rects::xywh<int>(rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top);
-		}
-
-		int get_refresh_rate() {
-			DEVMODE lpDevMode;
-			memset(&lpDevMode, 0, sizeof(DEVMODE));
-			lpDevMode.dmSize = sizeof(DEVMODE);
-			lpDevMode.dmDriverExtra = 0;
-
-			return EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &lpDevMode) ? lpDevMode.dmDisplayFrequency : -1;
-		}
-
-		void warp_cursor(int x, int y) {
-			SetCursorPos(x, y);
 		}
 
 		void set_cursor_visible(int flag) {

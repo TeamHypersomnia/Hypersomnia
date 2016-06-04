@@ -92,7 +92,7 @@ namespace augs {
 					--caret.pos;
 					if (s) ++caret.selection_offset;
 
-					//if(separator.is_newline(get_str()[caret.pos].c)) --caret.line;
+					//if(separator.is_character_newline(get_str()[caret.pos].c)) --caret.line;
 					anchor();
 				}
 				unbind_styles();
@@ -108,7 +108,7 @@ namespace augs {
 					++caret.pos;
 					if (s) --caret.selection_offset;
 
-					//if(separator.is_newline(get_str()[caret.pos-1].c)) ++caret.line;
+					//if(separator.is_character_newline(get_str()[caret.pos-1].c)) ++caret.line;
 					anchor();
 				}
 				unbind_styles();
@@ -291,7 +291,7 @@ namespace augs {
 				int left = 0, right = 0;
 				auto chr = get_str()[std::min(at, get_str().length() - 1)].c;
 
-				if (at >= get_str().length() || separator.is_newline(chr))
+				if (at >= get_str().length() || separator.is_character_newline(chr))
 					left = separator.get_left_word(get_str(), at);
 				else {
 					int type = separator.word_type(chr);
@@ -439,7 +439,7 @@ namespace augs {
 			}
 
 			bool ui::action::include(const action& next) {
-				if ((flag == CHARACTERS || flag == REPLACE_CHARACTERS) && next.flag == CHARACTERS && !subject->separator.is_newline(next.character.c)
+				if ((flag == CHARACTERS || flag == REPLACE_CHARACTERS) && next.flag == CHARACTERS && !subject->separator.is_character_newline(next.character.c)
 					&& next.where == where + _str.length() + 1 /* we don't want to merge characters at different positions */
 					) {
 					_str += next.character;

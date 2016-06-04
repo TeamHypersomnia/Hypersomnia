@@ -208,7 +208,7 @@ namespace augs {
 
 					/* if we have just encountered a newline character or there is need to wrap, we have to break the current line and
 					create another */
-					if (augs::window::is_newline(source[i].c) || wrap) {
+					if (augs::window::is_character_newline(source[i].c) || wrap) {
 						/* take care of the current line */
 						lines[l].wrapped = wrap;
 						/* this will be moved left if we're wrapping */
