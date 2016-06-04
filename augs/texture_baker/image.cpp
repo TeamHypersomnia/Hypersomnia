@@ -1,16 +1,9 @@
 #pragma once
-#include <Windows.h>
-#include <gdiplus.h>
-#include <memory>
-
 #include "image.h"
 #include "lodepng.h"
-
 #include "ensure.h"
 
 namespace augs {
-	using namespace Gdiplus;
-
 	image::image() : size(0, 0), channels(0) {}
 
 	image::image(const image& img) {
@@ -35,7 +28,7 @@ namespace augs {
 		image new_surface;
 		auto& surface = v.empty() ? *this : new_surface;
 		
-		surface.create(max(size.w, side), max(size.h, side), 4);
+		surface.create(std::max(size.w, side), std::max(size.h, side), 4);
 
 		ensure(size.w >= side);
 		ensure(size.h >= side);
@@ -227,32 +220,6 @@ namespace augs {
 
 		if (lodepng::encode(lodepngfname, v, size.w, size.h))
 			ensure(0);
-	}
-
-	bool image::from_clipboard() {
-		using namespace Gdiplus;
-
-		bool ret = false;
-		if (OpenClipboard(0)) {
-			HBITMAP h = (HBITMAP)GetClipboardData(CF_BITMAP);
-			if (h) {
-				Bitmap b(h, 0);
-				BitmapData bi = { 0 };
-				b.LockBits(&Rect(0, 0, b.GetWidth(), b.GetHeight()), ImageLockModeRead, PixelFormat24bppRGB, &bi);
-				create(b.GetWidth(), b.GetHeight(), 3);
-
-				for (unsigned i = 0; i < bi.Height; ++i)
-					for (unsigned j = 0; j < bi.Width; ++j) {
-						*ptr(j, i, 0) = ((unsigned char*)bi.Scan0)[i*bi.Stride + j * 3 + 2];
-						*ptr(j, i, 1) = ((unsigned char*)bi.Scan0)[i*bi.Stride + j * 3 + 1];
-						*ptr(j, i, 2) = ((unsigned char*)bi.Scan0)[i*bi.Stride + j * 3 + 0];
-					}
-
-				DeleteObject(h);
-			}
-			CloseClipboard();
-		}
-		return ret;
 	}
 
 	void image::fill(unsigned char val) {

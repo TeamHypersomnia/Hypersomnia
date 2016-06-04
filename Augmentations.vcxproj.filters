@@ -837,9 +837,6 @@
     <ClCompile Include="game\bind_game_and_augs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="augs\augmentations.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="augs\entity_system\entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1261,6 +1258,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="augs\misc\typesafe_sprintf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\global_libraries.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2735,9 +2735,6 @@
     <ClInclude Include="game\bind_game_and_augs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\augmentations.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\dirent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3345,6 +3342,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\build_settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\global_libraries.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

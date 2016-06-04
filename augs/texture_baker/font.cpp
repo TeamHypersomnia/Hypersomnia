@@ -5,7 +5,7 @@
 #include <freetype\ft2build.h> 
 #include FT_FREETYPE_H
 
-#include "../augmentations.h"
+#include "../global_libraries.h"
 #include "augs/error/augs_error.h"
 
 namespace augs {
@@ -40,7 +40,7 @@ namespace augs {
 	bool font::open(const char* filename, unsigned _pt, const charset& ranges) {
 		pt = _pt;
 		FT_Face face;
-		int f = 1, error = FT_New_Face(*freetype_library.get(), filename, 0, &face);
+		int f = 1, error = FT_New_Face(*global_libraries::freetype_library.get(), filename, 0, &face);
 
 		errsf(error != FT_Err_Unknown_File_Format, L"font format unsupported", f);
 		errsf(!error, L"coulnd't open font file", f);

@@ -1,37 +1,31 @@
 #include <Windows.h>
-#include <gdiplus.h>
 
 #include <GL/OpenGL.h>
 
 #include <freetype\ft2build.h>
 #include FT_FREETYPE_H
 
-#include "augmentations.h"
+#include "global_libraries.h"
 #include "window_framework\window.h"
 
 #include <gtest/gtest.h>
 #include "error/augs_error.h"
 #include "log.h"
+#include "ensure.h"
 
 namespace augs {
-	Gdiplus::GdiplusStartupInput gdi;
-	ULONG_PTR           gdit;
-	WNDCLASSEX wcl = {0};
-	HINSTANCE hinst;
-	unsigned initialized = 0;
-	std::unique_ptr<FT_Library> freetype_library(new FT_Library);
-
 	namespace window {
 		extern LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
 	};
 
-	void init(unsigned to_initialize) {
-		if(to_initialize & GDIPLUS) 
-			errs(Gdiplus::GdiplusStartup(&gdit, &gdi, nullptr) == Gdiplus::Status::Ok, L"Failed to initialize GDI+!");
+	unsigned global_libraries::initialized = 0;
+	std::unique_ptr<FT_Library> global_libraries::freetype_library(new FT_Library);
+
+	void global_libraries::init(unsigned to_initialize) {
 		if(to_initialize & FREETYPE)
 			errs(!FT_Init_FreeType(freetype_library.get()), "freetype initialization");
 		if(to_initialize & WINDOWS_API) {
-			hinst = GetModuleHandle(NULL);
+			WNDCLASSEX wcl = { 0 };
 			wcl.cbSize = sizeof(wcl);
 			wcl.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
 			wcl.lpfnWndProc = window::wndproc;
@@ -59,22 +53,23 @@ namespace augs {
 		initialized |= to_initialize;
 	}
 
-	void run_tests() {
+	void global_libraries::deinit(unsigned which_augs) {
+		if (which_augs & GLEW) {
+
+		}
+		if (which_augs & FREETYPE) {
+			ensure(initialized & FREETYPE);
+			errs(!FT_Done_FreeType(*freetype_library.get()), "freetype deinitialization");
+			initialized &= ~FREETYPE;
+		}
+	}
+
+	void global_libraries::run_googletest() {
 		int argc = 0;
 		::testing::InitGoogleTest(&argc, (wchar_t**)nullptr);
 
 		::testing::FLAGS_gtest_catch_exceptions = false;
 		::testing::FLAGS_gtest_break_on_failure = false;
 		auto result = RUN_ALL_TESTS();
-	}
-
-	void deinit() {
-		if(initialized & GDIPLUS) 
-			Gdiplus::GdiplusShutdown(gdit);
-		if(initialized & GLEW) {
-		
-		}
-		if(initialized & FREETYPE) 
-			errs(!FT_Done_FreeType(*freetype_library.get()), "freetype deinitialization");
 	}
 };
