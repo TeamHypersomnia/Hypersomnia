@@ -1,27 +1,27 @@
 #pragma once
-#include "../assets/texture_id.h"
-#include "../assets/atlas_id.h"
-#include "../assets/shader_id.h"
-#include "../assets/program_id.h"
-#include "../assets/font_id.h"
-#include "../assets/animation_id.h"
-#include "../assets/animation_response_id.h"
-#include "../assets/particle_effect_id.h"
-#include "../assets/particle_effect_response_id.h"
-#include "../assets/behaviour_tree_id.h"
+#include <unordered_map>
 
-#include "../resources/animation.h"
-#include "../resources/animation_response.h"
-#include "../resources/texture_with_image.h"
-#include "../resources/particle_effect.h"
-#include "../resources/particle_effect_response.h"
-#include "../resources/behaviour_tree.h"
+#include "game/assets/texture_id.h"
+#include "game/assets/atlas_id.h"
+#include "game/assets/shader_id.h"
+#include "game/assets/program_id.h"
+#include "game/assets/font_id.h"
+#include "game/assets/animation_id.h"
+#include "game/assets/animation_response_id.h"
+#include "game/assets/particle_effect_id.h"
+#include "game/assets/particle_effect_response_id.h"
+#include "game/assets/behaviour_tree_id.h"
+
+#include "game/resources/animation.h"
+#include "game/resources/animation_response.h"
+#include "game/resources/texture_with_image.h"
+#include "game/resources/particle_effect.h"
+#include "game/resources/particle_effect_response.h"
+#include "game/resources/behaviour_tree.h"
 
 #include "texture_baker/texture_baker.h"
 #include "texture_baker/font.h"
 #include "graphics/shader.h"
-
-#include <unordered_map>
 
 namespace resources {
 	class manager {

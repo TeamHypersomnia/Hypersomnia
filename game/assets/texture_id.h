@@ -1,11 +1,4 @@
 #pragma once
-
-//#include "asset.h"
-//
-namespace augs {
-	class texture;
-}
-
 #include "math/vec2.h"
 
 namespace assets {
@@ -88,6 +81,10 @@ namespace assets {
 	};
 	
 	vec2i get_size(texture_id);
+}
+
+namespace augs {
+	class texture;
 }
 
 augs::texture& operator*(const assets::texture_id& id);
