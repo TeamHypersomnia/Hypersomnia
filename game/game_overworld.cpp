@@ -22,7 +22,7 @@ using namespace std;
 using namespace augs;
 
 void SignalHandler(int signal) { 
-	ClipCursor(NULL);
+	window::disable_cursor_clipping();
 	throw "Access violation!"; 
 }
 

@@ -99,9 +99,6 @@ namespace augs {
 				 current(),
 				 vsync(int);
 
-#ifdef INCLUDE_DWM
-			bool transparency(bool);
-#endif
 			void initial_gl_calls();
 
 			bool poll_event(event::message& out);
@@ -150,5 +147,7 @@ namespace augs {
 		extern std::wstring get_executable_path();
 		extern std::string remove_filename_from_path(std::string input_path);
 
+		extern void enable_cursor_clipping(rects::ltrb<int>);
+		extern void disable_cursor_clipping();
 	}
 }

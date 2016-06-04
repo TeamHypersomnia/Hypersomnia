@@ -334,17 +334,6 @@ namespace augs {
 			return ret;
 		}
 		
-#ifdef INCLUDE_DWM
-		bool glwindow::transparency(bool f) {
-			transparent = f;
-			DWM_BLURBEHIND bb = {0};
-			bb.dwFlags = DWM_BB_ENABLE;
-			bb.fEnable = f;
-			bb.hRgnBlur = NULL;
-			return err(DwmEnableBlurBehindWindow(hwnd, &bb) == S_OK);
-		}
-#endif
-
 		bool glwindow::poll_event(event::message& out) {
 			if(PeekMessageW(&wmsg, hwnd, 0, 0, PM_REMOVE)) {
 				 //DispatchMessage(&wmsg); 
@@ -374,17 +363,10 @@ namespace augs {
 					output.push_back(state);
 			}
 			
-			if (GetFocus() == hwnd) {
-				static thread_local RECT r;
-				rects::ltrb<int> lt = get_window_rect();
-				r.bottom = lt.b;
-				r.left = lt.l;
-				r.right = lt.r;
-				r.top = lt.t;
-				ClipCursor(&r);
-			}
+			if (GetFocus() == hwnd)
+				enable_cursor_clipping(get_window_rect());
 			else
-				ClipCursor(NULL);
+				disable_cursor_clipping();
 			
 			return output;
 		}
@@ -634,5 +616,17 @@ namespace augs {
 			return std::string(wpath.begin(), wpath.end()) + "\\";
 		}
 
+		void enable_cursor_clipping(rects::ltrb<int> lt) {
+			static thread_local RECT r;
+			r.bottom = lt.b;
+			r.left = lt.l;
+			r.right = lt.r;
+			r.top = lt.t;
+			ClipCursor(&r);
+		}
+
+		void disable_cursor_clipping() {
+			ClipCursor(NULL);
+		}
 	}
 }

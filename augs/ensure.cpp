@@ -1,7 +1,7 @@
 #include "ensure.h"
-#include <Windows.h>
+#include "augs/window_framework/window.h"
 
 void cleanup_proc() {
-	ClipCursor(NULL);
+	augs::window::disable_cursor_clipping();
 	__debugbreak();
 }
