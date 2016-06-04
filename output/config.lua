@@ -1,7 +1,7 @@
 config_table = {
 	window_name = "example",
 	fullscreen = 0,
-	window_border = 1,
+	window_border = 0,
 	window_x = 0,
 	window_y = 0,
 	bpp = 24,
@@ -35,10 +35,10 @@ if config_table.fullscreen == 1 then
 	set_display(config_table.resolution_w, config_table.resolution_h, 32)
 end
 
-local borders_type = glwindow.ALL_WINDOW_ELEMENTS
+enabled_window_border = 1
 
-if config_table.window_border == 0 or config_table.fullscreen then
-	borders_type = 0
+if config_table.window_border == 0 or config_table.fullscreen == 1 then
+	enabled_window_border = 0
 end
 
 global_gl_window:create(
@@ -46,11 +46,11 @@ global_gl_window:create(
 				config_table.window_y, 
 				config_table.resolution_w, 
 				config_table.resolution_h), 
-	borders_type, 
+	enabled_window_border, 
 	config_table.window_name, 
 	config_table.doublebuffer, 
 	config_table.bpp)
 	
-global_gl_window:vsync(0)
+global_gl_window:set_vsync(0)
 
-global_gl_window:current()
+global_gl_window:set_as_current()
