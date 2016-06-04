@@ -398,6 +398,12 @@
     <ClCompile Include="game\components\tile_layer_component.cpp" />
     <ClCompile Include="game\components\transform_component.cpp" />
     <ClCompile Include="game\detail\ai\behaviours.cpp" />
+    <ClCompile Include="game\detail\ai\behaviours\explore_in_search_for_last_seen_target.cpp" />
+    <ClCompile Include="game\detail\ai\behaviours\immediate_evasion.cpp" />
+    <ClCompile Include="game\detail\ai\behaviours\minimize_recoil_through_movement.cpp" />
+    <ClCompile Include="game\detail\ai\behaviours\navigate_to_last_seen_position_of_target.cpp" />
+    <ClCompile Include="game\detail\ai\behaviours\pull_trigger.cpp" />
+    <ClCompile Include="game\detail\ai\behaviours\target_closest_enemy.cpp" />
     <ClCompile Include="game\detail\entity_scripts.cpp" />
     <ClCompile Include="game\detail\physics_events.cpp" />
     <ClCompile Include="game\detail\physics_friction_fields.cpp" />

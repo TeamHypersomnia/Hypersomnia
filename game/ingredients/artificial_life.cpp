@@ -16,7 +16,7 @@ namespace ingredients {
 
 		pathfinding.mark_touched_as_discovered = true;
 		pathfinding.force_persistent_navpoints = true;
-		pathfinding.enable_backtracking = true;
+		pathfinding.enable_backtracking = false;
 		pathfinding.target_offset = 100;
 		pathfinding.rotate_navpoints = 10;
 		pathfinding.distance_navpoint_hit = 2;
