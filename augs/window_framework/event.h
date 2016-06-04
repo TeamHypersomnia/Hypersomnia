@@ -173,9 +173,6 @@ namespace augs {
 					vec2i pos, rel, ldrag, rdrag;
 					bool state[3] = { false, false, false };
 					int scroll = 0;
-					int get_unit_scroll() {
-						return scroll / WHEEL_DELTA;
-					}
 				} mouse;
 
 				message msg;

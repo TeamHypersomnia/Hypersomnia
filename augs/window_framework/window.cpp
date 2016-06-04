@@ -103,7 +103,7 @@ namespace augs {
 					break;
 
 				case wheel:
-					events.mouse.scroll = GET_WHEEL_DELTA_WPARAM(wParam);
+					events.mouse.scroll = GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
 					break;
 				case ldoubleclick:
 				case ldown:

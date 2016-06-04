@@ -45,7 +45,7 @@ void game_gui_world::consume_raw_input(messages::raw_window_input_message& w) {
 		if (dragged_item) {
 			auto& item = dragged_item->item->get<components::item>();
 
-			auto delta = w.raw_window_input.mouse.get_unit_scroll();
+			auto delta = w.raw_window_input.mouse.scroll;
 
 			dragged_charges += delta;
 
