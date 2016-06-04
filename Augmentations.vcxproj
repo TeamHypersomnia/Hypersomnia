@@ -425,7 +425,6 @@
     <ClCompile Include="game\game_overworld.cpp" />
     <ClCompile Include="game\game_world.cpp" />
     <ClCompile Include="game\globals\filters.cpp" />
-    <ClCompile Include="game\globals\input_profiles.cpp" />
     <ClCompile Include="game\ingredients\backpack.cpp" />
     <ClCompile Include="game\ingredients\box_physics.cpp" />
     <ClCompile Include="game\ingredients\camera.cpp" />
@@ -1079,7 +1078,6 @@
     <ClInclude Include="game\globals\detector_domains.h" />
     <ClInclude Include="game\globals\entity_name.h" />
     <ClInclude Include="game\globals\filters.h" />
-    <ClInclude Include="game\globals\input_profiles.h" />
     <ClInclude Include="game\globals\intents.h" />
     <ClInclude Include="game\globals\inventory.h" />
     <ClInclude Include="game\globals\joints.h" />

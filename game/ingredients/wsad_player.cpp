@@ -24,7 +24,6 @@
 #include "game/assets/particle_effect_response.h"
 
 #include "game/globals/filters.h"
-#include "game/globals/input_profiles.h"
 #include "game/settings.h"
 
 namespace ingredients {
@@ -230,10 +229,10 @@ namespace ingredients {
 			next_character->add(components::gui_element());
 
 		if (next_character->find<components::input_receiver>() == nullptr)
-			next_character->add(input_profiles::character());
+			next_character->add<components::input_receiver>();
 
 		if (crosshair->find<components::input_receiver>() == nullptr)
-			crosshair->add(input_profiles::crosshair());
+			crosshair->add<components::input_receiver>();
 
 		next_character->enable<components::input_receiver>();
 		next_character->enable<components::gui_element>();

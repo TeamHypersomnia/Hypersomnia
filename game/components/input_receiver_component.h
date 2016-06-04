@@ -6,11 +6,7 @@
 
 namespace components {
 	struct input_receiver {
-		augs::sorted_vector<unsigned> intents;
 
-		void add(intent_type _intent) {
-			intents.add(_intent);
-		}
 	};
 }
 

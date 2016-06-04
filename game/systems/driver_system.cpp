@@ -10,8 +10,6 @@
 #include "../components/physics_component.h"
 #include "../components/force_joint_component.h"
 
-#include "../globals/input_profiles.h"
-
 #include "entity_system/world.h"
 
 void driver_system::assign_drivers_from_successful_trigger_hits() {

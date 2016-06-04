@@ -1146,9 +1146,6 @@
     <ClCompile Include="game\globals\filters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\globals\input_profiles.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\ingredients\obstacles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -3186,9 +3183,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\globals\filters.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\globals\input_profiles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\globals\intents.h">

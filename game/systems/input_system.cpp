@@ -137,10 +137,8 @@ void input_system::map_unmapped_intents_to_entities() {
 		entity_mapped_intent.unmapped_intent_message::operator=(unmapped_intent);
 
 		for (auto it = targets.begin(); it != targets.end(); ++it) {
-			//if ((*it)->get<components::input>().intents.find(unmapped_intent.intent)) {
 			entity_mapped_intent.subject = *it;
 			parent_world.post_message(entity_mapped_intent);
-			//}
 		}
 	}
 }

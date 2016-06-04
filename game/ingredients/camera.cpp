@@ -13,9 +13,6 @@ namespace ingredients {
 		components::camera camera;
 		components::position_copying position_copying;
 
-		input.add(intent_type::SWITCH_LOOK);
-		input.add(intent_type::ZOOM_CAMERA);
-
 		camera.enable_smoothing = true;
 		camera.mask = components::render::WORLD;
 		camera.smoothing_average_factor = 0.5;
