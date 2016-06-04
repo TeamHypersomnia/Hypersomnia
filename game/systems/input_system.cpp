@@ -14,7 +14,7 @@
 
 using namespace augs::window;
 
-bool input_system::found_recording() {
+bool input_system::found_recording() const {
 	return augs::file_exists(L"recorded.inputs");
 }
 
@@ -38,7 +38,7 @@ void input_system::record_and_save_this_session() {
 	gui_item_transfer_intent_player.player.record("sessions/" + augs::get_timestamp() + "/gui_transfers.inputs");
 }
 
-bool input_system::is_replaying() {
+bool input_system::is_replaying() const {
 	return unmapped_intent_player.player.is_replaying();
 }
 

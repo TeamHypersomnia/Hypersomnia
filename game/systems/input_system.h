@@ -23,19 +23,6 @@ struct input_system : public processing_system_templated<components::input_recei
 		void map_event_to_intent(window::event::message, intent_type);
 	};
 
-	void post_unmapped_intents_from_raw_window_inputs();
-	void map_unmapped_intents_to_entities();
-	void acquire_new_events_posted_by_drawing_time_systems();
-
-	void post_all_events_posted_by_drawing_time_systems_since_last_step();
-
-	void add_context(context);
-	void clear_contexts();
-
-	std::vector<context> active_contexts;
-
-	input_system::input_system(world& parent_world);
-
 	template <class event_type>
 	struct event_unpacker_and_recorder {
 		world& parent_world;
@@ -94,15 +81,26 @@ struct input_system : public processing_system_templated<components::input_recei
 		}
 	};
 
-
 	event_unpacker_and_recorder<messages::crosshair_intent_message> crosshair_intent_player;
 	event_unpacker_and_recorder<messages::unmapped_intent_message> unmapped_intent_player;
 	event_unpacker_and_recorder<messages::gui_item_transfer_intent> gui_item_transfer_intent_player;
+	
+	std::vector<context> active_contexts;
 
-	bool found_recording();
+	input_system::input_system(world& parent_world);
+
+	void post_unmapped_intents_from_raw_window_inputs();
+	void map_unmapped_intents_to_entities();
+	void acquire_new_events_posted_by_drawing_time_systems();
+
+	void post_all_events_posted_by_drawing_time_systems_since_last_step();
+
+	void add_context(context);
+	void clear_contexts();
 
 	void replay_found_recording();
 	void record_and_save_this_session();
 
-	bool is_replaying();
+	bool found_recording() const;
+	bool is_replaying() const;
 };
