@@ -858,9 +858,6 @@
     <ClCompile Include="augs\entity_system\world.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="augs\error\augs_error.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="augs\file.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -498,7 +498,6 @@
     <ClCompile Include="augs\entity_system\templated_list_to_hash_vector.cpp" />
     <ClCompile Include="augs\entity_system\type_hash_to_index_mapper.cpp" />
     <ClCompile Include="augs\entity_system\world.cpp" />
-    <ClCompile Include="augs\error\augs_error.cpp" />
     <ClCompile Include="augs\file.cpp" />
     <ClCompile Include="augs\graphics\fbo.cpp" />
     <ClCompile Include="augs\graphics\pixel.cpp" />
