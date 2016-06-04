@@ -117,31 +117,31 @@ namespace components {
 		body->ApplyAngularImpulse(imp, true);
 	}
 
-	float physics::get_mass() {
+	float physics::get_mass() const {
 		return body->GetMass();
 	}
 
-	float physics::get_angle() {
+	float physics::get_angle() const {
 		return body->GetAngle() * RAD_TO_DEG;
 	}
 
-	vec2 physics::get_position() {
+	vec2 physics::get_position() const {
 		return METERS_TO_PIXELSf * body->GetPosition();
 	}
 
-	vec2 physics::get_mass_position() {
+	vec2 physics::get_mass_position() const {
 		return METERS_TO_PIXELSf * body->GetWorldCenter();
 	}
 
-	vec2 physics::velocity() {
+	vec2 physics::velocity() const {
 		return vec2(body->GetLinearVelocity()) * METERS_TO_PIXELSf;
 	}
 
-	vec2 physics::get_world_center() {
+	vec2 physics::get_world_center() const {
 		return METERS_TO_PIXELSf * body->GetWorldCenter();
 	}
 
-	vec2 physics::get_aabb_size() {
+	vec2 physics::get_aabb_size() const {
 		b2AABB aabb;
 		aabb.lowerBound.Set(FLT_MAX, FLT_MAX);
 		aabb.upperBound.Set(-FLT_MAX, -FLT_MAX);
@@ -200,7 +200,7 @@ namespace components {
 		fixtures.get_body()->ResetMassData();
 	}
 
-	entity_id physics::get_owner_friction_ground() {
+	entity_id physics::get_owner_friction_ground() const {
 		return owner_friction_ground;
 	}
 

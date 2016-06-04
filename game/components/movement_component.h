@@ -6,9 +6,7 @@ namespace components {
 	struct movement  {
 		struct subscribtion {
 			augs::entity_id target;
-			bool stop_response_at_zero_speed;
-			subscribtion(augs::entity_id target, bool stop_at_zero_movement = true) :
-				target(target), stop_response_at_zero_speed(stop_at_zero_movement) {}
+			bool stop_response_at_zero_speed = false;
 		};
 
 		void add_animation_receiver(augs::entity_id e, bool stop_at_zero_movement);

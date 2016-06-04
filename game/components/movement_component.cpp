@@ -56,7 +56,10 @@ namespace components {
 	}
 
 	void movement::add_animation_receiver(augs::entity_id e, bool stop_at_zero_movement) {
-		response_receivers.push_back(subscribtion(e, stop_at_zero_movement));
+		subscribtion s;
+		s.target = e;
+		s.stop_response_at_zero_speed = stop_at_zero_movement;
+		response_receivers.push_back(s);
 	}
 
 	void movement::reset_movement_flags() {

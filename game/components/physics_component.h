@@ -29,7 +29,6 @@ namespace components {
 
 		augs::deterministic_timeout since_dropped = augs::deterministic_timeout(0);
 
-		augs::entity_id get_owner_friction_ground();
 
 		bool enable_angle_motor = false;
 		
@@ -45,7 +44,6 @@ namespace components {
 
 		std::vector<augs::entity_id> fixture_entities;
 
-		vec2 velocity();
 		void set_velocity(vec2);
 		void set_linear_damping(float);
 		void set_density(float);
@@ -55,15 +53,18 @@ namespace components {
 		void apply_impulse(vec2);
 		void apply_impulse(vec2, vec2 center_offset, bool wake = true);
 		void apply_angular_impulse(float);
-		float get_mass();
-		float get_angle();
-		vec2 get_position();
-		vec2 get_mass_position();
-		vec2 get_world_center();
-
-		vec2 get_aabb_size();
+		
+		vec2 velocity() const;
+		float get_mass() const;
+		float get_angle() const;
+		vec2 get_position() const;
+		vec2 get_mass_position() const;
+		vec2 get_world_center() const;
+		vec2 get_aabb_size() const;
 
 		void set_transform(components::transform);
 		void set_transform(augs::entity_id);
+		
+		augs::entity_id get_owner_friction_ground() const;
 	};
 }
