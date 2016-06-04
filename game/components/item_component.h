@@ -27,50 +27,21 @@ namespace components {
 		inventory_slot_id current_slot;
 		inventory_slot_id target_slot_after_unmount;
 
-		unsigned get_space_occupied() const {
-			return charges * space_occupied_per_charge;
-		}
-
 		float montage_time_ms = 1000;
 		float montage_time_left_ms = 0.f;
 
-		void reset_mounting_timer() {
-			montage_time_left_ms = montage_time_ms * current_slot->montage_time_multiplier;
-		}
-
-		void cancel_montage() {
-			reset_mounting_timer();
-			intended_mounting = current_mounting;
-			target_slot_after_unmount.unset();
-		}
-
-		bool is_mounted() const {
-			return current_mounting == MOUNTED;
-		}
-
-		void request_unmount() {
-			current_mounting = UNMOUNTED;
-			target_slot_after_unmount = current_slot;
-		}
-
-		void request_unmount(inventory_slot_id target_slot_after_unmount) {
-			request_unmount();
-			this->target_slot_after_unmount = target_slot_after_unmount;
-		}
-
-		void request_mount() {
-			reset_mounting_timer();
-			current_mounting = MOUNTED;
-		}
-
-		void set_mounted() {
-			current_mounting = MOUNTED;
-			intended_mounting = MOUNTED;
-		}
+		void set_mounted();
+		void request_mount();
+		void cancel_montage();
+		void request_unmount();
+		void request_unmount(inventory_slot_id target_slot_after_unmount);
+		void reset_mounting_timer();
 
 		void mark_parent_enclosing_containers_for_unmount();
 
-		bool are_parents_last_in_lifo_slots();
-		static bool can_merge_entities(augs::entity_id e1, augs::entity_id e2);
+		unsigned get_space_occupied() const;
+		bool is_mounted() const;
+		bool are_parents_last_in_lifo_slots() const;
+		static bool can_merge_entities(const augs::entity_id& e1, const augs::entity_id& e2);
 	};
 }

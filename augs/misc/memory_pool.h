@@ -83,7 +83,7 @@ namespace augs {
 			void unset();
 
 			void set_debug_name(std::string);
-			std::string get_debug_name();
+			std::string get_debug_name() const;
 		};
 
 		template <typename T>

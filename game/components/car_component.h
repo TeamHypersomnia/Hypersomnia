@@ -14,10 +14,6 @@ namespace components {
 		bool turning_right = false;
 		bool turning_left = false;
 		bool hand_brake = false;
-
-		void reset_movement_flags() {
-			accelerating = deccelerating = turning_left = turning_right = hand_brake = false;
-		}
 		
 		float braking_damping = -1.f;
 		float braking_angular_damping = -1.f;
@@ -46,5 +42,7 @@ namespace components {
 		float angular_air_resistance_while_hand_braking = 0.f;
 
 		vec2 wheel_offset = vec2(200, 125);
+
+		void reset_movement_flags();
 	};
 }

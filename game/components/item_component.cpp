@@ -21,7 +21,7 @@ namespace components {
 		}
 	}
 
-	bool item::are_parents_last_in_lifo_slots() {
+	bool item::are_parents_last_in_lifo_slots() const {
 		inventory_slot_id iterated_slot = current_slot;
 
 		while (iterated_slot.alive()) {
@@ -40,7 +40,7 @@ namespace components {
 		return true;
 	}
 
-	bool item::can_merge_entities(augs::entity_id e1, augs::entity_id e2) {
+	bool item::can_merge_entities(const augs::entity_id& e1, const augs::entity_id& e2) {
 		auto* pa = e1->find<item>();
 		auto* pb = e2->find<item>();
 		if (!pa && !pb) return true;
@@ -55,5 +55,43 @@ namespace components {
 				a.attachment_offsets_per_sticking_mode, a.montage_time_ms, a.current_mounting) == 
 			std::make_tuple(b.categories_for_slot_compatibility, b.space_occupied_per_charge, b.dual_wield_accuracy_loss_percentage, b.dual_wield_accuracy_loss_multiplier,
 				b.attachment_offsets_per_sticking_mode, b.montage_time_ms, b.current_mounting);
+	}
+
+	void item::reset_mounting_timer() {
+		montage_time_left_ms = montage_time_ms * current_slot->montage_time_multiplier;
+	}
+
+	void item::cancel_montage() {
+		reset_mounting_timer();
+		intended_mounting = current_mounting;
+		target_slot_after_unmount.unset();
+	}
+
+	bool item::is_mounted() const {
+		return current_mounting == MOUNTED;
+	}
+
+	void item::request_unmount() {
+		current_mounting = UNMOUNTED;
+		target_slot_after_unmount = current_slot;
+	}
+
+	void item::request_unmount(inventory_slot_id target_slot_after_unmount) {
+		request_unmount();
+		this->target_slot_after_unmount = target_slot_after_unmount;
+	}
+
+	void item::request_mount() {
+		reset_mounting_timer();
+		current_mounting = MOUNTED;
+	}
+
+	void item::set_mounted() {
+		current_mounting = MOUNTED;
+		intended_mounting = MOUNTED;
+	}
+
+	unsigned item::get_space_occupied() const {
+		return charges * space_occupied_per_charge;
 	}
 }

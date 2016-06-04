@@ -35,6 +35,6 @@ namespace components {
 
 		vec2 saved_point_of_impact_before_death;
 
-		static bool can_merge_entities(augs::entity_id a, augs::entity_id b);
+		static bool can_merge_entities(const augs::entity_id& a, const augs::entity_id& b);
 	};
 }

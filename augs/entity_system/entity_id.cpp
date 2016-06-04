@@ -46,7 +46,7 @@ namespace augs {
 		(*this)->debug_name = s;
 	}
 
-	std::string entity_id::get_debug_name() {
+	std::string entity_id::get_debug_name() const {
 		return (*this)->debug_name;
 	}
 }

@@ -59,7 +59,6 @@ namespace components {
 		friend class camera_system;
 		friend class gun_system;
 
-		augs::timer smooth_timer;
 		vec2 last_ortho_interpolant;
 	};
 }

@@ -1,7 +1,7 @@
 #include "damage_component.h"
 
 namespace components {
-	bool damage::can_merge_entities(augs::entity_id e1, augs::entity_id e2) {
+	bool damage::can_merge_entities(const augs::entity_id& e1, const augs::entity_id& e2) {
 		auto* pa = e1->find<damage>();
 		auto* pb = e2->find<damage>();
 		if (!pa && !pb) return true;

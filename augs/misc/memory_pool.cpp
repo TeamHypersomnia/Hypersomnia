@@ -75,7 +75,7 @@ namespace augs {
 #endif
 	}
 
-	std::string memory_pool::id::get_debug_name() {
+	std::string memory_pool::id::get_debug_name() const {
 #ifdef USE_NAMES_FOR_IDS
 		return debug_name;
 #else
