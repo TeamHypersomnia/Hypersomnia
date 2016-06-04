@@ -8,7 +8,8 @@
 
 #include "augs/stream.h"
 
-#include "augs/file.h"
+#include "augs/filesystem/file.h"
+#include "augs/filesystem/directory.h"
 #include "augs/misc/time.h"
 
 using namespace augs::window;

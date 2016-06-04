@@ -858,9 +858,6 @@
     <ClCompile Include="augs\entity_system\world.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="augs\file.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="augs\graphics\fbo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1258,6 +1255,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="augs\window_framework\colored_print.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\filesystem\directory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\filesystem\file.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2732,9 +2735,6 @@
     <ClInclude Include="game\bind_game_and_augs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\dirent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\entity_system\entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2763,9 +2763,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\error\augs_error.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\file.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\graphics\fbo.h">
@@ -3342,6 +3339,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\window_framework\colored_print.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\filesystem\directory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\filesystem\dirent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\filesystem\file.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -354,6 +354,7 @@
     <ClCompile Include="3rdparty\RakNet\Source\_FindFirst.cpp" />
     <ClCompile Include="augs\ensure.cpp" />
     <ClCompile Include="augs\entity_system\entity_id.cpp" />
+    <ClCompile Include="augs\filesystem\directory.cpp" />
     <ClCompile Include="augs\gui\appearance_detector.cpp" />
     <ClCompile Include="augs\misc\deterministic_timing.cpp" />
     <ClCompile Include="augs\misc\measurements.cpp" />
@@ -498,7 +499,7 @@
     <ClCompile Include="augs\entity_system\templated_list_to_hash_vector.cpp" />
     <ClCompile Include="augs\entity_system\type_hash_to_index_mapper.cpp" />
     <ClCompile Include="augs\entity_system\world.cpp" />
-    <ClCompile Include="augs\file.cpp" />
+    <ClCompile Include="augs\filesystem\file.cpp" />
     <ClCompile Include="augs\graphics\fbo.cpp" />
     <ClCompile Include="augs\graphics\pixel.cpp" />
     <ClCompile Include="augs\graphics\renderer.cpp" />
@@ -991,6 +992,7 @@
     <ClInclude Include="3rdparty\RakNet\Source\XBox360Includes.h" />
     <ClInclude Include="3rdparty\RakNet\Source\_FindFirst.h" />
     <ClInclude Include="augs\build_settings.h" />
+    <ClInclude Include="augs\filesystem\directory.h" />
     <ClInclude Include="augs\gui\appearance_detector.h" />
     <ClInclude Include="augs\gui\rect_id.h" />
     <ClInclude Include="augs\gui\text_drawer.h" />
@@ -1171,7 +1173,7 @@
     <ClInclude Include="game\systems\visibility_system.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="augs\global_libraries.h" />
-    <ClInclude Include="augs\dirent.h" />
+    <ClInclude Include="augs\filesystem\dirent.h" />
     <ClInclude Include="augs\entity_system\entity.h" />
     <ClInclude Include="augs\entity_system\entity_id.h" />
     <ClInclude Include="augs\entity_system\entity_system.h" />
@@ -1182,7 +1184,7 @@
     <ClInclude Include="augs\entity_system\type_hash_to_index_mapper.h" />
     <ClInclude Include="augs\entity_system\world.h" />
     <ClInclude Include="augs\error\augs_error.h" />
-    <ClInclude Include="augs\file.h" />
+    <ClInclude Include="augs\filesystem\file.h" />
     <ClInclude Include="augs\graphics\fbo.h" />
     <ClInclude Include="augs\graphics\pixel.h" />
     <ClInclude Include="augs\graphics\renderer.h" />

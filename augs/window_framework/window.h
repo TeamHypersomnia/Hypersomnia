@@ -8,13 +8,7 @@
 #include "../graphics/renderer.h"
 #include "colored_print.h"
 
-struct lua_State;
-
 namespace augs {
-	namespace config {
-		struct input_file;
-	}
-
 	namespace window {
 		extern LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
 
@@ -81,23 +75,10 @@ namespace augs {
 			if you do so, adjustwindowrectex
 			*/
 			int create(rects::xywh<int> client_rectangle, int _menu = ALL_WINDOW_ELEMENTS, std::wstring name = L"Window", int doublebuffer = 1, int bitsperpixel = 24);
-				/*
-				example:
-				string window_name Window
-				int fullscreen 0
-				int window_x 30
-				int window_y 0
-				int resolution_w 800
-				int resolution_h 800
-				int window_border 0
-				int doublebuffer 1
-				int bpp 24
-				*/
-				// create(lua_State*, rects::wh<int> force_minimum_resolution, int _menu = ALL_WINDOW_ELEMENTS),
-			     bool swap_buffers(), 
-				 focus_keyboard(), 
-				 current(),
-				 vsync(int);
+			    bool swap_buffers(), 
+				focus_keyboard(), 
+				current(),
+				vsync(int);
 
 			void initial_gl_calls();
 
@@ -133,21 +114,21 @@ namespace augs {
 		};
 
 
-		extern bool set_display(int width, int height, int bpp);
-		extern rects::xywh<int> get_display();
-		extern int get_refresh_rate();
-		extern void warp_cursor(int x, int y);
-		extern void set_cursor_visible(int flag);
+		bool set_display(int width, int height, int bpp);
+		rects::xywh<int> get_display();
+		int get_refresh_rate();
+		void warp_cursor(int x, int y);
+		void set_cursor_visible(int flag);
 
-		extern void mbx(const wchar_t* title, const wchar_t* content);
-		extern void imbx(int title, int content);
-		extern void smbx(std::wstring title, std::wstring content);
-		extern void copy_clipboard (std::wstring& from);
-		extern void paste_clipboard(std::wstring& to);
-		extern std::wstring get_executable_path();
-		extern std::string remove_filename_from_path(std::string input_path);
+		void mbx(const wchar_t* title, const wchar_t* content);
+		void imbx(int title, int content);
+		void smbx(std::wstring title, std::wstring content);
+		void copy_clipboard (std::wstring& from);
+		void paste_clipboard(std::wstring& to);
+		std::wstring get_executable_path();
+		std::string remove_filename_from_path(std::string input_path);
 
-		extern void enable_cursor_clipping(rects::ltrb<int>);
-		extern void disable_cursor_clipping();
+		void enable_cursor_clipping(rects::ltrb<int>);
+		void disable_cursor_clipping();
 	}
 }
