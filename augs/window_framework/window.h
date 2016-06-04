@@ -34,80 +34,41 @@ namespace augs {
 			
 			timer triple_timer;
 			bool doubled = false;
-		public:
-			static glwindow* get_current();
-
-			renderer glrenderer;
 
 			bool raw_mouse_input = true;
+			unsigned triple_click_delay; /* maximum delay time for the next click (after doubleclick) to be considered tripleclick (in milliseconds) */
 
-			enum mode {
-				MINIMIZE = SW_MINIMIZE,
-				MAXIMIZE = SW_MAXIMIZE,
-				RESTORE = SW_RESTORE,
-				SHOW = SW_SHOW,
-				HIDE = SW_HIDE
-			} show;
-
-			enum flag {
-				CAPTION = WS_CAPTION,
-				MENU = CAPTION | WS_SYSMENU,
-				RESIZABLE = CAPTION | WS_THICKFRAME,
-				MAXIMIZE_BOX = MENU | WS_MAXIMIZEBOX,
-				MINIMIZE_BOX = MENU | WS_MINIMIZEBOX,
-				ALL_WINDOW_ELEMENTS = CAPTION | MENU | MINIMIZE_BOX | MAXIMIZE_BOX
-			};
+		public:
+			renderer glrenderer;
 
 			event::state events;
-
-			/* user settings */
-			std::function<void (glwindow&)> resize; /* resize function */
-			unsigned triple_click_delay; /* maximum delay time for the next click (after doubleclick) to be considered tripleclick (in milliseconds) */
 			
 			glwindow();
+			~glwindow();
+
 			glwindow(const glwindow&) = delete;
 			glwindow(glwindow&&) = delete;
 			glwindow& operator=(const glwindow&) = delete;
-			~glwindow();
 
-			/*
-			NEVER EVER PASS ~RESIZABLE!
-			if you do so, adjustwindowrectex
-			*/
-			int create(rects::xywh<int> client_rectangle, int _menu = ALL_WINDOW_ELEMENTS, std::wstring name = L"Window", int doublebuffer = 1, int bitsperpixel = 24);
-			    bool swap_buffers(), 
-				focus_keyboard(), 
-				current(),
-				vsync(int);
+			int create(rects::xywh<int> client_rectangle, int enable_window_border = 0, std::wstring name = L"Window", int doublebuffer = 1, int bitsperpixel = 24);
+			
+			bool swap_buffers(), 
+				set_as_current(),
+				set_vsync(int);
 
 			void initial_gl_calls();
+			void destroy();
 
 			bool poll_event(event::message& out);
 			std::vector<event::state> poll_events();
 
-			void set_minimum_size(rects::wh<int> = rects::wh<int>()),
-			     set_maximum_size(rects::wh<int> = rects::wh<int>());
-			bool set_window_rect(const rects::xywh<int>&),
-			     set_adjusted_rect(const rects::xywh<int>&),
-			     set_show(mode);
-			int  set_caption(const wchar_t*);
+			bool set_window_rect(const rects::xywh<int>&);
+			rects::wh<int> get_screen_rect() const;
+			rects::xywh<int> get_window_rect() const;
 
-			rects::wh<int> 
-				get_minimum_size() const, 
-				get_maximum_size() const,
-				get_screen_rect() const;
-			rects::xywh<int>
-				get_window_rect() const,
-				get_adjusted_rect() const;
-
-			int get_vsync() const;
-			bool is_menu() const, is_transparent() const, is_active() const, is_doublebuffered() const;
+			bool is_active() const;
 			
-			void adjust(rects::xywh<int>&);
-
-			HWND get_hwnd() const;
-
-			void destroy();
+			static glwindow* get_current();
 		};
 	}
 }

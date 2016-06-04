@@ -19,18 +19,9 @@ namespace bindings {
 			luabind::class_<window::glwindow>("glwindow")
 			.def(luabind::constructor<>())
 			.def("create", &window::glwindow::create)
-			.def("vsync", &window::glwindow::vsync)
+			.def("set_vsync", &window::glwindow::set_vsync)
 			.def("swap_buffers", &window::glwindow::swap_buffers)
-			.def("current", &window::glwindow::current)
-			.enum_("border_type")[
-				luabind::value("ALL_WINDOW_ELEMENTS", window::glwindow::flag::ALL_WINDOW_ELEMENTS),
-				luabind::value("CAPTION", window::glwindow::flag::CAPTION),
-				luabind::value("MAXIMIZE_BOX", window::glwindow::flag::MAXIMIZE_BOX),
-				luabind::value("MENU", window::glwindow::flag::MENU),
-				luabind::value("MINIMIZE_BOX", window::glwindow::flag::MINIMIZE_BOX),
-				luabind::value("RESIZABLE", window::glwindow::flag::RESIZABLE)
-			]
-
+			.def("set_as_current", &window::glwindow::set_as_current)
 			);
 	}
 }

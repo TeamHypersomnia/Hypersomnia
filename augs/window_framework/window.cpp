@@ -34,7 +34,6 @@ namespace augs {
 				}
 				else if(umsg == WM_SIZE) {
 					LRESULT res = DefWindowProc(hwnd, umsg, wParam, lParam);
-					if(wnd->resize) wnd->resize(*wnd);
 					return res;
 				}
 			} 
@@ -241,10 +240,17 @@ namespace augs {
 			triple_click_delay = GetDoubleClickTime();
 		}
 
-		int glwindow::create(rects::xywh<int> crect, int _menu, std::wstring _name,
+		int glwindow::create(rects::xywh<int> crect, int enable_window_border, std::wstring _name,
 				int doublebuffer, int _bpp) {
 			int f = 1;
-			menu = _menu; bpp = _bpp; doublebuf = doublebuffer; name = _name.c_str();
+
+			enum flag {
+				CAPTION = WS_CAPTION,
+				MENU = CAPTION | WS_SYSMENU,
+				ALL_WINDOW_ELEMENTS = CAPTION | MENU
+			};
+
+			menu = enable_window_border ? ALL_WINDOW_ELEMENTS : 0; bpp = _bpp; doublebuf = doublebuffer; name = _name.c_str();
 
 			style =   menu ? (WS_OVERLAPPED | menu)|WS_CLIPSIBLINGS|WS_CLIPCHILDREN : WS_POPUP;
 			exstyle = menu ? WS_EX_WINDOWEDGE : WS_EX_APPWINDOW; 
@@ -263,7 +269,6 @@ namespace augs {
 			p.cAlphaBits = 8;
 			p.cDepthBits = 16;
 			p.iLayerType = PFD_MAIN_PLANE;
-			
 			errf(hdc = GetDC(hwnd), f);
 
 			GLuint pf;
@@ -272,14 +277,12 @@ namespace augs {
 
 			errf(hglrc = wglCreateContext(hdc), f); glerr
 
-			current();
+			set_as_current();
+			ShowWindow(hwnd, SW_SHOW);
 
 			SetLastError(0);
 			err(!(SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this) == 0 && GetLastError() != 0));
 			
-			set_maximum_size(crect);
-			set_minimum_size(crect);
-
 #ifndef HID_USAGE_PAGE_GENERIC
 #define HID_USAGE_PAGE_GENERIC         ((USHORT) 0x01)
 #endif
@@ -302,31 +305,25 @@ namespace augs {
 		}
 
 		bool glwindow::swap_buffers() {
-			if(this != context) current();
+			if(this != context) set_as_current();
 			return err(SwapBuffers(hdc)) != FALSE;
 		}
 
-		bool glwindow::focus_keyboard() { 
-			return err(SetFocus(hwnd)) != NULL;
-		}
-
-		bool glwindow::current() {
+		bool glwindow::set_as_current() {
 			bool ret = true;
 			if(context != this) {
 				ret = err(wglMakeCurrent(hdc, hglrc)) != FALSE; glerr
 				context = this;
 			}
 			
-			set_show(SHOW);
-
 			return ret;
 		}
 		 
-		bool glwindow::vsync(int v) {
+		bool glwindow::set_vsync(int v) {
 			bool ret = WGLEW_EXT_swap_control != NULL;
 			errs(ret, "vsync not supported!");
 			if(ret) {
-				errs(ret = current(), "error enabling vsync, could not set current context");
+				errs(ret = set_as_current(), "error enabling vsync, could not set current context");
 				wglSwapIntervalEXT(v); glerr
 				vsyn = v;
 			}
@@ -338,11 +335,6 @@ namespace augs {
 				 //DispatchMessage(&wmsg); 
 				out = events.msg = event::message(wmsg.message);
 				_poll(out, wmsg.wParam, wmsg.lParam);
-				
-				if(out == event::minimize)
-					set_show(MINIMIZE);
-				if(out == event::maximize)
-					set_show(MAXIMIZE);
 				
 				TranslateMessage(&wmsg);
 
@@ -369,26 +361,6 @@ namespace augs {
 			
 			return output;
 		}
-		
-		void glwindow::set_minimum_size(rects::wh<int> r) {
-			if(!r.good()) r = get_window_rect();
-			cminw = r.w;
-			cminh = r.h;
-			rects::xywh<int> rc = r;
-			adjust(rc);
-			minw = rc.w;
-			minh = rc.h;
-		}
-
-		void glwindow::set_maximum_size(rects::wh<int> r) {
-			if(!r.good()) r = get_window_rect();
-			cmaxw = r.w;
-			cmaxh = r.h;
-			rects::xywh<int> rc = r;
-			adjust(rc);
-			maxw = rc.w;
-			maxh = rc.h;
-		}
 
 		bool glwindow::set_window_rect(const rects::xywh<int>& r) {
 			static RECT wr = {0};
@@ -399,35 +371,10 @@ namespace augs {
 			return f != 0;
 		}
 
-		bool glwindow::set_adjusted_rect(const rects::xywh<int>& r) {
-			return err(MoveWindow(hwnd, r.x, r.y, r.w, r.h, TRUE)) != FALSE;
-		}
-
-		bool glwindow::set_show(mode m) {
-			return ShowWindow(hwnd, m) != FALSE;/*
-											if(m == SHOW) {
-											focus_keyboard();
-											SetForegroundWindow(hwnd);
-											UpdateWindow(hwnd);
-											}*/
-		}
-
-		int glwindow::set_caption(const wchar_t* name) {
-			return SetWindowText(hwnd, name);
-		}
-
-		rects::wh<int> glwindow::get_minimum_size() const {
-			return rects::wh<int>(cminw, cminh);
-		} 
-
-		rects::wh<int> glwindow::get_maximum_size() const {
-			return rects::wh<int>(cmaxw, cmaxh);
-		}
-
 		rects::wh<int> glwindow::get_screen_rect() const {
 			return rects::wh<int>(get_window_rect().w, get_window_rect().h);
 		}
-		
+
 		rects::xywh<int> glwindow::get_window_rect() const {
 			static RECT r;
 			GetClientRect(hwnd, &r);
@@ -436,42 +383,7 @@ namespace augs {
 			return rects::ltrb<int>(r.left, r.top, r.right, r.bottom);
 		}
 
-		rects::xywh<int> glwindow::get_adjusted_rect() const {
-			static RECT r;
-			GetWindowRect(hwnd, &r);
-			return rects::ltrb<int>(r.left, r.top, r.right, r.bottom);
-		}
-
-		void glwindow::adjust(rects::xywh<int>& rc) {
-			static RECT wr;
-			SetRect(&wr,0,0,rc.w,rc.h);
-			
-			errs(AdjustWindowRectEx(&wr, style, FALSE, exstyle), "Failed to adjust window rect");
-
-			rc = rects::ltrb<int>(wr.left, wr.top, wr.right, wr.bottom);
-		}
-		
-		HWND glwindow::get_hwnd() const {
-			return hwnd;
-		}
-
-		int glwindow::get_vsync() const { 
-			return vsyn; 
-		}
-
-		bool glwindow::is_menu() const { 
-			return menu != 0; 
-		}
-
-		bool glwindow::is_transparent() const { 
-			return transparent; 
-		}
-		
 		bool glwindow::is_active() const {
-			return active; 
-		}
-
-		bool glwindow::is_doublebuffered() const {
 			return active; 
 		}
 
