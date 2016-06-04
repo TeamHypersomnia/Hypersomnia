@@ -4,6 +4,13 @@
 
 using namespace augs;
 
+enum class vertex_attribute {
+	position,
+	texcoord,
+	color,
+	special
+};
+
 namespace augs {
 	class texture;
 

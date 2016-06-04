@@ -30,30 +30,30 @@ namespace augs {
 		glGenBuffers(1, &triangle_buffer_id); glerr;
 		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
 
-		glEnableVertexAttribArray(VERTEX_ATTRIBUTES::POSITION); glerr;
-		glEnableVertexAttribArray(VERTEX_ATTRIBUTES::TEXCOORD); glerr;
-		glEnableVertexAttribArray(VERTEX_ATTRIBUTES::COLOR); glerr;
+		glEnableVertexAttribArray(int(vertex_attribute::position)); glerr;
+		glEnableVertexAttribArray(int(vertex_attribute::texcoord)); glerr;
+		glEnableVertexAttribArray(int(vertex_attribute::color)); glerr;
 
-		glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), 0); glerr;
-		glVertexAttribPointer(VERTEX_ATTRIBUTES::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), (char*)(sizeof(float) * 2)); glerr;
-		glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr;
+		glVertexAttribPointer(int(vertex_attribute::position), 2, GL_FLOAT, GL_FALSE, sizeof(vertex), 0); glerr;
+		glVertexAttribPointer(int(vertex_attribute::texcoord), 2, GL_FLOAT, GL_FALSE, sizeof(vertex), (char*)(sizeof(float) * 2)); glerr;
+		glVertexAttribPointer(int(vertex_attribute::color), 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr;
 
 		glGenBuffers(1, &special_buffer_id); glerr;
 		glBindBuffer(GL_ARRAY_BUFFER, special_buffer_id); glerr;
 
 		enable_special_vertex_attribute();
-		glVertexAttribPointer(VERTEX_ATTRIBUTES::SPECIAL, sizeof(special)/sizeof(float), GL_FLOAT, GL_FALSE, sizeof(special), 0); glerr;
+		glVertexAttribPointer(int(vertex_attribute::special), sizeof(special)/sizeof(float), GL_FLOAT, GL_FALSE, sizeof(special), 0); glerr;
 		disable_special_vertex_attribute();
 
 		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
 	}
 
 	void renderer::enable_special_vertex_attribute() {
-		glEnableVertexAttribArray(VERTEX_ATTRIBUTES::SPECIAL); glerr;
+		glEnableVertexAttribArray(int(vertex_attribute::special)); glerr;
 	}
 
 	void renderer::disable_special_vertex_attribute() {
-		glDisableVertexAttribArray(VERTEX_ATTRIBUTES::SPECIAL); glerr;
+		glDisableVertexAttribArray(int(vertex_attribute::special)); glerr;
 	}
 
 	void renderer::clear_current_fbo() {
@@ -122,7 +122,7 @@ namespace augs {
 		lines.clear();
 	}
 
-	int renderer::get_triangle_count() {
+	int renderer::get_triangle_count() const {
 		return triangles.size();
 	}
 
@@ -143,21 +143,21 @@ namespace augs {
 		};
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0); glerr;
-		glDisableVertexAttribArray(VERTEX_ATTRIBUTES::TEXCOORD); glerr;
-		glDisableVertexAttribArray(VERTEX_ATTRIBUTES::COLOR); glerr;
-		glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), vertices); glerr;
+		glDisableVertexAttribArray(int(vertex_attribute::texcoord)); glerr;
+		glDisableVertexAttribArray(int(vertex_attribute::color)); glerr;
+		glVertexAttribPointer(int(vertex_attribute::position), 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), vertices); glerr;
 
 		glDrawArrays(GL_QUADS, 0, 4); glerr;
 
 		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
 
-		glEnableVertexAttribArray(VERTEX_ATTRIBUTES::POSITION); glerr;
-		glEnableVertexAttribArray(VERTEX_ATTRIBUTES::TEXCOORD); glerr;
-		glEnableVertexAttribArray(VERTEX_ATTRIBUTES::COLOR); glerr;
+		glEnableVertexAttribArray(int(vertex_attribute::position)); glerr;
+		glEnableVertexAttribArray(int(vertex_attribute::texcoord)); glerr;
+		glEnableVertexAttribArray(int(vertex_attribute::color)); glerr;
 
-		glVertexAttribPointer(VERTEX_ATTRIBUTES::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), 0); glerr;
-		glVertexAttribPointer(VERTEX_ATTRIBUTES::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), (char*)(sizeof(float) * 2)); glerr;
-		glVertexAttribPointer(VERTEX_ATTRIBUTES::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr;
+		glVertexAttribPointer(int(vertex_attribute::position), 2, GL_FLOAT, GL_FALSE, sizeof(vertex), 0); glerr;
+		glVertexAttribPointer(int(vertex_attribute::texcoord), 2, GL_FLOAT, GL_FALSE, sizeof(vertex), (char*)(sizeof(float) * 2)); glerr;
+		glVertexAttribPointer(int(vertex_attribute::color), 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr;
 	}
 
 	void renderer::clear_logic_lines() {

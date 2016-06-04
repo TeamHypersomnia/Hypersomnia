@@ -17,17 +17,6 @@ namespace augs {
 
 	class renderer {
 	public:
-		static renderer& get_current();
-		
-		void initialize();
-
-		enum VERTEX_ATTRIBUTES {
-			POSITION,
-			TEXCOORD,
-			COLOR,
-			SPECIAL
-		};
-
 		struct debug_line {
 			debug_line(vec2 a = vec2(), vec2 b = vec2(), rgba col = rgba(255, 255, 255, 255)) : col(col), a(a), b(b) {}
 
@@ -35,21 +24,11 @@ namespace augs {
 			vec2 a, b;
 		};
 
-		vertex_triangle_buffer triangles;
-		vertex_line_buffer lines;
-		special_buffer specials;
-
-		unsigned long long triangles_drawn_total = 0;
-
-		unsigned int position_buffer_id, texcoord_buffer_id, color_buffer_id;
-		unsigned int triangle_buffer_id;
-		unsigned int special_buffer_id;
-
 		struct line_channel {
 			std::vector<debug_line> lines;
 
 			void draw(vec2 a, vec2 b, rgba = white);
-			
+
 			void draw_red(vec2 a, vec2 b);
 			void draw_green(vec2 a, vec2 b);
 			void draw_blue(vec2 a, vec2 b);
@@ -60,7 +39,41 @@ namespace augs {
 		line_channel logic_lines, prev_logic_lines;
 		line_channel frame_lines;
 		line_channel blink_lines;
+		
 		timer line_timer;
+
+		unsigned int position_buffer_id, texcoord_buffer_id, color_buffer_id;
+		unsigned int triangle_buffer_id;
+		unsigned int special_buffer_id;
+
+		vertex_triangle_buffer triangles;
+		vertex_line_buffer lines;
+		special_buffer specials;
+
+		unsigned long long triangles_drawn_total = 0;
+
+		bool should_interpolate_debug_lines = false;
+
+		bool debug_draw_colinearization = false;
+		bool debug_draw_forces = false;
+		bool debug_draw_friction_field_collisions_of_entering = false;
+
+		float visibility_expansion = 1.0f;
+		float max_visibility_expansion_distance = 1000.0f;
+		int debug_drawing = 1;
+
+		int draw_visibility = 0;
+
+		int draw_steering_forces = 0;
+		int draw_substeering_forces = 0;
+		int draw_velocities = 0;
+
+		int draw_avoidance_info = 0;
+		int draw_wandering_info = 0;
+
+		int draw_weapon_info = 0;
+
+		void initialize();
 
 		void fullscreen_quad();
 		
@@ -85,31 +98,11 @@ namespace augs {
 
 		void default_render(vec2 visible_world_area);
 
-		int get_triangle_count();
+		int get_triangle_count() const;
 		vertex_triangle& get_triangle(int i);
 		std::vector<vertex_triangle>& get_triangle_buffer();
 
 		void clear_geometry();
-
-		bool should_interpolate_debug_lines = false;
-
-		bool debug_draw_colinearization = false;
-		bool debug_draw_forces = false;
-		bool debug_draw_friction_field_collisions_of_entering = false;
-
-		float visibility_expansion = 1.0f;
-		float max_visibility_expansion_distance = 1000.0f;
-		int debug_drawing = 1;
-
-		int draw_visibility = 0;
-
-		int draw_steering_forces = 0;
-		int draw_substeering_forces = 0;
-		int draw_velocities = 0;
-
-		int draw_avoidance_info = 0;
-		int draw_wandering_info = 0;
-
-		int draw_weapon_info = 0;
+		static renderer& get_current();
 	};
 }
