@@ -362,7 +362,7 @@
     <ClCompile Include="augs\misc\typesafe_sprintf.cpp" />
     <ClCompile Include="augs\stream.cpp" />
     <ClCompile Include="augs\texture_baker\polygonize_sprite.cpp" />
-    <ClCompile Include="augs\window_framework\console_colors.cpp" />
+    <ClCompile Include="augs\window_framework\colored_print.cpp" />
     <ClCompile Include="game\bindings\file_watcher_binding.cpp" />
     <ClCompile Include="game\bindings\glwindow_binding.cpp" />
     <ClCompile Include="game\bindings\id_generator_binding.cpp" />
@@ -1002,7 +1002,7 @@
     <ClInclude Include="augs\misc\typesafe_sprintf.h" />
     <ClInclude Include="augs\stlutil.h" />
     <ClInclude Include="augs\stream.h" />
-    <ClInclude Include="augs\window_framework\console_colors.h" />
+    <ClInclude Include="augs\window_framework\colored_print.h" />
     <ClInclude Include="game\all_component_includes.h" />
     <ClInclude Include="game\all_message_includes.h" />
     <ClInclude Include="game\all_system_includes.h" />

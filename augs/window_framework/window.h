@@ -6,7 +6,7 @@
 #include <functional>
 
 #include "../graphics/renderer.h"
-#include "console_colors.h"
+#include "colored_print.h"
 
 struct lua_State;
 

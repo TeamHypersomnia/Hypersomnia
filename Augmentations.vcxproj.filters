@@ -1170,9 +1170,6 @@
     <ClCompile Include="game\ingredients\melee_weapons.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="augs\window_framework\console_colors.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\systems\sentience_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1258,6 +1255,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="augs\global_libraries.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\window_framework\colored_print.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -3212,9 +3212,6 @@
     <ClInclude Include="game\messages\melee_swing_response.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\window_framework\console_colors.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\components\sentience_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3342,6 +3339,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\global_libraries.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\window_framework\colored_print.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

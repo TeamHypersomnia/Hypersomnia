@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/window_framework/console_colors.h"
+#include "augs/window_framework/colored_print.h"
 #include "augs/misc/typesafe_sprintf.h"
 #include "build_settings.h"
 

@@ -1,5 +1,5 @@
 #include <Windows.h>
-#include "console_colors.h"
+#include "colored_print.h"
 #include <cstdio>
 
 WORD GetColorAttribute(int color) {
