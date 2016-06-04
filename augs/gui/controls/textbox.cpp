@@ -2,6 +2,7 @@
 #include "textbox.h"
 #include "../text\drafter.h"
 #include "templates.h"
+#include "window_framework/platform_utils.h"
 
 namespace augs {
 	namespace gui {
@@ -235,7 +236,7 @@ namespace augs {
 			}
 
 			void property_textbox::on_character(wchar_t c) {
-				if (!text::drafter::is_newline(c)) textbox::on_character(c);
+				if (!augs::window::is_newline(c)) textbox::on_character(c);
 			}
 		}
 	}

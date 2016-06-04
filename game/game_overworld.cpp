@@ -2,7 +2,7 @@
 
 #include <signal.h>
 
-#include "window_framework/window.h"
+#include "window_framework/platform_utils.h"
 #include "scripting/script.h"
 
 #include "game/bind_game_and_augs.h"

@@ -1,7 +1,7 @@
 #pragma once
 #include "gui_world.h"
 #include "rect.h"
-#include "window_framework/window.h"
+#include "window_framework/platform_utils.h"
 #include "log.h"
 #undef max
 namespace augs {
@@ -238,8 +238,7 @@ namespace augs {
 		}
 
 		void paste_clipboard_formatted(text::fstr& out, text::formatted_char f) {
-			std::wstring w;
-			window::paste_clipboard(w);
+			auto w = window::get_data_from_clipboard();
 			size_t len = w.length();
 			out.clear();
 			out.reserve(len);
@@ -253,7 +252,7 @@ namespace augs {
 			contents = s;
 			own_copy = true;
 			own_clip = true;
-			window::copy_clipboard(formatted_string_to_wstring(s));
+			window::set_clipboard_data(formatted_string_to_wstring(s));
 		}
 
 		void gui_world::set_delta_milliseconds(float delta) {

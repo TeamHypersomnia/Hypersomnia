@@ -1,11 +1,14 @@
-#include <GL/OpenGL.h>
-#include "augs/error/augs_error.h"
-
 #include "window.h"
-#include "../templates.h"
+
+#include <GL/OpenGL.h>
 #include <algorithm>
-#include <Shlwapi.h>
+
 #include "log.h"
+#include "templates.h"
+
+#include "augs/error/augs_error.h"
+#include "platform_utils.h"
+
 namespace augs {
 	extern HINSTANCE hinst;
 
@@ -489,140 +492,6 @@ namespace augs {
 
 		glwindow::~glwindow() {
 			destroy();
-		}
-
-		bool set_display(int width, int height, int bpp) {
-			static DEVMODE screen;						
-			ZeroMemory(&screen,sizeof(screen));	
-			screen.dmSize=sizeof(screen);		
-			screen.dmPelsWidth	= width;		
-			screen.dmPelsHeight	= height;		
-			screen.dmBitsPerPel	= bpp;			
-			screen.dmFields = DM_BITSPERPEL|DM_PELSWIDTH|DM_PELSHEIGHT;
-			return ChangeDisplaySettings(&screen,CDS_FULLSCREEN) == DISP_CHANGE_SUCCESSFUL;
-		}
-
-		rects::xywh<int> get_display() {
-			static RECT rc;
-			GetWindowRect(GetDesktopWindow(), &rc);
-			return rects::xywh<int>(rc.left,rc.top,rc.right-rc.left,rc.bottom-rc.top);
-		}
-
-		int get_refresh_rate() {
-			DEVMODE lpDevMode;
-			memset(&lpDevMode, 0, sizeof(DEVMODE));
-			lpDevMode.dmSize = sizeof(DEVMODE);
-			lpDevMode.dmDriverExtra = 0;
-
-			return EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &lpDevMode) ? lpDevMode.dmDisplayFrequency : -1;
-		}
-
-		void warp_cursor(int x, int y) {
-			SetCursorPos(x, y);
-		}
-
-		void set_cursor_visible(int flag) {
-			ShowCursor(flag);
-		}
-
-		void mbx(const wchar_t* title, const wchar_t* content) { 
-			MessageBox(0, content, title, MB_OK); 
-		}
-
-		void imbx(int title, int content) { 
-			MessageBox(0, to_wstring(content).c_str(), to_wstring(title).c_str(), MB_OK); 
-		}
-
-		void smbx(std::wstring title, std::wstring content) { 
-			MessageBox(0, content.c_str(), title.c_str(), MB_OK); 
-		}
-
-		void copy_clipboard(std::wstring& from) {
-			if (OpenClipboard(0)) {
-				if (EmptyClipboard()) {
-					HGLOBAL h = GlobalAlloc(GMEM_DDESHARE, (from.length() + 1)*sizeof(WCHAR));
-					if (h) {
-						LPWSTR p = (LPWSTR) GlobalLock(h);
-
-						if (p) {
-							for (unsigned i = 0; i < from.length(); ++i)
-								p[i] = from[i];
-
-							p[from.length()] = 0;
-
-							SetClipboardData(CF_UNICODETEXT, h);
-							GlobalUnlock(p);
-							CloseClipboard();
-						}
-					}
-				}
-			}
-		}
-
-		bool is_newline(unsigned i) {
-			return (i == 0x000A || i == 0x000D);
-		}
-
-		void paste_clipboard(std::wstring& to) {
-			if (OpenClipboard(NULL)) {
-				if (!IsClipboardFormatAvailable(CF_UNICODETEXT)) {
-					CloseClipboard();
-					return;
-				}
-				HANDLE clip0 = GetClipboardData(CF_UNICODETEXT);
-
-				if (clip0) {
-					LPWSTR p = (LPWSTR) GlobalLock(clip0);
-					if (p) {
-						size_t len = wcslen(p);
-						to.clear();
-						to.reserve(len);
-
-						for (size_t i = 0; i < len; ++i) {
-							to += p[i];
-							if (is_newline(p[i]) && i < len - 1 && is_newline(p[i + 1])) ++i;
-						}
-					}
-					GlobalUnlock(clip0);
-				}
-
-				CloseClipboard();
-			}
-		}
-
-		std::wstring get_executable_path() {
-			wchar_t buffer[MAX_PATH + 1];
-			SecureZeroMemory(buffer, sizeof(buffer));
-			GetModuleFileName(NULL, buffer, MAX_PATH);
-			PathRemoveFileSpec(buffer);
-			return buffer;
-		}
-
-		std::string remove_filename_from_path(std::string input_path) {
-			std::wstring wpath(input_path.begin(), input_path.end());
-			wchar_t buffer[MAX_PATH + 1];
-
-			SecureZeroMemory(buffer, sizeof(buffer));
-
-			std::copy(wpath.begin(), wpath.end(), buffer);
-
-			PathRemoveFileSpec(buffer);
-
-			wpath = std::wstring(buffer);
-			return std::string(wpath.begin(), wpath.end()) + "\\";
-		}
-
-		void enable_cursor_clipping(rects::ltrb<int> lt) {
-			static thread_local RECT r;
-			r.bottom = lt.b;
-			r.left = lt.l;
-			r.right = lt.r;
-			r.top = lt.t;
-			ClipCursor(&r);
-		}
-
-		void disable_cursor_clipping() {
-			ClipCursor(NULL);
 		}
 	}
 }

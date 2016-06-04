@@ -3,6 +3,7 @@
 #include "bindings.h"
 
 #include "window_framework/window.h"
+#include "window_framework/platform_utils.h"
 #include "../bind_game_and_augs.h"
 
 namespace bindings {

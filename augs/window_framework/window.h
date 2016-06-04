@@ -92,9 +92,6 @@ namespace augs {
 			     set_show(mode);
 			int  set_caption(const wchar_t*);
 
-			mode get_show() const;
-			const wchar_t* get_caption() const;
-
 			rects::wh<int> 
 				get_minimum_size() const, 
 				get_maximum_size() const,
@@ -112,23 +109,5 @@ namespace augs {
 
 			void destroy();
 		};
-
-
-		bool set_display(int width, int height, int bpp);
-		rects::xywh<int> get_display();
-		int get_refresh_rate();
-		void warp_cursor(int x, int y);
-		void set_cursor_visible(int flag);
-
-		void mbx(const wchar_t* title, const wchar_t* content);
-		void imbx(int title, int content);
-		void smbx(std::wstring title, std::wstring content);
-		void copy_clipboard (std::wstring& from);
-		void paste_clipboard(std::wstring& to);
-		std::wstring get_executable_path();
-		std::string remove_filename_from_path(std::string input_path);
-
-		void enable_cursor_clipping(rects::ltrb<int>);
-		void disable_cursor_clipping();
 	}
 }

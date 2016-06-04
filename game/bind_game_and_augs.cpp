@@ -139,8 +139,8 @@ void bind_game_and_augs(augs::lua_state_wrapper& wrapper) {
 			luabind::def("open_editor", lua_state_wrapper::open_editor),
 			//luabind::def("get_meters_to_pixels", get_meters_to_pixels),
 			//luabind::def("set_meters_to_pixels", set_meters_to_pixels),
-			luabind::def("get_executable_path", window::get_executable_path),
-			luabind::def("remove_filename_from_path", window::remove_filename_from_path),
+			//luabind::def("get_executable_path", window::get_executable_path),
+			//luabind::def("remove_filename_from_path", window::remove_filename_from_path),
 
 			luabind::class_<std::string>("std_string")
 			.def("c_str", &std::string::c_str),

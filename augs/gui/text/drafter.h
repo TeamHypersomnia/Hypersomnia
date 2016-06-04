@@ -56,7 +56,6 @@ namespace augs {
 				rects::wh<float> get_bbox() const;
 
 				void draw(const fstr&);
-				static bool is_newline(unsigned i);
 
 				/*
 				clipper is in local drafter's space: (0, 0) = left top corner

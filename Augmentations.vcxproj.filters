@@ -1263,6 +1263,9 @@
     <ClCompile Include="augs\templates.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="augs\window_framework\platform_utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3345,6 +3348,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\templates.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\window_framework\platform_utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

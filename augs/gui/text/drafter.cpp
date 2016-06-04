@@ -3,16 +3,13 @@
 #include "../rect.h"
 #include "drafter.h"
 #include "window_framework/window.h"
+#include "window_framework/platform_utils.h"
 
 #undef min
 #undef max
 namespace augs {
 	namespace gui {
 		namespace text {
-			bool drafter::is_newline(unsigned i) {
-				return (i == 0x000A || i == 0x000D);
-			}
-
 			font& drafter::getf(const gui::text::fstr& source, unsigned i) const {
 				//return (i < source.length() && source[i].font_used) ? source[i].font_used : target_caret->default_style.f;
 				return *source[i].font_used;
@@ -211,7 +208,7 @@ namespace augs {
 
 					/* if we have just encountered a newline character or there is need to wrap, we have to break the current line and
 					create another */
-					if (is_newline(source[i].c) || wrap) {
+					if (augs::window::is_newline(source[i].c) || wrap) {
 						/* take care of the current line */
 						lines[l].wrapped = wrap;
 						/* this will be moved left if we're wrapping */
