@@ -17,9 +17,6 @@ namespace components {
 		bool destroy_upon_damage = true;
 		int damage_charges_before_destruction = 1;
 
-		/* used to destroy bullets */
-		vec2 starting_point;
-
 		vec2 custom_impact_velocity;
 
 		bool constrain_lifetime = true;
@@ -29,6 +26,7 @@ namespace components {
 		float damage_falloff_starting_distance = 500.f;
 		float minimum_amount_after_falloff = 5.f;
 
+		float distance_travelled = 0.f;
 		float max_distance = 0.f;
 		float max_lifetime_ms = 2000.f;
 		float recoil_multiplier = 1.f;

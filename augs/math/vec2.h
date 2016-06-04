@@ -388,6 +388,10 @@ namespace augs {
 		bool non_zero(float eps = AUGS_EPSILON) const {
 			return x_non_zero(eps) || y_non_zero();
 		}
+
+		bool is_zero(float eps = AUGS_EPSILON) const {
+			return !non_zero(eps);
+		}
 		
 		vec2t operator-() { return vec2t(x * -1, y * -1); }
 

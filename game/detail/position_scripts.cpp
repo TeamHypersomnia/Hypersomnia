@@ -27,6 +27,10 @@ vec2 velocity(augs::entity_id e) {
 	return components::physics::get_owner_body_entity(e)->get<components::physics>().velocity();
 }
 
+float speed(augs::entity_id e) {
+	return velocity(e).length();
+}
+
 bool is_physical(augs::entity_id e) {
 	return components::physics::is_entity_physical(e);
 }

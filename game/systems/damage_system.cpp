@@ -28,8 +28,8 @@ void damage_system::destroy_colliding_bullets_and_send_damage() {
 			
 			vec2 impact_velocity = damage->custom_impact_velocity;
 			
-			if(!impact_velocity.non_zero())
-				impact_velocity = components::physics::get_owner_body_entity(it.collider)->get<components::physics>().velocity();
+			if(impact_velocity.is_zero())
+				impact_velocity = velocity(it.collider);
 
 			if(damage->impulse_upon_hit > 0.f)
 				subject_of_impact.apply_force(vec2(impact_velocity).set_length(damage->impulse_upon_hit), it.point - subject_of_impact.get_mass_position());
@@ -61,15 +61,15 @@ void damage_system::destroy_colliding_bullets_and_send_damage() {
 
 void damage_system::destroy_outdated_bullets() {
 	for (auto it : targets) {
-		auto& transform = it->get<components::transform>();
 		auto& damage = it->get<components::damage>();
 	
 		if ((damage.constrain_lifetime && damage.lifetime_ms >= damage.max_lifetime_ms) ||
-			(damage.constrain_distance && (damage.starting_point - transform.pos).length() >= damage.max_distance)) {
-			damage.saved_point_of_impact_before_death = transform.pos;
+			(damage.constrain_distance && damage.distance_travelled >= damage.max_distance)) {
+			damage.saved_point_of_impact_before_death = position(it);
 			parent_world.post_message(messages::destroy_message(it));
 		}
 
+		damage.distance_travelled += speed(it);
 		damage.lifetime_ms += delta_milliseconds();
 	}
 }

@@ -6,7 +6,6 @@
 
 namespace components {
 	struct crosshair  {
-		//augs::rects::ltrb bounds;
 		static vec2 calculate_aiming_displacement(augs::entity_id subject_crosshair, bool snap_epsilon_base_offset = false);
 
 		augs::value_animation blink;
@@ -19,10 +18,5 @@ namespace components {
 		float rotation_offset = 0.f;
 		vec2 size_multiplier = vec2(1.0f, 1.0f);
 		vec2 sensitivity = vec2(1.0f, 1.0f);
-
-		crosshair() {
-			blink.animators.push_back(augs::value_animator(0.8f, 1.f, 200, augs::value_animator::QUADRATIC));
-			blink.animators.push_back(augs::value_animator(1.f, 0.8f, 200, augs::value_animator::QUADRATIC));
-		}
 	};
 }
