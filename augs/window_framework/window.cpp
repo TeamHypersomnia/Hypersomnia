@@ -237,10 +237,6 @@ namespace augs {
 			
 			triple_click_delay = GetDoubleClickTime();
 		}
-		
-		std::wstring to_wstr(const std::string& ss) {
-			return std::wstring(ss.begin(), ss.end());
-		}
 
 		int glwindow::create(rects::xywh<int> crect, int _menu, std::wstring _name,
 				int doublebuffer, int _bpp) {

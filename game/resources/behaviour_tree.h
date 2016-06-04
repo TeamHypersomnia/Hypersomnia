@@ -47,12 +47,12 @@ namespace resources {
 			template<class T>
 			void set_goal(const T& g) {
 				std::get<T>(resolved_goals) = g;
-				goals_set.at(Index<T, decltype(resolved_goals)>::value) = true;
+				goals_set.at(index_in_tuple<T, decltype(resolved_goals)>::value) = true;
 			}
 
 			template<class T>
 			T& get_goal() {
-				ensure(goals_set.at(Index<T, decltype(resolved_goals)>::value));
+				ensure(goals_set.at(index_in_tuple<T, decltype(resolved_goals)>::value));
 				return std::get<T>(resolved_goals);
 			}
 		};
