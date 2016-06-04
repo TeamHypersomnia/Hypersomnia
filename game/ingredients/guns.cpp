@@ -9,6 +9,7 @@
 #include "game/components/particle_effect_response_component.h"
 
 #include "game/globals/filters.h"
+#include "game/globals/item_category.h"
 
 #include "entity_system/world.h"
 

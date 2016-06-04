@@ -1,6 +1,6 @@
 #pragma once
 #include "entity_system/entity_id.h"
-#include "game/globals/relations.h"
+#include "game/globals/attitude_type.h"
 #include "math/vec2.h"
 
 std::vector<augs::entity_id> guns_wielded(augs::entity_id);

@@ -3188,9 +3188,6 @@
     <ClInclude Include="game\systems\trace_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\globals\particles.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\messages\movement_response.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3263,9 +3260,6 @@
     <ClInclude Include="game\detail\ai\behaviours.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\globals\relations.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\components\attitude_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3309,6 +3303,48 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\assets\animation_id.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\globals\sub_entity_name.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\globals\sub_definition_name.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\globals\slot_function.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\globals\render_layer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\globals\party_category.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\globals\particle_effect_response_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\globals\joint_name.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\globals\item_transfer_result_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\globals\item_category.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\globals\intent_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\globals\attitude_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\globals\associated_entity_name.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\globals\animation_response_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\item_transfer_result.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

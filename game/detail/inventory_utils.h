@@ -1,6 +1,7 @@
 #pragma once
 #include "inventory_slot_id.h"
 #include "../messages/item_slot_transfer_request.h"
+#include "item_transfer_result.h"
 
 #define SPACE_ATOMS_PER_UNIT 1000
 

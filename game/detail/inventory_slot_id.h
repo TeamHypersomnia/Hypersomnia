@@ -1,8 +1,7 @@
 #pragma once
 #include <functional>
-
-#include "../globals/inventory.h"
-#include "../components/transform_component.h"
+#include "game/globals/slot_function.h"
+#include "game/components/transform_component.h"
 #include "entity_system/entity_id.h"
 void for_each_descendant(augs::entity_id, std::function<void(augs::entity_id item)>);
 

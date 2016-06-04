@@ -1,27 +1,25 @@
 #include "item_button.h"
-#include "gui/stroke.h"
+#include "pixel_line_connector.h"
+#include "grid.h"
 
 #include "entity_system/world.h"
-#include "game/systems/gui_system.h"
+#include "augs/graphics/renderer.h"
+#include "augs/stream.h"
 
+#include "gui/stroke.h"
+
+#include "game/settings.h"
+#include "game/globals/item_category.h"
+#include "game/detail/state_for_drawing.h"
 #include "game/detail/inventory_slot.h"
 #include "game/detail/inventory_utils.h"
 #include "game/components/gui_element_component.h"
 #include "game/components/sprite_component.h"
 #include "game/components/item_component.h"
-
-#include "game/detail/state_for_drawing.h"
-#include "game/settings.h"
-
+#include "game/systems/gui_system.h"
 #include "game/systems/input_system.h"
-
-#include "augs/graphics/renderer.h"
 #include "game/resources/manager.h"
 
-#include "augs/stream.h"
-
-#include "pixel_line_connector.h"
-#include "grid.h"
 #include "ensure.h"
 
 void item_button::get_member_children(std::vector<augs::gui::rect_id>& children) {

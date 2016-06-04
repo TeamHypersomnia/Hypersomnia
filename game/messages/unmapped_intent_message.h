@@ -4,7 +4,7 @@
 
 #include "window_framework/event.h"
 
-#include "../globals/intents.h"
+#include "game/globals/intent_type.h"
 
 /* everything is a state since for actions we can just ignore states with flag set to false */
 using namespace augs;

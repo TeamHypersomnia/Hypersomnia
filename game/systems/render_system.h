@@ -10,7 +10,7 @@
 #include "graphics/vertex.h"
 #include "texture_baker/texture_baker.h"
 
-#include "../globals/layers.h"
+#include "../globals/render_layer.h"
 
 #include <Box2D/Collision/b2DynamicTree.h>
 

@@ -1,5 +1,4 @@
-#include "../../systems/gui_system.h"
-#include "../../globals/inventory.h"
+#include "game/systems/gui_system.h"
 
 #include "ensure.h"
 

@@ -1,13 +1,14 @@
 #pragma once
 #include "entity_system/processing_system.h"
-#include "../components/gui_element_component.h"
-#include "../messages/camera_render_request_message.h"
-#include "../messages/gui_intents.h"
-#include "../messages/raw_window_input_message.h"
+#include "game/components/gui_element_component.h"
+#include "game/messages/camera_render_request_message.h"
+#include "game/messages/gui_intents.h"
+#include "game/messages/raw_window_input_message.h"
 
 #include "augs/gui/gui_world.h"
-#include "../detail/gui/game_gui_root.h"
-#include "../detail/gui/immediate_hud.h"
+#include "game/detail/gui/game_gui_root.h"
+#include "game/detail/gui/immediate_hud.h"
+#include "game/globals/slot_function.h"
 
 class gui_system : public augs::processing_system_templated<components::gui_element> {
 	friend class item_button;

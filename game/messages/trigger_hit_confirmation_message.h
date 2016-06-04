@@ -1,6 +1,5 @@
 #pragma once
 #include "entity_system/entity_id.h"
-#include "../globals/detector_domains.h"
 
 namespace messages {
 	struct trigger_hit_confirmation_message {

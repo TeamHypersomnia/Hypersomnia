@@ -1,5 +1,5 @@
 #pragma once
-#include "../globals/particles.h"
+#include "../globals/particle_effect_response_type.h"
 #include "../assets/particle_effect_id.h"
 
 namespace resources {

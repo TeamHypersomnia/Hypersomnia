@@ -20,6 +20,7 @@
 #include "game/components/name_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/pathfinding_component.h"
+#include "game/globals/party_category.h"
 
 #include "game/messages/crosshair_intent_message.h"
 #include "game/messages/item_slot_transfer_request.h"

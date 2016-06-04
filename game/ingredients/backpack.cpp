@@ -2,6 +2,7 @@
 #include "entity_system/entity.h"
 #include "entity_system/world.h"
 
+#include "game/globals/item_category.h"
 #include "game/components/container_component.h"
 #include "game/components/item_component.h"
 #include "game/components/trigger_component.h"

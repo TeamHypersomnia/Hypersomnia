@@ -1,7 +1,7 @@
 #pragma once
 #include <set>
 #include "entity_system/entity_id.h"
-#include "game/globals/relations.h"
+#include "game/globals/attitude_type.h"
 
 namespace components {
 	struct attitude {

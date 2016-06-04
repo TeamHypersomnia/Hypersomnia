@@ -2,13 +2,12 @@
 #include "entity_system/entity.h"
 #include "entity_system/world.h"
 
+#include "game/globals/item_category.h"
 #include "game/components/container_component.h"
 #include "game/components/item_component.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/trigger_collision_detector_component.h"
 #include "game/components/gui_element_component.h"
-
-#include "../globals/detector_domains.h"
 
 namespace ingredients {
 	void character_inventory(augs::entity_id e) {

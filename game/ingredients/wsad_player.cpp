@@ -24,6 +24,7 @@
 #include "game/assets/particle_effect_response_id.h"
 
 #include "game/globals/filters.h"
+#include "game/globals/party_category.h"
 #include "game/settings.h"
 
 namespace ingredients {

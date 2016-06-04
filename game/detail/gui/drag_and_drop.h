@@ -1,5 +1,6 @@
 #pragma once
 #include "game/messages/gui_intents.h"
+#include "game/detail/item_transfer_result.h"
 
 class item_button;
 

@@ -4,7 +4,7 @@
 #include "game/all_system_includes.h"
 #include "game/all_message_includes.h"
 
-#include "game/globals/layers.h"
+#include "game/globals/render_layer.h"
 
 #include <functional>
 

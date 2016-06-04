@@ -2,7 +2,7 @@
 #include <string>
 #include "../systems/physics_system.h"
 #include "entity_system/entity_id.h"
-#include "../globals/joints.h"
+#include "../globals/joint_name.h"
 #include "../components/fixtures_component.h"
 
 struct body_definition {
