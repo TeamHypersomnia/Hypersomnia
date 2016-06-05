@@ -8,11 +8,6 @@
 #include "misc/sorted_vector.h"
 #include "misc/object_pool.h"
 
-#define INCLUDE_COMPONENT_NAMES 1
-
-#define USE_POINTER_TUPLE 1
-
-#ifdef USE_POINTER_TUPLE
 #include <tuple>
 namespace components {
 	struct animation;
@@ -55,7 +50,6 @@ namespace components {
 	struct sentience;
 	struct attitude;
 }
-#endif
 
 class destroy_system;
 namespace augs {
@@ -93,7 +87,6 @@ namespace augs {
 		void for_each_sub_definition(std::function<void(augs::entity_id)>);
 
 		/* maps type hashes into components */
-#if USE_POINTER_TUPLE 
 		std::tuple<
 			std::pair<memory_pool::id, components::animation*>,
 			std::pair<memory_pool::id, components::animation_response*>,
@@ -137,13 +130,7 @@ namespace augs {
 		> type_to_component;
 
 		component_bitset_matcher signature;
-#else
-		sorted_associative_vector<size_t, memory_pool::id> type_to_component;
-#endif
 
-#ifdef INCLUDE_COMPONENT_NAMES
-		sorted_associative_vector<size_t, std::string> typestrs;
-#endif
 		std::string debug_name;
 
 		entity_id get_id();
@@ -170,29 +157,19 @@ namespace augs {
 
 		template <typename component_class>
 		component_class* find() {
-#if USE_POINTER_TUPLE
 			auto& found = _find<component_class>();
 			if (found.alive())
 				return (component_class*)found.ptr();
-#else
-			auto found = type_to_component.get(typeid(component_class).hash_code());
-			if (found)
-				return reinterpret_cast<component_class*>(found->ptr());
-#endif
 			return nullptr;
 		}
 
 		template <typename component_class>
 		const component_class* find() const {
-#if USE_POINTER_TUPLE
 			auto& found = _find<component_class>();
+
 			if (found.alive())
 				return (component_class*)found.ptr();
-#else
-			auto found = type_to_component.get(typeid(component_class).hash_code());
-			if (found)
-				return reinterpret_cast<component_class*>(found->ptr());
-#endif
+
 			return nullptr;
 		}
 
@@ -230,16 +207,8 @@ namespace augs {
 
 			auto hash = typeid(component_type).hash_code();
 
-#ifdef INCLUDE_COMPONENT_NAMES
-			typestrs.add(hash, typeid(component_type).name());
-#endif
-#if USE_POINTER_TUPLE 
 			auto& component_ptr = *reinterpret_cast<object_pool<component_type>::typed_id*>(&_find<component_type>());
-#else
-			type_to_component.add(hash, memory_pool::id());
 
-			auto& component_ptr = *reinterpret_cast<object_pool<component_type>::typed_id*>(type_to_component.get(hash));
-#endif
 			/* allocate new component in a corresponding pool */
 			component_ptr = owner_world.get_components_by_type<component_type>().allocate(object);
 			
@@ -255,20 +224,13 @@ namespace augs {
 
 		template <typename component_type>
 		void remove() {
-#if USE_POINTER_TUPLE
 			if (!unplug_component_from_systems(typeid(component_type).hash_code()))
 				return;
 
 			/* delete component from the corresponding pool, use hash to identify the proper destructor */
 			owner_world.get_components_by_hash(typeid(component_type).hash_code()).free_with_destructor(_find<component_type>(), typeid(component_type).hash_code());
 			_find<component_type>().unset();
-
-#else
-			remove(typeid(component_type).hash_code());
-#endif
 		}
-
-		void remove(size_t component_type_hash);
 
 	private:
 		void clone(augs::entity_id);
@@ -276,7 +238,6 @@ namespace augs {
 		bool unplug_component_from_systems(size_t);
 		void add_to_compatible_systems(size_t);
 
-#if USE_POINTER_TUPLE 
 		template <typename component_class>
 		memory_pool::id& _find() {
 			return std::get<std::pair<memory_pool::id, component_class*>>(type_to_component).first;
@@ -286,7 +247,6 @@ namespace augs {
 		const memory_pool::id& _find() const {
 			return std::get<std::pair<memory_pool::id, component_class*>>(type_to_component).first;
 		}
-#endif
 	};
 }
 

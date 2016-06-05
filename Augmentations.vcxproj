@@ -993,6 +993,7 @@
     <ClInclude Include="3rdparty\RakNet\Source\XBox360Includes.h" />
     <ClInclude Include="3rdparty\RakNet\Source\_FindFirst.h" />
     <ClInclude Include="augs\build_settings.h" />
+    <ClInclude Include="augs\entity_system\ecs_template.h" />
     <ClInclude Include="augs\filesystem\directory.h" />
     <ClInclude Include="augs\gui\appearance_detector.h" />
     <ClInclude Include="augs\gui\rect_id.h" />
@@ -1067,6 +1068,7 @@
     <ClInclude Include="game\detail\entity_scripts.h" />
     <ClInclude Include="game\detail\item_transfer_result.h" />
     <ClInclude Include="game\detail\position_scripts.h" />
+    <ClInclude Include="game\ecs_declaration.h" />
     <ClInclude Include="game\globals\animation_response_type.h" />
     <ClInclude Include="game\globals\associated_entity_name.h" />
     <ClInclude Include="game\globals\attitude_type.h" />

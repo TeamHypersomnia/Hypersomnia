@@ -114,7 +114,6 @@ namespace augs {
 
 	void entity::clone(augs::entity_id b) {
 		ensure(b.alive());
-#if USE_POINTER_TUPLE
 		debug_name = b->debug_name;
 
 		clone_components(b->type_to_component, *this);
@@ -137,24 +136,10 @@ namespace augs {
 			get<components::item>().current_slot.unset();
 
 		// the same should be done with other sensitive pointers
-#else
-		ensure(0);
-#endif
 	}
 
 	component_bitset_matcher entity::get_component_signature() {
-#if USE_POINTER_TUPLE
 		return signature;
-#else
-		std::vector<unsigned> indices;
-
-		for (auto& raw : type_to_component.raw) {
-			int index = owner_world.component_library.get_index(raw.key);
-			indices.push_back(index);
-		}
-
-		return indices;
-#endif
 	}
 
 	entity_id entity::get_id() {
@@ -162,14 +147,7 @@ namespace augs {
 	}
 
 	void entity::clear() {
-#if USE_POINTER_TUPLE
 		remove_components(type_to_component, *this);
-#else
-		auto ids_to_remove = type_to_component.raw;
-
-		for (auto c : ids_to_remove)
-			remove(c.key);
-#endif
 	}
 
 	void entity::add_to_compatible_systems(size_t component_type_hash) {
@@ -213,25 +191,5 @@ namespace augs {
 				sys->remove(this_id);
 
 		return true;
-	}
-
-	void entity::remove(size_t component_type_hash) {
-#if !USE_POINTER_TUPLE
-		remove_from_incompatible_systems(component_type_hash);
-
-		auto* component_ptr = type_to_component.get(component_type_hash);
-
-		/* delete component from the corresponding pool, use hash to identify the proper destructor */
-		owner_world.get_components_by_hash(component_type_hash).free_with_destructor(*component_ptr, component_type_hash);
-
-		/* delete component entry from entity's map */
-		type_to_component.remove(component_type_hash);
-
-#ifdef INCLUDE_COMPONENT_NAMES
-		typestrs.remove(component_type_hash);
-#endif
-#else
-		ensure(0);
-#endif
 	}
 }
