@@ -1266,6 +1266,9 @@
     <ClCompile Include="augs\window_framework\platform_utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="augs\entity_system\storage_for_components_and_aggregates.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -2744,9 +2747,6 @@
     <ClInclude Include="augs\entity_system\entity_id.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\entity_system\entity_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\entity_system\overworld.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3351,6 +3351,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\window_framework\platform_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\entity_system\track_entities_with_components.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\ecs_instantiation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\entity_system\storage_for_components_and_aggregates.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\entity_system\configurable_components.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\entity_system\ecs_instantiation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
