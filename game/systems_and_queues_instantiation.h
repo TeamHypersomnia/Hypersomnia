@@ -1,3 +1,6 @@
+#include "entity_system/storage_for_message_queues.h"
+#include "entity_system/storage_for_systems.h"
+
 namespace messages {
 	struct intent_message;
 	struct damage_message;
@@ -49,3 +52,57 @@ struct gui_system;
 struct trace_system;
 struct melee_system;
 struct sentience_system;
+
+typedef storage_for_systems <
+	input_system,
+	steering_system,
+	movement_system,
+	animation_system,
+	crosshair_system,
+	rotation_copying_system,
+	physics_system,
+	visibility_system,
+	pathfinding_system,
+	gun_system,
+	particles_system,
+	render_system,
+	camera_system,
+	position_copying_system,
+	damage_system,
+	destroy_system,
+	behaviour_tree_system,
+	car_system,
+	driver_system,
+	trigger_detector_system,
+	item_system,
+	force_joint_system,
+	intent_contextualization_system,
+	gui_system,
+	trace_system,
+	melee_system,
+	sentience_system,
+> storage_for_all_systems;
+
+typedef augs::storage_for_message_queues <
+	messages::intent_message,
+	messages::damage_message,
+	messages::destroy_message,
+	messages::animation_message,
+	messages::movement_response,
+	messages::collision_message,
+	messages::create_particle_effect,
+	messages::gunshot_response,
+	messages::raw_window_input_message,
+	messages::unmapped_intent_message,
+	messages::crosshair_intent_message,
+	messages::trigger_hit_confirmation_message,
+	messages::trigger_hit_request_message,
+	messages::new_entity_message,
+	messages::camera_render_request_message,
+	messages::item_slot_transfer_request,
+	messages::gui_item_transfer_intent,
+	messages::rebuild_physics_message,
+	messages::physics_operation,
+	messages::melee_swing_response,
+	messages::health_event,
+> storage_for_all_message_queues;
