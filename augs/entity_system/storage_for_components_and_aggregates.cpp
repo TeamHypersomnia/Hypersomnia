@@ -20,4 +20,4 @@ namespace augs {
 
 }
 
-#include "ecs_instantiation.h"
+#include "components_instantiation.h"

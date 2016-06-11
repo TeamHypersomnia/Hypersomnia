@@ -2,27 +2,29 @@
 #include "misc/object_pool.h"
 #include "configurable_components.h"
 #include "ensure.h"
+#include "templates.h"
 
 namespace augs {
 	namespace detail {
 		template<class T>
-		struct make_object_pool_id { typedef augs::object_pool<T>::id type; };
+		struct make_object_pool_id { typedef typename object_pool<T>::typed_id type; };
 
 		template<class T>
-		struct make_object_pool { typedef augs::object_pool<T> type; };
+		struct make_object_pool { typedef object_pool<T> type; };
 	}
 
 	template <class... components>
 	class storage_for_components_and_aggregates {
+	public:
 		class component_aggregate {
-			typename transform_types<std::tuple, detail::make_object_pool_id, components...>::type component_ids;
-			friend class component_allocator;
+			typename transform_types<std::tuple, typename detail::make_object_pool_id, components...>::type component_ids;
+			template<class...> friend class component_allocator;
 			friend class component_cloner;
 
 		public:
 			template<class component>
 			component* find() {
-				auto id = std::get<component>(component_ids);
+				auto id = std::get<typename object_pool<component>::typed_id>(component_ids);
 
 				if (id.alive())
 					return id.ptr();
@@ -37,7 +39,7 @@ namespace augs {
 
 			template<class component>
 			const component* find() const {
-				auto id = std::get<component>(component_ids);
+				auto id = std::get<typename object_pool<component>::typed_id>(component_ids);
 
 				if (id.alive())
 					return id.ptr();
@@ -52,7 +54,7 @@ namespace augs {
 		};
 
 	public:
-		typedef object_pool<component_aggregate>::id aggregate_id;
+		typedef typename object_pool<component_aggregate>::typed_id aggregate_id;
 
 	private:
 		template<class component, class... Args>
@@ -62,7 +64,7 @@ namespace augs {
 
 		template <class component>
 		auto& writable_id(component_aggregate& from) {
-			return std::get<typename augs::object_pool<component>::id>(from.data);
+			return std::get<typename augs::object_pool<component>::typed_id>(from.data);
 		}
 
 		template<class... configured_components>
@@ -100,7 +102,7 @@ namespace augs {
 
 	public:
 		template<class... configured_components>
-		aggregate_id allocate_configured_components(const configurable_components& configuration) {
+		aggregate_id allocate_configured_components(const configurable_components<configured_components...>& configuration) {
 			component_allocator allocator{ *this };
 			allocator.from = configuration;
 
