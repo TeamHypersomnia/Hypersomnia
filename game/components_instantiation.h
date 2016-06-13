@@ -1,5 +1,6 @@
 #pragma once
 #include "entity_system/storage_for_components_and_aggregates.h"
+#include "templates.h"
 
 namespace components {
 	struct animation;
@@ -85,49 +86,59 @@ template class augs::storage_for_components_and_aggregates <
 	components::sentience,
 	components::attitude,
 	components::relations
->;
+> ;
 
-typedef augs::storage_for_components_and_aggregates <
-	components::animation,
-	components::animation_response,
-	components::behaviour_tree,
-	components::camera,
-	components::position_copying,
-	components::crosshair,
-	components::damage,
-	components::gun,
-	components::input_receiver,
-	components::rotation_copying,
-	components::movement,
-	components::particle_effect_response,
-	components::particle_group,
-	components::pathfinding,
-	components::physics,
-	components::render,
-	components::steering,
-	components::transform,
-	components::visibility,
-	components::sprite,
-	components::polygon,
-	components::tile_layer,
-	components::car,
-	components::driver,
-	components::trigger,
-	components::trigger_query_detector,
-	components::fixtures,
-	components::container,
-	components::item,
-	components::force_joint,
-	components::physics_definition,
-	components::item_slot_transfers,
-	components::gui_element,
-	components::trigger_collision_detector,
-	components::name,
-	components::trace,
-	components::melee,
-	components::sentience,
-	components::attitude,
-	components::relations
-> storage_for_all_components_and_aggregates;
+template<template<typename...> class List>
+struct put_components_into {
+	typedef typename put_types_into < List,
+		components::animation,
+		components::animation_response,
+		components::behaviour_tree,
+		components::camera,
+		components::position_copying,
+		components::crosshair,
+		components::damage,
+		components::gun,
+		components::input_receiver,
+		components::rotation_copying,
+		components::movement,
+		components::particle_effect_response,
+		components::particle_group,
+		components::pathfinding,
+		components::physics,
+		components::render,
+		components::steering,
+		components::transform,
+		components::visibility,
+		components::sprite,
+		components::polygon,
+		components::tile_layer,
+		components::car,
+		components::driver,
+		components::trigger,
+		components::trigger_query_detector,
+		components::fixtures,
+		components::container,
+		components::item,
+		components::force_joint,
+		components::physics_definition,
+		components::item_slot_transfers,
+		components::gui_element,
+		components::trigger_collision_detector,
+		components::name,
+		components::trace,
+		components::melee,
+		components::sentience,
+		components::attitude,
+		components::relations
+	> ::type type;
+};
 
-typedef storage_for_all_components_and_aggregates::aggregate_id aggregate_id;
+typedef typename put_components_into<augs::storage_for_components_and_aggregates>::type 
+storage_for_all_components_and_aggregates;
+
+typedef typename put_components_into<augs::configurable_components>::type 
+full_entity_definition;
+
+typedef storage_for_all_components_and_aggregates::aggregate_id 
+aggregate_id;
