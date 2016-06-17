@@ -1,78 +1,141 @@
 #include "physics_component.h"
-#include "item_component.h"
-#include "driver_component.h"
 
 #include <Box2D\Box2D.h>
 
 #include "graphics/renderer.h"
 #include "fixtures_component.h"
-#include "physics_definition_component.h"
-#include "../messages/collision_message.h"
 
 #include "math/vec2.h"
-#include "entity_system/world.h"
+#include "game/cosmos.h"
+#include "game/systems/physics_system.h"
 #include "ensure.h"
 
 namespace components {
-	augs::entity_id physics::get_owner_friction_field(augs::entity_id id) {
-		return get_owner_body_entity(id)->get<components::physics>().owner_friction_ground;
-	}
-	
-	augs::entity_id physics::get_owner_body_entity(augs::entity_id id) {
-		auto* fixtures = id->find<components::fixtures>();
-		if (fixtures) return fixtures->get_body_entity();
-		else if (id->find<components::physics>()) return id;
-		return augs::entity_id();
+	physics::physics(const physics& b) {
+		ensure(false);
 	}
 
-	bool physics::is_entity_physical(augs::entity_id id) {
-		return id->find<components::fixtures>() || id->find<components::physics>();
+	physics& physics::operator=(const physics& b) {
+		ensure(false);
+		//set_body_type(get_body_type());
+		//set_velocity(b.velocity());
 	}
 
-	bool physics::are_connected_by_friction(augs::entity_id child, augs::entity_id parent) {
-		if (components::physics::is_entity_physical(child) && components::physics::is_entity_physical(parent)) {
-			bool matched_ancestor = false;
+	physics::physics(const rigid_body_definition& def) {
+		initialize_from_definition(def);
+	}
 
-			entity_id parent_body_entity = components::physics::get_owner_body_entity(parent);
-			entity_id childs_ancestor_entity = components::physics::get_owner_body_entity(child)->get<components::physics>().get_owner_friction_ground();
+	void physics::initialize_from_definition(const rigid_body_definition& def) {
+		black = def;
+		rigid_body_white_box::operator=(def);
 
-			while (childs_ancestor_entity.alive()) {
-				if (childs_ancestor_entity == parent_body_entity) {
-					matched_ancestor = true;
-					break;
-				}
+		destroy_body();
 
-				childs_ancestor_entity = childs_ancestor_entity->get<components::physics>().get_owner_friction_ground();
+		if (should_body_exist_now())
+			build_body();
+	}
+
+	entity_id physics::get_entity() {
+		return black_detail.body_owner;
+	}
+
+	void physics::build_body() {
+		ensure(black_detail.body == nullptr);
+
+		b2BodyDef def;
+		def.type = b2BodyType(black.body_type);
+		def.angle = 0;
+		def.userData = get_entity();
+		def.bullet = black.bullet;
+		def.position = black.transform.pos * PIXELS_TO_METERSf;
+		def.angle = black.transform.rotation * DEG_TO_RAD;
+		def.angularDamping = black.angular_damping;
+		def.linearDamping = black.linear_damping;
+		def.fixedRotation = black.fixed_rotation;
+		def.gravityScale = black.gravity_scale;
+		def.active = true;
+		def.linearVelocity = black.velocity * PIXELS_TO_METERSf;
+		def.angularVelocity = black.angular_velocity * DEG_TO_RAD;
+
+		black_detail.body = black_detail.parent_system->b2world.CreateBody(&def);
+		black_detail.body->SetAngledDampingEnabled(black.angled_damping);
+
+		const auto& all_fixture_entities = get_entity()->get<components::physics>().black_detail.fixture_entities;
+
+		for (auto fe : all_fixture_entities) {
+			auto& fixtures = fe->get<components::fixtures>();
+
+			if (fixtures.should_fixtures_exist_now()) {
+				fixtures.destroy_fixtures();
+				fixtures.build_fixtures();
 			}
-
-			if (matched_ancestor)
-				return true;
+			else {
+				fixtures.destroy_fixtures();
+			}
 		}
+	}
 
-		return false;
+	void physics::destroy_body() {
+		if (black_detail.body != nullptr) {
+			const auto& all_fixture_entities = get_entity()->get<components::physics>().black_detail.fixture_entities;
+
+			for (auto fe : all_fixture_entities)
+				fe->get<components::fixtures>().destroy_fixtures();
+
+			black_detail.parent_system->b2world.DestroyBody(black_detail.body);
+		}
+	}
+
+	rigid_body_definition physics::get_definition() const {
+		rigid_body_definition output;
+		output.rigid_body_black_box::operator=(black);
+		output.rigid_body_white_box::operator=(*this);
+		return output;
+	}
+
+	void physics::set_body_type(type t) {
+		black.body_type = t;
+
+		destroy_body();
+
+		if (should_body_exist_now())
+			build_body();
+	}
+
+	void physics::set_activated(bool flag) {
+		black.activated = flag;
+
+		destroy_body();
+
+		if (should_body_exist_now())
+			build_body();
 	}
 
 	void physics::set_velocity(vec2 pixels) {
-		body->SetLinearVelocity(pixels * PIXELS_TO_METERSf);
+		black.velocity = pixels;
+
+		if (!syncable_black_box_exists())
+			return;
+
+		black_detail.body->SetLinearVelocity(pixels * PIXELS_TO_METERSf);
 	}	
 	
 	void physics::set_linear_damping(float damping) {
-		body->SetLinearDamping(damping);
+		black.linear_damping = damping;
+
+		if (!syncable_black_box_exists())
+			return;
+
+		black_detail.body->SetLinearDamping(damping);
 	}
 
-	void physics::set_density(float density) {
-		b2Fixture* f = body->GetFixtureList();
+	void physics::set_linear_damping_vec(vec2 damping) {
+		black.linear_damping_vec = damping;
 
-		while (f) {
-			f->SetDensity(density);
-			f = f->GetNext();
-		}
+		if (!syncable_black_box_exists())
+			return;
 
-		body->ResetMassData();
-	}
-	
-	void physics::set_linear_damping_vec(vec2 pixels) {
-		body->SetLinearDampingVec(pixels);
+		black_detail.body->SetLinearDampingVec(damping);
 	}
 
 	void physics::apply_force(vec2 pixels) {
@@ -80,13 +143,15 @@ namespace components {
 	}
 	
 	void physics::apply_force(vec2 pixels, vec2 center_offset, bool wake) {
+		ensure(syncable_black_box_exists());
+
 		if (pixels.is_epsilon(2.f))
 			return;
 
 		vec2 force = pixels * PIXELS_TO_METERSf;
-		vec2 location = body->GetWorldCenter() + (center_offset * PIXELS_TO_METERSf);
+		vec2 location = black_detail.body->GetWorldCenter() + (center_offset * PIXELS_TO_METERSf);
 
-		body->ApplyForce(force, location, wake);
+		black_detail.body->ApplyForce(force, location, wake);
 
 		if (renderer::get_current().debug_draw_forces && force.non_zero()) {
 			auto& lines = renderer::get_current().logic_lines;
@@ -99,13 +164,15 @@ namespace components {
 	}
 
 	void physics::apply_impulse(vec2 pixels, vec2 center_offset, bool wake) {
+		ensure(syncable_black_box_exists());
+
 		if (pixels.is_epsilon(2.f))
 			return;
 
 		vec2 force = pixels * PIXELS_TO_METERSf;
-		vec2 location = body->GetWorldCenter() + (center_offset * PIXELS_TO_METERSf);
+		vec2 location = black_detail.body->GetWorldCenter() + (center_offset * PIXELS_TO_METERSf);
 
-		body->ApplyLinearImpulse(force, location, true);
+		black_detail.body->ApplyLinearImpulse(force, location, true);
 
 		if (renderer::get_current().debug_draw_forces && force.non_zero()) {
 			auto& lines = renderer::get_current().logic_lines;
@@ -114,39 +181,47 @@ namespace components {
 	}
 
 	void physics::apply_angular_impulse(float imp) {
-		body->ApplyAngularImpulse(imp, true);
+		ensure(syncable_black_box_exists());
+		black_detail.body->ApplyAngularImpulse(imp, true);
 	}
 
 	float physics::get_mass() const {
-		return body->GetMass();
+		ensure(syncable_black_box_exists());
+		return black_detail.body->GetMass();
 	}
 
 	float physics::get_angle() const {
-		return body->GetAngle() * RAD_TO_DEG;
+		ensure(syncable_black_box_exists());
+		return black_detail.body->GetAngle() * RAD_TO_DEG;
 	}
 
 	vec2 physics::get_position() const {
-		return METERS_TO_PIXELSf * body->GetPosition();
+		ensure(syncable_black_box_exists());
+		return METERS_TO_PIXELSf * black_detail.body->GetPosition();
 	}
 
 	vec2 physics::get_mass_position() const {
-		return METERS_TO_PIXELSf * body->GetWorldCenter();
+		ensure(syncable_black_box_exists());
+		return METERS_TO_PIXELSf * black_detail.body->GetWorldCenter();
 	}
 
 	vec2 physics::velocity() const {
-		return vec2(body->GetLinearVelocity()) * METERS_TO_PIXELSf;
+		ensure(syncable_black_box_exists());
+		return vec2(black_detail.body->GetLinearVelocity()) * METERS_TO_PIXELSf;
 	}
 
 	vec2 physics::get_world_center() const {
-		return METERS_TO_PIXELSf * body->GetWorldCenter();
+		ensure(syncable_black_box_exists());
+		return METERS_TO_PIXELSf * black_detail.body->GetWorldCenter();
 	}
 
 	vec2 physics::get_aabb_size() const {
+		ensure(syncable_black_box_exists());
 		b2AABB aabb;
 		aabb.lowerBound.Set(FLT_MAX, FLT_MAX);
 		aabb.upperBound.Set(-FLT_MAX, -FLT_MAX);
 
-		b2Fixture* fixture = body->GetFixtureList();
+		b2Fixture* fixture = black_detail.body->GetFixtureList();
 		
 		while (fixture != nullptr) {
 			aabb.Combine(aabb, fixture->GetAABB(0));
@@ -156,59 +231,28 @@ namespace components {
 		return vec2(aabb.upperBound.x - aabb.lowerBound.x, aabb.upperBound.y - aabb.lowerBound.y);
 	}
 
-	void physics::set_active(augs::entity_id id, bool active) {
-		if (id->find<components::physics>() == nullptr)
-			id->get<components::physics_definition>().body.active = active;
-		else	
-			id->get<components::physics>().body->SetActive(active);
-	}
-
-	void physics::resolve_density_of_associated_fixtures(augs::entity_id id) {
-		auto* maybe_physics = id->find<components::physics>();
-
-		if (maybe_physics) {
-			for (auto& f : maybe_physics->fixture_entities) {
-				if(f != id)
-					resolve_density_of_associated_fixtures(f);
-			}
-		}
-
-		auto& fixtures = id->get<components::fixtures>();
-		auto& definition = id->get<components::physics_definition>();
-
-		float density_multiplier = 1.f;
-
-		auto* item = id->find<components::item>();
-
-		if (item != nullptr && item->current_slot.alive() && item->current_slot.should_item_inside_keep_physical_body())
-			density_multiplier *= item->current_slot.calculate_density_multiplier_due_to_being_attached();
-
-		auto owner_body = get_owner_body_entity(id);
-		auto* driver = owner_body->find<components::driver>();
-
-		if (driver) {
-			if (driver->owned_vehicle.alive()) {
-				density_multiplier *= driver->density_multiplier_while_driving;
-			}
-		}
-
-		for (auto& f : fixtures.list_of_fixtures) {
-			auto& fixdef = definition.fixtures[f.index_in_fixture_definitions];
-			f.fixture->SetDensity(fixdef.density * density_multiplier);
-		}
-
-		fixtures.get_body()->ResetMassData();
-	}
-
 	entity_id physics::get_owner_friction_ground() const {
 		return owner_friction_ground;
 	}
-
-	void physics::set_transform(augs::entity_id id) {
+	
+	void physics::set_transform(entity_id id) {
 		set_transform(id->get<components::transform>());
 	}
 
 	void physics::set_transform(components::transform transform) {
-		body->SetTransform(transform.pos * PIXELS_TO_METERSf, transform.rotation * DEG_TO_RAD);
+		black.transform = transform;
+
+		if (!syncable_black_box_exists())
+			return;
+
+		black_detail.body->SetTransform(transform.pos * PIXELS_TO_METERSf, transform.rotation * DEG_TO_RAD);
+	}
+
+	bool physics::should_body_exist_now() const {
+		return black_detail.parent_system != nullptr && black.activated;
+	}
+
+	bool physics::syncable_black_box_exists() const {
+		return black_detail.body != nullptr;
 	}
 }
