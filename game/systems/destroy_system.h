@@ -1,13 +1,12 @@
 #pragma once
-#include "entity_system/processing_system.h"
+#include "game/processing_system_with_cosmos_reference.h"
 
 using namespace augs;
 
-class destroy_system : public event_only_system {
+class destroy_system : public processing_system_with_cosmos_reference {
 public:
-	using event_only_system::event_only_system;
+	using processing_system_with_cosmos_reference::processing_system_with_cosmos_reference;
 
-	void purge_queue_of_duplicates();
-	void delete_queued_entities();
-	void purge_message_queues_of_dead_entities();
+	void queue_children_of_queued_entities();
+	void perform_deletions();
 };
