@@ -23,7 +23,7 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 	auto& renderer = augs::renderer::get_current();
 	auto& lines = augs::renderer::get_current().logic_lines;
 
-	for (auto it : cosmos.get_list(processing_subjects::WITH_PATHFINDING)) {
+	for (auto it : cosmos.get(processing_subjects::WITH_PATHFINDING)) {
 		/* get necessary components */
 		auto& visibility = it->get<components::visibility>();
 		auto& pathfinding = it->get<components::pathfinding>();

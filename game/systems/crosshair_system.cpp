@@ -57,7 +57,7 @@ void crosshair_system::apply_crosshair_intents_to_base_offsets(cosmos& cosmos, s
 }
 
 void crosshair_system::apply_base_offsets_to_crosshair_transforms(cosmos& cosmos, step_state& step) {
-	for (auto it : cosmos.get_list(processing_subjects::WITH_CROSSHAIR)) {
+	for (auto it : cosmos.get(processing_subjects::WITH_CROSSHAIR)) {
 		auto player_id = it->get<components::crosshair>().character_entity_to_chase;
 
 		if (player_id.alive()) {
@@ -68,7 +68,7 @@ void crosshair_system::apply_base_offsets_to_crosshair_transforms(cosmos& cosmos
 }
 
 void crosshair_system::animate_crosshair_sizes(cosmos& cosmos) {
-	for (auto it : cosmos.get_list(processing_subjects::WITH_CROSSHAIR)) {
+	for (auto it : cosmos.get(processing_subjects::WITH_CROSSHAIR)) {
 		auto& crosshair = it->get<components::crosshair>();
 
 		if (crosshair.should_blink) {

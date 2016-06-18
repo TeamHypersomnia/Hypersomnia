@@ -112,7 +112,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 	std::vector<std::pair<physics_system::raycast_output, physics_system::raycast_output>> all_ray_outputs;
 	std::vector<ray_input> all_ray_inputs;
 
-	for (auto it : cosmos.get_list(processing_subjects::WITH_VISIBILITY)) {
+	for (auto it : cosmos.get(processing_subjects::WITH_VISIBILITY)) {
 		auto& visibility = it->get<components::visibility>();
 		auto& transform = it->get<components::transform>();
 
