@@ -2,7 +2,6 @@
 #include <ctime>
 #include <sstream>
 
-
 template<class T>
 static std::string leading_zero(T component)
 {
@@ -34,5 +33,3 @@ std::string augs::get_timestamp() {
 		+ leading_zero(local_time->tm_sec) + 
 		"]";
 }
-
-

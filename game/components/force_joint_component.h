@@ -18,6 +18,6 @@ namespace components {
 		bool consider_rotation = true;
 		components::transform chased_entity_offset;
 
-		augs::constant_size_vector<vec2, 2> force_offsets;
+		std::array<vec2, 2> force_offsets;
 	};
 }

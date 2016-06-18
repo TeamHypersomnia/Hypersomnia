@@ -1,7 +1,6 @@
 #include "force_joint_system.h"
 #include "game/entity_id.h"
 #include "log.h"
-#include "Box2d/Box2d.h"
 
 void force_joint_system::apply_forces_towards_target_entities() {
 	for (auto& it : targets) {
@@ -32,17 +31,14 @@ void force_joint_system::apply_forces_towards_target_entities() {
 			auto force_for_chaser = vec2(direction).set_length(force_length * 1.f - force_joint.percent_applied_to_chased_entity);
 			auto force_for_chased = -force_for_chaser * force_joint.percent_applied_to_chased_entity;
 
-			int offset_num = force_joint.force_offsets.size();
-
 			bool is_force_epsilon = force_for_chaser.length() < 500;
+
+			auto& offsets = force_joint.force_offsets;
 
 			//if (!is_force_epsilon) 
 			{
-				if (offset_num > 0)
-					for (auto& force_offset : force_joint.force_offsets)
-						physics.apply_force(force_for_chaser * physics.get_mass() / offset_num, force_offset);
-				else
-					physics.apply_force(force_for_chaser * physics.get_mass());
+				for (auto& offset : offsets)
+					physics.apply_force(force_for_chaser * physics.get_mass() / offsets.size(), offset);
 
 				//LOG("F: %x, %x, %x", force_for_chaser, physics.velocity(), AS_INTV physics.get_position());
 			}
