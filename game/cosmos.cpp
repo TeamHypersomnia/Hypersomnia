@@ -81,7 +81,7 @@ std::wstring cosmos::summary() const {
 	return typesafe_sprintf(L"Entities: %x\n", entities_count());
 }
 
-std::vector<entity_id> cosmos::get_list(list_of_processing_subjects list) const {
+std::vector<entity_id> cosmos::get_list(processing_subjects list) const {
 	return lists_of_processing_subjects.get(list);
 }
 

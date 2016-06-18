@@ -32,9 +32,9 @@ void trigger_detector_system::consume_trigger_detector_presses() {
 
 				if (trigger_query_detector->spam_trigger_requests_when_detection_intented) {
 					if (trigger_query_detector->detection_intent_enabled)
-						e.subject.unskip_processing_in(list_of_processing_subjects::trigger_query_detector>();
+						e.subject.unskip_processing_in(processing_subjects::trigger_query_detector>();
 					else
-						e.subject.skip_processing_in(list_of_processing_subjects::trigger_query_detector>();
+						e.subject.skip_processing_in(processing_subjects::trigger_query_detector>();
 				}
 				else if(e.pressed_flag) {
 					e.subject.deactivate(trigger_query_detector);
@@ -60,7 +60,7 @@ void trigger_detector_system::post_trigger_requests_from_continuous_detectors() 
 
 	for (auto& t : targets_copy) {
 		if (!t->get<components::trigger_query_detector>().detection_intent_enabled)
-			t.skip_processing_in(list_of_processing_subjects::trigger_query_detector>();
+			t.skip_processing_in(processing_subjects::trigger_query_detector>();
 		else {
 			messages::trigger_hit_request_message request;
 			request.detector = t;

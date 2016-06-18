@@ -8,7 +8,7 @@
 
 #include "game/components/pathfinding_component.h"
 
-#include "game/globals/list_of_processing_subjects.h"
+#include "game/globals/processing_subjects.h"
 
 pathfinding_system::pathfinding_system() : draw_memorised_walls(false), draw_undiscovered(false),
 	epsilon_distance_the_same_vertex(50.f), epsilon_distance_visible_point(2) {}
@@ -23,7 +23,7 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 	auto& renderer = augs::renderer::get_current();
 	auto& lines = augs::renderer::get_current().logic_lines;
 
-	for (auto it : cosmos.get_list(list_of_processing_subjects::WITH_PATHFINDING)) {
+	for (auto it : cosmos.get_list(processing_subjects::WITH_PATHFINDING)) {
 		/* get necessary components */
 		auto& visibility = it->get<components::visibility>();
 		auto& pathfinding = it->get<components::pathfinding>();

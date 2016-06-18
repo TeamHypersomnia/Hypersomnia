@@ -108,12 +108,12 @@ void entity_id::for_each_sub_definition(std::function<void(full_entity_definitio
 	}
 }
 
-void entity_id::skip_processing_in(list_of_processing_subjects list) {
-	(*this)->removed_from_processing_lists |= 1 << unsigned long long(list);
+void entity_id::skip_processing_in(processing_subjects list) {
+	(*this)->removed_from_processing_subjects |= 1 << unsigned long long(list);
 	// TODO: notify parent cosmos to optimize the processing lists
 }
 
-void entity_id::unskip_processing_in(list_of_processing_subjects list) {
-	(*this)->removed_from_processing_lists &= ~(1 << unsigned long long(list));
+void entity_id::unskip_processing_in(processing_subjects list) {
+	(*this)->removed_from_processing_subjects &= ~(1 << unsigned long long(list));
 	// TODO: notify parent cosmos to optimize the processing lists
 }

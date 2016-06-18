@@ -46,7 +46,7 @@ public:
 	void advance_deterministic_schemata(augs::machine_entropy input, cosmic_profiler&);
 	void call_rendering_schemata(augs::variable_delta delta, cosmic_profiler&) const;
 
-	std::vector<entity_id> get_list(list_of_processing_subjects) const;
+	std::vector<entity_id> get_list(processing_subjects) const;
 	size_t entities_count() const;
 	std::wstring summary() const;
 };

@@ -6,7 +6,7 @@
 #include "game/globals/sub_definition_name.h"
 
 #include "game/globals/sub_definition_name.h"
-#include "game/globals/list_of_processing_subjects.h"
+#include "game/globals/processing_subjects.h"
 
 #include "game/types_specification/components_instantiation.h"
 #include "game/types_specification/full_entity_definition_declaration.h"
@@ -43,8 +43,8 @@ public:
 	void for_each_sub_entity_recursive(std::function<void(entity_id)>);
 	void for_each_sub_definition(std::function<void(full_entity_definition&)>);
 
-	void skip_processing_in(list_of_processing_subjects);
-	void unskip_processing_in(list_of_processing_subjects);
+	void skip_processing_in(processing_subjects);
+	void unskip_processing_in(processing_subjects);
 };
 
 class entity_handle {

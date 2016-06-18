@@ -28,7 +28,7 @@ namespace augs {
 		auto& from = *aggregate;
 		auto& to = *new_aggregate;
 
-		to.removed_from_processing_lists = from.removed_from_processing_lists;
+		to.removed_from_processing_subjects = from.removed_from_processing_subjects;
 
 		for_each_type<components...>([this, &from, &to](auto c) {
 			auto* maybe_component = from.find<decltype(c)>();

@@ -1022,7 +1022,7 @@
     <ClInclude Include="augs\window_framework\platform_utils.h" />
     <ClInclude Include="game\detail\convex_partitioned_shape.h" />
     <ClInclude Include="game\detail\physics_engine_reflected_state.h" />
-    <ClInclude Include="game\globals\list_of_processing_subjects.h" />
+    <ClInclude Include="game\globals\processing_subjects.h" />
     <ClInclude Include="game\lists_of_processing_subjects.h" />
     <ClInclude Include="game\messages\will_soon_be_deleted.h" />
     <ClInclude Include="game\cosmic_profiler.h" />

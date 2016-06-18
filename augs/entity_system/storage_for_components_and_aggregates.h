@@ -20,7 +20,7 @@ namespace augs {
 			friend storage_for_components_and_aggregates;
 			
 		public:
-			unsigned long long removed_from_processing_lists = 0;
+			unsigned long long removed_from_processing_subjects = 0;
 
 			template<class component>
 			component* find() {

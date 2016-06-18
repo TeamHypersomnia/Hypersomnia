@@ -1,6 +1,6 @@
 #pragma once
 
-enum class list_of_processing_subjects {
+enum class processing_subjects {
 	WITH_ANIMATION,
 	WITH_BEHAVIOUR_TREE,
 	WITH_CAMERA,

@@ -3401,13 +3401,13 @@
     <ClInclude Include="game\step_state.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\globals\list_of_processing_subjects.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\lists_of_processing_subjects.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\cosmic_profiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\globals\processing_subjects.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -80,7 +80,7 @@ bool driver_system::change_car_ownership(entity_id driver_entity, entity_id car_
 		driver.owned_vehicle = car_entity;
 		car.current_driver = driver_entity;
 		force_joint.chased_entity = car.left_wheel_trigger;
-		driver_entity.unskip_processing_in(list_of_processing_subjects::WITH_FORCE_JOINT);
+		driver_entity.unskip_processing_in(processing_subjects::WITH_FORCE_JOINT);
 
 		if (maybe_movement) {
 			maybe_movement->reset_movement_flags();
@@ -103,7 +103,7 @@ bool driver_system::change_car_ownership(entity_id driver_entity, entity_id car_
 
 		driver.owned_vehicle.unset();
 		car.current_driver.unset();
-		driver_entity.skip_processing_in(list_of_processing_subjects::WITH_FORCE_JOINT);
+		driver_entity.skip_processing_in(processing_subjects::WITH_FORCE_JOINT);
 
 		if (maybe_movement) {
 			maybe_movement->reset_movement_flags();
