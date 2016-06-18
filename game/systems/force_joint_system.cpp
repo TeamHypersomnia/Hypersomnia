@@ -1,5 +1,5 @@
 #include "force_joint_system.h"
-#include "entity_system/entity.h"
+#include "game/entity_id.h"
 #include "log.h"
 #include "Box2d/Box2d.h"
 

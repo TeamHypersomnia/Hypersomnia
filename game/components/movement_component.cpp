@@ -55,7 +55,7 @@ namespace components {
 		if (d.y < 0) moving_forward = true;
 	}
 
-	void movement::add_animation_receiver(augs::entity_id e, bool stop_at_zero_movement) {
+	void movement::add_animation_receiver(entity_id e, bool stop_at_zero_movement) {
 		subscribtion s;
 		s.target = e;
 		s.stop_response_at_zero_speed = stop_at_zero_movement;

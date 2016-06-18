@@ -9,7 +9,7 @@
 #include "inventory_utils.h"
 #include "inventory_slot.h"
 
-void unset_input_flags_of_orphaned_entity(augs::entity_id e) {
+void unset_input_flags_of_orphaned_entity(entity_id e) {
 	auto* gun = e->find<components::gun>();
 	auto* melee = e->find<components::melee>();
 	auto* car = e->find<components::car>();
@@ -34,7 +34,7 @@ bool isLeft(vec2 a, vec2 b, vec2 c) {
 	return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
 }
 
-identified_danger assess_danger(augs::entity_id victim, augs::entity_id danger) {
+identified_danger assess_danger(entity_id victim, entity_id danger) {
 	identified_danger result;
 
 	auto* sentience = victim->find<components::sentience>();
@@ -87,7 +87,7 @@ identified_danger assess_danger(augs::entity_id victim, augs::entity_id danger) 
 	return result;
 }
 
-attitude_type calculate_attitude(augs::entity_id targeter, augs::entity_id target) {
+attitude_type calculate_attitude(entity_id targeter, entity_id target) {
 	auto& targeter_attitude = targeter->get<components::attitude>();
 	auto* target_attitude = target->find<components::attitude>();
 
@@ -104,8 +104,8 @@ attitude_type calculate_attitude(augs::entity_id targeter, augs::entity_id targe
 	return attitude_type::NEUTRAL;
 }
 
-std::vector<augs::entity_id> guns_wielded(augs::entity_id subject) {
-	std::vector<augs::entity_id> result;
+std::vector<entity_id> guns_wielded(entity_id subject) {
+	std::vector<entity_id> result;
 
 	auto hand = subject[slot_function::PRIMARY_HAND];
 
@@ -129,7 +129,7 @@ std::vector<augs::entity_id> guns_wielded(augs::entity_id subject) {
 	return result;
 }
 
-float assess_projectile_velocity_of_weapon(augs::entity_id weapon) {
+float assess_projectile_velocity_of_weapon(entity_id weapon) {
 	if (weapon.dead())
 		return 0.f;
 

@@ -2,7 +2,7 @@
 #include <vector>
 #include <functional>
 #include "game/components/sprite_component.h"
-#include "entity_system/entity_id.h"
+#include "game/entity_id.h"
 
 namespace resources {
 	struct animation {

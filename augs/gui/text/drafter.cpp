@@ -1,6 +1,6 @@
 #pragma once
 #include <algorithm>
-#include "../rect.h"
+#include "gui/rect.h"
 #include "drafter.h"
 #include "window_framework/window.h"
 #include "window_framework/platform_utils.h"

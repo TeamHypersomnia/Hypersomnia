@@ -1,7 +1,6 @@
-#include "entity_system/world.h"
+#include "game/cosmos.h"
 #include "game/components/gun_component.h"
 #include "game/components/item_component.h"
-#include "game/components/physics_definition_component.h"
 #include "game/components/damage_component.h"
 #include "game/components/sprite_component.h"
 #include "game/components/name_component.h"
@@ -11,7 +10,7 @@
 #include "game/globals/filters.h"
 #include "game/globals/item_category.h"
 
-#include "entity_system/world.h"
+#include "game/cosmos.h"
 
 #include "game/messages/item_slot_transfer_request.h"
 
@@ -19,7 +18,7 @@
 #include "game/detail/inventory_utils.h"
 
 namespace ingredients {
-	void default_gun_container(augs::entity_id e) {
+	void default_gun_container(entity_id e) {
 		auto& item = make_item(e);
 		auto& container = *e += components::container();
 		item.space_occupied_per_charge = to_space_units("3.5");
@@ -62,7 +61,7 @@ namespace ingredients {
 }
 
 namespace prefabs {
-	augs::entity_id create_sample_magazine(augs::world& world, vec2 pos, std::string space, augs::entity_id charge_inside) {
+	entity_id create_sample_magazine(cosmos& world, vec2 pos, std::string space, entity_id charge_inside) {
 		auto sample_magazine = world.create_entity("sample_magazine");
 		name_entity(sample_magazine, entity_name::MAGAZINE);
 
@@ -97,7 +96,7 @@ namespace prefabs {
 		return sample_magazine;
 	}
 
-	augs::entity_id create_sample_suppressor(augs::world& world, vec2 pos) {
+	entity_id create_sample_suppressor(cosmos& world, vec2 pos) {
 		auto sample_suppressor = world.create_entity("sample_suppressor");
 		name_entity(sample_suppressor, entity_name::SUPPRESSOR);
 
@@ -112,7 +111,7 @@ namespace prefabs {
 		return sample_suppressor;
 	}
 
-	augs::entity_id create_pink_charge(augs::world& world, vec2 pos, int charges) {
+	entity_id create_pink_charge(cosmos& world, vec2 pos, int charges) {
 		auto pink_charge = world.create_entity("pink_charge");
 		auto round_definition = world.create_definition_entity("round_definition");
 		auto shell_definition = world.create_definition_entity("shell_definition");
@@ -164,7 +163,7 @@ namespace prefabs {
 		return pink_charge;
 	}
 
-	augs::entity_id create_cyan_charge(augs::world& world, vec2 pos, int charges) {
+	entity_id create_cyan_charge(cosmos& world, vec2 pos, int charges) {
 		auto cyan_charge = world.create_entity("cyan_charge");
 		auto round_definition = world.create_definition_entity("round_definition");
 		auto shell_definition = world.create_definition_entity("shell_definition");
@@ -213,7 +212,7 @@ namespace prefabs {
 		return cyan_charge;
 	}
 
-	augs::entity_id create_green_charge(augs::world& world, vec2 pos, int charges) {
+	entity_id create_green_charge(cosmos& world, vec2 pos, int charges) {
 		auto green_charge = world.create_entity("green_charge");
 		auto round_definition = world.create_definition_entity("round_definition");
 		auto shell_definition = world.create_definition_entity("shell_definition");
@@ -265,7 +264,7 @@ namespace prefabs {
 		return green_charge;
 	}
 
-	augs::entity_id create_sample_rifle(augs::world& world, vec2 pos, augs::entity_id load_mag) {
+	entity_id create_sample_rifle(cosmos& world, vec2 pos, entity_id load_mag) {
 		auto weapon = world.create_entity("sample_rifle");
 		name_entity(weapon, entity_name::ASSAULT_RIFLE);
 
@@ -339,7 +338,7 @@ namespace prefabs {
 		return weapon;
 	}
 
-	augs::entity_id create_submachine(augs::world& world, vec2 pos, augs::entity_id load_mag) {
+	entity_id create_submachine(cosmos& world, vec2 pos, entity_id load_mag) {
 		auto weapon = world.create_entity("submachine");
 		name_entity(weapon, entity_name::SUBMACHINE);
 
@@ -414,7 +413,7 @@ namespace prefabs {
 		return weapon;
 	}
 
-	augs::entity_id create_pistol(augs::world& world, vec2 pos, augs::entity_id load_mag) {
+	entity_id create_pistol(cosmos& world, vec2 pos, entity_id load_mag) {
 		auto weapon = world.create_entity("pistol");
 		name_entity(weapon, entity_name::PISTOL);
 

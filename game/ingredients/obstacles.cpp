@@ -1,9 +1,9 @@
 #include "ingredients.h"
-#include "entity_system/world.h"
+#include "game/cosmos.h"
 #include "game/components/name_component.h"
 
 namespace prefabs {
-	augs::entity_id create_crate(augs::world& world, vec2 pos, vec2 size) {
+	entity_id create_crate(cosmos world, vec2 pos, vec2 size) {
 		auto crate = world.create_entity("crate");
 
 		name_entity(crate, entity_name::CRATE);

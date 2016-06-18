@@ -8,8 +8,8 @@
 #include "game/messages/will_soon_be_deleted.h"
 
 void destroy_system::queue_children_of_queued_entities() {
-	auto& queued = parent_cosmos.messages.get_queue<messages::queue_destruction>();
-	auto& deletions = parent_cosmos.messages.get_queue<messages::will_soon_be_deleted>();
+	auto& queued = step.messages.get_queue<messages::queue_destruction>();
+	auto& deletions = step.messages.get_queue<messages::will_soon_be_deleted>();
 
 	for (auto it : queued) {
 		auto deletion_adder = [&deletions](entity_id descendant) {
@@ -17,20 +17,20 @@ void destroy_system::queue_children_of_queued_entities() {
 		};
 
 		deletions.push_back(it.subject);
-		it.subject.for_each_sub_entity(deletion_adder);
+		it.subject.for_each_sub_entity_recursive(deletion_adder);
 	}
 
 	queued.clear();
 }
 
 void destroy_system::perform_deletions() {
-	auto& deletions = parent_cosmos.messages.get_queue<messages::will_soon_be_deleted>();
+	auto& deletions = step.messages.get_queue<messages::will_soon_be_deleted>();
 
 	// destroy in reverse order; children first
 	for (auto& it = deletions.rbegin(); it != deletions.rend(); ++it) {
 		ensure((*it).subject.alive());
 
-		parent_cosmos.delete_entity((*it).subject);
+		cosmos.delete_entity((*it).subject);
 	}
 
 	deletions.clear();

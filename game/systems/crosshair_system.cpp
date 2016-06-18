@@ -1,16 +1,22 @@
 #include "crosshair_system.h"
-#include "entity_system/world.h"
+#include "game/cosmos.h"
 
-#include "../messages/intent_message.h"
-#include "../messages/crosshair_intent_message.h"
+#include "game/messages/intent_message.h"
+#include "game/messages/crosshair_intent_message.h"
 
-#include "../components/sprite_component.h"
-#include "../components/camera_component.h"
+#include "game/components/sprite_component.h"
+#include "game/components/camera_component.h"
+
+#include "game/components/crosshair_component.h"
+#include "game/components/transform_component.h"
+#include "game/messages/intent_message.h"
+
 #include "texture_baker/texture_baker.h"
+#include "game/step_state.h"
 
-void crosshair_system::generate_crosshair_intents() {
-	parent_world.get_message_queue<messages::crosshair_intent_message>().clear();
-	auto events = parent_world.get_message_queue<messages::intent_message>();
+void crosshair_system::generate_crosshair_intents(step_state& step) {
+	step.messages.get_queue<messages::crosshair_intent_message>().clear();
+	auto events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& it : events) {
 		messages::crosshair_intent_message crosshair_intent;
@@ -39,19 +45,19 @@ void crosshair_system::generate_crosshair_intents() {
 			crosshair_intent.crosshair_base_offset = base_offset;
 			crosshair_intent.crosshair_world_pos = base_offset + crosshair->character_entity_to_chase->get<components::transform>().pos;
 
-			parent_world.post_message(crosshair_intent);
+			step.messages.post(crosshair_intent);
 		}
 	}
 }
-void crosshair_system::apply_crosshair_intents_to_base_offsets() {
-	auto& events = parent_world.get_message_queue<messages::crosshair_intent_message>();
+void crosshair_system::apply_crosshair_intents_to_base_offsets(cosmos& cosmos, step_state& step) {
+	auto& events = step.messages.get_queue<messages::crosshair_intent_message>();
 
 	for (auto& it : events)
 		it.subject->get<components::crosshair>().base_offset = it.crosshair_base_offset;
 }
 
-void crosshair_system::apply_base_offsets_to_crosshair_transforms() {
-	for (auto it : targets) {
+void crosshair_system::apply_base_offsets_to_crosshair_transforms(cosmos& cosmos, step_state& step) {
+	for (auto it : cosmos.get_list(list_of_processing_subjects::WITH_CROSSHAIR)) {
 		auto player_id = it->get<components::crosshair>().character_entity_to_chase;
 
 		if (player_id.alive()) {
@@ -61,8 +67,8 @@ void crosshair_system::apply_base_offsets_to_crosshair_transforms() {
 	}
 }
 
-void crosshair_system::animate_crosshair_sizes() {
-	for (auto it : targets) {
+void crosshair_system::animate_crosshair_sizes(cosmos& cosmos) {
+	for (auto it : cosmos.get_list(list_of_processing_subjects::WITH_CROSSHAIR)) {
 		auto& crosshair = it->get<components::crosshair>();
 
 		if (crosshair.should_blink) {

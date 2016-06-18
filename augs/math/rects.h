@@ -307,6 +307,15 @@ namespace augs {
 				return ltrb(l + T(p.x), t + T(p.y), r + T(p.x), b + T(p.y));
 			}
 
+			ltrb& scale(T s) {
+				l *= s;
+				t *= s;
+				r *= s;
+				b *= s;
+
+				return *this;
+			}
+
 			bool operator==(const ltrb& a) {
 				return l == a.l && r == a.r && t == a.t && b == a.b;
 			}

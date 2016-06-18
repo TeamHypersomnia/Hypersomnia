@@ -1,6 +1,7 @@
 #pragma once
-#include "entity_system/entity_id.h"
-#include "../components/force_joint_component.h"
+#include "game/entity_id.h"
+#include "game/components/force_joint_component.h"
+
 struct inventory_slot {
 	bool items_need_mounting = false;
 	float montage_time_multiplier = 1.f;
@@ -23,14 +24,14 @@ struct inventory_slot {
 	float attachment_density_multiplier = 1.f;
 	
 	bool has_unlimited_space() const;
-	bool is_category_compatible_with(augs::entity_id item) const;
+	bool is_category_compatible_with(entity_id item) const;
 
 	augs::rects::sticking attachment_sticking_mode = augs::rects::sticking::LEFT;
 	components::transform attachment_offset;
 
-	std::vector<augs::entity_id> items_inside;
+	std::vector<entity_id> items_inside;
 
-	std::vector<augs::entity_id> get_mounted_items() const;
+	std::vector<entity_id> get_mounted_items() const;
 
 	unsigned calculate_free_space_with_children() const;
 };

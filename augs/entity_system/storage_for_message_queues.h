@@ -1,7 +1,9 @@
 #pragma once
 #include <tuple>
 #include <vector>
+#include <unordered_map>
 #include "templates.h"
+#include "ensure.h"
 
 namespace detail {
 	template<class T>
@@ -12,7 +14,17 @@ namespace augs {
 	template<class... Queues>
 	class storage_for_message_queues {
 		std::unordered_map<size_t, std::vector<std::function<void()>>> message_callbacks;
-		typename transform_types<std::tuple, ::detail::make_vector, Queues...>::type queues;
+		typedef typename transform_types<std::tuple, ::detail::make_vector, Queues...>::type tuple_type;
+		tuple_type queues;
+
+		struct ensure_empty {
+			storage_for_message_queues& q;
+
+			template <class Q>
+			void operator()() {
+				ensure(q.get_queue<Q>().empty());
+			}
+		};
 	public:
 		
 		template <typename T>
@@ -25,7 +37,12 @@ namespace augs {
 
 		template <typename T>
 		std::vector<T>& get_queue() {
-			return queues.get<T>();
+			return std::get<std::vector<T>>(queues);
+		}
+
+		template <typename T>
+		void clear_queue() {
+			return get_queue<T>().clear();
 		}
 
 		template <typename T>
@@ -43,6 +60,10 @@ namespace augs {
 		template<class T>
 		void register_callback(std::function<void()> callback) {
 			message_callbacks[typeid(T).hash_code()].push_back(callback);
+		}
+
+		void ensure_all_empty() {
+			for_each_type<Queues...>(ensure_empty(*this));
 		}
 	};
 }

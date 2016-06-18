@@ -1,35 +1,38 @@
 #include "item_system.h"
 
-#include "../messages/intent_message.h"
-#include "../messages/trigger_hit_confirmation_message.h"
-#include "../messages/trigger_hit_request_message.h"
+#include "game/messages/intent_message.h"
+#include "game/messages/trigger_hit_confirmation_message.h"
+#include "game/messages/trigger_hit_request_message.h"
 
-#include "../messages/item_slot_transfer_request.h"
-#include "../messages/destroy_message.h"
-#include "../messages/gui_intents.h"
-#include "../messages/rebuild_physics_message.h"
-#include "../messages/physics_operation.h"
+#include "game/messages/item_slot_transfer_request.h"
+#include "game/messages/queue_destruction.h"
+#include "game/messages/gui_intents.h"
+#include "game/messages/rebuild_physics_message.h"
+#include "game/messages/physics_operation.h"
 
-#include "entity_system/world.h"
+#include "game/cosmos.h"
 
-#include "../components/item_component.h"
-#include "../components/physics_component.h"
-#include "../components/force_joint_component.h"
-#include "../components/item_slot_transfers_component.h"
-#include "../components/physics_definition_component.h"
-#include "../components/fixtures_component.h"
+#include "game/components/item_component.h"
+#include "game/components/physics_component.h"
+#include "game/components/force_joint_component.h"
+#include "game/components/item_slot_transfers_component.h"
+#include "game/components/fixtures_component.h"
 
-#include "../detail/inventory_utils.h"
-#include "../detail/inventory_slot.h"
-#include "../detail/entity_scripts.h"
+#include "game/detail/inventory_utils.h"
+#include "game/detail/inventory_slot.h"
+#include "game/detail/entity_scripts.h"
+
+#include "game/systems/physics_system.h"
+
 #include "ensure.h"
 
 void item_system::handle_trigger_confirmations_as_pick_requests() {
-	auto& confirmations = parent_world.get_message_queue<messages::trigger_hit_confirmation_message>();
+	auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();
+	auto& physics = parent_cosmos.stateful_systems.get<physics_system>();
 
 	for (auto& e : confirmations) {
 		auto* item_slot_transfers = e.detector_body->find<components::item_slot_transfers>();
-		auto item_entity = components::physics::get_owner_body_entity(e.trigger);
+		auto item_entity = physics.get_owner_body_entity(e.trigger);
 
 		auto* item = item_entity->find<components::item>();
 
@@ -46,8 +49,8 @@ void item_system::handle_trigger_confirmations_as_pick_requests() {
 				request.target_slot = determine_pickup_target_slot(item_entity, e.detector_body);
 
 				if (request.target_slot.alive()) {
-					if (check_timeout_and_reset(item_slot_transfers->pickup_timeout)) {
-						parent_world.post_message(request);
+					if (physics.check_timeout_and_reset(item_slot_transfers->pickup_timeout)) {
+						step.messages.post(request);
 					}
 				}
 				else {
@@ -59,7 +62,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests() {
 }
 
 void item_system::handle_throw_item_intents() {
-	auto& requests = parent_world.get_message_queue<messages::intent_message>();
+	auto& requests = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& r : requests) {
 		if (r.pressed_flag &&
@@ -72,7 +75,7 @@ void item_system::handle_throw_item_intents() {
 				if (hand.has_items()) {
 					messages::item_slot_transfer_request request;
 					request.item = hand->items_inside[0];
-					parent_world.post_message(request);
+					step.messages.post(request);
 				}
 			}
 		}
@@ -80,7 +83,7 @@ void item_system::handle_throw_item_intents() {
 }
 
 void item_system::handle_holster_item_intents() {
-	auto& requests = parent_world.get_message_queue<messages::intent_message>();
+	auto& requests = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& r : requests) {
 		if (r.pressed_flag &&
@@ -96,7 +99,7 @@ void item_system::handle_holster_item_intents() {
 					request.target_slot = determine_hand_holstering_slot(hand->items_inside[0], r.subject);
 
 					if (request.target_slot.alive())
-						parent_world.post_message(request);
+						step.messages.post(request);
 				}
 			}
 		}
@@ -133,7 +136,7 @@ void item_system::process_mounting_and_unmounting() {
 						messages::item_slot_transfer_request after_unmount_transfer;
 						after_unmount_transfer.item = currently_mounted_item;
 						after_unmount_transfer.target_slot = item.target_slot_after_unmount;
-						parent_world.post_message(after_unmount_transfer);
+						step.messages.post(after_unmount_transfer);
 					}
 				}
 			}
@@ -146,21 +149,21 @@ void item_system::process_mounting_and_unmounting() {
 }
 
 void item_system::translate_gui_intents_to_transfer_requests() {
-	auto& intents = parent_world.get_message_queue<messages::gui_item_transfer_intent>();
+	auto& intents = step.messages.get_queue<messages::gui_item_transfer_intent>();
 
 	for (auto& i : intents) {
 		messages::item_slot_transfer_request request;
 		request.item = i.item;
 		request.target_slot = i.target_slot;
 		request.specified_quantity = i.specified_quantity;
-		parent_world.post_message(request);
+		step.messages.post(request);
 	}
 
 	intents.clear();
 }
 
 void item_system::consume_item_slot_transfer_requests() {
-	auto& requests = parent_world.get_message_queue<messages::item_slot_transfer_request>();
+	auto& requests = step.messages.get_queue<messages::item_slot_transfer_request>();
 
 	for (auto& r : requests) {
 		auto& item = r.item->get<components::item>();
@@ -182,7 +185,7 @@ void item_system::consume_item_slot_transfer_requests() {
 
 			components::transform previous_container_transform;
 
-			augs::entity_id target_item_to_stack_with;
+			entity_id target_item_to_stack_with;
 
 			if (is_pickup_or_transfer) {
 				for (auto& i : r.target_slot->items_inside) {
@@ -207,7 +210,7 @@ void item_system::consume_item_slot_transfer_requests() {
 
 			if (target_item_to_stack_with.alive()) {
 				if (whole_item_grabbed)
-					parent_world.post_message(messages::destroy_message(r.item));
+					step.messages.post(messages::queue_destruction(r.item));
 				else
 					item.charges -= result.transferred_charges;
 
@@ -216,13 +219,13 @@ void item_system::consume_item_slot_transfer_requests() {
 				continue;
 			}
 			
-			augs::entity_id grabbed_item_part;
-			augs::entity_id new_charge_stack;
+			entity_id grabbed_item_part;
+			entity_id new_charge_stack;
 
 			if (whole_item_grabbed)
 				grabbed_item_part = r.item;
 			else {
-				new_charge_stack = parent_world.clone_entity(r.item);
+				new_charge_stack = parent_cosmos.clone_entity(r.item);
 				item.charges -= result.transferred_charges;
 				new_charge_stack->get<components::item>().charges = result.transferred_charges;
 
@@ -232,7 +235,7 @@ void item_system::consume_item_slot_transfer_requests() {
 			if (is_pickup_or_transfer)
 				r.target_slot.add_item(grabbed_item_part);
 
-			for_each_descendant(grabbed_item_part, [this, previous_container_transform, new_charge_stack](augs::entity_id descendant) {
+			for_each_descendant(grabbed_item_part, [this, previous_container_transform, new_charge_stack](entity_id descendant) {
 				auto parent_slot = descendant->get<components::item>().current_slot;
 				auto current_def = descendant->get<components::physics_definition>();
 
@@ -245,18 +248,18 @@ void item_system::consume_item_slot_transfer_requests() {
 				if (parent_slot.alive()) {
 					def.create_fixtures_and_body = parent_slot.should_item_inside_keep_physical_body();
 					def.attach_fixtures_to_entity = parent_slot.get_root_container();
-					def.offsets_for_created_shapes[components::physics_definition::ITEM_ATTACHMENT_DISPLACEMENT]
+					def.offsets_for_created_shapes[components::fixtures::offset_type::ITEM_ATTACHMENT_DISPLACEMENT]
 						= parent_slot.sum_attachment_offsets_of_parents(descendant);
-					def.offsets_for_created_shapes[components::physics_definition::SPECIAL_MOVE_DISPLACEMENT].reset();
+					def.offsets_for_created_shapes[components::fixtures::offset_type::SPECIAL_MOVE_DISPLACEMENT].reset();
 				}
 				else {
 					def.create_fixtures_and_body = true;
 					def.attach_fixtures_to_entity = descendant;
-					def.offsets_for_created_shapes[components::physics_definition::ITEM_ATTACHMENT_DISPLACEMENT].reset();
-					def.offsets_for_created_shapes[components::physics_definition::SPECIAL_MOVE_DISPLACEMENT].reset();
+					def.offsets_for_created_shapes[components::fixtures::offset_type::ITEM_ATTACHMENT_DISPLACEMENT].reset();
+					def.offsets_for_created_shapes[components::fixtures::offset_type::SPECIAL_MOVE_DISPLACEMENT].reset();
 				}
 
-				parent_world.post_message(rebuild);
+				step.messages.post(rebuild);
 
 				descendant->get<components::transform>() = previous_container_transform;
 			});
@@ -280,7 +283,7 @@ void item_system::consume_item_slot_transfer_requests() {
 				op.force_offset = vec2().random_on_circle(20, parent_overworld.get_current_generator());
 				op.reset_drop_timeout = true;
 				op.timeout_ms = 200;
-				parent_world.post_message(op);
+				step.messages.post(op);
 			}
 		}
 		else {

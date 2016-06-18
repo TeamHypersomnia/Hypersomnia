@@ -1,11 +1,11 @@
 #pragma once
 #include <unordered_map>
 
-#include "../messages/animation_message.h"
+#include "game/messages/animation_message.h"
 #include "misc/map_wrapper.h"
 
-#include "../resources/animation.h"
-#include "../assets/animation_id.h"
+#include "game/resources/animation.h"
+#include "game/assets/animation_id.h"
 
 namespace components {
 	struct animation {
@@ -27,8 +27,8 @@ namespace components {
 
 		void set_current_frame(unsigned number);
 
-		void increase_frame(augs::entity_id);
-		void decrease_frame(augs::entity_id);
+		void increase_frame(entity_id);
+		void decrease_frame(entity_id);
 
 		unsigned get_current_frame() const;
 	};

@@ -1,10 +1,10 @@
 #pragma once
 #include "misc/timer.h"
 
-#include "entity_system/processing_system.h"
+#include "game/processing_system_with_cosmos_reference.h"
 
-#include "../components/animation_component.h"
-#include "../components/render_component.h"
+#include "game/components/animation_component.h"
+#include "game/components/render_component.h"
 
 using namespace augs;
 

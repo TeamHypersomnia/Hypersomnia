@@ -1,14 +1,14 @@
 #include "inventory_utils.h"
-#include "entity_system/entity.h"
-#include "entity_system/world.h"
+#include "game/entity_id.h"
+#include "game/cosmos.h"
 #include "game/components/item_component.h"
 
 #include "templates.h"
 #include "ensure.h"
 
-augs::entity_id get_owning_transfer_capability(augs::entity_id entity) {
+entity_id get_owning_transfer_capability(entity_id entity) {
 	if (entity.dead())
-		return augs::entity_id();
+		return entity_id();
 
 	auto* maybe_transfer_capability = entity->find<components::item_slot_transfers>();
 
@@ -18,12 +18,12 @@ augs::entity_id get_owning_transfer_capability(augs::entity_id entity) {
 	auto* maybe_item = entity->find<components::item>();
 
 	if (!maybe_item || maybe_item->current_slot.dead())
-		return augs::entity_id();
+		return entity_id();
 
 	return get_owning_transfer_capability(maybe_item->current_slot.container_entity);
 }
 
-inventory_slot_id first_free_hand(augs::entity_id root_container) {
+inventory_slot_id first_free_hand(entity_id root_container) {
 	auto maybe_primary = root_container[slot_function::PRIMARY_HAND];
 	auto maybe_secondary = root_container[slot_function::SECONDARY_HAND];
 
@@ -36,7 +36,7 @@ inventory_slot_id first_free_hand(augs::entity_id root_container) {
 	return inventory_slot_id();
 }
 
-inventory_slot_id determine_hand_holstering_slot(augs::entity_id item_entity, augs::entity_id searched_root_container) {
+inventory_slot_id determine_hand_holstering_slot(entity_id item_entity, entity_id searched_root_container) {
 	ensure(item_entity.alive());
 	ensure(searched_root_container.alive());
 
@@ -63,7 +63,7 @@ inventory_slot_id determine_hand_holstering_slot(augs::entity_id item_entity, au
 	return inventory_slot_id();
 }
 
-inventory_slot_id determine_pickup_target_slot(augs::entity_id item_entity, augs::entity_id searched_root_container) {
+inventory_slot_id determine_pickup_target_slot(entity_id item_entity, entity_id searched_root_container) {
 	ensure(item_entity.alive());
 	ensure(searched_root_container.alive());
 
@@ -81,7 +81,7 @@ inventory_slot_id determine_pickup_target_slot(augs::entity_id item_entity, augs
 	return inventory_slot_id();
 }
 
-inventory_slot_id map_primary_action_to_secondary_hand_if_primary_empty(augs::entity_id root_container, int is_action_secondary) {
+inventory_slot_id map_primary_action_to_secondary_hand_if_primary_empty(entity_id root_container, int is_action_secondary) {
 	inventory_slot_id subject_hand;
 	subject_hand.container_entity = root_container;
 
@@ -125,7 +125,7 @@ item_transfer_result query_transfer_result(messages::item_slot_transfer_request 
 	return output;
 }
 
-slot_function detect_compatible_slot(augs::entity_id item, augs::entity_id container_entity) {
+slot_function detect_compatible_slot(entity_id item, entity_id container_entity) {
 	auto* container = container_entity->find<components::container>();
 
 	if (container) {
@@ -201,7 +201,7 @@ item_transfer_result containment_result(messages::item_slot_transfer_request r, 
 }
 
 
-void for_each_descendant(augs::entity_id item, std::function<void(augs::entity_id item)> f) {
+void for_each_descendant(entity_id item, std::function<void(entity_id item)> f) {
 	f(item);
 
 	if (item->find<components::container>()) {
@@ -211,9 +211,9 @@ void for_each_descendant(augs::entity_id item, std::function<void(augs::entity_i
 	}
 }
 
-#include "../components/damage_component.h"
+#include "game/components/damage_component.h"
 
-bool can_merge_entities(augs::entity_id a, augs::entity_id b) {
+bool can_merge_entities(entity_id a, entity_id b) {
 	return 
 		components::item::can_merge_entities(a, b) &&
 		components::damage::can_merge_entities(a, b);
@@ -248,7 +248,7 @@ unsigned to_space_units(std::string s) {
 	return sum;
 }
 
-int count_charges_in_deposit(augs::entity_id item) {
+int count_charges_in_deposit(entity_id item) {
 	return count_charges_inside(item[slot_function::ITEM_DEPOSIT]);
 }
 
@@ -269,7 +269,7 @@ std::wstring format_space_units(unsigned u) {
 	return to_wstring(u / long double(SPACE_ATOMS_PER_UNIT), 2);
 }
 
-void drop_from_all_slots(augs::entity_id c) {
+void drop_from_all_slots(entity_id c) {
 	auto& container = c->get<components::container>();
 
 	messages::item_slot_transfer_request request;

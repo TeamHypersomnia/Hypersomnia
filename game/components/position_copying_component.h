@@ -1,13 +1,13 @@
 #pragma once
 
-#include "entity_system/entity.h"
+#include "game/entity_id.h"
 #include "math/vec2.h"
 
 class position_copying_system;
 
 namespace components {
 	struct position_copying  {
-		augs::entity_id target;
+		entity_id target;
 		
 		enum position_copying_type {
 			OFFSET,
@@ -33,11 +33,11 @@ namespace components {
 		bool target_newly_set = true;
 		bool subscribe_to_previous = false;
 
-		position_copying(augs::entity_id id = augs::entity_id()) {
+		position_copying(entity_id id = entity_id()) {
 			set_target(id);
 		}
 
-		void set_target(augs::entity_id);
+		void set_target(entity_id);
 
 	private:
 		friend class position_copying_system;

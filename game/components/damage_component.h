@@ -1,7 +1,7 @@
 #pragma once
 #include "math/vec2.h"
 
-#include "entity_system/entity.h"
+#include "game/entity_id.h"
 
 #include "misc/timer.h"
 #include "graphics/pixel.h"
@@ -12,7 +12,7 @@ namespace components {
 
 		float impulse_upon_hit = 100.f;
 
-		augs::entity_id sender;
+		entity_id sender;
 		bool damage_upon_collision = true;
 		bool destroy_upon_damage = true;
 		int damage_charges_before_destruction = 1;
@@ -35,6 +35,6 @@ namespace components {
 
 		vec2 saved_point_of_impact_before_death;
 
-		static bool can_merge_entities(const augs::entity_id& a, const augs::entity_id& b);
+		static bool can_merge_entities(const entity_id& a, const entity_id& b);
 	};
 }

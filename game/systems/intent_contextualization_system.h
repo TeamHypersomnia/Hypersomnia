@@ -1,11 +1,11 @@
 #pragma once
-#include "entity_system/processing_system.h"
+#include "game/processing_system_with_cosmos_reference.h"
 
 using namespace augs;
 
-class intent_contextualization_system : public event_only_system {
+class intent_contextualization_system : public processing_system_with_cosmos_reference {
 public:
-	using event_only_system::event_only_system;
+	using processing_system_with_cosmos_reference::processing_system_with_cosmos_reference;
 
 	void contextualize_movement_intents();
 	void contextualize_use_button_intents();

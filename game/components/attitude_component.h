@@ -1,15 +1,15 @@
 #pragma once
 #include <set>
-#include "entity_system/entity_id.h"
+#include "game/entity_id.h"
 #include "game/globals/attitude_type.h"
 
 namespace components {
 	struct attitude {
 		unsigned parties = 0;
 		unsigned hostile_parties = 0;
-		std::set<augs::entity_id> specific_hostile_entities;
+		std::set<entity_id> specific_hostile_entities;
 		
-		augs::entity_id currently_attacked_visible_entity;
+		entity_id currently_attacked_visible_entity;
 		attitude_type target_attitude = attitude_type::NEUTRAL;
 
 		bool is_alert = false;

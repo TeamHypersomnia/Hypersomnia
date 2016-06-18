@@ -1,11 +1,15 @@
 #include "trace_system.h"
-#include "augs/entity_system/world.h"
-#include "augs/entity_system/entity.h"
+#include "game/cosmos.h"
+#include "game/entity_id.h"
 
-#include "../components/sprite_component.h"
-#include "../components/damage_component.h"
-#include "../components/physics_component.h"
-#include "../messages/destroy_message.h"
+#include "game/components/trace_component.h"
+#include "game/components/render_component.h"
+#include "game/components/transform_component.h"
+#include "game/components/sprite_component.h"
+#include "game/components/damage_component.h"
+#include "game/components/physics_component.h"
+
+#include "game/messages/queue_destruction.h"
 
 void trace_system::lengthen_sprites_of_traces() {
 	for (auto& t : targets) {
@@ -38,13 +42,13 @@ void trace_system::destroy_outdated_traces() {
 			trace.lengthening_time_passed_ms = trace.chosen_lengthening_duration_ms - 0.01f;
 
 			if (trace.is_it_finishing_trace)
-				parent_world.post_message(messages::destroy_message(t));
+				step.messages.post(messages::queue_destruction(t));
 		}
 	}
 }
 
 void trace_system::spawn_finishing_traces_for_destroyed_objects() {
-	auto events = parent_world.get_message_queue<messages::destroy_message>();
+	auto events = step.messages.get_queue<messages::queue_destruction>();
 
 	for (auto& it : events) {
 		auto& e = it.subject;
@@ -52,7 +56,7 @@ void trace_system::spawn_finishing_traces_for_destroyed_objects() {
 		auto* trace = e->find<components::trace>();
 
 		if (trace && !trace->is_it_finishing_trace) {
-			auto finishing_trace = parent_world.create_entity("finishing_trace");
+			auto finishing_trace = parent_cosmos.create_entity("finishing_trace");
 			auto copied_trace = *trace;
 			copied_trace.lengthening_time_passed_ms = 0.f;
 			copied_trace.chosen_lengthening_duration_ms /= 4;

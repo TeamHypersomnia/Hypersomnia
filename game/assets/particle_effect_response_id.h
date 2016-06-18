@@ -1,5 +1,5 @@
 #pragma once
-#include "../resources/particle_effect_response.h"
+#include "game/resources/particle_effect_response.h"
 
 namespace assets {
 	enum particle_effect_response_id {

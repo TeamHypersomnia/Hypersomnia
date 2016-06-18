@@ -1,19 +1,12 @@
 #pragma once
-#include "entity_system/processing_system.h"
+class cosmos;
 
-#include "../components/pathfinding_component.h"
-#include "../components/visibility_component.h"
-#include "../components/transform_component.h"
-#include "../components/physics_component.h"
-
-using namespace augs;
-
-
-class pathfinding_system : public processing_system_templated<components::transform, components::visibility, components::pathfinding, components::physics> {
+class pathfinding_system {
 public:
-	pathfinding_system(world&);
+	pathfinding_system();
 
-	void advance_pathfinding_sessions();
+	void advance_pathfinding_sessions(cosmos&);
+
 	float epsilon_max_segment_difference;
 	float epsilon_distance_visible_point;
 	float epsilon_distance_the_same_vertex;

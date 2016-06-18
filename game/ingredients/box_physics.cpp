@@ -1,26 +1,30 @@
-#include "augs/entity_system/world.h"
+#include "game/cosmos.h"
 #include "game/components/physics_component.h"
+#include "game/components/fixtures_component.h"
 
 #include "game/globals/filters.h"
 
-#include "../components/physics_definition_component.h"
+#include "game/definition_interface.h"
 
 namespace ingredients {
-	components::physics_definition& standard_dynamic_body(augs::entity_id e) {
-		auto& physics_definition = *e += components::physics_definition();
+	void standard_dynamic_body(definition_interface e) {
+		auto& physics = e += components::physics();
 
-		physics_definition.body.fixed_rotation = false;
+		rigid_body_definition def;
+		def.fixed_rotation = false;
 
-		auto& info = physics_definition.new_fixture();
-		info.from_renderable(e);
+		colliders_definition colliders;
+
+		auto& info = colliders.new_collider();
+		info.shape.from_sprite(e.get<components::sprite>(), true);
 
 		info.filter = filters::dynamic_object();
 		info.density = 1;
 
-		return physics_definition;
+		e += components::fixtures(colliders);
 	}
 
-	components::physics_definition& see_through_dynamic_body(augs::entity_id e) {
+	components::physics_definition& see_through_dynamic_body(entity_id e) {
 		auto& physics_definition = *e += components::physics_definition();
 
 		physics_definition.body.fixed_rotation = false;
@@ -34,7 +38,7 @@ namespace ingredients {
 		return physics_definition;
 	}
 
-	components::physics_definition& standard_static_body(augs::entity_id e) {
+	components::physics_definition& standard_static_body(entity_id e) {
 		auto& physics_definition = *e += components::physics_definition();
 
 		physics_definition.body.fixed_rotation = false;
@@ -49,7 +53,7 @@ namespace ingredients {
 		return physics_definition;
 	}
 	
-	components::physics_definition& bullet_round_physics(augs::entity_id e) {
+	components::physics_definition& bullet_round_physics(entity_id e) {
 		auto& physics_definition = *e += components::physics_definition();
 
 		auto& body = physics_definition.body;

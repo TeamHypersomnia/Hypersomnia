@@ -1,11 +1,11 @@
 #pragma once
 #include <Windows.h>
-#include "../math/rects.h"
+#include "math/rects.h"
 #include "event.h"
-#include "../misc/timer.h"
+#include "misc/timer.h"
 #include <functional>
 
-#include "../graphics/renderer.h"
+#include "graphics/renderer.h"
 #include "colored_print.h"
 
 namespace augs {

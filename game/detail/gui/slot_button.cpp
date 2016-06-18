@@ -1,5 +1,5 @@
 #include "slot_button.h"
-#include "entity_system/entity.h"
+#include "game/entity_id.h"
 
 #include "augs/gui/stroke.h"
 #include "item_button.h"

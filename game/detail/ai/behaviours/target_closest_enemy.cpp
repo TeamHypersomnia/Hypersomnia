@@ -1,5 +1,5 @@
 #include "game/detail/ai/behaviours.h"
-#include "entity_system/entity.h"
+#include "game/entity_id.h"
 
 #include "game/components/attitude_component.h"
 #include "game/components/crosshair_component.h"
@@ -26,7 +26,7 @@ namespace behaviours {
 		auto& los = visibility.line_of_sight_layers[components::visibility::LINE_OF_SIGHT];
 		auto& attitude = subject->get<components::attitude>();
 
-		augs::entity_id closest_hostile;
+		entity_id closest_hostile;
 
 		float min_distance = std::numeric_limits<float>::max();
 

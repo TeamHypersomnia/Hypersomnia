@@ -28,7 +28,7 @@ namespace components {
 			tile(unsigned type);
 		};
 
-		tile_layer(augs::rects::wh<int> size);
+		tile_layer(augs::rects::wh<int> size = augs::rects::wh<int>());
 
 		void generate_indices_by_type(augs::rects::ltrb<int>);
 

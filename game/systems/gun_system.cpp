@@ -1,33 +1,32 @@
 #include "gun_system.h"
-#include "entity_system/world.h"
-#include "../messages/intent_message.h"
-#include "../messages/damage_message.h"
-#include "../messages/destroy_message.h"
-#include "../messages/gunshot_response.h"
-#include "../messages/item_slot_transfer_request.h"
-#include "../messages/physics_operation.h"
+#include "game/cosmos.h"
+#include "game/messages/intent_message.h"
+#include "game/messages/damage_message.h"
+#include "game/messages/queue_destruction.h"
+#include "game/messages/gunshot_response.h"
+#include "game/messages/item_slot_transfer_request.h"
+#include "game/messages/physics_operation.h"
 
-#include "../components/render_component.h"
-#include "../components/physics_component.h"
-#include "../components/camera_component.h"
-#include "../components/damage_component.h"
-#include "../components/particle_group_component.h"
-#include "../components/position_copying_component.h"
-#include "../components/container_component.h"
-#include "../components/physics_definition_component.h"
-#include "../components/item_component.h"
+#include "game/components/render_component.h"
+#include "game/components/physics_component.h"
+#include "game/components/camera_component.h"
+#include "game/components/damage_component.h"
+#include "game/components/particle_group_component.h"
+#include "game/components/position_copying_component.h"
+#include "game/components/container_component.h"
+#include "game/components/item_component.h"
 
-#include "../systems/physics_system.h"
-#include "../systems/render_system.h"
+#include "game/systems/physics_system.h"
+#include "game/systems/render_system.h"
 
-#include "../detail/physics_setup_helpers.h"
-#include "../detail/inventory_utils.h"
+#include "game/detail/physics_setup_helpers.h"
+#include "game/detail/inventory_utils.h"
 
-#include "misc/randval.h"
+#include "misc/randomization.h"
 #include "log.h"
 
 void gun_system::consume_gun_intents() {
-	auto events = parent_world.get_message_queue<messages::intent_message>();
+	auto events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto it : events) {
 		auto* maybe_gun = it.subject->find<components::gun>();
@@ -45,7 +44,7 @@ void gun_system::consume_gun_intents() {
 	}
 }
 
-void components::gun::shake_camera(augs::entity_id target_camera_to_shake, float rotation, augs::processing_system& p) {
+void components::gun::shake_camera(entity_id target_camera_to_shake, float rotation, augs::processing_system& p) {
 	if (target_camera_to_shake.alive()) {
 		vec2 shake_dir;
 		shake_dir.set_from_degrees(p.randval(
@@ -64,10 +63,10 @@ components::transform components::gun::calculate_barrel_transform(components::tr
 }
 
 void gun_system::launch_shots_due_to_pressed_triggers() {
-	parent_world.get_message_queue<messages::gunshot_response>().clear();
+	step.messages.get_queue<messages::gunshot_response>().clear();
 
-	auto& physics_sys = parent_world.get_system<physics_system>();
-	auto& render = parent_world.get_system<render_system>();
+	auto& physics_sys = parent_cosmos.stateful_systems.get<physics_system>();
+	auto& render = parent_cosmos.stateful_systems.get<render_system>();
 
 	for (auto it : targets) {
 		const auto& gun_transform = it->get<components::transform>();
@@ -87,7 +86,7 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 				
 				auto item_in_chamber = chamber_slot->get_mounted_items()[0];
 
-				static thread_local std::vector<augs::entity_id> bullet_entities;
+				static thread_local std::vector<entity_id> bullet_entities;
 				bullet_entities.clear();
 
 				auto pellets_slot = item_in_chamber[slot_function::ITEM_DEPOSIT];
@@ -108,10 +107,12 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 
 					messages::physics_operation op;
 					op.set_velocity = true;
-
+					bool ³ = true;
+					bool Atwo;
+					bool katka = ³ && Atwo;
 					while (charges--) {
 						{
-							auto round_entity = parent_world.create_entity_from_definition(catridge_or_pellet_stack[sub_definition_name::BULLET_ROUND]);
+							auto round_entity = parent_cosmos.create_entity_from_definition(catridge_or_pellet_stack[sub_definition_name::BULLET_ROUND]);
 							auto& damage = round_entity->get<components::damage>();
 							damage.amount *= gun.damage_multiplier;
 							damage.sender = it;
@@ -125,13 +126,13 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 							op.subject = round_entity;
 							response.spawned_rounds.push_back(round_entity);
 
-							parent_world.post_message(op);
+							step.messages.post(op);
 						}
 
 						auto shell_definition = catridge_or_pellet_stack[sub_definition_name::BULLET_SHELL];
 
 						if (shell_definition.alive()) {
-							auto shell_entity = parent_world.create_entity_from_definition(shell_definition);
+							auto shell_entity = parent_cosmos.create_entity_from_definition(shell_definition);
 
 							auto spread_component = randval(gun.shell_spread_degrees) + gun.shell_spawn_offset.rotation;
 
@@ -147,16 +148,16 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 							op.subject = shell_entity;
 							response.spawned_shells.push_back(shell_entity);
 
-							parent_world.post_message(op);
+							step.messages.post(op);
 						}
 					}
 
 					response.barrel_transform = barrel_transform;
 					response.subject = it;
 					
-					parent_world.post_message(response);
+					step.messages.post(response);
 
-					parent_world.post_message(messages::destroy_message(catridge_or_pellet_stack));
+					step.messages.post(messages::queue_destruction(catridge_or_pellet_stack));
 				}
 
 				if (total_recoil_multiplier > 0.f) {
@@ -169,12 +170,12 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 				//	//	gun.shake_camera(owning_capability[associated_entity_name::WATCHING_CAMERA], gun_transform.rotation, *this);
 
 				if (destroy_pellets_container)
-					parent_world.post_message(messages::destroy_message(chamber_slot->items_inside[0]));
+					step.messages.post(messages::queue_destruction(chamber_slot->items_inside[0]));
 				
 				chamber_slot->items_inside.clear();
 
 				if (gun.action_mode >= components::gun::action_type::SEMI_AUTOMATIC) {
-					std::vector<augs::entity_id> source_store_for_chamber;
+					std::vector<entity_id> source_store_for_chamber;
 
 					auto chamber_magazine_slot = it[slot_function::GUN_CHAMBER_MAGAZINE];
 
@@ -194,7 +195,7 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 						into_chamber_transfer.specified_quantity = 1;
 						into_chamber_transfer.force_immediate_mount = true;
 
-						parent_world.post_message(into_chamber_transfer);
+						step.messages.post(into_chamber_transfer);
 					}
 				}
 			}

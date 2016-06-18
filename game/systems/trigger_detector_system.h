@@ -1,6 +1,6 @@
 #pragma once
-#include "entity_system/processing_system.h"
-#include "../components/trigger_query_detector_component.h"
+#include "game/processing_system_with_cosmos_reference.h"
+#include "game/components/trigger_query_detector_component.h"
 
 class trigger_detector_system : public augs::processing_system_templated<components::trigger_query_detector> {
 public:

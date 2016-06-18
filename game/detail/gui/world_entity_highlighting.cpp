@@ -2,15 +2,15 @@
 #include "game_gui_root.h"
 #include "game/systems/gui_system.h"
 #include "game/systems/physics_system.h"
-#include "entity_system/world.h"
-#include "entity_system/entity.h"
+#include "game/cosmos.h"
+#include "game/entity_id.h"
 #include "game/globals/filters.h"
 #include "game/components/name_component.h"
 #include "game/components/render_component.h"
 #include <algorithm>
 
-augs::entity_id game_gui_world::get_hovered_world_entity(vec2 camera_pos) {
-	auto& physics = gui_system->parent_world.get_system<physics_system>();
+entity_id game_gui_world::get_hovered_world_entity(vec2 camera_pos) {
+	auto& physics = gui_system->parent_cosmos.stateful_systems.get<physics_system>();
 
 	auto cursor_pointing_at = camera_pos + gui_crosshair_position - size / 2;
 
@@ -18,16 +18,16 @@ augs::entity_id game_gui_world::get_hovered_world_entity(vec2 camera_pos) {
 	auto hovered = physics.query_polygon(v, filters::renderable_query());
 
 	if(hovered.entities.size() > 0) {
-		std::vector<augs::entity_id> sorted_by_visibility(hovered.entities.begin(), hovered.entities.end());
-		sorted_by_visibility.erase(std::remove_if(sorted_by_visibility.begin(), sorted_by_visibility.end(), [](augs::entity_id e) {
+		std::vector<entity_id> sorted_by_visibility(hovered.entities.begin(), hovered.entities.end());
+		sorted_by_visibility.erase(std::remove_if(sorted_by_visibility.begin(), sorted_by_visibility.end(), [](entity_id e) {
 			return e->find<components::render>() == nullptr;
 		}), sorted_by_visibility.end());
 
-		std::sort(sorted_by_visibility.begin(), sorted_by_visibility.end(), [](augs::entity_id a, augs::entity_id b) {
+		std::sort(sorted_by_visibility.begin(), sorted_by_visibility.end(), [](entity_id a, entity_id b) {
 			return a->get<components::render>().last_visibility_index > b->get<components::render>().last_visibility_index;
 		});
 
-		std::vector<augs::entity_id> hovered_and_named;
+		std::vector<entity_id> hovered_and_named;
 
 		for (auto h : sorted_by_visibility) {
 			auto named = get_first_named_ancestor(h);
@@ -41,6 +41,6 @@ augs::entity_id game_gui_world::get_hovered_world_entity(vec2 camera_pos) {
 		}
 	}
 
-	return augs::entity_id();
+	return entity_id();
 }
 

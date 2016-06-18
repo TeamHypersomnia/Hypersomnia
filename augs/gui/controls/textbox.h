@@ -1,8 +1,8 @@
 #pragma once
-#include "../dragger.h"
-#include "../rect.h"
-#include "../text\printer.h"
-#include "../text\ui.h"
+#include "gui/dragger.h"
+#include "gui/rect.h"
+#include "gui/text/printer.h"
+#include "gui/text/ui.h"
 #include "misc/undoredo.h"
 #include <functional>
 

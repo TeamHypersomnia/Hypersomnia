@@ -1,16 +1,16 @@
 #include "car_system.h"
-#include "../messages/intent_message.h"
+#include "game/messages/intent_message.h"
 
-#include "entity_system/world.h"
+#include "game/cosmos.h"
 
-#include "../components/trigger_component.h"
+#include "game/components/trigger_component.h"
 #include <Box2D\Box2D.h>
 
 #include "render_system.h"
 #include "log.h"
 
 void car_system::set_steering_flags_from_intents() {
-	auto& intents = parent_world.get_message_queue<messages::intent_message>();
+	auto& intents = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& it : intents) {
 		auto* maybe_car = it.subject->find<components::car>();

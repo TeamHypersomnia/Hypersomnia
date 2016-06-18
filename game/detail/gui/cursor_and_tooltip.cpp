@@ -4,8 +4,8 @@
 #include "game/components/item_component.h"
 #include "graphics/renderer.h"
 #include "gui/stroke.h"
-#include "../inventory_utils.h"
-#include "../entity_description.h"
+#include "game/detail/inventory_utils.h"
+#include "game/detail/entity_description.h"
 
 #include "special_drag_and_drop_target.h"
 

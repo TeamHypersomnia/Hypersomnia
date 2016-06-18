@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "entity_system/entity_id.h"
+#include "game/entity_id.h"
 #include "game/detail/entity_scripts.h"
 
 namespace behaviours {

@@ -1,11 +1,11 @@
-#include "misc/randval.h"
+#include "misc/randomization.h"
 
-#include "entity_system/entity.h"
-#include "entity_system/world.h"
+#include "game/entity_id.h"
+#include "game/cosmos.h"
 
-#include "../components/visibility_component.h"
+#include "game/components/visibility_component.h"
 
-#include "../detail/physics_setup_helpers.h"
+#include "game/detail/physics_setup_helpers.h"
 
 #include "steering_system.h"
 #include "render_system.h"
@@ -599,8 +599,8 @@ void steering_system::substep() {
 	auto& renderer = augs::renderer::get_current();
 	auto& lines = augs::renderer::get_current().logic_lines;
 
-	auto& render = parent_world.get_system<render_system>();
-	auto& physics_sys = parent_world.get_system<physics_system>();
+	auto& render = parent_cosmos.stateful_systems.get<render_system>();
+	auto& physics_sys = parent_cosmos.stateful_systems.get<physics_system>();
 
 	for (auto it : targets) {
 		auto& steer = it->get<steering>();

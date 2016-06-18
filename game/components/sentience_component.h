@@ -1,5 +1,5 @@
 #pragma once
-#include "entity_system/entity.h"
+#include "game/entity_id.h"
 #include "misc/recoil_player.h"
 #include "graphics/pixel.h"
 

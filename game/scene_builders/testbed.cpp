@@ -1,7 +1,7 @@
 #include "testbed.h"
-#include "../ingredients/ingredients.h"
+#include "game/ingredients/ingredients.h"
 
-#include "entity_system/world.h"
+#include "game/cosmos.h"
 #include "window_framework/window.h"
 
 #include "game/resources/manager.h"
@@ -25,8 +25,8 @@
 #include "game/messages/crosshair_intent_message.h"
 #include "game/messages/item_slot_transfer_request.h"
 
-#include "../detail/inventory_slot.h"
-#include "../detail/inventory_utils.h"
+#include "game/detail/inventory_slot.h"
+#include "game/detail/inventory_utils.h"
 
 #include "augs/filesystem/file.h"
 #include "misc/time.h"
@@ -59,11 +59,11 @@ namespace scene_builders {
 		resource_manager.create(assets::program_id::CIRCULAR_BARS, assets::shader_id::CIRCULAR_BARS_VERTEX, assets::shader_id::CIRCULAR_BARS_FRAGMENT);
 	}
 
-	void testbed::populate_world_with_entities(world& world) {
+	void testbed::populate_world_with_entities(cosmos& world) {
 		auto& window = *window::glwindow::get_current();
 		auto window_rect = window.get_screen_rect();
 
-		world.get_system<gui_system>().resize(vec2i(window_rect.w, window_rect.h));
+		world.systems.get<gui_system>().resize(vec2i(window_rect.w, window_rect.h));
 
 		auto crate = prefabs::create_crate(world, vec2(200, 200 + 300), vec2i(100, 100) / 3);
 		auto crate2 = prefabs::create_crate(world, vec2(400, 200 + 400), vec2i(300, 300));
@@ -275,7 +275,7 @@ namespace scene_builders {
 		active_context.map_key_to_intent(window::event::keys::SPACE, intent_type::SPACE_BUTTON);
 		active_context.map_key_to_intent(window::event::keys::MOUSE4, intent_type::SWITCH_TO_GUI);
 
-		auto& input = world.get_system<input_system>();
+		auto& input = world.systems.get<input_system>();
 		input.add_context(active_context);
 
 		if (input.found_recording()) {
@@ -284,13 +284,13 @@ namespace scene_builders {
 
 			input.replay_found_recording();
 
-			world.get_system<render_system>().enable_interpolation = true;
+			world.systems.get<render_system>().enable_interpolation = true;
 		}
 		else {
 			world.parent_overworld.configure_stepping(60, 500);
 			world.parent_overworld.delta_timer.set_stepping_speed_multiplier(1.0);
 
-			world.get_system<render_system>().enable_interpolation = true;
+			world.systems.get<render_system>().enable_interpolation = true;
 			input.record_and_save_this_session();
 		}
 
@@ -298,7 +298,7 @@ namespace scene_builders {
 		//draw_bodies.push_back(characters[0]);
 		//draw_bodies.push_back(backpack);
 
-		auto& visibility = world.get_system<visibility_system>();
+		auto& visibility = world.systems.get<visibility_system>();
 
 		visibility.epsilon_ray_distance_variation = 0.001;
 		visibility.epsilon_threshold_obstacle_hit = 10;
@@ -307,13 +307,13 @@ namespace scene_builders {
 		show_profile_details = true;
 
 		//characters[1]->get<components::pathfinding>().start_exploring();
-		world.get_system<pathfinding_system>().draw_memorised_walls = 1;
-		world.get_system<pathfinding_system>().draw_undiscovered = 1;
+		world.systems.get<pathfinding_system>().draw_memorised_walls = 1;
+		world.systems.get<pathfinding_system>().draw_undiscovered = 1;
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}
 
-	void testbed::perform_logic_step(world& world) {
-		auto inputs = world.get_message_queue<messages::crosshair_intent_message>();
+	void testbed::perform_logic_step(cosmos& world) {
+		auto inputs = world.messages.get_queue<messages::crosshair_intent_message>();
 
 		for (auto& it : inputs) {
 			bool draw = false;
@@ -328,7 +328,7 @@ namespace scene_builders {
 			}
 		}
 
-		auto key_inputs = world.get_message_queue<messages::unmapped_intent_message>();
+		auto key_inputs = world.messages.get_queue<messages::unmapped_intent_message>();
 
 		for (auto& it : key_inputs) {
 			if (it.intent == intent_type::SWITCH_CHARACTER && it.pressed_flag) {
@@ -360,7 +360,7 @@ namespace scene_builders {
 		// LOG("F: %x", ff);
 	}
 
-	void testbed::drawcalls_after_all_cameras(world& world) {
+	void testbed::drawcalls_after_all_cameras(cosmos& world) {
 		auto& target = renderer::get_current();
 		using namespace gui::text;
 
@@ -369,7 +369,7 @@ namespace scene_builders {
 		//quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", style(assets::font_id::GUI_FONT, violet), vec2i(200, 200 - 1), 0, nullptr);
 		//quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", style(assets::font_id::GUI_FONT, violet), vec2i(200, 200+1), 0, nullptr);
 		//
-		auto& raw_window_inputs = world.get_message_queue<messages::raw_window_input_message>();
+		auto& raw_window_inputs = world.messages.get_queue<messages::raw_window_input_message>();
 
 		for (auto& raw_input : raw_window_inputs) {
 			if (raw_input.raw_window_input.key_event == window::event::PRESSED) {

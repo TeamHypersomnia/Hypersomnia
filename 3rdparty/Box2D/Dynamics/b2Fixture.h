@@ -70,7 +70,7 @@ struct b2FixtureDef
 	const b2Shape* shape;
 
 	/// Use this to store application specific fixture data.
-	augs::entity_id userData;
+	entity_id userData;
 
 	/// The friction coefficient, usually in the range [0,1].
 	float32 friction;
@@ -146,10 +146,10 @@ public:
 
 	/// Get the user data that was assigned in the fixture definition. Use this to
 	/// store your application specific data.
-	augs::entity_id GetUserData() const;
+	entity_id GetUserData() const;
 
 	/// Set the user data. Use this to store your application specific data.
-	void SetUserData(augs::entity_id data);
+	void SetUserData(entity_id data);
 
 	/// Test a point for containment in this fixture.
 	/// @param p a point in world coordinates.
@@ -231,7 +231,7 @@ protected:
 
 	bool m_isSensor;
 
-	augs::entity_id m_userData;
+	entity_id m_userData;
 };
 
 inline b2Shape::Type b2Fixture::GetType() const
@@ -259,12 +259,12 @@ inline const b2Filter& b2Fixture::GetFilterData() const
 	return m_filter;
 }
 
-inline augs::entity_id b2Fixture::GetUserData() const
+inline entity_id b2Fixture::GetUserData() const
 {
 	return m_userData;
 }
 
-inline void b2Fixture::SetUserData(augs::entity_id data)
+inline void b2Fixture::SetUserData(entity_id data)
 {
 	m_userData = data;
 }

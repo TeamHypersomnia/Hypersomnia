@@ -1,5 +1,5 @@
 #include "game/systems/physics_system.h"
-#include "entity_system/world.h"
+#include "game/cosmos.h"
 #include "physics_setup_helpers.h"
 
 #include "ensure.h"
@@ -16,7 +16,6 @@ float32 physics_system::raycast_input::ReportFixture(b2Fixture* fixture, const b
 	output.intersection = point;
 
 	output.hit = true;
-	output.fixture_index = fixture->GetUserData()->get<components::fixtures>().get_fixture_index(fixture);
 	output.what_entity = fixture->GetBody()->GetUserData();
 	output.normal = normal;
 
@@ -167,7 +166,7 @@ physics_system::query_aabb_output physics_system::query_aabb(vec2 p1_meters, vec
 	return callback.out;
 }
 
-physics_system::query_output physics_system::query_body(augs::entity_id subject, b2Filter filter, entity_id ignore_entity) {
+physics_system::query_output physics_system::query_body(entity_id subject, b2Filter filter, entity_id ignore_entity) {
 	query_output total_output;
 
 	for (b2Fixture* f = subject->get<components::physics>().body->GetFixtureList(); f != nullptr; f = f->GetNext()) {

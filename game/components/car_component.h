@@ -1,13 +1,13 @@
 #pragma once
-#include "entity_system/entity.h"
+#include "game/entity_id.h"
 #include "math/vec2.h"
 
 namespace components {
 	struct car {
-		augs::entity_id current_driver;
+		entity_id current_driver;
 
-		augs::entity_id left_wheel_trigger;
-		augs::entity_id right_wheel_trigger;
+		entity_id left_wheel_trigger;
+		entity_id right_wheel_trigger;
 
 		bool accelerating = false;
 		bool deccelerating = false;

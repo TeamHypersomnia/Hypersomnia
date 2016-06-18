@@ -1,5 +1,5 @@
 #include "storage_for_components_and_aggregates.h"
-#include "game/all_component_includes.h"
+#include "game/types_specification/all_component_includes.h"
 
 namespace augs {
 
@@ -24,9 +24,11 @@ namespace augs {
 		storage_for_components_and_aggregates<components...>::clone_aggregate(typename storage_for_components_and_aggregates<components...>::aggregate_id aggregate) {
 		
 		auto new_aggregate = pool_for_aggregates.allocate();
-
+		
 		auto& from = *aggregate;
 		auto& to = *new_aggregate;
+
+		to.removed_from_processing_lists = from.removed_from_processing_lists;
 
 		for_each_type<components...>([this, &from, &to](auto c) {
 			auto* maybe_component = from.find<decltype(c)>();
@@ -37,6 +39,8 @@ namespace augs {
 				writable_id<decltype(c)>(to) = allocate_component<decltype(c)>(*maybe_component);
 			}
 		});
+
+		new_aggregate.set_debug_name(aggregate.get_debug_name());
 
 		return new_aggregate;
 	}
@@ -54,7 +58,7 @@ namespace augs {
 			const auto const* p = this;
 
 			if (p->find<decltype(elem)>() != nullptr) {
-				result.add(p->get<decltype(elem)>());
+				result.set(p->get<decltype(elem)>());
 			}
 		});
 

@@ -1,5 +1,5 @@
 #include "game/detail/ai/behaviours.h"
-#include "entity_system/entity.h"
+#include "game/entity_id.h"
 
 #include "game/components/attitude_component.h"
 #include "game/components/movement_component.h"

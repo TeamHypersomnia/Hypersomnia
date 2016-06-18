@@ -22,8 +22,8 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 
 			// construct metadata tree to know the already unneeded entries and to see the new ones
 
-			std::function<void(augs::entity_id)> iterate_inventory_tree
-				= [&new_slot_meta, &new_item_meta, &iterate_inventory_tree](augs::entity_id container) {
+			std::function<void(entity_id)> iterate_inventory_tree
+				= [&new_slot_meta, &new_item_meta, &iterate_inventory_tree](entity_id container) {
 				auto* maybe_container = container->find<components::container>();
 
 				if (maybe_container) {
@@ -48,7 +48,7 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 			// destroy unneeded metadata entries (possibly save elsewhere to preserve drag positions?)
 
 			std::vector<inventory_slot_id> slots_to_erase;
-			std::vector<augs::entity_id> items_to_erase;
+			std::vector<entity_id> items_to_erase;
 
 			for (auto& old_entry : previous_slot_meta) {
 				old_entry.second.children.clear();
@@ -83,7 +83,7 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 
 			// purge removed metadata from entries with dead entities
 			std::vector<inventory_slot_id> dead_slots;
-			std::vector<augs::entity_id> dead_items;
+			std::vector<entity_id> dead_items;
 
 			for (auto& s : cached_slot_meta) {
 				auto id = s.first;

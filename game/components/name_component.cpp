@@ -1,38 +1,30 @@
 #include "name_component.h"
-#include "entity_system/entity.h"
-#include "entity_system/world.h"
+#include "game/cosmos.h"
+#include "game/definition_interface.h"
 
-void name_entity(augs::entity_id id, entity_name n) {
+void name_entity(definition_interface id, entity_name n) {
 	components::name name;
 	name.id = n;
-
-	if (id->find<components::name>() == nullptr)
-		id->add(name);
-	else
-		id->get<components::name>() = name;
+	id.set(name);
 }
 
-void name_entity(augs::entity_id id, entity_name n, std::wstring nick) {
+void name_entity(definition_interface id, entity_name n, std::wstring nick) {
 	components::name name;
 	name.id = n;
 	name.custom_nickname = true;
 	name.nickname = nick;
-
-	if (id->find<components::name>() == nullptr)
-		id->add(name);
-	else
-		id->get<components::name>() = name;
+	id.set(name);
 }
 
-augs::entity_id get_first_named_ancestor(augs::entity_id p) {
+entity_id get_first_named_ancestor(entity_id p) {
 	while (p.alive()) {
-		if (p->find<components::name>() != nullptr) {
+		if (p->has<components::name>()) {
 			return p;
 			break;
 		}
 
-		p = p->get_parent();
+		p = p.get_parent();
 	}
 
-	return augs::entity_id();
+	return entity_id();
 }

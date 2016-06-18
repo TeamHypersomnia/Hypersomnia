@@ -19,7 +19,7 @@ struct immediate_hud {
 
 	struct pure_color_highlight : game_event_visualization {
 		float starting_alpha_ratio = 0.f;
-		augs::entity_id target;
+		entity_id target;
 		augs::rgba color;
 	};
 
@@ -33,7 +33,7 @@ struct immediate_hud {
 	void draw_circular_bars_information(messages::camera_render_request_message);
 	void draw_pure_color_highlights(messages::camera_render_request_message);
 
-	void acquire_game_events(augs::world&);
+	void acquire_game_events(cosmos&);
 	void draw_vertically_flying_numbers(messages::camera_render_request_message);
 private:
 	double get_current_time(messages::camera_render_request_message) const;

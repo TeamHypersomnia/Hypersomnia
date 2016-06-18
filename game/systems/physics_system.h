@@ -1,23 +1,23 @@
 #pragma once
 #include <Box2D\Box2D.h>
-#include "entity_system/processing_system.h"
-#include "entity_system/entity_id.h"
+#include "game/entity_id.h"
 
-#include "../components/physics_component.h"
-#include "../components/transform_component.h"
+#include "game/components/physics_component.h"
+#include "game/components/transform_component.h"
 
 #include <functional>
+#include <set>
 
-using namespace augs;
+class cosmos;
+class step_state;
 
-class physics_system : public augs::event_only_system {
+class physics_system {
+	cosmos& parent_cosmos;
+
 public:
-	using event_only_system::event_only_system;
-
 	struct raycast_output {
 		vec2 intersection, normal;
 		bool hit = false;
-		int fixture_index = -1;
 		entity_id what_entity;
 
 		bool operator<(const raycast_output& b) const {
@@ -39,7 +39,7 @@ public:
 		};
 
 		std::set<b2Body*> bodies;
-		std::set<augs::entity_id> entities;
+		std::set<entity_id> entities;
 		std::set<queried_result> details;
 
 		query_output& operator+=(const query_output& b) {
@@ -53,11 +53,11 @@ public:
 
 	struct query_aabb_output {
 		std::set<b2Body*> bodies;
-		std::set<augs::entity_id> entities;
+		std::set<entity_id> entities;
 		std::vector<b2Fixture*> fixtures;
 	};
 
-	physics_system(world&);
+	physics_system(cosmos&);
 
 	std::vector<raycast_output> ray_cast_all_intersections(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity = entity_id());
 
@@ -75,35 +75,29 @@ public:
 	query_aabb_output query_aabb(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity = entity_id());
 	query_aabb_output query_aabb_px(vec2 p1, vec2 p2, b2Filter filter, entity_id ignore_entity = entity_id());
 
-	query_output query_body(augs::entity_id, b2Filter filter, entity_id ignore_entity = entity_id());
+	query_output query_body(entity_id, b2Filter filter, entity_id ignore_entity = entity_id());
 
 	query_output query_polygon(const std::vector<vec2>& vertices, b2Filter filter, entity_id ignore_entity = entity_id());
 	query_output query_shape(b2Shape*, b2Filter filter, entity_id ignore_entity = entity_id());
 	
 	void enable_listener(bool flag);
 	
-	void destroy_whole_world();
+	void rechoose_owner_friction_body(entity_id);
 
-	static void rechoose_owner_friction_body(augs::entity_id);
+	void react_to_new_entities(step_state&);
+	void react_to_destroyed_entities(step_state&);
 
-	void clear_collision_messages();
+	void step_and_set_new_transforms(step_state&);
 
-	bool has_entity_any_physics(entity_id);
-	void destroy_fixtures_of_entity(augs::entity_id);
-	void destroy_physics_of_entity(augs::entity_id);
-	void create_physics_for_entity(augs::entity_id);
+	entity_id get_owner_friction_field(entity_id);
+	entity_id get_owner_body_entity(entity_id sub_entity);
+	bool is_entity_physical(entity_id);
+	bool are_connected_by_friction(entity_id child, entity_id parent);
+	void resolve_density_of_associated_fixtures(entity_id);
 
-	void create_bodies_and_fixtures_from_physics_definitions();
-	void consume_rebuild_physics_messages_and_save_new_definitions();
-
-	void execute_delayed_physics_ops();
-
-	void step_and_set_new_transforms();
-	void destroy_fixtures_and_bodies();
+	std::vector<b2Vec2> get_world_vertices(entity_id subject, bool meters = true, int fixture_num = 0);
 
 	int ray_casts_since_last_step = 0;
-
-	bool enable_motors = true;
 
 	b2World b2world;
 private:	
@@ -136,12 +130,13 @@ private:
 		void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) override;
 
 		std::vector<std::function<void()>> after_step_callbacks;
-		augs::world* world_ptr;
+		cosmos* cosmos_ptr;
+		step_state* step_ptr;
 	};
 
 	void recurential_friction_handler(entity_id entity, entity_id friction_owner);
 
-	void reset_states();
+	void set_transforms_from_body_transforms();
 
 	contact_listener listener;
 };

@@ -1,15 +1,17 @@
 #pragma once
 #include "misc/timer.h"
 
-#include "entity_system/entity.h"
+#include "game/entity_id.h"
 
 #include "render_component.h"
-#include "../detail/physics_setup_helpers.h"
+#include "game/detail/physics_setup_helpers.h"
 
 #include "misc/deterministic_timing.h"
 #include "misc/recoil_player.h"
 
 class gun_system;
+class processing_system;
+
 namespace components {
 	struct gun  {
 		enum action_type {
@@ -30,7 +32,7 @@ namespace components {
 		float camera_shake_radius = 0.f;
 		float camera_shake_spread_degrees = 0.f;
 
-		void shake_camera(augs::entity_id, float direction, augs::processing_system&);
+		void shake_camera(entity_id, float direction, processing_system&);
 
 		components::transform calculate_barrel_transform(components::transform gun_transform);
 

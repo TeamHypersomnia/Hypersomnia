@@ -1,10 +1,10 @@
 #include "sprite_component.h"
 #include "texture_baker/texture_baker.h"
 
-#include "../detail/state_for_drawing.h"
-#include "../components/render_component.h"
+#include "game/detail/state_for_drawing.h"
+#include "game/components/render_component.h"
 
-#include "entity_system/entity.h"
+#include "game/entity_id.h"
 
 #include "graphics/renderer.h"
 

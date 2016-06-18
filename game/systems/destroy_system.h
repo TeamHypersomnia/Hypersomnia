@@ -1,11 +1,9 @@
 #pragma once
-#include "game/processing_system_with_cosmos_reference.h"
+#include "game/cosmos_reference.h"
 
-using namespace augs;
-
-class destroy_system : public processing_system_with_cosmos_reference {
+class destroy_system : public cosmos_reference {
 public:
-	using processing_system_with_cosmos_reference::processing_system_with_cosmos_reference;
+	using cosmos_reference::cosmos_reference;
 
 	void queue_children_of_queued_entities();
 	void perform_deletions();

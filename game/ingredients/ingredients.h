@@ -1,14 +1,14 @@
 #pragma once
-#include "augs/entity_system/entity_id.h"
+#include "game/entity_id.h"
 #include "math/vec2.h"
 
 #include "game/assets/texture_id.h"
 #include "game/components/render_component.h"
+
 #include "graphics/pixel.h"
 
-namespace augs {
-	class world;
-}
+class definition_interface;
+class cosmos;
 
 namespace components {
 	struct item;
@@ -17,57 +17,57 @@ namespace components {
 }
 
 namespace ingredients {
-	void camera(augs::entity_id, int w, int h);
+	void camera(definition_interface, int w, int h);
 
-	components::item& make_item(augs::entity_id);
+	components::item& make_item(definition_interface);
 	
-	components::sprite& sprite(augs::entity_id, vec2 pos, assets::texture_id = assets::texture_id::BLANK, augs::rgba col = augs::rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
-	components::sprite& sprite_scalled(augs::entity_id, vec2 pos, vec2i size, assets::texture_id = assets::texture_id::BLANK, augs::rgba col = augs::rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
+	components::sprite& sprite(definition_interface, vec2 pos, assets::texture_id = assets::texture_id::BLANK, augs::rgba col = augs::rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
+	components::sprite& sprite_scalled(definition_interface, vec2 pos, vec2i size, assets::texture_id = assets::texture_id::BLANK, augs::rgba col = augs::rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
 	
-	components::physics_definition& bullet_round_physics(augs::entity_id);
-	components::physics_definition& see_through_dynamic_body(augs::entity_id);
-	components::physics_definition& standard_dynamic_body(augs::entity_id);
-	components::physics_definition& standard_static_body(augs::entity_id);
+	components::physics_definition& bullet_round_physics(definition_interface);
+	components::physics_definition& see_through_dynamic_body(definition_interface);
+	components::physics_definition& standard_dynamic_body(definition_interface);
+	components::physics_definition& standard_static_body(definition_interface);
 
-	void wsad_character_physics(augs::entity_id);
-	void wsad_character_legs(augs::entity_id legs, augs::entity_id player);
-	void wsad_character(augs::entity_id, augs::entity_id crosshair_entity);
-	void wsad_character_corpse(augs::entity_id);
+	void wsad_character_physics(definition_interface);
+	void wsad_character_legs(definition_interface legs, definition_interface player);
+	void wsad_character(definition_interface, definition_interface crosshair_entity);
+	void wsad_character_corpse(definition_interface);
 
-	void inject_window_input_to_character(augs::entity_id target_character, augs::entity_id camera_entity);
+	void inject_window_input_to_character(definition_interface target_character, definition_interface camera_entity);
 
-	void make_always_visible(augs::entity_id);
-	void cancel_always_visible(augs::entity_id);
+	void make_always_visible(definition_interface);
+	void cancel_always_visible(definition_interface);
 
-	void character_inventory(augs::entity_id);
-	void backpack(augs::entity_id);
+	void character_inventory(definition_interface);
+	void backpack(definition_interface);
 
-	void default_gun_container(augs::entity_id);
-	void default_gun(augs::entity_id);
+	void default_gun_container(definition_interface);
+	void default_gun(definition_interface);
 
-	void standard_pathfinding_capability(augs::entity_id);
-	void soldier_intelligence(augs::entity_id);
+	void standard_pathfinding_capability(definition_interface);
+	void soldier_intelligence(definition_interface);
 }
 
 namespace prefabs {
-	augs::entity_id create_car(augs::world&, components::transform);
-	augs::entity_id create_motorcycle(augs::world&, components::transform);
+	entity_id create_car(cosmos&, components::transform);
+	entity_id create_motorcycle(cosmos&, components::transform);
 
-	augs::entity_id create_sample_magazine(augs::world&, vec2 pos, std::string space = "0.30", augs::entity_id charge_inside = augs::entity_id());
-	augs::entity_id create_sample_suppressor(augs::world& world, vec2 pos);
-	augs::entity_id create_sample_rifle(augs::world&, vec2 pos, augs::entity_id load_mag = augs::entity_id());
-	augs::entity_id create_pistol(augs::world&, vec2 pos, augs::entity_id load_mag = augs::entity_id());
-	augs::entity_id create_submachine(augs::world&, vec2 pos, augs::entity_id load_mag = augs::entity_id());
+	entity_id create_sample_magazine(cosmos&, vec2 pos, std::string space = "0.30", entity_id charge_inside = entity_id());
+	entity_id create_sample_suppressor(cosmos& world, vec2 pos);
+	entity_id create_sample_rifle(cosmos&, vec2 pos, entity_id load_mag = entity_id());
+	entity_id create_pistol(cosmos&, vec2 pos, entity_id load_mag = entity_id());
+	entity_id create_submachine(cosmos&, vec2 pos, entity_id load_mag = entity_id());
 	
-	augs::entity_id create_pink_charge(augs::world&, vec2 pos, int charges = 23);
-	augs::entity_id create_cyan_charge(augs::world&, vec2 pos, int charges = 30);
-	augs::entity_id create_green_charge(augs::world& world, vec2 pos, int charges = 23);
+	entity_id create_pink_charge(cosmos&, vec2 pos, int charges = 23);
+	entity_id create_cyan_charge(cosmos&, vec2 pos, int charges = 30);
+	entity_id create_green_charge(cosmos& world, vec2 pos, int charges = 23);
 
-	augs::entity_id create_sample_backpack(augs::world&, vec2 pos);
+	entity_id create_sample_backpack(cosmos&, vec2 pos);
 
-	augs::entity_id create_character_crosshair(augs::world&);
-	augs::entity_id create_character(augs::world&, vec2 pos);
-	augs::entity_id create_crate(augs::world&, vec2 pos, vec2 size);
+	entity_id create_character_crosshair(cosmos&);
+	entity_id create_character(cosmos&, vec2 pos);
+	entity_id create_crate(cosmos&, vec2 pos, vec2 size);
 
-	augs::entity_id create_cyan_urban_machete(augs::world&, vec2 pos);
+	entity_id create_cyan_urban_machete(cosmos&, vec2 pos);
 }

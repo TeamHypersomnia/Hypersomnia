@@ -1,6 +1,6 @@
 #include "immediate_hud.h"
-#include "entity_system/entity.h"
-#include "entity_system/world.h"
+#include "game/entity_id.h"
+#include "game/cosmos.h"
 
 #include "game/systems/render_system.h"
 #include "game/systems/gui_system.h"
@@ -70,7 +70,7 @@ vec2 position_caption_around_a_circle(float radius, vec2 r, float alpha) {
 }
 
 void immediate_hud::draw_circular_bars(messages::camera_render_request_message r) {
-	auto& render = r.camera->get_owner_world().get_system<render_system>();
+	auto& render = r.camera->get_owner_world().systems.get<dynamic_tree_system>();
 	const auto& visible_entities = render.get_all_visible_entities();
 	auto& target = *r.state.output;
 
@@ -249,8 +249,8 @@ void immediate_hud::draw_circular_bars_information(messages::camera_render_reque
 	r.state.output->triangles.insert(r.state.output->triangles.begin(), circular_bars_information.begin(), circular_bars_information.end());
 }
 
-void immediate_hud::acquire_game_events(augs::world& w) {
-	auto& healths = w.get_message_queue<messages::health_event>();
+void immediate_hud::acquire_game_events(cosmos& w) {
+	auto& healths = w.messages.get_queue<messages::health_event>();
 
 	for (auto& h : healths) {
 		vertically_flying_number vn;

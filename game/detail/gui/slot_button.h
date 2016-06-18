@@ -8,7 +8,7 @@
 struct slot_button : augs::gui::rect {
 	slot_button();
 
-	augs::entity_id gui_element_entity;
+	entity_id gui_element_entity;
 
 	augs::gui::text_drawer space_caption;
 	void get_member_children(std::vector<augs::gui::rect_id>&) final;

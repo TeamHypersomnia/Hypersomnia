@@ -1,6 +1,6 @@
 #pragma once
-#include "../rect.h"
-#include "../text_drawer.h"
+#include "gui/rect.h"
+#include "gui/text_drawer.h"
 #include <functional>
 
 namespace augs {

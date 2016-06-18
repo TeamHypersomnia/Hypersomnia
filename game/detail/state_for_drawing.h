@@ -1,9 +1,9 @@
 #pragma once
 #include "math/vec2.h"
 #include "math/rects.h"
-#include "../components/transform_component.h"
+#include "game/components/transform_component.h"
 
-#include "augs/entity_system/entity_id.h"
+#include "game/entity_id.h"
 #include "augs/graphics/vertex.h"
 
 namespace augs {
@@ -27,7 +27,7 @@ namespace shared {
 		std::vector<augs::vertex_triangle>* overridden_target_buffer = nullptr;
 
 		components::transform renderable_transform;
-		augs::entity_id renderable;
+		entity_id renderable;
 		bool screen_space_mode = false;
 		bool position_is_left_top_corner = false;
 

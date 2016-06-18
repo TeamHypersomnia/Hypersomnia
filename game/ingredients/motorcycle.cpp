@@ -1,6 +1,6 @@
 #include "ingredients.h"
-#include "entity_system/entity.h"
-#include "entity_system/world.h"
+#include "game/entity_id.h"
+#include "game/cosmos.h"
 
 #include "game/components/position_copying_component.h"
 #include "game/components/camera_component.h"
@@ -11,7 +11,6 @@
 #include "game/components/rotation_copying_component.h"
 #include "game/components/animation_component.h"
 #include "game/components/animation_response_component.h"
-#include "game/components/physics_definition_component.h"
 #include "game/components/car_component.h"
 #include "game/components/trigger_component.h"
 #include "game/components/name_component.h"
@@ -19,7 +18,7 @@
 #include "game/globals/filters.h"
 
 namespace prefabs {
-	augs::entity_id create_motorcycle(augs::world& world, components::transform spawn_transform) {
+	entity_id create_motorcycle(cosmos world, components::transform spawn_transform) {
 		auto front = world.create_entity("front");
 		auto interior = world.create_entity("interior");
 		auto left_wheel = world.create_entity("left_wheel");

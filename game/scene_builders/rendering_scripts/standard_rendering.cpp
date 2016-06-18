@@ -1,7 +1,7 @@
 #include "all.h"
 
-#include "augs/entity_system/entity.h"
-#include "augs/entity_system/world.h"
+#include "game/entity_id.h"
+#include "game/cosmos.h"
 
 #include "game/systems/render_system.h"
 #include "game/systems/gui_system.h"
@@ -16,8 +16,8 @@ namespace rendering_scripts {
 		auto camera = msg.camera;
 
 		auto& world = camera->get_owner_world();
-		auto& render = world.get_system<render_system>();
-		auto& gui = world.get_system<gui_system>();
+		auto& render = world.systems.get<render_system>();
+		auto& gui = world.systems.get<gui_system>();
 
 		auto matrix = augs::orthographic_projection<float>(0, state.visible_world_area.x, state.visible_world_area.y, 0, 0, 1);
 

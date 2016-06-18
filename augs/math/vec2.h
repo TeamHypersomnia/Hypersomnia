@@ -1,12 +1,13 @@
 #pragma once
 #include <algorithm>
 #include "rects.h"
-#include "misc/randval.h"
+#include "misc/randomization.h"
 #include "vec2declare.h"
 
 #define AUGS_EPSILON 0.0001f
 #define DEG_TO_RAD 0.01745329251994329576923690768489
 #define RAD_TO_DEG (1.0/0.01745329251994329576923690768489)
+
 #define PI_f 3.1415926535897932384626433832795f
 #define PI_d 3.1415926535897932384626433832795
 

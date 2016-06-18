@@ -675,54 +675,6 @@
     <ClCompile Include="game\resources\manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\bindings\opengl_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\script_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\vec2_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\timer_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\utilities_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\value_animator_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\text_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\rgba_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\rect_xywh_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\rect_ltrb_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\random_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\id_generator_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\minmax_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\glwindow_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\file_watcher_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\world_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\scene_builders\scene_builder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -807,12 +759,6 @@
     <ClCompile Include="game\resources\texture_with_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\game_overworld.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\game_world.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\ingredients\box_physics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -832,30 +778,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\ingredients\wsad_player.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bind_game_and_augs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="augs\entity_system\entity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="augs\entity_system\overworld.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="augs\entity_system\processing_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="augs\entity_system\component_bitset_matcher.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="augs\entity_system\templated_list_to_hash_vector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="augs\entity_system\type_hash_to_index_mapper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="augs\entity_system\world.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="augs\graphics\fbo.cpp">
@@ -940,9 +862,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="augs\misc\object_pool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="augs\misc\randval.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="augs\misc\smooth_value_field.cpp">
@@ -1033,9 +952,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\systems\intent_contextualization_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="augs\entity_system\entity_id.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\components\item_component.cpp">
@@ -1267,6 +1183,102 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="augs\entity_system\storage_for_components_and_aggregates.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\cosmos.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\multiverse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\misc\simulation_timing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\misc\randomization.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\misc\delta.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\entity_id.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\components\relations_component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\processing_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\systems\dynamic_tree_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\definition_interface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bindings\bind_game_and_augs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bindings\classes\world_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bindings\classes\value_animator_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bindings\classes\vec2_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bindings\classes\utilities_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bindings\classes\timer_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bindings\classes\text_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bindings\classes\script_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bindings\classes\rgba_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bindings\classes\rect_xywh_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bindings\classes\random_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bindings\classes\rect_ltrb_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bindings\classes\opengl_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bindings\classes\minmax_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bindings\classes\id_generator_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bindings\classes\glwindow_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\bindings\classes\file_watcher_binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\physics_engine_reflected_state.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\convex_partitioned_shape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\step_state.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\lists_of_processing_subjects.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\cosmic_profiler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2597,9 +2609,6 @@
     <ClInclude Include="game\messages\damage_message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\messages\destroy_message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\messages\intent_message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2655,15 +2664,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\GL\OpenGL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\all_component_includes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\all_message_includes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\all_system_includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\messages\raw_window_input_message.h">
@@ -2726,43 +2726,10 @@
     <ClInclude Include="game\resources\texture_with_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\game_overworld.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\game_world.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\ingredients\ingredients.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\ingredients\renderable_includes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\bind_game_and_augs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\entity_system\entity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\entity_system\entity_id.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\entity_system\overworld.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\entity_system\processing_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\entity_system\component_bitset_matcher.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\entity_system\templated_list_to_hash_vector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\entity_system\type_hash_to_index_mapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\entity_system\world.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\error\augs_error.h">
@@ -2868,9 +2835,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\ptr_wrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\misc\randval.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\simple_pool.h">
@@ -3101,12 +3065,6 @@
     <ClInclude Include="game\messages\gui_intents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\messages\rebuild_physics_message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\messages\physics_operation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\ensure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3278,9 +3236,6 @@
     <ClInclude Include="game\globals\sub_entity_name.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\globals\sub_definition_name.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\globals\slot_function.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3353,9 +3308,6 @@
     <ClInclude Include="augs\window_framework\platform_utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\entity_system\track_entities_with_components.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\ecs_instantiation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3366,6 +3318,96 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\entity_system\ecs_instantiation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\cosmos.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\multiverse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\entity_system\components_instantiation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\simulation_timing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\randomization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\delta.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\entity_system\storage_for_message_queues.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\entity_id.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\components\relations_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\processing_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\systems\dynamic_tree_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\machine_entropy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\definition_interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\full_entity_definition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\types_specification\full_entity_definition_declaration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\types_specification\all_component_includes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\types_specification\components_instantiation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\bindings\bind_game_and_augs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\globals\sub_definition_name.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\physics_engine_reflected_state.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\convex_partitioned_shape.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\messages\queue_destruction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\messages\will_soon_be_deleted.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\entity_system\storage_for_stateful_systems.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\types_specification\stateful_systems_instantiation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\types_specification\message_queues_instantiation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\step_state.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\globals\list_of_processing_subjects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\lists_of_processing_subjects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\cosmic_profiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

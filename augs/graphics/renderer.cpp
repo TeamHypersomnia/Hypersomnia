@@ -7,11 +7,11 @@
 #include "game/components/visibility_component.h"
 #include "game/components/physics_component.h"
 
-#include "augs/entity_system/entity.h"
+#include "game/entity_id.h"
 
 #include "fbo.h"
 
-#include "../window_framework/window.h"
+#include "window_framework/window.h"
 
 #include "game/resources/manager.h"
 #include "gui/gui_world.h"

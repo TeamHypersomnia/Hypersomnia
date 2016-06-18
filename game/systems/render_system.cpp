@@ -1,10 +1,8 @@
 #include <algorithm>
 
 #include "render_system.h"
-#include "entity_system/entity.h"
-#include "../detail/state_for_drawing.h"
-
-#include "augs/entity_system/overworld.h"
+#include "game/entity_id.h"
+#include "game/detail/state_for_drawing.h"
 
 #include "game/components/polygon_component.h"
 #include "game/components/sprite_component.h"
@@ -14,24 +12,24 @@
 #include "game/components/particle_group_component.h"
 
 #include "game/messages/new_entity_message.h"
-#include "game/messages/destroy_message.h"
+#include "game/messages/queue_destruction.h"
 
 #include "physics_system.h"
 #include "camera_system.h"
 
-#include "entity_system/world.h"
-#include "../globals/filters.h"
+#include "game/cosmos.h"
+#include "game/globals/filters.h"
 
 #include <algorithm>
 
 using namespace shared;
 
-render_system::render_system(world& parent_world) : event_only_system(parent_world) {
-	layers_with_custom_drawing_order.push_back(render_layer::CAR_INTERIOR);
+render_system::render_system(cosmos& parent_cosmos) : processing_system_with_cosmos_reference(parent_cosmos) {
+	layers_whose_order_determines_friction.push_back(render_layer::CAR_INTERIOR);
 }
 
 void render_system::add_entities_to_rendering_tree() {
-	auto& events = parent_world.get_message_queue<messages::new_entity_message>();
+	auto& events = step.messages.get_queue<messages::new_entity_message>();
 
 	for (auto& it : events) {
 		auto& e = it.subject;
@@ -73,7 +71,7 @@ void render_system::add_entities_to_rendering_tree() {
 }
 
 void render_system::remove_entities_from_rendering_tree() {
-	auto& events = parent_world.get_message_queue<messages::destroy_message>();
+	auto& events = step.messages.get_queue<messages::queue_destruction>();
 
 	for (auto& it : events) {
 		auto& e = it.subject;
@@ -93,8 +91,8 @@ void render_system::remove_entities_from_rendering_tree() {
 }
 
 void render_system::determine_visible_entities_from_every_camera() {
-	auto& cameras = parent_world.get_system<camera_system>().targets;
-	auto& physics = parent_world.get_system<physics_system>();
+	auto& cameras = parent_cosmos.stateful_systems.get<camera_system>().targets;
+	auto& physics = parent_cosmos.stateful_systems.get<physics_system>();
 
 	visible_entities.clear();
 
@@ -106,7 +104,7 @@ void render_system::determine_visible_entities_from_every_camera() {
 
 		visible_entities.erase(
 			std::remove_if(visible_entities.begin(), visible_entities.end(), 
-				[](augs::entity_id id) { 
+				[](entity_id id) { 
 			return id->find<components::render>() == nullptr;  
 		}), visible_entities.end());
 
@@ -166,7 +164,7 @@ void render_system::generate_layers_from_visible_entities(int mask) {
 		layers[layer].push_back(it);
 	}
 
-	for (auto& custom_order_layer : layers_with_custom_drawing_order) {
+	for (auto& custom_order_layer : layers_whose_order_determines_friction) {
 		if (custom_order_layer < layers.size()) {
 			if (layers[custom_order_layer].size() > 1) {
 				std::sort(layers[custom_order_layer].begin(), layers[custom_order_layer].end(), [](entity_id b, entity_id a) {
@@ -258,7 +256,7 @@ void render_system::restore_actual_transforms() {
 	}
 }
 
-void render_system::standard_draw_entity(augs::entity_id e, shared::state_for_drawing_camera in_camera, bool only_border_highlights, int visibility_index) {
+void render_system::standard_draw_entity(entity_id e, shared::state_for_drawing_camera in_camera, bool only_border_highlights, int visibility_index) {
 	static thread_local state_for_drawing_renderable in;
 	in.setup_camera_state(in_camera);
 

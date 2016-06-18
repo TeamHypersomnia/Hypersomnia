@@ -3,7 +3,7 @@
 #include "ui.h"
 #include "drafter.h"
 #include "printer.h"
-#include "../rect.h"
+#include "gui/rect.h"
 #include "window_framework/window.h"
 
 #undef min

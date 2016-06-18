@@ -1,9 +1,9 @@
 #pragma once
-#include "entity_system/processing_system.h"
+#include "game/processing_system_with_cosmos_reference.h"
 
-#include "../components/damage_component.h"
-#include "../components/physics_component.h"
-#include "../components/transform_component.h"
+#include "game/components/damage_component.h"
+#include "game/components/physics_component.h"
+#include "game/components/transform_component.h"
 
 using namespace augs;
 

@@ -1,5 +1,5 @@
 #include "gui_intents.h"
-#include "../detail/inventory_slot_id.h"
+#include "game/detail/inventory_slot_id.h"
 #include "item_slot_transfer_request.h"
 
 namespace messages {

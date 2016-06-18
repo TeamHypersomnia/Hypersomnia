@@ -1,6 +1,6 @@
 #pragma once
 #include "textbox.h"
-#include "../text\drafter.h"
+#include "gui/text/drafter.h"
 #include "templates.h"
 #include "window_framework/platform_utils.h"
 
@@ -11,7 +11,6 @@ namespace augs {
 				: rect(r), editor(default_style), view_caret(false), blink_reset(false) {
 				//preserve_focus = true; 
 			}
-
 
 			void textbox::show_caret() {
 				editor.guarded_redraw();

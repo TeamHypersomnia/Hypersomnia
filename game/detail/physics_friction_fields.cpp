@@ -1,8 +1,8 @@
 #include "game/systems/physics_system.h"
 #include "game/components/fixtures_component.h"
-#include "entity_system/world.h"
+#include "game/cosmos.h"
 
-void physics_system::rechoose_owner_friction_body(augs::entity_id entity) {
+void physics_system::rechoose_owner_friction_body(entity_id entity) {
 	auto& physics = entity->get<components::physics>();
 
 	// purge of dead entities
@@ -17,14 +17,14 @@ void physics_system::rechoose_owner_friction_body(augs::entity_id entity) {
 		// cycle guard
 		// remove friction grounds whom do I own myself
 
-		feasible_grounds.erase(std::remove_if(feasible_grounds.begin(), feasible_grounds.end(), [entity](entity_id subject) {
-			return components::physics::are_connected_by_friction(subject, entity);
+		feasible_grounds.erase(std::remove_if(feasible_grounds.begin(), feasible_grounds.end(), [this, entity](entity_id subject) {
+			return are_connected_by_friction(subject, entity);
 		}), feasible_grounds.end());
 	}
 
 	if (!feasible_grounds.empty()) {
-		std::stable_sort(feasible_grounds.begin(), feasible_grounds.end(), [](entity_id a, entity_id b) {
-			return components::physics::are_connected_by_friction(a, b);
+		std::stable_sort(feasible_grounds.begin(), feasible_grounds.end(), [this](entity_id a, entity_id b) {
+			return are_connected_by_friction(a, b);
 		});
 
 		physics.owner_friction_ground = feasible_grounds[0];
@@ -60,10 +60,35 @@ void physics_system::recurential_friction_handler(entity_id entity, entity_id fr
 
 	recurential_friction_handler(entity, friction_entity->get<components::physics>().get_owner_friction_ground());
 
-	auto friction_body = friction_physics.get_body();
-	auto fricted_pos = physics.body->GetPosition() + delta_seconds() * friction_body->GetLinearVelocityFromWorldPoint(physics.body->GetPosition());
+	auto* body = physics.black_detail.body;
 
-	physics.body->SetTransform(fricted_pos, physics.body->GetAngle() + delta_seconds()*friction_body->GetAngularVelocity());
+	auto friction_body = friction_physics.get_body();
+	auto fricted_pos = body->GetPosition() + parent_cosmos.delta.in_seconds() * friction_body->GetLinearVelocityFromWorldPoint(body->GetPosition());
+
+	body->SetTransform(fricted_pos, body->GetAngle() + parent_cosmos.delta.in_seconds()*friction_body->GetAngularVelocity());
 
 	friction_entity->get<components::physics>().measured_carried_mass += physics.get_mass() + physics.measured_carried_mass;
+}
+
+bool physics_system::are_connected_by_friction(entity_id child, entity_id parent) {
+	if (is_entity_physical(child) && is_entity_physical(parent)) {
+		bool matched_ancestor = false;
+
+		entity_id parent_body_entity = get_owner_body_entity(parent);
+		entity_id childs_ancestor_entity = get_owner_body_entity(child)->get<components::physics>().get_owner_friction_ground();
+
+		while (childs_ancestor_entity.alive()) {
+			if (childs_ancestor_entity == parent_body_entity) {
+				matched_ancestor = true;
+				break;
+			}
+
+			childs_ancestor_entity = childs_ancestor_entity->get<components::physics>().get_owner_friction_ground();
+		}
+
+		if (matched_ancestor)
+			return true;
+	}
+
+	return false;
 }

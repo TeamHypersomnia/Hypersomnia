@@ -4,7 +4,7 @@
 
 namespace messages {
 	struct collision_message : public message {
-		augs::entity_id collider;
+		entity_id collider;
 		vec2 collider_impact_velocity, subject_impact_velocity, point;
 
 		bool operator<(const collision_message& b) const {

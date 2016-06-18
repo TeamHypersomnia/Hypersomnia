@@ -1,13 +1,13 @@
 #include "ingredients.h"
-#include "entity_system/entity.h"
-#include "entity_system/world.h"
+#include "game/entity_id.h"
+#include "game/cosmos.h"
 
 #include "game/components/position_copying_component.h"
 #include "game/components/camera_component.h"
 #include "game/components/input_receiver_component.h"
 
 namespace ingredients {
-	void camera(augs::entity_id e, int w, int h) {
+	void camera(entity_id e, int w, int h) {
 		components::transform transform;
 		components::input_receiver input;
 		components::camera camera;

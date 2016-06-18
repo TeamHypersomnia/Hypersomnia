@@ -69,5 +69,6 @@ namespace components {
 
 		const std::vector<entity_id>& get_fixture_entities() const;
 
+		bool test_point(vec2) const;
 	};
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "entity_system/entity.h"
+#include "game/entity_id.h"
 #include "math/vec2.h"
 #include "graphics/pixel.h"
 #include "misc/timer.h"
@@ -31,7 +31,7 @@ namespace components {
 			visibility* vision = nullptr;
 			std::vector<b2Vec2>* shape_verts = nullptr;
 
-			augs::entity_id subject_entity;
+			entity_id subject_entity;
 		};
 
 		struct target_info {
@@ -158,7 +158,7 @@ namespace components {
 			*/
 
 			target_info target;
-			augs::entity_id target_from;
+			entity_id target_from;
 
 			vec2 last_output_force;
 			vec2 last_estimated_target_position;

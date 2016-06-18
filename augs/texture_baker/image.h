@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
-#include "../math/vec2.h"
-#include "../graphics/pixel.h"
+#include "math/vec2.h"
+#include "graphics/pixel.h"
 
 namespace augs {
 	class image {

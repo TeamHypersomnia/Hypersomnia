@@ -1,27 +1,27 @@
 #include "trigger_detector_system.h"
-#include "entity_system/world.h"
+#include "game/cosmos.h"
 
-#include "../messages/intent_message.h"
+#include "game/messages/intent_message.h"
 
-#include "../messages/trigger_hit_confirmation_message.h"
-#include "../messages/trigger_hit_request_message.h"
-#include "../messages/collision_message.h"
+#include "game/messages/trigger_hit_confirmation_message.h"
+#include "game/messages/trigger_hit_request_message.h"
+#include "game/messages/collision_message.h"
 
-#include "../messages/intent_message.h"
+#include "game/messages/intent_message.h"
 
-#include "../systems/physics_system.h"
+#include "game/systems/physics_system.h"
 
-#include "../globals/filters.h"
+#include "game/globals/filters.h"
 
-#include "../components/trigger_component.h"
-#include "../components/physics_component.h"
-#include "../components/transform_component.h"
+#include "game/components/trigger_component.h"
+#include "game/components/physics_component.h"
+#include "game/components/transform_component.h"
 
-#include "../components/trigger_collision_detector_component.h"
-#include "../components/trigger_query_detector_component.h"
+#include "game/components/trigger_collision_detector_component.h"
+#include "game/components/trigger_query_detector_component.h"
 
 void trigger_detector_system::consume_trigger_detector_presses() {
-	auto& trigger_presses = parent_world.get_message_queue<messages::intent_message>();
+	auto& trigger_presses = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& e : trigger_presses) {
 		if (e.intent == intent_type::QUERY_TOUCHING_TRIGGERS) {
@@ -32,16 +32,16 @@ void trigger_detector_system::consume_trigger_detector_presses() {
 
 				if (trigger_query_detector->spam_trigger_requests_when_detection_intented) {
 					if (trigger_query_detector->detection_intent_enabled)
-						e.subject->enable(trigger_query_detector);
+						e.subject.unskip_processing_in(list_of_processing_subjects::trigger_query_detector>();
 					else
-						e.subject->disable(trigger_query_detector);
+						e.subject.skip_processing_in(list_of_processing_subjects::trigger_query_detector>();
 				}
 				else if(e.pressed_flag) {
-					e.subject->disable(trigger_query_detector);
+					e.subject.deactivate(trigger_query_detector);
 
 					messages::trigger_hit_request_message request;
 					request.detector = e.subject;
-					parent_world.post_message(request);
+					step.messages.post(request);
 				}
 			}
 		}
@@ -60,21 +60,21 @@ void trigger_detector_system::post_trigger_requests_from_continuous_detectors() 
 
 	for (auto& t : targets_copy) {
 		if (!t->get<components::trigger_query_detector>().detection_intent_enabled)
-			t->disable<components::trigger_query_detector>();
+			t.skip_processing_in(list_of_processing_subjects::trigger_query_detector>();
 		else {
 			messages::trigger_hit_request_message request;
 			request.detector = t;
-			parent_world.post_message(request);
+			step.messages.post(request);
 		}
 	}
 }
 
 void trigger_detector_system::send_trigger_confirmations() {
-	auto& confirmations = parent_world.get_message_queue<messages::trigger_hit_confirmation_message>();
+	auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();
 
 	confirmations.clear();
 
-	auto& collisions = parent_world.get_message_queue<messages::collision_message>();
+	auto& collisions = step.messages.get_queue<messages::collision_message>();
 
 	for (auto& c : collisions) {
 		if (c.type != messages::collision_message::event_type::PRE_SOLVE)
@@ -88,19 +88,19 @@ void trigger_detector_system::send_trigger_confirmations() {
 			messages::trigger_hit_confirmation_message confirmation;
 			confirmation.detector_body = c.subject;
 			confirmation.trigger = c.collider;
-			parent_world.post_message(confirmation);
+			step.messages.post(confirmation);
 		}
 	}
 
-	auto& requests = parent_world.get_message_queue<messages::trigger_hit_request_message>();
+	auto& requests = step.messages.get_queue<messages::trigger_hit_request_message>();
 
 	for (auto& e : requests) {
 		auto& trigger_query_detector = e.detector->get<components::trigger_query_detector>();
 		auto& detector_body = e.detector;
 		
-		std::vector<augs::entity_id> found_triggers;
+		std::vector<entity_id> found_triggers;
 
-		auto found_physical_triggers = parent_world.get_system<physics_system>().query_body(detector_body, filters::trigger());
+		auto found_physical_triggers = parent_cosmos.stateful_systems.get<physics_system>().query_body(detector_body, filters::trigger());
 
 		for (auto found_trigger : found_physical_triggers.entities) {
 			auto* maybe_trigger = found_trigger->find<components::trigger>();
@@ -114,7 +114,7 @@ void trigger_detector_system::send_trigger_confirmations() {
 			confirmation.trigger = t;
 			confirmation.detector_body = detector_body;
 			trigger_query_detector.detection_intent_enabled = false;
-			parent_world.post_message(confirmation);
+			step.messages.post(confirmation);
 			break;
 		}
 	}

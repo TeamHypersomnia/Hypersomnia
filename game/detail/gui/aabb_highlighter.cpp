@@ -1,14 +1,13 @@
 #include "aabb_highlighter.h"
 #include "game/components/sprite_component.h"
-#include "game/components/physics_definition_component.h"
-#include "entity_system/entity.h"
+#include "game/entity_id.h"
 
 void aabb_highlighter::update(float delta) {
 	timer += delta;
 	timer = fmod(timer, cycle_duration_ms);
 }
 
-void aabb_highlighter::draw(shared::state_for_drawing_camera camera, augs::entity_id subject) {
+void aabb_highlighter::draw(shared::state_for_drawing_camera camera, entity_id subject) {
 	vec2i as;
 	vec2i ap;
 
@@ -19,7 +18,7 @@ void aabb_highlighter::draw(shared::state_for_drawing_camera camera, augs::entit
 
 	rects::ltrb<float> aabb;
 
-	subject->for_each_sub_entity([&aabb](augs::entity_id e) {
+	subject.for_each_sub_entity_recursive([&aabb](entity_id e) {
 		auto* sprite = e->find<components::sprite>();
 		auto* physics = e->find<components::physics_definition>();
 

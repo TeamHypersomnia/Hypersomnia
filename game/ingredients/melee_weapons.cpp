@@ -1,6 +1,6 @@
 #include "ingredients.h"
-#include "entity_system/world.h"
-#include "entity_system/entity.h"
+#include "game/cosmos.h"
+#include "game/entity_id.h"
 
 #include "game/assets/particle_effect_id.h"
 #include "game/assets/particle_effect_response_id.h"
@@ -15,7 +15,7 @@
 #include "game/detail/inventory_utils.h"
 
 namespace prefabs {
-	augs::entity_id create_cyan_urban_machete(augs::world& world, vec2 pos) {
+	entity_id create_cyan_urban_machete(cosmos world, vec2 pos) {
 		auto& machete = world.create_entity("urban_cyan_machete");
 		name_entity(machete, entity_name::URBAN_CYAN_MACHETE);
 

@@ -1,22 +1,22 @@
 #include "ingredients.h"
 #include "game/systems/render_system.h"
 
-#include "entity_system/world.h"
-#include "entity_system/entity.h"
+#include "game/cosmos.h"
+#include "game/entity_id.h"
 
-#include "../components/item_component.h"
-#include "../components/trigger_component.h"
+#include "game/components/item_component.h"
+#include "game/components/trigger_component.h"
 
 namespace ingredients {
-	void make_always_visible(augs::entity_id e) {
-		e->get_owner_world().get_system<render_system>().set_visibility_persistence(e, true);
+	void make_always_visible(entity_id e) {
+		e->get_owner_world().systems.get<render_system>().set_visibility_persistence(e, true);
 	}
 
-	void cancel_always_visible(augs::entity_id e) {
-		e->get_owner_world().get_system<render_system>().set_visibility_persistence(e, false);
+	void cancel_always_visible(entity_id e) {
+		e->get_owner_world().systems.get<render_system>().set_visibility_persistence(e, false);
 	}
 
-	components::item& make_item(augs::entity_id e) {
+	components::item& make_item(entity_id e) {
 		auto& item = *e += components::item();
 
 		e->add<components::trigger>();
@@ -24,7 +24,7 @@ namespace ingredients {
 		e->get<components::trigger>().react_to_query_detectors = false;
 
 		auto& force_joint = e->add<components::force_joint>();
-		e->disable(force_joint);
+		e.skip_processing_in(list_of_processing_subjects::force_joint>();
 
 		return item;
 	}

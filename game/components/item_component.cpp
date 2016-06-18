@@ -1,5 +1,5 @@
 #include "item_component.h"
-#include "entity_system/entity.h"
+#include "game/entity_id.h"
 
 namespace components {
 	void item::mark_parent_enclosing_containers_for_unmount() {
@@ -40,7 +40,7 @@ namespace components {
 		return true;
 	}
 
-	bool item::can_merge_entities(const augs::entity_id& e1, const augs::entity_id& e2) {
+	bool item::can_merge_entities(const entity_id& e1, const entity_id& e2) {
 		auto* pa = e1->find<item>();
 		auto* pb = e2->find<item>();
 		if (!pa && !pb) return true;

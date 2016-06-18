@@ -1,15 +1,15 @@
 #pragma once
 #include "math/vec2.h"
-#include "entity_system/entity_id.h"
+#include "game/entity_id.h"
 
 namespace components {
 	struct movement  {
 		struct subscribtion {
-			augs::entity_id target;
+			entity_id target;
 			bool stop_response_at_zero_speed = false;
 		};
 
-		void add_animation_receiver(augs::entity_id e, bool stop_at_zero_movement);
+		void add_animation_receiver(entity_id e, bool stop_at_zero_movement);
 		void reset_movement_flags();
 		void set_flags_from_target_direction(vec2 d);
 		void set_flags_from_closest_direction(vec2 d);

@@ -1,18 +1,18 @@
 #include "damage_system.h"
-#include "entity_system/world.h"
-#include "entity_system/entity.h"
+#include "game/cosmos.h"
+#include "game/entity_id.h"
 
-#include "../messages/create_particle_effect.h"
-#include "../messages/collision_message.h"
-#include "../messages/destroy_message.h"
-#include "../messages/damage_message.h"
+#include "game/messages/create_particle_effect.h"
+#include "game/messages/collision_message.h"
+#include "game/messages/queue_destruction.h"
+#include "game/messages/damage_message.h"
 #include "graphics/renderer.h"
 
 #include "game/detail/inventory_utils.h"
 
 void damage_system::destroy_colliding_bullets_and_send_damage() {
-	auto events = parent_world.get_message_queue<messages::collision_message>();
-	parent_world.get_message_queue<messages::damage_message>().clear();
+	auto events = step.messages.get_queue<messages::collision_message>();
+	step.messages.get_queue<messages::damage_message>().clear();
 
 	for (auto it : events) {
 		if (it.type != messages::collision_message::event_type::BEGIN_CONTACT) 
@@ -40,7 +40,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage() {
 			damage_msg.amount = damage->amount;
 			damage_msg.impact_velocity = impact_velocity;
 			damage_msg.point_of_impact = it.point;
-			parent_world.post_message(damage_msg);
+			step.messages.post(damage_msg);
 
 			damage->saved_point_of_impact_before_death = it.point;
 
@@ -53,7 +53,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage() {
 				
 				// delete only once
 				if(damage->damage_charges_before_destruction == 0)
-					parent_world.post_message(messages::destroy_message(it.collider));
+					step.messages.post(messages::queue_destruction(it.collider));
 			}
 		}
 	}
@@ -66,7 +66,7 @@ void damage_system::destroy_outdated_bullets() {
 		if ((damage.constrain_lifetime && damage.lifetime_ms >= damage.max_lifetime_ms) ||
 			(damage.constrain_distance && damage.distance_travelled >= damage.max_distance)) {
 			damage.saved_point_of_impact_before_death = position(it);
-			parent_world.post_message(messages::destroy_message(it));
+			step.messages.post(messages::queue_destruction(it));
 		}
 
 		damage.distance_travelled += speed(it);

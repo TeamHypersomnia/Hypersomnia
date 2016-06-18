@@ -255,4 +255,8 @@ namespace components {
 	bool physics::syncable_black_box_exists() const {
 		return black_detail.body != nullptr;
 	}
+
+	bool physics::test_point(vec2 v) const {
+		return black_detail.body->TestPoint(v * PIXELS_TO_METERSf);
+	}
 }

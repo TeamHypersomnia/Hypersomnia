@@ -1,6 +1,6 @@
 #pragma once
-#include "../components/camera_component.h"
-#include "../components/transform_component.h"
+#include "game/components/camera_component.h"
+#include "game/components/transform_component.h"
 #include "render_system.h"
 
 using namespace augs;

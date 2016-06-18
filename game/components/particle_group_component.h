@@ -2,7 +2,7 @@
 #include <vector>
 #include "math/vec2.h"
 #include "particle_effect_response_component.h"
-#include "../resources/particle_effect.h"
+#include "game/resources/particle_effect.h"
 #include "transform_component.h"
 
 class physics_system;

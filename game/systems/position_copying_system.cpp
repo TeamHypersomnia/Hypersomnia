@@ -1,8 +1,8 @@
 #include "position_copying_system.h"
-#include "entity_system/entity.h"
-#include "../components/render_component.h"
+#include "game/entity_id.h"
+#include "game/components/render_component.h"
 
-void components::position_copying::set_target(augs::entity_id new_target) {
+void components::position_copying::set_target(entity_id new_target) {
 	target_newly_set = true;
 	target = new_target;
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "../globals/entity_name.h"
+#include "game/globals/entity_name.h"
 
 namespace components {
 	struct name {
@@ -10,4 +10,4 @@ namespace components {
 	};
 }
 
-augs::entity_id get_first_named_ancestor(augs::entity_id);
+entity_id get_first_named_ancestor(entity_id);

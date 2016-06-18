@@ -1,6 +1,6 @@
 #pragma once
 #include "scrollarea.h"
-#include "../gui_world.h"
+#include "gui/gui_world.h"
 #undef max
 #undef min
 #include <algorithm>

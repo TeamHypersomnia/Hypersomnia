@@ -1,7 +1,7 @@
 #include "one_entity.h"
-#include "../ingredients/ingredients.h"
+#include "game/ingredients/ingredients.h"
 
-#include "entity_system/world.h"
+#include "game/cosmos.h"
 #include "window_framework/window.h"
 
 #include "game/resources/manager.h"
@@ -48,7 +48,7 @@ namespace scene_builders {
 			20.0f);
 	}
 
-	void one_entity::populate_world_with_entities(world& world) {
+	void one_entity::populate_world_with_entities(cosmos& world) {
 		auto window_rect = window::glwindow::get_current()->get_screen_rect();
 
 		auto& player_response = resource_manager.create(assets::animation_response_id::TORSO_SET);
@@ -74,7 +74,7 @@ namespace scene_builders {
 		active_context.map_key_to_intent(window::event::keys::RMOUSE, intent_type::CROSSHAIR_SECONDARY_ACTION);
 		active_context.map_key_to_intent(window::event::keys::SPACE, intent_type::HAND_BRAKE);
 
-		auto& input = world.get_system<input_system>();
+		auto& input = world.systems.get<input_system>();
 		input.add_context(active_context);
 
 		if (input.found_recording()) {
@@ -83,7 +83,7 @@ namespace scene_builders {
 
 			input.replay_found_recording();
 		
-			world.get_system<render_system>().enable_interpolation = false;
+			world.systems.get<render_system>().enable_interpolation = false;
 		}
 		else {
 			world.parent_overworld.configure_stepping(60.0, 5);
@@ -93,7 +93,7 @@ namespace scene_builders {
 		}
 	}
 
-	void one_entity::perform_logic_step(world& world) {
+	void one_entity::perform_logic_step(cosmos& world) {
 
 	}
 

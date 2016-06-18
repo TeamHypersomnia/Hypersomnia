@@ -1,8 +1,8 @@
 #include <Box2D\Box2D.h>
 #include "visibility_system.h"
 
-#include "entity_system/world.h"
-#include "entity_system/entity.h"
+#include "game/cosmos.h"
+#include "game/entity_id.h"
 
 #include "physics_system.h"
 #include "render_system.h"
@@ -12,6 +12,14 @@
 
 #include <limits>
 #include <set>
+
+#include "game/components/physics_component.h"
+#include "game/components/visibility_component.h"
+#include "game/components/transform_component.h"
+
+#include "game/globals/list_of_processing_subjects.h"
+
+using namespace augs;
 
 /*
 source:
@@ -71,7 +79,7 @@ std::vector<vec2> components::visibility::full_visibility_info::get_polygon(floa
 	return output;
 }
 
-bool components::visibility::line_of_sight_info::sees(augs::entity_id id) const {
+bool components::visibility::line_of_sight_info::sees(entity_id id) const {
 	return visible_items.find(id) != visible_items.end() 
 		|| visible_sentiences.find(id) != visible_sentiences.end()
 		|| visible_attitudes.find(id) != visible_attitudes.end()
@@ -79,13 +87,13 @@ bool components::visibility::line_of_sight_info::sees(augs::entity_id id) const 
 		;
 }
 
-void visibility_system::generate_visibility_and_sight_information() {
+void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos) {
 	ensure(epsilon_distance_vertex_hit > 0.f);
 	ensure(epsilon_ray_distance_variation > 0.f);
 	ensure(epsilon_threshold_obstacle_hit > 0.f);
 	
-	auto& renderer = get_renderer();
-	auto& lines = get_renderer().logic_lines;
+	auto& renderer = augs::renderer::get_current();
+	auto& lines = renderer.logic_lines;
 
 	/* prepare epsilons to be used later, just to make the notation more clear */
 	float epsilon_distance_vertex_hit_sq = epsilon_distance_vertex_hit * PIXELS_TO_METERSf;
@@ -93,9 +101,9 @@ void visibility_system::generate_visibility_and_sight_information() {
 	epsilon_distance_vertex_hit_sq *= epsilon_distance_vertex_hit_sq;
 
 	/* we'll need a reference to physics system for raycasting */
-	physics_system& physics = parent_world.get_system<physics_system>();
+	physics_system& physics = cosmos.stateful_systems.get<physics_system>();
 	/* we'll need a reference to render system for debug drawing */
-	render_system& render = parent_world.get_system<render_system>();
+	render_system& render = cosmos.stateful_systems.get<render_system>();
 
 	struct ray_input {
 		vec2 targets[2];
@@ -104,7 +112,7 @@ void visibility_system::generate_visibility_and_sight_information() {
 	std::vector<std::pair<physics_system::raycast_output, physics_system::raycast_output>> all_ray_outputs;
 	std::vector<ray_input> all_ray_inputs;
 
-	for (auto it : targets) {
+	for (auto it : cosmos.get_list(list_of_processing_subjects::WITH_VISIBILITY)) {
 		auto& visibility = it->get<components::visibility>();
 		auto& transform = it->get<components::transform>();
 
@@ -122,7 +130,7 @@ void visibility_system::generate_visibility_and_sight_information() {
 			for (const auto& candidate : in_aabb.entities) {
 				auto target_pos = candidate->get<components::transform>().pos;
 				if ((target_pos - transform.pos).length_sq() <= d*d) {
-					static thread_local std::vector<std::set<augs::entity_id>*> target_sets;
+					static thread_local std::vector<std::set<entity_id>*> target_sets;
 					target_sets.clear();
 
 					if (request.test_items) {
@@ -227,7 +235,7 @@ void visibility_system::generate_visibility_and_sight_information() {
 			/* for every fixture that intersected with the visibility square */
 			for (auto b : bodies) {
 				/* get shape vertices from misc that transforms them to current entity's position and rotation in Box2D space */
-				auto verts = get_world_vertices(b->GetUserData());
+				auto verts = physics.get_world_vertices(b->GetUserData());
 				/* for every vertex in given fixture's shape */
 				for (auto& v : verts) 
 					push_vertex(v, true);

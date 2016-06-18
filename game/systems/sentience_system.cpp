@@ -4,8 +4,8 @@
 #include "game/messages/health_event.h"
 #include "game/messages/rebuild_physics_message.h"
 #include "game/messages/physics_operation.h"
-#include "entity_system/world.h"
-#include "entity_system/entity.h"
+#include "game/cosmos.h"
+#include "game/entity_id.h"
 
 #include "game/components/physics_component.h"
 #include "game/components/container_component.h"
@@ -72,7 +72,9 @@ void sentience_system::consume_health_event(messages::health_event h) {
 		if (container)
 			drop_from_all_slots(h.subject);
 
-		auto corpse = parent_world.create_entity_from_definition(h.subject[sub_definition_name::CORPSE_OF_SENTIENCE]);
+		auto sub_def = h.subject[sub_definition_name::CORPSE_OF_SENTIENCE];
+
+		auto corpse = parent_cosmos.create_from_definition(sub_def);
 
 		auto place_of_death = h.subject->get<components::transform>();
 		place_of_death.rotation = h.impact_velocity.degrees();
@@ -85,7 +87,7 @@ void sentience_system::consume_health_event(messages::health_event h) {
 		remove_from_physical_plane_of_existence.new_definition = h.subject->get<components::physics_definition>();
 		remove_from_physical_plane_of_existence.new_definition.create_fixtures_and_body = false;
 
-		parent_world.post_message(remove_from_physical_plane_of_existence);
+		step.messages.post(remove_from_physical_plane_of_existence);
 
 		auto astral_body_now_without_physical_prison = h.subject;
 		astral_body_now_without_physical_prison->get<components::position_copying>().set_target(corpse);
@@ -94,18 +96,18 @@ void sentience_system::consume_health_event(messages::health_event h) {
 		op.subject = corpse;
 		op.apply_force.set_from_degrees(place_of_death.rotation).set_length(27850 * 2);
 
-		parent_world.post_message(op);
+		step.messages.post(op);
 
 		h.spawned_remnants = corpse;
 		corpse[associated_entity_name::ASTRAL_BODY] = astral_body_now_without_physical_prison;
 	}
 
-	parent_world.post_message(h);
+	step.messages.post(h);
 }
 
 void sentience_system::apply_damage_and_generate_health_events() {
-	auto& damages = parent_world.get_message_queue<messages::damage_message>();
-	auto& healths = parent_world.get_message_queue<messages::health_event>();
+	auto& damages = step.messages.get_queue<messages::damage_message>();
+	auto& healths = step.messages.get_queue<messages::health_event>();
 
 	healths.clear();
 

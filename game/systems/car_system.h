@@ -1,8 +1,8 @@
 #pragma once
-#include "entity_system/processing_system.h"
-#include "../components/car_component.h"
-#include "../components/physics_component.h"
-#include "../components/transform_component.h"
+#include "game/processing_system_with_cosmos_reference.h"
+#include "game/components/car_component.h"
+#include "game/components/physics_component.h"
+#include "game/components/transform_component.h"
 
 class car_system : public augs::processing_system_templated<components::car, components::transform, components::physics> {
 public:

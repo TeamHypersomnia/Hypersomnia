@@ -1,9 +1,9 @@
 #pragma once
 #include "misc/timer.h"
-#include "entity_system/entity.h"
+#include "game/entity_id.h"
 
-#include "../assets/particle_effect_response_id.h"
-#include "../resources/particle_effect.h"
+#include "game/assets/particle_effect_response_id.h"
+#include "game/resources/particle_effect.h"
 
 namespace components {
 	struct particle_effect_response {

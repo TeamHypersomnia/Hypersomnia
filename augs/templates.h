@@ -23,6 +23,11 @@ void erase_remove(std::vector<T>& v, const L& l) {
 	v.erase(std::remove_if(v.begin(), v.end(), l), v.end());
 }
 
+template<class T>
+void remove_element(std::vector<T>& v, const T& l) {
+	v.erase(std::remove(v.begin(), v.end(), l), v.end());
+}
+
 template <typename T>
 void serialize(std::ofstream& f, const T& t) {
 	f.write((const char*)&t, sizeof(T));
@@ -102,7 +107,7 @@ T to_value(std::string& s) {
 	return v;
 }
 
-namespace detail
+namespace templates_detail
 {
 	template<int... Is>
 	struct seq { };
@@ -112,10 +117,7 @@ namespace detail
 
 	template<int... Is>
 	struct gen_seq<0, Is...> : seq<Is...> { };
-}
-
-namespace detail
-{
+	
 	template<typename T, typename F, int... Is>
 	void for_each(T&& t, F f, seq<Is...>)
 	{
@@ -126,8 +128,25 @@ namespace detail
 template<typename... Ts, typename F>
 void for_each_in_tuple(std::tuple<Ts...> const& t, F f)
 {
-	detail::for_each(t, f, detail::gen_seq<sizeof...(Ts)>());
+	templates_detail::for_each(t, f, templates_detail::gen_seq<sizeof...(Ts)>());
 }
+
+template<typename... Ts, typename F>
+void for_each_type(F f)
+{
+	templates_detail::for_each(std::tuple<Ts...>(), f, templates_detail::gen_seq<sizeof...(Ts)>());
+}
+
+template<typename Container, typename T>
+bool exists_in(const Container& c, T val) {
+	return std::find(c.begin(), c.end(), val) != c.end();
+}
+
+template<template<typename...> class List,
+	typename ...Args>
+	struct put_types_into {
+	typedef List<Args...> type;
+};
 
 template<template<typename...> class List,
 	template<typename> class Mod,

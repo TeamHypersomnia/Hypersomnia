@@ -1,19 +1,19 @@
 #include "driver_system.h"
-#include "../messages/trigger_hit_confirmation_message.h"
-#include "../messages/collision_message.h"
+#include "game/messages/trigger_hit_confirmation_message.h"
+#include "game/messages/collision_message.h"
 
-#include "../components/trigger_component.h"
-#include "../components/car_component.h"
-#include "../components/input_receiver_component.h"
-#include "../components/movement_component.h"
-#include "../components/rotation_copying_component.h"
-#include "../components/physics_component.h"
-#include "../components/force_joint_component.h"
+#include "game/components/trigger_component.h"
+#include "game/components/car_component.h"
+#include "game/components/input_receiver_component.h"
+#include "game/components/movement_component.h"
+#include "game/components/rotation_copying_component.h"
+#include "game/components/physics_component.h"
+#include "game/components/force_joint_component.h"
 
-#include "entity_system/world.h"
+#include "game/cosmos.h"
 
 void driver_system::assign_drivers_from_successful_trigger_hits() {
-	auto& confirmations = parent_world.get_message_queue<messages::trigger_hit_confirmation_message>();
+	auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();
 
 	for (auto& e : confirmations) {
 		auto subject_car = e.trigger->get<components::trigger>().entity_to_be_notified;
@@ -29,7 +29,7 @@ void driver_system::assign_drivers_from_successful_trigger_hits() {
 }
 
 void driver_system::release_drivers_due_to_ending_contact_with_wheel() {
-	auto& contacts = parent_world.get_message_queue<messages::collision_message>();
+	auto& contacts = step.messages.get_queue<messages::collision_message>();
 
 	for (auto& c : contacts) {
 		if (c.type == messages::collision_message::event_type::END_CONTACT) {
@@ -48,22 +48,22 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel() {
 	}
 }
 void driver_system::release_drivers_due_to_requests() {
-	auto& intents = parent_world.get_message_queue<messages::intent_message>();
+	auto& intents = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& e : intents)
 		if (e.intent == intent_type::RELEASE_CAR && e.pressed_flag)
 			release_car_ownership(e.subject);
 }
 
-bool driver_system::release_car_ownership(augs::entity_id driver) {
-	return change_car_ownership(driver, augs::entity_id(), true);
+bool driver_system::release_car_ownership(entity_id driver) {
+	return change_car_ownership(driver, entity_id(), true);
 }
 
-bool driver_system::assign_car_ownership(augs::entity_id driver, augs::entity_id car) {
+bool driver_system::assign_car_ownership(entity_id driver, entity_id car) {
 	return change_car_ownership(driver, car, false);
 }
 
-bool driver_system::change_car_ownership(augs::entity_id driver_entity, augs::entity_id car_entity, bool lost_ownership) {
+bool driver_system::change_car_ownership(entity_id driver_entity, entity_id car_entity, bool lost_ownership) {
 	auto& driver = driver_entity->get<components::driver>();
 
 	auto* maybe_rotation_copying = driver_entity->find<components::rotation_copying>();
@@ -80,7 +80,7 @@ bool driver_system::change_car_ownership(augs::entity_id driver_entity, augs::en
 		driver.owned_vehicle = car_entity;
 		car.current_driver = driver_entity;
 		force_joint.chased_entity = car.left_wheel_trigger;
-		driver_entity->enable(force_joint);
+		driver_entity.unskip_processing_in(list_of_processing_subjects::WITH_FORCE_JOINT);
 
 		if (maybe_movement) {
 			maybe_movement->reset_movement_flags();
@@ -103,7 +103,7 @@ bool driver_system::change_car_ownership(augs::entity_id driver_entity, augs::en
 
 		driver.owned_vehicle.unset();
 		car.current_driver.unset();
-		driver_entity->disable(force_joint);
+		driver_entity.skip_processing_in(list_of_processing_subjects::WITH_FORCE_JOINT);
 
 		if (maybe_movement) {
 			maybe_movement->reset_movement_flags();

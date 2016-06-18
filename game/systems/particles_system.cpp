@@ -1,25 +1,25 @@
 #include "particles_system.h"
-#include "entity_system/world.h"
-#include "entity_system/entity.h"
+#include "game/cosmos.h"
+#include "game/entity_id.h"
 
-#include "../resources/particle_effect.h"
+#include "game/resources/particle_effect.h"
 
-#include "../components/damage_component.h"
-#include "../components/render_component.h"
-#include "../components/position_copying_component.h"
-#include "../components/particle_group_component.h"
+#include "game/components/damage_component.h"
+#include "game/components/render_component.h"
+#include "game/components/position_copying_component.h"
+#include "game/components/particle_group_component.h"
 
-#include "../messages/gunshot_response.h"
-#include "../messages/create_particle_effect.h"
-#include "../messages/destroy_message.h"
-#include "../messages/damage_message.h"
-#include "../messages/melee_swing_response.h"
-#include "../messages/health_event.h"
+#include "game/messages/gunshot_response.h"
+#include "game/messages/create_particle_effect.h"
+#include "game/messages/queue_destruction.h"
+#include "game/messages/damage_message.h"
+#include "game/messages/melee_swing_response.h"
+#include "game/messages/health_event.h"
 
-#include "misc/randval.h"
+#include "misc/randomization.h"
 
-entity_id particles_system::create_refreshable_particle_group(world& parent_world) {
-	entity_id ent = parent_world.create_entity("refreshable_particle_group");
+entity_id particles_system::create_refreshable_particle_group(cosmos& parent_cosmos) {
+	entity_id ent = parent_cosmos.create_entity("refreshable_particle_group");
 	
 	ent->add(components::transform());
 	ent->add(components::particle_group()).stream_slots[0].destroy_after_lifetime_passed = false;
@@ -30,10 +30,10 @@ entity_id particles_system::create_refreshable_particle_group(world& parent_worl
 }
 
 void particles_system::game_responses_to_particle_effects() {
-	auto& gunshots = parent_world.get_message_queue<messages::gunshot_response>();
-	auto& damages = parent_world.get_message_queue<messages::damage_message>();
-	auto& swings = parent_world.get_message_queue<messages::melee_swing_response>();
-	auto& healths = parent_world.get_message_queue<messages::health_event>();
+	auto& gunshots = step.messages.get_queue<messages::gunshot_response>();
+	auto& damages = step.messages.get_queue<messages::damage_message>();
+	auto& swings = step.messages.get_queue<messages::melee_swing_response>();
+	auto& healths = step.messages.get_queue<messages::health_event>();
 
 	for (auto& g : gunshots) {
 		for (auto& r : g.spawned_rounds) {
@@ -46,7 +46,7 @@ void particles_system::game_responses_to_particle_effects() {
 			burst.effect = round_response_map.at(particle_effect_response_type::BARREL_LEAVE_EXPLOSION);
 			burst.modifier = round_response.modifier;
 
-			parent_world.post_message(burst);
+			step.messages.post(burst);
 
 			burst.transform.reset();
 			burst.transform.rotation = 180;
@@ -55,7 +55,7 @@ void particles_system::game_responses_to_particle_effects() {
 			burst.modifier = round_response.modifier;
 			burst.local_transform = true;
 
-			parent_world.post_message(burst);
+			step.messages.post(burst);
 		}
 
 		for (auto& s : g.spawned_shells) {
@@ -70,13 +70,13 @@ void particles_system::game_responses_to_particle_effects() {
 			burst.modifier = shell_response.modifier;
 			burst.local_transform = true;
 
-			parent_world.post_message(burst);
+			step.messages.post(burst);
 		}
 		//
 		//if (g.subject.has(sub_entity_name::BARREL_SMOKE))
 		//	burst.target_group_to_refresh = g.subject[sub_entity_name::BARREL_SMOKE];
 		//
-		//parent_world.post_message(burst);
+		//step.messages.post(burst);
 	}
 
 	for (auto& d : damages) {
@@ -95,7 +95,7 @@ void particles_system::game_responses_to_particle_effects() {
 		burst.effect = response_map.at(particle_effect_response_type::DESTRUCTION_EXPLOSION);
 		burst.modifier = response.modifier;
 
-		parent_world.post_message(burst);
+		step.messages.post(burst);
 	}
 
 	for (auto& h : healths) {
@@ -113,13 +113,13 @@ void particles_system::game_responses_to_particle_effects() {
 			if (h.effective_amount > 0) {
 				burst.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
 				burst.modifier.scale_amounts += h.ratio_effective_to_maximum;
-				parent_world.post_message(burst);
+				step.messages.post(burst);
 			}
 			else {
 				// burst.effect = response_map.at(particle_effect_response_type::DAMAGE_RECEIVED);
 				// burst.modifier.scale_amounts += h.ratio_effective_to_maximum;
 				// burst.modifier.colorize = green;
-				// parent_world.post_message(burst);
+				// step.messages.post(burst);
 			}
 		}
 	}
@@ -134,7 +134,7 @@ void particles_system::game_responses_to_particle_effects() {
 		burst.effect = response_map.at(particle_effect_response_type::PARTICLES_WHILE_SWINGING);
 		burst.modifier = response.modifier;
 
-		parent_world.post_message(burst);
+		step.messages.post(burst);
 	}
 }
 
@@ -142,7 +142,7 @@ void particles_system::create_particle_effects() {
 	using namespace components;
 	using namespace messages;
 
-	auto& events = parent_world.get_message_queue<create_particle_effect>();
+	auto& events = step.messages.get_queue<create_particle_effect>();
 
 	for (auto it : events) {
 		auto emissions = *it.effect;
@@ -164,7 +164,7 @@ void particles_system::create_particle_effects() {
 			if (emission.type == resources::emission::type::BURST) {
 				int burst_amount = randval(emission.particles_per_burst);
 
-				entity_id new_burst_entity = parent_world.create_entity("particle_burst");
+				entity_id new_burst_entity = parent_cosmos.create_entity("particle_burst");
 				new_burst_entity->add(components::particle_group());
 				new_burst_entity->add(components::transform());
 				new_burst_entity->add(emission.particle_render_template);
@@ -199,7 +199,7 @@ void particles_system::create_particle_effects() {
 
 		for (auto& stream : only_streams) {
 			if (it.target_group_to_refresh.dead()) {
-				entity_id new_stream_entity = parent_world.create_entity("particle_stream");
+				entity_id new_stream_entity = parent_cosmos.create_entity("particle_stream");
 				target_group = &new_stream_entity->add(components::particle_group());
 				target_transform = &new_stream_entity->add(components::transform());
 				target_render = &new_stream_entity->add(components::render());
@@ -318,7 +318,7 @@ void particles_system::destroy_dead_streams() {
 		auto& slots = group.stream_slots;
 
 		if (slots.empty())
-			parent_world.post_message(messages::destroy_message(it));
+			step.messages.post(messages::queue_destruction(it));
 	}
 }
 

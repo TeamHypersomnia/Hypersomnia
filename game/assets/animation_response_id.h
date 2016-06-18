@@ -1,5 +1,5 @@
 #pragma once
-#include "../resources/animation_response.h"
+#include "game/resources/animation_response.h"
 
 namespace assets {
 	enum animation_response_id {

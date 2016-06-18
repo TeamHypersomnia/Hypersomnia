@@ -4,15 +4,15 @@ void scene_builder::load_resources() {
 
 }
 
-void scene_builder::populate_world_with_entities(augs::world&) {
+void scene_builder::populate_world_with_entities(cosmos) {
 
 }
 
-void scene_builder::perform_logic_step(augs::world&) {
+void scene_builder::perform_logic_step(cosmos) {
 
 }
 
-void scene_builder::drawcalls_after_all_cameras(augs::world&) {
+void scene_builder::drawcalls_after_all_cameras(cosmos) {
 
 }
 

@@ -4,10 +4,10 @@
 #include "render_component.h"
 #include "misc/fixed_delta_timer.h"
 
-#include "entity_system/entity.h"
+#include "game/entity_id.h"
 
-#include "../components/transform_component.h"
-#include "../detail/state_for_drawing.h"
+#include "game/components/transform_component.h"
+#include "game/detail/state_for_drawing.h"
 
 #include "augs/misc/smooth_value_field.h"
 
@@ -22,7 +22,7 @@ namespace components {
 			LOOK
 		} orbit_mode = NONE;
 
-		static void configure_camera_and_character_with_crosshair(augs::entity_id camera, augs::entity_id character, augs::entity_id crosshair);
+		static void configure_camera_and_character_with_crosshair(entity_id camera, entity_id character, entity_id crosshair);
 
 		augs::rects::xywh<int> viewport;
 		vec2 visible_world_area;
@@ -44,14 +44,14 @@ namespace components {
 
 		vec2 max_look_expand = vec2(600.f, 300.f);
 
-		augs::entity_id entity_to_chase;
+		entity_id entity_to_chase;
 
 		vec2 previous_seen_player_position;
 		vec2 previous_step_player_position;
 
 		augs::smooth_value_field smoothing_player_pos;
 		
-		vec2i get_camera_offset_due_to_character_crosshair(augs::entity_id self) const;
+		vec2i get_camera_offset_due_to_character_crosshair(entity_id self) const;
 		
 		shared::state_for_drawing_camera how_camera_will_render;
 

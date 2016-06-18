@@ -1,18 +1,18 @@
 #include "entity_description.h"
-#include "entity_system/entity.h"
-#include "../components/name_component.h"
-#include "../components/melee_component.h"
-#include "../components/gun_component.h"
-#include "../components/damage_component.h"
-#include "../components/container_component.h"
-#include "../components/item_component.h"
-#include "../detail/inventory_utils.h"
-#include "../detail/inventory_slot.h"
-#include "../detail/inventory_slot_id.h"
+#include "game/entity_id.h"
+#include "game/components/name_component.h"
+#include "game/components/melee_component.h"
+#include "game/components/gun_component.h"
+#include "game/components/damage_component.h"
+#include "game/components/container_component.h"
+#include "game/components/item_component.h"
+#include "game/detail/inventory_utils.h"
+#include "game/detail/inventory_slot.h"
+#include "game/detail/inventory_slot_id.h"
 #include "log.h"
 #include "templates.h"
 
-textual_description description_of_entity(augs::entity_id id) {
+textual_description description_of_entity(entity_id id) {
 	auto& name = id->get<components::name>();
 	
 	auto result = description_by_entity_name(name.id);
@@ -23,7 +23,7 @@ textual_description description_of_entity(augs::entity_id id) {
 	return result;
 }
 
-std::wstring describe_properties(augs::entity_id id) {
+std::wstring describe_properties(entity_id id) {
 	std::wostringstream result;
 
 	auto* melee = id->find<components::melee>();
@@ -106,7 +106,7 @@ std::wstring describe_slot(inventory_slot_id id) {
 		text.details + L"[/color]";
 }
 
-std::wstring describe_entity(augs::entity_id id) {
+std::wstring describe_entity(entity_id id) {
 	auto desc = description_of_entity(id);
 	auto properties = describe_properties(id);
 	if (!properties.empty()) properties += L"\n";

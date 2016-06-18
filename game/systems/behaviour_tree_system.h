@@ -1,6 +1,6 @@
 #pragma once
-#include "entity_system/processing_system.h"
-#include "../components/behaviour_tree_component.h"
+#include "game/processing_system_with_cosmos_reference.h"
+#include "game/components/behaviour_tree_component.h"
 
 using namespace augs;
 

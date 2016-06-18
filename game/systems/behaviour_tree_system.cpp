@@ -1,7 +1,7 @@
 #include "behaviour_tree_system.h"
 
-#include "entity_system/world.h"
-#include "entity_system/entity.h"
+#include "game/cosmos.h"
+#include "game/entity_id.h"
 #include "ensure.h"
 
 void behaviour_tree_system::evaluate_trees() {

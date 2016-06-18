@@ -44,7 +44,7 @@ namespace components {
 			primary_move_flag = secondary_move_flag = tertiary_move_flag = false;
 		}
 
-		void reset_weapon(augs::entity_id e);
+		void reset_weapon(entity_id e);
 
 		state current_state = state::FREE;
 

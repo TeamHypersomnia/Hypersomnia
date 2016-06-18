@@ -1,24 +1,24 @@
 #include "delta.h"
 
 namespace augs {
-	double fixed_delta::delta_seconds() const {
+	double fixed_delta::in_seconds() const {
 		return fixed_delta_ms / 1000.0;
 	}
 
-	double fixed_delta::delta_milliseconds() const {
+	unsigned fixed_delta::get_steps_per_second() const {
+		return steps_per_second;
+	}
+
+	double fixed_delta::in_milliseconds() const {
 		return fixed_delta_ms;
 	}
 
-	double variable_delta::delta_seconds() const {
+	double variable_delta::in_seconds() const {
 		return variable_delta_ms / 1000.0;
 	}
 
-	double variable_delta::delta_milliseconds() const {
+	double variable_delta::in_milliseconds() const {
 		return variable_delta_ms;
-	}
-
-	double variable_delta::fixed_delta_milliseconds() const {
-		return fixed_delta_ms;
 	}
 
 	double variable_delta::view_interpolation_ratio() const {

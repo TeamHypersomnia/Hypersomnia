@@ -1,17 +1,9 @@
 #pragma once
-#include "entity_system/processing_system.h"
+class cosmos;
 
-#include "../components/physics_component.h"
-#include "../components/visibility_component.h"
-#include "../components/transform_component.h"
-
-using namespace augs;
-
-class visibility_system : public processing_system_templated<components::transform, components::visibility> {
+class visibility_system {
 public:
-	using processing_system_templated::processing_system_templated;
-
-	void generate_visibility_and_sight_information();
+	void generate_visibility_and_sight_information(cosmos&);
 
 	bool draw_triangle_edges = true;
 	bool draw_cast_rays = false;

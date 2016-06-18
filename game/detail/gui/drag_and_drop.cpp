@@ -4,8 +4,8 @@
 #include "item_button.h"
 #include "game/messages/item_slot_transfer_request.h"
 #include "game/components/item_component.h"
-#include "../inventory_utils.h"
-#include "entity_system/entity.h"
+#include "game/detail/inventory_utils.h"
+#include "game/entity_id.h"
 #include "ensure.h"
 #include "templates.h"
 

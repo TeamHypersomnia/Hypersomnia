@@ -1,33 +1,34 @@
 #include "pathfinding_system.h"
 
-#include "entity_system/world.h"
-#include "entity_system/entity.h"
+#include "game/cosmos.h"
+#include "game/entity_id.h"
 
 #include "render_system.h"
 #include "physics_system.h"
 
-#include "../detail/physics_setup_helpers.h"
-#include "log.h"
+#include "game/components/pathfinding_component.h"
 
-pathfinding_system::pathfinding_system(world& parent_world) : processing_system_templated(parent_world), draw_memorised_walls(false), draw_undiscovered(false),
+#include "game/globals/list_of_processing_subjects.h"
+
+pathfinding_system::pathfinding_system() : draw_memorised_walls(false), draw_undiscovered(false),
 	epsilon_distance_the_same_vertex(50.f), epsilon_distance_visible_point(2) {}
 
-void pathfinding_system::advance_pathfinding_sessions() {
+void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 	/* prepare epsilons to be used later, just to make the notation more clear */
 	const float epsilon_distance_visible_point_sq = epsilon_distance_visible_point * epsilon_distance_visible_point;
 	
 	/* we'll need a reference to physics system for raycasting */
-	physics_system& physics = parent_world.get_system<physics_system>();
+	physics_system& physics = cosmos.stateful_systems.get<physics_system>();
 
 	auto& renderer = augs::renderer::get_current();
 	auto& lines = augs::renderer::get_current().logic_lines;
 
-	for (auto it : targets) {
+	for (auto it : cosmos.get_list(list_of_processing_subjects::WITH_PATHFINDING)) {
 		/* get necessary components */
 		auto& visibility = it->get<components::visibility>();
 		auto& pathfinding = it->get<components::pathfinding>();
 		auto transform = it->get<components::transform>();
-		auto body = it->get<components::physics>().body;
+		auto& body = it->get<components::physics>();
 		transform.pos += pathfinding.eye_offset;
 
 		/* check if we request pathfinding at the moment */
@@ -182,7 +183,7 @@ void pathfinding_system::advance_pathfinding_sessions() {
 
 			/* prepare body polygon to test for overlaps */
 			b2PolygonShape body_poly;
-			auto verts = get_world_vertices(body->GetUserData());
+			auto verts = physics.get_world_vertices(it);
 			body_poly.Set(verts.data(), verts.size());
 
 			/* for every undiscovered navigation point */
@@ -249,7 +250,7 @@ void pathfinding_system::advance_pathfinding_sessions() {
 					if (pathfinding.is_exploring && old_session == pathfinding.session_stack.begin())
 						continue;
 
-					if (body->TestPoint((*old_session).target * PIXELS_TO_METERSf) ||
+					if (body.test_point((*old_session).target) ||
 						is_point_visible(transform.pos, (*old_session).target, vision.filter)) {
 							/* if there is, roll back to this session */
 							pathfinding.session() = (*old_session);
@@ -268,7 +269,7 @@ void pathfinding_system::advance_pathfinding_sessions() {
 			/* if we're exploring, we have no target in the first session */
 			if (!pathfinding.is_exploring && pathfinding.session_stack.size() == 1) {
 				/* if the target is inside body, it's already found */
-				if (body->TestPoint(pathfinding.session().target * PIXELS_TO_METERSf)) {
+				if (body.test_point(pathfinding.session().target)) {
 					/* done, target found */
 					pathfinding.stop_and_clear_pathfinding();
 					continue;
@@ -329,10 +330,10 @@ void pathfinding_system::advance_pathfinding_sessions() {
 					current_target = pathfinding.session().persistent_navpoint;
 				}
 				else {
-					vec2 unit_vel = body->GetLinearVelocity();
+					vec2 unit_vel = body.velocity();
 					unit_vel.normalize();
 					
-					auto local_minimum_predicate = [&pathfinding, &transform, body, unit_vel](const components::pathfinding::pathfinding_session::navigation_vertex& a,
+					auto local_minimum_predicate = [&pathfinding, &transform, unit_vel](const components::pathfinding::pathfinding_session::navigation_vertex& a,
 						const components::pathfinding::pathfinding_session::navigation_vertex& b) {
 
 						/* if we're exploring, we have no target in the first session */
@@ -412,7 +413,7 @@ void pathfinding_system::advance_pathfinding_sessions() {
 
 				bool rays_hit = false;
 				/* extract all transformed vertices of the subject's original model, false means we want pixels */
-				auto& subject_verts = get_world_vertices(it, false);
+				auto& subject_verts = physics.get_world_vertices(it, false);
 				subject_verts.clear();
 				subject_verts.push_back(transform.pos);
 
@@ -461,8 +462,8 @@ void pathfinding_system::advance_pathfinding_sessions() {
 				}
 
 				/* if we can see it, navigate there */
-				if (body->TestPoint(current_target.location * PIXELS_TO_METERSf) ||
-					body->TestPoint(current_target.sensor * PIXELS_TO_METERSf) ||
+				if (body.test_point(current_target.location) ||
+					body.test_point(current_target.sensor) ||
 					rays_hit
 					) {
 				}

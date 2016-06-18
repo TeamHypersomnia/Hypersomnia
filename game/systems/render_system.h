@@ -2,17 +2,13 @@
 #include "window_framework/window.h"
 #include "graphics/fbo.h"
 
-#include "entity_system/processing_system.h"
-
-#include "../components/transform_component.h"
-#include "../components/render_component.h"
+#include "game/components/transform_component.h"
+#include "game/components/render_component.h"
 
 #include "graphics/vertex.h"
 #include "texture_baker/texture_baker.h"
 
-#include "../globals/render_layer.h"
-
-#include <Box2D/Collision/b2DynamicTree.h>
+#include "game/globals/render_layer.h"
 
 #include <vector>
 
@@ -22,24 +18,14 @@ namespace shared {
 	struct state_for_drawing_camera;
 }
 
-class render_system : public event_only_system {
+class render_system {
 	std::vector<std::vector<entity_id>> layers;
-	std::vector<entity_id> visible_entities;
-
-	b2DynamicTree non_physical_objects_tree;
 	unsigned current_step = 0;
 	int current_visibility_index = 0;
 public:
-	static void standard_draw_entity(augs::entity_id, shared::state_for_drawing_camera in, bool only_border_highlights = false, int visibility_index = -1);
+	static void standard_draw_entity(entity_id, shared::state_for_drawing_camera in, bool only_border_highlights = false, int visibility_index = -1);
 
-	render_system(world& parent_world);
-
-	void add_entities_to_rendering_tree();
-	void remove_entities_from_rendering_tree();
-
-	void set_visibility_persistence(entity_id, bool);
-
-	void determine_visible_entities_from_every_camera();
+	render_system();
 
 	void set_current_transforms_as_previous_for_interpolation();
 	void calculate_and_set_interpolated_transforms();
@@ -49,9 +35,6 @@ public:
 	void draw_layer(shared::state_for_drawing_camera in, int layer, bool only_border_highlights = false);
 	void draw_all_visible_entities(shared::state_for_drawing_camera in, int mask);
 
-	const std::vector<entity_id>& get_all_visible_entities() const;
-
 	bool enable_interpolation = true;
-	std::vector<entity_id> always_visible_entities;
-	std::vector<render_layer> layers_with_custom_drawing_order;
+	std::vector<render_layer> layers_whose_order_determines_friction;
 };

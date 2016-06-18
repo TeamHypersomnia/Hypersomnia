@@ -1,20 +1,20 @@
 #include "intent_contextualization_system.h"
-#include "../messages/intent_message.h"
+#include "game/messages/intent_message.h"
 
-#include "../components/car_component.h"
-#include "../components/driver_component.h"
-#include "../components/gun_component.h"
-#include "../components/container_component.h"
-#include "../components/trigger_query_detector_component.h"
-#include "../components/trigger_collision_detector_component.h"
+#include "game/components/car_component.h"
+#include "game/components/driver_component.h"
+#include "game/components/gun_component.h"
+#include "game/components/container_component.h"
+#include "game/components/trigger_query_detector_component.h"
+#include "game/components/trigger_collision_detector_component.h"
 
-#include "entity_system/world.h"
-#include "entity_system/entity.h"
+#include "game/cosmos.h"
+#include "game/entity_id.h"
 
-#include "../detail/inventory_slot_id.h"
+#include "game/detail/inventory_slot_id.h"
 
 void intent_contextualization_system::contextualize_use_button_intents() {
-	auto& intents = parent_world.get_message_queue<messages::intent_message>();
+	auto& intents = step.messages.get_queue<messages::intent_message>();
 	
 	for (auto& e : intents) {
 		auto* query_detector = e.subject->find<components::trigger_query_detector>();
@@ -47,10 +47,10 @@ void intent_contextualization_system::contextualize_use_button_intents() {
 }
 
 void intent_contextualization_system::contextualize_crosshair_action_intents() {
-	auto& events = parent_world.get_message_queue<messages::intent_message>();
+	auto& events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& it : events) {
-		augs::entity_id callee;
+		entity_id callee;
 
 		auto* maybe_container = it.subject->find<components::container>();
 
@@ -96,10 +96,10 @@ void intent_contextualization_system::contextualize_crosshair_action_intents() {
 }
 
 void intent_contextualization_system::contextualize_movement_intents() {
-	auto& intents = parent_world.get_message_queue<messages::intent_message>();
+	auto& intents = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& e : intents) {
-		augs::entity_id callee;
+		entity_id callee;
 
 		auto* maybe_driver = e.subject->find<components::driver>();
 		auto* maybe_container = e.subject->find<components::container>();

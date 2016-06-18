@@ -1,18 +1,18 @@
 #include "animation_system.h"
-#include "entity_system/world.h"
-#include "../components/animation_response_component.h"
-#include "../messages/movement_response.h"
-#include "../messages/animation_message.h"
-#include "../messages/gunshot_response.h"
+#include "game/cosmos.h"
+#include "game/components/animation_response_component.h"
+#include "game/messages/movement_response.h"
+#include "game/messages/animation_message.h"
+#include "game/messages/gunshot_response.h"
 
-#include "../resources/manager.h"
+#include "game/resources/manager.h"
 
 using namespace messages;
 using namespace resources;
 
 void animation_system::game_responses_to_animation_messages() {
-	auto& movements = parent_world.get_message_queue<movement_response>();
-	auto& gunshots = parent_world.get_message_queue<gunshot_response>();
+	auto& movements = step.messages.get_queue<movement_response>();
+	auto& gunshots = step.messages.get_queue<gunshot_response>();
 
 	for (auto it : movements) {
 		animation_message msg;
@@ -32,7 +32,7 @@ void animation_system::game_responses_to_animation_messages() {
 		msg.set_animation = (*(it.subject->get<components::animation_response>().response))[animation_response_type::MOVE];
 		msg.speed_factor = it.speed;
 
-		parent_world.post_message(msg);
+		step.messages.post(msg);
 	}
 
 	for (auto it : gunshots) {
@@ -46,12 +46,12 @@ void animation_system::game_responses_to_animation_messages() {
 		// msg.animation_priority = 1;
 		// msg.set_animation = (*(it.subject->get<components::animation_response>().response))[animation_response_type::SHOT];
 		// 
-		// parent_world.post_message(msg);
+		// step.messages.post(msg);
 	}
 }
 
 void animation_system::handle_animation_messages() {
-	auto events = parent_world.get_message_queue<animation_message>();
+	auto events = step.messages.get_queue<animation_message>();
 
 	for (auto it : events) {
 		auto ptr = it.subject->find<components::animation>();
@@ -114,7 +114,7 @@ void animation_system::handle_animation_messages() {
 		}
 	}
 
-	parent_world.get_message_queue<animation_message>().clear();
+	step.messages.get_queue<animation_message>().clear();
 }
 
 void components::animation::set_current_frame(unsigned number) {

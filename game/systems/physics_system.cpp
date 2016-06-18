@@ -1,20 +1,26 @@
 #include "physics_system.h"
 
-#include "entity_system/entity.h"
-#include "entity_system/world.h"
+#include "game/entity_id.h"
+#include "game/cosmos.h"
 
-#include "../messages/collision_message.h"
-#include "../messages/destroy_message.h"
-#include "../messages/new_entity_message.h"
-#include "../messages/rebuild_physics_message.h"
-#include "../messages/physics_operation.h"
+#include "game/components/item_component.h"
+#include "game/components/driver_component.h"
+#include "game/components/fixtures_component.h"
+
+#include "game/messages/collision_message.h"
+#include "game/messages/queue_destruction.h"
+#include "game/messages/new_entity_message.h"
+#include "game/messages/will_soon_be_deleted.h"
+
+#include "game/cosmos.h"
+#include "game/step_state.h"
 
 double METERS_TO_PIXELS = 100.0;
 double PIXELS_TO_METERS = 1.0 / METERS_TO_PIXELS;
 float METERS_TO_PIXELSf = 100.f;
 float PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 
-physics_system::physics_system(world& parent_world) : event_only_system(parent_world),
+physics_system::physics_system(cosmos& parent_cosmos) : parent_cosmos(parent_cosmos),
 b2world(b2Vec2(0.f, 0.f)), ray_casts_since_last_step(0) {
 	b2world.SetAllowSleeping(false);
 	b2world.SetAutoClearForces(false);
@@ -25,8 +31,9 @@ void physics_system::enable_listener(bool flag) {
 	b2world.SetContactListener(flag ? &listener : nullptr);
 }
 
-void physics_system::step_and_set_new_transforms() {
-	listener.world_ptr = &parent_world;
+void physics_system::step_and_set_new_transforms(step_state& step) {
+	listener.cosmos_ptr = &parent_cosmos;
+	listener.step_ptr = &step;
 
 	int32 velocityIterations = 8;
 	int32 positionIterations = 3;
@@ -56,11 +63,11 @@ void physics_system::step_and_set_new_transforms() {
 		
 		if (angular_resistance > 0.f) {
 			//physics.body->ApplyTorque((angular_resistance * sqrt(sqrt(angular_speed * angular_speed)) + 0.2 * angular_speed * angular_speed)* -sgn(angular_speed) * b->GetInertia(), true);
-			physics.body->ApplyTorque((angular_resistance * angular_speed * angular_speed )* -sgn(angular_speed) * b->GetInertia(), true);
+			physics.black_detail.body->ApplyTorque((angular_resistance * angular_speed * angular_speed )* -sgn(angular_speed) * b->GetInertia(), true);
 		}
 
 		if (physics.enable_angle_motor) {
-			float next_angle = b->GetAngle() + b->GetAngularVelocity() / static_cast<float>(parent_overworld.delta_timer.get_steps_per_second());
+			float next_angle = b->GetAngle() + b->GetAngularVelocity() / static_cast<float>(parent_cosmos.delta.get_steps_per_second());
 			
 			auto target_orientation = vec2().set_from_degrees(physics.target_angle);
 			auto next_orientation = vec2().set_from_radians(next_angle);
@@ -70,7 +77,7 @@ void physics_system::step_and_set_new_transforms() {
 			if (target_orientation.cross(next_orientation) > 0)
 				total_rotation *= -1;
 
-			float desired_angular_velocity = total_rotation / static_cast<float>(parent_overworld.delta_timer.delta_seconds());
+			float desired_angular_velocity = total_rotation / static_cast<float>(parent_cosmos.delta.in_seconds());
 			float impulse = b->GetInertia() * desired_angular_velocity;// disregard time factor
 			b->ApplyAngularImpulse(impulse * physics.angle_motor_force_multiplier, true);
 		}
@@ -79,7 +86,7 @@ void physics_system::step_and_set_new_transforms() {
 	listener.after_step_callbacks.clear();
 
 	ray_casts_since_last_step = 0;
-	b2world.Step(static_cast<float32>(delta_seconds()), velocityIterations, positionIterations);
+	b2world.Step(static_cast<float32>(parent_cosmos.delta.in_seconds()), velocityIterations, positionIterations);
 	b2world.ClearForces();
 	
 	for (auto& c : listener.after_step_callbacks)
@@ -93,20 +100,10 @@ void physics_system::step_and_set_new_transforms() {
 		recurential_friction_handler(b->GetUserData(), physics.get_owner_friction_ground());
 	}
 
-	reset_states();
+	set_transforms_from_body_transforms();
 }
 
-void physics_system::destroy_whole_world() {
-	std::vector<b2Body*> to_destroy;
-
-	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext())
-		to_destroy.push_back(b);
-
-	for (auto& just_die : to_destroy)
-		b2world.DestroyBody(just_die);
-}
-
-void physics_system::reset_states() {
+void physics_system::set_transforms_from_body_transforms() {
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
 		auto& transform = static_cast<entity_id>(b->GetUserData())->get<components::transform>();
@@ -115,8 +112,9 @@ void physics_system::reset_states() {
 		auto body_pos = METERS_TO_PIXELSf * b->GetPosition();
 		auto body_angle = b->GetAngle() * RAD_TO_DEG;
 
-		for (auto& fe : physics.fixture_entities) {
+		for (auto& fe : physics.black_detail.fixture_entities) {
 			auto& fixtures = fe->get<components::fixtures>();
+			auto total_offset = fixtures.get_total_offset();
 
 			auto& transform = fe->get<components::transform>();
 			transform.pos = body_pos;
@@ -124,8 +122,8 @@ void physics_system::reset_states() {
 			if (!b->IsFixedRotation())
 				transform.rotation = body_angle;
 
-			transform.pos += fixtures.shape_offset.pos;
-			transform.rotation += fixtures.shape_offset.rotation;
+			transform.pos += total_offset.pos;
+			transform.rotation += total_offset.rotation;
 
 			transform.pos.rotate(body_angle, body_pos);
 		}
@@ -137,123 +135,125 @@ void physics_system::reset_states() {
 	}
 }
 
-void physics_system::create_physics_for_entity(augs::entity_id e) {
-	ensure(e->find<components::physics>() == nullptr);
-	ensure(e->find<components::fixtures>() == nullptr);
+void physics_system::react_to_destroyed_entities(step_state& step) {
+	auto& events = step.messages.get_queue<messages::will_soon_be_deleted>();
 
-	auto* physics_definition = e->find<components::physics_definition>();
+	for (auto& it : events) {
+		auto e = it.subject;
 
-	if (physics_definition) {
-		if (physics_definition->create_fixtures_and_body) {
-			auto other_body_entity = physics_definition->attach_fixtures_to_entity;
+		auto* maybe_physics = e->find<components::physics>();
+		auto* maybe_fixtures = e->find<components::fixtures>();
 
-			if (other_body_entity.dead() || other_body_entity == e)
-				create_physics_component(physics_definition->body, e);
+		if (maybe_physics)
+			maybe_physics->destroy_body();
 
-			for (auto fixture : physics_definition->fixtures) {
-				for(auto& offset : physics_definition->offsets_for_created_shapes)
-					fixture.transform_vertices += offset;
+		if (maybe_fixtures)
+			maybe_fixtures->destroy_fixtures();
+	}
+}
 
-				if (other_body_entity.alive())
-					add_fixtures_to_other_body(fixture, e, physics_definition->attach_fixtures_to_entity);
-				else
-					add_fixtures(fixture, e);
+void physics_system::react_to_new_entities(step_state& step) {
+	auto& events = step.messages.get_queue<messages::new_entity_message>();
+
+	for (auto& it : events) {
+		auto e = it.subject;
+
+		auto* maybe_physics = e->find<components::physics>();
+		auto* maybe_fixtures = e->find<components::fixtures>();
+
+		if (maybe_physics) {
+			maybe_physics->black_detail.body_owner = e;
+			maybe_physics->black_detail.parent_system = this;
+
+			if (maybe_physics->should_body_exist_now()) {
+				maybe_physics->build_body();
+			}
+		}
+
+		if (maybe_fixtures) {
+			if (maybe_fixtures->get_owner_body().dead()) {
+				maybe_fixtures->set_owner_body(e);
 			}
 
-			components::physics::resolve_density_of_associated_fixtures(e);
+			maybe_fixtures->black_detail.all_fixtures_owner = e;
+			maybe_fixtures->black_detail.parent_system = this;
+
+			if (maybe_fixtures->should_fixtures_exist_now()) {
+				maybe_fixtures->build_fixtures();
+			}
 		}
 	}
 }
 
-bool physics_system::has_entity_any_physics(augs::entity_id subject) {
-	return subject->find<components::physics>() || subject->find<components::fixtures>();
+entity_id physics_system::get_owner_friction_field(entity_id id) {
+	return get_owner_body_entity(id)->get<components::physics>().owner_friction_ground;
 }
 
-void physics_system::clear_collision_messages() {
-	auto& collisions = parent_world.get_message_queue<messages::collision_message>();
-	collisions.clear();
+entity_id physics_system::get_owner_body_entity(entity_id id) {
+	auto* fixtures = id->find<components::fixtures>();
+	if (fixtures) return fixtures->get_body_entity();
+	else if (id->find<components::physics>()) return id;
+	return entity_id();
 }
 
-void physics_system::destroy_fixtures_of_entity(augs::entity_id subject) {
-	auto* maybe_fixtures = subject->find<components::fixtures>();
-
-	if (maybe_fixtures) {
-		auto& fixture_list = maybe_fixtures->get_body_entity()->get<components::physics>().fixture_entities;
-		fixture_list.erase(std::remove(fixture_list.begin(), fixture_list.end(), subject), fixture_list.end());
-
-		for (auto f : maybe_fixtures->list_of_fixtures)
-			f.fixture->GetBody()->DestroyFixture(f.fixture);
-
-		subject->remove<components::fixtures>();
-	}
+bool physics_system::is_entity_physical(entity_id id) {
+	return id->find<components::fixtures>() || id->find<components::physics>();
 }
 
-void physics_system::destroy_physics_of_entity(augs::entity_id subject) {
-	destroy_fixtures_of_entity(subject);
-
-	auto* maybe_physics = subject->find<components::physics>();
+void physics_system::resolve_density_of_associated_fixtures(entity_id id) {
+	auto* maybe_physics = id->find<components::physics>();
 
 	if (maybe_physics) {
-		auto all_fixture_entities = maybe_physics->fixture_entities;
-		
-		for (auto fe : all_fixture_entities)
-			destroy_fixtures_of_entity(fe);
+		const auto& entities = maybe_physics->get_fixture_entities();
 
-		b2world.DestroyBody(maybe_physics->body);
-
-		subject->remove<components::physics>();
-	}
-}
-
-void physics_system::consume_rebuild_physics_messages_and_save_new_definitions() {
-	auto& events = parent_world.get_message_queue<messages::rebuild_physics_message>();
-
-	for (auto& it : events) {
-		if (it.subject->find<components::physics_definition>() == nullptr)
-			it.subject->add(it.new_definition);
-		else
-			it.subject->get<components::physics_definition>() = it.new_definition;
-
-		destroy_physics_of_entity(it.subject);
-		create_physics_for_entity(it.subject);
-	}
-
-	events.clear();
-}
-
-void physics_system::execute_delayed_physics_ops() {
-	auto& events = parent_world.get_message_queue<messages::physics_operation>();
-
-	for (auto& e : events) {
-		auto& physics = e.subject->get<components::physics>();
-
-		if (e.apply_force.non_zero())
-			physics.apply_force(e.apply_force, e.force_offset);
-
-		if (e.reset_drop_timeout) {
-			physics.since_dropped.set(e.timeout_ms);
-			reset(physics.since_dropped);
+		for (auto& f : entities) {
+			if (f != id)
+				resolve_density_of_associated_fixtures(f);
 		}
-
-		if (e.set_velocity)
-			physics.set_velocity(e.velocity);
 	}
 
-	events.clear();
-}
+	auto& fixtures = id->get<components::fixtures>();
 
-void physics_system::create_bodies_and_fixtures_from_physics_definitions() {
-	auto& events = parent_world.get_message_queue<messages::new_entity_message>();
+	float density_multiplier = 1.f;
 
-	for (auto& it : events) {
-		if(!has_entity_any_physics(it.subject))
-			create_physics_for_entity(it.subject);
+	auto* item = id->find<components::item>();
+
+	if (item != nullptr && item->current_slot.alive() && item->current_slot.should_item_inside_keep_physical_body())
+		density_multiplier *= item->current_slot.calculate_density_multiplier_due_to_being_attached();
+
+	auto owner_body = get_owner_body_entity(id);
+	auto* driver = owner_body->find<components::driver>();
+
+	if (driver) {
+		if (driver->owned_vehicle.alive()) {
+			density_multiplier *= driver->density_multiplier_while_driving;
+		}
 	}
+
+	for(size_t i = 0; i < fixtures.get_num_colliders(); ++i)
+		fixtures.set_density_multiplier(density_multiplier, i);
 }
 
-void physics_system::destroy_fixtures_and_bodies() {
-	auto& to_destroy = parent_world.get_message_queue<messages::destroy_message>();
+std::vector<b2Vec2> physics_system::get_world_vertices(entity_id subject, bool meters, int fixture_num) {
+	std::vector<b2Vec2> output;
 
-	for (auto& m : to_destroy)
-		destroy_physics_of_entity(m.subject);
+	auto& b = subject->get<components::physics>();
+
+	auto& verts = subject->get<components::fixtures>().get_definition().colliders[0].shape.convex_polys[fixture_num];
+
+	/* for every vertex in given fixture's shape */
+	for (auto& v : verts) {
+		auto position = b.get_position();
+		/* transform angle to degrees */
+		auto rotation = b.get_angle();
+
+		/* transform vertex to current entity's position and rotation */
+		vec2 out_vert = (vec2(v).rotate(rotation, b2Vec2(0, 0)) + position);
+
+		if (meters) out_vert *= PIXELS_TO_METERSf;
+
+		output.push_back(out_vert);
+	}
+
+	return output;
 }

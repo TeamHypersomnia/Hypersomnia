@@ -4,7 +4,7 @@
 
 #include "graphics/pixel.h"
 #include "graphics/vertex.h"
-#include "../assets/texture_id.h"
+#include "game/assets/texture_id.h"
 #include "transform_component.h"
 
 namespace augs {

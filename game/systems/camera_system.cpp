@@ -1,16 +1,16 @@
 #include "math/vec2.h"
 #include "camera_system.h"
 
-#include "entity_system/entity.h"
-#include "../components/physics_component.h"
-#include "../components/crosshair_component.h"
-#include "../components/position_copying_component.h"
-#include "../components/crosshair_component.h"
-#include "../components/physics_component.h"
-#include "../messages/intent_message.h"
-#include "../messages/camera_render_request_message.h"
-#include "../detail/state_for_drawing.h"
-#include "entity_system/world.h"
+#include "game/entity_id.h"
+#include "game/components/physics_component.h"
+#include "game/components/crosshair_component.h"
+#include "game/components/position_copying_component.h"
+#include "game/components/crosshair_component.h"
+#include "game/components/physics_component.h"
+#include "game/messages/intent_message.h"
+#include "game/messages/camera_render_request_message.h"
+#include "game/detail/state_for_drawing.h"
+#include "game/cosmos.h"
 
 void update_bounds_for_crosshair(components::camera& camera, components::crosshair& crosshair) {
 	if (camera.orbit_mode == components::camera::ANGLED)
@@ -20,7 +20,7 @@ void update_bounds_for_crosshair(components::camera& camera, components::crossha
 }
 
 void camera_system::react_to_input_intents() {
-	auto events = parent_world.get_message_queue<messages::intent_message>();
+	auto events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto it : events) {
 		if (it.subject->find<components::camera>() == nullptr)
@@ -42,14 +42,14 @@ void camera_system::react_to_input_intents() {
 	}
 }
 
-void components::camera::configure_camera_and_character_with_crosshair(augs::entity_id camera, augs::entity_id character, augs::entity_id crosshair) {
+void components::camera::configure_camera_and_character_with_crosshair(entity_id camera, entity_id character, entity_id crosshair) {
 	camera->get<components::camera>().entity_to_chase = character;
 	camera->get<components::position_copying>().set_target(character);
 
 	update_bounds_for_crosshair(camera->get<components::camera>(), crosshair->get<components::crosshair>());
 }
 
-vec2i components::camera::get_camera_offset_due_to_character_crosshair(augs::entity_id self) const {
+vec2i components::camera::get_camera_offset_due_to_character_crosshair(entity_id self) const {
 	vec2 camera_crosshair_offset;
 
 	if (entity_to_chase.dead())
@@ -198,7 +198,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 }
 
 void camera_system::post_render_requests_for_all_cameras() {
-	parent_world.get_message_queue<messages::camera_render_request_message>().clear();
+	step.messages.get_queue<messages::camera_render_request_message>().clear();
 
 	for (auto e : targets) {
 		auto& camera = e->get<components::camera>();
@@ -211,7 +211,7 @@ void camera_system::post_render_requests_for_all_cameras() {
 			msg.state = in;
 			msg.mask = camera.mask;
 
-			parent_world.post_message(msg);
+			step.messages.post(msg);
 		}
 	}
 }

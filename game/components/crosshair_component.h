@@ -2,16 +2,16 @@
 #include "math/vec2.h"
 #include "math/rects.h"
 #include "misc/value_animator.h"
-#include "entity_system/entity_id.h"
+#include "game/entity_id.h"
 
 namespace components {
 	struct crosshair  {
-		static vec2 calculate_aiming_displacement(augs::entity_id subject_crosshair, bool snap_epsilon_base_offset = false);
+		static vec2 calculate_aiming_displacement(entity_id subject_crosshair, bool snap_epsilon_base_offset = false);
 
 		augs::value_animation blink;
 		bool should_blink = false;
 		
-		augs::entity_id character_entity_to_chase;
+		entity_id character_entity_to_chase;
 		vec2 base_offset;
 		vec2 bounds_for_base_offset;
 

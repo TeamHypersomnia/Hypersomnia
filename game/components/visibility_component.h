@@ -80,12 +80,12 @@ namespace components {
 			bool test_attitudes = false;
 			bool test_dangers = false;
 
-			std::set<augs::entity_id> visible_items;
-			std::set<augs::entity_id> visible_sentiences;
-			std::set<augs::entity_id> visible_attitudes;
-			std::set<augs::entity_id> visible_dangers;
+			std::set<entity_id> visible_items;
+			std::set<entity_id> visible_sentiences;
+			std::set<entity_id> visible_attitudes;
+			std::set<entity_id> visible_dangers;
 			
-			bool sees(augs::entity_id) const;
+			bool sees(entity_id) const;
 		};
 
 		enum layer_type {

@@ -2,7 +2,7 @@
 #include "pixel_line_connector.h"
 #include "grid.h"
 
-#include "entity_system/world.h"
+#include "game/cosmos.h"
 #include "augs/graphics/renderer.h"
 #include "augs/templates.h"
 
@@ -31,7 +31,7 @@ bool item_button::is_being_wholely_dragged_or_pending_finish(augs::gui::gui_worl
 		return !is_drag_partial;
 	}
 
-	auto& gui_intents = gui_element_entity->get_owner_world().get_system<input_system>().gui_item_transfer_intent_player.get_pending_inputs_for_logic();
+	auto& gui_intents = gui_element_entity->get_owner_world().systems.get<input_system>().gui_item_transfer_intent_player.get_pending_inputs_for_logic();
 	
 	for (auto& g : gui_intents) {
 		if (g.item == item) {
@@ -97,7 +97,7 @@ rects::ltrb<float> item_button::iterate_children_attachments(bool draw, std::vec
 	rects::ltrb<float> button_bbox = item_sprite.get_aabb(components::transform(), true);
 
 	if (!is_container_open) {
-		for_each_descendant(item, [this, draw, &item_sprite, &state, &button_bbox](augs::entity_id desc) {
+		for_each_descendant(item, [this, draw, &item_sprite, &state, &button_bbox](entity_id desc) {
 			if (desc == item)
 				return;
 
@@ -204,7 +204,7 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 				bottom_number_val = considered_charges;
 				printing_charge_count = true;
 			}
-			else if (item->get_owner_world().get_system<gui_system>().draw_free_space_inside_container_icons && item[slot_function::ITEM_DEPOSIT].alive()) {
+			else if (item->get_owner_world().systems.get<gui_system>().draw_free_space_inside_container_icons && item[slot_function::ITEM_DEPOSIT].alive()) {
 				if (item->get<components::item>().categories_for_slot_compatibility & item_category::MAGAZINE) {
 					if (!is_container_open) {
 						printing_charge_count = true;
@@ -360,11 +360,11 @@ void item_button::consume_gui_event(event_info info) {
 	if (info == rect::gui_event::lfinisheddrag) {
 		started_drag = false;
 
-		auto& parent_world = item->get_owner_world();
+		auto& parent_cosmos = item->get_owner_world();
 		auto& drag_result = gui.prepare_drag_and_drop_result();
 
 		if (drag_result.possible_target_hovered && drag_result.will_drop_be_successful()) {
-			parent_world.post_message(drag_result.intent);
+			step.messages.post(drag_result.intent);
 		}
 		else if (!drag_result.possible_target_hovered) {
 			vec2i griddified = griddify(info.owner.current_drag_amount);
@@ -394,6 +394,6 @@ void item_button::draw_triangles(draw_info in) {
 	}
 }
 
-item_button& get_meta(augs::entity_id id) {
+item_button& get_meta(entity_id id) {
 	return get_owning_transfer_capability(id)->get<components::gui_element>().item_metadata[id];
 }

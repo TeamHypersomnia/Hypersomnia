@@ -2,8 +2,6 @@
 #include "ensure.h"
 
 namespace augs {
-	class world;
-
 	struct deterministic_timeout {
 		unsigned long long step_recorded = 0;
 		bool was_set = false;

@@ -5,7 +5,7 @@
 #include <freetype\ft2build.h> 
 #include FT_FREETYPE_H
 
-#include "../global_libraries.h"
+#include "augs/global_libraries.h"
 #include "augs/error/augs_error.h"
 
 namespace augs {

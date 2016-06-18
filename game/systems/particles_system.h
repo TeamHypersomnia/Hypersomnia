@@ -2,10 +2,10 @@
 #include <random>
 #include "misc/timer.h"
 
-#include "entity_system/processing_system.h"
+#include "game/processing_system_with_cosmos_reference.h"
 
-#include "../components/particle_effect_response_component.h"
-#include "../components/particle_group_component.h"
+#include "game/components/particle_effect_response_component.h"
+#include "game/components/particle_group_component.h"
 
 using namespace augs;
 
@@ -13,7 +13,7 @@ class particles_system : public processing_system_templated<components::particle
 public:
 	using processing_system_templated::processing_system_templated;
 
-	static entity_id create_refreshable_particle_group(world&);
+	static entity_id create_refreshable_particle_group(cosmos&);
 	void spawn_particle(components::particle_group::stream&, const vec2&, float, float spread, const resources::emission&);
 	void step_streams_and_particles();
 

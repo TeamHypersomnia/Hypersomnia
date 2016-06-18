@@ -1,6 +1,6 @@
 #pragma once
 #include "texture_baker/texture_baker.h"
-#include "../components/sprite_component.h"
+#include "game/components/sprite_component.h"
 
 namespace resources {
 	class texture_with_image {

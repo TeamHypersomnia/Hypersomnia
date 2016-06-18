@@ -1,9 +1,9 @@
 #pragma once
-#include "entity_system/entity.h"
+#include "game/entity_id.h"
 
 namespace components {
 	struct trigger {
-		augs::entity_id entity_to_be_notified;
+		entity_id entity_to_be_notified;
 		bool react_to_collision_detectors = false;
 		bool react_to_query_detectors = true;
 	};

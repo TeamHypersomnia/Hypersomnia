@@ -1,5 +1,5 @@
 #pragma once
-#include "entity_system/processing_system.h"
+#include "game/processing_system_with_cosmos_reference.h"
 #include "game/components/melee_component.h"
 #include "game/components/damage_component.h"
 
@@ -13,9 +13,9 @@ public:
 
 	void consume_melee_intents();
 	void initiate_and_update_moves();
-	components::melee::state primary_action(double dt, augs::entity_id target, components::melee& melee_component, components::damage& damage);
-	components::melee::state secondary_action(double dt, augs::entity_id target, components::melee& melee_component, components::damage& damage);
-	components::melee::state tertiary_action(double dt, augs::entity_id target, components::melee& melee_component, components::damage& damage);
+	components::melee::state primary_action(double dt, entity_id target, components::melee& melee_component, components::damage& damage);
+	components::melee::state secondary_action(double dt, entity_id target, components::melee& melee_component, components::damage& damage);
+	components::melee::state tertiary_action(double dt, entity_id target, components::melee& melee_component, components::damage& damage);
 
 	melee_animation animation;
 private:

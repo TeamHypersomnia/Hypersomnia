@@ -1,13 +1,13 @@
 #include "melee_system.h"
-#include "entity_system/world.h"
-#include "entity_system/entity.h"
+#include "game/cosmos.h"
+#include "game/entity_id.h"
 
 #include "game/messages/intent_message.h"
 #include "game/messages/melee_swing_response.h"
 #include "game/messages/rebuild_physics_message.h"
 #include "game/detail/inventory_utils.h"
 
-void components::melee::reset_weapon(augs::entity_id e) {
+void components::melee::reset_weapon(entity_id e) {
 	auto& m = e->get<components::melee>();
 	m.reset_move_flags();
 	m.current_state = components::melee::state::FREE;
@@ -17,7 +17,7 @@ void components::melee::reset_weapon(augs::entity_id e) {
 }
 
 void melee_system::consume_melee_intents() {
-	auto& events = parent_world.get_message_queue<messages::intent_message>();
+	auto& events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto it : events) {
 		/* 
@@ -55,7 +55,7 @@ void melee_system::initiate_and_update_moves() {
 	auto dt = delta_milliseconds();
 
 	/* clear melee swing response queue because this is the only place where we send them */
-	parent_world.get_message_queue<messages::melee_swing_response>().clear();
+	step.messages.get_queue<messages::melee_swing_response>().clear();
 
 	/* all entities in the "targets" vector are guaranteed to have both melee and damage components
 		therefore we use get instead of find
@@ -92,7 +92,7 @@ void melee_system::initiate_and_update_moves() {
 	}
 }
 
-components::melee::state melee_system::primary_action(double dt, augs::entity_id target, components::melee& melee_component, components::damage& damage)
+components::melee::state melee_system::primary_action(double dt, entity_id target, components::melee& melee_component, components::damage& damage)
 {
 	damage.damage_upon_collision = true;
 
@@ -163,10 +163,10 @@ components::melee::state melee_system::primary_action(double dt, augs::entity_id
 
 	response.subject = target;
 	response.origin_transform = target->get<components::transform>();
-	parent_world.post_message(response);
+	step.messages.post(response);
 
 	pos_response.new_definition = new_definition;
-	parent_world.post_message(pos_response);
+	step.messages.post(pos_response);
 
 	return components::melee::state::PRIMARY;
 }

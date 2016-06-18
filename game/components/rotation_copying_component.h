@@ -1,6 +1,6 @@
 #pragma once
 
-#include "entity_system/entity_id.h"
+#include "game/entity_id.h"
 #include "math/vec2.h"
 
 namespace components {
@@ -29,7 +29,7 @@ namespace components {
 
 		unsigned look_mode = look_type::POSITION;
 
-		augs::entity_id target;
+		entity_id target;
 
 		float last_value = 0.0f;
 		bool update_value = true;

@@ -2,7 +2,7 @@
 #include "game/systems/gui_system.h"
 #include "game/components/item_component.h"
 #include "item_button.h"
-#include "entity_system/world.h"
+#include "game/cosmos.h"
 
 void game_gui_root::get_member_children(std::vector<augs::gui::rect_id>& children) {
 	children.push_back(&parent_of_inventory_controls);
@@ -36,7 +36,7 @@ void game_gui_world::consume_raw_input(messages::raw_window_input_message& w) {
 			intent.item = dragged_item->item;
 			intent.target_slot.unset();
 			intent.specified_quantity = dragged_charges;
-			gui_system->parent_world.post_message(intent);
+			gui_system->step.messages.post(intent);
 			fetched = true;
 		}
 	}

@@ -1,6 +1,6 @@
 #include "ingredients.h"
-#include "entity_system/entity.h"
-#include "entity_system/world.h"
+#include "game/entity_id.h"
+#include "game/cosmos.h"
 
 #include "game/components/position_copying_component.h"
 #include "game/components/camera_component.h"
@@ -15,7 +15,6 @@
 #include "game/components/trigger_query_detector_component.h"
 #include "game/components/driver_component.h"
 #include "game/components/force_joint_component.h"
-#include "game/components/physics_definition_component.h"
 #include "game/components/gui_element_component.h"
 #include "game/components/name_component.h"
 #include "game/components/sentience_component.h"
@@ -27,7 +26,7 @@
 #include "game/globals/party_category.h"
 
 namespace ingredients {
-	void wsad_character_setup_movement(augs::entity_id e) {
+	void wsad_character_setup_movement(entity_id e) {
 		components::movement& movement = e->get<components::movement>();
 
 		movement.add_animation_receiver(e, false);
@@ -44,7 +43,7 @@ namespace ingredients {
 		movement.enable_braking_damping = true;
 	}
 
-	void wsad_character_physics(augs::entity_id e) {
+	void wsad_character_physics(entity_id e) {
 		auto& physics_definition = *e += components::physics_definition();
 
 		auto& body = physics_definition.body;
@@ -63,14 +62,14 @@ namespace ingredients {
 		wsad_character_setup_movement(e);
 	}
 
-	void wsad_character_legs(augs::entity_id legs, augs::entity_id player) {
+	void wsad_character_legs(entity_id legs, entity_id player) {
 		components::sprite sprite;
 		components::render render;
 		components::animation animation;
 		components::transform transform;
 	}
 
-	void wsad_character(augs::entity_id e, augs::entity_id crosshair_entity) {
+	void wsad_character(entity_id e, entity_id crosshair_entity) {
 		auto& sprite = *e += components::sprite();
 		auto& render = *e += components::render();
 		auto& animation = *e += components::animation();
@@ -157,7 +156,7 @@ namespace ingredients {
 		sentience.health.value = 100.0;
 		sentience.health.maximum = 100.0;
 
-		e->disable(force_joint);
+		e.deactivate(force_joint);
 
 		detector.spam_trigger_requests_when_detection_intented = true;
 
@@ -186,7 +185,7 @@ namespace ingredients {
 		wsad_character_setup_movement(e);
 	}
 
-	void wsad_character_corpse(augs::entity_id e) {
+	void wsad_character_corpse(entity_id e) {
 		auto& sprite = *e += components::sprite();
 		auto& render = *e += components::render();
 		auto& transform = *e += components::transform();
@@ -195,7 +194,6 @@ namespace ingredients {
 		render.layer = render_layer::CORPSES;
 
 		auto& physics_definition = *e += components::physics_definition();
-		physics_definition.create_fixtures_and_body = false;
 
 		auto& body = physics_definition.body;
 		auto& info = physics_definition.new_fixture();
@@ -208,15 +206,15 @@ namespace ingredients {
 		body.linear_damping = 6.5;
 	}
 
-	void inject_window_input_to_character(augs::entity_id next_character, augs::entity_id camera) {
+	void inject_window_input_to_character(entity_id next_character, entity_id camera) {
 		auto previously_controlled_character = camera->get<components::camera>().entity_to_chase;
 
 		if (previously_controlled_character.alive()) {
-			previously_controlled_character->disable<components::input_receiver>();
-			previously_controlled_character->disable<components::gui_element>();
+			previously_controlled_character.skip_processing_in(list_of_processing_subjects::WITH_INPUT_RECEIVER);
+			previously_controlled_character.skip_processing_in(list_of_processing_subjects::WITH_GUI_ELEMENT);
 
 			auto crosshair = previously_controlled_character[sub_entity_name::CHARACTER_CROSSHAIR];
-			crosshair->disable<components::input_receiver>();
+			crosshair.skip_processing_in(list_of_processing_subjects::WITH_INPUT_RECEIVER);
 
 			previously_controlled_character[associated_entity_name::WATCHING_CAMERA].unset();
 		}
@@ -234,16 +232,16 @@ namespace ingredients {
 		if (crosshair->find<components::input_receiver>() == nullptr)
 			crosshair->add<components::input_receiver>();
 
-		next_character->enable<components::input_receiver>();
-		next_character->enable<components::gui_element>();
-		crosshair->enable<components::input_receiver>();
+		next_character.unskip_processing_in(list_of_processing_subjects::WITH_INPUT_RECEIVER);
+		next_character.unskip_processing_in(list_of_processing_subjects::WITH_GUI_ELEMENT);
+		crosshair.unskip_processing_in(list_of_processing_subjects::WITH_INPUT_RECEIVER);
 
 		components::camera::configure_camera_and_character_with_crosshair(camera, next_character, crosshair);
 	}
 }
 
 namespace prefabs {
-	augs::entity_id create_character(augs::world& world, vec2 pos) {
+	entity_id create_character(cosmos world, vec2 pos) {
 		auto character = world.create_entity("player_unnamed");
 
 		name_entity(character, entity_name::PERSON);
@@ -268,7 +266,7 @@ namespace prefabs {
 		return character;
 	}
 
-	augs::entity_id create_character_crosshair(augs::world& world) {
+	entity_id create_character_crosshair(cosmos world) {
 		auto root = world.create_entity("crosshair");
 		auto recoil = world.create_entity("crosshair_recoil_body");
 		auto zero_target = world.create_entity("zero_target");

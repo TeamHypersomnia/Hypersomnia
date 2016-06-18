@@ -2,11 +2,11 @@
 #include "misc/constant_size_vector.h"
 #include "transform_component.h"
 
-#include "entity_system/entity_id.h"
+#include "game/entity_id.h"
 
 namespace components {
 	struct force_joint {
-		augs::entity_id chased_entity;
+		entity_id chased_entity;
 
 		float force_towards_chased_entity = 8000.f;
 		float distance_when_force_easing_starts = 10.f;

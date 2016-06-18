@@ -48,8 +48,8 @@ namespace components {
 
 		navigation_hint custom_exploration_hint;
 
-		std::function<bool(augs::entity_id, vec2, vec2)> first_priority_navpoint_check;
-		std::function<bool(augs::entity_id, vec2, vec2)> target_visibility_condition;
+		std::function<bool(entity_id, vec2, vec2)> first_priority_navpoint_check;
+		std::function<bool(entity_id, vec2, vec2)> target_visibility_condition;
 
 		pathfinding_session& session();
 		void start_pathfinding(vec2 target);

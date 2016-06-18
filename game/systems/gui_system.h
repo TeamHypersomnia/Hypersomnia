@@ -1,5 +1,4 @@
 #pragma once
-#include "entity_system/processing_system.h"
 #include "game/components/gui_element_component.h"
 #include "game/messages/camera_render_request_message.h"
 #include "game/messages/gui_intents.h"
@@ -10,7 +9,9 @@
 #include "game/detail/gui/immediate_hud.h"
 #include "game/globals/slot_function.h"
 
-class gui_system : public augs::processing_system_templated<components::gui_element> {
+class cosmos;
+
+class gui_system {
 	friend class item_button;
 	friend struct game_gui_world;
 
@@ -21,14 +22,16 @@ class gui_system : public augs::processing_system_templated<components::gui_elem
 	game_gui_root game_gui_root;
 
 	vec2 initial_inventory_root_position();
-	augs::entity_id get_game_world_crosshair();
+	entity_id get_cosmos_crosshair();
 
 	std::vector<messages::raw_window_input_message> buffered_inputs_during_freeze;
 	bool freeze_gui_model();
+
+	cosmos region;
 public:
 	bool draw_free_space_inside_container_icons = true;
 
-	gui_system(world& parent_world);
+	gui_system(const cosmos&);
 
 	immediate_hud hud;
 

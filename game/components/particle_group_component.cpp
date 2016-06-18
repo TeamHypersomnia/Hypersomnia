@@ -1,5 +1,5 @@
 #include "particle_group_component.h"
-#include "../detail/state_for_drawing.h"
+#include "game/detail/state_for_drawing.h"
 
 using namespace augs;
 

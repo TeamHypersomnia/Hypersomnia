@@ -4,7 +4,7 @@
 #include <tuple>
 #include <array>
 
-#include "entity_system/entity_id.h"
+#include "game/entity_id.h"
 #include "game/detail/ai/goals.h"
 
 #include "augs/templates.h"
@@ -14,7 +14,7 @@ namespace resources {
 	class behaviour_tree {
 	
 	public:
-		typedef augs::entity_id user_callback_input;
+		typedef entity_id user_callback_input;
 
 		enum class goal_availability {
 			ALREADY_ACHIEVED,

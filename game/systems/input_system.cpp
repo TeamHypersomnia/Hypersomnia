@@ -1,8 +1,8 @@
 #include "window_framework/window.h"
-#include "entity_system/entity.h"
-#include "entity_system/world.h"
+#include "game/entity_id.h"
+#include "game/cosmos.h"
 
-#include "../messages/raw_window_input_message.h"
+#include "game/messages/raw_window_input_message.h"
 
 #include "input_system.h"
 
@@ -42,10 +42,10 @@ bool input_system::is_replaying() const {
 	return unmapped_intent_player.player.is_replaying();
 }
 
-input_system::input_system(world& parent_world) : processing_system_templated(parent_world),
-	unmapped_intent_player(parent_world)
-	, crosshair_intent_player(parent_world)
-	, gui_item_transfer_intent_player(parent_world)
+input_system::input_system(cosmos& parent_cosmos) : processing_system_templated(parent_cosmos),
+	unmapped_intent_player(parent_cosmos)
+	, crosshair_intent_player(parent_cosmos)
+	, gui_item_transfer_intent_player(parent_cosmos)
 {
 }
 
@@ -72,18 +72,10 @@ void input_system::context::map_event_to_intent(window::event::message id, inten
 	event_to_intent[id] = intent;
 }
 
-void input_system::add_context(context c) {
-	active_contexts.push_back(c);
-}
-
-void input_system::clear_contexts() {
-	active_contexts.clear();
-}
-
 void input_system::post_unmapped_intents_from_raw_window_inputs() {
-	parent_world.get_message_queue<messages::unmapped_intent_message>().clear();
+	step.messages.get_queue<messages::unmapped_intent_message>().clear();
 
-	auto& raw_inputs = parent_world.get_message_queue<messages::raw_window_input_message>();
+	auto& raw_inputs = step.messages.get_queue<messages::raw_window_input_message>();
 
 	if (!active_contexts.empty()) {
 		for (auto& it : raw_inputs) {
@@ -120,7 +112,7 @@ void input_system::post_unmapped_intents_from_raw_window_inputs() {
 
 				if (found_context_entry) {
 					unmapped_intent.intent = intent;
-					parent_world.post_message(unmapped_intent);
+					step.messages.post(unmapped_intent);
 
 					break;
 				}
@@ -131,15 +123,15 @@ void input_system::post_unmapped_intents_from_raw_window_inputs() {
 
 
 void input_system::map_unmapped_intents_to_entities() {
-	parent_world.get_message_queue<messages::intent_message>().clear();
+	step.messages.get_queue<messages::intent_message>().clear();
 
-	for (auto& unmapped_intent : parent_world.get_message_queue<messages::unmapped_intent_message>()) {
+	for (auto& unmapped_intent : step.messages.get_queue<messages::unmapped_intent_message>()) {
 		messages::intent_message entity_mapped_intent;
 		entity_mapped_intent.unmapped_intent_message::operator=(unmapped_intent);
 
 		for (auto it = targets.begin(); it != targets.end(); ++it) {
 			entity_mapped_intent.subject = *it;
-			parent_world.post_message(entity_mapped_intent);
+			step.messages.post(entity_mapped_intent);
 		}
 	}
 }

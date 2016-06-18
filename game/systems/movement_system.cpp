@@ -1,15 +1,14 @@
 #include "math/vec2.h"
 #include "movement_system.h"
-#include "entity_system/world.h"
-#include "../messages/intent_message.h"
-#include "../messages/movement_response.h"
-
-#include "../components/gun_component.h"
-
-using namespace messages;
+#include "game/cosmos.h"
+#include "game/messages/intent_message.h"
+#include "game/messages/movement_response.h"
 #include "log.h"
+
+#include "game/components/gun_component.h"
+
 void movement_system::set_movement_flags_from_input() {
-	auto events = parent_world.get_message_queue<messages::intent_message>();
+	auto events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto it : events) {
 		auto* movement = it.subject->find<components::movement>();
@@ -37,7 +36,7 @@ void movement_system::set_movement_flags_from_input() {
 }
 
 void movement_system::apply_movement_forces() {
-	auto& physics_sys = parent_world.get_system<physics_system>();
+	auto& physics_sys = parent_cosmos.stateful_systems.get<physics_system>();
 
 	for (auto it : targets) {
 		auto& movement = it->get<components::movement>();
@@ -89,7 +88,7 @@ void movement_system::apply_movement_forces() {
 }
 
 void movement_system::generate_movement_responses() {
-	parent_world.get_message_queue<movement_response>().clear();
+	step.messages.get_queue<movement_response>().clear();
 
 	for (auto it : targets) {
 		auto& movement = it->get<components::movement>();
@@ -116,7 +115,7 @@ void movement_system::generate_movement_responses() {
 			movement_response copy(msg);
 			copy.stop_response_at_zero_speed = receiver.stop_response_at_zero_speed;
 			copy.subject = receiver.target;
-			parent_world.post_message(copy);
+			step.messages.post(copy);
 		}
 	}
 }

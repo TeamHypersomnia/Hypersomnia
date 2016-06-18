@@ -19,7 +19,7 @@ public:
 	augs::gui::text_drawer charges_caption;
 	void get_member_children(std::vector<augs::gui::rect_id>&) final;
 
-	augs::entity_id gui_element_entity;
+	entity_id gui_element_entity;
 	
 	bool is_inventory_root();
 
@@ -29,7 +29,7 @@ public:
 
 	bool started_drag = false;
 
-	augs::entity_id item;
+	entity_id item;
 
 	vec2i drag_offset_in_item_deposit;
 
@@ -51,4 +51,4 @@ public:
 		bool draw_charges = true);
 };
 
-item_button& get_meta(augs::entity_id);
+item_button& get_meta(entity_id);

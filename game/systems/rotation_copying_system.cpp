@@ -1,7 +1,7 @@
 #include "rotation_copying_system.h"
 #include <Box2D\Dynamics\b2Body.h>
 
-#include "entity_system/entity.h"
+#include "game/entity_id.h"
 #include "graphics/renderer.h"
 
 #include "game/components/physics_component.h"
@@ -60,7 +60,7 @@ float colinearize_AB(vec2 O_center_of_rotation, vec2 A_rifle_center, vec2 B_barr
 	return final_angle;
 }
 
-void rotation_copying_system::resolve_rotation_copying_value(augs::entity_id it) {
+void rotation_copying_system::resolve_rotation_copying_value(entity_id it) {
 	auto& rotation_copying = it->get<components::rotation_copying>();
 
 	if (rotation_copying.target.dead())
