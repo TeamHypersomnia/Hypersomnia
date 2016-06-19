@@ -1,34 +1,16 @@
 #pragma once
 #include <vector>
-#include "simple_pool.h"
 #define USE_NAMES_FOR_IDS
 
 namespace augs {
 	template<class T> class object_pool;
 
 	class memory_pool {
-		static simple_pool<memory_pool*> pool_locations;
-
 	protected:
 		typedef char byte;
 
-		struct pool_id {
-			int pointer_id = -1;
-			void unset();
-
-			memory_pool* operator->() const;
-			memory_pool& operator*() const;
-			operator bool() const;
-		};
-
-		pool_id this_pool_pointer_location;
-
-		int slot_size;
 		int count = 0;
 		
-		size_t associated_type_hash = 0;
-		bool associated_type_hash_set = false;
-
 		std::vector<byte> pool;
 
 		struct metadata {
@@ -55,23 +37,28 @@ namespace augs {
 
 	public:
 		class id {
+		public:
 #ifdef USE_NAMES_FOR_IDS
 			char debug_name[40];
 #endif
 		protected:
 			friend class memory_pool;
 
-			pool_id owner;
-			int version = 0xdeadbeef;
-			int indirection_index = 0xdeadbeef;
+			int version = -1;
+			int indirection_index = -1;
+		};
 
+		class handle : private id {
+			memory_pool& owner;
+			handle(id, memory_pool&);
+
+			friend class memory_pool;
 		public:
-			id();
 
-			bool operator<(const id&) const;
+			bool operator<(const handle&) const;
 			bool operator!() const;
-			bool operator!=(const id&) const;
-			bool operator==(const id&) const;
+			bool operator!=(const handle&) const;
+			bool operator==(const handle&) const;
 
 			byte* ptr();
 			const byte* ptr() const;
@@ -86,38 +73,40 @@ namespace augs {
 			std::string get_debug_name() const;
 		};
 
+		static id dead_id;
+
 		template <typename T>
-		class typed_id_interface : private id {
+		class typed_handle_interface : private handle {
 		public:
-			using id::id;
+			using handle::handle;
 
-			const T& get() const { return *reinterpret_cast<const T*>(id::ptr()); }
-			const T* ptr() const { return  reinterpret_cast<const T*>(id::ptr()); }
+			const T& get() const { return *reinterpret_cast<const T*>(handle::ptr()); }
+			const T* ptr() const { return  reinterpret_cast<const T*>(handle::ptr()); }
 
-			T* ptr() { return  reinterpret_cast<T*>(id::ptr()); }
-			T& get() { return *reinterpret_cast<T*>(id::ptr()); }
+			T* ptr() { return  reinterpret_cast<T*>(handle::ptr()); }
+			T& get() { return *reinterpret_cast<T*>(handle::ptr()); }
 
-			object_pool<T>& get_pool() { return reinterpret_cast<object_pool<T>&>(id::get_pool()); }
+			object_pool<T>& get_pool() { return reinterpret_cast<object_pool<T>&>(handle::get_pool()); }
 			T& operator*() { return get(); }
 			T* operator->() { return &get(); }
 			const T& operator*() const { return get(); }
 			const T* operator->() const { return &get(); }
 
-			using id::operator!;
-			bool operator< (const typed_id_interface& b) const { return id::operator< (reinterpret_cast<const id&>(b)); }
-			bool operator==(const typed_id_interface& b) const { return id::operator==(reinterpret_cast<const id&>(b)); }
-			bool operator!=(const typed_id_interface& b) const { return id::operator!=(reinterpret_cast<const id&>(b)); }
+			using handle::operator!;
+			bool operator< (const typed_handle_interface& b) const { return handle::operator< (reinterpret_cast<const handle&>(b)); }
+			bool operator==(const typed_handle_interface& b) const { return handle::operator==(reinterpret_cast<const handle&>(b)); }
+			bool operator!=(const typed_handle_interface& b) const { return handle::operator!=(reinterpret_cast<const handle&>(b)); }
 
-			bool alive() const { return id::alive(); }
-			bool dead() const { return id::dead(); }
+			bool alive() const { return handle::alive(); }
+			bool dead() const { return handle::dead(); }
 
-			using id::unset;
-			using id::get_debug_name;
-			using id::set_debug_name;
+			using handle::unset;
+			using handle::get_debug_name;
+			using handle::set_debug_name;
 		};
 
 		template <typename T>
-		class typed_id_template : public typed_id_interface<T> {
+		class typed_handle_template : public typed_handle_interface<T> {
 
 		};
 

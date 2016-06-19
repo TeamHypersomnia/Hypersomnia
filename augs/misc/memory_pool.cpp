@@ -5,18 +5,10 @@
 #include <tuple>
 
 namespace augs {
-	simple_pool<memory_pool*> memory_pool::pool_locations;
+	memory_pool::id memory_pool::dead_id;
 
 	void memory_pool::pool_id::unset() {
 		pointer_id = -1;
-	}
-
-	memory_pool* memory_pool::pool_id::operator->() const {
-		return pool_locations.get(pointer_id);
-	}
-
-	memory_pool& memory_pool::pool_id::operator*() const {
-		return *pool_locations.get(pointer_id);
 	}
 
 	memory_pool::pool_id::operator bool() const {
@@ -25,57 +17,55 @@ namespace augs {
 
 	memory_pool::memory_pool(int slot_count, int slot_size) { 
 		initialize(slot_count, slot_size);  
-		this_pool_pointer_location.pointer_id = pool_locations.allocate(this);
 	}
 
 	memory_pool::~memory_pool() {
 		free_all();
-		pool_locations.destroy(this_pool_pointer_location.pointer_id);
 	}
 	
-	memory_pool::id::id() {
+	memory_pool::handle::handle(memory_pool& owner) : owner(owner) {
 		unset();
 	}
 
-	memory_pool::byte* memory_pool::id::ptr() { return owner->get(*this); }
-	const memory_pool::byte* memory_pool::id::ptr() const { return owner->get(*this); }
+	memory_pool::byte* memory_pool::handle::ptr() { return owner.get(*this); }
+	const memory_pool::byte* memory_pool::handle::ptr() const { return owner.get(*this); }
 
-	memory_pool& memory_pool::id::get_pool() { return *owner; }
+	memory_pool& memory_pool::handle::get_pool() { return owner; }
 
-	bool memory_pool::id::operator<(const id& b) const { 
+	bool memory_pool::handle::operator<(const handle& b) const { 
 		auto& a = *this;
-		return std::make_tuple(a.owner, a.indirection_index, a.version) < 
-			   std::make_tuple(b.owner, b.indirection_index, b.version);
+		return std::make_tuple(&a.owner, a.indirection_index, a.version) < 
+			   std::make_tuple(&b.owner, b.indirection_index, b.version);
 	}
-	bool memory_pool::id::operator!() const { return !alive(); }
-	bool memory_pool::id::operator==(const id& b) const { 
+	bool memory_pool::handle::operator!() const { return !alive(); }
+	bool memory_pool::handle::operator==(const handle& b) const {
 		//ensure(alive() && b.alive());
-		bool result = alive() && b.alive() && owner == b.owner && (indirection_index == b.indirection_index && version == b.version); 
+		bool result = alive() && b.alive() && &owner == &b.owner && (indirection_index == b.indirection_index && version == b.version); 
 #ifdef USE_NAMES_FOR_IDS
 		//if(result) ensure(std::string(debug_name) == std::string(b.debug_name));
 #endif
 		return result;
 	}
-	bool memory_pool::id::operator!=(const id& b) const { return !operator==(b); }
+	bool memory_pool::handle::operator!=(const handle& b) const { return !operator==(b); }
 
-	bool memory_pool::id::alive() const { return owner && owner->alive(*this); }
-	bool memory_pool::id::dead() const { return !alive(); }
+	bool memory_pool::handle::alive() const { return indirection_index != -1 && owner.alive(*this); }
+	bool memory_pool::handle::dead() const { return !alive(); }
 
-	void memory_pool::id::unset() { 
-		owner.unset(); 
+	void memory_pool::handle::unset() { 
+		id::operator=(dead_id);
 #ifdef USE_NAMES_FOR_IDS
 		debug_name[0] = 0;
 #endif
 	}
 
-	void memory_pool::id::set_debug_name(std::string s) {
+	void memory_pool::handle::set_debug_name(std::string s) {
 #ifdef USE_NAMES_FOR_IDS
 		ensure(s.size() < sizeof(debug_name) / sizeof(char));
 		strcpy(debug_name, s.c_str());
 #endif
 	}
 
-	std::string memory_pool::id::get_debug_name() const {
+	std::string memory_pool::handle::get_debug_name() const {
 #ifdef USE_NAMES_FOR_IDS
 		return debug_name;
 #else
@@ -114,12 +104,11 @@ namespace augs {
 		id found_id;
 
 		if (address < pool.data() || address >= pool.data() + size() * slot_size)
-			found_id.owner.unset();
+			found_id = dead_id;
 		else {
 			int slot_index = (address - &*pool.begin()) / slot_size;
 			int indirector_index = slots[slot_index].pointing_indirector;
 
-			found_id.owner = this_pool_pointer_location;
 			found_id.indirection_index = indirector_index;
 			found_id.version = indirectors[indirector_index].version;
 		}
