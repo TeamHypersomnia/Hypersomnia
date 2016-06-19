@@ -1,5 +1,4 @@
 #pragma once
-#include "misc/constant_size_vector.h"
 #include "transform_component.h"
 
 #include "game/entity_id.h"

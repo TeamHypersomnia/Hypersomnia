@@ -11,10 +11,6 @@ namespace components {
 		struct mounting_operation {
 			entity_id current_item;
 			inventory_slot_id intented_mounting_slot;
-
-			bool alive() const { 
-				return current_item.alive(); 
-			}
 		} mounting;
 
 		std::set<entity_id> only_pick_these_items;

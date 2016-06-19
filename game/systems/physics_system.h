@@ -19,10 +19,6 @@ public:
 		vec2 intersection, normal;
 		bool hit = false;
 		entity_id what_entity;
-
-		bool operator<(const raycast_output& b) const {
-			return what_entity < b.what_entity;
-		}
 	};
 
 	struct edge_edge_output {

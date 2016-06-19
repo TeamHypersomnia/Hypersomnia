@@ -134,7 +134,4 @@ struct put_components_into {
 typedef typename put_components_into<augs::storage_for_components_and_aggregates>::type 
 storage_for_all_components_and_aggregates;
 
-typedef storage_for_all_components_and_aggregates::aggregate_id 
-aggregate_id;
-
 #include "full_entity_definition_declaration.h"

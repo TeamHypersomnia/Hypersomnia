@@ -1,2 +1,2 @@
 #pragma once
-#include "game/components_instantiation.h"
+#include "game/types_specification/components_instantiation.h"

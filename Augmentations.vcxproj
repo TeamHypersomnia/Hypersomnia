@@ -403,7 +403,6 @@
     <ClCompile Include="game\components\particle_group_component.cpp" />
     <ClCompile Include="game\components\pathfinding_component.cpp" />
     <ClCompile Include="game\components\physics_component.cpp" />
-    <ClCompile Include="game\components\physics_definition_component.cpp" />
     <ClCompile Include="game\components\polygon_component.cpp" />
     <ClCompile Include="game\components\sentience_component.cpp" />
     <ClCompile Include="game\components\sprite_component.cpp" />
@@ -534,8 +533,6 @@
     <ClCompile Include="augs\math\vec2.cpp" />
     <ClCompile Include="augs\misc\file_watcher.cpp" />
     <ClCompile Include="augs\misc\fixed_delta_timer.cpp" />
-    <ClCompile Include="augs\misc\memory_pool.cpp" />
-    <ClCompile Include="augs\misc\object_pool.cpp" />
     <ClCompile Include="augs\misc\randomization.cpp" />
     <ClCompile Include="augs\misc\smooth_value_field.cpp" />
     <ClCompile Include="augs\misc\time.cpp" />
@@ -1008,13 +1005,13 @@
     <ClInclude Include="augs\gui\appearance_detector.h" />
     <ClInclude Include="augs\gui\rect_id.h" />
     <ClInclude Include="augs\gui\text_drawer.h" />
-    <ClInclude Include="augs\misc\constant_size_vector.h" />
     <ClInclude Include="augs\misc\delta.h" />
     <ClInclude Include="augs\misc\deterministic_timing.h" />
     <ClInclude Include="augs\misc\machine_entropy.h" />
     <ClInclude Include="augs\misc\measurements.h" />
     <ClInclude Include="augs\misc\performance_timer.h" />
     <ClInclude Include="augs\misc\recoil_player.h" />
+    <ClInclude Include="augs\misc\simple_pool.h" />
     <ClInclude Include="augs\misc\simulation_timing.h" />
     <ClInclude Include="augs\misc\typesafe_sprintf.h" />
     <ClInclude Include="augs\templates.h" />
@@ -1054,7 +1051,6 @@
     <ClInclude Include="game\components\item_component.h" />
     <ClInclude Include="game\components\melee_component.h" />
     <ClInclude Include="game\components\name_component.h" />
-    <ClInclude Include="game\components\physics_definition_component.h" />
     <ClInclude Include="game\components\position_copying_component.h" />
     <ClInclude Include="game\components\crosshair_component.h" />
     <ClInclude Include="game\components\damage_component.h" />
@@ -1237,11 +1233,9 @@
     <ClInclude Include="augs\misc\id_generator.h" />
     <ClInclude Include="augs\misc\input_player.h" />
     <ClInclude Include="augs\misc\map_wrapper.h" />
-    <ClInclude Include="augs\misc\memory_pool.h" />
     <ClInclude Include="augs\misc\object_pool.h" />
     <ClInclude Include="augs\misc\ptr_wrapper.h" />
     <ClInclude Include="augs\misc\randomization.h" />
-    <ClInclude Include="augs\misc\simple_pool.h" />
     <ClInclude Include="augs\misc\smooth_value_field.h" />
     <ClInclude Include="augs\misc\sorted_vector.h" />
     <ClInclude Include="augs\misc\step_player.h" />

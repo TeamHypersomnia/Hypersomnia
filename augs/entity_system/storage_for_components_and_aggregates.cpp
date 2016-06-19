@@ -10,7 +10,7 @@ namespace augs {
 
 	template<class...components>
 	void storage_for_components_and_aggregates<components...>::reserve_storage_for_aggregates(size_t n) {
-		pool_for_aggregates.initialize(n);
+		pool_for_aggregates.initialize_space(n);
 
 		auto r = [this, n](auto elem) {
 			std::get<object_pool<decltype(elem)>>(pools_for_components).initialize(n);
@@ -21,17 +21,19 @@ namespace augs {
 
 	template<class...components>
 	typename storage_for_components_and_aggregates<components...>::aggregate_id 
-		storage_for_components_and_aggregates<components...>::clone_aggregate(typename storage_for_components_and_aggregates<components...>::aggregate_id aggregate) {
+		storage_for_components_and_aggregates<components...>::clone_aggregate(typename storage_for_components_and_aggregates<components...>::aggregate_id aggregate_id) {
 		
-		auto new_aggregate = pool_for_aggregates.allocate();
-		
-		auto& from = *aggregate;
-		auto& to = *new_aggregate;
+		auto new_aggregate_id = pool_for_aggregates.allocate();
+		auto& new_aggregate = pool_for_aggregates.get(new_aggregate_id);
 
-		to.removed_from_processing_subjects = from.removed_from_processing_subjects;
+		auto& from_handle = get_handle(aggregate_id);
+		auto& to = new_aggregate;
 
-		for_each_type<components...>([this, &from, &to](auto c) {
-			auto* maybe_component = from.find<decltype(c)>();
+		auto& aggregate = pool_for_aggregates.get(aggregate_id);
+		to.removed_from_processing_subjects = aggregate.removed_from_processing_subjects;
+
+		for_each_type<components...>([this, &from_handle, &to](auto c) {
+			auto* maybe_component = from_handle.find<decltype(c)>();
 
 			if (maybe_component) {
 				ensure(to.find<decltype(c)>() == nullptr);
@@ -40,9 +42,9 @@ namespace augs {
 			}
 		});
 
-		new_aggregate.set_debug_name(aggregate.get_debug_name());
+		new_aggregate_id.set_debug_name(aggregate_id.get_debug_name());
 
-		return new_aggregate;
+		return new_aggregate_id;
 	}
 
 	template<class...components>
@@ -51,7 +53,8 @@ namespace augs {
 	}
 
 	template<class...components>
-	const configurable_components<components...>& storage_for_components_and_aggregates<components...>::component_aggregate::get_definition() const {
+	template<class reference_type>
+	const configurable_components<components...>& storage_for_components_and_aggregates<components...>::basic_aggregate_handle<reference_type>::get_definition() const {
 		configurable_components<components...> result;
 
 		for_each_type<components...>([this, &result](auto elem) {
@@ -65,6 +68,19 @@ namespace augs {
 		return result;
 	}
 
+	template<class...components>
+	template<class reference_type>
+	typename storage_for_components_and_aggregates<components...>::aggregate_id 
+		storage_for_components_and_aggregates<components...>::basic_aggregate_handle<reference_type>::get_id() const {
+		return raw_id;
+	}
+
 }
+
+//template <class... components>
+//template class augs::storage_for_components_and_aggregates<components...>::basic_aggregate_handle<augs::storage_for_components_and_aggregates<components...>>;
+//
+//template <class... components>
+//template class augs::storage_for_components_and_aggregates<components...>::basic_aggregate_handle<const augs::storage_for_components_and_aggregates<components...>>;
 
 #include "components_instantiation.h"

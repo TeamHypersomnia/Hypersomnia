@@ -17,12 +17,23 @@ namespace components {
 	struct relations;
 }
 
-class entity_id : public aggregate_id {
+class cosmos;
+class entity_handle;
+
+class entity_id : public storage_for_all_components_and_aggregates::aggregate_id {
+public:
+
+};
+
+class entity_handle : public storage_for_all_components_and_aggregates::aggregate_handle {
 	components::relations& relations();
 	const components::relations& relations() const;
 
 	void make_child(entity_id p, sub_entity_name);
 public:
+	entity_handle(entity_id, cosmos&);
+	entity_handle(entity_id, const cosmos&);
+
 	inventory_slot_id operator[](slot_function);
 	const entity_id& operator[](sub_entity_name) const;
 	entity_id& operator[](associated_entity_name);
@@ -45,9 +56,4 @@ public:
 
 	void skip_processing_in(processing_subjects);
 	void unskip_processing_in(processing_subjects);
-};
-
-class entity_handle {
-
-
 };

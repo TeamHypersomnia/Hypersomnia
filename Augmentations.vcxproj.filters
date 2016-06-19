@@ -858,12 +858,6 @@
     <ClCompile Include="augs\misc\fixed_delta_timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="augs\misc\memory_pool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="augs\misc\object_pool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="augs\misc\smooth_value_field.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1000,9 +994,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\detail\gui\cursor_and_tooltip.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\components\physics_definition_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\components\damage_component.cpp">
@@ -2828,16 +2819,10 @@
     <ClInclude Include="augs\misc\map_wrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\misc\memory_pool.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\misc\object_pool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\ptr_wrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\misc\simple_pool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\smooth_value_field.h">
@@ -2907,9 +2892,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\log.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\misc\constant_size_vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\systems\item_system.h">
@@ -3006,9 +2988,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\systems\intent_contextualization_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\components\physics_definition_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\components\item_slot_transfers_component.h">
@@ -3408,6 +3387,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\globals\processing_subjects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\simple_pool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
