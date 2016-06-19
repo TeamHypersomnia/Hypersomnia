@@ -88,27 +88,3 @@ static luabind::scope bind_stdvector(const char* name) {
 		.def("reserve", &std::vector<T>::reserve)
 		.def("data", (T* (__thiscall std::vector<T>::*) ()) (&std::vector<T>::data));
 }
-
-
-#include "misc/map_wrapper.h"
-
-template<class key, class value>
-static luabind::scope bind_map_wrapper(const char* name) {
-	typedef augs::map_wrapper<key, value> V;
-
-	return
-		luabind::class_<V::find_result>((std::string(name) + std::string("find_result")).c_str())
-		.property("value", &V::find_result::get_value)
-		.def_readwrite("found", &V::find_result::found),
-
-		luabind::class_<V>(name)
-		.def(luabind::constructor<>())
-		.def("add", &V::add)
-		.def("insert", &V::insert)
-		.def("at", &V::at)
-		.def("get", &V::get)
-		.def("find", &V::find)
-		.def("remove", &V::remove)
-		.def("size", &V::size);
-}
-

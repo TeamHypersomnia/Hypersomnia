@@ -2,7 +2,6 @@
 #include <unordered_map>
 
 #include "game/messages/animation_message.h"
-#include "misc/map_wrapper.h"
 
 #include "game/resources/animation.h"
 #include "game/assets/animation_id.h"
