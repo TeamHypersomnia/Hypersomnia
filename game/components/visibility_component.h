@@ -5,7 +5,6 @@
 #include <Box2D\Dynamics\b2Fixture.h>
 
 #include "graphics/pixel.h"
-#include "misc/sorted_vector.h"
 #include "misc/timer.h"
 #include "game/systems/physics_system.h"
 
