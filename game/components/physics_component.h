@@ -47,6 +47,7 @@ namespace components {
 		void set_transform(components::transform);
 		void set_transform(entity_id);
 		
+		void set_angular_damping(float);
 		void set_linear_damping(float);
 		void set_linear_damping_vec(vec2);
 
@@ -59,6 +60,8 @@ namespace components {
 		vec2 velocity() const;
 		float get_mass() const;
 		float get_angle() const;
+		float get_angular_velocity() const;
+		float get_inertia() const;
 		vec2 get_position() const;
 		vec2 get_mass_position() const;
 		vec2 get_world_center() const;

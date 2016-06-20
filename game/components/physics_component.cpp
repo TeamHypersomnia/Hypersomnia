@@ -117,7 +117,7 @@ namespace components {
 
 		black_detail.body->SetLinearVelocity(pixels * PIXELS_TO_METERSf);
 	}	
-	
+
 	void physics::set_linear_damping(float damping) {
 		black.linear_damping = damping;
 
@@ -125,6 +125,15 @@ namespace components {
 			return;
 
 		black_detail.body->SetLinearDamping(damping);
+	}
+
+	void physics::set_angular_damping(float damping) {
+		black.angular_damping = damping;
+
+		if (!syncable_black_box_exists())
+			return;
+
+		black_detail.body->SetAngularDamping(damping);
 	}
 
 	void physics::set_linear_damping_vec(vec2 damping) {
@@ -191,6 +200,16 @@ namespace components {
 	float physics::get_angle() const {
 		ensure(syncable_black_box_exists());
 		return black_detail.body->GetAngle() * RAD_TO_DEG;
+	}
+
+	float physics::get_angular_velocity() const {
+		ensure(syncable_black_box_exists());
+		return black_detail.body->GetAngularVelocity() * RAD_TO_DEG;
+	}
+
+	float physics::get_inertia() const {
+		ensure(syncable_black_box_exists());
+		return black_detail.body->GetInertia();
 	}
 
 	vec2 physics::get_position() const {

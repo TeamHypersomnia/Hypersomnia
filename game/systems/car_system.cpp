@@ -57,7 +57,7 @@ void car_system::apply_movement_forces(cosmos& cosmos, step_state& step) {
 		vec2 forward_dir;
 		vec2 right_normal;
 
-		forward_dir = forward_dir.set_from_radians(physics.body->GetAngle());
+		forward_dir = forward_dir.set_from_degrees(physics.get_angle());
 		right_normal = forward_dir.perpendicular_cw();
 
 		resultant.x = car.accelerating * car.input_acceleration.x - car.deccelerating * car.input_acceleration.x;
@@ -105,10 +105,10 @@ void car_system::apply_movement_forces(cosmos& cosmos, step_state& step) {
 		float base_angular_damping = 0.f;
 
 		if (car.braking_angular_damping >= 0.f) {
-			if (physics.body->GetAngularVelocity() < 0 && resultant.y > 0) {
+			if (physics.get_angular_velocity() < 0 && resultant.y > 0) {
 				base_angular_damping += car.braking_angular_damping;
 			}
-			else if (physics.body->GetAngularVelocity() > 0 && resultant.y < 0) {
+			else if (physics.get_angular_velocity() > 0 && resultant.y < 0) {
 				base_angular_damping += car.braking_angular_damping;
 			}
 			else if (resultant.y == 0) {
@@ -122,20 +122,18 @@ void car_system::apply_movement_forces(cosmos& cosmos, step_state& step) {
 			lateral.set_length(car.maximum_lateral_cancellation_impulse);
 			
 		if (!car.hand_brake) {
-			physics.body->SetAngularDamping(base_angular_damping + car.angular_damping);
+			physics.set_angular_damping(base_angular_damping + car.angular_damping);
 			physics.apply_impulse(-lateral * physics.get_mass() * car.lateral_impulse_multiplier);
 			physics.angular_air_resistance = car.angular_air_resistance;
 		}
 		else {
 			physics.angular_air_resistance = car.angular_air_resistance_while_hand_braking;
-			physics.body->SetAngularDamping(base_angular_damping + car.angular_damping_while_hand_braking);
+			physics.set_angular_damping(base_angular_damping + car.angular_damping_while_hand_braking);
 		}
 
-		auto body = physics.body;
-
 		if(forwardal_speed > car.minimum_speed_for_maneuverability_decrease)
-			body->ApplyAngularImpulse(body->GetInertia() * -body->GetAngularVelocity() * 
-				(forwardal_speed-car.minimum_speed_for_maneuverability_decrease)*car.maneuverability_decrease_multiplier, true);
+			physics.apply_angular_impulse(physics.get_inertia() * -physics.get_angular_velocity() * DEG_TO_RAD * 
+				(forwardal_speed-car.minimum_speed_for_maneuverability_decrease)*car.maneuverability_decrease_multiplier);
 
 		//float angle = physics.get_angle();
 		//LOG("F: %x, %x, %x", AS_INTV physics.get_position(), AS_INT angle, AS_INTV physics.velocity());
