@@ -1,16 +1,13 @@
 #pragma once
-#include "game/components/camera_component.h"
-#include "game/components/transform_component.h"
-#include "render_system.h"
 
-using namespace augs;
+class cosmos;
+class step_state;
 
-class camera_system : public processing_system_templated<components::transform, components::camera> {
+class camera_system {
 public:
-	using processing_system_templated::processing_system_templated;
 
-	void react_to_input_intents();
+	void react_to_input_intents(cosmos& cosmos, step_state& step);
 
-	void resolve_cameras_transforms_and_smoothing();
-	void post_render_requests_for_all_cameras();
+	void resolve_cameras_transforms_and_smoothing(cosmos& cosmos, step_state& step);
+	void post_render_requests_for_all_cameras(cosmos& cosmos, step_state& step);
 };

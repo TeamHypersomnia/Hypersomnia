@@ -12,6 +12,17 @@
 #include "game/detail/state_for_drawing.h"
 #include "game/cosmos.h"
 
+#include "game/components/camera_component.h"
+#include "game/components/transform_component.h"
+#include "graphics/renderer.h"
+
+
+#include "game/entity_handle.h"
+#include "game/step_state.h"
+
+
+using namespace augs;
+
 void update_bounds_for_crosshair(components::camera& camera, components::crosshair& crosshair) {
 	if (camera.orbit_mode == components::camera::ANGLED)
 		crosshair.bounds_for_base_offset = camera.visible_world_area / 2.f;
@@ -19,43 +30,43 @@ void update_bounds_for_crosshair(components::camera& camera, components::crossha
 		crosshair.bounds_for_base_offset = camera.max_look_expand + camera.visible_world_area / 2.f;
 }
 
-void camera_system::react_to_input_intents() {
+void camera_system::react_to_input_intents(cosmos& cosmos, step_state& step) {
 	auto events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto it : events) {
-		if (it.subject.find<components::camera>() == nullptr)
+		if (cosmos.get_handle(it.subject).find<components::camera>() == nullptr)
 			continue;
 
 		if (it.intent == intent_type::SWITCH_LOOK && it.pressed_flag) {
-			auto& camera = it.subject.get<components::camera>();
+			auto& camera = cosmos.get_handle(it.subject).get<components::camera>();
 			auto& mode = camera.orbit_mode;
 
 			if (mode == components::camera::LOOK)
 				mode = components::camera::ANGLED;
 			else mode = components::camera::LOOK;
 
-			auto crosshair = camera.entity_to_chase[sub_entity_name::CHARACTER_CROSSHAIR];
+			auto crosshair = cosmos.get_handle(camera.entity_to_chase)[sub_entity_name::CHARACTER_CROSSHAIR];
 
 			if (crosshair.alive())
-				update_bounds_for_crosshair(camera, crosshair.get<components::crosshair>());
+				update_bounds_for_crosshair(camera, cosmos.get_handle(crosshair).get<components::crosshair>());
 		}
 	}
 }
 
-void components::camera::configure_camera_and_character_with_crosshair(entity_id camera, entity_id character, entity_id crosshair) {
-	camera.get<components::camera>().entity_to_chase = character;
-	camera.get<components::position_copying>().set_target(character);
+void components::camera::configure_camera_and_character_with_crosshair(cosmos& cosmos,entity_id camera, entity_id character, entity_id crosshair) {
+	cosmos.get_handle(camera).get<components::camera>().entity_to_chase = character;
+	cosmos.get_handle(camera).get<components::position_copying>().set_target(character);
 
-	update_bounds_for_crosshair(camera.get<components::camera>(), crosshair.get<components::crosshair>());
+	update_bounds_for_crosshair(cosmos.get_handle(camera).get<components::camera>(), cosmos.get_handle(crosshair).get<components::crosshair>());
 }
 
-vec2i components::camera::get_camera_offset_due_to_character_crosshair(entity_id self) const {
+vec2i components::camera::get_camera_offset_due_to_character_crosshair(cosmos& cosmos, entity_id self) const {
 	vec2 camera_crosshair_offset;
 
-	if (entity_to_chase.dead())
+	if (cosmos.get_handle(entity_to_chase).dead())
 		return vec2i(0, 0);
 
-	auto crosshair_entity = entity_to_chase[sub_entity_name::CHARACTER_CROSSHAIR];
+	auto crosshair_entity = cosmos.get_handle(entity_to_chase)[sub_entity_name::CHARACTER_CROSSHAIR];
 
 	/* if we set player and crosshair entity targets */
 	/* skip calculations if no orbit_mode is specified */
@@ -77,13 +88,16 @@ vec2i components::camera::get_camera_offset_due_to_character_crosshair(entity_id
 	return camera_crosshair_offset;
 }
 
-void camera_system::resolve_cameras_transforms_and_smoothing() {
+void camera_system::resolve_cameras_transforms_and_smoothing(cosmos& cosmos, step_state& step) {
+
+	auto targets_copy = cosmos.get(processing_subjects::WITH_CAMERA);
 	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
-	std::sort(targets.begin(), targets.end(), [](entity_id a, entity_id b) {
+	std::sort(targets_copy.begin(), targets_copy.end(), [](const entity_handle& a, const entity_handle& b) {
 		return a.get<components::camera>().layer > b.get<components::camera>().layer;
 	});
 
-	for (auto e : targets) {
+
+	for (auto e : targets_copy) {
 		auto& camera = e.get<components::camera>();
 
 		if (camera.enabled) {
@@ -91,7 +105,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 			auto transform = e.get<components::transform>();
 			transform.pos = vec2i(transform.pos);
 
-			vec2i camera_crosshair_offset = camera.get_camera_offset_due_to_character_crosshair(e);
+			vec2i camera_crosshair_offset = camera.get_camera_offset_due_to_character_crosshair(cosmos, e.get_id());
 
 			components::transform smoothed_camera_transform;
 			vec2 smoothed_visible_world_area;
@@ -103,7 +117,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 
 			if (camera.enable_smoothing) {
 				/* variable time step camera smoothing by averaging last position with the current */
-				float averaging_constant = 1.0f - pow(camera.smoothing_average_factor, camera.averages_per_sec * delta_seconds());
+				float averaging_constant = 1.0f - pow(camera.smoothing_average_factor, camera.averages_per_sec * cosmos.delta.in_seconds());
 				
 				if (camera.dont_smooth_once)
 					averaging_constant = 0.0f;
@@ -143,9 +157,9 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 				smoothed_visible_world_area = camera.last_ortho_interpolant;
 			}
 
-			if (camera.entity_to_chase.alive()) {
+			if (cosmos.get_handle(camera.entity_to_chase).alive()) {
 				vec2 target_value;
-				auto maybe_physics = camera.entity_to_chase.find<components::physics>();
+				auto maybe_physics = cosmos.get_handle(camera.entity_to_chase).find<components::physics>();
 
 				if (maybe_physics) {
 					auto player_pos = maybe_physics->get_mass_position();
@@ -155,7 +169,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 						camera.previous_step_player_position = player_pos;
 					}
 
-					target_value = (player_pos - camera.previous_seen_player_position) * fixed_delta_milliseconds();
+					target_value = (player_pos - camera.previous_seen_player_position) * cosmos.delta.in_milliseconds();
 					auto vel = maybe_physics->velocity();
 					
 					if (target_value.length() < camera.smoothing_player_pos.value.length())
@@ -170,7 +184,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 					// LOG("%x, %x, %x", *(vec2i*)&player_pos, *(vec2i*)&camera.previous_step_player_position, *(vec2i*)&target_value);
 				}
 				else {
-					target_value = camera.entity_to_chase.get<components::render>().interpolation_direction();
+					target_value = cosmos.get_handle(camera.entity_to_chase).get<components::render>().interpolation_direction();
 					target_value.set_length(100);
 					camera.smoothing_player_pos.averages_per_sec = 5;
 				}
@@ -188,7 +202,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 			in.transformed_visible_world_area_aabb = get_aabb_rotated(smoothed_visible_world_area, smoothed_camera_transform.rotation) 
 				+ smoothed_camera_transform.pos - smoothed_visible_world_area / 2;
 			in.camera_transform = smoothed_camera_transform;
-			in.output = &get_renderer();
+			in.output = &augs::renderer::get_current();
 			in.visible_world_area = smoothed_visible_world_area;
 			in.viewport = camera.viewport;
 
@@ -197,11 +211,12 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 	}
 }
 
-void camera_system::post_render_requests_for_all_cameras() {
+void camera_system::post_render_requests_for_all_cameras(cosmos& cosmos, step_state& step) {
 	step.messages.get_queue<messages::camera_render_request_message>().clear();
 
-	for (auto e : targets) {
-		auto& camera = e.get<components::camera>();
+	auto targets_copy = cosmos.get(processing_subjects::WITH_CAMERA);
+	for (auto e : targets_copy) {
+		auto& camera = cosmos.get_handle(e).get<components::camera>();
 
 		if (camera.enabled) {
 			auto& in = camera.how_camera_will_render;

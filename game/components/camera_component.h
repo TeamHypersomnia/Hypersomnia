@@ -12,6 +12,7 @@
 
 class camera_system;
 class gun_system;
+class cosmos;
 
 namespace components {
 	struct camera  {
@@ -21,7 +22,7 @@ namespace components {
 			LOOK
 		} orbit_mode = NONE;
 
-		static void configure_camera_and_character_with_crosshair(entity_id camera, entity_id character, entity_id crosshair);
+		static void configure_camera_and_character_with_crosshair(cosmos& cosmos,entity_id camera, entity_id character, entity_id crosshair);
 
 		augs::rects::xywh<int> viewport;
 		vec2 visible_world_area;
@@ -50,7 +51,7 @@ namespace components {
 
 		augs::smooth_value_field smoothing_player_pos;
 		
-		vec2i get_camera_offset_due_to_character_crosshair(entity_id self) const;
+		vec2i get_camera_offset_due_to_character_crosshair(cosmos& cosmos, entity_id self) const;
 		
 		shared::state_for_drawing_camera how_camera_will_render;
 
