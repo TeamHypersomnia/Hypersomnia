@@ -1,6 +1,5 @@
 #pragma once
 #include "math/vec2.h"
-#include "visibility_component.h"
 
 class pathfinding_system;
 

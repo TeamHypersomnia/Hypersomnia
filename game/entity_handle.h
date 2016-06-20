@@ -42,6 +42,12 @@ public:
 	void for_each_sub_definition(std::function<void(const full_entity_definition&)>) const;
 
 	basic_entity_handle get_parent() const;
+	
+	template <class component>
+	bool has() const {
+		return basic_aggregate_handle<is_const>::has<component>();
+	}
+
 	bool has(sub_entity_name) const;
 	bool has(sub_definition_name) const;
 	bool has(associated_entity_name) const;

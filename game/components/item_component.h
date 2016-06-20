@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include "container_component.h"
 #include "transform_component.h"
 #include "game/detail/inventory_slot_id.h"

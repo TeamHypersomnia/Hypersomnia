@@ -1,6 +1,7 @@
 #pragma once
 #include "misc/machine_entropy.h"
-#include "game/types_specification/components_instantiation.h"
+#include "entity_system/storage_for_components_and_aggregates.h"
+#include "game/types_specification/storage_instantiation.h"
 #include "game/types_specification/stateful_systems_instantiation.h"
 
 #include "game/lists_of_processing_subjects.h"

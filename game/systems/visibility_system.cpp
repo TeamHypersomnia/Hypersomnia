@@ -16,6 +16,9 @@
 #include "game/components/physics_component.h"
 #include "game/components/visibility_component.h"
 #include "game/components/transform_component.h"
+#include "game/components/item_component.h"
+#include "game/components/sentience_component.h"
+#include "game/components/attitude_component.h"
 
 #include "game/globals/processing_subjects.h"
 #include "game/entity_handle.h"
@@ -135,19 +138,19 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 					target_sets.clear();
 
 					if (request.test_items) {
-						if (candidate.find<components::item>() != nullptr) {
+						if (candidate.has<components::item>()) {
 							target_sets.push_back(&request.visible_items);
 						}
 					}
 
 					if (request.test_sentiences) {
-						if (candidate.find<components::sentience>() != nullptr) {
+						if (candidate.has<components::sentience>()) {
 							target_sets.push_back(&request.visible_sentiences);
 						}
 					}
 
 					if (request.test_attitudes) {
-						if (candidate.find<components::attitude>() != nullptr) {
+						if (candidate.has<components::attitude>()) {
 							target_sets.push_back(&request.visible_attitudes);
 						}
 					}

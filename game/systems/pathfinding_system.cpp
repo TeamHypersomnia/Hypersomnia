@@ -3,12 +3,14 @@
 #include "game/cosmos.h"
 #include "game/entity_id.h"
 
-#include "render_system.h"
 #include "physics_system.h"
 
 #include "game/components/pathfinding_component.h"
+#include "game/components/visibility_component.h"
 
+#include "graphics/renderer.h"
 #include "game/globals/processing_subjects.h"
+#include "game/entity_handle.h"
 
 pathfinding_system::pathfinding_system() : draw_memorised_walls(false), draw_undiscovered(false),
 	epsilon_distance_the_same_vertex(50.f), epsilon_distance_visible_point(2) {}
@@ -23,12 +25,12 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 	auto& renderer = augs::renderer::get_current();
 	auto& lines = augs::renderer::get_current().logic_lines;
 
-	for (auto it : cosmos.get(processing_subjects::WITH_PATHFINDING)) {
+	for (auto& it : cosmos.get(processing_subjects::WITH_PATHFINDING)) {
 		/* get necessary components */
-		auto& visibility = it->get<components::visibility>();
-		auto& pathfinding = it->get<components::pathfinding>();
-		auto transform = it->get<components::transform>();
-		auto& body = it->get<components::physics>();
+		auto& visibility = it.get<components::visibility>();
+		auto& pathfinding = it.get<components::pathfinding>();
+		auto transform = it.get<components::transform>();
+		auto& body = it.get<components::physics>();
 		transform.pos += pathfinding.eye_offset;
 
 		/* check if we request pathfinding at the moment */
@@ -155,11 +157,6 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 								sensor_direction * 10 + vert.location + sensor_direction.perpendicular_cw() * 4 + sensor_direction * pathfinding.target_offset,
 								sensor_direction * 10 + vert.location + sensor_direction.perpendicular_cw() * 4
 							};
-
-							//render.non_cleared_lines.push_back(renderer(sensor_polygon[0], sensor_polygon[1], rgba(255, 255, 255, 255)));
-							//render.non_cleared_lines.push_back(renderer(sensor_polygon[1], sensor_polygon[2], rgba(255, 255, 255, 255)));
-							//render.non_cleared_lines.push_back(renderer(sensor_polygon[2], sensor_polygon[3], rgba(255, 255, 255, 255)));
-							//render.non_cleared_lines.push_back(renderer(sensor_polygon[3], sensor_polygon[0], rgba(255, 255, 255, 255)));
 
 							auto out = physics.query_polygon(sensor_polygon, vision.filter, it);
 
