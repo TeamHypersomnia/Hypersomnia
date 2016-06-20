@@ -1,20 +1,12 @@
 #pragma once
-#include "misc/timer.h"
 
-#include "game/processing_system_with_cosmos_reference.h"
+class cosmos;
+class step_state;
 
-#include "game/components/animation_component.h"
-#include "game/components/render_component.h"
-
-using namespace augs;
-
-
-class animation_system : public processing_system_templated<components::animation, components::render> {
+class animation_system {
 public:
-	using processing_system_templated::processing_system_templated;
+	void game_responses_to_animation_messages(cosmos& cosmos, step_state& step);
 
-	void game_responses_to_animation_messages();
-
-	void handle_animation_messages();
-	void progress_animation_states();
+	void handle_animation_messages(cosmos& cosmos, step_state& step);
+	void progress_animation_states(cosmos& cosmos, step_state& step);
 };

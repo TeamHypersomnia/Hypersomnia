@@ -7,10 +7,21 @@
 
 #include "game/resources/manager.h"
 
+#include "misc/timer.h"
+
+#include "game/components/animation_component.h"
+#include "game/components/render_component.h"
+
+#include "game/entity_handle.h"
+#include "game/step_state.h"
+
+
+using namespace augs;
+
 using namespace messages;
 using namespace resources;
 
-void animation_system::game_responses_to_animation_messages() {
+void game_responses_to_animation_messages(cosmos& cosmos, step_state& step) {
 	auto& movements = step.messages.get_queue<movement_response>();
 	auto& gunshots = step.messages.get_queue<gunshot_response>();
 
@@ -29,7 +40,7 @@ void animation_system::game_responses_to_animation_messages() {
 
 		msg.animation_priority = 0;
 
-		msg.set_animation = (*(it.subject.get<components::animation_response>().response))[animation_response_type::MOVE];
+		msg.set_animation = (*(cosmos.get_handle(it.subject).get<components::animation_response>().response))[animation_response_type::MOVE];
 		msg.speed_factor = it.speed;
 
 		step.messages.post(msg);
@@ -50,11 +61,11 @@ void animation_system::game_responses_to_animation_messages() {
 	}
 }
 
-void animation_system::handle_animation_messages() {
+void animation_system::handle_animation_messages(cosmos& cosmos, step_state& step) {
 	auto events = step.messages.get_queue<animation_message>();
 
 	for (auto it : events) {
-		auto ptr = it.subject.find<components::animation>();
+		auto ptr = cosmos.get_handle(it.subject).find<components::animation>();
 		if (!ptr) continue; auto& animation = *ptr;
 
 		if (it.animation_priority >= animation.priority || animation.state == components::animation::playing_state::PAUSED) {
@@ -121,10 +132,12 @@ void components::animation::set_current_frame(unsigned number) {
 	frame_num = number;
 }
 
-void animation_system::progress_animation_states() {
-	auto delta = delta_milliseconds();
+void animation_system::progress_animation_states(cosmos& cosmos, step_state& step) {
+	auto delta = cosmos.delta.in_milliseconds();
 
-	for (auto it : targets) {
+	auto targets_copy = cosmos.get(processing_subjects::WITH_ANIMATION);
+
+	for (auto it : targets_copy) {
 		auto& animation_state = it.get<components::animation>();
 
 		if (animation_state.state != components::animation::playing_state::PAUSED) {
