@@ -1,12 +1,15 @@
 #pragma once
 #include <vector>
 #include "ensure.h"
+#include "object_pool_id.h"
 
 #define USE_NAMES_FOR_IDS
 
 namespace augs {
 	template<class T>
 	class object_pool {
+		typedef augs::object_pool_id<T> object_pool_id;
+
 		struct metadata {
 			int pointing_indirector = -1;
 		};
@@ -22,107 +25,66 @@ namespace augs {
 		std::vector<int> free_indirectors;
 
 	public:
-		class id {
-		public:
-#ifdef USE_NAMES_FOR_IDS
-			char debug_name[40];
-#endif
-			int version = 0xdeadbeef;
-			int indirection_index = -1;
 
-#ifdef USE_NAMES_FOR_IDS
-			id() {
-				set_debug_name("unset");
-			}
-#endif
+		template<bool is_const>
+		class basic_handle {
+			typedef typename std::conditional<is_const, const object_pool&, object_pool&>::type pool_reference;
+			typedef typename std::conditional<is_const, const T&, T&>::type value_reference;
+
+		public:
+			pool_reference owner;
+			object_pool_id raw_id;
+
+			basic_handle(pool_reference owner, object_pool_id raw_id) : owner(owner), raw_id(raw_id) {}
+
 			void unset() {
-				*this = id();
+				raw_id.unset();
 			}
 
 			void set_debug_name(std::string s) {
-#ifdef USE_NAMES_FOR_IDS
-				ensure(s.size() < sizeof(debug_name) / sizeof(char));
-				strcpy(debug_name, s.c_str());
-#endif
+				raw_id.set_debug_name(s);
 			}
 
-			std::string get_debug_name() const {
-#ifdef USE_NAMES_FOR_IDS
-				return debug_name;
-#else
-				ensure(0);
-#endif
+			value_reference get() const {
+				return owner.get(raw_id);
 			}
-		};
-
-		static id dead_id;
-
-		template<class reference_type>
-		class basic_handle {
-		public:
-			reference_type& owner;
-			id raw_id;
-
-			basic_handle(reference_type& owner, id raw_id) : owner(owner), raw_id(raw_id) {}
 
 			bool alive() const {
-				return owner.alive(*this);
+				return owner.alive(raw_id);
 			}
 
 			bool dead() const {
 				return !alive();
 			}
 
-			bool operator!() const {
-				return !alive();
-			}
-
-			bool operator==(const id& b) const {
-				bool result = alive() && b.alive() && &owner == &b.owner && (indirection_index == b.indirection_index && version == b.version);
-				return result;
-			}
-
-			bool operator!=(const id& b) const {
-				return !operator==(b);
-			}
-
-			const T& get() const {
-				return owner.get(*this);
-			}
-
-			const object_pool& get_pool() const {
+			pool_reference get_pool() const {
 				return owner;
 			}
+
+			object_pool_id get_id() const {
+				return raw_id;
+			}
+
+			//bool operator!() const {
+			//	return !alive();
+			//}
+			//
+			//bool operator==(const basic_handle& b) const {
+			//	bool result = alive() && b.alive() && &owner == &b.owner && raw_id == b.raw_id;
+			//	return result;
+			//}
+			//
+			//bool operator!=(const basic_handle& b) const {
+			//	return !operator==(b);
+			//}
 
 			std::string get_debug_name() const {
 				return raw_id.get_debug_name();
 			}
-
-			id get_id() const {
-				return raw_id;
-			}
 		};
 
-		class handle : public basic_handle<object_pool> {
-		public:
-			void unset() {
-				raw_id.unset();
-			}
-
-			object_pool& get_pool() {
-				return owner;
-			}
-
-			T& get() {
-				return owner.get(*this);
-			}
-
-			void set_debug_name(std::string s) {
-				raw_id.set_debug_name(s);
-			}
-		};
-
-		typedef basic_handle<const object_pool> const_handle;
+		typedef basic_handle<false> handle;
+		typedef basic_handle<true> const_handle;
 
 		object_pool(int slot_count = 0) {
 			initialize_space(slot_count);
@@ -145,7 +107,7 @@ namespace augs {
 		}
 
 		template<typename... Args>
-		id allocate(Args... args) {
+		object_pool_id allocate(Args... args) {
 			if (free_indirectors.empty())
 				throw std::runtime_error("Pool is full!");
 
@@ -159,7 +121,7 @@ namespace augs {
 			new_slot.pointing_indirector = next_free_indirection;
 			indirector.real_index = new_slot_index;
 
-			id allocated_id;
+			object_pool_id allocated_id;
 			allocated_id.version = indirector.version;
 			allocated_id.indirection_index = next_free_indirection;
 
@@ -169,7 +131,7 @@ namespace augs {
 			return allocated_id;
 		}
 
-		bool free(id object) {
+		bool free(object_pool_id object) {
 			if (!alive(object))
 				return false;
 
@@ -195,29 +157,25 @@ namespace augs {
 			pool.erase(slots.rbegin());
 		}
 
-		handle get_handle(id from_id) {
+		handle get_handle(object_pool_id from_id) {
 			return{ *this, from_id };
 		}
 
-		const_handle get_handle(id from_id) const {
+		const_handle get_handle(object_pool_id from_id) const {
 			return{ *this, from_id };
 		}
 
-		T& get(id object) {
-			if (!alive(object))
-				return nullptr;
-
-			return pool[indirectors[object.indirection_index]];
+		T& get(object_pool_id object) {
+			ensure(alive(object));
+			return pool[indirectors[object.indirection_index].real_index];
 		}
 
-		const T& get(id object) const {
-			if (!alive(object))
-				return nullptr;
-
-			return pool[indirectors[object.indirection_index]];
+		const T& get(object_pool_id object) const {
+			ensure(alive(object));
+			return pool[indirectors[object.indirection_index].real_index];
 		}
 
-		bool alive(id object) const {
+		bool alive(object_pool_id object) const {
 			return object.indirection_index >= 0 && indirectors[object.indirection_index].version == object.version;
 		}
 

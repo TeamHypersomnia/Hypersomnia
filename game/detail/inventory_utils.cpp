@@ -2,6 +2,7 @@
 #include "game/entity_id.h"
 #include "game/cosmos.h"
 #include "game/components/item_component.h"
+#include "game/components/damage_component.h"
 
 #include "templates.h"
 #include "ensure.h"
@@ -211,8 +212,6 @@ void for_each_descendant(entity_id item, std::function<void(entity_id item)> f) 
 	}
 }
 
-#include "game/components/damage_component.h"
-
 bool can_merge_entities(entity_id a, entity_id b) {
 	return 
 		components::item::can_merge_entities(a, b) &&
@@ -282,4 +281,18 @@ void drop_from_all_slots(entity_id c) {
 			c->get_owner_world().post_message(request);
 		}
 	}
+}
+
+unsigned calculate_space_occupied_with_children(entity_id item) {
+	auto space_occupied = item->get<components::item>().get_space_occupied();
+
+	if (item->find<components::container>()) {
+		ensure(item->get<components::item>().charges == 1);
+
+		for (auto& slot : item->get<components::container>().slots)
+			for (auto& entity_in_slot : slot.second.items_inside)
+				space_occupied += calculate_space_occupied_with_children(entity_in_slot);
+	}
+
+	return space_occupied;
 }

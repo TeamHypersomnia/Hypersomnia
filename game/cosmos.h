@@ -7,14 +7,18 @@
 
 #include "misc/delta.h"
 #include "game/entity_id.h"
+#include "game/entity_handle_declaration.h"
+#include "game/detail/inventory_slot_handle_declaration.h"
 
 class cosmic_profiler;
 
+struct inventory_slot_id;
+
 class cosmos {
-public:
 	storage_for_all_components_and_aggregates components_and_aggregates;
 
-	entity_id substantialize(aggregate_id);
+	entity_id substantialize(entity_id);
+	
 public:
 	storage_for_all_stateful_systems stateful_systems;
 	lists_of_processing_subjects lists_of_processing_subjects;
@@ -46,7 +50,14 @@ public:
 	void advance_deterministic_schemata(augs::machine_entropy input, cosmic_profiler&);
 	void call_rendering_schemata(augs::variable_delta delta, cosmic_profiler&) const;
 
-	std::vector<entity_id> get(processing_subjects) const;
+	entity_handle get_handle(entity_id);
+	const_entity_handle get_handle(entity_id) const;
+	inventory_slot_handle get_handle(inventory_slot_id);
+	const_inventory_slot_handle get_handle(inventory_slot_id) const;
+
+	std::vector<entity_handle> get(processing_subjects);
+	std::vector<const_entity_handle> get(processing_subjects) const;
+
 	size_t entities_count() const;
 	std::wstring summary() const;
 };

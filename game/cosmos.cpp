@@ -35,6 +35,8 @@
 
 #include "game/step_state.h"
 #include "game/cosmic_profiler.h"
+#include "game/entity_handle.h"
+#include "game/detail/inventory_slot_handle.h"
 
 using namespace components;
 using namespace messages;
@@ -81,8 +83,28 @@ std::wstring cosmos::summary() const {
 	return typesafe_sprintf(L"Entities: %x\n", entities_count());
 }
 
-std::vector<entity_id> cosmos::get(processing_subjects list) const {
-	return lists_of_processing_subjects.get(list);
+std::vector<entity_handle> cosmos::get(processing_subjects list) {
+	return lists_of_processing_subjects.get(list, *this);
+}
+
+std::vector<const_entity_handle> cosmos::get(processing_subjects list) const {
+	return lists_of_processing_subjects.get(list, *this);
+}
+
+entity_handle cosmos::get_handle(entity_id id) {
+	return entity_handle(components_and_aggregates, id);
+}
+
+const_entity_handle cosmos::get_handle(entity_id id) const {
+	return const_entity_handle(components_and_aggregates, id);
+}
+
+inventory_slot_handle cosmos::get_handle(inventory_slot_id id) {
+	return inventory_slot_handle(components_and_aggregates, id);
+}
+
+const_inventory_slot_handle cosmos::get_handle(inventory_slot_id id) const {
+	return const_inventory_slot_handle(components_and_aggregates, id);
 }
 
 void cosmos::advance_deterministic_schemata(augs::machine_entropy input, cosmic_profiler& profiler) {
@@ -218,15 +240,12 @@ cosmos::cosmos() {
 	stateful_systems.create<physics_system>(std::ref(*this));
 }
 
-entity_id cosmos::substantialize(aggregate_id aggregate) {
-	entity_id new_id;
-	new_id.aggregate_id::operator=(aggregate);
-
+entity_id cosmos::substantialize(entity_id new_id) {
 	lists_of_processing_subjects.add_entity_to_matching_lists(new_id);
 
-	messages::new_entity_message notification;
-	notification.subject = new_id;
-	messages.post(notification);
+	//messages::new_entity_message notification;
+	//notification.subject = new_id;
+	//messages.post(notification);
 
 	return new_id;
 }

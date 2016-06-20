@@ -2,7 +2,6 @@
 #include "game/types_specification/all_component_includes.h"
 
 namespace augs {
-
 	template<class...components>
 	size_t storage_for_components_and_aggregates<components...>::aggregates_count() const {
 		return pool_for_aggregates.size();
@@ -22,7 +21,7 @@ namespace augs {
 	template<class...components>
 	typename storage_for_components_and_aggregates<components...>::aggregate_id 
 		storage_for_components_and_aggregates<components...>::clone_aggregate(typename storage_for_components_and_aggregates<components...>::aggregate_id aggregate_id) {
-		
+
 		auto new_aggregate_id = pool_for_aggregates.allocate();
 		auto& new_aggregate = pool_for_aggregates.get(new_aggregate_id);
 
@@ -38,7 +37,7 @@ namespace augs {
 			if (maybe_component) {
 				ensure(to.find<decltype(c)>() == nullptr);
 
-				writable_id<decltype(c)>(to) = allocate_component<decltype(c)>(*maybe_component);
+				to.get_id<decltype(c)>() = allocate_component<decltype(c)>(*maybe_component);
 			}
 		});
 
@@ -53,8 +52,8 @@ namespace augs {
 	}
 
 	template<class...components>
-	template<class reference_type>
-	const configurable_components<components...>& storage_for_components_and_aggregates<components...>::basic_aggregate_handle<reference_type>::get_definition() const {
+	template<bool is_const>
+	const configurable_components<components...>& storage_for_components_and_aggregates<components...>::basic_aggregate_handle<is_const>::get_definition() const {
 		configurable_components<components...> result;
 
 		for_each_type<components...>([this, &result](auto elem) {
@@ -69,18 +68,12 @@ namespace augs {
 	}
 
 	template<class...components>
-	template<class reference_type>
+	template<bool is_const>
 	typename storage_for_components_and_aggregates<components...>::aggregate_id 
-		storage_for_components_and_aggregates<components...>::basic_aggregate_handle<reference_type>::get_id() const {
+		storage_for_components_and_aggregates<components...>::basic_aggregate_handle<is_const>::get_id() const {
 		return raw_id;
 	}
 
 }
 
-//template <class... components>
-//template class augs::storage_for_components_and_aggregates<components...>::basic_aggregate_handle<augs::storage_for_components_and_aggregates<components...>>;
-//
-//template <class... components>
-//template class augs::storage_for_components_and_aggregates<components...>::basic_aggregate_handle<const augs::storage_for_components_and_aggregates<components...>>;
-
-#include "components_instantiation.h"
+#include "storage_instantiation.h"

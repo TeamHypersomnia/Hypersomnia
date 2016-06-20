@@ -1,174 +1,23 @@
 #include "inventory_slot.h"
 #include "game/components/item_component.h"
-#include "game/components/fixtures_component.h"
 #include "game/cosmos.h"
+
 #include "inventory_utils.h"
+#include "game/entity_handle.h"
 #include "ensure.h"
-#include "game/entity_id.h"
 
-inventory_slot* inventory_slot_id::operator->() {
-	return &container_entity->get<components::container>().slots[type];
-}
-
-inventory_slot& inventory_slot_id::operator*() {
-	return container_entity->get<components::container>().slots[type];
-}
-
-const inventory_slot* inventory_slot_id::operator->() const {
-	return &container_entity->get<components::container>().slots.at(type);
-}
-
-const inventory_slot& inventory_slot_id::operator*() const {
-	return container_entity->get<components::container>().slots.at(type);
-}
-
-bool inventory_slot_id::operator==(inventory_slot_id b) const {
-	return type == b.type && container_entity == b.container_entity;
-}
-
-bool inventory_slot_id::operator<(const inventory_slot_id& b) const {
-	if (container_entity == b.container_entity)
-		return type < b.type;
-
-	return container_entity < b.container_entity;
-}
-
-bool inventory_slot_id::operator!=(inventory_slot_id b) const {
-	return !(*this == b);
-}
-
-
-bool inventory_slot_id::alive() const {
-	if (container_entity.dead())
-		return false;
-
-	const auto* container = container_entity->find<components::container>();
-
-	return container && container->slots.find(type) != container->slots.end();
-}
-
-bool inventory_slot_id::dead() const {
-	return !alive();
-}
-
-void inventory_slot_id::unset() {
-	container_entity.unset();
-	type = slot_function::INVALID;
-}
-
-bool inventory_slot_id::is_hand_slot() const {
-	return type == slot_function::PRIMARY_HAND || type == slot_function::SECONDARY_HAND;
-}
-
-bool inventory_slot_id::is_input_enabling_slot() const {
-	return is_hand_slot();
-}
-
-bool inventory_slot_id::has_items() const {
-	return alive() && (*this)->items_inside.size() > 0;
-}
-
-entity_id inventory_slot_id::try_get_item() const {
-	return has_items() ? (*this)->items_inside[0] : entity_id();
-}
-
-bool inventory_slot_id::is_empty_slot() const {
-	return alive() && (*this)->items_inside.size() == 0;
-}
-
-bool inventory_slot_id::should_item_inside_keep_physical_body(entity_id until_parent) const {
-	bool should_item_here_keep_physical_body = (*this)->is_physical_attachment_slot;
-
-	if (container_entity == until_parent) {
-		return should_item_here_keep_physical_body;
-	}
-
-	auto* maybe_item = container_entity->find<components::item>();
-
-	if (maybe_item) {
-		//if (maybe_item->current_slot.container_entity.alive() && maybe_item->current_slot.container_entity == until_parent)
-		//	return should_item_here_keep_physical_body;
-		//else 
-			if (maybe_item->current_slot.alive())
-			return std::min(should_item_here_keep_physical_body, maybe_item->current_slot.should_item_inside_keep_physical_body(until_parent));
-	}
-
-	return should_item_here_keep_physical_body;
-}
-
-float inventory_slot_id::calculate_density_multiplier_due_to_being_attached() const {
-	ensure((*this)->is_physical_attachment_slot);
-	float density_multiplier = (*this)->attachment_density_multiplier;
-
-	auto* maybe_item = container_entity->find<components::item>();
-
-	if (maybe_item && maybe_item->current_slot.alive())
-		return density_multiplier * maybe_item->current_slot.calculate_density_multiplier_due_to_being_attached();
-
-	return density_multiplier;
-}
-
-components::transform inventory_slot_id::sum_attachment_offsets_of_parents(entity_id attached_item) const {
-	auto offset = (*this)->attachment_offset;
-	
-	auto sticking = (*this)->attachment_sticking_mode;
-
-	offset.pos += attached_item->get<components::fixtures>().get_aabb_size().get_sticking_offset(sticking);
-	offset.pos += container_entity->get<components::fixtures>().get_aabb_size().get_sticking_offset(sticking);
-
-	offset += attached_item->get<components::item>().attachment_offsets_per_sticking_mode[sticking];
-
-	auto* maybe_item = container_entity->find<components::item>();
-
-	if (maybe_item && maybe_item->current_slot.alive())
-		return offset + maybe_item->current_slot.sum_attachment_offsets_of_parents(container_entity);
-
-	return offset;
-}
-
-entity_id inventory_slot_id::get_root_container() const {
-	auto* maybe_item = container_entity->find<components::item>();
-
-	if (maybe_item && maybe_item->current_slot.alive())
-		return maybe_item->current_slot.get_root_container();
-
-	return container_entity;
-}
-
-void inventory_slot_id::add_item(entity_id id) {
-	(*this)->items_inside.push_back(id);
-	id->get<components::item>().current_slot = *this;
-}
-
-void inventory_slot_id::remove_item(entity_id id) {
-	auto& v = (*this)->items_inside;
-	v.erase(std::remove(v.begin(), v.end(), id), v.end());
-	id->get<components::item>().current_slot.unset();
-}
-
-unsigned calculate_space_occupied_with_children(entity_id item) {
-	auto space_occupied = item->get<components::item>().get_space_occupied();
-
-	if (item->find<components::container>()) {
-		ensure(item->get<components::item>().charges == 1);
-		
-		for (auto& slot : item->get<components::container>().slots)
-			for (auto& entity_in_slot : slot.second.items_inside)
-				space_occupied += calculate_space_occupied_with_children(entity_in_slot);
-	}
-
-	return space_occupied;
-}
-
-std::vector<entity_id> inventory_slot::get_mounted_items() const {
+std::vector<entity_id> inventory_slot::get_mounted_items(const cosmos& cosmos) const {
 	static thread_local std::vector<entity_id> output;
 	output.clear();
 	// TODO: actually implement mounted items
 	return items_inside;
 
-	for (auto& i : items_inside) 
-		if (i->get<components::item>().is_mounted()) 
+	for (auto& i : items_inside) {
+		auto handle = cosmos.get_handle(i);
+
+		if (handle.get<components::item>().is_mounted())
 			output.push_back(i);
+	}
 
 	return output;
 }
@@ -192,45 +41,11 @@ unsigned inventory_slot::calculate_free_space_with_children() const {
 	return space;
 }
 
-unsigned inventory_slot_id::calculate_free_space_with_parent_containers() const {
-	auto maximum_space = (*this)->calculate_free_space_with_children();
-
-	auto* maybe_item = container_entity->find<components::item>();
-
-	if (maybe_item && maybe_item->current_slot.alive())
-		return std::min(maximum_space, maybe_item->current_slot.calculate_free_space_with_parent_containers());
-
-	return maximum_space;
-}
-
-bool inventory_slot::is_category_compatible_with(entity_id id) const {
-	auto& item = id->get<components::item>();
+bool inventory_slot::is_category_compatible_with(const_entity_handle id) const {
+	auto& item = id.get<components::item>();
 	
 	if (for_categorized_items_only && (category_allowed & item.categories_for_slot_compatibility) == 0)
 		return false;
 	
 	return true;
-}
-
-void inventory_slot_id::for_each_descendant(std::function<void(entity_id item)> f) {
-	for (auto& i : (*this)->items_inside) {
-		f(i);
-		
-		auto* container = i->find<components::container>();
-		
-		if (container)
-			for (auto& s : container->slots) 
-				i[s.first].for_each_descendant(f);
-	}
-}
-
-bool inventory_slot_id::can_contain(entity_id id) const {
-	if (dead())
-		return false;
-
-	messages::item_slot_transfer_request r;
-	r.target_slot = *this;
-	r.item = id;
-
-	return containment_result(r).transferred_charges > 0;
 }

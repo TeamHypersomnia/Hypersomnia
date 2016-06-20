@@ -18,6 +18,11 @@ struct index_in_tuple<T, std::tuple<U, Types...>> {
 	static const std::size_t value = 1 + index_in_tuple<T, std::tuple<Types...>>::value;
 };
 
+template<class T, class... Types>
+class index_in_pack {
+	static const size_t value = index_in_tuple<T, std::tuple<Types...>>::value;
+};
+
 template<class T, class L>
 void erase_remove(std::vector<T>& v, const L& l) {
 	v.erase(std::remove_if(v.begin(), v.end(), l), v.end());
@@ -143,14 +148,31 @@ bool exists_in(const Container& c, T val) {
 }
 
 template<template<typename...> class List,
-	typename ...Args>
-	struct put_types_into {
-	typedef List<Args...> type;
-};
-
-template<template<typename...> class List,
 	template<typename> class Mod,
 	typename ...Args>
 	struct transform_types {
 	typedef List<typename Mod<Args>::type...> type;
 };
+
+template<bool _Test,
+	template<typename> class _Ty1,
+	template<typename> class _Ty2>
+struct conditional_template
+{	// type is _Ty2 for assumed !_Test
+	template <typename T>
+	using type = _Ty2<T>;
+};
+
+template<template<typename> class _Ty1,
+	template<typename> class _Ty2>
+struct conditional_template<true, _Ty1, _Ty2>
+{	// type is _Ty1 for _Test
+	template <typename T>
+	using type = _Ty1<T>;
+};
+
+template<class T>
+struct const_ptr { typedef const T* type; };
+
+template<class T>
+struct const_ref { typedef const T& type; };

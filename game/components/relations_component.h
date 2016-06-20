@@ -4,6 +4,10 @@
 #include "game/entity_id.h"
 #include "game/types_specification/full_entity_definition_declaration.h"
 
+#include "game/globals/sub_definition_name.h"
+#include "game/globals/sub_entity_name.h"
+#include "game/globals/associated_entity_name.h"
+
 namespace components {
 	struct relations {
 		std::unordered_map<sub_definition_name, full_entity_definition> sub_definitions_by_name;

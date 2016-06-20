@@ -3,6 +3,7 @@
 #include <memory>
 #include <tuple>
 #include <array>
+#include <functional>
 
 #include "game/entity_id.h"
 #include "game/detail/ai/goals.h"

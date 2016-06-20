@@ -10,6 +10,10 @@ extern float PIXELS_TO_METERSf;
 class physics_system;
 
 namespace components {
+	struct fixtures;
+}
+
+namespace components {
 	struct physics : public ::rigid_body_white_box {
 	private:
 		rigid_body_black_box black;

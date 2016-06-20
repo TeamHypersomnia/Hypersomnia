@@ -18,6 +18,7 @@
 #include "game/components/transform_component.h"
 
 #include "game/globals/processing_subjects.h"
+#include "game/entity_handle.h"
 
 using namespace augs;
 
@@ -102,8 +103,6 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 
 	/* we'll need a reference to physics system for raycasting */
 	physics_system& physics = cosmos.stateful_systems.get<physics_system>();
-	/* we'll need a reference to render system for debug drawing */
-	render_system& render = cosmos.stateful_systems.get<render_system>();
 
 	struct ray_input {
 		vec2 targets[2];
@@ -112,9 +111,9 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 	std::vector<std::pair<physics_system::raycast_output, physics_system::raycast_output>> all_ray_outputs;
 	std::vector<ray_input> all_ray_inputs;
 
-	for (auto it : cosmos.get(processing_subjects::WITH_VISIBILITY)) {
-		auto& visibility = it->get<components::visibility>();
-		auto& transform = it->get<components::transform>();
+	for (auto& it : cosmos.get(processing_subjects::WITH_VISIBILITY)) {
+		auto& visibility = it.get<components::visibility>();
+		auto& transform = it.get<components::transform>();
 
 		for (auto& entry : visibility.line_of_sight_layers) {
 			auto& request = entry.second;
@@ -127,26 +126,28 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 			float d = request.maximum_distance;
 			auto in_aabb = physics.query_aabb_px(transform.pos - vec2(d, d), transform.pos + vec2(d, d), request.candidate_filter, it);
 
-			for (const auto& candidate : in_aabb.entities) {
-				auto target_pos = candidate->get<components::transform>().pos;
+			for (const auto& candidate_id : in_aabb.entities) {
+				auto candidate = cosmos.get_handle(candidate_id);
+
+				auto target_pos = candidate.get<components::transform>().pos;
 				if ((target_pos - transform.pos).length_sq() <= d*d) {
 					static thread_local std::vector<std::set<entity_id>*> target_sets;
 					target_sets.clear();
 
 					if (request.test_items) {
-						if (candidate->find<components::item>() != nullptr) {
+						if (candidate.find<components::item>() != nullptr) {
 							target_sets.push_back(&request.visible_items);
 						}
 					}
 
 					if (request.test_sentiences) {
-						if (candidate->find<components::sentience>() != nullptr) {
+						if (candidate.find<components::sentience>() != nullptr) {
 							target_sets.push_back(&request.visible_sentiences);
 						}
 					}
 
 					if (request.test_attitudes) {
-						if (candidate->find<components::attitude>() != nullptr) {
+						if (candidate.find<components::attitude>() != nullptr) {
 							target_sets.push_back(&request.visible_attitudes);
 						}
 					}

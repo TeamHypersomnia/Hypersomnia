@@ -87,12 +87,23 @@ void lists_of_processing_subjects::remove_entity_from_lists(entity_id id) {
 	}
 }
 
-std::vector<entity_id> lists_of_processing_subjects::get(processing_subjects list) const {
-	auto result = lists.at(list);
+std::vector<entity_handle> lists_of_processing_subjects::get(processing_subjects list, cosmos& cosmos) const {
+	const auto& subjects = lists.at(list);
+	std::vector<entity_handle> handles;
 
-	erase_remove(result, [list](entity_id l) {
-		return l->removed_from_processing_subjects & (1 << unsigned long long(list));
-	});
+	//
+	//erase_remove(result, [list](entity_id l) {
+	//	return l->removed_from_processing_subjects & (1 << unsigned long long(list));
+	//});
+
+	for (auto s : subjects) {
+		auto handle = cosmos.get_handle(s);
+
+		if()
+	}
 
 	return result;
 }
+
+std::vector<entity_handle> get(processing_subjects, cosmos&) const;
+std::vector<const_entity_handle> get(processing_subjects, const cosmos&) const;

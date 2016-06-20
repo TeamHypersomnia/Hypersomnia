@@ -1,6 +1,9 @@
 #pragma once
-#include "entity_system/storage_for_components_and_aggregates.h"
-#include "templates.h"
+
+namespace augs {
+	template <class...>
+	class storage_for_components_and_aggregates;
+}
 
 namespace components {
 	struct animation;
@@ -87,8 +90,8 @@ template class augs::storage_for_components_and_aggregates <
 > ;
 
 template<template<typename...> class List>
-struct put_components_into {
-	typedef typename put_types_into < List,
+struct put_all_components_into {
+	typedef List<
 		components::animation,
 		components::animation_response,
 		components::behaviour_tree,
@@ -128,10 +131,5 @@ struct put_components_into {
 		components::sentience,
 		components::attitude,
 		components::relations
-	> ::type type;
+	> type;
 };
-
-typedef typename put_components_into<augs::storage_for_components_and_aggregates>::type 
-storage_for_all_components_and_aggregates;
-
-#include "full_entity_definition_declaration.h"

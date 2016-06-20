@@ -1,7 +1,12 @@
 #pragma once
 #include <vector>
-#include "game/components/transform_component.h"
 #include "math/vec2.h"
+
+namespace components {
+	struct transform;
+	struct sprite;
+	struct polygon;
+}
 
 class convex_partitioned_shape {
 public:

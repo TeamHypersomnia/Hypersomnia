@@ -867,9 +867,6 @@
     <ClCompile Include="augs\misc\timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="augs\misc\unsafe_type_collection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="augs\misc\value_animator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1191,9 +1188,6 @@
     <ClCompile Include="augs\misc\delta.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\entity_id.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\components\relations_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1248,9 +1242,6 @@
     <ClCompile Include="game\bindings\classes\minmax_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\bindings\classes\id_generator_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\bindings\classes\glwindow_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1270,6 +1261,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\cosmic_profiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\entity_handle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\inventory_slot_id.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\inventory_slot_handle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2810,13 +2810,7 @@
     <ClInclude Include="augs\misc\fixed_delta_timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\misc\id_generator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\misc\input_player.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\misc\map_wrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\object_pool.h">
@@ -2826,9 +2820,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\smooth_value_field.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\misc\sorted_vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\step_player.h">
@@ -2844,9 +2835,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\undoredo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\misc\unsafe_type_collection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\value_animator.h">
@@ -3305,9 +3293,6 @@
     <ClInclude Include="game\multiverse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\entity_system\components_instantiation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\misc\simulation_timing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3389,7 +3374,25 @@
     <ClInclude Include="game\globals\processing_subjects.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\misc\simple_pool.h">
+    <ClInclude Include="game\entity_handle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\entity_handle_declaration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\inventory_slot_handle_declaration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\inventory_slot_handle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\object_pool_id.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\types_specification\storage_instantiation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\entity_system\storage_instantiation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
