@@ -9,11 +9,18 @@
 #include "render_system.h"
 #include "log.h"
 
-void car_system::set_steering_flags_from_intents() {
+#include "game/components/car_component.h"
+#include "game/components/physics_component.h"
+#include "game/components/transform_component.h"
+
+#include "game/entity_handle.h"
+#include "game/step_state.h"
+
+void car_system::set_steering_flags_from_intents(cosmos& cosmos, step_state& step) {
 	auto& intents = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& it : intents) {
-		auto* maybe_car = it.subject.find<components::car>();
+		auto* maybe_car = cosmos.get_handle(it.subject).find<components::car>();
 		if (maybe_car == nullptr) continue;
 
 		auto& car = *maybe_car;
@@ -39,9 +46,10 @@ void car_system::set_steering_flags_from_intents() {
 	}
 }
 
-void car_system::apply_movement_forces() {
-	for (auto it : targets) {
-		auto& car = it.get<components::car>();
+void car_system::apply_movement_forces(cosmos& cosmos, step_state& step) {
+	auto targets_copy = cosmos.get(processing_subjects::WITH_CAR);
+	for (auto it : targets_copy) {
+		auto& car = cosmos.get_handle(it).get<components::car>();
 		auto& physics = it.get<components::physics>();
 
 		vec2 resultant;
