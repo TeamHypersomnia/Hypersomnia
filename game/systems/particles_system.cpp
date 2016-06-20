@@ -37,7 +37,7 @@ void particles_system::game_responses_to_particle_effects() {
 
 	for (auto& g : gunshots) {
 		for (auto& r : g.spawned_rounds) {
-			const auto& round_response = r->get<components::particle_effect_response>();
+			const auto& round_response = r.get<components::particle_effect_response>();
 			const auto& round_response_map = *round_response.response;
 
 			messages::create_particle_effect burst;
@@ -59,7 +59,7 @@ void particles_system::game_responses_to_particle_effects() {
 		}
 
 		for (auto& s : g.spawned_shells) {
-			const auto& shell_response = s->get<components::particle_effect_response>();
+			const auto& shell_response = s.get<components::particle_effect_response>();
 			const auto& shell_response_map = *shell_response.response;
 
 			messages::create_particle_effect burst;
@@ -80,7 +80,7 @@ void particles_system::game_responses_to_particle_effects() {
 	}
 
 	for (auto& d : damages) {
-		const auto& response = d.inflictor->get<components::particle_effect_response>();
+		const auto& response = d.inflictor.get<components::particle_effect_response>();
 		const auto& response_map = *response.response;
 
 		messages::create_particle_effect burst;
@@ -99,13 +99,13 @@ void particles_system::game_responses_to_particle_effects() {
 	}
 
 	for (auto& h : healths) {
-		const auto& response = h.subject->get<components::particle_effect_response>();
+		const auto& response = h.subject.get<components::particle_effect_response>();
 		const auto& response_map = *response.response;
 
 		messages::create_particle_effect burst;
 		burst.subject = h.subject;
 		burst.transform.pos = h.point_of_impact;
-		burst.transform.pos = h.subject->get<components::transform>().pos;
+		burst.transform.pos = h.subject.get<components::transform>().pos;
 		burst.transform.rotation = (h.impact_velocity).degrees();
 		burst.modifier = response.modifier;
 
@@ -125,7 +125,7 @@ void particles_system::game_responses_to_particle_effects() {
 	}
 
 	for (auto& s : swings) {
-		const auto& response = s.subject->get<components::particle_effect_response>();
+		const auto& response = s.subject.get<components::particle_effect_response>();
 		const auto& response_map = *response.response;
 
 		messages::create_particle_effect burst;
@@ -151,8 +151,8 @@ void particles_system::create_particle_effects() {
 			e.apply_modifier(it.modifier);
 
 		if (it.local_transform && it.subject.alive()) {
-			it.transform.pos += it.subject->get<components::transform>().pos;
-			it.transform.rotation += it.subject->get<components::transform>().rotation;
+			it.transform.pos += it.subject.get<components::transform>().pos;
+			it.transform.rotation += it.subject.get<components::transform>().rotation;
 		}
 
 		std::vector<resources::emission*> only_streams;
@@ -170,7 +170,7 @@ void particles_system::create_particle_effects() {
 				new_burst_entity->add(emission.particle_render_template);
 
 				for (int i = 0; i < burst_amount; ++i)
-					spawn_particle(new_burst_entity->get<components::particle_group>().stream_slots[0], it.transform.pos, target_rotation, target_spread, emission);
+					spawn_particle(new_burst_entity.get<components::particle_group>().stream_slots[0], it.transform.pos, target_rotation, target_spread, emission);
 
 			}
 
@@ -189,10 +189,10 @@ void particles_system::create_particle_effects() {
 		components::transform* target_transform = nullptr;
 
 		if (it.target_group_to_refresh.alive()) {
-			target_group = it.target_group_to_refresh->find<components::particle_group>();
-			target_position_copying = it.target_group_to_refresh->find<components::position_copying>();
-			target_render = it.target_group_to_refresh->find<components::render>();
-			target_transform = it.target_group_to_refresh->find<components::transform>();
+			target_group = it.target_group_to_refresh.find<components::particle_group>();
+			target_position_copying = it.target_group_to_refresh.find<components::position_copying>();
+			target_render = it.target_group_to_refresh.find<components::render>();
+			target_transform = it.target_group_to_refresh.find<components::transform>();
 
 			target_group->stream_slots.resize(only_streams.size());
 		}
@@ -239,7 +239,7 @@ void particles_system::create_particle_effects() {
 			*target_render = stream->particle_render_template;
 
 			if (target_position_copying) {
-				auto& subject_transform = it.subject->get<components::transform>();
+				auto& subject_transform = it.subject.get<components::transform>();
 				*target_position_copying = components::position_copying(it.subject);
 				target_position_copying->position_copying_type = components::position_copying::position_copying_type::ORBIT;
 				target_position_copying->rotation_offset = target_rotation - subject_transform.rotation;
@@ -314,7 +314,7 @@ void integrate_particle(resources::particle& p, float dt) {
 
 void particles_system::destroy_dead_streams() {
 	for (auto it : targets) {
-		auto& group = it->get<components::particle_group>();
+		auto& group = it.get<components::particle_group>();
 		auto& slots = group.stream_slots;
 
 		if (slots.empty())
@@ -324,8 +324,8 @@ void particles_system::destroy_dead_streams() {
 
 void particles_system::step_streams_and_particles() {
 	for (auto it : targets) {
-		auto& group = it->get<components::particle_group>();
-		auto& transform = it->get<components::transform>();
+		auto& group = it.get<components::particle_group>();
+		auto& transform = it.get<components::transform>();
 
 		bool should_destroy = true;
 
@@ -345,7 +345,7 @@ void particles_system::step_streams_and_particles() {
 
 				auto new_particles_to_spawn_by_time = randval(stream_info.particles_per_sec.first, stream_info.particles_per_sec.second) * (stream_delta / 1000.f);
 				
-				if (stream_slot.stop_spawning_particles_if_chased_entity_dead && it->get<components::position_copying>().target.dead())
+				if (stream_slot.stop_spawning_particles_if_chased_entity_dead && it.get<components::position_copying>().target.dead())
 					new_particles_to_spawn_by_time = 0;
 
 				stream_slot.stream_particles_to_spawn += new_particles_to_spawn_by_time;

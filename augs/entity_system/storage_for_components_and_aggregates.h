@@ -101,6 +101,9 @@ namespace augs {
 				});
 			}
 
+			bool alive() const;
+			bool dead() const;
+
 			aggregate_id get_id() const;
 
 			const configurable_components<components...>& get_definition() const;

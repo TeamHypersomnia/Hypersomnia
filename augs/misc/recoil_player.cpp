@@ -22,7 +22,7 @@ vec2 recoil_player::shoot_and_get_offset() {
 
 void recoil_player::shoot_and_apply_impulse(entity_id recoil_body, float additional_scale, bool angular_impulse, 
 	float additional_angle, bool positional_impulse, float positional_rotation) {
-	auto& recoil_physics = recoil_body->get<components::physics>();
+	auto& recoil_physics = recoil_body.get<components::physics>();
 
 	auto offset = shoot_and_get_offset();
 

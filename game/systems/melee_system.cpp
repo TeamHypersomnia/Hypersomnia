@@ -8,11 +8,11 @@
 #include "game/detail/inventory_utils.h"
 
 void components::melee::reset_weapon(entity_id e) {
-	auto& m = e->get<components::melee>();
+	auto& m = e.get<components::melee>();
 	m.reset_move_flags();
 	m.current_state = components::melee::state::FREE;
 
-	auto& d = e->get<components::damage>();
+	auto& d = e.get<components::damage>();
 	d.damage_upon_collision = false;
 }
 
@@ -26,7 +26,7 @@ void melee_system::consume_melee_intents() {
 			therefore we need to filter out events we're interested in, and that would be
 			melee-related intents and only these applied to an entity with a melee component
 		*/
-		auto* maybe_melee = it.subject->find<components::melee>();
+		auto* maybe_melee = it.subject.find<components::melee>();
 		
 		if (maybe_melee == nullptr) 
 			continue;
@@ -61,8 +61,8 @@ void melee_system::initiate_and_update_moves() {
 		therefore we use get instead of find
 	*/
 	for (auto& t : targets) {
-		auto& melee = t->get<components::melee>();
-		auto& damage = t->get<components::damage>();
+		auto& melee = t.get<components::melee>();
+		auto& damage = t.get<components::damage>();
 
 		//		 LOG("P: %x, S: %x, T: %x CDT: %x MVT: %x STATE: %x", melee.primary_move_flag, melee.secondary_move_flag, melee.tertiary_move_flag,melee.swing_current_cooldown_time,melee.swing_current_time,melee.state);
 
@@ -154,15 +154,15 @@ components::melee::state melee_system::primary_action(double dt, entity_id targe
 	messages::melee_swing_response response;
 
 	pos_response.subject = target;
-	auto new_definition = target->get<components::physics_definition>();
+	auto new_definition = target.get<components::physics_definition>();
 
 	animation.offset_pattern = melee_component.offset_positions[int(action_stage)];
 	new_definition.offsets_for_created_shapes[components::physics_definition::SPECIAL_MOVE_DISPLACEMENT] = animation.calculate_intermediate_transform(melee_component.swing_current_time / melee_component.swings[int(action_stage)].duration_ms);
 	auto player = get_owning_transfer_capability(target);
-	damage.custom_impact_velocity = target->get<components::transform>().pos - player->get<components::transform>().pos;
+	damage.custom_impact_velocity = target.get<components::transform>().pos - player.get<components::transform>().pos;
 
 	response.subject = target;
-	response.origin_transform = target->get<components::transform>();
+	response.origin_transform = target.get<components::transform>();
 	step.messages.post(response);
 
 	pos_response.new_definition = new_definition;

@@ -12,9 +12,10 @@
 #include "game/messages/intent_message.h"
 
 #include "texture_baker/texture_baker.h"
+#include "game/entity_handle.h"
 #include "game/step_state.h"
 
-void crosshair_system::generate_crosshair_intents(step_state& step) {
+void crosshair_system::generate_crosshair_intents(cosmos& cosmos, step_state& step) {
 	step.messages.get_queue<messages::crosshair_intent_message>().clear();
 	auto events = step.messages.get_queue<messages::intent_message>();
 
@@ -27,7 +28,7 @@ void crosshair_system::generate_crosshair_intents(step_state& step) {
 			it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION
 			) {
 			auto& subject = it.subject;
-			auto crosshair = subject.find<components::crosshair>();
+			auto crosshair = cosmos.get_handle(subject).find<components::crosshair>();
 
 			if (!crosshair)
 				continue;
@@ -43,7 +44,7 @@ void crosshair_system::generate_crosshair_intents(step_state& step) {
 
 			crosshair_intent.crosshair_base_offset_rel = base_offset - old_base_offset;
 			crosshair_intent.crosshair_base_offset = base_offset;
-			crosshair_intent.crosshair_world_pos = base_offset + crosshair->character_entity_to_chase.get<components::transform>().pos;
+			crosshair_intent.crosshair_world_pos = base_offset + cosmos.get_handle(crosshair->character_entity_to_chase).get<components::transform>().pos;
 
 			step.messages.post(crosshair_intent);
 		}
@@ -53,12 +54,12 @@ void crosshair_system::apply_crosshair_intents_to_base_offsets(cosmos& cosmos, s
 	auto& events = step.messages.get_queue<messages::crosshair_intent_message>();
 
 	for (auto& it : events)
-		it.subject.get<components::crosshair>().base_offset = it.crosshair_base_offset;
+		cosmos.get_handle(it.subject).get<components::crosshair>().base_offset = it.crosshair_base_offset;
 }
 
 void crosshair_system::apply_base_offsets_to_crosshair_transforms(cosmos& cosmos, step_state& step) {
-	for (auto it : cosmos.get(processing_subjects::WITH_CROSSHAIR)) {
-		auto player_id = it.get<components::crosshair>().character_entity_to_chase;
+	for (auto& it : cosmos.get(processing_subjects::WITH_CROSSHAIR)) {
+		auto player_id = cosmos.get_handle(it.get<components::crosshair>().character_entity_to_chase);
 
 		if (player_id.alive()) {
 			it.get<components::transform>().pos = 

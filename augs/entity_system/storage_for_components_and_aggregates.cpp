@@ -66,7 +66,19 @@ namespace augs {
 
 	template<class...components>
 	template<bool is_const>
-	typename storage_for_components_and_aggregates<components...>::aggregate_id 
+	bool storage_for_components_and_aggregates<components...>::basic_aggregate_handle<is_const>::alive() const {
+		return owner.pool_for_aggregates.alive(raw_id);
+	}
+
+	template<class...components>
+	template<bool is_const>
+	bool storage_for_components_and_aggregates<components...>::basic_aggregate_handle<is_const>::dead() const {
+		return !alive();
+	}
+
+	template<class...components>
+	template<bool is_const>
+	typename storage_for_components_and_aggregates<components...>::aggregate_id
 		storage_for_components_and_aggregates<components...>::basic_aggregate_handle<is_const>::get_id() const {
 		return raw_id;
 	}

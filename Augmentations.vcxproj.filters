@@ -657,9 +657,6 @@
     <ClCompile Include="game\systems\render_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\systems\steering_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\systems\visibility_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -2645,9 +2642,6 @@
     <ClInclude Include="game\systems\render_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\systems\steering_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\systems\visibility_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2952,9 +2946,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\components\sprite_component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\components\steering_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\components\tile_layer_component.h">

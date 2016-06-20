@@ -82,7 +82,7 @@ return get<components::relations>();
 }
 
 const components::relations& const_entity_handle::relations() const {
-return (*this)->get<components::relations>();
+return (*this).get<components::relations>();
 }
 
 inventory_slot_id entity_id::operator[](slot_function type) {

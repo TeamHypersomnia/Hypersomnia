@@ -27,7 +27,7 @@ void trigger_detector_system::consume_trigger_detector_presses() {
 
 	for (auto& e : trigger_presses) {
 		if (e.intent == intent_type::QUERY_TOUCHING_TRIGGERS) {
-			auto* trigger_query_detector = e.subject->find<components::trigger_query_detector>();
+			auto* trigger_query_detector = e.subject.find<components::trigger_query_detector>();
 
 			if (trigger_query_detector) {
 				trigger_query_detector->detection_intent_enabled = e.pressed_flag;
@@ -48,7 +48,7 @@ void trigger_detector_system::consume_trigger_detector_presses() {
 			}
 		}
 		else if (e.intent == intent_type::DETECT_TRIGGER_COLLISIONS) {
-			auto* trigger_collision_detector = e.subject->find<components::trigger_collision_detector>();
+			auto* trigger_collision_detector = e.subject.find<components::trigger_collision_detector>();
 
 			if (trigger_collision_detector) {
 				trigger_collision_detector->detection_intent_enabled = e.pressed_flag;
@@ -82,8 +82,8 @@ void trigger_detector_system::send_trigger_confirmations() {
 		if (c.type != messages::collision_message::event_type::PRE_SOLVE)
 			continue;
 
-		auto* collision_detector = c.subject->find<components::trigger_collision_detector>();
-		auto* trigger = c.collider->find<components::trigger>();
+		auto* collision_detector = c.subject.find<components::trigger_collision_detector>();
+		auto* trigger = c.collider.find<components::trigger>();
 
 		if (collision_detector && trigger && trigger->react_to_collision_detectors && collision_detector->detection_intent_enabled
 			) {
@@ -97,7 +97,7 @@ void trigger_detector_system::send_trigger_confirmations() {
 	auto& requests = step.messages.get_queue<messages::trigger_hit_request_message>();
 
 	for (auto& e : requests) {
-		auto& trigger_query_detector = e.detector->get<components::trigger_query_detector>();
+		auto& trigger_query_detector = e.detector.get<components::trigger_query_detector>();
 		auto& detector_body = e.detector;
 		
 		std::vector<entity_id> found_triggers;
@@ -105,7 +105,7 @@ void trigger_detector_system::send_trigger_confirmations() {
 		auto found_physical_triggers = parent_cosmos.stateful_systems.get<physics_system>().query_body(detector_body, filters::trigger());
 
 		for (auto found_trigger : found_physical_triggers.entities) {
-			auto* maybe_trigger = found_trigger->find<components::trigger>();
+			auto* maybe_trigger = found_trigger.find<components::trigger>();
 			
 			if (maybe_trigger && maybe_trigger->react_to_query_detectors)
 				found_triggers.push_back(found_trigger);
