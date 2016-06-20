@@ -11,14 +11,12 @@
 #include "ensure.h"
 
 namespace components {
-	physics::physics(const physics& b) {
-		ensure(false);
+	physics& physics::operator=(const physics& p) {
+		initialize_from_definition(p.get_definition());
 	}
 
-	physics& physics::operator=(const physics& b) {
-		ensure(false);
-		//set_body_type(get_body_type());
-		//set_velocity(b.velocity());
+	physics::physics(const physics& p) {
+		initialize_from_definition(p.get_definition());
 	}
 
 	physics::physics(const rigid_body_definition& def) {

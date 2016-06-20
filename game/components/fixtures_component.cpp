@@ -9,12 +9,33 @@
 #include <string>
 #include <functional>
 namespace components {
-	fixtures& fixtures::operator=(const fixtures&) {
-		ensure(false);
+	fixtures& fixtures::operator=(const fixtures& f) {
+		initialize_from_definition(f.get_definition());
 	}
 	
-	fixtures::fixtures(const fixtures&) {
-		ensure(false);
+	fixtures::fixtures(const fixtures& f) {
+		initialize_from_definition(f.get_definition());
+	}
+
+	fixtures::fixtures(const colliders_definition& def) {
+		initialize_from_definition(def);
+	}
+
+	void fixtures::initialize_from_definition(const colliders_definition& def) {
+		black = def;
+		colliders_white_box::operator=(def);
+
+		destroy_fixtures();
+
+		if (should_fixtures_exist_now())
+			build_fixtures();
+	}
+
+	colliders_definition fixtures::get_definition() const {
+		colliders_definition output;
+		output.colliders_black_box::operator=(black);
+		output.colliders_white_box::operator=(*this);
+		return output;
 	}
 
 	b2Body* fixtures::get_body() const {
@@ -90,27 +111,6 @@ namespace components {
 
 			black_detail.fixtures_per_collider.push_back(partitioned_collider);
 		}
-	}
-
-	fixtures::fixtures(const colliders_definition& def) {
-		initialize_from_definition(def);
-	}
-
-	void fixtures::initialize_from_definition(const colliders_definition& def) {
-		black = def;
-		colliders_white_box::operator=(def);
-
-		destroy_fixtures();
-
-		if (should_fixtures_exist_now())
-			build_fixtures();
-	}
-
-	colliders_definition fixtures::get_definition() const {
-		colliders_definition output;
-		output.colliders_black_box::operator=(black);
-		output.colliders_white_box::operator=(*this);
-		return output;
 	}
 
 	void fixtures::set_offset(offset_type t, components::transform off) {

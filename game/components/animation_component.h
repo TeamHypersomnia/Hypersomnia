@@ -1,9 +1,4 @@
 #pragma once
-#include <unordered_map>
-
-#include "game/messages/animation_message.h"
-
-#include "game/resources/animation.h"
 #include "game/assets/animation_id.h"
 
 namespace components {

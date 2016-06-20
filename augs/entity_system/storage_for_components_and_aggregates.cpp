@@ -12,7 +12,7 @@ namespace augs {
 		pool_for_aggregates.initialize_space(n);
 
 		auto r = [this, n](auto elem) {
-			std::get<object_pool<decltype(elem)>>(pools_for_components).initialize(n);
+			std::get<object_pool<decltype(elem)>>(pools_for_components).initialize_space(n);
 		};
 
 		for_each_type<components...>(r);
@@ -34,11 +34,8 @@ namespace augs {
 		for_each_type<components...>([this, &from_handle, &to](auto c) {
 			auto* maybe_component = from_handle.find<decltype(c)>();
 
-			if (maybe_component) {
-				ensure(to.find<decltype(c)>() == nullptr);
-
-				to.get_id<decltype(c)>() = allocate_component<decltype(c)>(*maybe_component);
-			}
+			if (maybe_component)
+				to.writable_id<decltype(c)>() = allocate_component<decltype(c)>(*maybe_component);
 		});
 
 		new_aggregate_id.set_debug_name(aggregate_id.get_debug_name());

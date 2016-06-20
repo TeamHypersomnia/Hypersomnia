@@ -153,8 +153,10 @@ namespace augs {
 				pool[dead_index] = std::move(pool[size() - 1]);
 			}
 
-			slots.erase(slots.rbegin());
-			pool.erase(slots.rbegin());
+			slots.pop_back();
+			pool.pop_back();
+
+			return true;
 		}
 
 		handle get_handle(object_pool_id from_id) {

@@ -1,8 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include "game/globals/slot_function.h"
-
-struct inventory_slot;
+#include "game/detail/inventory_slot.h"
 
 namespace components {
 	struct container {

@@ -15,10 +15,6 @@ namespace components {
 		colliders_black_box black;
 		colliders_black_box_detail black_detail;
 
-		fixtures& operator=(const fixtures&);
-		fixtures(const fixtures&);
-		fixtures(fixtures&&) = delete;
-
 		bool syncable_black_box_exists() const;
 		bool should_fixtures_exist_now() const;
 
@@ -30,7 +26,10 @@ namespace components {
 	public:
 		typedef colliders_black_box::offset_type offset_type;
 
-		fixtures(const colliders_definition&);
+		fixtures& operator=(const fixtures&);
+		fixtures(const fixtures&);
+
+		fixtures(const colliders_definition& = colliders_definition());
 		void initialize_from_definition(const colliders_definition& = colliders_definition());
 		colliders_definition get_definition() const;
 

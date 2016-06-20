@@ -19,9 +19,6 @@ namespace components {
 		rigid_body_black_box black;
 		rigid_body_black_box_detail black_detail;
 
-		physics& operator=(const physics&);
-		physics(const physics&);
-		physics(physics&&) = delete;
 
 		bool syncable_black_box_exists() const;
 		bool should_body_exist_now() const;
@@ -37,6 +34,8 @@ namespace components {
 	public:
 		typedef rigid_body_black_box::type type;
 
+		physics& operator=(const physics&);
+		physics(const physics&);
 		physics(const rigid_body_definition& = rigid_body_definition());
 		void initialize_from_definition(const rigid_body_definition&);
 		rigid_body_definition get_definition() const;

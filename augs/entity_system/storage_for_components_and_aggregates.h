@@ -20,13 +20,18 @@ namespace augs {
 		typename transform_types<std::tuple, make_object_pool_id, components...>::type component_ids;
 
 		template <class component>
-		auto& get_id() {
-			return std::get<typename augs::object_pool_id<component>>(from.component_ids);
+		auto& writable_id() {
+			return std::get<object_pool_id<component>>(component_ids);
 		}
 
 		friend class storage_for_components_and_aggregates<components...>;
 
 	public:
+		template <class component>
+		auto get_id() const {
+			return std::get<object_pool_id<component>>(component_ids);
+		}
+
 		unsigned long long removed_from_processing_subjects = 0;
 	};
 
@@ -59,10 +64,9 @@ namespace augs {
 			template<class component>
 			typename std::conditional<is_const, const component*, component*>::type find() const {
 				auto& aggregate = owner.pool_for_aggregates.get(raw_id);
-
-				auto component_id = aggregate.get_id<component>();
+				
 				auto& component_pool = std::get<typename object_pool<component>>(owner.pools_for_components);
-				auto component_handle = component_pool.get_handle(component_id);
+				auto component_handle = component_pool.get_handle(aggregate.get_id<component>());
 
 				if (component_handle.alive())
 					return &component_handle.get();
@@ -122,7 +126,7 @@ namespace augs {
 
 			for_each_type<configured_components...>([this, &configuration, &aggregate](auto c) {
 				if (configuration.is_set<decltype(c)>()) {
-					aggregate.get_id<decltype(c)>() = allocate_component<decltype(c)>(configuration.get<decltype(c)>());
+					aggregate.writable_id<decltype(c)>() = allocate_component<decltype(c)>(configuration.get<decltype(c)>());
 				}
 			});
 
