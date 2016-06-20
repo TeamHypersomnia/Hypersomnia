@@ -4,8 +4,16 @@
 #include "game/entity_id.h"
 #include "ensure.h"
 
-void behaviour_tree_system::evaluate_trees() {
-	for (auto t : targets) {
+#include "game/components/behaviour_tree_component.h"
+
+#include "game/entity_handle.h"
+#include "game/step_state.h"
+
+using namespace augs;
+
+void behaviour_tree_system::evaluate_trees(cosmos& cosmos, step_state& step) {
+	auto targets_copy = cosmos.get(processing_subjects::WITH_BEHAVIOUR_TREE);
+	for (auto t : targets_copy) {
 		auto& behaviour_tree = t.get<components::behaviour_tree>();
 		
 		for (auto& t : behaviour_tree.concurrent_trees) {
