@@ -10,7 +10,17 @@
 
 #include "game/detail/inventory_utils.h"
 
-void damage_system::destroy_colliding_bullets_and_send_damage() {
+#include "game/components/damage_component.h"
+#include "game/components/physics_component.h"
+#include "game/components/transform_component.h"
+
+#include "game/entity_handle.h"
+#include "game/step_state.h"
+
+using namespace augs;
+
+
+void damage_system::destroy_colliding_bullets_and_send_damage(cosmos& cosmos, step_state& step) {
 	auto events = step.messages.get_queue<messages::collision_message>();
 	step.messages.get_queue<messages::damage_message>().clear();
 
@@ -18,7 +28,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage() {
 		if (it.type != messages::collision_message::event_type::BEGIN_CONTACT) 
 			continue;
 
-		auto* damage = it.collider.find<components::damage>();
+		auto* damage = cosmos.get_handle(it.collider).find<components::damage>();
 
 		bool bullet_colliding_with_sender =
 			damage && components::physics::get_owner_body_entity(damage->sender) == components::physics::get_owner_body_entity(it.subject);
@@ -46,7 +56,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage() {
 
 			auto owning_capability = get_owning_transfer_capability(it.subject);
 
-			bool is_victim_a_held_item = owning_capability.alive() && owning_capability != it.subject;
+			bool is_victim_a_held_item = cosmos.get_handle(owning_capability).alive() && owning_capability != it.subject;
 
 			if (!is_victim_a_held_item && damage->destroy_upon_damage) {
 				damage->damage_charges_before_destruction--;
@@ -59,8 +69,9 @@ void damage_system::destroy_colliding_bullets_and_send_damage() {
 	}
 }
 
-void damage_system::destroy_outdated_bullets() {
-	for (auto it : targets) {
+void damage_system::destroy_outdated_bullets(cosmos& cosmos, step_state& step) {
+	auto targets_copy = cosmos.get(processing_subjects::WITH_DAMAGE);
+	for (auto it : targets_copy) {
 		auto& damage = it.get<components::damage>();
 	
 		if ((damage.constrain_lifetime && damage.lifetime_ms >= damage.max_lifetime_ms) ||
@@ -70,6 +81,6 @@ void damage_system::destroy_outdated_bullets() {
 		}
 
 		damage.distance_travelled += speed(it);
-		damage.lifetime_ms += delta_milliseconds();
+		damage.lifetime_ms += cosmos.delta.in_milliseconds();
 	}
 }
