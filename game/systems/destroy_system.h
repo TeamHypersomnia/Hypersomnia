@@ -1,10 +1,11 @@
 #pragma once
-#include "game/cosmos_reference.h"
 
-class destroy_system : public cosmos_reference {
+class cosmos;
+class step_state;
+
+class destroy_system {
 public:
-	using cosmos_reference::cosmos_reference;
 
-	void queue_children_of_queued_entities();
-	void perform_deletions();
+	void queue_children_of_queued_entities(cosmos& cosmos, step_state& step);
+	void perform_deletions(cosmos& cosmos, step_state& step);
 };
