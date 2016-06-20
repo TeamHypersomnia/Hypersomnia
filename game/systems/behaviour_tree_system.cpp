@@ -11,7 +11,7 @@
 
 using namespace augs;
 
-void behaviour_tree_system::evaluate_trees(cosmos& cosmos, step_state& step) {
+void behaviour_tree_system::evaluate_trees(cosmos& cosmos) {
 	auto targets_copy = cosmos.get(processing_subjects::WITH_BEHAVIOUR_TREE);
 	for (auto t : targets_copy) {
 		auto& behaviour_tree = t.get<components::behaviour_tree>();
