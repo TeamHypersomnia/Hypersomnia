@@ -27,7 +27,7 @@ void crosshair_system::generate_crosshair_intents(step_state& step) {
 			it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION
 			) {
 			auto& subject = it.subject;
-			auto crosshair = subject->find<components::crosshair>();
+			auto crosshair = subject.find<components::crosshair>();
 
 			if (!crosshair)
 				continue;
@@ -43,7 +43,7 @@ void crosshair_system::generate_crosshair_intents(step_state& step) {
 
 			crosshair_intent.crosshair_base_offset_rel = base_offset - old_base_offset;
 			crosshair_intent.crosshair_base_offset = base_offset;
-			crosshair_intent.crosshair_world_pos = base_offset + crosshair->character_entity_to_chase->get<components::transform>().pos;
+			crosshair_intent.crosshair_world_pos = base_offset + crosshair->character_entity_to_chase.get<components::transform>().pos;
 
 			step.messages.post(crosshair_intent);
 		}
@@ -53,15 +53,15 @@ void crosshair_system::apply_crosshair_intents_to_base_offsets(cosmos& cosmos, s
 	auto& events = step.messages.get_queue<messages::crosshair_intent_message>();
 
 	for (auto& it : events)
-		it.subject->get<components::crosshair>().base_offset = it.crosshair_base_offset;
+		it.subject.get<components::crosshair>().base_offset = it.crosshair_base_offset;
 }
 
 void crosshair_system::apply_base_offsets_to_crosshair_transforms(cosmos& cosmos, step_state& step) {
 	for (auto it : cosmos.get(processing_subjects::WITH_CROSSHAIR)) {
-		auto player_id = it->get<components::crosshair>().character_entity_to_chase;
+		auto player_id = it.get<components::crosshair>().character_entity_to_chase;
 
 		if (player_id.alive()) {
-			it->get<components::transform>().pos = 
+			it.get<components::transform>().pos = 
 				components::crosshair::calculate_aiming_displacement(it, true) + position(player_id);
 		}
 	}
@@ -69,13 +69,13 @@ void crosshair_system::apply_base_offsets_to_crosshair_transforms(cosmos& cosmos
 
 void crosshair_system::animate_crosshair_sizes(cosmos& cosmos) {
 	for (auto it : cosmos.get(processing_subjects::WITH_CROSSHAIR)) {
-		auto& crosshair = it->get<components::crosshair>();
+		auto& crosshair = it.get<components::crosshair>();
 
 		if (crosshair.should_blink) {
 			float ratio = 0.f;
 			crosshair.blink.animate(ratio);
 
-			auto* crosshair_sprite = it->find<components::sprite>();
+			auto* crosshair_sprite = it.find<components::sprite>();
 
 			if (crosshair_sprite) {
 				crosshair_sprite->update_size_from_texture_dimensions();

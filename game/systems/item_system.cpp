@@ -31,10 +31,10 @@ void item_system::handle_trigger_confirmations_as_pick_requests() {
 	auto& physics = parent_cosmos.stateful_systems.get<physics_system>();
 
 	for (auto& e : confirmations) {
-		auto* item_slot_transfers = e.detector_body->find<components::item_slot_transfers>();
+		auto* item_slot_transfers = e.detector_body.find<components::item_slot_transfers>();
 		auto item_entity = physics.get_owner_body_entity(e.trigger);
 
-		auto* item = item_entity->find<components::item>();
+		auto* item = item_entity.find<components::item>();
 
 		if (item_slot_transfers && item && get_owning_transfer_capability(item_entity).dead()) {
 			auto& pick_list = item_slot_transfers->only_pick_these_items;
@@ -69,7 +69,7 @@ void item_system::handle_throw_item_intents() {
 			(r.intent == intent_type::THROW_PRIMARY_ITEM
 				|| r.intent == intent_type::THROW_SECONDARY_ITEM)
 			) {
-			if (r.subject->find<components::item_slot_transfers>()) {
+			if (r.subject.find<components::item_slot_transfers>()) {
 				auto hand = map_primary_action_to_secondary_hand_if_primary_empty(r.subject, intent_type::THROW_SECONDARY_ITEM == r.intent);
 
 				if (hand.has_items()) {
@@ -90,7 +90,7 @@ void item_system::handle_holster_item_intents() {
 			(r.intent == intent_type::HOLSTER_PRIMARY_ITEM
 				|| r.intent == intent_type::HOLSTER_SECONDARY_ITEM)
 			) {
-			if (r.subject->find<components::item_slot_transfers>()) {
+			if (r.subject.find<components::item_slot_transfers>()) {
 				auto hand = map_primary_action_to_secondary_hand_if_primary_empty(r.subject, intent_type::HOLSTER_SECONDARY_ITEM == r.intent);
 
 				if (hand.has_items()) {
@@ -113,12 +113,12 @@ void components::item_slot_transfers::interrupt_mounting() {
 
 void item_system::process_mounting_and_unmounting() {
 	for (auto& e : targets) {
-		auto& item_slot_transfers = e->get<components::item_slot_transfers>();
+		auto& item_slot_transfers = e.get<components::item_slot_transfers>();
 
 		auto& currently_mounted_item = item_slot_transfers.mounting.current_item;
 
 		if (currently_mounted_item.alive()) {
-			auto& item = currently_mounted_item->get<components::item>();
+			auto& item = currently_mounted_item.get<components::item>();
 
 			if (item.current_slot != item_slot_transfers.mounting.intented_mounting_slot) {
 				item_slot_transfers.interrupt_mounting();
@@ -166,7 +166,7 @@ void item_system::consume_item_slot_transfer_requests() {
 	auto& requests = step.messages.get_queue<messages::item_slot_transfer_request>();
 
 	for (auto& r : requests) {
-		auto& item = r.item->get<components::item>();
+		auto& item = r.item.get<components::item>();
 		auto previous_slot = item.current_slot;
 
 		auto result = query_transfer_result(r);
@@ -198,7 +198,7 @@ void item_system::consume_item_slot_transfer_requests() {
 			bool whole_item_grabbed = item.charges == result.transferred_charges;
 
 			if (previous_slot.alive()) {
-				previous_container_transform = previous_slot.container_entity->get<components::transform>();
+				previous_container_transform = previous_slot.container_entity.get<components::transform>();
 				
 				if(whole_item_grabbed)
 					previous_slot.remove_item(r.item);
@@ -214,7 +214,7 @@ void item_system::consume_item_slot_transfer_requests() {
 				else
 					item.charges -= result.transferred_charges;
 
-				target_item_to_stack_with->get<components::item>().charges += result.transferred_charges;
+				target_item_to_stack_with.get<components::item>().charges += result.transferred_charges;
 
 				continue;
 			}
@@ -227,7 +227,7 @@ void item_system::consume_item_slot_transfer_requests() {
 			else {
 				new_charge_stack = parent_cosmos.clone_entity(r.item);
 				item.charges -= result.transferred_charges;
-				new_charge_stack->get<components::item>().charges = result.transferred_charges;
+				new_charge_stack.get<components::item>().charges = result.transferred_charges;
 
 				grabbed_item_part = new_charge_stack;
 			}
@@ -236,8 +236,8 @@ void item_system::consume_item_slot_transfer_requests() {
 				r.target_slot.add_item(grabbed_item_part);
 
 			for_each_descendant(grabbed_item_part, [this, previous_container_transform, new_charge_stack](entity_id descendant) {
-				auto parent_slot = descendant->get<components::item>().current_slot;
-				auto current_def = descendant->get<components::physics_definition>();
+				auto parent_slot = descendant.get<components::item>().current_slot;
+				auto current_def = descendant.get<components::physics_definition>();
 
 				messages::rebuild_physics_message rebuild;
 				rebuild.subject = descendant;
@@ -261,10 +261,10 @@ void item_system::consume_item_slot_transfer_requests() {
 
 				step.messages.post(rebuild);
 
-				descendant->get<components::transform>() = previous_container_transform;
+				descendant.get<components::transform>() = previous_container_transform;
 			});
 
-			auto& grabbed_item = grabbed_item_part->get<components::item>();
+			auto& grabbed_item = grabbed_item_part.get<components::item>();
 
 			if (is_pickup_or_transfer) {
 				if (r.target_slot->items_need_mounting) {

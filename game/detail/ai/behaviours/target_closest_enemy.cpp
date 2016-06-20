@@ -22,9 +22,9 @@ namespace behaviours {
 
 		auto subject = t.instance.user_input;
 		auto pos = position(subject);
-		auto& visibility = subject->get<components::visibility>();
+		auto& visibility = subject.get<components::visibility>();
 		auto& los = visibility.line_of_sight_layers[components::visibility::LINE_OF_SIGHT];
-		auto& attitude = subject->get<components::attitude>();
+		auto& attitude = subject.get<components::attitude>();
 
 		entity_id closest_hostile;
 
@@ -54,7 +54,7 @@ namespace behaviours {
 
 		if (subject.has(sub_entity_name::CHARACTER_CROSSHAIR)) {
 			auto crosshair = subject[sub_entity_name::CHARACTER_CROSSHAIR];
-			auto& crosshair_offset = crosshair->get<components::crosshair>().base_offset;
+			auto& crosshair_offset = crosshair.get<components::crosshair>().base_offset;
 
 			float vel1 = assess_projectile_velocity_of_weapon(subject[slot_function::PRIMARY_HAND].try_get_item());
 			float vel2 = assess_projectile_velocity_of_weapon(subject[slot_function::SECONDARY_HAND].try_get_item());

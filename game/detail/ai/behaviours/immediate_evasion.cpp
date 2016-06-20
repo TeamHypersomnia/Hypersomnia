@@ -11,7 +11,7 @@
 namespace behaviours {
 	tree::goal_availability immediate_evasion::goal_resolution(tree::state_of_traversal& t) const {
 		auto subject = t.instance.user_input;
-		auto& visibility = subject->get<components::visibility>();
+		auto& visibility = subject.get<components::visibility>();
 		auto& los = visibility.line_of_sight_layers[components::visibility::LINE_OF_SIGHT];
 
 		immediate_evasion_goal goal;
@@ -26,7 +26,7 @@ namespace behaviours {
 			goal.dangers.push_back(danger);
 		}
 
-		if (total_danger < subject->get<components::sentience>().minimum_danger_amount_to_evade) {
+		if (total_danger < subject.get<components::sentience>().minimum_danger_amount_to_evade) {
 			return tree::goal_availability::ALREADY_ACHIEVED;
 		}
 		else {
@@ -37,7 +37,7 @@ namespace behaviours {
 
 	void immediate_evasion::execute_leaf_goal_callback(tree::execution_occurence o, tree::state_of_traversal& t) const {
 		auto subject = t.instance.user_input;
-		auto& movement = subject->get<components::movement>();
+		auto& movement = subject.get<components::movement>();
 
 		if (o == tree::execution_occurence::LAST) {
 			movement.reset_movement_flags();

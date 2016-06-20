@@ -190,13 +190,13 @@ namespace augs {
 
 		if (draw_visibility) {
 			for (auto it : target_entities) {
-				auto* visibility = it->find<components::visibility>();
+				auto* visibility = it.find<components::visibility>();
 				if (visibility) {
 					for (auto& entry : visibility->full_visibility_layers) {
 						/* shortcut */
 						auto& request = entry.second;
 						
-						auto origin = it->get<components::transform>().pos;
+						auto origin = it.get<components::transform>().pos;
 
 						for (int i = 0; i < request.get_num_triangles(); ++i) {
 							auto& tri = request.get_triangle(i, origin);

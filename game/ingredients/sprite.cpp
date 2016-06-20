@@ -19,7 +19,7 @@ namespace ingredients {
 
 	components::sprite&  sprite_scalled(entity_id e, vec2 pos, vec2i size, assets::texture_id id, augs::rgba col, render_layer layer) {
 		sprite(e, pos, id, col, layer);
-		e->get<components::sprite>().size = size;
-		return e->get<components::sprite>();
+		e.get<components::sprite>().size = size;
+		return e.get<components::sprite>();
 	}
 }

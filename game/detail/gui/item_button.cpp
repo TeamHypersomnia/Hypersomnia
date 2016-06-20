@@ -27,7 +27,7 @@ void item_button::get_member_children(std::vector<augs::gui::rect_id>& children)
 
 bool item_button::is_being_wholely_dragged_or_pending_finish(augs::gui::gui_world& gr) {
 	if (is_being_dragged(gr)) {
-		bool is_drag_partial = ((game_gui_world&)gr).dragged_charges < item->get<components::item>().charges;
+		bool is_drag_partial = ((game_gui_world&)gr).dragged_charges < item.get<components::item>().charges;
 		return !is_drag_partial;
 	}
 
@@ -35,7 +35,7 @@ bool item_button::is_being_wholely_dragged_or_pending_finish(augs::gui::gui_worl
 	
 	for (auto& g : gui_intents) {
 		if (g.item == item) {
-			bool is_pending_drag_partial = g.specified_quantity < item->get<components::item>().charges;
+			bool is_pending_drag_partial = g.specified_quantity < item.get<components::item>().charges;
 			return !is_pending_drag_partial;
 		}
 	}
@@ -66,7 +66,7 @@ void item_button::draw_grid_border_ghost(draw_info in) {
 }
 
 void item_button::draw_complete_dragged_ghost(draw_info in) {
-	auto parent_slot = item->get<components::item>().current_slot;
+	auto parent_slot = item.get<components::item>().current_slot;
 	ensure(parent_slot.alive());
 	auto prev_abs = absolute_xy;
 	absolute_xy += in.owner.current_drag_amount;
@@ -76,7 +76,7 @@ void item_button::draw_complete_dragged_ghost(draw_info in) {
 }
 
 rects::ltrb<float> item_button::iterate_children_attachments(bool draw, std::vector<vertex_triangle>* target, augs::rgba border_col) {
-	auto item_sprite = item->get<components::sprite>();
+	auto item_sprite = item.get<components::sprite>();
 
 	const auto& gui_def = resource_manager.find(item_sprite.tex)->gui_sprite_def;
 
@@ -101,10 +101,10 @@ rects::ltrb<float> item_button::iterate_children_attachments(bool draw, std::vec
 			if (desc == item)
 				return;
 
-			auto parent_slot = desc->get<components::item>().current_slot;
+			auto parent_slot = desc.get<components::item>().current_slot;
 
 			if (parent_slot.should_item_inside_keep_physical_body(item)) {
-				auto attachment_sprite = desc->get<components::sprite>();
+				auto attachment_sprite = desc.get<components::sprite>();
 
 				attachment_sprite.flip_horizontally = item_sprite.flip_horizontally;
 				attachment_sprite.flip_vertically = item_sprite.flip_vertically;
@@ -112,7 +112,7 @@ rects::ltrb<float> item_button::iterate_children_attachments(bool draw, std::vec
 
 				attachment_sprite.color.a = item_sprite.color.a;
 				shared::state_for_drawing_renderable attachment_state = state;
-				auto offset = parent_slot.sum_attachment_offsets_of_parents(desc) - item->get<components::item>().current_slot.sum_attachment_offsets_of_parents(item);
+				auto offset = parent_slot.sum_attachment_offsets_of_parents(desc) - item.get<components::item>().current_slot.sum_attachment_offsets_of_parents(item);
 				
 				if (attachment_sprite.flip_horizontally) {
 					offset.pos.x = -offset.pos.x;
@@ -148,7 +148,7 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 	if (is_inventory_root())
 		return;
 	
-	auto parent_slot = item->get<components::item>().current_slot;
+	auto parent_slot = item.get<components::item>().current_slot;
 
 	rgba inside_col = cyan;
 	rgba border_col = cyan;
@@ -185,7 +185,7 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 		iterate_children_attachments(true, &in.v, border_col);
 
 		if (draw_charges) {
-			auto& item_data = item->get<components::item>();
+			auto& item_data = item.get<components::item>();
 
 			int considered_charges = item_data.charges;
 
@@ -194,7 +194,7 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 			}
 
 			long double bottom_number_val = -1.f;
-			auto* container = item->find<components::container>();
+			auto* container = item.find<components::container>();
 			bool printing_charge_count = false;
 			bool trim_zero = false;
 
@@ -205,7 +205,7 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 				printing_charge_count = true;
 			}
 			else if (item->get_owner_world().systems.get<gui_system>().draw_free_space_inside_container_icons && item[slot_function::ITEM_DEPOSIT].alive()) {
-				if (item->get<components::item>().categories_for_slot_compatibility & item_category::MAGAZINE) {
+				if (item.get<components::item>().categories_for_slot_compatibility & item_category::MAGAZINE) {
 					if (!is_container_open) {
 						printing_charge_count = true;
 					}
@@ -267,7 +267,7 @@ void item_button::draw_proc(draw_info in, bool draw_inside, bool draw_border, bo
 	}
 
 	if (draw_container_opened_mark) {
-		if (item->find<components::container>()) {
+		if (item.find<components::container>()) {
 			components::sprite container_status_sprite;
 			if(is_container_open)
 				container_status_sprite.set(assets::CONTAINER_OPEN_ICON, border_col);
@@ -303,7 +303,7 @@ void item_button::perform_logic_step(augs::gui::gui_world& gr) {
 
 	vec2i parent_position;
 
-	auto* sprite = item->find<components::sprite>();
+	auto* sprite = item.find<components::sprite>();
 	
 	if (sprite) {
 		with_attachments_bbox = iterate_children_attachments();
@@ -317,7 +317,7 @@ void item_button::perform_logic_step(augs::gui::gui_world& gr) {
 		rc.set_size(rounded_size);
 	}
 
-	auto parent_slot = item->get<components::item>().current_slot;
+	auto parent_slot = item.get<components::item>().current_slot;
 	
 	if (parent_slot->always_allow_exactly_one_item) {
 		rc.set_position(get_meta(parent_slot).rc.get_position());
@@ -334,13 +334,13 @@ void item_button::consume_gui_event(event_info info) {
 	auto& gui = (game_gui_world&)info.owner;
 
 	detector.update_appearance(info);
-	auto parent_slot = item->get<components::item>().current_slot;
+	auto parent_slot = item.get<components::item>().current_slot;
 
 	if (info == rect::gui_event::ldrag) {
 		if (!started_drag) {
 			started_drag = true;
 
-			gui.dragged_charges = item->get<components::item>().charges;
+			gui.dragged_charges = item.get<components::item>().charges;
 
 			if (parent_slot->always_allow_exactly_one_item)
 				if (get_meta(parent_slot).get_rect_absolute().hover(info.owner.state.mouse.pos)) {
@@ -395,5 +395,5 @@ void item_button::draw_triangles(draw_info in) {
 }
 
 item_button& get_meta(entity_id id) {
-	return get_owning_transfer_capability(id)->get<components::gui_element>().item_metadata[id];
+	return get_owning_transfer_capability(id).get<components::gui_element>().item_metadata[id];
 }

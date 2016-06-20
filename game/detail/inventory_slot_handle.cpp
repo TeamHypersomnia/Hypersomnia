@@ -175,7 +175,7 @@ void basic_inventory_slot_handle<C>::for_each_descendant(std::function<void(enti
 	for (auto& i : (*this)->items_inside) {
 		f(i);
 
-		auto* container = i->find<components::container>();
+		auto* container = i.find<components::container>();
 
 		if (container)
 			for (auto& s : container->slots)

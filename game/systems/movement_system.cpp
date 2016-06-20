@@ -11,7 +11,7 @@ void movement_system::set_movement_flags_from_input() {
 	auto events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto it : events) {
-		auto* movement = it.subject->find<components::movement>();
+		auto* movement = it.subject.find<components::movement>();
 		if (movement == nullptr) continue;
 
 		switch (it.intent) {
@@ -39,11 +39,11 @@ void movement_system::apply_movement_forces() {
 	auto& physics_sys = parent_cosmos.stateful_systems.get<physics_system>();
 
 	for (auto it : targets) {
-		auto& movement = it->get<components::movement>();
+		auto& movement = it.get<components::movement>();
 
 		if (!movement.apply_movement_forces) continue;
 
-		auto* maybe_physics = it->find<components::physics>();
+		auto* maybe_physics = it.find<components::physics>();
 
 		vec2 resultant;
 
@@ -51,7 +51,7 @@ void movement_system::apply_movement_forces() {
 		resultant.y = movement.moving_backward * movement.input_acceleration_axes.y - movement.moving_forward * movement.input_acceleration_axes.y;
 
 		if (maybe_physics == nullptr) {
-			it->get<components::transform>().pos += resultant * delta_seconds();
+			it.get<components::transform>().pos += resultant * delta_seconds();
 			continue;
 		}
 
@@ -91,15 +91,15 @@ void movement_system::generate_movement_responses() {
 	step.messages.get_queue<movement_response>().clear();
 
 	for (auto it : targets) {
-		auto& movement = it->get<components::movement>();
+		auto& movement = it.get<components::movement>();
 
-		auto* maybe_physics = it->find<components::physics>();
+		auto* maybe_physics = it.find<components::physics>();
 		
 		float32 speed = 0.0f;
 
 		if (movement.enable_animation) {
 			if (maybe_physics == nullptr) {
-				if (it->get<components::render>().interpolation_direction().non_zero())
+				if (it.get<components::render>().interpolation_direction().non_zero())
 					speed = movement.max_speed_for_movement_response;
 			}
 			else

@@ -29,7 +29,7 @@ void gun_system::consume_gun_intents() {
 	auto events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto it : events) {
-		auto* maybe_gun = it.subject->find<components::gun>();
+		auto* maybe_gun = it.subject.find<components::gun>();
 		if (maybe_gun == nullptr) continue;
 
 		auto& gun = *maybe_gun;
@@ -51,7 +51,7 @@ void components::gun::shake_camera(entity_id target_camera_to_shake, float rotat
 			rotation - camera_shake_spread_degrees,
 			rotation + camera_shake_spread_degrees));
 
-		target_camera_to_shake->get<components::camera>().last_interpolant.pos += shake_dir * camera_shake_radius;
+		target_camera_to_shake.get<components::camera>().last_interpolant.pos += shake_dir * camera_shake_radius;
 	}
 }
 
@@ -69,9 +69,9 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 	auto& render = parent_cosmos.stateful_systems.get<render_system>();
 
 	for (auto it : targets) {
-		const auto& gun_transform = it->get<components::transform>();
-		auto& gun = it->get<components::gun>();
-		auto& container = it->get<components::container>();
+		const auto& gun_transform = it.get<components::transform>();
+		auto& gun = it.get<components::gun>();
+		auto& container = it.get<components::container>();
 
 		if (gun.trigger_pressed && check_timeout_and_reset(gun.timeout_between_shots)) {
 			if (gun.action_mode != components::gun::action_type::AUTOMATIC)
@@ -103,7 +103,7 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 				float total_recoil_multiplier = 1.f;
 
 				for(auto& catridge_or_pellet_stack : bullet_entities) {
-					int charges = catridge_or_pellet_stack->get<components::item>().charges;
+					int charges = catridge_or_pellet_stack.get<components::item>().charges;
 
 					messages::physics_operation op;
 					op.set_velocity = true;
@@ -113,14 +113,14 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 					while (charges--) {
 						{
 							auto round_entity = parent_cosmos.create_entity_from_definition(catridge_or_pellet_stack[sub_definition_name::BULLET_ROUND]);
-							auto& damage = round_entity->get<components::damage>();
+							auto& damage = round_entity.get<components::damage>();
 							damage.amount *= gun.damage_multiplier;
 							damage.sender = it;
 							total_recoil_multiplier *= damage.recoil_multiplier;
 
-							auto& physics_definition = round_entity->get<components::physics_definition>();
+							auto& physics_definition = round_entity.get<components::physics_definition>();
 							
-							round_entity->get<components::transform>() = barrel_transform;
+							round_entity.get<components::transform>() = barrel_transform;
 
 							op.velocity.set_from_degrees(barrel_transform.rotation).set_length(randval(gun.muzzle_velocity));
 							op.subject = round_entity;
@@ -140,9 +140,9 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 							shell_transform.pos += vec2(gun.shell_spawn_offset.pos).rotate(gun_transform.rotation, vec2());
 							shell_transform.rotation += spread_component;
 
-							auto& physics_definition = shell_entity->get<components::physics_definition>();
+							auto& physics_definition = shell_entity.get<components::physics_definition>();
 
-							shell_entity->get<components::transform>() = shell_transform;
+							shell_entity.get<components::transform>() = shell_transform;
 
 							op.velocity.set_from_degrees(barrel_transform.rotation + spread_component).set_length(randval(gun.shell_velocity));
 							op.subject = shell_entity;

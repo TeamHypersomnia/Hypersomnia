@@ -29,7 +29,7 @@ void animation_system::game_responses_to_animation_messages() {
 
 		msg.animation_priority = 0;
 
-		msg.set_animation = (*(it.subject->get<components::animation_response>().response))[animation_response_type::MOVE];
+		msg.set_animation = (*(it.subject.get<components::animation_response>().response))[animation_response_type::MOVE];
 		msg.speed_factor = it.speed;
 
 		step.messages.post(msg);
@@ -44,7 +44,7 @@ void animation_system::game_responses_to_animation_messages() {
 		// msg.subject = it.subject;
 		// msg.action = messages::animation_message::START;
 		// msg.animation_priority = 1;
-		// msg.set_animation = (*(it.subject->get<components::animation_response>().response))[animation_response_type::SHOT];
+		// msg.set_animation = (*(it.subject.get<components::animation_response>().response))[animation_response_type::SHOT];
 		// 
 		// step.messages.post(msg);
 	}
@@ -54,7 +54,7 @@ void animation_system::handle_animation_messages() {
 	auto events = step.messages.get_queue<animation_message>();
 
 	for (auto it : events) {
-		auto ptr = it.subject->find<components::animation>();
+		auto ptr = it.subject.find<components::animation>();
 		if (!ptr) continue; auto& animation = *ptr;
 
 		if (it.animation_priority >= animation.priority || animation.state == components::animation::playing_state::PAUSED) {
@@ -125,7 +125,7 @@ void animation_system::progress_animation_states() {
 	auto delta = delta_milliseconds();
 
 	for (auto it : targets) {
-		auto& animation_state = it->get<components::animation>();
+		auto& animation_state = it.get<components::animation>();
 
 		if (animation_state.state != components::animation::playing_state::PAUSED) {
 			auto& animation = *resource_manager.find(animation_state.current_animation);
@@ -186,7 +186,7 @@ void animation_system::progress_animation_states() {
 				else break;
 			}
 
-			auto& sprite = it->get<components::sprite>();
+			auto& sprite = it.get<components::sprite>();
 			sprite = animation.frames[animation_state.get_current_frame()].sprite;
 		}
 	}

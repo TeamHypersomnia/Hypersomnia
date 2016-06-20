@@ -3,7 +3,7 @@
 #include "game/cosmos.h"
 
 void physics_system::rechoose_owner_friction_body(entity_id entity) {
-	auto& physics = entity->get<components::physics>();
+	auto& physics = entity.get<components::physics>();
 
 	// purge of dead entities
 
@@ -53,12 +53,12 @@ void physics_system::rechoose_owner_friction_body(entity_id entity) {
 void physics_system::recurential_friction_handler(entity_id entity, entity_id friction_owner) {
 	if (friction_owner.dead()) return;
 
-	auto& physics = entity->get<components::physics>();
+	auto& physics = entity.get<components::physics>();
 
-	auto& friction_physics = friction_owner->get<components::fixtures>();
+	auto& friction_physics = friction_owner.get<components::fixtures>();
 	auto& friction_entity = friction_physics.get_body_entity();
 
-	recurential_friction_handler(entity, friction_entity->get<components::physics>().get_owner_friction_ground());
+	recurential_friction_handler(entity, friction_entity.get<components::physics>().get_owner_friction_ground());
 
 	auto* body = physics.black_detail.body;
 
@@ -67,7 +67,7 @@ void physics_system::recurential_friction_handler(entity_id entity, entity_id fr
 
 	body->SetTransform(fricted_pos, body->GetAngle() + parent_cosmos.delta.in_seconds()*friction_body->GetAngularVelocity());
 
-	friction_entity->get<components::physics>().measured_carried_mass += physics.get_mass() + physics.measured_carried_mass;
+	friction_entity.get<components::physics>().measured_carried_mass += physics.get_mass() + physics.measured_carried_mass;
 }
 
 bool physics_system::are_connected_by_friction(entity_id child, entity_id parent) {
@@ -75,7 +75,7 @@ bool physics_system::are_connected_by_friction(entity_id child, entity_id parent
 		bool matched_ancestor = false;
 
 		entity_id parent_body_entity = get_owner_body_entity(parent);
-		entity_id childs_ancestor_entity = get_owner_body_entity(child)->get<components::physics>().get_owner_friction_ground();
+		entity_id childs_ancestor_entity = get_owner_body_entity(child).get<components::physics>().get_owner_friction_ground();
 
 		while (childs_ancestor_entity.alive()) {
 			if (childs_ancestor_entity == parent_body_entity) {
@@ -83,7 +83,7 @@ bool physics_system::are_connected_by_friction(entity_id child, entity_id parent
 				break;
 			}
 
-			childs_ancestor_entity = childs_ancestor_entity->get<components::physics>().get_owner_friction_ground();
+			childs_ancestor_entity = childs_ancestor_entity.get<components::physics>().get_owner_friction_ground();
 		}
 
 		if (matched_ancestor)

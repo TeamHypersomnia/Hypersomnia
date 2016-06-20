@@ -17,16 +17,16 @@ void intent_contextualization_system::contextualize_use_button_intents() {
 	auto& intents = step.messages.get_queue<messages::intent_message>();
 	
 	for (auto& e : intents) {
-		auto* query_detector = e.subject->find<components::trigger_query_detector>();
-		auto* collision_detector = e.subject->find<components::trigger_collision_detector>();
+		auto* query_detector = e.subject.find<components::trigger_query_detector>();
+		auto* collision_detector = e.subject.find<components::trigger_collision_detector>();
 		
 		if (e.intent == intent_type::USE_BUTTON) {
-			auto* maybe_driver = e.subject->find<components::driver>();
+			auto* maybe_driver = e.subject.find<components::driver>();
 
 			if (maybe_driver) {
 				auto car = maybe_driver->owned_vehicle;
 
-				if (car.alive() && car->get<components::car>().current_driver == e.subject) {
+				if (car.alive() && car.get<components::car>().current_driver == e.subject) {
 					e.intent = intent_type::RELEASE_CAR;
 					continue;
 				}
@@ -52,7 +52,7 @@ void intent_contextualization_system::contextualize_crosshair_action_intents() {
 	for (auto& it : events) {
 		entity_id callee;
 
-		auto* maybe_container = it.subject->find<components::container>();
+		auto* maybe_container = it.subject.find<components::container>();
 
 		if (maybe_container) {
 			if (it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION) {
@@ -77,12 +77,12 @@ void intent_contextualization_system::contextualize_crosshair_action_intents() {
 		}
 
 		if (callee.alive()) {
-			if (callee->find<components::gun>()) {
+			if (callee.find<components::gun>()) {
 				it.intent = intent_type::PRESS_GUN_TRIGGER;
 				it.subject = callee;
 				continue;
 			}
-			if (callee->find<components::melee>()) {
+			if (callee.find<components::melee>()) {
 				if (it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION)
 					it.intent = intent_type::MELEE_PRIMARY_MOVE;
 				else if (it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION)
@@ -101,8 +101,8 @@ void intent_contextualization_system::contextualize_movement_intents() {
 	for (auto& e : intents) {
 		entity_id callee;
 
-		auto* maybe_driver = e.subject->find<components::driver>();
-		auto* maybe_container = e.subject->find<components::container>();
+		auto* maybe_driver = e.subject.find<components::driver>();
+		auto* maybe_container = e.subject.find<components::container>();
 
 		if (maybe_driver && maybe_driver->owned_vehicle.alive()) {
 			if (e.intent == intent_type::MOVE_FORWARD

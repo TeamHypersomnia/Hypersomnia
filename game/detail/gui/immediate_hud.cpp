@@ -75,7 +75,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 	auto& target = *r.state.output;
 
 	auto camera = r.camera;
-	auto watched_character = camera->get<components::camera>().entity_to_chase;
+	auto watched_character = camera.get<components::camera>().entity_to_chase;
 
 	int timestamp_ms = render.frame_timestamp_seconds() * 1000;
 
@@ -83,7 +83,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 	pure_color_highlights.clear();
 
 	for (auto v : render.get_all_visible_entities()) {
-		auto* sentience = v->find<components::sentience>();
+		auto* sentience = v.find<components::sentience>();
 
 		if (sentience) {
 			auto hr = sentience->health.ratio();
@@ -94,7 +94,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 
 			hr *= 1.f - (0.2f * time_pulse_ratio);
 
-			auto* render = v->find<components::render>();
+			auto* render = v.find<components::render>();
 			
 			if (render) {
 				//render->partial_overlay_color = red;
@@ -109,7 +109,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 
 			auto health_col = sentience->calculate_health_color(time_pulse_ratio);
 
-			auto& transform = v->get<components::transform>();
+			auto& transform = v.get<components::transform>();
 			shared::state_for_drawing_renderable state;
 			state.setup_camera_state(r.state);
 			state.renderable_transform = transform;
@@ -120,7 +120,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 			circle_hud.draw(state);
 
 			
-			auto watched_character_transform = watched_character->get<components::transform>();
+			auto watched_character_transform = watched_character.get<components::transform>();
 			float starting_health_angle = 0.f;
 			float ending_health_angle = 0.f;
 
@@ -129,7 +129,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 				ending_health_angle = starting_health_angle + sentience->health.ratio() * 90.f;
 			}
 			else {
-				starting_health_angle = (v->get<components::transform>().pos - watched_character_transform.pos).degrees() - 45;
+				starting_health_angle = (v.get<components::transform>().pos - watched_character_transform.pos).degrees() - 45;
 				ending_health_angle = starting_health_angle + sentience->health.ratio() * 90.f;
 			}
 
@@ -325,7 +325,7 @@ void immediate_hud::draw_pure_color_highlights(messages::camera_render_request_m
 	auto current_time = get_current_time(msg);
 
 	for (auto& r : recent_pure_color_highlights) {
-		auto& col = r.target->get<components::sprite>().color;
+		auto& col = r.target.get<components::sprite>().color;
 		auto prevcol = col;
 		col = r.color;
 

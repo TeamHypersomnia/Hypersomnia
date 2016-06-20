@@ -18,7 +18,7 @@ void name_entity(definition_interface id, entity_name n, std::wstring nick) {
 
 entity_id get_first_named_ancestor(entity_id p) {
 	while (p.alive()) {
-		if (p->has<components::name>()) {
+		if (p.has<components::name>()) {
 			return p;
 			break;
 		}

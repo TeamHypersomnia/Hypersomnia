@@ -6,7 +6,7 @@ namespace components {
 		inventory_slot_id iterated_slot = current_slot;
 
 		while (iterated_slot.alive()) {
-			auto* parent_maybe_item = iterated_slot.container_entity->find<components::item>();
+			auto* parent_maybe_item = iterated_slot.container_entity.find<components::item>();
 
 			if (parent_maybe_item) {
 				if (!iterated_slot->is_physical_attachment_slot) {
@@ -25,10 +25,10 @@ namespace components {
 		inventory_slot_id iterated_slot = current_slot;
 
 		while (iterated_slot.alive()) {
-			if (iterated_slot->only_last_inserted_is_movable && (*iterated_slot->items_inside.rbegin())->find<components::item>() != this)
+			if (iterated_slot->only_last_inserted_is_movable && (*iterated_slot->items_inside.rbegin()).find<components::item>() != this)
 				return false;
 			else {
-				auto* maybe_item = iterated_slot.container_entity->find<components::item>();
+				auto* maybe_item = iterated_slot.container_entity.find<components::item>();
 
 				if (maybe_item)
 					iterated_slot = maybe_item->current_slot;

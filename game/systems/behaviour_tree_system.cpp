@@ -6,7 +6,7 @@
 
 void behaviour_tree_system::evaluate_trees() {
 	for (auto t : targets) {
-		auto& behaviour_tree = t->get<components::behaviour_tree>();
+		auto& behaviour_tree = t.get<components::behaviour_tree>();
 		
 		for (auto& t : behaviour_tree.concurrent_trees) {
 			auto& tree = *t.tree_id;

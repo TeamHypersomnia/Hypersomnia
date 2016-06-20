@@ -19,15 +19,15 @@ void aabb_highlighter::draw(shared::state_for_drawing_camera camera, entity_id s
 	rects::ltrb<float> aabb;
 
 	subject.for_each_sub_entity_recursive([&aabb](entity_id e) {
-		auto* sprite = e->find<components::sprite>();
-		auto* physics = e->find<components::physics_definition>();
+		auto* sprite = e.find<components::sprite>();
+		auto* physics = e.find<components::physics_definition>();
 
 		if (e->get_name_as_sub_entity() == sub_entity_name::CHARACTER_CROSSHAIR
 			|| e->get_name_as_sub_entity() == sub_entity_name::CROSSHAIR_RECOIL_BODY)
 			return;
 
 		if (sprite) {
-			auto new_aabb = sprite->get_aabb(e->get<components::transform>());
+			auto new_aabb = sprite->get_aabb(e.get<components::transform>());
 
 			if (aabb.good())
 				aabb.contain(new_aabb);

@@ -18,13 +18,13 @@ void damage_system::destroy_colliding_bullets_and_send_damage() {
 		if (it.type != messages::collision_message::event_type::BEGIN_CONTACT) 
 			continue;
 
-		auto* damage = it.collider->find<components::damage>();
+		auto* damage = it.collider.find<components::damage>();
 
 		bool bullet_colliding_with_sender =
 			damage && components::physics::get_owner_body_entity(damage->sender) == components::physics::get_owner_body_entity(it.subject);
 
 		if (!bullet_colliding_with_sender && damage && damage->damage_upon_collision && damage->damage_charges_before_destruction > 0) {
-			auto& subject_of_impact = components::physics::get_owner_body_entity(it.subject)->get<components::physics>();
+			auto& subject_of_impact = components::physics::get_owner_body_entity(it.subject).get<components::physics>();
 			
 			vec2 impact_velocity = damage->custom_impact_velocity;
 			
@@ -61,7 +61,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage() {
 
 void damage_system::destroy_outdated_bullets() {
 	for (auto it : targets) {
-		auto& damage = it->get<components::damage>();
+		auto& damage = it.get<components::damage>();
 	
 		if ((damage.constrain_lifetime && damage.lifetime_ms >= damage.max_lifetime_ms) ||
 			(damage.constrain_distance && damage.distance_travelled >= damage.max_distance)) {

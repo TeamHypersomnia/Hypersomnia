@@ -13,8 +13,8 @@
 
 void trace_system::lengthen_sprites_of_traces() {
 	for (auto& t : targets) {
-		auto& trace = t->get<components::trace>();
-		auto& sprite = t->get<components::sprite>();
+		auto& trace = t.get<components::trace>();
+		auto& sprite = t.get<components::sprite>();
 
 		if (trace.chosen_lengthening_duration_ms < 0.f)
 			trace.reset(*this);
@@ -36,7 +36,7 @@ void trace_system::lengthen_sprites_of_traces() {
 
 void trace_system::destroy_outdated_traces() {
 	for (auto& t : targets) {
-		auto& trace = t->get<components::trace>();
+		auto& trace = t.get<components::trace>();
 
 		if (trace.lengthening_time_passed_ms > trace.chosen_lengthening_duration_ms - 0.01f) {
 			trace.lengthening_time_passed_ms = trace.chosen_lengthening_duration_ms - 0.01f;
@@ -53,7 +53,7 @@ void trace_system::spawn_finishing_traces_for_destroyed_objects() {
 	for (auto& it : events) {
 		auto& e = it.subject;
 
-		auto* trace = e->find<components::trace>();
+		auto* trace = e.find<components::trace>();
 
 		if (trace && !trace->is_it_finishing_trace) {
 			auto finishing_trace = parent_cosmos.create_entity("finishing_trace");
@@ -63,15 +63,15 @@ void trace_system::spawn_finishing_traces_for_destroyed_objects() {
 
 			copied_trace.is_it_finishing_trace = true;
 			*finishing_trace += copied_trace;
-			*finishing_trace += e->get<components::sprite>();
-			*finishing_trace += e->get<components::transform>();
-			*finishing_trace += e->get<components::render>();
+			*finishing_trace += e.get<components::sprite>();
+			*finishing_trace += e.get<components::transform>();
+			*finishing_trace += e.get<components::render>();
 
-			//finishing_trace->get<components::transform>().rotation = 90;// e->get<components::physics>().velocity().degrees();
+			//finishing_trace.get<components::transform>().rotation = 90;// e.get<components::physics>().velocity().degrees();
 
-			if (e->find<components::damage>()) {
-				finishing_trace->get<components::transform>().pos = e->get<components::damage>().saved_point_of_impact_before_death - 
-					(e->get<components::sprite>().size/2).rotate(finishing_trace->get<components::transform>().rotation, vec2(0,0))
+			if (e.find<components::damage>()) {
+				finishing_trace.get<components::transform>().pos = e.get<components::damage>().saved_point_of_impact_before_death - 
+					(e.get<components::sprite>().size/2).rotate(finishing_trace.get<components::transform>().rotation, vec2(0,0))
 					;
 			}
 		}

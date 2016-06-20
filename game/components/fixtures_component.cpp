@@ -39,7 +39,7 @@ namespace components {
 	}
 
 	b2Body* fixtures::get_body() const {
-		return black.owner_body->get<components::physics>().black_detail.body;
+		return black.owner_body.get<components::physics>().black_detail.body;
 	}
 
 	entity_id fixtures::get_body_entity() const {
@@ -178,12 +178,12 @@ namespace components {
 
 	void fixtures::set_owner_body(entity_id e) {
 		if (black.owner_body.alive())
-			remove_element(black.owner_body->get<components::physics>().black_detail.fixture_entities, black_detail.all_fixtures_owner);
+			remove_element(black.owner_body.get<components::physics>().black_detail.fixture_entities, black_detail.all_fixtures_owner);
 		
 		black.owner_body = e;
 
 		if (e.alive())
-			e->get<components::physics>().black_detail.fixture_entities.push_back(black_detail.all_fixtures_owner);
+			e.get<components::physics>().black_detail.fixture_entities.push_back(black_detail.all_fixtures_owner);
 
 		destroy_fixtures();
 
@@ -224,7 +224,7 @@ namespace components {
 	}
 
 	bool fixtures::should_fixtures_exist_now() const {
-		return black_detail.parent_system != nullptr && black.activated && black.owner_body->get<components::physics>().is_activated();
+		return black_detail.parent_system != nullptr && black.activated && black.owner_body.get<components::physics>().is_activated();
 	}
 
 	bool fixtures::syncable_black_box_exists() const {

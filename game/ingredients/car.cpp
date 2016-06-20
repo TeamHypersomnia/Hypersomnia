@@ -63,7 +63,7 @@ namespace prefabs {
 			fixture.density = 0.6f;
 			fixture.filter = filters::friction_ground();
 			
-			vec2 offset((front->get<components::sprite>().size.x / 2 + sprite.size.x / 2) * -1, 0);
+			vec2 offset((front.get<components::sprite>().size.x / 2 + sprite.size.x / 2) * -1, 0);
 			fixture.transform_vertices.pos = offset;
 			fixture.is_friction_ground = true;
 		}

@@ -169,7 +169,7 @@ physics_system::query_aabb_output physics_system::query_aabb(vec2 p1_meters, vec
 physics_system::query_output physics_system::query_body(entity_id subject, b2Filter filter, entity_id ignore_entity) {
 	query_output total_output;
 
-	for (b2Fixture* f = subject->get<components::physics>().body->GetFixtureList(); f != nullptr; f = f->GetNext()) {
+	for (b2Fixture* f = subject.get<components::physics>().body->GetFixtureList(); f != nullptr; f = f->GetNext()) {
 		auto world_vertices = get_world_vertices(subject, true);
 
 		b2PolygonShape shape;

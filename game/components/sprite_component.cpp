@@ -128,7 +128,7 @@ namespace components {
 
 		if (in.renderable.alive()) {
 			auto renderable = in.renderable;
-			render = renderable->find<components::render>();
+			render = renderable.find<components::render>();
 			
 			if (render != nullptr) {
 				/* compute average */

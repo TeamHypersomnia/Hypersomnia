@@ -28,7 +28,7 @@ namespace ingredients {
 	}
 
 	void soldier_intelligence(entity_id e) {
-		auto& los = e->get<components::visibility>().line_of_sight_layers[components::visibility::LINE_OF_SIGHT];
+		auto& los = e.get<components::visibility>().line_of_sight_layers[components::visibility::LINE_OF_SIGHT];
 		los.test_sentiences = true;
 		los.test_attitudes = true;
 		los.test_items = true;

@@ -4,19 +4,19 @@
 
 void force_joint_system::apply_forces_towards_target_entities() {
 	for (auto& it : targets) {
-		auto& physics = it->get<components::physics>();
-		auto& force_joint = it->get<components::force_joint>();
+		auto& physics = it.get<components::physics>();
+		auto& force_joint = it.get<components::force_joint>();
 
 		if (force_joint.chased_entity.dead()) continue;
 
-		auto chased_transform = force_joint.chased_entity->get<components::transform>() + force_joint.chased_entity_offset;
+		auto chased_transform = force_joint.chased_entity.get<components::transform>() + force_joint.chased_entity_offset;
 
 		auto direction = chased_transform.pos - physics.get_position();
 		auto distance = direction.length();
 		direction.normalize_hint(distance);
 
 		if (force_joint.divide_transform_mode) {
-			auto current_transform = it->get<components::transform>();
+			auto current_transform = it.get<components::transform>();
 			auto interpolated = augs::interp(current_transform, chased_transform, 1.0 - 1.0 / (1.0 + delta_seconds() * (60.0)));
 			physics.set_transform(interpolated);
 		}
@@ -49,7 +49,7 @@ void force_joint_system::apply_forces_towards_target_entities() {
 			//}
 
 			if (force_for_chased.length() > 5) {
-				auto& chased_physics = force_joint.chased_entity->get<components::physics>();
+				auto& chased_physics = force_joint.chased_entity.get<components::physics>();
 				chased_physics.apply_force(force_for_chaser * chased_physics.get_mass());
 			}
 

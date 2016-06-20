@@ -9,13 +9,13 @@ void components::position_copying::set_target(entity_id new_target) {
 
 void position_copying_system::update_transforms() {
 	for (auto it : targets) {
-		auto& transform = it->get<components::transform>();
-		auto& position_copying = it->get<components::position_copying>();
+		auto& transform = it.get<components::transform>();
+		auto& position_copying = it.get<components::position_copying>();
 
 		if (position_copying.target.dead()) continue;
 		
 		if (position_copying.target_newly_set) {
-			auto target_transform = position_copying.subscribe_to_previous ? position_copying.target->get<components::render>().previous_transform : position_copying.target->get<components::transform>();
+			auto target_transform = position_copying.subscribe_to_previous ? position_copying.target.get<components::render>().previous_transform : position_copying.target.get<components::transform>();
 			target_transform.rotation *= position_copying.rotation_multiplier;
 
 			position_copying.previous = target_transform.pos;
@@ -23,7 +23,7 @@ void position_copying_system::update_transforms() {
 			position_copying.target_newly_set = false;
 		}
 
-		auto target_transform = position_copying.subscribe_to_previous ? position_copying.target->get<components::render>().previous_transform : position_copying.target->get<components::transform>();
+		auto target_transform = position_copying.subscribe_to_previous ? position_copying.target.get<components::render>().previous_transform : position_copying.target.get<components::transform>();
 		target_transform.rotation *= position_copying.rotation_multiplier;
 		target_transform.pos = vec2i(target_transform.pos);
 

@@ -19,6 +19,8 @@
 
 #include "game/components/trigger_collision_detector_component.h"
 #include "game/components/trigger_query_detector_component.h"
+#include "game/entity_handle.h"
+#include "game/step_state.h"
 
 void trigger_detector_system::consume_trigger_detector_presses() {
 	auto& trigger_presses = step.messages.get_queue<messages::intent_message>();
@@ -55,12 +57,12 @@ void trigger_detector_system::consume_trigger_detector_presses() {
 	}
 }
 
-void trigger_detector_system::post_trigger_requests_from_continuous_detectors() {
-	auto targets_copy = targets;
+void trigger_detector_system::post_trigger_requests_from_continuous_detectors(cosmos& cosmos, step_state& step) {
+	auto targets_copy = cosmos.get(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
 
 	for (auto& t : targets_copy) {
-		if (!t->get<components::trigger_query_detector>().detection_intent_enabled)
-			t.skip_processing_in(processing_subjects::trigger_query_detector>();
+		if (!t.get<components::trigger_query_detector>().detection_intent_enabled)
+			t.skip_processing_in(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
 		else {
 			messages::trigger_hit_request_message request;
 			request.detector = t;

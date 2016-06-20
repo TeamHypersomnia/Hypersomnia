@@ -23,11 +23,11 @@ void camera_system::react_to_input_intents() {
 	auto events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto it : events) {
-		if (it.subject->find<components::camera>() == nullptr)
+		if (it.subject.find<components::camera>() == nullptr)
 			continue;
 
 		if (it.intent == intent_type::SWITCH_LOOK && it.pressed_flag) {
-			auto& camera = it.subject->get<components::camera>();
+			auto& camera = it.subject.get<components::camera>();
 			auto& mode = camera.orbit_mode;
 
 			if (mode == components::camera::LOOK)
@@ -37,16 +37,16 @@ void camera_system::react_to_input_intents() {
 			auto crosshair = camera.entity_to_chase[sub_entity_name::CHARACTER_CROSSHAIR];
 
 			if (crosshair.alive())
-				update_bounds_for_crosshair(camera, crosshair->get<components::crosshair>());
+				update_bounds_for_crosshair(camera, crosshair.get<components::crosshair>());
 		}
 	}
 }
 
 void components::camera::configure_camera_and_character_with_crosshair(entity_id camera, entity_id character, entity_id crosshair) {
-	camera->get<components::camera>().entity_to_chase = character;
-	camera->get<components::position_copying>().set_target(character);
+	camera.get<components::camera>().entity_to_chase = character;
+	camera.get<components::position_copying>().set_target(character);
 
-	update_bounds_for_crosshair(camera->get<components::camera>(), crosshair->get<components::crosshair>());
+	update_bounds_for_crosshair(camera.get<components::camera>(), crosshair.get<components::crosshair>());
 }
 
 vec2i components::camera::get_camera_offset_due_to_character_crosshair(entity_id self) const {
@@ -60,7 +60,7 @@ vec2i components::camera::get_camera_offset_due_to_character_crosshair(entity_id
 	/* if we set player and crosshair entity targets */
 	/* skip calculations if no orbit_mode is specified */
 	if (crosshair_entity.alive() && orbit_mode != NONE) {
-		auto& crosshair = crosshair_entity->get<components::crosshair>();
+		auto& crosshair = crosshair_entity.get<components::crosshair>();
 		camera_crosshair_offset = components::crosshair::calculate_aiming_displacement(crosshair_entity, false);
 		
 		if (orbit_mode == ANGLED)
@@ -80,15 +80,15 @@ vec2i components::camera::get_camera_offset_due_to_character_crosshair(entity_id
 void camera_system::resolve_cameras_transforms_and_smoothing() {
 	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
 	std::sort(targets.begin(), targets.end(), [](entity_id a, entity_id b) {
-		return a->get<components::camera>().layer > b->get<components::camera>().layer;
+		return a.get<components::camera>().layer > b.get<components::camera>().layer;
 	});
 
 	for (auto e : targets) {
-		auto& camera = e->get<components::camera>();
+		auto& camera = e.get<components::camera>();
 
 		if (camera.enabled) {
 			/* we obtain transform as a copy because we'll be now offsetting it by crosshair position */
-			auto transform = e->get<components::transform>();
+			auto transform = e.get<components::transform>();
 			transform.pos = vec2i(transform.pos);
 
 			vec2i camera_crosshair_offset = camera.get_camera_offset_due_to_character_crosshair(e);
@@ -145,7 +145,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 
 			if (camera.entity_to_chase.alive()) {
 				vec2 target_value;
-				auto maybe_physics = camera.entity_to_chase->find<components::physics>();
+				auto maybe_physics = camera.entity_to_chase.find<components::physics>();
 
 				if (maybe_physics) {
 					auto player_pos = maybe_physics->get_mass_position();
@@ -170,7 +170,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing() {
 					// LOG("%x, %x, %x", *(vec2i*)&player_pos, *(vec2i*)&camera.previous_step_player_position, *(vec2i*)&target_value);
 				}
 				else {
-					target_value = camera.entity_to_chase->get<components::render>().interpolation_direction();
+					target_value = camera.entity_to_chase.get<components::render>().interpolation_direction();
 					target_value.set_length(100);
 					camera.smoothing_player_pos.averages_per_sec = 5;
 				}
@@ -201,7 +201,7 @@ void camera_system::post_render_requests_for_all_cameras() {
 	step.messages.get_queue<messages::camera_render_request_message>().clear();
 
 	for (auto e : targets) {
-		auto& camera = e->get<components::camera>();
+		auto& camera = e.get<components::camera>();
 
 		if (camera.enabled) {
 			auto& in = camera.how_camera_will_render;

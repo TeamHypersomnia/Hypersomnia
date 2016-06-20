@@ -41,7 +41,7 @@ void physics_system::step_and_set_new_transforms(step_state& step) {
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
 
-		auto& physics = static_cast<entity_id>(b->GetUserData())->get<components::physics>();
+		auto& physics = static_cast<entity_id>(b->GetUserData()).get<components::physics>();
 		physics.measured_carried_mass = 0.f;
 
 		b2Vec2 vel(b->GetLinearVelocity());
@@ -95,7 +95,7 @@ void physics_system::step_and_set_new_transforms(step_state& step) {
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
 		auto entity = b->GetUserData();
-		auto& physics = entity->get<components::physics>();
+		auto& physics = entity.get<components::physics>();
 		
 		recurential_friction_handler(b->GetUserData(), physics.get_owner_friction_ground());
 	}
@@ -106,17 +106,17 @@ void physics_system::step_and_set_new_transforms(step_state& step) {
 void physics_system::set_transforms_from_body_transforms() {
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
-		auto& transform = static_cast<entity_id>(b->GetUserData())->get<components::transform>();
-		auto& physics = static_cast<entity_id>(b->GetUserData())->get<components::physics>();
+		auto& transform = static_cast<entity_id>(b->GetUserData()).get<components::transform>();
+		auto& physics = static_cast<entity_id>(b->GetUserData()).get<components::physics>();
 
 		auto body_pos = METERS_TO_PIXELSf * b->GetPosition();
 		auto body_angle = b->GetAngle() * RAD_TO_DEG;
 
 		for (auto& fe : physics.black_detail.fixture_entities) {
-			auto& fixtures = fe->get<components::fixtures>();
+			auto& fixtures = fe.get<components::fixtures>();
 			auto total_offset = fixtures.get_total_offset();
 
-			auto& transform = fe->get<components::transform>();
+			auto& transform = fe.get<components::transform>();
 			transform.pos = body_pos;
 
 			if (!b->IsFixedRotation())
@@ -141,8 +141,8 @@ void physics_system::react_to_destroyed_entities(step_state& step) {
 	for (auto& it : events) {
 		auto e = it.subject;
 
-		auto* maybe_physics = e->find<components::physics>();
-		auto* maybe_fixtures = e->find<components::fixtures>();
+		auto* maybe_physics = e.find<components::physics>();
+		auto* maybe_fixtures = e.find<components::fixtures>();
 
 		if (maybe_physics)
 			maybe_physics->destroy_body();
@@ -158,8 +158,8 @@ void physics_system::react_to_new_entities(step_state& step) {
 	for (auto& it : events) {
 		auto e = it.subject;
 
-		auto* maybe_physics = e->find<components::physics>();
-		auto* maybe_fixtures = e->find<components::fixtures>();
+		auto* maybe_physics = e.find<components::physics>();
+		auto* maybe_fixtures = e.find<components::fixtures>();
 
 		if (maybe_physics) {
 			maybe_physics->black_detail.body_owner = e;
@@ -186,22 +186,22 @@ void physics_system::react_to_new_entities(step_state& step) {
 }
 
 entity_id physics_system::get_owner_friction_field(entity_id id) {
-	return get_owner_body_entity(id)->get<components::physics>().owner_friction_ground;
+	return get_owner_body_entity(id).get<components::physics>().owner_friction_ground;
 }
 
 entity_id physics_system::get_owner_body_entity(entity_id id) {
-	auto* fixtures = id->find<components::fixtures>();
+	auto* fixtures = id.find<components::fixtures>();
 	if (fixtures) return fixtures->get_body_entity();
-	else if (id->find<components::physics>()) return id;
+	else if (id.find<components::physics>()) return id;
 	return entity_id();
 }
 
 bool physics_system::is_entity_physical(entity_id id) {
-	return id->find<components::fixtures>() || id->find<components::physics>();
+	return id.find<components::fixtures>() || id.find<components::physics>();
 }
 
 void physics_system::resolve_density_of_associated_fixtures(entity_id id) {
-	auto* maybe_physics = id->find<components::physics>();
+	auto* maybe_physics = id.find<components::physics>();
 
 	if (maybe_physics) {
 		const auto& entities = maybe_physics->get_fixture_entities();
@@ -212,17 +212,17 @@ void physics_system::resolve_density_of_associated_fixtures(entity_id id) {
 		}
 	}
 
-	auto& fixtures = id->get<components::fixtures>();
+	auto& fixtures = id.get<components::fixtures>();
 
 	float density_multiplier = 1.f;
 
-	auto* item = id->find<components::item>();
+	auto* item = id.find<components::item>();
 
 	if (item != nullptr && item->current_slot.alive() && item->current_slot.should_item_inside_keep_physical_body())
 		density_multiplier *= item->current_slot.calculate_density_multiplier_due_to_being_attached();
 
 	auto owner_body = get_owner_body_entity(id);
-	auto* driver = owner_body->find<components::driver>();
+	auto* driver = owner_body.find<components::driver>();
 
 	if (driver) {
 		if (driver->owned_vehicle.alive()) {
@@ -237,9 +237,9 @@ void physics_system::resolve_density_of_associated_fixtures(entity_id id) {
 std::vector<b2Vec2> physics_system::get_world_vertices(entity_id subject, bool meters, int fixture_num) {
 	std::vector<b2Vec2> output;
 
-	auto& b = subject->get<components::physics>();
+	auto& b = subject.get<components::physics>();
 
-	auto& verts = subject->get<components::fixtures>().get_definition().colliders[0].shape.convex_polys[fixture_num];
+	auto& verts = subject.get<components::fixtures>().get_definition().colliders[0].shape.convex_polys[fixture_num];
 
 	/* for every vertex in given fixture's shape */
 	for (auto& v : verts) {

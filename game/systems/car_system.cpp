@@ -13,7 +13,7 @@ void car_system::set_steering_flags_from_intents() {
 	auto& intents = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& it : intents) {
-		auto* maybe_car = it.subject->find<components::car>();
+		auto* maybe_car = it.subject.find<components::car>();
 		if (maybe_car == nullptr) continue;
 
 		auto& car = *maybe_car;
@@ -41,8 +41,8 @@ void car_system::set_steering_flags_from_intents() {
 
 void car_system::apply_movement_forces() {
 	for (auto it : targets) {
-		auto& car = it->get<components::car>();
-		auto& physics = it->get<components::physics>();
+		auto& car = it.get<components::car>();
+		auto& physics = it.get<components::physics>();
 
 		vec2 resultant;
 

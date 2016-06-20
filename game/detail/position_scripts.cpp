@@ -4,11 +4,11 @@
 #include "game/components/physics_component.h"
 
 vec2 position(entity_id e) {
-	return e->get<components::transform>().pos;
+	return e.get<components::transform>().pos;
 }
 
 float rotation(entity_id e) {
-	return e->get<components::transform>().rotation;
+	return e.get<components::transform>().rotation;
 }
 
 vec2 orientation(entity_id of) {
@@ -24,7 +24,7 @@ vec2 direction_norm(entity_id a, entity_id b) {
 }
 
 vec2 velocity(entity_id e) {
-	return components::physics::get_owner_body_entity(e)->get<components::physics>().velocity();
+	return components::physics::get_owner_body_entity(e).get<components::physics>().velocity();
 }
 
 float speed(entity_id e) {

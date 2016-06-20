@@ -9,7 +9,7 @@
 namespace behaviours {
 	tree::goal_availability explore_in_search_for_last_seen_target::goal_resolution(tree::state_of_traversal& t) const {
 		auto subject = t.instance.user_input;
-		auto& attitude = subject->get<components::attitude>();
+		auto& attitude = subject.get<components::attitude>();
 		auto currently_attacked_visible_entity = attitude.currently_attacked_visible_entity;
 
 		if (currently_attacked_visible_entity.dead() && attitude.is_alert && attitude.last_seen_target_position_inspected) {
@@ -21,9 +21,9 @@ namespace behaviours {
 
 	void explore_in_search_for_last_seen_target::execute_leaf_goal_callback(tree::execution_occurence o, tree::state_of_traversal& t) const {
 		auto subject = t.instance.user_input;
-		auto& attitude = subject->get<components::attitude>();
-		auto& movement = subject->get<components::movement>();
-		auto& pathfinding = subject->get<components::pathfinding>();
+		auto& attitude = subject.get<components::attitude>();
+		auto& movement = subject.get<components::movement>();
+		auto& pathfinding = subject.get<components::pathfinding>();
 
 		if (o == tree::execution_occurence::FIRST) {
 			pathfinding.start_exploring();

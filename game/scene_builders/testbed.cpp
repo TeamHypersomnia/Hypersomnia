@@ -116,30 +116,30 @@ namespace scene_builders {
 			characters.push_back(new_character);
 
 			if (i == 0) {
-				new_character->get<components::sentience>().health.value = 800;
-				new_character->get<components::sentience>().health.maximum = 800;
+				new_character.get<components::sentience>().health.value = 800;
+				new_character.get<components::sentience>().health.maximum = 800;
 			}
 			if (i == 1) {
-				new_character->get<components::transform>().pos.set(2800, 700);
-				new_character->get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
-				new_character->get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
-				new_character->get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
-				new_character->get<components::sentience>().minimum_danger_amount_to_evade = 20;
-				new_character->get<components::sentience>().health.value = 300;
-				new_character->get<components::sentience>().health.maximum = 300;
+				new_character.get<components::transform>().pos.set(2800, 700);
+				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
+				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
+				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
+				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
+				new_character.get<components::sentience>().health.value = 300;
+				new_character.get<components::sentience>().health.maximum = 300;
 				ingredients::standard_pathfinding_capability(new_character);
 				ingredients::soldier_intelligence(new_character);
 			}
 			if (i == 2) {
-				new_character->get<components::sentience>().health.value = 38;
+				new_character.get<components::sentience>().health.value = 38;
 			}
 			if (i == 5) {
-				new_character->get<components::attitude>().parties = party_category::METROPOLIS_CITIZEN;
-				new_character->get<components::attitude>().hostile_parties = party_category::RESISTANCE_CITIZEN;
-				new_character->get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
-				new_character->get<components::sentience>().minimum_danger_amount_to_evade = 20;
-				new_character->get<components::sentience>().health.value = 300;
-				new_character->get<components::sentience>().health.maximum = 300;
+				new_character.get<components::attitude>().parties = party_category::METROPOLIS_CITIZEN;
+				new_character.get<components::attitude>().hostile_parties = party_category::RESISTANCE_CITIZEN;
+				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
+				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
+				new_character.get<components::sentience>().health.value = 300;
+				new_character.get<components::sentience>().health.maximum = 300;
 				ingredients::standard_pathfinding_capability(new_character);
 				ingredients::soldier_intelligence(new_character);
 			}
@@ -306,7 +306,7 @@ namespace scene_builders {
 
 		show_profile_details = true;
 
-		//characters[1]->get<components::pathfinding>().start_exploring();
+		//characters[1].get<components::pathfinding>().start_exploring();
 		world.systems.get<pathfinding_system>().draw_memorised_walls = 1;
 		world.systems.get<pathfinding_system>().draw_undiscovered = 1;
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
@@ -340,22 +340,22 @@ namespace scene_builders {
 		}
 
 		for (auto& tested : draw_bodies) {
-			auto& s = tested->get<components::physics_definition>();
+			auto& s = tested.get<components::physics_definition>();
 
 			auto& lines = renderer::get_current().logic_lines;
 
 			auto vv = s.fixtures[0].debug_original;
 
 			for (int i = 0; i < vv.size(); ++i) {
-				auto& tt = tested->get<components::transform>();
+				auto& tt = tested.get<components::transform>();
 				auto pos = tt.pos;
 
 				lines.draw_cyan((pos + vv[i]).rotate(tt.rotation, pos), (pos + vv[(i + 1) % vv.size()]).rotate(tt.rotation, pos));
 			}
 		}
 
-		//auto ff = (characters[1]->get<components::pathfinding>().get_current_navigation_point() - position(characters[1])).set_length(15000);
-		//characters[1]->get<components::physics>().apply_force(ff);
+		//auto ff = (characters[1].get<components::pathfinding>().get_current_navigation_point() - position(characters[1])).set_length(15000);
+		//characters[1].get<components::physics>().apply_force(ff);
 
 		// LOG("F: %x", ff);
 	}
@@ -379,7 +379,7 @@ namespace scene_builders {
 			}
 		}
 
-		auto coords = characters[current_character]->get<components::transform>().pos;
+		auto coords = characters[current_character].get<components::transform>().pos;
 
 		quick_print_format(target.triangles, typesafe_sprintf(L"X: %f2\nY: %f2\n", coords.x, coords.y) + world.world_summary(show_profile_details), style(assets::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0, nullptr);
 		target.call_triangles();

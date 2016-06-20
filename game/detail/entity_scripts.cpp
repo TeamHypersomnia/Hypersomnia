@@ -10,11 +10,11 @@
 #include "inventory_slot.h"
 
 void unset_input_flags_of_orphaned_entity(entity_id e) {
-	auto* gun = e->find<components::gun>();
-	auto* melee = e->find<components::melee>();
-	auto* car = e->find<components::car>();
-	auto* movement = e->find<components::movement>();
-	auto* damage = e->find<components::damage>();
+	auto* gun = e.find<components::gun>();
+	auto* melee = e.find<components::melee>();
+	auto* car = e.find<components::car>();
+	auto* movement = e.find<components::movement>();
+	auto* damage = e.find<components::damage>();
 
 	if (car)
 		car->reset_movement_flags();
@@ -37,22 +37,22 @@ bool isLeft(vec2 a, vec2 b, vec2 c) {
 identified_danger assess_danger(entity_id victim, entity_id danger) {
 	identified_danger result;
 
-	auto* sentience = victim->find<components::sentience>();
+	auto* sentience = victim.find<components::sentience>();
 	if (!sentience) return result;
 
 	auto& s = *sentience;
 
 	result.danger = danger;
 
-	auto* damage = danger->find<components::damage>();
-	auto* attitude = danger->find<components::attitude>();
+	auto* damage = danger.find<components::damage>();
+	auto* attitude = danger.find<components::attitude>();
 
 	if ((!damage && !attitude) || (damage && get_owning_transfer_capability(damage->sender) == victim))
 		return result;
 
 	auto victim_pos = position(victim);
 	auto danger_pos = position(danger);
-	auto danger_vel = components::physics::get_owner_body_entity(danger)->get<components::physics>().velocity();
+	auto danger_vel = components::physics::get_owner_body_entity(danger).get<components::physics>().velocity();
 	auto danger_speed = danger_vel.length();
 	auto danger_dir = (danger_pos - victim_pos);
 	float danger_distance = danger_dir.length();
@@ -88,8 +88,8 @@ identified_danger assess_danger(entity_id victim, entity_id danger) {
 }
 
 attitude_type calculate_attitude(entity_id targeter, entity_id target) {
-	auto& targeter_attitude = targeter->get<components::attitude>();
-	auto* target_attitude = target->find<components::attitude>();
+	auto& targeter_attitude = targeter.get<components::attitude>();
+	auto* target_attitude = target.find<components::attitude>();
 
 	if (target_attitude) {
 		if (targeter_attitude.hostile_parties & target_attitude->parties) {
@@ -111,7 +111,7 @@ std::vector<entity_id> guns_wielded(entity_id subject) {
 
 	if (hand.has_items()) {
 		auto wielded = hand->items_inside[0];
-		if (wielded->find<components::gun>()) {
+		if (wielded.find<components::gun>()) {
 			result.push_back(wielded);
 		}
 	}
@@ -121,7 +121,7 @@ std::vector<entity_id> guns_wielded(entity_id subject) {
 	if (hand.has_items()) {
 		auto wielded = hand->items_inside[0];
 
-		if (wielded->find<components::gun>()) {
+		if (wielded.find<components::gun>()) {
 			result.push_back(wielded);
 		}
 	}
@@ -136,10 +136,10 @@ float assess_projectile_velocity_of_weapon(entity_id weapon) {
 	// auto ch = weapon[slot_function::GUN_CHAMBER];
 	// 
 	// if (ch.has_items()) {
-	// 	ch->items_inside[0][sub_definition_name::BULLET_ROUND]->get<components::damage>();
+	// 	ch->items_inside[0][sub_definition_name::BULLET_ROUND].get<components::damage>();
 	// }
 
-	auto* maybe_gun = weapon->find<components::gun>();
+	auto* maybe_gun = weapon.find<components::gun>();
 
 	if (maybe_gun) {
 		return (maybe_gun->muzzle_velocity.first + maybe_gun->muzzle_velocity.second) / 2;

@@ -61,16 +61,16 @@ float colinearize_AB(vec2 O_center_of_rotation, vec2 A_rifle_center, vec2 B_barr
 }
 
 void rotation_copying_system::resolve_rotation_copying_value(entity_id it) {
-	auto& rotation_copying = it->get<components::rotation_copying>();
+	auto& rotation_copying = it.get<components::rotation_copying>();
 
 	if (rotation_copying.target.dead())
 		return;
 
-	auto& transform = it->get<components::transform>();
+	auto& transform = it.get<components::transform>();
 	float new_angle = 0.f;
 
 	if (rotation_copying.look_mode == components::rotation_copying::look_type::POSITION) {
-		auto target_transform = rotation_copying.target->find<components::transform>();
+		auto target_transform = rotation_copying.target.find<components::transform>();
 		
 		if (target_transform != nullptr) {
 			auto diff = target_transform->pos - transform.pos;
@@ -86,11 +86,11 @@ void rotation_copying_system::resolve_rotation_copying_value(entity_id it) {
 				if (hand.has_items()) {
 					auto subject_item = hand->items_inside[0];
 
-					auto* maybe_gun = subject_item->find<components::gun>();
+					auto* maybe_gun = subject_item.find<components::gun>();
 
 					if (maybe_gun) {
-						auto gun_transform = subject_item->get<components::transform>();
-						auto mc = it->get<components::physics>().get_mass_position();
+						auto gun_transform = subject_item.get<components::transform>();
+						auto mc = it.get<components::physics>().get_mass_position();
 
 						new_angle =
 							transform.rotation +
@@ -101,7 +101,7 @@ void rotation_copying_system::resolve_rotation_copying_value(entity_id it) {
 		}
 	}
 	else {
-		auto target_physics = rotation_copying.target->find<components::physics>();
+		auto target_physics = rotation_copying.target.find<components::physics>();
 
 		if (target_physics != nullptr) {
 			vec2 direction;
@@ -133,13 +133,13 @@ void rotation_copying_system::resolve_rotation_copying_value(entity_id it) {
 
 void rotation_copying_system::update_physical_motors() {
 	for (auto it : targets) {
-		auto& rotation_copying = it->get<components::rotation_copying>();
+		auto& rotation_copying = it.get<components::rotation_copying>();
 
 		if (rotation_copying.update_value) {
-			if (rotation_copying.use_physical_motor && it->find<components::physics>() != nullptr) {
+			if (rotation_copying.use_physical_motor && it.find<components::physics>() != nullptr) {
 				resolve_rotation_copying_value(it);
 
-				auto& physics = it->get<components::physics>();
+				auto& physics = it.get<components::physics>();
 				physics.enable_angle_motor = true;
 				physics.target_angle = rotation_copying.last_value;
 			}
@@ -149,12 +149,12 @@ void rotation_copying_system::update_physical_motors() {
 
 void rotation_copying_system::update_rotations() {
 	for (auto it : targets) {
-		auto& rotation_copying = it->get<components::rotation_copying>();
+		auto& rotation_copying = it.get<components::rotation_copying>();
 
 		if (rotation_copying.update_value) {
 			if (!rotation_copying.use_physical_motor) {
 				resolve_rotation_copying_value(it);
-				it->get<components::transform>().rotation = rotation_copying.last_value;
+				it.get<components::transform>().rotation = rotation_copying.last_value;
 			}
 		}
 	}

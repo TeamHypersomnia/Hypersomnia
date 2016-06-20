@@ -13,7 +13,7 @@
 #include "templates.h"
 
 textual_description description_of_entity(entity_id id) {
-	auto& name = id->get<components::name>();
+	auto& name = id.get<components::name>();
 	
 	auto result = description_by_entity_name(name.id);
 
@@ -26,11 +26,11 @@ textual_description description_of_entity(entity_id id) {
 std::wstring describe_properties(entity_id id) {
 	std::wostringstream result;
 
-	auto* melee = id->find<components::melee>();
-	auto* gun = id->find<components::gun>();
-	auto* damage = id->find<components::damage>();
-	auto* container = id->find<components::container>();
-	auto* item = id->find<components::item>();
+	auto* melee = id.find<components::melee>();
+	auto* gun = id.find<components::gun>();
+	auto* damage = id.find<components::damage>();
+	auto* container = id.find<components::container>();
+	auto* item = id.find<components::item>();
 
 	if (item) {
 		if (item->categories_for_slot_compatibility != 0)

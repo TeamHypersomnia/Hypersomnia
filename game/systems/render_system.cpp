@@ -34,16 +34,16 @@ void render_system::add_entities_to_rendering_tree() {
 	for (auto& it : events) {
 		auto& e = it.subject;
 
-		auto* physics_definition = e->find<components::physics_definition>();
-		auto* render = e->find<components::render>();
+		auto* physics_definition = e.find<components::physics_definition>();
+		auto* render = e.find<components::render>();
 
 		if (!physics_definition && render) {
-			auto* sprite = e->find<components::sprite>();
-			auto* polygon = e->find<components::polygon>();
-			auto* tile_layer = e->find<components::tile_layer>();
-			auto* particle_group = e->find<components::particle_group>();
+			auto* sprite = e.find<components::sprite>();
+			auto* polygon = e.find<components::polygon>();
+			auto* tile_layer = e.find<components::tile_layer>();
+			auto* particle_group = e.find<components::particle_group>();
 
-			auto transform = e->get<components::transform>();
+			auto transform = e.get<components::transform>();
 
 			if(!render->was_drawn)
 				render->previous_transform = transform;
@@ -76,8 +76,8 @@ void render_system::remove_entities_from_rendering_tree() {
 	for (auto& it : events) {
 		auto& e = it.subject;
 
-		auto* physics_definition = e->find<components::physics_definition>();
-		auto* render = e->find<components::render>();
+		auto* physics_definition = e.find<components::physics_definition>();
+		auto* render = e.find<components::render>();
 
 		if (render && render->rendering_proxy >= 0) {
 			auto* userdata = non_physical_objects_tree.GetUserData(render->rendering_proxy);
@@ -97,7 +97,7 @@ void render_system::determine_visible_entities_from_every_camera() {
 	visible_entities.clear();
 
 	for (auto& camera : cameras) {
-		auto& in = camera->get<components::camera>().how_camera_will_render;
+		auto& in = camera.get<components::camera>().how_camera_will_render;
 
 		auto& result = physics.query_aabb_px(in.transformed_visible_world_area_aabb.left_top(), in.transformed_visible_world_area_aabb.right_bottom(), filters::renderable_query());
 		visible_entities.insert(visible_entities.end(), result.entities.begin(), result.entities.end());
@@ -105,7 +105,7 @@ void render_system::determine_visible_entities_from_every_camera() {
 		visible_entities.erase(
 			std::remove_if(visible_entities.begin(), visible_entities.end(), 
 				[](entity_id id) { 
-			return id->find<components::render>() == nullptr;  
+			return id.find<components::render>() == nullptr;  
 		}), visible_entities.end());
 
 		struct render_listener {
@@ -148,7 +148,7 @@ void render_system::generate_layers_from_visible_entities(int mask) {
 	std::vector<entity_id> entities_by_mask;
 
 	for (auto& it : visible_entities) {
-		auto* maybe_render = it->find<components::render>();
+		auto* maybe_render = it.find<components::render>();
 		if (!maybe_render) continue;
 
 		if (maybe_render->mask == mask)
@@ -156,7 +156,7 @@ void render_system::generate_layers_from_visible_entities(int mask) {
 	}
 
 	for (auto& it : entities_by_mask) {
-		auto layer = it->get<components::render>().layer;
+		auto layer = it.get<components::render>().layer;
 		
 		if (layer >= layers.size()) 
 			layers.resize(layer+1);
@@ -200,10 +200,10 @@ void render_system::set_current_transforms_as_previous_for_interpolation() {
 		if (it.dead())
 			continue;
 
-		auto& render = it->get<components::render>();
+		auto& render = it.get<components::render>();
 
 		if (render.interpolate) {
-			render.previous_transform = it->get<components::transform>();
+			render.previous_transform = it.get<components::transform>();
 		}
 	}
 }
@@ -218,10 +218,10 @@ void render_system::calculate_and_set_interpolated_transforms() {
 	auto ratio = view_interpolation_ratio();
 
 	for (auto e : visible_entities) {
-		auto& render = e->get<components::render>();
+		auto& render = e.get<components::render>();
 
 		if (render.interpolate) {
-			auto& actual_transform = e->get<components::transform>();
+			auto& actual_transform = e.get<components::transform>();
 			render.saved_actual_transform = actual_transform;
 
 			if (render.last_step_when_visible == current_step - 1) {
@@ -248,10 +248,10 @@ void render_system::restore_actual_transforms() {
 	if (!enable_interpolation) return;
 
 	for (auto it : visible_entities) {
-		auto& render = it->get<components::render>();
+		auto& render = it.get<components::render>();
 
 		if (render.interpolate) {
-			it->get<components::transform>() = render.saved_actual_transform;
+			it.get<components::transform>() = render.saved_actual_transform;
 		}
 	}
 }
@@ -260,9 +260,9 @@ void render_system::standard_draw_entity(entity_id e, shared::state_for_drawing_
 	static thread_local state_for_drawing_renderable in;
 	in.setup_camera_state(in_camera);
 
-	auto& render = e->get<components::render>();
+	auto& render = e.get<components::render>();
 
-	in.renderable_transform = e->get<components::transform>();
+	in.renderable_transform = e.get<components::transform>();
 	in.renderable_transform.pos = vec2i(in.renderable_transform.pos);
 	in.renderable_transform.rotation = in.renderable_transform.rotation;
 
@@ -270,10 +270,10 @@ void render_system::standard_draw_entity(entity_id e, shared::state_for_drawing_
 
 	in.camera_transform = render.absolute_transform ? components::transform() : in_camera.camera_transform;
 
-	auto* polygon = e->find<components::polygon>();
-	auto* sprite = e->find<components::sprite>();
-	auto* tile_layer = e->find<components::tile_layer>();
-	auto* particle_group = e->find<components::particle_group>();
+	auto* polygon = e.find<components::polygon>();
+	auto* sprite = e.find<components::sprite>();
+	auto* tile_layer = e.find<components::tile_layer>();
+	auto* particle_group = e.find<components::particle_group>();
 
 	if (only_border_highlights) {
 		if (render.draw_border) {

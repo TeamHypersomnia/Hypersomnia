@@ -20,11 +20,11 @@ entity_id game_gui_world::get_hovered_world_entity(vec2 camera_pos) {
 	if(hovered.entities.size() > 0) {
 		std::vector<entity_id> sorted_by_visibility(hovered.entities.begin(), hovered.entities.end());
 		sorted_by_visibility.erase(std::remove_if(sorted_by_visibility.begin(), sorted_by_visibility.end(), [](entity_id e) {
-			return e->find<components::render>() == nullptr;
+			return e.find<components::render>() == nullptr;
 		}), sorted_by_visibility.end());
 
 		std::sort(sorted_by_visibility.begin(), sorted_by_visibility.end(), [](entity_id a, entity_id b) {
-			return a->get<components::render>().last_visibility_index > b->get<components::render>().last_visibility_index;
+			return a.get<components::render>().last_visibility_index > b.get<components::render>().last_visibility_index;
 		});
 
 		std::vector<entity_id> hovered_and_named;

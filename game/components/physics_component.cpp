@@ -58,10 +58,10 @@ namespace components {
 		black_detail.body = black_detail.parent_system->b2world.CreateBody(&def);
 		black_detail.body->SetAngledDampingEnabled(black.angled_damping);
 
-		const auto& all_fixture_entities = get_entity()->get<components::physics>().black_detail.fixture_entities;
+		const auto& all_fixture_entities = get_entity().get<components::physics>().black_detail.fixture_entities;
 
 		for (auto fe : all_fixture_entities) {
-			auto& fixtures = fe->get<components::fixtures>();
+			auto& fixtures = fe.get<components::fixtures>();
 
 			if (fixtures.should_fixtures_exist_now()) {
 				fixtures.destroy_fixtures();
@@ -75,10 +75,10 @@ namespace components {
 
 	void physics::destroy_body() {
 		if (black_detail.body != nullptr) {
-			const auto& all_fixture_entities = get_entity()->get<components::physics>().black_detail.fixture_entities;
+			const auto& all_fixture_entities = get_entity().get<components::physics>().black_detail.fixture_entities;
 
 			for (auto fe : all_fixture_entities)
-				fe->get<components::fixtures>().destroy_fixtures();
+				fe.get<components::fixtures>().destroy_fixtures();
 
 			black_detail.parent_system->b2world.DestroyBody(black_detail.body);
 		}
@@ -234,7 +234,7 @@ namespace components {
 	}
 	
 	void physics::set_transform(entity_id id) {
-		set_transform(id->get<components::transform>());
+		set_transform(id.get<components::transform>());
 	}
 
 	void physics::set_transform(components::transform transform) {

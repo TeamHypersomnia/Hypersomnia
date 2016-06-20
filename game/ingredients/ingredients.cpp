@@ -20,8 +20,8 @@ namespace ingredients {
 		auto& item = *e += components::item();
 
 		e->add<components::trigger>();
-		e->get<components::trigger>().react_to_collision_detectors = true;
-		e->get<components::trigger>().react_to_query_detectors = false;
+		e.get<components::trigger>().react_to_collision_detectors = true;
+		e.get<components::trigger>().react_to_query_detectors = false;
 
 		auto& force_joint = e->add<components::force_joint>();
 		e.skip_processing_in(processing_subjects::force_joint>();

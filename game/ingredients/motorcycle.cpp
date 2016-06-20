@@ -90,7 +90,7 @@ namespace prefabs {
 			info.density = 0.6f;
 			info.sensor = true;
 			info.filter = filters::see_through_dynamic_object();
-			vec2 offset((front->get<components::sprite>().size.x / 2 + sprite.size.x / 2 - 1) * -1, 0);
+			vec2 offset((front.get<components::sprite>().size.x / 2 + sprite.size.x / 2 - 1) * -1, 0);
 			info.transform_vertices.pos = offset;
 		}
 
@@ -116,7 +116,7 @@ namespace prefabs {
 			info.density = 0.6f;
 			info.filter = filters::trigger();
 			info.sensor = true;
-			vec2 offset((front->get<components::sprite>().size.x / 2 + sprite.size.x / 2) * -1, 0);
+			vec2 offset((front.get<components::sprite>().size.x / 2 + sprite.size.x / 2) * -1, 0);
 			info.transform_vertices.pos = offset;
 		}
 

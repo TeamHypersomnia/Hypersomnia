@@ -11,12 +11,12 @@ entity_id get_owning_transfer_capability(entity_id entity) {
 	if (entity.dead())
 		return entity_id();
 
-	auto* maybe_transfer_capability = entity->find<components::item_slot_transfers>();
+	auto* maybe_transfer_capability = entity.find<components::item_slot_transfers>();
 
 	if (maybe_transfer_capability)
 		return entity;
 
-	auto* maybe_item = entity->find<components::item>();
+	auto* maybe_item = entity.find<components::item>();
 
 	if (!maybe_item || maybe_item->current_slot.dead())
 		return entity_id();
@@ -99,7 +99,7 @@ item_transfer_result query_transfer_result(messages::item_slot_transfer_request 
 	item_transfer_result output;
 	auto& predicted_result = output.result;
 
-	auto& item = r.item->get<components::item>();
+	auto& item = r.item.get<components::item>();
 
 	ensure(r.specified_quantity != 0);
 
@@ -127,7 +127,7 @@ item_transfer_result query_transfer_result(messages::item_slot_transfer_request 
 }
 
 slot_function detect_compatible_slot(entity_id item, entity_id container_entity) {
-	auto* container = container_entity->find<components::container>();
+	auto* container = container_entity.find<components::container>();
 
 	if (container) {
 		if (container_entity[slot_function::ITEM_DEPOSIT].alive())
@@ -146,7 +146,7 @@ item_transfer_result containment_result(messages::item_slot_transfer_request r, 
 	output.transferred_charges = 0;
 	output.result = item_transfer_result_type::NO_SLOT_AVAILABLE;
 
-	auto& item = r.item->get<components::item>();
+	auto& item = r.item.get<components::item>();
 	auto& slot = *r.target_slot;
 	auto& result = output.result;
 
@@ -205,8 +205,8 @@ item_transfer_result containment_result(messages::item_slot_transfer_request r, 
 void for_each_descendant(entity_id item, std::function<void(entity_id item)> f) {
 	f(item);
 
-	if (item->find<components::container>()) {
-		for (auto& s : item->get<components::container>().slots) {
+	if (item.find<components::container>()) {
+		for (auto& s : item.get<components::container>().slots) {
 			item[s.first].for_each_descendant(f);
 		}
 	}
@@ -255,7 +255,7 @@ int count_charges_inside(inventory_slot_id id) {
 	int charges = 0;
 
 	for (auto& i : id->items_inside) {
-		charges += i->get<components::item>().charges;
+		charges += i.get<components::item>().charges;
 	}
 
 	return charges;
@@ -269,7 +269,7 @@ std::wstring format_space_units(unsigned u) {
 }
 
 void drop_from_all_slots(entity_id c) {
-	auto& container = c->get<components::container>();
+	auto& container = c.get<components::container>();
 
 	messages::item_slot_transfer_request request;
 
@@ -284,12 +284,12 @@ void drop_from_all_slots(entity_id c) {
 }
 
 unsigned calculate_space_occupied_with_children(entity_id item) {
-	auto space_occupied = item->get<components::item>().get_space_occupied();
+	auto space_occupied = item.get<components::item>().get_space_occupied();
 
-	if (item->find<components::container>()) {
-		ensure(item->get<components::item>().charges == 1);
+	if (item.find<components::container>()) {
+		ensure(item.get<components::item>().charges == 1);
 
-		for (auto& slot : item->get<components::container>().slots)
+		for (auto& slot : item.get<components::container>().slots)
 			for (auto& entity_in_slot : slot.second.items_inside)
 				space_occupied += calculate_space_occupied_with_children(entity_in_slot);
 	}

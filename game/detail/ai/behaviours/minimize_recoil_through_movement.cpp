@@ -11,12 +11,12 @@ namespace behaviours {
 	tree::goal_availability minimize_recoil_through_movement::goal_resolution(tree::state_of_traversal& t) const {
 		auto subject = t.instance.user_input;
 		auto crosshair = subject[sub_entity_name::CHARACTER_CROSSHAIR];
-		auto& attitude = subject->get<components::attitude>();
+		auto& attitude = subject.get<components::attitude>();
 		auto currently_attacked_visible_entity = attitude.currently_attacked_visible_entity;
 
 		if (currently_attacked_visible_entity.alive() && crosshair.alive()) {
 			auto recoil = crosshair[sub_entity_name::CROSSHAIR_RECOIL_BODY];
-			auto& c = crosshair->get<components::crosshair>();
+			auto& c = crosshair.get<components::crosshair>();
 
 			minimize_recoil_through_movement_goal goal;
 
@@ -30,7 +30,7 @@ namespace behaviours {
 
 	void minimize_recoil_through_movement::execute_leaf_goal_callback(tree::execution_occurence o, tree::state_of_traversal& t) const {
 		auto subject = t.instance.user_input;
-		auto& movement = subject->get<components::movement>();
+		auto& movement = subject.get<components::movement>();
 
 		if (o == tree::execution_occurence::LAST)
 			movement.reset_movement_flags();

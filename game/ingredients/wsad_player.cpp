@@ -27,7 +27,7 @@
 
 namespace ingredients {
 	void wsad_character_setup_movement(entity_id e) {
-		components::movement& movement = e->get<components::movement>();
+		components::movement& movement = e.get<components::movement>();
 
 		movement.add_animation_receiver(e, false);
 
@@ -207,7 +207,7 @@ namespace ingredients {
 	}
 
 	void inject_window_input_to_character(entity_id next_character, entity_id camera) {
-		auto previously_controlled_character = camera->get<components::camera>().entity_to_chase;
+		auto previously_controlled_character = camera.get<components::camera>().entity_to_chase;
 
 		if (previously_controlled_character.alive()) {
 			previously_controlled_character.skip_processing_in(processing_subjects::WITH_INPUT_RECEIVER);
@@ -223,13 +223,13 @@ namespace ingredients {
 
 		next_character[associated_entity_name::WATCHING_CAMERA] = camera;
 
-		if (next_character->find<components::gui_element>() == nullptr)
+		if (next_character.find<components::gui_element>() == nullptr)
 			next_character->add(components::gui_element());
 
-		if (next_character->find<components::input_receiver>() == nullptr)
+		if (next_character.find<components::input_receiver>() == nullptr)
 			next_character->add<components::input_receiver>();
 
-		if (crosshair->find<components::input_receiver>() == nullptr)
+		if (crosshair.find<components::input_receiver>() == nullptr)
 			crosshair->add<components::input_receiver>();
 
 		next_character.unskip_processing_in(processing_subjects::WITH_INPUT_RECEIVER);
@@ -247,11 +247,11 @@ namespace prefabs {
 		name_entity(character, entity_name::PERSON);
 
 		auto crosshair = create_character_crosshair(world);
-		crosshair->get<components::crosshair>().character_entity_to_chase = character;
+		crosshair.get<components::crosshair>().character_entity_to_chase = character;
 
 		ingredients::wsad_character(character, crosshair);
 
-		character->get<components::transform>().pos = pos;
+		character.get<components::transform>().pos = pos;
 
 		ingredients::wsad_character_physics(character);
 

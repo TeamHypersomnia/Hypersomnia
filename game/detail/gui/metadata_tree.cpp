@@ -13,8 +13,8 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 	std::vector<augs::gui::rect_id> inventory_roots;
 
 	for (auto& root : targets) {
-		auto* item_slot_transfers = root->find<components::item_slot_transfers>();
-		auto& element = root->get<components::gui_element>();
+		auto* item_slot_transfers = root.find<components::item_slot_transfers>();
+		auto& element = root.get<components::gui_element>();
 
 		if (item_slot_transfers) {
 			decltype(element.slot_metadata) new_slot_meta;
@@ -24,7 +24,7 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 
 			std::function<void(entity_id)> iterate_inventory_tree
 				= [&new_slot_meta, &new_item_meta, &iterate_inventory_tree](entity_id container) {
-				auto* maybe_container = container->find<components::container>();
+				auto* maybe_container = container.find<components::container>();
 
 				if (maybe_container) {
 					/* create new if not found */
@@ -141,7 +141,7 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 						new_item.is_container_open = true;
 					}
 					else {
-						new_item.rc.set_position(previous_slot_meta[new_item.item->get<components::item>().current_slot].rc.get_position());
+						new_item.rc.set_position(previous_slot_meta[new_item.item.get<components::item>().current_slot].rc.get_position());
 						new_item.rc.set_size(64, 64);
 					}
 
@@ -158,7 +158,7 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 				bool is_it_root = entry.first == root;
 
 				if (!is_it_root) {
-					auto item_parent = entry.second.item->get<components::item>().current_slot.container_entity;
+					auto item_parent = entry.second.item.get<components::item>().current_slot.container_entity;
 					get_meta(item_parent).children.push_back(&entry.second);
 				}
 			}
