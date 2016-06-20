@@ -1,7 +1,7 @@
 #pragma once
 #include "game_gui_root.h"
-#include "game/systems/gui_system.h"
-#include "game/systems/physics_system.h"
+#include "game/stateful_systems/gui_system.h"
+#include "game/stateful_systems/physics_system.h"
 #include "game/cosmos.h"
 #include "game/entity_id.h"
 #include "game/globals/filters.h"

@@ -1,6 +1,6 @@
 #include "cosmos.h"
 
-#include "systems/physics_system.h"
+#include "stateful_systems/physics_system.h"
 #include "systems/steering_system.h"
 #include "systems/movement_system.h"
 #include "systems/visibility_system.h"
@@ -23,11 +23,11 @@
 #include "systems/item_system.h"
 #include "systems/force_joint_system.h"
 #include "systems/intent_contextualization_system.h"
-#include "systems/gui_system.h"
+#include "stateful_systems/gui_system.h"
 #include "systems/trace_system.h"
 #include "systems/melee_system.h"
 #include "systems/sentience_system.h"
-#include "systems/dynamic_tree_system.h"
+#include "stateful_systems/dynamic_tree_system.h"
 
 #include "game/globals/render_layer.h"
 

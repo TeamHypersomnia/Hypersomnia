@@ -1,4 +1,4 @@
-#include "game/systems/gui_system.h"
+#include "game/stateful_systems/gui_system.h"
 #include "game_gui_root.h"
 #include "game/components/sprite_component.h"
 #include "game/components/item_component.h"

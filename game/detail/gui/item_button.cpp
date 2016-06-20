@@ -15,7 +15,7 @@
 #include "game/components/gui_element_component.h"
 #include "game/components/sprite_component.h"
 #include "game/components/item_component.h"
-#include "game/systems/gui_system.h"
+#include "game/stateful_systems/gui_system.h"
 #include "game/systems/input_system.h"
 #include "game/resources/manager.h"
 

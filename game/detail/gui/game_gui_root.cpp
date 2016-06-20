@@ -1,5 +1,5 @@
 #include "game_gui_root.h"
-#include "game/systems/gui_system.h"
+#include "game/stateful_systems/gui_system.h"
 #include "game/components/item_component.h"
 #include "item_button.h"
 #include "game/cosmos.h"

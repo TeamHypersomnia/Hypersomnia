@@ -651,9 +651,6 @@
     <ClCompile Include="game\systems\pathfinding_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\systems\physics_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\systems\render_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -951,9 +948,6 @@
     <ClCompile Include="augs\misc\deterministic_timing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\systems\gui_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="augs\gui\appearance_detector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1191,9 +1185,6 @@
     <ClCompile Include="game\processing_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\systems\dynamic_tree_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\definition_interface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1267,6 +1258,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\detail\inventory_slot_handle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\stateful_systems\dynamic_tree_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\stateful_systems\gui_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\stateful_systems\physics_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2636,9 +2636,6 @@
     <ClInclude Include="game\systems\pathfinding_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\systems\physics_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\systems\render_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2975,9 +2972,6 @@
     <ClInclude Include="augs\misc\deterministic_timing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\systems\gui_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\components\gui_element_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3305,9 +3299,6 @@
     <ClInclude Include="game\processing_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\systems\dynamic_tree_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\misc\machine_entropy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3387,6 +3378,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\types_specification\storage_declaration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\stateful_systems\dynamic_tree_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\stateful_systems\gui_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\stateful_systems\physics_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

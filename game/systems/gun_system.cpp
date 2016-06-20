@@ -16,7 +16,7 @@
 #include "game/components/container_component.h"
 #include "game/components/item_component.h"
 
-#include "game/systems/physics_system.h"
+#include "game/stateful_systems/physics_system.h"
 #include "game/systems/render_system.h"
 
 #include "game/detail/physics_setup_helpers.h"

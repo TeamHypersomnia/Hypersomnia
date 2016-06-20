@@ -3,36 +3,33 @@
 #include "game/cosmos.h"
 #include "game/bindings/bindings.h"
 
-#include "game/all_message_includes.h"
-
-#include "systems/physics_system.h"
-#include "systems/steering_system.h"
-#include "systems/movement_system.h"
-#include "systems/visibility_system.h"
-#include "systems/pathfinding_system.h"
-#include "systems/animation_system.h"
-#include "systems/camera_system.h"
-#include "systems/render_system.h"
-#include "systems/input_system.h"
-#include "systems/gun_system.h"
-#include "systems/crosshair_system.h"
-#include "systems/rotation_copying_system.h"
-#include "systems/position_copying_system.h"
-#include "systems/damage_system.h"
-#include "systems/destroy_system.h"
-#include "systems/particles_system.h"
-#include "systems/behaviour_tree_system.h"
-#include "systems/car_system.h"
-#include "systems/driver_system.h"
-#include "systems/trigger_detector_system.h"
-#include "systems/item_system.h"
-#include "systems/force_joint_system.h"
-#include "systems/intent_contextualization_system.h"
-#include "systems/gui_system.h"
-#include "systems/trace_system.h"
-#include "systems/melee_system.h"
-#include "systems/sentience_system.h"
-#include "systems/dynamic_tree_system.h"
+#include "game/stateful_systems/physics_system.h"
+#include "game/systems/movement_system.h"
+#include "game/systems/visibility_system.h"
+#include "game/systems/pathfinding_system.h"
+#include "game/systems/animation_system.h"
+#include "game/systems/camera_system.h"
+#include "game/systems/render_system.h"
+#include "game/systems/input_system.h"
+#include "game/systems/gun_system.h"
+#include "game/systems/crosshair_system.h"
+#include "game/systems/rotation_copying_system.h"
+#include "game/systems/position_copying_system.h"
+#include "game/systems/damage_system.h"
+#include "game/systems/destroy_system.h"
+#include "game/systems/particles_system.h"
+#include "game/systems/behaviour_tree_system.h"
+#include "game/systems/car_system.h"
+#include "game/systems/driver_system.h"
+#include "game/systems/trigger_detector_system.h"
+#include "game/systems/item_system.h"
+#include "game/systems/force_joint_system.h"
+#include "game/systems/intent_contextualization_system.h"
+#include "game/stateful_systems/gui_system.h"
+#include "game/systems/trace_system.h"
+#include "game/systems/melee_system.h"
+#include "game/systems/sentience_system.h"
+#include "game/stateful_systems/dynamic_tree_system.h"
 
 
 #include "misc/vector_wrapper.h"
@@ -45,14 +42,14 @@ std::vector<T>& get_message_queue_for_scripts(cosmos& owner) {
 
 namespace bindings {
 	luabind::scope _world() {
-		return
-			bind_stdvector<queue_destruction>("destroy_message_vector"),
-			bind_stdvector<animation_message>("animation_message_vector"),
-			bind_stdvector<create_particle_effect>("particle_burst_message_vector"),
-			bind_stdvector<collision_message>("collision_message_vector"),
-			bind_stdvector<damage_message>("damage_message_vector"),
-			bind_stdvector<intent_message>("intent_message_vector"),
-			bind_stdvector<gunshot_response>("gunshot_response_vector"),
+		return luabind::scope();
+			//bind_stdvector<queue_destruction>("destroy_message_vector"),
+			//bind_stdvector<animation_message>("animation_message_vector"),
+			//bind_stdvector<create_particle_effect>("particle_burst_message_vector"),
+			//bind_stdvector<collision_message>("collision_message_vector"),
+			//bind_stdvector<damage_message>("damage_message_vector"),
+			//bind_stdvector<intent_message>("intent_message_vector"),
+			//bind_stdvector<gunshot_response>("gunshot_response_vector"),
 
 			//luabind::class_<world>("_world")
 			//.def(luabind::constructor<overworld&>())

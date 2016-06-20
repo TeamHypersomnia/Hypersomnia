@@ -22,7 +22,7 @@
 #include "game/detail/inventory_slot.h"
 #include "game/detail/entity_scripts.h"
 
-#include "game/systems/physics_system.h"
+#include "game/stateful_systems/physics_system.h"
 
 #include "ensure.h"
 

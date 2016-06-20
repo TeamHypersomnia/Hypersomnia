@@ -1,4 +1,4 @@
-#include "game/systems/gui_system.h"
+#include "game/stateful_systems/gui_system.h"
 
 #include "ensure.h"
 

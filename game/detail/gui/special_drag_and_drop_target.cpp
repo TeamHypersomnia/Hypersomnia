@@ -1,6 +1,6 @@
 #include "special_drag_and_drop_target.h"
 #include "item_button.h"
-#include "game/systems/gui_system.h"
+#include "game/stateful_systems/gui_system.h"
 
 special_drag_and_drop_target::special_drag_and_drop_target(augs::gui::material mat) : mat(mat) {
 	clip = false;

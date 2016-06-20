@@ -9,7 +9,7 @@
 
 #include "game/messages/intent_message.h"
 
-#include "game/systems/physics_system.h"
+#include "game/stateful_systems/physics_system.h"
 
 #include "game/globals/filters.h"
 

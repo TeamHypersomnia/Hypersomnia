@@ -10,7 +10,7 @@
 
 #include "game/systems/input_system.h"
 #include "game/systems/render_system.h"
-#include "game/systems/gui_system.h"
+#include "game/stateful_systems/gui_system.h"
 #include "game/systems/visibility_system.h"
 #include "game/systems/pathfinding_system.h"
 #include "game/components/position_copying_component.h"

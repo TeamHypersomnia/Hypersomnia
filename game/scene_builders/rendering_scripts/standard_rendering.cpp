@@ -4,7 +4,7 @@
 #include "game/cosmos.h"
 
 #include "game/systems/render_system.h"
-#include "game/systems/gui_system.h"
+#include "game/stateful_systems/gui_system.h"
 #include "game/resources/manager.h"
 
 #include "math/matrix.h"
