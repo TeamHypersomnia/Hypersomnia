@@ -1,13 +1,30 @@
 #include "entity_handle.h"
 #include "game/detail/inventory_slot_id.h"
 #include "game/components/relations_component.h"
+#include "game/full_entity_definition.h"
 
 #include "game/cosmos.h"
 
 template <bool is_const>
-basic_entity_handle<is_const>::inventory_slot_handle_type basic_entity_handle<is_const>::operator[](slot_function func) const {
-
+typename basic_entity_handle<is_const>::inventory_slot_handle_type basic_entity_handle<is_const>::operator[](slot_function func) const {
+	return basic_entity_handle<is_const>::inventory_slot_handle_type(owner, inventory_slot_id(func, raw_id));
 }
+
+template <bool is_const>
+basic_entity_handle<is_const> basic_entity_handle<is_const>::operator[](sub_entity_name child) const {
+	return make_handle(relations().sub_entities_by_name.at(child));
+}
+
+template <bool is_const>
+typename basic_entity_handle<is_const>::definition_type basic_entity_handle<is_const>::operator[](sub_definition_name child) const {
+	return relations().sub_definitions_by_name.at(child);
+}
+
+template <bool is_const>
+basic_entity_handle<is_const> basic_entity_handle<is_const>::operator[](associated_entity_name assoc) const {
+	return make_handle(relations().associated_entities_by_name.at(assoc));
+}
+
 /*
 
 basic_entity_handle operator[](sub_entity_name) const;

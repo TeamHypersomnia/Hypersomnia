@@ -3395,5 +3395,8 @@
     <ClInclude Include="augs\entity_system\storage_instantiation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\types_specification\storage_declaration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

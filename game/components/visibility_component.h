@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <set>
 #include <unordered_map>
 #include "math/vec2.h"
 #include <Box2D\Dynamics\b2Fixture.h>

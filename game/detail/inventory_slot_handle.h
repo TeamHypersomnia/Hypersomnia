@@ -6,6 +6,7 @@
 #include "game/entity_id.h"
 #include "game/globals/slot_function.h"
 #include "game/detail/inventory_slot_id.h"
+#include "game/types_specification/storage_instantiation.h"
 
 struct inventory_slot;
 
@@ -60,9 +61,6 @@ public:
 	bool should_item_inside_keep_physical_body(entity_id until_parent = entity_id()) const;
 
 	unsigned calculate_free_space_with_parent_containers() const;
-
-	const inventory_slot& operator*() const;
-	const inventory_slot* operator->() const;
 
 	inventory_slot_id get_id() const;
 	operator inventory_slot_id() const;

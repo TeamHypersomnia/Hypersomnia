@@ -13,7 +13,7 @@
 #include "game/types_specification/components_instantiation.h"
 #include "game/types_specification/full_entity_definition_declaration.h"
 
-#include "game/detail/inventory_slot_id.h"
+#include "game/detail/inventory_slot_handle.h"
 #include "game/entity_handle_declaration.h"
 
 namespace components {
@@ -25,6 +25,7 @@ class cosmos;
 template <bool is_const>
 class basic_entity_handle : public basic_aggregate_handle<is_const> {
 	typedef typename std::conditional<is_const, const components::relations&, components::relations&>::type relations_type;
+	typedef typename std::conditional<is_const, const full_entity_definition&, full_entity_definition&>::type definition_type;
 	typedef typename basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
 
 	relations_type relations() const;
@@ -36,10 +37,10 @@ public:
 	inventory_slot_handle_type operator[](slot_function) const;
 	basic_entity_handle operator[](sub_entity_name) const;
 	basic_entity_handle operator[](associated_entity_name) const;
-	const full_entity_definition& operator[](sub_definition_name) const;
+	definition_type operator[](sub_definition_name) const;
 
 	void for_each_sub_entity_recursive(std::function<void(basic_entity_handle)>) const;
-	void for_each_sub_definition(std::function<void(const full_entity_definition&)>) const;
+	void for_each_sub_definition(std::function<void(definition_type)>) const;
 
 	basic_entity_handle get_parent() const;
 	

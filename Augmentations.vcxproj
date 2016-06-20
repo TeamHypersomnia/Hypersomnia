@@ -1198,6 +1198,7 @@
     <ClInclude Include="game\systems\visibility_system.h" />
     <ClInclude Include="game\types_specification\message_queues_instantiation.h" />
     <ClInclude Include="game\types_specification\stateful_systems_instantiation.h" />
+    <ClInclude Include="game\types_specification\storage_declaration.h" />
     <ClInclude Include="game\types_specification\storage_instantiation.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="augs\global_libraries.h" />
