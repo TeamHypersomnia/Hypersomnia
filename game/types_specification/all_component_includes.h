@@ -15,7 +15,6 @@
 #include "game/components/particle_effect_response_component.h"
 #include "game/components/particle_group_component.h"
 #include "game/components/physics_component.h"
-#include "game/components/steering_component.h"
 #include "game/components/transform_component.h"
 #include "game/components/render_component.h"
 #include "game/components/sprite_component.h"
