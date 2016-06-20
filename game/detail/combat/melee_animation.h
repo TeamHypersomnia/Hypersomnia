@@ -2,6 +2,7 @@
 
 #include "math/vec2.h"
 #include "game/components/transform_component.h"
+#include "game/components/fixtures_component.h"
 
 #include <vector>
 #include <cmath>

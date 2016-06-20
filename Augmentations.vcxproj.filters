@@ -3389,5 +3389,8 @@
     <ClInclude Include="game\stateful_systems\physics_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\globals\melee_state.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

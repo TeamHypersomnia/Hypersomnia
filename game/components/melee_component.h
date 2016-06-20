@@ -4,17 +4,10 @@
 
 #include "math/vec2.h" 
 #include "game/components/transform_component.h"
+#include "game/globals/melee_state.h"
 
 namespace components {
 	struct melee {
-		enum class state {
-			FREE,
-			ONCOOLDOWN,
-			PRIMARY,
-			SECONDARY,
-			TERTIARY,
-		};
-
 		enum class stage {
 			FIRST_STAGE,
 			SECOND_STAGE,
@@ -44,10 +37,12 @@ namespace components {
 			primary_move_flag = secondary_move_flag = tertiary_move_flag = false;
 		}
 
-		void reset_weapon(entity_id e);
+		void reset_weapon(entity_handle e);
 
-		state current_state = state::FREE;
+		melee_state current_state = melee_state::FREE;
 
 		std::vector<components::transform> offset_positions[4];
+
+		stage action_stage = stage::FIRST_STAGE;
 	};
 }

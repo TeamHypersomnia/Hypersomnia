@@ -1,23 +1,27 @@
 #pragma once
-#include "game/processing_system_with_cosmos_reference.h"
-#include "game/components/melee_component.h"
-#include "game/components/damage_component.h"
 
-#include "game/detail/combat/melee_animation.h"
+#include "game/globals/melee_state.h"
 
-using namespace augs;
+class cosmos;
+class step_state;
 
-class melee_system : public processing_system_templated<components::melee, components::damage> {
+namespace components{
+	struct melee;
+	struct damage;
+}
+
+class melee_animation;
+template<bool> class basic_entity_handle;
+
+typedef basic_entity_handle<false> entity_handle;
+typedef basic_entity_handle<true> const_entity_handle;
+
+class melee_system {
 public:
-	using processing_system_templated::processing_system_templated;
 
-	void consume_melee_intents();
-	void initiate_and_update_moves();
-	components::melee::state primary_action(double dt, entity_id target, components::melee& melee_component, components::damage& damage);
-	components::melee::state secondary_action(double dt, entity_id target, components::melee& melee_component, components::damage& damage);
-	components::melee::state tertiary_action(double dt, entity_id target, components::melee& melee_component, components::damage& damage);
-
-	melee_animation animation;
-private:
-	components::melee::stage action_stage = components::melee::stage::FIRST_STAGE;
+	void consume_melee_intents(cosmos& cosmos, step_state& step);
+	void initiate_and_update_moves(cosmos& cosmos, step_state& step);
+	melee_state primary_action(cosmos& cosmos, step_state& step, double dt, entity_handle target, components::melee& melee_component, components::damage& damage);
+	melee_state secondary_action(cosmos& cosmos, step_state& step, double dt, entity_handle target, components::melee& melee_component, components::damage& damage);
+	melee_state tertiary_action(cosmos& cosmos, step_state& step, double dt, entity_handle target, components::melee& melee_component, components::damage& damage);
 };
