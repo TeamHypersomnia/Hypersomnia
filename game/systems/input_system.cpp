@@ -1,3 +1,5 @@
+#include <random>
+
 #include "window_framework/window.h"
 #include "game/entity_id.h"
 #include "game/cosmos.h"
@@ -11,6 +13,10 @@
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 #include "augs/misc/time.h"
+
+#include "game/components/transform_component.h"
+#include "game/components/gun_component.h"
+
 
 using namespace augs::window;
 

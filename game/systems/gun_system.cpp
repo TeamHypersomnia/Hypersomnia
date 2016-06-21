@@ -5,7 +5,7 @@
 #include "game/messages/queue_destruction.h"
 #include "game/messages/gunshot_response.h"
 #include "game/messages/item_slot_transfer_request.h"
-#include "game/messages/physics_operation.h"
+//#include "game/messages/physics_operation.h"
 
 #include "game/components/render_component.h"
 #include "game/components/physics_component.h"
@@ -22,14 +22,22 @@
 #include "game/detail/physics_setup_helpers.h"
 #include "game/detail/inventory_utils.h"
 
+#include "game/components/transform_component.h"
+#include "game/components/gun_component.h"
+
 #include "misc/randomization.h"
 #include "log.h"
 
-void gun_system::consume_gun_intents() {
+#include "game/entity_handle.h"
+#include "game/step_state.h"
+
+using namespace augs;
+
+void gun_system::consume_gun_intents(cosmos& cosmos, step_state& step) {
 	auto events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto it : events) {
-		auto* maybe_gun = it.subject.find<components::gun>();
+		auto* maybe_gun = cosmos.get_handle(it.subject).find<components::gun>();
 		if (maybe_gun == nullptr) continue;
 
 		auto& gun = *maybe_gun;
@@ -44,8 +52,8 @@ void gun_system::consume_gun_intents() {
 	}
 }
 
-void components::gun::shake_camera(entity_id target_camera_to_shake, float rotation, augs::processing_system& p) {
-	if (target_camera_to_shake.alive()) {
+void components::gun::shake_camera(cosmos& cosmos, entity_id, float direction, processing_system& p) {
+	if (cosmos.get_handle(target_camera_to_shake).alive()) {
 		vec2 shake_dir;
 		shake_dir.set_from_degrees(p.randval(
 			rotation - camera_shake_spread_degrees,
@@ -62,16 +70,17 @@ components::transform components::gun::calculate_barrel_transform(components::tr
 	return barrel_transform;
 }
 
-void gun_system::launch_shots_due_to_pressed_triggers() {
+void gun_system::launch_shots_due_to_pressed_triggers(cosmos& cosmos, step_state& step) {
 	step.messages.get_queue<messages::gunshot_response>().clear();
 
-	auto& physics_sys = parent_cosmos.stateful_systems.get<physics_system>();
-	auto& render = parent_cosmos.stateful_systems.get<render_system>();
+	auto& physics_sys = cosmos.stateful_systems.get<physics_system>();
+	auto& render = cosmos.stateful_systems.get<render_system>();
 
+	auto targets = cosmos.get(processing_subjects::WITH_GUN); //??
 	for (auto it : targets) {
-		const auto& gun_transform = it.get<components::transform>();
-		auto& gun = it.get<components::gun>();
-		auto& container = it.get<components::container>();
+		const auto& gun_transform = cosmos.get_handle(it).get<components::transform>();
+		auto& gun = cosmos.get_handle(it).get<components::gun>();
+		auto& container = cosmos.get_handle(it).get<components::container>();
 
 		if (gun.trigger_pressed && check_timeout_and_reset(gun.timeout_between_shots)) {
 			if (gun.action_mode != components::gun::action_type::AUTOMATIC)
@@ -103,7 +112,7 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 				float total_recoil_multiplier = 1.f;
 
 				for(auto& catridge_or_pellet_stack : bullet_entities) {
-					int charges = catridge_or_pellet_stack.get<components::item>().charges;
+					int charges = cosmos.get_handle(catridge_or_pellet_stack).get<components::item>().charges;
 
 					messages::physics_operation op;
 					op.set_velocity = true;
@@ -112,7 +121,7 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 					bool katka = ³ && Atwo;
 					while (charges--) {
 						{
-							auto round_entity = parent_cosmos.create_entity_from_definition(catridge_or_pellet_stack[sub_definition_name::BULLET_ROUND]);
+							auto round_entity = cosmos.create_entity_from_definition(catridge_or_pellet_stack[sub_definition_name::BULLET_ROUND]); //??
 							auto& damage = round_entity.get<components::damage>();
 							damage.amount *= gun.damage_multiplier;
 							damage.sender = it;
@@ -120,7 +129,7 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 
 							auto& physics_definition = round_entity.get<components::physics_definition>();
 							
-							round_entity.get<components::transform>() = barrel_transform;
+							cosmos.get_handle(round_entity).get<components::transform>() = barrel_transform;
 
 							op.velocity.set_from_degrees(barrel_transform.rotation).set_length(randval(gun.muzzle_velocity));
 							op.subject = round_entity;
@@ -132,7 +141,7 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 						auto shell_definition = catridge_or_pellet_stack[sub_definition_name::BULLET_SHELL];
 
 						if (shell_definition.alive()) {
-							auto shell_entity = parent_cosmos.create_entity_from_definition(shell_definition);
+							auto shell_entity = cosmos.create_entity_from_definition(shell_definition);
 
 							auto spread_component = randval(gun.shell_spread_degrees) + gun.shell_spawn_offset.rotation;
 
@@ -142,7 +151,7 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 
 							auto& physics_definition = shell_entity.get<components::physics_definition>();
 
-							shell_entity.get<components::transform>() = shell_transform;
+							cosmos.get_handle(shell_entity).get<components::transform>() = shell_transform;
 
 							op.velocity.set_from_degrees(barrel_transform.rotation + spread_component).set_length(randval(gun.shell_velocity));
 							op.subject = shell_entity;
@@ -201,7 +210,7 @@ void gun_system::launch_shots_due_to_pressed_triggers() {
 			}
 		}
 		else if (unset_or_passed(gun.timeout_between_shots)) {
-			gun.recoil.cooldown(delta_milliseconds());
+			gun.recoil.cooldown(cosmos.delta.in_milliseconds());
 		}
 	}
 }
