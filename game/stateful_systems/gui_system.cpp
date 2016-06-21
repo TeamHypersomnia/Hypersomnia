@@ -11,16 +11,18 @@
 #include "game/components/input_receiver_component.h"
 #include "game/systems/input_system.h"
 
-#include "crosshair_system.h"
+#include "game/systems/crosshair_system.h"
+#include "game/entity_handle.h"
 
-gui_system::gui_system(const cosmos& region) : region(region) {
+gui_system::gui_system(cosmos& region) : region(region) {
 	gui.gui_system = this;
 	gui.root.children.push_back(&game_gui_root);
 	gui.root.clip = false;
 }
 
 bool gui_system::freeze_gui_model() {
-	return parent_cosmos.stateful_systems.get<input_system>().gui_item_transfer_intent_player.get_pending_inputs_for_logic().size() > 0;
+	return false;
+	//return parent_cosmos.stateful_systems.get<input_system>().gui_item_transfer_intent_player.get_pending_inputs_for_logic().size() > 0;
 }
 
 void gui_system::draw_complete_gui_for_camera_rendering_request(messages::camera_render_request_message r) {
@@ -31,12 +33,10 @@ void gui_system::draw_complete_gui_for_camera_rendering_request(messages::camera
 		gui.draw_cursor_and_tooltip(r);
 }
 
-entity_id gui_system::get_cosmos_crosshair() {
-	auto& crosshairs = parent_cosmos.stateful_systems.get<crosshair_system>().targets;
-
-	for (auto& c : crosshairs) {
-		if (c->is_enabled<components::input_receiver>()) {
-			return c;
+entity_id gui_system::get_cosmos_crosshair(const cosmos& cosm) {
+	for (auto it : cosm.get(processing_subjects::WITH_CROSSHAIR)) {
+		if (it.is_in(processing_subjects::WITH_INPUT_RECEIVER)) {
+			return it;
 		}
 	}
 }

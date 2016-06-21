@@ -22,16 +22,16 @@ class gui_system {
 	game_gui_root game_gui_root;
 
 	vec2 initial_inventory_root_position();
-	entity_id get_cosmos_crosshair();
+	entity_id get_cosmos_crosshair(const cosmos&);
 
 	std::vector<messages::raw_window_input_message> buffered_inputs_during_freeze;
 	bool freeze_gui_model();
 
-	cosmos region;
+	cosmos& region;
 public:
 	bool draw_free_space_inside_container_icons = true;
 
-	gui_system(const cosmos&);
+	gui_system(cosmos&);
 
 	immediate_hud hud;
 

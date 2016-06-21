@@ -1,5 +1,5 @@
 #include "augs/misc/object_pool_id.h"
-#include "game/types_specification/components_instantiation.h"
+#include "game/types_specification/all_components_declaration.h"
 
 namespace augs {
 	template<class...>

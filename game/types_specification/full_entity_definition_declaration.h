@@ -1,5 +1,5 @@
 #pragma once
-#include "components_instantiation.h"
+#include "all_components_declaration.h"
 
 namespace augs {
 	template <class... components>

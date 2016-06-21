@@ -1,5 +1,8 @@
 #pragma once
-#include "entity_system/storage_for_message_queues.h"
+namespace augs {
+	template <class...>
+	class storage_for_message_queues;
+}
 
 namespace messages {
 	struct intent_message;

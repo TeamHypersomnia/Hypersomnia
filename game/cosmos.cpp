@@ -1,7 +1,6 @@
 #include "cosmos.h"
 
 #include "stateful_systems/physics_system.h"
-#include "systems/steering_system.h"
 #include "systems/movement_system.h"
 #include "systems/visibility_system.h"
 #include "systems/pathfinding_system.h"
@@ -40,6 +39,10 @@
 
 using namespace components;
 using namespace messages;
+
+const storage_for_all_components_and_aggregates::aggregate_pool_type& cosmos::get_pool() const {
+	return components_and_aggregates.get_pool();
+}
 
 void cosmos::call_rendering_schemata(augs::variable_delta delta, cosmic_profiler& profiler) const {
 	step_state step;
@@ -89,6 +92,10 @@ std::vector<entity_handle> cosmos::get(processing_subjects list) {
 
 std::vector<const_entity_handle> cosmos::get(processing_subjects list) const {
 	return lists_of_processing_subjects.get(list, *this);
+}
+
+bool cosmos::is_in(entity_id id, processing_subjects list) const {
+	return lists_of_processing_subjects.is_in(id, list);
 }
 
 entity_handle cosmos::get_handle(entity_id id) {

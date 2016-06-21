@@ -1,8 +1,13 @@
 #pragma once
 #include "misc/machine_entropy.h"
+
 #include "entity_system/storage_for_components_and_aggregates.h"
-#include "game/types_specification/storage_instantiation.h"
-#include "game/types_specification/stateful_systems_instantiation.h"
+#include "entity_system/storage_for_message_queues.h"
+#include "entity_system/storage_for_stateful_systems.h"
+
+#include "game/types_specification/all_components_declaration.h"
+#include "game/types_specification/all_messages_declaration.h"
+#include "game/types_specification/all_stateful_systems_declaration.h"
 
 #include "game/lists_of_processing_subjects.h"
 
@@ -19,7 +24,7 @@ class cosmos {
 	storage_for_all_components_and_aggregates components_and_aggregates;
 
 	entity_id substantialize(entity_id);
-	
+
 public:
 	storage_for_all_stateful_systems stateful_systems;
 	lists_of_processing_subjects lists_of_processing_subjects;
@@ -56,9 +61,13 @@ public:
 	inventory_slot_handle get_handle(inventory_slot_id);
 	const_inventory_slot_handle get_handle(inventory_slot_id) const;
 
+	bool is_in(entity_id, processing_subjects) const;
+
 	std::vector<entity_handle> get(processing_subjects);
 	std::vector<const_entity_handle> get(processing_subjects) const;
 
 	size_t entities_count() const;
 	std::wstring summary() const;
+
+	const storage_for_all_components_and_aggregates::aggregate_pool_type& get_pool() const;
 };

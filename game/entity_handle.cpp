@@ -1,3 +1,4 @@
+#include "game/types_specification/all_component_includes.h"
 #include "entity_handle.h"
 #include "game/detail/inventory_slot_id.h"
 #include "game/components/relations_component.h"
@@ -23,6 +24,11 @@ typename basic_entity_handle<is_const>::definition_type basic_entity_handle<is_c
 template <bool is_const>
 basic_entity_handle<is_const> basic_entity_handle<is_const>::operator[](associated_entity_name assoc) const {
 	return make_handle(relations().associated_entities_by_name.at(assoc));
+}
+
+template <bool is_const>
+bool basic_entity_handle<is_const>::is_in(processing_subjects list) const {
+	return owner.is_in(raw_id, list);
 }
 
 /*

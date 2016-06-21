@@ -1,131 +1,62 @@
 #pragma once
-#include "misc/object_pool.h"
-#include "configurable_components.h"
-#include "ensure.h"
 #include "templates.h"
-#include <vector>
+#include "misc/object_pool.h"
+#include "misc/object_pool_id.h"
+
+#include "aggregate_handle.h"
+#include "configurable_components.h"
 
 namespace augs {
 	template<class T>
 	struct make_object_pool { typedef object_pool<T> type; };
 
-	template<class T>
-	struct make_object_pool_id { typedef object_pool_id<T> type; };
-
-	template <class... components>
-	class storage_for_components_and_aggregates;
-
-	template <class... components>
-	class component_aggregate {
-		typename transform_types<std::tuple, make_object_pool_id, components...>::type component_ids;
-
-		template <class component>
-		auto& writable_id() {
-			return std::get<object_pool_id<component>>(component_ids);
-		}
-
-		friend class storage_for_components_and_aggregates<components...>;
-
-	public:
-		template <class component>
-		auto get_id() const {
-			return std::get<object_pool_id<component>>(component_ids);
-		}
-
-		unsigned long long removed_from_processing_subjects = 0;
-	};
-
-	template <class... components>
+	template <class handle_owner_type, class... components>
 	class storage_for_components_and_aggregates {
 		typedef component_aggregate<components...> aggregate_type;
+		typedef object_pool_id<aggregate_type> aggregate_id;
+
+		//template <bool is_const, class owner_type, class... components>
+		//friend class basic_aggregate_handle;
+
+		typedef basic_aggregate_handle<false, handle_owner_type, components...> aggregate_handle;
+		typedef basic_aggregate_handle<true, handle_owner_type, components...> const_aggregate_handle;
 
 		template<class component, class... Args>
 		auto allocate_component(Args... args) {
 			return std::get<augs::object_pool<component>>(pools_for_components).allocate(args...);
 		}
 
-		typename transform_types<std::tuple, make_object_pool, components...>::type pools_for_components;
-		object_pool<aggregate_type> pool_for_aggregates;
 
 	public:
-		typedef typename object_pool_id<aggregate_type> aggregate_id;
+		typedef object_pool<aggregate_type> aggregate_pool_type;
+	private:
 
-		template <bool is_const>
-		class basic_aggregate_handle {
-			typedef typename std::conditional<is_const, const storage_for_components_and_aggregates&, storage_for_components_and_aggregates&>::type pool_reference;
+		aggregate_pool_type pool_for_aggregates;
+		typename transform_types<std::tuple, make_object_pool, components...>::type pools_for_components;
 
-		public:
-			pool_reference owner;
-			aggregate_id raw_id;
+	public:
 
-			basic_aggregate_handle(pool_reference own, aggregate_id raw)
-				: owner(own), raw_id(raw) {}
-
-			template<class component>
-			typename std::conditional<is_const, const component*, component*>::type find() const {
-				auto& aggregate = owner.pool_for_aggregates.get(raw_id);
-				
-				auto& component_pool = std::get<typename object_pool<component>>(owner.pools_for_components);
-				auto component_handle = component_pool.get_handle(aggregate.get_id<component>());
-
-				if (component_handle.alive())
-					return &component_handle.get();
-
-				return nullptr;
-			}
-
-			template<class component>
-			typename std::conditional<is_const, const component&, component&>::type get() const {
-				return *find<component>();
-			}
-
-			template<class component>
-			bool has() const {
-				return find<component>() != nullptr;
-			}
-
-			template<class component,
-				class = typename std::enable_if<!is_const>::type>
-			component& set(const component& c) const {
-				get<component>() = c;
-				return get<component>();
-			}
-
-			template<class... components,
-				class = typename std::enable_if<!is_const>::type>
-			void set(components... args) const {
-				auto components_tuple = std::make_tuple(args...);
-
-				for_each_type<components...>([this, &components_tuple](auto c) {
-					set(std::get<decltype(c)>(components_tuple));
-				});
-			}
-
-			bool alive() const;
-			bool dead() const;
-
-			aggregate_id get_id() const;
-
-			const configurable_components<components...>& get_definition() const;
-		};
-
-		typedef basic_aggregate_handle<false> aggregate_handle;
-		typedef basic_aggregate_handle<true> const_aggregate_handle;
-
-		size_t aggregates_count() const;
-		void reserve_storage_for_aggregates(size_t n);
-
-		aggregate_handle get_handle(aggregate_id id) {
-			return{ *this, id };
+		const auto& get_pool() const {
+			return pool_for_aggregates;
 		}
 
-		const_aggregate_handle get_handle(aggregate_id id) const {
-			return{ *this, id };
+		size_t aggregates_count() const {
+			return pool_for_aggregates.size();
+		}
+
+		void reserve_storage_for_aggregates(size_t n) {
+			pool_for_aggregates.initialize_space(n);
+
+			auto r = [this, n](auto elem) {
+				std::get<object_pool<decltype(elem)>>(pools_for_components).initialize_space(n);
+			};
+
+			for_each_type<components...>(r);
 		}
 
 		template<class... configured_components>
 		aggregate_id allocate_configured_components(const configurable_components<configured_components...>& configuration, std::string debug_name = std::string()) {
-			component_aggregate aggregate;
+			aggregate_type aggregate;
 
 			for_each_type<configured_components...>([this, &configuration, &aggregate](auto c) {
 				if (configuration.is_set<decltype(c)>()) {
@@ -139,8 +70,31 @@ namespace augs {
 			return new_id;
 		}
 
-		aggregate_id clone_aggregate(aggregate_id aggregate);
-		void free_aggregate(aggregate_id aggregate);
+		aggregate_id clone_aggregate(const_aggregate_handle aggregate) {
+			auto new_aggregate_id = pool_for_aggregates.allocate();
+			auto& new_aggregate = pool_for_aggregates.get(new_aggregate_id);
+
+			auto& from_handle = get_handle(aggregate_id);
+			auto& to = new_aggregate;
+
+			auto& aggregate = pool_for_aggregates.get(aggregate_id);
+			to.removed_from_processing_subjects = aggregate.removed_from_processing_subjects;
+
+			for_each_type<components...>([this, &from_handle, &to](auto c) {
+				auto* maybe_component = from_handle.find<decltype(c)>();
+
+				if (maybe_component)
+					to.writable_id<decltype(c)>() = allocate_component<decltype(c)>(*maybe_component);
+			});
+
+			new_aggregate_id.set_debug_name(aggregate_id.get_debug_name());
+
+			return new_aggregate_id;
+		}
+
+		void free_aggregate(aggregate_id aggregate) {
+			pool_for_aggregates.free(aggregate);
+		}
 	};
 
 }

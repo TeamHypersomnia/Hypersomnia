@@ -19,6 +19,7 @@ namespace augs {
 		object_pool_id() {
 			set_debug_name("unset");
 		}
+
 		void unset() {
 			*this = object_pool_id();
 		}

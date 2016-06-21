@@ -1161,9 +1161,6 @@
     <ClCompile Include="augs\window_framework\platform_utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="augs\entity_system\storage_for_components_and_aggregates.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\cosmos.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -3314,9 +3311,6 @@
     <ClInclude Include="game\types_specification\all_component_includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\types_specification\components_instantiation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\bindings\bind_game_and_augs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3336,12 +3330,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\entity_system\storage_for_stateful_systems.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\types_specification\stateful_systems_instantiation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\types_specification\message_queues_instantiation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\step_state.h">
@@ -3371,15 +3359,6 @@
     <ClInclude Include="augs\misc\object_pool_id.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\types_specification\storage_instantiation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\entity_system\storage_instantiation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\types_specification\storage_declaration.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\stateful_systems\dynamic_tree_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3390,6 +3369,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\globals\melee_state.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\object_pool_handle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\entity_system\aggregate_handle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\entity_system\component_aggregate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\types_specification\all_components_declaration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\types_specification\all_messages_declaration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\types_specification\all_stateful_systems_declaration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

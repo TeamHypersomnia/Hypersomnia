@@ -1,4 +1,7 @@
-#include "entity_system/storage_for_stateful_systems.h"
+namespace augs {
+	template <class...>
+	class storage_for_stateful_systems;
+}
 
 class physics_system;
 class gui_system;
