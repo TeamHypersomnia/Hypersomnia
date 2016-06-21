@@ -21,11 +21,6 @@ namespace augs {
 		typedef basic_aggregate_handle<false, handle_owner_type, components...> aggregate_handle;
 		typedef basic_aggregate_handle<true, handle_owner_type, components...> const_aggregate_handle;
 
-		template<class component, class... Args>
-		auto allocate_component(Args... args) {
-			return std::get<augs::object_pool<component>>(pools_for_components).allocate(args...);
-		}
-
 
 	public:
 		typedef object_pool<aggregate_type> aggregate_pool_type;
@@ -35,9 +30,27 @@ namespace augs {
 		typename transform_types<std::tuple, make_object_pool, components...>::type pools_for_components;
 
 	public:
-
 		const auto& get_pool() const {
 			return pool_for_aggregates;
+		}
+
+		auto& get_pool() {
+			return pool_for_aggregates;
+		}
+
+		template<class component>
+		const auto& get_component_pool() const {
+			return std::get<augs::object_pool<component>>(pools_for_components);
+		}
+
+		template<class component>
+		auto& get_component_pool() {
+			return std::get<augs::object_pool<component>>(pools_for_components);
+		}
+
+		template<class component, class... Args>
+		auto allocate_component(Args... args) {
+			return get_component_pool<component>().allocate(args...);
 		}
 
 		size_t aggregates_count() const {

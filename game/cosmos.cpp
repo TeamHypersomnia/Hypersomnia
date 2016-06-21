@@ -44,6 +44,10 @@ const storage_for_all_components_and_aggregates::aggregate_pool_type& cosmos::ge
 	return components_and_aggregates.get_pool();
 }
 
+storage_for_all_components_and_aggregates::aggregate_pool_type& cosmos::get_pool() {
+	return components_and_aggregates.get_pool();
+}
+
 void cosmos::call_rendering_schemata(augs::variable_delta delta, cosmic_profiler& profiler) const {
 	step_state step;
 	const auto& cosm = *this;

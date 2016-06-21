@@ -1,13 +1,9 @@
 #pragma once
 #include "misc/object_pool_handle.h"
+#include "configurable_components.h"
+#include "component_aggregate.h"
 
 namespace augs {
-	template <class...>
-	class component_aggregate;
-
-	template <class...>
-	class configurable_components;
-
 	template <bool is_const, class owner_type, class... components>
 	class basic_aggregate_handle : public basic_handle<is_const, owner_type, component_aggregate<components...>> {
 		using basic_handle::get;
@@ -18,7 +14,7 @@ namespace augs {
 		typename std::conditional<is_const, const component*, component*>::type find() const {
 			auto& aggregate = get();
 
-			auto& component_pool = std::get<typename object_pool<component>>(owner.pools_for_components);
+			auto& component_pool = owner.get_component_pool<component>();
 			auto component_handle = component_pool.get_handle(aggregate.get_id<component>());
 
 			if (component_handle.alive())

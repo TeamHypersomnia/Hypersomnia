@@ -70,4 +70,15 @@ public:
 	std::wstring summary() const;
 
 	const storage_for_all_components_and_aggregates::aggregate_pool_type& get_pool() const;
+	storage_for_all_components_and_aggregates::aggregate_pool_type& get_pool();
+
+	template <class component>
+	const augs::object_pool<component>& get_component_pool() const {
+		return components_and_aggregates.get_component_pool<component>();
+	}
+
+	template <class component>
+	augs::object_pool<component>& get_component_pool() {
+		return components_and_aggregates.get_component_pool<component>();
+	}
 };

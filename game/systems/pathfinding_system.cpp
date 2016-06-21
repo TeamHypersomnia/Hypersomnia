@@ -3,7 +3,7 @@
 #include "game/cosmos.h"
 #include "game/entity_id.h"
 
-#include "physics_system.h"
+#include "game/stateful_systems/physics_system.h"
 
 #include "game/components/pathfinding_component.h"
 #include "game/components/visibility_component.h"

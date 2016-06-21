@@ -2,6 +2,7 @@
 #include <tuple>
 #include <vector>
 #include <unordered_map>
+#include <functional>
 #include "templates.h"
 #include "ensure.h"
 

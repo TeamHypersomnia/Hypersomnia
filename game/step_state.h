@@ -1,5 +1,5 @@
 #pragma once
-#include "game/types_specification/message_queues_instantiation.h"
+#include "game/types_specification/all_messages_declaration.h"
 
 class step_state {
 public:
