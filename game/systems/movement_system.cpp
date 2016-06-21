@@ -7,11 +7,20 @@
 
 #include "game/components/gun_component.h"
 
-void movement_system::set_movement_flags_from_input() {
+#include "game/components/physics_component.h"
+#include "game/components/movement_component.h"
+
+#include "game/entity_handle.h"
+#include "game/step_state.h"
+
+using namespace augs;
+
+
+void movement_system::set_movement_flags_from_input(cosmos& cosmos, step_state& step) {
 	auto events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto it : events) {
-		auto* movement = it.subject.find<components::movement>();
+		auto* movement = cosmos.get_handle(it.subject).find<components::movement>();
 		if (movement == nullptr) continue;
 
 		switch (it.intent) {
@@ -35,9 +44,10 @@ void movement_system::set_movement_flags_from_input() {
 	}
 }
 
-void movement_system::apply_movement_forces() {
-	auto& physics_sys = parent_cosmos.stateful_systems.get<physics_system>();
+void movement_system::apply_movement_forces(cosmos& cosmos) {
+	auto& physics_sys = cosmos.stateful_systems.get<physics_system>();
 
+	auto targets = cosmos.get(processing_subjects::WITH_MOVEMENT);
 	for (auto it : targets) {
 		auto& movement = it.get<components::movement>();
 
@@ -51,14 +61,14 @@ void movement_system::apply_movement_forces() {
 		resultant.y = movement.moving_backward * movement.input_acceleration_axes.y - movement.moving_forward * movement.input_acceleration_axes.y;
 
 		if (maybe_physics == nullptr) {
-			it.get<components::transform>().pos += resultant * delta_seconds();
+			it.get<components::transform>().pos += resultant * cosmos.delta.in_seconds();
 			continue;
 		}
 
 		auto& physics = *maybe_physics;
 		
 		if (movement.make_inert_for_ms > 0.f) {
-			movement.make_inert_for_ms -= delta_milliseconds();
+			movement.make_inert_for_ms -= cosmos.delta.in_milliseconds();
 			physics.set_linear_damping(2);
 		}
 		else
@@ -87,9 +97,10 @@ void movement_system::apply_movement_forces() {
 	}
 }
 
-void movement_system::generate_movement_responses() {
+void movement_system::generate_movement_responses(cosmos& cosmos, step_state& step) {
 	step.messages.get_queue<movement_response>().clear();
 
+	auto targets = cosmos.get(processing_subjects::WITH_MOVEMENT);
 	for (auto it : targets) {
 		auto& movement = it.get<components::movement>();
 

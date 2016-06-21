@@ -1,15 +1,12 @@
 #pragma once
-#include "game/processing_system_with_cosmos_reference.h"
-#include "game/components/physics_component.h"
-#include "game/components/movement_component.h"
 
-using namespace augs;
+class cosmos;
+class step_state;
 
-class movement_system : public processing_system_templated<components::movement> {
+class movement_system {
 public:
-	using processing_system_templated::processing_system_templated;
 
-	void set_movement_flags_from_input();
-	void apply_movement_forces();
-	void generate_movement_responses();
+	void set_movement_flags_from_input(cosmos& cosmos, step_state& step);
+	void apply_movement_forces(cosmos& cosmos);
+	void generate_movement_responses(cosmos& cosmos, step_state& step);
 };
