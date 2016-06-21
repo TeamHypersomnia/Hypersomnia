@@ -25,6 +25,9 @@ namespace components {
 class cosmos;
 
 template <bool is_const>
+using basic_entity_handle_base = augs::basic_aggregate_handle<is_const, cosmos, put_all_components_into<std::tuple>::type>;
+
+template <bool is_const>
 class basic_entity_handle : public basic_entity_handle_base<is_const> {
 	typedef typename std::conditional<is_const, const components::relations&, components::relations&>::type relations_type;
 	typedef typename std::conditional<is_const, const full_entity_definition&, full_entity_definition&>::type definition_type;

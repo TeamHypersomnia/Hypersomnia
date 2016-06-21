@@ -24,10 +24,10 @@ namespace ingredients {
 	components::sprite& sprite(definition_interface, vec2 pos, assets::texture_id = assets::texture_id::BLANK, augs::rgba col = augs::rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
 	components::sprite& sprite_scalled(definition_interface, vec2 pos, vec2i size, assets::texture_id = assets::texture_id::BLANK, augs::rgba col = augs::rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
 	
-	components::physics_definition& bullet_round_physics(definition_interface);
-	components::physics_definition& see_through_dynamic_body(definition_interface);
-	components::physics_definition& standard_dynamic_body(definition_interface);
-	components::physics_definition& standard_static_body(definition_interface);
+	void bullet_round_physics(definition_interface);
+	void see_through_dynamic_body(definition_interface);
+	void standard_dynamic_body(definition_interface);
+	void standard_static_body(definition_interface);
 
 	void wsad_character_physics(definition_interface);
 	void wsad_character_legs(definition_interface legs, definition_interface player);

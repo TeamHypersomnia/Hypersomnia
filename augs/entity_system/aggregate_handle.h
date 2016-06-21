@@ -4,8 +4,12 @@
 #include "component_aggregate.h"
 
 namespace augs {
+	template <bool is_const, class owner_type, class T>
+	class basic_aggregate_handle;
+
 	template <bool is_const, class owner_type, class... components>
-	class basic_aggregate_handle : public basic_handle<is_const, owner_type, component_aggregate<components...>> {
+	class basic_aggregate_handle<is_const, owner_type, std::tuple<components...>> 
+		: public basic_handle<is_const, owner_type, component_aggregate<components...>> {
 		using basic_handle::get;
 	public:
 		using basic_handle::basic_handle;
@@ -53,11 +57,11 @@ namespace augs {
 		const configurable_components<components...>& get_definition() const {
 			configurable_components<components...> result;
 
-			for_each_type<components...>([this, &result](auto elem) {
+			for_each_type<components...>([this, &result](auto c) {
 				const auto const* p = this;
 
-				if (p->find<decltype(elem)>() != nullptr) {
-					result.set(p->get<decltype(elem)>());
+				if (p->find<decltype(c)>() != nullptr) {
+					result.set(p->get<decltype(c)>());
 				}
 			});
 

@@ -85,53 +85,7 @@ struct put_all_components_into {
 	> type;
 };
 
-namespace augs {
-	template <bool, class, class...>
-	class basic_aggregate_handle;
-}
-
 class cosmos;
-
-template <bool is_const>
-using basic_entity_handle_base = augs::basic_aggregate_handle<is_const, cosmos, 
-	components::animation,
-	components::animation_response,
-	components::behaviour_tree,
-	components::camera,
-	components::position_copying,
-	components::crosshair,
-	components::damage,
-	components::gun,
-	components::input_receiver,
-	components::rotation_copying,
-	components::movement,
-	components::particle_effect_response,
-	components::particle_group,
-	components::pathfinding,
-	components::physics,
-	components::render,
-	components::transform,
-	components::visibility,
-	components::sprite,
-	components::polygon,
-	components::tile_layer,
-	components::car,
-	components::driver,
-	components::trigger,
-	components::trigger_query_detector,
-	components::fixtures,
-	components::container,
-	components::item,
-	components::force_joint,
-	components::item_slot_transfers,
-	components::gui_element,
-	components::trigger_collision_detector,
-	components::name,
-	components::trace,
-	components::melee,
-	components::sentience,
-	components::attitude,
-	components::relations>;
 
 namespace augs {
 	template<class, class...>
