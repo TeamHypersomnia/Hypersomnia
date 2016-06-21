@@ -12,6 +12,7 @@
 #include "game/components/force_joint_component.h"
 
 #include "game/cosmos.h"
+#include "game/stateful_systems/physics_system.h"
 
 #include "game/components/driver_component.h"
 #include "game/components/physics_component.h"
@@ -32,23 +33,24 @@ void driver_system::assign_drivers_from_successful_trigger_hits(cosmos& cosmos, 
 		auto* maybe_car = cosmos.get_handle(subject_car).find<components::car>();
 
 		if (maybe_car && e.trigger == maybe_car->left_wheel_trigger)
-			assign_car_ownership(cosmos, cosmos.get_handle(e.detector_body), cosmos.get_handle(subject_car));
+			assign_car_ownership(cosmos.get_handle(e.detector_body), cosmos.get_handle(subject_car));
 	}
 }
 
 void driver_system::release_drivers_due_to_ending_contact_with_wheel(cosmos& cosmos, step_state& step) {
 	auto& contacts = step.messages.get_queue<messages::collision_message>();
+	auto& physics = cosmos.stateful_systems.get<physics_system>();
 
 	for (auto& c : contacts) {
 		if (c.type == messages::collision_message::event_type::END_CONTACT) {
 			auto driver = cosmos.get_handle(c.subject);
-			auto car = components::physics::get_owner_body_entity(c.collider);
+			auto car = physics.get_owner_body_entity(c.collider);
 
 			auto* maybe_driver = cosmos.get_handle(driver).find<components::driver>();
 
 			if (maybe_driver) {
 				if (maybe_driver->owned_vehicle == car) {
-					release_car_ownership(cosmos, driver);
+					release_car_ownership(driver);
 					cosmos.get_handle(driver).get<components::movement>().make_inert_for_ms = 500.f;
 				}
 			}
@@ -60,19 +62,21 @@ void driver_system::release_drivers_due_to_requests(cosmos& cosmos, step_state& 
 
 	for (auto& e : intents)
 		if (e.intent == intent_type::RELEASE_CAR && e.pressed_flag)
-			release_car_ownership(cosmos, cosmos.get_handle(e.subject));
+			release_car_ownership(cosmos.get_handle(e.subject));
 }
 
-bool driver_system::release_car_ownership(cosmos& cosmos, entity_handle driver) {
-	return change_car_ownership(cosmos, driver, cosmos.get_handle(entity_id()), true);
+bool driver_system::release_car_ownership(entity_handle driver) {
+	return change_car_ownership(driver, driver.get_cosmos().get_handle(entity_id()), true);
 }
 
-bool driver_system::assign_car_ownership(cosmos& cosmos, entity_handle driver, entity_handle car) {
-	return change_car_ownership(cosmos, driver, car, false);
+bool driver_system::assign_car_ownership(entity_handle driver, entity_handle car) {
+	return change_car_ownership(driver, car, false);
 }
 
-bool driver_system::change_car_ownership(cosmos& cosmos, entity_handle driver_entity, entity_handle car_entity, bool lost_ownership) {
+bool driver_system::change_car_ownership(entity_handle driver_entity, entity_handle car_entity, bool lost_ownership) {
 	auto& driver = driver_entity.get<components::driver>();
+	auto& cosmos = driver_entity.get_cosmos();
+	auto& physics = cosmos.stateful_systems.get<physics_system>();
 
 	auto* maybe_rotation_copying = driver_entity.find<components::rotation_copying>();
 	auto* maybe_physics = driver_entity.find<components::physics>();
@@ -103,7 +107,7 @@ bool driver_system::change_car_ownership(cosmos& cosmos, entity_handle driver_en
 		if (maybe_physics) {
 			maybe_physics->set_transform(car.left_wheel_trigger);
 			maybe_physics->set_velocity(vec2(0, 0));
-			components::physics::resolve_density_of_associated_fixtures(driver_entity);
+			physics.resolve_density_of_associated_fixtures(driver_entity);
 		}
 	}
 	else {
@@ -131,7 +135,7 @@ bool driver_system::change_car_ownership(cosmos& cosmos, entity_handle driver_en
 		}
 
 		if (maybe_physics) {
-			components::physics::resolve_density_of_associated_fixtures(driver_entity);
+			physics.resolve_density_of_associated_fixtures(driver_entity);
 		}
 	}
 

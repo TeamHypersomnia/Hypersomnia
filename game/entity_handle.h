@@ -38,6 +38,10 @@ class basic_entity_handle : public basic_entity_handle_base<is_const> {
 	basic_entity_handle make_handle(entity_id) const;
 public:
 	using basic_entity_handle_base<is_const>::basic_entity_handle_base;
+	
+	auto& get_cosmos() const {
+		return owner;
+	}
 
 	basic_entity_handle get_parent() const;
 
