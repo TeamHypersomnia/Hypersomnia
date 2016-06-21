@@ -1,4 +1,3 @@
-#include "game/types_specification/all_component_includes.h"
 #include "entity_handle.h"
 #include "game/detail/inventory_slot_id.h"
 #include "game/components/relations_component.h"
