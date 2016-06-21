@@ -85,13 +85,6 @@ public:
 
 	void step_and_set_new_transforms(step_state&);
 
-	entity_id get_owner_friction_field(entity_id);
-	entity_id get_owner_body_entity(entity_id sub_entity);
-	bool is_entity_physical(entity_id);
-	bool are_connected_by_friction(entity_id child, entity_id parent);
-	void resolve_density_of_associated_fixtures(entity_id);
-
-	std::vector<b2Vec2> get_world_vertices(entity_id subject, bool meters = true, int fixture_num = 0);
 
 	int ray_casts_since_last_step = 0;
 

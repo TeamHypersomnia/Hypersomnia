@@ -8,8 +8,10 @@
 #include "game/components/attitude_component.h"
 #include "inventory_utils.h"
 #include "inventory_slot.h"
+#include "game/entity_handle.h"
+#include "game/cosmos.h"
 
-void unset_input_flags_of_orphaned_entity(entity_id e) {
+void unset_input_flags_of_orphaned_entity(entity_handle e) {
 	auto* gun = e.find<components::gun>();
 	auto* melee = e.find<components::melee>();
 	auto* car = e.find<components::car>();
@@ -34,8 +36,9 @@ bool isLeft(vec2 a, vec2 b, vec2 c) {
 	return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
 }
 
-identified_danger assess_danger(entity_id victim, entity_id danger) {
+identified_danger assess_danger(const_entity_handle victim, const_entity_handle danger) {
 	identified_danger result;
+	auto& cosmos = victim.get_cosmos();
 
 	auto* sentience = victim.find<components::sentience>();
 	if (!sentience) return result;
@@ -52,7 +55,7 @@ identified_danger assess_danger(entity_id victim, entity_id danger) {
 
 	auto victim_pos = position(victim);
 	auto danger_pos = position(danger);
-	auto danger_vel = components::physics::get_owner_body_entity(danger).get<components::physics>().velocity();
+	auto danger_vel = velocity(cosmos.get_handle(get_owner_body_entity(danger)));
 	auto danger_speed = danger_vel.length();
 	auto danger_dir = (danger_pos - victim_pos);
 	float danger_distance = danger_dir.length();
@@ -87,7 +90,7 @@ identified_danger assess_danger(entity_id victim, entity_id danger) {
 	return result;
 }
 
-attitude_type calculate_attitude(entity_id targeter, entity_id target) {
+attitude_type calculate_attitude(const_entity_handle targeter, const_entity_handle target) {
 	auto& targeter_attitude = targeter.get<components::attitude>();
 	auto* target_attitude = target.find<components::attitude>();
 
@@ -104,7 +107,7 @@ attitude_type calculate_attitude(entity_id targeter, entity_id target) {
 	return attitude_type::NEUTRAL;
 }
 
-std::vector<entity_id> guns_wielded(entity_id subject) {
+std::vector<entity_id> guns_wielded(const_entity_handle subject) {
 	std::vector<entity_id> result;
 
 	auto hand = subject[slot_function::PRIMARY_HAND];
@@ -129,7 +132,7 @@ std::vector<entity_id> guns_wielded(entity_id subject) {
 	return result;
 }
 
-float assess_projectile_velocity_of_weapon(entity_id weapon) {
+float assess_projectile_velocity_of_weapon(const_entity_handle weapon) {
 	if (weapon.dead())
 		return 0.f;
 

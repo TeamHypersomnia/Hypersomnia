@@ -1266,6 +1266,9 @@
     <ClCompile Include="game\stateful_systems\physics_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\detail\physics_scripts.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3387,6 +3390,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\types_specification\all_stateful_systems_declaration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\physics_scripts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

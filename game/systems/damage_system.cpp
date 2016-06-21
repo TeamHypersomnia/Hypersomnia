@@ -17,8 +17,9 @@
 #include "game/entity_handle.h"
 #include "game/step_state.h"
 
-using namespace augs;
+#include "game/detail/physics_scripts.h"
 
+using namespace augs;
 
 void damage_system::destroy_colliding_bullets_and_send_damage(cosmos& cosmos, step_state& step) {
 	auto events = step.messages.get_queue<messages::collision_message>();
@@ -28,18 +29,21 @@ void damage_system::destroy_colliding_bullets_and_send_damage(cosmos& cosmos, st
 		if (it.type != messages::collision_message::event_type::BEGIN_CONTACT) 
 			continue;
 
-		auto* damage = cosmos.get_handle(it.collider).find<components::damage>();
+		auto subject_handle = cosmos.get_handle(it.subject);
+		auto collider_handle = cosmos.get_handle(it.collider);
+
+		auto* damage = collider_handle.find<components::damage>();
 
 		bool bullet_colliding_with_sender =
-			damage && components::physics::get_owner_body_entity(damage->sender) == components::physics::get_owner_body_entity(it.subject);
+			damage && get_owner_body_entity(cosmos.get_handle(damage->sender)) == get_owner_body_entity(subject_handle);
 
 		if (!bullet_colliding_with_sender && damage && damage->damage_upon_collision && damage->damage_charges_before_destruction > 0) {
-			auto& subject_of_impact = components::physics::get_owner_body_entity(it.subject).get<components::physics>();
+			auto& subject_of_impact = cosmos.get_handle(get_owner_body_entity(subject_handle)).get<components::physics>();
 			
 			vec2 impact_velocity = damage->custom_impact_velocity;
 			
 			if(impact_velocity.is_zero())
-				impact_velocity = velocity(it.collider);
+				impact_velocity = velocity(collider_handle);
 
 			if(damage->impulse_upon_hit > 0.f)
 				subject_of_impact.apply_force(vec2(impact_velocity).set_length(damage->impulse_upon_hit), it.point - subject_of_impact.get_mass_position());
