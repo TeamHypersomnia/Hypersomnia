@@ -26,6 +26,15 @@
 
 #include "ensure.h"
 
+#include "game/components/item_component.h"
+#include "game/components/container_component.h"
+#include "game/components/item_slot_transfers_component.h"
+
+#include "game/entity_handle.h"
+#include "game/step_state.h"
+
+using namespace augs;
+
 void add_item(inventory_slot_handle handle, entity_handle new_item) {
 	handle->items_inside.push_back(new_item);
 	new_item.get<components::item>().current_slot = handle;
@@ -38,17 +47,17 @@ void remove_item(inventory_slot_handle handle, entity_handle removed_item) {
 }
 
 
-void item_system::handle_trigger_confirmations_as_pick_requests() {
+void item_system::handle_trigger_confirmations_as_pick_requests(cosmos& cosmos, step_state& step) {
 	auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();
-	auto& physics = parent_cosmos.stateful_systems.get<physics_system>();
+	auto& physics = cosmos.stateful_systems.get<physics_system>();
 
 	for (auto& e : confirmations) {
-		auto* item_slot_transfers = e.detector_body.find<components::item_slot_transfers>();
+		auto* item_slot_transfers = cosmos.get_handle(e.detector_body).find<components::item_slot_transfers>();
 		auto item_entity = physics.get_owner_body_entity(e.trigger);
 
-		auto* item = item_entity.find<components::item>();
+		auto* item = cosmos.get_handle(item_entity).find<components::item>();
 
-		if (item_slot_transfers && item && get_owning_transfer_capability(item_entity).dead()) {
+		if (item_slot_transfers && item && cosmos.get_handle(get_owning_transfer_capability(item_entity)).dead()) {
 			auto& pick_list = item_slot_transfers->only_pick_these_items;
 			bool found_on_subscription_list = pick_list.find(item_entity) != pick_list.end();
 
@@ -60,7 +69,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests() {
 				request.item = item_entity;
 				request.target_slot = determine_pickup_target_slot(item_entity, e.detector_body);
 
-				if (request.target_slot.alive()) {
+				if (cosmos.get_handle(request.target_slot).alive()) {
 					if (physics.check_timeout_and_reset(item_slot_transfers->pickup_timeout)) {
 						step.messages.post(request);
 					}
@@ -73,7 +82,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests() {
 	}
 }
 
-void item_system::handle_throw_item_intents() {
+void item_system::handle_throw_item_intents(cosmos& cosmos, step_state& step) {
 	auto& requests = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& r : requests) {
@@ -81,12 +90,12 @@ void item_system::handle_throw_item_intents() {
 			(r.intent == intent_type::THROW_PRIMARY_ITEM
 				|| r.intent == intent_type::THROW_SECONDARY_ITEM)
 			) {
-			if (r.subject.find<components::item_slot_transfers>()) {
+			if (cosmos.get_handle(r.subject).find<components::item_slot_transfers>()) {
 				auto hand = map_primary_action_to_secondary_hand_if_primary_empty(r.subject, intent_type::THROW_SECONDARY_ITEM == r.intent);
 
-				if (hand.has_items()) {
+				if (cosmos.get_handle(hand).has_items()) {
 					messages::item_slot_transfer_request request;
-					request.item = hand->items_inside[0];
+					request.item = cosmos.get_handle(hand)->items_inside[0];
 					step.messages.post(request);
 				}
 			}
@@ -94,7 +103,7 @@ void item_system::handle_throw_item_intents() {
 	}
 }
 
-void item_system::handle_holster_item_intents() {
+void item_system::handle_holster_item_intents(cosmos& cosmos, step_state& step) {
 	auto& requests = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& r : requests) {
@@ -102,15 +111,15 @@ void item_system::handle_holster_item_intents() {
 			(r.intent == intent_type::HOLSTER_PRIMARY_ITEM
 				|| r.intent == intent_type::HOLSTER_SECONDARY_ITEM)
 			) {
-			if (r.subject.find<components::item_slot_transfers>()) {
+			if (cosmos.get_handle(r.subject).find<components::item_slot_transfers>()) {
 				auto hand = map_primary_action_to_secondary_hand_if_primary_empty(r.subject, intent_type::HOLSTER_SECONDARY_ITEM == r.intent);
 
-				if (hand.has_items()) {
+				if (cosmos.get_handle(hand).has_items()) {
 					messages::item_slot_transfer_request request;
-					request.item = hand->items_inside[0];
-					request.target_slot = determine_hand_holstering_slot(hand->items_inside[0], r.subject);
+					request.item = cosmos.get_handle(hand)->items_inside[0];
+					request.target_slot = determine_hand_holstering_slot(cosmos.get_handle(hand)->items_inside[0], r.subject);
 
-					if (request.target_slot.alive())
+					if (cosmos.get_handle(request.target_slot).alive())
 						step.messages.post(request);
 				}
 			}
@@ -123,11 +132,13 @@ void components::item_slot_transfers::interrupt_mounting() {
 	mounting.intented_mounting_slot.unset();
 }
 
-void item_system::process_mounting_and_unmounting() {
+void item_system::process_mounting_and_unmounting(cosmos& cosmos, step_state& step) {
+	auto targets = cosmos.get(processing_subjects::WITH_ITEM_SLOT_TRANSFERS);
 	for (auto& e : targets) {
 		auto& item_slot_transfers = e.get<components::item_slot_transfers>();
 
-		auto& currently_mounted_item = item_slot_transfers.mounting.current_item;
+		auto& currently_mounted_item_id = item_slot_transfers.mounting.current_item;
+		auto currently_mounted_item = cosmos.get_handle(currently_mounted_item_id);
 
 		if (currently_mounted_item.alive()) {
 			auto& item = currently_mounted_item.get<components::item>();
@@ -139,7 +150,7 @@ void item_system::process_mounting_and_unmounting() {
 				ensure(item.intended_mounting != item.current_mounting);
 
 				if (item.montage_time_left_ms > 0) {
-					item.montage_time_left_ms -= delta_milliseconds();
+					item.montage_time_left_ms -= cosmos.delta.in_milliseconds();
 				}
 				else {
 					item.current_mounting = item.intended_mounting;
@@ -160,7 +171,7 @@ void item_system::process_mounting_and_unmounting() {
 	}
 }
 
-void item_system::translate_gui_intents_to_transfer_requests() {
+void item_system::translate_gui_intents_to_transfer_requests(cosmos& cosmos, step_state& step) {
 	auto& intents = step.messages.get_queue<messages::gui_item_transfer_intent>();
 
 	for (auto& i : intents) {
@@ -174,12 +185,13 @@ void item_system::translate_gui_intents_to_transfer_requests() {
 	intents.clear();
 }
 
-void item_system::consume_item_slot_transfer_requests() {
+void item_system::consume_item_slot_transfer_requests(cosmos& cosmos, step_state& step) {
 	auto& requests = step.messages.get_queue<messages::item_slot_transfer_request>();
 
 	for (auto& r : requests) {
-		auto& item = r.item.get<components::item>();
-		auto previous_slot = item.current_slot;
+		auto& item = cosmos.get_handle(r.item).get<components::item>();
+		auto previous_slot_id = item.current_slot;
+		auto previous_slot = cosmos.get_handle(previous_slot_id);
 
 		auto result = query_transfer_result(r);
 
@@ -192,7 +204,7 @@ void item_system::consume_item_slot_transfer_requests() {
 			continue;
 		}
 		else if (result.result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-			bool is_pickup_or_transfer = r.target_slot.alive();
+			bool is_pickup_or_transfer = cosmos.get_handle(r.target_slot).alive();
 			bool is_drop_request = !is_pickup_or_transfer;
 
 			components::transform previous_container_transform;
@@ -200,7 +212,7 @@ void item_system::consume_item_slot_transfer_requests() {
 			entity_id target_item_to_stack_with;
 
 			if (is_pickup_or_transfer) {
-				for (auto& i : r.target_slot->items_inside) {
+				for (auto& i : cosmos.get_handle(r.target_slot)->items_inside) {
 					if (can_merge_entities(r.item, i)) {
 						target_item_to_stack_with = i;
 					}
@@ -213,20 +225,20 @@ void item_system::consume_item_slot_transfer_requests() {
 				previous_container_transform = previous_slot.container_entity.get<components::transform>();
 				
 				if(whole_item_grabbed)
-					remove_item(r.item, previous_slot);
+					remove_item(cosmos.get_handle(r.item), cosmos.get_handle(previous_slot));
 
 				if (previous_slot.is_input_enabling_slot()) {
 					unset_input_flags_of_orphaned_entity(r.item);
 				}
 			}
 
-			if (target_item_to_stack_with.alive()) {
+			if (cosmos.get_handle(target_item_to_stack_with).alive()) {
 				if (whole_item_grabbed)
 					step.messages.post(messages::queue_destruction(r.item));
 				else
 					item.charges -= result.transferred_charges;
 
-				target_item_to_stack_with.get<components::item>().charges += result.transferred_charges;
+				cosmos.get_handle(target_item_to_stack_with).get<components::item>().charges += result.transferred_charges;
 
 				continue;
 			}
@@ -237,15 +249,15 @@ void item_system::consume_item_slot_transfer_requests() {
 			if (whole_item_grabbed)
 				grabbed_item_part = r.item;
 			else {
-				new_charge_stack = parent_cosmos.clone_entity(r.item);
+				new_charge_stack = cosmos.clone_entity(r.item);
 				item.charges -= result.transferred_charges;
-				new_charge_stack.get<components::item>().charges = result.transferred_charges;
+				cosmos.get_handle(new_charge_stack).get<components::item>().charges = result.transferred_charges;
 
 				grabbed_item_part = new_charge_stack;
 			}
 
 			if (is_pickup_or_transfer)
-				add_item(grabbed_item_part, r.target_slot);
+				add_item(cosmos.get_handle(grabbed_item_part), cosmos.get_handle(r.target_slot));
 
 			for_each_descendant(grabbed_item_part, [this, previous_container_transform, new_charge_stack](entity_id descendant) {
 				auto parent_slot = descendant.get<components::item>().current_slot;
