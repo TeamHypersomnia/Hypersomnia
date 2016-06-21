@@ -18,8 +18,8 @@ namespace augs {
 		//template <bool is_const, class owner_type, class... components>
 		//friend class basic_aggregate_handle;
 
-		typedef basic_aggregate_handle<false, handle_owner_type, components...> aggregate_handle;
-		typedef basic_aggregate_handle<true, handle_owner_type, components...> const_aggregate_handle;
+		typedef basic_aggregate_handle<false, handle_owner_type, std::tuple<components...>> aggregate_handle;
+		typedef basic_aggregate_handle<true, handle_owner_type, std::tuple<components...>> const_aggregate_handle;
 
 
 	public:

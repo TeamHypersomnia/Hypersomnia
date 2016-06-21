@@ -24,7 +24,7 @@ namespace ingredients {
 		e += components::fixtures(colliders);
 	}
 
-	components::physics_definition& see_through_dynamic_body(entity_id e) {
+	void see_through_dynamic_body(definition_interface e) {
 		auto& physics_definition = *e += components::physics_definition();
 
 		physics_definition.body.fixed_rotation = false;
@@ -38,7 +38,7 @@ namespace ingredients {
 		return physics_definition;
 	}
 
-	components::physics_definition& standard_static_body(entity_id e) {
+	void standard_static_body(definition_interface e) {
 		auto& physics_definition = *e += components::physics_definition();
 
 		physics_definition.body.fixed_rotation = false;
@@ -53,7 +53,7 @@ namespace ingredients {
 		return physics_definition;
 	}
 	
-	components::physics_definition& bullet_round_physics(entity_id e) {
+	void bullet_round_physics(definition_interface e) {
 		auto& physics_definition = *e += components::physics_definition();
 
 		auto& body = physics_definition.body;

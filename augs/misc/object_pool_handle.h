@@ -5,11 +5,11 @@
 namespace augs {
 	template<bool is_const, class owner_type, class value_type>
 	class basic_handle {
+	public:
 		typedef typename std::conditional<is_const, const owner_type&, owner_type&>::type owner_reference;
 		typedef typename std::conditional<is_const, const value_type&, value_type&>::type value_reference;
 		typedef object_pool_id<value_type> id_type;
 
-	public:
 		owner_reference owner;
 		id_type raw_id;
 
