@@ -1,9 +1,17 @@
 #include "entity_handle.h"
 #include "game/detail/inventory_slot_id.h"
+#include "game/detail/inventory_slot_handle.h"
 #include "game/components/relations_component.h"
 #include "game/full_entity_definition.h"
 
 #include "game/cosmos.h"
+
+
+template <bool is_const>
+template <class = typename std::enable_if<!is_const>::type>
+basic_entity_handle<is_const>::operator basic_entity_handle<true>() {
+	return basic_entity_handle<true>(owner, raw_id);
+}
 
 template <bool is_const>
 typename basic_entity_handle<is_const>::inventory_slot_handle_type basic_entity_handle<is_const>::operator[](slot_function func) const {
@@ -16,18 +24,112 @@ basic_entity_handle<is_const> basic_entity_handle<is_const>::operator[](sub_enti
 }
 
 template <bool is_const>
-typename basic_entity_handle<is_const>::definition_type basic_entity_handle<is_const>::operator[](sub_definition_name child) const {
-	return relations().sub_definitions_by_name.at(child);
-}
-
-template <bool is_const>
 basic_entity_handle<is_const> basic_entity_handle<is_const>::operator[](associated_entity_name assoc) const {
 	return make_handle(relations().associated_entities_by_name.at(assoc));
 }
 
 template <bool is_const>
+typename basic_entity_handle<is_const>::definition_type basic_entity_handle<is_const>::operator[](sub_definition_name child) const {
+	return relations().sub_definitions_by_name.at(child);
+}
+
+template <bool is_const>
+void basic_entity_handle<is_const>::for_each_sub_entity_recursive(std::function<void(basic_entity_handle)>) const {
+	{
+		auto& subs = relations().sub_entities;
+
+		for (auto& s : subs) {
+			callback(s);
+			s.for_each_sub_entity_recursive(callback);
+		}
+	}
+	{
+		auto& subs = relations().sub_entities_by_name;
+
+		for (auto& s : subs) {
+			callback(s.second);
+			s.second.for_each_sub_entity_recursive(callback);
+		}
+	}
+}
+
+template <bool is_const>
+void basic_entity_handle<is_const>::for_each_sub_definition(std::function<void(definition_type)>) const {
+	auto defs = relations().sub_definitions_by_name;
+
+	for (auto& d : defs) {
+		callback(d.second);
+	}
+}
+
+template <bool is_const>
+basic_entity_handle<is_const> basic_entity_handle<is_const>::get_parent() const {
+	return relations().parent;
+}
+
+template <bool is_const>
+bool basic_entity_handle<is_const>::has(sub_entity_name s) const {
+	return relations().sub_entities_by_name.find(n) != relations().sub_entities_by_name.end();
+}
+
+template <bool is_const>
+bool basic_entity_handle<is_const>::has(sub_definition_name) const {
+	return relations().sub_definitions_by_name.find(n) != relations().sub_definitions_by_name.end();
+}
+
+template <bool is_const>
+bool basic_entity_handle<is_const>::has(associated_entity_name) const {
+	return relations().associated_entities_by_name.find(n) != relations().associated_entities_by_name.end();
+}
+
+template <bool is_const>
+bool basic_entity_handle<is_const>::has(slot_function f) const {
+	return (*this)[f].alive();
+}
+
+template <bool is_const>
+bool basic_entity_handle<is_const>::operator==(entity_id b) {
+
+}
+
+template <bool is_const>
+operator basic_entity_handle<is_const>::entity_id() const {
+
+}
+
+template <bool is_const>
 bool basic_entity_handle<is_const>::is_in(processing_subjects list) const {
 	return owner.is_in(raw_id, list);
+}
+
+template <bool is_const>
+template <class = typename std::enable_if<!is_const>::type>
+void basic_entity_handle<is_const>::add_sub_entity(entity_id p, sub_entity_name optional_name = sub_entity_name::INVALID) const {
+
+}
+
+template <bool is_const>
+template <class = typename std::enable_if<!is_const>::type>
+void basic_entity_handle<is_const>::map_sub_entity(sub_entity_name n, entity_id p) const {
+
+}
+
+template <bool is_const>
+template <class = typename std::enable_if<!is_const>::type>
+void basic_entity_handle<is_const>::map_sub_definition(sub_definition_name n, const full_entity_definition& p) const {
+
+}
+
+template <bool is_const>
+template <class = typename std::enable_if<!is_const>::type>
+void basic_entity_handle<is_const>::skip_processing_in(processing_subjects) const {
+
+}
+
+template <bool is_const>
+template <class = typename std::enable_if<!is_const>::type>
+void basic_entity_handle<is_const>::unskip_processing_in(processing_subjects) const {
+
 }
 
 /*

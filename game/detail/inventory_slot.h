@@ -1,8 +1,11 @@
 #pragma once
 #include "game/entity_id.h"
 #include "game/entity_handle_declaration.h"
+#include "game/components/transform_component.h"
+#include "math/rects.h"
 
 class cosmos;
+
 
 struct inventory_slot {
 	bool items_need_mounting = false;

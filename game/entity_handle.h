@@ -12,7 +12,7 @@
 
 #include "game/types_specification/full_entity_definition_declaration.h"
 
-#include "game/detail/inventory_slot_handle.h"
+#include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/entity_handle_declaration.h"
 
 #include "entity_system/aggregate_handle.h"
@@ -35,6 +35,8 @@ class basic_entity_handle : public basic_entity_handle_base<is_const> {
 public:
 	using basic_entity_handle_base<is_const>::basic_entity_handle_base;
 
+	basic_entity_handle get_parent() const;
+
 	inventory_slot_handle_type operator[](slot_function) const;
 	basic_entity_handle operator[](sub_entity_name) const;
 	basic_entity_handle operator[](associated_entity_name) const;
@@ -43,23 +45,10 @@ public:
 	void for_each_sub_entity_recursive(std::function<void(basic_entity_handle)>) const;
 	void for_each_sub_definition(std::function<void(definition_type)>) const;
 
-	basic_entity_handle get_parent() const;
-	
-	template <class component>
-	bool has() const {
-		return basic_entity_handle_base<is_const>::has<component>();
-	}
-
 	bool has(sub_entity_name) const;
 	bool has(sub_definition_name) const;
 	bool has(associated_entity_name) const;
 	bool has(slot_function) const;
-
-	bool operator==(entity_id b);
-
-	operator entity_id() const;
-
-	bool is_in(processing_subjects) const;
 
 	template <class = typename std::enable_if<!is_const>::type>
 	void add_sub_entity(entity_id p, sub_entity_name optional_name = sub_entity_name::INVALID) const;
@@ -69,6 +58,20 @@ public:
 
 	template <class = typename std::enable_if<!is_const>::type>
 	void map_sub_definition(sub_definition_name n, const full_entity_definition& p) const;
+
+	template <class component>
+	bool has() const {
+		return basic_entity_handle_base<is_const>::has<component>();
+	}
+
+	template <class = typename std::enable_if<!is_const>::type>
+	operator basic_entity_handle<true>();
+
+	bool operator==(entity_id b);
+
+	operator entity_id() const;
+
+	bool is_in(processing_subjects) const;
 
 	template <class = typename std::enable_if<!is_const>::type>
 	void skip_processing_in(processing_subjects) const;

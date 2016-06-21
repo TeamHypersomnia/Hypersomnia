@@ -25,6 +25,7 @@ class basic_inventory_slot_handle {
 
 	entity_handle_type get_handle() const;
 	entity_handle_type make_handle(entity_id) const;
+	basic_inventory_slot_handle make_handle(inventory_slot_id) const;
 public:
 	basic_inventory_slot_handle(owner_reference, inventory_slot_id);
 	
@@ -32,9 +33,6 @@ public:
 	inventory_slot_id raw_id;
 
 	void unset();
-
-	void add_item(entity_id) const;
-	void remove_item(entity_id) const;
 
 	void for_each_descendant(std::function<void(entity_handle_type item)>) const;
 

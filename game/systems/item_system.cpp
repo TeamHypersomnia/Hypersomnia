@@ -7,8 +7,6 @@
 #include "game/messages/item_slot_transfer_request.h"
 #include "game/messages/queue_destruction.h"
 #include "game/messages/gui_intents.h"
-#include "game/messages/rebuild_physics_message.h"
-#include "game/messages/physics_operation.h"
 
 #include "game/cosmos.h"
 
@@ -20,11 +18,25 @@
 
 #include "game/detail/inventory_utils.h"
 #include "game/detail/inventory_slot.h"
+#include "game/detail/inventory_slot_handle.h"
 #include "game/detail/entity_scripts.h"
 
 #include "game/stateful_systems/physics_system.h"
+#include "game/entity_handle.h"
 
 #include "ensure.h"
+
+void add_item(inventory_slot_handle handle, entity_handle new_item) {
+	handle->items_inside.push_back(new_item);
+	new_item.get<components::item>().current_slot = handle;
+}
+
+void remove_item(inventory_slot_handle handle, entity_handle removed_item) {
+	auto& v = handle->items_inside;
+	v.erase(std::remove(v.begin(), v.end(), removed_item), v.end());
+	removed_item.get<components::item>().current_slot.unset();
+}
+
 
 void item_system::handle_trigger_confirmations_as_pick_requests() {
 	auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();
@@ -201,7 +213,7 @@ void item_system::consume_item_slot_transfer_requests() {
 				previous_container_transform = previous_slot.container_entity.get<components::transform>();
 				
 				if(whole_item_grabbed)
-					previous_slot.remove_item(r.item);
+					remove_item(r.item, previous_slot);
 
 				if (previous_slot.is_input_enabling_slot()) {
 					unset_input_flags_of_orphaned_entity(r.item);
@@ -233,7 +245,7 @@ void item_system::consume_item_slot_transfer_requests() {
 			}
 
 			if (is_pickup_or_transfer)
-				r.target_slot.add_item(grabbed_item_part);
+				add_item(grabbed_item_part, r.target_slot);
 
 			for_each_descendant(grabbed_item_part, [this, previous_container_transform, new_charge_stack](entity_id descendant) {
 				auto parent_slot = descendant.get<components::item>().current_slot;

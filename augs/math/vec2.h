@@ -145,10 +145,10 @@ namespace augs {
 		vec2t get_sticking_offset(augs::rects::sticking mode) {
 			vec2 res;
 			switch (mode) {
-			case rects::sticking::LEFT: res = vec2(-x / 2, 0);	break;
-			case rects::sticking::RIGHT: res = vec2(x / 2, 0);	break;
-			case rects::sticking::TOP: res = vec2(0, -y / 2);	break;
-			case rects::sticking::BOTTOM: res = vec2(0, y / 2);	break;
+			case ::augs::rects::sticking::LEFT: res = vec2(-x / 2, 0);	break;
+			case ::augs::rects::sticking::RIGHT: res = vec2(x / 2, 0);	break;
+			case ::augs::rects::sticking::TOP: res = vec2(0, -y / 2);	break;
+			case ::augs::rects::sticking::BOTTOM: res = vec2(0, y / 2);	break;
 			default: res = vec2(0, 0);			break;
 			}
 
