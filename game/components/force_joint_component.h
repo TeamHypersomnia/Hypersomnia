@@ -1,7 +1,11 @@
 #pragma once
+
+#include <array>
 #include "transform_component.h"
 
 #include "game/entity_id.h"
+
+#include "math/vec2.h"
 
 namespace components {
 	struct force_joint {

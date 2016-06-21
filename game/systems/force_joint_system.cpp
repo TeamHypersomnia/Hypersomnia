@@ -2,14 +2,24 @@
 #include "game/entity_id.h"
 #include "log.h"
 
-void force_joint_system::apply_forces_towards_target_entities() {
+#include "game/components/force_joint_component.h"
+#include "game/components/physics_component.h"
+#include "game/components/transform_component.h"
+
+#include "game/cosmos.h"
+
+#include "game/entity_handle.h"
+#include "game/step_state.h"
+
+void force_joint_system::apply_forces_towards_target_entities(cosmos& cosmos, step_state& step) {
+	auto targets = cosmos.get(processing_subjects::WITH_FORCE_JOINT);
 	for (auto& it : targets) {
 		auto& physics = it.get<components::physics>();
 		auto& force_joint = it.get<components::force_joint>();
 
-		if (force_joint.chased_entity.dead()) continue;
+		if (cosmos.get_handle(force_joint.chased_entity).dead()) continue;
 
-		auto chased_transform = force_joint.chased_entity.get<components::transform>() + force_joint.chased_entity_offset;
+		auto chased_transform = cosmos.get_handle(force_joint.chased_entity).get<components::transform>() + force_joint.chased_entity_offset;
 
 		auto direction = chased_transform.pos - physics.get_position();
 		auto distance = direction.length();
@@ -17,7 +27,7 @@ void force_joint_system::apply_forces_towards_target_entities() {
 
 		if (force_joint.divide_transform_mode) {
 			auto current_transform = it.get<components::transform>();
-			auto interpolated = augs::interp(current_transform, chased_transform, 1.0 - 1.0 / (1.0 + delta_seconds() * (60.0)));
+			auto interpolated = augs::interp(current_transform, chased_transform, 1.0 - 1.0 / (1.0 + cosmos.delta.in_seconds() * (60.0)));
 			physics.set_transform(interpolated);
 		}
 		else {
@@ -49,7 +59,7 @@ void force_joint_system::apply_forces_towards_target_entities() {
 			//}
 
 			if (force_for_chased.length() > 5) {
-				auto& chased_physics = force_joint.chased_entity.get<components::physics>();
+				auto& chased_physics = cosmos.get_handle(force_joint.chased_entity).get<components::physics>();
 				chased_physics.apply_force(force_for_chaser * chased_physics.get_mass());
 			}
 
