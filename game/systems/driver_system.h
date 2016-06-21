@@ -4,9 +4,9 @@ class cosmos;
 class step_state;
 
 class driver_system {
-	bool change_car_ownership(cosmos& cosmos, entity_id driver, entity_id car, bool lost);
-	bool release_car_ownership(cosmos& cosmos, entity_id driver);
-	bool assign_car_ownership(cosmos& cosmos, entity_id driver, entity_id car);
+	bool change_car_ownership(cosmos& cosmos, entity_handle driver, entity_handle car, bool lost);
+	bool release_car_ownership(cosmos& cosmos, entity_handle driver);
+	bool assign_car_ownership(cosmos& cosmos, entity_handle driver, entity_handle car);
 public:
 	void assign_drivers_from_successful_trigger_hits(cosmos& cosmos, step_state& step);
 
