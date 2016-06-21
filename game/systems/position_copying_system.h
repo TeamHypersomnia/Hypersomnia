@@ -1,15 +1,9 @@
 #pragma once
-#include "game/processing_system_with_cosmos_reference.h"
 
-#include "game/components/position_copying_component.h"
-#include "game/components/transform_component.h"
+class cosmos;
+class step_state;
 
-using namespace augs;
-
-
-class position_copying_system : public processing_system_templated<components::transform, components::position_copying> {
+class position_copying_system {
 public:
-	using processing_system_templated::processing_system_templated;
-
-	void update_transforms();
+	void update_transforms(cosmos& cosmos, step_state& step);
 };

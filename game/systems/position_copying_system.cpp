@@ -2,20 +2,31 @@
 #include "game/entity_id.h"
 #include "game/components/render_component.h"
 
+#include "game/components/position_copying_component.h"
+#include "game/components/transform_component.h"
+
+#include "game/entity_handle.h"
+#include "game/step_state.h"
+
+#include "game/cosmos.h"
+
+using namespace augs;
+
 void components::position_copying::set_target(entity_id new_target) {
 	target_newly_set = true;
 	target = new_target;
 }
 
-void position_copying_system::update_transforms() {
+void position_copying_system::update_transforms(cosmos& cosmos, step_state& step) {
+	auto targets = cosmos.get(processing_subjects::WITH_POSITION_COPYING);
 	for (auto it : targets) {
 		auto& transform = it.get<components::transform>();
 		auto& position_copying = it.get<components::position_copying>();
 
-		if (position_copying.target.dead()) continue;
+		if (cosmos.get_handle(position_copying.target).dead()) continue;
 		
 		if (position_copying.target_newly_set) {
-			auto target_transform = position_copying.subscribe_to_previous ? position_copying.target.get<components::render>().previous_transform : position_copying.target.get<components::transform>();
+			auto target_transform = position_copying.subscribe_to_previous ? cosmos.get_handle(position_copying.target).get<components::render>().previous_transform : cosmos.get_handle(position_copying.target).get<components::transform>();
 			target_transform.rotation *= position_copying.rotation_multiplier;
 
 			position_copying.previous = target_transform.pos;
@@ -23,7 +34,7 @@ void position_copying_system::update_transforms() {
 			position_copying.target_newly_set = false;
 		}
 
-		auto target_transform = position_copying.subscribe_to_previous ? position_copying.target.get<components::render>().previous_transform : position_copying.target.get<components::transform>();
+		auto target_transform = position_copying.subscribe_to_previous ? cosmos.get_handle(position_copying.target).get<components::render>().previous_transform : cosmos.get_handle(position_copying.target).get<components::transform>();
 		target_transform.rotation *= position_copying.rotation_multiplier;
 		target_transform.pos = vec2i(target_transform.pos);
 
