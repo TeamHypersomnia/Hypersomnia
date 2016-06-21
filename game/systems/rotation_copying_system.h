@@ -1,18 +1,12 @@
 #pragma once
-#include "game/processing_system_with_cosmos_reference.h"
 
-#include "game/components/rotation_copying_component.h"
-#include "game/components/transform_component.h"
+class cosmos;
+class step_state;
 
-#include "misc/timer.h"
-
-using namespace augs;
-
-class rotation_copying_system : public processing_system_templated<components::transform, components::rotation_copying> {
-	void resolve_rotation_copying_value(entity_id rotation_copying);
+class rotation_copying_system {
+	void resolve_rotation_copying_value(cosmos& cosmos, entity_handle rotation_copying);
 public:
-	using processing_system_templated::processing_system_templated;
 
-	void update_physical_motors();
-	void update_rotations();
+	void update_physical_motors(cosmos& cosmos);
+	void update_rotations(cosmos& cosmos);
 };
