@@ -34,27 +34,29 @@ typename basic_entity_handle<is_const>::definition_type basic_entity_handle<is_c
 }
 
 template <bool is_const>
-void basic_entity_handle<is_const>::for_each_sub_entity_recursive(std::function<void(basic_entity_handle)>) const {
+void basic_entity_handle<is_const>::for_each_sub_entity_recursive(std::function<void(basic_entity_handle)> callback) const {
 	{
 		auto& subs = relations().sub_entities;
 
 		for (auto& s : subs) {
-			callback(s);
-			s.for_each_sub_entity_recursive(callback);
+			auto handle = make_handle(s);
+			callback(handle);
+			handle.for_each_sub_entity_recursive(callback);
 		}
 	}
 	{
 		auto& subs = relations().sub_entities_by_name;
 
 		for (auto& s : subs) {
-			callback(s.second);
-			s.second.for_each_sub_entity_recursive(callback);
+			auto handle = make_handle(s.second);
+			callback(handle);
+			handle.for_each_sub_entity_recursive(callback);
 		}
 	}
 }
 
 template <bool is_const>
-void basic_entity_handle<is_const>::for_each_sub_definition(std::function<void(definition_type)>) const {
+void basic_entity_handle<is_const>::for_each_sub_definition(std::function<void(definition_type)> callback) const {
 	auto defs = relations().sub_definitions_by_name;
 
 	for (auto& d : defs) {
@@ -64,21 +66,21 @@ void basic_entity_handle<is_const>::for_each_sub_definition(std::function<void(d
 
 template <bool is_const>
 basic_entity_handle<is_const> basic_entity_handle<is_const>::get_parent() const {
-	return relations().parent;
+	return make_handle(relations().parent);
 }
 
 template <bool is_const>
-bool basic_entity_handle<is_const>::has(sub_entity_name s) const {
+bool basic_entity_handle<is_const>::has(sub_entity_name n) const {
 	return relations().sub_entities_by_name.find(n) != relations().sub_entities_by_name.end();
 }
 
 template <bool is_const>
-bool basic_entity_handle<is_const>::has(sub_definition_name) const {
+bool basic_entity_handle<is_const>::has(sub_definition_name n) const {
 	return relations().sub_definitions_by_name.find(n) != relations().sub_definitions_by_name.end();
 }
 
 template <bool is_const>
-bool basic_entity_handle<is_const>::has(associated_entity_name) const {
+bool basic_entity_handle<is_const>::has(associated_entity_name n) const {
 	return relations().associated_entities_by_name.find(n) != relations().associated_entities_by_name.end();
 }
 
@@ -89,12 +91,12 @@ bool basic_entity_handle<is_const>::has(slot_function f) const {
 
 template <bool is_const>
 bool basic_entity_handle<is_const>::operator==(entity_id b) {
-
+	return raw_id == b;
 }
 
 template <bool is_const>
-operator basic_entity_handle<is_const>::entity_id() const {
-
+basic_entity_handle<is_const>::operator entity_id() const {
+	return raw_id;
 }
 
 template <bool is_const>
@@ -105,31 +107,33 @@ bool basic_entity_handle<is_const>::is_in(processing_subjects list) const {
 template <bool is_const>
 template <class = typename std::enable_if<!is_const>::type>
 void basic_entity_handle<is_const>::add_sub_entity(entity_id p, sub_entity_name optional_name = sub_entity_name::INVALID) const {
-
+	make_child(p, optional_name);
+	relations().sub_entities.push_back(p);
 }
 
 template <bool is_const>
 template <class = typename std::enable_if<!is_const>::type>
 void basic_entity_handle<is_const>::map_sub_entity(sub_entity_name n, entity_id p) const {
-
+	make_child(p, n);
+	relations().sub_entities_by_name[n] = p;
 }
 
 template <bool is_const>
 template <class = typename std::enable_if<!is_const>::type>
 void basic_entity_handle<is_const>::map_sub_definition(sub_definition_name n, const full_entity_definition& p) const {
-
+	relations().sub_definitions_by_name[n] = p;
 }
 
 template <bool is_const>
 template <class = typename std::enable_if<!is_const>::type>
 void basic_entity_handle<is_const>::skip_processing_in(processing_subjects) const {
-
+	(*this)->removed_from_processing_subjects |= (1 << unsigned long long(list));
 }
 
 template <bool is_const>
 template <class = typename std::enable_if<!is_const>::type>
 void basic_entity_handle<is_const>::unskip_processing_in(processing_subjects) const {
-
+	(*this)->removed_from_processing_subjects &=~ (1 << unsigned long long(list));
 }
 
 /*

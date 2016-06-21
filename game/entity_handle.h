@@ -16,6 +16,7 @@
 #include "game/entity_handle_declaration.h"
 
 #include "entity_system/aggregate_handle.h"
+#include "game/entity_id.h"
 
 namespace components {
 	struct relations;
