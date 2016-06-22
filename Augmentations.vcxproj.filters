@@ -957,33 +957,6 @@
     <ClCompile Include="augs\gui\text_drawer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\detail\gui\grid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\gui\item_button.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\gui\pixel_line_connector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\gui\positioning.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\gui\slot_button.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\inventory_slot.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\inventory_utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\physics_setup_helpers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\gui\cursor_and_tooltip.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\components\damage_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -993,31 +966,7 @@
     <ClCompile Include="augs\ensure.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\detail\gui\special_drag_and_drop_target.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\gui\game_gui_root.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\gui\drag_and_drop.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\gui\metadata_tree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\entity_description.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\names_and_details.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\components\name_component.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\gui\world_entity_highlighting.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\gui\aabb_highlighter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\ingredients\obstacles.cpp">
@@ -1053,12 +1002,6 @@
     <ClCompile Include="game\systems\sentience_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\detail\gui\immediate_hud.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\combat\melee_animation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\components\transform_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1077,52 +1020,16 @@
     <ClCompile Include="game\scene_builders\resource_setups\standard_behaviour_trees.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\detail\entity_scripts.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\ai\behaviours.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="augs\misc\performance_timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="augs\misc\measurements.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\detail\position_scripts.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\physics_events.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\physics_queries.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\physics_friction_fields.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\components\pathfinding_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\components\movement_component.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\ai\behaviours\immediate_evasion.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\ai\behaviours\target_closest_enemy.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\ai\behaviours\pull_trigger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\ai\behaviours\minimize_recoil_through_movement.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\ai\behaviours\navigate_to_last_seen_position_of_target.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\ai\behaviours\explore_in_search_for_last_seen_target.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\components\animation_component.cpp">
@@ -1230,12 +1137,6 @@
     <ClCompile Include="game\bindings\classes\file_watcher_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\detail\physics_engine_reflected_state.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\convex_partitioned_shape.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\step_state.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1248,12 +1149,6 @@
     <ClCompile Include="game\entity_handle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\detail\inventory_slot_id.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\inventory_slot_handle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\stateful_systems\dynamic_tree_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1263,13 +1158,118 @@
     <ClCompile Include="game\stateful_systems\physics_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\enums\filters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\global\input_context.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\ai\behaviours\explore_in_search_for_last_seen_target.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\ai\behaviours\immediate_evasion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\ai\behaviours\minimize_recoil_through_movement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\ai\behaviours\navigate_to_last_seen_position_of_target.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\ai\behaviours\pull_trigger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\ai\behaviours\target_closest_enemy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\ai\behaviours.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\combat\melee_animation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\gui\aabb_highlighter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\gui\cursor_and_tooltip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\gui\drag_and_drop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\gui\game_gui_root.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\gui\grid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\gui\immediate_hud.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\gui\item_button.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\gui\metadata_tree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\gui\pixel_line_connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\gui\positioning.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\gui\slot_button.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\gui\special_drag_and_drop_target.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\gui\world_entity_highlighting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\convex_partitioned_shape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\entity_description.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\entity_scripts.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\inventory_slot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\inventory_slot_handle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\inventory_slot_id.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\inventory_utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\names_and_details.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\physics_engine_reflected_state.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\physics_events.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\physics_friction_fields.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\physics_queries.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="game\detail\physics_scripts.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\detail\input_context.cpp">
+    <ClCompile Include="game\detail\physics_setup_helpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\enums\filters.cpp">
+    <ClCompile Include="game\detail\position_scripts.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2990,58 +2990,13 @@
     <ClInclude Include="game\components\trigger_collision_detector_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\detail\gui\grid.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\gui\item_button.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\gui\pixel_line_connector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\gui\slot_button.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\inventory_slot.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\inventory_slot_id.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\inventory_utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\physics_setup_helpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\state_for_drawing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\messages\gui_intents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\ensure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\detail\gui\special_drag_and_drop_target.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\gui\special_controls.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\gui\game_gui_root.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\gui\drag_and_drop.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\entity_description.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\components\name_component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\gui\aabb_highlighter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\globals\associated_entities.h">
@@ -3116,12 +3071,6 @@
     <ClInclude Include="game\systems\sentience_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\detail\gui\immediate_hud.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\combat\melee_animation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\messages\health_event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3131,25 +3080,13 @@
     <ClInclude Include="game\resources\behaviour_tree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\detail\entity_scripts.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\ai\behaviours.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\components\attitude_component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\ai\goals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\measurements.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\performance_timer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\position_scripts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\assets\texture_id.h">
@@ -3180,9 +3117,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\assets\animation_id.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\item_transfer_result.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\typesafe_sprintf.h">
@@ -3278,12 +3212,6 @@
     <ClInclude Include="game\bindings\bind_game_and_augs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\detail\physics_engine_reflected_state.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\convex_partitioned_shape.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\messages\queue_destruction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3306,12 +3234,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\entity_handle_declaration.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\inventory_slot_handle_declaration.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\inventory_slot_handle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\object_pool_id.h">
@@ -3342,12 +3264,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\types_specification\all_stateful_systems_declaration.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\physics_scripts.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\input_context.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\entropy_unpacker_and_recorder.h">
@@ -3402,6 +3318,99 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\enums\sub_entity_name.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\global\input_context.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\ai\behaviours.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\ai\goals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\combat\melee_animation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\gui\aabb_highlighter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\gui\drag_and_drop.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\gui\game_gui_root.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\gui\grid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\gui\immediate_hud.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\gui\item_button.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\gui\pixel_line_connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\gui\slot_button.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\gui\special_controls.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\gui\special_drag_and_drop_target.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\convex_partitioned_shape.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\entity_description.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\entity_scripts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\inventory_slot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\inventory_slot_handle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\inventory_slot_handle_declaration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\inventory_slot_id.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\inventory_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\item_transfer_result.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\physics_engine_reflected_state.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\physics_scripts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\physics_setup_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\position_scripts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\state_for_drawing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\global\visibility_settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\global\pathfinding_settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\global\all_settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

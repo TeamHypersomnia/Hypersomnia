@@ -15,6 +15,7 @@
 #include "game/entity_id.h"
 #include "game/entity_handle_declaration.h"
 #include "game/detail/inventory_slot_handle_declaration.h"
+#include "game/global/all_settings.h"
 
 class cosmic_profiler;
 
@@ -28,6 +29,7 @@ class cosmos {
 public:
 	storage_for_all_stateful_systems stateful_systems;
 	lists_of_processing_subjects lists_of_processing_subjects;
+	all_settings settings;
 
 	unsigned long long current_step_number = 0;
 	double seconds_passed = 0.0;

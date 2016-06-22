@@ -11,13 +11,13 @@
 #include "graphics/renderer.h"
 #include "game/enums/processing_subjects.h"
 #include "game/entity_handle.h"
-
-pathfinding_system::pathfinding_system() : draw_memorised_walls(false), draw_undiscovered(false),
-	epsilon_distance_the_same_vertex(50.f), epsilon_distance_visible_point(2) {}
+#include "game/detail/physics_scripts.h"
 
 void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
+	auto& settings = cosmos.settings.pathfinding;
+
 	/* prepare epsilons to be used later, just to make the notation more clear */
-	const float epsilon_distance_visible_point_sq = epsilon_distance_visible_point * epsilon_distance_visible_point;
+	const float epsilon_distance_visible_point_sq = settings.epsilon_distance_visible_point * settings.epsilon_distance_visible_point;
 	
 	/* we'll need a reference to physics system for raycasting */
 	physics_system& physics = cosmos.stateful_systems.get<physics_system>();
@@ -71,7 +71,7 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 
 					for (auto& memorised : pathfinding.session().discovered_vertices) {
 						/* if a similiar discovered vertex exists */
-						if (memorised.location.compare(visible_vertex.second, epsilon_distance_the_same_vertex)) {
+						if (memorised.location.compare(visible_vertex.second, settings.epsilon_distance_the_same_vertex)) {
 							this_visible_vertex_is_already_memorised = true;
 							/* overwrite the location just in case */
 							memorised.location = visible_vertex.second;
@@ -100,7 +100,7 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 
 					for (auto& memorised_undiscovered : pathfinding.session().undiscovered_vertices) {
 						/* if a discontinuity with the same closer vertex already exists */
-						if (memorised_undiscovered.location.compare(disc.points.first, epsilon_distance_the_same_vertex)) {
+						if (memorised_undiscovered.location.compare(disc.points.first, settings.epsilon_distance_the_same_vertex)) {
 							this_discontinuity_is_already_memorised = true;
 							vert = memorised_undiscovered;
 							//memorised_undiscovered.location = disc.points.first;
@@ -110,7 +110,7 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 
 					for (auto& memorised_discovered : pathfinding.session().discovered_vertices) {
 						/* if a discontinuity with the same closer vertex already exists */
-						if (memorised_discovered.location.compare(disc.points.first, epsilon_distance_the_same_vertex)) {
+						if (memorised_discovered.location.compare(disc.points.first, settings.epsilon_distance_the_same_vertex)) {
 							this_discontinuity_is_already_discovered = true;
 							memorised_discovered.location = disc.points.first;
 							break;
@@ -180,12 +180,12 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 
 			/* prepare body polygon to test for overlaps */
 			b2PolygonShape body_poly;
-			auto verts = physics.get_world_vertices(it);
+			auto verts = get_world_vertices(it);
 			body_poly.Set(verts.data(), verts.size());
 
 			/* for every undiscovered navigation point */
 			auto& undiscs = pathfinding.session().undiscovered_vertices;
-			undiscs.erase(std::remove_if(undiscs.begin(), undiscs.end(), [&body, &pathfinding, &body_poly, this](const components::pathfinding::pathfinding_session::navigation_vertex& nav){
+			undiscs.erase(std::remove_if(undiscs.begin(), undiscs.end(), [&body, &pathfinding, &body_poly, &settings](const components::pathfinding::pathfinding_session::navigation_vertex& nav){
 
 				/* if we want to force the entity to touch the sensors, we can't discard undiscovered vertices only by 
 					saying that there exists a discovered vertex (which is discovered only because it is fully visible)
@@ -194,7 +194,7 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 					/* find epsilon-close discovered vertices */
 					for (auto& memorised_discovered : pathfinding.session().discovered_vertices)
 						/* if a similiar discovered vertex exists */
-					if (memorised_discovered.location.compare(nav.location, epsilon_distance_the_same_vertex))
+					if (memorised_discovered.location.compare(nav.location, settings.epsilon_distance_the_same_vertex))
 							return true;
 				//}
 				
@@ -298,7 +298,7 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 			/* save only for queries within the function "exists_among_undiscovered_visible" */
 			pathfinding.session().undiscovered_visible = undiscovered_visible;
 
-			if (draw_undiscovered) {
+			if (settings.draw_undiscovered) {
 				for (auto& disc : vertices)
 					lines.draw(disc.location, disc.sensor, rgba(0, 127, 255, 255));
 
@@ -315,7 +315,7 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 				if (pathfinding.force_persistent_navpoints) {
 					if (pathfinding.session().persistent_navpoint_set) {
 						for (auto& v : vertices) {
-							if (v.sensor.compare(pathfinding.session().persistent_navpoint.sensor, epsilon_distance_the_same_vertex)) {
+							if (v.sensor.compare(pathfinding.session().persistent_navpoint.sensor, settings.epsilon_distance_the_same_vertex)) {
 								persistent_navpoint_found = true;
 								break;
 							}
@@ -403,14 +403,14 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 					pathfinding.session().navigate_to = current_target.sensor;
 
 
-				if (draw_undiscovered) {
+				if (settings.draw_undiscovered) {
 					lines.draw(transform.pos, current_target.sensor, rgba(255, 255, 0, 255));
 					lines.draw(transform.pos, pathfinding.session().target, rgba(255, 0, 0, 255));
 				}
 
 				bool rays_hit = false;
 				/* extract all transformed vertices of the subject's original model, false means we want pixels */
-				auto& subject_verts = physics.get_world_vertices(it, false);
+				auto& subject_verts = get_world_vertices(it, false);
 				subject_verts.clear();
 				subject_verts.push_back(transform.pos);
 

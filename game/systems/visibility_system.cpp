@@ -22,6 +22,7 @@
 
 #include "game/enums/processing_subjects.h"
 #include "game/entity_handle.h"
+#include "game/detail/physics_scripts.h"
 
 using namespace augs;
 
@@ -92,16 +93,18 @@ bool components::visibility::line_of_sight_info::sees(entity_id id) const {
 }
 
 void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos) {
-	ensure(epsilon_distance_vertex_hit > 0.f);
-	ensure(epsilon_ray_distance_variation > 0.f);
-	ensure(epsilon_threshold_obstacle_hit > 0.f);
+	auto& settings = cosmos.settings.visibility;
+
+	ensure(settings.epsilon_distance_vertex_hit > 0.f);
+	ensure(settings.epsilon_ray_distance_variation > 0.f);
+	ensure(settings.epsilon_threshold_obstacle_hit > 0.f);
 	
 	auto& renderer = augs::renderer::get_current();
 	auto& lines = renderer.logic_lines;
 
 	/* prepare epsilons to be used later, just to make the notation more clear */
-	float epsilon_distance_vertex_hit_sq = epsilon_distance_vertex_hit * PIXELS_TO_METERSf;
-	float epsilon_threshold_obstacle_hit_meters = epsilon_threshold_obstacle_hit * PIXELS_TO_METERSf;
+	float epsilon_distance_vertex_hit_sq = settings.epsilon_distance_vertex_hit * PIXELS_TO_METERSf;
+	float epsilon_threshold_obstacle_hit_meters = settings.epsilon_threshold_obstacle_hit * PIXELS_TO_METERSf;
 	epsilon_distance_vertex_hit_sq *= epsilon_distance_vertex_hit_sq;
 
 	/* we'll need a reference to physics system for raycasting */
@@ -239,7 +242,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 			/* for every fixture that intersected with the visibility square */
 			for (auto b : bodies) {
 				/* get shape vertices from misc that transforms them to current entity's position and rotation in Box2D space */
-				auto verts = physics.get_world_vertices(b->GetUserData());
+				auto verts = get_world_vertices(cosmos.get_handle(b->GetUserData()));
 				/* for every vertex in given fixture's shape */
 				for (auto& v : verts) 
 					push_vertex(v, true);
@@ -264,7 +267,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 			bounds[3].Set(vec2(whole_vision[3]) + vec2(0.f, moving_epsilon), vec2(whole_vision[0]) + vec2(0.f, -moving_epsilon));
 
 			/* debug drawing of the visibility square */
-			if (draw_cast_rays || draw_triangle_edges) {
+			if (settings.draw_cast_rays || settings.draw_triangle_edges) {
 				lines.draw((vec2(whole_vision[0]) + vec2(-moving_epsilon, 0.f))*METERS_TO_PIXELSf, (vec2(whole_vision[1]) + vec2(moving_epsilon, 0.f))*METERS_TO_PIXELSf);
 				lines.draw((vec2(whole_vision[1]) + vec2(0.f, -moving_epsilon))*METERS_TO_PIXELSf, (vec2(whole_vision[2]) + vec2(0.f, moving_epsilon))*METERS_TO_PIXELSf);
 				lines.draw((vec2(whole_vision[2]) + vec2(moving_epsilon, 0.f))*METERS_TO_PIXELSf, (vec2(whole_vision[3]) + vec2(-moving_epsilon, 0.f))*METERS_TO_PIXELSf);
@@ -298,7 +301,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 						output.push_back(v.intersection);
 				}
 
-				if (draw_cast_rays) 
+				if (settings.draw_cast_rays)
 					lines.draw(METERS_TO_PIXELSf * bound.m_vertex1, METERS_TO_PIXELSf * bound.m_vertex2, rgba(255, 0, 0, 255));
 
 				for (auto& v : output)
@@ -390,8 +393,8 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 				vec2 perpendicular_cw = (vertex.pos - position_meters).normalize().perpendicular_cw();
 
 				vec2 directions[2] = {
-					((vertex.pos - perpendicular_cw * epsilon_ray_distance_variation * PIXELS_TO_METERSf) - position_meters).normalize(),
-					((vertex.pos + perpendicular_cw * epsilon_ray_distance_variation * PIXELS_TO_METERSf) - position_meters).normalize()
+					((vertex.pos - perpendicular_cw * settings.epsilon_ray_distance_variation * PIXELS_TO_METERSf) - position_meters).normalize(),
+					((vertex.pos + perpendicular_cw * settings.epsilon_ray_distance_variation * PIXELS_TO_METERSf) - position_meters).normalize()
 				};
 
 				vec2 targets[2] = {
@@ -468,7 +471,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 					new_discontinuity.is_boundary = true;
 					//request.discontinuities.push_back(new_discontinuity);
 					if (push_double_ray(double_ray(vertex.pos, vertex.pos, true, true)))
-						if (draw_cast_rays) draw_line(vertex.pos, rgba(255, 255, 0, 255));
+						if (settings.draw_cast_rays) draw_line(vertex.pos, rgba(255, 255, 0, 255));
 				}
 				else if (!vertex.is_on_a_bound) {
 					/* if we did not intersect with anything */
@@ -492,7 +495,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 
 						if ((ray_callbacks[0].intersection - position_meters).length() + epsilon_threshold_obstacle_hit_meters < distance_from_origin &&
 							(ray_callbacks[1].intersection - position_meters).length() + epsilon_threshold_obstacle_hit_meters < distance_from_origin) {
-							if (draw_cast_rays) draw_line(vertex.pos, rgba(255, 0, 0, 255));
+							if (settings.draw_cast_rays) draw_line(vertex.pos, rgba(255, 0, 0, 255));
 						}
 						/* distance between both intersections fit in epsilon which means ray intersected with the same vertex */
 						else if ((ray_callbacks[0].intersection - ray_callbacks[1].intersection).length_sq() < epsilon_distance_vertex_hit_sq) {
@@ -501,7 +504,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 
 							if (push_double_ray(double_ray(vertex.pos, vertex.pos, true, true))) {
 								request.vertex_hits.push_back(std::make_pair(double_rays.size()-1, vertex.pos * METERS_TO_PIXELSf));
-								if (draw_cast_rays) draw_line(vertex.pos, rgba(255, 255, 0, 255));
+								if (settings.draw_cast_rays) draw_line(vertex.pos, rgba(255, 255, 0, 255));
 							}
 						}
 						/* we're here so:
@@ -533,7 +536,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 								new_discontinuity.points.second = ray_callbacks[1].intersection;
 								new_discontinuity.winding = components::visibility::discontinuity::RIGHT;
 								new_discontinuity.edge_index = double_rays.size() - 1;
-								if (draw_cast_rays) draw_line(ray_callbacks[1].intersection, rgba(255, 0, 255, 255));
+								if (settings.draw_cast_rays) draw_line(ray_callbacks[1].intersection, rgba(255, 0, 255, 255));
 							}
 							/* otherwise the free area is to the left */
 							else {
@@ -545,7 +548,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 								new_discontinuity.points.second = ray_callbacks[0].intersection;
 								new_discontinuity.winding = components::visibility::discontinuity::LEFT;
 								new_discontinuity.edge_index = double_rays.size();
-								if (draw_cast_rays) draw_line(ray_callbacks[0].intersection, rgba(255, 0, 255, 255));
+								if (settings.draw_cast_rays) draw_line(ray_callbacks[0].intersection, rgba(255, 0, 255, 255));
 							}
 							
 							/* save new double ray */
@@ -592,7 +595,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 										/* save new double ray */
 										if (push_double_ray(new_double_ray)) {
 											request.discontinuities.push_back(new_discontinuity);
-											if (draw_cast_rays) draw_line(actual_intersection, rgba(0, 0, 255, 255));
+											if (settings.draw_cast_rays) draw_line(actual_intersection, rgba(0, 0, 255, 255));
 										}
 									}
 								}
@@ -613,7 +616,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 				vec2 p1 = ray_a.second * METERS_TO_PIXELSf;
 				vec2 p2 = ray_b.first * METERS_TO_PIXELSf;
 
-				if (draw_triangle_edges) {
+				if (settings.draw_triangle_edges) {
 					draw_line(p1 * PIXELS_TO_METERSf, request.color);
 					draw_line(p2 * PIXELS_TO_METERSf, request.color);
 					lines.draw(p1, p2, request.color);
@@ -653,7 +656,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 
 				/* for every discontinuity, remove if there exists any edge that is too close to the discontinuity's vertex */
 				discs_copy.erase(std::remove_if(discs_copy.begin(), discs_copy.end(),
-					[&request, edges_num, &transform, &wrap, &lines, &marked_holes, this]
+					[&request, edges_num, &transform, &wrap, &lines, &marked_holes, &settings]
 				(const components::visibility::discontinuity& d){
 						std::vector<vec2> points_too_close;
 
@@ -701,7 +704,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 							/* denote the unreachable area by saving an edge from the closest point to the discontinuity */
 							marked_holes.push_back(components::visibility::edge(closest_point, d.points.first));
 							
-							if (draw_discontinuities)
+							if (settings.draw_discontinuities)
 								lines.draw(closest_point, d.points.first);
 							
 							/* remove this discontinuity */
@@ -749,7 +752,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 				request.discontinuities = discs_copy;
 			}
 
-			if (draw_discontinuities)
+			if (settings.draw_discontinuities)
 				for (auto& disc : request.discontinuities)
 					lines.draw(disc.points.first, disc.points.second, rgba(0, 127, 255, 255));
 		}
