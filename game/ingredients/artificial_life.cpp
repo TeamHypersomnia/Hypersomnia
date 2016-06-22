@@ -7,6 +7,7 @@
 #include "game/components/visibility_component.h"
 
 #include "game/enums/filters.h"
+#include "game/entity_handle.h"
 
 namespace ingredients {
 	void standard_pathfinding_capability(entity_handle e) {

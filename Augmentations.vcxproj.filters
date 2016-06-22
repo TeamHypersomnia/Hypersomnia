@@ -663,13 +663,7 @@
     <ClCompile Include="3rdparty\GL\OpenGL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\scene_builders\testbed.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\resources\manager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\scene_builders\scene_builder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\resources\animation.cpp">
@@ -682,9 +676,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\systems\trigger_detector_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\scene_builders\one_entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\luabind\src\class.cpp">
@@ -984,15 +975,6 @@
     <ClCompile Include="game\resources\particle_effect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\scene_builders\resource_setups\standard_atlas.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\scene_builders\resource_setups\standard_particle_effects.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\scene_builders\rendering_scripts\standard_rendering.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\systems\melee_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1015,9 +997,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\ingredients\artificial_life.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\scene_builders\resource_setups\standard_behaviour_trees.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="augs\misc\performance_timer.cpp">
@@ -1084,9 +1063,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\processing_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\definition_interface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\bindings\bind_game_and_augs.cpp">
@@ -1270,6 +1246,27 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\detail\position_scripts.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\entropy_player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\scene_managers\rendering_scripts\standard_rendering.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\scene_managers\resource_setups\standard_atlas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\scene_managers\resource_setups\standard_behaviour_trees.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\scene_managers\resource_setups\standard_particle_effects.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\scene_managers\one_entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\scene_managers\testbed.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2660,12 +2657,6 @@
     <ClInclude Include="game\bindings\bind_callbacks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\scene_builders\scene_builder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\scene_builders\testbed.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\messages\unmapped_intent_message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2694,9 +2685,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\messages\trigger_hit_request_message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\scene_builders\one_entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\messages\new_entity_message.h">
@@ -3044,12 +3032,6 @@
     <ClInclude Include="game\components\particle_effect_response_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\scene_builders\rendering_scripts\all.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\scene_builders\resource_setups\all.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\systems\melee_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3155,9 +3137,6 @@
     <ClInclude Include="augs\entity_system\storage_for_components_and_aggregates.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\entity_system\configurable_components.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\entity_system\ecs_instantiation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3189,15 +3168,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\machine_entropy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\definition_interface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\full_entity_definition.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\types_specification\full_entity_definition_declaration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\types_specification\all_component_includes.h">
@@ -3308,9 +3278,6 @@
     <ClInclude Include="game\enums\slot_function.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\enums\sub_definition_name.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\enums\sub_entity_name.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3417,6 +3384,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\detail\item_slot_transfer_request.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\scene_managers\rendering_scripts\all.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\scene_managers\resource_setups\all.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\scene_managers\one_entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\scene_managers\testbed.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

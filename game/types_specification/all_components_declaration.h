@@ -1,6 +1,7 @@
 #pragma once
 
 namespace components {
+	struct meta;
 	struct animation;
 	struct animation_response;
 	struct behaviour_tree;
@@ -44,6 +45,7 @@ namespace components {
 template<template<typename...> class List, class... prepend>
 struct put_all_components_into {
 	typedef List<prepend...,
+		components::meta,
 		components::animation,
 		components::animation_response,
 		components::behaviour_tree,

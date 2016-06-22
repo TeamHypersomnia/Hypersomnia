@@ -17,8 +17,7 @@
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/global/all_settings.h"
 #include "game/cosmic_profiler.h"
-
-// #include "game/step_state.h"
+#include "game/step_state.h"
 
 class cosmic_profiler;
 
@@ -40,7 +39,7 @@ public:
 
 	cosmos();
 
-	void reserve_storage_for_aggregates(size_t);
+	void reserve_storage_for_entities(size_t);
 
 	entity_handle create_entity(std::string debug_name);
 	void construct_entity(entity_id);
@@ -59,11 +58,11 @@ public:
 	}
 
 	template<class F>
-	void special_rendering_step(augs::machine_entropy input, F pred) {
+	void special_rendering_step(augs::variable_delta delta, F pred) {
 		step_state step;
 		pred(*this, step);
 
-		advance_deterministic_schemata(input, step);
+		call_rendering_schemata(delta, step);
 	}
 
 	void advance_deterministic_schemata(augs::machine_entropy input, step_state initial_step_state = step_state());

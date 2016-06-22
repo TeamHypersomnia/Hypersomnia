@@ -2,7 +2,6 @@
 #include "game/components/gui_element_component.h"
 #include "game/messages/camera_render_request_message.h"
 #include "game/messages/gui_intents.h"
-#include "game/messages/raw_window_input_message.h"
 
 #include "augs/gui/gui_world.h"
 #include "game/detail/gui/game_gui_root.h"
@@ -24,7 +23,7 @@ class gui_system {
 	vec2 initial_inventory_root_position();
 	entity_id get_cosmos_crosshair(const cosmos&);
 
-	std::vector<messages::raw_window_input_message> buffered_inputs_during_freeze;
+	std::vector<augs::window::event::state> buffered_inputs_during_freeze;
 	bool freeze_gui_model();
 
 	cosmos& region;
@@ -40,7 +39,7 @@ public:
 	void resize(vec2i size) { gui.resize(size); }
 
 	void rebuild_gui_tree_based_on_game_state();
-	void translate_raw_window_inputs_to_gui_events();
+	void translate_raw_window_inputs_to_gui_events(augs::machine_entropy);
 	void suppress_inputs_meant_for_gui();
 
 	void switch_to_gui_mode_and_back();

@@ -1,5 +1,4 @@
 #pragma once
-#include "game/messages/raw_window_input_message.h"
 #include "game/messages/camera_render_request_message.h"
 #include "special_drag_and_drop_target.h"
 #include "gui/text_drawer.h"
@@ -34,7 +33,7 @@ struct game_gui_world : public augs::gui::gui_world {
 		this->size = size;
 	}
 
-	void consume_raw_input(messages::raw_window_input_message&);
+	void consume_raw_input(augs::window::event::state&);
 	void draw_cursor_and_tooltip(messages::camera_render_request_message);
 
 	entity_id get_hovered_world_entity(vec2 camera_pos);

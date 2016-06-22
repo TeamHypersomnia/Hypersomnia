@@ -62,14 +62,14 @@ namespace augs {
 			for_each_type<components...>(r);
 		}
 
-		aggregate_handle allocate_aggregate(std::string debug_name = std::string()) {
-			auto new_id = pool_for_aggregates.allocate();
+		aggregate_id allocate_aggregate(std::string debug_name = std::string()) {
+			auto new_id = pool_for_aggregates.allocate().get_id();
 			new_id.set_debug_name(debug_name);
 
 			return new_id;
 		}
 
-		aggregate_handle clone_aggregate(const_aggregate_handle const_aggregate) {
+		aggregate_id clone_aggregate(const_aggregate_handle const_aggregate) {
 			auto new_aggregate_id = pool_for_aggregates.allocate();
 
 			auto& from_handle = const_aggregate;

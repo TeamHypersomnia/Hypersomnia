@@ -37,8 +37,11 @@
 #include "game/entity_handle.h"
 #include "game/detail/inventory_slot_handle.h"
 
-using namespace components;
-using namespace messages;
+cosmos::cosmos() {
+	stateful_systems.create<gui_system>(std::ref(*this));
+	stateful_systems.create<dynamic_tree_system>(std::ref(*this));
+	stateful_systems.create<physics_system>(std::ref(*this));
+}
 
 const storage_for_all_components_and_aggregates::aggregate_pool_type& cosmos::get_pool() const {
 	return components_and_aggregates.get_pool();
@@ -46,43 +49,6 @@ const storage_for_all_components_and_aggregates::aggregate_pool_type& cosmos::ge
 
 storage_for_all_components_and_aggregates::aggregate_pool_type& cosmos::get_pool() {
 	return components_and_aggregates.get_pool();
-}
-
-void cosmos::call_rendering_schemata(augs::variable_delta delta, step_state step) const {
-	const auto& cosm = *this;
-
-	auto& performance = profiler.performance;
-
-	performance.start(meter_type::RENDERING);
-
-	performance.start(meter_type::CAMERA_QUERY);
-	render_system().determine_visible_entities_from_every_camera();
-	performance.stop(meter_type::CAMERA_QUERY);
-
-	performance.start(meter_type::INTERPOLATION);
-	render_system().calculate_and_set_interpolated_transforms();
-	performance.stop(meter_type::INTERPOLATION);
-	
-	input_system().post_unmapped_intents_from_raw_window_inputs();
-	input_system().map_unmapped_intents_to_entities();
-
-	movement_system().generate_movement_responses();
-
-	animation_system().game_responses_to_animation_messages();
-
-	animation_system().handle_animation_messages();
-	animation_system().progress_animation_states();
-
-
-	position_copying_system().update_transforms();
-	camera_system().resolve_cameras_transforms_and_smoothing();
-	rotation_copying_system().update_rotations();
-
-	camera_system().post_render_requests_for_all_cameras();
-
-	input_system().acquire_new_events_posted_by_drawing_time_systems();
-	
-	performance.stop(meter_type::RENDERING);
 }
 
 std::wstring cosmos::summary() const {
@@ -102,19 +68,52 @@ bool cosmos::is_in(entity_id id, processing_subjects list) const {
 }
 
 entity_handle cosmos::get_handle(entity_id id) {
-	return entity_handle(components_and_aggregates, id);
+	return entity_handle(*this, id);
 }
 
 const_entity_handle cosmos::get_handle(entity_id id) const {
-	return const_entity_handle(components_and_aggregates, id);
+	return const_entity_handle(*this, id);
 }
 
 inventory_slot_handle cosmos::get_handle(inventory_slot_id id) {
-	return inventory_slot_handle(components_and_aggregates, id);
+	return inventory_slot_handle(*this, id);
 }
 
 const_inventory_slot_handle cosmos::get_handle(inventory_slot_id id) const {
-	return const_inventory_slot_handle(components_and_aggregates, id);
+	return const_inventory_slot_handle(*this, id);
+}
+
+void cosmos::construct_entity(entity_id new_id) {
+	// lists_of_processing_subjects.add_entity_to_matching_lists(get_handle(new_id));
+}
+
+void cosmos::reserve_storage_for_entities(size_t n) {
+	components_and_aggregates.reserve_storage_for_aggregates(n);
+}
+
+entity_handle cosmos::create_entity(std::string debug_name) {
+	return get_handle(components_and_aggregates.allocate_aggregate(debug_name));
+}
+
+entity_handle cosmos::clone_entity(entity_id e) {
+	const_entity_handle const_handle = get_handle(e);
+	return get_handle(components_and_aggregates.clone_aggregate(const_handle));
+}
+
+entity_handle cosmos::clone_and_construct_entity(entity_id e) {
+	auto cloned = clone_entity(e);
+	construct_entity(cloned);
+	return cloned;
+}
+
+void cosmos::delete_entity(entity_id e) {
+	ensure(get_handle(e).alive());
+	lists_of_processing_subjects.remove_entity_from_lists(get_handle(e));
+	components_and_aggregates.free_aggregate(e);
+}
+
+size_t cosmos::entities_count() const {
+	return components_and_aggregates.aggregates_count();
 }
 
 void cosmos::advance_deterministic_schemata(augs::machine_entropy input, step_state step) {
@@ -130,7 +129,7 @@ void cosmos::advance_deterministic_schemata(augs::machine_entropy input, step_st
 	render_system().set_current_transforms_as_previous_for_interpolation();
 
 	input_system().post_unmapped_intents_from_raw_window_inputs(cosm, step, input);
-	
+
 	stateful_systems.get<gui_system>().switch_to_gui_mode_and_back();
 
 	input_system().map_unmapped_intents_to_entities();
@@ -193,7 +192,7 @@ void cosmos::advance_deterministic_schemata(augs::machine_entropy input, step_st
 	stateful_systems.get<physics_system>().step_and_set_new_transforms();
 	performance.stop(meter_type::PHYSICS);
 	position_copying_system().update_transforms();
-	
+
 	melee_system().initiate_and_update_moves();
 
 	damage_system().destroy_outdated_bullets();
@@ -201,7 +200,7 @@ void cosmos::advance_deterministic_schemata(augs::machine_entropy input, step_st
 
 	sentience_system().apply_damage_and_generate_health_events();
 	sentience_system().cooldown_aimpunches();
-	
+
 	particles_system().game_responses_to_particle_effects();
 	particles_system().create_particle_effects();
 
@@ -242,40 +241,39 @@ void cosmos::advance_deterministic_schemata(augs::machine_entropy input, step_st
 	performance.stop(meter_type::LOGIC);
 }
 
-cosmos::cosmos() {
-	stateful_systems.create<gui_system>(std::ref(*this));
-	stateful_systems.create<dynamic_tree_system>(std::ref(*this));
-	stateful_systems.create<physics_system>(std::ref(*this));
-}
+void cosmos::call_rendering_schemata(augs::variable_delta delta, step_state step) const {
+	const auto& cosm = *this;
 
-void cosmos::construct_entity(entity_id new_id) {
-	// lists_of_processing_subjects.add_entity_to_matching_lists(get_handle(new_id));
-}
+	auto& performance = profiler.performance;
 
-void cosmos::reserve_storage_for_aggregates(size_t n) {
-	components_and_aggregates.reserve_storage_for_aggregates(n);
-}
+	performance.start(meter_type::RENDERING);
 
-entity_handle cosmos::create_entity(std::string debug_name) {
-	return components_and_aggregates.allocate_aggregate(debug_name);
-}
+	performance.start(meter_type::CAMERA_QUERY);
+	render_system().determine_visible_entities_from_every_camera();
+	performance.stop(meter_type::CAMERA_QUERY);
 
-entity_handle cosmos::clone_entity(entity_id e) {
-	return components_and_aggregates.clone_aggregate(e);
-}
+	performance.start(meter_type::INTERPOLATION);
+	render_system().calculate_and_set_interpolated_transforms();
+	performance.stop(meter_type::INTERPOLATION);
 
-entity_handle cosmos::clone_and_construct_entity(entity_id e) {
-	auto cloned = components_and_aggregates.clone_aggregate(get_handle(e));
-	construct_entity(cloned);
-	return cloned;
-}
+	input_system().post_unmapped_intents_from_raw_window_inputs();
+	input_system().map_unmapped_intents_to_entities();
 
-void cosmos::delete_entity(entity_id e) {
-	ensure(get_handle(e).alive());
-	lists_of_processing_subjects.remove_entity_from_lists(get_handle(e));
-	components_and_aggregates.free_aggregate(e);
-}
+	movement_system().generate_movement_responses();
 
-size_t cosmos::entities_count() const {
-	return components_and_aggregates.aggregates_count();
+	animation_system().game_responses_to_animation_messages();
+
+	animation_system().handle_animation_messages();
+	animation_system().progress_animation_states();
+
+
+	position_copying_system().update_transforms();
+	camera_system().resolve_cameras_transforms_and_smoothing();
+	rotation_copying_system().update_rotations();
+
+	camera_system().post_render_requests_for_all_cameras();
+
+	input_system().acquire_new_events_posted_by_drawing_time_systems();
+
+	performance.stop(meter_type::RENDERING);
 }

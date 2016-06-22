@@ -8,7 +8,6 @@
 #include "graphics/pixel.h"
 #include "game/entity_handle.h"
 
-class entity_handle;
 class cosmos;
 
 namespace components {

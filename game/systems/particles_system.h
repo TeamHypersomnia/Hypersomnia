@@ -1,18 +1,11 @@
 #pragma once
-#include <random>
-#include "misc/timer.h"
-
-#include "game/processing_system_with_cosmos_reference.h"
-
 #include "game/components/particle_effect_response_component.h"
 #include "game/components/particle_group_component.h"
 
-using namespace augs;
+class cosmos;
 
-class particles_system : public processing_system_templated<components::particle_group> {
+class particles_system {
 public:
-	using processing_system_templated::processing_system_templated;
-
 	static entity_id create_refreshable_particle_group(cosmos&);
 	void spawn_particle(components::particle_group::stream&, const vec2&, float, float spread, const resources::emission&);
 	void step_streams_and_particles();

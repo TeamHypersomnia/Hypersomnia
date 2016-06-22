@@ -10,8 +10,6 @@
 #include "game/enums/sub_entity_name.h"
 #include "game/enums/processing_subjects.h"
 
-#include "game/types_specification/full_entity_definition_declaration.h"
-
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/entity_handle_declaration.h"
 
