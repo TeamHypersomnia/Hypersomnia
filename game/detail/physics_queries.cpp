@@ -1,13 +1,15 @@
 #include "game/stateful_systems/physics_system.h"
 #include "game/cosmos.h"
 #include "physics_setup_helpers.h"
+#include "game/entity_handle.h"
 
 #include "ensure.h"
+#include "game/detail/physics_scripts.h"
 
 bool physics_system::raycast_input::ShouldRaycast(b2Fixture* fixture) {
 	entity_id fixture_entity = fixture->GetBody()->GetUserData();
 	return
-		(!subject || fixture_entity != subject) &&
+		(subject.dead() || fixture_entity != subject) &&
 		(b2ContactFilter::ShouldCollide(&subject_filter, &fixture->GetFilterData()));
 }
 
@@ -31,9 +33,8 @@ std::vector<physics_system::raycast_output> physics_system::ray_cast_all_interse
 (vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity) {
 	++ray_casts_since_last_step;
 
-	raycast_input callback;
+	raycast_input callback{ parent_cosmos.get_handle(ignore_entity) } ;
 	callback.subject_filter = filter;
-	callback.subject = ignore_entity;
 	callback.save_all = true;
 
 	if (!((p1_meters - p2_meters).length_sq() > 0.f)) {
@@ -110,9 +111,8 @@ vec2 physics_system::push_away_from_walls(vec2 position, float radius, int ray_a
 physics_system::raycast_output physics_system::ray_cast(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity) {
 	++ray_casts_since_last_step;
 
-	raycast_input callback;
+	raycast_input callback{ parent_cosmos.get_handle(ignore_entity) };
 	callback.subject_filter = filter;
-	callback.subject = ignore_entity;
 
 	if (!((p1_meters - p2_meters).length_sq() > 0.f)) {
 		LOG("Ray casting error: X: %x %x", p1_meters, p2_meters);
@@ -136,7 +136,6 @@ bool physics_system::query_aabb_input::ReportFixture(b2Fixture* fixture) {
 		out.bodies.insert(fixture->GetBody());
 		out.fixtures.push_back(fixture);
 		out.entities.insert(fixture->GetUserData());
-		ensure(fixture->GetUserData().alive());
 	}
 
 	return true;
@@ -169,8 +168,10 @@ physics_system::query_aabb_output physics_system::query_aabb(vec2 p1_meters, vec
 physics_system::query_output physics_system::query_body(entity_id subject, b2Filter filter, entity_id ignore_entity) {
 	query_output total_output;
 
-	for (b2Fixture* f = subject.get<components::physics>().body->GetFixtureList(); f != nullptr; f = f->GetNext()) {
-		auto world_vertices = get_world_vertices(subject, true);
+	auto handle = parent_cosmos.get_handle(subject);
+
+	for (b2Fixture* f = handle.get<components::physics>().black_detail.body->GetFixtureList(); f != nullptr; f = f->GetNext()) {
+		auto world_vertices = get_world_vertices(handle, true);
 
 		b2PolygonShape shape;
 		shape.Set(world_vertices.data(), world_vertices.size());

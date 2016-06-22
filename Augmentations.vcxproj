@@ -357,6 +357,7 @@
     <ClCompile Include="game\cosmic_profiler.cpp" />
     <ClCompile Include="game\definition_interface.cpp" />
     <ClCompile Include="game\detail\convex_partitioned_shape.cpp" />
+    <ClCompile Include="game\detail\input_context.cpp" />
     <ClCompile Include="game\detail\inventory_slot_handle.cpp" />
     <ClCompile Include="game\detail\inventory_slot_id.cpp" />
     <ClCompile Include="game\detail\physics_engine_reflected_state.cpp" />
@@ -1007,6 +1008,7 @@
     <ClInclude Include="augs\gui\text_drawer.h" />
     <ClInclude Include="augs\misc\delta.h" />
     <ClInclude Include="augs\misc\deterministic_timing.h" />
+    <ClInclude Include="augs\misc\entropy_unpacker_and_recorder.h" />
     <ClInclude Include="augs\misc\machine_entropy.h" />
     <ClInclude Include="augs\misc\measurements.h" />
     <ClInclude Include="augs\misc\object_pool_handle.h" />
@@ -1019,6 +1021,7 @@
     <ClInclude Include="augs\window_framework\colored_print.h" />
     <ClInclude Include="augs\window_framework\platform_utils.h" />
     <ClInclude Include="game\detail\convex_partitioned_shape.h" />
+    <ClInclude Include="game\detail\input_context.h" />
     <ClInclude Include="game\detail\inventory_slot_handle.h" />
     <ClInclude Include="game\detail\inventory_slot_handle_declaration.h" />
     <ClInclude Include="game\detail\physics_engine_reflected_state.h" />

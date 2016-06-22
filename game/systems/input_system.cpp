@@ -70,14 +70,6 @@ void input_system::post_all_events_posted_by_drawing_time_systems_since_last_ste
 input_system::context::context() : enabled(true) {
 }
 
-void input_system::context::map_key_to_intent(window::event::keys::key id, intent_type intent) {
-	key_to_intent[id] = intent;
-}
-
-void input_system::context::map_event_to_intent(window::event::message id, intent_type intent) {
-	event_to_intent[id] = intent;
-}
-
 void input_system::post_unmapped_intents_from_raw_window_inputs() {
 	step.messages.get_queue<messages::unmapped_intent_message>().clear();
 

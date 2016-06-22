@@ -4,7 +4,6 @@
 #include "misc/object_pool_id.h"
 
 #include "aggregate_handle.h"
-#include "configurable_components.h"
 
 namespace augs {
 	template<class T>

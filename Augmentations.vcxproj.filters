@@ -1269,6 +1269,9 @@
     <ClCompile Include="game\detail\physics_scripts.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\detail\input_context.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3393,6 +3396,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\detail\physics_scripts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\input_context.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\entropy_unpacker_and_recorder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -7,6 +7,8 @@
 #include "game/scene_builders/scene_builder.h"
 #include "misc/performance_timer.h"
 
+#include "game/detail/input_context.h"
+
 class multiverse {
 	std::unique_ptr<scene_builder> current_scene_builder;
 
@@ -14,6 +16,8 @@ public:
 	augs::performance_timer profile;
 
 	multiverse();
+
+	input_context active_context;
 
 	window::glwindow game_window;
 

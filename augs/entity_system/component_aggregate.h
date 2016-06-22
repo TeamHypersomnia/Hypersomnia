@@ -21,6 +21,6 @@ namespace augs {
 			return std::get<object_pool_id<component>>(component_ids);
 		}
 
-		unsigned long long removed_from_processing_subjects = 0;
+		unsigned long long processing_subject_categories = 0;
 	};
 }

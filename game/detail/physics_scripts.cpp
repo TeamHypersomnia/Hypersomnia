@@ -57,6 +57,31 @@ void resolve_density_of_associated_fixtures(entity_handle id) {
 		fixtures.set_density_multiplier(density_multiplier, i);
 }
 
+bool are_connected_by_friction(const_entity_handle child, const_entity_handle parent) {
+	auto& cosmos = child.get_cosmos();
+
+	if (is_entity_physical(child) && is_entity_physical(parent)) {
+		bool matched_ancestor = false;
+
+		entity_id parent_body_entity = get_owner_body_entity(parent);
+		entity_id childs_ancestor_entity = cosmos.get_handle(get_owner_body_entity(child)).get<components::physics>().get_owner_friction_ground();
+
+		while (cosmos.get_handle(childs_ancestor_entity).alive()) {
+			if (childs_ancestor_entity == parent_body_entity) {
+				matched_ancestor = true;
+				break;
+			}
+
+			childs_ancestor_entity = cosmos.get_handle(childs_ancestor_entity).get<components::physics>().get_owner_friction_ground();
+		}
+
+		if (matched_ancestor)
+			return true;
+	}
+
+	return false;
+}
+
 std::vector<b2Vec2> get_world_vertices(const_entity_handle subject, bool meters, int fixture_num) {
 	std::vector<b2Vec2> output;
 

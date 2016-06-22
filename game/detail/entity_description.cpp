@@ -1,5 +1,6 @@
 #include "entity_description.h"
-#include "game/entity_id.h"
+#include "game/entity_handle.h"
+#include "game/detail/inventory_slot_handle.h"
 #include "game/components/name_component.h"
 #include "game/components/melee_component.h"
 #include "game/components/gun_component.h"
@@ -12,7 +13,7 @@
 #include "log.h"
 #include "templates.h"
 
-textual_description description_of_entity(entity_id id) {
+textual_description description_of_entity(const_entity_handle id) {
 	auto& name = id.get<components::name>();
 	
 	auto result = description_by_entity_name(name.id);
@@ -23,7 +24,7 @@ textual_description description_of_entity(entity_id id) {
 	return result;
 }
 
-std::wstring describe_properties(entity_id id) {
+std::wstring describe_properties(const_entity_handle id) {
 	std::wostringstream result;
 
 	auto* melee = id.find<components::melee>();
@@ -97,8 +98,8 @@ std::wstring describe_properties(entity_id id) {
 	}
 }
 
-std::wstring describe_slot(inventory_slot_id id) {
-	auto text = describe_slot_function(id.type);
+std::wstring describe_slot(const_inventory_slot_handle id) {
+	auto text = describe_slot_function(id.get_id().type);
 
 	auto catcolor = id->for_categorized_items_only ? L"violet" : L"vsblue";
 
@@ -106,7 +107,7 @@ std::wstring describe_slot(inventory_slot_id id) {
 		text.details + L"[/color]";
 }
 
-std::wstring describe_entity(entity_id id) {
+std::wstring describe_entity(const_entity_handle id) {
 	auto desc = description_of_entity(id);
 	auto properties = describe_properties(id);
 	if (!properties.empty()) properties += L"\n";

@@ -1,6 +1,7 @@
 #pragma once
 #include <Box2D\Box2D.h>
 #include "game/entity_id.h"
+#include "game/entity_handle.h"
 
 #include "game/components/physics_component.h"
 #include "game/components/transform_component.h"
@@ -77,8 +78,6 @@ public:
 	query_output query_shape(b2Shape*, b2Filter filter, entity_id ignore_entity = entity_id());
 	
 	void enable_listener(bool flag);
-	
-	void rechoose_owner_friction_body(entity_id);
 
 	void react_to_new_entities(step_state&);
 	void react_to_destroyed_entities(step_state&);
@@ -101,7 +100,8 @@ private:
 	};
 
 	struct raycast_input : public b2RayCastCallback {
-		entity_id subject;
+		const_entity_handle subject;
+		raycast_input(const_entity_handle h) : subject(h) {}
 		b2Filter subject_filter;
 
 		bool save_all = false;
@@ -123,7 +123,8 @@ private:
 		step_state* step_ptr;
 	};
 
-	void recurential_friction_handler(entity_id entity, entity_id friction_owner);
+	void rechoose_owner_friction_body(entity_handle);
+	void recurential_friction_handler(entity_handle entity, entity_handle friction_owner);
 
 	void set_transforms_from_body_transforms();
 
