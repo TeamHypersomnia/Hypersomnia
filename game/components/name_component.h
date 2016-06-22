@@ -10,4 +10,4 @@ namespace components {
 	};
 }
 
-entity_id get_first_named_ancestor(entity_id);
+entity_id get_first_named_ancestor(const_entity_handle);

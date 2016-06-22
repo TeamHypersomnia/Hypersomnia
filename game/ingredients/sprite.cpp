@@ -6,9 +6,9 @@
 
 namespace ingredients {
 	components::sprite&  sprite(entity_handle e, vec2 pos, assets::texture_id id, augs::rgba col, render_layer layer) {
-		auto& sprite = *e += components::sprite();
-		auto& render = *e += components::render();
-		auto& transform = *e += components::transform();
+		auto& sprite = e += components::sprite();
+		auto& render = e += components::render();
+		auto& transform = e += components::transform();
 
 		render.layer = layer;
 		transform.pos = pos;

@@ -1,8 +1,6 @@
 #pragma once
 #include "game/entity_id.h"
 
-class definition_interface;
-
 enum class entity_name {
 	ASSAULT_RIFLE,
 	MAGAZINE,
@@ -22,5 +20,5 @@ enum class entity_name {
 	URBAN_CYAN_MACHETE,
 };
 
-void name_entity(definition_interface, entity_name);
-void name_entity(definition_interface, entity_name, std::wstring custom_nickname);
+void name_entity(entity_handle, entity_name);
+void name_entity(entity_handle, entity_name, std::wstring custom_nickname);

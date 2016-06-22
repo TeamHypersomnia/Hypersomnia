@@ -44,7 +44,7 @@ namespace ingredients {
 	}
 
 	void wsad_character_physics(entity_handle e) {
-		auto& physics_definition = *e += components::physics_definition();
+		auto& physics_definition = e += components::physics_definition();
 
 		auto& body = physics_definition.body;
 		auto& info = physics_definition.new_fixture();
@@ -70,20 +70,20 @@ namespace ingredients {
 	}
 
 	void wsad_character(entity_handle e, entity_handle crosshair_entity) {
-		auto& sprite = *e += components::sprite();
-		auto& render = *e += components::render();
-		auto& animation = *e += components::animation();
-		auto& animation_response = *e += components::animation_response();
-		auto& transform = *e += components::transform();
-		auto& movement = *e += components::movement();
-		auto& rotation_copying = *e += components::rotation_copying();
-		auto& detector = *e += components::trigger_query_detector();
-		auto& driver = *e += components::driver();
-		auto& force_joint = *e += components::force_joint();
-		auto& sentience = *e += components::sentience();
-		*e += components::position_copying(); // used when it is an astral body
-		auto& particle_response = *e += components::particle_effect_response({ assets::particle_effect_response_id::CHARACTER_RESPONSE });
-		auto& attitude = *e += components::attitude();
+		auto& sprite = e += components::sprite();
+		auto& render = e += components::render();
+		auto& animation = e += components::animation();
+		auto& animation_response = e += components::animation_response();
+		auto& transform = e += components::transform();
+		auto& movement = e += components::movement();
+		auto& rotation_copying = e += components::rotation_copying();
+		auto& detector = e += components::trigger_query_detector();
+		auto& driver = e += components::driver();
+		auto& force_joint = e += components::force_joint();
+		auto& sentience = e += components::sentience();
+		e += components::position_copying(); // used when it is an astral body
+		auto& particle_response = e += components::particle_effect_response({ assets::particle_effect_response_id::CHARACTER_RESPONSE });
+		auto& attitude = e += components::attitude();
 
 		attitude.parties = party_category::METROPOLIS_CITIZEN;
 		attitude.hostile_parties = party_category::RESISTANCE_CITIZEN;
@@ -169,7 +169,7 @@ namespace ingredients {
 		movement.standard_linear_damping = 20.f;
 		// driver.linear_damping_while_driving = 4.f;
 
-		e->map_sub_entity(sub_entity_name::CHARACTER_CROSSHAIR, crosshair_entity);
+		e.map_sub_entity(sub_entity_name::CHARACTER_CROSSHAIR, crosshair_entity);
 		
 		animation_response.response = assets::animation_response_id::TORSO_SET;
 
@@ -186,14 +186,14 @@ namespace ingredients {
 	}
 
 	void wsad_character_corpse(entity_handle e) {
-		auto& sprite = *e += components::sprite();
-		auto& render = *e += components::render();
-		auto& transform = *e += components::transform();
+		auto& sprite = e += components::sprite();
+		auto& render = e += components::render();
+		auto& transform = e += components::transform();
 
 		sprite.set(assets::texture_id::DEAD_TORSO, rgba(255, 255, 255, 255));
 		render.layer = render_layer::CORPSES;
 
-		auto& physics_definition = *e += components::physics_definition();
+		auto& physics_definition = e += components::physics_definition();
 
 		auto& body = physics_definition.body;
 		auto& info = physics_definition.new_fixture();
@@ -261,7 +261,7 @@ namespace prefabs {
 		name_entity(corpse_of_sentience, entity_name::CORPSE);
 		ingredients::wsad_character_corpse(corpse_of_sentience);
 
-		character->map_sub_definition(sub_definition_name::CORPSE_OF_SENTIENCE, corpse_of_sentience);
+		character->map_sub_entity(sub_entity_name::CORPSE_OF_SENTIENCE, corpse_of_sentience);
 
 		return character;
 	}

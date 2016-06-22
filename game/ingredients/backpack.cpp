@@ -4,11 +4,13 @@
 
 #include "game/enums/item_category.h"
 #include "game/detail/inventory_utils.h"
+#include "game/components/container_component.h"
+#include "game/components/item_component.h"
 
-#include "game/definition_interface.h"
+#include "game/entity_handle.h"
 
 namespace ingredients {
-	void backpack(definition_interface e) {
+	void backpack(entity_handle e) {
 		auto& container = e += components::container();
 		auto& item = make_item(e);
 		

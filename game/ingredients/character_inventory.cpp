@@ -11,9 +11,9 @@
 
 namespace ingredients {
 	void character_inventory(entity_handle e) {
-		auto& container = *e += components::container();
-		auto& item_slot_transfers = *e += components::item_slot_transfers();
-		auto& detector = *e += components::trigger_collision_detector();
+		auto& container = e += components::container();
+		auto& item_slot_transfers = e += components::item_slot_transfers();
+		auto& detector = e += components::trigger_collision_detector();
 
 		inventory_slot slot_def;
 		slot_def.is_physical_attachment_slot = true;

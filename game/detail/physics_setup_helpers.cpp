@@ -21,4 +21,3 @@
 #include "texture_baker/texture_baker.h"
 #include "game/resources/manager.h"
 
-#include "game/definition_interface.h"

@@ -11,8 +11,8 @@
 
 namespace ingredients {
 	void standard_pathfinding_capability(entity_handle e) {
-		auto& pathfinding = *e += components::pathfinding();
-		auto& visibility = *e += components::visibility();
+		auto& pathfinding = e += components::pathfinding();
+		auto& visibility = e += components::visibility();
 
 		pathfinding.mark_touched_as_discovered = true;
 		pathfinding.force_persistent_navpoints = true;
@@ -38,7 +38,7 @@ namespace ingredients {
 		los.obstruction_filter = filters::line_of_sight_query();
 		los.candidate_filter = filters::line_of_sight_candidates();
 
-		auto& behaviour_tree = *e += components::behaviour_tree();
+		auto& behaviour_tree = e += components::behaviour_tree();
 		auto& trees = behaviour_tree.concurrent_trees;
 
 		trees.resize(3);

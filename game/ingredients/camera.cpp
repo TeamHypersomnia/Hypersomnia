@@ -27,9 +27,9 @@ namespace ingredients {
 
 		position_copying.relative = false;
 
-		e->add(transform);
-		e->add(input);
-		e->add(camera);
-		e->add(position_copying);
+		e.add(transform);
+		e.add(input);
+		e.add(camera);
+		e.add(position_copying);
 	}
 }

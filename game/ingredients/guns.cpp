@@ -20,7 +20,7 @@
 namespace ingredients {
 	void default_gun_container(entity_handle e) {
 		auto& item = make_item(e);
-		auto& container = *e += components::container();
+		auto& container = e += components::container();
 		item.space_occupied_per_charge = to_space_units("3.5");
 
 		{
@@ -70,7 +70,7 @@ namespace prefabs {
 			ingredients::see_through_dynamic_body(sample_magazine);
 
 			auto& item = ingredients::make_item(sample_magazine);
-			auto& container = *sample_magazine += components::container();
+			auto& container = sample_magazine += components::container();
 			
 			item.categories_for_slot_compatibility = item_category::MAGAZINE;
 			item.space_occupied_per_charge = to_space_units("0.5");
@@ -157,8 +157,8 @@ namespace prefabs {
 			response.modifier.colorize = pink;
 		}
 
-		pink_charge->map_sub_definition(sub_entity_name::BULLET_ROUND, round_definition);
-		pink_charge->map_sub_definition(sub_entity_name::BULLET_SHELL, shell_definition);
+		pink_charge.map_sub_entity(sub_entity_name::BULLET_ROUND, round_definition);
+		pink_charge.map_sub_entity(sub_entity_name::BULLET_SHELL, shell_definition);
 
 		return pink_charge;
 	}
@@ -206,8 +206,8 @@ namespace prefabs {
 			response.modifier.colorize = cyan;
 		}
 
-		cyan_charge->map_sub_definition(sub_entity_name::BULLET_ROUND, round_definition);
-		cyan_charge->map_sub_definition(sub_entity_name::BULLET_SHELL, shell_definition);
+		cyan_charge.map_sub_entity(sub_entity_name::BULLET_ROUND, round_definition);
+		cyan_charge.map_sub_entity(sub_entity_name::BULLET_SHELL, shell_definition);
 
 		return cyan_charge;
 	}
@@ -258,8 +258,8 @@ namespace prefabs {
 			response.modifier.colorize = green;
 		}
 
-		green_charge->map_sub_definition(sub_entity_name::BULLET_ROUND, round_definition);
-		green_charge->map_sub_definition(sub_entity_name::BULLET_SHELL, shell_definition);
+		green_charge.map_sub_entity(sub_entity_name::BULLET_ROUND, round_definition);
+		green_charge.map_sub_entity(sub_entity_name::BULLET_SHELL, shell_definition);
 
 		return green_charge;
 	}

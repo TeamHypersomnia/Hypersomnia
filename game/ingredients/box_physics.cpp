@@ -3,11 +3,10 @@
 #include "game/components/fixtures_component.h"
 
 #include "game/enums/filters.h"
-
-#include "game/definition_interface.h"
+#include "game/entity_handle.h"
 
 namespace ingredients {
-	void standard_dynamic_body(definition_interface e) {
+	void standard_dynamic_body(entity_handle e) {
 		auto& physics = e += components::physics();
 
 		rigid_body_definition def;
@@ -24,8 +23,8 @@ namespace ingredients {
 		e += components::fixtures(colliders);
 	}
 
-	void see_through_dynamic_body(definition_interface e) {
-		auto& physics_definition = *e += components::physics_definition();
+	void see_through_dynamic_body(entity_handle e) {
+		auto& physics_definition = e += components::physics();
 
 		physics_definition.body.fixed_rotation = false;
 
@@ -38,8 +37,8 @@ namespace ingredients {
 		return physics_definition;
 	}
 
-	void standard_static_body(definition_interface e) {
-		auto& physics_definition = *e += components::physics_definition();
+	void standard_static_body(entity_handle e) {
+		auto& physics_definition = e += components::physics_definition();
 
 		physics_definition.body.fixed_rotation = false;
 		physics_definition.body.body_type = b2_staticBody;
@@ -53,8 +52,8 @@ namespace ingredients {
 		return physics_definition;
 	}
 	
-	void bullet_round_physics(definition_interface e) {
-		auto& physics_definition = *e += components::physics_definition();
+	void bullet_round_physics(entity_handle e) {
+		auto& physics_definition = e += components::physics_definition();
 
 		auto& body = physics_definition.body;
 		body.bullet = true;
