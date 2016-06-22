@@ -104,6 +104,12 @@ void basic_entity_handle<C>::map_sub_entity(sub_entity_name n, entity_id p) cons
 
 template <bool C>
 template <class = typename std::enable_if<!C>::type>
+void basic_entity_handle<C>::map_associated_entity(associated_entity_name n, entity_id p) const {
+	relations().associated_entities_by_name[n] = p;
+}
+
+template <bool C>
+template <class = typename std::enable_if<!C>::type>
 void basic_entity_handle<C>::skip_processing_in(processing_subjects) const {
 	(*this)->removed_from_processing_subjects |= (1 << unsigned long long(list));
 }

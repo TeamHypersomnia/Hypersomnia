@@ -53,11 +53,11 @@ namespace prefabs {
 	entity_handle create_car(cosmos&, components::transform);
 	entity_handle create_motorcycle(cosmos&, components::transform);
 
-	entity_handle create_sample_magazine(cosmos&, vec2 pos, std::string space = "0.30", entity_handle charge_inside = entity_handle());
+	entity_handle create_sample_magazine(cosmos&, vec2 pos, std::string space = "0.30", entity_id charge_inside = entity_id());
 	entity_handle create_sample_suppressor(cosmos& world, vec2 pos);
-	entity_handle create_sample_rifle(cosmos&, vec2 pos, entity_handle load_mag = entity_handle());
-	entity_handle create_pistol(cosmos&, vec2 pos, entity_handle load_mag = entity_handle());
-	entity_handle create_submachine(cosmos&, vec2 pos, entity_handle load_mag = entity_handle());
+	entity_handle create_sample_rifle(cosmos&, vec2 pos, entity_id load_mag = entity_id());
+	entity_handle create_pistol(cosmos&, vec2 pos, entity_id load_mag = entity_id());
+	entity_handle create_submachine(cosmos&, vec2 pos, entity_id load_mag = entity_id());
 	
 	entity_handle create_pink_charge(cosmos&, vec2 pos, int charges = 23);
 	entity_handle create_cyan_charge(cosmos&, vec2 pos, int charges = 30);

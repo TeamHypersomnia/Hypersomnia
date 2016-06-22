@@ -207,7 +207,7 @@ namespace ingredients {
 	}
 
 	void inject_window_input_to_character(entity_handle next_character, entity_handle camera) {
-		auto previously_controlled_character = camera.get<components::camera>().entity_to_chase;
+		auto previously_controlled_character = next_character.make_handle(camera.get<components::camera>().entity_to_chase);
 
 		if (previously_controlled_character.alive()) {
 			previously_controlled_character.skip_processing_in(processing_subjects::WITH_INPUT_RECEIVER);
@@ -216,21 +216,21 @@ namespace ingredients {
 			auto crosshair = previously_controlled_character[sub_entity_name::CHARACTER_CROSSHAIR];
 			crosshair.skip_processing_in(processing_subjects::WITH_INPUT_RECEIVER);
 
-			previously_controlled_character[associated_entity_name::WATCHING_CAMERA].unset();
+			previously_controlled_character.map_associated_entity(associated_entity_name::WATCHING_CAMERA, entity_id());
 		}
 
 		auto crosshair = next_character[sub_entity_name::CHARACTER_CROSSHAIR];
 
-		next_character[associated_entity_name::WATCHING_CAMERA] = camera;
+		next_character.map_associated_entity(associated_entity_name::WATCHING_CAMERA, camera);
 
 		if (next_character.find<components::gui_element>() == nullptr)
-			next_character->add(components::gui_element());
+			next_character.add(components::gui_element());
 
 		if (next_character.find<components::input_receiver>() == nullptr)
-			next_character->add<components::input_receiver>();
+			next_character.add<components::input_receiver>();
 
 		if (crosshair.find<components::input_receiver>() == nullptr)
-			crosshair->add<components::input_receiver>();
+			crosshair.add<components::input_receiver>();
 
 		next_character.unskip_processing_in(processing_subjects::WITH_INPUT_RECEIVER);
 		next_character.unskip_processing_in(processing_subjects::WITH_GUI_ELEMENT);

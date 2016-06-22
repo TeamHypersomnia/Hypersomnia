@@ -59,6 +59,9 @@ public:
 	template <class = typename std::enable_if<!is_const>::type>
 	void map_sub_entity(sub_entity_name n, entity_id p) const;
 
+	template <class = typename std::enable_if<!is_const>::type>
+	void map_associated_entity(associated_entity_name n, entity_id p) const;
+
 	template <class component>
 	bool has() const {
 		return basic_entity_handle_base<is_const>::has<component>();

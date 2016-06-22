@@ -16,10 +16,8 @@
 #include "game/components/transform_component.h"
 #include "graphics/renderer.h"
 
-
 #include "game/entity_handle.h"
 #include "game/step_state.h"
-
 
 using namespace augs;
 
@@ -53,14 +51,14 @@ void camera_system::react_to_input_intents(cosmos& cosmos, step_state& step) {
 	}
 }
 
-void components::camera::configure_camera_and_character_with_crosshair(cosmos& cosmos,entity_id camera, entity_id character, entity_id crosshair) {
-	cosmos.get_handle(camera).get<components::camera>().entity_to_chase = character;
-	cosmos.get_handle(camera).get<components::position_copying>().set_target(character);
+void components::camera::configure_camera_and_character_with_crosshair(entity_handle camera, entity_handle character, entity_handle crosshair) {
+	camera.get<components::camera>().entity_to_chase = character;
+	camera.get<components::position_copying>().set_target(character);
 
-	update_bounds_for_crosshair(cosmos.get_handle(camera).get<components::camera>(), cosmos.get_handle(crosshair).get<components::crosshair>());
+	update_bounds_for_crosshair(camera.get<components::camera>(), crosshair.get<components::crosshair>());
 }
 
-vec2i components::camera::get_camera_offset_due_to_character_crosshair(cosmos& cosmos, entity_id self) const {
+vec2i components::camera::get_camera_offset_due_to_character_crosshair(cosmos& cosmos) const {
 	vec2 camera_crosshair_offset;
 
 	if (cosmos.get_handle(entity_to_chase).dead())
@@ -105,7 +103,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing(cosmos& cosmos, ste
 			auto transform = e.get<components::transform>();
 			transform.pos = vec2i(transform.pos);
 
-			vec2i camera_crosshair_offset = camera.get_camera_offset_due_to_character_crosshair(cosmos, e.get_id());
+			vec2i camera_crosshair_offset = camera.get_camera_offset_due_to_character_crosshair(cosmos);
 
 			components::transform smoothed_camera_transform;
 			vec2 smoothed_visible_world_area;

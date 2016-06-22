@@ -61,7 +61,7 @@ namespace ingredients {
 }
 
 namespace prefabs {
-	entity_handle create_sample_magazine(cosmos& world, vec2 pos, std::string space, entity_handle charge_inside) {
+	entity_handle create_sample_magazine(cosmos& world, vec2 pos, std::string space, entity_id charge_inside) {
 		auto sample_magazine = world.create_entity("sample_magazine");
 		name_entity(sample_magazine, entity_name::MAGAZINE);
 
@@ -133,14 +133,14 @@ namespace prefabs {
 			s.size *= vec2(2, 0.5);
 			auto& def = ingredients::bullet_round_physics(round_definition);
 			
-			auto& damage = *round_definition += components::damage();
+			auto& damage = round_definition += components::damage();
 			damage.impulse_upon_hit = 1000.f;
 
-			auto& response = *round_definition += components::particle_effect_response();
+			auto& response = round_definition += components::particle_effect_response();
 			response.response = assets::particle_effect_response_id::ELECTRIC_CHARGE_RESPONSE;
 			response.modifier.colorize = pink;
 
-			auto& trace = *round_definition += components::trace();
+			auto& trace = round_definition += components::trace();
 			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
 			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
 			trace.lengthening_duration_ms = std::make_pair(200.f, 250.f);
@@ -153,7 +153,7 @@ namespace prefabs {
 			def.fixtures[0].density = 0.001f;
 			def.fixtures[0].filter = filters::shell();
 
-			auto& response = *shell_definition += components::particle_effect_response{ assets::particle_effect_response_id::SHELL_RESPONSE };
+			auto& response = shell_definition += components::particle_effect_response{ assets::particle_effect_response_id::SHELL_RESPONSE };
 			response.modifier.colorize = pink;
 		}
 
@@ -185,11 +185,11 @@ namespace prefabs {
 			s.size *= vec2(2, 0.5);
 			auto& def = ingredients::bullet_round_physics(round_definition);
 
-			auto& response = *round_definition += components::particle_effect_response { assets::particle_effect_response_id::ELECTRIC_CHARGE_RESPONSE };
+			auto& response = round_definition += components::particle_effect_response { assets::particle_effect_response_id::ELECTRIC_CHARGE_RESPONSE };
 			response.modifier.colorize = cyan;
 
-			auto& damage = *round_definition += components::damage();
-			auto& trace = *round_definition += components::trace();
+			auto& damage = round_definition += components::damage();
+			auto& trace = round_definition += components::trace();
 			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
 			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
 			trace.lengthening_duration_ms = std::make_pair(200.f, 250.f);
@@ -202,7 +202,7 @@ namespace prefabs {
 			def.fixtures[0].density = 0.001f;
 			def.fixtures[0].filter = filters::shell();
 
-			auto& response = *shell_definition += components::particle_effect_response{ assets::particle_effect_response_id::SHELL_RESPONSE };
+			auto& response = shell_definition += components::particle_effect_response{ assets::particle_effect_response_id::SHELL_RESPONSE };
 			response.modifier.colorize = cyan;
 		}
 
@@ -234,14 +234,14 @@ namespace prefabs {
 			s.size *= vec2(2, 0.5);
 			auto& def = ingredients::bullet_round_physics(round_definition);
 
-			auto& response = *round_definition += components::particle_effect_response { assets::particle_effect_response_id::HEALING_CHARGE_RESPONSE };
+			auto& response = round_definition += components::particle_effect_response { assets::particle_effect_response_id::HEALING_CHARGE_RESPONSE };
 			response.modifier.colorize = green;
 
-			auto& damage = *round_definition += components::damage();
+			auto& damage = round_definition += components::damage();
 			damage.amount *= -1;
 			damage.impulse_upon_hit = 0.f;
 			damage.recoil_multiplier = 0.1f;
-			auto& trace = *round_definition += components::trace();
+			auto& trace = round_definition += components::trace();
 			trace.max_multiplier_x = std::make_pair(0.0f, 3.5f);
 			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
 			trace.lengthening_duration_ms = std::make_pair(200.f, 250.f);
@@ -254,7 +254,7 @@ namespace prefabs {
 			def.fixtures[0].density = 0.001f;
 			def.fixtures[0].filter = filters::shell();
 
-			auto& response = *shell_definition += components::particle_effect_response{ assets::particle_effect_response_id::SHELL_RESPONSE };
+			auto& response = shell_definition += components::particle_effect_response{ assets::particle_effect_response_id::SHELL_RESPONSE };
 			response.modifier.colorize = green;
 		}
 
@@ -264,7 +264,7 @@ namespace prefabs {
 		return green_charge;
 	}
 
-	entity_handle create_sample_rifle(cosmos& world, vec2 pos, entity_handle load_mag) {
+	entity_handle create_sample_rifle(cosmos& world, vec2 pos, entity_id load_mag) {
 		auto weapon = world.create_entity("sample_rifle");
 		name_entity(weapon, entity_name::ASSAULT_RIFLE);
 
@@ -272,7 +272,7 @@ namespace prefabs {
 		auto& def = ingredients::see_through_dynamic_body(weapon);
 		ingredients::default_gun_container(weapon);
 
-		auto& gun = *weapon += components::gun();
+		auto& gun = weapon += components::gun();
 
 		gun.action_mode = components::gun::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(4000, 4000);
@@ -338,7 +338,7 @@ namespace prefabs {
 		return weapon;
 	}
 
-	entity_handle create_submachine(cosmos& world, vec2 pos, entity_handle load_mag) {
+	entity_handle create_submachine(cosmos& world, vec2 pos, entity_id load_mag) {
 		auto weapon = world.create_entity("submachine");
 		name_entity(weapon, entity_name::SUBMACHINE);
 
@@ -346,7 +346,7 @@ namespace prefabs {
 		auto& def = ingredients::see_through_dynamic_body(weapon);
 		ingredients::default_gun_container(weapon);
 
-		auto& gun = *weapon += components::gun();
+		auto& gun = weapon += components::gun();
 
 		gun.action_mode = components::gun::AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(3000, 3000);
@@ -413,7 +413,7 @@ namespace prefabs {
 		return weapon;
 	}
 
-	entity_handle create_pistol(cosmos& world, vec2 pos, entity_handle load_mag) {
+	entity_handle create_pistol(cosmos& world, vec2 pos, entity_id load_mag) {
 		auto weapon = world.create_entity("pistol");
 		name_entity(weapon, entity_name::PISTOL);
 
@@ -421,7 +421,7 @@ namespace prefabs {
 		auto& def = ingredients::see_through_dynamic_body(weapon);
 		ingredients::default_gun_container(weapon);
 
-		auto& gun = *weapon += components::gun();
+		auto& gun = weapon += components::gun();
 
 		gun.action_mode = components::gun::SEMI_AUTOMATIC;
 		gun.muzzle_velocity = std::make_pair(2500, 2500);
