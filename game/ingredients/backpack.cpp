@@ -2,7 +2,7 @@
 #include "game/entity_id.h"
 #include "game/cosmos.h"
 
-#include "game/globals/item_category.h"
+#include "game/enums/item_category.h"
 #include "game/detail/inventory_utils.h"
 
 #include "game/definition_interface.h"

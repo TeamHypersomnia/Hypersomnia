@@ -2,7 +2,7 @@
 #include "game/entity_id.h"
 #include "game/cosmos.h"
 
-#include "game/globals/item_category.h"
+#include "game/enums/item_category.h"
 #include "game/components/container_component.h"
 #include "game/components/item_component.h"
 #include "game/components/item_slot_transfers_component.h"

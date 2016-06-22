@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "globals/processing_subjects.h"
+#include "enums/processing_subjects.h"
 #include "game/entity_id.h"
 #include "game/entity_handle_declaration.h"
 

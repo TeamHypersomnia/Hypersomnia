@@ -2,7 +2,7 @@
 #include "game/components/physics_component.h"
 #include "game/components/fixtures_component.h"
 
-#include "game/globals/filters.h"
+#include "game/enums/filters.h"
 
 #include "game/definition_interface.h"
 

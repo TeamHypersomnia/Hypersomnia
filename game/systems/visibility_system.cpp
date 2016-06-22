@@ -20,7 +20,7 @@
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"
 
-#include "game/globals/processing_subjects.h"
+#include "game/enums/processing_subjects.h"
 #include "game/entity_handle.h"
 
 using namespace augs;

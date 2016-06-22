@@ -18,7 +18,7 @@
 #include "camera_system.h"
 
 #include "game/cosmos.h"
-#include "game/globals/filters.h"
+#include "game/enums/filters.h"
 
 #include <algorithm>
 

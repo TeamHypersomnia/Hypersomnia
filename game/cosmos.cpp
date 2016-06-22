@@ -28,7 +28,7 @@
 #include "systems/sentience_system.h"
 #include "stateful_systems/dynamic_tree_system.h"
 
-#include "game/globals/render_layer.h"
+#include "game/enums/render_layer.h"
 
 #include "cosmos.h"
 

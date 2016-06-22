@@ -7,8 +7,8 @@
 #include "game/components/trace_component.h"
 #include "game/components/particle_effect_response_component.h"
 
-#include "game/globals/filters.h"
-#include "game/globals/item_category.h"
+#include "game/enums/filters.h"
+#include "game/enums/item_category.h"
 
 #include "game/cosmos.h"
 

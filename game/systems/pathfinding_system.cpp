@@ -9,7 +9,7 @@
 #include "game/components/visibility_component.h"
 
 #include "graphics/renderer.h"
-#include "game/globals/processing_subjects.h"
+#include "game/enums/processing_subjects.h"
 #include "game/entity_handle.h"
 
 pathfinding_system::pathfinding_system() : draw_memorised_walls(false), draw_undiscovered(false),

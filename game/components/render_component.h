@@ -2,7 +2,7 @@
 #include "transform_component.h"
 
 #include "math/vec2.h"
-#include "game/globals/render_layer.h"
+#include "game/enums/render_layer.h"
 #include "graphics/pixel.h"
 
 namespace components {

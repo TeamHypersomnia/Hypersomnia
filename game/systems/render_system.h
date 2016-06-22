@@ -8,7 +8,7 @@
 #include "graphics/vertex.h"
 #include "texture_baker/texture_baker.h"
 
-#include "game/globals/render_layer.h"
+#include "game/enums/render_layer.h"
 
 #include <vector>
 

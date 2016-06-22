@@ -7,7 +7,7 @@
 #include "augs/gui/gui_world.h"
 #include "game/detail/gui/game_gui_root.h"
 #include "game/detail/gui/immediate_hud.h"
-#include "game/globals/slot_function.h"
+#include "game/enums/slot_function.h"
 
 class cosmos;
 

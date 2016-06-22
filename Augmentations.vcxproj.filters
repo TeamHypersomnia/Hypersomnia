@@ -1020,9 +1020,6 @@
     <ClCompile Include="game\detail\gui\aabb_highlighter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\globals\filters.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\ingredients\obstacles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1270,6 +1267,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\detail\input_context.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\enums\filters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -3050,12 +3050,6 @@
     <ClInclude Include="game\globals\detector_domains.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\globals\entity_name.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\globals\filters.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\globals\intents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3188,42 +3182,6 @@
     <ClInclude Include="game\assets\animation_id.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\globals\sub_entity_name.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\globals\slot_function.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\globals\render_layer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\globals\party_category.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\globals\particle_effect_response_type.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\globals\joint_name.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\globals\item_transfer_result_type.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\globals\item_category.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\globals\intent_type.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\globals\attitude_type.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\globals\associated_entity_name.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\globals\animation_response_type.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\detail\item_transfer_result.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3320,9 +3278,6 @@
     <ClInclude Include="game\bindings\bind_game_and_augs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\globals\sub_definition_name.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\detail\physics_engine_reflected_state.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3347,9 +3302,6 @@
     <ClInclude Include="game\cosmic_profiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\globals\processing_subjects.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\entity_handle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3372,9 +3324,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\stateful_systems\physics_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\globals\melee_state.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\object_pool_handle.h">
@@ -3402,6 +3351,57 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\entropy_unpacker_and_recorder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\enums\animation_response_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\enums\associated_entity_name.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\enums\attitude_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\enums\entity_name.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\enums\filters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\enums\intent_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\enums\item_category.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\enums\item_transfer_result_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\enums\joint_name.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\enums\melee_state.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\enums\particle_effect_response_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\enums\party_category.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\enums\processing_subjects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\enums\render_layer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\enums\slot_function.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\enums\sub_definition_name.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\enums\sub_entity_name.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

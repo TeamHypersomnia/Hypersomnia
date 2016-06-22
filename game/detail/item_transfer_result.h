@@ -1,5 +1,5 @@
 #pragma once
-#include "game/globals/item_transfer_result_type.h"
+#include "game/enums/item_transfer_result_type.h"
 
 struct item_transfer_result {
 	item_transfer_result_type result = item_transfer_result_type::SUCCESSFUL_TRANSFER;

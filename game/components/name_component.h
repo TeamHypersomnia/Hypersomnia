@@ -1,5 +1,5 @@
 #pragma once
-#include "game/globals/entity_name.h"
+#include "game/enums/entity_name.h"
 
 namespace components {
 	struct name {

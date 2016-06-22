@@ -1,7 +1,7 @@
 #pragma once
 #include <functional>
 #include "game/entity_handle_declaration.h"
-#include "game/globals/slot_function.h"
+#include "game/enums/slot_function.h"
 
 #define SPACE_ATOMS_PER_UNIT 1000
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "game/entity_id.h"
-#include "game/globals/attitude_type.h"
+#include "game/enums/attitude_type.h"
 #include "math/vec2.h"
 #include "game/entity_handle_declaration.h"
 

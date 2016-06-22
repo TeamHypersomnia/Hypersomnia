@@ -22,8 +22,8 @@
 #include "game/components/attitude_component.h"
 #include "game/assets/particle_effect_response_id.h"
 
-#include "game/globals/filters.h"
-#include "game/globals/party_category.h"
+#include "game/enums/filters.h"
+#include "game/enums/party_category.h"
 
 namespace ingredients {
 	void wsad_character_setup_movement(entity_id e) {

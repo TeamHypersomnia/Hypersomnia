@@ -10,7 +10,7 @@
 #include "game/components/melee_component.h"
 #include "game/components/particle_effect_response_component.h"
 
-#include "game/globals/entity_name.h"
+#include "game/enums/entity_name.h"
 
 #include "game/detail/inventory_utils.h"
 

@@ -21,7 +21,7 @@
 
 #include <Box2D/Common/b2Math.h>
 
-#include "game/globals/joint_name.h"
+#include "game/enums/joint_name.h"
 
 class b2Body;
 class b2Joint;

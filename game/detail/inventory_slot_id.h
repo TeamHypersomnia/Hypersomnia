@@ -1,5 +1,5 @@
 #pragma once
-#include "game/globals/slot_function.h"
+#include "game/enums/slot_function.h"
 #include "game/entity_id.h"
 
 struct inventory_slot_id {

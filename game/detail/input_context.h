@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_map>
-#include "game/globals/intent_type.h"
+#include "game/enums/intent_type.h"
 #include "augs/window_framework/event.h"
 
 struct input_context {

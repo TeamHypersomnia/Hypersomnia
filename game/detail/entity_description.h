@@ -1,11 +1,11 @@
 #pragma once
 #include <string>
-#include "game/globals/entity_name.h"
+#include "game/enums/entity_name.h"
 #include "game/entity_id.h"
 
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/entity_handle_declaration.h"
-#include "game/globals/slot_function.h"
+#include "game/enums/slot_function.h"
 
 struct textual_description {
 	std::wstring name;

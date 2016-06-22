@@ -4,7 +4,7 @@
 #include "game/stateful_systems/physics_system.h"
 #include "game/cosmos.h"
 #include "game/entity_id.h"
-#include "game/globals/filters.h"
+#include "game/enums/filters.h"
 #include "game/components/name_component.h"
 #include "game/components/render_component.h"
 #include <algorithm>

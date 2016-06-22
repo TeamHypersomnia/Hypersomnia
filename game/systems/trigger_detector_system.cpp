@@ -11,7 +11,7 @@
 
 #include "game/stateful_systems/physics_system.h"
 
-#include "game/globals/filters.h"
+#include "game/enums/filters.h"
 
 #include "game/components/trigger_component.h"
 #include "game/components/physics_component.h"

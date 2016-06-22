@@ -6,7 +6,7 @@
 #include "game/components/pathfinding_component.h"
 #include "game/components/visibility_component.h"
 
-#include "game/globals/filters.h"
+#include "game/enums/filters.h"
 
 namespace ingredients {
 	void standard_pathfinding_capability(entity_id e) {

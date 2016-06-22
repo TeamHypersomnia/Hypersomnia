@@ -1,6 +1,6 @@
 #include "entity_description.h"
-#include "game/globals/slot_function.h"
-#include "game/globals/item_category.h"
+#include "game/enums/slot_function.h"
+#include "game/enums/item_category.h"
 #include "ensure.h"
 
 textual_description description_by_entity_name(entity_name n) {

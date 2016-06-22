@@ -15,7 +15,7 @@
 #include "game/components/trigger_component.h"
 #include "game/components/name_component.h"
 
-#include "game/globals/filters.h"
+#include "game/enums/filters.h"
 
 namespace prefabs {
 	entity_id create_motorcycle(cosmos world, components::transform spawn_transform) {

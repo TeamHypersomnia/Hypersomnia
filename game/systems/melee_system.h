@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/globals/melee_state.h"
+#include "game/enums/melee_state.h"
 
 class cosmos;
 class step_state;

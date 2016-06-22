@@ -2,13 +2,13 @@
 #include <functional>
 #include <type_traits>
 
-#include "game/globals/slot_function.h"
-#include "game/globals/associated_entity_name.h"
-#include "game/globals/sub_entity_name.h"
-#include "game/globals/sub_definition_name.h"
+#include "game/enums/slot_function.h"
+#include "game/enums/associated_entity_name.h"
+#include "game/enums/sub_entity_name.h"
+#include "game/enums/sub_definition_name.h"
 
-#include "game/globals/sub_definition_name.h"
-#include "game/globals/processing_subjects.h"
+#include "game/enums/sub_definition_name.h"
+#include "game/enums/processing_subjects.h"
 
 #include "game/types_specification/full_entity_definition_declaration.h"
 
