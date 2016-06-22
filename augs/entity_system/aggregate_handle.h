@@ -1,6 +1,5 @@
 #pragma once
 #include "misc/object_pool_handle.h"
-#include "configurable_components.h"
 #include "component_aggregate.h"
 
 namespace augs {
@@ -71,20 +70,6 @@ namespace augs {
 			set(const component& c = component()) {
 			get<component>() = c;
 			return get<component>();
-		}
-
-		const configurable_components<components...>& get_definition() const {
-			configurable_components<components...> result;
-
-			for_each_type<components...>([this, &result](auto c) {
-				const auto const* p = this;
-
-				if (p->find<decltype(c)>() != nullptr) {
-					result.set(p->get<decltype(c)>());
-				}
-			});
-
-			return result;
 		}
 	};
 }
