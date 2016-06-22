@@ -1,5 +1,5 @@
 #include "ingredients.h"
-#include "game/entity_id.h"
+#include "game/entity_handle.h"
 #include "game/cosmos.h"
 
 #include "game/enums/item_category.h"
@@ -25,7 +25,7 @@ namespace ingredients {
 }
 
 namespace prefabs {
-	entity_id create_sample_backpack(cosmos& world, vec2 pos) {
+	entity_handle create_sample_backpack(cosmos& world, vec2 pos) {
 		full_entity_definition def;
 
 		name_entity(def, entity_name::VIOLET_BACKPACK);

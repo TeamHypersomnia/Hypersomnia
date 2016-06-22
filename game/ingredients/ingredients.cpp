@@ -2,21 +2,21 @@
 #include "game/systems/render_system.h"
 
 #include "game/cosmos.h"
-#include "game/entity_id.h"
+#include "game/entity_handle.h"
 
 #include "game/components/item_component.h"
 #include "game/components/trigger_component.h"
 
 namespace ingredients {
-	void make_always_visible(entity_id e) {
+	void make_always_visible(entity_handle e) {
 		e->get_owner_world().systems.get<render_system>().set_visibility_persistence(e, true);
 	}
 
-	void cancel_always_visible(entity_id e) {
+	void cancel_always_visible(entity_handle e) {
 		e->get_owner_world().systems.get<render_system>().set_visibility_persistence(e, false);
 	}
 
-	components::item& make_item(entity_id e) {
+	components::item& make_item(entity_handle e) {
 		auto& item = *e += components::item();
 
 		e->add<components::trigger>();

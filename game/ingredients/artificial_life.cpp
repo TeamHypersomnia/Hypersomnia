@@ -1,5 +1,5 @@
 #include "ingredients.h"
-#include "game/entity_id.h"
+#include "game/entity_handle.h"
 #include "game/cosmos.h"
 
 #include "game/components/behaviour_tree_component.h"
@@ -9,7 +9,7 @@
 #include "game/enums/filters.h"
 
 namespace ingredients {
-	void standard_pathfinding_capability(entity_id e) {
+	void standard_pathfinding_capability(entity_handle e) {
 		auto& pathfinding = *e += components::pathfinding();
 		auto& visibility = *e += components::visibility();
 
@@ -27,7 +27,7 @@ namespace ingredients {
 		layer.filter = filters::pathfinding_query();
 	}
 
-	void soldier_intelligence(entity_id e) {
+	void soldier_intelligence(entity_handle e) {
 		auto& los = e.get<components::visibility>().line_of_sight_layers[components::visibility::LINE_OF_SIGHT];
 		los.test_sentiences = true;
 		los.test_attitudes = true;

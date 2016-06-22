@@ -1,5 +1,5 @@
 #include "ingredients.h"
-#include "game/entity_id.h"
+#include "game/entity_handle.h"
 #include "game/cosmos.h"
 
 #include "game/components/position_copying_component.h"
@@ -7,7 +7,7 @@
 #include "game/components/input_receiver_component.h"
 
 namespace ingredients {
-	void camera(entity_id e, int w, int h) {
+	void camera(entity_handle e, int w, int h) {
 		components::transform transform;
 		components::input_receiver input;
 		components::camera camera;

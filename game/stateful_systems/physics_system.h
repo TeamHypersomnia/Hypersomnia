@@ -13,9 +13,10 @@ class cosmos;
 class step_state;
 
 class physics_system {
-	cosmos& parent_cosmos;
 
 public:
+	cosmos& parent_cosmos;
+
 	struct raycast_output {
 		vec2 intersection, normal;
 		bool hit = false;

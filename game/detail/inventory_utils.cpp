@@ -95,7 +95,7 @@ inventory_slot_id map_primary_action_to_secondary_hand_if_primary_empty(entity_i
 		return is_action_secondary ? secondary : primary;
 }
 
-item_transfer_result query_transfer_result(messages::item_slot_transfer_request r) {
+item_transfer_result query_transfer_result(const_item_slot_transfer_request r) {
 	item_transfer_result output;
 	auto& predicted_result = output.result;
 
@@ -141,7 +141,7 @@ slot_function detect_compatible_slot(entity_id item, entity_id container_entity)
 	return slot_function::INVALID;
 }
 
-item_transfer_result containment_result(messages::item_slot_transfer_request r, bool allow_replacement) {
+item_transfer_result containment_result(const_item_slot_transfer_request r, bool allow_replacement) {
 	item_transfer_result output;
 	output.transferred_charges = 0;
 	output.result = item_transfer_result_type::NO_SLOT_AVAILABLE;
@@ -199,17 +199,6 @@ item_transfer_result containment_result(messages::item_slot_transfer_request r, 
 	}
 		
 	return output;
-}
-
-
-void for_each_descendant(entity_id item, std::function<void(entity_id item)> f) {
-	f(item);
-
-	if (item.find<components::container>()) {
-		for (auto& s : item.get<components::container>().slots) {
-			item[s.first].for_each_descendant(f);
-		}
-	}
 }
 
 bool can_merge_entities(entity_id a, entity_id b) {
@@ -271,7 +260,7 @@ std::wstring format_space_units(unsigned u) {
 void drop_from_all_slots(entity_id c) {
 	auto& container = c.get<components::container>();
 
-	messages::item_slot_transfer_request request;
+	item_slot_transfer_request request;
 
 	for (auto& s : container.slots) {
 		auto items_uninvalidated = s.second.items_inside;

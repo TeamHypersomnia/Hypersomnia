@@ -1,7 +1,7 @@
 #include "inventory_slot.h"
 #include "inventory_slot_handle.h"
 #include "game/entity_handle.h"
-#include "game/messages/item_slot_transfer_request.h"
+#include "game/detail/item_slot_transfer_request.h"
 #include "game/components/transform_component.h"
 #include "game/components/container_component.h"
 #include "game/components/fixtures_component.h"
@@ -193,7 +193,7 @@ bool basic_inventory_slot_handle<C>::can_contain(entity_id id) const {
 	if (dead())
 		return false;
 
-	messages::item_slot_transfer_request r;
+	item_slot_transfer_request r;
 	r.target_slot = *this;
 	r.item = id;
 

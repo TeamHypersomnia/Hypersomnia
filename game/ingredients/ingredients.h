@@ -1,13 +1,14 @@
 #pragma once
-#include "game/entity_id.h"
+#include "game/entity_handle.h"
 #include "math/vec2.h"
 
 #include "game/assets/texture_id.h"
 #include "game/components/render_component.h"
 
 #include "graphics/pixel.h"
+#include "game/entity_handle.h"
 
-class definition_interface;
+class entity_handle;
 class cosmos;
 
 namespace components {
@@ -17,57 +18,57 @@ namespace components {
 }
 
 namespace ingredients {
-	void camera(definition_interface, int w, int h);
+	void camera(entity_handle, int w, int h);
 
-	components::item& make_item(definition_interface);
+	components::item& make_item(entity_handle);
 	
-	components::sprite& sprite(definition_interface, vec2 pos, assets::texture_id = assets::texture_id::BLANK, augs::rgba col = augs::rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
-	components::sprite& sprite_scalled(definition_interface, vec2 pos, vec2i size, assets::texture_id = assets::texture_id::BLANK, augs::rgba col = augs::rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
+	components::sprite& sprite(entity_handle, vec2 pos, assets::texture_id = assets::texture_id::BLANK, augs::rgba col = augs::rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
+	components::sprite& sprite_scalled(entity_handle, vec2 pos, vec2i size, assets::texture_id = assets::texture_id::BLANK, augs::rgba col = augs::rgba(255, 255, 255, 255), render_layer = render_layer::GROUND);
 	
-	void bullet_round_physics(definition_interface);
-	void see_through_dynamic_body(definition_interface);
-	void standard_dynamic_body(definition_interface);
-	void standard_static_body(definition_interface);
+	void bullet_round_physics(entity_handle);
+	void see_through_dynamic_body(entity_handle);
+	void standard_dynamic_body(entity_handle);
+	void standard_static_body(entity_handle);
 
-	void wsad_character_physics(definition_interface);
-	void wsad_character_legs(definition_interface legs, definition_interface player);
-	void wsad_character(definition_interface, definition_interface crosshair_entity);
-	void wsad_character_corpse(definition_interface);
+	void wsad_character_physics(entity_handle);
+	void wsad_character_legs(entity_handle legs, entity_handle player);
+	void wsad_character(entity_handle, entity_handle crosshair_entity);
+	void wsad_character_corpse(entity_handle);
 
-	void inject_window_input_to_character(definition_interface target_character, definition_interface camera_entity);
+	void inject_window_input_to_character(entity_handle target_character, entity_handle camera_entity);
 
-	void make_always_visible(definition_interface);
-	void cancel_always_visible(definition_interface);
+	void make_always_visible(entity_handle);
+	void cancel_always_visible(entity_handle);
 
-	void character_inventory(definition_interface);
-	void backpack(definition_interface);
+	void character_inventory(entity_handle);
+	void backpack(entity_handle);
 
-	void default_gun_container(definition_interface);
-	void default_gun(definition_interface);
+	void default_gun_container(entity_handle);
+	void default_gun(entity_handle);
 
-	void standard_pathfinding_capability(definition_interface);
-	void soldier_intelligence(definition_interface);
+	void standard_pathfinding_capability(entity_handle);
+	void soldier_intelligence(entity_handle);
 }
 
 namespace prefabs {
-	entity_id create_car(cosmos&, components::transform);
-	entity_id create_motorcycle(cosmos&, components::transform);
+	entity_handle create_car(cosmos&, components::transform);
+	entity_handle create_motorcycle(cosmos&, components::transform);
 
-	entity_id create_sample_magazine(cosmos&, vec2 pos, std::string space = "0.30", entity_id charge_inside = entity_id());
-	entity_id create_sample_suppressor(cosmos& world, vec2 pos);
-	entity_id create_sample_rifle(cosmos&, vec2 pos, entity_id load_mag = entity_id());
-	entity_id create_pistol(cosmos&, vec2 pos, entity_id load_mag = entity_id());
-	entity_id create_submachine(cosmos&, vec2 pos, entity_id load_mag = entity_id());
+	entity_handle create_sample_magazine(cosmos&, vec2 pos, std::string space = "0.30", entity_handle charge_inside = entity_handle());
+	entity_handle create_sample_suppressor(cosmos& world, vec2 pos);
+	entity_handle create_sample_rifle(cosmos&, vec2 pos, entity_handle load_mag = entity_handle());
+	entity_handle create_pistol(cosmos&, vec2 pos, entity_handle load_mag = entity_handle());
+	entity_handle create_submachine(cosmos&, vec2 pos, entity_handle load_mag = entity_handle());
 	
-	entity_id create_pink_charge(cosmos&, vec2 pos, int charges = 23);
-	entity_id create_cyan_charge(cosmos&, vec2 pos, int charges = 30);
-	entity_id create_green_charge(cosmos& world, vec2 pos, int charges = 23);
+	entity_handle create_pink_charge(cosmos&, vec2 pos, int charges = 23);
+	entity_handle create_cyan_charge(cosmos&, vec2 pos, int charges = 30);
+	entity_handle create_green_charge(cosmos& world, vec2 pos, int charges = 23);
 
-	entity_id create_sample_backpack(cosmos&, vec2 pos);
+	entity_handle create_sample_backpack(cosmos&, vec2 pos);
 
-	entity_id create_character_crosshair(cosmos&);
-	entity_id create_character(cosmos&, vec2 pos);
-	entity_id create_crate(cosmos&, vec2 pos, vec2 size);
+	entity_handle create_character_crosshair(cosmos&);
+	entity_handle create_character(cosmos&, vec2 pos);
+	entity_handle create_crate(cosmos&, vec2 pos, vec2 size);
 
-	entity_id create_cyan_urban_machete(cosmos&, vec2 pos);
+	entity_handle create_cyan_urban_machete(cosmos&, vec2 pos);
 }

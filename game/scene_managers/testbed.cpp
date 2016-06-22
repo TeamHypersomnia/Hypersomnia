@@ -14,7 +14,6 @@
 #include "game/systems/visibility_system.h"
 #include "game/systems/pathfinding_system.h"
 #include "game/components/position_copying_component.h"
-#include "game/components/physics_definition_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/item_component.h"
 #include "game/components/name_component.h"
@@ -23,7 +22,7 @@
 #include "game/enums/party_category.h"
 
 #include "game/messages/crosshair_intent_message.h"
-#include "game/messages/item_slot_transfer_request.h"
+#include "game/detail/item_slot_transfer_request.h"
 
 #include "game/detail/inventory_slot.h"
 #include "game/detail/inventory_utils.h"
@@ -40,30 +39,12 @@
 #include "log.h"
 using namespace augs;
 
-namespace scene_builders {
-	void testbed::load_resources() {
-		resource_setups::load_standard_atlas();
-		resource_setups::load_standard_particle_effects();
-		resource_setups::load_standard_behaviour_trees();
-
-		resource_manager.create(assets::shader_id::DEFAULT_VERTEX, L"hypersomnia/shaders/default.vsh", augs::graphics::shader::type::VERTEX);
-		resource_manager.create(assets::shader_id::DEFAULT_FRAGMENT, L"hypersomnia/shaders/default.fsh", augs::graphics::shader::type::FRAGMENT);
-		resource_manager.create(assets::program_id::DEFAULT, assets::shader_id::DEFAULT_VERTEX, assets::shader_id::DEFAULT_FRAGMENT);
-
-		resource_manager.create(assets::shader_id::DEFAULT_HIGHLIGHT_VERTEX, L"hypersomnia/shaders/default_highlight.vsh", augs::graphics::shader::type::VERTEX);
-		resource_manager.create(assets::shader_id::DEFAULT_HIGHLIGHT_FRAGMENT, L"hypersomnia/shaders/default_highlight.fsh", augs::graphics::shader::type::FRAGMENT);
-		resource_manager.create(assets::program_id::DEFAULT_HIGHLIGHT, assets::shader_id::DEFAULT_HIGHLIGHT_VERTEX, assets::shader_id::DEFAULT_HIGHLIGHT_FRAGMENT);
-
-		resource_manager.create(assets::shader_id::CIRCULAR_BARS_VERTEX, L"hypersomnia/shaders/circular_bars.vsh", augs::graphics::shader::type::VERTEX);
-		resource_manager.create(assets::shader_id::CIRCULAR_BARS_FRAGMENT, L"hypersomnia/shaders/circular_bars.fsh", augs::graphics::shader::type::FRAGMENT);
-		resource_manager.create(assets::program_id::CIRCULAR_BARS, assets::shader_id::CIRCULAR_BARS_VERTEX, assets::shader_id::CIRCULAR_BARS_FRAGMENT);
-	}
-
-	void testbed::populate_world_with_entities(cosmos& world) {
+namespace scene_managers {
+	void testbed::populate_world_with_entities(cosmos& world, step_state& step) {
 		auto& window = *window::glwindow::get_current();
 		auto window_rect = window.get_screen_rect();
 
-		world.systems.get<gui_system>().resize(vec2i(window_rect.w, window_rect.h));
+		world.stateful_systems.get<gui_system>().resize(vec2i(window_rect.w, window_rect.h));
 
 		auto crate = prefabs::create_crate(world, vec2(200, 200 + 300), vec2i(100, 100) / 3);
 		auto crate2 = prefabs::create_crate(world, vec2(400, 200 + 400), vec2i(300, 300));
@@ -200,7 +181,7 @@ namespace scene_builders {
 		auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 		prefabs::create_sample_backpack(world, vec2(200, -750));
 
-		messages::item_slot_transfer_request r;
+		item_slot_transfer_request r;
 		r.item = backpack;
 		r.target_slot = characters[0][slot_function::SHOULDER_SLOT];
 

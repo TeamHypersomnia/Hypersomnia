@@ -57,7 +57,7 @@ namespace augs {
 				entry_type entry;
 
 				deserialize(source, entry.step_occurred);
-				entry.internal_data.deserialize(source);
+				deserialize(source, entry.internal_data);
 
 				loaded_recording.emplace_back(entry);
 			}
@@ -65,15 +65,16 @@ namespace augs {
 
 		void biserialize(entry_internal_type& currently_processed_entry) {
 			if (current_player_state == player_state::RECORDING) {
-				entry_type new_entry;
-				new_entry.internal_data = currently_processed_entry;
-				new_entry.step_occurred = player_position;
+				if (!currently_processed_entry.empty()) {
+					entry_type new_entry;
 
-				std::ofstream recording_file(live_saving_filename, std::ios::out | std::ios::binary | std::ios::app);
+					new_entry.internal_data = currently_processed_entry;
+					new_entry.step_occurred = player_position;
 
-				if (new_entry.internal_data.should_serialize()) {
+					std::ofstream recording_file(live_saving_filename, std::ios::out | std::ios::binary | std::ios::app);
+
 					serialize(recording_file, new_entry.step_occurred);
-					new_entry.internal_data.serialize(recording_file);
+					serialize(recording_file, new_entry.internal_data);
 				}
 			}
 			else if (current_player_state == player_state::REPLAYING) {

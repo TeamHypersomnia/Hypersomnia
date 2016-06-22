@@ -1017,10 +1017,13 @@
     <ClInclude Include="augs\misc\recoil_player.h" />
     <ClInclude Include="augs\misc\simulation_timing.h" />
     <ClInclude Include="augs\misc\typesafe_sprintf.h" />
+    <ClInclude Include="augs\serialization.h" />
     <ClInclude Include="augs\templates.h" />
     <ClInclude Include="augs\window_framework\colored_print.h" />
     <ClInclude Include="augs\window_framework\platform_utils.h" />
+    <ClInclude Include="game\components\meta_component.h" />
     <ClInclude Include="game\detail\convex_partitioned_shape.h" />
+    <ClInclude Include="game\entropy_player.h" />
     <ClInclude Include="game\global\all_settings.h" />
     <ClInclude Include="game\global\input_context.h" />
     <ClInclude Include="game\detail\inventory_slot_handle.h" />
@@ -1145,7 +1148,7 @@
     <ClInclude Include="game\messages\gui_intents.h" />
     <ClInclude Include="game\messages\gunshot_response.h" />
     <ClInclude Include="game\messages\health_event.h" />
-    <ClInclude Include="game\messages\item_slot_transfer_request.h" />
+    <ClInclude Include="game\detail\item_slot_transfer_request.h" />
     <ClInclude Include="game\messages\melee_swing_response.h" />
     <ClInclude Include="game\messages\movement_response.h" />
     <ClInclude Include="game\messages\new_entity_message.h" />
@@ -1155,7 +1158,6 @@
     <ClInclude Include="game\messages\intent_message.h" />
     <ClInclude Include="game\messages\message.h" />
     <ClInclude Include="game\messages\create_particle_effect.h" />
-    <ClInclude Include="game\messages\raw_window_input_message.h" />
     <ClInclude Include="game\messages\trigger_hit_confirmation_message.h" />
     <ClInclude Include="game\messages\trigger_hit_request_message.h" />
     <ClInclude Include="game\messages\unmapped_intent_message.h" />

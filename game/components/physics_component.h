@@ -19,11 +19,10 @@ namespace components {
 		rigid_body_black_box black;
 		rigid_body_black_box_detail black_detail;
 
-
 		bool syncable_black_box_exists() const;
 		bool should_body_exist_now() const;
 		
-		entity_id get_entity();
+		entity_handle get_entity();
 
 		void build_body();
 		void destroy_body();

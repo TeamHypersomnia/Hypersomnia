@@ -2,7 +2,6 @@
 #include "game/detail/inventory_slot_id.h"
 #include "game/detail/inventory_slot_handle.h"
 #include "game/components/relations_component.h"
-#include "game/full_entity_definition.h"
 
 #include "game/cosmos.h"
 
@@ -33,11 +32,6 @@ basic_entity_handle<C> basic_entity_handle<C>::operator[](associated_entity_name
 }
 
 template <bool C>
-typename basic_entity_handle<C>::definition_type basic_entity_handle<C>::operator[](sub_definition_name child) const {
-	return relations().sub_definitions_by_name.at(child);
-}
-
-template <bool C>
 void basic_entity_handle<C>::for_each_sub_entity_recursive(std::function<void(basic_entity_handle)> callback) const {
 	{
 		auto& subs = relations().sub_entities;
@@ -60,15 +54,6 @@ void basic_entity_handle<C>::for_each_sub_entity_recursive(std::function<void(ba
 }
 
 template <bool C>
-void basic_entity_handle<C>::for_each_sub_definition(std::function<void(definition_type)> callback) const {
-	auto defs = relations().sub_definitions_by_name;
-
-	for (auto& d : defs) {
-		callback(d.second);
-	}
-}
-
-template <bool C>
 basic_entity_handle<C> basic_entity_handle<C>::get_parent() const {
 	return make_handle(relations().parent);
 }
@@ -76,11 +61,6 @@ basic_entity_handle<C> basic_entity_handle<C>::get_parent() const {
 template <bool C>
 bool basic_entity_handle<C>::has(sub_entity_name n) const {
 	return relations().sub_entities_by_name.find(n) != relations().sub_entities_by_name.end();
-}
-
-template <bool C>
-bool basic_entity_handle<C>::has(sub_definition_name n) const {
-	return relations().sub_definitions_by_name.find(n) != relations().sub_definitions_by_name.end();
 }
 
 template <bool C>
@@ -120,12 +100,6 @@ template <class = typename std::enable_if<!C>::type>
 void basic_entity_handle<C>::map_sub_entity(sub_entity_name n, entity_id p) const {
 	make_child(p, n);
 	relations().sub_entities_by_name[n] = p;
-}
-
-template <bool C>
-template <class = typename std::enable_if<!C>::type>
-void basic_entity_handle<C>::map_sub_definition(sub_definition_name n, const full_entity_definition& p) const {
-	relations().sub_definitions_by_name[n] = p;
 }
 
 template <bool C>

@@ -2651,9 +2651,6 @@
     <ClInclude Include="3rdparty\GL\OpenGL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\messages\raw_window_input_message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\resources\manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2877,9 +2874,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\systems\item_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\messages\item_slot_transfer_request.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\components\animation_component.h">
@@ -3411,6 +3405,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\global\all_settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\components\meta_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\entropy_player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\serialization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\item_slot_transfer_request.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

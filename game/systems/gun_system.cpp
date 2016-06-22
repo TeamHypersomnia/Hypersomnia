@@ -4,7 +4,7 @@
 #include "game/messages/damage_message.h"
 #include "game/messages/queue_destruction.h"
 #include "game/messages/gunshot_response.h"
-#include "game/messages/item_slot_transfer_request.h"
+#include "game/detail/item_slot_transfer_request.h"
 //#include "game/messages/physics_operation.h"
 
 #include "game/components/render_component.h"
@@ -121,7 +121,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(cosmos& cosmos, step_state
 					bool katka = ³ && Atwo;
 					while (charges--) {
 						{
-							auto round_entity = cosmos.create_entity_from_definition(catridge_or_pellet_stack[sub_definition_name::BULLET_ROUND]); //??
+							auto round_entity = cosmos.create_entity_from_definition(catridge_or_pellet_stack[sub_entity_name::BULLET_ROUND]); //??
 							auto& damage = round_entity.get<components::damage>();
 							damage.amount *= gun.damage_multiplier;
 							damage.sender = it;
@@ -138,7 +138,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(cosmos& cosmos, step_state
 							step.messages.post(op);
 						}
 
-						auto shell_definition = catridge_or_pellet_stack[sub_definition_name::BULLET_SHELL];
+						auto shell_definition = catridge_or_pellet_stack[sub_entity_name::BULLET_SHELL];
 
 						if (shell_definition.alive()) {
 							auto shell_entity = cosmos.create_entity_from_definition(shell_definition);
@@ -198,7 +198,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(cosmos& cosmos, step_state
 					}
 
 					if (source_store_for_chamber.size() > 0) {
-						messages::item_slot_transfer_request into_chamber_transfer;
+						item_slot_transfer_request into_chamber_transfer;
 						into_chamber_transfer.item = *source_store_for_chamber.rbegin();
 						into_chamber_transfer.target_slot = chamber_slot;
 						into_chamber_transfer.specified_quantity = 1;

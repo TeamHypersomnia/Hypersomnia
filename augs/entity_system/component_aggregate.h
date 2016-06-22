@@ -20,7 +20,5 @@ namespace augs {
 		auto get_id() const {
 			return std::get<object_pool_id<component>>(component_ids);
 		}
-
-		unsigned long long processing_subject_categories = 0;
 	};
 }

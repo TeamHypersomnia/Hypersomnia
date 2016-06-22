@@ -1,5 +1,5 @@
 #include "ingredients.h"
-#include "game/entity_id.h"
+#include "game/entity_handle.h"
 #include "game/cosmos.h"
 
 #include "game/enums/item_category.h"
@@ -10,7 +10,7 @@
 #include "game/components/gui_element_component.h"
 
 namespace ingredients {
-	void character_inventory(entity_id e) {
+	void character_inventory(entity_handle e) {
 		auto& container = *e += components::container();
 		auto& item_slot_transfers = *e += components::item_slot_transfers();
 		auto& detector = *e += components::trigger_collision_detector();

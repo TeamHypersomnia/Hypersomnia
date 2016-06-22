@@ -9,6 +9,6 @@ namespace messages {
 		inventory_slot_id target_slot;
 		int specified_quantity = -1;
 
-		gui_item_transfer_intent& operator=(const messages::item_slot_transfer_request& b);
+		gui_item_transfer_intent& operator=(const item_slot_transfer_request& b);
 	};
 }

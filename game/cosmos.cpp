@@ -48,8 +48,7 @@ storage_for_all_components_and_aggregates::aggregate_pool_type& cosmos::get_pool
 	return components_and_aggregates.get_pool();
 }
 
-void cosmos::call_rendering_schemata(augs::variable_delta delta, cosmic_profiler& profiler) const {
-	step_state step;
+void cosmos::call_rendering_schemata(augs::variable_delta delta, step_state step) const {
 	const auto& cosm = *this;
 
 	auto& performance = profiler.performance;
@@ -118,8 +117,7 @@ const_inventory_slot_handle cosmos::get_handle(inventory_slot_id id) const {
 	return const_inventory_slot_handle(components_and_aggregates, id);
 }
 
-void cosmos::advance_deterministic_schemata(augs::machine_entropy input, cosmic_profiler& profiler) {
-	step_state step;
+void cosmos::advance_deterministic_schemata(augs::machine_entropy input, step_state step) {
 	auto& cosm = *this;
 	auto& performance = profiler.performance;
 
@@ -131,7 +129,7 @@ void cosmos::advance_deterministic_schemata(augs::machine_entropy input, cosmic_
 	performance.start(meter_type::LOGIC);
 	render_system().set_current_transforms_as_previous_for_interpolation();
 
-	input_system().post_all_events_posted_by_drawing_time_systems_since_last_step();
+	input_system().post_unmapped_intents_from_raw_window_inputs(cosm, step, input);
 	
 	stateful_systems.get<gui_system>().switch_to_gui_mode_and_back();
 
@@ -236,8 +234,7 @@ void cosmos::advance_deterministic_schemata(augs::machine_entropy input, cosmic_
 
 	destroy_system().perform_deletions();
 
-	step.messages.clear_queue<messages::collision_message>(); 
-	
+	step.messages.flush_queues();
 	step.messages.ensure_all_empty();
 
 	++current_step_number;

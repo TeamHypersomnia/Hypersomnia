@@ -12,13 +12,13 @@
 
 #include "game/cosmos.h"
 
-#include "game/messages/item_slot_transfer_request.h"
+#include "game/detail/item_slot_transfer_request.h"
 
 #include "ingredients.h"
 #include "game/detail/inventory_utils.h"
 
 namespace ingredients {
-	void default_gun_container(entity_id e) {
+	void default_gun_container(entity_handle e) {
 		auto& item = make_item(e);
 		auto& container = *e += components::container();
 		item.space_occupied_per_charge = to_space_units("3.5");
@@ -61,7 +61,7 @@ namespace ingredients {
 }
 
 namespace prefabs {
-	entity_id create_sample_magazine(cosmos& world, vec2 pos, std::string space, entity_id charge_inside) {
+	entity_handle create_sample_magazine(cosmos& world, vec2 pos, std::string space, entity_handle charge_inside) {
 		auto sample_magazine = world.create_entity("sample_magazine");
 		name_entity(sample_magazine, entity_name::MAGAZINE);
 
@@ -87,7 +87,7 @@ namespace prefabs {
 			charge_inside = create_cyan_charge(world, vec2(0, 0), 30);
 		}
 
-		messages::item_slot_transfer_request load_charge;
+		item_slot_transfer_request load_charge;
 		load_charge.item = charge_inside;
 		load_charge.target_slot = sample_magazine[slot_function::ITEM_DEPOSIT];
 
@@ -96,7 +96,7 @@ namespace prefabs {
 		return sample_magazine;
 	}
 
-	entity_id create_sample_suppressor(cosmos& world, vec2 pos) {
+	entity_handle create_sample_suppressor(cosmos& world, vec2 pos) {
 		auto sample_suppressor = world.create_entity("sample_suppressor");
 		name_entity(sample_suppressor, entity_name::SUPPRESSOR);
 
@@ -111,7 +111,7 @@ namespace prefabs {
 		return sample_suppressor;
 	}
 
-	entity_id create_pink_charge(cosmos& world, vec2 pos, int charges) {
+	entity_handle create_pink_charge(cosmos& world, vec2 pos, int charges) {
 		auto pink_charge = world.create_entity("pink_charge");
 		auto round_definition = world.create_definition_entity("round_definition");
 		auto shell_definition = world.create_definition_entity("shell_definition");
@@ -157,13 +157,13 @@ namespace prefabs {
 			response.modifier.colorize = pink;
 		}
 
-		pink_charge->map_sub_definition(sub_definition_name::BULLET_ROUND, round_definition);
-		pink_charge->map_sub_definition(sub_definition_name::BULLET_SHELL, shell_definition);
+		pink_charge->map_sub_definition(sub_entity_name::BULLET_ROUND, round_definition);
+		pink_charge->map_sub_definition(sub_entity_name::BULLET_SHELL, shell_definition);
 
 		return pink_charge;
 	}
 
-	entity_id create_cyan_charge(cosmos& world, vec2 pos, int charges) {
+	entity_handle create_cyan_charge(cosmos& world, vec2 pos, int charges) {
 		auto cyan_charge = world.create_entity("cyan_charge");
 		auto round_definition = world.create_definition_entity("round_definition");
 		auto shell_definition = world.create_definition_entity("shell_definition");
@@ -206,13 +206,13 @@ namespace prefabs {
 			response.modifier.colorize = cyan;
 		}
 
-		cyan_charge->map_sub_definition(sub_definition_name::BULLET_ROUND, round_definition);
-		cyan_charge->map_sub_definition(sub_definition_name::BULLET_SHELL, shell_definition);
+		cyan_charge->map_sub_definition(sub_entity_name::BULLET_ROUND, round_definition);
+		cyan_charge->map_sub_definition(sub_entity_name::BULLET_SHELL, shell_definition);
 
 		return cyan_charge;
 	}
 
-	entity_id create_green_charge(cosmos& world, vec2 pos, int charges) {
+	entity_handle create_green_charge(cosmos& world, vec2 pos, int charges) {
 		auto green_charge = world.create_entity("green_charge");
 		auto round_definition = world.create_definition_entity("round_definition");
 		auto shell_definition = world.create_definition_entity("shell_definition");
@@ -258,13 +258,13 @@ namespace prefabs {
 			response.modifier.colorize = green;
 		}
 
-		green_charge->map_sub_definition(sub_definition_name::BULLET_ROUND, round_definition);
-		green_charge->map_sub_definition(sub_definition_name::BULLET_SHELL, shell_definition);
+		green_charge->map_sub_definition(sub_entity_name::BULLET_ROUND, round_definition);
+		green_charge->map_sub_definition(sub_entity_name::BULLET_SHELL, shell_definition);
 
 		return green_charge;
 	}
 
-	entity_id create_sample_rifle(cosmos& world, vec2 pos, entity_id load_mag) {
+	entity_handle create_sample_rifle(cosmos& world, vec2 pos, entity_handle load_mag) {
 		auto weapon = world.create_entity("sample_rifle");
 		name_entity(weapon, entity_name::ASSAULT_RIFLE);
 
@@ -321,7 +321,7 @@ namespace prefabs {
 		};
 
 		if (load_mag.alive()) {
-			messages::item_slot_transfer_request r;
+			item_slot_transfer_request r;
 
 			r.item = load_mag;
 			r.target_slot = weapon[slot_function::GUN_DETACHABLE_MAGAZINE];
@@ -338,7 +338,7 @@ namespace prefabs {
 		return weapon;
 	}
 
-	entity_id create_submachine(cosmos& world, vec2 pos, entity_id load_mag) {
+	entity_handle create_submachine(cosmos& world, vec2 pos, entity_handle load_mag) {
 		auto weapon = world.create_entity("submachine");
 		name_entity(weapon, entity_name::SUBMACHINE);
 
@@ -396,7 +396,7 @@ namespace prefabs {
 		gun.recoil.scale = 30.0/2;
 
 		if (load_mag.alive()) {
-			messages::item_slot_transfer_request r;
+			item_slot_transfer_request r;
 
 			r.item = load_mag;
 			r.target_slot = weapon[slot_function::GUN_DETACHABLE_MAGAZINE];
@@ -413,7 +413,7 @@ namespace prefabs {
 		return weapon;
 	}
 
-	entity_id create_pistol(cosmos& world, vec2 pos, entity_id load_mag) {
+	entity_handle create_pistol(cosmos& world, vec2 pos, entity_handle load_mag) {
 		auto weapon = world.create_entity("pistol");
 		name_entity(weapon, entity_name::PISTOL);
 
@@ -471,7 +471,7 @@ namespace prefabs {
 		gun.recoil.scale = 30.0/2;
 
 		if (load_mag.alive()) {
-			messages::item_slot_transfer_request r;
+			item_slot_transfer_request r;
 
 			r.item = load_mag;
 			r.target_slot = weapon[slot_function::GUN_DETACHABLE_MAGAZINE];

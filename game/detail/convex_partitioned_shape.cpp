@@ -8,6 +8,7 @@
 #include "game/components/sprite_component.h"
 
 #include "game/resources/manager.h"
+#include "game/entity_handle.h"
 
 void convex_partitioned_shape::add_convex_polygon(const std::vector <vec2>& verts) {
 	convex_polys.push_back(verts);
@@ -34,6 +35,13 @@ void convex_partitioned_shape::mult_vertices(vec2 mult) {
 	for (auto& v : debug_original) {
 		v *= mult;
 	}
+}
+
+void convex_partitioned_shape::from_renderable(const_entity_handle handle) {
+	if (handle.has<components::sprite>())
+		from_sprite(handle.get<components::sprite>(), true);
+	if (handle.has<components::polygon>())
+		from_polygon(handle.get<components::polygon>());
 }
 
 void convex_partitioned_shape::from_sprite(const components::sprite& sprite, bool polygonize_sprite) {

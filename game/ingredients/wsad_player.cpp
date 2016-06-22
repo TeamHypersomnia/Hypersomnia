@@ -1,5 +1,5 @@
 #include "ingredients.h"
-#include "game/entity_id.h"
+#include "game/entity_handle.h"
 #include "game/cosmos.h"
 
 #include "game/components/position_copying_component.h"
@@ -26,7 +26,7 @@
 #include "game/enums/party_category.h"
 
 namespace ingredients {
-	void wsad_character_setup_movement(entity_id e) {
+	void wsad_character_setup_movement(entity_handle e) {
 		components::movement& movement = e.get<components::movement>();
 
 		movement.add_animation_receiver(e, false);
@@ -43,7 +43,7 @@ namespace ingredients {
 		movement.enable_braking_damping = true;
 	}
 
-	void wsad_character_physics(entity_id e) {
+	void wsad_character_physics(entity_handle e) {
 		auto& physics_definition = *e += components::physics_definition();
 
 		auto& body = physics_definition.body;
@@ -62,14 +62,14 @@ namespace ingredients {
 		wsad_character_setup_movement(e);
 	}
 
-	void wsad_character_legs(entity_id legs, entity_id player) {
+	void wsad_character_legs(entity_handle legs, entity_handle player) {
 		components::sprite sprite;
 		components::render render;
 		components::animation animation;
 		components::transform transform;
 	}
 
-	void wsad_character(entity_id e, entity_id crosshair_entity) {
+	void wsad_character(entity_handle e, entity_handle crosshair_entity) {
 		auto& sprite = *e += components::sprite();
 		auto& render = *e += components::render();
 		auto& animation = *e += components::animation();
@@ -185,7 +185,7 @@ namespace ingredients {
 		wsad_character_setup_movement(e);
 	}
 
-	void wsad_character_corpse(entity_id e) {
+	void wsad_character_corpse(entity_handle e) {
 		auto& sprite = *e += components::sprite();
 		auto& render = *e += components::render();
 		auto& transform = *e += components::transform();
@@ -206,7 +206,7 @@ namespace ingredients {
 		body.linear_damping = 6.5;
 	}
 
-	void inject_window_input_to_character(entity_id next_character, entity_id camera) {
+	void inject_window_input_to_character(entity_handle next_character, entity_handle camera) {
 		auto previously_controlled_character = camera.get<components::camera>().entity_to_chase;
 
 		if (previously_controlled_character.alive()) {
@@ -241,7 +241,7 @@ namespace ingredients {
 }
 
 namespace prefabs {
-	entity_id create_character(cosmos world, vec2 pos) {
+	entity_handle create_character(cosmos world, vec2 pos) {
 		auto character = world.create_entity("player_unnamed");
 
 		name_entity(character, entity_name::PERSON);
@@ -266,7 +266,7 @@ namespace prefabs {
 		return character;
 	}
 
-	entity_id create_character_crosshair(cosmos world) {
+	entity_handle create_character_crosshair(cosmos world) {
 		auto root = world.create_entity("crosshair");
 		auto recoil = world.create_entity("crosshair_recoil_body");
 		auto zero_target = world.create_entity("zero_target");

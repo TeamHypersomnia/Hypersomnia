@@ -18,14 +18,6 @@ namespace augs {
 		typedef typename transform_types<std::tuple, ::detail::make_vector, Queues...>::type tuple_type;
 		tuple_type queues;
 
-		struct ensure_empty {
-			storage_for_message_queues& q;
-
-			template <class Q>
-			void operator()() {
-				ensure(q.get_queue<Q>().empty());
-			}
-		};
 	public:
 		
 		template <typename T>
@@ -64,7 +56,11 @@ namespace augs {
 		}
 
 		void ensure_all_empty() {
-			for_each_type<Queues...>(ensure_empty(*this));
+			for_each_type<Queues...>([this](auto c) { ensure(get_queue<decltype(c)>().empty()); });
+		}
+
+		void flush_queues() {
+			for_each_type<Queues...>([this](auto c) { clear_queue<decltype(c)>(); } );
 		}
 	};
 }

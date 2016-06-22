@@ -72,7 +72,7 @@ void sentience_system::consume_health_event(messages::health_event h) {
 		if (container)
 			drop_from_all_slots(h.subject);
 
-		auto sub_def = h.subject[sub_definition_name::CORPSE_OF_SENTIENCE];
+		auto sub_def = h.subject[sub_entity_name::CORPSE_OF_SENTIENCE];
 
 		auto corpse = parent_cosmos.create_from_definition(sub_def);
 

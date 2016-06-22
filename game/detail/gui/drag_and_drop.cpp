@@ -2,7 +2,7 @@
 #include "game_gui_root.h"
 #include "slot_button.h"
 #include "item_button.h"
-#include "game/messages/item_slot_transfer_request.h"
+#include "game/detail/item_slot_transfer_request.h"
 #include "game/components/item_component.h"
 #include "game/detail/inventory_utils.h"
 #include "game/entity_id.h"
@@ -33,7 +33,7 @@ drag_and_drop_result game_gui_world::prepare_drag_and_drop_result() {
 
 			out.possible_target_hovered = true;
 
-			messages::item_slot_transfer_request simulated_request;
+			item_slot_transfer_request simulated_request;
 			simulated_request.item = dragged_item->item;
 			simulated_request.specified_quantity = dragged_charges;
 

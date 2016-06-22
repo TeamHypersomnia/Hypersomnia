@@ -16,11 +16,11 @@
 #include "game/entity_handle_declaration.h"
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/global/all_settings.h"
+// #include "game/step_state.h"
 
 class cosmic_profiler;
 
 struct inventory_slot_id;
-
 class cosmos {
 	storage_for_all_components_and_aggregates components_and_aggregates;
 
@@ -31,6 +31,8 @@ public:
 	lists_of_processing_subjects lists_of_processing_subjects;
 	all_settings settings;
 
+	mutable cosmic_profiler profiler;
+
 	unsigned long long current_step_number = 0;
 	double seconds_passed = 0.0;
 
@@ -40,23 +42,42 @@ public:
 
 	void reserve_storage_for_aggregates(size_t);
 
+	entity_handle create_entity(std::string debug_name);
+
 	template<class... configured_components>
-	entity_id create_from_definition(augs::configurable_components<configured_components...> definition, std::string debug_name = std::string()) {
+	entity_handle create_from_definition(augs::configurable_components<configured_components...> definition, std::string debug_name = std::string()) {
 		return substantialize(components_and_aggregates.allocate_configured_components(definition, debug_name));
 	}
 
 	template<class... configured_components>
-	entity_id create_from_components(configured_components... args, std::string debug_name = std::string()) {
+	entity_handle create_from_components(configured_components... args, std::string debug_name = std::string()) {
 		augs::configurable_components<configured_components...> definition;
 		definition.add(args...);
 		return create_from_definition(definition, debug_name);
 	}
 
-	entity_id clone_entity(entity_id);
+	entity_handle clone_entity(entity_id);
 	void delete_entity(entity_id);
 
-	void advance_deterministic_schemata(augs::machine_entropy input, cosmic_profiler&);
-	void call_rendering_schemata(augs::variable_delta delta, cosmic_profiler&) const;
+
+	template<class F>
+	void special_deterministic_step(augs::machine_entropy input, F pred) {
+		step_state step;
+		pred(*this, step);
+
+		advance_deterministic_schemata(input, step);
+	}
+
+	template<class F>
+	void special_rendering_step(augs::machine_entropy input, F pred) {
+		step_state step;
+		pred(*this, step);
+
+		advance_deterministic_schemata(input, step);
+	}
+
+	void advance_deterministic_schemata(augs::machine_entropy input, step_state initial_step_state = step_state());
+	void call_rendering_schemata(augs::variable_delta delta, step_state initial_step_state = step_state()) const;
 
 	entity_handle get_handle(entity_id);
 	const_entity_handle get_handle(entity_id) const;

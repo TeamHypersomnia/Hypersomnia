@@ -4,13 +4,11 @@
 #include "game/entity_id.h"
 #include "game/types_specification/full_entity_definition_declaration.h"
 
-#include "game/enums/sub_definition_name.h"
 #include "game/enums/sub_entity_name.h"
 #include "game/enums/associated_entity_name.h"
 
 namespace components {
 	struct relations {
-		std::unordered_map<sub_definition_name, full_entity_definition> sub_definitions_by_name;
 		std::unordered_map<sub_entity_name, entity_id> sub_entities_by_name;
 		std::unordered_map<associated_entity_name, entity_id> associated_entities_by_name;
 

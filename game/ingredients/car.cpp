@@ -1,12 +1,12 @@
 #include "ingredients.h"
-#include "game/entity_id.h"
+#include "game/entity_handle.h"
 #include "game/cosmos.h"
 
 #include "game/definition_interface.h"
 #include "game/enums/filters.h"
 
 namespace prefabs {
-	entity_id create_car(cosmos world, components::transform spawn_transform) {
+	entity_handle create_car(cosmos world, components::transform spawn_transform) {
 		full_entity_definition front;
 		full_entity_definition interior;
 		full_entity_definition left_wheel;

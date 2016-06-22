@@ -14,14 +14,12 @@ namespace messages {
 	struct collision_message;
 	struct create_particle_effect;
 	struct gunshot_response;
-	struct raw_window_input_message;
 	struct unmapped_intent_message;
 	struct crosshair_intent_message;
 	struct trigger_hit_confirmation_message;
 	struct trigger_hit_request_message;
 	struct new_entity_message;
 	struct camera_render_request_message;
-	struct item_slot_transfer_request;
 	struct gui_item_transfer_intent;
 	struct melee_swing_response;
 	struct health_event;
@@ -37,14 +35,12 @@ typedef augs::storage_for_message_queues <
 	messages::collision_message,
 	messages::create_particle_effect,
 	messages::gunshot_response,
-	messages::raw_window_input_message,
 	messages::unmapped_intent_message,
 	messages::crosshair_intent_message,
 	messages::trigger_hit_confirmation_message,
 	messages::trigger_hit_request_message,
 	messages::new_entity_message,
 	messages::camera_render_request_message,
-	messages::item_slot_transfer_request,
 	messages::gui_item_transfer_intent,
 	messages::melee_swing_response,
 	messages::health_event

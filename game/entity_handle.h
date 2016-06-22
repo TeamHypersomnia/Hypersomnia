@@ -5,9 +5,9 @@
 #include "game/enums/slot_function.h"
 #include "game/enums/associated_entity_name.h"
 #include "game/enums/sub_entity_name.h"
-#include "game/enums/sub_definition_name.h"
+#include "game/enums/sub_entity_name.h"
 
-#include "game/enums/sub_definition_name.h"
+#include "game/enums/sub_entity_name.h"
 #include "game/enums/processing_subjects.h"
 
 #include "game/types_specification/full_entity_definition_declaration.h"
@@ -30,7 +30,6 @@ using basic_entity_handle_base = augs::basic_aggregate_handle<is_const, cosmos, 
 template <bool is_const>
 class basic_entity_handle : public basic_entity_handle_base<is_const> {
 	typedef typename std::conditional<is_const, const components::relations&, components::relations&>::type relations_type;
-	typedef typename std::conditional<is_const, const full_entity_definition&, full_entity_definition&>::type definition_type;
 	typedef typename basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
 
 	relations_type relations() const;
@@ -49,13 +48,10 @@ public:
 	inventory_slot_handle_type operator[](slot_function) const;
 	basic_entity_handle operator[](sub_entity_name) const;
 	basic_entity_handle operator[](associated_entity_name) const;
-	definition_type operator[](sub_definition_name) const;
 
 	void for_each_sub_entity_recursive(std::function<void(basic_entity_handle)>) const;
-	void for_each_sub_definition(std::function<void(definition_type)>) const;
 
 	bool has(sub_entity_name) const;
-	bool has(sub_definition_name) const;
 	bool has(associated_entity_name) const;
 	bool has(slot_function) const;
 
@@ -64,9 +60,6 @@ public:
 
 	template <class = typename std::enable_if<!is_const>::type>
 	void map_sub_entity(sub_entity_name n, entity_id p) const;
-
-	template <class = typename std::enable_if<!is_const>::type>
-	void map_sub_definition(sub_definition_name n, const full_entity_definition& p) const;
 
 	template <class component>
 	bool has() const {

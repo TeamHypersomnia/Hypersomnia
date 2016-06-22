@@ -21,7 +21,7 @@
 
 using namespace augs;
 
-namespace scene_builders {
+namespace scene_managers {
 	void one_entity::load_resources() {
 		resource_manager.create(assets::texture_id::TEST_CROSSHAIR, std::wstring(L"hypersomnia/gfx/crosshair.png"));
 		resource_manager.create(assets::texture_id::TEST_PLAYER, L"hypersomnia/gfx/walk_1.png");

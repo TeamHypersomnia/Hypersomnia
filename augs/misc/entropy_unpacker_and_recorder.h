@@ -6,25 +6,11 @@
 namespace augs {
 	template <class event_type>
 	struct entropy_unpacker_and_recorder {
-		//struct events_per_step {
-		//	;
-		//
-		//	void serialize(std::ofstream& f) {
-		//		serialize_vector(f, events);
-		//	}
-		//
-		//	bool should_serialize() {
-		//		return !events.empty();
-		//	}
-		//
-		//	void deserialize(std::ifstream& f) {
-		//		deserialize_vector(f, events);
-		//	}
-		//};
-
+		typedef std::vector<event_type> events_per_step;
+		
 		step_player<events_per_step> player;
 
-		std::vector<event_type> buffered_inputs_for_next_step;
+		events_per_step buffered_inputs_for_next_step;
 		events_per_step inputs_from_last_drawing_time;
 
 		void buffer_new_events_before_step(std::vector<event_type> events) {

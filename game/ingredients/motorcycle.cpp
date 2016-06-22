@@ -1,5 +1,5 @@
 #include "ingredients.h"
-#include "game/entity_id.h"
+#include "game/entity_handle.h"
 #include "game/cosmos.h"
 
 #include "game/components/position_copying_component.h"
@@ -18,7 +18,7 @@
 #include "game/enums/filters.h"
 
 namespace prefabs {
-	entity_id create_motorcycle(cosmos world, components::transform spawn_transform) {
+	entity_handle create_motorcycle(cosmos world, components::transform spawn_transform) {
 		auto front = world.create_entity("front");
 		auto interior = world.create_entity("interior");
 		auto left_wheel = world.create_entity("left_wheel");

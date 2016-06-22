@@ -33,37 +33,6 @@ void remove_element(std::vector<T>& v, const T& l) {
 	v.erase(std::remove(v.begin(), v.end(), l), v.end());
 }
 
-template <typename T>
-void serialize(std::ofstream& f, const T& t) {
-	f.write((const char*)&t, sizeof(T));
-}
-
-template <typename T>
-void deserialize(std::ifstream& f, T& t) {
-	f.read((char*)&t, sizeof(T));
-}
-
-template <typename T>
-void serialize_vector(std::ofstream& f, const std::vector<T>& t) {
-	size_t size = t.size();
-	f.write((const char*)&size, sizeof(size));
-
-	for (size_t i = 0; i < size; ++i)
-		f.write((const char*)&t[i], sizeof(T));
-}
-
-template <typename T>
-void deserialize_vector(std::ifstream& f, std::vector<T>& t) {
-	size_t size = 0;
-	f.read((char*)&size, sizeof(size));
-
-	for (size_t i = 0; i < size; ++i) {
-		T obj;
-		f.read((char*)&obj, sizeof(T));
-		t.emplace_back(obj);
-	}
-}
-
 /* number to string conversion */
 
 template <class T>

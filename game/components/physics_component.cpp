@@ -9,6 +9,7 @@
 #include "game/cosmos.h"
 #include "game/stateful_systems/physics_system.h"
 #include "ensure.h"
+#include "game/entity_handle.h"
 
 namespace components {
 	physics& physics::operator=(const physics& p) {
@@ -33,8 +34,8 @@ namespace components {
 			build_body();
 	}
 
-	entity_id physics::get_entity() {
-		return black_detail.body_owner;
+	entity_handle physics::get_entity() {
+		return black_detail.parent_system->parent_cosmos.get_handle(black_detail.body_owner);
 	}
 
 	void physics::build_body() {

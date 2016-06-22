@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "math/vec2.h"
+#include "game/entity_handle_declaration.h"
 
 namespace components {
 	struct transform;
@@ -29,6 +30,7 @@ public:
 	void add_convex_polygon(const std::vector<vec2>&);
 	void add_concave_polygon(const std::vector<vec2>&);
 
+	void from_renderable(const_entity_handle);
 	void from_sprite(const components::sprite&, bool polygonize);
 	void from_polygon(const components::polygon&);
 };

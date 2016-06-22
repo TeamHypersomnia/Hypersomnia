@@ -88,8 +88,8 @@ std::wstring describe_properties(const_entity_handle id) {
 
 	std::wstring out;
 
-	if (id.has(sub_definition_name::BULLET_ROUND)) {
-		out = result.str() + describe_properties(id[sub_definition_name::BULLET_ROUND]);
+	if (id.has(sub_entity_name::BULLET_ROUND)) {
+		out = result.str() + describe_properties(id[sub_entity_name::BULLET_ROUND]);
 		return out;
 	}
 	else {

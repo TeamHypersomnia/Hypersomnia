@@ -1,9 +1,9 @@
 #pragma once
-#include "scene_builder.h"
+#include "scene_manager.h"
 #include "game/entity_id.h"
 
-namespace scene_builders {
-	struct one_entity : public scene_builder {
+namespace scene_managers {
+	struct one_entity : public scene_manager {
 		void load_resources() override;
 		void populate_world_with_entities(cosmos world) override;
 		void perform_logic_step(cosmos world) override;

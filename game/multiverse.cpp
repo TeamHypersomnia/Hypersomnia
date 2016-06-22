@@ -6,13 +6,14 @@
 #include "scripting/script.h"
 
 #include "game/bindings/bind_game_and_augs.h"
-#include "game/messages/raw_window_input_message.h"
 #include "game/messages/camera_render_request_message.h"
 
 #include "game/systems/input_system.h"
 #include "game/systems/render_system.h"
 #include "game/stateful_systems/gui_system.h"
 #include "game/resources/manager.h"
+
+#include "game/scene_managers/resource_setups/all.h"
 
 #include <luabind/luabind.hpp>
 
@@ -54,16 +55,30 @@ void multiverse::call_window_script(std::string filename) {
 	game_window.gl.initialize();
 }
 
-void multiverse::set_scene_builder(std::unique_ptr<scene_builder> builder) {
-	current_scene_builder = std::move(builder);
+void multiverse::load_resources() {
+	resource_setups::load_standard_atlas();
+	resource_setups::load_standard_particle_effects();
+	resource_setups::load_standard_behaviour_trees();
+
+	resource_manager.create(assets::shader_id::DEFAULT_VERTEX, L"hypersomnia/shaders/default.vsh", augs::graphics::shader::type::VERTEX);
+	resource_manager.create(assets::shader_id::DEFAULT_FRAGMENT, L"hypersomnia/shaders/default.fsh", augs::graphics::shader::type::FRAGMENT);
+	resource_manager.create(assets::program_id::DEFAULT, assets::shader_id::DEFAULT_VERTEX, assets::shader_id::DEFAULT_FRAGMENT);
+
+	resource_manager.create(assets::shader_id::DEFAULT_HIGHLIGHT_VERTEX, L"hypersomnia/shaders/default_highlight.vsh", augs::graphics::shader::type::VERTEX);
+	resource_manager.create(assets::shader_id::DEFAULT_HIGHLIGHT_FRAGMENT, L"hypersomnia/shaders/default_highlight.fsh", augs::graphics::shader::type::FRAGMENT);
+	resource_manager.create(assets::program_id::DEFAULT_HIGHLIGHT, assets::shader_id::DEFAULT_HIGHLIGHT_VERTEX, assets::shader_id::DEFAULT_HIGHLIGHT_FRAGMENT);
+
+	resource_manager.create(assets::shader_id::CIRCULAR_BARS_VERTEX, L"hypersomnia/shaders/circular_bars.vsh", augs::graphics::shader::type::VERTEX);
+	resource_manager.create(assets::shader_id::CIRCULAR_BARS_FRAGMENT, L"hypersomnia/shaders/circular_bars.fsh", augs::graphics::shader::type::FRAGMENT);
+	resource_manager.create(assets::program_id::CIRCULAR_BARS, assets::shader_id::CIRCULAR_BARS_VERTEX, assets::shader_id::CIRCULAR_BARS_FRAGMENT);
 }
 
 void multiverse::build_scene() {
 	resource_manager.destroy_everything();
-	current_scene_builder->load_resources();
+	current_scene_manager->load_resources();
 	
 	main_cosmos.delete_all_entities();
-	current_scene_builder->populate_world_with_entities(main_cosmos);
+	current_scene_manager->populate_world_with_entities(main_cosmos);
 	
 	clear_window_inputs_once = true;
 }
@@ -150,7 +165,7 @@ void multiverse::main_game_loop() {
 			renderer::get_current().clear_logic_lines();
 
 			main_cosmos.perform_logic_step();
-			current_scene_builder->perform_logic_step(main_cosmos);
+			current_scene_manager->perform_logic_step(main_cosmos);
 		}
 
 		main_cosmos.fps_counter.end_measurement();
@@ -165,10 +180,10 @@ void multiverse::consume_camera_render_requests() {
 
 	for (auto& r : requests) {
 		target.set_viewport(r.state.viewport);
-		current_scene_builder->execute_drawcalls_for_camera(r);
+		current_scene_manager->execute_drawcalls_for_camera(r);
 	}
 
-	current_scene_builder->drawcalls_after_all_cameras(main_cosmos);
+	current_scene_manager->drawcalls_after_all_cameras(main_cosmos);
 	
 	main_cosmos.triangles.measure(target.triangles_drawn_total);
 	target.triangles_drawn_total = 0;
