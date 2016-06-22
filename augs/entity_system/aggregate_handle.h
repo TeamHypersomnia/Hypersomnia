@@ -54,6 +54,25 @@ namespace augs {
 			});
 		}
 
+		template<class component,
+			class = typename std::enable_if<!is_const>::type>
+			component& add(const component& c) {
+			get().writable_id<component>() = owner.get_component_pool<component>().allocate_component(c);
+		}
+
+		template<class component,
+			class = typename std::enable_if<!is_const>::type>
+		component& operator+=(const component& c) {
+			return add(c);
+		}
+
+		template<class component>
+		typename std::enable_if<!is_const, component&>::type 
+			set(const component& c = component()) {
+			get<component>() = c;
+			return get<component>();
+		}
+
 		const configurable_components<components...>& get_definition() const {
 			configurable_components<components...> result;
 

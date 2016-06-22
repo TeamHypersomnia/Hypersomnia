@@ -50,7 +50,7 @@ namespace augs {
 		}
 
 		template<typename... Args>
-		id_type allocate(Args... args) {
+		handle_type allocate(Args... args) {
 			if (free_indirectors.empty())
 				throw std::runtime_error("Pool is full!");
 
@@ -71,7 +71,7 @@ namespace augs {
 			slots.push_back(new_slot);
 			pool.emplace_back(args...);
 
-			return allocated_id;
+			return get_handle(allocated_id);
 		}
 
 		bool free(id_type object) {

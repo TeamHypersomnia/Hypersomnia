@@ -14,12 +14,8 @@ namespace augs {
 		typedef component_aggregate<components...> aggregate_type;
 		typedef object_pool_id<aggregate_type> aggregate_id;
 
-		//template <bool is_const, class owner_type, class... components>
-		//friend class basic_aggregate_handle;
-
 		typedef basic_aggregate_handle<false, handle_owner_type, std::tuple<components...>> aggregate_handle;
 		typedef basic_aggregate_handle<true, handle_owner_type, std::tuple<components...>> const_aggregate_handle;
-
 
 	public:
 		typedef object_pool<aggregate_type> aggregate_pool_type;
@@ -66,40 +62,27 @@ namespace augs {
 			for_each_type<components...>(r);
 		}
 
-		template<class... configured_components>
-		aggregate_id allocate_configured_components(const configurable_components<configured_components...>& configuration, std::string debug_name = std::string()) {
-			aggregate_type aggregate;
-
-			for_each_type<configured_components...>([this, &configuration, &aggregate](auto c) {
-				if (configuration.is_set<decltype(c)>()) {
-					aggregate.writable_id<decltype(c)>() = allocate_component<decltype(c)>(configuration.get<decltype(c)>());
-				}
-			});
-
-			auto new_id = pool_for_aggregates.allocate(aggregate);
+		aggregate_handle allocate_aggregate(std::string debug_name = std::string()) {
+			auto new_id = pool_for_aggregates.allocate();
 			new_id.set_debug_name(debug_name);
 
 			return new_id;
 		}
 
-		aggregate_id clone_aggregate(const_aggregate_handle aggregate) {
+		aggregate_handle clone_aggregate(const_aggregate_handle const_aggregate) {
 			auto new_aggregate_id = pool_for_aggregates.allocate();
-			auto& new_aggregate = pool_for_aggregates.get(new_aggregate_id);
 
-			auto& from_handle = get_handle(aggregate_id);
-			auto& to = new_aggregate;
+			auto& from_handle = const_aggregate;
+			auto& to_handle = new_aggregate;
 
-			auto& aggregate = pool_for_aggregates.get(aggregate_id);
-			to.removed_from_processing_subjects = aggregate.removed_from_processing_subjects;
-
-			for_each_type<components...>([this, &from_handle, &to](auto c) {
+			for_each_type<components...>([&from_handle, &to_handle](auto c) {
 				auto* maybe_component = from_handle.find<decltype(c)>();
 
 				if (maybe_component)
-					to.writable_id<decltype(c)>() = allocate_component<decltype(c)>(*maybe_component);
+					to += *maybe_component;
 			});
 
-			new_aggregate_id.set_debug_name(aggregate_id.get_debug_name());
+			new_aggregate_id.set_debug_name(const_aggregate.get_debug_name());
 
 			return new_aggregate_id;
 		}

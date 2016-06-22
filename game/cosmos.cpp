@@ -248,27 +248,31 @@ cosmos::cosmos() {
 	stateful_systems.create<physics_system>(std::ref(*this));
 }
 
-entity_id cosmos::substantialize(entity_id new_id) {
-	lists_of_processing_subjects.add_entity_to_matching_lists(new_id);
-
-	//messages::new_entity_message notification;
-	//notification.subject = new_id;
-	//messages.post(notification);
-
-	return new_id;
+void cosmos::construct_entity(entity_id new_id) {
+	// lists_of_processing_subjects.add_entity_to_matching_lists(get_handle(new_id));
 }
 
 void cosmos::reserve_storage_for_aggregates(size_t n) {
 	components_and_aggregates.reserve_storage_for_aggregates(n);
 }
 
-entity_id cosmos::clone_entity(entity_id e) {
-	return substantialize(components_and_aggregates.clone_aggregate(e));
+entity_handle cosmos::create_entity(std::string debug_name) {
+	return components_and_aggregates.allocate_aggregate(debug_name);
+}
+
+entity_handle cosmos::clone_entity(entity_id e) {
+	return components_and_aggregates.clone_aggregate(e);
+}
+
+entity_handle cosmos::clone_and_construct_entity(entity_id e) {
+	auto cloned = components_and_aggregates.clone_aggregate(get_handle(e));
+	construct_entity(cloned);
+	return cloned;
 }
 
 void cosmos::delete_entity(entity_id e) {
-	ensure(e.alive());
-	lists_of_processing_subjects.remove_entity_from_lists(e);
+	ensure(get_handle(e).alive());
+	lists_of_processing_subjects.remove_entity_from_lists(get_handle(e));
 	components_and_aggregates.free_aggregate(e);
 }
 
