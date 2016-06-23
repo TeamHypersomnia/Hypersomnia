@@ -24,8 +24,6 @@ class basic_inventory_slot_handle {
 	typedef typename std::conditional<is_const, const inventory_slot*, inventory_slot*>::type slot_pointer;
 
 	entity_handle_type get_handle() const;
-	entity_handle_type make_handle(entity_id) const;
-	basic_inventory_slot_handle make_handle(inventory_slot_id) const;
 public:
 	basic_inventory_slot_handle(owner_reference, inventory_slot_id);
 	
@@ -33,6 +31,8 @@ public:
 	inventory_slot_id raw_id;
 
 	void unset();
+	entity_handle_type make_handle(entity_id) const;
+	basic_inventory_slot_handle make_handle(inventory_slot_id) const;
 
 	void for_each_descendant(std::function<void(entity_handle_type item)>) const;
 
@@ -45,6 +45,7 @@ public:
 	bool can_contain(entity_id) const;
 
 	entity_handle_type try_get_item() const;
+	entity_handle_type get_container() const;
 	entity_handle_type get_root_container() const;
 
 	bool has_items() const;

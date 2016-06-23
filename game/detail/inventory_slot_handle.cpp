@@ -161,6 +161,11 @@ typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot
 }
 
 template <bool C>
+typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot_handle<C>::get_container() const {
+	return make_handle(raw_id.container_entity);
+}
+
+template <bool C>
 unsigned basic_inventory_slot_handle<C>::calculate_free_space_with_parent_containers() const {
 	auto maximum_space = (*this)->calculate_free_space_with_children();
 

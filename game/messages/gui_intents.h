@@ -3,7 +3,6 @@
 #include "game/detail/inventory_slot_id.h"
 
 namespace messages {
-	struct item_slot_transfer_request;
 	struct gui_item_transfer_intent {
 		entity_id item;
 		inventory_slot_id target_slot;

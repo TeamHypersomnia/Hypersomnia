@@ -217,10 +217,10 @@ void item_system::perform_transfer(item_slot_transfer_request r, step_state& ste
 		bool whole_item_grabbed = item.charges == result.transferred_charges;
 
 		if (previous_slot.alive()) {
-			previous_container_transform = previous_slot.container_entity.get<components::transform>();
+			previous_container_transform = previous_slot.get_container().get<components::transform>();
 
 			if (whole_item_grabbed)
-				remove_item(cosmos.get_handle(r.item), cosmos.get_handle(previous_slot));
+				remove_item(previous_slot, r.item);
 
 			if (previous_slot.is_input_enabling_slot()) {
 				unset_input_flags_of_orphaned_entity(r.item);
@@ -246,23 +246,19 @@ void item_system::perform_transfer(item_slot_transfer_request r, step_state& ste
 		else {
 			new_charge_stack = cosmos.clone_entity(r.item);
 			item.charges -= result.transferred_charges;
-			cosmos.get_handle(new_charge_stack).get<components::item>().charges = result.transferred_charges;
+			(cosmos >> new_charge_stack).get<components::item>().charges = result.transferred_charges;
 
 			grabbed_item_part = new_charge_stack;
 		}
 
 		if (is_pickup_or_transfer)
-			add_item(cosmos.get_handle(grabbed_item_part), cosmos.get_handle(r.target_slot));
+			add_item(r.target_slot, cosmos.get_handle(grabbed_item_part)); 
 
-		for_each_descendant(grabbed_item_part, [this, previous_container_transform, new_charge_stack](entity_id descendant) {
-			auto parent_slot = descendant.get<components::item>().current_slot;
-			auto current_def = descendant.get<components::physics_definition>();
+		for_each_descendant(cosmos.get_handle(grabbed_item_part), [this, previous_container_transform, new_charge_stack](entity_handle descendant) {
+			auto& cosmos = descendant.get_cosmos();
 
-			messages::rebuild_physics_message rebuild;
-			rebuild.subject = descendant;
-
-			auto& def = rebuild.new_definition;
-			def = current_def;
+			auto parent_slot = cosmos >> descendant.get<components::item>().current_slot;
+			auto current_def = descendant.get<components::fixtures>();
 
 			if (parent_slot.alive()) {
 				def.create_fixtures_and_body = parent_slot.should_item_inside_keep_physical_body();

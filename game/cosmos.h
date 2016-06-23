@@ -73,6 +73,11 @@ public:
 	inventory_slot_handle get_handle(inventory_slot_id);
 	const_inventory_slot_handle get_handle(inventory_slot_id) const;
 
+	template<class T>
+	decltype(auto) operator >> (T id) {
+		return get_handle(id);
+	}
+
 	bool is_in(entity_id, processing_subjects) const;
 
 	std::vector<entity_handle> get(processing_subjects);
