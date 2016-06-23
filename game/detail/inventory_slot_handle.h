@@ -27,6 +27,10 @@ class basic_inventory_slot_handle {
 public:
 	basic_inventory_slot_handle(owner_reference, inventory_slot_id);
 	
+	std::vector<entity_handle_type> get_mounted_items() const;
+
+	owner_reference get_cosmos() const;
+
 	owner_reference owner;
 	inventory_slot_id raw_id;
 
@@ -55,6 +59,7 @@ public:
 	bool is_input_enabling_slot() const;
 
 	float calculate_density_multiplier_due_to_being_attached() const;
+	unsigned calculate_free_space_with_children() const;
 
 	components::transform sum_attachment_offsets_of_parents(entity_id attached_item) const;
 

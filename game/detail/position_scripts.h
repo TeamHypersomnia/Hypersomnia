@@ -12,3 +12,5 @@ vec2 velocity(const_entity_handle);
 float speed(const_entity_handle);
 float distance(const_entity_handle from, const_entity_handle to);
 float distance_sq(const_entity_handle from, const_entity_handle to);
+
+void set_velocity(entity_handle, vec2);

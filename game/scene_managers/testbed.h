@@ -17,7 +17,10 @@ namespace scene_managers {
 		bool keep_drawing = false;
 
 		void populate_world_with_entities(cosmos&, step_state&);
-		void perform_logic_step(cosmos&, step_state&);
+		
+		void pre_solve(cosmos&, step_state&);
+		void post_solve(cosmos&, const step_state&);
+
 		void drawcalls_after_all_cameras(cosmos&, step_state&);
 
 		void execute_drawcalls_for_camera(messages::camera_render_request_message);

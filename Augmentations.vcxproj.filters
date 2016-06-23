@@ -1269,6 +1269,12 @@
     <ClCompile Include="game\scene_managers\testbed.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\game_window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\misc\machine_entropy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3396,6 +3402,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\scene_managers\testbed.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\game_window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

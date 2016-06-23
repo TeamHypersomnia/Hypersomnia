@@ -70,7 +70,8 @@ public:
 	template <class = typename std::enable_if<!is_const>::type>
 	operator basic_entity_handle<true>();
 
-	bool operator==(entity_id b);
+	bool operator==(entity_id b) const;
+	bool operator!=(entity_id b) const;
 
 	operator entity_id() const;
 

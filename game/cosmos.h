@@ -19,8 +19,6 @@
 #include "game/cosmic_profiler.h"
 #include "game/step_state.h"
 
-class cosmic_profiler;
-
 struct inventory_slot_id;
 class cosmos {
 	storage_for_all_components_and_aggregates components_and_aggregates;
@@ -49,24 +47,8 @@ public:
 	
 	void delete_entity(entity_id);
 
-	template<class F>
-	void special_deterministic_step(augs::machine_entropy input, F pred) {
-		step_state step;
-		pred(*this, step);
-
-		advance_deterministic_schemata(input, step);
-	}
-
-	template<class F>
-	void special_rendering_step(augs::variable_delta delta, F pred) {
-		step_state step;
-		pred(*this, step);
-
-		call_rendering_schemata(delta, step);
-	}
-
-	void advance_deterministic_schemata(augs::machine_entropy input, step_state initial_step_state = step_state());
-	void call_rendering_schemata(augs::variable_delta delta, step_state initial_step_state = step_state()) const;
+	void advance_deterministic_schemata(augs::machine_entropy input, step_state& initial_step_state);
+	void call_rendering_schemata(augs::variable_delta delta, step_state& initial_step_state) const;
 
 	entity_handle get_handle(entity_id);
 	const_entity_handle get_handle(entity_id) const;
@@ -74,9 +56,31 @@ public:
 	const_inventory_slot_handle get_handle(inventory_slot_id) const;
 
 	template<class T>
-	decltype(auto) operator >> (T id) {
+	decltype(auto) to_handle_vector(std::vector<T> vec) {
+		std::vector<decltype(get_handle())> handles;
+		
+		for (auto v : vec)
+			handles.emplace_back(get_handle(v));
+		
+		return std::move(handles);
+	}
+
+	entity_handle dead_entity_handle();
+	const_entity_handle dead_entity_handle() const;
+	inventory_slot_handle dead_inventory_handle();
+	const_inventory_slot_handle dead_inventory_handle() const;
+
+	template<class T>
+	decltype(auto) operator [](T id) {
 		return get_handle(id);
 	}
+
+	template<class T>
+	decltype(auto) operator [](T id) const {
+		return get_handle(id);
+	}
+	
+	randomization get_rng_for(entity_id) const;
 
 	bool is_in(entity_id, processing_subjects) const;
 

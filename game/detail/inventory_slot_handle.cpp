@@ -18,6 +18,11 @@ basic_inventory_slot_handle<C>::basic_inventory_slot_handle(owner_reference owne
 }
 
 template <bool C>
+typename basic_inventory_slot_handle<C>::owner_reference basic_inventory_slot_handle<C>::get_cosmos() const {
+	return owner;
+}
+
+template <bool C>
 typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot_handle<C>::get_handle() const {
 	return make_handle(raw_id.container_entity);
 }
@@ -213,6 +218,37 @@ inventory_slot_id basic_inventory_slot_handle<C>::get_id() const {
 template <bool C>
 basic_inventory_slot_handle<C>::operator inventory_slot_id() const {
 	return get_id();
+}
+
+template <bool C>
+std::vector<typename basic_inventory_slot_handle<C>::entity_handle_type> basic_inventory_slot_handle<C>::get_mounted_items() const {
+	// TODO: actually implement mounted items
+	return get_cosmos().to_handle_vector(items_inside);
+
+	//for (auto& i : items_inside) {
+	//	auto handle = cosmos.get_handle(i);
+	//
+	//	if (handle.get<components::item>().is_mounted())
+	//		output.push_back(i);
+	//}
+	//
+	//return output;
+}
+
+template <bool C>
+unsigned basic_inventory_slot_handle<C>::calculate_free_space_with_children() const {
+	if (has_unlimited_space())
+		return 1000000 * SPACE_ATOMS_PER_UNIT;
+
+	unsigned space = space_available;
+
+	for (auto& e : items_inside) {
+		auto occupied = calculate_space_occupied_with_children(make_handle(e));
+		ensure(occupied <= space);
+		space -= occupied;
+	}
+
+	return space;
 }
 
 template class basic_inventory_slot_handle<true>;

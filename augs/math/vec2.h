@@ -157,7 +157,7 @@ namespace augs {
 
 		template <class t, class gen>
 		static vec2t random_on_circle(t radius, gen& g) {
-			return vec2t().set_from_degrees(randval(0.f, 360.f, g)) * radius;
+			return vec2t().set_from_degrees(g.randval(0.f, 360.f)) * radius;
 		}
 
 		static bool segment_in_segment(vec2t smaller_p1, vec2t smaller_p2, vec2t bigger_p1, vec2t bigger_p2,

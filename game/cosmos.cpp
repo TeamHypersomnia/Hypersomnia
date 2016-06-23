@@ -63,6 +63,10 @@ std::vector<const_entity_handle> cosmos::get(processing_subjects list) const {
 	return lists_of_processing_subjects.get(list, *this);
 }
 
+randomization cosmos::get_rng_for(entity_id id) const {
+	return{ id.version + id.indirection_index + current_step_number };
+}
+
 bool cosmos::is_in(entity_id id, processing_subjects list) const {
 	return lists_of_processing_subjects.is_in(id, list);
 }
@@ -116,9 +120,13 @@ size_t cosmos::entities_count() const {
 	return components_and_aggregates.aggregates_count();
 }
 
-void cosmos::advance_deterministic_schemata(augs::machine_entropy input, step_state step) {
+void cosmos::advance_deterministic_schemata(augs::machine_entropy input, step_state& step) {
 	auto& cosm = *this;
 	auto& performance = profiler.performance;
+
+	performance.start(meter_type::CAMERA_QUERY);
+	stateful_systems.get<dynamic_tree_system>().determine_visible_entities_from_every_camera();
+	performance.stop(meter_type::CAMERA_QUERY);
 
 	stateful_systems.get<gui_system>().rebuild_gui_tree_based_on_game_state();
 	stateful_systems.get<gui_system>().translate_raw_window_inputs_to_gui_events();
@@ -233,24 +241,18 @@ void cosmos::advance_deterministic_schemata(augs::machine_entropy input, step_st
 
 	destroy_system().perform_deletions();
 
-	step.messages.flush_queues();
-	step.messages.ensure_all_empty();
-
 	++current_step_number;
 	seconds_passed += delta.in_seconds();
 	performance.stop(meter_type::LOGIC);
 }
 
-void cosmos::call_rendering_schemata(augs::variable_delta delta, step_state step) const {
+void cosmos::call_rendering_schemata(augs::variable_delta delta, step_state& step) const {
 	const auto& cosm = *this;
 
 	auto& performance = profiler.performance;
 
 	performance.start(meter_type::RENDERING);
 
-	performance.start(meter_type::CAMERA_QUERY);
-	render_system().determine_visible_entities_from_every_camera();
-	performance.stop(meter_type::CAMERA_QUERY);
 
 	performance.start(meter_type::INTERPOLATION);
 	render_system().calculate_and_set_interpolated_transforms();

@@ -43,3 +43,7 @@ float distance_sq(const_entity_handle a, const_entity_handle b) {
 float distance(const_entity_handle a, const_entity_handle b) {
 	return sqrt(distance_sq(a, b));
 }
+
+void set_velocity(entity_handle h, vec2 v) {
+	h.get<components::physics>().set_velocity(v);
+}

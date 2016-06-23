@@ -13,7 +13,5 @@ public:
 
 	void translate_gui_intents_to_transfer_requests(cosmos& cosmos, step_state& step);
 	
-	void perform_transfer(item_slot_transfer_request, step_state& step);
-
 	void process_mounting_and_unmounting(cosmos& cosmos, step_state& step);
 };

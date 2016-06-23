@@ -1,30 +1,26 @@
 #pragma once
 #include "cosmos.h"
-#include "augs/scripting/lua_state_wrapper.h"
-
 #include "game/scene_managers/testbed.h"
-#include "misc/performance_timer.h"
 #include "game/entropy_player.h"
+#include "misc/fixed_delta_timer.h"
+
+class game_window;
 
 class multiverse {
 	scene_managers::testbed main_cosmos_manager;
 
+	float stepping_speed = 1.f;
 public:
 	multiverse();
 
-	window::glwindow game_window;
-
-	bool clear_window_inputs_once = true;
+	entropy_player main_cosmos_player;
 
 	cosmos main_cosmos;
-	augs::lua_state_wrapper lua;
+	augs::fixed_delta_timer main_cosmos_timer;
 
-	void call_window_script(std::string filename);
 	void load_resources();
 
-	void configure_scripting();
-
-	void control();
+	void control(augs::machine_entropy);
 	void simulate();
-	void view() const;
+	void view(game_window&) const;
 };

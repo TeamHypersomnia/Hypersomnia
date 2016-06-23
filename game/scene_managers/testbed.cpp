@@ -35,6 +35,9 @@
 
 #include "texture_baker/font.h"
 
+#include "game/detail/inventory_utils.h"
+#include "game/systems/item_system.h"
+
 #include "gui/text/printer.h"
 #include "log.h"
 using namespace augs;
@@ -70,8 +73,9 @@ namespace scene_managers {
 		auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, -600, -90));
 		prefabs::create_motorcycle(world, components::transform(100, -600, -90));
 
-		world_camera = world.create_entity("camera");
-		ingredients::camera(world_camera, window_rect.w, window_rect.h);
+		auto camera = world.create_entity("camera");
+		ingredients::camera(camera, window_rect.w, window_rect.h);
+		world_camera = camera;
 
 		auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
 
@@ -126,9 +130,9 @@ namespace scene_managers {
 			}
 		}
 
-		name_entity(characters[0], entity_name::PERSON, L"Attacker");
+		name_entity(world[characters[0]], entity_name::PERSON, L"Attacker");
 
-		ingredients::inject_window_input_to_character(characters[current_character], world_camera);
+		ingredients::inject_window_input_to_character(world[characters[current_character]], camera);
 
 		prefabs::create_sample_suppressor(world, vec2(300, -500));
 
@@ -184,6 +188,8 @@ namespace scene_managers {
 		item_slot_transfer_request r;
 		r.item = backpack;
 		r.target_slot = characters[0][slot_function::SHOULDER_SLOT];
+
+		item_system().perform_transfer(r, step);
 
 		// world.post_message(r);
 
@@ -293,7 +299,7 @@ namespace scene_managers {
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}
 
-	void testbed::perform_logic_step(cosmos& world) {
+	void testbed::post_solve(cosmos& world, const step_state& step) {
 		auto inputs = world.messages.get_queue<messages::crosshair_intent_message>();
 
 		for (auto& it : inputs) {

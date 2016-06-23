@@ -74,8 +74,13 @@ bool basic_entity_handle<C>::has(slot_function f) const {
 }
 
 template <bool C>
-bool basic_entity_handle<C>::operator==(entity_id b) {
+bool basic_entity_handle<C>::operator==(entity_id b) const {
 	return raw_id == b;
+}
+
+template <bool C>
+bool basic_entity_handle<C>::operator!=(entity_id b) const {
+	return raw_id != b;
 }
 
 template <bool C>

@@ -1,5 +1,6 @@
 #pragma once
 #include "timer.h"
+#include "delta.h"
 
 namespace augs {
 	class fixed_delta_timer {
@@ -22,9 +23,12 @@ namespace augs {
 
 		unsigned count_logic_steps_to_perform();
 		double fraction_of_time_until_the_next_logic_step() const;
+
 		void set_stepping_speed_multiplier(double);
 		double get_stepping_speed_multiplier();
 
+		variable_delta get_variable_delta() const;
+		fixed_delta get_fixed_delta() const;
 		/* a scalar that you should multiply your numbers by to get speed per second */
 		double delta_seconds() const;
 

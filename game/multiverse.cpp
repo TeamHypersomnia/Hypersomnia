@@ -19,44 +19,21 @@
 
 #include "log.h"
 
-using namespace std;
-using namespace augs;
-
-multiverse::multiverse() {
+multiverse::multiverse() 
+	: main_cosmos_timer(60, 5)
+{
 	main_cosmos = cosmos();
 	main_cosmos.reserve_storage_for_entities(50000);
 
-	main_cosmos.special_deterministic_step(augs::machine_entropy(), [this](cosmos& cosm, step_state& step) {
-		main_cosmos_manager.populate_world_with_entities(cosm, step);
-	});
+	step_state initializatory_step;
 
-	clear_window_inputs_once = true;
-}
-
-void multiverse::configure_scripting() {
-	bind_game_and_augs(lua);
-}
-
-void multiverse::call_window_script(std::string filename) {
-	lua.global_ptr("global_gl_window", &game_window);
-
-	try {
-		if (!lua.dofile(filename))
-			lua.debug_response();
-	}
-	catch (char* e) {
-		LOG("Exception thrown! %x", e);
-		lua.debug_response();
-	}
-	catch (...) {
-		LOG("Exception thrown!");
-		lua.debug_response();
-	}
-
-	game_window.gl.initialize();
+	main_cosmos_manager.populate_world_with_entities(main_cosmos, initializatory_step);
+	main_cosmos.advance_deterministic_schemata(augs::machine_entropy(), initializatory_step);
 }
 
 void multiverse::load_resources() {
+	resource_manager.destroy_everything();
+
 	resource_setups::load_standard_atlas();
 	resource_setups::load_standard_particle_effects();
 	resource_setups::load_standard_behaviour_trees();
@@ -74,17 +51,69 @@ void multiverse::load_resources() {
 	resource_manager.create(assets::program_id::CIRCULAR_BARS, assets::shader_id::CIRCULAR_BARS_VERTEX, assets::shader_id::CIRCULAR_BARS_FRAGMENT);
 }
 
-void multiverse::initialize_cosmoi() {
+void multiverse::control(augs::machine_entropy entropy) {
+	for (auto& raw_input : entropy.local) {
+		if (raw_input.key_event == window::event::PRESSED) {
+			if (raw_input.key == window::event::keys::_1) {
+				main_cosmos_timer = augs::fixed_delta_timer(60, 500000);
+			}
+			if (raw_input.key == window::event::keys::_2) {
+				main_cosmos_timer = augs::fixed_delta_timer(128, 500000);
+			}
+			if (raw_input.key == window::event::keys::_3) {
+				main_cosmos_timer = augs::fixed_delta_timer(400, 500000);
+			}
+			if (raw_input.key == window::event::keys::_4) {
+				stepping_speed = 0.1f;
+			}
+			if (raw_input.key == window::event::keys::_5) {
+				stepping_speed = 1.f;
+			}
+			if (raw_input.key == window::event::keys::_6) {
+				stepping_speed = 6.f;
+			}
+			if (raw_input.key == window::event::keys::F4) {
+				LOG_COLOR(console_color::YELLOW, "Separator");
+			}
+		}
+	}
+
+
 }
 
-#define RENDERING_STEPS_DETERMINISTICALLY_LIKE_LOGIC 0
+void multiverse::view(game_window& window) const {
+	main_cosmos.profiler.fps_counter.new_measurement();
 
-float stepping_speed = 1.f;
-void multiverse::main_game_loop() {
+	step_state step;
+	main_cosmos.call_rendering_schemata(main_cosmos_timer.get_variable_delta(), step);
+	main_cosmos.profiler.fps_counter.end_measurement();
+}
+
+void multiverse::simulate() {
+	auto steps_to_perform = main_cosmos_timer.count_logic_steps_to_perform();
+
+	if (steps_to_perform > 0) {
+
+		auto total_entropy_for_this_step = main_cosmos_player.acquire_machine_entropy_for_this_step();
+
+		while (steps_to_perform--) {
+			renderer::get_current().clear_logic_lines();
+			
+			main_cosmos.delta = main_cosmos_timer.get_fixed_delta();
+
+			step_state step;
+			main_cosmos_manager.pre_solve(main_cosmos, step);
+
+			main_cosmos.advance_deterministic_schemata(total_entropy_for_this_step, step);
+			main_cosmos_manager.post_solve(main_cosmos, step);
+		}
+	}
+
+
+
 	bool quit_flag = false;
 
 	while (!quit_flag) {
-		main_cosmos.fps_counter.new_measurement();
 
 		main_step.messages.get_queue<messages::raw_window_input_message>().clear();
 
@@ -95,49 +124,8 @@ void multiverse::main_game_loop() {
 			clear_window_inputs_once = false;
 		}
 
-		for (auto& raw_input : raw_window_inputs) {
-			if (raw_input.key_event == window::event::PRESSED) {
-				if (raw_input.key == window::event::keys::ESC) {
-					quit_flag = true;
-					break;
-				}
-				if (raw_input.key == window::event::keys::_1) {
-					configure_stepping(60, 500000);
-				}
-				if (raw_input.key == window::event::keys::_2) {
-					configure_stepping(128, 500000);
-				}
-				if (raw_input.key == window::event::keys::_3) {
-					configure_stepping(400, 500000);
-				}
-				if (raw_input.key == window::event::keys::_4) {
-					stepping_speed = 0.1f;
-				}
-				if (raw_input.key == window::event::keys::_5) {
-					stepping_speed = 1.f;
-				}
-				if (raw_input.key == window::event::keys::_6) {
-					stepping_speed = 6.f;
-				}
-				if (raw_input.key == window::event::keys::F4) {
-					LOG_COLOR(console_color::YELLOW, "Separator");
-				}
-			}
-
-			messages::raw_window_input_message msg;
-			msg.raw_window_input = raw_input;
-
-			if(!main_cosmos.systems.get<input_system>().is_replaying())
-				main_cosmos.post_message(msg);
-		}
 
 		delta_timer.set_stepping_speed_multiplier(stepping_speed);
-
-#if RENDERING_STEPS_DETERMINISTICALLY_LIKE_LOGIC
-		auto steps_to_perform = delta_timer.count_logic_steps_to_perform();
-
-		while (steps_to_perform--) {
-#endif
 
 		assign_frame_time_to_delta_for_drawing_time_systems();
 
@@ -151,18 +139,6 @@ void multiverse::main_game_loop() {
 		restore_fixed_delta();
 		enable_deterministic_random_generator();
 
-#if !RENDERING_STEPS_DETERMINISTICALLY_LIKE_LOGIC
-		auto steps_to_perform = delta_timer.count_logic_steps_to_perform();
-
-		while (steps_to_perform--) {
-#endif
-			renderer::get_current().clear_logic_lines();
-
-			main_cosmos.perform_logic_step();
-			current_scene_manager->perform_logic_step(main_cosmos);
-		}
-
-		main_cosmos.fps_counter.end_measurement();
 	}
 }
 

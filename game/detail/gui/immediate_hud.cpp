@@ -172,7 +172,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 							charges += count_charges_in_deposit(mag);
 
 							total_space_available += ammo_depo->space_available;
-							total_actual_free_space += ammo_depo->calculate_free_space_with_children();
+							total_actual_free_space += ammo_depo.calculate_free_space_with_children();
 						}
 
 						if (chamber_slot.alive()) {

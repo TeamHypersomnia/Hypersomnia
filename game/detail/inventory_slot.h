@@ -36,7 +36,5 @@ struct inventory_slot {
 
 	std::vector<entity_id> items_inside;
 
-	std::vector<entity_id> get_mounted_items(const cosmos&) const;
-
 	unsigned calculate_free_space_with_children() const;
 };

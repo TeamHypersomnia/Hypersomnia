@@ -1,11 +1,14 @@
 #pragma once
 #include <functional>
-#include "game/entity_handle_declaration.h"
+#include "game/entity_handle.h"
 #include "game/enums/slot_function.h"
 #include "game/detail/item_slot_transfer_request.h"
 #include "game/detail/item_transfer_result.h"
 
 #define SPACE_ATOMS_PER_UNIT 1000
+
+class step_state;
+void perform_transfer(item_slot_transfer_request, step_state& step);
 
 unsigned calculate_space_occupied_with_children(const_entity_handle item);
 entity_id get_owning_transfer_capability(const_entity_handle);
@@ -29,10 +32,10 @@ std::wstring format_space_units(unsigned);
 int count_charges_in_deposit(const_entity_handle item);
 int count_charges_inside(const_inventory_slot_handle);
 
-void drop_from_all_slots(entity_handle container);
+void drop_from_all_slots(entity_handle container, step_state&);
 
 template<bool is_const>
-void for_each_descendant(basic_entity_handle<is_const>, std::function<void(basic_entity_handle<is_const> item)>) {
+void for_each_descendant(basic_entity_handle<is_const> item, std::function<void(basic_entity_handle<is_const>)> f) {
 	f(item);
 
 	if (item.find<components::container>()) {

@@ -5,7 +5,6 @@
 #include "game/messages/queue_destruction.h"
 #include "game/messages/gunshot_response.h"
 #include "game/detail/item_slot_transfer_request.h"
-//#include "game/messages/physics_operation.h"
 
 #include "game/components/render_component.h"
 #include "game/components/physics_component.h"
@@ -30,6 +29,7 @@
 
 #include "game/entity_handle.h"
 #include "game/step_state.h"
+#include "game/detail/position_scripts.h"
 
 using namespace augs;
 
@@ -49,17 +49,6 @@ void gun_system::consume_gun_intents(cosmos& cosmos, step_state& step) {
 		if (it.intent == intent_type::RELOAD && it.pressed_flag) {
 			
 		}
-	}
-}
-
-void components::gun::shake_camera(cosmos& cosmos, entity_id, float direction, processing_system& p) {
-	if (cosmos.get_handle(target_camera_to_shake).alive()) {
-		vec2 shake_dir;
-		shake_dir.set_from_degrees(p.randval(
-			rotation - camera_shake_spread_degrees,
-			rotation + camera_shake_spread_degrees));
-
-		target_camera_to_shake.get<components::camera>().last_interpolant.pos += shake_dir * camera_shake_radius;
 	}
 }
 
@@ -88,7 +77,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(cosmos& cosmos, step_state
 
 			auto chamber_slot = it[slot_function::GUN_CHAMBER];
 
-			if (chamber_slot->get_mounted_items().size() == 1) {
+			if (chamber_slot.get_mounted_items().size() == 1) {
 				messages::gunshot_response response;
 
 				auto barrel_transform = gun.calculate_barrel_transform(gun_transform);
@@ -112,52 +101,41 @@ void gun_system::launch_shots_due_to_pressed_triggers(cosmos& cosmos, step_state
 				float total_recoil_multiplier = 1.f;
 
 				for(auto& catridge_or_pellet_stack : bullet_entities) {
-					int charges = cosmos.get_handle(catridge_or_pellet_stack).get<components::item>().charges;
+					int charges = cosmos[catridge_or_pellet_stack].get<components::item>().charges;
 
-					messages::physics_operation op;
-					op.set_velocity = true;
-					bool ³ = true;
-					bool Atwo;
-					bool katka = ³ && Atwo;
 					while (charges--) {
 						{
-							auto round_entity = cosmos.create_entity_from_definition(catridge_or_pellet_stack[sub_entity_name::BULLET_ROUND]); //??
+							auto round_entity = cosmos.clone_and_construct_entity(cosmos[catridge_or_pellet_stack][sub_entity_name::BULLET_ROUND]); //??
+							
 							auto& damage = round_entity.get<components::damage>();
 							damage.amount *= gun.damage_multiplier;
 							damage.sender = it;
 							total_recoil_multiplier *= damage.recoil_multiplier;
 
-							auto& physics_definition = round_entity.get<components::physics_definition>();
-							
 							cosmos.get_handle(round_entity).get<components::transform>() = barrel_transform;
-
-							op.velocity.set_from_degrees(barrel_transform.rotation).set_length(randval(gun.muzzle_velocity));
-							op.subject = round_entity;
+							
+							auto rng = cosmos.get_rng_for(round_entity);
+							set_velocity(round_entity, vec2().set_from_degrees(barrel_transform.rotation).set_length(rng.randval(gun.muzzle_velocity)));
 							response.spawned_rounds.push_back(round_entity);
-
-							step.messages.post(op);
 						}
 
 						auto shell_definition = catridge_or_pellet_stack[sub_entity_name::BULLET_SHELL];
 
 						if (shell_definition.alive()) {
-							auto shell_entity = cosmos.create_entity_from_definition(shell_definition);
+							auto shell_entity = cosmos.clone_and_construct_entity(shell_definition);
 
-							auto spread_component = randval(gun.shell_spread_degrees) + gun.shell_spawn_offset.rotation;
+							auto rng = cosmos.get_rng_for(shell_entity);
+
+							auto spread_component = rng.randval(gun.shell_spread_degrees) + gun.shell_spawn_offset.rotation;
 
 							auto shell_transform = gun_transform;
 							shell_transform.pos += vec2(gun.shell_spawn_offset.pos).rotate(gun_transform.rotation, vec2());
 							shell_transform.rotation += spread_component;
 
-							auto& physics_definition = shell_entity.get<components::physics_definition>();
-
 							cosmos.get_handle(shell_entity).get<components::transform>() = shell_transform;
 
-							op.velocity.set_from_degrees(barrel_transform.rotation + spread_component).set_length(randval(gun.shell_velocity));
-							op.subject = shell_entity;
+							set_velocity(shell_entity, vec2().set_from_degrees(barrel_transform.rotation + spread_component).set_length(rng.randval(gun.shell_velocity)));
 							response.spawned_shells.push_back(shell_entity);
-
-							step.messages.post(op);
 						}
 					}
 

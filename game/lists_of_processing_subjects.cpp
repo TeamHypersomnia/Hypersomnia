@@ -36,6 +36,9 @@ std::vector<processing_subjects> lists_of_processing_subjects::find_matching(con
 	if (id.has<components::gui_element>()) {
 		matching.push_back(processing_subjects::WITH_GUI_ELEMENT);
 	}
+	if (id.has<components::gun>()) {
+		matching.push_back(processing_subjects::WITH_GUN);
+	}
 	if (id.has<components::input_receiver>()) {
 		matching.push_back(processing_subjects::WITH_INPUT_RECEIVER);
 	}
