@@ -1,16 +1,7 @@
 #include "deterministic_timing.h"
+#include "delta.h"
 
 namespace augs {
-	deterministic_timeout::deterministic_timeout(float timeout_ms) : timeout_ms(timeout_ms) {}
-
-	void deterministic_timeout::unset() {
-		set(0);
-	}
-
-	void deterministic_timeout::set(float timeout_ms) {
-		*this = deterministic_timeout(timeout_ms);
-	}
-
 	deterministic_timestamp deterministic_timestamp::operator-(deterministic_timestamp b) const {
 		ensure(seconds_passed >= b.seconds_passed);
 
@@ -30,5 +21,31 @@ namespace augs {
 
 	double deterministic_timestamp::get_seconds() const {
 		return seconds_passed;
+	}
+
+	bool deterministic_timeout::passed(fixed_delta t) const {
+		return (parent_cosmos.current_step_number - step_recorded) * t.in_milliseconds() >= timeout_ms;
+	}
+
+	bool deterministic_timeout::unset_or_passed(fixed_delta t) const {
+		return !t.was_set || passed(t);
+	}
+
+	bool deterministic_timeout::was_set_and_passed(fixed_delta t) const {
+		return t.was_set && passed(t);
+	}
+
+	bool deterministic_timeout::check_timeout_and_reset(fixed_delta t) {
+		if (unset_or_passed(t)) {
+			reset(t);
+			return true;
+		}
+
+		return false;
+	}
+
+	void deterministic_timeout::reset(augs::deterministic_timeout& t) {
+		t.step_recorded = parent_cosmos.current_step_number;
+		t.was_set = true;
 	}
 }

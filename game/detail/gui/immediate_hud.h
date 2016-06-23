@@ -34,7 +34,7 @@ struct immediate_hud {
 	void draw_circular_bars_information(messages::camera_render_request_message);
 	void draw_pure_color_highlights(messages::camera_render_request_message);
 
-	void acquire_game_events(cosmos&);
+	void acquire_game_events(cosmos&, step_state&);
 	void draw_vertically_flying_numbers(messages::camera_render_request_message);
 private:
 	double get_current_time(messages::camera_render_request_message) const;

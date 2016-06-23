@@ -84,6 +84,8 @@ void multiverse::simulate() {
 
 			main_cosmos.advance_deterministic_schemata(total_entropy_for_this_step, step);
 			main_cosmos_manager.post_solve(main_cosmos, step);
+
+			main_cosmos_timer.increment_total_steps_passed();
 		}
 	}
 

@@ -6,7 +6,6 @@
 namespace augs {
 	class variable_delta_timer {
 		timer frame_timer;
-		double last_frame_timestamp_seconds = 0.0;
 	public:
 		variable_delta extract_variable_delta(const fixed_delta_timer&);
 	};

@@ -249,8 +249,8 @@ void immediate_hud::draw_circular_bars_information(messages::camera_render_reque
 	r.state.output->triangles.insert(r.state.output->triangles.begin(), circular_bars_information.begin(), circular_bars_information.end());
 }
 
-void immediate_hud::acquire_game_events(cosmos& w) {
-	auto& healths = w.messages.get_queue<messages::health_event>();
+void immediate_hud::acquire_game_events(cosmos& cosmos, step_state& step) {
+	auto& healths = step.messages.get_queue<messages::health_event>();
 
 	for (auto& h : healths) {
 		vertically_flying_number vn;
@@ -280,7 +280,7 @@ void immediate_hud::acquire_game_events(cosmos& w) {
 		ph.target = h.subject;
 		ph.starting_alpha_ratio = std::min(1.f, h.ratio_effective_to_maximum * 5);
 		
-		if (h.spawned_remnants.alive()) {
+		if (cosmos[h.spawned_remnants].alive()) {
 			ph.target = h.spawned_remnants;
 			ph.starting_alpha_ratio = 0.7;
 		}

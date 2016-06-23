@@ -10,7 +10,6 @@ public:
 	int current_offset = 0;
 	bool reversed = false;
 	int repeat_last_n_offsets = 5;
-	// augs::deterministic_timestamp since_last_shot;
 
 	double single_cooldown_duration_ms = 50.0;
 	double remaining_cooldown_duration = -1.0;
@@ -18,7 +17,7 @@ public:
 
 	vec2 shoot_and_get_offset();
 	
-	void shoot_and_apply_impulse(entity_id recoil_body, float scale, bool angular_impulse = false, float additional_angle = 0.f,
+	void shoot_and_apply_impulse(entity_handle recoil_body, float scale, bool angular_impulse = false, float additional_angle = 0.f,
 		bool positional_impulse = false, float positional_rotation = 0.f);
 	
 	void cooldown(double amount_ms);

@@ -2,13 +2,18 @@
 #include "ensure.h"
 
 namespace augs {
-	struct deterministic_timeout {
+	struct stepped_cooldown {
 		unsigned long long step_recorded = 0;
-		bool was_set = false;
-		float timeout_ms = 1000.f;
 
-		void unset();
-		void set(float timeout_ms);
+		bool ready = true;
+		float cooldown_duration_ms = 1000.f;
+
+		bool passed(fixed_delta t) const;
+		bool unset_or_passed(fixed_delta t) const;
+		bool was_set_and_passed(fixed_delta t) const;
+		bool check_for_readyness_and_reset(fixed_delta t);
+		void reset(fixed_delta t);
+
 		deterministic_timeout(float timeout_ms);
 	};
 

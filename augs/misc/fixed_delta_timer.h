@@ -6,25 +6,21 @@ namespace augs {
 	class fixed_delta_timer {
 		timer ticks;
 
-		double steps_per_second;
-		double accumulator;
-		double ratio;
-		double fixed_dt_milliseconds;
+		double accumulator = 0.0;
+		double time_multiplier = 1.0;
 
-		double time_multiplier;
+		fixed_delta basic_delta;
 
-		/* maximum steps taken to avoid spiral of death */
-		unsigned max_steps;
+		unsigned max_steps_to_perform;
 	public:
-		fixed_delta_timer(double steps_per_second, unsigned max_steps);
-
-		/* resets the timer and sets accumulator to 0 */
-		void reset();
+		fixed_delta_timer(unsigned steps_per_second, unsigned max_steps_to_perform);
 
 		unsigned count_logic_steps_to_perform();
-		double fraction_of_time_until_the_next_logic_step() const;
+		double fraction_of_step_until_next_step() const;
 		void set_stepping_speed_multiplier(double);
 		double get_stepping_speed_multiplier() const;
+
+		void increment_total_steps_passed();
 
 		fixed_delta get_fixed_delta() const;
 	};

@@ -9,6 +9,7 @@
 #include "game/enums/slot_function.h"
 
 class cosmos;
+class step_state;
 
 class gui_system {
 	friend class item_button;
@@ -34,7 +35,7 @@ public:
 
 	immediate_hud hud;
 
-	void translate_game_events_for_hud();
+	void translate_game_events_for_hud(cosmos&, step_state&);
 
 	void resize(vec2i size) { gui.resize(size); }
 
