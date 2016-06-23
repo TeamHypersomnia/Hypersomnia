@@ -11,7 +11,8 @@ namespace augs {
 	}
 
 	unsigned fixed_delta_timer::count_logic_steps_to_perform() {
-		accumulator += ticks.extract<std::chrono::milliseconds>() * time_multiplier;
+		auto extracted = ticks.extract<std::chrono::milliseconds>();
+		accumulator += extracted * time_multiplier;
 
 		const unsigned steps = static_cast<unsigned>(std::floor(accumulator / fixed_dt_milliseconds));
 
@@ -35,23 +36,17 @@ namespace augs {
 		ticks.reset();
 	}
 
-	double fixed_delta_timer::delta_seconds() const {
-		return fixed_dt_milliseconds / 1000.0;
-	}
-
-	double fixed_delta_timer::get_steps_per_second() const {
-		return steps_per_second;
-	}
-
-	double fixed_delta_timer::delta_milliseconds() const {
-		return fixed_dt_milliseconds;
-	}
-
 	void fixed_delta_timer::set_stepping_speed_multiplier(double tm) {
 		time_multiplier = tm;
 	}
 
-	double fixed_delta_timer::get_stepping_speed_multiplier() {
+	double fixed_delta_timer::get_stepping_speed_multiplier() const {
 		return time_multiplier;
+	}
+
+	fixed_delta fixed_delta_timer::get_fixed_delta() const {
+		fixed_delta out;
+		out.fixed_delta_ms = fixed_dt_milliseconds;
+		return out;
 	}
 }

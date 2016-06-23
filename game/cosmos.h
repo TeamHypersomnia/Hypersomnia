@@ -79,7 +79,7 @@ public:
 	decltype(auto) operator [](T id) const {
 		return get_handle(id);
 	}
-	
+
 	randomization get_rng_for(entity_id) const;
 
 	bool is_in(entity_id, processing_subjects) const;

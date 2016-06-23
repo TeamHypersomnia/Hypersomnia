@@ -372,7 +372,7 @@
     <ClCompile Include="augs\misc\measurements.cpp" />
     <ClCompile Include="augs\misc\performance_timer.cpp" />
     <ClCompile Include="augs\misc\recoil_player.cpp" />
-    <ClCompile Include="augs\misc\simulation_timing.cpp" />
+    <ClCompile Include="augs\misc\variable_delta_timer.cpp" />
     <ClCompile Include="augs\misc\typesafe_sprintf.cpp" />
     <ClCompile Include="augs\templates.cpp" />
     <ClCompile Include="augs\texture_baker\polygonize_sprite.cpp" />
@@ -462,6 +462,7 @@
     <ClCompile Include="game\scene_managers\rendering_scripts\standard_rendering.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\standard_atlas.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\standard_behaviour_trees.cpp" />
+    <ClCompile Include="game\scene_managers\resource_setups\standard_everything.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\standard_particle_effects.cpp" />
     <ClCompile Include="game\scene_managers\testbed.cpp" />
     <ClCompile Include="game\detail\gui\grid.cpp" />
@@ -1015,7 +1016,7 @@
     <ClInclude Include="augs\misc\object_pool_id.h" />
     <ClInclude Include="augs\misc\performance_timer.h" />
     <ClInclude Include="augs\misc\recoil_player.h" />
-    <ClInclude Include="augs\misc\simulation_timing.h" />
+    <ClInclude Include="augs\misc\variable_delta_timer.h" />
     <ClInclude Include="augs\misc\typesafe_sprintf.h" />
     <ClInclude Include="augs\serialization.h" />
     <ClInclude Include="augs\templates.h" />

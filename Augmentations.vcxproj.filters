@@ -1050,9 +1050,6 @@
     <ClCompile Include="game\multiverse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="augs\misc\simulation_timing.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="augs\misc\randomization.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1273,6 +1270,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="augs\misc\machine_entropy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\scene_managers\resource_setups\standard_everything.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\misc\variable_delta_timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -3152,9 +3155,6 @@
     <ClInclude Include="game\multiverse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\misc\simulation_timing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\misc\randomization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3405,6 +3405,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\game_window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\variable_delta_timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

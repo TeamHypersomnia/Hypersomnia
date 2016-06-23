@@ -209,12 +209,11 @@ void camera_system::resolve_cameras_transforms_and_smoothing(cosmos& cosmos, ste
 	}
 }
 
-void camera_system::post_render_requests_for_all_cameras(cosmos& cosmos, step_state& step) {
-	step.messages.get_queue<messages::camera_render_request_message>().clear();
-
+void camera_system::post_render_requests_for_all_cameras(const cosmos& cosmos, step_state& step) {
 	auto targets_copy = cosmos.get(processing_subjects::WITH_CAMERA);
+
 	for (auto e : targets_copy) {
-		auto& camera = cosmos.get_handle(e).get<components::camera>();
+		auto& camera = cosmos[e].get<components::camera>();
 
 		if (camera.enabled) {
 			auto& in = camera.how_camera_will_render;
