@@ -22,18 +22,19 @@
 using namespace std;
 using namespace augs;
 
-void SignalHandler(int signal) { 
-	window::disable_cursor_clipping();
-	throw "Access violation!"; 
-}
-
 multiverse::multiverse() {
-	main_cosmos.reserve_storage_for_aggregates(50000);
+	main_cosmos = cosmos();
+	main_cosmos.reserve_storage_for_entities(50000);
+
+	main_cosmos.special_deterministic_step(augs::machine_entropy(), [this](cosmos& cosm, step_state& step) {
+		main_cosmos_manager.populate_world_with_entities(cosm, step);
+	});
+
+	clear_window_inputs_once = true;
 }
 
 void multiverse::configure_scripting() {
 	bind_game_and_augs(lua);
-	signal(SIGSEGV, SignalHandler);
 }
 
 void multiverse::call_window_script(std::string filename) {
@@ -73,14 +74,7 @@ void multiverse::load_resources() {
 	resource_manager.create(assets::program_id::CIRCULAR_BARS, assets::shader_id::CIRCULAR_BARS_VERTEX, assets::shader_id::CIRCULAR_BARS_FRAGMENT);
 }
 
-void multiverse::build_scene() {
-	resource_manager.destroy_everything();
-	current_scene_manager->load_resources();
-	
-	main_cosmos.delete_all_entities();
-	current_scene_manager->populate_world_with_entities(main_cosmos);
-	
-	clear_window_inputs_once = true;
+void multiverse::initialize_cosmoi() {
 }
 
 #define RENDERING_STEPS_DETERMINISTICALLY_LIKE_LOGIC 0

@@ -7,11 +7,19 @@
 
 #include "global_libraries.h"
 #include "window_framework\window.h"
+#include "window_framework\platform_utils.h"
 
 #include <gtest/gtest.h>
 #include "error/augs_error.h"
 #include "log.h"
 #include "ensure.h"
+
+#include <signal.h>
+
+void SignalHandler(int signal) {
+	augs::window::disable_cursor_clipping();
+	throw "Access violation!";
+}
 
 namespace augs {
 	namespace window {
@@ -22,6 +30,8 @@ namespace augs {
 	std::unique_ptr<FT_Library> global_libraries::freetype_library(new FT_Library);
 
 	void global_libraries::init(unsigned to_initialize) {
+		signal(SIGSEGV, SignalHandler);
+
 		if(to_initialize & FREETYPE)
 			errs(!FT_Init_FreeType(freetype_library.get()), "freetype initialization");
 		if(to_initialize & WINDOWS_API) {

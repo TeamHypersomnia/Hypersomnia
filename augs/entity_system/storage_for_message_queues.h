@@ -1,8 +1,6 @@
 #pragma once
 #include <tuple>
 #include <vector>
-#include <unordered_map>
-#include <functional>
 #include "templates.h"
 #include "ensure.h"
 
@@ -14,7 +12,6 @@ namespace detail {
 namespace augs {
 	template<class... Queues>
 	class storage_for_message_queues {
-		std::unordered_map<size_t, std::vector<std::function<void()>>> message_callbacks;
 		typedef typename transform_types<std::tuple, ::detail::make_vector, Queues...>::type tuple_type;
 		tuple_type queues;
 
@@ -23,9 +20,6 @@ namespace augs {
 		template <typename T>
 		void post(const T& message_object) {
 			get_queue<T>().push_back(message_object);
-
-			for (auto& callback : message_callbacks[typeid(T).hash_code()])
-				callback();
 		}
 
 		template <typename T>
@@ -48,11 +42,6 @@ namespace augs {
 		template <typename T>
 		void delete_marked() {
 			delete_marked_messages(get_queue<T>());
-		}
-
-		template<class T>
-		void register_callback(std::function<void()> callback) {
-			message_callbacks[typeid(T).hash_code()].push_back(callback);
 		}
 
 		void ensure_all_empty() {
