@@ -20,7 +20,7 @@ void car_system::set_steering_flags_from_intents(cosmos& cosmos, step_state& ste
 	auto& intents = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& it : intents) {
-		auto* maybe_car = cosmos.get_handle(it.subject).find<components::car>();
+		auto* maybe_car = cosmos[it.subject].find<components::car>();
 		if (maybe_car == nullptr) continue;
 
 		auto& car = *maybe_car;
@@ -49,7 +49,7 @@ void car_system::set_steering_flags_from_intents(cosmos& cosmos, step_state& ste
 void car_system::apply_movement_forces(cosmos& cosmos, step_state& step) {
 	auto targets_copy = cosmos.get(processing_subjects::WITH_CAR);
 	for (auto it : targets_copy) {
-		auto& car = cosmos.get_handle(it).get<components::car>();
+		auto& car = cosmos[it].get<components::car>();
 		auto& physics = it.get<components::physics>();
 
 		vec2 resultant;

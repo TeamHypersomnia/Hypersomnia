@@ -20,7 +20,7 @@ void movement_system::set_movement_flags_from_input(cosmos& cosmos, step_state& 
 	auto events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto it : events) {
-		auto* movement = cosmos.get_handle(it.subject).find<components::movement>();
+		auto* movement = cosmos[it.subject].find<components::movement>();
 		if (movement == nullptr) continue;
 
 		switch (it.intent) {

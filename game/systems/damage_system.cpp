@@ -38,7 +38,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage(cosmos& cosmos, st
 			damage && get_owner_body_entity(cosmos.get_handle(damage->sender)) == get_owner_body_entity(subject_handle);
 
 		if (!bullet_colliding_with_sender && damage && damage->damage_upon_collision && damage->damage_charges_before_destruction > 0) {
-			auto& subject_of_impact = cosmos.get_handle(get_owner_body_entity(subject_handle)).get<components::physics>();
+			auto& subject_of_impact = cosmos[get_owner_body_entity(subject_handle)].get<components::physics>();
 			
 			vec2 impact_velocity = damage->custom_impact_velocity;
 			
@@ -60,7 +60,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage(cosmos& cosmos, st
 
 			auto owning_capability = get_owning_transfer_capability(it.subject);
 
-			bool is_victim_a_held_item = cosmos.get_handle(owning_capability).alive() && owning_capability != it.subject;
+			bool is_victim_a_held_item = cosmos[owning_capability].alive() && owning_capability != it.subject;
 
 			if (!is_victim_a_held_item && damage->destroy_upon_damage) {
 				damage->damage_charges_before_destruction--;

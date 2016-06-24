@@ -322,7 +322,7 @@ void perform_transfer(item_slot_transfer_request r, step_state& step) {
 		return;
 	}
 	else if (result.result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-		bool is_pickup_or_transfer = cosmos.get_handle(r.target_slot).alive();
+		bool is_pickup_or_transfer = cosmos[r.target_slot].alive();
 		bool is_drop_request = !is_pickup_or_transfer;
 
 		components::transform previous_container_transform;
@@ -350,13 +350,13 @@ void perform_transfer(item_slot_transfer_request r, step_state& step) {
 			}
 		}
 
-		if (cosmos.get_handle(target_item_to_stack_with).alive()) {
+		if (cosmos[target_item_to_stack_with].alive()) {
 			if (whole_item_grabbed)
 				step.messages.post(messages::queue_destruction(r.item));
 			else
 				item.charges -= result.transferred_charges;
 
-			cosmos.get_handle(target_item_to_stack_with).get<components::item>().charges += result.transferred_charges;
+			cosmos[target_item_to_stack_with].get<components::item>().charges += result.transferred_charges;
 
 			return;
 		}
@@ -417,7 +417,7 @@ void perform_transfer(item_slot_transfer_request r, step_state& step) {
 			auto force = vec2().set_from_degrees(previous_container_transform.rotation).set_length(60);
 			auto offset = vec2().random_on_circle(20, cosmos.get_rng_for(r.item));
 
-			auto& physics = cosmos.get_handle(grabbed_item_part).get<components::physics>();
+			auto& physics = cosmos[grabbed_item_part].get<components::physics>();
 			physics.apply_force(force, offset, true);
 			physics.since_dropped.set(200);
 		}

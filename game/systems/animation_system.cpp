@@ -40,7 +40,7 @@ void game_responses_to_animation_messages(cosmos& cosmos, step_state& step) {
 
 		msg.animation_priority = 0;
 
-		msg.set_animation = (*(cosmos.get_handle(it.subject).get<components::animation_response>().response))[animation_response_type::MOVE];
+		msg.set_animation = (*(cosmos[it.subject].get<components::animation_response>().response))[animation_response_type::MOVE];
 		msg.speed_factor = it.speed;
 
 		step.messages.post(msg);
@@ -65,7 +65,7 @@ void animation_system::handle_animation_messages(cosmos& cosmos, step_state& ste
 	auto events = step.messages.get_queue<animation_message>();
 
 	for (auto it : events) {
-		auto ptr = cosmos.get_handle(it.subject).find<components::animation>();
+		auto ptr = cosmos[it.subject].find<components::animation>();
 		if (!ptr) continue; auto& animation = *ptr;
 
 		if (it.animation_priority >= animation.priority || animation.state == components::animation::playing_state::PAUSED) {

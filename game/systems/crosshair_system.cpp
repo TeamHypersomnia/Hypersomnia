@@ -28,7 +28,7 @@ void crosshair_system::generate_crosshair_intents(cosmos& cosmos, step_state& st
 			it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION
 			) {
 			auto& subject = it.subject;
-			auto crosshair = cosmos.get_handle(subject).find<components::crosshair>();
+			auto crosshair = cosmos[subject].find<components::crosshair>();
 
 			if (!crosshair)
 				continue;
@@ -44,7 +44,7 @@ void crosshair_system::generate_crosshair_intents(cosmos& cosmos, step_state& st
 
 			crosshair_intent.crosshair_base_offset_rel = base_offset - old_base_offset;
 			crosshair_intent.crosshair_base_offset = base_offset;
-			crosshair_intent.crosshair_world_pos = base_offset + cosmos.get_handle(crosshair->character_entity_to_chase).get<components::transform>().pos;
+			crosshair_intent.crosshair_world_pos = base_offset + cosmos[crosshair->character_entity_to_chase].get<components::transform>().pos;
 
 			step.messages.post(crosshair_intent);
 		}
@@ -54,7 +54,7 @@ void crosshair_system::apply_crosshair_intents_to_base_offsets(cosmos& cosmos, s
 	auto& events = step.messages.get_queue<messages::crosshair_intent_message>();
 
 	for (auto& it : events)
-		cosmos.get_handle(it.subject).get<components::crosshair>().base_offset = it.crosshair_base_offset;
+		cosmos[it.subject].get<components::crosshair>().base_offset = it.crosshair_base_offset;
 }
 
 void crosshair_system::apply_base_offsets_to_crosshair_transforms(cosmos& cosmos, step_state& step) {

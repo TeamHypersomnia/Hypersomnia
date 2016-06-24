@@ -22,11 +22,11 @@ void intent_contextualization_system::contextualize_use_button_intents(cosmos& c
 	auto& intents = step.messages.get_queue<messages::intent_message>();
 	
 	for (auto& e : intents) {
-		auto* query_detector = cosmos.get_handle(e.subject).find<components::trigger_query_detector>();
-		auto* collision_detector = cosmos.get_handle(e.subject).find<components::trigger_collision_detector>();
+		auto* query_detector = cosmos[e.subject].find<components::trigger_query_detector>();
+		auto* collision_detector = cosmos[e.subject].find<components::trigger_collision_detector>();
 		
 		if (e.intent == intent_type::USE_BUTTON) {
-			auto* maybe_driver = cosmos.get_handle(e.subject).find<components::driver>();
+			auto* maybe_driver = cosmos[e.subject].find<components::driver>();
 
 			if (maybe_driver) {
 				auto car_id = maybe_driver->owned_vehicle;
@@ -58,7 +58,7 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(cos
 	for (auto& it : events) {
 		entity_id callee;
 
-		auto* maybe_container = cosmos.get_handle(it.subject).find<components::container>();
+		auto* maybe_container = cosmos[it.subject].find<components::container>();
 
 		if (maybe_container) {
 			if (it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION) {
@@ -109,10 +109,10 @@ void intent_contextualization_system::contextualize_movement_intents(cosmos& cos
 	for (auto& e : intents) {
 		entity_id callee;
 
-		auto* maybe_driver = cosmos.get_handle(e.subject).find<components::driver>();
-		auto* maybe_container = cosmos.get_handle(e.subject).find<components::container>();
+		auto* maybe_driver = cosmos[e.subject].find<components::driver>();
+		auto* maybe_container = cosmos[e.subject].find<components::container>();
 
-		if (maybe_driver && cosmos.get_handle(maybe_driver->owned_vehicle).alive()) {
+		if (maybe_driver && cosmos[maybe_driver->owned_vehicle].alive()) {
 			if (e.intent == intent_type::MOVE_FORWARD
 				|| e.intent == intent_type::MOVE_BACKWARD
 				|| e.intent == intent_type::MOVE_LEFT

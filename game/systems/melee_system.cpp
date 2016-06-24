@@ -38,7 +38,7 @@ void melee_system::consume_melee_intents(cosmos& cosmos, step_state& step) {
 			therefore we need to filter out events we're interested in, and that would be
 			melee-related intents and only these applied to an entity with a melee component
 		*/
-		auto* maybe_melee = cosmos.get_handle(it.subject).find<components::melee>();
+		auto* maybe_melee = cosmos[it.subject].find<components::melee>();
 		
 		if (maybe_melee == nullptr) 
 			continue;

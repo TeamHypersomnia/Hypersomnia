@@ -20,13 +20,13 @@ entity_id get_first_named_ancestor(const_entity_handle p) {
 	entity_id iterator = p;
 	auto& cosmos = p.get_cosmos();
 
-	while (cosmos.get_handle(iterator).alive()) {
-		if (cosmos.get_handle(iterator).has<components::name>()) {
+	while (cosmos[iterator].alive()) {
+		if (cosmos[iterator].has<components::name>()) {
 			return p;
 			break;
 		}
 
-		iterator = cosmos.get_handle(iterator).get_parent();
+		iterator = cosmos[iterator].get_parent();
 	}
 
 	return entity_id();

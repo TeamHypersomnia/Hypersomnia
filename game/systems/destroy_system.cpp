@@ -23,7 +23,7 @@ void destroy_system::queue_children_of_queued_entities(cosmos& cosmos, step_stat
 		};
 
 		deletions.push_back(it.subject);
-		cosmos.get_handle(it.subject).for_each_sub_entity_recursive(deletion_adder);
+		cosmos[it.subject].for_each_sub_entity_recursive(deletion_adder);
 	}
 
 	queued.clear();

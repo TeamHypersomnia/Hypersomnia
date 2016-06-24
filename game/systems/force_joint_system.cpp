@@ -17,9 +17,9 @@ void force_joint_system::apply_forces_towards_target_entities(cosmos& cosmos, st
 		auto& physics = it.get<components::physics>();
 		auto& force_joint = it.get<components::force_joint>();
 
-		if (cosmos.get_handle(force_joint.chased_entity).dead()) continue;
+		if (cosmos[force_joint.chased_entity].dead()) continue;
 
-		auto chased_transform = cosmos.get_handle(force_joint.chased_entity).get<components::transform>() + force_joint.chased_entity_offset;
+		auto chased_transform = cosmos[force_joint.chased_entity].get<components::transform>() + force_joint.chased_entity_offset;
 
 		auto direction = chased_transform.pos - physics.get_position();
 		auto distance = direction.length();
@@ -59,7 +59,7 @@ void force_joint_system::apply_forces_towards_target_entities(cosmos& cosmos, st
 			//}
 
 			if (force_for_chased.length() > 5) {
-				auto& chased_physics = cosmos.get_handle(force_joint.chased_entity).get<components::physics>();
+				auto& chased_physics = cosmos[force_joint.chased_entity].get<components::physics>();
 				chased_physics.apply_force(force_for_chaser * chased_physics.get_mass());
 			}
 

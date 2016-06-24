@@ -32,11 +32,11 @@ void camera_system::react_to_input_intents(cosmos& cosmos, step_state& step) {
 	auto events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto it : events) {
-		if (cosmos.get_handle(it.subject).find<components::camera>() == nullptr)
+		if (cosmos[it.subject].find<components::camera>() == nullptr)
 			continue;
 
 		if (it.intent == intent_type::SWITCH_LOOK && it.pressed_flag) {
-			auto& camera = cosmos.get_handle(it.subject).get<components::camera>();
+			auto& camera = cosmos[it.subject].get<components::camera>();
 			auto& mode = camera.orbit_mode;
 
 			if (mode == components::camera::LOOK)
@@ -46,7 +46,7 @@ void camera_system::react_to_input_intents(cosmos& cosmos, step_state& step) {
 			auto crosshair = cosmos.get_handle(camera.entity_to_chase)[sub_entity_name::CHARACTER_CROSSHAIR];
 
 			if (crosshair.alive())
-				update_bounds_for_crosshair(camera, cosmos.get_handle(crosshair).get<components::crosshair>());
+				update_bounds_for_crosshair(camera, cosmos[crosshair].get<components::crosshair>());
 		}
 	}
 }
@@ -61,7 +61,7 @@ void components::camera::configure_camera_and_character_with_crosshair(entity_ha
 vec2i components::camera::get_camera_offset_due_to_character_crosshair(cosmos& cosmos) const {
 	vec2 camera_crosshair_offset;
 
-	if (cosmos.get_handle(entity_to_chase).dead())
+	if (cosmos[entity_to_chase].dead())
 		return vec2i(0, 0);
 
 	auto crosshair_entity = cosmos.get_handle(entity_to_chase)[sub_entity_name::CHARACTER_CROSSHAIR];
@@ -155,9 +155,9 @@ void camera_system::resolve_cameras_transforms_and_smoothing(cosmos& cosmos, ste
 				smoothed_visible_world_area = camera.last_ortho_interpolant;
 			}
 
-			if (cosmos.get_handle(camera.entity_to_chase).alive()) {
+			if (cosmos[camera.entity_to_chase].alive()) {
 				vec2 target_value;
-				auto maybe_physics = cosmos.get_handle(camera.entity_to_chase).find<components::physics>();
+				auto maybe_physics = cosmos[camera.entity_to_chase].find<components::physics>();
 
 				if (maybe_physics) {
 					auto player_pos = maybe_physics->get_mass_position();
@@ -182,7 +182,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing(cosmos& cosmos, ste
 					// LOG("%x, %x, %x", *(vec2i*)&player_pos, *(vec2i*)&camera.previous_step_player_position, *(vec2i*)&target_value);
 				}
 				else {
-					target_value = cosmos.get_handle(camera.entity_to_chase).get<components::render>().interpolation_direction();
+					target_value = cosmos[camera.entity_to_chase].get<components::render>().interpolation_direction();
 					target_value.set_length(100);
 					camera.smoothing_player_pos.averages_per_sec = 5;
 				}

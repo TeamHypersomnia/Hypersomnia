@@ -74,14 +74,14 @@ float colinearize_AB(vec2 O_center_of_rotation, vec2 A_rifle_center, vec2 B_barr
 void rotation_copying_system::resolve_rotation_copying_value(cosmos& cosmos, entity_handle it) {
 	auto& rotation_copying = it.get<components::rotation_copying>();
 
-	if (cosmos.get_handle(rotation_copying.target).dead())
+	if (cosmos[rotation_copying.target].dead())
 		return;
 
 	auto& transform = it.get<components::transform>();
 	float new_angle = 0.f;
 
 	if (rotation_copying.look_mode == components::rotation_copying::look_type::POSITION) {
-		auto target_transform = cosmos.get_handle(rotation_copying.target).find<components::transform>();
+		auto target_transform = cosmos[rotation_copying.target].find<components::transform>();
 		
 		if (target_transform != nullptr) {
 			auto diff = target_transform->pos - transform.pos;
@@ -94,7 +94,7 @@ void rotation_copying_system::resolve_rotation_copying_value(cosmos& cosmos, ent
 			if (rotation_copying.colinearize_item_in_hand) {
 				auto hand = map_primary_action_to_secondary_hand_if_primary_empty(it, 0);
 
-				if (cosmos.get_handle(hand).has_items()) {
+				if (cosmos[hand].has_items()) {
 					auto subject_item = cosmos.get_handle(hand)->items_inside[0];
 
 					auto* maybe_gun = subject_item.find<components::gun>();
@@ -112,7 +112,7 @@ void rotation_copying_system::resolve_rotation_copying_value(cosmos& cosmos, ent
 		}
 	}
 	else {
-		auto target_physics = cosmos.get_handle(rotation_copying).target.find<components::physics>();
+		auto target_physics = cosmos[rotation_copying].target.find<components::physics>();
 
 		if (target_physics != nullptr) {
 			vec2 direction;
