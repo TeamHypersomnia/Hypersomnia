@@ -328,7 +328,7 @@ namespace prefabs {
 
 			world.post_message(r);
 
-			r.item = load_mag[slot_function::ITEM_DEPOSIT]->items_inside[0];
+			r.item = load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0];
 			r.specified_quantity = 1;
 			r.target_slot = weapon[slot_function::GUN_CHAMBER];
 
@@ -403,7 +403,7 @@ namespace prefabs {
 
 			world.post_message(r);
 
-			r.item = load_mag[slot_function::ITEM_DEPOSIT]->items_inside[0];
+			r.item = load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0];
 			r.specified_quantity = 1;
 			r.target_slot = weapon[slot_function::GUN_CHAMBER];
 
@@ -478,7 +478,7 @@ namespace prefabs {
 
 			world.post_message(r);
 
-			r.item = load_mag[slot_function::ITEM_DEPOSIT]->items_inside[0];
+			r.item = load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0];
 			r.specified_quantity = 1;
 			r.target_slot = weapon[slot_function::GUN_CHAMBER];
 

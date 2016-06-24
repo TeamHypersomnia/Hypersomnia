@@ -104,7 +104,7 @@ void slot_button::perform_logic_step(augs::gui::gui_world& gr) {
 		enable_drawing = true;
 
 		if (slot_id.has_items()) {
-			if (get_meta(slot_id->items_inside[0]).is_being_wholely_dragged_or_pending_finish(gr))
+			if (get_meta(slot_id.get_items_inside()[0]).is_being_wholely_dragged_or_pending_finish(gr))
 				enable_drawing = true;
 			else
 				enable_drawing = false;
