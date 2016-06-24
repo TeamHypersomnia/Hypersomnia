@@ -28,7 +28,7 @@ void update_bounds_for_crosshair(components::camera& camera, components::crossha
 		crosshair.bounds_for_base_offset = camera.max_look_expand + camera.visible_world_area / 2.f;
 }
 
-void camera_system::react_to_input_intents(cosmos& cosmos, step_state& step) {
+void camera_system::react_to_input_intents(fixed_step& step) {
 	auto events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto it : events) {
@@ -86,7 +86,7 @@ vec2i components::camera::get_camera_offset_due_to_character_crosshair(cosmos& c
 	return camera_crosshair_offset;
 }
 
-void camera_system::resolve_cameras_transforms_and_smoothing(cosmos& cosmos, step_state& step) {
+void camera_system::resolve_cameras_transforms_and_smoothing(fixed_step& step) {
 
 	auto targets_copy = cosmos.get(processing_subjects::WITH_CAMERA);
 	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */
@@ -209,7 +209,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing(cosmos& cosmos, ste
 	}
 }
 
-void camera_system::post_render_requests_for_all_cameras(const cosmos& cosmos, step_state& step) {
+void camera_system::post_render_requests_for_all_cameras(const fixed_step& step) {
 	auto targets_copy = cosmos.get(processing_subjects::WITH_CAMERA);
 
 	for (auto e : targets_copy) {

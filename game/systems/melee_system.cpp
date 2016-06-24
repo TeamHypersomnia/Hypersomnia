@@ -27,7 +27,7 @@ void components::melee::reset_weapon(entity_handle e) {
 	d.damage_upon_collision = false;
 }
 
-void melee_system::consume_melee_intents(cosmos& cosmos, step_state& step) {
+void melee_system::consume_melee_intents(fixed_step& step) {
 	auto& events = step.messages.get_queue<messages::intent_message>();
 
 
@@ -59,7 +59,7 @@ void melee_system::consume_melee_intents(cosmos& cosmos, step_state& step) {
 	}
 }
 
-void melee_system::initiate_and_update_moves(cosmos& cosmos, step_state& step) {
+void melee_system::initiate_and_update_moves(fixed_step& step) {
 	/* 
 	- fixed delta timestep if it's a logic procedure 
 	- variable frame time if it is a rendering-time procedure 
@@ -107,7 +107,7 @@ void melee_system::initiate_and_update_moves(cosmos& cosmos, step_state& step) {
 	}
 }
 
-melee_state melee_system::primary_action(cosmos& cosmos, step_state& step, double dt, entity_handle target, components::melee& melee_component, components::damage& damage)
+melee_state melee_system::primary_action(fixed_step& step, double dt, entity_handle target, components::melee& melee_component, components::damage& damage)
 {
 	damage.damage_upon_collision = true;
 

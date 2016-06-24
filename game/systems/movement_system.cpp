@@ -16,7 +16,7 @@
 using namespace augs;
 
 
-void movement_system::set_movement_flags_from_input(cosmos& cosmos, step_state& step) {
+void movement_system::set_movement_flags_from_input(fixed_step& step) {
 	auto events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto it : events) {
@@ -97,7 +97,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 	}
 }
 
-void movement_system::generate_movement_responses(cosmos& cosmos, step_state& step) {
+void movement_system::generate_movement_responses(fixed_step& step) {
 	step.messages.get_queue<movement_response>().clear();
 
 	auto targets = cosmos.get(processing_subjects::WITH_MOVEMENT);

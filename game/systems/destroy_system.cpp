@@ -13,7 +13,7 @@
 #include "ensure.h"
 
 
-void destroy_system::queue_children_of_queued_entities(cosmos& cosmos, step_state& step) {
+void destroy_system::queue_children_of_queued_entities(fixed_step& step) {
 	auto& queued = step.messages.get_queue<messages::queue_destruction>();
 	auto& deletions = step.messages.get_queue<messages::will_soon_be_deleted>();
 
@@ -29,7 +29,7 @@ void destroy_system::queue_children_of_queued_entities(cosmos& cosmos, step_stat
 	queued.clear();
 }
 
-void destroy_system::perform_deletions(cosmos& cosmos, step_state& step) {
+void destroy_system::perform_deletions(fixed_step& step) {
 	auto& deletions = step.messages.get_queue<messages::will_soon_be_deleted>();
 
 	// destroy in reverse order; children first

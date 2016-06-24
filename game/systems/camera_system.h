@@ -1,13 +1,13 @@
 #pragma once
 
 class cosmos;
-class step_state;
+class fixed_step;
 
 class camera_system {
 public:
 
-	void react_to_input_intents(cosmos& cosmos, step_state& step);
+	void react_to_input_intents(fixed_step& step);
 
-	void resolve_cameras_transforms_and_smoothing(cosmos& cosmos, step_state& step);
-	void post_render_requests_for_all_cameras(const cosmos& cosmos, step_state& step);
+	void resolve_cameras_transforms_and_smoothing(fixed_step& step);
+	void post_render_requests_for_all_cameras(const fixed_step& step);
 };

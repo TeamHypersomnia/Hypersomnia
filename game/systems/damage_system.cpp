@@ -21,7 +21,7 @@
 
 using namespace augs;
 
-void damage_system::destroy_colliding_bullets_and_send_damage(cosmos& cosmos, step_state& step) {
+void damage_system::destroy_colliding_bullets_and_send_damage(fixed_step& step) {
 	auto events = step.messages.get_queue<messages::collision_message>();
 	step.messages.get_queue<messages::damage_message>().clear();
 
@@ -73,7 +73,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage(cosmos& cosmos, st
 	}
 }
 
-void damage_system::destroy_outdated_bullets(cosmos& cosmos, step_state& step) {
+void damage_system::destroy_outdated_bullets(fixed_step& step) {
 	auto targets_copy = cosmos.get(processing_subjects::WITH_DAMAGE);
 	for (auto it : targets_copy) {
 		auto& damage = it.get<components::damage>();

@@ -1,9 +1,9 @@
 #pragma once
 
 class cosmos;
-class step_state;
+class fixed_step;
 
 class position_copying_system {
 public:
-	void update_transforms(cosmos& cosmos, step_state& step);
+	void update_transforms(fixed_step& step);
 };

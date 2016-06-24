@@ -2,7 +2,7 @@
 
 class physics_system;
 class cosmos;
-class step_state;
+class fixed_step;
 
 class behaviour_tree_system {
 public:

@@ -11,7 +11,7 @@
 #include "game/entity_handle.h"
 #include "game/step.h"
 
-void force_joint_system::apply_forces_towards_target_entities(cosmos& cosmos, step_state& step) {
+void force_joint_system::apply_forces_towards_target_entities(fixed_step& step) {
 	auto targets = cosmos.get(processing_subjects::WITH_FORCE_JOINT);
 	for (auto& it : targets) {
 		auto& physics = it.get<components::physics>();
