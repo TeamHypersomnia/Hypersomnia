@@ -166,6 +166,11 @@ typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot
 }
 
 template <bool C>
+std::vector<typename basic_inventory_slot_handle<C>::entity_handle_type> basic_inventory_slot_handle<C>::get_items_inside() const {
+	return get_cosmos().to_handle_vector((*this)->items_inside);
+}
+
+template <bool C>
 typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot_handle<C>::get_container() const {
 	return make_handle(raw_id.container_entity);
 }

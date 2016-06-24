@@ -1,6 +1,6 @@
 #pragma once
 #include "game/messages/camera_render_request_message.h"
-#include "misc/deterministic_timing.h"
+#include "misc/stepped_timing.h"
 #include "augs/gui/text_drawer.h"
 #include "game/components/transform_component.h"
 class cosmos;

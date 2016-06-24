@@ -368,7 +368,7 @@
     <ClCompile Include="augs\filesystem\directory.cpp" />
     <ClCompile Include="augs\gui\appearance_detector.cpp" />
     <ClCompile Include="augs\misc\delta.cpp" />
-    <ClCompile Include="augs\misc\deterministic_timing.cpp" />
+    <ClCompile Include="augs\misc\stepped_timing.cpp" />
     <ClCompile Include="augs\misc\measurements.cpp" />
     <ClCompile Include="augs\misc\performance_timer.cpp" />
     <ClCompile Include="augs\misc\recoil_player.cpp" />
@@ -1008,7 +1008,7 @@
     <ClInclude Include="augs\gui\rect_id.h" />
     <ClInclude Include="augs\gui\text_drawer.h" />
     <ClInclude Include="augs\misc\delta.h" />
-    <ClInclude Include="augs\misc\deterministic_timing.h" />
+    <ClInclude Include="augs\misc\stepped_timing.h" />
     <ClInclude Include="augs\misc\entropy_unpacker_and_recorder.h" />
     <ClInclude Include="augs\misc\machine_entropy.h" />
     <ClInclude Include="augs\misc\measurements.h" />

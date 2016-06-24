@@ -3,7 +3,7 @@
 #include <array>
 #include <Box2D\Dynamics\b2Fixture.h>
 
-#include "misc/deterministic_timing.h"
+#include "misc/stepped_timing.h"
 
 #include "game/entity_id.h"
 #include "game/components/transform_component.h"
@@ -50,7 +50,7 @@ struct rigid_body_white_box {
 	entity_id owner_friction_ground;
 	std::vector<entity_id> owner_friction_grounds;
 
-	augs::deterministic_timeout since_dropped = augs::deterministic_timeout(0);
+	augs::stepped_timeout since_dropped;
 
 	bool enable_angle_motor = false;
 

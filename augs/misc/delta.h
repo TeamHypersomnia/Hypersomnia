@@ -1,6 +1,8 @@
 #pragma once
 
 namespace augs {
+	struct stepped_timestamp;
+
 	class fixed_delta {
 		friend class fixed_delta_timer;
 		double fixed_delta_ms;
@@ -12,6 +14,8 @@ namespace augs {
 		unsigned get_steps_per_second() const;
 
 		double total_time_passed_in_seconds() const;
+
+		stepped_timestamp get_timestamp() const;
 	};
 
 	class variable_delta {

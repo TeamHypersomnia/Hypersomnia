@@ -52,6 +52,8 @@ public:
 	entity_handle_type get_container() const;
 	entity_handle_type get_root_container() const;
 
+	std::vector<entity_handle_type> get_items_inside() const;
+
 	bool has_items() const;
 	bool is_empty_slot() const;
 

@@ -1,4 +1,5 @@
 #include "delta.h"
+#include "stepped_timing.h"
 
 namespace augs {
 	double fixed_delta::in_seconds() const {
@@ -12,9 +13,13 @@ namespace augs {
 	double fixed_delta::total_time_passed_in_seconds() const {
 		return total_steps_passed * in_seconds();
 	}
-
+	
 	double fixed_delta::in_milliseconds() const {
 		return fixed_delta_ms;
+	}
+	
+	stepped_timestamp fixed_delta::get_timestamp() const {
+
 	}
 
 	double variable_delta::in_seconds() const {
