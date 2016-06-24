@@ -251,10 +251,11 @@ void immediate_hud::draw_circular_bars_information(messages::camera_render_reque
 
 void immediate_hud::acquire_game_events(cosmos& cosmos, step_state& step) {
 	auto& healths = step.messages.get_queue<messages::health_event>();
+	auto& delta = cosmos.delta;
 
 	for (auto& h : healths) {
 		vertically_flying_number vn;
-		vn.time_of_occurence = w.get_current_timestamp();
+		vn.time_of_occurence = delta.total_time_passed_in_seconds();
 		vn.value = h.effective_amount;
 		vn.maximum_duration_seconds = 0.7;
 
