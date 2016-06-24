@@ -133,7 +133,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 			auto in_aabb = physics.query_aabb_px(transform.pos - vec2(d, d), transform.pos + vec2(d, d), request.candidate_filter, it);
 
 			for (const auto& candidate_id : in_aabb.entities) {
-				auto candidate = cosmos.get_handle(candidate_id);
+				auto candidate = cosmos[candidate_id];
 
 				auto target_pos = candidate.get<components::transform>().pos;
 				if ((target_pos - transform.pos).length_sq() <= d*d) {
@@ -242,7 +242,7 @@ void visibility_system::generate_visibility_and_sight_information(cosmos& cosmos
 			/* for every fixture that intersected with the visibility square */
 			for (auto b : bodies) {
 				/* get shape vertices from misc that transforms them to current entity's position and rotation in Box2D space */
-				auto verts = get_world_vertices(cosmos.get_handle(b->GetUserData()));
+				auto verts = get_world_vertices(cosmos[b->GetUserData()]);
 				/* for every vertex in given fixture's shape */
 				for (auto& v : verts) 
 					push_vertex(v, true);

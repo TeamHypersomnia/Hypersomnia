@@ -35,7 +35,7 @@ namespace components {
 	}
 
 	entity_handle physics::get_entity() {
-		return black_detail.parent_system->parent_cosmos.get_handle(black_detail.body_owner);
+		return black_detail.parent_system->parent_cosmos[black_detail.body_owner];
 	}
 
 	void physics::build_body() {

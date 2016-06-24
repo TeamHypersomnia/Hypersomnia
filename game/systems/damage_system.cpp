@@ -29,8 +29,8 @@ void damage_system::destroy_colliding_bullets_and_send_damage(cosmos& cosmos, st
 		if (it.type != messages::collision_message::event_type::BEGIN_CONTACT) 
 			continue;
 
-		auto subject_handle = cosmos.get_handle(it.subject);
-		auto collider_handle = cosmos.get_handle(it.collider);
+		auto subject_handle = cosmos[it.subject];
+		auto collider_handle = cosmos[it.collider];
 
 		auto* damage = collider_handle.find<components::damage>();
 

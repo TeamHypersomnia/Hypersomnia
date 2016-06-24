@@ -30,7 +30,7 @@ void intent_contextualization_system::contextualize_use_button_intents(cosmos& c
 
 			if (maybe_driver) {
 				auto car_id = maybe_driver->owned_vehicle;
-				auto car = cosmos.get_handle(car_id);
+				auto car = cosmos[car_id];
 
 				if (car.alive() && car.get<components::car>().current_driver == e.subject) {
 					e.intent = intent_type::RELEASE_CAR;
@@ -62,19 +62,19 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(cos
 
 		if (maybe_container) {
 			if (it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION) {
-				auto hand = cosmos.get_handle(it.subject)[slot_function::PRIMARY_HAND];
+				auto hand = cosmos[it.subject][slot_function::PRIMARY_HAND];
 
 				if (hand.alive() && hand->items_inside.size() > 0)
 					callee = hand->items_inside[0];
 			}
 
 			if (it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION) {
-				auto hand = cosmos.get_handle(it.subject)[slot_function::SECONDARY_HAND];
+				auto hand = cosmos[it.subject][slot_function::SECONDARY_HAND];
 
 				if (hand.alive() && hand->items_inside.size() > 0)
 					callee = hand->items_inside[0];
 				else {
-					hand = cosmos.get_handle(it.subject)[slot_function::PRIMARY_HAND];
+					hand = cosmos[it.subject][slot_function::PRIMARY_HAND];
 
 					if (hand.alive() && hand->items_inside.size() > 0)
 						callee = hand->items_inside[0];
@@ -82,7 +82,7 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(cos
 			}
 		}
 
-		auto callee_handle = cosmos.get_handle(callee);
+		auto callee_handle = cosmos[callee];
 
 		if (callee_handle.alive()) {
 			if (callee_handle.find<components::gun>()) {
@@ -125,12 +125,12 @@ void intent_contextualization_system::contextualize_movement_intents(cosmos& cos
 			}
 		}
 
-		auto callee_handle = cosmos.get_handle(callee);
+		auto callee_handle = cosmos[callee];
 		
 		if (callee_handle.dead()) {
 			if (maybe_container) {
 				if (e.intent == intent_type::SPACE_BUTTON) {
-					auto hand = cosmos.get_handle(e.subject)[slot_function::PRIMARY_HAND];
+					auto hand = cosmos[e.subject][slot_function::PRIMARY_HAND];
 
 					if (hand.alive() && hand->items_inside.size() > 0) {
 						e.intent = intent_type::MELEE_TERTIARY_MOVE;

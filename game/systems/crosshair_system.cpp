@@ -27,8 +27,8 @@ void crosshair_system::generate_crosshair_intents(cosmos& cosmos, step_state& st
 			it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION ||
 			it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION
 			) {
-			auto& subject = it.subject;
-			auto crosshair = cosmos[subject].find<components::crosshair>();
+			auto subject = cosmos[it.subject];
+			auto crosshair = subject.find<components::crosshair>();
 
 			if (!crosshair)
 				continue;
@@ -59,7 +59,7 @@ void crosshair_system::apply_crosshair_intents_to_base_offsets(cosmos& cosmos, s
 
 void crosshair_system::apply_base_offsets_to_crosshair_transforms(cosmos& cosmos, step_state& step) {
 	for (auto& it : cosmos.get(processing_subjects::WITH_CROSSHAIR)) {
-		auto player_id = cosmos.get_handle(it.get<components::crosshair>().character_entity_to_chase);
+		auto player_id = cosmos[it.get<components::crosshair>().character_entity_to_chase];
 
 		if (player_id.alive()) {
 			it.get<components::transform>().pos = 

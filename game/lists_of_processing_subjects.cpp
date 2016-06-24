@@ -102,7 +102,7 @@ std::vector<entity_handle> lists_of_processing_subjects::get(processing_subjects
 	//});
 
 	for (auto s : subjects) {
-		auto handle = cosmos.get_handle(s);
+		auto handle = cosmos[s];
 
 		if (handle.removed_from_processing_subjects & (1 << unsigned long long(list))) {
 			handles.emplace_back(handle);

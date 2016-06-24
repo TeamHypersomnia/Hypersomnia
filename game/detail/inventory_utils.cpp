@@ -309,7 +309,7 @@ void perform_transfer(item_slot_transfer_request r, step_state& step) {
 	auto& cosmos = r.item.get_cosmos();
 	auto& item = r.item.get<components::item>();
 	auto previous_slot_id = item.current_slot;
-	auto previous_slot = cosmos.get_handle(previous_slot_id);
+	auto previous_slot = cosmos[previous_slot_id];
 
 	auto result = query_transfer_result(r);
 
@@ -375,7 +375,7 @@ void perform_transfer(item_slot_transfer_request r, step_state& step) {
 		}
 
 		if (is_pickup_or_transfer)
-			add_item(r.target_slot, cosmos.get_handle(grabbed_item_part));
+			add_item(r.target_slot, cosmos[grabbed_item_part]);
 
 		for_each_descendant(cosmos[grabbed_item_part], [previous_container_transform, new_charge_stack](entity_handle descendant) {
 			auto& cosmos = descendant.get_cosmos();
