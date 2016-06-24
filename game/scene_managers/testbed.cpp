@@ -299,7 +299,7 @@ namespace scene_managers {
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}
 
-	void testbed::post_solve(cosmos& world, const step_state& step) {
+	void testbed::post_solve(fixed_step& step) {
 		auto inputs = world.messages.get_queue<messages::crosshair_intent_message>();
 
 		for (auto& it : inputs) {

@@ -4,7 +4,7 @@
 #include "game/components/driver_component.h"
 
 #include "game/cosmos.h"
-#include "game/step_state.h"
+#include "game/step.h"
 
 #include "graphics/renderer.h"
 

@@ -13,7 +13,7 @@
 
 #include "texture_baker/texture_baker.h"
 #include "game/entity_handle.h"
-#include "game/step_state.h"
+#include "game/step.h"
 
 void crosshair_system::generate_crosshair_intents(fixed_step& step) {
 	step.messages.get_queue<messages::crosshair_intent_message>().clear();

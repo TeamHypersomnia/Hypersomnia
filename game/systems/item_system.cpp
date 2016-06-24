@@ -31,7 +31,7 @@
 #include "game/components/item_slot_transfers_component.h"
 
 #include "game/entity_handle.h"
-#include "game/step_state.h"
+#include "game/step.h"
 #include "game/enums/item_transfer_result_type.h"
 
 #include "game/detail/physics_scripts.h"

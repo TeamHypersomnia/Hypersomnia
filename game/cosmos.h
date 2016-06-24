@@ -17,7 +17,7 @@
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/global/all_settings.h"
 #include "game/cosmic_profiler.h"
-#include "game/step_state.h"
+#include "game/step.h"
 
 struct inventory_slot_id;
 class cosmos {

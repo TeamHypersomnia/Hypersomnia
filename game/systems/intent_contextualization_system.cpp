@@ -14,7 +14,7 @@
 #include "game/detail/inventory_slot_id.h"
 
 #include "game/entity_handle.h"
-#include "game/step_state.h"
+#include "game/step.h"
 
 using namespace augs;
 

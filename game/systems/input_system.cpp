@@ -22,7 +22,7 @@
 
 #include "window_framework/event.h"
 #include "misc/step_player.h"
-#include "game/step_state.h"
+#include "game/step.h"
 #include "game/entity_handle.h"
 
 using namespace augs::window;

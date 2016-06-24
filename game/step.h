@@ -4,6 +4,9 @@
 class cosmos;
 
 class variable_step {
+	friend class cosmos;
+	variable_step(const cosmos&, augs::variable_delta);
+
 public:
 	storage_for_all_message_queues messages;
 	
@@ -14,6 +17,8 @@ public:
 };
 
 class fixed_step {
+	friend class cosmos;
+	fixed_step(cosmos&);
 public:
 	storage_for_all_message_queues messages;
 	cosmos& cosm;

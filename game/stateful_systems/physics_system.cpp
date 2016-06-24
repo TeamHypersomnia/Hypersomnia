@@ -13,7 +13,7 @@
 #include "game/messages/will_soon_be_deleted.h"
 
 #include "game/cosmos.h"
-#include "game/step_state.h"
+#include "game/step.h"
 #include "game/entity_handle.h"
 
 double METERS_TO_PIXELS = 100.0;

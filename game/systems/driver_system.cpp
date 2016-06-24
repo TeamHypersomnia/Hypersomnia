@@ -19,7 +19,7 @@
 #include "game/components/transform_component.h"
 
 #include "game/entity_handle.h"
-#include "game/step_state.h"
+#include "game/step.h"
 
 void driver_system::assign_drivers_from_successful_trigger_hits(fixed_step& step) {
 	auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();

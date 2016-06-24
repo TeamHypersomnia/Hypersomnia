@@ -476,7 +476,7 @@
     <ClCompile Include="game\stateful_systems\dynamic_tree_system.cpp" />
     <ClCompile Include="game\stateful_systems\gui_system.cpp" />
     <ClCompile Include="game\stateful_systems\physics_system.cpp" />
-    <ClCompile Include="game\step_state.cpp" />
+    <ClCompile Include="game\step.cpp" />
     <ClCompile Include="game\systems\animation_system.cpp" />
     <ClCompile Include="game\systems\behaviour_tree_system.cpp" />
     <ClCompile Include="game\systems\camera_system.cpp" />
@@ -1058,7 +1058,7 @@
     <ClInclude Include="game\stateful_systems\dynamic_tree_system.h" />
     <ClInclude Include="game\stateful_systems\gui_system.h" />
     <ClInclude Include="game\stateful_systems\physics_system.h" />
-    <ClInclude Include="game\step_state.h" />
+    <ClInclude Include="game\step.h" />
     <ClInclude Include="game\types_specification\all_component_includes.h" />
     <ClInclude Include="game\assets\animation_id.h" />
     <ClInclude Include="game\assets\animation_response_id.h" />

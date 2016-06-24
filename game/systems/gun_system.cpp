@@ -26,7 +26,7 @@
 #include "log.h"
 
 #include "game/entity_handle.h"
-#include "game/step_state.h"
+#include "game/step.h"
 #include "game/detail/position_scripts.h"
 
 using namespace augs;

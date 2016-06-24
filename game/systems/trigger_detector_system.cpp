@@ -20,7 +20,7 @@
 #include "game/components/trigger_collision_detector_component.h"
 #include "game/components/trigger_query_detector_component.h"
 #include "game/entity_handle.h"
-#include "game/step_state.h"
+#include "game/step.h"
 
 void trigger_detector_system::consume_trigger_detector_presses() {
 	auto& trigger_presses = step.messages.get_queue<messages::intent_message>();
