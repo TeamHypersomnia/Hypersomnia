@@ -7,7 +7,7 @@
 
 #define SPACE_ATOMS_PER_UNIT 1000
 
-class step_state;
+class fixed_step;
 void perform_transfer(item_slot_transfer_request, step_state& step);
 
 unsigned calculate_space_occupied_with_children(const_entity_handle item);

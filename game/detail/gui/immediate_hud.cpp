@@ -251,7 +251,7 @@ void immediate_hud::draw_circular_bars_information(messages::camera_render_reque
 	r.state.output->triangles.insert(r.state.output->triangles.begin(), circular_bars_information.begin(), circular_bars_information.end());
 }
 
-void immediate_hud::acquire_game_events(cosmos& cosmos, step_state& step) {
+void immediate_hud::acquire_game_events(fixed_step& step) {
 	auto& healths = step.messages.get_queue<messages::health_event>();
 	auto& delta = cosmos.delta;
 

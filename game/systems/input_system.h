@@ -1,6 +1,6 @@
 #pragma once
 class cosmos;
-class step_state;
+class fixed_step;
 
 namespace augs {
 	struct machine_entropy;

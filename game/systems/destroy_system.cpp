@@ -12,7 +12,6 @@
 
 #include "ensure.h"
 
-
 void destroy_system::queue_children_of_queued_entities(fixed_step& step) {
 	auto& queued = step.messages.get_queue<messages::queue_destruction>();
 	auto& deletions = step.messages.get_queue<messages::will_soon_be_deleted>();

@@ -28,7 +28,7 @@
 using namespace augs::window;
 
 
-void input_system::post_unmapped_intents_from_raw_window_inputs(cosmos& cosmos, step_state& step, const machine_entropy& entropy) {
+void input_system::post_unmapped_intents_from_raw_window_inputs(fixed_step& step, const machine_entropy& entropy) {
 	step.messages.get_queue<messages::unmapped_intent_message>().clear();
 
 	auto& context = cosmos.settings.input;
@@ -70,7 +70,7 @@ void input_system::post_unmapped_intents_from_raw_window_inputs(cosmos& cosmos, 
 	}
 }
 
-void input_system::map_unmapped_intents_to_entities(cosmos& cosmos, step_state& step) {
+void input_system::map_unmapped_intents_to_entities(fixed_step& step) {
 	for (auto& unmapped_intent : step.messages.get_queue<messages::unmapped_intent_message>()) {
 		messages::intent_message entity_mapped_intent;
 		entity_mapped_intent.unmapped_intent_message::operator=(unmapped_intent);

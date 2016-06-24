@@ -21,7 +21,7 @@
 #include "game/entity_handle.h"
 #include "game/step_state.h"
 
-void driver_system::assign_drivers_from_successful_trigger_hits(cosmos& cosmos, step_state& step) {
+void driver_system::assign_drivers_from_successful_trigger_hits(fixed_step& step) {
 	auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();
 
 	for (auto& e : confirmations) {
@@ -37,7 +37,7 @@ void driver_system::assign_drivers_from_successful_trigger_hits(cosmos& cosmos, 
 	}
 }
 
-void driver_system::release_drivers_due_to_ending_contact_with_wheel(cosmos& cosmos, step_state& step) {
+void driver_system::release_drivers_due_to_ending_contact_with_wheel(fixed_step& step) {
 	auto& contacts = step.messages.get_queue<messages::collision_message>();
 	auto& physics = cosmos.stateful_systems.get<physics_system>();
 
@@ -57,7 +57,7 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel(cosmos& cos
 		}
 	}
 }
-void driver_system::release_drivers_due_to_requests(cosmos& cosmos, step_state& step) {
+void driver_system::release_drivers_due_to_requests(fixed_step& step) {
 	auto& intents = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& e : intents)

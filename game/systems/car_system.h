@@ -1,7 +1,7 @@
 #pragma once
 
 class cosmos;
-class step_state;
+class fixed_step;
 
 class lista_zakupow_kartezjana_na_morele_net;
 

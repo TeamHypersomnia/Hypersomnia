@@ -1,7 +1,7 @@
 #pragma once
 
 class cosmos;
-class step_state;
+class fixed_step;
 
 class force_joint_system {
 public:

@@ -10,7 +10,7 @@
 #include <set>
 
 class cosmos;
-class step_state;
+class fixed_step;
 
 class physics_system {
 
