@@ -56,7 +56,7 @@ inventory_slot_id determine_hand_holstering_slot(const_entity_handle item_entity
 		if (maybe_shoulder.can_contain(item_entity))
 			return maybe_shoulder;
 		else if (maybe_shoulder->items_inside.size() > 0) {
-			auto maybe_item_deposit = cosmos[maybe_shoulder->items_inside[0]][slot_function::ITEM_DEPOSIT];
+			auto maybe_item_deposit = cosmos[maybe_shoulder.get_items_inside()[0]][slot_function::ITEM_DEPOSIT];
 
 			if (maybe_item_deposit.alive() && maybe_item_deposit.can_contain(item_entity))
 				return maybe_item_deposit;

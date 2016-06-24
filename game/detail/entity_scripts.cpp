@@ -113,7 +113,7 @@ std::vector<entity_id> guns_wielded(const_entity_handle subject) {
 	auto hand = subject[slot_function::PRIMARY_HAND];
 
 	if (hand.has_items()) {
-		auto wielded = hand->items_inside[0];
+		auto wielded = hand.get_items_inside()[0];
 		if (wielded.find<components::gun>()) {
 			result.push_back(wielded);
 		}
@@ -122,7 +122,7 @@ std::vector<entity_id> guns_wielded(const_entity_handle subject) {
 	hand = subject[slot_function::SECONDARY_HAND];
 
 	if (hand.has_items()) {
-		auto wielded = hand->items_inside[0];
+		auto wielded = hand.get_items_inside()[0];
 
 		if (wielded.find<components::gun>()) {
 			result.push_back(wielded);
@@ -139,7 +139,7 @@ float assess_projectile_velocity_of_weapon(const_entity_handle weapon) {
 	// auto ch = weapon[slot_function::GUN_CHAMBER];
 	// 
 	// if (ch.has_items()) {
-	// 	ch->items_inside[0][sub_entity_name::BULLET_ROUND].get<components::damage>();
+	// 	ch.get_items_inside()[0][sub_entity_name::BULLET_ROUND].get<components::damage>();
 	// }
 
 	auto* maybe_gun = weapon.find<components::gun>();

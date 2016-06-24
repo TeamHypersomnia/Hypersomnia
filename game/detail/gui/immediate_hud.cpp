@@ -156,7 +156,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 			if (v == watched_character) {
 				auto examine_item_slot = [&textual_infos, &push_angles, &circle_hud, &state](inventory_slot_id id, float lower_outside, float max_angular_length, bool ccw) {
 					if (id.alive() && id.has_items()) {
-						auto item = id->items_inside[0];
+						auto item = id.get_items_inside()[0];
 
 						auto maybe_magazine_slot = item[slot_function::GUN_DETACHABLE_MAGAZINE];
 						auto chamber_slot = item[slot_function::GUN_CHAMBER];
@@ -167,7 +167,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 						float total_actual_free_space = 0.f;
 
 						if (maybe_magazine_slot.alive() && maybe_magazine_slot.has_items()) {
-							auto mag = maybe_magazine_slot->items_inside[0];
+							auto mag = maybe_magazine_slot.get_items_inside()[0];
 							auto ammo_depo = mag[slot_function::ITEM_DEPOSIT];
 							charges += count_charges_in_deposit(mag);
 

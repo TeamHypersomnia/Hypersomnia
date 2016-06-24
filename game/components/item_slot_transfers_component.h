@@ -16,7 +16,7 @@ namespace components {
 		std::set<entity_id> only_pick_these_items;
 		bool pick_all_touched_items_if_list_to_pick_empty = true;
 
-		augs::deterministic_timeout pickup_timeout = augs::deterministic_timeout(200);
+		augs::stepped_cooldown pickup_timeout = augs::stepped_cooldown(200);
 
 		static mounting_operation find_suitable_montage_operation(entity_id parent_container);
 

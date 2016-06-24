@@ -65,19 +65,19 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(cos
 				auto hand = cosmos[it.subject][slot_function::PRIMARY_HAND];
 
 				if (hand.alive() && hand->items_inside.size() > 0)
-					callee = hand->items_inside[0];
+					callee = hand.get_items_inside()[0];
 			}
 
 			if (it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION) {
 				auto hand = cosmos[it.subject][slot_function::SECONDARY_HAND];
 
 				if (hand.alive() && hand->items_inside.size() > 0)
-					callee = hand->items_inside[0];
+					callee = hand.get_items_inside()[0];
 				else {
 					hand = cosmos[it.subject][slot_function::PRIMARY_HAND];
 
 					if (hand.alive() && hand->items_inside.size() > 0)
-						callee = hand->items_inside[0];
+						callee = hand.get_items_inside()[0];
 				}
 			}
 		}
@@ -134,7 +134,7 @@ void intent_contextualization_system::contextualize_movement_intents(cosmos& cos
 
 					if (hand.alive() && hand->items_inside.size() > 0) {
 						e.intent = intent_type::MELEE_TERTIARY_MOVE;
-						callee = hand->items_inside[0];
+						callee = hand.get_items_inside()[0];
 					}
 				}
 			}

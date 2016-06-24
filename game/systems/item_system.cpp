@@ -86,7 +86,7 @@ void item_system::handle_throw_item_intents(cosmos& cosmos, step_state& step) {
 				auto hand = map_primary_action_to_secondary_hand_if_primary_empty(subject, intent_type::THROW_SECONDARY_ITEM == r.intent);
 
 				if (cosmos[hand].has_items()) {
-					perform_transfer({ cosmos[cosmos[hand]->items_inside[0]], cosmos.dead_inventory_handle() }, step);
+					perform_transfer({ cosmos[hand].get_items_inside()[0], cosmos.dead_inventory_handle() }, step);
 				}
 			}
 		}
@@ -107,7 +107,7 @@ void item_system::handle_holster_item_intents(cosmos& cosmos, step_state& step) 
 				auto hand = cosmos[map_primary_action_to_secondary_hand_if_primary_empty(subject, intent_type::HOLSTER_SECONDARY_ITEM == r.intent)];
 
 				if (hand.has_items()) {
-					auto item_inside = cosmos[hand->items_inside[0]];
+					auto item_inside = hand.get_items_inside()[0];
 
 					item_slot_transfer_request request(item_inside, cosmos[determine_hand_holstering_slot(item_inside, subject)]);
 

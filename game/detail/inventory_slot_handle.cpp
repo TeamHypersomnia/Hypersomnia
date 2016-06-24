@@ -84,7 +84,7 @@ bool basic_inventory_slot_handle<C>::has_items() const {
 
 template <bool C>
 typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot_handle<C>::try_get_item() const {
-	return make_handle(has_items() ? (*this)->items_inside[0] : entity_id());
+	return make_handle(has_items() ? (*this).get_items_inside()[0] : entity_id());
 }
 
 template <bool C>

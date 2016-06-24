@@ -155,7 +155,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(cosmos& cosmos, step_state
 				//	//	gun.shake_camera(owning_capability[associated_entity_name::WATCHING_CAMERA], gun_transform.rotation, *this);
 
 				if (destroy_pellets_container)
-					step.messages.post(messages::queue_destruction(chamber_slot->items_inside[0]));
+					step.messages.post(messages::queue_destruction(chamber_slot.get_items_inside()[0]));
 				
 				chamber_slot->items_inside.clear();
 
