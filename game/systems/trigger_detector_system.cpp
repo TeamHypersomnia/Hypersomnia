@@ -58,6 +58,8 @@ void trigger_detector_system::consume_trigger_detector_presses() {
 }
 
 void trigger_detector_system::post_trigger_requests_from_continuous_detectors(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto targets_copy = cosmos.get(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
 
 	for (auto& t : targets_copy) {

@@ -29,6 +29,8 @@ void update_bounds_for_crosshair(components::camera& camera, components::crossha
 }
 
 void camera_system::react_to_input_intents(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto it : events) {
@@ -87,6 +89,8 @@ vec2i components::camera::get_camera_offset_due_to_character_crosshair(cosmos& c
 }
 
 void camera_system::resolve_cameras_transforms_and_smoothing(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 
 	auto targets_copy = cosmos.get(processing_subjects::WITH_CAMERA);
 	/* we sort layers in reverse order to keep layer 0 as topmost and last layer on the bottom */

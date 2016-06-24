@@ -22,6 +22,8 @@ using namespace messages;
 using namespace resources;
 
 void game_responses_to_animation_messages(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto& movements = step.messages.get_queue<movement_response>();
 	auto& gunshots = step.messages.get_queue<gunshot_response>();
 
@@ -62,6 +64,8 @@ void game_responses_to_animation_messages(fixed_step& step) {
 }
 
 void animation_system::handle_animation_messages(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto events = step.messages.get_queue<animation_message>();
 
 	for (auto it : events) {
@@ -133,6 +137,8 @@ void components::animation::set_current_frame(unsigned number) {
 }
 
 void animation_system::progress_animation_states(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto delta = cosmos.delta.in_milliseconds();
 
 	auto targets_copy = cosmos.get(processing_subjects::WITH_ANIMATION);

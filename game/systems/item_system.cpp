@@ -40,6 +40,8 @@ using namespace augs;
 
 
 void item_system::handle_trigger_confirmations_as_pick_requests(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();
 	auto& physics = cosmos.stateful_systems.get<physics_system>();
 
@@ -73,6 +75,8 @@ void item_system::handle_trigger_confirmations_as_pick_requests(fixed_step& step
 }
 
 void item_system::handle_throw_item_intents(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto& requests = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& r : requests) {
@@ -94,6 +98,8 @@ void item_system::handle_throw_item_intents(fixed_step& step) {
 }
 
 void item_system::handle_holster_item_intents(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto& requests = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& r : requests) {
@@ -125,6 +131,8 @@ void components::item_slot_transfers::interrupt_mounting() {
 }
 
 void item_system::process_mounting_and_unmounting(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto targets = cosmos.get(processing_subjects::WITH_ITEM_SLOT_TRANSFERS);
 	for (auto& e : targets) {
 		auto& item_slot_transfers = e.get<components::item_slot_transfers>();
@@ -160,6 +168,8 @@ void item_system::process_mounting_and_unmounting(fixed_step& step) {
 }
 
 void item_system::translate_gui_intents_to_transfer_requests(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto& intents = step.messages.get_queue<messages::gui_item_transfer_intent>();
 
 	for (auto& i : intents) {

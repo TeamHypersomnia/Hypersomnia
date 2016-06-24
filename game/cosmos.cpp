@@ -150,6 +150,8 @@ void cosmos::call_rendering_schemata(augs::variable_delta delta,
 
 
 void cosmos::advance_deterministic_schemata(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto& performance = profiler.performance;
 
 	performance.start(meter_type::CAMERA_QUERY);

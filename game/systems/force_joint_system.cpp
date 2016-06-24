@@ -12,6 +12,8 @@
 #include "game/step.h"
 
 void force_joint_system::apply_forces_towards_target_entities(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto targets = cosmos.get(processing_subjects::WITH_FORCE_JOINT);
 	for (auto& it : targets) {
 		auto& physics = it.get<components::physics>();

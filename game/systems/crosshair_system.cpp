@@ -16,6 +16,8 @@
 #include "game/step.h"
 
 void crosshair_system::generate_crosshair_intents(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	step.messages.get_queue<messages::crosshair_intent_message>().clear();
 	auto events = step.messages.get_queue<messages::intent_message>();
 
@@ -51,6 +53,8 @@ void crosshair_system::generate_crosshair_intents(fixed_step& step) {
 	}
 }
 void crosshair_system::apply_crosshair_intents_to_base_offsets(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto& events = step.messages.get_queue<messages::crosshair_intent_message>();
 
 	for (auto& it : events)
@@ -58,6 +62,8 @@ void crosshair_system::apply_crosshair_intents_to_base_offsets(fixed_step& step)
 }
 
 void crosshair_system::apply_base_offsets_to_crosshair_transforms(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	for (auto& it : cosmos.get(processing_subjects::WITH_CROSSHAIR)) {
 		auto player_id = cosmos[it.get<components::crosshair>().character_entity_to_chase];
 

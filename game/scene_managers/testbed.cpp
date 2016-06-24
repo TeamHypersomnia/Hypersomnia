@@ -300,6 +300,8 @@ namespace scene_managers {
 	}
 
 	void testbed::post_solve(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 		auto inputs = world.messages.get_queue<messages::crosshair_intent_message>();
 
 		for (auto& it : inputs) {

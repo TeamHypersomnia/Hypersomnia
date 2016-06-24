@@ -19,6 +19,8 @@
 using namespace augs;
 
 void intent_contextualization_system::contextualize_use_button_intents(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto& intents = step.messages.get_queue<messages::intent_message>();
 	
 	for (auto& e : intents) {
@@ -53,6 +55,8 @@ void intent_contextualization_system::contextualize_use_button_intents(fixed_ste
 }
 
 void intent_contextualization_system::contextualize_crosshair_action_intents(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto& events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& it : events) {
@@ -104,6 +108,8 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(fix
 }
 
 void intent_contextualization_system::contextualize_movement_intents(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto& intents = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& e : intents) {

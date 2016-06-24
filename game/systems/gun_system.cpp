@@ -32,6 +32,8 @@
 using namespace augs;
 
 void gun_system::consume_gun_intents(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto it : events) {
@@ -58,6 +60,8 @@ components::transform components::gun::calculate_barrel_transform(components::tr
 }
 
 void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	step.messages.get_queue<messages::gunshot_response>().clear();
 	auto& delta = cosmos.delta;
 

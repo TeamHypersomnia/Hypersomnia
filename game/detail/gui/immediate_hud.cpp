@@ -252,8 +252,9 @@ void immediate_hud::draw_circular_bars_information(messages::camera_render_reque
 }
 
 void immediate_hud::acquire_game_events(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto& healths = step.messages.get_queue<messages::health_event>();
-	auto& delta = cosmos.delta;
 
 	for (auto& h : healths) {
 		vertically_flying_number vn;

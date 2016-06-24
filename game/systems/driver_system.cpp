@@ -22,6 +22,8 @@
 #include "game/step.h"
 
 void driver_system::assign_drivers_from_successful_trigger_hits(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();
 
 	for (auto& e : confirmations) {
@@ -38,6 +40,8 @@ void driver_system::assign_drivers_from_successful_trigger_hits(fixed_step& step
 }
 
 void driver_system::release_drivers_due_to_ending_contact_with_wheel(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto& contacts = step.messages.get_queue<messages::collision_message>();
 	auto& physics = cosmos.stateful_systems.get<physics_system>();
 
@@ -58,6 +62,8 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel(fixed_step&
 	}
 }
 void driver_system::release_drivers_due_to_requests(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto& intents = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& e : intents)

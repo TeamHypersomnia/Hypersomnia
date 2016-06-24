@@ -28,6 +28,8 @@ void components::melee::reset_weapon(entity_handle e) {
 }
 
 void melee_system::consume_melee_intents(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	auto& events = step.messages.get_queue<messages::intent_message>();
 
 
@@ -60,6 +62,8 @@ void melee_system::consume_melee_intents(fixed_step& step) {
 }
 
 void melee_system::initiate_and_update_moves(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
 	/* 
 	- fixed delta timestep if it's a logic procedure 
 	- variable frame time if it is a rendering-time procedure 
