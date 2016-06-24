@@ -119,9 +119,37 @@ void cosmos::delete_entity(entity_id e) {
 size_t cosmos::entities_count() const {
 	return components_and_aggregates.aggregates_count();
 }
+void cosmos::advance_deterministic_schemata(augs::machine_entropy input,
+	fixed_callback pre_solve = fixed_callback(),
+	fixed_callback post_solve = fixed_callback()) {
+	fixed_step step(*this, input);
+	
+	if (pre_solve)
+		pre_solve(step);
 
-void cosmos::advance_deterministic_schemata(augs::machine_entropy input, step_state& step) {
-	auto& cosm = *this;
+	advance_deterministic_schemata(step);
+
+	if (post_solve)
+		post_solve(step);
+}
+
+void cosmos::call_rendering_schemata(augs::variable_delta delta,
+	variable_callback pre_solve = variable_callback(),
+	variable_callback post_solve = variable_callback()
+) const {
+	variable_step step(*this, delta);
+
+	if (pre_solve)
+		pre_solve(step);
+
+	call_rendering_schemata(step);
+
+	if (post_solve)
+		post_solve(step);
+}
+
+
+void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	auto& performance = profiler.performance;
 
 	performance.start(meter_type::CAMERA_QUERY);
@@ -136,66 +164,64 @@ void cosmos::advance_deterministic_schemata(augs::machine_entropy input, step_st
 	performance.start(meter_type::LOGIC);
 	render_system().set_current_transforms_as_previous_for_interpolation();
 
-	input_system().post_unmapped_intents_from_raw_window_inputs(cosm, step, input);
+	input_system().post_unmapped_intents_from_raw_window_inputs(step);
 
 	stateful_systems.get<gui_system>().switch_to_gui_mode_and_back();
 
-	input_system().map_unmapped_intents_to_entities();
+	input_system().map_unmapped_intents_to_entities(step);
 
-	intent_contextualization_system().contextualize_crosshair_action_intents();
+	intent_contextualization_system().contextualize_crosshair_action_intents(step);
 
-	gun_system().consume_gun_intents();
-	gun_system().launch_shots_due_to_pressed_triggers();
+	gun_system().consume_gun_intents(step);
+	gun_system().launch_shots_due_to_pressed_triggers(step);
 
 	particles_system().create_particle_effects();
 
-	render_system().add_entities_to_rendering_tree();
+	dynamic_tree_system().add_entities_to_rendering_tree(step);
 	stateful_systems.get<physics_system>().react_to_new_entities();
 	step.messages.get_queue<new_entity_message>().clear();
 
 	trace_system().lengthen_sprites_of_traces();
 
 	crosshair_system().generate_crosshair_intents(step);
-	crosshair_system().apply_crosshair_intents_to_base_offsets(cosm, step);
-	crosshair_system().apply_base_offsets_to_crosshair_transforms(cosm, step);
-	crosshair_system().animate_crosshair_sizes(cosm);
+	crosshair_system().apply_crosshair_intents_to_base_offsets(step);
+	crosshair_system().apply_base_offsets_to_crosshair_transforms(step);
 
-	camera_system().react_to_input_intents();
+	camera_system().react_to_input_intents(step);
 
 	/* intent delegation stage (various ownership relations) */
-	intent_contextualization_system().contextualize_use_button_intents();
+	intent_contextualization_system().contextualize_use_button_intents(step);
 	/* end of intent delegation stage */
 
-	driver_system().release_drivers_due_to_requests();
+	driver_system().release_drivers_due_to_requests(step);
 
 	trigger_detector_system().consume_trigger_detector_presses();
-	trigger_detector_system().post_trigger_requests_from_continuous_detectors();
+	trigger_detector_system().post_trigger_requests_from_continuous_detectors(step);
 	trigger_detector_system().send_trigger_confirmations();
 
-	item_system().translate_gui_intents_to_transfer_requests();
-	item_system().handle_trigger_confirmations_as_pick_requests();
-	item_system().handle_holster_item_intents();
-	item_system().handle_throw_item_intents();
+	item_system().translate_gui_intents_to_transfer_requests(step);
+	item_system().handle_trigger_confirmations_as_pick_requests(step);
+	item_system().handle_holster_item_intents(step);
+	item_system().handle_throw_item_intents(step);
 
-	driver_system().assign_drivers_from_successful_trigger_hits();
-	driver_system().release_drivers_due_to_ending_contact_with_wheel();
+	driver_system().assign_drivers_from_successful_trigger_hits(step);
+	driver_system().release_drivers_due_to_ending_contact_with_wheel(step);
 
-	intent_contextualization_system().contextualize_movement_intents();
+	intent_contextualization_system().contextualize_movement_intents(step);
 
-	melee_system().consume_melee_intents();
-	force_joint_system().apply_forces_towards_target_entities();
+	melee_system().consume_melee_intents(step);
+	force_joint_system().apply_forces_towards_target_entities(step);
 
-	car_system().set_steering_flags_from_intents();
-	car_system().apply_movement_forces();
+	car_system().set_steering_flags_from_intents(step);
+	car_system().apply_movement_forces(step);
 
-	movement_system().set_movement_flags_from_input();
-	movement_system().apply_movement_forces();
+	movement_system().set_movement_flags_from_input(step);
+	movement_system().apply_movement_forces(step.cosm);
 
-	rotation_copying_system().update_physical_motors();
+	rotation_copying_system().update_physical_motors(step.cosm);
 	performance.start(meter_type::PHYSICS);
-	stateful_systems.get<physics_system>().execute_delayed_physics_ops();
 
-	raycasts.measure(stateful_systems.get<physics_system>().ray_casts_since_last_step);
+	profiler.raycasts.measure(stateful_systems.get<physics_system>().ray_casts_since_last_step);
 
 	stateful_systems.get<physics_system>().step_and_set_new_transforms();
 	performance.stop(meter_type::PHYSICS);
@@ -219,47 +245,32 @@ void cosmos::advance_deterministic_schemata(augs::machine_entropy input, step_st
 	performance.stop(meter_type::VISIBILITY);
 
 	performance.start(meter_type::AI);
-	behaviour_tree_system().evaluate_trees();
+	behaviour_tree_system().evaluate_trees(step.cosm);
 	performance.stop(meter_type::AI);
 
 	performance.start(meter_type::PATHFINDING);
-	pathfinding_system().advance_pathfinding_sessions(cosm);
+	pathfinding_system().advance_pathfinding_sessions(step.cosm);
 	performance.stop(meter_type::PATHFINDING);
 
 	particles_system().step_streams_and_particles();
 	particles_system().destroy_dead_streams();
 	trace_system().destroy_outdated_traces();
 
-	destroy_system().queue_children_of_queued_entities();
+	destroy_system().queue_children_of_queued_entities(step);
 
 	trace_system().spawn_finishing_traces_for_destroyed_objects();
-	render_system().remove_entities_from_rendering_tree();
-	stateful_systems.get<physics_system>().react_to_destroyed_entities();
+	dynamic_tree_system().remove_entities_from_rendering_tree();
+	stateful_systems.get<physics_system>().react_to_destroyed_entities(step);
 
 	bool has_no_destruction_callback_queued_any_additional_destruction = step.messages.get_queue<messages::queue_destruction>().empty();
 	ensure(has_no_destruction_callback_queued_any_additional_destruction);
 
 	destroy_system().perform_deletions();
 
-	++current_step_number;
-	seconds_passed += delta.in_seconds();
-	performance.stop(meter_type::LOGIC);
-}
-
-void cosmos::call_rendering_schemata(augs::variable_delta delta, step_state& step) const {
-	const auto& cosm = *this;
-
-	auto& performance = profiler.performance;
-
-	performance.start(meter_type::RENDERING);
-
-
-	performance.start(meter_type::INTERPOLATION);
-	render_system().calculate_and_set_interpolated_transforms();
-	performance.stop(meter_type::INTERPOLATION);
-
 	input_system().post_unmapped_intents_from_raw_window_inputs();
 	input_system().map_unmapped_intents_to_entities();
+
+
 
 	movement_system().generate_movement_responses();
 
@@ -268,14 +279,28 @@ void cosmos::call_rendering_schemata(augs::variable_delta delta, step_state& ste
 	animation_system().handle_animation_messages();
 	animation_system().progress_animation_states();
 
+	performance.start(meter_type::RENDERING);
+
+
+	performance.start(meter_type::INTERPOLATION);
+	render_system().calculate_and_set_interpolated_transforms();
+	performance.stop(meter_type::INTERPOLATION);
 
 	position_copying_system().update_transforms();
 	camera_system().resolve_cameras_transforms_and_smoothing();
 	rotation_copying_system().update_rotations();
 
-	camera_system().post_render_requests_for_all_cameras();
+	++current_step_number;
+	seconds_passed += delta.in_seconds();
+	performance.stop(meter_type::LOGIC);
+}
 
-	input_system().acquire_new_events_posted_by_drawing_time_systems();
+void cosmos::call_rendering_schemata(variable_step& step) const {
+	const auto& cosm = *this;
+
+	auto& performance = profiler.performance;
+
+	camera_system().post_render_requests_for_all_cameras();
 
 	performance.stop(meter_type::RENDERING);
 }

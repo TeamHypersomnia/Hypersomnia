@@ -18,11 +18,17 @@
 #include "game/global/all_settings.h"
 #include "game/cosmic_profiler.h"
 #include "game/step.h"
+#include <functional>
 
 struct inventory_slot_id;
 class cosmos {
 	storage_for_all_components_and_aggregates components_and_aggregates;
 
+	void advance_deterministic_schemata(fixed_step& step_state);
+	void call_rendering_schemata(variable_step& step_state) const;
+
+	typedef std::function<void(fixed_step&)> fixed_callback;
+	typedef std::function<void(variable_step&)> variable_callback;
 public:
 	storage_for_all_stateful_systems stateful_systems;
 	lists_of_processing_subjects lists_of_processing_subjects;
@@ -37,6 +43,15 @@ public:
 
 	cosmos();
 
+	void advance_deterministic_schemata(augs::machine_entropy input, 
+		fixed_callback pre_solve = fixed_callback(), 
+		fixed_callback post_solve = fixed_callback());
+
+	void call_rendering_schemata(augs::variable_delta delta,
+		variable_callback pre_solve = variable_callback(),
+		variable_callback post_solve = variable_callback()
+		) const;
+
 	void reserve_storage_for_entities(size_t);
 
 	entity_handle create_entity(std::string debug_name);
@@ -47,8 +62,6 @@ public:
 	
 	void delete_entity(entity_id);
 
-	void advance_deterministic_schemata(augs::machine_entropy input, step_state& initial_step_state);
-	void call_rendering_schemata(augs::variable_delta delta, step_state& initial_step_state) const;
 
 	entity_handle get_handle(entity_id);
 	const_entity_handle get_handle(entity_id) const;

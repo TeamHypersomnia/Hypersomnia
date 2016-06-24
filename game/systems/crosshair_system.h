@@ -8,6 +8,4 @@ public:
 	
 	void apply_crosshair_intents_to_base_offsets(fixed_step&);
 	void apply_base_offsets_to_crosshair_transforms(fixed_step&);
-
-	void animate_crosshair_sizes(cosmos&);
 };

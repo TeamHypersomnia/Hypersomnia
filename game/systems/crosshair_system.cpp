@@ -67,21 +67,3 @@ void crosshair_system::apply_base_offsets_to_crosshair_transforms(fixed_step& st
 		}
 	}
 }
-
-void crosshair_system::animate_crosshair_sizes(cosmos& cosmos) {
-	for (auto it : cosmos.get(processing_subjects::WITH_CROSSHAIR)) {
-		auto& crosshair = it.get<components::crosshair>();
-
-		if (crosshair.should_blink) {
-			float ratio = 0.f;
-			crosshair.blink.animate(ratio);
-
-			auto* crosshair_sprite = it.find<components::sprite>();
-
-			if (crosshair_sprite) {
-				crosshair_sprite->update_size_from_texture_dimensions();
-				crosshair_sprite->size *= crosshair.size_multiplier*ratio;
-			}
-		}
-	}
-}

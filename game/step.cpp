@@ -4,7 +4,7 @@
 
 variable_step::variable_step(const cosmos& cosm, augs::variable_delta delta) : cosm(cosm), delta(delta) {}
 
-fixed_step::fixed_step(cosmos& cosm) : cosm(cosm) {}
+fixed_step::fixed_step(cosmos& cosm, augs::machine_entropy entropy) : cosm(cosm), entropy(entropy) {}
 
 augs::variable_delta variable_step::get_delta() const {
 	return delta;
