@@ -29,12 +29,12 @@ typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot
 
 template <bool C>
 typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot_handle<C>::make_handle(entity_id id) const {
-	return owner.get_handle(id);
+	return owner[id];
 }
 
 template <bool C>
 typename basic_inventory_slot_handle<C> basic_inventory_slot_handle<C>::make_handle(inventory_slot_id id) const {
-	return owner.get_handle(id);
+	return owner[id];
 }
 
 template <bool C>
@@ -106,7 +106,7 @@ bool basic_inventory_slot_handle<C>::should_item_inside_keep_physical_body(entit
 		//if (maybe_item->current_slot.get_handle().alive() && maybe_item->current_slot.get_handle() == until_parent)
 		//	return should_item_here_keep_physical_body;
 		//else 
-		auto slot = owner.get_handle(maybe_item->current_slot);
+		auto slot = owner[maybe_item->current_slot];
 
 		if (slot.alive())
 			return std::min(should_item_here_keep_physical_body, slot.should_item_inside_keep_physical_body(until_parent));
@@ -226,7 +226,7 @@ std::vector<typename basic_inventory_slot_handle<C>::entity_handle_type> basic_i
 	return get_cosmos().to_handle_vector(items_inside);
 
 	//for (auto& i : items_inside) {
-	//	auto handle = cosmos.get_handle(i);
+	//	auto handle = cosmos[i];
 	//
 	//	if (handle.get<components::item>().is_mounted())
 	//		output.push_back(i);

@@ -33,7 +33,7 @@ std::vector<physics_system::raycast_output> physics_system::ray_cast_all_interse
 (vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity) {
 	++ray_casts_since_last_step;
 
-	raycast_input callback{ parent_cosmos.get_handle(ignore_entity) } ;
+	raycast_input callback{ parent_cosmos[ignore_entity] } ;
 	callback.subject_filter = filter;
 	callback.save_all = true;
 
@@ -111,7 +111,7 @@ vec2 physics_system::push_away_from_walls(vec2 position, float radius, int ray_a
 physics_system::raycast_output physics_system::ray_cast(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity) {
 	++ray_casts_since_last_step;
 
-	raycast_input callback{ parent_cosmos.get_handle(ignore_entity) };
+	raycast_input callback{ parent_cosmos[ignore_entity] };
 	callback.subject_filter = filter;
 
 	if (!((p1_meters - p2_meters).length_sq() > 0.f)) {
@@ -168,7 +168,7 @@ physics_system::query_aabb_output physics_system::query_aabb(vec2 p1_meters, vec
 physics_system::query_output physics_system::query_body(entity_id subject, b2Filter filter, entity_id ignore_entity) {
 	query_output total_output;
 
-	auto handle = parent_cosmos.get_handle(subject);
+	auto handle = parent_cosmos[subject];
 
 	for (b2Fixture* f = handle.get<components::physics>().black_detail.body->GetFixtureList(); f != nullptr; f = f->GetNext()) {
 		auto world_vertices = get_world_vertices(handle, true);

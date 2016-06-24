@@ -37,7 +37,7 @@ void gun_system::consume_gun_intents(cosmos& cosmos, step_state& step) {
 	auto events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto it : events) {
-		auto* maybe_gun = cosmos.get_handle(it.subject).find<components::gun>();
+		auto* maybe_gun = cosmos[it.subject].find<components::gun>();
 		if (maybe_gun == nullptr) continue;
 
 		auto& gun = *maybe_gun;
@@ -67,9 +67,9 @@ void gun_system::launch_shots_due_to_pressed_triggers(cosmos& cosmos, step_state
 
 	auto targets = cosmos.get(processing_subjects::WITH_GUN); //??
 	for (auto it : targets) {
-		const auto& gun_transform = cosmos.get_handle(it).get<components::transform>();
-		auto& gun = cosmos.get_handle(it).get<components::gun>();
-		auto& container = cosmos.get_handle(it).get<components::container>();
+		const auto& gun_transform = cosmos[it].get<components::transform>();
+		auto& gun = cosmos[it].get<components::gun>();
+		auto& container = cosmos[it].get<components::container>();
 
 		if (gun.trigger_pressed && check_timeout_and_reset(gun.timeout_between_shots)) {
 			if (gun.action_mode != components::gun::action_type::AUTOMATIC)
@@ -112,7 +112,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(cosmos& cosmos, step_state
 							damage.sender = it;
 							total_recoil_multiplier *= damage.recoil_multiplier;
 
-							cosmos.get_handle(round_entity).get<components::transform>() = barrel_transform;
+							cosmos[round_entity].get<components::transform>() = barrel_transform;
 							
 							auto rng = cosmos.get_rng_for(round_entity);
 							set_velocity(round_entity, vec2().set_from_degrees(barrel_transform.rotation).set_length(rng.randval(gun.muzzle_velocity)));
@@ -132,7 +132,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(cosmos& cosmos, step_state
 							shell_transform.pos += vec2(gun.shell_spawn_offset.pos).rotate(gun_transform.rotation, vec2());
 							shell_transform.rotation += spread_component;
 
-							cosmos.get_handle(shell_entity).get<components::transform>() = shell_transform;
+							cosmos[shell_entity].get<components::transform>() = shell_transform;
 
 							set_velocity(shell_entity, vec2().set_from_degrees(barrel_transform.rotation + spread_component).set_length(rng.randval(gun.shell_velocity)));
 							response.spawned_shells.push_back(shell_entity);

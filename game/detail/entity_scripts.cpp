@@ -55,7 +55,7 @@ identified_danger assess_danger(const_entity_handle victim, const_entity_handle 
 
 	auto victim_pos = position(victim);
 	auto danger_pos = position(danger);
-	auto danger_vel = velocity(cosmos.get_handle(get_owner_body_entity(danger)));
+	auto danger_vel = velocity(cosmos[get_owner_body_entity(danger))];
 	auto danger_speed = danger_vel.length();
 	auto danger_dir = (danger_pos - victim_pos);
 	float danger_distance = danger_dir.length();

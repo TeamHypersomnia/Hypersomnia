@@ -31,7 +31,7 @@ void resolve_density_of_associated_fixtures(entity_handle id) {
 
 		for (auto& f : entities) {
 			if (f != id)
-				resolve_density_of_associated_fixtures(cosmos.get_handle(f));
+				resolve_density_of_associated_fixtures(cosmos[f)];
 		}
 	}
 
@@ -41,14 +41,14 @@ void resolve_density_of_associated_fixtures(entity_handle id) {
 
 	auto* item = id.find<components::item>();
 
-	if (item != nullptr && cosmos.get_handle(item->current_slot).alive() && cosmos.get_handle(item->current_slot).should_item_inside_keep_physical_body())
-		density_multiplier *= cosmos.get_handle(item->current_slot).calculate_density_multiplier_due_to_being_attached();
+	if (item != nullptr && cosmos[item->current_slot).alive() && cosmos.get_handle(item->current_slot].should_item_inside_keep_physical_body())
+		density_multiplier *= cosmos[item->current_slot].calculate_density_multiplier_due_to_being_attached();
 
-	auto owner_body = cosmos.get_handle(get_owner_body_entity(id));
+	auto owner_body = cosmos[get_owner_body_entity(id)];
 	auto* driver = owner_body.find<components::driver>();
 
 	if (driver) {
-		if (cosmos.get_handle(driver->owned_vehicle).alive()) {
+		if (cosmos[driver->owned_vehicle].alive()) {
 			density_multiplier *= driver->density_multiplier_while_driving;
 		}
 	}
@@ -64,15 +64,15 @@ bool are_connected_by_friction(const_entity_handle child, const_entity_handle pa
 		bool matched_ancestor = false;
 
 		entity_id parent_body_entity = get_owner_body_entity(parent);
-		entity_id childs_ancestor_entity = cosmos.get_handle(get_owner_body_entity(child)).get<components::physics>().get_owner_friction_ground();
+		entity_id childs_ancestor_entity = cosmos[get_owner_body_entity(child)).get<components::physics>(].get_owner_friction_ground();
 
-		while (cosmos.get_handle(childs_ancestor_entity).alive()) {
+		while (cosmos[childs_ancestor_entity].alive()) {
 			if (childs_ancestor_entity == parent_body_entity) {
 				matched_ancestor = true;
 				break;
 			}
 
-			childs_ancestor_entity = cosmos.get_handle(childs_ancestor_entity).get<components::physics>().get_owner_friction_ground();
+			childs_ancestor_entity = cosmos[childs_ancestor_entity).get<components::physics>(].get_owner_friction_ground();
 		}
 
 		if (matched_ancestor)

@@ -25,15 +25,15 @@ void driver_system::assign_drivers_from_successful_trigger_hits(cosmos& cosmos, 
 	auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();
 
 	for (auto& e : confirmations) {
-		auto subject_car = cosmos.get_handle(e.trigger).get<components::trigger>().entity_to_be_notified;
+		auto subject_car = cosmos[e.trigger).get<components::trigger>(].entity_to_be_notified;
 
-		if (cosmos.get_handle(subject_car).dead())
+		if (cosmos[subject_car].dead())
 			continue;
 
-		auto* maybe_car = cosmos.get_handle(subject_car).find<components::car>();
+		auto* maybe_car = cosmos[subject_car].find<components::car>();
 
 		if (maybe_car && e.trigger == maybe_car->left_wheel_trigger)
-			assign_car_ownership(cosmos.get_handle(e.detector_body), cosmos.get_handle(subject_car));
+			assign_car_ownership(cosmos[e.detector_body), cosmos.get_handle(subject_car)];
 	}
 }
 
@@ -43,15 +43,15 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel(cosmos& cos
 
 	for (auto& c : contacts) {
 		if (c.type == messages::collision_message::event_type::END_CONTACT) {
-			auto driver = cosmos.get_handle(c.subject);
+			auto driver = cosmos[c.subject];
 			auto car = physics.get_owner_body_entity(c.collider);
 
-			auto* maybe_driver = cosmos.get_handle(driver).find<components::driver>();
+			auto* maybe_driver = cosmos[driver].find<components::driver>();
 
 			if (maybe_driver) {
 				if (maybe_driver->owned_vehicle == car) {
 					release_car_ownership(driver);
-					cosmos.get_handle(driver).get<components::movement>().make_inert_for_ms = 500.f;
+					cosmos[driver).get<components::movement>(].make_inert_for_ms = 500.f;
 				}
 			}
 		}
@@ -62,7 +62,7 @@ void driver_system::release_drivers_due_to_requests(cosmos& cosmos, step_state& 
 
 	for (auto& e : intents)
 		if (e.intent == intent_type::RELEASE_CAR && e.pressed_flag)
-			release_car_ownership(cosmos.get_handle(e.subject));
+			release_car_ownership(cosmos[e.subject)];
 }
 
 bool driver_system::release_car_ownership(entity_handle driver) {
@@ -86,7 +86,7 @@ bool driver_system::change_car_ownership(entity_handle driver_entity, entity_han
 	if (!lost_ownership) {
 		auto& car = car_entity.get<components::car>();
 
-		if (cosmos.get_handle(car.current_driver).alive())
+		if (cosmos[car.current_driver].alive())
 			return false;
 
 		driver.owned_vehicle = car_entity;
@@ -111,7 +111,7 @@ bool driver_system::change_car_ownership(entity_handle driver_entity, entity_han
 		}
 	}
 	else {
-		auto& car = cosmos.get_handle(driver.owned_vehicle).get<components::car>();
+		auto& car = cosmos[driver.owned_vehicle].get<components::car>();
 
 		driver.owned_vehicle.unset();
 		car.current_driver.unset();

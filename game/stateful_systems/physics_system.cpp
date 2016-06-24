@@ -42,7 +42,7 @@ void physics_system::step_and_set_new_transforms(step_state& step) {
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
 
-		auto& physics = parent_cosmos.get_handle(b->GetUserData()).get<components::physics>();
+		auto& physics = parent_cosmos[b->GetUserData()].get<components::physics>();
 		physics.measured_carried_mass = 0.f;
 
 		b2Vec2 vel(b->GetLinearVelocity());
@@ -95,7 +95,7 @@ void physics_system::step_and_set_new_transforms(step_state& step) {
 
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
-		auto entity = parent_cosmos.get_handle(b->GetUserData());
+		auto entity = parent_cosmos[b->GetUserData()];
 		auto& physics = entity.get<components::physics>();
 		
 		recurential_friction_handler(b->GetUserData(), physics.get_owner_friction_ground());
@@ -107,7 +107,7 @@ void physics_system::step_and_set_new_transforms(step_state& step) {
 void physics_system::set_transforms_from_body_transforms() {
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
-		auto entity = parent_cosmos.get_handle(b->GetUserData());
+		auto entity = parent_cosmos[b->GetUserData()];
 
 		auto& transform = entity.get<components::transform>();
 		auto& physics = entity.get<components::physics>();
@@ -116,7 +116,7 @@ void physics_system::set_transforms_from_body_transforms() {
 		auto body_angle = b->GetAngle() * RAD_TO_DEG;
 
 		for (auto& ff : physics.black_detail.fixture_entities) {
-			auto fe = parent_cosmos.get_handle(ff);
+			auto fe = parent_cosmos[ff];
 
 			auto& fixtures = fe.get<components::fixtures>();
 			auto total_offset = fixtures.get_total_offset();
@@ -144,7 +144,7 @@ void physics_system::react_to_destroyed_entities(step_state& step) {
 	auto& events = step.messages.get_queue<messages::will_soon_be_deleted>();
 
 	for (auto& it : events) {
-		auto e = parent_cosmos.get_handle(it.subject);
+		auto e = parent_cosmos[it.subject];
 
 		auto* maybe_physics = e.find<components::physics>();
 		auto* maybe_fixtures = e.find<components::fixtures>();
@@ -161,7 +161,7 @@ void physics_system::react_to_new_entities(step_state& step) {
 	auto& events = step.messages.get_queue<messages::new_entity_message>();
 
 	for (auto& it : events) {
-		auto e = parent_cosmos.get_handle(it.subject);
+		auto e = parent_cosmos[it.subject];
 
 		auto* maybe_physics = e.find<components::physics>();
 		auto* maybe_fixtures = e.find<components::fixtures>();
@@ -176,7 +176,7 @@ void physics_system::react_to_new_entities(step_state& step) {
 		}
 
 		if (maybe_fixtures) {
-			if (parent_cosmos.get_handle(maybe_fixtures->get_owner_body()).dead()) {
+			if (parent_cosmos[maybe_fixtures->get_owner_body()].dead()) {
 				maybe_fixtures->set_owner_body(e);
 			}
 
