@@ -32,7 +32,7 @@
 
 #include "cosmos.h"
 
-#include "game/step_state.h"
+#include "game/step.h"
 #include "game/cosmic_profiler.h"
 #include "game/entity_handle.h"
 #include "game/detail/inventory_slot_handle.h"

@@ -14,7 +14,7 @@
 #include "game/components/transform_component.h"
 
 #include "game/entity_handle.h"
-#include "game/step_state.h"
+#include "game/step.h"
 
 void car_system::set_steering_flags_from_intents(cosmos& cosmos, step_state& step) {
 	auto& intents = step.messages.get_queue<messages::intent_message>();

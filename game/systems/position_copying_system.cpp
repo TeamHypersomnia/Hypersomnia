@@ -6,7 +6,7 @@
 #include "game/components/transform_component.h"
 
 #include "game/entity_handle.h"
-#include "game/step_state.h"
+#include "game/step.h"
 
 #include "game/cosmos.h"
 

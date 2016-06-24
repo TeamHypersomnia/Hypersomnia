@@ -24,6 +24,8 @@
 #include "templates.h"
 #include "augs/gui/text_drawer.h"
 
+#include "misc/deterministic_timing.h"
+
 vec2 position_caption_around_a_circle(float radius, vec2 r, float alpha) {
 	vec2 top_bounds[2] =  { vec2(-r.x / 2, -radius - r.y / 2), vec2(r.x / 2, -radius - r.y / 2) };
 	vec2 left_bounds[2] = { vec2(-radius - r.x / 2, r.y / 2), vec2(-radius - r.x / 2, -r.y / 2) };
@@ -255,7 +257,7 @@ void immediate_hud::acquire_game_events(cosmos& cosmos, step_state& step) {
 
 	for (auto& h : healths) {
 		vertically_flying_number vn;
-		vn.time_of_occurence = delta.total_time_passed_in_seconds();
+		vn.time_of_occurence = delta.get_timestamp();
 		vn.value = h.effective_amount;
 		vn.maximum_duration_seconds = 0.7;
 
@@ -276,7 +278,7 @@ void immediate_hud::acquire_game_events(cosmos& cosmos, step_state& step) {
 		recent_vertically_flying_numbers.push_back(vn);
 
 		pure_color_highlight ph;
-		ph.time_of_occurence = w.get_current_timestamp();
+		ph.time_of_occurence = delta.get_timestamp();
 		
 		ph.target = h.subject;
 		ph.starting_alpha_ratio = std::min(1.f, h.ratio_effective_to_maximum * 5);
@@ -306,7 +308,7 @@ void immediate_hud::draw_vertically_flying_numbers(messages::camera_render_reque
 
 	for (auto& r : recent_vertically_flying_numbers) { 
 		auto passed = current_time - r.time_of_occurence;
-		auto ratio =  passed / r.maximum_duration_seconds;
+		auto ratio =  passed.in_seconds() / r.maximum_duration_seconds;
 
 		r.text.pos = msg.get_screen_space((r.transform.pos - vec2(0, sqrt(passed) * 150.f)));
 		

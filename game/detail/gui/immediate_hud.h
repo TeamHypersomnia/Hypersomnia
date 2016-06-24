@@ -8,7 +8,7 @@ class cosmos;
 struct immediate_hud {
 	struct game_event_visualization {
 		double maximum_duration_seconds = 0.0;
-		augs::deterministic_timestamp time_of_occurence;
+		augs::stepped_timestamp time_of_occurence;
 	};
 
 	struct vertically_flying_number : game_event_visualization {

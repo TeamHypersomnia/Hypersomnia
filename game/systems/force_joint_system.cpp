@@ -9,7 +9,7 @@
 #include "game/cosmos.h"
 
 #include "game/entity_handle.h"
-#include "game/step_state.h"
+#include "game/step.h"
 
 void force_joint_system::apply_forces_towards_target_entities(cosmos& cosmos, step_state& step) {
 	auto targets = cosmos.get(processing_subjects::WITH_FORCE_JOINT);

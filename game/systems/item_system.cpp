@@ -60,8 +60,8 @@ void item_system::handle_trigger_confirmations_as_pick_requests(cosmos& cosmos, 
 				item_slot_transfer_request request(item_entity, cosmos[determine_pickup_target_slot(item_entity, cosmos[e.detector_body])]);
 
 				if (request.target_slot.alive()) {
-					if (physics.check_timeout_and_reset(item_slot_transfers->pickup_timeout)) {
-						step.messages.post(request);
+					if (item_slot_transfers->pickup_timeout.try_to_fire_and_reset(cosmos.delta)) {
+						perform_transfer(request, step);
 					}
 				}
 				else {
@@ -129,8 +129,7 @@ void item_system::process_mounting_and_unmounting(cosmos& cosmos, step_state& st
 	for (auto& e : targets) {
 		auto& item_slot_transfers = e.get<components::item_slot_transfers>();
 
-		auto& currently_mounted_item_id = item_slot_transfers.mounting.current_item;
-		auto currently_mounted_item = cosmos[currently_mounted_item_id];
+		auto currently_mounted_item = cosmos[item_slot_transfers.mounting.current_item];
 
 		if (currently_mounted_item.alive()) {
 			auto& item = currently_mounted_item.get<components::item>();

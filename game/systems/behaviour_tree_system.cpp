@@ -7,7 +7,7 @@
 #include "game/components/behaviour_tree_component.h"
 
 #include "game/entity_handle.h"
-#include "game/step_state.h"
+#include "game/step.h"
 
 using namespace augs;
 

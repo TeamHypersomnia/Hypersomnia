@@ -18,7 +18,7 @@
 #include "misc/timer.h"
 
 #include "game/entity_handle.h"
-#include "game/step_state.h"
+#include "game/step.h"
 #include "game/cosmos.h"
 
 using namespace augs;
