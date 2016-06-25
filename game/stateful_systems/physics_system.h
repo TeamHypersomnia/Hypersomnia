@@ -85,7 +85,6 @@ public:
 
 	void step_and_set_new_transforms(step_state&);
 
-
 	int ray_casts_since_last_step = 0;
 
 	b2World b2world;

@@ -19,9 +19,9 @@ namespace scene_managers {
 		void populate_world_with_entities(fixed_step&);
 		
 		void pre_solve(fixed_step&);
-		void post_solve(cosmos&, const step_state&);
+		void post_solve(fixed_step&);
 
-		void drawcalls_after_all_cameras(fixed_step&);
+		void drawcalls_after_all_cameras(variable_step&) const;
 
 		void execute_drawcalls_for_camera(messages::camera_render_request_message);
 	};

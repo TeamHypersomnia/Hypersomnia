@@ -98,3 +98,7 @@ public:
 	std::vector<basic_entity_handle> guns_wielded();
 };
 
+template <bool is_const>
+std::vector<entity_id> to_id_vector(std::vector<basic_entity_handle<is_const>> vec) {
+	return std::vector<entity_id>(vec.begin(), vec.end());
+}

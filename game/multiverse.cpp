@@ -24,11 +24,26 @@ multiverse::multiverse()
 {
 	main_cosmos = cosmos();
 	main_cosmos.reserve_storage_for_entities(50000);
+	
+		//if (input.found_recording()) {
+		//	world.parent_overworld.configure_stepping(60, 500);
+		//	world.parent_overworld.delta_timer.set_stepping_speed_multiplier(6.00);
+		//
+		//	input.replay_found_recording();
+		//
+		//	world.settings.enable_interpolation = true;
+		//}
+		//else {
+		//	world.parent_overworld.configure_stepping(60, 500);
+		//	world.parent_overworld.delta_timer.set_stepping_speed_multiplier(1.0);
+		//
+		//	world.settings.enable_interpolation = true;
+		//	input.record_and_save_this_session();
+		//}
 
-	step_state initializatory_step;
-
-	main_cosmos_manager.populate_world_with_entities(main_cosmos, initializatory_step);
-	main_cosmos.advance_deterministic_schemata(augs::machine_entropy(), initializatory_step);
+	main_cosmos.advance_deterministic_schemata(augs::machine_entropy(), [this](fixed_step& step) {
+		main_cosmos_manager.populate_world_with_entities(step);
+	});
 }
 
 void multiverse::control(augs::machine_entropy entropy) {
@@ -61,9 +76,10 @@ void multiverse::control(augs::machine_entropy entropy) {
 
 void multiverse::view(game_window& window) const {
 	main_cosmos.profiler.fps_counter.new_measurement();
-
-	step_state step;
-	main_cosmos.call_rendering_schemata(frame_timer.extract_variable_delta(main_cosmos_timer), step);
+	
+	main_cosmos.call_rendering_schemata(frame_timer.extract_variable_delta(main_cosmos_timer), cosmos::variable_callback(), [this](variable_step& step) {
+		main_cosmos_manager.drawcalls_after_all_cameras(step);
+	});
 	main_cosmos.profiler.fps_counter.end_measurement();
 }
 

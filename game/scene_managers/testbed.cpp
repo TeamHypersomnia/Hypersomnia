@@ -43,7 +43,8 @@
 using namespace augs;
 
 namespace scene_managers {
-	void testbed::populate_world_with_entities(cosmos& world, step_state& step) {
+	void testbed::populate_world_with_entities(fixed_step& step) {
+		auto& world = step.cosm;
 		auto& window = *window::glwindow::get_current();
 		auto window_rect = window.get_screen_rect();
 
@@ -94,11 +95,13 @@ namespace scene_managers {
 
 		const int num_characters = 2;
 
+		std::vector<entity_handle> new_characters;
+
 		for (int i = 0; i < num_characters; ++i) {
 			auto new_character = prefabs::create_character(world, vec2(i * 300, 0));
 			new_character.set_debug_name(typesafe_sprintf("player%x", i));
 			
-			characters.push_back(new_character);
+			new_characters.push_back(new_character);
 
 			if (i == 0) {
 				new_character.get<components::sentience>().health.value = 800;
@@ -130,9 +133,9 @@ namespace scene_managers {
 			}
 		}
 
-		name_entity(world[characters[0]], entity_name::PERSON, L"Attacker");
+		name_entity(world[new_characters[0]], entity_name::PERSON, L"Attacker");
 
-		ingredients::inject_window_input_to_character(world[characters[current_character]], camera);
+		ingredients::inject_window_input_to_character(world[new_characters[current_character]], camera);
 
 		prefabs::create_sample_suppressor(world, vec2(300, -500));
 
@@ -185,60 +188,34 @@ namespace scene_managers {
 		auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
 		prefabs::create_sample_backpack(world, vec2(200, -750));
 
-		item_slot_transfer_request r;
-		r.item = backpack;
-		r.target_slot = characters[0][slot_function::SHOULDER_SLOT];
-
-		item_system().perform_transfer(r, step);
-
-		// world.post_message(r);
-
-		r.item = submachine;
-		r.target_slot = characters[0][slot_function::PRIMARY_HAND];
-
-		world.post_message(r);
-
-		r.item = rifle;
-		r.target_slot = characters[0][slot_function::SECONDARY_HAND];
-
-		world.post_message(r);
+		perform_transfer({ backpack, new_characters[0][slot_function::SHOULDER_SLOT] }, step);
+		perform_transfer({ submachine, new_characters[0][slot_function::PRIMARY_HAND] }, step);
+		perform_transfer({ rifle, new_characters[0][slot_function::SECONDARY_HAND] }, step);
 
 		if (num_characters > 1) {
-			name_entity(characters[1], entity_name::PERSON, L"Enemy");
-
-			r.item = rifle2;
-			r.target_slot = characters[1][slot_function::PRIMARY_HAND];
-
-			world.post_message(r);
+			name_entity(new_characters[1], entity_name::PERSON, L"Enemy");
+			perform_transfer({ rifle2, new_characters[1][slot_function::PRIMARY_HAND] }, step);
 		}
 
 		if (num_characters > 2) {
-			name_entity(characters[2], entity_name::PERSON, L"Swordsman");
-
-			r.item = second_machete;
-			r.target_slot = characters[2][slot_function::PRIMARY_HAND];
-
-			world.post_message(r);
+			name_entity(new_characters[2], entity_name::PERSON, L"Swordsman");
+			perform_transfer({ second_machete, new_characters[2][slot_function::PRIMARY_HAND] }, step);
 		}
 
 		if (num_characters > 3) {
-			name_entity(characters[3], entity_name::PERSON, L"Medic");
-
-			r.item = pis2;
-			r.target_slot = characters[3][slot_function::PRIMARY_HAND];
-
-			world.post_message(r);
+			name_entity(new_characters[3], entity_name::PERSON, L"Medic");
+			perform_transfer({ pis2, new_characters[3][slot_function::PRIMARY_HAND] }, step);
 		}
 
 		if (num_characters > 5) {
-			r.item = prefabs::create_submachine(world, vec2(0, -1000),
+			auto new_item = prefabs::create_submachine(world, vec2(0, -1000),
 				prefabs::create_sample_magazine(world, vec2(100 - 50, -650), true ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), true ? 500 : 50)));
-			r.target_slot = characters[5][slot_function::PRIMARY_HAND];
-
-			world.post_message(r);
+			
+			perform_transfer({ new_item, new_characters[5][slot_function::PRIMARY_HAND] }, step);
 		}
 
-		input_system::context active_context;
+		auto& active_context = world.settings.input;
+
 		active_context.map_key_to_intent(window::event::keys::W, intent_type::MOVE_FORWARD);
 		active_context.map_key_to_intent(window::event::keys::S, intent_type::MOVE_BACKWARD);
 		active_context.map_key_to_intent(window::event::keys::A, intent_type::MOVE_LEFT);
@@ -262,69 +239,42 @@ namespace scene_managers {
 		active_context.map_key_to_intent(window::event::keys::SPACE, intent_type::SPACE_BUTTON);
 		active_context.map_key_to_intent(window::event::keys::MOUSE4, intent_type::SWITCH_TO_GUI);
 
-		auto& input = world.systems.get<input_system>();
-		input.add_context(active_context);
-
-		if (input.found_recording()) {
-			world.parent_overworld.configure_stepping(60, 500);
-			world.parent_overworld.delta_timer.set_stepping_speed_multiplier(6.00);
-
-			input.replay_found_recording();
-
-			world.systems.get<render_system>().enable_interpolation = true;
-		}
-		else {
-			world.parent_overworld.configure_stepping(60, 500);
-			world.parent_overworld.delta_timer.set_stepping_speed_multiplier(1.0);
-
-			world.systems.get<render_system>().enable_interpolation = true;
-			input.record_and_save_this_session();
-		}
-
 		//draw_bodies.push_back(crate2);
-		//draw_bodies.push_back(characters[0]);
+		//draw_bodies.push_back(new_characters[0]);
 		//draw_bodies.push_back(backpack);
 
-		auto& visibility = world.systems.get<visibility_system>();
-
-		visibility.epsilon_ray_distance_variation = 0.001;
-		visibility.epsilon_threshold_obstacle_hit = 10;
-		visibility.epsilon_distance_vertex_hit = 1;
+		world.settings.visibility.epsilon_ray_distance_variation = 0.001;
+		world.settings.visibility.epsilon_threshold_obstacle_hit = 10;
+		world.settings.visibility.epsilon_distance_vertex_hit = 1;
 
 		show_profile_details = true;
 
-		//characters[1].get<components::pathfinding>().start_exploring();
-		world.systems.get<pathfinding_system>().draw_memorised_walls = 1;
-		world.systems.get<pathfinding_system>().draw_undiscovered = 1;
+		world.settings.pathfinding.draw_memorised_walls = 1;
+		world.settings.pathfinding.draw_undiscovered = 1;
+		
+		characters = to_id_vector(new_characters);
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}
 
 	void testbed::post_solve(fixed_step& step) {
-	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
-		auto inputs = world.messages.get_queue<messages::crosshair_intent_message>();
-
-		for (auto& it : inputs) {
-			bool draw = false;
-			if (it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION) {
-				keep_drawing = it.pressed_flag;
-				draw = true;
-			}
-
-			if (draw || (it.intent == intent_type::MOVE_CROSSHAIR && keep_drawing)) {
-				//auto ent = world.create_entity("drawn_sprite");
-				//ingredients::sprite_scalled(ent, it.crosshair_world_pos, vec2(10, 10), assets::texture_id::BLANK);
+		for (auto& in : step.entropy.local) {
+			if (in.key_event == window::event::PRESSED) {
+				if (in.key == window::event::keys::DASH) {
+					show_profile_details = !show_profile_details;
+				}
 			}
 		}
+		
+		auto& cosmos = step.cosm;
+		auto& delta = step.get_delta();
+		auto inputs = step.messages.get_queue<messages::crosshair_intent_message>();
 
-		auto key_inputs = world.messages.get_queue<messages::unmapped_intent_message>();
-
-		for (auto& it : key_inputs) {
+		for (auto& it : step.messages.get_queue<messages::unmapped_intent_message>()) {
 			if (it.intent == intent_type::SWITCH_CHARACTER && it.pressed_flag) {
 				++current_character;
 				current_character %= characters.size();
 				
-				ingredients::inject_window_input_to_character(characters[current_character], world_camera);
+				ingredients::inject_window_input_to_character(cosmos[characters[current_character]], cosmos[world_camera]);
 			}
 		}
 
@@ -343,13 +293,14 @@ namespace scene_managers {
 			}
 		}
 
-		//auto ff = (characters[1].get<components::pathfinding>().get_current_navigation_point() - position(characters[1])).set_length(15000);
-		//characters[1].get<components::physics>().apply_force(ff);
+		//auto ff = (new_characters[1].get<components::pathfinding>().get_current_navigation_point() - position(new_characters[1])).set_length(15000);
+		//new_characters[1].get<components::physics>().apply_force(ff);
 
 		// LOG("F: %x", ff);
 	}
 
-	void testbed::drawcalls_after_all_cameras(cosmos& world) {
+	void testbed::drawcalls_after_all_cameras(variable_step& step) const {
+		auto& cosmos = step.cosm;
 		auto& target = renderer::get_current();
 		using namespace gui::text;
 
@@ -358,17 +309,9 @@ namespace scene_managers {
 		//quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", style(assets::font_id::GUI_FONT, violet), vec2i(200, 200 - 1), 0, nullptr);
 		//quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", style(assets::font_id::GUI_FONT, violet), vec2i(200, 200+1), 0, nullptr);
 		//
-		auto& raw_window_inputs = world.messages.get_queue<messages::raw_window_input_message>();
 
-		for (auto& raw_input : raw_window_inputs) {
-			if (raw_input.raw_window_input.key_event == window::event::PRESSED) {
-				if (raw_input.raw_window_input.key == window::event::keys::DASH) {
-					show_profile_details = !show_profile_details;
-				}
-			}
-		}
 
-		auto coords = characters[current_character].get<components::transform>().pos;
+		auto coords = cosmos[characters[current_character]].get<components::transform>().pos;
 
 		quick_print_format(target.triangles, typesafe_sprintf(L"X: %f2\nY: %f2\n", coords.x, coords.y) + world.world_summary(show_profile_details), style(assets::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0, nullptr);
 		target.call_triangles();

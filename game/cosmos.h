@@ -27,9 +27,10 @@ class cosmos {
 	void advance_deterministic_schemata(fixed_step& step_state);
 	void call_rendering_schemata(variable_step& step_state) const;
 
+public:
 	typedef std::function<void(fixed_step&)> fixed_callback;
 	typedef std::function<void(variable_step&)> variable_callback;
-public:
+
 	storage_for_all_stateful_systems stateful_systems;
 	lists_of_processing_subjects lists_of_processing_subjects;
 	all_settings settings;
@@ -61,7 +62,6 @@ public:
 	entity_handle clone_and_construct_entity(entity_id);
 	
 	void delete_entity(entity_id);
-
 
 	entity_handle get_handle(entity_id);
 	const_entity_handle get_handle(entity_id) const;
