@@ -2,7 +2,6 @@
 #include <unordered_map>
 #include <vector>
 #include "game/entity_id.h"
-#include "game/types_specification/full_entity_definition_declaration.h"
 
 #include "game/enums/sub_entity_name.h"
 #include "game/enums/associated_entity_name.h"

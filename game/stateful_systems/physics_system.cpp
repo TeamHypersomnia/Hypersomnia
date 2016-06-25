@@ -32,8 +32,11 @@ void physics_system::enable_listener(bool flag) {
 	b2world.SetContactListener(flag ? &listener : nullptr);
 }
 
-void physics_system::step_and_set_new_transforms(step_state& step) {
-	listener.cosmos_ptr = &parent_cosmos;
+void physics_system::step_and_set_new_transforms(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	auto& delta = step.get_delta();
+
+	listener.cosmos_ptr = &cosmos;
 	listener.step_ptr = &step;
 
 	int32 velocityIterations = 8;
@@ -42,7 +45,7 @@ void physics_system::step_and_set_new_transforms(step_state& step) {
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
 
-		auto& physics = parent_cosmos[b->GetUserData()].get<components::physics>();
+		auto& physics = cosmos[b->GetUserData()].get<components::physics>();
 		physics.measured_carried_mass = 0.f;
 
 		b2Vec2 vel(b->GetLinearVelocity());
@@ -61,15 +64,15 @@ void physics_system::step_and_set_new_transforms(step_state& step) {
 
 		auto angular_resistance = physics.angular_air_resistance;
 		if (angular_resistance < 0.f) angular_resistance = physics.air_resistance;
-		
+
 		if (angular_resistance > 0.f) {
 			//physics.body->ApplyTorque((angular_resistance * sqrt(sqrt(angular_speed * angular_speed)) + 0.2 * angular_speed * angular_speed)* -sgn(angular_speed) * b->GetInertia(), true);
-			physics.black_detail.body->ApplyTorque((angular_resistance * angular_speed * angular_speed )* -sgn(angular_speed) * b->GetInertia(), true);
+			physics.black_detail.body->ApplyTorque((angular_resistance * angular_speed * angular_speed)* -sgn(angular_speed) * b->GetInertia(), true);
 		}
 
 		if (physics.enable_angle_motor) {
-			float next_angle = b->GetAngle() + b->GetAngularVelocity() / static_cast<float>(parent_cosmos.delta.get_steps_per_second());
-			
+			float next_angle = b->GetAngle() + b->GetAngularVelocity() / static_cast<float>(delta.get_steps_per_second());
+
 			auto target_orientation = vec2().set_from_degrees(physics.target_angle);
 			auto next_orientation = vec2().set_from_radians(next_angle);
 
@@ -78,7 +81,7 @@ void physics_system::step_and_set_new_transforms(step_state& step) {
 			if (target_orientation.cross(next_orientation) > 0)
 				total_rotation *= -1;
 
-			float desired_angular_velocity = total_rotation / static_cast<float>(parent_cosmos.delta.in_seconds());
+			float desired_angular_velocity = total_rotation / static_cast<float>(delta.in_seconds());
 			float impulse = b->GetInertia() * desired_angular_velocity;// disregard time factor
 			b->ApplyAngularImpulse(impulse * physics.angle_motor_force_multiplier, true);
 		}
@@ -87,27 +90,23 @@ void physics_system::step_and_set_new_transforms(step_state& step) {
 	listener.after_step_callbacks.clear();
 
 	ray_casts_since_last_step = 0;
-	b2world.Step(static_cast<float32>(parent_cosmos.delta.in_seconds()), velocityIterations, positionIterations);
+	b2world.Step(static_cast<float32>(delta.in_seconds()), velocityIterations, positionIterations);
 	b2world.ClearForces();
-	
+
 	for (auto& c : listener.after_step_callbacks)
 		c();
 
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
-		auto entity = parent_cosmos[b->GetUserData()];
+		auto entity = cosmos[b->GetUserData()];
 		auto& physics = entity.get<components::physics>();
-		
-		recurential_friction_handler(b->GetUserData(), physics.get_owner_friction_ground());
+
+		recurential_friction_handler(cosmos[b->GetUserData()], cosmos[physics.get_owner_friction_ground()]);
 	}
 
-	set_transforms_from_body_transforms();
-}
-
-void physics_system::set_transforms_from_body_transforms() {
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
-		auto entity = parent_cosmos[b->GetUserData()];
+		auto entity = cosmos[b->GetUserData()];
 
 		auto& transform = entity.get<components::transform>();
 		auto& physics = entity.get<components::physics>();
@@ -116,7 +115,7 @@ void physics_system::set_transforms_from_body_transforms() {
 		auto body_angle = b->GetAngle() * RAD_TO_DEG;
 
 		for (auto& ff : physics.black_detail.fixture_entities) {
-			auto fe = parent_cosmos[ff];
+			auto fe = cosmos[ff];
 
 			auto& fixtures = fe.get<components::fixtures>();
 			auto total_offset = fixtures.get_total_offset();

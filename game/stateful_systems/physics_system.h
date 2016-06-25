@@ -15,8 +15,6 @@ class fixed_step;
 class physics_system {
 
 public:
-	cosmos& parent_cosmos;
-
 	struct raycast_output {
 		vec2 intersection, normal;
 		bool hit = false;
@@ -80,10 +78,10 @@ public:
 	
 	void enable_listener(bool flag);
 
-	void react_to_new_entities(step_state&);
-	void react_to_destroyed_entities(step_state&);
+	void react_to_new_entities(fixed_step&);
+	void react_to_destroyed_entities(fixed_step&);
 
-	void step_and_set_new_transforms(step_state&);
+	void step_and_set_new_transforms(fixed_step&);
 
 	int ray_casts_since_last_step = 0;
 
@@ -120,13 +118,11 @@ private:
 
 		std::vector<std::function<void()>> after_step_callbacks;
 		cosmos* cosmos_ptr;
-		step_state* step_ptr;
+		fixed_step* step_ptr;
 	};
 
 	void rechoose_owner_friction_body(entity_handle);
 	void recurential_friction_handler(entity_handle entity, entity_handle friction_owner);
-
-	void set_transforms_from_body_transforms();
 
 	contact_listener listener;
 };

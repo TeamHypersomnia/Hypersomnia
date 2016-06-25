@@ -18,28 +18,15 @@
 #include <luabind/luabind.hpp>
 
 #include "log.h"
+#include "game_window.h"
+#include "cosmos.h"
+#include "types_specification/all_component_includes.h"
 
 multiverse::multiverse() 
 	: main_cosmos_timer(60, 5)
 {
 	main_cosmos = cosmos();
 	main_cosmos.reserve_storage_for_entities(50000);
-	
-		//if (input.found_recording()) {
-		//	world.parent_overworld.configure_stepping(60, 500);
-		//	world.parent_overworld.delta_timer.set_stepping_speed_multiplier(6.00);
-		//
-		//	input.replay_found_recording();
-		//
-		//	world.settings.enable_interpolation = true;
-		//}
-		//else {
-		//	world.parent_overworld.configure_stepping(60, 500);
-		//	world.parent_overworld.delta_timer.set_stepping_speed_multiplier(1.0);
-		//
-		//	world.settings.enable_interpolation = true;
-		//	input.record_and_save_this_session();
-		//}
 
 	main_cosmos.advance_deterministic_schemata(augs::machine_entropy(), [this](fixed_step& step) {
 		main_cosmos_manager.populate_world_with_entities(step);
@@ -47,6 +34,8 @@ multiverse::multiverse()
 }
 
 void multiverse::control(augs::machine_entropy entropy) {
+	main_cosmos_player.buffer_entropy_for_next_step(entropy);
+
 	for (auto& raw_input : entropy.local) {
 		if (raw_input.key_event == window::event::PRESSED) {
 			if (raw_input.key == window::event::keys::_1) {
@@ -72,87 +61,56 @@ void multiverse::control(augs::machine_entropy entropy) {
 			}
 		}
 	}
-}
 
-void multiverse::view(game_window& window) const {
-	main_cosmos.profiler.fps_counter.new_measurement();
-	
-	main_cosmos.call_rendering_schemata(frame_timer.extract_variable_delta(main_cosmos_timer), cosmos::variable_callback(), [this](variable_step& step) {
-		main_cosmos_manager.drawcalls_after_all_cameras(step);
-	});
-	main_cosmos.profiler.fps_counter.end_measurement();
+	main_cosmos_timer.set_stepping_speed_multiplier(stepping_speed);
 }
 
 void multiverse::simulate() {
 	auto steps_to_perform = main_cosmos_timer.count_logic_steps_to_perform();
 
 	if (steps_to_perform > 0) {
-
-		auto total_entropy_for_this_step = main_cosmos_player.acquire_machine_entropy_for_this_step();
+		auto total_entropy_for_this_step = main_cosmos_player.obtain_total_entropy_for_next_step();
 
 		while (steps_to_perform--) {
 			renderer::get_current().clear_logic_lines();
 			
 			main_cosmos.delta = main_cosmos_timer.get_fixed_delta();
 
-			step_state step;
-			main_cosmos_manager.pre_solve(main_cosmos, step);
-
-			main_cosmos.advance_deterministic_schemata(total_entropy_for_this_step, step);
-			main_cosmos_manager.post_solve(main_cosmos, step);
+			main_cosmos.advance_deterministic_schemata(total_entropy_for_this_step, 
+				[this](fixed_step& step) { main_cosmos_manager.pre_solve(step); }, 
+				[this](fixed_step& step) { main_cosmos_manager.post_solve(step); }
+			);
 
 			main_cosmos_timer.increment_total_steps_passed();
 		}
 	}
-
-
-
-	bool quit_flag = false;
-
-	while (!quit_flag) {
-
-		main_step.messages.get_queue<messages::raw_window_input_message>().clear();
-
-		auto raw_window_inputs = game_window.poll_events();
-
-		if (clear_window_inputs_once) {
-			raw_window_inputs.clear();
-			clear_window_inputs_once = false;
-		}
-
-
-		delta_timer.set_stepping_speed_multiplier(stepping_speed);
-
-		assign_frame_time_to_delta_for_drawing_time_systems();
-
-		enable_drawing_time_random_generator();
-		main_cosmos.call_drawing_time_systems();
-
-		consume_camera_render_requests();
-
-		main_cosmos.restore_transforms_after_drawing();
-
-		restore_fixed_delta();
-		enable_deterministic_random_generator();
-
-	}
 }
 
-void multiverse::consume_camera_render_requests() {
-	auto& requests = main_step.messages.get_queue<messages::camera_render_request_message>();
+void multiverse::view(game_window& window) const {
+	main_cosmos.profiler.fps_counter.new_measurement();
+
 	auto& target = renderer::get_current();
 
 	target.clear_current_fbo();
 
-	for (auto& r : requests) {
-		target.set_viewport(r.state.viewport);
-		current_scene_manager->execute_drawcalls_for_camera(r);
-	}
+	main_cosmos.call_rendering_schemata(frame_timer.extract_variable_delta(main_cosmos_timer),
+		cosmos::variable_callback(),
+		[this, &target](variable_step& step) {
+			auto& requests = step.messages.get_queue<messages::camera_render_request_message>();
 
-	current_scene_manager->drawcalls_after_all_cameras(main_cosmos);
+			for (auto& r : requests) {
+				target.set_viewport(r.state.viewport);
+				main_cosmos_manager.execute_drawcalls_for_camera(r);
+			}
+
+			main_cosmos_manager.drawcalls_after_all_cameras(step);
 	
-	main_cosmos.triangles.measure(target.triangles_drawn_total);
+	});
+
+	main_cosmos.profiler.triangles.measure(target.triangles_drawn_total);
 	target.triangles_drawn_total = 0;
 
-	game_window.swap_buffers();
+	window.window.swap_buffers();
+
+	main_cosmos.profiler.fps_counter.end_measurement();
 }

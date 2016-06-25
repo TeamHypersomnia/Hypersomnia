@@ -4,6 +4,7 @@
 #include "augs/gui/text_drawer.h"
 #include "game/components/transform_component.h"
 class cosmos;
+class fixed_step;
 
 struct immediate_hud {
 	struct game_event_visualization {

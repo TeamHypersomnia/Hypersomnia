@@ -50,7 +50,8 @@ namespace augs {
 
 		void load_recording(std::string filename) {
 			stop();
-			
+			loaded_recording.clear();
+
 			std::ifstream source(filename, std::ios::in | std::ios::binary);
 
 			while (source.peek() != EOF) {
@@ -61,6 +62,10 @@ namespace augs {
 
 				loaded_recording.emplace_back(entry);
 			}
+		}
+
+		bool is_recording_available() const {
+			return loaded_recording.size() > 0;
 		}
 
 		void biserialize(entry_internal_type& currently_processed_entry) {

@@ -10,7 +10,7 @@
 
 #include "augs/templates.h"
 #include "ensure.h"
-#include "game/entity_handle_declaration.h"
+#include "game/entity_handle.h"
 
 namespace resources {
 	class behaviour_tree {

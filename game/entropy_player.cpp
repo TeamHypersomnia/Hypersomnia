@@ -1,29 +1,32 @@
 #include "entropy_player.h"
+#include "filesystem/file.h"
+#include "filesystem/directory.h"
+#include "misc/time.h"
 
-bool entropy_player::found_recording() const {
-	return augs::file_exists(L"recorded.inputs");
+void entropy_player::buffer_entropy_for_next_step(augs::machine_entropy delta) {
+	total_buffered_entropy += delta;
 }
 
-void entropy_player::replay_found_recording() {
-	unmapped_intent_player.player.load_recording("recorded.inputs");
-	unmapped_intent_player.player.replay();
-
-	crosshair_intent_player.player.load_recording("recorded_crosshair.inputs");
-	crosshair_intent_player.player.replay();
-
-	gui_item_transfer_intent_player.player.load_recording("gui_transfers.inputs");
-	gui_item_transfer_intent_player.player.replay();
+augs::machine_entropy entropy_player::obtain_total_entropy_for_next_step() {
+	return total_buffered_entropy;
 }
 
-void entropy_player::record_and_save_this_session() {
-	augs::create_directory("sessions/");
-	augs::create_directory("sessions/" + augs::get_timestamp());
+bool entropy_player::try_to_load_and_replay_recording(std::string filename) {
+	if (augs::file_exists(filename)) {
+		local_entropy_player.load_recording(filename);
+		local_entropy_player.replay();
+	}
 
-	unmapped_intent_player.player.record("sessions/" + augs::get_timestamp() + "/recorded.inputs");
-	crosshair_intent_player.player.record("sessions/" + augs::get_timestamp() + "/recorded_crosshair.inputs");
-	gui_item_transfer_intent_player.player.record("sessions/" + augs::get_timestamp() + "/gui_transfers.inputs");
+	return local_entropy_player.is_recording_available();
+}
+
+void entropy_player::record_and_save_this_session(std::string folder, std::string filename) {
+	augs::create_directory(folder);
+	augs::create_directory(folder + augs::get_timestamp());
+
+	local_entropy_player.record(folder + augs::get_timestamp() + "/" + filename);
 }
 
 bool entropy_player::is_replaying() const {
-	return unmapped_intent_player.player.is_replaying();
+	return local_entropy_player.is_replaying();
 }

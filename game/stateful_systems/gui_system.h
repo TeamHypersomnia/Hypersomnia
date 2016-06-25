@@ -27,11 +27,8 @@ class gui_system {
 	std::vector<augs::window::event::state> buffered_inputs_during_freeze;
 	bool freeze_gui_model();
 
-	cosmos& region;
 public:
 	bool draw_free_space_inside_container_icons = true;
-
-	gui_system(cosmos&);
 
 	immediate_hud hud;
 

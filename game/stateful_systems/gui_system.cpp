@@ -14,7 +14,7 @@
 #include "game/systems/crosshair_system.h"
 #include "game/entity_handle.h"
 
-gui_system::gui_system(cosmos& region) : region(region) {
+gui_system::gui_system() {
 	gui.gui_system = this;
 	gui.root.children.push_back(&game_gui_root);
 	gui.root.clip = false;

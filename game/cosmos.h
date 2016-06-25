@@ -9,6 +9,10 @@
 #include "game/types_specification/all_messages_declaration.h"
 #include "game/types_specification/all_stateful_systems_declaration.h"
 
+#include "game/stateful_systems/dynamic_tree_system.h"
+#include "game/stateful_systems/gui_system.h"
+#include "game/stateful_systems/physics_system.h"
+
 #include "game/lists_of_processing_subjects.h"
 
 #include "misc/delta.h"

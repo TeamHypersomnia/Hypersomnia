@@ -318,7 +318,7 @@ namespace scene_managers {
 		target.clear_triangles();
 	}
 
-	void testbed::execute_drawcalls_for_camera(messages::camera_render_request_message msg) {
+	void testbed::execute_drawcalls_for_camera(messages::camera_render_request_message msg) const {
 		rendering_scripts::standard_rendering(msg);
 	}
 }

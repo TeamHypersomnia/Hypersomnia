@@ -1,5 +1,6 @@
 #pragma once
 #include <Box2D/Collision/b2DynamicTree.h>
+#include "game/entity_id.h"
 
 class dynamic_tree_system {
 	std::vector<entity_id> visible_entities;

@@ -37,10 +37,12 @@
 #include "game/entity_handle.h"
 #include "game/detail/inventory_slot_handle.h"
 
-cosmos::cosmos() {
-	stateful_systems.create<gui_system>(std::ref(*this));
-	stateful_systems.create<dynamic_tree_system>(std::ref(*this));
-	stateful_systems.create<physics_system>(std::ref(*this));
+cosmos::cosmos() :
+	stateful_systems(
+	physics_system(std::ref(*this)),
+	gui_system(std::ref(*this)), 
+	dynamic_tree_system())
+{
 }
 
 const storage_for_all_components_and_aggregates::aggregate_pool_type& cosmos::get_pool() const {
