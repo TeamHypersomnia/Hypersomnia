@@ -7,17 +7,6 @@
 #include "game/cosmos.h"
 #include "game/detail/inventory_slot_handle.h"
 
-entity_id get_owner_friction_field(const_entity_handle id) {
-	return id.make_handle(get_owner_body_entity(id)).get<components::physics>().owner_friction_ground;
-}
-
-entity_id get_owner_body_entity(const_entity_handle id) {
-	auto* fixtures = id.find<components::fixtures>();
-	if (fixtures) return fixtures->get_body_entity();
-	else if (id.find<components::physics>()) return id;
-	return entity_id();
-}
-
 bool is_entity_physical(const_entity_handle id) {
 	return id.find<components::fixtures>() || id.find<components::physics>();
 }

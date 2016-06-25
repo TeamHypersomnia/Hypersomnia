@@ -86,7 +86,7 @@ public:
 	basic_entity_handle get_owning_transfer_capability() const;
 
 	inventory_slot_handle_type determine_hand_holstering_slot(basic_entity_handle searched_root_container) const;
-	inventory_slot_handle_type determine_pickup_target_slot(basic_entity_handle searched_root_container) const;
+	inventory_slot_handle_type determine_pickup_target_slot_in(basic_entity_handle searched_root_container) const;
 
 	inventory_slot_handle_type first_free_hand() const;
 

@@ -59,7 +59,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests(fixed_step& step
 				|| item_slot_transfers->only_pick_these_items.find(item_entity) != item_slot_transfers->only_pick_these_items.end();
 			
 			if (item_subscribed) {
-				item_slot_transfer_request request(item_entity, cosmos[determine_pickup_target_slot(item_entity, cosmos[e.detector_body])]);
+				item_slot_transfer_request request(item_entity, cosmos[determine_pickup_target_slot_in(item_entity, cosmos[e.detector_body])]);
 
 				if (request.target_slot.alive()) {
 					if (item_slot_transfers->pickup_timeout.try_to_fire_and_reset(cosmos.delta)) {
