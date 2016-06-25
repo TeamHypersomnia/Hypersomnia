@@ -33,7 +33,7 @@ void resolve_density_of_associated_fixtures(entity_handle id) {
 	if (item != nullptr && cosmos[item->current_slot).alive() && cosmos.get_handle(item->current_slot].should_item_inside_keep_physical_body())
 		density_multiplier *= cosmos[item->current_slot].calculate_density_multiplier_due_to_being_attached();
 
-	auto owner_body = cosmos[get_owner_body_entity(id)];
+	auto owner_body = id.get_owner_body_entity();
 	auto* driver = owner_body.find<components::driver>();
 
 	if (driver) {
@@ -52,8 +52,8 @@ bool are_connected_by_friction(const_entity_handle child, const_entity_handle pa
 	if (is_entity_physical(child) && is_entity_physical(parent)) {
 		bool matched_ancestor = false;
 
-		entity_id parent_body_entity = get_owner_body_entity(parent);
-		entity_id childs_ancestor_entity = cosmos[get_owner_body_entity(child)).get<components::physics>(].get_owner_friction_ground();
+		entity_id parent_body_entity = parent.get_owner_body_entity();
+		entity_id childs_ancestor_entity = child.get_owner_body_entity().get<components::physics>.get_owner_friction_ground();
 
 		while (cosmos[childs_ancestor_entity].alive()) {
 			if (childs_ancestor_entity == parent_body_entity) {

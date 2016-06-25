@@ -47,7 +47,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests(fixed_step& step
 
 	for (auto& e : confirmations) {
 		auto* item_slot_transfers = cosmos[e.detector_body].find<components::item_slot_transfers>();
-		auto item_entity = cosmos[get_owner_body_entity(cosmos.get_handle(e.trigger))];
+		auto item_entity = cosmos.get_handle(e.trigger).get_owner_body_entity();
 
 		auto* item = item_entity.find<components::item>();
 
@@ -59,7 +59,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests(fixed_step& step
 				|| item_slot_transfers->only_pick_these_items.find(item_entity) != item_slot_transfers->only_pick_these_items.end();
 			
 			if (item_subscribed) {
-				item_slot_transfer_request request(item_entity, cosmos[determine_pickup_target_slot_in(item_entity, cosmos[e.detector_body])]);
+				auto item_slot_transfer_request = item_entity.request(cosmos[determine_pickup_target_slot_in(item_entity, cosmos[e.detector_body])]);
 
 				if (request.target_slot.alive()) {
 					if (item_slot_transfers->pickup_timeout.try_to_fire_and_reset(cosmos.delta)) {
@@ -87,7 +87,7 @@ void item_system::handle_throw_item_intents(fixed_step& step) {
 			auto subject = cosmos[r.subject];
 
 			if (subject.find<components::item_slot_transfers>()) {
-				auto hand = map_primary_action_to_secondary_hand_if_primary_empty(subject, intent_type::THROW_SECONDARY_ITEM == r.intent);
+				auto hand = subject.map_primary_action_to_secondary_hand_if_primary_empty(intent_type::THROW_SECONDARY_ITEM == r.intent);
 
 				if (cosmos[hand].has_items()) {
 					perform_transfer({ cosmos[hand].get_items_inside()[0], cosmos.dead_inventory_handle() }, step);
@@ -110,12 +110,12 @@ void item_system::handle_holster_item_intents(fixed_step& step) {
 			auto subject = cosmos[r.subject];
 
 			if (subject.find<components::item_slot_transfers>()) {
-				auto hand = cosmos[map_primary_action_to_secondary_hand_if_primary_empty(subject, intent_type::HOLSTER_SECONDARY_ITEM == r.intent)];
+				auto hand = subject.map_primary_action_to_secondary_hand_if_primary_empty(intent_type::HOLSTER_SECONDARY_ITEM == r.intent);
 
 				if (hand.has_items()) {
 					auto item_inside = hand.get_items_inside()[0];
 
-					item_slot_transfer_request request(item_inside, cosmos[determine_hand_holstering_slot(item_inside, subject)]);
+					auto item_slot_transfer_request =  item_inside.request(cosmos[determine_hand_holstering_slot(item_inside, subject)]);
 
 					if (cosmos[request.target_slot].alive())
 						perform_transfer(request, step);

@@ -37,10 +37,10 @@ void damage_system::destroy_colliding_bullets_and_send_damage(fixed_step& step) 
 		auto* damage = collider_handle.find<components::damage>();
 
 		bool bullet_colliding_with_sender =
-			damage && get_owner_body_entity(cosmos.get_handle(damage->sender)) == get_owner_body_entity(subject_handle);
+			damage && cosmos.get_handle(damage->sender).get_owner_body_entity() == subject_handle.get_owner_body_entity();
 
 		if (!bullet_colliding_with_sender && damage && damage->damage_upon_collision && damage->damage_charges_before_destruction > 0) {
-			auto& subject_of_impact = cosmos[get_owner_body_entity(subject_handle)].get<components::physics>();
+			auto& subject_of_impact = subject_handle.get_owner_body_entity().get<components::physics>();
 			
 			vec2 impact_velocity = damage->custom_impact_velocity;
 			

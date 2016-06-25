@@ -25,7 +25,7 @@ vec2 direction_norm(const_entity_handle a, const_entity_handle b) {
 }
 
 vec2 velocity(const_entity_handle e) {
-	return e.make_handle(get_owner_body_entity(e)).get<components::physics>().velocity();
+	return e.make_handle(e.get_owner_body_entity()).get<components::physics>().velocity();
 }
 
 float speed(const_entity_handle e) {

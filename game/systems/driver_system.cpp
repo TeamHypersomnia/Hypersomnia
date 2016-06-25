@@ -48,7 +48,7 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel(fixed_step&
 	for (auto& c : contacts) {
 		if (c.type == messages::collision_message::event_type::END_CONTACT) {
 			auto driver = cosmos[c.subject];
-			auto car = physics.get_owner_body_entity(c.collider);
+			auto car = physics.c.collider.get_owner_body_entity();
 
 			auto* maybe_driver = cosmos[driver].find<components::driver>();
 

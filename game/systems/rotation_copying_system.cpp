@@ -92,7 +92,7 @@ void rotation_copying_system::resolve_rotation_copying_value(cosmos& cosmos, ent
 				new_angle = diff.degrees();
 
 			if (rotation_copying.colinearize_item_in_hand) {
-				auto hand = map_primary_action_to_secondary_hand_if_primary_empty(it, 0);
+				auto hand = it.map_primary_action_to_secondary_hand_if_primary_empty(0);
 
 				if (cosmos[hand].has_items()) {
 					auto subject_item = cosmos.get_handle(hand).get_items_inside()[0];
