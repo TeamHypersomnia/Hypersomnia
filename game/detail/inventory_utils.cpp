@@ -29,7 +29,7 @@ entity_id get_owning_transfer_capability(const_entity_handle entity) {
 	if (!maybe_item || cosmos[maybe_item->current_slot].dead())
 		return entity_id();
 
-	return get_owning_transfer_capability(cosmos[maybe_item->current_slot].get_container());
+	return cosmos[maybe_item->current_slot].get_container().get_owning_transfer_capability();
 }
 
 inventory_slot_id first_free_hand(const_entity_handle root_container) {
@@ -113,8 +113,8 @@ item_transfer_result query_transfer_result(const_item_slot_transfer_request r) {
 
 	ensure(r.specified_quantity != 0);
 
-	auto item_owning_capability = cosmos[get_owning_transfer_capability(r.item)];
-	auto target_slot_owning_capability = cosmos[get_owning_transfer_capability(r.target_slot.get_container())];
+	auto item_owning_capability = r.item.get_owning_transfer_capability();
+	auto target_slot_owning_capability = r.target_slot.get_container().get_owning_transfer_capability();
 
 	//ensure(item_owning_capability.alive() || target_slot_owning_capability.alive());
 

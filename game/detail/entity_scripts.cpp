@@ -50,7 +50,7 @@ identified_danger assess_danger(const_entity_handle victim, const_entity_handle 
 	auto* damage = danger.find<components::damage>();
 	auto* attitude = danger.find<components::attitude>();
 
-	if ((!damage && !attitude) || (damage && get_owning_transfer_capability(damage->sender) == victim))
+	if ((!damage && !attitude) || (damage && damage->sender.get_owning_transfer_capability() == victim))
 		return result;
 
 	auto victim_pos = position(victim);

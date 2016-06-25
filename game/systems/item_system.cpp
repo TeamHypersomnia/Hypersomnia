@@ -51,7 +51,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests(fixed_step& step
 
 		auto* item = item_entity.find<components::item>();
 
-		if (item_slot_transfers && item && cosmos[get_owning_transfer_capability(item_entity)].dead()) {
+		if (item_slot_transfers && item && item_entity.get_owning_transfer_capability().dead()) {
 			auto& pick_list = item_slot_transfers->only_pick_these_items;
 			bool found_on_subscription_list = pick_list.find(item_entity) != pick_list.end();
 

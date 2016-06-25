@@ -112,7 +112,9 @@ void sentience_system::apply_damage_and_generate_health_events() {
 	healths.clear();
 
 	for (auto& d : damages) {
-		auto* sentience = d.subject.find<components::sentience>();
+		auto subject = cosmos[d.subject];
+
+		auto* sentience = subject.find<components::sentience>();
 
 		messages::health_event event;
 		event.subject = d.subject;
@@ -123,9 +125,9 @@ void sentience_system::apply_damage_and_generate_health_events() {
 		aimpunch_event.target = messages::health_event::AIM;
 
 		if (sentience)
-			aimpunch_event.subject = d.subject;
+			aimpunch_event.subject = subject;
 		else
-			aimpunch_event.subject = get_owning_transfer_capability(d.subject);
+			aimpunch_event.subject = subject.get_owning_transfer_capability();
 
 		if (d.amount > 0 && aimpunch_event.subject.alive())
 			consume_health_event(aimpunch_event);

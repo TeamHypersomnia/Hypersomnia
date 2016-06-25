@@ -60,7 +60,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage(fixed_step& step) 
 
 			damage->saved_point_of_impact_before_death = it.point;
 
-			auto owning_capability = get_owning_transfer_capability(it.subject);
+			auto owning_capability = subject_handle.get_owning_transfer_capability();
 
 			bool is_victim_a_held_item = cosmos[owning_capability].alive() && owning_capability != it.subject;
 

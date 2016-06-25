@@ -179,7 +179,7 @@ melee_state melee_system::primary_action(fixed_step& step, double dt, entity_han
 
 	animation.offset_pattern = melee_component.offset_positions[int(melee_component.action_stage)];
 	m.set_offset(components::fixtures::offset_type::SPECIAL_MOVE_DISPLACEMENT, animation.calculate_intermediate_transform(melee_component.swing_current_time / melee_component.swings[int(melee_component.action_stage)].duration_ms));
-	auto player = cosmos[get_owning_transfer_capability(target)];
+	auto player = target.get_owning_transfer_capability();
 	damage.custom_impact_velocity = target.get<components::transform>().pos - player.get<components::transform>().pos;
 
 	response.subject = target;

@@ -150,7 +150,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
 				}
 
 				if (total_recoil_multiplier > 0.f) {
-					auto owning_capability = cosmos[get_owning_transfer_capability(it)];
+					auto owning_capability = it.get_owning_transfer_capability();
 					auto owning_crosshair_recoil = owning_capability[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
 					gun.recoil.shoot_and_apply_impulse(owning_crosshair_recoil, total_recoil_multiplier/100.f, true);
 				}

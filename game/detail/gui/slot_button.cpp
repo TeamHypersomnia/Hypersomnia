@@ -135,5 +135,5 @@ void slot_button::consume_gui_event(event_info info) {
 }
 
 slot_button& get_meta(inventory_slot_id id) {
-	return get_owning_transfer_capability(id.container_entity).get<components::gui_element>().slot_metadata[id];
+	return id.container_entity.get_owning_transfer_capability().get<components::gui_element>().slot_metadata[id];
 }

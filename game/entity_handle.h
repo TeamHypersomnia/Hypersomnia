@@ -83,7 +83,7 @@ public:
 	template <class = typename std::enable_if<!is_const>::type>
 	void unskip_processing_in(processing_subjects) const;
 
-	basic_entity_handle get_owning_transfer_capability(basic_entity_handle) const;
+	basic_entity_handle get_owning_transfer_capability() const;
 
 	inventory_slot_handle_type determine_hand_holstering_slot(basic_entity_handle searched_root_container) const;
 	inventory_slot_handle_type determine_pickup_target_slot(basic_entity_handle searched_root_container) const;
