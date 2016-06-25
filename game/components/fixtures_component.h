@@ -59,6 +59,5 @@ namespace components {
 		size_t get_num_colliders() const;
 
 		b2Body* get_body() const;
-		entity_id get_body_entity() const;
 	};
 }

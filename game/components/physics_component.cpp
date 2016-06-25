@@ -59,7 +59,7 @@ namespace components {
 		black_detail.body = black_detail.parent_system->b2world.CreateBody(&def);
 		black_detail.body->SetAngledDampingEnabled(black.angled_damping);
 
-		const auto& all_fixture_entities = get_entity().get<components::physics>().black_detail.fixture_entities;
+		const auto& all_fixture_entities = black_detail.fixture_entities;
 
 		for (auto fe : all_fixture_entities) {
 			auto& fixtures = fe.get<components::fixtures>();
@@ -76,7 +76,7 @@ namespace components {
 
 	void physics::destroy_body() {
 		if (black_detail.body != nullptr) {
-			const auto& all_fixture_entities = get_entity().get<components::physics>().black_detail.fixture_entities;
+			const auto& all_fixture_entities = black_detail.fixture_entities;
 
 			for (auto fe : all_fixture_entities)
 				fe.get<components::fixtures>().destroy_fixtures();
@@ -247,6 +247,14 @@ namespace components {
 		}
 
 		return vec2(aabb.upperBound.x - aabb.lowerBound.x, aabb.upperBound.y - aabb.lowerBound.y);
+	}
+
+	physics::type physics::get_body_type() const {
+		return black.body_type;
+	}
+
+	bool physics::is_activated() const {
+		return black.activated;
 	}
 
 	entity_id physics::get_owner_friction_ground() const {

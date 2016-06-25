@@ -3416,5 +3416,8 @@
     <ClInclude Include="game\step.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\black_box_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

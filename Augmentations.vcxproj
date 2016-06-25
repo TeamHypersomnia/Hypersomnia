@@ -1024,6 +1024,7 @@
     <ClInclude Include="augs\templates.h" />
     <ClInclude Include="augs\window_framework\colored_print.h" />
     <ClInclude Include="augs\window_framework\platform_utils.h" />
+    <ClInclude Include="game\black_box_component.h" />
     <ClInclude Include="game\components\meta_component.h" />
     <ClInclude Include="game\detail\convex_partitioned_shape.h" />
     <ClInclude Include="game\entropy_player.h" />
