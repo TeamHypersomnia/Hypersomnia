@@ -1,5 +1,6 @@
 #include "behaviour_tree.h"
 #include "ensure.h"
+#include "game/entity_handle.h"
 
 namespace resources {
 	behaviour_tree::state_of_traversal::state_of_traversal(state_of_tree_instance& in, const behaviour_tree& bt) 
@@ -12,9 +13,8 @@ namespace resources {
 		return *node_pointers[i];
 	}
 
-	void behaviour_tree::state_of_tree_instance::reset() {
+	behaviour_tree::state_of_tree_instance::state_of_tree_instance(user_callback_input user_input) : user_input(user_input) {
 		previously_executed_leaf_id = -1;
-		user_input = user_callback_input();
 	}
 	
 	void behaviour_tree::dfs(node& p, std::function<void(node&)> f) {

@@ -10,12 +10,13 @@
 
 #include "augs/templates.h"
 #include "ensure.h"
+#include "game/entity_handle_declaration.h"
 
 namespace resources {
 	class behaviour_tree {
 	
 	public:
-		typedef entity_id user_callback_input;
+		typedef entity_handle user_callback_input;
 
 		enum class goal_availability {
 			ALREADY_ACHIEVED,
@@ -33,7 +34,7 @@ namespace resources {
 			int previously_executed_leaf_id = -1;
 			user_callback_input user_input;
 
-			void reset();
+			state_of_tree_instance(user_callback_input);
 		};
 
 		struct state_of_traversal {

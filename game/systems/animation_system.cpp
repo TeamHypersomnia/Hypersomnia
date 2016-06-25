@@ -15,7 +15,6 @@
 #include "game/entity_handle.h"
 #include "game/step.h"
 
-
 using namespace augs;
 
 using namespace messages;
@@ -139,7 +138,6 @@ void components::animation::set_current_frame(unsigned number) {
 void animation_system::progress_animation_states(fixed_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
-	auto delta = cosmos.delta.in_milliseconds();
 
 	auto targets_copy = cosmos.get(processing_subjects::WITH_ANIMATION);
 
@@ -151,7 +149,7 @@ void animation_system::progress_animation_states(fixed_step& step) {
 
 			if (animation.frames.empty()) continue;
 
-			animation_state.player_position_ms += delta * animation_state.speed_factor;
+			animation_state.player_position_ms += delta.in_milliseconds() * animation_state.speed_factor;
 
 			while (true) {
 				float frame_duration = animation.frames[animation_state.get_current_frame()].duration_milliseconds;
