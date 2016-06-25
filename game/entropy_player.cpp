@@ -8,6 +8,7 @@ void entropy_player::buffer_entropy_for_next_step(augs::machine_entropy delta) {
 }
 
 augs::machine_entropy entropy_player::obtain_total_entropy_for_next_step() {
+	local_entropy_player.biserialize(total_buffered_entropy.local);
 	return total_buffered_entropy;
 }
 

@@ -4,13 +4,13 @@
 
 template <typename B, typename T>
 void serialize(B& buffer, const T& t) {
-	static_assert(std::is_trivial<T>::is_pod, "T must be a POD type.");
+	// static_assert(std::is_pod<T>::value, "T must be a POD type.");
 	buffer.write((const char*)&t, sizeof(T));
 }
 
 template <typename B, typename T>
-void deserialize(const B& buffer, T& t) {
-	static_assert(std::is_trivial<T>::is_pod, "T must be a POD type.");
+void deserialize(B& buffer, T& t) {
+	// static_assert(std::is_pod<T>::value, "T must be a POD type.");
 	buffer.read((char*)&t, sizeof(T));
 }
 
@@ -23,7 +23,7 @@ void serialize(B& buffer, const std::vector<T>& vec) {
 }
 
 template <typename B, typename T>
-void deserialize(const B& buffer, std::vector<T>& vec) {
+void deserialize(B& buffer, std::vector<T>& vec) {
 	size_t size;
 	deserialize(buffer, size);
 

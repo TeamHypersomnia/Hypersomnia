@@ -1,8 +1,6 @@
 #pragma once
-
 #include <fstream>
-
-#include "templates.h"
+#include "serialization.h"
 
 namespace augs {
 	template <typename entry_internal_type>
