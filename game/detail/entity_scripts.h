@@ -4,7 +4,6 @@
 #include "math/vec2.h"
 #include "game/entity_handle_declaration.h"
 
-std::vector<entity_id> guns_wielded(const_entity_handle);
 float assess_projectile_velocity_of_weapon(const_entity_handle weapon);
 
 void unset_input_flags_of_orphaned_entity(entity_handle);

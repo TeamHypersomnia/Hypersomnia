@@ -82,5 +82,19 @@ public:
 
 	template <class = typename std::enable_if<!is_const>::type>
 	void unskip_processing_in(processing_subjects) const;
+
+	basic_entity_handle get_owning_transfer_capability(basic_entity_handle) const;
+
+	inventory_slot_handle_type determine_hand_holstering_slot(basic_entity_handle searched_root_container) const;
+	inventory_slot_handle_type determine_pickup_target_slot(basic_entity_handle searched_root_container) const;
+
+	inventory_slot_handle_type first_free_hand() const;
+
+	inventory_slot_handle_type map_primary_action_to_secondary_hand_if_primary_empty(int is_action_secondary) const;
+
+	basic_entity_handle get_owner_friction_field() const;
+	basic_entity_handle get_owner_body_entity() const;
+
+	std::vector<basic_entity_handle> guns_wielded();
 };
 

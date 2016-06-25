@@ -8,17 +8,9 @@
 #define SPACE_ATOMS_PER_UNIT 1000
 
 class fixed_step;
-void perform_transfer(item_slot_transfer_request, step_state& step);
+void perform_transfer(item_slot_transfer_request, fixed_step& step);
 
 unsigned calculate_space_occupied_with_children(const_entity_handle item);
-entity_id get_owning_transfer_capability(const_entity_handle);
-
-inventory_slot_id determine_hand_holstering_slot(const_entity_handle item, const_entity_handle searched_root_container);
-inventory_slot_id determine_pickup_target_slot(const_entity_handle item, const_entity_handle searched_root_container);
-
-inventory_slot_id first_free_hand(const_entity_handle root_container);
-
-inventory_slot_id map_primary_action_to_secondary_hand_if_primary_empty(const_entity_handle root_container, int is_action_secondary);
 
 item_transfer_result containment_result(const_item_slot_transfer_request, bool allow_replacement = true);
 item_transfer_result query_transfer_result(const_item_slot_transfer_request);
@@ -32,7 +24,7 @@ std::wstring format_space_units(unsigned);
 int count_charges_in_deposit(const_entity_handle item);
 int count_charges_inside(const_inventory_slot_handle);
 
-void drop_from_all_slots(entity_handle container, step_state&);
+void drop_from_all_slots(entity_handle container, fixed_step&);
 
 template<bool is_const>
 void for_each_descendant(basic_entity_handle<is_const> item, std::function<void(basic_entity_handle<is_const>)> f) {
