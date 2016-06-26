@@ -5,9 +5,11 @@
 #include <vector>
 #include "transform_component.h"
 #include "game/detail/physics_engine_reflected_state.h"
+#include "game/substantialized_component.h"
+
 
 namespace components {
-	struct fixtures : public colliders_white_box {
+	struct fixtures : private substantialized_component<colliders_white_box, colliders_black_box, colliders_black_box_detail> {
 	private:
 		friend struct components::physics;
 		friend class ::physics_system;

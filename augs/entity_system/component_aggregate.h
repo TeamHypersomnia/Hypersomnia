@@ -10,6 +10,7 @@ namespace augs {
 	class component_aggregate {
 	public:
 		typename transform_types<std::tuple, make_object_pool_id, components...>::type component_ids;
+		object_pool_id<component_aggregate> this_id;
 
 		template <class component>
 		auto& writable_id() {

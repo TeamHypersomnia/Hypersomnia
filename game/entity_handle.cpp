@@ -2,6 +2,7 @@
 #include "game/detail/inventory_slot_id.h"
 #include "game/detail/inventory_slot_handle.h"
 #include "game/components/relations_component.h"
+#include "game/components/substance_component.h"
 
 #include "game/cosmos.h"
 
@@ -123,6 +124,22 @@ template <bool C>
 template <class = typename std::enable_if<!C>::type>
 void basic_entity_handle<C>::unskip_processing_in(processing_subjects) const {
 	(*this)->removed_from_processing_subjects &=~ (1 << unsigned long long(list));
+}
+
+template <bool C>
+template<class = typename std::enable_if<!C>::type>
+components::substance& basic_entity_handle<C>::add(const components::substance& c) const {
+
+	return basic_entity_handle_base<C>::add(c);
+}
+
+template <bool C>
+template <class = typename std::enable_if<!C>::type>
+components::substance& basic_entity_handle<C>::add() const {
+	components::substance standard_substance;
+	standard_substance.processing_subject_categories = 1;
+
+	return add(standard_substance);
 }
 
 // explicit instantiation

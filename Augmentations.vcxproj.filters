@@ -1284,6 +1284,9 @@
     <ClCompile Include="game\detail\entity\physics_getters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\components\substance_component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3416,7 +3419,10 @@
     <ClInclude Include="game\step.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\black_box_component.h">
+    <ClInclude Include="game\components\substance_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\substantialized_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

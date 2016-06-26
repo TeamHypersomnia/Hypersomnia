@@ -179,7 +179,7 @@ namespace augs {
 	void renderer::line_channel::draw_yellow(vec2 a, vec2 b) { draw(a, b, yellow); }
 	void renderer::line_channel::draw_cyan(vec2 a, vec2 b) { draw(a, b, cyan); }
 
-	void renderer::draw_debug_info(vec2 visible_world_area, components::transform camera_transform, assets::texture_id tex_id, std::vector<entity_id> target_entities, double ratio) {
+	void renderer::draw_debug_info(vec2 visible_world_area, components::transform camera_transform, assets::texture_id tex_id, std::vector<const_entity_handle> target_entities, double ratio) {
 		if (!debug_drawing) return;
 		
 		auto& tex = resource_manager.find(tex_id)->tex;

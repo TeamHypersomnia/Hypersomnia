@@ -57,13 +57,13 @@ namespace components {
 			discontinuity* get_discontinuity_for_edge(int edge_num);
 			discontinuity* get_discontinuity(int disc_num);
 			
-			int get_num_discontinuities() {
+			int get_num_discontinuities() const {
 				return discontinuities.size();
 			}
 
-			int get_num_triangles();
-			triangle get_triangle(int index, vec2 origin);
-			std::vector<vec2> get_polygon(float distance_epsilon, vec2 expand_origin, float expand_mult);
+			int get_num_triangles() const;
+			triangle get_triangle(int index, vec2 origin) const;
+			std::vector<vec2> get_polygon(float distance_epsilon, vec2 expand_origin, float expand_mult) const;
 		};
 
 		struct line_of_sight_info {

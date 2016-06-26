@@ -39,6 +39,9 @@ namespace augs {
 		template<class component,
 			class = typename std::enable_if<!is_const>::type>
 			component& set(const component& c) const {
+			if (!has<component>())
+				add(c);
+
 			get<component>() = c;
 			return get<component>();
 		}
@@ -55,19 +58,25 @@ namespace augs {
 
 		template<class component,
 			class = typename std::enable_if<!is_const>::type>
-			component& add(const component& c) {
-			get().writable_id<component>() = owner.get_component_pool<component>().allocate_component(c);
+			component& add(const component& c) const {
+			get().writable_id<component>() = owner.get_component_pool<component>().allocate(c);
 		}
 
 		template<class component,
 			class = typename std::enable_if<!is_const>::type>
-		component& operator+=(const component& c) {
+			void remove() const {
+			owner.get_component_pool<component>().free(get().get_id<component>());
+		}
+
+		template<class component,
+			class = typename std::enable_if<!is_const>::type>
+		component& operator+=(const component& c) const {
 			return add(c);
 		}
 
 		template<class component>
 		typename std::enable_if<!is_const, component&>::type 
-			set(const component& c = component()) {
+			set(const component& c = component()) const {
 			get<component>() = c;
 			return get<component>();
 		}

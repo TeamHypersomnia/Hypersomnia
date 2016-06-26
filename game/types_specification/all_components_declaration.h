@@ -39,7 +39,7 @@ namespace components {
 	struct sentience;
 	struct attitude;
 	struct relations;
-	struct meta;
+	struct substance;
 }
 
 template<template<typename...> class List, class... prepend>
@@ -83,7 +83,7 @@ struct put_all_components_into {
 		components::sentience,
 		components::attitude,
 		components::relations,
-		components::meta
+		components::substance
 	> type;
 };
 

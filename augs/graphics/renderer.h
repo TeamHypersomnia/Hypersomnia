@@ -79,7 +79,7 @@ namespace augs {
 		
 		void clear_logic_lines();
 		void clear_frame_lines();
-		void draw_debug_info(vec2 visible_world_area, components::transform, assets::texture_id tex, std::vector<entity_id> target_entities, double interpolation_ratio);
+		void draw_debug_info(vec2 visible_world_area, components::transform, assets::texture_id tex, std::vector<const_entity_handle> target_entities, double interpolation_ratio);
 
 		void clear_current_fbo();
 		void enable_special_vertex_attribute();

@@ -53,6 +53,8 @@ public:
 	bool has(associated_entity_name) const;
 	bool has(slot_function) const;
 
+
+
 	template <class = typename std::enable_if<!is_const>::type>
 	void add_sub_entity(entity_id p, sub_entity_name optional_name = sub_entity_name::INVALID) const;
 
@@ -83,6 +85,12 @@ public:
 	template <class = typename std::enable_if<!is_const>::type>
 	void unskip_processing_in(processing_subjects) const;
 
+	template<class = typename std::enable_if<!is_const>::type>
+	components::substance& add(const components::substance& c) const;
+
+	template<class = typename std::enable_if<!is_const>::type>
+	components::substance& add() const;
+	
 	basic_entity_handle get_owning_transfer_capability() const;
 
 	inventory_slot_handle_type determine_hand_holstering_slot(basic_entity_handle searched_root_container) const;

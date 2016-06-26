@@ -102,14 +102,6 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 		auto& physics = entity.get<components::physics>();
 
 		recurential_friction_handler(cosmos[b->GetUserData()], cosmos[physics.get_owner_friction_ground()]);
-	}
-
-	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
-		if (b->GetType() == b2_staticBody) continue;
-		auto entity = cosmos[b->GetUserData()];
-
-		auto& transform = entity.get<components::transform>();
-		auto& physics = entity.get<components::physics>();
 
 		auto body_pos = METERS_TO_PIXELSf * b->GetPosition();
 		auto body_angle = b->GetAngle() * RAD_TO_DEG;
@@ -120,22 +112,28 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 			auto& fixtures = fe.get<components::fixtures>();
 			auto total_offset = fixtures.get_total_offset();
 
-			auto& transform = fe.get<components::transform>();
-			transform.pos = body_pos;
+			auto& fix_transform = fe.get<components::transform>();
+			fix_transform.pos = body_pos;
 
 			if (!b->IsFixedRotation())
-				transform.rotation = body_angle;
+				fix_transform.rotation = body_angle;
 
-			transform.pos += total_offset.pos;
-			transform.rotation += total_offset.rotation;
+			fix_transform.pos += total_offset.pos;
+			fix_transform.rotation += total_offset.rotation;
 
-			transform.pos.rotate(body_angle, body_pos);
+			fix_transform.pos.rotate(body_angle, body_pos);
 		}
+
+		auto& transform = entity.get<components::transform>();
 
 		transform.pos = body_pos;
 
 		if (!b->IsFixedRotation())
 			transform.rotation = body_angle;
+
+		physics.black.transform = transform;
+		physics.black.velocity = METERS_TO_PIXELSf * b->GetLinearVelocity();
+		physics.black.angular_velocity = RAD_TO_DEG * b->GetAngularVelocity();
 	}
 }
 
