@@ -5,6 +5,7 @@
 
 #include "game/components/physics_component.h"
 #include "game/components/transform_component.h"
+#include "game/detail/physics_engine_reflected_state.h"
 
 #include <functional>
 #include <set>
@@ -86,6 +87,9 @@ public:
 	int ray_casts_since_last_step = 0;
 
 	b2World b2world;
+
+	std::vector<colliders_black_box_detail> colliders_caches;
+	std::vector<rigid_body_black_box_detail> rigid_body_caches;
 private:	
 	/* callback structure used in QueryAABB function to get all shapes near-by */
 	struct query_aabb_input : b2QueryCallback {

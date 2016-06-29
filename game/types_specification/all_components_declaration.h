@@ -39,6 +39,7 @@ namespace components {
 	struct sentience;
 	struct attitude;
 	struct relations;
+	struct processing;
 	struct substance;
 }
 
@@ -83,6 +84,7 @@ struct put_all_components_into {
 		components::sentience,
 		components::attitude,
 		components::relations,
+		components::processing,
 		components::substance
 	> type;
 };

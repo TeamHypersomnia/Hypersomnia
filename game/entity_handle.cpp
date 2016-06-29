@@ -3,6 +3,7 @@
 #include "game/detail/inventory_slot_handle.h"
 #include "game/components/relations_component.h"
 #include "game/components/substance_component.h"
+#include "game/components/processing_component.h"
 
 #include "game/cosmos.h"
 
@@ -91,7 +92,7 @@ basic_entity_handle<C>::operator entity_id() const {
 
 template <bool C>
 bool basic_entity_handle<C>::is_in(processing_subjects list) const {
-	return owner.is_in(raw_id, list);
+	return get<components::processing>().is_in(list);
 }
 
 template <bool C>

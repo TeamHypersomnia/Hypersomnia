@@ -1,4 +1,4 @@
-#include "lists_of_processing_subjects.h"
+#include "processing_lists_system.h"
 #include "game/components/force_joint_component.h"
 #include "game/components/gui_element_component.h"
 #include "game/components/input_receiver_component.h"
@@ -6,7 +6,7 @@
 #include "game/cosmos.h"
 #include "game/entity_handle.h"
 
-std::vector<processing_subjects> lists_of_processing_subjects::find_matching(const_entity_handle id) const {
+std::vector<processing_subjects> processing_lists_system::find_matching(const_entity_handle id) const {
 	std::vector<processing_subjects> matching;
 
 	if (id.has<components::animation>()) {
@@ -76,7 +76,7 @@ std::vector<processing_subjects> lists_of_processing_subjects::find_matching(con
 	return matching;
 }
 
-void lists_of_processing_subjects::add_entity_to_matching_lists(const_entity_handle id) {
+void processing_lists_system::add_entity_to_matching_lists(const_entity_handle id) {
 	auto matching = find_matching(id);
 
 	for (auto m : matching) {
@@ -84,7 +84,7 @@ void lists_of_processing_subjects::add_entity_to_matching_lists(const_entity_han
 	}
 }
 
-void lists_of_processing_subjects::remove_entity_from_lists(const_entity_handle id) {
+void processing_lists_system::remove_entity_from_lists(const_entity_handle id) {
 	auto matching = find_matching(id);
 
 	for (auto m : matching) {
@@ -92,29 +92,26 @@ void lists_of_processing_subjects::remove_entity_from_lists(const_entity_handle 
 	}
 }
 
-std::vector<entity_handle> lists_of_processing_subjects::get(processing_subjects list, cosmos& cosmos) const {
+std::vector<entity_handle> processing_lists_system::get(processing_subjects list, cosmos& cosmos) const {
 	const auto& subjects = lists.at(list);
-	std::vector<entity_handle> handles;
+	//std::vector<entity_handle> handles;
 
 	//
 	//erase_remove(result, [list](entity_id l) {
 	//	return l->removed_from_processing_subjects & (1 << unsigned long long(list));
 	//});
 
-	for (auto s : subjects) {
-		auto handle = cosmos[s];
+	//for (auto s : subjects) {
+	//	auto handle = cosmos[s];
+	//
+	//	if (handle.removed_from_processing_subjects & (1 << unsigned long long(list))) {
+	//		handles.emplace_back(handle);
+	//	}
+	//}
 
-		if (handle.removed_from_processing_subjects & (1 << unsigned long long(list))) {
-			handles.emplace_back(handle);
-		}
-	}
-
-	return handles;
+	return cosmos.to_handle_vector(subjects);
 }
 
-bool lists_of_processing_subjects::is_in(entity_id id, processing_subjects) const {
-
+std::vector<const_entity_handle> processing_lists_system::get(processing_subjects list, const cosmos& cosmos) const {
+	return cosmos.to_handle_vector(lists.at(list));
 }
-
-std::vector<entity_handle> get(processing_subjects, cosmos&) const;
-std::vector<const_entity_handle> get(processing_subjects, const cosmos&) const;

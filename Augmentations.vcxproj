@@ -354,6 +354,7 @@
     <ClCompile Include="3rdparty\RakNet\Source\_FindFirst.cpp" />
     <ClCompile Include="augs\ensure.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
+    <ClCompile Include="game\components\processing_component.cpp" />
     <ClCompile Include="game\components\relations_component.cpp" />
     <ClCompile Include="game\components\substance_component.cpp" />
     <ClCompile Include="game\cosmic_profiler.cpp" />
@@ -430,7 +431,6 @@
     <ClCompile Include="game\detail\position_scripts.cpp" />
     <ClCompile Include="game\enums\filters.cpp" />
     <ClCompile Include="game\ingredients\artificial_life.cpp" />
-    <ClCompile Include="game\lists_of_processing_subjects.cpp" />
     <ClCompile Include="game\multiverse.cpp" />
     <ClCompile Include="game\resources\behaviour_tree.cpp" />
     <ClCompile Include="game\detail\combat\melee_animation.cpp" />
@@ -479,6 +479,7 @@
     <ClCompile Include="game\stateful_systems\dynamic_tree_system.cpp" />
     <ClCompile Include="game\stateful_systems\gui_system.cpp" />
     <ClCompile Include="game\stateful_systems\physics_system.cpp" />
+    <ClCompile Include="game\stateful_systems\processing_lists_system.cpp" />
     <ClCompile Include="game\step.cpp" />
     <ClCompile Include="game\systems\animation_system.cpp" />
     <ClCompile Include="game\systems\behaviour_tree_system.cpp" />
@@ -1025,6 +1026,9 @@
     <ClInclude Include="augs\templates.h" />
     <ClInclude Include="augs\window_framework\colored_print.h" />
     <ClInclude Include="augs\window_framework\platform_utils.h" />
+    <ClInclude Include="game\components\processing_component.h" />
+    <ClInclude Include="game\component_synchronizer.h" />
+    <ClInclude Include="game\stateful_systems\processing_lists_system.h" />
     <ClInclude Include="game\substantialized_component.h" />
     <ClInclude Include="game\components\meta_component.h" />
     <ClInclude Include="game\components\substance_component.h" />
@@ -1057,7 +1061,6 @@
     <ClInclude Include="game\enums\sub_entity_name.h" />
     <ClInclude Include="game\global\pathfinding_settings.h" />
     <ClInclude Include="game\global\visibility_settings.h" />
-    <ClInclude Include="game\lists_of_processing_subjects.h" />
     <ClInclude Include="game\messages\will_soon_be_deleted.h" />
     <ClInclude Include="game\cosmic_profiler.h" />
     <ClInclude Include="game\stateful_systems\dynamic_tree_system.h" />

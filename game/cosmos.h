@@ -12,8 +12,9 @@
 #include "game/stateful_systems/dynamic_tree_system.h"
 #include "game/stateful_systems/gui_system.h"
 #include "game/stateful_systems/physics_system.h"
+#include "game/stateful_systems/processing_lists_system.h"
 
-#include "game/lists_of_processing_subjects.h"
+#include "game/processing_lists_system.h"
 
 #include "misc/delta.h"
 #include "game/entity_id.h"
@@ -36,7 +37,6 @@ public:
 	typedef std::function<void(variable_step&)> variable_callback;
 
 	storage_for_all_stateful_systems stateful_systems;
-	lists_of_processing_subjects lists_of_processing_subjects;
 	all_settings settings;
 
 	mutable cosmic_profiler profiler;
@@ -75,10 +75,20 @@ public:
 	template<class T>
 	decltype(auto) to_handle_vector(std::vector<T> vec) {
 		std::vector<decltype(get_handle())> handles;
-		
+
 		for (auto v : vec)
 			handles.emplace_back(get_handle(v));
-		
+
+		return std::move(handles);
+	}
+
+	template<class T>
+	decltype(auto) to_handle_vector(std::vector<T> vec) const {
+		std::vector<decltype(get_handle())> handles;
+
+		for (auto v : vec)
+			handles.emplace_back(get_handle(v));
+
 		return std::move(handles);
 	}
 
@@ -98,8 +108,6 @@ public:
 	}
 
 	randomization get_rng_for(entity_id) const;
-
-	bool is_in(entity_id, processing_subjects) const;
 
 	std::vector<entity_handle> get(processing_subjects);
 	std::vector<const_entity_handle> get(processing_subjects) const;

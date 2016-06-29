@@ -1107,9 +1107,6 @@
     <ClCompile Include="game\bindings\classes\file_watcher_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\lists_of_processing_subjects.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\cosmic_profiler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1285,6 +1282,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\components\substance_component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\stateful_systems\processing_lists_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\components\processing_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -3197,9 +3200,6 @@
     <ClInclude Include="augs\entity_system\storage_for_stateful_systems.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\lists_of_processing_subjects.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\cosmic_profiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3423,6 +3423,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\substantialized_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\components\processing_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\stateful_systems\processing_lists_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\component_synchronizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

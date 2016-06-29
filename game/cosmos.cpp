@@ -58,19 +58,15 @@ std::wstring cosmos::summary() const {
 }
 
 std::vector<entity_handle> cosmos::get(processing_subjects list) {
-	return lists_of_processing_subjects.get(list, *this);
+	return stateful_systems.get<processing_lists_system>().get(list, *this);
 }
 
 std::vector<const_entity_handle> cosmos::get(processing_subjects list) const {
-	return lists_of_processing_subjects.get(list, *this);
+	return stateful_systems.get<processing_lists_system>().get(list, *this);
 }
 
 randomization cosmos::get_rng_for(entity_id id) const {
 	return{ id.version + id.indirection_index + current_step_number };
-}
-
-bool cosmos::is_in(entity_id id, processing_subjects list) const {
-	return lists_of_processing_subjects.is_in(id, list);
 }
 
 entity_handle cosmos::get_handle(entity_id id) {
@@ -90,7 +86,7 @@ const_inventory_slot_handle cosmos::get_handle(inventory_slot_id id) const {
 }
 
 void cosmos::construct_entity(entity_id new_id) {
-	// lists_of_processing_subjects.add_entity_to_matching_lists(get_handle(new_id));
+	// processing_lists_system.add_entity_to_matching_lists(get_handle(new_id));
 }
 
 void cosmos::reserve_storage_for_entities(size_t n) {
@@ -114,7 +110,7 @@ entity_handle cosmos::clone_and_construct_entity(entity_id e) {
 
 void cosmos::delete_entity(entity_id e) {
 	ensure(get_handle(e).alive());
-	lists_of_processing_subjects.remove_entity_from_lists(get_handle(e));
+	processing_lists_system.remove_entity_from_lists(get_handle(e));
 	components_and_aggregates.free_aggregate(e);
 }
 
