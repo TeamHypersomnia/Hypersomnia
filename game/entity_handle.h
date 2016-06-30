@@ -36,18 +36,12 @@ class basic_entity_handle : public basic_entity_handle_base<is_const> {
 
 	template <class T>
 	struct component_return_val {
-		//typedef typename maybe_const_ref<is_const, T>::type type;
 		typedef typename std::conditional<
 			is_component_synchronized<T>::value,
 			component_synchronizer<is_const, T>,
 			typename maybe_const_ref<is_const, T>::type 
 			>::type type;
 	};
-
-	//template<>
-	//struct component_return_val<components::processing> {
-	//	typedef component_synchronizer<is_const, components::processing> type;
-	//};
 
 public:
 	typedef basic_entity_handle_base<is_const> base;
@@ -121,8 +115,7 @@ public:
 
 	template<>
 	typename component_return_val<components::processing>::type get<components::processing>() const {
-		components::processing proc;
-		return component_synchronizer<is_const, components::processing>(proc, *this);
+		return component_synchronizer<is_const, components::processing>(base::get<components::processing>(), *this);
 	}
 
 	template<class = typename std::enable_if<!is_const>::type>
