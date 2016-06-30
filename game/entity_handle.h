@@ -43,10 +43,6 @@ class basic_entity_handle : private basic_entity_handle_base<is_const>, public a
 			return h.aggregate::get<T>();
 		}
 
-		decltype(auto) find() const {
-			return h.aggregate::find<T>();
-		}
-
 		decltype(auto) add(const T& t) const {
 			return h.aggregate::add(t);
 		}
@@ -62,11 +58,6 @@ class basic_entity_handle : private basic_entity_handle_base<is_const>, public a
 
 		auto get() const {
 			return component_synchronizer<is_const, T>(h.aggregate::get<T>(), h);
-		}
-
-		T* find() const {
-			static_assert(false, "Cannot return a pointer to synchronized component!");
-			return (T*)(nullptr);
 		}
 
 		auto add(const T& t) const {
@@ -114,10 +105,6 @@ public:
 	template <class = typename std::enable_if<!is_const>::type>
 	void map_associated_entity(associated_entity_name n, entity_id p) const;
 
-	template <class component>
-	bool has() const {
-		return aggregate::has<component>();
-	}
 
 	template <class = typename std::enable_if<!is_const>::type>
 	operator basic_entity_handle<true>();
@@ -147,14 +134,30 @@ public:
 	template<class = typename std::enable_if<!is_const>::type>
 	components::processing& add() const;
 
+	template <class component>
+	bool has() const {
+		return aggregate::has<component>();
+	}
+
 	template<class component>
 	decltype(auto) get() const {
 		return component_or_synchronizer<component>({ *this }).get();
 	}
 
 	template<class component>
+	decltype(auto) add(const component& c) const {
+		return component_or_synchronizer<component>({ *this }).add(c);
+	}
+
+	template<class component>
 	decltype(auto) find() const {
-		return component_or_synchronizer<component>({ *this }).find();
+		static_assert(!is_component_synchronized<component>::value, "Cannot return a pointer to synchronized component!");
+		return aggregate::find<component>();
+	}
+
+	template<class component>
+	void remove() const {
+		return component_or_synchronizer<component>({ *this }).remove();
 	}
 
 	template<class = typename std::enable_if<!is_const>::type>
