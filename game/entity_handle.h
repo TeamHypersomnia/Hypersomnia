@@ -29,6 +29,7 @@ using basic_entity_handle_base = augs::basic_aggregate_handle<is_const, cosmos, 
 
 template <bool is_const>
 class basic_entity_handle : public basic_entity_handle_base<is_const> {
+	typedef basic_entity_handle_base<is_const> base;
 	typedef typename maybe_const_ref<is_const, components::relations>::type relations_type;
 	typedef typename basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
 
@@ -43,8 +44,20 @@ class basic_entity_handle : public basic_entity_handle_base<is_const> {
 			>::type type;
 	};
 
+	template <class T, typename=void>
+	struct component_returner {
+		static typename maybe_const_ref<is_const, T>::type get(basic_entity_handle h) {
+			return h.base::get<T>();
+		}
+	};
+
+	template <class T>
+	struct component_returner<T, typename std::enable_if<is_component_synchronized<T>::value>::type> {
+		static component_synchronizer<is_const, T> get(basic_entity_handle h) {
+			return component_synchronizer<is_const, T>(h.base::get<T>(), h);
+		}
+	};
 public:
-	typedef basic_entity_handle_base<is_const> base;
 
 	using base::base;
 	
@@ -110,13 +123,13 @@ public:
 
 	template<class component>
 	typename component_return_val<component>::type get() const {
-		return *find<component>();
+		return component_returner<component>::get(*this);
 	}
 
-	template<>
-	typename component_return_val<components::processing>::type get<components::processing>() const {
-		return component_synchronizer<is_const, components::processing>(base::get<components::processing>(), *this);
-	}
+	//template<class component>
+	//typename component_return_val<component>::type get<component, typename std::enable_if<is_component_synchronized<component>::value>::type>() const {
+	//	return component_synchronizer<is_const, component>(base::get<component>(), *this);
+	//}
 
 	template<class = typename std::enable_if<!is_const>::type>
 	void default_construct();
