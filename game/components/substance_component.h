@@ -4,6 +4,6 @@
 
 namespace components {
 	struct substance {
-
+		bool dummy = false;
 	};
 }

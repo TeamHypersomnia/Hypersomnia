@@ -16,6 +16,8 @@
 #include "entity_system/aggregate_handle.h"
 #include "game/entity_id.h"
 
+#include "game/components/processing_component.h"
+
 namespace components {
 	struct relations;
 }
@@ -27,13 +29,30 @@ using basic_entity_handle_base = augs::basic_aggregate_handle<is_const, cosmos, 
 
 template <bool is_const>
 class basic_entity_handle : public basic_entity_handle_base<is_const> {
-	typedef typename std::conditional<is_const, const components::relations&, components::relations&>::type relations_type;
+	typedef typename maybe_const_ref<is_const, components::relations>::type relations_type;
 	typedef typename basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
 
 	relations_type relations() const;
 
+	template <class T>
+	struct component_return_val {
+		//typedef typename maybe_const_ref<is_const, T>::type type;
+		typedef typename std::conditional<
+			is_component_synchronized<T>::value,
+			component_synchronizer<is_const, T>,
+			typename maybe_const_ref<is_const, T>::type 
+			>::type type;
+	};
+
+	//template<>
+	//struct component_return_val<components::processing> {
+	//	typedef component_synchronizer<is_const, components::processing> type;
+	//};
+
 public:
-	using basic_entity_handle_base<is_const>::basic_entity_handle_base;
+	typedef basic_entity_handle_base<is_const> base;
+
+	using base::base;
 	
 	basic_entity_handle make_handle(entity_id) const;
 
@@ -53,8 +72,6 @@ public:
 	bool has(associated_entity_name) const;
 	bool has(slot_function) const;
 
-
-
 	template <class = typename std::enable_if<!is_const>::type>
 	void add_sub_entity(entity_id p, sub_entity_name optional_name = sub_entity_name::INVALID) const;
 
@@ -66,7 +83,7 @@ public:
 
 	template <class component>
 	bool has() const {
-		return basic_entity_handle_base<is_const>::has<component>();
+		return base::has<component>();
 	}
 
 	template <class = typename std::enable_if<!is_const>::type>
@@ -90,6 +107,26 @@ public:
 
 	template<class = typename std::enable_if<!is_const>::type>
 	components::substance& add() const;
+
+	template<class = typename std::enable_if<!is_const>::type>
+	components::processing& add(const components::processing& c) const;
+
+	template<class = typename std::enable_if<!is_const>::type>
+	components::processing& add() const;
+
+	template<class component>
+	typename component_return_val<component>::type get() const {
+		return *find<component>();
+	}
+
+	template<>
+	typename component_return_val<components::processing>::type get<components::processing>() const {
+		components::processing proc;
+		return component_synchronizer<is_const, components::processing>(proc, *this);
+	}
+
+	template<class = typename std::enable_if<!is_const>::type>
+	void default_construct();
 	
 	basic_entity_handle get_owning_transfer_capability() const;
 

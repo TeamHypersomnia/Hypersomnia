@@ -145,3 +145,13 @@ struct const_ptr { typedef const T* type; };
 
 template<class T>
 struct const_ref { typedef const T& type; };
+
+template<bool is_const, class T>
+struct maybe_const_ref { typedef typename std::conditional<is_const, const T&, T&>::type type; };
+
+
+template<typename T, typename = void>
+struct is_component_synchronized : std::false_type { };
+
+template<typename T>
+struct is_component_synchronized<T, decltype(std::declval<T>().activated, void())> : std::true_type { };

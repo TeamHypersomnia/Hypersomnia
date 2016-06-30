@@ -14,8 +14,6 @@
 #include "game/stateful_systems/physics_system.h"
 #include "game/stateful_systems/processing_lists_system.h"
 
-#include "game/processing_lists_system.h"
-
 #include "misc/delta.h"
 #include "game/entity_id.h"
 #include "game/entity_handle_declaration.h"

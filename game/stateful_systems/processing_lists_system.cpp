@@ -6,7 +6,7 @@
 #include "game/cosmos.h"
 #include "game/entity_handle.h"
 
-std::vector<processing_subjects> processing_lists_system::find_matching(const_entity_handle id) const {
+components::processing processing_lists_system::get_default_processing(const_entity_handle id) const {
 	std::vector<processing_subjects> matching;
 
 	if (id.has<components::animation>()) {
@@ -73,43 +73,24 @@ std::vector<processing_subjects> processing_lists_system::find_matching(const_en
 		matching.push_back(processing_subjects::WITH_VISIBILITY);
 	}
 
-	return matching;
+	components::processing result;
+
+	for (auto m : matching)
+		result.processing_subject_categories.set(int(m));
+
+	return result;
 }
 
-void processing_lists_system::add_entity_to_matching_lists(const_entity_handle id) {
-	auto matching = find_matching(id);
-
-	for (auto m : matching) {
-		lists[m].push_back(id);
-	}
+void processing_lists_system::add_entity_to_matching_lists(processing_subjects list, const_entity_handle id) {
+	lists[list].push_back(id);
 }
 
-void processing_lists_system::remove_entity_from_lists(const_entity_handle id) {
-	auto matching = find_matching(id);
-
-	for (auto m : matching) {
-		remove_element(lists[m], id.get_id());
-	}
+void processing_lists_system::remove_entity_from_lists(processing_subjects list, const_entity_handle id) {
+	remove_element(lists[list], id.get_id());
 }
 
 std::vector<entity_handle> processing_lists_system::get(processing_subjects list, cosmos& cosmos) const {
-	const auto& subjects = lists.at(list);
-	//std::vector<entity_handle> handles;
-
-	//
-	//erase_remove(result, [list](entity_id l) {
-	//	return l->removed_from_processing_subjects & (1 << unsigned long long(list));
-	//});
-
-	//for (auto s : subjects) {
-	//	auto handle = cosmos[s];
-	//
-	//	if (handle.removed_from_processing_subjects & (1 << unsigned long long(list))) {
-	//		handles.emplace_back(handle);
-	//	}
-	//}
-
-	return cosmos.to_handle_vector(subjects);
+	return cosmos.to_handle_vector(lists.at(list));
 }
 
 std::vector<const_entity_handle> processing_lists_system::get(processing_subjects list, const cosmos& cosmos) const {

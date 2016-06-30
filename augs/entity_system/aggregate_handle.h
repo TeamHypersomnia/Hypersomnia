@@ -27,7 +27,7 @@ namespace augs {
 		}
 
 		template<class component>
-		typename std::conditional<is_const, const component&, component&>::type get() const {
+		typename maybe_const_ref<is_const, component>::type get() const {
 			return *find<component>();
 		}
 

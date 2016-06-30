@@ -130,17 +130,33 @@ void basic_entity_handle<C>::unskip_processing_in(processing_subjects) const {
 template <bool C>
 template<class = typename std::enable_if<!C>::type>
 components::substance& basic_entity_handle<C>::add(const components::substance& c) const {
-
-	return basic_entity_handle_base<C>::add(c);
+	return base::add<components::substance>();
 }
 
 template <bool C>
 template <class = typename std::enable_if<!C>::type>
 components::substance& basic_entity_handle<C>::add() const {
-	components::substance standard_substance;
-	standard_substance.processing_subject_categories = 1;
+	return add(components::substance());
+}
 
-	return add(standard_substance);
+template <bool C>
+template<class = typename std::enable_if<!C>::type>
+components::processing& basic_entity_handle<C>::add(const components::processing& c) const {
+	return base::add(c);
+}
+
+template <bool C>
+template <class = typename std::enable_if<!C>::type>
+components::processing& basic_entity_handle<C>::add() const {
+	return add(get_cosmos().stateful_systems.get<processing_lists_system>().get_standard_processing());
+}
+
+
+template <bool C>
+template <class = typename std::enable_if<!C>::type>
+void basic_entity_handle<C>::default_construct() {
+	add<components::processing>();
+	add<components::substance>();
 }
 
 // explicit instantiation
