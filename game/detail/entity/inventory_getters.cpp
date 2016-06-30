@@ -5,26 +5,29 @@
 #include "game/components/item_slot_transfers_component.h"
 #include "game/cosmos.h"
 
-template <bool C>
-basic_entity_handle<C> basic_entity_handle<C>::get_owning_transfer_capability() const {
-	auto& cosmos = get_cosmos();
+#include "inventory_getters.h"
 
-	if (dead())
+template <class entity_handle_type>
+entity_handle_type inventory_getters<entity_handle_type>::get_owning_transfer_capability() const {
+	auto& self = *static_cast<const entity_handle_type*>(this);
+	auto& cosmos = self.get_cosmos();
+
+	if (self.dead())
 		return cosmos[entity_id()];
 
-	auto* maybe_transfer_capability = find<components::item_slot_transfers>();
+	auto* maybe_transfer_capability = self.find<components::item_slot_transfers>();
 
 	if (maybe_transfer_capability)
-		return *this;
+		return self;
 
-	auto* maybe_item = find<components::item>();
+	auto* maybe_item = self.find<components::item>();
 
 	if (!maybe_item || cosmos[maybe_item->current_slot].dead())
 		return cosmos[entity_id()];
 
 	return cosmos[maybe_item->current_slot].get_container().get_owning_transfer_capability();
 }
-
+/*
 template <bool C>
 typename basic_entity_handle<C>::inventory_slot_handle_type basic_entity_handle<C>::first_free_hand() const {
 	auto& cosmos = get_cosmos();
@@ -43,7 +46,7 @@ typename basic_entity_handle<C>::inventory_slot_handle_type basic_entity_handle<
 
 template <bool C>
 typename basic_entity_handle<C>::inventory_slot_handle_type basic_entity_handle<C>::determine_hand_holstering_slot(basic_entity_handle searched_root_container) const {
-	auto& item_entity = *this;
+	auto& item_entity = *static_cast<entity_handle_type*>(this);
 	auto& cosmos = item_entity.get_cosmos();
 
 	ensure(item_entity.alive());
@@ -74,7 +77,7 @@ typename basic_entity_handle<C>::inventory_slot_handle_type basic_entity_handle<
 
 template <bool C>
 typename basic_entity_handle<C>::inventory_slot_handle_type basic_entity_handle<C>::determine_pickup_target_slot_in(basic_entity_handle searched_root_container) const {
-	auto& item_entity = *this;
+	auto& item_entity = *static_cast<entity_handle_type*>(this);
 	ensure(item_entity.alive());
 	ensure(searched_root_container.alive());
 	auto& cosmos = item_entity.get_cosmos();
@@ -95,7 +98,7 @@ typename basic_entity_handle<C>::inventory_slot_handle_type basic_entity_handle<
 
 template <bool C>
 typename basic_entity_handle<C>::inventory_slot_handle_type basic_entity_handle<C>::map_primary_action_to_secondary_hand_if_primary_empty(int is_action_secondary) const {
-	auto& root_container = *this;
+	auto& root_container = *static_cast<entity_handle_type*>(this);
 
 	auto primary = root_container[slot_function::PRIMARY_HAND];
 	auto secondary = root_container[slot_function::SECONDARY_HAND];
@@ -105,7 +108,7 @@ typename basic_entity_handle<C>::inventory_slot_handle_type basic_entity_handle<
 	else
 		return is_action_secondary ? secondary : primary;
 }
-
+*/
 // explicit instantiation
-template class basic_entity_handle <false>;
-template class basic_entity_handle <true>;
+template class inventory_getters<basic_entity_handle <false>>;
+template class inventory_getters<basic_entity_handle <true>>;

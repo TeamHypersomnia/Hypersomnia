@@ -3434,5 +3434,14 @@
     <ClInclude Include="game\component_synchronizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\detail\entity\inventory_getters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\entity\processing_component_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\entity\relations_component_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

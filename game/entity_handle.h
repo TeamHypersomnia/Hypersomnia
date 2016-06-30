@@ -17,6 +17,7 @@
 #include "game/entity_id.h"
 
 #include "game/components/processing_component.h"
+#include "game/detail/entity/inventory_getters.h"
 
 namespace components {
 	struct relations;
@@ -28,10 +29,13 @@ template <bool is_const>
 using basic_entity_handle_base = augs::basic_aggregate_handle<is_const, cosmos, put_all_components_into<std::tuple>::type>;
 
 template <bool is_const>
-class basic_entity_handle : private basic_entity_handle_base<is_const>, public aggregate_setters<is_const, basic_entity_handle<is_const>> {
+class basic_entity_handle : 
+	private basic_entity_handle_base<is_const>, 
+	public augs::aggregate_setters<is_const, basic_entity_handle<is_const>>,
+	public inventory_getters<basic_entity_handle<is_const>>
+	{
 	typedef basic_entity_handle_base<is_const> aggregate;
 	typedef typename maybe_const_ref<is_const, components::relations>::type relations_type;
-	typedef typename basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
 
 	relations_type relations() const;
 
@@ -75,36 +79,20 @@ class basic_entity_handle : private basic_entity_handle_base<is_const>, public a
 		}
 	};
 public:
-
+	typedef typename basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
 	using aggregate::aggregate;
+	using aggregate::dead;
+	using aggregate::alive;
+	using aggregate::get_id;
+	using aggregate::unset;
+	using aggregate::set_debug_name;
+	using aggregate::get_debug_name;
 	
 	basic_entity_handle make_handle(entity_id) const;
 
 	auto& get_cosmos() const {
 		return owner;
 	}
-
-	basic_entity_handle get_parent() const;
-
-	inventory_slot_handle_type operator[](slot_function) const;
-	basic_entity_handle operator[](sub_entity_name) const;
-	basic_entity_handle operator[](associated_entity_name) const;
-
-	void for_each_sub_entity_recursive(std::function<void(basic_entity_handle)>) const;
-
-	bool has(sub_entity_name) const;
-	bool has(associated_entity_name) const;
-	bool has(slot_function) const;
-
-	template <class = typename std::enable_if<!is_const>::type>
-	void add_sub_entity(entity_id p, sub_entity_name optional_name = sub_entity_name::INVALID) const;
-
-	template <class = typename std::enable_if<!is_const>::type>
-	void map_sub_entity(sub_entity_name n, entity_id p) const;
-
-	template <class = typename std::enable_if<!is_const>::type>
-	void map_associated_entity(associated_entity_name n, entity_id p) const;
-
 
 	template <class = typename std::enable_if<!is_const>::type>
 	operator basic_entity_handle<true>();
@@ -162,20 +150,9 @@ public:
 
 	template<class = typename std::enable_if<!is_const>::type>
 	void default_construct();
-	
-	basic_entity_handle get_owning_transfer_capability() const;
-
-	inventory_slot_handle_type determine_hand_holstering_slot(basic_entity_handle searched_root_container) const;
-	inventory_slot_handle_type determine_pickup_target_slot_in(basic_entity_handle searched_root_container) const;
-
-	inventory_slot_handle_type first_free_hand() const;
-
-	inventory_slot_handle_type map_primary_action_to_secondary_hand_if_primary_empty(int is_action_secondary) const;
 
 	basic_entity_handle get_owner_friction_field() const;
 	basic_entity_handle get_owner_body_entity() const;
-
-	std::vector<basic_entity_handle> guns_wielded();
 };
 
 template <bool is_const>
