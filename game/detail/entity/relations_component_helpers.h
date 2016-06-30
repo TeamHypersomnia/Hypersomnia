@@ -1,14 +1,38 @@
 #pragma once
+#include <functional>
 
-template<class entity_handle_type>
+#include "game/detail/inventory_slot_handle_declaration.h"
+#include "game/entity_handle_declaration.h"
+#include "templates.h"
+
+#include "game/entity_id.h"
+
+#include "game/enums/slot_function.h"
+#include "game/enums/associated_entity_name.h"
+#include "game/enums/sub_entity_name.h"
+
+namespace components {
+	struct relations;
+}
+
+template<bool is_const>
 class relations_component_helpers {
-	basic_entity_handle get_parent() const;
+	typedef basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
+	typedef basic_entity_handle<is_const> entity_handle_type;
+	typedef typename maybe_const_ref<is_const, components::relations>::type relations_type;
+	relations_type relations() const;
+
+	template <class = typename std::enable_if<!is_const>::type>
+	void make_child(entity_id, sub_entity_name) const;
+public:
+
+	entity_handle_type get_parent() const;
 
 	inventory_slot_handle_type operator[](slot_function) const;
-	basic_entity_handle operator[](sub_entity_name) const;
-	basic_entity_handle operator[](associated_entity_name) const;
+	entity_handle_type operator[](sub_entity_name) const;
+	entity_handle_type operator[](associated_entity_name) const;
 
-	void for_each_sub_entity_recursive(std::function<void(basic_entity_handle)>) const;
+	void for_each_sub_entity_recursive(std::function<void(entity_handle_type)>) const;
 
 	bool has(sub_entity_name) const;
 	bool has(associated_entity_name) const;

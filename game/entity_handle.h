@@ -2,11 +2,6 @@
 #include <functional>
 #include <type_traits>
 
-#include "game/enums/slot_function.h"
-#include "game/enums/associated_entity_name.h"
-#include "game/enums/sub_entity_name.h"
-#include "game/enums/sub_entity_name.h"
-
 #include "game/enums/sub_entity_name.h"
 #include "game/enums/processing_subjects.h"
 
@@ -18,10 +13,9 @@
 
 #include "game/components/processing_component.h"
 #include "game/detail/entity/inventory_getters.h"
-
-namespace components {
-	struct relations;
-}
+#include "game/detail/entity/processing_component_helpers.h"
+#include "game/detail/entity/relations_component_helpers.h"
+#include "game/detail/entity/physics_getters.h"
 
 class cosmos;
 
@@ -39,12 +33,12 @@ class basic_entity_handle :
 	private basic_entity_handle_base<is_const>,
 	public basic_entity_handle_traits<is_const>,
 	public augs::aggregate_setters<is_const, basic_entity_handle<is_const>>,
-	public inventory_getters<basic_entity_handle<is_const>, basic_entity_handle_traits<is_const>>
+	public inventory_getters<basic_entity_handle<is_const>, basic_entity_handle_traits<is_const>>,
+	public physics_getters<basic_entity_handle<is_const>>,
+	public processing_component_helpers<basic_entity_handle<is_const>>,
+	public relations_component_helpers<is_const>
 	{
 	typedef basic_entity_handle_base<is_const> aggregate;
-	typedef typename maybe_const_ref<is_const, components::relations>::type relations_type;
-
-	relations_type relations() const;
 
 	template <class T, typename=void>
 	struct component_or_synchronizer {
@@ -93,7 +87,7 @@ public:
 	using aggregate::unset;
 	using aggregate::set_debug_name;
 	using aggregate::get_debug_name;
-	
+
 	basic_entity_handle make_handle(entity_id) const;
 
 	auto& get_cosmos() const {
@@ -156,9 +150,6 @@ public:
 
 	template<class = typename std::enable_if<!is_const>::type>
 	void default_construct();
-
-	basic_entity_handle get_owner_friction_field() const;
-	basic_entity_handle get_owner_body_entity() const;
 };
 
 template <bool is_const>

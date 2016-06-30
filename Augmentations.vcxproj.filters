@@ -1290,6 +1290,12 @@
     <ClCompile Include="game\components\processing_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\detail\entity\relations_component_helpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\entity\processing_component_helpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3441,6 +3447,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\detail\entity\relations_component_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\entity\physics_getters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
