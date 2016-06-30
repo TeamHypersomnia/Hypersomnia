@@ -29,10 +29,17 @@ template <bool is_const>
 using basic_entity_handle_base = augs::basic_aggregate_handle<is_const, cosmos, put_all_components_into<std::tuple>::type>;
 
 template <bool is_const>
+class basic_entity_handle_traits {
+public:
+	typedef typename basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
+};
+
+template <bool is_const>
 class basic_entity_handle : 
-	private basic_entity_handle_base<is_const>, 
+	private basic_entity_handle_base<is_const>,
+	public basic_entity_handle_traits<is_const>,
 	public augs::aggregate_setters<is_const, basic_entity_handle<is_const>>,
-	public inventory_getters<basic_entity_handle<is_const>>
+	public inventory_getters<basic_entity_handle<is_const>, basic_entity_handle_traits<is_const>>
 	{
 	typedef basic_entity_handle_base<is_const> aggregate;
 	typedef typename maybe_const_ref<is_const, components::relations>::type relations_type;
@@ -79,7 +86,6 @@ class basic_entity_handle :
 		}
 	};
 public:
-	typedef typename basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
 	using aggregate::aggregate;
 	using aggregate::dead;
 	using aggregate::alive;

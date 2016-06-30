@@ -7,8 +7,8 @@
 
 #include "inventory_getters.h"
 
-template <class entity_handle_type>
-entity_handle_type inventory_getters<entity_handle_type>::get_owning_transfer_capability() const {
+template <class entity_handle_type, class t>
+entity_handle_type inventory_getters<entity_handle_type, t>::get_owning_transfer_capability() const {
 	auto& self = *static_cast<const entity_handle_type*>(this);
 	auto& cosmos = self.get_cosmos();
 
@@ -27,10 +27,11 @@ entity_handle_type inventory_getters<entity_handle_type>::get_owning_transfer_ca
 
 	return cosmos[maybe_item->current_slot].get_container().get_owning_transfer_capability();
 }
-/*
-template <bool C>
-typename basic_entity_handle<C>::inventory_slot_handle_type basic_entity_handle<C>::first_free_hand() const {
-	auto& cosmos = get_cosmos();
+
+template <class entity_handle_type, class t>
+typename inventory_getters<entity_handle_type, t>::inventory_slot_handle_type inventory_getters<entity_handle_type, t>::first_free_hand() const {
+	auto& self = *static_cast<const entity_handle_type*>(this);
+	auto& cosmos = self.get_cosmos();
 
 	auto maybe_primary = operator[](slot_function::PRIMARY_HAND);
 	auto maybe_secondary = operator[](slot_function::SECONDARY_HAND);
@@ -44,9 +45,9 @@ typename basic_entity_handle<C>::inventory_slot_handle_type basic_entity_handle<
 	return cosmos[inventory_slot_id()];
 }
 
-template <bool C>
-typename basic_entity_handle<C>::inventory_slot_handle_type basic_entity_handle<C>::determine_hand_holstering_slot(basic_entity_handle searched_root_container) const {
-	auto& item_entity = *static_cast<entity_handle_type*>(this);
+template <class entity_handle_type, class t>
+typename inventory_getters<entity_handle_type, t>::inventory_slot_handle_type inventory_getters<entity_handle_type, t>::determine_hand_holstering_slot(entity_handle_type searched_root_container) const {
+	auto& item_entity = *static_cast<const entity_handle_type*>(this);
 	auto& cosmos = item_entity.get_cosmos();
 
 	ensure(item_entity.alive());
@@ -75,9 +76,9 @@ typename basic_entity_handle<C>::inventory_slot_handle_type basic_entity_handle<
 	return cosmos[inventory_slot_id()];
 }
 
-template <bool C>
-typename basic_entity_handle<C>::inventory_slot_handle_type basic_entity_handle<C>::determine_pickup_target_slot_in(basic_entity_handle searched_root_container) const {
-	auto& item_entity = *static_cast<entity_handle_type*>(this);
+template <class entity_handle_type, class t>
+typename inventory_getters<entity_handle_type, t>::inventory_slot_handle_type inventory_getters<entity_handle_type, t>::determine_pickup_target_slot_in(entity_handle_type searched_root_container) const {
+	auto& item_entity = *static_cast<const entity_handle_type*>(this);
 	ensure(item_entity.alive());
 	ensure(searched_root_container.alive());
 	auto& cosmos = item_entity.get_cosmos();
@@ -96,9 +97,9 @@ typename basic_entity_handle<C>::inventory_slot_handle_type basic_entity_handle<
 	return cosmos[inventory_slot_id()];
 }
 
-template <bool C>
-typename basic_entity_handle<C>::inventory_slot_handle_type basic_entity_handle<C>::map_primary_action_to_secondary_hand_if_primary_empty(int is_action_secondary) const {
-	auto& root_container = *static_cast<entity_handle_type*>(this);
+template <class entity_handle_type, class t>
+typename inventory_getters<entity_handle_type, t>::inventory_slot_handle_type inventory_getters<entity_handle_type, t>::map_primary_action_to_secondary_hand_if_primary_empty(int is_action_secondary) const {
+	auto& root_container = *static_cast<const entity_handle_type*>(this);
 
 	auto primary = root_container[slot_function::PRIMARY_HAND];
 	auto secondary = root_container[slot_function::SECONDARY_HAND];
@@ -108,7 +109,7 @@ typename basic_entity_handle<C>::inventory_slot_handle_type basic_entity_handle<
 	else
 		return is_action_secondary ? secondary : primary;
 }
-*/
+
 // explicit instantiation
-template class inventory_getters<basic_entity_handle <false>>;
-template class inventory_getters<basic_entity_handle <true>>;
+template class inventory_getters<basic_entity_handle <false>, basic_entity_handle_traits<false>>;
+template class inventory_getters<basic_entity_handle <true>, basic_entity_handle_traits<true>>;
