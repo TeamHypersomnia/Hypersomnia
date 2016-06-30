@@ -19,12 +19,12 @@ public:
 
 	bool is_in(processing_subjects) const;
 
-	template <class = typename std::enable_if<!is_const>::type>
-	component_synchronizer& operator=(const components::processing&);
+	typename std::enable_if<!is_const, component_synchronizer&>::type 
+		operator=(const components::processing&);
 
-	template <class = typename std::enable_if<!is_const>::type>
-	void skip_processing_in(processing_subjects);
-
-	template <class = typename std::enable_if<!is_const>::type>
-	void unskip_processing_in(processing_subjects);
+	typename std::enable_if<!is_const, void>::type 
+		skip_processing_in(processing_subjects);
+	
+	typename std::enable_if<!is_const, void>::type 
+		unskip_processing_in(processing_subjects);
 };

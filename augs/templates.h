@@ -140,15 +140,11 @@ struct conditional_template<true, _Ty1, _Ty2>
 	using type = _Ty1<T>;
 };
 
-template<class T>
-struct const_ptr { typedef const T* type; };
-
-template<class T>
-struct const_ref { typedef const T& type; };
-
 template<bool is_const, class T>
 struct maybe_const_ref { typedef typename std::conditional<is_const, const T&, T&>::type type; };
 
+template<bool is_const, class T>
+struct maybe_const_ptr { typedef typename std::conditional<is_const, const T*, T*>::type type; };
 
 template<typename T, typename = void>
 struct is_component_synchronized : std::false_type { };

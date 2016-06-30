@@ -19,9 +19,9 @@ template <bool is_const>
 class basic_inventory_slot_handle {
 	typedef basic_entity_handle<is_const> entity_handle_type;
 	
-	typedef typename std::conditional<is_const, const cosmos&, cosmos&>::type owner_reference;
-	typedef typename std::conditional<is_const, const inventory_slot&, inventory_slot&>::type slot_reference;
-	typedef typename std::conditional<is_const, const inventory_slot*, inventory_slot*>::type slot_pointer;
+	typedef typename maybe_const_ref<is_const, cosmos>::type owner_reference;
+	typedef typename maybe_const_ref<is_const, inventory_slot>::type slot_reference;
+	typedef typename maybe_const_ptr<is_const, inventory_slot>::type slot_pointer;
 
 	entity_handle_type get_handle() const;
 public:

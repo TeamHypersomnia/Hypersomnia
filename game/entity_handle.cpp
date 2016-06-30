@@ -130,7 +130,7 @@ void basic_entity_handle<C>::unskip_processing_in(processing_subjects) const {
 template <bool C>
 template<class = typename std::enable_if<!C>::type>
 components::substance& basic_entity_handle<C>::add(const components::substance& c) const {
-	return base::add<components::substance>();
+	return aggregate::add<components::substance>();
 }
 
 template <bool C>
@@ -142,7 +142,7 @@ components::substance& basic_entity_handle<C>::add() const {
 template <bool C>
 template<class = typename std::enable_if<!C>::type>
 components::processing& basic_entity_handle<C>::add(const components::processing& c) const {
-	return base::add(c);
+	return aggregate::add(c);
 }
 
 template <bool C>
