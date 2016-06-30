@@ -110,6 +110,33 @@ typename inventory_getters<entity_handle_type, t>::inventory_slot_handle_type in
 		return is_action_secondary ? secondary : primary;
 }
 
+template <class entity_handle_type, class t>
+std::vector<entity_handle_type> inventory_getters<entity_handle_type, t>::guns_wielded() const {
+	auto& subject = *static_cast<const entity_handle_type*>(this);
+	std::vector<entity_handle_type> result;
+
+	auto hand = subject[slot_function::PRIMARY_HAND];
+
+	if (hand.has_items()) {
+		auto wielded = hand.get_items_inside()[0];
+		if (wielded.find<components::gun>()) {
+			result.push_back(wielded);
+		}
+	}
+
+	hand = subject[slot_function::SECONDARY_HAND];
+
+	if (hand.has_items()) {
+		auto wielded = hand.get_items_inside()[0];
+
+		if (wielded.find<components::gun>()) {
+			result.push_back(wielded);
+		}
+	}
+
+	return result;
+}
+
 // explicit instantiation
 template class inventory_getters<basic_entity_handle <false>, basic_entity_handle_traits<false>>;
 template class inventory_getters<basic_entity_handle <true>, basic_entity_handle_traits<true>>;

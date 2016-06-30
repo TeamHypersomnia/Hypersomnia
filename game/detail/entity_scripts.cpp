@@ -50,7 +50,7 @@ identified_danger assess_danger(const_entity_handle victim, const_entity_handle 
 	auto* damage = danger.find<components::damage>();
 	auto* attitude = danger.find<components::attitude>();
 
-	if ((!damage && !attitude) || (damage && damage->sender.get_owning_transfer_capability() == victim))
+	if ((!damage && !attitude) || (damage && cosmos[damage->sender].get_owning_transfer_capability() == victim))
 		return result;
 
 	auto victim_pos = position(victim);
@@ -107,30 +107,6 @@ attitude_type calculate_attitude(const_entity_handle targeter, const_entity_hand
 	return attitude_type::NEUTRAL;
 }
 
-std::vector<entity_id> guns_wielded(const_entity_handle subject) {
-	std::vector<entity_id> result;
-
-	auto hand = subject[slot_function::PRIMARY_HAND];
-
-	if (hand.has_items()) {
-		auto wielded = hand.get_items_inside()[0];
-		if (wielded.find<components::gun>()) {
-			result.push_back(wielded);
-		}
-	}
-
-	hand = subject[slot_function::SECONDARY_HAND];
-
-	if (hand.has_items()) {
-		auto wielded = hand.get_items_inside()[0];
-
-		if (wielded.find<components::gun>()) {
-			result.push_back(wielded);
-		}
-	}
-
-	return result;
-}
 
 float assess_projectile_velocity_of_weapon(const_entity_handle weapon) {
 	if (weapon.dead())

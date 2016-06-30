@@ -2,6 +2,7 @@
 template<class entity_handle_type, class traits>
 class inventory_getters {
 	typedef typename traits::inventory_slot_handle_type inventory_slot_handle_type;
+public:
 
 	entity_handle_type get_owning_transfer_capability() const;
 
