@@ -361,7 +361,6 @@
     <ClCompile Include="game\detail\convex_partitioned_shape.cpp" />
     <ClCompile Include="game\detail\entity\inventory_getters.cpp" />
     <ClCompile Include="game\detail\entity\physics_getters.cpp" />
-    <ClCompile Include="game\detail\entity\processing_component_helpers.cpp" />
     <ClCompile Include="game\detail\entity\relations_component_helpers.cpp" />
     <ClCompile Include="game\entropy_player.cpp" />
     <ClCompile Include="game\game_window.cpp" />
@@ -1032,7 +1031,6 @@
     <ClInclude Include="game\component_synchronizer.h" />
     <ClInclude Include="game\detail\entity\inventory_getters.h" />
     <ClInclude Include="game\detail\entity\physics_getters.h" />
-    <ClInclude Include="game\detail\entity\processing_component_helpers.h" />
     <ClInclude Include="game\detail\entity\relations_component_helpers.h" />
     <ClInclude Include="game\stateful_systems\processing_lists_system.h" />
     <ClInclude Include="game\substantialized_component.h" />

@@ -1,15 +1,13 @@
 #include "entity_handle.h"
-#include "game/detail/inventory_slot_id.h"
-#include "game/detail/inventory_slot_handle.h"
-#include "game/components/relations_component.h"
 #include "game/components/substance_component.h"
 #include "game/components/processing_component.h"
 
 #include "game/cosmos.h"
+#include "game/detail/physics_scripts.h"
 
 template <bool C>
 template <class = typename std::enable_if<!C>::type>
-basic_entity_handle<C>::operator basic_entity_handle<true>() {
+basic_entity_handle<C>::operator basic_entity_handle<true>() const {
 	return basic_entity_handle<true>(owner, raw_id);
 }
 
@@ -26,23 +24,6 @@ bool basic_entity_handle<C>::operator!=(entity_id b) const {
 template <bool C>
 basic_entity_handle<C>::operator entity_id() const {
 	return raw_id;
-}
-
-template <bool C>
-bool basic_entity_handle<C>::is_in(processing_subjects list) const {
-	return get<components::processing>().is_in(list);
-}
-
-template <bool C>
-template <class = typename std::enable_if<!C>::type>
-void basic_entity_handle<C>::skip_processing_in(processing_subjects) const {
-	(*this)->removed_from_processing_subjects |= (1 << unsigned long long(list));
-}
-
-template <bool C>
-template <class = typename std::enable_if<!C>::type>
-void basic_entity_handle<C>::unskip_processing_in(processing_subjects) const {
-	(*this)->removed_from_processing_subjects &=~ (1 << unsigned long long(list));
 }
 
 template <bool C>
@@ -72,7 +53,10 @@ components::processing& basic_entity_handle<C>::add() const {
 
 template <bool C>
 template <class = typename std::enable_if<!C>::type>
-void basic_entity_handle<C>::default_construct() {
+void basic_entity_handle<C>::add_standard_components() {
+	if (has<components::render>() && !is_entity_physical(*this) && !has<components::dynamic_tree_node>())
+		add(components::dynamic_tree_node().from_renderable(*this));
+
 	add<components::processing>();
 	add<components::substance>();
 }

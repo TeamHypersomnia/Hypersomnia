@@ -1,9 +1,5 @@
 #pragma once
-#include <functional>
 #include <type_traits>
-
-#include "game/enums/sub_entity_name.h"
-#include "game/enums/processing_subjects.h"
 
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/entity_handle_declaration.h"
@@ -13,7 +9,6 @@
 
 #include "game/components/processing_component.h"
 #include "game/detail/entity/inventory_getters.h"
-#include "game/detail/entity/processing_component_helpers.h"
 #include "game/detail/entity/relations_component_helpers.h"
 #include "game/detail/entity/physics_getters.h"
 
@@ -23,19 +18,11 @@ template <bool is_const>
 using basic_entity_handle_base = augs::basic_aggregate_handle<is_const, cosmos, put_all_components_into<std::tuple>::type>;
 
 template <bool is_const>
-class basic_entity_handle_traits {
-public:
-	typedef typename basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
-};
-
-template <bool is_const>
 class basic_entity_handle : 
 	private basic_entity_handle_base<is_const>,
-	public basic_entity_handle_traits<is_const>,
 	public augs::aggregate_setters<is_const, basic_entity_handle<is_const>>,
-	public inventory_getters<basic_entity_handle<is_const>, basic_entity_handle_traits<is_const>>,
-	public physics_getters<basic_entity_handle<is_const>>,
-	public processing_component_helpers<basic_entity_handle<is_const>>,
+	public inventory_getters<is_const>,
+	public physics_getters<is_const>,
 	public relations_component_helpers<is_const>
 	{
 	typedef basic_entity_handle_base<is_const> aggregate;
@@ -90,37 +77,16 @@ public:
 
 	basic_entity_handle make_handle(entity_id) const;
 
-	auto& get_cosmos() const {
+	decltype(auto) get_cosmos() const {
 		return owner;
 	}
-
-	template <class = typename std::enable_if<!is_const>::type>
-	operator basic_entity_handle<true>();
 
 	bool operator==(entity_id b) const;
 	bool operator!=(entity_id b) const;
 
+	template <class = typename std::enable_if<!is_const>::type>
+	operator basic_entity_handle<true>() const;
 	operator entity_id() const;
-
-	bool is_in(processing_subjects) const;
-
-	template <class = typename std::enable_if<!is_const>::type>
-	void skip_processing_in(processing_subjects) const;
-
-	template <class = typename std::enable_if<!is_const>::type>
-	void unskip_processing_in(processing_subjects) const;
-
-	template<class = typename std::enable_if<!is_const>::type>
-	components::substance& add(const components::substance& c) const;
-
-	template<class = typename std::enable_if<!is_const>::type>
-	components::substance& add() const;
-
-	template<class = typename std::enable_if<!is_const>::type>
-	components::processing& add(const components::processing& c) const;
-
-	template<class = typename std::enable_if<!is_const>::type>
-	components::processing& add() const;
 
 	template <class component>
 	bool has() const {
@@ -133,7 +99,7 @@ public:
 	}
 
 	template<class component>
-	decltype(auto) add(const component& c) const {
+	decltype(auto) add(const component& c = component()) const {
 		return component_or_synchronizer<component>({ *this }).add(c);
 	}
 
@@ -149,7 +115,16 @@ public:
 	}
 
 	template<class = typename std::enable_if<!is_const>::type>
-	void default_construct();
+	components::substance& add(const components::substance& c) const;
+
+	template<class = typename std::enable_if<!is_const>::type>
+	components::substance& add() const;
+
+	template<class = typename std::enable_if<!is_const>::type>
+	components::processing& add() const;
+
+	template<class = typename std::enable_if<!is_const>::type>
+	void add_standard_components();
 };
 
 template <bool is_const>

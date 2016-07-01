@@ -59,7 +59,7 @@ void render_system::add_entities_to_rendering_tree() {
 				input.lowerBound = aabb.left_top();
 				input.upperBound = aabb.right_bottom();
 
-				render->rendering_proxy = non_physical_objects_tree.CreateProxy(input, new entity_id(e));
+				render->tree_proxy_id = non_physical_objects_tree.CreateProxy(input, new entity_id(e));
 			}
 			else {
 				if (particle_group) {
@@ -79,12 +79,12 @@ void render_system::remove_entities_from_rendering_tree() {
 		auto* physics_definition = e.find<components::physics_definition>();
 		auto* render = e.find<components::render>();
 
-		if (render && render->rendering_proxy >= 0) {
-			auto* userdata = non_physical_objects_tree.GetUserData(render->rendering_proxy);
+		if (render && render->tree_proxy_id >= 0) {
+			auto* userdata = non_physical_objects_tree.GetUserData(render->tree_proxy_id);
 			
 			if (userdata) {
 				delete ((entity_id*)userdata);
-				non_physical_objects_tree.DestroyProxy(render->rendering_proxy);
+				non_physical_objects_tree.DestroyProxy(render->tree_proxy_id);
 			}
 		}
 	}

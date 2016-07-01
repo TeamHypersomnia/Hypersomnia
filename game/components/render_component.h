@@ -35,8 +35,6 @@ namespace components {
 		float partial_overlay_height_ratio = 0.f;
 		augs::rgba partial_overlay_color;
 
-		int rendering_proxy = -1;
-
 		int layer_priority = 0;
 		unsigned last_step_when_visible = 0;
 		int last_visibility_index = -1;

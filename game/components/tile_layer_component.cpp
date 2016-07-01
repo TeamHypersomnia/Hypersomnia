@@ -94,7 +94,7 @@ namespace components {
 		}
 	}
 
-	rects::ltrb<float> tile_layer::get_aabb(components::transform transform) {
+	rects::ltrb<float> tile_layer::get_aabb(components::transform transform) const {
 		return rects::xywh<float>(transform.pos.x, transform.pos.y, size.w*square_size, size.h*square_size);
 	}
 }

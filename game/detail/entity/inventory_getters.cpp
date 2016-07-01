@@ -7,8 +7,8 @@
 
 #include "inventory_getters.h"
 
-template <class entity_handle_type, class t>
-entity_handle_type inventory_getters<entity_handle_type, t>::get_owning_transfer_capability() const {
+template <bool C>
+basic_entity_handle<C> inventory_getters<C>::get_owning_transfer_capability() const {
 	auto& self = *static_cast<const entity_handle_type*>(this);
 	auto& cosmos = self.get_cosmos();
 
@@ -28,8 +28,8 @@ entity_handle_type inventory_getters<entity_handle_type, t>::get_owning_transfer
 	return cosmos[maybe_item->current_slot].get_container().get_owning_transfer_capability();
 }
 
-template <class entity_handle_type, class t>
-typename inventory_getters<entity_handle_type, t>::inventory_slot_handle_type inventory_getters<entity_handle_type, t>::first_free_hand() const {
+template <bool C>
+typename inventory_getters<C>::inventory_slot_handle_type inventory_getters<C>::first_free_hand() const {
 	auto& self = *static_cast<const entity_handle_type*>(this);
 	auto& cosmos = self.get_cosmos();
 
@@ -45,8 +45,8 @@ typename inventory_getters<entity_handle_type, t>::inventory_slot_handle_type in
 	return cosmos[inventory_slot_id()];
 }
 
-template <class entity_handle_type, class t>
-typename inventory_getters<entity_handle_type, t>::inventory_slot_handle_type inventory_getters<entity_handle_type, t>::determine_hand_holstering_slot(entity_handle_type searched_root_container) const {
+template <bool C>
+typename inventory_getters<C>::inventory_slot_handle_type inventory_getters<C>::determine_hand_holstering_slot(entity_handle_type searched_root_container) const {
 	auto& item_entity = *static_cast<const entity_handle_type*>(this);
 	auto& cosmos = item_entity.get_cosmos();
 
@@ -76,8 +76,8 @@ typename inventory_getters<entity_handle_type, t>::inventory_slot_handle_type in
 	return cosmos[inventory_slot_id()];
 }
 
-template <class entity_handle_type, class t>
-typename inventory_getters<entity_handle_type, t>::inventory_slot_handle_type inventory_getters<entity_handle_type, t>::determine_pickup_target_slot_in(entity_handle_type searched_root_container) const {
+template <bool C>
+typename inventory_getters<C>::inventory_slot_handle_type inventory_getters<C>::determine_pickup_target_slot_in(entity_handle_type searched_root_container) const {
 	auto& item_entity = *static_cast<const entity_handle_type*>(this);
 	ensure(item_entity.alive());
 	ensure(searched_root_container.alive());
@@ -97,8 +97,8 @@ typename inventory_getters<entity_handle_type, t>::inventory_slot_handle_type in
 	return cosmos[inventory_slot_id()];
 }
 
-template <class entity_handle_type, class t>
-typename inventory_getters<entity_handle_type, t>::inventory_slot_handle_type inventory_getters<entity_handle_type, t>::map_primary_action_to_secondary_hand_if_primary_empty(int is_action_secondary) const {
+template <bool C>
+typename inventory_getters<C>::inventory_slot_handle_type inventory_getters<C>::map_primary_action_to_secondary_hand_if_primary_empty(int is_action_secondary) const {
 	auto& root_container = *static_cast<const entity_handle_type*>(this);
 
 	auto primary = root_container[slot_function::PRIMARY_HAND];
@@ -110,8 +110,8 @@ typename inventory_getters<entity_handle_type, t>::inventory_slot_handle_type in
 		return is_action_secondary ? secondary : primary;
 }
 
-template <class entity_handle_type, class t>
-std::vector<entity_handle_type> inventory_getters<entity_handle_type, t>::guns_wielded() const {
+template <bool C>
+std::vector<basic_entity_handle<C>> inventory_getters<C>::guns_wielded() const {
 	auto& subject = *static_cast<const entity_handle_type*>(this);
 	std::vector<entity_handle_type> result;
 
@@ -138,5 +138,5 @@ std::vector<entity_handle_type> inventory_getters<entity_handle_type, t>::guns_w
 }
 
 // explicit instantiation
-template class inventory_getters<basic_entity_handle <false>, basic_entity_handle_traits<false>>;
-template class inventory_getters<basic_entity_handle <true>, basic_entity_handle_traits<true>>;
+template class inventory_getters<false>;
+template class inventory_getters<true>;

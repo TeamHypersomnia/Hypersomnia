@@ -23,8 +23,8 @@ public:
 		operator=(const components::processing&);
 
 	typename std::enable_if<!is_const, void>::type 
-		skip_processing_in(processing_subjects);
+		skip_in(processing_subjects);
 	
 	typename std::enable_if<!is_const, void>::type 
-		unskip_processing_in(processing_subjects);
+		unskip_in(processing_subjects);
 };

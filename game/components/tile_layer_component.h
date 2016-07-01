@@ -33,7 +33,7 @@ namespace components {
 		void generate_indices_by_type(augs::rects::ltrb<int>);
 
 		void draw(const shared::state_for_drawing_renderable&) const;
-		augs::rects::ltrb<float> get_aabb(components::transform transform);
+		augs::rects::ltrb<float> get_aabb(components::transform transform) const;
 
 		augs::rects::ltrb<int> get_visible_tiles(const shared::state_for_drawing_renderable&) const;
 

@@ -112,7 +112,7 @@ namespace components {
 		}
 	}
 
-	std::vector<vec2> polygon::get_vertices() {
+	std::vector<vec2> polygon::get_vertices() const {
 		std::vector<vec2> out;
 
 		for (auto& v : triangulated_polygon)
@@ -154,7 +154,7 @@ namespace components {
 		}
 	}
 	
-	rects::ltrb<float> polygon::get_aabb(components::transform transform) {
+	rects::ltrb<float> polygon::get_aabb(components::transform transform) const {
 		return augs::get_aabb(original_polygon);
 	}
 }

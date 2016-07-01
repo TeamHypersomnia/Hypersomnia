@@ -49,7 +49,7 @@ namespace components {
 
 		void draw(const shared::state_for_drawing_renderable&) const;
 
-		std::vector<vec2> get_vertices();
-		rects::ltrb<float> get_aabb(components::transform);
+		std::vector<vec2> get_vertices() const;
+		rects::ltrb<float> get_aabb(components::transform) const;
 	};
 }
