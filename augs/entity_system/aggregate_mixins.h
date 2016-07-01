@@ -9,16 +9,18 @@ namespace augs {
 		template<class component,
 			class = typename std::enable_if<!is_const>::type>
 			decltype(auto) set(const component& c) const {
-			if (derived::has<component>())
-				return derived::get<component>() = c;
+			derived& self = *static_cast<derived*>(this);
+			if (self.has<component>())
+				return self.get<component>() = c;
 			else
-				return derived::add(c);
+				return self.add(c);
 		}
 
 		template<class component,
 			class = typename std::enable_if<!is_const>::type>
 			decltype(auto) operator+=(const component& c) const {
-			return derived::add(c);
+			derived& self = *static_cast<derived*>(this);
+			return self.add(c);
 		}
 
 		template<class... added_components,
@@ -27,7 +29,7 @@ namespace augs {
 			auto components_tuple = std::make_tuple(args...);
 
 			for_each_type<added_components...>([this, &components_tuple](auto c) {
-				derived::set(std::get<decltype(c)>(components_tuple));
+				set(std::get<decltype(c)>(components_tuple));
 			});
 		}
 	};
