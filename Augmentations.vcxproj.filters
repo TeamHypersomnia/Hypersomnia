@@ -1293,6 +1293,9 @@
     <ClCompile Include="game\detail\entity\relations_component_helpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\components\dynamic_tree_node_component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3227,9 +3230,6 @@
     <ClInclude Include="augs\misc\object_pool_handle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\entity_system\aggregate_handle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\entity_system\component_aggregate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3444,6 +3444,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\detail\entity\physics_getters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\components\dynamic_tree_node_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\components\special_physics_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\entity_system\aggregate_mixins.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -57,6 +57,9 @@ void basic_entity_handle<C>::add_standard_components() {
 	if (has<components::render>() && !is_entity_physical(*this) && !has<components::dynamic_tree_node>())
 		add(components::dynamic_tree_node().from_renderable(*this));
 
+	if (has<components::physics>() && !has<components::special_physics>())
+		add<components::special_physics>();
+
 	add<components::processing>();
 	add<components::substance>();
 }

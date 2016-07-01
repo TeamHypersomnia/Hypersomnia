@@ -2,6 +2,7 @@
 
 namespace components {
 	struct dynamic_tree_node;
+	struct special_physics;
 	struct animation;
 	struct animation_response;
 	struct behaviour_tree;
@@ -48,6 +49,7 @@ template<template<typename...> class List, class... prepend>
 struct put_all_components_into {
 	typedef List<prepend...,
 		components::dynamic_tree_node,
+		components::special_physics,
 		components::animation,
 		components::animation_response,
 		components::behaviour_tree,

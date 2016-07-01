@@ -4,7 +4,7 @@
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/entity_handle_declaration.h"
 
-#include "entity_system/aggregate_handle.h"
+#include "entity_system/aggregate_mixins.h"
 #include "game/entity_id.h"
 
 #include "game/components/processing_component.h"
@@ -14,33 +14,37 @@
 
 class cosmos;
 
-template <bool is_const>
-using basic_entity_handle_base = augs::basic_aggregate_handle<is_const, cosmos, put_all_components_into<std::tuple>::type>;
+template<bool is_const>
+using basic_entity_handle = basic_handle<is_const, cosmos, put_all_components_into<component_aggregate>::type>;
 
 template <bool is_const>
-class basic_entity_handle : 
-	private basic_entity_handle_base<is_const>,
-	public augs::aggregate_setters<is_const, basic_entity_handle<is_const>>,
+class basic_handle<is_const, cosmos, put_all_components_into<component_aggregate>::type> :
+	public basic_handle_base<is_const, cosmos, put_all_components_into<component_aggregate>::type>,
+	
+	private augs::component_allocators<is_const, entity_handle_alias<is_const>>,
+	public augs::component_setters<is_const, entity_handle_alias<is_const>>,
 	public inventory_getters<is_const>,
 	public physics_getters<is_const>,
 	public relations_component_helpers<is_const>
 	{
-	typedef basic_entity_handle_base<is_const> aggregate;
+	typedef augs::component_allocators<is_const, entity_handle_alias<is_const>> allocator;
+
+	friend class augs::component_allocators<is_const, entity_handle_alias<is_const>>;
 
 	template <class T, typename=void>
 	struct component_or_synchronizer {
 		basic_entity_handle h;
 
 		decltype(auto) get() const {
-			return h.aggregate::get<T>();
+			return h.allocator::get<T>();
 		}
 
 		decltype(auto) add(const T& t) const {
-			return h.aggregate::add(t);
+			return h.allocator::add(t);
 		}
 
 		decltype(auto) remove() const {
-			return h.aggregate::remove<T>();
+			return h.allocator::remove<T>();
 		}
 	};
 
@@ -49,31 +53,28 @@ class basic_entity_handle :
 		basic_entity_handle h;
 
 		auto get() const {
-			return component_synchronizer<is_const, T>(h.aggregate::get<T>(), h);
+			return component_synchronizer<is_const, T>(h.allocator::get<T>(), h);
 		}
 
 		auto add(const T& t) const {
 			ensure(!h.has<T>());
 
-			return component_synchronizer<is_const, T>(h.aggregate::add(t), h);
+			return component_synchronizer<is_const, T>(h.allocator::add(t), h);
 		}
 
 		void remove() const {
 			ensure(h.has<T>());
-			component_synchronizer<is_const, T> sync(h.aggregate::get<T>(), h);
+			component_synchronizer<is_const, T> sync(h.allocator::get<T>(), h);
 
 
-			h.aggregate::remove<T>();
+			h.allocator::remove<T>();
 		}
 	};
+
+	using basic_handle_base::get;
+
 public:
-	using aggregate::aggregate;
-	using aggregate::dead;
-	using aggregate::alive;
-	using aggregate::get_id;
-	using aggregate::unset;
-	using aggregate::set_debug_name;
-	using aggregate::get_debug_name;
+	using basic_handle_base::basic_handle_base;
 
 	basic_entity_handle make_handle(entity_id) const;
 
@@ -90,7 +91,7 @@ public:
 
 	template <class component>
 	bool has() const {
-		return aggregate::has<component>();
+		return allocator::has<component>();
 	}
 
 	template<class component>
@@ -106,7 +107,7 @@ public:
 	template<class component>
 	decltype(auto) find() const {
 		static_assert(!is_component_synchronized<component>::value, "Cannot return a pointer to synchronized component!");
-		return aggregate::find<component>();
+		return allocator::find<component>();
 	}
 
 	template<class component>
@@ -126,6 +127,7 @@ public:
 	template<class = typename std::enable_if<!is_const>::type>
 	void add_standard_components();
 };
+
 
 template <bool is_const>
 std::vector<entity_id> to_id_vector(std::vector<basic_entity_handle<is_const>> vec) {

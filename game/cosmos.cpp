@@ -85,10 +85,6 @@ const_inventory_slot_handle cosmos::get_handle(inventory_slot_id id) const {
 	return const_inventory_slot_handle(*this, id);
 }
 
-void cosmos::construct_entity(entity_id new_id) {
-	// processing_lists_system.add_entity_to_matching_lists(get_handle(new_id));
-}
-
 void cosmos::reserve_storage_for_entities(size_t n) {
 	components_and_aggregates.reserve_storage_for_aggregates(n);
 }
@@ -102,15 +98,15 @@ entity_handle cosmos::clone_entity(entity_id e) {
 	return get_handle(components_and_aggregates.clone_aggregate(const_handle));
 }
 
-entity_handle cosmos::clone_and_construct_entity(entity_id e) {
-	auto cloned = clone_entity(e);
-	construct_entity(cloned);
-	return cloned;
-}
-
 void cosmos::delete_entity(entity_id e) {
-	ensure(get_handle(e).alive());
-	processing_lists_system.remove_entity_from_lists(get_handle(e));
+	auto handle = get_handle(e);
+	ensure(handle.alive());
+
+	bool should_destruct_now_to_avoid_repeated_resubstantialization = handle.has<components::substance>();
+
+	if (should_destruct_now_to_avoid_repeated_resubstantialization)
+		handle.remove<components::substance>();
+
 	components_and_aggregates.free_aggregate(e);
 }
 

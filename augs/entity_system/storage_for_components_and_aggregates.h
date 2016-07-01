@@ -3,7 +3,7 @@
 #include "misc/object_pool.h"
 #include "misc/object_pool_id.h"
 
-#include "aggregate_handle.h"
+#include "aggregate_mixins.h"
 
 namespace augs {
 	template<class T>
@@ -13,9 +13,6 @@ namespace augs {
 	class storage_for_components_and_aggregates {
 		typedef component_aggregate<components...> aggregate_type;
 		typedef object_pool_id<aggregate_type> aggregate_id;
-
-		typedef basic_aggregate_handle<false, handle_owner_type, std::tuple<components...>> aggregate_handle;
-		typedef basic_aggregate_handle<true, handle_owner_type, std::tuple<components...>> const_aggregate_handle;
 
 	public:
 		typedef object_pool<aggregate_type> aggregate_pool_type;
@@ -69,25 +66,30 @@ namespace augs {
 			return new_id;
 		}
 
-		aggregate_id clone_aggregate(const_aggregate_handle const_aggregate) {
-			auto new_aggregate_id = pool_for_aggregates.allocate();
+		aggregate_id clone_aggregate(aggregate_id cloned_aggregate_id) {
+			auto cloned_aggregate = pool_for_aggregates.get_handle(cloned_aggregate_id);
 
-			auto& from_handle = const_aggregate;
-			auto& to_handle = new_aggregate;
+			aggregate_handle new_aggregate = pool_for_aggregates.allocate();
 
-			for_each_type<components...>([&from_handle, &to_handle](auto c) {
-				auto* maybe_component = from_handle.find<decltype(c)>();
+			for_each_type<components...>([&cloned_aggregate, &new_aggregate](auto c) {
+				auto* maybe_component = cloned_aggregate.find<decltype(c)>();
 
 				if (maybe_component)
-					to += *maybe_component;
+					new_aggregate += *maybe_component;
 			});
 
-			new_aggregate_id.set_debug_name(const_aggregate.get_debug_name());
+			new_aggregate.set_debug_name(cloned_aggregate.get_debug_name());
 
-			return new_aggregate_id;
+			return new_aggregate;
 		}
 
 		void free_aggregate(aggregate_id aggregate) {
+			auto handle = pool_for_aggregates.get_handle(aggregate);
+
+			for_each_type<components...>([&handle](auto c) {
+				handle.remove<decltype(c)>();
+			});
+
 			pool_for_aggregates.free(aggregate);
 		}
 	};

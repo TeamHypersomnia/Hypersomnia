@@ -11,7 +11,7 @@ namespace components {
 	//}
 
 	template<bool C>
-	bool processing_synchronizer<C>::is_in(processing_subjects list) const {
+	bool component_synchronizer<C, components::processing>::is_in(processing_subjects list) const {
 		return component.processing_subject_categories.test(int(list));
 	}
 

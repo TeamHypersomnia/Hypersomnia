@@ -4,7 +4,7 @@
 
 namespace augs {
 	template<bool is_const, class owner_type, class value_type>
-	class basic_handle {
+	class basic_handle_base {
 	public:
 		typedef typename maybe_const_ref<is_const, owner_type>::type owner_reference;
 		typedef typename maybe_const_ref<is_const, value_type>::type value_reference;
@@ -13,7 +13,7 @@ namespace augs {
 		owner_reference owner;
 		id_type raw_id;
 
-		basic_handle(owner_reference owner, id_type raw_id) : owner(owner), raw_id(raw_id) {}
+		basic_handle_base(owner_reference owner, id_type raw_id) : owner(owner), raw_id(raw_id) {}
 
 		void unset() {
 			raw_id.unset();
@@ -42,6 +42,11 @@ namespace augs {
 		std::string get_debug_name() const {
 			return raw_id.get_debug_name();
 		}
+	};
+
+	template<bool is_const, class owner_type, class value_type>
+	class basic_handle : public basic_handle_base<is_const, owner_type, value_type> {
+		using basic_handle_base::basic_handle_base;
 	};
 
 	template <class T>

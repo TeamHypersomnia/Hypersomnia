@@ -3,11 +3,9 @@
 #include "component_aggregate.h"
 
 namespace augs {
-	template <bool is_const, class owner_type, class T>
-	class basic_aggregate_handle;
-
 	template<bool is_const, class derived>
-	class aggregate_setters {
+	class component_setters {
+	public:
 		template<class component,
 			class = typename std::enable_if<!is_const>::type>
 			decltype(auto) set(const component& c) const {
@@ -34,19 +32,16 @@ namespace augs {
 		}
 	};
 
-	template <bool is_const, class owner_type, class... components>
-	class basic_aggregate_handle<is_const, owner_type, std::tuple<components...>> 
-		: public basic_handle<is_const, owner_type, component_aggregate<components...>>,
-		  public aggregate_setters<is_const, basic_aggregate_handle<is_const, owner_type, std::tuple<components...>>> {
-		using basic_handle::get;
+	template <bool is_const, class derived>
+	class component_allocators {
 	public:
-		using basic_handle::basic_handle;
-
 		template<class component>
 		typename maybe_const_ptr<is_const, component>::type find() const {
-			auto& aggregate = get();
+			derived& self = *static_cast<derived*>(this);
 
-			auto& component_pool = owner.get_component_pool<component>();
+			auto& aggregate = self.get();
+
+			auto& component_pool = self.owner.get_component_pool<component>();
 			auto component_handle = component_pool.get_handle(aggregate.get_id<component>());
 
 			if (component_handle.alive())
@@ -68,15 +63,17 @@ namespace augs {
 		template<class component,
 			class = typename std::enable_if<!is_const>::type>
 			component& add(const component& c) const {
+			derived& self = *static_cast<derived*>(this);
 			ensure(!has<component>());
-			get().writable_id<component>() = owner.get_component_pool<component>().allocate(c);
+			self.get().writable_id<component>() = owner.get_component_pool<component>().allocate(c);
 		}
 
 		template<class component,
 			class = typename std::enable_if<!is_const>::type>
 			void remove() const {
 			ensure(has<component>());
-			owner.get_component_pool<component>().free(get().get_id<component>());
+			derived& self = *static_cast<derived*>(this);
+			self.owner.get_component_pool<component>().free(self.get().get_id<component>());
 		}
 	};
 }

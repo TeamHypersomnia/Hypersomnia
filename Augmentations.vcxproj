@@ -354,6 +354,7 @@
     <ClCompile Include="3rdparty\RakNet\Source\_FindFirst.cpp" />
     <ClCompile Include="augs\ensure.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
+    <ClCompile Include="game\components\dynamic_tree_node_component.cpp" />
     <ClCompile Include="game\components\processing_component.cpp" />
     <ClCompile Include="game\components\relations_component.cpp" />
     <ClCompile Include="game\components\substance_component.cpp" />
@@ -1002,7 +1003,7 @@
     <ClInclude Include="3rdparty\RakNet\Source\XBox360Includes.h" />
     <ClInclude Include="3rdparty\RakNet\Source\_FindFirst.h" />
     <ClInclude Include="augs\build_settings.h" />
-    <ClInclude Include="augs\entity_system\aggregate_handle.h" />
+    <ClInclude Include="augs\entity_system\aggregate_mixins.h" />
     <ClInclude Include="augs\entity_system\component_aggregate.h" />
     <ClInclude Include="augs\entity_system\ecs_instantiation.h" />
     <ClInclude Include="augs\entity_system\storage_for_components_and_aggregates.h" />
@@ -1027,7 +1028,9 @@
     <ClInclude Include="augs\templates.h" />
     <ClInclude Include="augs\window_framework\colored_print.h" />
     <ClInclude Include="augs\window_framework\platform_utils.h" />
+    <ClInclude Include="game\components\dynamic_tree_node_component.h" />
     <ClInclude Include="game\components\processing_component.h" />
+    <ClInclude Include="game\components\special_physics_component.h" />
     <ClInclude Include="game\component_synchronizer.h" />
     <ClInclude Include="game\detail\entity\inventory_getters.h" />
     <ClInclude Include="game\detail\entity\physics_getters.h" />
