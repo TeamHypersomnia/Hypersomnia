@@ -98,6 +98,16 @@ public:
 		return get_handle(id);
 	}
 
+	template<class T>
+	decltype(auto) operator [](std::vector<T> ids) {
+		return to_handle_vector(ids);
+	}
+
+	template<class T>
+	decltype(auto) operator [](std::vector<T> ids) const {
+		return to_handle_vector(ids);
+	}
+
 	randomization get_rng_for(entity_id) const;
 
 	std::vector<entity_handle> get(processing_subjects);

@@ -97,7 +97,7 @@ namespace scene_managers {
 
 	}
 
-	void one_entity::execute_drawcalls_for_camera(messages::camera_render_request_message msg) {
+	void one_entity::execute_drawcalls_for_camera(viewing_step& msg) {
 		rendering_scripts::standard_rendering(msg);
 	}
 }

@@ -40,7 +40,7 @@ typedef augs::storage_for_message_queues <
 	messages::trigger_hit_confirmation_message,
 	messages::trigger_hit_request_message,
 	messages::new_entity_message,
-	messages::camera_render_request_message,
+	viewing_step&,
 	messages::gui_item_transfer_intent,
 	messages::melee_swing_response,
 	messages::health_event

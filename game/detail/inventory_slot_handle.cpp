@@ -167,7 +167,7 @@ typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot
 
 template <bool C>
 std::vector<typename basic_inventory_slot_handle<C>::entity_handle_type> basic_inventory_slot_handle<C>::get_items_inside() const {
-	return get_cosmos().to_handle_vector((*this)->items_inside);
+	return get_cosmos()[(*this)->items_inside];
 }
 
 template <bool C>
@@ -228,7 +228,7 @@ basic_inventory_slot_handle<C>::operator inventory_slot_id() const {
 template <bool C>
 std::vector<typename basic_inventory_slot_handle<C>::entity_handle_type> basic_inventory_slot_handle<C>::get_mounted_items() const {
 	// TODO: actually implement mounted items
-	return get_cosmos().to_handle_vector(items_inside);
+	return get_cosmos()[items_inside];
 
 	//for (auto& i : items_inside) {
 	//	auto handle = cosmos[i];

@@ -3,8 +3,10 @@
 #include "game/entity_id.h"
 #include "game/entity_handle_declaration.h"
 #include <vector>
+#include "game/detail/state_for_drawing_camera.h"
 
 class viewing_step;
+class physics_system;
 
 class dynamic_tree_system {
 	friend class cosmos;
@@ -29,5 +31,5 @@ class dynamic_tree_system {
 	void destruct(const_entity_handle);
 public:
 
-	std::vector<entity_id> determine_visible_entities_from_camera(const_entity_handle camera) const;
+	std::vector<entity_id> determine_visible_entities_from_camera(state_for_drawing_camera, const physics_system&) const;
 };

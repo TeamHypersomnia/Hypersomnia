@@ -27,6 +27,8 @@ public:
 	viewing_step(basic_viewing_step basic_step, state_for_drawing_camera camera_state);
 
 	state_for_drawing_camera camera_state;
+
+	std::vector<const_entity_handle> visible_entities;
 };
 
 class fixed_step {

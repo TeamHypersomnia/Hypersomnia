@@ -42,11 +42,11 @@ void processing_lists_system::reserve_caches_for_entities(size_t n) {
 }
 
 std::vector<entity_handle> processing_lists_system::get(processing_subjects list, cosmos& cosmos) const {
-	return cosmos.to_handle_vector(lists.at(list));
+	return cosmos[lists.at(list)];
 }
 
 std::vector<const_entity_handle> processing_lists_system::get(processing_subjects list, const cosmos& cosmos) const {
-	return cosmos.to_handle_vector(lists.at(list));
+	return cosmos[lists.at(list)];
 }
 
 components::processing processing_lists_system::get_default_processing(const_entity_handle id) const {

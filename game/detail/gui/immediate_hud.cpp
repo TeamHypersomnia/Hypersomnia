@@ -71,10 +71,10 @@ vec2 position_caption_around_a_circle(float radius, vec2 r, float alpha) {
 	return vec2(0, 0);
 }
 
-void immediate_hud::draw_circular_bars(messages::camera_render_request_message r) {
-	auto& render = r.camera->get_owner_world().systems.get<dynamic_tree_system>();
+void immediate_hud::draw_circular_bars(viewing_step& r) {
+	auto& dynamic_tree = r.cosm.stateful_systems.get<dynamic_tree_system>();
 	const auto& visible_entities = render.get_all_visible_entities();
-	auto& target = *r.state.output;
+	auto& target = r.renderer;
 
 	auto camera = r.camera;
 	auto watched_character = camera.get<components::camera>().entity_to_chase;
@@ -84,7 +84,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 	circular_bars_information.clear();
 	pure_color_highlights.clear();
 
-	for (auto v : render.get_all_visible_entities()) {
+	for (auto v : r.visible_entities) {
 		auto* sentience = v.find<components::sentience>();
 
 		if (sentience) {
@@ -247,7 +247,7 @@ void immediate_hud::draw_circular_bars(messages::camera_render_request_message r
 	}
 }
 
-void immediate_hud::draw_circular_bars_information(messages::camera_render_request_message r) {
+void immediate_hud::draw_circular_bars_information(viewing_step& r) {
 	r.state.output->triangles.insert(r.state.output->triangles.begin(), circular_bars_information.begin(), circular_bars_information.end());
 }
 
@@ -297,12 +297,12 @@ void immediate_hud::acquire_game_events(fixed_step& step) {
 	}
 }
 
-double immediate_hud::get_current_time(messages::camera_render_request_message msg) const {
+double immediate_hud::get_current_time(viewing_step& msg) const {
 	auto& world = msg.camera->get_owner_world();
 	return world.get_current_timestamp() + world.parent_overworld.fixed_delta_milliseconds() / 1000 * world.parent_overworld.view_interpolation_ratio();
 }
 
-void immediate_hud::draw_vertically_flying_numbers(messages::camera_render_request_message msg) {
+void immediate_hud::draw_vertically_flying_numbers(viewing_step& msg) {
 	auto& target = renderer::get_current();
 	
 	auto current_time = get_current_time(msg);
@@ -325,7 +325,7 @@ void immediate_hud::draw_vertically_flying_numbers(messages::camera_render_reque
 	erase_remove(recent_pure_color_highlights, timeout_lambda);
 }
 
-void immediate_hud::draw_pure_color_highlights(messages::camera_render_request_message msg) {
+void immediate_hud::draw_pure_color_highlights(viewing_step& msg) {
 	auto current_time = get_current_time(msg);
 
 	for (auto& r : recent_pure_color_highlights) {

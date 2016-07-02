@@ -15,7 +15,7 @@
 using namespace augs;
 using namespace gui;
 
-void game_gui_world::draw_cursor_and_tooltip(messages::camera_render_request_message r) {
+void game_gui_world::draw_cursor_and_tooltip(viewing_step& r) {
 	auto& drag_result = prepare_drag_and_drop_result();
 
 	shared::state_for_drawing_renderable state;

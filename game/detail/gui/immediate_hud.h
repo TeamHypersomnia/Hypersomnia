@@ -3,8 +3,10 @@
 #include "misc/stepped_timing.h"
 #include "augs/gui/text_drawer.h"
 #include "game/components/transform_component.h"
+
 class cosmos;
 class fixed_step;
+class viewing_step;
 
 struct immediate_hud {
 	struct game_event_visualization {
@@ -31,12 +33,12 @@ struct immediate_hud {
 	vertex_triangle_buffer circular_bars_information;
 	vertex_triangle_buffer pure_color_highlights;
 
-	void draw_circular_bars(messages::camera_render_request_message);
-	void draw_circular_bars_information(messages::camera_render_request_message);
-	void draw_pure_color_highlights(messages::camera_render_request_message);
+	void draw_circular_bars(viewing_step&);
+	void draw_circular_bars_information(viewing_step&);
+	void draw_pure_color_highlights(viewing_step&);
 
 	void acquire_game_events(fixed_step& step);
-	void draw_vertically_flying_numbers(messages::camera_render_request_message);
+	void draw_vertically_flying_numbers(viewing_step&);
 private:
-	double get_current_time(messages::camera_render_request_message) const;
+	double get_current_time(viewing_step&) const;
 };
