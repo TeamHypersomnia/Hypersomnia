@@ -14,8 +14,18 @@ class processing_lists_system {
 	std::unordered_map<processing_subjects, std::vector<entity_id>> lists;
 	friend class component_synchronizer<false, components::processing>;
 
-	void add_entity_to_matching_lists(processing_subjects, const_entity_handle);
-	void remove_entity_from_lists(processing_subjects, const_entity_handle);
+	struct cache {
+		bool is_constructed = false;
+	};
+
+	std::vector<cache> per_entity_cache;
+
+	void destruct(const_entity_handle);
+	void construct(const_entity_handle);
+
+	void reserve_caches_for_entities(size_t n);
+
+	friend class cosmos;
 public:
 
 	components::processing get_default_processing(const_entity_handle) const;

@@ -37,7 +37,7 @@ public:
 	storage_for_all_stateful_systems stateful_systems;
 	all_settings settings;
 
-	mutable cosmic_profiler profiler;
+	cosmic_profiler profiler;
 
 	unsigned long long current_step_number = 0;
 	double seconds_passed = 0.0;
@@ -50,19 +50,13 @@ public:
 		fixed_callback pre_solve = fixed_callback(), 
 		fixed_callback post_solve = fixed_callback());
 
-	void call_rendering_schemata(augs::variable_delta delta,
-		variable_callback pre_solve = variable_callback(),
-		variable_callback post_solve = variable_callback()
-		) const;
-
 	void reserve_storage_for_entities(size_t);
 
 	entity_handle create_entity(std::string debug_name);
-	
 	entity_handle clone_entity(entity_id);
-	entity_handle clone_and_construct_entity(entity_id);
-	
 	void delete_entity(entity_id);
+
+	void complete_resubstantialization(entity_handle);
 
 	entity_handle get_handle(entity_id);
 	const_entity_handle get_handle(entity_id) const;

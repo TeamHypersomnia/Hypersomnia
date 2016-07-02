@@ -5,6 +5,8 @@
 #include "game/resources/particle_effect.h"
 #include "transform_component.h"
 
+#include "game/detail/state_for_drawing.h"
+
 class physics_system;
 class particles_system;
 
@@ -18,6 +20,10 @@ namespace shared {
 
 namespace components {
 	struct particle_group {
+		struct drawing_input : with_target_buffer {
+			using with_target_buffer::with_target_buffer;
+		};
+
 		struct stream {
 			physics_system* optional_physics = nullptr;
 
@@ -57,7 +63,7 @@ namespace components {
 		std::vector<stream> stream_slots;
 		particle_group() { stream_slots.resize(1); }
 
-		void draw(shared::state_for_drawing_renderable);
+		void draw(const drawing_input&);
 	private:
 		friend class particles_system;
 	};

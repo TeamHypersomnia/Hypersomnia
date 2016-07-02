@@ -4,15 +4,20 @@
 
 template <bool is_const, class component_type>
 class component_synchronizer_base {
-	friend class basic_entity_handle<is_const>;
+	template<bool, class, class>
+	friend class augs::basic_handle;
+
 	typedef typename maybe_const_ref<is_const, component_type>::type component_reference;
 protected:
 	component_reference component;
 	basic_entity_handle<is_const> handle;
 public:
-	
-	bool should_be_live() const {
-		return component.activated && handle.has<components::substance>();
+	const component_type& get_data() const {
+		return component;
+	}
+
+	bool is_activated() const {
+		return component.activated;
 	}
 
 	component_synchronizer_base(component_reference c, basic_entity_handle<is_const> h) : component(c), handle(h) {
@@ -25,7 +30,3 @@ public:
 
 template <bool is_const, class component_type>
 class component_synchronizer {};
-
-//: public component_synchronizer_base<is_const, component_type> {
-//
-//};

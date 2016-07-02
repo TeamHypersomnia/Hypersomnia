@@ -4,7 +4,7 @@
 using namespace augs;
 
 namespace components {
-	void particle_group::draw(shared::state_for_drawing_renderable in) {
+	void particle_group::draw(const drawing_input& in) {
 		for (auto& s : stream_slots)
 			for (auto& it : s.particles.particles) {
 				auto temp_alpha = it.face.color.a;
@@ -22,6 +22,8 @@ namespace components {
 
 					// it.face.size_multiplier.set(alivity_multiplier, alivity_multiplier);
 				}
+
+				components::sprite::drawing_input in(in.target_buffer);
 
 				in.renderable_transform = it.ignore_rotation ? components::transform(it.pos, 0) : components::transform({ it.pos, it.rotation });
 				it.face.draw(in);

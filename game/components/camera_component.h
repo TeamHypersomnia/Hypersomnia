@@ -24,7 +24,6 @@ namespace components {
 
 		static void configure_camera_and_character_with_crosshair(entity_handle camera, entity_handle character, entity_handle crosshair);
 
-		augs::rects::xywh<int> viewport;
 		vec2 visible_world_area;
 
 		unsigned layer = 0;
@@ -40,8 +39,6 @@ namespace components {
 
 		components::transform last_interpolant;
 
-		vec2 rendered_size;
-
 		vec2 max_look_expand = vec2(600.f, 300.f);
 
 		entity_id entity_to_chase;
@@ -53,7 +50,7 @@ namespace components {
 		
 		vec2i get_camera_offset_due_to_character_crosshair(cosmos& cosmos) const;
 		
-		shared::state_for_drawing_camera how_camera_will_render;
+		state_for_drawing_camera how_camera_will_render;
 
 	private:
 		friend class camera_system;

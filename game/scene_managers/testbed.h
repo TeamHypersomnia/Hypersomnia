@@ -17,11 +17,10 @@ namespace scene_managers {
 		bool keep_drawing = false;
 
 		void populate_world_with_entities(fixed_step&);
-		
+
 		void pre_solve(fixed_step&);
 		void post_solve(fixed_step&);
-
-		void execute_drawcalls_for_camera(messages::camera_render_request_message) const;
-		void drawcalls_after_all_cameras(variable_step&) const;
+		
+		void view_cosmos(variable_step&) const;
 	};
 }

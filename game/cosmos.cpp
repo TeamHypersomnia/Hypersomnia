@@ -37,12 +37,35 @@
 #include "game/entity_handle.h"
 #include "game/detail/inventory_slot_handle.h"
 
-cosmos::cosmos() :
-	stateful_systems(
-	physics_system(std::ref(*this)),
-	gui_system(std::ref(*this)), 
-	dynamic_tree_system())
+cosmos::cosmos()
+	//:
+	//stateful_systems(
+	//physics_system(),
+	//gui_system(), 
+	//dynamic_tree_system(),
+	//processing_lists_system())
+	
 {
+}
+
+void cosmos::complete_resubstantialization(entity_handle h) {
+	stateful_systems.for_each([this, h](auto& sys) {
+		sys.destruct(h);
+	});
+
+	if (h.has<components::substance>()) {
+		stateful_systems.for_each([this, h](auto& sys) {
+			sys.construct(h);
+		});
+	}
+}
+
+void cosmos::reserve_storage_for_entities(size_t n) {
+	components_and_aggregates.reserve_storage_for_aggregates(n);
+
+	stateful_systems.for_each([this, n](auto& sys) {
+		sys.reserve_caches_for_entities(n);
+	});
 }
 
 const storage_for_all_components_and_aggregates::aggregate_pool_type& cosmos::get_pool() const {
@@ -85,9 +108,6 @@ const_inventory_slot_handle cosmos::get_handle(inventory_slot_id id) const {
 	return const_inventory_slot_handle(*this, id);
 }
 
-void cosmos::reserve_storage_for_entities(size_t n) {
-	components_and_aggregates.reserve_storage_for_aggregates(n);
-}
 
 entity_handle cosmos::create_entity(std::string debug_name) {
 	return get_handle(components_and_aggregates.allocate_aggregate(debug_name));
@@ -126,22 +146,6 @@ void cosmos::advance_deterministic_schemata(augs::machine_entropy input,
 	if (post_solve)
 		post_solve(step);
 }
-
-void cosmos::call_rendering_schemata(augs::variable_delta delta,
-	variable_callback pre_solve = variable_callback(),
-	variable_callback post_solve = variable_callback()
-) const {
-	variable_step step(*this, delta);
-
-	if (pre_solve)
-		pre_solve(step);
-
-	call_rendering_schemata(step);
-
-	if (post_solve)
-		post_solve(step);
-}
-
 
 void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	auto& cosmos = step.cosm;
@@ -289,14 +293,4 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	++current_step_number;
 	seconds_passed += delta.in_seconds();
 	performance.stop(meter_type::LOGIC);
-}
-
-void cosmos::call_rendering_schemata(variable_step& step) const {
-	const auto& cosm = *this;
-
-	auto& performance = profiler.performance;
-
-	camera_system().post_render_requests_for_all_cameras();
-
-	performance.stop(meter_type::RENDERING);
 }

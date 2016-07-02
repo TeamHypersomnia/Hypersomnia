@@ -14,9 +14,7 @@
 
 using namespace augs;
 
-namespace shared {
-	struct state_for_drawing_camera;
-}
+struct state_for_drawing_camera;
 
 class render_system {
 	std::vector<std::vector<entity_id>> layers;

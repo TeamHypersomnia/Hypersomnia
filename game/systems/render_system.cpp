@@ -28,48 +28,6 @@ render_system::render_system(cosmos& parent_cosmos) : processing_system_with_cos
 	layers_whose_order_determines_friction.push_back(render_layer::CAR_INTERIOR);
 }
 
-void render_system::add_entities_to_rendering_tree() {
-	auto& events = step.messages.get_queue<messages::new_entity_message>();
-
-	for (auto& it : events) {
-		auto& e = it.subject;
-
-		auto* physics_definition = e.find<components::physics_definition>();
-		auto* render = e.find<components::render>();
-
-		if (!physics_definition && render) {
-			auto* sprite = e.find<components::sprite>();
-			auto* polygon = e.find<components::polygon>();
-			auto* tile_layer = e.find<components::tile_layer>();
-			auto* particle_group = e.find<components::particle_group>();
-
-			auto transform = e.get<components::transform>();
-
-			if(!render->was_drawn)
-				render->previous_transform = transform;
-
-			rects::ltrb<float> aabb;
-
-			if (sprite) aabb = sprite->get_aabb(transform);
-			if (polygon) aabb = polygon->get_aabb(transform);
-			if (tile_layer) aabb = tile_layer->get_aabb(transform);
-
-			if (aabb.good()) {
-				b2AABB input;
-				input.lowerBound = aabb.left_top();
-				input.upperBound = aabb.right_bottom();
-
-				render->tree_proxy_id = non_physical_objects_tree.CreateProxy(input, new entity_id(e));
-			}
-			else {
-				if (particle_group) {
-					set_visibility_persistence(e, true);
-				}
-			}
-		}
-	}
-}
-
 void render_system::remove_entities_from_rendering_tree() {
 	auto& events = step.messages.get_queue<messages::queue_destruction>();
 
@@ -193,68 +151,6 @@ void render_system::set_visibility_persistence(entity_id id, bool flag) {
 	}
 }
 
-void render_system::set_current_transforms_as_previous_for_interpolation() {
-	if (!enable_interpolation) return;
-
-	for (auto it : visible_entities) {
-		if (it.dead())
-			continue;
-
-		auto& render = it.get<components::render>();
-
-		if (render.interpolate) {
-			render.previous_transform = it.get<components::transform>();
-		}
-	}
-}
-template<class T>
-static inline T tabs(T _a)
-{
-	return _a < 0 ? -_a : _a;
-}
-
-void render_system::calculate_and_set_interpolated_transforms() {
-	if (!enable_interpolation) return;
-	auto ratio = view_interpolation_ratio();
-
-	for (auto e : visible_entities) {
-		auto& render = e.get<components::render>();
-
-		if (render.interpolate) {
-			auto& actual_transform = e.get<components::transform>();
-			render.saved_actual_transform = actual_transform;
-
-			if (render.last_step_when_visible == current_step - 1) {
-				components::transform interpolated_transform = augs::interp(render.previous_transform, actual_transform, ratio);
-
-				if (!render.snap_interpolation_when_close || (actual_transform.pos - interpolated_transform.pos).length_sq() > 1.f)
-					actual_transform.pos = interpolated_transform.pos;
-				if (!render.snap_interpolation_when_close || tabs(actual_transform.rotation - interpolated_transform.rotation) > 1.f)
-					actual_transform.rotation = interpolated_transform.rotation;
-			}
-			else {
-				render.previous_transform = actual_transform;
-			}
-
-			render.last_step_when_visible = current_step;
-		}
-	}
-
-	++current_step;
-	current_visibility_index = 0;
-}
-
-void render_system::restore_actual_transforms() {
-	if (!enable_interpolation) return;
-
-	for (auto it : visible_entities) {
-		auto& render = it.get<components::render>();
-
-		if (render.interpolate) {
-			it.get<components::transform>() = render.saved_actual_transform;
-		}
-	}
-}
 
 void render_system::standard_draw_entity(entity_id e, shared::state_for_drawing_camera in_camera, bool only_border_highlights, int visibility_index) {
 	static thread_local state_for_drawing_renderable in;

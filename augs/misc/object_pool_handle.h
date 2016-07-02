@@ -46,6 +46,7 @@ namespace augs {
 
 	template<bool is_const, class owner_type, class value_type>
 	class basic_handle : public basic_handle_base<is_const, owner_type, value_type> {
+	public:
 		using basic_handle_base::basic_handle_base;
 	};
 

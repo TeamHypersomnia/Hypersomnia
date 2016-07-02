@@ -87,30 +87,21 @@ void multiverse::simulate() {
 }
 
 void multiverse::view(game_window& window) const {
-	main_cosmos.profiler.fps_counter.new_measurement();
+	frame_profiler.fps_counter.new_measurement();
 
 	auto& target = renderer::get_current();
 
 	target.clear_current_fbo();
 
-	main_cosmos.call_rendering_schemata(frame_timer.extract_variable_delta(main_cosmos_timer),
-		cosmos::variable_callback(),
-		[this, &target](variable_step& step) {
-			auto& requests = step.messages.get_queue<messages::camera_render_request_message>();
+	target.set_viewport({0, 0, main_cosmos.settings.screen_size.x, main_cosmos.settings.screen_size.y });
 
-			for (auto& r : requests) {
-				target.set_viewport(r.state.viewport);
-				main_cosmos_manager.execute_drawcalls_for_camera(r);
-			}
+	variable_step main_cosmos_viewing_step(main_cosmos, frame_timer.extract_variable_delta(main_cosmos_timer));
+	main_cosmos_manager.view_cosmos(main_cosmos_viewing_step);
 
-			main_cosmos_manager.drawcalls_after_all_cameras(step);
-	
-	});
-
-	main_cosmos.profiler.triangles.measure(target.triangles_drawn_total);
+	frame_profiler.triangles.measure(target.triangles_drawn_total);
 	target.triangles_drawn_total = 0;
 
 	window.window.swap_buffers();
 
-	main_cosmos.profiler.fps_counter.end_measurement();
+	frame_profiler.fps_counter.end_measurement();
 }

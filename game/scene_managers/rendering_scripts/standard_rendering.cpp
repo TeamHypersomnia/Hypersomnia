@@ -5,19 +5,16 @@
 
 #include "game/systems/render_system.h"
 #include "game/stateful_systems/gui_system.h"
+#include "game/stateful_systems/dynamic_tree_system.h"
 #include "game/resources/manager.h"
 
 #include "math/matrix.h"
 
 namespace rendering_scripts {
-	void standard_rendering(messages::camera_render_request_message msg) {
-		auto state = msg.state;
-		auto mask = msg.mask;
-		auto camera = msg.camera;
-
-		auto& world = camera->get_owner_world();
-		auto& render = world.systems.get<render_system>();
-		auto& gui = world.systems.get<gui_system>();
+	void standard_rendering(variable_step& step, const_entity_handle camera) {
+		auto& cosmos = camera.get_cosmos();
+		auto& dynamic_tree = cosmos.stateful_systems.get<dynamic_tree_system>();
+		auto& gui = cosmos.stateful_systems.get<gui_system>();
 
 		auto matrix = augs::orthographic_projection<float>(0, state.visible_world_area.x, state.visible_world_area.y, 0, 0, 1);
 
@@ -31,7 +28,7 @@ namespace rendering_scripts {
 			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
 		}
 		
-		render.generate_layers_from_visible_entities(mask);
+		dynamic_tree.generate_layers_from_visible_entities(mask);
 
 		for (int i = render_layer::UNDER_GROUND; i > render_layer::DYNAMIC_BODY; --i) {
 			render.draw_layer(state, i);

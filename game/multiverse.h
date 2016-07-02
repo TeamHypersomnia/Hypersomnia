@@ -16,6 +16,8 @@ class multiverse {
 public:
 	multiverse();
 
+	mutable cosmic_profiler frame_profiler;
+
 	entropy_player main_cosmos_player;
 
 	cosmos main_cosmos;

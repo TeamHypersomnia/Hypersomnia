@@ -22,7 +22,6 @@ namespace ingredients {
 		camera.max_look_expand.set(w / 2, h / 2);
 		camera.angled_look_length = 10;
 
-		camera.viewport.set(0, 0, w, h);
 		camera.visible_world_area.set(w, h);
 
 		position_copying.relative = false;

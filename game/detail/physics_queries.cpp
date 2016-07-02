@@ -152,7 +152,7 @@ physics_system::query_aabb_output physics_system::query_square_px(vec2 p1, float
 	return query_square(p1 * PIXELS_TO_METERSf, side * PIXELS_TO_METERSf, filter, ignore_entity);
 }
 
-physics_system::query_aabb_output physics_system::query_aabb(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity) {
+physics_system::query_aabb_output physics_system::query_aabb(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity) const {
 	query_aabb_input callback;
 	callback.filter = filter;
 	callback.ignore_entity = ignore_entity;
@@ -218,6 +218,6 @@ physics_system::query_output physics_system::query_shape(b2Shape* shape, b2Filte
 	return out;
 }
 
-physics_system::query_aabb_output physics_system::query_aabb_px(vec2 p1, vec2 p2, b2Filter filter, entity_id ignore_entity) {
+physics_system::query_aabb_output physics_system::query_aabb_px(vec2 p1, vec2 p2, b2Filter filter, entity_id ignore_entity) const {
 	return query_aabb(p1 * PIXELS_TO_METERSf, p2 * PIXELS_TO_METERSf, filter, ignore_entity);
 }

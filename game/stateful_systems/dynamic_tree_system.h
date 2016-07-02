@@ -1,21 +1,33 @@
 #pragma once
 #include <Box2D/Collision/b2DynamicTree.h>
 #include "game/entity_id.h"
+#include "game/entity_handle_declaration.h"
+#include <vector>
+
+class variable_step;
 
 class dynamic_tree_system {
-	std::vector<entity_id> visible_entities;
+	friend class cosmos;
+
+	std::vector<entity_id> always_visible_entities;
 
 	b2DynamicTree non_physical_objects_tree;
 
+	struct cache {
+		bool is_constructed = false;
+		int tree_proxy_id = -1;
+
+		bool is_constructed() const {
+			return is_constructed;
+		}
+	};
+
+	std::vector<cache> per_entity_cache;
+
+	void reserve_caches_for_entities(size_t n);
+	void construct(const_entity_handle);
+	void destruct(const_entity_handle);
 public:
 
-	void add_entities_to_rendering_tree();
-	void remove_entities_from_rendering_tree();
-
-	void set_visibility_persistence(entity_id, bool);
-
-	void determine_visible_entities_from_every_camera();
-
-	std::vector<entity_id> always_visible_entities;
-	const std::vector<entity_id>& get_all_visible_entities() const;
+	std::vector<entity_id> determine_visible_entities_from_camera(const_entity_handle camera) const;
 };

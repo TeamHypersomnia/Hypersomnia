@@ -22,6 +22,17 @@ namespace components {
 			STRETCH
 		};
 
+		struct drawing_input : with_target_buffer {
+			using with_target_buffer::with_target_buffer;
+
+			vec2 visible_world_area;
+
+			components::transform renderable_transform;
+			components::transform camera_transform;
+
+			augs::rgba colorize = augs::white;
+		};
+
 		void automatically_map_uv(assets::texture_id, unsigned uv_mapping_mode);
 
 		/* the polygon as it was originally, so possibly concave
@@ -47,7 +58,7 @@ namespace components {
 			return triangulated_polygon[i];
 		}
 
-		void draw(const shared::state_for_drawing_renderable&) const;
+		void draw(const drawing_input&) const;
 
 		std::vector<vec2> get_vertices() const;
 		rects::ltrb<float> get_aabb(components::transform) const;

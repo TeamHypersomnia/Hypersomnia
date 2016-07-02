@@ -120,8 +120,8 @@ namespace components {
 
 		return std::move(out);
 	}
-
-	void polygon::draw(const shared::state_for_drawing_renderable& in) const {
+	
+	void polygon::draw(const drawing_input& in) const {
 		vertex_triangle new_tri;
 		auto camera_pos = in.camera_transform.pos;
 
@@ -150,7 +150,7 @@ namespace components {
 			new_tri.vertices[1] = model_transformed[indices[i + 1]];
 			new_tri.vertices[2] = model_transformed[indices[i + 2]];
 
-			in.output->push_triangle(new_tri);
+			in.target_buffer.push_back(new_tri);
 		}
 	}
 	

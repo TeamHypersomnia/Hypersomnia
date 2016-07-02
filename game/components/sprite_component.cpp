@@ -10,6 +10,7 @@
 
 #include "game/resources/manager.h"
 
+#include "graphics/vertex.h"
 #include "ensure.h"
 using namespace augs;
 using namespace shared;
@@ -54,7 +55,7 @@ namespace components {
 		size = vec2i(resource_manager.find(tex)->tex.get_size());
 	}
 
-	void sprite::draw(const state_for_drawing_renderable& in) const {
+	void sprite::draw(const drawing_input& in) const {
 		static thread_local vec2 v[4];
 		ensure(tex != assets::texture_id::INVALID_TEXTURE);
 
@@ -124,80 +125,8 @@ namespace components {
 		t1.vertices[1].pos = t2.vertices[2].pos = vec2i(v[2]);
 		t1.vertices[2].pos = vec2i(v[3]);
 
-		components::render* render = nullptr;
-
-		if (in.renderable.alive()) {
-			auto renderable = in.renderable;
-			render = renderable.find<components::render>();
-			
-			if (render != nullptr) {
-				/* compute average */
-				render->last_screen_pos = (vec2(v[0]) + vec2(v[1]) + vec2(v[2]) + vec2(v[3])) / 4;
-				render->was_drawn = true;
-			}
-		}
-	
-		if (in.overridden_target_buffer) {
-			in.overridden_target_buffer->push_back(t1);
-			in.overridden_target_buffer->push_back(t2);
-		}
-		else {
-			in.output->push_triangle(t1);
-			in.output->push_triangle(t2);
-		}
-
-		if (render != nullptr && render->partial_overlay_height_ratio > 0.f) {
-			size_t lower_left, lower_right = 0, upper_left = 0, upper_right = 0;
-
-			upper_left = std::min_element(v, v + 4) - v;
-			upper_right = (upper_left + 1) % 4;
-			lower_right = (upper_right + 1) % 4;
-			lower_left = (lower_right + 1) % 4;
-
-			auto ratio = render->partial_overlay_height_ratio;
-			auto col = render->partial_overlay_color;
-
-			t1.vertices[0].color = t2.vertices[0].color = col;
-			t1.vertices[1].color = t2.vertices[1].color = col;
-			t1.vertices[2].color = t2.vertices[2].color = col;
-
-			v[upper_left] = augs::interp(v[lower_left], v[upper_left], ratio);
-			v[upper_right] = augs::interp(v[lower_right], v[upper_right], ratio);
-
-			//if (v[upper_right].y > v[upper_left].y) {
-			//	v[upper_right].y = v[upper_left].y;
-			//}
-			//if (v[upper_left].y > v[upper_right].y) {
-			//	v[upper_left].y = v[upper_right].y;
-			//}
-
-			texcoords[upper_left] = augs::interp(texcoords[lower_left], texcoords[upper_left], ratio);
-			texcoords[upper_right] = augs::interp(texcoords[lower_right], texcoords[upper_right], ratio);
-
-			t1.vertices[0].pos = t2.vertices[0].pos = vec2i(v[0]);
-			t2.vertices[1].pos = vec2i(v[1]);
-			t1.vertices[1].pos = t2.vertices[2].pos = vec2i(v[2]);
-			t1.vertices[2].pos = vec2i(v[3]);
-
-			t1.vertices[0].texcoord = t2.vertices[0].texcoord = texcoords[0];
-			t2.vertices[1].texcoord = texcoords[1];
-			t1.vertices[1].texcoord = t2.vertices[2].texcoord = texcoords[2];
-			t1.vertices[2].texcoord = texcoords[3];
-
-			for (int i = 0; i < 3; ++i) {
-				texture.get_uv(t1.vertices[i].texcoord);
-				texture.get_uv(t2.vertices[i].texcoord);
-			}
-
-			if (in.overridden_target_buffer) {
-				in.overridden_target_buffer->push_back(t1);
-				in.overridden_target_buffer->push_back(t2);
-			}
-			else {
-				in.output->push_triangle(t1);
-				in.output->push_triangle(t2);
-			}
-		}
+		in.target_buffer.push_back(t1);
+		in.target_buffer.push_back(t2);
 	}
 
 	std::vector<vec2> sprite::get_vertices() const {

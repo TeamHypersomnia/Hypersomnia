@@ -5,12 +5,10 @@
 class cosmos;
 
 class variable_step {
-	friend class cosmos;
+public:
 	variable_step(const cosmos&, augs::variable_delta);
 
-public:
-	storage_for_all_message_queues messages;
-	
+	augs::renderer& renderer;
 	const cosmos& cosm;
 	augs::variable_delta delta;
 

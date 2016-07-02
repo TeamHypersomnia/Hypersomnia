@@ -17,5 +17,12 @@ namespace augs {
 		const T& get() const {
 			return *std::get<std::unique_ptr<T>>(systems);
 		}
+
+		template <typename Pred>
+		void for_each(Pred f) {
+			for_each_type<Systems...>([this, f](auto c) {
+				f(get<decltype(c)>());
+			});
+		}
 	};
 }

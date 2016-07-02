@@ -7,9 +7,6 @@
 
 namespace components {
 	struct render {
-		vec2 last_screen_pos;
-		bool was_drawn = false;
-
 		transform previous_transform;
 		transform saved_actual_transform;
 		

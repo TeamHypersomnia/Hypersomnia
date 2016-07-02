@@ -161,10 +161,11 @@ void camera_system::resolve_cameras_transforms_and_smoothing(fixed_step& step) {
 
 			if (cosmos[camera.entity_to_chase].alive()) {
 				vec2 target_value;
-				auto maybe_physics = cosmos[camera.entity_to_chase].find<components::physics>();
+				auto entity_to_chase = cosmos[camera.entity_to_chase];
+				if (entity_to_chase.has<components::physics>()) {
+					auto& physics = entity_to_chase.get<components::physics>();
 
-				if (maybe_physics) {
-					auto player_pos = maybe_physics->get_mass_position();
+					auto player_pos = physics.get_mass_position();
 
 					if (player_pos != camera.previous_step_player_position) {
 						camera.previous_seen_player_position = camera.previous_step_player_position;
@@ -172,7 +173,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing(fixed_step& step) {
 					}
 
 					target_value = (player_pos - camera.previous_seen_player_position) * cosmos.delta.in_milliseconds();
-					auto vel = maybe_physics->velocity();
+					auto vel = physics.velocity();
 					
 					if (target_value.length() < camera.smoothing_player_pos.value.length())
 						// braking
@@ -200,34 +201,13 @@ void camera_system::resolve_cameras_transforms_and_smoothing(fixed_step& step) {
 
 			camera.dont_smooth_once = false;
 
-			shared::state_for_drawing_camera in;
+			state_for_drawing_camera in;
 			in.transformed_visible_world_area_aabb = get_aabb_rotated(smoothed_visible_world_area, smoothed_camera_transform.rotation) 
 				+ smoothed_camera_transform.pos - smoothed_visible_world_area / 2;
 			in.camera_transform = smoothed_camera_transform;
-			in.output = &augs::renderer::get_current();
 			in.visible_world_area = smoothed_visible_world_area;
-			in.viewport = camera.viewport;
 
 			camera.how_camera_will_render = in;
-		}
-	}
-}
-
-void camera_system::post_render_requests_for_all_cameras(const fixed_step& step) {
-	auto targets_copy = cosmos.get(processing_subjects::WITH_CAMERA);
-
-	for (auto e : targets_copy) {
-		auto& camera = cosmos[e].get<components::camera>();
-
-		if (camera.enabled) {
-			auto& in = camera.how_camera_will_render;
-
-			messages::camera_render_request_message msg;
-			msg.camera = e;
-			msg.state = in;
-			msg.mask = camera.mask;
-
-			step.messages.post(msg);
 		}
 	}
 }

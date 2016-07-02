@@ -19,6 +19,8 @@ public:
 
 	bool is_in(processing_subjects) const;
 
+	bool is_activated() const;
+
 	typename std::enable_if<!is_const, component_synchronizer&>::type 
 		operator=(const components::processing&);
 

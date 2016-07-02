@@ -21,7 +21,7 @@ double PIXELS_TO_METERS = 1.0 / METERS_TO_PIXELS;
 float METERS_TO_PIXELSf = 100.f;
 float PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 
-physics_system::physics_system(cosmos& parent_cosmos) : parent_cosmos(parent_cosmos),
+physics_system::physics_system() : 
 b2world(b2Vec2(0.f, 0.f)), ray_casts_since_last_step(0) {
 	b2world.SetAllowSleeping(false);
 	b2world.SetAutoClearForces(false);
@@ -135,6 +135,37 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 		physics.black.velocity = METERS_TO_PIXELSf * b->GetLinearVelocity();
 		physics.black.angular_velocity = RAD_TO_DEG * b->GetAngularVelocity();
 	}
+}
+
+void physics_system::destruct(const_entity_handle handle) {
+	auto id = handle.get_id();
+	size_t index = id.indirection_index;
+
+	if (per_entity_cache[index].is_constructed) {
+		for (auto& list : lists)
+			remove_element(list.second, id);
+
+		per_entity_cache[index].is_constructed = false;
+	}
+}
+
+void physics_system::construct(const_entity_handle handle) {
+	auto id = handle.get_id();
+	size_t index = id.indirection_index;
+
+	ensure(!per_entity_cache[index].is_constructed);
+
+	auto& processing = handle.get<components::processing>();
+
+	for (auto& list : lists)
+		if (processing.is_in(list.first))
+			list.second.push_back(id);
+
+	per_entity_cache[index].is_constructed = true;
+}
+
+void physics_system::reserve_caches_for_entities(size_t n) {
+	per_entity_cache.reserve(n);
 }
 
 void physics_system::react_to_destroyed_entities(step_state& step) {
