@@ -18,6 +18,7 @@
 #include "game/components/item_component.h"
 #include "game/components/name_component.h"
 #include "game/components/attitude_component.h"
+#include "game/components/camera_component.h"
 #include "game/components/pathfinding_component.h"
 #include "game/enums/party_category.h"
 
@@ -301,10 +302,12 @@ namespace scene_managers {
 
 
 	void testbed::view_cosmos(basic_viewing_step& step) const {
-		rendering_scripts::standard_rendering(step, step.cosm[world_camera]);
-
 		auto& cosmos = step.cosm;
-		auto& target = renderer::get_current();
+		
+		viewing_step viewing(step, cosmos[world_camera].get<components::camera>().how_camera_will_render);
+		rendering_scripts::standard_rendering(viewing);
+
+		auto& target = step.renderer;
 		using namespace gui::text;
 
 		//quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", style(assets::font_id::GUI_FONT, violet), vec2i(200-1, 200), 0, nullptr);

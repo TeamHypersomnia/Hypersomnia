@@ -9,7 +9,7 @@
 #include "game/components/physics_component.h"
 #include "game/messages/intent_message.h"
 #include "game/messages/camera_render_request_message.h"
-#include "game/detail/state_for_drawing.h"
+#include "game/detail/state_for_drawing_camera.h"
 #include "game/cosmos.h"
 
 #include "game/components/camera_component.h"
@@ -206,6 +206,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing(fixed_step& step) {
 				+ smoothed_camera_transform.pos - smoothed_visible_world_area / 2;
 			in.camera_transform = smoothed_camera_transform;
 			in.visible_world_area = smoothed_visible_world_area;
+			in.associated_character = camera.entity_to_chase;
 
 			camera.how_camera_will_render = in;
 		}

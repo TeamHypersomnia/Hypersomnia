@@ -1296,7 +1296,7 @@
     <ClCompile Include="game\components\dynamic_tree_node_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\detail\state_for_drawing.cpp">
+    <ClCompile Include="game\detail\state_for_drawing_camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -3377,9 +3377,6 @@
     <ClInclude Include="game\detail\position_scripts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\detail\state_for_drawing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\global\visibility_settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3456,6 +3453,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\entity_system\aggregate_mixins.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\state_for_drawing_camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

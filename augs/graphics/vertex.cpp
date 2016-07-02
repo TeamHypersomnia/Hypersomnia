@@ -12,3 +12,7 @@ namespace augs {
 		tex.get_uv(this->texcoord);
 	}
 }
+
+vertex_triangle_buffer_reference::vertex_triangle_buffer_reference(augs::vertex_triangle_buffer& target_buffer) : target_buffer(target_buffer) {
+
+}

@@ -8,7 +8,7 @@ augs::variable_delta basic_viewing_step::get_delta() const {
 	return delta;
 }
 
-viewing_step::viewing_step(basic_viewing_step basic_step, const_entity_handle camera) : basic_viewing_step(basic_step), camera(camera) {
+viewing_step::viewing_step(basic_viewing_step basic_step, state_for_drawing_camera camera_state) : basic_viewing_step(basic_step), camera_state(camera_state) {
 
 }
 

@@ -3,15 +3,14 @@
 #include "math/rects.h"
 
 #include "graphics/pixel.h"
+#include "graphics/vertex.h"
 #include "game/assets/texture_id.h"
 #include "transform_component.h"
 
-#include "game/detail/state_for_drawing.h"
-
 namespace components {
 	struct sprite {
-		struct drawing_input : with_target_buffer {
-			using with_target_buffer::with_target_buffer;
+		struct drawing_input : vertex_triangle_buffer_reference {
+			using vertex_triangle_buffer_reference::vertex_triangle_buffer_reference;
 
 			vec2 visible_world_area;
 

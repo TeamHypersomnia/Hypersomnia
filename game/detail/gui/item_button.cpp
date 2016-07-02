@@ -9,7 +9,7 @@
 #include "gui/stroke.h"
 
 #include "game/enums/item_category.h"
-#include "game/detail/state_for_drawing.h"
+#include "game/detail/state_for_drawing_camera.h"
 #include "game/detail/inventory_slot.h"
 #include "game/detail/inventory_utils.h"
 #include "game/components/gui_element_component.h"

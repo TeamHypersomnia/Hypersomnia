@@ -12,10 +12,10 @@
 
 namespace rendering_scripts {
 	void standard_rendering(viewing_step& step) {
-		auto camera = step.camera;
-		auto& cosmos = camera.get_cosmos();
+		auto& state = step.camera_state;
+		auto& renderer = step.renderer;
+		auto& cosmos = step.cosm;
 		auto& dynamic_tree = cosmos.stateful_systems.get<dynamic_tree_system>();
-		auto& gui = cosmos.stateful_systems.get<gui_system>();
 
 		auto matrix = augs::orthographic_projection<float>(0, state.visible_world_area.x, state.visible_world_area.y, 0, 0, 1);
 
@@ -35,8 +35,8 @@ namespace rendering_scripts {
 			render.draw_layer(state, i);
 		}
 
-		state.output->call_triangles();
-		state.output->clear_triangles();
+		renderer.call_triangles();
+		renderer.clear_triangles();
 
 		default_highlight_shader.use();
 		{
@@ -46,8 +46,8 @@ namespace rendering_scripts {
 		
 		render.draw_layer(state, render_layer::DYNAMIC_BODY, true);
 
-		state.output->call_triangles();
-		state.output->clear_triangles();
+		renderer.call_triangles();
+		renderer.clear_triangles();
 
 		default_shader.use();
 
@@ -55,10 +55,10 @@ namespace rendering_scripts {
 			render.draw_layer(state, i);
 		}
 
-		state.output->call_triangles();
-		state.output->clear_triangles();
+		renderer.call_triangles();
+		renderer.clear_triangles();
 
-		state.output->draw_debug_info(
+		renderer.draw_debug_info(
 			msg.state.visible_world_area, 
 			msg.state.camera_transform, 
 			assets::texture_id::BLANK, 
@@ -77,12 +77,14 @@ namespace rendering_scripts {
 			auto center = (upper + lower) / 2;
 
 			glUniform2f(glGetUniformLocation(circular_bars_shader.id, "texture_center"), center.x, center.y);
+		
 		}
+		auto& gui = cosmos.stateful_systems.get<gui_system>();
 
 		gui.hud.draw_circular_bars(msg);
 
-		state.output->call_triangles();
-		state.output->clear_triangles();
+		renderer.call_triangles();
+		renderer.clear_triangles();
 		
 		default_shader.use();
 
@@ -92,8 +94,8 @@ namespace rendering_scripts {
 
 		gui.hud.draw_pure_color_highlights(msg);
 
-		state.output->call_triangles();
-		state.output->clear_triangles();
+		renderer.call_triangles();
+		renderer.clear_triangles();
 
 		default_shader.use();
 
@@ -103,7 +105,7 @@ namespace rendering_scripts {
 
 		resource_manager.find(assets::atlas_id::GAME_WORLD_ATLAS)->bind();
 
-		state.output->call_triangles();
-		state.output->clear_triangles();
+		renderer.call_triangles();
+		renderer.clear_triangles();
 	}
 }

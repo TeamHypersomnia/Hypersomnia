@@ -5,7 +5,7 @@
 #include "game/resources/particle_effect.h"
 #include "transform_component.h"
 
-#include "game/detail/state_for_drawing.h"
+#include "game/detail/state_for_drawing_camera.h"
 
 class physics_system;
 class particles_system;
@@ -14,14 +14,10 @@ namespace resources {
 	struct emission;
 }
 
-namespace shared {
-	struct state_for_drawing_renderable;
-}
-
 namespace components {
 	struct particle_group {
-		struct drawing_input : with_target_buffer {
-			using with_target_buffer::with_target_buffer;
+		struct drawing_input : vertex_triangle_buffer_reference {
+			using vertex_triangle_buffer_reference::vertex_triangle_buffer_reference;
 		};
 
 		struct stream {

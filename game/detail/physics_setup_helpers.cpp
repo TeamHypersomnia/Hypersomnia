@@ -8,7 +8,7 @@
 #include "game/components/polygon_component.h"
 #include "game/components/render_component.h"
 #include "game/components/sprite_component.h"
-#include "game/detail/state_for_drawing.h"
+#include "game/detail/state_for_drawing_camera.h"
 
 #include "game/stateful_systems/physics_system.h"
 

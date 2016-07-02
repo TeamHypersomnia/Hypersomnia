@@ -1,5 +1,5 @@
 #pragma once
-#include "game/detail/state_for_drawing.h"
+#include "game/detail/state_for_drawing_camera.h"
 #include "game/entity_id.h"
 
 struct aabb_highlighter {

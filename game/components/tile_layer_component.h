@@ -3,10 +3,6 @@
 #include "game/assets/texture_id.h"
 #include "transform_component.h"
 
-namespace shared {
-	struct state_for_drawing_renderable;
-}
-
 namespace augs {
 	class texture;
 
@@ -22,6 +18,10 @@ namespace augs {
 
 namespace components {
 	struct tile_layer {
+		struct drawing_input {
+
+		};
+
 		struct tile {
 			unsigned type_id = 0;
 
@@ -32,10 +32,10 @@ namespace components {
 
 		void generate_indices_by_type(augs::rects::ltrb<int>);
 
-		void draw(const shared::state_for_drawing_renderable&) const;
+		void draw(const drawing_input&) const;
 		augs::rects::ltrb<float> get_aabb(components::transform transform) const;
 
-		augs::rects::ltrb<int> get_visible_tiles(const shared::state_for_drawing_renderable&) const;
+		augs::rects::ltrb<int> get_visible_tiles(const drawing_input&) const;
 
 		augs::rects::ltrb<int> indices_by_type_visibility;
 		std::vector<std::vector<vec2i>> indices_by_type;

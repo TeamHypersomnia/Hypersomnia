@@ -3,8 +3,13 @@
 #include "misc/delta.h"
 #include "misc/machine_entropy.h"
 #include "game/entity_handle_declaration.h"
+#include "game/detail/state_for_drawing_camera.h"
 
 class cosmos;
+
+namespace augs {
+	class renderer;
+}
 
 class basic_viewing_step {
 public:
@@ -19,9 +24,9 @@ public:
 
 class viewing_step : public basic_viewing_step {
 public:
-	viewing_step(basic_viewing_step basic_step, const_entity_handle camera);
+	viewing_step(basic_viewing_step basic_step, state_for_drawing_camera camera_state);
 
-	const_entity_handle camera;
+	state_for_drawing_camera camera_state;
 };
 
 class fixed_step {

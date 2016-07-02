@@ -11,10 +11,6 @@ namespace augs {
 	class texture;
 }
 
-namespace shared {
-	struct state_for_drawing_renderable;
-}
-
 namespace components {
 	struct polygon {
 		enum uv_mapping_mode {
@@ -22,8 +18,8 @@ namespace components {
 			STRETCH
 		};
 
-		struct drawing_input : with_target_buffer {
-			using with_target_buffer::with_target_buffer;
+		struct drawing_input : vertex_triangle_buffer_reference {
+			using vertex_triangle_buffer_reference::vertex_triangle_buffer_reference;
 
 			vec2 visible_world_area;
 

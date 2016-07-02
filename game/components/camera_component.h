@@ -6,7 +6,7 @@
 #include "game/entity_id.h"
 
 #include "game/components/transform_component.h"
-#include "game/detail/state_for_drawing.h"
+#include "game/detail/state_for_drawing_camera.h"
 
 #include "augs/misc/smooth_value_field.h"
 

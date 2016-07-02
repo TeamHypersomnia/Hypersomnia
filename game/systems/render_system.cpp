@@ -2,7 +2,7 @@
 
 #include "render_system.h"
 #include "game/entity_id.h"
-#include "game/detail/state_for_drawing.h"
+#include "game/detail/state_for_drawing_camera.h"
 
 #include "game/components/polygon_component.h"
 #include "game/components/sprite_component.h"
