@@ -21,6 +21,6 @@ namespace scene_managers {
 		void pre_solve(fixed_step&);
 		void post_solve(fixed_step&);
 		
-		void view_cosmos(variable_step&) const;
+		void view_cosmos(basic_viewing_step&) const;
 	};
 }

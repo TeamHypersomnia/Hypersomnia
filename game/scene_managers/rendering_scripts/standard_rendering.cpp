@@ -11,7 +11,8 @@
 #include "math/matrix.h"
 
 namespace rendering_scripts {
-	void standard_rendering(variable_step& step, const_entity_handle camera) {
+	void standard_rendering(viewing_step& step) {
+		auto camera = step.camera;
 		auto& cosmos = camera.get_cosmos();
 		auto& dynamic_tree = cosmos.stateful_systems.get<dynamic_tree_system>();
 		auto& gui = cosmos.stateful_systems.get<gui_system>();

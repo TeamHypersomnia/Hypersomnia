@@ -300,7 +300,7 @@ namespace scene_managers {
 	}
 
 
-	void testbed::view_cosmos(variable_step& step) const {
+	void testbed::view_cosmos(basic_viewing_step& step) const {
 		rendering_scripts::standard_rendering(step, step.cosm[world_camera]);
 
 		auto& cosmos = step.cosm;

@@ -28,11 +28,11 @@ class cosmos {
 	storage_for_all_components_and_aggregates components_and_aggregates;
 
 	void advance_deterministic_schemata(fixed_step& step_state);
-	void call_rendering_schemata(variable_step& step_state) const;
+	void call_rendering_schemata(viewing_step& step_state) const;
 
 public:
 	typedef std::function<void(fixed_step&)> fixed_callback;
-	typedef std::function<void(variable_step&)> variable_callback;
+	typedef std::function<void(viewing_step&)> variable_callback;
 
 	storage_for_all_stateful_systems stateful_systems;
 	all_settings settings;

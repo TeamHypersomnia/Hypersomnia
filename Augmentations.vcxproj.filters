@@ -1296,6 +1296,9 @@
     <ClCompile Include="game\components\dynamic_tree_node_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\detail\state_for_drawing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">

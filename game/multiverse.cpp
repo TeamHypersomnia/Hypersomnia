@@ -1,26 +1,6 @@
 #include "multiverse.h"
-
-#include <signal.h>
-
-#include "window_framework/platform_utils.h"
-#include "scripting/script.h"
-
-#include "game/bindings/bind_game_and_augs.h"
-#include "game/messages/camera_render_request_message.h"
-
-#include "game/systems/input_system.h"
-#include "game/systems/render_system.h"
-#include "game/stateful_systems/gui_system.h"
-#include "game/resources/manager.h"
-
-#include "game/scene_managers/resource_setups/all.h"
-
-#include <luabind/luabind.hpp>
-
-#include "log.h"
 #include "game_window.h"
 #include "cosmos.h"
-#include "types_specification/all_component_includes.h"
 
 multiverse::multiverse() 
 	: main_cosmos_timer(60, 5)
@@ -95,7 +75,7 @@ void multiverse::view(game_window& window) const {
 
 	target.set_viewport({0, 0, main_cosmos.settings.screen_size.x, main_cosmos.settings.screen_size.y });
 
-	variable_step main_cosmos_viewing_step(main_cosmos, frame_timer.extract_variable_delta(main_cosmos_timer));
+	basic_viewing_step main_cosmos_viewing_step(main_cosmos, frame_timer.extract_variable_delta(main_cosmos_timer), target);
 	main_cosmos_manager.view_cosmos(main_cosmos_viewing_step);
 
 	frame_profiler.triangles.measure(target.triangles_drawn_total);

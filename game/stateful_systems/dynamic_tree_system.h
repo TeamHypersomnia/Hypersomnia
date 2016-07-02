@@ -4,7 +4,7 @@
 #include "game/entity_handle_declaration.h"
 #include <vector>
 
-class variable_step;
+class viewing_step;
 
 class dynamic_tree_system {
 	friend class cosmos;
