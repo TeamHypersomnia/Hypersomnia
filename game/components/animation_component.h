@@ -21,8 +21,8 @@ namespace components {
 
 		void set_current_frame(unsigned number);
 
-		void increase_frame(entity_id);
-		void decrease_frame(entity_id);
+		void increase_frame();
+		void decrease_frame();
 
 		unsigned get_current_frame() const;
 	};

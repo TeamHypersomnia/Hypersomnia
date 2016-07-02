@@ -160,17 +160,17 @@ void animation_system::progress_animation_states(fixed_step& step) {
 					if (animation.loop_mode == animation::loop_type::INVERSE) {
 
 						if (animation_state.state == components::animation::playing_state::INCREASING) {
-							if (animation_state.get_current_frame() < animation.frames.size() - 1) animation_state.increase_frame(it);
+							if (animation_state.get_current_frame() < animation.frames.size() - 1) animation_state.increase_frame();
 							else {
-								animation_state.decrease_frame(it);
+								animation_state.decrease_frame();
 								animation_state.state = components::animation::playing_state::DECREASING;
 							}
 						}
 
 						else if (animation_state.state == components::animation::playing_state::DECREASING) {
-							if (animation_state.get_current_frame() > 0) animation_state.decrease_frame(it);
+							if (animation_state.get_current_frame() > 0) animation_state.decrease_frame();
 							else {
-								animation_state.increase_frame(it);
+								animation_state.increase_frame();
 								animation_state.state = components::animation::playing_state::INCREASING;
 							}
 						}
@@ -179,11 +179,11 @@ void animation_system::progress_animation_states(fixed_step& step) {
 					else if (animation.loop_mode == animation::loop_type::REPEAT) {
 						if (animation_state.state == components::animation::playing_state::INCREASING) {
 							if (animation_state.get_current_frame() < animation.frames.size() - 1)
-								animation_state.increase_frame(it);
+								animation_state.increase_frame();
 							else animation_state.set_current_frame(0);
 						}
 						else if (animation_state.state == components::animation::playing_state::DECREASING) {
-							if (animation_state.get_current_frame() > 0) animation_state.decrease_frame(it);
+							if (animation_state.get_current_frame() > 0) animation_state.decrease_frame();
 							else animation_state.set_current_frame(animation.frames.size() - 1);
 						}
 					}
@@ -191,11 +191,11 @@ void animation_system::progress_animation_states(fixed_step& step) {
 					else if (animation.loop_mode == animation::loop_type::NONE) {
 						if (animation_state.state == components::animation::playing_state::INCREASING) {
 							if (animation_state.get_current_frame() < animation.frames.size() - 1)
-								animation_state.increase_frame(it);
+								animation_state.increase_frame();
 							else animation_state.state = components::animation::playing_state::PAUSED;
 						}
 						else if (animation_state.state == components::animation::playing_state::DECREASING) {
-							if (animation_state.get_current_frame() > 0) animation_state.decrease_frame(it);
+							if (animation_state.get_current_frame() > 0) animation_state.decrease_frame();
 							else animation_state.state = components::animation::playing_state::PAUSED;
 						}
 					}
