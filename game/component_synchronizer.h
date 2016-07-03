@@ -11,6 +11,10 @@ class component_synchronizer_base {
 protected:
 	component_reference component;
 	basic_entity_handle<is_const> handle;
+
+	void complete_resubstantialization() {
+		handle.get_cosmos().complete_resubstantialization(handle);
+	}
 public:
 	const component_type& get_data() const {
 		return component;
@@ -21,6 +25,13 @@ public:
 	}
 
 	component_synchronizer_base(component_reference c, basic_entity_handle<is_const> h) : component(c), handle(h) {
+	}
+
+	template<class = std::enable_if<!is_const>::type>
+	component_synchronizer_base& operator=(const component_type& copy) {
+		component = copy;
+		complete_resubstantialization();
+		return *this;
 	}
 
 	operator typename std::remove_reference<component_reference>::type() const {

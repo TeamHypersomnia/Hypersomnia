@@ -6,6 +6,7 @@
 #include "game/components/item_component.h"
 #include "game/components/driver_component.h"
 #include "game/components/fixtures_component.h"
+#include "game/components/special_physics_component.h"
 
 #include "game/messages/collision_message.h"
 #include "game/messages/queue_destruction.h"
@@ -28,6 +29,11 @@ b2world(b2Vec2(0.f, 0.f)), ray_casts_since_last_step(0) {
 	enable_listener(true);
 }
 
+void physics_system::reserve_caches_for_entities(size_t n) {
+	rigid_body_caches.resize(n);
+	colliders_caches.resize(n);
+}
+
 void physics_system::enable_listener(bool flag) {
 	b2world.SetContactListener(flag ? &listener : nullptr);
 }
@@ -45,8 +51,11 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
 
-		auto& physics = cosmos[b->GetUserData()].get<components::physics>();
-		physics.measured_carried_mass = 0.f;
+		auto entity = cosmos[b->GetUserData()];
+
+		auto& physics = entity.get<components::physics>();
+		auto& special = entity.get<components::special_physics>();
+		special.measured_carried_mass = 0.f;
 
 		b2Vec2 vel(b->GetLinearVelocity());
 		float32 speed = vel.Normalize();
@@ -62,18 +71,18 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 		//	physics.body->ApplyForce(force_components * force_dir, physics.body->GetWorldCenter(), true);
 		//}
 
-		auto angular_resistance = physics.angular_air_resistance;
-		if (angular_resistance < 0.f) angular_resistance = physics.air_resistance;
+		auto angular_resistance = special.angular_air_resistance;
+		if (angular_resistance < 0.f) angular_resistance = special.air_resistance;
 
 		if (angular_resistance > 0.f) {
 			//physics.body->ApplyTorque((angular_resistance * sqrt(sqrt(angular_speed * angular_speed)) + 0.2 * angular_speed * angular_speed)* -sgn(angular_speed) * b->GetInertia(), true);
-			physics.black_detail.body->ApplyTorque((angular_resistance * angular_speed * angular_speed)* -sgn(angular_speed) * b->GetInertia(), true);
+			b->ApplyTorque((angular_resistance * angular_speed * angular_speed)* -sgn(angular_speed) * b->GetInertia(), true);
 		}
 
-		if (physics.enable_angle_motor) {
+		if (special.enable_angle_motor) {
 			float next_angle = b->GetAngle() + b->GetAngularVelocity() / static_cast<float>(delta.get_steps_per_second());
 
-			auto target_orientation = vec2().set_from_degrees(physics.target_angle);
+			auto target_orientation = vec2().set_from_degrees(special.target_angle);
 			auto next_orientation = vec2().set_from_radians(next_angle);
 
 			float total_rotation = target_orientation.radians_between(next_orientation);
@@ -83,7 +92,7 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 
 			float desired_angular_velocity = total_rotation / static_cast<float>(delta.in_seconds());
 			float impulse = b->GetInertia() * desired_angular_velocity;// disregard time factor
-			b->ApplyAngularImpulse(impulse * physics.angle_motor_force_multiplier, true);
+			b->ApplyAngularImpulse(impulse * special.angle_motor_force_multiplier, true);
 		}
 	}
 

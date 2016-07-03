@@ -5,7 +5,7 @@
 #include "physics_getters.h"
 
 template <bool C>
-basic_entity_handle<C> physics_getters<C>::get_owner_friction_field() const {
+basic_entity_handle<C> physics_getters<C>::get_owner_friction_ground() const {
 	auto& self = *static_cast<const entity_handle_type*>(this);
 	return self.get_cosmos()[get_owner_body_entity().get<components::physics>().owner_friction_ground];
 }

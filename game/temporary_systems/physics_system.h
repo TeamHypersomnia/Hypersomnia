@@ -14,7 +14,16 @@ class cosmos;
 class fixed_step;
 
 class physics_system {
+	std::vector<colliders_black_box_detail> colliders_caches;
+	std::vector<rigid_body_black_box_detail> rigid_body_caches;
 
+	void reserve_caches_for_entities(size_t n);
+	void construct(const_entity_handle);
+	void destruct(const_entity_handle);
+
+	friend class cosmos;
+	friend class component_synchronizer<false, components::physics>;
+	friend class component_synchronizer<true, components::physics>;
 public:
 	struct raycast_output {
 		vec2 intersection, normal;
@@ -87,9 +96,6 @@ public:
 	int ray_casts_since_last_step = 0;
 
 	b2World b2world;
-
-	std::vector<colliders_black_box_detail> colliders_caches;
-	std::vector<rigid_body_black_box_detail> rigid_body_caches;
 private:	
 	/* callback structure used in QueryAABB function to get all shapes near-by */
 	struct query_aabb_input : b2QueryCallback {

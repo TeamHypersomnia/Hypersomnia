@@ -30,9 +30,6 @@ struct immediate_hud {
 	std::vector<vertically_flying_number> recent_vertically_flying_numbers;
 	std::vector<pure_color_highlight> recent_pure_color_highlights;
 
-	vertex_triangle_buffer circular_bars_information;
-	vertex_triangle_buffer pure_color_highlights;
-
 	vertex_triangle_buffer draw_circular_bars_and_get_textual_info(viewing_step&) const;
 	void draw_pure_color_highlights(viewing_step&) const;
 	void draw_vertically_flying_numbers(viewing_step&) const;

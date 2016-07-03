@@ -53,12 +53,6 @@ class component_synchronizer<is_const, components::physics> : public component_s
 public:
 	using component_synchronizer_base<is_const, components::physics>::component_synchronizer_base;
 
-	physics& operator=(const physics&);
-	physics(const physics&);
-	physics(const rigid_body_definition& = rigid_body_definition());
-	void initialize_from_definition(const rigid_body_definition&);
-	rigid_body_definition get_definition() const;
-
 	void set_body_type(type);
 	void set_activated(bool);
 
