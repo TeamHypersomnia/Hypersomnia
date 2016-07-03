@@ -26,6 +26,7 @@ namespace components {
 				components::sprite::drawing_input in(in.target_buffer);
 
 				in.renderable_transform = it.ignore_rotation ? components::transform(it.pos, 0) : components::transform({ it.pos, it.rotation });
+				//in.renderable_transform += in.renderable_transform;
 				it.face.draw(in);
 				it.face.color.a = temp_alpha;
 				// it.face.size_multiplier.set(1, 1);

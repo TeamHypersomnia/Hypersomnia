@@ -24,7 +24,7 @@
 #include "templates.h"
 #include "augs/gui/text_drawer.h"
 
-#include "misc/deterministic_timing.h"
+#include "misc/stepped_timing.h"
 
 vec2 position_caption_around_a_circle(float radius, vec2 r, float alpha) {
 	vec2 top_bounds[2] =  { vec2(-r.x / 2, -radius - r.y / 2), vec2(r.x / 2, -radius - r.y / 2) };
@@ -73,18 +73,17 @@ vec2 position_caption_around_a_circle(float radius, vec2 r, float alpha) {
 
 void immediate_hud::draw_circular_bars(viewing_step& r) {
 	auto& dynamic_tree = r.cosm.stateful_systems.get<dynamic_tree_system>();
-	const auto& visible_entities = render.get_all_visible_entities();
+	const auto& visible_entities = r.visible_entities;
 	auto& target = r.renderer;
 
-	auto camera = r.camera;
-	auto watched_character = camera.get<components::camera>().entity_to_chase;
+	auto watched_character = r.camera_state.associated_character;
 
 	int timestamp_ms = render.frame_timestamp_seconds() * 1000;
 
 	circular_bars_information.clear();
 	pure_color_highlights.clear();
 
-	for (auto v : r.visible_entities) {
+	for (auto v : visible_entities) {
 		auto* sentience = v.find<components::sentience>();
 
 		if (sentience) {

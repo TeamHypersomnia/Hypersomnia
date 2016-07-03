@@ -4,6 +4,7 @@
 #include "misc/machine_entropy.h"
 #include "game/entity_handle_declaration.h"
 #include "game/detail/state_for_drawing_camera.h"
+#include "game/enums/render_layer.h"
 
 class cosmos;
 
@@ -28,7 +29,10 @@ public:
 
 	state_for_drawing_camera camera_state;
 
+	vec2 get_screen_space(vec2 pos) const;
+
 	std::vector<const_entity_handle> visible_entities;
+	std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> visible_per_layer;
 };
 
 class fixed_step {

@@ -19,7 +19,8 @@ namespace augs {
 namespace components {
 	struct tile_layer {
 		struct drawing_input {
-
+			components::transform renderable_transform;
+			augs::rgba colorize;
 		};
 
 		struct tile {

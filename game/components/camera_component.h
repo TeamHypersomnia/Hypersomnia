@@ -26,10 +26,6 @@ namespace components {
 
 		vec2 visible_world_area;
 
-		unsigned layer = 0;
-		unsigned mask = 0;
-		bool enabled = true;
-
 		float angled_look_length = 100.f;
 		bool enable_smoothing = true;
 		bool dont_smooth_once = false;

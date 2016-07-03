@@ -1,4 +1,6 @@
 #pragma once
+#include <unordered_map>
+
 #include "game/enums/particle_effect_response_type.h"
 #include "game/assets/particle_effect_id.h"
 

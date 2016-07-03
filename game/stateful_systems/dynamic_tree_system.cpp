@@ -6,6 +6,10 @@
 #include "game/components/camera_component.h"
 #include "game/enums/filters.h"
 
+bool dynamic_tree_system::cache::is_constructed() const {
+	return is_constructed;
+}
+
 void dynamic_tree_system::destruct(const_entity_handle handle) {
 	auto id = handle.get_id();
 	size_t index = id.indirection_index;

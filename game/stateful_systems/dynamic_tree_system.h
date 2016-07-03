@@ -19,9 +19,7 @@ class dynamic_tree_system {
 		bool is_constructed = false;
 		int tree_proxy_id = -1;
 
-		bool is_constructed() const {
-			return is_constructed;
-		}
+		bool is_constructed() const;
 	};
 
 	std::vector<cache> per_entity_cache;

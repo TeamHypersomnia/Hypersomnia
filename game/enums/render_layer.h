@@ -14,4 +14,6 @@ enum render_layer {
 	CAR_INTERIOR,
 	GROUND,
 	UNDER_GROUND,
+
+	LAYER_COUNT
 };

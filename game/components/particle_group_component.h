@@ -18,6 +18,9 @@ namespace components {
 	struct particle_group {
 		struct drawing_input : vertex_triangle_buffer_reference {
 			using vertex_triangle_buffer_reference::vertex_triangle_buffer_reference;
+
+			components::transform renderable_transform;
+			augs::rgba colorize;
 		};
 
 		struct stream {

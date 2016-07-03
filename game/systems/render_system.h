@@ -1,38 +1,20 @@
 #pragma once
-#include "window_framework/window.h"
-#include "graphics/fbo.h"
-
-#include "game/components/transform_component.h"
-#include "game/components/render_component.h"
-
-#include "graphics/vertex.h"
-#include "texture_baker/texture_baker.h"
-
 #include "game/enums/render_layer.h"
 
 #include <vector>
+#include <array>
+
+#include "graphics/vertex.h"
+#include "game/entity_handle_declaration.h"
 
 using namespace augs;
 
 struct state_for_drawing_camera;
 
 class render_system {
-	std::vector<std::vector<entity_id>> layers;
-	unsigned current_step = 0;
-	int current_visibility_index = 0;
 public:
-	static void standard_draw_entity(entity_id, shared::state_for_drawing_camera in, bool only_border_highlights = false, int visibility_index = -1);
+	void draw_entities(augs::vertex_triangle_buffer& output, std::vector<const_entity_handle>, state_for_drawing_camera in, bool only_border_highlights = false) const;
+	std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> get_visible_per_layer(std::vector<const_entity_handle>) const;
 
-	render_system();
-
-	void set_current_transforms_as_previous_for_interpolation();
-	void calculate_and_set_interpolated_transforms();
-	void restore_actual_transforms();
-
-	void generate_layers_from_visible_entities(int mask);
-	void draw_layer(shared::state_for_drawing_camera in, int layer, bool only_border_highlights = false);
-	void draw_all_visible_entities(shared::state_for_drawing_camera in, int mask);
-
-	bool enable_interpolation = true;
 	std::vector<render_layer> layers_whose_order_determines_friction;
 };
