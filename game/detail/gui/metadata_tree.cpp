@@ -178,4 +178,13 @@ void gui_system::rebuild_gui_tree_based_on_game_state(fixed_step& step) {
 
 	gui.reassign_children_and_unset_invalid_handles(&game_gui_root.parent_of_inventory_controls, inventory_roots);
 	gui.perform_logic_step();
+
+	auto delta = step.get_delta();
+
+	auto timeout_lambda = [delta](const immediate_hud::game_event_visualization& v) {
+		return (delta.total_time_passed_in_seconds() - v.time_of_occurence.in_seconds(delta)) > v.maximum_duration_seconds;
+	};
+
+	erase_remove(hud.recent_vertically_flying_numbers, timeout_lambda);
+	erase_remove(hud.recent_pure_color_highlights, timeout_lambda);
 }

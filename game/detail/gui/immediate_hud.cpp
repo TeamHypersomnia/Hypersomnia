@@ -273,47 +273,44 @@ void immediate_hud::acquire_game_events(fixed_step& step) {
 		ph.maximum_duration_seconds = 0.3;
 		ph.color = col;
 
-		erase_remove(recent_pure_color_highlights, [&ph](const pure_color_highlight& h) { return h.target == ph.target || h.target == ph.target[associated_entity_name::ASTRAL_BODY]; });
+		erase_remove(recent_pure_color_highlights, [&ph, &cosmos](const pure_color_highlight& h) { return h.target == ph.target || h.target == cosmos[ph.target][associated_entity_name::ASTRAL_BODY]; });
 		recent_pure_color_highlights.push_back(ph);
 	}
 }
 
 void immediate_hud::draw_vertically_flying_numbers(viewing_step& msg) const {
-	auto& target = renderer::get_current();
-	
 	auto current_time = msg.get_delta().total_time_passed_in_seconds();
+	auto& triangles = msg.renderer.triangles;
 
 	for (auto& r : recent_vertically_flying_numbers) { 
-		auto passed = current_time - r.time_of_occurence.in_seconds();
+		auto passed = current_time - r.time_of_occurence.in_seconds(msg.get_delta().get_fixed());
 		auto ratio =  passed / r.maximum_duration_seconds;
 
-		r.text.pos = msg.get_screen_space((r.transform.pos - vec2(0, sqrt(passed) * 150.f)));
+		auto text = r.text;
+
+		text.pos = msg.get_screen_space((r.transform.pos - vec2(0, sqrt(passed) * 150.f)));
 		
-		r.text.draw_stroke(msg.state.output->triangles);
-		r.text.draw(msg.state.output->triangles);
+		text.draw_stroke(triangles);
+		text.draw(triangles);
 	}
-
-	auto timeout_lambda = [current_time](const game_event_visualization& v) {
-		return (current_time - v.time_of_occurence) > v.maximum_duration_seconds;
-	};
-
-	erase_remove(recent_vertically_flying_numbers, timeout_lambda);
-	erase_remove(recent_pure_color_highlights, timeout_lambda);
 }
 
 void immediate_hud::draw_pure_color_highlights(viewing_step& msg) const {
+	auto& cosmos = msg.cosm;
 	auto current_time = msg.get_delta().total_time_passed_in_seconds();
+	auto& triangles = msg.renderer.triangles;
 
 	for (auto& r : recent_pure_color_highlights) {
-		auto& col = r.target.get<components::sprite>().color;
+		auto sprite = cosmos[r.target].get<components::sprite>();
+		auto& col = sprite.color;
 		auto prevcol = col;
 		col = r.color;
 
-		auto passed = current_time - r.time_of_occurence;
+		auto passed = current_time - r.time_of_occurence.in_seconds(msg.get_delta().get_fixed());
 		auto ratio = passed / r.maximum_duration_seconds;
 
 		col.a = 255 * (1-ratio) * r.starting_alpha_ratio;
-		render_system::standard_draw_entity(r.target, msg.state);
+		render_system().draw_entities(triangles, { cosmos[r.target] }, msg.camera_state, false);
 		col = prevcol;
 	}
 

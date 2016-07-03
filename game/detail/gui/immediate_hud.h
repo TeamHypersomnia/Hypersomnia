@@ -2,6 +2,7 @@
 #include "misc/stepped_timing.h"
 #include "augs/gui/text_drawer.h"
 #include "game/components/transform_component.h"
+#include "game/entity_id.h"
 
 class cosmos;
 class fixed_step;
