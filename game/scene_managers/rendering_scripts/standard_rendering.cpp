@@ -5,7 +5,7 @@
 
 #include "game/systems/render_system.h"
 #include "game/stateful_systems/gui_system.h"
-#include "game/stateful_systems/dynamic_tree_system.h"
+#include "game/temporary_systems/dynamic_tree_system.h"
 #include "game/resources/manager.h"
 #include "graphics/renderer.h"
 
@@ -19,8 +19,8 @@ namespace rendering_scripts {
 		auto& renderer = step.renderer;
 		auto& output = renderer.triangles;
 		auto& cosmos = step.cosm;
-		auto& dynamic_tree = cosmos.stateful_systems.get<dynamic_tree_system>();
-		auto& physics = cosmos.stateful_systems.get<physics_system>();
+		auto& dynamic_tree = cosmos.temporary_systems.get<dynamic_tree_system>();
+		auto& physics = cosmos.temporary_systems.get<physics_system>();
 
 		step.visible_entities = cosmos[dynamic_tree.determine_visible_entities_from_camera(state, physics)];
 		step.visible_per_layer = render_system().get_visible_per_layer(step.visible_entities);

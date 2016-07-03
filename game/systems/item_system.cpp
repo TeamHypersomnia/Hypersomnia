@@ -21,7 +21,7 @@
 #include "game/detail/inventory_slot_handle.h"
 #include "game/detail/entity_scripts.h"
 
-#include "game/stateful_systems/physics_system.h"
+#include "game/temporary_systems/physics_system.h"
 #include "game/entity_handle.h"
 
 #include "ensure.h"
@@ -43,7 +43,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests(fixed_step& step
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();
-	auto& physics = cosmos.stateful_systems.get<physics_system>();
+	auto& physics = cosmos.temporary_systems.get<physics_system>();
 
 	for (auto& e : confirmations) {
 		auto* item_slot_transfers = cosmos[e.detector_body].find<components::item_slot_transfers>();

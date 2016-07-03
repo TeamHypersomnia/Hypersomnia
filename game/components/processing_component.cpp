@@ -1,5 +1,5 @@
 #include "processing_component.h"
-#include "game/stateful_systems/processing_lists_system.h"
+#include "game/temporary_systems/processing_lists_system.h"
 
 namespace components {
 	//template<bool C>
@@ -26,7 +26,7 @@ namespace components {
 	template <class = typename std::enable_if<!is_const>::type>
 	void processing_synchronizer<C>::skip_processing_in(processing_subjects list) {
 		if (is_in(list)) {
-			handle.get_cosmos().stateful_systems.get<processing_lists_system>().
+			handle.get_cosmos().temporary_systems.get<processing_lists_system>().
 		}
 
 		component.processing_subject_categories.set(int(list), 0);

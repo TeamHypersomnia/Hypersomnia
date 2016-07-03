@@ -1,7 +1,7 @@
 #pragma once
 #include "game_gui_root.h"
 #include "game/stateful_systems/gui_system.h"
-#include "game/stateful_systems/physics_system.h"
+#include "game/temporary_systems/physics_system.h"
 #include "game/cosmos.h"
 #include "game/entity_id.h"
 #include "game/enums/filters.h"
@@ -10,7 +10,7 @@
 #include <algorithm>
 
 entity_id game_gui_world::get_hovered_world_entity(vec2 camera_pos) {
-	auto& physics = gui_system->parent_cosmos.stateful_systems.get<physics_system>();
+	auto& physics = gui_system->parent_cosmos.temporary_systems.get<physics_system>();
 
 	auto cursor_pointing_at = camera_pos + gui_crosshair_position - size / 2;
 

@@ -72,7 +72,7 @@ vec2 position_caption_around_a_circle(float radius, vec2 r, float alpha) {
 }
 
 vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(viewing_step& r) const {
-	auto& dynamic_tree = r.cosm.stateful_systems.get<dynamic_tree_system>();
+	auto& dynamic_tree = r.cosm.temporary_systems.get<dynamic_tree_system>();
 	const auto& visible_entities = r.visible_entities;
 	auto& target = r.renderer;
 	auto& cosmos = r.cosm;

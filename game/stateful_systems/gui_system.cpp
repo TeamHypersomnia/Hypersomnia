@@ -22,7 +22,7 @@ gui_system::gui_system() {
 
 bool gui_system::freeze_gui_model() {
 	return false;
-	//return parent_cosmos.stateful_systems.get<input_system>().gui_item_transfer_intent_player.get_pending_inputs_for_logic().size() > 0;
+	//return parent_cosmos.temporary_systems.get<input_system>().gui_item_transfer_intent_player.get_pending_inputs_for_logic().size() > 0;
 }
 
 void gui_system::draw_complete_gui_for_camera_rendering_request(viewing_step& r) const {

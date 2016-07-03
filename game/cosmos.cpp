@@ -1,6 +1,6 @@
 #include "cosmos.h"
 
-#include "stateful_systems/physics_system.h"
+#include "temporary_systems/physics_system.h"
 #include "systems/movement_system.h"
 #include "systems/visibility_system.h"
 #include "systems/pathfinding_system.h"
@@ -26,7 +26,7 @@
 #include "systems/trace_system.h"
 #include "systems/melee_system.h"
 #include "systems/sentience_system.h"
-#include "stateful_systems/dynamic_tree_system.h"
+#include "temporary_systems/dynamic_tree_system.h"
 
 #include "game/enums/render_layer.h"
 
@@ -39,7 +39,7 @@
 
 cosmos::cosmos()
 	//:
-	//stateful_systems(
+	//temporary_systems(
 	//physics_system(),
 	//gui_system(), 
 	//dynamic_tree_system(),
@@ -49,12 +49,12 @@ cosmos::cosmos()
 }
 
 void cosmos::complete_resubstantialization(entity_handle h) {
-	stateful_systems.for_each([this, h](auto& sys) {
+	temporary_systems.for_each([this, h](auto& sys) {
 		sys.destruct(h);
 	});
 
 	if (h.has<components::substance>()) {
-		stateful_systems.for_each([this, h](auto& sys) {
+		temporary_systems.for_each([this, h](auto& sys) {
 			sys.construct(h);
 		});
 	}
@@ -63,7 +63,7 @@ void cosmos::complete_resubstantialization(entity_handle h) {
 void cosmos::reserve_storage_for_entities(size_t n) {
 	components_and_aggregates.reserve_storage_for_aggregates(n);
 
-	stateful_systems.for_each([this, n](auto& sys) {
+	temporary_systems.for_each([this, n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
 	});
 }
@@ -81,11 +81,11 @@ std::wstring cosmos::summary() const {
 }
 
 std::vector<entity_handle> cosmos::get(processing_subjects list) {
-	return stateful_systems.get<processing_lists_system>().get(list, *this);
+	return temporary_systems.get<processing_lists_system>().get(list, *this);
 }
 
 std::vector<const_entity_handle> cosmos::get(processing_subjects list) const {
-	return stateful_systems.get<processing_lists_system>().get(list, *this);
+	return temporary_systems.get<processing_lists_system>().get(list, *this);
 }
 
 randomization cosmos::get_rng_for(entity_id id) const {
@@ -153,7 +153,7 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	auto& performance = profiler.performance;
 
 	performance.start(meter_type::CAMERA_QUERY);
-	stateful_systems.get<dynamic_tree_system>().determine_visible_entities_from_every_camera();
+	temporary_systems.get<dynamic_tree_system>().determine_visible_entities_from_every_camera();
 	performance.stop(meter_type::CAMERA_QUERY);
 
 	stateful_systems.get<gui_system>().rebuild_gui_tree_based_on_game_state();
@@ -178,7 +178,7 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	particles_system().create_particle_effects();
 
 	dynamic_tree_system().add_entities_to_rendering_tree(step);
-	stateful_systems.get<physics_system>().react_to_new_entities();
+	temporary_systems.get<physics_system>().react_to_new_entities();
 	step.messages.get_queue<new_entity_message>().clear();
 
 	trace_system().lengthen_sprites_of_traces();
@@ -221,9 +221,9 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	rotation_copying_system().update_physical_motors(step.cosm);
 	performance.start(meter_type::PHYSICS);
 
-	profiler.raycasts.measure(stateful_systems.get<physics_system>().ray_casts_since_last_step);
+	profiler.raycasts.measure(temporary_systems.get<physics_system>().ray_casts_since_last_step);
 
-	stateful_systems.get<physics_system>().step_and_set_new_transforms();
+	temporary_systems.get<physics_system>().step_and_set_new_transforms();
 	performance.stop(meter_type::PHYSICS);
 	position_copying_system().update_transforms();
 
@@ -260,7 +260,7 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 
 	trace_system().spawn_finishing_traces_for_destroyed_objects();
 	dynamic_tree_system().remove_entities_from_rendering_tree();
-	stateful_systems.get<physics_system>().react_to_destroyed_entities(step);
+	temporary_systems.get<physics_system>().react_to_destroyed_entities(step);
 
 	bool has_no_destruction_callback_queued_any_additional_destruction = step.messages.get_queue<messages::queue_destruction>().empty();
 	ensure(has_no_destruction_callback_queued_any_additional_destruction);

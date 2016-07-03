@@ -3,16 +3,17 @@
 
 #include "entity_system/storage_for_components_and_aggregates.h"
 #include "entity_system/storage_for_message_queues.h"
-#include "entity_system/storage_for_stateful_systems.h"
+#include "entity_system/storage_for_systems.h"
 
 #include "game/types_specification/all_components_declaration.h"
 #include "game/types_specification/all_messages_declaration.h"
-#include "game/types_specification/all_stateful_systems_declaration.h"
+#include "game/types_specification/all_systems_declaration.h"
 
-#include "game/stateful_systems/dynamic_tree_system.h"
+#include "game/temporary_systems/dynamic_tree_system.h"
+#include "game/temporary_systems/physics_system.h"
+#include "game/temporary_systems/processing_lists_system.h"
+
 #include "game/stateful_systems/gui_system.h"
-#include "game/stateful_systems/physics_system.h"
-#include "game/stateful_systems/processing_lists_system.h"
 
 #include "misc/delta.h"
 #include "game/entity_id.h"
@@ -34,6 +35,7 @@ public:
 	typedef std::function<void(fixed_step&)> fixed_callback;
 	typedef std::function<void(viewing_step&)> variable_callback;
 
+	storage_for_all_temporary_systems temporary_systems;
 	storage_for_all_stateful_systems stateful_systems;
 	all_settings settings;
 

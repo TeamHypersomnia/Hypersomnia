@@ -14,7 +14,7 @@
 #include "game/components/container_component.h"
 #include "game/components/item_component.h"
 
-#include "game/stateful_systems/physics_system.h"
+#include "game/temporary_systems/physics_system.h"
 
 #include "game/detail/physics_setup_helpers.h"
 #include "game/detail/inventory_utils.h"
@@ -65,7 +65,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
 	step.messages.get_queue<messages::gunshot_response>().clear();
 	auto& delta = cosmos.delta;
 
-	auto& physics_sys = cosmos.stateful_systems.get<physics_system>();
+	auto& physics_sys = cosmos.temporary_systems.get<physics_system>();
 
 	auto targets = cosmos.get(processing_subjects::WITH_GUN); //??
 	for (auto it : targets) {

@@ -3,7 +3,7 @@
 #include "game/cosmos.h"
 #include "game/entity_id.h"
 
-#include "game/stateful_systems/physics_system.h"
+#include "game/temporary_systems/physics_system.h"
 
 #include "game/components/pathfinding_component.h"
 #include "game/components/visibility_component.h"
@@ -20,7 +20,7 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 	const float epsilon_distance_visible_point_sq = settings.epsilon_distance_visible_point * settings.epsilon_distance_visible_point;
 	
 	/* we'll need a reference to physics system for raycasting */
-	physics_system& physics = cosmos.stateful_systems.get<physics_system>();
+	physics_system& physics = cosmos.temporary_systems.get<physics_system>();
 
 	auto& renderer = augs::renderer::get_current();
 	auto& lines = augs::renderer::get_current().logic_lines;

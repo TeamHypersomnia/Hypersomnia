@@ -1113,13 +1113,7 @@
     <ClCompile Include="game\entity_handle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\stateful_systems\dynamic_tree_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\stateful_systems\gui_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\stateful_systems\physics_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\enums\filters.cpp">
@@ -1284,9 +1278,6 @@
     <ClCompile Include="game\components\substance_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\stateful_systems\processing_lists_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\components\processing_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1297,6 +1288,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\detail\state_for_drawing_camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\temporary_systems\dynamic_tree_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\temporary_systems\physics_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\temporary_systems\processing_lists_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -3203,9 +3203,6 @@
     <ClInclude Include="game\messages\will_soon_be_deleted.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\entity_system\storage_for_stateful_systems.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\cosmic_profiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3218,13 +3215,7 @@
     <ClInclude Include="augs\misc\object_pool_id.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\stateful_systems\dynamic_tree_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\stateful_systems\gui_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\stateful_systems\physics_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\object_pool_handle.h">
@@ -3237,9 +3228,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\types_specification\all_messages_declaration.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\types_specification\all_stateful_systems_declaration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\entropy_unpacker_and_recorder.h">
@@ -3428,9 +3416,6 @@
     <ClInclude Include="game\components\processing_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\stateful_systems\processing_lists_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\component_synchronizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3453,6 +3438,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\detail\state_for_drawing_camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\types_specification\all_systems_declaration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\entity_system\storage_for_systems.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\temporary_systems\dynamic_tree_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\temporary_systems\physics_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\temporary_systems\processing_lists_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -56,7 +56,7 @@ void basic_entity_handle<C>::add_standard_components() {
 	if (has<components::physics>() && !has<components::special_physics>())
 		add<components::special_physics>();
 
-	add(get_cosmos().stateful_systems.get<processing_lists_system>().get_standard_processing());
+	add(get_cosmos().temporary_systems.get<processing_lists_system>().get_standard_processing());
 	add<components::substance>();
 }
 */

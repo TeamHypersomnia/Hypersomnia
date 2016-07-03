@@ -1,4 +1,4 @@
-#include "game/stateful_systems/physics_system.h"
+#include "game/temporary_systems/physics_system.h"
 #include "game/components/fixtures_component.h"
 #include "game/messages/collision_message.h"
 #include "game/components/driver_component.h"
@@ -11,7 +11,7 @@
 #define FRICTION_FIELDS_COLLIDE 0
 
 void physics_system::contact_listener::BeginContact(b2Contact* contact) {
-	auto& sys = this->cosmos_ptr->stateful_systems.get<physics_system>();
+	auto& sys = this->cosmos_ptr->temporary_systems.get<physics_system>();
 
 	for (int i = 0; i < 2; ++i) {
 		auto fix_a = contact->GetFixtureA();
@@ -99,7 +99,7 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 }
 
 void physics_system::contact_listener::EndContact(b2Contact* contact) {
-	auto& sys = this->cosmos_ptr->stateful_systems.get<physics_system>();
+	auto& sys = this->cosmos_ptr->temporary_systems.get<physics_system>();
 
 	for (int i = 0; i < 2; ++i) {
 		auto fix_a = contact->GetFixtureA();
@@ -144,7 +144,7 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 }
 
 void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold) {
-	auto& sys = this->cosmos_ptr->stateful_systems.get<physics_system>();
+	auto& sys = this->cosmos_ptr->temporary_systems.get<physics_system>();
 
 	messages::collision_message msgs[2];
 

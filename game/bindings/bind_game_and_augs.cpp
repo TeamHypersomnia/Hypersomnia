@@ -53,7 +53,7 @@ namespace bindings {
 
 		_opengl_binding(),
 		_random_binding(),
-		_all_stateful_systems(),
+		_all_temporary_systems(),
 
 		_text(),
 
@@ -117,7 +117,7 @@ void bind_game_and_augs(augs::lua_state_wrapper& wrapper) {
 
 			//bindings::_all_messages(),
 			//bindings::_all_components(),
-			//bindings::_all_stateful_systems(),
+			//bindings::_all_temporary_systems(),
 
 			//bindings::_entity(),
 			//bindings::_body_helper(),

@@ -3,7 +3,7 @@
 #include "game/cosmos.h"
 #include "game/bindings/bindings.h"
 
-#include "game/stateful_systems/physics_system.h"
+#include "game/temporary_systems/physics_system.h"
 #include "game/systems/movement_system.h"
 #include "game/systems/visibility_system.h"
 #include "game/systems/pathfinding_system.h"
@@ -29,7 +29,7 @@
 #include "game/systems/trace_system.h"
 #include "game/systems/melee_system.h"
 #include "game/systems/sentience_system.h"
-#include "game/stateful_systems/dynamic_tree_system.h"
+#include "game/temporary_systems/dynamic_tree_system.h"
 
 
 #include "misc/vector_wrapper.h"

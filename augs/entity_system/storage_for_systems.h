@@ -3,10 +3,10 @@
 
 namespace augs {
 	template<class... Systems>
-	class storage_for_stateful_systems {
+	class storage_for_systems {
 		std::tuple<Systems...> systems;
 	public:
-		storage_for_stateful_systems(Systems&&... args) : systems(std::forward(std::make_tuple(args...))) {}
+		storage_for_systems(Systems&&... args) : systems(std::forward(std::make_tuple(args...))) {}
 
 		template <typename T>
 		T& get() {

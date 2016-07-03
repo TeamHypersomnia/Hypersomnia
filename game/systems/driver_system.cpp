@@ -12,7 +12,7 @@
 #include "game/components/force_joint_component.h"
 
 #include "game/cosmos.h"
-#include "game/stateful_systems/physics_system.h"
+#include "game/temporary_systems/physics_system.h"
 
 #include "game/components/driver_component.h"
 #include "game/components/physics_component.h"
@@ -43,7 +43,7 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel(fixed_step&
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	auto& contacts = step.messages.get_queue<messages::collision_message>();
-	auto& physics = cosmos.stateful_systems.get<physics_system>();
+	auto& physics = cosmos.temporary_systems.get<physics_system>();
 
 	for (auto& c : contacts) {
 		if (c.type == messages::collision_message::event_type::END_CONTACT) {
@@ -82,7 +82,7 @@ bool driver_system::assign_car_ownership(entity_handle driver, entity_handle car
 bool driver_system::change_car_ownership(entity_handle driver_entity, entity_handle car_entity, bool lost_ownership) {
 	auto& driver = driver_entity.get<components::driver>();
 	auto& cosmos = driver_entity.get_cosmos();
-	auto& physics = cosmos.stateful_systems.get<physics_system>();
+	auto& physics = cosmos.temporary_systems.get<physics_system>();
 
 	auto* maybe_rotation_copying = driver_entity.find<components::rotation_copying>();
 	auto* maybe_physics = driver_entity.find<components::physics>();

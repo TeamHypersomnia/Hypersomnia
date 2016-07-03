@@ -7,7 +7,7 @@
 
 #include "math/vec2.h"
 #include "game/cosmos.h"
-#include "game/stateful_systems/physics_system.h"
+#include "game/temporary_systems/physics_system.h"
 #include "ensure.h"
 #include "game/entity_handle.h"
 

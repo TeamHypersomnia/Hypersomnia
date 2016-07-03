@@ -10,7 +10,7 @@
 #include "game/components/sprite_component.h"
 #include "game/detail/state_for_drawing_camera.h"
 
-#include "game/stateful_systems/physics_system.h"
+#include "game/temporary_systems/physics_system.h"
 
 #include "game/cosmos.h"
 
