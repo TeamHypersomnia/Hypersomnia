@@ -1,9 +1,12 @@
 #include "game/stateful_systems/gui_system.h"
 #include "game/components/item_component.h"
 #include "game/components/container_component.h"
+#include "game/cosmos.h"
 
-void gui_system::rebuild_gui_tree_based_on_game_state() {
-	gui.set_delta_milliseconds(delta_milliseconds());
+void gui_system::rebuild_gui_tree_based_on_game_state(fixed_step& step) {
+	auto& cosmos = step.cosm;
+	
+	gui.set_delta_milliseconds(step.get_delta().in_milliseconds());
 
 	if (freeze_gui_model())
 		return;
@@ -12,7 +15,7 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 
 	std::vector<augs::gui::rect_id> inventory_roots;
 
-	for (auto& root : targets) {
+	for (auto& root : cosmos.get(processing_subjects::WITH_GUI_ELEMENT)) {
 		auto* item_slot_transfers = root.find<components::item_slot_transfers>();
 		auto& element = root.get<components::gui_element>();
 
@@ -22,8 +25,8 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 
 			// construct metadata tree to know the already unneeded entries and to see the new ones
 
-			std::function<void(entity_id)> iterate_inventory_tree
-				= [&new_slot_meta, &new_item_meta, &iterate_inventory_tree](entity_id container) {
+			std::function<void(const_entity_handle)> iterate_inventory_tree
+				= [&cosmos, &new_slot_meta, &new_item_meta, &iterate_inventory_tree](const_entity_handle container) {
 				auto* maybe_container = container.find<components::container>();
 
 				if (maybe_container) {
@@ -33,7 +36,7 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 
 						for (auto& i : s.second.items_inside) {
 							new_item_meta[i] = item_button();
-							iterate_inventory_tree(i);
+							iterate_inventory_tree(cosmos[i]);
 						}
 					}
 				}
@@ -88,14 +91,14 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 			for (auto& s : cached_slot_meta) {
 				auto id = s.first;
 
-				if (id.dead())
+				if (cosmos[id].dead())
 					dead_slots.push_back(id);
 			}
 
 			for (auto& i : cached_item_meta) {
 				auto id = i.first;
 
-				if (id.dead())
+				if (cosmos[id].dead())
 					dead_items.push_back(id);
 			}
 
@@ -141,7 +144,7 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 						new_item.is_container_open = true;
 					}
 					else {
-						new_item.rc.set_position(previous_slot_meta[new_item.item.get<components::item>().current_slot].rc.get_position());
+						new_item.rc.set_position(previous_slot_meta[cosmos[new_item.item].get<components::item>().current_slot].rc.get_position());
 						new_item.rc.set_size(64, 64);
 					}
 
@@ -158,7 +161,7 @@ void gui_system::rebuild_gui_tree_based_on_game_state() {
 				bool is_it_root = entry.first == root;
 
 				if (!is_it_root) {
-					auto item_parent = entry.second.item.get<components::item>().current_slot.container_entity;
+					auto item_parent = cosmos[entry.second.item].get<components::item>().current_slot.container_entity;
 					get_meta(item_parent).children.push_back(&entry.second);
 				}
 			}

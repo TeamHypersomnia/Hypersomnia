@@ -36,11 +36,11 @@ public:
 
 	void resize(vec2i size) { gui.resize(size); }
 
-	void rebuild_gui_tree_based_on_game_state();
+	void rebuild_gui_tree_based_on_game_state(fixed_step&);
 	void translate_raw_window_inputs_to_gui_events(augs::machine_entropy);
-	void suppress_inputs_meant_for_gui();
+	void suppress_inputs_meant_for_gui(augs::machine_entropy&);
 
-	void switch_to_gui_mode_and_back();
+	void switch_to_gui_mode_and_back(fixed_step&);
 
 	void draw_complete_gui_for_camera_rendering_request(viewing_step&) const;
 

@@ -15,5 +15,5 @@ typedef augs::storage_for_systems <
 > storage_for_all_temporary_systems;
 
 typedef augs::storage_for_systems <
-	gui_system,
+	gui_system
 > storage_for_all_stateful_systems;

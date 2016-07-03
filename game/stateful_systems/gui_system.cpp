@@ -5,7 +5,7 @@
 #include "game/cosmos.h"
 
 #include "game/messages/intent_message.h"
-#include "game/messages/raw_window_input_message.h"
+#include "game/messages/unmapped_intent_message.h"
 
 #include "game/components/item_component.h"
 #include "game/components/input_receiver_component.h"
@@ -26,8 +26,7 @@ bool gui_system::freeze_gui_model() {
 }
 
 void gui_system::draw_complete_gui_for_camera_rendering_request(viewing_step& r) const {
-	gui.draw_triangles();
-	r.state.output->push_triangles_from_gui_world(gui);
+	r.renderer.push_triangles(gui.draw_triangles());
 
 	if (is_gui_look_enabled)
 		gui.draw_cursor_and_tooltip(r);
@@ -35,17 +34,17 @@ void gui_system::draw_complete_gui_for_camera_rendering_request(viewing_step& r)
 
 entity_id gui_system::get_cosmos_crosshair(const cosmos& cosm) {
 	for (auto it : cosm.get(processing_subjects::WITH_CROSSHAIR)) {
-		if (it.is_in(processing_subjects::WITH_INPUT_RECEIVER)) {
+		if (it.get<components::processing>().is_in(processing_subjects::WITH_INPUT_RECEIVER)) {
 			return it;
 		}
 	}
 }
 
-void gui_system::translate_raw_window_inputs_to_gui_events() {
+void gui_system::translate_raw_window_inputs_to_gui_events(augs::machine_entropy entropy) {
 	if (!is_gui_look_enabled)
 		return;
 	
-	auto window_inputs = step.messages.get_queue<messages::raw_window_input_message>();
+	auto window_inputs = entropy.local;
 
 	if (freeze_gui_model()) {
 		buffered_inputs_during_freeze.insert(buffered_inputs_during_freeze.end(), window_inputs.begin(), window_inputs.end());
@@ -61,23 +60,21 @@ void gui_system::translate_raw_window_inputs_to_gui_events() {
 	gui.perform_logic_step();
 }
 
-void gui_system::suppress_inputs_meant_for_gui() {
+void gui_system::suppress_inputs_meant_for_gui(augs::machine_entropy& entropy) {
 	if (!is_gui_look_enabled)
 		return;
 	
-	auto& inputs = step.messages.get_queue<messages::raw_window_input_message>();
-
-	for (auto& it : inputs) {
-		if (it.raw_window_input.msg != window::event::keydown &&
-			it.raw_window_input.msg != window::event::keyup) {
-			it.delete_this_message = true;
+	erase_remove(entropy.local, [](auto it) {
+		if (it.msg != window::event::keydown &&
+			it.msg != window::event::keyup) {
+			return true;
 		}
-	}
 
-	parent_cosmos.delete_marked_messages(inputs);
+		return false;
+	});
 }
 
-void gui_system::switch_to_gui_mode_and_back() {
+void gui_system::switch_to_gui_mode_and_back(fixed_step& step) {
 	auto& intents = step.messages.get_queue<messages::unmapped_intent_message>();
 
 	for (auto& i : intents) {
@@ -94,5 +91,5 @@ void gui_system::switch_to_gui_mode_and_back() {
 void gui_system::translate_game_events_for_hud(fixed_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
-	hud.acquire_game_events(cosmos, step);
+	hud.acquire_game_events(step);
 }
