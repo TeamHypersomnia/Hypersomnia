@@ -10,7 +10,7 @@
 #undef min
 namespace augs {
 	namespace gui {
-		rect::draw_info::draw_info(gui_world& owner, std::vector<augs::vertex_triangle>& v) : owner(owner), v(v) {}
+		rect::draw_info::draw_info(const gui_world& owner, vertex_triangle_buffer& v) : owner(owner), v(v) {}
 		rect::poll_info::poll_info(gui_world& owner, unsigned msg) : owner(owner), msg(msg), mouse_fetched(false), scroll_fetched(false) {}
 		rect::event_info::event_info(gui_world& owner, rect::gui_event msg) : owner(owner), msg(msg) {}
 
@@ -82,12 +82,12 @@ namespace augs {
 			}
 		}
 
-		void rect::draw_stretched_texture(draw_info in, const material& mat) {
+		void rect::draw_stretched_texture(draw_info in, const material& mat) const {
 			draw_clipped_rectangle(mat, get_rect_absolute(), parent, in.v).good();
 			// rc_clipped = draw_clipped_rectangle(mat, rc_clipped, parent, in.v);
 		}
 
-		void rect::draw_centered_texture(draw_info in, const material& mat, vec2i offset) {
+		void rect::draw_centered_texture(draw_info in, const material& mat, vec2i offset) const {
 			auto absolute_centered = get_rect_absolute();
 			auto tex_size = (*mat.tex).get_size();
 			absolute_centered.l += absolute_centered.w() / 2 - float(tex_size.x) / 2;
@@ -101,7 +101,7 @@ namespace augs {
 			// rc_clipped = draw_clipped_rectangle(mat, rc_clipped, parent, in.v);
 		}
 
-		void rect::draw_rectangle_stylesheeted(draw_info in, const stylesheet& styles) {
+		void rect::draw_rectangle_stylesheeted(draw_info in, const stylesheet& styles) const {
 			auto st = styles.get_style();
 
 			if (st.color.active || st.background_image.active)
@@ -110,20 +110,19 @@ namespace augs {
 			if (st.border.active) st.border.value.draw(in.v, *this);
 		}
 
-		void rect::draw_children(draw_info in) {
+		void rect::draw_children(draw_info in) const {
 			if (!enable_drawing_of_children) 
 				return;
 
 			auto children_all = children;
 			get_member_children(children_all);
 			for (size_t i = 0; i < children_all.size(); ++i) {
-				children_all[i]->parent = this;
 				if (children_all[i]->enable_drawing)
 					children_all[i]->draw_triangles(in);
 			}
 		}
 
-		void rect::get_member_children(std::vector<rect_id>& children) {
+		void rect::get_member_children(std::vector<rect_id>& children) const {
 
 		}
 

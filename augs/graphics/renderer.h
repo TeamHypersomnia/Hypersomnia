@@ -85,11 +85,12 @@ namespace augs {
 		void enable_special_vertex_attribute();
 		void disable_special_vertex_attribute();
 		void call_triangles();
+		void call_triangles(const vertex_triangle_buffer&);
 		void call_lines();
 		void set_viewport(rects::xywh<int>);
 		void push_line(const vertex_line&);
 		void push_triangle(const vertex_triangle&);
-		void push_triangles_from_gui_world(gui::gui_world&);
+		void push_triangles(const vertex_triangle_buffer&);
 		void push_special_vertex_triangle(augs::special, augs::special, augs::special);
 
 		void clear_special_vertex_data();

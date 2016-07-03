@@ -205,17 +205,19 @@ namespace augs {
 			return rect_in_focus;
 		}
 
-		void gui_world::draw_triangles() {
-			triangle_buffer.clear();
-			rect::draw_info in(*this, triangle_buffer);
+		vertex_triangle_buffer gui_world::draw_triangles() const {
+			vertex_triangle_buffer buffer;
+			rect::draw_info in(*this, buffer);
 
 			root.draw_children(in);
 
 			if (middlescroll.subject) {
 				rects::ltrb<float> scroller = rects::wh<float>(middlescroll.size);
 				scroller.center(middlescroll.pos);
-				gui::draw_clipped_rectangle(middlescroll.mat, scroller, &root, triangle_buffer);
+				gui::draw_clipped_rectangle(middlescroll.mat, scroller, &root, buffer);
 			}
+
+			return buffer;
 		}
 
 		void gui_world::perform_logic_step() {

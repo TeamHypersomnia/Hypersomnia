@@ -69,14 +69,18 @@ namespace augs {
 			glBufferData(GL_ARRAY_BUFFER, sizeof(special) * specials.size(), specials.data(), GL_STREAM_DRAW); glerr;
 		}
 
-		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
-
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_triangle) * triangles.size(), triangles.data(), GL_STREAM_DRAW); glerr;
-		glDrawArrays(GL_TRIANGLES, 0, triangles.size() * 3); glerr;
-		triangles_drawn_total += triangles.size();
+		call_triangles(triangles);
 
 		if (!specials.empty()) 
 			disable_special_vertex_attribute();
+	}
+
+	void renderer::call_triangles(const vertex_triangle_buffer& buffer) {
+		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
+
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_triangle) * buffer.size(), buffer.data(), GL_STREAM_DRAW); glerr;
+		glDrawArrays(GL_TRIANGLES, 0, buffer.size() * 3); glerr;
+		triangles_drawn_total += buffer.size();
 	}
 
 	void renderer::push_triangle(const vertex_triangle& tri) {
@@ -99,8 +103,8 @@ namespace augs {
 		glViewport(xywh.x, xywh.y, xywh.w, xywh.h);
 	}
 	
-	void renderer::push_triangles_from_gui_world(gui::gui_world& gui) {
-		triangles.insert(triangles.end(), gui.triangle_buffer.begin(), gui.triangle_buffer.end());
+	void renderer::push_triangles(const vertex_triangle_buffer& added) {
+		triangles.insert(triangles.end(), added.begin(), added.end());
 	}
 
 	void renderer::push_special_vertex_triangle(augs::special s1, augs::special s2, augs::special s3) {

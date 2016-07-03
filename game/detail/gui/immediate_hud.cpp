@@ -71,17 +71,17 @@ vec2 position_caption_around_a_circle(float radius, vec2 r, float alpha) {
 	return vec2(0, 0);
 }
 
-void immediate_hud::draw_circular_bars(viewing_step& r) {
+vertex_triangle_buffer immediate_hud::draw_circular_bars_and_get_textual_info(viewing_step& r) const {
 	auto& dynamic_tree = r.cosm.stateful_systems.get<dynamic_tree_system>();
 	const auto& visible_entities = r.visible_entities;
 	auto& target = r.renderer;
+	auto& cosmos = r.cosm;
 
-	auto watched_character = r.camera_state.associated_character;
+	auto watched_character = cosmos[r.camera_state.associated_character];
 
-	int timestamp_ms = render.frame_timestamp_seconds() * 1000;
+	int timestamp_ms = r.get_delta().total_time_passed_in_seconds() * 1000;
 
-	circular_bars_information.clear();
-	pure_color_highlights.clear();
+	vertex_triangle_buffer circular_bars_information;
 
 	for (auto v : visible_entities) {
 		auto* sentience = v.find<components::sentience>();
@@ -93,33 +93,18 @@ void immediate_hud::draw_circular_bars(viewing_step& r) {
 			int pulse_duration = 1250 - 1000 * (1 - hr);
 			float time_pulse_ratio = (timestamp_ms % pulse_duration) / float(pulse_duration);
 
-			hr *= 1.f - (0.2f * time_pulse_ratio);
-
-			auto* render = v.find<components::render>();
-			
-			if (render) {
-				//render->partial_overlay_color = red;
-				//render->partial_overlay_height_ratio = 1 - hr;
-				if (hr < 1.f) {
-					render->draw_border = true;
-					render->border_color = rgba(255, 0, 0, one_less_hr * one_less_hr * one_less_hr * one_less_hr * 255 * time_pulse_ratio);
-				}
-				else
-					render->draw_border = false;
-			}
-
 			auto health_col = sentience->calculate_health_color(time_pulse_ratio);
 
 			auto& transform = v.get<components::transform>();
-			shared::state_for_drawing_renderable state;
-			state.setup_camera_state(r.state);
+			
+			components::sprite::drawing_input state(r.renderer.triangles);
+			state.setup_from(r.camera_state);
 			state.renderable_transform = transform;
 			state.renderable_transform.rotation = 0;
 
 			components::sprite circle_hud;
 			circle_hud.set(assets::HUD_CIRCULAR_BAR_MEDIUM, health_col);
 			circle_hud.draw(state);
-
 			
 			auto watched_character_transform = watched_character.get<components::transform>();
 			float starting_health_angle = 0.f;
@@ -155,7 +140,7 @@ void immediate_hud::draw_circular_bars(viewing_step& r) {
 			std::vector<circle_info> textual_infos;
 
 			if (v == watched_character) {
-				auto examine_item_slot = [&textual_infos, &push_angles, &circle_hud, &state](inventory_slot_id id, float lower_outside, float max_angular_length, bool ccw) {
+				auto examine_item_slot = [&textual_infos, &push_angles, &circle_hud, &state](const_inventory_slot_handle id, float lower_outside, float max_angular_length, bool ccw) {
 					if (id.alive() && id.has_items()) {
 						auto item = id.get_items_inside()[0];
 
@@ -235,7 +220,6 @@ void immediate_hud::draw_circular_bars(viewing_step& r) {
 				auto circle_displacement_length = health_points.get_bbox().bigger_side() + radius;
 				vec2i screen_space_circle_center = r.get_screen_space(transform.pos);
 
-
 				health_points.pos = screen_space_circle_center + position_caption_around_a_circle(radius+6, health_points.get_bbox(), in.angle) - health_points.get_bbox()/2;
 				//health_points.pos = screen_space_circle_center + vec2().set_from_degrees(in.angle).set_length(circle_displacement_length);
 
@@ -244,10 +228,8 @@ void immediate_hud::draw_circular_bars(viewing_step& r) {
 			}
 		}
 	}
-}
 
-void immediate_hud::draw_circular_bars_information(viewing_step& r) {
-	r.state.output->triangles.insert(r.state.output->triangles.begin(), circular_bars_information.begin(), circular_bars_information.end());
+	return circular_bars_information;
 }
 
 void immediate_hud::acquire_game_events(fixed_step& step) {
@@ -301,7 +283,7 @@ double immediate_hud::get_current_time(viewing_step& msg) const {
 	return world.get_current_timestamp() + world.parent_overworld.fixed_delta_milliseconds() / 1000 * world.parent_overworld.view_interpolation_ratio();
 }
 
-void immediate_hud::draw_vertically_flying_numbers(viewing_step& msg) {
+void immediate_hud::draw_vertically_flying_numbers(viewing_step& msg) const {
 	auto& target = renderer::get_current();
 	
 	auto current_time = get_current_time(msg);
@@ -324,7 +306,7 @@ void immediate_hud::draw_vertically_flying_numbers(viewing_step& msg) {
 	erase_remove(recent_pure_color_highlights, timeout_lambda);
 }
 
-void immediate_hud::draw_pure_color_highlights(viewing_step& msg) {
+void immediate_hud::draw_pure_color_highlights(viewing_step& msg) const {
 	auto current_time = get_current_time(msg);
 
 	for (auto& r : recent_pure_color_highlights) {

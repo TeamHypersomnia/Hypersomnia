@@ -7,6 +7,8 @@
 #include "game/assets/texture_id.h"
 #include "transform_component.h"
 
+struct state_for_drawing_camera;
+
 namespace components {
 	struct sprite {
 		struct drawing_input : vertex_triangle_buffer_reference {
@@ -21,6 +23,8 @@ namespace components {
 			bool position_is_left_top_corner = false;
 
 			augs::rgba colorize = augs::white;
+
+			void setup_from(const state_for_drawing_camera&);
 		};
 
 		static void make_rect(vec2 pos, vec2 size, float rotation_degrees, vec2 out[4], bool pos_at_center);

@@ -13,9 +13,13 @@
 #include "graphics/vertex.h"
 #include "ensure.h"
 using namespace augs;
-using namespace shared;
 
 namespace components {
+	void sprite::drawing_input::setup_from(const state_for_drawing_camera& state) {
+		visible_world_area = state.visible_world_area;
+		camera_transform = state.camera_transform;
+	}
+
 	void sprite::make_rect(vec2 pos, vec2 size, float angle, vec2 v[4], bool pos_at_center) {
 		vec2 origin = pos;
 		

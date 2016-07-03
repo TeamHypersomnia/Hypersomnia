@@ -2,8 +2,10 @@
 
 #include "game/messages/damage_message.h"
 #include "game/messages/health_event.h"
-#include "game/messages/rebuild_physics_message.h"
-#include "game/messages/physics_operation.h"
+#include "game/components/sentience_component.h"
+#include "game/components/render_component.h"
+#include "game/messages/health_event.h"
+
 #include "game/cosmos.h"
 #include "game/entity_id.h"
 
@@ -17,6 +19,8 @@
 #include "game/detail/inventory_slot.h"
 #include "game/detail/inventory_slot_id.h"
 #include "game/detail/inventory_utils.h"
+
+#include "game/step.h"
 
 components::sentience::meter::damage_result components::sentience::meter::calculate_damage_result(float amount) const {
 	components::sentience::meter::damage_result result;
@@ -105,7 +109,7 @@ void sentience_system::consume_health_event(messages::health_event h) {
 	step.messages.post(h);
 }
 
-void sentience_system::apply_damage_and_generate_health_events() {
+void sentience_system::apply_damage_and_generate_health_events(fixed_step& step) const {
 	auto& damages = step.messages.get_queue<messages::damage_message>();
 	auto& healths = step.messages.get_queue<messages::health_event>();
 
@@ -172,14 +176,41 @@ void sentience_system::apply_damage_and_generate_health_events() {
 	}
 }
 
-void sentience_system::cooldown_aimpunches() {
-	for (auto& t : targets) {
-		t.get<components::sentience>().aimpunch.cooldown(delta_milliseconds());
+void sentience_system::cooldown_aimpunches(fixed_step& step) const {
+	for (auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
+		t.get<components::sentience>().aimpunch.cooldown(step.get_delta().in_milliseconds());
 	}
 }
 
-void sentience_system::regenerate_values() {
-	for (auto& t : targets) {
-		t.get<components::sentience>().aimpunch.cooldown(delta_milliseconds());
+void sentience_system::regenerate_values(fixed_step& step) const {
+	for (auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
+		t.get<components::sentience>().aimpunch.cooldown(step.get_delta().in_milliseconds());
+	}
+}
+
+void sentience_system::set_borders(fixed_step& step) const {
+	int timestamp_ms = step.get_delta().total_time_passed_in_seconds() * 1000;
+
+	for (auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
+		auto& sentience = t.get<components::sentience>();
+
+		auto hr = sentience.health.ratio();
+		auto one_less_hr = 1 - hr;
+
+		int pulse_duration = 1250 - 1000 * (1 - hr);
+		float time_pulse_ratio = (timestamp_ms % pulse_duration) / float(pulse_duration);
+
+		hr *= 1.f - (0.2f * time_pulse_ratio);
+
+		auto* render = t.find<components::render>();
+
+		if (render) {
+			if (hr < 1.f) {
+				render->draw_border = true;
+				render->border_color = rgba(255, 0, 0, one_less_hr * one_less_hr * one_less_hr * one_less_hr * 255 * time_pulse_ratio);
+			}
+			else
+				render->draw_border = false;
+		}
 	}
 }

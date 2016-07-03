@@ -42,7 +42,7 @@ public:
 
 	void switch_to_gui_mode_and_back();
 
-	void draw_complete_gui_for_camera_rendering_request(viewing_step&);
+	void draw_complete_gui_for_camera_rendering_request(viewing_step&) const;
 
 	rects::xywh<float> get_rectangle_for_slot_function(slot_function);
 	vec2i get_initial_position_for_special_control(special_control);

@@ -46,10 +46,10 @@ namespace augs {
 			};
 
 			struct draw_info {
-				gui_world& owner;
-				std::vector<augs::vertex_triangle>& v;
+				const gui_world& owner;
+				vertex_triangle_buffer& v;
 
-				draw_info(gui_world&, std::vector<augs::vertex_triangle>&);
+				draw_info(const gui_world&, vertex_triangle_buffer&);
 			};
 
 			struct poll_info {
@@ -118,12 +118,12 @@ namespace augs {
 			bool focus_next_rect_by_enter(event_info);
 
 			/* draw_triangles default subroutines */
-			void draw_stretched_texture(draw_info in, const material& = material()),
-				draw_centered_texture(draw_info in, const material& = material(), vec2i offset = vec2i()),
-				draw_rectangle_stylesheeted(draw_info in, const stylesheet&),
-				draw_children(draw_info in);
+			void draw_stretched_texture(draw_info in, const material& = material()) const,
+				draw_centered_texture(draw_info in, const material& = material(), vec2i offset = vec2i()) const,
+				draw_rectangle_stylesheeted(draw_info in, const stylesheet&) const,
+				draw_children(draw_info in) const;
 
-			virtual void get_member_children(std::vector<rect_id>& children);
+			virtual void get_member_children(std::vector<rect_id>& children) const;
 
 			void get_all_descendants(std::vector<rect_id>&);
 

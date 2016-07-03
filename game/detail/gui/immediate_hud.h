@@ -1,5 +1,4 @@
 #pragma once
-#include "game/messages/camera_render_request_message.h"
 #include "misc/stepped_timing.h"
 #include "augs/gui/text_drawer.h"
 #include "game/components/transform_component.h"
@@ -33,12 +32,11 @@ struct immediate_hud {
 	vertex_triangle_buffer circular_bars_information;
 	vertex_triangle_buffer pure_color_highlights;
 
-	void draw_circular_bars(viewing_step&);
-	void draw_circular_bars_information(viewing_step&);
-	void draw_pure_color_highlights(viewing_step&);
+	vertex_triangle_buffer draw_circular_bars_and_get_textual_info(viewing_step&) const;
+	void draw_pure_color_highlights(viewing_step&) const;
+	void draw_vertically_flying_numbers(viewing_step&) const;
 
 	void acquire_game_events(fixed_step& step);
-	void draw_vertically_flying_numbers(viewing_step&);
 private:
 	double get_current_time(viewing_step&) const;
 };

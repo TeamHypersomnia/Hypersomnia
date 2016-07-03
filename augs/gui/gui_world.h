@@ -92,8 +92,6 @@ namespace augs {
 
 			rect root;
 
-			std::vector<augs::vertex_triangle> triangle_buffer;
-
 			gui_world();
 
 			void reassign_children_and_unset_invalid_handles(rect_id parent, std::vector<rect_id> new_children);
@@ -106,7 +104,7 @@ namespace augs {
 
 			void consume_raw_input_and_generate_gui_events(augs::window::event::state);
 			void perform_logic_step();
-			void draw_triangles();
+			vertex_triangle_buffer draw_triangles() const;
 		};
 
 		void paste_clipboard_formatted(text::fstr& out, text::formatted_char = text::formatted_char());
