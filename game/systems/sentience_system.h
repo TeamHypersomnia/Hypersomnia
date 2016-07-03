@@ -8,7 +8,7 @@ using namespace augs;
 class fixed_step;
 
 class sentience_system {
-	void consume_health_event(messages::health_event);
+	void consume_health_event(messages::health_event, fixed_step&) const;
 
 public:
 	void apply_damage_and_generate_health_events(fixed_step&) const;

@@ -14,6 +14,7 @@
 #include "game/components/position_copying_component.h"
 
 #include "game/components/animation_component.h"
+#include "game/components/relations_component.h"
 #include "game/components/movement_component.h"
 
 #include "game/detail/inventory_slot.h"
@@ -49,15 +50,17 @@ components::sentience::meter::damage_result components::sentience::meter::calcul
 	return result;
 }
 
-void sentience_system::consume_health_event(messages::health_event h) {
-	auto& sentience = h.subject.get<components::sentience>();
+void sentience_system::consume_health_event(messages::health_event h, fixed_step& step) const {
+	auto& cosmos = step.cosm;
+	auto subject = cosmos[h.subject];
+	auto& sentience = subject.get<components::sentience>();
 
 	switch (h.target) {
 	case messages::health_event::HEALTH: sentience.health.value -= h.effective_amount; ensure(sentience.health.value >= 0) break;;
 	case messages::health_event::CONSCIOUSNESS: sentience.consciousness.value -= h.effective_amount; ensure(sentience.health.value >= 0); break;
 	case messages::health_event::SHIELD: ensure(0); break;
 	case messages::health_event::AIM:
-		auto punched = h.subject;
+		auto punched = subject;
 
 		if (punched.has(sub_entity_name::CHARACTER_CROSSHAIR) && punched[sub_entity_name::CHARACTER_CROSSHAIR].has(sub_entity_name::CROSSHAIR_RECOIL_BODY)) {
 			auto owning_crosshair_recoil = punched[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
@@ -71,39 +74,29 @@ void sentience_system::consume_health_event(messages::health_event h) {
 	}
 
 	if (h.special_result == messages::health_event::DEATH) {
-		auto* container = h.subject.find<components::container>();
+		auto* container = subject.find<components::container>();
 
 		if (container)
-			drop_from_all_slots(h.subject);
+			drop_from_all_slots(subject);
 
-		auto sub_def = h.subject[sub_entity_name::CORPSE_OF_SENTIENCE];
+		auto sub_def = subject[sub_entity_name::CORPSE_OF_SENTIENCE];
 
-		auto corpse = parent_cosmos.create_from_definition(sub_def);
+		auto corpse = cosmos.clone_entity(sub_def);
 
-		auto place_of_death = h.subject.get<components::transform>();
+		auto place_of_death = subject.get<components::transform>();
 		place_of_death.rotation = h.impact_velocity.degrees();
 
-		corpse.get<components::physics_definition>().create_fixtures_and_body = true;
-		corpse.get<components::transform>() = place_of_death;
+		corpse.get<components::physics>().set_transform(place_of_death);
+		
+		subject.get<components::physics>().set_activated(false);
+		subject.get<components::position_copying>().set_target(corpse);
 
-		messages::rebuild_physics_message remove_from_physical_plane_of_existence;
-		remove_from_physical_plane_of_existence.subject = h.subject;
-		remove_from_physical_plane_of_existence.new_definition = h.subject.get<components::physics_definition>();
-		remove_from_physical_plane_of_existence.new_definition.create_fixtures_and_body = false;
+		corpse.get<components::physics>().apply_force(vec2().set_from_degrees(place_of_death.rotation).set_length(27850 * 2));
 
-		step.messages.post(remove_from_physical_plane_of_existence);
-
-		auto astral_body_now_without_physical_prison = h.subject;
-		astral_body_now_without_physical_prison.get<components::position_copying>().set_target(corpse);
-
-		messages::physics_operation op;
-		op.subject = corpse;
-		op.apply_force.set_from_degrees(place_of_death.rotation).set_length(27850 * 2);
-
-		step.messages.post(op);
+		corpse.add_standard_components();
 
 		h.spawned_remnants = corpse;
-		corpse[associated_entity_name::ASTRAL_BODY] = astral_body_now_without_physical_prison;
+		corpse.map_associated_entity(associated_entity_name::ASTRAL_BODY, subject);
 	}
 
 	step.messages.post(h);
@@ -112,6 +105,7 @@ void sentience_system::consume_health_event(messages::health_event h) {
 void sentience_system::apply_damage_and_generate_health_events(fixed_step& step) const {
 	auto& damages = step.messages.get_queue<messages::damage_message>();
 	auto& healths = step.messages.get_queue<messages::health_event>();
+	auto& cosmos = step.cosm;
 
 	healths.clear();
 
@@ -133,8 +127,8 @@ void sentience_system::apply_damage_and_generate_health_events(fixed_step& step)
 		else
 			aimpunch_event.subject = subject.get_owning_transfer_capability();
 
-		if (d.amount > 0 && aimpunch_event.subject.alive())
-			consume_health_event(aimpunch_event);
+		if (d.amount > 0 && cosmos[aimpunch_event.subject].alive())
+			consume_health_event(aimpunch_event, step);
 
 		if (sentience) {
 			auto& s = *sentience;
@@ -155,7 +149,7 @@ void sentience_system::apply_damage_and_generate_health_events(fixed_step& step)
 				}
 
 				if (event.effective_amount != 0)
-					consume_health_event(event);
+					consume_health_event(event, step);
 			}
 
 			if (s.consciousness.enabled) {
@@ -170,7 +164,7 @@ void sentience_system::apply_damage_and_generate_health_events(fixed_step& step)
 				}
 
 				if (event.effective_amount != 0)
-					consume_health_event(event);
+					consume_health_event(event, step);
 			}
 		}
 	}
