@@ -29,7 +29,7 @@ namespace augs {
 			rc.set_size((*id).get_size());
 		 }
 
-		rects::wh<float> rect::get_content_size() {
+		rects::wh<float> rect::get_content_size() const {
 			/* init on zero */
 			rects::ltrb<float> content = rects::ltrb<float>(0, 0, 0, 0);
 

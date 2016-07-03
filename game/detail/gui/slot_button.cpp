@@ -16,7 +16,7 @@ slot_button::slot_button() {
 	clip = false;
 }
 
-void slot_button::get_member_children(std::vector<augs::gui::rect_id>& children) {
+void slot_button::get_member_children(std::vector<augs::gui::rect_id>& children) const {
 
 }
 

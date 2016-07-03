@@ -51,7 +51,7 @@ namespace augs {
 				inactive_text.set_text(inactive_str);
 			}
 
-			void checklabel::get_member_children(std::vector<rect_id>& c) {
+			void checklabel::get_member_children(std::vector<rect_id>& c) const {
 				// c.push_back(&active_label());
 			}
 

@@ -16,7 +16,7 @@ void dynamic_tree_system::destruct(const_entity_handle handle) {
 
 	auto& cache = per_entity_cache[index];
 
-	if (cache.is_constructed) {
+	if (cache.is_constructed()) {
 		remove_element(always_visible_entities, entity_id(handle));
 
 		if (cache.tree_proxy_id != -1) {
@@ -26,7 +26,7 @@ void dynamic_tree_system::destruct(const_entity_handle handle) {
 			non_physical_objects_tree.DestroyProxy(cache.tree_proxy_id);
 		}
 
-		per_entity_cache[index].is_constructed = false;
+		per_entity_cache[index].constructed = false;
 	}
 }
 
@@ -38,7 +38,7 @@ void dynamic_tree_system::construct(const_entity_handle handle) {
 
 	auto& cache = per_entity_cache[index];
 
-	ensure(!cache.is_constructed);
+	ensure(!cache.is_constructed());
 
 	auto& dynamic_tree_node = handle.get<components::dynamic_tree_node>();
 
@@ -56,7 +56,7 @@ void dynamic_tree_system::construct(const_entity_handle handle) {
 			cache.tree_proxy_id = non_physical_objects_tree.CreateProxy(input, new entity_id(handle));
 		}
 
-		cache.is_constructed = true;
+		cache.constructed = true;
 	}
 }
 

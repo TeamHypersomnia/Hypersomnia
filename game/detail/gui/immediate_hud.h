@@ -37,6 +37,4 @@ struct immediate_hud {
 	void draw_vertically_flying_numbers(viewing_step&) const;
 
 	void acquire_game_events(fixed_step& step);
-private:
-	double get_current_time(viewing_step&) const;
 };

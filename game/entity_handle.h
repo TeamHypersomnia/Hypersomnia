@@ -105,6 +105,11 @@ namespace augs {
 		}
 
 		template<class component>
+		typename std::enable_if<!is_const, component_or_synchronizer<component>>::type add(const component_or_synchronizer<component>& c = component()) const {
+			return component_or_synchronizer<component>({ *this }).add(c.get_data());
+		}
+
+		template<class component>
 		decltype(auto) find() const {
 			static_assert(!is_component_synchronized<component>::value, "Cannot return a pointer to synchronized component!");
 			return allocator::find<component>();
@@ -116,7 +121,7 @@ namespace augs {
 		}
 
 		template<>
-		typename std::enable_if<!is_const, component_or_synchronizer<components::substance>>::type 
+		typename std::enable_if<!is_const, component_or_synchronizer<components::substance>>::type
 			add(const components::substance& c = components::substance()) const {
 			auto result = component_or_synchronizer<components::substance>({ *this }).add(c);
 			get_cosmos().complete_resubstantialization(*this);

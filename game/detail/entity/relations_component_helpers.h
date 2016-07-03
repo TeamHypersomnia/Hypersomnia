@@ -32,6 +32,8 @@ public:
 	entity_handle_type operator[](sub_entity_name) const;
 	entity_handle_type operator[](associated_entity_name) const;
 
+	sub_entity_name get_name_as_sub_entity() const;
+
 	void for_each_sub_entity_recursive(std::function<void(entity_handle_type)>) const;
 
 	bool has(sub_entity_name) const;

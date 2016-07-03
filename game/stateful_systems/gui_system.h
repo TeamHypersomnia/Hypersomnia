@@ -1,6 +1,6 @@
 #pragma once
 #include "game/components/gui_element_component.h"
-#include "game/messages/camera_render_request_message.h"
+#include "game/step.h"
 #include "game/messages/gui_intents.h"
 
 #include "augs/gui/gui_world.h"

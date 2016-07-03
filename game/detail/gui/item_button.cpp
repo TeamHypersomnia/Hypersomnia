@@ -21,7 +21,7 @@
 
 #include "ensure.h"
 
-void item_button::get_member_children(std::vector<augs::gui::rect_id>& children) {
+void item_button::get_member_children(std::vector<augs::gui::rect_id>& children) const {
 	// children.push_back(&charges_caption);
 }
 

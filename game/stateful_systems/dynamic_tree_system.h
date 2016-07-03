@@ -16,7 +16,7 @@ class dynamic_tree_system {
 	b2DynamicTree non_physical_objects_tree;
 
 	struct cache {
-		bool is_constructed = false;
+		bool constructed = false;
 		int tree_proxy_id = -1;
 
 		bool is_constructed() const;

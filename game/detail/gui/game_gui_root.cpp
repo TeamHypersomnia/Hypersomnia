@@ -4,7 +4,7 @@
 #include "item_button.h"
 #include "game/cosmos.h"
 
-void game_gui_root::get_member_children(std::vector<augs::gui::rect_id>& children) {
+void game_gui_root::get_member_children(std::vector<augs::gui::rect_id>& children) const {
 	children.push_back(&parent_of_inventory_controls);
 	children.push_back(&drop_item_icon);
 	children.push_back(&parent_of_game_windows);

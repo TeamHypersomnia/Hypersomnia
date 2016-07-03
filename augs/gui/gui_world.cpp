@@ -265,7 +265,7 @@ namespace augs {
 			return delta_ms;
 		}
 
-		void rect::get_all_descendants(std::vector<rect_id>& sum) {
+		void rect::get_all_descendants(std::vector<rect_id>& sum) const {
 			auto all = children;
 			get_member_children(all);
 

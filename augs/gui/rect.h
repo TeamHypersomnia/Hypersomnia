@@ -94,7 +94,7 @@ namespace augs {
 			rect(rects::xywh<float> rc = rects::xywh<float>());
 			rect(assets::texture_id);
 
-			virtual rects::wh<float> get_content_size();
+			virtual rects::wh<float> get_content_size() const;
 
 			void calculate_clipped_rectangle_layout();
 

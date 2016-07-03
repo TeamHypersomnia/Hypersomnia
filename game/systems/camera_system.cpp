@@ -8,7 +8,7 @@
 #include "game/components/crosshair_component.h"
 #include "game/components/physics_component.h"
 #include "game/messages/intent_message.h"
-#include "game/messages/camera_render_request_message.h"
+#include "game/step.h"
 #include "game/detail/state_for_drawing_camera.h"
 #include "game/cosmos.h"
 

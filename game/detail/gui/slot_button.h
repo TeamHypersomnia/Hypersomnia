@@ -11,7 +11,7 @@ struct slot_button : augs::gui::rect {
 	entity_id gui_element_entity;
 
 	augs::gui::text_drawer space_caption;
-	void get_member_children(std::vector<augs::gui::rect_id>&) final;
+	void get_member_children(std::vector<augs::gui::rect_id>&) const final;
 
 	bool houted_after_drag_started = true;
 

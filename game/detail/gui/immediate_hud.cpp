@@ -278,19 +278,14 @@ void immediate_hud::acquire_game_events(fixed_step& step) {
 	}
 }
 
-double immediate_hud::get_current_time(viewing_step& msg) const {
-	auto& world = msg.camera->get_owner_world();
-	return world.get_current_timestamp() + world.parent_overworld.fixed_delta_milliseconds() / 1000 * world.parent_overworld.view_interpolation_ratio();
-}
-
 void immediate_hud::draw_vertically_flying_numbers(viewing_step& msg) const {
 	auto& target = renderer::get_current();
 	
-	auto current_time = get_current_time(msg);
+	auto current_time = msg.get_delta().total_time_passed_in_seconds();
 
 	for (auto& r : recent_vertically_flying_numbers) { 
-		auto passed = current_time - r.time_of_occurence;
-		auto ratio =  passed.in_seconds() / r.maximum_duration_seconds;
+		auto passed = current_time - r.time_of_occurence.in_seconds();
+		auto ratio =  passed / r.maximum_duration_seconds;
 
 		r.text.pos = msg.get_screen_space((r.transform.pos - vec2(0, sqrt(passed) * 150.f)));
 		
@@ -307,7 +302,7 @@ void immediate_hud::draw_vertically_flying_numbers(viewing_step& msg) const {
 }
 
 void immediate_hud::draw_pure_color_highlights(viewing_step& msg) const {
-	auto current_time = get_current_time(msg);
+	auto current_time = msg.get_delta().total_time_passed_in_seconds();
 
 	for (auto& r : recent_pure_color_highlights) {
 		auto& col = r.target.get<components::sprite>().color;

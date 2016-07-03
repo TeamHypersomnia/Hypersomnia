@@ -2720,9 +2720,6 @@
     <ClInclude Include="game\messages\new_entity_message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\messages\camera_render_request_message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\resources\texture_with_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>

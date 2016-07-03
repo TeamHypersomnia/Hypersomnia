@@ -1157,7 +1157,6 @@
     <ClInclude Include="game\ingredients\renderable_includes.h" />
     <ClInclude Include="game\messages\animation_message.h" />
     <ClInclude Include="game\components\animation_response_component.h" />
-    <ClInclude Include="game\messages\camera_render_request_message.h" />
     <ClInclude Include="game\messages\collision_message.h" />
     <ClInclude Include="game\messages\gui_intents.h" />
     <ClInclude Include="game\messages\gunshot_response.h" />

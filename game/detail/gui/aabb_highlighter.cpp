@@ -1,13 +1,18 @@
 #include "aabb_highlighter.h"
 #include "game/components/sprite_component.h"
-#include "game/entity_id.h"
+#include "game/entity_handle.h"
+#include "game/step.h"
+#include "game/cosmos.h"
+#include "graphics/renderer.h"
 
 void aabb_highlighter::update(float delta) {
 	timer += delta;
 	timer = fmod(timer, cycle_duration_ms);
 }
 
-void aabb_highlighter::draw(shared::state_for_drawing_camera camera, entity_id subject) {
+void aabb_highlighter::draw(viewing_step& step, const_entity_handle subject) {
+	auto& cosmos = step.cosm;
+	
 	vec2i as;
 	vec2i ap;
 
@@ -18,12 +23,11 @@ void aabb_highlighter::draw(shared::state_for_drawing_camera camera, entity_id s
 
 	rects::ltrb<float> aabb;
 
-	subject.for_each_sub_entity_recursive([&aabb](entity_id e) {
+	subject.for_each_sub_entity_recursive([&aabb](const_entity_handle e) {
 		auto* sprite = e.find<components::sprite>();
-		auto* physics = e.find<components::physics_definition>();
 
-		if (e->get_name_as_sub_entity() == sub_entity_name::CHARACTER_CROSSHAIR
-			|| e->get_name_as_sub_entity() == sub_entity_name::CROSSHAIR_RECOIL_BODY)
+		if (e.get_name_as_sub_entity() == sub_entity_name::CHARACTER_CROSSHAIR
+			|| e.get_name_as_sub_entity() == sub_entity_name::CROSSHAIR_RECOIL_BODY)
 			return;
 
 		if (sprite) {
@@ -58,8 +62,8 @@ void aabb_highlighter::draw(shared::state_for_drawing_camera camera, entity_id s
 	ap = aabb.get_position();
 
 	if (aabb.good()) {
-		shared::state_for_drawing_renderable state;
-		state.setup_camera_state(camera);
+		components::sprite::drawing_input state(step.renderer.triangles);
+		state.setup_from(step.camera_state);
 		state.position_is_left_top_corner = true;
 		state.renderable_transform.rotation = 0;
 

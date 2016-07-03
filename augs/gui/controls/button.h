@@ -30,7 +30,7 @@ namespace augs {
 				text_button(const button&, const text::fstr&);
 				text_button(const button&, vec2i, const text::fstr&);
 
-				void get_member_children(std::vector<rect_id>& children) override;
+				void get_member_children(std::vector<rect_id>& children) const override;
 
 				void draw_label(draw_info);
 				void center();

@@ -1,6 +1,7 @@
 #pragma once
 #include "game/detail/state_for_drawing_camera.h"
 #include "game/entity_id.h"
+class viewing_step;
 
 struct aabb_highlighter {
 	float timer = 0.f;
@@ -12,5 +13,5 @@ struct aabb_highlighter {
 	float scale_down_when_aabb_no_bigger_than = 40.f;
 
 	void update(float delta);
-	void draw(shared::state_for_drawing_camera, entity_id subject);
+	void draw(viewing_step&, const_entity_handle subject);
 };

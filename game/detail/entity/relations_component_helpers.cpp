@@ -44,6 +44,16 @@ basic_entity_handle<C> relations_component_helpers<C>::operator[](sub_entity_nam
 }
 
 template <bool C>
+sub_entity_name relations_component_helpers<C>::get_name_as_sub_entity() const {
+	auto& self = *static_cast<const entity_handle_type*>(this);
+	
+	if (!self.has<components::relations>())
+		return sub_entity_name::INVALID;
+
+	return relations().name_as_sub_entity;
+}
+
+template <bool C>
 basic_entity_handle<C> relations_component_helpers<C>::operator[](associated_entity_name assoc) const {
 	return make_handle(relations().associated_entities_by_name.at(assoc));
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "game/messages/camera_render_request_message.h"
+#include "game/step.h"
 #include "special_drag_and_drop_target.h"
 #include "gui/text_drawer.h"
 #include "gui/gui_world.h"
@@ -12,7 +12,7 @@ struct game_gui_root : public augs::gui::rect {
 	special_drag_and_drop_target drop_item_icon = special_drag_and_drop_target(augs::gui::material(assets::texture_id::DROP_HAND_ICON, red));
 
 	game_gui_root();
-	void get_member_children(std::vector<augs::gui::rect_id>& children) final;
+	void get_member_children(std::vector<augs::gui::rect_id>& children) const final;
 };
 
 class gui_system;
