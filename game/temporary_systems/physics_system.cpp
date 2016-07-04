@@ -22,11 +22,128 @@ double PIXELS_TO_METERS = 1.0 / METERS_TO_PIXELS;
 float METERS_TO_PIXELSf = 100.f;
 float PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 
-physics_system::physics_system() : 
-b2world(b2Vec2(0.f, 0.f)), ray_casts_since_last_step(0) {
-	b2world.SetAllowSleeping(false);
-	b2world.SetAutoClearForces(false);
-	enable_listener(true);
+bool physics_system::is_constructed_rigid_body(const_entity_handle handle) const {
+	return handle.alive() && rigid_body_caches[handle.get_id().indirection_index].body != nullptr;
+}
+
+bool physics_system::is_constructed_colliders(const_entity_handle handle) const {
+	return 
+		handle.alive() && is_constructed_rigid_body(handle.get<components::fixtures>().get_owner_body())
+		&& 
+		colliders_caches[handle.get_id().indirection_index].fixtures_per_collider.size()> 0 && 
+		colliders_caches[handle.get_id().indirection_index].fixtures_per_collider[0].size() > 0;
+}
+
+physics_system::rigid_body_black_box_detail& physics_system::get_rigid_body_cache(const_entity_handle handle) {
+	return rigid_body_caches[handle.get_id().indirection_index];
+}
+
+physics_system::colliders_black_box_detail& physics_system::get_colliders_cache(const_entity_handle handle) {
+	return colliders_caches[handle.get_id().indirection_index];
+}
+
+void physics_system::destruct(const_entity_handle handle) {
+	if (is_constructed_rigid_body(handle)) {
+		auto& cache = get_rigid_body_cache(handle);
+		
+		auto fixture_entities = handle.get<components::physics>().get_fixture_entities();
+
+		for (auto& f : fixture_entities)
+			destruct(f);
+
+		b2world.DestroyBody(cache.body);
+
+		cache = rigid_body_black_box_detail();
+	}
+	
+	if (is_constructed_colliders(handle)) {
+		auto& cache = get_colliders_cache(handle);
+		auto& owner_body_cache = get_rigid_body_cache(handle.get<components::fixtures>().get_owner_body());
+
+		for (auto& f_per_c : cache.fixtures_per_collider)
+			for (auto f : f_per_c)
+				owner_body_cache.body->DestroyFixture(f);
+
+		cache = colliders_black_box_detail();
+	}
+}
+
+void physics_system::construct(const_entity_handle handle) {
+	ensure(!is_constructed_rigid_body(handle));
+	ensure(!is_constructed_colliders(handle));
+
+	if (handle.has<components::fixtures>()) {
+		auto& colliders = handle.get<components::fixtures>();
+
+		if (colliders.is_activated() && is_constructed_rigid_body(colliders.get_owner_body())) {
+			auto& colliders_data = colliders.get_data();
+			auto& cache = get_colliders_cache(handle);
+
+			for (const auto& c : colliders_data.colliders) {
+				b2PolygonShape shape;
+
+				b2FixtureDef fixdef;
+				fixdef.density = c.density;
+				fixdef.friction = c.friction;
+				fixdef.isSensor = c.sensor;
+				fixdef.filter = c.filter;
+				fixdef.restitution = c.restitution;
+				fixdef.shape = &shape;
+				fixdef.userData = handle;
+
+				auto transformed_shape = c.shape;
+				transformed_shape.offset_vertices(colliders.get_total_offset());
+
+				std::vector<b2Fixture*> partitioned_collider;
+
+				auto owner_body_entity = colliders.get_owner_body();
+				ensure(owner_body_entity.alive());
+				auto& owner_cache = get_rigid_body_cache(owner_body_entity);
+
+				for (auto convex : transformed_shape.convex_polys) {
+					std::vector<b2Vec2> b2verts(convex.begin(), convex.end());
+
+					for (auto& v : b2verts)
+						v *= PIXELS_TO_METERSf;
+
+					shape.Set(b2verts.data(), b2verts.size());
+					partitioned_collider.push_back(owner_cache.body->CreateFixture(&fixdef));
+				}
+
+				cache.fixtures_per_collider.push_back(partitioned_collider);
+			}
+		}
+	}
+
+	if (handle.has<components::physics>()) {
+		auto& physics = handle.get<components::physics>();
+
+		if (physics.is_activated()) {
+			auto& physics_data = physics.get_data();
+			auto& cache = get_rigid_body_cache(handle);
+
+			b2BodyDef def;
+			def.type = b2BodyType(physics_data.body_type);
+			def.angle = 0;
+			def.userData = handle;
+			def.bullet = physics_data.bullet;
+			def.position = physics_data.transform.pos * PIXELS_TO_METERSf;
+			def.angle = physics_data.transform.rotation * DEG_TO_RAD;
+			def.angularDamping = physics_data.angular_damping;
+			def.linearDamping = physics_data.linear_damping;
+			def.fixedRotation = physics_data.fixed_rotation;
+			def.gravityScale = physics_data.gravity_scale;
+			def.active = true;
+			def.linearVelocity = physics_data.velocity * PIXELS_TO_METERSf;
+			def.angularVelocity = physics_data.angular_velocity * DEG_TO_RAD;
+
+			cache.body = b2world.CreateBody(&def);
+			cache.body->SetAngledDampingEnabled(physics_data.angled_damping);
+
+			for (auto& f : physics.get_fixture_entities())
+				construct(f);
+		}
+	}
 }
 
 void physics_system::reserve_caches_for_entities(size_t n) {
@@ -34,8 +151,11 @@ void physics_system::reserve_caches_for_entities(size_t n) {
 	colliders_caches.resize(n);
 }
 
-void physics_system::enable_listener(bool flag) {
-	b2world.SetContactListener(flag ? &listener : nullptr);
+physics_system::physics_system() : 
+b2world(b2Vec2(0.f, 0.f)), ray_casts_since_last_step(0) {
+	b2world.SetAllowSleeping(false);
+	b2world.SetAutoClearForces(false);
+	b2world.SetContactListener(&listener);
 }
 
 void physics_system::step_and_set_new_transforms(fixed_step& step) {
@@ -115,7 +235,7 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 		auto body_pos = METERS_TO_PIXELSf * b->GetPosition();
 		auto body_angle = b->GetAngle() * RAD_TO_DEG;
 
-		for (auto& ff : physics.black_detail.fixture_entities) {
+		for (auto& ff : physics.get_fixture_entities()) {
 			auto fe = cosmos[ff];
 
 			auto& fixtures = fe.get<components::fixtures>();
@@ -140,89 +260,8 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 		if (!b->IsFixedRotation())
 			transform.rotation = body_angle;
 
-		physics.black.transform = transform;
-		physics.black.velocity = METERS_TO_PIXELSf * b->GetLinearVelocity();
-		physics.black.angular_velocity = RAD_TO_DEG * b->GetAngularVelocity();
-	}
-}
-
-void physics_system::destruct(const_entity_handle handle) {
-	auto id = handle.get_id();
-	size_t index = id.indirection_index;
-
-	if (per_entity_cache[index].is_constructed) {
-		for (auto& list : lists)
-			remove_element(list.second, id);
-
-		per_entity_cache[index].is_constructed = false;
-	}
-}
-
-void physics_system::construct(const_entity_handle handle) {
-	auto id = handle.get_id();
-	size_t index = id.indirection_index;
-
-	ensure(!per_entity_cache[index].is_constructed);
-
-	auto& processing = handle.get<components::processing>();
-
-	for (auto& list : lists)
-		if (processing.is_in(list.first))
-			list.second.push_back(id);
-
-	per_entity_cache[index].is_constructed = true;
-}
-
-void physics_system::reserve_caches_for_entities(size_t n) {
-	per_entity_cache.reserve(n);
-}
-
-void physics_system::react_to_destroyed_entities(step_state& step) {
-	auto& events = step.messages.get_queue<messages::will_soon_be_deleted>();
-
-	for (auto& it : events) {
-		auto e = parent_cosmos[it.subject];
-
-		auto* maybe_physics = e.find<components::physics>();
-		auto* maybe_fixtures = e.find<components::fixtures>();
-
-		if (maybe_physics)
-			maybe_physics->destroy_body();
-
-		if (maybe_fixtures)
-			maybe_fixtures->destroy_fixtures();
-	}
-}
-
-void physics_system::react_to_new_entities(step_state& step) {
-	auto& events = step.messages.get_queue<messages::new_entity_message>();
-
-	for (auto& it : events) {
-		auto e = parent_cosmos[it.subject];
-
-		auto* maybe_physics = e.find<components::physics>();
-		auto* maybe_fixtures = e.find<components::fixtures>();
-
-		if (maybe_physics) {
-			maybe_physics->black_detail.body_owner = e;
-			maybe_physics->black_detail.parent_system = this;
-
-			if (maybe_physics->should_body_exist_now()) {
-				maybe_physics->build_body();
-			}
-		}
-
-		if (maybe_fixtures) {
-			if (parent_cosmos[maybe_fixtures->get_owner_body()].dead()) {
-				maybe_fixtures->set_owner_body(e);
-			}
-
-			maybe_fixtures->black_detail.all_fixtures_owner = e;
-			maybe_fixtures->black_detail.parent_system = this;
-
-			if (maybe_fixtures->should_fixtures_exist_now()) {
-				maybe_fixtures->build_fixtures();
-			}
-		}
+		physics.get_data().transform = transform;
+		physics.get_data().velocity = METERS_TO_PIXELSf * b->GetLinearVelocity();
+		physics.get_data().angular_velocity = RAD_TO_DEG * b->GetAngularVelocity();
 	}
 }

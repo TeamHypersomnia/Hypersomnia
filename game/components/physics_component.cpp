@@ -11,41 +11,16 @@
 #include "ensure.h"
 #include "game/entity_handle.h"
 
+template<bool C>
+bool component_synchronizer<C, components::physics>::can_synchronize() const {
+	return handle.get_cosmos().temporary_systems.get<physics_system>().is_constructed_rigid_body(handle);
+}
+
 namespace components {
+	
+
 	void physics::build_body() {
-		ensure(black_detail.body == nullptr);
 
-		b2BodyDef def;
-		def.type = b2BodyType(black.body_type);
-		def.angle = 0;
-		def.userData = get_entity();
-		def.bullet = black.bullet;
-		def.position = black.transform.pos * PIXELS_TO_METERSf;
-		def.angle = black.transform.rotation * DEG_TO_RAD;
-		def.angularDamping = black.angular_damping;
-		def.linearDamping = black.linear_damping;
-		def.fixedRotation = black.fixed_rotation;
-		def.gravityScale = black.gravity_scale;
-		def.active = true;
-		def.linearVelocity = black.velocity * PIXELS_TO_METERSf;
-		def.angularVelocity = black.angular_velocity * DEG_TO_RAD;
-
-		black_detail.body = black_detail.parent_system->b2world.CreateBody(&def);
-		black_detail.body->SetAngledDampingEnabled(black.angled_damping);
-
-		const auto& all_fixture_entities = black_detail.fixture_entities;
-
-		for (auto fe : all_fixture_entities) {
-			auto& fixtures = fe.get<components::fixtures>();
-
-			if (fixtures.should_fixtures_exist_now()) {
-				fixtures.destroy_fixtures();
-				fixtures.build_fixtures();
-			}
-			else {
-				fixtures.destroy_fixtures();
-			}
-		}
 	}
 
 	void physics::destroy_body() {

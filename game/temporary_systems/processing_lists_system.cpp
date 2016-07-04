@@ -14,7 +14,7 @@ void processing_lists_system::destruct(const_entity_handle handle) {
 		for (auto& list : lists)
 			remove_element(list.second, id);
 
-		per_entity_cache[index].is_constructed = false;
+		per_entity_cache[index] = cache();
 	}
 }
 

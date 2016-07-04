@@ -14,6 +14,14 @@ class cosmos;
 class fixed_step;
 
 class physics_system {
+	struct rigid_body_black_box_detail {
+		b2Body* body = nullptr;
+	};
+
+	struct colliders_black_box_detail {
+		std::vector<std::vector<b2Fixture*>> fixtures_per_collider;
+	};
+
 	std::vector<colliders_black_box_detail> colliders_caches;
 	std::vector<rigid_body_black_box_detail> rigid_body_caches;
 
@@ -24,6 +32,14 @@ class physics_system {
 	friend class cosmos;
 	friend class component_synchronizer<false, components::physics>;
 	friend class component_synchronizer<true, components::physics>;
+	friend class component_synchronizer<false, components::fixtures>;
+	friend class component_synchronizer<true, components::fixtures>;
+
+	bool is_constructed_rigid_body(const_entity_handle) const;
+	bool is_constructed_colliders(const_entity_handle) const;
+
+	rigid_body_black_box_detail& get_rigid_body_cache(const_entity_handle);
+	colliders_black_box_detail& get_colliders_cache(const_entity_handle);
 public:
 	struct raycast_output {
 		vec2 intersection, normal;
@@ -86,11 +102,6 @@ public:
 	query_output query_polygon(const std::vector<vec2>& vertices, b2Filter filter, entity_id ignore_entity = entity_id());
 	query_output query_shape(b2Shape*, b2Filter filter, entity_id ignore_entity = entity_id());
 	
-	void enable_listener(bool flag);
-
-	void react_to_new_entities(fixed_step&);
-	void react_to_destroyed_entities(fixed_step&);
-
 	void step_and_set_new_transforms(fixed_step&);
 
 	int ray_casts_since_last_step = 0;

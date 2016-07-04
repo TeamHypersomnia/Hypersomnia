@@ -9,8 +9,10 @@ extern float METERS_TO_PIXELSf;
 extern float PIXELS_TO_METERSf;
 
 namespace components {
-	class physics {
+	struct physics {
+	private:
 		std::vector<entity_id> fixture_entities;
+		friend class component_synchronizer<false, components::fixtures>;
 	public:
 		components::transform transform;
 
@@ -35,8 +37,6 @@ namespace components {
 
 		vec2 velocity;
 		float angular_velocity = 0.f;
-
-		void add_child_collider(entity_handle);
 	};
 	
 	struct fixtures;
@@ -46,34 +46,31 @@ class physics_system;
 
 template<bool is_const>
 class component_synchronizer<is_const, components::physics> : public component_synchronizer_base<is_const, components::physics> {
-	bool syncable_black_box_exists() const;
-	bool should_body_exist_now() const;
-
-	void build_body();
-	void destroy_body();
-
 	friend class ::physics_system;
-	friend struct ::components::fixtures;
+	friend class component_synchronizer<is_const, components::fixtures>;
 
 public:
 	using component_synchronizer_base<is_const, components::physics>::component_synchronizer_base;
 
 	void set_body_type(type);
-	void set_activated(bool);
 
-	void set_velocity(vec2);
-	void set_transform(components::transform);
-	void set_transform(entity_id);
+	typename std::enable_if<!is_const, void>::type set_activated(bool);
+	bool is_activated() const;
+	bool is_constructed() const;
 
-	void set_angular_damping(float);
-	void set_linear_damping(float);
-	void set_linear_damping_vec(vec2);
+	typename std::enable_if<!is_const, void>::type set_velocity(vec2);
+	typename std::enable_if<!is_const, void>::type set_transform(components::transform);
+	typename std::enable_if<!is_const, void>::type set_transform(entity_id);
 
-	void apply_force(vec2);
-	void apply_force(vec2, vec2 center_offset, bool wake = true);
-	void apply_impulse(vec2);
-	void apply_impulse(vec2, vec2 center_offset, bool wake = true);
-	void apply_angular_impulse(float);
+	typename std::enable_if<!is_const, void>::type set_angular_damping(float);
+	typename std::enable_if<!is_const, void>::type set_linear_damping(float);
+	typename std::enable_if<!is_const, void>::type set_linear_damping_vec(vec2);
+
+	typename std::enable_if<!is_const, void>::type apply_force(vec2);
+	typename std::enable_if<!is_const, void>::type apply_force(vec2, vec2 center_offset, bool wake = true);
+	typename std::enable_if<!is_const, void>::type apply_impulse(vec2);
+	typename std::enable_if<!is_const, void>::type apply_impulse(vec2, vec2 center_offset, bool wake = true);
+	typename std::enable_if<!is_const, void>::type apply_angular_impulse(float);
 
 	vec2 velocity() const;
 	float get_mass() const;
@@ -87,11 +84,9 @@ public:
 
 	type get_body_type() const;
 
-	bool is_activated() const;
-
 	basic_entity_handle<is_const> get_owner_friction_ground() const;
 
-	const std::vector<entity_id>& get_fixture_entities() const;
+	const std::vector<basic_entity_handle<is_const>>& get_fixture_entities() const;
 
 	bool test_point(vec2) const;
 };

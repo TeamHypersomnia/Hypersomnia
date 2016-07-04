@@ -13,11 +13,7 @@ class b2Body;
 class b2Fixture;
 class physics_system;
 
-struct rigid_body_black_box_detail {
-	physics_system* parent_system = nullptr;
-	b2Body* body = nullptr;
-	entity_id body_owner;
-};
+
 
 struct rigid_body_black_box {
 	components::transform transform;
@@ -68,12 +64,6 @@ struct rigid_body_definition : public rigid_body_black_box, public rigid_body_wh
 
 };
 
-struct colliders_black_box_detail {
-	entity_id all_fixtures_owner;
-	physics_system* parent_system = nullptr;
-	std::vector<std::vector<b2Fixture*>> fixtures_per_collider;
-};
-
 struct convex_partitioned_collider {
 	convex_partitioned_shape shape;
 	b2Filter filter;
@@ -87,27 +77,9 @@ struct convex_partitioned_collider {
 };
 
 struct colliders_black_box {
-	std::vector<convex_partitioned_collider> colliders;
-	bool activated = true;
-
-	entity_id owner_body;
-
-	enum class offset_type {
-		ITEM_ATTACHMENT_DISPLACEMENT,
-		SPECIAL_MOVE_DISPLACEMENT
-	};
-
-	std::array<components::transform, 2> offsets_for_created_shapes;
-
-	convex_partitioned_collider& new_collider() {
-		colliders.push_back(convex_partitioned_collider());
-		return *colliders.rbegin();
-	}
 };
 
 struct colliders_white_box {
-	bool is_friction_ground = false;
-	bool disable_standard_collision_resolution = false;
 };
 
 struct colliders_definition : public colliders_black_box, public colliders_white_box {

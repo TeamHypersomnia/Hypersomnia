@@ -15,6 +15,12 @@ protected:
 	void complete_resubstantialization() {
 		handle.get_cosmos().complete_resubstantialization(handle);
 	}
+
+	template<class = std::enable_if<!is_const>::type>
+	component_type& get_data() {
+		return component;
+	}
+
 public:
 	const component_type& get_data() const {
 		return component;

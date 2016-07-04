@@ -9,6 +9,11 @@
 #include <string>
 #include <functional>
 namespace components {
+	void components::set_owner_body(entity_handle owner) {
+		owner.get<components::physics>().get_data().add_child_collider(this);
+	}
+
+
 	fixtures& fixtures::operator=(const fixtures& f) {
 		initialize_from_definition(f.get_definition());
 	}
@@ -82,35 +87,7 @@ namespace components {
 	void fixtures::build_fixtures() {
 		ensure(black_detail.fixtures_per_collider.empty());
 
-		for (const auto& c : black.colliders) {
-			b2PolygonShape shape;
 
-			b2FixtureDef fixdef;
-			fixdef.density = c.density;
-			fixdef.friction = c.friction;
-			fixdef.isSensor = c.sensor;
-			fixdef.filter = c.filter;
-			fixdef.restitution = c.restitution;
-			fixdef.shape = &shape;
-			fixdef.userData = black_detail.all_fixtures_owner;
-
-			auto transformed_shape = c.shape;
-			transformed_shape.offset_vertices(get_total_offset());
-			
-			std::vector<b2Fixture*> partitioned_collider;
-
-			for (auto convex : transformed_shape.convex_polys) {
-				std::vector<b2Vec2> b2verts(convex.begin(), convex.end());
-
-				for (auto& v : b2verts)
-					v *= PIXELS_TO_METERSf;
-
-				shape.Set(b2verts.data(), b2verts.size());
-				partitioned_collider.push_back(get_body()->CreateFixture(&fixdef));
-			}
-
-			black_detail.fixtures_per_collider.push_back(partitioned_collider);
-		}
 	}
 
 	void fixtures::set_offset(offset_type t, components::transform off) {

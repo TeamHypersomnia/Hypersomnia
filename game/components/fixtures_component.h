@@ -7,59 +7,66 @@
 #include "game/detail/physics_engine_reflected_state.h"
 #include "game/substantialized_component.h"
 
-
 namespace components {
 	struct fixtures : private substantialized_component<colliders_white_box, colliders_black_box, colliders_black_box_detail> {
 	private:
-		friend struct components::physics;
-		friend class ::physics_system;
-
-		colliders_black_box black;
-		colliders_black_box_detail black_detail;
-
-		bool syncable_black_box_exists() const;
-		bool should_fixtures_exist_now() const;
-
-		void destroy_fixtures();
-		void build_fixtures();
-
-		void rebuild_density(size_t);
-
+		entity_id owner_body;
+		friend class component_synchronizer<false, components::fixtures>;
 	public:
-		typedef colliders_black_box::offset_type offset_type;
 
-		fixtures& operator=(const fixtures&);
-		fixtures(const fixtures&);
+		std::vector<convex_partitioned_collider> colliders;
+		bool activated = true;
 
-		fixtures(const colliders_definition& = colliders_definition());
-		void initialize_from_definition(const colliders_definition& = colliders_definition());
-		colliders_definition get_definition() const;
+		enum class offset_type {
+			ITEM_ATTACHMENT_DISPLACEMENT,
+			SPECIAL_MOVE_DISPLACEMENT
+		};
 
-		void set_offset(offset_type, components::transform);
-		components::transform get_offset(offset_type) const;
-		components::transform get_total_offset() const;
+		std::array<components::transform, 2> offsets_for_created_shapes;
 
-		void set_activated(bool);
-		bool is_activated() const;
+		convex_partitioned_collider& new_collider() {
+			colliders.push_back(convex_partitioned_collider());
+			return *colliders.rbegin();
+		}
 
-		void set_density(float, size_t = 0);
-		void set_density_multiplier(float, size_t = 0);
-		void set_friction(float, size_t = 0);
-		void set_restitution(float, size_t = 0);
-
-		float get_density_multiplier(size_t = 0) const;
-		float get_friction(size_t = 0) const;
-		float get_restitution(size_t = 0) const;
-		float get_density(size_t = 0) const;
-
-		void set_owner_body(entity_id);
-		entity_id get_owner_body() const;
-
-		vec2 get_aabb_size() const;
-		augs::rects::ltrb<float> get_aabb_rect() const;
-
-		size_t get_num_colliders() const;
-
-		b2Body* get_body() const;
+		bool is_friction_ground = false;
+		bool disable_standard_collision_resolution = false;
 	};
 }
+
+template<bool is_const>
+class component_synchronizer<is_const, components::fixtures> : public component_synchronizer_base<is_const, components::fixtures> {
+	void rebuild_density(size_t);
+
+	friend struct components::physics;
+	friend class ::physics_system;
+
+public:
+	using component_synchronizer_base<is_const, components::fixtures>::component_synchronizer_base;
+
+	void set_offset(offset_type, components::transform);
+	components::transform get_offset(offset_type) const;
+	components::transform get_total_offset() const;
+
+	void set_activated(bool);
+	bool is_activated() const;
+	bool is_constructed() const;
+
+	void set_density(float, size_t = 0);
+	void set_density_multiplier(float, size_t = 0);
+	void set_friction(float, size_t = 0);
+	void set_restitution(float, size_t = 0);
+
+	float get_density_multiplier(size_t = 0) const;
+	float get_friction(size_t = 0) const;
+	float get_restitution(size_t = 0) const;
+	float get_density(size_t = 0) const;
+
+	typename std::enable_if<!is_const, void>::type set_owner_body(basic_entity_handle<is_const>);
+	basic_entity_handle<false> get_owner_body() const;
+
+	vec2 get_aabb_size() const;
+	augs::rects::ltrb<float> get_aabb_rect() const;
+
+	size_t get_num_colliders() const;
+};

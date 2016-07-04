@@ -26,7 +26,7 @@ void dynamic_tree_system::destruct(const_entity_handle handle) {
 			non_physical_objects_tree.DestroyProxy(cache.tree_proxy_id);
 		}
 
-		per_entity_cache[index].constructed = false;
+		per_entity_cache[index] = dynamic_tree_system::cache();
 	}
 }
 
