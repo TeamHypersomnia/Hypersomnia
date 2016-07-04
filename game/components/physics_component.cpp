@@ -12,32 +12,6 @@
 #include "game/entity_handle.h"
 
 namespace components {
-	physics& physics::operator=(const physics& p) {
-		initialize_from_definition(p.get_definition());
-	}
-
-	physics::physics(const physics& p) {
-		initialize_from_definition(p.get_definition());
-	}
-
-	physics::physics(const rigid_body_definition& def) {
-		initialize_from_definition(def);
-	}
-
-	void physics::initialize_from_definition(const rigid_body_definition& def) {
-		black = def;
-		rigid_body_white_box::operator=(def);
-
-		destroy_body();
-
-		if (should_body_exist_now())
-			build_body();
-	}
-
-	entity_handle physics::get_entity() {
-		return black_detail.parent_system->parent_cosmos[black_detail.body_owner];
-	}
-
 	void physics::build_body() {
 		ensure(black_detail.body == nullptr);
 
@@ -257,10 +231,6 @@ namespace components {
 		return black.activated;
 	}
 
-	entity_id physics::get_owner_friction_ground() const {
-		return owner_friction_ground;
-	}
-	
 	void physics::set_transform(entity_id id) {
 		set_transform(id.get<components::transform>());
 	}

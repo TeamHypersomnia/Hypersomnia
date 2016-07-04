@@ -42,7 +42,6 @@ public:
 	cosmic_profiler profiler;
 
 	unsigned long long current_step_number = 0;
-	double seconds_passed = 0.0;
 
 	augs::fixed_delta delta;
 

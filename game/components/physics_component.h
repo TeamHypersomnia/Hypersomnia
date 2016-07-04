@@ -1,6 +1,7 @@
 #pragma once
 #include "misc/stepped_timing.h"
 #include "game/component_synchronizer.h"
+#include "game/entity_handle_declaration.h"
 
 extern double METERS_TO_PIXELS;
 extern double PIXELS_TO_METERS;
@@ -8,7 +9,9 @@ extern float METERS_TO_PIXELSf;
 extern float PIXELS_TO_METERSf;
 
 namespace components {
-	struct physics {
+	class physics {
+		std::vector<entity_id> fixture_entities;
+	public:
 		components::transform transform;
 
 		bool activated = true;
@@ -32,6 +35,8 @@ namespace components {
 
 		vec2 velocity;
 		float angular_velocity = 0.f;
+
+		void add_child_collider(entity_handle);
 	};
 	
 	struct fixtures;
@@ -84,7 +89,7 @@ public:
 
 	bool is_activated() const;
 
-	entity_id get_owner_friction_ground() const;
+	basic_entity_handle<is_const> get_owner_friction_ground() const;
 
 	const std::vector<entity_id>& get_fixture_entities() const;
 

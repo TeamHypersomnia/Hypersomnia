@@ -10,7 +10,7 @@ namespace components {
 
 		rects::ltrb<float> aabb;
 
-		dynamic_tree_node& from_renderable(const_entity_handle);
+		static dynamic_tree_node get_default(const_entity_handle);
 	};
 }
 

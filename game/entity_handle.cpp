@@ -46,20 +46,21 @@ template<class = typename std::enable_if<!C>::type>
 components::processing& basic_entity_handle<C>::add(const components::processing& c) const {
 	return aggregate::add(c);
 }
+*/
 
 template <bool C>
 template <class = typename std::enable_if<!C>::type>
-void basic_entity_handle<C>::add_standard_components() {
+void basic_handle<C, cosmos, put_all_components_into<component_aggregate>::type>::add_standard_components() {
 	if (has<components::render>() && !is_entity_physical(*this) && !has<components::dynamic_tree_node>())
-		add(components::dynamic_tree_node().from_renderable(*this));
+		add(components::dynamic_tree_node::get_default(*this));
 
 	if (has<components::physics>() && !has<components::special_physics>())
 		add<components::special_physics>();
 
-	add(get_cosmos().temporary_systems.get<processing_lists_system>().get_standard_processing());
+	add(components::processing::get_default(*this));
 	add<components::substance>();
 }
-*/
+
 // explicit instantiation
 template class basic_handle<true, cosmos, put_all_components_into<component_aggregate>::type>;
 template class basic_handle<false, cosmos, put_all_components_into<component_aggregate>::type>;

@@ -17,7 +17,6 @@ struct rigid_body_black_box_detail {
 	physics_system* parent_system = nullptr;
 	b2Body* body = nullptr;
 	entity_id body_owner;
-	std::vector<entity_id> fixture_entities;
 };
 
 struct rigid_body_black_box {

@@ -28,8 +28,6 @@ class processing_lists_system {
 	friend class cosmos;
 public:
 
-	components::processing get_default_processing(const_entity_handle) const;
-
 	std::vector<entity_handle> get(processing_subjects, cosmos&) const;
 	std::vector<const_entity_handle> get(processing_subjects, const cosmos&) const;
 };

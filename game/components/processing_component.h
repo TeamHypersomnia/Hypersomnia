@@ -6,6 +6,8 @@
 namespace components {
 	struct processing {
 		typedef std::bitset<int(processing_subjects::LIST_COUNT)> bitset_type;
+		static components::processing get_default(const_entity_handle);
+		
 		bool activated = true;
 
 		bitset_type processing_subject_categories = 0;

@@ -291,6 +291,5 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	rotation_copying_system().update_rotations();
 
 	++current_step_number;
-	seconds_passed += delta.in_seconds();
 	performance.stop(meter_type::LOGIC);
 }

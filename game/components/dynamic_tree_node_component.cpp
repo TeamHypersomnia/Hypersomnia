@@ -8,7 +8,9 @@
 #include "game/components/transform_component.h"
 
 namespace components {
-	dynamic_tree_node& dynamic_tree_node::from_renderable(const_entity_handle e) {
+	dynamic_tree_node dynamic_tree_node::get_default(const_entity_handle e) {
+		dynamic_tree_node result;
+
 		auto* sprite = e.find<components::sprite>();
 		auto* polygon = e.find<components::polygon>();
 		auto* tile_layer = e.find<components::tile_layer>();
@@ -16,12 +18,12 @@ namespace components {
 
 		auto transform = e.get<components::transform>();
 
-		if (sprite) aabb = sprite->get_aabb(transform);
-		if (polygon) aabb = polygon->get_aabb(transform);
-		if (tile_layer) aabb = tile_layer->get_aabb(transform);
+		if (sprite) result.aabb = sprite->get_aabb(transform);
+		if (polygon) result.aabb = polygon->get_aabb(transform);
+		if (tile_layer) result.aabb = tile_layer->get_aabb(transform);
 
-		if (particle_group) always_visible = true;
+		if (particle_group) result.always_visible = true;
 
-		return *this;
+		return result;
 	}
 }
