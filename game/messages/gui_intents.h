@@ -1,8 +1,7 @@
 #pragma once
 #include "game/entity_id.h"
 #include "game/detail/inventory_slot_id.h"
-
-struct item_slot_transfer_request;
+#include "game/detail/item_slot_transfer_request.h"
 
 namespace messages {
 	struct gui_item_transfer_intent {

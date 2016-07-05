@@ -8,6 +8,7 @@
 #include "transform_component.h"
 #include "game/component_synchronizer.h"
 #include "game/detail/convex_partitioned_shape.h"
+#include <Box2D/Dynamics/b2Fixture.h>
 
 namespace components {
 	struct fixtures {
@@ -50,6 +51,7 @@ namespace components {
 }
 
 struct colliders_cache;
+class physics_system;
 
 template<bool is_const>
 class component_synchronizer<is_const, components::fixtures> : public component_synchronizer_base<is_const, components::fixtures> {

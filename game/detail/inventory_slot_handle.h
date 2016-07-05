@@ -7,6 +7,8 @@
 #include "game/enums/slot_function.h"
 #include "game/detail/inventory_slot_id.h"
 
+#include "templates.h"
+
 struct inventory_slot;
 
 namespace components {
@@ -40,6 +42,7 @@ public:
 
 	void for_each_descendant(std::function<void(entity_handle_type item)>) const;
 
+	slot_reference get() const;
 	slot_reference operator*() const;
 	slot_pointer operator->() const;
 
@@ -71,4 +74,5 @@ public:
 
 	inventory_slot_id get_id() const;
 	operator inventory_slot_id() const;
+	operator basic_inventory_slot_handle<true>() const;
 };
