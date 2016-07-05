@@ -66,7 +66,9 @@ public:
 
 	template<class T>
 	decltype(auto) to_handle_vector(std::vector<T> vec) {
-		std::vector<decltype(get_handle())> handles;
+		auto dummy = get_handle(T());
+
+		std::vector<decltype(dummy)> handles;
 
 		for (auto v : vec)
 			handles.emplace_back(get_handle(v));
@@ -76,7 +78,9 @@ public:
 
 	template<class T>
 	decltype(auto) to_handle_vector(std::vector<T> vec) const {
-		std::vector<decltype(get_handle())> handles;
+		auto dummy = get_handle(T());
+
+		std::vector<decltype(dummy)> handles;
 
 		for (auto v : vec)
 			handles.emplace_back(get_handle(v));

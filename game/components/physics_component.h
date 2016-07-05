@@ -14,6 +14,8 @@ namespace components {
 	private:
 		std::vector<entity_id> fixture_entities;
 		friend class component_synchronizer<false, components::fixtures>;
+		friend class component_synchronizer<true, components::physics>;
+		friend class component_synchronizer<false, components::physics>;
 	public:
 		components::transform transform;
 
@@ -100,8 +102,6 @@ public:
 	vec2 get_aabb_size() const;
 
 	components::physics::type get_body_type() const;
-
-	basic_entity_handle<is_const> get_owner_friction_ground() const;
 
 	const std::vector<basic_entity_handle<is_const>>& get_fixture_entities() const;
 

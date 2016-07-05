@@ -8,19 +8,18 @@
 #include "game/detail/inventory_slot_handle.h"
 
 bool is_entity_physical(const_entity_handle id) {
-	return id.find<components::fixtures>() || id.find<components::physics>();
+	return id.has<components::fixtures>() || id.has<components::physics>();
 }
 
 void resolve_density_of_associated_fixtures(entity_handle id) {
 	auto& cosmos = id.get_cosmos();
-	auto* maybe_physics = id.find<components::physics>();
 
-	if (maybe_physics) {
-		const auto& entities = maybe_physics->get_fixture_entities();
+	if (id.has<components::physics>()) {
+		const auto& entities = id.get<components::physics>().get_fixture_entities();
 
 		for (auto& f : entities) {
 			if (f != id)
-				resolve_density_of_associated_fixtures(cosmos[f)];
+				resolve_density_of_associated_fixtures(f);
 		}
 	}
 
@@ -30,7 +29,7 @@ void resolve_density_of_associated_fixtures(entity_handle id) {
 
 	auto* item = id.find<components::item>();
 
-	if (item != nullptr && cosmos[item->current_slot).alive() && cosmos.get_handle(item->current_slot].should_item_inside_keep_physical_body())
+	if (item != nullptr && cosmos[item->current_slot].alive() && cosmos[item->current_slot].should_item_inside_keep_physical_body())
 		density_multiplier *= cosmos[item->current_slot].calculate_density_multiplier_due_to_being_attached();
 
 	auto owner_body = id.get_owner_body_entity();
@@ -53,7 +52,7 @@ bool are_connected_by_friction(const_entity_handle child, const_entity_handle pa
 		bool matched_ancestor = false;
 
 		entity_id parent_body_entity = parent.get_owner_body_entity();
-		entity_id childs_ancestor_entity = child.get_owner_body_entity().get<components::physics>.get_owner_friction_ground();
+		entity_id childs_ancestor_entity = child.get_owner_body_entity().get_owner_friction_ground();
 
 		while (cosmos[childs_ancestor_entity].alive()) {
 			if (childs_ancestor_entity == parent_body_entity) {
@@ -61,7 +60,7 @@ bool are_connected_by_friction(const_entity_handle child, const_entity_handle pa
 				break;
 			}
 
-			childs_ancestor_entity = cosmos[childs_ancestor_entity).get<components::physics>(].get_owner_friction_ground();
+			childs_ancestor_entity = cosmos[childs_ancestor_entity].get_owner_friction_ground();
 		}
 
 		if (matched_ancestor)
@@ -76,7 +75,7 @@ std::vector<b2Vec2> get_world_vertices(const_entity_handle subject, bool meters,
 
 	auto& b = subject.get<components::physics>();
 
-	auto& verts = subject.get<components::fixtures>().get_definition().colliders[0].shape.convex_polys[fixture_num];
+	const auto& verts = subject.get<components::fixtures>().get_data().colliders[0].shape.convex_polys[fixture_num];
 
 	/* for every vertex in given fixture's shape */
 	for (auto& v : verts) {

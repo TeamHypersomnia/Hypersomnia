@@ -1221,9 +1221,6 @@
     <ClCompile Include="game\detail\physics_scripts.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\detail\physics_setup_helpers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\detail\position_scripts.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -3345,9 +3342,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\detail\physics_scripts.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\physics_setup_helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\detail\position_scripts.h">

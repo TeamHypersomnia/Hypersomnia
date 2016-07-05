@@ -25,8 +25,8 @@ void physics_system::rechoose_owner_friction_body(entity_handle entity) {
 	}
 
 	if (!feasible_grounds.empty()) {
-		std::stable_sort(feasible_grounds.begin(), feasible_grounds.end(), [this](entity_id a, entity_id b) {
-			return are_connected_by_friction(a, b);
+		std::stable_sort(feasible_grounds.begin(), feasible_grounds.end(), [this, &cosmos](entity_id a, entity_id b) {
+			return are_connected_by_friction(cosmos[a], cosmos[b]);
 		});
 
 		physics.owner_friction_ground = feasible_grounds[0];
@@ -58,7 +58,7 @@ void physics_system::recurential_friction_handler(entity_handle entity, entity_h
 	auto& physics = entity.get<components::physics>();
 
 	auto& friction_physics = friction_owner.get<components::fixtures>();
-	auto& friction_entity = friction_physics.get_body_entity();
+	auto& friction_entity = friction_physics.get_owner_body();
 
 	recurential_friction_handler(entity, friction_entity.get<components::physics>().get_owner_friction_ground());
 

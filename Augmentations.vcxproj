@@ -476,7 +476,6 @@
     <ClCompile Include="game\detail\gui\slot_button.cpp" />
     <ClCompile Include="game\detail\inventory_slot.cpp" />
     <ClCompile Include="game\detail\inventory_utils.cpp" />
-    <ClCompile Include="game\detail\physics_setup_helpers.cpp" />
     <ClCompile Include="game\stateful_systems\gui_system.cpp" />
     <ClCompile Include="game\step.cpp" />
     <ClCompile Include="game\systems\animation_system.cpp" />
@@ -1187,7 +1186,6 @@
     <ClInclude Include="game\detail\inventory_slot.h" />
     <ClInclude Include="game\detail\inventory_slot_id.h" />
     <ClInclude Include="game\detail\inventory_utils.h" />
-    <ClInclude Include="game\detail\physics_setup_helpers.h" />
     <ClInclude Include="game\detail\state_for_drawing_camera.h" />
     <ClInclude Include="game\systems\animation_system.h" />
     <ClInclude Include="game\systems\behaviour_tree_system.h" />

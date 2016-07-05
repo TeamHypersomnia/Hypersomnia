@@ -230,6 +230,12 @@ void component_synchronizer<C, P>::set_transform(components::transform transform
 	get_cache().body->SetTransform(transform.pos * PIXELS_TO_METERSf, transform.rotation * DEG_TO_RAD);
 }
 
+
+template<bool C>
+const std::vector<basic_entity_handle<C>>& component_synchronizer<C, P>::get_fixture_entities() const {
+	return handle.get_cosmos().to_handle_vector(component.fixture_entities);
+}
+
 template<bool C>
 bool component_synchronizer<C, P>::test_point(vec2 v) const {
 	return get_cache().body->TestPoint(v * PIXELS_TO_METERSf);
