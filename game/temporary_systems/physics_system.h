@@ -156,5 +156,5 @@ private:
 	};
 
 	void rechoose_owner_friction_body(entity_handle);
-	void recurential_friction_handler(entity_handle entity, entity_handle friction_owner);
+	void recurential_friction_handler(fixed_step&, entity_handle entity, entity_handle friction_owner);
 };

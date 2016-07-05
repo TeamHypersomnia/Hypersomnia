@@ -52,7 +52,7 @@ void physics_system::rechoose_owner_friction_body(entity_handle entity) {
 	}
 }
 
-void physics_system::recurential_friction_handler(entity_handle entity, entity_handle friction_owner) {
+void physics_system::recurential_friction_handler(fixed_step& step, entity_handle entity, entity_handle friction_owner) {
 	if (friction_owner.dead()) return;
 
 	auto& physics = entity.get<components::physics>();
@@ -60,14 +60,14 @@ void physics_system::recurential_friction_handler(entity_handle entity, entity_h
 	auto& friction_physics = friction_owner.get<components::fixtures>();
 	auto& friction_entity = friction_physics.get_owner_body();
 
-	recurential_friction_handler(entity, friction_entity.get<components::physics>().get_owner_friction_ground());
+	recurential_friction_handler(step, entity, friction_entity.get_owner_friction_ground());
 
-	auto* body = physics.black_detail.body;
+	auto* body = get_rigid_body_cache(entity).body;
 
-	auto friction_body = friction_physics.get_body();
-	auto fricted_pos = body->GetPosition() + parent_cosmos.delta.in_seconds() * friction_body->GetLinearVelocityFromWorldPoint(body->GetPosition());
+	auto friction_body = get_rigid_body_cache(friction_entity).body;
+	auto fricted_pos = body->GetPosition() + step.get_delta().in_seconds() * friction_body->GetLinearVelocityFromWorldPoint(body->GetPosition());
 
-	body->SetTransform(fricted_pos, body->GetAngle() + parent_cosmos.delta.in_seconds()*friction_body->GetAngularVelocity());
+	body->SetTransform(fricted_pos, body->GetAngle() + step.get_delta().in_seconds()*friction_body->GetAngularVelocity());
 
-	friction_entity.get<components::physics>().measured_carried_mass += physics.get_mass() + physics.measured_carried_mass;
+	friction_entity.get<components::special_physics>().measured_carried_mass += physics.get_mass() + entity.get<components::special_physics>().measured_carried_mass;
 }

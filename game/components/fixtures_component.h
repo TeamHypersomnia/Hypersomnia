@@ -1,8 +1,10 @@
 #pragma once
+#include <vector>
+#include <array>
+
 #include "game/entity_id.h"
 #include "math/vec2.h"
 #include "math/rects.h"
-#include <vector>
 #include "transform_component.h"
 #include "game/component_synchronizer.h"
 #include "game/detail/convex_partitioned_shape.h"
