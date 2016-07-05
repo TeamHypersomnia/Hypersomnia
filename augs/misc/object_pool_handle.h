@@ -42,6 +42,14 @@ namespace augs {
 		std::string get_debug_name() const {
 			return raw_id.get_debug_name();
 		}
+
+		bool operator==(const id_type& b) const {
+			return raw_id == b;
+		}
+
+		bool operator!=(const id_type& b) const {
+			return raw_id != b;
+		}
 	};
 
 	template<bool is_const, class owner_type, class value_type>

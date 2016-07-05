@@ -5,10 +5,10 @@
 #include <vector>
 #include "transform_component.h"
 #include "game/detail/physics_engine_reflected_state.h"
-#include "game/substantialized_component.h"
+#include "game/component_synchronizer.h"
 
 namespace components {
-	struct fixtures : private substantialized_component<colliders_white_box, colliders_black_box, colliders_black_box_detail> {
+	struct fixtures {
 	private:
 		entity_id owner_body;
 		friend class component_synchronizer<false, components::fixtures>;
@@ -44,8 +44,8 @@ class component_synchronizer<is_const, components::fixtures> : public component_
 public:
 	using component_synchronizer_base<is_const, components::fixtures>::component_synchronizer_base;
 
-	void set_offset(offset_type, components::transform);
-	components::transform get_offset(offset_type) const;
+	void set_offset(components::fixtures::offset_type, components::transform);
+	components::transform get_offset(components::fixtures::offset_type) const;
 	components::transform get_total_offset() const;
 
 	void set_activated(bool);
@@ -62,7 +62,9 @@ public:
 	float get_restitution(size_t = 0) const;
 	float get_density(size_t = 0) const;
 
-	typename std::enable_if<!is_const, void>::type set_owner_body(basic_entity_handle<is_const>);
+	template <class = typename std::enable_if<!is_const>::type>
+	void set_owner_body(basic_entity_handle<is_const>);
+	
 	basic_entity_handle<false> get_owner_body() const;
 
 	vec2 get_aabb_size() const;

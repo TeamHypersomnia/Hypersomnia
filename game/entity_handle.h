@@ -9,7 +9,6 @@
 #include "misc/object_pool_handle.h"
 #include "game/entity_id.h"
 
-#include "game/components/processing_component.h"
 #include "game/detail/entity/inventory_getters.h"
 #include "game/detail/entity/relations_component_helpers.h"
 #include "game/detail/entity/physics_getters.h"
@@ -40,11 +39,21 @@ namespace augs {
 			}
 
 			decltype(auto) add(const T& t) const {
-				return h.allocator::add(t);
+				auto& ret = h.allocator::add(t);
+				
+				if (std::is_same<T, components::substance>()) {
+					h.get_cosmos().complete_resubstantialization(h);
+				}
+
+				return ret;
 			}
 
-			decltype(auto) remove() const {
-				return h.allocator::remove<T>();
+			void remove() const {
+				h.allocator::remove<T>();
+
+				if (std::is_same<T, components::substance>()) {
+					h.get_cosmos().complete_resubstantialization(h);
+				}
 			}
 		};
 
@@ -58,18 +67,18 @@ namespace augs {
 
 			auto add(const T& t) const {
 				ensure(!h.has<T>());
-
-				return component_synchronizer<is_const, T>(h.allocator::add(t), h);
+				auto& added = component_synchronizer<is_const, T>(h.allocator::add(t), h);
+				h.get_cosmos().complete_resubstantialization(h);
+				return added;
 			}
 
 			void remove() const {
 				ensure(h.has<T>());
-				component_synchronizer<is_const, T> sync(h.allocator::get<T>(), h);
-
-
 				h.allocator::remove<T>();
+				h.get_cosmos().complete_resubstantialization(h);
 			}
 		};
+		
 
 		using basic_handle_base::get;
 
@@ -81,9 +90,6 @@ namespace augs {
 		decltype(auto) get_cosmos() const {
 			return owner;
 		}
-
-		bool operator==(entity_id b) const;
-		bool operator!=(entity_id b) const;
 
 		template <class = typename std::enable_if<!is_const>::type>
 		operator basic_entity_handle<true>() const;
@@ -115,23 +121,9 @@ namespace augs {
 			return allocator::find<component>();
 		}
 
-		template<class component>
-		typename std::enable_if<!is_const, void>::type remove() const {
+		template<class component, typename = typename std::enable_if<!is_const>::type>
+		void remove() const {
 			return component_or_synchronizer<component>({ *this }).remove();
-		}
-
-		template<>
-		typename std::enable_if<!is_const, component_or_synchronizer<components::substance>>::type
-			add(const components::substance& c = components::substance()) const {
-			auto result = component_or_synchronizer<components::substance>({ *this }).add(c);
-			get_cosmos().complete_resubstantialization(*this);
-			return result;
-		}
-
-		template<>
-		typename std::enable_if<!is_const, void>::type remove<components::substance>() const {
-			allocator::remove<components::substance>();
-			get_cosmos().complete_resubstantialization(*this);
 		}
 
 		template<class = typename std::enable_if<!is_const>::type>

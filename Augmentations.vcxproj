@@ -1036,7 +1036,6 @@
     <ClInclude Include="game\detail\entity\inventory_getters.h" />
     <ClInclude Include="game\detail\entity\physics_getters.h" />
     <ClInclude Include="game\detail\entity\relations_component_helpers.h" />
-    <ClInclude Include="game\substantialized_component.h" />
     <ClInclude Include="game\components\meta_component.h" />
     <ClInclude Include="game\components\substance_component.h" />
     <ClInclude Include="game\detail\convex_partitioned_shape.h" />

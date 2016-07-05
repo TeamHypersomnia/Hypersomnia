@@ -52,7 +52,7 @@ class component_synchronizer<is_const, components::physics> : public component_s
 public:
 	using component_synchronizer_base<is_const, components::physics>::component_synchronizer_base;
 
-	void set_body_type(type);
+	typename std::enable_if<!is_const, components::physics::type>::type set_body_type(components::physics::type);
 
 	typename std::enable_if<!is_const, void>::type set_activated(bool);
 	bool is_activated() const;
@@ -82,7 +82,7 @@ public:
 	vec2 get_world_center() const;
 	vec2 get_aabb_size() const;
 
-	type get_body_type() const;
+	components::physics::type get_body_type() const;
 
 	basic_entity_handle<is_const> get_owner_friction_ground() const;
 
