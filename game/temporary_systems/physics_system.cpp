@@ -23,22 +23,30 @@ float METERS_TO_PIXELSf = 100.f;
 float PIXELS_TO_METERSf = 1.0f / METERS_TO_PIXELSf;
 
 bool physics_system::is_constructed_rigid_body(const_entity_handle handle) const {
-	return handle.alive() && rigid_body_caches[handle.get_id().indirection_index].body != nullptr;
+	return handle.alive() && get_rigid_body_cache(handle).body != nullptr;
 }
 
 bool physics_system::is_constructed_colliders(const_entity_handle handle) const {
 	return 
 		handle.alive() && is_constructed_rigid_body(handle.get<components::fixtures>().get_owner_body())
 		&& 
-		colliders_caches[handle.get_id().indirection_index].fixtures_per_collider.size()> 0 && 
-		colliders_caches[handle.get_id().indirection_index].fixtures_per_collider[0].size() > 0;
+		get_colliders_cache(handle).fixtures_per_collider.size()> 0 && 
+		get_colliders_cache(handle).fixtures_per_collider[0].size() > 0;
 }
 
-physics_system::rigid_body_black_box_detail& physics_system::get_rigid_body_cache(const_entity_handle handle) {
+rigid_body_cache& physics_system::get_rigid_body_cache(const_entity_handle handle) {
 	return rigid_body_caches[handle.get_id().indirection_index];
 }
 
-physics_system::colliders_black_box_detail& physics_system::get_colliders_cache(const_entity_handle handle) {
+colliders_cache& physics_system::get_colliders_cache(const_entity_handle handle) {
+	return colliders_caches[handle.get_id().indirection_index];
+}
+
+const rigid_body_cache& physics_system::get_rigid_body_cache(const_entity_handle handle) const {
+	return rigid_body_caches[handle.get_id().indirection_index];
+}
+
+const colliders_cache& physics_system::get_colliders_cache(const_entity_handle handle) const {
 	return colliders_caches[handle.get_id().indirection_index];
 }
 
@@ -53,7 +61,7 @@ void physics_system::destruct(const_entity_handle handle) {
 
 		b2world.DestroyBody(cache.body);
 
-		cache = rigid_body_black_box_detail();
+		cache = rigid_body_cache();
 	}
 	
 	if (is_constructed_colliders(handle)) {
@@ -64,7 +72,7 @@ void physics_system::destruct(const_entity_handle handle) {
 			for (auto f : f_per_c)
 				owner_body_cache.body->DestroyFixture(f);
 
-		cache = colliders_black_box_detail();
+		cache = colliders_cache();
 	}
 }
 

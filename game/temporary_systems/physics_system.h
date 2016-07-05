@@ -13,17 +13,17 @@
 class cosmos;
 class fixed_step;
 
+struct rigid_body_cache {
+	b2Body* body = nullptr;
+};
+
+struct colliders_cache {
+	std::vector<std::vector<b2Fixture*>> fixtures_per_collider;
+};
+
 class physics_system {
-	struct rigid_body_black_box_detail {
-		b2Body* body = nullptr;
-	};
-
-	struct colliders_black_box_detail {
-		std::vector<std::vector<b2Fixture*>> fixtures_per_collider;
-	};
-
-	std::vector<colliders_black_box_detail> colliders_caches;
-	std::vector<rigid_body_black_box_detail> rigid_body_caches;
+	std::vector<colliders_cache> colliders_caches;
+	std::vector<rigid_body_cache> rigid_body_caches;
 
 	void reserve_caches_for_entities(size_t n);
 	void construct(const_entity_handle);
@@ -38,8 +38,10 @@ class physics_system {
 	bool is_constructed_rigid_body(const_entity_handle) const;
 	bool is_constructed_colliders(const_entity_handle) const;
 
-	rigid_body_black_box_detail& get_rigid_body_cache(const_entity_handle);
-	colliders_black_box_detail& get_colliders_cache(const_entity_handle);
+	rigid_body_cache& get_rigid_body_cache(const_entity_handle);
+	colliders_cache& get_colliders_cache(const_entity_handle);
+	const rigid_body_cache& get_rigid_body_cache(const_entity_handle) const;
+	const colliders_cache& get_colliders_cache(const_entity_handle) const;
 public:
 	struct raycast_output {
 		vec2 intersection, normal;

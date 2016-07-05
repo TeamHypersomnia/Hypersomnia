@@ -8,13 +8,13 @@
 #include <numeric>
 #include <string>
 #include <functional>
+#include "game/cosmos.h"
 
-template<bool C>
-using c = component_synchronizer<C, components::fixtures>;
+typedef components::fixtures F;
 
 template<bool C>
 template <class = typename std::enable_if<!is_const>::type>
-void component_synchronizer<C, components::fixtures>::set_owner_body(basic_entity_handle<C> owner) {
+void component_synchronizer<C, F>::set_owner_body(basic_entity_handle<C> owner) {
 	auto& cosmos = owner.get_cosmos();
 	auto former_owner = cosmos[component.owner_body];
 
@@ -30,200 +30,149 @@ void component_synchronizer<C, components::fixtures>::set_owner_body(basic_entit
 
 	cosmos.complete_resubstantialization(handle);
 }
-/*
-fixtures& fixtures::operator=(const fixtures& f) {
-	initialize_from_definition(f.get_definition());
+
+template<bool C>
+typename maybe_const_ref<C, colliders_cache>::type& component_synchronizer<C, F>::get_cache() const {
+	auto& cosmos = handle.get_cosmos();
+	return cosmos.temporary_systems.get<physics_system>().get_colliders_cache(handle);
 }
 
-fixtures::fixtures(const fixtures& f) {
-	initialize_from_definition(f.get_definition());
-}
-
-fixtures::fixtures(const colliders_definition& def) {
-	initialize_from_definition(def);
-}
-
-void fixtures::initialize_from_definition(const colliders_definition& def) {
-	black = def;
-	colliders_white_box::operator=(def);
-
-	destroy_fixtures();
-
-	if (should_fixtures_exist_now())
-		build_fixtures();
-}
-
-colliders_definition fixtures::get_definition() const {
-	colliders_definition output;
-	output.colliders_black_box::operator=(black);
-	output.colliders_white_box::operator=(*this);
-	return output;
-}
-
-b2Body* fixtures::get_body() const {
-	return black.owner_body.get<components::physics>().black_detail.body;
-}
-
-entity_id fixtures::get_body_entity() const {
-	return black.owner_body;
-}
-
-vec2 fixtures::get_aabb_size() const {
+template<bool C>
+vec2 component_synchronizer<C, F>::get_aabb_size() const {
 	return get_aabb_rect().get_size();
 }
 
-augs::rects::ltrb<float> fixtures::get_aabb_rect() const {
+template<bool C>
+augs::rects::ltrb<float> component_synchronizer<C, F>::get_aabb_rect() const {
 	b2AABB aabb;
 	aabb.lowerBound.Set(FLT_MAX, FLT_MAX);
 	aabb.upperBound.Set(-FLT_MAX, -FLT_MAX);
 
-	for (auto& c : black_detail.fixtures_per_collider)
+	for (auto& c : get_cache().fixtures_per_collider)
 		for (auto f : c)
 			aabb.Combine(aabb, f->GetAABB(0));
 
 	return augs::rects::ltrb<float>(aabb.lowerBound.x, aabb.lowerBound.y, aabb.upperBound.x, aabb.upperBound.y).scale(METERS_TO_PIXELSf);
 }
 
-size_t fixtures::get_num_colliders() const {
-	return black_detail.fixtures_per_collider.size();
+template<bool C>
+size_t component_synchronizer<C, F>::get_num_colliders() const {
+	return get_cache().fixtures_per_collider.size();
 }
 
-void fixtures::destroy_fixtures() {
-	if (black_detail.fixtures_per_collider.empty())
-		return;
-
-	auto* body_previously_owning_fixtures = black_detail.fixtures_per_collider[0][0]->GetBody();
-
-	for (auto& c : black_detail.fixtures_per_collider)
-		for (auto f : c)
-			body_previously_owning_fixtures->DestroyFixture(f);
-
-	black_detail.fixtures_per_collider.clear();
+template<bool C>
+template <class = typename std::enable_if<!is_const>::type>
+void component_synchronizer<C, F>::set_offset(F::offset_type t, components::transform off) {
+	component.offsets_for_created_shapes[static_cast<int>(t)] = off;
+	complete_resubstantialization();
 }
 
-void fixtures::build_fixtures() {
-	ensure(black_detail.fixtures_per_collider.empty());
+template<bool C>
+template <class = typename std::enable_if<!is_const>::type>
+void component_synchronizer<C, F>::rebuild_density(size_t index) {
+	for (auto f : get_cache().fixtures_per_collider[index])
+		f->SetDensity(component.colliders[index].density * component.colliders[index].density_multiplier);
 
-
+	get_cache().fixtures_per_collider[0][0]->GetBody()->ResetMassData();
 }
 
-void fixtures::set_offset(offset_type t, components::transform off) {
-	black.offsets_for_created_shapes[static_cast<int>(t)] = off;
+template<bool C>
+template <class = typename std::enable_if<!is_const>::type>
+void component_synchronizer<C, F>::set_density(float d, size_t index) {
+	component.colliders[index].density = d;
 
-	destroy_fixtures();
-
-	if (should_fixtures_exist_now())
-		build_fixtures();
-}
-
-void fixtures::rebuild_density(size_t index) {
-	for (auto f : black_detail.fixtures_per_collider[index])
-		f->SetDensity(black.colliders[index].density * black.colliders[index].density_multiplier);
-
-	get_body()->ResetMassData();
-}
-
-void fixtures::set_density(float d, size_t index) {
-	black.colliders[index].density = d;
-
-	if (!syncable_black_box_exists())
+	if (!is_constructed())
 		return;
 
 	rebuild_density(index);
 }
 
-void fixtures::set_density_multiplier(float mult, size_t index) {
-	black.colliders[index].density_multiplier = mult;
+template<bool C>
+template <class = typename std::enable_if<!is_const>::type>
+void component_synchronizer<C, F>::set_density_multiplier(float mult, size_t index) {
+	component.colliders[index].density_multiplier = mult;
 
-	if (!syncable_black_box_exists())
+	if (!is_constructed())
 		return;
 
 	rebuild_density(index);
 }
 
-void fixtures::set_activated(bool flag) {
-	black.activated = flag;
-
-	destroy_fixtures();
-
-	if (should_fixtures_exist_now())
-		build_fixtures();
+template<bool C>
+template <class = typename std::enable_if<!is_const>::type>
+void component_synchronizer<C, F>::set_activated(bool flag) {
+	component.activated = flag;
+	complete_resubstantialization();
 }
 
-void fixtures::set_friction(float fr, size_t index) {
-	black.colliders[index].friction = fr;
+template<bool C>
+template <class = typename std::enable_if<!is_const>::type>
+void component_synchronizer<C, F>::set_friction(float fr, size_t index) {
+	component.colliders[index].friction = fr;
 
-	if (!syncable_black_box_exists())
+	if (!is_constructed())
 		return;
 
-	for (auto f : black_detail.fixtures_per_collider[index])
+	for (auto f : get_cache().fixtures_per_collider[index])
 		f->SetFriction(fr);
 }
 
-void fixtures::set_restitution(float r, size_t index) {
-	black.colliders[index].restitution = r;
+template<bool C>
+template <class = typename std::enable_if<!is_const>::type>
+void component_synchronizer<C, F>::set_restitution(float r, size_t index) {
+	component.colliders[index].restitution = r;
 
-	if (!syncable_black_box_exists())
+	if (!is_constructed())
 		return;
 
-	for (auto f : black_detail.fixtures_per_collider[index])
+	for (auto f : get_cache().fixtures_per_collider[index])
 		f->SetRestitution(r);
 }
 
-void fixtures::set_owner_body(entity_id e) {
-	if (black.owner_body.alive())
-		remove_element(black.owner_body.get<components::physics>().black_detail.fixture_entities, black_detail.all_fixtures_owner);
-
-	black.owner_body = e;
-
-	if (e.alive())
-		e.get<components::physics>().black_detail.fixture_entities.push_back(black_detail.all_fixtures_owner);
-
-	destroy_fixtures();
-
-	if (should_fixtures_exist_now())
-		build_fixtures();
+template<bool C>
+float component_synchronizer<C, F>::get_friction(size_t index) const {
+	return component.colliders[index].friction;
 }
 
-float fixtures::get_friction(size_t index) const {
-	return black.colliders[index].friction;
+template<bool C>
+float component_synchronizer<C, F>::get_restitution(size_t index) const {
+	return component.colliders[index].restitution;
 }
 
-float fixtures::get_restitution(size_t index) const {
-	return black.colliders[index].restitution;
+template<bool C>
+float component_synchronizer<C, F>::get_density(size_t index) const {
+	return component.colliders[index].density;
 }
 
-float fixtures::get_density(size_t index) const {
-	return black.colliders[index].density;
+template<bool C>
+float component_synchronizer<C, F>::get_density_multiplier(size_t index) const {
+	return component.colliders[index].density_multiplier;
 }
 
-float fixtures::get_density_multiplier(size_t index) const {
-	return black.colliders[index].density_multiplier;
+template<bool C>
+bool component_synchronizer<C, F>::is_activated() const {
+	return component.activated;
 }
 
-bool fixtures::is_activated() const {
-	return black.activated;
+template<bool C>
+bool component_synchronizer<C, F>::is_constructed() const {
+	return handle.get_cosmos().temporary_systems.get<physics_system>().is_constructed_colliders(handle);
 }
 
-entity_id fixtures::get_owner_body() const {
-	return black.owner_body;
+template<bool C>
+basic_entity_handle<C> component_synchronizer<C, F>::get_owner_body() const {
+	return handle.get_cosmos()[component.owner_body];
 }
 
-components::transform fixtures::get_offset(offset_type t) const {
-	black.offsets_for_created_shapes[static_cast<int>(t)];
+template<bool C>
+components::transform component_synchronizer<C, F>::get_offset(F::offset_type t) const {
+	component.offsets_for_created_shapes[static_cast<int>(t)];
 }
 
-components::transform fixtures::get_total_offset() const {
-	return std::accumulate(black.offsets_for_created_shapes.begin(), black.offsets_for_created_shapes.end(), components::transform());
+template<bool C>
+components::transform component_synchronizer<C, F>::get_total_offset() const {
+	return std::accumulate(component.offsets_for_created_shapes.begin(), component.offsets_for_created_shapes.end(), components::transform());
 }
-
-bool fixtures::should_fixtures_exist_now() const {
-	return black_detail.parent_system != nullptr && black.activated && black.owner_body.get<components::physics>().is_activated();
-}
-
-bool fixtures::syncable_black_box_exists() const {
-	return black_detail.fixtures_per_collider.size() > 0;
-}*/
 
 template class component_synchronizer<false, components::fixtures>;
 template class component_synchronizer<true, components::fixtures>;

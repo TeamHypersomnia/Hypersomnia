@@ -12,6 +12,7 @@ namespace components {
 	private:
 		entity_id owner_body;
 		friend class component_synchronizer<false, components::fixtures>;
+		friend class component_synchronizer<true, components::fixtures>;
 	public:
 
 		std::vector<convex_partitioned_collider> colliders;
@@ -34,27 +35,42 @@ namespace components {
 	};
 }
 
+struct colliders_cache;
+
 template<bool is_const>
 class component_synchronizer<is_const, components::fixtures> : public component_synchronizer_base<is_const, components::fixtures> {
+	template <class = typename std::enable_if<!is_const>::type>
 	void rebuild_density(size_t);
 
 	friend struct components::physics;
 	friend class ::physics_system;
 
+	typename maybe_const_ref<is_const, colliders_cache>::type& get_cache() const;
 public:
 	using component_synchronizer_base<is_const, components::fixtures>::component_synchronizer_base;
 
+	template <class = typename std::enable_if<!is_const>::type>
 	void set_offset(components::fixtures::offset_type, components::transform);
+
 	components::transform get_offset(components::fixtures::offset_type) const;
 	components::transform get_total_offset() const;
 
+	template <class = typename std::enable_if<!is_const>::type>
 	void set_activated(bool);
+
 	bool is_activated() const;
 	bool is_constructed() const;
 
+	template <class = typename std::enable_if<!is_const>::type>
 	void set_density(float, size_t = 0);
+
+	template <class = typename std::enable_if<!is_const>::type>
 	void set_density_multiplier(float, size_t = 0);
+
+	template <class = typename std::enable_if<!is_const>::type>
 	void set_friction(float, size_t = 0);
+
+	template <class = typename std::enable_if<!is_const>::type>
 	void set_restitution(float, size_t = 0);
 
 	float get_density_multiplier(size_t = 0) const;
@@ -65,7 +81,7 @@ public:
 	template <class = typename std::enable_if<!is_const>::type>
 	void set_owner_body(basic_entity_handle<is_const>);
 	
-	basic_entity_handle<false> get_owner_body() const;
+	basic_entity_handle<is_const> get_owner_body() const;
 
 	vec2 get_aabb_size() const;
 	augs::rects::ltrb<float> get_aabb_rect() const;

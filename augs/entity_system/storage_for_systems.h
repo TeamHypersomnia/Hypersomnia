@@ -10,12 +10,12 @@ namespace augs {
 
 		template <typename T>
 		T& get() {
-			return *std::get<std::unique_ptr<T>>(systems);
+			return std::get<T>(systems);
 		}
 
 		template <typename T>
 		const T& get() const {
-			return *std::get<std::unique_ptr<T>>(systems);
+			return std::get<T>(systems);
 		}
 
 		template <typename Pred>
