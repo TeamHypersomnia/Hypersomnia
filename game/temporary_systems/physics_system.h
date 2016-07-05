@@ -39,10 +39,10 @@ class physics_system {
 	bool is_constructed_rigid_body(const_entity_handle) const;
 	bool is_constructed_colliders(const_entity_handle) const;
 
-	rigid_body_cache& get_rigid_body_cache(const_entity_handle);
-	colliders_cache& get_colliders_cache(const_entity_handle);
-	const rigid_body_cache& get_rigid_body_cache(const_entity_handle) const;
-	const colliders_cache& get_colliders_cache(const_entity_handle) const;
+	rigid_body_cache& get_rigid_body_cache(entity_id);
+	colliders_cache& get_colliders_cache(entity_id);
+	const rigid_body_cache& get_rigid_body_cache(entity_id) const;
+	const colliders_cache& get_colliders_cache(entity_id) const;
 
 	std::vector<messages::collision_message> accumulated_messages;
 public:
@@ -102,7 +102,7 @@ public:
 	query_aabb_output query_aabb(vec2 p1_meters, vec2 p2_meters, b2Filter filter, entity_id ignore_entity = entity_id()) const;
 	query_aabb_output query_aabb_px(vec2 p1, vec2 p2, b2Filter filter, entity_id ignore_entity = entity_id()) const;
 
-	query_output query_body(entity_id, b2Filter filter, entity_id ignore_entity = entity_id());
+	query_output query_body(const_entity_handle, b2Filter filter, entity_id ignore_entity = entity_id());
 
 	query_output query_polygon(const std::vector<vec2>& vertices, b2Filter filter, entity_id ignore_entity = entity_id());
 	query_output query_shape(b2Shape*, b2Filter filter, entity_id ignore_entity = entity_id());
@@ -125,8 +125,7 @@ private:
 	};
 
 	struct raycast_input : public b2RayCastCallback {
-		const_entity_handle subject;
-		raycast_input(const_entity_handle h) : subject(h) {}
+		entity_id subject;
 		b2Filter subject_filter;
 
 		bool save_all = false;

@@ -34,20 +34,20 @@ bool physics_system::is_constructed_colliders(const_entity_handle handle) const 
 		get_colliders_cache(handle).fixtures_per_collider[0].size() > 0;
 }
 
-rigid_body_cache& physics_system::get_rigid_body_cache(const_entity_handle handle) {
-	return rigid_body_caches[handle.get_id().indirection_index];
+rigid_body_cache& physics_system::get_rigid_body_cache(entity_id id) {
+	return rigid_body_caches[id.indirection_index];
 }
 
-colliders_cache& physics_system::get_colliders_cache(const_entity_handle handle) {
-	return colliders_caches[handle.get_id().indirection_index];
+colliders_cache& physics_system::get_colliders_cache(entity_id id) {
+	return colliders_caches[id.indirection_index];
 }
 
-const rigid_body_cache& physics_system::get_rigid_body_cache(const_entity_handle handle) const {
-	return rigid_body_caches[handle.get_id().indirection_index];
+const rigid_body_cache& physics_system::get_rigid_body_cache(entity_id id) const {
+	return rigid_body_caches[id.indirection_index];
 }
 
-const colliders_cache& physics_system::get_colliders_cache(const_entity_handle handle) const {
-	return colliders_caches[handle.get_id().indirection_index];
+const colliders_cache& physics_system::get_colliders_cache(entity_id id) const {
+	return colliders_caches[id.indirection_index];
 }
 
 void physics_system::destruct(entity_handle handle) {
