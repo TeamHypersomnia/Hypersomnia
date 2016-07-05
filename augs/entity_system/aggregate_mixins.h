@@ -9,7 +9,7 @@ namespace augs {
 		template<class component,
 			class = typename std::enable_if<!is_const>::type>
 			decltype(auto) set(const component& c) const {
-			derived& self = *static_cast<derived*>(this);
+			auto& self = *static_cast<const derived*>(this);
 			if (self.has<component>())
 				return self.get<component>() = c;
 			else
@@ -19,7 +19,7 @@ namespace augs {
 		template<class component,
 			class = typename std::enable_if<!is_const>::type>
 			decltype(auto) operator+=(const component& c) const {
-			derived& self = *static_cast<derived*>(this);
+			auto& self = *static_cast<const derived*>(this);
 			return self.add(c);
 		}
 
@@ -39,7 +39,7 @@ namespace augs {
 	public:
 		template<class component>
 		typename maybe_const_ptr<is_const, component>::type find() const {
-			derived& self = *static_cast<derived*>(this);
+			auto& self = *static_cast<const derived*>(this);
 
 			auto& aggregate = self.get();
 
@@ -65,7 +65,7 @@ namespace augs {
 		template<class component,
 			class = typename std::enable_if<!is_const>::type>
 			component& add(const component& c) const {
-			derived& self = *static_cast<derived*>(this);
+			auto& self = *static_cast<const derived*>(this);
 			ensure(!has<component>());
 			self.get().writable_id<component>() = owner.get_component_pool<component>().allocate(c);
 		}
@@ -74,7 +74,7 @@ namespace augs {
 			class = typename std::enable_if<!is_const>::type>
 			void remove() const {
 			ensure(has<component>());
-			derived& self = *static_cast<derived*>(this);
+			auto& self = *static_cast<const derived*>(this);
 			self.owner.get_component_pool<component>().free(self.get().get_id<component>());
 		}
 	};

@@ -6,5 +6,5 @@ class fixed_step;
 
 class behaviour_tree_system {
 public:
-	void evaluate_trees(cosmos& cosmos);
+	void evaluate_trees(fixed_step& cosmos);
 };

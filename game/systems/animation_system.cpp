@@ -7,8 +7,6 @@
 
 #include "game/resources/manager.h"
 
-#include "misc/timer.h"
-
 #include "game/components/animation_component.h"
 #include "game/components/render_component.h"
 
