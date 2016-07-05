@@ -6,6 +6,8 @@
 #include "game/components/physics_component.h"
 #include "game/components/transform_component.h"
 
+#include "game/messages/collision_message.h"
+
 #include <functional>
 #include <set>
 
@@ -25,8 +27,8 @@ class physics_system {
 	std::vector<rigid_body_cache> rigid_body_caches;
 
 	void reserve_caches_for_entities(size_t n);
-	void construct(const_entity_handle);
-	void destruct(const_entity_handle);
+	void construct(entity_handle);
+	void destruct(entity_handle);
 
 	friend class cosmos;
 	friend class component_synchronizer<false, components::physics>;
@@ -41,6 +43,8 @@ class physics_system {
 	colliders_cache& get_colliders_cache(const_entity_handle);
 	const rigid_body_cache& get_rigid_body_cache(const_entity_handle) const;
 	const colliders_cache& get_colliders_cache(const_entity_handle) const;
+
+	std::vector<messages::collision_message> accumulated_messages;
 public:
 	struct raycast_output {
 		vec2 intersection, normal;
@@ -104,6 +108,7 @@ public:
 	query_output query_shape(b2Shape*, b2Filter filter, entity_id ignore_entity = entity_id());
 	
 	void step_and_set_new_transforms(fixed_step&);
+	void post_and_clear_accumulated_collision_messages(fixed_step&);
 
 	int ray_casts_since_last_step = 0;
 
@@ -138,13 +143,19 @@ private:
 		void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override;
 		void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) override;
 
-		std::vector<std::function<void()>> after_step_callbacks;
-		cosmos* cosmos_ptr;
-		fixed_step* step_ptr;
+		cosmos& cosm;
+		physics_system& get_sys() const;
+
+		contact_listener(const contact_listener&) = delete;
+		contact_listener(contact_listener&&) = delete;
+		
+		contact_listener(cosmos&);
+		~contact_listener();
+		
+		contact_listener& operator=(const contact_listener&) = delete;
+		contact_listener& operator=(contact_listener&&) = delete;
 	};
 
 	void rechoose_owner_friction_body(entity_handle);
 	void recurential_friction_handler(entity_handle entity, entity_handle friction_owner);
-
-	contact_listener listener;
 };

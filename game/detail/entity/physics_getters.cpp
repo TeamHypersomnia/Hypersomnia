@@ -16,7 +16,7 @@ basic_entity_handle<C> physics_getters<C>::get_owner_body_entity() const {
 	auto& cosmos = self.get_cosmos();
 
 	auto* fixtures = self.find<components::fixtures>();
-	if (fixtures) return cosmos[fixtures->get_body_entity()];
+	if (fixtures) return cosmos[fixtures->get_owner_body()];
 	else if (self.find<components::physics>()) return self;
 	return cosmos[entity_id()];
 }

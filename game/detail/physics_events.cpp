@@ -2,16 +2,21 @@
 #include "game/components/fixtures_component.h"
 #include "game/messages/collision_message.h"
 #include "game/components/driver_component.h"
+#include "game/components/special_physics_component.h"
 
 #include "game/cosmos.h"
 #include "game/step.h"
+
+#include "physics_scripts.h"
 
 #include "graphics/renderer.h"
 
 #define FRICTION_FIELDS_COLLIDE 0
 
 void physics_system::contact_listener::BeginContact(b2Contact* contact) {
-	auto& sys = this->cosmos_ptr->temporary_systems.get<physics_system>();
+	auto& sys = get_sys();
+	auto& cosmos = cosm;
+	auto delta = cosm.delta;
 
 	for (int i = 0; i < 2; ++i) {
 		auto fix_a = contact->GetFixtureA();
@@ -40,26 +45,29 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 		messages::collision_message msg;
 		msg.type = messages::collision_message::event_type::BEGIN_CONTACT;
 
-		msg.subject = static_cast<entity_id>(fix_a->GetUserData());
-		msg.collider = static_cast<entity_id>(fix_b->GetUserData());
+		auto subject = cosmos[fix_a->GetUserData()];
+		auto collider = cosmos[fix_b->GetUserData()];
 
-		auto& subject_fixtures = msg.subject.get<components::fixtures>();
-		auto& collider_fixtures = msg.collider.get<components::fixtures>();
+		msg.subject = subject;
+		msg.collider = collider;
 
-		if (subject_fixtures.is_friction_ground) {
+		auto& subject_fixtures = subject.get<components::fixtures>();
+		auto& collider_fixtures = collider.get<components::fixtures>();
+
+		if (subject_fixtures.is_friction_ground()) {
 #if FRICTION_FIELDS_COLLIDE
 			if (!collider_fixtures.is_friction_ground)
 #endif
 			{
-				auto& collider_physics = collider_fixtures.get_body_entity().get<components::physics>();
+				auto& collider_physics = collider_fixtures.get_owner_body().get<components::special_physics>();
 
 				bool found_suitable = false;
 
 				// always accept my own children
-				if (sys.are_connected_by_friction(msg.collider, msg.subject)) {
+				if (are_connected_by_friction(collider, subject)) {
 					found_suitable = true;
 				}
-				else if (collider_physics.since_dropped.was_set && !sys.passed(collider_physics.since_dropped)) {
+				else if (collider_physics.since_dropped.lasts(delta)) {
 					collider_physics.since_dropped.unset();
 					found_suitable = true;
 				}
@@ -83,8 +91,8 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 				}
 
 				if (found_suitable) {
-					collider_physics.owner_friction_grounds.push_back(subject_fixtures.get_body_entity());
-					sys.rechoose_owner_friction_body(collider_fixtures.get_body_entity());
+					collider_physics.owner_friction_grounds.push_back(subject_fixtures.get_owner_body());
+					sys.rechoose_owner_friction_body(collider_fixtures.get_owner_body());
 				}
 			}
 		}
@@ -94,12 +102,13 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 
 		msg.subject_impact_velocity = body_a->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
 		msg.collider_impact_velocity = body_b->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
-		step_ptr->messages.post(msg);
+		sys.accumulated_messages.push_back(msg);
 	}
 }
 
 void physics_system::contact_listener::EndContact(b2Contact* contact) {
-	auto& sys = this->cosmos_ptr->temporary_systems.get<physics_system>();
+	auto& sys = get_sys();
+	auto& cosmos = cosm;
 
 	for (int i = 0; i < 2; ++i) {
 		auto fix_a = contact->GetFixtureA();
@@ -114,13 +123,16 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 		messages::collision_message msg;
 		msg.type = messages::collision_message::event_type::END_CONTACT;
 
-		msg.subject = static_cast<entity_id>(fix_a->GetUserData());
-		msg.collider = static_cast<entity_id>(fix_b->GetUserData());
+		auto subject = cosmos[fix_a->GetUserData()];
+		auto collider = cosmos[fix_b->GetUserData()];
 
-		auto& subject_fixtures = msg.subject.get<components::fixtures>();
-		auto& collider_fixtures = msg.collider.get<components::fixtures>();
+		msg.subject = subject;
+		msg.collider = collider;
 
-		auto& collider_physics = collider_fixtures.get_body_entity().get<components::physics>();
+		auto& subject_fixtures = subject.get<components::fixtures>();
+		auto& collider_fixtures = collider.get<components::fixtures>();
+
+		auto& collider_physics = collider_fixtures.get_owner_body().get<components::special_physics>();
 
 		if (subject_fixtures.is_friction_ground) {
 #if FRICTION_FIELDS_COLLIDE
@@ -128,10 +140,10 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 #endif
 			{
 				for (auto it = collider_physics.owner_friction_grounds.begin(); it != collider_physics.owner_friction_grounds.end(); ++it)
-					if (*it == subject_fixtures.get_body_entity())
+					if (*it == subject_fixtures.get_owner_body())
 					{
 						collider_physics.owner_friction_grounds.erase(it);
-						sys.rechoose_owner_friction_body(collider_fixtures.get_body_entity());
+						sys.rechoose_owner_friction_body(collider_fixtures.get_owner_body());
 						break;
 					}
 			}
@@ -139,12 +151,13 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 
 		msg.subject_impact_velocity = -body_a->GetLinearVelocity();
 		msg.collider_impact_velocity = -body_b->GetLinearVelocity();
-		step_ptr->messages.post(msg);
+		sys.accumulated_messages.push_back(msg);
 	}
 }
 
 void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold) {
-	auto& sys = this->cosmos_ptr->temporary_systems.get<physics_system>();
+	auto& sys = get_sys();
+	auto& cosmos = cosm;
 
 	messages::collision_message msgs[2];
 
@@ -164,39 +177,43 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 		auto& msg = msgs[i];
 
 		msg.type = messages::collision_message::event_type::PRE_SOLVE;
-		msg.subject = static_cast<entity_id>(fix_a->GetUserData());
-		msg.collider = static_cast<entity_id>(fix_b->GetUserData());
 
-		auto& subject_fixtures = msg.subject.get<components::fixtures>();
-		auto& collider_fixtures = msg.collider.get<components::fixtures>();
+		auto subject = cosmos[fix_a->GetUserData()];
+		auto collider = cosmos[fix_b->GetUserData()];
+
+		msg.subject = subject;
+		msg.collider = collider;
+
+		auto& subject_fixtures = subject.get<components::fixtures>();
+		auto& collider_fixtures = collider.get<components::fixtures>();
 
 		if (subject_fixtures.is_friction_ground) {
 			// friction fields do not collide with their children
-			if (sys.are_connected_by_friction(msg.collider, msg.subject)) {
+			if (are_connected_by_friction(collider, subject)) {
 				contact->SetEnabled(false);
 				return;
 			}
 
-			auto& collider_physics = collider_fixtures.get_body_entity().get<components::physics>();
+			auto& collider_physics = collider_fixtures.get_owner_body().get<components::special_physics>();
 
 			for (auto it = collider_physics.owner_friction_grounds.begin(); it != collider_physics.owner_friction_grounds.end(); ++it)
-				if (*it == subject_fixtures.get_body_entity())
+				if (*it == subject_fixtures.get_owner_body())
 				{
 					contact->SetEnabled(false);
 					return;
 				}
 		}
 
-		auto* driver = sys.get_owner_body_entity(msg.subject).find<components::driver>();
+		auto* driver = subject.get_owner_body_entity().find<components::driver>();
 
-		bool colliding_with_owning_car = driver && driver->owned_vehicle == sys.get_owner_body_entity(msg.collider);
+		bool colliding_with_owning_car = driver && driver->owned_vehicle == collider.get_owner_body_entity();
 
 		if (colliding_with_owning_car) {
 			contact->SetEnabled(false);
 			return;
 		}
 
-		if (subject_fixtures.disable_standard_collision_resolution || collider_fixtures.disable_standard_collision_resolution) {
+		if (subject_fixtures.standard_collision_resolution_disabled() || collider_fixtures.standard_collision_resolution_disabled()) {
 			contact->SetEnabled(false);
 		}
 
@@ -207,8 +224,8 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 		msg.collider_impact_velocity = body_b->GetLinearVelocityFromWorldPoint(manifold.points[0]);
 	}
 
-	step_ptr->messages.post(msgs[0]);
-	step_ptr->messages.post(msgs[1]);
+	sys.accumulated_messages.push_back(msgs[0]);
+	sys.accumulated_messages.push_back(msgs[1]);
 }
 
 void physics_system::contact_listener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) {

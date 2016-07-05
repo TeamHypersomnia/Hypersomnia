@@ -50,7 +50,9 @@ const colliders_cache& physics_system::get_colliders_cache(const_entity_handle h
 	return colliders_caches[handle.get_id().indirection_index];
 }
 
-void physics_system::destruct(const_entity_handle handle) {
+void physics_system::destruct(entity_handle handle) {
+	contact_listener listener(handle.get_cosmos());
+
 	if (is_constructed_rigid_body(handle)) {
 		auto& cache = get_rigid_body_cache(handle);
 		
@@ -76,9 +78,11 @@ void physics_system::destruct(const_entity_handle handle) {
 	}
 }
 
-void physics_system::construct(const_entity_handle handle) {
+void physics_system::construct(entity_handle handle) {
 	ensure(!is_constructed_rigid_body(handle));
 	ensure(!is_constructed_colliders(handle));
+	
+	contact_listener listener(handle.get_cosmos());
 
 	if (handle.has<components::fixtures>()) {
 		auto& colliders = handle.get<components::fixtures>();
@@ -163,15 +167,28 @@ physics_system::physics_system() :
 b2world(b2Vec2(0.f, 0.f)), ray_casts_since_last_step(0) {
 	b2world.SetAllowSleeping(false);
 	b2world.SetAutoClearForces(false);
-	b2world.SetContactListener(&listener);
+}
+
+void physics_system::post_and_clear_accumulated_collision_messages(fixed_step& step) {
+	step.messages.post(accumulated_messages);
+	accumulated_messages.clear();
+}
+
+physics_system& physics_system::contact_listener::get_sys() const {
+	return cosm.temporary_systems.get<physics_system>();
+}
+
+physics_system::contact_listener::contact_listener(cosmos& cosm) : cosm(cosm) {
+	get_sys().b2world.SetContactListener(this);
+}
+
+physics_system::contact_listener::~contact_listener() {
+	get_sys().b2world.SetContactListener(nullptr);
 }
 
 void physics_system::step_and_set_new_transforms(fixed_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
-
-	listener.cosmos_ptr = &cosmos;
-	listener.step_ptr = &step;
 
 	int32 velocityIterations = 8;
 	int32 positionIterations = 3;
@@ -224,14 +241,14 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 		}
 	}
 
-	listener.after_step_callbacks.clear();
-
 	ray_casts_since_last_step = 0;
+
+	contact_listener listener(step.cosm);
+
+	post_and_clear_accumulated_collision_messages(step);
+
 	b2world.Step(static_cast<float32>(delta.in_seconds()), velocityIterations, positionIterations);
 	b2world.ClearForces();
-
-	for (auto& c : listener.after_step_callbacks)
-		c();
 
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;

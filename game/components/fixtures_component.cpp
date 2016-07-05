@@ -61,6 +61,16 @@ size_t component_synchronizer<C, F>::get_num_colliders() const {
 }
 
 template<bool C>
+bool component_synchronizer<C, F>::is_friction_ground() const {
+	return get_cache().fixtures_per_collider.size();
+}
+
+template<bool C>
+bool component_synchronizer<C, F>::standard_collision_resolution_disabled() const {
+	return get_cache().fixtures_per_collider.size();
+}
+
+template<bool C>
 template <class = typename std::enable_if<!is_const>::type>
 void component_synchronizer<C, F>::set_offset(F::offset_type t, components::transform off) {
 	component.offsets_for_created_shapes[static_cast<int>(t)] = off;

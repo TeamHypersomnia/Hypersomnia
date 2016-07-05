@@ -23,6 +23,11 @@ namespace augs {
 		}
 
 		template <typename T>
+		void post(const std::vector<T>& messages) {
+			get_queue<T>().insert(get_queue<T>().end(), messages.begin(), messages.end());
+		}
+
+		template <typename T>
 		std::vector<T>& get_queue() {
 			return std::get<std::vector<T>>(queues);
 		}

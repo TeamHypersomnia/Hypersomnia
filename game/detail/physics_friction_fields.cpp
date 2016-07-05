@@ -1,14 +1,16 @@
 #include "game/temporary_systems/physics_system.h"
 #include "game/components/fixtures_component.h"
+#include "game/components/special_physics_component.h"
 #include "game/cosmos.h"
+#include "physics_scripts.h"
 
 void physics_system::rechoose_owner_friction_body(entity_handle entity) {
-	auto& physics = entity.get<components::physics>();
-
+	auto& physics = entity.get<components::special_physics>();
+	auto& cosmos = entity.get_cosmos();
 	// purge of dead entities
 
-	physics.owner_friction_grounds.erase(std::remove_if(physics.owner_friction_grounds.begin(), physics.owner_friction_grounds.end(), [entity](entity_id subject) {
-		return subject.dead();
+	physics.owner_friction_grounds.erase(std::remove_if(physics.owner_friction_grounds.begin(), physics.owner_friction_grounds.end(), [&cosmos](entity_id subject) {
+		return cosmos[subject].dead();
 	}), physics.owner_friction_grounds.end());
 
 	auto feasible_grounds = physics.owner_friction_grounds;
@@ -17,8 +19,8 @@ void physics_system::rechoose_owner_friction_body(entity_handle entity) {
 		// cycle guard
 		// remove friction grounds whom do I own myself
 
-		feasible_grounds.erase(std::remove_if(feasible_grounds.begin(), feasible_grounds.end(), [this, entity](entity_id subject) {
-			return are_connected_by_friction(subject, entity);
+		feasible_grounds.erase(std::remove_if(feasible_grounds.begin(), feasible_grounds.end(), [this, entity, &cosmos](entity_id subject) {
+			return are_connected_by_friction(cosmos[subject], entity);
 		}), feasible_grounds.end());
 	}
 

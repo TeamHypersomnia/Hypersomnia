@@ -19,6 +19,7 @@ namespace augs {
 		bool is_set = false;
 		float timeout_duration_ms = 1000.f;
 
+		void unset();
 		void set(float timeout_duration_ms, fixed_delta);
 		bool passed(fixed_delta) const;
 		bool lasts(fixed_delta) const;

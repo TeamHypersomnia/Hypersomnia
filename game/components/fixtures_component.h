@@ -5,6 +5,7 @@
 #include <vector>
 #include "transform_component.h"
 #include "game/component_synchronizer.h"
+#include "game/detail/convex_partitioned_shape.h"
 
 namespace components {
 	struct fixtures {
@@ -98,4 +99,7 @@ public:
 	augs::rects::ltrb<float> get_aabb_rect() const;
 
 	size_t get_num_colliders() const;
+
+	bool is_friction_ground() const;
+	bool standard_collision_resolution_disabled() const;
 };

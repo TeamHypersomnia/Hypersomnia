@@ -32,6 +32,10 @@ namespace augs {
 		return false;
 	}
 
+	void stepped_timeout::unset() {
+		is_set = false;
+	}
+
 	void stepped_timeout::set(float duration_ms, fixed_delta t) {
 		timeout_duration_ms = duration_ms;
 		when_started = t.get_timestamp();

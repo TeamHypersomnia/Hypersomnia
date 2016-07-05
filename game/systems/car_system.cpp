@@ -12,6 +12,7 @@
 #include "game/components/car_component.h"
 #include "game/components/physics_component.h"
 #include "game/components/transform_component.h"
+#include "game/components/special_physics_component.h"
 
 #include "game/entity_handle.h"
 #include "game/step.h"
@@ -55,6 +56,7 @@ void car_system::apply_movement_forces(fixed_step& step) {
 	for (auto it : targets_copy) {
 		auto& car = cosmos[it].get<components::car>();
 		auto& physics = it.get<components::physics>();
+		auto& special_physics = it.get<components::special_physics>();
 
 		vec2 resultant;
 
@@ -128,10 +130,10 @@ void car_system::apply_movement_forces(fixed_step& step) {
 		if (!car.hand_brake) {
 			physics.set_angular_damping(base_angular_damping + car.angular_damping);
 			physics.apply_impulse(-lateral * physics.get_mass() * car.lateral_impulse_multiplier);
-			physics.angular_air_resistance = car.angular_air_resistance;
+			special_physics.angular_air_resistance = car.angular_air_resistance;
 		}
 		else {
-			physics.angular_air_resistance = car.angular_air_resistance_while_hand_braking;
+			special_physics.angular_air_resistance = car.angular_air_resistance_while_hand_braking;
 			physics.set_angular_damping(base_angular_damping + car.angular_damping_while_hand_braking);
 		}
 
