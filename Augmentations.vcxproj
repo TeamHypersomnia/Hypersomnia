@@ -363,13 +363,11 @@
     <ClCompile Include="game\detail\entity\inventory_getters.cpp" />
     <ClCompile Include="game\detail\entity\physics_getters.cpp" />
     <ClCompile Include="game\detail\entity\relations_component_helpers.cpp" />
-    <ClCompile Include="game\detail\state_for_drawing_camera.cpp" />
     <ClCompile Include="game\entropy_player.cpp" />
     <ClCompile Include="game\game_window.cpp" />
     <ClCompile Include="game\global\input_context.cpp" />
     <ClCompile Include="game\detail\inventory_slot_handle.cpp" />
     <ClCompile Include="game\detail\inventory_slot_id.cpp" />
-    <ClCompile Include="game\detail\physics_engine_reflected_state.cpp" />
     <ClCompile Include="game\detail\physics_scripts.cpp" />
     <ClCompile Include="game\entity_handle.cpp" />
     <ClCompile Include="augs\filesystem\directory.cpp" />
@@ -1045,7 +1043,6 @@
     <ClInclude Include="game\global\input_context.h" />
     <ClInclude Include="game\detail\inventory_slot_handle.h" />
     <ClInclude Include="game\detail\inventory_slot_handle_declaration.h" />
-    <ClInclude Include="game\detail\physics_engine_reflected_state.h" />
     <ClInclude Include="game\detail\physics_scripts.h" />
     <ClInclude Include="game\entity_handle.h" />
     <ClInclude Include="game\entity_handle_declaration.h" />

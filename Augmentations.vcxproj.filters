@@ -1209,9 +1209,6 @@
     <ClCompile Include="game\detail\names_and_details.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\detail\physics_engine_reflected_state.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\detail\physics_events.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1285,9 +1282,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\components\dynamic_tree_node_component.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\detail\state_for_drawing_camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\temporary_systems\dynamic_tree_system.cpp">
@@ -3348,9 +3342,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\detail\item_transfer_result.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\detail\physics_engine_reflected_state.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\detail\physics_scripts.h">

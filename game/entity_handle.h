@@ -91,6 +91,14 @@ namespace augs {
 			return owner;
 		}
 
+		bool operator==(entity_id id) const {
+			return basic_handle_base::operator==(id);
+		}
+
+		bool operator!=(entity_id id) const {
+			return basic_handle_base::operator!=(id);
+		}
+
 		template <class = typename std::enable_if<!is_const>::type>
 		operator basic_entity_handle<true>() const;
 		operator entity_id() const;
