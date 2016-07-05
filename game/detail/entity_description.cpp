@@ -10,6 +10,7 @@
 #include "game/detail/inventory_utils.h"
 #include "game/detail/inventory_slot.h"
 #include "game/detail/inventory_slot_id.h"
+#include "game/cosmos.h"
 #include "log.h"
 #include "templates.h"
 
@@ -72,9 +73,9 @@ std::wstring describe_properties(const_entity_handle id) {
 		result << L"Swing cooldown: [color=vscyan]" << melee->swings[0].cooldown_ms << L" ms[/color]\n";
 	}
 
-	if (id.has(slot_function::ITEM_DEPOSIT)) {
-		auto depo = id[slot_function::ITEM_DEPOSIT];
+	auto depo = id[slot_function::ITEM_DEPOSIT];
 
+	if (depo.alive()) {
 		auto children_space = format_space_units(depo->calculate_free_space_with_children());
 		auto with_parents_space = format_space_units(depo.calculate_free_space_with_parent_containers());
 
@@ -88,8 +89,10 @@ std::wstring describe_properties(const_entity_handle id) {
 
 	std::wstring out;
 
-	if (id.has(sub_entity_name::BULLET_ROUND)) {
-		out = result.str() + describe_properties(id[sub_entity_name::BULLET_ROUND]);
+	auto bullet_round = id[sub_entity_name::BULLET_ROUND];
+
+	if (bullet_round.alive()) {
+		out = result.str() + describe_properties(bullet_round);
 		return out;
 	}
 	else {

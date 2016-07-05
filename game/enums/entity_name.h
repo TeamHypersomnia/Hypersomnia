@@ -1,5 +1,5 @@
 #pragma once
-#include "game/entity_id.h"
+#include "game/entity_handle_declaration.h"
 
 enum class entity_name {
 	ASSAULT_RIFLE,

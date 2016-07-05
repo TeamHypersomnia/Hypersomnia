@@ -4,7 +4,6 @@
 #include "game/entity_id.h"
 
 #include "render_component.h"
-#include "game/detail/physics_setup_helpers.h"
 
 #include "misc/stepped_timing.h"
 #include "misc/recoil_player.h"

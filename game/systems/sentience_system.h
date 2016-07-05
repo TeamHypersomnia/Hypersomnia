@@ -4,7 +4,6 @@ namespace messages {
 	struct health_event;
 }
 
-using namespace augs;
 class fixed_step;
 
 class sentience_system {

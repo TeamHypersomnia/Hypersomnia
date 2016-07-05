@@ -86,21 +86,6 @@ basic_entity_handle<C> relations_component_helpers<C>::get_parent() const {
 }
 
 template <bool C>
-bool relations_component_helpers<C>::has(sub_entity_name n) const {
-	return relations().sub_entities_by_name.find(n) != relations().sub_entities_by_name.end();
-}
-
-template <bool C>
-bool relations_component_helpers<C>::has(associated_entity_name n) const {
-	return relations().associated_entities_by_name.find(n) != relations().associated_entities_by_name.end();
-}
-
-template <bool C>
-bool relations_component_helpers<C>::has(slot_function f) const {
-	return (*this)[f].alive();
-}
-
-template <bool C>
 template <class = typename std::enable_if<!C>::type>
 void relations_component_helpers<C>::map_associated_entity(associated_entity_name n, entity_id p) const {
 	relations().associated_entities_by_name[n] = p;

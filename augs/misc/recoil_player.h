@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "math/vec2.h"
-#include "game/entity_id.h"
+#include "game/entity_handle_declaration.h"
 
 class recoil_player {
 	int delta_offset = 0;

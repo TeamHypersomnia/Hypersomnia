@@ -52,8 +52,9 @@ namespace behaviours {
 			attitude.last_seen_target_velocity = velocity(closest_hostile);
 		}
 
-		if (subject.has(sub_entity_name::CHARACTER_CROSSHAIR)) {
-			auto crosshair = subject[sub_entity_name::CHARACTER_CROSSHAIR];
+		auto crosshair = subject[sub_entity_name::CHARACTER_CROSSHAIR];
+
+		if (crosshair.alive()) {
 			auto& crosshair_offset = crosshair.get<components::crosshair>().base_offset;
 
 			float vel1 = assess_projectile_velocity_of_weapon(subject[slot_function::PRIMARY_HAND].try_get_item());

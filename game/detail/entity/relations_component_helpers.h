@@ -36,10 +36,6 @@ public:
 
 	void for_each_sub_entity_recursive(std::function<void(entity_handle_type)>) const;
 
-	bool has(sub_entity_name) const;
-	bool has(associated_entity_name) const;
-	bool has(slot_function) const;
-
 	template <class = typename std::enable_if<!is_const>::type>
 	void add_sub_entity(entity_id p, sub_entity_name optional_name = sub_entity_name::INVALID) const;
 

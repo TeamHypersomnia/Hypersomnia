@@ -62,7 +62,7 @@ void sentience_system::consume_health_event(messages::health_event h, fixed_step
 	case messages::health_event::AIM:
 		auto punched = subject;
 
-		if (punched.has(sub_entity_name::CHARACTER_CROSSHAIR) && punched[sub_entity_name::CHARACTER_CROSSHAIR].has(sub_entity_name::CROSSHAIR_RECOIL_BODY)) {
+		if (punched[sub_entity_name::CHARACTER_CROSSHAIR].alive() && punched[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY].alive()) {
 			auto owning_crosshair_recoil = punched[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
 
 			sentience.aimpunch.shoot_and_apply_impulse(owning_crosshair_recoil, 1 / 15.f, true,
@@ -77,7 +77,7 @@ void sentience_system::consume_health_event(messages::health_event h, fixed_step
 		auto* container = subject.find<components::container>();
 
 		if (container)
-			drop_from_all_slots(subject);
+			drop_from_all_slots(subject, step);
 
 		auto sub_def = subject[sub_entity_name::CORPSE_OF_SENTIENCE];
 
