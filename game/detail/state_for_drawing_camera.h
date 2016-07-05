@@ -2,6 +2,7 @@
 #include "math/vec2.h"
 #include "math/rects.h"
 #include "game/components/transform_component.h"
+#include "game/entity_id.h"
 
 struct state_for_drawing_camera {
 	entity_id associated_character;
