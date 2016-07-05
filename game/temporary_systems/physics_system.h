@@ -5,7 +5,6 @@
 
 #include "game/components/physics_component.h"
 #include "game/components/transform_component.h"
-#include "game/detail/physics_engine_reflected_state.h"
 
 #include <functional>
 #include <set>

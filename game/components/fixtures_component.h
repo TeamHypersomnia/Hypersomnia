@@ -4,7 +4,6 @@
 #include "math/rects.h"
 #include <vector>
 #include "transform_component.h"
-#include "game/detail/physics_engine_reflected_state.h"
 #include "game/component_synchronizer.h"
 
 namespace components {
@@ -13,7 +12,19 @@ namespace components {
 		entity_id owner_body;
 		friend class component_synchronizer<false, components::fixtures>;
 		friend class component_synchronizer<true, components::fixtures>;
+	
 	public:
+		struct convex_partitioned_collider {
+			convex_partitioned_shape shape;
+			b2Filter filter;
+
+			float density = 1.f;
+			float density_multiplier = 1.f;
+			float friction = 0.f;
+			float restitution = 0.f;
+
+			bool sensor = false;
+		};
 
 		std::vector<convex_partitioned_collider> colliders;
 		bool activated = true;
