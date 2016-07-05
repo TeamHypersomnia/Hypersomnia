@@ -1,6 +1,7 @@
 #pragma once
 #include "misc/stepped_timing.h"
 #include "game/component_synchronizer.h"
+#include "game/components/transform_component.h"
 #include "game/entity_handle_declaration.h"
 
 extern double METERS_TO_PIXELS;
@@ -43,34 +44,50 @@ namespace components {
 }
 
 class physics_system;
+struct rigid_body_cache;
 
 template<bool is_const>
 class component_synchronizer<is_const, components::physics> : public component_synchronizer_base<is_const, components::physics> {
 	friend class ::physics_system;
 	friend class component_synchronizer<is_const, components::fixtures>;
 
+	typename maybe_const_ref<is_const, rigid_body_cache>::type& get_cache() const;
 public:
 	using component_synchronizer_base<is_const, components::physics>::component_synchronizer_base;
 
-	typename std::enable_if<!is_const, components::physics::type>::type set_body_type(components::physics::type);
+	template <class = typename std::enable_if<!is_const>::type>
+	void set_body_type(components::physics::type);
 
-	typename std::enable_if<!is_const, void>::type set_activated(bool);
+	template <class = typename std::enable_if<!is_const>::type>
+	void set_activated(bool);
+
 	bool is_activated() const;
 	bool is_constructed() const;
 
-	typename std::enable_if<!is_const, void>::type set_velocity(vec2);
-	typename std::enable_if<!is_const, void>::type set_transform(components::transform);
-	typename std::enable_if<!is_const, void>::type set_transform(entity_id);
+	template <class = typename std::enable_if<!is_const>::type>
+	void set_velocity(vec2);
+	template <class = typename std::enable_if<!is_const>::type>
+	void set_transform(components::transform);
+	template <class = typename std::enable_if<!is_const>::type>
+	void set_transform(const_entity_handle);
 
-	typename std::enable_if<!is_const, void>::type set_angular_damping(float);
-	typename std::enable_if<!is_const, void>::type set_linear_damping(float);
-	typename std::enable_if<!is_const, void>::type set_linear_damping_vec(vec2);
+	template <class = typename std::enable_if<!is_const>::type>
+	void set_angular_damping(float);
+	template <class = typename std::enable_if<!is_const>::type>
+	void set_linear_damping(float);
+	template <class = typename std::enable_if<!is_const>::type>
+	void set_linear_damping_vec(vec2);
 
-	typename std::enable_if<!is_const, void>::type apply_force(vec2);
-	typename std::enable_if<!is_const, void>::type apply_force(vec2, vec2 center_offset, bool wake = true);
-	typename std::enable_if<!is_const, void>::type apply_impulse(vec2);
-	typename std::enable_if<!is_const, void>::type apply_impulse(vec2, vec2 center_offset, bool wake = true);
-	typename std::enable_if<!is_const, void>::type apply_angular_impulse(float);
+	template <class = typename std::enable_if<!is_const>::type>
+	void apply_force(vec2);
+	template <class = typename std::enable_if<!is_const>::type>
+	void apply_force(vec2, vec2 center_offset, bool wake = true);
+	template <class = typename std::enable_if<!is_const>::type>
+	void apply_impulse(vec2);
+	template <class = typename std::enable_if<!is_const>::type>
+	void apply_impulse(vec2, vec2 center_offset, bool wake = true);
+	template <class = typename std::enable_if<!is_const>::type>
+	void apply_angular_impulse(float);
 
 	vec2 velocity() const;
 	float get_mass() const;

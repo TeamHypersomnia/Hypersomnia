@@ -174,5 +174,5 @@ components::transform component_synchronizer<C, F>::get_total_offset() const {
 	return std::accumulate(component.offsets_for_created_shapes.begin(), component.offsets_for_created_shapes.end(), components::transform());
 }
 
-template class component_synchronizer<false, components::fixtures>;
-template class component_synchronizer<true, components::fixtures>;
+template class component_synchronizer<false, F>;
+template class component_synchronizer<true, F>;

@@ -11,223 +11,229 @@
 #include "ensure.h"
 #include "game/entity_handle.h"
 
+typedef components::physics P;
+
 template<bool C>
-bool component_synchronizer<C, components::physics>::can_synchronize() const {
+bool component_synchronizer<C, P>::is_constructed() const {
 	return handle.get_cosmos().temporary_systems.get<physics_system>().is_constructed_rigid_body(handle);
 }
 
-namespace components {
-	
+template<bool C>
+typename maybe_const_ref<C, rigid_body_cache>::type& component_synchronizer<C, P>::get_cache() const {
+	return handle.get_cosmos().temporary_systems.get<physics_system>().get_rigid_body_cache(handle);
+}
 
-	void physics::build_body() {
+template<bool C>
+template <class = typename std::enable_if<!C>::type>
+void component_synchronizer<C, P>::set_body_type(components::physics::type t) {
+	component.body_type = t;
+	complete_resubstantialization();
+}
 
-	}
+template<bool C>
+template <class = typename std::enable_if<!C>::type>
+void component_synchronizer<C, P>::set_activated(bool flag) {
+	component.activated = flag;
+	complete_resubstantialization();
+}
 
-	void physics::destroy_body() {
-		if (black_detail.body != nullptr) {
-			const auto& all_fixture_entities = black_detail.fixture_entities;
+template<bool C>
+template <class = typename std::enable_if<!C>::type>
+void component_synchronizer<C, P>::set_velocity(vec2 pixels) {
+	component.velocity = pixels;
 
-			for (auto fe : all_fixture_entities)
-				fe.get<components::fixtures>().destroy_fixtures();
+	if (!is_constructed())
+		return;
 
-			black_detail.parent_system->b2world.DestroyBody(black_detail.body);
-		}
-	}
+	get_cache().body->SetLinearVelocity(pixels * PIXELS_TO_METERSf);
+}
 
-	rigid_body_definition physics::get_definition() const {
-		rigid_body_definition output;
-		output.rigid_body_black_box::operator=(black);
-		output.rigid_body_white_box::operator=(*this);
-		return output;
-	}
+template<bool C>
+template <class = typename std::enable_if<!C>::type>
+void component_synchronizer<C, P>::set_linear_damping(float damping) {
+	component.linear_damping = damping;
 
-	void physics::set_body_type(type t) {
-		black.body_type = t;
+	if (!is_constructed())
+		return;
 
-		destroy_body();
+	get_cache().body->SetLinearDamping(damping);
+}
 
-		if (should_body_exist_now())
-			build_body();
-	}
+template<bool C>
+template <class = typename std::enable_if<!C>::type>
+void component_synchronizer<C, P>::set_angular_damping(float damping) {
+	component.angular_damping = damping;
 
-	void physics::set_activated(bool flag) {
-		black.activated = flag;
+	if (!is_constructed())
+		return;
 
-		destroy_body();
+	get_cache().body->SetAngularDamping(damping);
+}
 
-		if (should_body_exist_now())
-			build_body();
-	}
+template<bool C>
+template <class = typename std::enable_if<!C>::type>
+void component_synchronizer<C, P>::set_linear_damping_vec(vec2 damping) {
+	component.linear_damping_vec = damping;
 
-	void physics::set_velocity(vec2 pixels) {
-		black.velocity = pixels;
+	if (!is_constructed())
+		return;
 
-		if (!syncable_black_box_exists())
-			return;
+	get_cache().body->SetLinearDampingVec(damping);
+}
 
-		black_detail.body->SetLinearVelocity(pixels * PIXELS_TO_METERSf);
-	}	
+template<bool C>
+template <class = typename std::enable_if<!C>::type>
+void component_synchronizer<C, P>::apply_force(vec2 pixels) {
+	apply_force(pixels, vec2(0, 0), true);
+}
 
-	void physics::set_linear_damping(float damping) {
-		black.linear_damping = damping;
+template<bool C>
+template <class = typename std::enable_if<!C>::type>
+void component_synchronizer<C, P>::apply_force(vec2 pixels, vec2 center_offset, bool wake) {
+	ensure(is_constructed());
 
-		if (!syncable_black_box_exists())
-			return;
+	if (pixels.is_epsilon(2.f))
+		return;
 
-		black_detail.body->SetLinearDamping(damping);
-	}
+	vec2 force = pixels * PIXELS_TO_METERSf;
+	vec2 location = get_cache().body->GetWorldCenter() + (center_offset * PIXELS_TO_METERSf);
 
-	void physics::set_angular_damping(float damping) {
-		black.angular_damping = damping;
+	get_cache().body->ApplyForce(force, location, wake);
 
-		if (!syncable_black_box_exists())
-			return;
-
-		black_detail.body->SetAngularDamping(damping);
-	}
-
-	void physics::set_linear_damping_vec(vec2 damping) {
-		black.linear_damping_vec = damping;
-
-		if (!syncable_black_box_exists())
-			return;
-
-		black_detail.body->SetLinearDampingVec(damping);
-	}
-
-	void physics::apply_force(vec2 pixels) {
-		apply_force(pixels, vec2(0,0), true);
-	}
-	
-	void physics::apply_force(vec2 pixels, vec2 center_offset, bool wake) {
-		ensure(syncable_black_box_exists());
-
-		if (pixels.is_epsilon(2.f))
-			return;
-
-		vec2 force = pixels * PIXELS_TO_METERSf;
-		vec2 location = black_detail.body->GetWorldCenter() + (center_offset * PIXELS_TO_METERSf);
-
-		black_detail.body->ApplyForce(force, location, wake);
-
-		if (renderer::get_current().debug_draw_forces && force.non_zero()) {
-			auto& lines = renderer::get_current().logic_lines;
-			lines.draw_green(location * METERS_TO_PIXELSf + force * METERS_TO_PIXELSf, location * METERS_TO_PIXELSf);
-		}
-	}
-
-	void physics::apply_impulse(vec2 pixels) {
-		apply_impulse(pixels, vec2(0, 0), true);
-	}
-
-	void physics::apply_impulse(vec2 pixels, vec2 center_offset, bool wake) {
-		ensure(syncable_black_box_exists());
-
-		if (pixels.is_epsilon(2.f))
-			return;
-
-		vec2 force = pixels * PIXELS_TO_METERSf;
-		vec2 location = black_detail.body->GetWorldCenter() + (center_offset * PIXELS_TO_METERSf);
-
-		black_detail.body->ApplyLinearImpulse(force, location, true);
-
-		if (renderer::get_current().debug_draw_forces && force.non_zero()) {
-			auto& lines = renderer::get_current().logic_lines;
-			lines.draw_green(location * METERS_TO_PIXELSf + force * METERS_TO_PIXELSf, location * METERS_TO_PIXELSf);
-		}
-	}
-
-	void physics::apply_angular_impulse(float imp) {
-		ensure(syncable_black_box_exists());
-		black_detail.body->ApplyAngularImpulse(imp, true);
-	}
-
-	float physics::get_mass() const {
-		ensure(syncable_black_box_exists());
-		return black_detail.body->GetMass();
-	}
-
-	float physics::get_angle() const {
-		ensure(syncable_black_box_exists());
-		return black_detail.body->GetAngle() * RAD_TO_DEG;
-	}
-
-	float physics::get_angular_velocity() const {
-		ensure(syncable_black_box_exists());
-		return black_detail.body->GetAngularVelocity() * RAD_TO_DEG;
-	}
-
-	float physics::get_inertia() const {
-		ensure(syncable_black_box_exists());
-		return black_detail.body->GetInertia();
-	}
-
-	vec2 physics::get_position() const {
-		ensure(syncable_black_box_exists());
-		return METERS_TO_PIXELSf * black_detail.body->GetPosition();
-	}
-
-	vec2 physics::get_mass_position() const {
-		ensure(syncable_black_box_exists());
-		return METERS_TO_PIXELSf * black_detail.body->GetWorldCenter();
-	}
-
-	vec2 physics::velocity() const {
-		ensure(syncable_black_box_exists());
-		return vec2(black_detail.body->GetLinearVelocity()) * METERS_TO_PIXELSf;
-	}
-
-	vec2 physics::get_world_center() const {
-		ensure(syncable_black_box_exists());
-		return METERS_TO_PIXELSf * black_detail.body->GetWorldCenter();
-	}
-
-	vec2 physics::get_aabb_size() const {
-		ensure(syncable_black_box_exists());
-		b2AABB aabb;
-		aabb.lowerBound.Set(FLT_MAX, FLT_MAX);
-		aabb.upperBound.Set(-FLT_MAX, -FLT_MAX);
-
-		b2Fixture* fixture = black_detail.body->GetFixtureList();
-		
-		while (fixture != nullptr) {
-			aabb.Combine(aabb, fixture->GetAABB(0));
-			fixture = fixture->GetNext();
-		}
-
-		return vec2(aabb.upperBound.x - aabb.lowerBound.x, aabb.upperBound.y - aabb.lowerBound.y);
-	}
-
-	physics::type physics::get_body_type() const {
-		return black.body_type;
-	}
-
-	bool physics::is_activated() const {
-		return black.activated;
-	}
-
-	void physics::set_transform(entity_id id) {
-		set_transform(id.get<components::transform>());
-	}
-
-	void physics::set_transform(components::transform transform) {
-		black.transform = transform;
-
-		if (!syncable_black_box_exists())
-			return;
-
-		black_detail.body->SetTransform(transform.pos * PIXELS_TO_METERSf, transform.rotation * DEG_TO_RAD);
-	}
-
-	bool physics::should_body_exist_now() const {
-		return black_detail.parent_system != nullptr && black.activated;
-	}
-
-	bool physics::syncable_black_box_exists() const {
-		return black_detail.body != nullptr;
-	}
-
-	bool physics::test_point(vec2 v) const {
-		return black_detail.body->TestPoint(v * PIXELS_TO_METERSf);
+	if (renderer::get_current().debug_draw_forces && force.non_zero()) {
+		auto& lines = renderer::get_current().logic_lines;
+		lines.draw_green(location * METERS_TO_PIXELSf + force * METERS_TO_PIXELSf, location * METERS_TO_PIXELSf);
 	}
 }
+
+template<bool C>
+template <class = typename std::enable_if<!C>::type>
+void component_synchronizer<C, P>::apply_impulse(vec2 pixels) {
+	apply_impulse(pixels, vec2(0, 0), true);
+}
+
+template<bool C>
+template <class = typename std::enable_if<!C>::type>
+void component_synchronizer<C, P>::apply_impulse(vec2 pixels, vec2 center_offset, bool wake) {
+	ensure(is_constructed());
+
+	if (pixels.is_epsilon(2.f))
+		return;
+
+	vec2 force = pixels * PIXELS_TO_METERSf;
+	vec2 location = get_cache().body->GetWorldCenter() + (center_offset * PIXELS_TO_METERSf);
+
+	get_cache().body->ApplyLinearImpulse(force, location, true);
+
+	if (renderer::get_current().debug_draw_forces && force.non_zero()) {
+		auto& lines = renderer::get_current().logic_lines;
+		lines.draw_green(location * METERS_TO_PIXELSf + force * METERS_TO_PIXELSf, location * METERS_TO_PIXELSf);
+	}
+}
+
+template<bool C>
+template <class = typename std::enable_if<!C>::type>
+void component_synchronizer<C, P>::apply_angular_impulse(float imp) {
+	ensure(is_constructed());
+	get_cache().body->ApplyAngularImpulse(imp, true);
+}
+
+template<bool C>
+float component_synchronizer<C, P>::get_mass() const {
+	ensure(is_constructed());
+	return get_cache().body->GetMass();
+}
+
+template<bool C>
+float component_synchronizer<C, P>::get_angle() const {
+	ensure(is_constructed());
+	return get_cache().body->GetAngle() * RAD_TO_DEG;
+}
+
+template<bool C>
+float component_synchronizer<C, P>::get_angular_velocity() const {
+	ensure(is_constructed());
+	return get_cache().body->GetAngularVelocity() * RAD_TO_DEG;
+}
+
+template<bool C>
+float component_synchronizer<C, P>::get_inertia() const {
+	ensure(is_constructed());
+	return get_cache().body->GetInertia();
+}
+
+template<bool C>
+vec2 component_synchronizer<C, P>::get_position() const {
+	ensure(is_constructed());
+	return METERS_TO_PIXELSf * get_cache().body->GetPosition();
+}
+
+template<bool C>
+vec2 component_synchronizer<C, P>::get_mass_position() const {
+	ensure(is_constructed());
+	return METERS_TO_PIXELSf * get_cache().body->GetWorldCenter();
+}
+
+template<bool C>
+vec2 component_synchronizer<C, P>::velocity() const {
+	ensure(is_constructed());
+	return vec2(get_cache().body->GetLinearVelocity()) * METERS_TO_PIXELSf;
+}
+
+template<bool C>
+vec2 component_synchronizer<C, P>::get_world_center() const {
+	ensure(is_constructed());
+	return METERS_TO_PIXELSf * get_cache().body->GetWorldCenter();
+}
+
+template<bool C>
+vec2 component_synchronizer<C, P>::get_aabb_size() const {
+	ensure(is_constructed());
+	b2AABB aabb;
+	aabb.lowerBound.Set(FLT_MAX, FLT_MAX);
+	aabb.upperBound.Set(-FLT_MAX, -FLT_MAX);
+
+	b2Fixture* fixture = get_cache().body->GetFixtureList();
+
+	while (fixture != nullptr) {
+		aabb.Combine(aabb, fixture->GetAABB(0));
+		fixture = fixture->GetNext();
+	}
+
+	return vec2(aabb.upperBound.x - aabb.lowerBound.x, aabb.upperBound.y - aabb.lowerBound.y);
+}
+
+template<bool C>
+P::type component_synchronizer<C, P>::get_body_type() const {
+	return component.body_type;
+}
+
+template<bool C>
+bool component_synchronizer<C, P>::is_activated() const {
+	return component.activated;
+}
+
+template<bool C>
+template <class = typename std::enable_if<!C>::type>
+void component_synchronizer<C, P>::set_transform(const_entity_handle id) {
+	set_transform(id.get<components::transform>());
+}
+
+template<bool C>
+template <class = typename std::enable_if<!C>::type>
+void component_synchronizer<C, P>::set_transform(components::transform transform) {
+	component.transform = transform;
+
+	if (!is_constructed())
+		return;
+
+	get_cache().body->SetTransform(transform.pos * PIXELS_TO_METERSf, transform.rotation * DEG_TO_RAD);
+}
+
+template<bool C>
+bool component_synchronizer<C, P>::test_point(vec2 v) const {
+	return get_cache().body->TestPoint(v * PIXELS_TO_METERSf);
+}
+
+template class component_synchronizer<false, P>;
+template class component_synchronizer<true, P>;
