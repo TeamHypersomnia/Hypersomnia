@@ -21,14 +21,9 @@ public:
 
 	bool is_in(processing_subjects) const;
 
-	bool is_activated() const;
-
-	typename std::enable_if<!is_const, component_synchronizer&>::type 
-		operator=(const components::processing&);
-
-	typename std::enable_if<!is_const, void>::type 
-		remove_from(processing_subjects);
+	template<class = std::enable_if<!is_const>::type>
+	void remove_from(processing_subjects) const;
 	
-	typename std::enable_if<!is_const, void>::type 
-		add_to(processing_subjects);
+	template<class = std::enable_if<!is_const>::type>
+	void add_to(processing_subjects) const;
 };

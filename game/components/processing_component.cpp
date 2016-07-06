@@ -1,6 +1,8 @@
 #include "processing_component.h"
 #include "game/temporary_systems/processing_lists_system.h"
 #include "game/entity_handle.h"
+#include "game/cosmos.h"
+#include "game/types_specification/all_component_includes.h"
 
 components::processing components::processing::get_default(const_entity_handle id) {
 	std::vector<processing_subjects> matching;
@@ -83,26 +85,17 @@ bool component_synchronizer<C, components::processing>::is_in(processing_subject
 }
 
 template<bool C>
-template <class = typename std::enable_if<!is_const>::type>
-processing_synchronizer<C>& processing_synchronizer<C>::operator=(const components::processing& p) {
-	component.processing_subject_categories = p.processing_subject_categories;
-	return *this;
-}
-
-template<bool C>
-template <class = typename std::enable_if<!is_const>::type>
-void processing_synchronizer<C>::skip_processing_in(processing_subjects list) {
-	if (is_in(list)) {
-		handle.get_cosmos().temporary_systems.get<processing_lists_system>().
-	}
-
+template <class>
+void component_synchronizer<C, components::processing>::remove_from(processing_subjects list) const {
 	component.processing_subject_categories.set(int(list), 0);
+	complete_resubstantialization();
 }
 
 template<bool C>
-template <class = typename std::enable_if<!is_const>::type>
-void processing_synchronizer<C>::unskip_processing_in(processing_subjects) {
+template <class>
+void component_synchronizer<C, components::processing>::add_to(processing_subjects list) const {
 	component.processing_subject_categories.set(int(list), 1);
+	complete_resubstantialization();
 }
 
 template class component_synchronizer<false, components::processing>;
