@@ -41,7 +41,7 @@ public:
 	}
 
 	operator typename std::remove_reference<component_reference>::type() const {
-		return *component;
+		return component;
 	}
 };
 

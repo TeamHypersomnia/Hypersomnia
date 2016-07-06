@@ -15,6 +15,9 @@
 
 class cosmos;
 
+template <bool, class>
+class component_synchronizer;
+
 namespace augs {
 	template <bool is_const>
 	class basic_handle<is_const, cosmos, put_all_components_into<component_aggregate>::type> :
@@ -32,13 +35,15 @@ namespace augs {
 
 		template <class T, typename = void>
 		struct component_or_synchronizer {
+			typedef typename maybe_const_ref<is_const, T>::type return_type;
+
 			basic_entity_handle<is_const> h;
 
-			decltype(auto) get() const {
+			return_type get() const {
 				return h.allocator::get<T>();
 			}
 
-			decltype(auto) add(const T& t) const {
+			return_type add(const T& t) const {
 				auto& ret = h.allocator::add(t);
 				
 				if (std::is_same<T, components::substance>()) {
@@ -59,15 +64,17 @@ namespace augs {
 
 		template <class T>
 		struct component_or_synchronizer<T, typename std::enable_if<is_component_synchronized<T>::value>::type> {
+			typedef component_synchronizer<is_const, T> return_type;
+
 			basic_entity_handle<is_const> h;
 
-			auto get() const {
+			return_type get() const {
 				return component_synchronizer<is_const, T>(h.allocator::get<T>(), h);
 			}
 
-			auto add(const T& t) const {
+			return_type add(const T& t) const {
 				ensure(!h.has<T>());
-				auto& added = component_synchronizer<is_const, T>(h.allocator::add(t), h);
+				auto added = component_synchronizer<is_const, T>(h.allocator::add(t), h);
 				h.get_cosmos().complete_resubstantialization(h);
 				return added;
 			}
@@ -114,12 +121,12 @@ namespace augs {
 		}
 
 		template<class component>
-		typename std::enable_if<!is_const, component_or_synchronizer<component>>::type add(const component& c = component()) const {
+		typename std::enable_if<!is_const, typename component_or_synchronizer<component>::return_type>::type add(const component& c = component()) const {
 			return component_or_synchronizer<component>({ *this }).add(c);
 		}
 
 		template<class component>
-		typename std::enable_if<!is_const, component_or_synchronizer<component>>::type add(const component_or_synchronizer<component>& c = component()) const {
+		typename std::enable_if<!is_const, typename component_or_synchronizer<component>::return_type>::type add(const component_or_synchronizer<component>& c = component()) const {
 			return component_or_synchronizer<component>({ *this }).add(c.get_data());
 		}
 

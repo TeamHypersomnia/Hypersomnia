@@ -39,6 +39,10 @@ namespace augs {
 			return raw_id;
 		}
 
+		operator id_type() const {
+			return get_id();
+		}
+
 		std::string get_debug_name() const {
 			return raw_id.get_debug_name();
 		}

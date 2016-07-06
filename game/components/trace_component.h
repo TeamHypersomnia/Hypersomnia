@@ -1,5 +1,7 @@
 #pragma once
 #include "math/vec2.h"
+#include "misc/randomization.h"
+
 class processing_system;
 
 namespace components {
@@ -15,10 +17,10 @@ namespace components {
 
 		bool is_it_finishing_trace = false;
 
-		void reset(processing_system& p) {
-			// lengthening_time_passed_ms = 0.f;
-			// chosen_multiplier.set(p.randval(max_multiplier_x), p.randval(max_multiplier_y));
-			// chosen_lengthening_duration_ms = p.randval(lengthening_duration_ms);
+		void reset(randomization& p) {
+			lengthening_time_passed_ms = 0.f;
+			chosen_multiplier.set(p.randval(max_multiplier_x), p.randval(max_multiplier_y));
+			chosen_lengthening_duration_ms = p.randval(lengthening_duration_ms);
 		}
 	};
 }

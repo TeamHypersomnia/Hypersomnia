@@ -67,7 +67,7 @@ namespace augs {
 			component& add(const component& c) const {
 			auto& self = *static_cast<const derived*>(this);
 			ensure(!has<component>());
-			self.get().writable_id<component>() = owner.get_component_pool<component>().allocate(c);
+			self.get().writable_id<component>() = self.owner.get_component_pool<component>().allocate(c);
 		}
 
 		template<class component,

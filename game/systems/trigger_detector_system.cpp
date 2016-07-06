@@ -22,7 +22,7 @@
 #include "game/entity_handle.h"
 #include "game/step.h"
 
-void trigger_detector_system::consume_trigger_detector_presses(fixed_step& step) {
+void trigger_detector_system::consume_trigger_detector_presses(fixed_step& step) const {
 	auto& trigger_presses = step.messages.get_queue<messages::intent_message>();
 	auto& cosmos = step.cosm;
 
@@ -62,7 +62,7 @@ void trigger_detector_system::consume_trigger_detector_presses(fixed_step& step)
 	}
 }
 
-void trigger_detector_system::post_trigger_requests_from_continuous_detectors(fixed_step& step) {
+void trigger_detector_system::post_trigger_requests_from_continuous_detectors(fixed_step& step) const {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	auto targets_copy = cosmos.get(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
@@ -78,7 +78,7 @@ void trigger_detector_system::post_trigger_requests_from_continuous_detectors(fi
 	}
 }
 
-void trigger_detector_system::send_trigger_confirmations(fixed_step& step) {
+void trigger_detector_system::send_trigger_confirmations(fixed_step& step) const {
 	auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();
 	auto& cosmos = step.cosm;
 
