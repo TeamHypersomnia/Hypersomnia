@@ -12,6 +12,8 @@
 #include "ensure.h"
 #include "game/entity_handle.h"
 
+class fixed_step;
+
 namespace resources {
 	class behaviour_tree {
 	
@@ -32,14 +34,14 @@ namespace resources {
 
 		struct state_of_tree_instance {
 			int previously_executed_leaf_id = -1;
-			user_callback_input user_input;
-
-			state_of_tree_instance(user_callback_input);
+			//state_of_tree_instance(user_callback_input);
 		};
 
 		struct state_of_traversal {
-			state_of_traversal(state_of_tree_instance&, const behaviour_tree&);
+			state_of_traversal(entity_handle, fixed_step&, state_of_tree_instance&, const behaviour_tree&);
 
+			entity_handle subject;
+			fixed_step& step;
 			state_of_tree_instance& instance;
 			const behaviour_tree& original_tree;
 			

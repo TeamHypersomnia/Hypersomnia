@@ -43,11 +43,8 @@ namespace ingredients {
 
 		trees.resize(3);
 		
-		trees[0].state.user_input = e;
 		trees[0].tree_id = assets::behaviour_tree_id::HOSTILE_TARGET_PRIORITIZATION;
-		trees[1].state.user_input = e;
 		trees[1].tree_id = assets::behaviour_tree_id::SOLDIER_MOVEMENT;
-		trees[2].state.user_input = e;
 		trees[2].tree_id = assets::behaviour_tree_id::HANDS_ACTOR;
 		
 		//trees[1].state.user_input = e;

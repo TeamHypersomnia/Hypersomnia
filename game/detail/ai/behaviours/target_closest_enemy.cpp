@@ -9,6 +9,8 @@
 #include "game/detail/position_scripts.h"
 
 #include "game/detail/inventory_utils.h"
+#include "game/cosmos.h"
+#include "game/step.h"
 
 namespace behaviours {
 
@@ -20,28 +22,32 @@ namespace behaviours {
 		if (occ == tree::execution_occurence::LAST)
 			return;
 
-		auto subject = t.instance.user_input;
+		auto& cosmos = t.step.cosm;
+		auto subject = t.subject;
 		auto pos = position(subject);
 		auto& visibility = subject.get<components::visibility>();
 		auto& los = visibility.line_of_sight_layers[components::visibility::LINE_OF_SIGHT];
 		auto& attitude = subject.get<components::attitude>();
 
-		entity_id closest_hostile;
+		entity_id closest_hostile_raw;
 
 		float min_distance = std::numeric_limits<float>::max();
 
-		for (auto& s : los.visible_sentiences) {
+		for (auto s_raw : los.visible_sentiences) {
+			auto s = cosmos[s_raw];
 			auto att = calculate_attitude(s, subject);
 
 			if (att == attitude_type::WANTS_TO_KILL || att == attitude_type::WANTS_TO_KNOCK_UNCONSCIOUS) {
 				auto dist = distance_sq(s, subject);
 
 				if (dist < min_distance) {
-					closest_hostile = s;
+					closest_hostile_raw = s;
 					min_distance = dist;
 				}
 			}
 		}
+
+		auto closest_hostile = cosmos[closest_hostile_raw];
 
 		attitude.currently_attacked_visible_entity = closest_hostile;
 

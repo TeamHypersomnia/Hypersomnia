@@ -3,19 +3,18 @@
 #include "game/entity_handle.h"
 
 namespace resources {
-	behaviour_tree::state_of_traversal::state_of_traversal(state_of_tree_instance& in, const behaviour_tree& bt) 
-		: instance(in), original_tree(bt) {
+	behaviour_tree::state_of_traversal::state_of_traversal(entity_handle subject, fixed_step& step, state_of_tree_instance& in, const behaviour_tree& bt)
+		: step(step), instance(in), original_tree(bt), subject(subject) {
 		std::fill(goals_set.begin(), goals_set.end(), false);
 	}
-
 
 	const behaviour_tree::node& behaviour_tree::get_node_by_id(int i) const {
 		return *node_pointers[i];
 	}
 
-	behaviour_tree::state_of_tree_instance::state_of_tree_instance(user_callback_input user_input) : user_input(user_input) {
-		previously_executed_leaf_id = -1;
-	}
+	//behaviour_tree::state_of_tree_instance::state_of_tree_instance(user_callback_input user_input) : user_input(user_input) {
+	//	previously_executed_leaf_id = -1;
+	//}
 	
 	void behaviour_tree::dfs(node& p, std::function<void(node&)> f) {
 		f(p);

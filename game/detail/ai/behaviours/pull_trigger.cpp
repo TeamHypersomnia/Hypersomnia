@@ -6,12 +6,14 @@
 #include "game/components/gun_component.h"
 #include "game/detail/entity_scripts.h"
 #include "game/detail/position_scripts.h"
+#include "game/cosmos.h"
+#include "game/step.h"
 
 namespace behaviours {
 	tree::goal_availability pull_trigger::goal_resolution(tree::state_of_traversal& t) const {
-		auto subject = t.instance.user_input;
+		auto subject = t.subject;
 		auto& attitude = subject.get<components::attitude>();
-		auto currently_attacked_visible_entity = attitude.currently_attacked_visible_entity;
+		auto currently_attacked_visible_entity = t.step.cosm[attitude.currently_attacked_visible_entity];
 		auto crosshair = subject[sub_entity_name::CHARACTER_CROSSHAIR];
 		auto& crosshair_offset = crosshair.get<components::crosshair>().base_offset;
 
@@ -25,7 +27,7 @@ namespace behaviours {
 	}
 
 	void pull_trigger::execute_leaf_goal_callback(tree::execution_occurence o, tree::state_of_traversal& t) const {
-		auto subject = t.instance.user_input;
+		auto subject = t.subject;
 		auto wielded = subject.guns_wielded();
 
 		for (auto& w : wielded) {
