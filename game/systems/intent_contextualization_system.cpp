@@ -6,6 +6,7 @@
 #include "game/components/gun_component.h"
 #include "game/components/container_component.h"
 #include "game/components/trigger_query_detector_component.h"
+#include "game/components/melee_component.h"
 #include "game/components/trigger_collision_detector_component.h"
 
 #include "game/cosmos.h"
@@ -78,10 +79,10 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(fix
 				if (hand.alive() && hand->items_inside.size() > 0)
 					callee = hand.get_items_inside()[0];
 				else {
-					hand = cosmos[it.subject][slot_function::PRIMARY_HAND];
+					auto prim_hand = cosmos[it.subject][slot_function::PRIMARY_HAND];
 
-					if (hand.alive() && hand->items_inside.size() > 0)
-						callee = hand.get_items_inside()[0];
+					if (prim_hand.alive() && prim_hand->items_inside.size() > 0)
+						callee = prim_hand.get_items_inside()[0];
 				}
 			}
 		}

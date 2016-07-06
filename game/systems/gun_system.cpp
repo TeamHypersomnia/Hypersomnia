@@ -16,7 +16,6 @@
 
 #include "game/temporary_systems/physics_system.h"
 
-#include "game/detail/physics_setup_helpers.h"
 #include "game/detail/inventory_utils.h"
 
 #include "game/components/transform_component.h"
@@ -61,9 +60,8 @@ components::transform components::gun::calculate_barrel_transform(components::tr
 
 void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
+	auto delta = step.get_delta();
 	step.messages.get_queue<messages::gunshot_response>().clear();
-	auto& delta = cosmos.delta;
 
 	auto& physics_sys = cosmos.temporary_systems.get<physics_system>();
 
@@ -107,7 +105,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
 
 					while (charges--) {
 						{
-							auto round_entity = cosmos.clone_and_construct_entity(catridge_or_pellet_stack[sub_entity_name::BULLET_ROUND]); //??
+							auto round_entity = cosmos.clone_entity(catridge_or_pellet_stack[sub_entity_name::BULLET_ROUND]); //??
 							
 							auto& damage = round_entity.get<components::damage>();
 							damage.amount *= gun.damage_multiplier;
@@ -119,12 +117,14 @@ void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
 							auto rng = cosmos.get_rng_for(round_entity);
 							set_velocity(round_entity, vec2().set_from_degrees(barrel_transform.rotation).set_length(rng.randval(gun.muzzle_velocity)));
 							response.spawned_rounds.push_back(round_entity);
+
+							round_entity.add_standard_components();
 						}
 
 						auto shell_definition = catridge_or_pellet_stack[sub_entity_name::BULLET_SHELL];
 
 						if (shell_definition.alive()) {
-							auto shell_entity = cosmos.clone_and_construct_entity(shell_definition);
+							auto shell_entity = cosmos.clone_entity(shell_definition);
 
 							auto rng = cosmos.get_rng_for(shell_entity);
 
@@ -138,6 +138,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
 
 							set_velocity(shell_entity, vec2().set_from_degrees(barrel_transform.rotation + spread_component).set_length(rng.randval(gun.shell_velocity)));
 							response.spawned_shells.push_back(shell_entity);
+
+							shell_entity.add_standard_components();
 						}
 					}
 
