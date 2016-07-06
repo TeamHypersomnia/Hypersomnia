@@ -7,7 +7,8 @@
 #include "game/components/visibility_component.h"
 #include "game/components/physics_component.h"
 
-#include "game/entity_id.h"
+#include "game/entity_handle.h"
+#include "game/cosmos.h"
 
 #include "fbo.h"
 
@@ -183,7 +184,7 @@ namespace augs {
 	void renderer::line_channel::draw_yellow(vec2 a, vec2 b) { draw(a, b, yellow); }
 	void renderer::line_channel::draw_cyan(vec2 a, vec2 b) { draw(a, b, cyan); }
 
-	void renderer::draw_debug_info(vec2 visible_world_area, components::transform camera_transform, assets::texture_id tex_id, std::vector<const_entity_handle> target_entities, double ratio) {
+	void renderer::draw_debug_info(vec2 visible_world_area, components::transform camera_transform, assets::texture_id tex_id, std::vector<const_entity_handle> target_entities, float ratio) {
 		if (!debug_drawing) return;
 		
 		auto& tex = resource_manager.find(tex_id)->tex;
@@ -264,7 +265,7 @@ namespace augs {
 			std::vector<debug_line> interpolated_logic_lines;
 			interpolated_logic_lines.resize(logic_lines.lines.size());
 
-			for (int i = 0; i < logic_lines.lines.size(); ++i) {
+			for (size_t i = 0; i < logic_lines.lines.size(); ++i) {
 				interpolated_logic_lines[i].a = prev_logic_lines.lines[i].a.lerp(logic_lines.lines[i].a, ratio);
 				interpolated_logic_lines[i].b = prev_logic_lines.lines[i].b.lerp(logic_lines.lines[i].b, ratio);
 				interpolated_logic_lines[i].col = logic_lines.lines[i].col;
