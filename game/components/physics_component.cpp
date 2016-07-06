@@ -215,8 +215,8 @@ bool component_synchronizer<C, P>::is_activated() const {
 
 template<bool C>
 template <class = typename std::enable_if<!C>::type>
-void component_synchronizer<C, P>::set_transform(const_entity_handle id) {
-	set_transform(id.get<components::transform>());
+void component_synchronizer<C, P>::set_transform(entity_id id) {
+	set_transform(handle.get_cosmos()[id].get<components::transform>());
 }
 
 template<bool C>

@@ -71,7 +71,7 @@ public:
 	template <class = typename std::enable_if<!is_const>::type>
 	void set_transform(components::transform);
 	template <class = typename std::enable_if<!is_const>::type>
-	void set_transform(const_entity_handle);
+	void set_transform(entity_id);
 
 	template <class = typename std::enable_if<!is_const>::type>
 	void set_angular_damping(float);
