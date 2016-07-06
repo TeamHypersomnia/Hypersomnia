@@ -5,6 +5,7 @@
 #include "graphics/renderer.h"
 
 #include "game/components/physics_component.h"
+#include "game/components/special_physics_component.h"
 #include "game/components/gun_component.h"
 #include "game/detail/inventory_slot_id.h"
 #include "game/detail/inventory_slot.h"
@@ -71,17 +72,19 @@ float colinearize_AB(vec2 O_center_of_rotation, vec2 A_rifle_center, vec2 B_barr
 	return final_angle;
 }
 
-void rotation_copying_system::resolve_rotation_copying_value(cosmos& cosmos, entity_handle it) {
+void rotation_copying_system::resolve_rotation_copying_value(entity_handle it) const {
 	auto& rotation_copying = it.get<components::rotation_copying>();
+	auto& cosmos = it.get_cosmos();
+	auto target = cosmos[rotation_copying.target];
 
-	if (cosmos[rotation_copying.target].dead())
+	if (target.dead())
 		return;
 
 	auto& transform = it.get<components::transform>();
 	float new_angle = 0.f;
 
 	if (rotation_copying.look_mode == components::rotation_copying::look_type::POSITION) {
-		auto target_transform = cosmos[rotation_copying.target].find<components::transform>();
+		auto target_transform = target.find<components::transform>();
 		
 		if (target_transform != nullptr) {
 			auto diff = target_transform->pos - transform.pos;
@@ -112,16 +115,13 @@ void rotation_copying_system::resolve_rotation_copying_value(cosmos& cosmos, ent
 		}
 	}
 	else {
-		auto target_physics = cosmos[rotation_copying].target.find<components::physics>();
+		if (target.has<components::physics>()) {
+			auto target_physics = target.get<components::physics>();
 
-		if (target_physics != nullptr) {
 			vec2 direction;
 
 			if (rotation_copying.look_mode == components::rotation_copying::look_type::VELOCITY)
-				direction = vec2(target_physics->body->GetLinearVelocity());
-
-			if (rotation_copying.look_mode == components::rotation_copying::look_type::ACCELEARATION)
-				direction = vec2(target_physics->body->m_last_force);
+				direction = vec2(target_physics.velocity());
 
 			if (direction.non_zero())
 				new_angle = direction.degrees();
@@ -142,16 +142,15 @@ void rotation_copying_system::resolve_rotation_copying_value(cosmos& cosmos, ent
 	}
 }
 
-void rotation_copying_system::update_physical_motors(cosmos& cosmos) {
-	auto targets = cosmos.get(processing_subjects::WITH_ROTATION_COPYING);
-	for (auto it : targets) {
+void rotation_copying_system::update_physical_motors(cosmos& cosmos) const {
+	for (auto it : cosmos.get(processing_subjects::WITH_ROTATION_COPYING)) {
 		auto& rotation_copying = it.get<components::rotation_copying>();
 
 		if (rotation_copying.update_value) {
-			if (rotation_copying.use_physical_motor && it.find<components::physics>() != nullptr) {
+			if (rotation_copying.use_physical_motor && it.has<components::special_physics>()) {
 				resolve_rotation_copying_value(it);
 
-				auto& physics = it.get<components::physics>();
+				auto& physics = it.get<components::special_physics>();
 				physics.enable_angle_motor = true;
 				physics.target_angle = rotation_copying.last_value;
 			}
@@ -159,9 +158,8 @@ void rotation_copying_system::update_physical_motors(cosmos& cosmos) {
 	}
 }
 
-void rotation_copying_system::update_rotations(cosmos& cosmos) {
-	auto targets = cosmos.get(processing_subjects::WITH_ROTATION_COPYING);
-	for (auto it : targets) {
+void rotation_copying_system::update_rotations(cosmos& cosmos) const {
+	for (auto it : cosmos.get(processing_subjects::WITH_ROTATION_COPYING)) {
 		auto& rotation_copying = it.get<components::rotation_copying>();
 
 		if (rotation_copying.update_value) {

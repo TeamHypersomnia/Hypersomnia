@@ -8,7 +8,6 @@ namespace components {
 		enum look_type {
 			POSITION,
 			VELOCITY,
-			ACCELEARATION
 		};
 
 		enum rotation_copying_easing {
