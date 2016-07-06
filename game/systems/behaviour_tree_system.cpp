@@ -14,12 +14,12 @@ using namespace augs;
 void behaviour_tree_system::evaluate_trees(fixed_step& step) {
 	auto& cosmos = step.cosm;
 
-	for (auto t : cosmos.get(processing_subjects::WITH_BEHAVIOUR_TREE)) {
-		auto& behaviour_tree = t.get<components::behaviour_tree>();
+	for (auto target : cosmos.get(processing_subjects::WITH_BEHAVIOUR_TREE)) {
+		auto& behaviour_tree = target.get<components::behaviour_tree>();
 		
-		for (auto& t : behaviour_tree.concurrent_trees) {
-			auto& tree = *t.tree_id;
-			tree.evaluate_instance_of_tree(t.state);
+		for (auto& concurrent_tree : behaviour_tree.concurrent_trees) {
+			auto& tree = *concurrent_tree.tree_id;
+			tree.evaluate_instance_of_tree(step, target, concurrent_tree.state);
 		}
 	}
 }

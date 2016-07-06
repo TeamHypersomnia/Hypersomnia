@@ -34,14 +34,13 @@ namespace resources {
 
 		struct state_of_tree_instance {
 			int previously_executed_leaf_id = -1;
-			//state_of_tree_instance(user_callback_input);
 		};
 
 		struct state_of_traversal {
-			state_of_traversal(entity_handle, fixed_step&, state_of_tree_instance&, const behaviour_tree&);
+			state_of_traversal(fixed_step&, entity_handle, state_of_tree_instance&, const behaviour_tree&);
 
-			entity_handle subject;
 			fixed_step& step;
+			entity_handle subject;
 			state_of_tree_instance& instance;
 			const behaviour_tree& original_tree;
 			
@@ -88,7 +87,7 @@ namespace resources {
 
 		node root;
 		void build_tree();
-		void evaluate_instance_of_tree(state_of_tree_instance&) const;
+		void evaluate_instance_of_tree(fixed_step&, entity_handle, state_of_tree_instance&) const;
 
 		const node& get_node_by_id(int) const;
 	private:
