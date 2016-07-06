@@ -15,7 +15,6 @@
 
 using namespace augs;
 
-
 void movement_system::set_movement_flags_from_input(fixed_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
@@ -55,22 +54,20 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 
 		if (!movement.apply_movement_forces) continue;
 
-		auto* maybe_physics = it.find<components::physics>();
-
 		vec2 resultant;
 
 		resultant.x = movement.moving_right * movement.input_acceleration_axes.x - movement.moving_left * movement.input_acceleration_axes.x;
 		resultant.y = movement.moving_backward * movement.input_acceleration_axes.y - movement.moving_forward * movement.input_acceleration_axes.y;
 
-		if (maybe_physics == nullptr) {
+		if (!it.has<components::physics>()) {
 			it.get<components::transform>().pos += resultant * cosmos.delta.in_seconds();
 			continue;
 		}
 
-		auto& physics = *maybe_physics;
+		auto& physics = it.get<components::physics>();
 		
 		if (movement.make_inert_for_ms > 0.f) {
-			movement.make_inert_for_ms -= cosmos.delta.in_milliseconds();
+			movement.make_inert_for_ms -= static_cast<float>(cosmos.delta.in_milliseconds());
 			physics.set_linear_damping(2);
 		}
 		else
@@ -86,7 +83,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 			if (movement.walking_enabled)
 				resultant /= 2.f;
 
-			physics.apply_force(resultant * physics.body->GetMass(), movement.applied_force_offset, true);
+			physics.apply_force(resultant * physics.get_mass(), movement.applied_force_offset, true);
 		}
 
 		/* the player feels less like a physical projectile if we brake per-axis */
@@ -102,32 +99,30 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 void movement_system::generate_movement_responses(fixed_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
-	step.messages.get_queue<movement_response>().clear();
+	step.messages.get_queue<messages::movement_response>().clear();
 
 	auto targets = cosmos.get(processing_subjects::WITH_MOVEMENT);
 	for (auto it : targets) {
 		auto& movement = it.get<components::movement>();
 
-		auto* maybe_physics = it.find<components::physics>();
-		
 		float32 speed = 0.0f;
 
 		if (movement.enable_animation) {
-			if (maybe_physics == nullptr) {
-				if (it.get<components::render>().interpolation_direction().non_zero())
-					speed = movement.max_speed_for_movement_response;
+			if (it.has<components::physics>()) {
+				speed = it.get<components::physics>().velocity().length();
 			}
 			else
-				speed = maybe_physics->velocity().length();
+				if (it.get<components::render>().interpolation_direction().non_zero())
+					speed = movement.max_speed_for_movement_response;
 		}
 
-		movement_response msg;
+		messages::movement_response msg;
 
 		if (movement.max_speed_for_movement_response == 0.f) msg.speed = 0.f;
 		else msg.speed = speed / movement.max_speed_for_movement_response;
 		
 		for (auto receiver : movement.response_receivers) {
-			movement_response copy(msg);
+			messages::movement_response copy(msg);
 			copy.stop_response_at_zero_speed = receiver.stop_response_at_zero_speed;
 			copy.subject = receiver.target;
 			step.messages.post(copy);
