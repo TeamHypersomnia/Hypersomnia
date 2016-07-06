@@ -7,7 +7,6 @@
 #include "game/temporary_systems/physics_system.h"
 #include "render_system.h"
 
-#include "game/detail/physics_setup_helpers.h"
 #include "game/detail/entity_scripts.h"
 
 #include <limits>
@@ -23,6 +22,8 @@
 #include "game/enums/processing_subjects.h"
 #include "game/entity_handle.h"
 #include "game/detail/physics_scripts.h"
+
+#include "graphics/renderer.h"
 
 using namespace augs;
 

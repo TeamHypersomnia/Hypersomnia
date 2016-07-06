@@ -22,24 +22,29 @@
 #include "game/entity_handle.h"
 #include "game/step.h"
 
-void trigger_detector_system::consume_trigger_detector_presses() {
+void trigger_detector_system::consume_trigger_detector_presses(fixed_step& step) {
 	auto& trigger_presses = step.messages.get_queue<messages::intent_message>();
+	auto& cosmos = step.cosm;
 
 	for (auto& e : trigger_presses) {
+		auto subject = cosmos[e.subject];
+
 		if (e.intent == intent_type::QUERY_TOUCHING_TRIGGERS) {
-			auto* trigger_query_detector = e.subject.find<components::trigger_query_detector>();
+			auto* trigger_query_detector = subject.find<components::trigger_query_detector>();
 
 			if (trigger_query_detector) {
-				trigger_query_detector->detection_intent_enabled = e.pressed_flag;
+				bool pressed = e.pressed_flag;
+
+				trigger_query_detector->detection_intent_enabled = pressed;
 
 				if (trigger_query_detector->spam_trigger_requests_when_detection_intented) {
-					if (trigger_query_detector->detection_intent_enabled)
-						e.subject.unskip_processing_in(processing_subjects::trigger_query_detector>();
+					if (pressed)
+						subject.get<components::processing>().add_to(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
 					else
-						e.subject.skip_processing_in(processing_subjects::trigger_query_detector>();
+						subject.get<components::processing>().remove_from(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
 				}
-				else if(e.pressed_flag) {
-					e.subject.deactivate(trigger_query_detector);
+				else if(pressed) {
+					subject.get<components::processing>().remove_from(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
 
 					messages::trigger_hit_request_message request;
 					request.detector = e.subject;
@@ -48,7 +53,7 @@ void trigger_detector_system::consume_trigger_detector_presses() {
 			}
 		}
 		else if (e.intent == intent_type::DETECT_TRIGGER_COLLISIONS) {
-			auto* trigger_collision_detector = e.subject.find<components::trigger_collision_detector>();
+			auto* trigger_collision_detector = subject.find<components::trigger_collision_detector>();
 
 			if (trigger_collision_detector) {
 				trigger_collision_detector->detection_intent_enabled = e.pressed_flag;
@@ -64,7 +69,7 @@ void trigger_detector_system::post_trigger_requests_from_continuous_detectors(fi
 
 	for (auto& t : targets_copy) {
 		if (!t.get<components::trigger_query_detector>().detection_intent_enabled)
-			t.skip_processing_in(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
+			t.get<components::processing>().remove_from(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
 		else {
 			messages::trigger_hit_request_message request;
 			request.detector = t;
@@ -73,8 +78,9 @@ void trigger_detector_system::post_trigger_requests_from_continuous_detectors(fi
 	}
 }
 
-void trigger_detector_system::send_trigger_confirmations() {
+void trigger_detector_system::send_trigger_confirmations(fixed_step& step) {
 	auto& confirmations = step.messages.get_queue<messages::trigger_hit_confirmation_message>();
+	auto& cosmos = step.cosm;
 
 	confirmations.clear();
 
@@ -84,8 +90,8 @@ void trigger_detector_system::send_trigger_confirmations() {
 		if (c.type != messages::collision_message::event_type::PRE_SOLVE)
 			continue;
 
-		auto* collision_detector = c.subject.find<components::trigger_collision_detector>();
-		auto* trigger = c.collider.find<components::trigger>();
+		auto* collision_detector = cosmos[c.subject].find<components::trigger_collision_detector>();
+		auto* trigger = cosmos[c.collider].find<components::trigger>();
 
 		if (collision_detector && trigger && trigger->react_to_collision_detectors && collision_detector->detection_intent_enabled
 			) {
@@ -99,21 +105,21 @@ void trigger_detector_system::send_trigger_confirmations() {
 	auto& requests = step.messages.get_queue<messages::trigger_hit_request_message>();
 
 	for (auto& e : requests) {
-		auto& trigger_query_detector = e.detector.get<components::trigger_query_detector>();
-		auto& detector_body = e.detector;
+		auto& trigger_query_detector = cosmos[e.detector].get<components::trigger_query_detector>();
+		auto detector_body = cosmos[e.detector];
 		
 		std::vector<entity_id> found_triggers;
 
-		auto found_physical_triggers = parent_cosmos.temporary_systems.get<physics_system>().query_body(detector_body, filters::trigger());
+		auto found_physical_triggers = cosmos.temporary_systems.get<physics_system>().query_body(detector_body, filters::trigger());
 
 		for (auto found_trigger : found_physical_triggers.entities) {
-			auto* maybe_trigger = found_trigger.find<components::trigger>();
+			auto* maybe_trigger = cosmos[found_trigger].find<components::trigger>();
 			
 			if (maybe_trigger && maybe_trigger->react_to_query_detectors)
 				found_triggers.push_back(found_trigger);
 		}
 
-		for (auto& t : found_triggers) {
+		for (auto t : found_triggers) {
 			messages::trigger_hit_confirmation_message confirmation;
 			confirmation.trigger = t;
 			confirmation.detector_body = detector_body;

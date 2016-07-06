@@ -5,9 +5,7 @@ class fixed_step;
 
 class trigger_detector_system {
 public:
-	void consume_trigger_detector_presses();
-
+	void consume_trigger_detector_presses(fixed_step&);
 	void post_trigger_requests_from_continuous_detectors(fixed_step&);
-
-	void send_trigger_confirmations();
+	void send_trigger_confirmations(fixed_step&);
 };

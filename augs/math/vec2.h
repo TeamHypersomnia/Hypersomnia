@@ -318,7 +318,7 @@ namespace augs {
 			return normalize_hint(length());
 		}
 
-		vec2t perpendicular_cw() {
+		vec2t perpendicular_cw() const {
 			return vec2t(-y, x);
 		}
 		
@@ -394,23 +394,23 @@ namespace augs {
 			return !non_zero(eps);
 		}
 		
-		vec2t operator-() { return vec2t(x * -1, y * -1); }
+		vec2t operator-() const { return vec2t(x * -1, y * -1); }
 
-		bool compare_abs(const vec2t& b, const float epsilon = AUGS_EPSILON) {
+		bool compare_abs(const vec2t& b, const float epsilon = AUGS_EPSILON) const {
 			if (std::abs(x - b.x) < epsilon && std::abs(y - b.y) < epsilon)
 				return true;
 
 			return false;
 		}
 
-		bool is_epsilon(const float epsilon = AUGS_EPSILON) {
+		bool is_epsilon(const float epsilon = AUGS_EPSILON) const {
 			if (std::abs(x) < epsilon && std::abs(y) < epsilon)
 				return true;
 
 			return false;
 		}
 
-		bool compare(const vec2t& b, const float epsilon = AUGS_EPSILON) {
+		bool compare(const vec2t& b, const float epsilon = AUGS_EPSILON) const {
 			if ((*this - b).length_sq() <= epsilon*epsilon)
 				return true;
 
