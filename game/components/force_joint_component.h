@@ -1,5 +1,4 @@
 #pragma once
-
 #include <array>
 #include "transform_component.h"
 

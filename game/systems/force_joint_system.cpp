@@ -4,6 +4,7 @@
 
 #include "game/components/force_joint_component.h"
 #include "game/components/physics_component.h"
+#include "game/components/special_physics_component.h"
 #include "game/components/transform_component.h"
 
 #include "game/cosmos.h"
@@ -47,10 +48,12 @@ void force_joint_system::apply_forces_towards_target_entities(fixed_step& step) 
 
 			auto& offsets = force_joint.force_offsets;
 
+			int offsets_count = offsets.size();
+
 			//if (!is_force_epsilon) 
 			{
-				for (auto& offset : offsets)
-					physics.apply_force(force_for_chaser * physics.get_mass() / offsets.size(), offset);
+				for (auto offset : offsets)
+					physics.apply_force(force_for_chaser * physics.get_mass() / offsets_count, offset);
 
 				//LOG("F: %x, %x, %x", force_for_chaser, physics.velocity(), AS_INTV physics.get_position());
 			}
@@ -66,7 +69,7 @@ void force_joint_system::apply_forces_towards_target_entities(fixed_step& step) 
 			}
 
 			if (force_joint.consider_rotation)
-				physics.target_angle = chased_transform.rotation;
+				it.get<components::special_physics>().target_angle = chased_transform.rotation;
 
 			//LOG("F: %x", physics.body->GetLinearDamping());
 		}
