@@ -3,6 +3,7 @@
 #include "game/detail/inventory_slot_handle.h"
 #include "game/components/item_component.h"
 #include "game/components/item_slot_transfers_component.h"
+#include "game/components/gun_component.h"
 #include "game/cosmos.h"
 
 #include "inventory_getters.h"
@@ -15,9 +16,7 @@ basic_entity_handle<C> inventory_getters<C>::get_owning_transfer_capability() co
 	if (self.dead())
 		return cosmos[entity_id()];
 
-	auto* maybe_transfer_capability = self.find<components::item_slot_transfers>();
-
-	if (maybe_transfer_capability)
+	if (self.has<components::item_slot_transfers>())
 		return self;
 
 	auto* maybe_item = self.find<components::item>();
@@ -33,8 +32,8 @@ typename inventory_getters<C>::inventory_slot_handle_type inventory_getters<C>::
 	auto& self = *static_cast<const entity_handle_type*>(this);
 	auto& cosmos = self.get_cosmos();
 
-	auto maybe_primary = operator[](slot_function::PRIMARY_HAND);
-	auto maybe_secondary = operator[](slot_function::SECONDARY_HAND);
+	auto maybe_primary = self[slot_function::PRIMARY_HAND];
+	auto maybe_secondary = self[slot_function::SECONDARY_HAND];
 
 	if (maybe_primary.is_empty_slot())
 		return maybe_primary;
@@ -46,7 +45,7 @@ typename inventory_getters<C>::inventory_slot_handle_type inventory_getters<C>::
 }
 
 template <bool C>
-typename inventory_getters<C>::inventory_slot_handle_type inventory_getters<C>::determine_hand_holstering_slot(entity_handle_type searched_root_container) const {
+typename inventory_getters<C>::inventory_slot_handle_type inventory_getters<C>::determine_hand_holstering_slot_in(entity_handle_type searched_root_container) const {
 	auto& item_entity = *static_cast<const entity_handle_type*>(this);
 	auto& cosmos = item_entity.get_cosmos();
 
@@ -83,7 +82,7 @@ typename inventory_getters<C>::inventory_slot_handle_type inventory_getters<C>::
 	ensure(searched_root_container.alive());
 	auto& cosmos = item_entity.get_cosmos();
 
-	auto hidden_slot = item_entity.determine_hand_holstering_slot(searched_root_container);;
+	auto hidden_slot = item_entity.determine_hand_holstering_slot_in(searched_root_container);;
 
 	if (cosmos[hidden_slot].alive())
 		return hidden_slot;
@@ -115,22 +114,26 @@ std::vector<basic_entity_handle<C>> inventory_getters<C>::guns_wielded() const {
 	auto& subject = *static_cast<const entity_handle_type*>(this);
 	std::vector<entity_handle_type> result;
 
-	auto hand = subject[slot_function::PRIMARY_HAND];
+	{
+		auto hand = subject[slot_function::PRIMARY_HAND];
 
-	if (hand.has_items()) {
-		auto wielded = hand.get_items_inside()[0];
-		if (wielded.find<components::gun>()) {
-			result.push_back(wielded);
+		if (hand.has_items()) {
+			auto wielded = hand.get_items_inside()[0];
+			if (wielded.has<components::gun>()) {
+				result.push_back(wielded);
+			}
 		}
 	}
 
-	hand = subject[slot_function::SECONDARY_HAND];
+	{
+		auto hand = subject[slot_function::SECONDARY_HAND];
 
-	if (hand.has_items()) {
-		auto wielded = hand.get_items_inside()[0];
+		if (hand.has_items()) {
+			auto wielded = hand.get_items_inside()[0];
 
-		if (wielded.find<components::gun>()) {
-			result.push_back(wielded);
+			if (wielded.has<components::gun>()) {
+				result.push_back(wielded);
+			}
 		}
 	}
 

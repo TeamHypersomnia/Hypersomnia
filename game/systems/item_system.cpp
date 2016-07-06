@@ -46,7 +46,9 @@ void item_system::handle_trigger_confirmations_as_pick_requests(fixed_step& step
 	auto& physics = cosmos.temporary_systems.get<physics_system>();
 
 	for (auto& e : confirmations) {
-		auto* item_slot_transfers = cosmos[e.detector_body].find<components::item_slot_transfers>();
+		auto detector = cosmos[e.detector_body];
+
+		auto* item_slot_transfers = detector.find<components::item_slot_transfers>();
 		auto item_entity = cosmos.get_handle(e.trigger).get_owner_body_entity();
 
 		auto* item = item_entity.find<components::item>();
@@ -59,7 +61,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests(fixed_step& step
 				|| item_slot_transfers->only_pick_these_items.find(item_entity) != item_slot_transfers->only_pick_these_items.end();
 			
 			if (item_subscribed) {
-				auto item_slot_transfer_request = item_entity.request(cosmos[determine_pickup_target_slot_in(item_entity, cosmos[e.detector_body])]);
+				item_slot_transfer_request request(item_entity, item_entity.determine_pickup_target_slot_in(detector));
 
 				if (request.target_slot.alive()) {
 					if (item_slot_transfers->pickup_timeout.try_to_fire_and_reset(cosmos.delta)) {
@@ -114,10 +116,9 @@ void item_system::handle_holster_item_intents(fixed_step& step) {
 
 				if (hand.has_items()) {
 					auto item_inside = hand.get_items_inside()[0];
+					item_slot_transfer_request request(item_inside, item_inside.determine_hand_holstering_slot_in(subject));
 
-					auto item_slot_transfer_request =  item_inside.request(cosmos[determine_hand_holstering_slot(item_inside, subject)]);
-
-					if (cosmos[request.target_slot].alive())
+					if (request.target_slot.alive())
 						perform_transfer(request, step);
 				}
 			}
@@ -149,7 +150,7 @@ void item_system::process_mounting_and_unmounting(fixed_step& step) {
 				ensure(item.intended_mounting != item.current_mounting);
 
 				if (item.montage_time_left_ms > 0) {
-					item.montage_time_left_ms -= cosmos.delta.in_milliseconds();
+					item.montage_time_left_ms -= static_cast<float>(cosmos.delta.in_milliseconds());
 				}
 				else {
 					item.current_mounting = item.intended_mounting;
