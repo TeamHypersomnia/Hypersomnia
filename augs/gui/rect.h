@@ -161,7 +161,7 @@ namespace augs {
 			virtual void perform_logic_step(gui_world&);
 		public:
 			rects::ltrb<float> rc_clipped;
-			rects::ltrb<float> clipping_rect = rects::ltrb<float>(0, 0, std::numeric_limits<int>::max() / 2, std::numeric_limits<int>::max() / 2);
+			rects::ltrb<float> clipping_rect = rects::ltrb<float>(0.f, 0.f, std::numeric_limits<int>::max() / 2.f, std::numeric_limits<int>::max() / 2.f);
 
 			vec2i absolute_xy;
 		};

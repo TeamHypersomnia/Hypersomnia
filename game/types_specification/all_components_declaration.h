@@ -1,4 +1,5 @@
 #pragma once
+#pragma warning(disable : 4503)
 
 namespace components {
 	struct dynamic_tree_node;

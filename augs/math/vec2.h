@@ -7,6 +7,8 @@
 #define AUGS_EPSILON 0.0001f
 #define DEG_TO_RAD 0.01745329251994329576923690768489
 #define RAD_TO_DEG (1.0/0.01745329251994329576923690768489)
+#define DEG_TO_RADf 0.01745329251994329576923690768489f
+#define RAD_TO_DEGf (1.0f/0.01745329251994329576923690768489f)
 
 #define PI_f 3.1415926535897932384626433832795f
 #define PI_d 3.1415926535897932384626433832795
@@ -234,11 +236,11 @@ namespace augs {
 		}
 
 		float radians() const {
-			return atan2(y, x);
+			return static_cast<float>(atan2(y, x));
 		}
 
 		float degrees() const {
-			return radians()*RAD_TO_DEG;
+			return radians()*RAD_TO_DEGf;
 		}
 
 		float radians_between(const vec2t<>& v) const {
@@ -260,7 +262,7 @@ namespace augs {
 
 		template<class A, class B>
 		vec2t& set(const A& vx, const B& vy) {
-			x = vx; y = vy;
+			x = static_cast<type>(vx); y = static_cast<type>(vy);
 			return *this;
 		}
 		
