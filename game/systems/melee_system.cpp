@@ -10,7 +10,6 @@
 #include "game/components/damage_component.h"
 #include "game/components/fixtures_component.h"
 
-
 #include "game/detail/combat/melee_animation.h"
 
 #include "game/entity_handle.h"
@@ -68,7 +67,7 @@ void melee_system::initiate_and_update_moves(fixed_step& step) {
 	- fixed delta timestep if it's a logic procedure 
 	- variable frame time if it is a rendering-time procedure 
 	*/
-	auto dt = cosmos.delta.in_milliseconds();
+	auto dt = static_cast<float>(cosmos.delta.in_milliseconds());
 
 	/* clear melee swing response queue because this is the only place where we send them */
 	step.messages.get_queue<messages::melee_swing_response>().clear();
@@ -88,7 +87,7 @@ void melee_system::initiate_and_update_moves(fixed_step& step) {
 		switch (melee.current_state) {
 		case melee_state::FREE:
 			if (melee.primary_move_flag) {
-				melee.current_state = primary_action(cosmos, step, dt, t, melee, damage);
+				melee.current_state = primary_action(step, dt, t, melee, damage);
 			}
 			/* send a response message so that the rest of the game knows that a swing has occured;
 			the message could be read by particles system, audio system and possibly animation system
@@ -103,7 +102,7 @@ void melee_system::initiate_and_update_moves(fixed_step& step) {
 			}
 			break;
 		case melee_state::PRIMARY:
-			melee.current_state = primary_action(cosmos,step,dt,t,melee,damage);
+			melee.current_state = primary_action(step,dt,t,melee,damage);
 			break;
 		 default:
 			LOG("Uknown action in melee_system.cpp");
@@ -111,8 +110,10 @@ void melee_system::initiate_and_update_moves(fixed_step& step) {
 	}
 }
 
-melee_state melee_system::primary_action(fixed_step& step, double dt, entity_handle target, components::melee& melee_component, components::damage& damage)
+melee_state melee_system::primary_action(fixed_step& step, double dt_d, entity_handle target, components::melee& melee_component, components::damage& damage)
 {
+	float dt = static_cast<float>(dt_d);
+
 	damage.damage_upon_collision = true;
 
 	if (melee_component.swing_current_time > melee_component.swings[int(melee_component.action_stage)].duration_ms) {

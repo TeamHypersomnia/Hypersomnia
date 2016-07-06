@@ -1,6 +1,6 @@
 #pragma once
-
 #include "game/enums/melee_state.h"
+#include "game/entity_handle_declaration.h"
 
 class cosmos;
 class fixed_step;
@@ -11,10 +11,6 @@ namespace components{
 }
 
 class melee_animation;
-template<bool> class basic_entity_handle;
-
-typedef basic_entity_handle<false> entity_handle;
-typedef basic_entity_handle<true> const_entity_handle;
 
 class melee_system {
 public:
