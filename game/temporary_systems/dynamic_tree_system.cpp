@@ -7,7 +7,7 @@
 #include "game/enums/filters.h"
 
 bool dynamic_tree_system::cache::is_constructed() const {
-	return is_constructed;
+	return constructed;
 }
 
 void dynamic_tree_system::destruct(const_entity_handle handle) {

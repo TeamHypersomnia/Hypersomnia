@@ -140,14 +140,14 @@ void physics_system::construct(entity_handle handle) {
 			def.userData = handle;
 			def.bullet = physics_data.bullet;
 			def.position = physics_data.transform.pos * PIXELS_TO_METERSf;
-			def.angle = physics_data.transform.rotation * DEG_TO_RAD;
+			def.angle = physics_data.transform.rotation * DEG_TO_RADf;
 			def.angularDamping = physics_data.angular_damping;
 			def.linearDamping = physics_data.linear_damping;
 			def.fixedRotation = physics_data.fixed_rotation;
 			def.gravityScale = physics_data.gravity_scale;
 			def.active = true;
 			def.linearVelocity = physics_data.velocity * PIXELS_TO_METERSf;
-			def.angularVelocity = physics_data.angular_velocity * DEG_TO_RAD;
+			def.angularVelocity = physics_data.angular_velocity * DEG_TO_RADf;
 
 			cache.body = b2world.CreateBody(&def);
 			cache.body->SetAngledDampingEnabled(physics_data.angled_damping);
@@ -255,10 +255,10 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 		auto entity = cosmos[b->GetUserData()];
 		auto& physics = entity.get<components::physics>();
 
-		recurential_friction_handler(cosmos[b->GetUserData()], cosmos[physics.get_owner_friction_ground()]);
+		recurential_friction_handler(step, entity, entity.get_owner_friction_ground());
 
 		auto body_pos = METERS_TO_PIXELSf * b->GetPosition();
-		auto body_angle = b->GetAngle() * RAD_TO_DEG;
+		auto body_angle = b->GetAngle() * RAD_TO_DEGf;
 
 		for (auto& ff : physics.get_fixture_entities()) {
 			auto fe = cosmos[ff];
@@ -287,6 +287,6 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 
 		physics.get_data().transform = transform;
 		physics.get_data().velocity = METERS_TO_PIXELSf * b->GetLinearVelocity();
-		physics.get_data().angular_velocity = RAD_TO_DEG * b->GetAngularVelocity();
+		physics.get_data().angular_velocity = RAD_TO_DEGf * b->GetAngularVelocity();
 	}
 }
