@@ -89,6 +89,6 @@ void damage_system::destroy_outdated_bullets(fixed_step& step) {
 		}
 
 		damage.distance_travelled += speed(it);
-		damage.lifetime_ms += cosmos.delta.in_milliseconds();
+		damage.lifetime_ms += static_cast<float>(cosmos.delta.in_milliseconds());
 	}
 }

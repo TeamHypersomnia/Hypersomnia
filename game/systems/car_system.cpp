@@ -104,7 +104,7 @@ void car_system::apply_movement_forces(fixed_step& step) {
 		auto base_damping = (forwardal_speed < car.maximum_speed_with_static_damping ? car.static_damping : car.dynamic_damping);
 
 		if (car.braking_damping >= 0.f) {
-			base_damping += resultant.x > 0 ? 0.0 : car.braking_damping;
+			base_damping += resultant.x > 0 ? 0.0f : car.braking_damping;
 
 		}
 
@@ -138,7 +138,7 @@ void car_system::apply_movement_forces(fixed_step& step) {
 		}
 
 		if(forwardal_speed > car.minimum_speed_for_maneuverability_decrease)
-			physics.apply_angular_impulse(physics.get_inertia() * -physics.get_angular_velocity() * DEG_TO_RAD * 
+			physics.apply_angular_impulse(physics.get_inertia() * -physics.get_angular_velocity() * DEG_TO_RADf * 
 				(forwardal_speed-car.minimum_speed_for_maneuverability_decrease)*car.maneuverability_decrease_multiplier);
 
 		//float angle = physics.get_angle();

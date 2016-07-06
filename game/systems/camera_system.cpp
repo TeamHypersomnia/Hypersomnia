@@ -111,7 +111,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing(fixed_step& step) {
 
 		if (camera.enable_smoothing) {
 			/* variable time step camera smoothing by averaging last position with the current */
-			float averaging_constant = 1.0f - pow(camera.smoothing_average_factor, camera.averages_per_sec * cosmos.delta.in_seconds());
+			float averaging_constant = 1.0f - static_cast<float>(pow(camera.smoothing_average_factor, camera.averages_per_sec * cosmos.delta.in_seconds()));
 
 			if (camera.dont_smooth_once)
 				averaging_constant = 0.0f;
@@ -130,8 +130,8 @@ void camera_system::resolve_cameras_transforms_and_smoothing(fixed_step& step) {
 
 			/* save smoothing result */
 			//if ((smoothed_camera_transform.pos - camera.last_interpolant.pos).length() > 5)
-			vec2 calculated_smoothed_pos = target - smoothed_part + camera.last_interpolant.pos;
-			int calculated_smoothed_rotation = camera.last_interpolant.rotation;
+			vec2 calculated_smoothed_pos = static_cast<vec2>(target - smoothed_part) + camera.last_interpolant.pos;
+			int calculated_smoothed_rotation = static_cast<int>(camera.last_interpolant.rotation);
 
 			//if (vec2i(calculated_smoothed_pos) == vec2i(smoothed_camera_transform.pos))
 			//	camera.last_interpolant.pos = smoothed_part;
@@ -144,7 +144,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing(fixed_step& step) {
 				camera.last_interpolant.rotation = smoothed_camera_transform.rotation;
 
 			smoothed_camera_transform.pos = calculated_smoothed_pos;
-			smoothed_camera_transform.rotation = calculated_smoothed_rotation;
+			smoothed_camera_transform.rotation = static_cast<float>(calculated_smoothed_rotation);
 
 			//smoothing_player_pos
 
