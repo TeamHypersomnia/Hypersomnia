@@ -273,14 +273,14 @@ namespace augs {
 		}
 
 		vec2t& set_from_degrees(float degrees) {
-			float radians = degrees * DEG_TO_RAD;
+			float radians = degrees * DEG_TO_RADf;
 			set(cos(radians), sin(radians));
 			normalize();
 			return *this;
 		}
 
 		vec2t& set_from_radians(float radians) {
-			return set_from_degrees(radians * RAD_TO_DEG);
+			return set_from_degrees(radians * RAD_TO_DEGf);
 		}
 
 		template <typename v>

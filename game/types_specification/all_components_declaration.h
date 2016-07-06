@@ -1,4 +1,5 @@
 #pragma once
+// disables the warning due to type name length exceeded
 #pragma warning(disable : 4503)
 
 namespace components {

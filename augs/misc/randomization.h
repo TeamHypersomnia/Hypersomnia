@@ -3,8 +3,6 @@
 #include <utility>
 
 struct randomization {
-public:
-
 	std::mt19937 generator;
 	randomization(size_t seed = 0);
 
