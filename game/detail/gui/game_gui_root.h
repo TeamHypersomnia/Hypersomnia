@@ -6,6 +6,10 @@
 #include "drag_and_drop.h"
 #include "aabb_highlighter.h"
 
+#include "misc/machine_entropy.h"
+
+class fixed_step;
+
 struct game_gui_root : public augs::gui::rect {
 	augs::gui::rect parent_of_inventory_controls;
 	augs::gui::rect parent_of_game_windows;
@@ -17,7 +21,6 @@ struct game_gui_root : public augs::gui::rect {
 
 class gui_system;
 struct game_gui_world : public augs::gui::gui_world {
-	gui_system* gui_system = nullptr;
 	vec2 gui_crosshair_position;
 
 	aabb_highlighter world_hover_highlighter;
@@ -37,5 +40,5 @@ struct game_gui_world : public augs::gui::gui_world {
 	void draw_cursor_and_tooltip(viewing_step&) const;
 
 	entity_id get_hovered_world_entity(vec2 camera_pos);
-	drag_and_drop_result prepare_drag_and_drop_result();
+	drag_and_drop_result prepare_drag_and_drop_result() const;
 };

@@ -32,13 +32,15 @@ public:
 
 	immediate_hud hud;
 
+	gui_system();
+
 	void translate_game_events_for_hud(fixed_step&);
 
 	void resize(vec2i size) { gui.resize(size); }
 
 	void rebuild_gui_tree_based_on_game_state(fixed_step&);
-	void translate_raw_window_inputs_to_gui_events(augs::machine_entropy);
-	void suppress_inputs_meant_for_gui(augs::machine_entropy&);
+	void translate_raw_window_inputs_to_gui_events(fixed_step&);
+	void suppress_inputs_meant_for_gui(fixed_step&);
 
 	void switch_to_gui_mode_and_back(fixed_step&);
 

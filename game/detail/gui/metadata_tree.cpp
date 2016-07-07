@@ -11,6 +11,7 @@ void gui_system::rebuild_gui_tree_based_on_game_state(fixed_step& step) {
 	if (freeze_gui_model())
 		return;
 
+	gui.root.children = { &game_gui_root };
 	game_gui_root.parent_of_inventory_controls.cache_descendants_before_children_reassignment();
 
 	std::vector<augs::gui::rect_id> inventory_roots;

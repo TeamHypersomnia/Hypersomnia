@@ -17,7 +17,7 @@ bool drag_and_drop_result::will_item_be_disposed() {
 	return result.result >= item_transfer_result_type::SUCCESSFUL_TRANSFER && intent.target_slot.dead();
 }
 
-drag_and_drop_result game_gui_world::prepare_drag_and_drop_result() {
+drag_and_drop_result game_gui_world::prepare_drag_and_drop_result() const {
 	drag_and_drop_result out;
 	auto& tooltip_text = out.tooltip_text;
 
@@ -33,7 +33,7 @@ drag_and_drop_result game_gui_world::prepare_drag_and_drop_result() {
 
 			out.possible_target_hovered = true;
 
-			item_slot_transfer_request simulated_request;
+			const_item_slot_transfer_request simulated_request(dragged_item->item, dragged;
 			simulated_request.item = dragged_item->item;
 			simulated_request.specified_quantity = dragged_charges;
 

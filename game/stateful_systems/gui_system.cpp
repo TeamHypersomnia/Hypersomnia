@@ -14,9 +14,9 @@
 #include "game/systems/crosshair_system.h"
 #include "game/entity_handle.h"
 
+#include "game/step.h"
+
 gui_system::gui_system() {
-	gui.gui_system = this;
-	gui.root.children.push_back(&game_gui_root);
 	gui.root.clip = false;
 }
 
@@ -40,11 +40,11 @@ entity_id gui_system::get_cosmos_crosshair(const cosmos& cosm) {
 	}
 }
 
-void gui_system::translate_raw_window_inputs_to_gui_events(augs::machine_entropy entropy) {
+void gui_system::translate_raw_window_inputs_to_gui_events(fixed_step& step) {
 	if (!is_gui_look_enabled)
 		return;
 	
-	auto window_inputs = entropy.local;
+	auto window_inputs = step.entropy.local;
 
 	if (freeze_gui_model()) {
 		buffered_inputs_during_freeze.insert(buffered_inputs_during_freeze.end(), window_inputs.begin(), window_inputs.end());
@@ -60,11 +60,11 @@ void gui_system::translate_raw_window_inputs_to_gui_events(augs::machine_entropy
 	gui.perform_logic_step();
 }
 
-void gui_system::suppress_inputs_meant_for_gui(augs::machine_entropy& entropy) {
+void gui_system::suppress_inputs_meant_for_gui(fixed_step& step) {
 	if (!is_gui_look_enabled)
 		return;
 	
-	erase_remove(entropy.local, [](auto it) {
+	erase_remove(step.entropy.local, [](auto it) {
 		if (it.msg != window::event::keydown &&
 			it.msg != window::event::keyup) {
 			return true;
