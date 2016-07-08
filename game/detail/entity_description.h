@@ -16,7 +16,7 @@ description_of_entity(const_entity_handle)
 
 std::wstring describe_properties(const_entity_handle);
 
-std::wstring describe_item_compatibility_categories(unsigned flags);
+std::wstring describe_item_compatibility_categories(unsigned long long flags);
 textual_description describe_slot_function(slot_function);
 
 std::wstring describe_slot(const_inventory_slot_handle);

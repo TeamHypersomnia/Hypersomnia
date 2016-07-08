@@ -55,6 +55,8 @@ void physics_system::rechoose_owner_friction_body(entity_handle entity) {
 void physics_system::recurential_friction_handler(fixed_step& step, entity_handle entity, entity_handle friction_owner) {
 	if (friction_owner.dead()) return;
 
+	float dt = static_cast<float>(step.get_delta().in_seconds());
+
 	auto& physics = entity.get<components::physics>();
 
 	auto& friction_physics = friction_owner.get<components::fixtures>();
@@ -65,9 +67,9 @@ void physics_system::recurential_friction_handler(fixed_step& step, entity_handl
 	auto* body = get_rigid_body_cache(entity).body;
 
 	auto friction_body = get_rigid_body_cache(friction_entity).body;
-	auto fricted_pos = body->GetPosition() + step.get_delta().in_seconds() * friction_body->GetLinearVelocityFromWorldPoint(body->GetPosition());
+	auto fricted_pos = body->GetPosition() + dt* friction_body->GetLinearVelocityFromWorldPoint(body->GetPosition());
 
-	body->SetTransform(fricted_pos, body->GetAngle() + step.get_delta().in_seconds()*friction_body->GetAngularVelocity());
+	body->SetTransform(fricted_pos, body->GetAngle() + dt*friction_body->GetAngularVelocity());
 
 	friction_entity.get<components::special_physics>().measured_carried_mass += physics.get_mass() + entity.get<components::special_physics>().measured_carried_mass;
 }

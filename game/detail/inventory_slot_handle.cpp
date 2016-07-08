@@ -48,6 +48,11 @@ typename basic_inventory_slot_handle<C>::slot_reference basic_inventory_slot_han
 }
 
 template <bool C>
+typename basic_inventory_slot_handle<C>::slot_reference basic_inventory_slot_handle<C>::get() const {
+	return *operator->();
+}
+
+template <bool C>
 bool basic_inventory_slot_handle<C>::alive() const {
 	if (get_handle().dead())
 		return false;

@@ -10,6 +10,8 @@
 #include "game/resources/manager.h"
 #include "game/entity_handle.h"
 
+#include "game/cosmos.h"
+
 void convex_partitioned_shape::add_convex_polygon(const std::vector <vec2>& verts) {
 	convex_polys.push_back(verts);
 }
@@ -52,7 +54,7 @@ void convex_partitioned_shape::from_sprite(const components::sprite& sprite, boo
 		type = POLYGON;
 
 		auto image_size = image_to_polygonize.get_size();
-		vec2 polygonized_size(image_size.w, image_size.h);
+		vec2 polygonized_size = vec2i(image_size.w, image_size.h);
 
 		std::vector<vec2> new_concave;
 
@@ -126,10 +128,10 @@ void convex_partitioned_shape::add_concave_polygon(const std::vector <vec2> &ver
 
 		auto first_v = new_convex[0];
 
-		const int max_vertices = 8;
+		const unsigned max_vertices = 8;
 
 		if (new_convex.size() > max_vertices) {
-			int first = 1;
+			unsigned first = 1;
 
 			while (first + max_vertices - 2 < new_convex.size() - 1) {
 				std::vector<vec2> new_poly;

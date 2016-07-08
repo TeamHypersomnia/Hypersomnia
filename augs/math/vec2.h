@@ -257,7 +257,7 @@ struct vec2t {
 	}
 
 	float degrees_between(const vec2t& v) const {
-		return radians_between(v) * RAD_TO_DEG;
+		return radians_between(v) * RAD_TO_DEGf;
 	}
 
 	template<class A, class B>

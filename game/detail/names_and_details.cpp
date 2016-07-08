@@ -94,7 +94,7 @@ textual_description description_by_entity_name(entity_name n) {
 	}
 }
 
-std::wstring describe_item_compatibility_categories(unsigned flags) {
+std::wstring describe_item_compatibility_categories(unsigned long long flags) {
 	std::wstring result;
 
 	if (flags & item_category::MAGAZINE) 

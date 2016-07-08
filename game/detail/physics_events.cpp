@@ -134,7 +134,7 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 
 		auto& collider_physics = collider_fixtures.get_owner_body().get<components::special_physics>();
 
-		if (subject_fixtures.is_friction_ground) {
+		if (subject_fixtures.is_friction_ground()) {
 #if FRICTION_FIELDS_COLLIDE
 			if (!collider_fixtures.is_friction_ground)
 #endif
@@ -187,7 +187,7 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 		auto& subject_fixtures = subject.get<components::fixtures>();
 		auto& collider_fixtures = collider.get<components::fixtures>();
 
-		if (subject_fixtures.is_friction_ground) {
+		if (subject_fixtures.is_friction_ground()) {
 			// friction fields do not collide with their children
 			if (are_connected_by_friction(collider, subject)) {
 				contact->SetEnabled(false);

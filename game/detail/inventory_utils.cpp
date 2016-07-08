@@ -223,10 +223,11 @@ void perform_transfer(item_slot_transfer_request r, fixed_step& step) {
 	auto result = query_transfer_result(r);
 
 	if (result.result == item_transfer_result_type::UNMOUNT_BEFOREHAND) {
+		ensure(false);
 		ensure(previous_slot.alive());
 
-		item.request_unmount(r.target_slot);
-		item.mark_parent_enclosing_containers_for_unmount();
+		//item.request_unmount(r.target_slot);
+		//item.mark_parent_enclosing_containers_for_unmount();
 
 		return;
 	}
