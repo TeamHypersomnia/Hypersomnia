@@ -279,20 +279,20 @@ namespace scene_managers {
 			}
 		}
 
-		for (auto& tested : draw_bodies) {
-			auto& s = tested.get<components::physics_definition>();
-
-			auto& lines = renderer::get_current().logic_lines;
-
-			auto vv = s.fixtures[0].debug_original;
-
-			for (int i = 0; i < vv.size(); ++i) {
-				auto& tt = tested.get<components::transform>();
-				auto pos = tt.pos;
-
-				lines.draw_cyan((pos + vv[i]).rotate(tt.rotation, pos), (pos + vv[(i + 1) % vv.size()]).rotate(tt.rotation, pos));
-			}
-		}
+		//for (auto& tested : draw_bodies) {
+		//	auto& s = tested.get<components::physics_definition>();
+		//
+		//	auto& lines = renderer::get_current().logic_lines;
+		//
+		//	auto vv = s.fixtures[0].debug_original;
+		//
+		//	for (int i = 0; i < vv.size(); ++i) {
+		//		auto& tt = tested.get<components::transform>();
+		//		auto pos = tt.pos;
+		//
+		//		lines.draw_cyan((pos + vv[i]).rotate(tt.rotation, pos), (pos + vv[(i + 1) % vv.size()]).rotate(tt.rotation, pos));
+		//	}
+		//}
 
 		//auto ff = (new_characters[1].get<components::pathfinding>().get_current_navigation_point() - position(new_characters[1])).set_length(15000);
 		//new_characters[1].get<components::physics>().apply_force(ff);

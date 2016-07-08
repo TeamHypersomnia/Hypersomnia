@@ -47,9 +47,7 @@ namespace ingredients {
 		trees[1].tree_id = assets::behaviour_tree_id::SOLDIER_MOVEMENT;
 		trees[2].tree_id = assets::behaviour_tree_id::HANDS_ACTOR;
 		
-		//trees[1].state.user_input = e;
 		//trees[1].tree_id = assets::behaviour_tree_id::INVENTORY_ACTOR;
-		//trees[2].state.user_input = e;
 		//trees[2].tree_id = assets::behaviour_tree_id::ITEM_PICKER;
 	}
 }

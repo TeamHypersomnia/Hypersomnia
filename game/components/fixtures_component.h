@@ -7,6 +7,7 @@
 #include "math/rects.h"
 #include "transform_component.h"
 #include "game/component_synchronizer.h"
+#include "game/enums/colliders_offset_type.h"
 #include "game/detail/convex_partitioned_shape.h"
 #include <Box2D/Dynamics/b2Fixture.h>
 
@@ -33,12 +34,7 @@ namespace components {
 		std::vector<convex_partitioned_collider> colliders;
 		bool activated = true;
 
-		enum class offset_type {
-			ITEM_ATTACHMENT_DISPLACEMENT,
-			SPECIAL_MOVE_DISPLACEMENT
-		};
-
-		std::array<components::transform, 2> offsets_for_created_shapes;
+		std::array<components::transform, colliders_offset_type::OFFSET_COUNT> offsets_for_created_shapes;
 
 		convex_partitioned_collider& new_collider() {
 			colliders.push_back(convex_partitioned_collider());
@@ -66,9 +62,9 @@ public:
 	using component_synchronizer_base<is_const, components::fixtures>::component_synchronizer_base;
 
 	template <class = typename std::enable_if<!is_const>::type>
-	void set_offset(components::fixtures::offset_type, components::transform);
+	void set_offset(colliders_offset_type, components::transform);
 
-	components::transform get_offset(components::fixtures::offset_type) const;
+	components::transform get_offset(colliders_offset_type) const;
 	components::transform get_total_offset() const;
 
 	template <class = typename std::enable_if<!is_const>::type>

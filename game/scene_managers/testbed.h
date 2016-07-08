@@ -1,6 +1,8 @@
 #pragma once
+#include <vector>
 #include "game/entity_id.h"
 
+class basic_viewing_step;
 class fixed_step;
 class cosmos;
 

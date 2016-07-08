@@ -14,7 +14,6 @@ namespace ingredients {
 		components::position_copying position_copying;
 
 		camera.enable_smoothing = true;
-		camera.mask = components::render::WORLD;
 		camera.smoothing_average_factor = 0.5;
 		camera.averages_per_sec = 25;
 

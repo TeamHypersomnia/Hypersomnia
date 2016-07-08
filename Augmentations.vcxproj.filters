@@ -3437,5 +3437,8 @@
     <ClInclude Include="game\temporary_systems\processing_lists_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\enums\colliders_offset_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -64,8 +64,8 @@ namespace prefabs {
 			body.angular_damping = 2.f;
 			body.angular_air_resistance = 0.55f;
 
-			auto& info = physics_definition.new_fixture();
-			info.from_renderable(front);
+			auto& info = physics_definition.new_collider();
+			info.shape.from_renderable(front);
 
 			info.filter = filters::see_through_dynamic_object();
 			info.density = 0.6f;
@@ -86,7 +86,7 @@ namespace prefabs {
 			sprite.set(assets::texture_id::MOTORCYCLE_INSIDE);
 
 			auto& info = physics_definition.new_fixture(front);
-			info.from_renderable(interior);
+			info.shape.from_renderable(interior);
 			info.density = 0.6f;
 			info.sensor = true;
 			info.filter = filters::see_through_dynamic_object();
@@ -112,7 +112,7 @@ namespace prefabs {
 			sprite.color.a = 0;
 
 			auto& info = physics_definition.new_fixture(front);
-			info.from_renderable(left_wheel);
+			info.shape.from_renderable(left_wheel);
 			info.density = 0.6f;
 			info.filter = filters::trigger();
 			info.sensor = true;

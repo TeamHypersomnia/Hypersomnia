@@ -1,18 +1,17 @@
 #include "game/cosmos.h"
 #include "game/components/physics_component.h"
 #include "game/components/fixtures_component.h"
+#include "game/components/sprite_component.h"
 
 #include "game/enums/filters.h"
 #include "game/entity_handle.h"
 
 namespace ingredients {
 	void standard_dynamic_body(entity_handle e) {
-		auto& physics = e += components::physics();
-
-		rigid_body_definition def;
+		components::physics def;
 		def.fixed_rotation = false;
 
-		colliders_definition colliders;
+		components::fixtures colliders;
 
 		auto& info = colliders.new_collider();
 		info.shape.from_sprite(e.get<components::sprite>(), true);
@@ -20,57 +19,62 @@ namespace ingredients {
 		info.filter = filters::dynamic_object();
 		info.density = 1;
 
-		e += components::fixtures(colliders);
+		e += def;
+		e += colliders;
 	}
 
 	void see_through_dynamic_body(entity_handle e) {
-		auto& physics_definition = e += components::physics();
+		components::physics def;
+		components::fixtures colliders;
+		def.fixed_rotation = false;
 
-		physics_definition.body.fixed_rotation = false;
-
-		auto& info = physics_definition.new_fixture();
-		info.from_renderable(e);
+		auto& info = colliders.new_collider();
+		info.shape.from_renderable(e);
 
 		info.filter = filters::see_through_dynamic_object();
 		info.density = 1;
 
-		return physics_definition;
+		e += def;
+		e += colliders;
 	}
 
 	void standard_static_body(entity_handle e) {
-		auto& physics_definition = e += components::physics_definition();
+		components::physics def;
+		components::fixtures colliders;
 
-		physics_definition.body.fixed_rotation = false;
-		physics_definition.body.body_type = b2_staticBody;
+		def.fixed_rotation = false;
+		def.body_type = components::physics::type::STATIC;
 
-		auto& info = physics_definition.new_fixture();
-		info.from_renderable(e);
+		auto& info = colliders.new_collider();
+		info.shape.from_renderable(e);
 
 		info.filter = filters::dynamic_object();
 		info.density = 1;
 
-		return physics_definition;
+		e += def;
+		e += colliders;
 	}
 	
 	void bullet_round_physics(entity_handle e) {
-		auto& physics_definition = e += components::physics_definition();
+		components::physics body;
+		components::fixtures colliders;
 
-		auto& body = physics_definition.body;
 		body.bullet = true;
 		body.angular_damping = 0.f,
 		body.linear_damping = 0.f,
 		body.gravity_scale = 0.f;
-		body.angular_air_resistance = 0.f;
 		body.fixed_rotation = false;
 		body.angled_damping = false;
 		
-		auto& info = physics_definition.new_fixture();
-		info.from_renderable(e);
+		colliders.disable_standard_collision_resolution = true;
+
+		auto& info = colliders.new_collider();
+		info.shape.from_renderable(e);
 
 		info.filter = filters::bullet();
 		info.density = 1;
-		info.disable_standard_collision_resolution = true;
 
-		return physics_definition;
+		e += body;
+		e += colliders;
 	}
 }

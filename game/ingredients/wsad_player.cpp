@@ -47,9 +47,9 @@ namespace ingredients {
 		auto& physics_definition = e += components::physics_definition();
 
 		auto& body = physics_definition.body;
-		auto& info = physics_definition.new_fixture();
+		auto& info = physics_definition.new_collider();
 
-		info.from_renderable(e);
+		info.shape.from_renderable(e);
 
 		info.filter = filters::controlled_character();
 		info.density = 1.0;
@@ -196,9 +196,9 @@ namespace ingredients {
 		auto& physics_definition = e += components::physics_definition();
 
 		auto& body = physics_definition.body;
-		auto& info = physics_definition.new_fixture();
+		auto& info = physics_definition.new_collider();
 
-		info.from_renderable(e);
+		info.shape.from_renderable(e);
 
 		info.filter = filters::corpse();
 		info.density = 1.0;
@@ -304,9 +304,9 @@ namespace prefabs {
 			ingredients::make_always_visible(recoil);
 
 			auto& body = physics_definition.body;
-			auto& info = physics_definition.new_fixture();
+			auto& info = physics_definition.new_collider();
 
-			info.from_renderable(recoil);
+			info.shape.from_renderable(recoil);
 
 			info.filter = filters::renderable();
 			//info.filter.categoryBits = 0;

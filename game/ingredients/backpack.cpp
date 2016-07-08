@@ -3,6 +3,7 @@
 #include "game/cosmos.h"
 
 #include "game/enums/item_category.h"
+#include "game/enums/entity_name.h"
 #include "game/detail/inventory_utils.h"
 #include "game/components/container_component.h"
 #include "game/components/item_component.h"
@@ -28,7 +29,7 @@ namespace ingredients {
 
 namespace prefabs {
 	entity_handle create_sample_backpack(cosmos& world, vec2 pos) {
-		full_entity_definition def;
+		auto def = world.create_entity("sample_backpack");
 
 		name_entity(def, entity_name::VIOLET_BACKPACK);
 		ingredients::backpack(def);
@@ -36,8 +37,7 @@ namespace prefabs {
 		ingredients::sprite(def, pos, assets::texture_id::BACKPACK, augs::white, render_layer::DYNAMIC_BODY);
 		ingredients::see_through_dynamic_body(def);
 		
-		auto sample_backpack = world.create_from_definition(def, "sample_backpack");
-
-		return sample_backpack;
+		def.add_standard_components();
+		return def;
 	}
 }

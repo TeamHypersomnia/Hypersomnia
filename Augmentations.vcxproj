@@ -1037,6 +1037,7 @@
     <ClInclude Include="game\components\substance_component.h" />
     <ClInclude Include="game\detail\convex_partitioned_shape.h" />
     <ClInclude Include="game\entropy_player.h" />
+    <ClInclude Include="game\enums\colliders_offset_type.h" />
     <ClInclude Include="game\game_window.h" />
     <ClInclude Include="game\global\all_settings.h" />
     <ClInclude Include="game\global\input_context.h" />
