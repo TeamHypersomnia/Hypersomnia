@@ -91,7 +91,7 @@ public:
 	float get_density(size_t = 0) const;
 
 	template <class = typename std::enable_if<!is_const>::type>
-	void set_owner_body(basic_entity_handle<is_const>);
+	void set_owner_body(entity_id);
 	
 	basic_entity_handle<is_const> get_owner_body() const;
 

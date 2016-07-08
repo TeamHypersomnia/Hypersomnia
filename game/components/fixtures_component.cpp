@@ -13,9 +13,11 @@
 typedef components::fixtures F;
 
 template<bool C>
-template <class = typename std::enable_if<!is_const>::type>
-void component_synchronizer<C, F>::set_owner_body(basic_entity_handle<C> owner) {
-	auto& cosmos = owner.get_cosmos();
+template <class>
+void component_synchronizer<C, F>::set_owner_body(entity_id owner_id) {
+	auto& cosmos = handle.get_cosmos();
+	auto owner = cosmos[owner_id];
+
 	auto former_owner = cosmos[component.owner_body];
 
 	if (former_owner.alive()) {
@@ -62,23 +64,23 @@ size_t component_synchronizer<C, F>::get_num_colliders() const {
 
 template<bool C>
 bool component_synchronizer<C, F>::is_friction_ground() const {
-	return get_cache().fixtures_per_collider.size();
+	return component.is_friction_ground;
 }
 
 template<bool C>
 bool component_synchronizer<C, F>::standard_collision_resolution_disabled() const {
-	return get_cache().fixtures_per_collider.size();
+	return component.disable_standard_collision_resolution;
 }
 
 template<bool C>
-template <class = typename std::enable_if<!is_const>::type>
-void component_synchronizer<C, F>::set_offset(F::offset_type t, components::transform off) {
+template <class>
+void component_synchronizer<C, F>::set_offset(colliders_offset_type t, components::transform off) {
 	component.offsets_for_created_shapes[static_cast<int>(t)] = off;
 	complete_resubstantialization();
 }
 
 template<bool C>
-template <class = typename std::enable_if<!is_const>::type>
+template <class>
 void component_synchronizer<C, F>::rebuild_density(size_t index) {
 	for (auto f : get_cache().fixtures_per_collider[index])
 		f->SetDensity(component.colliders[index].density * component.colliders[index].density_multiplier);
@@ -87,7 +89,7 @@ void component_synchronizer<C, F>::rebuild_density(size_t index) {
 }
 
 template<bool C>
-template <class = typename std::enable_if<!is_const>::type>
+template <class>
 void component_synchronizer<C, F>::set_density(float d, size_t index) {
 	component.colliders[index].density = d;
 
@@ -98,7 +100,7 @@ void component_synchronizer<C, F>::set_density(float d, size_t index) {
 }
 
 template<bool C>
-template <class = typename std::enable_if<!is_const>::type>
+template <class>
 void component_synchronizer<C, F>::set_density_multiplier(float mult, size_t index) {
 	component.colliders[index].density_multiplier = mult;
 
@@ -109,14 +111,14 @@ void component_synchronizer<C, F>::set_density_multiplier(float mult, size_t ind
 }
 
 template<bool C>
-template <class = typename std::enable_if<!is_const>::type>
+template <class>
 void component_synchronizer<C, F>::set_activated(bool flag) {
 	component.activated = flag;
 	complete_resubstantialization();
 }
 
 template<bool C>
-template <class = typename std::enable_if<!is_const>::type>
+template <class>
 void component_synchronizer<C, F>::set_friction(float fr, size_t index) {
 	component.colliders[index].friction = fr;
 
@@ -128,7 +130,7 @@ void component_synchronizer<C, F>::set_friction(float fr, size_t index) {
 }
 
 template<bool C>
-template <class = typename std::enable_if<!is_const>::type>
+template <class>
 void component_synchronizer<C, F>::set_restitution(float r, size_t index) {
 	component.colliders[index].restitution = r;
 
@@ -175,7 +177,7 @@ basic_entity_handle<C> component_synchronizer<C, F>::get_owner_body() const {
 }
 
 template<bool C>
-components::transform component_synchronizer<C, F>::get_offset(F::offset_type t) const {
+components::transform component_synchronizer<C, F>::get_offset(colliders_offset_type t) const {
 	component.offsets_for_created_shapes[static_cast<int>(t)];
 }
 

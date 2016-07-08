@@ -285,8 +285,8 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 		if (!b->IsFixedRotation())
 			transform.rotation = body_angle;
 
-		physics.get_data().transform = transform;
-		physics.get_data().velocity = METERS_TO_PIXELSf * b->GetLinearVelocity();
-		physics.get_data().angular_velocity = RAD_TO_DEGf * b->GetAngularVelocity();
+		physics.component.transform = transform;
+		physics.component.velocity = METERS_TO_PIXELSf * b->GetLinearVelocity();
+		physics.component.angular_velocity = RAD_TO_DEGf * b->GetAngularVelocity();
 	}
 }

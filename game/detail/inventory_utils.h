@@ -25,14 +25,3 @@ int count_charges_in_deposit(const_entity_handle item);
 int count_charges_inside(const_inventory_slot_handle);
 
 void drop_from_all_slots(entity_handle container, fixed_step&);
-
-template<bool is_const>
-void for_each_descendant(basic_entity_handle<is_const> item, std::function<void(basic_entity_handle<is_const>)> f) {
-	f(item);
-
-	if (item.find<components::container>()) {
-		for (auto& s : item.get<components::container>().slots) {
-			item[s.first].for_each_descendant(f);
-		}
-	}
-}

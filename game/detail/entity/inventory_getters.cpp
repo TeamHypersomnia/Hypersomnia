@@ -140,6 +140,21 @@ std::vector<basic_entity_handle<C>> inventory_getters<C>::guns_wielded() const {
 	return result;
 }
 
+template <bool C>
+void inventory_getters<C>::for_each_contained_item_recursive(std::function<void(basic_entity_handle<C>)> f) const {
+	auto& item = *static_cast<const entity_handle_type*>(this);
+	auto& cosmos = item.get_cosmos();
+
+	if (item.has<components::container>()) {
+		for (auto& s : item.get<components::container>().slots) {
+			auto item = cosmos[item[s.first]];
+			
+			f(item);
+			item.for_each_contained_item_recursive(f);
+		}
+	}
+}
+
 // explicit instantiation
 template class inventory_getters<false>;
 template class inventory_getters<true>;

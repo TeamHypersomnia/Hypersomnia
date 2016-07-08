@@ -5,6 +5,7 @@
 #include "game/components/damage_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/physics_component.h"
+#include "game/components/special_physics_component.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/detail/entity_scripts.h"
 #include "game/messages/queue_destruction.h"
@@ -285,29 +286,36 @@ void perform_transfer(item_slot_transfer_request r, fixed_step& step) {
 		if (is_pickup_or_transfer)
 			add_item(r.target_slot, cosmos[grabbed_item_part]);
 
-		for_each_descendant(cosmos[grabbed_item_part], [previous_container_transform, new_charge_stack](entity_handle descendant) {
+		auto physics_updater = [previous_container_transform, new_charge_stack](entity_handle descendant) {
 			auto& cosmos = descendant.get_cosmos();
 
 			auto parent_slot = cosmos[descendant.get<components::item>().current_slot];
-			auto def = descendant.get<components::fixtures>().get_definition();
+			auto def = descendant.get<components::fixtures>().get_data();
+			entity_id owner_body;
 
 			if (parent_slot.alive()) {
 				def.activated = parent_slot.should_item_inside_keep_physical_body();
-				def.owner_body = parent_slot.get_root_container();
-				def.offsets_for_created_shapes[int(components::fixtures::offset_type::ITEM_ATTACHMENT_DISPLACEMENT)]
+				owner_body = parent_slot.get_root_container();
+				def.offsets_for_created_shapes[colliders_offset_type::ITEM_ATTACHMENT_DISPLACEMENT]
 					= parent_slot.sum_attachment_offsets_of_parents(descendant);
-				def.offsets_for_created_shapes[int(components::fixtures::offset_type::SPECIAL_MOVE_DISPLACEMENT)].reset();
+				def.offsets_for_created_shapes[colliders_offset_type::SPECIAL_MOVE_DISPLACEMENT].reset();
 			}
 			else {
 				def.activated = true;
-				def.owner_body = descendant;
-				def.offsets_for_created_shapes[int(components::fixtures::offset_type::ITEM_ATTACHMENT_DISPLACEMENT)].reset();
-				def.offsets_for_created_shapes[int(components::fixtures::offset_type::SPECIAL_MOVE_DISPLACEMENT)].reset();
+				owner_body = descendant;
+				def.offsets_for_created_shapes[colliders_offset_type::ITEM_ATTACHMENT_DISPLACEMENT].reset();
+				def.offsets_for_created_shapes[colliders_offset_type::SPECIAL_MOVE_DISPLACEMENT].reset();
 			}
 
-			descendant.get<components::fixtures>().initialize_from_definition(def);
-			descendant.get<components::transform>() = previous_container_transform;
-		});
+			descendant.get<components::fixtures>() = def;
+			descendant.get<components::fixtures>().set_owner_body(owner_body);
+			
+			if(descendant.has<components::physics>())
+				descendant.get<components::physics>().set_transform(previous_container_transform);
+		};
+
+		physics_updater(cosmos[grabbed_item_part]);
+		cosmos[grabbed_item_part].for_each_contained_item_recursive(physics_updater);
 
 		auto& grabbed_item = cosmos[grabbed_item_part].get<components::item>();
 
@@ -327,7 +335,8 @@ void perform_transfer(item_slot_transfer_request r, fixed_step& step) {
 
 			auto& physics = cosmos[grabbed_item_part].get<components::physics>();
 			physics.apply_force(force, offset, true);
-			physics.since_dropped.set(200);
+			auto& special_physics = cosmos[grabbed_item_part].get<components::special_physics>();
+			special_physics.since_dropped.set(200, step.get_delta());
 		}
 	}
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/entity_handle_declaration.h"
 
@@ -18,4 +19,6 @@ public:
 	inventory_slot_handle_type map_primary_action_to_secondary_hand_if_primary_empty(int is_action_secondary) const;
 	
 	std::vector<entity_handle_type> guns_wielded() const;
+
+	void for_each_contained_item_recursive(std::function<void(basic_entity_handle<is_const>)> f) const;
 };
