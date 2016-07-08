@@ -12,6 +12,7 @@
 
 #include "graphics/vertex.h"
 #include "ensure.h"
+#include "math/vec2.h"
 using namespace augs;
 
 namespace components {

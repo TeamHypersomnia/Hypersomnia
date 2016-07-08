@@ -1,6 +1,7 @@
 #pragma once
+template <class type> struct vec2t;
+
 namespace augs {
-	template <class type = float> struct vec2t;
 	namespace rects {
 		template <class type> struct ltrb;
 		template <class type> struct xywh;
@@ -8,9 +9,9 @@ namespace augs {
 	}
 }
 
-typedef augs::vec2t<int> vec2i;
-typedef augs::vec2t<float> vec2;
-typedef augs::vec2t<double> vec2d;
+typedef vec2t<int> vec2i;
+typedef vec2t<float> vec2;
+typedef vec2t<double> vec2d;
 
 typedef augs::rects::ltrb<int> ltrbi;
 typedef augs::rects::ltrb<float> ltrb;
