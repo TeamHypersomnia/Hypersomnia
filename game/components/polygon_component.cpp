@@ -103,7 +103,7 @@ namespace components {
 				auto new_tri_point = out.GetPoint(i);
 
 				for (size_t j = offset; j < polygon.size(); ++j) {
-					if (polygon[j].pos.compare(vec2(new_tri_point.x, -new_tri_point.y), 1.f)) {
+					if (polygon[j].pos.compare(vec2(static_cast<float>(new_tri_point.x), static_cast<float>(-new_tri_point.y)), 1.f)) {
 						indices.push_back(j);
 						break;
 					}
@@ -141,8 +141,8 @@ namespace components {
 			if (std::abs(in.camera_transform.rotation) > 0.f)
 				v.pos.rotate(in.camera_transform.rotation, center);
 
-			v.pos.x = int(v.pos.x);
-			v.pos.y = int(v.pos.y);
+			v.pos.x = static_cast<float>(static_cast<int>(v.pos.x));
+			v.pos.y = static_cast<float>(static_cast<int>(v.pos.y));
 		}
 
 		for (size_t i = 0; i < indices.size(); i += 3) {

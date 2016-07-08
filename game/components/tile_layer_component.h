@@ -2,6 +2,7 @@
 #include "math/vec2.h"
 #include "game/assets/texture_id.h"
 #include "transform_component.h"
+#include "graphics/pixel.h"
 
 namespace augs {
 	class texture;
