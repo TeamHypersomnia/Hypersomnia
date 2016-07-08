@@ -62,6 +62,9 @@ public:
 	using component_synchronizer_base<is_const, components::fixtures>::component_synchronizer_base;
 
 	template <class = typename std::enable_if<!is_const>::type>
+	component_synchronizer& operator=(const components::fixtures&);
+
+	template <class = typename std::enable_if<!is_const>::type>
 	void set_offset(colliders_offset_type, components::transform);
 
 	components::transform get_offset(colliders_offset_type) const;

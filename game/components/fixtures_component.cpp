@@ -81,6 +81,12 @@ void component_synchronizer<C, F>::set_offset(colliders_offset_type t, component
 
 template<bool C>
 template <class>
+component_synchronizer<C, F>& component_synchronizer<C, F>::operator=(const F& f) {
+	return component_synchronizer_base<C, F>::operator=(f);
+}
+
+template<bool C>
+template <class>
 void component_synchronizer<C, F>::rebuild_density(size_t index) {
 	for (auto f : get_cache().fixtures_per_collider[index])
 		f->SetDensity(component.colliders[index].density * component.colliders[index].density_multiplier);
