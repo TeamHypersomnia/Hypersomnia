@@ -38,6 +38,23 @@ namespace ingredients {
 		e += colliders;
 	}
 
+	void shell_dynamic_body(entity_handle e) {
+		components::physics def;
+		components::fixtures colliders;
+		def.fixed_rotation = false;
+
+		auto& info = colliders.new_collider();
+		info.shape.from_renderable(e);
+
+		info.filter = filters::shell();
+		info.density = 1;
+		info.restitution = 1.4;
+		info.density = 0.001f;
+
+		e += def;
+		e += colliders;
+	}
+
 	void standard_static_body(entity_handle e) {
 		components::physics def;
 		components::fixtures colliders;

@@ -18,6 +18,10 @@ namespace augs {
 		void unset() {
 			raw_id.unset();
 		}
+		
+		void set_id(id_type id) {
+			raw_id = id;
+		}
 
 		void set_debug_name(std::string s) {
 			raw_id.set_debug_name(s);

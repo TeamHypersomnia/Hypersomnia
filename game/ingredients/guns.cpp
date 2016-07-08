@@ -11,6 +11,7 @@
 #include "game/enums/item_category.h"
 
 #include "game/cosmos.h"
+#include "game/step.h"
 
 #include "game/detail/item_slot_transfer_request.h"
 
@@ -61,8 +62,11 @@ namespace ingredients {
 }
 
 namespace prefabs {
-	entity_handle create_sample_magazine(cosmos& world, vec2 pos, std::string space, entity_id charge_inside) {
-		auto sample_magazine = world.create_entity("sample_magazine");
+	entity_handle create_sample_magazine(fixed_step& step, vec2 pos, std::string space, entity_id charge_inside_id) {
+		auto& cosmos = step.cosm;
+		auto charge_inside = cosmos[charge_inside_id];
+
+		auto sample_magazine = cosmos.create_entity("sample_magazine");
 		name_entity(sample_magazine, entity_name::MAGAZINE);
 
 		{
@@ -84,20 +88,19 @@ namespace prefabs {
 		}
 
 		if (charge_inside.dead()) {
-			charge_inside = create_cyan_charge(world, vec2(0, 0), 30);
+			charge_inside.set_id(create_cyan_charge(cosmos, vec2(0, 0), 30));
 		}
 
-		item_slot_transfer_request load_charge;
-		load_charge.item = charge_inside;
-		load_charge.target_slot = sample_magazine[slot_function::ITEM_DEPOSIT];
+		sample_magazine.add_standard_components();
 
-		world.post_message(load_charge);
+		item_slot_transfer_request load_charge(charge_inside, sample_magazine[slot_function::ITEM_DEPOSIT]);
+		perform_transfer(load_charge, step);
 
 		return sample_magazine;
 	}
 
-	entity_handle create_sample_suppressor(cosmos& world, vec2 pos) {
-		auto sample_suppressor = world.create_entity("sample_suppressor");
+	entity_handle create_sample_suppressor(cosmos& cosmos, vec2 pos) {
+		auto sample_suppressor = cosmos.create_entity("sample_suppressor");
 		name_entity(sample_suppressor, entity_name::SUPPRESSOR);
 
 		ingredients::sprite(sample_suppressor, pos, assets::texture_id::SAMPLE_SUPPRESSOR, augs::white, render_layer::DYNAMIC_BODY);
@@ -108,13 +111,15 @@ namespace prefabs {
 		item.categories_for_slot_compatibility = item_category::BARREL_ATTACHMENT;
 		item.space_occupied_per_charge = to_space_units("0.2");
 
+		sample_suppressor.add_standard_components();
+
 		return sample_suppressor;
 	}
 
-	entity_handle create_pink_charge(cosmos& world, vec2 pos, int charges) {
-		auto pink_charge = world.create_entity("pink_charge");
-		auto round_definition = world.create_definition_entity("round_definition");
-		auto shell_definition = world.create_definition_entity("shell_definition");
+	entity_handle create_pink_charge(cosmos& cosmos, vec2 pos, int charges) {
+		auto pink_charge = cosmos.create_entity("pink_charge");
+		auto round_definition = cosmos.create_entity("round_definition");
+		auto shell_definition = cosmos.create_entity("shell_definition");
 		name_entity(pink_charge, entity_name::PINK_CHARGE);
 
 		{
@@ -131,7 +136,7 @@ namespace prefabs {
 		{
 			auto& s = ingredients::sprite(round_definition, pos, assets::texture_id::ROUND_TRACE, augs::pink, render_layer::FLYING_BULLETS);
 			s.size *= vec2(2, 0.5);
-			auto& def = ingredients::bullet_round_physics(round_definition);
+			ingredients::bullet_round_physics(round_definition);
 			
 			auto& damage = round_definition += components::damage();
 			damage.impulse_upon_hit = 1000.f;
@@ -148,10 +153,7 @@ namespace prefabs {
 
 		{
 			ingredients::sprite(shell_definition, pos, assets::texture_id::PINK_SHELL, augs::white, render_layer::FLYING_BULLETS);
-			auto& def = ingredients::see_through_dynamic_body(shell_definition);
-			def.fixtures[0].restitution = 1.4;
-			def.fixtures[0].density = 0.001f;
-			def.fixtures[0].filter = filters::shell();
+			ingredients::shell_dynamic_body(shell_definition);
 
 			auto& response = shell_definition += components::particle_effect_response{ assets::particle_effect_response_id::SHELL_RESPONSE };
 			response.modifier.colorize = pink;
@@ -160,13 +162,15 @@ namespace prefabs {
 		pink_charge.map_sub_entity(sub_entity_name::BULLET_ROUND, round_definition);
 		pink_charge.map_sub_entity(sub_entity_name::BULLET_SHELL, shell_definition);
 
+		pink_charge.add_standard_components();
+
 		return pink_charge;
 	}
 
-	entity_handle create_cyan_charge(cosmos& world, vec2 pos, int charges) {
-		auto cyan_charge = world.create_entity("cyan_charge");
-		auto round_definition = world.create_definition_entity("round_definition");
-		auto shell_definition = world.create_definition_entity("shell_definition");
+	entity_handle create_cyan_charge(cosmos& cosmos, vec2 pos, int charges) {
+		auto cyan_charge = cosmos.create_entity("cyan_charge");
+		auto round_definition = cosmos.create_entity("round_definition");
+		auto shell_definition = cosmos.create_entity("shell_definition");
 		name_entity(cyan_charge, entity_name::CYAN_CHARGE);
 
 		{
@@ -183,7 +187,7 @@ namespace prefabs {
 		{
 			auto& s = ingredients::sprite(round_definition, pos, assets::texture_id::ROUND_TRACE, augs::cyan, render_layer::FLYING_BULLETS);
 			s.size *= vec2(2, 0.5);
-			auto& def = ingredients::bullet_round_physics(round_definition);
+			ingredients::bullet_round_physics(round_definition);
 
 			auto& response = round_definition += components::particle_effect_response { assets::particle_effect_response_id::ELECTRIC_CHARGE_RESPONSE };
 			response.modifier.colorize = cyan;
@@ -197,11 +201,8 @@ namespace prefabs {
 
 		{
 			ingredients::sprite(shell_definition, pos, assets::texture_id::CYAN_SHELL, augs::white, render_layer::FLYING_BULLETS);
-			auto& def = ingredients::see_through_dynamic_body(shell_definition);
-			def.fixtures[0].restitution = 1.4;
-			def.fixtures[0].density = 0.001f;
-			def.fixtures[0].filter = filters::shell();
-
+			ingredients::shell_dynamic_body(shell_definition);
+			
 			auto& response = shell_definition += components::particle_effect_response{ assets::particle_effect_response_id::SHELL_RESPONSE };
 			response.modifier.colorize = cyan;
 		}
@@ -209,13 +210,15 @@ namespace prefabs {
 		cyan_charge.map_sub_entity(sub_entity_name::BULLET_ROUND, round_definition);
 		cyan_charge.map_sub_entity(sub_entity_name::BULLET_SHELL, shell_definition);
 
+		cyan_charge.add_standard_components();
+
 		return cyan_charge;
 	}
 
-	entity_handle create_green_charge(cosmos& world, vec2 pos, int charges) {
-		auto green_charge = world.create_entity("green_charge");
-		auto round_definition = world.create_definition_entity("round_definition");
-		auto shell_definition = world.create_definition_entity("shell_definition");
+	entity_handle create_green_charge(cosmos& cosmos, vec2 pos, int charges) {
+		auto green_charge = cosmos.create_entity("green_charge");
+		auto round_definition = cosmos.create_entity("round_definition");
+		auto shell_definition = cosmos.create_entity("shell_definition");
 		name_entity(green_charge, entity_name::GREEN_CHARGE);
 
 		{
@@ -231,8 +234,8 @@ namespace prefabs {
 
 		{
 			auto& s = ingredients::sprite(round_definition, pos, assets::texture_id::ROUND_TRACE, augs::green, render_layer::FLYING_BULLETS);
-			s.size *= vec2(2, 0.5);
-			auto& def = ingredients::bullet_round_physics(round_definition);
+			s.size *= vec2(2.f, 0.5f);
+			ingredients::bullet_round_physics(round_definition);
 
 			auto& response = round_definition += components::particle_effect_response { assets::particle_effect_response_id::HEALING_CHARGE_RESPONSE };
 			response.modifier.colorize = green;
@@ -249,10 +252,7 @@ namespace prefabs {
 
 		{
 			ingredients::sprite(shell_definition, pos, assets::texture_id::GREEN_SHELL, augs::white, render_layer::FLYING_BULLETS);
-			auto& def = ingredients::see_through_dynamic_body(shell_definition);
-			def.fixtures[0].restitution = 1.4;
-			def.fixtures[0].density = 0.001f;
-			def.fixtures[0].filter = filters::shell();
+			ingredients::shell_dynamic_body(shell_definition);
 
 			auto& response = shell_definition += components::particle_effect_response{ assets::particle_effect_response_id::SHELL_RESPONSE };
 			response.modifier.colorize = green;
@@ -261,22 +261,27 @@ namespace prefabs {
 		green_charge.map_sub_entity(sub_entity_name::BULLET_ROUND, round_definition);
 		green_charge.map_sub_entity(sub_entity_name::BULLET_SHELL, shell_definition);
 
+		green_charge.add_standard_components();
+
 		return green_charge;
 	}
 
-	entity_handle create_sample_rifle(cosmos& world, vec2 pos, entity_id load_mag) {
-		auto weapon = world.create_entity("sample_rifle");
+	entity_handle create_sample_rifle(fixed_step& step, vec2 pos, entity_id load_mag_id) {
+		auto& cosmos = step.cosm;
+		auto load_mag = cosmos[load_mag_id];
+		
+		auto weapon = cosmos.create_entity("sample_rifle");
 		name_entity(weapon, entity_name::ASSAULT_RIFLE);
 
 		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::ASSAULT_RIFLE, augs::white, render_layer::DYNAMIC_BODY);
-		auto& def = ingredients::see_through_dynamic_body(weapon);
+		ingredients::see_through_dynamic_body(weapon);
 		ingredients::default_gun_container(weapon);
 
 		auto& gun = weapon += components::gun();
 
 		gun.action_mode = components::gun::AUTOMATIC;
-		gun.muzzle_velocity = std::make_pair(4000, 4000);
-		gun.timeout_between_shots.set(100);
+		gun.muzzle_velocity = std::make_pair(4000.f, 4000.f);
+		gun.shot_cooldown = augs::stepped_cooldown(100);
 		gun.bullet_spawn_offset.set(sprite.size.x/2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
@@ -285,72 +290,66 @@ namespace prefabs {
 		gun.shell_spawn_offset.rotation = 45;
 		gun.shell_angular_velocity = std::make_pair(2.f, 14.f);
 		gun.shell_spread_degrees = 20.f;
-		gun.shell_velocity = std::make_pair(300, 1700);
+		gun.shell_velocity = std::make_pair(300.f, 1700.f);
 		gun.damage_multiplier = 2.2f;
 
 		gun.recoil.repeat_last_n_offsets = 20;
 		gun.recoil.scale = 30.0/2;
 
 		gun.recoil.offsets = {
-			{ vec2().set_from_degrees(1.35*2) },
-			{ vec2().set_from_degrees(1.35*2) },
-			{ vec2().set_from_degrees(1.35*2.6) },
-			{ vec2().set_from_degrees(1.35*2.8) },
-			{ vec2().set_from_degrees(1.35*3.2) },
-			{ vec2().set_from_degrees(1.35*3.0) },
-			{ vec2().set_from_degrees(1.35*2.7) },
-			{ vec2().set_from_degrees(1.35*2.3) },
-			{ vec2().set_from_degrees(1.35*2.0) },
-			{ vec2().set_from_degrees(1.35*0.3) },
-			{ vec2().set_from_degrees(1.35*-0.5) },
-			{ vec2().set_from_degrees(1.35*-1.0) },
-			{ vec2().set_from_degrees(1.35*-1.5) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*-3.2) },
-			{ vec2().set_from_degrees(1.35*-4.0) },
-			{ vec2().set_from_degrees(1.35*2.3) },
-			{ vec2().set_from_degrees(1.35*2.5) },
-			{ vec2().set_from_degrees(1.35*1.7) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*3.0) },
+			{ vec2().set_from_degrees(1.35f*2.f) },
+			{ vec2().set_from_degrees(1.35f*2.f) },
+			{ vec2().set_from_degrees(1.35f*2.6f) },
+			{ vec2().set_from_degrees(1.35f*2.8f) },
+			{ vec2().set_from_degrees(1.35f*3.2f) },
+			{ vec2().set_from_degrees(1.35f*3.0f) },
+			{ vec2().set_from_degrees(1.35f*2.7f) },
+			{ vec2().set_from_degrees(1.35f*2.3f) },
+			{ vec2().set_from_degrees(1.35f*2.0f) },
+			{ vec2().set_from_degrees(1.35f*0.3f) },
+			{ vec2().set_from_degrees(1.35f*-0.5f) },
+			{ vec2().set_from_degrees(1.35f*-1.0f) },
+			{ vec2().set_from_degrees(1.35f*-1.5f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-3.2f) },
+			{ vec2().set_from_degrees(1.35f*-4.0f) },
+			{ vec2().set_from_degrees(1.35f*2.3f) },
+			{ vec2().set_from_degrees(1.35f*2.5f) },
+			{ vec2().set_from_degrees(1.35f*1.7f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*3.0f) },
 		};
 
+		weapon.add_standard_components();
+
 		if (load_mag.alive()) {
-			item_slot_transfer_request r;
-
-			r.item = load_mag;
-			r.target_slot = weapon[slot_function::GUN_DETACHABLE_MAGAZINE];
-
-			world.post_message(r);
-
-			r.item = load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0];
-			r.specified_quantity = 1;
-			r.target_slot = weapon[slot_function::GUN_CHAMBER];
-
-			world.post_message(r);
+			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
+			perform_transfer({ load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1 }, step);
 		}
 
 		return weapon;
 	}
 
-	entity_handle create_submachine(cosmos& world, vec2 pos, entity_id load_mag) {
-		auto weapon = world.create_entity("submachine");
+	entity_handle create_submachine(fixed_step& step, vec2 pos, entity_id load_mag_id) {
+		auto& cosmos = step.cosm;
+		auto load_mag = cosmos[load_mag_id];
+		auto weapon = cosmos.create_entity("submachine");
 		name_entity(weapon, entity_name::SUBMACHINE);
 
 		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::SUBMACHINE, augs::white, render_layer::DYNAMIC_BODY);
-		auto& def = ingredients::see_through_dynamic_body(weapon);
+		ingredients::see_through_dynamic_body(weapon);
 		ingredients::default_gun_container(weapon);
 
 		auto& gun = weapon += components::gun();
 
 		gun.action_mode = components::gun::AUTOMATIC;
-		gun.muzzle_velocity = std::make_pair(3000, 3000);
-		gun.timeout_between_shots.set(50);
+		gun.muzzle_velocity = std::make_pair(3000.f, 3000.f);
+		gun.shot_cooldown = augs::stepped_cooldown(50);
 		gun.bullet_spawn_offset.set(sprite.size.x/2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
@@ -359,73 +358,67 @@ namespace prefabs {
 		gun.shell_spawn_offset.rotation = 45;
 		gun.shell_angular_velocity = std::make_pair(2.f, 14.f);
 		gun.shell_spread_degrees = 20.f;
-		gun.shell_velocity = std::make_pair(300, 1700);
+		gun.shell_velocity = std::make_pair(300.f, 1700.f);
 		gun.damage_multiplier = 1.f;
 		
 		gun.recoil.repeat_last_n_offsets = 20;
 
 		gun.recoil.offsets = {
-			{ vec2().set_from_degrees(1.35 * 2) },
-			{ vec2().set_from_degrees(1.35 * 2) },
-			{ vec2().set_from_degrees(1.35*2.6) },
-			{ vec2().set_from_degrees(1.35*2.8) },
-			{ vec2().set_from_degrees(1.35*3.2) },
-			{ vec2().set_from_degrees(1.35*3.0) },
-			{ vec2().set_from_degrees(1.35*2.7) },
-			{ vec2().set_from_degrees(1.35*2.3) },
-			{ vec2().set_from_degrees(1.35*2.0) },
-			{ vec2().set_from_degrees(1.35*0.3) },
-			{ vec2().set_from_degrees(1.35*-0.5) },
-			{ vec2().set_from_degrees(1.35*-1.0) },
-			{ vec2().set_from_degrees(1.35*-1.5) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*-3.2) },
-			{ vec2().set_from_degrees(1.35*-4.0) },
-			{ vec2().set_from_degrees(1.35*2.3) },
-			{ vec2().set_from_degrees(1.35*2.5) },
-			{ vec2().set_from_degrees(1.35*1.7) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*3.0) },
+			{ vec2().set_from_degrees(1.35f * 2.f) },
+			{ vec2().set_from_degrees(1.35f * 2.f) },
+			{ vec2().set_from_degrees(1.35f*2.6f) },
+			{ vec2().set_from_degrees(1.35f*2.8f) },
+			{ vec2().set_from_degrees(1.35f*3.2f) },
+			{ vec2().set_from_degrees(1.35f*3.0f) },
+			{ vec2().set_from_degrees(1.35f*2.7f) },
+			{ vec2().set_from_degrees(1.35f*2.3f) },
+			{ vec2().set_from_degrees(1.35f*2.0f) },
+			{ vec2().set_from_degrees(1.35f*0.3f) },
+			{ vec2().set_from_degrees(1.35f*-0.5f) },
+			{ vec2().set_from_degrees(1.35f*-1.0f) },
+			{ vec2().set_from_degrees(1.35f*-1.5f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-3.2f) },
+			{ vec2().set_from_degrees(1.35f*-4.0f) },
+			{ vec2().set_from_degrees(1.35f*2.3f) },
+			{ vec2().set_from_degrees(1.35f*2.5f) },
+			{ vec2().set_from_degrees(1.35f*1.7f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*3.0f) },
 		};
 
-		gun.recoil.scale = 30.0/2;
+		gun.recoil.scale = 30.0f/2;
+		
+		weapon.add_standard_components();
 
 		if (load_mag.alive()) {
-			item_slot_transfer_request r;
-
-			r.item = load_mag;
-			r.target_slot = weapon[slot_function::GUN_DETACHABLE_MAGAZINE];
-
-			world.post_message(r);
-
-			r.item = load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0];
-			r.specified_quantity = 1;
-			r.target_slot = weapon[slot_function::GUN_CHAMBER];
-
-			world.post_message(r);
+			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
+			perform_transfer({ load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1 }, step);
 		}
 
 		return weapon;
 	}
 
-	entity_handle create_pistol(cosmos& world, vec2 pos, entity_id load_mag) {
-		auto weapon = world.create_entity("pistol");
+	entity_handle create_pistol(fixed_step& step, vec2 pos, entity_id load_mag_id) {
+		auto& cosmos = step.cosm;
+		auto load_mag = cosmos[load_mag_id];
+		auto weapon = cosmos.create_entity("pistol");
 		name_entity(weapon, entity_name::PISTOL);
 
 		auto& sprite = ingredients::sprite(weapon, pos, assets::texture_id::PISTOL, augs::white, render_layer::DYNAMIC_BODY);
-		auto& def = ingredients::see_through_dynamic_body(weapon);
+		ingredients::see_through_dynamic_body(weapon);
 		ingredients::default_gun_container(weapon);
 
 		auto& gun = weapon += components::gun();
 
 		gun.action_mode = components::gun::SEMI_AUTOMATIC;
-		gun.muzzle_velocity = std::make_pair(2500, 2500);
-		gun.timeout_between_shots.set(150);
+		gun.muzzle_velocity = std::make_pair(2500.f, 2500.f);
+		gun.shot_cooldown = augs::stepped_cooldown(150);
 		gun.bullet_spawn_offset.set(sprite.size.x / 2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
@@ -434,55 +427,47 @@ namespace prefabs {
 		gun.shell_spawn_offset.rotation = 45;
 		gun.shell_angular_velocity = std::make_pair(2.f, 14.f);
 		gun.shell_spread_degrees = 20.f;
-		gun.shell_velocity = std::make_pair(300, 1700);
+		gun.shell_velocity = std::make_pair(300.f, 1700.f);
 		gun.damage_multiplier = 1.f;
 		
 		gun.recoil.repeat_last_n_offsets = 20;
 
 		gun.recoil.offsets = {
-			{ vec2().set_from_degrees(1.35 * 2) },
-			{ vec2().set_from_degrees(1.35 * 2) },
-			{ vec2().set_from_degrees(1.35*2.6) },
-			{ vec2().set_from_degrees(1.35*2.8) },
-			{ vec2().set_from_degrees(1.35*3.2) },
-			{ vec2().set_from_degrees(1.35*3.0) },
-			{ vec2().set_from_degrees(1.35*2.7) },
-			{ vec2().set_from_degrees(1.35*2.3) },
-			{ vec2().set_from_degrees(1.35*2.0) },
-			{ vec2().set_from_degrees(1.35*0.3) },
-			{ vec2().set_from_degrees(1.35*-0.5) },
-			{ vec2().set_from_degrees(1.35*-1.0) },
-			{ vec2().set_from_degrees(1.35*-1.5) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*-3.2) },
-			{ vec2().set_from_degrees(1.35*-4.0) },
-			{ vec2().set_from_degrees(1.35*2.3) },
-			{ vec2().set_from_degrees(1.35*2.5) },
-			{ vec2().set_from_degrees(1.35*1.7) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*-2) },
-			{ vec2().set_from_degrees(1.35*3.0) },
+			{ vec2().set_from_degrees(1.35f * 2.f) },
+			{ vec2().set_from_degrees(1.35f * 2.f) },
+			{ vec2().set_from_degrees(1.35f*2.6f) },
+			{ vec2().set_from_degrees(1.35f*2.8f) },
+			{ vec2().set_from_degrees(1.35f*3.2f) },
+			{ vec2().set_from_degrees(1.35f*3.0f) },
+			{ vec2().set_from_degrees(1.35f*2.7f) },
+			{ vec2().set_from_degrees(1.35f*2.3f) },
+			{ vec2().set_from_degrees(1.35f*2.0f) },
+			{ vec2().set_from_degrees(1.35f*0.3f) },
+			{ vec2().set_from_degrees(1.35f*-0.5f) },
+			{ vec2().set_from_degrees(1.35f*-1.0f) },
+			{ vec2().set_from_degrees(1.35f*-1.5f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-3.2f) },
+			{ vec2().set_from_degrees(1.35f*-4.0f) },
+			{ vec2().set_from_degrees(1.35f*2.3f) },
+			{ vec2().set_from_degrees(1.35f*2.5f) },
+			{ vec2().set_from_degrees(1.35f*1.7f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*-2.f) },
+			{ vec2().set_from_degrees(1.35f*3.0f) },
 		};
 
-		gun.recoil.scale = 30.0/2;
+		gun.recoil.scale = 30.0f/2;
+		
+		weapon.add_standard_components();
 
 		if (load_mag.alive()) {
-			item_slot_transfer_request r;
-
-			r.item = load_mag;
-			r.target_slot = weapon[slot_function::GUN_DETACHABLE_MAGAZINE];
-
-			world.post_message(r);
-
-			r.item = load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0];
-			r.specified_quantity = 1;
-			r.target_slot = weapon[slot_function::GUN_CHAMBER];
-
-			world.post_message(r);
+			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
+			perform_transfer({ load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1 }, step);
 		}
 
 		return weapon;
