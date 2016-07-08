@@ -7,6 +7,8 @@
 #include "game/components/particle_group_component.h"
 #include "game/components/transform_component.h"
 
+#include "game/cosmos.h"
+
 namespace components {
 	dynamic_tree_node dynamic_tree_node::get_default(const_entity_handle e) {
 		dynamic_tree_node result;

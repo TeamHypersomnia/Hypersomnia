@@ -2,6 +2,7 @@
 #include "math/vec2.h"
 
 #include "game/entity_id.h"
+#include "game/entity_handle_declaration.h"
 
 #include "misc/timer.h"
 #include "graphics/pixel.h"
@@ -35,6 +36,6 @@ namespace components {
 
 		vec2 saved_point_of_impact_before_death;
 
-		static bool can_merge_entities(const entity_id& a, const entity_id& b);
+		static bool can_merge_entities(const_entity_handle a, const_entity_handle b);
 	};
 }

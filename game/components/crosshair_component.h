@@ -3,10 +3,11 @@
 #include "math/rects.h"
 #include "misc/value_animator.h"
 #include "game/entity_id.h"
+#include "game/entity_handle_declaration.h"
 
 namespace components {
 	struct crosshair  {
-		static vec2 calculate_aiming_displacement(entity_id subject_crosshair, bool snap_epsilon_base_offset = false);
+		static vec2 calculate_aiming_displacement(const_entity_handle subject_crosshair, bool snap_epsilon_base_offset = false);
 
 		entity_id character_entity_to_chase;
 		vec2 base_offset;

@@ -1,9 +1,11 @@
 #include "crosshair_component.h"
 #include "game/entity_id.h"
 #include "transform_component.h"
+#include "game/entity_handle.h"
+#include "game/cosmos.h"
 
 namespace components {
-	vec2 crosshair::calculate_aiming_displacement(entity_id subject_crosshair, bool snap_epsilon_base_offset) {
+	vec2 crosshair::calculate_aiming_displacement(const_entity_handle subject_crosshair, bool snap_epsilon_base_offset) {
 		auto recoil_body = subject_crosshair[sub_entity_name::CROSSHAIR_RECOIL_BODY];
 
 		auto considered_base_offset = subject_crosshair.get<components::crosshair>().base_offset;

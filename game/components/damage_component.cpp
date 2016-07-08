@@ -1,9 +1,11 @@
 #include "damage_component.h"
+#include "game/entity_handle.h"
+#include "game/cosmos.h"
 
 namespace components {
-	bool damage::can_merge_entities(const entity_id& e1, const entity_id& e2) {
-		auto* pa = e1->find<damage>();
-		auto* pb = e2->find<damage>();
+	bool damage::can_merge_entities(const_entity_handle e1, const_entity_handle e2) {
+		auto* pa = e1.find<damage>();
+		auto* pb = e2.find<damage>();
 		if (!pa && !pb) return true;
 		if (!(pa && pb)) return false;
 

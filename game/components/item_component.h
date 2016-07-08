@@ -3,6 +3,7 @@
 #include "container_component.h"
 #include "transform_component.h"
 #include "game/detail/inventory_slot_id.h"
+#include "game/entity_handle_declaration.h"
 
 namespace components {
 	struct item {
@@ -43,6 +44,6 @@ namespace components {
 		unsigned get_space_occupied() const;
 		bool is_mounted() const;
 		bool are_parents_last_in_lifo_slots() const;
-		static bool can_merge_entities(const entity_id& e1, const entity_id& e2);
+		static bool can_merge_entities(const_entity_handle e1, const_entity_handle e2);
 	};
 }
