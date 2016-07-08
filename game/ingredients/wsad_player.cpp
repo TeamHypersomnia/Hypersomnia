@@ -217,11 +217,11 @@ namespace ingredients {
 		auto previously_controlled_character = next_character.make_handle(camera.get<components::camera>().entity_to_chase);
 
 		if (previously_controlled_character.alive()) {
-			previously_controlled_character.get<components::processing>().remove_from(processing_subjects::WITH_INPUT_RECEIVER);
-			previously_controlled_character.get<components::processing>().remove_from(processing_subjects::WITH_GUI_ELEMENT);
+			previously_controlled_character.get<components::processing>().disable_in(processing_subjects::WITH_INPUT_RECEIVER);
+			previously_controlled_character.get<components::processing>().disable_in(processing_subjects::WITH_GUI_ELEMENT);
 
 			auto crosshair = previously_controlled_character[sub_entity_name::CHARACTER_CROSSHAIR];
-			crosshair.get<components::processing>().remove_from(processing_subjects::WITH_INPUT_RECEIVER);
+			crosshair.get<components::processing>().disable_in(processing_subjects::WITH_INPUT_RECEIVER);
 
 			previously_controlled_character.map_associated_entity(associated_entity_name::WATCHING_CAMERA, entity_id());
 		}
@@ -239,9 +239,9 @@ namespace ingredients {
 		if (crosshair.find<components::input_receiver>() == nullptr)
 			crosshair.add<components::input_receiver>();
 
-		next_character.get<components::processing>().add_to(processing_subjects::WITH_INPUT_RECEIVER);
-		next_character.get<components::processing>().add_to(processing_subjects::WITH_GUI_ELEMENT);
-		crosshair.get<components::processing>().add_to(processing_subjects::WITH_INPUT_RECEIVER);
+		next_character.get<components::processing>().enable_in(processing_subjects::WITH_INPUT_RECEIVER);
+		next_character.get<components::processing>().enable_in(processing_subjects::WITH_GUI_ELEMENT);
+		crosshair.get<components::processing>().enable_in(processing_subjects::WITH_INPUT_RECEIVER);
 
 		components::camera::configure_camera_and_character_with_crosshair(camera, next_character, crosshair);
 	}

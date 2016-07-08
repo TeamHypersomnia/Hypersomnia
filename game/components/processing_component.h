@@ -23,10 +23,10 @@ public:
 	bool is_in(processing_subjects) const;
 
 	template<class = std::enable_if<!is_const>::type>
-	void remove_from(processing_subjects) const;
+	void disable_in(processing_subjects) const;
 	
 	template<class = std::enable_if<!is_const>::type>
-	void add_to(processing_subjects) const;
+	void enable_in(processing_subjects) const;
 
 	components::processing::bitset_type get_disabled_categories() const;
 

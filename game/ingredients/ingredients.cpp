@@ -17,7 +17,7 @@ namespace ingredients {
 		e.get<components::trigger>().react_to_query_detectors = false;
 
 		auto& force_joint = e.add(components::force_joint());
-		e.get<components::processing>().remove_from(processing_subjects::WITH_FORCE_JOINT);
+		e.get<components::processing>().disable_in(processing_subjects::WITH_FORCE_JOINT);
 
 		return item;
 	}

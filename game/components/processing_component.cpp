@@ -88,14 +88,14 @@ bool component_synchronizer<C, P>::is_in(processing_subjects list) const {
 
 template<bool C>
 template <class>
-void component_synchronizer<C, P>::remove_from(processing_subjects list) const {
+void component_synchronizer<C, P>::disable_in(processing_subjects list) const {
 	component.disabled_categories.set(int(list), 0);
 	complete_resubstantialization();
 }
 
 template<bool C>
 template <class>
-void component_synchronizer<C, P>::add_to(processing_subjects list) const {
+void component_synchronizer<C, P>::enable_in(processing_subjects list) const {
 	component.disabled_categories.set(int(list), 1);
 	complete_resubstantialization();
 }

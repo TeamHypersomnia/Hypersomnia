@@ -39,12 +39,12 @@ void trigger_detector_system::consume_trigger_detector_presses(fixed_step& step)
 
 				if (trigger_query_detector->spam_trigger_requests_when_detection_intented) {
 					if (pressed)
-						subject.get<components::processing>().add_to(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
+						subject.get<components::processing>().enable_in(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
 					else
-						subject.get<components::processing>().remove_from(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
+						subject.get<components::processing>().disable_in(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
 				}
 				else if(pressed) {
-					subject.get<components::processing>().remove_from(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
+					subject.get<components::processing>().disable_in(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
 
 					messages::trigger_hit_request_message request;
 					request.detector = e.subject;
@@ -69,7 +69,7 @@ void trigger_detector_system::post_trigger_requests_from_continuous_detectors(fi
 
 	for (auto& t : targets_copy) {
 		if (!t.get<components::trigger_query_detector>().detection_intent_enabled)
-			t.get<components::processing>().remove_from(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
+			t.get<components::processing>().disable_in(processing_subjects::WITH_TRIGGER_QUERY_DETECTOR);
 		else {
 			messages::trigger_hit_request_message request;
 			request.detector = t;
