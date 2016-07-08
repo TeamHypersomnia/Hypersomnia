@@ -4,7 +4,9 @@
 #include "game/cosmos.h"
 #include "game/types_specification/all_component_includes.h"
 
-components::processing components::processing::get_default(const_entity_handle id) {
+typedef components::processing P;
+
+P P::get_default(const_entity_handle id) {
 	std::vector<processing_subjects> matching;
 
 	if (id.has<components::animation>()) {
@@ -71,7 +73,7 @@ components::processing components::processing::get_default(const_entity_handle i
 		matching.push_back(processing_subjects::WITH_VISIBILITY);
 	}
 
-	components::processing result;
+	P result;
 
 	for (auto m : matching)
 		result.processing_subject_categories.set(int(m));
@@ -80,23 +82,36 @@ components::processing components::processing::get_default(const_entity_handle i
 }
 
 template<bool C>
-bool component_synchronizer<C, components::processing>::is_in(processing_subjects list) const {
-	return component.processing_subject_categories.test(int(list));
+bool component_synchronizer<C, P>::is_in(processing_subjects list) const {
+	return component.processing_subject_categories.test(int(list)) && !component.disabled_categories.test(int(list));
 }
 
 template<bool C>
 template <class>
-void component_synchronizer<C, components::processing>::remove_from(processing_subjects list) const {
-	component.processing_subject_categories.set(int(list), 0);
+void component_synchronizer<C, P>::remove_from(processing_subjects list) const {
+	component.disabled_categories.set(int(list), 0);
 	complete_resubstantialization();
 }
 
 template<bool C>
 template <class>
-void component_synchronizer<C, components::processing>::add_to(processing_subjects list) const {
-	component.processing_subject_categories.set(int(list), 1);
+void component_synchronizer<C, P>::add_to(processing_subjects list) const {
+	component.disabled_categories.set(int(list), 1);
 	complete_resubstantialization();
 }
 
-template class component_synchronizer<false, components::processing>;
-template class component_synchronizer<true, components::processing>;
+
+template<bool C>
+P::bitset_type component_synchronizer<C, P>::get_disabled_categories() const {
+	return component.disabled_categories;
+}
+
+template<bool C>
+template <class>
+void component_synchronizer<C, P>::set_disabled_categories(P::bitset_type categories) const {
+	component.disabled_categories = categories;
+	complete_resubstantialization();
+}
+
+template class component_synchronizer<false, P>;
+template class component_synchronizer<true, P>;

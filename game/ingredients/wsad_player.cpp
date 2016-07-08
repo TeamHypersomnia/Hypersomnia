@@ -10,8 +10,10 @@
 #include "game/components/movement_component.h"
 #include "game/components/rotation_copying_component.h"
 #include "game/components/animation_component.h"
+#include "game/components/fixtures_component.h"
 #include "game/components/animation_response_component.h"
 #include "game/components/physics_component.h"
+#include "game/components/special_physics_component.h"
 #include "game/components/trigger_query_detector_component.h"
 #include "game/components/driver_component.h"
 #include "game/components/force_joint_component.h"
@@ -44,10 +46,11 @@ namespace ingredients {
 	}
 
 	void wsad_character_physics(entity_handle e) {
-		auto& physics_definition = e += components::physics_definition();
+		components::physics body;
+		components::special_physics special;
+		components::fixtures colliders;
 
-		auto& body = physics_definition.body;
-		auto& info = physics_definition.new_collider();
+		auto& info = colliders.new_collider();
 
 		info.shape.from_renderable(e);
 
@@ -55,11 +58,15 @@ namespace ingredients {
 		info.density = 1.0;
 		body.fixed_rotation = false;
 		body.angled_damping = true;
-		body.angle_motor_force_multiplier = 1.0;
+		special.angle_motor_force_multiplier = 1.0;
 
 		body.linear_damping = 20;
 
 		wsad_character_setup_movement(e);
+
+		e += body;
+		e += special;
+		e += colliders;
 	}
 
 	void wsad_character_legs(entity_handle legs, entity_handle player) {
@@ -210,11 +217,11 @@ namespace ingredients {
 		auto previously_controlled_character = next_character.make_handle(camera.get<components::camera>().entity_to_chase);
 
 		if (previously_controlled_character.alive()) {
-			previously_controlled_character.skip_processing_in(processing_subjects::WITH_INPUT_RECEIVER);
-			previously_controlled_character.skip_processing_in(processing_subjects::WITH_GUI_ELEMENT);
+			previously_controlled_character.get<components::processing>().remove_from(processing_subjects::WITH_INPUT_RECEIVER);
+			previously_controlled_character.get<components::processing>().remove_from(processing_subjects::WITH_GUI_ELEMENT);
 
 			auto crosshair = previously_controlled_character[sub_entity_name::CHARACTER_CROSSHAIR];
-			crosshair.skip_processing_in(processing_subjects::WITH_INPUT_RECEIVER);
+			crosshair.get<components::processing>().remove_from(processing_subjects::WITH_INPUT_RECEIVER);
 
 			previously_controlled_character.map_associated_entity(associated_entity_name::WATCHING_CAMERA, entity_id());
 		}
@@ -226,22 +233,22 @@ namespace ingredients {
 		if (next_character.find<components::gui_element>() == nullptr)
 			next_character.add(components::gui_element());
 
-		if (next_character.find<components::input_receiver>() == nullptr)
-			next_character.add<components::input_receiver>();
+		if (!next_character.has<components::input_receiver>())
+			next_character.add(components::input_receiver());
 
 		if (crosshair.find<components::input_receiver>() == nullptr)
 			crosshair.add<components::input_receiver>();
 
-		next_character.unskip_processing_in(processing_subjects::WITH_INPUT_RECEIVER);
-		next_character.unskip_processing_in(processing_subjects::WITH_GUI_ELEMENT);
-		crosshair.unskip_processing_in(processing_subjects::WITH_INPUT_RECEIVER);
+		next_character.get<components::processing>().add_to(processing_subjects::WITH_INPUT_RECEIVER);
+		next_character.get<components::processing>().add_to(processing_subjects::WITH_GUI_ELEMENT);
+		crosshair.get<components::processing>().add_to(processing_subjects::WITH_INPUT_RECEIVER);
 
 		components::camera::configure_camera_and_character_with_crosshair(camera, next_character, crosshair);
 	}
 }
 
 namespace prefabs {
-	entity_handle create_character(cosmos world, vec2 pos) {
+	entity_handle create_character(cosmos& world, vec2 pos) {
 		auto character = world.create_entity("player_unnamed");
 
 		name_entity(character, entity_name::PERSON);
@@ -257,16 +264,16 @@ namespace prefabs {
 
 		ingredients::character_inventory(character);
 
-		auto corpse_of_sentience = world.create_definition_entity("corpse_of_sentience");
+		auto corpse_of_sentience = world.create_entity("corpse_of_sentience");
 		name_entity(corpse_of_sentience, entity_name::CORPSE);
 		ingredients::wsad_character_corpse(corpse_of_sentience);
 
-		character->map_sub_entity(sub_entity_name::CORPSE_OF_SENTIENCE, corpse_of_sentience);
+		character.map_sub_entity(sub_entity_name::CORPSE_OF_SENTIENCE, corpse_of_sentience);
 
 		return character;
 	}
 
-	entity_handle create_character_crosshair(cosmos world) {
+	entity_handle create_character_crosshair(cosmos& world) {
 		auto root = world.create_entity("crosshair");
 		auto recoil = world.create_entity("crosshair_recoil_body");
 		auto zero_target = world.create_entity("zero_target");
@@ -324,7 +331,7 @@ namespace prefabs {
 			force_joint.divide_transform_mode = true;
 		}
 
-		root->map_sub_entity(sub_entity_name::CROSSHAIR_RECOIL_BODY, recoil);
+		root.map_sub_entity(sub_entity_name::CROSSHAIR_RECOIL_BODY, recoil);
 
 		return root;
 	}

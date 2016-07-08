@@ -15,7 +15,7 @@
 #include "game/detail/inventory_utils.h"
 
 namespace prefabs {
-	entity_handle create_cyan_urban_machete(cosmos world, vec2 pos) {
+	entity_handle create_cyan_urban_machete(cosmos& world, vec2 pos) {
 		auto& machete = world.create_entity("urban_cyan_machete");
 		name_entity(machete, entity_name::URBAN_CYAN_MACHETE);
 
