@@ -3,6 +3,7 @@
 #include "game/components/physics_component.h"
 #include "game/entity_handle.h"
 #include "game/detail/physics_scripts.h"
+#include "game/cosmos.h"
 
 vec2 position(const_entity_handle e) {
 	return e.get<components::transform>().pos;

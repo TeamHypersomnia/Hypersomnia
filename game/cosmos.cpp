@@ -156,7 +156,7 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	temporary_systems.get<dynamic_tree_system>().determine_visible_entities_from_every_camera();
 	performance.stop(meter_type::CAMERA_QUERY);
 
-	stateful_systems.get<gui_system>().rebuild_gui_tree_based_on_game_state();
+	stateful_systems.get<gui_system>().advance_gui_elements();
 	stateful_systems.get<gui_system>().translate_raw_window_inputs_to_gui_events();
 
 	stateful_systems.get<gui_system>().suppress_inputs_meant_for_gui();

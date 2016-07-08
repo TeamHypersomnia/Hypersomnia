@@ -3,7 +3,7 @@
 #include "game/components/container_component.h"
 #include "game/cosmos.h"
 
-void gui_system::rebuild_gui_tree_based_on_game_state(fixed_step& step) {
+void gui_system::advance_gui_elements(fixed_step& step) {
 	auto& cosmos = step.cosm;
 	
 	gui.set_delta_milliseconds(step.get_delta().in_milliseconds());

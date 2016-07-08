@@ -38,7 +38,7 @@ public:
 
 	void resize(vec2i size) { gui.resize(size); }
 
-	void rebuild_gui_tree_based_on_game_state(fixed_step&);
+	void advance_gui_elements(fixed_step&);
 	void translate_raw_window_inputs_to_gui_events(fixed_step&);
 	void suppress_inputs_meant_for_gui(fixed_step&);
 
