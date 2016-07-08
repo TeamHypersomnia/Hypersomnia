@@ -132,6 +132,10 @@ namespace prefabs {
 			left_wheel.get<components::fixtures>().set_owner_body(front);
 		}
 
+		front.add_standard_components();
+		left_wheel.add_standard_components();
+		interior.add_standard_components();
+
 		return front;
 	}
 

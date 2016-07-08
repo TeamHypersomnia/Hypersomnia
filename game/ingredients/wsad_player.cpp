@@ -92,6 +92,9 @@ namespace ingredients {
 		auto& particle_response = e += components::particle_effect_response({ assets::particle_effect_response_id::CHARACTER_RESPONSE });
 		auto& attitude = e += components::attitude();
 
+		e += components::gui_element();
+		e += components::input_receiver();
+
 		attitude.parties = party_category::METROPOLIS_CITIZEN;
 		attitude.hostile_parties = party_category::RESISTANCE_CITIZEN;
 
@@ -163,7 +166,7 @@ namespace ingredients {
 		sentience.health.value = 100.0;
 		sentience.health.maximum = 100.0;
 
-		e.deactivate(force_joint);
+		e.get<components::processing>().disable_in(processing_subjects::WITH_FORCE_JOINT);
 
 		detector.spam_trigger_requests_when_detection_intented = true;
 
@@ -200,10 +203,10 @@ namespace ingredients {
 		sprite.set(assets::texture_id::DEAD_TORSO, rgba(255, 255, 255, 255));
 		render.layer = render_layer::CORPSES;
 
-		auto& physics_definition = e += components::physics_definition();
+		components::physics body;
+		components::fixtures colliders;
 
-		auto& body = physics_definition.body;
-		auto& info = physics_definition.new_collider();
+		auto& info = colliders.new_collider();
 
 		info.shape.from_renderable(e);
 
@@ -211,6 +214,9 @@ namespace ingredients {
 		info.density = 1.0;
 
 		body.linear_damping = 6.5;
+
+		e += body;
+		e += colliders;
 	}
 
 	void inject_window_input_to_character(entity_handle next_character, entity_handle camera) {
@@ -229,15 +235,6 @@ namespace ingredients {
 		auto crosshair = next_character[sub_entity_name::CHARACTER_CROSSHAIR];
 
 		next_character.map_associated_entity(associated_entity_name::WATCHING_CAMERA, camera);
-
-		if (next_character.find<components::gui_element>() == nullptr)
-			next_character.add(components::gui_element());
-
-		if (!next_character.has<components::input_receiver>())
-			next_character.add(components::input_receiver());
-
-		if (crosshair.find<components::input_receiver>() == nullptr)
-			crosshair.add<components::input_receiver>();
 
 		next_character.get<components::processing>().enable_in(processing_subjects::WITH_INPUT_RECEIVER);
 		next_character.get<components::processing>().enable_in(processing_subjects::WITH_GUI_ELEMENT);
@@ -279,10 +276,10 @@ namespace prefabs {
 		auto zero_target = world.create_entity("zero_target");
 
 		{
-			auto& sprite = *root += components::sprite();
-			auto& render = *root += components::render();
-			auto& transform = *root += components::transform();
-			auto& crosshair = *root += components::crosshair();
+			auto& sprite = root += components::sprite();
+			auto& render = root += components::render();
+			auto& transform = root += components::transform();
+			auto& crosshair = root += components::crosshair();
 			
 			sprite.set(assets::texture_id::TEST_CROSSHAIR, rgba(0, 255, 0, 255));
 
@@ -295,29 +292,29 @@ namespace prefabs {
 		}
 
 		{
-			auto& transform = *recoil += components::transform();
-			auto& physics_definition = *recoil += components::physics_definition();
-			auto& force_joint = *recoil += components::force_joint();
-			*zero_target += components::transform();
+			auto& transform = recoil += components::transform();
+			auto& force_joint = recoil += components::force_joint();
+			zero_target += components::transform();
+			components::physics body;
+			components::fixtures colliders;
 
-			auto& sprite = *recoil += components::sprite();
+			auto& sprite = recoil += components::sprite();
 
 			sprite.set(assets::texture_id::TEST_CROSSHAIR, rgba(0, 255, 0, 0));
 
-			auto& render = *recoil += components::render();
+			auto& render = recoil += components::render();
 			render.layer = render_layer::OVER_CROSSHAIR;
 			render.interpolate = true;
 			render.snap_interpolation_when_close = false;
 			ingredients::make_always_visible(recoil);
 
-			auto& body = physics_definition.body;
-			auto& info = physics_definition.new_collider();
+			auto& info = colliders.new_collider();
 
 			info.shape.from_renderable(recoil);
 
 			info.filter = filters::renderable();
 			//info.filter.categoryBits = 0;
-			info.density = 0.1;
+			info.density = 0.1f;
 			info.sensor = true;
 
 			body.linear_damping = 5;

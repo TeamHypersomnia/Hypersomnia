@@ -1,11 +1,9 @@
 #include "ingredients.h"
 #include "renderable_includes.h"
-
-#include "game/detail/physics_setup_helpers.h"
 #include "game/enums/filters.h"
 
 namespace ingredients {
-	components::sprite&  sprite(entity_handle e, vec2 pos, assets::texture_id id, augs::rgba col, render_layer layer) {
+	components::sprite& sprite(entity_handle e, vec2 pos, assets::texture_id id, augs::rgba col, render_layer layer) {
 		auto& sprite = e += components::sprite();
 		auto& render = e += components::render();
 		auto& transform = e += components::transform();
