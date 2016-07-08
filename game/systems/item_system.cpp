@@ -132,6 +132,7 @@ void components::item_slot_transfers::interrupt_mounting() {
 }
 
 void item_system::process_mounting_and_unmounting(fixed_step& step) {
+	ensure(false);
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 	auto targets = cosmos.get(processing_subjects::WITH_ITEM_SLOT_TRANSFERS);

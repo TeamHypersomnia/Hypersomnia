@@ -24,21 +24,21 @@ typename maybe_const_ref<C, rigid_body_cache>::type& component_synchronizer<C, P
 }
 
 template<bool C>
-template <class = typename std::enable_if<!C>::type>
+template <class>
 void component_synchronizer<C, P>::set_body_type(components::physics::type t) {
 	component.body_type = t;
 	complete_resubstantialization();
 }
 
 template<bool C>
-template <class = typename std::enable_if<!C>::type>
+template <class>
 void component_synchronizer<C, P>::set_activated(bool flag) {
 	component.activated = flag;
 	complete_resubstantialization();
 }
 
 template<bool C>
-template <class = typename std::enable_if<!C>::type>
+template <class>
 void component_synchronizer<C, P>::set_velocity(vec2 pixels) {
 	component.velocity = pixels;
 
@@ -49,7 +49,7 @@ void component_synchronizer<C, P>::set_velocity(vec2 pixels) {
 }
 
 template<bool C>
-template <class = typename std::enable_if<!C>::type>
+template <class>
 void component_synchronizer<C, P>::set_linear_damping(float damping) {
 	component.linear_damping = damping;
 
@@ -60,7 +60,7 @@ void component_synchronizer<C, P>::set_linear_damping(float damping) {
 }
 
 template<bool C>
-template <class = typename std::enable_if<!C>::type>
+template <class>
 void component_synchronizer<C, P>::set_angular_damping(float damping) {
 	component.angular_damping = damping;
 
@@ -71,7 +71,7 @@ void component_synchronizer<C, P>::set_angular_damping(float damping) {
 }
 
 template<bool C>
-template <class = typename std::enable_if<!C>::type>
+template <class>
 void component_synchronizer<C, P>::set_linear_damping_vec(vec2 damping) {
 	component.linear_damping_vec = damping;
 
@@ -82,13 +82,13 @@ void component_synchronizer<C, P>::set_linear_damping_vec(vec2 damping) {
 }
 
 template<bool C>
-template <class = typename std::enable_if<!C>::type>
+template <class>
 void component_synchronizer<C, P>::apply_force(vec2 pixels) {
 	apply_force(pixels, vec2(0, 0), true);
 }
 
 template<bool C>
-template <class = typename std::enable_if<!C>::type>
+template <class>
 void component_synchronizer<C, P>::apply_force(vec2 pixels, vec2 center_offset, bool wake) {
 	ensure(is_constructed());
 
@@ -107,13 +107,13 @@ void component_synchronizer<C, P>::apply_force(vec2 pixels, vec2 center_offset, 
 }
 
 template<bool C>
-template <class = typename std::enable_if<!C>::type>
+template <class>
 void component_synchronizer<C, P>::apply_impulse(vec2 pixels) {
 	apply_impulse(pixels, vec2(0, 0), true);
 }
 
 template<bool C>
-template <class = typename std::enable_if<!C>::type>
+template <class>
 void component_synchronizer<C, P>::apply_impulse(vec2 pixels, vec2 center_offset, bool wake) {
 	ensure(is_constructed());
 
@@ -132,7 +132,7 @@ void component_synchronizer<C, P>::apply_impulse(vec2 pixels, vec2 center_offset
 }
 
 template<bool C>
-template <class = typename std::enable_if<!C>::type>
+template <class>
 void component_synchronizer<C, P>::apply_angular_impulse(float imp) {
 	ensure(is_constructed());
 	get_cache().body->ApplyAngularImpulse(imp, true);
@@ -147,13 +147,13 @@ float component_synchronizer<C, P>::get_mass() const {
 template<bool C>
 float component_synchronizer<C, P>::get_angle() const {
 	ensure(is_constructed());
-	return get_cache().body->GetAngle() * RAD_TO_DEG;
+	return get_cache().body->GetAngle() * RAD_TO_DEGf;
 }
 
 template<bool C>
 float component_synchronizer<C, P>::get_angular_velocity() const {
 	ensure(is_constructed());
-	return get_cache().body->GetAngularVelocity() * RAD_TO_DEG;
+	return get_cache().body->GetAngularVelocity() * RAD_TO_DEGf;
 }
 
 template<bool C>
@@ -214,13 +214,13 @@ bool component_synchronizer<C, P>::is_activated() const {
 }
 
 template<bool C>
-template <class = typename std::enable_if<!C>::type>
+template <class>
 void component_synchronizer<C, P>::set_transform(entity_id id) {
 	set_transform(handle.get_cosmos()[id].get<components::transform>());
 }
 
 template<bool C>
-template <class = typename std::enable_if<!C>::type>
+template <class>
 void component_synchronizer<C, P>::set_transform(components::transform transform) {
 	component.transform = transform;
 

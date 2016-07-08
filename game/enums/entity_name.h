@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include "game/entity_handle_declaration.h"
 
 enum class entity_name {
