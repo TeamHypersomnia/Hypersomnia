@@ -1247,7 +1247,7 @@
     <ClInclude Include="augs\math\matrix.h" />
     <ClInclude Include="augs\math\rects.h" />
     <ClInclude Include="augs\math\vec2.h" />
-    <ClInclude Include="augs\math\vec2declare.h" />
+    <ClInclude Include="augs\math\declare.h" />
     <ClInclude Include="augs\misc\file_watcher.h" />
     <ClInclude Include="augs\misc\fixed_delta_timer.h" />
     <ClInclude Include="augs\misc\input_player.h" />

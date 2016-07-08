@@ -8,7 +8,7 @@ namespace components {
 		bool always_visible = false;
 		bool activated = true;
 
-		rects::ltrb<float> aabb;
+		augs::rects::ltrb<float> aabb;
 
 		static dynamic_tree_node get_default(const_entity_handle);
 	};

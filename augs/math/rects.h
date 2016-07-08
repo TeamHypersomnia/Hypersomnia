@@ -2,7 +2,7 @@
 #include <vector>
 #include <sstream>
 #include <algorithm>
-#include "vec2declare.h"
+#include "declare.h"
 // trzeba usprawnic rect2D - rozszerzyc max_size na wh bo z samego max_s: wielkie prostokaty rozpychaja kwadrat a male wykorzystuja miejsce na dole
 
 struct b2Vec2;

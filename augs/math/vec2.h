@@ -2,7 +2,7 @@
 #include <algorithm>
 #include "rects.h"
 #include "misc/randomization.h"
-#include "vec2declare.h"
+#include "declare.h"
 
 #define AUGS_EPSILON 0.0001f
 #define DEG_TO_RAD 0.01745329251994329576923690768489

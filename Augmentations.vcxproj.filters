@@ -2798,9 +2798,6 @@
     <ClInclude Include="augs\math\vec2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\math\vec2declare.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\misc\file_watcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3438,6 +3435,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\enums\colliders_offset_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\math\declare.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
