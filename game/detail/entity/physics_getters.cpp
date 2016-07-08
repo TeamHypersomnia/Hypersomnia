@@ -1,5 +1,6 @@
 #include "game/entity_handle.h"
 #include "game/components/physics_component.h"
+#include "game/components/special_physics_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/cosmos.h"
 #include "physics_getters.h"
@@ -15,9 +16,8 @@ basic_entity_handle<C> physics_getters<C>::get_owner_body_entity() const {
 	auto& self = *static_cast<const entity_handle_type*>(this);
 	auto& cosmos = self.get_cosmos();
 
-	auto* fixtures = self.find<components::fixtures>();
-	if (fixtures) return cosmos[fixtures->get_owner_body()];
-	else if (self.find<components::physics>()) return self;
+	if (self.has<components::fixtures>()) return cosmos[self.get<components::fixtures>().get_owner_body()];
+	else if (self.has<components::physics>()) return self;
 	return cosmos[entity_id()];
 }
 

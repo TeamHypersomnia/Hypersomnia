@@ -147,10 +147,12 @@ void inventory_getters<C>::for_each_contained_item_recursive(std::function<void(
 
 	if (item.has<components::container>()) {
 		for (auto& s : item.get<components::container>().slots) {
-			auto item = cosmos[item[s.first]];
-			
-			f(item);
-			item.for_each_contained_item_recursive(f);
+			auto item_handles = cosmos[s.second.items_inside];
+
+			for (auto it : item_handles) {
+				f(it);
+				it.for_each_contained_item_recursive(f);
+			}
 		}
 	}
 }

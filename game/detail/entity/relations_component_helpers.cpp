@@ -4,7 +4,7 @@
 #include "game/components/relations_component.h"
 
 template <bool C>
-template <class = typename std::enable_if<!C>::type>
+template <class>
 void relations_component_helpers<C>::make_child(entity_id p, sub_entity_name optional_name) const {
 	auto& self = *static_cast<const entity_handle_type*>(this);
 	auto& cosmos = self.get_cosmos();
@@ -14,14 +14,14 @@ void relations_component_helpers<C>::make_child(entity_id p, sub_entity_name opt
 }
 
 template <bool C>
-template <class = typename std::enable_if<!C>::type>
+template <class>
 void relations_component_helpers<C>::add_sub_entity(entity_id p, sub_entity_name optional_name = sub_entity_name::INVALID) const {
 	make_child(p, optional_name);
 	relations().sub_entities.push_back(p);
 }
 
 template <bool C>
-template <class = typename std::enable_if<!C>::type>
+template <class>
 void relations_component_helpers<C>::map_sub_entity(sub_entity_name n, entity_id p) const {
 	make_child(p, n);
 	relations().sub_entities_by_name[n] = p;
@@ -86,7 +86,7 @@ basic_entity_handle<C> relations_component_helpers<C>::get_parent() const {
 }
 
 template <bool C>
-template <class = typename std::enable_if<!C>::type>
+template <class>
 void relations_component_helpers<C>::map_associated_entity(associated_entity_name n, entity_id p) const {
 	relations().associated_entities_by_name[n] = p;
 }
