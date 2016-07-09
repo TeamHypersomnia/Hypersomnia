@@ -21,10 +21,11 @@
 #include "ensure.h"
 
 std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> render_system::get_visible_per_layer(std::vector<const_entity_handle> entities) const {
-	std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> layers;
-	
+	std::array<std::vector<entity_id>, render_layer::LAYER_COUNT> layers;
+	std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> output;
+
 	if (entities.empty())
-		return layers;
+		return output;
 
 	auto& cosmos = entities[0].get_cosmos();
 
@@ -43,10 +44,12 @@ std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> render_s
 					return are_connected_by_friction(cosmos[a], cosmos[b]);
 				});
 			}
+
+			output[custom_order_layer] = cosmos[layers[custom_order_layer]];
 		}
 	}
 
-	return layers;
+	return output;
 }
 
 void render_system::draw_entities(augs::vertex_triangle_buffer& output, std::vector<const_entity_handle> entities, state_for_drawing_camera in_camera, bool only_border_highlights) const {

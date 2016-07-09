@@ -94,7 +94,7 @@ namespace augs {
 
 		basic_entity_handle<is_const> make_handle(entity_id) const;
 
-		decltype(auto) get_cosmos() const {
+		typename basic_handle_base::owner_reference get_cosmos() const {
 			return owner;
 		}
 
