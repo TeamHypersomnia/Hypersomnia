@@ -11,7 +11,7 @@ public:
 	augs::step_player<decltype(augs::machine_entropy::local)> local_entropy_player;
 
 	void buffer_entropy_for_next_step(augs::machine_entropy);
-	cosmic_entropy obtain_cosmic_entropy_for_next_step(const cosmos&);
+	augs::machine_entropy obtain_machine_entropy_for_next_step();
 
 	void record_and_save_this_session(std::string folder, std::string filename);
 	

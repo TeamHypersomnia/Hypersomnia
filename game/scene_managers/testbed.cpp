@@ -13,6 +13,7 @@
 #include "game/stateful_systems/gui_system.h"
 #include "game/systems/visibility_system.h"
 #include "game/systems/pathfinding_system.h"
+#include "game/components/input_receiver_component.h"
 #include "game/components/position_copying_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/item_component.h"
@@ -40,16 +41,16 @@
 #include "game/systems/item_system.h"
 
 #include "gui/text/printer.h"
+
+#include "misc/machine_entropy.h"
+#include "game/cosmic_entropy.h"
 #include "log.h"
 using namespace augs;
 
 namespace scene_managers {
 	void testbed::populate_world_with_entities(fixed_step& step) {
 		auto& world = step.cosm;
-		auto& window = *window::glwindow::get_current();
-		auto window_rect = window.get_screen_rect();
-
-		world.stateful_systems.get<gui_system>().resize(vec2i(window_rect.w, window_rect.h));
+		vec2i size = step.cosm.settings.screen_size;
 
 		auto crate = prefabs::create_crate(world, vec2(200, 200 + 300), vec2i(100, 100) / 3);
 		auto crate2 = prefabs::create_crate(world, vec2(400, 200 + 400), vec2i(300, 300));
@@ -76,12 +77,12 @@ namespace scene_managers {
 		prefabs::create_motorcycle(world, components::transform(100, -600, -90));
 
 		auto camera = world.create_entity("camera");
-		ingredients::camera(camera, window_rect.w, window_rect.h);
+		ingredients::camera(camera, size.x, size.y);
 		world_camera = camera;
 
 		auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
 
-		for (int x = -4*10; x < 4 * 10; ++x)
+		for (int x = -4 * 10; x < 4 * 10; ++x)
 			for (int y = -4 * 10; y < 4 * 10; ++y)
 			{
 				auto background = world.create_entity("bg[-]");
@@ -101,7 +102,7 @@ namespace scene_managers {
 		for (int i = 0; i < num_characters; ++i) {
 			auto new_character = prefabs::create_character(world, vec2(i * 300, 0));
 			new_character.set_debug_name(typesafe_sprintf("player%x", i));
-			
+
 			new_characters.push_back(new_character);
 
 			if (i == 0) {
@@ -153,11 +154,11 @@ namespace scene_managers {
 		prefabs::create_sample_rifle(step, vec2(100, -500 + 100));
 
 		prefabs::create_pistol(step, vec2(300, -500 + 50));
-		
+
 		auto pis2 = prefabs::create_pistol(step, vec2(300, 50),
 			prefabs::create_sample_magazine(step, vec2(100, -650), "0.4",
 				prefabs::create_green_charge(world, vec2(0, 0), 40)));
-		
+
 		auto submachine = prefabs::create_submachine(step, vec2(500, -500 + 50),
 			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
 
@@ -211,7 +212,7 @@ namespace scene_managers {
 		if (num_characters > 5) {
 			auto new_item = prefabs::create_submachine(step, vec2(0, -1000),
 				prefabs::create_sample_magazine(step, vec2(100 - 50, -650), true ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), true ? 500 : 50)));
-			
+
 			perform_transfer({ new_item, new_characters[5][slot_function::PRIMARY_HAND] }, step);
 		}
 
@@ -225,14 +226,14 @@ namespace scene_managers {
 		active_context.map_event_to_intent(window::event::mousemotion, intent_type::MOVE_CROSSHAIR);
 		active_context.map_key_to_intent(window::event::keys::LMOUSE, intent_type::CROSSHAIR_PRIMARY_ACTION);
 		active_context.map_key_to_intent(window::event::keys::RMOUSE, intent_type::CROSSHAIR_SECONDARY_ACTION);
-		
+
 		active_context.map_key_to_intent(window::event::keys::E, intent_type::USE_BUTTON);
 		active_context.map_key_to_intent(window::event::keys::LSHIFT, intent_type::WALK);
-		
+
 		active_context.map_key_to_intent(window::event::keys::G, intent_type::THROW_PRIMARY_ITEM);
 		active_context.map_key_to_intent(window::event::keys::H, intent_type::HOLSTER_PRIMARY_ITEM);
-		
-	    active_context.map_key_to_intent(window::event::keys::BACKSPACE, intent_type::SWITCH_LOOK);
+
+		active_context.map_key_to_intent(window::event::keys::BACKSPACE, intent_type::SWITCH_LOOK);
 
 		active_context.map_key_to_intent(window::event::keys::LCTRL, intent_type::START_PICKING_UP_ITEMS);
 		active_context.map_key_to_intent(window::event::keys::CAPSLOCK, intent_type::SWITCH_CHARACTER);
@@ -252,29 +253,46 @@ namespace scene_managers {
 
 		world.settings.pathfinding.draw_memorised_walls = 1;
 		world.settings.pathfinding.draw_undiscovered = 1;
-		
+
 		characters = to_id_vector(new_characters);
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}
 
-	void testbed::post_solve(fixed_step& step) {
-		for (auto& in : step.entropy.local) {
+	cosmic_entropy testbed::make_cosmic_entropy(augs::machine_entropy machine, cosmos& cosm) {
+		for (auto& in : machine.local) {
 			if (in.key_event == window::event::PRESSED) {
 				if (in.key == window::event::keys::DASH) {
 					show_profile_details = !show_profile_details;
 				}
 			}
 		}
-		
+
+		cosmic_entropy result;
+
+		auto targets = cosm.get(processing_subjects::WITH_INPUT_RECEIVER);
+
+		for (auto it : targets) {
+			if (it.get<components::input_receiver>().local) {
+				cosmic_entropy new_entropy;
+				new_entropy.entropy_per_entity[it] = machine.local;
+
+				result += new_entropy;
+			}
+		}
+	}
+
+	void testbed::pre_solve(fixed_step& step) {
+
+	}
+
+	void testbed::post_solve(fixed_step& step) {
 		auto& cosmos = step.cosm;
-		auto& delta = step.get_delta();
-		auto inputs = step.messages.get_queue<messages::crosshair_intent_message>();
 
 		for (auto& it : step.messages.get_queue<messages::unmapped_intent_message>()) {
 			if (it.intent == intent_type::SWITCH_CHARACTER && it.pressed_flag) {
 				++current_character;
 				current_character %= characters.size();
-				
+
 				ingredients::inject_window_input_to_character(cosmos[characters[current_character]], cosmos[world_camera]);
 			}
 		}

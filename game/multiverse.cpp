@@ -49,21 +49,20 @@ void multiverse::control(augs::machine_entropy entropy) {
 void multiverse::simulate() {
 	auto steps_to_perform = main_cosmos_timer.count_logic_steps_to_perform();
 
-	if (steps_to_perform > 0) {
-		auto total_entropy_for_this_step = main_cosmos_player.obtain_cosmic_entropy_for_next_step(main_cosmos);
+	while (steps_to_perform--) {
+		auto total_entropy_for_this_step = main_cosmos_player.obtain_machine_entropy_for_next_step();
+		auto cosmic_entropy_for_this_step = main_cosmos_manager.make_cosmic_entropy(total_entropy_for_this_step, main_cosmos);
 
-		while (steps_to_perform--) {
-			renderer::get_current().clear_logic_lines();
-			
-			main_cosmos.delta = main_cosmos_timer.get_fixed_delta();
+		renderer::get_current().clear_logic_lines();
 
-			main_cosmos.advance_deterministic_schemata(total_entropy_for_this_step, 
-				[this](fixed_step& step) { main_cosmos_manager.pre_solve(step); }, 
-				[this](fixed_step& step) { main_cosmos_manager.post_solve(step); }
-			);
+		main_cosmos.delta = main_cosmos_timer.get_fixed_delta();
 
-			main_cosmos_timer.increment_total_steps_passed();
-		}
+		main_cosmos.advance_deterministic_schemata(cosmic_entropy_for_this_step,
+			[this](fixed_step& step) { main_cosmos_manager.pre_solve(step); },
+			[this](fixed_step& step) { main_cosmos_manager.post_solve(step); }
+		);
+
+		main_cosmos_timer.increment_total_steps_passed();
 	}
 }
 

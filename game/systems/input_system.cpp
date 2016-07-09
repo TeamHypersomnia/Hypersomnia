@@ -27,7 +27,7 @@
 
 using namespace augs::window;
 
-void input_system::post_unmapped_intents_from_raw_window_inputs(fixed_step& step) {
+void input_system::post_unmapped_intents_from_raw_entropy(fixed_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
 

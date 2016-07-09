@@ -164,7 +164,7 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	performance.start(meter_type::LOGIC);
 	render_system().set_current_transforms_as_previous_for_interpolation();
 
-	input_system().post_unmapped_intents_from_raw_window_inputs(step);
+	input_system().post_unmapped_intents_from_raw_entropy(step);
 
 	stateful_systems.get<gui_system>().switch_to_gui_mode_and_back();
 
@@ -267,7 +267,7 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 
 	destroy_system().perform_deletions();
 
-	input_system().post_unmapped_intents_from_raw_window_inputs();
+	input_system().post_unmapped_intents_from_raw_entropy();
 	input_system().map_unmapped_intents_to_entities();
 
 
