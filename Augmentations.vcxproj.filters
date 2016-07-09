@@ -1239,9 +1239,6 @@
     <ClCompile Include="game\scene_managers\resource_setups\standard_particle_effects.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\scene_managers\one_entity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\scene_managers\testbed.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -3369,9 +3366,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\scene_managers\resource_setups\all.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\scene_managers\one_entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\scene_managers\testbed.h">

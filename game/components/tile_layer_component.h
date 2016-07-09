@@ -19,8 +19,10 @@ namespace augs {
 
 namespace components {
 	struct tile_layer {
-		struct drawing_input {
+		struct drawing_input : vertex_triangle_buffer_reference {
+			using vertex_triangle_buffer_reference::vertex_triangle_buffer_reference;
 			components::transform renderable_transform;
+			components::transform camera_transform;
 			augs::rgba colorize;
 		};
 

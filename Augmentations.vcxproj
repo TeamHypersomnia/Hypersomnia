@@ -462,7 +462,6 @@
     <ClCompile Include="game\resources\manager.cpp" />
     <ClCompile Include="game\resources\particle_effect.cpp" />
     <ClCompile Include="game\resources\texture_with_image.cpp" />
-    <ClCompile Include="game\scene_managers\one_entity.cpp" />
     <ClCompile Include="game\scene_managers\rendering_scripts\standard_rendering.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\standard_atlas.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\standard_behaviour_trees.cpp" />
@@ -1176,7 +1175,6 @@
     <ClInclude Include="game\resources\particle_effect.h" />
     <ClInclude Include="game\resources\particle_effect_response.h" />
     <ClInclude Include="game\resources\texture_with_image.h" />
-    <ClInclude Include="game\scene_managers\one_entity.h" />
     <ClInclude Include="game\scene_managers\rendering_scripts\all.h" />
     <ClInclude Include="game\scene_managers\resource_setups\all.h" />
     <ClInclude Include="game\scene_managers\testbed.h" />

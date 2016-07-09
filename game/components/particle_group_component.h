@@ -20,6 +20,7 @@ namespace components {
 			using vertex_triangle_buffer_reference::vertex_triangle_buffer_reference;
 
 			components::transform renderable_transform;
+			components::transform camera_transform;
 			augs::rgba colorize;
 		};
 
@@ -62,7 +63,7 @@ namespace components {
 		std::vector<stream> stream_slots;
 		particle_group() { stream_slots.resize(1); }
 
-		void draw(const drawing_input&);
+		void draw(const drawing_input&) const;
 	private:
 		friend class particles_system;
 	};
