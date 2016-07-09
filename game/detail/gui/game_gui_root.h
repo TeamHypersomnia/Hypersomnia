@@ -6,7 +6,7 @@
 #include "drag_and_drop.h"
 #include "aabb_highlighter.h"
 
-#include "misc/machine_entropy.h"
+#include "game/machine_entropy.h"
 
 class fixed_step;
 

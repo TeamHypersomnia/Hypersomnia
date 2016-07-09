@@ -24,8 +24,8 @@ void game_window::call_window_script(std::string filename) {
 	window.gl.initialize();
 }
 
-augs::machine_entropy game_window::collect_entropy() {
-	augs::machine_entropy result;
+machine_entropy game_window::collect_entropy() {
+	machine_entropy result;
 	
 	result.local = window.poll_events();
 

@@ -11,7 +11,7 @@ public:
 	window::glwindow window;
 	bool clear_window_inputs_once = true;
 
-	augs::machine_entropy collect_entropy();
+	machine_entropy collect_entropy();
 
 	void call_window_script(std::string filename);
 };

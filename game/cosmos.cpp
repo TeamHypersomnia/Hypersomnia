@@ -133,7 +133,7 @@ void cosmos::delete_entity(entity_id e) {
 size_t cosmos::entities_count() const {
 	return components_and_aggregates.aggregates_count();
 }
-void cosmos::advance_deterministic_schemata(augs::machine_entropy input,
+void cosmos::advance_deterministic_schemata(cosmic_entropy input,
 	fixed_callback pre_solve = fixed_callback(),
 	fixed_callback post_solve = fixed_callback()) {
 	fixed_step step(*this, input);

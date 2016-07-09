@@ -1,6 +1,9 @@
 #pragma once
-#include "misc/machine_entropy.h"
+#include "augs/misc/machine_entropy.h"
+#include "game/cosmic_entropy.h"
+
 #include "misc/step_player.h"
+
 class entropy_player {
 public:
 	augs::machine_entropy total_buffered_entropy;
@@ -8,7 +11,7 @@ public:
 	augs::step_player<decltype(augs::machine_entropy::local)> local_entropy_player;
 
 	void buffer_entropy_for_next_step(augs::machine_entropy);
-	augs::machine_entropy obtain_total_entropy_for_next_step();
+	cosmic_entropy obtain_cosmic_entropy_for_next_step(const cosmos&);
 
 	void record_and_save_this_session(std::string folder, std::string filename);
 	

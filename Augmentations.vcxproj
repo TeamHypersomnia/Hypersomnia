@@ -354,7 +354,9 @@
     <ClCompile Include="3rdparty\RakNet\Source\_FindFirst.cpp" />
     <ClCompile Include="augs\ensure.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
+    <ClCompile Include="game\cosmic_entropy.cpp" />
     <ClCompile Include="game\components\dynamic_tree_node_component.cpp" />
+    <ClCompile Include="game\components\gui_element_component.cpp" />
     <ClCompile Include="game\components\processing_component.cpp" />
     <ClCompile Include="game\components\relations_component.cpp" />
     <ClCompile Include="game\components\substance_component.cpp" />
@@ -457,7 +459,6 @@
     <ClCompile Include="game\ingredients\obstacles.cpp" />
     <ClCompile Include="game\ingredients\sprite.cpp" />
     <ClCompile Include="game\ingredients\wsad_player.cpp" />
-    <ClCompile Include="game\messages\gui_intents.cpp" />
     <ClCompile Include="game\resources\animation.cpp" />
     <ClCompile Include="game\resources\manager.cpp" />
     <ClCompile Include="game\resources\particle_effect.cpp" />
@@ -1011,9 +1012,10 @@
     <ClInclude Include="augs\gui\rect_id.h" />
     <ClInclude Include="augs\gui\text_drawer.h" />
     <ClInclude Include="augs\misc\delta.h" />
+    <ClInclude Include="augs\misc\machine_entropy.h" />
     <ClInclude Include="augs\misc\stepped_timing.h" />
     <ClInclude Include="augs\misc\entropy_unpacker_and_recorder.h" />
-    <ClInclude Include="augs\misc\machine_entropy.h" />
+    <ClInclude Include="game\cosmic_entropy.h" />
     <ClInclude Include="augs\misc\measurements.h" />
     <ClInclude Include="augs\misc\object_pool_handle.h" />
     <ClInclude Include="augs\misc\object_pool_id.h" />
@@ -1153,7 +1155,6 @@
     <ClInclude Include="game\messages\animation_message.h" />
     <ClInclude Include="game\components\animation_response_component.h" />
     <ClInclude Include="game\messages\collision_message.h" />
-    <ClInclude Include="game\messages\gui_intents.h" />
     <ClInclude Include="game\messages\gunshot_response.h" />
     <ClInclude Include="game\messages\health_event.h" />
     <ClInclude Include="game\detail\item_slot_transfer_request.h" />

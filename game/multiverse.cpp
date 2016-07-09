@@ -1,6 +1,7 @@
 #include "multiverse.h"
 #include "game_window.h"
 #include "cosmos.h"
+#include "game/types_specification/all_component_includes.h"
 
 multiverse::multiverse() 
 	: main_cosmos_timer(60, 5)
@@ -8,7 +9,7 @@ multiverse::multiverse()
 	main_cosmos = cosmos();
 	main_cosmos.reserve_storage_for_entities(50000);
 
-	main_cosmos.advance_deterministic_schemata(augs::machine_entropy(), [this](fixed_step& step) {
+	main_cosmos.advance_deterministic_schemata(cosmic_entropy(), [this](fixed_step& step) {
 		main_cosmos_manager.populate_world_with_entities(step);
 	});
 }
@@ -49,7 +50,7 @@ void multiverse::simulate() {
 	auto steps_to_perform = main_cosmos_timer.count_logic_steps_to_perform();
 
 	if (steps_to_perform > 0) {
-		auto total_entropy_for_this_step = main_cosmos_player.obtain_total_entropy_for_next_step();
+		auto total_entropy_for_this_step = main_cosmos_player.obtain_cosmic_entropy_for_next_step(main_cosmos);
 
 		while (steps_to_perform--) {
 			renderer::get_current().clear_logic_lines();

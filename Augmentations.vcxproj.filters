@@ -948,9 +948,6 @@
     <ClCompile Include="game\components\damage_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\messages\gui_intents.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="augs\ensure.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1245,9 +1242,6 @@
     <ClCompile Include="game\game_window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="augs\misc\machine_entropy.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\scene_managers\resource_setups\standard_everything.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1285,6 +1279,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\temporary_systems\processing_lists_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\components\gui_element_component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\cosmic_entropy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\misc\machine_entropy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2981,9 +2984,6 @@
     <ClInclude Include="game\components\trigger_collision_detector_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\messages\gui_intents.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\ensure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3171,9 +3171,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\processing_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\misc\machine_entropy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\types_specification\all_component_includes.h">
@@ -3432,6 +3429,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\math\declare.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\cosmic_entropy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\machine_entropy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

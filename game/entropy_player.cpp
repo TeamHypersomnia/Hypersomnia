@@ -2,14 +2,30 @@
 #include "filesystem/file.h"
 #include "filesystem/directory.h"
 #include "misc/time.h"
+#include "game/cosmos.h"
+#include "game/components/input_receiver_component.h"
 
 void entropy_player::buffer_entropy_for_next_step(augs::machine_entropy delta) {
 	total_buffered_entropy += delta;
 }
 
-augs::machine_entropy entropy_player::obtain_total_entropy_for_next_step() {
+cosmic_entropy entropy_player::obtain_cosmic_entropy_for_next_step(const cosmos& cosm) {
 	local_entropy_player.biserialize(total_buffered_entropy.local);
-	return total_buffered_entropy;
+
+	cosmic_entropy result;
+
+	auto targets = cosm.get(processing_subjects::WITH_INPUT_RECEIVER);
+
+	for (auto it : targets) {
+		if (it.get<components::input_receiver>().local) {
+			cosmic_entropy new_entropy;
+			new_entropy.entropy_per_entity[it] = total_buffered_entropy.local;
+
+			result += new_entropy;
+		}
+	}
+
+	return result;
 }
 
 bool entropy_player::try_to_load_and_replay_recording(std::string filename) {

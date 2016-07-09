@@ -1,5 +1,5 @@
 #pragma once
-#include "misc/machine_entropy.h"
+#include "game/cosmic_entropy.h"
 
 #include "entity_system/storage_for_components_and_aggregates.h"
 #include "entity_system/storage_for_message_queues.h"
@@ -47,7 +47,7 @@ public:
 
 	cosmos();
 
-	void advance_deterministic_schemata(augs::machine_entropy input, 
+	void advance_deterministic_schemata(cosmic_entropy input,
 		fixed_callback pre_solve = fixed_callback(), 
 		fixed_callback post_solve = fixed_callback());
 
