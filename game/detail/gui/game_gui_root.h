@@ -12,8 +12,6 @@ class fixed_step;
 
 struct game_gui_root : public augs::gui::rect {
 	augs::gui::rect parent_of_inventory_controls;
-	augs::gui::rect parent_of_game_windows;
-	special_drag_and_drop_target drop_item_icon = special_drag_and_drop_target(augs::gui::material(assets::texture_id::DROP_HAND_ICON, red));
 
 	game_gui_root();
 	void get_member_children(std::vector<augs::gui::rect_id>& children) const final;
@@ -21,21 +19,6 @@ struct game_gui_root : public augs::gui::rect {
 
 class gui_system;
 struct game_gui_world : public augs::gui::gui_world {
-	vec2 gui_crosshair_position;
-
-	aabb_highlighter world_hover_highlighter;
-
-	augs::gui::text_drawer tooltip_drawer;
-	augs::gui::text_drawer description_drawer;
-	augs::gui::text_drawer dragged_charges_drawer;
-	int dragged_charges = 0;
-
-	vec2i size;
-
-	void resize(vec2i size) {
-		this->size = size;
-	}
-
 	void consume_raw_input(augs::window::event::state&);
 	void draw_cursor_and_tooltip(viewing_step&) const;
 

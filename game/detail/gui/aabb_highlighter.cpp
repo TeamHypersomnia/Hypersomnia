@@ -10,7 +10,7 @@ void aabb_highlighter::update(float delta) {
 	timer = fmod(timer, cycle_duration_ms);
 }
 
-void aabb_highlighter::draw(viewing_step& step, const_entity_handle subject) {
+void aabb_highlighter::draw(viewing_step& step, const_entity_handle subject) const {
 	auto& cosmos = step.cosm;
 	
 	vec2i as;

@@ -30,7 +30,6 @@ using namespace augs::window;
 void input_system::post_unmapped_intents_from_raw_window_inputs(fixed_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
-	step.messages.get_queue<messages::unmapped_intent_message>().clear();
 
 	auto& context = cosmos.settings.input;
 	auto& raw_inputs = step.entropy.local;

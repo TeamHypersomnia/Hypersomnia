@@ -18,6 +18,10 @@ using namespace gui;
 void game_gui_world::draw_cursor_and_tooltip(viewing_step& r) const {
 	auto& drag_result = prepare_drag_and_drop_result();
 
+	augs::gui::text_drawer tooltip_drawer;
+	augs::gui::text_drawer description_drawer;
+	augs::gui::text_drawer dragged_charges_drawer;
+
 	shared::state_for_drawing_renderable state;
 	state.setup_camera_state(r.state);
 	state.screen_space_mode = true;
