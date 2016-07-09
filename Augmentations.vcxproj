@@ -1169,7 +1169,6 @@
     <ClInclude Include="game\messages\create_particle_effect.h" />
     <ClInclude Include="game\messages\trigger_hit_confirmation_message.h" />
     <ClInclude Include="game\messages\trigger_hit_request_message.h" />
-    <ClInclude Include="game\messages\unmapped_intent_message.h" />
     <ClInclude Include="game\resources\animation.h" />
     <ClInclude Include="game\resources\animation_response.h" />
     <ClInclude Include="game\resources\manager.h" />

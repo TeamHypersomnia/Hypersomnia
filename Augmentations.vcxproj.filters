@@ -2678,9 +2678,6 @@
     <ClInclude Include="game\bindings\bind_callbacks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\messages\unmapped_intent_message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\messages\crosshair_intent_message.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -11,7 +11,6 @@
 #include "game/messages/collision_message.h"
 #include "game/messages/create_particle_effect.h"
 #include "game/messages/gunshot_response.h"
-#include "game/messages/unmapped_intent_message.h"
 #include "game/messages/crosshair_intent_message.h"
 #include "game/messages/trigger_hit_confirmation_message.h"
 #include "game/messages/trigger_hit_request_message.h"

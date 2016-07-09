@@ -288,8 +288,8 @@ namespace scene_managers {
 	void testbed::post_solve(fixed_step& step) {
 		auto& cosmos = step.cosm;
 
-		for (auto& it : step.messages.get_queue<messages::unmapped_intent_message>()) {
-			if (it.intent == intent_type::SWITCH_CHARACTER && it.pressed_flag) {
+		for (auto& it : step.messages.get_queue<messages::intent_message>()) {
+			if (it.subject == characters[current_character] && it.intent == intent_type::SWITCH_CHARACTER && it.pressed_flag) {
 				++current_character;
 				current_character %= characters.size();
 

@@ -50,8 +50,8 @@ void multiverse::simulate() {
 	auto steps_to_perform = main_cosmos_timer.count_logic_steps_to_perform();
 
 	while (steps_to_perform--) {
-		auto total_entropy_for_this_step = main_cosmos_player.obtain_machine_entropy_for_next_step();
-		auto cosmic_entropy_for_this_step = main_cosmos_manager.make_cosmic_entropy(total_entropy_for_this_step, main_cosmos);
+		auto machine_entropy_for_this_step = main_cosmos_player.obtain_machine_entropy_for_next_step();
+		auto cosmic_entropy_for_this_step = main_cosmos_manager.make_cosmic_entropy(machine_entropy_for_this_step, main_cosmos);
 
 		renderer::get_current().clear_logic_lines();
 

@@ -5,7 +5,6 @@
 #include "game/cosmos.h"
 
 #include "game/messages/intent_message.h"
-#include "game/messages/unmapped_intent_message.h"
 
 #include "game/components/item_component.h"
 #include "game/components/input_receiver_component.h"
