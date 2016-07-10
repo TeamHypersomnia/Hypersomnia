@@ -30,4 +30,7 @@ namespace components {
 		return vec2(size.x - 250, size.y - 200);
 	}
 
+	void gui_element::draw_complete_gui_for_camera_rendering_request(viewing_step& step) const {
+
+	}
 }

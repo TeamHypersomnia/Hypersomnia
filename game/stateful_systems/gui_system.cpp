@@ -35,23 +35,7 @@ void gui_system::draw_complete_gui_for_camera_rendering_request(viewing_step& r)
 }
 
 void gui_system::translate_raw_window_inputs_to_gui_events(fixed_step& step) {
-	if (!is_gui_look_enabled)
-		return;
-	
-	auto window_inputs = step.entropy.local;
 
-	if (freeze_gui_model()) {
-		buffered_inputs_during_freeze.insert(buffered_inputs_during_freeze.end(), window_inputs.begin(), window_inputs.end());
-		return;
-	}
-
-	window_inputs.insert(window_inputs.begin(), buffered_inputs_during_freeze.begin(), buffered_inputs_during_freeze.end());
-	buffered_inputs_during_freeze.clear();
-	
-	for (auto w : window_inputs)
-		gui.consume_raw_input(w);
-
-	gui.perform_logic_step();
 }
 
 void gui_system::suppress_inputs_meant_for_gui(fixed_step& step) {
@@ -270,6 +254,26 @@ void gui_system::advance_gui_elements(fixed_step& step) {
 	}
 
 	gui.reassign_children_and_unset_invalid_handles(&game_gui_root.parent_of_inventory_controls, inventory_roots);
+
+	if (!is_gui_look_enabled)
+		return;
+
+	auto window_inputs = step.entropy.local;
+
+	if (freeze_gui_model()) {
+		buffered_inputs_during_freeze.insert(buffered_inputs_during_freeze.end(), window_inputs.begin(), window_inputs.end());
+		return;
+	}
+
+	window_inputs.insert(window_inputs.begin(), buffered_inputs_during_freeze.begin(), buffered_inputs_during_freeze.end());
+	buffered_inputs_during_freeze.clear();
+
+	for (auto w : window_inputs)
+		gui.consume_raw_input(w);
+
+	gui.perform_logic_step();
+
+
 	gui.perform_logic_step();
 
 	auto delta = step.get_delta();

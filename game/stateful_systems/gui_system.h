@@ -1,16 +1,19 @@
 #pragma once
+#include <functional>
+#include "game/entity_handle_declaration.h"
 
 class fixed_step;
 class viewing_step;
+class game_gui_world;
 
 class gui_system {
+	template<bool is_const>
+	void tree_callback(basic_entity_handle<is_const>, std::function<void()>);
+
 public:
 	void translate_game_events_for_hud(fixed_step&);
 
 	void advance_gui_elements(fixed_step&);
-	void translate_raw_window_inputs_to_gui_events(fixed_step&);
-	void suppress_inputs_meant_for_gui(fixed_step&);
-
-	void switch_to_gui_mode_and_back(fixed_step&);
-	void draw_complete_gui_for_camera_rendering_request(viewing_step&) const;
+	
+	void switch_to_gui_mode_and_back(fixed_step&);	
 };

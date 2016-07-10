@@ -1,10 +1,13 @@
 #include "all.h"
 
 #include "game/entity_id.h"
+#include "game/entity_handle.h"
 #include "game/cosmos.h"
 
 #include "game/systems/render_system.h"
 #include "game/stateful_systems/gui_system.h"
+#include "game/components/input_receiver_component.h"
+#include "game/components/gui_element_component.h"
 #include "game/temporary_systems/dynamic_tree_system.h"
 #include "game/resources/manager.h"
 #include "graphics/renderer.h"
@@ -85,29 +88,34 @@ namespace rendering_scripts {
 			glUniform2f(glGetUniformLocation(circular_bars_shader.id, "texture_center"), center.x, center.y);
 		
 		}
-		auto& gui = cosmos.stateful_systems.get<gui_system>();
 
-		auto textual_infos = gui.hud.draw_circular_bars_and_get_textual_info(step);
+		for (auto it : cosmos.get(processing_subjects::WITH_INPUT_RECEIVER)) {
+			if (it.get<components::input_receiver>().local && it.has<components::gui_element>()) {
+				auto& gui = it.get<components::gui_element>();
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
-		
-		default_shader.use();
+				auto textual_infos = gui.hud.draw_circular_bars_and_get_textual_info(step);
 
-		renderer.call_triangles(textual_infos);
-		
-		default_highlight_shader.use();
+				renderer.call_triangles();
+				renderer.clear_triangles();
 
-		gui.hud.draw_pure_color_highlights(step);
+				default_shader.use();
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
+				renderer.call_triangles(textual_infos);
 
-		default_shader.use();
+				default_highlight_shader.use();
 
-		gui.hud.draw_vertically_flying_numbers(step);
+				gui.hud.draw_pure_color_highlights(step);
 
-		gui.draw_complete_gui_for_camera_rendering_request(step);
+				renderer.call_triangles();
+				renderer.clear_triangles();
+
+				default_shader.use();
+
+				gui.hud.draw_vertically_flying_numbers(step);
+
+				gui.draw_complete_gui_for_camera_rendering_request(step);
+			}
+		}
 
 		resource_manager.find(assets::atlas_id::GAME_WORLD_ATLAS)->bind();
 

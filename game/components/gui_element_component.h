@@ -12,6 +12,8 @@
 #include "game/detail/gui/game_gui_root.h"
 #include "game/detail/gui/immediate_hud.h"
 
+class viewing_step;
+
 namespace components {
 	struct gui_element {
 		vec2 gui_crosshair_position;
@@ -39,5 +41,6 @@ namespace components {
 		rects::xywh<float> get_rectangle_for_slot_function(slot_function) const;
 		vec2i get_initial_position_for_special_control(special_control) const;
 		vec2 initial_inventory_root_position() const;
+		void draw_complete_gui_for_camera_rendering_request(viewing_step&) const;
 	};
 }
