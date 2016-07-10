@@ -82,9 +82,9 @@ namespace augs {
 
 			bool was_hovered_rect_visited = false;
 			bool held_rect_is_dragged = false;
-			rect *rect_hovered = nullptr;
-			rect *rect_held_by_lmb = nullptr;
-			rect *rect_held_by_rmb = nullptr;
+			rect_id rect_hovered = nullptr;
+			rect_id rect_held_by_lmb = nullptr;
+			rect_id rect_held_by_rmb = nullptr;
 			
 			vec2i ldrag_relative_anchor;
 			vec2i last_ldown_position;
