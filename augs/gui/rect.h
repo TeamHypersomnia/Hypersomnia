@@ -95,7 +95,6 @@ namespace augs {
 			rect(rects::xywh<float> rc = rects::xywh<float>());
 			rect(assets::texture_id);
 
-			void calculate_clipped_rectangle_layout();
 
 			void consume_raw_input_and_generate_gui_events(poll_info&); /* event generator */
 			void unhover(poll_info& inf);
@@ -103,7 +102,9 @@ namespace augs {
 			typedef std::function<void(rect_handle)> logic_behaviour;
 			typedef std::function<void(rect_handle, event_info)> event_behaviour;
 			typedef std::function<void(rect_handle, draw_info)> draw_behaviour;
+			typedef std::function<rects::wh<float>(rect_handle)> content_size_behaviour;
 
+			void calculate_clipped_rectangle_layout(content_size_behaviour);
 			void perform_logic_step(gui_world&, logic_behaviour callback);
 			void consume_gui_event(event_info, event_behaviour callback); /* event listener */
 			

@@ -66,7 +66,7 @@ namespace augs {
 			rect_id get_rect_in_focus() const;
 
 			void consume_raw_input_and_generate_gui_events(rect::event_behaviour, augs::window::event::state);
-			void perform_logic_step(rect::logic_behaviour);
+			void perform_logic_step(rect::logic_behaviour, rect::content_size_behaviour);
 			vertex_triangle_buffer draw_triangles(rect::draw_behaviour) const;
 		};
 
