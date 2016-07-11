@@ -51,4 +51,7 @@ namespace augs {
 			return std::make_tuple(version, indirection_index) < std::make_tuple(b.version, b.indirection_index);
 		}
 	};
+
+	template<class T>
+	struct make_object_pool_id { typedef object_pool_id<T> type; };
 }

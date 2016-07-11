@@ -10,6 +10,7 @@
 #include "rect.h"
 
 #include "misc/object_pool.h"
+#include "misc/object_pool_handlizer.h"
 
 #include "game/assets/font_id.h"
 
@@ -17,7 +18,7 @@
 
 namespace augs {
 	namespace gui {
-		class rect_world : augs::object_pool_handlizer<rect_world> {
+		class rect_world : object_pool_handlizer<rect_world> {
 			float delta_ms = 1000 / 60.f;
 
 		public:

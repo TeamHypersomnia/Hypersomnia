@@ -156,4 +156,7 @@ namespace augs {
 			return slots.capacity();
 		}
 	};
+
+	template<class T>
+	struct make_object_pool { typedef object_pool<T> type; };
 }

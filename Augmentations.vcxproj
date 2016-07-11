@@ -1012,6 +1012,7 @@
     <ClInclude Include="augs\filesystem\directory.h" />
     <ClInclude Include="augs\gui\appearance_detector.h" />
     <ClInclude Include="augs\gui\clipboard.h" />
+    <ClInclude Include="augs\gui\element_world.h" />
     <ClInclude Include="augs\gui\formatted_text.h" />
     <ClInclude Include="augs\gui\rect_id.h" />
     <ClInclude Include="augs\gui\text_drawer.h" />

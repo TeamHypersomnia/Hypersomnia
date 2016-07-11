@@ -3449,5 +3449,8 @@
     <ClInclude Include="augs\gui\rect_world.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="augs\gui\element_world.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

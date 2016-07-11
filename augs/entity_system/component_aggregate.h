@@ -3,9 +3,6 @@
 #include "misc/object_pool_id.h"
 
 namespace augs {
-	template<class T>
-	struct make_object_pool_id { typedef object_pool_id<T> type; };
-	
 	template <class... components>
 	class component_aggregate {
 	public:

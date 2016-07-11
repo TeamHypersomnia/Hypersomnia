@@ -6,9 +6,6 @@
 #include "aggregate_mixins.h"
 
 namespace augs {
-	template<class T>
-	struct make_object_pool { typedef object_pool<T> type; };
-
 	template <class handle_owner_type, class... components>
 	class storage_for_components_and_aggregates {
 		typedef component_aggregate<components...> aggregate_type;
