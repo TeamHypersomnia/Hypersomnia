@@ -17,7 +17,7 @@
 
 namespace augs {
 	namespace gui {
-		class gui_world : augs::object_pool_handlizer<gui_world> {
+		class rect_world : augs::object_pool_handlizer<rect_world> {
 			float delta_ms = 1000 / 60.f;
 
 		public:
@@ -57,7 +57,7 @@ namespace augs {
 
 			rect_id root;
 
-			gui_world();
+			rect_world();
 
 			void set_delta_milliseconds(float);
 			float delta_milliseconds();

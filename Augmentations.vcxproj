@@ -525,7 +525,7 @@
     <ClCompile Include="augs\gui\controls\stylesheeted\controls.cpp" />
     <ClCompile Include="augs\gui\controls\textbox.cpp" />
     <ClCompile Include="augs\gui\dragger.cpp" />
-    <ClCompile Include="augs\gui\gui_world.cpp" />
+    <ClCompile Include="augs\gui\rect_world.cpp" />
     <ClCompile Include="augs\gui\material.cpp" />
     <ClCompile Include="augs\gui\rect.cpp" />
     <ClCompile Include="augs\gui\stroke.cpp" />
@@ -1235,7 +1235,7 @@
     <ClInclude Include="augs\gui\controls\stylesheeted\controls.h" />
     <ClInclude Include="augs\gui\controls\textbox.h" />
     <ClInclude Include="augs\gui\dragger.h" />
-    <ClInclude Include="augs\gui\gui_world.h" />
+    <ClInclude Include="augs\gui\rect_world.h" />
     <ClInclude Include="augs\gui\material.h" />
     <ClInclude Include="augs\gui\rect.h" />
     <ClInclude Include="augs\gui\stroke.h" />

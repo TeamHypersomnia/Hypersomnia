@@ -13,7 +13,7 @@ namespace augs {
 				bool disappear_if_fits;
 
 				virtual void consume_gui_event(event_info) override;
-				virtual void perform_logic_step(gui_world&) override;
+				virtual void perform_logic_step(rect_world&) override;
 
 				rect_id origin;
 				void align();

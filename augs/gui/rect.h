@@ -8,7 +8,7 @@
 namespace augs {
 	namespace gui {
 		struct stylesheet;
-		class gui_world;
+		class rect_world;
 
 		struct rect {
 			enum class gui_event {
@@ -47,26 +47,26 @@ namespace augs {
 			};
 
 			struct draw_info {
-				const gui_world& owner;
+				const rect_world& owner;
 				vertex_triangle_buffer& v;
 
-				draw_info(const gui_world&, vertex_triangle_buffer&);
+				draw_info(const rect_world&, vertex_triangle_buffer&);
 			};
 
 			struct poll_info {
-				gui_world& owner;
+				rect_world& owner;
 				const unsigned msg;
 
 				bool mouse_fetched = false;
 				bool scroll_fetched = false;
-				poll_info(gui_world&, unsigned);
+				poll_info(rect_world&, unsigned);
 			};
 
 			struct event_info {
-				gui_world& owner;
+				rect_world& owner;
 				gui_event msg;
 
-				event_info(gui_world&, gui_event);
+				event_info(rect_world&, gui_event);
 				operator gui_event();
 				event_info& operator=(gui_event);
 			};
@@ -105,7 +105,7 @@ namespace augs {
 			typedef std::function<rects::wh<float>(rect_handle)> content_size_behaviour;
 
 			void calculate_clipped_rectangle_layout(content_size_behaviour);
-			void perform_logic_step(gui_world&, logic_behaviour callback);
+			void perform_logic_step(rect_world&, logic_behaviour callback);
 			void consume_gui_event(event_info, event_behaviour callback); /* event listener */
 			
 			void draw_triangles(draw_info, draw_behaviour) const;
@@ -145,7 +145,7 @@ namespace augs {
 			void gen_focus_links_depth(rect_id next = rect_id());
 			void gen_focus_links();
 
-			bool is_being_dragged(gui_world&);
+			bool is_being_dragged(rect_world&);
 
 			const rects::ltrb<float>& get_clipped_rect() const;
 			rects::ltrb<float> get_rect_absolute() const;
@@ -156,7 +156,7 @@ namespace augs {
 
 			static rect_id seek_focusable(rect_id, bool);
 		protected:
-			friend class gui_world;
+			friend class rect_world;
 
 			rect_id parent;
 		public:

@@ -1,6 +1,6 @@
 #pragma once
 #include "scrollarea.h"
-#include "gui/gui_world.h"
+#include "gui/rect_world.h"
 #undef max
 #undef min
 #include <algorithm>
@@ -27,7 +27,7 @@ namespace augs {
 					(flags == orientation::OMNI && (need[0] || need[1]));
 			}
 
-			void scrollarea::perform_logic_step(gui_world& inf) {
+			void scrollarea::perform_logic_step(rect_world& inf) {
 				bool n = is_needed();
 				box->enable_drawing = enable_drawing = !(disappear_if_fits && !n);
 				rects::ltrb<float>& sl = box->rc;

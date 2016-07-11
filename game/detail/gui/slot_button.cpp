@@ -93,7 +93,7 @@ void slot_button::draw_triangles(draw_info info) {
 	}
 }
 
-void slot_button::perform_logic_step(augs::gui::gui_world& gr) {
+void slot_button::perform_logic_step(augs::gui::rect_world& gr) {
 	rect::perform_logic_step(gr);
 
 	if (slot_id->always_allow_exactly_one_item) {

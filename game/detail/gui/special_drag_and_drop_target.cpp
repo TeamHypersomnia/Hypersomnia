@@ -22,7 +22,7 @@ void special_drag_and_drop_target::consume_gui_event(event_info info) {
 	detector.update_appearance(info);
 }
 
-void special_drag_and_drop_target::perform_logic_step(augs::gui::gui_world& gui) {
+void special_drag_and_drop_target::perform_logic_step(augs::gui::rect_world& gui) {
 	game_gui_world& game_gui = (game_gui_world&)gui;
 
 	auto dragged_item = dynamic_cast<item_button*>(gui.rect_held_by_lmb) ;

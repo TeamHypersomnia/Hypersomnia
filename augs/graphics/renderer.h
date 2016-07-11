@@ -11,10 +11,6 @@
 #include "augs/misc/timer.h"
 
 namespace augs {
-	namespace gui {
-		class gui_world;
-	}
-
 	class renderer {
 	public:
 		struct debug_line {

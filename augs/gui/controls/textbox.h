@@ -29,11 +29,11 @@ namespace augs {
 				virtual void on_pagedown();
 				virtual void on_pageup();
 				virtual void on_character(wchar_t);
-				virtual void on_cut(gui_world&);
+				virtual void on_cut(rect_world&);
 				virtual void on_bold();
 				virtual void on_italics();
-				virtual void on_copy(gui_world&);
-				virtual void on_paste(gui_world&);
+				virtual void on_copy(rect_world&);
+				virtual void on_paste(rect_world&);
 				virtual void on_undo();
 				virtual void on_redo();
 				virtual void on_backspace(bool);
@@ -42,7 +42,7 @@ namespace augs {
 
 				virtual rects::wh<float> get_content_size() override;
 				virtual void consume_gui_event(event_info) override;
-				virtual void perform_logic_step(gui_world&) override;
+				virtual void perform_logic_step(rect_world&) override;
 				virtual void draw_triangles(draw_info) override;
 
 				void draw_text_ui(draw_info);

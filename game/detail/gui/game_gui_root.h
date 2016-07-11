@@ -2,7 +2,7 @@
 #include "game/step.h"
 #include "special_drag_and_drop_target.h"
 #include "gui/text_drawer.h"
-#include "gui/gui_world.h"
+#include "gui/rect_world.h"
 #include "drag_and_drop.h"
 #include "aabb_highlighter.h"
 
@@ -15,7 +15,7 @@ struct game_gui_root : public augs::gui::rect {
 };
 
 class gui_system;
-struct game_gui_world : public augs::gui::gui_world {
+struct game_gui_world : public augs::gui::rect_world {
 	void consume_raw_input(augs::window::event::state&);
 	void draw_cursor_and_tooltip(viewing_step&) const;
 

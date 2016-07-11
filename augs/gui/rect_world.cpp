@@ -1,5 +1,5 @@
 #pragma once
-#include "gui_world.h"
+#include "rect_world.h"
 #include "rect.h"
 #include "window_framework/platform_utils.h"
 #include "log.h"
@@ -7,7 +7,7 @@
 #undef max
 namespace augs {
 	namespace gui {
-		gui_world::gui_world() {
+		rect_world::rect_world() {
 			auto new_rect = rects.allocate();
 			auto& r = new_rect.get();
 
@@ -18,7 +18,7 @@ namespace augs {
 			root = new_rect;
 		}
 
-		void gui_world::set_focus(rect_id f) {
+		void rect_world::set_focus(rect_id f) {
 			if (f == rect_in_focus) return;
 			root.calculate_clipped_rectangle_layout();
 
@@ -32,11 +32,11 @@ namespace augs {
 			}
 		}
 
-		rect_id gui_world::get_rect_in_focus() const {
+		rect_id rect_world::get_rect_in_focus() const {
 			return rect_in_focus;
 		}
 
-		vertex_triangle_buffer gui_world::draw_triangles() const {
+		vertex_triangle_buffer rect_world::draw_triangles() const {
 			vertex_triangle_buffer buffer;
 			rect::draw_info in(*this, buffer);
 
@@ -51,7 +51,7 @@ namespace augs {
 			return buffer;
 		}
 
-		void gui_world::perform_logic_step() {
+		void rect_world::perform_logic_step() {
 			root.perform_logic_step(*this);
 			root.calculate_clipped_rectangle_layout();
 
@@ -71,17 +71,17 @@ namespace augs {
 		}
 
 
-		void gui_world::set_delta_milliseconds(float delta) {
+		void rect_world::set_delta_milliseconds(float delta) {
 			delta_ms = delta;
 		}
 
-		float gui_world::delta_milliseconds() {
+		float rect_world::delta_milliseconds() {
 			return delta_ms;
 		}
 
-		clipboard gui_world::global_clipboard;
+		clipboard rect_world::global_clipboard;
 
-		void gui_world::consume_raw_input_and_generate_gui_events(augs::window::event::state new_state) {
+		void rect_world::consume_raw_input_and_generate_gui_events(augs::window::event::state new_state) {
 			state = new_state;
 			auto& gl = state;
 			using namespace augs::window;

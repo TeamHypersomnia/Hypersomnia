@@ -23,7 +23,7 @@ namespace augs {
 				print.draw_text(in.v, editor, *this);
 			}
 
-			void textbox::perform_logic_step(gui_world& owner) {
+			void textbox::perform_logic_step(rect_world& owner) {
 				drag.move(scroll, owner.delta_milliseconds());
 
 				if (drag.vel[0] != 0.f || drag.vel[1] != 0.f)
@@ -98,13 +98,13 @@ namespace augs {
 			void textbox::on_pagedown() { scroll.y += get_rect_absolute().h(); }
 			void textbox::on_pageup() { scroll.y -= get_rect_absolute().h(); }
 			void textbox::on_character(wchar_t c) { editor.character(c);								view_caret = true; blink_reset = true; }
-			void textbox::on_cut(gui_world& sys) { editor.cut(sys.global_clipboard);					view_caret = true; }
+			void textbox::on_cut(rect_world& sys) { editor.cut(sys.global_clipboard);					view_caret = true; }
 			void textbox::on_bold() { editor.bold();									view_caret = true; }
 			void textbox::on_italics() { editor.italics();									view_caret = true; }
-			void textbox::on_copy(gui_world& sys) { editor.copy(sys.global_clipboard);				view_caret = true; }
+			void textbox::on_copy(rect_world& sys) { editor.copy(sys.global_clipboard);				view_caret = true; }
 			void textbox::on_undo() { editor.undo();									view_caret = true; }
 			void textbox::on_redo() { editor.redo();									view_caret = true; }
-			void textbox::on_paste(gui_world& sys) { editor.paste(sys.global_clipboard);				view_caret = true; blink_reset = true; }
+			void textbox::on_paste(rect_world& sys) { editor.paste(sys.global_clipboard);				view_caret = true; blink_reset = true; }
 			void textbox::on_backspace(bool c) { editor.backspace(c);								view_caret = true; blink_reset = true; }
 			void textbox::on_del(bool c) { editor.del(c);									view_caret = true; blink_reset = true; }
 

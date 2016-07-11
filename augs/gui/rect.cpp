@@ -10,9 +10,9 @@
 #undef min
 namespace augs {
 	namespace gui {
-		rect::draw_info::draw_info(const gui_world& owner, vertex_triangle_buffer& v) : owner(owner), v(v) {}
-		rect::poll_info::poll_info(gui_world& owner, unsigned msg) : owner(owner), msg(msg), mouse_fetched(false), scroll_fetched(false) {}
-		rect::event_info::event_info(gui_world& owner, rect::gui_event msg) : owner(owner), msg(msg) {}
+		rect::draw_info::draw_info(const rect_world& owner, vertex_triangle_buffer& v) : owner(owner), v(v) {}
+		rect::poll_info::poll_info(rect_world& owner, unsigned msg) : owner(owner), msg(msg), mouse_fetched(false), scroll_fetched(false) {}
+		rect::event_info::event_info(rect_world& owner, rect::gui_event msg) : owner(owner), msg(msg) {}
 
 		rect::event_info::operator rect::gui_event() {
 			return msg;
@@ -119,7 +119,7 @@ namespace augs {
 			}
 		}
 
-		void rect::perform_logic_step(gui_world& owner) {
+		void rect::perform_logic_step(rect_world& owner) {
 			auto children_all = children;
 			for (size_t i = 0; i < children_all.size(); ++i) {
 				children_all[i]->parent = this;
@@ -447,7 +447,7 @@ namespace augs {
 			}
 		}
 		
-		bool rect::is_being_dragged(gui_world& g) {
+		bool rect::is_being_dragged(rect_world& g) {
 			return g.rect_held_by_lmb == this && g.held_rect_is_dragged;
 		}
 

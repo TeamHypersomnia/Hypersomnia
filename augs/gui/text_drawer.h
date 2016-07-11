@@ -2,7 +2,7 @@
 #include "text/drafter.h"
 #include "text/printer.h"
 #include "text/draft_interface.h"
-#include "gui_world.h"
+#include "rect_world.h"
 
 namespace augs {
 	namespace gui {

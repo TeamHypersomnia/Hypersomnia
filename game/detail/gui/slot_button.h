@@ -20,7 +20,7 @@ struct slot_button : augs::gui::rect {
 
 	augs::gui::appearance_detector detector;
 	
-	void perform_logic_step(augs::gui::gui_world&) final;
+	void perform_logic_step(augs::gui::rect_world&) final;
 
 	void draw_triangles(draw_info) final;
 	void consume_gui_event(event_info) final;

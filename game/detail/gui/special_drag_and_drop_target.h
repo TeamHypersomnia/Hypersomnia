@@ -18,5 +18,5 @@ struct special_drag_and_drop_target : augs::gui::rect {
 
 	void draw_triangles(draw_info) final;
 	void consume_gui_event(event_info) final;
-	void perform_logic_step(augs::gui::gui_world&) final;
+	void perform_logic_step(augs::gui::rect_world&) final;
 };

@@ -21,7 +21,7 @@
 
 #include "ensure.h"
 
-bool item_button::is_being_wholely_dragged_or_pending_finish(augs::gui::gui_world& gr) {
+bool item_button::is_being_wholely_dragged_or_pending_finish(augs::gui::rect_world& gr) {
 	if (is_being_dragged(gr)) {
 		bool is_drag_partial = ((game_gui_world&)gr).dragged_charges < item.get<components::item>().charges;
 		return !is_drag_partial;
@@ -285,7 +285,7 @@ bool item_button::is_inventory_root() {
 	return item == gui_element_entity;
 }
 
-void item_button::perform_logic_step(augs::gui::gui_world& gr) {
+void item_button::perform_logic_step(augs::gui::rect_world& gr) {
 	rect::perform_logic_step(gr);
 
 	if (is_inventory_root()) {

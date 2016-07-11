@@ -1,4 +1,4 @@
-#include "gui/gui_world.h"
+#include "gui/rect_world.h"
 
 namespace augs {
 	namespace gui {
