@@ -108,7 +108,6 @@ const_inventory_slot_handle cosmos::get_handle(inventory_slot_id id) const {
 	return const_inventory_slot_handle(*this, id);
 }
 
-
 entity_handle cosmos::create_entity(std::string debug_name) {
 	return get_handle(components_and_aggregates.allocate_aggregate(debug_name));
 }

@@ -17,7 +17,7 @@
 
 namespace augs {
 	namespace gui {
-		class gui_world {
+		class gui_world : augs::object_pool_handlizer<gui_world> {
 			float delta_ms = 1000 / 60.f;
 
 		public:
@@ -32,6 +32,9 @@ namespace augs {
 			static clipboard global_clipboard;
 
 			rect_pool rects;
+
+			rect_handle get_handle(rect_id);
+			const_rect_handle get_handle(rect_id) const;
 
 			rect_pool& get_pool();
 			const rect_pool& get_pool() const;

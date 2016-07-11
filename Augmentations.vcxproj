@@ -353,6 +353,8 @@
     <ClCompile Include="3rdparty\RakNet\Source\WSAStartupSingleton.cpp" />
     <ClCompile Include="3rdparty\RakNet\Source\_FindFirst.cpp" />
     <ClCompile Include="augs\ensure.cpp" />
+    <ClCompile Include="augs\gui\clipboard.cpp" />
+    <ClCompile Include="augs\gui\formatted_text.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
     <ClCompile Include="game\cosmic_entropy.cpp" />
     <ClCompile Include="game\components\dynamic_tree_node_component.cpp" />
@@ -1009,10 +1011,13 @@
     <ClInclude Include="augs\entity_system\storage_for_systems.h" />
     <ClInclude Include="augs\filesystem\directory.h" />
     <ClInclude Include="augs\gui\appearance_detector.h" />
+    <ClInclude Include="augs\gui\clipboard.h" />
+    <ClInclude Include="augs\gui\formatted_text.h" />
     <ClInclude Include="augs\gui\rect_id.h" />
     <ClInclude Include="augs\gui\text_drawer.h" />
     <ClInclude Include="augs\misc\delta.h" />
     <ClInclude Include="augs\misc\machine_entropy.h" />
+    <ClInclude Include="augs\misc\object_pool_handlizer.h" />
     <ClInclude Include="augs\misc\stepped_timing.h" />
     <ClInclude Include="augs\misc\entropy_unpacker_and_recorder.h" />
     <ClInclude Include="game\cosmic_entropy.h" />

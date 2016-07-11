@@ -184,7 +184,7 @@ void drop_from_all_slots(entity_handle c, fixed_step& step) {
 		auto items_uninvalidated = s.second.items_inside;
 
 		for (auto item : items_uninvalidated) {
-			perform_transfer({ c.get_cosmos()[item], c.get_cosmos().dead_inventory_handle() }, step);
+			perform_transfer({ c.get_cosmos()[item], c.get_cosmos()[inventory_slot_id()] }, step);
 		}
 	}
 }

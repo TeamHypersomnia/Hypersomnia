@@ -16,7 +16,10 @@
 #include "game/stateful_systems/gui_system.h"
 
 #include "misc/delta.h"
+#include "misc/object_pool_handlizer.h"
+
 #include "game/entity_id.h"
+#include "game/detail/inventory_slot_id.h"
 #include "game/entity_handle_declaration.h"
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/global/all_settings.h"
@@ -24,8 +27,8 @@
 #include "game/step.h"
 #include <functional>
 
-struct inventory_slot_id;
-class cosmos {
+class cosmos : public augs::object_pool_handlizer<cosmos>
+{
 	storage_for_all_components_and_aggregates components_and_aggregates;
 
 	void advance_deterministic_schemata(fixed_step& step_state);
@@ -63,55 +66,6 @@ public:
 	const_entity_handle get_handle(entity_id) const;
 	inventory_slot_handle get_handle(inventory_slot_id);
 	const_inventory_slot_handle get_handle(inventory_slot_id) const;
-
-	template<class T>
-	decltype(auto) to_handle_vector(std::vector<T> vec) {
-		auto dummy = get_handle(T());
-
-		std::vector<decltype(dummy)> handles;
-
-		for (auto v : vec)
-			handles.emplace_back(get_handle(v));
-
-		return std::move(handles);
-	}
-
-	template<class T>
-	decltype(auto) to_handle_vector(std::vector<T> vec) const {
-		auto dummy = get_handle(T());
-
-		std::vector<decltype(dummy)> handles;
-
-		for (auto v : vec)
-			handles.emplace_back(get_handle(v));
-
-		return std::move(handles);
-	}
-
-	entity_handle dead_entity_handle();
-	const_entity_handle dead_entity_handle() const;
-	inventory_slot_handle dead_inventory_handle();
-	const_inventory_slot_handle dead_inventory_handle() const;
-
-	template<class T>
-	decltype(auto) operator [](T id) {
-		return get_handle(id);
-	}
-
-	template<class T>
-	decltype(auto) operator [](T id) const {
-		return get_handle(id);
-	}
-
-	template<class T>
-	decltype(auto) operator [](std::vector<T> ids) {
-		return to_handle_vector(ids);
-	}
-
-	template<class T>
-	decltype(auto) operator [](std::vector<T> ids) const {
-		return to_handle_vector(ids);
-	}
 
 	randomization get_rng_for(entity_id) const;
 
