@@ -12,7 +12,6 @@ struct game_gui_root : public augs::gui::rect {
 	augs::gui::rect parent_of_inventory_controls;
 
 	game_gui_root();
-	void get_member_children(std::vector<augs::gui::rect_id>& children) const final;
 };
 
 class gui_system;

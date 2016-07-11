@@ -44,9 +44,6 @@ namespace augs {
 				label.pos = p;
 			}
 
-			void text_button::get_member_children(std::vector<rect_id>& v) const {
-			}
-
 			void text_button::center() {
 				label.center(rc);
 			}

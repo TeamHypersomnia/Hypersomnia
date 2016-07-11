@@ -16,10 +16,6 @@ slot_button::slot_button() {
 	clip = false;
 }
 
-void slot_button::get_member_children(std::vector<augs::gui::rect_id>& children) const {
-
-}
-
 void slot_button::draw_triangles(draw_info info) {
 	auto is_hand_slot = slot_id.is_hand_slot();
 

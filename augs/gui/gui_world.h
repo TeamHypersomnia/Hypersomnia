@@ -8,6 +8,9 @@
 #include "texture_baker/font.h"
 #include "rect.h"
 
+#include <functional>
+#include "misc/object_pool.h"
+
 #include "game/assets/font_id.h"
 
 namespace augs {
@@ -47,6 +50,8 @@ namespace augs {
 			float delta_ms = 1000 / 60.f;
 
 		public:
+			rect_pool rects;
+
 			class clipboard {
 				bool
 					/* own_copy indicates whether the clipboard_change event comes from manual "copy_clipboard" or from external source */
@@ -68,7 +73,7 @@ namespace augs {
 				material mat;
 				rects::wh<float> size = rects::wh<float>(25, 25);
 				vec2i pos;
-				rect_id subject = nullptr;
+				rect_id subject;
 				float speed_mult = 1.f;
 			};
 
@@ -82,24 +87,22 @@ namespace augs {
 
 			bool was_hovered_rect_visited = false;
 			bool held_rect_is_dragged = false;
-			rect_id rect_hovered = nullptr;
-			rect_id rect_held_by_lmb = nullptr;
-			rect_id rect_held_by_rmb = nullptr;
+			rect_id rect_hovered;
+			rect_id rect_held_by_lmb;
+			rect_id rect_held_by_rmb;
 			
 			vec2i ldrag_relative_anchor;
 			vec2i last_ldown_position;
 			vec2i current_drag_amount;
 
-			rect root;
+			rect_id root;
 
 			gui_world();
-
-			void reassign_children_and_unset_invalid_handles(rect_id parent, std::vector<rect_id> new_children);
 
 			void set_delta_milliseconds(float);
 			float delta_milliseconds();
 
-			void set_focus(rect_id);
+			void set_focus(rect_id, std::function<void(rect_handle, )> event_behaviour);
 			rect_id get_rect_in_focus() const;
 
 			void consume_raw_input_and_generate_gui_events(augs::window::event::state);

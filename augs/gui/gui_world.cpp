@@ -3,6 +3,7 @@
 #include "rect.h"
 #include "window_framework/platform_utils.h"
 #include "log.h"
+#include "misc/object_pool.h"
 #undef max
 namespace augs {
 	namespace gui {
@@ -181,10 +182,15 @@ namespace augs {
 			return own_clip;
 		}
 
-		gui_world::gui_world() : rect_in_focus(&root) {
-			root.clip = false;
-			root.focusable = false;
-			root.scrollable = false;
+		gui_world::gui_world() {
+			auto new_rect = rects.allocate();
+			auto& r = new_rect.get();
+
+			r.clip = false;
+			r.focusable = false;
+			r.scrollable = false;
+
+			root = new_rect;
 		}
 
 		void gui_world::set_focus(rect_id f) {
@@ -263,51 +269,6 @@ namespace augs {
 
 		float gui_world::delta_milliseconds() {
 			return delta_ms;
-		}
-
-		void rect::get_all_descendants(std::vector<rect_id>& sum) const {
-			auto all = children;
-			get_member_children(all);
-
-			sum.insert(sum.begin(), all.begin(), all.end());
-
-			for (auto c : all)
-				c->get_all_descendants(sum);
-		}
-
-		void gui_world::reassign_children_and_unset_invalid_handles(rect_id parent, std::vector<rect_id> rects) {
-			std::vector<rect_id> old_descendants = parent->cached_descendants;
-			std::vector<rect_id> new_descendants;
-			std::vector<rect_id> dead_handles;
-
-			parent->children = rects;
-			parent->get_all_descendants(new_descendants);
-
-			std::sort(old_descendants.begin(), old_descendants.end());
-			std::sort(new_descendants.begin(), new_descendants.end());
-
-			dead_handles.resize(old_descendants.size());
-			auto it = std::set_difference(old_descendants.begin(), old_descendants.end(), new_descendants.begin(), new_descendants.end(), dead_handles.begin());
-			dead_handles.resize(it - dead_handles.begin());
-
-			auto found = [&dead_handles](rect_id candidate) { return std::find(dead_handles.begin(), dead_handles.end(), candidate) != dead_handles.end(); };
-
-			if (found(middlescroll.subject))
-				middlescroll.subject = nullptr;
-
-			if (found(rect_held_by_lmb)) {
-				current_drag_amount.set(0, 0);
-				rect_held_by_lmb = nullptr;
-				held_rect_is_dragged = false;
-			}
-
-			if (found(rect_held_by_rmb))
-				rect_held_by_rmb = nullptr;
-
-			if (found(rect_hovered))
-				rect_hovered = nullptr;
-
-			// TODO: rebuild focus links
 		}
 
 		void gui_world::clipboard::change_clipboard() {

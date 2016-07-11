@@ -148,6 +148,40 @@ namespace augs {
 			return pool[index];
 		}
 
+		std::vector<handle_type> to_handle_vector(std::vector<id_type> vec) {
+			std::vector<handle_type> handles;
+
+			for (auto v : vec)
+				handles.emplace_back(get_handle(v));
+
+			return std::move(handles);
+		}
+
+		std::vector<const_handle_type> to_handle_vector(std::vector<id_type> vec) const {
+			std::vector<const_handle_type> handles;
+
+			for (auto v : vec)
+				handles.emplace_back(get_handle(v));
+
+			return std::move(handles);
+		}
+
+		handle_type operator[](id_type from_id) {
+			return get_handle(from_id);
+		}
+
+		const_handle_type operator[](id_type from_id) const {
+			return get_handle(from_id);
+		}
+
+		std::vector<handle_type> operator [](std::vector<id_type> ids) {
+			return to_handle_vector(ids);
+		}
+
+		std::vector<const_handle_type> operator [](std::vector<id_type> ids) const {
+			return to_handle_vector(ids);
+		}
+
 		int size() const {
 			return slots.size();
 		}

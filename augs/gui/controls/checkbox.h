@@ -36,8 +36,6 @@ namespace augs {
 
 				virtual void on_change(bool set) override;
 
-				void get_member_children(std::vector<rect_id>&) const override;
-
 				text_drawer& active_label();
 			};
 		}

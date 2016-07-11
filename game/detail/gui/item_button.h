@@ -17,7 +17,6 @@ public:
 	bool is_being_wholely_dragged_or_pending_finish(augs::gui::gui_world& gr);
 
 	augs::gui::text_drawer charges_caption;
-	void get_member_children(std::vector<augs::gui::rect_id>&) const final;
 
 	entity_id gui_element_entity;
 	

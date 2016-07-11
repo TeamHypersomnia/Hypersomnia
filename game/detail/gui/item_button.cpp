@@ -21,10 +21,6 @@
 
 #include "ensure.h"
 
-void item_button::get_member_children(std::vector<augs::gui::rect_id>& children) const {
-	// children.push_back(&charges_caption);
-}
-
 bool item_button::is_being_wholely_dragged_or_pending_finish(augs::gui::gui_world& gr) {
 	if (is_being_dragged(gr)) {
 		bool is_drag_partial = ((game_gui_world&)gr).dragged_charges < item.get<components::item>().charges;

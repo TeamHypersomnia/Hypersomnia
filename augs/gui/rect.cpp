@@ -35,7 +35,6 @@ namespace augs {
 
 			/* enlarge the content size by every child */
 			auto children_all = children;
-			get_member_children(children_all);
 			for (size_t i = 0; i < children_all.size(); ++i)
 				if (children_all[i]->enable_drawing)
 					content.contain_positive(children_all[i]->rc);
@@ -74,7 +73,6 @@ namespace augs {
 
 			/* do the same for every child */
 			auto children_all = children;
-			get_member_children(children_all);
 			for (size_t i = 0; i < children_all.size(); ++i) {
 				children_all[i]->parent = this;
 				//if (children_all[i]->enable_drawing)
@@ -115,20 +113,14 @@ namespace augs {
 				return;
 
 			auto children_all = children;
-			get_member_children(children_all);
 			for (size_t i = 0; i < children_all.size(); ++i) {
 				if (children_all[i]->enable_drawing)
 					children_all[i]->draw_triangles(in);
 			}
 		}
 
-		void rect::get_member_children(std::vector<rect_id>& children) const {
-
-		}
-
 		void rect::perform_logic_step(gui_world& owner) {
 			auto children_all = children;
-			get_member_children(children_all);
 			for (size_t i = 0; i < children_all.size(); ++i) {
 				children_all[i]->parent = this;
 				children_all[i]->perform_logic_step(owner);
@@ -256,11 +248,6 @@ namespace augs {
 			}
 		}
 		
-		void rect::cache_descendants_before_children_reassignment() {
-			cached_descendants.clear();
-			get_all_descendants(cached_descendants);
-		}
-
 		void rect::consume_gui_event(event_info e) {
 			try_to_enable_middlescrolling(e);
 			try_to_make_this_rect_focused(e);
@@ -279,7 +266,6 @@ namespace augs {
 			if (enable_drawing) {
 				if (enable_drawing_of_children) {
 					auto children_all = children;
-					get_member_children(children_all);
 					for (int i = children_all.size() - 1; i >= 0; --i) {
 						if (!children_all[i]->enable_drawing) continue;
 						children_all[i]->parent = this;
@@ -400,7 +386,6 @@ namespace augs {
 
 		void rect::gen_focus_links() {
 			auto children_all = children;
-			get_member_children(children_all);
 			if (children_all.empty()) {
 				//if(next) next_focusable = next;
 				return;
@@ -416,7 +401,7 @@ namespace augs {
 			//}
 
 			/* operations on order, sort by vertical distance */
-			sort(order.begin(), order.end(), [](rect_id a, rect_id b) {
+			std::sort(order.begin(), order.end(), [](rect_id a, rect_id b) {
 				auto& r1 = a->rc;
 				auto& r2 = b->rc;
 				return (r1.t == r2.t) ? (r1.l < r2.l) : (r1.t < r2.t);
@@ -437,7 +422,6 @@ namespace augs {
 
 		void rect::gen_focus_links_depth(rect_id next) {
 			auto children_all = children;
-			get_member_children(children_all);
 
 			if (next == nullptr)
 				next = this;

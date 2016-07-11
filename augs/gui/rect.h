@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <functional>
 #include "material.h"
 #include <limits>
 #include "rect_id.h"
@@ -70,8 +71,8 @@ namespace augs {
 				event_info& operator=(gui_event);
 			};
 
-			rect_id next_focusable = nullptr;
-			rect_id prev_focusable = nullptr;
+			rect_id next_focusable;
+			rect_id prev_focusable;
 
 			bool disable_hovering = false;
 			bool enable_drawing = true;
@@ -94,15 +95,20 @@ namespace augs {
 			rect(rects::xywh<float> rc = rects::xywh<float>());
 			rect(assets::texture_id);
 
-			virtual rects::wh<float> get_content_size() const;
-
 			void calculate_clipped_rectangle_layout();
 
 			void consume_raw_input_and_generate_gui_events(poll_info&); /* event generator */
 			void unhover(poll_info& inf);
 
-			virtual void consume_gui_event(event_info); /* event listener */
-			virtual void draw_triangles(draw_info);
+			typedef std::function<void(rect_handle)> logic_behaviour;
+			typedef std::function<void(rect_handle, event_info)> event_behaviour;
+			typedef std::function<void(rect_handle, draw_info)> draw_behaviour;
+
+			void perform_logic_step(gui_world&, logic_behaviour callback);
+			void consume_gui_event(event_info, event_behaviour callback); /* event listener */
+			
+			void draw_triangles(draw_info, draw_behaviour) const;
+			rects::wh<float> get_content_size() const;
 
 			/* consume_gui_event default subroutines */
 			void scroll_content_with_wheel(event_info);
@@ -123,8 +129,6 @@ namespace augs {
 				draw_rectangle_stylesheeted(draw_info in, const stylesheet&) const,
 				draw_children(draw_info in) const;
 
-			virtual void get_member_children(std::vector<rect_id>& children) const;
-
 			void get_all_descendants(std::vector<rect_id>&);
 
 			/*  does scroll not exceed the content */
@@ -137,7 +141,7 @@ namespace augs {
 
 			/* if last is nullptr, focus will be cycled on this rect (next = this) */
 			/* not implemented */
-			void gen_focus_links_depth(rect_id next = nullptr);
+			void gen_focus_links_depth(rect_id next = rect_id());
 			void gen_focus_links();
 
 			bool is_being_dragged(gui_world&);
@@ -150,15 +154,10 @@ namespace augs {
 			rect_id get_parent() const;
 
 			static rect_id seek_focusable(rect_id, bool);
-
-			void cache_descendants_before_children_reassignment();
 		protected:
 			friend class gui_world;
 
-			rect_id parent = nullptr;
-			std::vector<rect_id> cached_descendants;
-
-			virtual void perform_logic_step(gui_world&);
+			rect_id parent;
 		public:
 			rects::ltrb<float> rc_clipped;
 			rects::ltrb<float> clipping_rect = rects::ltrb<float>(0.f, 0.f, std::numeric_limits<int>::max() / 2.f, std::numeric_limits<int>::max() / 2.f);
