@@ -15,10 +15,9 @@ namespace components {
 	struct relations;
 }
 
-template<bool is_const>
+template<bool is_const, class entity_handle_type>
 class relations_component_helpers {
 	typedef basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
-	typedef basic_entity_handle<is_const> entity_handle_type;
 	typedef typename maybe_const_ref<is_const, components::relations>::type relations_type;
 	relations_type relations() const;
 

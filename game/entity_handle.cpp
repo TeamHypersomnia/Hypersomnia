@@ -9,19 +9,19 @@ typedef cosmos O;
 typedef put_all_components_into<augs::component_aggregate>::type N;
 
 template <bool C>
-template <class = typename std::enable_if<!C>::type>
-basic_handle<C, O, N>::operator basic_entity_handle<true>() const {
+template <class>
+augs::basic_handle<C, O, N>::operator basic_entity_handle<true>() const {
 	return basic_entity_handle<true>(owner, raw_id);
 }
 
 template <bool C>
-basic_handle<C, O, N>::operator entity_id() const {
+augs::basic_handle<C, O, N>::operator entity_id() const {
 	return raw_id;
 }
 
 template <bool C>
-template <class = typename std::enable_if<!C>::type>
-void basic_handle<C, O, N>::add_standard_components() {
+template <class>
+void augs::basic_handle<C, O, N>::add_standard_components() {
 	if (has<components::transform>() && has<components::physics>())
 		get<components::physics>().set_transform(get<components::transform>());
 
@@ -36,5 +36,5 @@ void basic_handle<C, O, N>::add_standard_components() {
 }
 
 // explicit instantiation
-template class augs::basic_handle<true, cosmos, put_all_components_into<component_aggregate>::type>;
-template class augs::basic_handle<false, cosmos, put_all_components_into<component_aggregate>::type>;
+template class augs::basic_handle<true, cosmos, put_all_components_into<augs::component_aggregate>::type>;
+template class augs::basic_handle<false, cosmos, put_all_components_into<augs::component_aggregate>::type>;

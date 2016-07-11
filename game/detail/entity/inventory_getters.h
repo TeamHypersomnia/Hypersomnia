@@ -3,10 +3,9 @@
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/entity_handle_declaration.h"
 
-template<bool is_const>
+template<bool is_const, class entity_handle_type>
 class inventory_getters {
 	typedef typename basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
-	typedef basic_entity_handle<is_const> entity_handle_type;
 public:
 
 	entity_handle_type get_owning_transfer_capability() const;

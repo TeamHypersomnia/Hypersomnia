@@ -220,7 +220,7 @@ namespace ingredients {
 	}
 
 	void inject_window_input_to_character(entity_handle next_character, entity_handle camera) {
-		auto previously_controlled_character = next_character.make_handle(camera.get<components::camera>().entity_to_chase);
+		auto previously_controlled_character = next_character.get_cosmos()[camera.get<components::camera>().entity_to_chase];
 
 		if (previously_controlled_character.alive()) {
 			previously_controlled_character.get<components::processing>().disable_in(processing_subjects::WITH_INPUT_RECEIVER);

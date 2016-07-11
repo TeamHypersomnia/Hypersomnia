@@ -9,7 +9,7 @@ namespace augs {
 		decltype(auto) to_handle_vector(std::vector<id_type> vec) {
 			auto& self = *static_cast<derived*>(this);
 
-			auto dummy = self.get_handle(T());
+			auto dummy = self.get_handle(id_type());
 
 			std::vector<decltype(dummy)> handles;
 
@@ -22,7 +22,7 @@ namespace augs {
 		template <class id_type>
 		decltype(auto) to_handle_vector(std::vector<id_type> vec) const {
 			auto& self = *static_cast<const derived*>(this);
-			auto dummy = self.get_handle(T());
+			auto dummy = self.get_handle(id_type());
 
 			std::vector<decltype(dummy)> handles;
 

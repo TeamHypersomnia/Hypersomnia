@@ -25,9 +25,9 @@ namespace augs {
 
 		private augs::component_allocators<is_const, basic_entity_handle<is_const>>,
 		public augs::component_setters<is_const, basic_entity_handle<is_const>>,
-		public inventory_getters<is_const>,
-		public physics_getters<is_const>,
-		public relations_component_helpers<is_const>
+		public inventory_getters<is_const, basic_entity_handle<is_const>>,
+		public physics_getters<is_const, basic_entity_handle<is_const>>,
+		public relations_component_helpers<is_const, basic_entity_handle<is_const>>
 	{
 		typedef augs::component_allocators<is_const, basic_entity_handle<is_const>> allocator;
 
@@ -91,8 +91,6 @@ namespace augs {
 
 	public:
 		using basic_handle_base::basic_handle_base;
-
-		basic_entity_handle<is_const> make_handle(entity_id) const;
 
 		typename basic_handle_base::owner_reference get_cosmos() const {
 			return owner;
