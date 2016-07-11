@@ -68,14 +68,6 @@ void cosmos::reserve_storage_for_entities(size_t n) {
 	});
 }
 
-const storage_for_all_components_and_aggregates::aggregate_pool_type& cosmos::get_pool() const {
-	return components_and_aggregates.get_pool();
-}
-
-storage_for_all_components_and_aggregates::aggregate_pool_type& cosmos::get_pool() {
-	return components_and_aggregates.get_pool();
-}
-
 std::wstring cosmos::summary() const {
 	return typesafe_sprintf(L"Entities: %x\n", entities_count());
 }

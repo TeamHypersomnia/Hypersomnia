@@ -124,11 +124,11 @@ namespace augs {
 			return object.indirection_index >= 0 && indirectors[object.indirection_index].version == object.version;
 		}
 
-		object_pool& get_pool() {
+		object_pool& get_pool(id_type) {
 			return *this;
 		}
 
-		const object_pool& get_pool() const {
+		const object_pool& get_pool(id_type) const {
 			return *this;
 		}
 

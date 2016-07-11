@@ -43,7 +43,7 @@ namespace augs {
 
 			auto& aggregate = self.get();
 
-			auto& component_pool = self.owner.get_component_pool<component>();
+			auto& component_pool = self.owner.get_pool(object_pool_id<component>());
 			auto component_handle = component_pool.get_handle(aggregate.get_id<component>());
 
 			if (component_handle.alive())
@@ -67,7 +67,7 @@ namespace augs {
 			component& add(const component& c) const {
 			auto& self = *static_cast<const derived*>(this);
 			ensure(!has<component>());
-			self.get().writable_id<component>() = self.owner.get_component_pool<component>().allocate(c);
+			self.get().writable_id<component>() = self.owner.get_pool(object_pool_id<component>()).allocate(c);
 		}
 
 		template<class component,
@@ -75,7 +75,7 @@ namespace augs {
 			void remove() const {
 			ensure(has<component>());
 			auto& self = *static_cast<const derived*>(this);
-			self.owner.get_component_pool<component>().free(self.get().get_id<component>());
+			self.owner.get_pool(object_pool_id<component>()).free(self.get().get_id<component>());
 		}
 	};
 }

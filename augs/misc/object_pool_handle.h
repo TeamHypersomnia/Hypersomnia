@@ -28,11 +28,11 @@ namespace augs {
 		}
 
 		value_reference get() const {
-			return owner.get_pool().get(raw_id);
+			return owner.get_pool(raw_id).get(raw_id);
 		}
 
 		bool alive() const {
-			return owner.get_pool().alive(raw_id);
+			return owner.get_pool(raw_id).alive(raw_id);
 		}
 
 		bool dead() const {

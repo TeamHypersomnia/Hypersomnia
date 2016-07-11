@@ -11,6 +11,11 @@ namespace augs {
 			public basic_handle_base<is_const, rect_world, rect> {
 		public:
 			using basic_handle_base::basic_handle_base;
+
+			template<typename callback>
+			void static_dispatch(callback f) {
+
+			}
 		};
 	}
 }

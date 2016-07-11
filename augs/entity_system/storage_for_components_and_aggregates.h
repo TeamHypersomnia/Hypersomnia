@@ -13,28 +13,28 @@ namespace augs {
 
 	public:
 		typedef object_pool<aggregate_type> aggregate_pool_type;
-	private:
 
 		aggregate_pool_type pool_for_aggregates;
 		typename transform_types<std::tuple, make_object_pool, components...>::type pools_for_components;
 
-	public:
-		const auto& get_pool() const {
+		template<class T>
+		auto& get_pool(object_pool_id<T>) {
+			return std::get<object_pool<T>>(pools_for_components);
+		}
+
+		template<class T>
+		const auto& get_pool(object_pool_id<T>) const {
+			return std::get<object_pool<T>>(pools_for_components);
+		}
+
+		template<>
+		auto& get_pool(aggregate_id) {
 			return pool_for_aggregates;
 		}
 
-		auto& get_pool() {
+		template<>
+		const auto& get_pool(aggregate_id) const {
 			return pool_for_aggregates;
-		}
-
-		template<class component>
-		const auto& get_component_pool() const {
-			return std::get<augs::object_pool<component>>(pools_for_components);
-		}
-
-		template<class component>
-		auto& get_component_pool() {
-			return std::get<augs::object_pool<component>>(pools_for_components);
 		}
 
 		template<class component, class... Args>

@@ -32,14 +32,6 @@ namespace augs {
 
 			static clipboard global_clipboard;
 
-			rect_pool rects;
-
-			rect_handle get_handle(rect_id);
-			const_rect_handle get_handle(rect_id) const;
-
-			rect_pool& get_pool();
-			const rect_pool& get_pool() const;
-
 			rect_id rect_in_focus;
 
 			middlescroll_data middlescroll;
