@@ -1296,6 +1296,9 @@
     <ClCompile Include="augs\gui\rect_world.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="augs\gui\middlescrolling.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3459,6 +3462,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\gui\element_id.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\gui\middlescrolling.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

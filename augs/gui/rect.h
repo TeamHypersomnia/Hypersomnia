@@ -105,6 +105,7 @@ namespace augs {
 			typedef std::function<rects::wh<float>(rect_handle)> content_size_behaviour;
 
 			void calculate_clipped_rectangle_layout(content_size_behaviour);
+			
 			void perform_logic_step(rect_world&, logic_behaviour callback);
 			void consume_gui_event(event_info, event_behaviour callback); /* event listener */
 			

@@ -15,6 +15,7 @@
 #include "game/assets/font_id.h"
 
 #include "clipboard.h"
+#include "middlescrolling.h"
 
 namespace augs {
 	namespace gui {
@@ -22,21 +23,15 @@ namespace augs {
 			float delta_ms = 1000 / 60.f;
 
 		public:
-			struct middlescroll_data {
-				material mat;
-				rects::wh<float> size = rects::wh<float>(25, 25);
-				vec2i pos;
-				rect_id subject;
-				float speed_mult = 1.f;
-			};
-
 			static clipboard global_clipboard;
+
+			rect_pool rects;
 
 			rect_id rect_in_focus;
 
-			middlescroll_data middlescroll;
-
-			augs::window::event::state state;
+			middlescrolling middlescroll;
+			
+			window::event::state state;
 
 			bool was_hovered_rect_visited = false;
 			bool held_rect_is_dragged = false;
@@ -58,8 +53,8 @@ namespace augs {
 			void set_focus(rect_id, std::function<void(rect_handle, rect::event_behaviour)> behaviour);
 			rect_id get_rect_in_focus() const;
 
-			void consume_raw_input_and_generate_gui_events(rect::event_behaviour, augs::window::event::state);
-			void perform_logic_step(rect::logic_behaviour, rect::content_size_behaviour);
+			void consume_raw_input_and_generate_gui_events(window::event::state, rect::event_behaviour);
+			void perform_logic_step(fixed_delta, rect::logic_behaviour, rect::content_size_behaviour);
 			vertex_triangle_buffer draw_triangles(rect::draw_behaviour) const;
 		};
 

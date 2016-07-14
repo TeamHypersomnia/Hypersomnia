@@ -42,23 +42,16 @@ namespace augs {
 
 			root.draw_children(in);
 
-			if (middlescroll.subject) {
-				rects::ltrb<float> scroller = rects::wh<float>(middlescroll.size);
-				scroller.center(middlescroll.pos);
-				gui::draw_clipped_rectangle(middlescroll.mat, scroller, &root, buffer);
-			}
+			middlescroll.draw_triangles(rects, in);
 
 			return buffer;
 		}
 
-		void rect_world::perform_logic_step() {
+		void rect_world::perform_logic_step(fixed_delta delta, rect::logic_behaviour, rect::content_size_behaviour) {
 			root.perform_logic_step(*this);
 			root.calculate_clipped_rectangle_layout();
 
-			if (middlescroll.subject) {
-				vec2i tempp = middlescroll.subject->scroll;
-				middlescroll.subject->scroll += (state.mouse.pos - middlescroll.pos) * float(middlescroll.speed_mult*delta_milliseconds());
-			}
+			middlescroll.perform_logic_step(rects, delta);
 
 			was_hovered_rect_visited = false;
 
@@ -90,13 +83,8 @@ namespace augs {
 
 			was_hovered_rect_visited = false;
 
-			if (middlescroll.subject) {
-				if (gl.msg == event::mdown || gl.msg == event::mdoubleclick) {
-					pass = false;
-					middlescroll.subject = nullptr;
-				}
+			if (middlescroll.consume_raw_event(rects, new_state))
 				return;
-			}
 
 			rect::event_info e(*this, rect::gui_event::unknown);
 

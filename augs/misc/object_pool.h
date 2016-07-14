@@ -2,12 +2,13 @@
 #include <vector>
 #include "ensure.h"
 #include "object_pool_handle.h"
+#include "object_pool_handlizer.h"
 
 #define USE_NAMES_FOR_IDS
 
 namespace augs {
 	template<class T>
-	class object_pool {
+	class object_pool : public object_pool_handlizer<object_pool<T>> {
 		typedef augs::object_pool_id<T> id_type;
 
 		typedef augs::object_pool_handle<T> handle_type;
@@ -138,14 +139,6 @@ namespace augs {
 
 		const T* data() const {
 			return pool.data();
-		}
-
-		T& operator[](int index) {
-			return pool[index];
-		}
-
-		const T& operator[](int index) const {
-			return pool[index];
 		}
 
 		int size() const {

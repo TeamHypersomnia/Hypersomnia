@@ -5,10 +5,13 @@
 namespace augs {
 	namespace gui {
 		template<bool is_const, class element>
-		class basic_element_handle {
+		class basic_element_handle<is_const, rect_world, rect> {
 		public:
-			operator rect_id() const;
-			operator element_id<element>() const;
+			template<class T, class = std::enable_if<std::is_base_of<T, element>::value>::type>
+			operator element_id<T>() const {
+				element_id<T> id;
+
+			}
 		};
 
 		template<class element>

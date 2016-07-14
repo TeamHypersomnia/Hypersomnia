@@ -355,6 +355,7 @@
     <ClCompile Include="augs\ensure.cpp" />
     <ClCompile Include="augs\gui\clipboard.cpp" />
     <ClCompile Include="augs\gui\formatted_text.cpp" />
+    <ClCompile Include="augs\gui\middlescrolling.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
     <ClCompile Include="game\cosmic_entropy.cpp" />
     <ClCompile Include="game\components\dynamic_tree_node_component.cpp" />
@@ -1016,6 +1017,7 @@
     <ClInclude Include="augs\gui\element_id.h" />
     <ClInclude Include="augs\gui\element_world.h" />
     <ClInclude Include="augs\gui\formatted_text.h" />
+    <ClInclude Include="augs\gui\middlescrolling.h" />
     <ClInclude Include="augs\gui\rect_handle.h" />
     <ClInclude Include="augs\gui\rect_id.h" />
     <ClInclude Include="augs\gui\text_drawer.h" />

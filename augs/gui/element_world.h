@@ -32,25 +32,25 @@ namespace augs {
 				return{ *this, id };
 			}
 
-			template<>
-			rect_handle get_handle(rect_id id) {
-				return rects[id];
-			}
+			//template<>
+			//rect_handle get_handle(rect_id id) {
+			//	return rects[id];
+			//}
+			//
+			//template<>
+			//const_rect_handle get_handle(rect_id id) const {
+			//	return rects[id];
+			//}
 
-			template<>
-			const_rect_handle get_handle(rect_id id) const {
-				return rects[id];
-			}
-
-			template<class T>
-			element_handle<T> downcast(rect_id) {
-
-			}
-
-			template<class T>
-			const_element_handle<T> downcast(rect_id) const {
-
-			}
+			//template<class T>
+			//element_handle<T> downcast(rect_id) {
+			//
+			//}
+			//
+			//template<class T>
+			//const_element_handle<T> downcast(rect_id) const {
+			//
+			//}
 
 			std::vector<rect_meta> elements;
 
