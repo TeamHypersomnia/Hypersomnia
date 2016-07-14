@@ -121,6 +121,12 @@ template<template<typename...> class List,
 	typename ...Args>
 	struct transform_types {
 	typedef List<typename Mod<Args>::type...> type;
+}; 
+
+template<template<typename> class Mod,
+	typename ...Args>
+	struct tuple_of {
+	typedef std::tuple<typename Mod<Args>::type...> type;
 };
 
 template<bool _Test,

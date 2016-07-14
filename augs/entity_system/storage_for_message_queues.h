@@ -12,7 +12,7 @@ namespace detail {
 namespace augs {
 	template<class... Queues>
 	class storage_for_message_queues {
-		typedef typename transform_types<std::tuple, ::detail::make_vector, Queues...>::type tuple_type;
+		typedef typename tuple_of<::detail::make_vector, Queues...>::type tuple_type;
 		tuple_type queues;
 
 	public:

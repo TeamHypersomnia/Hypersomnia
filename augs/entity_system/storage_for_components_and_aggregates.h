@@ -15,7 +15,7 @@ namespace augs {
 		typedef object_pool<aggregate_type> aggregate_pool_type;
 
 		aggregate_pool_type pool_for_aggregates;
-		typename transform_types<std::tuple, make_object_pool, components...>::type pools_for_components;
+		typename tuple_of<make_object_pool, components...>::type pools_for_components;
 
 		template<class T>
 		auto& get_pool(object_pool_id<T>) {
