@@ -6,8 +6,8 @@ namespace augs {
 	template<bool is_const, class owner_type, class value_type>
 	class basic_handle_base {
 	public:
-		typedef typename maybe_const_ref<is_const, owner_type>::type owner_reference;
-		typedef typename maybe_const_ref<is_const, value_type>::type value_reference;
+		typedef maybe_const_ref_t<is_const, owner_type> owner_reference;
+		typedef maybe_const_ref_t<is_const, value_type> value_reference;
 		typedef pool_id<value_type> id_type;
 
 		owner_reference owner;
@@ -27,12 +27,20 @@ namespace augs {
 			raw_id.set_debug_name(s);
 		}
 
+		decltype(auto) get_pool() {
+			return owner.get_pool(id_type());
+		}
+
+		decltype(auto) get_pool() const {
+			return owner.get_pool(id_type());
+		}
+
 		value_reference get() const {
-			return owner.get_pool(raw_id).get(raw_id);
+			return get_pool().get(raw_id);
 		}
 
 		bool alive() const {
-			return owner.get_pool(raw_id).alive(raw_id);
+			return get_pool().alive(raw_id);
 		}
 
 		bool dead() const {

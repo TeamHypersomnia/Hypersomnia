@@ -159,6 +159,10 @@ namespace augs {
 				memcpy(&r, &p, sizeof(rgba));
 			}
 
+			bool formatted_char::operator==(const formatted_char& b) const {
+				return font_used == b.font_used && c == b.c;
+			}
+
 			style::style(assets::font_id f, rgba c) : f(f), color(c) {}
 
 			style::style(const formatted_char& c) : f(c.font_used), color(rgba(c.r, c.g, c.b, c.a)) {}

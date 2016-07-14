@@ -1,5 +1,6 @@
 #pragma once
 #include "rect.h"
+#include "gui_event.h"
 
 namespace augs {
 	namespace gui {
@@ -15,7 +16,7 @@ namespace augs {
 
 			appearance current_appearance = appearance::released;
 
-			void update_appearance(rect::gui_event);
+			void update_appearance(gui_event);
 
 		protected:
 			bool focus_flag = false;

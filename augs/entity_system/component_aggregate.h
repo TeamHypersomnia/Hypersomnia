@@ -6,7 +6,7 @@ namespace augs {
 	template <class... components>
 	class component_aggregate {
 	public:
-		typename tuple_of<make_pool_id, components...>::type component_ids;
+		tuple_of_t<make_pool_id, components...> component_ids;
 		pool_id<component_aggregate> this_id;
 
 		template <class component>

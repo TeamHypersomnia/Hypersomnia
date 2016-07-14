@@ -18,7 +18,7 @@ namespace components {
 template<bool is_const, class entity_handle_type>
 class relations_component_helpers {
 	typedef basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
-	typedef typename maybe_const_ref<is_const, components::relations>::type relations_type;
+	typedef maybe_const_ref_t<is_const, components::relations> relations_type;
 	relations_type relations() const;
 
 	template <class = typename std::enable_if<!is_const>::type>

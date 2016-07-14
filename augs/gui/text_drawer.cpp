@@ -23,7 +23,7 @@ namespace augs {
 			print.draw_text(v, draft.get_draft(), draft.get_str(), nullptr, pos, nullptr);
 		}
 
-		void text_drawer::draw(rect::draw_info in) {
+		void text_drawer::draw(draw_info in) {
 			draw(in.v);
 		}
 

@@ -780,21 +780,6 @@
     <ClCompile Include="augs\graphics\vertex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="augs\gui\controls\button.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="augs\gui\controls\checkbox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="augs\gui\controls\scrollarea.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="augs\gui\controls\stylesheeted\controls.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="augs\gui\controls\textbox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="augs\gui\dragger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1297,6 +1282,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="augs\gui\middlescrolling.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\gui\rect_handle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2744,21 +2732,6 @@
     <ClInclude Include="augs\graphics\vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\gui\controls\button.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\gui\controls\checkbox.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\gui\controls\scrollarea.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\gui\controls\stylesheeted\controls.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\gui\controls\textbox.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\gui\dragger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3465,6 +3438,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\pool_handlizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\gui\gui_event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

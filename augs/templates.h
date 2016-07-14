@@ -129,6 +129,11 @@ template<template<typename> class Mod,
 	typedef std::tuple<typename Mod<Args>::type...> type;
 };
 
+template<template<typename> class Mod,
+	typename ...Args>
+	using tuple_of_t = typename tuple_of<Mod, Args...>::type;
+
+
 template<bool _Test,
 	template<typename> class _Ty1,
 	template<typename> class _Ty2>
@@ -147,10 +152,16 @@ struct conditional_template<true, _Ty1, _Ty2>
 };
 
 template<bool is_const, class T>
-struct maybe_const_ref { typedef typename std::conditional<is_const, const T&, T&>::type type; };
+struct maybe_const_ref { typedef std::conditional_t<is_const, const T&, T&> type; };
 
 template<bool is_const, class T>
-struct maybe_const_ptr { typedef typename std::conditional<is_const, const T*, T*>::type type; };
+using maybe_const_ref_t = typename maybe_const_ref<is_const, T>::type;
+
+template<bool is_const, class T>
+struct maybe_const_ptr { typedef std::conditional_t<is_const, const T*, T*> type; };
+
+template<bool is_const, class T>
+using maybe_const_ptr_t = typename maybe_const_ptr<is_const, T>::type;
 
 template<typename T, typename = void>
 struct is_component_synchronized : std::false_type { };

@@ -27,7 +27,7 @@ void game_gui_world::draw_cursor_and_tooltip(viewing_step& r) const {
 	state.screen_space_mode = true;
 
 	auto& out = state.output->get_triangle_buffer();
-	gui::rect::draw_info in(*this, out);
+	gui::draw_info in(*this, out);
 
 	if (drag_result.dragged_item) {
 		drag_result.dragged_item->draw_complete_dragged_ghost(in);

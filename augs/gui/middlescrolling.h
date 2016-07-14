@@ -16,7 +16,7 @@ namespace augs {
 
 			void perform_logic_step(rect_pool&, fixed_delta, window::event::state state);
 			bool handle_new_raw_state(rect_pool&, window::event::state);
-			void draw_triangles(const rect_pool&, rect::draw_info) const;
+			void draw_triangles(const rect_pool&, draw_info) const;
 		};
 	}
 }

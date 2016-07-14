@@ -34,7 +34,7 @@ void component_synchronizer<C, F>::set_owner_body(entity_id owner_id) {
 }
 
 template<bool C>
-typename maybe_const_ref<C, colliders_cache>::type& component_synchronizer<C, F>::get_cache() const {
+maybe_const_ref_t<C, colliders_cache>& component_synchronizer<C, F>::get_cache() const {
 	auto& cosmos = handle.get_cosmos();
 	return cosmos.temporary_systems.get<physics_system>().get_colliders_cache(handle);
 }

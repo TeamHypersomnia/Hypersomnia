@@ -19,7 +19,7 @@ bool component_synchronizer<C, P>::is_constructed() const {
 }
 
 template<bool C>
-typename maybe_const_ref<C, rigid_body_cache>::type& component_synchronizer<C, P>::get_cache() const {
+maybe_const_ref_t<C, rigid_body_cache>& component_synchronizer<C, P>::get_cache() const {
 	return handle.get_cosmos().temporary_systems.get<physics_system>().get_rigid_body_cache(handle);
 }
 

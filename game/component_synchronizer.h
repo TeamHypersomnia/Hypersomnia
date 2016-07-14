@@ -7,7 +7,7 @@ class component_synchronizer_base {
 	template<bool, class, class>
 	friend class augs::basic_handle;
 
-	typedef typename maybe_const_ref<is_const, component_type>::type component_reference;
+	typedef maybe_const_ref_t<is_const, component_type> component_reference;
 protected:
 	component_reference component;
 	basic_entity_handle<is_const> handle;

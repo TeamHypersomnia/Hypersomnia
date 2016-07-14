@@ -121,11 +121,11 @@ void slot_button::perform_logic_step(augs::gui::rect_world& gr) {
 void slot_button::consume_gui_event(event_info info) {
 	detector.update_appearance(info);
 	
-	if (info == rect::gui_event::lfinisheddrag) {
+	if (info == gui_event::lfinisheddrag) {
 		user_drag_offset += griddify(info.owner.current_drag_amount);
 	}
 
-	if (info == rect::gui_event::hout) {
+	if (info == gui_event::hout) {
 		houted_after_drag_started = true;
 	}
 }

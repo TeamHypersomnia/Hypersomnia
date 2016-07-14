@@ -21,14 +21,25 @@ namespace augs {
 		class element_world : public pool_handlizer<element_world<all_elements...>> {
 			class rect_meta {
 			public:
-				typename tuple_of<make_pool_id, all_elements...>::type element_ids;
+				tuple_of_t<make_pool_id, all_elements...> element_ids;
 			};
 
-			rect_world<rect_meta> rects;
+			rect_world rect_tree;
+			pool_with_meta<rect, rect_meta> rects;
 
 		public:
-			typename tuple_of<make_pool_with_element_meta, all_elements...>::type element_pools;
+			tuple_of_t<make_pool_with_element_meta, all_elements...> element_pools;
 
+			element_world() {
+				auto new_rect = rects.allocate();
+				auto& r = new_rect.get();
+
+				r.clip = false;
+				r.focusable = false;
+				r.scrollable = false;
+
+				rect_tree.root = new_rect;
+			}
 	
 			template<class T>
 			element_handle<T> get_handle(pool_id<T> id) {

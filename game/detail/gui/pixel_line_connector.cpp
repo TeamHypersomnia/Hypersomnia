@@ -121,7 +121,7 @@ std::vector<std::array<vec2i, 2>> get_connecting_pixel_lines(rects::ltrb<float> 
 }
 
 
-void draw_pixel_line_connector(rects::ltrb<float> a, rects::ltrb<float> b, augs::gui::rect::draw_info in, augs::rgba col) {
+void draw_pixel_line_connector(rects::ltrb<float> a, rects::ltrb<float> b, augs::gui::draw_info in, augs::rgba col) {
 	augs::gui::material line_mat(assets::BLANK, col);
 
 	for (auto& l : get_connecting_pixel_lines(a, b)) {

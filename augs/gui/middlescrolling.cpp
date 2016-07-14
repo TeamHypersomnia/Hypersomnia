@@ -21,7 +21,7 @@ namespace augs {
 			return false;
 		}
 
-		void middlescrolling::draw_triangles(const rect_pool& rects, rect::draw_info in) const {
+		void middlescrolling::draw_triangles(const rect_pool& rects, draw_info in) const {
 			auto r = rects[subject];
 
 			if (r.alive()) {

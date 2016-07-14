@@ -332,7 +332,7 @@ void item_button::consume_gui_event(event_info info) {
 	detector.update_appearance(info);
 	auto parent_slot = item.get<components::item>().current_slot;
 
-	if (info == rect::gui_event::ldrag) {
+	if (info == gui_event::ldrag) {
 		if (!started_drag) {
 			started_drag = true;
 
@@ -345,15 +345,15 @@ void item_button::consume_gui_event(event_info info) {
 		}
 	}
 
-	if (info == rect::gui_event::wheel) {
+	if (info == gui_event::wheel) {
 		LOG("%x", info.owner.state.mouse.scroll);
 	}
 
-	if (info == rect::gui_event::rclick) {
+	if (info == gui_event::rclick) {
 		is_container_open = !is_container_open;
 	}
 
-	if (info == rect::gui_event::lfinisheddrag) {
+	if (info == gui_event::lfinisheddrag) {
 		started_drag = false;
 
 		auto& parent_cosmos = item->get_owner_world();
@@ -376,7 +376,7 @@ void item_button::consume_gui_event(event_info info) {
 		}
 	}
 
-	// if(being_dragged && inf == rect::gui_event::lup)
+	// if(being_dragged && inf == gui_event::lup)
 }
 
 void item_button::draw_triangles(draw_info in) {

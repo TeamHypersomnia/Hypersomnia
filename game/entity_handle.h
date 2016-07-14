@@ -35,7 +35,7 @@ namespace augs {
 
 		template <class T, typename = void>
 		struct component_or_synchronizer {
-			typedef typename maybe_const_ref<is_const, T>::type return_type;
+			typedef maybe_const_ref_t<is_const, T> return_type;
 
 			basic_entity_handle<is_const> h;
 
@@ -105,8 +105,8 @@ namespace augs {
 		}
 
 		template <class = typename std::enable_if<!is_const>::type>
-		operator basic_entity_handle<true>() const;
-		operator entity_id() const;
+		operator const_entity_handle() const;
+		using basic_handle_base::operator entity_id;
 
 		template <class component>
 		bool has() const {

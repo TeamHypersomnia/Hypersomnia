@@ -58,7 +58,7 @@ namespace augs {
 		}
 
 		template<class component>
-		typename maybe_const_ref<is_const, component>::type get() const {
+		maybe_const_ref_t<is_const, component> get() const {
 			return *find<component>();
 		}
 

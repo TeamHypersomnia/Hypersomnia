@@ -53,7 +53,7 @@ class component_synchronizer<is_const, components::physics> : public component_s
 	friend class ::physics_system;
 	friend class component_synchronizer<is_const, components::fixtures>;
 
-	typename maybe_const_ref<is_const, rigid_body_cache>::type& get_cache() const;
+	maybe_const_ref_t<is_const, rigid_body_cache>& get_cache() const;
 public:
 	using component_synchronizer_base<is_const, components::physics>::component_synchronizer_base;
 

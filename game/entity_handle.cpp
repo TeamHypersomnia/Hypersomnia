@@ -10,13 +10,8 @@ typedef put_all_components_into<augs::component_aggregate>::type N;
 
 template <bool C>
 template <class>
-augs::basic_handle<C, O, N>::operator basic_entity_handle<true>() const {
+augs::basic_handle<C, O, N>::operator const_entity_handle() const {
 	return basic_entity_handle<true>(owner, raw_id);
-}
-
-template <bool C>
-augs::basic_handle<C, O, N>::operator entity_id() const {
-	return raw_id;
 }
 
 template <bool C>

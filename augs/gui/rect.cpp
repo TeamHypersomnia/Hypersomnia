@@ -6,19 +6,21 @@
 #include <algorithm>
 #include <functional>
 #include "ensure.h"
+#include "rect_world.h"
+
 #undef max
 #undef min
 namespace augs {
 	namespace gui {
-		rect::draw_info::draw_info(const rect_world& owner, vertex_triangle_buffer& v) : owner(owner), v(v) {}
-		rect::poll_info::poll_info(rect_world& owner, unsigned msg) : owner(owner), msg(msg), mouse_fetched(false), scroll_fetched(false) {}
-		rect::event_info::event_info(rect_world& owner, rect::gui_event msg) : owner(owner), msg(msg) {}
+		draw_info::draw_info(const rect_world& owner, vertex_triangle_buffer& v) : owner(owner), v(v) {}
+		raw_event_info::raw_event_info(rect_world& owner, unsigned msg) : owner(owner), msg(msg), mouse_fetched(false), scroll_fetched(false) {}
+		event_info::event_info(rect_world& owner, gui_event msg) : owner(owner), msg(msg) {}
 
-		rect::event_info::operator rect::gui_event() {
+		event_info::operator gui_event() {
 			return msg;
 		}
 
-		rect::event_info& rect::event_info::operator=(gui_event m) {
+		event_info& event_info::operator=(gui_event m) {
 			msg = m;
 			return *this;
 		}
@@ -40,44 +42,6 @@ namespace augs {
 					content.contain_positive(children_all[i]->rc);
 
 			return content;
-		}
-
-		void rect::calculate_clipped_rectangle_layout() {
-			/* init; later to be processed absolute and clipped with local rc */
-			rc_clipped = rc;
-			absolute_xy = vec2i(rc.l, rc.t);
-
-			/* if we have parent */
-			if (parent) {
-				/* we have to save our global coordinates in absolute_xy */
-				absolute_xy = parent->absolute_xy + vec2i(rc.l, rc.t) - vec2i(int(parent->scroll.x), int(parent->scroll.y));
-				rc_clipped = rects::xywh<float>(absolute_xy.x, absolute_xy.y, rc.w(), rc.h());
-
-				/* and we have to clip by first clipping parent's rc_clipped */
-				//auto* clipping = get_clipping_parent(); 
-				//if(clipping) 
-				rc_clipped.clip_by(parent->clipping_rect);
-
-				clipping_rect = parent->clipping_rect;
-			}
-
-			if (clip)
-				clipping_rect.clip_by(rc_clipped);
-
-			/* update content size */
-			content_size = this->get_content_size();
-
-			/* align scroll only to be positive and not to exceed content size */
-			if (snap_scroll_to_content_size)
-				clamp_scroll_to_right_down_corner();
-
-			/* do the same for every child */
-			auto children_all = children;
-			for (size_t i = 0; i < children_all.size(); ++i) {
-				children_all[i]->parent = this;
-				//if (children_all[i]->enable_drawing)
-					children_all[i]->calculate_clipped_rectangle_layout();
-			}
 		}
 
 		void rect::draw_stretched_texture(draw_info in, const material& mat) const {
@@ -191,72 +155,14 @@ namespace augs {
 				else sys.set_focus(this);
 			}
 		}
-
-		bool rect::focus_next_rect_by_tab(event_info e) {
-			using namespace augs::window::event::keys;
-			if (e == gui_event::keydown && e.owner.state.key == TAB) {
-				rect_id f = seek_focusable(this, e.owner.state.keys[LSHIFT]);
-				if (f) e.owner.set_focus(f);
-				return true;
-			}
-			/* in case it's character event */
-			if (e == gui_event::character && e.owner.state.key == TAB) return true;
-			return false;
-		}
-
-		bool rect::focus_next_rect_by_arrows(event_info e) {
-			using namespace augs::window::event::keys;
-			if (e == gui_event::keydown) {
-				rect_id f = nullptr;
-				switch (e.owner.state.key) {
-				case DOWN: f = seek_focusable(this, false); break;
-				case UP: f = seek_focusable(this, true); break;
-				case LEFT: f = seek_focusable(this, true); break;
-				case RIGHT: f = seek_focusable(this, false); break;
-				default: break;
-				}
-
-				if (f)
-					e.owner.set_focus(f);
-
-				return true;
-			}
-
-			return false;
-		}
-
-		bool rect::focus_next_rect_by_enter(event_info e) {
-			using namespace augs::window::event::keys;
-			if (e == gui_event::keydown && e.owner.state.key == ENTER) {
-				rect_id f = seek_focusable(this, e.owner.state.keys[LSHIFT]);
-				if (f) e.owner.set_focus(f);
-				return true;
-			}
-			/* in case it's character event */
-			if (e == gui_event::character && e.owner.state.key == ENTER) return true;
-			return false;
-		}
-
-		rect_id rect::seek_focusable(rect_id f, bool prev) {
-			rect_id rect::*fn = prev ? &rect::prev_focusable : &rect::next_focusable;
-			rect_id it = f;
-			if (f->preserve_focus) return nullptr;
-			while (true) {
-				it = it->*fn;
-				if (!it || it == f) return nullptr;
-				if (it->focusable) return it;
-			}
-		}
 		
 		void rect::consume_gui_event(event_info e) {
 			try_to_enable_middlescrolling(e);
 			try_to_make_this_rect_focused(e);
 			scroll_content_with_wheel(e);
-			focus_next_rect_by_tab(e);
-			focus_next_rect_by_arrows(e);
 		}
 
-		void rect::consume_raw_input_and_generate_gui_events(poll_info& inf) {
+		void rect::consume_raw_input_and_generate_gui_events(raw_event_info& inf) {
 			using namespace augs::window::event;
 			auto& gr = inf.owner;
 			auto& m = gr.state.mouse;
@@ -353,7 +259,7 @@ namespace augs {
 			}
 		}
 
-		void rect::unhover(poll_info& inf) {
+		void rect::unhover(raw_event_info& inf) {
 			event_info e(inf.owner, gui_event::unknown);
 
 			consume_gui_event(e = gui_event::hoverlost);
@@ -381,69 +287,6 @@ namespace augs {
 				parent->scroll += off1;
 				parent->scroll -= off2;
 				parent->scroll_to_view();
-			}
-		}
-
-		void rect::gen_focus_links() {
-			auto children_all = children;
-			if (children_all.empty()) {
-				//if(next) next_focusable = next;
-				return;
-			}
-
-			auto order = children_all;
-
-			//for(unsigned i = 0; i < order.size(); ++i) {
-			//	if(!order[i]->focusable) {
-			//		order.erase(order.begin()+i);
-			//		--i;
-			//	}
-			//}
-
-			/* operations on order, sort by vertical distance */
-			std::sort(order.begin(), order.end(), [](rect_id a, rect_id b) {
-				auto& r1 = a->rc;
-				auto& r2 = b->rc;
-				return (r1.t == r2.t) ? (r1.l < r2.l) : (r1.t < r2.t);
-			});
-
-			//if(next == nullptr) next = this;
-				//next = focusable ? this : order[0];
-
-
-			next_focusable = order[0];
-			prev_focusable = *order.rbegin();
-
-			for (unsigned i = 0; i < order.size(); ++i) {
-				order[i]->next_focusable = (i == order.size() - 1) ? this : order[i + 1];
-				order[i]->prev_focusable = (i == 0) ? this : order[i - 1];
-			}
-		}
-
-		void rect::gen_focus_links_depth(rect_id next) {
-			auto children_all = children;
-
-			if (next == nullptr)
-				next = this;
-
-			if (children_all.empty()) {
-				next_focusable = next;
-			}
-
-			auto order = children_all;
-
-			/* operations on order, sort by vertical distance */
-			sort(order.begin(), order.end(), [](rect_id a, rect_id b) {
-				auto& r1 = a->rc;
-				auto& r2 = b->rc;
-				return (r1.t == r2.t) ? (r1.l < r2.l) : (r1.t < r2.t);
-			});
-
-			if (!children_all.empty())
-				next_focusable = order[0];
-
-			for (unsigned i = 0; i < order.size(); ++i) {
-				order[i]->gen_focus_links_depth((i == order.size() - 1) ? next : order[i + 1]);
 			}
 		}
 		

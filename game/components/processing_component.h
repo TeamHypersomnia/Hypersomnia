@@ -22,14 +22,14 @@ public:
 
 	bool is_in(processing_subjects) const;
 
-	template<class = std::enable_if<!is_const>::type>
+	template<class = typename std::enable_if<!is_const>::type>
 	void disable_in(processing_subjects) const;
 	
-	template<class = std::enable_if<!is_const>::type>
+	template<class = typename std::enable_if<!is_const>::type>
 	void enable_in(processing_subjects) const;
 
 	components::processing::bitset_type get_disabled_categories() const;
 
-	template<class = std::enable_if<!is_const>::type>
+	template<class = typename std::enable_if<!is_const>::type>
 	void set_disabled_categories(components::processing::bitset_type) const;
 };

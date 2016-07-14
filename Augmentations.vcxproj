@@ -356,6 +356,7 @@
     <ClCompile Include="augs\gui\clipboard.cpp" />
     <ClCompile Include="augs\gui\formatted_text.cpp" />
     <ClCompile Include="augs\gui\middlescrolling.cpp" />
+    <ClCompile Include="augs\gui\rect_handle.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
     <ClCompile Include="game\cosmic_entropy.cpp" />
     <ClCompile Include="game\components\dynamic_tree_node_component.cpp" />
@@ -520,11 +521,6 @@
     <ClCompile Include="augs\graphics\renderer.cpp" />
     <ClCompile Include="augs\graphics\shader.cpp" />
     <ClCompile Include="augs\graphics\vertex.cpp" />
-    <ClCompile Include="augs\gui\controls\button.cpp" />
-    <ClCompile Include="augs\gui\controls\checkbox.cpp" />
-    <ClCompile Include="augs\gui\controls\scrollarea.cpp" />
-    <ClCompile Include="augs\gui\controls\stylesheeted\controls.cpp" />
-    <ClCompile Include="augs\gui\controls\textbox.cpp" />
     <ClCompile Include="augs\gui\dragger.cpp" />
     <ClCompile Include="augs\gui\rect_world.cpp" />
     <ClCompile Include="augs\gui\material.cpp" />
@@ -1017,6 +1013,7 @@
     <ClInclude Include="augs\gui\element_id.h" />
     <ClInclude Include="augs\gui\element_world.h" />
     <ClInclude Include="augs\gui\formatted_text.h" />
+    <ClInclude Include="augs\gui\gui_event.h" />
     <ClInclude Include="augs\gui\middlescrolling.h" />
     <ClInclude Include="augs\gui\rect_handle.h" />
     <ClInclude Include="augs\gui\rect_id.h" />
@@ -1235,11 +1232,6 @@
     <ClInclude Include="augs\graphics\renderer.h" />
     <ClInclude Include="augs\graphics\shader.h" />
     <ClInclude Include="augs\graphics\vertex.h" />
-    <ClInclude Include="augs\gui\controls\button.h" />
-    <ClInclude Include="augs\gui\controls\checkbox.h" />
-    <ClInclude Include="augs\gui\controls\scrollarea.h" />
-    <ClInclude Include="augs\gui\controls\stylesheeted\controls.h" />
-    <ClInclude Include="augs\gui\controls\textbox.h" />
     <ClInclude Include="augs\gui\dragger.h" />
     <ClInclude Include="augs\gui\rect_world.h" />
     <ClInclude Include="augs\gui\material.h" />

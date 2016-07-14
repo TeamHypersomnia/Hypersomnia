@@ -12,9 +12,7 @@ namespace augs {
 				void set(wchar_t, assets::font_id = assets::font_id::GUI_FONT, const rgba& = rgba());
 				void set(assets::font_id = assets::font_id::GUI_FONT, const rgba& = rgba());
 
-				bool operator==(const formatted_char& b) {
-					return font_used == b.font_used && c == b.c;
-				}
+				bool operator==(const formatted_char& b) const;
 			};
 
 			struct style {

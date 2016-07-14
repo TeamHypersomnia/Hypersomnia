@@ -19,5 +19,7 @@ namespace augs {
 
 			bool is_clipboard_own() const;
 		};
+
+		void paste_clipboard_formatted(text::fstr& out, text::formatted_char = text::formatted_char());
 	}
 }

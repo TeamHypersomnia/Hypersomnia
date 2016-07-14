@@ -21,12 +21,11 @@
 
 namespace augs {
 	namespace gui {
-		class rect_world : pool_handlizer<rect_world> {
+		class rect_world {
 		public:
 			static clipboard global_clipboard;
 
 			fixed_delta delta;
-			rect_pool rects;
 
 			rect_id rect_in_focus;
 
@@ -46,17 +45,38 @@ namespace augs {
 
 			rect_id root;
 
-			rect_world();
-
-			void set_focus(rect_id, std::function<void(rect_handle, rect::event_behaviour)> behaviour);
+			void set_focus(rect_handle, event_behaviour behaviour);
 			rect_id get_rect_in_focus() const;
 
-			void consume_raw_input_and_generate_gui_events(window::event::state, rect::event_behaviour);
-			void perform_logic_step(fixed_delta, rect::logic_behaviour, rect::content_size_behaviour);
-			vertex_triangle_buffer draw_triangles(rect::draw_behaviour) const;
+			void consume_raw_input_and_generate_gui_events(rect_pool&, window::event::state, event_behaviour);
+			void perform_logic_step(rect_pool&, event_behaviour, logic_behaviour, content_size_behaviour);
+			vertex_triangle_buffer draw_triangles(const rect_pool&, draw_behaviour) const;
 		};
 
-		void paste_clipboard_formatted(text::fstr& out, text::formatted_char = text::formatted_char());
+		struct draw_info {
+			const rect_world& owner;
+			vertex_triangle_buffer& v;
+
+			draw_info(const rect_world&, vertex_triangle_buffer&);
+		};
+
+		struct raw_event_info {
+			rect_world& owner;
+			const unsigned msg;
+
+			bool mouse_fetched = false;
+			bool scroll_fetched = false;
+			raw_event_info(rect_world&, unsigned);
+		};
+
+		struct event_info {
+			rect_world& owner;
+			gui_event msg;
+
+			event_info(rect_world&, gui_event);
+			operator gui_event();
+			event_info& operator=(gui_event);
+		};
 	}
 }
 
