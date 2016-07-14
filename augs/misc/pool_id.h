@@ -8,7 +8,7 @@
 
 namespace augs {
 	template<class owner_pool_type>
-	class object_pool_id {
+	class pool_id {
 	public:
 #ifdef USE_NAMES_FOR_IDS
 		char debug_name[40];
@@ -16,12 +16,12 @@ namespace augs {
 		int version = 0xdeadbeef;
 		int indirection_index = -1;
 
-		object_pool_id() {
+		pool_id() {
 			set_debug_name("unset");
 		}
 
 		void unset() {
-			*this = object_pool_id();
+			*this = pool_id();
 		}
 
 		void set_debug_name(std::string s) {
@@ -39,19 +39,19 @@ namespace augs {
 #endif
 		}
 
-		bool operator==(const object_pool_id& b) const {
+		bool operator==(const pool_id& b) const {
 			return std::make_tuple(version, indirection_index) == std::make_tuple(b.version, b.indirection_index);
 		}
 
-		bool operator!=(const object_pool_id& b) const {
+		bool operator!=(const pool_id& b) const {
 			return !operator==(b);
 		}
 
-		bool operator<(const object_pool_id& b) const {
+		bool operator<(const pool_id& b) const {
 			return std::make_tuple(version, indirection_index) < std::make_tuple(b.version, b.indirection_index);
 		}
 	};
 
 	template<class T>
-	struct make_object_pool_id { typedef object_pool_id<T> type; };
+	struct make_pool_id { typedef pool_id<T> type; };
 }

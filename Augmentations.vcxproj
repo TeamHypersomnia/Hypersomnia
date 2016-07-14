@@ -1023,13 +1023,13 @@
     <ClInclude Include="augs\gui\text_drawer.h" />
     <ClInclude Include="augs\misc\delta.h" />
     <ClInclude Include="augs\misc\machine_entropy.h" />
-    <ClInclude Include="augs\misc\object_pool_handlizer.h" />
+    <ClInclude Include="augs\misc\pool_handlizer.h" />
     <ClInclude Include="augs\misc\stepped_timing.h" />
     <ClInclude Include="augs\misc\entropy_unpacker_and_recorder.h" />
     <ClInclude Include="game\cosmic_entropy.h" />
     <ClInclude Include="augs\misc\measurements.h" />
-    <ClInclude Include="augs\misc\object_pool_handle.h" />
-    <ClInclude Include="augs\misc\object_pool_id.h" />
+    <ClInclude Include="augs\misc\pool_handle.h" />
+    <ClInclude Include="augs\misc\pool_id.h" />
     <ClInclude Include="augs\misc\performance_timer.h" />
     <ClInclude Include="augs\misc\recoil_player.h" />
     <ClInclude Include="augs\misc\variable_delta_timer.h" />
@@ -1260,7 +1260,7 @@
     <ClInclude Include="augs\misc\file_watcher.h" />
     <ClInclude Include="augs\misc\fixed_delta_timer.h" />
     <ClInclude Include="augs\misc\input_player.h" />
-    <ClInclude Include="augs\misc\object_pool.h" />
+    <ClInclude Include="augs\misc\pool.h" />
     <ClInclude Include="augs\misc\ptr_wrapper.h" />
     <ClInclude Include="augs\misc\randomization.h" />
     <ClInclude Include="augs\misc\smooth_value_field.h" />

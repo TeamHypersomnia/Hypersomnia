@@ -1,6 +1,6 @@
 #pragma once
 #include "templates.h"
-#include "object_pool_id.h"
+#include "pool_id.h"
 
 namespace augs {
 	template<bool is_const, class owner_type, class value_type>
@@ -8,7 +8,7 @@ namespace augs {
 	public:
 		typedef typename maybe_const_ref<is_const, owner_type>::type owner_reference;
 		typedef typename maybe_const_ref<is_const, value_type>::type value_reference;
-		typedef object_pool_id<value_type> id_type;
+		typedef pool_id<value_type> id_type;
 
 		owner_reference owner;
 		id_type raw_id;
@@ -66,15 +66,15 @@ namespace augs {
 		using basic_handle_base::basic_handle_base;
 	};
 
-	template <class T, class... M>
-	class object_pool;
+	template <class T>
+	class basic_pool;
 
-	template<bool is_const, class T, class... M>
-	using basic_object_pool_handle = basic_handle<is_const, object_pool<T, M...>, T>;
+	template<bool is_const, class T>
+	using basic_pool_handle = basic_handle<is_const, basic_pool<T>, T>;
 
-	template<class T, class... M>
-	using object_pool_handle = basic_object_pool_handle<false, T, M...>;
+	template<class T>
+	using pool_handle = basic_pool_handle<false, T>;
 	
-	template<class T, class... M>
-	using const_object_pool_handle = basic_object_pool_handle<true, T, M...>;
+	template<class T>
+	using const_pool_handle = basic_pool_handle<true, T>;
 }

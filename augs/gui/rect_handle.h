@@ -1,5 +1,5 @@
 #pragma once
-#include "misc/object_pool_handle.h"
+#include "misc/pool_handle.h"
 
 namespace augs {
 	namespace gui {

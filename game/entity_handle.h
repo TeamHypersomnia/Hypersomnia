@@ -6,7 +6,7 @@
 
 #include "entity_system/component_aggregate.h"
 #include "entity_system/aggregate_mixins.h"
-#include "misc/object_pool_handle.h"
+#include "misc/pool_handle.h"
 #include "game/entity_id.h"
 
 #include "game/detail/entity/inventory_getters.h"

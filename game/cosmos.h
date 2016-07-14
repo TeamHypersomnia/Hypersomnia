@@ -16,7 +16,7 @@
 #include "game/stateful_systems/gui_system.h"
 
 #include "misc/delta.h"
-#include "misc/object_pool_handlizer.h"
+#include "misc/pool_handlizer.h"
 
 #include "game/entity_id.h"
 #include "game/detail/inventory_slot_id.h"
@@ -27,7 +27,7 @@
 #include "game/step.h"
 #include <functional>
 
-class cosmos : public augs::object_pool_handlizer<cosmos>
+class cosmos : public augs::pool_handlizer<cosmos>
 {
 	storage_for_all_components_and_aggregates components_and_aggregates;
 
@@ -76,12 +76,12 @@ public:
 	std::wstring summary() const;
 	
 	template <class T>
-	decltype(auto) get_pool(augs::object_pool_id<T> id) {
+	decltype(auto) get_pool(augs::pool_id<T> id) {
 		return components_and_aggregates.get_pool(id);
 	}
 
 	template <class T>
-	decltype(auto) get_pool(augs::object_pool_id<T> id) const {
+	decltype(auto) get_pool(augs::pool_id<T> id) const {
 		return components_and_aggregates.get_pool(id);
 	}
 };

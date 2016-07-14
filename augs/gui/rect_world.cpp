@@ -3,7 +3,7 @@
 #include "rect.h"
 #include "window_framework/platform_utils.h"
 #include "log.h"
-#include "misc/object_pool.h"
+#include "misc/pool.h"
 #undef max
 namespace augs {
 	namespace gui {

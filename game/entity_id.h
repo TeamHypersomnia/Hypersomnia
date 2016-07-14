@@ -1,4 +1,4 @@
-#include "augs/misc/object_pool_id.h"
+#include "augs/misc/pool_id.h"
 #include "game/types_specification/all_components_declaration.h"
 
 namespace augs {
@@ -6,4 +6,4 @@ namespace augs {
 	class component_aggregate;
 }
 
-typedef augs::object_pool_id<typename put_all_components_into<augs::component_aggregate>::type> entity_id;
+typedef augs::pool_id<typename put_all_components_into<augs::component_aggregate>::type> entity_id;

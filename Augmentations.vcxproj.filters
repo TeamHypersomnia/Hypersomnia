@@ -2810,9 +2810,6 @@
     <ClInclude Include="augs\misc\input_player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\misc\object_pool.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\misc\ptr_wrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3197,13 +3194,7 @@
     <ClInclude Include="game\entity_handle_declaration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\misc\object_pool_id.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\stateful_systems\gui_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\misc\object_pool_handle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\entity_system\component_aggregate.h">
@@ -3446,9 +3437,6 @@
     <ClInclude Include="augs\gui\clipboard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\misc\object_pool_handlizer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\gui\rect_world.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3465,6 +3453,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\gui\middlescrolling.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\pool_handle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\pool_id.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\pool_handlizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

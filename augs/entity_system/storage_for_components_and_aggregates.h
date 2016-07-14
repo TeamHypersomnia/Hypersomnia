@@ -1,7 +1,7 @@
 #pragma once
 #include "templates.h"
-#include "misc/object_pool.h"
-#include "misc/object_pool_id.h"
+#include "misc/pool.h"
+#include "misc/pool_id.h"
 
 #include "aggregate_mixins.h"
 
@@ -9,22 +9,22 @@ namespace augs {
 	template <class handle_owner_type, class... components>
 	class storage_for_components_and_aggregates {
 		typedef component_aggregate<components...> aggregate_type;
-		typedef object_pool_id<aggregate_type> aggregate_id;
+		typedef pool_id<aggregate_type> aggregate_id;
 
 	public:
-		typedef object_pool<aggregate_type> aggregate_pool_type;
+		typedef pool<aggregate_type> aggregate_pool_type;
 
 		aggregate_pool_type pool_for_aggregates;
-		typename tuple_of<make_object_pool, components...>::type pools_for_components;
+		typename tuple_of<make_pool, components...>::type pools_for_components;
 
 		template<class T>
-		auto& get_pool(object_pool_id<T>) {
-			return std::get<object_pool<T>>(pools_for_components);
+		auto& get_pool(pool_id<T>) {
+			return std::get<pool<T>>(pools_for_components);
 		}
 
 		template<class T>
-		const auto& get_pool(object_pool_id<T>) const {
-			return std::get<object_pool<T>>(pools_for_components);
+		const auto& get_pool(pool_id<T>) const {
+			return std::get<pool<T>>(pools_for_components);
 		}
 
 		template<>
@@ -50,7 +50,7 @@ namespace augs {
 			pool_for_aggregates.initialize_space(n);
 
 			auto r = [this, n](auto elem) {
-				std::get<object_pool<decltype(elem)>>(pools_for_components).initialize_space(n);
+				std::get<pool<decltype(elem)>>(pools_for_components).initialize_space(n);
 			};
 
 			for_each_type<components...>(r);

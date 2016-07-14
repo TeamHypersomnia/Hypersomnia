@@ -3,7 +3,7 @@
 
 namespace augs {
 	template<class derived>
-	class object_pool_handlizer {
+	class pool_handlizer {
 	public:
 		template <class id_type>
 		decltype(auto) to_handle_vector(std::vector<id_type> vec) {

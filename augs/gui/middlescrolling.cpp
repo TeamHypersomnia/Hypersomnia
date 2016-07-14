@@ -1,5 +1,5 @@
 #include "middlescrolling.h"
-#include "misc/object_pool.h"
+#include "misc/pool.h"
 
 namespace augs {
 	namespace gui {

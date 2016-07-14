@@ -9,22 +9,23 @@
 #include "texture_baker/font.h"
 #include "rect.h"
 
-#include "misc/object_pool.h"
-#include "misc/object_pool_handlizer.h"
+#include "misc/pool.h"
+#include "misc/pool_handlizer.h"
 
 #include "game/assets/font_id.h"
 
 #include "clipboard.h"
 #include "middlescrolling.h"
 
+#include "misc/delta.h"
+
 namespace augs {
 	namespace gui {
-		class rect_world : object_pool_handlizer<rect_world> {
-			float delta_ms = 1000 / 60.f;
-
+		class rect_world : pool_handlizer<rect_world> {
 		public:
 			static clipboard global_clipboard;
 
+			fixed_delta delta;
 			rect_pool rects;
 
 			rect_id rect_in_focus;
@@ -46,9 +47,6 @@ namespace augs {
 			rect_id root;
 
 			rect_world();
-
-			void set_delta_milliseconds(float);
-			float delta_milliseconds();
 
 			void set_focus(rect_id, std::function<void(rect_handle, rect::event_behaviour)> behaviour);
 			rect_id get_rect_in_focus() const;

@@ -1,34 +1,42 @@
 #pragma once
 #include "templates.h"
-#include "misc/object_pool.h"
-#include "misc/object_pool_id.h"
-#include "misc/object_pool_handlizer.h"
+#include "misc/pool.h"
+#include "misc/pool_id.h"
+#include "misc/pool_handlizer.h"
 #include "rect_id.h"
 #include "rect_world.h"
 #include "element_handle.h"
+#include "misc/delta.h"
 
 namespace augs {
 	namespace gui {
+		struct element_meta {
+			rect_id tree_node;
+		};
+
+		template<class T>
+		struct make_pool_with_element_meta { typedef pool<T, element_meta> type; };
+
 		template<class... all_elements>
-		class element_world : public object_pool_handlizer<element_world<all_elements...>> {
-			rect_world rects;
-
-		public:
-			typename transform_types<std::tuple, make_object_pool, all_elements...>::type element_pools;
-
+		class element_world : public pool_handlizer<element_world<all_elements...>> {
 			class rect_meta {
 			public:
-				typename transform_types<std::tuple, make_object_pool_id, all_elements...>::type element_ids;
-			
+				typename tuple_of<make_pool_id, all_elements...>::type element_ids;
 			};
 
+			rect_world<rect_meta> rects;
+
+		public:
+			typename tuple_of<make_pool_with_element_meta, all_elements...>::type element_pools;
+
+	
 			template<class T>
-			element_handle<T> get_handle(object_pool_id<T> id) {
+			element_handle<T> get_handle(pool_id<T> id) {
 				return{ *this, id };
 			}
 
 			template<class T>
-			const_element_handle<T> get_handle(object_pool_id<T> id) const {
+			const_element_handle<T> get_handle(pool_id<T> id) const {
 				return{ *this, id };
 			}
 
@@ -52,7 +60,14 @@ namespace augs {
 			//
 			//}
 
-			std::vector<rect_meta> elements;
+			void set_delta(fixed_delta delta) {
+				rects.delta = delta;
+			}
+
+			fixed_delta get_delta() const {
+				return rects.delta;
+			}
+
 
 			template<class element>
 			void create_element() {
