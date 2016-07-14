@@ -66,15 +66,15 @@ namespace augs {
 		using basic_handle_base::basic_handle_base;
 	};
 
-	template <class T>
+	template <class T, class... M>
 	class object_pool;
 
-	template<bool is_const, class T>
-	using basic_object_pool_handle = basic_handle<is_const, object_pool<T>, T>;
+	template<bool is_const, class T, class... M>
+	using basic_object_pool_handle = basic_handle<is_const, object_pool<T, M...>, T>;
 
-	template<class T>
-	using object_pool_handle = basic_object_pool_handle<false, T>;
+	template<class T, class... M>
+	using object_pool_handle = basic_object_pool_handle<false, T, M...>;
 	
-	template<class T>
-	using const_object_pool_handle = basic_object_pool_handle<true, T>;
+	template<class T, class... M>
+	using const_object_pool_handle = basic_object_pool_handle<true, T, M...>;
 }

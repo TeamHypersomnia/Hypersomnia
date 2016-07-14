@@ -7,12 +7,12 @@
 #define USE_NAMES_FOR_IDS
 
 namespace augs {
-	template<class T>
-	class object_pool : public object_pool_handlizer<object_pool<T>> {
+	template<class T, typename... meta>
+	class object_pool : public object_pool_handlizer<object_pool<T, meta...>> {
 		typedef augs::object_pool_id<T> id_type;
 
-		typedef augs::object_pool_handle<T> handle_type;
-		typedef augs::const_object_pool_handle<T> const_handle_type;
+		typedef augs::object_pool_handle<T, meta...> handle_type;
+		typedef augs::const_object_pool_handle<T, meta...> const_handle_type;
 
 		struct metadata {
 			int pointing_indirector = -1;
@@ -24,6 +24,7 @@ namespace augs {
 		};
 
 		std::vector<T> pool;
+		std::vector<std::tuple<meta...>> metas;
 		std::vector<metadata> slots;
 		std::vector<indirector> indirectors;
 		std::vector<int> free_indirectors;
@@ -36,11 +37,13 @@ namespace augs {
 
 		void initialize_space(int slot_count) {
 			pool.clear();
+			metas.clear();
 			indirectors.clear();
 			slots.clear();
 			free_indirectors.clear();
 
 			pool.reserve(slot_count);
+			metas.reserve(slot_count);
 			slots.reserve(slot_count);
 
 			indirectors.resize(slot_count);
@@ -71,6 +74,7 @@ namespace augs {
 
 			slots.push_back(new_slot);
 			pool.emplace_back(args...);
+			metas.emplace_back(std::tuple<meta...>());
 
 			return get_handle(allocated_id);
 		}
@@ -95,10 +99,12 @@ namespace augs {
 
 				slots[dead_index] = std::move(slots[size() - 1]);
 				pool[dead_index] = std::move(pool[size() - 1]);
+				metas[dead_index] = std::move(metas[size() - 1]);
 			}
 
 			slots.pop_back();
 			pool.pop_back();
+			metas.pop_back();
 
 			return true;
 		}
@@ -119,6 +125,18 @@ namespace augs {
 		const T& get(id_type object) const {
 			ensure(alive(object));
 			return pool[indirectors[object.indirection_index].real_index];
+		}
+
+		template <typename M>
+		M& get_meta(id_type object) {
+			ensure(alive(object));
+			return std::get<M>(metas[indirectors[object.indirection_index].real_index]);
+		}
+
+		template <typename M>
+		const M& get_meta(id_type object) const {
+			ensure(alive(object));
+			return std::get<M>(metas[indirectors[object.indirection_index].real_index]);
 		}
 
 		bool alive(id_type object) const {
