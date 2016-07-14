@@ -183,7 +183,7 @@ void sentience_system::regenerate_values(fixed_step& step) const {
 }
 
 void sentience_system::set_borders(fixed_step& step) const {
-	int timestamp_ms = step.get_delta().total_time_passed_in_seconds() * 1000;
+	int timestamp_ms = static_cast<int>(step.get_delta().total_time_passed_in_seconds() * 1000.0);
 
 	for (auto& t : step.cosm.get(processing_subjects::WITH_SENTIENCE)) {
 		auto& sentience = t.get<components::sentience>();
@@ -191,7 +191,7 @@ void sentience_system::set_borders(fixed_step& step) const {
 		auto hr = sentience.health.ratio();
 		auto one_less_hr = 1 - hr;
 
-		int pulse_duration = 1250 - 1000 * (1 - hr);
+		int pulse_duration = static_cast<int>(1250 - 1000 * (1 - hr));
 		float time_pulse_ratio = (timestamp_ms % pulse_duration) / float(pulse_duration);
 
 		hr *= 1.f - (0.2f * time_pulse_ratio);
@@ -201,7 +201,7 @@ void sentience_system::set_borders(fixed_step& step) const {
 		if (render) {
 			if (hr < 1.f) {
 				render->draw_border = true;
-				render->border_color = augs::rgba(255, 0, 0, one_less_hr * one_less_hr * one_less_hr * one_less_hr * 255 * time_pulse_ratio);
+				render->border_color = augs::rgba(255, 0, 0, static_cast<augs::rgba_channel>(one_less_hr * one_less_hr * one_less_hr * one_less_hr * 255 * time_pulse_ratio));
 			}
 			else
 				render->draw_border = false;
