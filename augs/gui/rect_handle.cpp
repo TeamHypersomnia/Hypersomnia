@@ -19,35 +19,6 @@ typedef augs::basic_pool<augs::gui::rect> B;
 typedef rect R;
 
 namespace augs {
-	namespace gui {
-		rects::wh<float> default_rect_callbacks::content_size(const_rect_handle h) const {
-			/* init on zero */
-			rects::ltrb<float> content = rects::ltrb<float>(0, 0, 0, 0);
-
-			/* enlarge the content size by every child */
-			auto children_all = h.get_children();
-			for (size_t i = 0; i < children_all.size(); ++i)
-				if (children_all[i].get().enable_drawing)
-					content.contain_positive(children_all[i].get().rc);
-
-			return content;
-		}
-
-		void default_rect_callbacks::logic(rect_handle, rect_world&) const {
-
-		}
-
-		void default_rect_callbacks::event(rect_handle r, event_info e) const {
-			r.try_to_enable_middlescrolling(e);
-			r.try_to_make_this_rect_focused(e);
-			r.scroll_content_with_wheel(e);
-		}
-
-		void default_rect_callbacks::draw(const_rect_handle, draw_info) const {
-
-		}
-	}
-
 	template <bool C>
 	template <class>
 	basic_handle<C, B, R>::operator basic_handle<true, B, R>() const {

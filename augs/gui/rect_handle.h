@@ -9,12 +9,43 @@ namespace augs {
 		struct rect;
 		class rect_world;
 
+		template<bool is_const, class derived>
 		class default_rect_callbacks {
 		public:
-			void logic(rect_handle, rect_world&) const;
-			void event(rect_handle, event_info) const;
-			void draw(const_rect_handle, draw_info) const;
-			rects::wh<float> content_size(const_rect_handle) const;
+			template<class = std::enable_if_t<!is_const>>
+			void logic(rect_world&) const {
+				
+			}
+
+			template<class = std::enable_if_t<!is_const>>
+			void event(event_info e) const {
+				const auto& self = *static_cast<const derived*>(this);
+				auto r = self.get_rect();
+
+				r.try_to_enable_middlescrolling(e);
+				r.try_to_make_this_rect_focused(e);
+				r.scroll_content_with_wheel(e);
+			}
+
+			void draw(draw_info) const {
+
+			}
+
+			rects::wh<float> content_size() const {
+				const auto& self = *static_cast<const derived*>(this);
+				auto r = self.get_rect();
+
+				/* init on zero */
+				rects::ltrb<float> content = rects::ltrb<float>(0, 0, 0, 0);
+
+				/* enlarge the content size by every child */
+				auto children_all = r.get_children();
+				for (size_t i = 0; i < children_all.size(); ++i)
+					if (children_all[i].get().enable_drawing)
+						content.contain_positive(children_all[i].get().rc);
+
+				return content;
+			}
 		};
 	}
 
@@ -132,9 +163,9 @@ namespace augs {
 		}
 
 		template <class D, class = std::enable_if_t<!is_const>>
-		void consume_gui_event(gui::event_info, D dispatcher) const {			
-			dispatcher.dispatch(*this, [this](auto c) {
-				c.event(*this, e);
+		void consume_gui_event(gui::event_info e, D dispatcher) const {			
+			dispatcher.dispatch(*this, [&e](auto c) {
+				c.event(e);
 			});
 		}
 
@@ -166,7 +197,7 @@ namespace augs {
 				self.clipping_rect.clip_by(self.rc_clipped);
 
 			self.content_size = dispatcher.dispatch(*this, [self](auto handle) {
-				self.content_size = handle.content_size(*this);
+				self.content_size = handle.content_size();
 			});
 
 			/* align scroll only to be positive and not to exceed content size */
@@ -185,8 +216,8 @@ namespace augs {
 		template <class D, class = std::enable_if_t<!is_const>>
 		void perform_logic_step(gui::rect_world& w, D dispatcher) const {
 			
-			dispatcher.dispatch(*this, [this, &w](auto c) {
-				c.logic(*this, w);
+			dispatcher.dispatch(*this, [&w](auto c) {
+				c.logic(w);
 			});
 
 			auto children_all = get_children();
@@ -240,7 +271,7 @@ namespace augs {
 				if (children_all[i].get().enable_drawing) {
 					
 					dispatcher.dispatch(children_all[i], [in](auto c) {
-						c.draw(children_all[i], in);
+						c.draw(in);
 					});
 
 					children_all[i].draw_children(in, behaviour);
