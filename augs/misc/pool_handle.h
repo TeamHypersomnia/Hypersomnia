@@ -27,12 +27,13 @@ namespace augs {
 			raw_id.set_debug_name(s);
 		}
 
-		decltype(auto) get_pool() {
+		decltype(auto) get_pool() const {
 			return owner.get_pool(id_type());
 		}
 
-		decltype(auto) get_pool() const {
-			return owner.get_pool(id_type());
+		template<class M>
+		maybe_const_ref_t<is_const, M> get_meta() const {
+			return get_pool().get_meta<M>(raw_id);
 		}
 
 		value_reference get() const {

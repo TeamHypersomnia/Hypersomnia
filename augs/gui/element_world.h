@@ -29,12 +29,14 @@ namespace augs {
 				}
 			};
 
+			template<bool C, class D, class... E>
+			friend class basic_element_handle_base<C, D, E...>;
+
 			rect_world rect_tree;
 			pool_with_meta<rect, rect_meta> rects;
-
-		public:
 			tuple_of_t<make_pool_with_element_meta, all_elements...> element_pools;
 
+		public:
 			element_world() {
 				auto new_rect = rects.allocate();
 				auto& r = new_rect.get();
@@ -47,23 +49,23 @@ namespace augs {
 			}
 
 			template <class T>
-			auto& get_pool() {
+			auto& get_pool(pool_id<T>) {
 				return std::get<pool_with_meta<T, element_meta>>(element_pools);
 			}
 
 			template <class T>
-			const auto& get_pool() const {
+			const auto& get_pool(pool_id<T>) const {
 				return std::get<pool_with_meta<T, element_meta>>(element_pools);
 			}
 
 			template<class T>
 			element_handle<T> get_handle(pool_id<T> id) {
-				return{ get_pool<T>(), id };
+				return{ get_pool(id), id };
 			}
 
 			template<class T>
 			const_element_handle<T> get_handle(pool_id<T> id) const {
-				return{ get_pool<T>(), id };
+				return{ get_pool(id), id };
 			}
 
 			template<>
@@ -99,7 +101,7 @@ namespace augs {
 
 			template<class T, class = std::enable_if_t<!std::is_same<T, rect>::value>>
 			element_handle<T> create_element() {
-				auto& element_pool = get_pool<T>();
+				auto& element_pool = get_pool(pool_id<T>());
 				
 				auto new_rect = rects.allocate();
 				auto new_element = element_pool.allocate();

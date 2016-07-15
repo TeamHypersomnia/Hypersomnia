@@ -47,7 +47,7 @@ namespace augs {
 			rect_id root;
 
 			template<class D>
-			void set_focus(rect_handle, D dispatcher) {
+			void set_focus(rect_handle f, D dispatcher) {
 				if (f == rect_in_focus) return;
 				auto& rects = f.get_pool();
 
@@ -64,7 +64,7 @@ namespace augs {
 			}
 
 			template<class D>
-			void consume_raw_input_and_generate_gui_events(rect_pool&, window::event::state, D dispatcher) {
+			void consume_raw_input_and_generate_gui_events(rect_pool& rects, window::event::state, D dispatcher) {
 				state = new_state;
 				auto& gl = state;
 				using namespace augs::window;
@@ -153,7 +153,7 @@ namespace augs {
 			}
 
 			template<class D>
-			void perform_logic_step(rect_pool&, D dispatcher) {
+			void perform_logic_step(rect_pool& rects, D dispatcher) {
 				auto root_handle = rects[root];
 
 				root_handle.perform_logic_step(*this, dispatcher);
@@ -174,7 +174,7 @@ namespace augs {
 			}
 			
 			template<class D>
-			vertex_triangle_buffer draw_triangles(const rect_pool&, D dispatcher) const {
+			vertex_triangle_buffer draw_triangles(const rect_pool& rects, D dispatcher) const {
 				vertex_triangle_buffer buffer;
 				draw_info in(*this, buffer);
 

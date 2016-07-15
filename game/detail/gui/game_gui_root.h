@@ -16,9 +16,4 @@ struct game_gui_root : public augs::gui::rect {
 
 class gui_system;
 struct game_gui_world : public augs::gui::rect_world {
-	void consume_raw_input(augs::window::event::state&);
-	void draw_cursor_and_tooltip(viewing_step&) const;
-
-	entity_id get_hovered_world_entity(vec2 camera_pos);
-	drag_and_drop_result prepare_drag_and_drop_result() const;
 };

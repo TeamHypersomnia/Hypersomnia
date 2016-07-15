@@ -28,7 +28,6 @@ namespace augs {
 	template <bool C>
 	template <class>
 	void basic_handle<C, B, R>::scroll_content_with_wheel(event_info e) {
-		auto& pool = get_pool();
 		auto& self = get();
 
 		auto& sys = e.owner;
@@ -60,7 +59,6 @@ namespace augs {
 	template <bool C>
 	template <class>
 	void basic_handle<C, B, R>::try_to_enable_middlescrolling(event_info e) {
-		auto& pool = get_pool();
 		auto& self = get();
 
 		auto& gr = e.owner;

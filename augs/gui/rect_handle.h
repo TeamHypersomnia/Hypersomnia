@@ -13,7 +13,7 @@ namespace augs {
 		class default_rect_callbacks {
 		public:
 			template<class = std::enable_if_t<!is_const>>
-			void logic(rect_world&) const {
+			void logic() const {
 				
 			}
 
@@ -214,17 +214,17 @@ namespace augs {
 		}
 
 		template <class D, class = std::enable_if_t<!is_const>>
-		void perform_logic_step(gui::rect_world& w, D dispatcher) const {
+		void perform_logic_step(D dispatcher) const {
 			
-			dispatcher.dispatch(*this, [&w](auto c) {
-				c.logic(w);
+			dispatcher.dispatch(*this, [](auto c) {
+				c.logic();
 			});
 
 			auto children_all = get_children();
 
 			for (size_t i = 0; i < children_all.size(); ++i) {
 				children_all[i].get().parent = *this;
-				children_all[i].perform_logic_step(owner, dispatcher);
+				children_all[i].perform_logic_step(dispatcher);
 			}
 		}
 
