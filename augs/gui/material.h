@@ -13,8 +13,8 @@ namespace augs {
 			material(const rgba&);
 		};
 
-		extern rects::ltrb<float> draw_clipped_rectangle(augs::texture&, rgba, rects::ltrb<float> origin, const rects::ltrb<float>* clipper, std::vector<augs::vertex_triangle>& v);
-		extern rects::ltrb<float> draw_clipped_rectangle(material, rects::ltrb<float> origin, const rects::ltrb<float>* clipper, std::vector<augs::vertex_triangle>& v);
-		extern rects::ltrb<float> draw_clipped_rectangle(material, rects::ltrb<float> global, const rect* clipper, vertex_triangle_buffer& v);
+		extern rects::ltrb<float> draw_clipped_rectangle(augs::texture&, rgba, rects::ltrb<float> origin, rects::ltrb<float> clipper, std::vector<augs::vertex_triangle>& v);
+		extern rects::ltrb<float> draw_clipped_rectangle(material, rects::ltrb<float> origin, rects::ltrb<float> clipper, std::vector<augs::vertex_triangle>& v);
+		extern rects::ltrb<float> draw_clipped_rectangle(material, rects::ltrb<float> global, const rect& clipper, vertex_triangle_buffer& v);
 	}
 }

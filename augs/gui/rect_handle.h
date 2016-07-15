@@ -3,6 +3,8 @@
 #include "misc/pool_handle.h"
 #include "misc/pool.h"
 #include "rect_id.h"
+#include "material.h"
+#include "stylesheet.h"
 
 namespace augs {
 	namespace gui {
@@ -241,6 +243,13 @@ namespace augs {
 		/* try to scroll to view whole content */
 		template <class = std::enable_if_t<!is_const>>
 		void scroll_to_view() const;
+
+		/* draw_triangles default subroutines */
+		void draw_stretched_texture(gui::draw_info in, const gui::material& = gui::material()) const;
+		
+		void draw_centered_texture(gui::draw_info in, const gui::material& = gui::material(), vec2i offset = vec2i()) const;
+		
+		void draw_rectangle_stylesheeted(gui::draw_info in, const gui::stylesheet&) const;
 
 		std::vector<handle_type> get_children() const;
 		handle_type get_parent() const;

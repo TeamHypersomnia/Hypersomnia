@@ -1,6 +1,5 @@
 #pragma once
 #include "stylesheet.h"
-#include "rect.h"
 
 namespace augs {
 	namespace gui {

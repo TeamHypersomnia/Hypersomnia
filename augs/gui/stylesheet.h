@@ -1,6 +1,5 @@
 #pragma once
 #include "stroke.h"
-#include "rect.h"
 #include "appearance_detector.h"
 
 namespace augs {

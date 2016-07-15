@@ -30,11 +30,6 @@ namespace augs {
 			rect(rects::xywh<float> rc = rects::xywh<float>());
 			rect(assets::texture_id);
 
-			/* draw_triangles default subroutines */
-			void draw_stretched_texture(draw_info in, const material& = material()) const;
-			void draw_centered_texture(draw_info in, const material& = material(), vec2i offset = vec2i()) const;
-			void draw_rectangle_stylesheeted(draw_info in, const stylesheet&) const;
-
 			/*  does scroll not exceed the content */
 			bool is_scroll_clamped_to_right_down_corner();
 

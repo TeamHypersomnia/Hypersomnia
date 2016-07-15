@@ -30,38 +30,6 @@ namespace augs {
 			rc.set_size((*id).get_size());
 		 }
 
-		rects::wh<float> rect::get_content_size() const {
-
-		}
-
-		void rect::draw_stretched_texture(draw_info in, const material& mat) const {
-			draw_clipped_rectangle(mat, get_rect_absolute(), parent, in.v).good();
-			// rc_clipped = draw_clipped_rectangle(mat, rc_clipped, parent, in.v);
-		}
-
-		void rect::draw_centered_texture(draw_info in, const material& mat, vec2i offset) const {
-			auto absolute_centered = get_rect_absolute();
-			auto tex_size = (*mat.tex).get_size();
-			absolute_centered.l += absolute_centered.w() / 2 - float(tex_size.x) / 2;
-			absolute_centered.t += absolute_centered.h() / 2 - float(tex_size.y) / 2;
-			absolute_centered.l = int(absolute_centered.l) + offset.x;
-			absolute_centered.t = int(absolute_centered.t) + offset.y;
-			absolute_centered.w(tex_size.x);
-			absolute_centered.h(tex_size.y);
-
-			draw_clipped_rectangle(mat, absolute_centered, parent, in.v).good();
-			// rc_clipped = draw_clipped_rectangle(mat, rc_clipped, parent, in.v);
-		}
-
-		void rect::draw_rectangle_stylesheeted(draw_info in, const stylesheet& styles) const {
-			auto st = styles.get_style();
-
-			if (st.color.active || st.background_image.active)
-				draw_stretched_texture(in, material(st));
-
-			if (st.border.active) st.border.value.draw(in.v, *this);
-		}
-
 		/* handle focus and passing scroll to parents */
 
 		bool rect::is_scroll_clamped_to_right_down_corner() {

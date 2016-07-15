@@ -389,7 +389,3 @@ void item_button::draw_triangles(draw_info in) {
 		draw_complete_with_children(in);
 	}
 }
-
-item_button& get_meta(entity_id id) {
-	return id.get_owning_transfer_capability().get<components::gui_element>().item_metadata[id];
-}

@@ -1,6 +1,7 @@
 #pragma once
 #include "stroke.h"
 #include "rect.h"
+#include "rect_handle.h"
 
 namespace augs {
 	namespace gui {
@@ -17,14 +18,14 @@ namespace augs {
 			left.mat = top.mat = right.mat = bottom.mat = mat;
 		}
 
-		void solid_stroke::draw(std::vector<augs::vertex_triangle>& out, const rect& r) const {
-			auto drawn_rect = r.get_rect_absolute();
+		void solid_stroke::draw(std::vector<augs::vertex_triangle>& out, const_rect_handle r) const {
+			auto drawn_rect = r.get().get_rect_absolute();
 			drawn_rect.l++;
 			drawn_rect.t++;
-			draw(out, drawn_rect, &r.get_parent()->get_clipping_rect());
+			draw(out, drawn_rect, r.get_parent().get().get_clipping_rect());
 		}
 
-		void solid_stroke::draw(std::vector<augs::vertex_triangle>& out, rects::ltrb<float> g, const rects::ltrb<float>* clipper) const {
+		void solid_stroke::draw(std::vector<augs::vertex_triangle>& out, rects::ltrb<float> g, rects::ltrb<float> clipper) const {
 			if (_type == OUTSIDE) {
 				g.l -= left.width;
 				g.t -= top.width;

@@ -38,7 +38,7 @@ namespace augs {
 		class basic_element_handle<special_drag_and_drop_target, is_const, all_elements...>
 			: public basic_element_handle_base<special_drag_and_drop_target, is_const, all_elements...> {
 
-			void draw(draw_info) const {
+			void draw(draw_info info) const {
 				auto mat_coloured = mat;
 
 				if (detector.is_hovered)
@@ -46,7 +46,7 @@ namespace augs {
 				else
 					mat_coloured.color.a = 120;
 
-				draw_centered_texture(info, mat_coloured);
+				get_rect().draw_centered_texture(info, mat_coloured);
 			}
 
 			template<class = std::enable_if_t<!is_const>>
