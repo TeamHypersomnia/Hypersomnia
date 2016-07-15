@@ -6,8 +6,6 @@ namespace augs {
 	class storage_for_systems {
 		std::tuple<Systems...> systems;
 	public:
-		storage_for_systems(Systems&&... args) : systems(std::forward(std::make_tuple(args...))) {}
-
 		template <typename T>
 		T& get() {
 			return std::get<T>(systems);

@@ -77,7 +77,7 @@ namespace augs {
 		}
 
 		template<typename... Args>
-		handle_type allocate(Args... args) {
+		id_type allocate(Args... args) {
 			if (free_indirectors.empty())
 				throw std::runtime_error("Pool is full!");
 

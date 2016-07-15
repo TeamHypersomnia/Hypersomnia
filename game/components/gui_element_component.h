@@ -18,7 +18,7 @@ class viewing_step;
 
 namespace components {
 	struct gui_element {
-		augs::gui::element_world<slot_button, item_button> elements;
+		augs::gui::element_world<slot_button, item_button, special_drag_and_drop_target> elements;
 
 		vec2 gui_crosshair_position;
 		
@@ -34,7 +34,7 @@ namespace components {
 		
 		immediate_hud hud;
 		
-		special_drag_and_drop_target drop_item_icon = special_drag_and_drop_target(augs::gui::material(assets::texture_id::DROP_HAND_ICON, red));
+		augs::gui::element_id<special_drag_and_drop_target> drop_item_icon = special_drag_and_drop_target(augs::gui::material(assets::texture_id::DROP_HAND_ICON, red));
 		
 		std::map<inventory_slot_id, slot_button> slot_metadata;
 		std::map<entity_id, item_button> item_metadata;

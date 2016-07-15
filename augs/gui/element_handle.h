@@ -9,15 +9,28 @@ namespace augs {
 		template<class...>
 		class element_world;
 
-		template<bool is_const, class element, class all_elements...>
+		template<bool is_const, class element>
+		class element_handle_userdata {
+		public:
+		};
+
+		template<class element, bool is_const, class... all_elements>
 		class basic_element_handle_base : 
 			public basic_handle<is_const, element_world<all_elements...>, element>,
-			public default_rect_callbacks<is_const, basic_element_handle_base<is_const, element, all_elements...>>
+			public default_rect_callbacks<is_const, basic_element_handle_base<element, is_const, all_elements...>>
 		{
 		public:
+			typedef element_handle_userdata<is_const, element> userdata_type;
 			typedef element element_type;
+
+			userdata_type userdata;
 			
-			using basic_handle::basic_handle;
+			basic_element_handle_base(owner_reference owner, id_type id, userdata_type userdata) : basic_handle(owner, id), userdata(userdata) {
+			}
+
+			maybe_const_ref_t<is_const, rect_world> get_rect_world() const {
+				return owner.rect_tree;
+			}
 
 			basic_rect_handle<is_const> get_rect() const {
 				return owner.rects[get_meta<element_meta>().tree_node];
@@ -25,16 +38,16 @@ namespace augs {
 
 		};
 
-		template<bool is_const, class element, class all_elements...>
-		class basic_element_handle : public basic_element_handle_base<is_const, element, all_elements...> {
+		template<class element, bool is_const, class... all_elements>
+		class basic_element_handle : public basic_element_handle_base<element, is_const, all_elements...> {
 		public:
 			using basic_element_handle_base::basic_element_handle_base;
 		};
 
 		template<class element>
-		using element_handle = basic_element_handle<false, element>;
+		using element_handle = basic_element_handle<element, false>;
 
 		template<class element>
-		using const_element_handle = basic_element_handle<true, element>;
+		using const_element_handle = basic_element_handle<element, true>;
 	}
 }

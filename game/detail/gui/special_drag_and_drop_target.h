@@ -1,13 +1,22 @@
 #pragma once
 #include "augs/gui/rect.h"
+#include "augs/gui/material.h"
+#include "augs/gui/element_handle.h"
 #include "augs/gui/appearance_detector.h"
 #include "special_controls.h"
 
-class gui_system;
-struct special_drag_and_drop_target : augs::gui::rect {
-	special_control type;
+struct special_drag_and_drop_target {
+	template<class all_elements...>
+	special_drag_and_drop_target(augs::gui::rect_handle rect, augs::gui::element_world<all_elements...>& world, augs::gui::material new_mat) {
+		auto& self = rect.get();
+		mat = new_mat;
 
-	special_drag_and_drop_target(augs::gui::material mat);
+		self.mat = mat;
+		self.clip = false;
+		self.enable_drawing = false;
+	}
+
+	special_control type;
 
 	augs::gui::material mat;
 
@@ -15,8 +24,47 @@ struct special_drag_and_drop_target : augs::gui::rect {
 	vec2i initial_pos;
 
 	augs::gui::appearance_detector detector;
-
-	void draw_triangles(draw_info) final;
-	void consume_gui_event(event_info) final;
-	void perform_logic_step(augs::gui::rect_world&) final;
 };
+
+namespace augs {
+	namespace gui {
+		template<bool is_const>
+		class element_handle_userdata<is_const, special_drag_and_drop_target> {
+		public:
+			basic_entity_handle<is_const> owner_entity;
+		};
+
+		template<bool is_const, class... all_elements>
+		class basic_element_handle<special_drag_and_drop_target, is_const, all_elements...>
+			: public basic_element_handle_base<special_drag_and_drop_target, is_const, all_elements...> {
+
+			void draw(draw_info) const {
+				auto mat_coloured = mat;
+
+				if (detector.is_hovered)
+					mat_coloured.color.a = 255;
+				else
+					mat_coloured.color.a = 120;
+
+				draw_centered_texture(info, mat_coloured);
+			}
+
+			template<class = std::enable_if_t<!is_const>>
+			void event(event_info) const {
+				get().detector.update_appearance(info);
+			}
+
+			template<class = std::enable_if_t<!is_const>>
+			void logic() const {
+				auto& gui = get_rect_world();
+				auto& entity = userdata.owner_entity;
+
+				auto dragged_item = owner[gui.rect_held_by_lmb];
+
+				enable_drawing = dragged_item.alive() && gui.held_rect_is_dragged;
+				rc.set_position(entity.get<components::gui_element>().get_initial_position_for_special_control(type) - vec2(20, 20));
+				rc.set_size((*mat.tex).get_size() + vec2(40, 40));
+			}
+		};
+	}
+}

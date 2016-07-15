@@ -32,11 +32,30 @@ namespace augs {
 			template<bool C, class D, class... E>
 			friend class basic_element_handle_base<C, D, E...>;
 
-			rect_world rect_tree;
 			pool_with_meta<rect, rect_meta> rects;
 			tuple_of_t<make_pool_with_element_meta, all_elements...> element_pools;
 
 		public:
+			template<bool is_const, class... Args>
+			class dispatcher {
+				maybe_const_ref_t<is_const, element_world> elements;
+
+				template <class F>
+				void dispatch(rect_id id, F f) {
+					auto meta = rects.get_meta<rect_meta>(id);
+
+					for_each_type<all_elements...>([this, meta, f](auto c) {
+						auto element_handle = get_handle(meta.get_id<decltype(c)>());
+
+						if (element_handle.alive()) {
+							f(element_handle);
+						}
+					});
+				}
+			};
+			
+			rect_world rect_tree;
+
 			element_world() {
 				auto new_rect = rects.allocate();
 				auto& r = new_rect.get();
@@ -58,14 +77,14 @@ namespace augs {
 				return std::get<pool_with_meta<T, element_meta>>(element_pools);
 			}
 
-			template<class T>
-			element_handle<T> get_handle(pool_id<T> id) {
-				return{ get_pool(id), id };
+			template<class T, class... Args>
+			element_handle<T> get_handle(pool_id<T> id, Args... args) {
+				return{ get_pool(id), id, { args... }  };
 			}
 
-			template<class T>
-			const_element_handle<T> get_handle(pool_id<T> id) const {
-				return{ get_pool(id), id };
+			template<class T, class... Args>
+			const_element_handle<T> get_handle(pool_id<T> id, Args... args) const {
+				return{ get_pool(id), id, { args... } };
 			}
 
 			template<>
@@ -79,14 +98,14 @@ namespace augs {
 			}
 
 			template <class F>
-			void dispatch(rect_id id, F f) {
+			void dispatch_id(rect_id id, F f) {
 				auto meta = rects.get_meta<rect_meta>(id);
 
 				for_each_type<all_elements...>([this, meta, f](auto c) {
-					auto element_handle = get_handle(meta.get_id<decltype(c)>());
+					auto typed_id = meta.get_id<decltype(c)>();
 
-					if (element_handle.alive()) {
-						f(element_handle);
+					if (get_pool(typed_id).alive(typed_id)) {
+						f(typed_id);
 					}
 				});
 			}
@@ -99,12 +118,12 @@ namespace augs {
 				return rects.delta;
 			}
 
-			template<class T, class = std::enable_if_t<!std::is_same<T, rect>::value>>
-			element_handle<T> create_element() {
+			template<class T, class... Args> 
+			element_id<T> create_element(Args... args) {
 				auto& element_pool = get_pool(pool_id<T>());
 				
 				auto new_rect = rects.allocate();
-				auto new_element = element_pool.allocate();
+				auto new_element = element_pool.allocate(rects[new_rect], *this, args...);
 				
 				auto& meta = rects.get_meta<rect_meta>(new_rect);
 				auto& elem_meta = element_pool.get_meta<element_meta>(new_element);
@@ -116,8 +135,8 @@ namespace augs {
 			}
 
 			void destroy_element(rect_id id) {
-				dispatch(id, [this](auto c) {
-					c.get_pool().free(c.get_id());
+				dispatch_id(id, [this](auto id) {
+					get_pool(id).free(id);
 				});
 
 				rects.free(id);
