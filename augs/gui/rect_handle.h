@@ -8,33 +8,244 @@ namespace augs {
 	namespace gui {
 		struct rect;
 		class rect_world;
+
+		class default_rect_callbacks {
+		public:
+			void logic(rect_handle, rect_world&) const;
+			void event(rect_handle, event_info) const;
+			void draw(const_rect_handle, draw_info) const;
+			rects::wh<float> content_size(const_rect_handle) const;
+		};
 	}
 
 	template <bool is_const>
 	class basic_handle<is_const, basic_pool<gui::rect>, gui::rect> :
 		public basic_handle_base<is_const, basic_pool<gui::rect>, gui::rect> {
 	public:
+		typedef basic_handle<is_const, basic_pool<gui::rect>, gui::rect> handle_type;
+
 		using basic_handle_base::basic_handle_base;
 		using basic_handle_base::operator pool_id<gui::rect>;
 
-		template <class = typename std::enable_if<!is_const>::type>
-		operator gui::const_rect_handle() const;
+		template <class = std::enable_if_t<!is_const>>
+		operator basic_handle<true, basic_pool<gui::rect>, gui::rect>() const;
 
-		template <class = typename std::enable_if<!is_const>::type>
-		void calculate_clipped_rectangle_layout(gui::content_size_behaviour) const;
+		template <class D, class = std::enable_if_t<!is_const>>
+		void consume_raw_input_and_generate_gui_events(gui::raw_event_info&, D dispatcher) const {
+			using namespace augs::window::event;
+			auto& gr = inf.owner;
+			auto& m = gr.state.mouse;
+			unsigned msg = inf.msg;
+			event_info e(gr, gui_event::unknown);
 
-		template <class = typename std::enable_if<!is_const>::type>
-		void perform_logic_step(gui::rect_world&, gui::logic_behaviour callback) const;
+			auto& pool = get_pool();
+			auto& self = get();
 
-		template <class = typename std::enable_if<!is_const>::type>
-		void consume_gui_event(gui::event_info, gui::event_behaviour callback) const; /* event listener */
+			if (self.enable_drawing) {
+				if (self.enable_drawing_of_children) {
+					auto children_all = get_children();
+					for (int i = children_all.size() - 1; i >= 0; --i) {
+						if (!children_all[i].get().enable_drawing) continue;
+						children_all[i].get().parent = *this;
+						children_all[i].consume_raw_input_and_generate_gui_events(inf, dispatcher);
+					}
+				}
 
-		void draw_triangles(gui::draw_info, gui::draw_behaviour) const;
-		rects::wh<float> get_content_size() const;
+				if (!self.disable_hovering) {
+					if (gr.rect_hovered == nullptr) {
+						bool hover = self.rc_clipped.good() && self.rc_clipped.hover(m.pos);
 
-		basic_handle<is_const, basic_pool<gui::rect>, gui::rect>  get_parent() const;
+						if (hover) {
+							consume_gui_event(e = gui_event::hover, dispatcher);
+							gr.rect_hovered = this;
+							gr.was_hovered_rect_visited = true;
+						}
+					}
+					else if (gr.rect_hovered == this) {
+						bool still_hover = self.rc_clipped.good() && self.rc_clipped.hover(m.pos);
 
-		void consume_raw_input_and_generate_gui_events(gui::raw_event_info&, gui::event_behaviour callback); /* event generator */
-		void unhover(gui::raw_event_info& inf);
+						if (still_hover) {
+							if (msg == lup) {
+								consume_gui_event(e = gui_event::lup, dispatcher);
+							}
+							if (msg == ldown) {
+								gr.rect_held_by_lmb = this;
+								gr.ldrag_relative_anchor = m.pos - rc.get_position();
+								gr.last_ldown_position = m.pos;
+								rc_pos_before_dragging = vec2i(rc.l, rc.t);
+								consume_gui_event(e = gui_event::ldown, dispatcher);
+							}
+							if (msg == mdown) {
+								consume_gui_event(e = gui_event::mdown, dispatcher);
+							}
+							if (msg == mdoubleclick) {
+								consume_gui_event(e = gui_event::mdoubleclick, dispatcher);
+							}
+							if (msg == ldoubleclick) {
+								gr.rect_held_by_lmb = this;
+								gr.ldrag_relative_anchor = m.pos - rc.get_position();
+								gr.last_ldown_position = m.pos;
+								consume_gui_event(e = gui_event::ldoubleclick, dispatcher);
+							}
+							if (msg == ltripleclick) {
+								gr.rect_held_by_lmb = this;
+								gr.ldrag_relative_anchor = m.pos - rc.get_position();
+								gr.last_ldown_position = m.pos;
+								consume_gui_event(e = gui_event::ltripleclick, dispatcher);
+							}
+							if (msg == rdown) {
+								gr.rect_held_by_rmb = this;
+								consume_gui_event(e = gui_event::rdown, dispatcher);
+							}
+							if (msg == rdoubleclick) {
+								gr.rect_held_by_rmb = this;
+								consume_gui_event(e = gui_event::rdoubleclick, dispatcher);
+							}
+
+							if (msg == wheel) {
+								consume_gui_event(e = gui_event::wheel, dispatcher);
+							}
+
+							if (gr.rect_held_by_lmb == this && msg == mousemotion && m.state[0] && self.rc_clipped.hover(m.ldrag)) {
+								consume_gui_event(e = gui_event::lpressed, dispatcher);
+							}
+							if (gr.rect_held_by_rmb == this && msg == mousemotion && m.state[1] && self.rc_clipped.hover(m.rdrag)) {
+								consume_gui_event(e = gui_event::rpressed, dispatcher);
+							}
+						}
+						else {
+							// ensure(msg == mousemotion);
+							consume_gui_event(e = gui_event::hout, dispatcher);
+							unhover(inf, dispatcher);
+						}
+
+						gr.was_hovered_rect_visited = true;
+					}
+				}
+
+				if (gr.rect_held_by_lmb == this && msg == mousemotion && m.pos != gr.last_ldown_position) {
+					gr.held_rect_is_dragged = true;
+					gr.current_drag_amount = m.pos - gr.last_ldown_position;
+					consume_gui_event(e = gui_event::ldrag);
+				}
+			}
+		}
+
+		template <class D, class = std::enable_if_t<!is_const>>
+		void consume_gui_event(gui::event_info, D dispatcher) const {			
+			dispatcher.dispatch(*this, [this](auto c) {
+				c.event(*this, e);
+			});
+		}
+
+		template <class D, class = std::enable_if_t<!is_const>>
+		void calculate_clipped_rectangle_layout(D dispatcher) const {
+			/* init; later to be processed absolute and clipped with local rc */
+			auto& self = get();
+
+			self.rc_clipped = self.rc;
+			self.absolute_xy = vec2i(self.rc.l, self.rc.t);
+
+			/* if we have parent */
+			if (get_parent().alive()) {
+				auto& p = get_parent().get();
+
+				/* we have to save our global coordinates in absolute_xy */
+				self.absolute_xy = p.absolute_xy + vec2i(self.rc.l, self.rc.t) - vec2i(int(p.scroll.x), int(p.scroll.y));
+				self.rc_clipped = rects::xywh<float>(self.absolute_xy.x, self.absolute_xy.y, self.rc.w(), self.rc.h());
+
+				/* and we have to clip by first clipping parent's rc_clipped */
+				//auto* clipping = get_clipping_parent(); 
+				//if(clipping) 
+				self.rc_clipped.clip_by(p.clipping_rect);
+
+				self.clipping_rect = p.clipping_rect;
+			}
+
+			if (self.clip)
+				self.clipping_rect.clip_by(self.rc_clipped);
+
+			self.content_size = dispatcher.dispatch(*this, [self](auto handle) {
+				self.content_size = handle.content_size(*this);
+			});
+
+			/* align scroll only to be positive and not to exceed content size */
+			if (self.snap_scroll_to_content_size)
+				clamp_scroll_to_right_down_corner();
+
+			/* do the same for every child */
+			auto children_all = get_children();
+			for (size_t i = 0; i < children_all.size(); ++i) {
+				children_all[i].get().parent = this;
+				//if (children_all[i]->enable_drawing)
+				children_all[i].calculate_clipped_rectangle_layout(behaviour);
+			}
+		}
+
+		template <class D, class = std::enable_if_t<!is_const>>
+		void perform_logic_step(gui::rect_world& w, D dispatcher) const {
+			
+			dispatcher.dispatch(*this, [this, &w](auto c) {
+				c.logic(*this, w);
+			});
+
+			auto children_all = get_children();
+
+			for (size_t i = 0; i < children_all.size(); ++i) {
+				children_all[i].get().parent = *this;
+				children_all[i].perform_logic_step(owner, dispatcher);
+			}
+		}
+
+		/* consume_gui_event default subroutines */
+		template <class = std::enable_if_t<!is_const>>
+		void scroll_content_with_wheel(gui::event_info);
+
+		template <class = std::enable_if_t<!is_const>>
+		void try_to_enable_middlescrolling(gui::event_info);
+
+		template <class = std::enable_if_t<!is_const>>
+		void try_to_make_this_rect_focused(gui::event_info);
+
+		/* try to scroll to view whole content */
+		template <class = std::enable_if_t<!is_const>>
+		void scroll_to_view() const;
+
+		std::vector<handle_type> get_children() const;
+		handle_type get_parent() const;
+		
+		bool is_being_dragged(gui::rect_world&) const;
+
+		template <class D, class = std::enable_if_t<!is_const>>
+		void unhover(gui::raw_event_info& inf, D dispatcher) const {
+			event_info e(inf.owner, gui_event::unknown);
+
+			consume_gui_event(e = gui_event::hoverlost, dispatcher);
+
+			if (inf.owner.rect_held_by_lmb == this)
+				consume_gui_event(e = gui_event::loutdrag, dispatcher);
+
+			inf.owner.rect_hovered = rect_id();
+		}
+		
+		template <class D>
+		void draw_children(gui::draw_info in, D dispatcher) const {
+			auto& self = get();
+
+			if (!self.enable_drawing_of_children)
+				return;
+
+			auto children_all = get_children();
+			for (size_t i = 0; i < children_all.size(); ++i) {
+				if (children_all[i].get().enable_drawing) {
+					
+					dispatcher.dispatch(children_all[i], [in](auto c) {
+						c.draw(children_all[i], in);
+					});
+
+					children_all[i].draw_children(in, behaviour);
+				}
+			}
+		}
 	};
 }

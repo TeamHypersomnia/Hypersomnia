@@ -358,6 +358,7 @@
     <ClCompile Include="augs\gui\middlescrolling.cpp" />
     <ClCompile Include="augs\gui\rect_handle.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
+    <ClCompile Include="augs\misc\pool_id.cpp" />
     <ClCompile Include="game\cosmic_entropy.cpp" />
     <ClCompile Include="game\components\dynamic_tree_node_component.cpp" />
     <ClCompile Include="game\components\gui_element_component.cpp" />

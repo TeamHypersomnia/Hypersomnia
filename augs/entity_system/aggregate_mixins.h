@@ -7,7 +7,7 @@ namespace augs {
 	class component_setters {
 	public:
 		template<class component,
-			class = typename std::enable_if<!is_const>::type>
+			class = std::enable_if_t<!is_const>>
 			decltype(auto) set(const component& c) const {
 			auto& self = *static_cast<const derived*>(this);
 			if (self.has<component>())
@@ -17,14 +17,14 @@ namespace augs {
 		}
 
 		template<class component,
-			class = typename std::enable_if<!is_const>::type>
+			class = std::enable_if_t<!is_const>>
 			decltype(auto) operator+=(const component& c) const {
 			auto& self = *static_cast<const derived*>(this);
 			return self.add(c);
 		}
 
 		template<class... added_components,
-			class = typename std::enable_if<!is_const>::type>
+			class = std::enable_if_t<!is_const>>
 			void set(added_components... args) const {
 			auto components_tuple = std::make_tuple(args...);
 
@@ -63,7 +63,7 @@ namespace augs {
 		}
 
 		template<class component,
-			class = typename std::enable_if<!is_const>::type>
+			class = std::enable_if_t<!is_const>>
 			component& add(const component& c) const {
 			auto& self = *static_cast<const derived*>(this);
 			ensure(!has<component>());
@@ -71,7 +71,7 @@ namespace augs {
 		}
 
 		template<class component,
-			class = typename std::enable_if<!is_const>::type>
+			class = std::enable_if_t<!is_const>>
 			void remove() const {
 			ensure(has<component>());
 			auto& self = *static_cast<const derived*>(this);

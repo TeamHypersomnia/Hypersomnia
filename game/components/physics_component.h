@@ -57,38 +57,38 @@ class component_synchronizer<is_const, components::physics> : public component_s
 public:
 	using component_synchronizer_base<is_const, components::physics>::component_synchronizer_base;
 
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void set_body_type(components::physics::type);
 
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void set_activated(bool);
 
 	bool is_activated() const;
 	bool is_constructed() const;
 
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void set_velocity(vec2);
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void set_transform(components::transform);
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void set_transform(entity_id);
 
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void set_angular_damping(float);
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void set_linear_damping(float);
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void set_linear_damping_vec(vec2);
 
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void apply_force(vec2);
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void apply_force(vec2, vec2 center_offset, bool wake = true);
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void apply_impulse(vec2);
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void apply_impulse(vec2, vec2 center_offset, bool wake = true);
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void apply_angular_impulse(float);
 
 	vec2 velocity() const;

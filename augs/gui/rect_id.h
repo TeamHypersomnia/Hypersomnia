@@ -21,10 +21,5 @@ namespace augs {
 		
 		typedef basic_rect_handle<false> rect_handle;
 		typedef basic_rect_handle<true> const_rect_handle;
-
-		typedef std::function<void(rect_handle)> logic_behaviour;
-		typedef std::function<void(rect_handle, event_info)> event_behaviour;
-		typedef std::function<void(rect_handle, draw_info)> draw_behaviour;
-		typedef std::function<rects::wh<float>(rect_handle)> content_size_behaviour;
 	}
 }

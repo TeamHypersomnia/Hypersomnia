@@ -3,12 +3,10 @@
 
 #ifdef USE_NAMES_FOR_IDS
 #include <string>
-#include "ensure.h"
 #endif
 
 namespace augs {
-	template<class owner_pool_type>
-	class pool_id {
+	class raw_pool_id {
 	public:
 #ifdef USE_NAMES_FOR_IDS
 		char debug_name[40];
@@ -16,40 +14,26 @@ namespace augs {
 		int version = 0xdeadbeef;
 		int indirection_index = -1;
 
-		pool_id() {
-			set_debug_name("unset");
-		}
+		raw_pool_id();
 
-		void unset() {
-			*this = pool_id();
-		}
+		void unset();
 
-		void set_debug_name(std::string s) {
-#ifdef USE_NAMES_FOR_IDS
-			ensure(s.size() < sizeof(debug_name) / sizeof(char));
-			strcpy(debug_name, s.c_str());
-#endif
-		}
+		void set_debug_name(std::string s);
 
-		std::string get_debug_name() const {
-#ifdef USE_NAMES_FOR_IDS
-			return debug_name;
-#else
-			ensure(0);
-#endif
-		}
+		std::string get_debug_name() const;
 
-		bool operator==(const pool_id& b) const {
-			return std::make_tuple(version, indirection_index) == std::make_tuple(b.version, b.indirection_index);
-		}
+		bool operator==(const raw_pool_id& b) const;
+		bool operator!=(const raw_pool_id& b) const;
+		bool operator<(const raw_pool_id& b) const;
+	};
 
-		bool operator!=(const pool_id& b) const {
-			return !operator==(b);
-		}
-
-		bool operator<(const pool_id& b) const {
-			return std::make_tuple(version, indirection_index) < std::make_tuple(b.version, b.indirection_index);
-		}
+	template<class owner_pool_type>
+	class pool_id : public raw_pool_id {
+	public:
+		using raw_pool_id::raw_pool_id;
+		using raw_pool_id::operator==;
+		using raw_pool_id::operator!=;
+		using raw_pool_id::operator<;
 	};
 
 	template<class T>

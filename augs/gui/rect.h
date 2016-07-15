@@ -30,26 +30,16 @@ namespace augs {
 			rect(rects::xywh<float> rc = rects::xywh<float>());
 			rect(assets::texture_id);
 
-			/* consume_gui_event default subroutines */
-			void scroll_content_with_wheel(event_info);
-			void try_to_enable_middlescrolling(event_info);
-			void try_to_make_this_rect_focused(event_info);
-
 			/* draw_triangles default subroutines */
-			void draw_stretched_texture(draw_info in, const material& = material()) const,
-				draw_centered_texture(draw_info in, const material& = material(), vec2i offset = vec2i()) const,
-				draw_rectangle_stylesheeted(draw_info in, const stylesheet&) const,
-				draw_children(draw_info in) const;
+			void draw_stretched_texture(draw_info in, const material& = material()) const;
+			void draw_centered_texture(draw_info in, const material& = material(), vec2i offset = vec2i()) const;
+			void draw_rectangle_stylesheeted(draw_info in, const stylesheet&) const;
 
 			/*  does scroll not exceed the content */
 			bool is_scroll_clamped_to_right_down_corner();
 
 			/* align scroll to not exceed the content */
-			void clamp_scroll_to_right_down_corner(),
-				/* try to scroll to view whole content */
-				scroll_to_view();
-
-			bool is_being_dragged(rect_world&);
+			void clamp_scroll_to_right_down_corner();
 
 			const rects::ltrb<float>& get_clipped_rect() const;
 			rects::ltrb<float> get_rect_absolute() const;

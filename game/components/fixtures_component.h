@@ -51,7 +51,7 @@ class physics_system;
 
 template<bool is_const>
 class component_synchronizer<is_const, components::fixtures> : public component_synchronizer_base<is_const, components::fixtures> {
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void rebuild_density(size_t);
 
 	friend struct components::physics;
@@ -61,31 +61,31 @@ class component_synchronizer<is_const, components::fixtures> : public component_
 public:
 	using component_synchronizer_base<is_const, components::fixtures>::component_synchronizer_base;
 
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	component_synchronizer& operator=(const components::fixtures&);
 
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void set_offset(colliders_offset_type, components::transform);
 
 	components::transform get_offset(colliders_offset_type) const;
 	components::transform get_total_offset() const;
 
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void set_activated(bool);
 
 	bool is_activated() const;
 	bool is_constructed() const;
 
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void set_density(float, size_t = 0);
 
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void set_density_multiplier(float, size_t = 0);
 
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void set_friction(float, size_t = 0);
 
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void set_restitution(float, size_t = 0);
 
 	float get_density_multiplier(size_t = 0) const;
@@ -93,7 +93,7 @@ public:
 	float get_restitution(size_t = 0) const;
 	float get_density(size_t = 0) const;
 
-	template <class = typename std::enable_if<!is_const>::type>
+	template <class = std::enable_if_t<!is_const>>
 	void set_owner_body(entity_id);
 	
 	basic_entity_handle<is_const> get_owner_body() const;

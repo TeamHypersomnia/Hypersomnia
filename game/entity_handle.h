@@ -104,7 +104,7 @@ namespace augs {
 			return basic_handle_base::operator!=(id);
 		}
 
-		template <class = typename std::enable_if<!is_const>::type>
+		template <class = std::enable_if_t<!is_const>>
 		operator const_entity_handle() const;
 		using basic_handle_base::operator entity_id;
 
@@ -134,12 +134,12 @@ namespace augs {
 			return allocator::find<component>();
 		}
 
-		template<class component, typename = typename std::enable_if<!is_const>::type>
+		template<class component, typename = std::enable_if_t<!is_const>>
 		void remove() const {
 			return component_or_synchronizer<component>({ *this }).remove();
 		}
 
-		template<class = typename std::enable_if<!is_const>::type>
+		template<class = std::enable_if_t<!is_const>>
 		void add_standard_components();
 	};
 }

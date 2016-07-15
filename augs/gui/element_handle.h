@@ -4,14 +4,16 @@
 
 namespace augs {
 	namespace gui {
-		template<bool is_const, class element>
-		class basic_element_handle<is_const, rect_world, rect> {
-		public:
-			template<class T, class = std::enable_if<std::is_base_of<T, element>::value>::type>
-			operator element_id<T>() const {
-				element_id<T> id;
+		struct element_meta;
 
-			}
+		template<bool is_const, class element>
+		class basic_element_handle : public basic_handle<is_const, basic_pool<element>, element> {
+		public:
+			typedef element element_type;
+
+			using basic_handle::basic_handle;
+			//maybe_const_ref_t<is_const, rect_pool> rects;
+			//maybe_const_ref_t<is_const, element_meta> meta;
 		};
 
 		template<class element>
