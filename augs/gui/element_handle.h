@@ -8,12 +8,23 @@ namespace augs {
 
 		template<bool is_const, class element>
 		class basic_element_handle : public basic_handle<is_const, basic_pool<element>, element> {
+			typedef maybe_const_ref_t<is_const, rect_pool> rect_pool_ref;
+			typedef maybe_const_ref_t<is_const, element_meta> meta_ref;
+			
+			rect_pool_ref rects;
+			meta_ref meta;
+
 		public:
 			typedef element element_type;
 
-			using basic_handle::basic_handle;
-			//maybe_const_ref_t<is_const, rect_pool> rects;
-			//maybe_const_ref_t<is_const, element_meta> meta;
+			basic_element_handle(owner_reference owner, id_type elem, rect_pool_ref rects, meta_ref meta)
+				: basic_handle(owner, elem), rects(rects), meta(meta) {
+			}
+
+			basic_rect_handle<is_const> get_rect() const {
+				return rects[meta.tree_node];
+			}
+
 		};
 
 		template<class element>
