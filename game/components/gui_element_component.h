@@ -34,13 +34,15 @@ namespace components {
 		
 		immediate_hud hud;
 		
-		augs::gui::element_id<special_drag_and_drop_target> drop_item_icon = special_drag_and_drop_target(augs::gui::material(assets::texture_id::DROP_HAND_ICON, red));
+		augs::gui::element_id<special_drag_and_drop_target> drop_item_icon;
 		
 		std::map<inventory_slot_id, slot_button> slot_metadata;
 		std::map<entity_id, item_button> item_metadata;
 		
 		std::map<inventory_slot_id, slot_button> removed_slot_metadata;
 		std::map<entity_id, item_button> removed_item_metadata;
+
+		gui_element();
 
 		void consume_raw_input(augs::window::event::state&);
 		void draw_cursor_and_tooltip(viewing_step&) const;

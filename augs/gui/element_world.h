@@ -119,10 +119,10 @@ namespace augs {
 			}
 
 			template<class T, class... Args> 
-			element_id<T> create_element(Args... args) {
+			element_id<T> create_element(const rect& new_node, Args... args) {
 				auto& element_pool = get_pool(pool_id<T>());
 				
-				auto new_rect = rects.allocate();
+				auto new_rect = rects.allocate(new_node);
 				auto new_element = element_pool.allocate(rects[new_rect], *this, args...);
 				
 				auto& meta = rects.get_meta<rect_meta>(new_rect);

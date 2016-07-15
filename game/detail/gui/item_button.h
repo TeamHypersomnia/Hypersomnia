@@ -4,6 +4,8 @@
 #include "augs/gui/appearance_detector.h"
 
 #include "game/detail/inventory_slot_id.h"
+#include "augs/gui/element_handle.h"
+#include "game/entity_handle.h"
 
 class item_button : public augs::gui::rect{
 	void draw_dragged_ghost_inside(augs::gui::draw_info in);
