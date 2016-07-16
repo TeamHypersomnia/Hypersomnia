@@ -41,7 +41,9 @@ namespace augs {
 				FITS_INSIDE_FLIPPED,
 				FITS_PERFECTLY,
 				FITS_PERFECTLY_FLIPPED
-			} fits(const wh& r) const {
+			};
+      
+      fit_status fits(const wh& r) const {
 				if (w == r.w && h == r.h) return fit_status::FITS_PERFECTLY;
 				if (h == r.w && w == r.h) return fit_status::FITS_PERFECTLY_FLIPPED;
 				if (w <= r.w && h <= r.h) return fit_status::FITS_INSIDE;

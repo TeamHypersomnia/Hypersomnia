@@ -1,5 +1,5 @@
 #pragma once
-#include "math/rects.h"
+#include "augs/math/rects.h"
 
 namespace augs {
 	namespace window {

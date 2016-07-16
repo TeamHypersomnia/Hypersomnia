@@ -3,6 +3,7 @@
 #include <sstream>
 #include <utility>
 #include <type_traits>
+#include <limits>
 
 void typesafe_sprintf_detail(size_t, std::string&);
 

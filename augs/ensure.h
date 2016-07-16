@@ -3,8 +3,6 @@
 
 void cleanup_proc();
 
-#define ENABLE_ENSURE 1
-
 #if ENABLE_ENSURE
 #define ensure(x) if(!(x))\
 {\
