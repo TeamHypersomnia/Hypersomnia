@@ -18,21 +18,15 @@ namespace augs {
 
 		template <typename Pred>
 		void for_each(Pred f) {
-			for_each_type<Systems...>([this, f](auto c) {
-				storage_for_systems& self = *this;
-
-				auto& sys = self.get<decltype(c)>();
-				f(sys);
+			for_each_in_tuple(systems, [f](auto& c) {
+				f(c);
 			});
 		}
 
 		template <typename Pred>
 		void for_each(Pred f) const {
-			for_each_type<Systems...>([this, f](auto c) {
-				const storage_for_systems& self = *this;
-
-				auto& sys = self.get<decltype(c)>();
-				f(sys);
+			for_each_in_tuple(systems, [f](const auto& c) {
+				f(c);
 			});
 		}
 	};

@@ -1,3 +1,6 @@
+#pragma warning(disable : 4503)
+#pragma once
+
 namespace augs {
 	template <class...>
 	class storage_for_systems;

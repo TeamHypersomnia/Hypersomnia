@@ -28,7 +28,7 @@ bool physics_system::is_constructed_rigid_body(const_entity_handle handle) const
 
 bool physics_system::is_constructed_colliders(const_entity_handle handle) const {
 	return 
-		handle.alive() && is_constructed_rigid_body(handle.get<components::fixtures>().get_owner_body())
+		handle.alive() // && is_constructed_rigid_body(handle.get<components::fixtures>().get_owner_body())
 		&& 
 		get_colliders_cache(handle).fixtures_per_collider.size()> 0 && 
 		get_colliders_cache(handle).fixtures_per_collider[0].size() > 0;

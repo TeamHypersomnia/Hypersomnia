@@ -19,8 +19,7 @@ template<bool is_const, class entity_handle_type>
 class basic_relations_component_helpers {
 protected:
 	typedef basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
-	typedef maybe_const_ref_t<is_const, components::relations> relations_type;
-	relations_type relations() const;
+	const components::relations& relations() const;
 
 public:
 	entity_handle_type get_parent() const;
@@ -40,6 +39,8 @@ class relations_component_helpers;
 template<class entity_handle_type>
 class relations_component_helpers<false, entity_handle_type> : public basic_relations_component_helpers<false, entity_handle_type> {
 protected:
+	components::relations& relations() const;
+	void add_relations_if_none() const;
 	void make_child(entity_id, sub_entity_name) const;
 public:
 

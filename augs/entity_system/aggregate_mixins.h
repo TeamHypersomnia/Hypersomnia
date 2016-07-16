@@ -29,8 +29,8 @@ namespace augs {
 			void set(added_components... args) const {
 			auto components_tuple = std::make_tuple(args...);
 
-			for_each_type<added_components...>([this, &components_tuple](auto c) {
-				set(std::get<decltype(c)>(components_tuple));
+			for_each_in_tuple(components_tuple, [this](auto& c) {
+				set(c);
 			});
 		}
 	};
@@ -60,6 +60,7 @@ namespace augs {
 
 		template<class component>
 		maybe_const_ref_t<is_const, component> get() const {
+			ensure(has<component>());
 			return *find<component>();
 		}
 

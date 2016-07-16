@@ -44,11 +44,11 @@ namespace augs {
 		void reserve_storage_for_aggregates(size_t n) {
 			pool_for_aggregates.initialize_space(n);
 
-			auto r = [this, n](auto elem) {
-				std::get<pool<decltype(elem)>>(pools_for_components).initialize_space(n);
+			auto r = [n](auto& component_pool) {
+				component_pool.initialize_space(n);
 			};
 
-			for_each_type<components...>(r);
+			for_each_in_tuple(pools_for_components, r);
 		}
 
 		aggregate_id allocate_aggregate(std::string debug_name = std::string()) {

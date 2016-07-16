@@ -43,12 +43,12 @@
 #include "game/types_specification/all_component_includes.h"
 
 void cosmos::complete_resubstantialization(entity_handle h) {
-	temporary_systems.for_each([this, h](auto& sys) {
+	temporary_systems.for_each([h](auto& sys) {
 		sys.destruct(h);
 	});
 
 	if (h.has<components::substance>()) {
-		temporary_systems.for_each([this, h](auto& sys) {
+		temporary_systems.for_each([h](auto& sys) {
 			sys.construct(h);
 		});
 	}
@@ -57,7 +57,7 @@ void cosmos::complete_resubstantialization(entity_handle h) {
 void cosmos::reserve_storage_for_entities(size_t n) {
 	reserve_storage_for_aggregates(n);
 
-	temporary_systems.for_each([this, n](auto& sys) {
+	temporary_systems.for_each([n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
 	});
 }
