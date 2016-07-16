@@ -1,3 +1,4 @@
+#pragma warning(disable : 4503)
 #pragma once
 #include "game/cosmic_entropy.h"
 

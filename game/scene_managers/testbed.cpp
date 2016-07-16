@@ -279,6 +279,8 @@ namespace scene_managers {
 				result += new_entropy;
 			}
 		}
+
+		return result;
 	}
 
 	void testbed::pre_solve(fixed_step& step) {

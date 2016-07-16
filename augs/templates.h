@@ -100,7 +100,13 @@ namespace templates_detail
 }
 
 template<typename... Ts, typename F>
-void for_each_in_tuple(std::tuple<Ts...> const& t, F f)
+void for_each_in_tuple(const std::tuple<Ts...>& t, F f)
+{
+	templates_detail::for_each(t, f, templates_detail::gen_seq<sizeof...(Ts)>());
+}
+
+template<typename... Ts, typename F>
+void for_each_in_tuple(std::tuple<Ts...>& t, F f)
 {
 	templates_detail::for_each(t, f, templates_detail::gen_seq<sizeof...(Ts)>());
 }

@@ -38,7 +38,7 @@ void processing_lists_system::construct(const_entity_handle handle) {
 }
 
 void processing_lists_system::reserve_caches_for_entities(size_t n) {
-	per_entity_cache.reserve(n);
+	per_entity_cache.resize(n);
 }
 
 std::vector<entity_handle> processing_lists_system::get(processing_subjects list, cosmos& cosmos) const {

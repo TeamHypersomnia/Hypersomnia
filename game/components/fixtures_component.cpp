@@ -167,7 +167,7 @@ basic_entity_handle<C> basic_fixtures_synchronizer<C>::get_owner_body() const {
 
 template<bool C>
 components::transform basic_fixtures_synchronizer<C>::get_offset(colliders_offset_type t) const {
-	component.offsets_for_created_shapes[static_cast<int>(t)];
+	return component.offsets_for_created_shapes[static_cast<int>(t)];
 }
 
 template<bool C>

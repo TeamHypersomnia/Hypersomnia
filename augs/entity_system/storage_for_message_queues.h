@@ -50,11 +50,11 @@ namespace augs {
 		}
 
 		void ensure_all_empty() {
-			for_each_type<Queues...>([this](auto c) { ensure(get_queue<decltype(c)>().empty()); });
+			for_each_in_tuple(queues, [this](auto& q) { ensure(q.empty()); });
 		}
 
 		void flush_queues() {
-			for_each_type<Queues...>([this](auto c) { clear_queue<decltype(c)>(); } );
+			for_each_in_tuple(queues, [this](auto& q) { q.clear(); });
 		}
 	};
 }

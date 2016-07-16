@@ -15,6 +15,14 @@ void relations_component_helpers<false, D>::make_child(entity_id p, sub_entity_n
 }
 
 template <class D>
+void relations_component_helpers<false, D>::add_relations_if_none() const {
+	auto& self = *static_cast<const D*>(this);
+	if (!self.has<components::relations>()) {
+		self.add(components::relations());
+	}
+}
+
+template <class D>
 void relations_component_helpers<false, D>::add_sub_entity(entity_id p, sub_entity_name optional_name = sub_entity_name::INVALID) const {
 	make_child(p, optional_name);
 	relations().sub_entities.push_back(p);
@@ -27,7 +35,14 @@ void relations_component_helpers<false, D>::map_sub_entity(sub_entity_name n, en
 }
 
 template <bool C, class D>
-typename basic_relations_component_helpers<C, D>::relations_type basic_relations_component_helpers<C, D>::relations() const {
+const components::relations& basic_relations_component_helpers<C, D>::relations() const {
+	auto& self = *static_cast<const D*>(this);
+	return self.get<components::relations>();
+}
+
+template <class D>
+components::relations& relations_component_helpers<false, D>::relations() const {
+	add_relations_if_none();
 	auto& self = *static_cast<const D*>(this);
 	return self.get<components::relations>();
 }
