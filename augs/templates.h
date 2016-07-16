@@ -168,3 +168,58 @@ struct is_component_synchronized : std::false_type { };
 
 template<typename T>
 struct is_component_synchronized<T, decltype(std::declval<T>().activated, void())> : std::true_type { };
+
+template <typename Base, typename Tuple, std::size_t I = 0>
+struct tuple_ref_index;
+
+template <typename Base, typename Head, typename... Tail, std::size_t I>
+struct tuple_ref_index<Base, std::tuple<Head, Tail...>, I>
+	: std::conditional<std::is_base_of<Base, Head>::value
+	, std::integral_constant<std::size_t, I>
+	, tuple_ref_index<Base, std::tuple<Tail...>, I + 1>
+	>::type
+{
+};
+
+template <typename Base, typename Tuple>
+auto tuple_ref_by_inheritance(Tuple&& tuple)
+-> decltype(std::get<tuple_ref_index<Base, typename std::decay<Tuple>::type>::value>(std::forward<Tuple>(tuple)))
+{
+	return std::get<tuple_ref_index<Base, typename std::decay<Tuple>::type>::value>(std::forward<Tuple>(tuple));
+}
+
+template <class T>
+struct saved_args_base {
+
+};
+
+template <class T, class... Args>
+struct saved_args : saved_args_base<T> {
+	std::tuple<Args...> args;
+};
+
+template <class T>
+struct save_args {
+	template<class... Args>
+	auto operator()(Args... args) {
+		return saved_args<T, Args...>(std::make_tuple(args...));
+	}
+};
+
+namespace detail {
+	template <class F, class Tuple, std::size_t... I>
+	constexpr decltype(auto) apply_impl(F&& f, Tuple&& t, std::index_sequence<I...>)
+	{
+		return std::invoke(std::forward<F>(f), std::get<I>(std::forward<Tuple>(t))...);
+		// Note: std::invoke is a C++17 feature
+	}
+} // namespace detail
+
+namespace std {
+	template <class F, class Tuple>
+	constexpr decltype(auto) apply(F&& f, Tuple&& t)
+	{
+		return detail::apply_impl(std::forward<F>(f), std::forward<Tuple>(t),
+			std::make_index_sequence<std::tuple_size_v<std::decay_t<Tuple>>>{});
+	}
+}

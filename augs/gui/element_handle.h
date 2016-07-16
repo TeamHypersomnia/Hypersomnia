@@ -20,13 +20,9 @@ namespace augs {
 			public default_rect_callbacks<is_const, basic_element_handle_base<element, is_const, all_elements...>>
 		{
 		public:
-			typedef element_handle_userdata<is_const, element> userdata_type;
 			typedef element element_type;
 
-			userdata_type userdata;
-			
-			basic_element_handle_base(owner_reference owner, id_type id, userdata_type userdata) : basic_handle(owner, id), userdata(userdata) {
-			}
+			using basic_handle::basic_handle;
 
 			maybe_const_ref_t<is_const, rect_world> get_rect_world() const {
 				return owner.rect_tree;

@@ -36,16 +36,28 @@ namespace augs {
 			tuple_of_t<make_pool_with_element_meta, all_elements...> element_pools;
 
 		public:
-			template<bool is_const, class... Args>
+			template<bool is_const, class handle_arguments>
 			class dispatcher {
-				maybe_const_ref_t<is_const, element_world> elements;
+				typedef maybe_const_ref_t<is_const, element_world> world_ref;
+
+				world_ref elements;
+				handle_arguments tuple_of_saved_args;
+				
+				dispatcher(handle_arguments args, world_ref ref) : tuple_of_saved_args(args), elements(ref) {}
 
 				template <class F>
 				void dispatch(rect_id id, F f) {
 					auto meta = rects.get_meta<rect_meta>(id);
 
 					for_each_type<all_elements...>([this, meta, f](auto c) {
-						auto element_handle = get_handle(meta.get_id<decltype(c)>());
+						auto get_handle_args = std::tuple_cat(
+							std::make_tuple(meta.get_id<decltype(c)>()),
+							tuple_ref_by_inheritance<saved_args_base<decltype(c)>>(tuple_of_saved_args).args
+						);
+
+						auto element_handle = std::apply([this](auto... params) {
+							return elements.get_handle(params...);
+						}, get_handle_args);
 
 						if (element_handle.alive()) {
 							f(element_handle);
@@ -53,18 +65,26 @@ namespace augs {
 					});
 				}
 			};
-			
+
+			template<class... Args>
+			auto create_dispatcher(Args... args) {
+				return dispatcher<false, std::tuple<Args...>>(std::make_tuple(args...), *this);
+			}
+
+			template<class... Args>
+			auto create_dispatcher(Args... args) const {
+				return dispatcher<true, std::tuple<Args...>>(std::make_tuple(args...), *this);
+			}
+
 			rect_world rect_tree;
 
 			element_world() {
-				auto new_rect = rects.allocate();
-				auto& r = new_rect.get();
+				rect new_root;
+				new_root.clip = false;
+				new_root.focusable = false;
+				new_root.scrollable = false;
 
-				r.clip = false;
-				r.focusable = false;
-				r.scrollable = false;
-
-				rect_tree.root = new_rect;
+				rect_tree.root = rects.allocate(new_root);
 			}
 
 			template <class T>
@@ -79,12 +99,12 @@ namespace augs {
 
 			template<class T, class... Args>
 			element_handle<T> get_handle(pool_id<T> id, Args... args) {
-				return{ get_pool(id), id, { args... }  };
+				return{ get_pool(id), id, args... };
 			}
 
 			template<class T, class... Args>
 			const_element_handle<T> get_handle(pool_id<T> id, Args... args) const {
-				return{ get_pool(id), id, { args... } };
+				return{ get_pool(id), id, args... };
 			}
 
 			template<>

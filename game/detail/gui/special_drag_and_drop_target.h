@@ -28,15 +28,15 @@ struct special_drag_and_drop_target {
 
 namespace augs {
 	namespace gui {
-		template<bool is_const>
-		class element_handle_userdata<is_const, special_drag_and_drop_target> {
-		public:
-			basic_entity_handle<is_const> owner_entity;
-		};
-
 		template<bool is_const, class... all_elements>
 		class basic_element_handle<special_drag_and_drop_target, is_const, all_elements...>
 			: public basic_element_handle_base<special_drag_and_drop_target, is_const, all_elements...> {
+
+			basic_entity_handle<is_const> owner_entity;
+
+			basic_element_handle(owner_reference owner, id_type id, basic_entity_handle<is_const> owner_entity) : basic_handle(owner, id), 
+				owner_entity(owner_entity) {
+			}
 
 			void draw(draw_info info) const {
 				auto mat_coloured = mat;
