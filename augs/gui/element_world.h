@@ -45,19 +45,37 @@ namespace augs {
 				
 				dispatcher(handle_arguments args, world_ref ref) : tuple_of_saved_args(args), elements(ref) {}
 
+				template <class, typename>
+				friend struct handle_maker;
+
+				template <class E, typename = void>
+				struct handle_maker {
+					static const auto& make(const rect_meta& meta, dispatcher& disp) {
+						return disp.elements.get_handle(meta.get_id<E>());
+					}
+				};
+
+				template <class E>
+				struct handle_maker<E, std::enable_if_t<tuple_contains_type<saved_args<E>, handle_arguments>::value>> {
+					static const auto& make(const rect_meta& meta, dispatcher& disp) {
+						auto get_handle_args = std::tuple_cat(
+							std::make_tuple(meta.get_id<E>()),
+							tuple_ref_by_inheritance<saved_args_base<E>>(disp.tuple_of_saved_args).args
+						);
+
+						return std::apply([&disp](auto... params) {
+							return disp.elements.get_handle(params...);
+						}, get_handle_args);
+					}
+				};
+
+			public:
 				template <class F>
 				void dispatch(rect_id id, F f) {
 					auto meta = rects.get_meta<rect_meta>(id);
 
 					for_each_type<all_elements...>([this, meta, f](auto c) {
-						auto get_handle_args = std::tuple_cat(
-							std::make_tuple(meta.get_id<decltype(c)>()),
-							tuple_ref_by_inheritance<saved_args_base<decltype(c)>>(tuple_of_saved_args).args
-						);
-
-						auto element_handle = std::apply([this](auto... params) {
-							return elements.get_handle(params...);
-						}, get_handle_args);
+						auto element_handle = handle_maker<decltype(c)>(meta, *this);
 
 						if (element_handle.alive()) {
 							f(element_handle);
