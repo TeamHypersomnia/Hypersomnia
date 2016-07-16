@@ -3,5 +3,8 @@
 
 void cleanup_proc() {
 	augs::window::disable_cursor_clipping();
-	__debugbreak();
+	
+#ifdef PLATFORM_WINDOWS
+  __debugbreak();
+#endif
 }

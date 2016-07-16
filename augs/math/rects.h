@@ -190,18 +190,18 @@ namespace augs {
 				return vec2t<T>(l + w() / 2.f, t + h() / 2.f);
 			}
 
-			template <typename T>
-			bool hover(const vec2t<T>& m) const {
+			template <typename S>
+			bool hover(const vec2t<S>& m) const {
 				return m.x >= l && m.y >= t && m.x <= r && m.y <= b;
 			}
 
-			template <class T>
-			std::vector<vec2t<T>> get_vertices() const {
-				std::vector<vec2t<T>> out;
-				out.push_back(vec2t<T>(l, t));
-				out.push_back(vec2t<T>(r, t));
-				out.push_back(vec2t<T>(r, b));
-				out.push_back(vec2t<T>(l, b));
+			template <class S>
+			std::vector<vec2t<S>> get_vertices() const {
+				std::vector<vec2t<S>> out;
+				out.push_back(vec2t<S>(l, t));
+				out.push_back(vec2t<S>(r, t));
+				out.push_back(vec2t<S>(r, b));
+				out.push_back(vec2t<S>(l, b));
 				return std::move(out);
 			}
 
@@ -326,16 +326,16 @@ namespace augs {
 		template <class T>
 		struct xywh : public wh<T> {
 			xywh() : x(0), y(0) {}
-			xywh(const wh& rr) : x(0), y(0), wh(rr) {}
+			xywh(const wh<T>& rr) : x(0), y(0), wh<T>(rr) {}
 			xywh(const ltrb<T>& rc) : x(rc.l), y(rc.t) { b(rc.b); r(rc.r); }
-			xywh(T x, T y, T w, T h) : x(x), y(y), wh(w, h) {}
-			xywh(T x, T y, const wh& r) : x(x), y(y), wh(r) {}
-			xywh(const vec2t<T>& p, const wh& r) : x(p.x), y(p.y), wh(r) {}
+			xywh(T x, T y, T w, T h) : x(x), y(y), wh<T>(w, h) {}
+			xywh(T x, T y, const wh<T>& r) : x(x), y(y), wh<T>(r) {}
+			xywh(const vec2t<T>& p, const wh<T>& r) : x(p.x), y(p.y), wh<T>(r) {}
 
 			void set(T x, T y, T w, T h) { *this = xywh(x, y, w, h); }
 			
 			vec2t<T> center() {
-				return{ x + w/2, y + h/2 };
+				return{ x + this->w/2, y + this->h/2 };
 			}
 
 			bool clip(const xywh& rc) {
@@ -343,7 +343,7 @@ namespace augs {
 					*this = xywh();
 					return false;
 				}
-				*this = ltrb(std::max(x, rc.x),
+				*this = ltrb<T>(std::max(x, rc.x),
 					std::max(y, rc.y),
 					std::min(r(), rc.r()),
 					std::min(b(), rc.b()));
@@ -359,23 +359,23 @@ namespace augs {
 			}
 
 			bool hover(const xywh& rc) const {
-				return ltrb(rc).hover(*this);
+				return ltrb<T>(rc).hover(*this);
 			}
 
 			T r() const {
-				return x + w;
+				return x + this->w;
 			};
 
 			T b() const {
-				return y + h;
+				return y + this->h;
 			}
 
 			void r(T right) {
-				w = right - x;
+				this->w = right - x;
 			}
 
 			void b(T bottom) {
-				h = bottom - y;
+				this->h = bottom - y;
 			}
 			
 			T x, y;
@@ -393,30 +393,30 @@ namespace augs {
 			
 			template <class P>
 			xywh operator-(const P& p) const {
-				return xywh(x - T(p.x), y - T(p.y), w, h);
+				return xywh(x - T(p.x), y - T(p.y), this->w, this->h);
 			}
 
 			template <class P>
 			xywh operator+(const P& p) const {
-				return xywh(x + T(p.x), y + T(p.y), w, h);
+				return xywh(x + T(p.x), y + T(p.y), this->w, this->h);
 			}
 		};
 		
 		template <class T>
 		struct xywhf : public xywh<T> {
-			xywhf(const ltrb<T>& rr) : xywh(rr), flipped(false) {}
-			xywhf(const xywh<T>& rr) : xywh(rr), flipped(false) {}
-			xywhf(const wh<T>  & rr) : xywh(rr), flipped(false) {}
-			xywhf(T x, T y, T width, T height, bool flipped) : xywh(x, y, width, height), flipped(flipped) {}
+			xywhf(const ltrb<T>& rr) : xywh<T>(rr), flipped(false) {}
+			xywhf(const xywh<T>& rr) : xywh<T>(rr), flipped(false) {}
+			xywhf(const wh<T>  & rr) : xywh<T>(rr), flipped(false) {}
+			xywhf(T x, T y, T width, T height, bool flipped) : xywh<T>(x, y, width, height), flipped(flipped) {}
 			xywhf() : flipped(false) {}
 
 			void flip() {
 				flipped = !flipped;
-				std::swap(w, h);
+				std::swap(this->w, this->h);
 			}
 
 			xywh<T> rc() const {
-				return xywh<T>(x, y, flipped ? h : w, flipped ? w : h);
+				return xywh<T>(this->x, this->y, flipped ? this->h : this->w, flipped ? this->w : this->h);
 			}
 
 			bool flipped;
