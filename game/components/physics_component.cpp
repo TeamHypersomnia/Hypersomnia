@@ -14,32 +14,28 @@
 typedef components::physics P;
 
 template<bool C>
-bool component_synchronizer<C, P>::is_constructed() const {
+bool basic_physics_synchronizer<C>::is_constructed() const {
 	return handle.get_cosmos().temporary_systems.get<physics_system>().is_constructed_rigid_body(handle);
 }
 
 template<bool C>
-maybe_const_ref_t<C, rigid_body_cache>& component_synchronizer<C, P>::get_cache() const {
+maybe_const_ref_t<C, rigid_body_cache>& basic_physics_synchronizer<C>::get_cache() const {
 	return handle.get_cosmos().temporary_systems.get<physics_system>().get_rigid_body_cache(handle);
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, P>::set_body_type(components::physics::type t) {
+void component_synchronizer<false, P>::set_body_type(components::physics::type t) const {
 	component.body_type = t;
 	complete_resubstantialization();
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, P>::set_activated(bool flag) {
+
+void component_synchronizer<false, P>::set_activated(bool flag) const {
 	component.activated = flag;
 	complete_resubstantialization();
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, P>::set_velocity(vec2 pixels) {
+
+void component_synchronizer<false, P>::set_velocity(vec2 pixels) const {
 	component.velocity = pixels;
 
 	if (!is_constructed())
@@ -48,9 +44,8 @@ void component_synchronizer<C, P>::set_velocity(vec2 pixels) {
 	get_cache().body->SetLinearVelocity(pixels * PIXELS_TO_METERSf);
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, P>::set_linear_damping(float damping) {
+
+void component_synchronizer<false, P>::set_linear_damping(float damping) const {
 	component.linear_damping = damping;
 
 	if (!is_constructed())
@@ -59,9 +54,8 @@ void component_synchronizer<C, P>::set_linear_damping(float damping) {
 	get_cache().body->SetLinearDamping(damping);
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, P>::set_angular_damping(float damping) {
+
+void component_synchronizer<false, P>::set_angular_damping(float damping) const {
 	component.angular_damping = damping;
 
 	if (!is_constructed())
@@ -70,9 +64,8 @@ void component_synchronizer<C, P>::set_angular_damping(float damping) {
 	get_cache().body->SetAngularDamping(damping);
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, P>::set_linear_damping_vec(vec2 damping) {
+
+void component_synchronizer<false, P>::set_linear_damping_vec(vec2 damping) const {
 	component.linear_damping_vec = damping;
 
 	if (!is_constructed())
@@ -81,15 +74,13 @@ void component_synchronizer<C, P>::set_linear_damping_vec(vec2 damping) {
 	get_cache().body->SetLinearDampingVec(damping);
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, P>::apply_force(vec2 pixels) {
+
+void component_synchronizer<false, P>::apply_force(vec2 pixels) const {
 	apply_force(pixels, vec2(0, 0), true);
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, P>::apply_force(vec2 pixels, vec2 center_offset, bool wake) {
+
+void component_synchronizer<false, P>::apply_force(vec2 pixels, vec2 center_offset, bool wake) const {
 	ensure(is_constructed());
 
 	if (pixels.is_epsilon(2.f))
@@ -106,15 +97,13 @@ void component_synchronizer<C, P>::apply_force(vec2 pixels, vec2 center_offset, 
 	}
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, P>::apply_impulse(vec2 pixels) {
+
+void component_synchronizer<false, P>::apply_impulse(vec2 pixels) const {
 	apply_impulse(pixels, vec2(0, 0), true);
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, P>::apply_impulse(vec2 pixels, vec2 center_offset, bool wake) {
+
+void component_synchronizer<false, P>::apply_impulse(vec2 pixels, vec2 center_offset, bool wake) const {
 	ensure(is_constructed());
 
 	if (pixels.is_epsilon(2.f))
@@ -131,63 +120,62 @@ void component_synchronizer<C, P>::apply_impulse(vec2 pixels, vec2 center_offset
 	}
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, P>::apply_angular_impulse(float imp) {
+
+void component_synchronizer<false, P>::apply_angular_impulse(float imp) const {
 	ensure(is_constructed());
 	get_cache().body->ApplyAngularImpulse(imp, true);
 }
 
 template<bool C>
-float component_synchronizer<C, P>::get_mass() const {
+float basic_physics_synchronizer<C>::get_mass() const {
 	ensure(is_constructed());
 	return get_cache().body->GetMass();
 }
 
 template<bool C>
-float component_synchronizer<C, P>::get_angle() const {
+float basic_physics_synchronizer<C>::get_angle() const {
 	ensure(is_constructed());
 	return get_cache().body->GetAngle() * RAD_TO_DEGf;
 }
 
 template<bool C>
-float component_synchronizer<C, P>::get_angular_velocity() const {
+float basic_physics_synchronizer<C>::get_angular_velocity() const {
 	ensure(is_constructed());
 	return get_cache().body->GetAngularVelocity() * RAD_TO_DEGf;
 }
 
 template<bool C>
-float component_synchronizer<C, P>::get_inertia() const {
+float basic_physics_synchronizer<C>::get_inertia() const {
 	ensure(is_constructed());
 	return get_cache().body->GetInertia();
 }
 
 template<bool C>
-vec2 component_synchronizer<C, P>::get_position() const {
+vec2 basic_physics_synchronizer<C>::get_position() const {
 	ensure(is_constructed());
 	return METERS_TO_PIXELSf * get_cache().body->GetPosition();
 }
 
 template<bool C>
-vec2 component_synchronizer<C, P>::get_mass_position() const {
+vec2 basic_physics_synchronizer<C>::get_mass_position() const {
 	ensure(is_constructed());
 	return METERS_TO_PIXELSf * get_cache().body->GetWorldCenter();
 }
 
 template<bool C>
-vec2 component_synchronizer<C, P>::velocity() const {
+vec2 basic_physics_synchronizer<C>::velocity() const {
 	ensure(is_constructed());
 	return vec2(get_cache().body->GetLinearVelocity()) * METERS_TO_PIXELSf;
 }
 
 template<bool C>
-vec2 component_synchronizer<C, P>::get_world_center() const {
+vec2 basic_physics_synchronizer<C>::get_world_center() const {
 	ensure(is_constructed());
 	return METERS_TO_PIXELSf * get_cache().body->GetWorldCenter();
 }
 
 template<bool C>
-vec2 component_synchronizer<C, P>::get_aabb_size() const {
+vec2 basic_physics_synchronizer<C>::get_aabb_size() const {
 	ensure(is_constructed());
 	b2AABB aabb;
 	aabb.lowerBound.Set(FLT_MAX, FLT_MAX);
@@ -204,42 +192,37 @@ vec2 component_synchronizer<C, P>::get_aabb_size() const {
 }
 
 template<bool C>
-P::type component_synchronizer<C, P>::get_body_type() const {
+P::type basic_physics_synchronizer<C>::get_body_type() const {
 	return component.body_type;
 }
 
 template<bool C>
-bool component_synchronizer<C, P>::is_activated() const {
+bool basic_physics_synchronizer<C>::is_activated() const {
 	return component.activated;
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, P>::set_transform(entity_id id) {
+void component_synchronizer<false, P>::set_transform(entity_id id) const {
 	set_transform(handle.get_cosmos()[id].get<components::transform>());
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, P>::set_transform(components::transform transform) {
+void component_synchronizer<false, P>::set_transform(components::transform transform) const {
 	component.transform = transform;
 
 	if (!is_constructed())
 		return;
 
-	get_cache().body->SetTransform(transform.pos * PIXELS_TO_METERSf, transform.rotation * DEG_TO_RAD);
+	get_cache().body->SetTransform(transform.pos * PIXELS_TO_METERSf, transform.rotation * DEG_TO_RADf);
 }
 
-
 template<bool C>
-const std::vector<basic_entity_handle<C>>& component_synchronizer<C, P>::get_fixture_entities() const {
+std::vector<basic_entity_handle<C>> basic_physics_synchronizer<C>::get_fixture_entities() const {
 	return handle.get_cosmos().to_handle_vector(component.fixture_entities);
 }
 
 template<bool C>
-bool component_synchronizer<C, P>::test_point(vec2 v) const {
+bool basic_physics_synchronizer<C>::test_point(vec2 v) const {
 	return get_cache().body->TestPoint(v * PIXELS_TO_METERSf);
 }
 
-template class component_synchronizer<false, P>;
-template class component_synchronizer<true, P>;
+template class basic_physics_synchronizer<false>;
+template class basic_physics_synchronizer<true>;

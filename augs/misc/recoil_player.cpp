@@ -2,19 +2,20 @@
 #include "recoil_player.h"
 #include "game/components/physics_component.h"
 #include "game/entity_handle.h"
+#include "game/cosmos.h"
 
 vec2 recoil_player::shoot_and_get_offset() {
 	if (current_offset > int(offsets.size() - 1))
 		reversed = true;
 	ensure(repeat_last_n_offsets > 0 && repeat_last_n_offsets < offsets.size());
-	if (current_offset <= int(offsets.size()) - repeat_last_n_offsets) {
+	if (current_offset + repeat_last_n_offsets <= offsets.size()) {
 		reversed = false;
 		delta_offset = 0;
 	}
 
 	if (reversed) {
 		delta_offset++;
-		current_offset = int(offsets.size() - 1) - delta_offset;
+		current_offset = offsets.size() - 1 - delta_offset;
 	}
 
 	return offsets[current_offset++] * scale;
@@ -43,5 +44,5 @@ void recoil_player::cooldown(double amount_ms) {
 		--current_offset;
 	}
 
-	current_offset = std::max(current_offset, 0);
+	current_offset = std::max(current_offset, 0u);
 }

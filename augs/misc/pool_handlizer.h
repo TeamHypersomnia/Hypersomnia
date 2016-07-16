@@ -16,7 +16,7 @@ namespace augs {
 			for (auto v : vec)
 				handles.emplace_back(self.get_handle(v));
 
-			return std::move(handles);
+			return handles;
 		}
 
 		template <class id_type>
@@ -29,7 +29,7 @@ namespace augs {
 			for (auto v : vec)
 				handles.emplace_back(self.get_handle(v));
 
-			return std::move(handles);
+			return handles;
 		}
 
 		template <class id_type>

@@ -37,16 +37,10 @@
 #include "game/entity_handle.h"
 #include "game/detail/inventory_slot_handle.h"
 
-cosmos::cosmos()
-	//:
-	//temporary_systems(
-	//physics_system(),
-	//gui_system(), 
-	//dynamic_tree_system(),
-	//processing_lists_system())
-	
-{
-}
+#include "game/messages/health_event.h"
+
+#include "game/types_specification/all_messages_includes.h"
+#include "game/types_specification/all_component_includes.h"
 
 void cosmos::complete_resubstantialization(entity_handle h) {
 	temporary_systems.for_each([this, h](auto& sys) {
@@ -61,7 +55,7 @@ void cosmos::complete_resubstantialization(entity_handle h) {
 }
 
 void cosmos::reserve_storage_for_entities(size_t n) {
-	components_and_aggregates.reserve_storage_for_aggregates(n);
+	reserve_storage_for_aggregates(n);
 
 	temporary_systems.for_each([this, n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
@@ -81,7 +75,7 @@ std::vector<const_entity_handle> cosmos::get(processing_subjects list) const {
 }
 
 randomization cosmos::get_rng_for(entity_id id) const {
-	return{ id.version + id.indirection_index + current_step_number };
+	return{ id.version + id.indirection_index + static_cast<size_t>(current_step_number) };
 }
 
 entity_handle cosmos::get_handle(entity_id id) {
@@ -101,12 +95,12 @@ const_inventory_slot_handle cosmos::get_handle(inventory_slot_id id) const {
 }
 
 entity_handle cosmos::create_entity(std::string debug_name) {
-	return get_handle(components_and_aggregates.allocate_aggregate(debug_name));
+	return get_handle(allocate_aggregate(debug_name));
 }
 
 entity_handle cosmos::clone_entity(entity_id e) {
 	const_entity_handle const_handle = get_handle(e);
-	return get_handle(components_and_aggregates.clone_aggregate(const_handle));
+	return get_handle(clone_aggregate(const_handle));
 }
 
 void cosmos::delete_entity(entity_id e) {
@@ -118,15 +112,13 @@ void cosmos::delete_entity(entity_id e) {
 	if (should_destruct_now_to_avoid_repeated_resubstantialization)
 		handle.remove<components::substance>();
 
-	components_and_aggregates.free_aggregate(e);
+	free_aggregate(e);
 }
 
 size_t cosmos::entities_count() const {
-	return components_and_aggregates.aggregates_count();
+	return aggregates_count();
 }
-void cosmos::advance_deterministic_schemata(cosmic_entropy input,
-	fixed_callback pre_solve = fixed_callback(),
-	fixed_callback post_solve = fixed_callback()) {
+void cosmos::advance_deterministic_schemata(cosmic_entropy input, fixed_callback pre_solve, fixed_callback post_solve) {
 	fixed_step step(*this, input);
 	
 	if (pre_solve)
@@ -143,36 +135,35 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	auto& delta = step.get_delta();
 	auto& performance = profiler.performance;
 
-	performance.start(meter_type::CAMERA_QUERY);
-	temporary_systems.get<dynamic_tree_system>().determine_visible_entities_from_every_camera();
-	performance.stop(meter_type::CAMERA_QUERY);
+	//performance.start(meter_type::CAMERA_QUERY);
+	//temporary_systems.get<dynamic_tree_system>().determine_visible_entities_from_every_camera();
+	//performance.stop(meter_type::CAMERA_QUERY);
 
-	stateful_systems.get<gui_system>().advance_gui_elements();
-	stateful_systems.get<gui_system>().translate_raw_window_inputs_to_gui_events();
-
-	stateful_systems.get<gui_system>().suppress_inputs_meant_for_gui();
+	//stateful_systems.get<gui_system>().advance_gui_elements();
+	//stateful_systems.get<gui_system>().translate_raw_window_inputs_to_gui_events();
+	//
+	//stateful_systems.get<gui_system>().suppress_inputs_meant_for_gui();
 
 	performance.start(meter_type::LOGIC);
-	render_system().set_current_transforms_as_previous_for_interpolation();
+	//render_system().set_current_transforms_as_previous_for_interpolation();
 
-	input_system().post_unmapped_intents_from_raw_entropy(step);
 
-	stateful_systems.get<gui_system>().switch_to_gui_mode_and_back();
+	input_system().make_intents_from_raw_entropy(step);
 
-	input_system().map_unmapped_intents_to_entities(step);
+	//stateful_systems.get<gui_system>().switch_to_gui_mode_and_back();
 
 	intent_contextualization_system().contextualize_crosshair_action_intents(step);
 
 	gun_system().consume_gun_intents(step);
 	gun_system().launch_shots_due_to_pressed_triggers(step);
 
-	particles_system().create_particle_effects();
+	particles_system().create_particle_effects(step);
 
-	dynamic_tree_system().add_entities_to_rendering_tree(step);
-	temporary_systems.get<physics_system>().react_to_new_entities();
-	step.messages.get_queue<new_entity_message>().clear();
+	//temporary_systems.get<dynamic_tree_system>().add_entities_to_rendering_tree(step);
+	//temporary_systems.get<physics_system>().react_to_new_entities();
+	//step.messages.get_queue<new_entity_message>().clear();
 
-	trace_system().lengthen_sprites_of_traces();
+	trace_system().lengthen_sprites_of_traces(step);
 
 	crosshair_system().generate_crosshair_intents(step);
 	crosshair_system().apply_crosshair_intents_to_base_offsets(step);
@@ -186,11 +177,11 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 
 	driver_system().release_drivers_due_to_requests(step);
 
-	trigger_detector_system().consume_trigger_detector_presses();
+	trigger_detector_system().consume_trigger_detector_presses(step);
 	trigger_detector_system().post_trigger_requests_from_continuous_detectors(step);
-	trigger_detector_system().send_trigger_confirmations();
+	trigger_detector_system().send_trigger_confirmations(step);
 
-	item_system().translate_gui_intents_to_transfer_requests(step);
+//	item_system().translate_gui_intents_to_transfer_requests(step);
 	item_system().handle_trigger_confirmations_as_pick_requests(step);
 	item_system().handle_holster_item_intents(step);
 	item_system().handle_throw_item_intents(step);
@@ -214,72 +205,69 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 
 	profiler.raycasts.measure(temporary_systems.get<physics_system>().ray_casts_since_last_step);
 
-	temporary_systems.get<physics_system>().step_and_set_new_transforms();
+	temporary_systems.get<physics_system>().step_and_set_new_transforms(step);
 	performance.stop(meter_type::PHYSICS);
-	position_copying_system().update_transforms();
+	position_copying_system().update_transforms(step);
 
-	melee_system().initiate_and_update_moves();
+	melee_system().initiate_and_update_moves(step);
 
-	damage_system().destroy_outdated_bullets();
-	damage_system().destroy_colliding_bullets_and_send_damage();
+	damage_system().destroy_outdated_bullets(step);
+	damage_system().destroy_colliding_bullets_and_send_damage(step);
 
-	sentience_system().apply_damage_and_generate_health_events();
-	sentience_system().cooldown_aimpunches();
+	sentience_system().apply_damage_and_generate_health_events(step);
+	sentience_system().cooldown_aimpunches(step);
 
-	particles_system().game_responses_to_particle_effects();
-	particles_system().create_particle_effects();
+	particles_system().game_responses_to_particle_effects(step);
+	particles_system().create_particle_effects(step);
 
-	stateful_systems.get<gui_system>().translate_game_events_for_hud();
+	// stateful_systems.get<gui_system>().translate_game_events_for_hud(step);
 
 	performance.start(meter_type::VISIBILITY);
-	visibility_system().generate_visibility_and_sight_information();
+	visibility_system().generate_visibility_and_sight_information(step.cosm);
 	performance.stop(meter_type::VISIBILITY);
 
 	performance.start(meter_type::AI);
-	behaviour_tree_system().evaluate_trees(step.cosm);
+	behaviour_tree_system().evaluate_trees(step);
 	performance.stop(meter_type::AI);
 
 	performance.start(meter_type::PATHFINDING);
 	pathfinding_system().advance_pathfinding_sessions(step.cosm);
 	performance.stop(meter_type::PATHFINDING);
 
-	particles_system().step_streams_and_particles();
-	particles_system().destroy_dead_streams();
-	trace_system().destroy_outdated_traces();
+	particles_system().step_streams_and_particles(step);
+	particles_system().destroy_dead_streams(step);
+	trace_system().destroy_outdated_traces(step);
 
 	destroy_system().queue_children_of_queued_entities(step);
 
-	trace_system().spawn_finishing_traces_for_destroyed_objects();
-	dynamic_tree_system().remove_entities_from_rendering_tree();
-	temporary_systems.get<physics_system>().react_to_destroyed_entities(step);
+	trace_system().spawn_finishing_traces_for_destroyed_objects(step);
+	// dynamic_tree_system().remove_entities_from_rendering_tree();
+	// temporary_systems.get<physics_system>().react_to_destroyed_entities(step);
 
 	bool has_no_destruction_callback_queued_any_additional_destruction = step.messages.get_queue<messages::queue_destruction>().empty();
 	ensure(has_no_destruction_callback_queued_any_additional_destruction);
 
-	destroy_system().perform_deletions();
+	destroy_system().perform_deletions(step);
 
-	input_system().post_unmapped_intents_from_raw_entropy();
-	input_system().map_unmapped_intents_to_entities();
+	//input_system().post_unmapped_intents_from_raw_entropy();
+	//input_system().map_unmapped_intents_to_entities();
 
+	movement_system().generate_movement_responses(step);
 
+	animation_system().game_responses_to_animation_messages(step);
 
-	movement_system().generate_movement_responses();
-
-	animation_system().game_responses_to_animation_messages();
-
-	animation_system().handle_animation_messages();
-	animation_system().progress_animation_states();
+	animation_system().handle_animation_messages(step);
+	animation_system().progress_animation_states(step);
 
 	performance.start(meter_type::RENDERING);
 
-
 	performance.start(meter_type::INTERPOLATION);
-	render_system().calculate_and_set_interpolated_transforms();
+	//render_system().calculate_and_set_interpolated_transforms();
 	performance.stop(meter_type::INTERPOLATION);
 
-	position_copying_system().update_transforms();
-	camera_system().resolve_cameras_transforms_and_smoothing();
-	rotation_copying_system().update_rotations();
+	position_copying_system().update_transforms(step);
+	camera_system().resolve_cameras_transforms_and_smoothing(step);
+	rotation_copying_system().update_rotations(step.cosm);
 
 	++current_step_number;
 	performance.stop(meter_type::LOGIC);

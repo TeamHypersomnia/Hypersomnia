@@ -47,8 +47,8 @@ namespace ingredients {
 		info.shape.from_renderable(e);
 
 		info.filter = filters::shell();
-		info.density = 1;
-		info.restitution = 1.4;
+		info.density = 1.f;
+		info.restitution = 1.4f;
 		info.density = 0.001f;
 
 		e += def;

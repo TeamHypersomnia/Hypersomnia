@@ -168,15 +168,3 @@ void item_system::process_mounting_and_unmounting(fixed_step& step) {
 		}
 	}
 }
-
-void item_system::translate_gui_intents_to_transfer_requests(fixed_step& step) {
-	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
-	auto& intents = step.messages.get_queue<messages::gui_item_transfer_intent>();
-
-	for (auto& i : intents) {
-		perform_transfer({ cosmos[i.item], cosmos[i.target_slot], i.specified_quantity }, step);
-	}
-
-	intents.clear();
-}

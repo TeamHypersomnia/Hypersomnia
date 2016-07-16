@@ -10,8 +10,8 @@
 #include "game/entity_id.h"
 
 #include "game/detail/entity/inventory_getters.h"
-#include "game/detail/entity/relations_component_helpers.h"
 #include "game/detail/entity/physics_getters.h"
+#include "game/detail/entity/relations_component_helpers.h"
 
 class cosmos;
 
@@ -43,14 +43,12 @@ namespace augs {
 				return h.allocator::get<T>();
 			}
 
-			return_type add(const T& t) const {
-				auto& ret = h.allocator::add(t);
+			void add(const T& t) const {
+				h.allocator::add(t);
 				
 				if (std::is_same<T, components::substance>()) {
 					h.get_cosmos().complete_resubstantialization(h);
 				}
-
-				return ret;
 			}
 
 			void remove() const {
@@ -63,7 +61,7 @@ namespace augs {
 		};
 
 		template <class T>
-		struct component_or_synchronizer<T, typename std::enable_if<is_component_synchronized<T>::value>::type> {
+		struct component_or_synchronizer<T, std::enable_if_t<is_component_synchronized<T>::value>> {
 			typedef component_synchronizer<is_const, T> return_type;
 
 			basic_entity_handle<is_const> h;
@@ -72,11 +70,10 @@ namespace augs {
 				return component_synchronizer<is_const, T>(h.allocator::get<T>(), h);
 			}
 
-			return_type add(const T& t) const {
+			void add(const T& t) const {
 				ensure(!h.has<T>());
-				auto added = component_synchronizer<is_const, T>(h.allocator::add(t), h);
+				h.allocator::add(t);
 				h.get_cosmos().complete_resubstantialization(h);
-				return added;
 			}
 
 			void remove() const {
@@ -86,6 +83,8 @@ namespace augs {
 			}
 		};
 		
+		template<class T>
+		using component_or_synchronizer_t = typename component_or_synchronizer<T>::return_type;
 
 		using basic_handle_base::get;
 
@@ -105,7 +104,11 @@ namespace augs {
 		}
 
 		template <class = std::enable_if_t<!is_const>>
-		operator const_entity_handle() const;
+		
+		operator const_entity_handle() const {
+			return const_entity_handle(owner, raw_id);
+		}
+
 		using basic_handle_base::operator entity_id;
 
 		template <class component>
@@ -114,18 +117,20 @@ namespace augs {
 		}
 
 		template<class component>
-		decltype(auto) get() const {
+		auto& get() const {
 			return component_or_synchronizer<component>({ *this }).get();
 		}
 
-		template<class component>
-		typename std::enable_if<!is_const, typename component_or_synchronizer<component>::return_type>::type add(const component& c = component()) const {
-			return component_or_synchronizer<component>({ *this }).add(c);
+		template<class component, class = std::enable_if_t<!is_const>>
+		auto& add(const component& c) const {
+			component_or_synchronizer<component>({ *this }).add(c);
+			return get<component>();
 		}
 
-		template<class component>
-		typename std::enable_if<!is_const, typename component_or_synchronizer<component>::return_type>::type add(const component_or_synchronizer<component>& c = component()) const {
-			return component_or_synchronizer<component>({ *this }).add(c.get_data());
+		template<class component, class = std::enable_if_t<!is_const>>
+		auto& add(const component_synchronizer<is_const, component>& c) const {
+			component_or_synchronizer<component>({ *this }).add(c.get_data());
+			return get<component>();
 		}
 
 		template<class component>

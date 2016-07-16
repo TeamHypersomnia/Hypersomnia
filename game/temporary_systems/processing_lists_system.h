@@ -13,6 +13,7 @@ class cosmos;
 class processing_lists_system {
 	std::unordered_map<processing_subjects, std::vector<entity_id>> lists;
 	friend class component_synchronizer<false, components::processing>;
+	template<bool> friend class basic_processing_synchronizer;
 
 	struct cache {
 		bool is_constructed = false;

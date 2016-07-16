@@ -27,10 +27,8 @@
 #include "game/step.h"
 #include <functional>
 
-class cosmos : public augs::pool_handlizer<cosmos>
+class cosmos : private storage_for_all_components_and_aggregates, public augs::pool_handlizer<cosmos>
 {
-	storage_for_all_components_and_aggregates components_and_aggregates;
-
 	void advance_deterministic_schemata(fixed_step& step_state);
 	void call_rendering_schemata(viewing_step& step_state) const;
 
@@ -47,8 +45,6 @@ public:
 	unsigned long long current_step_number = 0;
 
 	augs::fixed_delta delta;
-
-	cosmos();
 
 	void advance_deterministic_schemata(cosmic_entropy input,
 		fixed_callback pre_solve = fixed_callback(), 
@@ -74,14 +70,6 @@ public:
 
 	size_t entities_count() const;
 	std::wstring summary() const;
-	
-	template <class T>
-	decltype(auto) get_pool(augs::pool_id<T> id) {
-		return components_and_aggregates.get_pool(id);
-	}
 
-	template <class T>
-	decltype(auto) get_pool(augs::pool_id<T> id) const {
-		return components_and_aggregates.get_pool(id);
-	}
+	using storage_for_all_components_and_aggregates::get_pool;
 };

@@ -34,7 +34,7 @@ void trace_system::lengthen_sprites_of_traces(fixed_step& step) const {
 
 		sprite.center_offset = sprite.size * (surplus_multiplier / 2.f);
 
-		trace.lengthening_time_passed_ms += delta.in_milliseconds();
+		trace.lengthening_time_passed_ms += static_cast<float>(delta.in_milliseconds());
 	}
 }
 

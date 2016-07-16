@@ -6,7 +6,7 @@
 #include "aggregate_mixins.h"
 
 namespace augs {
-	template <class handle_owner_type, class... components>
+	template <class derived, class... components>
 	class storage_for_components_and_aggregates {
 		typedef component_aggregate<components...> aggregate_type;
 		typedef pool_id<aggregate_type> aggregate_id;
@@ -37,11 +37,6 @@ namespace augs {
 			return pool_for_aggregates;
 		}
 
-		template<class component, class... Args>
-		auto allocate_component(Args... args) {
-			return get_component_pool<component>().allocate(args...);
-		}
-
 		size_t aggregates_count() const {
 			return pool_for_aggregates.size();
 		}
@@ -57,22 +52,22 @@ namespace augs {
 		}
 
 		aggregate_id allocate_aggregate(std::string debug_name = std::string()) {
-			auto new_id = pool_for_aggregates.allocate().get_id();
+			aggregate_id new_id = pool_for_aggregates.allocate();
 			new_id.set_debug_name(debug_name);
 
 			return new_id;
 		}
 
 		aggregate_id clone_aggregate(aggregate_id cloned_aggregate_id) {
-			auto cloned_aggregate = pool_for_aggregates.get_handle(cloned_aggregate_id);
+			auto& self = *static_cast<derived*>(this);
 
-			aggregate_handle new_aggregate = pool_for_aggregates.allocate();
+			auto cloned_aggregate = self.get_handle(cloned_aggregate_id);
+
+			auto new_aggregate = self.get_handle(pool_for_aggregates.allocate());
 
 			for_each_type<components...>([&cloned_aggregate, &new_aggregate](auto c) {
-				auto* maybe_component = cloned_aggregate.find<decltype(c)>();
-
-				if (maybe_component)
-					new_aggregate += *maybe_component;
+				if (cloned_aggregate.has<decltype(c)>())
+					new_aggregate += cloned_aggregate.get<decltype(c)>();
 			});
 
 			new_aggregate.set_debug_name(cloned_aggregate.get_debug_name());
@@ -81,7 +76,9 @@ namespace augs {
 		}
 
 		void free_aggregate(aggregate_id aggregate) {
-			auto handle = pool_for_aggregates.get_handle(aggregate);
+			auto& self = *static_cast<derived*>(this);
+
+			auto handle = self.get_handle(aggregate);
 
 			for_each_type<components...>([&handle](auto c) {
 				handle.remove<decltype(c)>();

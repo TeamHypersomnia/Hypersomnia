@@ -12,40 +12,38 @@
 
 typedef components::fixtures F;
 
-template<bool C>
-template <class>
-void component_synchronizer<C, F>::set_owner_body(entity_id owner_id) {
+void component_synchronizer<false, F>::set_owner_body(entity_id owner_id) const {
 	auto& cosmos = handle.get_cosmos();
 	auto owner = cosmos[owner_id];
 
 	auto former_owner = cosmos[component.owner_body];
 
 	if (former_owner.alive()) {
-		remove_element(former_owner.get<components::physics>().get_data().fixture_entities, handle);
+		remove_element(former_owner.get<components::physics>().component.fixture_entities, handle.get_id());
 		cosmos.complete_resubstantialization(former_owner);
 	}
 
 	component.owner_body = owner;
 
-	remove_element(owner.get<components::physics>().get_data().fixture_entities, handle);
-	owner.get<components::physics>().get_data().fixture_entities.push_back(handle);
+	remove_element(owner.get<components::physics>().component.fixture_entities, handle.get_id());
+	owner.get<components::physics>().component.fixture_entities.push_back(handle.get_id());
 
 	cosmos.complete_resubstantialization(handle);
 }
 
 template<bool C>
-maybe_const_ref_t<C, colliders_cache>& component_synchronizer<C, F>::get_cache() const {
+maybe_const_ref_t<C, colliders_cache>& basic_fixtures_synchronizer<C>::get_cache() const {
 	auto& cosmos = handle.get_cosmos();
 	return cosmos.temporary_systems.get<physics_system>().get_colliders_cache(handle);
 }
 
 template<bool C>
-vec2 component_synchronizer<C, F>::get_aabb_size() const {
+vec2 basic_fixtures_synchronizer<C>::get_aabb_size() const {
 	return get_aabb_rect().get_size();
 }
 
 template<bool C>
-augs::rects::ltrb<float> component_synchronizer<C, F>::get_aabb_rect() const {
+augs::rects::ltrb<float> basic_fixtures_synchronizer<C>::get_aabb_rect() const {
 	b2AABB aabb;
 	aabb.lowerBound.Set(FLT_MAX, FLT_MAX);
 	aabb.upperBound.Set(-FLT_MAX, -FLT_MAX);
@@ -58,45 +56,38 @@ augs::rects::ltrb<float> component_synchronizer<C, F>::get_aabb_rect() const {
 }
 
 template<bool C>
-size_t component_synchronizer<C, F>::get_num_colliders() const {
+size_t basic_fixtures_synchronizer<C>::get_num_colliders() const {
 	return get_cache().fixtures_per_collider.size();
 }
 
 template<bool C>
-bool component_synchronizer<C, F>::is_friction_ground() const {
+bool basic_fixtures_synchronizer<C>::is_friction_ground() const {
 	return component.is_friction_ground;
 }
 
 template<bool C>
-bool component_synchronizer<C, F>::standard_collision_resolution_disabled() const {
+bool basic_fixtures_synchronizer<C>::standard_collision_resolution_disabled() const {
 	return component.disable_standard_collision_resolution;
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, F>::set_offset(colliders_offset_type t, components::transform off) {
+void component_synchronizer<false, F>::set_offset(colliders_offset_type t, components::transform off) const {
 	component.offsets_for_created_shapes[static_cast<int>(t)] = off;
 	complete_resubstantialization();
 }
 
-template<bool C>
-template <class>
-component_synchronizer<C, F>& component_synchronizer<C, F>::operator=(const F& f) {
-	return component_synchronizer_base<C, F>::operator=(f);
+component_synchronizer<false, F>& component_synchronizer<false, F>::operator=(const F& f) {
+	component_synchronizer_base<false, F>::operator=(f);
+	return *this;
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, F>::rebuild_density(size_t index) {
+void component_synchronizer<false, F>::rebuild_density(size_t index) const {
 	for (auto f : get_cache().fixtures_per_collider[index])
 		f->SetDensity(component.colliders[index].density * component.colliders[index].density_multiplier);
 
 	get_cache().fixtures_per_collider[0][0]->GetBody()->ResetMassData();
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, F>::set_density(float d, size_t index) {
+void component_synchronizer<false, F>::set_density(float d, size_t index) const {
 	component.colliders[index].density = d;
 
 	if (!is_constructed())
@@ -105,9 +96,7 @@ void component_synchronizer<C, F>::set_density(float d, size_t index) {
 	rebuild_density(index);
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, F>::set_density_multiplier(float mult, size_t index) {
+void component_synchronizer<false, F>::set_density_multiplier(float mult, size_t index) const {
 	component.colliders[index].density_multiplier = mult;
 
 	if (!is_constructed())
@@ -116,16 +105,12 @@ void component_synchronizer<C, F>::set_density_multiplier(float mult, size_t ind
 	rebuild_density(index);
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, F>::set_activated(bool flag) {
+void component_synchronizer<false, F>::set_activated(bool flag) const {
 	component.activated = flag;
 	complete_resubstantialization();
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, F>::set_friction(float fr, size_t index) {
+void component_synchronizer<false, F>::set_friction(float fr, size_t index) const {
 	component.colliders[index].friction = fr;
 
 	if (!is_constructed())
@@ -135,9 +120,7 @@ void component_synchronizer<C, F>::set_friction(float fr, size_t index) {
 		f->SetFriction(fr);
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, F>::set_restitution(float r, size_t index) {
+void component_synchronizer<false, F>::set_restitution(float r, size_t index) const {
 	component.colliders[index].restitution = r;
 
 	if (!is_constructed())
@@ -148,49 +131,49 @@ void component_synchronizer<C, F>::set_restitution(float r, size_t index) {
 }
 
 template<bool C>
-float component_synchronizer<C, F>::get_friction(size_t index) const {
+float basic_fixtures_synchronizer<C>::get_friction(size_t index) const {
 	return component.colliders[index].friction;
 }
 
 template<bool C>
-float component_synchronizer<C, F>::get_restitution(size_t index) const {
+float basic_fixtures_synchronizer<C>::get_restitution(size_t index) const {
 	return component.colliders[index].restitution;
 }
 
 template<bool C>
-float component_synchronizer<C, F>::get_density(size_t index) const {
+float basic_fixtures_synchronizer<C>::get_density(size_t index) const {
 	return component.colliders[index].density;
 }
 
 template<bool C>
-float component_synchronizer<C, F>::get_density_multiplier(size_t index) const {
+float basic_fixtures_synchronizer<C>::get_density_multiplier(size_t index) const {
 	return component.colliders[index].density_multiplier;
 }
 
 template<bool C>
-bool component_synchronizer<C, F>::is_activated() const {
+bool basic_fixtures_synchronizer<C>::is_activated() const {
 	return component.activated;
 }
 
 template<bool C>
-bool component_synchronizer<C, F>::is_constructed() const {
+bool basic_fixtures_synchronizer<C>::is_constructed() const {
 	return handle.get_cosmos().temporary_systems.get<physics_system>().is_constructed_colliders(handle);
 }
 
 template<bool C>
-basic_entity_handle<C> component_synchronizer<C, F>::get_owner_body() const {
+basic_entity_handle<C> basic_fixtures_synchronizer<C>::get_owner_body() const {
 	return handle.get_cosmos()[component.owner_body];
 }
 
 template<bool C>
-components::transform component_synchronizer<C, F>::get_offset(colliders_offset_type t) const {
+components::transform basic_fixtures_synchronizer<C>::get_offset(colliders_offset_type t) const {
 	component.offsets_for_created_shapes[static_cast<int>(t)];
 }
 
 template<bool C>
-components::transform component_synchronizer<C, F>::get_total_offset() const {
+components::transform basic_fixtures_synchronizer<C>::get_total_offset() const {
 	return std::accumulate(component.offsets_for_created_shapes.begin(), component.offsets_for_created_shapes.end(), components::transform());
 }
 
-template class component_synchronizer<false, F>;
-template class component_synchronizer<true, F>;
+template class basic_fixtures_synchronizer<false>;
+template class basic_fixtures_synchronizer<true>;

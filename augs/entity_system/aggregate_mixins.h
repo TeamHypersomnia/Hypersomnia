@@ -1,6 +1,7 @@
 #pragma once
 #include "misc/pool_handle.h"
 #include "component_aggregate.h"
+#include "ensure.h"
 
 namespace augs {
 	template<bool is_const, class derived>
@@ -64,7 +65,7 @@ namespace augs {
 
 		template<class component,
 			class = std::enable_if_t<!is_const>>
-			component& add(const component& c) const {
+			void add(const component& c) const {
 			auto& self = *static_cast<const derived*>(this);
 			ensure(!has<component>());
 			self.get().writable_id<component>() = self.owner.get_pool(pool_id<component>()).allocate(c);

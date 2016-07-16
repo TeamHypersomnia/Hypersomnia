@@ -4,6 +4,7 @@
 
 namespace augs {
 	namespace window {
+		/*
 		void set_clipboard_data(std::wstring from) {
 			if (OpenClipboard(0)) {
 				if (EmptyClipboard()) {
@@ -25,11 +26,11 @@ namespace augs {
 				}
 			}
 		}
-
+		*/
 		bool is_character_newline(unsigned i) {
 			return (i == 0x000A || i == 0x000D);
 		}
-
+		/*
 		std::wstring get_data_from_clipboard() {
 			std::wstring result;
 
@@ -59,7 +60,7 @@ namespace augs {
 			}
 
 			return result;
-		}
+		}*/
 
 		std::wstring get_executable_path() {
 			wchar_t buffer[MAX_PATH + 1];

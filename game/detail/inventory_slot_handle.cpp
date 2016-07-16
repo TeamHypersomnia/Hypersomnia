@@ -182,7 +182,7 @@ typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot
 
 template <bool C>
 unsigned basic_inventory_slot_handle<C>::calculate_free_space_with_parent_containers() const {
-	auto maximum_space = get().calculate_free_space_with_children();
+	auto maximum_space = calculate_free_space_with_children();
 
 	auto* maybe_item = get_handle().find<components::item>();
 
@@ -229,7 +229,7 @@ basic_inventory_slot_handle<C>::operator inventory_slot_id() const {
 
 template <bool C>
 basic_inventory_slot_handle<C>::operator basic_inventory_slot_handle<true>() const {
-	return basic_inventory_slot_handle(owner, raw_id);
+	return basic_inventory_slot_handle<true>(owner, raw_id);
 }
 
 template <bool C>

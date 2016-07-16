@@ -15,6 +15,4 @@ class render_system {
 public:
 	void draw_entities(augs::vertex_triangle_buffer& output, std::vector<const_entity_handle>, state_for_drawing_camera in, bool only_border_highlights = false) const;
 	std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> get_visible_per_layer(std::vector<const_entity_handle>) const;
-
-	std::vector<render_layer> layers_whose_order_determines_friction;
 };

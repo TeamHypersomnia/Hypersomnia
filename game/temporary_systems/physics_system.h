@@ -35,6 +35,8 @@ class physics_system {
 	friend class component_synchronizer<true, components::physics>;
 	friend class component_synchronizer<false, components::fixtures>;
 	friend class component_synchronizer<true, components::fixtures>;
+	template<bool> friend class basic_physics_synchronizer;
+	template<bool> friend class basic_fixtures_synchronizer;
 
 	bool is_constructed_rigid_body(const_entity_handle) const;
 	bool is_constructed_colliders(const_entity_handle) const;

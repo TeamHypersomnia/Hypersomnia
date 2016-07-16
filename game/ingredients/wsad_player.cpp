@@ -22,6 +22,7 @@
 #include "game/components/sentience_component.h"
 #include "game/components/particle_effect_response_component.h"
 #include "game/components/attitude_component.h"
+#include "game/components/dynamic_tree_node_component.h"
 #include "game/assets/particle_effect_response_id.h"
 
 #include "game/enums/filters.h"

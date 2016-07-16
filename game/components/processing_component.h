@@ -16,20 +16,26 @@ namespace components {
 }
 
 template<bool is_const>
-class component_synchronizer<is_const, components::processing> : public component_synchronizer_base<is_const, components::processing> {
+class basic_processing_synchronizer : public component_synchronizer_base<is_const, components::processing> {
 public:
 	using component_synchronizer_base<is_const, components::processing>::component_synchronizer_base;
 
 	bool is_in(processing_subjects) const;
-
-	template<class = std::enable_if_t<!is_const>>
-	void disable_in(processing_subjects) const;
-	
-	template<class = std::enable_if_t<!is_const>>
-	void enable_in(processing_subjects) const;
-
 	components::processing::bitset_type get_disabled_categories() const;
+};
 
-	template<class = std::enable_if_t<!is_const>>
+template<>
+class component_synchronizer<false, components::processing> : public basic_processing_synchronizer<false> {
+public:
+	using basic_processing_synchronizer<false>::basic_processing_synchronizer;
+
+	void disable_in(processing_subjects) const;
+	void enable_in(processing_subjects) const;
 	void set_disabled_categories(components::processing::bitset_type) const;
+};
+
+template<>
+class component_synchronizer<true, components::processing> : public basic_processing_synchronizer<true> {
+public:
+	using basic_processing_synchronizer<true>::basic_processing_synchronizer;
 };

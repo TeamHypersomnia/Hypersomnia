@@ -1,5 +1,6 @@
 #include "middlescrolling.h"
 #include "misc/pool.h"
+#include "rect_world.h"
 
 namespace augs {
 	namespace gui {
@@ -27,7 +28,7 @@ namespace augs {
 			if (r.alive()) {
 				rects::ltrb<float> scroller = rects::wh<float>(size);
 				scroller.center(pos);
-				gui::draw_clipped_rectangle(mat, scroller, &r.get(), in.v);
+				draw_clipped_rectangle(mat, scroller, r.get(), in.v);
 			}
 		}
 	}

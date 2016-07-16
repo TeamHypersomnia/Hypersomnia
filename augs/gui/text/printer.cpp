@@ -5,6 +5,7 @@
 #include "printer.h"
 #include "gui/rect.h"
 #include "window_framework/window.h"
+#include "gui/rect_handle.h"
 
 #undef min
 #undef max
@@ -49,7 +50,7 @@ namespace augs {
 				caret_visible = true;
 			}
 
-			void printer::draw_text(std::vector<augs::vertex_triangle>& out, ui& u, const rect& parent) const {
+			void printer::draw_text(std::vector<augs::vertex_triangle>& out, ui& u, const_rect_handle parent) const {
 				draw_text(out, u.get_draft(), u.get_str(), &u.caret, parent);
 			}
 
@@ -57,15 +58,15 @@ namespace augs {
 				const drafter& d,
 				const fstr& colors,
 				const caret_info* caret,
-				const rect& subject
+				const_rect_handle subject
 				) const
 			{
 				/* note that parent's scroll is already taken into account by absolute_xy */
-				if (subject.get_parent() == nullptr) 
-					draw_text(out, d, colors, caret, subject.get_absolute_xy() - subject.scroll, nullptr);
+				if (subject.get_parent().dead()) 
+					draw_text(out, d, colors, caret, subject.get().get_absolute_xy() - subject.get().scroll, rects::ltrb<float>());
 				else {
-					auto clipping_rect = subject.clip ? subject.get_clipping_rect() : subject.get_parent()->get_clipping_rect();
-					draw_text(out, d, colors, caret, subject.get_absolute_xy() - subject.scroll, &clipping_rect);
+					auto clipping_rect = subject.get().clip ? subject.get().get_clipping_rect() : subject.get_parent().get().get_clipping_rect();
+					draw_text(out, d, colors, caret, subject.get().get_absolute_xy() - subject.get().scroll, clipping_rect);
 				}
 			}
 			void printer::draw_text(std::vector<augs::vertex_triangle>& out,
@@ -73,14 +74,14 @@ namespace augs {
 				const fstr& colors,
 				const caret_info* caret,
 				vec2i pos,
-				const rects::ltrb<float>* clipper
+				rects::ltrb<float> clipper
 				) const
 			{
 				/* shortcuts */
 				auto& lines = d.lines;
 				auto& sectors = d.sectors;
 				auto& v = out;
-				bool clip = clipper != nullptr;
+				bool clip = clipper.good();
 
 				//if(clip) 
 				//	pos = vec2i(*parent);
@@ -90,14 +91,10 @@ namespace augs {
 				/* we'll draw caret at the very end of procedure so we have to declare this variable here */
 				rects::xywh<float> caret_rect(0, 0, 0, 0);
 
-				/* validations */
-				/* return if we want to clip but the clipper is not a valid rectangle */
-				if (clip && !clipper->good()) return;
-
 				/* here we highlight the line caret is currently on */
 				if (caret && active && highlight_current_line) {
 					drafter::line highlighted = lines.size() ? lines[d.get_line(caret->pos)] : drafter::line();
-					gui::draw_clipped_rectangle(highlight_mat, rects::xywh<float>(0, highlighted.top, clipper ? d.get_bbox().w + clipper->w() : d.get_bbox().w,
+					gui::draw_clipped_rectangle(highlight_mat, rects::xywh<float>(0, highlighted.top, clip ? d.get_bbox().w + clipper.w() : d.get_bbox().w,
 
 						/* snap to default style's height */
 						highlighted.empty() ? (*(caret->default_style.f)).get_height()
@@ -109,7 +106,7 @@ namespace augs {
 					std::pair<int, int> visible;
 
 					if (clip)
-						visible = d.get_line_visibility(*clipper - pos);
+						visible = d.get_line_visibility(clipper - pos);
 					else visible = std::make_pair(0, lines.size() - 1);
 
 					/* if this happens:
@@ -224,7 +221,7 @@ namespace augs {
 				const fstr& str,
 				vec2i pos,
 				unsigned wrapping_width,
-				const rects::ltrb<float>* clipper)
+				rects::ltrb<float> clipper)
 			{
 				drafter dr;
 				printer pr;
@@ -239,7 +236,7 @@ namespace augs {
 				gui::text::style style,
 				vec2i pos,
 				unsigned wrapping_width,
-				const rects::ltrb<float>* clipper)
+				rects::ltrb<float> clipper)
 			{
 				fstr str = format(wstr.c_str(), style);
 				drafter dr;

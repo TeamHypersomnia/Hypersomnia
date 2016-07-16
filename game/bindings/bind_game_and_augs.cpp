@@ -1,12 +1,12 @@
 #pragma once
 #include "stdafx.h"
-#include "bindings/bindings.h"
+#include "bindings.h"
 
 #include "misc/vector_wrapper.h"
 
-#include "bindings/bind_game_and_augs.h"
+#include "game/bindings/bind_game_and_augs.h"
 #include "augs/scripting/script.h"
-#include "components/physics_component.h"
+#include "game/components/physics_component.h"
 
 #include "game/entity_id.h"
 #include "augs/scripting/lua_state_wrapper.h"
@@ -93,7 +93,7 @@ void bind_game_and_augs(augs::lua_state_wrapper& wrapper) {
 			bind_vector_wrapper<int>("int_vector"),
 			bind_vector_wrapper<float>("float_vector"),
 			
-			bindings::_id_generator(),
+			//bindings::_id_generator(),
 			bindings::_minmax(),
 			bindings::_value_animator(),
 			//bindings::_b2Filter(),
@@ -125,7 +125,7 @@ void bind_game_and_augs(augs::lua_state_wrapper& wrapper) {
 			bindings::_opengl_binding(),
 
 			luabind::def("clamp", &augs::get_clamp<float>),
-			bindings::_random_binding(),
+			//bindings::_random_binding(),
 
 			luabind::def("open_editor", lua_state_wrapper::open_editor),
 			//luabind::def("get_meters_to_pixels", get_meters_to_pixels),
@@ -138,7 +138,7 @@ void bind_game_and_augs(augs::lua_state_wrapper& wrapper) {
 
 			bindings::_file_watcher(),
 
-			bindings::_text(),
+			//bindings::_text(),
 
 			bindings::_timer(),
 			bindings::_utilities(),

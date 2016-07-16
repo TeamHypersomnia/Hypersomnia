@@ -39,7 +39,7 @@ namespace augs {
 
 				printer();
 
-				void draw_text(std::vector<augs::vertex_triangle>& out, ui&, const rect& parent) const;
+				void draw_text(std::vector<augs::vertex_triangle>& out, ui&, const_rect_handle parent) const;
 
 				void draw_text(
 					std::vector<augs::vertex_triangle>& out,
@@ -47,7 +47,7 @@ namespace augs {
 					const fstr& colors,
 					/* if caret is 0, draw no caret */
 					const caret_info* caret,
-					const rect& parent
+					const_rect_handle parent
 					) const;
 
 				void draw_text(
@@ -56,8 +56,8 @@ namespace augs {
 					const fstr& colors,
 					/* if caret is 0, draw no caret */
 					const caret_info* caret,
-					vec2i scroll,
-					const rects::ltrb<float>* parent = 0) const;
+					vec2i pos,
+					rects::ltrb<float> clipper) const;
 			};
 
 			/*
@@ -72,14 +72,14 @@ namespace augs {
 				const fstr& str,
 				vec2i pos,
 				unsigned wrapping_width = 0,
-				const rects::ltrb<float>* parent = 0);
+				rects::ltrb<float> clipper = rects::ltrb<float>());
 
 			extern rects::wh<float> quick_print_format(std::vector<augs::vertex_triangle>& v,
 				const std::wstring& wstr,
 				style style,
 				vec2i pos,
 				unsigned wrapping_width = 0,
-				const rects::ltrb<float>* parent = 0);
+				rects::ltrb<float> clipper = rects::ltrb<float>());
 		}
 	}
 }

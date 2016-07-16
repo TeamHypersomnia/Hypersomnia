@@ -4,5 +4,6 @@
 namespace augs {
 	machine_entropy& machine_entropy::operator+=(const machine_entropy& b) {
 		local.insert(local.end(), b.local.begin(), b.local.end());
+		return *this;
 	}
 }

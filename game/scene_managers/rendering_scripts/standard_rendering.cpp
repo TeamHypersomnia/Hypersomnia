@@ -89,33 +89,33 @@ namespace rendering_scripts {
 		
 		}
 
-		for (auto it : cosmos.get(processing_subjects::WITH_INPUT_RECEIVER)) {
-			if (it.get<components::input_receiver>().local && it.has<components::gui_element>()) {
-				auto& gui = it.get<components::gui_element>();
-
-				auto textual_infos = gui.hud.draw_circular_bars_and_get_textual_info(step);
-
-				renderer.call_triangles();
-				renderer.clear_triangles();
-
-				default_shader.use();
-
-				renderer.call_triangles(textual_infos);
-
-				default_highlight_shader.use();
-
-				gui.hud.draw_pure_color_highlights(step);
-
-				renderer.call_triangles();
-				renderer.clear_triangles();
-
-				default_shader.use();
-
-				gui.hud.draw_vertically_flying_numbers(step);
-
-				gui.draw_complete_gui_for_camera_rendering_request(step);
-			}
-		}
+		//for (auto it : cosmos.get(processing_subjects::WITH_INPUT_RECEIVER)) {
+		//	if (it.get<components::input_receiver>().local && it.has<components::gui_element>()) {
+		//		auto& gui = it.get<components::gui_element>();
+		//
+		//		auto textual_infos = gui.hud.draw_circular_bars_and_get_textual_info(step);
+		//
+		//		renderer.call_triangles();
+		//		renderer.clear_triangles();
+		//
+		//		default_shader.use();
+		//
+		//		renderer.call_triangles(textual_infos);
+		//
+		//		default_highlight_shader.use();
+		//
+		//		gui.hud.draw_pure_color_highlights(step);
+		//
+		//		renderer.call_triangles();
+		//		renderer.clear_triangles();
+		//
+		//		default_shader.use();
+		//
+		//		gui.hud.draw_vertically_flying_numbers(step);
+		//
+		//		gui.draw_complete_gui_for_camera_rendering_request(step);
+		//	}
+		//}
 
 		resource_manager.find(assets::atlas_id::GAME_WORLD_ATLAS)->bind();
 

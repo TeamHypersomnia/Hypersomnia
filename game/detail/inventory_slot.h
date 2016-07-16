@@ -35,6 +35,4 @@ struct inventory_slot {
 	components::transform attachment_offset;
 
 	std::vector<entity_id> items_inside;
-
-	unsigned calculate_free_space_with_children() const;
 };

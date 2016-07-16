@@ -12,7 +12,7 @@ protected:
 	component_reference component;
 	basic_entity_handle<is_const> handle;
 
-	void complete_resubstantialization() {
+	void complete_resubstantialization() const {
 		handle.get_cosmos().complete_resubstantialization(handle);
 	}
 

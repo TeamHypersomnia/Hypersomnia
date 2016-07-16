@@ -3,6 +3,7 @@
 #include "game/assets/texture_id.h"
 #include "transform_component.h"
 #include "graphics/pixel.h"
+#include "graphics/vertex.h"
 
 namespace augs {
 	class texture;

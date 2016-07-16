@@ -7,9 +7,9 @@ class recoil_player {
 	int delta_offset = 0;
 public:
 	std::vector<vec2> offsets;
-	int current_offset = 0;
+	unsigned current_offset = 0;
 	bool reversed = false;
-	int repeat_last_n_offsets = 5;
+	unsigned repeat_last_n_offsets = 5;
 
 	double single_cooldown_duration_ms = 50.0;
 	double remaining_cooldown_duration = -1.0;

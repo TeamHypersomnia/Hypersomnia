@@ -13,6 +13,7 @@
 #include "game/entity_id.h"
 
 #include "game/detail/inventory_slot_id.h"
+#include "game/detail/inventory_slot_handle.h"
 
 #include "game/entity_handle.h"
 #include "game/step.h"

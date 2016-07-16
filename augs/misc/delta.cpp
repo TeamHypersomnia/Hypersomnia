@@ -19,7 +19,9 @@ namespace augs {
 	}
 	
 	stepped_timestamp fixed_delta::get_timestamp() const {
-
+		stepped_timestamp result;
+		result.step = total_steps_passed;
+		return result;
 	}
 
 	double variable_delta::in_seconds() const {

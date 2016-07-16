@@ -11,8 +11,8 @@ namespace augs {
 			for (auto& c : coloured_str)
 				c.set(c.font_used, col);
 
-			print.draw_text(v, draft.get_draft(), coloured_str, nullptr, pos + vec2(-1, 0), nullptr);
-			print.draw_text(v, draft.get_draft(), coloured_str, nullptr, pos + vec2(1, 0), nullptr);
+			print.draw_text(v, draft.get_draft(), coloured_str, nullptr, pos + vec2(-1, 0));
+			print.draw_text(v, draft.get_draft(), coloured_str, nullptr, pos + vec2(1, 0));
 			print.draw_text(v, draft.get_draft(), coloured_str, nullptr, pos + vec2(0, -1), nullptr);
 			print.draw_text(v, draft.get_draft(), coloured_str, nullptr, pos + vec2(0, 1), nullptr);
 

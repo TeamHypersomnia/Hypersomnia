@@ -82,36 +82,29 @@ P P::get_default(const_entity_handle id) {
 }
 
 template<bool C>
-bool component_synchronizer<C, P>::is_in(processing_subjects list) const {
+bool basic_processing_synchronizer<C>::is_in(processing_subjects list) const {
 	return component.processing_subject_categories.test(int(list)) && !component.disabled_categories.test(int(list));
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, P>::disable_in(processing_subjects list) const {
+void component_synchronizer<false, P>::disable_in(processing_subjects list) const {
 	component.disabled_categories.set(int(list), 0);
 	complete_resubstantialization();
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, P>::enable_in(processing_subjects list) const {
+void component_synchronizer<false, P>::enable_in(processing_subjects list) const {
 	component.disabled_categories.set(int(list), 1);
 	complete_resubstantialization();
 }
 
-
 template<bool C>
-P::bitset_type component_synchronizer<C, P>::get_disabled_categories() const {
+P::bitset_type basic_processing_synchronizer<C>::get_disabled_categories() const {
 	return component.disabled_categories;
 }
 
-template<bool C>
-template <class>
-void component_synchronizer<C, P>::set_disabled_categories(P::bitset_type categories) const {
+void component_synchronizer<false, P>::set_disabled_categories(P::bitset_type categories) const {
 	component.disabled_categories = categories;
 	complete_resubstantialization();
 }
 
-template class component_synchronizer<false, P>;
-template class component_synchronizer<true, P>;
+template class basic_processing_synchronizer<false>;
+template class basic_processing_synchronizer<true>;

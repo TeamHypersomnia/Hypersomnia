@@ -102,7 +102,7 @@ namespace augs {
 		}
 
 		bool free(id_type object) {
-			return internal_free(object, []() {});
+			return internal_free(object, [](auto...){});
 		}
 
 	public:

@@ -38,7 +38,6 @@ namespace ingredients {
 	void inject_window_input_to_character(entity_handle target_character, entity_handle camera_entity);
 
 	void make_always_visible(entity_handle);
-	void cancel_always_visible(entity_handle);
 
 	void character_inventory(entity_handle);
 	void backpack(entity_handle);

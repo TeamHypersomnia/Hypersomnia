@@ -9,6 +9,8 @@ extern double PIXELS_TO_METERS;
 extern float METERS_TO_PIXELSf;
 extern float PIXELS_TO_METERSf;
 
+template<bool> class basic_physics_synchronizer;
+
 namespace components {
 	struct physics {
 	private:
@@ -16,6 +18,8 @@ namespace components {
 		friend class component_synchronizer<false, components::fixtures>;
 		friend class component_synchronizer<true, components::physics>;
 		friend class component_synchronizer<false, components::physics>;
+		template<bool> friend class ::basic_physics_synchronizer;
+
 	public:
 		components::transform transform;
 
@@ -49,47 +53,18 @@ class physics_system;
 struct rigid_body_cache;
 
 template<bool is_const>
-class component_synchronizer<is_const, components::physics> : public component_synchronizer_base<is_const, components::physics> {
+class basic_physics_synchronizer : public component_synchronizer_base<is_const, components::physics> {
+protected:
 	friend class ::physics_system;
 	friend class component_synchronizer<is_const, components::fixtures>;
+	template<bool> friend class basic_fixtures_synchronizer;
 
 	maybe_const_ref_t<is_const, rigid_body_cache>& get_cache() const;
 public:
 	using component_synchronizer_base<is_const, components::physics>::component_synchronizer_base;
 
-	template <class = std::enable_if_t<!is_const>>
-	void set_body_type(components::physics::type);
-
-	template <class = std::enable_if_t<!is_const>>
-	void set_activated(bool);
-
 	bool is_activated() const;
 	bool is_constructed() const;
-
-	template <class = std::enable_if_t<!is_const>>
-	void set_velocity(vec2);
-	template <class = std::enable_if_t<!is_const>>
-	void set_transform(components::transform);
-	template <class = std::enable_if_t<!is_const>>
-	void set_transform(entity_id);
-
-	template <class = std::enable_if_t<!is_const>>
-	void set_angular_damping(float);
-	template <class = std::enable_if_t<!is_const>>
-	void set_linear_damping(float);
-	template <class = std::enable_if_t<!is_const>>
-	void set_linear_damping_vec(vec2);
-
-	template <class = std::enable_if_t<!is_const>>
-	void apply_force(vec2);
-	template <class = std::enable_if_t<!is_const>>
-	void apply_force(vec2, vec2 center_offset, bool wake = true);
-	template <class = std::enable_if_t<!is_const>>
-	void apply_impulse(vec2);
-	template <class = std::enable_if_t<!is_const>>
-	void apply_impulse(vec2, vec2 center_offset, bool wake = true);
-	template <class = std::enable_if_t<!is_const>>
-	void apply_angular_impulse(float);
 
 	vec2 velocity() const;
 	float get_mass() const;
@@ -103,7 +78,34 @@ public:
 
 	components::physics::type get_body_type() const;
 
-	const std::vector<basic_entity_handle<is_const>>& get_fixture_entities() const;
+	std::vector<basic_entity_handle<is_const>> get_fixture_entities() const;
 
 	bool test_point(vec2) const;
+};
+
+template<>
+class component_synchronizer<false, components::physics> : public basic_physics_synchronizer<false> {
+public:
+	using basic_physics_synchronizer<false>::basic_physics_synchronizer;
+
+	void set_body_type(components::physics::type) const;
+	void set_activated(bool) const;
+	void set_velocity(vec2) const;
+	void set_transform(components::transform) const;
+	void set_transform(entity_id) const;
+	void set_angular_damping(float) const;
+	void set_linear_damping(float) const;
+	void set_linear_damping_vec(vec2) const;
+
+	void apply_force(vec2) const;
+	void apply_force(vec2, vec2 center_offset, bool wake = true) const;
+	void apply_impulse(vec2) const;
+	void apply_impulse(vec2, vec2 center_offset, bool wake = true) const;
+	void apply_angular_impulse(float) const;
+};
+
+template<>
+class component_synchronizer<true, components::physics> : public basic_physics_synchronizer<true> {
+public:
+	using basic_physics_synchronizer<true>::basic_physics_synchronizer;
 };
