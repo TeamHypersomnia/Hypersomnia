@@ -81,11 +81,8 @@ void physics_system::destruct(entity_handle handle) {
 	}
 }
 
-void physics_system::construct(entity_handle handle) {
-	ensure(!is_constructed_rigid_body(handle));
+void physics_system::fixtures_construct(entity_handle handle) {
 	ensure(!is_constructed_colliders(handle));
-	
-	contact_listener listener(handle.get_cosmos());
 
 	if (handle.has<components::fixtures>()) {
 		auto& colliders = handle.get<components::fixtures>();
@@ -135,6 +132,14 @@ void physics_system::construct(entity_handle handle) {
 			}
 		}
 	}
+}
+
+void physics_system::construct(entity_handle handle) {
+	ensure(!is_constructed_rigid_body(handle));
+	
+	contact_listener listener(handle.get_cosmos());
+
+	fixtures_construct(handle);
 
 	if (handle.has<components::physics>()) {
 		auto& physics = handle.get<components::physics>();
@@ -162,7 +167,7 @@ void physics_system::construct(entity_handle handle) {
 			cache.body->SetAngledDampingEnabled(physics_data.angled_damping);
 
 			for (auto& f : physics.get_fixture_entities())
-				construct(f);
+				fixtures_construct(f);
 		}
 	}
 }

@@ -33,6 +33,10 @@ void remove_element(std::vector<T>& v, const T& l) {
 	v.erase(std::remove(v.begin(), v.end(), l), v.end());
 }
 
+template<class T>
+bool found_in(std::vector<T>& v, const T& l) {
+	return std::find(v.begin(), v.end(), l) != v.end();
+}
 /* number to string conversion */
 
 template <class T>

@@ -14,21 +14,25 @@ typedef components::fixtures F;
 
 void component_synchronizer<false, F>::set_owner_body(entity_id owner_id) const {
 	auto& cosmos = handle.get_cosmos();
-	auto owner = cosmos[owner_id];
+	auto new_owner = cosmos[owner_id];
+	auto this_id = handle.get_id();
 
 	auto former_owner = cosmos[component.owner_body];
 
 	if (former_owner.alive()) {
-		remove_element(former_owner.get<components::physics>().component.fixture_entities, handle.get_id());
+		remove_element(former_owner.get<components::physics>().component.fixture_entities, this_id);
 		cosmos.complete_resubstantialization(former_owner);
 	}
 
-	component.owner_body = owner;
+	component.owner_body = new_owner;
 
-	remove_element(owner.get<components::physics>().component.fixture_entities, handle.get_id());
-	owner.get<components::physics>().component.fixture_entities.push_back(handle.get_id());
-
-	cosmos.complete_resubstantialization(handle);
+	if (new_owner.alive()) {
+		remove_element(new_owner.get<components::physics>().component.fixture_entities, this_id);
+		new_owner.get<components::physics>().component.fixture_entities.push_back(this_id);
+		cosmos.complete_resubstantialization(new_owner);
+	}
+	else
+		cosmos.complete_resubstantialization(handle);
 }
 
 template<bool C>

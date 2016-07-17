@@ -68,6 +68,7 @@ namespace ingredients {
 		e += body;
 		e += special;
 		e += colliders;
+		e.get<components::fixtures>().set_owner_body(e);
 	}
 
 	void wsad_character_legs(entity_handle legs, entity_handle player) {
@@ -219,6 +220,7 @@ namespace ingredients {
 
 		e += body;
 		e += colliders;
+		e.get<components::fixtures>().set_owner_body(e);
 	}
 
 	void inject_window_input_to_character(entity_handle next_character, entity_handle camera) {
@@ -329,6 +331,10 @@ namespace prefabs {
 			//force_joint.force_towards_chased_entity = 1000.f;
 			//force_joint.power_of_force_easing_multiplier = 1.f;
 			force_joint.divide_transform_mode = true;
+
+			recoil += body;
+			recoil += colliders;
+			recoil.get<components::fixtures>().set_owner_body(recoil);
 		}
 
 		root.map_sub_entity(sub_entity_name::CROSSHAIR_RECOIL_BODY, recoil);
