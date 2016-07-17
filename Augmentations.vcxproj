@@ -361,6 +361,7 @@
     <ClCompile Include="augs\gui\rect_handle.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
     <ClCompile Include="augs\misc\pool_id.cpp" />
+    <ClCompile Include="augs\misc\time_utils.cpp" />
     <ClCompile Include="game\cosmic_entropy.cpp" />
     <ClCompile Include="game\components\dynamic_tree_node_component.cpp" />
     <ClCompile Include="game\components\processing_component.cpp" />
@@ -525,7 +526,6 @@
     <ClCompile Include="augs\misc\fixed_delta_timer.cpp" />
     <ClCompile Include="augs\misc\randomization.cpp" />
     <ClCompile Include="augs\misc\smooth_value_field.cpp" />
-    <ClCompile Include="augs\misc\time.cpp" />
     <ClCompile Include="augs\misc\timer.cpp" />
     <ClCompile Include="augs\misc\value_animator.cpp" />
     <ClCompile Include="augs\misc\vector_wrapper.cpp" />
@@ -1006,6 +1006,7 @@
     <ClInclude Include="augs\misc\pool_handlizer.h" />
     <ClInclude Include="augs\misc\stepped_timing.h" />
     <ClInclude Include="augs\misc\entropy_unpacker_and_recorder.h" />
+    <ClInclude Include="augs\misc\time_utils.h" />
     <ClInclude Include="game\cosmic_entropy.h" />
     <ClInclude Include="augs\misc\measurements.h" />
     <ClInclude Include="augs\misc\pool_handle.h" />
@@ -1230,7 +1231,6 @@
     <ClInclude Include="augs\misc\smooth_value_field.h" />
     <ClInclude Include="augs\misc\step_player.h" />
     <ClInclude Include="augs\misc\stream.h" />
-    <ClInclude Include="augs\misc\time.h" />
     <ClInclude Include="augs\misc\timer.h" />
     <ClInclude Include="augs\misc\undoredo.h" />
     <ClInclude Include="augs\misc\value_animator.h" />

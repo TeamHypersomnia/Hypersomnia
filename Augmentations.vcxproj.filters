@@ -828,9 +828,6 @@
     <ClCompile Include="augs\misc\smooth_value_field.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="augs\misc\time.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="augs\misc\timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1231,6 +1228,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="augs\misc\pool_id.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\misc\time_utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2741,9 +2741,6 @@
     <ClInclude Include="augs\misc\stream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\misc\time.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\misc\timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3351,6 +3348,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\types_specification\all_messages_includes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\time_utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
