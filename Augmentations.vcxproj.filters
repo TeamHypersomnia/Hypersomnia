@@ -825,9 +825,6 @@
     <ClCompile Include="augs\misc\value_animator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="augs\misc\vector_wrapper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="augs\network\network_interface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1023,22 +1020,7 @@
     <ClCompile Include="game\bindings\bind_game_and_augs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\bindings\classes\world_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\classes\value_animator_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\bindings\classes\vec2_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\classes\utilities_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\classes\timer_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\classes\script_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\bindings\classes\rgba_binding.cpp">
@@ -1048,12 +1030,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\bindings\classes\rect_ltrb_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\classes\opengl_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\classes\minmax_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\bindings\classes\glwindow_binding.cpp">
@@ -2597,9 +2573,6 @@
     <ClInclude Include="game\bindings\bindings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\bindings\bind_callbacks.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\messages\crosshair_intent_message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2724,9 +2697,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\value_animator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\misc\vector_wrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\network\bitstream_wrapper.h">
