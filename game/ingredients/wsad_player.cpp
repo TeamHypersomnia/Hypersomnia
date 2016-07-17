@@ -92,6 +92,7 @@ namespace ingredients {
 		e += components::position_copying(); // used when it is an astral body
 		auto& particle_response = e += components::particle_effect_response({ assets::particle_effect_response_id::CHARACTER_RESPONSE });
 		auto& attitude = e += components::attitude();
+		auto& processing = e += components::processing();
 
 		e += components::gui_element();
 		e += components::input_receiver();
@@ -167,7 +168,7 @@ namespace ingredients {
 		sentience.health.value = 100.0;
 		sentience.health.maximum = 100.0;
 
-		e.get<components::processing>().disable_in(processing_subjects::WITH_FORCE_JOINT);
+		processing.disable_in(processing_subjects::WITH_FORCE_JOINT);
 
 		detector.spam_trigger_requests_when_detection_intented = true;
 

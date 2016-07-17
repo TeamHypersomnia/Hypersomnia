@@ -23,8 +23,17 @@ void augs::basic_handle<C, O, N>::add_standard_components() {
 	if (has<components::physics>() && !has<components::special_physics>())
 		add(components::special_physics());
 
-	add(components::processing::get_default(*this));
-	add(components::substance());
+	auto default_processing = components::processing::get_default(*this);
+
+	if (!has<components::processing>()) {
+		add(default_processing);
+	}
+	else {
+		get<components::processing>().set_basic_categories(default_processing.get_basic_categories());
+	}
+	
+	if (!has<components::substance>())
+		add(components::substance());
 }
 
 // explicit instantiation
