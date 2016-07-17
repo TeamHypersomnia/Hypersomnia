@@ -269,6 +269,7 @@ namespace prefabs {
 
 		character.map_sub_entity(sub_entity_name::CORPSE_OF_SENTIENCE, corpse_of_sentience);
 
+		character.add_standard_components();
 		return character;
 	}
 
@@ -331,6 +332,10 @@ namespace prefabs {
 		}
 
 		root.map_sub_entity(sub_entity_name::CROSSHAIR_RECOIL_BODY, recoil);
+		
+		root.add_standard_components();
+		recoil.add_standard_components();
+		zero_target.add_standard_components();
 
 		return root;
 	}
