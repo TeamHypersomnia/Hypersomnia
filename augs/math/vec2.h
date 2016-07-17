@@ -130,6 +130,7 @@ namespace augs {
 template <class type>
 struct vec2t {
 	type x, y;
+	typedef float real;
 
 	void reset() {
 		x = static_cast<type>(0);
@@ -163,7 +164,7 @@ struct vec2t {
 	}
 
 	static bool segment_in_segment(vec2t smaller_p1, vec2t smaller_p2, vec2t bigger_p1, vec2t bigger_p2,
-		type maximum_offset
+		real maximum_offset
 	) {
 		return
 			((bigger_p2 - bigger_p1).length_sq() >= (smaller_p2 - smaller_p1).length_sq())
@@ -189,32 +190,32 @@ struct vec2t {
 	vec2t(type x = 0, type y = 0) : x(x), y(y) {}
 
 	/* from http://stackoverflow.com/a/1501725 */
-	type distance_from_segment_sq(vec2t v, vec2t w) const {
+	real distance_from_segment_sq(vec2t v, vec2t w) const {
 		auto& p = *this;
 		// Return minimum distance between line segment vw and point p
-		const type l2 = (v - w).length_sq();  // i.e. |w-v|^2 -  avoid a sqrt
+		const real l2 = (v - w).length_sq();  // i.e. |w-v|^2 -  avoid a sqrt
 		if (l2 == 0.0) return (p - v).length_sq();   // v == w case
 		// Consider the line extending the segment, parameterized as v + t (w - v).
 		// We find projection of point p onto the line. 
 		// It falls where t = [(p-v) . (w-v)] / |w-v|^2
-		const type t = (p - v).dot(w - v) / l2;
-		if (t < 0.f) return (p - v).length_sq();       // Beyond the 'v' end of the segment
-		else if (t > 1.f) return (p - w).length_sq();  // Beyond the 'w' end of the segment
-		const vec2t projection = v + t * (w - v);  // Projection falls on the segment
+		const real tt = (p - v).dot(w - v) / l2;
+		if (tt < 0.f) return (p - v).length_sq();       // Beyond the 'v' end of the segment
+		else if (tt > 1.f) return (p - w).length_sq();  // Beyond the 'w' end of the segment
+		const vec2t projection = v + tt * (w - v);  // Projection falls on the segment
 		return (p - projection).length_sq();
 	}
 
-	type distance_from_segment(vec2t v, vec2t w) const {
+	real distance_from_segment(vec2t v, vec2t w) const {
 		return sqrt(distance_from_segment_sq(v, w));
 	}
 
 	vec2t project_onto(vec2t v, vec2t w) const {
-		const type t = ((*this) - v).dot(w - v) / (v - w).length_sq();
+		const real t = ((*this) - v).dot(w - v) / (v - w).length_sq();
 		return v + t * (w - v);
 	}
 
 	vec2t closest_point_on_segment(vec2t v, vec2t w) const {
-		const type t = ((*this) - v).dot(w - v) / (v - w).length_sq();
+		const real t = ((*this) - v).dot(w - v) / (v - w).length_sq();
 
 		if (t < 0.f) return v;
 		else if (t > 1.f) return w;
@@ -230,7 +231,7 @@ struct vec2t {
 		return x * v.y - y * v.x;
 	}
 
-	type length() const {
+	real length() const {
 		return sqrt(length_sq());
 	}
 
@@ -238,15 +239,15 @@ struct vec2t {
 		return x*x + y*y;
 	}
 
-	type radians() const {
+	real radians() const {
 		return static_cast<float>(atan2(y, x));
 	}
 
-	type degrees() const {
+	real degrees() const {
 		return radians()*RAD_TO_DEGf;
 	}
 
-	type radians_between(const vec2t& v) const {
+	real radians_between(const vec2t& v) const {
 		auto a_norm = vec2(v).normalize();
 		auto b_norm = vec2(*this).normalize();
 		auto dotted = a_norm.dot(b_norm);
@@ -259,7 +260,7 @@ struct vec2t {
 		return result;
 	}
 
-	type degrees_between(const vec2t& v) const {
+	real degrees_between(const vec2t& v) const {
 		return radians_between(v) * RAD_TO_DEGf;
 	}
 
@@ -275,44 +276,44 @@ struct vec2t {
 		return *this;
 	}
 
-	vec2t& set_from_degrees(float degrees) {
+	vec2t& set_from_degrees(real degrees) {
 		float radians = degrees * DEG_TO_RADf;
 		set(cos(radians), sin(radians));
 		normalize();
 		return *this;
 	}
 
-	vec2t& set_from_radians(float radians) {
+	vec2t& set_from_radians(real radians) {
 		return set_from_degrees(radians * RAD_TO_DEGf);
 	}
 
 	template <typename v>
-	vec2t& rotate(type angle, v origin) {
+	vec2t& rotate(real angle, v origin) {
 		augs::rotate<vec2t, float>(*this, origin, angle);
 		return *this;
 	}
 
-	vec2t lerp(const vec2t& bigger, float ratio) const {
+	vec2t lerp(const vec2t& bigger, real ratio) const {
 		return (*this) + (bigger - (*this)) * ratio;
 	}
 
-	vec2t& set_length(type len) {
+	vec2t& set_length(real len) {
 		normalize();
 		return (*this) *= len;
 	}
 
-	vec2t& add_length(type len) {
-		type actual_length = length();
+	vec2t& add_length(real len) {
+		real actual_length = length();
 		normalize_hint(actual_length);
 		return (*this) *= (actual_length + len);
 	}
 
-	vec2t& normalize_hint(type suggested_length) {
-		type len = suggested_length;
-		if (std::abs(len) < std::numeric_limits<float>::epsilon())
+	vec2t& normalize_hint(real suggested_length) {
+		real len = suggested_length;
+		if (std::abs(len) < std::numeric_limits<real>::epsilon())
 			return *this;
 
-		type inv_len = static_cast<type>(1) / len;
+		type inv_len = static_cast<real>(1) / len;
 
 		x *= inv_len;
 		y *= inv_len;
@@ -375,7 +376,7 @@ struct vec2t {
 		return *this;
 	}
 
-	vec2t& clamp(type max_length) {
+	vec2t& clamp(real max_length) {
 		if (length_sq() > max_length*max_length) {
 			normalize();
 			(*this) *= max_length;
@@ -383,19 +384,19 @@ struct vec2t {
 		return *this;
 	}
 
-	bool x_non_zero(type eps = AUGS_EPSILON) const {
+	bool x_non_zero(real eps = AUGS_EPSILON) const {
 		return std::abs(x) > eps;
 	}
 
-	bool y_non_zero(type eps = AUGS_EPSILON) const {
+	bool y_non_zero(real eps = AUGS_EPSILON) const {
 		return std::abs(y) > eps;
 	}
 
-	bool non_zero(type eps = AUGS_EPSILON) const {
-		return x_non_zero(eps) || y_non_zero();
+	bool non_zero(real eps = AUGS_EPSILON) const {
+		return x_non_zero(eps) || y_non_zero(eps);
 	}
 
-	bool is_zero(type eps = AUGS_EPSILON) const {
+	bool is_zero(real eps = AUGS_EPSILON) const {
 		return !non_zero(eps);
 	}
 
@@ -408,14 +409,14 @@ struct vec2t {
 		return false;
 	}
 
-	bool is_epsilon(const type epsilon = AUGS_EPSILON) const {
+	bool is_epsilon(const real epsilon = AUGS_EPSILON) const {
 		if (std::abs(x) < epsilon && std::abs(y) < epsilon)
 			return true;
 
 		return false;
 	}
 
-	bool compare(const vec2t& b, const type epsilon = AUGS_EPSILON) const {
+	bool compare(const vec2t& b, const real epsilon = AUGS_EPSILON) const {
 		if ((*this - b).length_sq() <= epsilon*epsilon)
 			return true;
 
