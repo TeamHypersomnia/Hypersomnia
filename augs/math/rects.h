@@ -180,7 +180,7 @@ namespace augs {
 				case sticking::RIGHT: res = vec2t<T>(-l, 0);	break;
 				case sticking::TOP: res = vec2t<T>(0, -b);	break;
 				case sticking::BOTTOM: res = vec2t<T>(0, -t);	break;
-				default: res = vec2(0, 0); break;
+				default: res = vec2t<T>(0, 0); break;
 				}
 
 				return res;
