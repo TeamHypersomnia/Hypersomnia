@@ -101,8 +101,18 @@ P::bitset_type basic_processing_synchronizer<C>::get_disabled_categories() const
 	return component.disabled_categories;
 }
 
+template<bool C>
+P::bitset_type basic_processing_synchronizer<C>::get_basic_categories() const {
+	return component.processing_subject_categories;
+}
+
 void component_synchronizer<false, P>::set_disabled_categories(P::bitset_type categories) const {
 	component.disabled_categories = categories;
+	complete_resubstantialization();
+}
+
+void component_synchronizer<false, P>::set_basic_categories(P::bitset_type categories) const {
+	component.processing_subject_categories = categories;
 	complete_resubstantialization();
 }
 

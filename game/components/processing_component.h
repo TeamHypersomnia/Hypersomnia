@@ -22,6 +22,7 @@ public:
 
 	bool is_in(processing_subjects) const;
 	components::processing::bitset_type get_disabled_categories() const;
+	components::processing::bitset_type get_basic_categories() const;
 };
 
 template<>
@@ -32,6 +33,7 @@ public:
 	void disable_in(processing_subjects) const;
 	void enable_in(processing_subjects) const;
 	void set_disabled_categories(components::processing::bitset_type) const;
+	void set_basic_categories(components::processing::bitset_type) const;
 };
 
 template<>
