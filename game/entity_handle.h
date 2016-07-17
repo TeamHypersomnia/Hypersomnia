@@ -118,17 +118,20 @@ namespace augs {
 
 		template<class component>
 		decltype(auto) get() const {
+			ensure(has<component>());
 			return component_or_synchronizer<component>({ *this }).get();
 		}
 
 		template<class component, class = std::enable_if_t<!is_const>>
 		decltype(auto) add(const component& c) const {
+			ensure(!has<component>());
 			component_or_synchronizer<component>({ *this }).add(c);
 			return get<component>();
 		}
 
 		template<class component, class = std::enable_if_t<!is_const>>
 		decltype(auto) add(const component_synchronizer<is_const, component>& c) const {
+			ensure(!has<component>());
 			component_or_synchronizer<component>({ *this }).add(c.get_data());
 			return get<component>();
 		}
