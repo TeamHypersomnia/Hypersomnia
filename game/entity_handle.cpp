@@ -29,7 +29,7 @@ void augs::basic_handle<C, O, N>::add_standard_components() {
 		add(default_processing);
 	}
 	else {
-		get<components::processing>().set_basic_categories(default_processing.get_basic_categories());
+		get<components::processing>().set_basic_categories(default_processing.processing_subject_categories);
 	}
 	
 	if (!has<components::substance>())
