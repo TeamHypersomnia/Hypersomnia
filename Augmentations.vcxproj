@@ -391,17 +391,10 @@
     <ClCompile Include="augs\window_framework\colored_print.cpp" />
     <ClCompile Include="augs\window_framework\platform_utils.cpp" />
     <ClCompile Include="game\bindings\classes\glwindow_binding.cpp" />
-    <ClCompile Include="game\bindings\classes\minmax_binding.cpp" />
-    <ClCompile Include="game\bindings\classes\opengl_binding.cpp" />
     <ClCompile Include="game\bindings\classes\rect_ltrb_binding.cpp" />
     <ClCompile Include="game\bindings\classes\rect_xywh_binding.cpp" />
     <ClCompile Include="game\bindings\classes\rgba_binding.cpp" />
-    <ClCompile Include="game\bindings\classes\script_binding.cpp" />
-    <ClCompile Include="game\bindings\classes\timer_binding.cpp" />
-    <ClCompile Include="game\bindings\classes\utilities_binding.cpp" />
-    <ClCompile Include="game\bindings\classes\value_animator_binding.cpp" />
     <ClCompile Include="game\bindings\classes\vec2_binding.cpp" />
-    <ClCompile Include="game\bindings\classes\world_binding.cpp" />
     <ClCompile Include="game\bindings\bind_game_and_augs.cpp" />
     <ClCompile Include="game\components\animation_component.cpp" />
     <ClCompile Include="game\components\car_component.cpp" />
@@ -524,7 +517,6 @@
     <ClCompile Include="augs\misc\smooth_value_field.cpp" />
     <ClCompile Include="augs\misc\timer.cpp" />
     <ClCompile Include="augs\misc\value_animator.cpp" />
-    <ClCompile Include="augs\misc\vector_wrapper.cpp" />
     <ClCompile Include="augs\network\network_interface.cpp" />
     <ClCompile Include="augs\network\reliable_channel.cpp" />
     <ClCompile Include="augs\log.cpp" />
@@ -1068,7 +1060,6 @@
     <ClInclude Include="game\assets\shader_id.h" />
     <ClInclude Include="game\assets\texture_id.h" />
     <ClInclude Include="game\bindings\bindings.h" />
-    <ClInclude Include="game\bindings\bind_callbacks.h" />
     <ClInclude Include="game\bindings\bind_game_and_augs.h" />
     <ClInclude Include="game\build_settings.h" />
     <ClInclude Include="game\components\animation_component.h" />
@@ -1226,7 +1217,6 @@
     <ClInclude Include="augs\misc\timer.h" />
     <ClInclude Include="augs\misc\undoredo.h" />
     <ClInclude Include="augs\misc\value_animator.h" />
-    <ClInclude Include="augs\misc\vector_wrapper.h" />
     <ClInclude Include="augs\network\bitstream_wrapper.h" />
     <ClInclude Include="augs\network\network_interface.h" />
     <ClInclude Include="augs\network\reliable_channel.h" />
