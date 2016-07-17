@@ -30,7 +30,7 @@ namespace augs {
 	std::unique_ptr<FT_Library> global_libraries::freetype_library(new FT_Library);
 
 	void global_libraries::init(unsigned to_initialize) {
-		signal(SIGSEGV, SignalHandler);
+		// signal(SIGSEGV, SignalHandler);
 
 		if(to_initialize & FREETYPE)
 			errs(!FT_Init_FreeType(freetype_library.get()), "freetype initialization");

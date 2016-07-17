@@ -56,7 +56,7 @@ void sentience_system::consume_health_event(messages::health_event h, fixed_step
 	auto& sentience = subject.get<components::sentience>();
 
 	switch (h.target) {
-	case messages::health_event::HEALTH: sentience.health.value -= h.effective_amount; ensure(sentience.health.value >= 0) break;;
+	case messages::health_event::HEALTH: sentience.health.value -= h.effective_amount; ensure(sentience.health.value >= 0); break;
 	case messages::health_event::CONSCIOUSNESS: sentience.consciousness.value -= h.effective_amount; ensure(sentience.health.value >= 0); break;
 	case messages::health_event::SHIELD: ensure(0); break;
 	case messages::health_event::AIM:

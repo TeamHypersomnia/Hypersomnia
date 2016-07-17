@@ -121,6 +121,8 @@ namespace prefabs {
 			vec2 offset((front.get<components::sprite>().size.x / 2 + sprite.size.x / 2 + 20) * -1, 0);
 			colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
 
+			left_wheel += colliders;
+
 			left_wheel.get<components::fixtures>().set_owner_body(front);
 		}
 
