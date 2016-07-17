@@ -1209,7 +1209,6 @@
     <ClInclude Include="augs\misc\fixed_delta_timer.h" />
     <ClInclude Include="augs\misc\input_player.h" />
     <ClInclude Include="augs\misc\pool.h" />
-    <ClInclude Include="augs\misc\ptr_wrapper.h" />
     <ClInclude Include="augs\misc\randomization.h" />
     <ClInclude Include="augs\misc\smooth_value_field.h" />
     <ClInclude Include="augs\misc\step_player.h" />
