@@ -165,6 +165,6 @@ textual_description describe_slot_function(slot_function f) {
 			L"Shoulder",
 			L"For backpacks or items with belts."
 		};
-	default: ensure(false);
+	default: ensure(false); return{};
 	}
 }
