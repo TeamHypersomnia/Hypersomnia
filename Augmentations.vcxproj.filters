@@ -1032,9 +1032,6 @@
     <ClCompile Include="game\components\relations_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\processing_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\bindings\bind_game_and_augs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -3087,9 +3084,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\components\relations_component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\processing_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\types_specification\all_component_includes.h">
