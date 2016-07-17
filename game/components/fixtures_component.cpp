@@ -44,20 +44,22 @@ vec2 basic_fixtures_synchronizer<C>::get_aabb_size() const {
 
 template<bool C>
 augs::rects::ltrb<float> basic_fixtures_synchronizer<C>::get_aabb_rect() const {
-	b2AABB aabb;
-	aabb.lowerBound.Set(FLT_MAX, FLT_MAX);
-	aabb.upperBound.Set(-FLT_MAX, -FLT_MAX);
+	std::vector<vec2> all_verts;
+	
+	for (auto& s : component.colliders) {
+		for (auto& c : s.shape.convex_polys) {
+			for (auto& v : c) {
+				all_verts.push_back(v);
+			}
+		}
+	}
 
-	for (auto& c : get_cache().fixtures_per_collider)
-		for (auto f : c)
-			aabb.Combine(aabb, f->GetAABB(0));
-
-	return augs::rects::ltrb<float>(aabb.lowerBound.x, aabb.lowerBound.y, aabb.upperBound.x, aabb.upperBound.y).scale(METERS_TO_PIXELSf);
+	return augs::get_aabb(all_verts);
 }
 
 template<bool C>
 size_t basic_fixtures_synchronizer<C>::get_num_colliders() const {
-	return get_cache().fixtures_per_collider.size();
+	return component.colliders.size();
 }
 
 template<bool C>
@@ -76,7 +78,9 @@ void component_synchronizer<false, F>::set_offset(colliders_offset_type t, compo
 }
 
 component_synchronizer<false, F>& component_synchronizer<false, F>::operator=(const F& f) {
-	component_synchronizer_base<false, F>::operator=(f);
+	set_owner_body(f.owner_body);
+	component = f;
+	complete_resubstantialization();
 	return *this;
 }
 
