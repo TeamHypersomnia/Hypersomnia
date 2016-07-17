@@ -6,10 +6,6 @@
 namespace fs = std::experimental::filesystem;
 
 namespace augs {
-	void create_directory(std::wstring filename) {
-		fs::create_directory(filename);
-	}
-
 	void create_directory(std::string filename) {
 		fs::create_directory(filename);
 	}

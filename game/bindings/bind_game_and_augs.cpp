@@ -136,7 +136,7 @@ void bind_game_and_augs(augs::lua_state_wrapper& wrapper) {
 			luabind::class_<std::string>("std_string")
 			.def("c_str", &std::string::c_str),
 
-			bindings::_file_watcher(),
+			//bindings::_file_watcher(),
 
 			//bindings::_text(),
 

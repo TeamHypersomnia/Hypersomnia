@@ -147,9 +147,9 @@ namespace resources {
 		return tex;
 	}
 
-	void manager::create_sprites_indexed(assets::texture_id first, assets::texture_id last, std::wstring filename_preffix) {
+	void manager::create_sprites_indexed(assets::texture_id first, assets::texture_id last, std::string filename_preffix) {
 		for (assets::texture_id i = first; i < last; i = assets::texture_id(i + 1)) {
-			std::wostringstream filename;
+			std::ostringstream filename;
 			filename << filename_preffix << L"_" << int(i - first + 1) << L".png";
 
 			create(i, filename.str());
@@ -258,7 +258,7 @@ namespace resources {
 		return resp;
 	}
 
-	texture_with_image& manager::create(assets::texture_id id, std::wstring filename) {
+	texture_with_image& manager::create(assets::texture_id id, std::string filename) {
 		textures.insert(std::make_pair(id, texture_with_image()));
 
 		texture_with_image& tex = textures[id];
@@ -267,7 +267,7 @@ namespace resources {
 		return tex;
 	}
 
-	graphics::shader& manager::create(assets::shader_id id, std::wstring filename, augs::graphics::shader::type type) {
+	graphics::shader& manager::create(assets::shader_id id, std::string filename, augs::graphics::shader::type type) {
 		shaders.insert(std::make_pair(id, graphics::shader()));
 
 		graphics::shader& sh = shaders[id];

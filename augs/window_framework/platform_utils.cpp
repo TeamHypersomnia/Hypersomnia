@@ -1,11 +1,12 @@
 #include "platform_utils.h"
 #include <Windows.h>
 #include <Shlwapi.h>
+#include "templates.h"
 
 namespace augs {
 	namespace window {
 		/*
-		void set_clipboard_data(std::wstring from) {
+		void set_clipboard_data(std::string from) {
 			if (OpenClipboard(0)) {
 				if (EmptyClipboard()) {
 					HGLOBAL h = GlobalAlloc(GMEM_DDESHARE, (from.length() + 1) * sizeof(WCHAR));
@@ -31,8 +32,8 @@ namespace augs {
 			return (i == 0x000A || i == 0x000D);
 		}
 		/*
-		std::wstring get_data_from_clipboard() {
-			std::wstring result;
+		std::string get_data_from_clipboard() {
+			std::string result;
 
 			if (OpenClipboard(NULL)) {
 				if (!IsClipboardFormatAvailable(CF_UNICODETEXT)) {
@@ -62,12 +63,12 @@ namespace augs {
 			return result;
 		}*/
 
-		std::wstring get_executable_path() {
+		std::string get_executable_path() {
 			wchar_t buffer[MAX_PATH + 1];
 			SecureZeroMemory(buffer, sizeof(buffer));
 			GetModuleFileName(NULL, buffer, MAX_PATH);
 			PathRemoveFileSpec(buffer);
-			return buffer;
+			return to_string(buffer);
 		}
 
 		void enable_cursor_clipping(rects::ltrb<int> lt) {

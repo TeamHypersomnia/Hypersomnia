@@ -11,7 +11,7 @@ namespace resources {
 		components::sprite gui_sprite_def;
 
 		void set_from_image(augs::image img);
-		void set_from_image_file(std::wstring filename);
-		void polygonize_from_file(std::wstring filename);
+		void set_from_image_file(std::string filename);
+		void polygonize_from_file(std::string filename);
 	};
 }

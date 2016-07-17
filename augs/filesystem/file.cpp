@@ -2,18 +2,9 @@
 #include <fstream>
 
 namespace augs {
-	bool file_exists(std::wstring filename) {
-		std::ifstream infile(filename);
-		return infile.good();
-	}
-	
 	bool file_exists(std::string filename) {
 		std::ifstream infile(filename);
 		return infile.good();
-	}
-
-	std::string get_file_contents(std::wstring filename) {
-		return get_file_contents(std::string(filename.begin(), filename.end()));
 	}
 
 	std::string get_file_contents(std::string filename) {

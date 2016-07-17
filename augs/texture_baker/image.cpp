@@ -191,7 +191,7 @@ namespace augs {
 		}
 	}
 
-	bool image::from_file(const std::wstring& filename, unsigned force_channels) {
+	bool image::from_file(const std::string& filename, unsigned force_channels) {
 		channels = 4;
 
 		std::string lodepngfname(filename.begin(), filename.end());
@@ -215,7 +215,7 @@ namespace augs {
 			std::swap(v[i * 4 + 0], v[i * 4 + 2]);
 	}
 
-	void image::save(const std::wstring& filename) {
+	void image::save(const std::string& filename) {
 		std::string lodepngfname(filename.begin(), filename.end());
 
 		if (lodepng::encode(lodepngfname, v, size.w, size.h))

@@ -29,7 +29,7 @@ namespace augs {
 			int minw, minh, maxw, maxh, cminw, cminh, cmaxw, cmaxh;
 			int bpp = 0, style, exstyle, menu = 0, vsyn;
 			
-			std::wstring name;
+			std::string name;
 			bool active = false, transparent = false, doublebuf;
 			
 			
@@ -47,7 +47,7 @@ namespace augs {
 			glwindow();
 			~glwindow();
 
-			int create(rects::xywh<int> client_rectangle, int enable_window_border = 0, std::wstring name = L"Window", int doublebuffer = 1, int bitsperpixel = 24);
+			int create(rects::xywh<int> client_rectangle, int enable_window_border = 0, std::string name = "Window", int doublebuffer = 1, int bitsperpixel = 24);
 			
 			bool swap_buffers(), 
 				set_as_current(),

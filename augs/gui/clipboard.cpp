@@ -22,7 +22,7 @@ namespace augs {
 			contents = s;
 			own_copy = true;
 			own_clip = true;
-			window::set_clipboard_data(formatted_string_to_wstring(s));
+			// window::set_clipboard_data(formatted_string_to_wstring(s));
 		}
 
 		void clipboard::change_clipboard() {

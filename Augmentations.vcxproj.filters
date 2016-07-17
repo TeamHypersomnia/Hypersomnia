@@ -153,12 +153,6 @@
     <ClCompile Include="3rdparty\Box2D\Rope\b2Rope.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\FileWatcher\FileWatcher.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\FileWatcher\FileWatcherWin32.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\GL\glew.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -819,9 +813,6 @@
     <ClCompile Include="augs\math\vec2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="augs\misc\file_watcher.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="augs\misc\fixed_delta_timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1066,9 +1057,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\bindings\classes\glwindow_binding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\bindings\classes\file_watcher_binding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\cosmic_profiler.cpp">
@@ -1374,15 +1362,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\Box2D\Box2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\FileWatcher\FileWatcher.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\FileWatcher\FileWatcherImpl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\FileWatcher\FileWatcherWin32.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\freetype\config\ftconfig.h">
@@ -2718,9 +2697,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\math\vec2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\misc\file_watcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\fixed_delta_timer.h">

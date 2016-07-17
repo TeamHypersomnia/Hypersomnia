@@ -177,8 +177,6 @@
     <ClCompile Include="3rdparty\Box2D\Dynamics\Joints\b2WeldJoint.cpp" />
     <ClCompile Include="3rdparty\Box2D\Dynamics\Joints\b2WheelJoint.cpp" />
     <ClCompile Include="3rdparty\Box2D\Rope\b2Rope.cpp" />
-    <ClCompile Include="3rdparty\FileWatcher\FileWatcher.cpp" />
-    <ClCompile Include="3rdparty\FileWatcher\FileWatcherWin32.cpp" />
     <ClCompile Include="3rdparty\GL\glew.c" />
     <ClCompile Include="3rdparty\GL\OpenGL.cpp" />
     <ClCompile Include="3rdparty\gtest\src\gtest-death-test.cc" />
@@ -392,7 +390,6 @@
     <ClCompile Include="augs\texture_baker\polygonize_sprite.cpp" />
     <ClCompile Include="augs\window_framework\colored_print.cpp" />
     <ClCompile Include="augs\window_framework\platform_utils.cpp" />
-    <ClCompile Include="game\bindings\classes\file_watcher_binding.cpp" />
     <ClCompile Include="game\bindings\classes\glwindow_binding.cpp" />
     <ClCompile Include="game\bindings\classes\minmax_binding.cpp" />
     <ClCompile Include="game\bindings\classes\opengl_binding.cpp" />
@@ -522,7 +519,6 @@
     <ClCompile Include="augs\scripting\lua_state_wrapper.cpp" />
     <ClCompile Include="augs\math\rects.cpp" />
     <ClCompile Include="augs\math\vec2.cpp" />
-    <ClCompile Include="augs\misc\file_watcher.cpp" />
     <ClCompile Include="augs\misc\fixed_delta_timer.cpp" />
     <ClCompile Include="augs\misc\randomization.cpp" />
     <ClCompile Include="augs\misc\smooth_value_field.cpp" />
@@ -589,9 +585,6 @@
     <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2WeldJoint.h" />
     <ClInclude Include="3rdparty\Box2D\Dynamics\Joints\b2WheelJoint.h" />
     <ClInclude Include="3rdparty\Box2D\Rope\b2Rope.h" />
-    <ClInclude Include="3rdparty\FileWatcher\FileWatcher.h" />
-    <ClInclude Include="3rdparty\FileWatcher\FileWatcherImpl.h" />
-    <ClInclude Include="3rdparty\FileWatcher\FileWatcherWin32.h" />
     <ClInclude Include="3rdparty\freetype\config\ftconfig.h" />
     <ClInclude Include="3rdparty\freetype\config\ftheader.h" />
     <ClInclude Include="3rdparty\freetype\config\ftmodule.h" />
@@ -1222,7 +1215,6 @@
     <ClInclude Include="augs\math\rects.h" />
     <ClInclude Include="augs\math\vec2.h" />
     <ClInclude Include="augs\math\declare.h" />
-    <ClInclude Include="augs\misc\file_watcher.h" />
     <ClInclude Include="augs\misc\fixed_delta_timer.h" />
     <ClInclude Include="augs\misc\input_player.h" />
     <ClInclude Include="augs\misc\pool.h" />

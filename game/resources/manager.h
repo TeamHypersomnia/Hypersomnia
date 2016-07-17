@@ -34,10 +34,10 @@ namespace resources {
 
 		augs::atlas& create(assets::atlas_id, unsigned atlas_creation_mode_flags);
 		augs::font& create(assets::font_id);
-		texture_with_image& create(assets::texture_id, std::wstring filename);
+		texture_with_image& create(assets::texture_id, std::string filename);
 		texture_with_image& create(assets::texture_id, augs::image img);
 
-		void create_sprites_indexed(assets::texture_id first, assets::texture_id last, std::wstring filename_preffix);
+		void create_sprites_indexed(assets::texture_id first, assets::texture_id last, std::string filename_preffix);
 
 		animation& create(assets::animation_id, assets::texture_id first_frame, assets::texture_id last_frame, float frame_duration_ms,
 			resources::animation::loop_type = resources::animation::INVERSE
@@ -52,7 +52,7 @@ namespace resources {
 		particle_effect& create(assets::particle_effect_id);
 		particle_effect_response& create(assets::particle_effect_response_id);
 
-		augs::graphics::shader& create(assets::shader_id, std::wstring filename, augs::graphics::shader::type);
+		augs::graphics::shader& create(assets::shader_id, std::string filename, augs::graphics::shader::type);
 		augs::graphics::shader_program& create(assets::program_id, assets::shader_id vertex, assets::shader_id fragment);
 
 		behaviour_tree& create(assets::behaviour_tree_id);

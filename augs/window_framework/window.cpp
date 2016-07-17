@@ -240,9 +240,10 @@ namespace augs {
 			triple_click_delay = GetDoubleClickTime();
 		}
 
-		int glwindow::create(rects::xywh<int> crect, int enable_window_border, std::wstring _name,
+		int glwindow::create(rects::xywh<int> crect, int enable_window_border, std::string nn,
 				int doublebuffer, int _bpp) {
 			int f = 1;
+			std::wstring _name(nn.begin(), nn.end());
 
 			enum flag {
 				CAPTION = WS_CAPTION,
@@ -250,7 +251,7 @@ namespace augs {
 				ALL_WINDOW_ELEMENTS = CAPTION | MENU
 			};
 
-			menu = enable_window_border ? ALL_WINDOW_ELEMENTS : 0; bpp = _bpp; doublebuf = doublebuffer; name = _name.c_str();
+			menu = enable_window_border ? ALL_WINDOW_ELEMENTS : 0; bpp = _bpp; doublebuf = doublebuffer; name = nn;
 
 			style =   menu ? (WS_OVERLAPPED | menu)|WS_CLIPSIBLINGS|WS_CLIPCHILDREN : WS_POPUP;
 			exstyle = menu ? WS_EX_WINDOWEDGE : WS_EX_APPWINDOW; 
