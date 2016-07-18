@@ -105,6 +105,7 @@ namespace scene_managers {
 		world.settings.pathfinding.draw_memorised_walls = 1;
 		world.settings.pathfinding.draw_undiscovered = 1;
 
+		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 		characters = to_id_vector(new_characters);
 	}
 

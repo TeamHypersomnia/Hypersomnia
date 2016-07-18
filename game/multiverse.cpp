@@ -11,6 +11,8 @@ multiverse::multiverse()
 
 void multiverse::populate_cosmoi() {
 	main_cosmos.reserve_storage_for_entities(50000);
+	
+	main_cosmos.delta = main_cosmos_timer.get_fixed_delta();
 
 	main_cosmos.advance_deterministic_schemata(cosmic_entropy(), [this](fixed_step& step) {
 		main_cosmos_manager.populate_world_with_entities(step);
