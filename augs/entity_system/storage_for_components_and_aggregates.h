@@ -27,12 +27,10 @@ namespace augs {
 			return std::get<pool<T>>(pools_for_components);
 		}
 
-		template<>
 		auto& get_pool(aggregate_id) {
 			return pool_for_aggregates;
 		}
 
-		template<>
 		const auto& get_pool(aggregate_id) const {
 			return pool_for_aggregates;
 		}
@@ -66,8 +64,8 @@ namespace augs {
 			auto new_aggregate = self.get_handle(pool_for_aggregates.allocate());
 
 			for_each_type<components...>([&cloned_aggregate, &new_aggregate](auto c) {
-				if (cloned_aggregate.has<decltype(c)>())
-					new_aggregate += cloned_aggregate.get<decltype(c)>();
+				if (cloned_aggregate.template has<decltype(c)>())
+					new_aggregate += cloned_aggregate.template get<decltype(c)>();
 			});
 
 			new_aggregate.set_debug_name(cloned_aggregate.get_debug_name());
@@ -81,7 +79,7 @@ namespace augs {
 			auto handle = self.get_handle(aggregate);
 
 			for_each_type<components...>([&handle](auto c) {
-				handle.remove<decltype(c)>();
+				handle.template remove<decltype(c)>();
 			});
 
 			pool_for_aggregates.free(aggregate);

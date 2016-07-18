@@ -7,25 +7,25 @@ namespace augs {
 	template<bool is_const, class derived>
 	class component_setters {
 	public:
-		template<class component,
-			class = std::enable_if_t<!is_const>>
+		template<class component, bool dummy_const = is_const,
+			class = std::enable_if_t<!dummy_const>>
 			decltype(auto) set(const component& c) const {
 			auto& self = *static_cast<const derived*>(this);
-			if (self.has<component>())
-				return self.get<component>() = c;
+			if (self.template has<component>())
+				return self.template get<component>() = c;
 			else
 				return self.add(c);
 		}
 
-		template<class component,
-			class = std::enable_if_t<!is_const>>
+		template<class component, bool dummy_const = is_const,
+			class = std::enable_if_t<!dummy_const>>
 			decltype(auto) operator+=(const component& c) const {
 			auto& self = *static_cast<const derived*>(this);
 			return self.add(c);
 		}
 
-		template<class... added_components,
-			class = std::enable_if_t<!is_const>>
+		template<class... added_components, bool dummy_const = is_const,
+			class = std::enable_if_t<!dummy_const>>
 			void set(added_components... args) const {
 			auto components_tuple = std::make_tuple(args...);
 
@@ -45,7 +45,7 @@ namespace augs {
 			auto& aggregate = self.get();
 
 			auto& component_pool = self.owner.get_pool(pool_id<component>());
-			auto component_handle = component_pool.get_handle(aggregate.get_id<component>());
+			auto component_handle = component_pool.get_handle(aggregate.template get_id<component>());
 
 			if (component_handle.alive())
 				return &component_handle.get();
@@ -64,20 +64,20 @@ namespace augs {
 			return *find<component>();
 		}
 
-		template<class component,
-			class = std::enable_if_t<!is_const>>
-			void add(const component& c) const {
+		template<class component, bool dummy_const = is_const,
+			class = std::enable_if<!dummy_const>>
+		  void add(const component& c) const {
 			auto& self = *static_cast<const derived*>(this);
 			ensure(!has<component>());
-			self.get().writable_id<component>() = self.owner.get_pool(pool_id<component>()).allocate(c);
+			self.get().template writable_id<component>() = self.owner.get_pool(pool_id<component>()).allocate(c);
 		}
 
-		template<class component,
-			class = std::enable_if_t<!is_const>>
+		template<class component, bool dummy_const = is_const,
+			class = std::enable_if_t<!dummy_const>>
 			void remove() const {
 			ensure(has<component>());
 			auto& self = *static_cast<const derived*>(this);
-			self.owner.get_pool(pool_id<component>()).free(self.get().get_id<component>());
+			self.owner.get_pool(pool_id<component>()).free(self.get().template get_id<component>());
 		}
 	};
 }
