@@ -17,7 +17,6 @@
 #include "game/components/input_receiver_component.h"
 #include "game/messages/intent_message.h"
 
-#include "game/messages/crosshair_intent_message.h"
 #include "game/messages/gui_intents.h"
 
 #include "window_framework/event.h"
