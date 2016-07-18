@@ -21,18 +21,12 @@
     <ClInclude Include="game\augs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="client\utilities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="client\draw_tile_highlights.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

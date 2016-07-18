@@ -1,5 +1,5 @@
 #pragma once
-#include "game/detail/state_for_drawing.h"
+#include "game/detail/state_for_drawing_camera.h"
 #include "game/resources/animation.h"
 #include "game/components/tile_layer_component.h"
 
