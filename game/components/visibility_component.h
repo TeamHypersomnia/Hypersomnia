@@ -2,10 +2,10 @@
 #include <vector>
 #include <set>
 #include <unordered_map>
-#include "math/vec2.h"
-#include <Box2D\Dynamics\b2Fixture.h>
+#include "augs/math/vec2.h"
+#include "3rdparty/Box2D/Dynamics/b2Fixture.h"
 
-#include "graphics/pixel.h"
+#include "augs/graphics/pixel.h"
 
 namespace components {
 	struct visibility  {

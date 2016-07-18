@@ -1,4 +1,4 @@
-#include <GL/OpenGL.h>
+#include "3rdparty/GL/OpenGL.h"
 #undef min
 #undef max
 

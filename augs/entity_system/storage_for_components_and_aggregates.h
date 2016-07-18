@@ -1,7 +1,7 @@
 #pragma once
-#include "templates.h"
-#include "misc/pool.h"
-#include "misc/pool_id.h"
+#include "augs/templates.h"
+#include "augs/misc/pool.h"
+#include "augs/misc/pool_id.h"
 
 #include "aggregate_mixins.h"
 

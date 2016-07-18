@@ -1,6 +1,6 @@
 #pragma once
-#include "templates.h"
-#include "misc/pool_id.h"
+#include "augs/templates.h"
+#include "augs/misc/pool_id.h"
 
 namespace augs {
 	template <class... components>

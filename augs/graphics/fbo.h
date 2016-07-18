@@ -1,5 +1,5 @@
 #pragma once
-#include <GL/OpenGL.h>
+#include "3rdparty/GL/OpenGL.h"
 
 namespace augs {
 	namespace graphics {

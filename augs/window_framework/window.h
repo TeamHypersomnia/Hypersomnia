@@ -12,7 +12,8 @@
 
 namespace augs {
 	namespace window {
-		extern LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
+#ifdef PLATFORM_WINDOWS
+    extern LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
 
 		class glwindow {
 			friend int WINAPI ::WinMain (HINSTANCE, HINSTANCE, LPSTR, int);
@@ -71,5 +72,7 @@ namespace augs {
 			glwindow(glwindow&&) = delete;
 			glwindow& operator=(const glwindow&) = delete;
 		};
+#elif PLATFORM_LINUX
+#endif
 	}
 }

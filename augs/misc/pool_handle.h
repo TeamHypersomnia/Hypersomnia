@@ -1,5 +1,5 @@
 #pragma once
-#include "templates.h"
+#include "augs/templates.h"
 #include "pool_id.h"
 
 namespace augs {

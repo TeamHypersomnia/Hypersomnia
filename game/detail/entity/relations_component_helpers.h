@@ -3,7 +3,7 @@
 
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/entity_handle_declaration.h"
-#include "templates.h"
+#include "augs/templates.h"
 
 #include "game/entity_id.h"
 

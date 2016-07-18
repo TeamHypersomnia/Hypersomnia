@@ -1,9 +1,9 @@
 #pragma once
 #include "game/cosmic_entropy.h"
 
-#include "entity_system/storage_for_components_and_aggregates.h"
-#include "entity_system/storage_for_message_queues.h"
-#include "entity_system/storage_for_systems.h"
+#include "augs/entity_system/storage_for_components_and_aggregates.h"
+#include "augs/entity_system/storage_for_message_queues.h"
+#include "augs/entity_system/storage_for_systems.h"
 
 #include "game/types_specification/all_components_declaration.h"
 #include "game/types_specification/all_messages_declaration.h"
@@ -15,8 +15,8 @@
 
 #include "game/stateful_systems/gui_system.h"
 
-#include "misc/delta.h"
-#include "misc/pool_handlizer.h"
+#include "augs/misc/delta.h"
+#include "augs/misc/pool_handlizer.h"
 
 #include "game/entity_id.h"
 #include "game/detail/inventory_slot_id.h"

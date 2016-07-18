@@ -19,12 +19,12 @@ namespace augs {
 			double count = 0.0;
 
 			if (is_paused)
-				count = duration_cast<duration<double, resolution::period>>(paused_difference).count();
+				count = duration_cast<duration<double, typename resolution::period>>(paused_difference).count();
 			else
 			{
 				auto diff = now - ticks;
 				diff += paused_difference;
-				count = duration_cast<duration<double, resolution::period>>(diff).count();
+				count = duration_cast<duration<double, typename resolution::period>>(diff).count();
 			}
 
 			/* reset using already calculated "now" point in time */
@@ -38,11 +38,11 @@ namespace augs {
 		double get() const {
 			using namespace std::chrono;
 			if (is_paused)
-				return duration_cast<duration<double, resolution::period>>(paused_difference).count();
+				return duration_cast<duration<double, typename resolution::period>>(paused_difference).count();
 
 			auto diff = (high_resolution_clock::now() - ticks);
 			diff += paused_difference;
-			return duration_cast<duration<double, resolution::period>>(diff).count();
+			return duration_cast<duration<double, typename resolution::period>>(diff).count();
 		}
 
 		void reset();

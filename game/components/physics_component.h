@@ -1,5 +1,5 @@
 #pragma once
-#include "misc/stepped_timing.h"
+#include "augs/misc/stepped_timing.h"
 #include "game/component_synchronizer.h"
 #include "game/components/transform_component.h"
 #include "game/entity_handle_declaration.h"

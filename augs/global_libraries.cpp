@@ -33,8 +33,10 @@ void SignalHandler(int signal) {
 
 namespace augs {
 	namespace window {
-		extern LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
-	};
+#ifdef PLATFORM_WINDOWS
+    extern LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
+#endif
+  };
 
 	unsigned global_libraries::initialized = 0;
 	std::unique_ptr<FT_Library> global_libraries::freetype_library(new FT_Library);
@@ -44,7 +46,8 @@ namespace augs {
 
 		if(to_initialize & FREETYPE)
 			errs(!FT_Init_FreeType(freetype_library.get()), "freetype initialization");
-		if(to_initialize & WINDOWS_API) {
+#ifdef PLATFORM_WINDOWS
+    if(to_initialize & WINDOWS_API) {
 			WNDCLASSEX wcl = { 0 };
 			wcl.cbSize = sizeof(wcl);
 			wcl.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
@@ -61,6 +64,7 @@ namespace augs {
 
 			(errs((RegisterClassEx(&wcl) != 0), "class registering") != 0);
 		}
+
 		
 		if(to_initialize & GLEW) {
 			window::glwindow dummy;
@@ -69,7 +73,7 @@ namespace augs {
 			glewExperimental = FALSE;
 			errs(glewInit() == GLEW_OK, L"Failed to initialize GLEW");
 		}
-
+#endif
 		initialized |= to_initialize;
 	}
 

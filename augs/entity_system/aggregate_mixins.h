@@ -1,7 +1,7 @@
 #pragma once
-#include "misc/pool_handle.h"
+#include "augs/misc/pool_handle.h"
 #include "component_aggregate.h"
-#include "ensure.h"
+#include "augs/ensure.h"
 
 namespace augs {
 	template<bool is_const, class derived>

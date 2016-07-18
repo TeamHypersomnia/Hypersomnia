@@ -4,9 +4,9 @@
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/entity_handle_declaration.h"
 
-#include "entity_system/component_aggregate.h"
-#include "entity_system/aggregate_mixins.h"
-#include "misc/pool_handle.h"
+#include "augs/entity_system/component_aggregate.h"
+#include "augs/entity_system/aggregate_mixins.h"
+#include "augs/misc/pool_handle.h"
 #include "game/entity_id.h"
 
 #include "game/detail/entity/inventory_getters.h"
