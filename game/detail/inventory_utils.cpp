@@ -11,7 +11,7 @@
 #include "game/messages/queue_destruction.h"
 #include "game/entity_handle.h"
 
-#include "templates.h"
+#include "augs/templates.h"
 #include "augs/ensure.h"
 
 item_transfer_result query_transfer_result(const_item_slot_transfer_request r) {

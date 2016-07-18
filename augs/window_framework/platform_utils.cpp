@@ -1,7 +1,7 @@
 #include "platform_utils.h"
 #include <Windows.h>
 #include <Shlwapi.h>
-#include "templates.h"
+#include "augs/templates.h"
 
 namespace augs {
 	namespace window {

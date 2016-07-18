@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "templates.h"
+#include "augs/templates.h"
 #include "step_player.h"
 
 namespace augs {

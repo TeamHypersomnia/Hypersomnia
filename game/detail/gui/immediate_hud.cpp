@@ -20,8 +20,8 @@
 
 #include "graphics/renderer.h"
 #include "graphics/vertex.h"
-#include "templates.h"
-#include "templates.h"
+#include "augs/templates.h"
+#include "augs/templates.h"
 #include "augs/gui/text_drawer.h"
 
 #include "misc/stepped_timing.h"

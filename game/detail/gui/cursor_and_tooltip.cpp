@@ -10,7 +10,7 @@
 #include "special_drag_and_drop_target.h"
 
 #include "augs/ensure.h"
-#include "templates.h"
+#include "augs/templates.h"
 
 using namespace augs;
 using namespace gui;

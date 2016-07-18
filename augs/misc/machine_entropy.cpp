@@ -1,5 +1,5 @@
 #include "machine_entropy.h"
-#include "templates.h"
+#include "augs/templates.h"
 
 namespace augs {
 	machine_entropy& machine_entropy::operator+=(const machine_entropy& b) {

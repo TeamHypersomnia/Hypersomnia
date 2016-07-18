@@ -7,7 +7,7 @@
 #include "game/enums/slot_function.h"
 #include "game/detail/inventory_slot_id.h"
 
-#include "templates.h"
+#include "augs/templates.h"
 
 struct inventory_slot;
 

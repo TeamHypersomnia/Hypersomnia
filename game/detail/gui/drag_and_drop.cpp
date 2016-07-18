@@ -7,7 +7,7 @@
 #include "game/detail/inventory_utils.h"
 #include "game/entity_id.h"
 #include "augs/ensure.h"
-#include "templates.h"
+#include "augs/templates.h"
 
 bool drag_and_drop_result::will_drop_be_successful() {
 	return result.result >= item_transfer_result_type::SUCCESSFUL_TRANSFER;

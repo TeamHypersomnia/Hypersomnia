@@ -12,7 +12,7 @@
 #include "game/detail/inventory_slot_id.h"
 #include "game/cosmos.h"
 #include "log.h"
-#include "templates.h"
+#include "augs/templates.h"
 
 textual_description description_of_entity(const_entity_handle id) {
 	auto& name = id.get<components::name>();
