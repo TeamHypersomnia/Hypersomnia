@@ -5,7 +5,7 @@
 
 template<bool is_const, class entity_handle_type>
 class inventory_getters {
-	typedef typename basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
+	typedef basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
 public:
 
 	entity_handle_type get_owning_transfer_capability() const;

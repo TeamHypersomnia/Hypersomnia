@@ -11,10 +11,10 @@ namespace augs {
 	class basic_pool : public pool_handlizer<basic_pool<T>> {
 		typedef augs::pool_id<T> id_type;
 
-		typedef augs::pool_handle<T> handle_type;
+    typedef augs::pool_handle<T> handle_type;
 		typedef augs::const_pool_handle<T> const_handle_type;
-
-		struct metadata {
+		
+    struct metadata {
 			int pointing_indirector = -1;
 		};
 
@@ -25,7 +25,7 @@ namespace augs {
 
 		std::vector<T> pooled;
 		std::vector<metadata> slots;
-		std::vector<indirector> indirectors;
+    std::vector<indirector> indirectors;
 		std::vector<int> free_indirectors;
 
 	protected:
@@ -177,13 +177,13 @@ namespace augs {
 		}
 
 		template<typename... Args>
-		handle_type allocate(Args... args) {
+		typename basic_pool<T>::handle_type allocate(Args... args) {
 			auto result = pool<T>::allocate(args...);
 			metas.emplace_back(std::tuple<meta...>());
 			return result;
 		}
 
-		bool free(id_type object) {
+		bool free(typename basic_pool<T>::id_type object) {
 			auto result = pool<T>::internal_free(object, [this](size_t to, size_t from){
 				metas[to] = std::move(metas[from]);
 			});
@@ -197,15 +197,15 @@ namespace augs {
 		}
 
 		template <typename M>
-		M& get_meta(id_type object) {
+		M& get_meta(typename basic_pool<T>::id_type object) {
 			ensure(alive(object));
-			return std::get<M>(metas[indirectors[object.indirection_index].real_index]);
+			return std::get<M>(metas[basic_pool<T>::indirectors[object.indirection_index].real_index]);
 		}
 
 		template <typename M>
-		const M& get_meta(id_type object) const {
+		const M& get_meta(typename basic_pool<T>::id_type object) const {
 			ensure(alive(object));
-			return std::get<M>(metas[indirectors[object.indirection_index].real_index]);
+			return std::get<M>(metas[basic_pool<T>::indirectors[object.indirection_index].real_index]);
 		}
 	};
 

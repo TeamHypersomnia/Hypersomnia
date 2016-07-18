@@ -33,7 +33,7 @@ namespace augs {
 
 		template<class M>
 		maybe_const_ref_t<is_const, M> get_meta() const {
-			return get_pool().get_meta<M>(raw_id);
+			return get_pool().template get_meta<M>(raw_id);
 		}
 
 		value_reference get() const {
@@ -72,7 +72,7 @@ namespace augs {
 	template<bool is_const, class owner_type, class value_type>
 	class basic_handle : public basic_handle_base<is_const, owner_type, value_type> {
 	public:
-		using basic_handle_base::basic_handle_base;
+		using basic_handle_base<is_const, owner_type, value_type>::basic_handle_base;
 	};
 
 	template <class T>

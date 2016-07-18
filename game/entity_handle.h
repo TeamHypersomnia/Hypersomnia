@@ -40,7 +40,7 @@ namespace augs {
 			basic_entity_handle<is_const> h;
 
 			return_type get() const {
-				return h.allocator::get<T>();
+				return h.allocator::template get<T>();
 			}
 
 			void add(const T& t) const {
@@ -52,7 +52,7 @@ namespace augs {
 			}
 
 			void remove() const {
-				h.allocator::remove<T>();
+				h.allocator::template remove<T>();
 
 				if (std::is_same<T, components::substance>()) {
 					h.get_cosmos().complete_resubstantialization(h);
@@ -67,7 +67,7 @@ namespace augs {
 			basic_entity_handle<is_const> h;
 
 			return_type get() const {
-				return component_synchronizer<is_const, T>(h.allocator::get<T>(), h);
+				return component_synchronizer<is_const, T>(h.allocator::template get<T>(), h);
 			}
 
 			void add(const T& t) const {
@@ -78,7 +78,7 @@ namespace augs {
 
 			void remove() const {
 				ensure(h.has<T>());
-				h.allocator::remove<T>();
+				h.allocator::template remove<T>();
 				h.get_cosmos().complete_resubstantialization(h);
 			}
 		};
@@ -86,34 +86,33 @@ namespace augs {
 		template<class T>
 		using component_or_synchronizer_t = typename component_or_synchronizer<T>::return_type;
 
-		using basic_handle_base::get;
+		using basic_handle_base<is_const, cosmos, put_all_components_into<component_aggregate>    ::type>::get;
 
 	public:
-		using basic_handle_base::basic_handle_base;
+		using basic_handle_base<is_const, cosmos, put_all_components_into<component_aggregate>    ::type>::basic_handle_base;
 
-		typename basic_handle_base::owner_reference get_cosmos() const {
-			return owner;
+		typename basic_handle_base<is_const, cosmos, put_all_components_into<component_aggregate>    ::type>::owner_reference get_cosmos() const {
+			return this->owner;
 		}
 
 		bool operator==(entity_id id) const {
-			return basic_handle_base::operator==(id);
+			return basic_handle_base<is_const, cosmos, put_all_components_into<component_aggregate>::type>::operator==(id);
 		}
 
 		bool operator!=(entity_id id) const {
-			return basic_handle_base::operator!=(id);
+			return basic_handle_base<is_const, cosmos, put_all_components_into<component_aggregate>::type>::operator!=(id);
 		}
 
-		template <class = std::enable_if_t<!is_const>>
-		
+		template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		operator const_entity_handle() const {
-			return const_entity_handle(owner, raw_id);
+			return const_entity_handle(this->owner, this->raw_id);
 		}
 
-		using basic_handle_base::operator entity_id;
+		using basic_handle_base<is_const, cosmos, put_all_components_into<component_aggregate>    ::type>::operator entity_id;
 
 		template <class component>
 		bool has() const {
-			return allocator::has<component>();
+			return allocator::template has<component>();
 		}
 
 		template<class component>
@@ -122,14 +121,14 @@ namespace augs {
 			return component_or_synchronizer<component>({ *this }).get();
 		}
 
-		template<class component, class = std::enable_if_t<!is_const>>
+		template<class component, bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		decltype(auto) add(const component& c) const {
 			ensure(!has<component>());
 			component_or_synchronizer<component>({ *this }).add(c);
 			return get<component>();
 		}
 
-		template<class component, class = std::enable_if_t<!is_const>>
+		template<class component, bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		decltype(auto) add(const component_synchronizer<is_const, component>& c) const {
 			ensure(!has<component>());
 			component_or_synchronizer<component>({ *this }).add(c.get_data());
@@ -139,15 +138,15 @@ namespace augs {
 		template<class component>
 		decltype(auto) find() const {
 			static_assert(!is_component_synchronized<component>::value, "Cannot return a pointer to synchronized component!");
-			return allocator::find<component>();
+			return allocator::template find<component>();
 		}
 
-		template<class component, typename = std::enable_if_t<!is_const>>
+		template<class component, bool _is_const = is_const, typename = std::enable_if_t<!_is_const>>
 		void remove() const {
 			return component_or_synchronizer<component>({ *this }).remove();
 		}
 
-		template<class = std::enable_if_t<!is_const>>
+		template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		void add_standard_components();
 	};
 }
