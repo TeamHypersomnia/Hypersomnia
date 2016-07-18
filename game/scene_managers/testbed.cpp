@@ -1,50 +1,27 @@
 #include "testbed.h"
 #include "game/ingredients/ingredients.h"
-
 #include "game/cosmos.h"
-#include "window_framework/window.h"
-
-#include "game/resources/manager.h"
 #include "game/assets/texture_id.h"
-#include "game/assets/atlas_id.h"
 
 #include "game/systems/input_system.h"
 #include "game/systems/render_system.h"
 #include "game/stateful_systems/gui_system.h"
-#include "game/systems/visibility_system.h"
-#include "game/systems/pathfinding_system.h"
-#include "game/components/input_receiver_component.h"
-#include "game/components/position_copying_component.h"
-#include "game/components/sentience_component.h"
-#include "game/components/item_component.h"
-#include "game/components/name_component.h"
-#include "game/components/attitude_component.h"
 #include "game/components/camera_component.h"
-#include "game/components/pathfinding_component.h"
+#include "game/components/sentience_component.h"
+#include "game/components/attitude_component.h"
+#include "game/components/name_component.h"
 #include "game/enums/party_category.h"
 
-#include "game/messages/crosshair_intent_message.h"
-#include "game/detail/item_slot_transfer_request.h"
-
-#include "game/detail/inventory_slot.h"
+#include "game/messages/intent_message.h"
 #include "game/detail/inventory_utils.h"
 
-#include "augs/filesystem/file.h"
-#include "misc/time_utils.h"
-
 #include "rendering_scripts/all.h"
-#include "resource_setups/all.h"
 
 #include "texture_baker/font.h"
 
-#include "game/detail/inventory_utils.h"
-#include "game/systems/item_system.h"
-
-
 #include "misc/machine_entropy.h"
 #include "game/cosmic_entropy.h"
-#include "log.h"
-using namespace augs;
+#include "game/step.h"
 
 namespace scene_managers {
 	void testbed::populate_world_with_entities(fixed_step& step) {
