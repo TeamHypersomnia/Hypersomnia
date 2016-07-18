@@ -12,7 +12,7 @@ class fixed_step;
 class cosmos;
 
 namespace scene_managers {
-	struct testbed {
+	class testbed {
 		std::vector<entity_id> characters;
 		
 		unsigned current_character = 0;
@@ -20,12 +20,12 @@ namespace scene_managers {
 
 		std::vector<entity_id> draw_bodies;
 
-		bool show_profile_details = false;
 		bool keep_drawing = false;
 
+	public:
 		void populate_world_with_entities(fixed_step&);
-
 		cosmic_entropy make_cosmic_entropy(augs::machine_entropy, cosmos&);
+		entity_id get_controlled_entity() const;
 
 		void pre_solve(fixed_step&);
 		void post_solve(fixed_step&);

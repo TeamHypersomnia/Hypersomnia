@@ -25,6 +25,9 @@ void multiverse::control(augs::machine_entropy entropy) {
 			if (raw_input.key == window::event::keys::_1) {
 				main_cosmos_timer = augs::fixed_delta_timer(60, 500000);
 			}
+			if (raw_input.key == window::event::keys::DASH) {
+				show_profile_details = !show_profile_details;
+			}
 			if (raw_input.key == window::event::keys::_2) {
 				main_cosmos_timer = augs::fixed_delta_timer(128, 500000);
 			}
@@ -109,10 +112,10 @@ void multiverse::print_summary(basic_viewing_step& step) const {
 	auto& cosmos = main_cosmos;
 	using namespace augs::gui::text;
 
-	auto coords = cosmos[main_cosmos_manager.characters[main_cosmos_manager.current_character]].get<components::transform>().pos;
+	auto coords = cosmos[main_cosmos_manager.get_controlled_entity()].get<components::transform>().pos;
 
 	quick_print_format(target.triangles, typesafe_sprintf(L"X: %f2\nY: %f2\n", coords.x, coords.y)
-		+ summary(main_cosmos_manager.show_profile_details), style(assets::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0);
+		+ summary(show_profile_details), style(assets::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0);
 
 	target.call_triangles();
 	target.clear_triangles();

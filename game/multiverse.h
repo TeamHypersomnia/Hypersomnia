@@ -14,6 +14,8 @@ class multiverse {
 
 	float stepping_speed = 1.f;
 
+	bool show_profile_details = true;
+
 	void print_summary(basic_viewing_step&) const;
 	std::wstring summary(bool detailed) const;
 public:

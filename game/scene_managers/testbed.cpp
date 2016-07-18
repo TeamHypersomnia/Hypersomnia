@@ -253,8 +253,6 @@ namespace scene_managers {
 		world.settings.visibility.epsilon_threshold_obstacle_hit = 10;
 		world.settings.visibility.epsilon_distance_vertex_hit = 1;
 
-		show_profile_details = true;
-
 		world.settings.pathfinding.draw_memorised_walls = 1;
 		world.settings.pathfinding.draw_undiscovered = 1;
 
@@ -262,15 +260,12 @@ namespace scene_managers {
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}
 
-	cosmic_entropy testbed::make_cosmic_entropy(augs::machine_entropy machine, cosmos& cosm) {
-		for (auto& in : machine.local) {
-			if (in.key_event == window::event::PRESSED) {
-				if (in.key == window::event::keys::DASH) {
-					show_profile_details = !show_profile_details;
-				}
-			}
-		}
 
+	entity_id testbed::get_controlled_entity() const {
+		return characters[current_character];
+	}
+
+	cosmic_entropy testbed::make_cosmic_entropy(augs::machine_entropy machine, cosmos& cosm) {
 		cosmic_entropy result;
 		result.from_input_receivers_distribution(machine, cosm);
 
