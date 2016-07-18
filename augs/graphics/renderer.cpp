@@ -203,7 +203,7 @@ namespace augs {
 						auto origin = it.get<components::transform>().pos;
 
 						for (int i = 0; i < request.get_num_triangles(); ++i) {
-							auto& tri = request.get_triangle(i, origin);
+							auto tri = request.get_triangle(i, origin);
 
 							for (auto& p : tri.points) {
 								p -= origin;
