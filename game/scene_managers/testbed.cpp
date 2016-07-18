@@ -272,17 +272,7 @@ namespace scene_managers {
 		}
 
 		cosmic_entropy result;
-
-		auto targets = cosm.get(processing_subjects::WITH_INPUT_RECEIVER);
-
-		for (auto it : targets) {
-			if (it.get<components::input_receiver>().local) {
-				cosmic_entropy new_entropy;
-				new_entropy.entropy_per_entity[it] = machine.local;
-
-				result += new_entropy;
-			}
-		}
+		result.from_input_receivers_distribution(machine, cosm);
 
 		return result;
 	}

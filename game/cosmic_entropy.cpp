@@ -1,5 +1,8 @@
 #include "cosmic_entropy.h"
 #include "templates.h"
+#include "game/cosmos.h"
+#include "game/components/input_receiver_component.h"
+#include "misc/machine_entropy.h"
 
 cosmic_entropy& cosmic_entropy::operator+=(const cosmic_entropy& b) {
 	for (auto& ent : b.entropy_per_entity) {
@@ -20,3 +23,15 @@ size_t cosmic_entropy::length() const {
 	return total;
 }
 
+void cosmic_entropy::from_input_receivers_distribution(const augs::machine_entropy& machine, cosmos& cosm) {
+	auto targets = cosm.get(processing_subjects::WITH_INPUT_RECEIVER);
+
+	for (auto it : targets) {
+		if (it.get<components::input_receiver>().local) {
+			cosmic_entropy new_entropy;
+			new_entropy.entropy_per_entity[it] = machine.local;
+
+			(*this) += new_entropy;
+		}
+	}
+}
