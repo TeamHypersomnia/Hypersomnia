@@ -1,6 +1,6 @@
 #pragma once
-#include "graphics/pixel.h"
-#include "math/vec2.h"
+#include "augs/graphics/pixel.h"
+#include "augs/math/vec2.h"
 
 using namespace augs;
 

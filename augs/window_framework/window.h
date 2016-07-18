@@ -1,11 +1,13 @@
 #pragma once
+#ifdef PLATFORM_WINDOWS
 #include <Windows.h>
-#include "math/rects.h"
+#endif
+#include "augs/math/rects.h"
 #include "event.h"
-#include "misc/timer.h"
+#include "augs/misc/timer.h"
 #include <functional>
 
-#include "graphics/renderer.h"
+#include "augs/graphics/renderer.h"
 #include "colored_print.h"
 
 namespace augs {

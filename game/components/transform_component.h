@@ -1,6 +1,6 @@
 #pragma once
-#include "math/rects.h"
-#include "math/vec2.h"
+#include "augs/math/rects.h"
+#include "augs/math/vec2.h"
 
 namespace components {
 	struct transform {

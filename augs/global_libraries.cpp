@@ -1,13 +1,23 @@
+#ifdef PLATFORM_WINDOWS
 #include <Windows.h>
+#endif
 
+#ifdef PLATFORM_WINDOWS
 #include <GL/OpenGL.h>
+#elif PLATFORM_LINUX
+#include <GL/gl.h>
+#endif
 
+#ifdef PLATFORM_WINDOWS
 #include <freetype\ft2build.h>
+#elif PLATFORM_LINUX
+#include <freetype2/ft2build.h>
+#endif
 #include FT_FREETYPE_H
 
 #include "global_libraries.h"
-#include "window_framework\window.h"
-#include "window_framework\platform_utils.h"
+#include "augs/window_framework/window.h"
+#include "augs/window_framework/platform_utils.h"
 
 #include <gtest/gtest.h>
 #include "error/augs_error.h"

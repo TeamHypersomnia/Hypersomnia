@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
-#include "math/vec2.h"
-#include "graphics/pixel.h"
-#include "graphics/vertex.h"
+#include "augs/math/vec2.h"
+#include "augs/graphics/pixel.h"
+#include "augs/graphics/vertex.h"
 
 #include "game/components/transform_component.h"
 #include "game/entity_id.h"

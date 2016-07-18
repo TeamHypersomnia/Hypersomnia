@@ -1,7 +1,7 @@
 #pragma once
 #include <algorithm>
 #include "rects.h"
-#include "misc/randomization.h"
+#include "augs/misc/randomization.h"
 #include "declare.h"
 
 #define AUGS_EPSILON 0.0001f
@@ -51,7 +51,7 @@ namespace augs {
 
 	template <class T>
 	rects::ltrb<T> get_aabb_rotated(vec2t<T> initial_size, T rotation) {
-		auto verts = rects::ltrb<T>(0, 0, initial_size.x, initial_size.y).get_vertices<T>();
+		auto verts = rects::ltrb<T>(0, 0, initial_size.x, initial_size.y).template get_vertices<T>();
 
 		for (auto& v : verts)
 			v.rotate(rotation, initial_size / 2);
