@@ -149,7 +149,14 @@ void physics_system::construct(entity_handle handle) {
 			auto& cache = get_rigid_body_cache(handle);
 
 			b2BodyDef def;
-			def.type = b2BodyType(physics_data.body_type);
+
+			switch (physics_data.body_type) {
+			case components::physics::type::DYNAMIC: def.type = b2BodyType::b2_dynamicBody; break;
+			case components::physics::type::STATIC: def.type = b2BodyType::b2_staticBody; break;
+			case components::physics::type::KINEMATIC: def.type = b2BodyType::b2_kinematicBody; break;
+			default:ensure(false) break;
+			}
+
 			def.angle = 0;
 			def.userData = handle;
 			def.bullet = physics_data.bullet;

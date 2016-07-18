@@ -1,6 +1,7 @@
 #pragma once
 #include "cosmos.h"
 #include "game/scene_managers/testbed.h"
+#include "game/scene_managers/one_entity.h"
 #include "game/entropy_player.h"
 #include "misc/fixed_delta_timer.h"
 #include "misc/variable_delta_timer.h"
@@ -8,7 +9,7 @@
 class game_window;
 
 class multiverse {
-	scene_managers::testbed main_cosmos_manager;
+	scene_managers::one_entity main_cosmos_manager;
 
 	mutable augs::variable_delta_timer frame_timer;
 

@@ -1,12 +1,31 @@
 #pragma once
-#include "scene_manager.h"
+#include <vector>
 #include "game/entity_id.h"
 
+namespace augs {
+	struct machine_entropy;
+}
+
+struct cosmic_entropy;
+class basic_viewing_step;
+class fixed_step;
+class cosmos;
+
 namespace scene_managers {
-	struct one_entity : public scene_manager {
-		void load_resources() override;
-		void populate_world_with_entities(cosmos& world) override;
-		void perform_logic_step(cosmos& world) override;
-		void execute_drawcalls_for_camera(viewing_step&) override;
+	class one_entity {
+		std::vector<entity_id> characters;
+
+		unsigned current_character = 0;
+		entity_id world_camera;
+
+	public:
+		void populate_world_with_entities(fixed_step&);
+		cosmic_entropy make_cosmic_entropy(augs::machine_entropy, cosmos&);
+		entity_id get_controlled_entity() const;
+
+		void pre_solve(fixed_step&);
+		void post_solve(fixed_step&);
+
+		void view_cosmos(basic_viewing_step&) const;
 	};
 }
