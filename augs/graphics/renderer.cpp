@@ -12,7 +12,7 @@
 
 #include "fbo.h"
 
-#include "window_framework/window.h"
+#include "augs/window_framework/window.h"
 
 #include "game/resources/manager.h"
 

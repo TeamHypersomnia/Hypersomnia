@@ -1,6 +1,6 @@
 #include <random>
 
-#include "window_framework/window.h"
+#include "augs/window_framework/window.h"
 #include "game/entity_id.h"
 #include "game/cosmos.h"
 
@@ -20,7 +20,7 @@
 #include "game/messages/crosshair_intent_message.h"
 #include "game/messages/gui_intents.h"
 
-#include "window_framework/event.h"
+#include "augs/window_framework/event.h"
 #include "misc/step_player.h"
 #include "game/step.h"
 #include "game/entity_handle.h"

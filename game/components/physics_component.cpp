@@ -2,10 +2,10 @@
 
 #include <Box2D\Box2D.h>
 
-#include "graphics/renderer.h"
+#include "augs/graphics/renderer.h"
 #include "fixtures_component.h"
 
-#include "math/vec2.h"
+#include "augs/math/vec2.h"
 #include "game/cosmos.h"
 #include "game/temporary_systems/physics_system.h"
 #include "augs/ensure.h"

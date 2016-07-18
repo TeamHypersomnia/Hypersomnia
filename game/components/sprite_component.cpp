@@ -1,18 +1,18 @@
 #include "sprite_component.h"
-#include "texture_baker/texture_baker.h"
+#include "augs/texture_baker/texture_baker.h"
 
 #include "game/detail/state_for_drawing_camera.h"
 #include "game/components/render_component.h"
 
 #include "game/entity_id.h"
 
-#include "graphics/renderer.h"
+#include "augs/graphics/renderer.h"
 
 #include "game/resources/manager.h"
 
-#include "graphics/vertex.h"
+#include "augs/graphics/vertex.h"
 #include "augs/ensure.h"
-#include "math/vec2.h"
+#include "augs/math/vec2.h"
 using namespace augs;
 
 namespace components {

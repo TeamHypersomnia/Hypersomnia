@@ -1,9 +1,9 @@
 #include "polygon_component.h"
-#include "texture_baker/texture_baker.h"
+#include "augs/texture_baker/texture_baker.h"
 
 #include "3rdparty/polypartition/polypartition.h"
 
-#include "graphics/renderer.h"
+#include "augs/graphics/renderer.h"
 #include "game/detail/state_for_drawing_camera.h"
 
 #include "game/resources/manager.h"

@@ -9,7 +9,7 @@
 
 #include "physics_scripts.h"
 
-#include "graphics/renderer.h"
+#include "augs/graphics/renderer.h"
 
 #define FRICTION_FIELDS_COLLIDE 0
 

@@ -2,7 +2,7 @@
 #include "game/entity_id.h"
 #include "game/entity_handle_declaration.h"
 #include "game/components/transform_component.h"
-#include "math/rects.h"
+#include "augs/math/rects.h"
 
 class cosmos;
 

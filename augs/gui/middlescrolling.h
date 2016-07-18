@@ -1,9 +1,9 @@
 #pragma once
 #include "material.h"
-#include "math/rects.h"
+#include "augs/math/rects.h"
 #include "rect.h"
-#include "misc/delta.h"
-#include "window_framework/event.h"
+#include "augs/misc/delta.h"
+#include "augs/window_framework/event.h"
 
 namespace augs {
 	namespace gui {

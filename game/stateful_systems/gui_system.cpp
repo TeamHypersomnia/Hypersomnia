@@ -1,5 +1,5 @@
 #include "gui_system.h"
-#include "graphics/renderer.h"
+#include "augs/graphics/renderer.h"
 
 #include "game/entity_id.h"
 #include "game/cosmos.h"

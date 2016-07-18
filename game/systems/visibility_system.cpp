@@ -23,7 +23,7 @@
 #include "game/entity_handle.h"
 #include "game/detail/physics_scripts.h"
 
-#include "graphics/renderer.h"
+#include "augs/graphics/renderer.h"
 
 using namespace augs;
 

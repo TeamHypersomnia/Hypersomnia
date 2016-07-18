@@ -1,11 +1,11 @@
 #pragma once
-#include "math/vec2.h"
+#include "augs/math/vec2.h"
 
 #include "game/entity_id.h"
 #include "game/entity_handle_declaration.h"
 
 #include "misc/timer.h"
-#include "graphics/pixel.h"
+#include "augs/graphics/pixel.h"
 
 namespace components {
 	struct damage {

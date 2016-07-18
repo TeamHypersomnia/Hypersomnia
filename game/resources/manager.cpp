@@ -2,7 +2,7 @@
 #include <string>
 #include "augs/filesystem/file.h"
 #include <sstream>
-#include "texture_baker/font.h"
+#include "augs/texture_baker/font.h"
 
 using namespace augs;
 

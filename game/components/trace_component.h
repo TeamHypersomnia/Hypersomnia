@@ -1,5 +1,5 @@
 #pragma once
-#include "math/vec2.h"
+#include "augs/math/vec2.h"
 #include "misc/randomization.h"
 
 class processing_system;

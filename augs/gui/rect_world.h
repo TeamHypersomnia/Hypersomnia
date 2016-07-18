@@ -1,12 +1,12 @@
 #pragma once
 #include <vector>
 #include <functional>
-#include "math/vec2.h"
-#include "window_framework/event.h"
+#include "augs/math/vec2.h"
+#include "augs/window_framework/event.h"
 #include "misc/timer.h"
-#include "graphics/pixel.h"
-#include "texture_baker/texture_baker.h"
-#include "texture_baker/font.h"
+#include "augs/graphics/pixel.h"
+#include "augs/texture_baker/texture_baker.h"
+#include "augs/texture_baker/font.h"
 #include "rect.h"
 
 #include "misc/pool.h"
@@ -17,7 +17,7 @@
 #include "clipboard.h"
 #include "middlescrolling.h"
 
-#include "misc/delta.h"
+#include "augs/misc/delta.h"
 #include "gui_event.h"
 
 namespace augs {

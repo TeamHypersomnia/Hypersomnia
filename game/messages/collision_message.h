@@ -1,6 +1,6 @@
 #pragma once
 #include "message.h"
-#include "math/vec2.h"
+#include "augs/math/vec2.h"
 
 namespace messages {
 	struct collision_message : public message {

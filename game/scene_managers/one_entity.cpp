@@ -2,7 +2,7 @@
 #include "game/ingredients/ingredients.h"
 
 #include "game/cosmos.h"
-#include "window_framework/window.h"
+#include "augs/window_framework/window.h"
 
 #include "game/resources/manager.h"
 #include "game/assets/texture_id.h"

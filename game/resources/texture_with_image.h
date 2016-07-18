@@ -1,5 +1,5 @@
 #pragma once
-#include "texture_baker/texture_baker.h"
+#include "augs/texture_baker/texture_baker.h"
 #include "game/components/sprite_component.h"
 
 namespace resources {

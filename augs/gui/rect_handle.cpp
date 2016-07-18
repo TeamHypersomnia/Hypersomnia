@@ -3,7 +3,7 @@
 #include "gui_event.h"
 
 #include "stylesheet.h"
-#include "window_framework/window.h"
+#include "augs/window_framework/window.h"
 
 #include <algorithm>
 #include <functional>

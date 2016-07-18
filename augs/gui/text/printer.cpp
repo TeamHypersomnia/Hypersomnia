@@ -4,7 +4,7 @@
 #include "drafter.h"
 #include "printer.h"
 #include "gui/rect.h"
-#include "window_framework/window.h"
+#include "augs/window_framework/window.h"
 #include "gui/rect_handle.h"
 
 #undef min

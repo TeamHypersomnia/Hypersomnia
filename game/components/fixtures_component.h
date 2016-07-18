@@ -3,8 +3,8 @@
 #include <array>
 
 #include "game/entity_id.h"
-#include "math/vec2.h"
-#include "math/rects.h"
+#include "augs/math/vec2.h"
+#include "augs/math/rects.h"
 #include "transform_component.h"
 #include "game/component_synchronizer.h"
 #include "game/enums/colliders_offset_type.h"

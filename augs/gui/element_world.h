@@ -6,7 +6,7 @@
 #include "rect_id.h"
 #include "rect_world.h"
 #include "element_handle.h"
-#include "misc/delta.h"
+#include "augs/misc/delta.h"
 
 namespace augs {
 	namespace gui {

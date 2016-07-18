@@ -1,6 +1,6 @@
 #pragma once
 #include "game/entity_id.h"
-#include "math/vec2.h"
+#include "augs/math/vec2.h"
 
 namespace components {
 	struct car {

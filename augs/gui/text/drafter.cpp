@@ -2,8 +2,8 @@
 #include <algorithm>
 #include "gui/rect.h"
 #include "drafter.h"
-#include "window_framework/window.h"
-#include "window_framework/platform_utils.h"
+#include "augs/window_framework/window.h"
+#include "augs/window_framework/platform_utils.h"
 
 #undef min
 #undef max

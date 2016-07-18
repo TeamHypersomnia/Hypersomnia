@@ -1,7 +1,7 @@
 #pragma once
 
 #include "game/entity_id.h"
-#include "math/vec2.h"
+#include "augs/math/vec2.h"
 
 class position_copying_system;
 

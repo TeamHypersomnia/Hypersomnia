@@ -1,6 +1,6 @@
 #pragma once
-#include "math/vec2.h"
-#include "math/rects.h"
+#include "augs/math/vec2.h"
+#include "augs/math/rects.h"
 #include "misc/value_animator.h"
 #include "game/entity_id.h"
 #include "game/entity_handle_declaration.h"

@@ -2,7 +2,7 @@
 #include <Box2D\Dynamics\b2Body.h>
 
 #include "game/entity_id.h"
-#include "graphics/renderer.h"
+#include "augs/graphics/renderer.h"
 
 #include "game/components/physics_component.h"
 #include "game/components/special_physics_component.h"

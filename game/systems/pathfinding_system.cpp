@@ -8,7 +8,7 @@
 #include "game/components/pathfinding_component.h"
 #include "game/components/visibility_component.h"
 
-#include "graphics/renderer.h"
+#include "augs/graphics/renderer.h"
 #include "game/enums/processing_subjects.h"
 #include "game/entity_handle.h"
 #include "game/detail/physics_scripts.h"

@@ -2,8 +2,8 @@
 #include "stdafx.h"
 #include "game/bindings/bindings.h"
 
-#include "window_framework/window.h"
-#include "window_framework/platform_utils.h"
+#include "augs/window_framework/window.h"
+#include "augs/window_framework/platform_utils.h"
 #include "game/bindings/bind_game_and_augs.h"
 
 namespace bindings {

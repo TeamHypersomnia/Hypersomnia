@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "math/vec2.h"
+#include "augs/math/vec2.h"
 #include "game/entity_handle_declaration.h"
 #include "game/entity_id.h"
 

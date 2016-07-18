@@ -1,5 +1,5 @@
 #pragma once
-#include <Box2D\Box2D.h>
+#include "3rdparty/Box2D/Box2D.h"
 #include "game/entity_id.h"
 #include "game/entity_handle.h"
 

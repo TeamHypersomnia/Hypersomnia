@@ -1,6 +1,6 @@
 #pragma once
 #include <functional>
-#include "math/vec2.h"
+#include "augs/math/vec2.h"
 #include "game/entity_id.h"
 
 class pathfinding_system;

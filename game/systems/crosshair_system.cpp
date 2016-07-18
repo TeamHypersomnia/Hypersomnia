@@ -11,7 +11,7 @@
 #include "game/components/transform_component.h"
 #include "game/messages/intent_message.h"
 
-#include "texture_baker/texture_baker.h"
+#include "augs/texture_baker/texture_baker.h"
 #include "game/entity_handle.h"
 #include "game/step.h"
 

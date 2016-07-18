@@ -1,7 +1,7 @@
 #pragma once
 #include "material.h"
 #include "rect.h"
-#include "texture_baker/texture_baker.h"
+#include "augs/texture_baker/texture_baker.h"
 
 namespace augs {
 	namespace gui {

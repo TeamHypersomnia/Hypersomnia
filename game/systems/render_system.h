@@ -4,7 +4,7 @@
 #include <vector>
 #include <array>
 
-#include "graphics/vertex.h"
+#include "augs/graphics/vertex.h"
 #include "game/entity_handle_declaration.h"
 
 using namespace augs;

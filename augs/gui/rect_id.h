@@ -2,7 +2,7 @@
 #include <functional>
 #include "misc/pool_id.h"
 #include "misc/pool_handle.h"
-#include "math/rects.h"
+#include "augs/math/rects.h"
 
 namespace augs {
 	namespace gui {

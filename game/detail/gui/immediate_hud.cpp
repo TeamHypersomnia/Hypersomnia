@@ -18,8 +18,8 @@
 #include "game/detail/inventory_slot_id.h"
 #include "game/detail/entity_description.h"
 
-#include "graphics/renderer.h"
-#include "graphics/vertex.h"
+#include "augs/graphics/renderer.h"
+#include "augs/graphics/vertex.h"
 #include "augs/templates.h"
 #include "augs/templates.h"
 #include "augs/gui/text_drawer.h"

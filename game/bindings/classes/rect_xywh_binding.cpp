@@ -2,8 +2,8 @@
 #include "stdafx.h"
 #include "game/bindings/bindings.h"
 
-#include "math/rects.h"
-#include "math/vec2.h"
+#include "augs/math/rects.h"
+#include "augs/math/vec2.h"
 
 namespace bindings {
 	luabind::scope _rect_xywh() {

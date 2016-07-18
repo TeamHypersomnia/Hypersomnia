@@ -1,5 +1,5 @@
 #pragma once
-#include "graphics/pixel.h"
+#include "augs/graphics/pixel.h"
 #include "game/assets/font_id.h"
 
 namespace augs {

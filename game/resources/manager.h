@@ -19,9 +19,9 @@
 #include "game/resources/particle_effect_response.h"
 #include "game/resources/behaviour_tree.h"
 
-#include "texture_baker/texture_baker.h"
-#include "texture_baker/font.h"
-#include "graphics/shader.h"
+#include "augs/texture_baker/texture_baker.h"
+#include "augs/texture_baker/font.h"
+#include "augs/graphics/shader.h"
 
 namespace resources {
 	class manager {

@@ -1,7 +1,7 @@
 #pragma once
-#include "graphics/pixel.h"
+#include "augs/graphics/pixel.h"
 #include "game/assets/texture_id.h"
-#include "graphics/vertex.h"
+#include "augs/graphics/vertex.h"
 #include "rect_id.h"
 
 namespace augs {

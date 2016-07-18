@@ -1,5 +1,5 @@
 #pragma once
-#include "math/vec2.h"
+#include "augs/math/vec2.h"
 #include "render_component.h"
 #include "misc/fixed_delta_timer.h"
 

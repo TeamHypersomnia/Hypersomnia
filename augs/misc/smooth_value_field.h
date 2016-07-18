@@ -1,6 +1,6 @@
 #pragma once
 
-#include "math/vec2.h"
+#include "augs/math/vec2.h"
 #include "misc/timer.h"
 
 namespace augs {

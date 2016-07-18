@@ -1,4 +1,4 @@
-#include "math/vec2.h"
+#include "augs/math/vec2.h"
 #include "movement_system.h"
 #include "game/cosmos.h"
 #include "game/messages/intent_message.h"

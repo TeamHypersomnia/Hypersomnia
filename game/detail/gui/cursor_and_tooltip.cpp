@@ -2,7 +2,7 @@
 #include "game_gui_root.h"
 #include "game/components/sprite_component.h"
 #include "game/components/item_component.h"
-#include "graphics/renderer.h"
+#include "augs/graphics/renderer.h"
 #include "gui/stroke.h"
 #include "game/detail/inventory_utils.h"
 #include "game/detail/entity_description.h"

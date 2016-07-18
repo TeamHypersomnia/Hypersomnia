@@ -2,13 +2,13 @@
 #include <array>
 
 #include "game/types_specification/all_messages_declaration.h"
-#include "misc/delta.h"
+#include "augs/misc/delta.h"
 #include "game/cosmic_entropy.h"
 #include "game/entity_handle_declaration.h"
 #include "game/detail/state_for_drawing_camera.h"
 #include "game/enums/render_layer.h"
 
-#include "entity_system/storage_for_message_queues.h"
+#include "augs/entity_system/storage_for_message_queues.h"
 
 class cosmos;
 

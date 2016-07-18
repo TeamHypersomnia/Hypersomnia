@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "math/vec2.h" 
+#include "augs/math/vec2.h" 
 #include "game/components/transform_component.h"
 #include "game/enums/melee_state.h"
 

@@ -4,7 +4,7 @@
 #include <string>
 #include <gtest/gtest.h>
 
-#include "math/vec2.h"
+#include "augs/math/vec2.h"
 
 
 #include <fstream>

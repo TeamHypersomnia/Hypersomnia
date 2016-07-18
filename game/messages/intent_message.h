@@ -1,8 +1,8 @@
 #pragma once
 #include "message.h"
-#include "math/vec2.h"
+#include "augs/math/vec2.h"
 
-#include "window_framework/event.h"
+#include "augs/window_framework/event.h"
 #include "game/enums/intent_type.h"
 
 namespace messages {

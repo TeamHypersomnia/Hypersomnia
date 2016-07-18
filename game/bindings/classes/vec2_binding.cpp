@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "game/bindings/bindings.h"
 
-#include "math/vec2.h"
+#include "augs/math/vec2.h"
 #include <luabind/operator.hpp>
 
 template<class T>

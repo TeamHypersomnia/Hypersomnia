@@ -1,11 +1,11 @@
 #pragma once
 #include "game/entity_handle.h"
-#include "math/vec2.h"
+#include "augs/math/vec2.h"
 
 #include "game/assets/texture_id.h"
 #include "game/components/render_component.h"
 
-#include "graphics/pixel.h"
+#include "augs/graphics/pixel.h"
 #include "game/entity_handle.h"
 
 class cosmos;

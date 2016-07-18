@@ -1,4 +1,4 @@
-#include "math/vec2.h"
+#include "augs/math/vec2.h"
 #include "camera_system.h"
 
 #include "game/entity_id.h"
@@ -14,7 +14,7 @@
 
 #include "game/components/camera_component.h"
 #include "game/components/transform_component.h"
-#include "graphics/renderer.h"
+#include "augs/graphics/renderer.h"
 
 #include "game/entity_handle.h"
 #include "game/step.h"

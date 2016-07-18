@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "game/bindings/bindings.h"
 
-#include "graphics/pixel.h"
+#include "augs/graphics/pixel.h"
 
 namespace bindings {
 	luabind::scope _rgba() {

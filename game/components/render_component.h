@@ -1,9 +1,9 @@
 #pragma once
 #include "transform_component.h"
 
-#include "math/vec2.h"
+#include "augs/math/vec2.h"
 #include "game/enums/render_layer.h"
-#include "graphics/pixel.h"
+#include "augs/graphics/pixel.h"
 
 namespace components {
 	struct render {

@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "math/rects.h"
+#include "augs/math/rects.h"
 
 namespace augs {
 	namespace packing {

@@ -3,7 +3,7 @@
 #include "game/entity_handle.h"
 #include "game/step.h"
 #include "game/cosmos.h"
-#include "graphics/renderer.h"
+#include "augs/graphics/renderer.h"
 
 void aabb_highlighter::update(float delta) {
 	timer += delta;

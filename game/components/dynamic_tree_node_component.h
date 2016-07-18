@@ -1,7 +1,7 @@
 #pragma once
 #include "game/component_synchronizer.h"
-#include "math/vec2.h"
-#include "math/rects.h"
+#include "augs/math/vec2.h"
+#include "augs/math/rects.h"
 
 namespace components {
 	struct dynamic_tree_node {

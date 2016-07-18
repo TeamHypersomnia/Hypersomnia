@@ -2,7 +2,7 @@
 #include "all.h"
 #include "game/resources/behaviour_tree.h"
 #include "game/resources/manager.h"
-#include "graphics/shader.h"
+#include "augs/graphics/shader.h"
 
 #include "game/detail/ai/behaviours.h"
 
