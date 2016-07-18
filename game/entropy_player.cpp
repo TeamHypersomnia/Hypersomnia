@@ -11,7 +11,11 @@ void entropy_player::buffer_entropy_for_next_step(augs::machine_entropy delta) {
 
 augs::machine_entropy entropy_player::obtain_machine_entropy_for_next_step() {
 	local_entropy_player.biserialize(total_buffered_entropy.local);
-	return total_buffered_entropy;
+	
+	auto resultant_entropy = total_buffered_entropy;
+	total_buffered_entropy = augs::machine_entropy();
+
+	return resultant_entropy;
 }
 
 bool entropy_player::try_to_load_and_replay_recording(std::string filename) {
