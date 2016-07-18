@@ -1,6 +1,7 @@
 #include "measurements.h"
 #include <algorithm>
 #include "log.h"
+#include "augs/math/vec2.h"
 
 namespace augs {
 	measurements::measurements(std::wstring title, bool measurements_are_time) : title(title), measurements_are_time(measurements_are_time) {
@@ -37,22 +38,33 @@ namespace augs {
 		double scale = 1000;
 		bool detailed = false;
 
+		auto avg_secs = get_average_seconds();
+
 		if(detailed)
 		return typesafe_sprintf(L"%x: %f (%F) (avg: %f min: %f max: %f)\n", title, 
 			get_last_measurement_seconds()*scale,
-			get_average_seconds() *scale,
+			avg_secs * scale,
 			get_minimum_seconds() * scale,
 			get_maximum_seconds() * scale);
 		else {
 			scale = 1000;
 			if (measurements_are_time) {
-				return typesafe_sprintf(L"%x: %f2 ms (%f2 FPS)\n", title,
-					get_average_seconds() * scale,
-					1 / get_average_seconds());
+				if (std::abs(avg_secs) > AUGS_EPSILON) {
+					return typesafe_sprintf(L"%x: %f2 ms (%f2 FPS)\n", title,
+						avg_secs * scale,
+						1 / avg_secs);
+				}
+				else
+					return typesafe_sprintf(L"%x: %f2 ms\n", title,
+						avg_secs * scale);
 			}
 			else
-				return typesafe_sprintf(L"%x: %f2\n", title, get_average_seconds());
+				return typesafe_sprintf(L"%x: %f2\n", title, avg_secs);
 		}
+	}
+
+	bool measurements::operator<(const measurements& b) const {
+		return get_average_seconds() < b.get_average_seconds();
 	}
 
 	double measurements::get_average_seconds() const {

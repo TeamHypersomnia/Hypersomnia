@@ -1,6 +1,12 @@
 #include "one_entity.h"
 #include "game/ingredients/ingredients.h"
 #include "game/cosmos.h"
+<<<<<<< HEAD
+#include "augs/window_framework/window.h"
+
+#include "game/resources/manager.h"
+=======
+>>>>>>> 8a7fca5727aafda06ef7499360690ae671e06948
 #include "game/assets/texture_id.h"
 
 #include "game/systems/input_system.h"
@@ -17,7 +23,12 @@
 
 #include "rendering_scripts/all.h"
 
+<<<<<<< HEAD
+#include "augs/filesystem/file.h"
+#include "augs/misc/time.h"
+=======
 #include "texture_baker/font.h"
+>>>>>>> 8a7fca5727aafda06ef7499360690ae671e06948
 
 #include "augs/misc/machine_entropy.h"
 #include "game/cosmic_entropy.h"

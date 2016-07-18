@@ -1,6 +1,12 @@
 #include "testbed.h"
 #include "game/ingredients/ingredients.h"
 #include "game/cosmos.h"
+<<<<<<< HEAD
+#include "augs/window_framework/window.h"
+
+#include "game/resources/manager.h"
+=======
+>>>>>>> 8a7fca5727aafda06ef7499360690ae671e06948
 #include "game/assets/texture_id.h"
 
 #include "game/systems/input_system.h"
@@ -15,11 +21,25 @@
 #include "game/messages/intent_message.h"
 #include "game/detail/inventory_utils.h"
 
+<<<<<<< HEAD
+#include "augs/filesystem/file.h"
+#include "augs/misc/time_utils.h"
+
+=======
+>>>>>>> 8a7fca5727aafda06ef7499360690ae671e06948
 #include "rendering_scripts/all.h"
 
-#include "texture_baker/font.h"
+#include "augs/texture_baker/font.h"
+
+<<<<<<< HEAD
+#include "game/detail/inventory_utils.h"
+#include "game/systems/item_system.h"
+
 
 #include "augs/misc/machine_entropy.h"
+=======
+#include "augs/misc/machine_entropy.h"
+>>>>>>> 8a7fca5727aafda06ef7499360690ae671e06948
 #include "game/cosmic_entropy.h"
 #include "game/step.h"
 

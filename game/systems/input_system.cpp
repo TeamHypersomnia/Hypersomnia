@@ -17,7 +17,6 @@
 #include "game/components/input_receiver_component.h"
 #include "game/messages/intent_message.h"
 
-#include "game/messages/crosshair_intent_message.h"
 #include "game/messages/gui_intents.h"
 
 #include "augs/window_framework/event.h"
@@ -29,8 +28,6 @@ using namespace augs::window;
 
 void input_system::make_intents_from_raw_entropy(fixed_step& step) {
 	auto& cosmos = step.cosm;
-	auto& delta = step.get_delta();
-
 	auto& context = cosmos.settings.input;
 
 	for (auto& per_entity : step.entropy.entropy_per_entity) {
@@ -65,8 +62,6 @@ void input_system::make_intents_from_raw_entropy(fixed_step& step) {
 			if (found_context_entry) {
 				mapped_intent.intent = intent;
 				step.messages.post(mapped_intent);
-
-				break;
 			}
 		}
 	}

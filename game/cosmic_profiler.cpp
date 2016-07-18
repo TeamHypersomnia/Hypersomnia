@@ -29,6 +29,7 @@ std::wstring cosmic_profiler::sorted_summary() const {
 			sorted_meters.push_back(m);
 
 	std::sort(sorted_meters.begin(), sorted_meters.end());
+	std::reverse(sorted_meters.begin(), sorted_meters.end());
 
 	std::wstring summary = raycasts.summary();
 

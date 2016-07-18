@@ -170,6 +170,7 @@ namespace ingredients {
 		sentience.health.maximum = 100.0;
 
 		processing.disable_in(processing_subjects::WITH_FORCE_JOINT);
+		processing.disable_in(processing_subjects::WITH_INPUT_RECEIVER);
 
 		detector.spam_trigger_requests_when_detection_intented = true;
 
@@ -272,6 +273,8 @@ namespace prefabs {
 		character.map_sub_entity(sub_entity_name::CORPSE_OF_SENTIENCE, corpse_of_sentience);
 
 		character.add_standard_components();
+
+		LOG("Character mass: %x", character.get<components::physics>().get_mass());
 		return character;
 	}
 
@@ -285,6 +288,9 @@ namespace prefabs {
 			auto& render = root += components::render();
 			auto& transform = root += components::transform();
 			auto& crosshair = root += components::crosshair();
+			root += components::input_receiver();
+			auto& processing = root += components::processing();
+			processing.disable_in(processing_subjects::WITH_INPUT_RECEIVER);
 			
 			sprite.set(assets::texture_id::TEST_CROSSHAIR, rgba(0, 255, 0, 255));
 

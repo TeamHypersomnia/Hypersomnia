@@ -26,9 +26,9 @@ namespace components {
 		bool activated = true;
 
 		enum class type {
-			DYNAMIC,
 			STATIC,
-			KINEMATIC
+			KINEMATIC,
+			DYNAMIC
 		};
 
 		type body_type = type::DYNAMIC;

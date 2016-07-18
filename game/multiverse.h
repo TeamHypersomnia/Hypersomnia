@@ -1,6 +1,7 @@
 #pragma once
 #include "cosmos.h"
 #include "game/scene_managers/testbed.h"
+#include "game/scene_managers/one_entity.h"
 #include "game/entropy_player.h"
 #include "augs/misc/fixed_delta_timer.h"
 #include "augs/misc/variable_delta_timer.h"

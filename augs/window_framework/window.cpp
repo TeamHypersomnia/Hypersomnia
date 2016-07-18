@@ -63,9 +63,11 @@ namespace augs {
 						break;
 					}
 					events.utf32 = unsigned(wParam);
+					events.repeated = ((lParam & (1 << 30)) != 0);
 					break;
 				case WM_UNICHAR:
 					events.utf32 = unsigned(wParam);
+					events.repeated = ((lParam & (1 << 30)) != 0);
 					break;
 
 				case event::close:
@@ -73,8 +75,10 @@ namespace augs {
 
 				case WM_SYSKEYUP:
 					m = events.msg = keyup;
+					events.repeated = ((lParam & (1 << 30)) != 0);
 				case WM_SYSKEYDOWN:
 					m = events.msg = keydown;
+					events.repeated = ((lParam & (1 << 30)) != 0);
 				case keydown:
 					//if (!((lParam & (1 << 30)) != 0)) {
 						// events.keys[wParam] = true;

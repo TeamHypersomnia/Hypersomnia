@@ -77,6 +77,7 @@ void render_system::draw_entities(augs::vertex_triangle_buffer& output, std::vec
 				
 				in.camera_transform = camera_transform;
 				in.renderable_transform = renderable_transform;
+				in.visible_world_area = in_camera.visible_world_area;
 
 				if (only_border_highlights) {
 					if (render.draw_border) {

@@ -11,6 +11,8 @@ multiverse::multiverse()
 
 void multiverse::populate_cosmoi() {
 	main_cosmos.reserve_storage_for_entities(50000);
+	
+	main_cosmos.delta = main_cosmos_timer.get_fixed_delta();
 
 	main_cosmos.advance_deterministic_schemata(cosmic_entropy(), [this](fixed_step& step) {
 		main_cosmos_manager.populate_world_with_entities(step);
@@ -86,7 +88,7 @@ void multiverse::view(game_window& window) const {
 	
 	print_summary(main_cosmos_viewing_step);
 
-	triangles.measure(target.triangles_drawn_total);
+	triangles.measure(static_cast<double>(target.triangles_drawn_total));
 	target.triangles_drawn_total = 0;
 
 	window.window.swap_buffers();

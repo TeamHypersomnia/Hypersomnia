@@ -65,7 +65,7 @@ void dynamic_tree_system::reserve_caches_for_entities(size_t n) {
 }
 
 std::vector<entity_id> dynamic_tree_system::determine_visible_entities_from_camera(state_for_drawing_camera in, const physics_system& physics) const {
-	std::vector<entity_id> visible_entities;
+	std::vector<entity_id> visible_entities = always_visible_entities;
 
 	auto& result = physics.query_aabb_px(in.transformed_visible_world_area_aabb.left_top(), in.transformed_visible_world_area_aabb.right_bottom(), filters::renderable_query());
 	visible_entities.insert(visible_entities.end(), result.entities.begin(), result.entities.end());

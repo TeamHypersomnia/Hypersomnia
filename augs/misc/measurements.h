@@ -22,9 +22,7 @@ namespace augs {
 
 		std::wstring summary() const;
 
-		bool operator<(const measurements& b) const {
-			return !(get_average_seconds() < b.get_average_seconds());
-		}
+		bool operator<(const measurements& b) const;
 
 		double get_average_seconds() const;
 		double get_maximum_seconds() const;

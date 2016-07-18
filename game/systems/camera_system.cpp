@@ -188,7 +188,11 @@ void camera_system::resolve_cameras_transforms_and_smoothing(fixed_step& step) {
 			camera.smoothing_player_pos.tick();
 		}
 
-		smoothed_camera_transform.pos = vec2i(smoothed_camera_transform.pos + camera.smoothing_player_pos.value);
+		if (camera.enable_smoothing)
+			smoothed_camera_transform.pos = vec2i(smoothed_camera_transform.pos + camera.smoothing_player_pos.value);
+		else
+			smoothed_camera_transform.pos = vec2i(smoothed_camera_transform.pos);
+
 		smoothed_visible_world_area = vec2i(smoothed_visible_world_area);
 
 		camera.dont_smooth_once = false;

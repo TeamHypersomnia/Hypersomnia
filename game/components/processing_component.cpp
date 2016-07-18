@@ -60,6 +60,9 @@ P P::get_default(const_entity_handle id) {
 	if (id.has<components::position_copying>()) {
 		matching.push_back(processing_subjects::WITH_POSITION_COPYING);
 	}
+	if (id.has<components::rotation_copying>()) {
+		matching.push_back(processing_subjects::WITH_ROTATION_COPYING);
+	}
 	if (id.has<components::sentience>()) {
 		matching.push_back(processing_subjects::WITH_SENTIENCE);
 	}
@@ -87,12 +90,12 @@ bool basic_processing_synchronizer<C>::is_in(processing_subjects list) const {
 }
 
 void component_synchronizer<false, P>::disable_in(processing_subjects list) const {
-	component.disabled_categories.set(int(list), 0);
+	component.disabled_categories.set(int(list), 1);
 	complete_resubstantialization();
 }
 
 void component_synchronizer<false, P>::enable_in(processing_subjects list) const {
-	component.disabled_categories.set(int(list), 1);
+	component.disabled_categories.set(int(list), 0);
 	complete_resubstantialization();
 }
 

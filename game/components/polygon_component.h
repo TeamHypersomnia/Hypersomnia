@@ -21,10 +21,9 @@ namespace components {
 		struct drawing_input : vertex_triangle_buffer_reference {
 			using vertex_triangle_buffer_reference::vertex_triangle_buffer_reference;
 
-			vec2 visible_world_area;
-
 			components::transform renderable_transform;
 			components::transform camera_transform;
+			vec2 visible_world_area;
 
 			augs::rgba colorize = augs::white;
 		};

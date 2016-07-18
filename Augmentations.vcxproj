@@ -449,6 +449,7 @@
     <ClCompile Include="game\resources\manager.cpp" />
     <ClCompile Include="game\resources\particle_effect.cpp" />
     <ClCompile Include="game\resources\texture_with_image.cpp" />
+    <ClCompile Include="game\scene_managers\one_entity.cpp" />
     <ClCompile Include="game\scene_managers\rendering_scripts\standard_rendering.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\standard_atlas.cpp" />
     <ClCompile Include="game\scene_managers\resource_setups\standard_behaviour_trees.cpp" />
@@ -1042,6 +1043,7 @@
     <ClInclude Include="game\global\visibility_settings.h" />
     <ClInclude Include="game\messages\will_soon_be_deleted.h" />
     <ClInclude Include="game\cosmic_profiler.h" />
+    <ClInclude Include="game\scene_managers\one_entity.h" />
     <ClInclude Include="game\step.h" />
     <ClInclude Include="game\temporary_systems\dynamic_tree_system.h" />
     <ClInclude Include="game\temporary_systems\physics_system.h" />
