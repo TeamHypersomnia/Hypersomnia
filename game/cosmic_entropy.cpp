@@ -9,3 +9,14 @@ cosmic_entropy& cosmic_entropy::operator+=(const cosmic_entropy& b) {
 
 	return *this;
 }
+
+size_t cosmic_entropy::length() const {
+	size_t total = 0;
+
+	for (auto& ent : entropy_per_entity) {
+		total += ent.second.size();
+	}
+
+	return total;
+}
+

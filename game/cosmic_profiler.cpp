@@ -32,6 +32,8 @@ std::wstring cosmic_profiler::sorted_summary() const {
 
 	std::wstring summary = raycasts.summary();
 
+	summary += entropy_length.summary();
+
 	for (auto& m : sorted_meters)
 		summary += m.summary();
 

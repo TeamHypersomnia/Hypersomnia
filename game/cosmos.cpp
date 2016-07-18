@@ -135,6 +135,8 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	auto& delta = step.get_delta();
 	auto& performance = profiler;
 
+	profiler.entropy_length.measure(step.entropy.length());
+
 	//performance.start(meter_type::CAMERA_QUERY);
 	//temporary_systems.get<dynamic_tree_system>().determine_visible_entities_from_every_camera();
 	//performance.stop(meter_type::CAMERA_QUERY);
