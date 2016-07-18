@@ -24,6 +24,7 @@ namespace components {
 			using vertex_triangle_buffer_reference::vertex_triangle_buffer_reference;
 			components::transform renderable_transform;
 			components::transform camera_transform;
+			vec2 visible_world_area;
 			augs::rgba colorize;
 		};
 

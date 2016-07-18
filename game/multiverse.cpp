@@ -86,7 +86,7 @@ void multiverse::view(game_window& window) const {
 	
 	print_summary(main_cosmos_viewing_step);
 
-	triangles.measure(target.triangles_drawn_total);
+	triangles.measure(static_cast<double>(target.triangles_drawn_total));
 	target.triangles_drawn_total = 0;
 
 	window.window.swap_buffers();
