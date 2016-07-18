@@ -150,7 +150,7 @@ namespace resources {
 	void manager::create_sprites_indexed(assets::texture_id first, assets::texture_id last, std::string filename_preffix) {
 		for (assets::texture_id i = first; i < last; i = assets::texture_id(i + 1)) {
 			std::ostringstream filename;
-			filename << filename_preffix << L"_" << int(i - first + 1) << L".png";
+			filename << filename_preffix << "_" << int(i - first + 1) << ".png";
 
 			create(i, filename.str());
 		}

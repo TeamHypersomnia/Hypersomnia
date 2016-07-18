@@ -14,21 +14,25 @@ typedef components::fixtures F;
 
 void component_synchronizer<false, F>::set_owner_body(entity_id owner_id) const {
 	auto& cosmos = handle.get_cosmos();
-	auto owner = cosmos[owner_id];
+	auto new_owner = cosmos[owner_id];
+	auto this_id = handle.get_id();
 
 	auto former_owner = cosmos[component.owner_body];
 
 	if (former_owner.alive()) {
-		remove_element(former_owner.get<components::physics>().component.fixture_entities, handle.get_id());
+		remove_element(former_owner.get<components::physics>().component.fixture_entities, this_id);
 		cosmos.complete_resubstantialization(former_owner);
 	}
 
-	component.owner_body = owner;
+	component.owner_body = new_owner;
 
-	remove_element(owner.get<components::physics>().component.fixture_entities, handle.get_id());
-	owner.get<components::physics>().component.fixture_entities.push_back(handle.get_id());
-
-	cosmos.complete_resubstantialization(handle);
+	if (new_owner.alive()) {
+		remove_element(new_owner.get<components::physics>().component.fixture_entities, this_id);
+		new_owner.get<components::physics>().component.fixture_entities.push_back(this_id);
+		cosmos.complete_resubstantialization(new_owner);
+	}
+	else
+		cosmos.complete_resubstantialization(handle);
 }
 
 template<bool C>
@@ -44,20 +48,22 @@ vec2 basic_fixtures_synchronizer<C>::get_aabb_size() const {
 
 template<bool C>
 augs::rects::ltrb<float> basic_fixtures_synchronizer<C>::get_aabb_rect() const {
-	b2AABB aabb;
-	aabb.lowerBound.Set(FLT_MAX, FLT_MAX);
-	aabb.upperBound.Set(-FLT_MAX, -FLT_MAX);
+	std::vector<vec2> all_verts;
+	
+	for (auto& s : component.colliders) {
+		for (auto& c : s.shape.convex_polys) {
+			for (auto& v : c) {
+				all_verts.push_back(v);
+			}
+		}
+	}
 
-	for (auto& c : get_cache().fixtures_per_collider)
-		for (auto f : c)
-			aabb.Combine(aabb, f->GetAABB(0));
-
-	return augs::rects::ltrb<float>(aabb.lowerBound.x, aabb.lowerBound.y, aabb.upperBound.x, aabb.upperBound.y).scale(METERS_TO_PIXELSf);
+	return augs::get_aabb(all_verts);
 }
 
 template<bool C>
 size_t basic_fixtures_synchronizer<C>::get_num_colliders() const {
-	return get_cache().fixtures_per_collider.size();
+	return component.colliders.size();
 }
 
 template<bool C>
@@ -76,7 +82,9 @@ void component_synchronizer<false, F>::set_offset(colliders_offset_type t, compo
 }
 
 component_synchronizer<false, F>& component_synchronizer<false, F>::operator=(const F& f) {
-	component_synchronizer_base<false, F>::operator=(f);
+	set_owner_body(f.owner_body);
+	component = f;
+	complete_resubstantialization();
 	return *this;
 }
 

@@ -21,6 +21,7 @@ namespace ingredients {
 
 		e += def;
 		e += colliders;
+		e.get<components::fixtures>().set_owner_body(e);
 	}
 
 	void see_through_dynamic_body(entity_handle e) {
@@ -36,6 +37,7 @@ namespace ingredients {
 
 		e += def;
 		e += colliders;
+		e.get<components::fixtures>().set_owner_body(e);
 	}
 
 	void shell_dynamic_body(entity_handle e) {
@@ -53,6 +55,7 @@ namespace ingredients {
 
 		e += def;
 		e += colliders;
+		e.get<components::fixtures>().set_owner_body(e);
 	}
 
 	void standard_static_body(entity_handle e) {
@@ -70,6 +73,7 @@ namespace ingredients {
 
 		e += def;
 		e += colliders;
+		e.get<components::fixtures>().set_owner_body(e);
 	}
 	
 	void bullet_round_physics(entity_handle e) {
@@ -93,5 +97,6 @@ namespace ingredients {
 
 		e += body;
 		e += colliders;
+		e.get<components::fixtures>().set_owner_body(e);
 	}
 }

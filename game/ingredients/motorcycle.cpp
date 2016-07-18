@@ -79,6 +79,7 @@ namespace prefabs {
 
 			front += body;
 			front += colliders;
+			front.get<components::fixtures>().set_owner_body(front);
 		}
 
 		{

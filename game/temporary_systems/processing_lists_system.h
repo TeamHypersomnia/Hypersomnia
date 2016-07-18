@@ -11,16 +11,17 @@
 class cosmos;
 
 class processing_lists_system {
-	std::unordered_map<processing_subjects, std::vector<entity_id>> lists;
 	friend class component_synchronizer<false, components::processing>;
 	template<bool> friend class basic_processing_synchronizer;
 
 	struct cache {
 		bool is_constructed = false;
 	};
-
+	
+	std::unordered_map<processing_subjects, std::vector<entity_id>> lists;
 	std::vector<cache> per_entity_cache;
 
+	
 	void destruct(const_entity_handle);
 	void construct(const_entity_handle);
 
@@ -28,6 +29,7 @@ class processing_lists_system {
 
 	friend class cosmos;
 public:
+	processing_lists_system();
 
 	std::vector<entity_handle> get(processing_subjects, cosmos&) const;
 	std::vector<const_entity_handle> get(processing_subjects, const cosmos&) const;

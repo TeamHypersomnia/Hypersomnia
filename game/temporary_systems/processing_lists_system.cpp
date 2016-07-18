@@ -6,6 +6,12 @@
 #include "game/cosmos.h"
 #include "game/entity_handle.h"
 
+processing_lists_system::processing_lists_system() {
+	for (size_t i = 0; i < size_t(processing_subjects::LIST_COUNT); ++i) {
+		lists[processing_subjects(i)] = std::vector<entity_id>();
+	}
+}
+
 void processing_lists_system::destruct(const_entity_handle handle) {
 	auto id = handle.get_id();
 	size_t index = id.indirection_index;

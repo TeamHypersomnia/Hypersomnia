@@ -56,10 +56,8 @@ void physics_system::destruct(entity_handle handle) {
 	if (is_constructed_rigid_body(handle)) {
 		auto& cache = get_rigid_body_cache(handle);
 		
-		auto fixture_entities = handle.get<components::physics>().get_fixture_entities();
-
-		for (auto& f : fixture_entities)
-			destruct(f);
+		for (auto& colliders_cache_id : cache.correspondent_colliders_caches)
+			colliders_caches[colliders_cache_id] = colliders_cache();
 
 		b2world.DestroyBody(cache.body);
 
@@ -67,22 +65,24 @@ void physics_system::destruct(entity_handle handle) {
 	}
 	
 	if (is_constructed_colliders(handle)) {
-		auto& cache = get_colliders_cache(handle);
-		auto& owner_body_cache = get_rigid_body_cache(handle.get<components::fixtures>().get_owner_body());
+		auto this_cache_id = handle.get_id().indirection_index;
+		auto& cache = colliders_caches[this_cache_id];
+
+		ensure(cache.correspondent_rigid_body_cache != -1);
+
+		auto& owner_body_cache = rigid_body_caches[cache.correspondent_rigid_body_cache];
 
 		for (auto& f_per_c : cache.fixtures_per_collider)
 			for (auto f : f_per_c)
 				owner_body_cache.body->DestroyFixture(f);
 
+		remove_element(owner_body_cache.correspondent_colliders_caches, this_cache_id);
 		cache = colliders_cache();
 	}
 }
 
-void physics_system::construct(entity_handle handle) {
-	ensure(!is_constructed_rigid_body(handle));
+void physics_system::fixtures_construct(entity_handle handle) {
 	ensure(!is_constructed_colliders(handle));
-	
-	contact_listener listener(handle.get_cosmos());
 
 	if (handle.has<components::fixtures>()) {
 		auto& colliders = handle.get<components::fixtures>();
@@ -90,6 +90,16 @@ void physics_system::construct(entity_handle handle) {
 		if (colliders.is_activated() && is_constructed_rigid_body(colliders.get_owner_body())) {
 			auto& colliders_data = colliders.get_data();
 			auto& cache = get_colliders_cache(handle);
+
+			auto owner_body_entity = colliders.get_owner_body();
+			ensure(owner_body_entity.alive());
+			auto& owner_cache = get_rigid_body_cache(owner_body_entity);
+
+			auto this_cache_id = handle.get_id().indirection_index;
+			auto owner_cache_id = owner_body_entity.get_id().indirection_index;
+
+			owner_cache.correspondent_colliders_caches.push_back(this_cache_id);
+			cache.correspondent_rigid_body_cache = owner_cache_id;
 
 			for (const auto& c : colliders_data.colliders) {
 				b2PolygonShape shape;
@@ -108,10 +118,6 @@ void physics_system::construct(entity_handle handle) {
 
 				std::vector<b2Fixture*> partitioned_collider;
 
-				auto owner_body_entity = colliders.get_owner_body();
-				ensure(owner_body_entity.alive());
-				auto& owner_cache = get_rigid_body_cache(owner_body_entity);
-
 				for (auto convex : transformed_shape.convex_polys) {
 					std::vector<b2Vec2> b2verts(convex.begin(), convex.end());
 
@@ -126,6 +132,14 @@ void physics_system::construct(entity_handle handle) {
 			}
 		}
 	}
+}
+
+void physics_system::construct(entity_handle handle) {
+	ensure(!is_constructed_rigid_body(handle));
+	
+	contact_listener listener(handle.get_cosmos());
+
+	fixtures_construct(handle);
 
 	if (handle.has<components::physics>()) {
 		auto& physics = handle.get<components::physics>();
@@ -153,7 +167,7 @@ void physics_system::construct(entity_handle handle) {
 			cache.body->SetAngledDampingEnabled(physics_data.angled_damping);
 
 			for (auto& f : physics.get_fixture_entities())
-				construct(f);
+				fixtures_construct(f);
 		}
 	}
 }

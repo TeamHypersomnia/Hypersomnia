@@ -67,6 +67,7 @@ namespace scene_managers {
 			auto frog = world.create_entity("frog");
 			ingredients::sprite(frog, vec2(100 + x * 40, 200 + 400), assets::texture_id::TEST_SPRITE, augs::white, render_layer::DYNAMIC_BODY);
 			ingredients::see_through_dynamic_body(frog);
+			frog.add_standard_components();
 		}
 
 		auto car = prefabs::create_car(world, components::transform(-300, -600, -90));
@@ -78,6 +79,7 @@ namespace scene_managers {
 
 		auto camera = world.create_entity("camera");
 		ingredients::camera(camera, size.x, size.y);
+		camera.add_standard_components();
 		world_camera = camera;
 
 		auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
@@ -93,6 +95,9 @@ namespace scene_managers {
 				ingredients::sprite_scalled(street, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 700)) - vec2(1500, 700),
 					vec2(3000, 3000),
 					assets::texture_id::TEST_BACKGROUND, augs::gray1, render_layer::UNDER_GROUND);
+
+				background.add_standard_components();
+				street.add_standard_components();
 			}
 
 		const int num_characters = 2;

@@ -2678,9 +2678,6 @@
     <ClInclude Include="augs\misc\input_player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="augs\misc\ptr_wrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="augs\misc\smooth_value_field.h">
       <Filter>Header Files</Filter>
     </ClInclude>

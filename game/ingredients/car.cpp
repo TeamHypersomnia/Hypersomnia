@@ -61,6 +61,7 @@ namespace prefabs {
 
 			front += physics_definition;
 			front += colliders;
+			front.get<components::fixtures>().set_owner_body(front);
 			//physics.air_resistance = 0.2f;
 		}
 

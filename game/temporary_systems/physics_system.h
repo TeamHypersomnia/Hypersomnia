@@ -16,10 +16,12 @@ class fixed_step;
 
 struct rigid_body_cache {
 	b2Body* body = nullptr;
+	std::vector<int> correspondent_colliders_caches;
 };
 
 struct colliders_cache {
 	std::vector<std::vector<b2Fixture*>> fixtures_per_collider;
+	int correspondent_rigid_body_cache = -1;
 };
 
 class physics_system {
@@ -27,6 +29,7 @@ class physics_system {
 	std::vector<rigid_body_cache> rigid_body_caches;
 
 	void reserve_caches_for_entities(size_t n);
+	void fixtures_construct(entity_handle);
 	void construct(entity_handle);
 	void destruct(entity_handle);
 

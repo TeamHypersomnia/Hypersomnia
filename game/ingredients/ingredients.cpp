@@ -12,13 +12,14 @@
 namespace ingredients {
 	components::item& make_item(entity_handle e) {
 		auto& item = e += components::item();
+		auto& processing = e += components::processing();
 
 		e.add(components::trigger());
 		e.get<components::trigger>().react_to_collision_detectors = true;
 		e.get<components::trigger>().react_to_query_detectors = false;
 
 		auto& force_joint = e.add(components::force_joint());
-		e.get<components::processing>().disable_in(processing_subjects::WITH_FORCE_JOINT);
+		processing.disable_in(processing_subjects::WITH_FORCE_JOINT);
 
 		return item;
 	}
