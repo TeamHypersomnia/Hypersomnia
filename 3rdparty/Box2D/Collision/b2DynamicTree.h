@@ -124,6 +124,10 @@ public:
 	void ShiftOrigin(const b2Vec2& newOrigin);
 
 private:
+	b2DynamicTree& operator=(const b2DynamicTree&) = delete;
+	b2DynamicTree& operator=(b2DynamicTree&&) = delete;
+	b2DynamicTree(const b2DynamicTree&) = delete;
+	b2DynamicTree(b2DynamicTree&&) = delete;
 
 	int32 AllocateNode();
 	void FreeNode(int32 node);

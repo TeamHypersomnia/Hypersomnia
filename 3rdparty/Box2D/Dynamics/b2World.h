@@ -210,6 +210,10 @@ public:
 	void Dump();
 
 private:
+	b2World& operator=(const b2World&) = delete;
+	b2World& operator=(b2World&&) = delete;
+	b2World(const b2World&) = delete;
+	b2World(b2World&&) = delete;
 
 	// m_flags
 	enum
