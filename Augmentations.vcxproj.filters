@@ -957,9 +957,6 @@
     <ClCompile Include="game\ingredients\artificial_life.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="augs\misc\performance_timer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="augs\misc\measurements.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -2925,9 +2922,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="augs\misc\measurements.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="augs\misc\performance_timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\assets\texture_id.h">

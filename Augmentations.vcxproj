@@ -382,7 +382,6 @@
     <ClCompile Include="augs\misc\delta.cpp" />
     <ClCompile Include="augs\misc\stepped_timing.cpp" />
     <ClCompile Include="augs\misc\measurements.cpp" />
-    <ClCompile Include="augs\misc\performance_timer.cpp" />
     <ClCompile Include="augs\misc\recoil_player.cpp" />
     <ClCompile Include="augs\misc\variable_delta_timer.cpp" />
     <ClCompile Include="augs\misc\typesafe_sprintf.cpp" />
@@ -996,7 +995,6 @@
     <ClInclude Include="augs\misc\measurements.h" />
     <ClInclude Include="augs\misc\pool_handle.h" />
     <ClInclude Include="augs\misc\pool_id.h" />
-    <ClInclude Include="augs\misc\performance_timer.h" />
     <ClInclude Include="augs\misc\recoil_player.h" />
     <ClInclude Include="augs\misc\variable_delta_timer.h" />
     <ClInclude Include="augs\misc\typesafe_sprintf.h" />

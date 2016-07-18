@@ -13,10 +13,14 @@ class multiverse {
 	mutable augs::variable_delta_timer frame_timer;
 
 	float stepping_speed = 1.f;
+
+	void print_summary(basic_viewing_step&) const;
+	std::wstring summary(bool detailed) const;
 public:
 	multiverse();
 
-	mutable cosmic_profiler frame_profiler;
+	mutable augs::measurements fps_profiler;
+	mutable augs::measurements triangles = augs::measurements(L"Triangles", false);
 
 	entropy_player main_cosmos_player;
 

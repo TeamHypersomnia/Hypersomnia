@@ -2,6 +2,7 @@
 #include "game_window.h"
 #include "cosmos.h"
 #include "game/types_specification/all_component_includes.h"
+#include "gui/text/printer.h"
 
 multiverse::multiverse() 
 	: main_cosmos_timer(60, 5)
@@ -69,7 +70,7 @@ void multiverse::simulate() {
 }
 
 void multiverse::view(game_window& window) const {
-	frame_profiler.fps_counter.new_measurement();
+	fps_profiler.new_measurement();
 
 	auto& target = renderer::get_current();
 
@@ -79,11 +80,40 @@ void multiverse::view(game_window& window) const {
 
 	basic_viewing_step main_cosmos_viewing_step(main_cosmos, frame_timer.extract_variable_delta(main_cosmos_timer), target);
 	main_cosmos_manager.view_cosmos(main_cosmos_viewing_step);
+	
+	print_summary(main_cosmos_viewing_step);
 
-	frame_profiler.triangles.measure(target.triangles_drawn_total);
+	triangles.measure(target.triangles_drawn_total);
 	target.triangles_drawn_total = 0;
 
 	window.window.swap_buffers();
 
-	frame_profiler.fps_counter.end_measurement();
+	fps_profiler.end_measurement();
+}
+
+
+std::wstring multiverse::summary(bool detailed) const {
+	std::wstring result; 
+	result += fps_profiler.summary();
+	result += triangles.summary();
+	
+	if (detailed) {
+		result += main_cosmos.profiler.sorted_summary();
+	}
+
+	return result;
+}
+
+void multiverse::print_summary(basic_viewing_step& step) const {
+	auto& target = step.renderer;
+	auto& cosmos = main_cosmos;
+	using namespace augs::gui::text;
+
+	auto coords = cosmos[main_cosmos_manager.characters[main_cosmos_manager.current_character]].get<components::transform>().pos;
+
+	quick_print_format(target.triangles, typesafe_sprintf(L"X: %f2\nY: %f2\n", coords.x, coords.y)
+		+ summary(main_cosmos_manager.show_profile_details), style(assets::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0);
+
+	target.call_triangles();
+	target.clear_triangles();
 }

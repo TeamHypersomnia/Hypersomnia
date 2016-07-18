@@ -40,7 +40,6 @@
 #include "game/detail/inventory_utils.h"
 #include "game/systems/item_system.h"
 
-#include "gui/text/printer.h"
 
 #include "misc/machine_entropy.h"
 #include "game/cosmic_entropy.h"
@@ -332,20 +331,5 @@ namespace scene_managers {
 		viewing_step viewing(step, cosmos[world_camera].get<components::camera>().how_camera_will_render);
 		rendering_scripts::standard_rendering(viewing);
 
-		auto& target = step.renderer;
-		using namespace gui::text;
-
-		//quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", style(assets::font_id::GUI_FONT, violet), vec2i(200-1, 200), 0, nullptr);
-		//quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", style(assets::font_id::GUI_FONT, violet), vec2i(200+1, 200), 0, nullptr);
-		//quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", style(assets::font_id::GUI_FONT, violet), vec2i(200, 200 - 1), 0, nullptr);
-		//quick_print_format(target.triangles, L"Be welcomed in Hypersomnia, Architect.", style(assets::font_id::GUI_FONT, violet), vec2i(200, 200+1), 0, nullptr);
-		//
-
-		auto coords = cosmos[characters[current_character]].get<components::transform>().pos;
-
-		quick_print_format(target.triangles, typesafe_sprintf(L"X: %f2\nY: %f2\n", coords.x, coords.y) 
-			+ cosmos.profiler.summary(show_profile_details), style(assets::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0);
-		target.call_triangles();
-		target.clear_triangles();
 	}
 }
