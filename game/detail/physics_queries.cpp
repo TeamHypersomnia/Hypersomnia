@@ -2,7 +2,7 @@
 #include "game/cosmos.h"
 #include "game/entity_handle.h"
 
-#include "ensure.h"
+#include "augs/ensure.h"
 #include "game/detail/physics_scripts.h"
 
 bool physics_system::raycast_input::ShouldRaycast(b2Fixture* fixture) {

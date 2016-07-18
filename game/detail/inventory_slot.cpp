@@ -4,7 +4,7 @@
 
 #include "inventory_utils.h"
 #include "game/entity_handle.h"
-#include "ensure.h"
+#include "augs/ensure.h"
 
 bool inventory_slot::has_unlimited_space() const {
 	return is_physical_attachment_slot;// || always_allow_exactly_one_item;

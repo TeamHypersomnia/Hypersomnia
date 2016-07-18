@@ -1,7 +1,7 @@
 #pragma once
 #include "image.h"
 #include "lodepng.h"
-#include "ensure.h"
+#include "augs/ensure.h"
 
 namespace augs {
 	image::image() : size(0, 0), channels(0) {}

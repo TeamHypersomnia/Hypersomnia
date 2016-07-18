@@ -10,7 +10,7 @@
 #include "game/entity_handle.h"
 #include "game/step.h"
 
-#include "ensure.h"
+#include "augs/ensure.h"
 
 void destroy_system::queue_children_of_queued_entities(fixed_step& step) {
 	auto& cosmos = step.cosm;

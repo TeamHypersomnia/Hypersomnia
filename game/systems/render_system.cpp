@@ -18,7 +18,7 @@
 #include "game/enums/filters.h"
 
 #include "game/detail/physics_scripts.h"
-#include "ensure.h"
+#include "augs/ensure.h"
 
 std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> render_system::get_visible_per_layer(std::vector<const_entity_handle> entities) const {
 	std::array<std::vector<entity_id>, render_layer::LAYER_COUNT> layers;

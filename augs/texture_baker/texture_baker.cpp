@@ -1,6 +1,6 @@
 #pragma once
 #include <GL/OpenGL.h>
-#include "ensure.h"
+#include "augs/ensure.h"
 
 #include "texture_baker.h"
 

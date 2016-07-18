@@ -2,7 +2,7 @@
 #include "physics_component.h"
 #include <Box2D\Dynamics\b2Fixture.h>
 #include <Box2D/Box2D.h>
-#include "ensure.h"
+#include "augs/ensure.h"
 #include <algorithm>
 
 #include <numeric>

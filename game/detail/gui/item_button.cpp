@@ -19,7 +19,7 @@
 #include "game/systems/input_system.h"
 #include "game/resources/manager.h"
 
-#include "ensure.h"
+#include "augs/ensure.h"
 
 bool item_button::is_being_wholely_dragged_or_pending_finish(augs::gui::rect_world& gr) {
 

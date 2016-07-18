@@ -11,7 +11,7 @@
 #include "game/detail/inventory_slot.h"
 #include "game/detail/inventory_utils.h"
 
-#include "ensure.h"
+#include "augs/ensure.h"
 
 #include "game/components/rotation_copying_component.h"
 #include "game/components/transform_component.h"

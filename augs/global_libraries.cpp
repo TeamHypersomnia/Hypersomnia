@@ -22,7 +22,7 @@
 #include <gtest/gtest.h>
 #include "error/augs_error.h"
 #include "log.h"
-#include "ensure.h"
+#include "augs/ensure.h"
 
 #include <signal.h>
 

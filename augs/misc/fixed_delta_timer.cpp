@@ -1,7 +1,7 @@
 #pragma once
 #include "fixed_delta_timer.h"
 #include <algorithm>
-#include "ensure.h"
+#include "augs/ensure.h"
 #undef min
 /* credits goes to http://www.unagames.com/blog/daniele/2010/06/fixed-time-step-implementation-box2d */
 

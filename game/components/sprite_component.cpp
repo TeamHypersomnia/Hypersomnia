@@ -11,7 +11,7 @@
 #include "game/resources/manager.h"
 
 #include "graphics/vertex.h"
-#include "ensure.h"
+#include "augs/ensure.h"
 #include "math/vec2.h"
 using namespace augs;
 

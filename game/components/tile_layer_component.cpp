@@ -5,7 +5,7 @@
 #include "game/detail/state_for_drawing_camera.h"
 
 #include "graphics/vertex.h"
-#include "ensure.h"
+#include "augs/ensure.h"
 
 using namespace components;
 using namespace augs;

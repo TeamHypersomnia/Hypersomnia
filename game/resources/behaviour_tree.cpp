@@ -1,5 +1,5 @@
 #include "behaviour_tree.h"
-#include "ensure.h"
+#include "augs/ensure.h"
 #include "game/entity_handle.h"
 
 namespace resources {

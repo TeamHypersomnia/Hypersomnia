@@ -12,7 +12,7 @@
 #include "game/entity_handle.h"
 
 #include "templates.h"
-#include "ensure.h"
+#include "augs/ensure.h"
 
 item_transfer_result query_transfer_result(const_item_slot_transfer_request r) {
 	item_transfer_result output;

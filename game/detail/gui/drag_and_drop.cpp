@@ -6,7 +6,7 @@
 #include "game/components/item_component.h"
 #include "game/detail/inventory_utils.h"
 #include "game/entity_id.h"
-#include "ensure.h"
+#include "augs/ensure.h"
 #include "templates.h"
 
 bool drag_and_drop_result::will_drop_be_successful() {

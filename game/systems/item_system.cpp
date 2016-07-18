@@ -24,7 +24,7 @@
 #include "game/temporary_systems/physics_system.h"
 #include "game/entity_handle.h"
 
-#include "ensure.h"
+#include "augs/ensure.h"
 
 #include "game/components/item_component.h"
 #include "game/components/container_component.h"

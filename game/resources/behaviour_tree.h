@@ -9,7 +9,7 @@
 #include "game/detail/ai/goals.h"
 
 #include "augs/templates.h"
-#include "ensure.h"
+#include "augs/ensure.h"
 #include "game/entity_handle.h"
 
 class fixed_step;

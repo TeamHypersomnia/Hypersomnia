@@ -1,7 +1,7 @@
 #include <GL/OpenGL.h>
 #include <cassert>
 #include "shader.h"
-#include "ensure.h"
+#include "augs/ensure.h"
 
 namespace augs {
 	namespace graphics {

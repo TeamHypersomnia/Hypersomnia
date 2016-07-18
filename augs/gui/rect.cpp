@@ -5,7 +5,7 @@
 
 #include <algorithm>
 #include <functional>
-#include "ensure.h"
+#include "augs/ensure.h"
 #include "rect_world.h"
 
 #undef max

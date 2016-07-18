@@ -1,6 +1,6 @@
 #include <tuple>
 #include "pool_id.h"
-#include "ensure.h"
+#include "augs/ensure.h"
 
 namespace augs {
 	raw_pool_id::raw_pool_id() {

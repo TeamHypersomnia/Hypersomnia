@@ -2,7 +2,7 @@
 
 #include "game/cosmos.h"
 #include "game/entity_id.h"
-#include "ensure.h"
+#include "augs/ensure.h"
 
 #include "game/components/behaviour_tree_component.h"
 
