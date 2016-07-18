@@ -1,5 +1,5 @@
 #pragma once
-#ifdef PLATFORM_WINDOWS
+#if PLATFORM_WINDOWS
 #include <Windows.h>
 #endif
 #include "augs/math/rects.h"

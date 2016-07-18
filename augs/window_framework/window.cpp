@@ -54,7 +54,7 @@ namespace augs {
 
 				events.repeated = false;
 				events.mouse.rel.set(0, 0);
-				events.key_event = key_changed::NONE;
+				events.key_event = key_changed::NO_CHANGE;
 
 				switch (m) {
 				case character:
