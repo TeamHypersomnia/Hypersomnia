@@ -70,7 +70,7 @@ namespace augs {
 					new_aggregate += cloned_aggregate.get<decltype(c)>();
 			});
 
-			new_aggregate.set_debug_name(cloned_aggregate.get_debug_name());
+			new_aggregate.set_debug_name("+" + cloned_aggregate.get_debug_name());
 
 			return new_aggregate;
 		}
