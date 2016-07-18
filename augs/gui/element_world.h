@@ -1,8 +1,8 @@
 #pragma once
 #include "augs/templates.h"
-#include "misc/pool.h"
-#include "misc/pool_id.h"
-#include "misc/pool_handlizer.h"
+#include "augs/misc/pool.h"
+#include "augs/misc/pool_id.h"
+#include "augs/misc/pool_handlizer.h"
 #include "rect_id.h"
 #include "rect_world.h"
 #include "element_handle.h"

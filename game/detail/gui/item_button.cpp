@@ -6,7 +6,7 @@
 #include "augs/graphics/renderer.h"
 #include "augs/templates.h"
 
-#include "gui/stroke.h"
+#include "augs/gui/stroke.h"
 
 #include "game/enums/item_category.h"
 #include "game/detail/state_for_drawing_camera.h"

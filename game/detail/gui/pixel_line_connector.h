@@ -1,5 +1,5 @@
 #pragma once
-#include "gui/rect.h"
+#include "augs/gui/rect.h"
 #include <array>
 
 std::vector<std::array<vec2i, 2>> get_connecting_pixel_lines(rects::ltrb<float> origin, rects::ltrb<float> target);

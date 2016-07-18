@@ -2,7 +2,7 @@
 #include "game_window.h"
 #include "cosmos.h"
 #include "game/types_specification/all_component_includes.h"
-#include "gui/text/printer.h"
+#include "augs/gui/text/printer.h"
 
 multiverse::multiverse() 
 	: main_cosmos_timer(60, 5)

@@ -30,7 +30,7 @@
 #include "game/detail/inventory_utils.h"
 
 #include "augs/filesystem/file.h"
-#include "misc/time_utils.h"
+#include "augs/misc/time_utils.h"
 
 #include "rendering_scripts/all.h"
 #include "resource_setups/all.h"
@@ -41,7 +41,7 @@
 #include "game/systems/item_system.h"
 
 
-#include "misc/machine_entropy.h"
+#include "augs/misc/machine_entropy.h"
 #include "game/cosmic_entropy.h"
 #include "log.h"
 using namespace augs;

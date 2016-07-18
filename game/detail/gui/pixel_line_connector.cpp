@@ -1,5 +1,5 @@
 #include "pixel_line_connector.h"
-#include "gui/material.h"
+#include "augs/gui/material.h"
 
 std::vector<std::array<vec2i, 2>> get_connecting_pixel_lines(rects::ltrb<float> a, rects::ltrb<float> b) {
 	using namespace augs::gui;

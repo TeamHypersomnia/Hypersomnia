@@ -4,7 +4,7 @@
 #include "game/detail/inventory_slot_id.h"
 
 #include "game/entity_handle_declaration.h"
-#include "misc/stepped_timing.h"
+#include "augs/misc/stepped_timing.h"
 #include <set>
 
 namespace components {

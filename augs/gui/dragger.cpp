@@ -1,6 +1,6 @@
 #pragma once
 #include "dragger.h"
-#include "misc/timer.h"
+#include "augs/misc/timer.h"
 
 namespace augs {
 	namespace gui {

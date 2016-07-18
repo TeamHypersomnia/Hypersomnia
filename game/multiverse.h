@@ -2,8 +2,8 @@
 #include "cosmos.h"
 #include "game/scene_managers/testbed.h"
 #include "game/entropy_player.h"
-#include "misc/fixed_delta_timer.h"
-#include "misc/variable_delta_timer.h"
+#include "augs/misc/fixed_delta_timer.h"
+#include "augs/misc/variable_delta_timer.h"
 
 class game_window;
 

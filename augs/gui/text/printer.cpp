@@ -3,9 +3,9 @@
 #include "ui.h"
 #include "drafter.h"
 #include "printer.h"
-#include "gui/rect.h"
+#include "augs/gui/rect.h"
 #include "augs/window_framework/window.h"
-#include "gui/rect_handle.h"
+#include "augs/gui/rect_handle.h"
 
 #undef min
 #undef max

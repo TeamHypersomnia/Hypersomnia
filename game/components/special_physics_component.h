@@ -2,7 +2,7 @@
 #include <vector>
 
 #include "game/entity_id.h"
-#include "misc/stepped_timing.h"
+#include "augs/misc/stepped_timing.h"
 
 namespace components {
 	struct special_physics {

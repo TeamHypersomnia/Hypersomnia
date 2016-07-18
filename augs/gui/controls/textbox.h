@@ -1,9 +1,9 @@
 #pragma once
-#include "gui/dragger.h"
-#include "gui/rect.h"
-#include "gui/text/printer.h"
-#include "gui/text/ui.h"
-#include "misc/undoredo.h"
+#include "augs/gui/dragger.h"
+#include "augs/gui/rect.h"
+#include "augs/gui/text/printer.h"
+#include "augs/gui/text/ui.h"
+#include "augs/misc/undoredo.h"
 #include <functional>
 
 namespace augs {

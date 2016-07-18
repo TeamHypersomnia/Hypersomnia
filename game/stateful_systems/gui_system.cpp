@@ -19,8 +19,8 @@
 #include "game/messages/gui_intents.h"
 
 #include "augs/gui/rect_world.h"
-#include "game/detail/gui/game_gui_root.h"
-#include "game/detail/gui/immediate_hud.h"
+#include "game/detail/augs/gui/game_gui_root.h"
+#include "game/detail/augs/gui/immediate_hud.h"
 #include "game/enums/slot_function.h"
 
 gui_system::gui_system() {

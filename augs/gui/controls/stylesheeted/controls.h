@@ -1,9 +1,9 @@
 #pragma once
-#include "gui/stylesheet.h"
-#include "gui/controls/checkbox.h"
-#include "gui/controls/scrollarea.h"
-#include "gui/controls/textbox.h"
-#include "gui/controls/button.h"
+#include "augs/gui/stylesheet.h"
+#include "augs/gui/controls/checkbox.h"
+#include "augs/gui/controls/scrollarea.h"
+#include "augs/gui/controls/textbox.h"
+#include "augs/gui/controls/button.h"
 
 namespace augs {
 	namespace gui {

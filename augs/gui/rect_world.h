@@ -3,14 +3,14 @@
 #include <functional>
 #include "augs/math/vec2.h"
 #include "augs/window_framework/event.h"
-#include "misc/timer.h"
+#include "augs/misc/timer.h"
 #include "augs/graphics/pixel.h"
 #include "augs/texture_baker/texture_baker.h"
 #include "augs/texture_baker/font.h"
 #include "rect.h"
 
-#include "misc/pool.h"
-#include "misc/pool_handlizer.h"
+#include "augs/misc/pool.h"
+#include "augs/misc/pool_handlizer.h"
 
 #include "game/assets/font_id.h"
 

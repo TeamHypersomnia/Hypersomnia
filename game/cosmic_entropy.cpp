@@ -2,7 +2,7 @@
 #include "augs/templates.h"
 #include "game/cosmos.h"
 #include "game/components/input_receiver_component.h"
-#include "misc/machine_entropy.h"
+#include "augs/misc/machine_entropy.h"
 
 cosmic_entropy& cosmic_entropy::operator+=(const cosmic_entropy& b) {
 	for (auto& ent : b.entropy_per_entity) {

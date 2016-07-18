@@ -1,7 +1,7 @@
 #pragma once
 
 #include "augs/math/vec2.h"
-#include "misc/timer.h"
+#include "augs/misc/timer.h"
 
 namespace augs {
 	class smooth_value_field {

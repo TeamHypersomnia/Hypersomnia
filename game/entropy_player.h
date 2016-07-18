@@ -2,7 +2,7 @@
 #include "augs/misc/machine_entropy.h"
 #include "game/cosmic_entropy.h"
 
-#include "misc/step_player.h"
+#include "augs/misc/step_player.h"
 
 class entropy_player {
 public:

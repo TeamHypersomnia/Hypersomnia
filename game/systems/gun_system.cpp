@@ -21,7 +21,7 @@
 #include "game/components/transform_component.h"
 #include "game/components/gun_component.h"
 
-#include "misc/randomization.h"
+#include "augs/misc/randomization.h"
 #include "log.h"
 
 #include "game/entity_handle.h"

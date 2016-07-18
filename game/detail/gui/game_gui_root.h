@@ -1,8 +1,8 @@
 #pragma once
 #include "game/step.h"
 #include "special_drag_and_drop_target.h"
-#include "gui/text_drawer.h"
-#include "gui/rect_world.h"
+#include "augs/gui/text_drawer.h"
+#include "augs/gui/rect_world.h"
 #include "drag_and_drop.h"
 #include "aabb_highlighter.h"
 

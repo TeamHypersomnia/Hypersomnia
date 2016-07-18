@@ -1,6 +1,6 @@
 #pragma once
 #include "game/entity_id.h"
-#include "misc/recoil_player.h"
+#include "augs/misc/recoil_player.h"
 #include "augs/graphics/pixel.h"
 
 namespace components {

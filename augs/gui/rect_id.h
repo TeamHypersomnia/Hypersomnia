@@ -1,7 +1,7 @@
 #pragma once
 #include <functional>
-#include "misc/pool_id.h"
-#include "misc/pool_handle.h"
+#include "augs/misc/pool_id.h"
+#include "augs/misc/pool_handle.h"
 #include "augs/math/rects.h"
 
 namespace augs {

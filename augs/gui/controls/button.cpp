@@ -1,7 +1,6 @@
-#pragma once
 #include "button.h"
 #include "augs/window_framework/event.h"
-#include "gui/rect_world.h"
+#include "augs/gui/rect_world.h"
 
 namespace augs {
 	namespace gui {

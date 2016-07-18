@@ -1,7 +1,7 @@
 #pragma once
 #include <functional>
-#include "misc/pool_handle.h"
-#include "misc/pool.h"
+#include "augs/misc/pool_handle.h"
+#include "augs/misc/pool.h"
 #include "rect_id.h"
 #include "material.h"
 #include "stylesheet.h"

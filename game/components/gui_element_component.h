@@ -6,11 +6,11 @@
 //#include "game/detail/inventory_slot_id.h"
 //#include "augs/gui/appearance_detector.h"
 //
-//#include "game/detail/gui/item_button.h"
-//#include "game/detail/gui/slot_button.h"
+//#include "game/detail/augs/gui/item_button.h"
+//#include "game/detail/augs/gui/slot_button.h"
 //
-//#include "game/detail/gui/game_gui_root.h"
-//#include "game/detail/gui/immediate_hud.h"
+//#include "game/detail/augs/gui/game_gui_root.h"
+//#include "game/detail/augs/gui/immediate_hud.h"
 //
 //#include "augs/gui/element_world.h"
 

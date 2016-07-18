@@ -1,12 +1,12 @@
 #pragma once
-#include "misc/timer.h"
+#include "augs/misc/timer.h"
 
 #include "game/entity_id.h"
 
 #include "render_component.h"
 
-#include "misc/stepped_timing.h"
-#include "misc/recoil_player.h"
+#include "augs/misc/stepped_timing.h"
+#include "augs/misc/recoil_player.h"
 
 class gun_system;
 class processing_system;

@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/math/vec2.h"
 #include "render_component.h"
-#include "misc/fixed_delta_timer.h"
+#include "augs/misc/fixed_delta_timer.h"
 
 #include "game/entity_id.h"
 

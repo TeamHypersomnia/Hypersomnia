@@ -16,7 +16,7 @@
 #include "game/messages/melee_swing_response.h"
 #include "game/messages/health_event.h"
 
-#include "misc/randomization.h"
+#include "augs/misc/randomization.h"
 
 #include "game/step.h"
 #include "game/cosmos.h"

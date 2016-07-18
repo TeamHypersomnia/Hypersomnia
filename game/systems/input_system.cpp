@@ -21,7 +21,7 @@
 #include "game/messages/gui_intents.h"
 
 #include "augs/window_framework/event.h"
-#include "misc/step_player.h"
+#include "augs/misc/step_player.h"
 #include "game/step.h"
 #include "game/entity_handle.h"
 

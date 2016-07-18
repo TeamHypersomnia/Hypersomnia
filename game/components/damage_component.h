@@ -4,7 +4,7 @@
 #include "game/entity_id.h"
 #include "game/entity_handle_declaration.h"
 
-#include "misc/timer.h"
+#include "augs/misc/timer.h"
 #include "augs/graphics/pixel.h"
 
 namespace components {
