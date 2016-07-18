@@ -6,6 +6,9 @@
 multiverse::multiverse() 
 	: main_cosmos_timer(60, 5)
 {
+}
+
+void multiverse::populate_cosmoi() {
 	main_cosmos.reserve_storage_for_entities(50000);
 
 	main_cosmos.advance_deterministic_schemata(cosmic_entropy(), [this](fixed_step& step) {

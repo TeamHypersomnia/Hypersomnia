@@ -37,7 +37,6 @@ public:
 	typedef std::function<void(viewing_step&)> variable_callback;
 
 	storage_for_all_temporary_systems temporary_systems;
-	storage_for_all_stateful_systems stateful_systems;
 	all_settings settings;
 
 	cosmic_profiler profiler;

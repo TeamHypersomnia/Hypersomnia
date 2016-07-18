@@ -20,6 +20,8 @@ public:
 
 	entropy_player main_cosmos_player;
 
+	void populate_cosmoi();
+
 	cosmos main_cosmos;
 	augs::fixed_delta_timer main_cosmos_timer;
 

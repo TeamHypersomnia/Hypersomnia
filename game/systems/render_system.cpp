@@ -44,9 +44,11 @@ std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> render_s
 					return are_connected_by_friction(cosmos[a], cosmos[b]);
 				});
 			}
-
-			output[custom_order_layer] = cosmos[layers[custom_order_layer]];
 		}
+	}
+
+	for (size_t layer_idx = 0; layer_idx < layers.size(); ++layer_idx) {
+		output[layer_idx] = cosmos[layers[layer_idx]];
 	}
 
 	return output;
