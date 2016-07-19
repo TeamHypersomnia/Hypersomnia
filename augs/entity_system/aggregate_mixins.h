@@ -7,8 +7,8 @@ namespace augs {
 	template<bool is_const, class derived>
 	class component_setters {
 	public:
-		template<class component, bool dummy_const = is_const,
-			class = std::enable_if_t<!dummy_const>>
+		template<class component, bool _is_const = is_const,
+			class = std::enable_if_t<!_is_const>>
 			decltype(auto) set(const component& c) const {
 			auto& self = *static_cast<const derived*>(this);
 			if (self.template has<component>())
@@ -17,15 +17,15 @@ namespace augs {
 				return self.add(c);
 		}
 
-		template<class component, bool dummy_const = is_const,
-			class = std::enable_if_t<!dummy_const>>
+		template<class component, bool _is_const = is_const,
+			class = std::enable_if_t<!_is_const>>
 			decltype(auto) operator+=(const component& c) const {
 			auto& self = *static_cast<const derived*>(this);
 			return self.add(c);
 		}
 
-		template<class... added_components, bool dummy_const = is_const,
-			class = std::enable_if_t<!dummy_const>>
+		template<class... added_components, bool _is_const = is_const,
+			class = std::enable_if_t<!_is_const>>
 			void set(added_components... args) const {
 			auto components_tuple = std::make_tuple(args...);
 
@@ -64,16 +64,16 @@ namespace augs {
 			return *find<component>();
 		}
 
-		template<class component, bool dummy_const = is_const,
-			class = std::enable_if<!dummy_const>>
+		template<class component, bool _is_const = is_const,
+			class = std::enable_if<!_is_const>>
 		  void add(const component& c) const {
 			auto& self = *static_cast<const derived*>(this);
 			ensure(!has<component>());
 			self.get().template writable_id<component>() = self.owner.get_pool(pool_id<component>()).allocate(c);
 		}
 
-		template<class component, bool dummy_const = is_const,
-			class = std::enable_if_t<!dummy_const>>
+		template<class component, bool _is_const = is_const,
+			class = std::enable_if_t<!_is_const>>
 			void remove() const {
 			ensure(has<component>());
 			auto& self = *static_cast<const derived*>(this);
