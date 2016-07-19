@@ -1,5 +1,6 @@
 #pragma once
 #include "rect_id.h"
+#include "material.h"
 
 namespace augs {
 	namespace gui {

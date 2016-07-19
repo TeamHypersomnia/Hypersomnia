@@ -5,6 +5,7 @@
 #include "rect_id.h"
 #include "material.h"
 #include "stylesheet.h"
+#include "draw_and_event_infos.h"
 
 namespace augs {
 	namespace gui {
@@ -61,7 +62,9 @@ namespace augs {
 		using basic_handle_base::operator pool_id<gui::rect>;
 
 		template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
-		operator basic_handle<true, basic_pool<gui::rect>, gui::rect>() const;
+		operator basic_handle<true, basic_pool<gui::rect>, gui::rect>() const {
+			return basic_handle<true, B, R>(owner, raw_id);
+		}
 
 		template <class D, bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		void consume_raw_input_and_generate_gui_events(gui::raw_event_info&, D dispatcher) const {
@@ -232,17 +235,88 @@ namespace augs {
 
 		/* consume_gui_event default subroutines */
 		template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
-		void scroll_content_with_wheel(gui::event_info);
+		void scroll_content_with_wheel(gui::event_info) {
+			auto& self = get();
+
+			auto& sys = e.owner;
+			auto& wnd = sys.state;
+			if (e == gui_event::wheel) {
+				if (wnd.keys[augs::window::event::keys::SHIFT]) {
+					int temp(int(self.scroll.x));
+					if (self.scrollable) {
+						self.scroll.x -= wnd.mouse.scroll;
+						clamp_scroll_to_right_down_corner();
+					}
+					if ((!self.scrollable || temp == self.scroll.x) && get_parent().alive()) {
+						get_parent().consume_gui_event(e = gui_event::wheel);
+					}
+				}
+				else {
+					int temp(int(self.scroll.y));
+					if (self.scrollable) {
+						self.scroll.y -= wnd.mouse.scroll;
+						clamp_scroll_to_right_down_corner();
+					}
+					if ((!self.scrollable || temp == self.scroll.y) && get_parent().alive()) {
+						get_parent().consume_gui_event(e = gui_event::wheel);
+					}
+				}
+			}
+		}
 
 		template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
-		void try_to_enable_middlescrolling(gui::event_info);
+		void try_to_enable_middlescrolling(gui::event_info) {
+			auto& self = get();
+
+			auto& gr = e.owner;
+			auto& wnd = gr.state;
+			if (e == gui_event::mdown || e == gui_event::mdoubleclick) {
+				if (self.scrollable && !self.content_size.inside(rects::wh<float>(self.rc))) {
+					gr.middlescroll.subject = *this;
+					gr.middlescroll.pos = wnd.mouse.pos;
+					gr.set_focus(*this);
+				}
+				else if (get_parent().alive()) {
+					get_parent().consume_gui_event(e);
+				}
+			}
+		}
 
 		template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
-		void try_to_make_this_rect_focused(gui::event_info);
+		void try_to_make_this_rect_focused(gui::event_info) {
+			auto& pool = get_pool();
+
+			if (!focusable) return;
+			auto& sys = e.owner;
+			if (e == gui_event::ldown ||
+				e == gui_event::ldoubleclick ||
+				e == gui_event::ltripleclick ||
+				e == gui_event::rdoubleclick ||
+				e == gui_event::rdown
+				) {
+				if (pool[sys.get_rect_in_focus()].alive()) {
+					if (get().preserve_focus || !pool[sys.get_rect_in_focus()].get().preserve_focus)
+						sys.set_focus(*this);
+				}
+				else sys.set_focus(*this);
+			}
+		}
 
 		/* try to scroll to view whole content */
 		template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
-		void scroll_to_view() const;
+		void scroll_to_view() const {
+			if (get_parent().alive()) {
+				auto& p = get_parent().get();
+
+				rects::ltrb<float> global = get().get_rect_absolute();
+				rects::ltrb<float> parent_global = p.get_rect_absolute();
+				vec2i off1 = vec2i(std::max(0.f, global.r + 2 - parent_global.r), std::max(0.f, global.b + 2 - parent_global.b));
+				vec2i off2 = vec2i(std::max(0.f, parent_global.l - global.l + 2 + off1.x), std::max(0.f, parent_global.t - global.t + 2 + off1.y));
+				p.scroll += off1;
+				p.scroll -= off2;
+				get_parent().scroll_to_view();
+			}
+		}
 
 		/* draw_triangles default subroutines */
 		void draw_stretched_texture(gui::draw_info in, const gui::material& = gui::material()) const;
