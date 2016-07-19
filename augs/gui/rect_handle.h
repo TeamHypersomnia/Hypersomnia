@@ -14,12 +14,12 @@ namespace augs {
 		template<bool is_const, class derived>
 		class default_rect_callbacks {
 		public:
-			template<class = std::enable_if_t<!is_const>>
+			template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 			void logic() const {
 				
 			}
 
-			template<class = std::enable_if_t<!is_const>>
+			template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 			void event(event_info e) const {
 				const auto& self = *static_cast<const derived*>(this);
 				auto r = self.get_rect();
@@ -60,10 +60,10 @@ namespace augs {
 		using basic_handle_base::basic_handle_base;
 		using basic_handle_base::operator pool_id<gui::rect>;
 
-		template <class = std::enable_if_t<!is_const>>
+		template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		operator basic_handle<true, basic_pool<gui::rect>, gui::rect>() const;
 
-		template <class D, class = std::enable_if_t<!is_const>>
+		template <class D, bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		void consume_raw_input_and_generate_gui_events(gui::raw_event_info&, D dispatcher) const {
 			using namespace augs::window::event;
 			auto& gr = inf.owner;
@@ -164,14 +164,14 @@ namespace augs {
 			}
 		}
 
-		template <class D, class = std::enable_if_t<!is_const>>
+		template <class D, bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		void consume_gui_event(gui::event_info e, D dispatcher) const {			
 			dispatcher.dispatch(*this, [&e](auto c) {
 				c.event(e);
 			});
 		}
 
-		template <class D, class = std::enable_if_t<!is_const>>
+		template <class D, bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		void calculate_clipped_rectangle_layout(D dispatcher) const {
 			/* init; later to be processed absolute and clipped with local rc */
 			auto& self = get();
@@ -215,7 +215,7 @@ namespace augs {
 			}
 		}
 
-		template <class D, class = std::enable_if_t<!is_const>>
+		template <class D, bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		void perform_logic_step(D dispatcher) const {
 			
 			dispatcher.dispatch(*this, [](auto c) {
@@ -231,17 +231,17 @@ namespace augs {
 		}
 
 		/* consume_gui_event default subroutines */
-		template <class = std::enable_if_t<!is_const>>
+		template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		void scroll_content_with_wheel(gui::event_info);
 
-		template <class = std::enable_if_t<!is_const>>
+		template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		void try_to_enable_middlescrolling(gui::event_info);
 
-		template <class = std::enable_if_t<!is_const>>
+		template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		void try_to_make_this_rect_focused(gui::event_info);
 
 		/* try to scroll to view whole content */
-		template <class = std::enable_if_t<!is_const>>
+		template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		void scroll_to_view() const;
 
 		/* draw_triangles default subroutines */
@@ -256,7 +256,7 @@ namespace augs {
 		
 		bool is_being_dragged(gui::rect_world&) const;
 
-		template <class D, class = std::enable_if_t<!is_const>>
+		template <class D, bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		void unhover(gui::raw_event_info& inf, D dispatcher) const {
 			event_info e(inf.owner, gui_event::unknown);
 

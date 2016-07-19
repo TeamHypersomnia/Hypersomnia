@@ -49,12 +49,12 @@ namespace augs {
 				get_rect().draw_centered_texture(info, mat_coloured);
 			}
 
-			template<class = std::enable_if_t<!is_const>>
+			template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 			void event(event_info) const {
 				get().detector.update_appearance(info);
 			}
 
-			template<class = std::enable_if_t<!is_const>>
+			template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 			void logic() const {
 				auto& gui = get_rect_world();
 				auto& entity = userdata.owner_entity;

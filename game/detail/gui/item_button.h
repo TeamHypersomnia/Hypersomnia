@@ -49,7 +49,7 @@ namespace augs {
 				return owner[id.get_owning_transfer_capability().get<components::gui_element>().item_metadata[id], gui_element_entity];
 			}
 
-			template<class = std::enable_if_t<!is_const>>
+			template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 			void logic() const {
 				auto& r = get_rect();
 				auto& self = get();
@@ -92,7 +92,7 @@ namespace augs {
 				}
 			}
 
-			template<class = std::enable_if_t<!is_const>>
+			template<bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 			void consume_gui_event(event_info info) const {
 				if (is_inventory_root())
 					return;
