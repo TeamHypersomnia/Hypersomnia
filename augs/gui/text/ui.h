@@ -30,7 +30,7 @@ namespace augs {
 					action(ui& subject, int where, const formatted_char&, const fstr& replaced);
 					action(ui& subject, int where, const fstr&, type flag = INSERT);
 					action(ui& subject, int where, const fstr&, const fstr& replaced = fstr());
-					action(ui& subject, int left, int right, bool unapply, std::vector<bool>&, type flag);
+					action(ui& subject, int left, int right, bool unapply, const std::vector<bool>&, type flag);
 
 					bool include(const action&);
 					void execute(bool undo);

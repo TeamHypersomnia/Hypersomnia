@@ -1,5 +1,5 @@
 #include "image.h"
-#include "log.h"
+#include "augs/log.h"
 
 #define OFFSET_COUNT 8
 

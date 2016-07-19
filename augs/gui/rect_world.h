@@ -66,7 +66,7 @@ namespace augs {
 			}
 
 			template<class D>
-			void consume_raw_input_and_generate_gui_events(rect_pool& rects, window::event::state, D dispatcher) {
+			void consume_raw_input_and_generate_gui_events(rect_pool& rects, window::event::state new_state, D dispatcher) {
 				state = new_state;
 				auto& gl = state;
 				using namespace augs::window;
@@ -149,8 +149,7 @@ namespace augs {
 					rects[root].consume_raw_input_and_generate_gui_events(in, dispatcher);
 
 					if (!was_hovered_rect_visited && rects[rect_hovered].alive()) {
-						rects[rect_hovered].unhover(in);
-					}
+						rects[rect_hovered].unhover(in, dispatcher);}
 				}
 			}
 

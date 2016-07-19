@@ -123,7 +123,7 @@ namespace augs {
 			}
 
 			void ui::caret_right(unsigned n, bool s) {
-				caret.pos += (n = std::min(n, get_str().length() - caret.pos));
+				caret.pos += (n = std::min<unsigned long>(n, get_str().length() - caret.pos));
 				anchor();
 				if (s) caret.selection_offset -= n;
 				else caret.selection_offset = 0;
@@ -289,7 +289,7 @@ namespace augs {
 				if (get_str().empty()) return;
 
 				int left = 0, right = 0;
-				auto chr = get_str()[std::min(at, get_str().length() - 1)].c;
+				auto chr = get_str()[std::min<unsigned long>(at, get_str().length() - 1)].c;
 
 				if (at >= get_str().length() || separator.is_character_newline(chr))
 					left = separator.get_left_word(get_str(), at);
@@ -299,7 +299,7 @@ namespace augs {
 					right = separator.get_right_word(get_str(), at, get_str().length(), type);
 				}
 
-				caret.pos = std::min(at + right, get_str().length());
+				caret.pos = std::min<unsigned long>(at + right, get_str().length());
 				caret.selection_offset = -int(right + left);
 				anchor();
 			}
@@ -379,7 +379,7 @@ namespace augs {
 
 				int line = get_draft().get_line(caret.pos);
 				if (line > 0) {
-					auto c = get_draft().lines[line - 1].hover(get_draft().sectors[std::min(get_draft().sectors.size() - 1, anchor_pos)], get_draft().sectors);
+					auto c = get_draft().lines[line - 1].hover(get_draft().sectors[std::min<unsigned long>(get_draft().sectors.size() - 1, anchor_pos)], get_draft().sectors);
 					caret.selection_offset += caret.pos - c;
 					caret.pos = c;
 				}
@@ -395,7 +395,7 @@ namespace augs {
 
 				unsigned line = get_draft().get_line(caret.pos);
 				if (line < get_draft().lines.size() - 1) {
-					auto c = get_draft().lines[line + 1].hover(get_draft().sectors[std::min(get_draft().sectors.size() - 1, anchor_pos)], get_draft().sectors);
+					auto c = get_draft().lines[line + 1].hover(get_draft().sectors[std::min<unsigned long>(get_draft().sectors.size() - 1, anchor_pos)], get_draft().sectors);
 					caret.selection_offset -= c - caret.pos;
 					caret.pos = c;
 				}
@@ -433,7 +433,7 @@ namespace augs {
 				set_undo();
 			}
 
-			ui::action::action(ui& subject, int where, int right, bool unapply, std::vector<bool>& v, type flag)
+			ui::action::action(ui& subject, int where, int right, bool unapply, const std::vector<bool>& v, type flag)
 				: subject(&subject), where(where), right(right), unapply(unapply), states(v), flag(flag) {
 				set_undo();
 			}

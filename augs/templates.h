@@ -4,6 +4,8 @@
 #include <fstream>
 #include <vector>
 #include <iomanip>
+#include <algorithm>
+#include <functional>
 
 template <class T, class Tuple>
 struct index_in_tuple;

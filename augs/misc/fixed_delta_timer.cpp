@@ -2,6 +2,7 @@
 #include "fixed_delta_timer.h"
 #include <algorithm>
 #include "augs/ensure.h"
+#include <cmath>
 #undef min
 /* credits goes to http://www.unagames.com/blog/daniele/2010/06/fixed-time-step-implementation-box2d */
 
@@ -22,7 +23,7 @@ namespace augs {
 
 		ensure(
 			"Accumulator must have a value lesser than the fixed time step" &&
-			accumulator < basic_delta.fixed_delta_ms + FLT_EPSILON
+			accumulator < basic_delta.fixed_delta_ms
 			);
 
 		return std::min(steps, max_steps_to_perform);

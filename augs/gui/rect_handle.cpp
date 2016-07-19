@@ -21,13 +21,13 @@ typedef rect R;
 namespace augs {
 	template <bool C>
 	void basic_handle<C, B, R>::draw_stretched_texture(gui::draw_info in, const gui::material& mat) const {
-		draw_clipped_rectangle(mat, get().get_rect_absolute(), get_parent().get(), in.v).good();
+		draw_clipped_rectangle(mat, this->get().get_rect_absolute(), get_parent().get(), in.v).good();
 		// rc_clipped = draw_clipped_rectangle(mat, rc_clipped, parent, in.v);
 	}
 
 	template <bool C>
 	void basic_handle<C, B, R>::draw_centered_texture(gui::draw_info in, const gui::material& mat, vec2i offset) const {
-		auto absolute_centered = get().get_rect_absolute();
+		auto absolute_centered = this->get().get_rect_absolute();
 		auto tex_size = (*mat.tex).get_size();
 		absolute_centered.l += absolute_centered.w() / 2 - float(tex_size.x) / 2;
 		absolute_centered.t += absolute_centered.h() / 2 - float(tex_size.y) / 2;
@@ -52,7 +52,7 @@ namespace augs {
 
 	template <bool C>
 	basic_handle<C, B, R> basic_handle<C, B, R>::get_parent() const {
-		return get_pool()[get().parent];
+		return this->get_pool()[this->get().parent];
 	}
 
 
@@ -63,7 +63,7 @@ namespace augs {
 	
 	template <bool C>
 	std::vector<basic_handle<C, B, R>> basic_handle<C, B, R>::get_children() const {
-		return get_pool()[get().children];
+		return this->get_pool()[this->get().children];
 	}
 }
 

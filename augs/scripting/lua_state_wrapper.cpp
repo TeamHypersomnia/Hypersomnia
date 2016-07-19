@@ -5,7 +5,7 @@
 #include "script.h"
 #include "augs/window_framework/platform_utils.h"
 
-#include "log.h"
+#include "augs/log.h"
 
 // called by luabind internals whenever an error occurs
 void luabind_error_callback(lua_State *L) {

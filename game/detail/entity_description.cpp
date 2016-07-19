@@ -11,7 +11,7 @@
 #include "game/detail/inventory_slot.h"
 #include "game/detail/inventory_slot_id.h"
 #include "game/cosmos.h"
-#include "log.h"
+#include "augs/log.h"
 #include "augs/templates.h"
 
 textual_description description_of_entity(const_entity_handle id) {

@@ -2,7 +2,7 @@
 #include "rect_world.h"
 #include "rect.h"
 #include "augs/window_framework/platform_utils.h"
-#include "log.h"
+#include "augs/log.h"
 #include "augs/misc/pool.h"
 
 #include "rect_handle.h"

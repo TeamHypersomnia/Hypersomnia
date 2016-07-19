@@ -1,5 +1,5 @@
 #include "vec2.h"
-#include <Box2D\Collision\Shapes\b2CircleShape.h>
+#include <3rdparty/Box2D/Collision/Shapes/b2CircleShape.h>
 #include "augs/ensure.h"
 
 std::pair<bool, vec2> circle_ray_intersection(vec2 a, vec2 b, vec2 circle, float radius) {

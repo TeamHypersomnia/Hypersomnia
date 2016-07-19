@@ -3,7 +3,7 @@
 
 #include "game_window.h"
 #include "game/bindings/bind_game_and_augs.h"
-#include "log.h"
+#include "augs/log.h"
 
 game_window::game_window() {
 	bind_game_and_augs(lua);

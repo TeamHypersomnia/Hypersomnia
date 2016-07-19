@@ -22,7 +22,7 @@
 #include "game/components/gun_component.h"
 
 #include "augs/misc/randomization.h"
-#include "log.h"
+#include "augs/log.h"
 
 #include "game/entity_handle.h"
 #include "game/step.h"

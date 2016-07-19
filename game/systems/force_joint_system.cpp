@@ -1,6 +1,6 @@
 #include "force_joint_system.h"
 #include "game/entity_id.h"
-#include "log.h"
+#include "augs/log.h"
 
 #include "game/components/force_joint_component.h"
 #include "game/components/physics_component.h"

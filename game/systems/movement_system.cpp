@@ -3,7 +3,7 @@
 #include "game/cosmos.h"
 #include "game/messages/intent_message.h"
 #include "game/messages/movement_response.h"
-#include "log.h"
+#include "augs/log.h"
 
 #include "game/components/gun_component.h"
 

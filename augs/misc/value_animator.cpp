@@ -1,5 +1,6 @@
 #pragma once
 #include "value_animator.h"
+#include <cmath>
 
 namespace augs {
 	value_animator::method::method(float left_x, float right_x, const std::function<float(float)>& increasing_func)

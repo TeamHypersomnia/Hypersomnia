@@ -1,7 +1,7 @@
 #include "timer.h"
 #include <algorithm>
 #include <numeric>
-#include "log.h"
+#include "augs/log.h"
 
 namespace augs {
 	timer::timer() {

@@ -21,7 +21,7 @@
 
 #include <gtest/gtest.h>
 #include "error/augs_error.h"
-#include "log.h"
+#include "augs/log.h"
 #include "augs/ensure.h"
 
 #include <signal.h>

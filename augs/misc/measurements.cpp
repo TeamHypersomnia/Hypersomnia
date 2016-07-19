@@ -1,6 +1,6 @@
 #include "measurements.h"
 #include <algorithm>
-#include "log.h"
+#include "augs/log.h"
 #include "augs/math/vec2.h"
 
 namespace augs {

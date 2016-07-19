@@ -18,7 +18,7 @@ namespace augs {
 			}
 		}
 
-		void clipboard::copy_clipboard(text::fstr& s) {
+		void clipboard::copy_clipboard(const text::fstr& s) {
 			contents = s;
 			own_copy = true;
 			own_clip = true;

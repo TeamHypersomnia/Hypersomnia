@@ -3,7 +3,7 @@
 #include <GL/OpenGL.h>
 #include <algorithm>
 
-#include "log.h"
+#include "augs/log.h"
 #include "augs/templates.h"
 
 #include "augs/error/augs_error.h"
