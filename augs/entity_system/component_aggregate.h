@@ -7,7 +7,6 @@ namespace augs {
 	class component_aggregate {
 	public:
 		tuple_of_t<make_pool_id, components...> component_ids;
-		pool_id<component_aggregate> this_id;
 
 		template <class component>
 		auto& writable_id() {
