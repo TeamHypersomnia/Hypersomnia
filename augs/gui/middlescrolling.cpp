@@ -1,5 +1,6 @@
 #include "middlescrolling.h"
 #include "augs/misc/pool.h"
+#include "rect_handle.h"
 #include "rect_world.h"
 
 namespace augs {

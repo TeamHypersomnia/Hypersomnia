@@ -1,4 +1,3 @@
-#pragma once
 #include "material.h"
 #include "rect.h"
 #include "augs/texture_baker/texture_baker.h"

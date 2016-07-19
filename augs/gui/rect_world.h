@@ -8,6 +8,7 @@
 #include "augs/texture_baker/texture_baker.h"
 #include "augs/texture_baker/font.h"
 #include "rect.h"
+#include "rect_handle.h"
 
 #include "augs/misc/pool.h"
 #include "augs/misc/pool_handlizer.h"

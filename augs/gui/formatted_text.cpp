@@ -1,4 +1,6 @@
 #include "formatted_text.h"
+#include <algorithm>
+#include <cstring>
 
 namespace augs {
 	namespace gui {

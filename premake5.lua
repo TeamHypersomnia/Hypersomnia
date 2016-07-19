@@ -9,7 +9,14 @@ project "Augmentations"
 
   includedirs { ".", "augs/**", "3rdparty" }
   files { "augs/**.h", "augs/**.cpp" }
---  flags { "C++14" }
+  removefiles { "augs/gui/controls/**",
+                "augs/gui/text_drawer.cpp",
+                "game/detail/gui/**",
+                "game/components/gui_element.cpp",
+                "game/messages/gui_intents.cpp",
+                "game/stateful_systems/gui_system.cpp",
+  }
+  --  flags { "C++14" }
   buildoptions { "-std=c++1z" }
 
   filter "configurations:Debug"

@@ -1,5 +1,4 @@
 #pragma once
-#include "rect_world.h"
 #include "rect_id.h"
 
 namespace augs {
