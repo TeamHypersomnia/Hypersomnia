@@ -9,12 +9,13 @@
 namespace augs {
 	template<class T>
 	class basic_pool : public pool_handlizer<basic_pool<T>> {
+	public:
 		typedef augs::pool_id<T> id_type;
-
-    typedef augs::pool_handle<T> handle_type;
+		typedef augs::pool_handle<T> handle_type;
 		typedef augs::const_pool_handle<T> const_handle_type;
-		
-    struct metadata {
+	
+	protected:
+		struct metadata {
 			int pointing_indirector = -1;
 		};
 
@@ -25,10 +26,8 @@ namespace augs {
 
 		std::vector<T> pooled;
 		std::vector<metadata> slots;
-    std::vector<indirector> indirectors;
+		std::vector<indirector> indirectors;
 		std::vector<int> free_indirectors;
-
-	protected:
 
 		void initialize_space(int slot_count) {
 			pooled.clear();
