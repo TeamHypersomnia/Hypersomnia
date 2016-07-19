@@ -354,6 +354,7 @@
     <ClCompile Include="3rdparty\RakNet\Source\_FindFirst.cpp" />
     <ClCompile Include="augs\ensure.cpp" />
     <ClCompile Include="augs\gui\clipboard.cpp" />
+    <ClCompile Include="augs\gui\draw_and_event_infos.cpp" />
     <ClCompile Include="augs\gui\formatted_text.cpp" />
     <ClCompile Include="augs\gui\middlescrolling.cpp" />
     <ClCompile Include="augs\gui\rect_handle.cpp" />
@@ -363,13 +364,12 @@
     <ClCompile Include="game\cosmic_entropy.cpp" />
     <ClCompile Include="game\components\dynamic_tree_node_component.cpp" />
     <ClCompile Include="game\components\processing_component.cpp" />
-    <ClCompile Include="game\components\relations_component.cpp" />
     <ClCompile Include="game\components\substance_component.cpp" />
     <ClCompile Include="game\cosmic_profiler.cpp" />
     <ClCompile Include="game\detail\convex_partitioned_shape.cpp" />
     <ClCompile Include="game\detail\entity\inventory_getters.cpp" />
     <ClCompile Include="game\detail\entity\physics_getters.cpp" />
-    <ClCompile Include="game\detail\entity\relations_component_helpers.cpp" />
+    <ClCompile Include="game\detail\entity\relations_helpers.cpp" />
     <ClCompile Include="game\entropy_player.cpp" />
     <ClCompile Include="game\game_window.cpp" />
     <ClCompile Include="game\global\input_context.cpp" />
@@ -978,6 +978,7 @@
     <ClInclude Include="augs\filesystem\directory.h" />
     <ClInclude Include="augs\gui\appearance_detector.h" />
     <ClInclude Include="augs\gui\clipboard.h" />
+    <ClInclude Include="augs\gui\draw_and_event_infos.h" />
     <ClInclude Include="augs\gui\element_handle.h" />
     <ClInclude Include="augs\gui\element_id.h" />
     <ClInclude Include="augs\gui\element_world.h" />
@@ -1009,10 +1010,11 @@
     <ClInclude Include="game\component_synchronizer.h" />
     <ClInclude Include="game\detail\entity\inventory_getters.h" />
     <ClInclude Include="game\detail\entity\physics_getters.h" />
-    <ClInclude Include="game\detail\entity\relations_component_helpers.h" />
+    <ClInclude Include="game\detail\entity\relations_helpers.h" />
     <ClInclude Include="game\components\meta_component.h" />
     <ClInclude Include="game\components\substance_component.h" />
     <ClInclude Include="game\detail\convex_partitioned_shape.h" />
+    <ClInclude Include="game\entity_relations.h" />
     <ClInclude Include="game\entropy_player.h" />
     <ClInclude Include="game\enums\colliders_offset_type.h" />
     <ClInclude Include="game\game_window.h" />
@@ -1080,7 +1082,6 @@
     <ClInclude Include="game\components\driver_component.h" />
     <ClInclude Include="game\components\fixtures_component.h" />
     <ClInclude Include="game\components\gun_component.h" />
-    <ClInclude Include="game\components\relations_component.h" />
     <ClInclude Include="game\components\rotation_copying_component.h" />
     <ClInclude Include="game\components\movement_component.h" />
     <ClInclude Include="game\components\particle_effect_response_component.h" />

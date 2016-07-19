@@ -11,7 +11,7 @@
 
 #include "game/detail/entity/inventory_getters.h"
 #include "game/detail/entity/physics_getters.h"
-#include "game/detail/entity/relations_component_helpers.h"
+#include "game/detail/entity/relations_helpers.h"
 
 class cosmos;
 
@@ -27,9 +27,13 @@ namespace augs {
 		public augs::component_setters<is_const, basic_entity_handle<is_const>>,
 		public inventory_getters<is_const, basic_entity_handle<is_const>>,
 		public physics_getters<is_const, basic_entity_handle<is_const>>,
-		public relations_component_helpers<is_const, basic_entity_handle<is_const>>
+		public relations_helpers<is_const, basic_entity_handle<is_const>>
 	{
+		friend class relations_helpers<is_const, basic_entity_handle<is_const>>;
+		template <bool, class> friend class basic_relations_helpers;
+
 		typedef augs::component_allocators<is_const, basic_entity_handle<is_const>> allocator;
+		typedef basic_handle_base<is_const, cosmos, put_all_components_into<component_aggregate>::type> base;
 
 		friend class augs::component_allocators<is_const, basic_entity_handle<is_const>>;
 
@@ -86,21 +90,22 @@ namespace augs {
 		template<class T>
 		using component_or_synchronizer_t = typename component_or_synchronizer<T>::return_type;
 
-		using basic_handle_base<is_const, cosmos, put_all_components_into<component_aggregate>    ::type>::get;
+		using base::get;
+		using base::get_meta;
 
 	public:
-		using basic_handle_base<is_const, cosmos, put_all_components_into<component_aggregate>    ::type>::basic_handle_base;
+		using base::base;
 
-		typename basic_handle_base<is_const, cosmos, put_all_components_into<component_aggregate>    ::type>::owner_reference get_cosmos() const {
+		typename base::owner_reference get_cosmos() const {
 			return this->owner;
 		}
 
 		bool operator==(entity_id id) const {
-			return basic_handle_base<is_const, cosmos, put_all_components_into<component_aggregate>::type>::operator==(id);
+			return base::operator==(id);
 		}
 
 		bool operator!=(entity_id id) const {
-			return basic_handle_base<is_const, cosmos, put_all_components_into<component_aggregate>::type>::operator!=(id);
+			return base::operator!=(id);
 		}
 
 		template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
@@ -108,7 +113,7 @@ namespace augs {
 			return const_entity_handle(this->owner, this->raw_id);
 		}
 
-		using basic_handle_base<is_const, cosmos, put_all_components_into<component_aggregate>    ::type>::operator entity_id;
+		using base::operator entity_id;
 
 		template <class component>
 		bool has() const {

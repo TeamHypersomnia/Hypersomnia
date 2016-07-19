@@ -6,7 +6,7 @@
 #include "material.h"
 #include "stylesheet.h"
 #include "draw_and_event_infos.h"
-#include "event.h"
+#include "augs/window_framework/event.h"
 
 namespace augs {
 	namespace gui {

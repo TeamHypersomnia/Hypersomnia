@@ -1011,9 +1011,6 @@
     <ClCompile Include="augs\misc\delta.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\components\relations_component.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\bindings\bind_game_and_augs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1152,9 +1149,6 @@
     <ClCompile Include="game\components\processing_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\detail\entity\relations_component_helpers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\components\dynamic_tree_node_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1195,6 +1189,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\scene_managers\one_entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="augs\gui\draw_and_event_infos.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\entity\relations_helpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -3020,9 +3020,6 @@
     <ClInclude Include="game\entity_id.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\components\relations_component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\types_specification\all_component_includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3203,9 +3200,6 @@
     <ClInclude Include="game\detail\entity\inventory_getters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\detail\entity\relations_component_helpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\detail\entity\physics_getters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3294,6 +3288,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\scene_managers\one_entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\entity_relations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\gui\draw_and_event_infos.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\entity\relations_helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

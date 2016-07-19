@@ -1,3 +1,4 @@
+#include "game/entity_relations.h"
 #include "multiverse.h"
 #include "game_window.h"
 #include "cosmos.h"

@@ -9,30 +9,13 @@
 #include <string>
 #include <functional>
 #include "game/cosmos.h"
+#include "game/entity_handle.h"
+#include "game/entity_relations.h"
 
 typedef components::fixtures F;
 
 void component_synchronizer<false, F>::set_owner_body(entity_id owner_id) const {
-	auto& cosmos = handle.get_cosmos();
-	auto new_owner = cosmos[owner_id];
-	auto this_id = handle.get_id();
-
-	auto former_owner = cosmos[component.owner_body];
-
-	if (former_owner.alive()) {
-		remove_element(former_owner.get<components::physics>().component.fixture_entities, this_id);
-		cosmos.complete_resubstantialization(former_owner);
-	}
-
-	component.owner_body = new_owner;
-
-	if (new_owner.alive()) {
-		remove_element(new_owner.get<components::physics>().component.fixture_entities, this_id);
-		new_owner.get<components::physics>().component.fixture_entities.push_back(this_id);
-		cosmos.complete_resubstantialization(new_owner);
-	}
-	else
-		cosmos.complete_resubstantialization(handle);
+	handle.set_owner_body(owner_id);
 }
 
 template<bool C>
@@ -82,7 +65,6 @@ void component_synchronizer<false, F>::set_offset(colliders_offset_type t, compo
 }
 
 component_synchronizer<false, F>& component_synchronizer<false, F>::operator=(const F& f) {
-	set_owner_body(f.owner_body);
 	component = f;
 	complete_resubstantialization();
 	return *this;
@@ -170,7 +152,7 @@ bool basic_fixtures_synchronizer<C>::is_constructed() const {
 
 template<bool C>
 basic_entity_handle<C> basic_fixtures_synchronizer<C>::get_owner_body() const {
-	return handle.get_cosmos()[component.owner_body];
+	return handle.get_owner_body();
 }
 
 template<bool C>

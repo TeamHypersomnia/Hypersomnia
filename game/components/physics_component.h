@@ -13,14 +13,6 @@ template<bool> class basic_physics_synchronizer;
 
 namespace components {
 	struct physics {
-	private:
-		std::vector<entity_id> fixture_entities;
-		friend class component_synchronizer<false, components::fixtures>;
-		friend class component_synchronizer<true, components::physics>;
-		friend class component_synchronizer<false, components::physics>;
-		template<bool> friend class ::basic_physics_synchronizer;
-
-	public:
 		components::transform transform;
 
 		bool activated = true;

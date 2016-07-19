@@ -10,6 +10,7 @@
 #include "game/temporary_systems/physics_system.h"
 #include "augs/ensure.h"
 #include "game/entity_handle.h"
+#include "game/entity_relations.h"
 
 typedef components::physics P;
 
@@ -216,7 +217,7 @@ void component_synchronizer<false, P>::set_transform(components::transform trans
 
 template<bool C>
 std::vector<basic_entity_handle<C>> basic_physics_synchronizer<C>::get_fixture_entities() const {
-	return handle.get_cosmos().to_handle_vector(component.fixture_entities);
+	return handle.get_fixture_entities();
 }
 
 template<bool C>

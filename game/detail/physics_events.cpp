@@ -204,9 +204,9 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 				}
 		}
 
-		auto* driver = subject.get_owner_body_entity().find<components::driver>();
+		auto* driver = subject.get_owner_body().find<components::driver>();
 
-		bool colliding_with_owning_car = driver && driver->owned_vehicle == collider.get_owner_body_entity();
+		bool colliding_with_owning_car = driver && driver->owned_vehicle == collider.get_owner_body();
 
 		if (colliding_with_owning_car) {
 			contact->SetEnabled(false);

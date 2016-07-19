@@ -14,7 +14,6 @@
 #include "game/components/position_copying_component.h"
 
 #include "game/components/animation_component.h"
-#include "game/components/relations_component.h"
 #include "game/components/movement_component.h"
 
 #include "game/detail/inventory_slot.h"

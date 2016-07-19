@@ -38,6 +38,5 @@
 #include "game/components/melee_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"
-#include "game/components/relations_component.h"
 #include "game/components/processing_component.h"
 #include "game/components/substance_component.h"

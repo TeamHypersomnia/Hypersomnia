@@ -89,18 +89,18 @@ struct put_all_components_into {
 		components::melee,
 		components::sentience,
 		components::attitude,
-		components::relations,
 		components::processing,
 		components::substance
 	> type;
 };
 
 class cosmos;
+struct entity_relations;
 
 namespace augs {
-	template<class, class...>
+	template<class, class, class...>
 	class storage_for_components_and_aggregates;
 }
 
-typedef typename put_all_components_into<augs::storage_for_components_and_aggregates, cosmos>::type
+typedef typename put_all_components_into<augs::storage_for_components_and_aggregates, cosmos, entity_relations>::type
 storage_for_all_components_and_aggregates;

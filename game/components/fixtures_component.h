@@ -18,13 +18,6 @@ class basic_fixtures_synchronizer;
 
 namespace components {
 	struct fixtures {
-	private:
-		entity_id owner_body;
-		friend class component_synchronizer<false, components::fixtures>;
-		friend class component_synchronizer<true, components::fixtures>;
-		template<bool> friend class ::basic_fixtures_synchronizer;
-	
-	public:
 		struct convex_partitioned_collider {
 			convex_partitioned_shape shape;
 			b2Filter filter;

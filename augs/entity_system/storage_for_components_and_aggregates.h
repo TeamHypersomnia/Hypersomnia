@@ -6,13 +6,13 @@
 #include "aggregate_mixins.h"
 
 namespace augs {
-	template <class derived, class... components>
+	template <class derived, class aggregate_meta, class... components>
 	class storage_for_components_and_aggregates {
 		typedef component_aggregate<components...> aggregate_type;
 		typedef pool_id<aggregate_type> aggregate_id;
 
 	public:
-		typedef pool<aggregate_type> aggregate_pool_type;
+		typedef pool_with_meta<aggregate_type, aggregate_meta> aggregate_pool_type;
 
 		aggregate_pool_type pool_for_aggregates;
 		tuple_of_t<make_pool, components...> pools_for_components;
@@ -79,7 +79,8 @@ namespace augs {
 			auto handle = self.get_handle(aggregate);
 
 			for_each_type<components...>([&handle](auto c) {
-				handle.template remove<decltype(c)>();
+				if(handle.template has<decltype(c)>())
+					handle.template remove<decltype(c)>();
 			});
 
 			pool_for_aggregates.free(aggregate);

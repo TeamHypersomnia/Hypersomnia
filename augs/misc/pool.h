@@ -169,21 +169,21 @@ namespace augs {
 		std::vector<std::tuple<meta...>> metas;
 	public:
 		void initialize_space(int slot_count) {
-			pool<T>::initialize_space(slot_count);
+			basic_pool<T>::initialize_space(slot_count);
 
 			metas.clear();
 			metas.reserve(slot_count);
 		}
 
 		template<typename... Args>
-		typename basic_pool<T>::handle_type allocate(Args... args) {
-			auto result = pool<T>::allocate(args...);
+		id_type allocate(Args... args) {
+			auto result = basic_pool<T>::allocate(args...);
 			metas.emplace_back(std::tuple<meta...>());
 			return result;
 		}
 
 		bool free(typename basic_pool<T>::id_type object) {
-			auto result = pool<T>::internal_free(object, [this](size_t to, size_t from){
+			auto result = basic_pool<T>::internal_free(object, [this](size_t to, size_t from){
 				metas[to] = std::move(metas[from]);
 			});
 

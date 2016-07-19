@@ -296,7 +296,12 @@ void perform_transfer(item_slot_transfer_request r, fixed_step& step) {
 
 			if (parent_slot.alive()) {
 				def.activated = parent_slot.should_item_inside_keep_physical_body();
-				owner_body = parent_slot.get_root_container();
+				
+				if (def.activated)
+					owner_body = parent_slot.get_root_container();
+				else
+					owner_body = descendant;
+
 				def.offsets_for_created_shapes[colliders_offset_type::ITEM_ATTACHMENT_DISPLACEMENT]
 					= parent_slot.sum_attachment_offsets_of_parents(descendant);
 				def.offsets_for_created_shapes[colliders_offset_type::SPECIAL_MOVE_DISPLACEMENT].reset();

@@ -39,6 +39,8 @@
 
 #include "game/messages/health_event.h"
 
+#include "game/entity_relations.h"
+
 #include "game/types_specification/all_messages_includes.h"
 #include "game/types_specification/all_component_includes.h"
 
@@ -99,8 +101,17 @@ entity_handle cosmos::create_entity(std::string debug_name) {
 }
 
 entity_handle cosmos::clone_entity(entity_id e) {
-	const_entity_handle const_handle = get_handle(e);
-	return get_handle(clone_aggregate(const_handle));
+	const_entity_handle copied_entity = get_handle(e);
+	auto new_entity = get_handle(clone_aggregate(copied_entity));
+
+	new_entity.make_cloned_sub_entities_recursive(e);
+	new_entity.assign_associated_entities(e);
+	
+	if (copied_entity.get_owner_body() == copied_entity) {
+		new_entity.set_owner_body(new_entity);
+	}
+
+	return new_entity;
 }
 
 void cosmos::delete_entity(entity_id e) {
@@ -111,6 +122,16 @@ void cosmos::delete_entity(entity_id e) {
 
 	if (should_destruct_now_to_avoid_repeated_resubstantialization)
 		handle.remove<components::substance>();
+
+	// now manipulation of substanceless entity won't trigger redundant resubstantialization
+
+	auto owner_body = handle.get_owner_body();
+
+	bool should_release_dependency = owner_body != handle;
+
+	if (should_release_dependency) {
+		handle.set_owner_body(owner_body);
+	}
 
 	free_aggregate(e);
 }

@@ -27,10 +27,6 @@ public:
 
 	component_synchronizer_base(component_reference c, basic_entity_handle<is_const> h) : component(c), handle(h) {
 	}
-
-	operator typename std::remove_reference<component_reference>::type() const {
-		return component;
-	}
 };
 
 template <bool is_const, class component_type>
