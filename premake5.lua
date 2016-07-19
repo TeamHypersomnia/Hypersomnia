@@ -15,6 +15,7 @@ project "Augmentations"
                 "game/components/gui_element.cpp",
                 "game/messages/gui_intents.cpp",
                 "game/stateful_systems/gui_system.cpp",
+                "augs/network/**",
   }
   --  flags { "C++14" }
   buildoptions { "-std=c++1z" }

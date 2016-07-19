@@ -1,6 +1,6 @@
 #include "entropy_player.h"
-#include "filesystem/file.h"
-#include "filesystem/directory.h"
+#include "augs/filesystem/file.h"
+#include "augs/filesystem/directory.h"
 #include "augs/misc/time_utils.h"
 #include "game/cosmos.h"
 #include "game/components/input_receiver_component.h"

@@ -2,7 +2,7 @@
 #include "font.h"
 #include <set>
 
-#include <freetype\ft2build.h> 
+#include <freetype/ft2build.h> 
 #include FT_FREETYPE_H
 
 #include "augs/global_libraries.h"

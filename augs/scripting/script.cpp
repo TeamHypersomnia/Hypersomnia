@@ -5,7 +5,7 @@
 #include <fstream>
 
 #include "augs/window_framework/window.h"
-#include "filesystem/file.h"
+#include "augs/filesystem/file.h"
 
 namespace augs {
 	script::script(lua_state_wrapper& lua_state) : lua_state(lua_state) {}
