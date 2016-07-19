@@ -58,24 +58,24 @@ namespace augs {
 	public:
 		typedef basic_handle<is_const, basic_pool<gui::rect>, gui::rect> handle_type;
 
-		using basic_handle_base::basic_handle_base;
-		using basic_handle_base::operator pool_id<gui::rect>;
+		using basic_handle_base<is_const, basic_pool<gui::rect>, gui::rect>::basic_handle_base;
+		using basic_handle_base<is_const, basic_pool<gui::rect>, gui::rect>::operator pool_id<gui::rect>;
 
 		template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		operator basic_handle<true, basic_pool<gui::rect>, gui::rect>() const {
-			return basic_handle<true, B, R>(owner, raw_id);
+			return basic_handle<true, augs::basic_pool<augs::gui::rect>, augs::gui::rect>(this->owner, this->raw_id);
 		}
 
 		template <class D, bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		void consume_raw_input_and_generate_gui_events(gui::raw_event_info&, D dispatcher) const {
 			using namespace augs::window::event;
-			auto& gr = inf.owner;
-			auto& m = gr.state.mouse;
-			unsigned msg = inf.msg;
-			event_info e(gr, gui_event::unknown);
+			auto& gr = this->inf.owner;
+			auto& m = this->gr.state.mouse;
+			unsigned msg = this->inf.msg;
+      gui::event_info e(gr, gui_event::unknown);
 
-			auto& pool = get_pool();
-			auto& self = get();
+			auto& pool = this->get_pool();
+			auto& self = this->get();
 
 			if (self.enable_drawing) {
 				if (self.enable_drawing_of_children) {
@@ -83,7 +83,7 @@ namespace augs {
 					for (int i = children_all.size() - 1; i >= 0; --i) {
 						if (!children_all[i].get().enable_drawing) continue;
 						children_all[i].get().parent = *this;
-						children_all[i].consume_raw_input_and_generate_gui_events(inf, dispatcher);
+						children_all[i].consume_raw_input_and_generate_gui_events(this->inf, dispatcher);
 					}
 				}
 
@@ -106,9 +106,9 @@ namespace augs {
 							}
 							if (msg == ldown) {
 								gr.rect_held_by_lmb = this;
-								gr.ldrag_relative_anchor = m.pos - rc.get_position();
+								gr.ldrag_relative_anchor = m.pos - this->rc.get_position();
 								gr.last_ldown_position = m.pos;
-								rc_pos_before_dragging = vec2i(rc.l, rc.t);
+								this->rc_pos_before_dragging = vec2i(this->rc.l, this->rc.t);
 								consume_gui_event(e = gui_event::ldown, dispatcher);
 							}
 							if (msg == mdown) {
@@ -119,13 +119,13 @@ namespace augs {
 							}
 							if (msg == ldoubleclick) {
 								gr.rect_held_by_lmb = this;
-								gr.ldrag_relative_anchor = m.pos - rc.get_position();
+								gr.ldrag_relative_anchor = m.pos - this->rc.get_position();
 								gr.last_ldown_position = m.pos;
 								consume_gui_event(e = gui_event::ldoubleclick, dispatcher);
 							}
 							if (msg == ltripleclick) {
 								gr.rect_held_by_lmb = this;
-								gr.ldrag_relative_anchor = m.pos - rc.get_position();
+								gr.ldrag_relative_anchor = m.pos - this->rc.get_position();
 								gr.last_ldown_position = m.pos;
 								consume_gui_event(e = gui_event::ltripleclick, dispatcher);
 							}
@@ -152,7 +152,7 @@ namespace augs {
 						else {
 							// ensure(msg == mousemotion);
 							consume_gui_event(e = gui_event::hout, dispatcher);
-							unhover(inf, dispatcher);
+							unhover(this->inf, dispatcher);
 						}
 
 						gr.was_hovered_rect_visited = true;
@@ -177,7 +177,7 @@ namespace augs {
 		template <class D, bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		void calculate_clipped_rectangle_layout(D dispatcher) const {
 			/* init; later to be processed absolute and clipped with local rc */
-			auto& self = get();
+			auto& self = this->get();
 
 			self.rc_clipped = self.rc;
 			self.absolute_xy = vec2i(self.rc.l, self.rc.t);
@@ -207,14 +207,14 @@ namespace augs {
 
 			/* align scroll only to be positive and not to exceed content size */
 			if (self.snap_scroll_to_content_size)
-				clamp_scroll_to_right_down_corner();
+				this->clamp_scroll_to_right_down_corner();
 
 			/* do the same for every child */
 			auto children_all = get_children();
 			for (size_t i = 0; i < children_all.size(); ++i) {
 				children_all[i].get().parent = this;
 				//if (children_all[i]->enable_drawing)
-				children_all[i].calculate_clipped_rectangle_layout(behaviour);
+				children_all[i].calculate_clipped_rectangle_layout(this->behaviour);
 			}
 		}
 
@@ -236,29 +236,29 @@ namespace augs {
 		/* consume_gui_event default subroutines */
 		template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		void scroll_content_with_wheel(gui::event_info) {
-			auto& self = get();
+			auto& self = this->get();
 
-			auto& sys = e.owner;
-			auto& wnd = sys.state;
-			if (e == gui_event::wheel) {
+			auto& sys = this->e.owner;
+			auto& wnd = this->sys.state;
+			if (this->e == gui_event::wheel) {
 				if (wnd.keys[augs::window::event::keys::SHIFT]) {
 					int temp(int(self.scroll.x));
 					if (self.scrollable) {
 						self.scroll.x -= wnd.mouse.scroll;
-						clamp_scroll_to_right_down_corner();
+						this->clamp_scroll_to_right_down_corner();
 					}
 					if ((!self.scrollable || temp == self.scroll.x) && get_parent().alive()) {
-						get_parent().consume_gui_event(e = gui_event::wheel);
+						get_parent().consume_gui_event(this->e = gui_event::wheel);
 					}
 				}
 				else {
 					int temp(int(self.scroll.y));
 					if (self.scrollable) {
 						self.scroll.y -= wnd.mouse.scroll;
-						clamp_scroll_to_right_down_corner();
+						this->clamp_scroll_to_right_down_corner();
 					}
 					if ((!self.scrollable || temp == self.scroll.y) && get_parent().alive()) {
-						get_parent().consume_gui_event(e = gui_event::wheel);
+						get_parent().consume_gui_event(this->e = gui_event::wheel);
 					}
 				}
 			}
@@ -266,36 +266,36 @@ namespace augs {
 
 		template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		void try_to_enable_middlescrolling(gui::event_info) {
-			auto& self = get();
+			auto& self = this->get();
 
-			auto& gr = e.owner;
-			auto& wnd = gr.state;
-			if (e == gui_event::mdown || e == gui_event::mdoubleclick) {
+			auto& gr = this->e.owner;
+			auto& wnd = this->gr.state;
+			if (this->e == gui_event::mdown || this->e == gui_event::mdoubleclick) {
 				if (self.scrollable && !self.content_size.inside(rects::wh<float>(self.rc))) {
 					gr.middlescroll.subject = *this;
 					gr.middlescroll.pos = wnd.mouse.pos;
 					gr.set_focus(*this);
 				}
 				else if (get_parent().alive()) {
-					get_parent().consume_gui_event(e);
+					get_parent().consume_gui_event(this->e);
 				}
 			}
 		}
 
 		template <bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		void try_to_make_this_rect_focused(gui::event_info) {
-			auto& pool = get_pool();
+			auto& pool = this->get_pool();
 
-			if (!focusable) return;
-			auto& sys = e.owner;
-			if (e == gui_event::ldown ||
-				e == gui_event::ldoubleclick ||
-				e == gui_event::ltripleclick ||
-				e == gui_event::rdoubleclick ||
-				e == gui_event::rdown
+			if (!this->focusable) return;
+			auto& sys = this->e.owner;
+			if (this->e == gui_event::ldown ||
+				this->e == gui_event::ldoubleclick ||
+				this->e == gui_event::ltripleclick ||
+				this->e == gui_event::rdoubleclick ||
+				this->e == gui_event::rdown
 				) {
 				if (pool[sys.get_rect_in_focus()].alive()) {
-					if (get().preserve_focus || !pool[sys.get_rect_in_focus()].get().preserve_focus)
+					if (this->get().preserve_focus || !pool[sys.get_rect_in_focus()].get().preserve_focus)
 						sys.set_focus(*this);
 				}
 				else sys.set_focus(*this);
@@ -308,7 +308,7 @@ namespace augs {
 			if (get_parent().alive()) {
 				auto& p = get_parent().get();
 
-				rects::ltrb<float> global = get().get_rect_absolute();
+				rects::ltrb<float> global = this->get().get_rect_absolute();
 				rects::ltrb<float> parent_global = p.get_rect_absolute();
 				vec2i off1 = vec2i(std::max(0.f, global.r + 2 - parent_global.r), std::max(0.f, global.b + 2 - parent_global.b));
 				vec2i off2 = vec2i(std::max(0.f, parent_global.l - global.l + 2 + off1.x), std::max(0.f, parent_global.t - global.t + 2 + off1.y));
@@ -332,19 +332,19 @@ namespace augs {
 
 		template <class D, bool _is_const = is_const, class = std::enable_if_t<!_is_const>>
 		void unhover(gui::raw_event_info& inf, D dispatcher) const {
-			event_info e(inf.owner, gui_event::unknown);
+      gui::event_info e(inf.owner, gui_event::unknown);
 
 			consume_gui_event(e = gui_event::hoverlost, dispatcher);
 
-			if (inf.owner.rect_held_by_lmb == this)
+			if (this->inf.owner.rect_held_by_lmb == this)
 				consume_gui_event(e = gui_event::loutdrag, dispatcher);
 
-			inf.owner.rect_hovered = rect_id();
+			this->inf.owner.rect_hovered = this->rect_id();
 		}
 		
 		template <class D>
 		void draw_children(gui::draw_info in, D dispatcher) const {
-			auto& self = get();
+			auto& self = this->get();
 
 			if (!self.enable_drawing_of_children)
 				return;
@@ -357,7 +357,7 @@ namespace augs {
 						c.draw(in);
 					});
 
-					children_all[i].draw_children(in, behaviour);
+					children_all[i].draw_children(in, this->behaviour);
 				}
 			}
 		}

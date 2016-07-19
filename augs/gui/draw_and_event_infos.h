@@ -1,5 +1,5 @@
 #pragma once
-#include "graphics/vertex.h"
+#include "augs/graphics/vertex.h"
 #include "gui_event.h"
 
 class rect_world;
