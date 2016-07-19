@@ -12,7 +12,7 @@ typedef cosmos O;
 typedef put_all_components_into<augs::component_aggregate>::type N;
 
 template <bool C>
-template <class>
+template <bool, class>
 void augs::basic_handle<C, O, N>::add_standard_components() {
 	if (has<components::transform>() && has<components::physics>())
 		get<components::physics>().set_transform(get<components::transform>());
@@ -37,4 +37,4 @@ void augs::basic_handle<C, O, N>::add_standard_components() {
 }
 
 // explicit instantiation
-template void augs::basic_handle<false, cosmos, put_all_components_into<augs::component_aggregate>::type>::add_standard_components();
+template void augs::basic_handle<false, cosmos, put_all_components_into<augs::component_aggregate>::type>::add_standard_components<false, void>();
