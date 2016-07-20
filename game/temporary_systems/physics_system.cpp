@@ -51,8 +51,6 @@ const colliders_cache& physics_system::get_colliders_cache(entity_id id) const {
 }
 
 void physics_system::destruct(entity_handle handle) {
-	contact_listener listener(handle.get_cosmos());
-
 	if (is_constructed_rigid_body(handle)) {
 		auto& cache = get_rigid_body_cache(handle);
 		
@@ -266,10 +264,10 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 
 	contact_listener listener(step.cosm);
 
-	post_and_clear_accumulated_collision_messages(step);
-
 	b2world.Step(static_cast<float32>(delta.in_seconds()), velocityIterations, positionIterations);
 	b2world.ClearForces();
+
+	post_and_clear_accumulated_collision_messages(step);
 
 	for (b2Body* b = b2world.GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
