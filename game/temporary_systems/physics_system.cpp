@@ -142,9 +142,10 @@ void physics_system::construct(entity_handle handle) {
 	fixtures_construct(handle);
 
 	if (handle.has<components::physics>()) {
-		auto& physics = handle.get<components::physics>();
+		const auto& physics = handle.get<components::physics>();
+		const auto& fixture_entities = physics.get_fixture_entities();
 
-		if (physics.is_activated()) {
+		if (physics.is_activated() && fixture_entities.size() > 0) {
 			auto& physics_data = physics.get_data();
 			auto& cache = get_rigid_body_cache(handle);
 
@@ -157,7 +158,6 @@ void physics_system::construct(entity_handle handle) {
 			default:ensure(false) break;
 			}
 
-			def.angle = 0;
 			def.userData = handle;
 			def.bullet = physics_data.bullet;
 			def.position = physics_data.transform.pos * PIXELS_TO_METERSf;
@@ -173,7 +173,7 @@ void physics_system::construct(entity_handle handle) {
 			cache.body = b2world.CreateBody(&def);
 			cache.body->SetAngledDampingEnabled(physics_data.angled_damping);
 
-			for (auto& f : physics.get_fixture_entities())
+			for (const auto& f : fixture_entities)
 				fixtures_construct(f);
 		}
 	}
@@ -281,6 +281,17 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 		auto body_pos = METERS_TO_PIXELSf * b->GetPosition();
 		auto body_angle = b->GetAngle() * RAD_TO_DEGf;
 
+		auto& transform = entity.get<components::transform>();
+
+		transform.pos = body_pos;
+
+		if (!b->IsFixedRotation())
+			transform.rotation = body_angle;
+
+		physics.component.transform = transform;
+		physics.component.velocity = METERS_TO_PIXELSf * b->GetLinearVelocity();
+		physics.component.angular_velocity = RAD_TO_DEGf * b->GetAngularVelocity();
+
 		for (auto& ff : physics.get_fixture_entities()) {
 			auto fe = cosmos[ff];
 
@@ -298,16 +309,5 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 
 			fix_transform.pos.rotate(body_angle, body_pos);
 		}
-
-		auto& transform = entity.get<components::transform>();
-
-		transform.pos = body_pos;
-
-		if (!b->IsFixedRotation())
-			transform.rotation = body_angle;
-
-		physics.component.transform = transform;
-		physics.component.velocity = METERS_TO_PIXELSf * b->GetLinearVelocity();
-		physics.component.angular_velocity = RAD_TO_DEGf * b->GetAngularVelocity();
 	}
 }

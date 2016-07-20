@@ -78,6 +78,58 @@ namespace scene_managers {
 
 		ingredients::inject_window_input_to_character(world[new_characters[current_character]], camera);
 
+
+		prefabs::create_sample_suppressor(world, vec2(300, -500));
+
+		bool many_charges = false;
+
+		auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
+			prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
+				prefabs::create_cyan_charge(world, vec2(0, 0), many_charges ? 1000 : 30)));
+
+		auto rifle2 = prefabs::create_sample_rifle(step, vec2(100, -500 + 50),
+			prefabs::create_sample_magazine(step, vec2(100, -650), true ? "10" : "0.3",
+				prefabs::create_cyan_charge(world, vec2(0, 0), true ? 1000 : 30)));
+
+		prefabs::create_sample_rifle(step, vec2(100, -500 + 100));
+
+		prefabs::create_pistol(step, vec2(300, -500 + 50));
+
+		auto pis2 = prefabs::create_pistol(step, vec2(300, 50),
+			prefabs::create_sample_magazine(step, vec2(100, -650), "0.4",
+				prefabs::create_green_charge(world, vec2(0, 0), 40)));
+
+		auto submachine = prefabs::create_submachine(step, vec2(500, -500 + 50),
+			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
+
+		prefabs::create_submachine(step, vec2(0, -1000),
+			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
+
+		prefabs::create_submachine(step, vec2(150, -1000 + 150),
+			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
+
+		prefabs::create_submachine(step, vec2(300, -1000 + 300),
+			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
+
+		prefabs::create_submachine(step, vec2(450, -1000 + 450),
+			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_pink_charge(world, vec2(0, 0), many_charges ? 500 : 50)));
+
+
+		prefabs::create_sample_magazine(step, vec2(100 - 50, -650));
+		prefabs::create_sample_magazine(step, vec2(100 - 100, -650), "0.30");
+		//prefabs::create_pink_charge(world, vec2(100, 100));
+		//prefabs::create_pink_charge(world, vec2(100, -400));
+		//prefabs::create_pink_charge(world, vec2(150, -400));
+		//prefabs::create_pink_charge(world, vec2(200, -400));
+		prefabs::create_cyan_charge(world, vec2(150, -500));
+		prefabs::create_cyan_charge(world, vec2(200, -500));
+
+		prefabs::create_cyan_urban_machete(world, vec2(100, 100));
+		auto second_machete = prefabs::create_cyan_urban_machete(world, vec2(0, 0));
+
+		auto backpack = prefabs::create_sample_backpack(world, vec2(200, -650));
+		prefabs::create_sample_backpack(world, vec2(200, -750));
+
 		auto& active_context = world.settings.input;
 
 		active_context.map_key_to_intent(window::event::keys::W, intent_type::MOVE_FORWARD);
