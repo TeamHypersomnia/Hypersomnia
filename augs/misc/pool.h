@@ -176,7 +176,7 @@ namespace augs {
 		}
 
 		template<typename... Args>
-		id_type allocate(Args... args) {
+		typename basic_pool<T>::id_type allocate(Args... args) {
 			auto result = basic_pool<T>::allocate(args...);
 			metas.emplace_back(std::tuple<meta...>());
 			return result;

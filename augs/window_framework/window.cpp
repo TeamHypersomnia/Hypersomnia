@@ -9,6 +9,7 @@
 #include "augs/error/augs_error.h"
 #include "platform_utils.h"
 
+#ifdef PLATFORM_WINDOWS
 namespace augs {
 	extern HINSTANCE hinst;
 
@@ -408,3 +409,5 @@ namespace augs {
 		}
 	}
 }
+#elif PLATFORM_LINUX
+#endif

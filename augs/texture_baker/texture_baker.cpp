@@ -150,7 +150,7 @@ namespace augs {
 		for (unsigned i = 0; i < textures.size(); ++i)
 			textures[i]->set_uv_unit(u, v);
 
-		unsigned char pixel[] = { 0, atlas_channels == 2 ? 255 : 0, 0, 0 };
+		unsigned char pixel[] = { 0, static_cast<unsigned char>(atlas_channels == 2 ? 255 : 0), 0, 0 };
 		img.create(b.size.w, b.size.h, atlas_channels);
 		img.fill(pixel);
 

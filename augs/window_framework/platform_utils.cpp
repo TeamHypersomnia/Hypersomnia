@@ -1,8 +1,12 @@
 #include "platform_utils.h"
+#ifdef PLATFORM_WINDOWS
 #include <Windows.h>
 #include <Shlwapi.h>
+#elif PLATFORM_LINUX
+#endif
 #include "augs/templates.h"
 
+#ifdef PLATFORM_WINDOWS
 namespace augs {
 	namespace window {
 		/*
@@ -107,3 +111,5 @@ namespace augs {
 		}
 	}
 }
+#elif PLATFORM_LINUX
+#endif

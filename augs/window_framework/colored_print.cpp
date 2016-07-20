@@ -1,7 +1,11 @@
+#ifdef PLATFORM_WINDOWS
 #include <Windows.h>
+#elif PLATFORM_LINUX
+#endif
 #include "colored_print.h"
 #include <cstdio>
 
+#ifdef PLATFORM_WINDOWS
 WORD GetColorAttribute(int color) {
 	switch (color) {
 	case 1:    return FOREGROUND_RED;
@@ -34,4 +38,6 @@ namespace augs {
 		SetConsoleTextAttribute(stdout_handle, old_color_attrs);
 	}
 }
+#elif PLATFORM_LINUX
+#endif
 
