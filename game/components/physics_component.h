@@ -77,6 +77,7 @@ public:
 
 template<>
 class component_synchronizer<false, components::physics> : public basic_physics_synchronizer<false> {
+	void resubstantialization() const;
 public:
 	using basic_physics_synchronizer<false>::basic_physics_synchronizer;
 

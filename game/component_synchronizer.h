@@ -12,10 +12,6 @@ protected:
 	component_reference component;
 	basic_entity_handle<is_const> handle;
 
-	void complete_resubstantialization() const {
-		handle.get_cosmos().complete_resubstantialization(handle);
-	}
-
 public:
 	const component_type& get_data() const {
 		return component;

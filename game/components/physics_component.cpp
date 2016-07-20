@@ -1,4 +1,5 @@
 #include "physics_component.h"
+#include "substance_component.h"
 
 #include <Box2D\Box2D.h>
 
@@ -24,15 +25,19 @@ maybe_const_ref_t<C, rigid_body_cache>& basic_physics_synchronizer<C>::get_cache
 	return handle.get_cosmos().temporary_systems.get<physics_system>().get_rigid_body_cache(handle);
 }
 
+void component_synchronizer<false, P>::resubstantialization() const {
+	handle.get_cosmos().partial_resubstantialization<physics_system>(handle);
+}
+
 void component_synchronizer<false, P>::set_body_type(components::physics::type t) const {
 	component.body_type = t;
-	complete_resubstantialization();
+	resubstantialization();
 }
 
 
 void component_synchronizer<false, P>::set_activated(bool flag) const {
 	component.activated = flag;
-	complete_resubstantialization();
+	resubstantialization();
 }
 
 

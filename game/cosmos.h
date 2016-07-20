@@ -56,6 +56,16 @@ public:
 	void delete_entity(entity_id);
 
 	void complete_resubstantialization(entity_handle);
+	
+	template<class System>
+	void partial_resubstantialization(entity_handle handle) {
+		auto& sys = temporary_systems.get<System>();
+
+		sys.destruct(handle);
+
+		if (handle.has<components::substance>())
+			sys.construct(handle);
+	}
 
 	entity_handle get_handle(entity_id);
 	const_entity_handle get_handle(entity_id) const;

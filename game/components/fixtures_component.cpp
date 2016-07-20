@@ -1,4 +1,5 @@
 #include "fixtures_component.h"
+#include "substance_component.h"
 #include "physics_component.h"
 #include <Box2D\Dynamics\b2Fixture.h>
 #include <Box2D/Box2D.h>
@@ -61,13 +62,17 @@ bool basic_fixtures_synchronizer<C>::standard_collision_resolution_disabled() co
 
 void component_synchronizer<false, F>::set_offset(colliders_offset_type t, components::transform off) const {
 	component.offsets_for_created_shapes[static_cast<int>(t)] = off;
-	complete_resubstantialization();
+	resubstantialization();
 }
 
 component_synchronizer<false, F>& component_synchronizer<false, F>::operator=(const F& f) {
 	component = f;
-	complete_resubstantialization();
+	resubstantialization();
 	return *this;
+}
+
+void component_synchronizer<false, F>::resubstantialization() const {
+	handle.get_cosmos().partial_resubstantialization<processing_lists_system>(handle);
 }
 
 void component_synchronizer<false, F>::rebuild_density(size_t index) const {
@@ -97,7 +102,7 @@ void component_synchronizer<false, F>::set_density_multiplier(float mult, size_t
 
 void component_synchronizer<false, F>::set_activated(bool flag) const {
 	component.activated = flag;
-	complete_resubstantialization();
+	resubstantialization();
 }
 
 void component_synchronizer<false, F>::set_friction(float fr, size_t index) const {

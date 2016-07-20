@@ -4,6 +4,7 @@
 #include "game/entity_handle.h"
 #include "game/entity_relations.h"
 #include "game/cosmos.h"
+#include "game/components/substance_component.h"
 
 template <class D>
 void relations_helpers<false, D>::make_child(entity_id p, sub_entity_name optional_name) const {
@@ -48,7 +49,7 @@ void relations_helpers<false, D>::set_owner_body(entity_id owner_id) const {
 
 	if (former_owner.alive()) {
 		remove_element(former_owner.relations().fixture_entities, this_id);
-		cosmos.complete_resubstantialization(former_owner);
+		cosmos.partial_resubstantialization<physics_system>(former_owner);
 	}
 
 	self.relations().owner_body = new_owner;
@@ -56,10 +57,10 @@ void relations_helpers<false, D>::set_owner_body(entity_id owner_id) const {
 	if (new_owner.alive()) {
 		remove_element(new_owner.relations().fixture_entities, this_id);
 		new_owner.relations().fixture_entities.push_back(this_id);
-		cosmos.complete_resubstantialization(new_owner);
+		cosmos.partial_resubstantialization<physics_system>(new_owner);
 	}
 	else
-		cosmos.complete_resubstantialization(self);
+		cosmos.partial_resubstantialization<physics_system>(self);
 }
 
 template <class D>

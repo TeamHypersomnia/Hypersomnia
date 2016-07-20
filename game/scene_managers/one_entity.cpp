@@ -68,6 +68,11 @@ namespace scene_managers {
 				new_character.get<components::sentience>().health.maximum = 800;
 			}
 		}
+		
+		auto car = prefabs::create_car(world, components::transform(-300, -600, -90));
+		auto car2 = prefabs::create_car(world, components::transform(-800, -600, -90));
+		auto car3 = prefabs::create_car(world, components::transform(-1300, -600, -90));
+		auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, -600, -90));
 
 		name_entity(world[new_characters[0]], entity_name::PERSON, L"Attacker");
 
