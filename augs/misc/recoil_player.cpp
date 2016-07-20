@@ -41,8 +41,8 @@ void recoil_player::cooldown(double amount_ms) {
 
 	if (remaining_cooldown_duration < 0) {
 		remaining_cooldown_duration = single_cooldown_duration_ms;
-		--current_offset;
-	}
 
-	current_offset = std::max(current_offset, 0u);
+		if(current_offset > 0)
+			--current_offset;
+	}
 }
