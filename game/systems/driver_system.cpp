@@ -52,7 +52,7 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel(fixed_step&
 			auto driver = cosmos[c.subject];
 			auto car = cosmos[c.collider].get_owner_body();
 
-			auto* maybe_driver = cosmos[driver].find<components::driver>();
+			auto* maybe_driver = driver.find<components::driver>();
 
 			if (maybe_driver) {
 				if (maybe_driver->owned_vehicle == car) {

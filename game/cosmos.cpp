@@ -158,33 +158,46 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 
 	profiler.entropy_length.measure(step.entropy.length());
 
-	//performance.start(meter_type::CAMERA_QUERY);
-	//temporary_systems.get<dynamic_tree_system>().determine_visible_entities_from_every_camera();
-	//performance.stop(meter_type::CAMERA_QUERY);
-
 	//stateful_systems.get<gui_system>().advance_gui_elements();
 	//stateful_systems.get<gui_system>().translate_raw_window_inputs_to_gui_events();
-	//
 	//stateful_systems.get<gui_system>().suppress_inputs_meant_for_gui();
-
-	performance.start(meter_type::LOGIC);
-	//render_system().set_current_transforms_as_previous_for_interpolation();
-
-
-	input_system().make_intents_from_raw_entropy(step);
-
 	//stateful_systems.get<gui_system>().switch_to_gui_mode_and_back();
 
+	performance.start(meter_type::LOGIC);
+	
+	input_system().make_intents_from_raw_entropy(step);
+
 	intent_contextualization_system().contextualize_crosshair_action_intents(step);
+	intent_contextualization_system().contextualize_use_button_intents(step);
+	intent_contextualization_system().contextualize_movement_intents(step);
+
+
+	driver_system().release_drivers_due_to_requests(step);
+
+	movement_system().set_movement_flags_from_input(step);
+	movement_system().apply_movement_forces(step.cosm);
 
 	gun_system().consume_gun_intents(step);
 	gun_system().launch_shots_due_to_pressed_triggers(step);
 
-	particles_system().create_particle_effects(step);
+	car_system().set_steering_flags_from_intents(step);
+	car_system().apply_movement_forces(step);
 
-	//temporary_systems.get<dynamic_tree_system>().add_entities_to_rendering_tree(step);
-	//temporary_systems.get<physics_system>().react_to_new_entities();
-	//step.messages.get_queue<new_entity_message>().clear();
+	melee_system().consume_melee_intents(step);
+	melee_system().initiate_and_update_moves(step);
+
+	trigger_detector_system().consume_trigger_detector_presses(step);
+	trigger_detector_system().post_trigger_requests_from_continuous_detectors(step);
+
+	force_joint_system().apply_forces_towards_target_entities(step);
+
+	rotation_copying_system().update_physical_motors(step.cosm);
+	performance.start(meter_type::PHYSICS);
+	temporary_systems.get<physics_system>().step_and_set_new_transforms(step);
+	performance.stop(meter_type::PHYSICS);
+	position_copying_system().update_transforms(step);
+
+	particles_system().create_particle_effects(step);
 
 	trace_system().lengthen_sprites_of_traces(step);
 
@@ -194,14 +207,6 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 
 	camera_system().react_to_input_intents(step);
 
-	/* intent delegation stage (various ownership relations) */
-	intent_contextualization_system().contextualize_use_button_intents(step);
-	/* end of intent delegation stage */
-
-	driver_system().release_drivers_due_to_requests(step);
-
-	trigger_detector_system().consume_trigger_detector_presses(step);
-	trigger_detector_system().post_trigger_requests_from_continuous_detectors(step);
 	trigger_detector_system().send_trigger_confirmations(step);
 
 //	item_system().translate_gui_intents_to_transfer_requests(step);
@@ -211,28 +216,6 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 
 	driver_system().assign_drivers_from_successful_trigger_hits(step);
 	driver_system().release_drivers_due_to_ending_contact_with_wheel(step);
-
-	intent_contextualization_system().contextualize_movement_intents(step);
-
-	melee_system().consume_melee_intents(step);
-	force_joint_system().apply_forces_towards_target_entities(step);
-
-	car_system().set_steering_flags_from_intents(step);
-	car_system().apply_movement_forces(step);
-
-	movement_system().set_movement_flags_from_input(step);
-	movement_system().apply_movement_forces(step.cosm);
-
-	rotation_copying_system().update_physical_motors(step.cosm);
-	performance.start(meter_type::PHYSICS);
-
-	profiler.raycasts.measure(temporary_systems.get<physics_system>().ray_casts_since_last_step);
-
-	temporary_systems.get<physics_system>().step_and_set_new_transforms(step);
-	performance.stop(meter_type::PHYSICS);
-	position_copying_system().update_transforms(step);
-
-	melee_system().initiate_and_update_moves(step);
 
 	damage_system().destroy_outdated_bullets(step);
 	damage_system().destroy_colliding_bullets_and_send_damage(step);
@@ -292,6 +275,7 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	camera_system().resolve_cameras_transforms_and_smoothing(step);
 	rotation_copying_system().update_rotations(step.cosm);
 
+	profiler.raycasts.measure(temporary_systems.get<physics_system>().ray_casts_since_last_step);
 	++current_step_number;
 	performance.stop(meter_type::LOGIC);
 }
