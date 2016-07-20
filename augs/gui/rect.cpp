@@ -1,4 +1,3 @@
-#pragma once
 #include "rect.h"
 #include "stylesheet.h"
 #include "augs/window_framework/window.h"

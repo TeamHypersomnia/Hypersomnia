@@ -1,4 +1,3 @@
-#pragma once
 #include "stroke.h"
 #include "rect.h"
 #include "rect_handle.h"

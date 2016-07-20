@@ -1,4 +1,3 @@
-#pragma once
 #include "rect_world.h"
 #include "rect.h"
 #include "augs/window_framework/platform_utils.h"

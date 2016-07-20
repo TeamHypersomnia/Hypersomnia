@@ -1,4 +1,3 @@
-#pragma once
 #include "word_separator.h"
 
 namespace augs {

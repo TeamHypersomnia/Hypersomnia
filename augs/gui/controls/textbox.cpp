@@ -1,4 +1,3 @@
-#pragma once
 #include "textbox.h"
 #include "augs/gui/text/drafter.h"
 #include "augs/templates.h"

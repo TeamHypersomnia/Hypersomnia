@@ -1,4 +1,3 @@
-#pragma once
 #include "game_gui_root.h"
 #include "game/stateful_systems/gui_system.h"
 #include "game/temporary_systems/physics_system.h"

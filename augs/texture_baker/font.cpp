@@ -1,4 +1,3 @@
-#pragma once
 #include "font.h"
 #include <set>
 

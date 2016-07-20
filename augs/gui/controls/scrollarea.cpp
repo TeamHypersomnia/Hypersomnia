@@ -1,4 +1,3 @@
-#pragma once
 #include "scrollarea.h"
 #include "augs/gui/rect_world.h"
 #undef max

@@ -1,4 +1,3 @@
-#pragma once
 #include "smooth_value_field.h"
 
 namespace augs {

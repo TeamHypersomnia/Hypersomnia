@@ -1,4 +1,3 @@
-#pragma once
 #include <algorithm>
 #include "ui.h"
 #include "drafter.h"

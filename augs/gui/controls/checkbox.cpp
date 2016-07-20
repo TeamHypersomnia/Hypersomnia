@@ -1,4 +1,3 @@
-#pragma once
 #include "checkbox.h"
 
 namespace augs {

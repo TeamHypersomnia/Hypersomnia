@@ -1,4 +1,3 @@
-#pragma once
 #include "draft_interface.h"
 namespace augs {
 	namespace gui {

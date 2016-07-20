@@ -1,4 +1,3 @@
-#pragma once
 #include "image.h"
 #include "lodepng.h"
 #include "augs/ensure.h"

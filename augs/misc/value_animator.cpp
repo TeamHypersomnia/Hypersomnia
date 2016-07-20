@@ -1,4 +1,3 @@
-#pragma once
 #include "value_animator.h"
 #include <cmath>
 

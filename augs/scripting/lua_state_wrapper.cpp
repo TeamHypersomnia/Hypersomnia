@@ -1,4 +1,3 @@
-#pragma once
 #include "lua/lua.hpp"
 #include <luabind/luabind.hpp>
 #include "lua_state_wrapper.h"

@@ -1,4 +1,3 @@
-#pragma once
 #include "all.h"
 #include "game/resources/behaviour_tree.h"
 #include "game/resources/manager.h"

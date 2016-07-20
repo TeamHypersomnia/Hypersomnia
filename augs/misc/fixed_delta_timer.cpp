@@ -1,4 +1,3 @@
-#pragma once
 #include "fixed_delta_timer.h"
 #include <algorithm>
 #include "augs/ensure.h"

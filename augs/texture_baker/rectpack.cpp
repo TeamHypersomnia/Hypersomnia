@@ -1,4 +1,3 @@
-#pragma once
 #include "rectpack.h"
 #include <vector>
 #include <algorithm>

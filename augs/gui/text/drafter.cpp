@@ -1,4 +1,3 @@
-#pragma once
 #include <algorithm>
 #include "augs/gui/rect.h"
 #include "drafter.h"

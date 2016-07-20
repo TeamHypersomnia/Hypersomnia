@@ -1,4 +1,3 @@
-#pragma once
 #include <algorithm>
 #include "ui.h"
 #include "augs/window_framework/window.h"

@@ -1,4 +1,3 @@
-#pragma once
 #include <GL/OpenGL.h>
 #include "augs/ensure.h"
 

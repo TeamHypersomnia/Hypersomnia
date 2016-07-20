@@ -1,4 +1,3 @@
-#pragma once
 #include "stylesheet.h"
 
 namespace augs {

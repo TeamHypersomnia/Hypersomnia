@@ -1,4 +1,3 @@
-#pragma once
 #include "bitstream_wrapper.h"
 #include "reliable_channel.h"
 #undef min
