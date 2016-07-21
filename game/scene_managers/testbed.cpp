@@ -81,8 +81,7 @@ namespace scene_managers {
 		std::vector<entity_handle> new_characters;
 
 		for (int i = 0; i < num_characters; ++i) {
-			auto new_character = prefabs::create_character(world, vec2(i * 300 , 0));
-			new_character.set_debug_name(typesafe_sprintf("player%x", i));
+			auto new_character = prefabs::create_character(world, vec2(i * 300 , 0), typesafe_sprintf("player%x", i));
 
 			new_characters.push_back(new_character);
 

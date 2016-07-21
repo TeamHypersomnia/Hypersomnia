@@ -97,8 +97,8 @@ void rotation_copying_system::resolve_rotation_copying_value(entity_handle it) c
 			if (rotation_copying.colinearize_item_in_hand) {
 				auto hand = it.map_primary_action_to_secondary_hand_if_primary_empty(0);
 
-				if (cosmos[hand].has_items()) {
-					auto subject_item = cosmos.get_handle(hand).get_items_inside()[0];
+				if (hand.has_items()) {
+					auto subject_item = hand.get_items_inside()[0];
 
 					auto* maybe_gun = subject_item.find<components::gun>();
 

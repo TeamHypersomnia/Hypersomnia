@@ -9,7 +9,7 @@
 class game_window;
 
 class multiverse {
-	scene_managers::one_entity main_cosmos_manager;
+	scene_managers::testbed main_cosmos_manager;
 
 	mutable augs::variable_delta_timer frame_timer;
 

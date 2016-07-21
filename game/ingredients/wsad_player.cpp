@@ -250,8 +250,8 @@ namespace ingredients {
 }
 
 namespace prefabs {
-	entity_handle create_character(cosmos& world, vec2 pos) {
-		auto character = world.create_entity("player_unnamed");
+	entity_handle create_character(cosmos& world, vec2 pos, std::string name = "character_unnamed") {
+		auto character = world.create_entity(name);
 
 		name_entity(character, entity_name::PERSON);
 
