@@ -11,6 +11,7 @@
 #include "game/components/physics_component.h"
 
 #include "game/messages/queue_destruction.h"
+#include "game/messages/will_soon_be_deleted.h"
 
 void trace_system::lengthen_sprites_of_traces(fixed_step& step) const {
 	auto& cosmos = step.cosm;
@@ -55,7 +56,7 @@ void trace_system::destroy_outdated_traces(fixed_step& step) const {
 
 void trace_system::spawn_finishing_traces_for_destroyed_objects(fixed_step& step) const {
 	auto& cosmos = step.cosm;
-	auto events = step.messages.get_queue<messages::queue_destruction>();
+	auto events = step.messages.get_queue<messages::will_soon_be_deleted>();
 
 	for (auto& it : events) {
 		auto e = cosmos[it.subject];
