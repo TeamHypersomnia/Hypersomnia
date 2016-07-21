@@ -159,10 +159,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing(fixed_step& step) {
 
 				vec2 player_pos;
 				
-				if (physics.is_constructed())
-					player_pos = physics.get_mass_position();
-				else
-					player_pos = physics.get_position();
+				player_pos = physics.get_position();
 
 				if (player_pos != camera.previous_step_player_position) {
 					camera.previous_seen_player_position = camera.previous_step_player_position;

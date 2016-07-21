@@ -77,7 +77,7 @@ namespace behaviours {
 
 				crosshair_offset = leaded - position(subject);
 			}
-			else if (is_physical(subject)) {
+			else if (is_entity_physical(subject)) {
 				crosshair_offset = velocity(subject).length() > 3.0 ? velocity(subject) : vec2(10, 0);
 			}
 			else

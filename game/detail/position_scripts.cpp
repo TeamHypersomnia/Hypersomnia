@@ -1,12 +1,28 @@
 #include "position_scripts.h"
 #include "game/components/transform_component.h"
 #include "game/components/physics_component.h"
+#include "game/components/fixtures_component.h"
 #include "game/entity_handle.h"
 #include "game/detail/physics_scripts.h"
 #include "game/cosmos.h"
 
 vec2 position(const_entity_handle e) {
 	return e.get<components::transform>().pos;
+}
+
+vec2 mass_center(const_entity_handle e) {
+	return e.get<components::physics>().get_mass_position();
+}
+
+vec2 mass_center_or_position(const_entity_handle e) {
+	if (e.has<components::physics>()) {
+		const auto& phys = e.get<components::physics>();
+		
+		if(phys.is_constructed())
+			return phys.get_mass_position();
+	}
+
+	return position(e);
 }
 
 float rotation(const_entity_handle e) {
@@ -33,8 +49,8 @@ float speed(const_entity_handle e) {
 	return velocity(e).length();
 }
 
-bool is_physical(const_entity_handle e) {
-	return is_entity_physical(e);
+bool is_entity_physical(const_entity_handle e) {
+	return e.has<components::fixtures>() || e.has<components::physics>();
 }
 
 float distance_sq(const_entity_handle a, const_entity_handle b) {

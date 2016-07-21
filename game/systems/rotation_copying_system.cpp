@@ -32,7 +32,7 @@ float colinearize_AB(vec2 O_center_of_rotation, vec2 A_rifle_center, vec2 B_barr
 		crosshair_vector.set(1, 0);
 
 	if (crosshair_vector.length() < barrel_vector.length() + 1.f)
-		crosshair_vector.set_length(barrel_vector.length() + 1.f);
+		return crosshair_vector.degrees();
 	
 	C_crosshair = O_center_of_rotation + crosshair_vector;
 
@@ -80,36 +80,38 @@ void rotation_copying_system::resolve_rotation_copying_value(entity_handle it) c
 	if (target.dead())
 		return;
 
-	auto& transform = it.get<components::transform>();
 	float new_angle = 0.f;
 
 	if (rotation_copying.look_mode == components::rotation_copying::look_type::POSITION) {
-		auto target_transform = target.find<components::transform>();
+		auto& target_transform = target.get<components::transform>();
 		
-		if (target_transform != nullptr) {
-			auto diff = target_transform->pos - transform.pos;
-			
-			if (diff.is_epsilon(1.f))
-				new_angle = 0.f;
-			else
-				new_angle = diff.degrees();
+		auto diff = target_transform.pos - position(it);
 
-			if (rotation_copying.colinearize_item_in_hand) {
-				auto hand = it.map_primary_action_to_secondary_hand_if_primary_empty(0);
+		if (diff.is_epsilon(1.f))
+			new_angle = 0.f;
+		else
+			new_angle = diff.degrees();
 
-				if (hand.has_items()) {
-					auto subject_item = hand.get_items_inside()[0];
+		if (rotation_copying.colinearize_item_in_hand) {
+			auto hand = it.map_primary_action_to_secondary_hand_if_primary_empty(0);
 
-					auto* maybe_gun = subject_item.find<components::gun>();
+			if (hand.has_items()) {
+				auto subject_item = hand.get_items_inside()[0];
 
-					if (maybe_gun) {
-						auto gun_transform = subject_item.get<components::transform>();
-						auto mc = it.get<components::physics>().get_mass_position();
+				auto* maybe_gun = subject_item.find<components::gun>();
 
-						new_angle =
-							transform.rotation +
-							colinearize_AB(mc, gun_transform.pos, maybe_gun->calculate_barrel_transform(gun_transform).pos, target_transform->pos);
-					}
+				if (maybe_gun) {
+					auto rifle_transform = subject_item.get<components::transform>();
+					auto rifle_center = rifle_transform.pos;
+					auto barrel = maybe_gun->calculate_barrel_transform(rifle_transform).pos;
+					auto mc = position(it);
+
+					rifle_center.rotate(-rotation(it), mc);
+					barrel.rotate(-rotation(it), mc);
+
+					auto crosshair_vector = target_transform.pos - mc;
+
+					new_angle = colinearize_AB(mc, rifle_center, barrel, target_transform.pos);
 				}
 			}
 		}

@@ -6,10 +6,7 @@
 #include "game/entity_handle.h"
 #include "game/cosmos.h"
 #include "game/detail/inventory_slot_handle.h"
-
-bool is_entity_physical(const_entity_handle id) {
-	return id.has<components::fixtures>() || id.has<components::physics>();
-}
+#include "position_scripts.h"
 
 void resolve_density_of_associated_fixtures(entity_handle id) {
 	auto& cosmos = id.get_cosmos();

@@ -12,9 +12,7 @@
 #include <Box2D/Dynamics/b2Fixture.h>
 
 class physics_system;
-
-template<bool>
-class basic_fixtures_synchronizer;
+struct colliders_cache;
 
 namespace components {
 	struct fixtures {
@@ -45,13 +43,9 @@ namespace components {
 	};
 }
 
-struct colliders_cache;
-class fixtures_system;
-
 template<bool is_const>
 class basic_fixtures_synchronizer : public component_synchronizer_base<is_const, components::fixtures> {
 protected:
-	friend struct components::physics;
 	friend class ::physics_system;
 
 	maybe_const_ref_t<is_const, colliders_cache>& get_cache() const;

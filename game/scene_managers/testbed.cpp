@@ -76,7 +76,7 @@ namespace scene_managers {
 				street.add_standard_components();
 			}
 
-		const int num_characters = 2;
+		const int num_characters = 3;
 
 		std::vector<entity_handle> new_characters;
 

@@ -68,8 +68,10 @@ void crosshair_system::apply_base_offsets_to_crosshair_transforms(fixed_step& st
 		auto player_id = cosmos[it.get<components::crosshair>().character_entity_to_chase];
 
 		if (player_id.alive()) {
-			it.get<components::transform>().pos = 
-				components::crosshair::calculate_aiming_displacement(it, true) + position(player_id);
+			vec2 aiming_displacement = components::crosshair::calculate_aiming_displacement(it, true);
+			vec2 player_center = position(player_id);
+
+			it.get<components::transform>().pos = aiming_displacement + player_center;
 		}
 	}
 }

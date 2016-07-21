@@ -10,6 +10,8 @@ extern float METERS_TO_PIXELSf;
 extern float PIXELS_TO_METERSf;
 
 template<bool> class basic_physics_synchronizer;
+class physics_system;
+struct rigid_body_cache;
 
 namespace components {
 	struct physics {
@@ -40,9 +42,6 @@ namespace components {
 	
 	struct fixtures;
 }
-
-class physics_system;
-struct rigid_body_cache;
 
 template<bool is_const>
 class basic_physics_synchronizer : public component_synchronizer_base<is_const, components::physics> {

@@ -242,19 +242,8 @@ void physics_system::step_and_set_new_transforms(fixed_step& step) {
 		}
 
 		if (special.enable_angle_motor) {
-			float next_angle = b->GetAngle() + b->GetAngularVelocity() / static_cast<float>(delta.get_steps_per_second());
-
-			auto target_orientation = vec2().set_from_degrees(special.target_angle);
-			auto next_orientation = vec2().set_from_radians(next_angle);
-
-			float total_rotation = target_orientation.radians_between(next_orientation);
-
-			if (target_orientation.cross(next_orientation) > 0)
-				total_rotation *= -1;
-
-			float desired_angular_velocity = total_rotation / static_cast<float>(delta.in_seconds());
-			float impulse = b->GetInertia() * desired_angular_velocity;// disregard time factor
-			b->ApplyAngularImpulse(impulse * special.angle_motor_force_multiplier, true);
+			b->SetTransform(b->GetPosition(), special.target_angle * DEG_TO_RADf);
+			b->SetAngularVelocity(0);
 		}
 	}
 
