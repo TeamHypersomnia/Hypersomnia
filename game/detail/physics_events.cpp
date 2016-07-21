@@ -35,14 +35,14 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 			worldManifold.normal *= -1;
 		}
 
-		/* collision messaging happens only for sensors here
-		PreSolve is the counterpart for regular bodies
-		*/
-
 		auto body_a = fix_a->GetBody();
 		auto body_b = fix_b->GetBody();
 
 		messages::collision_message msg;
+
+		if (fix_a->IsSensor() || fix_b->IsSensor())
+			msg.one_is_sensor = true;
+
 		msg.type = messages::collision_message::event_type::BEGIN_CONTACT;
 
 		auto subject = cosmos[fix_a->GetUserData()];

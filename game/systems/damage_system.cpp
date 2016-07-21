@@ -28,7 +28,7 @@ void damage_system::destroy_colliding_bullets_and_send_damage(fixed_step& step) 
 	step.messages.get_queue<messages::damage_message>().clear();
 
 	for (auto it : events) {
-		if (it.type != messages::collision_message::event_type::BEGIN_CONTACT) 
+		if (it.type != messages::collision_message::event_type::BEGIN_CONTACT || it.one_is_sensor) 
 			continue;
 
 		auto subject_handle = cosmos[it.subject];

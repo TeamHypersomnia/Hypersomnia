@@ -7,6 +7,8 @@ namespace messages {
 		entity_id collider;
 		vec2 collider_impact_velocity, subject_impact_velocity, point;
 
+		bool one_is_sensor = false;
+
 		bool operator<(const collision_message& b) const {
 			return std::make_pair(subject, collider) < std::make_pair(b.subject, b.collider);
 		}
