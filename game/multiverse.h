@@ -22,7 +22,7 @@ class multiverse {
 public:
 	multiverse();
 
-	mutable augs::measurements fps_profiler;
+	mutable augs::measurements fps_profiler = augs::measurements(L"Frame");
 	mutable augs::measurements triangles = augs::measurements(L"Triangles", false);
 
 	entropy_player main_cosmos_player;
