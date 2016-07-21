@@ -10,6 +10,7 @@
 #include "game/scene_managers/resource_setups/all.h"
 
 #include "game/types_specification/all_component_includes.h"
+#include "game/entity_relations.h"
 
 int main(int argc, char** argv) {
 	augs::global_libraries::init();
@@ -24,6 +25,7 @@ int main(int argc, char** argv) {
 
 	multiverse hypersomnia;
 	hypersomnia.main_cosmos.settings.screen_size = vec2i(window.window.get_screen_rect());
+	hypersomnia.populate_cosmoi();
 
 	window.window.set_as_current();
 
