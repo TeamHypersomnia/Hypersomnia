@@ -171,7 +171,6 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	intent_contextualization_system().contextualize_use_button_intents(step);
 	intent_contextualization_system().contextualize_movement_intents(step);
 
-
 	driver_system().release_drivers_due_to_requests(step);
 
 	movement_system().set_movement_flags_from_input(step);
@@ -247,16 +246,11 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	destroy_system().queue_children_of_queued_entities(step);
 
 	trace_system().spawn_finishing_traces_for_destroyed_objects(step);
-	// dynamic_tree_system().remove_entities_from_rendering_tree();
-	// temporary_systems.get<physics_system>().react_to_destroyed_entities(step);
 
 	bool has_no_destruction_callback_queued_any_additional_destruction = step.messages.get_queue<messages::queue_destruction>().empty();
 	ensure(has_no_destruction_callback_queued_any_additional_destruction);
 
 	destroy_system().perform_deletions(step);
-
-	//input_system().post_unmapped_intents_from_raw_entropy();
-	//input_system().map_unmapped_intents_to_entities();
 
 	movement_system().generate_movement_responses(step);
 
@@ -266,10 +260,6 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	animation_system().progress_animation_states(step);
 
 	performance.start(meter_type::RENDERING);
-
-	performance.start(meter_type::INTERPOLATION);
-	//render_system().calculate_and_set_interpolated_transforms();
-	performance.stop(meter_type::INTERPOLATION);
 
 	position_copying_system().update_transforms(step);
 	camera_system().resolve_cameras_transforms_and_smoothing(step);

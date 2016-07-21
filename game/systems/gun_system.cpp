@@ -186,7 +186,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
 				}
 			}
 		}
-		else if (!gun.shot_cooldown.is_ready(delta)) {
+		else if (gun.shot_cooldown.is_ready(delta)) {
 			gun.recoil.cooldown(cosmos.delta.in_milliseconds());
 		}
 	}
