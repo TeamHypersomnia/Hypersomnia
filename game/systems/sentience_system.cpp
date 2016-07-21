@@ -85,17 +85,17 @@ void sentience_system::consume_health_event(messages::health_event h, fixed_step
 		auto place_of_death = subject.get<components::transform>();
 		place_of_death.rotation = h.impact_velocity.degrees();
 
-		corpse.get<components::physics>().set_transform(place_of_death);
+		corpse.get<components::transform>() = place_of_death;
 		
 		subject.get<components::physics>().set_activated(false);
 		subject.get<components::position_copying>().set_target(corpse);
 
+		corpse.add_standard_components();
+	
 		corpse.get<components::physics>().apply_force(vec2().set_from_degrees(place_of_death.rotation).set_length(27850 * 2));
 
 		h.spawned_remnants = corpse;
 		corpse.map_associated_entity(associated_entity_name::ASTRAL_BODY, subject);
-
-		corpse.add_standard_components();
 	}
 
 	step.messages.post(h);

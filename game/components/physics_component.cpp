@@ -170,8 +170,7 @@ vec2 basic_physics_synchronizer<C>::get_mass_position() const {
 
 template<bool C>
 vec2 basic_physics_synchronizer<C>::velocity() const {
-	ensure(is_constructed());
-	return vec2(get_cache().body->GetLinearVelocity()) * METERS_TO_PIXELSf;
+	return component.velocity;
 }
 
 template<bool C>
