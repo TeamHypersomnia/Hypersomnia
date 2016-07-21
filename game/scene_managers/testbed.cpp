@@ -76,7 +76,7 @@ namespace scene_managers {
 				street.add_standard_components();
 			}
 
-		const int num_characters = 3;
+		const int num_characters = 6;
 
 		std::vector<entity_handle> new_characters;
 
@@ -99,6 +99,7 @@ namespace scene_managers {
 				new_character.get<components::sentience>().health.maximum = 300;
 				ingredients::standard_pathfinding_capability(new_character);
 				ingredients::soldier_intelligence(new_character);
+				new_character.recalculate_basic_processing_categories();
 			}
 			if (i == 2) {
 				new_character.get<components::sentience>().health.value = 38;
@@ -112,6 +113,7 @@ namespace scene_managers {
 				new_character.get<components::sentience>().health.maximum = 300;
 				ingredients::standard_pathfinding_capability(new_character);
 				ingredients::soldier_intelligence(new_character);
+				new_character.recalculate_basic_processing_categories();
 			}
 		}
 

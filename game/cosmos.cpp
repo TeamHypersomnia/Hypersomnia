@@ -228,15 +228,15 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	// stateful_systems.get<gui_system>().translate_game_events_for_hud(step);
 
 	performance.start(meter_type::VISIBILITY);
-	//visibility_system().generate_visibility_and_sight_information(step.cosm);
+	visibility_system().generate_visibility_and_sight_information(step.cosm);
 	performance.stop(meter_type::VISIBILITY);
 
 	performance.start(meter_type::AI);
-	//behaviour_tree_system().evaluate_trees(step);
+	behaviour_tree_system().evaluate_trees(step);
 	performance.stop(meter_type::AI);
 
 	performance.start(meter_type::PATHFINDING);
-	//pathfinding_system().advance_pathfinding_sessions(step.cosm);
+	pathfinding_system().advance_pathfinding_sessions(step.cosm);
 	performance.stop(meter_type::PATHFINDING);
 
 	particles_system().step_streams_and_particles(step);
