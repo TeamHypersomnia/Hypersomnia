@@ -140,8 +140,7 @@ float basic_physics_synchronizer<C>::get_mass() const {
 
 template<bool C>
 float basic_physics_synchronizer<C>::get_angle() const {
-	ensure(is_constructed());
-	return get_cache().body->GetAngle() * RAD_TO_DEGf;
+	return component.transform.rotation;
 }
 
 template<bool C>
@@ -158,8 +157,7 @@ float basic_physics_synchronizer<C>::get_inertia() const {
 
 template<bool C>
 vec2 basic_physics_synchronizer<C>::get_position() const {
-	ensure(is_constructed());
-	return METERS_TO_PIXELSf * get_cache().body->GetPosition();
+	return component.transform.pos;
 }
 
 template<bool C>

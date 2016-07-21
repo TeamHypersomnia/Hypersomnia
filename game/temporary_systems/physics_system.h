@@ -29,9 +29,9 @@ class physics_system {
 	std::vector<rigid_body_cache> rigid_body_caches;
 
 	void reserve_caches_for_entities(size_t n);
-	void fixtures_construct(entity_handle);
-	void construct(entity_handle);
-	void destruct(entity_handle);
+	void fixtures_construct(const_entity_handle);
+	void construct(const_entity_handle);
+	void destruct(const_entity_handle);
 
 	friend class cosmos;
 	friend class component_synchronizer<false, components::physics>;

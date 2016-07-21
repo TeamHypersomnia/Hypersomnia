@@ -50,7 +50,7 @@ const colliders_cache& physics_system::get_colliders_cache(entity_id id) const {
 	return colliders_caches[id.indirection_index];
 }
 
-void physics_system::destruct(entity_handle handle) {
+void physics_system::destruct(const_entity_handle handle) {
 	if (is_constructed_rigid_body(handle)) {
 		auto& cache = get_rigid_body_cache(handle);
 		
@@ -79,7 +79,7 @@ void physics_system::destruct(entity_handle handle) {
 	}
 }
 
-void physics_system::fixtures_construct(entity_handle handle) {
+void physics_system::fixtures_construct(const_entity_handle handle) {
 	ensure(!is_constructed_colliders(handle));
 
 	if (handle.has<components::fixtures>()) {
@@ -132,11 +132,9 @@ void physics_system::fixtures_construct(entity_handle handle) {
 	}
 }
 
-void physics_system::construct(entity_handle handle) {
+void physics_system::construct(const_entity_handle handle) {
 	ensure(!is_constructed_rigid_body(handle));
 	
-	contact_listener listener(handle.get_cosmos());
-
 	fixtures_construct(handle);
 
 	if (handle.has<components::physics>()) {

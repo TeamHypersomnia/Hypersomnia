@@ -26,8 +26,6 @@ namespace components {
 		};
 
 		struct stream {
-			physics_system* optional_physics = nullptr;
-
 			struct uncopyable {
 				uncopyable& operator=(const uncopyable& b) { return *this; }
 				std::vector<resources::particle> particles;

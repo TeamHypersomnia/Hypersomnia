@@ -157,7 +157,12 @@ void camera_system::resolve_cameras_transforms_and_smoothing(fixed_step& step) {
 			if (entity_to_chase.has<components::physics>()) {
 				auto& physics = entity_to_chase.get<components::physics>();
 
-				auto player_pos = physics.get_mass_position();
+				vec2 player_pos;
+				
+				if (physics.is_constructed())
+					player_pos = physics.get_mass_position();
+				else
+					player_pos = physics.get_position();
 
 				if (player_pos != camera.previous_step_player_position) {
 					camera.previous_seen_player_position = camera.previous_step_player_position;

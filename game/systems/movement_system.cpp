@@ -66,6 +66,9 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 
 		auto& physics = it.get<components::physics>();
 		
+		if (!physics.is_constructed())
+			continue;
+
 		if (movement.make_inert_for_ms > 0.f) {
 			movement.make_inert_for_ms -= static_cast<float>(cosmos.delta.in_milliseconds());
 			physics.set_linear_damping(2);
