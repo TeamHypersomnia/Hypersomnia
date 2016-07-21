@@ -95,7 +95,7 @@ namespace prefabs {
 			auto& info = colliders.new_collider();
 			info.shape.from_renderable(interior);
 			info.density = 0.6f;
-			info.sensor = true;
+			colliders.disable_standard_collision_resolution = true;
 			info.filter = filters::see_through_dynamic_object();
 			vec2 offset((front.get<components::sprite>().size.x / 2 + sprite.size.x / 2 - 1) * -1, 0);
 			colliders.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
