@@ -17,17 +17,40 @@ namespace augs {
 	protected:
 		struct metadata {
 			int pointing_indirector = -1;
+
+			template <class Archive>
+			void serialize(Archive& ar) {
+				ar(CEREAL_NVP(pooled));
+			}
 		};
 
 		struct indirector {
 			int real_index = -1;
 			int version = 0;
+
+			template <class Archive>
+			void serialize(Archive& ar) {
+				ar(
+					CEREAL_NVP(real_index),
+					CEREAL_NVP(version)
+				);
+			}
 		};
 
 		std::vector<T> pooled;
 		std::vector<metadata> slots;
 		std::vector<indirector> indirectors;
 		std::vector<int> free_indirectors;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(pooled),
+				CEREAL_NVP(slots),
+				CEREAL_NVP(indirectors),
+				CEREAL_NVP(free_indirectors)
+			);
+		}
 
 		void initialize_space(int slot_count) {
 			pooled.clear();
@@ -168,6 +191,13 @@ namespace augs {
 	class pool_with_meta : public basic_pool<T> {
 		std::vector<std::tuple<meta...>> metas;
 	public:
+		template <class Archive>
+		void serialize(Archive& ar) {
+			basic_pool<T>::serialize(ar);
+
+			ar(CEREAL_NVP(metas));
+		}
+
 		void initialize_space(int slot_count) {
 			basic_pool<T>::initialize_space(slot_count);
 
