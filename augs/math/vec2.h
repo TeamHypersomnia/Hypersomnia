@@ -130,6 +130,12 @@ namespace augs {
 template <class type>
 struct vec2t {
 	type x, y;
+
+	template <class Archive>
+	void serialize(Archive& ar) {
+		ar(x, y);
+	}
+
 	typedef float real;
 
 	void reset() {

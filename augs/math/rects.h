@@ -52,6 +52,11 @@ namespace augs {
 			}
 
 			T w, h;
+
+			template <class Archive>
+			void serialize(Archive& ar) {
+				ar(w, h);
+			}
 			
 			void clamp_offset_to_right_down_corner_of(const wh& bigger, vec2t<T>& offset) const {
 				offset.x = std::min(offset.x, T(bigger.w - w));
@@ -96,6 +101,11 @@ namespace augs {
 		template <class T>
 		struct ltrb {
 			T l, t, r, b;
+
+			template <class Archive>
+			void serialize(Archive& ar) {
+				ar(l, t, r, b);
+			}
 
 			ltrb() : l(0), t(0), r(0), b(0) {}
 			ltrb(const wh<T>& rr) : l(0), t(0), r(rr.w), b(rr.h) {}
@@ -379,6 +389,11 @@ namespace augs {
 			}
 			
 			T x, y;
+
+			template <class Archive>
+			void serialize(Archive& ar) {
+				ar(x, y, w, h);
+			}
 
 			bool operator==(const xywh& r) const {
 				return x == r.x && y == r.y && wh<T>::operator==(r);
