@@ -133,7 +133,7 @@ struct vec2t {
 
 	template <class Archive>
 	void serialize(Archive& ar) {
-		ar(x, y);
+		ar(CEREAL_NVP(x), CEREAL_NVP(y));
 	}
 
 	typedef float real;

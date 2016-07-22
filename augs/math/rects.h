@@ -55,7 +55,7 @@ namespace augs {
 
 			template <class Archive>
 			void serialize(Archive& ar) {
-				ar(w, h);
+				ar(CEREAL_NVP(w), CEREAL_NVP(h));
 			}
 			
 			void clamp_offset_to_right_down_corner_of(const wh& bigger, vec2t<T>& offset) const {
@@ -104,7 +104,7 @@ namespace augs {
 
 			template <class Archive>
 			void serialize(Archive& ar) {
-				ar(l, t, r, b);
+				ar(CEREAL_NVP(l), CEREAL_NVP(t), CEREAL_NVP(r), CEREAL_NVP(b));
 			}
 
 			ltrb() : l(0), t(0), r(0), b(0) {}
@@ -392,7 +392,7 @@ namespace augs {
 
 			template <class Archive>
 			void serialize(Archive& ar) {
-				ar(x, y, w, h);
+				ar(CEREAL_NVP(x), CEREAL_NVP(y), CEREAL_NVP(w), CEREAL_NVP(h));
 			}
 
 			bool operator==(const xywh& r) const {

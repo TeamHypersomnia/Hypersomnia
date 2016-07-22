@@ -19,7 +19,14 @@ namespace components {
 
 		template <class Archive>
 		void serialize(Archive& ar) {
-			ar(character_entity_to_chase, base_offset, bounds_for_base_offset, rotation_offset, size_multiplier, sensitivity);
+			ar(
+				CEREAL_NVP(character_entity_to_chase), 
+				CEREAL_NVP(base_offset), 
+				CEREAL_NVP(bounds_for_base_offset), 
+				
+				CEREAL_NVP(rotation_offset), 
+				CEREAL_NVP(size_multiplier), 
+				CEREAL_NVP(sensitivity));
 		}
 	};
 }
