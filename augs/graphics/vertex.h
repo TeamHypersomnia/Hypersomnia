@@ -19,6 +19,15 @@ namespace augs {
 		vec2 texcoord;
 		rgba color;
 
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(pos),
+				CEREAL_NVP(texcoord),
+				CEREAL_NVP(color)
+			);
+		}
+
 		vertex() {}
 		vertex(vec2 pos) : pos(pos) {}
 		vertex(vec2 pos, vec2 texcoord, rgba color, augs::texture& tex);

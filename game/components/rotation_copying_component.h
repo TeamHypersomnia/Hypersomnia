@@ -34,5 +34,27 @@ namespace components {
 		bool update_value = true;
 
 		bool use_physical_motor = false;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(easing_mode),
+				CEREAL_NVP(colinearize_item_in_hand),
+
+				CEREAL_NVP(smoothing_average_factor),
+				CEREAL_NVP(averages_per_sec),
+
+				CEREAL_NVP(last_rotation_interpolant),
+
+				CEREAL_NVP(look_mode),
+
+				CEREAL_NVP(target),
+
+				CEREAL_NVP(last_value),
+				CEREAL_NVP(update_value),
+
+				CEREAL_NVP(use_physical_motor)
+			);
+		}
 	};
 }

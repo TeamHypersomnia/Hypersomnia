@@ -26,17 +26,34 @@ namespace components {
 			void setup_from(const state_for_drawing_camera&);
 		};
 
-		static void make_rect(vec2 pos, vec2 size, float rotation_degrees, vec2 out[4], bool pos_at_center);
-
 		assets::texture_id tex = assets::texture_id::INVALID_TEXTURE;
 		augs::rgba color;
-		vec2 size, size_multiplier = vec2(1, 1);
+		vec2 size;
+		vec2 size_multiplier = vec2(1, 1);
 		vec2 gui_bbox_expander;
 		vec2 center_offset;
 		float rotation_offset = 0.f;
 
 		bool flip_horizontally = false;
 		bool flip_vertically = false;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(tex),
+				CEREAL_NVP(color),
+				CEREAL_NVP(size),
+				CEREAL_NVP(size_multiplier),
+				CEREAL_NVP(gui_bbox_expander),
+				CEREAL_NVP(center_offset),
+				CEREAL_NVP(rotation_offset),
+
+				CEREAL_NVP(flip_horizontally),
+				CEREAL_NVP(flip_vertically)
+			);
+		}
+
+		static void make_rect(vec2 pos, vec2 size, float rotation_degrees, vec2 out[4], bool pos_at_center);
 
 		vec2 get_size() const;
 

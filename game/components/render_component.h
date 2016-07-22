@@ -9,10 +9,6 @@ namespace components {
 	struct render {
 		transform previous_transform;
 		transform saved_actual_transform;
-		
-		vec2 interpolation_direction() {
-			return saved_actual_transform.pos - previous_transform.pos;
-		}
 
 		bool interpolate = true;
 		bool snap_interpolation_when_close = true;
@@ -25,5 +21,29 @@ namespace components {
 		augs::rgba border_color;
 
 		unsigned last_step_when_visible = 0;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(previous_transform),
+				CEREAL_NVP(saved_actual_transform),
+
+				CEREAL_NVP(interpolate),
+				CEREAL_NVP(snap_interpolation_when_close),
+
+				CEREAL_NVP(layer),
+
+				CEREAL_NVP(absolute_transform),
+
+				CEREAL_NVP(draw_border),
+				CEREAL_NVP(border_color),
+
+				CEREAL_NVP(last_step_when_visible),
+			);
+		}
+
+		vec2 interpolation_direction() const {
+			return saved_actual_transform.pos - previous_transform.pos;
+		}
 	};
 }

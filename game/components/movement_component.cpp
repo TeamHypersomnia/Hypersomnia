@@ -63,6 +63,6 @@ namespace components {
 	}
 
 	void movement::reset_movement_flags() {
-		moving_left = moving_right = moving_forward = moving_backward = walking_enabled = 0;
+		moving_left = moving_right = moving_forward = moving_backward = walking_enabled = false;
 	}
 }

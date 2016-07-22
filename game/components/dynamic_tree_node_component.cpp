@@ -15,14 +15,14 @@ namespace components {
 
 		auto* sprite = e.find<components::sprite>();
 		auto* polygon = e.find<components::polygon>();
-		auto* tile_layer = e.find<components::tile_layer>();
+		//auto* tile_layer = e.find<components::tile_layer>();
 		auto* particle_group = e.find<components::particle_group>();
 
 		auto transform = e.get<components::transform>();
 
 		if (sprite) result.aabb = sprite->get_aabb(transform);
 		if (polygon) result.aabb = polygon->get_aabb(transform);
-		if (tile_layer) result.aabb = tile_layer->get_aabb(transform);
+		//if (tile_layer) result.aabb = tile_layer->get_aabb(transform);
 
 		if (particle_group) result.always_visible = true;
 

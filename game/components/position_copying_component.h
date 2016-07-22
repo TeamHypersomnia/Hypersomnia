@@ -6,7 +6,7 @@
 class position_copying_system;
 
 namespace components {
-	struct position_copying  {
+	struct position_copying {
 		entity_id target;
 		
 		enum position_copying_type {
@@ -33,16 +33,47 @@ namespace components {
 		bool target_newly_set = true;
 		bool subscribe_to_previous = false;
 
-		position_copying(entity_id id = entity_id()) {
-			set_target(id);
-		}
-
-		void set_target(entity_id);
-
 	private:
 		friend class position_copying_system;
 
 		vec2 previous;
 		float rotation_previous = 0.0f;
+
+	public:
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(target),
+
+				CEREAL_NVP(position_copying_type),
+
+				CEREAL_NVP(offset),
+				CEREAL_NVP(rotation_orbit_offset),
+
+				CEREAL_NVP(reference_position),
+				CEREAL_NVP(target_reference_position),
+
+				CEREAL_NVP(scrolling_speed),
+
+				CEREAL_NVP(rotation_offset),
+				CEREAL_NVP(rotation_multiplier),
+
+				CEREAL_NVP(relative),
+				CEREAL_NVP(position_copying_rotation),
+				CEREAL_NVP(track_origin),
+
+				CEREAL_NVP(target_newly_set),
+				CEREAL_NVP(subscribe_to_previous),
+
+				CEREAL_NVP(previous),
+				CEREAL_NVP(rotation_previous)
+			);
+		}
+
+		position_copying(entity_id id = entity_id()) {
+			set_target(id);
+		}
+
+		void set_target(entity_id);
 	};
 }

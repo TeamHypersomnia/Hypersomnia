@@ -15,15 +15,15 @@ struct rigid_body_cache;
 
 namespace components {
 	struct physics {
-		components::transform transform;
-
-		bool activated = true;
-
 		enum class type {
 			STATIC,
 			KINEMATIC,
 			DYNAMIC
 		};
+
+		components::transform transform;
+
+		bool activated = true;
 
 		type body_type = type::DYNAMIC;
 
@@ -38,6 +38,29 @@ namespace components {
 
 		vec2 velocity;
 		float angular_velocity = 0.f;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(transform),
+
+				CEREAL_NVP(activated),
+
+				CEREAL_NVP(body_type),
+
+				CEREAL_NVP(angular_damping),
+				CEREAL_NVP(linear_damping),
+				CEREAL_NVP(linear_damping_vec),
+				CEREAL_NVP(gravity_scale),
+
+				CEREAL_NVP(fixed_rotation),
+				CEREAL_NVP(bullet),
+				CEREAL_NVP(angled_damping),
+
+				CEREAL_NVP(velocity),
+				CEREAL_NVP(angular_velocity)
+			);
+		}
 	};
 	
 	struct fixtures;

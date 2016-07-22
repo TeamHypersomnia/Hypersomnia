@@ -28,8 +28,6 @@ namespace components {
 			augs::rgba colorize = augs::white;
 		};
 
-		void automatically_map_uv(assets::texture_id, unsigned uv_mapping_mode);
-
 		/* the polygon as it was originally, so possibly concave
 		it is later triangulated for rendering and divided into convex polygons for physics */
 		std::vector<vec2> original_polygon;
@@ -39,6 +37,19 @@ namespace components {
 
 		/* indices used in glDrawElements */
 		std::vector<int> indices;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(original_polygon),
+
+				CEREAL_NVP(triangulated_polygon),
+
+				CEREAL_NVP(indices)
+			);
+		}
+		
+		void automatically_map_uv(assets::texture_id, unsigned uv_mapping_mode);
 
 		/* construct a set of convex polygons from a potentially concave polygon */
 		void add_polygon_vertices(std::vector<vertex>);

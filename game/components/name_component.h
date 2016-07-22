@@ -9,6 +9,16 @@ namespace components {
 
 		bool custom_nickname = false;
 		std::wstring nickname;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(id),
+
+				CEREAL_NVP(custom_nickname),
+				CEREAL_NVP(nickname)
+			);
+		}
 	};
 }
 

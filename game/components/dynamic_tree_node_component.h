@@ -10,6 +10,16 @@ namespace components {
 
 		augs::rects::ltrb<float> aabb;
 
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(always_visible),
+				CEREAL_NVP(activated),
+				
+				CEREAL_NVP(aabb)
+			);
+		}
+
 		static dynamic_tree_node get_default(const_entity_handle);
 	};
 }

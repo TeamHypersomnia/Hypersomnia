@@ -26,6 +26,21 @@ namespace components {
 			float restitution = 0.f;
 
 			bool sensor = false;
+
+			template <class Archive>
+			void serialize(Archive& ar) {
+				ar(
+					CEREAL_NVP(shape),
+					CEREAL_NVP(filter),
+
+					CEREAL_NVP(density),
+					CEREAL_NVP(density_multiplier),
+					CEREAL_NVP(friction),
+					CEREAL_NVP(restitution),
+
+					CEREAL_NVP(sensor)
+				);
+			}
 		};
 
 		std::vector<convex_partitioned_collider> colliders;
@@ -33,13 +48,26 @@ namespace components {
 
 		std::array<components::transform, colliders_offset_type::OFFSET_COUNT> offsets_for_created_shapes;
 
+		bool is_friction_ground = false;
+		bool disable_standard_collision_resolution = false;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(colliders),
+				CEREAL_NVP(activated),
+
+				CEREAL_NVP(offsets_for_created_shapes),
+
+				CEREAL_NVP(is_friction_ground),
+				CEREAL_NVP(disable_standard_collision_resolution)
+			);
+		}
+
 		convex_partitioned_collider& new_collider() {
 			colliders.push_back(convex_partitioned_collider());
 			return *colliders.rbegin();
 		}
-
-		bool is_friction_ground = false;
-		bool disable_standard_collision_resolution = false;
 	};
 }
 

@@ -24,6 +24,20 @@ public:
 	std::vector<std::vector<vec2>> convex_polys;
 	std::vector<vec2> debug_original;
 
+	template <class Archive>
+	void serialize(Archive& ar) {
+		ar(
+			CEREAL_NVP(radius),
+
+			CEREAL_NVP(type),
+
+			CEREAL_NVP(rect_size),
+
+			CEREAL_NVP(convex_polys),
+			CEREAL_NVP(debug_original)
+		);
+	}
+
 	void offset_vertices(components::transform);
 	void mult_vertices(vec2);
 

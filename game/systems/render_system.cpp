@@ -56,7 +56,7 @@ std::array<std::vector<const_entity_handle>, render_layer::LAYER_COUNT> render_s
 
 void render_system::draw_entities(augs::vertex_triangle_buffer& output, std::vector<const_entity_handle> entities, state_for_drawing_camera in_camera, bool only_border_highlights) const {
 	for (auto e : entities) {
-		for_each_type<components::polygon, components::sprite, components::tile_layer, components::particle_group>([e, &output, &in_camera, only_border_highlights](auto T) {
+		for_each_type<components::polygon, components::sprite, /*components::tile_layer,*/ components::particle_group>([e, &output, &in_camera, only_border_highlights](auto T) {
 			typedef decltype(T) renderable_type;
 
 			if (e.has<renderable_type>()) {

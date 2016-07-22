@@ -22,5 +22,24 @@ namespace components {
 		float air_resistance = 2.0f;
 		// -1.f - the same as the air resistance
 		float angular_air_resistance = 0;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(owner_friction_ground),
+				CEREAL_NVP(owner_friction_grounds),
+
+				CEREAL_NVP(since_dropped),
+
+				CEREAL_NVP(enable_angle_motor),
+
+				CEREAL_NVP(target_angle),
+				CEREAL_NVP(angle_motor_force_multiplier),
+
+				CEREAL_NVP(measured_carried_mass),
+				CEREAL_NVP(air_resistance),
+				CEREAL_NVP(angular_air_resistance)
+			);
+		}
 	};
 }

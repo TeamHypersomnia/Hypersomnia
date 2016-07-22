@@ -7,6 +7,14 @@ namespace components {
 		vec2 pos;
 		float rotation = 0.0f;
 
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(pos),
+				CEREAL_NVP(rotation)
+			);
+		}
+
 		transform(float x, float y, float rotation = 0.0f) : pos(vec2(x, y)), rotation(rotation) {}
 		transform(vec2 pos = vec2(), float rotation = 0.0f) : pos(pos), rotation(rotation) {}
 

@@ -25,7 +25,7 @@ namespace components {
 	struct visibility;
 	struct sprite;
 	struct polygon;
-	struct tile_layer;
+	//struct tile_layer;
 	struct car;
 	struct driver;
 	struct trigger;
@@ -42,7 +42,6 @@ namespace components {
 	struct melee;
 	struct sentience;
 	struct attitude;
-	struct relations;
 	struct processing;
 	struct substance;
 }
@@ -72,7 +71,7 @@ struct put_all_components_into {
 		components::visibility,
 		components::sprite,
 		components::polygon,
-		components::tile_layer,
+		//components::tile_layer,
 		components::car,
 		components::driver,
 		components::trigger,

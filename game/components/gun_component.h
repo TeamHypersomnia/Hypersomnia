@@ -31,10 +31,6 @@ namespace components {
 		float camera_shake_radius = 0.f;
 		float camera_shake_spread_degrees = 0.f;
 
-		components::transform calculate_barrel_transform(components::transform gun_transform);
-
-		// state
-		
 		bool trigger_pressed = false;
 
 		std::pair<float, float> shell_velocity;
@@ -45,5 +41,36 @@ namespace components {
 		recoil_player recoil;
 
 		components::transform shell_spawn_offset;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(action_mode),
+
+				CEREAL_NVP(muzzle_velocity),
+
+				CEREAL_NVP(damage_multiplier),
+
+				CEREAL_NVP(shot_cooldown),
+
+				CEREAL_NVP(bullet_spawn_offset),
+
+				CEREAL_NVP(camera_shake_radius),
+				CEREAL_NVP(camera_shake_spread_degrees),
+
+				CEREAL_NVP(trigger_pressed),
+
+				CEREAL_NVP(shell_velocity),
+				CEREAL_NVP(shell_angular_velocity),
+
+				CEREAL_NVP(shell_spread_degrees),
+
+				CEREAL_NVP(recoil),
+
+				CEREAL_NVP(shell_spawn_offset)
+			);
+		}
+
+		components::transform calculate_barrel_transform(components::transform gun_transform);
 	};
 }

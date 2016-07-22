@@ -5,5 +5,12 @@
 namespace components {
 	struct substance {
 		bool dummy = false;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(dummy)
+			);
+		}
 	};
 }

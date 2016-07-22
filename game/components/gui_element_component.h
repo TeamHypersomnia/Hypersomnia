@@ -26,7 +26,7 @@ namespace components {
 		//
 		//int dragged_charges = 0;
 		//
-		//vec2i size;
+		vec2i size;
 		//
 		//bool is_gui_look_enabled = false;
 		//bool preview_due_to_item_picking_request = false;
@@ -54,5 +54,12 @@ namespace components {
 		//vec2i get_initial_position_for_special_control(special_control) const;
 		//vec2 initial_inventory_root_position() const;
 		//void draw_complete_gui_for_camera_rendering_request(viewing_step&) const;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(size)
+			);
+		}
 	};
 }

@@ -223,8 +223,8 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 			auto& is_point_visible = [&physics, epsilon_distance_visible_point_sq, &pathfinding, it](vec2 from, vec2 point, b2Filter& filter){
 				bool visibility_condition_fulfilled = true;
 				
-				if (pathfinding.target_visibility_condition)
-					visibility_condition_fulfilled = pathfinding.target_visibility_condition(it, from, point);
+				//if (pathfinding.target_visibility_condition)
+				//	visibility_condition_fulfilled = pathfinding.target_visibility_condition(it, from, point);
 
 				if (visibility_condition_fulfilled) {
 					auto line_of_sight = physics.ray_cast_px(from, point, filter);
@@ -363,30 +363,30 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 
 					bool first_priority_navpoint_found = false;
 
-					if (pathfinding.first_priority_navpoint_check) {
-						std::vector<components::pathfinding::pathfinding_session::navigation_vertex> first_priority_candidates;
-
-						for (auto& v : vertices) {
-							try {
-								/* arguments: subject, transform, navpoint 
-									returns true or false
-								*/
-								if (pathfinding.first_priority_navpoint_check(it, transform.pos, v.sensor)) {
-									first_priority_candidates.push_back(v);
-								}
-							}
-							catch (std::exception compilation_error) {
-								LOG(compilation_error.what());
-							}
-						}
-
-						if (!first_priority_candidates.empty()) {
-							/* find discontinuity that is closest to the target */
-							current_target = (*std::min_element(first_priority_candidates.begin(), first_priority_candidates.end(), local_minimum_predicate));
-
-							first_priority_navpoint_found = true;
-						}
-					}
+					//if (pathfinding.first_priority_navpoint_check) {
+					//	std::vector<components::pathfinding::pathfinding_session::navigation_vertex> first_priority_candidates;
+					//
+					//	for (auto& v : vertices) {
+					//		try {
+					//			/* arguments: subject, transform, navpoint 
+					//				returns true or false
+					//			*/
+					//			if (pathfinding.first_priority_navpoint_check(it, transform.pos, v.sensor)) {
+					//				first_priority_candidates.push_back(v);
+					//			}
+					//		}
+					//		catch (std::exception compilation_error) {
+					//			LOG(compilation_error.what());
+					//		}
+					//	}
+					//
+					//	if (!first_priority_candidates.empty()) {
+					//		/* find discontinuity that is closest to the target */
+					//		current_target = (*std::min_element(first_priority_candidates.begin(), first_priority_candidates.end(), local_minimum_predicate));
+					//
+					//		first_priority_navpoint_found = true;
+					//	}
+					//}
 
 					if (!first_priority_navpoint_found) 
 						/* find discontinuity that is closest to the target */

@@ -42,13 +42,47 @@ namespace components {
 
 			float swing_spread = 0.f;
 			float swings_per_sec = 0.f;
-			float min_swing_spread = 0.f, max_swing_spread = 0.f, min_swings_per_sec = 0.f, max_swings_per_sec = 0.f;
-			float swing_spread_change = 0.f, swing_speed_change = 0.f;
+			float min_swing_spread = 0.f;
+			float max_swing_spread = 0.f;
+			float min_swings_per_sec = 0.f;
+			float max_swings_per_sec = 0.f;
+			float swing_spread_change = 0.f;
+			float swing_speed_change = 0.f;
 
 			float fade_when_ms_remaining = 0.f;
 
 			resources::emission stream_info;
 			bool enable_streaming = false;
+
+			template <class Archive>
+			void serialize(Archive& ar) {
+				ar(
+					CEREAL_NVP(particles),
+
+					CEREAL_NVP(destroy_after_lifetime_passed),
+					CEREAL_NVP(stop_spawning_particles_if_chased_entity_dead),
+
+					CEREAL_NVP(stream_lifetime_ms),
+					CEREAL_NVP(stream_max_lifetime_ms),
+					CEREAL_NVP(stream_particles_to_spawn),
+
+					CEREAL_NVP(target_spread),
+
+					CEREAL_NVP(swing_spread),
+					CEREAL_NVP(swings_per_sec),
+					CEREAL_NVP(min_swing_spread),
+					CEREAL_NVP(max_swing_spread),
+					CEREAL_NVP(min_swings_per_sec),
+					CEREAL_NVP(max_swings_per_sec),
+					CEREAL_NVP(swing_spread_change),
+					CEREAL_NVP(swing_speed_change),
+
+					CEREAL_NVP(fade_when_ms_remaining),
+
+					CEREAL_NVP(stream_info),
+					CEREAL_NVP(enable_streaming)
+				);
+			}
 
 			void stop_streaming() {
 				enable_streaming = false;
@@ -56,10 +90,18 @@ namespace components {
 		};
 		
 		bool pause_emission = false;
-
 		components::transform previous_transform;
-
 		std::vector<stream> stream_slots;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(pause_emission),
+				CEREAL_NVP(previous_transform),
+				CEREAL_NVP(stream_slots)
+			);
+		}
+
 		particle_group() { stream_slots.resize(1); }
 
 		void draw(const drawing_input&) const;

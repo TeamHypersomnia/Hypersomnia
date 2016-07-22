@@ -17,6 +17,22 @@ namespace components {
 
 		bool is_it_finishing_trace = false;
 
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(max_multiplier_x),
+				CEREAL_NVP(max_multiplier_y),
+
+				CEREAL_NVP(chosen_multiplier),
+
+				CEREAL_NVP(lengthening_duration_ms),
+				CEREAL_NVP(chosen_lengthening_duration_ms),
+				CEREAL_NVP(lengthening_time_passed_ms),
+
+				CEREAL_NVP(is_it_finishing_trace)
+			);
+		}
+
 		void reset(randomization& p) {
 			lengthening_time_passed_ms = 0.f;
 			chosen_multiplier.set(p.randval(max_multiplier_x), p.randval(max_multiplier_y));

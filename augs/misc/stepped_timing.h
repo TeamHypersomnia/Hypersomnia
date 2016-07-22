@@ -7,6 +7,11 @@ namespace augs {
 	struct stepped_timestamp {
 		unsigned long long step = 0;
 
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(CEREAL_NVP(step));
+		}
+
 		stepped_timestamp operator-(stepped_timestamp b) const;
 
 		double in_seconds(fixed_delta) const;
@@ -19,6 +24,16 @@ namespace augs {
 		bool is_set = false;
 		float timeout_duration_ms = 1000.f;
 
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(when_started),
+
+				CEREAL_NVP(is_set),
+				CEREAL_NVP(timeout_duration_ms),
+				);
+		}
+
 		void unset();
 		void set(float timeout_duration_ms, fixed_delta);
 		bool passed(fixed_delta) const;
@@ -30,6 +45,16 @@ namespace augs {
 
 		bool ready_to_fire = true;
 		float cooldown_duration_ms = 1000.f;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(when_last_fired),
+
+				CEREAL_NVP(ready_to_fire),
+				CEREAL_NVP(cooldown_duration_ms),
+			);
+		}
 
 		stepped_cooldown(float cooldown_duration_ms);
 

@@ -4,22 +4,53 @@
 
 namespace resources {
 	struct particle {
-		vec2 pos, vel, acc;
+		vec2 pos;
+		vec2 vel;
+		vec2 acc;
 		components::sprite face;
 		float rotation = 0.f;
 		float rotation_speed = 0.f;
 		float linear_damping = 0.f;
 		float angular_damping = 0.f;
-		float lifetime_ms = 0.f, max_lifetime_ms = 0.f;
+		float lifetime_ms = 0.f;
+		float max_lifetime_ms = 0.f;
 		bool should_disappear = true;
 		bool ignore_rotation = false;
 		int alpha_levels = -1;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(pos),
+				CEREAL_NVP(vel),
+				CEREAL_NVP(acc),
+				CEREAL_NVP(face),
+				CEREAL_NVP(rotation),
+				CEREAL_NVP(rotation_speed),
+				CEREAL_NVP(linear_damping),
+				CEREAL_NVP(angular_damping),
+				CEREAL_NVP(lifetime_ms),
+				CEREAL_NVP(max_lifetime_ms),
+				CEREAL_NVP(should_disappear),
+				CEREAL_NVP(ignore_rotation),
+				CEREAL_NVP(alpha_levels)
+			);
+		}
 	};
 
 	struct particle_effect_modifier {
 		augs::rgba colorize;
 		float scale_amounts = 1.f;
 		float scale_lifetimes = 1.f;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(colorize),
+				CEREAL_NVP(scale_amounts),
+				CEREAL_NVP(scale_lifetimes)
+			);
+		}
 	};
 
 	struct emission {
@@ -59,6 +90,42 @@ namespace resources {
 
 		std::vector<particle> particle_templates;
 		components::render particle_render_template;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(type),
+				CEREAL_NVP(spread_degrees),
+				CEREAL_NVP(velocity),
+				CEREAL_NVP(angular_velocity),
+				CEREAL_NVP(particles_per_sec),
+				CEREAL_NVP(stream_duration_ms),
+				CEREAL_NVP(particle_lifetime_ms),
+				CEREAL_NVP(size_multiplier),
+				CEREAL_NVP(acceleration),
+				CEREAL_NVP(angular_offset),
+				CEREAL_NVP(swing_spread),
+				CEREAL_NVP(swings_per_sec),
+				CEREAL_NVP(min_swing_spread),
+				CEREAL_NVP(max_swing_spread),
+				CEREAL_NVP(min_swings_per_sec),
+				CEREAL_NVP(max_swings_per_sec),
+				CEREAL_NVP(swing_spread_change_rate),
+				CEREAL_NVP(swing_speed_change_rate),
+				CEREAL_NVP(fade_when_ms_remaining),
+				CEREAL_NVP(num_of_particles_to_spawn_initially),
+
+				CEREAL_NVP(particles_per_burst),
+
+				CEREAL_NVP(initial_rotation_variation),
+				CEREAL_NVP(randomize_acceleration),
+
+				CEREAL_NVP(offset),
+
+				CEREAL_NVP(particle_templates),
+				CEREAL_NVP(particle_render_template)
+			);
+		}
 
 		void apply_modifier(particle_effect_modifier m);
 	};

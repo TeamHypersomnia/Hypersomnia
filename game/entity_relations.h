@@ -18,4 +18,21 @@ struct entity_relations {
 
 	std::vector<entity_id> fixture_entities;
 	entity_id owner_body;
+
+	template <class Archive>
+	void serialize(Archive& ar) {
+		ar(
+			CEREAL_NVP(sub_entities_by_name),
+			CEREAL_NVP(associated_entities_by_name),
+
+			CEREAL_NVP(sub_entities),
+
+			CEREAL_NVP(parent),
+
+			CEREAL_NVP(name_as_sub_entity),
+
+			CEREAL_NVP(fixture_entities),
+			CEREAL_NVP(owner_body)
+		);
+	}
 };
