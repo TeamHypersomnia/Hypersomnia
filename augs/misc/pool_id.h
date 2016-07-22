@@ -29,9 +29,9 @@ namespace augs {
 		template <class Archive>
 		void serialize(Archive& ar) {
 #ifdef USE_NAMES_FOR_IDS
-			ar(debug_name);
+			ar(CEREAL_NVP(debug_name));
 #endif
-			ar(version, indirection_index);
+			ar(CEREAL_NVP(version), CEREAL_NVP(indirection_index));
 		}
 	};
 

@@ -9,9 +9,20 @@ namespace components {
 		struct instance {
 			resources::behaviour_tree::state_of_tree_instance state;
 			assets::behaviour_tree_id tree_id;
+
+			template <class Archive>
+			void serialize(Archive& ar) {
+				ar(CEREAL_NVP(state), 
+					CEREAL_NVP(tree_id));
+			}
 		};
 
 		std::vector<instance> concurrent_trees;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(CEREAL_NVP(concurrent_trees));
+		}
 	};
 }
 

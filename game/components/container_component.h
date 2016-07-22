@@ -6,5 +6,10 @@
 namespace components {
 	struct container {
 		std::unordered_map<slot_function, inventory_slot> slots;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(CEREAL_NVP(slots));
+		}
 	};
 }

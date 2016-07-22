@@ -12,4 +12,15 @@ struct state_for_drawing_camera {
 
 	// used for visibility queries
 	augs::rects::ltrb<float> transformed_visible_world_area_aabb;
+
+	template <class Archive>
+	void serialize(Archive& ar) {
+		ar(
+			CEREAL_NVP(associated_character),
+			CEREAL_NVP(camera_transform),
+
+			CEREAL_NVP(visible_world_area),
+
+			CEREAL_NVP(transformed_visible_world_area_aabb));
+	}
 };

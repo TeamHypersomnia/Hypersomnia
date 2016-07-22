@@ -19,6 +19,21 @@ namespace components {
 		playing_state state = playing_state::PAUSED;
 		playing_state paused_state = playing_state::PAUSED;
 
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(current_animation),
+
+				CEREAL_NVP(priority),
+				CEREAL_NVP(frame_num),
+				CEREAL_NVP(player_position_ms),
+				CEREAL_NVP(speed_factor),
+
+				CEREAL_NVP(state),
+				CEREAL_NVP(paused_state)
+				);
+		}
+
 		void set_current_frame(unsigned number);
 
 		void increase_frame();

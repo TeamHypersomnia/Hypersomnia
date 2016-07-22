@@ -34,6 +34,11 @@ namespace resources {
 
 		struct state_of_tree_instance {
 			int previously_executed_leaf_id = -1;
+			
+			template <class Archive>
+			void serialize(Archive& ar) {
+				ar(CEREAL_NVP(previously_executed_leaf_id));
+			}
 		};
 
 		struct state_of_traversal {

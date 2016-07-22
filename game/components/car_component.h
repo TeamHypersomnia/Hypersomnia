@@ -43,6 +43,51 @@ namespace components {
 
 		vec2 wheel_offset = vec2(200, 125);
 
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(current_driver),
+
+				CEREAL_NVP(left_wheel_trigger),
+				CEREAL_NVP(right_wheel_trigger),
+
+				CEREAL_NVP(accelerating),
+				CEREAL_NVP(deccelerating),
+				CEREAL_NVP(turning_right),
+				CEREAL_NVP(turning_left),
+				CEREAL_NVP(hand_brake),
+
+				CEREAL_NVP(braking_damping),
+				CEREAL_NVP(braking_angular_damping),
+
+				CEREAL_NVP(input_acceleration),
+
+				CEREAL_NVP(acceleration_length),
+
+				CEREAL_NVP(maximum_speed_with_static_air_resistance),
+				CEREAL_NVP(maximum_speed_with_static_damping),
+				CEREAL_NVP(static_air_resistance),
+				CEREAL_NVP(dynamic_air_resistance),
+				CEREAL_NVP(static_damping),
+				CEREAL_NVP(dynamic_damping),
+
+				CEREAL_NVP(maximum_lateral_cancellation_impulse),
+				CEREAL_NVP(lateral_impulse_multiplier),
+
+				CEREAL_NVP(angular_damping),
+				CEREAL_NVP(angular_damping_while_hand_braking),
+
+				CEREAL_NVP(minimum_speed_for_maneuverability_decrease),
+				CEREAL_NVP(maneuverability_decrease_multiplier),
+
+				CEREAL_NVP(angular_air_resistance),
+				CEREAL_NVP(angular_air_resistance_while_hand_braking),
+
+				CEREAL_NVP(wheel_offset)
+				);
+		}
+
 		void reset_movement_flags();
 	};
 }
