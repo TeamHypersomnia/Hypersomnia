@@ -6,7 +6,7 @@
 #include "game/entity_handle_declaration.h"
 
 namespace components {
-	struct crosshair  {
+	struct crosshair {
 		static vec2 calculate_aiming_displacement(const_entity_handle subject_crosshair, bool snap_epsilon_base_offset = false);
 
 		entity_id character_entity_to_chase;
@@ -16,5 +16,10 @@ namespace components {
 		float rotation_offset = 0.f;
 		vec2 size_multiplier = vec2(1.0f, 1.0f);
 		vec2 sensitivity = vec2(1.0f, 1.0f);
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(character_entity_to_chase, base_offset, bounds_for_base_offset, rotation_offset, size_multiplier, sensitivity);
+		}
 	};
 }
