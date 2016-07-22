@@ -25,6 +25,14 @@ namespace augs {
 		bool operator==(const raw_pool_id& b) const;
 		bool operator!=(const raw_pool_id& b) const;
 		bool operator<(const raw_pool_id& b) const;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+#ifdef USE_NAMES_FOR_IDS
+			ar(debug_name);
+#endif
+			ar(version, indirection_index);
+		}
 	};
 
 	template<class owner_pool_type>
