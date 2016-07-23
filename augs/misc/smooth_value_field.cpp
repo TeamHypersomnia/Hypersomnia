@@ -1,11 +1,9 @@
 #include "smooth_value_field.h"
 
 namespace augs {
-	void smooth_value_field::tick() {
-		double delta = delta_timer.extract<std::chrono::seconds>();
-
+	void smooth_value_field::tick(double delta_seconds) {
 		double averaging_constant =
-			pow(smoothing_average_factor, averages_per_sec * delta);
+			pow(smoothing_average_factor, averages_per_sec * delta_seconds);
 
 		auto calculated_smoothed_value = value * averaging_constant + target_value * (1.0 - averaging_constant);
 

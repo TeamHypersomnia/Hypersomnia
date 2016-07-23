@@ -44,6 +44,23 @@
 #include "game/types_specification/all_messages_includes.h"
 #include "game/types_specification/all_component_includes.h"
 
+#include <sstream>
+
+void cosmos::complete_resubstantialization() {
+	temporary_systems.~storage_for_all_temporary_systems();
+	new (&temporary_systems) storage_for_all_temporary_systems;
+
+	pool_for_aggregates.for_each_id([this](entity_id id) {
+		auto h = get_handle(id);
+
+		if (h.has<components::substance>()) {
+			temporary_systems.for_each([h](auto& sys) {
+				sys.construct(h);
+			});
+		}
+	});
+}
+
 void cosmos::complete_resubstantialization(entity_handle h) {
 	temporary_systems.for_each([h](auto& sys) {
 		sys.destruct(h);
@@ -77,7 +94,7 @@ std::vector<const_entity_handle> cosmos::get(processing_subjects list) const {
 }
 
 randomization cosmos::get_rng_for(entity_id id) const {
-	return{ id.version + id.indirection_index + static_cast<size_t>(current_step_number) };
+	return{ id.version + id.indirection_index + static_cast<size_t>(delta.get_total_steps_passed()) };
 }
 
 entity_handle cosmos::get_handle(entity_id id) {

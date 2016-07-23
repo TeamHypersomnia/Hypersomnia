@@ -39,11 +39,23 @@ public:
 	storage_for_all_temporary_systems temporary_systems;
 	all_settings settings;
 
+	unsigned long long current_step_number = 0;
+	augs::fixed_delta delta;
+
 	cosmic_profiler profiler;
 
-	unsigned long long current_step_number = 0;
-
-	augs::fixed_delta delta;
+	template <class Archive>
+	void serialize(Archive& ar) {
+		ar(
+			CEREAL_NVP(settings),
+			CEREAL_NVP(current_step_number),
+			CEREAL_NVP(delta),
+			CEREAL_NVP(pool_for_aggregates),
+			CEREAL_NVP(pools_for_components)
+		);
+		
+		complete_resubstantialization();
+	}
 
 	void advance_deterministic_schemata(cosmic_entropy input,
 		fixed_callback pre_solve = fixed_callback(), 
@@ -55,6 +67,7 @@ public:
 	entity_handle clone_entity(entity_id);
 	void delete_entity(entity_id);
 
+	void complete_resubstantialization();
 	void complete_resubstantialization(entity_handle);
 	
 	template<class System>

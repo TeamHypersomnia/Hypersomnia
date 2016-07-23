@@ -187,7 +187,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing(fixed_step& step) {
 			}
 
 			camera.smoothing_player_pos.target_value = target_value * (-1);
-			camera.smoothing_player_pos.tick();
+			camera.smoothing_player_pos.tick(delta.in_seconds());
 		}
 
 		if (camera.enable_smoothing)

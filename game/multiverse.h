@@ -29,6 +29,9 @@ public:
 
 	void populate_cosmoi();
 
+	void save_cosmos_to_file(std::string);
+	void load_cosmos_from_file(std::string);
+
 	cosmos main_cosmos;
 	augs::fixed_delta_timer main_cosmos_timer;
 

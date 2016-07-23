@@ -15,6 +15,22 @@ public:
 	double remaining_cooldown_duration = -1.0;
 	double scale = 1.0;
 
+	template <class Archive>
+	void serialize(Archive& ar) {
+		ar(
+			CEREAL_NVP(delta_offset),
+
+			CEREAL_NVP(offsets),
+			CEREAL_NVP(current_offset),
+			CEREAL_NVP(reversed),
+			CEREAL_NVP(repeat_last_n_offsets),
+
+			CEREAL_NVP(single_cooldown_duration_ms),
+			CEREAL_NVP(remaining_cooldown_duration),
+			CEREAL_NVP(scale)
+		);
+	}
+
 	vec2 shoot_and_get_offset();
 	
 	void shoot_and_apply_impulse(entity_handle recoil_body, float scale, bool angular_impulse = false, float additional_angle = 0.f,

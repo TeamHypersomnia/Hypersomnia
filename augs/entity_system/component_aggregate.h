@@ -8,6 +8,13 @@ namespace augs {
 	public:
 		tuple_of_t<make_pool_id, components...> component_ids;
 
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(component_ids)
+			);
+		}
+
 		template <class component>
 		auto& writable_id() {
 			return std::get<pool_id<component>>(component_ids);

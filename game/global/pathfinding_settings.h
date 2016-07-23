@@ -6,4 +6,15 @@ struct pathfinding_settings {
 
 	int draw_memorised_walls = false;
 	int draw_undiscovered = false;
+
+	template <class Archive>
+	void serialize(Archive& ar) {
+		ar(
+			CEREAL_NVP(epsilon_distance_visible_point),
+			CEREAL_NVP(epsilon_distance_the_same_vertex),
+
+			CEREAL_NVP(draw_memorised_walls),
+			CEREAL_NVP(draw_undiscovered)
+		);
+	}
 };

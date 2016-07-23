@@ -20,7 +20,7 @@ namespace augs {
 
 			template <class Archive>
 			void serialize(Archive& ar) {
-				ar(CEREAL_NVP(pooled));
+				ar(CEREAL_NVP(pointing_indirector));
 			}
 		};
 
@@ -42,6 +42,7 @@ namespace augs {
 		std::vector<indirector> indirectors;
 		std::vector<int> free_indirectors;
 
+	public:
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(
@@ -52,6 +53,7 @@ namespace augs {
 			);
 		}
 
+	protected:
 		void initialize_space(int slot_count) {
 			pooled.clear();
 			indirectors.clear();
@@ -138,6 +140,17 @@ namespace augs {
 
 		const_handle_type get_handle(id_type from_id) const {
 			return{ *this, from_id };
+		}
+
+		void for_each_id(std::function<void(id_type)> f) {
+			id_type id;
+
+			for(const auto& s : slots) {
+				id.indirection_index = s.pointing_indirector;
+				id.version = indirectors[s.pointing_indirector].version;
+
+				f(id);
+			}
 		}
 
 		T& get(id_type object) {

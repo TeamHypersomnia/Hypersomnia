@@ -14,6 +14,10 @@ namespace augs {
 		return total_steps_passed * in_seconds();
 	}
 	
+	unsigned long long fixed_delta::get_total_steps_passed() const {
+		return total_steps_passed;
+	}
+
 	double fixed_delta::in_milliseconds() const {
 		return fixed_delta_ms;
 	}

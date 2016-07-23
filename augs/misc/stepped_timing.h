@@ -30,7 +30,7 @@ namespace augs {
 				CEREAL_NVP(when_started),
 
 				CEREAL_NVP(is_set),
-				CEREAL_NVP(timeout_duration_ms),
+				CEREAL_NVP(timeout_duration_ms)
 				);
 		}
 
@@ -52,7 +52,7 @@ namespace augs {
 				CEREAL_NVP(when_last_fired),
 
 				CEREAL_NVP(ready_to_fire),
-				CEREAL_NVP(cooldown_duration_ms),
+				CEREAL_NVP(cooldown_duration_ms)
 			);
 		}
 

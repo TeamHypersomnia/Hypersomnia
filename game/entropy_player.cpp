@@ -1,3 +1,7 @@
+#include <cereal/types/vector.hpp>
+#include <cereal/types/bitset.hpp>
+#include <cereal/archives/portable_binary.hpp>
+
 #include "entropy_player.h"
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"

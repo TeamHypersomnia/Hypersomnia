@@ -14,6 +14,17 @@ namespace augs {
 
 	struct rgba {
 		rgba_channel r, g, b, a;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(r),
+				CEREAL_NVP(g),
+				CEREAL_NVP(b),
+				CEREAL_NVP(a)
+			);
+		}
+
 		rgba(rgba_channel red = 255, rgba_channel green = 255, rgba_channel blue = 255, rgba_channel alpha = 255);
 		void set(rgba_channel red = 255, rgba_channel green = 255, rgba_channel blue = 255, rgba_channel alpha = 255);
 

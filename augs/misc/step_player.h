@@ -1,6 +1,5 @@
 #pragma once
 #include <fstream>
-#include "serialization.h"
 
 namespace augs {
 	template <typename entry_internal_type>
@@ -16,6 +15,11 @@ namespace augs {
 		struct entry_type {
 			entry_internal_type internal_data;
 			int step_occurred;
+
+			template <class Archive>
+			void serialize(Archive& ar) {
+				ar(CEREAL_NVP(internal_data), CEREAL_NVP(step_occurred));
+			}
 		};
 
 		int player_position = 0;
@@ -55,8 +59,10 @@ namespace augs {
 			while (source.peek() != EOF) {
 				entry_type entry;
 
-				deserialize(source, entry.step_occurred);
-				deserialize(source, entry.internal_data);
+				{
+					cereal::PortableBinaryInputArchive ar(source);
+					ar(entry);
+				}
 
 				loaded_recording.emplace_back(entry);
 			}
@@ -76,8 +82,10 @@ namespace augs {
 
 					std::ofstream recording_file(live_saving_filename, std::ios::out | std::ios::binary | std::ios::app);
 
-					serialize(recording_file, new_entry.step_occurred);
-					serialize(recording_file, new_entry.internal_data);
+					{
+						cereal::PortableBinaryOutputArchive ar(recording_file);
+						ar(new_entry);
+					}
 				}
 			}
 			else if (current_player_state == player_state::REPLAYING) {

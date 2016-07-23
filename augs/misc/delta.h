@@ -9,11 +9,22 @@ namespace augs {
 		unsigned steps_per_second;
 		unsigned long long total_steps_passed = 0;
 	public:
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(fixed_delta_ms),
+				CEREAL_NVP(steps_per_second),
+				CEREAL_NVP(total_steps_passed)
+			);
+		}
+
 		double in_milliseconds() const;
 		double in_seconds() const;
 		unsigned get_steps_per_second() const;
 
 		double total_time_passed_in_seconds() const;
+		unsigned long long get_total_steps_passed() const;
 
 		stepped_timestamp get_timestamp() const;
 	};

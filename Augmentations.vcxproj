@@ -458,6 +458,7 @@
     <ClCompile Include="game\scene_managers\testbed.cpp" />
     <ClCompile Include="game\detail\inventory_slot.cpp" />
     <ClCompile Include="game\detail\inventory_utils.cpp" />
+    <ClCompile Include="game\serialization.cpp" />
     <ClCompile Include="game\step.cpp" />
     <ClCompile Include="game\systems\animation_system.cpp" />
     <ClCompile Include="game\systems\behaviour_tree_system.cpp" />
@@ -991,7 +992,6 @@
     <ClInclude Include="augs\misc\machine_entropy.h" />
     <ClInclude Include="augs\misc\pool_handlizer.h" />
     <ClInclude Include="augs\misc\stepped_timing.h" />
-    <ClInclude Include="augs\misc\entropy_unpacker_and_recorder.h" />
     <ClInclude Include="augs\misc\time_utils.h" />
     <ClInclude Include="game\cosmic_entropy.h" />
     <ClInclude Include="augs\misc\measurements.h" />
@@ -1000,7 +1000,6 @@
     <ClInclude Include="augs\misc\recoil_player.h" />
     <ClInclude Include="augs\misc\variable_delta_timer.h" />
     <ClInclude Include="augs\misc\typesafe_sprintf.h" />
-    <ClInclude Include="augs\serialization.h" />
     <ClInclude Include="augs\templates.h" />
     <ClInclude Include="augs\window_framework\colored_print.h" />
     <ClInclude Include="augs\window_framework\platform_utils.h" />

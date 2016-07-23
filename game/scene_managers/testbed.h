@@ -20,9 +20,19 @@ namespace scene_managers {
 
 		std::vector<entity_id> draw_bodies;
 
-		bool keep_drawing = false;
-
 	public:
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(characters),
+
+				CEREAL_NVP(current_character),
+				CEREAL_NVP(world_camera),
+
+				CEREAL_NVP(draw_bodies)
+			);
+		}
+
 		void populate_world_with_entities(fixed_step&);
 		cosmic_entropy make_cosmic_entropy(augs::machine_entropy, cosmos&);
 		entity_id get_controlled_entity() const;

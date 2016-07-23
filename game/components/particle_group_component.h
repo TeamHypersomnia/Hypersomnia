@@ -57,7 +57,7 @@ namespace components {
 			template <class Archive>
 			void serialize(Archive& ar) {
 				ar(
-					CEREAL_NVP(particles),
+					CEREAL_NVP(particles.particles),
 
 					CEREAL_NVP(destroy_after_lifetime_passed),
 					CEREAL_NVP(stop_spawning_particles_if_chased_entity_dead),

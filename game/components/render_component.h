@@ -38,7 +38,7 @@ namespace components {
 				CEREAL_NVP(draw_border),
 				CEREAL_NVP(border_color),
 
-				CEREAL_NVP(last_step_when_visible),
+				CEREAL_NVP(last_step_when_visible)
 			);
 		}
 

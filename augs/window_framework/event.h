@@ -323,9 +323,26 @@ namespace augs {
 
 			struct state {
 				struct mouse_info {
-					vec2i pos, rel, ldrag, rdrag;
+					vec2i pos;
+					vec2i rel;
+					vec2i ldrag;
+					vec2i rdrag;
+
 					bool state[3] = { false, false, false };
 					int scroll = 0;
+
+					template <class Archive>
+					void serialize(Archive& ar) {
+						ar(
+							CEREAL_NVP(pos),
+							CEREAL_NVP(rel),
+							CEREAL_NVP(ldrag),
+							CEREAL_NVP(rdrag),
+
+							CEREAL_NVP(state),
+							CEREAL_NVP(scroll)
+						);
+					}
 				} mouse;
 
 				message msg;
@@ -335,6 +352,20 @@ namespace augs {
 				wchar_t utf16 = 0;
 				unsigned utf32 = 0;
 				std::bitset<256> keys;
+
+				template <class Archive>
+				void serialize(Archive& ar) {
+					ar(
+						CEREAL_NVP(mouse),
+						CEREAL_NVP(msg),
+						CEREAL_NVP(key_event),
+						CEREAL_NVP(key),
+						CEREAL_NVP(repeated),
+						CEREAL_NVP(utf16),
+						CEREAL_NVP(utf32),
+						CEREAL_NVP(keys)
+					);
+				}
 			};
 		}
 	}
