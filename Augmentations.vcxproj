@@ -69,10 +69,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\gtest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\lua;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\gtest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\lua;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\gtest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\lua;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\gtest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\lua;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
