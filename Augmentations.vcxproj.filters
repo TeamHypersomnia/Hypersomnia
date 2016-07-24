@@ -1200,6 +1200,9 @@
     <ClCompile Include="game\serialization.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="3rdparty\polypartition\src\polypartition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3294,6 +3297,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\detail\entity\relations_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\polypartition\src\polypartition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

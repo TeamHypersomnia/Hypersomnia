@@ -1,7 +1,7 @@
 #include "convex_partitioned_shape.h"
 #include <Box2D/Box2D.h>
 
-#include "3rdparty/polypartition/polypartition.h"
+#include "3rdparty/polypartition/src/polypartition.h"
 
 #include "game/components/polygon_component.h"
 #include "game/components/physics_component.h"
@@ -101,7 +101,7 @@ void convex_partitioned_shape::from_polygon(const components::polygon& poly) {
 }
 
 void convex_partitioned_shape::add_concave_polygon(const std::vector <vec2> &verts) {
-	list<TPPLPoly> inpolys, outpolys;
+	std::list<TPPLPoly> inpolys, outpolys;
 	TPPLPoly subject_poly;
 	subject_poly.Init(verts.size());
 	subject_poly.SetHole(false);

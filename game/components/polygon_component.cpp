@@ -1,7 +1,7 @@
 #include "polygon_component.h"
 #include "augs/texture_baker/texture_baker.h"
 
-#include "3rdparty/polypartition/polypartition.h"
+#include "3rdparty/polypartition/src/polypartition.h"
 
 #include "augs/graphics/renderer.h"
 #include "game/detail/state_for_drawing_camera.h"
@@ -75,7 +75,7 @@ namespace components {
 
 
 		TPPLPoly inpoly;
-		list<TPPLPoly> out_tris;
+		std::list<TPPLPoly> out_tris;
 
 		TPPLPoly subject_poly;
 		inpoly.Init(polygon.size());

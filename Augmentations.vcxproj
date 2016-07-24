@@ -241,7 +241,7 @@
     <ClCompile Include="3rdparty\lua\lutf8lib.c" />
     <ClCompile Include="3rdparty\lua\lvm.c" />
     <ClCompile Include="3rdparty\lua\lzio.c" />
-    <ClCompile Include="3rdparty\polypartition\polypartition.cpp" />
+    <ClCompile Include="3rdparty\polypartition\src\polypartition.cpp" />
     <ClCompile Include="3rdparty\RakNet\Source\Base64Encoder.cpp" />
     <ClCompile Include="3rdparty\RakNet\Source\BitStream.cpp" />
     <ClCompile Include="3rdparty\RakNet\Source\CCRakNetSlidingWindow.cpp" />
@@ -814,7 +814,7 @@
     <ClInclude Include="3rdparty\lua\lundump.h" />
     <ClInclude Include="3rdparty\lua\lvm.h" />
     <ClInclude Include="3rdparty\lua\lzio.h" />
-    <ClInclude Include="3rdparty\polypartition\polypartition.h" />
+    <ClInclude Include="3rdparty\polypartition\src\polypartition.h" />
     <ClInclude Include="3rdparty\RakNet\Source\AutopatcherPatchContext.h" />
     <ClInclude Include="3rdparty\RakNet\Source\AutopatcherRepositoryInterface.h" />
     <ClInclude Include="3rdparty\RakNet\Source\Base64Encoder.h" />
