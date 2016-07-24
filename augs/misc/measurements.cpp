@@ -35,6 +35,9 @@ namespace augs {
 	}
 
 	std::wstring measurements::summary() const {
+		if (!was_measured())
+			return std::wstring();
+
 		double scale = 1000;
 		bool detailed = false;
 
