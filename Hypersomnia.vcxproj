@@ -70,12 +70,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>$(AUGMENTATIONS)\3rdparty\libs;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
-    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\gtest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\lua;$(AUGMENTATIONS)\3rdparty\cereal\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\gtest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\lua\src;$(AUGMENTATIONS)\3rdparty\cereal\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)output/</OutDir>
     <TargetName>$(ProjectName)-$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\gtest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\lua;$(AUGMENTATIONS)\3rdparty\cereal\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\gtest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\lua\src;$(AUGMENTATIONS)\3rdparty\cereal\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <LibraryPath>$(AUGMENTATIONS)\3rdparty\libs;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
     <OutDir>$(SolutionDir)output/</OutDir>
     <TargetName>$(ProjectName)-$(Configuration)</TargetName>
