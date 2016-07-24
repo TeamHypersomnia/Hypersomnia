@@ -25,7 +25,7 @@ public:
 	void print_summary(augs::renderer&) const;
 	std::wstring summary(bool detailed) const;
 	std::string recording_filename = "recorded.inputs";
-	std::string save_filename = "save.dat";
+	std::string save_filename = "save.state";
 	std::string saves_folder = "saves/";
 	std::string sessions_folder = "sessions/";
 
