@@ -33,6 +33,10 @@ void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {
 		auto& body = it.get<components::physics>();
 		transform.pos += pathfinding.eye_offset;
 
+		if (!body.is_constructed()) {
+			continue;
+		}
+
 		/* check if we request pathfinding at the moment */
 		if (!pathfinding.session_stack.empty()) {
 			/* get visibility information */

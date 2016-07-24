@@ -224,6 +224,7 @@ std::vector<basic_entity_handle<C>> basic_physics_synchronizer<C>::get_fixture_e
 
 template<bool C>
 bool basic_physics_synchronizer<C>::test_point(vec2 v) const {
+	ensure(is_constructed());
 	return get_cache().body->TestPoint(v * PIXELS_TO_METERSf);
 }
 
