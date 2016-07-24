@@ -1,4 +1,4 @@
-#include "lua/lua.hpp"
+#include "lua.hpp"
 #include <luabind/luabind.hpp>
 #include "lua_state_wrapper.h"
 #include "script.h"

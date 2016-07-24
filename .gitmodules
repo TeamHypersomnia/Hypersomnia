@@ -4,3 +4,6 @@
 [submodule "3rdparty/polypartition"]
 	path = 3rdparty/polypartition
 	url = https://github.com/TeamHypersomnia/polypartition.git
+[submodule "3rdparty/lua"]
+	path = 3rdparty/lua
+	url = https://github.com/lua/lua.git

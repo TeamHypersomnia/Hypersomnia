@@ -1,4 +1,4 @@
-#include "lua/lua.hpp"
+#include "lua.hpp"
 #include <luabind/luabind.hpp>
 
 #include "game_window.h"

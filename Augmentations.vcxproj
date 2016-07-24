@@ -69,10 +69,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\gtest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\lua;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\gtest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\gtest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\lua;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\gtest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -207,6 +207,40 @@
     <ClCompile Include="3rdparty\luabind\src\stack_content_by_name.cpp" />
     <ClCompile Include="3rdparty\luabind\src\weak_ref.cpp" />
     <ClCompile Include="3rdparty\luabind\src\wrapper_base.cpp" />
+    <ClCompile Include="3rdparty\lua\src\lapi.c" />
+    <ClCompile Include="3rdparty\lua\src\lauxlib.c" />
+    <ClCompile Include="3rdparty\lua\src\lbaselib.c" />
+    <ClCompile Include="3rdparty\lua\src\lbitlib.c" />
+    <ClCompile Include="3rdparty\lua\src\lcode.c" />
+    <ClCompile Include="3rdparty\lua\src\lcorolib.c" />
+    <ClCompile Include="3rdparty\lua\src\lctype.c" />
+    <ClCompile Include="3rdparty\lua\src\ldblib.c" />
+    <ClCompile Include="3rdparty\lua\src\ldebug.c" />
+    <ClCompile Include="3rdparty\lua\src\ldo.c" />
+    <ClCompile Include="3rdparty\lua\src\ldump.c" />
+    <ClCompile Include="3rdparty\lua\src\lfunc.c" />
+    <ClCompile Include="3rdparty\lua\src\lgc.c" />
+    <ClCompile Include="3rdparty\lua\src\linit.c" />
+    <ClCompile Include="3rdparty\lua\src\liolib.c" />
+    <ClCompile Include="3rdparty\lua\src\llex.c" />
+    <ClCompile Include="3rdparty\lua\src\lmathlib.c" />
+    <ClCompile Include="3rdparty\lua\src\lmem.c" />
+    <ClCompile Include="3rdparty\lua\src\loadlib.c" />
+    <ClCompile Include="3rdparty\lua\src\lobject.c" />
+    <ClCompile Include="3rdparty\lua\src\lopcodes.c" />
+    <ClCompile Include="3rdparty\lua\src\loslib.c" />
+    <ClCompile Include="3rdparty\lua\src\lparser.c" />
+    <ClCompile Include="3rdparty\lua\src\lstate.c" />
+    <ClCompile Include="3rdparty\lua\src\lstring.c" />
+    <ClCompile Include="3rdparty\lua\src\lstrlib.c" />
+    <ClCompile Include="3rdparty\lua\src\ltable.c" />
+    <ClCompile Include="3rdparty\lua\src\ltablib.c" />
+    <ClCompile Include="3rdparty\lua\src\ltm.c" />
+    <ClCompile Include="3rdparty\lua\src\lua.c" />
+    <ClCompile Include="3rdparty\lua\src\lundump.c" />
+    <ClCompile Include="3rdparty\lua\src\lutf8lib.c" />
+    <ClCompile Include="3rdparty\lua\src\lvm.c" />
+    <ClCompile Include="3rdparty\lua\src\lzio.c" />
     <ClCompile Include="3rdparty\polypartition\src\polypartition.cpp" />
     <ClCompile Include="3rdparty\RakNet\Source\Base64Encoder.cpp" />
     <ClCompile Include="3rdparty\RakNet\Source\BitStream.cpp" />
@@ -754,6 +788,32 @@
     <ClInclude Include="3rdparty\luabind\weak_ref.hpp" />
     <ClInclude Include="3rdparty\luabind\wrapper_base.hpp" />
     <ClInclude Include="3rdparty\luabind\yield_policy.hpp" />
+    <ClInclude Include="3rdparty\lua\src\lapi.h" />
+    <ClInclude Include="3rdparty\lua\src\lauxlib.h" />
+    <ClInclude Include="3rdparty\lua\src\lcode.h" />
+    <ClInclude Include="3rdparty\lua\src\lctype.h" />
+    <ClInclude Include="3rdparty\lua\src\ldebug.h" />
+    <ClInclude Include="3rdparty\lua\src\ldo.h" />
+    <ClInclude Include="3rdparty\lua\src\lfunc.h" />
+    <ClInclude Include="3rdparty\lua\src\lgc.h" />
+    <ClInclude Include="3rdparty\lua\src\llex.h" />
+    <ClInclude Include="3rdparty\lua\src\llimits.h" />
+    <ClInclude Include="3rdparty\lua\src\lmem.h" />
+    <ClInclude Include="3rdparty\lua\src\lobject.h" />
+    <ClInclude Include="3rdparty\lua\src\lopcodes.h" />
+    <ClInclude Include="3rdparty\lua\src\lparser.h" />
+    <ClInclude Include="3rdparty\lua\src\lprefix.h" />
+    <ClInclude Include="3rdparty\lua\src\lstate.h" />
+    <ClInclude Include="3rdparty\lua\src\lstring.h" />
+    <ClInclude Include="3rdparty\lua\src\ltable.h" />
+    <ClInclude Include="3rdparty\lua\src\ltm.h" />
+    <ClInclude Include="3rdparty\lua\src\lua.h" />
+    <ClInclude Include="3rdparty\lua\src\lua.hpp" />
+    <ClInclude Include="3rdparty\lua\src\luaconf.h" />
+    <ClInclude Include="3rdparty\lua\src\lualib.h" />
+    <ClInclude Include="3rdparty\lua\src\lundump.h" />
+    <ClInclude Include="3rdparty\lua\src\lvm.h" />
+    <ClInclude Include="3rdparty\lua\src\lzio.h" />
     <ClInclude Include="3rdparty\polypartition\src\polypartition.h" />
     <ClInclude Include="3rdparty\RakNet\Source\AutopatcherPatchContext.h" />
     <ClInclude Include="3rdparty\RakNet\Source\AutopatcherRepositoryInterface.h" />
