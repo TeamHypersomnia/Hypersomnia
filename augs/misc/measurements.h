@@ -15,7 +15,7 @@ namespace augs {
 		bool measured = false;
 		bool measurements_are_time = false;
 	public:
-		measurements(std::wstring title = L"Untitled", bool measurements_are_time = true);
+		measurements(std::wstring title = L"Untitled", bool measurements_are_time = true, size_t tracked_count = 20);
 
 		std::wstring title;
 

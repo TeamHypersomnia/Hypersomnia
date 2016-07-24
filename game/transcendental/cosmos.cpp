@@ -47,6 +47,8 @@
 #include <sstream>
 
 void cosmos::complete_resubstantialization() {
+	profiler.complete_resubstantiation.new_measurement();
+
 	temporary_systems.~storage_for_all_temporary_systems();
 	new (&temporary_systems) storage_for_all_temporary_systems;
 
@@ -60,6 +62,8 @@ void cosmos::complete_resubstantialization() {
 		auto h = get_handle(id);
 		complete_resubstantialization(h);
 	});
+
+	profiler.complete_resubstantiation.end_measurement();
 }
 
 void cosmos::complete_resubstantialization(entity_handle h) {

@@ -38,6 +38,8 @@ std::wstring cosmic_profiler::sorted_summary() const {
 	for (auto& m : sorted_meters)
 		summary += m.summary();
 
+	summary += complete_resubstantiation.summary();
+
 	return summary;
 }
 

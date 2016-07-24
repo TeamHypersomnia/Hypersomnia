@@ -15,6 +15,9 @@ public:
 	mutable augs::measurements fps_profiler = augs::measurements(L"Frame");
 	mutable augs::measurements triangles = augs::measurements(L"Triangles", false);
 
+	mutable augs::measurements reading_savefile = augs::measurements(L"Loading savefile", true, 1);
+	mutable augs::measurements writing_savefile = augs::measurements(L"Writing savefile", true, 1);
+
 	float stepping_speed = 1.f;
 
 	bool show_profile_details = true;
@@ -25,7 +28,6 @@ public:
 	std::string save_filename = "save.dat";
 	std::string saves_folder = "saves/";
 	std::string sessions_folder = "sessions/";
-
 
 	entropy_player main_cosmos_player;
 

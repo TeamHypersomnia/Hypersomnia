@@ -135,6 +135,9 @@ std::wstring multiverse::summary(bool detailed) const {
 		result += main_cosmos.profiler.sorted_summary();
 	}
 
+	result += writing_savefile.summary();
+	result += reading_savefile.summary();
+
 	return result;
 }
 

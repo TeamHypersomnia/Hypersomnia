@@ -19,6 +19,8 @@
 #include <fstream>
 
 void multiverse::save_cosmos_to_file(std::string filename) {
+	writing_savefile.new_measurement();
+
 	std::ofstream out(filename, std::ios::out | std::ios::binary);
 
 	{
@@ -27,9 +29,13 @@ void multiverse::save_cosmos_to_file(std::string filename) {
 		ar(main_cosmos_manager);
 		ar(main_cosmos);
 	}
+
+	writing_savefile.end_measurement();
 }
 
 void multiverse::load_cosmos_from_file(std::string filename) {
+	reading_savefile.new_measurement();
+
 	std::ifstream in(filename, std::ios::in | std::ios::binary);
 
 	{
@@ -38,4 +44,6 @@ void multiverse::load_cosmos_from_file(std::string filename) {
 		ar(main_cosmos_manager);
 		ar(main_cosmos);
 	}
+
+	reading_savefile.end_measurement();
 }

@@ -4,12 +4,12 @@
 #include "augs/math/vec2.h"
 
 namespace augs {
-	measurements::measurements(std::wstring title, bool measurements_are_time) : title(title), measurements_are_time(measurements_are_time) {
+	measurements::measurements(std::wstring title, bool measurements_are_time, size_t tracked_count) : title(title), measurements_are_time(measurements_are_time) {
 		last_average = 1.0;
 		last_maximum = 1.0;
 		last_minimum = 1.0;
 		last_measurement = 1.0;
-		tracked.resize(20, 0);
+		tracked.resize(tracked_count, 0);
 	}
 
 	void measurements::measure(double value) {

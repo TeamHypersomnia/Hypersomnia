@@ -17,6 +17,8 @@ enum class meter_type {
 
 class cosmic_profiler {
 public:
+	augs::measurements complete_resubstantiation = augs::measurements(L"Complete resubstantiation", true, 1);
+
 	augs::measurements raycasts = augs::measurements(L"Raycasts", false);
 	augs::measurements entropy_length = augs::measurements(L"Entropy length", false);
 	augs::measurements meters[(int)meter_type::METER_COUNT];
