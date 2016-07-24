@@ -1296,6 +1296,27 @@
     <ClCompile Include="3rdparty\freetype\builds\windows\ftdebug.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="3rdparty\googletest\googletest\src\gtest.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="3rdparty\googletest\googletest\src\gtest-filepath.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="3rdparty\googletest\googletest\src\gtest-port.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="3rdparty\googletest\googletest\src\gtest-printers.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="3rdparty\googletest\googletest\src\gtest-test-part.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="3rdparty\googletest\googletest\src\gtest-typed-test.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="3rdparty\googletest\googletest\src\gtest-death-test.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3810,6 +3831,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\freetype\src\winfonts\winfnt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\googletest\googletest\src\gtest-internal-inl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
