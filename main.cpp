@@ -1,7 +1,7 @@
 #pragma once
 #include "game/bindings/bind_game_and_augs.h"
 #include "augs/global_libraries.h"
-#include "game/multiverse.h"
+#include "game/transcendental/multiverse.h"
 #include "game/game_window.h"
 
 #include "game/resources/manager.h"
@@ -9,8 +9,10 @@
 #include "game/scene_managers/testbed.h"
 #include "game/scene_managers/resource_setups/all.h"
 
-#include "game/types_specification/all_component_includes.h"
-#include "game/entity_relations.h"
+#include "game/transcendental/types_specification/all_component_includes.h"
+#include "game/transcendental/entity_relations.h"
+
+#include "augs/filesystem/file.h"
 
 int main(int argc, char** argv) {
 	augs::global_libraries::init();
@@ -31,9 +33,9 @@ int main(int argc, char** argv) {
 
 	bool should_quit = false;
 
-	if (!hypersomnia.main_cosmos_player.try_to_load_and_replay_recording("recorded.inputs"))
-		hypersomnia.main_cosmos_player.record_and_save_this_session("sessions/", "recorded.inputs");
-
+	hypersomnia.try_to_load_save();
+	hypersomnia.try_to_load_or_save_new_session();
+	
 	while (!should_quit) {
 		auto new_entropy = window.collect_entropy();
 
