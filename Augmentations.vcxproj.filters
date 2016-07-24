@@ -156,27 +156,6 @@
     <ClCompile Include="3rdparty\GL\glew.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\gtest\src\gtest.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\gtest\src\gtest-death-test.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\gtest\src\gtest-filepath.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\gtest\src\gtest-port.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\gtest\src\gtest-printers.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\gtest\src\gtest-test-part.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\gtest\src\gtest-typed-test.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\RakNet\Source\_FindFirst.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1467,69 +1446,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\GL\wglew.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\internal\gtest-death-test-internal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\internal\gtest-filepath.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\internal\gtest-internal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\internal\gtest-linked_ptr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\internal\gtest-param-util.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\internal\gtest-param-util-generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\internal\gtest-port.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\internal\gtest-string.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\internal\gtest-tuple.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\internal\gtest-type-util.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\src\gtest-internal-inl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\gtest.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\gtest_pred_impl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\gtest_prod.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\gtest-death-test.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\gtest-message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\gtest-param-test.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\gtest-printers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\gtest-spi.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\gtest-test-part.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\gtest\gtest-typed-test.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="3rdparty\RakNet\Source\_FindFirst.h">
