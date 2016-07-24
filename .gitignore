@@ -175,4 +175,6 @@ WorkingAssets/
 *.iobj
 *.opendb
 *.inputs
+*.state
+*.jpr
 output/builds/
