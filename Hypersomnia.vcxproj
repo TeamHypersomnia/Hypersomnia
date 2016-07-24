@@ -70,12 +70,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>$(AUGMENTATIONS)\3rdparty\libs;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
-    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\gtest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\lua\src;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\cereal\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\lua\src;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\cereal\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)output/</OutDir>
     <TargetName>$(ProjectName)-$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\gtest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\lua\src;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\cereal\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\lua\src;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\cereal\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <LibraryPath>$(AUGMENTATIONS)\3rdparty\libs;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
     <OutDir>$(SolutionDir)output/</OutDir>
     <TargetName>$(ProjectName)-$(Configuration)</TargetName>
@@ -86,7 +86,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PreprocessorDefinitions>UNICODE;_CRT_SECURE_NO_WARNINGS;_MBCS;PLATFORM_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>UNICODE;_CRT_SECURE_NO_WARNINGS;_MBCS;PLATFORM_WINDOWS;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Strict</FloatingPointModel>
       <DisableSpecificWarnings>4503;</DisableSpecificWarnings>
     </ClCompile>
@@ -113,7 +113,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>UNICODE;_CRT_SECURE_NO_WARNINGS;_MBCS;PLATFORM_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>UNICODE;_CRT_SECURE_NO_WARNINGS;_MBCS;PLATFORM_WINDOWS;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FloatingPointModel>Strict</FloatingPointModel>
       <DisableSpecificWarnings>4503;</DisableSpecificWarnings>
