@@ -174,7 +174,7 @@ namespace ingredients {
 
 		detector.spam_trigger_requests_when_detection_intented = true;
 
-		force_joint.force_towards_chased_entity = 85000.f;
+		force_joint.force_towards_chased_entity = 92000.f;
 		force_joint.distance_when_force_easing_starts = 10.f;
 		force_joint.power_of_force_easing_multiplier = 2.f;
 
