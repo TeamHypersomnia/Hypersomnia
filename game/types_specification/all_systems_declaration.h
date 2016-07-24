@@ -15,6 +15,3 @@ typedef augs::storage_for_systems <
 	dynamic_tree_system,
 	processing_lists_system
 > storage_for_all_temporary_systems;
-
-typedef augs::storage_for_systems <
-> storage_for_all_stateful_systems;

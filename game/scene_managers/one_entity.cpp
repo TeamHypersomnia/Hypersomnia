@@ -5,7 +5,7 @@
 
 #include "game/systems/input_system.h"
 #include "game/systems/render_system.h"
-#include "game/stateful_systems/gui_system.h"
+#include "game/systems/gui_system.h"
 #include "game/components/camera_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"

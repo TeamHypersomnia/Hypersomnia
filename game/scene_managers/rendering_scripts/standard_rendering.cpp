@@ -5,7 +5,7 @@
 #include "game/cosmos.h"
 
 #include "game/systems/render_system.h"
-#include "game/stateful_systems/gui_system.h"
+#include "game/systems/gui_system.h"
 #include "game/components/input_receiver_component.h"
 #include "game/components/gui_element_component.h"
 #include "game/temporary_systems/dynamic_tree_system.h"

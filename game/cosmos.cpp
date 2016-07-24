@@ -22,7 +22,7 @@
 #include "systems/item_system.h"
 #include "systems/force_joint_system.h"
 #include "systems/intent_contextualization_system.h"
-#include "stateful_systems/gui_system.h"
+#include "systems/gui_system.h"
 #include "systems/trace_system.h"
 #include "systems/melee_system.h"
 #include "systems/sentience_system.h"
@@ -175,10 +175,10 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 
 	profiler.entropy_length.measure(step.entropy.length());
 
-	//stateful_systems.get<gui_system>().advance_gui_elements();
-	//stateful_systems.get<gui_system>().translate_raw_window_inputs_to_gui_events();
-	//stateful_systems.get<gui_system>().suppress_inputs_meant_for_gui();
-	//stateful_systems.get<gui_system>().switch_to_gui_mode_and_back();
+	//gui_system().advance_gui_elements();
+	//gui_system().translate_raw_window_inputs_to_gui_events();
+	//gui_system().suppress_inputs_meant_for_gui();
+	//gui_system().switch_to_gui_mode_and_back();
 
 	performance.start(meter_type::LOGIC);
 	
@@ -242,7 +242,7 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	particles_system().game_responses_to_particle_effects(step);
 	particles_system().create_particle_effects(step);
 
-	// stateful_systems.get<gui_system>().translate_game_events_for_hud(step);
+	// gui_system().translate_game_events_for_hud(step);
 
 	performance.start(meter_type::VISIBILITY);
 	visibility_system().generate_visibility_and_sight_information(step.cosm);
