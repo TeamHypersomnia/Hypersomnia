@@ -10,3 +10,6 @@
 [submodule "3rdparty/luabind-deboostified"]
 	path = 3rdparty/luabind-deboostified
 	url = https://github.com/decimad/luabind-deboostified.git
+[submodule "3rdparty/freetype"]
+	path = 3rdparty/freetype
+	url = git://git.sv.nongnu.org/freetype/freetype2.git

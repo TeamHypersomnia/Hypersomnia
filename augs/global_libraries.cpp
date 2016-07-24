@@ -9,9 +9,9 @@
 #endif
 
 #ifdef PLATFORM_WINDOWS
-#include <freetype\ft2build.h>
+#include <ft2build.h>
 #elif PLATFORM_LINUX
-#include <freetype2/ft2build.h>
+#include <ft2build.h>
 #endif
 #include FT_FREETYPE_H
 
