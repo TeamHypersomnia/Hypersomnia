@@ -50,14 +50,15 @@ void cosmos::complete_resubstantialization() {
 	temporary_systems.~storage_for_all_temporary_systems();
 	new (&temporary_systems) storage_for_all_temporary_systems;
 
+	size_t n = pool_for_aggregates.capacity();
+
+	temporary_systems.for_each([n](auto& sys) {
+		sys.reserve_caches_for_entities(n);
+	});
+
 	pool_for_aggregates.for_each_id([this](entity_id id) {
 		auto h = get_handle(id);
-
-		if (h.has<components::substance>()) {
-			temporary_systems.for_each([h](auto& sys) {
-				sys.construct(h);
-			});
-		}
+		complete_resubstantialization(h);
 	});
 }
 

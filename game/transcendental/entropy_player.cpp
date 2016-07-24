@@ -32,10 +32,10 @@ bool entropy_player::try_to_load_and_replay_recording(std::string filename) {
 }
 
 void entropy_player::record_and_save_this_session(std::string folder, std::string filename) {
-	augs::create_directory(folder);
-	augs::create_directory(folder + augs::get_timestamp());
+	auto target_folder = folder + augs::get_timestamp();
+	augs::create_directories(target_folder);
 
-	local_entropy_player.record(folder + augs::get_timestamp() + "/" + filename);
+	local_entropy_player.record(target_folder + "/" + filename);
 }
 
 bool entropy_player::is_replaying() const {

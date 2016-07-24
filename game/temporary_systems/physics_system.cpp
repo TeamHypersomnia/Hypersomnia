@@ -168,7 +168,8 @@ void physics_system::construct(const_entity_handle handle) {
 
 			cache.body = b2world.CreateBody(&def);
 			cache.body->SetAngledDampingEnabled(physics_data.angled_damping);
-
+			
+			/* notice that all fixtures must be unconstructed at this moment since we assert that the rigid body itself is not */
 			for (const auto& f : fixture_entities)
 				fixtures_construct(f);
 		}

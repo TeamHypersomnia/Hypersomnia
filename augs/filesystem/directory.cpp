@@ -5,8 +5,12 @@
 namespace fs = std::experimental::filesystem;
 
 namespace augs {
-	void create_directory(std::string filename) {
-		fs::create_directory(filename);
+	bool create_directory(std::string filename) {
+		return fs::create_directory(filename);
+	}
+	
+	bool create_directories(std::string filename) {
+		return fs::create_directories(filename);
 	}
 
 	std::vector<std::string> get_all_files_in_directory(std::string dirpath) {

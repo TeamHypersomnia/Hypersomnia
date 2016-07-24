@@ -10,23 +10,30 @@ class game_window;
 
 class multiverse {
 	scene_managers::testbed main_cosmos_manager;
-
+public:
 	mutable augs::variable_delta_timer frame_timer;
+	mutable augs::measurements fps_profiler = augs::measurements(L"Frame");
+	mutable augs::measurements triangles = augs::measurements(L"Triangles", false);
 
 	float stepping_speed = 1.f;
 
 	bool show_profile_details = true;
 
-	void print_summary(basic_viewing_step&) const;
+	void print_summary(augs::renderer&) const;
 	std::wstring summary(bool detailed) const;
-public:
-	multiverse();
+	std::string recording_filename = "recorded.inputs";
+	std::string save_filename = "save.dat";
+	std::string saves_folder = "saves/";
+	std::string sessions_folder = "sessions/";
 
-	mutable augs::measurements fps_profiler = augs::measurements(L"Frame");
-	mutable augs::measurements triangles = augs::measurements(L"Triangles", false);
 
 	entropy_player main_cosmos_player;
 
+	bool try_to_load_save();
+	bool try_to_load_or_save_new_session();
+
+	multiverse();
+	
 	void populate_cosmoi();
 
 	void save_cosmos_to_file(std::string);

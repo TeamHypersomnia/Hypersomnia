@@ -4,10 +4,32 @@
 #include "cosmos.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "augs/gui/text/printer.h"
+#include "augs/filesystem/file.h"
+#include "augs/filesystem/directory.h"
+#include "augs/misc/time_utils.h"
 
 multiverse::multiverse() 
 	: main_cosmos_timer(60, 5)
 {
+}
+
+bool multiverse::try_to_load_or_save_new_session() {
+	if (!main_cosmos_player.try_to_load_and_replay_recording(recording_filename)) {
+		main_cosmos_player.record_and_save_this_session(sessions_folder, recording_filename);
+
+		return false;
+	}
+
+	return true;
+}
+
+bool multiverse::try_to_load_save() {
+	if (augs::file_exists(save_filename)) {
+		load_cosmos_from_file(save_filename);
+		return true;
+	}
+
+	return false;
 }
 
 void multiverse::populate_cosmoi() {
@@ -49,6 +71,12 @@ void multiverse::control(augs::machine_entropy entropy) {
 			if (raw_input.key == window::event::keys::F4) {
 				LOG_COLOR(console_color::YELLOW, "Separator");
 			}
+			if (raw_input.key == window::event::keys::F7) {
+				auto target_folder = saves_folder + augs::get_timestamp();
+				augs::create_directories(target_folder);
+
+				save_cosmos_to_file(target_folder + "/" + save_filename);
+			}
 		}
 	}
 
@@ -87,7 +115,7 @@ void multiverse::view(game_window& window) const {
 	basic_viewing_step main_cosmos_viewing_step(main_cosmos, frame_timer.extract_variable_delta(main_cosmos_timer), target);
 	main_cosmos_manager.view_cosmos(main_cosmos_viewing_step);
 	
-	print_summary(main_cosmos_viewing_step);
+	print_summary(target);
 
 	triangles.measure(static_cast<double>(target.triangles_drawn_total));
 	target.triangles_drawn_total = 0;
@@ -110,8 +138,7 @@ std::wstring multiverse::summary(bool detailed) const {
 	return result;
 }
 
-void multiverse::print_summary(basic_viewing_step& step) const {
-	auto& target = step.renderer;
+void multiverse::print_summary(augs::renderer& target) const {
 	auto& cosmos = main_cosmos;
 	using namespace augs::gui::text;
 
