@@ -1,8 +1,8 @@
 #pragma once
 #include "augs/math/vec2.h"
 
-#include "game/entity_id.h"
-#include "game/entity_handle_declaration.h"
+#include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_handle_declaration.h"
 
 #include "augs/misc/timer.h"
 #include "augs/graphics/pixel.h"

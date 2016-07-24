@@ -1,6 +1,6 @@
 #pragma once
 #include "game/detail/state_for_drawing_camera.h"
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 class viewing_step;
 
 struct aabb_highlighter {

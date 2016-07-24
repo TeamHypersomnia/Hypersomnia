@@ -2,7 +2,7 @@
 #include "message.h"
 #include "augs/math/vec2.h"
 
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 #include "game/components/transform_component.h"
 #include "game/assets/particle_effect_id.h"
 

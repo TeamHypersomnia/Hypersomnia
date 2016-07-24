@@ -6,8 +6,8 @@
 #include "game/components/render_component.h"
 #include "game/messages/health_event.h"
 
-#include "game/cosmos.h"
-#include "game/entity_id.h"
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/entity_id.h"
 
 #include "game/components/physics_component.h"
 #include "game/components/container_component.h"
@@ -20,7 +20,7 @@
 #include "game/detail/inventory_slot_id.h"
 #include "game/detail/inventory_utils.h"
 
-#include "game/step.h"
+#include "game/transcendental/step.h"
 
 components::sentience::meter::damage_result components::sentience::meter::calculate_damage_result(float amount) const {
 	components::sentience::meter::damage_result result;

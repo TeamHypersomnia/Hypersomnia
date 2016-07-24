@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/math/vec2.h"
-#include "game/entity_handle_declaration.h"
+#include "game/transcendental/entity_handle_declaration.h"
 
 float rotation(const_entity_handle of);
 vec2 orientation(const_entity_handle of);

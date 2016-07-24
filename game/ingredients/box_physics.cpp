@@ -1,10 +1,10 @@
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 #include "game/components/physics_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/sprite_component.h"
 
 #include "game/enums/filters.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_handle.h"
 
 namespace ingredients {
 	void standard_dynamic_body(entity_handle e) {

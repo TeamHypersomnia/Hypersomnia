@@ -1,8 +1,8 @@
 #include "ingredients.h"
 #include "game/systematic/render_system.h"
 
-#include "game/cosmos.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/entity_handle.h"
 
 #include "game/components/item_component.h"
 #include "game/components/trigger_component.h"

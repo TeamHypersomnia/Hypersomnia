@@ -1,6 +1,6 @@
 #include "inventory_slot.h"
 #include "inventory_slot_handle.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_handle.h"
 #include "game/detail/item_slot_transfer_request.h"
 #include "game/components/transform_component.h"
 #include "game/components/container_component.h"
@@ -8,7 +8,7 @@
 #include "game/components/item_component.h"
 
 #include "inventory_utils.h"
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 
 #include "game/detail/item_transfer_result.h"
 

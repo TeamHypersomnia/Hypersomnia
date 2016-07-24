@@ -1,5 +1,5 @@
 #include "crosshair_system.h"
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 
 #include "game/messages/intent_message.h"
 #include "game/messages/crosshair_intent_message.h"
@@ -12,8 +12,8 @@
 #include "game/messages/intent_message.h"
 
 #include "augs/texture_baker/texture_baker.h"
-#include "game/entity_handle.h"
-#include "game/step.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/step.h"
 
 void crosshair_system::generate_crosshair_intents(fixed_step& step) {
 	auto& cosmos = step.cosm;

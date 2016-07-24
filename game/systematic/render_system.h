@@ -5,7 +5,7 @@
 #include <array>
 
 #include "augs/graphics/vertex.h"
-#include "game/entity_handle_declaration.h"
+#include "game/transcendental/entity_handle_declaration.h"
 
 using namespace augs;
 

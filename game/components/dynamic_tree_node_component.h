@@ -1,5 +1,5 @@
 #pragma once
-#include "game/component_synchronizer.h"
+#include "game/transcendental/component_synchronizer.h"
 #include "augs/math/vec2.h"
 #include "augs/math/rects.h"
 

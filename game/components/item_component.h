@@ -3,7 +3,7 @@
 #include "container_component.h"
 #include "transform_component.h"
 #include "game/detail/inventory_slot_id.h"
-#include "game/entity_handle_declaration.h"
+#include "game/transcendental/entity_handle_declaration.h"
 
 namespace components {
 	struct item {

@@ -1,6 +1,6 @@
 #include "melee_system.h"
-#include "game/cosmos.h"
-#include "game/entity_id.h"
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/entity_id.h"
 
 #include "game/messages/intent_message.h"
 #include "game/messages/melee_swing_response.h"
@@ -12,8 +12,8 @@
 
 #include "game/detail/combat/melee_animation.h"
 
-#include "game/entity_handle.h"
-#include "game/step.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/step.h"
 
 using namespace augs;
 

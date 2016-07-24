@@ -14,7 +14,7 @@
 #include "entity_relations.h"
 #include "multiverse.h"
 #include "cosmos.h"
-#include "types_specification/all_component_includes.h"
+#include "game/transcendental/types_specification/all_component_includes.h"
 
 #include <fstream>
 

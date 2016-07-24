@@ -2,7 +2,7 @@
 #include "game/systematic/item_system.h"
 #include "cosmos.h"
 
-#include "game/types_specification/all_messages_includes.h"
+#include "game/transcendental/types_specification/all_messages_includes.h"
 
 basic_viewing_step::basic_viewing_step(const cosmos& cosm, augs::variable_delta delta, augs::renderer& renderer) : cosm(cosm), delta(delta), renderer(renderer) {}
 

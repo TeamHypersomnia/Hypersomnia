@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/misc/machine_entropy.h"
-#include "game/cosmic_entropy.h"
+#include "game/transcendental/cosmic_entropy.h"
 
 #include "augs/misc/step_player.h"
 

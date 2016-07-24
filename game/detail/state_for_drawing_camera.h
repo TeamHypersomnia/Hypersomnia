@@ -2,7 +2,7 @@
 #include "augs/math/vec2.h"
 #include "augs/math/rects.h"
 #include "game/components/transform_component.h"
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 
 struct state_for_drawing_camera {
 	entity_id associated_character;

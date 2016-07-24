@@ -1,5 +1,5 @@
 #include "animation_system.h"
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 #include "game/components/animation_response_component.h"
 #include "game/messages/movement_response.h"
 #include "game/messages/animation_message.h"
@@ -10,8 +10,8 @@
 #include "game/components/animation_component.h"
 #include "game/components/render_component.h"
 
-#include "game/entity_handle.h"
-#include "game/step.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/step.h"
 
 using namespace augs;
 

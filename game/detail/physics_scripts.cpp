@@ -3,8 +3,8 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/item_component.h"
 #include "game/components/driver_component.h"
-#include "game/entity_handle.h"
-#include "game/cosmos.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/cosmos.h"
 #include "game/detail/inventory_slot_handle.h"
 #include "position_scripts.h"
 

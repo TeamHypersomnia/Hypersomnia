@@ -4,8 +4,8 @@
 #include "game/components/driver_component.h"
 #include "game/components/special_physics_component.h"
 
-#include "game/cosmos.h"
-#include "game/step.h"
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/step.h"
 
 #include "physics_scripts.h"
 

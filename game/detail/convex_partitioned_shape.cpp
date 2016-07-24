@@ -8,9 +8,9 @@
 #include "game/components/sprite_component.h"
 
 #include "game/resources/manager.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_handle.h"
 
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 
 void convex_partitioned_shape::add_convex_polygon(const std::vector <vec2>& verts) {
 	convex_polys.push_back(verts);

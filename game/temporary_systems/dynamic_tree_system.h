@@ -1,7 +1,7 @@
 #pragma once
 #include <Box2D/Collision/b2DynamicTree.h>
-#include "game/entity_id.h"
-#include "game/entity_handle_declaration.h"
+#include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_handle_declaration.h"
 #include <vector>
 #include "game/detail/state_for_drawing_camera.h"
 

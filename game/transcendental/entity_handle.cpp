@@ -5,7 +5,7 @@
 #include "game/components/dynamic_tree_node_component.h"
 #include "game/components/special_physics_component.h"
 
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 #include "game/detail/physics_scripts.h"
 
 typedef cosmos O;

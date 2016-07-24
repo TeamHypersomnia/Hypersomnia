@@ -1,5 +1,5 @@
 #include "force_joint_system.h"
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 #include "augs/log.h"
 
 #include "game/components/force_joint_component.h"
@@ -7,10 +7,10 @@
 #include "game/components/special_physics_component.h"
 #include "game/components/transform_component.h"
 
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 
-#include "game/entity_handle.h"
-#include "game/step.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/step.h"
 
 void force_joint_system::apply_forces_towards_target_entities(fixed_step& step) {
 	auto& cosmos = step.cosm;

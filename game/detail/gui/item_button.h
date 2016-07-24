@@ -5,7 +5,7 @@
 
 #include "game/detail/inventory_slot_id.h"
 #include "augs/gui/element_handle.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_handle.h"
 #include "game/resources/manager.h"
 
 struct item_button {

@@ -1,4 +1,4 @@
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 #include "game/components/gun_component.h"
 #include "game/components/item_component.h"
 #include "game/components/damage_component.h"
@@ -10,8 +10,8 @@
 #include "game/enums/filters.h"
 #include "game/enums/item_category.h"
 
-#include "game/cosmos.h"
-#include "game/step.h"
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/step.h"
 
 #include "game/detail/item_slot_transfer_request.h"
 

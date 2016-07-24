@@ -1,6 +1,6 @@
 #include "ingredients.h"
-#include "game/entity_handle.h"
-#include "game/cosmos.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/cosmos.h"
 
 #include "game/components/position_copying_component.h"
 #include "game/components/camera_component.h"

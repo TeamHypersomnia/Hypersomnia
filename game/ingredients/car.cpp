@@ -16,7 +16,7 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/name_component.h"
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 
 #include "game/enums/filters.h"
 

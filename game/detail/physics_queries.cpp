@@ -1,6 +1,6 @@
 #include "game/temporary_systems/physics_system.h"
-#include "game/cosmos.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/entity_handle.h"
 
 #include "augs/ensure.h"
 #include "game/detail/physics_scripts.h"

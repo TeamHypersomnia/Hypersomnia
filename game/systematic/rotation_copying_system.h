@@ -1,5 +1,5 @@
 #pragma once
-#include "game/entity_handle_declaration.h"
+#include "game/transcendental/entity_handle_declaration.h"
 
 class cosmos;
 class fixed_step;

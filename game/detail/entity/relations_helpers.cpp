@@ -1,9 +1,9 @@
 #include "relations_helpers.h"
 #include "game/detail/inventory_slot_id.h"
 #include "game/detail/inventory_slot_handle.h"
-#include "game/entity_handle.h"
-#include "game/entity_relations.h"
-#include "game/cosmos.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/entity_relations.h"
+#include "game/transcendental/cosmos.h"
 #include "game/components/substance_component.h"
 
 template <class D>

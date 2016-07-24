@@ -1,7 +1,7 @@
 #include "gui_system.h"
 #include "augs/graphics/renderer.h"
 
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 #include "game/cosmos.h"
 
 #include "game/messages/intent_message.h"
@@ -11,7 +11,7 @@
 #include "game/systems/input_system.h"
 
 #include "game/systems/crosshair_system.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_handle.h"
 
 #include "game/step.h"
 #include "game/components/gui_element_component.h"

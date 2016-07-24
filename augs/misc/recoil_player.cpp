@@ -1,8 +1,8 @@
 #include "augs/ensure.h"
 #include "recoil_player.h"
 #include "game/components/physics_component.h"
-#include "game/entity_handle.h"
-#include "game/cosmos.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/cosmos.h"
 
 vec2 recoil_player::shoot_and_get_offset() {
 	if (current_offset > int(offsets.size() - 1))

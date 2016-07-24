@@ -11,7 +11,7 @@
 #include "game/components/physics_component.h"
 #include "game/components/force_joint_component.h"
 
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 #include "game/temporary_systems/physics_system.h"
 
 #include "game/components/driver_component.h"
@@ -20,8 +20,8 @@
 
 #include "game/detail/physics_scripts.h"
 
-#include "game/entity_handle.h"
-#include "game/step.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/step.h"
 
 void driver_system::assign_drivers_from_successful_trigger_hits(fixed_step& step) {
 	auto& cosmos = step.cosm;

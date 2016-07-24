@@ -1,6 +1,6 @@
 #pragma once
 #include "game/enums/slot_function.h"
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 
 struct inventory_slot_id {
 	inventory_slot_id(slot_function = slot_function::INVALID, entity_id = entity_id());

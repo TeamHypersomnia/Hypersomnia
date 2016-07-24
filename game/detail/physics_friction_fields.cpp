@@ -1,7 +1,7 @@
 #include "game/temporary_systems/physics_system.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/special_physics_component.h"
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 #include "physics_scripts.h"
 
 void physics_system::rechoose_owner_friction_body(entity_handle entity) {

@@ -1,8 +1,8 @@
 #include "processing_component.h"
 #include "game/temporary_systems/processing_lists_system.h"
-#include "game/entity_handle.h"
-#include "game/cosmos.h"
-#include "game/types_specification/all_component_includes.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/types_specification/all_component_includes.h"
 
 typedef components::processing P;
 

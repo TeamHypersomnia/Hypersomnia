@@ -1,8 +1,8 @@
 #pragma once
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 #include "game/enums/attitude_type.h"
 #include "augs/math/vec2.h"
-#include "game/entity_handle_declaration.h"
+#include "game/transcendental/entity_handle_declaration.h"
 
 float assess_projectile_velocity_of_weapon(const_entity_handle weapon);
 

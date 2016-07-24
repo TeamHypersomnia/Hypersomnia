@@ -1,14 +1,14 @@
 #include "position_copying_system.h"
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 #include "game/components/render_component.h"
 
 #include "game/components/position_copying_component.h"
 #include "game/components/transform_component.h"
 
-#include "game/entity_handle.h"
-#include "game/step.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/step.h"
 
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 
 using namespace augs;
 

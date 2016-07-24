@@ -1,10 +1,10 @@
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_handle.h"
 #include "game/detail/inventory_slot_id.h"
 #include "game/detail/inventory_slot_handle.h"
 #include "game/components/item_component.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/gun_component.h"
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 
 #include "inventory_getters.h"
 

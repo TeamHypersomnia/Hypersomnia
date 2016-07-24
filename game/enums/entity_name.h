@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "game/entity_handle_declaration.h"
+#include "game/transcendental/entity_handle_declaration.h"
 
 enum class entity_name {
 	ASSAULT_RIFLE,

@@ -1,6 +1,6 @@
 #include "name_component.h"
-#include "game/cosmos.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/entity_handle.h"
 
 void name_entity(entity_handle id, entity_name n) {
 	components::name name;

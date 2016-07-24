@@ -8,8 +8,8 @@
 #include "game/components/attitude_component.h"
 #include "inventory_utils.h"
 #include "inventory_slot.h"
-#include "game/entity_handle.h"
-#include "game/cosmos.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/cosmos.h"
 
 void unset_input_flags_of_orphaned_entity(entity_handle e) {
 	auto* gun = e.find<components::gun>();

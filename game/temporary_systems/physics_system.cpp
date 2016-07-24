@@ -1,7 +1,7 @@
 #include "physics_system.h"
 
-#include "game/entity_id.h"
-#include "game/cosmos.h"
+#include "game/transcendental/entity_id.h"
+#include "game/transcendental/cosmos.h"
 
 #include "game/components/item_component.h"
 #include "game/components/driver_component.h"
@@ -13,9 +13,9 @@
 #include "game/messages/new_entity_message.h"
 #include "game/messages/will_soon_be_deleted.h"
 
-#include "game/cosmos.h"
-#include "game/step.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/step.h"
+#include "game/transcendental/entity_handle.h"
 
 double METERS_TO_PIXELS = 100.0;
 double PIXELS_TO_METERS = 1.0 / METERS_TO_PIXELS;

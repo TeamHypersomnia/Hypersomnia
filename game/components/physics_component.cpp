@@ -7,11 +7,11 @@
 #include "fixtures_component.h"
 
 #include "augs/math/vec2.h"
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 #include "game/temporary_systems/physics_system.h"
 #include "augs/ensure.h"
-#include "game/entity_handle.h"
-#include "game/entity_relations.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/entity_relations.h"
 
 typedef components::physics P;
 

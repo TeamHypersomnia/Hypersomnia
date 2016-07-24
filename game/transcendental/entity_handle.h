@@ -2,12 +2,12 @@
 #include <type_traits>
 
 #include "game/detail/inventory_slot_handle_declaration.h"
-#include "game/entity_handle_declaration.h"
+#include "game/transcendental/entity_handle_declaration.h"
 
 #include "augs/entity_system/component_aggregate.h"
 #include "augs/entity_system/aggregate_mixins.h"
 #include "augs/misc/pool_handle.h"
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 
 #include "game/detail/entity/inventory_getters.h"
 #include "game/detail/entity/physics_getters.h"

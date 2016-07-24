@@ -2,11 +2,11 @@
 #include <vector>
 #include <array>
 
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 #include "augs/math/vec2.h"
 #include "augs/math/rects.h"
 #include "transform_component.h"
-#include "game/component_synchronizer.h"
+#include "game/transcendental/component_synchronizer.h"
 #include "game/enums/colliders_offset_type.h"
 #include "game/detail/convex_partitioned_shape.h"
 #include <Box2D/Dynamics/b2Fixture.h>

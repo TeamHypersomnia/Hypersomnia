@@ -1,5 +1,5 @@
 #pragma once
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_handle.h"
 #include <type_traits>
 
 template <bool is_const, class component_type>

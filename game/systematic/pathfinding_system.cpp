@@ -1,7 +1,7 @@
 #include "pathfinding_system.h"
 
-#include "game/cosmos.h"
-#include "game/entity_id.h"
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/entity_id.h"
 
 #include "game/temporary_systems/physics_system.h"
 
@@ -10,7 +10,7 @@
 
 #include "augs/graphics/renderer.h"
 #include "game/enums/processing_subjects.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_handle.h"
 #include "game/detail/physics_scripts.h"
 
 void pathfinding_system::advance_pathfinding_sessions(cosmos& cosmos) {

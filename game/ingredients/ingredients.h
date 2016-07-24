@@ -1,12 +1,12 @@
 #pragma once
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_handle.h"
 #include "augs/math/vec2.h"
 
 #include "game/assets/texture_id.h"
 #include "game/components/render_component.h"
 
 #include "augs/graphics/pixel.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_handle.h"
 
 class cosmos;
 class fixed_step;

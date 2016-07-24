@@ -6,7 +6,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 #include "augs/misc/time_utils.h"
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 #include "game/components/input_receiver_component.h"
 
 void entropy_player::buffer_entropy_for_next_step(augs::machine_entropy delta) {

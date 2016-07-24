@@ -1,7 +1,7 @@
 #include "item_slot_transfers_component.h"
 #include "item_component.h"
-#include "game/cosmos.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/entity_handle.h"
 
 namespace components {
 	item_slot_transfers::mounting_operation item_slot_transfers::find_suitable_montage_operation(const_entity_handle parent_container) {

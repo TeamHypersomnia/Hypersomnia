@@ -1,8 +1,8 @@
 #include "crosshair_component.h"
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 #include "transform_component.h"
-#include "game/entity_handle.h"
-#include "game/cosmos.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/cosmos.h"
 
 namespace components {
 	vec2 crosshair::calculate_aiming_displacement(const_entity_handle subject_crosshair, bool snap_epsilon_base_offset) {

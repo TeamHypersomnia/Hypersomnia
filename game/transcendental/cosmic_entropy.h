@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/window_framework/event.h"
 #include <map>
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 
 namespace augs {
 	struct machine_entropy;

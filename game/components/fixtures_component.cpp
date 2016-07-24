@@ -9,9 +9,9 @@
 #include <numeric>
 #include <string>
 #include <functional>
-#include "game/cosmos.h"
-#include "game/entity_handle.h"
-#include "game/entity_relations.h"
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/entity_relations.h"
 
 typedef components::fixtures F;
 

@@ -1,6 +1,6 @@
 #include "ingredients.h"
-#include "game/entity_handle.h"
-#include "game/cosmos.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/cosmos.h"
 
 #include "game/enums/item_category.h"
 #include "game/components/container_component.h"

@@ -1,7 +1,7 @@
 #include "car_system.h"
 #include "game/messages/intent_message.h"
 
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 
 #include "game/components/trigger_component.h"
 #include <Box2D\Box2D.h>
@@ -14,8 +14,8 @@
 #include "game/components/transform_component.h"
 #include "game/components/special_physics_component.h"
 
-#include "game/entity_handle.h"
-#include "game/step.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/step.h"
 
 void car_system::set_steering_flags_from_intents(fixed_step& step) {
 	auto& cosmos = step.cosm;

@@ -5,7 +5,7 @@
 #include "game/detail/item_slot_transfer_request.h"
 #include "game/components/item_component.h"
 #include "game/detail/inventory_utils.h"
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 #include "augs/ensure.h"
 #include "augs/templates.h"
 

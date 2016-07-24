@@ -1,8 +1,8 @@
 #include <Box2D\Box2D.h>
 #include "visibility_system.h"
 
-#include "game/cosmos.h"
-#include "game/entity_id.h"
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/entity_id.h"
 
 #include "game/temporary_systems/physics_system.h"
 #include "render_system.h"
@@ -20,7 +20,7 @@
 #include "game/components/attitude_component.h"
 
 #include "game/enums/processing_subjects.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_handle.h"
 #include "game/detail/physics_scripts.h"
 
 #include "augs/graphics/renderer.h"

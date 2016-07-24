@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/misc/timer.h"
 
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 
 #include "render_component.h"
 

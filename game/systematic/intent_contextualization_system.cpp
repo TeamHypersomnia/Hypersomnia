@@ -9,14 +9,14 @@
 #include "game/components/melee_component.h"
 #include "game/components/trigger_collision_detector_component.h"
 
-#include "game/cosmos.h"
-#include "game/entity_id.h"
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/entity_id.h"
 
 #include "game/detail/inventory_slot_id.h"
 #include "game/detail/inventory_slot_handle.h"
 
-#include "game/entity_handle.h"
-#include "game/step.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/step.h"
 
 using namespace augs;
 

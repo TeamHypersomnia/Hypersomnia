@@ -1,6 +1,6 @@
 #include "particles_system.h"
-#include "game/cosmos.h"
-#include "game/entity_id.h"
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/entity_id.h"
 
 #include "game/resources/particle_effect.h"
 
@@ -18,8 +18,8 @@
 
 #include "augs/misc/randomization.h"
 
-#include "game/step.h"
-#include "game/cosmos.h"
+#include "game/transcendental/step.h"
+#include "game/transcendental/cosmos.h"
 
 entity_id particles_system::create_refreshable_particle_group(fixed_step& step) const {
 	auto ent = step.cosm.create_entity("refreshable_particle_group");

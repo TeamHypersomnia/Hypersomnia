@@ -1,5 +1,5 @@
 #include "game/detail/ai/behaviours.h"
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 
 #include "game/components/attitude_component.h"
 #include "game/components/movement_component.h"
@@ -7,8 +7,8 @@
 #include "game/detail/entity_scripts.h"
 #include "game/detail/position_scripts.h"
 
-#include "game/cosmos.h"
-#include "game/step.h"
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/step.h"
 
 namespace behaviours {
 	tree::goal_availability minimize_recoil_through_movement::goal_resolution(tree::state_of_traversal& t) const {

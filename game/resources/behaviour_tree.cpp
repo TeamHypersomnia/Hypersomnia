@@ -1,6 +1,6 @@
 #include "behaviour_tree.h"
 #include "augs/ensure.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_handle.h"
 
 namespace resources {
 	behaviour_tree::state_of_traversal::state_of_traversal(fixed_step& step, entity_handle subject, state_of_tree_instance& in, const behaviour_tree& bt)

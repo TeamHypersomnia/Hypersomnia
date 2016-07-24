@@ -1,5 +1,5 @@
 #pragma once
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 #include "augs/misc/recoil_player.h"
 #include "augs/graphics/pixel.h"
 

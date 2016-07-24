@@ -1,6 +1,6 @@
 #include "damage_component.h"
-#include "game/entity_handle.h"
-#include "game/cosmos.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/cosmos.h"
 
 namespace components {
 	bool damage::can_merge_entities(const_entity_handle e1, const_entity_handle e2) {

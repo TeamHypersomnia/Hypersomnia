@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 #include "augs/math/vec2.h"
 
 namespace components {

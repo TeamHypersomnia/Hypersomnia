@@ -1,13 +1,13 @@
 #include "ingredients.h"
-#include "game/entity_handle.h"
-#include "game/cosmos.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/cosmos.h"
 
 #include "game/components/behaviour_tree_component.h"
 #include "game/components/pathfinding_component.h"
 #include "game/components/visibility_component.h"
 
 #include "game/enums/filters.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_handle.h"
 
 namespace ingredients {
 	void standard_pathfinding_capability(entity_handle e) {

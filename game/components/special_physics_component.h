@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 #include "augs/misc/stepped_timing.h"
 
 namespace components {

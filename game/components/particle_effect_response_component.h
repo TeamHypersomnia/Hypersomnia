@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/misc/timer.h"
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 
 #include "game/assets/particle_effect_response_id.h"
 #include "game/resources/particle_effect.h"

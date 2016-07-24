@@ -1,5 +1,5 @@
 #pragma once
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 #include "game/detail/state_for_drawing_camera.h"
 
 namespace messages {

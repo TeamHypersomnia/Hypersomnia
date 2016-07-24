@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "augs/math/vec2.h"
-#include "game/entity_handle_declaration.h"
+#include "game/transcendental/entity_handle_declaration.h"
 
 namespace components {
 	struct transform;

@@ -5,12 +5,12 @@
 #include <array>
 #include <functional>
 
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 #include "game/detail/ai/goals.h"
 
 #include "augs/templates.h"
 #include "augs/ensure.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_handle.h"
 
 class fixed_step;
 

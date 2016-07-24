@@ -1,5 +1,5 @@
 #include "game/detail/ai/behaviours.h"
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 
 #include "game/components/attitude_component.h"
 #include "game/components/crosshair_component.h"
@@ -9,8 +9,8 @@
 #include "game/detail/position_scripts.h"
 
 #include "game/detail/inventory_utils.h"
-#include "game/cosmos.h"
-#include "game/step.h"
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/step.h"
 
 namespace behaviours {
 

@@ -5,7 +5,7 @@
 #include "augs/graphics/vertex.h"
 
 #include "game/components/transform_component.h"
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 
 #include "game/assets/texture_id.h"
 #include "augs/misc/timer.h"

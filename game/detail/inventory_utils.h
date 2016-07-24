@@ -1,6 +1,6 @@
 #pragma once
 #include <functional>
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_handle.h"
 #include "game/enums/slot_function.h"
 #include "game/detail/item_slot_transfer_request.h"
 #include "game/detail/item_transfer_result.h"

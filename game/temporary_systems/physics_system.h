@@ -1,7 +1,7 @@
 #pragma once
 #include "3rdparty/Box2D/Box2D.h"
-#include "game/entity_id.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_handle.h"
 
 #include "game/components/physics_component.h"
 #include "game/components/transform_component.h"

@@ -1,5 +1,5 @@
 #include "ingredients.h"
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 #include "game/components/name_component.h"
 
 namespace prefabs {

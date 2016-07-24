@@ -1,8 +1,8 @@
 #pragma once
 #include "augs/misc/stepped_timing.h"
-#include "game/component_synchronizer.h"
+#include "game/transcendental/component_synchronizer.h"
 #include "game/components/transform_component.h"
-#include "game/entity_handle_declaration.h"
+#include "game/transcendental/entity_handle_declaration.h"
 
 extern double METERS_TO_PIXELS;
 extern double PIXELS_TO_METERS;

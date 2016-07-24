@@ -1,7 +1,7 @@
 #include "item_component.h"
-#include "game/entity_id.h"
-#include "game/entity_handle.h"
-#include "game/cosmos.h"
+#include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/cosmos.h"
 
 namespace components {
 	//void item::mark_parent_enclosing_containers_for_unmount() {

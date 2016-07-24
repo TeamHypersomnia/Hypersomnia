@@ -1,10 +1,10 @@
 #pragma once
 #include <array>
 
-#include "game/types_specification/all_messages_declaration.h"
+#include "game/transcendental/types_specification/all_messages_declaration.h"
 #include "augs/misc/delta.h"
-#include "game/cosmic_entropy.h"
-#include "game/entity_handle_declaration.h"
+#include "game/transcendental/cosmic_entropy.h"
+#include "game/transcendental/entity_handle_declaration.h"
 #include "game/detail/state_for_drawing_camera.h"
 #include "game/enums/render_layer.h"
 

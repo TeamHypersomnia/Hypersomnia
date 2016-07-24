@@ -1,6 +1,6 @@
 #include "aabb_highlighter.h"
 #include "game/components/sprite_component.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_handle.h"
 #include "game/step.h"
 #include "game/cosmos.h"
 #include "augs/graphics/renderer.h"

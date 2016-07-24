@@ -1,8 +1,8 @@
-#include "game/entity_relations.h"
+#include "game/transcendental/entity_relations.h"
+#include "game/game_window.h"
 #include "multiverse.h"
-#include "game_window.h"
 #include "cosmos.h"
-#include "game/types_specification/all_component_includes.h"
+#include "game/transcendental/types_specification/all_component_includes.h"
 #include "augs/gui/text/printer.h"
 
 multiverse::multiverse() 

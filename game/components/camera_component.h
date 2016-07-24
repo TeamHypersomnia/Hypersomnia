@@ -3,7 +3,7 @@
 #include "render_component.h"
 #include "augs/misc/fixed_delta_timer.h"
 
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 
 #include "game/components/transform_component.h"
 #include "game/detail/state_for_drawing_camera.h"

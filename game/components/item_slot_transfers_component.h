@@ -1,9 +1,9 @@
 #pragma once
 #include <vector>
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 #include "game/detail/inventory_slot_id.h"
 
-#include "game/entity_handle_declaration.h"
+#include "game/transcendental/entity_handle_declaration.h"
 #include "augs/misc/stepped_timing.h"
 #include <set>
 

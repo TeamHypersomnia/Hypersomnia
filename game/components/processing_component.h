@@ -1,7 +1,7 @@
 #pragma once
 #include <bitset>
 #include "game/enums/processing_subjects.h"
-#include "game/component_synchronizer.h"
+#include "game/transcendental/component_synchronizer.h"
 
 namespace components {
 	struct processing {

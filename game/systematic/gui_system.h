@@ -1,6 +1,6 @@
 #pragma once
 #include <functional>
-#include "game/entity_handle_declaration.h"
+#include "game/transcendental/entity_handle_declaration.h"
 
 class fixed_step;
 class viewing_step;

@@ -1,6 +1,6 @@
 #include "augs/math/vec2.h"
 #include "movement_system.h"
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 #include "game/messages/intent_message.h"
 #include "game/messages/movement_response.h"
 #include "augs/log.h"
@@ -10,8 +10,8 @@
 #include "game/components/physics_component.h"
 #include "game/components/movement_component.h"
 
-#include "game/entity_handle.h"
-#include "game/step.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/step.h"
 
 using namespace augs;
 

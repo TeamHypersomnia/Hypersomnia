@@ -1,5 +1,5 @@
 #pragma once
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 #include "game/detail/inventory_slot_id.h"
 #include "game/detail/item_slot_transfer_request.h"
 

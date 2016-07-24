@@ -1,5 +1,5 @@
 #include "immediate_hud.h"
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 #include "game/cosmos.h"
 
 #include "game/systems/render_system.h"

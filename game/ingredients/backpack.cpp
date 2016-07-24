@@ -1,6 +1,6 @@
 #include "ingredients.h"
-#include "game/entity_handle.h"
-#include "game/cosmos.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/cosmos.h"
 
 #include "game/enums/item_category.h"
 #include "game/enums/entity_name.h"
@@ -8,7 +8,7 @@
 #include "game/components/container_component.h"
 #include "game/components/item_component.h"
 
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_handle.h"
 
 namespace ingredients {
 	void backpack(entity_handle e) {

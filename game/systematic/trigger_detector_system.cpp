@@ -1,5 +1,5 @@
 #include "trigger_detector_system.h"
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 
 #include "game/messages/intent_message.h"
 
@@ -19,8 +19,8 @@
 
 #include "game/components/trigger_collision_detector_component.h"
 #include "game/components/trigger_query_detector_component.h"
-#include "game/entity_handle.h"
-#include "game/step.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/step.h"
 
 void trigger_detector_system::consume_trigger_detector_presses(fixed_step& step) const {
 	auto& trigger_presses = step.messages.get_queue<messages::intent_message>();

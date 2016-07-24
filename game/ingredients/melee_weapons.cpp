@@ -1,6 +1,6 @@
 #include "ingredients.h"
-#include "game/cosmos.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/entity_handle.h"
 
 #include "game/assets/particle_effect_id.h"
 #include "game/assets/particle_effect_response_id.h"

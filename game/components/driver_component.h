@@ -1,5 +1,5 @@
 #pragma once
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 
 namespace components {
 	struct driver {

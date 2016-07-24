@@ -1,9 +1,9 @@
 #include "inventory_slot.h"
 #include "game/components/item_component.h"
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 
 #include "inventory_utils.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_handle.h"
 #include "augs/ensure.h"
 
 bool inventory_slot::has_unlimited_space() const {

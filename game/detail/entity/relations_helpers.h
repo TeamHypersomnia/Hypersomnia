@@ -2,10 +2,10 @@
 #include <functional>
 
 #include "game/detail/inventory_slot_handle_declaration.h"
-#include "game/entity_handle_declaration.h"
+#include "game/transcendental/entity_handle_declaration.h"
 #include "augs/templates.h"
 
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 
 #include "game/enums/slot_function.h"
 #include "game/enums/associated_entity_name.h"

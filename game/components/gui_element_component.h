@@ -1,6 +1,6 @@
 #pragma once
 //#include "augs/gui/rect.h"
-//#include "game/entity_id.h"
+//#include "game/transcendental/entity_id.h"
 //#include <map>
 //
 //#include "game/detail/inventory_slot_id.h"

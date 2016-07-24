@@ -1,7 +1,7 @@
 #include "rotation_copying_system.h"
 #include <Box2D\Dynamics\b2Body.h>
 
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 #include "augs/graphics/renderer.h"
 
 #include "game/components/physics_component.h"
@@ -18,9 +18,9 @@
 
 #include "augs/misc/timer.h"
 
-#include "game/entity_handle.h"
-#include "game/step.h"
-#include "game/cosmos.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/step.h"
+#include "game/transcendental/cosmos.h"
 
 using namespace augs;
 

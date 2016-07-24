@@ -3,8 +3,8 @@
 #include "game/components/gui_element_component.h"
 #include "game/components/input_receiver_component.h"
 #include "game/components/trigger_query_detector_component.h"
-#include "game/cosmos.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/entity_handle.h"
 
 processing_lists_system::processing_lists_system() {
 	for (size_t i = 0; i < size_t(processing_subjects::LIST_COUNT); ++i) {

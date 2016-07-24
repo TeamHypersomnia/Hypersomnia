@@ -1,8 +1,8 @@
 #include "all.h"
 
-#include "game/entity_id.h"
-#include "game/entity_handle.h"
-#include "game/cosmos.h"
+#include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/cosmos.h"
 
 #include "game/systematic/render_system.h"
 #include "game/systematic/gui_system.h"

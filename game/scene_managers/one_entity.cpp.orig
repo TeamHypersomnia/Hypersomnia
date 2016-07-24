@@ -31,7 +31,7 @@
 >>>>>>> 8a7fca5727aafda06ef7499360690ae671e06948
 
 #include "augs/misc/machine_entropy.h"
-#include "game/cosmic_entropy.h"
+#include "game/transcendental/cosmic_entropy.h"
 #include "game/step.h"
 
 namespace scene_managers {

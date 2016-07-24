@@ -2,7 +2,7 @@
 #include "game/stateful_systems/gui_system.h"
 #include "game/temporary_systems/physics_system.h"
 #include "game/cosmos.h"
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 #include "game/enums/filters.h"
 #include "game/components/name_component.h"
 #include "game/components/render_component.h"

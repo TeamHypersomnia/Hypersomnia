@@ -1,6 +1,6 @@
 #include "one_entity.h"
 #include "game/ingredients/ingredients.h"
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 #include "game/assets/texture_id.h"
 
 #include "game/systematic/input_system.h"
@@ -20,8 +20,8 @@
 #include "texture_baker/font.h"
 
 #include "augs/misc/machine_entropy.h"
-#include "game/cosmic_entropy.h"
-#include "game/step.h"
+#include "game/transcendental/cosmic_entropy.h"
+#include "game/transcendental/step.h"
 
 namespace scene_managers {
 	void one_entity::populate_world_with_entities(fixed_step& step) {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 
 namespace messages {
 	struct new_entity_message {

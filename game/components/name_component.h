@@ -1,7 +1,7 @@
 #pragma once
 #include "game/enums/entity_name.h"
-#include "game/entity_id.h"
-#include "game/entity_handle_declaration.h"
+#include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_handle_declaration.h"
 
 namespace components {
 	struct name {

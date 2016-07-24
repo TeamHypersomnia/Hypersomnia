@@ -1,5 +1,5 @@
 #pragma once
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_handle.h"
 #include "game/detail/inventory_slot_handle.h"
 
 template <bool C>

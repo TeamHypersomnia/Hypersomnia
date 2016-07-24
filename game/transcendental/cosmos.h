@@ -1,13 +1,13 @@
 #pragma once
-#include "game/cosmic_entropy.h"
+#include "game/transcendental/cosmic_entropy.h"
 
 #include "augs/entity_system/storage_for_components_and_aggregates.h"
 #include "augs/entity_system/storage_for_message_queues.h"
 #include "augs/entity_system/storage_for_systems.h"
 
-#include "game/types_specification/all_components_declaration.h"
-#include "game/types_specification/all_messages_declaration.h"
-#include "game/types_specification/all_systems_declaration.h"
+#include "game/transcendental/types_specification/all_components_declaration.h"
+#include "game/transcendental/types_specification/all_messages_declaration.h"
+#include "game/transcendental/types_specification/all_systems_declaration.h"
 
 #include "game/temporary_systems/dynamic_tree_system.h"
 #include "game/temporary_systems/physics_system.h"
@@ -18,13 +18,13 @@
 #include "augs/misc/delta.h"
 #include "augs/misc/pool_handlizer.h"
 
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 #include "game/detail/inventory_slot_id.h"
-#include "game/entity_handle_declaration.h"
+#include "game/transcendental/entity_handle_declaration.h"
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/global/all_settings.h"
-#include "game/cosmic_profiler.h"
-#include "game/step.h"
+#include "game/transcendental/cosmic_profiler.h"
+#include "game/transcendental/step.h"
 #include <functional>
 
 class cosmos : private storage_for_all_components_and_aggregates, public augs::pool_handlizer<cosmos>

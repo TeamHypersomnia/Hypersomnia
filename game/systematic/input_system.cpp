@@ -1,8 +1,8 @@
 #include <random>
 
 #include "augs/window_framework/window.h"
-#include "game/entity_id.h"
-#include "game/cosmos.h"
+#include "game/transcendental/entity_id.h"
+#include "game/transcendental/cosmos.h"
 
 #include "input_system.h"
 
@@ -21,8 +21,8 @@
 
 #include "augs/window_framework/event.h"
 #include "augs/misc/step_player.h"
-#include "game/step.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/step.h"
+#include "game/transcendental/entity_handle.h"
 
 using namespace augs::window;
 

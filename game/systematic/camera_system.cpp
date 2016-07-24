@@ -1,23 +1,23 @@
 #include "augs/math/vec2.h"
 #include "camera_system.h"
 
-#include "game/entity_id.h"
+#include "game/transcendental/entity_id.h"
 #include "game/components/physics_component.h"
 #include "game/components/crosshair_component.h"
 #include "game/components/position_copying_component.h"
 #include "game/components/crosshair_component.h"
 #include "game/components/physics_component.h"
 #include "game/messages/intent_message.h"
-#include "game/step.h"
+#include "game/transcendental/step.h"
 #include "game/detail/state_for_drawing_camera.h"
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 
 #include "game/components/camera_component.h"
 #include "game/components/transform_component.h"
 #include "augs/graphics/renderer.h"
 
-#include "game/entity_handle.h"
-#include "game/step.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/step.h"
 
 using namespace augs;
 

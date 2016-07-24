@@ -2,8 +2,8 @@
 #include <functional>
 
 #include "inventory_slot_handle_declaration.h"
-#include "game/entity_handle_declaration.h"
-#include "game/entity_id.h"
+#include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/entity_id.h"
 #include "game/enums/slot_function.h"
 #include "game/detail/inventory_slot_id.h"
 

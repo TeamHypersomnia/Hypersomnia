@@ -8,7 +8,7 @@
 #include "game/messages/queue_destruction.h"
 #include "game/messages/gui_intents.h"
 
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 
 #include "game/components/item_component.h"
 #include "game/components/physics_component.h"
@@ -22,7 +22,7 @@
 #include "game/detail/entity_scripts.h"
 
 #include "game/temporary_systems/physics_system.h"
-#include "game/entity_handle.h"
+#include "game/transcendental/entity_handle.h"
 
 #include "augs/ensure.h"
 
@@ -30,8 +30,8 @@
 #include "game/components/container_component.h"
 #include "game/components/item_slot_transfers_component.h"
 
-#include "game/entity_handle.h"
-#include "game/step.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/step.h"
 #include "game/enums/item_transfer_result_type.h"
 
 #include "game/detail/physics_scripts.h"

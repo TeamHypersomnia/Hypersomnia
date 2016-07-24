@@ -1,5 +1,5 @@
 #include "gun_system.h"
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 #include "game/messages/intent_message.h"
 #include "game/messages/damage_message.h"
 #include "game/messages/queue_destruction.h"
@@ -24,8 +24,8 @@
 #include "augs/misc/randomization.h"
 #include "augs/log.h"
 
-#include "game/entity_handle.h"
-#include "game/step.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/step.h"
 #include "game/detail/position_scripts.h"
 
 using namespace augs;

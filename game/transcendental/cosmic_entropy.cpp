@@ -1,6 +1,6 @@
 #include "cosmic_entropy.h"
 #include "augs/templates.h"
-#include "game/cosmos.h"
+#include "game/transcendental/cosmos.h"
 #include "game/components/input_receiver_component.h"
 #include "augs/misc/machine_entropy.h"
 
