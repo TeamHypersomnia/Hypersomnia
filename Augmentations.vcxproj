@@ -80,7 +80,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PreprocessorDefinitions>UNICODE;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;SFML_STATIC;_WINSOCK_DEPRECATED_NO_WARNINGS;PLATFORM_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>UNICODE;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;SFML_STATIC;_WINSOCK_DEPRECATED_NO_WARNINGS;PLATFORM_WINDOWS;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Strict</FloatingPointModel>
       <DisableSpecificWarnings>4503;</DisableSpecificWarnings>
     </ClCompile>
@@ -105,7 +105,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>UNICODE;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;SFML_STATIC;_WINSOCK_DEPRECATED_NO_WARNINGS;PLATFORM_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>UNICODE;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;SFML_STATIC;_WINSOCK_DEPRECATED_NO_WARNINGS;PLATFORM_WINDOWS;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FloatingPointModel>Strict</FloatingPointModel>
       <DisableSpecificWarnings>4503;</DisableSpecificWarnings>
@@ -177,6 +177,45 @@
     <ClCompile Include="3rdparty\Box2D\Dynamics\Joints\b2WeldJoint.cpp" />
     <ClCompile Include="3rdparty\Box2D\Dynamics\Joints\b2WheelJoint.cpp" />
     <ClCompile Include="3rdparty\Box2D\Rope\b2Rope.cpp" />
+    <ClCompile Include="3rdparty\freetype\src\autofit\autofit.c" />
+    <ClCompile Include="3rdparty\freetype\src\bdf\bdf.c" />
+    <ClCompile Include="3rdparty\freetype\src\cff\cff.c" />
+    <ClCompile Include="3rdparty\freetype\src\base\ftbase.c" />
+    <ClCompile Include="3rdparty\freetype\src\base\ftbitmap.c" />
+    <ClCompile Include="3rdparty\freetype\src\cache\ftcache.c" />
+    <ClCompile Include="3rdparty\freetype\builds\windows\ftdebug.c" />
+    <ClCompile Include="3rdparty\freetype\src\base\ftfstype.c" />
+    <ClCompile Include="3rdparty\freetype\src\base\ftgasp.c" />
+    <ClCompile Include="3rdparty\freetype\src\base\ftglyph.c" />
+    <ClCompile Include="3rdparty\freetype\src\gzip\ftgzip.c" />
+    <ClCompile Include="3rdparty\freetype\src\base\ftinit.c" />
+    <ClCompile Include="3rdparty\freetype\src\lzw\ftlzw.c" />
+    <ClCompile Include="3rdparty\freetype\src\base\ftstroke.c" />
+    <ClCompile Include="3rdparty\freetype\src\base\ftsystem.c" />
+    <ClCompile Include="3rdparty\freetype\src\smooth\smooth.c" />
+    <ClCompile Include="3rdparty\freetype\src\base\ftbbox.c" />
+    <ClCompile Include="3rdparty\freetype\src\base\ftfntfmt.c" />
+    <ClCompile Include="3rdparty\freetype\src\base\ftmm.c" />
+    <ClCompile Include="3rdparty\freetype\src\base\ftpfr.c" />
+    <ClCompile Include="3rdparty\freetype\src\base\ftsynth.c" />
+    <ClCompile Include="3rdparty\freetype\src\base\fttype1.c" />
+    <ClCompile Include="3rdparty\freetype\src\base\ftwinfnt.c" />
+    <ClCompile Include="3rdparty\freetype\src\base\ftlcdfil.c" />
+    <ClCompile Include="3rdparty\freetype\src\base\ftgxval.c" />
+    <ClCompile Include="3rdparty\freetype\src\base\ftotval.c" />
+    <ClCompile Include="3rdparty\freetype\src\base\ftpatent.c" />
+    <ClCompile Include="3rdparty\freetype\src\pcf\pcf.c" />
+    <ClCompile Include="3rdparty\freetype\src\pfr\pfr.c" />
+    <ClCompile Include="3rdparty\freetype\src\psaux\psaux.c" />
+    <ClCompile Include="3rdparty\freetype\src\pshinter\pshinter.c" />
+    <ClCompile Include="3rdparty\freetype\src\psnames\psmodule.c" />
+    <ClCompile Include="3rdparty\freetype\src\raster\raster.c" />
+    <ClCompile Include="3rdparty\freetype\src\sfnt\sfnt.c" />
+    <ClCompile Include="3rdparty\freetype\src\truetype\truetype.c" />
+    <ClCompile Include="3rdparty\freetype\src\type1\type1.c" />
+    <ClCompile Include="3rdparty\freetype\src\cid\type1cid.c" />
+    <ClCompile Include="3rdparty\freetype\src\type42\type42.c" />
+    <ClCompile Include="3rdparty\freetype\src\winfonts\winfnt.c" />
     <ClCompile Include="3rdparty\GL\glew.c" />
     <ClCompile Include="3rdparty\GL\OpenGL.cpp" />
     <ClCompile Include="3rdparty\gtest\src\gtest-death-test.cc" />

@@ -1200,61 +1200,7 @@
     <ClCompile Include="3rdparty\luabind-deboostified\src\wrapper_base.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\autofit\afangles.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\autofit\afblue.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\autofit\afcjk.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\autofit\afdummy.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\autofit\afglobal.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\autofit\afhints.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\autofit\afindic.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\autofit\aflatin.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\autofit\aflatin2.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\autofit\afloader.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\autofit\afmodule.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\autofit\afpic.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\autofit\afranges.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\autofit\afshaper.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\autofit\afwarp.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\autofit\autofit.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\base\basepic.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\base\ftadvanc.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\base\ftapi.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\base\ftbase.c">
@@ -1263,22 +1209,7 @@
     <ClCompile Include="3rdparty\freetype\src\base\ftbbox.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\base\ftbdf.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\base\ftbitmap.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\base\ftcalc.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\base\ftcid.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\base\ftdbgmem.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\base\ftdebug.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\base\ftfntfmt.c">
@@ -1290,16 +1221,10 @@
     <ClCompile Include="3rdparty\freetype\src\base\ftgasp.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\base\ftgloadr.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\base\ftglyph.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\base\ftgxval.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\base\fthash.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\base\ftinit.c">
@@ -1308,37 +1233,16 @@
     <ClCompile Include="3rdparty\freetype\src\base\ftlcdfil.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\base\ftmac.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\base\ftmm.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\base\ftobjs.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\base\ftotval.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\base\ftoutln.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\base\ftpatent.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\base\ftpfr.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\base\ftpic.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\base\ftrfork.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\base\ftsnames.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\base\ftstream.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\base\ftstroke.c">
@@ -1350,487 +1254,67 @@
     <ClCompile Include="3rdparty\freetype\src\base\ftsystem.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\base\fttrigon.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\base\fttype1.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\base\ftutil.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\base\ftwinfnt.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\base\md5.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\bdf\bdf.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\bdf\bdfdrivr.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\bdf\bdflib.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\bzip2\ftbzip2.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\cache\ftcache.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cache\ftcbasic.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cache\ftccache.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cache\ftccmap.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cache\ftcglyph.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cache\ftcimage.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cache\ftcmanag.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cache\ftcmru.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cache\ftcsbits.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cff\cf2arrst.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cff\cf2blues.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cff\cf2error.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cff\cf2font.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cff\cf2ft.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cff\cf2hints.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cff\cf2intrp.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cff\cf2read.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cff\cf2stack.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\cff\cff.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cff\cffcmap.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cff\cffdrivr.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cff\cffgload.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cff\cffload.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cff\cffobjs.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cff\cffparse.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cff\cffpic.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cid\cidgload.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cid\cidload.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cid\cidobjs.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cid\cidparse.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\cid\cidriver.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\cid\type1cid.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvalid.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvbsln.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvcommn.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvfeat.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvfgen.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvjust.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvkern.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvlcar.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvmod.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvmort.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvmort0.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvmort1.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvmort2.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvmort4.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvmort5.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvmorx.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvmorx0.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvmorx1.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvmorx2.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvmorx4.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvmorx5.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvopbd.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvprop.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gxvalid\gxvtrak.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gzip\adler32.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\gzip\ftgzip.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gzip\infblock.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gzip\infcodes.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gzip\inflate.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gzip\inftrees.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gzip\infutil.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\gzip\zutil.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\lzw\ftlzw.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\lzw\ftzopen.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\otvalid\otvalid.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\otvalid\otvbase.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\otvalid\otvcommn.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\otvalid\otvgdef.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\otvalid\otvgpos.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\otvalid\otvgsub.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\otvalid\otvjstf.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\otvalid\otvmath.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\otvalid\otvmod.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\pcf\pcf.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\pcf\pcfdrivr.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\pcf\pcfread.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\pcf\pcfutil.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\pfr\pfr.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\pfr\pfrcmap.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\pfr\pfrdrivr.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\pfr\pfrgload.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\pfr\pfrload.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\pfr\pfrobjs.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\pfr\pfrsbit.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\psaux\afmparse.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\psaux\psaux.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\psaux\psauxmod.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\psaux\psconv.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\psaux\psobjs.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\psaux\t1cmap.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\psaux\t1decode.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\pshinter\pshalgo.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\pshinter\pshglob.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\pshinter\pshinter.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\pshinter\pshmod.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\pshinter\pshpic.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\pshinter\pshrec.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\psnames\psmodule.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\psnames\psnames.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\psnames\pspic.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\raster\ftraster.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\raster\ftrend1.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\raster\raster.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\raster\rastpic.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\sfnt\pngshim.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\sfnt\sfdriver.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\sfnt\sfnt.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\sfnt\sfntpic.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\sfnt\sfobjs.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\sfnt\ttbdf.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\sfnt\ttcmap.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\sfnt\ttkern.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\sfnt\ttload.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\sfnt\ttmtx.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\sfnt\ttpost.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\sfnt\ttsbit.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\smooth\ftgrays.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\smooth\ftsmooth.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\smooth\ftspic.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\smooth\smooth.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\tools\ftfuzzer\ftfuzzer.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\tools\ftfuzzer\ftmutator.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\tools\ftfuzzer\rasterfuzzer.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\tools\ftfuzzer\runinput.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\tools\ftrandom\ftrandom.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\tools\apinames.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\tools\test_afm.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\tools\test_bbox.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\tools\test_trig.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\truetype\truetype.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\truetype\ttdriver.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\truetype\ttgload.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\truetype\ttgxvar.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\truetype\ttinterp.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\truetype\ttobjs.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\truetype\ttpic.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\truetype\ttpload.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\truetype\ttsubpix.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\type1\t1afm.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\type1\t1driver.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\type1\t1gload.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\type1\t1load.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\type1\t1objs.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\type1\t1parse.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\type1\type1.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\type42\t42drivr.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\type42\t42objs.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\freetype\src\type42\t42parse.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\type42\type42.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\freetype\src\winfonts\winfnt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="3rdparty\freetype\builds\windows\ftdebug.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
