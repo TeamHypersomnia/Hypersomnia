@@ -1,5 +1,5 @@
 #include "step.h"
-#include "game/systems/item_system.h"
+#include "game/systematic/item_system.h"
 #include "cosmos.h"
 
 #include "game/types_specification/all_messages_includes.h"

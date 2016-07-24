@@ -3,9 +3,9 @@
 #include "game/cosmos.h"
 #include "game/assets/texture_id.h"
 
-#include "game/systems/input_system.h"
-#include "game/systems/render_system.h"
-#include "game/systems/gui_system.h"
+#include "game/systematic/input_system.h"
+#include "game/systematic/render_system.h"
+#include "game/systematic/gui_system.h"
 #include "game/components/camera_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"

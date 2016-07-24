@@ -13,7 +13,7 @@
 #include "game/temporary_systems/physics_system.h"
 #include "game/temporary_systems/processing_lists_system.h"
 
-#include "game/systems/gui_system.h"
+#include "game/systematic/gui_system.h"
 
 #include "augs/misc/delta.h"
 #include "augs/misc/pool_handlizer.h"
