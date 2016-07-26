@@ -13,6 +13,16 @@ namespace augs {
 
 		unsigned max_steps_to_perform;
 	public:
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(accumulator),
+				CEREAL_NVP(time_multiplier),
+				CEREAL_NVP(basic_delta),
+				CEREAL_NVP(max_steps_to_perform)
+			);
+		}
+
 		fixed_delta_timer(unsigned steps_per_second, unsigned max_steps_to_perform);
 
 		unsigned count_logic_steps_to_perform();

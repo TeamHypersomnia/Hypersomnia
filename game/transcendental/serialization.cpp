@@ -28,6 +28,7 @@ void multiverse::save_cosmos_to_file(std::string filename) {
 	{
 		cereal::PortableBinaryOutputArchive ar(out);
 
+		ar(main_cosmos_timer);
 		ar(main_cosmos_manager);
 		ar(main_cosmos);
 	}
@@ -45,6 +46,7 @@ void multiverse::load_cosmos_from_file(std::string filename) {
 	{
 		cereal::PortableBinaryInputArchive ar(in);
 
+		ar(main_cosmos_timer);
 		ar(main_cosmos_manager);
 		ar(main_cosmos);
 	}
@@ -56,8 +58,8 @@ bool cosmos::operator==(const cosmos& second) const {
 	std::ostringstream this_serialized;
 	std::ostringstream second_serialized;
 	
-	cosmos c1 = *this;
-	cosmos c2 = second;
+	cosmos c1; c1.clone_significant_from(*this);
+	cosmos c2; c2.clone_significant_from(second);
 
 	{
 		cereal::BinaryOutputArchive ar(this_serialized);

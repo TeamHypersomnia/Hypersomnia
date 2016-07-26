@@ -9,7 +9,7 @@
 #include "augs/misc/time_utils.h"
 
 multiverse::multiverse() 
-	: main_cosmos_timer(60, 5)
+	: main_cosmos_timer(60, 5), stashed_timer(main_cosmos_timer)
 {
 }
 
@@ -90,6 +90,18 @@ void multiverse::simulate() {
 					augs::create_directories(target_folder);
 
 					save_cosmos_to_file(target_folder + "/" + save_filename);
+				}
+				if (raw_input.key == window::event::keys::F8) {
+					duplication.new_measurement();
+					stashed_cosmos.clone_significant_from(main_cosmos);
+					stashed_timer = main_cosmos_timer;
+					duplication.end_measurement();
+				}
+				if (raw_input.key == window::event::keys::F9) {
+					duplication.new_measurement();
+					main_cosmos = stashed_cosmos;
+					main_cosmos_timer = stashed_timer;
+					duplication.end_measurement();
 				}
 			}
 		}

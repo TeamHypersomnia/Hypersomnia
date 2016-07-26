@@ -73,13 +73,16 @@ cosmos::cosmos(const cosmos& b) {
 	*this = b;
 }
 
-cosmos& cosmos::operator=(const cosmos& b) {
+void cosmos::clone_significant_from(const cosmos& b) {
 	settings = b.settings;
 	current_step_number = b.current_step_number;
 	delta = b.delta;
 	pool_for_aggregates = b.pool_for_aggregates;
 	pools_for_components = b.pools_for_components;
+}
 
+cosmos& cosmos::operator=(const cosmos& b) {
+	clone_significant_from(b);
 	complete_resubstantialization();
 	return *this;
 }

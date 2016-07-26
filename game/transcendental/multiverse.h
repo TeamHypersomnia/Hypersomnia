@@ -10,6 +10,9 @@ class game_window;
 
 class multiverse {
 	scene_managers::testbed main_cosmos_manager;
+
+	cosmos stashed_cosmos;
+	augs::fixed_delta_timer stashed_timer;
 public:
 	mutable augs::variable_delta_timer frame_timer;
 	mutable augs::measurements fps_profiler = augs::measurements(L"Frame");
@@ -17,6 +20,7 @@ public:
 
 	mutable augs::measurements reading_savefile = augs::measurements(L"Loading savefile", true, 1);
 	mutable augs::measurements writing_savefile = augs::measurements(L"Writing savefile", true, 1);
+	mutable augs::measurements duplication = augs::measurements(L"Duplication");
 
 	float stepping_speed = 1.f;
 

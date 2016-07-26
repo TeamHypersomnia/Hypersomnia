@@ -43,10 +43,6 @@ public:
 
 	cosmic_profiler profiler;
 
-	cosmos();
-	cosmos(const cosmos&);
-	cosmos& operator=(const cosmos&);
-
 	template <class Archive>
 	void serialize(Archive& ar) {
 		ar(
@@ -59,6 +55,12 @@ public:
 		
 		complete_resubstantialization();
 	}
+
+	cosmos();
+	cosmos(const cosmos&);
+	cosmos& operator=(const cosmos&);
+
+	void clone_significant_from(const cosmos&);
 
 	bool operator==(const cosmos&) const;
 	bool operator!=(const cosmos&) const;
