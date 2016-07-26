@@ -41,6 +41,8 @@ namespace components {
 		float minimum_danger_amount_to_evade = 5.f;
 		float danger_amount_from_hostile_attitude = 100.f;
 
+		recoil_player aimpunch;
+
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(
@@ -50,14 +52,14 @@ namespace components {
 
 				CEREAL_NVP(comfort_zone),
 				CEREAL_NVP(minimum_danger_amount_to_evade),
-				CEREAL_NVP(danger_amount_from_hostile_attitude)
+				CEREAL_NVP(danger_amount_from_hostile_attitude),
+
+				CEREAL_NVP(aimpunch)
 			);
 		}
 
 		sentience();
 
 		augs::rgba calculate_health_color(float time_pulse_multiplier) const;
-
-		recoil_player aimpunch;
 	};
 }
