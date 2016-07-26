@@ -72,10 +72,6 @@ bool cosmos::operator==(const cosmos& second) const {
 	const auto& this_str = this_serialized.rdbuf()->str();
 	const auto& second_str = second_serialized.rdbuf()->str();
 	
-	LOG("C1: %x C2: %x", this_str, second_str);
-	
-	auto s1 = this_str.size();
-	auto s2 = second_str.size();
 	bool cosmoi_identical = std::equal(this_str.begin(), this_str.end(), second_str.begin(), second_str.end()); 
 	return cosmoi_identical;
 }
