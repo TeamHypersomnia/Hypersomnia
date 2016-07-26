@@ -10,6 +10,7 @@
 #include <cereal/types/bitset.hpp>
 
 #include <cereal/archives/portable_binary.hpp>
+#include <cereal/archives/binary.hpp>
 
 #include "entity_relations.h"
 #include "multiverse.h"
@@ -17,6 +18,7 @@
 #include "game/transcendental/types_specification/all_component_includes.h"
 
 #include <fstream>
+#include <sstream>
 
 void multiverse::save_cosmos_to_file(std::string filename) {
 	writing_savefile.new_measurement();
@@ -34,6 +36,8 @@ void multiverse::save_cosmos_to_file(std::string filename) {
 }
 
 void multiverse::load_cosmos_from_file(std::string filename) {
+	ensure(main_cosmos == cosmos());
+
 	reading_savefile.new_measurement();
 
 	std::ifstream in(filename, std::ios::in | std::ios::binary);
@@ -46,4 +50,36 @@ void multiverse::load_cosmos_from_file(std::string filename) {
 	}
 
 	reading_savefile.end_measurement();
+}
+
+bool cosmos::operator==(const cosmos& second) const {
+	std::ostringstream this_serialized;
+	std::ostringstream second_serialized;
+	
+	cosmos c1 = *this;
+	cosmos c2 = second;
+
+	{
+		cereal::BinaryOutputArchive ar(this_serialized);
+		ar(c1);
+	}
+
+	{
+		cereal::BinaryOutputArchive ar(second_serialized);
+		ar(c2);
+	}
+
+	const auto& this_str = this_serialized.rdbuf()->str();
+	const auto& second_str = second_serialized.rdbuf()->str();
+	
+	LOG("C1: %x C2: %x", this_str, second_str);
+	
+	auto s1 = this_str.size();
+	auto s2 = second_str.size();
+	bool cosmoi_identical = std::equal(this_str.begin(), this_str.end(), second_str.begin(), second_str.end()); 
+	return cosmoi_identical;
+}
+
+bool cosmos::operator!=(const cosmos& second) const {
+	return !operator==(second);
 }

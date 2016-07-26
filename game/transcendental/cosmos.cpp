@@ -66,6 +66,25 @@ void cosmos::complete_resubstantialization() {
 	profiler.complete_resubstantiation.end_measurement();
 }
 
+cosmos::cosmos() {
+}
+
+cosmos::cosmos(const cosmos& b) {
+	*this = b;
+}
+
+cosmos& cosmos::operator=(const cosmos& b) {
+	settings = b.settings;
+	current_step_number = b.current_step_number;
+	delta = b.delta;
+	pool_for_aggregates = b.pool_for_aggregates;
+	pools_for_components = b.pools_for_components;
+
+	complete_resubstantialization();
+	return *this;
+}
+
+
 void cosmos::complete_resubstantialization(entity_handle h) {
 	temporary_systems.for_each([h](auto& sys) {
 		sys.destruct(h);
@@ -161,6 +180,11 @@ void cosmos::delete_entity(entity_id e) {
 size_t cosmos::entities_count() const {
 	return aggregates_count();
 }
+
+size_t cosmos::get_maximum_entities() const {
+	return pool_for_aggregates.capacity();
+}
+
 void cosmos::advance_deterministic_schemata(cosmic_entropy input, fixed_callback pre_solve, fixed_callback post_solve) {
 	fixed_step step(*this, input);
 	

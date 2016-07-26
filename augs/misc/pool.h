@@ -188,7 +188,7 @@ namespace augs {
 		}
 
 		int capacity() const {
-			return slots.capacity();
+			return indirectors.capacity();
 		}
 	};
 

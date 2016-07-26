@@ -71,12 +71,6 @@ void multiverse::control(augs::machine_entropy entropy) {
 			if (raw_input.key == window::event::keys::F4) {
 				LOG_COLOR(console_color::YELLOW, "Separator");
 			}
-			if (raw_input.key == window::event::keys::F7) {
-				auto target_folder = saves_folder + augs::get_timestamp();
-				augs::create_directories(target_folder);
-
-				save_cosmos_to_file(target_folder + "/" + save_filename);
-			}
 		}
 	}
 
@@ -88,6 +82,18 @@ void multiverse::simulate() {
 
 	while (steps_to_perform--) {
 		auto machine_entropy_for_this_step = main_cosmos_player.obtain_machine_entropy_for_next_step();
+
+		for (auto& raw_input : machine_entropy_for_this_step.local) {
+			if (raw_input.key_event == window::event::PRESSED) {
+				if (raw_input.key == window::event::keys::F7) {
+					auto target_folder = saves_folder + augs::get_timestamp();
+					augs::create_directories(target_folder);
+
+					save_cosmos_to_file(target_folder + "/" + save_filename);
+				}
+			}
+		}
+
 		auto cosmic_entropy_for_this_step = main_cosmos_manager.make_cosmic_entropy(machine_entropy_for_this_step, main_cosmos);
 
 		renderer::get_current().clear_logic_lines();
@@ -128,6 +134,7 @@ void multiverse::view(game_window& window) const {
 
 std::wstring multiverse::summary(bool detailed) const {
 	std::wstring result; 
+	result += typesafe_sprintf(L"Entities: %x\n", main_cosmos.entities_count());
 	result += fps_profiler.summary();
 	result += triangles.summary();
 	

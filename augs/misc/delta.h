@@ -5,8 +5,8 @@ namespace augs {
 
 	class fixed_delta {
 		friend class fixed_delta_timer;
-		double fixed_delta_ms;
-		unsigned steps_per_second;
+		double fixed_delta_ms = 0;
+		unsigned steps_per_second = 0;
 		unsigned long long total_steps_passed = 0;
 	public:
 

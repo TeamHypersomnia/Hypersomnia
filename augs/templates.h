@@ -181,24 +181,24 @@ struct is_component_synchronized : std::false_type { };
 template<typename T>
 struct is_component_synchronized<T, decltype(std::declval<T>().activated, void())> : std::true_type { };
 
-template <typename Base, typename Tuple, std::size_t I = 0>
-struct tuple_ref_index;
-
-template <typename Base, typename Head, typename... Tail, std::size_t I>
-struct tuple_ref_index<Base, std::tuple<Head, Tail...>, I>
-	: std::conditional<std::is_base_of<Base, Head>::value
-	, std::integral_constant<std::size_t, I>
-	, tuple_ref_index<Base, std::tuple<Tail...>, I + 1>
-	>::type
-{
-};
-
-template <typename Base, typename Tuple>
-auto tuple_ref_by_inheritance(Tuple&& tuple)
--> decltype(std::get<tuple_ref_index<Base, typename std::decay<Tuple>::type>::value>(std::forward<Tuple>(tuple)))
-{
-	return std::get<tuple_ref_index<Base, typename std::decay<Tuple>::type>::value>(std::forward<Tuple>(tuple));
-}
+//template <typename Base, typename Tuple, std::size_t I = 0>
+//struct tuple_ref_index;
+//
+//template <typename Base, typename Head, typename... Tail, std::size_t I>
+//struct tuple_ref_index<Base, std::tuple<Head, Tail...>, I>
+//	: std::conditional<std::is_base_of<Base, Head>::value
+//	, std::integral_constant<std::size_t, I>
+//	, tuple_ref_index<Base, std::tuple<Tail...>, I + 1>
+//	>::type
+//{
+//};
+//
+//template <typename Base, typename Tuple>
+//auto tuple_ref_by_inheritance(Tuple&& tuple)
+//-> decltype(std::get<tuple_ref_index<Base, typename std::decay<Tuple>::type>::value>(std::forward<Tuple>(tuple)))
+//{
+//	return std::get<tuple_ref_index<Base, typename std::decay<Tuple>::type>::value>(std::forward<Tuple>(tuple));
+//}
 
 template <class T>
 struct saved_args_base {

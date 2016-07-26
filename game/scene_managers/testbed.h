@@ -13,6 +13,7 @@ class cosmos;
 
 namespace scene_managers {
 	class testbed {
+	public:
 		std::vector<entity_id> characters;
 		
 		unsigned current_character = 0;
@@ -20,7 +21,6 @@ namespace scene_managers {
 
 		std::vector<entity_id> draw_bodies;
 
-	public:
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(

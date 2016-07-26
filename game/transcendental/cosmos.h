@@ -30,7 +30,6 @@
 class cosmos : private storage_for_all_components_and_aggregates, public augs::pool_handlizer<cosmos>
 {
 	void advance_deterministic_schemata(fixed_step& step_state);
-	void call_rendering_schemata(viewing_step& step_state) const;
 
 public:
 	typedef std::function<void(fixed_step&)> fixed_callback;
@@ -44,6 +43,10 @@ public:
 
 	cosmic_profiler profiler;
 
+	cosmos();
+	cosmos(const cosmos&);
+	cosmos& operator=(const cosmos&);
+
 	template <class Archive>
 	void serialize(Archive& ar) {
 		ar(
@@ -56,6 +59,9 @@ public:
 		
 		complete_resubstantialization();
 	}
+
+	bool operator==(const cosmos&) const;
+	bool operator!=(const cosmos&) const;
 
 	void advance_deterministic_schemata(cosmic_entropy input,
 		fixed_callback pre_solve = fixed_callback(), 
@@ -91,6 +97,7 @@ public:
 	std::vector<const_entity_handle> get(processing_subjects) const;
 
 	size_t entities_count() const;
+	size_t get_maximum_entities() const;
 	std::wstring summary() const;
 
 	using storage_for_all_components_and_aggregates::get_pool;
