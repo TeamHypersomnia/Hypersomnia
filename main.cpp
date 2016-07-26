@@ -26,16 +26,18 @@ int main(int argc, char** argv) {
 	resource_setups::load_standard_everything();
 
 	multiverse hypersomnia;
-	hypersomnia.main_cosmos.settings.screen_size = vec2i(window.window.get_screen_rect());
-	hypersomnia.populate_cosmoi();
+
+	if (!hypersomnia.try_to_load_save()) {
+		hypersomnia.main_cosmos.settings.screen_size = vec2i(window.window.get_screen_rect());
+		hypersomnia.populate_cosmoi();
+	}
+	
+	hypersomnia.try_to_load_or_save_new_session();
 
 	window.window.set_as_current();
 
 	bool should_quit = false;
 
-	hypersomnia.try_to_load_save();
-	hypersomnia.try_to_load_or_save_new_session();
-	
 	while (!should_quit) {
 		auto new_entropy = window.collect_entropy();
 
