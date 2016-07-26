@@ -4,6 +4,15 @@
 #include <cstring>
 
 namespace augs {
+	std::ostream& operator<<(std::ostream& out, const augs::raw_pool_id &x) {
+		out << "(" << x.indirection_index << ";" << x.version;
+#ifdef USE_NAMES_FOR_IDS
+		out << ";" << x.get_debug_name();
+#endif
+		out << ")";
+		return out;
+	}
+
 	raw_pool_id::raw_pool_id() {
 		set_debug_name("unset");
 	}

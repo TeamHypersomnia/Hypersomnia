@@ -136,6 +136,8 @@ struct vec2t {
 		ar(CEREAL_NVP(x), CEREAL_NVP(y));
 	}
 
+	friend std::ostream& operator<<(std::ostream& out, const vec2t<type>& x);
+
 	typedef float real;
 
 	void reset() {
@@ -480,4 +482,10 @@ namespace augs {
 	T normalize_degrees(T degrees) {
 		return vec2t<T>().set_from_degrees(degrees).degrees();
 	}
+}
+
+template<class T>
+std::ostream& operator<<(std::ostream& out, const vec2t<T>& x) {
+	out << "(" << x.x << ";" << x.y << ")";
+	return out;
 }

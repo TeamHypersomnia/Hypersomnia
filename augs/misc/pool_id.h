@@ -26,6 +26,8 @@ namespace augs {
 		bool operator!=(const raw_pool_id& b) const;
 		bool operator<(const raw_pool_id& b) const;
 
+		friend std::ostream& operator<<(std::ostream& out, const raw_pool_id &x);
+
 		template <class Archive>
 		void serialize(Archive& ar) {
 #ifdef USE_NAMES_FOR_IDS
