@@ -1,11 +1,11 @@
 #include "cosmos.h"
 
 #include "game/temporary_systems/physics_system.h"
+#include "game/temporary_systems/dynamic_tree_system.h"
 #include "game/systematic/movement_system.h"
 #include "game/systematic/visibility_system.h"
 #include "game/systematic/pathfinding_system.h"
 #include "game/systematic/animation_system.h"
-#include "game/systematic/camera_system.h"
 #include "game/systematic/render_system.h"
 #include "game/systematic/input_system.h"
 #include "game/systematic/gun_system.h"
@@ -26,7 +26,6 @@
 #include "game/systematic/trace_system.h"
 #include "game/systematic/melee_system.h"
 #include "game/systematic/sentience_system.h"
-#include "game/temporary_systems/dynamic_tree_system.h"
 
 #include "game/enums/render_layer.h"
 
@@ -168,7 +167,11 @@ entity_handle cosmos::clone_entity(entity_id e) {
 
 void cosmos::delete_entity(entity_id e) {
 	auto handle = get_handle(e);
-	ensure(handle.alive());
+	if (handle.dead()) {
+		LOG("Warning! Attempt to delete a dead entity: %x", e);
+		return;
+	}
+	//ensure(handle.alive());
 
 	bool should_destruct_now_to_avoid_repeated_resubstantialization = handle.has<components::substance>();
 
@@ -265,8 +268,6 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	crosshair_system().apply_crosshair_intents_to_base_offsets(step);
 	crosshair_system().apply_base_offsets_to_crosshair_transforms(step);
 
-	camera_system().react_to_input_intents(step);
-
 	trigger_detector_system().send_trigger_confirmations(step);
 
 //	item_system().translate_gui_intents_to_transfer_requests(step);
@@ -323,7 +324,6 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	performance.start(meter_type::RENDERING);
 
 	position_copying_system().update_transforms(step);
-	camera_system().resolve_cameras_transforms_and_smoothing(step);
 	rotation_copying_system().update_rotations(step.cosm);
 
 	profiler.raycasts.measure(temporary_systems.get<physics_system>().ray_casts_since_last_step);

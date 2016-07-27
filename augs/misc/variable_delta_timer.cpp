@@ -9,7 +9,7 @@ namespace augs {
 		variable_delta out;
 		out.fixed = fixed;
 		out.interpolation_ratio = timer.fraction_of_step_until_next_step();
-		out.variable_delta_ms = extracted;
+		out.delta_ms = extracted;
 
 		return out;
 	}

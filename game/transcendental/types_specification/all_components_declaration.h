@@ -8,7 +8,6 @@ namespace components {
 	struct animation;
 	struct animation_response;
 	struct behaviour_tree;
-	struct camera;
 	struct position_copying;
 	struct crosshair;
 	struct damage;
@@ -54,7 +53,6 @@ struct put_all_components_into {
 		components::animation,
 		components::animation_response,
 		components::behaviour_tree,
-		components::camera,
 		components::position_copying,
 		components::crosshair,
 		components::damage,

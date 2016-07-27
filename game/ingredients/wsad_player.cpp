@@ -3,7 +3,6 @@
 #include "game/transcendental/cosmos.h"
 
 #include "game/components/position_copying_component.h"
-#include "game/components/camera_component.h"
 #include "game/components/input_receiver_component.h"
 #include "game/components/crosshair_component.h"
 #include "game/components/sprite_component.h"
@@ -224,30 +223,23 @@ namespace ingredients {
 		e.get<components::fixtures>().set_owner_body(e);
 	}
 
-	void inject_window_input_to_character(entity_handle next_character, entity_handle camera) {
-		auto previously_controlled_character = next_character.get_cosmos()[camera.get<components::camera>().entity_to_chase];
-
+	void inject_window_input_to_character(entity_handle next_character, entity_handle previously_controlled_character) {
 		if (previously_controlled_character.alive()) {
 			previously_controlled_character.get<components::processing>().disable_in(processing_subjects::WITH_INPUT_RECEIVER);
 			previously_controlled_character.get<components::processing>().disable_in(processing_subjects::WITH_GUI_ELEMENT);
-			previously_controlled_character.get<components::render>().interpolate = true;
+			// previously_controlled_character.get<components::render>().interpolate = true;
 
 			auto crosshair = previously_controlled_character[sub_entity_name::CHARACTER_CROSSHAIR];
 			crosshair.get<components::processing>().disable_in(processing_subjects::WITH_INPUT_RECEIVER);
-
-			previously_controlled_character.map_associated_entity(associated_entity_name::WATCHING_CAMERA, entity_id());
 		}
 
 		auto crosshair = next_character[sub_entity_name::CHARACTER_CROSSHAIR];
 
-		next_character.map_associated_entity(associated_entity_name::WATCHING_CAMERA, camera);
-		next_character.get<components::render>().interpolate = false;
+		// next_character.get<components::render>().interpolate = false;
 
 		next_character.get<components::processing>().enable_in(processing_subjects::WITH_INPUT_RECEIVER);
 		next_character.get<components::processing>().enable_in(processing_subjects::WITH_GUI_ELEMENT);
 		crosshair.get<components::processing>().enable_in(processing_subjects::WITH_INPUT_RECEIVER);
-
-		components::camera::configure_camera_and_character_with_crosshair(camera, next_character, crosshair);
 	}
 }
 
@@ -300,6 +292,8 @@ namespace prefabs {
 			render.interpolate = false;
 
 			crosshair.sensitivity.set(3, 3);
+			crosshair.visible_world_area = world.significant.settings.screen_size;
+			crosshair.update_bounds();
 
 			ingredients::make_always_visible(root);
 		}

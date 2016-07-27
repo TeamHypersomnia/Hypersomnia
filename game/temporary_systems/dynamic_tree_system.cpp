@@ -3,7 +3,6 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/components/dynamic_tree_node_component.h"
-#include "game/components/camera_component.h"
 #include "game/enums/filters.h"
 
 bool dynamic_tree_system::cache::is_constructed() const {

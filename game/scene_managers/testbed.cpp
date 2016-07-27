@@ -6,7 +6,6 @@
 #include "game/systematic/input_system.h"
 #include "game/systematic/render_system.h"
 #include "game/systematic/gui_system.h"
-#include "game/components/camera_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/name_component.h"
@@ -23,11 +22,11 @@
 #include "game/transcendental/cosmic_entropy.h"
 #include "game/transcendental/step.h"
 
+#include "game/detail/world_camera.h"
+
 namespace scene_managers {
 	void testbed::populate_world_with_entities(fixed_step& step) {
 		auto& world = step.cosm;
-		vec2i size = step.cosm.significant.settings.screen_size;
-
 		auto crate = prefabs::create_crate(world, vec2(200, 200 + 300), vec2i(100, 100) / 3);
 		auto crate2 = prefabs::create_crate(world, vec2(400, 200 + 400), vec2i(300, 300));
 		auto crate4 = prefabs::create_crate(world, vec2(500, 200 + 0), vec2i(100, 100));
@@ -52,11 +51,6 @@ namespace scene_managers {
 
 		auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, -600, -90));
 		prefabs::create_motorcycle(world, components::transform(100, -600, -90));
-
-		auto camera = world.create_entity("camera");
-		ingredients::camera(camera, size.x, size.y);
-		camera.add_standard_components();
-		world_camera = camera;
 
 		auto bg_size = assets::get_size(assets::texture_id::TEST_BACKGROUND);
 
@@ -119,7 +113,7 @@ namespace scene_managers {
 
 		name_entity(world[new_characters[0]], entity_name::PERSON, L"Attacker");
 
-		ingredients::inject_window_input_to_character(world[new_characters[current_character]], camera);
+		inject_input_to(world[new_characters[current_character]]);
 
 		prefabs::create_sample_suppressor(world, vec2(300, -500));
 
@@ -244,6 +238,11 @@ namespace scene_managers {
 	entity_id testbed::get_controlled_entity() const {
 		return characters[current_character];
 	}
+	
+	void testbed::inject_input_to(entity_handle h) {
+		ingredients::inject_window_input_to_character(h, h.get_cosmos()[currently_controlled_character]);
+		currently_controlled_character = h;
+	}
 
 	cosmic_entropy testbed::make_cosmic_entropy(augs::machine_entropy machine, cosmos& cosm) {
 		cosmic_entropy result;
@@ -264,7 +263,7 @@ namespace scene_managers {
 				++current_character;
 				current_character %= characters.size();
 
-				ingredients::inject_window_input_to_character(cosmos[characters[current_character]], cosmos[world_camera]);
+				inject_input_to(cosmos[characters[current_character]]);
 			}
 		}
 
@@ -290,10 +289,14 @@ namespace scene_managers {
 	}
 
 
-	void testbed::view_cosmos(basic_viewing_step& step) const {
+	void testbed::view_cosmos(basic_viewing_step& step, world_camera& camera) const {
 		auto& cosmos = step.cosm;
+
+		auto character_chased_by_camera = cosmos[currently_controlled_character];
+
+		camera.tick(step.get_delta(), character_chased_by_camera);
 		
-		viewing_step viewing(step, cosmos[world_camera].get<components::camera>().how_camera_will_render);
+		viewing_step viewing(step, camera.get_state_for_drawing_camera(character_chased_by_camera));
 		rendering_scripts::standard_rendering(viewing);
 
 	}

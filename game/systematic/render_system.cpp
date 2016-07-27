@@ -12,8 +12,6 @@
 #include "game/messages/new_entity_message.h"
 #include "game/messages/queue_destruction.h"
 
-#include "camera_system.h"
-
 #include "game/transcendental/cosmos.h"
 #include "game/enums/filters.h"
 

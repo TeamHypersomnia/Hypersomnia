@@ -8,6 +8,7 @@
 #include "augs/filesystem/directory.h"
 #include "augs/misc/time_utils.h"
 #include "game/transcendental/step.h"
+#include "game/transcendental/viewing_session.h"
 
 multiverse::multiverse() 
 	: main_cosmos_timer(60, 5), stashed_timer(main_cosmos_timer)
@@ -58,7 +59,7 @@ void multiverse::control(augs::machine_entropy entropy) {
 				main_cosmos_timer = augs::fixed_delta_timer(128, 500000);
 			}
 			if (raw_input.key == window::event::keys::_3) {
-				main_cosmos_timer = augs::fixed_delta_timer(400, 500000);
+				main_cosmos_timer = augs::fixed_delta_timer(144, 500000);
 			}
 			if (raw_input.key == window::event::keys::_4) {
 				stepping_speed = 0.1f;
@@ -125,34 +126,34 @@ void multiverse::simulate() {
 	}
 }
 
-void multiverse::view(game_window& window) const {
-	fps_profiler.new_measurement();
+void multiverse::view(game_window& window, viewing_session& session) const {
+	session.fps_profiler.new_measurement();
 
 	auto& target = renderer::get_current();
 
 	target.clear_current_fbo();
 
-	target.set_viewport({0, 0, main_cosmos.significant.settings.screen_size.x, main_cosmos.significant.settings.screen_size.y });
+	target.set_viewport({0, 0, static_cast<int>(session.camera.visible_world_area.x), static_cast<int>(session.camera.visible_world_area.y) });
 
-	basic_viewing_step main_cosmos_viewing_step(main_cosmos, frame_timer.extract_variable_delta(main_cosmos_timer), target);
-	main_cosmos_manager.view_cosmos(main_cosmos_viewing_step);
+	basic_viewing_step main_cosmos_viewing_step(main_cosmos, session.frame_timer.extract_variable_delta(main_cosmos_timer), target);
+	main_cosmos_manager.view_cosmos(main_cosmos_viewing_step, session.camera);
 	
-	print_summary(target);
+	print_summary(target, session);
 
-	triangles.measure(static_cast<double>(target.triangles_drawn_total));
+	session.triangles.measure(static_cast<double>(target.triangles_drawn_total));
 	target.triangles_drawn_total = 0;
 
 	window.window.swap_buffers();
 
-	fps_profiler.end_measurement();
+	session.fps_profiler.end_measurement();
 }
 
 
-std::wstring multiverse::summary(bool detailed) const {
+std::wstring multiverse::summary(bool detailed, const viewing_session& session) const {
 	std::wstring result; 
 	result += typesafe_sprintf(L"Entities: %x\n", main_cosmos.entities_count());
-	result += fps_profiler.summary();
-	result += triangles.summary();
+	result += session.fps_profiler.summary();
+	result += session.triangles.summary();
 	
 	if (detailed) {
 		result += main_cosmos.profiler.sorted_summary();
@@ -165,14 +166,14 @@ std::wstring multiverse::summary(bool detailed) const {
 	return result;
 }
 
-void multiverse::print_summary(augs::renderer& target) const {
+void multiverse::print_summary(augs::renderer& target, const viewing_session& session) const {
 	auto& cosmos = main_cosmos;
 	using namespace augs::gui::text;
 
 	auto coords = cosmos[main_cosmos_manager.get_controlled_entity()].get<components::transform>().pos;
 
 	quick_print_format(target.triangles, typesafe_sprintf(L"X: %f2\nY: %f2\n", coords.x, coords.y)
-		+ summary(show_profile_details), style(assets::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0);
+		+ summary(show_profile_details, session), style(assets::GUI_FONT, rgba(255, 255, 255, 150)), vec2i(0, 0), 0);
 
 	target.call_triangles();
 	target.clear_triangles();

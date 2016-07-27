@@ -6,7 +6,6 @@
 #include "game/systematic/input_system.h"
 #include "game/systematic/render_system.h"
 #include "game/systematic/gui_system.h"
-#include "game/components/camera_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/name_component.h"
@@ -26,12 +25,10 @@
 namespace scene_managers {
 	void one_entity::populate_world_with_entities(fixed_step& step) {
 		auto& world = step.cosm;
-		vec2i size = step.cosm.significant.settings.screen_size;
 
 		auto crate = prefabs::create_crate(world, vec2(300, 300), vec2i(100, 100));
 
 		auto camera = world.create_entity("camera");
-		ingredients::camera(camera, size.x, size.y);
 		camera.add_standard_components();
 		world_camera = camera;
 
@@ -198,7 +195,7 @@ namespace scene_managers {
 	void one_entity::view_cosmos(basic_viewing_step& step) const {
 		auto& cosmos = step.cosm;
 
-		viewing_step viewing(step, cosmos[world_camera].get<components::camera>().how_camera_will_render);
-		rendering_scripts::standard_rendering(viewing);
+		//viewing_step viewing(step, cosmos[world_camera].get<components::camera>().how_camera_will_render);
+		//rendering_scripts::standard_rendering(viewing);
 	}
 }

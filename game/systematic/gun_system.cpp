@@ -7,7 +7,6 @@
 #include "game/detail/item_slot_transfer_request.h"
 
 #include "game/components/physics_component.h"
-#include "game/components/camera_component.h"
 #include "game/components/damage_component.h"
 #include "game/components/particle_group_component.h"
 #include "game/components/position_copying_component.h"
@@ -156,9 +155,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(fixed_step& step) {
 					auto owning_crosshair_recoil = owning_capability[sub_entity_name::CHARACTER_CROSSHAIR][sub_entity_name::CROSSHAIR_RECOIL_BODY];
 					gun.recoil.shoot_and_apply_impulse(owning_crosshair_recoil, total_recoil_multiplier/100.f, true);
 				}
-
-				//	//if (owning_capability.alive())
-				//	//	gun.shake_camera(owning_capability[associated_entity_name::WATCHING_CAMERA], gun_transform.rotation, *this);
 
 				if (destroy_pellets_container)
 					step.messages.post(messages::queue_destruction(chamber_slot.get_items_inside()[0]));

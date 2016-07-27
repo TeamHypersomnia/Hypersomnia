@@ -9,13 +9,23 @@ namespace components {
 	struct crosshair {
 		static vec2 calculate_aiming_displacement(const_entity_handle subject_crosshair, bool snap_epsilon_base_offset = false);
 
+		enum orbit_type {
+			NONE,
+			ANGLED,
+			LOOK
+		} orbit_mode = LOOK;
+
 		entity_id character_entity_to_chase;
 		vec2 base_offset;
 		vec2 bounds_for_base_offset;
+		vec2 visible_world_area;
+		vec2 max_look_expand;
 
 		float rotation_offset = 0.f;
 		vec2 size_multiplier = vec2(1.0f, 1.0f);
 		vec2 sensitivity = vec2(1.0f, 1.0f);
+
+		void update_bounds();
 
 		template <class Archive>
 		void serialize(Archive& ar) {

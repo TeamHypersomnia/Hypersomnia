@@ -174,9 +174,6 @@
     <ClCompile Include="game\ingredients\box_physics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\ingredients\camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\ingredients\car.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -891,9 +888,6 @@
     <ClCompile Include="game\systematic\behaviour_tree_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\systematic\camera_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\systematic\car_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -979,6 +973,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\transcendental\step.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\detail\world_camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1302,9 +1299,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\components\behaviour_tree_component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\components\camera_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\components\car_component.h">
@@ -2933,9 +2927,6 @@
     <ClInclude Include="game\systematic\behaviour_tree_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\systematic\camera_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\systematic\car_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3045,6 +3036,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\transcendental\types_specification\all_systems_declaration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\detail\world_camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\transcendental\viewing_session.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

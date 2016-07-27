@@ -2,8 +2,12 @@
 #include "stepped_timing.h"
 
 namespace augs {
-	double fixed_delta::in_seconds() const {
-		return fixed_delta_ms / 1000.0;
+	double delta::in_seconds() const {
+		return delta_ms / 1000.0;
+	}
+
+	double delta::in_milliseconds() const {
+		return delta_ms;
 	}
 
 	unsigned fixed_delta::get_steps_per_second() const {
@@ -18,24 +22,12 @@ namespace augs {
 		return total_steps_passed;
 	}
 
-	double fixed_delta::in_milliseconds() const {
-		return fixed_delta_ms;
-	}
-	
 	stepped_timestamp fixed_delta::get_timestamp() const {
 		stepped_timestamp result;
 		result.step = total_steps_passed;
 		return result;
 	}
-
-	double variable_delta::in_seconds() const {
-		return variable_delta_ms / 1000.0;
-	}
-
-	double variable_delta::in_milliseconds() const {
-		return variable_delta_ms;
-	}
-
+	
 	double variable_delta::view_interpolation_ratio() const {
 		return interpolation_ratio;
 	}

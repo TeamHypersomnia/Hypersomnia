@@ -5,7 +5,6 @@
 #include "game/messages/crosshair_intent_message.h"
 
 #include "game/components/sprite_component.h"
-#include "game/components/camera_component.h"
 
 #include "game/components/crosshair_component.h"
 #include "game/components/transform_component.h"
@@ -15,6 +14,15 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/step.h"
 
+void components::crosshair::update_bounds() {
+	max_look_expand = visible_world_area / 2;
+
+	if (orbit_mode == ANGLED)
+		bounds_for_base_offset = visible_world_area / 2.f;
+	if (orbit_mode == LOOK)
+		bounds_for_base_offset = max_look_expand + visible_world_area / 2;
+}
+
 void crosshair_system::generate_crosshair_intents(fixed_step& step) {
 	auto& cosmos = step.cosm;
 	auto& delta = step.get_delta();
@@ -22,6 +30,13 @@ void crosshair_system::generate_crosshair_intents(fixed_step& step) {
 	auto events = step.messages.get_queue<messages::intent_message>();
 
 	for (auto& it : events) {
+		auto subject = cosmos[it.subject];
+		
+		if (!subject.has<components::crosshair>())
+			continue;
+
+		auto& crosshair = subject.get<components::crosshair>();
+
 		messages::crosshair_intent_message crosshair_intent;
 		crosshair_intent.messages::intent_message::operator=(it);
 
@@ -29,26 +44,30 @@ void crosshair_system::generate_crosshair_intents(fixed_step& step) {
 			it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION ||
 			it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION
 			) {
-			auto subject = cosmos[it.subject];
-			auto crosshair = subject.find<components::crosshair>();
 
-			if (!crosshair)
-				continue;
+			vec2 delta = vec2(vec2(it.state.mouse.rel) * crosshair.sensitivity).rotate(crosshair.rotation_offset, vec2());
 
-			vec2 delta = vec2(vec2(it.state.mouse.rel) * crosshair->sensitivity).rotate(crosshair->rotation_offset, vec2());
-
-			vec2& base_offset = crosshair->base_offset;
+			vec2& base_offset = crosshair.base_offset;
 			vec2 old_base_offset = base_offset;
 			vec2 old_pos = position(subject);
 
 			base_offset += delta;
-			base_offset.clamp_rotated(crosshair->bounds_for_base_offset, crosshair->rotation_offset);
+			base_offset.clamp_rotated(crosshair.bounds_for_base_offset, crosshair.rotation_offset);
 
 			crosshair_intent.crosshair_base_offset_rel = base_offset - old_base_offset;
 			crosshair_intent.crosshair_base_offset = base_offset;
-			crosshair_intent.crosshair_world_pos = base_offset + cosmos[crosshair->character_entity_to_chase].get<components::transform>().pos;
+			crosshair_intent.crosshair_world_pos = base_offset + cosmos[crosshair.character_entity_to_chase].get<components::transform>().pos;
 
 			step.messages.post(crosshair_intent);
+		}
+		else if (it.intent == intent_type::SWITCH_LOOK && it.pressed_flag) {
+			auto& mode = crosshair.orbit_mode;
+
+			if (mode == components::crosshair::LOOK)
+				mode = components::crosshair::ANGLED;
+			else mode = components::crosshair::LOOK;
+
+			crosshair.update_bounds();
 		}
 	}
 }

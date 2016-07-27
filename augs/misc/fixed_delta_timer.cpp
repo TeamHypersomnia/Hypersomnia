@@ -9,20 +9,20 @@ namespace augs {
 	fixed_delta_timer::fixed_delta_timer(unsigned steps_per_second, unsigned max_steps_to_perform)
 		: max_steps_to_perform(max_steps_to_perform) {
 		basic_delta.steps_per_second = steps_per_second;
-		basic_delta.fixed_delta_ms = 1000.0 / steps_per_second;
+		basic_delta.delta_ms = 1000.0 / steps_per_second;
 	}
 
 	unsigned fixed_delta_timer::count_logic_steps_to_perform() {
 		accumulator += ticks.extract<std::chrono::milliseconds>() * time_multiplier;
 
-		const unsigned steps = static_cast<unsigned>(std::floor(accumulator / basic_delta.fixed_delta_ms));
+		const unsigned steps = static_cast<unsigned>(std::floor(accumulator / basic_delta.delta_ms));
 
 		if (steps > 0) 
-			accumulator -= steps * basic_delta.fixed_delta_ms;
+			accumulator -= steps * basic_delta.delta_ms;
 
 		ensure(
 			"Accumulator must have a value lesser than the fixed time step" &&
-			accumulator < basic_delta.fixed_delta_ms
+			accumulator < basic_delta.delta_ms
 			);
 
 		return std::min(steps, max_steps_to_perform);
@@ -33,7 +33,7 @@ namespace augs {
 	}
 
 	double fixed_delta_timer::fraction_of_step_until_next_step() const {
-		return accumulator / basic_delta.fixed_delta_ms;
+		return accumulator / basic_delta.delta_ms;
 	}
 
 	void fixed_delta_timer::set_stepping_speed_multiplier(double tm) {

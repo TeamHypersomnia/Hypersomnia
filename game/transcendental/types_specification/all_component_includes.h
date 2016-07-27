@@ -6,7 +6,6 @@
 #include "game/components/pathfinding_component.h"
 #include "game/components/animation_response_component.h"
 #include "game/components/animation_component.h"
-#include "game/components/camera_component.h"
 #include "game/components/position_copying_component.h"
 #include "game/components/crosshair_component.h"
 #include "game/components/damage_component.h"

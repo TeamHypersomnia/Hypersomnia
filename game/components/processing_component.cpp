@@ -15,9 +15,6 @@ P P::get_default(const_entity_handle id) {
 	if (id.has<components::behaviour_tree>()) {
 		matching.push_back(processing_subjects::WITH_BEHAVIOUR_TREE);
 	}
-	if (id.has<components::camera>()) {
-		matching.push_back(processing_subjects::WITH_CAMERA);
-	}
 	if (id.has<components::car>()) {
 		matching.push_back(processing_subjects::WITH_CAR);
 	}

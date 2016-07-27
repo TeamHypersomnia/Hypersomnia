@@ -4,9 +4,9 @@
 #include "game/scene_managers/one_entity.h"
 #include "game/transcendental/entropy_player.h"
 #include "augs/misc/fixed_delta_timer.h"
-#include "augs/misc/variable_delta_timer.h"
 
 class game_window;
+class viewing_session;
 
 namespace augs {
 	class renderer;
@@ -17,21 +17,18 @@ class multiverse {
 
 	cosmos::significant_state stashed_cosmos;
 	augs::fixed_delta_timer stashed_timer;
+
+	augs::measurements reading_savefile = augs::measurements(L"Loading savefile", true, 1);
+	augs::measurements writing_savefile = augs::measurements(L"Writing savefile", true, 1);
+	augs::measurements duplication = augs::measurements(L"Duplication");
+
+	void print_summary(augs::renderer&, const viewing_session&) const;
+	std::wstring summary(bool detailed, const viewing_session&) const;
 public:
-	mutable augs::variable_delta_timer frame_timer;
-	mutable augs::measurements fps_profiler = augs::measurements(L"Frame");
-	mutable augs::measurements triangles = augs::measurements(L"Triangles", false);
-
-	mutable augs::measurements reading_savefile = augs::measurements(L"Loading savefile", true, 1);
-	mutable augs::measurements writing_savefile = augs::measurements(L"Writing savefile", true, 1);
-	mutable augs::measurements duplication = augs::measurements(L"Duplication");
-
 	float stepping_speed = 1.f;
 
 	bool show_profile_details = true;
 
-	void print_summary(augs::renderer&) const;
-	std::wstring summary(bool detailed) const;
 	std::string recording_filename = "recorded.inputs";
 	std::string save_filename = "save.state";
 	std::string saves_folder = "saves/";
@@ -54,5 +51,5 @@ public:
 
 	void control(augs::machine_entropy);
 	void simulate();
-	void view(game_window&) const;
+	void view(game_window&, viewing_session&) const;
 };

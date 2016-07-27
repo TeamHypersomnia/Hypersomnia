@@ -1,7 +1,6 @@
 #include "ingredients.h"
 
 #include "game/components/position_copying_component.h"
-#include "game/components/camera_component.h"
 #include "game/components/input_receiver_component.h"
 #include "game/components/crosshair_component.h"
 #include "game/components/sprite_component.h"
