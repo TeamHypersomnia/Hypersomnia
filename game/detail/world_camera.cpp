@@ -83,8 +83,7 @@ void world_camera::tick(augs::variable_delta dt, const_entity_handle entity_to_c
 				previous_step_player_position = player_pos;
 			}
 
-			target_value = (player_pos - previous_seen_player_position) * dt.in_milliseconds();
-			auto vel = physics.velocity();
+			target_value = (player_pos - previous_seen_player_position) * dt.get_fixed().in_milliseconds();
 
 			if (target_value.length() < smoothing_player_pos.value.length())
 				// braking

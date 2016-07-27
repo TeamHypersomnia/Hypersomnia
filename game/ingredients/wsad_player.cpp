@@ -289,7 +289,6 @@ namespace prefabs {
 			sprite.set(assets::texture_id::TEST_CROSSHAIR, rgba(0, 255, 0, 255));
 
 			render.layer = render_layer::CROSSHAIR;
-			render.interpolate = false;
 
 			crosshair.sensitivity.set(3, 3);
 			crosshair.visible_world_area = world.significant.settings.screen_size;
@@ -311,7 +310,6 @@ namespace prefabs {
 
 			auto& render = recoil += components::render();
 			render.layer = render_layer::OVER_CROSSHAIR;
-			render.interpolate = false;
 			ingredients::make_always_visible(recoil);
 
 			auto& info = colliders.new_collider();
