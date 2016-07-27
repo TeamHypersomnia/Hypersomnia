@@ -74,7 +74,7 @@ void driver_system::release_drivers_due_to_requests(fixed_step& step) {
 }
 
 bool driver_system::release_car_ownership(entity_handle driver) {
-	return change_car_ownership(driver, driver.get_cosmos().get_handle(entity_id()), true);
+	return change_car_ownership(driver, driver.get_cosmos()[entity_id()], true);
 }
 
 bool driver_system::assign_car_ownership(entity_handle driver, entity_handle car) {

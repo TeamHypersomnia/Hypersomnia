@@ -45,7 +45,7 @@ void camera_system::react_to_input_intents(fixed_step& step) {
 				mode = components::camera::ANGLED;
 			else mode = components::camera::LOOK;
 
-			auto crosshair = cosmos.get_handle(camera.entity_to_chase)[sub_entity_name::CHARACTER_CROSSHAIR];
+			auto crosshair = cosmos[camera.entity_to_chase][sub_entity_name::CHARACTER_CROSSHAIR];
 
 			if (crosshair.alive())
 				update_bounds_for_crosshair(camera, cosmos[crosshair].get<components::crosshair>());

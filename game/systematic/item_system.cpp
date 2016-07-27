@@ -49,7 +49,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests(fixed_step& step
 		auto detector = cosmos[e.detector_body];
 
 		auto* item_slot_transfers = detector.find<components::item_slot_transfers>();
-		auto item_entity = cosmos.get_handle(e.trigger).get_owner_body();
+		auto item_entity = cosmos[e.trigger].get_owner_body();
 
 		auto* item = item_entity.find<components::item>();
 

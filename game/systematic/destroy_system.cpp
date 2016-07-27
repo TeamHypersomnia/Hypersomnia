@@ -37,7 +37,7 @@ void destroy_system::perform_deletions(fixed_step& step) {
 
 	// destroy in reverse order; children first
 	for (auto& it = deletions.rbegin(); it != deletions.rend(); ++it) {
-		ensure(cosmos.get_handle((*it).subject).alive());
+		ensure(cosmos[(*it).subject].alive());
 
 		cosmos.delete_entity((*it).subject);
 	}
