@@ -154,11 +154,11 @@ namespace augs {
 		}
 
 		void for_each(std::function<void(T&)> f) {
-			std::for_each(pool.begin(), pool.end(), f);
+			std::for_each(pooled.begin(), pooled.end(), f);
 		}
 
 		void for_each(std::function<void(const T&)> f) const {
-			std::for_each(pool.begin(), pool.end(), f);
+			std::for_each(pooled.begin(), pooled.end(), f);
 		}
 
 		T& get(id_type object) {
