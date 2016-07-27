@@ -156,6 +156,7 @@ std::wstring multiverse::summary(bool detailed) const {
 
 	result += writing_savefile.summary();
 	result += reading_savefile.summary();
+	result += duplication.summary();
 
 	return result;
 }
