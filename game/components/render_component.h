@@ -7,11 +7,7 @@
 
 namespace components {
 	struct render {
-		transform previous_transform;
-		transform saved_actual_transform;
-
 		bool interpolate = true;
-		bool snap_interpolation_when_close = true;
 
 		render_layer layer = render_layer::INVALID;
 
@@ -25,11 +21,7 @@ namespace components {
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(
-				CEREAL_NVP(previous_transform),
-				CEREAL_NVP(saved_actual_transform),
-
 				CEREAL_NVP(interpolate),
-				CEREAL_NVP(snap_interpolation_when_close),
 
 				CEREAL_NVP(layer),
 
@@ -40,10 +32,6 @@ namespace components {
 
 				CEREAL_NVP(last_step_when_visible)
 			);
-		}
-
-		vec2 interpolation_direction() const {
-			return saved_actual_transform.pos - previous_transform.pos;
 		}
 	};
 }

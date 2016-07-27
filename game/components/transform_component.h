@@ -7,9 +7,20 @@ namespace components {
 		vec2 pos;
 		float rotation = 0.0f;
 
+		struct {
+			vec2 pos;
+			float rotation = 0.0f;
+
+			operator transform() const {
+				return{ pos, rotation };
+			}
+		} previous;
+
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(
+				CEREAL_NVP(previous.pos),
+				CEREAL_NVP(previous.rotation),
 				CEREAL_NVP(pos),
 				CEREAL_NVP(rotation)
 			);
@@ -48,6 +59,10 @@ namespace components {
 		void reset() {
 			pos.reset();
 			rotation = 0.f;
+		}
+
+		vec2 interpolation_direction() const {
+			return pos - previous.pos;
 		}
 	};
 }

@@ -181,7 +181,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing(fixed_step& step) {
 				// LOG("%x, %x, %x", *(vec2i*)&player_pos, *(vec2i*)&camera.previous_step_player_position, *(vec2i*)&target_value);
 			}
 			else {
-				target_value = cosmos[camera.entity_to_chase].get<components::render>().interpolation_direction();
+				target_value = cosmos[camera.entity_to_chase].get<components::transform>().interpolation_direction();
 				target_value.set_length(100);
 				camera.smoothing_player_pos.averages_per_sec = 5;
 			}
