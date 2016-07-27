@@ -29,45 +29,19 @@ namespace components {
 			);
 		}
 		
-		transform(float x, float y, float rotation = 0.0f) : pos(vec2(x, y)), rotation(rotation) {}
-		transform(vec2 pos = vec2(), float rotation = 0.0f) : pos(pos), rotation(rotation) {}
-		transform(previous_state state) : transform(state.pos, state.rotation) {}
+		transform(float x, float y, float rotation = 0.0f);
+		transform(vec2 pos = vec2(), float rotation = 0.0f);
+		transform(previous_state state);
 
-		transform operator+(const transform& b) const {
-			transform out;
-			out.pos = pos + b.pos;
-			out.rotation = rotation + b.rotation;
-			return out;
-		}		
-		
-		transform operator-(const transform& b) const {
-			transform out;
-			out.pos = pos - b.pos;
-			out.rotation = rotation - b.rotation;
-			return out;
-		}
+		transform operator+(const transform& b) const;
+		transform operator-(const transform& b) const;
+		transform& operator+=(const transform& b);
+		bool operator==(const transform& b) const;
 
-		transform& operator+=(const transform& b) {
-			(*this) = (*this) + b;
-			return *this;
-		}
-
-		bool operator==(const transform& b) const {
-			return pos == b.pos && rotation == b.rotation;
-		}
-
-		void flip_rotation() {
-			rotation = -rotation;
-		}
-
-		void reset() {
-			pos.reset();
-			rotation = 0.f;
-		}
-
-		vec2 interpolation_direction() const {
-			return pos - previous.pos;
-		}
+		transform interpolated(float ratio, float epsilon = 1.f) const;
+		void flip_rotation();
+		void reset();
+		vec2 interpolation_direction() const;
 	};
 }
 

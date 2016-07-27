@@ -230,6 +230,7 @@ namespace ingredients {
 		if (previously_controlled_character.alive()) {
 			previously_controlled_character.get<components::processing>().disable_in(processing_subjects::WITH_INPUT_RECEIVER);
 			previously_controlled_character.get<components::processing>().disable_in(processing_subjects::WITH_GUI_ELEMENT);
+			previously_controlled_character.get<components::render>().interpolate = true;
 
 			auto crosshair = previously_controlled_character[sub_entity_name::CHARACTER_CROSSHAIR];
 			crosshair.get<components::processing>().disable_in(processing_subjects::WITH_INPUT_RECEIVER);
@@ -240,6 +241,7 @@ namespace ingredients {
 		auto crosshair = next_character[sub_entity_name::CHARACTER_CROSSHAIR];
 
 		next_character.map_associated_entity(associated_entity_name::WATCHING_CAMERA, camera);
+		next_character.get<components::render>().interpolate = false;
 
 		next_character.get<components::processing>().enable_in(processing_subjects::WITH_INPUT_RECEIVER);
 		next_character.get<components::processing>().enable_in(processing_subjects::WITH_GUI_ELEMENT);

@@ -60,13 +60,15 @@ void components::camera::configure_camera_and_character_with_crosshair(entity_ha
 	update_bounds_for_crosshair(camera.get<components::camera>(), crosshair.get<components::crosshair>());
 }
 
-vec2i components::camera::get_camera_offset_due_to_character_crosshair(cosmos& cosmos) const {
+vec2i components::camera::get_camera_offset_due_to_character_crosshair(const cosmos& cosmos) const {
 	vec2 camera_crosshair_offset;
 
-	if (cosmos[entity_to_chase].dead())
+	auto entity_to_chase = cosmos[this->entity_to_chase];
+
+	if (entity_to_chase.dead())
 		return vec2i(0, 0);
 
-	auto crosshair_entity = cosmos.get_handle(entity_to_chase)[sub_entity_name::CHARACTER_CROSSHAIR];
+	auto crosshair_entity = entity_to_chase[sub_entity_name::CHARACTER_CROSSHAIR];
 
 	/* if we set player and crosshair entity targets */
 	/* skip calculations if no orbit_mode is specified */
@@ -151,9 +153,11 @@ void camera_system::resolve_cameras_transforms_and_smoothing(fixed_step& step) {
 			smoothed_visible_world_area = camera.last_ortho_interpolant;
 		}
 
-		if (cosmos[camera.entity_to_chase].alive()) {
+		auto entity_to_chase = cosmos[camera.entity_to_chase];
+
+		if (entity_to_chase.alive()) {
 			vec2 target_value;
-			auto entity_to_chase = cosmos[camera.entity_to_chase];
+
 			if (entity_to_chase.has<components::physics>()) {
 				auto& physics = entity_to_chase.get<components::physics>();
 

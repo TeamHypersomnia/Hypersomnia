@@ -82,13 +82,7 @@ void render_system::draw_entities(augs::vertex_triangle_buffer& output, std::vec
 				components::transform renderable_transform = transform;
 
 				if (interpolation_enabled && render.interpolate) {
-					components::transform interpolated_transform = augs::interp(
-						components::transform(transform.previous), transform, interpolation_ratio);
-
-					if ((transform.pos - interpolated_transform.pos).length_sq() > 1.f)
-						renderable_transform.pos = interpolated_transform.pos;
-					if (tabs(transform.rotation - interpolated_transform.rotation) > 1.f)
-						renderable_transform.rotation = interpolated_transform.rotation;
+					renderable_transform = transform.interpolated(interpolation_ratio);
 				}
 				//else {
 				//	renderable_transform = transform;

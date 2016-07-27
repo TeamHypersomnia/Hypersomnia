@@ -104,6 +104,9 @@ void multiverse::simulate() {
 					main_cosmos_timer = stashed_timer;
 					duplication.end_measurement();
 				}
+				if (raw_input.key == window::event::keys::F10) {
+					main_cosmos.significant.settings.enable_interpolation = !main_cosmos.significant.settings.enable_interpolation;
+				}
 			}
 		}
 

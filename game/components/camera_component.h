@@ -16,7 +16,6 @@ class cosmos;
 
 namespace components {
 	struct camera  {
-
 		enum orbit_type {
 			NONE,
 			ANGLED,
@@ -75,7 +74,7 @@ namespace components {
 		}
 
 		static void configure_camera_and_character_with_crosshair(entity_handle camera, entity_handle character, entity_handle crosshair);
-		vec2i get_camera_offset_due_to_character_crosshair(cosmos& cosmos) const;
+		vec2i get_camera_offset_due_to_character_crosshair(const cosmos& cosmos) const;
 
 	private:
 		friend class camera_system;
