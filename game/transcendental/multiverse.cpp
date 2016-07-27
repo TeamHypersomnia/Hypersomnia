@@ -104,6 +104,7 @@ void multiverse::simulate() {
 					main_cosmos = stashed_cosmos;
 					main_cosmos_timer = stashed_timer;
 					duplication.end_measurement();
+					LOG_COLOR(console_color::YELLOW, "Separator");
 				}
 				if (raw_input.key == window::event::keys::F10) {
 					main_cosmos.significant.settings.enable_interpolation = !main_cosmos.significant.settings.enable_interpolation;

@@ -90,6 +90,9 @@ cosmos& cosmos::operator=(const cosmos& b) {
 }
 
 cosmos& cosmos::operator=(const significant_state& b) {
+	this->~cosmos();
+	new (this) cosmos;
+
 	significant = b;
 	complete_resubstantialization();
 	return *this;

@@ -18,6 +18,7 @@ namespace components {
 		entity_id character_entity_to_chase;
 		vec2 base_offset;
 		vec2 bounds_for_base_offset;
+
 		vec2 visible_world_area;
 		vec2 max_look_expand;
 
@@ -30,9 +31,14 @@ namespace components {
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(
-				CEREAL_NVP(character_entity_to_chase), 
+				CEREAL_NVP(orbit_mode),
+
+				CEREAL_NVP(character_entity_to_chase),
 				CEREAL_NVP(base_offset), 
-				CEREAL_NVP(bounds_for_base_offset), 
+				CEREAL_NVP(bounds_for_base_offset),
+
+				CEREAL_NVP(visible_world_area),
+				CEREAL_NVP(max_look_expand),
 				
 				CEREAL_NVP(rotation_offset), 
 				CEREAL_NVP(size_multiplier), 
