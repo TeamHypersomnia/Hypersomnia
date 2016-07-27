@@ -26,6 +26,8 @@ namespace rendering_scripts {
 		auto& dynamic_tree = cosmos.temporary_systems.get<dynamic_tree_system>();
 		auto& physics = cosmos.temporary_systems.get<physics_system>();
 
+		auto interpolation_ratio = step.get_delta().view_interpolation_ratio();
+
 		step.visible_entities = cosmos[dynamic_tree.determine_visible_entities_from_camera(state, physics)];
 		step.visible_per_layer = render_system().get_visible_per_layer(step.visible_entities);
 
@@ -42,7 +44,7 @@ namespace rendering_scripts {
 		}
 		
 		for (int i = render_layer::UNDER_GROUND; i > render_layer::DYNAMIC_BODY; --i) {
-			render_system().draw_entities(output, step.visible_per_layer[i], state);
+			render_system().draw_entities(output, step.visible_per_layer[i], state, interpolation_ratio);
 		}
 
 		renderer.call_triangles();
@@ -54,7 +56,7 @@ namespace rendering_scripts {
 			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
 		}
 		
-		render_system().draw_entities(output, step.visible_per_layer[render_layer::DYNAMIC_BODY], state, true);
+		render_system().draw_entities(output, step.visible_per_layer[render_layer::DYNAMIC_BODY], state, interpolation_ratio, true);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
@@ -62,7 +64,7 @@ namespace rendering_scripts {
 		default_shader.use();
 
 		for (int i = render_layer::DYNAMIC_BODY; i >= 0; --i) {
-			render_system().draw_entities(output, step.visible_per_layer[i], state);
+			render_system().draw_entities(output, step.visible_per_layer[i], state, interpolation_ratio);
 		}
 
 		renderer.call_triangles();

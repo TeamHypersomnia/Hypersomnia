@@ -7,27 +7,31 @@ namespace components {
 		vec2 pos;
 		float rotation = 0.0f;
 
-		struct {
+		struct previous_state {
 			vec2 pos;
 			float rotation = 0.0f;
 
-			operator transform() const {
-				return{ pos, rotation };
+			template <class Archive>
+			void serialize(Archive& ar) {
+				ar(
+					CEREAL_NVP(pos),
+					CEREAL_NVP(rotation)
+				);
 			}
 		} previous;
 
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(
-				CEREAL_NVP(previous.pos),
-				CEREAL_NVP(previous.rotation),
+				CEREAL_NVP(previous),
 				CEREAL_NVP(pos),
 				CEREAL_NVP(rotation)
 			);
 		}
-
+		
 		transform(float x, float y, float rotation = 0.0f) : pos(vec2(x, y)), rotation(rotation) {}
 		transform(vec2 pos = vec2(), float rotation = 0.0f) : pos(pos), rotation(rotation) {}
+		transform(previous_state state) : transform(state.pos, state.rotation) {}
 
 		transform operator+(const transform& b) const {
 			transform out;

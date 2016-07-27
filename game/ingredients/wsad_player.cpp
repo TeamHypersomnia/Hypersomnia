@@ -315,8 +315,7 @@ namespace prefabs {
 
 			auto& render = recoil += components::render();
 			render.layer = render_layer::OVER_CROSSHAIR;
-			render.interpolate = true;
-			render.snap_interpolation_when_close = false;
+			render.interpolate = false;
 			ingredients::make_always_visible(recoil);
 
 			auto& info = colliders.new_collider();

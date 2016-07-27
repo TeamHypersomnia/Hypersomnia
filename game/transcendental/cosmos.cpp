@@ -220,6 +220,10 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	//gui_system().suppress_inputs_meant_for_gui();
 	//gui_system().switch_to_gui_mode_and_back();
 
+	performance.start(meter_type::INTERPOLATION);
+	render_system().set_current_transforms_as_previous_for_interpolation(cosmos);
+	performance.stop(meter_type::INTERPOLATION);
+
 	performance.start(meter_type::LOGIC);
 	
 	input_system().make_intents_from_raw_entropy(step);
