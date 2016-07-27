@@ -111,7 +111,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing(fixed_step& step) {
 
 		if (camera.enable_smoothing) {
 			/* variable time step camera smoothing by averaging last position with the current */
-			float averaging_constant = 1.0f - static_cast<float>(pow(camera.smoothing_average_factor, camera.averages_per_sec * cosmos.delta.in_seconds()));
+			float averaging_constant = 1.0f - static_cast<float>(pow(camera.smoothing_average_factor, camera.averages_per_sec * delta.in_seconds()));
 
 			if (camera.dont_smooth_once)
 				averaging_constant = 0.0f;
@@ -166,7 +166,7 @@ void camera_system::resolve_cameras_transforms_and_smoothing(fixed_step& step) {
 					camera.previous_step_player_position = player_pos;
 				}
 
-				target_value = (player_pos - camera.previous_seen_player_position) * cosmos.delta.in_milliseconds();
+				target_value = (player_pos - camera.previous_seen_player_position) * delta.in_milliseconds();
 				auto vel = physics.velocity();
 
 				if (target_value.length() < camera.smoothing_player_pos.value.length())

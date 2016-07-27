@@ -26,7 +26,7 @@
 namespace scene_managers {
 	void testbed::populate_world_with_entities(fixed_step& step) {
 		auto& world = step.cosm;
-		vec2i size = step.cosm.settings.screen_size;
+		vec2i size = step.cosm.significant.settings.screen_size;
 
 		auto crate = prefabs::create_crate(world, vec2(200, 200 + 300), vec2i(100, 100) / 3);
 		auto crate2 = prefabs::create_crate(world, vec2(400, 200 + 400), vec2i(300, 300));
@@ -198,7 +198,7 @@ namespace scene_managers {
 			perform_transfer({ new_item, new_characters[5][slot_function::PRIMARY_HAND] }, step);
 		}
 
-		auto& active_context = world.settings.input;
+		auto& active_context = world.significant.settings.input;
 
 		active_context.map_key_to_intent(window::event::keys::W, intent_type::MOVE_FORWARD);
 		active_context.map_key_to_intent(window::event::keys::S, intent_type::MOVE_BACKWARD);
@@ -227,12 +227,12 @@ namespace scene_managers {
 		//draw_bodies.push_back(new_characters[0]);
 		//draw_bodies.push_back(backpack);
 
-		world.settings.visibility.epsilon_ray_distance_variation = 0.001;
-		world.settings.visibility.epsilon_threshold_obstacle_hit = 10;
-		world.settings.visibility.epsilon_distance_vertex_hit = 1;
+		world.significant.settings.visibility.epsilon_ray_distance_variation = 0.001;
+		world.significant.settings.visibility.epsilon_threshold_obstacle_hit = 10;
+		world.significant.settings.visibility.epsilon_distance_vertex_hit = 1;
 
-		world.settings.pathfinding.draw_memorised_walls = 1;
-		world.settings.pathfinding.draw_undiscovered = 1;
+		world.significant.settings.pathfinding.draw_memorised_walls = 1;
+		world.significant.settings.pathfinding.draw_undiscovered = 1;
 
 		characters = to_id_vector(new_characters);
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);

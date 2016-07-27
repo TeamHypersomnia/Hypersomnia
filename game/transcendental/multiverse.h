@@ -8,10 +8,14 @@
 
 class game_window;
 
+namespace augs {
+	class renderer;
+}
+
 class multiverse {
 	scene_managers::testbed main_cosmos_manager;
 
-	cosmos stashed_cosmos;
+	cosmos::significant_state stashed_cosmos;
 	augs::fixed_delta_timer stashed_timer;
 public:
 	mutable augs::variable_delta_timer frame_timer;

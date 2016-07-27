@@ -13,44 +13,29 @@ namespace augs {
 
 	public:
 		typedef pool_with_meta<aggregate_type, aggregate_meta> aggregate_pool_type;
-
-		aggregate_pool_type pool_for_aggregates;
-		tuple_of_t<make_pool, components...> pools_for_components;
-
-		template<class T>
-		auto& get_pool(pool_id<T>) {
-			return std::get<pool<T>>(pools_for_components);
-		}
-
-		template<class T>
-		const auto& get_pool(pool_id<T>) const {
-			return std::get<pool<T>>(pools_for_components);
-		}
-
-		auto& get_pool(aggregate_id) {
-			return pool_for_aggregates;
-		}
-
-		const auto& get_pool(aggregate_id) const {
-			return pool_for_aggregates;
-		}
+		typedef tuple_of_t<make_pool, components...> component_pools_type;
 
 		size_t aggregates_count() const {
-			return pool_for_aggregates.size();
+			const auto& self = *static_cast<const derived*>(this);
+			return self.get_pool(aggregate_id()).size();
 		}
 
 		void reserve_storage_for_aggregates(size_t n) {
-			pool_for_aggregates.initialize_space(n);
+			auto& self = *static_cast<derived*>(this);
 
-			auto r = [n](auto& component_pool) {
+			self.get_pool(aggregate_id()).initialize_space(n);
+
+			auto r = [&self, n](auto c) {
+				auto& component_pool = self.get_pool(pool_id<decltype(c)>());
 				component_pool.initialize_space(n);
 			};
 
-			for_each_in_tuple(pools_for_components, r);
+			for_each_type<components...>(r);
 		}
 
 		aggregate_id allocate_aggregate(std::string debug_name = std::string()) {
-			aggregate_id new_id = pool_for_aggregates.allocate();
+			auto& self = *static_cast<derived*>(this);
+			aggregate_id new_id = self.get_pool(aggregate_id()).allocate();
 			new_id.set_debug_name(debug_name);
 
 			return new_id;
@@ -61,7 +46,7 @@ namespace augs {
 
 			auto cloned_aggregate = self.get_handle(cloned_aggregate_id);
 
-			auto new_aggregate = self.get_handle(pool_for_aggregates.allocate());
+			auto new_aggregate = self.get_handle(self.get_pool(aggregate_id()).allocate());
 
 			for_each_type<components...>([&cloned_aggregate, &new_aggregate](auto c) {
 				if (cloned_aggregate.template has<decltype(c)>())
@@ -83,7 +68,7 @@ namespace augs {
 					handle.template remove<decltype(c)>();
 			});
 
-			pool_for_aggregates.free(aggregate);
+			self.get_pool(aggregate_id()).free(aggregate);
 		}
 	};
 

@@ -21,5 +21,5 @@ vec2 viewing_step::get_screen_space(vec2 pos) const {
 fixed_step::fixed_step(cosmos& cosm, cosmic_entropy entropy) : cosm(cosm), entropy(entropy) {}
 
 augs::fixed_delta fixed_step::get_delta() const {
-	return cosm.delta;
+	return cosm.significant.delta;
 }

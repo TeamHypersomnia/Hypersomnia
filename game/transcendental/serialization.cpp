@@ -54,12 +54,12 @@ void multiverse::load_cosmos_from_file(std::string filename) {
 	reading_savefile.end_measurement();
 }
 
-bool cosmos::operator==(const cosmos& second) const {
+bool cosmos::significant_state::operator==(const significant_state& second) const {
 	std::ostringstream this_serialized;
 	std::ostringstream second_serialized;
 	
-	cosmos c1; c1.clone_significant_from(*this);
-	cosmos c2; c2.clone_significant_from(second);
+	significant_state c1 = *this;
+	significant_state c2 = second;
 
 	{
 		cereal::BinaryOutputArchive ar(this_serialized);
@@ -78,6 +78,6 @@ bool cosmos::operator==(const cosmos& second) const {
 	return cosmoi_identical;
 }
 
-bool cosmos::operator!=(const cosmos& second) const {
+bool cosmos::significant_state::operator!=(const significant_state& second) const {
 	return !operator==(second);
 }

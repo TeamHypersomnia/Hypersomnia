@@ -52,18 +52,22 @@ void cosmos::complete_resubstantialization() {
 	temporary_systems.~storage_for_all_temporary_systems();
 	new (&temporary_systems) storage_for_all_temporary_systems;
 
-	size_t n = pool_for_aggregates.capacity();
+	size_t n = significant.pool_for_aggregates.capacity();
 
 	temporary_systems.for_each([n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
 	});
 
-	pool_for_aggregates.for_each_id([this](entity_id id) {
+	significant.pool_for_aggregates.for_each_id([this](entity_id id) {
 		auto h = get_handle(id);
 		complete_resubstantialization(h);
 	});
 
 	profiler.complete_resubstantiation.end_measurement();
+}
+
+cosmos::significant_state::significant_state(const cosmos& b) {
+	*this = b.significant;
 }
 
 cosmos::cosmos() {
@@ -73,20 +77,24 @@ cosmos::cosmos(const cosmos& b) {
 	*this = b;
 }
 
-void cosmos::clone_significant_from(const cosmos& b) {
-	settings = b.settings;
-	current_step_number = b.current_step_number;
-	delta = b.delta;
-	pool_for_aggregates = b.pool_for_aggregates;
-	pools_for_components = b.pools_for_components;
+bool cosmos::operator==(const cosmos& b) const {
+	return significant == b.significant;
+}
+
+bool cosmos::operator!=(const cosmos& b) const {
+	return !operator==(b);
 }
 
 cosmos& cosmos::operator=(const cosmos& b) {
-	clone_significant_from(b);
-	complete_resubstantialization();
+	operator=(b.significant);
 	return *this;
 }
 
+cosmos& cosmos::operator=(const significant_state& b) {
+	significant = b;
+	complete_resubstantialization();
+	return *this;
+}
 
 void cosmos::complete_resubstantialization(entity_handle h) {
 	temporary_systems.for_each([h](auto& sys) {
@@ -121,7 +129,7 @@ std::vector<const_entity_handle> cosmos::get(processing_subjects list) const {
 }
 
 randomization cosmos::get_rng_for(entity_id id) const {
-	return{ id.version + id.indirection_index + static_cast<size_t>(delta.get_total_steps_passed()) };
+	return{ id.version + id.indirection_index + static_cast<size_t>(significant.delta.get_total_steps_passed()) };
 }
 
 entity_handle cosmos::get_handle(entity_id id) {
@@ -185,7 +193,7 @@ size_t cosmos::entities_count() const {
 }
 
 size_t cosmos::get_maximum_entities() const {
-	return pool_for_aggregates.capacity();
+	return significant.pool_for_aggregates.capacity();
 }
 
 void cosmos::advance_deterministic_schemata(cosmic_entropy input, fixed_callback pre_solve, fixed_callback post_solve) {
@@ -315,6 +323,5 @@ void cosmos::advance_deterministic_schemata(fixed_step& step) {
 	rotation_copying_system().update_rotations(step.cosm);
 
 	profiler.raycasts.measure(temporary_systems.get<physics_system>().ray_casts_since_last_step);
-	++current_step_number;
 	performance.stop(meter_type::LOGIC);
 }

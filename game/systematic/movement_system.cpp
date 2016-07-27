@@ -47,6 +47,7 @@ void movement_system::set_movement_flags_from_input(fixed_step& step) {
 
 void movement_system::apply_movement_forces(cosmos& cosmos) {
 	auto& physics_sys = cosmos.temporary_systems.get<physics_system>();
+	auto delta = cosmos.significant.delta;
 
 	auto targets = cosmos.get(processing_subjects::WITH_MOVEMENT);
 	for (auto it : targets) {
@@ -60,7 +61,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 		resultant.y = movement.moving_backward * movement.input_acceleration_axes.y - movement.moving_forward * movement.input_acceleration_axes.y;
 
 		if (!it.has<components::physics>()) {
-			it.get<components::transform>().pos += resultant * cosmos.delta.in_seconds();
+			it.get<components::transform>().pos += resultant * delta.in_seconds();
 			continue;
 		}
 
@@ -70,7 +71,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 			continue;
 
 		if (movement.make_inert_for_ms > 0.f) {
-			movement.make_inert_for_ms -= static_cast<float>(cosmos.delta.in_milliseconds());
+			movement.make_inert_for_ms -= static_cast<float>(delta.in_milliseconds());
 			physics.set_linear_damping(2);
 		}
 		else

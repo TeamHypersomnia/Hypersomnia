@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include "game/transcendental/cosmic_entropy.h"
 
 #include "augs/entity_system/storage_for_components_and_aggregates.h"
@@ -13,8 +14,6 @@
 #include "game/temporary_systems/physics_system.h"
 #include "game/temporary_systems/processing_lists_system.h"
 
-#include "game/systematic/gui_system.h"
-
 #include "augs/misc/delta.h"
 #include "augs/misc/pool_handlizer.h"
 
@@ -24,8 +23,6 @@
 #include "game/detail/inventory_slot_handle_declaration.h"
 #include "game/global/all_settings.h"
 #include "game/transcendental/cosmic_profiler.h"
-#include "game/transcendental/step.h"
-#include <functional>
 
 class cosmos : private storage_for_all_components_and_aggregates, public augs::pool_handlizer<cosmos>
 {
@@ -36,31 +33,47 @@ public:
 	typedef std::function<void(viewing_step&)> variable_callback;
 
 	storage_for_all_temporary_systems temporary_systems;
-	all_settings settings;
-
-	unsigned long long current_step_number = 0;
-	augs::fixed_delta delta;
-
 	cosmic_profiler profiler;
+
+	class significant_state {
+	public:
+		significant_state() = default;
+		significant_state(const cosmos&);
+
+		all_settings settings;
+
+		augs::fixed_delta delta;
+
+		aggregate_pool_type pool_for_aggregates;
+		component_pools_type pools_for_components;
+
+		template <class Archive>
+		void serialize(Archive& ar) {
+			ar(
+				CEREAL_NVP(settings),
+
+				CEREAL_NVP(delta),
+
+				CEREAL_NVP(pool_for_aggregates),
+				CEREAL_NVP(pools_for_components)
+			);
+		}
+
+		bool operator==(const significant_state&) const;
+		bool operator!=(const significant_state&) const;
+
+	} significant;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
-		ar(
-			CEREAL_NVP(settings),
-			CEREAL_NVP(current_step_number),
-			CEREAL_NVP(delta),
-			CEREAL_NVP(pool_for_aggregates),
-			CEREAL_NVP(pools_for_components)
-		);
-		
+		ar(CEREAL_NVP(significant));
 		complete_resubstantialization();
 	}
 
 	cosmos();
 	cosmos(const cosmos&);
 	cosmos& operator=(const cosmos&);
-
-	void clone_significant_from(const cosmos&);
+	cosmos& operator=(const significant_state&);
 
 	bool operator==(const cosmos&) const;
 	bool operator!=(const cosmos&) const;
@@ -102,5 +115,21 @@ public:
 	size_t get_maximum_entities() const;
 	std::wstring summary() const;
 
-	using storage_for_all_components_and_aggregates::get_pool;
+	template<class T>
+	auto& get_pool(augs::pool_id<T>) {
+		return std::get<augs::pool<T>>(significant.pools_for_components);
+	}
+
+	template<class T>
+	const auto& get_pool(augs::pool_id<T>) const {
+		return std::get<augs::pool<T>>(significant.pools_for_components);
+	}
+
+	auto& get_pool(entity_id) {
+		return significant.pool_for_aggregates;
+	}
+
+	const auto& get_pool(entity_id) const {
+		return significant.pool_for_aggregates;
+	}
 };

@@ -64,7 +64,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests(fixed_step& step
 				item_slot_transfer_request request(item_entity, item_entity.determine_pickup_target_slot_in(detector));
 
 				if (request.target_slot.alive()) {
-					if (item_slot_transfers->pickup_timeout.try_to_fire_and_reset(cosmos.delta)) {
+					if (item_slot_transfers->pickup_timeout.try_to_fire_and_reset(delta)) {
 						perform_transfer(request, step);
 					}
 				}
@@ -151,7 +151,7 @@ void item_system::process_mounting_and_unmounting(fixed_step& step) {
 				ensure(item.intended_mounting != item.current_mounting);
 
 				if (item.montage_time_left_ms > 0) {
-					item.montage_time_left_ms -= static_cast<float>(cosmos.delta.in_milliseconds());
+					item.montage_time_left_ms -= static_cast<float>(delta.in_milliseconds());
 				}
 				else {
 					item.current_mounting = item.intended_mounting;

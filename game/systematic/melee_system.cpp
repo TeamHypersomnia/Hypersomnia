@@ -67,7 +67,7 @@ void melee_system::initiate_and_update_moves(fixed_step& step) {
 	- fixed delta timestep if it's a logic procedure 
 	- variable frame time if it is a rendering-time procedure 
 	*/
-	auto dt = static_cast<float>(cosmos.delta.in_milliseconds());
+	auto dt = static_cast<float>(delta.in_milliseconds());
 
 	/* clear melee swing response queue because this is the only place where we send them */
 	step.messages.get_queue<messages::melee_swing_response>().clear();

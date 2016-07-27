@@ -28,7 +28,7 @@ using namespace augs::window;
 
 void input_system::make_intents_from_raw_entropy(fixed_step& step) {
 	auto& cosmos = step.cosm;
-	auto& context = cosmos.settings.input;
+	auto& context = cosmos.significant.settings.input;
 
 	for (auto& per_entity : step.entropy.entropy_per_entity) {
 		for (auto& raw : per_entity.second) {

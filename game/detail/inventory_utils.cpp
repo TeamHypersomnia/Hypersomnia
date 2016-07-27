@@ -13,6 +13,7 @@
 
 #include "augs/templates.h"
 #include "augs/ensure.h"
+#include "game/transcendental/step.h"
 
 item_transfer_result query_transfer_result(const_item_slot_transfer_request r) {
 	item_transfer_result output;

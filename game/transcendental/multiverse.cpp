@@ -7,6 +7,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 #include "augs/misc/time_utils.h"
+#include "game/transcendental/step.h"
 
 multiverse::multiverse() 
 	: main_cosmos_timer(60, 5), stashed_timer(main_cosmos_timer)
@@ -35,7 +36,7 @@ bool multiverse::try_to_load_save() {
 void multiverse::populate_cosmoi() {
 	main_cosmos.reserve_storage_for_entities(50000);
 	
-	main_cosmos.delta = main_cosmos_timer.get_fixed_delta();
+	main_cosmos.significant.delta = main_cosmos_timer.get_fixed_delta();
 
 	main_cosmos.advance_deterministic_schemata(cosmic_entropy(), [this](fixed_step& step) {
 		main_cosmos_manager.populate_world_with_entities(step);
@@ -93,7 +94,7 @@ void multiverse::simulate() {
 				}
 				if (raw_input.key == window::event::keys::F8) {
 					duplication.new_measurement();
-					stashed_cosmos.clone_significant_from(main_cosmos);
+					stashed_cosmos = main_cosmos;
 					stashed_timer = main_cosmos_timer;
 					duplication.end_measurement();
 				}
@@ -110,7 +111,7 @@ void multiverse::simulate() {
 
 		renderer::get_current().clear_logic_lines();
 
-		main_cosmos.delta = main_cosmos_timer.get_fixed_delta();
+		main_cosmos.significant.delta = main_cosmos_timer.get_fixed_delta();
 
 		main_cosmos.advance_deterministic_schemata(cosmic_entropy_for_this_step,
 			[this](fixed_step& step) { main_cosmos_manager.pre_solve(step); },
@@ -128,7 +129,7 @@ void multiverse::view(game_window& window) const {
 
 	target.clear_current_fbo();
 
-	target.set_viewport({0, 0, main_cosmos.settings.screen_size.x, main_cosmos.settings.screen_size.y });
+	target.set_viewport({0, 0, main_cosmos.significant.settings.screen_size.x, main_cosmos.significant.settings.screen_size.y });
 
 	basic_viewing_step main_cosmos_viewing_step(main_cosmos, frame_timer.extract_variable_delta(main_cosmos_timer), target);
 	main_cosmos_manager.view_cosmos(main_cosmos_viewing_step);

@@ -30,7 +30,7 @@ void force_joint_system::apply_forces_towards_target_entities(fixed_step& step) 
 
 		if (force_joint.divide_transform_mode) {
 			auto current_transform = it.get<components::transform>();
-			auto interpolated = augs::interp(current_transform, chased_transform, 1.0 - 1.0 / (1.0 + cosmos.delta.in_seconds() * (60.0)));
+			auto interpolated = augs::interp(current_transform, chased_transform, 1.0 - 1.0 / (1.0 + delta.in_seconds() * (60.0)));
 			physics.set_transform(interpolated);
 		}
 		else {
