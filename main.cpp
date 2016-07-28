@@ -11,6 +11,7 @@
 
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/transcendental/entity_relations.h"
+#include "game/transcendental/viewing_session.h"
 
 #include "augs/filesystem/file.h"
 
@@ -21,20 +22,24 @@ int main(int argc, char** argv) {
 	game_window window;
 
 	window.call_window_script("config.lua");
+	vec2i screen_size = vec2i(window.window.get_screen_rect());
 
 	resource_manager.destroy_everything();
 	resource_setups::load_standard_everything();
 
 	multiverse hypersomnia;
+	hypersomnia.main_cosmos.significant.settings.screen_size = screen_size;
 
 	if (!hypersomnia.try_to_load_save()) {
-		hypersomnia.main_cosmos.settings.screen_size = vec2i(window.window.get_screen_rect());
 		hypersomnia.populate_cosmoi();
 	}
 	
 	hypersomnia.try_to_load_or_save_new_session();
 
 	window.window.set_as_current();
+
+	viewing_session session;
+	session.camera.configure_size(screen_size);
 
 	bool should_quit = false;
 
@@ -49,7 +54,7 @@ int main(int argc, char** argv) {
 
 		hypersomnia.control(new_entropy);
 		hypersomnia.simulate();
-		hypersomnia.view(window);
+		hypersomnia.view(window, session);
 	}
 
 	augs::global_libraries::deinit();
