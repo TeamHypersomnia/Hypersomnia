@@ -19,10 +19,12 @@ void force_joint_system::apply_forces_towards_target_entities(fixed_step& step) 
 	for (auto& it : targets) {
 		auto& physics = it.get<components::physics>();
 		auto& force_joint = it.get<components::force_joint>();
+		auto chased_entity = cosmos[force_joint.chased_entity];
 
-		if (cosmos[force_joint.chased_entity].dead()) continue;
+		if (chased_entity.dead()) continue;
 
-		auto chased_transform = cosmos[force_joint.chased_entity].get<components::transform>() + force_joint.chased_entity_offset;
+		auto chased_entity_transform = chased_entity.get<components::transform>();
+		auto chased_transform = chased_entity_transform + force_joint.chased_entity_offset;
 
 		auto direction = chased_transform.pos - physics.get_position();
 		auto distance = direction.length();
@@ -31,6 +33,7 @@ void force_joint_system::apply_forces_towards_target_entities(fixed_step& step) 
 		if (force_joint.divide_transform_mode) {
 			auto current_transform = it.get<components::transform>();
 			auto interpolated = augs::interp(current_transform, chased_transform, 1.0 - 1.0 / (1.0 + delta.in_seconds() * (60.0)));
+			//LOG("Cur: %x,%x, Chas: %x,%x, Inter: %x,%x", current_transform.pos, current_transform.rotation, chased_entity_transform.pos, chased_entity_transform.rotation, interpolated.pos, interpolated.rotation);
 			physics.set_transform(interpolated);
 		}
 		else {
