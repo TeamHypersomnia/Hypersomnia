@@ -24,6 +24,8 @@
 #include "game/global/all_settings.h"
 #include "game/transcendental/cosmic_profiler.h"
 
+class cosmic_delta;
+
 class cosmos : private storage_for_all_components_and_aggregates, public augs::pool_handlizer<cosmos>
 {
 	void advance_deterministic_schemata(fixed_step& step_state);
@@ -72,6 +74,8 @@ public:
 
 	cosmos();
 	cosmos(const cosmos&);
+	cosmos(const cosmos&, const cosmic_delta&);
+
 	cosmos& operator=(const cosmos&);
 	cosmos& operator=(const significant_state&);
 
