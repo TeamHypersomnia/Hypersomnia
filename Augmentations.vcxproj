@@ -291,6 +291,7 @@
     <ClCompile Include="augs\gui\rect_handle.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
     <ClCompile Include="augs\misc\pool_id.cpp" />
+    <ClCompile Include="augs\misc\streams.cpp" />
     <ClCompile Include="augs\misc\time_utils.cpp" />
     <ClCompile Include="game\detail\world_camera.cpp" />
     <ClCompile Include="game\transcendental\cosmic_delta.cpp" />
@@ -908,6 +909,7 @@
     <ClInclude Include="augs\misc\machine_entropy.h" />
     <ClInclude Include="augs\misc\pool_handlizer.h" />
     <ClInclude Include="augs\misc\stepped_timing.h" />
+    <ClInclude Include="augs\misc\streams.h" />
     <ClInclude Include="augs\misc\time_utils.h" />
     <ClInclude Include="game\detail\world_camera.h" />
     <ClInclude Include="game\transcendental\component_synchronizer.h" />

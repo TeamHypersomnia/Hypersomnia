@@ -981,6 +981,9 @@
     <ClCompile Include="game\transcendental\cosmic_delta.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="augs\misc\streams.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\Box2D\Collision\Shapes\b2ChainShape.h">
@@ -3048,6 +3051,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\transcendental\cosmic_delta.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\streams.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

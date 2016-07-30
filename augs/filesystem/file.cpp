@@ -8,16 +8,8 @@ namespace augs {
 	}
 
 	std::string get_file_contents(std::string filename) {
-		std::ifstream t(filename);
-		std::string script_file;
-
-		t.seekg(0, std::ios::end);
-		script_file.reserve(static_cast<unsigned>(t.tellg()));
-		t.seekg(0, std::ios::beg);
-
-		script_file.assign((std::istreambuf_iterator<char>(t)),
-			std::istreambuf_iterator<char>());
-
-		return script_file;
+		std::string result;
+		assign_file_contents(filename, result);
+		return result;
 	}
 }

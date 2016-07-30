@@ -1,3 +1,5 @@
+#include "augs/misc/streams.h"
+
 #include <cereal/cereal.hpp>
 #include <cereal/types/array.hpp>
 #include <cereal/types/vector.hpp>
@@ -16,6 +18,7 @@
 #include "multiverse.h"
 #include "cosmos.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
+#include "augs/filesystem/file.h"
 
 #include <fstream>
 #include <sstream>
@@ -23,10 +26,20 @@
 void multiverse::save_cosmos_to_file(std::string filename) {
 	writing_savefile.new_measurement();
 
-	std::ofstream out(filename, std::ios::out | std::ios::binary);
+	augs::output_stream_reserver reserver;
 
 	{
-		cereal::PortableBinaryOutputArchive ar(out);
+		cereal::BinaryOutputArchiveReserver ar(reserver);
+
+		ar(main_cosmos_timer);
+		ar(main_cosmos_manager);
+		ar(main_cosmos);
+	}
+
+	auto stream = reserver.make_stream();
+
+	{
+		cereal::PortableBinaryOutputArchive ar(stream);
 
 		ar(main_cosmos_timer);
 		ar(main_cosmos_manager);
@@ -34,17 +47,21 @@ void multiverse::save_cosmos_to_file(std::string filename) {
 	}
 
 	writing_savefile.end_measurement();
+
+	std::ofstream out(filename, std::ios::out | std::ios::binary);
+	out.write(stream.buf.data(), stream.buf.size());
 }
 
 void multiverse::load_cosmos_from_file(std::string filename) {
 	ensure(main_cosmos == cosmos());
 
+	augs::input_stream stream;
+	augs::assign_file_contents(filename, stream.buf);
+	
 	reading_savefile.new_measurement();
 
-	std::ifstream in(filename, std::ios::in | std::ios::binary);
-
 	{
-		cereal::PortableBinaryInputArchive ar(in);
+		cereal::PortableBinaryInputArchive ar(stream);
 
 		ar(main_cosmos_timer);
 		ar(main_cosmos_manager);
@@ -55,11 +72,24 @@ void multiverse::load_cosmos_from_file(std::string filename) {
 }
 
 bool cosmos::significant_state::operator==(const significant_state& second) const {
-	std::ostringstream this_serialized;
-	std::ostringstream second_serialized;
+	augs::output_stream_reserver this_serialized_reserver;
+	augs::output_stream_reserver second_serialized_reserver;
 	
 	significant_state c1 = *this;
 	significant_state c2 = second;
+
+	{
+		cereal::BinaryOutputArchiveReserver ar(this_serialized_reserver);
+		ar(c1);
+	}
+
+	{
+		cereal::BinaryOutputArchiveReserver ar(second_serialized_reserver);
+		ar(c2);
+	}
+
+	auto this_serialized = this_serialized_reserver.make_stream();
+	auto second_serialized = second_serialized_reserver.make_stream();
 
 	{
 		cereal::BinaryOutputArchive ar(this_serialized);
@@ -71,10 +101,7 @@ bool cosmos::significant_state::operator==(const significant_state& second) cons
 		ar(c2);
 	}
 
-	const auto& this_str = this_serialized.rdbuf()->str();
-	const auto& second_str = second_serialized.rdbuf()->str();
-	
-	bool cosmoi_identical = std::equal(this_str.begin(), this_str.end(), second_str.begin(), second_str.end()); 
+	bool cosmoi_identical = this_serialized == second_serialized;
 	return cosmoi_identical;
 }
 
