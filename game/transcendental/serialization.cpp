@@ -12,6 +12,7 @@
 #include <cereal/types/bitset.hpp>
 
 #include <cereal/archives/portable_binary_hacked.hpp>
+#include <cereal/archives/portable_binary.hpp>
 #include <cereal/archives/binary_hacked.hpp>
 
 #include "entity_relations.h"
@@ -55,13 +56,13 @@ void multiverse::save_cosmos_to_file(std::string filename) {
 }
 
 void multiverse::load_cosmos_from_file(std::string filename) {
+	reading_savefile.new_measurement();
+
 	ensure(main_cosmos == cosmos());
 
 	auto& stream = main_cosmos.reserved_memory_for_serialization;
-	augs::assign_file_contents(filename, stream.buf);
+	augs::assign_file_contents_binary(filename, stream.buf);
 	stream.reset_pos();
-
-	reading_savefile.new_measurement();
 
 	{
 		cereal::PortableBinaryInputArchiveHacked ar(stream);
@@ -73,6 +74,7 @@ void multiverse::load_cosmos_from_file(std::string filename) {
 
 	reading_savefile.end_measurement();
 }
+
 
 bool cosmos::significant_state::operator==(const significant_state& second) const {
 	augs::output_stream_reserver this_serialized_reserver;

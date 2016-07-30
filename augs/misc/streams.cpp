@@ -7,7 +7,7 @@ namespace augs {
 	}
 
 	bool stream::operator==(const stream& b) const {
-		return std::equal(buf.begin(), buf.end(), b.buf.begin(), b.buf.end());
+		return std::equal(data(), data() + size(), b.data(), b.data() + size());
 	}
 
 	size_t stream::size() const {
@@ -43,7 +43,7 @@ namespace augs {
 
 	void stream::reserve(size_t bytes) {
 		reset_pos();
-		buf.reserve(bytes);
+		buf.resize(bytes);
 	};
 	
 	void stream::reserve(const output_stream_reserver& r) {
