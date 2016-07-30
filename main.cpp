@@ -28,11 +28,13 @@ int main(int argc, char** argv) {
 	resource_setups::load_standard_everything();
 
 	multiverse hypersomnia;
-	hypersomnia.main_cosmos.significant.settings.screen_size = screen_size;
 
 	if (!hypersomnia.try_to_load_save()) {
+		hypersomnia.main_cosmos.significant.settings.screen_size = screen_size;
 		hypersomnia.populate_cosmoi();
 	}
+	else 
+		hypersomnia.main_cosmos.significant.settings.screen_size = screen_size;
 	
 	hypersomnia.try_to_load_or_save_new_session();
 
