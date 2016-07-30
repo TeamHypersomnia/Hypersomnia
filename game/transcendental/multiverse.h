@@ -18,8 +18,16 @@ class multiverse {
 	cosmos::significant_state stashed_cosmos;
 	augs::fixed_delta_timer stashed_timer;
 
+	augs::measurements total_load = augs::measurements(L"Total load", true, 1);
 	augs::measurements reading_savefile = augs::measurements(L"Loading savefile", true, 1);
+	augs::measurements deserialization_pass = augs::measurements(L"Deserialization pass", true, 1);
+
+	augs::measurements total_save = augs::measurements(L"Total save", true, 1);
+	augs::measurements size_calculation_pass = augs::measurements(L"Size calculation pass", true, 1);
+	augs::measurements memory_allocation_pass = augs::measurements(L"Memory allocation pass", true, 1);
+	augs::measurements serialization_pass = augs::measurements(L"Serialization pass", true, 1);
 	augs::measurements writing_savefile = augs::measurements(L"Writing savefile", true, 1);
+
 	augs::measurements duplication = augs::measurements(L"Duplication");
 
 	void print_summary(augs::renderer&, const viewing_session&) const;

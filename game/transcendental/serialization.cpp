@@ -25,8 +25,9 @@
 #include <sstream>
 
 void multiverse::save_cosmos_to_file(std::string filename) {
-	writing_savefile.new_measurement();
+	total_save.new_measurement();
 
+	size_calculation_pass.new_measurement();
 	augs::output_stream_reserver reserver;
 
 	{
@@ -36,11 +37,15 @@ void multiverse::save_cosmos_to_file(std::string filename) {
 		ar(main_cosmos_manager);
 		ar(main_cosmos.significant);
 	}
-
+	size_calculation_pass.end_measurement();
 
 	auto& stream = main_cosmos.reserved_memory_for_serialization;
-	//LOG("Reserved: %x; capacity already: %x", reserver.size * 1.2, stream.buf.capacity());
+
+	memory_allocation_pass.new_measurement();
 	stream.reserve(reserver.size * 1.2);
+	memory_allocation_pass.end_measurement();
+
+	serialization_pass.new_measurement();
 	{
 		cereal::PortableBinaryOutputArchiveHacked ar(stream);
 
@@ -48,19 +53,28 @@ void multiverse::save_cosmos_to_file(std::string filename) {
 		ar(main_cosmos_manager);
 		ar(main_cosmos);
 	}
+	serialization_pass.end_measurement();
 
+	writing_savefile.new_measurement();
 	write_file_binary(filename, stream.buf);
 	writing_savefile.end_measurement();
+	
+	total_save.end_measurement();
 }
 
 void multiverse::load_cosmos_from_file(std::string filename) {
-	reading_savefile.new_measurement();
-
+	total_load.new_measurement();
 	ensure(main_cosmos == cosmos());
 
 	auto& stream = main_cosmos.reserved_memory_for_serialization;
+	
+	reading_savefile.new_measurement();
 	augs::assign_file_contents_binary(filename, stream.buf);
+	reading_savefile.end_measurement();
+	
 	stream.reset_pos();
+
+	deserialization_pass.new_measurement();
 
 	{
 		cereal::PortableBinaryInputArchiveHacked ar(stream);
@@ -69,8 +83,9 @@ void multiverse::load_cosmos_from_file(std::string filename) {
 		ar(main_cosmos_manager);
 		ar(main_cosmos);
 	}
+	deserialization_pass.end_measurement();
 
-	reading_savefile.end_measurement();
+	total_load.end_measurement();
 }
 
 

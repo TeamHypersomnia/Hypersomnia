@@ -160,8 +160,16 @@ std::wstring multiverse::summary(bool detailed, const viewing_session& session) 
 		result += main_cosmos.profiler.sorted_summary();
 	}
 
+	result += total_save.summary();
+	result += size_calculation_pass.summary();
+	result += memory_allocation_pass.summary();
+	result += serialization_pass.summary();
 	result += writing_savefile.summary();
+
+	result += total_load.summary();
 	result += reading_savefile.summary();
+	result += deserialization_pass.summary();
+
 	result += duplication.summary();
 
 	return result;
