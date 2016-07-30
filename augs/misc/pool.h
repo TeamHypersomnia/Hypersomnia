@@ -4,8 +4,6 @@
 #include "pool_handle.h"
 #include "pool_handlizer.h"
 
-#define USE_NAMES_FOR_IDS
-
 namespace augs {
 	template<class T>
 	class basic_pool : public pool_handlizer<basic_pool<T>> {

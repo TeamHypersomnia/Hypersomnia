@@ -1,15 +1,12 @@
 #pragma once
-#define USE_NAMES_FOR_IDS
+#define USE_NAMES_FOR_IDS 0
 
-#ifdef USE_NAMES_FOR_IDS
 #include <string>
-#endif
-
 namespace augs {
 	class raw_pool_id {
 	public:
-#ifdef USE_NAMES_FOR_IDS
-		char debug_name[40];
+#if USE_NAMES_FOR_IDS
+		std::string debug_name;
 #endif
 		int version = 0xdeadbeef;
 		int indirection_index = -1;
@@ -30,7 +27,7 @@ namespace augs {
 
 		template <class Archive>
 		void serialize(Archive& ar) {
-#ifdef USE_NAMES_FOR_IDS
+#if USE_NAMES_FOR_IDS
 			ar(CEREAL_NVP(debug_name));
 #endif
 			ar(CEREAL_NVP(version), CEREAL_NVP(indirection_index));

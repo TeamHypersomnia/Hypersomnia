@@ -6,7 +6,7 @@
 namespace augs {
 	std::ostream& operator<<(std::ostream& out, const augs::raw_pool_id &x) {
 		out << "(" << x.indirection_index << ";" << x.version;
-#ifdef USE_NAMES_FOR_IDS
+#if USE_NAMES_FOR_IDS
 		out << ";" << x.get_debug_name();
 #endif
 		out << ")";
@@ -22,17 +22,16 @@ namespace augs {
 	}
 
 	void raw_pool_id::set_debug_name(std::string s) {
-#ifdef USE_NAMES_FOR_IDS
-		ensure(s.size() < sizeof(debug_name) / sizeof(char));
-		strcpy(debug_name, s.c_str());
+#if USE_NAMES_FOR_IDS
+		debug_name = s;
 #endif
 	}
 
 	std::string raw_pool_id::get_debug_name() const {
-#ifdef USE_NAMES_FOR_IDS
+#if USE_NAMES_FOR_IDS
 		return debug_name;
 #else
-		ensure(0);
+		return std::string();
 #endif
 	}
 

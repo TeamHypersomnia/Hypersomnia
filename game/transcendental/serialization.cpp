@@ -24,9 +24,10 @@
 #include <sstream>
 
 void multiverse::save_cosmos_to_file(std::string filename) {
+	writing_savefile.new_measurement();
+
 	augs::output_stream_reserver reserver;
 
-	writing_savefile.new_measurement();
 	{
 		cereal::BinaryOutputArchiveReserver ar(reserver);
 
@@ -34,6 +35,7 @@ void multiverse::save_cosmos_to_file(std::string filename) {
 		ar(main_cosmos_manager);
 		ar(main_cosmos.significant);
 	}
+
 
 	auto& stream = main_cosmos.reserved_memory_for_serialization;
 	//LOG("Reserved: %x; capacity already: %x", reserver.size * 1.2, stream.buf.capacity());
