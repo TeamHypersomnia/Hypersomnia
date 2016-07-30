@@ -1,6 +1,3 @@
-[submodule "3rdparty/cereal"]
-	path = 3rdparty/cereal
-	url = https://github.com/TeamHypersomnia/cereal.git
 [submodule "3rdparty/polypartition"]
 	path = 3rdparty/polypartition
 	url = https://github.com/TeamHypersomnia/polypartition.git
