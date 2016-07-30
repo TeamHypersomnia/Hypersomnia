@@ -60,12 +60,13 @@ void multiverse::load_cosmos_from_file(std::string filename) {
 
 	ensure(main_cosmos == cosmos());
 
-	auto& stream = main_cosmos.reserved_memory_for_serialization;
-	augs::assign_file_contents_binary(filename, stream.buf);
-	stream.reset_pos();
+	//auto& stream = main_cosmos.reserved_memory_for_serialization;
+	//augs::assign_file_contents_binary(filename, stream.buf);
+	//stream.reset_pos();
+	std::ifstream stream(filename, std::ios::in | std::ios::binary);
 
 	{
-		cereal::PortableBinaryInputArchiveHacked ar(stream);
+		cereal::PortableBinaryInputArchive ar(stream);
 
 		ar(main_cosmos_timer);
 		ar(main_cosmos_manager);
