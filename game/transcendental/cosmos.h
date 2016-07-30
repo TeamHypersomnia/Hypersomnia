@@ -1,5 +1,7 @@
 #pragma once
 #include <functional>
+#include <thread>
+#include "augs/misc/streams.h"
 #include "game/transcendental/cosmic_entropy.h"
 
 #include "augs/entity_system/storage_for_components_and_aggregates.h"
@@ -36,6 +38,7 @@ public:
 
 	storage_for_all_temporary_systems temporary_systems;
 	cosmic_profiler profiler;
+	augs::stream reserved_memory_for_serialization;
 
 	class significant_state {
 	public:

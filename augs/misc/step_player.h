@@ -60,7 +60,7 @@ namespace augs {
 				entry_type entry;
 
 				{
-					cereal::PortableBinaryInputArchive<I> ar(source);
+					cereal::PortableBinaryInputArchive ar(source);
 					ar(entry);
 				}
 

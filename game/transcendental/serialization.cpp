@@ -11,8 +11,8 @@
 #include <cereal/types/tuple.hpp>
 #include <cereal/types/bitset.hpp>
 
-#include <cereal/archives/portable_binary.hpp>
-#include <cereal/archives/binary.hpp>
+#include <cereal/archives/portable_binary_hacked.hpp>
+#include <cereal/archives/binary_hacked.hpp>
 
 #include "entity_relations.h"
 #include "multiverse.h"
@@ -24,44 +24,45 @@
 #include <sstream>
 
 void multiverse::save_cosmos_to_file(std::string filename) {
-	writing_savefile.new_measurement();
-
 	augs::output_stream_reserver reserver;
 
+	writing_savefile.new_measurement();
 	{
 		cereal::BinaryOutputArchiveReserver ar(reserver);
 
 		ar(main_cosmos_timer);
 		ar(main_cosmos_manager);
-		ar(main_cosmos);
+		ar(main_cosmos.significant);
 	}
 
-	auto stream = reserver.make_stream();
+	auto& stream = main_cosmos.reserved_memory_for_serialization;
+	//LOG("Reserved: %x; capacity already: %x", reserver.size * 1.2, stream.buf.capacity());
+	stream.reserve(reserver.size * 1.2);
 
 	{
-		cereal::PortableBinaryOutputArchive ar(stream);
+		cereal::PortableBinaryOutputArchiveHacked ar(stream);
 
 		ar(main_cosmos_timer);
 		ar(main_cosmos_manager);
 		ar(main_cosmos);
 	}
 
-	writing_savefile.end_measurement();
-
 	std::ofstream out(filename, std::ios::out | std::ios::binary);
-	out.write(stream.buf.data(), stream.buf.size());
+	out.write(stream.data(), stream.size());
+	writing_savefile.end_measurement();
 }
 
 void multiverse::load_cosmos_from_file(std::string filename) {
 	ensure(main_cosmos == cosmos());
 
-	augs::input_stream stream;
+	auto& stream = main_cosmos.reserved_memory_for_serialization;
 	augs::assign_file_contents(filename, stream.buf);
-	
+	stream.reset_pos();
+
 	reading_savefile.new_measurement();
 
 	{
-		cereal::PortableBinaryInputArchive ar(stream);
+		cereal::PortableBinaryInputArchiveHacked ar(stream);
 
 		ar(main_cosmos_timer);
 		ar(main_cosmos_manager);
@@ -92,12 +93,12 @@ bool cosmos::significant_state::operator==(const significant_state& second) cons
 	auto second_serialized = second_serialized_reserver.make_stream();
 
 	{
-		cereal::BinaryOutputArchive ar(this_serialized);
+		cereal::BinaryOutputArchiveHacked ar(this_serialized);
 		ar(c1);
 	}
 
 	{
-		cereal::BinaryOutputArchive ar(second_serialized);
+		cereal::BinaryOutputArchiveHacked ar(second_serialized);
 		ar(c2);
 	}
 
