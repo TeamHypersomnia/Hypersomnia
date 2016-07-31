@@ -91,6 +91,11 @@ struct put_all_components_into {
 	> type;
 };
 
+template<class... Types>
+struct type_count {
+	static const unsigned value = sizeof...(Types);
+};
+
 class cosmos;
 struct entity_relations;
 
@@ -101,3 +106,5 @@ namespace augs {
 
 typedef typename put_all_components_into<augs::storage_for_components_and_aggregates, cosmos, entity_relations>::type
 storage_for_all_components_and_aggregates;
+
+constexpr unsigned COMPONENTS_COUNT = put_all_components_into<type_count>::type::value;
