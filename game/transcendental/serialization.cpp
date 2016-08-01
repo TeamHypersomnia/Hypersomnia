@@ -42,7 +42,7 @@ void multiverse::save_cosmos_to_file(std::string filename) {
 	auto& stream = main_cosmos.reserved_memory_for_serialization;
 
 	memory_allocation_pass.new_measurement();
-	stream.reserve(reserver.size * 1.2);
+	stream.reserve(static_cast<size_t>(reserver.size() * 1.2));
 	memory_allocation_pass.end_measurement();
 
 	serialization_pass.new_measurement();

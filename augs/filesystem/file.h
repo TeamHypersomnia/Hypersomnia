@@ -29,7 +29,7 @@ namespace augs {
 		std::streamsize size = file.tellg();
 		file.seekg(0, std::ios::beg);
 
-		target.reserve(size);
+		target.reserve(static_cast<unsigned>(size));
 		file.read(target.data(), size);
 	}
 }

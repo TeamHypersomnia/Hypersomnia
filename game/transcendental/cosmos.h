@@ -78,11 +78,8 @@ public:
 	cosmos();
 	cosmos(const cosmos&);
 
-	template<class OutputStream>
-	void delta_encode(cosmos& base, OutputStream& to) const;
-	
-	template<class InputStream>
-	void delta_decode(InputStream& from, bool resubstantiate_partially = false);
+	void delta_encode(cosmos& base, augs::stream& to) const;
+	void delta_decode(augs::stream& from, bool resubstantiate_partially = false);
 
 	cosmos& operator=(const cosmos&);
 	cosmos& operator=(const significant_state&);
