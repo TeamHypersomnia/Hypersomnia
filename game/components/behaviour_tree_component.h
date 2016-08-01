@@ -4,6 +4,9 @@
 #include "game/resources/behaviour_tree.h"
 #include "game/assets/behaviour_tree_id.h"
 
+#include "game/container_sizes.h"
+#include "augs/misc/constant_size_vector.h"
+
 namespace components {
 	struct behaviour_tree {
 		struct instance {
@@ -17,7 +20,7 @@ namespace components {
 			}
 		};
 
-		std::vector<instance> concurrent_trees;
+		augs::constant_size_vector<instance, CONCURRENT_TREES_COUNT> concurrent_trees;
 
 		template <class Archive>
 		void serialize(Archive& ar) {

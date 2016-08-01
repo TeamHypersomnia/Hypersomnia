@@ -28,9 +28,8 @@ void relations_helpers<false, D>::make_cloned_sub_entities_recursive(entity_id f
 	for (auto id : from_rels.sub_entities)
 		add_sub_entity(cosmos.clone_entity(id));
 
-	for (int i = 0; i < int(sub_entity_name::COUNT); ++i) {
-		map_sub_entity((sub_entity_name)i, cosmos.clone_entity(from_rels.sub_entities_by_name[i]));
-	}
+	for (auto id : from_rels.sub_entities_by_name)
+		map_sub_entity(id.first, cosmos.clone_entity(id.second));
 }
 
 template <class D>
@@ -77,7 +76,7 @@ void relations_helpers<false, D>::add_sub_entity(entity_id p, sub_entity_name op
 template <class D>
 void relations_helpers<false, D>::map_sub_entity(sub_entity_name n, entity_id p) const {
 	make_child(p, n);
-	relations().sub_entities_by_name[int(n)] = p;
+	relations().sub_entities_by_name[n] = p;
 }
 
 template <bool C, class D>
@@ -95,7 +94,7 @@ typename basic_relations_helpers<C, D>::inventory_slot_handle_type basic_relatio
 template <bool C, class D>
 D basic_relations_helpers<C, D>::operator[](sub_entity_name child) const {
 	auto& self = *static_cast<const D*>(this);
-	return self.get_cosmos()[relations().sub_entities_by_name.at(int(child))];
+	return self.get_cosmos()[relations().sub_entities_by_name.at(child)];
 }
 
 template <bool C, class D>
@@ -118,7 +117,7 @@ sub_entity_name basic_relations_helpers<C, D>::get_name_as_sub_entity() const {
 template <bool C, class D>
 D basic_relations_helpers<C, D>::operator[](associated_entity_name assoc) const {
 	auto& self = *static_cast<const D*>(this);
-	return self.get_cosmos()[relations().associated_entities_by_name.at(int(assoc))];
+	return self.get_cosmos()[relations().associated_entities_by_name.at(assoc)];
 }
 
 template <bool C, class D>
@@ -130,15 +129,18 @@ void basic_relations_helpers<C, D>::for_each_sub_entity_recursive(std::function<
 
 		for (auto& s : subs) {
 			auto handle = self.get_cosmos()[s];
-			callback(handle);
-			handle.for_each_sub_entity_recursive(callback);
+			
+			if (handle.alive()) {
+				callback(handle);
+				handle.for_each_sub_entity_recursive(callback);
+			}
 		}
 	}
 	{
 		auto& subs = relations().sub_entities_by_name;
 
 		for (auto& s : subs) {
-			auto handle = self.get_cosmos()[s];
+			auto handle = self.get_cosmos()[s.second];
 
 			if (handle.alive()) {
 				callback(handle);
@@ -157,7 +159,7 @@ D basic_relations_helpers<C, D>::get_parent() const {
 
 template <class D>
 void relations_helpers<false, D>::map_associated_entity(associated_entity_name n, entity_id p) const {
-	relations().associated_entities_by_name[int(n)] = p;
+	relations().associated_entities_by_name[n] = p;
 }
 
 template class basic_relations_helpers<false, basic_entity_handle<false>>;

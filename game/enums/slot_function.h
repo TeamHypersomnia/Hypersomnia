@@ -15,5 +15,7 @@ enum class slot_function {
 	SECONDARY_HAND,
 
 	SHOULDER_SLOT,
-	TORSO_ARMOR_SLOT
+	TORSO_ARMOR_SLOT,
+	
+	COUNT
 };

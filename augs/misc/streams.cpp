@@ -1,9 +1,29 @@
 #include "streams.h"
+#include "enum_associative_array.h"
 
 namespace augs {
 	void stream::read(char* data, size_t bytes) {
 		memcpy(data, buf.data() + pos, bytes);
 		pos += bytes;
+
+
+		enum class hja {
+			FIRST,
+			COUNT
+		};
+
+		struct omg {
+			int hhh;
+		};
+
+		enum_associative_array<hja, omg> abc;
+
+		for (auto& itt : abc) {
+			itt.first;
+			itt.second.hhh;
+		}
+		
+		abc[hja::FIRST].hhh;
 	}
 
 	bool stream::operator==(const stream& b) const {

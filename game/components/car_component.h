@@ -43,7 +43,6 @@ namespace components {
 
 		vec2 wheel_offset = vec2(200, 125);
 
-
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(

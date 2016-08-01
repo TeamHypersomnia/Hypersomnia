@@ -906,6 +906,9 @@
     <ClInclude Include="augs\gui\middlescrolling.h" />
     <ClInclude Include="augs\gui\rect_handle.h" />
     <ClInclude Include="augs\gui\rect_id.h" />
+    <ClInclude Include="augs\misc\enum_associative_array.h" />
+    <ClInclude Include="augs\misc\bit_stream.h" />
+    <ClInclude Include="augs\misc\constant_size_vector.h" />
     <ClInclude Include="augs\misc\delta.h" />
     <ClInclude Include="augs\misc\machine_entropy.h" />
     <ClInclude Include="augs\misc\pool_handlizer.h" />

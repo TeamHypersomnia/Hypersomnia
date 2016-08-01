@@ -100,7 +100,7 @@ attitude_type calculate_attitude(const_entity_handle targeter, const_entity_hand
 		}
 	}
 
-	if(targeter_attitude.specific_hostile_entities.find(target) != targeter_attitude.specific_hostile_entities.end()) {
+	if(found_in(targeter_attitude.specific_hostile_entities, target)) {
 		return attitude_type::WANTS_TO_KILL;
 	}
 

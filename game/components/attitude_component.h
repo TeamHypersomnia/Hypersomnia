@@ -3,11 +3,14 @@
 #include "game/transcendental/entity_id.h"
 #include "game/enums/attitude_type.h"
 
+#include "game/container_sizes.h"
+#include "augs/misc/constant_size_vector.h"
+
 namespace components {
 	struct attitude {
 		unsigned parties = 0;
 		unsigned hostile_parties = 0;
-		std::set<entity_id> specific_hostile_entities;
+		augs::constant_size_vector<entity_id, SPECIFIC_HOSTILE_ENTITIES_COUNT> specific_hostile_entities;
 		
 		entity_id currently_attacked_visible_entity;
 		attitude_type target_attitude = attitude_type::NEUTRAL;

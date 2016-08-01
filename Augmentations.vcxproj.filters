@@ -3062,5 +3062,14 @@
     <ClInclude Include="game\container_sizes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="augs\misc\bit_stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\constant_size_vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="augs\misc\enum_associative_array.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

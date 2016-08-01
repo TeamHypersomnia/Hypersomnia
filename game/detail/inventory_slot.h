@@ -4,8 +4,10 @@
 #include "game/components/transform_component.h"
 #include "augs/math/rects.h"
 
-class cosmos;
+#include "augs/misc/constant_size_vector.h"
+#include "game/container_sizes.h"
 
+class cosmos;
 
 struct inventory_slot {
 	bool items_need_mounting = false;
@@ -31,7 +33,7 @@ struct inventory_slot {
 	augs::rects::sticking attachment_sticking_mode = augs::rects::sticking::LEFT;
 	components::transform attachment_offset;
 
-	std::vector<entity_id> items_inside;
+	augs::constant_size_vector<entity_id, ITEMS_INSIDE_COUNT> items_inside;
 
 	bool has_unlimited_space() const;
 	bool is_category_compatible_with(const_entity_handle item) const;

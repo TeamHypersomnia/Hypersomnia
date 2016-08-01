@@ -39,7 +39,7 @@ typename basic_inventory_slot_handle<C> basic_inventory_slot_handle<C>::make_han
 
 template <bool C>
 typename basic_inventory_slot_handle<C>::slot_pointer basic_inventory_slot_handle<C>::operator->() const {
-	return &get_handle().get<components::container>().slots.at(raw_id.type);
+	return &get_handle().get<components::container>().slots[raw_id.type];
 }
 
 template <bool C>

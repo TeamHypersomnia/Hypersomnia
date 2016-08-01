@@ -250,3 +250,5 @@ struct has_type<T, std::tuple<T, Ts...>> : std::true_type {};
 
 template <typename T, typename Tuple>
 using tuple_contains_type = typename has_type<T, Tuple>::type;
+
+#define ENABLE_IF(x) bool _dummy_flag = x, class = std::enable_if_t<_dummy_flag>
