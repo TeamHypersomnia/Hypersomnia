@@ -1,7 +1,7 @@
 #pragma once
-#include <unordered_map>
-#include <vector>
+#include <array>
 #include <EASTL/fixed_vector.h>
+
 #include "game/transcendental/entity_id.h"
 
 #include "game/enums/sub_entity_name.h"
@@ -10,8 +10,8 @@
 #include "game/container_sizes.h"
 
 struct entity_relations {
-	std::unordered_map<sub_entity_name, entity_id> sub_entities_by_name;
-	std::unordered_map<associated_entity_name, entity_id> associated_entities_by_name;
+	std::array<entity_id, int(sub_entity_name::COUNT)> sub_entities_by_name;
+	std::array<entity_id, int(associated_entity_name::COUNT)> associated_entities_by_name;
 
 	eastl::fixed_vector<entity_id, SUB_ENTITIES_COUNT> sub_entities;
 

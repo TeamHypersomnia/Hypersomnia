@@ -156,6 +156,10 @@ entity_handle cosmos::create_entity(std::string debug_name) {
 
 entity_handle cosmos::clone_entity(entity_id e) {
 	const_entity_handle copied_entity = get_handle(e);
+	
+	if (copied_entity.dead())
+		return get_handle(entity_id());
+
 	auto new_entity = get_handle(clone_aggregate(copied_entity));
 
 	new_entity.make_cloned_sub_entities_recursive(e);
