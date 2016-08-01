@@ -69,10 +69,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\EASTL\test\packages\EABase\include\Common;$(AUGMENTATIONS)\3rdparty\EASTL\include;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(AUGMENTATIONS);$(AUGMENTATIONS)\augs;$(AUGMENTATIONS)\3rdparty;$(AUGMENTATIONS)\3rdparty\googletest\googletest\include;$(AUGMENTATIONS)\3rdparty\googletest\googletest;$(AUGMENTATIONS)\3rdparty\freetype;$(AUGMENTATIONS)\3rdparty\RakNet\Source;$(AUGMENTATIONS)\3rdparty\cereal\include;$(AUGMENTATIONS)\3rdparty\EASTL\test\packages\EABase\include\Common;$(AUGMENTATIONS)\3rdparty\EASTL\include;$(AUGMENTATIONS)\3rdparty\freetype\include;$(AUGMENTATIONS)\3rdparty\luabind-deboostified;$(AUGMENTATIONS)\3rdparty\lua\src;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
