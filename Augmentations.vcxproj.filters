@@ -984,7 +984,7 @@
     <ClCompile Include="augs\misc\streams.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="augs\misc\bits_stream.cpp">
+    <ClCompile Include="augs\misc\bit_stream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

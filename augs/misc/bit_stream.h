@@ -3,7 +3,7 @@
 #include "streams.h"
 
 namespace augs {
-	class bits_stream : public stream_position {
+	class bit_stream : public stream_position {
 	public:
 		std::vector<bool> buf;
 

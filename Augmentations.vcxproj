@@ -289,7 +289,7 @@
     <ClCompile Include="augs\gui\formatted_text.cpp" />
     <ClCompile Include="augs\gui\middlescrolling.cpp" />
     <ClCompile Include="augs\gui\rect_handle.cpp" />
-    <ClCompile Include="augs\misc\bits_stream.cpp" />
+    <ClCompile Include="augs\misc\bit_stream.cpp" />
     <ClCompile Include="augs\misc\machine_entropy.cpp" />
     <ClCompile Include="augs\misc\pool_id.cpp" />
     <ClCompile Include="augs\misc\streams.cpp" />

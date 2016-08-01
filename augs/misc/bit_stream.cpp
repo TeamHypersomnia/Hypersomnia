@@ -1,7 +1,7 @@
-#include "bits_stream.h"
+#include "bit_stream.h"
 
 namespace augs {
-	void bits_stream::read_variable_length_index(unsigned short& idx) {
+	void bit_stream::read_variable_length_index(unsigned short& idx) {
 		std::bitset<4> index_bitcount;
 		read(index_bitcount);
 
@@ -13,7 +13,7 @@ namespace augs {
 		idx = decoded_index.to_ulong();
 	}
 
-	void bits_stream::write_variable_length_index(unsigned short idx) {
+	void bit_stream::write_variable_length_index(unsigned short idx) {
 		if (idx == 0) {
 			write(std::bitset<4>());
 			return;
