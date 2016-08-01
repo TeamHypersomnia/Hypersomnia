@@ -20,7 +20,7 @@ textual_description description_of_entity(const_entity_handle id) {
 	auto result = description_by_entity_name(name.id);
 
 	if(name.custom_nickname)
-		result.name = name.nickname;
+		result.name = name.get_nickname();
 
 	return result;
 }

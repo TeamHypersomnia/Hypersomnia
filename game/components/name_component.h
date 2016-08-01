@@ -1,4 +1,7 @@
 #pragma once
+#include "game/container_sizes.h"
+#include "augs/misc/constant_size_vector.h"
+
 #include "game/enums/entity_name.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
@@ -8,8 +11,11 @@ namespace components {
 		entity_name id;
 
 		bool custom_nickname = false;
-		std::wstring nickname;
+		augs::constant_size_vector<wchar_t, NICKNAME_LENGTH> nickname;
 
+		std::wstring get_nickname() const;
+		void set_nickname(std::wstring);
+		
 		template <class Archive>
 		void serialize(Archive& ar) {
 			ar(

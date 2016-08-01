@@ -2,6 +2,16 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
+namespace components {
+	std::wstring name::get_nickname() const {
+		return { nickname.begin(), nickname.end() };
+	}
+
+	void name::set_nickname(std::wstring s) {
+		nickname.assign(s.begin(), s.end());
+	}
+}
+
 void name_entity(entity_handle id, entity_name n) {
 	components::name name;
 	name.id = n;
@@ -12,7 +22,7 @@ void name_entity(entity_handle id, entity_name n, std::wstring nick) {
 	components::name name;
 	name.id = n;
 	name.custom_nickname = true;
-	name.nickname = nick;
+	name.set_nickname(nick);
 	id.set(name);
 }
 
