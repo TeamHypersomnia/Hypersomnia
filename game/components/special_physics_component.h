@@ -8,7 +8,23 @@
 namespace components {
 	struct special_physics {
 		entity_id owner_friction_ground;
-		augs::constant_size_vector<entity_id, OWNER_FRICTION_GROUNDS_COUNT> owner_friction_grounds;
+
+		struct friction_connection {
+			friction_connection(entity_id t = entity_id()) : target(t) {}
+			entity_id target;
+
+			bool operator==(entity_id b) const {
+				return target == b;
+			}
+
+			operator entity_id() const {
+				return target;
+			}
+
+			unsigned fixtures_connected = 0;
+		};
+
+		augs::constant_size_vector<friction_connection, OWNER_FRICTION_GROUNDS_COUNT> owner_friction_grounds;
 
 		augs::stepped_timeout since_dropped;
 

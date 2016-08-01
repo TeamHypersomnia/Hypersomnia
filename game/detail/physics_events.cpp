@@ -91,7 +91,24 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 				}
 
 				if (found_suitable) {
-					collider_physics.owner_friction_grounds.push_back(subject_fixtures.get_owner_body());
+					auto new_owner = subject_fixtures.get_owner_body().get_id();
+					auto& grounds = collider_physics.owner_friction_grounds;
+					
+					components::special_physics::friction_connection connection(new_owner);
+					connection.fixtures_connected = 1;
+
+					if (found_in(grounds, new_owner)) {
+						auto found = find_in(grounds, new_owner);
+						LOG("Incr: %x", new_owner);
+
+						connection.fixtures_connected = (*found).fixtures_connected + 1;
+						grounds.erase(found);
+					}
+					else
+						LOG("Reg: %x", new_owner);
+					
+					grounds.push_back(connection);
+
 					sys.rechoose_owner_friction_body(collider_fixtures.get_owner_body());
 				}
 			}
@@ -140,10 +157,21 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 #endif
 			{
 				for (auto it = collider_physics.owner_friction_grounds.begin(); it != collider_physics.owner_friction_grounds.end(); ++it)
-					if (*it == subject_fixtures.get_owner_body())
+					if ((*it).target == subject_fixtures.get_owner_body())
 					{
-						collider_physics.owner_friction_grounds.erase(it);
-						sys.rechoose_owner_friction_body(collider_fixtures.get_owner_body());
+						auto& fixtures_connected = (*it).fixtures_connected;
+						ensure(fixtures_connected > 0);
+
+						--fixtures_connected;
+
+						if (fixtures_connected == 0) {
+							LOG("Unreg: %x", subject_fixtures.get_owner_body().get_id());
+							collider_physics.owner_friction_grounds.erase(it);
+							sys.rechoose_owner_friction_body(collider_fixtures.get_owner_body());
+						}
+						else
+							LOG("Decr: %x", subject_fixtures.get_owner_body().get_id());
+
 						break;
 					}
 			}
@@ -197,7 +225,7 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 			auto& collider_physics = collider_fixtures.get_owner_body().get<components::special_physics>();
 
 			for (auto it = collider_physics.owner_friction_grounds.begin(); it != collider_physics.owner_friction_grounds.end(); ++it)
-				if (*it == subject_fixtures.get_owner_body())
+				if ((*it).target == subject_fixtures.get_owner_body())
 				{
 					contact->SetEnabled(false);
 					return;

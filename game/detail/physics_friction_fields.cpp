@@ -10,19 +10,19 @@ void physics_system::rechoose_owner_friction_body(entity_handle entity) {
 	auto& cosmos = entity.get_cosmos();
 	// purge of dead entities
 
-	physics.owner_friction_grounds.erase(std::remove_if(physics.owner_friction_grounds.begin(), physics.owner_friction_grounds.end(), [&cosmos](entity_id subject) {
+	erase_remove(physics.owner_friction_grounds, [&cosmos](entity_id subject) {
 		return cosmos[subject].dead();
-	}), physics.owner_friction_grounds.end());
+	});
 
 	auto feasible_grounds = physics.owner_friction_grounds;
 
 	if (!feasible_grounds.empty()) {
 		// cycle guard
-		// remove friction grounds whom do I own myself
+		// remove friction grounds whom I do own myself
 
-		feasible_grounds.erase(std::remove_if(feasible_grounds.begin(), feasible_grounds.end(), [this, entity, &cosmos](entity_id subject) {
+		erase_remove(feasible_grounds, [this, entity, &cosmos](entity_id subject) {
 			return are_connected_by_friction(cosmos[subject], entity);
-		}), feasible_grounds.end());
+		});
 	}
 
 	if (!feasible_grounds.empty()) {

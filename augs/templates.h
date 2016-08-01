@@ -39,6 +39,11 @@ template<class Container, class T>
 bool found_in(Container& v, const T& l) {
 	return std::find(v.begin(), v.end(), l) != v.end();
 }
+
+template<class Container, class T>
+auto find_in(Container& v, const T& l) {
+	return std::find(v.begin(), v.end(), l);
+}
 /* number to string conversion */
 
 template <class T>
