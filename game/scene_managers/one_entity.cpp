@@ -70,9 +70,9 @@ namespace scene_managers {
 		auto car3 = prefabs::create_car(world, components::transform(-1300, -600, -90));
 		auto motorcycle = prefabs::create_motorcycle(world, components::transform(0, -600, -90));
 
-		name_entity(world[new_characters[0]], entity_name::PERSON, L"Attacker");
+		name_entity(new_characters[0], entity_name::PERSON, L"Attacker");
 
-		ingredients::inject_window_input_to_character(world[new_characters[current_character]], camera);
+		ingredients::inject_window_input_to_character(new_characters[current_character], camera);
 
 
 		prefabs::create_sample_suppressor(world, vec2(300, -500));

@@ -25,18 +25,18 @@ class index_in_pack {
 	static const size_t value = index_in_tuple<T, std::tuple<Types...>>::value;
 };
 
-template<class T, class L>
-void erase_remove(std::vector<T>& v, const L& l) {
+template<class Container, class T>
+void erase_remove(Container& v, const T& l) {
 	v.erase(std::remove_if(v.begin(), v.end(), l), v.end());
 }
 
-template<class T>
-void remove_element(std::vector<T>& v, const T& l) {
+template<class Container, class T>
+void remove_element(Container& v, const T& l) {
 	v.erase(std::remove(v.begin(), v.end(), l), v.end());
 }
 
-template<class T>
-bool found_in(std::vector<T>& v, const T& l) {
+template<class Container, class T>
+bool found_in(Container& v, const T& l) {
 	return std::find(v.begin(), v.end(), l) != v.end();
 }
 /* number to string conversion */

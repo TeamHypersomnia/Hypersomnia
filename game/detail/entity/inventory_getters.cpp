@@ -84,7 +84,7 @@ typename inventory_getters<C, D>::inventory_slot_handle_type inventory_getters<C
 
 	auto hidden_slot = item_entity.determine_hand_holstering_slot_in(searched_root_container);;
 
-	if (cosmos[hidden_slot].alive())
+	if (hidden_slot.alive())
 		return hidden_slot;
 
 	if (searched_root_container[slot_function::PRIMARY_HAND].can_contain(item_entity))

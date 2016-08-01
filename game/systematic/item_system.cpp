@@ -91,8 +91,8 @@ void item_system::handle_throw_item_intents(fixed_step& step) {
 			if (subject.find<components::item_slot_transfers>()) {
 				auto hand = subject.map_primary_action_to_secondary_hand_if_primary_empty(intent_type::THROW_SECONDARY_ITEM == r.intent);
 
-				if (cosmos[hand].has_items()) {
-					perform_transfer({ cosmos[hand].get_items_inside()[0], cosmos[inventory_slot_id()] }, step);
+				if (hand.has_items()) {
+					perform_transfer({ hand.get_items_inside()[0], cosmos[inventory_slot_id()] }, step);
 				}
 			}
 		}

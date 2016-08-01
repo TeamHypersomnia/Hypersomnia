@@ -34,7 +34,7 @@ void driver_system::assign_drivers_from_successful_trigger_hits(fixed_step& step
 		if (subject_car.dead())
 			continue;
 
-		auto* maybe_car = cosmos[subject_car].find<components::car>();
+		auto* maybe_car = subject_car.find<components::car>();
 
 		if (maybe_car && e.trigger == maybe_car->left_wheel_trigger)
 			assign_car_ownership(cosmos[e.detector_body], subject_car);

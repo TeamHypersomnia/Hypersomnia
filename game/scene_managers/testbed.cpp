@@ -111,9 +111,9 @@ namespace scene_managers {
 			}
 		}
 
-		name_entity(world[new_characters[0]], entity_name::PERSON, L"Attacker");
+		name_entity(new_characters[0], entity_name::PERSON, L"Attacker");
 
-		inject_input_to(world[new_characters[current_character]]);
+		inject_input_to(new_characters[current_character]);
 
 		prefabs::create_sample_suppressor(world, vec2(300, -500));
 

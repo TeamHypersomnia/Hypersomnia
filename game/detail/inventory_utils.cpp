@@ -233,7 +233,7 @@ void perform_transfer(item_slot_transfer_request r, fixed_step& step) {
 		return;
 	}
 	else if (result.result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-		bool is_pickup_or_transfer = cosmos[r.target_slot].alive();
+		bool is_pickup_or_transfer = r.target_slot.alive();
 		bool is_drop_request = !is_pickup_or_transfer;
 
 		components::transform previous_container_transform;
@@ -242,7 +242,7 @@ void perform_transfer(item_slot_transfer_request r, fixed_step& step) {
 
 		if (is_pickup_or_transfer) {
 			for (auto& i : cosmos.get_handle(r.target_slot)->items_inside) {
-				if (can_merge_entities(cosmos[r.item], cosmos[i])) {
+				if (can_merge_entities(r.item, cosmos[i])) {
 					target_item_to_stack_with = i;
 				}
 			}
