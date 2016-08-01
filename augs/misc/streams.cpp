@@ -66,11 +66,9 @@ namespace augs {
 
 		bool non_zero = _BitScanReverse(&index, mask);
 
-		if (non_zero) {
-			const unsigned bits_needed = index + 1;
-			
-			write(std::bitset<4>(bits_needed));
-			write(std::bitset<16>(idx), bits_needed);
-		}
+		const unsigned bits_needed = index + 1;
+		
+		write(std::bitset<4>(bits_needed));
+		write(std::bitset<16>(idx), bits_needed);
 	}
 }
