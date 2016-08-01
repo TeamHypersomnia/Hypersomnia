@@ -58,7 +58,7 @@ void item_system::handle_trigger_confirmations_as_pick_requests(fixed_step& step
 			bool found_on_subscription_list = pick_list.find(item_entity) != pick_list.end();
 
 			bool item_subscribed = (pick_list.empty() && item_slot_transfers->pick_all_touched_items_if_list_to_pick_empty)
-				|| item_slot_transfers->only_pick_these_items.find(item_entity) != item_slot_transfers->only_pick_these_items.end();
+				|| found_in(item_slot_transfers->only_pick_these_items, item_entity);
 			
 			if (item_subscribed) {
 				item_slot_transfer_request request(item_entity, item_entity.determine_pickup_target_slot_in(detector));

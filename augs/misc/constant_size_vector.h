@@ -13,6 +13,7 @@ namespace augs  {
 		typedef typename arr_type::const_iterator const_iterator;
 
 		void push_back(const T& obj) {
+			ensure(count < capacity());
 			raw[count++] = obj;
 		}
 
@@ -33,18 +34,21 @@ namespace augs  {
 		}
 
 		iterator erase(iterator first, iterator last) {
+			ensure(last >= first && first >= begin() && last <= end());
 			std::copy(last, end(), first);
 			resize(size() - (last - first));
 			return first;
 		}
 
 		iterator erase(iterator position) {
+			ensure(position >= begin() && position <= end());
 			std::copy(position + 1, end(), position);
 			resize(size() - 1);
 			return position;
 		}
 
 		void resize(size_t s) {
+			ensure(s <= capacity());
 			int diff = s;
 			diff -= size();
 
@@ -79,6 +83,7 @@ namespace augs  {
 		}
 
 		void pop_back() {
+			ensure(count > 0);
 			raw[count-1] = T();
 			--count;
 		}

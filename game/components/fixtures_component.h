@@ -11,6 +11,9 @@
 #include "game/detail/convex_partitioned_shape.h"
 #include <Box2D/Dynamics/b2Fixture.h>
 
+#include "augs/misc/constant_size_vector.h"
+#include "game/container_sizes.h"
+
 class physics_system;
 struct colliders_cache;
 

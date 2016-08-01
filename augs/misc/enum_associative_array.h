@@ -51,6 +51,7 @@ namespace augs {
 			}
 
 			ref_type operator*() const {
+				ensure(idx < ptr->capacity());
 				return { Enum(idx), ptr->raw[idx] };
 			}
 		};
@@ -83,6 +84,7 @@ namespace augs {
 
 		iterator find(Enum enum_idx) {
 			size_t i = size_t(enum_idx);
+			ensure(i < capacity());
 
 			if (is_set[i])
 				return iterator(this, i);
@@ -92,6 +94,7 @@ namespace augs {
 
 		const_iterator find(Enum enum_idx) const {
 			size_t i = size_t(enum_idx);
+			ensure(i < capacity());
 
 			if (is_set[i])
 				return const_iterator(this, i);
@@ -101,13 +104,13 @@ namespace augs {
 
 		T& at(Enum enum_idx) {
 			size_t i = size_t(enum_idx);
-			ensure(is_set[i]);
+			ensure(i < capacity() && is_set[i]);
 			return raw[i];
 		}
 
 		const T& at(Enum enum_idx) const {
 			size_t i = size_t(enum_idx);
-			ensure(is_set[i]);
+			ensure(i < capacity() && is_set[i]);
 			return raw[i];
 		}
 
@@ -123,6 +126,10 @@ namespace augs {
 
 		const T& operator[](Enum enum_idx) const {
 			return at(enum_idx);
+		}
+
+		size_t capacity() const {
+			return raw.size();
 		}
 
 		void clear() {
