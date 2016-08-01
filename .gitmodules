@@ -17,6 +17,3 @@
 	path = 3rdparty/cereal
 	url = https://github.com/TeamHypersomnia/cereal.git
 	branch = master
-[submodule "3rdparty/EASTL"]
-	path = 3rdparty/EASTL
-	url = https://github.com/electronicarts/EASTL.git
